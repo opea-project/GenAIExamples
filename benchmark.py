@@ -99,7 +99,7 @@ def _create_yaml_content(service, base_url, bench_target, test_phase, num_querie
     """Create content for the run.yaml file."""
 
     # calculate the number of concurrent users
-    concurrent_level = int ( num_queries // concurrency )
+    concurrent_level = int(num_queries // concurrency)
 
     import importlib.util
 
@@ -131,7 +131,7 @@ def _create_yaml_content(service, base_url, bench_target, test_phase, num_querie
                 "locustfile": os.path.join(eval_path, "evals/benchmark/stresscli/locust/aistress.py"),
                 "host": base_url,
                 "stop-timeout": test_params["query_timeout"],
-                "processes": 2, # set to 2 by default
+                "processes": 2,  # set to 2 by default
                 "namespace": test_params["namespace"],
                 "bench-target": bench_target,
                 "service-metric-collect": test_params["collect_service_metric"],
@@ -165,7 +165,9 @@ def _create_stresscli_confs(case_params, test_params, test_phase, num_queries, b
         print(f"[OPEA BENCHMARK] 🚀 Running test for {b_target} in phase {test_phase} for {num_queries} queries")
         stresscli_conf["envs"] = {"DATASET": test_params["dataset"][i], "MAX_LINES": str(test_params["prompt"][i])}
         # Generate the content of stresscli configuration file
-        stresscli_yaml = _create_yaml_content(case_params, base_url, b_target, test_phase, num_queries, test_params, concurrency)
+        stresscli_yaml = _create_yaml_content(
+            case_params, base_url, b_target, test_phase, num_queries, test_params, concurrency
+        )
 
         # Dump the stresscli configuration file
         service_name = case_params.get("service_name")
@@ -201,7 +203,15 @@ def create_stresscli_confs(service, base_url, test_suite_config, index):
             concurrency_list = test_suite_config["concurrency"]
             user_query *= test_suite_config["node_num"]
             stresscli_confs.extend(
-                _create_stresscli_confs(service, test_suite_config, "benchmark", user_query, base_url, index, concurrency=concurrency_list[i])
+                _create_stresscli_confs(
+                    service,
+                    test_suite_config,
+                    "benchmark",
+                    user_query,
+                    base_url,
+                    index,
+                    concurrency=concurrency_list[i],
+                )
             )
 
     return stresscli_confs
@@ -327,8 +337,8 @@ def _run_service_test(example, service, test_suite_config, namespace):
 
 
 def run_benchmark(benchmark_config, chart_name, namespace, node_num=1, llm_model=None, report=False):
-    """
-    Run the benchmark test for the specified helm chart and configuration.
+    """Run the benchmark test for the specified helm chart and configuration.
+
     Args:
         benchmark_config (dict): The benchmark configuration.
         chart_name (str): The name of the helm chart.
