@@ -84,6 +84,12 @@ jobs:
                   run_test_cases="$run_test_cases $test_case"
               fi
           done
+          
+          set -x
+          if [ -z "$run_test_cases" ] && [[ $(printf '%s\n' "${changed_files[@]}" | grep ${{ inputs.example }} | grep /tests/) ]]; then
+              run_test_cases=$other_test_cases
+          fi
+          set +x
 
           test_cases=$(echo $run_test_cases | tr ' ' '\n' | sort -u | jq -R '.' | jq -sc '.')
           echo "test_cases=$test_cases"
