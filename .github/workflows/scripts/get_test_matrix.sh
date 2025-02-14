@@ -28,6 +28,9 @@ for example in ${examples}; do
     if [[ $(printf '%s\n' "${changed_files[@]}" | grep ${example} | cut -d'/' -f2 | grep -E '\.py|Dockerfile*|ui|docker_image_build' ) ]]; then
         # run test on all hardware if megaservice or ui code change
         run_hardware=$hardware_list
+    elif [[ $(printf '%s\n' "${changed_files[@]}" | grep ${example} | grep 'tests' | grep -vE '^test_|^_test' ) ]]; then
+        # run test on all hardware if common test scripts change
+        run_hardware=$hardware_list
     else
         for hardware in ${hardware_list}; do
             if [[ $(printf '%s\n' "${changed_files[@]}" | grep ${example} | grep -c ${hardware}) != 0 ]]; then
