@@ -121,19 +121,19 @@ function validate_microservices() {
 
     # test /v1/dataprep/delete
     validate_service \
-       "http://${ip_address}:6007/v1/dataprep/delete" \
+       "http://${ip_address}:11101/v1/dataprep/delete" \
        '{"status":true}' \
         "dataprep_del" \
-        "dataprep-pinecone-server"
+        "dataprep-milvus-server"
 
 
     # test /v1/dataprep/ingest upload file
     echo "Deep learning is a subset of machine learning that utilizes neural networks with multiple layers to analyze various levels of abstract data representations. It enables computers to identify patterns and make decisions with minimal human intervention by learning from large amounts of data." > $LOG_PATH/dataprep_file.txt
     validate_service \
-       "http://${ip_address}:6007/v1/dataprep/ingest" \
+       "http://${ip_address}:11101/v1/dataprep/ingest" \
         "Data preparation succeeded" \
         "dataprep_upload_file" \
-        "dataprep-pinecone-server"
+        "dataprep-milvus-server"
 
 
     # retrieval microservice
@@ -142,7 +142,7 @@ function validate_microservices() {
         "${ip_address}:7000/v1/retrieval" \
         " " \
         "retrieval" \
-        "retriever-pinecone-server" \
+        "retriever-milvus-server" \
         "{\"text\":\"What is the revenue of Nike in 2023?\",\"embedding\":${test_embedding}}"
 
     # tei for rerank microservice
@@ -210,7 +210,7 @@ function stop_docker() {
     echo "In stop docker"
     echo $WORKPATH
     cd $WORKPATH/docker_compose/intel/cpu/xeon/
-    docker compose -f compose_pinecone.yaml down
+    docker compose -f compose_milvus.yaml down
 }
 
 function main() {
