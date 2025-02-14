@@ -26,11 +26,29 @@ RERANK_SERVICE_PORT = int(os.getenv("RERANK_SERVICE_PORT", 8000))
 LVM_SERVICE_HOST_IP = os.getenv("LVM_SERVICE_HOST_IP", "0.0.0.0")
 LVM_SERVICE_PORT = int(os.getenv("LVM_SERVICE_PORT", 9000))
 
+def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **kwargs):
+    if self.services[cur_node].service_type == ServiceType.RETRIEVER:
+        breakpoint()
+        # next_inputs = {"text": "test", "embedding": inputs["data"][0]["embedding"]}
+        return inputs
+    # else:
+    return inputs
+
+def align_outputs(self, data, cur_node, inputs, runtime_graph, llm_parameters_dict, **kwargs):
+    if self.services[cur_node].service_type == ServiceType.EMBEDDING:
+        # assert isinstance(data, list)
+        return {"text": inputs["input"], "embedding": data["data"][0]["embedding"]}
+    elif self.services[cur_node].service_type == ServiceType.RERANK:
+        return data
+    else:
+        return data
 
 class VideoQnAService:
     def __init__(self, host="0.0.0.0", port=8888):
         self.host = host
         self.port = port
+        ServiceOrchestrator.align_inputs = align_inputs
+        ServiceOrchestrator.align_outputs = align_outputs
         self.megaservice = ServiceOrchestrator()
         self.endpoint = str(MegaServiceEndpoint.VIDEO_RAG_QNA)
 
@@ -88,7 +106,7 @@ class VideoQnAService:
             stream=stream_opt,
         )
         result_dict, runtime_graph = await self.megaservice.schedule(
-            initial_inputs={"text": prompt}, llm_parameters=parameters
+            initial_inputs={"input": prompt}, llm_parameters=parameters
         )
         for node, response in result_dict.items():
             # Here it suppose the last microservice in the megaservice is LVM.

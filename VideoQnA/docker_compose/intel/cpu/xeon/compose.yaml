@@ -32,7 +32,7 @@ services:
     image: ${REGISTRY:-opea}/embedding:${TAG:-latest}
     container_name: clip-embedding-server
     ports:
-      - "6000:5000"
+      - "6000:6000"
     ipc: host
     environment:
       no_proxy: ${no_proxy}
@@ -60,6 +60,7 @@ services:
       VDMS_USE_CLIP: ${USECLIP}
       LOGFLAG: ${LOGFLAG}
       RETRIEVER_COMPONENT_NAME: "OPEA_RETRIEVER_VDMS"
+      NUMBA_CACHE_DIR: "/tmp/numba_cache"
     restart: unless-stopped
     volumes:
       - /home/$USER/.cache/huggingface/hub:/home/user/.cache/huggingface/hub
@@ -76,6 +77,7 @@ services:
       CHUNK_DURATION: ${CHUNK_DURATION}
       FILE_SERVER_ENDPOINT: ${DATAPREP_GET_FILE_ENDPOINT}
       DATAPREP_GET_VIDEO_LIST_ENDPOINT: ${DATAPREP_GET_VIDEO_LIST_ENDPOINT}
+      RERANK_COMPONENT_NAME: ${RERANK_COMPONENT_NAME:-OPEA_VIDEO_RERANKING}
     restart: unless-stopped
   lvm-video-llama:
     image: ${REGISTRY:-opea}/lvm-video-llama:${TAG:-latest}
@@ -95,7 +97,7 @@ services:
     image: ${REGISTRY:-opea}/lvm:${TAG:-latest}
     container_name: lvm
     ports:
-      - "9000:9000"
+      - "9000:9399"
     ipc: host
     environment:
       http_proxy: ${http_proxy}
