@@ -54,8 +54,8 @@ function start_services() {
 
     n=0
     until [[ "$n" -ge 100 ]]; do
-        docker logs tgi-service > ${LOG_PATH}/tgi_service_start.log
-        if grep -q Connected ${LOG_PATH}/tgi_service_start.log; then
+        docker logs vllm-service > ${LOG_PATH}/vllm_service_start.log
+        if grep -q Connected ${LOG_PATH}/vllm_service_start.log; then
             break
         fi
         sleep 5s
