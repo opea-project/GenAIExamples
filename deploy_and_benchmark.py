@@ -283,6 +283,7 @@ def main(yaml_file, target_node=None, test_mode="oob"):
                             benchmark_config=benchmark_config,
                             chart_name=chart_name,
                             namespace=namespace,
+                            node_num=node,
                             llm_model=deploy_config.get("services", {}).get("llm", {}).get("model_id", ""),
                         )
 
