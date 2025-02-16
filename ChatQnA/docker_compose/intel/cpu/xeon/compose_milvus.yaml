@@ -81,7 +81,7 @@ services:
       LOGFLAG: ${LOGFLAG}
     restart: unless-stopped
 
-  retriever:
+  retriever-milvus-service:
     image: ${REGISTRY:-opea}/retriever:${TAG:-latest}
     container_name: retriever-milvus-server
     depends_on:
@@ -161,7 +161,7 @@ services:
       - milvus-standalone
       - tei-embedding-service
       - dataprep-milvus-service
-      - retriever
+      - retriever-milvus-service
       - tei-reranking-service
       - vllm-service
     ports:
@@ -172,7 +172,7 @@ services:
       - http_proxy=${http_proxy}
       - MEGA_SERVICE_HOST_IP=chatqna-xeon-backend-server
       - EMBEDDING_SERVER_HOST_IP=tei-embedding-service
-      - RETRIEVER_SERVICE_HOST_IP=retriever
+      - RETRIEVER_SERVICE_HOST_IP=retriever-milvus-service
       - RERANK_SERVER_HOST_IP=tei-reranking-service
       - LLM_SERVER_HOST_IP=vllm-service
       - LLM_MODEL=${LLM_MODEL_ID}
