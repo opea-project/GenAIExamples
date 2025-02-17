@@ -26,7 +26,10 @@ for example in ${examples}; do
 
     run_hardware=""
     if [[ $(printf '%s\n' "${changed_files[@]}" | grep ${example} | cut -d'/' -f2 | grep -E '\.py|Dockerfile*|ui|docker_image_build' ) ]]; then
-        # run test on all hardware if megaservice or ui code change
+        echo "run test on all hardware if megaservice or ui code change..."
+        run_hardware=$hardware_list
+    elif [[ $(printf '%s\n' "${changed_files[@]}" | grep ${example} | grep 'tests'| cut -d'/' -f3 | grep -vE '^test_|^_test' ) ]]; then
+        echo "run test on all hardware if common test scripts change..."
         run_hardware=$hardware_list
     else
         for hardware in ${hardware_list}; do
