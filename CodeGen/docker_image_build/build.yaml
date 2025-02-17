@@ -29,7 +29,7 @@ services:
       dockerfile: comps/llms/src/text-generation/Dockerfile
     extends: codegen
     image: ${REGISTRY:-opea}/llm-textgen:${TAG:-latest}
-  vllm_rocm:
+  vllm-rocm:
     build:
       args:
         http_proxy: ${http_proxy}
