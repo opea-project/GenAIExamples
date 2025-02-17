@@ -74,8 +74,13 @@ jobs:
           cd ${{ github.workspace }}/${{ inputs.example }}/docker_image_build
           docker_compose_path=${{ github.workspace }}/${{ inputs.example }}/docker_image_build/build.yaml
           if [[ $(grep -c "vllm:" ${docker_compose_path}) != 0 ]]; then
-              git clone --depth 1 https://github.com/vllm-project/vllm.git
-              cd vllm && git rev-parse HEAD && cd ../
+              git clone https://github.com/vllm-project/vllm.git  && cd vllm
+              # Get the latest tag
+              VLLM_VER="$(git describe --tags "$(git rev-list --tags --max-count=1)" )"
+              echo "Check out vLLM tag ${VLLM_VER}"
+              git checkout ${VLLM_VER} &> /dev/null
+              # make sure do not change the pwd
+              git rev-parse HEAD && cd ../
           fi
           if [[ $(grep -c "vllm-gaudi:" ${docker_compose_path}) != 0 ]]; then
               git clone --depth 1 --branch v0.6.4.post2+Gaudi-1.19.0 https://github.com/HabanaAI/vllm-fork.git
