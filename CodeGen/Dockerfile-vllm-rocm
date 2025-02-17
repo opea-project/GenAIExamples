@@ -14,6 +14,7 @@ WORKDIR /workspace
 
 # Copy the entrypoints files into the image
 COPY --from=builder /workspace/vllm /workspace
+COPY --from=builder /workspace/vllm/vllm/entrypoints/openai/api_server.py /workspace
 
 # Expose the port used by the API server
 EXPOSE 8011
@@ -24,4 +25,4 @@ ENV VLLM_USE_TRITON_FLASH_ATTENTION=0
 ENV PYTORCH_JIT=0
 
 # Set the entrypoint to the api_server.py script
-ENTRYPOINT ["python3", "/workspace/vllm/entrypoints/openai/api_server.py"]
+ENTRYPOINT ["python3", "/workspace/api_server.py"]
