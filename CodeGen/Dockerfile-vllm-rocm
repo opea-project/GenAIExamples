@@ -7,7 +7,7 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /workspace
 RUN git clone https://github.com/vllm-project/vllm.git && cd vllm && git checkout v0.6.6
 
-FROM rocm/vllm-dev:main
+FROM rocm/vllm:rocm6.3.1_mi300_ubuntu22.04_py3.12_vllm_0.6.6
 
 # Set the working directory
 WORKDIR /workspace
