@@ -13,7 +13,7 @@
 // limitations under the License.
 
 export interface Language {
-  name: string;
+	name: string;
 }
 
 /**
