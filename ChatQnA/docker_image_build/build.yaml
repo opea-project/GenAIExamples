@@ -71,7 +71,7 @@ services:
       dockerfile: comps/guardrails/src/guardrails/Dockerfile
     extends: chatqna
     image: ${REGISTRY:-opea}/guardrails:${TAG:-latest}
-  vllm_rocm:
+  vllm-rocm:
     build:
       args:
         http_proxy: ${http_proxy}
