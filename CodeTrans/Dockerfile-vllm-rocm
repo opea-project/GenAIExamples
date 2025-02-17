@@ -11,7 +11,7 @@ EXPOSE 8011
 
 # Set environment variables
 ENV HUGGINGFACE_HUB_CACHE=/workspace
-ENV WILM_USE_TRITON_FLASH_ATTENTION=0
+ENV VLLM_USE_TRITON_FLASH_ATTENTION=0
 ENV PYTORCH_JIT=0
 
 # Set the entrypoint to the api_server.py script
