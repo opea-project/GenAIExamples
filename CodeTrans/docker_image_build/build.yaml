@@ -29,7 +29,7 @@ services:
       dockerfile: comps/third_parties/nginx/src/Dockerfile
     extends: codetrans
     image: ${REGISTRY:-opea}/nginx:${TAG:-latest}
-  vllm_rocm:
+  vllm-rocm:
     build:
       args:
         http_proxy: ${http_proxy}

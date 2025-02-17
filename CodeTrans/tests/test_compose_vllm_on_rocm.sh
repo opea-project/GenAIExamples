@@ -32,7 +32,7 @@ function build_docker_images() {
     git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="vllm_rocm llm-textgen codetrans codetrans-ui nginx"
+    service_list="vllm-rocm llm-textgen codetrans codetrans-ui nginx"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker images && sleep 1s
