@@ -29,7 +29,12 @@ function build_docker_images() {
 
     cd $WORKPATH/docker_image_build
     git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
-    git clone --depth 1 https://github.com/vllm-project/vllm.git
+    git clone https://github.com/vllm-project/vllm.git && cd vllm
+    VLLM_VER="$(git describe --tags "$(git rev-list --tags --max-count=1)" )"
+    echo "Check out vLLM tag ${VLLM_VER}"
+    git checkout ${VLLM_VER} &> /dev/null
+    # Not change the pwd
+    cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
     service_list="chatqna chatqna-ui dataprep retriever vllm nginx"
