@@ -17,16 +17,16 @@ import { SSE } from "sse.js";
 const BASE_URL = env.BASE_URL;
 
 export async function fetchTextStream(query: string, langFrom, langTo) {
-  const payload = {
-    language_from: langFrom,
-    language_to: langTo,
-    source_code: query,
-  };
+	const payload = {
+		language_from: langFrom,
+		language_to: langTo,
+		source_code: query,
+	};
 
-  let url = `${BASE_URL}`;
+	let url = `${BASE_URL}`;
 
-  return new SSE(url, {
-    headers: { "Content-Type": "application/json" },
-    payload: JSON.stringify(payload),
-  });
+	return new SSE(url, {
+		headers: { "Content-Type": "application/json" },
+		payload: JSON.stringify(payload),
+	});
 }
