@@ -336,7 +336,7 @@ def _run_service_test(example, service, test_suite_config, namespace):
     return output_folders
 
 
-def run_benchmark(benchmark_config, chart_name, namespace, node_num=1, llm_model=None, report=False):
+def run_benchmark(benchmark_config, chart_name, namespace, node_num=1, llm_model=None, report=True):
     """Run the benchmark test for the specified helm chart and configuration.
 
     Args:
