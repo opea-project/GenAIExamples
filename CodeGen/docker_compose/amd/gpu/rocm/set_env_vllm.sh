@@ -5,6 +5,7 @@
 
 ### The IP address or domain name of the server on which the application is running
 export HOST_IP=''
+export EXTERNAL_HOST_IP=''
 
 ### The port of the vLLM service. On this port, the TGI service will accept connections
 export CODEGEN_VLLM_SERVICE_PORT=8028
@@ -26,7 +27,7 @@ export CODEGEN_MEGA_SERVICE_HOST_IP=${HOST_IP}
 export CODEGEN_BACKEND_SERVICE_PORT=18150
 
 ### The URL of CodeGen backend service, used by the frontend service
-export CODEGEN_BACKEND_SERVICE_URL="http://${HOST_IP}:${CODEGEN_BACKEND_SERVICE_PORT}/v1/codegen"
+export CODEGEN_BACKEND_SERVICE_URL="http://${EXTERNAL_HOST_IP}:${CODEGEN_BACKEND_SERVICE_PORT}/v1/codegen"
 
 ### The endpoint of the LLM service to which requests to this service will be sent
 export CODEGEN_LLM_SERVICE_HOST_IP=${HOST_IP}
