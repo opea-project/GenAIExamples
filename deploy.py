@@ -482,7 +482,7 @@ def read_deploy_config(config_path):
         return None
 
 
-def check_deployment_ready(release_name, namespace, timeout=300, interval=5, logfile="deployment.log"):
+def check_deployment_ready(release_name, namespace, timeout=1000, interval=5, logfile="deployment.log"):
     """Wait until all pods in the deployment are running and ready.
 
     Args:
