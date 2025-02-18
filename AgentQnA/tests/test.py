@@ -26,6 +26,7 @@ def process_request(url, query, is_stream=False):
         ret = f"An error occurred:{e}"
         return None
 
+
 def test_worker_agent(args):
     url = f"http://{args.ip_addr}:{args.ext_port}/v1/chat/completions"
     query = {"role": "user", "messages": args.prompt, "stream": "false"}
@@ -52,10 +53,9 @@ def test_chat_completion_multi_turn(args):
 
     # second turn
     print("===============Second turn==================")
-    user_message = "Give me a few examples of the artist's albumns?"
+    user_message = "Give me a few examples of the artist's albums?"
     add_message_and_run(url, user_message, thread_id, stream=args.stream)
     print("===============End of second turn==================")
-
 
 
 if __name__ == "__main__":
