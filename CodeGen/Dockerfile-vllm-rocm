@@ -1,3 +1,5 @@
+# Copyright (c) 2024 Advanced Micro Devices, Inc.
+
 FROM rocm/vllm:rocm6.3.1_mi300_ubuntu22.04_py3.12_vllm_0.6.6
 
 # Set the working directory

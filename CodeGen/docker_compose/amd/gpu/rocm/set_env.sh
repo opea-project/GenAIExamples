@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 # Copyright (C) 2024 Intel Corporation
+# Copyright (c) 2024 Advanced Micro Devices, Inc.
 # SPDX-License-Identifier: Apache-2.0
 
 ### The IP address or domain name of the server on which the application is running
