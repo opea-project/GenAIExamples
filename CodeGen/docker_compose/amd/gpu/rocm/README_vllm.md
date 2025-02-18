@@ -1,4 +1,4 @@
-### Copyright (c) 2024 Advanced Micro Devices, Inc.
+Copyright (c) 2024 Advanced Micro Devices, Inc.
 
 # Build and deploy CodeGen Application on AMD GPU (ROCm)
 
