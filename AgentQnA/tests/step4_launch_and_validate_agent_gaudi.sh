@@ -13,13 +13,13 @@ export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
 HF_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
 model="meta-llama/Llama-3.3-70B-Instruct" #"meta-llama/Meta-Llama-3.1-70B-Instruct"
 
-# export HF_CACHE_DIR=/data2/huggingface
-# if [ ! -d "$HF_CACHE_DIR" ]; then
-#     HF_CACHE_DIR=$WORKDIR/hf_cache
-#     mkdir -p "$HF_CACHE_DIR"
-# fi
-# echo  "HF_CACHE_DIR=$HF_CACHE_DIR"
-ls $HF_CACHE_DIR/hub
+export HF_CACHE_DIR=/data2/huggingface
+if [ ! -d "$HF_CACHE_DIR" ]; then
+    HF_CACHE_DIR=$WORKDIR/hf_cache
+    mkdir -p "$HF_CACHE_DIR"
+fi
+echo  "HF_CACHE_DIR=$HF_CACHE_DIR"
+ls $HF_CACHE_DIR
 
 vllm_port=8086
 vllm_volume=${HF_CACHE_DIR}
