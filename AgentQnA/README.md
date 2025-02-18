@@ -247,6 +247,7 @@ docker logs react-agent-endpoint
 You should see something like "HTTP server setup successful" if the docker containers are started successfully.</p>
 
 2. You can use python to validate the agent system
+
 ```bash
 # RAG worker agent
 python tests/test.py --prompt "Tell me about Michael Jackson song Thriller" --agent_role "worker" --ext_port 9095
