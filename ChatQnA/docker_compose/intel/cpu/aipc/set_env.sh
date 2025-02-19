@@ -7,8 +7,10 @@ pushd "../../../../../" > /dev/null
 source .set_env.sh
 popd > /dev/null
 
-if [ -z "${your_hf_api_token}" ]; then
-    echo "Error: HUGGINGFACEHUB_API_TOKEN is not set. Please set your_hf_api_token."
+export host_ip=$(hostname -I | awk '{print $1}')
+
+if [ -z "${HUGGINGFACEHUB_API_TOKEN}" ]; then
+    echo "Error: HUGGINGFACEHUB_API_TOKEN is not set. Please set HUGGINGFACEHUB_API_TOKEN."
 fi
 
 if [ -z "${host_ip}" ]; then
