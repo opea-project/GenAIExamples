@@ -29,11 +29,6 @@ services:
     security_opt:
       - seccomp:unconfined
     ipc: host
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://${host_ip}:${DOCSUM_TGI_SERVICE_PORT}/health || exit 1"]
-      interval: 10s
-      timeout: 10s
-      retries: 100
     command: --model-id ${DOCSUM_LLM_MODEL_ID} --max-input-length ${MAX_INPUT_TOKENS} --max-total-tokens ${MAX_TOTAL_TOKENS}
 
   docsum-llm-server:
