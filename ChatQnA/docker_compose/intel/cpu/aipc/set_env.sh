@@ -17,7 +17,7 @@ if [ -z "${host_ip}" ]; then
     echo "Error: host_ip is not set. Please set host_ip first."
 fi
 
-export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
+export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
 export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
 export RERANK_MODEL_ID="BAAI/bge-reranker-base"
 export INDEX_NAME="rag-redis"
