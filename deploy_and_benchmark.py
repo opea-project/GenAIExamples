@@ -281,19 +281,25 @@ def main(yaml_file, target_node=None, test_mode="oob"):
                             str(interval)
                         ]
                         try:
-                            result = subprocess.run(cmd, check=True)
-                            print("Deployments are ready!")
+                            result = subprocess.run(cmd, check=False)  # Changed to check=False to handle return code manually
+                            if result.returncode == 0:
+                                print("Deployments are ready!")
+                                # Run benchmark only if deployment is ready
+                                run_benchmark(
+                                    benchmark_config=benchmark_config,
+                                    chart_name=chart_name,
+                                    namespace=namespace,
+                                    node_num=node,
+                                    llm_model=deploy_config.get("services", {}).get("llm", {}).get("model_id", ""),
+                                )
+                            else:
+                                print(f"Deployments are not ready after timeout period during "
+                                      f"{'deployment' if i == 0 else 'update'} for {node} nodes. "
+                                      f"Skipping remaining iterations.")
+                                break  # Exit the batch parameter loop for current node
                         except subprocess.CalledProcessError as e:
-                            print(f"Deployments status failed with returncode: {e.returncode}")
-
-                        # Run benchmark
-                        run_benchmark(
-                            benchmark_config=benchmark_config,
-                            chart_name=chart_name,
-                            namespace=namespace,
-                            node_num=node,
-                            llm_model=deploy_config.get("services", {}).get("llm", {}).get("model_id", ""),
-                        )
+                            print(f"Error while checking deployment status: {str(e)}")
+                            break  # Exit the batch parameter loop for current node
 
                     except Exception as e:
                         print(
