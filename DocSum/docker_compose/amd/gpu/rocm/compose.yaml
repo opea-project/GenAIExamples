@@ -28,7 +28,7 @@ services:
     security_opt:
       - seccomp:unconfined
     ipc: host
-    command: --model-id ${DOCSUM_LLM_MODEL_ID} --max-input-length ${MAX_INPUT_TOKENS} --max-total-tokens ${MAX_TOTAL_TOKENS}
+    command: --model-id ${DOCSUM_LLM_MODEL_ID} --max-input-length ${DOCSUM_MAX_INPUT_TOKENS} --max-total-tokens ${DOCSUM_MAX_TOTAL_TOKENS}
 
   docsum-llm-server:
     image: ${REGISTRY:-opea}/llm-docsum:${TAG:-latest}
