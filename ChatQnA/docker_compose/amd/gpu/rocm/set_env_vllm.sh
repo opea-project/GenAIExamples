@@ -1,12 +1,11 @@
 #!/usr/bin/env bash
 
 # Copyright (C) 2024 Intel Corporation
+# Copyright (C) 2024 Advanced Micro Devices, Inc.
 # SPDX-License-Identifier: Apache-2.0
 
-# SPDX-License-Identifier: Apache-2.0
-
-export HOST_IP='10.53.22.29'
-export HOST_IP_EXTERNAL='68.69.180.77'
+export HOST_IP=''
+export HOST_IP_EXTERNAL=''
 export CHATQNA_HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
 export CHATQNA_EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
 export CHATQNA_RERANK_MODEL_ID="BAAI/bge-reranker-base"

@@ -1,3 +1,5 @@
+Copyright (C) 2024 Advanced Micro Devices, Inc.
+
 # Build and deploy ChatQnA Application on AMD GPU (ROCm)
 
 ## Build MegaService of ChatQnA on AMD ROCm GPU
