@@ -133,23 +133,23 @@ function validate_microservices() {
     # whisper microservice
     ulimit -s 65536
     validate_services \
-        "${host_ip}:7066/v1/asr" \
+        "${host_ip}:${DOCSUM_WHISPER_PORT}/v1/asr" \
         '{"asr_result":"well"}' \
         "whisper-service" \
         "whisper-service" \
         "{\"audio\": \"$(input_data_for_test "audio")\"}"
 
-    # tgi for llm service
+    # vLLM service
     validate_services \
-        "${host_ip}:8008/generate" \
-        "generated_text" \
-        "docsum-tgi-service" \
-        "docsum-tgi-service" \
-        '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}'
+        "${host_ip}:${DOCSUM_VLLM_SERVICE_PORT}/v1/chat/completions" \
+        "content" \
+        "docsum-vllm-service" \
+        "docsum-vllm-service" \
+        '{"model": "Intel/neural-chat-7b-v3-3", "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens": 17}'
 
     # llm microservice
     validate_services \
-        "${host_ip}:9000/v1/docsum" \
+        "${host_ip}:${DOCSUM_LLM_SERVER_PORT}/v1/docsum" \
         "text" \
         "docsum-llm-server" \
         "docsum-llm-server" \
@@ -192,7 +192,7 @@ function validate_megaservice_json() {
     echo ""
     echo ">>> Checking text data with Content-Type: application/json"
     validate_services \
-        "${host_ip}:8888/v1/docsum" \
+        "${host_ip}:${DOCSUM_BACKEND_SERVER_PORT}/v1/docsum" \
         "[DONE]" \
         "docsum-backend-server" \
         "docsum-backend-server" \
@@ -200,7 +200,7 @@ function validate_megaservice_json() {
 
     echo ">>> Checking audio data"
     validate_services \
-        "${host_ip}:8888/v1/docsum" \
+        "${host_ip}:${DOCSUM_BACKEND_SERVER_PORT}/v1/docsum" \
         "[DONE]" \
         "docsum-backend-server" \
         "docsum-backend-server" \
@@ -208,7 +208,7 @@ function validate_megaservice_json() {
 
     echo ">>> Checking video data"
     validate_services \
-        "${host_ip}:8888/v1/docsum" \
+        "${host_ip}:${DOCSUM_BACKEND_SERVER_PORT}/v1/docsum" \
         "[DONE]" \
         "docsum-backend-server" \
         "docsum-backend-server" \
@@ -218,7 +218,7 @@ function validate_megaservice_json() {
 
 function stop_docker() {
     cd $WORKPATH/docker_compose/amd/gpu/rocm/
-    docker compose stop && docker compose rm -f
+    docker compose -f compose_vllm.yaml stop && docker compose -f compose_vllm.yaml rm -f
 }
 
 function main() {
