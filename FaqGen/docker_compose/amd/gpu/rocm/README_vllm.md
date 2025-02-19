@@ -2,6 +2,15 @@
 
 ## Build images
 
+### Build the vLLM Docker Image
+
+```bash
+### Cloning repo
+cd GenAIExamples/FaqGen
+### Build Docker image
+docker build -t opea/llm-vllm-rocm:latest -f Dockerfile-vllm-rocm .
+```
+
 ### Build the LLM Docker Image
 
 ```bash
@@ -10,7 +19,29 @@ git clone https://github.com/opea-project/GenAIComps.git
 cd GenAIComps
 
 ### Build Docker image
-docker build -t opea/llm-textgen:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/src/text-generation/Dockerfile .
+docker build -t opea/llm-faqgen:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/src/faq-generation/Dockerfile .
+```
+
+### Build Megaservice Docker Image
+
+```bash
+### Cloning repo
+git clone https://github.com/opea-project/GenAIExamples.git
+cd GenAIExamples/FaqGen
+
+### Build Docker image
+docker build -t opea/faqgen:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
+```
+
+### Build UI Docker Image
+
+```bash
+### Cloning repo
+git clone https://github.com/opea-project/GenAIExamples.git
+cd GenAIExamples/FaqGen/ui
+
+### Build Docker image
+docker build -t opea/faqgen-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
 ```
 
 ## 🚀 Start Microservices and MegaService
@@ -26,15 +57,7 @@ For gated models, you also need to provide [HuggingFace token](https://huggingfa
 Since the `compose.yaml` will consume some environment variables, you need to setup them in advance as below.
 
 ```bash
-export FAQGEN_LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
-export HOST_IP=${your_no_proxy}
-export FAQGEN_TGI_SERVICE_PORT=8008
-export FAQGEN_LLM_SERVER_PORT=9000
-export FAQGEN_HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
-export FAQGEN_BACKEND_SERVER_PORT=8888
-export FAGGEN_UI_PORT=5173
-export LLM_ENDPOINT="http://${HOST_IP}:${FAQGEN_TGI_SERVICE_PORT}"
-export FAQGen_COMPONENT_NAME="OpeaFaqGenTgi"
+. set_env_vllm.sh
 ```
 
 Note: Please replace with `host_ip` with your external IP address, do not use localhost.
