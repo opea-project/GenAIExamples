@@ -45,7 +45,7 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      LLM_ENDPOINT: "http://${HOST_IP}:${DOCSUM_TGI_SERVICE_PORT}"
+      LLM_ENDPOINT: ${DOCSUM_LLM_ENDPOINT}
       HUGGINGFACEHUB_API_TOKEN: ${DOCSUM_HUGGINGFACEHUB_API_TOKEN}
       MAX_INPUT_TOKENS: ${DOCSUM_MAX_INPUT_TOKENS}
       MAX_TOTAL_TOKENS: ${DOCSUM_MAX_TOTAL_TOKENS}
