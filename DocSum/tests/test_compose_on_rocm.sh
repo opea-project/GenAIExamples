@@ -132,7 +132,7 @@ function validate_microservices() {
 
     # tgi for llm service
     validate_services \
-        "${host_ip}:8008/generate" \
+        "${host_ip}:${DOCSUM_TGI_SERVICE_PORT}/generate" \
         "generated_text" \
         "docsum-tgi-service" \
         "docsum-tgi-service" \
@@ -140,7 +140,7 @@ function validate_microservices() {
 
     # llm microservice
     validate_services \
-        "${host_ip}:9000/v1/docsum" \
+        "${host_ip}:${DOCSUM_LLM_SERVER_PORT}/v1/docsum" \
         "text" \
         "docsum-llm-server" \
         "docsum-llm-server" \
@@ -153,7 +153,7 @@ function validate_megaservice() {
     local DOCKER_NAME="docsum-backend-server"
     local EXPECTED_RESULT="[DONE]"
     local INPUT_DATA="messages=Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."
-    local URL="${host_ip}:8888/v1/docsum"
+    local URL="${host_ip}:${DOCSUM_BACKEND_SERVER_PORT}/v1/docsum"
     local DATA_TYPE="type=text"
 
     local HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST -F "$DATA_TYPE" -F "$INPUT_DATA" -H 'Content-Type: multipart/form-data' "$URL")
@@ -183,7 +183,7 @@ function validate_megaservice_json() {
     echo ""
     echo ">>> Checking text data with Content-Type: application/json"
     validate_services \
-        "${host_ip}:8888/v1/docsum" \
+        "${host_ip}:${DOCSUM_BACKEND_SERVER_PORT}/v1/docsum" \
         "[DONE]" \
         "docsum-backend-server" \
         "docsum-backend-server" \
@@ -191,7 +191,7 @@ function validate_megaservice_json() {
 
     echo ">>> Checking audio data"
     validate_services \
-        "${host_ip}:8888/v1/docsum" \
+        "${host_ip}:${DOCSUM_BACKEND_SERVER_PORT}/v1/docsum" \
         "[DONE]" \
         "docsum-backend-server" \
         "docsum-backend-server" \
@@ -199,7 +199,7 @@ function validate_megaservice_json() {
 
     echo ">>> Checking video data"
     validate_services \
-        "${host_ip}:8888/v1/docsum" \
+        "${host_ip}:${DOCSUM_BACKEND_SERVER_PORT}/v1/docsum" \
         "[DONE]" \
         "docsum-backend-server" \
         "docsum-backend-server" \
