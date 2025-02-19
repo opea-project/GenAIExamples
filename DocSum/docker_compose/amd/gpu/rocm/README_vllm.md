@@ -67,12 +67,14 @@ Edit the file set_env_vllm.sh - set the desired values of the variables in it
 Note: Please replace value HOST_IP with your server IP address, do not use localhost.
 
 Set values:
+
 ```bash
 cd GenAiExamples/DocSum/docker_compose/amd/gpu/rocm
 . set_env_vllm.sh
 ```
 
 #### Set GPU settings in compose_vllm.yaml:
+
 Note: In order to limit access to a subset of GPUs, please pass each device individually using one or more -device /dev/dri/rendered<node>, where <node> is the card index, starting from 128. (https://rocm.docs.amd.com/projects/install-on-linux/en/latest/how-to/docker.html#docker-restrict-gpus)
 Example for set isolation for 1 GPU
 
