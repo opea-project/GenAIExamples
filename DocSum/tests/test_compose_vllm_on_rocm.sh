@@ -162,7 +162,7 @@ function validate_megaservice() {
     local DOCKER_NAME="docsum-backend-server"
     local EXPECTED_RESULT="[DONE]"
     local INPUT_DATA="messages=Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."
-    local URL="${host_ip}:8888/v1/docsum"
+    local URL="${host_ip}:${DOCSUM_BACKEND_SERVER_PORT}/v1/docsum"
     local DATA_TYPE="type=text"
 
     local HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST -F "$DATA_TYPE" -F "$INPUT_DATA" -H 'Content-Type: multipart/form-data' "$URL")
@@ -223,14 +223,14 @@ function stop_docker() {
 
 function main() {
     echo "==========================================="
-    echo ">>>> Stopping any running Docker containers..."
-    stop_docker
+#    echo ">>>> Stopping any running Docker containers..."
+#    stop_docker
 
-    echo "==========================================="
-    if [[ "$IMAGE_REPO" == "opea" ]]; then
-        echo ">>>> Building Docker images..."
-        build_docker_images
-    fi
+#    echo "==========================================="
+#    if [[ "$IMAGE_REPO" == "opea" ]]; then
+#        echo ">>>> Building Docker images..."
+#        build_docker_images
+#    fi
 
     echo "==========================================="
     echo ">>>> Starting Docker services..."
@@ -246,15 +246,15 @@ function main() {
     echo ">>>> Validating validate_megaservice_json..."
     validate_megaservice_json
 
-    echo "==========================================="
-    echo ">>>> Stopping Docker containers..."
-    stop_docker
-
-    echo "==========================================="
-    echo ">>>> Pruning Docker system..."
-    echo y | docker system prune
-    echo ">>>> Docker system pruned successfully."
-    echo "==========================================="
+#    echo "==========================================="
+#    echo ">>>> Stopping Docker containers..."
+#    stop_docker
+#
+#    echo "==========================================="
+#    echo ">>>> Pruning Docker system..."
+#    echo y | docker system prune
+#    echo ">>>> Docker system pruned successfully."
+#    echo "==========================================="
 }
 
 main
