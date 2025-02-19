@@ -13,6 +13,7 @@ services:
     environment:
       ip_address: ${ip_address}
       strategy: rag_agent_llama
+      with_memory: false
       recursion_limit: ${recursion_limit_worker}
       llm_engine: vllm
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
@@ -43,6 +44,7 @@ services:
     environment:
       ip_address: ${ip_address}
       strategy: sql_agent_llama
+      with_memory: false
       db_name: ${db_name}
       db_path: ${db_path}
       use_hints: false
@@ -74,6 +76,7 @@ services:
     environment:
       ip_address: ${ip_address}
       strategy: react_llama
+      with_memory: true
       recursion_limit: ${recursion_limit_supervisor}
       llm_engine: vllm
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
@@ -81,7 +84,7 @@ services:
       model: ${LLM_MODEL_ID}
       temperature: ${temperature}
       max_new_tokens: ${max_new_tokens}
-      stream: false
+      stream: true
       tools: /home/user/tools/supervisor_agent_tools.yaml
       require_human_feedback: false
       no_proxy: ${no_proxy}
