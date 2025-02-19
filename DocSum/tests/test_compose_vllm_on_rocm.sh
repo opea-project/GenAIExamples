@@ -223,14 +223,14 @@ function stop_docker() {
 
 function main() {
     echo "==========================================="
-#    echo ">>>> Stopping any running Docker containers..."
-#    stop_docker
+    echo ">>>> Stopping any running Docker containers..."
+    stop_docker
 
-#    echo "==========================================="
-#    if [[ "$IMAGE_REPO" == "opea" ]]; then
-#        echo ">>>> Building Docker images..."
-#        build_docker_images
-#    fi
+    echo "==========================================="
+    if [[ "$IMAGE_REPO" == "opea" ]]; then
+        echo ">>>> Building Docker images..."
+        build_docker_images
+    fi
 
     echo "==========================================="
     echo ">>>> Starting Docker services..."
@@ -246,15 +246,15 @@ function main() {
     echo ">>>> Validating validate_megaservice_json..."
     validate_megaservice_json
 
-#    echo "==========================================="
-#    echo ">>>> Stopping Docker containers..."
-#    stop_docker
-#
-#    echo "==========================================="
-#    echo ">>>> Pruning Docker system..."
-#    echo y | docker system prune
-#    echo ">>>> Docker system pruned successfully."
-#    echo "==========================================="
+    echo "==========================================="
+    echo ">>>> Stopping Docker containers..."
+    stop_docker
+
+    echo "==========================================="
+    echo ">>>> Pruning Docker system..."
+    echo y | docker system prune
+    echo ">>>> Docker system pruned successfully."
+    echo "==========================================="
 }
 
 main
