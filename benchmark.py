@@ -108,16 +108,15 @@ def _create_yaml_content(service, base_url, bench_target, test_phase, num_querie
     print(spec)
 
     # get folder path of opea-eval
-    # TODO: use environment variable for now until related issues been fixed in opea-eval
     eval_path = os.getenv("EVAL_PATH", "")
-    # import pkg_resources
-
-    # for dist in pkg_resources.working_set:
-    #     if "opea-eval" in dist.project_name:
-    #         eval_path = dist.location
-    #         break
     if not eval_path:
-        print("Fail to find the opea-eval package. Please install/download it first.")
+        import pkg_resources
+        for dist in pkg_resources.working_set:
+            if "opea-eval" in dist.project_name:
+                eval_path = dist.location
+                break
+    if not eval_path:
+        print("Fail to find the opea-eval package. Please set/install it first.")
         exit(1)
 
     load_shape = test_params["load_shape"]
