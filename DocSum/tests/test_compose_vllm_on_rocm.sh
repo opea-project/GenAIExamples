@@ -11,27 +11,22 @@ echo "TAG=IMAGE_TAG=${IMAGE_TAG}"
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
-export MAX_INPUT_TOKENS=1024
-export MAX_TOTAL_TOKENS=2048
-export REGISTRY=${IMAGE_REPO}
-export TAG=${IMAGE_TAG}
-export DOCSUM_TGI_IMAGE="ghcr.io/huggingface/text-generation-inference:2.3.1-rocm"
-export DOCSUM_LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
-export HOST_IP=${ip_address}
+
 export host_ip=${ip_address}
-export DOCSUM_TGI_SERVICE_PORT="8008"
-export DOCSUM_HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+export HOST_IP=${ip_address}
+export EXTERNAL_HOST_IP=${ip_address}
+export DOCSUM_HUGGINGFACEHUB_API_TOKEN="${HUGGINGFACEHUB_API_TOKEN}"
+export DOCSUM_MAX_INPUT_TOKENS=2048
+export DOCSUM_MAX_TOTAL_TOKENS=4096
+export DOCSUM_LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
+export DOCSUM_VLLM_SERVICE_PORT="8008"
+export DOCSUM_LLM_ENDPOINT="http://${HOST_IP}:${DOCSUM_VLLM_SERVICE_PORT}"
+export DOCSUM_WHISPER_PORT="7066"
+export ASR_SERVICE_HOST_IP="${HOST_IP}"
 export DOCSUM_LLM_SERVER_PORT="9000"
-export DOCSUM_BACKEND_SERVER_PORT="8888"
-export DOCSUM_FRONTEND_PORT="5552"
-export MEGA_SERVICE_HOST_IP=${host_ip}
-export LLM_SERVICE_HOST_IP=${host_ip}
-export ASR_SERVICE_HOST_IP=${host_ip}
-export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:8888/v1/docsum"
-export DOCSUM_CARD_ID="card1"
-export DOCSUM_RENDER_ID="renderD136"
-export DocSum_COMPONENT_NAME="OpeaDocSumTgi"
-export LOGFLAG=True
+export DOCSUM_BACKEND_SERVER_PORT="18072"
+export DOCSUM_FRONTEND_PORT="18073"
+export BACKEND_SERVICE_ENDPOINT="http://${EXTERNAL_HOST_IP}:${DOCSUM_BACKEND_SERVER_PORT}/v1/docsum"
 
 function build_docker_images() {
     opea_branch=${opea_branch:-"main"}
@@ -50,10 +45,9 @@ function build_docker_images() {
     git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="docsum docsum-gradio-ui whisper llm-docsum"
+    service_list="docsum docsum-gradio-ui whisper llm-docsum vllm-rocm"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
-    docker pull ghcr.io/huggingface/text-generation-inference:1.4
     docker images && sleep 1s
 }
 
@@ -61,8 +55,17 @@ function start_services() {
     cd "$WORKPATH"/docker_compose/amd/gpu/rocm
     sed -i "s/backend_address/$ip_address/g" "$WORKPATH"/ui/svelte/.env
     # Start Docker Containers
-    docker compose up -d > "${LOG_PATH}"/start_services_with_compose.log
-    sleep 1m
+    docker compose -f compose_vllm.yaml up -d > "${LOG_PATH}"/start_services_with_compose.log
+    n=0
+    until [[ "$n" -ge 500 ]]; do
+        docker logs docsum-vllm-service >& "${LOG_PATH}"/docsum-vllm-service_start.log
+        if grep -q "Application startup complete" "${LOG_PATH}"/docsum-vllm-service_start.log; then
+            break
+        fi
+        sleep 10s
+        n=$((n+1))
+    done
+    sleep 5s
 }
 
 function validate_services() {
