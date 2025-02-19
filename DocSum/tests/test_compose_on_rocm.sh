@@ -13,6 +13,7 @@ LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
 
 export HOST_IP=${ip_address}
+export host_ip=${ip_address}
 export DOCSUM_MAX_INPUT_TOKENS="2048"
 export DOCSUM_MAX_TOTAL_TOKENS="4096"
 export DOCSUM_LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
@@ -123,7 +124,7 @@ function validate_microservices() {
     # whisper microservice
     ulimit -s 65536
     validate_services \
-        "${host_ip}:7066/v1/asr" \
+        "${host_ip}:${DOCSUM_WHISPER_PORT}/v1/asr" \
         '{"asr_result":"well"}' \
         "whisper-service" \
         "whisper-service" \
