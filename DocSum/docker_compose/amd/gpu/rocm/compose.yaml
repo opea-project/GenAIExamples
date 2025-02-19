@@ -15,6 +15,11 @@ services:
       HUGGINGFACEHUB_API_TOKEN: ${DOCSUM_HUGGINGFACEHUB_API_TOKEN}
       host_ip: ${host_ip}
       DOCSUM_TGI_SERVICE_PORT: ${DOCSUM_TGI_SERVICE_PORT}
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://localhost:80/health || exit 1" ]
+      interval: 10s
+      timeout: 10s
+      retries: 100
     volumes:
       - "/var/opea/docsum-service/data:/data"
     shm_size: 1g
