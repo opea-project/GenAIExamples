@@ -1,4 +1,5 @@
 # Copyright (C) 2024 Intel Corporation
+# Copyright (c) 2024 Advanced Micro Devices, Inc.
 # SPDX-License-Identifier: Apache-2.0
 
 services:
@@ -48,6 +49,7 @@ services:
       LLM_MODEL_ID: ${CODETRANS_LLM_MODEL_ID}
       HUGGINGFACEHUB_API_TOKEN: ${CODETRANS_HUGGINGFACEHUB_API_TOKEN}
       HF_TOKEN: ${CODETRANS_HUGGINGFACEHUB_API_TOKEN}
+      LLM_COMPONENT_NAME: "OpeaTextGenService"
     restart: unless-stopped
   codetrans-backend-server:
     image: ${REGISTRY:-opea}/codetrans:${TAG:-latest}
