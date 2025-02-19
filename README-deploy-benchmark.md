@@ -61,7 +61,7 @@ Before running the benchmarks, ensure you have:
    - When deploying on 4 nodes → uses replicaCount[2] = 4
    - When deploying on 8 nodes → uses replicaCount[3] = 8
 
-   Note: Model parameters that accept lists (e.g., `max_batch_size`, `max_num_seqs`) are deployment parameters that affect model behavior but not service count. When these parameters are lists, each value will trigger a service upgrade followed by a new round of testing, while maintaining the same number of service instances.
+   Note: Model parameters that accept lists (e.g., `max_batch_size`, `max_num_seqs`) are deployment parameters that affect model service behavior but not the number of service instances. When these parameters are lists, each value will trigger a service upgrade followed by a new round of testing, while maintaining the same number of service instances.
 
 3. **Install required Python packages**
    Run the following command to install all necessary dependencies:
