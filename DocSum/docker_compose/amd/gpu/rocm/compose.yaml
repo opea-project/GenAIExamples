@@ -39,16 +39,6 @@ services:
     ports:
       - "${DOCSUM_LLM_SERVER_PORT}:9000"
     ipc: host
-    group_add:
-      - video
-    security_opt:
-      - seccomp:unconfined
-    cap_add:
-      - SYS_PTRACE
-    devices:
-      - /dev/kfd:/dev/kfd
-      - /dev/dri/${DOCSUM_CARD_ID}:/dev/dri/${DOCSUM_CARD_ID}
-      - /dev/dri/${DOCSUM_RENDER_ID}:/dev/dri/${DOCSUM_RENDER_ID}
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
@@ -58,7 +48,7 @@ services:
       MAX_INPUT_TOKENS: ${DOCSUM_MAX_INPUT_TOKENS}
       MAX_TOTAL_TOKENS: ${DOCSUM_MAX_TOTAL_TOKENS}
       LLM_MODEL_ID: ${DOCSUM_LLM_MODEL_ID}
-      DocSum_COMPONENT_NAME: ${DocSum_COMPONENT_NAME}
+      DocSum_COMPONENT_NAME: "OpeaDocSumTgi"
       LOGFLAG: ${LOGFLAG:-False}
     restart: unless-stopped
 
