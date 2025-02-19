@@ -33,7 +33,7 @@ Before running the benchmarks, ensure you have:
    - Embedding: `BAAI/bge-base-en-v1.5`
    - Reranking: `BAAI/bge-reranker-base`
 
-   You can customize these models by setting the `model_id` field in the corresponding service section. Note that the LLM model must be specified in the configuration as it is used by both deployment and benchmarking processes.
+   You can customize which models to use by setting the `model_id` field in the corresponding service section. Note that the LLM model must be specified in the configuration as it is used by both deployment and benchmarking processes.
 
    **Important Notes**:
 
