@@ -32,7 +32,7 @@ def construct_benchmark_config(test_suite_config):
         "warmup_iterations": test_suite_config.get("warmup_iterations", 10),
         "seed": test_suite_config.get("seed", None),
         "bench_target": test_suite_config.get("bench_target", ["chatqnafixed"]),
-        "dataset": test_suite_config.get("dataset", ["upload_file.txt"]),
+        "dataset": test_suite_config.get("dataset", ""),
         "prompt": test_suite_config.get("prompt", [10]),
         "llm_max_token_size": test_suite_config.get("llm", {}).get("max_token_size", [128]),
     }
@@ -162,7 +162,10 @@ def _create_stresscli_confs(case_params, test_params, test_phase, num_queries, b
     for i, b_target in enumerate(bench_target):
         stresscli_conf = {}
         print(f"[OPEA BENCHMARK] 🚀 Running test for {b_target} in phase {test_phase} for {num_queries} queries")
-        stresscli_conf["envs"] = {"DATASET": test_params["dataset"][i], "MAX_LINES": str(test_params["prompt"][i])}
+        if len(test_params["dataset"]) > i:
+            stresscli_conf["envs"] = {"DATASET": test_params["dataset"][i], "MAX_LINES": str(test_params["prompt"][i])}
+        else:
+            stresscli_conf["envs"] = {"MAX_LINES": str(test_params["prompt"][i])}
         # Generate the content of stresscli configuration file
         stresscli_yaml = _create_yaml_content(
             case_params, base_url, b_target, test_phase, num_queries, test_params, concurrency
@@ -313,14 +316,15 @@ def _run_service_test(example, service, test_suite_config, namespace):
                 os.environ[key] = value
                 if key == "DATASET":
                     dataset = value
-        if not dataset:
+        
+        if dataset:
+            # Ingest data into the database for single run of benchmark
+            result = ingest_data_to_db(service, dataset, namespace)
+            if not result:
+                print(f"[OPEA BENCHMARK] 🚀 Data ingestion failed for {service_name}.")
+                exit(1)
+        else:
             print(f"[OPEA BENCHMARK] 🚀 Dataset is not specified for {service_name}. Check the benchmark.yaml again.")
-
-        # Ingest data into the database for single run of benchmark
-        result = ingest_data_to_db(service, dataset, namespace)
-        if not result:
-            print(f"[OPEA BENCHMARK] 🚀 Data ingestion failed for {service_name}.")
-            exit(1)
 
         # Run the benchmark test and append the output folder to the list
         output_folders.append(locust_runtests(None, run_yaml_path))
@@ -335,7 +339,7 @@ def _run_service_test(example, service, test_suite_config, namespace):
     return output_folders
 
 
-def run_benchmark(benchmark_config, chart_name, namespace, node_num=1, llm_model=None, report=True):
+def run_benchmark(benchmark_config, chart_name, namespace, node_num=1, llm_model=None, report=False):
     """Run the benchmark test for the specified helm chart and configuration.
 
     Args:
