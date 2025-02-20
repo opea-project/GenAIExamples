@@ -12,12 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { sveltekit } from "@sveltejs/kit/vite";
-import { defineConfig } from "vite";
+import type { Language } from "../../routes/types.js";
 
-export default defineConfig({
-	plugins: [sveltekit()],
-	server: {
-		allowedHosts: true,
-	},
-});
+export const languagesList: Language[] = [
+	{ name: "C" },
+	{ name: "C++" },
+	// { name: "C#" },
+	{ name: "Java" },
+	{ name: "Python" },
+	{ name: "JavaScript" },
+	// { name: "Swift" },
+	// { name: "Ruby" },
+	{ name: "Go" },
+	{ name: "Rust" },
+	// { name: "PHP" },
+	// { name: "TypeScript" },
+	// { name: "Kotlin" },
+	// { name: "Objective-C" },
+	// { name: "Perl" },
+	// { name: "MATLAB" },
+	// { name: "R" },
+	// { name: "Lua" },
+	// { name: "Bash" },
+	// { name: "SQL" },
+];

@@ -9,8 +9,7 @@
 		"skipLibCheck": true,
 		"sourceMap": true,
 		"strict": true,
-		"module": "ESNext",
-		"target": "ES6",
-		"outDir": "./dist"
+		"module": "NodeNext",
+		"moduleResolution": "NodeNext"
 	}
 }
