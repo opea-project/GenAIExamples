@@ -324,10 +324,13 @@ def _run_service_test(example, service, test_suite_config, namespace):
             exit(1)
 
         # Run the benchmark test and append the output folder to the list
+        print("[OPEA BENCHMARK] 🚀 Start locust_runtests at", datetime.now().strftime("%Y%m%d_%H%M%S"))
         output_folders.append(locust_runtests(None, run_yaml_path))
+        print("[OPEA BENCHMARK] 🚀 End locust_runtests at", datetime.now().strftime("%Y%m%d_%H%M%S"))
 
         # Delete all files from the database after the test
         result = clear_db(service, namespace)
+        print("[OPEA BENCHMARK] 🚀 End of clean up db", datetime.now().strftime("%Y%m%d_%H%M%S"))
         if not result:
             print(f"[OPEA BENCHMARK] 🚀 Data deletion failed for {service_name}.")
             exit(1)
@@ -336,7 +339,7 @@ def _run_service_test(example, service, test_suite_config, namespace):
     return output_folders
 
 
-def run_benchmark(benchmark_config, chart_name, namespace, node_num=1, llm_model=None, report=True):
+def run_benchmark(benchmark_config, chart_name, namespace, node_num=1, llm_model=None, report=False):
     """Run the benchmark test for the specified helm chart and configuration.
 
     Args:
