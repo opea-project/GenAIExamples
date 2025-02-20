@@ -18,6 +18,7 @@ cd ~/OPEA
 git clone https://github.com/opea-project/GenAIExamples.git
 cd GenAIExamples/ChatQnA/docker_compose/intel/cpu/aipc
 ```
+
 1. Set the required environment variables:
 
    ```bash
@@ -31,16 +32,19 @@ cd GenAIExamples/ChatQnA/docker_compose/intel/cpu/aipc
    # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
    export no_proxy=$no_proxy,chatqna-aipc-backend-server,tei-embedding-service,retriever,tei-reranking-service,redis-vector-db,dataprep-redis-service,ollama-service
    ```
+
 3. Set up other environment variables
 
-     By default, llama3.2 is used for LLM serving, the default model can be changed to other LLM models. Please pick a [validated llm models](https://github.com/opea-project/GenAIComps/tree/main/comps/llms/src/text-generation#validated-llm-models) from the table.  
+   By default, llama3.2 is used for LLM serving, the default model can be changed to other LLM models. Please pick a [validated llm models](https://github.com/opea-project/GenAIComps/tree/main/comps/llms/src/text-generation#validated-llm-models) from the table.  
    To change the default model defined in set_env.sh, overwrite it by exporting OLLAMA_MODEL to the new model or by modifying set_env.sh.  
    For example, change to using the following model.
 
    ```bash
    export OLLAMA_MODEL="deepseek-r1:8b"
    ```
+
    to use the [DeepSeek-R1-Distill-Llama-8B model](https://ollama.com/library/deepseek-r1:8b)
+
    ```bash
    source ./set_env.sh
    ```
