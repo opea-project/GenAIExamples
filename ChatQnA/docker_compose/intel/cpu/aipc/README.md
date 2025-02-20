@@ -63,7 +63,7 @@ NB: You should build docker image from source by yourself if:
 - You can't download the docker image.
 - You want to use a specific version of Docker image.
 
-Please refer to ['Build Docker Images'](#🚀 Build Docker Images) in below.
+Please refer to ['Build Docker Images'](#🚀-build-docker-images) in below.
 
 ### Quick Start:3. Consume the ChatQnA Service
 
