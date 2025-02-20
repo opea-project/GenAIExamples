@@ -302,10 +302,10 @@ function validate_megaservice() {
     echo "Validating megaservice with first query"
     validate_service \
         "http://${host_ip}:${MEGA_SERVICE_PORT}/v1/multimodalqna" \
-        '"time_of_frame_ms":' \
+        'red' \
         "multimodalqna" \
         "multimodalqna-backend-server" \
-        '{"messages": "What is the revenue of Nike in 2023?"}'
+        '{"messages": "Find an apple. What color is it?"}'
 
     echo "Validating megaservice with first audio query"
     validate_service \
