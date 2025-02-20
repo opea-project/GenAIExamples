@@ -2,6 +2,84 @@
 
 This document outlines the deployment process for a ChatQnA application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on AIPC. The steps include Docker image creation, container deployment via Docker Compose, and service execution to integrate microservices such as `embedding`, `retriever`, `rerank`, and `llm`.
 
+## Quick Start:
+
+1. Set up the environment variables.
+2. Run Docker Compose.
+3. Consume the ChatQnA Service.
+
+### Quick Start: 1. Set up Environment Variable
+
+To set up environment variables for deploying ChatQnA services, follow these steps:
+
+```bash
+mkdir ~/OPEA -p
+cd ~/OPEA
+git clone https://github.com/opea-project/GenAIExamples.git
+cd GenAIExamples/ChatQnA/docker_compose/intel/cpu/aipc
+```
+
+1. Set the required environment variables:
+
+   ```bash
+   export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
+   ```
+
+2. If you are in a proxy environment, also set the proxy-related environment variables:
+
+   ```bash
+   export https_proxy="Your_HTTPs_Proxy"
+   # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
+   export no_proxy=$no_proxy,chatqna-aipc-backend-server,tei-embedding-service,retriever,tei-reranking-service,redis-vector-db,dataprep-redis-service,ollama-service
+   ```
+
+3. Set up other environment variables
+
+   By default, llama3.2 is used for LLM serving, the default model can be changed to other LLM models. Please pick a [validated llm models](https://github.com/opea-project/GenAIComps/tree/main/comps/llms/src/text-generation#validated-llm-models) from the table.  
+   To change the default model defined in set_env.sh, overwrite it by exporting OLLAMA_MODEL to the new model or by modifying set_env.sh.  
+   For example, change to using the following model.
+
+   ```bash
+   export OLLAMA_MODEL="deepseek-r1:8b"
+   ```
+
+   to use the [DeepSeek-R1-Distill-Llama-8B model](https://ollama.com/library/deepseek-r1:8b)
+
+   ```bash
+   source ./set_env.sh
+   ```
+
+### Quick Start: 2. Run Docker Compose
+
+```bash
+    docker compose up -d
+```
+
+It will take several minutes to automatically download the docker images
+
+NB: You should build docker image from source by yourself if:
+
+- You are developing off the git main branch (as the container's ports in the repo may be different from the published docker image).
+- You can't download the docker image.
+- You want to use a specific version of Docker image.
+
+Please refer to ['Build Docker Images'](#🚀-build-docker-images) in below.
+
+### Quick Start:3. Consume the ChatQnA Service
+
+Once the services are up, open the following URL from your browser: http://{host_ip}:80.
+Enter Prompt like What is deep learning?
+
+Or if you prefer to try only on the localhost machine, then try
+
+```bash
+curl http://${host_ip}:8888/v1/chatqna \
+    -H "Content-Type: application/json" \
+    -d '{
+        "messages": "What is deep learning?"
+    }'
+```
+
 ## 🚀 Build Docker Images
 
 First of all, you need to build Docker Images locally and install the python package of it.
