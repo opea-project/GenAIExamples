@@ -13,6 +13,7 @@ services:
     environment:
       ip_address: ${ip_address}
       strategy: rag_agent
+      with_memory: false
       recursion_limit: ${recursion_limit_worker}
       llm_engine: openai
       OPENAI_API_KEY: ${OPENAI_API_KEY}
@@ -35,17 +36,17 @@ services:
     image: opea/agent:latest
     container_name: sql-agent-endpoint
     volumes:
-      - ${WORKDIR}/TAG-Bench/:/home/user/TAG-Bench # SQL database
+      - ${WORKDIR}/GenAIExamples/AgentQnA/tests:/home/user/chinook-db # SQL database
     ports:
       - "9096:9096"
     ipc: host
     environment:
       ip_address: ${ip_address}
       strategy: sql_agent
+      with_memory: false
       db_name: ${db_name}
       db_path: ${db_path}
       use_hints: false
-      hints_file: /home/user/TAG-Bench/${db_name}_hints.csv
       recursion_limit: ${recursion_limit_worker}
       llm_engine: openai
       OPENAI_API_KEY: ${OPENAI_API_KEY}
@@ -64,6 +65,7 @@ services:
     container_name: react-agent-endpoint
     depends_on:
       - worker-rag-agent
+      - worker-sql-agent
     volumes:
       - ${TOOLSET_PATH}:/home/user/tools/
     ports:
@@ -71,14 +73,15 @@ services:
     ipc: host
     environment:
       ip_address: ${ip_address}
-      strategy: react_langgraph
+      strategy: react_llama
+      with_memory: true
       recursion_limit: ${recursion_limit_supervisor}
       llm_engine: openai
       OPENAI_API_KEY: ${OPENAI_API_KEY}
       model: ${model}
       temperature: ${temperature}
       max_new_tokens: ${max_new_tokens}
-      stream: false
+      stream: true
       tools: /home/user/tools/supervisor_agent_tools.yaml
       require_human_feedback: false
       no_proxy: ${no_proxy}

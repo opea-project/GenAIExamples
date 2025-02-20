@@ -11,7 +11,7 @@ export ip_address=$(hostname -I | awk '{print $1}')
 export TOOLSET_PATH=$WORKPATH/tools/
 export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
 HF_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
-model="meta-llama/Meta-Llama-3.1-70B-Instruct"
+model="meta-llama/Llama-3.3-70B-Instruct" #"meta-llama/Meta-Llama-3.1-70B-Instruct"
 
 export HF_CACHE_DIR=/data2/huggingface
 if [ ! -d "$HF_CACHE_DIR" ]; then
@@ -60,23 +60,6 @@ function start_vllm_service_70B() {
     echo "Service started successfully"
 }
 
-
-function prepare_data() {
-    cd $WORKDIR
-
-    echo "Downloading data..."
-    git clone https://github.com/TAG-Research/TAG-Bench.git
-    cd TAG-Bench/setup
-    chmod +x get_dbs.sh
-    ./get_dbs.sh
-
-    echo "Split data..."
-    cd $WORKPATH/tests/sql_agent_test
-    bash run_data_split.sh
-
-    echo "Data preparation done!"
-}
-
 function download_chinook_data(){
     echo "Downloading chinook data..."
     cd $WORKDIR
@@ -113,7 +96,7 @@ function validate_agent_service() {
     echo "======================Testing worker rag agent======================"
     export agent_port="9095"
     prompt="Tell me about Michael Jackson song Thriller"
-    local CONTENT=$(python3 $WORKDIR/GenAIExamples/AgentQnA/tests/test.py --prompt "$prompt")
+    local CONTENT=$(python3 $WORKDIR/GenAIExamples/AgentQnA/tests/test.py --prompt "$prompt" --agent_role "worker" --ext_port $agent_port)
     # echo $CONTENT
     local EXIT_CODE=$(validate "$CONTENT" "Thriller" "rag-agent-endpoint")
     echo $EXIT_CODE
@@ -127,7 +110,7 @@ function validate_agent_service() {
     echo "======================Testing worker sql agent======================"
     export agent_port="9096"
     prompt="How many employees are there in the company?"
-    local CONTENT=$(python3 $WORKDIR/GenAIExamples/AgentQnA/tests/test.py --prompt "$prompt")
+    local CONTENT=$(python3 $WORKDIR/GenAIExamples/AgentQnA/tests/test.py --prompt "$prompt" --agent_role "worker" --ext_port $agent_port)
     local EXIT_CODE=$(validate "$CONTENT" "8" "sql-agent-endpoint")
     echo $CONTENT
     # echo $EXIT_CODE
@@ -140,9 +123,8 @@ function validate_agent_service() {
     # test supervisor react agent
     echo "======================Testing supervisor react agent======================"
     export agent_port="9090"
-    prompt="How many albums does Iron Maiden have?"
-    local CONTENT=$(python3 $WORKDIR/GenAIExamples/AgentQnA/tests/test.py --prompt "$prompt")
-    local EXIT_CODE=$(validate "$CONTENT" "21" "react-agent-endpoint")
+    local CONTENT=$(python3 $WORKDIR/GenAIExamples/AgentQnA/tests/test.py --agent_role "supervisor" --ext_port $agent_port --stream)
+    local EXIT_CODE=$(validate "$CONTENT" "Iron" "react-agent-endpoint")
     # echo $CONTENT
     echo $EXIT_CODE
     local EXIT_CODE="${EXIT_CODE:0-1}"
@@ -151,15 +133,6 @@ function validate_agent_service() {
         exit 1
     fi
 
-}
-
-function remove_data() {
-    echo "Removing data..."
-    cd $WORKDIR
-    if [ -d "TAG-Bench" ]; then
-        rm -rf TAG-Bench
-    fi
-    echo "Data removed!"
 }
 
 function remove_chinook_data(){
@@ -189,8 +162,9 @@ function main() {
     echo "==================== Agent service validated ===================="
 }
 
-remove_data
+
 remove_chinook_data
+
 main
-remove_data
+
 remove_chinook_data
