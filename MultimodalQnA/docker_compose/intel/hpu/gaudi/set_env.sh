@@ -13,10 +13,6 @@ export MM_RETRIEVER_SERVICE_HOST_IP=${host_ip}
 export LVM_SERVICE_HOST_IP=${host_ip}
 export MEGA_SERVICE_HOST_IP=${host_ip}
 
-export no_proxy=${your_no_proxy}
-export http_proxy=${your_http_proxy}
-export https_proxy=${your_http_proxy}
-
 export REDIS_DB_PORT=6379
 export REDIS_INSIGHTS_PORT=8001
 export REDIS_URL="redis://${host_ip}:${REDIS_DB_PORT}"

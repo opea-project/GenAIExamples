@@ -8,10 +8,6 @@ popd > /dev/null
 
 export host_ip=$(hostname -I | awk '{print $1}')
 
-export no_proxy=${your_no_proxy}
-export http_proxy=${your_http_proxy}
-export https_proxy=${your_http_proxy}
-
 export MM_EMBEDDING_SERVICE_HOST_IP=${host_ip}
 export MM_RETRIEVER_SERVICE_HOST_IP=${host_ip}
 export LVM_SERVICE_HOST_IP=${host_ip}
