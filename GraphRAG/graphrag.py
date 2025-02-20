@@ -110,7 +110,7 @@ def align_outputs(self, data, cur_node, inputs, runtime_graph, llm_parameters_di
 
 
 def align_generator(self, gen, **kwargs):
-    # openai reaponse format
+    # OpenAI response format
     # b'data:{"id":"","object":"text_completion","created":1725530204,"model":"meta-llama/Meta-Llama-3-8B-Instruct","system_fingerprint":"2.0.1-native","choices":[{"index":0,"delta":{"role":"assistant","content":"?"},"logprobs":null,"finish_reason":null}]}\n\n'
     print("generator in align generator:\n", gen)
     for line in gen:
