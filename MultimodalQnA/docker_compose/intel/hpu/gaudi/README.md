@@ -116,7 +116,15 @@ Build whisper server image
 docker build --no-cache -t opea/whisper:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/asr/src/integrations/dependency/whisper/Dockerfile .
 ```
 
-### 6. Build MegaService Docker Image
+### 6. Build TTS Server Image
+
+Build TTS server image
+
+```bash
+docker build --no-cache -t opea/speecht5:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/tts/src/integrations/dependency/speecht5/Dockerfile .
+```
+
+### 7. Build MegaService Docker Image
 
 To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the [multimodalqna.py](../../../../multimodalqna.py) Python script. Build MegaService Docker image via below command:
 
@@ -126,7 +134,7 @@ cd GenAIExamples/MultimodalQnA
 docker build --no-cache -t opea/multimodalqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
 ```
 
-### 6. Build UI Docker Image
+### 8. Build UI Docker Image
 
 Build frontend Docker image via below command:
 
@@ -142,17 +150,19 @@ Then run the command `docker images`, you will have the following 11 Docker Imag
 3. `ghcr.io/huggingface/tgi-gaudi:2.0.6`
 4. `opea/retriever:latest`
 5. `opea/whisper:latest`
-6. `opea/redis-vector-db`
-7. `opea/embedding:latest`
-8. `opea/embedding-multimodal-bridgetower:latest`
-9. `opea/multimodalqna:latest`
-10. `opea/multimodalqna-ui:latest`
+6. `opea/speech5:latest`
+7. `opea/redis-vector-db`
+8. `opea/embedding:latest`
+9. `opea/embedding-multimodal-bridgetower:latest`
+10. `opea/multimodalqna:latest`
+11. `opea/multimodalqna-ui:latest`
 
 ## 🚀 Start Microservices
 
 ### Required Models
 
 By default, the multimodal-embedding and LVM models are set to a default value as listed below:
+
 
 | Service   | Model                                       |
 | --------- | ------------------------------------------- |
@@ -230,7 +240,16 @@ curl http://${host_ip}:${LLAVA_SERVER_PORT}/generate \
     -H 'Content-Type: application/json'
 ```
 
-6. lvm
+6. tts
+
+```bash
+curl ${TTS_ENDPOINT} \
+  -X POST \
+  -d '{"text": "Who are you?"}' \
+  -H 'Content-Type: application/json'
+```
+
+7. lvm
 
 ```bash
 curl http://${host_ip}:${LVM_PORT}/v1/lvm \
@@ -255,7 +274,7 @@ curl http://${host_ip}:${LVM_PORT}/v1/lvm \
     -d '{"retrieved_docs": [], "initial_query": "What is this?", "top_n": 1, "metadata": [], "chat_template":"The caption of the image is: '\''{context}'\''. {question}"}'
 ```
 
-7. Multimodal Dataprep Microservice
+8. Multimodal Dataprep Microservice
 
 Download a sample video (.mp4), image (.png, .gif, .jpg), pdf, and audio file (.wav, .mp3) and create a caption
 
@@ -335,7 +354,7 @@ curl -X POST \
     ${DATAPREP_DELETE_FILE_ENDPOINT}
 ```
 
-8. MegaService
+9. MegaService
 
 Test the MegaService with a text query:
 
@@ -362,10 +381,10 @@ curl http://${host_ip}:${MEGA_SERVICE_PORT}/v1/multimodalqna \
     -d  '{"messages": [{"role": "user", "content": [{"type": "text", "text": "Green bananas in a tree"}, {"type": "image_url", "image_url": {"url": "http://images.cocodataset.org/test-stuff2017/000000004248.jpg"}}]}]}'
 ```
 
-Test the MegaService with a back and forth conversation between the user and assistant:
+Test the MegaService with a back and forth conversation between the user and assistant including a text to speech response from the assistant using `"modalities": ["text", "audio"]'`:
 
 ```bash
 curl http://${host_ip}:${MEGA_SERVICE_PORT}/v1/multimodalqna \
 	-H "Content-Type: application/json" \
-	-d '{"messages": [{"role": "user", "content": [{"type": "text", "text": "hello, "}, {"type": "image_url", "image_url": {"url": "https://www.ilankelman.org/stopsigns/australia.jpg"}}]}, {"role": "assistant", "content": "opea project! "}, {"role": "user", "content": "chao, "}], "max_tokens": 10}'
+	-d '{"messages": [{"role": "user", "content": [{"type": "text", "text": "hello, "}, {"type": "image_url", "image_url": {"url": "https://www.ilankelman.org/stopsigns/australia.jpg"}}]}, {"role": "assistant", "content": "opea project! "}, {"role": "user", "content": "chao, "}], "max_tokens": 10, "modalities": ["text", "audio"]}'
 ```

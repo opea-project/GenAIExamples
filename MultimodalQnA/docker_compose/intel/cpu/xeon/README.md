@@ -44,6 +44,10 @@ whisper
 ===
 port 7066 - Open to 0.0.0.0/0
 
+speecht5-service
+===
+port 7055 - Open to 0.0.0.0/0
+
 dataprep-multimodal-redis
 ===
 Port 6007 - Open to 0.0.0.0/0
@@ -83,6 +87,8 @@ export MEGA_SERVICE_HOST_IP=${host_ip}
 export WHISPER_PORT=7066
 export WHISPER_SERVER_ENDPOINT="http://${host_ip}:${WHISPER_PORT}/v1/asr"
 export WHISPER_MODEL="base"
+export TTS_PORT=7055
+export TTS_ENDPOINT="http://${host_ip}:${TTS_PORT}/v1/tts"
 export MAX_IMAGES=1
 export REDIS_DB_PORT=6379
 export REDIS_INSIGHTS_PORT=8001
@@ -168,7 +174,13 @@ Build whisper server image
 docker build --no-cache -t opea/whisper:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/asr/src/integrations/dependency/whisper/Dockerfile .
 ```
 
-### 6. Build MegaService Docker Image
+### 6. Build TTS Image
+
+```bash
+docker build --no-cache -t opea/speecht5:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/tts/src/integrations/dependency/speecht5/Dockerfile .
+```
+
+### 7. Build MegaService Docker Image
 
 To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the [multimodalqna.py](../../../../multimodalqna.py) Python script. Build MegaService Docker image via below command:
 
@@ -179,7 +191,7 @@ docker build --no-cache -t opea/multimodalqna:latest --build-arg https_proxy=$ht
 cd ../..
 ```
 
-### 7. Build UI Docker Image
+### 8. Build UI Docker Image
 
 Build frontend Docker image via below command:
 
@@ -196,11 +208,12 @@ Then run the command `docker images`, you will have the following 11 Docker Imag
 3. `opea/lvm-llava:latest`
 4. `opea/retriever:latest`
 5. `opea/whisper:latest`
-6. `opea/redis-vector-db`
-7. `opea/embedding:latest`
-8. `opea/embedding-multimodal-bridgetower:latest`
-9. `opea/multimodalqna:latest`
-10. `opea/multimodalqna-ui:latest`
+6. `opea/speech5:latest`
+7. `opea/redis-vector-db`
+8. `opea/embedding:latest`
+9. `opea/embedding-multimodal-bridgetower:latest`
+10. `opea/multimodalqna:latest`
+11. `opea/multimodalqna-ui:latest`
 
 ## 🚀 Start Microservices
 
@@ -275,7 +288,16 @@ curl ${WHISPER_SERVER_ENDPOINT} \
     -d '{"audio" : "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA"}'
 ```
 
-5. lvm-llava
+5. tts
+
+```bash
+curl ${TTS_ENDPOINT} \
+  -X POST \
+  -d '{"text": "Who are you?"}' \
+  -H 'Content-Type: application/json'
+```
+
+6. lvm-llava
 
 ```bash
 curl http://${host_ip}:${LLAVA_SERVER_PORT}/generate \
@@ -284,7 +306,7 @@ curl http://${host_ip}:${LLAVA_SERVER_PORT}/generate \
      -d '{"prompt":"Describe the image please.", "img_b64_str": "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8/5+hnoEIwDiqkL4KAcT9GO0U4BxoAAAAAElFTkSuQmCC"}'
 ```
 
-6. lvm
+7. lvm
 
 ```bash
 curl http://${host_ip}:${LVM_PORT}/v1/lvm \
@@ -309,7 +331,7 @@ curl http://${host_ip}:${LVM_PORT}/v1/lvm \
     -d '{"retrieved_docs": [], "initial_query": "What is this?", "top_n": 1, "metadata": [], "chat_template":"The caption of the image is: '\''{context}'\''. {question}"}'
 ```
 
-7. dataprep-multimodal-redis
+8. dataprep-multimodal-redis
 
 Download a sample video (.mp4), image (.png, .gif, .jpg), pdf, and audio file (.wav, .mp3) and create a caption
 
@@ -389,7 +411,7 @@ curl -X POST \
     ${DATAPREP_DELETE_FILE_ENDPOINT}
 ```
 
-8. MegaService
+9. MegaService
 
 Test the MegaService with a text query:
 
@@ -424,8 +446,9 @@ curl http://${host_ip}:${MEGA_SERVICE_PORT}/v1/multimodalqna  \
     -d '{"messages": [{"role": "user", "content": [{"type": "audio", "audio": "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA"}]}]}'
 ```
 
+Test the MegaService with a back and forth conversation between the user and assistant including a text to speech response from the assistant using `"modalities": ["text", "audio"]'`:
 ```bash
 curl http://${host_ip}:${MEGA_SERVICE_PORT}/v1/multimodalqna \
     -H "Content-Type: application/json" \
-    -d '{"messages": [{"role": "user", "content": [{"type": "text", "text": "hello, "}, {"type": "image_url", "image_url": {"url": "https://www.ilankelman.org/stopsigns/australia.jpg"}}]}, {"role": "assistant", "content": "opea project! "}, {"role": "user", "content": "chao, "}], "max_tokens": 10}'
+    -d '{"messages": [{"role": "user", "content": [{"type": "text", "text": "hello, "}, {"type": "image_url", "image_url": {"url": "https://www.ilankelman.org/stopsigns/australia.jpg"}}]}, {"role": "assistant", "content": "opea project! "}, {"role": "user", "content": "chao, "}], "max_tokens": 10, "modalities": ["text", "audio"]}'
 ```

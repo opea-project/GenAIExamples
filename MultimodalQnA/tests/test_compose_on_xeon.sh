@@ -60,7 +60,7 @@ function build_docker_images() {
     git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="multimodalqna multimodalqna-ui embedding-multimodal-bridgetower embedding retriever lvm-llava lvm dataprep whisper"
+    service_list="multimodalqna multimodalqna-ui embedding-multimodal-bridgetower embedding retriever speecht5 lvm-llava lvm dataprep whisper"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
     docker images && sleep 1s
 }
@@ -75,6 +75,8 @@ function setup_env() {
     export MAX_IMAGES=1
     export WHISPER_MODEL="base"
     export WHISPER_SERVER_ENDPOINT="http://${host_ip}:${WHISPER_PORT}/v1/asr"
+    export TTS_PORT=7055
+    export TTS_ENDPOINT="http://${host_ip}:${TTS_PORT}/v1/tts" 
     export REDIS_DB_PORT=6379
     export REDIS_INSIGHTS_PORT=8001
     export REDIS_URL="redis://${host_ip}:${REDIS_DB_PORT}"
@@ -321,8 +323,7 @@ function validate_megaservice() {
         '"time_of_frame_ms":' \
         "multimodalqna" \
         "multimodalqna-backend-server" \
-        '{"messages": [{"role": "user", "content": [{"type": "text", "text": "Find a similar image"}, {"type": "image_url", "image_url": {"url": "https://www.ilankelman.org/stopsigns/australia.jpg"}}]}]}'
-
+        '{"messages": [{"role": "user", "content": [{"type": "text", "text": "hello, "}, {"type": "image_url", "image_url": {"url": "https://www.ilankelman.org/stopsigns/australia.jpg"}}]}, {"role": "assistant", "content": "opea project! "}, {"role": "user", "content": "chao, "}], "max_tokens": 10, "modalities": ["text", "audio"]}'
     echo "Validating megaservice with follow-up query"
     validate_service \
         "http://${host_ip}:${MEGA_SERVICE_PORT}/v1/multimodalqna" \
