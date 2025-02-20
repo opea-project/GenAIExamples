@@ -315,7 +315,7 @@ curl --silent --write-out "HTTPSTATUS:%{http_code}" \
     -X POST -F "files=@./${image_fn}"
 ```
 
-Now, test the microservice with posting a custom caption along with an image and a PDF containing images and text.
+Now, test the microservice with posting a custom caption along with an image and a PDF containing images and text. The image caption can be provided as a text (`.txt`) or as spoken audio (`.wav` or `.mp3`).
 
 ```bash
 curl --silent --write-out "HTTPSTATUS:%{http_code}" \

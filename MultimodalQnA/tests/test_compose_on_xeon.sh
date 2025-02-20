@@ -14,10 +14,10 @@ WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
 
-export image_fn="apple.png"
+export image_fn="sample.png"
 export video_fn="WeAreGoingOnBullrun.mp4"
-export audio_fn="sample_audio.mp3"
-export caption_fn="apple.txt"
+export audio_fn="sample.mp3"  # audio_fn and caption_fn are used as captions for image_fn, so they all need the same base name
+export caption_fn="sample.txt"
 export pdf_fn="nke-10k-2023.pdf"
 
 function check_service_ready() {
@@ -138,16 +138,19 @@ function validate_service() {
     elif [[ $SERVICE_NAME == *"dataprep-multimodal-redis-caption"* ]]; then
         cd $LOG_PATH
         HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -F "files=@./${image_fn}" -H 'Content-Type: multipart/form-data' "$URL")
+    elif [[ $SERVICE_NAME == *"dataprep-multimodal-redis-ingest-image-audio"* ]]; then
+        cd $LOG_PATH
+        HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -F "files=@./${image_fn}" -F "files=@./${audio_fn}" -H 'Content-Type: multipart/form-data' "$URL")
     elif [[ $SERVICE_NAME == *"dataprep-multimodal-redis-ingest"* ]]; then
         cd $LOG_PATH
-        HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -F "files=@./${image_fn}" -F "files=@./apple.txt" -H 'Content-Type: multipart/form-data' "$URL")
+        HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -F "files=@./${image_fn}" -F "files=@./${caption_fn}" -H 'Content-Type: multipart/form-data' "$URL")
     elif [[ $SERVICE_NAME == *"dataprep-multimodal-redis-pdf"* ]]; then
         cd $LOG_PATH
         HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -F "files=@./${pdf_fn}" -H 'Content-Type: multipart/form-data' "$URL")
     elif [[ $SERVICE_NAME == *"dataprep_get"* ]]; then
         HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -H 'Content-Type: application/json' "$URL")
     elif [[ $SERVICE_NAME == *"dataprep_del"* ]]; then
-        HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -d '{"file_path": "apple.txt"}' -H 'Content-Type: application/json' "$URL")
+        HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -d '{"file_path": "${caption_fn}"}' -H 'Content-Type: application/json' "$URL")
     else
         HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL")
     fi
@@ -219,11 +222,18 @@ function validate_microservices() {
         "dataprep-multimodal-redis-transcript" \
         "dataprep-multimodal-redis"
 
-    echo "Validating Data Prep with Image & Caption Ingestion"
+    echo "Validating Data Prep with Image & Text Caption Ingestion"
     validate_service \
         "${DATAPREP_INGEST_SERVICE_ENDPOINT}" \
         "Data preparation succeeded" \
         "dataprep-multimodal-redis-ingest" \
+        "dataprep-multimodal-redis"
+
+    echo "Validating Data Prep with Image & Audio Caption Ingestion"
+    validate_service \
+        "${DATAPREP_INGEST_SERVICE_ENDPOINT}" \
+        "Data preparation succeeded" \
+        "dataprep-multimodal-redis-ingest-image-audio" \
         "dataprep-multimodal-redis"
 
     echo "Validating Data Prep with PDF"
