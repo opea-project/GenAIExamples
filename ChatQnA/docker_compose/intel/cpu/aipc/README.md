@@ -82,18 +82,18 @@ export host_ip="External_Public_IP"
 
 For Linux users, please run `hostname -I | awk '{print $1}'`. For Windows users, please run `ipconfig | findstr /i "IPv4"` to get the external public ip.
 
-**Export the value of your Huggingface API token to the `your_hf_api_token` environment variable**
+**Export the value of your Huggingface API token to the `HUGGINGFACEHUB_API_TOKEN` environment variable**
 
 > Change the Your_Huggingface_API_Token below with tyour actual Huggingface API Token value
 
 ```
-export your_hf_api_token="Your_Huggingface_API_Token"
+export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
 ```
 
 **Append the value of the public IP address to the no_proxy list if you are in a proxy environment**
 
 ```
-export your_no_proxy=${your_no_proxy},"External_Public_IP",chatqna-aipc-backend-server,tei-embedding-service,retriever,tei-reranking-service,redis-vector-db,dataprep-redis-service
+export your_no_proxy=${your_no_proxy},"External_Public_IP",chatqna-aipc-backend-server,tei-embedding-service,retriever,tei-reranking-service,redis-vector-db,dataprep-redis-service,ollama-service
 ```
 
 - Linux PC
@@ -105,7 +105,7 @@ export https_proxy=${your_http_proxy}
 export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
 export RERANK_MODEL_ID="BAAI/bge-reranker-base"
 export INDEX_NAME="rag-redis"
-export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
+export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
 export OLLAMA_HOST=${host_ip}
 export OLLAMA_MODEL="llama3.2"
 ```
@@ -116,7 +116,7 @@ export OLLAMA_MODEL="llama3.2"
 set EMBEDDING_MODEL_ID=BAAI/bge-base-en-v1.5
 set RERANK_MODEL_ID=BAAI/bge-reranker-base
 set INDEX_NAME=rag-redis
-set HUGGINGFACEHUB_API_TOKEN=%your_hf_api_token%
+set HUGGINGFACEHUB_API_TOKEN=%HUGGINGFACEHUB_API_TOKEN%
 set OLLAMA_HOST=host.docker.internal
 set OLLAMA_MODEL="llama3.2"
 ```
