@@ -131,7 +131,7 @@ def _create_yaml_content(service, base_url, bench_target, test_phase, num_querie
                 "locustfile": os.path.join(eval_path, "evals/benchmark/stresscli/locust/aistress.py"),
                 "host": base_url,
                 "stop-timeout": test_params["query_timeout"],
-                "processes": 2,  # set to 2 by default
+                "processes": 16,  # set to 2 by default
                 "namespace": test_params["namespace"],
                 "bench-target": bench_target,
                 "service-metric-collect": test_params["collect_service_metric"],
