@@ -111,6 +111,7 @@ def _create_yaml_content(service, base_url, bench_target, test_phase, num_querie
     eval_path = os.getenv("EVAL_PATH", "")
     if not eval_path:
         import pkg_resources
+
         for dist in pkg_resources.working_set:
             if "opea-eval" in dist.project_name:
                 eval_path = dist.location
@@ -313,7 +314,7 @@ def _run_service_test(example, service, test_suite_config, namespace):
                 os.environ[key] = value
                 if key == "DATASET":
                     dataset = value
-        
+
         if dataset:
             # Ingest data into the database for single run of benchmark
             result = ingest_data_to_db(service, dataset, namespace)
