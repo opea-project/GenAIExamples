@@ -32,7 +32,7 @@ def construct_benchmark_config(test_suite_config):
         "warmup_iterations": test_suite_config.get("warmup_iterations", 10),
         "seed": test_suite_config.get("seed", None),
         "bench_target": test_suite_config.get("bench_target", ["chatqnafixed"]),
-        "dataset": test_suite_config.get("dataset", ["upload_file.txt"]),
+        "dataset": test_suite_config.get("dataset", ""),
         "prompt": test_suite_config.get("prompt", [10]),
         "llm_max_token_size": test_suite_config.get("llm", {}).get("max_token_size", [128]),
     }
@@ -108,16 +108,16 @@ def _create_yaml_content(service, base_url, bench_target, test_phase, num_querie
     print(spec)
 
     # get folder path of opea-eval
-    # TODO: use environment variable for now until related issues been fixed in opea-eval
     eval_path = os.getenv("EVAL_PATH", "")
-    # import pkg_resources
-
-    # for dist in pkg_resources.working_set:
-    #     if "opea-eval" in dist.project_name:
-    #         eval_path = dist.location
-    #         break
     if not eval_path:
-        print("Fail to find the opea-eval package. Please install/download it first.")
+        import pkg_resources
+
+        for dist in pkg_resources.working_set:
+            if "opea-eval" in dist.project_name:
+                eval_path = dist.location
+                break
+    if not eval_path:
+        print("Fail to find the opea-eval package. Please set/install it first.")
         exit(1)
 
     load_shape = test_params["load_shape"]
@@ -130,6 +130,7 @@ def _create_yaml_content(service, base_url, bench_target, test_phase, num_querie
                 "tool": "locust",
                 "locustfile": os.path.join(eval_path, "evals/benchmark/stresscli/locust/aistress.py"),
                 "host": base_url,
+                "run-time": test_params["run_time"],
                 "stop-timeout": test_params["query_timeout"],
                 "processes": 16,  # set to 2 by default
                 "namespace": test_params["namespace"],
@@ -148,10 +149,6 @@ def _create_yaml_content(service, base_url, bench_target, test_phase, num_querie
         }
     }
 
-    # For the following scenarios, test will stop after the specified run-time
-    if test_params["run_time"] is not None and test_phase != "warmup":
-        yaml_content["profile"]["global-settings"]["run-time"] = test_params["run_time"]
-
     return yaml_content
 
 
@@ -163,7 +160,10 @@ def _create_stresscli_confs(case_params, test_params, test_phase, num_queries, b
     for i, b_target in enumerate(bench_target):
         stresscli_conf = {}
         print(f"[OPEA BENCHMARK] 🚀 Running test for {b_target} in phase {test_phase} for {num_queries} queries")
-        stresscli_conf["envs"] = {"DATASET": test_params["dataset"][i], "MAX_LINES": str(test_params["prompt"][i])}
+        if len(test_params["dataset"]) > i:
+            stresscli_conf["envs"] = {"DATASET": test_params["dataset"][i], "MAX_LINES": str(test_params["prompt"][i])}
+        else:
+            stresscli_conf["envs"] = {"MAX_LINES": str(test_params["prompt"][i])}
         # Generate the content of stresscli configuration file
         stresscli_yaml = _create_yaml_content(
             case_params, base_url, b_target, test_phase, num_queries, test_params, concurrency
@@ -314,14 +314,15 @@ def _run_service_test(example, service, test_suite_config, namespace):
                 os.environ[key] = value
                 if key == "DATASET":
                     dataset = value
-        if not dataset:
-            print(f"[OPEA BENCHMARK] 🚀 Dataset is not specified for {service_name}. Check the benchmark.yaml again.")
 
-        # Ingest data into the database for single run of benchmark
-        result = ingest_data_to_db(service, dataset, namespace)
-        if not result:
-            print(f"[OPEA BENCHMARK] 🚀 Data ingestion failed for {service_name}.")
-            exit(1)
+        if dataset:
+            # Ingest data into the database for single run of benchmark
+            result = ingest_data_to_db(service, dataset, namespace)
+            if not result:
+                print(f"[OPEA BENCHMARK] 🚀 Data ingestion failed for {service_name}.")
+                exit(1)
+        else:
+            print(f"[OPEA BENCHMARK] 🚀 Dataset is not specified for {service_name}. Check the benchmark.yaml again.")
 
         # Run the benchmark test and append the output folder to the list
         print("[OPEA BENCHMARK] 🚀 Start locust_runtests at", datetime.now().strftime("%Y%m%d_%H%M%S"))
@@ -359,7 +360,7 @@ def run_benchmark(benchmark_config, chart_name, namespace, node_num=1, llm_model
     test_suite_config = {
         "user_queries": parsed_data["user_queries"],  # num of user queries
         "random_prompt": False,  # whether to use random prompt, set to False by default
-        "run_time": "60m",  # The max total run time for the test suite, set to 60m by default
+        "run_time": "30m",  # The max total run time for the test suite, set to 60m by default
         "collect_service_metric": False,  # whether to collect service metrics, set to False by default
         "llm_model": llm_model,  # The LLM model used for the test
         "deployment_type": "k8s",  # Default is "k8s", can also be "docker"
