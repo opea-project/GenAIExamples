@@ -20,7 +20,7 @@ export MAX_NUM_BATCHED_TOKENS=4000
 export MAX_NUM_SEQS=256
 export TENSOR_PARALLEL_SIZE=1
 
-# set teh path where locates the pre-downloaded models
+# set the path where locates the pre-downloaded models
 export EMBEDDING_MODEL_ID="/data/BAAI-bge-base-en-v1.5"
 export RERANK_MODEL_ID="/data/BAAI-bge-reranker-base"
 export INDEX_NAME="rag-redis"

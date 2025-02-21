@@ -20,7 +20,7 @@ Several prerequisites are required when starting up the ChatQnA use case. Please
 ```
 Docker installation: https://docs.docker.com/engine/install/ubuntu/
 Pip installation: https://pip.pypa.io/en/stable/installation/
-Modelscope CLI installation: 
+Modelscope CLI installation:
   pip install modelscope
 ```
 
@@ -125,7 +125,7 @@ For users in China who are unable to download models directly from Huggingface, 
    model_name="deepseek-ai/DeepSeek-R1-Distill-Qwen-32B"
    # Start vLLM LLM Service
    docker run -p 8008:80 -v ./data:/llm/models --name vllm-service --device=/dev/dri:/dev/dri -e HF_ENDPOINT=$HF_ENDPOINT -e HF_TOKEN=$HF_TOKEN -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e no_proxy=$no_proxy --shm-size 128g intelanalytics/ipex-llm-serving-xpu:2.2.0-b14
-   
+
    ```
 
 2. Offline
@@ -289,7 +289,6 @@ curl -X POST "http://${host_ip}:6007/v1/dataprep/delete" \
      -d '{"file_path": "all"}' \
      -H "Content-Type: application/json"
 ```
-
 
 ## 🚀 Launch the UI
 
