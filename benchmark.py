@@ -129,6 +129,7 @@ def _create_yaml_content(service, base_url, bench_target, test_phase, num_querie
                 "tool": "locust",
                 "locustfile": os.path.join(eval_path, "evals/benchmark/stresscli/locust/aistress.py"),
                 "host": base_url,
+                "run-time": test_params["run_time"],
                 "stop-timeout": test_params["query_timeout"],
                 "processes": 2,  # set to 2 by default
                 "namespace": test_params["namespace"],
@@ -146,10 +147,6 @@ def _create_yaml_content(service, base_url, bench_target, test_phase, num_querie
             "runs": [{"name": test_phase, "users": concurrency, "max-request": num_queries}],
         }
     }
-
-    # For the following scenarios, test will stop after the specified run-time
-    if test_params["run_time"] is not None and test_phase != "warmup":
-        yaml_content["profile"]["global-settings"]["run-time"] = test_params["run_time"]
 
     return yaml_content
 
@@ -359,7 +356,7 @@ def run_benchmark(benchmark_config, chart_name, namespace, node_num=1, llm_model
     test_suite_config = {
         "user_queries": parsed_data["user_queries"],  # num of user queries
         "random_prompt": False,  # whether to use random prompt, set to False by default
-        "run_time": "60m",  # The max total run time for the test suite, set to 60m by default
+        "run_time": "30m",  # The max total run time for the test suite, set to 60m by default
         "collect_service_metric": False,  # whether to collect service metrics, set to False by default
         "llm_model": llm_model,  # The LLM model used for the test
         "deployment_type": "k8s",  # Default is "k8s", can also be "docker"
