@@ -12,12 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { sveltekit } from "@sveltejs/kit/vite";
-import { defineConfig } from "vite";
+export interface Language {
+	name: string;
+}
 
-export default defineConfig({
-	plugins: [sveltekit()],
-	server: {
-		allowedHosts: true,
-	},
-});
+/**
+ * TODO: Create API to return a list of languages and load them from there.
+ */
