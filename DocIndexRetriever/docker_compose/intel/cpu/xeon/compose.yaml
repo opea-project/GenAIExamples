@@ -13,6 +13,8 @@ services:
   dataprep-redis-service:
     image: ${REGISTRY:-opea}/dataprep:${TAG:-latest}
     container_name: dataprep-redis-server
+    # volumes:
+    #   - $WORKDIR/GenAIExamples/DocIndexRetriever/docker_image_build/GenAIComps/comps:/home/user/comps
     depends_on:
       - redis-vector-db
     ports:
@@ -52,6 +54,8 @@ services:
   embedding:
     image: ${REGISTRY:-opea}/embedding:${TAG:-latest}
     container_name: embedding-server
+    # volumes:
+    #   - $WORKDIR/GenAIExamples/DocIndexRetriever/docker_image_build/GenAIComps/comps:/home/comps
     ports:
       - "6000:6000"
     ipc: host
@@ -110,6 +114,8 @@ services:
   reranking:
     image: ${REGISTRY:-opea}/reranking:${TAG:-latest}
     container_name: reranking-tei-xeon-server
+    # volumes:
+    #   - $WORKDIR/GenAIExamples/DocIndexRetriever/docker_image_build/GenAIComps/comps:/home/user/comps
     depends_on:
       tei-reranking-service:
         condition: service_healthy

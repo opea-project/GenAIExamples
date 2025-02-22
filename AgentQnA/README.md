@@ -84,7 +84,7 @@ flowchart LR
 3. Hierarchical multi-agents can improve performance.
    Expert worker agents, such as RAG agent and SQL agent, can provide high-quality output for different aspects of a complex query, and the supervisor agent can aggregate the information together to provide a comprehensive answer. If we only use one agent and provide all the tools to this single agent, it may get overwhelmed and not able to provide accurate answers.
 
-## Deployment with docker
+## Deploy with docker
 
 1. Build agent docker image [Optional]
 
@@ -217,13 +217,19 @@ docker build -t opea/agent:latest --build-arg https_proxy=$https_proxy --build-a
    :::
    ::::
 
+## Deploy AgentQnA UI
+
+The AgentQnA UI can be deployed locally or using Docker.
+
+For detailed instructions on deploying AgentQnA UI, refer to the [AgentQnA UI Guide](./ui/svelte/README.md).
+
 ## Deploy using Helm Chart
 
 Refer to the [AgentQnA helm chart](./kubernetes/helm/README.md) for instructions on deploying AgentQnA on Kubernetes.
 
 ## Validate services
 
-First look at logs of the agent docker containers:
+1. First look at logs of the agent docker containers:
 
 ```
 # worker RAG agent
@@ -240,35 +246,18 @@ docker logs react-agent-endpoint
 
 You should see something like "HTTP server setup successful" if the docker containers are started successfully.</p>
 
-Second, validate worker RAG agent:
+2. You can use python to validate the agent system
 
+```bash
+# RAG worker agent
+python tests/test.py --prompt "Tell me about Michael Jackson song Thriller" --agent_role "worker" --ext_port 9095
+
+# SQL agent
+python tests/test.py --prompt "How many employees in company" --agent_role "worker" --ext_port 9096
+
+# supervisor agent: this will test a two-turn conversation
+python tests/test.py --agent_role "supervisor" --ext_port 9090
 ```
-curl http://${host_ip}:9095/v1/chat/completions -X POST -H "Content-Type: application/json" -d '{
-     "messages": "Michael Jackson song Thriller"
-    }'
-```
-
-Third, validate worker SQL agent:
-
-```
-curl http://${host_ip}:9096/v1/chat/completions -X POST -H "Content-Type: application/json" -d '{
-     "messages": "How many employees are in the company"
-    }'
-```
-
-Finally, validate supervisor agent:
-
-```
-curl http://${host_ip}:9090/v1/chat/completions -X POST -H "Content-Type: application/json" -d '{
-     "messages": "How many albums does Iron Maiden have?"
-    }'
-```
-
-## Deploy AgentQnA UI
-
-The AgentQnA UI can be deployed locally or using Docker.
-
-For detailed instructions on deploying AgentQnA UI, refer to the [AgentQnA UI Guide](./ui/svelte/README.md).
 
 ## How to register your own tools with agent
 

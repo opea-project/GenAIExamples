@@ -78,7 +78,7 @@ bash step3_ingest_data_and_validate_retrieval.sh
 echo "=================== #3 Data ingestion and validation completed===================="
 
 echo "=================== #4 Start agent and API server===================="
-bash step4_launch_and_validate_agent_tgi.sh
+bash step4_launch_and_validate_agent_gaudi.sh
 echo "=================== #4 Agent test passed ===================="
 
 echo "=================== #5 Stop agent and API server===================="
