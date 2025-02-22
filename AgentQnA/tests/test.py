@@ -1,34 +1,20 @@
-# Copyright (C) 2024 Intel Corporation
+# Copyright (C) 2025 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
 import argparse
-import os
+import json
+import uuid
 
 import requests
 
 
-def generate_answer_agent_api(url, prompt):
-    proxies = {"http": ""}
-    payload = {
-        "messages": prompt,
-    }
-    response = requests.post(url, json=payload, proxies=proxies)
-    answer = response.json()["text"]
-    return answer
-
-
 def process_request(url, query, is_stream=False):
     proxies = {"http": ""}
-
-    payload = {
-        "messages": query,
-    }
-
+    content = json.dumps(query) if query is not None else None
     try:
-        resp = requests.post(url=url, json=payload, proxies=proxies, stream=is_stream)
+        resp = requests.post(url=url, data=content, proxies=proxies, stream=is_stream)
         if not is_stream:
             ret = resp.json()["text"]
-            print(ret)
         else:
             for line in resp.iter_lines(decode_unicode=True):
                 print(line)
@@ -38,19 +24,54 @@ def process_request(url, query, is_stream=False):
         return ret
     except requests.exceptions.RequestException as e:
         ret = f"An error occurred:{e}"
-        print(ret)
-        return False
+        return None
+
+
+def test_worker_agent(args):
+    url = f"http://{args.ip_addr}:{args.ext_port}/v1/chat/completions"
+    query = {"role": "user", "messages": args.prompt, "stream": "false"}
+    ret = process_request(url, query)
+    print("Response: ", ret)
+
+
+def add_message_and_run(url, user_message, thread_id, stream=False):
+    print("User message: ", user_message)
+    query = {"role": "user", "messages": user_message, "thread_id": thread_id, "stream": stream}
+    ret = process_request(url, query, is_stream=stream)
+    print("Response: ", ret)
+
+
+def test_chat_completion_multi_turn(args):
+    url = f"http://{args.ip_addr}:{args.ext_port}/v1/chat/completions"
+    thread_id = f"{uuid.uuid4()}"
+
+    # first turn
+    print("===============First turn==================")
+    user_message = "Which artist has the most albums in the database?"
+    add_message_and_run(url, user_message, thread_id, stream=args.stream)
+    print("===============End of first turn==================")
+
+    # second turn
+    print("===============Second turn==================")
+    user_message = "Give me a few examples of the artist's albums?"
+    add_message_and_run(url, user_message, thread_id, stream=args.stream)
+    print("===============End of second turn==================")
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--prompt", type=str)
-    parser.add_argument("--stream", action="store_true")
-    args = parser.parse_args()
+    parser.add_argument("--ip_addr", type=str, default="127.0.0.1", help="endpoint ip address")
+    parser.add_argument("--ext_port", type=str, default="9090", help="endpoint port")
+    parser.add_argument("--stream", action="store_true", help="streaming mode")
+    parser.add_argument("--prompt", type=str, help="prompt message")
+    parser.add_argument("--agent_role", type=str, default="supervisor", help="supervisor or worker")
+    args, _ = parser.parse_known_args()
 
-    ip_address = os.getenv("ip_address", "localhost")
-    agent_port = os.getenv("agent_port", "9090")
-    url = f"http://{ip_address}:{agent_port}/v1/chat/completions"
-    prompt = args.prompt
+    print(args)
 
-    process_request(url, prompt, args.stream)
+    if args.agent_role == "supervisor":
+        test_chat_completion_multi_turn(args)
+    elif args.agent_role == "worker":
+        test_worker_agent(args)
+    else:
+        raise ValueError("Invalid agent role")
