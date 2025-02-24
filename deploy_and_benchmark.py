@@ -271,7 +271,7 @@ def main(yaml_file, target_node=None, test_mode="oob"):
                                 "--namespace",
                                 namespace,
                                 "--chart-dir",
-                                chart_dir
+                                chart_dir,
                             ]
                             result = subprocess.run(cmd, check=True, capture_output=True, text=True)
 
@@ -297,7 +297,7 @@ def main(yaml_file, target_node=None, test_mode="oob"):
                                 chart_dir,
                                 "--user-values",
                                 values_file_path,
-                                "--update-service"
+                                "--update-service",
                             ]
                             result = subprocess.run(cmd, check=True)
                             if result.returncode != 0:
@@ -317,10 +317,12 @@ def main(yaml_file, target_node=None, test_mode="oob"):
                             "--timeout",
                             str(timeout),
                             "--interval",
-                            str(interval)
+                            str(interval),
                         ]
                         try:
-                            result = subprocess.run(cmd, check=False)  # Changed to check=False to handle return code manually
+                            result = subprocess.run(
+                                cmd, check=False
+                            )  # Changed to check=False to handle return code manually
                             if result.returncode == 0:
                                 print("Deployments are ready!")
                                 # Run benchmark only if deployment is ready
@@ -332,9 +334,11 @@ def main(yaml_file, target_node=None, test_mode="oob"):
                                     llm_model=deploy_config.get("services", {}).get("llm", {}).get("model_id", ""),
                                 )
                             else:
-                                print(f"Deployments are not ready after timeout period during "
-                                      f"{'deployment' if i == 0 else 'update'} for {node} nodes. "
-                                      f"Skipping remaining iterations.")
+                                print(
+                                    f"Deployments are not ready after timeout period during "
+                                    f"{'deployment' if i == 0 else 'update'} for {node} nodes. "
+                                    f"Skipping remaining iterations."
+                                )
                                 break  # Exit the batch parameter loop for current node
                         except subprocess.CalledProcessError as e:
                             print(f"Error while checking deployment status: {str(e)}")

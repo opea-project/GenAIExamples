@@ -77,19 +77,13 @@ def configure_resources(values, deploy_config):
             # Only add CPU if cores_per_instance has a valid value
             cores = resources_config.get("cores_per_instance")
             if cores is not None and cores != "":
-                resources = {
-                    "limits": {"cpu": cores},
-                    "requests": {"cpu": cores}
-                }
+                resources = {"limits": {"cpu": cores}, "requests": {"cpu": cores}}
 
             # Only add memory if memory_capacity has a valid value
             memory = resources_config.get("memory_capacity")
             if memory is not None and memory != "":
                 if not resources:
-                    resources = {
-                        "limits": {"memory": memory},
-                        "requests": {"memory": memory}
-                    }
+                    resources = {"limits": {"memory": memory}, "requests": {"memory": memory}}
                 else:
                     resources["limits"]["memory"] = memory
                     resources["requests"]["memory"] = memory
@@ -627,7 +621,6 @@ def main():
         default=5,
         help="Interval between readiness checks in seconds (default: 5)",
     )
-
 
     args = parser.parse_args()
 
