@@ -15,8 +15,8 @@ deploy:
     backend:
       resources:
         enabled: False
-        cores_per_instance: ""
-        memory_capacity: ""
+        cores_per_instance: "16"
+        memory_capacity: "8000Mi"
       replicaCount: [1, 2, 4, 8]
 
     teirerank:
@@ -31,8 +31,8 @@ deploy:
       model_id: ""
       resources:
         enabled: False
-        cores_per_instance: ""
-        memory_capacity: ""
+        cores_per_instance: "80"
+        memory_capacity: "20000Mi"
       replicaCount: [1, 2, 4, 8]
 
     llm:
@@ -61,10 +61,10 @@ deploy:
             max_batch_size: [1, 2, 4, 8]  # Each value triggers an LLM service upgrade
           token_params:
             enabled: False
-            max_input_length: ""
-            max_total_tokens: ""
-            max_batch_total_tokens: ""
-            max_batch_prefill_tokens: ""
+            max_input_length: "1280"
+            max_total_tokens: "2048"
+            max_batch_total_tokens: "65536"
+            max_batch_prefill_tokens: "4096"
 
     data-prep:
       resources:
@@ -76,8 +76,8 @@ deploy:
     retriever-usvc:
       resources:
         enabled: False
-        cores_per_instance: ""
-        memory_capacity: ""
+        cores_per_instance: "8"
+        memory_capacity: "8000Mi"
       replicaCount: [1, 2, 4, 8]
 
     redis-vector-db:
