@@ -13,11 +13,13 @@
 // limitations under the License.
 
 import { sveltekit } from "@sveltejs/kit/vite";
-import { defineConfig } from "vite";
+import type { UserConfig } from "vite";
 
-export default defineConfig({
+const config: UserConfig = {
 	plugins: [sveltekit()],
 	server: {
 		allowedHosts: true,
 	},
-});
+};
+
+export default config;
