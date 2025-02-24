@@ -2,7 +2,7 @@
 
 ## Introduction
 
-GenAIExamples are designed to give developers an easy entry into generative AI, featuring microservice-based samples that simplify the processes of deploying, testing, and scaling GenAI applications. All examples are fully compatible with Docker and Kubernetes, supporting a wide range of hardware platforms such as Gaudi, Xeon, and NVIDIA GPU, and other hardwares, ensuring flexibility and efficiency for your GenAI adoption. 
+GenAIExamples are designed to give developers an easy entry into generative AI, featuring microservice-based samples that simplify the processes of deploying, testing, and scaling GenAI applications. All examples are fully compatible with Docker and Kubernetes, supporting a wide range of hardware platforms such as Gaudi, Xeon, and NVIDIA GPU, and other hardwares, ensuring flexibility and efficiency for your GenAI adoption.
 
 ## Architecture
 
@@ -13,7 +13,8 @@ GenAIExamples are designed to give developers an easy entry into generative AI, 
 [GenAIEval](https://github.com/opea-project/GenAIEval) measures service performance metrics such as throughput, latency, and accuracy for GenAIExamples. This feature helps users compare performance across various hardware configurations easily.
 
 ## Documentation
-The GenAIExamples [documentation](https://opea-project.github.io/latest/examples/index.html) contains a comprehensive guide on all available examples including architecture, deployment guides, and more. Information on GenAIComps, GenAIInfra, and GenAIEval can also be found there. 
+
+The GenAIExamples [documentation](https://opea-project.github.io/latest/examples/index.html) contains a comprehensive guide on all available examples including architecture, deployment guides, and more. Information on GenAIComps, GenAIInfra, and GenAIEval can also be found there.
 
 ## Getting Started
 
@@ -46,7 +47,7 @@ Deployment is based on released docker images by default, check [docker image li
 
 #### Deploy Examples
 
->**Note**: Check for [sample guides](https://opea-project.github.io/latest/examples/index.html) first for your use case. If it is not available, then refer to the table below. 
+> **Note**: Check for [sample guides](https://opea-project.github.io/latest/examples/index.html) first for your use case. If it is not available, then refer to the table below.
 
 | Use Case          | Docker Compose<br/>Deployment on Xeon                                          | Docker Compose<br/>Deployment on Gaudi                                       | Docker Compose<br/>Deployment on ROCm                                    | Kubernetes with Helm Charts                                         | Kubernetes with GMC                                          |
 | ----------------- | ------------------------------------------------------------------------------ | ---------------------------------------------------------------------------- | ------------------------------------------------------------------------ | ------------------------------------------------------------------- | ------------------------------------------------------------ |
