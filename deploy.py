@@ -74,25 +74,25 @@ def configure_resources(values, deploy_config):
                 "requests": {"habana.ai/gaudi": resources_config["cards_per_instance"]},
             }
         else:
-            limits = {}
-            requests = {}
-
             # Only add CPU if cores_per_instance has a valid value
             cores = resources_config.get("cores_per_instance")
             if cores is not None and cores != "":
-                limits["cpu"] = cores
-                requests["cpu"] = cores
+                resources = {
+                    "limits": {"cpu": cores},
+                    "requests": {"cpu": cores}
+                }
 
             # Only add memory if memory_capacity has a valid value
             memory = resources_config.get("memory_capacity")
             if memory is not None and memory != "":
-                limits["memory"] = memory
-                requests["memory"] = memory
-
-            # Only create resources if we have any valid limits/requests
-            if limits and requests:
-                resources["limits"] = limits
-                resources["requests"] = resources
+                if not resources:
+                    resources = {
+                        "limits": {"memory": memory},
+                        "requests": {"memory": memory}
+                    }
+                else:
+                    resources["limits"]["memory"] = memory
+                    resources["requests"]["memory"] = memory
 
         if resources:
             if service_name == "llm":
@@ -129,9 +129,12 @@ def configure_extra_cmd_args(values, deploy_config):
             engine = config.get("engine", "tgi")
             model_params = config.get("model_params", {})
 
+            # Get engine-specific parameters
+            engine_params = model_params.get(engine, {})
+
             # Get batch parameters and token parameters configuration
-            batch_params = model_params.get("batch_params", {})
-            token_params = model_params.get("token_params", {})
+            batch_params = engine_params.get("batch_params", {})
+            token_params = engine_params.get("token_params", {})
 
             # Add all parameters that exist in batch_params
             for param, value in batch_params.items():
@@ -147,6 +150,7 @@ def configure_extra_cmd_args(values, deploy_config):
                 if engine not in values:
                     values[engine] = {}
                 values[engine]["extraCmdArgs"] = extra_cmd_args
+                print(f"extraCmdArgs: {extra_cmd_args}")
 
     return values
 

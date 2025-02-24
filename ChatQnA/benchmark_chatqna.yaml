@@ -45,18 +45,26 @@ deploy:
         enabled: False
         cards_per_instance: 1
       model_params:
-        batch_params:
-          enabled: True
-          # TGI specific settings
-          max_batch_size: [1, 2, 4, 8]  # Each value triggers an LLM service upgrade
-          # VLLM specific settings
-          max_num_seqs: [1, 2, 4, 8]    # Each value triggers an LLM service upgrade
-        token_params:
-          enabled: False
-          max_input_length: ""
-          max_total_tokens: ""
-          max_batch_total_tokens: ""
-          max_batch_prefill_tokens: ""
+        vllm:  # VLLM specific parameters
+          batch_params:
+            enabled: True
+            max_num_seqs: [1, 2, 4, 8]    # Each value triggers an LLM service upgrade
+          token_params:
+            enabled: False
+            max_input_length: ""
+            max_total_tokens: ""
+            max_batch_total_tokens: ""
+            max_batch_prefill_tokens: ""
+        tgi:   # TGI specific parameters
+          batch_params:
+            enabled: True
+            max_batch_size: [1, 2, 4, 8]  # Each value triggers an LLM service upgrade
+          token_params:
+            enabled: False
+            max_input_length: ""
+            max_total_tokens: ""
+            max_batch_total_tokens: ""
+            max_batch_prefill_tokens: ""
 
     data-prep:
       resources:

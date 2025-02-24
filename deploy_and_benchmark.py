@@ -78,8 +78,8 @@ def construct_deploy_config(deploy_config, target_node, batch_param_value=None, 
         if "resources" in service_config:
             resources = service_config["resources"]
             if test_mode == "tune" or resources.get("enabled", False):
-                # Keep resource configuration
-                pass
+                # Keep resource configuration but remove enabled field
+                resources.pop("enabled", None)
             else:
                 # Remove resource configuration in OOB mode when disabled
                 service_config.pop("resources")
@@ -87,34 +87,43 @@ def construct_deploy_config(deploy_config, target_node, batch_param_value=None, 
         # Handle model parameters for LLM service
         if service_name == "llm" and "model_params" in service_config:
             model_params = service_config["model_params"]
+            engine = service_config.get("engine", "tgi")
+
+            # Get engine-specific parameters
+            engine_params = model_params.get(engine, {})
 
             # Handle batch parameters
-            if "batch_params" in model_params:
-                batch_params = model_params["batch_params"]
+            if "batch_params" in engine_params:
+                batch_params = engine_params["batch_params"]
                 if test_mode == "tune" or batch_params.get("enabled", False):
-                    engine = service_config.get("engine", "tgi")
+                    # Keep batch parameters configuration but remove enabled field
+                    batch_params.pop("enabled", None)
+
+                    # Update batch parameter value if specified
                     if batch_param_value is not None:
                         if engine == "tgi":
-                            batch_params["max_batch_size"] = batch_param_value
-                            batch_params.pop("max_num_seqs", None)
+                            batch_params["max_batch_size"] = str(batch_param_value)
                         elif engine == "vllm":
-                            batch_params["max_num_seqs"] = batch_param_value
-                            batch_params.pop("max_batch_size", None)
+                            batch_params["max_num_seqs"] = str(batch_param_value)
                 else:
-                    model_params.pop("batch_params")
+                    engine_params.pop("batch_params")
 
             # Handle token parameters
-            if "token_params" in model_params:
-                token_params = model_params["token_params"]
+            if "token_params" in engine_params:
+                token_params = engine_params["token_params"]
                 if test_mode == "tune" or token_params.get("enabled", False):
-                    # Keep token parameters configuration
-                    pass
+                    # Keep token parameters configuration but remove enabled field
+                    token_params.pop("enabled", None)
                 else:
                     # Remove token parameters in OOB mode when disabled
-                    model_params.pop("token_params")
+                    engine_params.pop("token_params")
 
-            # Remove model_params if empty
-            if not model_params:
+            # Update model_params with engine-specific parameters only
+            model_params.clear()
+            model_params[engine] = engine_params
+
+            # Remove model_params if empty or if engine_params is empty
+            if not model_params or not engine_params:
                 service_config.pop("model_params")
 
     return new_config
@@ -195,21 +204,26 @@ def main(yaml_file, target_node=None, test_mode="oob"):
                 continue
 
             try:
-                # Only process batch parameters in tune mode
-                if test_mode == "tune":
-                    # Process batch parameters based on engine type
-                    llm_config = deploy_config.get("services", {}).get("llm", {})
+                # Process batch parameters based on engine type
+                services = deploy_config.get("services", {})
+                llm_config = services.get("llm", {})
+
+                if "model_params" in llm_config:
+                    model_params = llm_config["model_params"]
                     engine = llm_config.get("engine", "tgi")
 
-                    if engine == "tgi":
-                        batch_params = llm_config.get("max_batch_size", [])
-                        param_name = "max_batch_size"
-                    elif engine == "vllm":
-                        batch_params = llm_config.get("max_num_seqs", [])
-                        param_name = "max_num_seqs"
-                    else:
-                        print(f"Unsupported LLM engine: {engine}")
-                        continue
+                    # Get engine-specific parameters
+                    engine_params = model_params.get(engine, {})
+
+                    # Handle batch parameters
+                    batch_params = []
+                    if "batch_params" in engine_params:
+                        batch_params = (
+                            engine_params["batch_params"].get("max_batch_size", [])
+                            if engine == "tgi"
+                            else engine_params["batch_params"].get("max_num_seqs", [])
+                        )
+                        param_name = "max_batch_size" if engine == "tgi" else "max_num_seqs"
 
                     if not isinstance(batch_params, list):
                         batch_params = [batch_params]
@@ -218,7 +232,6 @@ def main(yaml_file, target_node=None, test_mode="oob"):
                     if batch_params == [""] or not batch_params:
                         batch_params = [None]
                 else:
-                    # In OOB mode, just do one iteration with no batch parameter
                     batch_params = [None]
                     param_name = "batch_param"
 
