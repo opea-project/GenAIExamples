@@ -1,5 +1,198 @@
 Copyright (C) 2024 Advanced Micro Devices, Inc.
 
+
+# Deploy ChatQnA application
+
+## 1. Clone repo and build Docker images
+
+
+### 1.1. Cloning GenAIComps repo
+
+Create an empty directory in home directory and navigate to it:
+```bash
+mkdir ~/chatqna-apps && cd ~/chatqna-apps
+```
+
+Cloning GenAIComps repo for build Docker images:
+```bash
+git clone https://github.com/opea-project/GenAIComps.git
+```
+
+### 1.2. Navigate to repo directory and switching to the desired version of the code:
+
+If you are using the main branch, then you do not need to make the transition, the main branch is used by default
+```bash
+cd GenAIComps
+```
+
+If you are using a specific branch or tag, then we perform git checkout to the desired version.
+```bash
+### Replace "v1.2" with the code version you need (branch or tag)
+cd GenAIComps && git checkout v1.2
+```
+
+### 1.3. Build Docker images from GenAIComps repo
+
+#### Build Docker image for chatqna-dataprep-service service:
+```bash
+docker build --no-cache -t opea/dataprep:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/src/Dockerfile .
+```
+
+#### Build Docker image for chatqna-retriever service:
+```bash
+docker build --no-cache -t opea/retriever:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/src/Dockerfile .
+```
+
+#### Build Docker image for chatqna-nginx-server:
+```bash
+docker build --no-cache -t opea/nginx:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/third_parties/nginx/src/Dockerfile .
+```
+
+### 1.4. Cloning GenAIExamples repo
+```bash
+cd ~/chatqna-apps
+git clone https://github.com/opea-project/GenAIExamples.git
+```
+
+### 1.5. Navigate to repo directory and switching to the desired version of the code:
+
+If you are using the main branch, then you do not need to make the transition, the main branch is used by default
+```bash
+cd GenAIExamples && cd ChatQnA
+```
+
+If you are using a specific branch or tag, then we perform git checkout to the desired version.
+```bash
+### Replace "v1.2" with the code version you need (branch or tag)
+cd GenAIExamples && git checkout v1.2 && cd ChatQnA
+```
+
+### 1.6. Build Docker images from GenAIExamples repo
+
+#### Build Docker image for chatqna-vllm-service:
+```bash
+docker build --no-cache -t opea/llm-vllm-rocm:latest -f Dockerfile-vllm-rocm .
+```
+
+#### Build Docker image for chatqna-backend-server:
+```bash
+docker build --no-cache -t opea/chatqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
+```
+
+#### Build Docker image for chatqna-ui-server:
+```bash
+cd ./ui
+docker build --no-cache -t opea/chatqna-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
+```
+
+### 1.7. Pull Docker images from Docker Hub
+Images for services chatqna-redis-vector-db, chatqna-tei-embedding-service, chatqna-tei-reranking-service can be downloaded in advance from DockerHub using the commands
+```bash
+docker pull redis/redis-stack:7.2.0-v9
+docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+```
+
+### 1.8. Checking for the necessary Docker images
+
+After assembling the images, you can check their presence in the list of available images using the command:
+```bash
+docker image ls
+```
+
+The output of the command should contain images:
+- opea/dataprep:latest
+- opea/retriever:latest
+- opea/nginx:latest
+- opea/llm-vllm-rocm
+- opea/chatqna:latest
+- opea/chatqna-ui:latest
+- redis/redis-stack:7.2.0-v9
+- ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+
+
+## 2. Set deploy environment variables
+
+### Setting variables in the operating system environment
+#### Set variable HUGGINGFACEHUB_API_TOKEN:
+```bash
+### Replace the string 'your_huggingfacehub_token' with your HuggingFacehub repository access token.
+export HUGGINGFACEHUB_API_TOKEN='your_huggingfacehub_token'
+```
+
+#### Set variables value in set_env_vllm.sh file:
+```bash
+cd ~/chatqna-apps/GenAIExamples/ChatQnA/docker_compose/amd/gpu/rocm
+### The example uses the Nano text editor. You can use any convenient text editor
+nano set_env_vllm.sh
+```
+
+Set the values of the variables:
+
+- **HOST_IP, HOST_IP_EXTERNAL** - These variables are used to configure the name/address of the service in the operating system environment for the application services to interact with each other and with the outside world.
+
+   If your server uses only an internal address and is not accessible from the Internet, then the values for these two variables will be the same and the value will be equal to the server's internal name/address.
+
+   If your server uses only an external, Internet-accessible address, then the values for these two variables will be the same and the value will be equal to the server's external name/address.
+
+   If your server is located on an internal network, has an internal address, but is accessible from the Internet via a proxy/firewall/load balancer, then the HOST_IP variable will have a value equal to the internal name/address of the server, and the EXTERNAL_HOST_IP variable will have a value equal to the external name/address of the proxy/firewall/load balancer behind which the server is located.
+
+   We set these values in the file set_env_vllm.sh
+- **Variables with names like "%%%%_PORT"** - These variables set the IP port numbers for establishing network connections to the application services.
+  The values shown in the file set_env_vllm.sh they are the values used for the development and testing of the application, as well as configured for the environment in which the development is performed. These values must be configured in accordance with the rules of network access to your environment's server, and must not overlap with the IP ports of other applications that are already in use.
+
+#### Run set environment script:
+```bash
+. set_env_vllm.sh
+```
+
+## 3. Deploy application
+
+### 3.1. Deploying applications using Docker Compose
+
+```bash
+docker compose -f compose_vllm.yaml up -d --force-recreate
+```
+
+After starting the containers, you need to view their status with the command:
+```bash
+docker compose -f compose_vllm.yaml ps
+```
+
+The following containers should be running:
+- chatqna-backend-server
+- chatqna-dataprep-service
+- chatqna-nginx-server
+- chatqna-redis-vector-db
+- chatqna-retriever
+- chatqna-tei-embedding-service
+- chatqna-tei-reranking-service
+- chatqna-ui-server
+- chatqna-vllm-service
+
+Containers should not restart.
+
+### 3.2. Checking the application services
+
+#### 3.2.1. Cheking chatqna-vllm-service:
+Verification is performed in two ways:
+- Checking the container logs
+   ```bash
+   docker logs chatqna-vllm-service
+   ```
+   A message like this should appear in the logs:
+   ```commandline
+   INFO:     Started server process [1]
+   INFO:     Waiting for application startup.
+   INFO:     Application startup complete.
+   INFO:     Uvicorn running on http://0.0.0.0:8011 (Press CTRL+C to quit)
+   ``` 
+
+- 
+
+
+
+
+
 # Build and deploy ChatQnA Application on AMD GPU (ROCm)
 
 ## Build MegaService of ChatQnA on AMD ROCm GPU
@@ -392,7 +585,7 @@ To access the frontend, open the following URL in your browser: http://{host_ip}
 ```yaml
   chaqna-ui-server:
     image: opea/chatqna-ui:latest
-    ...
+    
     ports:
       - "80:5173"
 ```
@@ -425,7 +618,7 @@ Once the services are up, open the following URL in your browser: http://{host_i
 ```yaml
   chaqna-react-ui-server:
     image: opea/chatqna-react-ui:latest
-    ...
+    
     ports:
       - "80:80"
 ```
