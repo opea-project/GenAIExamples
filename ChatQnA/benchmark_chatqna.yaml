@@ -13,21 +13,27 @@ deploy:
 
   services:
     backend:
+      resources:
+        enabled: False
+        cores_per_instance: ""
+        memory_capacity: ""
       replicaCount: [1, 2, 4, 8]
-      cores_per_instance: ""
-      memory_capacity: ""
 
     teirerank:
       enabled: True
       model_id: ""
+      resources:
+        enabled: False
+        cards_per_instance: 1
       replicaCount: [1, 1, 1, 1]
-      cards_per_instance: 1
 
     tei:
       model_id: ""
+      resources:
+        enabled: False
+        cores_per_instance: ""
+        memory_capacity: ""
       replicaCount: [1, 2, 4, 8]
-      cores_per_instance: ""
-      memory_capacity: ""
 
     llm:
       engine: vllm  # or tgi
@@ -35,31 +41,43 @@ deploy:
       replicaCount:
         with_teirerank: [7, 15, 31, 63]     # When teirerank.enabled is True
         without_teirerank: [8, 16, 32, 64]   # When teirerank.enabled is False
-      # TGI specific settings
-      max_batch_size: [1, 2, 4, 8]  # Each value triggers an LLM service upgrade. Not related to node count or replicaCount
-      # VLLM specific settings
-      max_num_seqs: [1, 2, 4, 8]    # Each value triggers an LLM service upgrade. Not related to node count or replicaCount
-      # Common settings
-      max_input_length: ""
-      max_total_tokens: ""
-      max_batch_total_tokens: ""
-      max_batch_prefill_tokens: ""
-      cards_per_instance: 1
+      resources:
+        enabled: False
+        cards_per_instance: 1
+      model_params:
+        batch_params:
+          enabled: True
+          # TGI specific settings
+          max_batch_size: [1, 2, 4, 8]  # Each value triggers an LLM service upgrade
+          # VLLM specific settings
+          max_num_seqs: [1, 2, 4, 8]    # Each value triggers an LLM service upgrade
+        token_params:
+          enabled: False
+          max_input_length: ""
+          max_total_tokens: ""
+          max_batch_total_tokens: ""
+          max_batch_prefill_tokens: ""
 
     data-prep:
+      resources:
+        enabled: False
+        cores_per_instance: ""
+        memory_capacity: ""
       replicaCount: [1, 1, 1, 1]
-      cores_per_instance: ""
-      memory_capacity: ""
 
     retriever-usvc:
+      resources:
+        enabled: False
+        cores_per_instance: ""
+        memory_capacity: ""
       replicaCount: [1, 2, 4, 8]
-      cores_per_instance: ""
-      memory_capacity: ""
 
     redis-vector-db:
+      resources:
+        enabled: False
+        cores_per_instance: ""
+        memory_capacity: ""
       replicaCount: [1, 1, 1, 1]
-      cores_per_instance: ""
-      memory_capacity: ""
 
     chatqna-ui:
       replicaCount: [1, 1, 1, 1]

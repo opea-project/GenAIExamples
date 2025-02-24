@@ -62,24 +62,29 @@ def configure_resources(values, deploy_config):
     resource_configs = []
 
     for service_name, config in deploy_config["services"].items():
+        # Skip if resources configuration doesn't exist or is not enabled
+        resources_config = config.get("resources", {})
+        if not resources_config:
+            continue
+
         resources = {}
-        if deploy_config["device"] == "gaudi" and config.get("cards_per_instance", 0) > 1:
+        if deploy_config["device"] == "gaudi" and resources_config.get("cards_per_instance", 0) > 1:
             resources = {
-                "limits": {"habana.ai/gaudi": config["cards_per_instance"]},
-                "requests": {"habana.ai/gaudi": config["cards_per_instance"]},
+                "limits": {"habana.ai/gaudi": resources_config["cards_per_instance"]},
+                "requests": {"habana.ai/gaudi": resources_config["cards_per_instance"]},
             }
         else:
             limits = {}
             requests = {}
 
             # Only add CPU if cores_per_instance has a valid value
-            cores = config.get("cores_per_instance")
+            cores = resources_config.get("cores_per_instance")
             if cores is not None and cores != "":
                 limits["cpu"] = cores
                 requests["cpu"] = cores
 
             # Only add memory if memory_capacity has a valid value
-            memory = config.get("memory_capacity")
+            memory = resources_config.get("memory_capacity")
             if memory is not None and memory != "":
                 limits["memory"] = memory
                 requests["memory"] = memory
@@ -87,7 +92,7 @@ def configure_resources(values, deploy_config):
             # Only create resources if we have any valid limits/requests
             if limits and requests:
                 resources["limits"] = limits
-                resources["requests"] = requests
+                resources["requests"] = resources
 
         if resources:
             if service_name == "llm":
@@ -122,30 +127,21 @@ def configure_extra_cmd_args(values, deploy_config):
         if service_name == "llm":
             extra_cmd_args = []
             engine = config.get("engine", "tgi")
+            model_params = config.get("model_params", {})
 
-            # Define parameters based on engine type
-            if engine == "tgi":
-                params = [
-                    "max_batch_size",
-                    "max_input_length",
-                    "max_total_tokens",
-                    "max_batch_total_tokens",
-                    "max_batch_prefill_tokens",
-                ]
-            elif engine == "vllm":
-                params = [
-                    "max_num_seqs",
-                    "max_input_length",
-                    "max_total_tokens",
-                    "max_batch_total_tokens",
-                    "max_batch_prefill_tokens",
-                ]
+            # Get batch parameters and token parameters configuration
+            batch_params = model_params.get("batch_params", {})
+            token_params = model_params.get("token_params", {})
 
-            for param in params:
-                param_value = config.get(param)
-                # Only add parameter if its value is not None and not empty string
-                if param_value is not None and param_value != "":
-                    extra_cmd_args.extend([f"--{param.replace('_', '-')}", str(param_value)])
+            # Add all parameters that exist in batch_params
+            for param, value in batch_params.items():
+                if value is not None and value != "":
+                    extra_cmd_args.extend([f"--{param.replace('_', '-')}", str(value)])
+
+            # Add all parameters that exist in token_params
+            for param, value in token_params.items():
+                if value is not None and value != "":
+                    extra_cmd_args.extend([f"--{param.replace('_', '-')}", str(value)])
 
             if extra_cmd_args:
                 if engine not in values:
@@ -194,7 +190,7 @@ def configure_rerank(values, with_rerank, deploy_config, example_type, node_sele
     return values
 
 
-def generate_helm_values(example_type, deploy_config, chart_dir, action_type, node_selector=None, test_mode="oob"):
+def generate_helm_values(example_type, deploy_config, chart_dir, action_type, node_selector=None):
     """Create a values.yaml file based on the provided configuration."""
     if deploy_config is None:
         raise ValueError("deploy_config is required")
@@ -223,12 +219,8 @@ def generate_helm_values(example_type, deploy_config, chart_dir, action_type, no
     values = configure_node_selectors(values, node_selector or {}, deploy_config)
     values = configure_rerank(values, with_rerank, deploy_config, example_type, node_selector or {})
     values = configure_replica(values, deploy_config)
-
-    # Only configure resources and extra cmd args in tune mode
-    if test_mode == "tune":
-        values = configure_resources(values, deploy_config)
-        values = configure_extra_cmd_args(values, deploy_config)
-
+    values = configure_resources(values, deploy_config)
+    values = configure_extra_cmd_args(values, deploy_config)
     values = configure_models(values, deploy_config)
 
     device = deploy_config.get("device", "unknown")
@@ -618,13 +610,6 @@ def main():
     )
     parser.add_argument("--update-service", action="store_true", help="Update the deployment with new configuration.")
     parser.add_argument("--check-ready", action="store_true", help="Check if all services in the deployment are ready.")
-    parser.add_argument(
-        "--test-mode",
-        type=str,
-        choices=["oob", "tune"],
-        default="oob",
-        help="Test mode: 'oob' (out of box) or 'tune' (default: oob)",
-    )
     parser.add_argument("--chart-dir", default=".", help="Path to the untarred Helm chart directory.")
     parser.add_argument(
         "--timeout",
@@ -688,7 +673,6 @@ def main():
             chart_dir=args.chart_dir,
             action_type=action_type,  # 0 - deploy, 1 - update
             node_selector=node_selector,
-            test_mode=args.test_mode,  # Pass the test mode to generate_helm_values
         )
 
         # Check result status
