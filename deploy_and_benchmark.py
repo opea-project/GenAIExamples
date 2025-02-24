@@ -192,6 +192,10 @@ def main(yaml_file, target_node=None, test_mode="oob"):
                     batch_params = [None]
                     param_name = "batch_param"
 
+                # Get timeout and interval from deploy config for check-ready
+                timeout = deploy_config.get("timeout", 1000)  # default 1000s
+                interval = deploy_config.get("interval", 5)  # default 5s
+
                 values_file_path = None
                 for i, batch_param in enumerate(batch_params):
                     if test_mode == "tune":
@@ -271,6 +275,10 @@ def main(yaml_file, target_node=None, test_mode="oob"):
                             "--namespace",
                             namespace,
                             "--check-ready",
+                            "--timeout",
+                            str(timeout),
+                            "--interval",
+                            str(interval)
                         ]
                         try:
                             result = subprocess.run(cmd, check=True)

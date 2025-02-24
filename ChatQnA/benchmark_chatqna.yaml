@@ -8,6 +8,8 @@ deploy:
   HUGGINGFACEHUB_API_TOKEN: "" # mandatory
   node: [1, 2, 4, 8]
   namespace: ""
+  timeout: 1000  # timeout in seconds for services to be ready, default 30 minutes
+  interval: 5    # interval in seconds between service ready checks, default 5 seconds
 
   services:
     backend:

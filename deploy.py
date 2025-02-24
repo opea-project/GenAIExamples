@@ -626,6 +626,19 @@ def main():
         help="Test mode: 'oob' (out of box) or 'tune' (default: oob)",
     )
     parser.add_argument("--chart-dir", default=".", help="Path to the untarred Helm chart directory.")
+    parser.add_argument(
+        "--timeout",
+        type=int,
+        default=1000,
+        help="Maximum time to wait for deployment readiness in seconds (default: 1000)",
+    )
+    parser.add_argument(
+        "--interval",
+        type=int,
+        default=5,
+        help="Interval between readiness checks in seconds (default: 5)",
+    )
+
 
     args = parser.parse_args()
 
@@ -637,7 +650,7 @@ def main():
         clear_labels_from_nodes(args.label, args.node_names)
         return
     elif args.check_ready:
-        is_ready = check_deployment_ready(args.chart_name, args.namespace)
+        is_ready = check_deployment_ready(args.chart_name, args.namespace, args.timeout, args.interval)
         return is_ready
     elif args.uninstall:
         uninstall_helm_release(args.chart_name, args.namespace)
