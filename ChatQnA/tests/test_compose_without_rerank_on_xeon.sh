@@ -29,7 +29,13 @@ function build_docker_images() {
 
     cd $WORKPATH/docker_image_build
     git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
-    git clone --depth 1 https://github.com/vllm-project/vllm.git
+    git clone https://github.com/vllm-project/vllm.git && cd vllm
+    # Get the latest tag
+    VLLM_VER="$(git describe --tags "$(git rev-list --tags --max-count=1)" )"
+    echo "Check out vLLM tag ${VLLM_VER}"
+    git checkout ${VLLM_VER} &> /dev/null
+    # Not change the pwd
+    cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
     service_list="chatqna-without-rerank chatqna-ui dataprep retriever vllm nginx"
@@ -219,16 +225,12 @@ function main() {
     duration=$((end_time-start_time))
     echo "Mega service start duration is $duration s" && sleep 1s
 
-    if [ "${mode}" == "perf" ]; then
-        python3 $WORKPATH/tests/chatqna_benchmark.py
-    elif [ "${mode}" == "" ]; then
-        validate_microservices
-        echo "==== microservices validated ===="
-        validate_megaservice
-        echo "==== megaservice validated ===="
-        validate_frontend
-        echo "==== frontend validated ===="
-    fi
+    validate_microservices
+    echo "==== microservices validated ===="
+    validate_megaservice
+    echo "==== megaservice validated ===="
+    validate_frontend
+    echo "==== frontend validated ===="
 
     stop_docker
     echo y | docker system prune
