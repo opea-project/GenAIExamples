@@ -8,56 +8,84 @@ deploy:
   HUGGINGFACEHUB_API_TOKEN: "" # mandatory
   node: [1, 2, 4, 8]
   namespace: ""
+  timeout: 1000  # timeout in seconds for services to be ready, default 30 minutes
+  interval: 5    # interval in seconds between service ready checks, default 5 seconds
 
   services:
     backend:
-      instance_num: [1, 2, 4, 8]
-      cores_per_instance: ""
-      memory_capacity: ""
+      resources:
+        enabled: False
+        cores_per_instance: "16"
+        memory_capacity: "8000Mi"
+      replicaCount: [1, 2, 4, 8]
 
     teirerank:
       enabled: True
       model_id: ""
+      resources:
+        enabled: False
+        cards_per_instance: 1
       replicaCount: [1, 1, 1, 1]
-      cards_per_instance: 1
 
     tei:
       model_id: ""
+      resources:
+        enabled: False
+        cores_per_instance: "80"
+        memory_capacity: "20000Mi"
       replicaCount: [1, 2, 4, 8]
-      cores_per_instance: ""
-      memory_capacity: ""
 
     llm:
       engine: vllm  # or tgi
-      model_id: "meta-llama/Meta-Llama-3-8B-Instruct"
+      model_id: "meta-llama/Meta-Llama-3-8B-Instruct" # mandatory
       replicaCount:
         with_teirerank: [7, 15, 31, 63]     # When teirerank.enabled is True
         without_teirerank: [8, 16, 32, 64]   # When teirerank.enabled is False
-      # TGI specific settings
-      max_batch_size: [1, 2, 4, 8]
-      # VLLM specific settings
-      max_num_seqs: [1, 2, 4, 8]
-      # Common settings
-      max_input_length: ""
-      max_total_tokens: ""
-      max_batch_total_tokens: ""
-      max_batch_prefill_tokens: ""
-      cards_per_instance: 1
+      resources:
+        enabled: False
+        cards_per_instance: 1
+      model_params:
+        vllm:  # VLLM specific parameters
+          batch_params:
+            enabled: True
+            max_num_seqs: [1, 2, 4, 8]    # Each value triggers an LLM service upgrade
+          token_params:
+            enabled: False
+            max_input_length: ""
+            max_total_tokens: ""
+            max_batch_total_tokens: ""
+            max_batch_prefill_tokens: ""
+        tgi:   # TGI specific parameters
+          batch_params:
+            enabled: True
+            max_batch_size: [1, 2, 4, 8]  # Each value triggers an LLM service upgrade
+          token_params:
+            enabled: False
+            max_input_length: "1280"
+            max_total_tokens: "2048"
+            max_batch_total_tokens: "65536"
+            max_batch_prefill_tokens: "4096"
 
     data-prep:
+      resources:
+        enabled: False
+        cores_per_instance: ""
+        memory_capacity: ""
       replicaCount: [1, 1, 1, 1]
-      cores_per_instance: ""
-      memory_capacity: ""
 
     retriever-usvc:
+      resources:
+        enabled: False
+        cores_per_instance: "8"
+        memory_capacity: "8000Mi"
       replicaCount: [1, 2, 4, 8]
-      cores_per_instance: ""
-      memory_capacity: ""
 
     redis-vector-db:
+      resources:
+        enabled: False
+        cores_per_instance: ""
+        memory_capacity: ""
       replicaCount: [1, 1, 1, 1]
-      cores_per_instance: ""
-      memory_capacity: ""
 
     chatqna-ui:
       replicaCount: [1, 1, 1, 1]

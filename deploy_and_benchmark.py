@@ -23,13 +23,14 @@ def read_yaml(file_path):
         return None
 
 
-def construct_deploy_config(deploy_config, target_node, batch_param_value=None):
+def construct_deploy_config(deploy_config, target_node, batch_param_value=None, test_mode="oob"):
     """Construct a new deploy config based on the target node number and optional batch parameter value.
 
     Args:
         deploy_config: Original deploy config dictionary
         target_node: Target node number to match in the node array
-        batch_param_value: Optional specific batch parameter value to use (max_batch_size for TGI or max_num_seqs for VLLM)
+        batch_param_value: Optional specific batch parameter value to use
+        test_mode: Test mode, either 'oob' or 'tune'
 
     Returns:
         A new deploy config with single values for node and instance_num
@@ -55,37 +56,75 @@ def construct_deploy_config(deploy_config, target_node, batch_param_value=None):
     services = new_config.get("services", {})
     teirerank_enabled = services.get("teirerank", {}).get("enabled", True)
 
-    if "llm" in services:
-        llm_config = services["llm"]
-        if isinstance(llm_config.get("replicaCount"), dict):
-            replica_counts = llm_config["replicaCount"]
-            llm_config["replicaCount"] = (
-                replica_counts["with_teirerank"] if teirerank_enabled else replica_counts["without_teirerank"]
-            )
-
-    # Update instance_num for each service based on the same index
+    # Process each service's configuration
     for service_name, service_config in services.items():
+        # Handle replicaCount
         if "replicaCount" in service_config:
-            instance_nums = service_config["replicaCount"]
-            if isinstance(instance_nums, list):
-                if len(instance_nums) != len(nodes):
+            if service_name == "llm" and isinstance(service_config["replicaCount"], dict):
+                replica_counts = service_config["replicaCount"]
+                service_config["replicaCount"] = (
+                    replica_counts["with_teirerank"] if teirerank_enabled else replica_counts["without_teirerank"]
+                )
+
+            if isinstance(service_config["replicaCount"], list):
+                if len(service_config["replicaCount"]) != len(nodes):
                     raise ValueError(
-                        f"instance_num array length ({len(instance_nums)}) for service {service_name} "
+                        f"replicaCount array length ({len(service_config['replicaCount'])}) for service {service_name} "
                         f"doesn't match node array length ({len(nodes)})"
                     )
-                service_config["replicaCount"] = instance_nums[node_index]
+                service_config["replicaCount"] = service_config["replicaCount"][node_index]
 
-    # Update batch parameter if specified
-    if batch_param_value is not None and "llm" in new_config["services"]:
-        llm_config = new_config["services"]["llm"]
-        engine = llm_config.get("engine", "tgi")
+        # Handle resources based on test_mode
+        if "resources" in service_config:
+            resources = service_config["resources"]
+            if test_mode == "tune" or resources.get("enabled", False):
+                # Keep resource configuration but remove enabled field
+                resources.pop("enabled", None)
+            else:
+                # Remove resource configuration in OOB mode when disabled
+                service_config.pop("resources")
 
-        if engine == "tgi":
-            llm_config["max_batch_size"] = batch_param_value
-        elif engine == "vllm":
-            llm_config["max_num_seqs"] = batch_param_value
-            # Remove TGI-specific parameter if it exists
-            llm_config.pop("max_batch_size", None)
+        # Handle model parameters for LLM service
+        if service_name == "llm" and "model_params" in service_config:
+            model_params = service_config["model_params"]
+            engine = service_config.get("engine", "tgi")
+
+            # Get engine-specific parameters
+            engine_params = model_params.get(engine, {})
+
+            # Handle batch parameters
+            if "batch_params" in engine_params:
+                batch_params = engine_params["batch_params"]
+                if test_mode == "tune" or batch_params.get("enabled", False):
+                    # Keep batch parameters configuration but remove enabled field
+                    batch_params.pop("enabled", None)
+
+                    # Update batch parameter value if specified
+                    if batch_param_value is not None:
+                        if engine == "tgi":
+                            batch_params["max_batch_size"] = str(batch_param_value)
+                        elif engine == "vllm":
+                            batch_params["max_num_seqs"] = str(batch_param_value)
+                else:
+                    engine_params.pop("batch_params")
+
+            # Handle token parameters
+            if "token_params" in engine_params:
+                token_params = engine_params["token_params"]
+                if test_mode == "tune" or token_params.get("enabled", False):
+                    # Keep token parameters configuration but remove enabled field
+                    token_params.pop("enabled", None)
+                else:
+                    # Remove token parameters in OOB mode when disabled
+                    engine_params.pop("token_params")
+
+            # Update model_params with engine-specific parameters only
+            model_params.clear()
+            model_params[engine] = engine_params
+
+            # Remove model_params if empty or if engine_params is empty
+            if not model_params or not engine_params:
+                service_config.pop("model_params")
 
     return new_config
 
@@ -165,21 +204,26 @@ def main(yaml_file, target_node=None, test_mode="oob"):
                 continue
 
             try:
-                # Only process batch parameters in tune mode
-                if test_mode == "tune":
-                    # Process batch parameters based on engine type
-                    llm_config = deploy_config.get("services", {}).get("llm", {})
+                # Process batch parameters based on engine type
+                services = deploy_config.get("services", {})
+                llm_config = services.get("llm", {})
+
+                if "model_params" in llm_config:
+                    model_params = llm_config["model_params"]
                     engine = llm_config.get("engine", "tgi")
 
-                    if engine == "tgi":
-                        batch_params = llm_config.get("max_batch_size", [])
-                        param_name = "max_batch_size"
-                    elif engine == "vllm":
-                        batch_params = llm_config.get("max_num_seqs", [])
-                        param_name = "max_num_seqs"
-                    else:
-                        print(f"Unsupported LLM engine: {engine}")
-                        continue
+                    # Get engine-specific parameters
+                    engine_params = model_params.get(engine, {})
+
+                    # Handle batch parameters
+                    batch_params = []
+                    if "batch_params" in engine_params:
+                        batch_params = (
+                            engine_params["batch_params"].get("max_batch_size", [])
+                            if engine == "tgi"
+                            else engine_params["batch_params"].get("max_num_seqs", [])
+                        )
+                        param_name = "max_batch_size" if engine == "tgi" else "max_num_seqs"
 
                     if not isinstance(batch_params, list):
                         batch_params = [batch_params]
@@ -188,9 +232,12 @@ def main(yaml_file, target_node=None, test_mode="oob"):
                     if batch_params == [""] or not batch_params:
                         batch_params = [None]
                 else:
-                    # In OOB mode, just do one iteration with no batch parameter
                     batch_params = [None]
                     param_name = "batch_param"
+
+                # Get timeout and interval from deploy config for check-ready
+                timeout = deploy_config.get("timeout", 1000)  # default 1000s
+                interval = deploy_config.get("interval", 5)  # default 5s
 
                 values_file_path = None
                 for i, batch_param in enumerate(batch_params):
@@ -200,7 +247,7 @@ def main(yaml_file, target_node=None, test_mode="oob"):
                         print("\nProcessing OOB deployment")
 
                     # Construct new deploy config
-                    new_deploy_config = construct_deploy_config(deploy_config, node, batch_param)
+                    new_deploy_config = construct_deploy_config(deploy_config, node, batch_param, test_mode)
 
                     # Write the new deploy config to a temporary file
                     temp_config_file = (
@@ -225,8 +272,6 @@ def main(yaml_file, target_node=None, test_mode="oob"):
                                 namespace,
                                 "--chart-dir",
                                 chart_dir,
-                                "--test-mode",
-                                test_mode,
                             ]
                             result = subprocess.run(cmd, check=True, capture_output=True, text=True)
 
@@ -253,8 +298,6 @@ def main(yaml_file, target_node=None, test_mode="oob"):
                                 "--user-values",
                                 values_file_path,
                                 "--update-service",
-                                "--test-mode",
-                                test_mode,
                             ]
                             result = subprocess.run(cmd, check=True)
                             if result.returncode != 0:
@@ -271,21 +314,35 @@ def main(yaml_file, target_node=None, test_mode="oob"):
                             "--namespace",
                             namespace,
                             "--check-ready",
+                            "--timeout",
+                            str(timeout),
+                            "--interval",
+                            str(interval),
                         ]
                         try:
-                            result = subprocess.run(cmd, check=True)
-                            print("Deployments are ready!")
+                            result = subprocess.run(
+                                cmd, check=False
+                            )  # Changed to check=False to handle return code manually
+                            if result.returncode == 0:
+                                print("Deployments are ready!")
+                                # Run benchmark only if deployment is ready
+                                run_benchmark(
+                                    benchmark_config=benchmark_config,
+                                    chart_name=chart_name,
+                                    namespace=namespace,
+                                    node_num=node,
+                                    llm_model=deploy_config.get("services", {}).get("llm", {}).get("model_id", ""),
+                                )
+                            else:
+                                print(
+                                    f"Deployments are not ready after timeout period during "
+                                    f"{'deployment' if i == 0 else 'update'} for {node} nodes. "
+                                    f"Skipping remaining iterations."
+                                )
+                                break  # Exit the batch parameter loop for current node
                         except subprocess.CalledProcessError as e:
-                            print(f"Deployments status failed with returncode: {e.returncode}")
-
-                        # Run benchmark
-                        run_benchmark(
-                            benchmark_config=benchmark_config,
-                            chart_name=chart_name,
-                            namespace=namespace,
-                            node_num=node,
-                            llm_model=deploy_config.get("services", {}).get("llm", {}).get("model_id", ""),
-                        )
+                            print(f"Error while checking deployment status: {str(e)}")
+                            break  # Exit the batch parameter loop for current node
 
                     except Exception as e:
                         print(

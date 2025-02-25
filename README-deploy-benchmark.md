@@ -137,28 +137,33 @@ The script provides two test modes controlled by the `--test-mode` parameter:
    --test-mode oob  # or omit the parameter
    ```
 
-   - Uses default values from Helm chart
-   - Ignores performance tuning configurations
-   - Suitable for basic functionality testing
+   - Uses enabled configurations only:
+     - Resources: Only uses resources when `resources.enabled` is True
+     - Model parameters:
+       - Uses batch parameters when `batch_params.enabled` is True
+       - Uses token parameters when `token_params.enabled` is True
+   - Suitable for basic functionality testing with selected optimizations
 
 2. **Tune Mode**
    ```bash
    --test-mode tune
    ```
-   - Applies performance optimization configurations
-   - Resource-related parameters:
-     - `cores_per_instance`: CPU cores allocation
-     - `memory_capacity`: Memory allocation
-     - `cards_per_instance`: GPU/Accelerator cards allocation
-   - Model parameters:
-     - `max_batch_size`: Maximum batch size (TGI engine)
-     - `max_num_seqs`: Maximum number of sequences (vLLM engine)
-     - `max_input_length`: Maximum input sequence length
-     - `max_total_tokens`: Maximum total tokens per request
-     - `max_batch_total_tokens`: Maximum total tokens in a batch
-     - `max_batch_prefill_tokens`: Maximum tokens in prefill phase
+   - Applies all configurations regardless of enabled status:
+     - Resource-related parameters:
+       - `resources.cores_per_instance`: CPU cores allocation
+       - `resources.memory_capacity`: Memory allocation
+       - `resources.cards_per_instance`: GPU/Accelerator cards allocation
+     - Model parameters:
+       - Batch parameters:
+         - `max_batch_size`: Maximum batch size (TGI engine)
+         - `max_num_seqs`: Maximum number of sequences (vLLM engine)
+       - Token parameters:
+         - `max_input_length`: Maximum input sequence length
+         - `max_total_tokens`: Maximum total tokens per request
+         - `max_batch_total_tokens`: Maximum total tokens in a batch
+         - `max_batch_prefill_tokens`: Maximum tokens in prefill phase
 
-Choose "oob" mode for basic functionality testing or "tune" mode when optimizing performance through parameter tuning.
+Choose "oob" mode when you want to selectively enable optimizations, or "tune" mode when you want to apply all available optimizations regardless of their enabled status.
 
 ### Troubleshooting
 
