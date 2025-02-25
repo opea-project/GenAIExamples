@@ -44,7 +44,7 @@ services:
     depends_on:
       - chatqna-redis-vector-db
     ports:
-      - "${CHATQNA_REDIS_RETRIEVER_PORT}:7000"
+      - "${CHATQNA_REDIS_RETRIEVER_PORT:-7000}:7000"
     ipc: host
     environment:
       no_proxy: ${no_proxy}
