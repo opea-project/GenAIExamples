@@ -174,7 +174,7 @@ def _create_stresscli_confs(case_params, test_params, test_phase, num_queries, b
         max_output = case_params.get("max_output")
         run_yaml_path = os.path.join(
             test_params["test_output_dir"],
-            f"run_{test_phase}_{service_name}_{num_queries}_{b_target}_{max_output}_{ts}.yaml"
+            f"run_{test_phase}_{service_name}_{num_queries}_{b_target}_{max_output}_{ts}.yaml",
         )
         with open(run_yaml_path, "w") as yaml_file:
             yaml.dump(stresscli_yaml, yaml_file)
@@ -331,7 +331,9 @@ def _run_service_test(example, service, test_suite_config, namespace):
         locust_output = locust_runtests(None, run_yaml_path)
         print(f"[OPEA BENCHMARK] 🚀 locust_output origin name is {locust_output}")
         # Rename the output folder to include the index
-        new_output_path =os.path.join(os.path.dirname(run_yaml_path), f"{os.path.splitext(os.path.basename(run_yaml_path))[0]}_output")
+        new_output_path = os.path.join(
+            os.path.dirname(run_yaml_path), f"{os.path.splitext(os.path.basename(run_yaml_path))[0]}_output"
+        )
         os.rename(locust_output, new_output_path)
         print(f"[OPEA BENCHMARK] 🚀 locust new_output_path is {new_output_path}")
 
