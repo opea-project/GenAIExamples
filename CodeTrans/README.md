@@ -136,19 +136,9 @@ docker compose up -d
 
 Refer to the [Xeon Guide](./docker_compose/intel/cpu/xeon/README.md) for more instructions on building docker images from source.
 
-### Deploy using Kubernetes with GMC
+### Deploy CodeTrans on Kubernetes using Helm Chart
 
-Refer to the [Code Translation Kubernetes Guide](./kubernetes/intel/README_gmc.md)
-
-### Deploy using Kubernetes without GMC
-
-Refer to the [Code Translation Kubernetes Guide](./kubernetes/intel/README.md)
-
-### Deploy CodeTrans into Kubernetes using Helm Chart
-
-Install Helm (version >= 3.15) first. Refer to the [Helm Installation Guide](https://helm.sh/docs/intro/install/) for more information.
-
-Refer to the [CodeTrans helm chart](https://github.com/opea-project/GenAIInfra/tree/main/helm-charts/codetrans/README.md) for instructions on deploying CodeTrans into Kubernetes on Xeon & Gaudi.
+Refer to the [CodeTrans helm chart](./kubernetes/helm/README.md) for instructions on deploying CodeTrans on Kubernetes.
 
 ## Consume Code Translation Service
 

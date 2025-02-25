@@ -47,7 +47,8 @@ Results will be displayed in the terminal and saved as CSV file named `1_stats.c
 
 ### Prerequisites
 
-- Kubernetes installation: Use [kubespray](https://github.com/opea-project/docs/blob/main/guide/installation/k8s_install/k8s_install_kubespray.md) or other official Kubernetes installation guides.
+- Kubernetes installation: Use [kubespray](https://github.com/opea-project/docs/blob/main/guide/installation/k8s_install/k8s_install_kubespray.md) or other official Kubernetes installation guides: 
+- (Optional) [Kubernetes set up guide on Intel Gaudi product](https://github.com/opea-project/GenAIInfra/blob/main/README.md#setup-kubernetes-cluster) 
 - Helm installation: Follow the [Helm documentation](https://helm.sh/docs/intro/install/#helm) to install Helm.
 - Setup Hugging Face Token
 
@@ -69,10 +70,6 @@ Results will be displayed in the terminal and saved as CSV file named `1_stats.c
   - Persistent Volume Claim (PVC): This is the recommended approach for production setups. For more details on using PVC, refer to [PVC](https://github.com/opea-project/GenAIInfra/blob/main/helm-charts/README.md#using-persistent-volume).
   - Local Host Path: For simpler testing, ensure that each node involved in the deployment follows the steps above to locally prepare the models. After preparing the models, use `--set global.modelUseHostPath=${MODELDIR}` in the deployment command.
 
-- Add OPEA Helm Repository:
-  ```bash
-  python deploy.py --add-repo
-  ```
 - Label Nodes
   ```base
   python deploy.py --add-label --num-nodes 2
@@ -150,7 +147,6 @@ Before testing, upload a specified file to make sure the llm input have the toke
 Get files:
 
 ```bash
-wget https://github.com/opea-project/GenAIEval/tree/main/evals/benchmark/data/upload_file_no_rerank.txt
 wget https://github.com/opea-project/GenAIEval/tree/main/evals/benchmark/data/upload_file.txt
 ```
 
@@ -168,14 +164,10 @@ Use the following `cURL` command to upload file:
 
 ```bash
 cd GenAIEval/evals/benchmark/data
-# RAG with Rerank
-curl -X POST "http://${cluster_ip}:6007/v1/dataprep" \
+curl -X POST "http://${cluster_ip}:6007/v1/dataprep/ingest" \
      -H "Content-Type: multipart/form-data" \
+     -F "chunk_size=3800" \
      -F "files=@./upload_file.txt"
-# RAG without Rerank
-curl -X POST "http://${cluster_ip}:6007/v1/dataprep" \
-     -H "Content-Type: multipart/form-data" \
-     -F "files=@./upload_file_no_rerank.txt"
 ```
 
 #### Run Benchmark Test
@@ -192,13 +184,9 @@ All the test results will come to the folder `GenAIEval/evals/benchmark/benchmar
 
 ## Teardown
 
-After completing the benchmark, use the following commands to clean up the environment:
+After completing the benchmark, use the following command to clean up the environment:
 
 Remove Node Labels:
-```base
-python deploy.py --delete-label
-```
-Delete the OPEA Helm Repository:
 ```bash
-python deploy.py --delete-repo
+python deploy.py --delete-label
 ```

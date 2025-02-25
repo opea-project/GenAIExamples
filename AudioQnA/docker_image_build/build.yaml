@@ -11,51 +11,63 @@ services:
       context: ../
       dockerfile: ./Dockerfile
     image: ${REGISTRY:-opea}/audioqna:${TAG:-latest}
+  audioqna-ui:
+    build:
+      context: ../ui
+      dockerfile: ./docker/Dockerfile
+    extends: audioqna
+    image: ${REGISTRY:-opea}/audioqna-ui:${TAG:-latest}
+  audioqna-multilang:
+    build:
+      context: ../
+      dockerfile: ./Dockerfile.multilang
+    extends: audioqna
+    image: ${REGISTRY:-opea}/audioqna-multilang:${TAG:-latest}
   whisper-gaudi:
     build:
       context: GenAIComps
-      dockerfile: comps/asr/whisper/dependency/Dockerfile.intel_hpu
+      dockerfile: comps/asr/src/integrations/dependency/whisper/Dockerfile.intel_hpu
     extends: audioqna
     image: ${REGISTRY:-opea}/whisper-gaudi:${TAG:-latest}
   whisper:
     build:
       context: GenAIComps
-      dockerfile: comps/asr/whisper/dependency/Dockerfile
+      dockerfile: comps/asr/src/integrations/dependency/whisper/Dockerfile
     extends: audioqna
     image: ${REGISTRY:-opea}/whisper:${TAG:-latest}
   asr:
     build:
       context: GenAIComps
-      dockerfile: comps/asr/whisper/Dockerfile
+      dockerfile: comps/asr/src/Dockerfile
     extends: audioqna
     image: ${REGISTRY:-opea}/asr:${TAG:-latest}
-  llm-tgi:
+  llm-textgen:
     build:
       context: GenAIComps
-      dockerfile: comps/llms/text-generation/tgi/Dockerfile
+      dockerfile: comps/llms/src/text-generation/Dockerfile
     extends: audioqna
-    image: ${REGISTRY:-opea}/llm-tgi:${TAG:-latest}
+    image: ${REGISTRY:-opea}/llm-textgen:${TAG:-latest}
   speecht5-gaudi:
     build:
       context: GenAIComps
-      dockerfile: comps/tts/speecht5/dependency/Dockerfile.intel_hpu
+      dockerfile: comps/tts/src/integrations/dependency/speecht5/Dockerfile.intel_hpu
     extends: audioqna
     image: ${REGISTRY:-opea}/speecht5-gaudi:${TAG:-latest}
   speecht5:
     build:
       context: GenAIComps
-      dockerfile: comps/tts/speecht5/dependency/Dockerfile
+      dockerfile: comps/tts/src/integrations/dependency/speecht5/Dockerfile
     extends: audioqna
     image: ${REGISTRY:-opea}/speecht5:${TAG:-latest}
   tts:
     build:
       context: GenAIComps
-      dockerfile: comps/tts/speecht5/Dockerfile
+      dockerfile: comps/tts/src/Dockerfile
     extends: audioqna
     image: ${REGISTRY:-opea}/tts:${TAG:-latest}
   gpt-sovits:
     build:
       context: GenAIComps
-      dockerfile: comps/tts/gpt-sovits/Dockerfile
+      dockerfile: comps/tts/src/integrations/dependency/gpt-sovits/Dockerfile
     extends: audioqna
     image: ${REGISTRY:-opea}/gpt-sovits:${TAG:-latest}

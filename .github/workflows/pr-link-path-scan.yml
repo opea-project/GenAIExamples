@@ -1,0 +1,141 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+name: Check hyperlinks and relative path validity
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, reopened, ready_for_review, synchronize]
+
+jobs:
+  check-the-validity-of-hyperlinks-in-README:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clean Up Working Directory
+        run: sudo rm -rf ${{github.workspace}}/*
+
+      - name: Checkout Repo GenAIExamples
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check the Validity of Hyperlinks
+        run: |
+          cd ${{github.workspace}}
+          fail="FALSE"
+          merged_commit=$(git log -1 --format='%H')
+          changed_files="$(git diff --name-status --diff-filter=ARM ${{ github.event.pull_request.base.sha }} ${merged_commit} | awk '/\.md$/ {print $NF}')"
+          if  [ -n "$changed_files" ]; then
+            for changed_file in $changed_files; do
+              # echo $changed_file
+              url_lines=$(grep -H -Eo '\]\(http[s]?://[^)]+\)' "$changed_file" | grep -Ev 'GenAIExamples/blob/main') || true
+              if [ -n "$url_lines" ]; then
+                for url_line in $url_lines; do
+                  # echo $url_line
+                  url=$(echo "$url_line"|cut -d '(' -f2 | cut -d ')' -f1|sed 's/\.git$//')
+                  path=$(echo "$url_line"|cut -d':' -f1 | cut -d'/' -f2-)
+                  response=$(curl -L -s -o /dev/null -w "%{http_code}" "$url")|| true
+                  if [ "$response" -ne 200 ]; then
+                    echo "**********Validation failed, try again**********"
+                    response_retry=$(curl -s -o /dev/null -w "%{http_code}" "$url")
+                    if [ "$response_retry" -eq 200 ]; then
+                      echo "*****Retry successfully*****"
+                    else
+                      echo "Invalid link from ${{github.workspace}}/$path: $url"
+                      fail="TRUE"
+                    fi
+                  fi
+                done
+              fi
+            done
+          else
+            echo "No changed .md file."
+          fi
+
+          if [[ "$fail" == "TRUE" ]]; then
+            exit 1
+          else
+            echo "All hyperlinks are valid."
+          fi
+        shell: bash
+
+  check-the-validity-of-relative-path:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clean up Working Directory
+        run: sudo rm -rf ${{github.workspace}}/*
+
+      - name: Checkout Repo GenAIExamples
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Checking Relative Path Validity
+        run: |
+          cd ${{github.workspace}}
+          fail="FALSE"
+          repo_name=${{ github.event.pull_request.head.repo.full_name }}
+          if [ "$(echo "$repo_name"|cut -d'/' -f1)" != "opea-project" ]; then
+            owner=$(echo "${{ github.event.pull_request.head.repo.full_name }}" |cut -d'/' -f1)
+            branch="https://github.com/$owner/GenAIExamples/tree/${{ github.event.pull_request.head.ref }}"
+          else
+            branch="https://github.com/opea-project/GenAIExamples/blob/${{ github.event.pull_request.head.ref }}"
+          fi
+          link_head="https://github.com/opea-project/GenAIExamples/blob/main"
+
+          merged_commit=$(git log -1 --format='%H')
+          changed_files="$(git diff --name-status --diff-filter=ARM ${{ github.event.pull_request.base.sha }} ${merged_commit} | awk '/\.md$/ {print $NF}')"
+          png_lines=$(grep -Eo '\]\([^)]+\)' --include='*.md' -r .|grep -Ev 'http')
+          if [ -n "$png_lines" ]; then
+            for png_line in $png_lines; do
+              refer_path=$(echo "$png_line"|cut -d':' -f1 | cut -d'/' -f2-)
+              png_path=$(echo "$png_line"|cut -d '(' -f2 | cut -d ')' -f1)
+
+              if [[ "${png_path:0:1}" == "/" ]]; then
+                check_path=$png_path
+              elif [[ "$png_path" == *#* ]]; then
+                relative_path=$(echo "$png_path" | cut -d '#' -f1)
+                if [ -n "$relative_path" ]; then
+                  check_path=$(dirname "$refer_path")/$relative_path
+                  png_path=$(echo "$png_path" | awk -F'#' '{print "#" $2}')
+                else
+                  check_path=$refer_path
+                fi
+              else
+                check_path=$(dirname "$refer_path")/$png_path
+              fi
+
+              if [ -e "$check_path" ]; then
+                real_path=$(realpath $check_path)
+                if [[ "$png_line" == *#* ]]; then
+                  if [ -n "changed_files" ] && echo "$changed_files" | grep -q "^${refer_path}$"; then
+                    url_dev=$branch$(echo "$real_path" | sed 's|.*/GenAIExamples||')$png_path
+                    response=$(curl -I -L -s -o /dev/null -w "%{http_code}" "$url_dev")
+                    if [ "$response" -ne 200 ]; then
+                      echo "**********Validation failed, try again**********"
+                      response_retry=$(curl -s -o /dev/null -w "%{http_code}" "$url_dev")
+                      if [ "$response_retry" -eq 200 ]; then
+                        echo "*****Retry successfully*****"
+                      else
+                        echo "Invalid path from ${{github.workspace}}/$refer_path: $png_path"
+                        fail="TRUE"
+                      fi
+                    else
+                      echo "Validation succeed $png_line"
+                    fi
+                  fi
+                fi
+              else
+                echo "${{github.workspace}}/$refer_path:$png_path does not exist"
+                fail="TRUE"
+              fi
+            done
+          fi
+
+          if [[ "$fail" == "TRUE" ]]; then
+            exit 1
+          else
+            echo "All hyperlinks are valid."
+          fi
+        shell: bash

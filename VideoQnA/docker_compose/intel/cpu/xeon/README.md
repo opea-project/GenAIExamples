@@ -53,34 +53,34 @@ First of all, you need to build Docker Images locally and install the python pac
 ```bash
 git clone https://github.com/opea-project/GenAIComps.git
 cd GenAIComps
-docker build -t opea/embedding-multimodal-clip:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/multimodal_clip/Dockerfile .
+docker build -t opea/embedding-multimodal-clip:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/third_parties/clip/src/Dockerfile .
 ```
 
 ### 2. Build Retriever Image
 
 ```bash
-docker build -t opea/retriever-vdms:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/vdms/langchain/Dockerfile .
+docker build -t opea/retriever:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/src/Dockerfile .
 ```
 
-### 3. Build Rerank Image
+### 3. Build Reranking Image
 
 ```bash
-docker build -t opea/reranking-videoqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy  -f comps/reranks/videoqna/Dockerfile .
+docker build -t opea/reranking:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy  -f comps/rerankings/src/Dockerfile .
 ```
 
 ### 4. Build LVM Image (Xeon)
 
 ```bash
-docker build -t opea/video-llama-lvm-server:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/lvms/video-llama/dependency/Dockerfile .
+docker build -t opea/lvm-video-llama:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/lvms/src/integrations/dependency/video-llama/Dockerfile .
 
 # LVM Service Image
-docker build -t opea/lvm-video-llama:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/lvms/video-llama/Dockerfile .
+docker build -t opea/lvm:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/lvms/src/Dockerfile .
 ```
 
 ### 5. Build Dataprep Image
 
 ```bash
-docker build -t opea/dataprep-multimodal-vdms:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/vdms/multimodal_langchain/Dockerfile .
+docker build -t opea/dataprep:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/src/Dockerfile .
 ```
 
 ### 6. Build MegaService Docker Image
@@ -106,14 +106,17 @@ docker build -t opea/videoqna-ui:latest --build-arg https_proxy=$https_proxy --b
 
 Then run the command `docker images`, you will have the following 8 Docker Images:
 
-1. `opea/dataprep-multimodal-vdms:latest`
+1. `opea/dataprep:latest`
 2. `opea/embedding-multimodal-clip:latest`
-3. `opea/retriever-vdms:latest`
-4. `opea/reranking-videoqna:latest`
+3. `opea/retriever:latest`
+4. `opea/reranking:latest`
 5. `opea/video-llama-lvm-server:latest`
-6. `opea/lvm-video-llama:latest`
-7. `opea/videoqna:latest`
-8. `opea/videoqna-ui:latest`
+6. # `opea/lvm-video-llama:latest`
+7. `opea/reranking-tei:latest`
+8. `opea/lvm-video-llama:latest`
+9. `opea/lvm:latest`
+10. `opea/videoqna:latest`
+11. `opea/videoqna-ui:latest`
 
 ## 🚀 Start Microservices
 
@@ -158,8 +161,8 @@ export LVM_SERVICE_HOST_IP=${host_ip}
 export LVM_ENDPOINT="http://${host_ip}:9009"
 export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/videoqna"
 export BACKEND_HEALTH_CHECK_ENDPOINT="http://${host_ip}:8888/v1/health_check"
-export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/dataprep"
-export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/get_file"
+export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/ingest"
+export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/get"
 export DATAPREP_GET_VIDEO_LIST_ENDPOINT="http://${host_ip}:6007/v1/dataprep/get_videos"
 
 export VDMS_HOST=${host_ip}
@@ -192,7 +195,7 @@ docker compose up vdms-vector-db dataprep -d
 sleep 1m # wait for the services ready
 
 # Insert some sample data to the DB
-curl -X POST http://${host_ip}:6007/v1/dataprep \
+curl -X POST http://${host_ip}:6007/v1/dataprep/ingest \
       -H "Content-Type: multipart/form-data" \
       -F "files=@./data/op_1_0320241830.mp4"
 
@@ -275,7 +278,7 @@ docker compose up -d
 
    In first startup, this service will take times to download the LLM file. After it's finished, the service will be ready.
 
-   Use `docker logs video-llama-lvm-server` to check if the download is finished.
+   Use `docker logs lvm-video-llama` to check if the download is finished.
 
    ```bash
    curl -X POST \

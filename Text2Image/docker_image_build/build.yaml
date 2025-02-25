@@ -9,5 +9,25 @@ services:
         https_proxy: ${https_proxy}
         no_proxy: ${no_proxy}
       context: GenAIComps
-      dockerfile: comps/text2image/Dockerfile
+      dockerfile: comps/text2image/src/Dockerfile
     image: ${REGISTRY:-opea}/text2image:${TAG:-latest}
+  text2image-gaudi:
+    build:
+      args:
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
+        no_proxy: ${no_proxy}
+      context: GenAIComps
+      dockerfile: comps/text2image/src/Dockerfile.intel_hpu
+    image: ${REGISTRY:-opea}/text2image-gaudi:${TAG:-latest}
+  text2image-ui:
+    build:
+      context: ../ui
+      dockerfile: ./docker/Dockerfile
+    image: ${REGISTRY:-opea}/text2image-ui:${TAG:-latest}
+  nginx:
+    build:
+      context: GenAIComps
+      dockerfile: comps/third_parties/nginx/src/Dockerfile
+    extends: text2image
+    image: ${REGISTRY:-opea}/nginx:${TAG:-latest}

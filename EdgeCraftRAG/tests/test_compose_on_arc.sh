@@ -20,22 +20,27 @@ HOST_IP=$ip_address
 
 COMPOSE_FILE="compose.yaml"
 EC_RAG_SERVICE_PORT=16010
-#MODEL_PATH="$WORKPATH/models"
+
 MODEL_PATH="/home/media/models"
+# MODEL_PATH="$WORKPATH/models"
+DOC_PATH="$WORKPATH/tests"
+GRADIO_PATH="$WORKPATH/tests"
+
 HF_ENDPOINT=https://hf-mirror.com
 
 
 function build_docker_images() {
     cd $WORKPATH/docker_image_build
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="server ui ecrag"
-    docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
+    docker compose -f build.yaml build --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker images && sleep 1s
 }
 
 function start_services() {
     export MODEL_PATH=${MODEL_PATH}
+    export DOC_PATH=${DOC_PATH}
+    export GRADIO_PATH=${GRADIO_PATH}
     export HOST_IP=${HOST_IP}
     export LLM_MODEL=${LLM_MODEL}
     export HF_ENDPOINT=${HF_ENDPOINT}
@@ -74,7 +79,7 @@ function validate_rag() {
         "${HOST_IP}:${EC_RAG_SERVICE_PORT}/v1/chatqna" \
         "1234567890" \
         "query" \
-        "vllm-openvino-server" \
+        "edgecraftrag-server" \
         '{"messages":"What is the test id?"}'
 }
 
@@ -84,7 +89,7 @@ function validate_megaservice() {
         "${HOST_IP}:16011/v1/chatqna" \
         "1234567890" \
         "query" \
-        "vllm-openvino-server" \
+        "edgecraftrag-server" \
         '{"messages":"What is the test id?"}'
 }
 

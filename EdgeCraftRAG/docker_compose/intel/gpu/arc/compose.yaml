@@ -11,11 +11,13 @@ services:
       https_proxy: ${https_proxy}
       HF_ENDPOINT: ${HF_ENDPOINT}
       vLLM_ENDPOINT: ${vLLM_ENDPOINT}
+      ENABLE_BENCHMARK: ${ENABLE_BENCHMARK:-false}
     volumes:
       - ${MODEL_PATH:-${PWD}}:/home/user/models
       - ${DOC_PATH:-${PWD}}:/home/user/docs
       - ${GRADIO_PATH:-${PWD}}:/home/user/gradio_cache
       - ${HF_CACHE:-${HOME}/.cache}:/home/user/.cache
+      - ${PROMPT_PATH:-${PWD}}:/templates/custom
     ports:
       - ${PIPELINE_SERVICE_PORT:-16010}:${PIPELINE_SERVICE_PORT:-16010}
     devices:

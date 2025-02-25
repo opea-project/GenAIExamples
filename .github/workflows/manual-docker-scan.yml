@@ -47,6 +47,7 @@ jobs:
   scan-docker:
     needs: get-image-list
     runs-on: "docker-build-${{ inputs.node }}"
+    if: ${{ needs.get-image-list.outputs.matrix != '' }}
     strategy:
       matrix:
         image: ${{ fromJson(needs.get-image-list.outputs.matrix) }}
