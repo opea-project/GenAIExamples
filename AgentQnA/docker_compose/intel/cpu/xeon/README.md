@@ -60,7 +60,7 @@ This example showcases a hierarchical multi-agent system for question-answering 
    ```
 6. Launch multi-agent system
 
-   The configurations of the supervisor agent and the worker agents are defined in the docker-compose yaml file. We currently use openAI GPT-4o-mini as LLM.
+   The configurations of the supervisor agent and the worker agents are defined in the docker-compose yaml file. We currently use OpenAI GPT-4o-mini as LLM.
 
    ```
    cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/cpu/xeon
