@@ -9,12 +9,11 @@ echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
 echo "TAG=IMAGE_TAG=${IMAGE_TAG}"
 export REGISTRY=${IMAGE_REPO}
 export TAG=${IMAGE_TAG}
-export MODEL_CACHE=${model_cache:-"./data"}
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
-export DATA_PATH="/data/cache"
+export DATA_PATH=${model_cache:-"/data/cache"}
 
 function build_docker_images() {
     opea_branch=${opea_branch:-"main"}
