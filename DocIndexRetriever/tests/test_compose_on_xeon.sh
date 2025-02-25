@@ -18,10 +18,9 @@ function build_docker_images() {
     echo "Building Docker Images...."
     cd $WORKPATH/docker_image_build
     if [ ! -d "GenAIComps" ] ; then
-        echo "Cloning GenAIComps repository"
-        git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
+        git clone --single-branch --branch "${opea_branch:-"main"}" https://github.com/opea-project/GenAIComps.git
     fi
-    service_list="dataprep-redis embedding-tei retriever-redis reranking-tei doc-index-retriever"
+    service_list="dataprep embedding retriever reranking doc-index-retriever"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
@@ -47,6 +46,9 @@ function start_services() {
     export RETRIEVER_SERVICE_HOST_IP=${ip_address}
     export RERANK_SERVICE_HOST_IP=${ip_address}
     export LLM_SERVICE_HOST_IP=${ip_address}
+    export host_ip=${ip_address}
+    export RERANK_TYPE="tei"
+    export LOGFLAG=true
 
     # Start Docker Containers
     docker compose up -d
@@ -70,7 +72,7 @@ function validate() {
 
 function validate_megaservice() {
     echo "===========Ingest data=================="
-    local CONTENT=$(http_proxy="" curl -X POST "http://${ip_address}:6007/v1/dataprep" \
+    local CONTENT=$(http_proxy="" curl -X POST "http://${ip_address}:6007/v1/dataprep/ingest" \
      -H "Content-Type: multipart/form-data" \
      -F 'link_list=["https://opea.dev/"]')
     local EXIT_CODE=$(validate "$CONTENT" "Data preparation succeeded" "dataprep-redis-service-xeon")
@@ -88,14 +90,14 @@ function validate_megaservice() {
     local CONTENT=$(http_proxy="" curl http://${ip_address}:8889/v1/retrievaltool -X POST -H "Content-Type: application/json" -d '{
      "text": "Explain the OPEA project?"
     }')
-    # local CONTENT=$(python test.py --host_ip ${ip_address} --request_type text)
+
     local EXIT_CODE=$(validate "$CONTENT" "OPEA" "doc-index-retriever-service-xeon")
     echo "$EXIT_CODE"
     local EXIT_CODE="${EXIT_CODE:0-1}"
     echo "return value is $EXIT_CODE"
     if [ "$EXIT_CODE" == "1" ]; then
         echo "=============Embedding container log=================="
-        docker logs embedding-tei-server | tee -a ${LOG_PATH}/doc-index-retriever-service-xeon.log
+        docker logs embedding-server | tee -a ${LOG_PATH}/doc-index-retriever-service-xeon.log
         echo "=============Retriever container log=================="
         docker logs retriever-redis-server | tee -a ${LOG_PATH}/doc-index-retriever-service-xeon.log
         echo "=============TEI Reranking log=================="
@@ -107,26 +109,6 @@ function validate_megaservice() {
         exit 1
     fi
 
-    echo "================Testing retriever service: ChatCompletion Request================"
-    cd $WORKPATH/tests
-    local CONTENT=$(python test.py --host_ip ${ip_address} --request_type chat_completion)
-    local EXIT_CODE=$(validate "$CONTENT" "OPEA" "doc-index-retriever-service-xeon")
-    echo "$EXIT_CODE"
-    local EXIT_CODE="${EXIT_CODE:0-1}"
-    echo "return value is $EXIT_CODE"
-    if [ "$EXIT_CODE" == "1" ]; then
-        echo "=============Embedding container log=================="
-        docker logs embedding-tei-server | tee -a ${LOG_PATH}/doc-index-retriever-service-xeon.log
-        echo "=============Retriever container log=================="
-        docker logs retriever-redis-server | tee -a ${LOG_PATH}/doc-index-retriever-service-xeon.log
-        echo "=============TEI Reranking log=================="
-        docker logs tei-reranking-server | tee -a ${LOG_PATH}/doc-index-retriever-service-xeon.log
-        echo "=============Reranking container log=================="
-        docker logs reranking-tei-xeon-server | tee -a ${LOG_PATH}/doc-index-retriever-service-xeon.log
-        echo "=============Doc-index-retriever container log=================="
-        docker logs doc-index-retriever-server | tee -a ${LOG_PATH}/doc-index-retriever-service-xeon.log
-        exit 1
-    fi
 }
 
 function stop_docker() {
@@ -142,7 +124,7 @@ function stop_docker() {
 function main() {
 
     stop_docker
-    build_docker_images
+    if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
     echo "Dump current docker ps"
     docker ps
     start_time=$(date +%s)

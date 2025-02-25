@@ -10,6 +10,7 @@ on:
       - "**.py"
       - "**Dockerfile*"
       - "**docker_image_build/build.yaml"
+      - "**/ui/**"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}-on-push
@@ -23,6 +24,7 @@ jobs:
 
   image-build:
     needs: job1
+    if: ${{ needs.job1.outputs.run_matrix != '{"include":[]}' }}
     strategy:
       matrix: ${{ fromJSON(needs.job1.outputs.run_matrix) }}
       fail-fast: false

@@ -10,12 +10,12 @@ services:
     ports:
       - "8001:55555"
   dataprep:
-    image: ${REGISTRY:-opea}/dataprep-multimodal-vdms:${TAG:-latest}
+    image: ${REGISTRY:-opea}/dataprep:${TAG:-latest}
     container_name: dataprep-vdms-server
     depends_on:
       - vdms-vector-db
     ports:
-      - "6007:6007"
+      - "6007:5000"
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
@@ -23,6 +23,7 @@ services:
       VDMS_HOST: ${VDMS_HOST}
       VDMS_PORT: ${VDMS_PORT}
       INDEX_NAME: ${INDEX_NAME}
+      MULTIMODAL_DATAPREP: true
     entrypoint: sh -c 'sleep 15 && python ingest_videos.py'
     volumes:
       - /home/$USER/.cache/clip:/home/user/.cache/clip
@@ -41,7 +42,7 @@ services:
       - /home/$USER/.cache/huggingface/hub:/home/user/.cache/huggingface/hub
     restart: unless-stopped
   retriever:
-    image: ${REGISTRY:-opea}/retriever-vdms:${TAG:-latest}
+    image: ${REGISTRY:-opea}/retriever:${TAG:-latest}
     container_name: retriever-vdms-server
     depends_on:
       - vdms-vector-db
@@ -52,17 +53,19 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      INDEX_NAME: ${INDEX_NAME}
+      VDMS_INDEX_NAME: ${INDEX_NAME}
       VDMS_HOST: ${VDMS_HOST}
       VDMS_PORT: ${VDMS_PORT}
-      USECLIP: ${USECLIP}
+      VDMS_USE_CLIP: ${USECLIP}
+      LOGFLAG: ${LOGFLAG}
+      RETRIEVER_COMPONENT_NAME: "OPEA_RETRIEVER_VDMS"
     entrypoint: sh -c 'sleep 30 && python retriever_vdms.py'
     restart: unless-stopped
     volumes:
       - /home/$USER/.cache/huggingface/hub:/home/user/.cache/huggingface/hub
   reranking:
-    image: ${REGISTRY:-opea}/reranking-videoqna:${TAG:-latest}
-    container_name: reranking-videoqna-server
+    image: ${REGISTRY:-opea}/reranking:${TAG:-latest}
+    container_name: reranking-tei-server
     ports:
       - "8000:8000"
     ipc: host
@@ -75,8 +78,8 @@ services:
       DATAPREP_GET_VIDEO_LIST_ENDPOINT: ${DATAPREP_GET_VIDEO_LIST_ENDPOINT}
     restart: unless-stopped
   lvm-video-llama:
-    image: ${REGISTRY:-opea}/video-llama-lvm-server:${TAG:-latest}
-    container_name: video-llama-lvm-server
+    image: ${REGISTRY:-opea}/lvm-video-llama:${TAG:-latest}
+    container_name: lvm-video-llama
     ports:
       - "9009:9009"
     ipc: host
@@ -90,8 +93,8 @@ services:
       - video-llama-model:/home/user/model
     restart: unless-stopped
   lvm:
-    image: ${REGISTRY:-opea}/lvm-video-llama:${TAG:-latest}
-    container_name: lvm-video-llama
+    image: ${REGISTRY:-opea}/lvm:${TAG:-latest}
+    container_name: lvm
     ports:
       - "9000:9000"
     ipc: host
@@ -99,6 +102,7 @@ services:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       no_proxy: ${no_proxy}
+      LVM_COMPONENT_NAME: "OPEA_VIDEO_LLAMA_LVM"
       LVM_ENDPOINT: ${LVM_ENDPOINT}
     restart: unless-stopped
     depends_on:

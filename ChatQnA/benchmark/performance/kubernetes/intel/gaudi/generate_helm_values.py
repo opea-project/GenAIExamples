@@ -38,6 +38,7 @@ def generate_helm_values(with_rerank, num_nodes, hf_token, model_dir, node_selec
         values["teirerank"] = {"nodeSelector": {key: value for key, value in node_selector.items()}}
     else:
         values["image"] = {"repository": "opea/chatqna-without-rerank"}
+        values["teirerank"] = {"enabled": False}
 
     default_replicas = [
         {"name": "chatqna", "replicaCount": 2},

@@ -1,0 +1,76 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+name: E2E Test with Helm Charts
+
+on:
+  pull_request_target:
+    branches: [main]
+    types: [opened, reopened, ready_for_review, synchronize] # added `ready_for_review` since draft is skipped
+    paths:
+      - "!**.md"
+      - "**/helm/**"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  job1:
+    name: Get-Test-Matrix
+    runs-on: ubuntu-latest
+    outputs:
+      run_matrix: ${{ steps.get-test-matrix.outputs.run_matrix }}
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        with:
+          ref: "refs/pull/${{ github.event.number }}/merge"
+          fetch-depth: 0
+
+      - name: Get Test Matrix
+        id: get-test-matrix
+        run: |
+          set -x
+          echo "base_commit=${{ github.event.pull_request.base.sha }}"
+          base_commit=${{ github.event.pull_request.base.sha }}
+          merged_commit=$(git log -1 --format='%H')
+          values_files=$(git diff --name-only ${base_commit} ${merged_commit} | \
+          grep "values.yaml" | \
+          sort -u ) #CodeGen/kubernetes/helm/cpu-values.yaml
+          run_matrix="{\"include\":["
+          for values_file in ${values_files}; do
+            if [ -f "$values_file" ]; then
+              valuefile=$(basename "$values_file")   # cpu-values.yaml
+              example=$(echo "$values_file" | cut -d'/' -f1) # CodeGen
+              if [[ "$valuefile" == *"gaudi"* ]]; then
+                hardware="gaudi"
+              elif [[ "$valuefile" == *"nv"* ]]; then
+                continue
+              else
+                hardware="xeon"
+              fi
+              echo "example=${example}, hardware=${hardware}, valuefile=${valuefile}"
+              if [[ $(echo ${run_matrix} | grep -c "{\"example\":\"${example}\",\"hardware\":\"${hardware}\"},") == 0 ]]; then
+                run_matrix="${run_matrix}{\"example\":\"${example}\",\"hardware\":\"${hardware}\"},"
+                echo "------------------ add one values file ------------------"
+              fi
+            fi
+          done
+          run_matrix="${run_matrix%,}"
+          run_matrix=$run_matrix"]}"
+          echo "run_matrix="${run_matrix}""
+          echo "run_matrix="${run_matrix}"" >> $GITHUB_OUTPUT
+
+  helm-chart-test:
+    needs: [job1]
+    if: always() && ${{ fromJSON(needs.job1.outputs.run_matrix).length != 0 }}
+    uses: ./.github/workflows/_helm-e2e.yml
+    strategy:
+      matrix: ${{ fromJSON(needs.job1.outputs.run_matrix) }}
+    with:
+      example: ${{ matrix.example }}
+      hardware: ${{ matrix.hardware }}
+      mode: "CI"
+    secrets: inherit

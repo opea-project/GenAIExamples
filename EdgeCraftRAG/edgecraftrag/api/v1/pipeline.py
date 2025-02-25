@@ -5,9 +5,15 @@ import weakref
 
 from edgecraftrag.api_schema import PipelineCreateIn
 from edgecraftrag.base import IndexerType, InferenceType, ModelType, NodeParserType, PostProcessorType, RetrieverType
+from edgecraftrag.components.benchmark import Benchmark
 from edgecraftrag.components.generator import QnAGenerator
 from edgecraftrag.components.indexer import VectorIndexer
-from edgecraftrag.components.node_parser import HierarchyNodeParser, SimpleNodeParser, SWindowNodeParser
+from edgecraftrag.components.node_parser import (
+    HierarchyNodeParser,
+    SimpleNodeParser,
+    SWindowNodeParser,
+    UnstructedNodeParser,
+)
 from edgecraftrag.components.postprocessor import MetadataReplaceProcessor, RerankProcessor
 from edgecraftrag.components.retriever import AutoMergeRetriever, SimpleBM25Retriever, VectorSimRetriever
 from edgecraftrag.context import ctx
@@ -28,6 +34,14 @@ async def get_pipeline(name):
     return ctx.get_pipeline_mgr().get_pipeline_by_name_or_id(name)
 
 
+# GET Pipeline benchmark
+@pipeline_app.get(path="/v1/settings/pipelines/{name}/benchmark")
+async def get_pipeline_benchmark(name):
+    pl = ctx.get_pipeline_mgr().get_pipeline_by_name_or_id(name)
+    if pl and pl.benchmark:
+        return pl.benchmark
+
+
 # POST Pipeline
 @pipeline_app.post(path="/v1/settings/pipelines")
 async def add_pipeline(request: PipelineCreateIn):
@@ -40,7 +54,11 @@ async def add_pipeline(request: PipelineCreateIn):
             pass
         else:
             return "Unable to patch an active pipeline..."
-    update_pipeline_handler(pl, request)
+    try:
+        update_pipeline_handler(pl, request)
+    except ValueError as e:
+        ctx.get_pipeline_mgr().remove_pipeline_by_name_or_id(request.name)
+        return str(e)
     return pl
 
 
@@ -49,7 +67,7 @@ async def add_pipeline(request: PipelineCreateIn):
 async def update_pipeline(name, request: PipelineCreateIn):
     pl = ctx.get_pipeline_mgr().get_pipeline_by_name_or_id(name)
     if pl is None:
-        return None
+        return "Pipeline not exists"
     active_pl = ctx.get_pipeline_mgr().get_active_pipeline()
     if pl == active_pl:
         if not request.active:
@@ -57,8 +75,17 @@ async def update_pipeline(name, request: PipelineCreateIn):
         else:
             return "Unable to patch an active pipeline..."
     async with ctx.get_pipeline_mgr()._lock:
-        update_pipeline_handler(pl, request)
+        try:
+            update_pipeline_handler(pl, request)
+        except ValueError as e:
+            return str(e)
     return pl
+
+
+# REMOVE Pipeline
+@pipeline_app.delete(path="/v1/settings/pipelines/{name}")
+async def remove_pipeline(name):
+    return ctx.get_pipeline_mgr().remove_pipeline_by_name_or_id(name)
 
 
 def update_pipeline_handler(pl, req):
@@ -86,6 +113,8 @@ def update_pipeline_handler(pl, req):
                     )
                 case NodeParserType.SENTENCEWINDOW:
                     pl.node_parser = SWindowNodeParser.from_defaults(window_size=np.window_size)
+                case NodeParserType.UNSTRUCTURED:
+                    pl.node_parser = UnstructedNodeParser(chunk_size=np.chunk_size, chunk_overlap=np.chunk_overlap)
             ctx.get_node_parser_mgr().add(pl.node_parser)
 
     if req.indexer is not None:
@@ -169,6 +198,8 @@ def update_pipeline_handler(pl, req):
             # Use weakref to achieve model deletion and memory release
             model_ref = weakref.ref(model)
             pl.generator = QnAGenerator(model_ref, gen.prompt_path, gen.inference_type)
+
+            pl.benchmark = Benchmark(pl.enable_benchmark, gen.inference_type)
         else:
             return "Inference Type Not Supported"
 

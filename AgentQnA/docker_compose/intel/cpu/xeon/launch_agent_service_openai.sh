@@ -13,7 +13,10 @@ export temperature=0
 export max_new_tokens=4096
 export OPENAI_API_KEY=${OPENAI_API_KEY}
 export WORKER_AGENT_URL="http://${ip_address}:9095/v1/chat/completions"
+export SQL_AGENT_URL="http://${ip_address}:9096/v1/chat/completions"
 export RETRIEVAL_TOOL_URL="http://${ip_address}:8889/v1/retrievaltool"
 export CRAG_SERVER=http://${ip_address}:8080
+export db_name=Chinook
+export db_path="sqlite:////home/user/chinook-db/Chinook_Sqlite.sqlite"
 
 docker compose -f compose_openai.yaml up -d

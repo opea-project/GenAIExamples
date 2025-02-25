@@ -10,7 +10,7 @@ git clone https://github.com/opea-project/GenAIComps.git
 cd GenAIComps
 
 ### Build Docker image
-docker build -t opea/llm-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/tgi/Dockerfile .
+docker build -t opea/llm-textgen:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/src/text-generation/Dockerfile .
 ```
 
 ## 🚀 Start Microservices and MegaService
@@ -33,6 +33,8 @@ export FAQGEN_LLM_SERVER_PORT=9000
 export FAQGEN_HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
 export FAQGEN_BACKEND_SERVER_PORT=8888
 export FAGGEN_UI_PORT=5173
+export LLM_ENDPOINT="http://${HOST_IP}:${FAQGEN_TGI_SERVICE_PORT}"
+export FAQGen_COMPONENT_NAME="OpeaFaqGenTgi"
 ```
 
 Note: Please replace with `host_ip` with your external IP address, do not use localhost.
