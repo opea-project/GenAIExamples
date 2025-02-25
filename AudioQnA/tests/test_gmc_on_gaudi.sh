@@ -34,7 +34,7 @@ function validate_audioqa() {
     export CLIENT_POD=$(kubectl get pod -n $APP_NAMESPACE -l app=client-test -o jsonpath={.items..metadata.name})
     echo "$CLIENT_POD"
     accessUrl=$(kubectl get gmc -n $APP_NAMESPACE -o jsonpath="{.items[?(@.metadata.name=='audioqa')].status.accessUrl}")
-    byte_str=$(kubectl exec "$CLIENT_POD" -n $APP_NAMESPACE -- curl $accessUrl -s -X POST  -d '{"byte_str": "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA", "parameters":{"max_tokens":64, "do_sample": true, "streaming":false}}' -H 'Content-Type: application/json' | jq .byte_str)
+    byte_str=$(kubectl exec "$CLIENT_POD" -n $APP_NAMESPACE -- curl $accessUrl -s -X POST  -d '{"byte_str": "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA", "parameters":{"max_tokens":64, "do_sample": true, "stream":false}}' -H 'Content-Type: application/json' | jq .byte_str)
     echo "$byte_str" > $LOG_PATH/curl_audioqa.log
     if [ -z "$byte_str" ]; then
 	echo "audioqa failed, please check the logs in ${LOG_PATH}!"
@@ -96,12 +96,12 @@ fi
 
 case "$1" in
     install_AudioQnA)
-        pushd AudioQnA/kubernetes/intel/hpu/gaudi/gmc
+        pushd AudioQnA/kubernetes/gmc
         install_audioqa
         popd
         ;;
     validate_AudioQnA)
-        pushd AudioQnA/kubernetes/intel/hpu/gaudi/gmc
+        pushd AudioQnA/kubernetes/gmc
         validate_audioqa
         popd
         ;;

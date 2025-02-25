@@ -14,13 +14,14 @@ LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
 finetuning_service_port=8015
 ray_port=8265
+service_name=finetuning
 
 function build_docker_images() {
     cd $WORKPATH/docker_image_build
     if [ ! -d "GenAIComps" ] ; then
-        git clone https://github.com/opea-project/GenAIComps.git
+        git clone --depth 1 --branch ${opea_branch:-"main"} https://github.com/opea-project/GenAIComps.git
     fi
-    docker compose -f build.yaml build --no-cache > ${LOG_PATH}/docker_image_build.log
+    docker compose -f build.yaml build ${service_name} --no-cache > ${LOG_PATH}/docker_image_build.log
 }
 
 function start_service() {
@@ -94,7 +95,18 @@ EOF
         echo "[ $SERVICE_NAME ] Content is as expected."
     fi
 
-    sleep 10m
+    sleep 3m
+
+    docker logs finetuning-server 2>&1 | tee ${LOG_PATH}/finetuning-server_create.log
+    FINETUNING_LOG=$(grep "succeeded" ${LOG_PATH}/finetuning-server_create.log)
+    if [[ "$FINETUNING_LOG" != *'succeeded'* ]]; then
+        echo "Finetuning failed."
+        RAY_JOBID=$(grep "Submitted Ray job" ${LOG_PATH}/finetuning-server_create.log | sed 's/.*raysubmit/raysubmit/' | cut -d' ' -f 1)
+        docker exec finetuning-server python -c "import os;os.environ['RAY_ADDRESS']='http://localhost:8265';from ray.job_submission import JobSubmissionClient;client = JobSubmissionClient();print(client.get_job_logs('${RAY_JOBID}'))" 2>&1 | tee ${LOG_PATH}/finetuning.log
+        exit 1
+    else
+        echo "Finetuning succeeded."
+    fi
 }
 
 function stop_docker() {

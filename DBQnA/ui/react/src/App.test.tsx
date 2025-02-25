@@ -21,12 +21,12 @@ const getHostIP = () => {
 test('testing api with dynamic host', async () => {
   // Get the dynamic host IP
   const host = await getHostIP();
-  const endpointUrl = `http://${host}:9090/v1/texttosql`;
+  const endpointUrl = `http://${host}:9090/v1/text2sql`;
 
   const formData = {
     user: 'postgres',
     database: 'chinook',
-    host: host,  // Dynamic IP
+    host: host,
     password: 'testpwd',
     port: '5442',
   };
@@ -43,9 +43,10 @@ test('testing api with dynamic host', async () => {
   expect(response.status).toBe(200);
 
   const result = response.data.result;
+  console.log(result);
   expect(result.hasOwnProperty('sql')).toBe(true);
   expect(result.hasOwnProperty('output')).toBe(true);
   expect(result.hasOwnProperty('input')).toBe(true);
-  expect(result.input).toBe(question);
+  expect(result.input.input_text).toBe(question);
 
 }, apiTimeOutInSeconds * 1000);

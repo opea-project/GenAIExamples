@@ -1,0 +1,36 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+vllm:
+  enabled: false
+
+llm-uservice:
+  DOCSUM_BACKEND: "TGI"
+
+tgi:
+  enabled: true
+  accelDevice: "gaudi"
+  image:
+    repository: ghcr.io/huggingface/tgi-gaudi
+    tag: "2.3.1"
+  resources:
+    limits:
+      habana.ai/gaudi: 1
+  CUDA_GRAPHS: ""
+  ENABLE_HPU_GRAPH: true
+  LIMIT_HPU_GRAPH: true
+  USE_FLASH_ATTENTION: true
+  FLASH_ATTENTION_RECOMPUTE: true
+  livenessProbe:
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    timeoutSeconds: 1
+  readinessProbe:
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    timeoutSeconds: 1
+  startupProbe:
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    timeoutSeconds: 1
+    failureThreshold: 120

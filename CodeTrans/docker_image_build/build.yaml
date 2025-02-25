@@ -17,15 +17,15 @@ services:
       dockerfile: ./docker/Dockerfile
     extends: codetrans
     image: ${REGISTRY:-opea}/codetrans-ui:${TAG:-latest}
-  llm-tgi:
+  llm-textgen:
     build:
       context: GenAIComps
-      dockerfile: comps/llms/text-generation/tgi/Dockerfile
+      dockerfile: comps/llms/src/text-generation/Dockerfile
     extends: codetrans
-    image: ${REGISTRY:-opea}/llm-tgi:${TAG:-latest}
+    image: ${REGISTRY:-opea}/llm-textgen:${TAG:-latest}
   nginx:
     build:
       context: GenAIComps
-      dockerfile: comps/nginx/Dockerfile
+      dockerfile: comps/third_parties/nginx/src/Dockerfile
     extends: codetrans
     image: ${REGISTRY:-opea}/nginx:${TAG:-latest}

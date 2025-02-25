@@ -17,23 +17,17 @@ export TAG=${IMAGE_TAG}
 export MAX_INPUT_TOKENS=2048
 export MAX_TOTAL_TOKENS=4096
 export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
-export TGI_LLM_ENDPOINT="http://${host_ip}:8008"
 export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
 export MEGA_SERVICE_HOST_IP=${host_ip}
 export LLM_SERVICE_HOST_IP=${host_ip}
+export ASR_SERVICE_HOST_IP=${host_ip}
 export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/docsum"
 export no_proxy="${no_proxy},${host_ip}"
-
-export V2A_SERVICE_HOST_IP=${host_ip}
-export V2A_ENDPOINT=http://$host_ip:7078
-
-export A2T_ENDPOINT=http://$host_ip:7066
-export A2T_SERVICE_HOST_IP=${host_ip}
-export A2T_SERVICE_PORT=9099
-
-export DATA_ENDPOINT=http://$host_ip:7079
-export DATA_SERVICE_HOST_IP=${host_ip}
-export DATA_SERVICE_PORT=7079
+export LLM_ENDPOINT_PORT=8008
+export DOCSUM_PORT=9000
+export LLM_ENDPOINT="http://${host_ip}:${LLM_ENDPOINT_PORT}"
+export DocSum_COMPONENT_NAME="OpeaDocSumTgi"
+export LOGFLAG=True
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
@@ -42,11 +36,23 @@ LOG_PATH="$WORKPATH/tests"
 ROOT_FOLDER=$(dirname "$(readlink -f "$0")")
 
 function build_docker_images() {
+    opea_branch=${opea_branch:-"main"}
+    # If the opea_branch isn't main, replace the git clone branch in Dockerfile.
+    if [[ "${opea_branch}" != "main" ]]; then
+        cd $WORKPATH
+        OLD_STRING="RUN git clone --depth 1 https://github.com/opea-project/GenAIComps.git"
+        NEW_STRING="RUN git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git"
+        find . -type f -name "Dockerfile*" | while read -r file; do
+            echo "Processing file: $file"
+            sed -i "s|$OLD_STRING|$NEW_STRING|g" "$file"
+        done
+    fi
+
     cd $WORKPATH/docker_image_build
-    git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
+    git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="docsum docsum-gradio-ui whisper dataprep-multimedia2text dataprep-audio2text dataprep-video2audio llm-docsum-tgi"
+    service_list="docsum docsum-gradio-ui whisper llm-docsum"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull ghcr.io/huggingface/text-generation-inference:1.4
@@ -55,18 +61,8 @@ function build_docker_images() {
 
 function start_services() {
     cd $WORKPATH/docker_compose/intel/cpu/xeon/
-
     docker compose -f compose.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
-    sleep 3m
-
-    until [[ "$n" -ge 100 ]]; do
-        docker logs tgi-server > ${LOG_PATH}/tgi_service_start.log
-        if grep -q Connected ${LOG_PATH}/tgi_service_start.log; then
-            break
-        fi
-        sleep 5s
-        n=$((n+1))
-    done
+    sleep 1m
 }
 
 get_base64_str() {
@@ -168,17 +164,17 @@ function validate_microservices() {
     validate_services_json \
         "${host_ip}:8008/generate" \
         "generated_text" \
-        "tgi" \
+        "tgi-server" \
         "tgi-server" \
         '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}'
 
     # llm microservice
     validate_services_json \
-        "${host_ip}:9000/v1/chat/docsum" \
-        "data: " \
+        "${host_ip}:9000/v1/docsum" \
+        "text" \
         "llm-docsum-tgi" \
         "llm-docsum-server" \
-        '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
+        '{"messages":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
 
     # whisper microservice
     ulimit -s 65536
@@ -188,46 +184,6 @@ function validate_microservices() {
         "whisper" \
         "whisper-server" \
         "{\"audio\": \"$(input_data_for_test "audio")\"}"
-
-    # Audio2Text service
-    validate_services_json \
-        "${host_ip}:9099/v1/audio/transcriptions" \
-        '"query":"well"' \
-        "dataprep-audio2text" \
-        "dataprep-audio2text-server" \
-        "{\"byte_str\": \"$(input_data_for_test "audio")\"}"
-
-    # Video2Audio service
-    validate_services_json \
-        "${host_ip}:7078/v1/video2audio" \
-        "SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjI5LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAASW5mbwAAAA8AAAAIAAAN3wAtLS0tLS0tLS0tLS1LS0tLS0tLS0tLS0tpaWlpaWlpaWlpaWlph4eHh4eHh4eHh4eHpaWlpaWlpaWlpaWlpcPDw8PDw8PDw8PDw+Hh4eHh4eHh4eHh4eH///////////////8AAAAATGF2YzU4LjU0AAAAAAAAAAAAAAAAJAYwAAAAAAAADd95t4qPAAAAAAAAAAAAAAAAAAAAAP/7kGQAAAMhClSVMEACMOAabaCMAREA" \
-        "dataprep-video2audio" \
-        "dataprep-video2audio-server" \
-        "{\"byte_str\": \"$(input_data_for_test "video")\"}"
-
-    # Docsum Data service - video
-    validate_services_json \
-        "${host_ip}:7079/v1/multimedia2text" \
-        "well" \
-        "dataprep-multimedia2text" \
-        "dataprep-multimedia2text" \
-        "{\"video\": \"$(input_data_for_test "video")\"}"
-
-    # Docsum Data service - audio
-    validate_services_json \
-        "${host_ip}:7079/v1/multimedia2text" \
-        "well" \
-        "dataprep-multimedia2text" \
-        "dataprep-multimedia2text" \
-        "{\"audio\": \"$(input_data_for_test "audio")\"}"
-
-    # Docsum Data service - text
-    validate_services_json \
-        "${host_ip}:7079/v1/multimedia2text" \
-        "THIS IS A TEST >>>> and a number of states are starting to adopt them voluntarily special correspondent john delenco" \
-        "dataprep-multimedia2text" \
-        "dataprep-multimedia2text" \
-        "{\"text\": \"$(input_data_for_test "text")\"}"
 
 }
 

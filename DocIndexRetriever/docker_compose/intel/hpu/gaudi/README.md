@@ -9,25 +9,25 @@ DocRetriever are the most widely adopted use case for leveraging the different m
   ```bash
   git clone https://github.com/opea-project/GenAIComps.git
   cd GenAIComps
-  docker build -t opea/embedding-tei:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/tei/langchain/Dockerfile .
+  docker build -t opea/embedding:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/src/Dockerfile .
   ```
 
 - Retriever Vector store Image
 
   ```bash
-  docker build -t opea/retriever-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/redis/langchain/Dockerfile .
+  docker build -t opea/retriever:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/src/Dockerfile .
   ```
 
 - Rerank TEI Image
 
   ```bash
-  docker build -t opea/reranking-tei:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/reranks/tei/Dockerfile .
+  docker build -t opea/reranking:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/rerankings/src/Dockerfile .
   ```
 
 - Dataprep Image
 
   ```bash
-  docker build -t opea/dataprep-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/redis/langchain_ray/Dockerfile .
+  docker build -t opea/dataprep:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/src/Dockerfile .
   ```
 
 ## 2. Build Images for MegaService
@@ -57,7 +57,7 @@ export RETRIEVER_SERVICE_HOST_IP=${host_ip}
 export RERANK_SERVICE_HOST_IP=${host_ip}
 export LLM_SERVICE_HOST_IP=${host_ip}
 export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8000/v1/retrievaltool"
-export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/dataprep"
+export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/ingest"
 export llm_hardware='cpu/xeon' #cpu/xeon, xpu, hpu/gaudi
 cd GenAIExamples/DocIndexRetriever/intel/hpu/gaudi/
 docker compose up -d
@@ -68,7 +68,7 @@ docker compose up -d
 Add Knowledge Base via HTTP Links:
 
 ```bash
-curl -X POST "http://${host_ip}:6007/v1/dataprep" \
+curl -X POST "http://${host_ip}:6007/v1/dataprep/ingest" \
      -H "Content-Type: multipart/form-data" \
      -F 'link_list=["https://opea.dev"]'
 
@@ -115,7 +115,7 @@ curl http://${host_ip}:8889/v1/retrievaltool -X POST -H "Content-Type: applicati
      -X POST \
      -d '{"text":"Explain the OPEA project"}' \
      -H 'Content-Type: application/json' > query
-   docker container logs embedding-tei-server
+   docker container logs embedding-server
 
    # if you used tei-gaudi
    docker container logs tei-embedding-gaudi-server

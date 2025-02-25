@@ -1,0 +1,158 @@
+
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  whisper-service:
+    image: ${REGISTRY:-opea}/whisper:${TAG:-latest}
+    container_name: whisper-service
+    ports:
+      - "7066:7066"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+    restart: unless-stopped
+  asr:
+    image: ${REGISTRY:-opea}/asr:${TAG:-latest}
+    container_name: asr-service
+    ports:
+      - "3001:9099"
+    ipc: host
+    environment:
+      ASR_ENDPOINT: ${ASR_ENDPOINT}
+  speecht5-service:
+    image: ${REGISTRY:-opea}/speecht5:${TAG:-latest}
+    container_name: speecht5-service
+    ports:
+      - "7055:7055"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+    restart: unless-stopped
+  tts:
+    image: ${REGISTRY:-opea}/tts:${TAG:-latest}
+    container_name: tts-service
+    ports:
+      - "3002:9088"
+    ipc: host
+    environment:
+      TTS_ENDPOINT: ${TTS_ENDPOINT}
+  tgi-service:
+    image: ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
+    container_name: tgi-service
+    ports:
+      - "${TGI_SERVICE_PORT:-3006}:80"
+    volumes:
+      - "./data:/data"
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      HUGGING_FACE_HUB_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+    shm_size: 1g
+    devices:
+      - /dev/kfd:/dev/kfd
+      - /dev/dri/:/dev/dri/
+    cap_add:
+      - SYS_PTRACE
+    group_add:
+      - video
+    security_opt:
+      - seccomp:unconfined
+    ipc: host
+    command: --model-id ${LLM_MODEL_ID} --max-input-length 4096 --max-total-tokens 8192
+  llm:
+    image: ${REGISTRY:-opea}/llm-textgen:${TAG:-latest}
+    container_name: llm-tgi-server
+    depends_on:
+      - tgi-service
+    ports:
+      - "3007:9000"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      TGI_LLM_ENDPOINT: ${TGI_LLM_ENDPOINT}
+      LLM_ENDPOINT: ${TGI_LLM_ENDPOINT}
+      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+    restart: unless-stopped
+  wav2lip-service:
+    image: ${REGISTRY:-opea}/wav2lip:${TAG:-latest}
+    container_name: wav2lip-service
+    ports:
+      - "7860:7860"
+    ipc: host
+    volumes:
+      - ${PWD}:/outputs
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      DEVICE: ${DEVICE}
+      INFERENCE_MODE: ${INFERENCE_MODE}
+      CHECKPOINT_PATH: ${CHECKPOINT_PATH}
+      FACE: ${FACE}
+      AUDIO: ${AUDIO}
+      FACESIZE: ${FACESIZE}
+      OUTFILE: ${OUTFILE}
+      GFPGAN_MODEL_VERSION: ${GFPGAN_MODEL_VERSION}
+      UPSCALE_FACTOR: ${UPSCALE_FACTOR}
+      FPS: ${FPS}
+      WAV2LIP_PORT: ${WAV2LIP_PORT}
+    restart: unless-stopped
+  animation:
+    image: ${REGISTRY:-opea}/animation:${TAG:-latest}
+    container_name: animation-server
+    ports:
+      - "3008:9066"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      WAV2LIP_ENDPOINT: ${WAV2LIP_ENDPOINT}
+    restart: unless-stopped
+  avatarchatbot-backend-server:
+    image: ${REGISTRY:-opea}/avatarchatbot:${TAG:-latest}
+    container_name: avatarchatbot-backend-server
+    depends_on:
+      - asr
+      - llm
+      - tts
+      - animation
+    ports:
+      - "3009:8888"
+    environment:
+      no_proxy: ${no_proxy}
+      https_proxy: ${https_proxy}
+      http_proxy: ${http_proxy}
+      MEGA_SERVICE_HOST_IP: ${MEGA_SERVICE_HOST_IP}
+      MEGA_SERVICE_PORT: ${MEGA_SERVICE_PORT}
+      ASR_SERVICE_HOST_IP: ${ASR_SERVICE_HOST_IP}
+      ASR_SERVICE_PORT: ${ASR_SERVICE_PORT}
+      LLM_SERVICE_HOST_IP: ${LLM_SERVICE_HOST_IP}
+      LLM_SERVICE_PORT: ${LLM_SERVICE_PORT}
+      LLM_SERVER_HOST_IP: ${LLM_SERVICE_HOST_IP}
+      LLM_SERVER_PORT: ${LLM_SERVICE_PORT}
+      TTS_SERVICE_HOST_IP: ${TTS_SERVICE_HOST_IP}
+      TTS_SERVICE_PORT: ${TTS_SERVICE_PORT}
+      ANIMATION_SERVICE_HOST_IP: ${ANIMATION_SERVICE_HOST_IP}
+      ANIMATION_SERVICE_PORT: ${ANIMATION_SERVICE_PORT}
+      WHISPER_SERVER_HOST_IP: ${WHISPER_SERVER_HOST_IP}
+      WHISPER_SERVER_PORT: ${WHISPER_SERVER_PORT}
+      SPEECHT5_SERVER_HOST_IP: ${SPEECHT5_SERVER_HOST_IP}
+      SPEECHT5_SERVER_PORT: ${SPEECHT5_SERVER_PORT}
+    ipc: host
+    restart: always
+
+networks:
+  default:
+    driver: bridge

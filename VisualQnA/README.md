@@ -140,3 +140,7 @@ Find the corresponding [compose.yaml](./docker_compose/intel/cpu/xeon/compose.ya
 cd GenAIExamples/VisualQnA/docker_compose/intel/cpu/xeon/
 docker compose up -d
 ```
+
+### Deploy VisualQnA on Kubernetes using Helm Chart
+
+Refer to the [VisualQnA helm chart](./kubernetes/helm/README.md) for instructions on deploying VisualQnA on Kubernetes.

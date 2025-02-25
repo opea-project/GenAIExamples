@@ -77,7 +77,7 @@ class DocSumUI:
         """
         logger.info(">>> Reading audio file: %s", file.name)
         base64_str = self.encode_file_to_base64(file)
-        return self.generate_summary(base64_str, document_type="audio")
+        return base64_str
 
     def read_video_file(self, file):
         """Read and process the content of a video file.
@@ -90,7 +90,7 @@ class DocSumUI:
         """
         logger.info(">>> Reading video file: %s", file.name)
         base64_str = self.encode_file_to_base64(file)
-        return self.generate_summary(base64_str, document_type="video")
+        return base64_str
 
     def is_valid_url(self, url):
         try:
@@ -193,7 +193,7 @@ class DocSumUI:
 
         return str(response.status_code)
 
-    def create_upload_ui(self, label, file_types, process_function):
+    def create_upload_ui(self, label, file_types, process_function, document_type="text"):
         """Create a Gradio UI for file uploads.
 
         Args:
@@ -213,7 +213,11 @@ class DocSumUI:
                     generated_text = gr.TextArea(
                         label="Text Summary", placeholder="Summarized text will be displayed here"
                     )
-            upload_btn.upload(lambda file: self.generate_summary(process_function(file)), upload_btn, generated_text)
+            upload_btn.upload(
+                lambda file: self.generate_summary(process_function(file), document_type=document_type),
+                upload_btn,
+                generated_text,
+            )
         return upload_ui
 
     def render(self):
@@ -269,11 +273,15 @@ class DocSumUI:
             label="Please upload audio file (.wav, .mp3)",
             file_types=[".wav", ".mp3"],
             process_function=self.read_audio_file,
+            document_type="audio",
         )
 
         # Video Upload UI
         video_ui = self.create_upload_ui(
-            label="Please upload Video file (.mp4)", file_types=[".mp4"], process_function=self.read_video_file
+            label="Please upload Video file (.mp4)",
+            file_types=[".mp4"],
+            process_function=self.read_video_file,
+            document_type="video",
         )
 
         # Render all the UI in separate tabs
@@ -288,8 +296,8 @@ class DocSumUI:
                     audio_ui.render()
                 with gr.TabItem("Upload Video"):
                     video_ui.render()
-                with gr.TabItem("Enter URL"):
-                    url_ui.render()
+                # with gr.TabItem("Enter URL"):
+                #     url_ui.render()
 
         return self.demo
 
@@ -305,11 +313,17 @@ app = gr.mount_gradio_app(app, demo, path="/")
 if __name__ == "__main__":
     import argparse
 
+    import nltk
+
     parser = argparse.ArgumentParser()
     parser.add_argument("--host", type=str, default="0.0.0.0")
     parser.add_argument("--port", type=int, default=5173)
 
     args = parser.parse_args()
     logger.info(">>> Starting server at %s:%d", args.host, args.port)
+
+    # Needed for UnstructuredURLLoader when reading content from a URL
+    nltk.download("punkt_tab")
+    nltk.download("averaged_perceptron_tagger_eng")
 
     uvicorn.run(app, host=args.host, port=args.port)

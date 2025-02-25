@@ -19,7 +19,7 @@ ray_port=8265
 function build_docker_images() {
     cd $WORKPATH/docker_image_build
     if [ ! -d "GenAIComps" ] ; then
-        git clone https://github.com/opea-project/GenAIComps.git
+        git clone --single-branch --branch "${opea_branch:-"main"}" https://github.com/opea-project/GenAIComps.git
     fi
     docker compose -f build.yaml build --no-cache > ${LOG_PATH}/docker_image_build.log
 }
