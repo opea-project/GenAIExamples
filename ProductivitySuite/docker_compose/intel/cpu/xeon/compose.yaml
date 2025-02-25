@@ -310,7 +310,7 @@ services:
     command: mongod --quiet --logpath /dev/null
 
   chathistory-mongo:
-    image: ${REGISTRY:-opea}/chathistory-mongo-server:${TAG:-latest}
+    image: ${REGISTRY:-opea}/chathistory-mongo:${TAG:-latest}
     container_name: chathistory-mongo-server
     ports:
       - "6012:6012"
