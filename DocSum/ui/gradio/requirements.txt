@@ -1,5 +1,5 @@
 docx2txt
-gradio==5.5.0
+gradio==5.11.0
 langchain_community
 moviepy==1.0.3
 numpy==1.26.4
