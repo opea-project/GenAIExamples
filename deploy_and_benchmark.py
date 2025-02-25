@@ -67,10 +67,10 @@ def construct_deploy_config(deploy_config, target_node, batch_param_value=None, 
                 )
 
             if isinstance(service_config["replicaCount"], list):
-                if len(service_config["replicaCount"]) != len(nodes):
+                if len(service_config["replicaCount"]) < len(nodes):
                     raise ValueError(
                         f"replicaCount array length ({len(service_config['replicaCount'])}) for service {service_name} "
-                        f"doesn't match node array length ({len(nodes)})"
+                        f"smaller than node array length ({len(nodes)})"
                     )
                 service_config["replicaCount"] = service_config["replicaCount"][node_index]
 
