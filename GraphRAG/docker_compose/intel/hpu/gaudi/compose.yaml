@@ -90,7 +90,7 @@ services:
     command: --model-id ${LLM_MODEL_ID}
 
   dataprep-neo4j-llamaindex:
-    image: opea/dataprep-neo4j-llamaindex:comps
+    image: ${REGISTRY:-opea}/dataprep:${TAG:-latest}
     container_name: dataprep-neo4j-llamaindex
     depends_on:
       neo4j-apoc:
@@ -124,7 +124,7 @@ services:
       MAX_INPUT_TOKENS: ${MAX_INPUT_TOKENS:-4096}
     restart: unless-stopped
   retriever-neo4j:
-    image: opea/retriever:comps
+    image: ${REGISTRY:-opea}/retriever:${TAG:-latest}
     container_name: retriever-neo4j
     ports:
       - "${RETRIEVER_PORT:-7000}:7000"
