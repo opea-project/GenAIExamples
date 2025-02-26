@@ -288,7 +288,7 @@ Verification is performed in two ways:
 The verification is performed using an analog of the service logs
 
 ```bash
-docker logs redis-vector-db
+docker logs chatqna-redis-vector-db
 ```
 
 if the log output contains the string "Ready to accept tcp connections" and there are no obvious errors, then the service is considered successfully started.
