@@ -84,7 +84,7 @@ services:
     restart: unless-stopped
 
   retriever:
-    image:opea/retriever  
+    image:opea/retriever
     #image: ${REGISTRY:-opea}/retriever:${TAG:-latest}
     container_name: retriever-milvus-server
     depends_on:
