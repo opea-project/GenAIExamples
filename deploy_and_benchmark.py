@@ -348,6 +348,7 @@ def main(yaml_file, target_node=None, test_mode="oob"):
                                     namespace=namespace,
                                     node_num=node,
                                     llm_model=deploy_config.get("services", {}).get("llm", {}).get("model_id", ""),
+                                    output_dir=iteration_dir,
                                 )
                             else:
                                 print(

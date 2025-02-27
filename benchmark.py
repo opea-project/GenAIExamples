@@ -351,7 +351,7 @@ def _run_service_test(example, service, test_suite_config, namespace):
     return output_folders
 
 
-def run_benchmark(benchmark_config, chart_name, namespace, node_num=1, llm_model=None, report=False):
+def run_benchmark(benchmark_config, chart_name, namespace, node_num=1, llm_model=None, report=False, output_dir=None):
     """Run the benchmark test for the specified helm chart and configuration.
 
     Args:
@@ -361,6 +361,7 @@ def run_benchmark(benchmark_config, chart_name, namespace, node_num=1, llm_model
         node_num (int): The number of nodes of current deployment.
         llm_model (str): The LLM model to use for the test.
         report (bool): Whether to generate a report after the test.
+        output_dir (str): Directory to store the test output. If None, uses default directory.
     """
     # If llm_model is None or an empty string, set to default value
     if not llm_model:
@@ -377,7 +378,7 @@ def run_benchmark(benchmark_config, chart_name, namespace, node_num=1, llm_model
         "deployment_type": "k8s",  # Default is "k8s", can also be "docker"
         "service_ip": None,  # Leave as None for k8s, specify for Docker
         "service_port": None,  # Leave as None for k8s, specify for Docker
-        "test_output_dir": os.getcwd() + "/benchmark_output",  # The directory to store the test output
+        "test_output_dir": output_dir if output_dir else os.getcwd() + "/benchmark_output",  # Use output_dir if provided
         "node_num": node_num,
         "load_shape": {
             "name": parsed_data["load_shape_type"],
