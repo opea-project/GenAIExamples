@@ -185,6 +185,7 @@ The [AudioQnA](./AudioQnA/README.md) example demonstrates the integration of Gen
 | [LangChain](https://www.langchain.com)/[LlamaIndex](https://www.llamaindex.ai) | [Meta-Llama-3-8B-Instruct](https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct) | [TGI](https://github.com/huggingface/text-generation-inference) | Xeon/Gaudi2 | Chatbot |
 
 ### MultimodalQnA
+
 [MultimodalQnA](./MultimodalQnA/README.md) addresses your questions by dynamically fetching the most pertinent multimodal information (frames, transcripts, and/or captions) from your collection of videos, images, or audio files. MultimodalQnA utilizes BridgeTower model, a multimodal encoding transformer model which merges visual and textual data into a unified semantic space. During the ingestion phase, the BridgeTower model embeds both visual cues and auditory facts as texts, and those embeddings are then stored in a vector database. When it comes to answering a question, the MultimodalQnA will fetch its most relevant multimodal content from the vector store and feed it into a downstream Large Vision-Language Model (LVM) as input context to generate a response for the user.
 
 | Service   | Model                                                                                                             | HW         | Description                   |
@@ -194,7 +195,6 @@ The [AudioQnA](./AudioQnA/README.md) example demonstrates the integration of Gen
 | LVM       | [llava-hf/llava-1.5-7b-hf](https://huggingface.co/llava-hf/llava-1.5-7b-hf)                                       | Xeon       | LVM service                   |
 | LVM       | [llava-hf/llava-1.5-13b-hf](https://huggingface.co/llava-hf/llava-1.5-13b-hf)                                     | Xeon       | LVM service                   |
 | LVM       | [llava-hf/llava-v1.6-vicuna-13b-hf](https://huggingface.co/llava-hf/llava-v1.6-vicuna-13b-hf)                     | Gaudi      | LVM service                   |
-
 
 ### ProductivitySuite
 
