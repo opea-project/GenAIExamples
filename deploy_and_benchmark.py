@@ -218,12 +218,9 @@ def main(yaml_file, target_node=None, test_mode="oob"):
                     # Handle batch parameters
                     batch_params = []
                     if "batch_params" in engine_params:
-                        batch_params = (
-                            engine_params["batch_params"].get("max_batch_size", [])
-                            if engine == "tgi"
-                            else engine_params["batch_params"].get("max_num_seqs", [])
-                        )
-                        param_name = "max_batch_size" if engine == "tgi" else "max_num_seqs"
+                        key = "max_batch_size" if engine == "tgi" else "max_num_seqs"
+                        batch_params = engine_params["batch_params"].get(key, [])
+                        param_name = key
 
                     if not isinstance(batch_params, list):
                         batch_params = [batch_params]
@@ -240,11 +237,18 @@ def main(yaml_file, target_node=None, test_mode="oob"):
                 interval = deploy_config.get("interval", 5)  # default 5s
 
                 values_file_path = None
+                # Create benchmark output directory
+                benchmark_dir = os.path.join(os.getcwd(), "benchmark_output")
+                os.makedirs(benchmark_dir, exist_ok=True)
+
                 for i, batch_param in enumerate(batch_params):
-                    if test_mode == "tune":
-                        print(f"\nProcessing {param_name}: {batch_param}")
-                    else:
-                        print("\nProcessing OOB deployment")
+                    print(f"\nProcessing {test_mode} mode {param_name}: {batch_param}")
+                    # Create subdirectory for this iteration with test mode in the name
+                    iteration_dir = os.path.join(
+                        benchmark_dir,
+                        f"benchmark_{test_mode}_node{node}_batch{batch_param if batch_param is not None else 'default'}"
+                    )
+                    os.makedirs(iteration_dir, exist_ok=True)
 
                     # Construct new deploy config
                     new_deploy_config = construct_deploy_config(deploy_config, node, batch_param, test_mode)
@@ -279,6 +283,8 @@ def main(yaml_file, target_node=None, test_mode="oob"):
                             if match:
                                 values_file_path = match.group(1)
                                 print(f"Captured values_file_path: {values_file_path}")
+                                # Copy values file to iteration directory
+                                shutil.copy2(values_file_path, iteration_dir)
                             else:
                                 print("values_file_path not found in the output")
 
@@ -299,10 +305,20 @@ def main(yaml_file, target_node=None, test_mode="oob"):
                                 values_file_path,
                                 "--update-service",
                             ]
-                            result = subprocess.run(cmd, check=True)
+                            result = subprocess.run(cmd, check=True, capture_output=True, text=True)
                             if result.returncode != 0:
                                 print(f"Update failed for {node} nodes configuration with {param_name} {batch_param}")
                                 break  # Skip remaining {param_name} for this node
+
+                            # Update values_file_path from the output
+                            match = re.search(r"values_file_path: (\S+)", result.stdout)
+                            if match:
+                                values_file_path = match.group(1)
+                                print(f"Updated values_file_path: {values_file_path}")
+                                # Copy values file to iteration directory
+                                shutil.copy2(values_file_path, iteration_dir)
+                            else:
+                                print("values_file_path not found in the output")
 
                         # Wait for deployment to be ready
                         print("\nWaiting for deployment to be ready...")
