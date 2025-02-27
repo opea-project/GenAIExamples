@@ -48,7 +48,7 @@ To setup a LLM model, we can use [tgi-gaudi](https://github.com/huggingface/tgi-
 docker run -p {your_llm_port}:80 --runtime=habana -e HABANA_VISIBLE_DEVICES=all -e PT_HPU_ENABLE_LAZY_COLLECTIVES=true -e OMPI_MCA_btl_vader_single_copy_mechanism=none -e HF_TOKEN={your_hf_token} --cap-add=sys_nice --ipc=host ghcr.io/huggingface/tgi-gaudi:2.0.1 --model-id mistralai/Mixtral-8x7B-Instruct-v0.1 --max-input-tokens 2048 --max-total-tokens 4096 --sharded true --num-shard 2
 
 # for better performance, set `PREFILL_BATCH_BUCKET_SIZE`, `BATCH_BUCKET_SIZE`, `max-batch-total-tokens`, `max-batch-prefill-tokens`
-docker run -p {your_llm_port}:80 --runtime=habana -e HABANA_VISIBLE_DEVICES=all -e PT_HPU_ENABLE_LAZY_COLLECTIVES=true -e OMPI_MCA_btl_vader_single_copy_mechanism=none -e HF_TOKEN={your_hf_token} -e PREFILL_BATCH_BUCKET_SIZE=1 -e BATCH_BUCKET_SIZE=8 --cap-add=sys_nice --ipc=host ghcr.io/huggingface/tgi-gaudi:2.0.5 --model-id mistralai/Mixtral-8x7B-Instruct-v0.1 --max-input-tokens 2048 --max-total-tokens 4096 --sharded true --num-shard 2 --max-batch-total-tokens 65536 --max-batch-prefill-tokens 2048
+docker run -p {your_llm_port}:80 --runtime=habana -e HABANA_VISIBLE_DEVICES=all -e PT_HPU_ENABLE_LAZY_COLLECTIVES=true -e OMPI_MCA_btl_vader_single_copy_mechanism=none -e HF_TOKEN={your_hf_token} -e PREFILL_BATCH_BUCKET_SIZE=1 -e BATCH_BUCKET_SIZE=8 --cap-add=sys_nice --ipc=host ghcr.io/huggingface/tgi-gaudi:2.0.6 --model-id mistralai/Mixtral-8x7B-Instruct-v0.1 --max-input-tokens 2048 --max-total-tokens 4096 --sharded true --num-shard 2 --max-batch-total-tokens 65536 --max-batch-prefill-tokens 2048
 ```
 
 ### Prepare Dataset
@@ -72,14 +72,14 @@ python eval_multihop.py --docs_path MultiHop-RAG/dataset/corpus.json  --dataset_
 If you are using Kubernetes manifest/helm to deploy `ChatQnA` system, you must specify more arguments as following:
 
 ```bash
-python eval_multihop.py --docs_path MultiHop-RAG/dataset/corpus.json  --dataset_path MultiHop-RAG/dataset/MultiHopRAG.json --ingest_docs --retrieval_metrics --ragas_metrics --llm_endpoint http://{llm_as_judge_ip}:{llm_as_judge_port}/generate --database_endpoint http://{your_dataprep_ip}:{your_dataprep_port}/v1/dataprep --embedding_endpoint http://{your_embedding_ip}:{your_embedding_port}/v1/embeddings --tei_embedding_endpoint http://{your_tei_embedding_ip}:{your_tei_embedding_port} --retrieval_endpoint http://{your_retrieval_ip}:{your_retrieval_port}/v1/retrieval --service_url http://{your_chatqna_ip}:{your_chatqna_port}/v1/chatqna
+python eval_multihop.py --docs_path MultiHop-RAG/dataset/corpus.json  --dataset_path MultiHop-RAG/dataset/MultiHopRAG.json --ingest_docs --retrieval_metrics --ragas_metrics --llm_endpoint http://{llm_as_judge_ip}:{llm_as_judge_port}/generate --database_endpoint http://{your_dataprep_ip}:{your_dataprep_port}/v1/dataprep/ingest --embedding_endpoint http://{your_embedding_ip}:{your_embedding_port}/v1/embeddings --tei_embedding_endpoint http://{your_tei_embedding_ip}:{your_tei_embedding_port} --retrieval_endpoint http://{your_retrieval_ip}:{your_retrieval_port}/v1/retrieval --service_url http://{your_chatqna_ip}:{your_chatqna_port}/v1/chatqna
 ```
 
 The default values for arguments are:
 |Argument|Default value|
 |--------|-------------|
 |service_url|http://localhost:8888/v1/chatqna|
-|database_endpoint|http://localhost:6007/v1/dataprep|
+|database_endpoint|http://localhost:6007/v1/dataprep/ingest|
 |embedding_endpoint|http://localhost:6000/v1/embeddings|
 |tei_embedding_endpoint|http://localhost:8090|
 |retrieval_endpoint|http://localhost:7000/v1/retrieval|
@@ -139,14 +139,14 @@ python eval_crud.py --dataset_path ./data/split_merged.json --docs_path ./data/8
 If you are using Kubernetes manifest/helm to deploy `ChatQnA` system, you must specify more arguments as following:
 
 ```bash
-python eval_crud.py --dataset_path ./data/split_merged.json --docs_path ./data/80000_docs --ingest_docs --database_endpoint http://{your_dataprep_ip}:{your_dataprep_port}/v1/dataprep --embedding_endpoint http://{your_embedding_ip}:{your_embedding_port}/v1/embeddings --retrieval_endpoint http://{your_retrieval_ip}:{your_retrieval_port}/v1/retrieval --service_url http://{your_chatqna_ip}:{your_chatqna_port}/v1/chatqna
+python eval_crud.py --dataset_path ./data/split_merged.json --docs_path ./data/80000_docs --ingest_docs --database_endpoint http://{your_dataprep_ip}:{your_dataprep_port}/v1/dataprep/ingest --embedding_endpoint http://{your_embedding_ip}:{your_embedding_port}/v1/embeddings --retrieval_endpoint http://{your_retrieval_ip}:{your_retrieval_port}/v1/retrieval --service_url http://{your_chatqna_ip}:{your_chatqna_port}/v1/chatqna
 ```
 
 The default values for arguments are:
 |Argument|Default value|
 |--------|-------------|
 |service_url|http://localhost:8888/v1/chatqna|
-|database_endpoint|http://localhost:6007/v1/dataprep|
+|database_endpoint|http://localhost:6007/v1/dataprep/ingest|
 |embedding_endpoint|http://localhost:6000/v1/embeddings|
 |retrieval_endpoint|http://localhost:7000/v1/retrieval|
 |reranking_endpoint|http://localhost:8000/v1/reranking|

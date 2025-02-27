@@ -1,0 +1,47 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+test_suite_config: # Overall configuration settings for the test suite
+  examples: ["faqgen"]  # The specific test cases being tested, e.g., chatqna, codegen, codetrans, faqgen, audioqna, visualqna
+  deployment_type: "k8s"  # Default is "k8s", can also be "docker"
+  service_ip: None  # Leave as None for k8s, specify for Docker
+  service_port: None  # Leave as None for k8s, specify for Docker
+  warm_ups: 0  # Number of test requests for warm-up
+  run_time: 60m  # The max total run time for the test suite
+  seed:  # The seed for all RNGs
+  user_queries: [1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048]  # Number of test requests at each concurrency level
+  query_timeout: 120  # Number of seconds to wait for a simulated user to complete any executing task before exiting. 120 sec by defeult.
+  random_prompt: false  # Use random prompts if true, fixed prompts if false
+  collect_service_metric: false  # Collect service metrics if true, do not collect service metrics if false
+  data_visualization: false # Generate data visualization if true, do not generate data visualization if false
+  llm_model: "meta-llama/Meta-Llama-3-8B-Instruct"  # The LLM model used for the test
+  test_output_dir: "/tmp/benchmark_output"  # The directory to store the test output
+  load_shape:              # Tenant concurrency pattern
+    name: constant           # poisson or constant(locust default load shape)
+    params:                  # Loadshape-specific parameters
+      constant:                # Constant load shape specific parameters, activate only if load_shape.name is constant
+        concurrent_level: 4      # If user_queries is specified, concurrent_level is target number of requests per user. If not, it is the number of simulated users
+        # arrival_rate: 1.0       # Request arrival rate. If set, concurrent_level will be overridden, constant load will be generated based on arrival-rate
+      poisson:                 # Poisson load shape specific parameters, activate only if load_shape.name is poisson
+        arrival_rate: 1.0        # Request arrival rate
+  namespace: "" # Fill the user-defined namespace. Otherwise, it will be default.
+
+test_cases:
+  faqgen:
+    llm:
+      run_test: false
+      service_name: "faq-tgi-svc"  # Replace with your service name
+      parameters:
+        model_name: "meta-llama/Meta-Llama-3-8B-Instruct"
+        max_new_tokens: 128
+        temperature: 0.01
+        top_k: 10
+        top_p: 0.95
+        repetition_penalty: 1.03
+        stream: true
+    llmserve:
+      run_test: false
+      service_name: "faq-micro-svc"  # Replace with your service name
+    e2e:
+      run_test: true
+      service_name: "faq-mega-server-svc"  # Replace with your service name

@@ -1,0 +1,74 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+name: Nightly build/publish latest docker images
+
+on:
+  schedule:
+    - cron: "30 14 * * *" # UTC time
+  workflow_dispatch:
+
+env:
+  EXAMPLES: ${{ vars.NIGHTLY_RELEASE_EXAMPLES }}
+  TAG: "latest"
+  PUBLISH_TAGS: "latest"
+
+jobs:
+  get-build-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      examples_json: ${{ steps.get-matrix.outputs.examples_json }}
+      EXAMPLES: ${{ steps.get-matrix.outputs.EXAMPLES }}
+      TAG: ${{ steps.get-matrix.outputs.TAG }}
+      PUBLISH_TAGS: ${{ steps.get-matrix.outputs.PUBLISH_TAGS }}
+    steps:
+      - name: Create Matrix
+        id: get-matrix
+        run: |
+          examples=($(echo ${EXAMPLES} | tr ',' ' '))
+          examples_json=$(printf '%s\n' "${examples[@]}" | sort -u | jq -R '.' | jq -sc '.')
+          echo "examples_json=$examples_json" >> $GITHUB_OUTPUT
+          echo "EXAMPLES=$EXAMPLES" >> $GITHUB_OUTPUT
+          echo "TAG=$TAG" >> $GITHUB_OUTPUT
+          echo "PUBLISH_TAGS=$PUBLISH_TAGS" >> $GITHUB_OUTPUT
+
+  build-and-test:
+    needs: get-build-matrix
+    if: ${{ needs.get-build-matrix.outputs.examples_json != '' }}
+    strategy:
+      matrix:
+        example: ${{ fromJSON(needs.get-build-matrix.outputs.examples_json) }}
+      fail-fast: false
+    uses: ./.github/workflows/_example-workflow.yml
+    with:
+      node: gaudi
+      example: ${{ matrix.example }}
+      test_compose: true
+    secrets: inherit
+
+  get-image-list:
+    needs: get-build-matrix
+    uses: ./.github/workflows/_get-image-list.yml
+    with:
+      examples: ${{ needs.get-build-matrix.outputs.EXAMPLES }}
+
+  publish:
+    needs: [get-build-matrix, get-image-list, build-and-test]
+    if: ${{ needs.get-image-list.outputs.matrix != '' }}
+    strategy:
+      matrix:
+        image: ${{ fromJSON(needs.get-image-list.outputs.matrix) }}
+      fail-fast: false
+    runs-on: "docker-build-gaudi"
+    steps:
+      - uses: docker/login-action@v3.2.0
+        with:
+          username: ${{ secrets.DOCKERHUB_USER }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Image Publish
+        uses: opea-project/validation/actions/image-publish@main
+        with:
+          local_image_ref: ${OPEA_IMAGE_REPO}opea/${{ matrix.image }}:${{ needs.get-build-matrix.outputs.TAG }}
+          image_name: opea/${{ matrix.image }}
+          publish_tags: ${{ needs.get-build-matrix.outputs.PUBLISH_TAGS }}

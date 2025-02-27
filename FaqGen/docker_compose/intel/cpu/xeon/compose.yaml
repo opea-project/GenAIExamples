@@ -3,34 +3,44 @@
 
 services:
   tgi-service:
-    image: ghcr.io/huggingface/text-generation-inference:sha-e4201f4-intel-cpu
+    image: ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu
     container_name: tgi-xeon-server
     ports:
-      - "8008:80"
+      - ${LLM_ENDPOINT_PORT:-8008}:80
+    volumes:
+      - "./data:/data"
+    shm_size: 1g
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      TGI_LLM_ENDPOINT: ${TGI_LLM_ENDPOINT}
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
-    volumes:
-      - "./data:/data"
-    shm_size: 1g
+      host_ip: ${host_ip}
+      LLM_ENDPOINT_PORT: ${LLM_ENDPOINT_PORT}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://${host_ip}:${LLM_ENDPOINT_PORT}/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 100
     command: --model-id ${LLM_MODEL_ID} --cuda-graphs 0
   llm_faqgen:
-    image: ${REGISTRY:-opea}/llm-faqgen-tgi:${TAG:-latest}
+    image: ${REGISTRY:-opea}/llm-faqgen:${TAG:-latest}
     container_name: llm-faqgen-server
     depends_on:
-      - tgi-service
+      tgi-service:
+        condition: service_healthy
     ports:
-      - "9000:9000"
+      - ${LLM_SERVICE_PORT:-9000}:9000
     ipc: host
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      TGI_LLM_ENDPOINT: ${TGI_LLM_ENDPOINT}
+      LLM_ENDPOINT: ${LLM_ENDPOINT}
+      LLM_MODEL_ID: ${LLM_MODEL_ID}
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      FAQGen_COMPONENT_NAME: ${FAQGen_COMPONENT_NAME}
+      LOGFLAG: ${LOGFLAG:-False}
     restart: unless-stopped
   faqgen-xeon-backend-server:
     image: ${REGISTRY:-opea}/faqgen:${TAG:-latest}
@@ -46,6 +56,7 @@ services:
       - http_proxy=${http_proxy}
       - MEGA_SERVICE_HOST_IP=${MEGA_SERVICE_HOST_IP}
       - LLM_SERVICE_HOST_IP=${LLM_SERVICE_HOST_IP}
+      - LLM_SERVICE_PORT=${LLM_SERVICE_PORT}
     ipc: host
     restart: always
   faqgen-xeon-ui-server:
@@ -59,7 +70,7 @@ services:
       - no_proxy=${no_proxy}
       - https_proxy=${https_proxy}
       - http_proxy=${http_proxy}
-      - DOC_BASE_URL=${BACKEND_SERVICE_ENDPOINT}
+      - FAQ_BASE_URL=${BACKEND_SERVICE_ENDPOINT}
     ipc: host
     restart: always
 networks:

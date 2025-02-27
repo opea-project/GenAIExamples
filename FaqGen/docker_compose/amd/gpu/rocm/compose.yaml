@@ -1,0 +1,91 @@
+# Copyright (C) 2024 Advanced Micro Devices, Inc.
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  faqgen-tgi-service:
+    image: ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
+    container_name: faggen-tgi-service
+    ports:
+      - "${FAQGEN_TGI_SERVICE_PORT:-8008}:80"
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      TGI_LLM_ENDPOINT: "http://${HOST_IP}:${FAQGEN_TGI_SERVICE_PORT}"
+      HUGGINGFACEHUB_API_TOKEN: ${FAQGEN_HUGGINGFACEHUB_API_TOKEN}
+      HUGGING_FACE_HUB_TOKEN: ${FAQGEN_HUGGINGFACEHUB_API_TOKEN}
+      HOST_IP: ${HOST_IP}
+      FAQGEN_TGI_SERVICE_PORT: ${FAQGEN_TGI_SERVICE_PORT}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://${HOST_IP}:${FAQGEN_TGI_SERVICE_PORT}/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 100
+    volumes:
+      - "/var/opea/faqgen-service/data:/data"
+    shm_size: 1g
+    devices:
+      - /dev/kfd:/dev/kfd
+      - /dev/dri/${FAQGEN_CARD_ID}:/dev/dri/${FAQGEN_CARD_ID}
+      - /dev/dri/${FAQGEN_RENDER_ID}:/dev/dri/${FAQGEN_RENDER_ID}
+    cap_add:
+      - SYS_PTRACE
+    group_add:
+      - video
+    security_opt:
+      - seccomp:unconfined
+    ipc: host
+    command: --model-id ${FAQGEN_LLM_MODEL_ID}
+  faqgen-llm-server:
+    image: ${REGISTRY:-opea}/llm-faqgen:${TAG:-latest}
+    container_name: faqgen-llm-server
+    depends_on:
+      faqgen-tgi-service:
+        condition: service_healthy
+    ports:
+      - "${FAQGEN_LLM_SERVER_PORT:-9000}:9000"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      LLM_ENDPOINT: "http://${HOST_IP}:${FAQGEN_TGI_SERVICE_PORT}"
+      HUGGINGFACEHUB_API_TOKEN: ${FAQGEN_HUGGINGFACEHUB_API_TOKEN}
+      HUGGING_FACE_HUB_TOKEN: ${FAQGEN_HUGGINGFACEHUB_API_TOKEN}
+      LLM_MODEL_ID: ${FAQGEN_LLM_MODEL_ID}
+      FAQGen_COMPONENT_NAME: ${FAQGen_COMPONENT_NAME}
+      LOGFLAG: ${LOGFLAG:-False}
+    restart: unless-stopped
+  faqgen-backend-server:
+    image: ${REGISTRY:-opea}/faqgen:${TAG:-latest}
+    container_name: faqgen-backend-server
+    depends_on:
+      - faqgen-tgi-service
+      - faqgen-llm-server
+    ports:
+      - "${FAQGEN_BACKEND_SERVER_PORT:-8888}:8888"
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - MEGA_SERVICE_HOST_IP=${HOST_IP}
+      - LLM_SERVICE_HOST_IP=${HOST_IP}
+    ipc: host
+    restart: always
+  faqgen-ui-server:
+    image: ${REGISTRY:-opea}/faqgen-ui:${TAG:-latest}
+    container_name: faqgen-ui-server
+    depends_on:
+      - faqgen-backend-server
+    ports:
+      - "${FAGGEN_UI_PORT:-5173}:5173"
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - DOC_BASE_URL="http://${HOST_IP}:${FAQGEN_BACKEND_SERVER_PORT}/v1/faqgen"
+    ipc: host
+    restart: always
+networks:
+  default:
+    driver: bridge

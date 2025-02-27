@@ -1,0 +1,44 @@
+{
+  "name": "rag_test_local_llm",
+  "node_parser": {
+    "chunk_size": 400,
+    "chunk_overlap": 48,
+    "parser_type": "simple"
+  },
+  "indexer": {
+    "indexer_type": "faiss_vector",
+    "embedding_model": {
+      "model_id": "BAAI/bge-small-en-v1.5",
+      "model_path": "./models/BAAI/bge-small-en-v1.5",
+      "device": "auto",
+      "weight": "INT4"
+    }
+  },
+  "retriever": {
+    "retriever_type": "vectorsimilarity",
+    "retrieve_topk": 30
+  },
+  "postprocessor": [
+    {
+      "processor_type": "reranker",
+      "top_n": 2,
+      "reranker_model": {
+        "model_id": "BAAI/bge-reranker-large",
+        "model_path": "./models/BAAI/bge-reranker-large",
+        "device": "auto",
+        "weight": "INT4"
+      }
+    }
+  ],
+  "generator": {
+    "model": {
+      "model_id": "Qwen/Qwen2-7B-Instruct",
+      "model_path": "./models/Qwen/Qwen2-7B-Instruct/INT4_compressed_weights",
+      "device": "auto",
+      "weight": "INT4"
+    },
+    "prompt_path": "./default_prompt.txt",
+    "inference_type": "local"
+  },
+  "active": "True"
+}

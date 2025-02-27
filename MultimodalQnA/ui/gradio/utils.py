@@ -5,6 +5,7 @@ import base64
 import logging
 import logging.handlers
 import os
+import shutil
 import sys
 from pathlib import Path
 
@@ -118,6 +119,18 @@ def maintain_aspect_ratio_resize(image, width=None, height=None, inter=cv2.INTER
     return cv2.resize(image, dim, interpolation=inter)
 
 
+def make_temp_image(
+    image_name,
+    file_ext,
+    output_image_path: str = "./public/images",
+    output_image_name: str = "image_tmp",
+):
+    Path(output_image_path).mkdir(parents=True, exist_ok=True)
+    output_image = os.path.join(output_image_path, "{}{}".format(output_image_name, file_ext))
+    shutil.copy(image_name, output_image)
+    return output_image
+
+
 # function to split video at a timestamp
 def split_video(
     video_path,
@@ -150,7 +163,7 @@ def delete_split_video(video_path):
 
 
 def convert_img_to_base64(image):
-    "Convert image to base64 string"
+    """Convert image to base64 string."""
     _, buffer = cv2.imencode(".png", image)
     encoded_string = base64.b64encode(buffer)
     return encoded_string.decode("utf-8")
@@ -167,3 +180,9 @@ def get_b64_frame_from_timestamp(video_path, timestamp_in_ms, maintain_aspect_ra
         b64_img_str = convert_img_to_base64(frame)
         return b64_img_str
     return None
+
+
+def convert_audio_to_base64(audio_path):
+    """Convert .wav file to base64 string."""
+    encoded_string = base64.b64encode(open(audio_path, "rb").read())
+    return encoded_string.decode("utf-8")

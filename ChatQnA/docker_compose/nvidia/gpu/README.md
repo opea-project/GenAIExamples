@@ -5,8 +5,11 @@ This document outlines the deployment process for a ChatQnA application utilizin
 Quick Start Deployment Steps:
 
 1. Set up the environment variables.
-2. Run Docker Compose.
-3. Consume the ChatQnA Service.
+2. Modify the TEI Docker Image for Reranking
+3. Run Docker Compose.
+4. Consume the ChatQnA Service.
+
+Note: The default LLM is `meta-llama/Meta-Llama-3-8B-Instruct`. Before deploying the application, please make sure either you've requested and been granted the access to it on [Huggingface](https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct) or you've downloaded the model locally from [ModelScope](https://www.modelscope.cn/models).
 
 ## Quick Start: 1.Setup Environment Variable
 
@@ -17,8 +20,6 @@ To set up environment variables for deploying ChatQnA services, follow these ste
    ```bash
    # Example: host_ip="192.168.1.1"
    export host_ip="External_Public_IP"
-   # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
-   export no_proxy="Your_No_Proxy"
    export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
    ```
 
@@ -27,6 +28,8 @@ To set up environment variables for deploying ChatQnA services, follow these ste
    ```bash
    export http_proxy="Your_HTTP_Proxy"
    export https_proxy="Your_HTTPs_Proxy"
+   # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
+   export no_proxy="Your_No_Proxy",chatqna-ui-server,chatqna-backend-server,dataprep-redis-service,tei-embedding-service,retriever,tei-reranking-service,tgi-service
    ```
 
 3. Set up other environment variables:
@@ -35,7 +38,30 @@ To set up environment variables for deploying ChatQnA services, follow these ste
    source ./set_env.sh
    ```
 
-## Quick Start: 2.Run Docker Compose
+## Quick Start: 2.Modify the TEI Docker Image for Reranking
+
+> **Note:**
+> The default Docker image for the `tei-reranking-service` in `compose.yaml` is built for A100 and A30 backend with compute capacity 8.0. If you are using A100/A30, skip this step. For other GPU architectures, please modify the `image` with specific tag for `tei-reranking-service` based on the following table with target CUDA compute capacity.
+
+| GPU Arch     | GPU                                        | Compute Capacity | Image                                                    |
+| ------------ | ------------------------------------------ | ---------------- | -------------------------------------------------------- |
+| Volta        | V100                                       | 7.0              | NOT SUPPORTED                                            |
+| Turing       | T4, GeForce RTX 2000 Series                | 7.5              | ghcr.io/huggingface/text-embeddings-inference:turing-1.5 |
+| Ampere 80    | A100, A30                                  | 8.0              | ghcr.io/huggingface/text-embeddings-inference:1.5        |
+| Ampere 86    | A40, A10, A16, A2, GeForce RTX 3000 Series | 8.6              | ghcr.io/huggingface/text-embeddings-inference:86-1.5     |
+| Ada Lovelace | L40S, L40, L4, GeForce RTX 4000 Series     | 8.9              | ghcr.io/huggingface/text-embeddings-inference:89-1.5     |
+| Hopper       | H100                                       | 9.0              | ghcr.io/huggingface/text-embeddings-inference:hopper-1.5 |
+
+For instance, if Hopper arch GPU (such as H100/H100 NVL) is the target backend:
+
+```
+# vim compose.yaml
+tei-reranking-service:
+  #image: ghcr.io/huggingface/text-embeddings-inference:1.5
+  image: ghcr.io/huggingface/text-embeddings-inference:hopper-1.5
+```
+
+## Quick Start: 3.Run Docker Compose
 
 ```bash
 docker compose up -d
@@ -56,7 +82,7 @@ In following cases, you could build docker image from source by yourself.
 
 Please refer to 'Build Docker Images' in below.
 
-## QuickStart: 3.Consume the ChatQnA Service
+## QuickStart: 4.Consume the ChatQnA Service
 
 ```bash
 curl http://${host_ip}:8888/v1/chatqna \
@@ -80,13 +106,13 @@ cd GenAIComps
 ### 2. Build Retriever Image
 
 ```bash
-docker build --no-cache -t opea/retriever-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/redis/langchain/Dockerfile .
+docker build --no-cache -t opea/retriever:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/src/Dockerfile .
 ```
 
 ### 3. Build Dataprep Image
 
 ```bash
-docker build --no-cache -t opea/dataprep-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/redis/langchain/Dockerfile .
+docker build --no-cache -t opea/dataprep:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/src/Dockerfile .
 ```
 
 ### 4. Build MegaService Docker Image
@@ -95,9 +121,9 @@ To construct the Mega Service, we utilize the [GenAIComps](https://github.com/op
 
 ```bash
 git clone https://github.com/opea-project/GenAIExamples.git
-cd GenAIExamples/ChatQnA/docker
+cd GenAIExamples/ChatQnA
 docker build --no-cache -t opea/chatqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
-cd ../../..
+cd ../..
 ```
 
 ### 5. Build UI Docker Image
@@ -107,7 +133,7 @@ Construct the frontend Docker image using the command below:
 ```bash
 cd GenAIExamples/ChatQnA/ui
 docker build --no-cache -t opea/chatqna-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
-cd ../../../..
+cd ../../../
 ```
 
 ### 6. Build React UI Docker Image (Optional)
@@ -117,20 +143,20 @@ Construct the frontend Docker image using the command below:
 ```bash
 cd GenAIExamples/ChatQnA/ui
 docker build --no-cache -t opea/chatqna-react-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile.react .
-cd ../../../..
+cd ../../..
 ```
 
 ### 7. Build Nginx Docker Image
 
 ```bash
 cd GenAIComps
-docker build -t opea/nginx:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/nginx/Dockerfile .
+docker build -t opea/nginx:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/third_parties/nginx/src/Dockerfile .
 ```
 
 Then run the command `docker images`, you will have the following 5 Docker Images:
 
-1. `opea/retriever-redis:latest`
-2. `opea/dataprep-redis:latest`
+1. `opea/retriever:latest`
+2. `opea/dataprep:latest`
 3. `opea/chatqna:latest`
 4. `opea/chatqna-ui:latest` or `opea/chatqna-react-ui:latest`
 5. `opea/nginx:latest`
@@ -141,11 +167,11 @@ Then run the command `docker images`, you will have the following 5 Docker Image
 
 By default, the embedding, reranking and LLM models are set to a default value as listed below:
 
-| Service   | Model                     |
-| --------- | ------------------------- |
-| Embedding | BAAI/bge-base-en-v1.5     |
-| Reranking | BAAI/bge-reranker-base    |
-| LLM       | Intel/neural-chat-7b-v3-3 |
+| Service   | Model                               |
+| --------- | ----------------------------------- |
+| Embedding | BAAI/bge-base-en-v1.5               |
+| Reranking | BAAI/bge-reranker-base              |
+| LLM       | meta-llama/Meta-Llama-3-8B-Instruct |
 
 Change the `xxx_MODEL_ID` below for your needs.
 
@@ -156,8 +182,6 @@ Change the `xxx_MODEL_ID` below for your needs.
    ```bash
    # Example: host_ip="192.168.1.1"
    export host_ip="External_Public_IP"
-   # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
-   export no_proxy="Your_No_Proxy"
    export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
    # Example: NGINX_PORT=80
    export NGINX_PORT=${your_nginx_port}
@@ -168,6 +192,8 @@ Change the `xxx_MODEL_ID` below for your needs.
    ```bash
    export http_proxy="Your_HTTP_Proxy"
    export https_proxy="Your_HTTPs_Proxy"
+   # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
+   export no_proxy="Your_No_Proxy",chatqna-ui-server,chatqna-backend-server,dataprep-redis-service,tei-embedding-service,retriever,tei-reranking-service,tgi-service
    ```
 
 3. Set up other environment variables:
@@ -175,6 +201,29 @@ Change the `xxx_MODEL_ID` below for your needs.
    ```bash
    source ./set_env.sh
    ```
+
+### Modify the TEI Docker Image for Reranking
+
+> **Note:**
+> The default Docker image for the `tei-reranking-service` in `compose.yaml` is built for A100 and A30 backend with compute capacity 8.0. If you are using A100/A30, skip this step. For other GPU architectures, please modify the `image` with specific tag for `tei-reranking-service` based on the following table with target CUDA compute capacity.
+
+| GPU Arch     | GPU                                        | Compute Capacity | Image                                                    |
+| ------------ | ------------------------------------------ | ---------------- | -------------------------------------------------------- |
+| Volta        | V100                                       | 7.0              | NOT SUPPORTED                                            |
+| Turing       | T4, GeForce RTX 2000 Series                | 7.5              | ghcr.io/huggingface/text-embeddings-inference:turing-1.5 |
+| Ampere 80    | A100, A30                                  | 8.0              | ghcr.io/huggingface/text-embeddings-inference:1.5        |
+| Ampere 86    | A40, A10, A16, A2, GeForce RTX 3000 Series | 8.6              | ghcr.io/huggingface/text-embeddings-inference:86-1.5     |
+| Ada Lovelace | L40S, L40, L4, GeForce RTX 4000 Series     | 8.9              | ghcr.io/huggingface/text-embeddings-inference:89-1.5     |
+| Hopper       | H100                                       | 9.0              | ghcr.io/huggingface/text-embeddings-inference:hopper-1.5 |
+
+For instance, if Hopper arch GPU (such as H100/H100 NVL) is the target backend:
+
+```
+# vim compose.yaml
+tei-reranking-service:
+  #image: ghcr.io/huggingface/text-embeddings-inference:1.5
+  image: ghcr.io/huggingface/text-embeddings-inference:hopper-1.5
+```
 
 ### Start all the services Docker Containers
 
@@ -226,7 +275,7 @@ docker compose up -d
    Try the command below to check whether the TGI service is ready.
 
    ```bash
-   docker logs ${CONTAINER_ID} | grep Connected
+   docker logs tgi-server | grep Connected
    ```
 
    If the service is ready, you will get the response like below.
@@ -238,9 +287,9 @@ docker compose up -d
    Then try the `cURL` command below to validate TGI.
 
    ```bash
-   curl http://${host_ip}:8008/generate \
+   curl http://${host_ip}:8008/v1/chat/completions \
      -X POST \
-     -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":64, "do_sample": true}}' \
+     -d '{"model": "meta-llama/Meta-Llama-3-8B-Instruct", "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens":17}' \
      -H 'Content-Type: application/json'
    ```
 
@@ -267,7 +316,7 @@ If you want to update the default knowledge base, you can use the following comm
 Update Knowledge Base via Local File Upload:
 
 ```bash
-curl -X POST "http://${host_ip}:6007/v1/dataprep" \
+curl -X POST "http://${host_ip}:6007/v1/dataprep/ingest" \
      -H "Content-Type: multipart/form-data" \
      -F "files=@./nke-10k-2023.pdf"
 ```
@@ -277,7 +326,7 @@ This command updates a knowledge base by uploading a local file for processing. 
 Add Knowledge Base via HTTP Links:
 
 ```bash
-curl -X POST "http://${host_ip}:6007/v1/dataprep" \
+curl -X POST "http://${host_ip}:6007/v1/dataprep/ingest" \
      -H "Content-Type: multipart/form-data" \
      -F 'link_list=["https://opea.dev"]'
 ```
@@ -287,7 +336,7 @@ This command updates a knowledge base by submitting a list of HTTP links for pro
 Also, you are able to get the file list that you uploaded:
 
 ```bash
-curl -X POST "http://${host_ip}:6007/v1/dataprep/get_file" \
+curl -X POST "http://${host_ip}:6007/v1/dataprep/get" \
      -H "Content-Type: application/json"
 ```
 
@@ -295,17 +344,17 @@ To delete the file/link you uploaded:
 
 ```bash
 # delete link
-curl -X POST "http://${host_ip}:6007/v1/dataprep/delete_file" \
+curl -X POST "http://${host_ip}:6007/v1/dataprep/delete" \
      -d '{"file_path": "https://opea.dev"}' \
      -H "Content-Type: application/json"
 
 # delete file
-curl -X POST "http://${host_ip}:6007/v1/dataprep/delete_file" \
+curl -X POST "http://${host_ip}:6007/v1/dataprep/delete" \
      -d '{"file_path": "nke-10k-2023.pdf"}' \
      -H "Content-Type: application/json"
 
 # delete all uploaded files and links
-curl -X POST "http://${host_ip}:6007/v1/dataprep/delete_file" \
+curl -X POST "http://${host_ip}:6007/v1/dataprep/delete" \
      -d '{"file_path": "all"}' \
      -H "Content-Type: application/json"
 ```

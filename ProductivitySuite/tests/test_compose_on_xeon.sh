@@ -16,13 +16,13 @@ ip_address=$(hostname -I | awk '{print $1}')
 
 function build_docker_images() {
     cd $WORKPATH/docker_image_build
-    git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
+    git clone --depth 1 --branch ${opea_branch:-"main"} https://github.com/opea-project/GenAIComps.git
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
     docker compose -f build.yaml build --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
-    docker pull ghcr.io/huggingface/text-generation-inference:2.1.0
+    docker pull ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu
     docker images && sleep 1s
 }
 
@@ -30,9 +30,12 @@ function start_services() {
     cd $WORKPATH/docker_compose/intel/cpu/xeon/
 
     export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
+    export RERANK_TYPE="tei"
     export RERANK_MODEL_ID="BAAI/bge-reranker-base"
     export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
     export LLM_MODEL_ID_CODEGEN="Intel/neural-chat-7b-v3-3"
+    export DATAPREP_TYPE="redis"
+    export RETRIEVER_TYPE="redis"
     export TEI_EMBEDDING_ENDPOINT="http://${ip_address}:6006"
     export TEI_RERANKING_ENDPOINT="http://${ip_address}:8808"
     export TGI_LLM_ENDPOINT="http://${ip_address}:9009"
@@ -55,11 +58,10 @@ function start_services() {
     export TGI_LLM_ENDPOINT_DOCSUM="http://${ip_address}:9009"
     export BACKEND_SERVICE_ENDPOINT_CHATQNA="http://${ip_address}:8888/v1/chatqna"
     export BACKEND_SERVICE_ENDPOINT_FAQGEN="http://${ip_address}:8889/v1/faqgen"
-    export DATAPREP_DELETE_FILE_ENDPOINT="http://${ip_address}:6009/v1/dataprep/delete_file"
+    export DATAPREP_DELETE_FILE_ENDPOINT="http://${ip_address}:5000/v1/dataprep/delete"
     export BACKEND_SERVICE_ENDPOINT_CODEGEN="http://${ip_address}:7778/v1/codegen"
-    export BACKEND_SERVICE_ENDPOINT_DOCSUM="http://${ip_address}:8890/v1/docsum"
-    export DATAPREP_SERVICE_ENDPOINT="http://${ip_address}:6007/v1/dataprep"
-    export DATAPREP_GET_FILE_ENDPOINT="http://${ip_address}:6008/v1/dataprep/get_file"
+    export DATAPREP_SERVICE_ENDPOINT="http://${ip_address}:5000/v1/dataprep/ingest"
+    export DATAPREP_GET_FILE_ENDPOINT="http://${ip_address}:5000/v1/dataprep/get"
     export CHAT_HISTORY_CREATE_ENDPOINT="http://${ip_address}:6012/v1/chathistory/create"
     export CHAT_HISTORY_CREATE_ENDPOINT="http://${ip_address}:6012/v1/chathistory/create"
     export CHAT_HISTORY_DELETE_ENDPOINT="http://${ip_address}:6012/v1/chathistory/delete"
@@ -73,21 +75,18 @@ function start_services() {
     export COLLECTION_NAME="Conversations"
     export LLM_SERVICE_HOST_PORT_FAQGEN=9002
     export LLM_SERVICE_HOST_PORT_CODEGEN=9001
-    export LLM_SERVICE_HOST_PORT_DOCSUM=9003
+    export RERANK_SERVER_PORT=8808
+    export EMBEDDING_SERVER_PORT=6006
+    export LLM_SERVER_PORT=9009
     export PROMPT_COLLECTION_NAME="prompt"
+    export host_ip=${ip_address}
+    export FAQGen_COMPONENT_NAME="OpeaFaqGenTgi"
+    export LOGFLAG=True
 
     # Start Docker Containers
     docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
-    n=0
-    until [[ "$n" -ge 100 ]]; do
-        docker logs tgi-service > ${LOG_PATH}/tgi_service_start.log
-        if grep -q Connected ${LOG_PATH}/tgi_service_start.log; then
-            echo "ChatQnA TGI Service Connected"
-            break
-        fi
-        sleep 5s
-        n=$((n+1))
-    done
+    sleep 30s
+
     n=0
     until [[ "$n" -ge 100 ]]; do
         docker logs tgi_service_codegen > ${LOG_PATH}/tgi_service_codegen_start.log
@@ -116,6 +115,9 @@ function validate_service() {
         HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -H 'Content-Type: application/json' "$URL")
     elif [[ $SERVICE_NAME == *"dataprep_del"* ]]; then
         HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -d '{"file_path": "all"}' -H 'Content-Type: application/json' "$URL")
+    elif [[ $SERVICE_NAME == *"faqgen-xeon-backend-server"* ]]; then
+        local INPUT_DATA="messages=Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."
+        HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -F "$INPUT_DATA" -F "max_tokens=32" -F "stream=False" -H 'Content-Type: multipart/form-data' "$URL")
     else
         HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL")
     fi
@@ -142,6 +144,61 @@ function validate_service() {
     sleep 1s
 }
 
+function validate_faqgen_megaservice() {
+    local URL="$1"
+    local SERVICE_NAME="$2"
+    local DOCKER_NAME="$3"
+    local EXPECTED_RESULT="Embeddings"
+    local INPUT_DATA="messages=Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."
+    local HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST -F "$INPUT_DATA" -F "max_tokens=32" -F "stream=False" -H 'Content-Type: multipart/form-data' "$URL")
+    if [ "$HTTP_STATUS" -eq 200 ]; then
+        echo "[ $SERVICE_NAME ] HTTP status is 200. Checking content..."
+
+        local CONTENT=$(curl -s -X POST -F "$INPUT_DATA"  -F "max_tokens=32" -F "stream=False" -H 'Content-Type: multipart/form-data' "$URL" | tee ${LOG_PATH}/${SERVICE_NAME}.log)
+
+        if echo "$CONTENT" | grep -q "$EXPECTED_RESULT"; then
+            echo "[ $SERVICE_NAME ] Content is as expected."
+        else
+            echo "[ $SERVICE_NAME ] Content does not match the expected result: $CONTENT"
+            docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
+            exit 1
+        fi
+    else
+        echo "[ $SERVICE_NAME ] HTTP status is not 200. Received status was $HTTP_STATUS"
+        docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
+        exit 1
+    fi
+    sleep 1s
+}
+
+function validate_faqgen() {
+    local URL="$1"
+    local EXPECTED_RESULT="$2"
+    local SERVICE_NAME="$3"
+    local DOCKER_NAME="$4"
+    local INPUT_DATA="$5"
+
+    local HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL")
+    if [ "$HTTP_STATUS" -eq 200 ]; then
+        echo "[ $SERVICE_NAME ] HTTP status is 200. Checking content..."
+
+        local CONTENT=$(curl -s -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL" | tee ${LOG_PATH}/${SERVICE_NAME}.log)
+
+        if echo "$CONTENT" | grep -q "$EXPECTED_RESULT"; then
+            echo "[ $SERVICE_NAME ] Content is as expected."
+        else
+            echo "[ $SERVICE_NAME ] Content does not match the expected result: $CONTENT"
+            docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
+            exit 1
+        fi
+    else
+        echo "[ $SERVICE_NAME ] HTTP status is not 200. Received status was $HTTP_STATUS"
+        docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
+        exit 1
+    fi
+    sleep 1s
+}
+
 function validate_microservices() {
     # Check if the microservices are running correctly.
 
@@ -156,40 +213,40 @@ function validate_microservices() {
     # embedding microservice
     validate_service \
         "${ip_address}:6000/v1/embeddings" \
-        '"text":"What is Deep Learning?","embedding":[' \
+        '"embedding":[' \
         "embedding-microservice" \
-        "embedding-tei-server" \
-        '{"text":"What is Deep Learning?"}'
+        "embedding-server" \
+        '{"input":"What is Deep Learning?"}'
 
     sleep 1m # retrieval can't curl as expected, try to wait for more time
 
-    # test /v1/dataprep upload file
+    # test /v1/dataprep/delete
+    validate_service \
+        "http://${ip_address}:6007/v1/dataprep/delete" \
+        '{"status":true}' \
+        "dataprep_del" \
+        "dataprep-redis-server"
+
+    # test /v1/dataprep/ingest upload file
     echo "Deep learning is a subset of machine learning that utilizes neural networks with multiple layers to analyze various levels of abstract data representations. It enables computers to identify patterns and make decisions with minimal human intervention by learning from large amounts of data." > $LOG_PATH/dataprep_file.txt
     validate_service \
-        "http://${ip_address}:6007/v1/dataprep" \
+        "http://${ip_address}:6007/v1/dataprep/ingest" \
         "Data preparation succeeded" \
         "dataprep_upload_file" \
         "dataprep-redis-server"
 
     # test /v1/dataprep upload link
     validate_service \
-        "http://${ip_address}:6007/v1/dataprep" \
+        "http://${ip_address}:6007/v1/dataprep/ingest" \
         "Data preparation succeeded" \
         "dataprep_upload_link" \
         "dataprep-redis-server"
 
-    # test /v1/dataprep/get_file
+    # test /v1/dataprep/get
     validate_service \
-        "http://${ip_address}:6007/v1/dataprep/get_file" \
+        "http://${ip_address}:6007/v1/dataprep/get" \
         '{"name":' \
         "dataprep_get" \
-        "dataprep-redis-server"
-
-    # test /v1/dataprep/delete_file
-    validate_service \
-        "http://${ip_address}:6007/v1/dataprep/delete_file" \
-        '{"status":true}' \
-        "dataprep_del" \
         "dataprep-redis-server"
 
     # retrieval microservice
@@ -230,31 +287,23 @@ function validate_microservices() {
         "${ip_address}:9000/v1/chat/completions" \
         "data: " \
         "llm-microservice" \
-        "llm-tgi-server" \
+        "llm-textgen-server" \
         '{"query":"What is Deep Learning?"}'
 
     # FAQGen llm microservice
-    validate_service \
+    validate_faqgen \
         "${ip_address}:9002/v1/faqgen" \
-        "data: " \
+        "text" \
         "llm_faqgen" \
         "llm-faqgen-server" \
-        '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
-
-    # Docsum llm microservice
-    validate_service \
-        "${ip_address}:9003/v1/chat/docsum" \
-        "data: " \
-        "llm_docsum" \
-        "llm-docsum-server" \
-        '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
+        '{"messages":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
 
     # CodeGen llm microservice
     validate_service \
         "${ip_address}:9001/v1/chat/completions" \
         "data: " \
         "llm_codegen" \
-        "llm-tgi-server-codegen" \
+        "llm-textgen-server-codegen" \
         '{"query":"def print_hello_world():"}'
 
     result=$(curl -X 'POST' \
@@ -291,9 +340,7 @@ function validate_microservices() {
 
 }
 
-
 function validate_megaservice() {
-
 
     # Curl the ChatQnAMega Service
     validate_service \
@@ -303,23 +350,11 @@ function validate_megaservice() {
         "chatqna-xeon-backend-server" \
         '{"messages": "What is the revenue of Nike in 2023?"}'\
 
-
-    # Curl the FAQGen Service
-    validate_service \
+    # Curl the FAQGenMega Service
+    validate_faqgen_megaservice \
         "${ip_address}:8889/v1/faqgen" \
-        "Text Embeddings Inference" \
         "faqgen-xeon-backend-server" \
-        "faqgen-xeon-backend-server" \
-        '{"messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'\
-
-    # Curl the DocSum Mega Service
-    validate_service \
-        "${ip_address}:8890/v1/docsum" \
-        "toolkit" \
-        "docsum-xeon-backend-server" \
-        "docsum-xeon-backend-server" \
-        '{"messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
-
+        "faqgen-xeon-backend-server"
 
     # Curl the CodeGen Mega Service
     validate_service \
@@ -340,7 +375,7 @@ function validate_frontend() {
     source activate ${conda_env_name}
     echo "[ TEST INFO ]: --------- conda env activated ---------"
 
-#    conda install -c conda-forge nodejs -y
+#    conda install -c conda-forge nodejs=22.6.0 -y
     npm install && npm ci
     node -v && npm -v && pip list
 

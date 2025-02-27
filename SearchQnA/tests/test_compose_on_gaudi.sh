@@ -15,16 +15,28 @@ LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
 
 function build_docker_images() {
+    opea_branch=${opea_branch:-"main"}
+    # If the opea_branch isn't main, replace the git clone branch in Dockerfile.
+    if [[ "${opea_branch}" != "main" ]]; then
+        cd $WORKPATH
+        OLD_STRING="RUN git clone --depth 1 https://github.com/opea-project/GenAIComps.git"
+        NEW_STRING="RUN git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git"
+        find . -type f -name "Dockerfile*" | while read -r file; do
+            echo "Processing file: $file"
+            sed -i "s|$OLD_STRING|$NEW_STRING|g" "$file"
+        done
+    fi
+
     cd $WORKPATH/docker_image_build
-    git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
+    git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="searchqna searchqna-ui embedding-tei web-retriever-chroma reranking-tei llm-tgi"
+    service_list="searchqna searchqna-ui embedding web-retriever reranking llm-textgen"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
-    docker pull ghcr.io/huggingface/tgi-gaudi:2.0.5
-    docker pull ghcr.io/huggingface/tei-gaudi:latest
+    docker pull ghcr.io/huggingface/tei-gaudi:1.5.0
+    docker pull ghcr.io/huggingface/tgi-gaudi:2.0.6
     docker images && sleep 1s
 }
 
@@ -38,6 +50,7 @@ function start_services() {
     export EMBEDDING_MODEL_ID=BAAI/bge-base-en-v1.5
     export TEI_EMBEDDING_ENDPOINT=http://$ip_address:3001
     export RERANK_MODEL_ID=BAAI/bge-reranker-base
+    export RERANK_TYPE="tei"
     export TEI_RERANKING_ENDPOINT=http://$ip_address:3004
 
     export TGI_LLM_ENDPOINT=http://$ip_address:3006
@@ -54,39 +67,31 @@ function start_services() {
     export RERANK_SERVICE_PORT=3005
     export LLM_SERVICE_PORT=3007
     export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:3008/v1/searchqna"
+    export host_ip=${ip_address}
+    export LOGFLAG=true
 
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
     # Start Docker Containers
     docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
-    n=0
-    until [[ "$n" -ge 100 ]]; do
-        docker logs tgi-gaudi-server > $LOG_PATH/tgi_service_start.log
-        if grep -q Connected $LOG_PATH/tgi_service_start.log; then
-            break
-        fi
-        sleep 5s
-        n=$((n+1))
-    done
+
+    sleep 10s
 }
 
 
 function validate_megaservice() {
-    result=$(http_proxy="" curl http://${ip_address}:3008/v1/searchqna -XPOST -d '{"messages": "What is black myth wukong?", "stream": "False"}' -H 'Content-Type: application/json')
+    result=$(curl http://${ip_address}:3008/v1/searchqna -X POST -d '{"messages": "What is the capital of China?", "stream": "False"}' -H 'Content-Type: application/json')
     echo $result
 
-    if [[ $result == *"the"* ]]; then
-        docker logs web-retriever-chroma-server > ${LOG_PATH}/web-retriever-chroma-server.log
-        docker logs searchqna-gaudi-backend-server > ${LOG_PATH}/searchqna-gaudi-backend-server.log
-        docker logs tei-embedding-gaudi-server > ${LOG_PATH}/tei-embedding-gaudi-server.log
-        docker logs embedding-tei-server > ${LOG_PATH}/embedding-tei-server.log
+    docker logs web-retriever-server > ${LOG_PATH}/web-retriever-server.log
+    docker logs searchqna-gaudi-backend-server > ${LOG_PATH}/searchqna-gaudi-backend-server.log
+    docker logs tei-embedding-gaudi-server > ${LOG_PATH}/tei-embedding-gaudi-server.log
+    docker logs embedding-gaudi-server > ${LOG_PATH}/embedding-gaudi-server.log
+
+    if [[ $result == *"capital"* ]]; then
         echo "Result correct."
     else
-        docker logs web-retriever-chroma-server > ${LOG_PATH}/web-retriever-chroma-server.log
-        docker logs searchqna-gaudi-backend-server > ${LOG_PATH}/searchqna-gaudi-backend-server.log
-        docker logs tei-embedding-gaudi-server > ${LOG_PATH}/tei-embedding-gaudi-server.log
-        docker logs embedding-tei-server > ${LOG_PATH}/embedding-tei-server.log
         echo "Result wrong."
         exit 1
     fi
@@ -107,7 +112,7 @@ function validate_frontend() {
 
     sed -i "s/localhost/$ip_address/g" playwright.config.ts
 
-    conda install -c conda-forge nodejs -y
+    conda install -c conda-forge nodejs=22.6.0 -y
     npm install && npm ci && npx playwright install --with-deps
     node -v && npm -v && pip list
 

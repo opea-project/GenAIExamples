@@ -1,0 +1,94 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  server:
+    image: ${REGISTRY:-opea}/edgecraftrag-server:${TAG:-latest}
+    container_name: edgecraftrag-server
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      HF_ENDPOINT: ${HF_ENDPOINT}
+      vLLM_ENDPOINT: ${vLLM_ENDPOINT}
+      ENABLE_BENCHMARK: ${ENABLE_BENCHMARK:-false}
+    volumes:
+      - ${MODEL_PATH:-${PWD}}:/home/user/models
+      - ${DOC_PATH:-${PWD}}:/home/user/docs
+      - ${GRADIO_PATH:-${PWD}}:/home/user/gradio_cache
+      - ${HF_CACHE:-${HOME}/.cache}:/home/user/.cache
+      - ${PROMPT_PATH:-${PWD}}:/templates/custom
+    ports:
+      - ${PIPELINE_SERVICE_PORT:-16010}:${PIPELINE_SERVICE_PORT:-16010}
+    devices:
+      - /dev/dri:/dev/dri
+    group_add:
+      - ${VIDEOGROUPID:-44}
+      - ${RENDERGROUPID:-109}
+  ecrag:
+    image: ${REGISTRY:-opea}/edgecraftrag:${TAG:-latest}
+    container_name: edgecraftrag
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      MEGA_SERVICE_PORT: ${MEGA_SERVICE_PORT:-16011}
+      MEGA_SERVICE_HOST_IP: ${MEGA_SERVICE_HOST_IP:-${HOST_IP}}
+      PIPELINE_SERVICE_PORT: ${PIPELINE_SERVICE_PORT:-16010}
+      PIPELINE_SERVICE_HOST_IP: ${PIPELINE_SERVICE_HOST_IP:-${HOST_IP}}
+    ports:
+      - ${MEGA_SERVICE_PORT:-16011}:${MEGA_SERVICE_PORT:-16011}
+    depends_on:
+      - server
+  ui:
+    image: ${REGISTRY:-opea}/edgecraftrag-ui:${TAG:-latest}
+    container_name: edgecraftrag-ui
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      MEGA_SERVICE_PORT: ${MEGA_SERVICE_PORT:-16011}
+      MEGA_SERVICE_HOST_IP: ${MEGA_SERVICE_HOST_IP:-${HOST_IP}}
+      PIPELINE_SERVICE_PORT: ${PIPELINE_SERVICE_PORT:-16010}
+      PIPELINE_SERVICE_HOST_IP: ${PIPELINE_SERVICE_HOST_IP:-${HOST_IP}}
+      UI_SERVICE_PORT: ${UI_SERVICE_PORT:-8082}
+      UI_SERVICE_HOST_IP: ${UI_SERVICE_HOST_IP:-0.0.0.0}
+    volumes:
+      - ${GRADIO_PATH:-${PWD}}:/home/user/gradio_cache
+    ports:
+      - ${UI_SERVICE_PORT:-8082}:${UI_SERVICE_PORT:-8082}
+    restart: always
+    depends_on:
+      - server
+      - ecrag
+  # vllm-openvino-server:
+  #   container_name: vllm-openvino-server
+  #   image: opea/vllm-arc:latest
+  #   ports:
+  #     - ${VLLM_SERVICE_PORT:-8008}:80
+  #   environment:
+  #     HTTPS_PROXY: ${https_proxy}
+  #     HTTP_PROXY: ${https_proxy}
+  #     VLLM_OPENVINO_DEVICE: GPU
+  #     HF_ENDPOINT: ${HF_ENDPOINT}
+  #     HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+  #   volumes:
+  #     - /dev/dri/by-path:/dev/dri/by-path
+  #     - $HOME/.cache/huggingface:/root/.cache/huggingface
+  #   devices:
+  #     - /dev/dri
+  #   group_add:
+  #     - ${VIDEOGROUPID:-44}
+  #     - ${RENDERGROUPID:-109}
+  #   entrypoint: /bin/bash -c "\
+  #     cd / && \
+  #     export VLLM_CPU_KVCACHE_SPACE=50 && \
+  #     export VLLM_OPENVINO_ENABLE_QUANTIZED_WEIGHTS=ON && \
+  #     python3 -m vllm.entrypoints.openai.api_server \
+  #       --model '${LLM_MODEL}' \
+  #       --max_model_len=1024 \
+  #       --host 0.0.0.0 \
+  #       --port 80"
+networks:
+  default:
+    driver: bridge

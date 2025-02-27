@@ -2,42 +2,69 @@
 # SPDX-License-Identifier: Apache-2.0
 
 services:
-  tgi-service:
-    image: ghcr.io/huggingface/text-generation-inference:sha-e4201f4-intel-cpu
-    container_name: tgi-service
+  tgi-server:
+    image: ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu
+    container_name: tgi-server
     ports:
-      - "8008:80"
+      - ${LLM_ENDPOINT_PORT:-8008}:80
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       TGI_LLM_ENDPOINT: ${TGI_LLM_ENDPOINT}
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      host_ip: ${host_ip}
+      LLM_ENDPOINT_PORT: ${LLM_ENDPOINT_PORT}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://${host_ip}:${LLM_ENDPOINT_PORT}/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 100
     volumes:
       - "./data:/data"
     shm_size: 1g
-    command: --model-id ${LLM_MODEL_ID} --cuda-graphs 0
-  llm:
-    image: ${REGISTRY:-opea}/llm-docsum-tgi:${TAG:-latest}
+    command: --model-id ${LLM_MODEL_ID} --cuda-graphs 0  --max-input-length ${MAX_INPUT_TOKENS} --max-total-tokens ${MAX_TOTAL_TOKENS}
+
+  llm-docsum-tgi:
+    image: ${REGISTRY:-opea}/llm-docsum:${TAG:-latest}
     container_name: llm-docsum-server
     depends_on:
-      - tgi-service
+      tgi-server:
+        condition: service_healthy
     ports:
-      - "9000:9000"
+      - ${DOCSUM_PORT:-9000}:9000
     ipc: host
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      TGI_LLM_ENDPOINT: ${TGI_LLM_ENDPOINT}
+      LLM_ENDPOINT: ${LLM_ENDPOINT}
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      MAX_INPUT_TOKENS: ${MAX_INPUT_TOKENS}
+      MAX_TOTAL_TOKENS: ${MAX_TOTAL_TOKENS}
+      LLM_MODEL_ID: ${LLM_MODEL_ID}
+      DocSum_COMPONENT_NAME: ${DocSum_COMPONENT_NAME}
+      LOGFLAG: ${LOGFLAG:-False}
     restart: unless-stopped
+
+  whisper:
+    image: ${REGISTRY:-opea}/whisper:${TAG:-latest}
+    container_name: whisper-server
+    ports:
+      - "7066:7066"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+    restart: unless-stopped
+
   docsum-xeon-backend-server:
     image: ${REGISTRY:-opea}/docsum:${TAG:-latest}
     container_name: docsum-xeon-backend-server
     depends_on:
-      - tgi-service
-      - llm
+      - tgi-server
+      - llm-docsum-tgi
     ports:
       - "8888:8888"
     environment:
@@ -46,10 +73,12 @@ services:
       - http_proxy=${http_proxy}
       - MEGA_SERVICE_HOST_IP=${MEGA_SERVICE_HOST_IP}
       - LLM_SERVICE_HOST_IP=${LLM_SERVICE_HOST_IP}
+      - ASR_SERVICE_HOST_IP=${ASR_SERVICE_HOST_IP}
     ipc: host
     restart: always
-  docsum-xeon-ui-server:
-    image: ${REGISTRY:-opea}/docsum-ui:${TAG:-latest}
+
+  docsum-gradio-ui:
+    image: ${REGISTRY:-opea}/docsum-gradio-ui:${TAG:-latest}
     container_name: docsum-xeon-ui-server
     depends_on:
       - docsum-xeon-backend-server
@@ -59,6 +88,7 @@ services:
       - no_proxy=${no_proxy}
       - https_proxy=${https_proxy}
       - http_proxy=${http_proxy}
+      - BACKEND_SERVICE_ENDPOINT=${BACKEND_SERVICE_ENDPOINT}
       - DOC_BASE_URL=${BACKEND_SERVICE_ENDPOINT}
     ipc: host
     restart: always

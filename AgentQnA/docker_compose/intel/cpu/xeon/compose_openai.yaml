@@ -2,11 +2,10 @@
 # SPDX-License-Identifier: Apache-2.0
 
 services:
-  worker-docgrader-agent:
-    image: opea/agent-langchain:latest
-    container_name: docgrader-agent-endpoint
+  worker-rag-agent:
+    image: opea/agent:latest
+    container_name: rag-agent-endpoint
     volumes:
-      - ${WORKDIR}/GenAIComps/comps/agent/langchain/:/home/user/comps/agent/langchain/
       - ${TOOLSET_PATH}:/home/user/tools/
     ports:
       - "9095:9095"
@@ -14,13 +13,14 @@ services:
     environment:
       ip_address: ${ip_address}
       strategy: rag_agent
+      with_memory: false
       recursion_limit: ${recursion_limit_worker}
       llm_engine: openai
       OPENAI_API_KEY: ${OPENAI_API_KEY}
       model: ${model}
       temperature: ${temperature}
       max_new_tokens: ${max_new_tokens}
-      streaming: false
+      stream: false
       tools: /home/user/tools/worker_agent_tools.yaml
       require_human_feedback: false
       RETRIEVAL_TOOL_URL: ${RETRIEVAL_TOOL_URL}
@@ -32,26 +32,56 @@ services:
       LANGCHAIN_PROJECT: "opea-worker-agent-service"
       port: 9095
 
+  worker-sql-agent:
+    image: opea/agent:latest
+    container_name: sql-agent-endpoint
+    volumes:
+      - ${WORKDIR}/GenAIExamples/AgentQnA/tests:/home/user/chinook-db # SQL database
+    ports:
+      - "9096:9096"
+    ipc: host
+    environment:
+      ip_address: ${ip_address}
+      strategy: sql_agent
+      with_memory: false
+      db_name: ${db_name}
+      db_path: ${db_path}
+      use_hints: false
+      recursion_limit: ${recursion_limit_worker}
+      llm_engine: openai
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      model: ${model}
+      temperature: 0
+      max_new_tokens: ${max_new_tokens}
+      stream: false
+      require_human_feedback: false
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      port: 9096
 
   supervisor-react-agent:
-    image: opea/agent-langchain:latest
+    image: opea/agent:latest
     container_name: react-agent-endpoint
+    depends_on:
+      - worker-rag-agent
+      - worker-sql-agent
     volumes:
-      - ${WORKDIR}/GenAIComps/comps/agent/langchain/:/home/user/comps/agent/langchain/
       - ${TOOLSET_PATH}:/home/user/tools/
     ports:
       - "9090:9090"
     ipc: host
     environment:
       ip_address: ${ip_address}
-      strategy: react_langgraph
+      strategy: react_llama
+      with_memory: true
       recursion_limit: ${recursion_limit_supervisor}
       llm_engine: openai
       OPENAI_API_KEY: ${OPENAI_API_KEY}
       model: ${model}
       temperature: ${temperature}
       max_new_tokens: ${max_new_tokens}
-      streaming: false
+      stream: true
       tools: /home/user/tools/supervisor_agent_tools.yaml
       require_human_feedback: false
       no_proxy: ${no_proxy}

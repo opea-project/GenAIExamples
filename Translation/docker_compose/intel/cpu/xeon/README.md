@@ -34,7 +34,7 @@ Follow the instructions below to build the docker images from source.
 ```bash
 git clone https://github.com/opea-project/GenAIComps.git
 cd GenAIComps
-docker build -t opea/llm-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/tgi/Dockerfile .
+docker build -t opea/llm-textgen:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/src/text-generation/Dockerfile .
 ```
 
 ### 2. Build MegaService Docker Image
@@ -60,12 +60,12 @@ docker build -t opea/translation-ui:latest --build-arg https_proxy=$https_proxy 
 
 ```bash
 cd GenAIComps
-docker build -t opea/nginx:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/nginx/Dockerfile .
+docker build -t opea/nginx:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/third_parties/nginx/src/Dockerfile .
 ```
 
 Then run the command `docker images`, you will have the following Docker Images:
 
-1. `opea/llm-tgi:latest`
+1. `opea/llm-textgen:latest`
 2. `opea/translation:latest`
 3. `opea/translation-ui:latest`
 4. `opea/nginx:latest`
@@ -119,7 +119,7 @@ docker compose up -d
 > Note: The docker images will be automatically downloaded from `docker hub`:
 
 ```bash
-docker pull opea/llm-tgi:latest
+docker pull opea/llm-textgen:latest
 docker pull opea/translation:latest
 docker pull opea/translation-ui:latest
 docker pull opea/nginx:latest

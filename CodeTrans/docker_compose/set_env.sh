@@ -2,9 +2,12 @@
 
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
+pushd "../../" > /dev/null
+source .set_env.sh
+popd > /dev/null
 
 
-export LLM_MODEL_ID="HuggingFaceH4/mistral-7b-grok"
+export LLM_MODEL_ID="mistralai/Mistral-7B-Instruct-v0.3"
 export TGI_LLM_ENDPOINT="http://${host_ip}:8008"
 export MEGA_SERVICE_HOST_IP=${host_ip}
 export LLM_SERVICE_HOST_IP=${host_ip}

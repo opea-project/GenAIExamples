@@ -11,6 +11,15 @@ services:
       context: ../
       dockerfile: ./Dockerfile
     image: ${REGISTRY:-opea}/docsum:${TAG:-latest}
+  docsum-gradio-ui:
+    build:
+      args:
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
+      context: ../ui
+      dockerfile: ./docker/Dockerfile.gradio
+    extends: docsum
+    image: ${REGISTRY:-opea}/docsum-gradio-ui:${TAG:-latest}
   docsum-ui:
     build:
       context: ../ui
@@ -23,9 +32,18 @@ services:
       dockerfile: ./docker/Dockerfile.react
     extends: docsum
     image: ${REGISTRY:-opea}/docsum-react-ui:${TAG:-latest}
-  llm-docsum-tgi:
+  whisper:
+    build:
+      args:
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
+      context: GenAIComps
+      dockerfile: comps/asr/src/integrations/dependency/whisper/Dockerfile
+    extends: docsum
+    image: ${REGISTRY:-opea}/whisper:${TAG:-latest}
+  llm-docsum:
     build:
       context: GenAIComps
-      dockerfile: comps/llms/summarization/tgi/langchain/Dockerfile
+      dockerfile: comps/llms/src/doc-summarization/Dockerfile
     extends: docsum
-    image: ${REGISTRY:-opea}/llm-docsum-tgi:${TAG:-latest}
+    image: ${REGISTRY:-opea}/llm-docsum:${TAG:-latest}

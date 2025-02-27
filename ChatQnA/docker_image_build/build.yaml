@@ -35,93 +35,57 @@ services:
       dockerfile: ./docker/Dockerfile.react
     extends: chatqna
     image: ${REGISTRY:-opea}/chatqna-conversation-ui:${TAG:-latest}
-  embedding-tei:
+  embedding:
     build:
       context: GenAIComps
-      dockerfile: comps/embeddings/tei/langchain/Dockerfile
+      dockerfile: comps/embeddings/src/Dockerfile
     extends: chatqna
-    image: ${REGISTRY:-opea}/embedding-tei:${TAG:-latest}
-  retriever-redis:
+    image: ${REGISTRY:-opea}/embedding:${TAG:-latest}
+  retriever:
     build:
       context: GenAIComps
-      dockerfile: comps/retrievers/redis/langchain/Dockerfile
+      dockerfile: comps/retrievers/src/Dockerfile
     extends: chatqna
-    image: ${REGISTRY:-opea}/retriever-redis:${TAG:-latest}
-  retriever-qdrant:
+    image: ${REGISTRY:-opea}/retriever:${TAG:-latest}
+  reranking:
     build:
       context: GenAIComps
-      dockerfile: comps/retrievers/qdrant/haystack/Dockerfile
+      dockerfile: comps/rerankings/src/Dockerfile
     extends: chatqna
-    image: ${REGISTRY:-opea}/retriever-qdrant:${TAG:-latest}
-  reranking-tei:
+    image: ${REGISTRY:-opea}/reranking:${TAG:-latest}
+  llm-textgen:
     build:
       context: GenAIComps
-      dockerfile: comps/reranks/tei/Dockerfile
+      dockerfile: comps/llms/src/text-generation/Dockerfile
     extends: chatqna
-    image: ${REGISTRY:-opea}/reranking-tei:${TAG:-latest}
-  llm-tgi:
+    image: ${REGISTRY:-opea}/llm-textgen:${TAG:-latest}
+  dataprep:
     build:
       context: GenAIComps
-      dockerfile: comps/llms/text-generation/tgi/Dockerfile
+      dockerfile: comps/dataprep/src/Dockerfile
     extends: chatqna
-    image: ${REGISTRY:-opea}/llm-tgi:${TAG:-latest}
-  llm-ollama:
+    image: ${REGISTRY:-opea}/dataprep:${TAG:-latest}
+  guardrails:
     build:
       context: GenAIComps
-      dockerfile: comps/llms/text-generation/ollama/langchain/Dockerfile
+      dockerfile: comps/guardrails/src/guardrails/Dockerfile
     extends: chatqna
-    image: ${REGISTRY:-opea}/llm-ollama:${TAG:-latest}
-  llm-vllm:
-    build:
-      context: GenAIComps
-      dockerfile: comps/llms/text-generation/vllm/langchain/Dockerfile
-    extends: chatqna
-    image: ${REGISTRY:-opea}/llm-vllm:${TAG:-latest}
-  llm-vllm-hpu:
-    build:
-      context: GenAIComps
-      dockerfile: comps/llms/text-generation/vllm/langchain/dependency/Dockerfile.intel_hpu
-    extends: chatqna
-    image: ${REGISTRY:-opea}/llm-vllm-hpu:${TAG:-latest}
-  llm-vllm-ray:
-    build:
-      context: GenAIComps
-      dockerfile: comps/llms/text-generation/vllm/ray/Dockerfile
-    extends: chatqna
-    image: ${REGISTRY:-opea}/llm-vllm-ray:${TAG:-latest}
-  llm-vllm-ray-hpu:
-    build:
-      context: GenAIComps
-      dockerfile: comps/llms/text-generation/vllm/ray/dependency/Dockerfile
-    extends: chatqna
-    image: ${REGISTRY:-opea}/llm-vllm-ray-hpu:${TAG:-latest}
-  dataprep-redis:
-    build:
-      context: GenAIComps
-      dockerfile: comps/dataprep/redis/langchain/Dockerfile
-    extends: chatqna
-    image: ${REGISTRY:-opea}/dataprep-redis:${TAG:-latest}
-  dataprep-qdrant:
-    build:
-      context: GenAIComps
-      dockerfile: comps/dataprep/qdrant/langchain/Dockerfile
-    extends: chatqna
-    image: ${REGISTRY:-opea}/dataprep-qdrant:${TAG:-latest}
-  guardrails-tgi:
-    build:
-      context: GenAIComps
-      dockerfile: comps/guardrails/llama_guard/langchain/Dockerfile
-    extends: chatqna
-    image: ${REGISTRY:-opea}/guardrails-tgi:${TAG:-latest}
+    image: ${REGISTRY:-opea}/guardrails:${TAG:-latest}
   vllm:
     build:
       context: vllm
       dockerfile: Dockerfile.cpu
     extends: chatqna
     image: ${REGISTRY:-opea}/vllm:${TAG:-latest}
+  vllm-gaudi:
+    build:
+      context: vllm-fork
+      dockerfile: Dockerfile.hpu
+    extends: chatqna
+    image: ${REGISTRY:-opea}/vllm-gaudi:${TAG:-latest}
   nginx:
     build:
       context: GenAIComps
-      dockerfile: comps/nginx/Dockerfile
+      dockerfile: comps/third_parties/nginx/src/Dockerfile
     extends: chatqna
     image: ${REGISTRY:-opea}/nginx:${TAG:-latest}

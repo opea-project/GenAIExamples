@@ -15,20 +15,12 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      HABANA_VISIBLE_MODULES: all
+      HABANA_VISIBLE_DEVICES: all
       OMPI_MCA_btl_vader_single_copy_mechanism: none
     runtime: habana
     cap_add:
       - SYS_NICE
     restart: unless-stopped
-  asr:
-    image: ${REGISTRY:-opea}/asr:${TAG:-latest}
-    container_name: asr-service
-    ports:
-      - "3001:9099"
-    ipc: host
-    environment:
-      ASR_ENDPOINT: ${ASR_ENDPOINT}
   speecht5-service:
     image: ${REGISTRY:-opea}/speecht5-gaudi:${TAG:-latest}
     container_name: speecht5-service
@@ -39,22 +31,14 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      HABANA_VISIBLE_MODULES: all
+      HABANA_VISIBLE_DEVICES: all
       OMPI_MCA_btl_vader_single_copy_mechanism: none
     runtime: habana
     cap_add:
       - SYS_NICE
     restart: unless-stopped
-  tts:
-    image: ${REGISTRY:-opea}/tts:${TAG:-latest}
-    container_name: tts-service
-    ports:
-      - "3002:9088"
-    ipc: host
-    environment:
-      TTS_ENDPOINT: ${TTS_ENDPOINT}
   tgi-service:
-    image: ghcr.io/huggingface/tgi-gaudi:2.0.5
+    image: ghcr.io/huggingface/tgi-gaudi:2.0.6
     container_name: tgi-gaudi-server
     ports:
       - "3006:80"
@@ -67,7 +51,7 @@ services:
       HUGGING_FACE_HUB_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       HF_HUB_DISABLE_PROGRESS_BARS: 1
       HF_HUB_ENABLE_HF_TRANSFER: 0
-      HABANA_VISIBLE_MODULES: all
+      HABANA_VISIBLE_DEVICES: all
       OMPI_MCA_btl_vader_single_copy_mechanism: none
       ENABLE_HPU_GRAPH: true
       LIMIT_HPU_GRAPH: true
@@ -78,21 +62,6 @@ services:
       - SYS_NICE
     ipc: host
     command: --model-id ${LLM_MODEL_ID} --max-input-length 128 --max-total-tokens 256
-  llm:
-    image: ${REGISTRY:-opea}/llm-tgi:${TAG:-latest}
-    container_name: llm-tgi-gaudi-server
-    depends_on:
-      - tgi-service
-    ports:
-      - "3007:9000"
-    ipc: host
-    environment:
-      no_proxy: ${no_proxy}
-      http_proxy: ${http_proxy}
-      https_proxy: ${https_proxy}
-      TGI_LLM_ENDPOINT: ${TGI_LLM_ENDPOINT}
-      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
-    restart: unless-stopped
   wav2lip-service:
     image: ${REGISTRY:-opea}/wav2lip-gaudi:${TAG:-latest}
     container_name: wav2lip-service
@@ -105,7 +74,7 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      HABANA_VISIBLE_MODULES: all
+      HABANA_VISIBLE_DEVICES: all
       OMPI_MCA_btl_vader_single_copy_mechanism: none
       DEVICE: ${DEVICE}
       INFERENCE_MODE: ${INFERENCE_MODE}
@@ -132,7 +101,7 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      HABANA_VISIBLE_MODULES: all
+      HABANA_VISIBLE_DEVICES: all
       OMPI_MCA_btl_vader_single_copy_mechanism: none
       WAV2LIP_ENDPOINT: ${WAV2LIP_ENDPOINT}
     runtime: habana
@@ -143,9 +112,6 @@ services:
     image: ${REGISTRY:-opea}/avatarchatbot:${TAG:-latest}
     container_name: avatarchatbot-gaudi-backend-server
     depends_on:
-      - asr
-      - llm
-      - tts
       - animation
     ports:
       - "3009:8888"
@@ -155,12 +121,12 @@ services:
       - http_proxy=${http_proxy}
       - MEGA_SERVICE_HOST_IP=${MEGA_SERVICE_HOST_IP}
       - MEGA_SERVICE_PORT=${MEGA_SERVICE_PORT}
-      - ASR_SERVICE_HOST_IP=${ASR_SERVICE_HOST_IP}
-      - ASR_SERVICE_PORT=${ASR_SERVICE_PORT}
-      - LLM_SERVICE_HOST_IP=${LLM_SERVICE_HOST_IP}
-      - LLM_SERVICE_PORT=${LLM_SERVICE_PORT}
-      - TTS_SERVICE_HOST_IP=${TTS_SERVICE_HOST_IP}
-      - TTS_SERVICE_PORT=${TTS_SERVICE_PORT}
+      - WHISPER_SERVER_HOST_IP=${WHISPER_SERVER_HOST_IP}
+      - WHISPER_SERVER_PORT=${WHISPER_SERVER_PORT}
+      - LLM_SERVER_HOST_IP=${LLM_SERVER_HOST_IP}
+      - LLM_SERVER_PORT=${LLM_SERVER_PORT}
+      - SPEECHT5_SERVER_HOST_IP=${SPEECHT5_SERVER_HOST_IP}
+      - SPEECHT5_SERVER_PORT=${SPEECHT5_SERVER_PORT}
       - ANIMATION_SERVICE_HOST_IP=${ANIMATION_SERVICE_HOST_IP}
       - ANIMATION_SERVICE_PORT=${ANIMATION_SERVICE_PORT}
     ipc: host

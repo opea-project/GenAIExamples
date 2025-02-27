@@ -1,0 +1,31 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  worflowexec-agent:
+    image: ${REGISTRY:-opea}/agent:${TAG:-latest}
+    container_name: workflowexec-agent-endpoint
+    volumes:
+      - ${WORKDIR}/GenAIComps/comps/agent/src/:/home/user/comps/agent/src/
+      - ${TOOLSET_PATH}:/home/user/tools/
+    ports:
+      - "9090:9090"
+    ipc: host
+    environment:
+      ip_address: ${ip_address}
+      strategy: react_langgraph
+      recursion_limit: ${recursion_limit}
+      llm_engine: ${llm_engine}
+      llm_endpoint_url: ${llm_endpoint_url}
+      model: ${model}
+      temperature: ${temperature}
+      max_new_tokens: ${max_new_tokens}
+      stream: false
+      tools: /home/user/tools/tools.yaml
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      port: 9090
+      SDK_BASE_URL: ${SDK_BASE_URL}
+      SERVING_TOKEN: ${SERVING_TOKEN}
+      custom_prompt: /home/user/tools/custom_prompt.py

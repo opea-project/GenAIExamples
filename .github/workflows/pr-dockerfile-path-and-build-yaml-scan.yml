@@ -1,0 +1,109 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+name: Compose file and dockerfile path checking
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, reopened, ready_for_review, synchronize]
+
+jobs:
+  check-dockerfile-paths-in-README:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clean Up Working Directory
+        run: sudo rm -rf ${{github.workspace}}/*
+
+      - name: Checkout Repo GenAIExamples
+        uses: actions/checkout@v4
+
+      - name: Clone Repo GenAIComps
+        run: |
+          cd ..
+          git clone --depth 1 https://github.com/opea-project/GenAIComps.git
+
+      - name: Check for Missing Dockerfile Paths in GenAIComps
+        run: |
+          cd ${{github.workspace}}
+          miss="FALSE"
+          while IFS=: read -r file line content; do
+              dockerfile_path=$(echo "$content" | awk -F '-f ' '{print $2}' | awk '{print $1}')
+              if [[ ! -f "../GenAIComps/${dockerfile_path}" ]]; then
+                  miss="TRUE"
+                  echo "Missing Dockerfile: GenAIComps/${dockerfile_path} (Referenced in GenAIExamples/${file}:${line})"
+              fi
+          done < <(grep -Ern 'docker build .* -f comps/.+/Dockerfile' --include='*.md' .)
+
+
+          if [[ "$miss" == "TRUE" ]]; then
+            exit 1
+          fi
+
+        shell: bash
+
+  check-Dockerfile-in-build-yamls:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clean Up Working Directory
+        run: sudo rm -rf ${{github.workspace}}/*
+
+      - name: Checkout Repo GenAIExamples
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check Dockerfile path included in image build yaml
+        if: always()
+        run: |
+          set -e
+          shopt -s globstar
+          no_add="FALSE"
+          cd ${{github.workspace}}
+          Dockerfiles=$(realpath $(find ./ -name '*Dockerfile*' ! -path '*/tests/*'))
+          if [ -n "$Dockerfiles" ]; then
+            for dockerfile in $Dockerfiles; do
+              service=$(echo "$dockerfile" | awk -F '/GenAIExamples/' '{print $2}' | awk -F '/' '{print $2}')
+              cd ${{github.workspace}}/$service/docker_image_build
+              all_paths=$(realpath $(awk '  /context:/ { context = $2 }  /dockerfile:/ { dockerfile = $2; combined = context "/" dockerfile; gsub(/\/+/, "/", combined); if  (index(context, ".") > 0) {print combined}}' build.yaml) 2> /dev/null || true  )
+              if ! echo "$all_paths" | grep -q "$dockerfile"; then
+                echo "AR: Update $dockerfile to GenAIExamples/$service/docker_image_build/build.yaml. The yaml is used for release images build."
+                no_add="TRUE"
+              fi
+            done
+          fi
+
+          if [[ "$no_add" == "TRUE" ]]; then
+            exit 1
+          fi
+
+  check-image-and-service-names-in-build-yaml:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clean Up Working Directory
+        run: sudo rm -rf ${{github.workspace}}/*
+
+      - name: Checkout Repo GenAIExamples
+        uses: actions/checkout@v4
+
+      - name: Check name agreement in build.yaml
+        run: |
+          pip install ruamel.yaml
+          cd ${{github.workspace}}
+          consistency="TRUE"
+          build_yamls=$(find . -name 'build.yaml')
+          for build_yaml in $build_yamls; do
+            message=$(python3 .github/workflows/scripts/check-name-agreement.py "$build_yaml")
+            if [[ "$message" != *"consistent"* ]]; then
+              consistency="FALSE"
+              echo "Inconsistent service name and image name found in file $build_yaml."
+              echo "$message"
+            fi
+          done
+
+          if [[ "$consistency" == "FALSE" ]]; then
+            echo "Please ensure that the service and image names are consistent in build.yaml, otherwise we cannot guarantee that your image will be published correctly."
+            exit 1
+          fi
+
+        shell: bash

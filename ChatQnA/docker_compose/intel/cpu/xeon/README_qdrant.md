@@ -1,6 +1,10 @@
 # Build Mega Service of ChatQnA (with Qdrant) on Xeon
 
-This document outlines the deployment process for a ChatQnA application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on Intel Xeon server. The steps include Docker image creation, container deployment via Docker Compose, and service execution to integrate microservices such as `embedding`, `retriever`, `rerank`, and `llm`. We will publish the Docker images to Docker Hub soon, it will simplify the deployment process for this service.
+This document outlines the deployment process for a ChatQnA application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on Intel Xeon server. The steps include Docker image creation, container deployment via Docker Compose, and service execution to integrate microservices such as `embedding`, `retriever`, `rerank`, and `llm`.
+
+The default pipeline deploys with vLLM as the LLM serving component and leverages rerank component.
+
+Note: The default LLM is `meta-llama/Meta-Llama-3-8B-Instruct`. Before deploying the application, please make sure either you've requested and been granted the access to it on [Huggingface](https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct) or you've downloaded the model locally from [ModelScope](https://www.modelscope.cn/models).
 
 ## 🚀 Apply Xeon Server on AWS
 
@@ -44,7 +48,7 @@ reranking
 =========
 Port 6046 - Open to 0.0.0.0/0
 
-tgi-service
+vllm-service
 ===========
 Port 6042 - Open to 0.0.0.0/0
 
@@ -73,13 +77,13 @@ cd GenAIComps
 ### 1. Build Retriever Image
 
 ```bash
-docker build --no-cache -t opea/retriever-qdrant:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/qdrant/haystack/Dockerfile .
+docker build --no-cache -t opea/retriever:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/src/Dockerfile .
 ```
 
 ### 2. Build Dataprep Image
 
 ```bash
-docker build --no-cache -t opea/dataprep-qdrant:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/qdrant/langchain/Dockerfile .
+docker build --no-cache -t opea/dataprep:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/src/Dockerfile .
 cd ..
 ```
 
@@ -113,7 +117,7 @@ Build frontend Docker image that enables Conversational experience with ChatQnA 
 ```bash
 cd GenAIExamples/ChatQnA/ui
 export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8912/v1/chatqna"
-export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6043/v1/dataprep"
+export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6043/v1/dataprep/ingest"
 docker build --no-cache -t opea/chatqna-conversation-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy --build-arg BACKEND_SERVICE_ENDPOINT=$BACKEND_SERVICE_ENDPOINT --build-arg DATAPREP_SERVICE_ENDPOINT=$DATAPREP_SERVICE_ENDPOINT -f ./docker/Dockerfile.react .
 cd ../../../..
 ```
@@ -122,13 +126,13 @@ cd ../../../..
 
 ```bash
 cd GenAIComps
-docker build -t opea/nginx:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/nginx/Dockerfile .
+docker build -t opea/nginx:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/third_parties/nginx/src/Dockerfile .
 ```
 
 Then run the command `docker images`, you will have the following 5 Docker Images:
 
-1. `opea/dataprep-qdrant:latest`
-2. `opea/retriever-qdrant:latest`
+1. `opea/dataprep:latest`
+2. `opea/retriever:latest`
 3. `opea/chatqna:latest`
 4. `opea/chatqna-ui:latest`
 5. `opea/nginx:latest`
@@ -139,11 +143,11 @@ Then run the command `docker images`, you will have the following 5 Docker Image
 
 By default, the embedding, reranking and LLM models are set to a default value as listed below:
 
-| Service   | Model                     |
-| --------- | ------------------------- |
-| Embedding | BAAI/bge-base-en-v1.5     |
-| Reranking | BAAI/bge-reranker-base    |
-| LLM       | Intel/neural-chat-7b-v3-3 |
+| Service   | Model                               |
+| --------- | ----------------------------------- |
+| Embedding | BAAI/bge-base-en-v1.5               |
+| Reranking | BAAI/bge-reranker-base              |
+| LLM       | meta-llama/Meta-Llama-3-8B-Instruct |
 
 Change the `xxx_MODEL_ID` below for your needs.
 
@@ -170,7 +174,7 @@ export your_hf_api_token="Your_Huggingface_API_Token"
 **Append the value of the public IP address to the no_proxy list if you are in a proxy environment**
 
 ```
-export your_no_proxy=${your_no_proxy},"External_Public_IP",chatqna-xeon-ui-server,chatqna-xeon-backend-server,dataprep-qdrant-service,tei-embedding-service,retriever,tei-reranking-service,tgi-service
+export your_no_proxy=${your_no_proxy},"External_Public_IP",chatqna-xeon-ui-server,chatqna-xeon-backend-server,dataprep-qdrant-service,tei-embedding-service,retriever,tei-reranking-service,tgi-service,vllm-service
 ```
 
 ```bash
@@ -179,7 +183,7 @@ export http_proxy=${your_http_proxy}
 export https_proxy=${your_http_proxy}
 export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
 export RERANK_MODEL_ID="BAAI/bge-reranker-base"
-export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
+export LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
 export INDEX_NAME="rag-qdrant"
 ```
 
@@ -233,28 +237,28 @@ For details on how to verify the correctness of the response, refer to [how-to-v
        -H 'Content-Type: application/json'
    ```
 
-4. TGI Service
+4. LLM Backend Service
 
-   In first startup, this service will take more time to download the model files. After it's finished, the service will be ready.
+   In the first startup, this service will take more time to download, load and warm up the model. After it's finished, the service will be ready.
 
-   Try the command below to check whether the TGI service is ready.
+   Try the command below to check whether the LLM service is ready.
 
    ```bash
-   docker logs ${CONTAINER_ID} | grep Connected
+   docker logs vllm-service 2>&1 | grep complete
    ```
 
    If the service is ready, you will get the response like below.
 
-   ```
-   2024-09-03T02:47:53.402023Z  INFO text_generation_router::server: router/src/server.rs:2311: Connected
+   ```text
+   INFO: Application startup complete.
    ```
 
-   Then try the `cURL` command below to validate TGI.
+   Then try the `cURL` command below to validate vLLM service.
 
    ```bash
-   curl http://${host_ip}:6042/generate \
+   curl http://${host_ip}:6042/v1/chat/completions \
      -X POST \
-     -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}' \
+     -d '{"model": "meta-llama/Meta-Llama-3-8B-Instruct", "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens":17}' \
      -H 'Content-Type: application/json'
    ```
 
@@ -273,7 +277,7 @@ For details on how to verify the correctness of the response, refer to [how-to-v
    Update Knowledge Base via Local File Upload:
 
    ```bash
-   curl -X POST "http://${host_ip}:6043/v1/dataprep" \
+   curl -X POST "http://${host_ip}:6043/v1/dataprep/ingest" \
         -H "Content-Type: multipart/form-data" \
         -F "files=@./your_file.pdf"
    ```
@@ -283,7 +287,7 @@ For details on how to verify the correctness of the response, refer to [how-to-v
    Add Knowledge Base via HTTP Links:
 
    ```bash
-   curl -X POST "http://${host_ip}:6043/v1/dataprep" \
+   curl -X POST "http://${host_ip}:6043/v1/dataprep/ingest" \
         -H "Content-Type: multipart/form-data" \
         -F 'link_list=["https://opea.dev"]'
    ```

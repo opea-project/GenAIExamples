@@ -1,0 +1,9 @@
+distro>=1.9.0
+gradio>=4.44.1
+loguru>=0.7.2
+omegaconf>=2.3.0
+openvino>=2024.4.0
+psutil>=6.1.0
+py-cpuinfo>=9.0.0
+unstructured==0.16.11
+uvicorn>=0.30.6

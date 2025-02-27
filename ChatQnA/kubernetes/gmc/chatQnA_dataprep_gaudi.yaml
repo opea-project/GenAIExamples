@@ -1,0 +1,76 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: gmc.opea.io/v1alpha3
+kind: GMConnector
+metadata:
+  labels:
+    app.kubernetes.io/name: gmconnector
+    app.kubernetes.io/managed-by: kustomize
+    gmc/platform: gaudi
+  name: chatqa
+  namespace: chatqa
+spec:
+  routerConfig:
+    name: router
+    serviceName: router-service
+  nodes:
+    root:
+      routerType: Sequence
+      steps:
+      - name: Embedding
+        internalService:
+          serviceName: embedding-svc
+          config:
+            endpoint: /v1/embeddings
+            TEI_EMBEDDING_ENDPOINT: tei-embedding-gaudi-svc
+      - name: TeiEmbeddingGaudi
+        internalService:
+          serviceName: tei-embedding-gaudi-svc
+          isDownstreamService: true
+      - name: Retriever
+        data: $response
+        internalService:
+          serviceName: retriever-svc
+          config:
+            endpoint: /v1/retrieval
+            REDIS_URL: redis-vector-db
+            TEI_EMBEDDING_ENDPOINT: tei-embedding-gaudi-svc
+      - name: VectorDB
+        internalService:
+          serviceName: redis-vector-db
+          isDownstreamService: true
+      - name: Reranking
+        data: $response
+        internalService:
+          serviceName: reranking-svc
+          config:
+            endpoint: /v1/reranking
+            TEI_RERANKING_ENDPOINT: tei-reranking-svc
+      - name: TeiReranking
+        internalService:
+          serviceName: tei-reranking-svc
+          config:
+            endpoint: /rerank
+          isDownstreamService: true
+      - name: Llm
+        data: $response
+        internalService:
+          serviceName: llm-svc
+          config:
+            endpoint: /v1/chat/completions
+            TGI_LLM_ENDPOINT: tgi-gaudi-svc
+      - name: TgiGaudi
+        internalService:
+          serviceName: tgi-gaudi-svc
+          config:
+            endpoint: /generate
+          isDownstreamService: true
+      - name: DataPrep
+        internalService:
+          serviceName: data-prep-svc
+          config:
+            endpoint: /v1/dataprep/ingest
+            REDIS_URL: redis-vector-db
+            TEI_ENDPOINT: tei-embedding-gaudi-svc
+          isDownstreamService: true

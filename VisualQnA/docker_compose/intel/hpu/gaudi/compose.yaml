@@ -3,7 +3,7 @@
 
 services:
   llava-tgi-service:
-    image: ghcr.io/huggingface/tgi-gaudi:2.0.5
+    image: ghcr.io/huggingface/tgi-gaudi:2.3.1
     container_name: tgi-llava-gaudi-server
     ports:
       - "8399:80"
@@ -22,14 +22,19 @@ services:
       LIMIT_HPU_GRAPH: true
       USE_FLASH_ATTENTION: true
       FLASH_ATTENTION_RECOMPUTE: true
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://$host_ip:8399/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 60
     runtime: habana
     cap_add:
       - SYS_NICE
     ipc: host
     command: --model-id ${LVM_MODEL_ID} --max-input-length 4096 --max-total-tokens 8192
-  lvm-tgi:
-    image: ${REGISTRY:-opea}/lvm-tgi:${TAG:-latest}
-    container_name: lvm-tgi-gaudi-server
+  lvm:
+    image: ${REGISTRY:-opea}/lvm:${TAG:-latest}
+    container_name: lvm-gaudi-server
     depends_on:
       - llava-tgi-service
     ports:
@@ -40,6 +45,7 @@ services:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       LVM_ENDPOINT: ${LVM_ENDPOINT}
+      LVM_COMPONENT_NAME: "OPEA_TGI_LLAVA_LVM"
       HF_HUB_DISABLE_PROGRESS_BARS: 1
       HF_HUB_ENABLE_HF_TRANSFER: 0
     restart: unless-stopped
@@ -48,7 +54,7 @@ services:
     container_name: visualqna-gaudi-backend-server
     depends_on:
       - llava-tgi-service
-      - lvm-tgi
+      - lvm
     ports:
       - "8888:8888"
     environment:

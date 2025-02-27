@@ -1,0 +1,35 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+name: Check Online Document Building
+permissions: {}
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "**.md"
+      - "**.rst"
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        path: GenAIExamples
+
+    - name: Checkout docs
+      uses: actions/checkout@v4
+      with:
+        repository: opea-project/docs
+        path: docs
+
+    - name: Build Online Document
+      shell: bash
+      run: |
+        echo "build online doc"
+        cd docs
+        bash scripts/build.sh

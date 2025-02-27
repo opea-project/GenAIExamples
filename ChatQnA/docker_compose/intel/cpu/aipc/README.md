@@ -2,6 +2,84 @@
 
 This document outlines the deployment process for a ChatQnA application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on AIPC. The steps include Docker image creation, container deployment via Docker Compose, and service execution to integrate microservices such as `embedding`, `retriever`, `rerank`, and `llm`.
 
+## Quick Start:
+
+1. Set up the environment variables.
+2. Run Docker Compose.
+3. Consume the ChatQnA Service.
+
+### Quick Start: 1. Set up Environment Variable
+
+To set up environment variables for deploying ChatQnA services, follow these steps:
+
+```bash
+mkdir ~/OPEA -p
+cd ~/OPEA
+git clone https://github.com/opea-project/GenAIExamples.git
+cd GenAIExamples/ChatQnA/docker_compose/intel/cpu/aipc
+```
+
+1. Set the required environment variables:
+
+   ```bash
+   export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
+   ```
+
+2. If you are in a proxy environment, also set the proxy-related environment variables:
+
+   ```bash
+   export https_proxy="Your_HTTPs_Proxy"
+   # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
+   export no_proxy=$no_proxy,chatqna-aipc-backend-server,tei-embedding-service,retriever,tei-reranking-service,redis-vector-db,dataprep-redis-service,ollama-service
+   ```
+
+3. Set up other environment variables
+
+   By default, llama3.2 is used for LLM serving, the default model can be changed to other LLM models. Please pick a [validated llm models](https://github.com/opea-project/GenAIComps/tree/main/comps/llms/src/text-generation#validated-llm-models) from the table.  
+   To change the default model defined in set_env.sh, overwrite it by exporting OLLAMA_MODEL to the new model or by modifying set_env.sh.  
+   For example, change to using the following model.
+
+   ```bash
+   export OLLAMA_MODEL="deepseek-r1:8b"
+   ```
+
+   to use the [DeepSeek-R1-Distill-Llama-8B model](https://ollama.com/library/deepseek-r1:8b)
+
+   ```bash
+   source ./set_env.sh
+   ```
+
+### Quick Start: 2. Run Docker Compose
+
+```bash
+    docker compose up -d
+```
+
+It will take several minutes to automatically download the docker images
+
+NB: You should build docker image from source by yourself if:
+
+- You are developing off the git main branch (as the container's ports in the repo may be different from the published docker image).
+- You can't download the docker image.
+- You want to use a specific version of Docker image.
+
+Please refer to ['Build Docker Images'](#🚀-build-docker-images) in below.
+
+### Quick Start:3. Consume the ChatQnA Service
+
+Once the services are up, open the following URL from your browser: http://{host_ip}:80.
+Enter Prompt like What is deep learning?
+
+Or if you prefer to try only on the localhost machine, then try
+
+```bash
+curl http://${host_ip}:8888/v1/chatqna \
+    -H "Content-Type: application/json" \
+    -d '{
+        "messages": "What is deep learning?"
+    }'
+```
+
 ## 🚀 Build Docker Images
 
 First of all, you need to build Docker Images locally and install the python package of it.
@@ -21,13 +99,13 @@ export https_proxy="Your_HTTPs_Proxy"
 ### 1. Build Retriever Image
 
 ```bash
-docker build --no-cache -t opea/retriever-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/redis/langchain/Dockerfile .
+docker build --no-cache -t opea/retriever:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/src/Dockerfile .
 ```
 
 ### 2. Build Dataprep Image
 
 ```bash
-docker build --no-cache -t opea/dataprep-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/redis/langchain/Dockerfile .
+docker build --no-cache -t opea/dataprep:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/src/Dockerfile .
 cd ..
 ```
 
@@ -55,13 +133,13 @@ docker build --no-cache -t opea/chatqna-ui:latest --build-arg https_proxy=$https
 
 ```bash
 cd GenAIComps
-docker build -t opea/nginx:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/nginx/Dockerfile .
+docker build -t opea/nginx:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/third_parties/nginx/src/Dockerfile .
 ```
 
-Then run the command `docker images`, you will have the following 6 Docker Images:
+Then run the command `docker images`, you will have the following Docker Images:
 
-1. `opea/dataprep-redis:latest`
-2. `opea/retriever-redis:latest`
+1. `opea/dataprep:latest`
+2. `opea/retriever:latest`
 3. `opea/chatqna:latest`
 4. `opea/chatqna-ui:latest`
 5. `opea/nginx:latest`
@@ -82,18 +160,18 @@ export host_ip="External_Public_IP"
 
 For Linux users, please run `hostname -I | awk '{print $1}'`. For Windows users, please run `ipconfig | findstr /i "IPv4"` to get the external public ip.
 
-**Export the value of your Huggingface API token to the `your_hf_api_token` environment variable**
+**Export the value of your Huggingface API token to the `HUGGINGFACEHUB_API_TOKEN` environment variable**
 
 > Change the Your_Huggingface_API_Token below with tyour actual Huggingface API Token value
 
 ```
-export your_hf_api_token="Your_Huggingface_API_Token"
+export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
 ```
 
 **Append the value of the public IP address to the no_proxy list if you are in a proxy environment**
 
 ```
-export your_no_proxy=${your_no_proxy},"External_Public_IP",chatqna-aipc-backend-server,tei-embedding-service,retriever,tei-reranking-service,redis-vector-db,dataprep-redis-service
+export your_no_proxy=${your_no_proxy},"External_Public_IP",chatqna-aipc-backend-server,tei-embedding-service,retriever,tei-reranking-service,redis-vector-db,dataprep-redis-service,ollama-service
 ```
 
 - Linux PC
@@ -105,7 +183,7 @@ export https_proxy=${your_http_proxy}
 export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
 export RERANK_MODEL_ID="BAAI/bge-reranker-base"
 export INDEX_NAME="rag-redis"
-export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
+export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
 export OLLAMA_HOST=${host_ip}
 export OLLAMA_MODEL="llama3.2"
 ```
@@ -116,7 +194,7 @@ export OLLAMA_MODEL="llama3.2"
 set EMBEDDING_MODEL_ID=BAAI/bge-base-en-v1.5
 set RERANK_MODEL_ID=BAAI/bge-reranker-base
 set INDEX_NAME=rag-redis
-set HUGGINGFACEHUB_API_TOKEN=%your_hf_api_token%
+set HUGGINGFACEHUB_API_TOKEN=%HUGGINGFACEHUB_API_TOKEN%
 set OLLAMA_HOST=host.docker.internal
 set OLLAMA_MODEL="llama3.2"
 ```
@@ -188,10 +266,10 @@ For details on how to verify the correctness of the response, refer to [how-to-v
 
 ```bash
 # download pdf file
-wget https://raw.githubusercontent.com/opea-project/GenAIComps/main/comps/retrievers/redis/data/nke-10k-2023.pdf
+wget https://raw.githubusercontent.com/opea-project/GenAIComps/v1.1/comps/retrievers/redis/data/nke-10k-2023.pdf
 
 # upload pdf file with dataprep
-curl -X POST "http://${host_ip}:6007/v1/dataprep" \
+curl -X POST "http://${host_ip}:6007/v1/dataprep/ingest" \
      -H "Content-Type: multipart/form-data" \
      -F "files=@./nke-10k-2023.pdf"
 ```
@@ -201,7 +279,7 @@ This command updates a knowledge base by uploading a local file for processing. 
 Alternatively, you can add knowledge base via HTTP Links:
 
 ```bash
-curl -X POST "http://${host_ip}:6007/v1/dataprep" \
+curl -X POST "http://${host_ip}:6007/v1/dataprep/ingest" \
      -H "Content-Type: multipart/form-data" \
      -F 'link_list=["https://opea.dev"]'
 ```
@@ -211,7 +289,7 @@ This command updates a knowledge base by submitting a list of HTTP links for pro
 To check the uploaded files, you are able to get the file list that uploaded:
 
 ```bash
-curl -X POST "http://${host_ip}:6007/v1/dataprep/get_file" \
+curl -X POST "http://${host_ip}:6007/v1/dataprep/get" \
      -H "Content-Type: application/json"
 ```
 

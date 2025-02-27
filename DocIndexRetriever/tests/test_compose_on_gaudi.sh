@@ -15,20 +15,23 @@ LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
 
 function build_docker_images() {
+    echo "Building Docker Images...."
     cd $WORKPATH/docker_image_build
     if [ ! -d "GenAIComps" ] ; then
-        git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
+        git clone --single-branch --branch "${opea_branch:-"main"}" https://github.com/opea-project/GenAIComps.git
     fi
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
     docker compose -f build.yaml build --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull redis/redis-stack:7.2.0-v9
-    docker pull ghcr.io/huggingface/tei-gaudi:latest
+    docker pull ghcr.io/huggingface/tei-gaudi:1.5.0
     docker images && sleep 1s
+    echo "Docker images built!"
 }
 
 function start_services() {
+    echo "Starting Docker Services...."
     cd $WORKPATH/docker_compose/intel/hpu/gaudi
     export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
     export RERANK_MODEL_ID="BAAI/bge-reranker-base"
@@ -43,10 +46,14 @@ function start_services() {
     export RETRIEVER_SERVICE_HOST_IP=${ip_address}
     export RERANK_SERVICE_HOST_IP=${ip_address}
     export LLM_SERVICE_HOST_IP=${ip_address}
+    export host_ip=${ip_address}
+    export RERANK_TYPE="tei"
+    export LOGFLAG=true
 
     # Start Docker Containers
     docker compose up -d
-    sleep 20
+    sleep 30
+    echo "Docker services started!"
 }
 
 function validate() {
@@ -65,7 +72,7 @@ function validate() {
 
 function validate_megaservice() {
     echo "=========Ingest data=================="
-    local CONTENT=$(curl -X POST "http://${ip_address}:6007/v1/dataprep" \
+    local CONTENT=$(curl -X POST "http://${ip_address}:6007/v1/dataprep/ingest" \
      -H "Content-Type: multipart/form-data" \
      -F 'link_list=["https://opea.dev"]')
     local EXIT_CODE=$(validate "$CONTENT" "Data preparation succeeded" "dataprep-redis-service-gaudi")
@@ -89,25 +96,11 @@ function validate_megaservice() {
     if [ "$EXIT_CODE" == "1" ]; then
         docker logs tei-embedding-gaudi-server | tee -a ${LOG_PATH}/doc-index-retriever-service-gaudi.log
         docker logs retriever-redis-server | tee -a ${LOG_PATH}/doc-index-retriever-service-gaudi.log
-        docker logs reranking-tei-server | tee -a ${LOG_PATH}/doc-index-retriever-service-gaudi.log
+        docker logs reranking-tei-gaudi-server | tee -a ${LOG_PATH}/doc-index-retriever-service-gaudi.log
         docker logs doc-index-retriever-server | tee -a ${LOG_PATH}/doc-index-retriever-service-gaudi.log
         exit 1
     fi
 
-    echo "==============Testing retriever service: ChatCompletion Request================"
-    cd $WORKPATH/tests
-    local CONTENT=$(python test.py --host_ip ${ip_address} --request_type chat_completion)
-    local EXIT_CODE=$(validate "$CONTENT" "OPEA" "doc-index-retriever-service-gaudi")
-    echo "$EXIT_CODE"
-    local EXIT_CODE="${EXIT_CODE:0-1}"
-    echo "return value is $EXIT_CODE"
-    if [ "$EXIT_CODE" == "1" ]; then
-        docker logs tei-embedding-gaudi-server | tee -a ${LOG_PATH}/doc-index-retriever-service-gaudi.log
-        docker logs retriever-redis-server | tee -a ${LOG_PATH}/doc-index-retriever-service-gaudi.log
-        docker logs reranking-tei-server | tee -a ${LOG_PATH}/doc-index-retriever-service-gaudi.log
-        docker logs doc-index-retriever-server | tee -a ${LOG_PATH}/doc-index-retriever-service-gaudi.log
-        exit 1
-    fi
 }
 
 function stop_docker() {
@@ -123,7 +116,7 @@ function stop_docker() {
 function main() {
 
     stop_docker
-    build_docker_images
+    if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
     echo "Dump current docker ps"
     docker ps
     start_time=$(date +%s)

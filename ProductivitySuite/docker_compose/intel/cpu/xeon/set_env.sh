@@ -1,5 +1,8 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
+pushd "../../../../../" > /dev/null
+source .set_env.sh
+popd > /dev/null
 
 export MONGO_HOST=${host_ip}
 export MONGO_PORT=27017
@@ -29,12 +32,12 @@ export TGI_LLM_ENDPOINT_CODEGEN="http://${host_ip}:8028"
 export TGI_LLM_ENDPOINT_FAQGEN="http://${host_ip}:9009"
 export TGI_LLM_ENDPOINT_DOCSUM="http://${host_ip}:9009"
 export BACKEND_SERVICE_ENDPOINT_CHATQNA="http://${host_ip}:8888/v1/chatqna"
-export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:6009/v1/dataprep/delete_file"
+export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:5000/v1/dataprep/delete"
 export BACKEND_SERVICE_ENDPOINT_FAQGEN="http://${host_ip}:8889/v1/faqgen"
 export BACKEND_SERVICE_ENDPOINT_CODEGEN="http://${host_ip}:7778/v1/codegen"
 export BACKEND_SERVICE_ENDPOINT_DOCSUM="http://${host_ip}:8890/v1/docsum"
-export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/dataprep"
-export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/get_file"
+export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:5000/v1/dataprep/ingest"
+export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:5000/v1/dataprep/get"
 export CHAT_HISTORY_CREATE_ENDPOINT="http://${host_ip}:6012/v1/chathistory/create"
 export CHAT_HISTORY_CREATE_ENDPOINT="http://${host_ip}:6012/v1/chathistory/create"
 export CHAT_HISTORY_DELETE_ENDPOINT="http://${host_ip}:6012/v1/chathistory/delete"

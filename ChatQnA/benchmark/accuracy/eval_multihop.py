@@ -41,11 +41,11 @@ class MultiHop_Evaluator(Evaluator):
             return []
 
     def get_retrieved_documents(self, query, arguments):
-        data = {"text": query}
+        data = {"inputs": query}
         headers = {"Content-Type": "application/json"}
-        response = requests.post(arguments.embedding_endpoint, data=json.dumps(data), headers=headers)
+        response = requests.post(arguments.tei_embedding_endpoint + "/embed", data=json.dumps(data), headers=headers)
         if response.ok:
-            embedding = response.json()["embedding"]
+            embedding = response.json()[0]
         else:
             print(f"Request for embedding failed due to {response.text}.")
             return []
@@ -211,7 +211,7 @@ def args_parser():
     parser.add_argument("--ragas_metrics", action="store_true", help="Whether to compute ragas metrics.")
     parser.add_argument("--limits", type=int, default=100, help="Number of examples to be evaluated by llm-as-judge")
     parser.add_argument(
-        "--database_endpoint", type=str, default="http://localhost:6007/v1/dataprep", help="Service URL address."
+        "--database_endpoint", type=str, default="http://localhost:6007/v1/dataprep/ingest", help="Service URL address."
     )
     parser.add_argument(
         "--embedding_endpoint", type=str, default="http://localhost:6000/v1/embeddings", help="Service URL address."

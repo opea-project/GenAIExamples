@@ -43,21 +43,21 @@ Here is the output:
 CONTAINER ID   IMAGE                                                   COMMAND                  CREATED         STATUS                          PORTS                                                                                  NAMES
 28d9a5570246   opea/chatqna-ui:latest                                  "docker-entrypoint.s…"   2 minutes ago   Up 2 minutes                    0.0.0.0:5173->5173/tcp, :::5173->5173/tcp                                              chatqna-gaudi-ui-server
 bee1132464cd   opea/chatqna:latest                                     "python chatqna.py"      2 minutes ago   Up 2 minutes                    0.0.0.0:8888->8888/tcp, :::8888->8888/tcp                                              chatqna-gaudi-backend-server
-f810f3b4d329   opea/embedding-tei:latest                               "python embedding_te…"   2 minutes ago   Up 2 minutes                    0.0.0.0:6000->6000/tcp, :::6000->6000/tcp                                              embedding-tei-server
-325236a01f9b   opea/llm-tgi:latest                                     "python llm.py"          2 minutes ago   Up 2 minutes                    0.0.0.0:9000->9000/tcp, :::9000->9000/tcp                                              llm-tgi-gaudi-server
-2fa17d84605f   opea/dataprep-redis:latest                              "python prepare_doc_…"   2 minutes ago   Up 2 minutes                    0.0.0.0:6007->6007/tcp, :::6007->6007/tcp                                              dataprep-redis-server
-69e1fb59e92c   opea/retriever-redis:latest                             "/home/user/comps/re…"   2 minutes ago   Up 2 minutes                    0.0.0.0:7000->7000/tcp, :::7000->7000/tcp                                              retriever-redis-server
+f810f3b4d329   opea/embedding:latest                               "python embedding_te…"   2 minutes ago   Up 2 minutes                    0.0.0.0:6000->6000/tcp, :::6000->6000/tcp                                              embedding-server
+325236a01f9b   opea/llm-textgen:latest                                     "python llm.py"          2 minutes ago   Up 2 minutes                    0.0.0.0:9000->9000/tcp, :::9000->9000/tcp                                              llm-textgen-gaudi-server
+2fa17d84605f   opea/dataprep:latest                              "python prepare_doc_…"   2 minutes ago   Up 2 minutes                    0.0.0.0:6007->6007/tcp, :::6007->5000/tcp                                              dataprep-redis-server
+69e1fb59e92c   opea/retriever:latest                             "/home/user/comps/re…"   2 minutes ago   Up 2 minutes                    0.0.0.0:7000->7000/tcp, :::7000->7000/tcp                                              retriever-redis-server
 313b9d14928a   opea/reranking-tei:latest                               "python reranking_te…"   2 minutes ago   Up 2 minutes                    0.0.0.0:8000->8000/tcp, :::8000->8000/tcp                                              reranking-tei-gaudi-server
-05c40b636239   ghcr.io/huggingface/tgi-gaudi:2.0.5                     "text-generation-lau…"   2 minutes ago   Exited (1) About a minute ago                                                                                          tgi-gaudi-server
-174bd43fa6b5   ghcr.io/huggingface/tei-gaudi:latest                    "text-embeddings-rou…"   2 minutes ago   Up 2 minutes                    0.0.0.0:8090->80/tcp, :::8090->80/tcp                                                  tei-embedding-gaudi-server
+174bd43fa6b5   ghcr.io/huggingface/tei-gaudi:1.5.0                    "text-embeddings-rou…"   2 minutes ago   Up 2 minutes                    0.0.0.0:8090->80/tcp, :::8090->80/tcp                                                  tei-embedding-gaudi-server
+05c40b636239   ghcr.io/huggingface/tgi-gaudi:2.0.6                     "text-generation-lau…"   2 minutes ago   Exited (1) About a minute ago                                                                                          tgi-gaudi-server
 74084469aa33   redis/redis-stack:7.2.0-v9                              "/entrypoint.sh"         2 minutes ago   Up 2 minutes                    0.0.0.0:6379->6379/tcp, :::6379->6379/tcp, 0.0.0.0:8001->8001/tcp, :::8001->8001/tcp   redis-vector-db
 88399dbc9e43   ghcr.io/huggingface/text-embeddings-inference:cpu-1.5   "text-embeddings-rou…"   2 minutes ago   Up 2 minutes                    0.0.0.0:8808->80/tcp, :::8808->80/tcp                                                  tei-reranking-gaudi-server
 ```
 
-In this case, `ghcr.io/huggingface/tgi-gaudi:2.0.5` Existed.
+In this case, `ghcr.io/huggingface/tgi-gaudi:2.0.6` Existed.
 
 ```
-05c40b636239   ghcr.io/huggingface/tgi-gaudi:2.0.5                     "text-generation-lau…"   2 minutes ago   Exited (1) About a minute ago                                                                                          tgi-gaudi-server
+05c40b636239   ghcr.io/huggingface/tgi-gaudi:2.0.6                     "text-generation-lau…"   2 minutes ago   Exited (1) About a minute ago                                                                                          tgi-gaudi-server
 ```
 
 Next we can check the container logs to get to know what happened during the docker start.
@@ -68,7 +68,7 @@ Check the log of container by:
 
 `docker logs <CONTAINER ID> -t`
 
-View the logs of `ghcr.io/huggingface/tgi-gaudi:2.0.5`
+View the logs of `ghcr.io/huggingface/tgi-gaudi:2.0.6`
 
 `docker logs 05c40b636239 -t`
 
@@ -97,7 +97,7 @@ So just make sure the devices are available.
 Here is another failure example:
 
 ```
-f7a08f9867f9   ghcr.io/huggingface/tgi-gaudi:2.0.5                     "text-generation-lau…"   16 seconds ago   Exited (2) 14 seconds ago                                                                                          tgi-gaudi-server
+f7a08f9867f9   ghcr.io/huggingface/tgi-gaudi:2.0.6                     "text-generation-lau…"   16 seconds ago   Exited (2) 14 seconds ago                                                                                          tgi-gaudi-server
 ```
 
 Check the log by `docker logs f7a08f9867f9 -t`.
@@ -114,7 +114,7 @@ View the docker input parameters in `./ChatQnA/docker_compose/intel/hpu/gaudi/co
 
 ```
   tgi-service:
-    image: ghcr.io/huggingface/tgi-gaudi:2.0.5
+    image: ghcr.io/huggingface/tgi-gaudi:2.0.6
     container_name: tgi-gaudi-server
     ports:
       - "8008:80"
@@ -231,7 +231,7 @@ and the log shows model warm up, please wait for a while and try it later.
 ```
 2024-06-05T05:45:27.707509646Z 2024-06-05T05:45:27.707361Z  WARN text_generation_router: router/src/main.rs:357: `--revision` is not set
 2024-06-05T05:45:27.707539740Z 2024-06-05T05:45:27.707379Z  WARN text_generation_router: router/src/main.rs:358: We strongly advise to set it to a known supported commit.
-2024-06-05T05:45:27.852525522Z 2024-06-05T05:45:27.852437Z  INFO text_generation_router: router/src/main.rs:379: Serving revision bdd31cf498d13782cc7497cba5896996ce429f91 of model Intel/neural-chat-7b-v3-3
+2024-06-05T05:45:27.852525522Z 2024-06-05T05:45:27.852437Z  INFO text_generation_router: router/src/main.rs:379: Serving revision bdd31cf498d13782cc7497cba5896996ce429f91 of model meta-llama/Meta-Llama-3-8B-Instruct
 2024-06-05T05:45:27.867833811Z 2024-06-05T05:45:27.867759Z  INFO text_generation_router: router/src/main.rs:221: Warming up model
 ```
 
@@ -239,7 +239,7 @@ and the log shows model warm up, please wait for a while and try it later.
 
 ```
 curl http://${host_ip}:8888/v1/chatqna -H "Content-Type: application/json" -d '{
-     "model": "Intel/neural-chat-7b-v3-3",
+     "model": "meta-llama/Meta-Llama-3-8B-Instruct",
      "messages": "What is the revenue of Nike in 2023?"
      }'
 ```

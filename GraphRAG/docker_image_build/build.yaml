@@ -1,0 +1,58 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  graphrag:
+    build:
+      args:
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
+        no_proxy: ${no_proxy}
+      context: ../
+      dockerfile: ./Dockerfile
+    image: ${REGISTRY:-opea}/graphrag:${TAG:-latest}
+  retriever:
+    build:
+      args:
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
+        no_proxy: ${no_proxy}
+      context: GenAIComps
+      dockerfile: comps/retrievers/src/Dockerfile
+    image: ${REGISTRY:-opea}/retriever:${TAG:-latest}
+  dataprep:
+    build:
+      args:
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
+        no_proxy: ${no_proxy}
+      context: GenAIComps
+      dockerfile: comps/dataprep/src/Dockerfile
+    image: ${REGISTRY:-opea}/dataprep:${TAG:-latest}
+  nginx:
+    build:
+      args:
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
+        no_proxy: ${no_proxy}
+      context: GenAIComps
+      dockerfile: comps/third_parties/nginx/src/Dockerfile
+    image: ${REGISTRY:-opea}/nginx:${TAG:-latest}
+  graphrag-ui:
+    build:
+      args:
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
+        no_proxy: ${no_proxy}
+      context: ../ui
+      dockerfile: ./docker/Dockerfile
+    image: ${REGISTRY:-opea}/graphrag-ui:${TAG:-latest}
+  graphrag-react-ui:
+    build:
+      args:
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
+        no_proxy: ${no_proxy}
+      context: ../ui
+      dockerfile: ./docker/Dockerfile.react
+    image: ${REGISTRY:-opea}/graphrag-react-ui:${TAG:-latest}

@@ -14,14 +14,6 @@ services:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
     restart: unless-stopped
-  asr:
-    image: ${REGISTRY:-opea}/asr:${TAG:-latest}
-    container_name: asr-service
-    ports:
-      - "3001:9099"
-    ipc: host
-    environment:
-      ASR_ENDPOINT: ${ASR_ENDPOINT}
   speecht5-service:
     image: ${REGISTRY:-opea}/speecht5:${TAG:-latest}
     container_name: speecht5-service
@@ -33,16 +25,8 @@ services:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
     restart: unless-stopped
-  tts:
-    image: ${REGISTRY:-opea}/tts:${TAG:-latest}
-    container_name: tts-service
-    ports:
-      - "3002:9088"
-    ipc: host
-    environment:
-      TTS_ENDPOINT: ${TTS_ENDPOINT}
   tgi-service:
-    image: ghcr.io/huggingface/text-generation-inference:sha-e4201f4-intel-cpu
+    image: ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu
     container_name: tgi-service
     ports:
       - "3006:80"
@@ -54,22 +38,12 @@ services:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://${host_ip}:3006/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 100
     command: --model-id ${LLM_MODEL_ID} --cuda-graphs 0
-  llm:
-    image: ${REGISTRY:-opea}/llm-tgi:${TAG:-latest}
-    container_name: llm-tgi-server
-    depends_on:
-      - tgi-service
-    ports:
-      - "3007:9000"
-    ipc: host
-    environment:
-      no_proxy: ${no_proxy}
-      http_proxy: ${http_proxy}
-      https_proxy: ${https_proxy}
-      TGI_LLM_ENDPOINT: ${TGI_LLM_ENDPOINT}
-      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
-    restart: unless-stopped
   wav2lip-service:
     image: ${REGISTRY:-opea}/wav2lip:${TAG:-latest}
     container_name: wav2lip-service
@@ -110,9 +84,6 @@ services:
     image: ${REGISTRY:-opea}/avatarchatbot:${TAG:-latest}
     container_name: avatarchatbot-xeon-backend-server
     depends_on:
-      - asr
-      - llm
-      - tts
       - animation
     ports:
       - "3009:8888"
@@ -122,12 +93,12 @@ services:
       - http_proxy=${http_proxy}
       - MEGA_SERVICE_HOST_IP=${MEGA_SERVICE_HOST_IP}
       - MEGA_SERVICE_PORT=${MEGA_SERVICE_PORT}
-      - ASR_SERVICE_HOST_IP=${ASR_SERVICE_HOST_IP}
-      - ASR_SERVICE_PORT=${ASR_SERVICE_PORT}
-      - LLM_SERVICE_HOST_IP=${LLM_SERVICE_HOST_IP}
-      - LLM_SERVICE_PORT=${LLM_SERVICE_PORT}
-      - TTS_SERVICE_HOST_IP=${TTS_SERVICE_HOST_IP}
-      - TTS_SERVICE_PORT=${TTS_SERVICE_PORT}
+      - WHISPER_SERVER_HOST_IP=${WHISPER_SERVER_HOST_IP}
+      - WHISPER_SERVER_PORT=${WHISPER_SERVER_PORT}
+      - LLM_SERVER_HOST_IP=${LLM_SERVER_HOST_IP}
+      - LLM_SERVER_PORT=${LLM_SERVER_PORT}
+      - SPEECHT5_SERVER_HOST_IP=${SPEECHT5_SERVER_HOST_IP}
+      - SPEECHT5_SERVER_PORT=${SPEECHT5_SERVER_PORT}
       - ANIMATION_SERVICE_HOST_IP=${ANIMATION_SERVICE_HOST_IP}
       - ANIMATION_SERVICE_PORT=${ANIMATION_SERVICE_PORT}
     ipc: host

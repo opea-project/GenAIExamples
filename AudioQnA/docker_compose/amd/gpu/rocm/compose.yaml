@@ -1,0 +1,79 @@
+# Copyright (C) 2024 Advanced Micro Devices, Inc.
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  whisper-service:
+    image: ${REGISTRY:-opea}/whisper:${TAG:-latest}
+    container_name: whisper-service
+    ports:
+      - "7066:7066"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+    restart: unless-stopped
+  speecht5-service:
+    image: ${REGISTRY:-opea}/speecht5:${TAG:-latest}
+    container_name: speecht5-service
+    ports:
+      - "7055:7055"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+    restart: unless-stopped
+  tgi-service:
+    image: ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
+    container_name: tgi-service
+    ports:
+      - "3006:80"
+    volumes:
+     - "./data:/data"
+    shm_size: 1g
+    devices:
+      - /dev/kfd:/dev/kfd
+      - /dev/dri/card1:/dev/dri/card1
+      - /dev/dri/renderD136:/dev/dri/renderD136
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HF_HUB_DISABLE_PROGRESS_BARS: 1
+      HF_HUB_ENABLE_HF_TRANSFER: 0
+    command: --model-id ${LLM_MODEL_ID}
+    cap_add:
+      - SYS_PTRACE
+    group_add:
+      - video
+    security_opt:
+      - seccomp:unconfined
+    ipc: host
+  audioqna-backend-server:
+    image: ${REGISTRY:-opea}/audioqna:${TAG:-latest}
+    container_name: audioqna-rocm-backend-server
+    depends_on:
+      - whisper-service
+      - tgi-service
+      - speecht5-service
+    ports:
+      - "3008:8888"
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - MEGA_SERVICE_HOST_IP=${MEGA_SERVICE_HOST_IP}
+      - WHISPER_SERVER_HOST_IP=${WHISPER_SERVER_HOST_IP}
+      - WHISPER_SERVER_PORT=${WHISPER_SERVER_PORT}
+      - LLM_SERVER_HOST_IP=${LLM_SERVER_HOST_IP}
+      - LLM_SERVER_PORT=${LLM_SERVER_PORT}
+      - SPEECHT5_SERVER_HOST_IP=${SPEECHT5_SERVER_HOST_IP}
+      - SPEECHT5_SERVER_PORT=${SPEECHT5_SERVER_PORT}
+    ipc: host
+    restart: always
+
+networks:
+  default:
+    driver: bridge

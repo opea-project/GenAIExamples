@@ -16,13 +16,19 @@ import { env } from "$env/dynamic/public";
 import { SSE } from "sse.js";
 
 const CHAT_BASE_URL = env.CHAT_BASE_URL;
+const MODEL_ID = env.MODEL_ID;
 
 export async function fetchTextStream(query: string) {
 	let payload = {};
 	let url = "";
+	let modelId = "meta-llama/Meta-Llama-3-8B-Instruct";
+
+	if (MODEL_ID) {
+		modelId = MODEL_ID;
+	}
 
 	payload = {
-		model: "Intel/neural-chat-7b-v3-3",
+		model: `${modelId}`,
 		messages: query,
 	};
 	url = `${CHAT_BASE_URL}`;

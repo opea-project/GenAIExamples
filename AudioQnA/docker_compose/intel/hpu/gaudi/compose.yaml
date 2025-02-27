@@ -18,14 +18,6 @@ services:
     cap_add:
       - SYS_NICE
     restart: unless-stopped
-  asr:
-    image: ${REGISTRY:-opea}/asr:${TAG:-latest}
-    container_name: asr-service
-    ports:
-      - "3001:9099"
-    ipc: host
-    environment:
-      ASR_ENDPOINT: ${ASR_ENDPOINT}
   speecht5-service:
     image: ${REGISTRY:-opea}/speecht5-gaudi:${TAG:-latest}
     container_name: speecht5-service
@@ -42,16 +34,8 @@ services:
     cap_add:
       - SYS_NICE
     restart: unless-stopped
-  tts:
-    image: ${REGISTRY:-opea}/tts:${TAG:-latest}
-    container_name: tts-service
-    ports:
-      - "3002:9088"
-    ipc: host
-    environment:
-      TTS_ENDPOINT: ${TTS_ENDPOINT}
   tgi-service:
-    image: ghcr.io/huggingface/tgi-gaudi:2.0.5
+    image: ghcr.io/huggingface/tgi-gaudi:2.3.1
     container_name: tgi-gaudi-server
     ports:
       - "3006:80"
@@ -70,33 +54,23 @@ services:
       LIMIT_HPU_GRAPH: true
       USE_FLASH_ATTENTION: true
       FLASH_ATTENTION_RECOMPUTE: true
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://$host_ip:3006/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 100
     runtime: habana
     cap_add:
       - SYS_NICE
     ipc: host
     command: --model-id ${LLM_MODEL_ID} --max-input-length 1024 --max-total-tokens 2048
-  llm:
-    image: ${REGISTRY:-opea}/llm-tgi:${TAG:-latest}
-    container_name: llm-tgi-gaudi-server
-    depends_on:
-      - tgi-service
-    ports:
-      - "3007:9000"
-    ipc: host
-    environment:
-      no_proxy: ${no_proxy}
-      http_proxy: ${http_proxy}
-      https_proxy: ${https_proxy}
-      TGI_LLM_ENDPOINT: ${TGI_LLM_ENDPOINT}
-      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
-    restart: unless-stopped
   audioqna-gaudi-backend-server:
     image: ${REGISTRY:-opea}/audioqna:${TAG:-latest}
     container_name: audioqna-gaudi-backend-server
     depends_on:
-      - asr
-      - llm
-      - tts
+      - whisper-service
+      - tgi-service
+      - speecht5-service
     ports:
       - "3008:8888"
     environment:
@@ -104,12 +78,26 @@ services:
       - https_proxy=${https_proxy}
       - http_proxy=${http_proxy}
       - MEGA_SERVICE_HOST_IP=${MEGA_SERVICE_HOST_IP}
-      - ASR_SERVICE_HOST_IP=${ASR_SERVICE_HOST_IP}
-      - ASR_SERVICE_PORT=${ASR_SERVICE_PORT}
-      - LLM_SERVICE_HOST_IP=${LLM_SERVICE_HOST_IP}
-      - LLM_SERVICE_PORT=${LLM_SERVICE_PORT}
-      - TTS_SERVICE_HOST_IP=${TTS_SERVICE_HOST_IP}
-      - TTS_SERVICE_PORT=${TTS_SERVICE_PORT}
+      - WHISPER_SERVER_HOST_IP=${WHISPER_SERVER_HOST_IP}
+      - WHISPER_SERVER_PORT=${WHISPER_SERVER_PORT}
+      - LLM_SERVER_HOST_IP=${LLM_SERVER_HOST_IP}
+      - LLM_SERVER_PORT=${LLM_SERVER_PORT}
+      - SPEECHT5_SERVER_HOST_IP=${SPEECHT5_SERVER_HOST_IP}
+      - SPEECHT5_SERVER_PORT=${SPEECHT5_SERVER_PORT}
+    ipc: host
+    restart: always
+  audioqna-gaudi-ui-server:
+    image: ${REGISTRY:-opea}/audioqna-ui:${TAG:-latest}
+    container_name: audioqna-gaudi-ui-server
+    depends_on:
+      - audioqna-gaudi-backend-server
+    ports:
+      - "5173:5173"
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - CHAT_URL=${BACKEND_SERVICE_ENDPOINT}
     ipc: host
     restart: always
 

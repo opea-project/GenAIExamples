@@ -3,7 +3,7 @@
 
 services:
   llava-tgi-service:
-    image: ghcr.io/huggingface/text-generation-inference:sha-e4201f4-intel-cpu
+    image: ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu
     container_name: tgi-llava-xeon-server
     ports:
       - "8399:80"
@@ -16,12 +16,19 @@ services:
       https_proxy: ${https_proxy}
       HF_HUB_DISABLE_PROGRESS_BARS: 1
       HF_HUB_ENABLE_HF_TRANSFER: 0
+      host_ip: ${host_ip}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://$host_ip:8399/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 60
     command: --model-id ${LVM_MODEL_ID} --max-input-length 4096 --max-total-tokens 8192 --cuda-graphs 0
-  lvm-tgi:
-    image: ${REGISTRY:-opea}/lvm-tgi:${TAG:-latest}
-    container_name: lvm-tgi-xeon-server
+  lvm:
+    image: ${REGISTRY:-opea}/lvm:${TAG:-latest}
+    container_name: lvm-xeon-server
     depends_on:
-      - llava-tgi-service
+      llava-tgi-service:
+        condition: service_healthy
     ports:
       - "9399:9399"
     ipc: host
@@ -30,6 +37,7 @@ services:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       LVM_ENDPOINT: ${LVM_ENDPOINT}
+      LVM_COMPONENT_NAME: "OPEA_TGI_LLAVA_LVM"
       HF_HUB_DISABLE_PROGRESS_BARS: 1
       HF_HUB_ENABLE_HF_TRANSFER: 0
     restart: unless-stopped
@@ -38,7 +46,7 @@ services:
     container_name: visualqna-xeon-backend-server
     depends_on:
       - llava-tgi-service
-      - lvm-tgi
+      - lvm
     ports:
       - "8888:8888"
     environment:
