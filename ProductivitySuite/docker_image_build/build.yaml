@@ -41,18 +41,18 @@ services:
       dockerfile: comps/dataprep/src/Dockerfile
     extends: chatqna
     image: ${REGISTRY:-opea}/dataprep:${TAG:-latest}
-  promptregistry-mongo-server:
+  promptregistry-mongo:
     build:
       context: GenAIComps
       dockerfile: comps/prompt_registry/src/Dockerfile
     extends: chatqna
-    image: ${REGISTRY:-opea}/promptregistry-mongo-server:${TAG:-latest}
-  chathistory-mongo-server:
+    image: ${REGISTRY:-opea}/promptregistry-mongo:${TAG:-latest}
+  chathistory-mongo:
     build:
       context: GenAIComps
       dockerfile: comps/chathistory/src/Dockerfile
     extends: chatqna
-    image: ${REGISTRY:-opea}/chathistory-mongo-server:${TAG:-latest}
+    image: ${REGISTRY:-opea}/chathistory-mongo:${TAG:-latest}
   productivity-suite-react-ui-server:
     build:
       context: ../ui
