@@ -63,7 +63,8 @@ services:
       - "minio"
 
   dataprep-milvus-service:
-    image: ${REGISTRY:-opea}/dataprep:${TAG:-latest}
+    image: opea/dataprep
+    #image: ${REGISTRY:-opea}/dataprep:${TAG:-latest}
     container_name: dataprep-milvus-server
     ports:
       - "${DATAPREP_PORT:-11101}:5000"
@@ -83,7 +84,8 @@ services:
     restart: unless-stopped
 
   retriever:
-    image: ${REGISTRY:-opea}/retriever:${TAG:-latest}
+    image:opea/retriever  
+    #image: ${REGISTRY:-opea}/retriever:${TAG:-latest}
     container_name: retriever-milvus-server
     depends_on:
       - milvus-standalone
