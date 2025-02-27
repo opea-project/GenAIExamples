@@ -49,12 +49,14 @@ def configure_replica(values, deploy_config):
     return values
 
 
-def get_output_filename(num_nodes, with_rerank, example_type, device, action_type):
+def get_output_filename(num_nodes, with_rerank, example_type, device, action_type, batch_size=None):
     """Generate output filename based on configuration."""
     rerank_suffix = "with-rerank-" if with_rerank else ""
     action_suffix = "deploy-" if action_type == 0 else "update-" if action_type == 1 else ""
+    # Only include batch_suffix if batch_size is not None
+    batch_suffix = f"batch{batch_size}-" if batch_size else ""
 
-    return f"{example_type}-{num_nodes}-{device}-{action_suffix}{rerank_suffix}values.yaml"
+    return f"{example_type}-{rerank_suffix}{device}-{action_suffix}node{num_nodes}-{batch_suffix}values.yaml"
 
 
 def configure_resources(values, deploy_config):
@@ -117,6 +119,7 @@ def configure_resources(values, deploy_config):
 
 def configure_extra_cmd_args(values, deploy_config):
     """Configure extra command line arguments for services."""
+    batch_size = None
     for service_name, config in deploy_config["services"].items():
         if service_name == "llm":
             extra_cmd_args = []
@@ -129,6 +132,13 @@ def configure_extra_cmd_args(values, deploy_config):
             # Get batch parameters and token parameters configuration
             batch_params = engine_params.get("batch_params", {})
             token_params = engine_params.get("token_params", {})
+
+            # Get batch size based on engine type
+            if engine == "tgi":
+                batch_size = batch_params.get("max_batch_size")
+            elif engine == "vllm":
+                batch_size = batch_params.get("max_num_seqs")
+            batch_size = batch_size if batch_size and batch_size != "" else None
 
             # Add all parameters that exist in batch_params
             for param, value in batch_params.items():
@@ -146,7 +156,7 @@ def configure_extra_cmd_args(values, deploy_config):
                 values[engine]["extraCmdArgs"] = extra_cmd_args
                 print(f"extraCmdArgs: {extra_cmd_args}")
 
-    return values
+    return values, batch_size
 
 
 def configure_models(values, deploy_config):
@@ -218,13 +228,13 @@ def generate_helm_values(example_type, deploy_config, chart_dir, action_type, no
     values = configure_rerank(values, with_rerank, deploy_config, example_type, node_selector or {})
     values = configure_replica(values, deploy_config)
     values = configure_resources(values, deploy_config)
-    values = configure_extra_cmd_args(values, deploy_config)
+    values, batch_size = configure_extra_cmd_args(values, deploy_config)
     values = configure_models(values, deploy_config)
 
     device = deploy_config.get("device", "unknown")
 
     # Generate and write YAML file
-    filename = get_output_filename(num_nodes, with_rerank, example_type, device, action_type)
+    filename = get_output_filename(num_nodes, with_rerank, example_type, device, action_type, batch_size)
     yaml_string = yaml.dump(values, default_flow_style=False)
 
     filepath = os.path.join(chart_dir, filename)
@@ -694,6 +704,7 @@ def main():
             update_service(
                 args.chart_name, args.chart_name, args.namespace, hw_values_file, args.user_values, values_file_path
             )
+            print(f"values_file_path: {values_file_path}")
             return
         except Exception as e:
             parser.error(f"Failed to update deployment: {str(e)}")
