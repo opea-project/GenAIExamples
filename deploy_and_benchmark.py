@@ -246,7 +246,7 @@ def main(yaml_file, target_node=None, test_mode="oob"):
                     # Create subdirectory for this iteration with test mode in the name
                     iteration_dir = os.path.join(
                         benchmark_dir,
-                        f"benchmark_{test_mode}_node{node}_batch{batch_param if batch_param is not None else 'default'}"
+                        f"benchmark_{test_mode}_node{node}_batch{batch_param if batch_param is not None else 'default'}",
                     )
                     os.makedirs(iteration_dir, exist_ok=True)
 

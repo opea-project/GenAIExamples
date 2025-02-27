@@ -378,7 +378,9 @@ def run_benchmark(benchmark_config, chart_name, namespace, node_num=1, llm_model
         "deployment_type": "k8s",  # Default is "k8s", can also be "docker"
         "service_ip": None,  # Leave as None for k8s, specify for Docker
         "service_port": None,  # Leave as None for k8s, specify for Docker
-        "test_output_dir": output_dir if output_dir else os.getcwd() + "/benchmark_output",  # Use output_dir if provided
+        "test_output_dir": (
+            output_dir if output_dir else os.getcwd() + "/benchmark_output"
+        ),  # Use output_dir if provided
         "node_num": node_num,
         "load_shape": {
             "name": parsed_data["load_shape_type"],
