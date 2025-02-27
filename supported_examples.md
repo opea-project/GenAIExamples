@@ -105,9 +105,9 @@ This document introduces the supported examples of GenAIExamples. The supported 
 
 [VisualQnA](./VisualQnA/README.md) is an example of chatbot for question and answering based on the images.
 
-| LVM                                                                                           | HW     | Description |
-| --------------------------------------------------------------------------------------------- | ------ | ----------- |
-| [llava-hf/llava-v1.6-mistral-7b-hf](https://huggingface.co/llava-hf/llava-v1.6-mistral-7b-hf) | Gaudi2 | Chatbot     |
+| LVM                                                                                           | HW          | Description |
+| --------------------------------------------------------------------------------------------- | ----------- | ----------- |
+| [llava-hf/llava-v1.6-mistral-7b-hf](https://huggingface.co/llava-hf/llava-v1.6-mistral-7b-hf) | Xeon/Gaudi2 | Chatbot     |
 
 ### VideoQnA
 
@@ -122,27 +122,27 @@ By default, the embedding and LVM models are set to a default value as listed be
 
 ### RerankFinetuning
 
-Rerank model finetuning example is for training rerank model on a dataset for improving its capability on specific field.
+[Rerank model finetuning](./RerankFinetuning/README.md) example is for training rerank model on a dataset for improving its capability on specific field.
 
 By default, the base model is set to a default value as listed below:
 
-| Service           | Base Model                                                                | HW   | Description                     |
-| ----------------- | ------------------------------------------------------------------------- | ---- | ------------------------------- |
-| Rerank Finetuning | [BAAI/bge-reranker-large](https://huggingface.co/BAAI/bge-reranker-large) | Xeon | Rerank model finetuning service |
+| Service           | Base Model                                                                | HW          | Description                     |
+| ----------------- | ------------------------------------------------------------------------- | ----------- | ------------------------------- |
+| Rerank Finetuning | [BAAI/bge-reranker-large](https://huggingface.co/BAAI/bge-reranker-large) | Xeon/Gaudi2 | Rerank model finetuning service |
 
 ### InstructionTuning
 
-The Instruction Tuning example is designed to further train large language models (LLMs) on a dataset consisting of (instruction, output) pairs using supervised learning. This process bridges the gap between the LLM's original objective of next-word prediction and the user’s objective of having the model follow human instructions accurately. By leveraging Instruction Tuning, this example enhances the LLM's ability to better understand and execute specific tasks, improving the model's alignment with user instructions and its overall performance.
+The [Instruction Tuning](./InstructionTuning/README.md) example is designed to further train large language models (LLMs) on a dataset consisting of (instruction, output) pairs using supervised learning. This process bridges the gap between the LLM's original objective of next-word prediction and the user’s objective of having the model follow human instructions accurately. By leveraging Instruction Tuning, this example enhances the LLM's ability to better understand and execute specific tasks, improving the model's alignment with user instructions and its overall performance.
 
 By default, the base model is set to a default value as listed below:
 
-| Service           | Base Model                                                                            | HW         | Description                          |
-| ----------------- | ------------------------------------------------------------------------------------- | ---------- | ------------------------------------ |
-| InstructionTuning | [meta-llama/Llama-2-7b-chat-hf](https://huggingface.co/meta-llama/Llama-2-7b-chat-hf) | Xeon/Gaudi | LLM model Instruction Tuning service |
+| Service           | Base Model                                                                            | HW          | Description                          |
+| ----------------- | ------------------------------------------------------------------------------------- | ----------- | ------------------------------------ |
+| InstructionTuning | [meta-llama/Llama-2-7b-chat-hf](https://huggingface.co/meta-llama/Llama-2-7b-chat-hf) | Xeon/Gaudi2 | LLM model Instruction Tuning service |
 
 ### DocIndexRetriever
 
-The DocRetriever example demonstrates how to match user queries with free-text records using various retrieval methods. It plays a key role in Retrieval-Augmented Generation (RAG) systems by dynamically fetching relevant information from external sources, ensuring responses are factual and up-to-date. Powered by vector databases, DocRetriever enables efficient, semantic retrieval by storing data as vectors and quickly identifying the most relevant documents based on similarity.
+The [DocRetriever](./DocIndexRetriever/README.md) example demonstrates how to match user queries with free-text records using various retrieval methods. It plays a key role in Retrieval-Augmented Generation (RAG) systems by dynamically fetching relevant information from external sources, ensuring responses are factual and up-to-date. Powered by vector databases, DocRetriever enables efficient, semantic retrieval by storing data as vectors and quickly identifying the most relevant documents based on similarity.
 
 | Framework                                                                      | Embedding                                           | Vector Database            | Serving                                                         | HW          | Description                |
 | ------------------------------------------------------------------------------ | --------------------------------------------------- | -------------------------- | --------------------------------------------------------------- | ----------- | -------------------------- |
@@ -150,7 +150,7 @@ The DocRetriever example demonstrates how to match user queries with free-text r
 
 ### AgentQnA
 
-The AgentQnA example demonstrates a hierarchical, multi-agent system designed for question-answering tasks. A supervisor agent interacts directly with the user, delegating tasks to a worker agent and utilizing various tools to gather information and generate answers. The worker agent primarily uses a retrieval tool to respond to the supervisor's queries. Additionally, the supervisor can access other tools, such as APIs to query knowledge graphs, SQL databases, or external knowledge bases, to enhance the accuracy and relevance of its responses.
+The [AgentQnA](./AgentQnA/README.md) example demonstrates a hierarchical, multi-agent system designed for question-answering tasks. A supervisor agent interacts directly with the user, delegating tasks to a worker agent and utilizing various tools to gather information and generate answers. The worker agent primarily uses a retrieval tool to respond to the supervisor's queries. Additionally, the supervisor can access other tools, such as APIs to query knowledge graphs, SQL databases, or external knowledge bases, to enhance the accuracy and relevance of its responses.
 
 Worker agent uses open-source websearch tool (duckduckgo), agents use OpenAI GPT-4o-mini as llm backend.
 
@@ -158,7 +158,7 @@ Worker agent uses open-source websearch tool (duckduckgo), agents use OpenAI GPT
 
 ### AudioQnA
 
-The AudioQnA example demonstrates the integration of Generative AI (GenAI) models for performing question-answering (QnA) on audio files, with the added functionality of Text-to-Speech (TTS) for generating spoken responses. The example showcases how to convert audio input to text using Automatic Speech Recognition (ASR), generate answers to user queries using a language model, and then convert those answers back to speech using Text-to-Speech (TTS).
+The [AudioQnA](./AudioQnA/README.md) example demonstrates the integration of Generative AI (GenAI) models for performing question-answering (QnA) on audio files, with the added functionality of Text-to-Speech (TTS) for generating spoken responses. The example showcases how to convert audio input to text using Automatic Speech Recognition (ASR), generate answers to user queries using a language model, and then convert those answers back to speech using Text-to-Speech (TTS).
 
 <table>
     <tr>
@@ -179,7 +179,7 @@ The AudioQnA example demonstrates the integration of Generative AI (GenAI) model
 
 ### FaqGen
 
-FAQ Generation Application leverages the power of large language models (LLMs) to revolutionize the way you interact with and comprehend complex textual data. By harnessing cutting-edge natural language processing techniques, our application can automatically generate comprehensive and natural-sounding frequently asked questions (FAQs) from your documents, legal texts, customer queries, and other sources. In this example use case, we utilize LangChain to implement FAQ Generation and facilitate LLM inference using Text Generation Inference on Intel Xeon and Gaudi2 processors.
+[FAQ Generation](./FaqGen/README.md) application leverages the power of large language models (LLMs) to revolutionize the way you interact with and comprehend complex textual data. By harnessing cutting-edge natural language processing techniques, our application can automatically generate comprehensive and natural-sounding frequently asked questions (FAQs) from your documents, legal texts, customer queries, and other sources. In this example use case, we utilize LangChain to implement FAQ Generation and facilitate LLM inference using Text Generation Inference on Intel Xeon and Gaudi2 processors.
 | Framework | LLM | Serving | HW | Description |
 | ------------------------------------------------------------------------------ | ----------------------------------------------------------------- | --------------------------------------------------------------- | ----------- | ----------- |
 | [LangChain](https://www.langchain.com)/[LlamaIndex](https://www.llamaindex.ai) | [Meta-Llama-3-8B-Instruct](https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct) | [TGI](https://github.com/huggingface/text-generation-inference) | Xeon/Gaudi2 | Chatbot |
@@ -199,3 +199,24 @@ FAQ Generation Application leverages the power of large language models (LLMs) t
 ### ProductivitySuite
 
 [Productivity Suite](./ProductivitySuite/README.md) streamlines your workflow to boost productivity. It leverages the power of OPEA microservices to deliver a comprehensive suite of features tailored to meet the diverse needs of modern enterprises.
+
+### DBQnA
+
+[DBQnA](./DBQnA/README.md) converts your natural language query into an SQL query, automatically executes the generated query on the database and delivers real-time query results.
+| Framework | LLM | Database | HW | Description |
+|----------------------------------------|-------------------------------------------------------------------------------------------------|-------------------------------------------|------|----------------------------|
+| [LangChain](https://www.langchain.com) | [mistralai/Mistral-7B-Instruct-v0.3](https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.3) | [PostgresDB](https://www.postgresql.org/) | Xeon | Natural language SQL agent |
+
+### Text2Image
+
+[Text2Image](./Text2Image/README.md) generates image based on your provided text.
+| Framework | LDM | HW | Description |
+|----------------------------------------|--------------------------------------------------------------------------------------------------------|-------------|-------------|
+| [LangChain](https://www.langchain.com) | [stabilityai/stable-diffusion](https://huggingface.co/stabilityai/stable-diffusion-3-medium-diffusers) | Xeon/Gaudi2 | Text2Image |
+
+### AvatarChatbot
+
+[AvatarChatbot](./AvatarChatbot/README.md) example is a chatbot with a visual character that provides users dynamic, engaging interactions, by leveraging multiple generative AI components including LLM, ASR (Audio-Speech-Recognition), and TTS (Text-To-Speech).
+| LLM | ASR | TTS | Animation | HW | Description |
+|-------------------------------------------------------------------------------|---------------------------------------------------------------------|---------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------|-------------|----------------------------|
+| [Intel/neural-chat-7b-v3-3](https://huggingface.co/Intel/neural-chat-7b-v3-3) | [openai/whisper-small](https://huggingface.co/openai/whisper-small) | [microsoft/SpeechT5](https://huggingface.co/microsoft/speecht5_tts) | [Rudrabha/Wav2Lip](https://github.com/Rudrabha/Wav2Lip) <br> [TencentARC/GFPGAN](https://github.com/TencentARC/GFPGAN) | Xeon/Gaudi2 | Interactive chatbot Avatar |
