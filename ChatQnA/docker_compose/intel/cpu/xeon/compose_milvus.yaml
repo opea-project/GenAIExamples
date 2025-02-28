@@ -82,7 +82,7 @@ services:
     depends_on:
       tei-embedding-serving:
         condition: service_healthy
-      standalone:
+      milvus-standalone:
         condition: service_healthy
       etcd:
         condition: service_healthy
