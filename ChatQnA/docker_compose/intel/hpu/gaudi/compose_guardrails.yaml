@@ -23,7 +23,7 @@ services:
       REDIS_URL: redis://redis-vector-db:6379
       REDIS_HOST: redis-vector-db
       INDEX_NAME: ${INDEX_NAME}
-      TEI_EMBEDDING_ENDPOINT: http://tei-embedding-service:80
+      TEI_ENDPOINT: http://tei-embedding-service:80
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
   tgi-guardrails-service:
     image: ghcr.io/huggingface/tgi-gaudi:2.0.6
