@@ -80,8 +80,6 @@ services:
       LOGFLAG: ${LOGFLAG}
     restart: unless-stopped
     depends_on:
-      tei-embedding-service:
-        condition: service_healthy
       milvus-standalone:
         condition: service_healthy
       etcd:
