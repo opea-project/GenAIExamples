@@ -74,7 +74,6 @@ services:
       DATAPREP_COMPONENT_NAME: "OPEA_DATAPREP_MILVUS"
       MILVUS_HOST: ${host_ip}
       MILVUS_PORT: 19530
-      #COLLECTION_NAME: ${COLLECTION_NAME}
       TEI_EMBEDDING_ENDPOINT: http://tei-embedding-service:80
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       EMBEDDING_MODEL_ID: ${EMBEDDING_MODEL_ID}
@@ -95,7 +94,6 @@ services:
       https_proxy: ${https_proxy}
       MILVUS_HOST: ${host_ip}
       MILVUS_PORT: 19530
-      #COLLECTION_NAME: ${COLLECTION_NAME}
       TEI_EMBEDDING_ENDPOINT: http://tei-embedding-service:80
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       LOGFLAG: ${LOGFLAG}
