@@ -79,6 +79,15 @@ services:
       EMBEDDING_MODEL_ID: ${EMBEDDING_MODEL_ID}
       LOGFLAG: ${LOGFLAG}
     restart: unless-stopped
+    depends_on:
+      tei-embedding-serving:
+        condition: service_healthy
+      standalone:
+        condition: service_healthy
+      etcd:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
 
   retriever:
     image: ${REGISTRY:-opea}/retriever:${TAG:-latest}
@@ -131,22 +140,27 @@ services:
       HF_HUB_ENABLE_HF_TRANSFER: 0
     command: --model-id ${RERANK_MODEL_ID} --auto-truncate
 
-  tgi-service:
-    image: ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu
-    container_name: tgi-service
+  vllm-service:
+    image: ${REGISTRY:-opea}/vllm:${TAG:-latest}
+    container_name: vllm-service
     ports:
       - "9009:80"
     volumes:
       - "./data:/data"
-    shm_size: 1g
+    shm_size: 128g
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
-      HF_HUB_DISABLE_PROGRESS_BARS: 1
-      HF_HUB_ENABLE_HF_TRANSFER: 0
-    command: --model-id ${LLM_MODEL_ID} --cuda-graphs 0
+      LLM_MODEL_ID: ${LLM_MODEL_ID}
+      VLLM_TORCH_PROFILER_DIR: "/mnt"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://$host_ip:9009/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 100
+    command: --model $LLM_MODEL_ID --host 0.0.0.0 --port 80
 
   chatqna-xeon-backend-server:
     image: ${REGISTRY:-opea}/chatqna:${TAG:-latest}
@@ -157,7 +171,7 @@ services:
       - dataprep-milvus-service
       - retriever
       - tei-reranking-service
-      - tgi-service
+      - vllm-service
     ports:
       - "8888:8888"
     environment:
@@ -168,7 +182,7 @@ services:
       - EMBEDDING_SERVER_HOST_IP=tei-embedding-service
       - RETRIEVER_SERVICE_HOST_IP=retriever
       - RERANK_SERVER_HOST_IP=tei-reranking-service
-      - LLM_SERVER_HOST_IP=tgi-service
+      - LLM_SERVER_HOST_IP=vllm-service
       - LLM_MODEL=${LLM_MODEL_ID}
       - LOGFLAG=${LOGFLAG}
     ipc: host
