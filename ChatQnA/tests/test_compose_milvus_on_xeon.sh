@@ -29,16 +29,13 @@ function build_docker_images() {
 
     cd $WORKPATH/docker_image_build
     git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
-    git clone https://github.com/vllm-project/vllm.git && cd vllm
-    VLLM_VER="$(git describe --tags "$(git rev-list --tags --max-count=1)" )"
-    echo "Check out vLLM tag ${VLLM_VER}"
-    git checkout ${VLLM_VER} &> /dev/null
-    # Not change the pwd
-    cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="chatqna chatqna-ui dataprep retriever vllm nginx"
+    service_list="chatqna chatqna-ui dataprep retriever nginx"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
+
+    docker pull ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu
+    docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
 
     docker images && sleep 1s
 }
@@ -57,8 +54,8 @@ function start_services() {
 
     n=0
     until [[ "$n" -ge 100 ]]; do
-        docker logs vllm-service > ${LOG_PATH}/vllm_service_start.log 2>&1
-        if grep -q complete ${LOG_PATH}/vllm_service_start.log; then
+        docker logs tgi-service > ${LOG_PATH}/tgi_service_start.log
+        if grep -q Connected ${LOG_PATH}/tgi_service_start.log; then
             break
         fi
         sleep 5s
@@ -157,13 +154,13 @@ function validate_microservices() {
         '{"query":"What is Deep Learning?", "texts": ["Deep Learning is not...", "Deep learning is..."]}'
 
 
-    # vllm for llm service
+    # tgi for llm service
     echo "Validating llm service"
     validate_service \
         "${ip_address}:9009/v1/chat/completions" \
         "content" \
-        "vllm-llm" \
-        "vllm-service" \
+        "tgi-llm" \
+        "tgi-service" \
         '{"model": "meta-llama/Meta-Llama-3-8B-Instruct", "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens": 17}'
 }
 
