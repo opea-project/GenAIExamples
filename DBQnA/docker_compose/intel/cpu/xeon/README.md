@@ -54,8 +54,8 @@ export host_ip=$(hostname -I | awk '{print $1}')
 export no_proxy=${no_proxy},${host_ip}
 
 # If you are in a proxy environment, also set the proxy-related environment variables:
-export http_proxy=${your_http_proxy}
-export https_proxy=${your_http_proxy}
+export http_proxy=${http_proxy}
+export https_proxy=${https_proxy}
 
 # Set other required variables
 
