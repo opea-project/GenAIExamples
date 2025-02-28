@@ -1,17 +1,5 @@
 # ChatQnA Application
 
-Chatbots are a widely adopted use case for leveraging the powerful chat and reasoning capabilities of large language models (LLMs). The ChatQnA example provides the starting point for developers to begin working in the GenAI space. Consider it the “hello world” of GenAI applications and can be leveraged for solutions across wide enterprise verticals, both internally and externally.
-
-The ChatQnA service can be effortlessly deployed on Intel Gaudi2, Intel Xeon Scalable Processors，Nvidia GPU and AMD GPU.
-
-Two types of ChatQnA pipeline are supported now: `ChatQnA with/without Rerank`. And the `ChatQnA without Rerank` pipeline (including Embedding, Retrieval, and LLM) is offered for Xeon customers who can not run rerank service on HPU yet require high performance and accuracy.
-
-To get started right away with ChatQnA service refer to the specific **Quick Start** documentation for the target platform:
-
-| Use Case | Docker Compose<br/>Deployment on Xeon                        | Docker Compose<br/>Deployment on Gaudi                         | Docker Compose<br/>Deployment on ROCm                      | Kubernetes with Helm Charts                           | Kubernetes with GMC                          |
-| -------- | ------------------------------------------------------------ | -------------------------------------------------------------- | ---------------------------------------------------------- | ----------------------------------------------------- | -------------------------------------------- |
-| ChatQnA  | [Xeon Instructions](docker_compose/intel/cpu/xeon/README.md) | [Gaudi Instructions](docker_compose/intel/hpu/gaudi/README.md) | [ROCm Instructions](docker_compose/amd/gpu/rocm/README.md) | [ChatQnA with Helm Charts](kubernetes/helm/README.md) | [ChatQnA with GMC](kubernetes/gmc/README.md) |
-
 Chatbots are the most widely adopted use case for leveraging the powerful chat and reasoning capabilities of large language models (LLMs). The retrieval augmented generation (RAG) architecture is quickly becoming the industry standard for chatbots development. It combines the benefits of a knowledge base (via a vector store) and generative models to reduce hallucinations, maintain up-to-date information, and leverage domain-specific knowledge.
 
 RAG bridges the knowledge gap by dynamically fetching relevant information from external sources, ensuring that responses generated remain factual and current. The core of this architecture are vector databases, which are instrumental in enabling efficient and semantic retrieval of information. These databases store data as vectors, allowing RAG to swiftly access the most pertinent documents or data points based on semantic similarity.
@@ -35,11 +23,109 @@ Use this if you are not using Terraform and have provisioned your system with an
 | Ubuntu 20.04 | [ChatQnA Ansible Module](https://github.com/intel/optimized-cloud-recipes/tree/main/recipes/ai-opea-chatqna-xeon) |
 | Ubuntu 22.04 | Work-in-progress |
 
-## ChatQnA service deployment requirements
+## Manually Deploy ChatQnA Service
+
+The ChatQnA service can be effortlessly deployed on Intel Gaudi2, Intel Xeon Scalable Processors，Nvidia GPU and AMD GPU.
+
+Two types of ChatQnA pipeline are supported now: `ChatQnA with/without Rerank`. And the `ChatQnA without Rerank` pipeline (including Embedding, Retrieval, and LLM) is offered for Xeon customers who can not run rerank service on HPU yet require high performance and accuracy.
+
+Quick Start Deployment Steps:
+
+1. Set up the environment variables.
+2. Run Docker Compose.
+3. Consume the ChatQnA Service.
+
+Note:
 
 1. If you do not have docker installed you can run this script to install docker : `bash docker_compose/install_docker.sh`.
 
 2. The default LLM is `meta-llama/Meta-Llama-3-8B-Instruct`. Before deploying the application, please make sure either you've requested and been granted the access to it on [Huggingface](https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct) or you've downloaded the model locally from [ModelScope](https://www.modelscope.cn/models).
+
+### Quick Start: 1.Setup Environment Variable
+
+To set up environment variables for deploying ChatQnA services, follow these steps:
+
+1. Set the required environment variables:
+
+   ```bash
+   # Example: host_ip="192.168.1.1"
+   export host_ip="External_Public_IP"
+   # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
+   export no_proxy="Your_No_Proxy"
+   export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
+   ```
+
+2. If you are in a proxy environment, also set the proxy-related environment variables:
+
+   ```bash
+   export http_proxy="Your_HTTP_Proxy"
+   export https_proxy="Your_HTTPs_Proxy"
+   ```
+
+3. Set up other environment variables:
+
+   > Notice that you can only choose **one** hardware option below to set up envs according to your hardware. Make sure port numbers are set correctly as well.
+
+   ```bash
+   # on Gaudi
+   cd GenAIExamples/ChatQnA/docker_compose/intel/hpu/gaudi/
+   source ./set_env.sh
+   export no_proxy="Your_No_Proxy",chatqna-gaudi-ui-server,chatqna-gaudi-backend-server,dataprep-redis-service,tei-embedding-service,retriever,tei-reranking-service,tgi-service,vllm-service,guardrails
+   # on Xeon
+   cd GenAIExamples/ChatQnA/docker_compose/intel/cpu/xeon/
+   source ./set_env.sh
+   export no_proxy="Your_No_Proxy",chatqna-xeon-ui-server,chatqna-xeon-backend-server,dataprep-redis-service,tei-embedding-service,retriever,tei-reranking-service,tgi-service,vllm-service
+   # on Nvidia GPU
+   cd GenAIExamples/ChatQnA/docker_compose/nvidia/gpu
+   source ./set_env.sh
+   export no_proxy="Your_No_Proxy",chatqna-ui-server,chatqna-backend-server,dataprep-redis-service,tei-embedding-service,retriever,tei-reranking-service,tgi-service
+   ```
+
+### Quick Start: 2.Run Docker Compose
+
+Select the compose.yaml file that matches your hardware.
+
+CPU example:
+
+```bash
+cd GenAIExamples/ChatQnA/docker_compose/intel/cpu/xeon/
+# cd GenAIExamples/ChatQnA/docker_compose/intel/hpu/gaudi/
+# cd GenAIExamples/ChatQnA/docker_compose/nvidia/gpu/
+docker compose up -d
+```
+
+To enable Open Telemetry Tracing, compose.telemetry.yaml file need to be merged along with default compose.yaml file.  
+CPU example with Open Telemetry feature:
+
+```bash
+cd GenAIExamples/ChatQnA/docker_compose/intel/cpu/xeon/
+docker compose -f compose.yaml -f compose.telemetry.yaml up -d
+```
+
+It will automatically download the docker image on `docker hub`:
+
+```bash
+docker pull opea/chatqna:latest
+docker pull opea/chatqna-ui:latest
+```
+
+In following cases, you could build docker image from source by yourself.
+
+- Failed to download the docker image.
+
+- If you want to use a specific version of Docker image.
+
+Please refer to the 'Build Docker Images' in [Guide](docker_compose/intel/cpu/xeon/README.md).
+
+### QuickStart: 3.Consume the ChatQnA Service
+
+```bash
+curl http://${host_ip}:8888/v1/chatqna \
+    -H "Content-Type: application/json" \
+    -d '{
+        "messages": "What is the revenue of Nike in 2023?"
+    }'
+```
 
 ## Architecture and Deploy details
 
