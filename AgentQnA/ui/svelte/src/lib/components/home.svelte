@@ -108,7 +108,7 @@
 			<!-- svelte-ignore a11y-click-events-have-key-events -->
 			<div
 				class="relative rounded-xl bg-white p-2 py-8 pl-16"
-				on:click={() => handleCreate(feature)}
+				on:click={() => handleCreate(feature.description)}
 			>
 				<dt class="text-base font-semibold text-gray-900">
 					<div
