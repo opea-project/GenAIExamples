@@ -12,6 +12,7 @@ export host_ip=$(hostname -I | awk '{print $1}')
 
 echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
 echo "TAG=IMAGE_TAG=${IMAGE_TAG}"
+export MODEL_CACHE=${model_cache:-"./data"}
 export REGISTRY=${IMAGE_REPO}
 export TAG=${IMAGE_TAG}
 export MAX_INPUT_TOKENS=2048

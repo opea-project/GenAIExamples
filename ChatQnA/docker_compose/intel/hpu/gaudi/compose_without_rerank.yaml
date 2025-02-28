@@ -31,7 +31,7 @@ services:
     ports:
       - "8090:80"
     volumes:
-      - "./data:/data"
+      - "${MODEL_CACHE}:/data"
     shm_size: 1g
     environment:
       no_proxy: ${no_proxy}
@@ -64,7 +64,7 @@ services:
     ports:
       - "8007:80"
     volumes:
-      - "./data:/data"
+      - "${MODEL_CACHE}:/data"
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
