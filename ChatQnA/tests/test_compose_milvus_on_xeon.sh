@@ -13,6 +13,7 @@ export TAG=${IMAGE_TAG}
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
+host_ip=$(hostname -I | awk '{print $1}')
 
 function build_docker_images() {
     opea_branch=${opea_branch:-"main"}
