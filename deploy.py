@@ -49,12 +49,14 @@ def configure_replica(values, deploy_config):
     return values
 
 
-def get_output_filename(num_nodes, with_rerank, example_type, device, action_type):
+def get_output_filename(num_nodes, with_rerank, example_type, device, action_type, batch_size=None):
     """Generate output filename based on configuration."""
     rerank_suffix = "with-rerank-" if with_rerank else ""
     action_suffix = "deploy-" if action_type == 0 else "update-" if action_type == 1 else ""
+    # Only include batch_suffix if batch_size is not None
+    batch_suffix = f"batch{batch_size}-" if batch_size else ""
 
-    return f"{example_type}-{num_nodes}-{device}-{action_suffix}{rerank_suffix}values.yaml"
+    return f"{example_type}-{rerank_suffix}{device}-{action_suffix}node{num_nodes}-{batch_suffix}values.yaml"
 
 
 def configure_resources(values, deploy_config):
@@ -62,30 +64,31 @@ def configure_resources(values, deploy_config):
     resource_configs = []
 
     for service_name, config in deploy_config["services"].items():
+        # Skip if resources configuration doesn't exist or is not enabled
+        resources_config = config.get("resources", {})
+        if not resources_config:
+            continue
+
         resources = {}
-        if deploy_config["device"] == "gaudi" and config.get("cards_per_instance", 0) > 1:
+        if deploy_config["device"] == "gaudi" and resources_config.get("cards_per_instance", 0) > 1:
             resources = {
-                "limits": {"habana.ai/gaudi": config["cards_per_instance"]},
-                "requests": {"habana.ai/gaudi": config["cards_per_instance"]},
+                "limits": {"habana.ai/gaudi": resources_config["cards_per_instance"]},
+                "requests": {"habana.ai/gaudi": resources_config["cards_per_instance"]},
             }
         else:
-            limits = {}
-            requests = {}
+            # Only add CPU if cores_per_instance has a valid value
+            cores = resources_config.get("cores_per_instance")
+            if cores is not None and cores != "":
+                resources = {"limits": {"cpu": cores}, "requests": {"cpu": cores}}
 
-            # Only add CPU if cores_per_instance has a value
-            if config.get("cores_per_instance"):
-                limits["cpu"] = config["cores_per_instance"]
-                requests["cpu"] = config["cores_per_instance"]
-
-            # Only add memory if memory_capacity has a value
-            if config.get("memory_capacity"):
-                limits["memory"] = config["memory_capacity"]
-                requests["memory"] = config["memory_capacity"]
-
-            # Only create resources if we have any limits/requests
-            if limits and requests:
-                resources["limits"] = limits
-                resources["requests"] = requests
+            # Only add memory if memory_capacity has a valid value
+            memory = resources_config.get("memory_capacity")
+            if memory is not None and memory != "":
+                if not resources:
+                    resources = {"limits": {"memory": memory}, "requests": {"memory": memory}}
+                else:
+                    resources["limits"]["memory"] = memory
+                    resources["requests"]["memory"] = memory
 
         if resources:
             if service_name == "llm":
@@ -116,48 +119,64 @@ def configure_resources(values, deploy_config):
 
 def configure_extra_cmd_args(values, deploy_config):
     """Configure extra command line arguments for services."""
+    batch_size = None
     for service_name, config in deploy_config["services"].items():
-        extra_cmd_args = []
+        if service_name == "llm":
+            extra_cmd_args = []
+            engine = config.get("engine", "tgi")
+            model_params = config.get("model_params", {})
 
-        for param in [
-            "max_batch_size",
-            "max_input_length",
-            "max_total_tokens",
-            "max_batch_total_tokens",
-            "max_batch_prefill_tokens",
-        ]:
-            if config.get(param):
-                extra_cmd_args.extend([f"--{param.replace('_', '-')}", str(config[param])])
+            # Get engine-specific parameters
+            engine_params = model_params.get(engine, {})
 
-        if extra_cmd_args:
-            if service_name == "llm":
-                engine = config.get("engine", "tgi")
+            # Get batch parameters and token parameters configuration
+            batch_params = engine_params.get("batch_params", {})
+            token_params = engine_params.get("token_params", {})
+
+            # Get batch size based on engine type
+            if engine == "tgi":
+                batch_size = batch_params.get("max_batch_size")
+            elif engine == "vllm":
+                batch_size = batch_params.get("max_num_seqs")
+            batch_size = batch_size if batch_size and batch_size != "" else None
+
+            # Add all parameters that exist in batch_params
+            for param, value in batch_params.items():
+                if value is not None and value != "":
+                    extra_cmd_args.extend([f"--{param.replace('_', '-')}", str(value)])
+
+            # Add all parameters that exist in token_params
+            for param, value in token_params.items():
+                if value is not None and value != "":
+                    extra_cmd_args.extend([f"--{param.replace('_', '-')}", str(value)])
+
+            if extra_cmd_args:
                 if engine not in values:
                     values[engine] = {}
                 values[engine]["extraCmdArgs"] = extra_cmd_args
-            else:
-                if service_name not in values:
-                    values[service_name] = {}
-                values[service_name]["extraCmdArgs"] = extra_cmd_args
+                print(f"extraCmdArgs: {extra_cmd_args}")
 
-    return values
+    return values, batch_size
 
 
 def configure_models(values, deploy_config):
     """Configure model settings for services."""
     for service_name, config in deploy_config["services"].items():
-        # Skip if no model_id defined or service is disabled
-        if not config.get("model_id") or config.get("enabled") is False:
+        # Get model_id and check if it's valid (not None or empty string)
+        model_id = config.get("model_id")
+        if not model_id or model_id == "" or config.get("enabled") is False:
             continue
 
         if service_name == "llm":
             # For LLM service, use its engine as the key
+            # Check if engine is valid (not None or empty string)
             engine = config.get("engine", "tgi")
-            values[engine]["LLM_MODEL_ID"] = config.get("model_id")
+            if engine and engine != "":
+                values[engine]["LLM_MODEL_ID"] = model_id
         elif service_name == "tei":
-            values[service_name]["EMBEDDING_MODEL_ID"] = config.get("model_id")
+            values[service_name]["EMBEDDING_MODEL_ID"] = model_id
         elif service_name == "teirerank":
-            values[service_name]["RERANK_MODEL_ID"] = config.get("model_id")
+            values[service_name]["RERANK_MODEL_ID"] = model_id
 
     return values
 
@@ -209,13 +228,13 @@ def generate_helm_values(example_type, deploy_config, chart_dir, action_type, no
     values = configure_rerank(values, with_rerank, deploy_config, example_type, node_selector or {})
     values = configure_replica(values, deploy_config)
     values = configure_resources(values, deploy_config)
-    values = configure_extra_cmd_args(values, deploy_config)
+    values, batch_size = configure_extra_cmd_args(values, deploy_config)
     values = configure_models(values, deploy_config)
 
     device = deploy_config.get("device", "unknown")
 
     # Generate and write YAML file
-    filename = get_output_filename(num_nodes, with_rerank, example_type, device, action_type)
+    filename = get_output_filename(num_nodes, with_rerank, example_type, device, action_type, batch_size)
     yaml_string = yaml.dump(values, default_flow_style=False)
 
     filepath = os.path.join(chart_dir, filename)
@@ -376,12 +395,24 @@ def install_helm_release(release_name, chart_name, namespace, hw_values_file, de
 
 
 def uninstall_helm_release(release_name, namespace=None):
-    """Uninstall a Helm release and clean up resources, optionally delete the namespace if not 'default'."""
+    """Uninstall a Helm release and clean up resources, optionally delete the namespace if not 'default'.
+
+    First checks if the release exists before attempting to uninstall.
+    """
     # Default to 'default' namespace if none is specified
     if not namespace:
         namespace = "default"
 
     try:
+        # Check if the release exists
+        check_command = ["helm", "list", "--namespace", namespace, "--filter", release_name, "--output", "json"]
+        output = run_kubectl_command(check_command)
+        releases = json.loads(output)
+
+        if not releases:
+            print(f"Helm release {release_name} not found in namespace {namespace}. Nothing to uninstall.")
+            return
+
         # Uninstall the Helm release
         command = ["helm", "uninstall", release_name, "--namespace", namespace]
         print(f"Uninstalling Helm release {release_name} in namespace {namespace}...")
@@ -399,6 +430,8 @@ def uninstall_helm_release(release_name, namespace=None):
 
     except subprocess.CalledProcessError as e:
         print(f"Error occurred while uninstalling Helm release or deleting namespace: {e}")
+    except json.JSONDecodeError as e:
+        print(f"Error parsing helm list output: {e}")
 
 
 def update_service(release_name, chart_name, namespace, hw_values_file, deploy_values_file, update_values_file):
@@ -449,7 +482,7 @@ def read_deploy_config(config_path):
         return None
 
 
-def check_deployment_ready(release_name, namespace, timeout=300, interval=5, logfile="deployment.log"):
+def check_deployment_ready(release_name, namespace, timeout=1000, interval=5, logfile="deployment.log"):
     """Wait until all pods in the deployment are running and ready.
 
     Args:
@@ -586,6 +619,18 @@ def main():
     parser.add_argument("--update-service", action="store_true", help="Update the deployment with new configuration.")
     parser.add_argument("--check-ready", action="store_true", help="Check if all services in the deployment are ready.")
     parser.add_argument("--chart-dir", default=".", help="Path to the untarred Helm chart directory.")
+    parser.add_argument(
+        "--timeout",
+        type=int,
+        default=1000,
+        help="Maximum time to wait for deployment readiness in seconds (default: 1000)",
+    )
+    parser.add_argument(
+        "--interval",
+        type=int,
+        default=5,
+        help="Interval between readiness checks in seconds (default: 5)",
+    )
 
     args = parser.parse_args()
 
@@ -597,7 +642,7 @@ def main():
         clear_labels_from_nodes(args.label, args.node_names)
         return
     elif args.check_ready:
-        is_ready = check_deployment_ready(args.chart_name, args.namespace)
+        is_ready = check_deployment_ready(args.chart_name, args.namespace, args.timeout, args.interval)
         return is_ready
     elif args.uninstall:
         uninstall_helm_release(args.chart_name, args.namespace)
@@ -659,6 +704,7 @@ def main():
             update_service(
                 args.chart_name, args.chart_name, args.namespace, hw_values_file, args.user_values, values_file_path
             )
+            print(f"values_file_path: {values_file_path}")
             return
         except Exception as e:
             parser.error(f"Failed to update deployment: {str(e)}")
