@@ -122,20 +122,19 @@ function validate_microservices() {
 
     sleep 1m # retrieval can't curl as expected, try to wait for more time
 
-    # test /v1/dataprep/delete
-    validate_service \
-       "http://${ip_address}:11101/v1/dataprep/delete" \
-       '{"status":true}' \
-        "dataprep_del" \
-        "dataprep-milvus-server"
-
-
     # test /v1/dataprep/ingest upload file
     echo "Deep learning is a subset of machine learning that utilizes neural networks with multiple layers to analyze various levels of abstract data representations. It enables computers to identify patterns and make decisions with minimal human intervention by learning from large amounts of data." > $LOG_PATH/dataprep_file.txt
     validate_service \
        "http://${ip_address}:11101/v1/dataprep/ingest" \
         "Data preparation succeeded" \
         "dataprep_upload_file" \
+        "dataprep-milvus-server"
+    
+    # test /v1/dataprep/delete
+    validate_service \
+       "http://${ip_address}:11101/v1/dataprep/delete" \
+       '{"status":true}' \
+        "dataprep_del" \
         "dataprep-milvus-server"
 
 
