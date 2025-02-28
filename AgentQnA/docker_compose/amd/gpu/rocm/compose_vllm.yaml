@@ -38,7 +38,7 @@ services:
     container_name: rag-agent-endpoint
     volumes:
       # - ${WORKDIR}/GenAIExamples/AgentQnA/docker_image_build/GenAIComps/comps/agent/langchain/:/home/user/comps/agent/langchain/
-      - ./data/tools:/home/user/tools/
+      - ../../../tools:/home/user/tools/
     ports:
       - "${AGENT_RAG_AGENT_PORT:-9095}:9095"
     ipc: host
@@ -72,7 +72,7 @@ services:
       - worker-rag-agent
     volumes:
       # - ${WORKDIR}/GenAIExamples/AgentQnA/docker_image_build/GenAIComps/comps/agent/langchain/:/home/user/comps/agent/langchain/
-      - ./data/tools:/home/user/tools/
+      - ../../../tools:/home/user/tools/
     ports:
       - "${AGENT_FRONTEND_PORT:-9090}:9090"
     ipc: host
