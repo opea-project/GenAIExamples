@@ -26,3 +26,5 @@ export VDMS_PORT=8001
 export INDEX_NAME="mega-videoqna"
 export USECLIP=1
 export LLM_DOWNLOAD="True" # Set to "False" before redeploy LVM server to avoid model download
+
+export RERANK_COMPONENT_NAME="OPEA_VIDEO_RERANKING"
