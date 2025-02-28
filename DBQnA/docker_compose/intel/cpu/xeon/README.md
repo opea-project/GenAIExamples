@@ -37,13 +37,14 @@ Then run the command `docker images`, you will have the following Docker Images:
 We set default model as "mistralai/Mistral-7B-Instruct-v0.3", change "LLM_MODEL_ID" in following Environment Variables setting if you want to use other models.
 
 If use gated models, you also need to provide [huggingface token](https://huggingface.co/docs/hub/security-tokens) to "HUGGINGFACEHUB_API_TOKEN" environment variable.
+
 ```bash
 export HUGGINGFACEHUB_API_TOKEN="xxx"
 ```
 
 ### 2.1 Setup Environment Variables
 
-Since the `compose.yaml` will consume some environment variables, you need to setup them in advance as below. 
+Since the `compose.yaml` will consume some environment variables, you need to setup them in advance as below.
 
 ```bash
 # host_ip should be your external IP address, do not use localhost.
@@ -67,11 +68,14 @@ export POSTGRES_PASSWORD=testpwd
 export POSTGRES_DB=chinook
 export text2sql_port=9090
 ```
-or 
-edit the file set_env.sh to set those environment variables, 
+
+or
+edit the file set_env.sh to set those environment variables,
+
 ```bash
 source set_env.sh
 ```
+
 Note: Please replace with `host_ip` with your external IP address, do not use localhost.
 
 ### 2.2 Start Microservice Docker Containers
