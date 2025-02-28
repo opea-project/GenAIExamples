@@ -24,4 +24,4 @@ export POSTGRES_USER=postgres
 export POSTGRES_PASSWORD=testpwd
 export POSTGRES_DB=chinook
 export TEXT2SQL_PORT=9090
-"set_env.sh" 27L, 974B          
+"set_env.sh" 27L, 974B
