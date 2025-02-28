@@ -17,7 +17,7 @@ export recursion_limit_worker=12
 export AGENT_LLM_ENDPOINT_URL="http://${HOST_IP}:${AGENT_VLLM_SERVICE_PORT}"
 export temperature="0.01"
 export max_new_tokens="512"
-export AGENT_RETRIEVAL_TOOL_URL="http://${HOST_IP}:${AGENT_RETRIEVAL_PORT}"
+export AGENT_RETRIEVAL_TOOL_URL="http://${HOST_IP}:8889/v1/retrievaltool"
 export AGENT_LANGCHAIN_API_KEY=${LANGCHAIN_API_KEY}
 export AGENT_LANGCHAIN_TRACING_V2=${LANGCHAIN_TRACING_V2}
 
