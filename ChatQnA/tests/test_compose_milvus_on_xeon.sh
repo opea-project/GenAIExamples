@@ -131,7 +131,7 @@ function validate_microservices() {
         "Data preparation succeeded" \
         "dataprep_upload_file" \
         "dataprep-milvus-server"
-    
+
     # test /v1/dataprep/delete
     validate_service \
        "http://${ip_address}:11101/v1/dataprep/delete" \
