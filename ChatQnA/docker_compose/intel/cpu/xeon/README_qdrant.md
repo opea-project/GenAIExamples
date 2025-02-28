@@ -184,7 +184,7 @@ export https_proxy=${your_http_proxy}
 export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
 export RERANK_MODEL_ID="BAAI/bge-reranker-base"
 export LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
-export INDEX_NAME="rag-qdrant"
+export INDEX_NAME="rag_qdrant"
 ```
 
 Note: Please replace with `host_ip` with you external IP address, do not use localhost.
