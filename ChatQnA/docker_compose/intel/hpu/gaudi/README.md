@@ -4,7 +4,7 @@ This example covers the single-node on-premises deployment of the ChatQnA exampl
 
 This example includes the following sections:
 
-- [ChatQnA Quick Start Deployment](#chatqna-quick-start-deployment): Demonstrates how to quickly deploy a ChatQnA platform on a Intel Gaudi platfrom.
+- [ChatQnA Quick Start Deployment](#chatqna-quick-start-deployment): Demonstrates how to quickly deploy a ChatQnA platform on a Intel Gaudi platform.
 - [ChatQnA Docker Compose Files](#chatqna-docker-compose-files): Describes the example docker compose files and the example deployments.
 - [ChatQnA Service Configuration](#chatqna-service-configuration): Describes the services and possible configuration changes.
 
@@ -14,13 +14,13 @@ This example includes the following sections:
 
 This section describes how to quickly deploy and test the ChatQnA service manually on an Intel Gaudi platform. The basic steps are:
 
-1. [Access the Code](#access-the-code) 
+1. [Access the Code](#access-the-code)
 2. [Generate a HuggingFace Access Token](#generate-a-huggingface-access-token)
-2. [Configure the Deployment Environment](#configure-the-deployment-environment)
-3. [Deploy the Services Using Docker Compose](#deploy-the-services-using-docker-compose)
-4. [Check the Deployment Status](#check-the-deployment-status)
-5. [Test the Pipeline](#test-the-pipeline)
-6. [Cleanup the Deployment](#cleanup-the-deployment)
+3. [Configure the Deployment Environment](#configure-the-deployment-environment)
+4. [Deploy the Services Using Docker Compose](#deploy-the-services-using-docker-compose)
+5. [Check the Deployment Status](#check-the-deployment-status)
+6. [Test the Pipeline](#test-the-pipeline)
+7. [Cleanup the Deployment](#cleanup-the-deployment)
 
 ### Access the Code
 
@@ -35,15 +35,15 @@ cd GenAIExamples/ChatQnA/docker_compose/intel/hpu/gaudi/
 
 Setup a [HuggingFace](https://huggingface.co/) account and generate a [user access token](https://huggingface.co/docs/transformers.js/en/guides/private#step-1-generating-a-user-access-token), if required. An access token is required for some services to access model.
 
-### Configure the Deployment Environment 
+### Configure the Deployment Environment
 
-To set up environment variables for deploying ChatQnA services, source the *setup_env.sh* script in this directory:
+To set up environment variables for deploying ChatQnA services, source the _setup_env.sh_ script in this directory:
 
 ```
 source ./set_env.sh
-``` 
+```
 
-The *set_env.sh* script will prompt for required and optional environment variables used to configure the ChatQnA services. If a value is not entered the script will enable a default value for the environment variable. It will also generate a *.env* file defining the desired configuration. Consult the section on [ChatQnA Service configuration](#chatqna-service-configuration) for information how service specific configuration parameters affect deployments.
+The _set_env.sh_ script will prompt for required and optional environment variables used to configure the ChatQnA services. If a value is not entered the script will enable a default value for the environment variable. It will also generate a _.env_ file defining the desired configuration. Consult the section on [ChatQnA Service configuration](#chatqna-service-configuration) for information how service specific configuration parameters affect deployments.
 
 ### Deploy the Services Using Docker Compose
 
@@ -111,6 +111,7 @@ To stop the containers associated with the deployment, execute the following com
 ```
 docker compose -f compose.yaml down
 ```
+
 ```
 [+] Running 10/10
  ✔ Container chatqna-gaudi-nginx-server    Removed                                                                                                 10.5s
@@ -135,79 +136,78 @@ In the context of deploying a ChatQnA pipeline on an Intel Gaudi platform, the a
 
 The default deployment utilizes Gaudi devices primarily for the `vllm-service`, which handles large language model (LLM) tasks. This service is configured to maximize the use of Gaudi's capabilities, potentially allocating multiple devices to enhance parallel processing and throughput. The `tei-reranking-service` also uses Gaudi hardware (1 card), however, indicating a balanced approach where both LLM processing and reranking tasks benefit from Gaudi's performance enhancements.
 
-| Service Name                  | Image Name                                           | Gaudi Use      |
-|-------------------------------|------------------------------------------------------|----------------|
-| redis-vector-db               | redis/redis-stack:7.2.0-v9                           | No             |
-| dataprep-redis-service        | opea/dataprep:latest                                 | No             |
-| tei-embedding-service         | ghcr.io/huggingface/text-embeddings-inference:cpu-1.5| No             |
-| retriever                     | opea/retriever:latest                                | No             |
-| tei-reranking-service         | ghcr.io/huggingface/tei-gaudi:1.5.0                  | 1 card         |
-| vllm-service                  | opea/vllm-gaudi:latest                               | Configurable   |
-| chatqna-gaudi-backend-server  | opea/chatqna:latest                                  | No             |
-| chatqna-gaudi-ui-server       | opea/chatqna-ui:latest                               | No             |
-| chatqna-gaudi-nginx-server    | opea/nginx:latest                                    | No             |
+| Service Name                 | Image Name                                            | Gaudi Use    |
+| ---------------------------- | ----------------------------------------------------- | ------------ |
+| redis-vector-db              | redis/redis-stack:7.2.0-v9                            | No           |
+| dataprep-redis-service       | opea/dataprep:latest                                  | No           |
+| tei-embedding-service        | ghcr.io/huggingface/text-embeddings-inference:cpu-1.5 | No           |
+| retriever                    | opea/retriever:latest                                 | No           |
+| tei-reranking-service        | ghcr.io/huggingface/tei-gaudi:1.5.0                   | 1 card       |
+| vllm-service                 | opea/vllm-gaudi:latest                                | Configurable |
+| chatqna-gaudi-backend-server | opea/chatqna:latest                                   | No           |
+| chatqna-gaudi-ui-server      | opea/chatqna-ui:latest                                | No           |
+| chatqna-gaudi-nginx-server   | opea/nginx:latest                                     | No           |
 
 ### compose_tgi.yaml - TGI Deployment
 
 The TGI (Text Generation Inference) deployment and the default deployment differ primarily in their service configurations and specific focus on handling large language models (LLMs). The TGI deployment includes a unique `tgi-service`, which utilizes the `ghcr.io/huggingface/tgi-gaudi:2.0.6` image and is specifically configured to run on Gaudi hardware. This service is designed to handle LLM tasks with optimizations such as `ENABLE_HPU_GRAPH` and `USE_FLASH_ATTENTION`. The `chatqna-gaudi-backend-server` in the TGI deployment depends on the `tgi-service`, whereas in the default deployment, it relies on the `vllm-service`.
 
-| Service Name                  | Image Name                                           | Gaudi Specific |
-|-------------------------------|------------------------------------------------------|----------------|
-| redis-vector-db               | redis/redis-stack:7.2.0-v9                           | No             |
-| dataprep-redis-service        | opea/dataprep:latest                                 | No             |
-| tei-embedding-service         | ghcr.io/huggingface/text-embeddings-inference:cpu-1.5| No             |
-| retriever                     | opea/retriever:latest                                | No             |
-| tei-reranking-service         | ghcr.io/huggingface/tei-gaudi:1.5.0                  | 1 card         |
-| **tgi-service**               | ghcr.io/huggingface/tgi-gaudi:2.0.6                  | Configurable   |
-| chatqna-gaudi-backend-server  | opea/chatqna:latest                                  | No             |
-| chatqna-gaudi-ui-server       | opea/chatqna-ui:latest                               | No             |
-| chatqna-gaudi-nginx-server    | opea/nginx:latest                                    | No             |
+| Service Name                 | Image Name                                            | Gaudi Specific |
+| ---------------------------- | ----------------------------------------------------- | -------------- |
+| redis-vector-db              | redis/redis-stack:7.2.0-v9                            | No             |
+| dataprep-redis-service       | opea/dataprep:latest                                  | No             |
+| tei-embedding-service        | ghcr.io/huggingface/text-embeddings-inference:cpu-1.5 | No             |
+| retriever                    | opea/retriever:latest                                 | No             |
+| tei-reranking-service        | ghcr.io/huggingface/tei-gaudi:1.5.0                   | 1 card         |
+| **tgi-service**              | ghcr.io/huggingface/tgi-gaudi:2.0.6                   | Configurable   |
+| chatqna-gaudi-backend-server | opea/chatqna:latest                                   | No             |
+| chatqna-gaudi-ui-server      | opea/chatqna-ui:latest                                | No             |
+| chatqna-gaudi-nginx-server   | opea/nginx:latest                                     | No             |
 
 This deployment may allocate more Gaudi resources to the tgi-service to optimize LLM tasks depending on the specific configuration and workload requirements.
 
 ### compose_without_rerank.yaml - No ReRank Deployment
 
-The *compose_without_rerank.yaml* Docker Compose file is distinct from the default deployment primarily due to the exclusion of the reranking service. In this version, the `tei-reranking-service`, which is typically responsible for providing reranking capabilities for text embeddings and is configured to run on Gaudi hardware, is absent. This omission simplifies the service architecture by removing a layer of processing that would otherwise enhance the ranking of text embeddings. Consequently, the `chatqna-gaudi-backend-server` in this deployment uses a specialized image, `opea/chatqna-without-rerank:latest`, indicating that it is tailored to function without the reranking feature. As a result, the backend server's dependencies are adjusted, without the need for the reranking service. This streamlined setup may impact the application's functionality and performance by focusing on core operations without the additional processing layer provided by reranking, potentially making it more efficient for scenarios where reranking is not essential and freeing Intel Gaudi accelerators for other tasks.
+The _compose_without_rerank.yaml_ Docker Compose file is distinct from the default deployment primarily due to the exclusion of the reranking service. In this version, the `tei-reranking-service`, which is typically responsible for providing reranking capabilities for text embeddings and is configured to run on Gaudi hardware, is absent. This omission simplifies the service architecture by removing a layer of processing that would otherwise enhance the ranking of text embeddings. Consequently, the `chatqna-gaudi-backend-server` in this deployment uses a specialized image, `opea/chatqna-without-rerank:latest`, indicating that it is tailored to function without the reranking feature. As a result, the backend server's dependencies are adjusted, without the need for the reranking service. This streamlined setup may impact the application's functionality and performance by focusing on core operations without the additional processing layer provided by reranking, potentially making it more efficient for scenarios where reranking is not essential and freeing Intel Gaudi accelerators for other tasks.
 
-| Service Name                  | Image Name                                           | Gaudi Specific |
-|-------------------------------|------------------------------------------------------|----------------|
-| redis-vector-db               | redis/redis-stack:7.2.0-v9                           | No             |
-| dataprep-redis-service        | opea/dataprep:latest                                 | No             |
-| tei-embedding-service         | ghcr.io/huggingface/text-embeddings-inference:cpu-1.5| No             |
-| retriever                     | opea/retriever:latest                                | No             |
-| vllm-service                  | opea/vllm-gaudi:latest                               | Configurable   |
-| chatqna-gaudi-backend-server  | **opea/chatqna-without-rerank:latest**               | No             |
-| chatqna-gaudi-ui-server       | opea/chatqna-ui:latest                               | No             |
-| chatqna-gaudi-nginx-server    | opea/nginx:latest                                    | No             |
+| Service Name                 | Image Name                                            | Gaudi Specific |
+| ---------------------------- | ----------------------------------------------------- | -------------- |
+| redis-vector-db              | redis/redis-stack:7.2.0-v9                            | No             |
+| dataprep-redis-service       | opea/dataprep:latest                                  | No             |
+| tei-embedding-service        | ghcr.io/huggingface/text-embeddings-inference:cpu-1.5 | No             |
+| retriever                    | opea/retriever:latest                                 | No             |
+| vllm-service                 | opea/vllm-gaudi:latest                                | Configurable   |
+| chatqna-gaudi-backend-server | **opea/chatqna-without-rerank:latest**                | No             |
+| chatqna-gaudi-ui-server      | opea/chatqna-ui:latest                                | No             |
+| chatqna-gaudi-nginx-server   | opea/nginx:latest                                     | No             |
 
-This setup might allow for more Gaudi devices to be dedicated to the `vllm-service`, enhancing LLM processing capabilities and accomidating larger models. However, it also means that the benefits of reranking are sacrificed, which could impact the overall quality of the pipeline's output. 
-
+This setup might allow for more Gaudi devices to be dedicated to the `vllm-service`, enhancing LLM processing capabilities and accommodating larger models. However, it also means that the benefits of reranking are sacrificed, which could impact the overall quality of the pipeline's output.
 
 ### compose_guardrails.yaml - Gaurdrails Deployment
 
-The *compose_guardrails.yaml* Docker Compose file introduces enhancements over the default deployment by incorporating additional services focused on safety and ChatQnA response control. Notably, it includes the `tgi-guardrails-service` and `guardrails` services. The `tgi-guardrails-service` uses the `ghcr.io/huggingface/tgi-gaudi:2.0.6` image and is configured to run on Gaudi hardware, providing functionality to manage input constraints and ensure safe operations within defined limits. The guardrails service, using the `opea/guardrails:latest` image, acts as a safety layer that interfaces with the `tgi-guardrails-service` to enforce safety protocols and manage interactions with the large language model (LLM). Additionally, the `chatqna-gaudi-backend-server` is updated to use the `opea/chatqna-guardrails:latest` image, indicating its design to integrate with these new guardrail services. This backend server now depends on the `tgi-guardrails-service` and `guardrails`, alongside existing dependencies like `redis-vector-db`, `tei-embedding-service`, `retriever`, `tei-reranking-service`, and `vllm-service`. The environment configurations for the backend are also updated to include settings for the guardrail services.
+The _compose_guardrails.yaml_ Docker Compose file introduces enhancements over the default deployment by incorporating additional services focused on safety and ChatQnA response control. Notably, it includes the `tgi-guardrails-service` and `guardrails` services. The `tgi-guardrails-service` uses the `ghcr.io/huggingface/tgi-gaudi:2.0.6` image and is configured to run on Gaudi hardware, providing functionality to manage input constraints and ensure safe operations within defined limits. The guardrails service, using the `opea/guardrails:latest` image, acts as a safety layer that interfaces with the `tgi-guardrails-service` to enforce safety protocols and manage interactions with the large language model (LLM). Additionally, the `chatqna-gaudi-backend-server` is updated to use the `opea/chatqna-guardrails:latest` image, indicating its design to integrate with these new guardrail services. This backend server now depends on the `tgi-guardrails-service` and `guardrails`, alongside existing dependencies like `redis-vector-db`, `tei-embedding-service`, `retriever`, `tei-reranking-service`, and `vllm-service`. The environment configurations for the backend are also updated to include settings for the guardrail services.
 
-| Service Name                  | Image Name                                           | Gaudi Specific | Uses LLM |
-|-------------------------------|------------------------------------------------------|----------------|----------|
-| redis-vector-db               | redis/redis-stack:7.2.0-v9                           | No             | No       |
-| dataprep-redis-service        | opea/dataprep:latest                                 | No             | No       |
-| *tgi-guardrails-service*      | ghcr.io/huggingface/tgi-gaudi:2.0.6                  | 1 card         | Yes      |
-| *guardrails*                  | opea/guardrails:latest                               | No             | No       |
-| tei-embedding-service         | ghcr.io/huggingface/text-embeddings-inference:cpu-1.5| No             | No       |
-| retriever                     | opea/retriever:latest                                | No             | No       |
-| tei-reranking-service         | ghcr.io/huggingface/tei-gaudi:1.5.0                  | 1 card         | No       |
-| vllm-service                  | opea/vllm-gaudi:latest                               | Configurable   | Yes      |
-| chatqna-gaudi-backend-server  | opea/chatqna-guardrails:latest                       | No             | No       |
-| chatqna-gaudi-ui-server       | opea/chatqna-ui:latest                               | No             | No       |
-| chatqna-gaudi-nginx-server    | opea/nginx:latest                                    | No             | No       |
+| Service Name                 | Image Name                                            | Gaudi Specific | Uses LLM |
+| ---------------------------- | ----------------------------------------------------- | -------------- | -------- |
+| redis-vector-db              | redis/redis-stack:7.2.0-v9                            | No             | No       |
+| dataprep-redis-service       | opea/dataprep:latest                                  | No             | No       |
+| _tgi-guardrails-service_     | ghcr.io/huggingface/tgi-gaudi:2.0.6                   | 1 card         | Yes      |
+| _guardrails_                 | opea/guardrails:latest                                | No             | No       |
+| tei-embedding-service        | ghcr.io/huggingface/text-embeddings-inference:cpu-1.5 | No             | No       |
+| retriever                    | opea/retriever:latest                                 | No             | No       |
+| tei-reranking-service        | ghcr.io/huggingface/tei-gaudi:1.5.0                   | 1 card         | No       |
+| vllm-service                 | opea/vllm-gaudi:latest                                | Configurable   | Yes      |
+| chatqna-gaudi-backend-server | opea/chatqna-guardrails:latest                        | No             | No       |
+| chatqna-gaudi-ui-server      | opea/chatqna-ui:latest                                | No             | No       |
+| chatqna-gaudi-nginx-server   | opea/nginx:latest                                     | No             | No       |
 
 The deployment with guardrails introduces additional Gaudi-specific services, such as the `tgi-guardrails-service`, which necessitates careful consideration of Gaudi allocation. This deployment aims to balance safety and performance, potentially requiring a strategic distribution of Gaudi devices between the guardrail services and the LLM tasks to maintain both operational safety and efficiency.
 
 ### Telemetry Enablement - compose.telemetry.yaml and compose_tgi.telemetry.yaml
 
-The telemetry Docker Compose files are incremental configurations designed to enhance existing deployments by integrating telemetry metrics, thereby providing valuable insights into the performance and behavior of certain services. This setup modifies specific services, such as the `tgi-service`, `tei-embedding-service` and `tei-reranking-service`, by adding a command-line argument that specifies an OpenTelemetry Protocol (OTLP) endpoint. This enables these services to export telemetry data to a designated endpoint, facilitating detailed monitoring and analysis. The `chatqna-gaudi-backend-server` is configured with environment variables that enable telemetry and specify the telemetry endpoint, ensuring that the backend server's operations are also monitored. 
+The telemetry Docker Compose files are incremental configurations designed to enhance existing deployments by integrating telemetry metrics, thereby providing valuable insights into the performance and behavior of certain services. This setup modifies specific services, such as the `tgi-service`, `tei-embedding-service` and `tei-reranking-service`, by adding a command-line argument that specifies an OpenTelemetry Protocol (OTLP) endpoint. This enables these services to export telemetry data to a designated endpoint, facilitating detailed monitoring and analysis. The `chatqna-gaudi-backend-server` is configured with environment variables that enable telemetry and specify the telemetry endpoint, ensuring that the backend server's operations are also monitored.
 
-Additionally, the telemetry files introduce a new service, `jaeger`, which uses the `jaegertracing/all-in-one:latest` image. Jaeger is a powerful open-source tool for tracing and monitoring distributed systems, offering a user-friendly interface for visualizing traces and understanding the flow of requests through the system. 
+Additionally, the telemetry files introduce a new service, `jaeger`, which uses the `jaegertracing/all-in-one:latest` image. Jaeger is a powerful open-source tool for tracing and monitoring distributed systems, offering a user-friendly interface for visualizing traces and understanding the flow of requests through the system.
 
 To enable Open Telemetry Tracing, compose.telemetry.yaml file needs to be merged along with default compose.yaml file on deployment:
 
@@ -221,28 +221,27 @@ For a TGI Deployment, this would become:
 docker compose -f compose_tgi.yaml -f compose_tgi.telemetry.yaml up -d
 ```
 
-## ChatQnA Service Configuration 
+## ChatQnA Service Configuration
 
 The table provides a comprehensive overview of the ChatQnA services utilized across various deployments as illustrated in the example Docker Compose files. Each row in the table represents a distinct service, detailing its possible images used to enable it and a concise description of its function within the deployment architecture. These services collectively enable functionalities such as data storage and management, text embedding, retrieval, reranking, and large language model processing. Additionally, specialized services like `tgi-service` and `guardrails` are included to enhance text generation inference and ensure operational safety, respectively. The table also highlights the integration of telemetry through the `jaeger` service, which provides tracing and monitoring capabilities.
 
-
-| Service Name                  | Possible Image Names                                      | Optional | Description                                                                 |
-|-------------------------------|-----------------------------------------------------------|----------|-----------------------------------------------------------------------------|
-| redis-vector-db               | redis/redis-stack:7.2.0-v9                                | No       | Acts as a Redis database for storing and managing data.                     |
-| dataprep-redis-service        | opea/dataprep:latest                 | No       | Prepares data and interacts with the Redis database.                        |
-| tei-embedding-service         | ghcr.io/huggingface/text-embeddings-inference:cpu-1.5     | No       | Provides text embedding services, often using Hugging Face models.          |
-| retriever                     | opea/retriever:latest                | No       | Retrieves data from the Redis database and interacts with embedding services.|
-| tei-reranking-service         | ghcr.io/huggingface/tei-gaudi:1.5.0                       | Yes      | Reranks text embeddings, typically using Gaudi hardware for enhanced performance.|
-| vllm-service                  | opea/vllm-gaudi:latest               | No       | Handles large language model (LLM) tasks, utilizing Gaudi hardware.         |
-| tgi-service                   | ghcr.io/huggingface/tgi-gaudi:2.0.6                       | Yes      | Specific to the TGI deployment, focuses on text generation inference using Gaudi hardware.|
-| tgi-guardrails-service        | ghcr.io/huggingface/tgi-gaudi:2.0.6                       | Yes      | Provides guardrails functionality, ensuring safe operations within defined limits.|
-| guardrails                    | opea/guardrails:latest               | Yes      | Acts as a safety layer, interfacing with the `tgi-guardrails-service` to enforce safety protocols.|
-| chatqna-gaudi-backend-server  | opea/chatqna:latest                  | No       | Serves as the backend for the ChatQnA application, with variations depending on the deployment.|
-|                               | opea/chatqna-without-rerank:latest   |          |                                                                                 |
-|                               | opea/chatqna-guardrails:latest       |          |                                                                                 |
-| chatqna-gaudi-ui-server       | opea/chatqna-ui:latest               | No       | Provides the user interface for the ChatQnA application.                     |
-| chatqna-gaudi-nginx-server    | opea/nginx:latest                    | No       | Acts as a reverse proxy, managing traffic between the UI and backend services.|
-| jaeger                        | jaegertracing/all-in-one:latest                           | Yes      | Provides tracing and monitoring capabilities for distributed systems.        |
+| Service Name                 | Possible Image Names                                  | Optional | Description                                                                                        |
+| ---------------------------- | ----------------------------------------------------- | -------- | -------------------------------------------------------------------------------------------------- |
+| redis-vector-db              | redis/redis-stack:7.2.0-v9                            | No       | Acts as a Redis database for storing and managing data.                                            |
+| dataprep-redis-service       | opea/dataprep:latest                                  | No       | Prepares data and interacts with the Redis database.                                               |
+| tei-embedding-service        | ghcr.io/huggingface/text-embeddings-inference:cpu-1.5 | No       | Provides text embedding services, often using Hugging Face models.                                 |
+| retriever                    | opea/retriever:latest                                 | No       | Retrieves data from the Redis database and interacts with embedding services.                      |
+| tei-reranking-service        | ghcr.io/huggingface/tei-gaudi:1.5.0                   | Yes      | Reranks text embeddings, typically using Gaudi hardware for enhanced performance.                  |
+| vllm-service                 | opea/vllm-gaudi:latest                                | No       | Handles large language model (LLM) tasks, utilizing Gaudi hardware.                                |
+| tgi-service                  | ghcr.io/huggingface/tgi-gaudi:2.0.6                   | Yes      | Specific to the TGI deployment, focuses on text generation inference using Gaudi hardware.         |
+| tgi-guardrails-service       | ghcr.io/huggingface/tgi-gaudi:2.0.6                   | Yes      | Provides guardrails functionality, ensuring safe operations within defined limits.                 |
+| guardrails                   | opea/guardrails:latest                                | Yes      | Acts as a safety layer, interfacing with the `tgi-guardrails-service` to enforce safety protocols. |
+| chatqna-gaudi-backend-server | opea/chatqna:latest                                   | No       | Serves as the backend for the ChatQnA application, with variations depending on the deployment.    |
+|                              | opea/chatqna-without-rerank:latest                    |          |                                                                                                    |
+|                              | opea/chatqna-guardrails:latest                        |          |                                                                                                    |
+| chatqna-gaudi-ui-server      | opea/chatqna-ui:latest                                | No       | Provides the user interface for the ChatQnA application.                                           |
+| chatqna-gaudi-nginx-server   | opea/nginx:latest                                     | No       | Acts as a reverse proxy, managing traffic between the UI and backend services.                     |
+| jaeger                       | jaegertracing/all-in-one:latest                       | Yes      | Provides tracing and monitoring capabilities for distributed systems.                              |
 
 Many of these services provide pipeline support required for all ChatQnA deployments, and are not specific to supporting the Intel Gaudi platform. Therefore, while the `redis-vector-db`, `dataprep-redis-service`, `retriever`, `chatqna-gaudi-backend-server`, `chatqna-gaudi-ui-server`, `chatqna-gaudi-nginx-server`, `jaeger` are configurable, they will not be covered by this example, which will focus on the configuration specifics of the services modified to support the Intel Gaudi platform.
 
@@ -250,7 +249,7 @@ Many of these services provide pipeline support required for all ChatQnA deploym
 
 In the configuration of the `vllm-service` and the `tgi-service`, two primary variables play a primary role in determining the service's performance and functionality: `LLM_MODEL_ID` and `NUM_CARDS`. Both can be set using the appropriate environment variables. The `LLM_MODEL_ID` parameter specifies the particular large language model (LLM) that the service will utilize, effectively determining the capabilities and characteristics of the language processing tasks it can perform. This model identifier ensures that the service is aligned with the specific requirements of the application, whether it involves text generation, comprehension, or other language-related tasks. The `NUM_CARDS` parameter dictates the number of Gaudi devices allocated to the service. A higher number of Gaudi devices can enhance parallel processing capabilities, reduce latency, and improve throughput.
 
-However, developers need to be aware of the models that have been tested with the appropriate service image supporting the `vllm-service` and `tgi-service`. For example, documentation for the OPEA GenAIComps v1.0 release specifiy the list of [validated LLM models](https://github.com/opea-project/GenAIComps/blob/v1.0/comps/llms/text-generation/README.md#validated-llm-models) for each Gaudi enabled service images. Specific models may have stringent requirements on the number of Intel Gaudi devices required to support them.
+However, developers need to be aware of the models that have been tested with the appropriate service image supporting the `vllm-service` and `tgi-service`. For example, documentation for the OPEA GenAIComps v1.0 release specify the list of [validated LLM models](https://github.com/opea-project/GenAIComps/blob/v1.0/comps/llms/text-generation/README.md#validated-llm-models) for each Gaudi enabled service images. Specific models may have stringent requirements on the number of Intel Gaudi devices required to support them.
 
 #### Deepseek Model Support for Intel Gaudi Platform ChatQnA pipeline
 
@@ -258,7 +257,7 @@ ChatQnA now supports running the latest DeepSeek models, including [deepseek-ai/
 
 ### tei-embedding-service & tei-reranking-service
 
-The `ghcr.io/huggingface/text-embeddings-inference:cpu-1.5` image supporting `tei-embedding-service` and `tei-reranking-service` depends on the `EMBEDDING_MODEL_ID` or `RERANK_MODEL_ID` environment variables repectively to specify the embedding model and reranking model used for converting text into vector representations and rankings. This choice impacts the quality and relevance of the embeddings rerankings for various applications. Unlike the `vllm-service`, the `tei-embedding-service` and `tei-reranking-service` each typically acquires only one Gaudi device and does not use the `NUM_CARDS` parameter; embedding and reranking tasks generally do not require extensive parallel processing and one Gaudi per service is appropriate. The list of [supported embedding and reranking models](https://github.com/huggingface/tei-gaudi?tab=readme-ov-file#supported-models) can be found at the the [huggingface/tei-gaudi](https://github.com/huggingface/tei-gaudi?tab=readme-ov-file#supported-models) website.
+The `ghcr.io/huggingface/text-embeddings-inference:cpu-1.5` image supporting `tei-embedding-service` and `tei-reranking-service` depends on the `EMBEDDING_MODEL_ID` or `RERANK_MODEL_ID` environment variables respectively to specify the embedding model and reranking model used for converting text into vector representations and rankings. This choice impacts the quality and relevance of the embeddings rerankings for various applications. Unlike the `vllm-service`, the `tei-embedding-service` and `tei-reranking-service` each typically acquires only one Gaudi device and does not use the `NUM_CARDS` parameter; embedding and reranking tasks generally do not require extensive parallel processing and one Gaudi per service is appropriate. The list of [supported embedding and reranking models](https://github.com/huggingface/tei-gaudi?tab=readme-ov-file#supported-models) can be found at the the [huggingface/tei-gaudi](https://github.com/huggingface/tei-gaudi?tab=readme-ov-file#supported-models) website.
 
 ### tgi-gaurdrails-service
 
