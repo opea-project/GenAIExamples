@@ -1,47 +1,40 @@
 # Copyright (C) 2024 Advanced Micro Devices, Inc.
 # SPDX-License-Identifier: Apache-2.0
 
-WORKPATH=$(dirname "$PWD")/..
 export ip_address=${host_ip}
-export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
-export AGENTQNA_TGI_IMAGE=ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
-export AGENTQNA_TGI_SERVICE_PORT="8085"
 
-# LLM related environment variables
-export AGENTQNA_CARD_ID="card1"
-export AGENTQNA_RENDER_ID="renderD136"
-export HF_CACHE_DIR=${HF_CACHE_DIR}
-ls $HF_CACHE_DIR
-export LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
-#export NUM_SHARDS=4
-export LLM_ENDPOINT_URL="http://${ip_address}:${AGENTQNA_TGI_SERVICE_PORT}"
+export WORKPATH=$(dirname "$PWD")
+export WORKDIR=${WORKPATH}/../../../../
+export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+export VLLM_SERVICE_PORT="8081"
+export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+export VLLM_LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
+
+export HF_CACHE_DIR="./data"
+
+export TOOLSET_PATH=$WORKDIR/GenAIExamples/AgentQnA/tools/
+export WORKER_RAG_AGENT_PORT="9095"
+export recursion_limit_worker=12
+export LLM_ENDPOINT_URL=http://${ip_address}:${VLLM_SERVICE_PORT}
+export LLM_MODEL_ID=${VLLM_LLM_MODEL_ID}
 export temperature=0.01
 export max_new_tokens=512
-
-# agent related environment variables
-export AGENTQNA_WORKER_AGENT_SERVICE_PORT="9095"
-export TOOLSET_PATH=/home/huggingface/datamonsters/amd-opea/GenAIExamples/AgentQnA/tools/
-echo "TOOLSET_PATH=${TOOLSET_PATH}"
-export recursion_limit_worker=12
-export recursion_limit_supervisor=10
-export WORKER_AGENT_URL="http://${ip_address}:${AGENTQNA_WORKER_AGENT_SERVICE_PORT}/v1/chat/completions"
 export RETRIEVAL_TOOL_URL="http://${ip_address}:8889/v1/retrievaltool"
-export CRAG_SERVER=http://${ip_address}:18881
+export LANGCHAIN_API_KEY=${LANGCHAIN_API_KEY}
+export LANGCHAIN_TRACING_V2=${LANGCHAIN_TRACING_V2}
 
-export AGENTQNA_FRONTEND_PORT="9090"
+export WORKER_SQL_AGENT_PORT="9096"
+export db_name=Chinook
+export db_path="sqlite:////home/user/chinook-db/Chinook_Sqlite.sqlite"
+export recursion_limit_worker=12
 
-#retrieval_tool
-export TEI_EMBEDDING_ENDPOINT="http://${host_ip}:6006"
-export TEI_RERANKING_ENDPOINT="http://${host_ip}:8808"
-export REDIS_URL="redis://${host_ip}:26379"
-export INDEX_NAME="rag-redis"
-export MEGA_SERVICE_HOST_IP=${host_ip}
-export EMBEDDING_SERVICE_HOST_IP=${host_ip}
-export RETRIEVER_SERVICE_HOST_IP=${host_ip}
-export RERANK_SERVICE_HOST_IP=${host_ip}
-export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8889/v1/retrievaltool"
-export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/ingest"
-export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/get"
-export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/delete"
+export SUPERVISOR_REACT_AGENT_PORT="9090"
+export recursion_limit_supervisor=10
+export CRAG_SERVER_PORT="18881"
+export CRAG_SERVER=http://${ip_address}:${CRAG_SERVER_PORT}
+export WORKER_AGENT_URL="http://${ip_address}:${WORKER_RAG_AGENT_PORT}/v1/chat/completions"
+export SQL_AGENT_URL="http://${ip_address}:${WORKER_SQL_AGENT_PORT}/v1/chat/completions"
 
-docker compose -f compose.yaml up -d
+bash ../../../../retrieval_tool/launch_retrieval_tool.sh
+
+docker compose -f compose_vllm.yaml up -d
