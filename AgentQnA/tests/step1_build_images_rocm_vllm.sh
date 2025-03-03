@@ -17,7 +17,7 @@ function get_genai_comps() {
 
 
 function build_docker_images_for_retrieval_tool(){
-    cd $WORKPATH/../../DocIndexRetriever/docker_image_build/
+    cd $WORKPATH/../DocIndexRetriever/docker_image_build/
     get_genai_comps
     echo "Build all the images with --no-cache..."
     service_list="doc-index-retriever dataprep embedding retriever reranking"
