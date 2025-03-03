@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 set -e
-WORKPATH=$(dirname "$PWD")
+export WORKPATH=$(dirname "$PWD")
 export WORKDIR=$WORKPATH/../../
 echo "WORKDIR=${WORKDIR}"
 export ip_address=$(hostname -I | awk '{print $1}')
