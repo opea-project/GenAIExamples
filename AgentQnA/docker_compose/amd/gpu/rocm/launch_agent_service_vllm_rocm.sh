@@ -1,6 +1,13 @@
 # Copyright (C) 2024 Advanced Micro Devices, Inc.
 # SPDX-License-Identifier: Apache-2.0
 
+# Before start script:
+# export HUGGINGFACEHUB_API_TOKEN="your_huggingface_api_token"
+# export LANGCHAIN_API_KEY="your_langchain_api_key"
+# export LANGCHAIN_TRACING_V2=""
+
+
+
 export ip_address=${host_ip}
 
 export WORKPATH=$(dirname "$PWD")
