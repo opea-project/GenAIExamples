@@ -14,7 +14,6 @@ from llama_index.llms.openai_like import OpenAILike
 from pydantic import model_serializer
 from unstructured.staging.base import elements_from_base64_gzipped_json
 
-
 DEFAULT_TEMPLATE = """
 <|im_start|>System: You are an AI assistant. Your task is to learn from the following context. Then answer the user's question based on what you learned from the context but not your own knowledge.<|im_end|>
 
@@ -41,7 +40,7 @@ async def stream_generator(llm, prompt_str, retrieved_nodes=[], text_gen_context
 
 class QnAGenerator(BaseComponent):
 
-    def __init__(self, llm_model, prompt_template_file, inference_type, **kwargs):        
+    def __init__(self, llm_model, prompt_template_file, inference_type, **kwargs):
         BaseComponent.__init__(
             self,
             comp_type=CompType.GENERATOR,
