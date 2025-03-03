@@ -8,7 +8,7 @@ services:
     ports:
       - "8008:80"
     volumes:
-      - "./data:/data"
+      - "${MODEL_CACHE}:/data"
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
