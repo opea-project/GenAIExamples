@@ -64,35 +64,6 @@ services:
       LANGCHAIN_PROJECT: "opea-worker-agent-service"
       port: ${WORKER_RAG_AGENT_PORT:-9095}
 
-  worker-sql-agent:
-    image: opea/agent:latest
-    container_name: sql-agent-endpoint
-    volumes:
-      - ${WORKDIR}/GenAIExamples/AgentQnA/tests:/home/user/chinook-db # test db
-    ports:
-      - "${WORKER_SQL_AGENT_PORT:-9096}:9096"
-    ipc: host
-    environment:
-      ip_address: ${ip_address}
-      strategy: sql_agent_llama
-      with_memory: false
-      db_name: ${db_name}
-      db_path: ${db_path}
-      use_hints: false
-      recursion_limit: ${recursion_limit_worker}
-      llm_engine: vllm
-      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
-      llm_endpoint_url: ${LLM_ENDPOINT_URL}
-      model: ${LLM_MODEL_ID}
-      temperature: ${temperature}
-      max_new_tokens: ${max_new_tokens}
-      stream: false
-      require_human_feedback: false
-      no_proxy: ${no_proxy}
-      http_proxy: ${http_proxy}
-      https_proxy: ${https_proxy}
-      port: ${WORKER_SQL_AGENT_PORT:-9096}
-
   supervisor-react-agent:
     image: opea/agent:latest
     container_name: react-agent-endpoint
