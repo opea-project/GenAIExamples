@@ -102,7 +102,7 @@ services:
     volumes:
       - ${TOOLSET_PATH}:/home/user/tools/
     ports:
-      - "${SUPERVISOR_REACT_AGENT_PORT:=9090}:9090"
+      - "${SUPERVISOR_REACT_AGENT_PORT:-9090}:9090"
     ipc: host
     environment:
       ip_address: ${ip_address}
