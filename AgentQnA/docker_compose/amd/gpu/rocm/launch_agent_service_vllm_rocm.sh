@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 # Before start script:
+# export host_ip="your_host_ip_or_host_name"
 # export HUGGINGFACEHUB_API_TOKEN="your_huggingface_api_token"
 # export LANGCHAIN_API_KEY="your_langchain_api_key"
 # export LANGCHAIN_TRACING_V2=""
@@ -19,7 +20,7 @@ export VLLM_LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
 
 export HF_CACHE_DIR="./data"
 
-export TOOLSET_PATH=$WORKDIR/GenAIExamples/AgentQnA/tools/
+export TOOLSET_PATH=$WORKPATH/../../../../tools/
 export WORKER_RAG_AGENT_PORT="9095"
 export recursion_limit_worker=12
 export LLM_ENDPOINT_URL=http://${ip_address}:${VLLM_SERVICE_PORT}
