@@ -101,6 +101,7 @@ function validate_service() {
 
 function validate_microservices() {
     # Check if the microservices are running correctly.
+    sleep 10m
 
     # tei for embedding service
     validate_service \
