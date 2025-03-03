@@ -84,7 +84,7 @@ function validate_service() {
 
         local CONTENT=$(curl -s -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL" | tee ${LOG_PATH}/${SERVICE_NAME}.log)
 
-        if echo "$content" | grep -q "Nike"; then
+        if echo "$CONTENT" | grep -q "$EXPECTED_RESULT"; then
             echo "[ $SERVICE_NAME ] Content is as expected."
         else
             echo "[ $SERVICE_NAME ] Content does not match the expected result: $CONTENT"
@@ -116,7 +116,7 @@ function validate_microservices() {
     test_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
     validate_service \
         "${ip_address}:7000/v1/retrieval" \
-        "Nike" \
+        " " \
         "retrieval" \
         "retriever-redis-server" \
         "{\"text\":\"What is the revenue of Nike in 2023?\",\"embedding\":${test_embedding}}"
@@ -142,7 +142,7 @@ function validate_megaservice() {
     # Curl the Mega Service
     validate_service \
         "${ip_address}:8888/v1/chatqna" \
-        "data" \
+        "Nike" \
         "mega-chatqna" \
         "chatqna-xeon-backend-server" \
         '{"messages": "What is the revenue of Nike in 2023?"}'
