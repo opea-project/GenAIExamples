@@ -26,6 +26,13 @@ ls $HF_CACHE_DIR
 vllm_port=8086
 vllm_volume=${HF_CACHE_DIR}
 
+function download_chinook_data(){
+    echo "Downloading chinook data..."
+    cd $WORKDIR
+    git clone https://github.com/lerocha/chinook-database.git
+    cp chinook-database/ChinookDatabase/DataSources/Chinook_Sqlite.sqlite $WORKDIR/GenAIExamples/AgentQnA/tests/
+}
+
 function start_agent_and_api_server() {
     echo "Starting CRAG server"
     docker rm kdd-cup-24-crag-service --force
@@ -75,19 +82,19 @@ function validate_agent_service() {
         exit 1
     fi
 
-    # # test worker sql agent
-#    echo "======================Testing worker sql agent======================"
-#    export agent_port="9096"
-#    prompt="How many employees are there in the company?"
-#    local CONTENT=$(python3 $WORKDIR/GenAIExamples/AgentQnA/tests/test.py --prompt "$prompt" --agent_role "worker" --ext_port $agent_port)
-#    local EXIT_CODE=$(validate "$CONTENT" "8" "sql-agent-endpoint")
-#    echo $CONTENT
-#    # echo $EXIT_CODE
-#    local EXIT_CODE="${EXIT_CODE:0-1}"
-#    if [ "$EXIT_CODE" == "1" ]; then
-#        docker logs sql-agent-endpoint
-#        exit 1
-#    fi
+     # test worker sql agent
+    echo "======================Testing worker sql agent======================"
+    export agent_port="9096"
+    prompt="How many employees are there in the company?"
+    local CONTENT=$(python3 $WORKDIR/GenAIExamples/AgentQnA/tests/test.py --prompt "$prompt" --agent_role "worker" --ext_port $agent_port)
+    local EXIT_CODE=$(validate "$CONTENT" "8" "sql-agent-endpoint")
+    echo $CONTENT
+    # echo $EXIT_CODE
+    local EXIT_CODE="${EXIT_CODE:0-1}"
+    if [ "$EXIT_CODE" == "1" ]; then
+        docker logs sql-agent-endpoint
+        exit 1
+    fi
 
     # test supervisor react agent
     echo "======================Testing supervisor react agent======================"
@@ -104,23 +111,19 @@ function validate_agent_service() {
 
 }
 
-#function remove_chinook_data(){
-#    echo "Removing chinook data..."
-#    cd $WORKDIR
-#    if [ -d "chinook-database" ]; then
-#        rm -rf chinook-database
-#    fi
-#    echo "Chinook data removed!"
-#}
+function remove_chinook_data(){
+    echo "Removing chinook data..."
+    cd $WORKDIR
+    if [ -d "chinook-database" ]; then
+        rm -rf chinook-database
+    fi
+    echo "Chinook data removed!"
+}
 
 function main() {
-#    echo "==================== Prepare data ===================="
-#    download_chinook_data
-#    echo "==================== Data prepare done ===================="
-
-#    echo "==================== Start VLLM service ===================="
-#    start_vllm_service_70B
-#    echo "==================== VLLM service started ===================="
+    echo "==================== Prepare data ===================="
+    download_chinook_data
+    echo "==================== Data prepare done ===================="
 
     echo "==================== Start agent ===================="
     start_agent_and_api_server
@@ -132,8 +135,8 @@ function main() {
 }
 
 
-#remove_chinook_data
+remove_chinook_data
 
 main
 
-#remove_chinook_data
+remove_chinook_data
