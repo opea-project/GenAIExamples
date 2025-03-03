@@ -28,6 +28,7 @@ vllm_volume=${HF_CACHE_DIR}
 
 function start_agent_and_api_server() {
     echo "Starting CRAG server"
+    docker rm kdd-cup-24-crag-service --force
     docker run -d --runtime=runc --name=kdd-cup-24-crag-service -p=8080:8000 docker.io/aicrowd/kdd-cup-24-crag-mock-api:v0
 
     echo "Starting Agent services"
