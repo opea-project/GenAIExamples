@@ -5,7 +5,7 @@
 set -e
 
 WORKPATH=$(dirname "$PWD")
-export WORKDIR=$WORKPATH/../../
+export WORKDIR=$WORKPATH/../
 echo "WORKDIR=${WORKDIR}"
 export ip_address=$(hostname -I | awk '{print $1}')
 export host_ip=$ip_address
@@ -28,7 +28,7 @@ function validate() {
 
 function ingest_data_and_validate() {
     echo "Ingesting data"
-    cd $WORKPATH/retrieval_tool/
+    cd $WORKPATH/AgentQnA/retrieval_tool/
     echo $PWD
     local CONTENT=$(bash run_ingest_data.sh)
     local EXIT_CODE=$(validate "$CONTENT" "Data preparation succeeded" "dataprep-redis-server")
