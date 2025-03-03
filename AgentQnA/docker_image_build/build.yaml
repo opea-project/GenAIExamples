@@ -2,51 +2,6 @@
 # SPDX-License-Identifier: Apache-2.0
 
 services:
-  dataprep:
-    build:
-      context: GenAIComps
-      dockerfile: comps/dataprep/src/Dockerfile
-      args:
-        http_proxy: ${http_proxy}
-        https_proxy: ${https_proxy}
-        no_proxy: ${no_proxy}
-    image: ${REGISTRY:-opea}/dataprep:${TAG:-latest}
-  embedding:
-    build:
-      context: GenAIComps
-      dockerfile: comps/embeddings/src/Dockerfile
-      args:
-        http_proxy: ${http_proxy}
-        https_proxy: ${https_proxy}
-        no_proxy: ${no_proxy}
-    image: ${REGISTRY:-opea}/embedding:${TAG:-latest}
-  retriever:
-    build:
-      context: GenAIComps
-      dockerfile: comps/retrievers/src/Dockerfile
-      args:
-        http_proxy: ${http_proxy}
-        https_proxy: ${https_proxy}
-        no_proxy: ${no_proxy}
-    image: ${REGISTRY:-opea}/retriever:${TAG:-latest}
-  reranking:
-    build:
-      context: GenAIComps
-      dockerfile: comps/rerankings/src/Dockerfile
-      args:
-        http_proxy: ${http_proxy}
-        https_proxy: ${https_proxy}
-        no_proxy: ${no_proxy}
-    image: ${REGISTRY:-opea}/reranking:${TAG:-latest}
-  doc-index-retriever:
-    build:
-      context: ../../DocIndexRetriever
-      dockerfile: ./Dockerfile
-      args:
-        http_proxy: ${http_proxy}
-        https_proxy: ${https_proxy}
-        no_proxy: ${no_proxy}
-    image: ${REGISTRY:-opea}/doc-index-retriever:${TAG:-latest}
   agent:
     build:
       context: GenAIComps
