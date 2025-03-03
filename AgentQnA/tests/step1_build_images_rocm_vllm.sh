@@ -4,7 +4,7 @@
 
 set -e
 export WORKPATH=$(dirname "$PWD")
-export WORKDIR=$WORKPATH/../../
+export WORKDIR=${WORKPATH}/../../
 echo "WORKDIR=${WORKDIR}"
 export ip_address=$(hostname -I | awk '{print $1}')
 
