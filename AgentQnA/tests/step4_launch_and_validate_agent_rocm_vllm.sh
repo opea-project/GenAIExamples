@@ -9,6 +9,7 @@ export LOG_PATH=${WORKPATH}
 export WORKDIR=$WORKPATH/../../
 echo "WORKDIR=${WORKDIR}"
 export ip_address=$(hostname -I | awk '{print $1}')
+export host_ip=${ip_address}
 export TOOLSET_PATH=$WORKPATH/tools/
 export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
 HF_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
