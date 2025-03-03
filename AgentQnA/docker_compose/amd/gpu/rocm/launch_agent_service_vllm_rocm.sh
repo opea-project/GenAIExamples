@@ -67,4 +67,4 @@ export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:6009/v1/dataprep/delete"
 
 docker compose -f ../../../../../DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml up -d
 
-docker compose -f compose_vllm.yaml up -d --force-recreate
+docker compose -f compose_vllm.yaml up -d
