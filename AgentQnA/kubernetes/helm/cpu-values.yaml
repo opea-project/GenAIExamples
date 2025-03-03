@@ -1,0 +1,26 @@
+# Copyright (C) 2025 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+# Accelerate inferencing in heaviest components to improve performance
+# by overriding their subchart values
+
+vllm:
+  enabled: true
+  accelDevice: ""
+  resources:
+    limits:
+      habana.ai/gaudi: 0
+  image:
+    repository: opea/vllm
+  LLM_MODEL_ID: "meta-llama/Llama-3.2-3B-Instruct"
+  VLLM_CPU_KVCACHE_SPACE: 40
+  extraCmdArgs: ["--max-seq-len-to-capture", "16384"]
+supervisor:
+  llm_endpoint_url: http://{{ .Release.Name }}-vllm
+  model: "meta-llama/Llama-3.2-3B-Instruct"
+ragagent:
+  llm_endpoint_url: http://{{ .Release.Name }}-vllm
+  model: "meta-llama/Llama-3.2-3B-Instruct"
+sqlagent:
+  llm_endpoint_url: http://{{ .Release.Name }}-vllm
+  model: "meta-llama/Llama-3.2-3B-Instruct"
