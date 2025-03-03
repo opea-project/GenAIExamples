@@ -101,6 +101,7 @@ function validate_service() {
 
 function validate_microservices() {
     # Check if the microservices are running correctly.
+    sleep 10m
 
     # tei for embedding service
     validate_service \
@@ -142,7 +143,7 @@ function validate_megaservice() {
     # Curl the Mega Service
     validate_service \
         "${ip_address}:8888/v1/chatqna" \
-        "data" \
+        "Nike" \
         "mega-chatqna" \
         "chatqna-xeon-backend-server" \
         '{"messages": "What is the revenue of Nike in 2023?"}'
