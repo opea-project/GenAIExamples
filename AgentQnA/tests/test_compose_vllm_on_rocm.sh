@@ -6,6 +6,7 @@ set -xe
 
 WORKPATH=$(dirname "$PWD")
 export WORKDIR=$WORKPATH/../../
+export LOG_PATH=$WORKPATH
 echo "WORKDIR=${WORKDIR}"
 export ip_address=$(hostname -I | awk '{print $1}')
 export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
