@@ -69,7 +69,6 @@ services:
     container_name: react-agent-endpoint
     depends_on:
       - worker-rag-agent
-      - worker-sql-agent
     volumes:
       - ${TOOLSET_PATH}:/home/user/tools/
     ports:
