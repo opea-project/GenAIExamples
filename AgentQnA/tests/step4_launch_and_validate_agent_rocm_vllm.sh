@@ -30,7 +30,7 @@ function download_chinook_data(){
     echo "Downloading chinook data..."
     cd $WORKDIR
     git clone https://github.com/lerocha/chinook-database.git
-    cp chinook-database/ChinookDatabase/DataSources/Chinook_Sqlite.sqlite $WORKDIR/GenAIExamples/AgentQnA/tests/
+    cp chinook-database/ChinookDatabase/DataSources/Chinook_Sqlite.sqlite ${WORKDIR}/GenAIExamples/AgentQnA/tests/
 }
 
 function start_agent_and_api_server() {
