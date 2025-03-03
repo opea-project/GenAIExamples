@@ -8,7 +8,7 @@ vllm:
   enabled: true
   accelDevice: ""
   resources:
-    limits: 
+    limits:
       habana.ai/gaudi: 0
   image:
     repository: opea/vllm
