@@ -38,7 +38,7 @@ function build_agent_docker_image() {
 
 function build_vllm_docker_image() {
     echo "Building the vllm docker image"
-    cd $WORKPATH/../
+    cd $WORKPATH/
     docker build --no-cache -t opea/llm-vllm-rocm:ci -f Dockerfile-vllm-rocm .
 
     docker images && sleep 3s
