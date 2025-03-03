@@ -76,7 +76,7 @@ jobs:
 
   build-deploy-gmc:
     needs: [get-test-matrix]
-    if: ${{ fromJSON(inputs.deploy_gmc) }} && ${{ fromJSON(needs.get-test-matrix.outputs.nodes).length != 0 }}
+    if: ${{ fromJSON(inputs.deploy_gmc) }}
     strategy:
       matrix:
         node: ${{ fromJson(needs.get-test-matrix.outputs.nodes) }}
@@ -90,7 +90,7 @@ jobs:
 
   run-examples:
     needs: [get-test-matrix, build-deploy-gmc]
-    if: always() && ${{ fromJSON(needs.get-test-matrix.outputs.examples).length != 0 }}
+    if: always()
     strategy:
       matrix:
         example: ${{ fromJson(needs.get-test-matrix.outputs.examples) }}
