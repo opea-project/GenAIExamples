@@ -263,8 +263,8 @@ function main() {
     echo "==== microservices validated ===="
     validate_megaservice
     echo "==== megaservice validated ===="
-    # validate_frontend
-    # echo "==== frontend validated ===="
+    validate_frontend
+    echo "==== frontend validated ===="
 
     stop_docker
     echo y | docker system prune
