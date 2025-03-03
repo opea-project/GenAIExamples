@@ -28,7 +28,7 @@ function validate() {
 
 function ingest_data_and_validate() {
     echo "Ingesting data"
-    cd $WORKPATH/AgentQnA/retrieval_tool/
+    cd $WORKPATH/retrieval_tool/
     echo $PWD
     local CONTENT=$(bash run_ingest_data.sh)
     local EXIT_CODE=$(validate "$CONTENT" "Data preparation succeeded" "dataprep-redis-server")
