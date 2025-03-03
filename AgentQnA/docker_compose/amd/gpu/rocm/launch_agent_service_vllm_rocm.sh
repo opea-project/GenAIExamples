@@ -33,7 +33,7 @@ export LANGCHAIN_TRACING_V2=${LANGCHAIN_TRACING_V2}
 
 export WORKER_SQL_AGENT_PORT="9096"
 export db_name=Chinook
-export db_path="sqlite://~/chinook-db/Chinook_Sqlite.sqlite"
+export db_path="sqlite:////home/user/chinook-db/Chinook_Sqlite.sqlite"
 export recursion_limit_worker=12
 
 export SUPERVISOR_REACT_AGENT_PORT="9090"
