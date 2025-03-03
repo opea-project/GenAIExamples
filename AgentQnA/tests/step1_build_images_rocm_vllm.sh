@@ -28,7 +28,7 @@ function build_docker_images_for_retrieval_tool(){
 }
 
 function build_agent_docker_image() {
-    cd $WORKPATH/../docker_image_build/
+    cd $WORKPATH/docker_image_build/
     get_genai_comps
     echo "Build agent image with --no-cache..."
     docker compose -f build.yaml build --no-cache
