@@ -6,7 +6,8 @@ import time
 from typing import Any, Callable, List, Optional
 
 from comps.cores.proto.api_protocol import ChatCompletionRequest
-from edgecraftrag.base import BaseComponent, CallbackType, CompType, InferenceType
+from edgecraftrag.base import BaseComponent, CallbackType, CompType, InferenceType, RetrieverType
+from edgecraftrag.components.retriever import AutoMergeRetriever, SimpleBM25Retriever, VectorSimRetriever
 from edgecraftrag.components.postprocessor import RerankProcessor
 from fastapi.responses import StreamingResponse
 from llama_index.core.schema import Document, QueryBundle
@@ -42,25 +43,65 @@ class Pipeline(BaseComponent):
         self.run_pipeline_cb = run_test_generator_ben if self.enable_benchmark else run_test_generator
         self.run_retriever_cb = run_test_retrieve
         self.run_data_prepare_cb = run_simple_doc
-        self.run_data_update_cb = run_update_doc
-        self._node_changed = True
+
+        self._node_changed = False
+        self._index_changed = False
+        self._index_to_retriever_updated = True
 
     # TODO: consider race condition
     @property
     def node_changed(self) -> bool:
         return self._node_changed
 
+    def reset_node_status(self) -> bool:
+        self._node_changed = False
+        self._index_changed = False
+        self._index_to_retriever_updated = True
+
+    def check_active(self, nodelist):
+        if self._node_changed:
+            if not self._index_changed:
+                print("Reinitializing indexer ...")
+                self.indexer.reinitialize_indexer()
+                self._index_changed = True
+                self._index_to_retriever_updated = False
+
+            if nodelist is not None and len(nodelist) > 0:
+                self.update_nodes(nodelist)
+            self._node_changed = False
+
+        # Due to limitation, need to update retriever's db after reinitialize_indexer()
+        if self._index_changed and not self._index_to_retriever_updated:
+            self.update_indexer_to_retriever()
+            self._index_changed = False
+            self._index_to_retriever_updated = True
+
+        self.reset_node_status()
+
     # TODO: update doc changes
     # TODO: more operations needed, add, del, modify
     def update_nodes(self, nodes):
-        print("updating nodes ", nodes)
+        print(f"Updating {len(nodes)} nodes ...")
         if self.indexer is not None:
             self.indexer.insert_nodes(nodes)
 
-    # TODO: check more conditions
-    def check_active(self, nodelist):
-        if self._node_changed and nodelist is not None:
-            self.update_nodes(nodelist)
+    def update_indexer_to_retriever(self):
+        print("Updating indexer to retriever ...")
+        if self.indexer is not None and self.retriever is not None:
+            old_retriever = self.retriever
+            retriever_type = old_retriever.comp_subtype
+            similarity_top_k = old_retriever.topk
+            match retriever_type:
+                case RetrieverType.VECTORSIMILARITY:
+                    new_retriever = VectorSimRetriever(self.indexer, similarity_top_k=similarity_top_k)
+                case RetrieverType.AUTOMERGE:
+                    new_retriever = AutoMergeRetriever(self.indexer, similarity_top_k=similarity_top_k)
+                case RetrieverType.BM25:
+                    new_retriever = SimpleBM25Retriever(self.indexer, similarity_top_k=similarity_top_k)
+                case _:
+                    new_retriever = old_retriever
+
+            self.retriever = new_retriever
 
     # Implement abstract run function
     # callback dispatcher
@@ -70,9 +111,6 @@ class Pipeline(BaseComponent):
             if kwargs["cbtype"] == CallbackType.DATAPREP:
                 if "docs" in kwargs:
                     return self.run_data_prepare_cb(self, docs=kwargs["docs"])
-            if kwargs["cbtype"] == CallbackType.DATAUPDATE:
-                if "docs" in kwargs:
-                    return self.run_data_update_cb(self, docs=kwargs["docs"])
             if kwargs["cbtype"] == CallbackType.RETRIEVE:
                 if "chat_request" in kwargs:
                     return self.run_retriever_cb(self, chat_request=kwargs["chat_request"])
@@ -146,18 +184,6 @@ def run_test_retrieve(pl: Pipeline, chat_request: ChatCompletionRequest) -> Any:
 def run_simple_doc(pl: Pipeline, docs: List[Document]) -> Any:
     n = pl.node_parser.run(docs=docs)
     if pl.indexer is not None:
-        pl.indexer.insert_nodes(n)
-    print(pl.indexer._index_struct)
-    return n
-
-
-def run_update_doc(pl: Pipeline, docs: List[Document]) -> Any:
-    n = pl.node_parser.run(docs=docs)
-    if pl.indexer is not None:
-        pl.indexer.reinitialize_indexer()
-        pl.retriever._vector_store = pl.indexer.vector_store
-        pl.retriever._docstore = pl.indexer.docstore
-
         pl.indexer.insert_nodes(n)
     print(pl.indexer._index_struct)
     return n

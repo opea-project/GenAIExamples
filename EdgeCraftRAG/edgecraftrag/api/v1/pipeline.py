@@ -117,6 +117,12 @@ def update_pipeline_handler(pl, req):
                     pl.node_parser = UnstructedNodeParser(chunk_size=np.chunk_size, chunk_overlap=np.chunk_overlap)
             ctx.get_node_parser_mgr().add(pl.node_parser)
 
+            all_docs = ctx.get_file_mgr().get_all_docs()
+            nodelist = pl.node_parser.run(docs=all_docs)
+            if nodelist is not None and len(nodelist) > 0:
+                ctx.get_node_mgr().add_nodes(pl.node_parser.idx, nodelist)
+            pl._node_changed = True
+
     if req.indexer is not None:
         ind = req.indexer
         found_indexer = ctx.get_indexer_mgr().search_indexer(ind)
@@ -138,6 +144,10 @@ def update_pipeline_handler(pl, req):
                 case _:
                     pass
             ctx.get_indexer_mgr().add(pl.indexer)
+            pl._index_changed = True
+            pl._index_to_retriever_updated = False
+            # As indexer changed, nodes are cleared in indexer's db
+            pl._node_changed = True
 
     if req.retriever is not None:
         retr = req.retriever
@@ -160,6 +170,8 @@ def update_pipeline_handler(pl, req):
                     return "No indexer"
             case _:
                 pass
+        # Index is updated to retriever
+        pl._index_to_retriever_updated = True
 
     if req.postprocessor is not None:
         pp = req.postprocessor

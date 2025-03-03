@@ -15,6 +15,18 @@ from pydantic import model_serializer
 from unstructured.staging.base import elements_from_base64_gzipped_json
 
 
+DEFAULT_TEMPLATE = """
+<|im_start|>System: You are an AI assistant. Your task is to learn from the following context. Then answer the user's question based on what you learned from the context but not your own knowledge.<|im_end|>
+
+<|im_start|>{context}<|im_end|>
+
+<|im_start|>System: Pay attention to your formatting of response. If you need to reference content from context, try to keep the formatting.<|im_end|>
+<|im_start|>System: Try to summarize from the context, do some reasoning before response, then response. Make sure your response is logically sound and self-consistent.<|im_end|>
+
+<|im_start|>{input}
+"""
+
+
 async def stream_generator(llm, prompt_str, retrieved_nodes=[], text_gen_context=""):
     response = llm.stream_complete(prompt_str)
     for r in response:
@@ -29,7 +41,7 @@ async def stream_generator(llm, prompt_str, retrieved_nodes=[], text_gen_context
 
 class QnAGenerator(BaseComponent):
 
-    def __init__(self, llm_model, prompt_template, inference_type, **kwargs):
+    def __init__(self, llm_model, prompt_template_file, inference_type, **kwargs):        
         BaseComponent.__init__(
             self,
             comp_type=CompType.GENERATOR,
@@ -40,13 +52,19 @@ class QnAGenerator(BaseComponent):
             ("\n\n", "\n"),
             ("\t\n", "\n"),
         )
-        safe_root = "/templates"
-        template = os.path.normpath(os.path.join(safe_root, prompt_template))
-        if not template.startswith(safe_root):
-            raise ValueError("Invalid template path")
-        if not os.path.exists(template):
-            raise ValueError("Template file not exists")
-        self.prompt = DocumentedContextRagPromptTemplate.from_file(template)
+
+        if prompt_template_file is None:
+            print("There is no template file, using the default template.")
+            self.prompt = DocumentedContextRagPromptTemplate.from_template(DEFAULT_TEMPLATE)
+        else:
+            safe_root = "/templates"
+            template_path = os.path.normpath(os.path.join(safe_root, prompt_template_file))
+            if not template_path.startswith(safe_root):
+                raise ValueError("Invalid template path")
+            if not os.path.exists(template_path):
+                raise ValueError("Template file not exists")
+            self.prompt = DocumentedContextRagPromptTemplate.from_file(template_path)
+
         self.llm = llm_model
         if isinstance(llm_model, str):
             self.model_id = llm_model
