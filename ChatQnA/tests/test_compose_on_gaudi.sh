@@ -137,7 +137,7 @@ function validate_megaservice() {
     # Curl the Mega Service
     validate_service \
         "${ip_address}:8888/v1/chatqna" \
-        "data:" \
+        "Nike" \
         "mega-chatqna" \
         "chatqna-gaudi-backend-server" \
         '{"messages": "What is the revenue of Nike in 2023?"}'
@@ -189,7 +189,7 @@ function main() {
 
     validate_microservices
     validate_megaservice
-    # validate_frontend
+    validate_frontend
 
     stop_docker
     echo y | docker system prune
