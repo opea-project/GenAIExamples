@@ -38,6 +38,8 @@ To set up environment variables for deploying ChatQnA services, follow these ste
    export LLM_SERVICE_HOST_IP=${host_ip}
    export LLM_SERVICE_PORT=9000
    export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/faqgen"
+   export MAX_INPUT_TOKENS=4096
+   export MAX_TOTAL_TOKENS=8192
    ```
 
 ### Quick Start: 2.Run Docker Compose
@@ -164,6 +166,8 @@ export MEGA_SERVICE_HOST_IP=${host_ip}
 export LLM_SERVICE_HOST_IP=${host_ip}
 export LLM_ENDPOINT="http://${host_ip}:${LLM_ENDPOINT_PORT}"
 export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/faqgen"
+export MAX_INPUT_TOKENS=4096
+export MAX_TOTAL_TOKENS=8192
 ```
 
 Note: Please replace with `host_ip` with your external IP address, do not use localhost.
