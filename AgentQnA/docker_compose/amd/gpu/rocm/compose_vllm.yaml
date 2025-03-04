@@ -68,7 +68,7 @@ services:
     image: opea/agent:latest
     container_name: sql-agent-endpoint
     volumes:
-      - "${WORKPATH}/tests/Chinook_Sqlite.sqlite:/home/user/chinook-db/Chinook_Sqlite.sqlite:rw"
+      - "${WORKDIR}/tests/Chinook_Sqlite.sqlite:/home/user/chinook-db/Chinook_Sqlite.sqlite:rw"
     ports:
       - "${WORKER_SQL_AGENT_PORT:-9096}:9096"
     ipc: host
