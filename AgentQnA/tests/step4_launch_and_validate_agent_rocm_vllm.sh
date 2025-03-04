@@ -62,8 +62,7 @@ function validate() {
 function validate_agent_service() {
     # # test worker rag agent
     echo "======================Testing worker rag agent======================"
-    echo "agent_port = ${WORKER_RAG_AGENT_PORT}"
-    export agent_port=${WORKER_RAG_AGENT_PORT}
+    export agent_port=${cat ${WORKPATH}/docker_compose/amd/gpu/WORKER_RAG_AGENT_PORT_tmp}
     prompt="Tell me about Michael Jackson song Thriller"
     local CONTENT=$(python3 $WORKDIR/GenAIExamples/AgentQnA/tests/test.py --prompt "$prompt" --agent_role "worker" --ext_port $agent_port)
     # echo $CONTENT
@@ -77,8 +76,7 @@ function validate_agent_service() {
 
      # test worker sql agent
     echo "======================Testing worker sql agent======================"
-    echo "agent_port = ${WORKER_SQL_AGENT_PORT}"
-    export agent_port=${WORKER_SQL_AGENT_PORT}
+    export agent_port=${cat ${WORKPATH}/docker_compose/amd/gpu/WORKER_SQL_AGENT_PORT_tmp}
     prompt="How many employees are there in the company?"
     local CONTENT=$(python3 $WORKDIR/GenAIExamples/AgentQnA/tests/test.py --prompt "$prompt" --agent_role "worker" --ext_port $agent_port)
     local EXIT_CODE=$(validate "$CONTENT" "8" "sql-agent-endpoint")
@@ -92,7 +90,7 @@ function validate_agent_service() {
 
     # test supervisor react agent
     echo "======================Testing supervisor react agent======================"
-    export agent_port=${SUPERVISOR_REACT_AGENT_PORT}
+    export agent_port=${cat ${WORKPATH}/docker_compose/amd/gpu/SUPERVISOR_REACT_AGENT_PORT_tmp}
     local CONTENT=$(python3 $WORKDIR/GenAIExamples/AgentQnA/tests/test.py --agent_role "supervisor" --ext_port $agent_port --stream)
     local EXIT_CODE=$(validate "$CONTENT" "Iron" "react-agent-endpoint")
     # echo $CONTENT
