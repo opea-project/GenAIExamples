@@ -29,6 +29,7 @@ function start_agent_and_api_server() {
     echo "Starting CRAG server"
     docker rm kdd-cup-24-crag-service --force
     export CRAG_SERVER_PORT=$(cat ${WORKPATH}/docker_compose/amd/gpu/CRAG_SERVER_PORT_tmp)
+    echo "CRAG_PORT = ${CRAG_SERVER_PORT}"
     docker run -d --runtime=runc --name=kdd-cup-24-crag-service -p=${CRAG_SERVER_PORT}:8000 docker.io/aicrowd/kdd-cup-24-crag-mock-api:v0
 
     echo "Starting Agent services"
