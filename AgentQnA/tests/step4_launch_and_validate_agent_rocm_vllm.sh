@@ -62,6 +62,7 @@ function validate() {
 function validate_agent_service() {
     # # test worker rag agent
     echo "======================Testing worker rag agent======================"
+    echo "agent_port = ${WORKER_RAG_AGENT_PORT}"
     export agent_port=${WORKER_RAG_AGENT_PORT}
     prompt="Tell me about Michael Jackson song Thriller"
     local CONTENT=$(python3 $WORKDIR/GenAIExamples/AgentQnA/tests/test.py --prompt "$prompt" --agent_role "worker" --ext_port $agent_port)
