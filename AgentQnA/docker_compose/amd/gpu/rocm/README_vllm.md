@@ -110,7 +110,6 @@ export https_proxy="Your_HTTPs_Proxy"
 - **Variables with names like "%%%%\_PORT"** - These variables set the IP port numbers for establishing network connections to the application services.
   The values shown in the file **launch_agent_service_vllm_rocm.sh** they are the values used for the development and testing of the application, as well as configured for the environment in which the development is performed. These values must be configured in accordance with the rules of network access to your environment's server, and must not overlap with the IP ports of other applications that are already in use.
 
-
 ## 3. Deploy application
 
 ### 3.1. Deploying applications using Docker Compose
@@ -145,7 +144,7 @@ Containers should not restart.
 
 #### 3.1.1. Configuring GPU forwarding
 
-By default, in the Docker Compose file, compose_vllm.yaml is configured to forward all GPUs to the chatqna-vllm-service container. 
+By default, in the Docker Compose file, compose_vllm.yaml is configured to forward all GPUs to the chatqna-vllm-service container.
 To use certain GPUs, you need to configure the forwarding of certain devices from the host system to the container.
 The configuration must be done in:
 
