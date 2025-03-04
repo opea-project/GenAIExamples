@@ -11,20 +11,12 @@ echo "WORKDIR=${WORKDIR}"
 export ip_address=$(hostname -I | awk '{print $1}')
 export host_ip=${ip_address}
 export TOOLSET_PATH=$WORKPATH/tools/
-export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
-HF_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
-model="meta-llama/Llama-3.3-70B-Instruct" #"meta-llama/Meta-Llama-3.1-70B-Instruct"
 
 export HF_CACHE_DIR=$WORKPATH/data2/huggingface
 if [ ! -d "$HF_CACHE_DIR" ]; then
     HF_CACHE_DIR=$WORKDIR/hf_cache
     mkdir -p "$HF_CACHE_DIR"
 fi
-echo  "HF_CACHE_DIR=$HF_CACHE_DIR"
-ls $HF_CACHE_DIR
-
-vllm_port=8086
-vllm_volume=${HF_CACHE_DIR}
 
 function download_chinook_data(){
     echo "Downloading chinook data..."
@@ -36,7 +28,7 @@ function download_chinook_data(){
 function start_agent_and_api_server() {
     echo "Starting CRAG server"
     docker rm kdd-cup-24-crag-service --force
-    docker run -d --runtime=runc --name=kdd-cup-24-crag-service -p=8080:8000 docker.io/aicrowd/kdd-cup-24-crag-mock-api:v0
+    docker run -d --runtime=runc --name=kdd-cup-24-crag-service -p=${CRAG_SERVER_PORT}:8000 docker.io/aicrowd/kdd-cup-24-crag-mock-api:v0
 
     echo "Starting Agent services"
     cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/amd/gpu/rocm
@@ -70,7 +62,7 @@ function validate() {
 function validate_agent_service() {
     # # test worker rag agent
     echo "======================Testing worker rag agent======================"
-    export agent_port="9095"
+    export agent_port=${WORKER_RAG_AGENT_PORT}
     prompt="Tell me about Michael Jackson song Thriller"
     local CONTENT=$(python3 $WORKDIR/GenAIExamples/AgentQnA/tests/test.py --prompt "$prompt" --agent_role "worker" --ext_port $agent_port)
     # echo $CONTENT
@@ -84,7 +76,7 @@ function validate_agent_service() {
 
      # test worker sql agent
     echo "======================Testing worker sql agent======================"
-    export agent_port="9096"
+    export agent_port=${WORKER_SQL_AGENT_PORT}
     prompt="How many employees are there in the company?"
     local CONTENT=$(python3 $WORKDIR/GenAIExamples/AgentQnA/tests/test.py --prompt "$prompt" --agent_role "worker" --ext_port $agent_port)
     local EXIT_CODE=$(validate "$CONTENT" "8" "sql-agent-endpoint")
@@ -98,7 +90,7 @@ function validate_agent_service() {
 
     # test supervisor react agent
     echo "======================Testing supervisor react agent======================"
-    export agent_port="9090"
+    export agent_port=${SUPERVISOR_REACT_AGENT_PORT}
     local CONTENT=$(python3 $WORKDIR/GenAIExamples/AgentQnA/tests/test.py --agent_role "supervisor" --ext_port $agent_port --stream)
     local EXIT_CODE=$(validate "$CONTENT" "Iron" "react-agent-endpoint")
     # echo $CONTENT
