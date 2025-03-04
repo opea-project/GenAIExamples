@@ -72,7 +72,7 @@ Here is an example of `Nike 2023` pdf.
 # download pdf file
 wget https://raw.githubusercontent.com/opea-project/GenAIComps/v1.1/comps/retrievers/redis/data/nke-10k-2023.pdf
 # upload pdf file with dataprep
-curl -X POST "http://${host_ip}:6004/v1/dataprep/ingest" \
+curl -X POST "http://${host_ip}:11103/v1/dataprep/ingest" \
     -H "Content-Type: multipart/form-data" \
     -F "files=@./nke-10k-2023.pdf"
 ```
@@ -80,8 +80,7 @@ curl -X POST "http://${host_ip}:6004/v1/dataprep/ingest" \
 ```bash
 curl http://${host_ip}:8888/v1/graphrag \
     -H "Content-Type: application/json"  \
-    -d '{
-        "model": "gpt-4o-mini","messages": [{"role": "user","content": "What is the revenue of Nike in 2023?
+    -d '{"messages": [{"role": "user","content": "where do Nike subsidiaries operate?
     "}]}'
 ```
 
