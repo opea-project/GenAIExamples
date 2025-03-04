@@ -25,7 +25,7 @@ function stop_agent_docker() {
 
 function stop_retrieval_tool() {
     echo "Stopping Retrieval tool"
-    local RETRIEVAL_TOOL_PATH=$WORKDIR/../DocIndexRetriever
+    local RETRIEVAL_TOOL_PATH=$WORKDIR/GenAIExamples/DocIndexRetriever
     cd $RETRIEVAL_TOOL_PATH/docker_compose/intel/cpu/xeon/
     docker compose -f compose.yaml down
 }
