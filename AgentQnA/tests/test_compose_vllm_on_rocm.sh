@@ -32,9 +32,9 @@ function stop_retrieval_tool() {
 
 echo "workpath: $WORKPATH"
 echo "=================== Stop containers ===================="
-stop_crag
-stop_agent_docker
-stop_retrieval_tool
+#stop_crag
+#stop_agent_docker
+#stop_retrieval_tool
 
 cd $WORKPATH/tests
 
