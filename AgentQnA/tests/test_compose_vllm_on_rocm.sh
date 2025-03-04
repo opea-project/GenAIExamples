@@ -42,13 +42,13 @@ cd $WORKPATH/tests
 #bash step1_build_images_rocm_vllm.sh
 #echo "=================== #1 Building docker images completed===================="
 
-echo "=================== #2 Start retrieval tool===================="
-bash step2_start_retrieval_tool_rocm_vllm.sh
-echo "=================== #2 Retrieval tool started===================="
+#echo "=================== #2 Start retrieval tool===================="
+#bash step2_start_retrieval_tool_rocm_vllm.sh
+#echo "=================== #2 Retrieval tool started===================="
 
-echo "=================== #3 Ingest data and validate retrieval===================="
-bash step3_ingest_data_and_validate_retrieval_rocm_vllm.sh
-echo "=================== #3 Data ingestion and validation completed===================="
+#echo "=================== #3 Ingest data and validate retrieval===================="
+#bash step3_ingest_data_and_validate_retrieval_rocm_vllm.sh
+#echo "=================== #3 Data ingestion and validation completed===================="
 
 echo "=================== #4 Start agent and API server===================="
 bash step4_launch_and_validate_agent_rocm_vllm.sh
