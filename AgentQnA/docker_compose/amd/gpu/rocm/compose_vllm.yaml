@@ -62,7 +62,7 @@ services:
       LANGCHAIN_API_KEY: ${LANGCHAIN_API_KEY}
       LANGCHAIN_TRACING_V2: ${LANGCHAIN_TRACING_V2}
       LANGCHAIN_PROJECT: "opea-worker-agent-service"
-      port: ${WORKER_RAG_AGENT_PORT:-9095}
+      port: 9095
 
   worker-sql-agent:
     image: opea/agent:latest
@@ -91,7 +91,7 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      port: ${WORKER_SQL_AGENT_PORT:-9096}
+      port: 9096
 
   supervisor-react-agent:
     image: opea/agent:latest
@@ -126,4 +126,4 @@ services:
       CRAG_SERVER: ${CRAG_SERVER}
       WORKER_AGENT_URL: ${WORKER_AGENT_URL}
       SQL_AGENT_URL: ${SQL_AGENT_URL}
-      port: ${SUPERVISOR_REACT_AGENT_PORT:-9090}
+      port: 9090
