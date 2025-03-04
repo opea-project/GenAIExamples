@@ -65,5 +65,16 @@ echo ${WORKER_SQL_AGENT_PORT} > ${WORKPATH}/WORKER_SQL_AGENT_PORT_tmp
 echo ${SUPERVISOR_REACT_AGENT_PORT} > ${WORKPATH}/SUPERVISOR_REACT_AGENT_PORT_tmp
 echo ${CRAG_SERVER_PORT} > ${WORKPATH}/CRAG_SERVER_PORT_tmp
 
+echo "Removing chinook data..."
+echo Y | rm -R chinook-database
+if [ -d "chinook-database" ]; then
+    rm -rf chinook-database
+fi
+echo "Chinook data removed!"
+
+echo "Downloading chinook data..."
+git clone https://github.com/lerocha/chinook-database.git
+cp chinook-database/ChinookDatabase/DataSources/Chinook_Sqlite.sqlite ~/agentqna-test/GenAIExamples/AgentQnA/tests
+
 docker compose -f ../../../../../DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml up -d
 docker compose -f compose_vllm.yaml up -d
