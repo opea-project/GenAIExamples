@@ -117,8 +117,6 @@ export https_proxy="Your_HTTPs_Proxy"
 
 ```bash
 cd cd ~/agentqna-test/GenAIExamples/AgentQnA/docker_compose/amd/gpu/rocm/
-git clone https://github.com/lerocha/chinook-database.git
-cp chinook-database/ChinookDatabase/DataSources/Chinook_Sqlite.sqlite ~/agentqna-test/GenAIExamples/AgentQnA/tests
 bash launch_agent_service_vllm_rocm.sh
 ```
 
