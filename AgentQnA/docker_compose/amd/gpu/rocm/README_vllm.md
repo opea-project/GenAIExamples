@@ -108,20 +108,18 @@ export https_proxy="Your_HTTPs_Proxy"
 ```
 
 - **Variables with names like "%%%%\_PORT"** - These variables set the IP port numbers for establishing network connections to the application services.
-  The values shown in the file set_env_vllm.sh they are the values used for the development and testing of the application, as well as configured for the environment in which the development is performed. These values must be configured in accordance with the rules of network access to your environment's server, and must not overlap with the IP ports of other applications that are already in use.
+  The values shown in the file **launch_agent_service_vllm_rocm.sh** they are the values used for the development and testing of the application, as well as configured for the environment in which the development is performed. These values must be configured in accordance with the rules of network access to your environment's server, and must not overlap with the IP ports of other applications that are already in use.
 
-#### Run set environment script:
-
-```bash
-. set_env_vllm.sh
-```
 
 ## 3. Deploy application
 
 ### 3.1. Deploying applications using Docker Compose
 
 ```bash
-docker compose -f compose_vllm.yaml up -d --force-recreate
+cd cd ~/agentqna-test/GenAIExamples/AgentQnA/docker_compose/amd/gpu/rocm/
+git clone https://github.com/lerocha/chinook-database.git
+cp chinook-database/ChinookDatabase/DataSources/Chinook_Sqlite.sqlite ~/agentqna-test/GenAIExamples/AgentQnA/tests
+bash launch_agent_service_vllm_rocm.sh
 ```
 
 After starting the containers, you need to view their status with the command:
