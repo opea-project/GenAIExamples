@@ -32,7 +32,7 @@ function start_agent_and_api_server() {
 
     echo "Starting Agent services"
     cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/amd/gpu/rocm
-    bash launch_agent_service_vllm_rocm.sh
+    source launch_agent_service_vllm_rocm.sh
     n=0
     until [[ "$n" -ge 500 ]]; do
         docker logs vllm-service >& "${LOG_PATH}"/vllm-service_start.log
