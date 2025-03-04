@@ -50,6 +50,7 @@ jobs:
 # Image Build
 ####################################################################################################
   build-images:
+    if: ${{ !(fromJSON(inputs.test_helmchart)) }}
     runs-on: "docker-build-${{ inputs.node }}"
     steps:
       - name: Clean Up Working Directory
@@ -110,6 +111,7 @@ jobs:
       tag: ${{ inputs.tag }}
       example: ${{ inputs.example }}
       hardware: ${{ inputs.node }}
+      mode: "CD"
     secrets: inherit
 
 
