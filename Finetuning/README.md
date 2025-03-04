@@ -27,7 +27,7 @@ curl http://${your_ip}:8015/v1/files -X POST -H "Content-Type: multipart/form-da
 
 #### Rerank model finetuning dataset example
 
-Download a toy example training file `toy_finetune_data.jsonl` and upload it to the server with below command, this file can be downloaded in [here](https://github.com/FlagOpen/FlagEmbedding/blob/master/examples/finetune/toy_finetune_data.jsonl):
+Download a toy example training file `toy_finetune_data.jsonl` and upload it to the server with below command, this file can be downloaded in [here](https://github.com/FlagOpen/FlagEmbedding/blob/JUNJIE99-patch-1/examples/finetune/toy_finetune_data.jsonl):
 
 ```bash
 # upload a training file
