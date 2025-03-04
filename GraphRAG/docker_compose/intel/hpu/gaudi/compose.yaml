@@ -208,7 +208,7 @@ services:
       - BACKEND_SERVICE_IP=graphrag-gaudi-backend-server
       - BACKEND_SERVICE_PORT=8888
       - DATAPREP_SERVICE_IP=dataprep-neo4j-llamaindex
-      - DATAPREP_SERVICE_PORT=${DATAPREP_PORT}
+      - DATAPREP_SERVICE_PORT=5000
     ipc: host
     restart: always
 networks:
