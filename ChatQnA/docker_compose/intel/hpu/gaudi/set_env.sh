@@ -6,6 +6,10 @@ pushd "../../../../../" > /dev/null
 source .set_env.sh
 popd > /dev/null
 
+if [ -z "$HF_TOKEN" ]; then
+    echo "Error: The HF_TOKEN environment variable is **NOT** set. Please set it"
+    return -1
+fi
 
 export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
 export RERANK_MODEL_ID="BAAI/bge-reranker-base"
