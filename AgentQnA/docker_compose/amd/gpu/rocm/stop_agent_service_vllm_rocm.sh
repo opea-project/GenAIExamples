@@ -72,9 +72,5 @@ if [ -d "chinook-database" ]; then
 fi
 echo "Chinook data removed!"
 
-echo "Downloading chinook data..."
-git clone https://github.com/lerocha/chinook-database.git
-cp chinook-database/ChinookDatabase/DataSources/Chinook_Sqlite.sqlite ~/agentqna-test/GenAIExamples/AgentQnA/tests
-
-docker compose -f ../../../../../DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml up -d
-docker compose -f compose_vllm.yaml up -d
+docker compose -f ../../../../../DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml down
+docker compose -f compose_vllm.yaml down
