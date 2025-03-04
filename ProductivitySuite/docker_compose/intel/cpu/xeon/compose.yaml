@@ -39,7 +39,7 @@ services:
     ports:
       - "6006:80"
     volumes:
-      - "${MODEL_CACHE}:/data"
+      - "./data_embedding:/data"
     shm_size: 1g
     environment:
       no_proxy: ${no_proxy}
@@ -95,7 +95,7 @@ services:
     ports:
       - "8808:80"
     volumes:
-      - "${MODEL_CACHE}:/data"
+      - "./data_tei:/data"
     shm_size: 1g
     environment:
       no_proxy: ${no_proxy}
@@ -136,7 +136,7 @@ services:
     ports:
       - "9009:80"
     volumes:
-      - "${MODEL_CACHE}:/data"
+      - "./data:/data"
     shm_size: 1g
     environment:
       no_proxy: ${no_proxy}
@@ -209,7 +209,7 @@ services:
     ports:
       - "8028:80"
     volumes:
-      - "${MODEL_CACHE}:/data"
+      - "./data_codegen:/data"
     shm_size: 1g
     environment:
       no_proxy: ${no_proxy}
@@ -310,7 +310,7 @@ services:
     command: mongod --quiet --logpath /dev/null
 
   chathistory-mongo:
-    image: ${REGISTRY:-opea}/chathistory-mongo-server:${TAG:-latest}
+    image: ${REGISTRY:-opea}/chathistory-mongo:${TAG:-latest}
     container_name: chathistory-mongo-server
     ports:
       - "6012:6012"
@@ -326,7 +326,7 @@ services:
     restart: unless-stopped
 
   promptregistry-mongo:
-    image: ${REGISTRY:-opea}/promptregistry-mongo-server:${TAG:-latest}
+    image: ${REGISTRY:-opea}/promptregistry-mongo:${TAG:-latest}
     container_name: promptregistry-mongo-server
     ports:
       - "6018:6018"

@@ -6,10 +6,10 @@ services:
     image: neo4j:latest
     container_name: neo4j-apoc
     volumes:
-        - /${MODEL_CACHE}/neo4j/logs:/logs
-        - /${MODEL_CACHE}/neo4j/config:/config
-        - /${MODEL_CACHE}/neo4j/data:/data
-        - /${MODEL_CACHE}/neo4j/plugins:/plugins
+        - /$HOME/neo4j/logs:/logs
+        - /$HOME/neo4j/config:/config
+        - /$HOME/neo4j/data:/data
+        - /$HOME/neo4j/plugins:/plugins
     ipc: host
     environment:
       - NEO4J_AUTH=${NEO4J_USERNAME}/${NEO4J_PASSWORD}
@@ -28,7 +28,7 @@ services:
     ports:
       - "6006:80"
     volumes:
-      - "${MODEL_CACHE}:/data"
+      - "./data:/data"
     shm_size: 1g
     environment:
       no_proxy: ${no_proxy}
@@ -44,7 +44,7 @@ services:
     ports:
       - "6005:80"
     volumes:
-      - "${MODEL_CACHE}:/data"
+      - "./data:/data"
     environment:
       no_proxy: ${no_proxy}
       NO_PROXY: ${no_proxy}
