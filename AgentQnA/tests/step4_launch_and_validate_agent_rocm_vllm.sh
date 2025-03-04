@@ -76,6 +76,7 @@ function validate_agent_service() {
 
      # test worker sql agent
     echo "======================Testing worker sql agent======================"
+    echo "agent_port = ${WORKER_SQL_AGENT_PORT}"
     export agent_port=${WORKER_SQL_AGENT_PORT}
     prompt="How many employees are there in the company?"
     local CONTENT=$(python3 $WORKDIR/GenAIExamples/AgentQnA/tests/test.py --prompt "$prompt" --agent_role "worker" --ext_port $agent_port)
