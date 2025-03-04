@@ -1,0 +1,67 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  vllm-service:
+    image: ${REGISTRY:-opea}/vllm:${TAG:-latest}
+    container_name: vllm-service
+    ports:
+      - ${LLM_ENDPOINT_PORT:-8008}:80
+    volumes:
+      - "${DATA_PATH:-./data}:/data"
+    shm_size: 128g
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      LLM_MODEL_ID: ${LLM_MODEL_ID}
+      VLLM_TORCH_PROFILER_DIR: "${VLLM_TORCH_PROFILER_DIR:-/mnt}"
+      host_ip: ${host_ip}
+      LLM_ENDPOINT_PORT: ${LLM_ENDPOINT_PORT}
+      VLLM_SKIP_WARMUP: ${VLLM_SKIP_WARMUP:-false}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://${host_ip}:${LLM_ENDPOINT_PORT}/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 100
+    command: --model $LLM_MODEL_ID --host 0.0.0.0 --port 80
+
+  postgres:
+    image: postgres:latest
+    container_name: postgres-container
+    restart: always
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    ports:
+      - '5442:5432'
+    volumes:
+      - ./chinook.sql:/docker-entrypoint-initdb.d/chinook.sql
+
+  text2sql-service:
+    image: ${REGISTRY:-opea}/text2sql:${TAG:-latest}
+    container_name: text2sql-service
+    ports:
+      - "9090:8080"
+    environment:
+      - TGI_LLM_ENDPOINT=${LLM_ENDPOINT}
+
+  dbqna-xeon-react-ui-server:
+    image: ${REGISTRY:-opea}/text2sql-react-ui:${TAG:-latest}
+    container_name: dbqna-xeon-react-ui-server
+    depends_on:
+      - text2sql-service
+    ports:
+      - "5174:80"
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+    ipc: host
+    restart: always
+
+networks:
+  default:
+    driver: bridge
