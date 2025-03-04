@@ -152,7 +152,14 @@ jobs:
         run: |
           cd ${{ github.workspace }}/$example/tests
           if [[ "$IMAGE_REPO" == "" ]]; then export IMAGE_REPO="${OPEA_IMAGE_REPO}opea"; fi
-          if [[ "$use_model_cache" == "true" ]]; then export model_cache="/data2/hf_model"; fi
+          if [[ "$use_model_cache" == "true" ]]; then
+            if [ -d "/data2/hf_model" ]; then
+              export model_cache="/data2/hf_model"
+            else
+              echo "Model cache directory /data2/hf_model does not exist"
+              export model_cache="~/.cache/huggingface/hub"
+            fi
+          fi
           if [ -f ${test_case} ]; then timeout 30m bash ${test_case}; else echo "Test script {${test_case}} not found, skip test!"; fi
 
       - name: Clean up container after test
