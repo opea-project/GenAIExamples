@@ -2,7 +2,7 @@
 # Copyright (C) 2024 Advanced Micro Devices, Inc.
 # SPDX-License-Identifier: Apache-2.0
 
-set -xe
+set -e
 
 WORKPATH=$(dirname "$PWD")
 export LOG_PATH=${WORKPATH}
