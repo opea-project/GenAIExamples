@@ -17,12 +17,3 @@ services:
       dockerfile: ./docker/Dockerfile
     extends: agent
     image: ${REGISTRY:-opea}/agent-ui:${TAG:-latest}
-  vllm-rocm:
-    build:
-      args:
-        http_proxy: ${http_proxy}
-        https_proxy: ${https_proxy}
-        no_proxy: ${no_proxy}
-      context: ../
-      dockerfile: ./Dockerfile-vllm-rocm
-    image: ${REGISTRY:-opea}/llm-vllm-rocm:${TAG:-latest}
