@@ -60,9 +60,9 @@ export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/ingest"
 export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:6008/v1/dataprep/get"
 export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:6009/v1/dataprep/delete"
 
-echo ${WORKER_RAG_AGENT_PORT} > ${WORKPATH}/../WORKER_RAG_AGENT_PORT_tmp
-echo ${WORKER_SQL_AGENT_PORT} > ${WORKPATH}/../WORKER_SQL_AGENT_PORT_tmp
-echo ${SUPERVISOR_REACT_AGENT_PORT} > ${WORKPATH}/../SUPERVISOR_REACT_AGENT_PORT_tmp
+echo ${WORKER_RAG_AGENT_PORT} > ${WORKPATH}/WORKER_RAG_AGENT_PORT_tmp
+echo ${WORKER_SQL_AGENT_PORT} > ${WORKPATH}/WORKER_SQL_AGENT_PORT_tmp
+echo ${SUPERVISOR_REACT_AGENT_PORT} > ${WORKPATH}/SUPERVISOR_REACT_AGENT_PORT_tmp
 
 docker compose -f ../../../../../DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml up -d
 docker compose -f compose_vllm.yaml up -d
