@@ -3,8 +3,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 set -e
-export WORKPATH=$(dirname "$PWD")
-export WORKDIR=${WORKPATH}/../../
+WORKPATH=$(dirname "$PWD")
+export WORKDIR=$WORKPATH/../../
 echo "WORKDIR=${WORKDIR}"
 export ip_address=$(hostname -I | awk '{print $1}')
 
@@ -17,7 +17,7 @@ function get_genai_comps() {
 
 
 function build_docker_images_for_retrieval_tool(){
-    cd $WORKPATH/../DocIndexRetriever/docker_image_build/
+    cd $WORKPATH/../../DocIndexRetriever/docker_image_build/
     get_genai_comps
     echo "Build all the images with --no-cache..."
     service_list="doc-index-retriever dataprep embedding retriever reranking"
@@ -28,7 +28,7 @@ function build_docker_images_for_retrieval_tool(){
 }
 
 function build_agent_docker_image() {
-    cd $WORKPATH/docker_image_build/
+    cd $WORKPATH/../docker_image_build/
     get_genai_comps
     echo "Build agent image with --no-cache..."
     docker compose -f build.yaml build --no-cache
@@ -38,7 +38,7 @@ function build_agent_docker_image() {
 
 function build_vllm_docker_image() {
     echo "Building the vllm docker image"
-    cd $WORKPATH/
+    cd $WORKPATH/../
     docker build --no-cache -t opea/llm-vllm-rocm:ci -f Dockerfile-vllm-rocm .
 
     docker images && sleep 3s
