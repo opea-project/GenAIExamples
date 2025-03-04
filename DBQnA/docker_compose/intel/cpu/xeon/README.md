@@ -51,16 +51,20 @@ Since the `compose.yaml` will consume some environment variables, you need to se
 export host_ip=$(hostname -I | awk '{print $1}')
 
 # Example: no_proxy="localhost,127.0.0.1,192.168.1.1"
-export no_proxy=${no_proxy},${host_ip}
+export no_proxy=${no_proxy},${host_ip},dbqna-xeon-react-ui-server,text2sql-service,vllm-service,tgi-service
 
 # If you are in a proxy environment, also set the proxy-related environment variables:
 export http_proxy=${http_proxy}
 export https_proxy=${https_proxy}
 
 # Set other required variables
-
+#TGI Service 
 export TGI_PORT=8008
 export TGI_LLM_ENDPOINT=http://${host_ip}:${TGI_PORT}
+#vLLM Sercice
+export LLM_ENDPOINT_PORT=8008
+export LLM_ENDPOINT="http://${host_ip}:${LLM_ENDPOINT_PORT}"
+
 export HF_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
 export LLM_MODEL_ID="mistralai/Mistral-7B-Instruct-v0.3"
 export POSTGRES_USER=postgres
@@ -75,7 +79,6 @@ edit the file set_env.sh to set those environment variables,
 ```bash
 source set_env.sh
 ```
-
 Note: Please replace with `host_ip` with your external IP address, do not use localhost.
 
 ### 2.2 Start Microservice Docker Containers
@@ -88,7 +91,11 @@ There are 2 options to start the microservice
 cd GenAIExamples/DBQnA/docker_compose/intel/cpu/xeon
 docker compose up -d
 ```
-
+or use vLLM service 
+```bash
+cd GenAIExamples/DBQnA/docker_compose/intel/cpu/xeon
+docker compose -f compose_vllm.yaml up -d
+```
 #### 2.2.2 Alternatively we can start the microservices by running individual docker services
 
 **NOTE:** Make sure all the individual docker services are down before starting them.
@@ -108,7 +115,7 @@ docker run --name test-text2sql-postgres --ipc=host -e POSTGRES_USER=${POSTGRES_
 
 ```bash
 
-docker run -d --name="test-text2sql-tgi-endpoint" --ipc=host -p $TGI_PORT:80 -v ./data:/data --shm-size 1g -e HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN} -e HF_TOKEN=${HF_TOKEN} -e model=${model} ghcr.io/huggingface/text-generation-inference:2.1.0 --model-id $model
+docker run -d --name="test-text2sql-tgi-endpoint" --ipc=host -p $TGI_PORT:80 -v ./data:/data --shm-size 1g -e HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN} -e HF_TOKEN=${HF_TOKEN} -e model=${model} ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu --model-id $model
 ```
 
 - Start Text-to-SQL Service
@@ -127,8 +134,8 @@ docker run -d --name="test-dbqna-react-ui-server" --ipc=host -p 5174:80 -e no_pr
 
 ## 🚀 Validate Microservices
 
-### 3.1 TGI Service
-
+### 3.1 TGI Service Or vllm Sercice 
+TGI Service
 ```bash
 
 curl http://${host_ip}:$TGI_PORT/generate \
@@ -136,7 +143,13 @@ curl http://${host_ip}:$TGI_PORT/generate \
     -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}' \
     -H 'Content-Type: application/json'
 ```
+vllm Sercice
 
+```bash
+curl http://${host_ip}:8008/v1/chat/completions \
+  -X POST \
+  -d '{"model":"mistralai/Mistral-7B-Instruct-v0.3", "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens":17}' \
+  -H 'Content-Type: application/json'
 ### 3.2 Postgres Microservice
 
 Once Text-to-SQL microservice is started, user can use below command
