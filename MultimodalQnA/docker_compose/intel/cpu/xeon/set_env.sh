@@ -6,11 +6,6 @@ pushd "../../../../../" > /dev/null
 source .set_env.sh
 popd > /dev/null
 
-if [ -z "$HF_TOKEN" ]; then
-    echo "Error: The HF_TOKEN environment variable is **NOT** set. Please set it"
-    return -1
-fi
-
 export host_ip=$(hostname -I | awk '{print $1}')
 
 export no_proxy=${your_no_proxy}
