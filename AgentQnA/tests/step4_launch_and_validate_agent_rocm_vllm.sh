@@ -26,12 +26,12 @@ ls $HF_CACHE_DIR
 vllm_port=8086
 vllm_volume=${HF_CACHE_DIR}
 
-#function download_chinook_data(){
-#    echo "Downloading chinook data..."
-#    cd $WORKDIR
-#    git clone https://github.com/lerocha/chinook-database.git
-#    cp chinook-database/ChinookDatabase/DataSources/Chinook_Sqlite.sqlite ${WORKDIR}/GenAIExamples/AgentQnA/tests/
-#}
+function download_chinook_data(){
+    echo "Downloading chinook data..."
+    cd $WORKDIR
+    git clone https://github.com/lerocha/chinook-database.git
+    cp chinook-database/ChinookDatabase/DataSources/Chinook_Sqlite.sqlite ${WORKDIR}/GenAIExamples/AgentQnA/tests/
+}
 
 function start_agent_and_api_server() {
     echo "Starting CRAG server"
@@ -111,19 +111,19 @@ function validate_agent_service() {
 
 }
 
-#function remove_chinook_data(){
-#    echo "Removing chinook data..."
-#    cd $WORKDIR
-#    if [ -d "chinook-database" ]; then
-#        rm -rf chinook-database
-#    fi
-#    echo "Chinook data removed!"
-#}
+function remove_chinook_data(){
+    echo "Removing chinook data..."
+    cd $WORKDIR
+    if [ -d "chinook-database" ]; then
+        rm -rf chinook-database
+    fi
+    echo "Chinook data removed!"
+}
 
 function main() {
-#    echo "==================== Prepare data ===================="
-#    download_chinook_data
-#    echo "==================== Data prepare done ===================="
+    echo "==================== Prepare data ===================="
+    download_chinook_data
+    echo "==================== Data prepare done ===================="
 
     echo "==================== Start agent ===================="
     start_agent_and_api_server
@@ -135,8 +135,8 @@ function main() {
 }
 
 
-#remove_chinook_data
+remove_chinook_data
 
 main
 
-#remove_chinook_data
+remove_chinook_data
