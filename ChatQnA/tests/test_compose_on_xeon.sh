@@ -101,7 +101,7 @@ function validate_service() {
 
 function validate_microservices() {
     # Check if the microservices are running correctly.
-    sleep 10m
+    sleep 3m
 
     # tei for embedding service
     validate_service \
@@ -110,8 +110,6 @@ function validate_microservices() {
         "tei-embedding" \
         "tei-embedding-server" \
         '{"inputs":"What is Deep Learning?"}'
-
-    sleep 1m # retrieval can't curl as expected, try to wait for more time
 
     # retrieval microservice
     test_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
@@ -196,7 +194,7 @@ function main() {
 
     validate_microservices
     validate_megaservice
-    # validate_frontend
+    validate_frontend
 
     stop_docker
     echo y | docker system prune
