@@ -8,7 +8,6 @@
 # export LANGCHAIN_TRACING_V2=""
 
 
-
 export ip_address=${host_ip}
 
 export WORKPATH=$(dirname "$PWD")
