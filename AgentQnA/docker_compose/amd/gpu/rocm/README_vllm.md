@@ -1,269 +1,101 @@
-Copyright (C) 2024 Advanced Micro Devices, Inc.
+# Single node on-prem deployment with Docker Compose on AMD GPU
 
-# Deploy AgentQnA application
+This example showcases a hierarchical multi-agent system for question-answering applications. We deploy the example on Xeon. For LLMs, we use OpenAI models via API calls. For instructions on using open-source LLMs, please refer to the deployment guide [here](../../../../README.md).
 
-## 1. Clone repo and build Docker images
+## Deployment with docker
 
-### 1.1. Cloning GenAIComps repo
+1. First, clone this repo.
+   ```
+   export WORKDIR=<your-work-directory>
+   cd $WORKDIR
+   git clone https://github.com/opea-project/GenAIExamples.git
+   ```
+2. Set up environment for this example </br>
 
-Create an empty directory in home directory and navigate to it:
+   ```
+   # Example: host_ip="192.168.1.1" or export host_ip="External_Public_IP"
+   export host_ip=$(hostname -I | awk '{print $1}')
+   # if you are in a proxy environment, also set the proxy-related environment variables
+   export http_proxy="Your_HTTP_Proxy"
+   export https_proxy="Your_HTTPs_Proxy"
+   # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
+   export no_proxy="Your_No_Proxy"
 
-```bash
-mkdir -p ~/agentqna-test && cd ~/agentqna-test
-```
+   export TOOLSET_PATH=$WORKDIR/GenAIExamples/AgentQnA/tools/
+   #OPANAI_API_KEY if you want to use OpenAI models
+   export OPENAI_API_KEY=<your-openai-key>
+   # Set AMD GPU settings
+   export AGENTQNA_CARD_ID="card1"
+   export AGENTQNA_RENDER_ID="renderD136"
+   ```
 
-Cloning GenAIExamples repo for build Docker images:
+3. Deploy the retrieval tool (i.e., DocIndexRetriever mega-service)
 
-```bash
-git clone https://github.com/opea-project/GenAIExamples.git
-```
+   First, launch the mega-service.
 
-### 1.2. Navigate to repo directory and switching to the desired version of the code:
+   ```
+   cd $WORKDIR/GenAIExamples/AgentQnA/retrieval_tool
+   bash launch_retrieval_tool.sh
+   ```
 
-If you are using the main branch, then you do not need to make the transition, the main branch is used by default
+   Then, ingest data into the vector database. Here we provide an example. You can ingest your own data.
 
-```bash
-cd ~/agentqna-test/GenAIExamples/AgentQnA/docker_image_build
-```
+   ```
+   bash run_ingest_data.sh
+   ```
 
-If you are using a specific branch or tag, then we perform git checkout to the desired version.
+4. Launch Tool service
+   In this example, we will use some of the mock APIs provided in the Meta CRAG KDD Challenge to demonstrate the benefits of gaining additional context from mock knowledge graphs.
+   ```
+   docker run -d -p=8080:8000 docker.io/aicrowd/kdd-cup-24-crag-mock-api:v0
+   ```
+5. Launch `Agent` service
 
-```bash
-### Replace "v1.2" with the code version you need (branch or tag)
-cd cd ~/agentqna-test/GenAIExamples/AgentQnA/docker_image_build && git checkout v1.2
-git clone https://github.com/opea-project/GenAIComps.git
-```
+   ```
+   cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/amd/gpu/rocm
+   bash launch_agent_service_tgi_rocm.sh
+   ```
 
-### 1.3. Build Docker images repo
+6. [Optional] Build `Agent` docker image if pulling images failed.
 
-#### Build Agent Docker image:
+   ```
+   git clone https://github.com/opea-project/GenAIComps.git
+   cd GenAIComps
+   docker build -t opea/agent:latest -f comps/agent/src/Dockerfile .
+   ```
 
-```bash
-docker compose -f build.yaml build --no-cache
-```
+## Validate services
 
-#### Build Retrieval Tools Docker image:
-
-```bash
-cd ~/agentqna-test/GenAIExamples/DocIndexRetriever/docker_image_build/
-git clone https://github.com/opea-project/GenAIComps.git
-service_list="doc-index-retriever dataprep embedding retriever reranking"
-docker compose -f build.yaml build ${service_list} --no-cache
-```
-
-#### Build ROCm vLLM Docker image:
-
-```bash
-cd ~/agentqna-test/GenAIExamples/AgentQnA
-docker build --no-cache -t opea/llm-vllm-rocm:ci -f Dockerfile-vllm-rocm .
-```
-
-### 1.4. Pull Docker images from Docker Hub
-
-```bash
-docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
-```
-
-### 1.5. Checking for the necessary Docker images
-
-After assembling the images, you can check their presence in the list of available images using the command:
-
-```bash
-docker image ls
-```
-
-The output of the command should contain images:
-
-- opea/doc-index-retriever:latest
-- opea/embedding:latest
-- opea/retriever:latest
-- opea/reranking:latest
-- opea/dataprep:lates
-- opea/llm-vllm-rocm
-- opea/agent:latest
-- opea/agent-ui:latest
-- ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
-
-## 2. Set deploy environment variables
-
-### Setting variables in the operating system environment
-
-#### Set variables:
-
-```bash
-### Replace the string "your_host_ip_or_host_name" with your server hostname or IP address.
-export host_ip="your_host_ip_or_host_name"
-### Replace the string 'your_huggingfacehub_token' with your HuggingFacehub repository access token.
-export HUGGINGFACEHUB_API_TOKEN='your_huggingfacehub_token'
-### Replace the string 'your_langchain_api_key' with your LangChain API key.
-export LANGCHAIN_API_KEY='your_langchain_api_key'
-export LANGCHAIN_TRACING_V2=""
-```
-
-If you are in a proxy environment, also set the proxy-related environment variables:
-
-```bash
-export http_proxy="Your_HTTP_Proxy"
-export https_proxy="Your_HTTPs_Proxy"
-```
-
-- **Variables with names like "%%%%\_PORT"** - These variables set the IP port numbers for establishing network connections to the application services.
-  The values shown in the file **launch_agent_service_vllm_rocm.sh** they are the values used for the development and testing of the application, as well as configured for the environment in which the development is performed. These values must be configured in accordance with the rules of network access to your environment's server, and must not overlap with the IP ports of other applications that are already in use.
-
-## 3. Deploy application
-
-### 3.1. Deploying applications using Docker Compose
-
-```bash
-cd cd ~/agentqna-test/GenAIExamples/AgentQnA/docker_compose/amd/gpu/rocm/
-bash launch_agent_service_vllm_rocm.sh
-```
-
-After starting the containers, you need to view their status with the command:
-
-```bash
-docker ps
-```
-
-The following containers should be running:
-
-- react-agent-endpoint
-- vllm-service
-- sql-agent-endpoint
-- rag-agent-endpoint
-- doc-index-retriever-server
-- dataprep-redis-server
-- retriever-redis-server
-- reranking-tei-xeon-server
-- embedding-server
-- redis-vector-db
-- tei-embedding-server
-- tei-reranking-server
-
-Containers should not restart.
-
-#### 3.1.1. Configuring GPU forwarding
-
-By default, in the Docker Compose file, compose_vllm.yaml is configured to forward all GPUs to the chatqna-vllm-service container.
-To use certain GPUs, you need to configure the forwarding of certain devices from the host system to the container.
-The configuration must be done in:
-
-```yaml
-services:
-  #######
-  vllm-service:
-    devices:
-```
-
-Example for set isolation for 1 GPU
+First look at logs of the agent docker containers:
 
 ```
-      - /dev/dri/card0:/dev/dri/card0
-      - /dev/dri/renderD128:/dev/dri/renderD128
+# worker agent
+docker logs rag-agent-endpoint
 ```
 
-Example for set isolation for 2 GPUs
-
 ```
-      - /dev/dri/card0:/dev/dri/card0
-      - /dev/dri/renderD128:/dev/dri/renderD128
-      - /dev/dri/card1:/dev/dri/card1
-      - /dev/dri/renderD129:/dev/dri/renderD129
+# supervisor agent
+docker logs react-agent-endpoint
 ```
 
-### 3.2. Checking the application services
+You should see something like "HTTP server setup successful" if the docker containers are started successfully.</p>
 
-#### 3.2.1. Checking vllm-service
+Second, validate worker agent:
 
-Verification is performed in two ways:
-
-- Checking the container logs
-
-  ```bash
-  docker logs vllm-service
-  ```
-
-  A message like this should appear in the logs:
-
-  ```commandline
-  INFO:     Started server process [1]
-  INFO:     Waiting for application startup.
-  INFO:     Application startup complete.
-  INFO:     Uvicorn running on http://0.0.0.0:8011 (Press CTRL+C to quit)
-  ```
-
-- Сhecking the response from the service
-  ```bash
-  ### curl request
-  ### Replace 18110 with the value set in the startup script in the variable VLLM_SERVICE_PORT
-  curl http://${host_ip}:18110/v1/completions \
-  -H "Content-Type: application/json" \
-  -d '{
-      "model": "Intel/neural-chat-7b-v3-3",
-      "prompt": "What is a Deep Learning?",
-      "max_tokens": 30,
-      "temperature": 0
-  }'
-  ```
-  The response from the service must be in the form of JSON:
-  ```json
-  {
-    "id": "cmpl-1d7d175d36d0491cba3abaa8b5bd6991",
-    "object": "text_completion",
-    "created": 1740411135,
-    "model": "Intel/neural-chat-7b-v3-3",
-    "choices": [
-      {
-        "index": 0,
-        "text": " Deep learning is a subset of machine learning that involves the use of artificial neural networks to analyze and interpret data. It is called \"deep\" because it",
-        "logprobs": null,
-        "finish_reason": "length",
-        "stop_reason": null,
-        "prompt_logprobs": null
-      }
-    ],
-    "usage": { "prompt_tokens": 7, "total_tokens": 37, "completion_tokens": 30, "prompt_tokens_details": null }
-  }
-  ```
-  The value of choice.text must contain a response from the service that makes sense.
-  If such a response is present, then the vllm-service is considered verified.
-
-#### 3.2.2. Checking worker rag agent
-
-It is performed using requests to the service
-
-**Checking Upload file**
-
-```bash
-### Replace 18111 with the value set in the startup script in the variable WORKER_RAG_AGENT_PORT
-export agent_port="18111"
-prompt="Tell me about Michael Jackson song Thriller"
-python3 ~/agentqna-test/GenAIExamples/AgentQnA/tests/test.py --prompt "$prompt" --agent_role "worker" --ext_port $agent_port
+```
+curl http://${host_ip}:9095/v1/chat/completions -X POST -H "Content-Type: application/json" -d '{
+     "query": "Most recent album by Taylor Swift"
+    }'
 ```
 
-The response must contain the correct text.
+Third, validate supervisor agent:
 
-#### 3.2.3. Checking worker sql agent
-
-It is performed using requests to the service
-
-```bash
-### Replace 18112 with the value set in the startup script in the variable WORKER_SQL_AGENT_PORT
-export agent_port="18112"
-prompt="How many employees are there in the company?"
-python3 ~/agentqna-test/GenAIExamples/AgentQnA/tests/test.py --prompt "$prompt" --agent_role "worker" --ext_port $agent_port
+```
+curl http://${host_ip}:9090/v1/chat/completions -X POST -H "Content-Type: application/json" -d '{
+     "query": "Most recent album by Taylor Swift"
+    }'
 ```
 
-The response should contain the string "8 employees in the company"
+## How to register your own tools with agent
 
-#### 3.2.4. Checking supervisor react agent
-
-It is performed using requests to the service
-
-```bash
-### Replace 18113 with the value set in the startup script in the variable SUPERVISOR_REACT_AGENT_PORT
-export agent_port="18113"
-python3 ~/agentqna-test/GenAIExamples/AgentQnA/tests/test.py --agent_role "supervisor" --ext_port $agent_port --stream
-```
-
-The response must contain the string "Iron Maiden"
+You can take a look at the tools yaml and python files in this example. For more details, please refer to the "Provide your own tools" section in the instructions [here](https://github.com/opea-project/GenAIComps/tree/main/comps/agent/src/README.md).
