@@ -3,6 +3,9 @@
 # SPDX-License-Identifier: Apache-2.0
 set -xe
 
+echo "All running containers"
+docker ps
+
 WORKPATH=$(dirname "$PWD")
 export WORKDIR=$WORKPATH/../../
 echo "WORKDIR=${WORKDIR}"
