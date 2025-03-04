@@ -305,6 +305,15 @@ function validate_microservices() {
         "Data preparation succeeded" \
         "dataprep-multimodal-redis-caption" \
         "dataprep-multimodal-redis"
+    
+    echo "Validating Text to speech service"
+    validate_service \
+        "${TTS_ENDPOINT}" \
+        '"tts_result":' \
+        "speecht5-service" \
+        "speecht5-service" \
+        '{"text": "Who are you?"}'
+ 
 
     sleep 3m
 }

@@ -83,6 +83,8 @@ function setup_env() {
     export MAX_IMAGES=1
     export WHISPER_MODEL="base"
     export WHISPER_SERVER_ENDPOINT="http://${host_ip}:${WHISPER_PORT}/v1/asr"
+    export TTS_PORT=7055
+    export TTS_ENDPOINT="http://${host_ip}:${TTS_PORT}/v1/tts" 
     export DATAPREP_MMR_PORT=6007
     export DATAPREP_INGEST_SERVICE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/dataprep/ingest"
     export DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/dataprep/generate_transcripts"
@@ -257,6 +259,14 @@ function validate_microservices() {
         '.png' \
         "dataprep_get" \
         "dataprep-multimodal-redis"
+
+    echo "Validating Text to speech service"
+    validate_service \
+        "${TTS_ENDPOINT}" \
+        '"tts_result":' \
+        "speecht5-service" \
+        "speecht5-service" \
+        '{"text": "Who are you?"}'
 
     sleep 1m
 
