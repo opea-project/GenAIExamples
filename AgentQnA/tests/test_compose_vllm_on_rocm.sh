@@ -51,7 +51,7 @@ cd $WORKPATH/tests
 #echo "=================== #3 Data ingestion and validation completed===================="
 
 echo "=================== #4 Start agent and API server===================="
-bash step4_launch_and_validate_agent_rocm_vllm.sh
+source step4_launch_and_validate_agent_rocm_vllm.sh
 echo "=================== #4 Agent test passed ===================="
 
 echo "=================== #5 Stop agent and API server===================="
