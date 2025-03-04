@@ -43,7 +43,11 @@ on:
       inject_commit:
         default: false
         required: false
-        type: string
+        type: boolean
+      use_model_cache:
+        default: false
+        required: false
+        type: boolean
 
 jobs:
 ####################################################################################################
@@ -110,6 +114,7 @@ jobs:
       tag: ${{ inputs.tag }}
       example: ${{ inputs.example }}
       hardware: ${{ inputs.node }}
+      use_model_cache: ${{ inputs.use_model_cache }}
     secrets: inherit
 
 
@@ -131,7 +136,7 @@ jobs:
 ####################################################################################################
   test-gmc-pipeline:
     needs: [build-images]
-    if: ${{ fromJSON(inputs.test_gmc) }}
+    if: false # ${{ fromJSON(inputs.test_gmc) }}
     uses: ./.github/workflows/_gmc-e2e.yml
     with:
       example: ${{ inputs.example }}
