@@ -12,7 +12,7 @@
 export ip_address=${host_ip}
 
 export WORKPATH=$(dirname "$PWD")
-export WORKDIR=${WORKPATH}/../../../../
+export WORKDIR=${WORKPATH}/../../../
 export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
 export VLLM_SERVICE_PORT="8081"
 export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
