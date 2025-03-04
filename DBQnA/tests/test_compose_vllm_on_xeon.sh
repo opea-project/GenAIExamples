@@ -30,14 +30,14 @@ function build_docker_images() {
     else
         echo "opea/vllm built successful"
     fi
-	
+
     cd $WORKPATH/docker_image_build
     git clone --single-branch --branch "${opea_branch:-"main"}" https://github.com/opea-project/GenAIComps.git
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
     service_list="vllm-service text2sql text2sql-react-ui"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
-	
+
 	}
 
 function start_service() {
