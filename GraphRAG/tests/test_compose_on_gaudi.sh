@@ -168,7 +168,7 @@ function validate_microservices() {
         "${host_ip}:${RETRIEVER_PORT}/v1/retrieval" \
         "documents" \
         "retriever_community_answers_neo4j" \
-        "retriever_neo4j" \
+        "retriever-neo4j" \
         "{\"messages\": [{\"role\": \"user\",\"content\": \"Who is John Brady and has he had any confrontations?\"}]}"
 
     }
