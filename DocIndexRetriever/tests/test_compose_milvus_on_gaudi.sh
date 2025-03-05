@@ -78,7 +78,7 @@ function validate_megaservice() {
     local CONTENT=$(http_proxy="" curl -X POST "http://${ip_address}:6007/v1/dataprep/ingest" \
      -H "Content-Type: multipart/form-data" \
      -F 'link_list=["https://opea.dev/"]')
-    local EXIT_CODE=$(validate "$CONTENT" "Data preparation succeeded" "dataprep-milvus-service-xeon")
+    local EXIT_CODE=$(validate "$CONTENT" "Data preparation succeeded" "dataprep-milvus-service-gaudi")
     echo "$EXIT_CODE"
     local EXIT_CODE="${EXIT_CODE:0-1}"
     echo "return value is $EXIT_CODE"
@@ -94,7 +94,7 @@ function validate_megaservice() {
      "text": "Explain the OPEA project?"
     }')
 
-    local EXIT_CODE=$(validate "$CONTENT" "OPEA" "doc-index-retriever-service-xeon")
+    local EXIT_CODE=$(validate "$CONTENT" "OPEA" "doc-index-retriever-service-gaudi")
     echo "$EXIT_CODE"
     local EXIT_CODE="${EXIT_CODE:0-1}"
     echo "return value is $EXIT_CODE"
@@ -144,4 +144,3 @@ function main() {
 }
 
 main
-
