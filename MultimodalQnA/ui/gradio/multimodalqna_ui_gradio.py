@@ -74,7 +74,7 @@ def add_text(state, multimodal_textbox, request: gr.Request):
     if not text and not files:
         state.skip_next = True
         return (state, state.to_gradio_chatbot(), None) + (no_change_btn,) * 1
-    
+
     text = text[:2000]  # Hard cut-off
 
     state.skip_next = False
@@ -84,7 +84,6 @@ def add_text(state, multimodal_textbox, request: gr.Request):
             image_file = files[0]
         if Path(files[0]).suffix in GRADIO_AUDIO_FORMATS or len(files) > 1:
             audio_file = files[-1]  # Guaranteed that last file would be recorded audio
-    
     
     # Add to chatbot history
     if image_file:
@@ -126,8 +125,6 @@ def http_bot(state, audio_response_toggler, request: gr.Request):
     
     is_very_first_query = all(True if h['role'] == 'user' else False for h in state.chatbot_history)
     
-    
-    
     # Construct prompt
     prompt = state.get_prompt(is_very_first_query)
     
@@ -146,13 +143,10 @@ def http_bot(state, audio_response_toggler, request: gr.Request):
     
     yield (state, state.to_gradio_chatbot(), state.split_video, state.image, state.pdf) + (disable_btn,) * 1
     
-
     if logflag:
         logger.info(f"==== request ====\n{pload}")
     logger.info(f"==== url request ====\n{gateway_addr}")
 
-    
-    
     try:
         response = requests.post(
             url,
@@ -222,9 +216,6 @@ def http_bot(state, audio_response_toggler, request: gr.Request):
         
         yield (state, state.to_gradio_chatbot(), None, None, None) + (enable_btn,)
         return
-    
-    # print(f"chatbot_history: \n {state.chatbot_history}")
-    # print(f"message: {message}")
     
     if audio_response:
         state.chatbot_history[-1]["content"] = {'path': convert_base64_to_audio(audio_response)}

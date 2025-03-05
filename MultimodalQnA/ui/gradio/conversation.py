@@ -57,7 +57,6 @@ class Conversation:
                     if Path(content['path']).suffix in GRADIO_AUDIO_FORMATS:
                         conv_dict[-1]['content'].append({'type': 'audio', 'audio': convert_audio_to_base64(content['path'])})
         else:
-            # print(f'chatbot history: \n{self.chatbot_history}')
             for i, item in enumerate(self.chatbot_history):
                 role = item['role']
                 content = item['content']
@@ -65,7 +64,6 @@ class Conversation:
                 if i == 0:
                     conv_dict.append({'role': role, 'content': []})
                     
-                
                 if role == 'user':
                     if conv_dict[-1]['role'] != 'user':
                         conv_dict.append({'role': role, 'content': []})
