@@ -57,7 +57,7 @@ def clear_history(state, request: gr.Request):
         os.remove(state.pdf)
     state = multimodalqna_conv.copy()
     state.chatbot_history = []
-    video = gr.Video(height=512, width=512, elem_id="video", visible=True, label="Media")
+    video = gr.Video(height=512, width=512, elem_id="video", visible=True, label="Media", value=None)
     image = gr.Image(height=512, width=512, elem_id="image", visible=False, label="Media")
     pdf = PDF(height=512, elem_id="pdf", interactive=False, visible=False, label="Media")
     return (state, state.to_gradio_chatbot(), None, video, image, pdf) + (disable_btn,) * 1
@@ -168,7 +168,11 @@ def http_bot(state, audio_response_toggler, request: gr.Request):
             choice = response["choices"][-1]
             metadata = choice["metadata"]
             message = choice["message"]["content"]
-            audio_response = choice["message"]["audio"]["data"] if audio_response_toggler else None
+            audio_response = None
+            if audio_response_toggler:
+                if choice["message"]["audio"]:
+                    audio_response = choice["message"]["audio"]["data"]
+                    
             if (
                 is_very_first_query
                 and not state.video_file
@@ -596,22 +600,21 @@ with gr.Blocks() as upload_pdf:
 
 with gr.Blocks() as qna:
     state = gr.State(multimodalqna_conv.copy())
-    with gr.Row():
+    with gr.Row(equal_height=True):
         with gr.Column(scale=2):
-            video = gr.Video(height=512, width=512, elem_id="video", visible=True, label="Media")
-            image = gr.Image(height=512, width=512, elem_id="image", visible=False, label="Media")
-            pdf = PDF(height=512, elem_id="pdf", interactive=False, visible=False, label="Media")
+            video = gr.Video(elem_id="video", visible=True, label="Media")
+            image = gr.Image(elem_id="image", visible=False, label="Media")
+            pdf = PDF(elem_id="pdf", interactive=False, visible=False, label="Media")
         with gr.Column(scale=9):
             chatbot = gr.Chatbot(elem_id="chatbot", label="MultimodalQnA Chatbot", height=390, type="messages")
-            with gr.Row():
+            with gr.Row(equal_height=True):
                 with gr.Column(scale=8):
-                    with gr.Tabs():
-                        with gr.TabItem("Text, Image & Audio Query"):
-                            multimodal_textbox = gr.MultimodalTextbox(
-                                show_label=False,
-                                file_types=["image", "audio"],
-                                sources=["microphone", "upload"],
-                            )
+                    multimodal_textbox = gr.MultimodalTextbox(
+                        show_label=False,
+                        file_types=["image", "audio"],
+                        sources=["microphone", "upload"],
+                        placeholder="Text, Image & Audio Query"
+                    )
                 with gr.Column(scale=1, min_width=150):
                     with gr.Row():
                         audio_response_toggler = gr.Checkbox(label="Audio Responses", container=False)
