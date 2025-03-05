@@ -158,7 +158,7 @@ def http_bot(state, audio_response_toggler, request: gr.Request):
         logger.info(response.status_code)
         if logflag:
             logger.info(response.json())
-            
+        
         if response.status_code == 200:
             response = response.json()
             choice = response["choices"][-1]
