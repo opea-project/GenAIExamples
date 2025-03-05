@@ -23,6 +23,7 @@ export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
 export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
 export VLLM_LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
 export HF_CACHE_DIR="./data"
+export MODEL_CACHE="./data"
 export TOOLSET_PATH=${WORKPATH}/../../../tools/
 export recursion_limit_worker=12
 export LLM_ENDPOINT_URL=http://${ip_address}:${VLLM_SERVICE_PORT}
