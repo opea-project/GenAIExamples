@@ -69,6 +69,8 @@ def add_text(state, multimodal_textbox, request: gr.Request):
     
     image_file, audio_file = None, None
     
+    text = text.strip()
+    
     if not text and not files:
         state.skip_next = True
         return (state, state.to_gradio_chatbot(), None) + (no_change_btn,) * 1
@@ -606,7 +608,7 @@ with gr.Blocks() as qna:
             image = gr.Image(elem_id="image", visible=False, label="Media")
             pdf = PDF(elem_id="pdf", interactive=False, visible=False, label="Media")
         with gr.Column(scale=9):
-            chatbot = gr.Chatbot(elem_id="chatbot", label="MultimodalQnA Chatbot", height=390, type="messages")
+            chatbot = gr.Chatbot(elem_id="chatbot", label="MultimodalQnA Chatbot", type="messages")
             with gr.Row(equal_height=True):
                 with gr.Column(scale=8):
                     multimodal_textbox = gr.MultimodalTextbox(
