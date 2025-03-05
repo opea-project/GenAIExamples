@@ -28,7 +28,7 @@ services:
     container_name: lvm-xeon-server
     depends_on:
       llava-tgi-service:
-        condition: service_healthy
+        condition: service_started  # service_healthy
     ports:
       - "9399:9399"
     ipc: host
