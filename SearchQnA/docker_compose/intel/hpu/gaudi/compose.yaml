@@ -9,7 +9,7 @@ services:
     ports:
       - "3001:80"
     volumes:
-      - "./data:/data"
+      - "${MODEL_CACHE}:/data"
     runtime: habana
     cap_add:
       - SYS_NICE
@@ -67,7 +67,7 @@ services:
     ports:
       - "3004:80"
     volumes:
-      - "./data:/data"
+      - "${MODEL_CACHE}:/data"
     shm_size: 1g
     environment:
       no_proxy: ${no_proxy}
@@ -103,7 +103,7 @@ services:
     ports:
       - "3006:80"
     volumes:
-      - "./data:/data"
+      - "${MODEL_CACHE}:/data"
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
