@@ -30,7 +30,7 @@ services:
     ports:
       - "${CHATQNA_TEI_EMBEDDING_PORT}:80"
     volumes:
-      - "/var/opea/chatqna-service/data:/data"
+      - "${MODEL_CACHE}:/data"
     shm_size: 1g
     ipc: host
     environment:
@@ -72,7 +72,7 @@ services:
     ports:
       - "${CHATQNA_TEI_RERANKING_PORT}:80"
     volumes:
-      - "/var/opea/chatqna-service/data:/data"
+      - "${MODEL_CACHE}:/data"
     shm_size: 1g
     environment:
       no_proxy: ${no_proxy}
@@ -104,7 +104,7 @@ services:
       HF_HUB_DISABLE_PROGRESS_BARS: 1
       HF_HUB_ENABLE_HF_TRANSFER: 0
     volumes:
-      - "/var/opea/chatqna-service/data:/data"
+      - "${MODEL_CACHE}:/data"
     shm_size: 1g
     devices:
       - /dev/kfd:/dev/kfd
