@@ -32,7 +32,7 @@ services:
     ports:
       - "6040:80"
     volumes:
-      - "./data:/data"
+      - "${MODEL_CACHE}:/data"
     shm_size: 1g
     environment:
       no_proxy: ${no_proxy}
@@ -64,7 +64,7 @@ services:
     ports:
       - "6041:80"
     volumes:
-      - "./data:/data"
+      - "${MODEL_CACHE}:/data"
     shm_size: 1g
     environment:
       no_proxy: ${no_proxy}
@@ -80,7 +80,7 @@ services:
     ports:
       - "6042:80"
     volumes:
-      - "./data:/data"
+      - "${MODEL_CACHE}:/data"
     shm_size: 128g
     environment:
       no_proxy: ${no_proxy}
