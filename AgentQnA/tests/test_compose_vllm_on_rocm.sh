@@ -20,7 +20,7 @@ function stop_crag() {
 
 function stop_agent_docker() {
     cd $WORKPATH/docker_compose/amd/gpu/rocm
-    docker compose -f compose_vllm.yaml down
+    bash stop_agent_service_vllm_rocm.sh
 }
 
 function stop_retrieval_tool() {
