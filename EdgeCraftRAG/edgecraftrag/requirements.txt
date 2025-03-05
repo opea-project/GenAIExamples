@@ -1,6 +1,6 @@
 docx2txt
 faiss-cpu>=1.8.0.post1
-langchain-core==0.2.29
+langchain-core>=0.2.29
 llama-index>=0.11.0
 llama-index-embeddings-openvino>=0.4.0
 llama-index-llms-openai-like>=0.2.0
@@ -9,7 +9,7 @@ llama-index-postprocessor-openvino-rerank>=0.3.0
 llama-index-readers-file>=0.4.0
 llama-index-retrievers-bm25>=0.3.0
 llama-index-vector-stores-faiss>=0.2.1
-opea-comps>=0.9
+opea-comps>=1.2
 pillow>=10.4.0
 python-docx==1.1.2
 unstructured==0.16.11
