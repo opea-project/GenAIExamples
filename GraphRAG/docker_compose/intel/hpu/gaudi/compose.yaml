@@ -9,10 +9,10 @@ services:
       - "${NEO4J_PORT1:-7474}:7474"
       - "${NEO4J_PORT2:-7687}:7687"
     volumes:
-        - /${MODEL_CACHE}/neo4j/logs:/logs
-        - /${MODEL_CACHE}/neo4j/config:/config
-        - /${MODEL_CACHE}/neo4j/data:/data
-        - /${MODEL_CACHE}/neo4j/plugins:/plugins
+        - ./data/neo4j/logs:/logs
+        - ./data/neo4j/config:/config
+        - ./data/neo4j/data:/data
+        - ./data/neo4j/plugins:/plugins
     ipc: host
     environment:
       - no_proxy=${no_proxy}
@@ -39,7 +39,7 @@ services:
     ports:
       - "${TEI_EMBEDDER_PORT:-12000}:80"
     volumes:
-      - "${MODEL_CACHE}:/data"
+      - "${MODEL_CACHE:-./data}:/data"
     shm_size: 1g
     environment:
       no_proxy: ${no_proxy}
@@ -58,7 +58,7 @@ services:
     ports:
       - ${LLM_ENDPOINT_PORT:-8008}:80
     volumes:
-      - "${MODEL_CACHE}:/data"
+      - "${MODEL_CACHE:-./data}:/data"
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
