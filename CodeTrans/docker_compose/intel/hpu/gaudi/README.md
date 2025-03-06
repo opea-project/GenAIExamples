@@ -138,7 +138,7 @@ docker compose -f compose_tgi.yaml up -d
 
 1. LLM backend Service
 
-    In the first startup, this service will take more time to download, load and warm up the model. After it's finished, the service will be ready.
+   In the first startup, this service will take more time to download, load and warm up the model. After it's finished, the service will be ready.
 
    Try the command below to check whether the LLM serving is ready.
 
