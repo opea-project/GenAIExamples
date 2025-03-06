@@ -22,7 +22,7 @@ services:
       timeout: 10s
       retries: 100
     volumes:
-      - "/var/opea/faqgen-service/data:/data"
+      - "${MODEL_CACHE}:/data"
     shm_size: 1g
     devices:
       - /dev/kfd:/dev/kfd

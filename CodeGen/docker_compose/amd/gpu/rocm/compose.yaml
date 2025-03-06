@@ -8,7 +8,7 @@ services:
     ports:
       - "${CODEGEN_TGI_SERVICE_PORT:-8028}:80"
     volumes:
-      - "/var/lib/GenAI/data:/data"
+      - "${MODEL_CACHE}:/data"
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
