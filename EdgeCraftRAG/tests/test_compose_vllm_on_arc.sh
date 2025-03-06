@@ -20,8 +20,9 @@ HOST_IP=$ip_address
 
 COMPOSE_FILE="compose_vllm.yaml"
 EC_RAG_SERVICE_PORT=16010
-
-MODEL_PATH="/home/media/models"
+export MODEL_PATH=${model_cache:-"/home/media/models"}
+echo "${MODEL_PATH}"
+# MODEL_PATH="/home/media/models"
 # MODEL_PATH="$WORKPATH/models"
 DOC_PATH="$WORKPATH/tests"
 GRADIO_PATH="$WORKPATH/tests"
