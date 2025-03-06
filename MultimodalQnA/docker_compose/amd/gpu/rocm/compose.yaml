@@ -105,7 +105,7 @@ services:
       HUGGINGFACEHUB_API_TOKEN: ${MULTIMODAL_HUGGINGFACEHUB_API_TOKEN}
       HUGGING_FACE_HUB_TOKEN: ${MULTIMODAL_HUGGINGFACEHUB_API_TOKEN}
     volumes:
-      - "/var/opea/multimodalqna-service/data:/data"
+      - "${MODEL_CACHE}:/data"
     shm_size: 64g
     devices:
       - /dev/kfd:/dev/kfd
