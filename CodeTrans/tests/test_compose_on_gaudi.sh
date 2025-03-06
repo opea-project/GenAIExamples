@@ -52,11 +52,11 @@ function start_services() {
     export LLM_SERVICE_HOST_IP=${ip_address}
     export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:7777/v1/codetrans"
     export FRONTEND_SERVICE_IP=${ip_address}
-    export FRONTEND_SERVICE_PORT=5174
+    export FRONTEND_SERVICE_PORT=5173
     export BACKEND_SERVICE_NAME=codetrans
     export BACKEND_SERVICE_IP=${ip_address}
     export BACKEND_SERVICE_PORT=7777
-    export NGINX_PORT=81
+    export NGINX_PORT=80
     export host_ip=${ip_address}
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
@@ -73,6 +73,8 @@ function start_services() {
         sleep 5s
         n=$((n+1))
     done
+
+    sleep 1m
 }
 
 function validate_services() {
