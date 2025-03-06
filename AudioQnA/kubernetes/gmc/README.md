@@ -25,7 +25,7 @@ The AudioQnA uses the below prebuilt images if you choose a Xeon deployment
 Should you desire to use the Gaudi accelerator, two alternate images are used for the embedding and llm services.
 For Gaudi:
 
-- tgi-service: ghcr.io/huggingface/tgi-gaudi:2.0.6
+- tgi-service: ghcr.io/huggingface/tgi-gaudi:2.3.1
 - whisper-gaudi: opea/whisper-gaudi:latest
 - speecht5-gaudi: opea/speecht5-gaudi:latest
 

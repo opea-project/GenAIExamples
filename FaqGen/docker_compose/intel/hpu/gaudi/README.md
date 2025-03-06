@@ -90,7 +90,7 @@ First of all, you need to build Docker Images locally. This step can be ignored 
 As TGI Gaudi has been officially published as a Docker image, we simply need to pull it:
 
 ```bash
-docker pull ghcr.io/huggingface/tgi-gaudi:2.0.6
+docker pull ghcr.io/huggingface/tgi-gaudi:2.3.1
 ```
 
 ### 2. Build LLM Image
@@ -132,7 +132,7 @@ docker build -t opea/faqgen-react-ui:latest --build-arg https_proxy=$https_proxy
 
 Then run the command `docker images`, you will have the following Docker Images:
 
-1. `ghcr.io/huggingface/tgi-gaudi:2.0.6`
+1. `ghcr.io/huggingface/tgi-gaudi:2.3.1`
 2. `opea/llm-faqgen:latest`
 3. `opea/faqgen:latest`
 4. `opea/faqgen-ui:latest`
