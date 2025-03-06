@@ -146,7 +146,7 @@ curl http://${host_ip}:${FAQGEN_BACKEND_PORT}/v1/faqgen \
   -F "stream=True"
 ```
 
-   Following the validation of all aforementioned microservices, we are now prepared to construct a mega-service.
+Following the validation of all aforementioned microservices, we are now prepared to construct a mega-service.
 
 ## 🚀 Launch the UI
 
