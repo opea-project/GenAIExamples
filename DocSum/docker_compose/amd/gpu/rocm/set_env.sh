@@ -5,7 +5,7 @@
 
 export MAX_INPUT_TOKENS=2048
 export MAX_TOTAL_TOKENS=4096
-export DOCSUM_TGI_IMAGE="ghcr.io/huggingface/text-generation-inference:2.3.1-rocm"
+export DOCSUM_TGI_IMAGE="ghcr.io/huggingface/text-generation-inference:2.4.1-rocm"
 export DOCSUM_LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
 export HOST_IP=${host_ip}
 export DOCSUM_TGI_SERVICE_PORT="8008"
