@@ -28,7 +28,7 @@ export DOCSUM_PORT=9000
 export LLM_ENDPOINT="http://${host_ip}:${LLM_ENDPOINT_PORT}"
 export DocSum_COMPONENT_NAME="OpeaDocSumTgi"
 export LOGFLAG=True
-export DATA_PATH="/data/cache"
+export DATA_PATH=${model_cache:-"/data/cache"}
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"

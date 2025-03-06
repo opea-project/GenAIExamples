@@ -12,6 +12,10 @@ GenAIExamples are designed to give developers an easy entry into generative AI, 
 
 [GenAIEval](https://github.com/opea-project/GenAIEval) measures service performance metrics such as throughput, latency, and accuracy for GenAIExamples. This feature helps users compare performance across various hardware configurations easily.
 
+## Documentation
+
+The GenAIExamples [documentation](https://opea-project.github.io/latest/examples/index.html) contains a comprehensive guide on all available examples including architecture, deployment guides, and more. Information on GenAIComps, GenAIInfra, and GenAIEval can also be found there.
+
 ## Getting Started
 
 GenAIExamples offers flexible deployment options that cater to different user needs, enabling efficient use and deployment in various environments. Here’s a brief overview of the three primary methods: Python startup, Docker Compose, and Kubernetes.
@@ -20,7 +24,7 @@ Users can choose the most suitable approach based on ease of setup, scalability 
 
 ### Deployment Guide
 
-Deployment are based on released docker images by default, check [docker image list](./docker_images_list.md) for detailed information. You can also build your own images following instructions.
+Deployment is based on released docker images by default, check [docker image list](./docker_images_list.md) for detailed information. You can also build your own images following instructions.
 
 #### Prerequisite
 
@@ -42,6 +46,8 @@ Deployment are based on released docker images by default, check [docker image l
   | Xeon     | Intel/neural-chat-7b-v3-3 | 64 vCPUs, 100 GB disk 64 GB RAM, and Ubuntu 24.04                    | AWS Cloud/c7i.16xlarge                                                       |
 
 #### Deploy Examples
+
+> **Note**: Check for [sample guides](https://opea-project.github.io/latest/examples/index.html) first for your use case. If it is not available, then refer to the table below.
 
 | Use Case          | Docker Compose<br/>Deployment on Xeon                                          | Docker Compose<br/>Deployment on Gaudi                                       | Docker Compose<br/>Deployment on ROCm                                    | Kubernetes with Helm Charts                                         | Kubernetes with GMC                                          |
 | ----------------- | ------------------------------------------------------------------------------ | ---------------------------------------------------------------------------- | ------------------------------------------------------------------------ | ------------------------------------------------------------------- | ------------------------------------------------------------ |
