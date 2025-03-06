@@ -9,11 +9,11 @@ echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
 echo "TAG=IMAGE_TAG=${IMAGE_TAG}"
 export REGISTRY=${IMAGE_REPO}
 export TAG=${IMAGE_TAG}
-export MODEL_CACHE=${model_cache:-"./data"}
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
+export host_ip=$(hostname -I | awk '{print $1}')
 
 function build_docker_images() {
     opea_branch=${opea_branch:-"main"}
@@ -34,7 +34,7 @@ function build_docker_images() {
     VLLM_VER="$(git describe --tags "$(git rev-list --tags --max-count=1)" )"
     echo "Check out vLLM tag ${VLLM_VER}"
     git checkout ${VLLM_VER} &> /dev/null
-    # Not change the pwd
+    # make sure NOT change the pwd
     cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
@@ -45,21 +45,17 @@ function build_docker_images() {
 
     docker images && sleep 1s
 }
-
 function start_services() {
     cd $WORKPATH/docker_compose/intel/cpu/xeon/
     export no_proxy=${no_proxy},${ip_address}
     export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
     export RERANK_MODEL_ID="BAAI/bge-reranker-base"
     export LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
-    export PINECONE_API_KEY=${PINECONE_KEY_LANGCHAIN_TEST}
-    export PINECONE_INDEX_NAME="langchain-test"
-    export INDEX_NAME="langchain-test"
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
     export LOGFLAG=true
 
     # Start Docker Containers
-    docker compose -f compose_pinecone.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
+    docker compose -f compose_milvus.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
 
     n=0
     until [[ "$n" -ge 100 ]]; do
@@ -128,21 +124,27 @@ function validate_microservices() {
 
     sleep 1m # retrieval can't curl as expected, try to wait for more time
 
-    # test /v1/dataprep/delete
-    validate_service \
-       "http://${ip_address}:6007/v1/dataprep/delete" \
-       '{"status":true}' \
-        "dataprep_del" \
-        "dataprep-pinecone-server"
-
-
     # test /v1/dataprep/ingest upload file
     echo "Deep learning is a subset of machine learning that utilizes neural networks with multiple layers to analyze various levels of abstract data representations. It enables computers to identify patterns and make decisions with minimal human intervention by learning from large amounts of data." > $LOG_PATH/dataprep_file.txt
     validate_service \
-       "http://${ip_address}:6007/v1/dataprep/ingest" \
+       "http://${ip_address}:11101/v1/dataprep/ingest" \
         "Data preparation succeeded" \
         "dataprep_upload_file" \
-        "dataprep-pinecone-server"
+        "dataprep-milvus-server"
+
+    # test /v1/dataprep/delete
+    validate_service \
+       "http://${ip_address}:11101/v1/dataprep/delete" \
+       '{"status":true}' \
+        "dataprep_del" \
+        "dataprep-milvus-server"
+
+    # test /v1/dataprep/delete
+    validate_service \
+       "http://${ip_address}:11101/v1/dataprep/delete" \
+       '{"status":true}' \
+        "dataprep_del" \
+        "dataprep-milvus-server"
 
 
     # retrieval microservice
@@ -151,7 +153,7 @@ function validate_microservices() {
         "${ip_address}:7000/v1/retrieval" \
         " " \
         "retrieval" \
-        "retriever-pinecone-server" \
+        "retriever-milvus-server" \
         "{\"text\":\"What is the revenue of Nike in 2023?\",\"embedding\":${test_embedding}}"
 
     # tei for rerank microservice
@@ -164,7 +166,7 @@ function validate_microservices() {
         '{"query":"What is Deep Learning?", "texts": ["Deep Learning is not...", "Deep learning is..."]}'
 
 
-    # vllm for llm service
+    # tgi for llm service
     echo "Validating llm service"
     validate_service \
         "${ip_address}:9009/v1/chat/completions" \
@@ -219,7 +221,7 @@ function stop_docker() {
     echo "In stop docker"
     echo $WORKPATH
     cd $WORKPATH/docker_compose/intel/cpu/xeon/
-    docker compose -f compose_pinecone.yaml down
+    docker compose -f compose_milvus.yaml down
 }
 
 function main() {

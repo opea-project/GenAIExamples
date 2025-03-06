@@ -5,52 +5,65 @@ services:
   neo4j-apoc:
     image: neo4j:latest
     container_name: neo4j-apoc
+    ports:
+      - "${NEO4J_PORT1:-7474}:7474"
+      - "${NEO4J_PORT2:-7687}:7687"
     volumes:
-        - /$HOME/neo4j/logs:/logs
-        - /$HOME/neo4j/config:/config
-        - /$HOME/neo4j/data:/data
-        - /$HOME/neo4j/plugins:/plugins
+        - ./data/neo4j/logs:/logs
+        - ./data/neo4j/config:/config
+        - ./data/neo4j/data:/data
+        - ./data/neo4j/plugins:/plugins
     ipc: host
     environment:
+      - no_proxy=${no_proxy}
+      - http_proxy=${http_proxy}
+      - https_proxy=${https_proxy}
       - NEO4J_AUTH=${NEO4J_USERNAME}/${NEO4J_PASSWORD}
       - NEO4J_PLUGINS=["apoc"]
       - NEO4J_apoc_export_file_enabled=true
       - NEO4J_apoc_import_file_enabled=true
       - NEO4J_apoc_import_file_use__neo4j__config=true
       - NEO4J_dbms_security_procedures_unrestricted=apoc.\*
-    ports:
-      - "7474:7474"
-      - "7687:7687"
+      - NEO4J_server_bolt_advertised__address=localhost:${NEO4J_PORT2}
     restart: always
-  tei-embedding-service:
+    healthcheck:
+      test: wget http://localhost:7474 || exit 1
+      interval: 5s
+      timeout: 10s
+      retries: 20
+      start_period: 3s
+  tei-embedding-serving:
     image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
-    container_name: tei-embedding-server
+    container_name: tei-embedding-serving
+    entrypoint: /bin/sh -c "apt-get update && apt-get install -y curl && text-embeddings-router --json-output --model-id ${EMBEDDING_MODEL_ID} --auto-truncate"
     ports:
-      - "6006:80"
+      - "${TEI_EMBEDDER_PORT:-12000}:80"
     volumes:
       - "./data:/data"
     shm_size: 1g
     environment:
       no_proxy: ${no_proxy}
-      NO_PROXY: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      HUGGING_FACE_HUB_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
-    ipc: host
-    command: --model-id ${EMBEDDING_MODEL_ID} --auto-truncate
-  tgi-gaudi-service:
-    image: ghcr.io/huggingface/tgi-gaudi:2.0.6
+      host_ip: ${host_ip}
+      HF_TOKEN: ${HF_TOKEN}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://${host_ip}:${TEI_EMBEDDER_PORT}/health"]
+      interval: 10s
+      timeout: 6s
+      retries: 48
+  tgi-gaudi-server:
+    image: ghcr.io/huggingface/tgi-gaudi:2.3.1
     container_name: tgi-gaudi-server
     ports:
-      - "6005:80"
+      - ${LLM_ENDPOINT_PORT:-8008}:80
     volumes:
-      - "./data:/data"
+      - "${DATA_PATH:-./data}:/data"
     environment:
       no_proxy: ${no_proxy}
-      NO_PROXY: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      HUGGING_FACE_HUB_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HUGGING_FACE_HUB_TOKEN: ${HF_TOKEN}
       HF_TOKEN: ${HF_TOKEN}
       HF_HUB_DISABLE_PROGRESS_BARS: 1
       HF_HUB_ENABLE_HF_TRANSFER: 0
@@ -60,33 +73,44 @@ services:
       LIMIT_HPU_GRAPH: true
       USE_FLASH_ATTENTION: true
       FLASH_ATTENTION_RECOMPUTE: true
+      host_ip: ${host_ip}
+      LLM_ENDPOINT_PORT: ${LLM_ENDPOINT_PORT}
+      MAX_INPUT_TOKENS: ${MAX_INPUT_TOKENS:-2048}
+      MAX_TOTAL_TOKENS: ${MAX_TOTAL_TOKENS:-4096}
       TEXT_GENERATION_SERVER_IGNORE_EOS_TOKEN: false
     runtime: habana
     cap_add:
       - SYS_NICE
     ipc: host
-    command: --model-id ${LLM_MODEL_ID} --max-input-length 6000 --max-total-tokens 8192
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://${host_ip}:${LLM_ENDPOINT_PORT}/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 100
+    command: --model-id ${LLM_MODEL_ID}
+
   dataprep-neo4j-llamaindex:
     image: ${REGISTRY:-opea}/dataprep:${TAG:-latest}
-    container_name: dataprep-neo4j-server
+    container_name: dataprep-neo4j-llamaindex
     depends_on:
-      - neo4j-apoc
-      - tgi-gaudi-service
-      - tei-embedding-service
+      neo4j-apoc:
+        condition: service_healthy
+      tgi-gaudi-server:
+        condition: service_healthy
+      tei-embedding-serving:
+        condition: service_healthy
     ports:
-      - "6004:5000"
+      - "${DATAPREP_PORT:-11103}:5000"
     ipc: host
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       host_ip: ${host_ip}
-      HUGGING_FACE_HUB_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
-      HF_TOKEN: ${HF_TOKEN}
+      DATAPREP_COMPONENT_NAME: "OPEA_DATAPREP_NEO4J_LLAMAINDEX"
       NEO4J_URL: ${NEO4J_URL}
       NEO4J_USERNAME: ${NEO4J_USERNAME}
       NEO4J_PASSWORD: ${NEO4J_PASSWORD}
-      DATAPREP_COMPONENT_NAME: "OPEA_DATAPREP_NEO4J_LLAMAINDEX"
       TGI_LLM_ENDPOINT: ${TGI_LLM_ENDPOINT}
       TEI_EMBEDDING_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
       OPENAI_API_KEY: ${OPENAI_API_KEY}
@@ -94,59 +118,61 @@ services:
       OPENAI_LLM_MODEL: ${OPENAI_LLM_MODEL}
       EMBEDDING_MODEL_ID: ${EMBEDDING_MODEL_ID}
       LLM_MODEL_ID: ${LLM_MODEL_ID}
-      MAX_OUTPUT_TOKENS: ${MAX_OUTPUT_TOKENS}
       LOGFLAG: ${LOGFLAG}
+      HUGGINGFACEHUB_API_TOKEN: ${HF_TOKEN}
+      HF_TOKEN: ${HF_TOKEN}
+      MAX_INPUT_TOKENS: ${MAX_INPUT_TOKENS:-4096}
     restart: unless-stopped
-  retriever-neo4j-llamaindex:
+  retriever-neo4j:
     image: ${REGISTRY:-opea}/retriever:${TAG:-latest}
-    container_name: retriever-neo4j-server
-    depends_on:
-      - neo4j-apoc
-      - tgi-gaudi-service
-      - tei-embedding-service
+    container_name: retriever-neo4j
     ports:
-      - "7000:7000"
+      - "${RETRIEVER_PORT:-7000}:7000"
     ipc: host
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      host_ip: ${host_ip}
-      HUGGING_FACE_HUB_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
-      HF_TOKEN: ${HF_TOKEN}
-      NEO4J_URI: ${NEO4J_URL}
-      NEO4J_USERNAME: ${NEO4J_USERNAME}
-      NEO4J_PASSWORD: ${NEO4J_PASSWORD}
-      TGI_LLM_ENDPOINT: ${TGI_LLM_ENDPOINT}
+      HUGGINGFACEHUB_API_TOKEN: ${HF_TOKEN}
+      LOGFLAG: ${LOGFLAG:-False}
+      RETRIEVER_COMPONENT_NAME: ${RETRIEVER_COMPONENT_NAME:-OPEA_RETRIEVER_NEO4J}
       TEI_EMBEDDING_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
-      OPENAI_API_KEY: ${OPENAI_API_KEY}
-      OPENAI_EMBEDDING_MODEL: ${OPENAI_EMBEDDING_MODEL}
-      OPENAI_LLM_MODEL: ${OPENAI_LLM_MODEL}
+      TGI_LLM_ENDPOINT: ${TGI_LLM_ENDPOINT}
       EMBEDDING_MODEL_ID: ${EMBEDDING_MODEL_ID}
       LLM_MODEL_ID: ${LLM_MODEL_ID}
-      MAX_OUTPUT_TOKENS: ${MAX_OUTPUT_TOKENS}
-      LOGFLAG: ${LOGFLAG}
-      RETRIEVER_COMPONENT_NAME: "OPEA_RETRIEVER_NEO4J"
-    restart: unless-stopped
+      NEO4J_URI: ${NEO4J_URI}
+      NEO4J_URL: ${NEO4J_URI}
+      NEO4J_USERNAME: ${NEO4J_USERNAME}
+      NEO4J_PASSWORD: ${NEO4J_PASSWORD}
+      VDMS_USE_CLIP: 0
+      host_ip: ${host_ip}
+    depends_on:
+      neo4j-apoc:
+        condition: service_healthy
+      tei-embedding-serving:
+        condition: service_healthy
+      tgi-gaudi-server:
+        condition: service_healthy
   graphrag-gaudi-backend-server:
     image: ${REGISTRY:-opea}/graphrag:${TAG:-latest}
     container_name: graphrag-gaudi-backend-server
     depends_on:
       - neo4j-apoc
-      - tei-embedding-service
-      - retriever-neo4j-llamaindex
-      - tgi-gaudi-service
+      - tei-embedding-serving
+      - retriever-neo4j
+      - tgi-gaudi-server
     ports:
       - "8888:8888"
+      - "${MEGA_SERVICE_PORT:-8888}:8888"
     environment:
       - no_proxy=${no_proxy}
       - https_proxy=${https_proxy}
       - http_proxy=${http_proxy}
       - MEGA_SERVICE_HOST_IP=graphrag-gaudi-backend-server
-      - RETRIEVER_SERVICE_HOST_IP=retriever-neo4j-llamaindex
+      - RETRIEVER_SERVICE_HOST_IP=retriever-neo4j
       - RETRIEVER_SERVICE_PORT=7000
-      - LLM_SERVER_HOST_IP=tgi-gaudi-service
-      - LLM_SERVER_PORT=${LLM_SERVER_PORT:-80}
+      - LLM_SERVER_HOST_IP=tgi-gaudi-server
+      - LLM_SERVER_PORT=80
       - LLM_MODEL_ID=${LLM_MODEL_ID}
       - LOGFLAG=${LOGFLAG}
     ipc: host
