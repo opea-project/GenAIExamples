@@ -7,7 +7,7 @@ on:
     inputs:
       nodes:
         default: "gaudi,xeon"
-        description: "Hardware to run test"
+        description: "Hardware to run test gaudi,gaudi3,xeon,rocm,arc"
         required: true
         type: string
       examples:

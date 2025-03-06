@@ -54,6 +54,7 @@ jobs:
 # Image Build
 ####################################################################################################
   build-images:
+    if: ${{ inputs.node }} != "gaudi3" && ${{ inputs.node }} != "rocm" && ${{ inputs.node }} != "arc"
     runs-on: "docker-build-${{ inputs.node }}"
     steps:
       - name: Clean Up Working Directory

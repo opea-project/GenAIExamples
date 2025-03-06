@@ -64,9 +64,14 @@ jobs:
           cd ${{ github.workspace }}/${{ inputs.example }}/tests
           run_test_cases=""
 
-          default_test_case=$(find . -type f -name "test_compose_on_${{ inputs.hardware }}.sh" | cut -d/ -f2)
+          if [ "${{ inputs.hardware }}" == "gaudi2" ] || [ "${{ inputs.hardware }}" == "gaudi3" ]; then
+            hardware="gaudi"
+          else
+            hardware="${{ inputs.hardware }}"
+          fi
+          default_test_case=$(find . -type f -name "test_compose_on_$hardware.sh" | cut -d/ -f2)
           if [ "$default_test_case" ]; then run_test_cases="$default_test_case"; fi
-          other_test_cases=$(find . -type f -name "test_compose_*_on_${{ inputs.hardware }}.sh" | cut -d/ -f2)
+          other_test_cases=$(find . -type f -name "test_compose_*_on_$hardware.sh" | cut -d/ -f2)
           echo "default_test_case=$default_test_case"
           echo "other_test_cases=$other_test_cases"
 
