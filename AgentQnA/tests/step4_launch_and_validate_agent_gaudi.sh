@@ -13,7 +13,7 @@ export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
 HF_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
 model="meta-llama/Llama-3.3-70B-Instruct" #"meta-llama/Meta-Llama-3.1-70B-Instruct"
 
-export HF_CACHE_DIR=/data2/huggingface
+export HF_CACHE_DIR=${model_cache:-"/data2/huggingface"}
 if [ ! -d "$HF_CACHE_DIR" ]; then
     HF_CACHE_DIR=$WORKDIR/hf_cache
     mkdir -p "$HF_CACHE_DIR"
