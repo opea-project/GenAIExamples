@@ -30,12 +30,12 @@ function build_docker_images() {
 
     cd $WORKPATH/docker_image_build
     git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
+    git clone --depth 1 --branch v0.6.4.post2+Gaudi-1.19.0 https://github.com/HabanaAI/vllm-fork.git
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="codetrans codetrans-ui llm-textgen nginx"
+    service_list="codetrans codetrans-ui llm-textgen vllm-gaudi nginx"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
-    docker pull ghcr.io/huggingface/tgi-gaudi:2.0.6
     docker images && sleep 1s
 }
 
@@ -45,7 +45,12 @@ function start_services() {
     export http_proxy=${http_proxy}
     export https_proxy=${http_proxy}
     export LLM_MODEL_ID="mistralai/Mistral-7B-Instruct-v0.3"
-    export TGI_LLM_ENDPOINT="http://${ip_address}:8008"
+    export LLM_ENDPOINT="http://${ip_address}:8008"
+    export LLM_COMPONENT_NAME="OpeaTextGenService"
+    export NUM_CARDS=1
+    export BLOCK_SIZE=128
+    export MAX_NUM_SEQS=256
+    export MAX_SEQ_LEN_TO_CAPTURE=2048
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
     export MEGA_SERVICE_HOST_IP=${ip_address}
     export LLM_SERVICE_HOST_IP=${ip_address}
@@ -65,13 +70,15 @@ function start_services() {
 
     n=0
     until [[ "$n" -ge 100 ]]; do
-        docker logs codetrans-tgi-service > ${LOG_PATH}/tgi_service_start.log
-        if grep -q Connected ${LOG_PATH}/tgi_service_start.log; then
+        docker logs codetrans-gaudi-vllm-service > ${LOG_PATH}/vllm_service_start.log 2>&1
+        if grep -q complete ${LOG_PATH}/vllm_service_start.log; then
             break
         fi
         sleep 5s
         n=$((n+1))
     done
+
+    sleep 1m
 }
 
 function validate_services() {
@@ -103,27 +110,19 @@ function validate_services() {
 }
 
 function validate_microservices() {
-    # tgi for embedding service
-    validate_services \
-        "${ip_address}:8008/generate" \
-        "generated_text" \
-        "tgi" \
-        "codetrans-tgi-service" \
-        '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}'
-
     # llm microservice
     validate_services \
         "${ip_address}:9000/v1/chat/completions" \
         "data: " \
         "llm" \
-        "llm-textgen-gaudi-server" \
+        "codetrans-xeon-llm-server" \
         '{"query":"    ### System: Please translate the following Golang codes into  Python codes.    ### Original codes:    '\'''\'''\''Golang    \npackage main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n    '\'''\'''\''    ### Translated codes:"}'
 }
 
 function validate_megaservice() {
     # Curl the Mega Service
     validate_services \
-        "${ip_address}:7777/v1/codetrans" \
+        "${ip_address}:${BACKEND_SERVICE_PORT}/v1/codetrans" \
         "print" \
         "mega-codetrans" \
         "codetrans-gaudi-backend-server" \
@@ -131,7 +130,7 @@ function validate_megaservice() {
 
     # test the megeservice via nginx
     validate_services \
-        "${ip_address}:80/v1/codetrans" \
+        "${ip_address}:${NGINX_PORT}/v1/codetrans" \
         "print" \
         "mega-codetrans-nginx" \
         "codetrans-gaudi-nginx-server" \
@@ -170,7 +169,7 @@ function validate_frontend() {
 
 function stop_docker() {
     cd $WORKPATH/docker_compose/intel/hpu/gaudi
-    docker compose stop && docker compose rm -f
+    docker compose -f compose.yaml stop && docker compose rm -f
 }
 
 function main() {
