@@ -21,7 +21,7 @@ services:
       timeout: 10s
       retries: 100
     volumes:
-      - "${MODEL_CACHE}:/data"
+      - "${MODEL_CACHE:-./data}:/data"
     shm_size: 1g
     command: --model-id ${LLM_MODEL_ID} --cuda-graphs 0  --max-input-length ${MAX_INPUT_TOKENS} --max-total-tokens ${MAX_TOTAL_TOKENS}
 
