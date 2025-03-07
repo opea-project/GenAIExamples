@@ -8,8 +8,8 @@ services:
     ports:
       - ${VLLM_PORT:-8399}:80
     volumes:
-      - "./data:/data"
-    shm_size: 128g
+      - "${MODEL_CACHE:-./data}:/data"
+    shm_size: 1g
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
