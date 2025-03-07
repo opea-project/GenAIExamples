@@ -236,7 +236,7 @@ def http_bot(state, audio_response_toggler, request: gr.Request):
         gr.Image(state.image, visible=state.image is not None),
         PDF(state.pdf, visible=state.pdf is not None, interactive=False, starting_page=int(state.time_of_frame_ms) if state.time_of_frame_ms else 0),
     ) + (enable_btn,) * 1
-    
+
     logger.info(f"{state.chatbot_history[-1]['content']}")
     return
 
@@ -628,7 +628,7 @@ with gr.Blocks() as qna:
         ],
         [state, chatbot, multimodal_textbox, video, image, pdf, clear_btn],
     )
-    
+
     multimodal_textbox.submit(
         add_text,
         [state, multimodal_textbox],
