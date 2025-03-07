@@ -9,7 +9,7 @@ echo "WORKDIR=${WORKDIR}"
 export ip_address=$(hostname -I | awk '{print $1}')
 export host_ip=${ip_address}
 
-export HF_CACHE_DIR=$WORKDIR/hf_cache
+export HF_CACHE_DIR=${model_cache:-"$WORKDIR/hf_cache"}
 if [ ! -d "$HF_CACHE_DIR" ]; then
     echo "Creating HF_CACHE directory"
     mkdir -p "$HF_CACHE_DIR"
