@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 export FAQGEN_LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
-export FAQGEN_TGI_SERVICE_IMAGE="ghcr.io/huggingface/text-generation-inference:2.3.1-rocm"
+export FAQGEN_TGI_SERVICE_IMAGE="ghcr.io/huggingface/text-generation-inference:2.4.1-rocm"
 export HOST_IP=${host_ip}
 export FAQGEN_CARD_ID="card0"
 export FAQGEN_RENDER_ID="renderD128"

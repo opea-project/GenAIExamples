@@ -35,7 +35,7 @@ function build_docker_images() {
     service_list="faqgen faqgen-ui llm-faqgen"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
-    docker pull ghcr.io/huggingface/text-generation-inference:1.4
+    docker pull ghcr.io/huggingface/text-generation-inference:2.4.1
     docker images && sleep 1s
 }
 
