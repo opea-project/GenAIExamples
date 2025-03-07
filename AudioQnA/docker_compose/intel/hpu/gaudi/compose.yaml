@@ -40,7 +40,7 @@ services:
     ports:
       - "3006:80"
     volumes:
-      - "${MODEL_CACHE}:/data"
+      - "${MODEL_CACHE:-./data}:/data"
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
