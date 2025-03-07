@@ -6,17 +6,17 @@ on:
   workflow_dispatch:
     inputs:
       nodes:
-        default: "gaudi,xeon"
+        default: "gaudi3,rocm,arc"  # "gaudi,xeon"
         description: "Hardware to run test gaudi,gaudi3,xeon,rocm,arc"
         required: true
         type: string
       examples:
-        default: "ChatQnA"
+        default: "CodeGen"   #"ChatQnA"
         description: 'List of examples to test [AgentQnA,AudioQnA,ChatQnA,CodeGen,CodeTrans,DocIndexRetriever,DocSum,FaqGen,InstructionTuning,MultimodalQnA,ProductivitySuite,RerankFinetuning,SearchQnA,Translation,VideoQnA,VisualQnA,AvatarChatbot,Text2Image,WorkflowExecAgent,DBQnA,EdgeCraftRAG,GraphRAG]'
         required: true
         type: string
       tag:
-        default: "latest"
+        default: "test" #"latest"
         description: "Tag to apply to images"
         required: true
         type: string
@@ -26,7 +26,7 @@ on:
       #   required: true
       #   type: boolean
       build:
-        default: true
+        default: false #true
         description: 'Build test required images for Examples'
         required: false
         type: boolean
@@ -36,7 +36,7 @@ on:
         required: false
         type: boolean
       test_helmchart:
-        default: true
+        default: false #true
         description: 'Test examples with helm charts'
         required: false
         type: boolean
