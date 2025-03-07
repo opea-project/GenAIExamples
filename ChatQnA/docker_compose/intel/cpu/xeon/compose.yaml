@@ -8,12 +8,19 @@ services:
     ports:
       - "6379:6379"
       - "8001:8001"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
   dataprep-redis-service:
     image: ${REGISTRY:-opea}/dataprep:${TAG:-latest}
     container_name: dataprep-redis-server
     depends_on:
-      - redis-vector-db
-      - tei-embedding-service
+      redis-vector-db:
+        condition: service_healthy
+      tei-embedding-service:
+        condition: service_started
     ports:
       - "6007:5000"
     environment:
