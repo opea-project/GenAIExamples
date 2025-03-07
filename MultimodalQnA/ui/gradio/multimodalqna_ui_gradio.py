@@ -14,7 +14,15 @@ from conversation import multimodalqna_conv
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from gradio_pdf import PDF
-from utils import build_logger, make_temp_image, server_error_msg, split_video, convert_base64_to_audio, GRADIO_IMAGE_FORMATS, GRADIO_AUDIO_FORMATS
+from utils import (
+    build_logger,
+    convert_base64_to_audio,
+    GRADIO_AUDIO_FORMATS,
+    GRADIO_IMAGE_FORMATS,
+    make_temp_image,
+    server_error_msg,
+    split_video
+)
 
 logger = build_logger("gradio_web_server", "gradio_web_server.log")
 logflag = os.getenv("LOGFLAG", False)
@@ -154,11 +162,10 @@ def http_bot(state, audio_response_toggler, request: gr.Request):
             json=pload,
             timeout=ui_timeout,
         )
-        
         logger.info(response.status_code)
         if logflag:
             logger.info(response.json())
-        
+
         if response.status_code == 200:
             response = response.json()
             choice = response["choices"][-1]

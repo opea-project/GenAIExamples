@@ -2,8 +2,9 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import dataclasses
-from pathlib import Path
+
 from enum import Enum, auto
+from pathlib import Path
 from typing import Dict, List, Any, Literal
 
 from utils import convert_audio_to_base64, get_b64_frame_from_timestamp, GRADIO_IMAGE_FORMATS, GRADIO_AUDIO_FORMATS
