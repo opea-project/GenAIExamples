@@ -47,6 +47,10 @@ function start_services() {
     export LLM_MODEL_ID="mistralai/Mistral-7B-Instruct-v0.3"
     export LLM_ENDPOINT="http://${ip_address}:8008"
     export LLM_COMPONENT_NAME="OpeaTextGenService"
+    export NUM_CARDS=1
+    export BLOCK_SIZE=128
+    export MAX_NUM_SEQS=256
+    export MAX_SEQ_LEN_TO_CAPTURE=2048
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
     export MEGA_SERVICE_HOST_IP=${ip_address}
     export LLM_SERVICE_HOST_IP=${ip_address}
