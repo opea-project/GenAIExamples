@@ -611,7 +611,7 @@ with gr.Blocks() as qna:
                 with gr.Column(scale=8):
                     multimodal_textbox = gr.MultimodalTextbox(
                         show_label=False,
-                        file_types=["image", "audio"],
+                        file_types=GRADIO_IMAGE_FORMATS + GRADIO_AUDIO_FORMATS,
                         sources=["microphone", "upload"],
                         placeholder="Text, Image & Audio Query"
                     )

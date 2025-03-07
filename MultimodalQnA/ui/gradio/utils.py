@@ -18,8 +18,8 @@ LOGDIR = "."
 server_error_msg = "**NETWORK ERROR DUE TO HIGH TRAFFIC. PLEASE REGENERATE OR REFRESH THIS PAGE.**"
 moderation_msg = "YOUR INPUT VIOLATES OUR CONTENT MODERATION GUIDELINES. PLEASE TRY AGAIN."
 
-GRADIO_IMAGE_FORMATS = [".tiff", ".jfif", ".bmp", ".pjp", ".apng", ".jpeg", ".png", ".webp", ".svgz", ".jpg", ".heic", ".gif", ".svg", ".heif", ".ico", ".xbm", ".dib", ".tif", ".pjpeg", ".avif",]
-GRADIO_AUDIO_FORMATS = [".opus", ".flac", ".webm", ".weba", ".wav", ".ogg", ".m4a", ".oga", ".mid", ".mp3", ".aiff", ".wma", ".au",]
+GRADIO_IMAGE_FORMATS = [".jpeg", ".png", ".jpg", ".gif"]
+GRADIO_AUDIO_FORMATS = [".wav", ".mp3",]
 
 handler = None
 save_log = False
