@@ -166,10 +166,10 @@ def align_outputs(self, data, cur_node, inputs, runtime_graph, llm_parameters_di
     return next_data
 
 
-async def align_generator(self, gen, **kwargs):
+def align_generator(self, gen, **kwargs):
     # OpenAI response format
     # b'data:{"id":"","object":"text_completion","created":1725530204,"model":"meta-llama/Meta-Llama-3-8B-Instruct","system_fingerprint":"2.0.1-native","choices":[{"index":0,"delta":{"role":"assistant","content":"?"},"logprobs":null,"finish_reason":null}]}\n\n'
-    async for line in gen:
+    for line in gen:
         line = line.decode("utf-8")
         start = line.find("{")
         end = line.rfind("}") + 1
