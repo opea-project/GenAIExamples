@@ -2,13 +2,13 @@
 
 ## Introduction
 
-GenAIExamples are designed to give developers an easy entry into generative AI, featuring microservice-based samples that simplify the processes of deploying, testing, and scaling GenAI applications. All examples are fully compatible with Docker and Kubernetes, supporting a wide range of hardware platforms such as Gaudi, Xeon, and NVIDIA GPU, and other hardwares, ensuring flexibility and efficiency for your GenAI adoption.
+GenAIExamples are designed to give developers an easy entry into generative AI, featuring microservice-based samples that simplify the processes of deploying, testing, and scaling GenAI applications. All examples are fully compatible with both Docker and Kubernetes, supporting a wide range of hardware platforms such as Gaudi, Xeon, NVIDIA GPUs, and other hardwares including AMD GPUs, ensuring flexibility and efficiency for your GenAI adoption.
 
 ## Architecture
 
-[GenAIComps](https://github.com/opea-project/GenAIComps) is a service-based tool that includes microservice components such as llm, embedding, reranking, and so on. Using these components, various examples in GenAIExample can be constructed, including ChatQnA, DocSum, etc.
+[GenAIComps](https://github.com/opea-project/GenAIComps) is a service-based tool that includes microservice components such as llm, embedding, reranking, and so on. Using these components, various examples in GenAIExample can be constructed including ChatQnA, DocSum, etc.
 
-[GenAIInfra](https://github.com/opea-project/GenAIInfra), part of the OPEA containerization and cloud-native suite, enables quick and efficient deployment of GenAIExamples in the cloud.
+[GenAIInfra](https://github.com/opea-project/GenAIInfra) is part of the OPEA containerization and cloud-native suite and enables quick and efficient deployment of GenAIExamples in the cloud.
 
 [GenAIEval](https://github.com/opea-project/GenAIEval) measures service performance metrics such as throughput, latency, and accuracy for GenAIExamples. This feature helps users compare performance across various hardware configurations easily.
 
@@ -18,18 +18,18 @@ The GenAIExamples [documentation](https://opea-project.github.io/latest/examples
 
 ## Getting Started
 
-GenAIExamples offers flexible deployment options that cater to different user needs, enabling efficient use and deployment in various environments. Here’s a brief overview of the three primary methods: Python startup, Docker Compose, and Kubernetes.
+GenAIExamples offers flexible deployment options that cater to different user needs, enabling efficient use and deployment in various environments. Three primary methods are presently used to do this: Python startup, Docker Compose, and Kubernetes.
 
 Users can choose the most suitable approach based on ease of setup, scalability needs, and the environment in which they are operating.
 
 ### Deployment Guide
 
-Deployment is based on released docker images by default, check [docker image list](./docker_images_list.md) for detailed information. You can also build your own images following instructions.
+Deployment is based on released docker images by default - check [docker image list](./docker_images_list.md) for detailed information. You can also build your own images following instructions.
 
 #### Prerequisite
 
-- For Docker Compose based deployment, you should have docker compose installed. Refer to [docker compose install](https://docs.docker.com/compose/install/).
-- For Kubernetes based deployment, you can use [Helm](https://helm.sh) or [GMC](https://github.com/opea-project/GenAIInfra/tree/main/microservices-connector/README.md) based deployment.
+- For Docker Compose-based deployment, you should have docker compose installed. Refer to [docker compose install](https://docs.docker.com/compose/install/) for more information.
+- For Kubernetes-based deployment, you can use [Helm](https://helm.sh) or [GMC](https://github.com/opea-project/GenAIInfra/tree/main/microservices-connector/README.md)-based deployment.
 
   - You should have a kubernetes cluster ready for use. If not, you can refer to [k8s install](https://github.com/opea-project/docs/tree/main/guide/installation/k8s_install/README.md) to deploy one.
   - (Optional) You should have Helm (version >= 3.15) installed if you want to deploy with Helm Charts. Refer to the [Helm Installation Guide](https://helm.sh/docs/intro/install/) for more information.
@@ -37,7 +37,7 @@ Deployment is based on released docker images by default, check [docker image li
 
 - Recommended Hardware Reference
 
-  Based on different deployment model size and performance requirement, you may choose different hardware platforms or cloud instances. Here are some reference platforms
+  Based on different deployment model sizes and performance requirements, you may choose different hardware platforms or cloud instances. Here are some of the reference platforms:
 
   | Use Case | Deployment model          | Reference Configuration                                              | Hardware access/instances                                                    |
   | -------- | ------------------------- | -------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
@@ -47,7 +47,7 @@ Deployment is based on released docker images by default, check [docker image li
 
 #### Deploy Examples
 
-> **Note**: Check for [sample guides](https://opea-project.github.io/latest/examples/index.html) first for your use case. If it is not available, then refer to the table below.
+> **Note**: Check for [sample guides](https://opea-project.github.io/latest/examples/index.html) first for your use case. If it is not available, then refer to the table below:
 
 | Use Case          | Docker Compose<br/>Deployment on Xeon                                          | Docker Compose<br/>Deployment on Gaudi                                       | Docker Compose<br/>Deployment on ROCm                                    | Kubernetes with Helm Charts                                         | Kubernetes with GMC                                          |
 | ----------------- | ------------------------------------------------------------------------------ | ---------------------------------------------------------------------------- | ------------------------------------------------------------------------ | ------------------------------------------------------------------- | ------------------------------------------------------------ |
