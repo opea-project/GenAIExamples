@@ -10,7 +10,7 @@ services:
     ports:
       - "3001:80"
     volumes:
-      - "${MODEL_PATH}:/data"
+      - "${MODEL_PATH:-./data}:/data"
     shm_size: 1g
     environment:
       no_proxy: ${no_proxy}
@@ -56,7 +56,7 @@ services:
     ports:
       - "3004:80"
     volumes:
-      - "${MODEL_PATH}:/data"
+      - "${MODEL_PATH:-./data}:/data"
     shm_size: 1g
     environment:
       no_proxy: ${no_proxy}
@@ -86,7 +86,7 @@ services:
     ports:
       - "3006:80"
     volumes:
-      - "${MODEL_PATH}:/data"
+      - "${MODEL_PATH:-./data}:/data"
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
