@@ -212,7 +212,7 @@ def http_bot(state, audio_response_toggler, request: gr.Request):
         if logflag:
             logger.info(f"Request Exception occured:\n{str(e)}")
         
-        gr.Error("Request Exception occured! See logs for more info")
+        gr.Error("Request exception occurred. See logs for details.")
         
         yield (state, state.to_gradio_chatbot(), None, None, None) + (enable_btn,)
         return
