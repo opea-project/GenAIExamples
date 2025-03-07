@@ -9,6 +9,7 @@ echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
 echo "TAG=IMAGE_TAG=${IMAGE_TAG}"
 export REGISTRY=${IMAGE_REPO}
 export TAG=${IMAGE_TAG}
+export MODEL_CACHE=${model_cache:-"./data"}
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
@@ -231,13 +232,9 @@ function main() {
     duration=$((end_time-start_time))
     echo "Mega service start duration is $duration s"
 
-    if [ "${mode}" == "perf" ]; then
-        python3 $WORKPATH/tests/chatqna_benchmark.py
-    elif [ "${mode}" == "" ]; then
-        validate_microservices
-        validate_megaservice
-        validate_frontend
-    fi
+    validate_microservices
+    validate_megaservice
+    validate_frontend
 
     stop_docker
     echo y | docker system prune

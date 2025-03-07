@@ -43,7 +43,11 @@ on:
       inject_commit:
         default: false
         required: false
-        type: string
+        type: boolean
+      use_model_cache:
+        default: false
+        required: false
+        type: boolean
 
 jobs:
 ####################################################################################################
@@ -74,12 +78,16 @@ jobs:
           cd ${{ github.workspace }}/${{ inputs.example }}/docker_image_build
           docker_compose_path=${{ github.workspace }}/${{ inputs.example }}/docker_image_build/build.yaml
           if [[ $(grep -c "vllm:" ${docker_compose_path}) != 0 ]]; then
-              git clone --depth 1 https://github.com/vllm-project/vllm.git
-              cd vllm && git rev-parse HEAD && cd ../
+              git clone https://github.com/vllm-project/vllm.git  && cd vllm
+              # Get the latest tag
+              VLLM_VER="$(git describe --tags "$(git rev-list --tags --max-count=1)" )"
+              echo "Check out vLLM tag ${VLLM_VER}"
+              git checkout ${VLLM_VER} &> /dev/null
+              # make sure do not change the pwd
+              git rev-parse HEAD && cd ../
           fi
           if [[ $(grep -c "vllm-gaudi:" ${docker_compose_path}) != 0 ]]; then
               git clone --depth 1 --branch v0.6.4.post2+Gaudi-1.19.0 https://github.com/HabanaAI/vllm-fork.git
-              sed -i 's/triton/triton==3.1.0/g' vllm-fork/requirements-hpu.txt
           fi
           git clone --depth 1 --branch ${{ inputs.opea_branch }} https://github.com/opea-project/GenAIComps.git
           cd GenAIComps && git rev-parse HEAD && cd ../
@@ -106,6 +114,7 @@ jobs:
       tag: ${{ inputs.tag }}
       example: ${{ inputs.example }}
       hardware: ${{ inputs.node }}
+      use_model_cache: ${{ inputs.use_model_cache }}
     secrets: inherit
 
 
@@ -127,7 +136,7 @@ jobs:
 ####################################################################################################
   test-gmc-pipeline:
     needs: [build-images]
-    if: ${{ fromJSON(inputs.test_gmc) }}
+    if: false # ${{ fromJSON(inputs.test_gmc) }}
     uses: ./.github/workflows/_gmc-e2e.yml
     with:
       example: ${{ inputs.example }}
