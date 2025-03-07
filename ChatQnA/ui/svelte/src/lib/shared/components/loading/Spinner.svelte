@@ -15,7 +15,7 @@
 -->
 
 <script lang="ts">
-  export let color = '#3498db'; 
+  export let color = '#3498db';
 </script>
 
 <div class="spinner" style="width: 28px; height: 28px;">
