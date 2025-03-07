@@ -30,7 +30,7 @@ services:
     ports:
       - "3006:80"
     volumes:
-      - "${MODEL_CACHE}:/data"
+      - "${MODEL_CACHE:-./data}:/data"
     shm_size: 1g
     environment:
       no_proxy: ${no_proxy}
