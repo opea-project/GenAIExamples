@@ -11,6 +11,11 @@ export REGISTRY=${IMAGE_REPO}
 export TAG=${IMAGE_TAG}
 export MODEL_CACHE=${model_cache:-"./data"}
 
+export DOCKER_COMPOSE_PROFILE="codegen-xeon-tgi"
+export LLM_CONTINER_NAME="tgi-server"
+#export DOCKER_COMPOSE_PROFILE="codegen-xeon-vllm"
+#export LLM_CONTINER_NAME="vllm-server"
+
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
@@ -31,8 +36,16 @@ function build_docker_images() {
     cd $WORKPATH/docker_image_build
     git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
 
+    if [[ "${LLM_CONTINER_NAME}" == "tgi-server" ]]; then
+       git clone https://github.com/vllm-project/vllm.git && cd vllm
+       VLLM_VER="$(git describe --tags "$(git rev-list --tags --max-count=1)" )"
+       echo "Check out vLLM tag ${VLLM_VER}"
+       git checkout ${VLLM_VER} &> /dev/null
+       cd ../
+    fi
+
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="codegen codegen-ui llm-textgen"
+    service_list="codegen codegen-ui llm-textgen vllm"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu
@@ -42,8 +55,8 @@ function build_docker_images() {
 function start_services() {
     cd $WORKPATH/docker_compose/intel/cpu/xeon/
 
-    export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
-    export TGI_LLM_ENDPOINT="http://${ip_address}:8028"
+    export LLM_MODEL_ID="Qwen/Qwen2.5-Coder-7B-Instruct"
+    export LLM_ENDPOINT="http://${ip_address}:8028"
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
     export MEGA_SERVICE_HOST_IP=${ip_address}
     export LLM_SERVICE_HOST_IP=${ip_address}
@@ -53,12 +66,12 @@ function start_services() {
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
     # Start Docker Containers
-    docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
+    docker compose --profile ${DOCKER_COMPOSE_PROFILE} up -d > ${LOG_PATH}/start_services_with_compose.log
 
     n=0
     until [[ "$n" -ge 100 ]]; do
-        docker logs tgi-service > ${LOG_PATH}/tgi_service_start.log
-        if grep -q Connected ${LOG_PATH}/tgi_service_start.log; then
+        docker logs ${LLM_CONTINER_NAME} > ${LOG_PATH}/llm_service_start.log 2>&1
+        if grep -E "Connected|complete" ${LOG_PATH}/llm_service_start.log; then
             break
         fi
         sleep 5s
@@ -97,11 +110,11 @@ function validate_services() {
 function validate_microservices() {
     # tgi for llm service
     validate_services \
-        "${ip_address}:8028/generate" \
-        "generated_text" \
-        "tgi-llm" \
-        "tgi-service" \
-        '{"inputs":"def print_hello_world():","parameters":{"max_new_tokens":256, "do_sample": true}}'
+        "${ip_address}:8028/v1/chat/completions" \
+        "completion_tokens" \
+        "llm-service" \
+        "${LLM_CONTINER_NAME}" \
+        '{"model": "Qwen/Qwen2.5-Coder-7B-Instruct", "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens": 256}'
 
     # llm microservice
     validate_services \
@@ -109,7 +122,7 @@ function validate_microservices() {
         "data: " \
         "llm" \
         "llm-textgen-server" \
-        '{"query":"def print_hello_world():"}'
+        '{"query":"def print_hello_world():", "max_tokens": 256}'
 
 }
 
@@ -120,7 +133,7 @@ function validate_megaservice() {
         "print" \
         "mega-codegen" \
         "codegen-xeon-backend-server" \
-        '{"messages": "def print_hello_world():"}'
+        '{"messages": "def print_hello_world():", "max_tokens": 256}'
 
 }
 
@@ -155,7 +168,7 @@ function validate_frontend() {
 
 function stop_docker() {
     cd $WORKPATH/docker_compose/intel/cpu/xeon/
-    docker compose stop && docker compose rm -f
+    docker compose --profile ${DOCKER_COMPOSE_PROFILE} down
 }
 
 function main() {
