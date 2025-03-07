@@ -37,7 +37,7 @@ services:
       interval: 10s
       timeout: 10s
       retries: 100
-    command: --model-id ${LLM_MODEL_ID} --max-input-length ${MAX_INPUT_TOKENS} --max-total-tokens ${MAX_TOTAL_TOKENS} --max-batch-total-tokens 65536 --max-batch-prefill-tokens 4096
+    command: --model-id ${LLM_MODEL_ID} --max-input-tokens ${MAX_INPUT_TOKENS} --max-total-tokens ${MAX_TOTAL_TOKENS} --max-batch-total-tokens 65536 --max-batch-prefill-tokens 4096
   llm_faqgen:
     image: ${REGISTRY:-opea}/llm-faqgen:${TAG:-latest}
     container_name: llm-faqgen-server

@@ -21,6 +21,7 @@ services:
       host_ip: ${host_ip}
       LLM_ENDPOINT_PORT: ${LLM_ENDPOINT_PORT}
       VLLM_SKIP_WARMUP: ${VLLM_SKIP_WARMUP:-false}
+      NUM_CARDS: ${NUM_CARDS:-1}
     runtime: habana
     cap_add:
       - SYS_NICE
@@ -30,7 +31,7 @@ services:
       interval: 10s
       timeout: 10s
       retries: 150
-    command: --model $LLM_MODEL_ID --tensor-parallel-size 1 --host 0.0.0.0 --port 80 --block-size 128 --max-num-seqs 256
+    command: --model $LLM_MODEL_ID --tensor-parallel-size ${NUM_CARDS} --host 0.0.0.0 --port 80 --block-size 128 --max-num-seqs 256
   llm_faqgen:
     image: ${REGISTRY:-opea}/llm-faqgen:${TAG:-latest}
     container_name: llm-faqgen-server

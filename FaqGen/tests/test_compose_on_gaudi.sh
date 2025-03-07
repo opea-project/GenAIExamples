@@ -63,6 +63,7 @@ function start_services() {
     export LLM_SERVICE_HOST_IP=${ip_address}
     export LLM_SERVICE_PORT=9001
     export FAQGEN_BACKEND_PORT=8888
+    export NUM_CARDS=1
     export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:${FAQGEN_BACKEND_PORT}/v1/faqgen"
     export LOGFLAG=True
 
