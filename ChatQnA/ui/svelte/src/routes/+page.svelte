@@ -39,6 +39,8 @@
 	import ChatMessage from "$lib/modules/chat/ChatMessage.svelte";
 	import { fetchAllFile } from "$lib/network/upload/Network.js";
 	import { getNotificationsContext } from "svelte-notifications";
+	import Spinner from "$lib/shared/components/loading/Spinner.svelte";
+
 
 	let query: string = "";
 	let loading: boolean = false;
@@ -241,8 +243,13 @@
 						type="submit"
 						id="send"
 						class="absolute bottom-2.5 end-2.5 px-4 py-2 text-sm font-medium text-white dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-						><PaperAirplane /></button
-					>
+						>
+						{#if loading}
+							<Spinner />
+						{:else}
+							<PaperAirplane />
+						{/if}
+					</button>
 				</div>
 			</div>
 		</div>
