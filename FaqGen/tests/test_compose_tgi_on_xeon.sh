@@ -13,6 +13,7 @@ export TAG=${IMAGE_TAG}
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
+export MODEL_CACHE=${model_cache:-"./data"}
 
 function build_docker_images() {
     opea_branch=${opea_branch:-"main"}

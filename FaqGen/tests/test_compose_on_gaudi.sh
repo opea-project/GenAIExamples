@@ -13,7 +13,7 @@ export TAG=${IMAGE_TAG}
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
-export DATA_PATH=${model_cache:-"/data/cache"}
+export MODEL_CACHE=${model_cache:-"/data/cache"}
 
 function build_docker_images() {
     cd $WORKPATH
