@@ -124,7 +124,7 @@ jobs:
         run: echo "build_result=${{ steps.build-image.outputs.result }}" >> $GITHUB_OUTPUT
 
   check:
-    needs: [check-skip, build-images] 
+    needs: [check-skip, build-images]
     if: always()
     runs-on: ubuntu-latest
     outputs:
@@ -145,7 +145,7 @@ jobs:
           fi
 
   check--check:
-    # needs: [check] 
+    # needs: [check]
     if: ${{ inputs.test_compose }} && ${{ needs.check.outputs.should_compose == 'true' }}
     runs-on: ubuntu-latest
     steps:
