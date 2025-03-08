@@ -21,7 +21,8 @@ WORKDIR $HOME
 FROM base AS git
 
 RUN apt-get update && apt-get install -y --no-install-recommends git
-RUN git clone --depth 1 https://github.com/opea-project/GenAIComps.git
+#RUN git clone --depth 1 https://github.com/opea-project/GenAIComps.git
+RUN git clone https://github.com/intel-ai-tce/GenAIComps.git && cd GenAIComps  && git checkout otlp_disable_by_default
 
 
 # Stage 3: common layer shared by services using GenAIComps
