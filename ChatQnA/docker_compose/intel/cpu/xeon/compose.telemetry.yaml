@@ -4,8 +4,12 @@
 services:
   tei-embedding-service:
     command: --model-id ${EMBEDDING_MODEL_ID} --auto-truncate --otlp-endpoint $OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
+    environment:
+      - TELEMETRY_ENDPOINT=${TELEMETRY_ENDPOINT}
   tei-reranking-service:
     command: --model-id ${RERANK_MODEL_ID} --auto-truncate --otlp-endpoint $OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
+    environment:
+      - TELEMETRY_ENDPOINT=${TELEMETRY_ENDPOINT}
   jaeger:
     image: jaegertracing/all-in-one:latest
     container_name: jaeger
@@ -70,5 +74,4 @@ services:
       mode: global
   chatqna-xeon-backend-server:
     environment:
-      - ENABLE_OPEA_TELEMETRY=true
       - TELEMETRY_ENDPOINT=${TELEMETRY_ENDPOINT}
