@@ -10,6 +10,11 @@ services:
     command: --model-id ${RERANK_MODEL_ID} --auto-truncate --otlp-endpoint $OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
     environment:
       - TELEMETRY_ENDPOINT=${TELEMETRY_ENDPOINT}
+#  vllm-service:
+#    command: --model $LLM_MODEL_ID --host 0.0.0.0 --port 80 --otlp-traces-endpoint $OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
+  chatqna-xeon-backend-server:
+    environment:
+      - TELEMETRY_ENDPOINT=${TELEMETRY_ENDPOINT}
   jaeger:
     image: jaegertracing/all-in-one:latest
     container_name: jaeger
@@ -72,6 +77,3 @@ services:
     restart: always
     deploy:
       mode: global
-  chatqna-xeon-backend-server:
-    environment:
-      - TELEMETRY_ENDPOINT=${TELEMETRY_ENDPOINT}
