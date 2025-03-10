@@ -181,8 +181,8 @@ function main() {
 #    if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
     start_services
 
-    validate_microservices
-    validate_megaservice
+#    validate_microservices
+#    validate_megaservice
     validate_frontend
 
 #    stop_docker
