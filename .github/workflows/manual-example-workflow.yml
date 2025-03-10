@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       nodes:
-        default: "gaudi,xeon"
+        default: "xeon" #"gaudi,xeon"
         description: "Hardware to run test gaudi,gaudi3,xeon,rocm,arc"
         required: true
         type: string
@@ -96,7 +96,7 @@ jobs:
 
   run-examples:
     needs: [get-test-matrix]   #[get-test-matrix, build-deploy-gmc]
-    if: always()
+    # if: always()
     strategy:
       matrix:
         example: ${{ fromJson(needs.get-test-matrix.outputs.examples) }}
