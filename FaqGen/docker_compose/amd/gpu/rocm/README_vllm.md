@@ -1,68 +1,143 @@
-# Build and deploy FaqGen Application on AMD GPU (ROCm)
+Copyright (C) 2024 Advanced Micro Devices, Inc.
 
-## Build images
+# Deploy FaqGen application
 
-### Build the vLLM Docker Image
+## 1. Clone repo and build Docker images
+
+### 1.1. Cloning GenAIComps repo
+
+Create an empty directory in home directory and navigate to it:
 
 ```bash
-### Cloning repo
-cd GenAIExamples/FaqGen
-### Build Docker image
-docker build -t opea/llm-vllm-rocm:latest -f Dockerfile-vllm-rocm .
+mkdir -p ~/faqgen-test && cd ~/faqgen-test
 ```
 
-### Build the LLM Docker Image
+Cloning GenAIExamples repo for build Docker images:
 
 ```bash
-### Cloning repo
+git clone https://github.com/opea-project/GenAIExamples.git
+```
+
+### 1.2. Navigate to repo directory and switching to the desired version of the code:
+
+If you are using the main branch, then you do not need to make the transition, the main branch is used by default
+
+```bash
+cd ~/faqgen-test/GenAIExamples/FaqGen/docker_image_build
 git clone https://github.com/opea-project/GenAIComps.git
-cd GenAIComps
-
-### Build Docker image
-docker build -t opea/llm-faqgen:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/src/faq-generation/Dockerfile .
 ```
 
-### Build Megaservice Docker Image
+If you are using a specific branch or tag, then we perform git checkout to the desired version.
 
 ```bash
-### Cloning repo
-git clone https://github.com/opea-project/GenAIExamples.git
-cd GenAIExamples/FaqGen
-
-### Build Docker image
-docker build -t opea/faqgen:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
+### Replace "v1.2" with the code version you need (branch or tag)
+cd cd ~/faqgen-test/GenAIExamples/FaqGen/docker_image_build && git checkout v1.2
+git clone https://github.com/opea-project/GenAIComps.git
 ```
 
-### Build UI Docker Image
+### 1.3. Build Docker images repo
+
+#### Build Docker image:
 
 ```bash
-### Cloning repo
-git clone https://github.com/opea-project/GenAIExamples.git
-cd GenAIExamples/FaqGen/ui
-
-### Build Docker image
-docker build -t opea/faqgen-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
+docker compose -f build.yaml build --no-cache
 ```
 
-## 🚀 Start Microservices and MegaService
+### 1.5. Checking for the necessary Docker images
 
-### Required Models
-
-Default model is "meta-llama/Meta-Llama-3-8B-Instruct". Change "LLM_MODEL_ID" in environment variables below if you want to use another model.
-
-For gated models, you also need to provide [HuggingFace token](https://huggingface.co/docs/hub/security-tokens) in "HUGGINGFACEHUB_API_TOKEN" environment variable.
-
-### Setup Environment Variables
-
-Since the `compose.yaml` will consume some environment variables, you need to setup them in advance as below.
+After assembling the images, you can check their presence in the list of available images using the command:
 
 ```bash
-. set_env_vllm.sh
+docker image ls
 ```
 
-Note: Please replace with `host_ip` with your external IP address, do not use localhost.
+The output of the command should contain images:
 
-Note: In order to limit access to a subset of GPUs, please pass each device individually using one or more -device /dev/dri/rendered<node>, where <node> is the card index, starting from 128. (https://rocm.docs.amd.com/projects/install-on-linux/en/latest/how-to/docker.html#docker-restrict-gpus)
+- opea/llm-vllm-rocm:latest
+- opea/llm-faqgen:latest
+- opea/faqgen:latest
+- opea/faqgen-ui:latest
+
+## 2. Set deploy environment variables
+
+### Setting variables in the operating system environment
+
+#### Set variables:
+
+```bash
+### Replace the string 'your_huggingfacehub_token' with your HuggingFacehub repository access token.
+export HUGGINGFACEHUB_API_TOKEN='your_huggingfacehub_token'
+```
+
+### Setting variables in the file set_env_vllm.sh
+
+```bash
+cd cd cd ~/faqgen-test/GenAIExamples/FaqGen/docker_compose-/amd/gpu/rocm
+### The example uses the Nano text editor. You can use any convenient text editor
+nano set_env_vllm.sh
+```
+
+Set the values of the variables:
+
+- **HOST_IP, HOST_IP_EXTERNAL** - These variables are used to configure the name/address of the service in the operating system environment for the application services to interact with each other and with the outside world.
+
+  If your server uses only an internal address and is not accessible from the Internet, then the values for these two variables will be the same and the value will be equal to the server's internal name/address.
+
+  If your server uses only an external, Internet-accessible address, then the values for these two variables will be the same and the value will be equal to the server's external name/address.
+
+  If your server is located on an internal network, has an internal address, but is accessible from the Internet via a proxy/firewall/load balancer, then the HOST_IP variable will have a value equal to the internal name/address of the server, and the EXTERNAL_HOST_IP variable will have a value equal to the external name/address of the proxy/firewall/load balancer behind which the server is located.
+
+  We set these values in the file set_env_vllm.sh
+
+- **Variables with names like "%%%%\_PORT"** - These variables set the IP port numbers for establishing network connections to the application services.
+  The values shown in the file set_env_vllm.sh they are the values used for the development and testing of the application, as well as configured for the environment in which the development is performed. These values must be configured in accordance with the rules of network access to your environment's server, and must not overlap with the IP ports of other applications that are already in use.
+
+If you are in a proxy environment, also set the proxy-related environment variables:
+
+```bash
+export http_proxy="Your_HTTP_Proxy"
+export https_proxy="Your_HTTPs_Proxy"
+```
+
+- **Variables with names like "%%%%\_PORT"** - These variables set the IP port numbers for establishing network connections to the application services.
+  The values shown in the file **launch_agent_service_vllm_rocm.sh** they are the values used for the development and testing of the application, as well as configured for the environment in which the development is performed. These values must be configured in accordance with the rules of network access to your environment's server, and must not overlap with the IP ports of other applications that are already in use.
+
+## 3. Deploy application
+
+### 3.1. Deploying applications using Docker Compose
+
+```bash
+cd cd ~/faqgen-test/GenAIExamples/FaqGen/docker_compose/amd/gpu/rocm/
+docker compose -f compose_vllm up -d
+```
+
+After starting the containers, you need to view their status with the command:
+
+```bash
+docker ps
+```
+
+The following containers should be running:
+
+- faqgen-vllm-service
+- faqgen-llm-server
+- faqgen-backend-server
+- faqgen-ui-server
+
+Containers should not restart.
+
+#### 3.1.1. Configuring GPU forwarding
+
+By default, in the Docker Compose file, compose_vllm.yaml is configured to forward all GPUs to the chatqna-vllm-service container.
+To use certain GPUs, you need to configure the forwarding of certain devices from the host system to the container.
+The configuration must be done in:
+
+```yaml
+services:
+  #######
+  vllm-service:
+    devices:
+```
 
 Example for set isolation for 1 GPU
 
@@ -76,81 +151,64 @@ Example for set isolation for 2 GPUs
 ```
       - /dev/dri/card0:/dev/dri/card0
       - /dev/dri/renderD128:/dev/dri/renderD128
-      - /dev/dri/card0:/dev/dri/card0
+      - /dev/dri/card1:/dev/dri/card1
       - /dev/dri/renderD129:/dev/dri/renderD129
 ```
 
-Please find more information about accessing and restricting AMD GPUs in the link (https://rocm.docs.amd.com/projects/install-on-linux/en/latest/how-to/docker.html#docker-restrict-gpus)
+### 3.2. Checking the application services
 
-### Start Microservice Docker Containers
+#### 3.2.1. Checking vllm-service
 
-```bash
-cd GenAIExamples/FaqGen/docker_compose/amd/gpu/rocm/
-docker compose up -d
-```
+Verification is performed in two ways:
 
-### Validate Microservices
+- Checking the container logs
 
-1. TGI Service
+  ```bash
+  docker logs vllm-service
+  ```
 
-   ```bash
-   curl http://${host_ip}:8008/generate \
-     -X POST \
-     -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}' \
-     -H 'Content-Type: application/json'
-   ```
+  A message like this should appear in the logs:
 
-2. LLM Microservice
+  ```commandline
+  INFO:     Started server process [1]
+  INFO:     Waiting for application startup.
+  INFO:     Application startup complete.
+  INFO:     Uvicorn running on http://0.0.0.0:8011 (Press CTRL+C to quit)
+  ```
 
-   ```bash
-   curl http://${host_ip}:9000/v1/faqgen \
-     -X POST \
-     -d '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}' \
-     -H 'Content-Type: application/json'
-   ```
+- Сhecking the response from the service
+  ```bash
+  ### curl request
+  ### Replace 18110 with the value set in the startup script in the variable VLLM_SERVICE_PORT
+  curl http://${HOST_IP}:${FAQGEN_VLLM_SERVICE_PORT}/v1/completions \
+  -H "Content-Type: application/json" \
+  -d '{
+      "model": "meta-llama/Meta-Llama-3-8B-Instruct",
+      "prompt": "What is a Deep Learning?",
+      "max_tokens": 30,
+      "temperature": 0
+  }'
+  ```
+  The response from the service must be in the form of JSON:
+  ```json
+  {
+    "id": "cmpl-1d7d175d36d0491cba3abaa8b5bd6991",
+    "object": "text_completion",
+    "created": 1740411135,
+    "model": "meta-llama/Meta-Llama-3-8B-Instruct",
+    "choices": [
+      {
+        "index": 0,
+        "text": " Deep learning is a subset of machine learning that involves the use of artificial neural networks to analyze and interpret data. It is called \"deep\" because it",
+        "logprobs": null,
+        "finish_reason": "length",
+        "stop_reason": null,
+        "prompt_logprobs": null
+      }
+    ],
+    "usage": { "prompt_tokens": 7, "total_tokens": 37, "completion_tokens": 30, "prompt_tokens_details": null }
+  }
+  ```
+  The value of choice.text must contain a response from the service that makes sense.
+  If such a response is present, then the vllm-service is considered verified.
 
-3. MegaService
-
-   ```bash
-   curl http://${host_ip}:8888/v1/faqgen \
-   -H "Content-Type: multipart/form-data" \
-   -F "messages=Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5." \
-   -F "max_tokens=32" \
-   -F "stream=false"
-   ```
-
-   Following the validation of all aforementioned microservices, we are now prepared to construct a mega-service.
-
-## 🚀 Launch the UI
-
-Open this URL `http://{host_ip}:5173` in your browser to access the frontend.
-
-![project-screenshot](../../../../assets/img/faqgen_ui_text.png)
-
-## 🚀 Launch the React UI (Optional)
-
-To access the FAQGen (react based) frontend, modify the UI service in the `compose.yaml` file. Replace `faqgen-rocm-ui-server` service with the `faqgen-rocm-react-ui-server` service as per the config below:
-
-```bash
-  faqgen-rocm-react-ui-server:
-    image: opea/faqgen-react-ui:latest
-    container_name: faqgen-rocm-react-ui-server
-    environment:
-      - no_proxy=${no_proxy}
-      - https_proxy=${https_proxy}
-      - http_proxy=${http_proxy}
-    ports:
-      - 5174:80
-    depends_on:
-      - faqgen-rocm-backend-server
-    ipc: host
-    restart: always
-```
-
-Open this URL `http://{host_ip}:5174` in your browser to access the react based frontend.
-
-- Create FAQs from Text input
-  ![project-screenshot](../../../../assets/img/faqgen_react_ui_text.png)
-
-- Create FAQs from Text Files
-  ![project-screenshot](../../../../assets/img/faqgen_react_ui_text_file.png)

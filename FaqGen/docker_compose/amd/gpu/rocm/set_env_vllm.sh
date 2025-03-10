@@ -5,7 +5,7 @@
 
 export HOST_IP=''
 export EXTERNAL_HOST_IP=''
-export FAQGEN_LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
+export FAQGEN_LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
 export FAQGEN_VLLM_SERVICE_PORT=8883
 export FAQGEN_LLM_SERVER_PORT=9001
 export FAGGEN_LLM_ENDPOINT="http://${HOST_IP}:${FAQGEN_VLLM_SERVICE_PORT}"
