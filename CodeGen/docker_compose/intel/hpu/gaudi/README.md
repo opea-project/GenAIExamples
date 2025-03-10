@@ -43,6 +43,7 @@ Since the `compose.yaml` will consume some environment variables, you need to se
 export host_ip=${your_ip_address}
 export HUGGINGFACEHUB_API_TOKEN=you_huggingface_token
 ```
+
 2. Set Netowork Proxy
 
 **If you access public network through proxy, set the network proxy, otherwise, skip this step**
@@ -58,6 +59,7 @@ export https_proxy=${your_https_proxy}
 CodeGen support TGI service and vLLM service, you can choose start either one of them.
 
 Start CodeGen based on TGI service:
+
 ```bash
 cd GenAIExamples/CodeGen/docker_compose
 source set_env.sh
@@ -66,6 +68,7 @@ docker compose --profile codegen-gaudi-tgi up -d
 ```
 
 Start CodeGen based on vLLM service:
+
 ```bash
 cd GenAIExamples/CodeGen/docker_compose
 source set_env.sh
@@ -259,4 +262,3 @@ Then run the command `docker images`, you will have the following Docker images:
 - `opea/codegen:latest`
 - `opea/codegen-ui:latest`
 - `opea/codegen-react-ui:latest`
-

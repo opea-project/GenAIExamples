@@ -176,11 +176,11 @@ function main() {
     docker_compose_profiles=("codegen-xeon-tgi" "codegen-xeon-vllm")
     docker_llm_container_names=("tgi-server" "vllm-server")
 
-    # get numer of profiels and docker container names number must matched
+    # get number of profiels and docker container names number must matched
     len_profiles=${#docker_compose_profiles[@]}
     len_containers=${#docker_llm_container_names[@]}
 
-    # numer of profiels and docker container names number must be matched
+    # number of profiels and docker container names number must be matched
     if [ ${len_profiles} -ne ${len_containers} ]; then
         echo "Error: docker_compose_profiles 'profile' and container names num mismatched"
         exit 1
