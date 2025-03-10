@@ -23,6 +23,65 @@ services:
       https_proxy: ${https_proxy}
       COLLECTOR_ZIPKIN_HOST_PORT: 9411
     restart: unless-stopped
+  prometheus:
+    image: prom/prometheus:v2.52.0
+    container_name: prometheus
+    user: root
+    volumes:
+      - ./prometheus.yaml:/etc/prometheus/prometheus.yaml
+      - ./prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yaml'
+    ports:
+      - '9090:9090'
+    ipc: host
+    restart: unless-stopped
+  grafana:
+    image: grafana/grafana:11.0.0
+    container_name: grafana
+    volumes:
+      - ./grafana_data:/var/lib/grafana
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
+      - ./grafana/provisioning:/etc/grafana/provisioning
+    user: root
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_RENDERING_CALLBACK_URL: http://grafana:3000/
+      GF_LOG_FILTERS: rendering:debug
+    depends_on:
+      - prometheus
+    ports:
+      - '3000:3000'
+    ipc: host
+    restart: unless-stopped
+  node-exporter:
+    image: prom/node-exporter
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - --collector.filesystem.ignored-mount-points
+      - "^/(sys|proc|dev|host|etc|rootfs/var/lib/docker/containers|rootfs/var/lib/docker/overlay2|rootfs/run/docker/netns|rootfs/var/lib/docker/aufs)($$|/)"
+    ports:
+      - 9100:9100
+    restart: always
+    deploy:
+      mode: global
+  gaudi-exporter:
+    image: vault.habana.ai/gaudi-metric-exporter/metric-exporter:1.19.2-32
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+      - /dev:/dev
+    ports:
+      - 41611:41611
+    restart: always
+    deploy:
+      mode: global
   chatqna-gaudi-backend-server:
     environment:
       - ENABLE_OPEA_TELEMETRY=true

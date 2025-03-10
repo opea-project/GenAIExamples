@@ -1,0 +1,47 @@
+# Copyright (C) 2025 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+# [IP_ADDR]:{PORT_OUTSIDE_CONTAINER} -> {PORT_INSIDE_CONTAINER} / {PROTOCOL}
+global:
+  scrape_interval: 5s # Server 抓取頻率
+  external_labels:
+    monitor: "my-monitor"
+scrape_configs:
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["prometheus:9090"]
+  - job_name: "vllm"
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["vllm-gaudi-server:80"]
+  - job_name: "tgi"
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["tgi-gaudi-server:80"]
+  - job_name: "tei-embedding"
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["tei-embedding-gaudi-server:80"]
+  - job_name: "tei-reranking"
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["tei-reranking-gaudi-server:80"]
+  - job_name: "retriever"
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["retriever:7000"]
+  - job_name: "dataprep-redis-service"
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["dataprep-redis-service:5000"]
+  - job_name: "chatqna-backend-server"
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["chatqna-gaudi-backend-server:8888"]
+  - job_name: "prometheus-node-exporter"
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["gaudi-node-exporter-1:9100"]
+  - job_name: "prometheus-gaudi-exporter"
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["gaudi-gaudi-exporter-1:41611"]
