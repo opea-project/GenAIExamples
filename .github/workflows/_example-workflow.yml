@@ -50,10 +50,26 @@ on:
         type: boolean
 
 jobs:
+  check-skip:
+    runs-on: ubuntu-latest
+    outputs:
+      should_skip: ${{ steps.check-skip.outputs.should_skip }}
+    steps:
+      - name: Check if job should be skipped
+        id: check-skip
+        run: |
+          if [[ "${{ inputs.node }}" == "gaudi3" || "${{ inputs.node }}" == "rocm" || "${{ inputs.node }}" == "arc" ]]; then
+            echo "should_skip=true" >> $GITHUB_OUTPUT
+          else
+            echo "should_skip=false" >> $GITHUB_OUTPUT
+          fi
+
 ####################################################################################################
 # Image Build
 ####################################################################################################
   build-images:
+    needs: [check-skip]
+    if: ${{ needs.check-skip.outputs.should_skip == 'false' }}
     runs-on: "docker-build-${{ inputs.node }}"
     steps:
       - name: Clean Up Working Directory
@@ -105,12 +121,30 @@ jobs:
           inject_commit: ${{ inputs.inject_commit }}
           tag: ${{ inputs.tag }}
 
+  check:
+    needs: [check-skip, build-images]
+    if: always()
+    runs-on: ubuntu-latest
+    outputs:
+      should_compose: ${{ steps.check-compose.outputs.should_compose }}
+    steps:
+      - name: Check if job should be skipped
+        id: check-compose
+        run: |
+          if [[ "${{ needs.check-skip.outputs.should_skip }}" == "false" && "${{ needs.build-images.result}}" == "success" || "${{ needs.check-skip.outputs.should_skip }}" == "true" ]]; then
+            echo "should_compose="true""
+            echo "should_compose="true"" >> $GITHUB_OUTPUT
+          else
+            echo "should_compose="false""
+            echo "should_compose="false"" >> $GITHUB_OUTPUT
+          fi
+
 ####################################################################################################
 # Docker Compose Test
 ####################################################################################################
   test-example-compose:
-    needs: [build-images]
-    if: ${{ fromJSON(inputs.test_compose) }}
+    needs: [check]
+    if: ${{ always() && inputs.test_compose && needs.check.outputs.should_compose == 'true' }}
     uses: ./.github/workflows/_run-docker-compose.yml
     with:
       tag: ${{ inputs.tag }}
