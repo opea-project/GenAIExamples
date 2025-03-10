@@ -144,7 +144,7 @@ services:
     ports:
       - "9009:80"
     volumes:
-      - "./data:/data"
+      - "${MODEL_CACHE:-./data}:/root/.cache/huggingface/hub"
     shm_size: 128g
     environment:
       no_proxy: ${no_proxy}

@@ -201,7 +201,7 @@ For users in China who are unable to download models directly from Huggingface, 
    export HF_TOKEN=${your_hf_token}
    export HF_ENDPOINT="https://hf-mirror.com"
    model_name="meta-llama/Meta-Llama-3-8B-Instruct"
-   docker run -p 8008:80 -v ./data:/data --name vllm-service -e HF_ENDPOINT=$HF_ENDPOINT -e http_proxy=$http_proxy -e https_proxy=$https_proxy --shm-size 128g opea/vllm:latest --model $model_name --host 0.0.0.0 --port 80
+   docker run -p 8008:80 -v ./data:/root/.cache/huggingface/hub --name vllm-service -e HF_ENDPOINT=$HF_ENDPOINT -e http_proxy=$http_proxy -e https_proxy=$https_proxy --shm-size 128g opea/vllm:latest --model $model_name --host 0.0.0.0 --port 80
    ```
 
 2. Offline
@@ -215,7 +215,7 @@ For users in China who are unable to download models directly from Huggingface, 
      ```bash
      export HF_TOKEN=${your_hf_token}
      export model_path="/path/to/model"
-     docker run -p 8008:80 -v $model_path:/data --name vllm-service --shm-size 128g opea/vllm:latest --model /data --host 0.0.0.0 --port 80
+     docker run -p 8008:80 -v $model_path:/root/.cache/huggingface/hub --name vllm-service --shm-size 128g opea/vllm:latest --model /root/.cache/huggingface/hub --host 0.0.0.0 --port 80
      ```
 
 ### Setup Environment Variables

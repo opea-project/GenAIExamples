@@ -8,7 +8,7 @@ services:
     ports:
       - ${LLM_ENDPOINT_PORT:-8008}:80
     volumes:
-      - "${MODEL_CACHE:-./data}:/data"
+      - "${MODEL_CACHE:-./data}:/root/.cache/huggingface/hub"
     shm_size: 1g
     environment:
       no_proxy: ${no_proxy}
