@@ -14,7 +14,17 @@ After launching your instance, you can connect to it using SSH (for Linux instan
 
 First of all, you need to build Docker Images locally. This step can be ignored once the Docker images are published to Docker hub.
 
-### 1. Build LLM Image
+### 1. Build vLLM Image
+
+```bash
+git clone https://github.com/vllm-project/vllm.git
+cd ./vllm/
+VLLM_VER="$(git describe --tags "$(git rev-list --tags --max-count=1)" )"
+git checkout ${VLLM_VER}
+docker build --no-cache --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile.cpu -t opea/vllm:latest --shm-size=128g .
+```
+
+### 2. Build LLM Image
 
 ```bash
 git clone https://github.com/opea-project/GenAIComps.git
@@ -22,7 +32,7 @@ cd GenAIComps
 docker build -t opea/llm-faqgen:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/src/faq-generation/Dockerfile .
 ```
 
-### 2. Build MegaService Docker Image
+### 3. Build MegaService Docker Image
 
 To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `faqgen.py` Python script. Build the MegaService Docker image via below command:
 
@@ -32,7 +42,7 @@ cd GenAIExamples/FaqGen/
 docker build --no-cache -t opea/faqgen:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f GenAIExamples/FaqGen/Dockerfile .
 ```
 
-### 3. Build UI Docker Image
+### 4. Build UI Docker Image
 
 Build the frontend Docker image via below command:
 
@@ -41,7 +51,7 @@ cd GenAIExamples/FaqGen/ui
 docker build -t opea/faqgen-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
 ```
 
-### 4. Build react UI Docker Image (Optional)
+### 5. Build react UI Docker Image (Optional)
 
 Build the frontend Docker image based on react framework via below command:
 
@@ -53,10 +63,11 @@ docker build -t opea/faqgen-react-ui:latest --build-arg https_proxy=$https_proxy
 
 Then run the command `docker images`, you will have the following Docker Images:
 
-1. `opea/llm-faqgen:latest`
-2. `opea/faqgen:latest`
-3. `opea/faqgen-ui:latest`
-4. `opea/faqgen-react-ui:latest`
+1. `opea/vllm:latest`
+2. `opea/llm-faqgen:latest`
+3. `opea/faqgen:latest`
+4. `opea/faqgen-ui:latest`
+5. `opea/faqgen-react-ui:latest`
 
 ## 🚀 Start Microservices and MegaService
 
@@ -77,7 +88,8 @@ export https_proxy=${your_http_proxy}
 export host_ip=${your_host_ip}
 export LLM_ENDPOINT_PORT=8008
 export LLM_SERVICE_PORT=9000
-export FAQGen_COMPONENT_NAME="OpeaFaqGenTgi"
+export FAQGEN_BACKEND_PORT=8888
+export FAQGen_COMPONENT_NAME="OpeaFaqGenvLLM"
 export LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
 export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
 export MEGA_SERVICE_HOST_IP=${host_ip}
@@ -97,44 +109,44 @@ docker compose up -d
 
 ### Validate Microservices
 
-1. TGI Service
+1. vLLM Service
 
-   ```bash
-   curl http://${host_ip}:8008/generate \
-     -X POST \
-     -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}' \
-     -H 'Content-Type: application/json'
-   ```
+```bash
+curl http://${host_ip}:${LLM_ENDPOINT_PORT}/v1/chat/completions \
+  -X POST \
+  -H "Content-Type: application/json" \
+  -d '{"model": "meta-llama/Meta-Llama-3-8B-Instruct", "messages": [{"role": "user", "content": "What is Deep Learning?"}]}'
+```
 
 2. LLM Microservice
 
-   ```bash
-   curl http://${host_ip}:9000/v1/faqgen \
-     -X POST \
-     -d '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}' \
-     -H 'Content-Type: application/json'
-   ```
+```bash
+curl http://${host_ip}:${LLM_SERVICE_PORT}/v1/faqgen \
+  -X POST \
+  -d '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}' \
+  -H 'Content-Type: application/json'
+```
 
 3. MegaService
 
-   ```bash
-   curl http://${host_ip}:8888/v1/faqgen \
-      -H "Content-Type: multipart/form-data" \
-      -F "messages=Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5." \
-      -F "max_tokens=32" \
-      -F "stream=False"
-   ```
+```bash
+curl http://${host_ip}:${FAQGEN_BACKEND_PORT}/v1/faqgen \
+  -H "Content-Type: multipart/form-data" \
+  -F "messages=Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5." \
+  -F "max_tokens=32" \
+  -F "stream=False"
+```
 
-   ```bash
-   ## enable stream
-   curl http://${host_ip}:8888/v1/faqgen \
-      -H "Content-Type: multipart/form-data" \
-      -F "messages=Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5." \
-      -F "max_tokens=32" \
-      -F "stream=True"
-   ```
+```bash
+## enable stream
+curl http://${host_ip}:${FAQGEN_BACKEND_PORT}/v1/faqgen \
+  -H "Content-Type: multipart/form-data" \
+  -F "messages=Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5." \
+  -F "max_tokens=32" \
+  -F "stream=True"
+```
 
-   Following the validation of all aforementioned microservices, we are now prepared to construct a mega-service.
+Following the validation of all aforementioned microservices, we are now prepared to construct a mega-service.
 
 ## 🚀 Launch the UI
 
