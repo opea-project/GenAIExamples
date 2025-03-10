@@ -250,7 +250,7 @@ The response from the service must be in the form of JSON:
 {"id":"chatcmpl-uYDrRWhzokThxLE4GnU5ny","object":"chat.completion","created":1741586656,"model":"faqgen","choices":[{"index":0,"message":{"role":"assistant","content":" Q: What is Deep Learning?\n         A: Deep Learning is a subset of Machine Learning that involves the use of artificial neural networks to analyze and interpret data."},"finish_reason":"stop","metadata":null}],"usage":{"prompt_tokens":0,"total_tokens":0,"completion_tokens":0}}
 ```
 
-The value of choises.message.content must contain a response from the service that makes sense.
+The value of "choises.message.content" must contain a response from the service that makes sense.
 If such a response is present, then the llm-service is considered verified.
 
 
