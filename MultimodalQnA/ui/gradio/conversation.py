@@ -43,44 +43,30 @@ class Conversation:
         return out
 
     def get_prompt(self, is_very_first_query):
-        conv_dict = []
+        conv_dict = [{'role': 'user', 'content': []}]
         
-        if is_very_first_query:
-            conv_dict.append({'role': 'user', 'content': []})
-            for item in self.chatbot_history:
-                content = item['content']
-                
-                if isinstance(content, str):
-                    conv_dict[-1]['content'].append({'type': 'text', 'text': content})
-                elif isinstance(content, dict) and 'path' in content:
-                    if Path(content['path']).suffix in GRADIO_IMAGE_FORMATS:
-                        conv_dict[-1]['content'].append({'type': 'image_url', 'image_url': {'url': get_b64_frame_from_timestamp(content['path'], 0)}})
-                    if Path(content['path']).suffix in GRADIO_AUDIO_FORMATS:
-                        conv_dict[-1]['content'].append({'type': 'audio', 'audio': convert_audio_to_base64(content['path'])})
-        else:
-            for i, item in enumerate(self.chatbot_history):
-                role = item['role']
-                content = item['content']
-                
-                if i == 0:
-                    conv_dict.append({'role': role, 'content': []})
-                    
-                if role == 'user':
-                    if conv_dict[-1]['role'] != 'user':
-                        conv_dict.append({'role': role, 'content': []})
-                    
-                    if isinstance(content, str):
-                        conv_dict[-1]['content'].append({'type': 'text', 'text': content})
-                    elif isinstance(content, dict) and 'path' in content:
-                        if Path(content['path']).suffix in GRADIO_IMAGE_FORMATS:
-                            conv_dict[-1]['content'].append({'type': 'image_url', 'image_url': {'url': get_b64_frame_from_timestamp(content['path'], 0)}})
-                        if Path(content['path']).suffix in GRADIO_AUDIO_FORMATS:
-                            conv_dict[-1]['content'].append({'type': 'audio', 'audio': convert_audio_to_base64(content['path'])})
-                elif role == 'assistant':
-                    if conv_dict[-1]['role'] != 'assistant':
-                        conv_dict.append({'role': role, 'content': []})
-                    if isinstance(content, str):
-                        conv_dict[-1]['content'] = content
+        for record in self.chatbot_history:
+            role = record['role']
+            content = record['content']
+            
+            if role == 'user':
+                # Check if last entry of conv_dict has role user
+                if conv_dict[-1]['role'] != 'user':
+                    conv_dict.append({'role': 'user', 'content': []})
+            elif role == 'assistant':
+                # Check if last entry of conv_dict has role assistant
+                if conv_dict[-1]['role'] != 'assistant':
+                    conv_dict.append({'role': 'assistant', 'content': []})
+            
+            # Add content to the last conv_dict record
+            if isinstance(content, str):
+                conv_dict[-1]['content'].append({'type': 'text', 'text': content + self._template_caption()})
+            
+            if isinstance(content, dict) and 'path' in content:
+                if Path(content['path']).suffix in GRADIO_IMAGE_FORMATS:
+                    conv_dict[-1]['content'].append({'type': 'image_url', 'image_url': {'url': get_b64_frame_from_timestamp(content['path'], 0)}})
+                if Path(content['path']).suffix in GRADIO_AUDIO_FORMATS:
+                    conv_dict[-1]['content'].append({'type': 'audio', 'audio': convert_audio_to_base64(content['path'])})
                                         
         return conv_dict        
 

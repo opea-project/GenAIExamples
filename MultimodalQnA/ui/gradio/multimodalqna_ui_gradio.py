@@ -65,9 +65,9 @@ def clear_history(state, request: gr.Request):
         os.remove(state.pdf)
     state = multimodalqna_conv.copy()
     state.chatbot_history = []
-    video = gr.Video(height=512, width=512, elem_id="video", visible=True, label="Media", value=None)
-    image = gr.Image(height=512, width=512, elem_id="image", visible=False, label="Media")
-    pdf = PDF(height=512, elem_id="pdf", interactive=False, visible=False, label="Media")
+    video = gr.Video(value=None, elem_id="video", visible=True, label="Media")
+    image = gr.Image(value=None, elem_id="image", visible=False, label="Media")
+    pdf = PDF(value=None, elem_id="pdf", interactive=False, visible=False, label="Media")
     return (state, state.to_gradio_chatbot(), None, video, image, pdf) + (disable_btn,) * 1
 
 
