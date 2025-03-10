@@ -15,21 +15,15 @@ LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
 
 export HOST_IP=${ip_address}
+export EXTERNAL_HOST_IP=${ip_address}
 export FAQGEN_LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
-export FAQGEN_TGI_SERVICE_PORT=8008
-export FAQGEN_LLM_SERVER_PORT=9000
+export FAQGEN_VLLM_SERVICE_PORT=8883
+export FAQGEN_LLM_SERVER_PORT=9001
+export FAGGEN_LLM_ENDPOINT="http://${HOST_IP}:${FAQGEN_VLLM_SERVICE_PORT}"
 export FAQGEN_HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
-export FAQGEN_CARD_ID="card1"
-export FAQGEN_RENDER_ID="renderD136"
-export FAQGEN_BACKEND_SERVER_PORT=8888
+export FAQGEN_BACKEND_SERVER_PORT=18074
+export FAQGEN_BACKEND_ENDPOINT="http://${EXTERNAL_HOST_IP}:${FAQGEN_BACKEND_SERVER_PORT}/v1/faqgen"
 export FAGGEN_UI_PORT=5173
-export LLM_ENDPOINT="http://${ip_address}:8008"
-export MEGA_SERVICE_HOST_IP=${ip_address}
-export LLM_SERVICE_HOST_IP=${ip_address}
-export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:8888/v1/faqgen"
-export PATH="~/miniconda3/bin:$PATH"
-export FAQGen_COMPONENT_NAME="OpeaFaqGenTgi"
-export LOGFLAG=True
 
 function build_docker_images() {
     opea_branch=${opea_branch:-"main"}
@@ -48,10 +42,9 @@ function build_docker_images() {
     git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="faqgen faqgen-ui llm-faqgen"
+    service_list="faqgen faqgen-ui llm-faqgen vllm-rocm"
     docker compose -f build.yaml build ${service_list} --no-cache > "${LOG_PATH}"/docker_image_build.log
-    docker pull ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
-    docker images && sleep 1s
+    docker images && sleep 3s
 }
 
 function start_services() {
@@ -60,9 +53,17 @@ function start_services() {
     sed -i "s/backend_address/$ip_address/g" "$WORKPATH"/ui/svelte/.env
 
     # Start Docker Containers
-    docker compose up -d > "${LOG_PATH}"/start_services_with_compose.log
-
-    sleep 30s
+    docker compose -f compose_vllm.yaml up -d > "${LOG_PATH}"/start_services_with_compose.log
+    n=0
+    until [[ "$n" -ge 500 ]]; do
+        docker logs faqgen-vllm-service >& "${LOG_PATH}"/docsum-vllm-service_start.log
+        if grep -q "Application startup complete" "${LOG_PATH}"/docsum-vllm-service_start.log; then
+            break
+        fi
+        sleep 10s
+        n=$((n+1))
+    done
+    sleep 3s
 }
 
 function validate_services() {
@@ -96,17 +97,17 @@ function validate_services() {
 function validate_microservices() {
     # Check if the microservices are running correctly.
 
-    # tgi for llm service
+    # vllm for llm service
     validate_services \
-        "${ip_address}:8008/generate" \
-        "generated_text" \
-        "tgi-service" \
-        "faqgen-tgi-service" \
-        '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}'
+        "${HOST_IP}:${FAQGEN_VLLM_SERVICE_PORT}/v1/chat/completions" \
+        "content" \
+        "faqgen-vllm-service" \
+        "faqgen-vllm-service" \
+        '{"model": "meta-llama/Meta-Llama-3-8B-Instruct", "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens": 17}'
 
     # llm microservice
     validate_services \
-        "${ip_address}:9000/v1/faqgen" \
+        "${HOST_IP}:${FAQGEN_LLM_SERVER_PORT}/v1/faqgen" \
         "text" \
         "llm" \
         "faqgen-llm-server" \
@@ -118,7 +119,7 @@ function validate_megaservice() {
     local DOCKER_NAME="faqgen-backend-server"
     local EXPECTED_RESULT="embedding"
     local INPUT_DATA="messages=Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."
-    local URL="${ip_address}:8888/v1/faqgen"
+    local URL="${HOST_IP}:${FAQGEN_BACKEND_SERVER_PORT}/v1/faqgen"
     local HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST -F "$INPUT_DATA" -H 'Content-Type: multipart/form-data' "$URL")
     if [ "$HTTP_STATUS" -eq 200 ]; then
         echo "[ $SERVICE_NAME ] HTTP status is 200. Checking content..."
@@ -143,7 +144,7 @@ function validate_megaservice() {
 function validate_frontend() {
     cd "$WORKPATH"/ui/svelte
     local conda_env_name="OPEA_e2e"
-    export PATH=${HOME}/miniforge3/bin/:$PATH
+    export PATH=${HOME}/miniconda3/bin/:$PATH
     if conda info --envs | grep -q "$conda_env_name"; then
         echo "$conda_env_name exist!"
     else
