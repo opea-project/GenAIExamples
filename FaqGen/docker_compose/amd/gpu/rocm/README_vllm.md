@@ -271,5 +271,5 @@ The response from the service must be in the form of JSON:
 }
 ```
 
-The value of "choises.message.content" must contain a response from the service that makes sense.
+The value of "choices.message.content" must contain a response from the service that makes sense.
 If such a response is present, then the llm-service is considered verified.
