@@ -8,7 +8,7 @@ services:
     ports:
       - ${VLLM_PORT:-8399}:80
     volumes:
-      - "${MODEL_CACHE:-./data}:/data"
+      - "${MODEL_CACHE:-./data}:/root/.cache/huggingface/hub"
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
@@ -48,7 +48,7 @@ services:
       - vllm-service
       - lvm
     ports:
-      - "8888:8888"
+      - "8899:8888"
     environment:
       - no_proxy=${no_proxy}
       - https_proxy=${https_proxy}
@@ -63,7 +63,7 @@ services:
     depends_on:
       - visualqna-xeon-backend-server
     ports:
-      - "5173:5173"
+      - "5176:5173"
     environment:
       - no_proxy=${no_proxy}
       - https_proxy=${https_proxy}

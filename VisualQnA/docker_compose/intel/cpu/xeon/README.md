@@ -96,7 +96,7 @@ Follow the instructions to validate MicroServices.
 2. MegaService
 
 ```bash
-curl http://${host_ip}:8888/v1/visualqna -H "Content-Type: application/json" -d '{
+curl http://${host_ip}:8899/v1/visualqna -H "Content-Type: application/json" -d '{
     "messages": [
       {
         "role": "user",
@@ -120,7 +120,7 @@ curl http://${host_ip}:8888/v1/visualqna -H "Content-Type: application/json" -d 
 
 ## 🚀 Launch the UI
 
-To access the frontend, open the following URL in your browser: http://{host_ip}:5173. By default, the UI runs on port 5173 internally. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `compose.yaml` file as shown below:
+To access the frontend, open the following URL in your browser: http://{host_ip}:5176. By default, the UI runs on port 5176 internally. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `compose.yaml` file as shown below:
 
 ```yaml
   visualqna-gaudi-ui-server:
