@@ -109,7 +109,6 @@ jobs:
           cd GenAIComps && git rev-parse HEAD && cd ../
 
       - name: Build Image
-        id: build-image
         if: ${{ fromJSON(inputs.build) }}
         uses: opea-project/validation/actions/image-build@main
         with:
@@ -119,9 +118,6 @@ jobs:
           registry: ${OPEA_IMAGE_REPO}opea
           inject_commit: ${{ inputs.inject_commit }}
           tag: ${{ inputs.tag }}
-
-      - name: Save Build Result
-        run: echo "build_result=${{ steps.build-image.outputs.result }}" >> $GITHUB_OUTPUT
 
   check:
     needs: [check-skip, build-images]
