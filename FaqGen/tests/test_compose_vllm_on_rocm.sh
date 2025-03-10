@@ -186,7 +186,7 @@ function main() {
 #    validate_frontend
 
     stop_docker
-    echo y | docker system prune
+#    echo y | docker system prune
 
 }
 
