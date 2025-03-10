@@ -226,7 +226,11 @@ curl http://${HOST_IP}:${FAQGEN_LLM_SERVER_PORT}/v1/faqgen \
 The response from the service must be in the form of JSON:
 
 ```json
-{"id":"9de4a6499f40c93e376453e477382902","text":" Q: What is Deep Learning?\n         A: Deep Learning is a subset of Machine Learning that involves the use of artificial neural networks to analyze and interpret data. It is called \"deep\" because it involves multiple layers of interconnected nodes or \"neurons\" that process and transform the data.\n\n         Q: What is the main difference between Deep Learning and Machine Learning?\n         A: The main difference between Deep Learning and Machine Learning is the complexity of the models used. Machine Learning models are typically simpler and more linear, while Deep Learning models are more complex and non-linear, allowing them to learn and represent more abstract and nuanced patterns in data.\n\n         Q: What are some common applications of Deep Learning?\n         A: Some common applications of Deep Learning include image and speech recognition, natural language processing, recommender systems, and autonomous vehicles.\n\n         Q: Is Deep Learning a new field?\n         A: Deep Learning is not a new field, but it has gained significant attention and popularity in recent years due to advances in computing power, data storage, and algorithms.\n\n         Q: What are some of the challenges of Deep Learning?\n         A: Some of the challenges of Deep Learning include the need for large amounts of data, the risk of overfitting, and the difficulty of interpreting the results of the models.\n\n         Q: Can Deep Learning be used for any type of data?\n         A: Deep Learning can be used for any type of data that can be represented as a numerical array, such as images, audio, text, and sensor readings.\n\n         Q: Is Deep Learning a replacement for traditional Machine Learning?\n         A: Deep Learning is not a replacement for traditional Machine Learning, but rather a complementary approach that can be used in conjunction with other Machine Learning techniques to solve complex problems.","prompt":"What is Deep Learning?"}
+{
+  "id": "9de4a6499f40c93e376453e477382902",
+  "text": " Q: What is Deep Learning?\n         A: Deep Learning is a subset of Machine Learning that involves the use of artificial neural networks to analyze and interpret data. It is called \"deep\" because it involves multiple layers of interconnected nodes or \"neurons\" that process and transform the data.\n\n         Q: What is the main difference between Deep Learning and Machine Learning?\n         A: The main difference between Deep Learning and Machine Learning is the complexity of the models used. Machine Learning models are typically simpler and more linear, while Deep Learning models are more complex and non-linear, allowing them to learn and represent more abstract and nuanced patterns in data.\n\n         Q: What are some common applications of Deep Learning?\n         A: Some common applications of Deep Learning include image and speech recognition, natural language processing, recommender systems, and autonomous vehicles.\n\n         Q: Is Deep Learning a new field?\n         A: Deep Learning is not a new field, but it has gained significant attention and popularity in recent years due to advances in computing power, data storage, and algorithms.\n\n         Q: What are some of the challenges of Deep Learning?\n         A: Some of the challenges of Deep Learning include the need for large amounts of data, the risk of overfitting, and the difficulty of interpreting the results of the models.\n\n         Q: Can Deep Learning be used for any type of data?\n         A: Deep Learning can be used for any type of data that can be represented as a numerical array, such as images, audio, text, and sensor readings.\n\n         Q: Is Deep Learning a replacement for traditional Machine Learning?\n         A: Deep Learning is not a replacement for traditional Machine Learning, but rather a complementary approach that can be used in conjunction with other Machine Learning techniques to solve complex problems.",
+  "prompt": "What is Deep Learning?"
+}
 ```
 
 The value of text must contain a response from the service that makes sense.
@@ -247,10 +251,25 @@ curl http://${HOST_IP}:${FAQGEN_BACKEND_SERVER_PORT}/v1/faqgen \
 The response from the service must be in the form of JSON:
 
 ```json
-{"id":"chatcmpl-uYDrRWhzokThxLE4GnU5ny","object":"chat.completion","created":1741586656,"model":"faqgen","choices":[{"index":0,"message":{"role":"assistant","content":" Q: What is Deep Learning?\n         A: Deep Learning is a subset of Machine Learning that involves the use of artificial neural networks to analyze and interpret data."},"finish_reason":"stop","metadata":null}],"usage":{"prompt_tokens":0,"total_tokens":0,"completion_tokens":0}}
+{
+  "id": "chatcmpl-uYDrRWhzokThxLE4GnU5ny",
+  "object": "chat.completion",
+  "created": 1741586656,
+  "model": "faqgen",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": " Q: What is Deep Learning?\n         A: Deep Learning is a subset of Machine Learning that involves the use of artificial neural networks to analyze and interpret data."
+      },
+      "finish_reason": "stop",
+      "metadata": null
+    }
+  ],
+  "usage": { "prompt_tokens": 0, "total_tokens": 0, "completion_tokens": 0 }
+}
 ```
 
 The value of "choises.message.content" must contain a response from the service that makes sense.
 If such a response is present, then the llm-service is considered verified.
-
-
