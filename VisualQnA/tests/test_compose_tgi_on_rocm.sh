@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright (C) 2024 Intel Corporation
+# Copyright (C) 2024 Advanced Micro Devices, Inc.
 # SPDX-License-Identifier: Apache-2.0
 
 set -x
@@ -7,13 +7,32 @@ IMAGE_REPO=${IMAGE_REPO:-"opea"}
 IMAGE_TAG=${IMAGE_TAG:-"latest"}
 echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
 echo "TAG=IMAGE_TAG=${IMAGE_TAG}"
-export REGISTRY=${IMAGE_REPO}
-export TAG=${IMAGE_TAG}
-export MODEL_CACHE=${model_cache:-"./data"}
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
+
+export REGISTRY=${IMAGE_REPO}
+export TAG=${IMAGE_TAG}
+export HOST_IP=${ip_address}
+export VISUALQNA_TGI_SERVICE_PORT="8399"
+export VISUALQNA_HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+export VISUALQNA_CARD_ID="card1"
+export VISUALQNA_RENDER_ID="renderD136"
+export LVM_MODEL_ID="Xkev/Llama-3.2V-11B-cot"
+export MODEL="llava-hf/llava-v1.6-mistral-7b-hf"
+export LVM_ENDPOINT="http://${HOST_IP}:8399"
+export LVM_SERVICE_PORT=9399
+export MEGA_SERVICE_HOST_IP=${HOST_IP}
+export LVM_SERVICE_HOST_IP=${HOST_IP}
+export BACKEND_SERVICE_ENDPOINT="http://${HOST_IP}:${BACKEND_SERVICE_PORT}/v1/visualqna"
+export FRONTEND_SERVICE_IP=${HOST_IP}
+export FRONTEND_SERVICE_PORT=5173
+export BACKEND_SERVICE_NAME=visualqna
+export BACKEND_SERVICE_IP=${HOST_IP}
+export BACKEND_SERVICE_PORT=8888
+export NGINX_PORT=18003
+export PATH="~/miniconda3/bin:$PATH"
 
 function build_docker_images() {
     opea_branch=${opea_branch:-"main"}
@@ -34,27 +53,12 @@ function build_docker_images() {
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
     docker compose -f build.yaml build --no-cache > ${LOG_PATH}/docker_image_build.log
 
-    docker pull opea/vllm:latest
+    docker pull ghcr.io/huggingface/text-generation-inference:2.4.1-rocm
     docker images && sleep 1s
 }
 
 function start_services() {
-    cd $WORKPATH/docker_compose/intel/cpu/xeon/
-
-    export LVM_MODEL_ID="llava-hf/llava-v1.6-mistral-7b-hf"
-    export LVM_ENDPOINT="http://${ip_address}:8399"
-    export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
-    export LVM_SERVICE_PORT=9399
-    export MEGA_SERVICE_HOST_IP=${ip_address}
-    export LVM_SERVICE_HOST_IP=${ip_address}
-    export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:8888/v1/visualqna"
-    export FRONTEND_SERVICE_IP=${ip_address}
-    export FRONTEND_SERVICE_PORT=5173
-    export BACKEND_SERVICE_NAME=visualqna
-    export BACKEND_SERVICE_IP=${ip_address}
-    export BACKEND_SERVICE_PORT=8888
-    export NGINX_PORT=80
-    export host_ip=${ip_address}
+    cd $WORKPATH/docker_compose/amd/gpu/rocm
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
@@ -62,9 +66,9 @@ function start_services() {
     docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
 
     n=0
-    until [[ "$n" -ge 200 ]]; do
-        docker logs lvm-xeon-server > ${LOG_PATH}/lvm_vllm_service_start.log
-        if grep -q Connected ${LOG_PATH}/lvm_vllm_service_start.log; then
+    until [[ "$n" -ge 100 ]]; do
+        docker logs visualqna-tgi-service > ${LOG_PATH}/lvm_tgi_service_start.log
+        if grep -q Connected ${LOG_PATH}/lvm_tgi_service_start.log; then
             break
         fi
         sleep 5s
@@ -108,7 +112,7 @@ function validate_microservices() {
         "${ip_address}:9399/v1/lvm" \
         "The image" \
         "lvm" \
-        "lvm-xeon-server" \
+        "visualqna-tgi-service" \
         '{"image": "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8/5+hnoEIwDiqkL4KAcT9GO0U4BxoAAAAAElFTkSuQmCC", "prompt":"What is this?"}'
 }
 
@@ -117,8 +121,8 @@ function validate_megaservice() {
     validate_services \
     "${ip_address}:8888/v1/visualqna" \
     "The image" \
-    "visualqna-xeon-backend-server" \
-    "visualqna-xeon-backend-server" \
+    "visualqna-rocm-backend-server" \
+    "visualqna-rocm-backend-server" \
     '{
         "messages": [
         {
@@ -142,10 +146,10 @@ function validate_megaservice() {
 
     # test the megeservice via nginx
     validate_services \
-    "${ip_address}:80/v1/visualqna" \
+    "${ip_address}:${NGINX_PORT}/v1/visualqna" \
     "The image" \
-    "visualqna-xeon-nginx-server" \
-    "visualqna-xeon-nginx-server" \
+    "visualqna-rocm-nginx-server" \
+    "visualqna-rocm-nginx-server" \
     '{
         "messages": [
         {
@@ -181,7 +185,7 @@ function validate_frontend() {
 
     sed -i "s/localhost/$ip_address/g" playwright.config.ts
 
-    conda install -c conda-forge nodejs=22.6.0 -y
+    conda install -c conda-forge nodejs -y
     npm install && npm ci && npx playwright install --with-deps
     node -v && npm -v && pip list
 
@@ -197,7 +201,7 @@ function validate_frontend() {
 }
 
 function stop_docker() {
-    cd $WORKPATH/docker_compose/intel/cpu/xeon/
+    cd $WORKPATH/docker_compose/amd/gpu/rocm/
     docker compose stop && docker compose rm -f
 }
 

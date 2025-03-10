@@ -34,7 +34,13 @@ function build_docker_images() {
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
     docker compose -f build.yaml build --no-cache > ${LOG_PATH}/docker_image_build.log
 
-    docker pull ghcr.io/huggingface/tgi-gaudi:2.0.6
+    git clone https://github.com/HabanaAI/vllm-fork.git
+    cd ./vllm-fork/
+    git checkout habana_main
+    docker build -f Dockerfile.hpu -t opea/vllm-gaudi:latest --shm-size=128g . --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy
+    cd ..
+    rm -rf vllm-fork
+
     docker images && sleep 1s
 }
 
@@ -59,7 +65,7 @@ function start_services() {
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
     # Start Docker Containers
-    docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
+    docker compose -f compose_tgi.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
 
     n=0
     until [[ "$n" -ge 100 ]]; do
@@ -210,7 +216,7 @@ function main() {
 
     validate_microservices
     validate_megaservice
-    #validate_frontend
+    validate_frontend
 
     stop_docker
     echo y | docker system prune
