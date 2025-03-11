@@ -66,11 +66,13 @@ function start_services() {
     until [[ "$n" -ge 500 ]]; do
         docker logs translation-vllm-service >& ${LOG_PATH}/translation-vllm-service_start.log
         if grep -q "Application startup complete" ${LOG_PATH}/translation-vllm-service_start.log; then
+            echo "vLLM check successful"
             break
         fi
         sleep 10s
         n=$((n+1))
     done
+
 }
 
 function validate_services() {
