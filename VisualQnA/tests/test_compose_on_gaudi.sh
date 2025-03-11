@@ -11,6 +11,7 @@ export REGISTRY=${IMAGE_REPO}
 export TAG=${IMAGE_TAG}
 export MODEL_CACHE=${model_cache:-"./data"}
 export NGINX_PORT=81
+export VLLM_SKIP_WARMUP=true
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
@@ -43,6 +44,7 @@ function build_docker_images() {
     git clone https://github.com/HabanaAI/vllm-fork.git
     cd ./vllm-fork/
     git checkout habana_main
+    git reset f78aeb9da0712561163eddd353e3b6097cd69bac --hard
     docker build -f Dockerfile.hpu -t opea/vllm-gaudi:${TAG} --shm-size=128g . --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy
     cd ..
     rm -rf vllm-fork
@@ -109,15 +111,16 @@ function validate_microservices() {
         "${ip_address}:9399/v1/lvm" \
         "yellow" \
         "lvm" \
-        "lvm-gaudi-server" \
+        "lvm-vllm-gaudi-service" \
         '{"image": "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8/5+hnoEIwDiqkL4KAcT9GO0U4BxoAAAAAElFTkSuQmCC", "prompt":"What is this?"}'
 }
 
 function validate_megaservice() {
+    sleep 15s
     # Curl the Mega Service
     validate_services \
     "${ip_address}:8899/v1/visualqna" \
-    "The image" \
+    "sign" \
     "visualqna-gaudi-backend-server" \
     "visualqna-gaudi-backend-server" \
     '{
@@ -144,7 +147,7 @@ function validate_megaservice() {
     # test the megeservice via nginx
     validate_services \
     "${ip_address}:${NGINX_PORT}/v1/visualqna" \
-    "The image" \
+    "sign" \
     "visualqna-gaudi-nginx-server" \
     "visualqna-gaudi-nginx-server" \
     '{

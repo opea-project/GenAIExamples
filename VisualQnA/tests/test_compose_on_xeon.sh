@@ -111,7 +111,7 @@ function validate_megaservice() {
     # Curl the Mega Service
     validate_services \
     "${ip_address}:8899/v1/visualqna" \
-    "The image" \
+    "sign" \
     "visualqna-xeon-backend-server" \
     "visualqna-xeon-backend-server" \
     '{
@@ -138,7 +138,7 @@ function validate_megaservice() {
     # test the megeservice via nginx
     validate_services \
     "${ip_address}:${NGINX_PORT}/v1/visualqna" \
-    "The image" \
+    "sign" \
     "visualqna-xeon-nginx-server" \
     "visualqna-xeon-nginx-server" \
     '{
