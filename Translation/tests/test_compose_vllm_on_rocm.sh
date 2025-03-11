@@ -112,7 +112,7 @@ function validate_microservices() {
         "content" \
         "translation-vllm-service" \
         "translation-vllm-service" \
-        '{"model": "haoranxu/ALMA-13B", "prompt": "What is Deep Learning?"}, "max_tokens": 100}'
+        '{"model": "haoranxu/ALMA-13B", "prompt": "What is Deep Learning?", "max_tokens": 100, "temperature": 0}'
 
     # llm microservice
     validate_services \
