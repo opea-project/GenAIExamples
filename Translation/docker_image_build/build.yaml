@@ -29,3 +29,12 @@ services:
       dockerfile: comps/third_parties/nginx/src/Dockerfile
     extends: translation
     image: ${REGISTRY:-opea}/nginx:${TAG:-latest}
+  vllm-rocm:
+    build:
+      args:
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
+        no_proxy: ${no_proxy}
+      context: ../
+      dockerfile: ./Dockerfile-vllm-rocm
+    image: ${REGISTRY:-opea}/llm-vllm-rocm:${TAG:-latest}
