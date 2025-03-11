@@ -131,7 +131,7 @@ Containers should not restart.
 
 #### 3.1.1. Configuring GPU forwarding
 
-By default, in the Docker Compose file, compose_vllm.yaml is configured to forward all GPUs to the chatqna-vllm-service container. To use certain GPUs, you need to configure the forwarding of certain devices from the host system to the container.
+By default, in the Docker Compose file, compose_vllm.yaml is configured to forward all GPUs to the translation-vllm-service container. To use certain GPUs, you need to configure the forwarding of certain devices from the host system to the container.
 The configuration must be done in:
 
 ```yaml
