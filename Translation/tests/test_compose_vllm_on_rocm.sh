@@ -169,7 +169,7 @@ function validate_frontend() {
 
 function stop_docker() {
     cd $WORKPATH/docker_compose/amd/gpu/rocm/
-    docker compose -f compose_vllm.yaml stop && docker compose rm -f
+    docker compose -f compose_vllm.yaml stop && docker compose -f compose_vllm.yaml rm -f
 }
 
 function main() {
