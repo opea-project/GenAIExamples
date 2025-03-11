@@ -10,6 +10,7 @@ echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
 echo "TAG=IMAGE_TAG=${IMAGE_TAG}"
 export REGISTRY=${IMAGE_REPO}
 export TAG=${IMAGE_TAG}
+export MODEL_CACHE=${model_cache:-"./data"}
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
@@ -22,6 +23,9 @@ function build_docker_images() {
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
     docker compose -f build.yaml build --no-cache > ${LOG_PATH}/docker_image_build.log
+
+    docker pull ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu
+    docker images && sleep 1s
 }
 
 function start_service() {

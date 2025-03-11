@@ -38,25 +38,29 @@ We set default model as "mistralai/Mistral-7B-Instruct-v0.3", change "LLM_MODEL_
 
 If use gated models, you also need to provide [huggingface token](https://huggingface.co/docs/hub/security-tokens) to "HUGGINGFACEHUB_API_TOKEN" environment variable.
 
+```bash
+export HUGGINGFACEHUB_API_TOKEN="xxx"
+```
+
 ### 2.1 Setup Environment Variables
 
 Since the `compose.yaml` will consume some environment variables, you need to setup them in advance as below.
 
 ```bash
-# your_ip should be your external IP address, do not use localhost.
-export your_ip=$(hostname -I | awk '{print $1}')
+# host_ip should be your external IP address, do not use localhost.
+export host_ip=$(hostname -I | awk '{print $1}')
 
 # Example: no_proxy="localhost,127.0.0.1,192.168.1.1"
-export no_proxy=${your_no_proxy},${your_ip}
+export no_proxy=${no_proxy},${host_ip}
 
 # If you are in a proxy environment, also set the proxy-related environment variables:
-export http_proxy=${your_http_proxy}
-export https_proxy=${your_http_proxy}
+export http_proxy=${http_proxy}
+export https_proxy=${https_proxy}
 
 # Set other required variables
 
 export TGI_PORT=8008
-export TGI_LLM_ENDPOINT=http://${your_ip}:${TGI_PORT}
+export TGI_LLM_ENDPOINT=http://${host_ip}:${TGI_PORT}
 export HF_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
 export LLM_MODEL_ID="mistralai/Mistral-7B-Instruct-v0.3"
 export POSTGRES_USER=postgres
@@ -65,7 +69,14 @@ export POSTGRES_DB=chinook
 export text2sql_port=9090
 ```
 
-Note: Please replace with `your_ip` with your external IP address, do not use localhost.
+or
+edit the file set_env.sh to set those environment variables,
+
+```bash
+source set_env.sh
+```
+
+Note: Please replace with `host_ip` with your external IP address, do not use localhost.
 
 ### 2.2 Start Microservice Docker Containers
 
@@ -120,7 +131,7 @@ docker run -d --name="test-dbqna-react-ui-server" --ipc=host -p 5174:80 -e no_pr
 
 ```bash
 
-curl http://${your_ip}:$TGI_PORT/generate \
+curl http://${host_ip}:$TGI_PORT/generate \
     -X POST \
     -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}' \
     -H 'Content-Type: application/json'
@@ -133,17 +144,17 @@ Once Text-to-SQL microservice is started, user can use below command
 #### 3.2.1 Test the Database connection
 
 ```bash
-curl --location http://${your_ip}:9090/v1/postgres/health \
+curl --location http://${host_ip}:9090/v1/postgres/health \
     --header 'Content-Type: application/json' \
-    --data '{"user": "'${POSTGRES_USER}'","password": "'${POSTGRES_PASSWORD}'","host": "'${your_ip}'", "port": "5442", "database": "'${POSTGRES_DB}'"}'
+    --data '{"user": "'${POSTGRES_USER}'","password": "'${POSTGRES_PASSWORD}'","host": "'${host_ip}'", "port": "5442", "database": "'${POSTGRES_DB}'"}'
 ```
 
 #### 3.2.2 Invoke the microservice.
 
 ```bash
-curl http://${your_ip}:9090/v1/text2sql\
+curl http://${host_ip}:9090/v1/text2sql\
     -X POST \
-    -d '{"input_text": "Find the total number of Albums.","conn_str": {"user": "'${POSTGRES_USER}'","password": "'${POSTGRES_PASSWORD}'","host": "'${your_ip}'", "port": "5442", "database": "'${POSTGRES_DB}'"}}' \
+    -d '{"input_text": "Find the total number of Albums.","conn_str": {"user": "'${POSTGRES_USER}'","password": "'${POSTGRES_PASSWORD}'","host": "'${host_ip}'", "port": "5442", "database": "'${POSTGRES_DB}'"}}' \
     -H 'Content-Type: application/json'
 ```
 
@@ -161,7 +172,7 @@ npm run test
 
 ## 🚀 Launch the React UI
 
-Open this URL `http://{your_ip}:5174` in your browser to access the frontend.
+Open this URL `http://{host_ip}:5174` in your browser to access the frontend.
 
 ![project-screenshot](../../../../assets/img/dbQnA_ui_init.png)
 
