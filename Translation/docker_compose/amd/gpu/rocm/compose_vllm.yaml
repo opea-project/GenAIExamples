@@ -19,7 +19,7 @@ services:
       PYTORCH_JIT: 0
     volumes:
       - "./data:/data"
-    shm_size: 128G
+    shm_size: 20G
     devices:
       - /dev/kfd:/dev/kfd
       - /dev/dri/:/dev/dri/
@@ -30,7 +30,7 @@ services:
     security_opt:
       - seccomp:unconfined
       - apparmor=unconfined
-    command: "--model ${TRANSLATION_LLM_MODEL_ID} --swap-space 16 --disable-log-requests --dtype float16 --tensor-parallel-size 4 --host 0.0.0.0 --port 8011 --num-scheduler-steps 1 --distributed-executor-backend \"mp\""
+    command: "--model ${TRANSLATION_LLM_MODEL_ID} --swap-space 16 --disable-log-requests --dtype float16 --tensor-parallel-size 1 --host 0.0.0.0 --port 8011 --num-scheduler-steps 1 --distributed-executor-backend \"mp\""
     ipc: host
   translation-llm:
     image: ${REGISTRY:-opea}/llm-textgen:${TAG:-latest}
