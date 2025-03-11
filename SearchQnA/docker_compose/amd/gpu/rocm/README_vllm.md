@@ -188,7 +188,7 @@ Verification is performed in two ways:
 
   A message like this should appear in the logs:
 
-  ```commandline
+  ```textmate
   INFO:     Started server process [1]
   INFO:     Waiting for application startup.
   INFO:     Application startup complete.
