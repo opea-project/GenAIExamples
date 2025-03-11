@@ -63,7 +63,7 @@ function start_services() {
 
     n=0
     until [[ "$n" -ge 100 ]]; do
-        docker logs lvm-gaudi-server > ${LOG_PATH}/lvm_tgi_service_start.log
+        docker logs tgi-llava-gaudi-server > ${LOG_PATH}/lvm_tgi_service_start.log
         if grep -q Connected ${LOG_PATH}/lvm_tgi_service_start.log; then
             break
         fi

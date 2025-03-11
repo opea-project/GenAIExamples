@@ -63,7 +63,7 @@ function start_services() {
 
     n=0
     until [[ "$n" -ge 100 ]]; do
-        docker logs lvm-gaudi-server > ${LOG_PATH}/lvm_vllm_service_start.log
+        docker logs vllm-gaudi-service > ${LOG_PATH}/lvm_vllm_service_start.log
         if grep -q Starting ${LOG_PATH}/lvm_vllm_service_start.log; then
             break
         fi
