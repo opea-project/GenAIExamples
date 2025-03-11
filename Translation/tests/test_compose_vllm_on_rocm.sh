@@ -108,7 +108,7 @@ function validate_microservices() {
 
     # vLLM for llm service
     validate_services \
-        "${ip_address}:${TRANSLATION_VLLM_SERVICE_PORT}/v1/chat/completions" \
+        "${ip_address}:${TRANSLATION_VLLM_SERVICE_PORT}/v1/completions" \
         "content" \
         "translation-vllm-service" \
         "translation-vllm-service" \
