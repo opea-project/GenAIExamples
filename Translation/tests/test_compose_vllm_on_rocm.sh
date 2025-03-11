@@ -109,7 +109,7 @@ function validate_microservices() {
     # vLLM for llm service
     validate_services \
         "${ip_address}:${TRANSLATION_VLLM_SERVICE_PORT}/v1/completions" \
-        "content" \
+        "choices" \
         "translation-vllm-service" \
         "translation-vllm-service" \
         '{"model": "haoranxu/ALMA-13B", "prompt": "What is Deep Learning?", "max_tokens": 100, "temperature": 0}'
