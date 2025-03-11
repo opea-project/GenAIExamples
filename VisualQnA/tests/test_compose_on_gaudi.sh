@@ -43,7 +43,7 @@ function build_docker_images() {
     git clone https://github.com/HabanaAI/vllm-fork.git
     cd ./vllm-fork/
     git checkout habana_main
-    docker build -f Dockerfile.hpu -t opea/vllm-gaudi:latest --shm-size=128g . --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy
+    docker build -f Dockerfile.hpu -t opea/vllm-gaudi:${TAG} --shm-size=128g . --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy
     cd ..
     rm -rf vllm-fork
 

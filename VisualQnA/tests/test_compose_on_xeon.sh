@@ -41,6 +41,7 @@ function build_docker_images() {
     # docker compose -f build.yaml build --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull opea/vllm:latest
+    docker tag opea/vllm:latest opea/vllm:${TAG}
     docker images && sleep 1s
 }
 
