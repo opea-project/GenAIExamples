@@ -225,6 +225,7 @@ curl http://${HOST_IP}:${TRANSLATION_LLM_PORT}/v1/chat/completions \
 ```
 
 The response from the service must be in the form of JSON:
+
 ```textmate
 data: {"id":"cmpl-8b5634bc3b97466f8f166dd71d35a7f0","choices":[{"finish_reason":null,"index":0,"logprobs":null,"text":"I","stop_reason":null}],"created":1741677287,"model":"haoranxu/ALMA-13B","object":"text_completion","system_fingerprint":null,"usage":null}
 data: {"id":"cmpl-8b5634bc3b97466f8f166dd71d35a7f0","choices":[{"finish_reason":null,"index":0,"logprobs":null,"text":" love","stop_reason":null}],"created":1741677287,"model":"haoranxu/ALMA-13B","object":"text_completion","system_fingerprint":null,"usage":null}
