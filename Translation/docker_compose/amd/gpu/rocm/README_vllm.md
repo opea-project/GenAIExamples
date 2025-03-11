@@ -171,7 +171,7 @@ Verification is performed in two ways:
 
   A message like this should appear in the logs:
 
-  ```commandline
+  ```textmate
   INFO:     Started server process [1]
   INFO:     Waiting for application startup.
   INFO:     Application startup complete.
@@ -210,7 +210,7 @@ Verification is performed in two ways:
     "usage": { "prompt_tokens": 7, "total_tokens": 37, "completion_tokens": 30, "prompt_tokens_details": null }
   }
   ```
-  The value of choice.text must contain a response from the service that makes sense.
+  The value of "choice.text" must contain a response from the service that makes sense.
   If such a response is present, then the translation-vllm-service is considered verified.
 
 #### 3.2.2. Checking translation-llm
