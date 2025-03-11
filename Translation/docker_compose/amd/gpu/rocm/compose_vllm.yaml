@@ -44,7 +44,7 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      LLM_ENDPOINT: ${TRANSLATION_TGI_LLM_ENDPOINT}
+      LLM_ENDPOINT: ${TRANSLATION_LLM_ENDPOINT}
       LLM_MODEL_ID: ${TRANSLATION_LLM_MODEL_ID}
       HUGGINGFACEHUB_API_TOKEN: ${TRANSLATION_HUGGINGFACEHUB_API_TOKEN}
       HF_TOKEN: ${CODETRANS_HUGGINGFACEHUB_API_TOKEN}
@@ -66,6 +66,7 @@ services:
       http_proxy: ${http_proxy}
       MEGA_SERVICE_HOST_IP: ${TRANSLATION_MEGA_SERVICE_HOST_IP}
       LLM_SERVICE_HOST_IP: ${TRANSLATION_LLM_SERVICE_HOST_IP}
+      LLM_SERVICE_PORT: ${TRANSLATION_LLM_PORT}
     ipc: host
     restart: always
   translation-ui-server:
