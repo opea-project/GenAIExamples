@@ -301,7 +301,18 @@ curl http://${HOST_IP}:${SEARCH_EMBEDDING_SERVICE_PORT}/v1/embeddings\
 The response from the service must be in the form of text:
 
 ```json
-{"object":"list","model":"BAAI/bge-base-en-v1.5","data":[{"index":0,"object":"embedding","embedding":[0.0007791813,0.042613804,0.020304274,-0.0070378557,0.059366036,-0.0044034636]}],"usage":{"prompt_tokens":3,"total_tokens":3,"completion_tokens":0}}
+{
+  "object": "list",
+  "model": "BAAI/bge-base-en-v1.5",
+  "data": [
+    {
+      "index": 0,
+      "object": "embedding",
+      "embedding": [0.0007791813, 0.042613804, 0.020304274, -0.0070378557, 0.059366036, -0.0044034636]
+    }
+  ],
+  "usage": { "prompt_tokens": 3, "total_tokens": 3, "completion_tokens": 0 }
+}
 ```
 
 If the output value is similar to the example given, we consider the service to be successfully launched.
@@ -321,7 +332,33 @@ curl http://${HOST_IP}:${SEARCH_WEB_RETRIEVER_SERVICE_PORT}/v1/web_retrieval \
 The response from the service must be in the form of JSON:
 
 ```json
-{"id":"67cace517e36aff3f10a756b87a9125b","retrieved_docs":[{"downstream_black_list":[],"id":"4ba6bc05cff877011da321bbd03c05a8","text":"* Message from the Director\n    * Introduction\n    * Workforce Planning and AnalysisToggle submenu\n      * Early Career Talent\n    * Evaluation System Development\n    * Innovation\n    * Leading Practices\n    * Resources\n  * Career Paths for Federal Program and Project Management GuideToggle submenu\n    * Introduction\n    * Purpose and Objectives\n    * Data and Methodology\n    * Differentiating Job Titles for Program and Project Managers\n    * Understanding the Career Path\n    * Success Factors\n    * Competency Development Framework Part I\n    * Competency Development Framework Part II\n    * Credentials and Certifications\n    * Appendix A: Key Terminology\n    * Appendix B: Subject Matter Expert (SME) Workshops List of Participating Agencies\n    * Appendix C: List of Designated Title & Number for Each Job Series\n    * Appendix D: Program and Project Competency Model and Competency Definitions\n    * Appendix E: Program and Project Management Competency Model Proficiency Level\n  * FY 2024 Human Capital ReviewsToggle submenu\n    * Message from the Director\n    * Introduction\n    * Data Driven Decision Making\n    * Strategic Planning\n    * Artificial Intelligence\n    * Resources \n description: Welcome to opm.gov \n \n title: Federal Holidays \n \n source: https://www.opm.gov/policy-data-oversight/pay-leave/federal-holidays/ \n"},{"downstream_black_list":[],"id":"b3908b0a74cb115a09a0928beda79bc5","text":"If you have a question whether a particular State office is open or closed,\nplease contact that office.\n\nBack to Top\n\nCommissioner Beth Fastiggi  \n120 State Street, Montpelier, VT 05620  \n(802) 828-3491  \nDHR.General@vermont.gov\n\n_Contact Us  \nHR Field Representative Locator_  \n_Alerts/Closings/Delays_  \nCurrent Road & Driving Conditions  \nPublic Records Officer Contact Information and Public Records Database  \nTransparent and Open Government Information​\n\n### Connect with Us\n\nTwitter\n\nFacebook\n\nInstagram\n\nYouTube\n\nRSS\n\n## Need Assistance?\n\nClick here for a list of Department contacts.\n\n\n\n## How Do I?\n\n    * Learn about benefit plans\n    * Contact EAP\n    * Answer payroll questions\n    * See pay periods & pay dates\n    * Find wellness programs\n    * Learn about leave benefits\n    * Make a public records request\n    * Find info about classification\n    * OWA Email Login\n    * Find workforce reports\n    * View Workforce Dashboard\n    * Employment Verification\n\n## Popular Links\n\n    * Classroom/Online Training\n    * Collective Bargaining Agreements\n    * Employee/Manager Self Service\n    * Job Specifications\n    * Pay Charts\n    * Pay Dates\n    * Policy & Procedure Manual\n    * Retirement Planning\n    * Retirement Office \n    * State Holiday Schedule\n    * Time Entry & Approval\n    * VTHR Login\n\n__\n\nReturn to top\n\nCopyright (C) 2025 State of Vermont All rights reserved. | \n\n    * Policies\n    * Accessibility Policy\n    * Privacy Policy\n    * Feedback Survey  \n title: State Holiday Schedule | Department of Human Resources \n \n source: https://humanresources.vermont.gov/benefits-wellness/holiday-schedule \n"},{"downstream_black_list":[],"id":"b52e0a8865ebfc6f93cc5e366e9b57b0","text":"##  Revenue and Spending\n\n    * Contracts \n    * Monthly Revenue Watch\n    * Severance Taxes\n    * Sources of Revenue Guide\n    * Taxes of Texas: A Field Guide (PDF)\n\n##  Budget and  \nFinance\n\n    * Financial Reports and Forecasts\n    * Budget Process Primer\n    * Texas Investments\n    * Understanding the ACFR\n    * Cash Report and ACFR (PDF)\n\n##  Open Data Tools and Information\n\n    * Analysis and Reports\n    * Dashboards\n    * Pension Search Tool\n    * Search Datasets\n    * Secure Information and File Transfer (SIFT)\n\n##  Local Governments\n\n    * Eminent Domain\n    * Hotel Occupancy Tax\n    * Local Government Debt\n    * Sheriffs' and Constables' Fees\n    * SPD Financials and Taxes \n    * Tax Allocation Summaries\n    * Transparency Stars\n    * Reports and Tools\n\n  * Economy\n\n##  __  Economy Home\n\n##  Fiscal Notes\n\n    * Latest Articles\n    * Archives\n    * About _Fiscal Notes_\n    * Republish\n\n##  In Depth\n\n    * Regional Reports\n    * Forecasts\n    * Key Economic Indicators\n    * Economic Data(Good for Texas Tours)\n    * Special Reports\n\n##  Economic Development Programs\n\n    * Property Tax Programs\n    * Sales Tax Programs\n    * Grants and Special Assessments\n    * Search Tools and Data\n\n  * Purchasing\n\n##  __  Purchasing Home\n\n## Statewide Contracts\n\n    * Search Statewide Contracts\n    * Contract Development\n    * Contract Management\n    * Procurement Oversight & Delegation\n    * Texas Multiple Award Schedule (TXMAS)\n    * txsmartbuy.gov\n    * DIR Contracts \n description: Office holiday schedule for fiscal 2024. \n \n title: State of Texas Holiday Schedule - Fiscal 2025 \n \n source: https://comptroller.texas.gov/about/holidays.php \n"},{"downstream_black_list":[],"id":"ee75f07d60742868abfae486bbc1849d","text":"Skip to page navigation\n\nAn official website of the United States government\n\nHere's how you know\n\nHere's how you know\n\n**Official websites use .gov**  \nA **.gov** website belongs to an official government organization in the\nUnited States.\n\n**Secure .gov websites use HTTPS**  \nA **lock** (  Lock A locked padlock ) or **https://** means you’ve safely\nconnected to the .gov website. Share sensitive information only on official,\nsecure websites.\n\nMenu\n\nSearch all of OPM Submit\n\nSections\n\n  * About Toggle submenu\n\n    * Our Agency\n    * Who We Are\n    * Our Work\n    * Mission & History\n    * Careers at OPM\n    * Doing Business with OPM\n    * Reports & Publications\n    * Open Government\n    * Get Help\n    * Contact Us\n    * News\n    * Data\n    * 2023 Agency Financial Report\n    * Combined Federal Campaign\n    * 2023 Annual Performance Report\n    * FY 2025 Congressional Budget Justification\n    * 2024 Agency Financial Report\n    * 2024 Annual Performance Report\n\n  * Policy Toggle submenu \n description: Welcome to opm.gov \n \n title: Federal Holidays \n \n source: https://www.opm.gov/policy-data-oversight/pay-leave/federal-holidays/ \n"}],"initial_query":"What is the 2024 holiday schedule?","top_n":1}
+{
+  "id": "67cace517e36aff3f10a756b87a9125b",
+  "retrieved_docs": [
+    {
+      "downstream_black_list": [],
+      "id": "4ba6bc05cff877011da321bbd03c05a8",
+      "text": "* Message from the Director\n    * Introduction\n    * Workforce Planning and AnalysisToggle submenu\n      * Early Career Talent\n    * Evaluation System Development\n    * Innovation\n    * Leading Practices\n    * Resources\n  * Career Paths for Federal Program and Project Management GuideToggle submenu\n    * Introduction\n    * Purpose and Objectives\n    * Data and Methodology\n    * Differentiating Job Titles for Program and Project Managers\n    * Understanding the Career Path\n    * Success Factors\n    * Competency Development Framework Part I\n    * Competency Development Framework Part II\n    * Credentials and Certifications\n    * Appendix A: Key Terminology\n    * Appendix B: Subject Matter Expert (SME) Workshops List of Participating Agencies\n    * Appendix C: List of Designated Title & Number for Each Job Series\n    * Appendix D: Program and Project Competency Model and Competency Definitions\n    * Appendix E: Program and Project Management Competency Model Proficiency Level\n  * FY 2024 Human Capital ReviewsToggle submenu\n    * Message from the Director\n    * Introduction\n    * Data Driven Decision Making\n    * Strategic Planning\n    * Artificial Intelligence\n    * Resources \n description: Welcome to opm.gov \n \n title: Federal Holidays \n \n source: https://www.opm.gov/policy-data-oversight/pay-leave/federal-holidays/ \n"
+    },
+    {
+      "downstream_black_list": [],
+      "id": "b3908b0a74cb115a09a0928beda79bc5",
+      "text": "If you have a question whether a particular State office is open or closed,\nplease contact that office.\n\nBack to Top\n\nCommissioner Beth Fastiggi  \n120 State Street, Montpelier, VT 05620  \n(802) 828-3491  \nDHR.General@vermont.gov\n\n_Contact Us  \nHR Field Representative Locator_  \n_Alerts/Closings/Delays_  \nCurrent Road & Driving Conditions  \nPublic Records Officer Contact Information and Public Records Database  \nTransparent and Open Government Information​\n\n### Connect with Us\n\nTwitter\n\nFacebook\n\nInstagram\n\nYouTube\n\nRSS\n\n## Need Assistance?\n\nClick here for a list of Department contacts.\n\n\n\n## How Do I?\n\n    * Learn about benefit plans\n    * Contact EAP\n    * Answer payroll questions\n    * See pay periods & pay dates\n    * Find wellness programs\n    * Learn about leave benefits\n    * Make a public records request\n    * Find info about classification\n    * OWA Email Login\n    * Find workforce reports\n    * View Workforce Dashboard\n    * Employment Verification\n\n## Popular Links\n\n    * Classroom/Online Training\n    * Collective Bargaining Agreements\n    * Employee/Manager Self Service\n    * Job Specifications\n    * Pay Charts\n    * Pay Dates\n    * Policy & Procedure Manual\n    * Retirement Planning\n    * Retirement Office \n    * State Holiday Schedule\n    * Time Entry & Approval\n    * VTHR Login\n\n__\n\nReturn to top\n\nCopyright (C) 2025 State of Vermont All rights reserved. | \n\n    * Policies\n    * Accessibility Policy\n    * Privacy Policy\n    * Feedback Survey  \n title: State Holiday Schedule | Department of Human Resources \n \n source: https://humanresources.vermont.gov/benefits-wellness/holiday-schedule \n"
+    },
+    {
+      "downstream_black_list": [],
+      "id": "b52e0a8865ebfc6f93cc5e366e9b57b0",
+      "text": "##  Revenue and Spending\n\n    * Contracts \n    * Monthly Revenue Watch\n    * Severance Taxes\n    * Sources of Revenue Guide\n    * Taxes of Texas: A Field Guide (PDF)\n\n##  Budget and  \nFinance\n\n    * Financial Reports and Forecasts\n    * Budget Process Primer\n    * Texas Investments\n    * Understanding the ACFR\n    * Cash Report and ACFR (PDF)\n\n##  Open Data Tools and Information\n\n    * Analysis and Reports\n    * Dashboards\n    * Pension Search Tool\n    * Search Datasets\n    * Secure Information and File Transfer (SIFT)\n\n##  Local Governments\n\n    * Eminent Domain\n    * Hotel Occupancy Tax\n    * Local Government Debt\n    * Sheriffs' and Constables' Fees\n    * SPD Financials and Taxes \n    * Tax Allocation Summaries\n    * Transparency Stars\n    * Reports and Tools\n\n  * Economy\n\n##  __  Economy Home\n\n##  Fiscal Notes\n\n    * Latest Articles\n    * Archives\n    * About _Fiscal Notes_\n    * Republish\n\n##  In Depth\n\n    * Regional Reports\n    * Forecasts\n    * Key Economic Indicators\n    * Economic Data(Good for Texas Tours)\n    * Special Reports\n\n##  Economic Development Programs\n\n    * Property Tax Programs\n    * Sales Tax Programs\n    * Grants and Special Assessments\n    * Search Tools and Data\n\n  * Purchasing\n\n##  __  Purchasing Home\n\n## Statewide Contracts\n\n    * Search Statewide Contracts\n    * Contract Development\n    * Contract Management\n    * Procurement Oversight & Delegation\n    * Texas Multiple Award Schedule (TXMAS)\n    * txsmartbuy.gov\n    * DIR Contracts \n description: Office holiday schedule for fiscal 2024. \n \n title: State of Texas Holiday Schedule - Fiscal 2025 \n \n source: https://comptroller.texas.gov/about/holidays.php \n"
+    },
+    {
+      "downstream_black_list": [],
+      "id": "ee75f07d60742868abfae486bbc1849d",
+      "text": "Skip to page navigation\n\nAn official website of the United States government\n\nHere's how you know\n\nHere's how you know\n\n**Official websites use .gov**  \nA **.gov** website belongs to an official government organization in the\nUnited States.\n\n**Secure .gov websites use HTTPS**  \nA **lock** (  Lock A locked padlock ) or **https://** means you’ve safely\nconnected to the .gov website. Share sensitive information only on official,\nsecure websites.\n\nMenu\n\nSearch all of OPM Submit\n\nSections\n\n  * About Toggle submenu\n\n    * Our Agency\n    * Who We Are\n    * Our Work\n    * Mission & History\n    * Careers at OPM\n    * Doing Business with OPM\n    * Reports & Publications\n    * Open Government\n    * Get Help\n    * Contact Us\n    * News\n    * Data\n    * 2023 Agency Financial Report\n    * Combined Federal Campaign\n    * 2023 Annual Performance Report\n    * FY 2025 Congressional Budget Justification\n    * 2024 Agency Financial Report\n    * 2024 Annual Performance Report\n\n  * Policy Toggle submenu \n description: Welcome to opm.gov \n \n title: Federal Holidays \n \n source: https://www.opm.gov/policy-data-oversight/pay-leave/federal-holidays/ \n"
+    }
+  ],
+  "initial_query": "What is the 2024 holiday schedule?",
+  "top_n": 1
+}
 ```
 
 The value of "retrieved_docs.text" must contain a response from the service that makes sense.
@@ -341,7 +378,10 @@ curl http://${HOST_IP}:${SEARCH_TEI_RERANKING_PORT}/rerank \
 The response from the service must be in the form of JSON:
 
 ```json
-[{"index":1,"score":0.94238955},{"index":0,"score":0.120219156}]
+[
+  { "index": 1, "score": 0.94238955 },
+  { "index": 0, "score": 0.120219156 }
+]
 ```
 
 If the output value is similar to the example given, we consider the service to be successfully launched.
@@ -360,7 +400,24 @@ curl http://${HOST_IP}:${SEARCH_RERANK_SERVICE_PORT}/v1/reranking\
 The response from the service must be in the form of JSON:
 
 ```json
-{"id":"26e5d7f6259b8a184387f13fc9c54038","model":null,"query":"What is Deep Learning?","max_tokens":1024,"max_new_tokens":1024,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,"frequency_penalty":0.0,"presence_penalty":0.0,"repetition_penalty":1.03,"stream":true,"language":"auto","chat_template":null,"documents":["Deep learning is..."]}
+{
+  "id": "26e5d7f6259b8a184387f13fc9c54038",
+  "model": null,
+  "query": "What is Deep Learning?",
+  "max_tokens": 1024,
+  "max_new_tokens": 1024,
+  "top_k": 10,
+  "top_p": 0.95,
+  "typical_p": 0.95,
+  "temperature": 0.01,
+  "frequency_penalty": 0.0,
+  "presence_penalty": 0.0,
+  "repetition_penalty": 1.03,
+  "stream": true,
+  "language": "auto",
+  "chat_template": null,
+  "documents": ["Deep learning is..."]
+}
 ```
 
 If the output value is similar to the example given, we consider the service to be successfully launched.
