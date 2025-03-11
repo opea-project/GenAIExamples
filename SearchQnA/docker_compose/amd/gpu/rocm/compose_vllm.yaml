@@ -33,6 +33,7 @@ services:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       TEI_EMBEDDING_HOST_IP: ${SEARCH_HOST_IP}
+      TEI_EMBEDDING_PORT: ${SEARCH_TEI_EMBEDDING_PORT}
       TEI_EMBEDDING_ENDPOINT: ${SEARCH_TEI_EMBEDDING_ENDPOINT}
       HF_TOKEN: ${SEARCH_HUGGINGFACEHUB_API_TOKEN}
     restart: unless-stopped
