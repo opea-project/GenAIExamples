@@ -36,7 +36,8 @@ services:
     image: ${REGISTRY:-opea}/lvm:${TAG:-latest}
     container_name: lvm-gaudi-server
     depends_on:
-      - llava-tgi-service
+      llava-tgi-service:
+        condition: service_healthy
     ports:
       - "9399:9399"
     ipc: host

@@ -101,6 +101,7 @@ function validate_services() {
 }
 
 function validate_microservices() {
+    sleep 15s
     # Check if the microservices are running correctly.
 
     # lvm microservice
@@ -113,6 +114,7 @@ function validate_microservices() {
 }
 
 function validate_megaservice() {
+    sleep 15s
     # Curl the Mega Service
     validate_services \
     "${ip_address}:8888/v1/visualqna" \
