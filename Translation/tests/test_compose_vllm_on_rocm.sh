@@ -64,7 +64,7 @@ function start_services() {
     n=0
     # wait long for llm model download
     until [[ "$n" -ge 500 ]]; do
-        docker logs translation-vllm-service > ${LOG_PATH}/translation-vllm-service_start.log
+        docker logs translation-vllm-service >& ${LOG_PATH}/translation-vllm-service_start.log
         if grep -q "Application startup complete" ${LOG_PATH}/translation-vllm-service_start.log; then
             break
         fi
