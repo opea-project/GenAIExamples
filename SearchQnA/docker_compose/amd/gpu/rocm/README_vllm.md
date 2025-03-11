@@ -331,7 +331,7 @@ curl http://${HOST_IP}:${SEARCH_WEB_RETRIEVER_SERVICE_PORT}/v1/web_retrieval \
 
 The response from the service must be in the form of JSON:
 
-```json
+```textmate
 {
   "id": "67cace517e36aff3f10a756b87a9125b",
   "retrieved_docs": [
