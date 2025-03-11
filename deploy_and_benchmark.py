@@ -374,34 +374,34 @@ def main(yaml_file, target_node=None, test_mode="oob"):
             finally:
                 # Uninstall the deployment
                 print(f"\nUninstalling deployment for {node} nodes...")
-                cmd = [
-                    python_cmd,
-                    "deploy.py",
-                    "--chart-name",
-                    chart_name,
-                    "--namespace",
-                    namespace,
-                    "--uninstall",
-                ]
-                try:
-                    result = subprocess.run(cmd, check=True)
-                    if result.returncode != 0:
-                        print(f"Failed to uninstall deployment for {node} nodes")
-                except Exception as e:
-                    print(f"Error while uninstalling deployment for {node} nodes: {str(e)}")
+                # cmd = [
+                #     python_cmd,
+                #     "deploy.py",
+                #     "--chart-name",
+                #     chart_name,
+                #     "--namespace",
+                #     namespace,
+                #     "--uninstall",
+                # ]
+                # try:
+                #     result = subprocess.run(cmd, check=True)
+                #     if result.returncode != 0:
+                #         print(f"Failed to uninstall deployment for {node} nodes")
+                # except Exception as e:
+                #     print(f"Error while uninstalling deployment for {node} nodes: {str(e)}")
 
-                # Delete labels for current node configuration
-                print(f"Deleting labels for {node} nodes...")
-                cmd = [python_cmd, "deploy.py", "--chart-name", chart_name, "--num-nodes", str(node), "--delete-label"]
-                if current_node_names:
-                    cmd.extend(["--node-names"] + current_node_names)
+                # # Delete labels for current node configuration
+                # print(f"Deleting labels for {node} nodes...")
+                # cmd = [python_cmd, "deploy.py", "--chart-name", chart_name, "--num-nodes", str(node), "--delete-label"]
+                # if current_node_names:
+                #     cmd.extend(["--node-names"] + current_node_names)
 
-                try:
-                    result = subprocess.run(cmd, check=True)
-                    if result.returncode != 0:
-                        print(f"Failed to delete labels for {node} nodes")
-                except Exception as e:
-                    print(f"Error while deleting labels for {node} nodes: {str(e)}")
+                # try:
+                #     result = subprocess.run(cmd, check=True)
+                #     if result.returncode != 0:
+                #         print(f"Failed to delete labels for {node} nodes")
+                # except Exception as e:
+                #     print(f"Error while deleting labels for {node} nodes: {str(e)}")
 
         except Exception as e:
             print(f"Error processing configuration for {node} nodes: {str(e)}")
