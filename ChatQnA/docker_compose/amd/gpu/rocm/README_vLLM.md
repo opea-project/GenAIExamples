@@ -1,4 +1,4 @@
-Copyright (C) 2024 Advanced Micro Devices, Inc.
+Copyright (C) 2025 Advanced Micro Devices, Inc.
 
 # Deploy ChatQnA application
 
