@@ -1,0 +1,18 @@
+# Copyright (c) 2024 Advanced Micro Devices, Inc.
+
+FROM rocm/vllm:rocm6.3.1_mi300_ubuntu22.04_py3.12_vllm_0.6.6
+
+# Set the working directory
+WORKDIR /workspace
+
+# Expose the port used by the API server
+EXPOSE 8011
+
+# Set environment variables
+ENV HUGGINGFACE_HUB_CACHE=/workspace
+ENV VLLM_USE_TRITON_FLASH_ATTENTION=0
+ENV PYTORCH_JIT=0
+
+# Set the entrypoint to the api_server.py script
+RUN cp /usr/local/lib/python3.12/dist-packages/vllm/entrypoints/openai/api_server.py /workspace/api_server.py
+ENTRYPOINT ["python3", "/workspace/api_server.py"]
