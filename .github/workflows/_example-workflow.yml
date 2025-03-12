@@ -50,7 +50,7 @@ on:
         type: boolean
 
 jobs:
-  check-skip:
+  pre-build-image-check:
     runs-on: ubuntu-latest
     outputs:
       should_skip: ${{ steps.check-skip.outputs.should_skip }}
@@ -68,8 +68,8 @@ jobs:
 # Image Build
 ####################################################################################################
   build-images:
-    needs: [check-skip]
-    if: ${{ needs.check-skip.outputs.should_skip == 'false' }}
+    needs: [pre-build-image-check]
+    if: ${{ needs.pre-build-image-check.outputs.should_skip == 'false' }}
     runs-on: "docker-build-${{ inputs.node }}"
     steps:
       - name: Clean Up Working Directory
@@ -120,29 +120,32 @@ jobs:
           tag: ${{ inputs.tag }}
 
   check:
-    needs: [check-skip, build-images]
+    needs: [pre-build-image-check, build-images]
     if: always()
     runs-on: ubuntu-latest
     outputs:
-      should_compose: ${{ steps.check-compose.outputs.should_compose }}
+      run_compose: ${{ steps.check-compose.outputs.run_compose }}
     steps:
       - name: Check if job should be skipped
         id: check-compose
         run: |
-          if [[ "${{ needs.check-skip.outputs.should_skip }}" == "false" && "${{ needs.build-images.result}}" == "success" || "${{ needs.check-skip.outputs.should_skip }}" == "true" ]]; then
-            echo "should_compose="true""
-            echo "should_compose="true"" >> $GITHUB_OUTPUT
-          else
-            echo "should_compose="false""
-            echo "should_compose="false"" >> $GITHUB_OUTPUT
+          if [[ inputs.test_compose ]]; then
+            if [[ "${{ needs.pre-build-image-check.outputs.should_skip }}" == "false" && "${{ needs.build-images.result}}" == "success" || "${{ needs.pre-build-image-check.outputs.should_skip }}" == "true" ]]; then
+              echo "run_compose="true""
+              echo "run_compose="true"" >> $GITHUB_OUTPUT
+            else
+              echo "run_compose="false""
+              echo "run_compose="false"" >> $GITHUB_OUTPUT
+            fi
           fi
+          
 
 ####################################################################################################
 # Docker Compose Test
 ####################################################################################################
   test-example-compose:
     needs: [check]
-    if: ${{ always() && inputs.test_compose && needs.check.outputs.should_compose == 'true' }}
+    if: ${{ needs.check.outputs.run_compose == 'true' }}
     uses: ./.github/workflows/_run-docker-compose.yml
     with:
       tag: ${{ inputs.tag }}
