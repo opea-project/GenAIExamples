@@ -125,16 +125,16 @@ function stop_docker() {
 
 function main() {
 
-#    stop_docker
-#    if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
+    stop_docker
+    if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
     start_services
 
     validate_megaservice
     # Frontend tests are currently disabled
     # validate_frontend
 
-#    stop_docker
-#    echo y | docker system prune
+    stop_docker
+    echo y | docker system prune
 
 }
 
