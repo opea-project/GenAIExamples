@@ -140,7 +140,7 @@ jobs:
           fi
           echo "run_compose=$run_compose"
           echo "run_compose=$run_compose" >> $GITHUB_OUTPUT
-          
+
 
 ####################################################################################################
 # Docker Compose Test
