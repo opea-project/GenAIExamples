@@ -254,4 +254,3 @@ curl http://${host_ip}:${BACKEND_SERVICE_PORT}/v1/audioqna \
 ```
 
 The result of the request is the output.wav file. If, when listening to it, you hear the answer that it is an assistant and a request for a new question, then the service is considered started.
-
