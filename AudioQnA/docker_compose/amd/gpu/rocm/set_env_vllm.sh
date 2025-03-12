@@ -7,6 +7,7 @@
 # export host_ip=<your External Public IP>    # export host_ip=$(hostname -I | awk '{print $1}')
 
 export host_ip=""
+export external_host_ip=""
 export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
 
 export HF_CACHE_DIR="./data"
@@ -24,4 +25,4 @@ export LLM_SERVER_PORT=${VLLM_SERVICE_PORT}
 export BACKEND_SERVICE_PORT=18038
 export FRONTEND_SERVICE_PORT=18039
 
-export BACKEND_SERVICE_ENDPOINT=http://${host_ip}:${BACKEND_SERVICE_PORT}/v1/audioqna
+export BACKEND_SERVICE_ENDPOINT=http://${external_host_ip}:${BACKEND_SERVICE_PORT}/v1/audioqna
