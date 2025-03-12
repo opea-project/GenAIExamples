@@ -9,7 +9,6 @@
 export host_ip=""
 export external_host_ip=""
 export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
-
 export HF_CACHE_DIR="./data"
 export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
 export VLLM_SERVICE_PORT="8081"

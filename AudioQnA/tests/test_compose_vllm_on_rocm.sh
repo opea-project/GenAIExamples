@@ -41,8 +41,8 @@ function start_services() {
     cd $WORKPATH/docker_compose/amd/gpu/rocm/
 
     export host_ip=${ip_address}
+    export external_host_ip=${ip_address}
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
-
     export HF_CACHE_DIR="./data"
     export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
     export VLLM_SERVICE_PORT="8081"
@@ -54,10 +54,11 @@ function start_services() {
 
     export WHISPER_SERVER_PORT=7066
     export SPEECHT5_SERVER_PORT=7055
-    export LLM_SERVER_PORT=3006
+    export LLM_SERVER_PORT=${VLLM_SERVICE_PORT}
     export BACKEND_SERVICE_PORT=3008
     export FRONTEND_SERVICE_PORT=5173
-    export BACKEND_SERVICE_ENDPOINT=http://${host_ip}:${BACKEND_SERVICE_PORT}/v1/audioqna
+
+    export BACKEND_SERVICE_ENDPOINT=http://${external_host_ip}:${BACKEND_SERVICE_PORT}/v1/audioqna
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
@@ -92,7 +93,7 @@ function validate_megaservice() {
 }
 
 #function validate_frontend() {
-# Frontend tests are currently disabled
+## Frontend tests are currently disabled
 #    cd $WORKPATH/ui/svelte
 #    local conda_env_name="OPEA_e2e"
 #    export PATH=${HOME}/miniforge3/bin/:$PATH
@@ -119,7 +120,7 @@ function validate_megaservice() {
 
 function stop_docker() {
     cd $WORKPATH/docker_compose/amd/gpu/rocm/
-    docker compose stop && docker compose rm -f
+    docker compose -f compose_vllm.yaml stop && docker compose -f compose_vllm.yaml rm -f
 }
 
 function main() {
