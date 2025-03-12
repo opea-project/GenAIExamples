@@ -227,7 +227,7 @@ curl http://${host_ip}:${WHISPER_SERVER_PORT}/v1/audio/transcriptions \
 The response from the service must be in the form of JSON:
 
 ```json
-{"text":"who is pat gelsinger"}
+{ "text": "who is pat gelsinger" }
 ```
 
 If the value of the text key is "who is pat gelsinger", then we consider the service to be successfully launched.
