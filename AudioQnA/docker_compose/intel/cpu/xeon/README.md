@@ -147,12 +147,12 @@ docker compose -f compose_tgi.yaml up -d
    Then try the `cURL` command below to validate services.
    
    ```bash
+   # either vLLM or TGI service
    curl http://${host_ip}:${LLM_SERVER_PORT}/v1/chat/completions \
      -X POST \
      -d '{"model": "Intel/neural-chat-7b-v3-3", "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens":17}' \
      -H 'Content-Type: application/json'
    ```
-
 
 3. TTS Service
 
