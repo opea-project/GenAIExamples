@@ -2,6 +2,8 @@
 
 This document outlines the deployment process for a AudioQnA application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on Intel Xeon server.
 
+The default pipeline deploys with vLLM as the LLM serving component. It also provides options of using TGI backend for LLM microservice, please refer to [Start the MegaService](#-start-the-megaservice) section in this page.
+
 ## 🚀 Build Docker images
 
 ### 1. Source Code install GenAIComps
@@ -17,9 +19,15 @@ cd GenAIComps
 docker build -t opea/whisper:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/asr/src/integrations/dependency/whisper/Dockerfile .
 ```
 
-### 3. Build LLM Image
+### 3. Build vLLM Image
 
-Intel Xeon optimized image hosted in huggingface repo will be used for TGI service: ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu (https://github.com/huggingface/text-generation-inference)
+```bash
+git clone https://github.com/vllm-project/vllm.git
+cd ./vllm/
+VLLM_VER="$(git describe --tags "$(git rev-list --tags --max-count=1)" )"
+git checkout ${VLLM_VER}
+docker build --no-cache --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile.cpu -t opea/vllm:latest --shm-size=128g .
+```
 
 ### 4. Build TTS Image
 
@@ -43,9 +51,10 @@ docker build --no-cache -t opea/audioqna:latest --build-arg https_proxy=$https_p
 Then run the command `docker images`, you will have following images ready:
 
 1. `opea/whisper:latest`
-2. `opea/speecht5:latest`
-3. `opea/audioqna:latest`
-4. `opea/gpt-sovits:latest` (optional)
+2. `opea/vllm:latest`
+3. `opea/speecht5:latest`
+4. `opea/audioqna:latest`
+5. `opea/gpt-sovits:latest` (optional)
 
 ## 🚀 Set the environment variables
 
@@ -73,40 +82,87 @@ export BACKEND_SERVICE_ENDPOINT=http://${host_ip}:3008/v1/audioqna
 
 or use set_env.sh file to setup environment variables.
 
-Note: Please replace with host_ip with your external IP address, do not use localhost.
+Note: 
+- Please replace with host_ip with your external IP address, do not use localhost.
+- If you are in a proxy environment, also set the proxy-related environment variables:
+```
+export http_proxy="Your_HTTP_Proxy"
+export https_proxy="Your_HTTPs_Proxy"
+# Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
+export no_proxy="Your_No_Proxy",${host_ip},whisper-service,speecht5-service,gpt-sovits-service,tgi-service,vllm-service,audioqna-xeon-backend-server,audioqna-xeon-ui-server
+```
+
 
 ## 🚀 Start the MegaService
 
 ```bash
 cd GenAIExamples/AudioQnA/docker_compose/intel/cpu/xeon/
+```
+
+If use vLLM as the LLM serving backend:
+```
 docker compose up -d
 
 # multilang tts (optional)
 docker compose -f compose_multilang.yaml up -d
 ```
 
+If use TGI as the LLM serving backend:
+```
+docker compose -f compose_tgi.yaml up -d
+```
+
 ## 🚀 Test MicroServices
 
-```bash
-# whisper service
-wget https://github.com/intel/intel-extension-for-transformers/raw/main/intel_extension_for_transformers/neural_chat/assets/audio/sample.wav
-curl http://${host_ip}:7066/v1/audio/transcriptions \
-  -H "Content-Type: multipart/form-data" \
-  -F file="@./sample.wav" \
-  -F model="openai/whisper-small"
+1. Whisper Service
 
-# tgi service
-curl http://${host_ip}:3006/generate \
-  -X POST \
-  -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}' \
-  -H 'Content-Type: application/json'
+   ```bash
+   wget https://github.com/intel/intel-extension-for-transformers/raw/main/intel_extension_for_transformers/neural_chat/assets/audio/sample.wav
+   curl http://${host_ip}:${WHISPER_SERVER_PORT}/v1/audio/transcriptions \
+     -H "Content-Type: multipart/form-data" \
+     -F file="@./sample.wav" \
+     -F model="openai/whisper-small"
+   ```
 
-# speecht5 service
-curl http://${host_ip}:7055/v1/audio/speech -XPOST -d '{"input": "Who are you?"}' -H 'Content-Type: application/json' --output speech.mp3
+2. LLM backend Service
 
-# gpt-sovits service (optional)
-curl http://${host_ip}:9880/v1/audio/speech -XPOST -d '{"input": "Who are you?"}' -H 'Content-Type: application/json' --output speech.mp3
-```
+   In the first startup, this service will take more time to download, load and warm up the model. After it's finished, the service will be ready and it shows `healthy` state for the `vllm-service` container or `tgi-service` container.
+   
+   Or try the command below to check whether the LLM serving is ready.
+   
+   ```bash
+   # vLLM service
+   docker logs vllm-service 2>&1 | grep complete
+   # If the service is ready, you will get the response like below.
+   INFO:     Application startup complete.
+   ```
+
+   ```bash
+   # TGI service
+   docker logs tgi-service | grep Connected
+   # If the service is ready, you will get the response like below.
+   2024-09-03T02:47:53.402023Z  INFO text_generation_router::server: router/src/server.rs:2311: Connected
+   ```
+
+   Then try the `cURL` command below to validate services.
+   
+   ```bash
+   curl http://${host_ip}:${LLM_SERVER_PORT}/v1/chat/completions \
+     -X POST \
+     -d '{"model": "Intel/neural-chat-7b-v3-3", "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens":17}' \
+     -H 'Content-Type: application/json'
+   ```
+
+
+3. TTS Service
+
+   ```
+   # speecht5 service
+   curl http://${host_ip}:${SPEECHT5_SERVER_PORT}/v1/audio/speech -XPOST -d '{"input": "Who are you?"}' -H 'Content-Type: application/json' --output speech.mp3
+
+   # gpt-sovits service (optional)
+   curl http://${host_ip}:${GPT_SOVITS_SERVER_PORT}/v1/audio/speech -XPOST -d '{"input": "Who are you?"}' -H 'Content-Type: application/json' --output speech.mp3
+   ```
 
 ## 🚀 Test MegaService
 
