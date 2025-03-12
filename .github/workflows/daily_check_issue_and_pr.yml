@@ -1,7 +1,8 @@
 # Copyright (C) 2025 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-name: Check stale issues
+name: Check stale issue and pr
+
 on:
   schedule:
     - cron: "30 22 * * *"
