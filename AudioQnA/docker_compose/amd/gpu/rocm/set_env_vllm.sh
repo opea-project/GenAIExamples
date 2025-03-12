@@ -8,7 +8,6 @@
 
 export host_ip=""
 export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
-# <token>
 
 export HF_CACHE_DIR="./data"
 export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
