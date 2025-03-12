@@ -79,8 +79,8 @@ function validate_megaservice() {
     # always print the log
     docker logs whisper-service > $LOG_PATH/whisper-service.log
     docker logs speecht5-service > $LOG_PATH/tts-service.log
-    docker logs tgi-service > $LOG_PATH/tgi-service.log
-    docker logs audioqna-rocm-backend-server > $LOG_PATH/audioqna-rocm-backend-server.log
+    docker logs audioqna-vllm-service > $LOG_PATH/audioqna-vllm-service.log
+    docker logs audioqna-backend-server > $LOG_PATH/audioqna-backend-server.log
     echo "$response" | sed 's/^"//;s/"$//' | base64 -d > speech.mp3
 
     if [[ $(file speech.mp3) == *"RIFF"* ]]; then
