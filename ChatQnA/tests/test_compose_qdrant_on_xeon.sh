@@ -45,6 +45,7 @@ function build_docker_images() {
 }
 
 function start_services() {
+    echo "Test"
     cd $WORKPATH/docker_compose/intel/cpu/xeon
 
     export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
