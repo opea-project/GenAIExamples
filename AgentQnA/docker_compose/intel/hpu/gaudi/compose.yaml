@@ -97,3 +97,37 @@ services:
       WORKER_AGENT_URL: $WORKER_AGENT_URL
       SQL_AGENT_URL: $SQL_AGENT_URL
       port: 9090
+  agent-ui:
+    image: opea:agent-ui
+    container_name: agent-ui
+    ports:
+      - "5173:5173"
+    ipc: host
+  vllm-service:
+    image: ${REGISTRY:-opea}/vllm-gaudi:${TAG:-latest}
+    container_name: vllm-gaudi-server
+    ports:
+      - "8086:8000"
+    volumes:
+      - "./data:/data"
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HABANA_VISIBLE_DEVICES: all
+      OMPI_MCA_btl_vader_single_copy_mechanism: none
+      LLM_MODEL_ID: ${LLM_MODEL_ID}
+      VLLM_TORCH_PROFILER_DIR: "/mnt"
+      VLLM_SKIP_WARMUP: true
+      PT_HPU_ENABLE_LAZY_COLLECTIVES: true
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://$host_ip:8086/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 100
+    runtime: habana
+    cap_add:
+      - SYS_NICE
+    ipc: host
+    command: --model $LLM_MODEL_ID --tensor-parallel-size 4 --host 0.0.0.0 --port 8000 --block-size 128 --max-num-seqs 256 --max-seq_len-to-capture 16384
