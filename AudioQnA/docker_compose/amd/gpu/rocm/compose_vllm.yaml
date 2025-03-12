@@ -27,7 +27,7 @@ services:
     restart: unless-stopped
 
   audioqna-vllm-service:
-    image: ${REGISTRY:-opea}/llm-vllm-rocm:${TAG:-latest}
+    image: ${REGISTRY:-opea}/vllm-rocm:${TAG:-latest}
     container_name: audioqna-vllm-service
     ports:
       - "${VLLM_SERVICE_PORT:-8081}:8011"
