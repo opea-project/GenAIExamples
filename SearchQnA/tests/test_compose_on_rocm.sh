@@ -29,6 +29,7 @@ function build_docker_images() {
 }
 
 function start_services() {
+    echo "Test"
     cd $WORKPATH/docker_compose/amd/gpu/rocm/
     export SEARCH_HOST_IP=${ip_address}
     export SEARCH_EXTERNAL_HOST_IP=${ip_address}
