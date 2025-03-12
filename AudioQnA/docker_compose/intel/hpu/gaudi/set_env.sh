@@ -10,6 +10,12 @@ export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
 
 export LLM_MODEL_ID=Intel/neural-chat-7b-v3-3
 
+# set vLLM parameters
+export NUM_CARDS=1
+export BLOCK_SIZE=128
+export MAX_NUM_SEQS=256
+export MAX_SEQ_LEN_TO_CAPTURE=2048
+
 export MEGA_SERVICE_HOST_IP=${host_ip}
 export WHISPER_SERVER_HOST_IP=${host_ip}
 export SPEECHT5_SERVER_HOST_IP=${host_ip}
