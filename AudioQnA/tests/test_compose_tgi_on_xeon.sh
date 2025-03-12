@@ -31,23 +31,11 @@ function build_docker_images() {
     cd $WORKPATH/docker_image_build
     git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
 
-    git clone https://github.com/vllm-project/vllm.git
-    cd ./vllm/
-    VLLM_VER="$(git describe --tags "$(git rev-list --tags --max-count=1)" )"
-    echo "Check out vLLM tag ${VLLM_VER}"
-    git checkout ${VLLM_VER} &> /dev/null
-    docker build --no-cache -f Dockerfile.cpu -t ${REGISTRY:-opea}/vllm:${TAG:-latest} --shm-size=128g .
-    if [ $? -ne 0 ]; then
-        echo "opea/vllm:latest built fail"
-        exit 1
-    else
-        echo "opea/vllm:latest built successful"
-    fi
-    
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="audioqna audioqna-ui whisper speecht5 vllm"
+    service_list="audioqna audioqna-ui whisper speecht5"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
+    docker pull ghcr.io/huggingface/tgi-gaudi:2.0.6
     docker images && sleep 1s
 }
 
@@ -74,8 +62,8 @@ function start_services() {
     docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
     n=0
     until [[ "$n" -ge 200 ]]; do
-       docker logs vllm-service > $LOG_PATH/vllm_service_start.log 2>&1
-       if grep -q complete $LOG_PATH/vllm_service_start.log; then
+       docker logs tgi-service > $LOG_PATH/tgi_service_start.log
+       if grep -q Connected $LOG_PATH/tgi_service_start.log; then
            break
        fi
        sleep 5s
@@ -89,7 +77,7 @@ function validate_megaservice() {
     # always print the log
     docker logs whisper-service > $LOG_PATH/whisper-service.log
     docker logs speecht5-service > $LOG_PATH/tts-service.log
-    docker logs vllm-service > $LOG_PATH/vllm-service.log
+    docker logs tgi-service > $LOG_PATH/tgi-service.log
     docker logs audioqna-xeon-backend-server > $LOG_PATH/audioqna-xeon-backend-server.log
     echo "$response" | sed 's/^"//;s/"$//' | base64 -d > speech.mp3
 
@@ -129,7 +117,7 @@ function validate_megaservice() {
 
 function stop_docker() {
     cd $WORKPATH/docker_compose/intel/cpu/xeon/
-    docker compose -f compose.yaml stop && docker compose rm -f
+    docker compose -f compose_tgi.yaml stop && docker compose rm -f
 }
 
 function main() {
