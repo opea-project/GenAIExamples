@@ -66,7 +66,7 @@ function start_services() {
     docker compose -f compose_vllm.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
     n=0
     until [[ "$n" -ge 200 ]]; do
-       docker logs audioqna-vllm-service > $LOG_PATH/vllm_service_start.log
+       docker logs audioqna-vllm-service >& $LOG_PATH/vllm_service_start.log
        if grep -q "Application startup complete" $LOG_PATH/vllm_service_start.log; then
            break
        fi
@@ -125,16 +125,16 @@ function stop_docker() {
 
 function main() {
 
-    stop_docker
-    if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
+#    stop_docker
+#    if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
     start_services
 
     validate_megaservice
     # Frontend tests are currently disabled
     # validate_frontend
 
-    stop_docker
-    echo y | docker system prune
+#    stop_docker
+#    echo y | docker system prune
 
 }
 
