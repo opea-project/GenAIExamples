@@ -121,7 +121,7 @@ jobs:
           inject_commit: ${{ inputs.inject_commit }}
           tag: ${{ inputs.tag }}
 
-  check:
+  pre-compose-test-check:
     needs: [pre-build-image-check, build-images]
     if: always()
     runs-on: ubuntu-latest
@@ -131,23 +131,23 @@ jobs:
       - name: Check if job should be skipped
         id: check-compose
         run: |
-          if [[ inputs.test_compose ]]; then
+          set -x
+          run_compose="false"
+          if [[ ${{ inputs.test_compose }} ]]; then
             if [[ "${{ needs.pre-build-image-check.outputs.should_skip }}" == "false" && "${{ needs.build-images.result}}" == "success" || "${{ needs.pre-build-image-check.outputs.should_skip }}" == "true" ]]; then
-              echo "run_compose="true""
-              echo "run_compose="true"" >> $GITHUB_OUTPUT
-            else
-              echo "run_compose="false""
-              echo "run_compose="false"" >> $GITHUB_OUTPUT
+              run_compose="true"
             fi
           fi
+          echo "run_compose=$run_compose"
+          echo "run_compose=$run_compose" >> $GITHUB_OUTPUT
           
 
 ####################################################################################################
 # Docker Compose Test
 ####################################################################################################
   test-example-compose:
-    needs: [check]
-    if: ${{ needs.check.outputs.run_compose == 'true' }}
+    needs: [pre-compose-test-check]
+    if: ${{ always() && needs.pre-compose-test-check.outputs.run_compose == 'true' }}
     uses: ./.github/workflows/_run-docker-compose.yml
     with:
       tag: ${{ inputs.tag }}
