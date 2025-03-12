@@ -43,7 +43,7 @@ Since the `compose.yaml` will consume some environment variables, you need to se
 
 1. set the host_ip and huggingface token
 
-> Note: 
+> Note:
 > Please replace the `your_ip_address` with you external IP address, do not use `localhost`.
 
 ```bash
@@ -66,6 +66,7 @@ export https_proxy=${your_https_proxy}
 CodeGen support TGI service and vLLM service, you can choose start either one of them.
 
 Start CodeGen based on TGI service:
+
 ```bash
 cd GenAIExamples/CodeGen/docker_compose
 source set_env.sh
@@ -74,6 +75,7 @@ docker compose --profile codegen-xeon-tgi up -d
 ```
 
 Start CodeGen based on vLLM service:
+
 ```bash
 cd GenAIExamples/CodeGen/docker_compose
 source set_env.sh
@@ -223,7 +225,6 @@ For example:
 
 ![qna](../../../../assets/img/codegen_qna.png)
 
-
 ## 🚀 Download or Build Docker Images
 
 Should the Docker image you seek not yet be available on Docker Hub, you can build the Docker image locally.
@@ -272,4 +273,3 @@ Then run the command `docker images`, you will have the following Docker Images:
 - `opea/codegen:latest`
 - `opea/codegen-ui:latest`
 - `opea/codegen-react-ui:latest` (optional)
-
