@@ -13,21 +13,9 @@ export TAG=${IMAGE_TAG}
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
-export MODEL_CACHE=${model_cache:-"/data/cache"}
+export MODEL_CACHE=${model_cache:-"./data"}
 
 function build_docker_images() {
-    cd $WORKPATH
-    git clone https://github.com/HabanaAI/vllm-fork.git
-    cd vllm-fork/
-    git checkout v0.6.4.post2+Gaudi-1.19.0
-    docker build --no-cache -f Dockerfile.hpu -t ${REGISTRY:-opea}/vllm-gaudi:${TAG:-latest} --shm-size=128g .
-    if [ $? -ne 0 ]; then
-        echo "opea/vllm-gaudi built fail"
-        exit 1
-    else
-        echo "opea/vllm-gaudi built successful"
-    fi
-
     opea_branch=${opea_branch:-"main"}
     # If the opea_branch isn't main, replace the git clone branch in Dockerfile.
     if [[ "${opea_branch}" != "main" ]]; then
@@ -47,30 +35,30 @@ function build_docker_images() {
     service_list="faqgen faqgen-ui llm-faqgen"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
+    docker pull ghcr.io/huggingface/text-generation-inference:1.4
     docker images && sleep 1s
 }
 
 function start_services() {
-    cd $WORKPATH/docker_compose/intel/hpu/gaudi
+    cd $WORKPATH/docker_compose/intel/cpu/xeon/
 
     export host_ip=${ip_address}
-    export LLM_ENDPOINT_PORT=8010
-    export FAQGen_COMPONENT_NAME="OpeaFaqGenvLLM"
-    export LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
+    export LLM_ENDPOINT_PORT=8009
+    export FAQGen_COMPONENT_NAME="OpeaFaqGenTgi"
+    export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
     export LLM_ENDPOINT="http://${host_ip}:${LLM_ENDPOINT_PORT}"
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
     export MEGA_SERVICE_HOST_IP=${ip_address}
     export LLM_SERVICE_HOST_IP=${ip_address}
     export LLM_SERVICE_PORT=9001
-    export FAQGEN_BACKEND_PORT=8888
-    export NUM_CARDS=1
+    export FAQGEN_BACKEND_PORT=8889
     export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:${FAQGEN_BACKEND_PORT}/v1/faqgen"
     export LOGFLAG=True
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
     # Start Docker Containers
-    docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
+    docker compose -f compose_tgi.yaml  up -d > ${LOG_PATH}/start_services_with_compose.log
 
     sleep 30s
 }
@@ -106,14 +94,13 @@ function validate_services() {
 function validate_microservices() {
     # Check if the microservices are running correctly.
 
-    # vllm
-    echo "Validate vllm..."
+    # tgi for llm service
     validate_services \
-        "http://${host_ip}:${LLM_ENDPOINT_PORT}/v1/chat/completions" \
-        "text" \
-        "vllm-gaudi-service" \
-        "vllm-gaudi-service" \
-        '{"model": "meta-llama/Meta-Llama-3-8B-Instruct", "messages": [{"role": "user", "content": "What is Deep Learning?"}]}'
+        "${ip_address}:${LLM_ENDPOINT_PORT}/generate" \
+        "generated_text" \
+        "tgi-service" \
+        "tgi-xeon-server" \
+        '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}'
 
     # llm microservice
     validate_services \
@@ -126,11 +113,11 @@ function validate_microservices() {
 
 function validate_megaservice() {
     local SERVICE_NAME="mega-faqgen"
-    local DOCKER_NAME="faqgen-gaudi-backend-server"
+    local DOCKER_NAME="faqgen-xeon-backend-server"
     local EXPECTED_RESULT="Embeddings"
     local INPUT_DATA="messages=Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."
     local URL="${ip_address}:${FAQGEN_BACKEND_PORT}/v1/faqgen"
-    local HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST -F "$INPUT_DATA" -F "max_tokens=32" -F "stream=False" -H 'Content-Type: multipart/form-data' "$URL")
+    local HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST -F "$INPUT_DATA"  -F "max_tokens=32" -F "stream=False" -H 'Content-Type: multipart/form-data' "$URL")
     if [ "$HTTP_STATUS" -eq 200 ]; then
         echo "[ $SERVICE_NAME ] HTTP status is 200. Checking content..."
 
@@ -180,8 +167,8 @@ function validate_frontend() {
 }
 
 function stop_docker() {
-    cd $WORKPATH/docker_compose/intel/hpu/gaudi
-    docker compose stop && docker compose rm -f
+    cd $WORKPATH/docker_compose/intel/cpu/xeon/
+    docker compose -f compose_tgi.yaml stop && docker compose rm -f
 }
 
 function main() {

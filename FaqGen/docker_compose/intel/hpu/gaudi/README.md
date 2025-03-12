@@ -6,7 +6,7 @@ This document outlines the deployment process for a FAQ Generation application u
 
 1. Set up the environment variables.
 2. Run Docker Compose.
-3. Consume the ChatQnA Service.
+3. Consume the FaqGen Service.
 
 ### Quick Start: 1.Setup Environment Variable
 
@@ -32,12 +32,14 @@ To set up environment variables for deploying ChatQnA services, follow these ste
 3. Set up other environment variables:
 
    ```bash
-   export LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
-   export TGI_LLM_ENDPOINT="http://${host_ip}:8008"
    export MEGA_SERVICE_HOST_IP=${host_ip}
    export LLM_SERVICE_HOST_IP=${host_ip}
+   export LLM_ENDPOINT_PORT=8008
    export LLM_SERVICE_PORT=9000
-   export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/faqgen"
+   export FAQGEN_BACKEND_PORT=8888
+   export LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
+   export vLLM_LLM_ENDPOINT="http://${host_ip}:${LLM_ENDPOINT_PORT}"
+   export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:${FAQGEN_BACKEND_PORT}/v1/faqgen"
    ```
 
 ### Quick Start: 2.Run Docker Compose
@@ -50,7 +52,7 @@ It will automatically download the docker image on `docker hub`, please check th
 
 ```bash
   docker ps -a
-  docker logs tgi-gaudi-server -t
+  docker logs vllm-gaudi-service -t
 ```
 
 it may take some time to download the model.
@@ -65,32 +67,33 @@ Please refer to 'Build Docker Images' in below.
 ### QuickStart: 3.Consume the Service
 
 ```bash
-curl localhost:8008/generate \
-     -X POST \
-     -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":64, "do_sample": true}}' \
-     -H 'Content-Type: application/json'
+curl http://localhost:${LLM_ENDPOINT_PORT}/v1/chat/completions \
+    -X POST \
+    -H "Content-Type: application/json" \
+    -d '{"model": "meta-llama/Meta-Llama-3-8B-Instruct", "messages": [{"role": "user", "content": "What is Deep Learning?"}]}'
 ```
 
 here we just test the service on the host machine for a quick start.
 If all networks work fine, please try
 
 ```bash
-   curl http://${host_ip}:8008/generate \
-     -X POST \
-     -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":64, "do_sample": true}}' \
-     -H 'Content-Type: application/json'
+curl http://${host_ip}:${LLM_ENDPOINT_PORT}/v1/chat/completions \
+    -X POST \
+    -H "Content-Type: application/json" \
+    -d '{"model": "meta-llama/Meta-Llama-3-8B-Instruct", "messages": [{"role": "user", "content": "What is Deep Learning?"}]}'
 ```
 
 ## 🚀 Build Docker Images
 
 First of all, you need to build Docker Images locally. This step can be ignored once the Docker images are published to Docker hub.
 
-### 1. Pull TGI Gaudi Image
-
-As TGI Gaudi has been officially published as a Docker image, we simply need to pull it:
+### 1. Build vLLM Image
 
 ```bash
-docker pull ghcr.io/huggingface/tgi-gaudi:2.0.6
+git clone https://github.com/HabanaAI/vllm-fork.git
+cd vllm-fork/
+git checkout v0.6.4.post2+Gaudi-1.19.0
+docker build --no-cache --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile.hpu -t opea/vllm-gaudi:latest --shm-size=128g .
 ```
 
 ### 2. Build LLM Image
@@ -126,13 +129,13 @@ Build the frontend Docker image based on react framework via below command:
 
 ```bash
 cd GenAIExamples/FaqGen/ui
-export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/faqgen"
+export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:${FAQGEN_BACKEND_PORT}/v1/faqgen"
 docker build -t opea/faqgen-react-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy --build-arg BACKEND_SERVICE_ENDPOINT=$BACKEND_SERVICE_ENDPOINT -f docker/Dockerfile.react .
 ```
 
 Then run the command `docker images`, you will have the following Docker Images:
 
-1. `ghcr.io/huggingface/tgi-gaudi:2.0.6`
+1. `opea/vllm-gaudi:latest`
 2. `opea/llm-faqgen:latest`
 3. `opea/faqgen:latest`
 4. `opea/faqgen-ui:latest`
@@ -157,13 +160,14 @@ export https_proxy=${your_http_proxy}
 export host_ip=${your_host_ip}
 export LLM_ENDPOINT_PORT=8008
 export LLM_SERVICE_PORT=9000
-export FAQGen_COMPONENT_NAME="OpeaFaqGenTgi"
+export FAQGEN_BACKEND_PORT=8888
+export FAQGen_COMPONENT_NAME="OpeaFaqGenvLLM"
 export LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
 export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
 export MEGA_SERVICE_HOST_IP=${host_ip}
 export LLM_SERVICE_HOST_IP=${host_ip}
 export LLM_ENDPOINT="http://${host_ip}:${LLM_ENDPOINT_PORT}"
-export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/faqgen"
+export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:${FAQGEN_BACKEND_PORT}/v1/faqgen"
 ```
 
 Note: Please replace with `host_ip` with your external IP address, do not use localhost.
@@ -177,19 +181,19 @@ docker compose up -d
 
 ### Validate Microservices
 
-1. TGI Service
+1.vLLM Service
 
-   ```bash
-   curl http://${host_ip}:8008/generate \
-     -X POST \
-     -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":64, "do_sample": true}}' \
-     -H 'Content-Type: application/json'
-   ```
+    ```bash
+    curl http://${host_ip}:${LLM_ENDPOINT_PORT}/v1/chat/completions \
+      -X POST \
+      -H "Content-Type: application/json" \
+      -d '{"model": "meta-llama/Meta-Llama-3-8B-Instruct", "messages": [{"role": "user", "content": "What is Deep Learning?"}]}'
+    ```
 
 2. LLM Microservice
 
    ```bash
-   curl http://${host_ip}:9000/v1/faqgen \
+   curl http://${host_ip}:${LLM_SERVICE_PORT}/v1/faqgen \
      -X POST \
      -d '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}' \
      -H 'Content-Type: application/json'
@@ -198,7 +202,7 @@ docker compose up -d
 3. MegaService
 
    ```bash
-   curl http://${host_ip}:8888/v1/faqgen \
+   curl http://${host_ip}:${FAQGEN_BACKEND_PORT}/v1/faqgen \
       -H "Content-Type: multipart/form-data" \
       -F "messages=Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5." \
       -F "max_tokens=32" \
@@ -207,7 +211,7 @@ docker compose up -d
 
    ```bash
    ##enable stream
-   curl http://${host_ip}:8888/v1/faqgen \
+   curl http://${host_ip}:${FAQGEN_BACKEND_PORT}/v1/faqgen \
      -H "Content-Type: multipart/form-data" \
      -F "messages=Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5." \
      -F "max_tokens=32" \
