@@ -9,25 +9,13 @@ echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
 echo "TAG=IMAGE_TAG=${IMAGE_TAG}"
 export REGISTRY=${IMAGE_REPO}
 export TAG=${IMAGE_TAG}
+export MODEL_CACHE=${model_cache:-"./data"}
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
-export MODEL_CACHE=${model_cache:-"/data/cache"}
 
 function build_docker_images() {
-    cd $WORKPATH
-    git clone https://github.com/HabanaAI/vllm-fork.git
-    cd vllm-fork/
-    git checkout v0.6.4.post2+Gaudi-1.19.0
-    docker build --no-cache -f Dockerfile.hpu -t ${REGISTRY:-opea}/vllm-gaudi:${TAG:-latest} --shm-size=128g .
-    if [ $? -ne 0 ]; then
-        echo "opea/vllm-gaudi built fail"
-        exit 1
-    else
-        echo "opea/vllm-gaudi built successful"
-    fi
-
     opea_branch=${opea_branch:-"main"}
     # If the opea_branch isn't main, replace the git clone branch in Dockerfile.
     if [[ "${opea_branch}" != "main" ]]; then
@@ -44,35 +32,48 @@ function build_docker_images() {
     git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="faqgen faqgen-ui llm-faqgen"
+    service_list="codetrans codetrans-ui llm-textgen nginx"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
+    docker pull ghcr.io/huggingface/tgi-gaudi:2.0.6
     docker images && sleep 1s
 }
 
 function start_services() {
-    cd $WORKPATH/docker_compose/intel/hpu/gaudi
-
-    export host_ip=${ip_address}
-    export LLM_ENDPOINT_PORT=8010
-    export FAQGen_COMPONENT_NAME="OpeaFaqGenvLLM"
-    export LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
-    export LLM_ENDPOINT="http://${host_ip}:${LLM_ENDPOINT_PORT}"
+    cd $WORKPATH/docker_compose/intel/hpu/gaudi/
+    export http_proxy=${http_proxy}
+    export https_proxy=${http_proxy}
+    export LLM_MODEL_ID="mistralai/Mistral-7B-Instruct-v0.3"
+    export LLM_ENDPOINT="http://${ip_address}:8008"
+    export LLM_COMPONENT_NAME="OpeaTextGenService"
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
     export MEGA_SERVICE_HOST_IP=${ip_address}
     export LLM_SERVICE_HOST_IP=${ip_address}
-    export LLM_SERVICE_PORT=9001
-    export FAQGEN_BACKEND_PORT=8888
-    export NUM_CARDS=1
-    export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:${FAQGEN_BACKEND_PORT}/v1/faqgen"
-    export LOGFLAG=True
+    export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:7777/v1/codetrans"
+    export FRONTEND_SERVICE_IP=${ip_address}
+    export FRONTEND_SERVICE_PORT=5173
+    export BACKEND_SERVICE_NAME=codetrans
+    export BACKEND_SERVICE_IP=${ip_address}
+    export BACKEND_SERVICE_PORT=7777
+    export NGINX_PORT=80
+    export host_ip=${ip_address}
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
     # Start Docker Containers
-    docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
+    docker compose -f compose_tgi.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
 
-    sleep 30s
+    n=0
+    until [[ "$n" -ge 100 ]]; do
+        docker logs codetrans-gaudi-tgi-service > ${LOG_PATH}/tgi_service_start.log
+        if grep -q Connected ${LOG_PATH}/tgi_service_start.log; then
+            break
+        fi
+        sleep 5s
+        n=$((n+1))
+    done
+
+    sleep 1m
 }
 
 function validate_services() {
@@ -100,55 +101,45 @@ function validate_services() {
         docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
         exit 1
     fi
-    sleep 1s
+    sleep 5s
 }
 
 function validate_microservices() {
-    # Check if the microservices are running correctly.
-
-    # vllm
-    echo "Validate vllm..."
+    # tgi for embedding service
     validate_services \
-        "http://${host_ip}:${LLM_ENDPOINT_PORT}/v1/chat/completions" \
-        "text" \
-        "vllm-gaudi-service" \
-        "vllm-gaudi-service" \
-        '{"model": "meta-llama/Meta-Llama-3-8B-Instruct", "messages": [{"role": "user", "content": "What is Deep Learning?"}]}'
+        "${ip_address}:8008/generate" \
+        "generated_text" \
+        "tgi" \
+        "codetrans-gaudi-tgi-service" \
+        '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}'
 
     # llm microservice
     validate_services \
-        "${ip_address}:${LLM_SERVICE_PORT}/v1/faqgen" \
-        "text" \
+        "${ip_address}:9000/v1/chat/completions" \
+        "data: " \
         "llm" \
-        "llm-faqgen-server" \
-        '{"messages":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
+        "codetrans-gaudi-llm-server" \
+        '{"query":"    ### System: Please translate the following Golang codes into  Python codes.    ### Original codes:    '\'''\'''\''Golang    \npackage main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n    '\'''\'''\''    ### Translated codes:"}'
+
 }
 
 function validate_megaservice() {
-    local SERVICE_NAME="mega-faqgen"
-    local DOCKER_NAME="faqgen-gaudi-backend-server"
-    local EXPECTED_RESULT="Embeddings"
-    local INPUT_DATA="messages=Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."
-    local URL="${ip_address}:${FAQGEN_BACKEND_PORT}/v1/faqgen"
-    local HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST -F "$INPUT_DATA" -F "max_tokens=32" -F "stream=False" -H 'Content-Type: multipart/form-data' "$URL")
-    if [ "$HTTP_STATUS" -eq 200 ]; then
-        echo "[ $SERVICE_NAME ] HTTP status is 200. Checking content..."
+    # Curl the Mega Service
+    validate_services \
+        "${ip_address}:${BACKEND_SERVICE_PORT}/v1/codetrans" \
+        "print" \
+        "mega-codetrans" \
+        "codetrans-gaudi-backend-server" \
+        '{"language_from": "Golang","language_to": "Python","source_code": "package main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n}"}'
 
-        local CONTENT=$(curl -s -X POST -F "$INPUT_DATA"  -F "max_tokens=32" -F "stream=False" -H 'Content-Type: multipart/form-data' "$URL" | tee ${LOG_PATH}/${SERVICE_NAME}.log)
+    # test the megeservice via nginx
+    validate_services \
+        "${ip_address}:${NGINX_PORT}/v1/codetrans" \
+        "print" \
+        "mega-codetrans-nginx" \
+        "codetrans-gaudi-nginx-server" \
+        '{"language_from": "Golang","language_to": "Python","source_code": "package main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n}"}'
 
-        if echo "$CONTENT" | grep -q "$EXPECTED_RESULT"; then
-            echo "[ $SERVICE_NAME ] Content is as expected."
-        else
-            echo "[ $SERVICE_NAME ] Content does not match the expected result: $CONTENT"
-            docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
-            exit 1
-        fi
-    else
-        echo "[ $SERVICE_NAME ] HTTP status is not 200. Received status was $HTTP_STATUS"
-        docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
-        exit 1
-    fi
-    sleep 1s
 }
 
 function validate_frontend() {
@@ -180,8 +171,8 @@ function validate_frontend() {
 }
 
 function stop_docker() {
-    cd $WORKPATH/docker_compose/intel/hpu/gaudi
-    docker compose stop && docker compose rm -f
+    cd $WORKPATH/docker_compose/intel/hpu/gaudi/
+    docker compose -f compose_tgi.yaml stop && docker compose rm -f
 }
 
 function main() {
@@ -193,7 +184,7 @@ function main() {
 
     validate_microservices
     validate_megaservice
-    # validate_frontend
+    validate_frontend
 
     stop_docker
     echo y | docker system prune

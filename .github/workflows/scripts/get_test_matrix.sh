@@ -12,6 +12,7 @@ run_matrix="{\"include\":["
 
 examples=$(printf '%s\n' "${changed_files[@]}" | grep '/' | cut -d'/' -f1 | sort -u)
 for example in ${examples}; do
+    if [[ ! -d $WORKSPACE/$example ]]; then continue; fi
     cd $WORKSPACE/$example
     if [[ ! $(find . -type f | grep ${test_mode}) ]]; then continue; fi
     cd tests
