@@ -42,7 +42,7 @@ function build_docker_images() {
 function start_services() {
     cd $WORKPATH/docker_compose/intel/cpu/xeon/
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
-    export LLM_MODEL_ID=Intel/neural-chat-7b-v3-3
+    export LLM_MODEL_ID=meta-llama/Meta-Llama-3-8B-Instruct
 
     export MEGA_SERVICE_HOST_IP=${ip_address}
     export WHISPER_SERVER_HOST_IP=${ip_address}

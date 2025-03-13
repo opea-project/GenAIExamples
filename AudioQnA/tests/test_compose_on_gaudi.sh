@@ -54,7 +54,7 @@ function build_docker_images() {
 function start_services() {
     cd $WORKPATH/docker_compose/intel/hpu/gaudi
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
-    export LLM_MODEL_ID=Intel/neural-chat-7b-v3-3
+    export LLM_MODEL_ID=meta-llama/Meta-Llama-3-8B-Instruct
     export NUM_CARDS=1
     export BLOCK_SIZE=128
     export MAX_NUM_SEQS=256

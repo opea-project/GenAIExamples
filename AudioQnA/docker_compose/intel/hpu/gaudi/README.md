@@ -4,6 +4,8 @@ This document outlines the deployment process for a AudioQnA application utilizi
 
 The default pipeline deploys with vLLM as the LLM serving component. It also provides options of using TGI backend for LLM microservice, please refer to [Start the MegaService](#-start-the-megaservice) section in this page.
 
+Note: The default LLM is `meta-llama/Meta-Llama-3-8B-Instruct`. Before deploying the application, please make sure either you've requested and been granted the access to it on [Huggingface](https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct) or you've downloaded the model locally from [ModelScope](https://www.modelscope.cn/models).
+
 ## 🚀 Build Docker images
 
 ### 1. Source Code install GenAIComps
@@ -58,7 +60,7 @@ Before starting the services with `docker compose`, you have to recheck the foll
 export host_ip=<your External Public IP>    # export host_ip=$(hostname -I | awk '{print $1}')
 export HUGGINGFACEHUB_API_TOKEN=<your HF token>
 
-export LLM_MODEL_ID=Intel/neural-chat-7b-v3-3
+export LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
 # set vLLM parameters
 export NUM_CARDS=1
 export BLOCK_SIZE=128
@@ -146,7 +148,7 @@ docker compose -f compose_tgi.yaml up -d
    # either vLLM or TGI service
    curl http://${host_ip}:${LLM_SERVER_PORT}/v1/chat/completions \
      -X POST \
-     -d '{"model": "Intel/neural-chat-7b-v3-3", "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens":17}' \
+     -d '{"model": "meta-llama/Meta-Llama-3-8B-Instruct", "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens":17}' \
      -H 'Content-Type: application/json'
    ```
 
