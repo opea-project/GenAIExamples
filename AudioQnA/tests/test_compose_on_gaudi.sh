@@ -38,10 +38,10 @@ function build_docker_images() {
     git checkout ${VLLM_VER} &> /dev/null && cd ../
     docker build --no-cache -f Dockerfile.hpu -t ${REGISTRY:-opea}/vllm-gaudi:${TAG:-latest} --shm-size=128g .
     if [ $? -ne 0 ]; then
-        echo "opea/vllm-gaudi:latest built fail"
+        echo "opea/vllm-gaudi:ci built fail"
         exit 1
     else
-        echo "opea/vllm-gaudi:latest built successful"
+        echo "opea/vllm-gaudi:ci built successful"
     fi
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
