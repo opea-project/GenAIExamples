@@ -39,7 +39,7 @@ services:
     ports:
       - "6006:80"
     volumes:
-      - "./data_embedding:/data"
+      - "${MODEL_CACHE:-./data_embedding}:/data"
     shm_size: 1g
     environment:
       no_proxy: ${no_proxy}
@@ -95,7 +95,7 @@ services:
     ports:
       - "8808:80"
     volumes:
-      - "./data_tei:/data"
+      - "${MODEL_CACHE:-./data_tei}:/data"
     shm_size: 1g
     environment:
       no_proxy: ${no_proxy}
@@ -136,7 +136,7 @@ services:
     ports:
       - "9009:80"
     volumes:
-      - "./data:/data"
+      - "${MODEL_CACHE:-./data}:/data"
     shm_size: 1g
     environment:
       no_proxy: ${no_proxy}
@@ -209,7 +209,7 @@ services:
     ports:
       - "8028:80"
     volumes:
-      - "./data_codegen:/data"
+      - "${MODEL_CACHE:-./data_codegen}:/data"
     shm_size: 1g
     environment:
       no_proxy: ${no_proxy}
