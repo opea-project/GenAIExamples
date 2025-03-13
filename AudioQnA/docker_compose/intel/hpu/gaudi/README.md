@@ -81,7 +81,8 @@ export BACKEND_SERVICE_ENDPOINT=http://${host_ip}:3008/v1/audioqna
 
 or use set_env.sh file to setup environment variables.
 
-Note: 
+Note:
+
 - Please replace with host_ip with your external IP address, do not use localhost.
 - If you are in a proxy environment, also set the proxy-related environment variables:
 
@@ -92,7 +93,6 @@ export https_proxy="Your_HTTPs_Proxy"
 export no_proxy="Your_No_Proxy",${host_ip},whisper-service,speecht5-service,tgi-service,vllm-service,audioqna-gaudi-backend-server,audioqna-gaudi-ui-server
 ```
 
-
 ## 🚀 Start the MegaService
 
 > **_NOTE:_** Users will need at least three Gaudi cards for AudioQnA.
@@ -102,11 +102,13 @@ cd GenAIExamples/AudioQnA/docker_compose/intel/hpu/gaudi/
 ```
 
 If use vLLM as the LLM serving backend:
+
 ```
 docker compose up -d
 ```
 
 If use TGI as the LLM serving backend:
+
 ```
 docker compose -f compose_tgi.yaml up -d
 ```
@@ -161,7 +163,6 @@ docker compose -f compose_tgi.yaml up -d
      -d '{"text": "Who are you?"}' \
      -H 'Content-Type: application/json'
    ```
-
 
 ## 🚀 Test MegaService
 

@@ -43,7 +43,7 @@ function build_docker_images() {
     else
         echo "opea/vllm:latest built successful"
     fi
-    
+
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
     service_list="audioqna audioqna-ui whisper speecht5 vllm"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log

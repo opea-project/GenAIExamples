@@ -84,16 +84,17 @@ export BACKEND_SERVICE_ENDPOINT=http://${host_ip}:3008/v1/audioqna
 
 or use set_env.sh file to setup environment variables.
 
-Note: 
+Note:
+
 - Please replace with host_ip with your external IP address, do not use localhost.
 - If you are in a proxy environment, also set the proxy-related environment variables:
+
 ```
 export http_proxy="Your_HTTP_Proxy"
 export https_proxy="Your_HTTPs_Proxy"
 # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
 export no_proxy="Your_No_Proxy",${host_ip},whisper-service,speecht5-service,gpt-sovits-service,tgi-service,vllm-service,audioqna-xeon-backend-server,audioqna-xeon-ui-server
 ```
-
 
 ## 🚀 Start the MegaService
 
@@ -102,6 +103,7 @@ cd GenAIExamples/AudioQnA/docker_compose/intel/cpu/xeon/
 ```
 
 If use vLLM as the LLM serving backend:
+
 ```
 docker compose up -d
 
@@ -110,6 +112,7 @@ docker compose -f compose_multilang.yaml up -d
 ```
 
 If use TGI as the LLM serving backend:
+
 ```
 docker compose -f compose_tgi.yaml up -d
 ```
@@ -129,9 +132,9 @@ docker compose -f compose_tgi.yaml up -d
 2. LLM backend Service
 
    In the first startup, this service will take more time to download, load and warm up the model. After it's finished, the service will be ready and the container (`vllm-service` or `tgi-service`) status shown via `docker ps` will be `healthy`. Before that, the status will be `health: starting`.
-   
+
    Or try the command below to check whether the LLM serving is ready.
-   
+
    ```bash
    # vLLM service
    docker logs vllm-service 2>&1 | grep complete
@@ -147,7 +150,7 @@ docker compose -f compose_tgi.yaml up -d
    ```
 
    Then try the `cURL` command below to validate services.
-   
+
    ```bash
    # either vLLM or TGI service
    curl http://${host_ip}:${LLM_SERVER_PORT}/v1/chat/completions \
