@@ -126,7 +126,7 @@ docker compose -f compose_tgi.yaml up -d
 
 2. LLM backend Service
 
-   In the first startup, this service will take more time to download, load and warm up the model. After it's finished, the service will be ready and it shows `healthy` state for the `vllm-service` container or `tgi-service` container.
+   In the first startup, this service will take more time to download, load and warm up the model. After it's finished, the service will be ready and the container (`vllm-service` or `tgi-service`) status shown via `docker ps` will be `healthy`. Before that, the status will be `health: starting`.
    
    Or try the command below to check whether the LLM serving is ready.
    
