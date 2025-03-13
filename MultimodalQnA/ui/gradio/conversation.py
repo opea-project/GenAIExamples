@@ -58,9 +58,10 @@ class Conversation:
                 if conv_dict[-1]['role'] != 'assistant':
                     conv_dict.append({'role': 'assistant', 'content': []})
             
-            # Add content to the last conv_dict record
+            # Add content to the last conv_dict record. The single space has only effect on first image-only
+            # query for the similarity search results to get expected response.
             if isinstance(content, str):
-                conv_dict[-1]['content'].append({'type': 'text', 'text': content + self._template_caption()})
+                conv_dict[-1]['content'].append({'type': 'text', 'text': content + self._template_caption() + " "})
             
             if isinstance(content, dict) and 'path' in content:
                 if Path(content['path']).suffix in GRADIO_IMAGE_FORMATS:
