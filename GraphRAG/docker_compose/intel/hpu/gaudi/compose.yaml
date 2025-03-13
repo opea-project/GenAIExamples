@@ -39,7 +39,7 @@ services:
     ports:
       - "${TEI_EMBEDDER_PORT:-12000}:80"
     volumes:
-      - "./data:/data"
+      - "${MODEL_CACHE:-./data}:/data"
     shm_size: 1g
     environment:
       no_proxy: ${no_proxy}
@@ -58,7 +58,7 @@ services:
     ports:
       - ${LLM_ENDPOINT_PORT:-8008}:80
     volumes:
-      - "${DATA_PATH:-./data}:/data"
+      - "${MODEL_CACHE:-./data}:/data"
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
