@@ -58,10 +58,10 @@ function start_services() {
     # sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
     # Start Docker Containers
-    docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
+    docker compose -f compose_tgi.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
     n=0
     until [[ "$n" -ge 200 ]]; do
-       docker logs tgi-gaudi-server > $LOG_PATH/tgi_service_start.log
+       docker logs tgi-gaudi-service > $LOG_PATH/tgi_service_start.log
        if grep -q Connected $LOG_PATH/tgi_service_start.log; then
            break
        fi
@@ -86,7 +86,7 @@ function validate_megaservice() {
     # always print the log
     docker logs whisper-service > $LOG_PATH/whisper-service.log
     docker logs speecht5-service > $LOG_PATH/tts-service.log
-    docker logs tgi-gaudi-server > $LOG_PATH/tgi-gaudi-server.log
+    docker logs tgi-gaudi-service > $LOG_PATH/tgi-gaudi-service.log
     docker logs audioqna-gaudi-backend-server > $LOG_PATH/audioqna-gaudi-backend-server.log
     echo "$response" | sed 's/^"//;s/"$//' | base64 -d > speech.mp3
 

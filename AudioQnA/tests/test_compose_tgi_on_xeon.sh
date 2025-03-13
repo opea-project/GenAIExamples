@@ -35,7 +35,7 @@ function build_docker_images() {
     service_list="audioqna audioqna-ui whisper speecht5"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
-    docker pull ghcr.io/huggingface/tgi-gaudi:2.0.6
+    docker pull ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu
     docker images && sleep 1s
 }
 
@@ -59,7 +59,7 @@ function start_services() {
     # sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
     # Start Docker Containers
-    docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
+    docker compose -f compose_tgi.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
     n=0
     until [[ "$n" -ge 200 ]]; do
        docker logs tgi-service > $LOG_PATH/tgi_service_start.log

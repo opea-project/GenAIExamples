@@ -70,7 +70,7 @@ function start_services() {
     docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
     n=0
     until [[ "$n" -ge 200 ]]; do
-       docker logs vllm-gaudi-server > $LOG_PATH/vllm_service_start.log 2>&1
+       docker logs vllm-gaudi-service > $LOG_PATH/vllm_service_start.log 2>&1
        if grep -q complete $LOG_PATH/vllm_service_start.log; then
            break
        fi
@@ -95,7 +95,7 @@ function validate_megaservice() {
     # always print the log
     docker logs whisper-service > $LOG_PATH/whisper-service.log
     docker logs speecht5-service > $LOG_PATH/tts-service.log
-    docker logs vllm-gaudi-server > $LOG_PATH/vllm-gaudi-server.log
+    docker logs vllm-gaudi-service > $LOG_PATH/vllm-gaudi-service.log
     docker logs audioqna-gaudi-backend-server > $LOG_PATH/audioqna-gaudi-backend-server.log
     echo "$response" | sed 's/^"//;s/"$//' | base64 -d > speech.mp3
 
