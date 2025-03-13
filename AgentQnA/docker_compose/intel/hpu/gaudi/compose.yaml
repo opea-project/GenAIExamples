@@ -100,6 +100,8 @@ services:
   agent-ui:
     image: opea:agent-ui
     container_name: agent-ui
+    volumes:
+      - ${WORKDIR}/GenAIExamples/AgentQnA/ui/svelte/.env:/home/user/svelte/.env # test db
     ports:
       - "5173:5173"
     ipc: host
