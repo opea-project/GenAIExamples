@@ -12,6 +12,22 @@ GenAIExamples are designed to give developers an easy entry into generative AI, 
 
 [GenAIEval](https://github.com/opea-project/GenAIEval) measures service performance metrics such as throughput, latency, and accuracy for GenAIExamples. This feature helps users compare performance across various hardware configurations easily.
 
+## Use Cases
+
+Below are some highlighted GenAI use cases across various application scenarios:
+
+| Scenario                     | Use Case                                                                                                                              |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| <b>Question Answering<b/>    | [ChatQnA](ChatQnA) ✨: Chatbot with Retrieval Augmented Generation (RAG). <br/> [VisualQnA](VisualQnA) ✨: Visual Question-answering. |
+| <b>Image Generation<b/>      | [Text2Image](Text2Image) ✨: Text-to-image generation.                                                                                |
+| <b>Content Summarization<b/> | [DocSum](DocSum): Document Summarization Application.                                                                                 |
+| <b>FAQ Generation<b/>        | [FaqGen](FaqGen): Frequently asked questions (FAQs) generation from your documents, legal texts, customer queries etc.                |
+| <b>Code Generation<b/>       | [CodeGen](CodeGen): Gen-AI Powered Code Generator.                                                                                    |
+| <b>Information Retrieval<b/> | [DocIndexRetriever](DocIndexRetriever): Document Retrieval with Retrieval Augmented Generation (RAG).                                 |
+| <b>Fine-tuning<b/>           | [InstructionTuning](InstructionTuning): Application of Instruction Tuning.                                                            |
+
+For the full list of the available use cases and their supported deployment type, please refer [here](#deploy-examples).
+
 ## Documentation
 
 The GenAIExamples [documentation](https://opea-project.github.io/latest/examples/index.html) contains a comprehensive guide on all available examples including architecture, deployment guides, and more. Information on GenAIComps, GenAIInfra, and GenAIEval can also be found there.
