@@ -182,7 +182,7 @@ function validate_megaservice() {
     # Curl the Mega Service
     validate_service \
         "${ip_address}:8888/v1/chatqna" \
-        "data: " \
+        "Nike" \
         "chatqna-megaservice" \
         "chatqna-gaudi-backend-server" \
         '{"messages": "What is the revenue of Nike in 2023?"}'
