@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import argparse
+import glob
 import os
 import shutil
 import time
@@ -65,6 +66,8 @@ def clear_history(state, request: gr.Request):
         os.remove(state.pdf)
     state = multimodalqna_conv.copy()
     state.chatbot_history = []
+    for file in glob.glob("/tmp/*.wav"):
+        os.remove(file)  # This removes all chatbot assistant's voice response files
     video = gr.Video(value=None, elem_id="video", visible=True, label="Media")
     image = gr.Image(value=None, elem_id="image", visible=False, label="Media")
     pdf = PDF(value=None, elem_id="pdf", interactive=False, visible=False, label="Media")
