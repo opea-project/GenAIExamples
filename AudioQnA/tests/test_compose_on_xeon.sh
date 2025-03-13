@@ -36,13 +36,6 @@ function build_docker_images() {
     VLLM_VER="$(git describe --tags "$(git rev-list --tags --max-count=1)" )"
     echo "Check out vLLM tag ${VLLM_VER}"
     git checkout ${VLLM_VER} &> /dev/null && cd ../
-    docker build --no-cache -f Dockerfile.cpu -t ${REGISTRY:-opea}/vllm:${TAG:-latest} --shm-size=128g .
-    if [ $? -ne 0 ]; then
-        echo "opea/vllm:ci built fail"
-        exit 1
-    else
-        echo "opea/vllm:ci built successful"
-    fi
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
     service_list="audioqna audioqna-ui whisper speecht5 vllm"
