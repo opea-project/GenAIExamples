@@ -7,7 +7,7 @@ services:
     container_name: tei-embedding-serving
     entrypoint: /bin/sh -c "apt-get update && apt-get install -y curl && text-embeddings-router --json-output --model-id ${EMBEDDING_MODEL_ID} --auto-truncate"
     ports:
-      - "${TEI_EMBEDDER_PORT:-12000}:80"
+      - "${TEI_EMBEDDER_PORT:-10221}:80"
     volumes:
       - "./data:/data"
     shm_size: 1g
@@ -56,7 +56,7 @@ services:
       start_period: 10s
   
   dataprep-redis-finance:
-    image: ${REGISTRY:-opea}/dataprep:${TAG:-latest}
+    image: ${REGISTRY:-opea}/dataprep:${TAG:-comps} ### CHange back to latest
     container_name: dataprep-redis-server-finance
     depends_on:
       redis-vector-db:
@@ -66,7 +66,7 @@ services:
       tei-embedding-serving:
         condition: service_healthy
     ports:
-      - "${DATAPREP_PORT:-11108}:5000"
+      - "${DATAPREP_PORT:-6007}:5000"
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}

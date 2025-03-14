@@ -1,14 +1,14 @@
 from langchain_community.retrievers import BM25Retriever
 from langchain_redis import RedisConfig, RedisVectorStore
 from langchain_core.documents import Document
-from redis_kv import RedisKVStore
+from tools.redis_kv import RedisKVStore
 import os
 from openai import OpenAI
 from langchain_community.embeddings import HuggingFaceBgeEmbeddings
 from langchain_huggingface import HuggingFaceEndpointEmbeddings
 
 # Embedding model
-EMBED_MODEL = os.getenv("EMBED_MODEL", "BAAI/bge-base-en-v1.5")
+EMBED_MODEL = os.getenv("EMBED_MODEL", "BAAI/bge-base-en-v1.5") 
 TEI_EMBEDDING_ENDPOINT = os.getenv("TEI_EMBEDDING_ENDPOINT", "")
 
 # Redis URL
@@ -16,10 +16,11 @@ REDIS_URL_VECTOR = os.getenv("REDIS_URL_VECTOR", "redis://localhost:6379/")
 REDIS_URL_KV = os.getenv("REDIS_URL_KV", "redis://localhost:6380/")
 
 # LLM config
-LLM_MODEL=os.getenv("LLM_MODEL", "meta-llama/Llama-3.3-70B-Instruct")
-LLM_ENDPOINT=os.getenv("LLM_ENDPOINT", "http://localhost:8086")
-MAX_TOKENS = os.getenv("MAX_TOKENS", 1024)
-TEMPERATURE = os.getenv("TEMPERATURE", 0.2)
+LLM_MODEL=os.getenv("model", "meta-llama/Llama-3.3-70B-Instruct")
+LLM_ENDPOINT=os.getenv("llm_endpoint_url", "http://localhost:8086")
+print(f"LLM endpoint: {LLM_ENDPOINT}")
+MAX_TOKENS = 1024
+TEMPERATURE = 0.2
 
 COMPANY_NAME_PROMPT="""\
 Here is the list of company names in the knowledge base:

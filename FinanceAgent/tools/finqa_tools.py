@@ -1,4 +1,4 @@
-from utils import *
+from tools.utils import *
 
 def get_context_bm25_llm(query, company, year, quarter = ""):
     k = 5
@@ -29,7 +29,7 @@ def get_context_bm25_llm(query, company, year, quarter = ""):
 
     # get unique results
     context = get_unique_docs(chunks+tables)
-    print("Context:\n", context)
+    print("Context:\n", context[:500])
 
     if context:
         query = f"{query} for {company} in {year} {quarter}"
@@ -38,6 +38,7 @@ def get_context_bm25_llm(query, company, year, quarter = ""):
         response = parse_response(response)
     else:
         response = f"No relevant information found for {company} in {year} {quarter}."
+    print("Search result:\n", response)
     return response
 
 
@@ -75,9 +76,14 @@ def search_full_doc(query, company):
 
 
 if __name__ == "__main__":
-    company="Gap"
-    year="2024"
-    quarter="Q4"
+    # company="Gap"
+    # year="2024"
+    # quarter="Q4"
+
+    company="Costco"
+    year="2025"
+    quarter="Q2"
+
     collection_name=f"chunks_{company}"
     search_metadata = ("company", company)
     

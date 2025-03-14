@@ -20,8 +20,8 @@ services:
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       llm_endpoint_url: ${LLM_ENDPOINT_URL}
       model: ${LLM_MODEL_ID}
-      temperature: ${temperature}
-      max_new_tokens: ${max_new_tokens}
+      temperature: ${TEMPERATURE}
+      max_new_tokens: ${MAX_TOKENS}
       stream: false
       tools: /home/user/tools/finqa_agent_tools.yaml
       custom_prompt: /home/user/prompts/finqa_prompt.py
@@ -29,6 +29,9 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
+      REDIS_URL_VECTOR: $REDIS_URL_VECTOR
+      REDIS_URL_KV: $REDIS_URL_KV
+      TEI_EMBEDDING_ENDPOINT: $TEI_EMBEDDING_ENDPOINT
       port: 9095
 
   # worker-research-agent:
@@ -49,8 +52,8 @@ services:
   #     HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
   #     llm_endpoint_url: ${LLM_ENDPOINT_URL}
   #     model: ${LLM_MODEL_ID}
-  #     temperature: ${temperature}
-  #     max_new_tokens: ${max_new_tokens}
+  #     temperature: ${TEMPERATURE}
+  #     max_new_tokens: ${MAX_TOKENS}
   #     stream: false
   #     tools: /home/user/tools/research_agent_tools.yaml
   #     custom_prompt: /home/user/prompts/research_prompt.py
@@ -65,7 +68,7 @@ services:
     container_name: supervisor-agent-endpoint
     depends_on:
       - worker-finqa-agent
-      - worker-research-agent
+      # - worker-research-agent
     volumes:
       - ${TOOLSET_PATH}:/home/user/tools/
       - ${PROMPT_PATH}:/home/user/prompts/
@@ -81,8 +84,8 @@ services:
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       llm_endpoint_url: ${LLM_ENDPOINT_URL}
       model: ${LLM_MODEL_ID}
-      temperature: ${temperature}
-      max_new_tokens: ${max_new_tokens}
+      temperature: ${TEMPERATURE}
+      max_new_tokens: ${MAX_TOKENS}
       stream: true
       tools: /home/user/tools/supervisor_agent_tools.yaml
       custom_prompt: /home/user/prompts/supervisor_prompt.py
