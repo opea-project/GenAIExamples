@@ -79,11 +79,16 @@ if __name__ == "__main__":
     parser.add_argument("--stream", action="store_true", help="streaming mode")
     parser.add_argument("--prompt", type=str, help="prompt message")
     parser.add_argument("--agent_role", type=str, default="supervisor", help="supervisor or worker")
+    parser.add_argument("--multi-turn", action="store_true", help="multi-turn conversation")
     args, _ = parser.parse_known_args()
 
     print(args)
 
     if args.agent_role == "supervisor":
+        if args.multi_turn:
+            test_chat_completion_multi_turn(args)
+        else:
+            test_supervisor_agent_single_turn(args)
         test_chat_completion_multi_turn(args)
     elif args.agent_role == "worker":
         test_worker_agent(args)

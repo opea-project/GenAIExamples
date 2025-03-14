@@ -49,7 +49,7 @@ The commands below will upload some example files into the knowledge base. You c
 
 First, launch the redis databases and the dataprep microservice.
 ```bash
-
+docker compose -f $WORKDIR/GenAIExamples/FinanceAgent/docker_compose/intel/hpu/gaudi/dataprep.yaml up -d
 ```
 
 ### 3.3 Launch the multi-agent system
