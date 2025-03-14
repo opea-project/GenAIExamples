@@ -86,8 +86,10 @@ flowchart LR
 
 ## Deploy with docker
 
-1. Build agent docker image [Optional]
+### 1. Build agent docker image [Optional]
 
+<details>
+<summary> Instructions </summary>
 > [!NOTE]
 > the step is optional. The docker images will be automatically pulled when running the docker compose commands. This step is only needed if pulling images failed.
 
@@ -106,116 +108,86 @@ cd GenAIComps
 docker build -t opea/agent:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/agent/src/Dockerfile .
 ```
 
-2. Set up environment for this example </br>
+</details>
 
-   First, clone this repo.
+### 2. Set up environment for this example </br>
 
-   ```
-   export WORKDIR=<your-work-directory>
-   cd $WORKDIR
-   git clone https://github.com/opea-project/GenAIExamples.git
-   ```
+#### First, clone this repo.
 
-   Second, set up env vars.
+```
+export WORKDIR=<your-work-directory>
+cd $WORKDIR
+git clone https://github.com/opea-project/GenAIExamples.git
+```
 
-   ```
-   # Example: host_ip="192.168.1.1" or export host_ip="External_Public_IP"
-   export host_ip=$(hostname -I | awk '{print $1}')
-   # if you are in a proxy environment, also set the proxy-related environment variables
-   export http_proxy="Your_HTTP_Proxy"
-   export https_proxy="Your_HTTPs_Proxy"
-   # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
-   export no_proxy="Your_No_Proxy"
+#### Second, set up env vars.
 
-   export TOOLSET_PATH=$WORKDIR/GenAIExamples/AgentQnA/tools/
-   # for using open-source llms
-   export HUGGINGFACEHUB_API_TOKEN=<your-HF-token>
-   export HF_CACHE_DIR=<directory-where-llms-are-downloaded> #so that no need to redownload every time
+```
+# if you are in a proxy environment, also set the proxy-related environment variables
+export http_proxy="Your_HTTP_Proxy"
+export https_proxy="Your_HTTPs_Proxy"
+# Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
+export no_proxy="Your_No_Proxy"
 
-   # optional: OPANAI_API_KEY if you want to use OpenAI models
-   export OPENAI_API_KEY=<your-openai-key>
-   ```
+# for using open-source llms
+export HUGGINGFACEHUB_API_TOKEN=<your-HF-token>
+export HF_CACHE_DIR=<directory-where-llms-are-downloaded> #so that no need to redownload every time
 
-3. Deploy the retrieval tool (i.e., DocIndexRetriever mega-service)
+# optional: OPANAI_API_KEY if you want to use OpenAI models
+export OPENAI_API_KEY=<your-openai-key>
+```
 
-   First, launch the mega-service.
+#### Third, set up pre-defined environment variables via set_env.sh
 
-   ```
-   cd $WORKDIR/GenAIExamples/AgentQnA/retrieval_tool
-   bash launch_retrieval_tool.sh
-   ```
+e.g. set up for Gaudi.
 
-   Then, ingest data into the vector database. Here we provide an example. You can ingest your own data.
+```
+source $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/hpu/gaudi/set_env.sh
+```
 
-   ```
-   bash run_ingest_data.sh
-   ```
+### 3. Launch other tools. [Optional]
 
-4. Prepare SQL database
-   In this example, we will use the Chinook SQLite database. Run the commands below.
-
-   ```
-   # Download data
-   cd $WORKDIR
-   git clone https://github.com/lerocha/chinook-database.git
-   cp chinook-database/ChinookDatabase/DataSources/Chinook_Sqlite.sqlite $WORKDIR/GenAIExamples/AgentQnA/tests/
-   ```
-
-5. Launch other tools. </br>
+<details>
+<summary> Instructions </summary>
    In this example, we will use some of the mock APIs provided in the Meta CRAG KDD Challenge to demonstrate the benefits of gaining additional context from mock knowledge graphs.
 
-   ```
-   docker run -d -p=8080:8000 docker.io/aicrowd/kdd-cup-24-crag-mock-api:v0
-   ```
+```
+docker run -d -p=8080:8000 docker.io/aicrowd/kdd-cup-24-crag-mock-api:v0
+```
 
-6. Launch multi-agent system. </br>
-   We provide two options for `llm_engine` of the agents: 1. open-source LLMs on Intel Gaudi2, 2. OpenAI models via API calls.
+</details>
 
-   ::::{tab-set}
-   :::{tab-item} Gaudi
-   :sync: Gaudi
+### 4. Launch multi-agent system. </br>
 
-   On Gaudi2 we will serve `meta-llama/Meta-Llama-3.1-70B-Instruct` using vllm.
+We provide two options for `llm_engine` of the agents: 1. open-source LLMs on Intel Gaudi2, 2. OpenAI models via API calls.
 
-   First build vllm-gaudi docker image.
+#### Gaudi
 
-   ```bash
-   cd $WORKDIR
-   git clone https://github.com/vllm-project/vllm.git
-   cd ./vllm
-   git checkout v0.6.6
-   docker build --no-cache -f Dockerfile.hpu -t opea/vllm-gaudi:latest --shm-size=128g . --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy
-   ```
+On Gaudi2 we will serve `meta-llama/Meta-Llama-3.1-70B-Instruct` using vllm.
 
-   Then launch vllm on Gaudi2 with the command below.
+```bash
+cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/hpu/gaudi/
+docker compose -f $WORKDIR/GenAIExamples/DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml -f compose.yaml up -d
+```
 
-   ```bash
-   vllm_port=8086
-   model="meta-llama/Meta-Llama-3.1-70B-Instruct"
-   docker run -d --runtime=habana --rm --name "vllm-gaudi-server" -e HABANA_VISIBLE_DEVICES=0,1,2,3 -p $vllm_port:8000 -v $vllm_volume:/data -e HF_TOKEN=$HF_TOKEN -e HUGGING_FACE_HUB_TOKEN=$HF_TOKEN -e HF_HOME=/data -e OMPI_MCA_btl_vader_single_copy_mechanism=none -e PT_HPU_ENABLE_LAZY_COLLECTIVES=true -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e no_proxy=$no_proxy -e VLLM_SKIP_WARMUP=true --cap-add=sys_nice --ipc=host opea/vllm-gaudi:latest --model ${model} --max-seq-len-to-capture 16384 --tensor-parallel-size 4
-   ```
+#### Xeon
 
-   Then launch Agent microservices.
+To use OpenAI models, run commands below.
 
-   ```bash
-   cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/hpu/gaudi/
-   bash launch_agent_service_gaudi.sh
-   ```
+```
+export OPENAI_API_KEY=<your-openai-key>
+cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/cpu/xeon
+bash launch_agent_service_openai.sh
+```
 
-   :::
-   :::{tab-item} Xeon
-   :sync: Xeon
+### 5. Ingest Data into vector database
 
-   To use OpenAI models, run commands below.
+Then, ingest data into the vector database. Here we provide an example. You can ingest your own data.
 
-   ```
-   export OPENAI_API_KEY=<your-openai-key>
-   cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/cpu/xeon
-   bash launch_agent_service_openai.sh
-   ```
-
-   :::
-   ::::
+```
+cd  $WORKDIR/GenAIExamples/AgentQnA/retrieval_tool/
+bash run_ingest_data.sh
+```
 
 ## Deploy AgentQnA UI
 
@@ -250,13 +222,13 @@ You should see something like "HTTP server setup successful" if the docker conta
 
 ```bash
 # RAG worker agent
-python tests/test.py --prompt "Tell me about Michael Jackson song Thriller" --agent_role "worker" --ext_port 9095
+python $WORKDIR/GenAIExamples/AgentQnA/tests/test.py --prompt "Tell me about Michael Jackson song Thriller" --agent_role "worker" --ext_port 9095
 
 # SQL agent
-python tests/test.py --prompt "How many employees in company" --agent_role "worker" --ext_port 9096
+python $WORKDIR/GenAIExamples/AgentQnA/tests/test.py --prompt "How many employees in company" --agent_role "worker" --ext_port 9096
 
 # supervisor agent: this will test a two-turn conversation
-python tests/test.py --agent_role "supervisor" --ext_port 9090
+python $WORKDIR/GenAIExamples/AgentQnA/tests/test.py --agent_role "supervisor" --ext_port 9090
 ```
 
 ## How to register your own tools with agent
