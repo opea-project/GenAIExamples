@@ -157,12 +157,13 @@ function validate_frontend() {
 
 
 function stop_docker() {
+    echo "OPENAI_API_KEY - ${OPENAI_API_KEY}"
     cd $WORKPATH/docker_compose/amd/gpu/rocm/
     docker compose -f compose_vllm.yaml stop && docker compose -f compose_vllm.yaml rm -f
 }
 
 function main() {
-    echo "OPENAI_API_KEY - ${OPENAI_API_KEY}"
+
     stop_docker
     if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
     start_services
