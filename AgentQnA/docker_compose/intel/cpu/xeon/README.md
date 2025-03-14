@@ -42,7 +42,8 @@ This example showcases a hierarchical multi-agent system for question-answering 
    ```
 
 4. Prepare SQL database
-   In this example, we will use the SQLite database provided in the [TAG-Bench](https://github.com/TAG-Research/TAG-Bench/tree/main). Run the commands below.
+   In this example, we will use the SQLite database provided in the [TAG-Bench](https://github.com/TAG-Research/TAG-Bench/tree/main).
+   Please follow https://github.com/TAG-Research/TAG-Bench?tab=readme-ov-file#setup to setup the environment before running the commands below.
 
    ```
    # Download data
