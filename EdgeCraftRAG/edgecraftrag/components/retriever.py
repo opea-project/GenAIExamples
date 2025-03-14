@@ -19,6 +19,8 @@ class VectorSimRetriever(BaseComponent, VectorIndexRetriever):
             comp_type=CompType.RETRIEVER,
             comp_subtype=RetrieverType.VECTORSIMILARITY,
         )
+        self.topk = kwargs["similarity_top_k"]
+
         VectorIndexRetriever.__init__(
             self,
             index=indexer,

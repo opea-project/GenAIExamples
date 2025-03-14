@@ -79,7 +79,6 @@ class InferenceType(str, Enum):
 class CallbackType(str, Enum):
 
     DATAPREP = "dataprep"
-    DATAUPDATE = "dataupdate"
     RETRIEVE = "retrieve"
     PIPELINE = "pipeline"
 

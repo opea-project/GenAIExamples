@@ -46,7 +46,6 @@ class PipelineMgr(BaseMgr):
         pl.run_pipeline_cb = None
         pl.run_retriever_cb = None
         pl.run_data_prepare_cb = None
-        pl.run_data_update_cb = None
         pl._node_changed = None
         self.remove(pl.idx)
         del pl
@@ -58,14 +57,17 @@ class PipelineMgr(BaseMgr):
 
     def activate_pipeline(self, name: str, active: bool, nm: NodeMgr):
         pl = self.get_pipeline_by_name_or_id(name)
+        if pl is None:
+            return
+
+        if not active:
+            pl.status.active = False
+            self._active_pipeline = None
+            return
+
         nodelist = None
-        if pl is not None:
-            if not active:
-                pl.status.active = False
-                self._active_pipeline = None
-                return
-            if pl.node_changed:
-                nodelist = nm.get_nodes(pl.node_parser.idx)
+        if pl.node_changed:
+            nodelist = nm.get_nodes(pl.node_parser.idx)
         pl.check_active(nodelist)
         prevactive = self._active_pipeline
         if prevactive:
@@ -100,10 +102,4 @@ class PipelineMgr(BaseMgr):
         ap = self.get_active_pipeline()
         if ap is not None:
             return ap.run(cbtype=CallbackType.DATAPREP, docs=docs)
-        return -1
-
-    def run_data_update(self, docs: List[Document]) -> Any:
-        ap = self.get_active_pipeline()
-        if ap is not None:
-            return ap.run(cbtype=CallbackType.DATAUPDATE, docs=docs)
         return -1
