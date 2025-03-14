@@ -23,6 +23,12 @@ services:
       dockerfile: ./Dockerfile.without_rerank
     extends: chatqna
     image: ${REGISTRY:-opea}/chatqna-without-rerank:${TAG:-latest}
+  chatqna-faqgen:
+    build:
+      context: ../
+      dockerfile: ./Dockerfile.faqgen
+    extends: chatqna
+    image: ${REGISTRY:-opea}/chatqna-faqgen:${TAG:-latest}
   chatqna-ui:
     build:
       context: ../ui
@@ -59,6 +65,12 @@ services:
       dockerfile: comps/llms/src/text-generation/Dockerfile
     extends: chatqna
     image: ${REGISTRY:-opea}/llm-textgen:${TAG:-latest}
+  llm-faqgen:
+    build:
+      context: GenAIComps
+      dockerfile: comps/llms/src/faq-generation/Dockerfile
+    extends: chatqna
+    image: ${REGISTRY:-opea}/llm-faqgen:${TAG:-latest}
   dataprep:
     build:
       context: GenAIComps
