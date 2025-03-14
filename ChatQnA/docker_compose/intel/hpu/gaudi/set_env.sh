@@ -29,3 +29,4 @@ export CHATQNA_FRONTEND_SERVICE_PORT=5173
 export NGINX_PORT=80
 export FAQGen_COMPONENT_NAME="OpeaFaqGenvLLM"
 export LLM_ENDPOINT="http://${host_ip}:${LLM_ENDPOINT_PORT}"
+export no_proxy="$no_proxy,chatqna-gaudi-ui-server,chatqna-gaudi-backend-server,dataprep-redis-service,tei-embedding-service,retriever,tei-reranking-service,tgi-gaudi-server,vllm-gaudi-server,llm-faqgen,guardrails,jaeger,prometheus,grafana,node-exporter,gaudi-exporter,$JAEGER_IP"

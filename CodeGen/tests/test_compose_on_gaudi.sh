@@ -30,34 +30,44 @@ function build_docker_images() {
 
     cd $WORKPATH/docker_image_build
     git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
+    # Download Gaudi vllm of latest tag
+    git clone https://github.com/HabanaAI/vllm-fork.git && cd vllm-fork
+    VLLM_VER=$(git describe --tags "$(git rev-list --tags --max-count=1)")
+    echo "Check out vLLM tag ${VLLM_VER}"
+    git checkout ${VLLM_VER} &> /dev/null && cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="codegen codegen-ui llm-textgen"
+    service_list="codegen codegen-ui llm-textgen vllm-gaudi"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
-    docker pull ghcr.io/huggingface/tgi-gaudi:2.0.6
     docker images && sleep 1s
 }
 
 function start_services() {
+    local compose_profile="$1"
+    local llm_container_name="$2"
+
     cd $WORKPATH/docker_compose/intel/hpu/gaudi
-    export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
-    export TGI_LLM_ENDPOINT="http://${ip_address}:8028"
+    export http_proxy=${http_proxy}
+    export https_proxy=${https_proxy}
+    export LLM_MODEL_ID="Qwen/Qwen2.5-Coder-7B-Instruct"
+    export LLM_ENDPOINT="http://${ip_address}:8028"
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
     export MEGA_SERVICE_HOST_IP=${ip_address}
     export LLM_SERVICE_HOST_IP=${ip_address}
     export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:7778/v1/codegen"
+    export NUM_CARDS=1
     export host_ip=${ip_address}
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
     # Start Docker Containers
-    docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
+    docker compose --profile ${compose_profile} up -d | tee ${LOG_PATH}/start_services_with_compose.log
 
     n=0
     until [[ "$n" -ge 100 ]]; do
-        docker logs tgi-gaudi-server > ${LOG_PATH}/tgi_service_start.log
-        if grep -q Connected ${LOG_PATH}/tgi_service_start.log; then
+        docker logs ${llm_container_name} > ${LOG_PATH}/llm_service_start.log 2>&1
+        if grep -E "Connected|complete" ${LOG_PATH}/llm_service_start.log; then
             break
         fi
         sleep 5s
@@ -94,13 +104,15 @@ function validate_services() {
 }
 
 function validate_microservices() {
+    local llm_container_name="$1"
+
     # tgi for llm service
     validate_services \
-        "${ip_address}:8028/generate" \
-        "generated_text" \
-        "tgi-llm" \
-        "tgi-gaudi-server" \
-        '{"inputs":"def print_hello_world():","parameters":{"max_new_tokens":256, "do_sample": true}}'
+        "${ip_address}:8028/v1/chat/completions" \
+        "completion_tokens" \
+        "llm-service" \
+        "${llm_container_name}" \
+        '{"model": "Qwen/Qwen2.5-Coder-7B-Instruct", "messages": [{"role": "user", "content": "def print_hello_world():"}], "max_tokens": 256}'
 
     # llm microservice
     validate_services \
@@ -152,24 +164,50 @@ function validate_frontend() {
 }
 
 function stop_docker() {
+    local docker_profile="$1"
+
     cd $WORKPATH/docker_compose/intel/hpu/gaudi
-    docker compose stop && docker compose rm -f
+    docker compose --profile ${docker_profile} down
 }
 
 function main() {
+    # all docker docker compose profiles for XEON Platform
+    docker_compose_profiles=("codegen-gaudi-vllm" "codegen-gaudi-tgi")
+    docker_llm_container_names=("vllm-gaudi-server" "tgi-gaudi-server")
 
-    stop_docker
+    # get number of profiels and container
+    len_profiles=${#docker_compose_profiles[@]}
+    len_containers=${#docker_llm_container_names[@]}
 
+    # number of profiels and docker container names must be matched
+    if [ ${len_profiles} -ne ${len_containers} ]; then
+        echo "Error: number of profiles ${len_profiles} and container names ${len_containers} mismatched"
+        exit 1
+    fi
+
+    # stop_docker, stop all profiles
+    for ((i = 0; i < len_profiles; i++)); do
+        stop_docker "${docker_compose_profiles[${i}]}"
+    done
+
+    # build docker images
     if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
-    start_services
 
-    validate_microservices
-    validate_megaservice
-    validate_frontend
+    # loop all profiles
+    for ((i = 0; i < len_profiles; i++)); do
+        echo "Process [${i}]: ${docker_compose_profiles[$i]}, ${docker_llm_container_names[${i}]}"
+        start_services "${docker_compose_profiles[${i}]}" "${docker_llm_container_names[${i}]}"
+        docker ps -a
 
-    stop_docker
+        validate_microservices "${docker_llm_container_names[${i}]}"
+        validate_megaservice
+        validate_frontend
+
+        stop_docker "${docker_compose_profiles[${i}]}"
+        sleep 5s
+    done
+
     echo y | docker system prune
-
 }
 
 main

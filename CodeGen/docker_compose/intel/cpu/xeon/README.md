@@ -1,6 +1,7 @@
 # Build MegaService of CodeGen on Xeon
 
 This document outlines the deployment process for a CodeGen application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on Intel Xeon server. The steps include Docker images creation, container deployment via Docker Compose, and service execution to integrate microservices such as `llm`. We will publish the Docker images to Docker Hub soon, further simplifying the deployment process for this service.
+The default pipeline deploys with vLLM as the LLM serving component. It also provides options of using TGI backend for LLM microservice.
 
 ## 🚀 Create an AWS Xeon Instance
 
@@ -9,55 +10,6 @@ To run the example on an AWS Xeon instance, start by creating an AWS account if 
 For detailed information about these instance types, you can refer to [m7i](https://aws.amazon.com/ec2/instance-types/m7i/). Once you've chosen the appropriate instance type, proceed with configuring your instance settings, including network configurations, security groups, and storage options.
 
 After launching your instance, you can connect to it using SSH (for Linux instances) or Remote Desktop Protocol (RDP) (for Windows instances). From there, you'll have full access to your Xeon server, allowing you to install, configure, and manage your applications as needed.
-
-## 🚀 Download or Build Docker Images
-
-Should the Docker image you seek not yet be available on Docker Hub, you can build the Docker image locally.
-
-### 1. Build the LLM Docker Image
-
-```bash
-git clone https://github.com/opea-project/GenAIComps.git
-cd GenAIComps
-docker build -t opea/llm-textgen:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/src/text-generation/Dockerfile .
-```
-
-### 2. Build the MegaService Docker Image
-
-To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `codegen.py` Python script. Build MegaService Docker image via the command below:
-
-```bash
-git clone https://github.com/opea-project/GenAIExamples
-cd GenAIExamples/CodeGen
-docker build -t opea/codegen:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
-```
-
-### 3. Build the UI Docker Image
-
-Build the frontend Docker image via the command below:
-
-```bash
-cd GenAIExamples/CodeGen/ui
-docker build -t opea/codegen-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
-```
-
-### 4. Build CodeGen React UI Docker Image (Optional)
-
-Build react frontend Docker image via below command:
-
-**Export the value of the public IP address of your Xeon server to the `host_ip` environment variable**
-
-```bash
-cd GenAIExamples/CodeGen/ui
-docker build --no-cache -t opea/codegen-react-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile.react .
-```
-
-Then run the command `docker images`, you will have the following Docker Images:
-
-- `opea/llm-textgen:latest`
-- `opea/codegen:latest`
-- `opea/codegen-ui:latest`
-- `opea/codegen-react-ui:latest` (optional)
 
 ## 🚀 Start Microservices and MegaService
 
@@ -89,42 +41,57 @@ flowchart LR
 
 Since the `compose.yaml` will consume some environment variables, you need to setup them in advance as below.
 
-**Append the value of the public IP address to the no_proxy list**
+1. set the host_ip and huggingface token
 
+> Note:
+> Please replace the `your_ip_address` with you external IP address, do not use `localhost`.
+
+```bash
+export host_ip=${your_ip_address}
+export HUGGINGFACEHUB_API_TOKEN=you_huggingface_token
 ```
-export your_no_proxy=${your_no_proxy},"External_Public_IP"
-```
+
+2. Set Netowork Proxy
+
+**If you access public network through proxy, set the network proxy, otherwise, skip this step**
 
 ```bash
 export no_proxy=${your_no_proxy}
 export http_proxy=${your_http_proxy}
-export https_proxy=${your_http_proxy}
-export LLM_MODEL_ID="Qwen/Qwen2.5-Coder-7B-Instruct"
-export TGI_LLM_ENDPOINT="http://${host_ip}:8028"
-export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
-export MEGA_SERVICE_HOST_IP=${host_ip}
-export LLM_SERVICE_HOST_IP=${host_ip}
-export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:7778/v1/codegen"
+export https_proxy=${your_https_proxy}
 ```
-
-Note: Please replace the `host_ip` with you external IP address, do not use `localhost`.
 
 ### Start the Docker Containers for All Services
 
+CodeGen support TGI service and vLLM service, you can choose start either one of them.
+
+Start CodeGen based on TGI service:
+
 ```bash
-cd GenAIExamples/CodeGen/docker_compose/intel/cpu/xeon
-docker compose up -d
+cd GenAIExamples/CodeGen/docker_compose
+source set_env.sh
+cd intel/cpu/xeon
+docker compose --profile codegen-xeon-tgi up -d
+```
+
+Start CodeGen based on vLLM service:
+
+```bash
+cd GenAIExamples/CodeGen/docker_compose
+source set_env.sh
+cd intel/cpu/xeon
+docker compose --profile codegen-xeon-vllm up -d
 ```
 
 ### Validate the MicroServices and MegaService
 
-1. TGI Service
+1. LLM Service (for TGI, vLLM)
 
    ```bash
-   curl http://${host_ip}:8028/generate \
-     -X POST \
-     -d '{"inputs":"Implement a high-level API for a TODO list application. The API takes as input an operation request and updates the TODO list in place. If the request is invalid, raise an exception.","parameters":{"max_new_tokens":256, "do_sample": true}}' \
-     -H 'Content-Type: application/json'
+   curl http://${host_ip}:8028/v1/chat/completions \
+       -X POST \
+       -d '{"model": "Qwen/Qwen2.5-Coder-7B-Instruct", "messages": [{"role": "user", "content": "Implement a high-level API for a TODO list application. The API takes as input an operation request and updates the TODO list in place. If the request is invalid, raise an exception."}], "max_tokens":32}' \
+       -H 'Content-Type: application/json'
    ```
 
 2. LLM Microservices
@@ -257,3 +224,52 @@ For example:
 - Ask question and get answer
 
 ![qna](../../../../assets/img/codegen_qna.png)
+
+## 🚀 Download or Build Docker Images
+
+Should the Docker image you seek not yet be available on Docker Hub, you can build the Docker image locally.
+
+### 1. Build the LLM Docker Image
+
+```bash
+git clone https://github.com/opea-project/GenAIComps.git
+cd GenAIComps
+docker build -t opea/llm-textgen:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/src/text-generation/Dockerfile .
+```
+
+### 2. Build the MegaService Docker Image
+
+To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `codegen.py` Python script. Build MegaService Docker image via the command below:
+
+```bash
+git clone https://github.com/opea-project/GenAIExamples
+cd GenAIExamples/CodeGen
+docker build -t opea/codegen:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
+```
+
+### 3. Build the UI Docker Image
+
+Build the frontend Docker image via the command below:
+
+```bash
+cd GenAIExamples/CodeGen/ui
+docker build -t opea/codegen-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
+```
+
+### 4. Build CodeGen React UI Docker Image (Optional)
+
+Build react frontend Docker image via below command:
+
+**Export the value of the public IP address of your Xeon server to the `host_ip` environment variable**
+
+```bash
+cd GenAIExamples/CodeGen/ui
+docker build --no-cache -t opea/codegen-react-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile.react .
+```
+
+Then run the command `docker images`, you will have the following Docker Images:
+
+- `opea/llm-textgen:latest`
+- `opea/codegen:latest`
+- `opea/codegen-ui:latest`
+- `opea/codegen-react-ui:latest` (optional)
