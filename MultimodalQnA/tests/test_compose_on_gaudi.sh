@@ -62,7 +62,7 @@ function build_docker_images() {
     service_list="multimodalqna multimodalqna-ui embedding-multimodal-bridgetower-gaudi embedding retriever lvm dataprep whisper"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
-    docker pull ghcr.io/huggingface/tgi-gaudi:2.0.6
+    docker pull ghcr.io/huggingface/tgi-gaudi:2.3.1
 
     docker images && sleep 1s
 }
