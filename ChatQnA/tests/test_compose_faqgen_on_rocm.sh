@@ -202,7 +202,7 @@ function validate_microservices() {
         "tgi-llm" \
         "chatqna-tgi-server" \
         '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}'
-    
+
     # faqgen llm microservice
     echo "validate llm-faqgen..."
     validate_service \

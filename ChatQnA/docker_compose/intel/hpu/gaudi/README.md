@@ -126,6 +126,7 @@ To fortify AI initiatives in production, Guardrails microservice can secure mode
 ```bash
 docker build -t opea/guardrails:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/guardrails/src/guardrails/Dockerfile .
 ```
+
 ### 4. Build FaqGen LLM Image (Optional)
 
 If you want to enable FAQ generation LLM in the pipeline, please use the below command:
@@ -170,13 +171,13 @@ docker build -t opea/llm-faqgen:latest --build-arg https_proxy=$https_proxy --bu
 
 4. MegaService with FaqGen
 
-    To use FAQ generation instead of normal text generation LLM, please use the below command:
+   To use FAQ generation instead of normal text generation LLM, please use the below command:
 
-    ```bash
-    git clone https://github.com/opea-project/GenAIExamples.git
-    cd GenAIExamples/ChatQnA
-    docker build --no-cache -t opea/chatqna-faqgen:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile.faqgen .
-    ```
+   ```bash
+   git clone https://github.com/opea-project/GenAIExamples.git
+   cd GenAIExamples/ChatQnA
+   docker build --no-cache -t opea/chatqna-faqgen:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile.faqgen .
+   ```
 
 ### 6. Build UI Docker Image
 
@@ -209,7 +210,7 @@ Then run the command `docker images`, you will have the following 5 Docker Image
 
 - `opea/retriever:latest`
 - `opea/dataprep:latest`
-- `opea/chatqna:latest` or ``opea/chatqna-faqgen:latest``
+- `opea/chatqna:latest` or `opea/chatqna-faqgen:latest`
 - `opea/chatqna-ui:latest`
 - `opea/nginx:latest`
 
@@ -422,6 +423,7 @@ curl http://${host_ip}:${LLM_SERVICE_PORT}/v1/faqgen \
   -d '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}' \
   -H 'Content-Type: application/json'
 ```
+
 6. MegaService
 
    ```bash

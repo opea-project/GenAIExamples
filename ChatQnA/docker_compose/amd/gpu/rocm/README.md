@@ -166,7 +166,7 @@ Then run the command `docker images`, you will have the following 5 Docker Image
 
 1. `opea/retriever:latest`
 2. `opea/dataprep:latest`
-3. `opea/chatqna:latest` or ``opea/chatqna-faqgen:latest``
+3. `opea/chatqna:latest` or `opea/chatqna-faqgen:latest`
 4. `opea/chatqna-ui:latest` or `opea/chatqna-react-ui:latest`
 5. `opea/nginx:latest`
 
