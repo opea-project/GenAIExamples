@@ -92,4 +92,9 @@ services:
       LANGCHAIN_PROJECT: "opea-supervisor-agent-service"
       CRAG_SERVER: $CRAG_SERVER
       WORKER_AGENT_URL: $WORKER_AGENT_URL
+      SQL_AGENT_URL: $SQL_AGENT_URL
       port: 9090
+
+networks:
+  default:
+    driver: bridge

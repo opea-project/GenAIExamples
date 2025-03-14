@@ -42,15 +42,13 @@ This example showcases a hierarchical multi-agent system for question-answering 
    ```
 
 4. Prepare SQL database
-   In this example, we will use the SQLite database provided in the [TAG-Bench](https://github.com/TAG-Research/TAG-Bench/tree/main). Run the commands below.
+   In this example, we will use the Chinook SQLite database. Run the commands below.
 
    ```
    # Download data
    cd $WORKDIR
-   git clone https://github.com/TAG-Research/TAG-Bench.git
-   cd TAG-Bench/setup
-   chmod +x get_dbs.sh
-   ./get_dbs.sh
+   git clone https://github.com/lerocha/chinook-database.git
+   cp chinook-database/ChinookDatabase/DataSources/Chinook_Sqlite.sqlite $WORKDIR/GenAIExamples/AgentQnA/tests/
    ```
 
 5. Launch Tool service
