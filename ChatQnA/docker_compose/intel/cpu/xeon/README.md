@@ -59,8 +59,10 @@ docker compose up -d
 To enable Open Telemetry Tracing, compose.telemetry.yaml file need to be merged along with default compose.yaml file.  
 CPU example with Open Telemetry feature:
 
+> NOTE : To get supported Grafana Dashboard, please run download_opea_dashboard.sh following below commands.
+
 ```bash
-cd GenAIExamples/ChatQnA/docker_compose/intel/cpu/xeon/
+./grafana/dashboards/download_opea_dashboard.sh
 docker compose -f compose.yaml -f compose.telemetry.yaml up -d
 ```
 

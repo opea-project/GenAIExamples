@@ -19,3 +19,4 @@ export LOGFLAG=""
 export JAEGER_IP=$(ip route get 8.8.8.8 | grep -oP 'src \K[^ ]+')
 export OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=grpc://$JAEGER_IP:4317
 export TELEMETRY_ENDPOINT=http://$JAEGER_IP:4318/v1/traces
+export no_proxy="$no_proxy,chatqna-gaudi-ui-server,chatqna-gaudi-backend-server,dataprep-redis-service,tei-embedding-service,retriever,tei-reranking-service,tgi-gaudi-server,vllm-gaudi-server,guardrails,jaeger,prometheus,grafana,node-exporter,gaudi-exporter,$JAEGER_IP"
