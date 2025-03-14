@@ -31,16 +31,11 @@ function build_docker_images() {
     cd $WORKPATH/docker_image_build
     git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
 
-    git clone https://github.com/HabanaAI/vllm-fork.git
-    cd vllm-fork/
-    VLLM_VER=$(git describe --tags "$(git rev-list --tags --max-count=1)")
-    echo "Check out vLLM tag ${VLLM_VER}"
-    git checkout ${VLLM_VER} &> /dev/null && cd ../
-
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="audioqna audioqna-ui whisper-gaudi speecht5-gaudi vllm-gaudi"
+    service_list="audioqna audioqna-ui whisper-gaudi speecht5-gaudi"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
+    docker pull ghcr.io/huggingface/tgi-gaudi:2.0.6
     docker images && sleep 1s
 }
 
@@ -48,10 +43,6 @@ function start_services() {
     cd $WORKPATH/docker_compose/intel/hpu/gaudi
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
     export LLM_MODEL_ID=meta-llama/Meta-Llama-3-8B-Instruct
-    export NUM_CARDS=1
-    export BLOCK_SIZE=128
-    export MAX_NUM_SEQS=256
-    export MAX_SEQ_LEN_TO_CAPTURE=2048
 
     export MEGA_SERVICE_HOST_IP=${ip_address}
     export WHISPER_SERVER_HOST_IP=${ip_address}
@@ -67,11 +58,11 @@ function start_services() {
     # sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
     # Start Docker Containers
-    docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
+    docker compose -f compose_tgi.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
     n=0
     until [[ "$n" -ge 200 ]]; do
-       docker logs vllm-gaudi-service > $LOG_PATH/vllm_service_start.log 2>&1
-       if grep -q complete $LOG_PATH/vllm_service_start.log; then
+       docker logs tgi-gaudi-service > $LOG_PATH/tgi_service_start.log
+       if grep -q Connected $LOG_PATH/tgi_service_start.log; then
            break
        fi
        sleep 5s
@@ -95,7 +86,7 @@ function validate_megaservice() {
     # always print the log
     docker logs whisper-service > $LOG_PATH/whisper-service.log
     docker logs speecht5-service > $LOG_PATH/tts-service.log
-    docker logs vllm-gaudi-service > $LOG_PATH/vllm-gaudi-service.log
+    docker logs tgi-gaudi-service > $LOG_PATH/tgi-gaudi-service.log
     docker logs audioqna-gaudi-backend-server > $LOG_PATH/audioqna-gaudi-backend-server.log
     echo "$response" | sed 's/^"//;s/"$//' | base64 -d > speech.mp3
 
@@ -135,7 +126,7 @@ function validate_megaservice() {
 
 function stop_docker() {
     cd $WORKPATH/docker_compose/intel/hpu/gaudi
-    docker compose -f compose.yaml stop && docker compose rm -f
+    docker compose -f compose_tgi.yaml stop && docker compose rm -f
 }
 
 function main() {
