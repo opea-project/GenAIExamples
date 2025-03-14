@@ -89,7 +89,6 @@ if __name__ == "__main__":
             test_chat_completion_multi_turn(args)
         else:
             test_supervisor_agent_single_turn(args)
-        test_chat_completion_multi_turn(args)
     elif args.agent_role == "worker":
         test_worker_agent(args)
     else:

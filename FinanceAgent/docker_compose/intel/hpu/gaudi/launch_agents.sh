@@ -13,8 +13,8 @@ export LLM_ENDPOINT_URL="http://${ip_address}:${vllm_port}"
 export TEMPERATURE=0.5
 export MAX_TOKENS=4096
 
-export WORKER_FINQA_AGENT_URL="http://${ip_address}:9095"
-export WORKER_RESEARCH_AGENT_URL="http://${ip_address}:9096"
+export WORKER_FINQA_AGENT_URL="http://${ip_address}:9095/v1/chat/completions"
+export WORKER_RESEARCH_AGENT_URL="http://${ip_address}:9096/v1/chat/completions"
 
 export TEI_EMBEDDING_ENDPOINT="http://${ip_address}:10221"
 export REDIS_URL_VECTOR="redis://${ip_address}:6379"

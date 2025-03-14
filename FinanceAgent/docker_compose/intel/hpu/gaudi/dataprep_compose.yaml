@@ -56,7 +56,7 @@ services:
       start_period: 10s
   
   dataprep-redis-finance:
-    image: ${REGISTRY:-opea}/dataprep:${TAG:-comps} ### CHange back to latest
+    image: ${REGISTRY:-opea}/dataprep:${TAG:-latest}
     container_name: dataprep-redis-server-finance
     depends_on:
       redis-vector-db:
