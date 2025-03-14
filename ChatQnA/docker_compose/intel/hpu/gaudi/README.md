@@ -66,7 +66,10 @@ docker compose up -d
 
 To enable Open Telemetry Tracing, compose.telemetry.yaml file need to be merged along with default compose.yaml file.
 
+> NOTE : To get supported Grafana Dashboard, please run download_opea_dashboard.sh following below commands.
+
 ```bash
+./grafana/dashboards/download_opea_dashboard.sh
 docker compose -f compose.yaml -f compose.telemetry.yaml up -d
 ```
 

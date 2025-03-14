@@ -70,11 +70,11 @@ To set up environment variables for deploying ChatQnA services, follow these ste
    # on Gaudi
    cd GenAIExamples/ChatQnA/docker_compose/intel/hpu/gaudi/
    source ./set_env.sh
-   export no_proxy="Your_No_Proxy",chatqna-gaudi-ui-server,chatqna-gaudi-backend-server,dataprep-redis-service,tei-embedding-service,retriever,tei-reranking-service,tgi-service,vllm-service,guardrails
+   export no_proxy="Your_No_Proxy",chatqna-gaudi-ui-server,chatqna-gaudi-backend-server,dataprep-redis-service,tei-embedding-service,retriever,tei-reranking-service,tgi-service,vllm-service,guardrails,jaeger,prometheus,grafana,gaudi-node-exporter-1
    # on Xeon
    cd GenAIExamples/ChatQnA/docker_compose/intel/cpu/xeon/
    source ./set_env.sh
-   export no_proxy="Your_No_Proxy",chatqna-xeon-ui-server,chatqna-xeon-backend-server,dataprep-redis-service,tei-embedding-service,retriever,tei-reranking-service,tgi-service,vllm-service
+   export no_proxy="Your_No_Proxy",chatqna-xeon-ui-server,chatqna-xeon-backend-server,dataprep-redis-service,tei-embedding-service,retriever,tei-reranking-service,tgi-service,vllm-service,jaeger,prometheus,grafana,xeon-node-exporter-1
    # on Nvidia GPU
    cd GenAIExamples/ChatQnA/docker_compose/nvidia/gpu
    source ./set_env.sh
