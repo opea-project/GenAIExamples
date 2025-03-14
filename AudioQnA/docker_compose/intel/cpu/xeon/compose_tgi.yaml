@@ -24,34 +24,32 @@ services:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
     restart: unless-stopped
-  vllm-service:
-    image: ${REGISTRY:-opea}/vllm:${TAG:-latest}
-    container_name: vllm-service
+  tgi-service:
+    image: ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu
+    container_name: tgi-service
     ports:
       - ${LLM_SERVER_PORT:-3006}:80
     volumes:
-      - "${MODEL_CACHE:-./data}:/root/.cache/huggingface/hub"
-    shm_size: 128g
+      - "${MODEL_CACHE:-./data}:/data"
+    shm_size: 1g
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
-      LLM_MODEL_ID: ${LLM_MODEL_ID}
-      VLLM_TORCH_PROFILER_DIR: "/mnt"
       LLM_SERVER_PORT: ${LLM_SERVER_PORT}
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://$host_ip:${LLM_SERVER_PORT}/health || exit 1"]
       interval: 10s
       timeout: 10s
       retries: 100
-    command: --model ${LLM_MODEL_ID} --host 0.0.0.0 --port 80
+    command: --model-id ${LLM_MODEL_ID} --cuda-graphs 0
   audioqna-xeon-backend-server:
     image: ${REGISTRY:-opea}/audioqna:${TAG:-latest}
     container_name: audioqna-xeon-backend-server
     depends_on:
       - whisper-service
-      - vllm-service
+      - tgi-service
       - speecht5-service
     ports:
       - "3008:8888"
