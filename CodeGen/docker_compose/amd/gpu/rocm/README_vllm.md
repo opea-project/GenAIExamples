@@ -1,57 +1,80 @@
-Copyright (c) 2024 Advanced Micro Devices, Inc.
+# Build and Deploy CodeGen Application on AMD GPU (ROCm)
 
-# Build and deploy CodeGen Application on AMD GPU (ROCm)
+## Prerequisites
 
-## Build images
+Before starting, ensure the following are installed on your system:
+- **Docker**
+- **ROCm** (for AMD GPU support)
+- **Git**
 
-### Build the LLM Docker Image
+---
+
+## Build Docker Images
+
+### 1. Build the LLM Docker Image
 
 ```bash
-### Cloning repo
+# Clone the repository
 git clone https://github.com/opea-project/GenAIComps.git
 cd GenAIComps
 
-### Build Docker image
-docker build -t opea/llm-textgen:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/src/text-generation/Dockerfile .
+# Build the Docker image
+docker build -t opea/llm-textgen:latest \
+  --build-arg https_proxy=$https_proxy \
+  --build-arg http_proxy=$http_proxy \
+  -f comps/llms/src/text-generation/Dockerfile .
 ```
 
-### Build vLLM ROCm Docker image
+### 2. Build the vLLM ROCm Docker Image
 
 ```bash
-### Cloning repo
+# Build the vLLM Docker image with ROCm support
+docker build -t opea/vllm-rocm:latest \
+  -f comps/third_parties/vllm/src/Dockerfile.amd_gpu .
+```
+
+### 3. Build the MegaService Docker Image
+
+```bash
+# Clone the examples repository
 git clone https://github.com/opea-project/GenAIExamples
-
-cd GenAIExamples/CodeGen
-docker build -t opea/llm-vllm-rocm:latest -f Dockerfile-vllm-rocm .
-```
-
-### Build the MegaService Docker Image
-
-```bash
 cd GenAIExamples/CodeGen
 
-### Build Docker image
-docker build -t opea/codegen:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
+# Build the MegaService Docker image
+docker build -t opea/codegen:latest \
+  --build-arg https_proxy=$https_proxy \
+  --build-arg http_proxy=$http_proxy \
+  -f Dockerfile .
 ```
 
-### Build the UI Docker Image
+### 4. Build the UI Docker Images
 
 ```bash
+# Navigate to the UI directory
 cd GenAIExamples/CodeGen/ui
-### Build UI Docker image
-docker build -t opea/codegen-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
 
-### Build React UI Docker image (React UI allows you to use file uploads)
-docker build --no-cache -t opea/codegen-react-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile.react .
+# Build the base UI Docker image
+docker build -t opea/codegen-ui:latest \
+  --build-arg https_proxy=$https_proxy \
+  --build-arg http_proxy=$http_proxy \
+  -f ./docker/Dockerfile .
+
+# Build the React UI Docker image (recommended for file uploads)
+docker build --no-cache -t opea/codegen-react-ui:latest \
+  --build-arg https_proxy=$https_proxy \
+  --build-arg http_proxy=$http_proxy \
+  -f ./docker/Dockerfile.react .
 ```
 
-It is recommended to use the React UI as it works for downloading files. The use of React UI is set in the Docker Compose file
+**Note:** The React UI is recommended as it supports file uploads. Its usage is configured in the Docker Compose file.
 
-## Deploy CodeGen Application
+---
 
-### Features of Docker compose for AMD GPUs
+## Deploy the CodeGen Application
 
-1. Added forwarding of GPU devices to the container vLLM service with instructions:
+### Docker Compose Configuration for AMD GPUs
+
+To enable GPU support for AMD GPUs, the following configuration is added to the Docker Compose file:
 
 ```yaml
 shm_size: 1g
@@ -66,9 +89,7 @@ security_opt:
   - seccomp:unconfined
 ```
 
-In this case, all GPUs are thrown. To reset a specific GPU, you need to use specific device names cardN and renderN.
-
-For example:
+This configuration forwards all available GPUs to the container. To use a specific GPU, specify its `cardN` and `renderN` device IDs. For example:
 
 ```yaml
 shm_size: 1g
@@ -84,32 +105,39 @@ security_opt:
   - seccomp:unconfined
 ```
 
-To find out which GPU device IDs cardN and renderN correspond to the same GPU, use the GPU driver utility
+**How to Identify GPU Device IDs:**
+Use AMD GPU driver utilities to determine the correct `cardN` and `renderN` IDs for your GPU.
 
-### Go to the directory with the Docker compose file
+---
 
-```bash
-cd GenAIExamples/CodeGen/docker_compose/amd/gpu/rocm
-```
+### Launch the Application
 
-### Set environments
+1. Navigate to the Docker Compose directory:
 
-In the file "GenAIExamples/CodeGen/docker_compose/amd/gpu/rocm/set_env_vllm.sh " it is necessary to set the required values. Parameter assignments are specified in the comments for each variable setting command
+   ```bash
+   cd GenAIExamples/CodeGen/docker_compose/amd/gpu/rocm
+   ```
 
-```bash
-chmod +x set_env_vllm.sh
-. set_env.sh
-```
+2. Configure environment variables:
+    - Edit the `set_env_vllm.sh` file to set the required values. Comments in the file provide guidance for each variable.
+    - Make the script executable and apply the environment variables:
 
-### Run services
+      ```bash
+      chmod +x set_env_vllm.sh
+      . set_env_vllm.sh
+      ```
 
-```
-docker compose -f compose_vllm.yaml up -d --force-recreate
-```
+3. Start the services:
 
-# Validate the MicroServices and MegaService
+   ```bash
+   docker compose -f compose_vllm.yaml up -d --force-recreate
+   ```
 
-## Validate vLLM service
+---
+
+## Validate the Services
+
+### 1. Validate the vLLM Service
 
 ```bash
 curl http://${HOST_IP}:${CODEGEN_VLLM_SERVICE_PORT}/v1/chat/completions \
@@ -118,19 +146,31 @@ curl http://${HOST_IP}:${CODEGEN_VLLM_SERVICE_PORT}/v1/chat/completions \
   -H 'Content-Type: application/json'
 ```
 
-## Validate LLM service
+### 2. Validate the LLM Service
 
 ```bash
-curl http://${HOST_IP}:${CODEGEN_LLM_SERVICE_PORT}/v1/chat/completions\
+curl http://${HOST_IP}:${CODEGEN_LLM_SERVICE_PORT}/v1/chat/completions \
   -X POST \
   -d '{"query":"Implement a high-level API for a TODO list application. The API takes as input an operation request and updates the TODO list in place. If the request is invalid, raise an exception.","max_tokens":256,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,"repetition_penalty":1.03,"stream":true}' \
   -H 'Content-Type: application/json'
 ```
 
-## Validate MegaService
+### 3. Validate the MegaService
 
 ```bash
-curl http://${HOST_IP}:${CODEGEN_BACKEND_SERVICE_PORT}/v1/codegen -H "Content-Type: application/json" -d '{
-  "messages": "Implement a high-level API for a TODO list application. The API takes as input an operation request and updates the TODO list in place. If the request is invalid, raise an exception."
+curl http://${HOST_IP}:${CODEGEN_BACKEND_SERVICE_PORT}/v1/codegen \
+  -H "Content-Type: application/json" \
+  -d '{
+    "messages": "Implement a high-level API for a TODO list application. The API takes as input an operation request and updates the TODO list in place. If the request is invalid, raise an exception."
   }'
 ```
+
+---
+
+## Conclusion
+
+After completing these steps, the CodeGen application will be deployed and ready for use. Ensure all services are functioning correctly by running the validation commands. If issues arise, check container logs using `docker logs <container_id>` for troubleshooting.
+
+---
+
+This version of the instructions is more structured, includes clear explanations, and provides better readability for users.
