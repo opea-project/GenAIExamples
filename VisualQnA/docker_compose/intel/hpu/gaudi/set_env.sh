@@ -6,14 +6,17 @@ pushd "../../../../../" > /dev/null
 source .set_env.sh
 popd > /dev/null
 
-export LVM_MODEL_ID="llava-hf/llava-v1.6-mistral-7b-hf"
+export host_ip=$(hostname -I | awk '{print $1}')
+export no_proxy=$host_ip,$no_proxy
+# export LVM_MODEL_ID="llava-hf/llava-v1.6-mistral-7b-hf"
+export LVM_MODEL_ID="llava-hf/llava-1.5-7b-hf"
 export LVM_ENDPOINT="http://${host_ip}:8399"
 export LVM_SERVICE_PORT=9399
 export MEGA_SERVICE_HOST_IP=${host_ip}
 export LVM_SERVICE_HOST_IP=${host_ip}
-export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/visualqna"
+export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8899/v1/visualqna"
 export FRONTEND_SERVICE_IP=${host_ip}
-export FRONTEND_SERVICE_PORT=5173
+export FRONTEND_SERVICE_PORT=5176
 export BACKEND_SERVICE_NAME=visualqna
 export BACKEND_SERVICE_IP=${host_ip}
-export BACKEND_SERVICE_PORT=8888
+export BACKEND_SERVICE_PORT=8899
