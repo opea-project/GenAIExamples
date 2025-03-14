@@ -25,7 +25,7 @@ services:
       TEI_ENDPOINT: ${CHATQNA_TEI_EMBEDDING_ENDPOINT}
       HUGGINGFACEHUB_API_TOKEN: ${CHATQNA_HUGGINGFACEHUB_API_TOKEN}
   chatqna-tei-embedding-service:
-    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.6
     container_name: chatqna-tei-embedding-server
     ports:
       - "${CHATQNA_TEI_EMBEDDING_PORT}:80"
@@ -67,7 +67,7 @@ services:
       RETRIEVER_COMPONENT_NAME: "OPEA_RETRIEVER_REDIS"
     restart: unless-stopped
   chatqna-tei-reranking-service:
-    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.6
     container_name: chatqna-tei-reranking-server
     ports:
       - "${CHATQNA_TEI_RERANKING_PORT}:80"
