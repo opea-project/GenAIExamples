@@ -9,7 +9,7 @@ services:
   tgi-service:
     command: --model-id ${LLM_MODEL_ID} --max-input-length 2048 --max-total-tokens 4096 --otlp-endpoint $OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
   jaeger:
-    image: jaegertracing/all-in-one:latest
+    image: jaegertracing/all-in-one:1.67.0
     container_name: jaeger
     ports:
       - "16686:16686"

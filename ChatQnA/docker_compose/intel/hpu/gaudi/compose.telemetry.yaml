@@ -7,7 +7,7 @@ services:
   tei-reranking-service:
     command: --model-id ${RERANK_MODEL_ID} --auto-truncate --otlp-endpoint $OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
   jaeger:
-    image: jaegertracing/all-in-one:latest
+    image: jaegertracing/all-in-one:1.67.0
     container_name: jaeger
     ports:
       - "16686:16686"

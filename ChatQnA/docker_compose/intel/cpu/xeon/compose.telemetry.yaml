@@ -16,7 +16,7 @@ services:
     environment:
       - TELEMETRY_ENDPOINT=${TELEMETRY_ENDPOINT}
   jaeger:
-    image: jaegertracing/all-in-one:latest
+    image: jaegertracing/all-in-one:1.67.0
     container_name: jaeger
     ports:
       - "16686:16686"
