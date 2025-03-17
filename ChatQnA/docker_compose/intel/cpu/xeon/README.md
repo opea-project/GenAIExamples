@@ -551,16 +551,19 @@ There are two ways to switch to the Conversational UI:
 This script automates the process of modifying the `compose.yaml` file to use the Conversational UI.
 
 1. Navigate to the Xeon directory:
+
 ```bash
 cd GenAIExamples/ChatQnA/docker_compose/intel/cpu/xeon/
 ```
 
 2. Run the script:
+
 ```bash
 ./use_conversation_ui.sh
 ```
 
 3. Start the Services
+
 ```bash
 docker compose up -d
 ```
@@ -601,18 +604,18 @@ Once the services are up, open the following URL in your browser: http://{host_i
 ```
 
 ### Troubleshooting Conversational UI
+
 **UI Doesn't Load or Shows Errors:**
 
-  - **Double-check** `compose.yaml`: Ensure you've correctly replaced the service definition and that there are no typos. Verify the environment variables are set correctly.
+- **Double-check** `compose.yaml`: Ensure you've correctly replaced the service definition and that there are no typos. Verify the environment variables are set correctly.
 
-  - **Check Browser Console:** Open your browser's developer tools (usually by pressing F12) and look for any errors in the console. This can provide clues about what's going wrong.
+- **Check Browser Console:** Open your browser's developer tools (usually by pressing F12) and look for any errors in the console. This can provide clues about what's going wrong.
 
-  - **Clear Browser Cache:** Sometimes, cached files can cause issues. Try clearing your browser's cache and reloading the page.
+- **Clear Browser Cache:** Sometimes, cached files can cause issues. Try clearing your browser's cache and reloading the page.
 
-  - **Check Service Logs:** Use `docker logs chatqna-xeon-conversation-ui-server` to see if there are any errors reported by the UI container itself.
+- **Check Service Logs:** Use `docker logs chatqna-xeon-conversation-ui-server` to see if there are any errors reported by the UI container itself.
 
-  - **Check Network:** Make sure the port 5174 is not blocked
-
+- **Check Network:** Make sure the port 5174 is not blocked
 
 ![project-screenshot](../../../../assets/img/chat_ui_init.png)
 

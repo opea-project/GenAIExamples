@@ -1,3 +1,6 @@
+# Copyright (C) 2025 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 # Backup the original compose file (if not already backed up)
 if [ ! -f compose.yaml.bak ]; then
   echo "Backing up compose.yaml to compose.yaml.bak"
@@ -64,8 +67,3 @@ echo "Conversational UI setup complete.  Run 'docker compose up -d' to start."[[
 
 #Start the Services
 #docker compose up -d
-
-
-
-
-
