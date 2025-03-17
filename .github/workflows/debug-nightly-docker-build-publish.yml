@@ -38,7 +38,7 @@ jobs:
     strategy:
       matrix:
         example: ${{ fromJSON(needs.get-build-matrix.outputs.examples_json) }}
-      # fail-fast: false
+      fail-fast: false
     # uses: ./.github/workflows/_example-workflow.yml
     # with:
     #   node: gaudi
