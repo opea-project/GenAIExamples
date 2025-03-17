@@ -90,6 +90,7 @@ class AutoMergeRetriever(BaseComponent, AutoMergingRetriever):
         }
         return set
 
+
 class SimpleBM25Retriever(BaseComponent):
     # The nodes parameter in BM25Retriever is not from index,
     # nodes in BM25Retriever can not be updated through 'indexer.insert_nodes()',

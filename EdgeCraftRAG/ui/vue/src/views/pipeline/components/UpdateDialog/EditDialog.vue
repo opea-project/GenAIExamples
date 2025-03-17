@@ -38,7 +38,7 @@
           />
         </keep-alive>
         <div class="footer-wrap">
-          <a-button type="primary" ghost @click="handleCancle">Cancle</a-button>
+          <a-button type="primary" ghost @click="handleCancle">Cancel</a-button>
           <a-button
             key="submit"
             type="primary"
@@ -57,7 +57,7 @@ import { requestPipelineUpdate } from "@/api/pipeline";
 import _ from "lodash";
 import { computed, markRaw, ref } from "vue";
 import {
-  Actived,
+  Activated,
   Basic,
   Generator,
   Indexer,
@@ -117,10 +117,10 @@ const stepList = ref<EmptyArrayType>([
     component: markRaw(Generator),
   },
   {
-    label: "Actived",
+    label: "Activated",
     index: 7,
     icon: "icon-active",
-    component: markRaw(Actived),
+    component: markRaw(Activated),
   },
 ]);
 

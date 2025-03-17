@@ -2,8 +2,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import os
-from typing import Any, List, Optional
 import threading
+from typing import Any, List, Optional
 
 import requests
 from edgecraftrag.base import BaseComponent, CompType, InferenceType, ModelType
@@ -13,7 +13,7 @@ from pydantic import BaseModel, Field, model_serializer
 
 class Benchmark(BaseComponent):
 
-    def __init__(self, enable_benchmark, inference_type, tokenizer = None, bench_hook = None):
+    def __init__(self, enable_benchmark, inference_type, tokenizer=None, bench_hook=None):
         super().__init__()
         self.enabled = enable_benchmark
         self.is_vllm = True if inference_type == InferenceType.VLLM else False
@@ -40,9 +40,9 @@ class Benchmark(BaseComponent):
     def cal_input_token_size(self, input_text_list):
         tokenizer = self.tokenizer
         if tokenizer:
-            input_data = tokenizer(input_text_list, return_tensors='pt')
-            input_data.pop('token_type_ids', None)
-            input_tokens = input_data['input_ids'] if 'input_ids' in input_data else input_data
+            input_data = tokenizer(input_text_list, return_tensors="pt")
+            input_data.pop("token_type_ids", None)
+            input_tokens = input_data["input_ids"] if "input_ids" in input_data else input_data
             input_token_size = input_tokens[0].numel()
         else:
             input_token_size = -1
@@ -85,8 +85,10 @@ class Benchmark(BaseComponent):
                     metrics["input_token_size"] = input_token_size
                     metrics["output_token_size"] = len(tm_list)
                     metrics["generation_time"] = sum(tm_list)
-                    metrics["first_token_latency"] = tm_list[0] if len(tm_list) > 0 else ''
-                    metrics["other_tokens_avg_latency"] = sum(tm_list[1:])/len(tm_list[1:]) if len(tm_list) > 1 else ''
+                    metrics["first_token_latency"] = tm_list[0] if len(tm_list) > 0 else ""
+                    metrics["other_tokens_avg_latency"] = (
+                        sum(tm_list[1:]) / len(tm_list[1:]) if len(tm_list) > 1 else ""
+                    )
                     bench_hook.clear_time_list()
                     bench_hook.clear_time_infer_list()
                 else:

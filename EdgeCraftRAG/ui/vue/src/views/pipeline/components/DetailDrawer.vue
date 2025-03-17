@@ -16,7 +16,7 @@
         <span class="label-wrap">Status</span>
         <span
           :class="{ 'active-state': formData.active, 'content-wrap': true }"
-          >{{ formData.active ? "Actived" : "Inactive" }}</span
+          >{{ formData.active ? "Activated" : "Inactive" }}</span
         >
       </p>
     </div>

@@ -1,7 +1,8 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-import weakref, json
+import json
+import weakref
 
 from edgecraftrag.api_schema import PipelineCreateIn
 from edgecraftrag.base import IndexerType, InferenceType, ModelType, NodeParserType, PostProcessorType, RetrieverType
@@ -17,7 +18,7 @@ from edgecraftrag.components.node_parser import (
 from edgecraftrag.components.postprocessor import MetadataReplaceProcessor, RerankProcessor
 from edgecraftrag.components.retriever import AutoMergeRetriever, SimpleBM25Retriever, VectorSimRetriever
 from edgecraftrag.context import ctx
-from fastapi import FastAPI, status, File, UploadFile, HTTPException
+from fastapi import FastAPI, File, HTTPException, UploadFile, status
 
 pipeline_app = FastAPI()
 
@@ -88,14 +89,14 @@ async def remove_pipeline(name):
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 
-# IMPORT pipeline json from a file 
+# IMPORT pipeline json from a file
 @pipeline_app.post(path="/v1/settings/pipelines/import")
 async def upload_file(file: UploadFile = File(...)):
     content = await file.read()
     request = json.loads(content)
     pipeline_req = PipelineCreateIn(**request)
     return load_pipeline(pipeline_req)
-    
+
 
 def load_pipeline(request):
     pl = ctx.get_pipeline_mgr().get_pipeline_by_name_or_id(request.name)
@@ -222,7 +223,7 @@ def update_pipeline_handler(pl, req):
     if req.generator:
         gen = req.generator
         if gen.model is None:
-            raise Exception("No ChatQnA Model") 
+            raise Exception("No ChatQnA Model")
         if gen.inference_type:
             model = ctx.get_model_mgr().search_model(gen.model)
             if model is None:
@@ -239,13 +240,13 @@ def update_pipeline_handler(pl, req):
             model_ref = weakref.ref(model)
             pl.generator = QnAGenerator(model_ref, gen.prompt_path, gen.inference_type)
             if pl.enable_benchmark:
-                if 'tokenizer' not in locals() or tokenizer is None:
+                if "tokenizer" not in locals() or tokenizer is None:
                     _, tokenizer, bench_hook = ctx.get_model_mgr().load_model_ben(gen.model)
                 pl.benchmark = Benchmark(pl.enable_benchmark, gen.inference_type, tokenizer, bench_hook)
             else:
                 pl.benchmark = Benchmark(pl.enable_benchmark, gen.inference_type)
         else:
-            raise Exception( "Inference Type Not Supported")
+            raise Exception("Inference Type Not Supported")
 
     if pl.status.active != req.active:
         ctx.get_pipeline_mgr().activate_pipeline(pl.name, req.active, ctx.get_node_mgr())

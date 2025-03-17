@@ -5,7 +5,7 @@ from comps import GeneratedDoc
 from comps.cores.proto.api_protocol import ChatCompletionRequest
 from edgecraftrag.api_schema import RagOut
 from edgecraftrag.context import ctx
-from fastapi import FastAPI, File, UploadFile, HTTPException, status
+from fastapi import FastAPI, File, HTTPException, UploadFile, status
 from fastapi.responses import StreamingResponse
 
 chatqna_app = FastAPI()
@@ -61,7 +61,7 @@ async def ragqna(request: ChatCompletionRequest):
             ragout.contexts.append(origin_text.strip())
         return ragout
     except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))  
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 
 # Upload prompt file for LLM ChatQnA
@@ -73,10 +73,10 @@ async def load_prompt(file: UploadFile = File(...)):
             content = await file.read()
             prompt_str = content.decode("utf-8")
             generator.set_prompt(prompt_str)
-            return "Set LLM Prompt Sucessfully"
+            return "Set LLM Prompt Successfully"
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
-    
+
 
 # Reset prompt for LLM ChatQnA
 @chatqna_app.post(path="/v1/chatqna/prompt/reset")
@@ -85,6 +85,6 @@ async def reset_prompt():
         generator = ctx.get_pipeline_mgr().get_active_pipeline().generator
         if generator:
             generator.reset_prompt()
-            return "Reset LLM Prompt Sucessfully"
+            return "Reset LLM Prompt Successfully"
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))

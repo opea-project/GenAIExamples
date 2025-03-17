@@ -1,11 +1,14 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-from fastapi import FastAPI, HTTPException, status
-
-import cpuinfo, distro, platform, psutil
+import platform
 from datetime import datetime
+
+import cpuinfo
+import distro
 import openvino.runtime as ov
+import psutil
+from fastapi import FastAPI, HTTPException, status
 
 
 def get_available_devices():
@@ -14,6 +17,7 @@ def get_available_devices():
     if "NPU" in avail_devices:
         avail_devices.remove("NPU")
     return avail_devices
+
 
 def get_system_status():
     cpu_usage = psutil.cpu_percent(interval=1)
@@ -41,7 +45,7 @@ def get_system_status():
         "kernel": kernel_version,
         "processor": processor,
         "os": dist_name,
-        "currentTime": current_time_str
+        "currentTime": current_time_str,
     }
     return status
 
@@ -58,12 +62,10 @@ async def get_system_info():
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 
-# GET available devices info 
+# GET available devices info
 @system_app.get(path="/v1/system/device")
 async def get_device_info():
     try:
         return get_available_devices()
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
-
-

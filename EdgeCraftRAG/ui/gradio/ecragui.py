@@ -5,6 +5,7 @@ import argparse
 import base64
 import os
 import platform
+import re
 import time
 from datetime import datetime
 from threading import Timer
@@ -17,7 +18,7 @@ import httpx
 
 # Creation of the ModelLoader instance and loading models remain the same
 import platform_config as pconf
-import psutil, re
+import psutil
 from loguru import logger
 from omegaconf import OmegaConf
 from platform_config import (
@@ -161,11 +162,13 @@ def build_app(cfg, args):
             async with client.stream("POST", f"{server_addr}/v1/chatqna", json=new_req, timeout=None) as response:
                 async for chunk in response.aiter_text():
                     wrap_text = chunk
-                    if '参考图片' in chunk:
-                        image_paths = re.compile(r'!\[\]\((.*?)\)').findall(chunk)
+                    if "参考图片" in chunk:
+                        image_paths = re.compile(r"!\[\]\((.*?)\)").findall(chunk)
                         for image_path in image_paths:
                             image_base64 = get_image_base64(image_path)
-                            wrap_text = chunk.replace(f'![]({image_path})', f'<img src="data:image/png;base64,{image_base64}">')
+                            wrap_text = chunk.replace(
+                                f"![]({image_path})", f'<img src="data:image/png;base64,{image_base64}">'
+                            )
                     partial_text = partial_text + wrap_text
                     history[-1][1] = partial_text
                     yield history
@@ -632,7 +635,7 @@ def build_app(cfg, args):
             return cli.get_files()
 
         def create_vectordb(docs, spliter):
-          
+
             res = cli.create_vectordb(docs, spliter)
             return gr.update(value=get_files()), res, None
 

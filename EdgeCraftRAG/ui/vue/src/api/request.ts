@@ -1,3 +1,6 @@
+// Copyright (C) 2025 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
+
 import { NextLoading } from "@/utils/loading";
 import serviceManager from "@/utils/serviceManager";
 import axios, { AxiosInstance } from "axios";
@@ -25,7 +28,7 @@ service.interceptors.request.use(
   },
   (error) => {
     return Promise.reject(error);
-  }
+  },
 );
 
 // response interceptor
@@ -35,8 +38,7 @@ service.interceptors.response.use(
     if (NextLoading) NextLoading.done();
     const res = response.data;
     if (config.showSuccessMsg) {
-      if (antNotification)
-        antNotification("success", "Success", config.successMsg);
+      if (antNotification) antNotification("success", "Success", config.successMsg);
     }
     return Promise.resolve(res);
   },
@@ -54,7 +56,7 @@ service.interceptors.response.use(
     if (antNotification) antNotification("error", "Error", errorMessage);
 
     return Promise.reject(error);
-  }
+  },
 );
 
 export default service;
