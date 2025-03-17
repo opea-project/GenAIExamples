@@ -1,18 +1,6 @@
-# Copyright (c) 2024 Intel Corporation
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#    http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
 
-import asyncio
 import os
 
 from comps import MegaServiceEndpoint, MicroService, ServiceOrchestrator, ServiceRoleType, ServiceType
@@ -53,17 +41,35 @@ class TranslationService:
         data = await request.json()
         language_from = data["language_from"]
         language_to = data["language_to"]
-        source_language = data["source_language"]
-        prompt_template = """
-            Translate this from {language_from} to {language_to}:
+        source_data = data["source_data"]
+        translate_type = data["translate_type"]
+        if translate_type == "code":
+            prompt_template = """
+                ### System: Please translate the following {language_from} codes into {language_to} codes.
 
-            {language_from}:
-            {source_language}
+                ### Original codes:
+                '''{language_from}
 
-            {language_to}:
-        """
+                {source_data}
+
+                '''
+
+                ### Translated codes:
+            """
+        elif translate_type == "text":
+            prompt_template = """
+                Translate this from {language_from} to {language_to}:
+
+                {language_from}:
+                {source_data}
+
+                {language_to}:
+            """
+        else:
+            raise ValueError("Invalid translate_type")
+        
         prompt = prompt_template.format(
-            language_from=language_from, language_to=language_to, source_language=source_language
+            language_from=language_from, language_to=language_to, source_data=source_data
         )
         result_dict, runtime_graph = await self.megaservice.schedule(initial_inputs={"query": prompt})
         for node, response in result_dict.items():

@@ -8,7 +8,7 @@ popd > /dev/null
 
 
 export LLM_MODEL_ID="haoranxu/ALMA-13B"
-export TGI_LLM_ENDPOINT="http://${host_ip}:8008"
+export LLM_ENDPOINT="http://${host_ip}:8008"
 export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
 export MEGA_SERVICE_HOST_IP=${host_ip}
 export LLM_SERVICE_HOST_IP=${host_ip}
