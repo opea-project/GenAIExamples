@@ -34,12 +34,14 @@ docker image ls
 The list of images should include:
 
 #### vLLM-based application:
+
 - opea/vllm-rocm:latest
 - opea/llm-textgen:latest
 - opea/codegen:latest
 - opea/codegen-ui:latest
 
 #### TGI-based application:
+
 - ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
 - opea/llm-textgen:latest
 - opea/codegen:latest
@@ -50,6 +52,7 @@ The list of images should include:
 ### Docker Compose Configuration for AMD GPUs
 
 To enable GPU support for AMD GPUs, the following configuration is added to the Docker Compose file:
+
 - compose_vllm.yaml - for vLLM-based application
 - compose.yaml - for TGI-based
 
@@ -108,7 +111,7 @@ Use AMD GPU driver utilities to determine the correct `cardN` and `renderN` IDs 
 export HUGGINGFACEHUB_API_TOKEN='your_huggingfacehub_token'
 ```
 
-#### Set variables value in set_env****.sh file:
+#### Set variables value in set_env\*\*\*\*.sh file:
 
 ```bash
 cd GenAIExamples/CodeGen/docker_compose/amd/gpu/rocm
@@ -141,7 +144,7 @@ Set the values of the variables:
 - **Variables with names like "%%%%\_PORT"** - These variables set the IP port numbers for establishing network connections to the application services.
   The values shown in the file set_env.sh or set_env_vllm they are the values used for the development and testing of the application, as well as configured for the environment in which the development is performed. These values must be configured in accordance with the rules of network access to your environment's server, and must not overlap with the IP ports of other applications that are already in use.
 
-# Set variables with script set_env****.sh
+# Set variables with script set_env\*\*\*\*.sh
 
 ```bash
 # If you use vLLM
@@ -164,6 +167,7 @@ docker compose -f compose.yaml up -d --force-recreate
 ### 1. Validate the vLLM/TGI Service
 
 If you use vLLM:
+
 ```bash
 curl http://${HOST_IP}:${CODEGEN_VLLM_SERVICE_PORT}/v1/chat/completions \
   -X POST \
@@ -172,6 +176,7 @@ curl http://${HOST_IP}:${CODEGEN_VLLM_SERVICE_PORT}/v1/chat/completions \
 ```
 
 If you use TGI:
+
 ```bash
 curl http://${HOST_IP}:${CODEGEN_TGI_SERVICE_PORT}/generate \
   -X POST \
