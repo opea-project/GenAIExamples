@@ -19,7 +19,7 @@ ip_address=$(hostname -I | awk '{print $1}')
 
 function build_docker_images() {
     cd $WORKPATH/docker_image_build
-    git clone --depth 1 --branch main https://github.com/opea/GenAIComps.git
+    git clone --depth 1 --branch main https://github.com/opea-project/GenAIComps.git
     docker compose -f build.yaml build --no-cache > ${LOG_PATH}/docker_image_build.log
 
     git clone https://github.com/HabanaAI/vllm-fork.git
