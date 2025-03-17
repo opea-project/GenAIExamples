@@ -1,6 +1,6 @@
 # Build MegaService of ChatQnA on Gaudi
 
-This document outlines the deployment process for a ChatQnA application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on Intel Gaudi server. The steps include Docker image creation, container deployment via Docker Compose, and service execution to integrate microservices such as `embedding`, `retriever`, `rerank`, and `llm`.
+This document outlines the deployment process for a ChatQnA application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on Intel Gaudi server. The steps include Docker image creation, container deployment via Docker Compose, and service execution to integrate microservices such as `embedding`, `retriever`, `rerank`, `llm` and `faqgen`.
 
 The default pipeline deploys with vLLM as the LLM serving component and leverages rerank component. It also provides options of not using rerank in the pipeline, leveraging guardrails, or using TGI backend for LLM microservice, please refer to [start-all-the-services-docker-containers](#start-all-the-services-docker-containers) section in this page.
 
@@ -30,7 +30,7 @@ To set up environment variables for deploying ChatQnA services, follow these ste
    export http_proxy="Your_HTTP_Proxy"
    export https_proxy="Your_HTTPs_Proxy"
    # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
-   export no_proxy="Your_No_Proxy",chatqna-gaudi-ui-server,chatqna-gaudi-backend-server,dataprep-redis-service,tei-embedding-service,retriever,tei-reranking-service,tgi-service,vllm-service,guardrails
+   export no_proxy="Your_No_Proxy",chatqna-gaudi-ui-server,chatqna-gaudi-backend-server,dataprep-redis-service,tei-embedding-service,retriever,tei-reranking-service,tgi-service,vllm-service,guardrails,llm-faqgen
    ```
 
 3. Set up other environment variables:
@@ -127,7 +127,17 @@ To fortify AI initiatives in production, Guardrails microservice can secure mode
 docker build -t opea/guardrails:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/guardrails/src/guardrails/Dockerfile .
 ```
 
-### 4. Build MegaService Docker Image
+### 4. Build FaqGen LLM Image (Optional)
+
+If you want to enable FAQ generation LLM in the pipeline, please use the below command:
+
+```bash
+git clone https://github.com/opea-project/GenAIComps.git
+cd GenAIComps
+docker build -t opea/llm-faqgen:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/src/faq-generation/Dockerfile .
+```
+
+### 5. Build MegaService Docker Image
 
 1. MegaService with Rerank
 
@@ -159,7 +169,17 @@ docker build -t opea/guardrails:latest --build-arg https_proxy=$https_proxy --bu
    docker build --no-cache -t opea/chatqna-without-rerank:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile.without_rerank .
    ```
 
-### 5. Build UI Docker Image
+4. MegaService with FaqGen
+
+   To use FAQ generation instead of normal text generation LLM, please use the below command:
+
+   ```bash
+   git clone https://github.com/opea-project/GenAIExamples.git
+   cd GenAIExamples/ChatQnA
+   docker build --no-cache -t opea/chatqna-faqgen:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile.faqgen .
+   ```
+
+### 6. Build UI Docker Image
 
 Construct the frontend Docker image using the command below:
 
@@ -168,7 +188,7 @@ cd GenAIExamples/ChatQnA/ui
 docker build --no-cache -t opea/chatqna-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
 ```
 
-### 6. Build Conversational React UI Docker Image (Optional)
+### 7. Build Conversational React UI Docker Image (Optional)
 
 Build frontend Docker image that enables Conversational experience with ChatQnA megaservice via below command:
 
@@ -179,7 +199,7 @@ cd GenAIExamples/ChatQnA/ui
 docker build --no-cache -t opea/chatqna-conversation-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile.react .
 ```
 
-### 7. Build Nginx Docker Image
+### 8. Build Nginx Docker Image
 
 ```bash
 cd GenAIComps
@@ -190,7 +210,7 @@ Then run the command `docker images`, you will have the following 5 Docker Image
 
 - `opea/retriever:latest`
 - `opea/dataprep:latest`
-- `opea/chatqna:latest`
+- `opea/chatqna:latest` or `opea/chatqna-faqgen:latest`
 - `opea/chatqna-ui:latest`
 - `opea/nginx:latest`
 
@@ -201,6 +221,10 @@ If Conversation React UI is built, you will find one more image:
 If Guardrails docker image is built, you will find one more image:
 
 - `opea/guardrails:latest`
+
+If FaqGen related docker image is built, you will find one more image:
+
+- `opea/llm-faqgen:latest`
 
 ## 🚀 Start MicroServices and MegaService
 
@@ -289,6 +313,8 @@ docker compose -f compose.yaml up -d
 docker compose -f compose_without_rerank.yaml up -d
 # Start ChatQnA with Rerank Pipeline and Open Telemetry Tracing
 docker compose -f compose.yaml -f compose.telemetry.yaml up -d
+# Start ChatQnA with FaqGen Pipeline
+docker compose -f compose_faqgen.yaml up -d
 ```
 
 If use TGI as the LLM serving backend.
@@ -297,6 +323,8 @@ If use TGI as the LLM serving backend.
 docker compose -f compose_tgi.yaml up -d
 # Start ChatQnA with Open Telemetry Tracing
 docker compose -f compose_tgi.yaml -f compose_tgi.telemetry.yaml up -d
+# Start ChatQnA with FaqGen Pipeline
+docker compose -f compose_faqgen_tgi.yaml up -d
 ```
 
 If you want to enable guardrails microservice in the pipeline, please follow the below command instead:
@@ -387,7 +415,16 @@ For validation details, please refer to [how-to-validate_service](./how_to_valid
      -H 'Content-Type: application/json'
    ```
 
-5. MegaService
+5. FaqGen LLM Microservice (if enabled)
+
+```bash
+curl http://${host_ip}:${LLM_SERVICE_PORT}/v1/faqgen \
+  -X POST \
+  -d '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}' \
+  -H 'Content-Type: application/json'
+```
+
+6. MegaService
 
    ```bash
    curl http://${host_ip}:8888/v1/chatqna -H "Content-Type: application/json" -d '{
@@ -395,7 +432,7 @@ For validation details, please refer to [how-to-validate_service](./how_to_valid
          }'
    ```
 
-6. Nginx Service
+7. Nginx Service
 
    ```bash
    curl http://${host_ip}:${NGINX_PORT}/v1/chatqna \
@@ -403,7 +440,7 @@ For validation details, please refer to [how-to-validate_service](./how_to_valid
        -d '{"messages": "What is the revenue of Nike in 2023?"}'
    ```
 
-7. Dataprep Microservice（Optional）
+8. Dataprep Microservice（Optional）
 
 If you want to update the default knowledge base, you can use the following commands:
 
