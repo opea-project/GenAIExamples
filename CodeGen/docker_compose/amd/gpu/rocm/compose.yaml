@@ -47,9 +47,11 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      LLM_ENDPOINT: "http://codegen-tgi-service"
+      LLM_ENDPOINT: ${CODEGEN_TGI_LLM_ENDPOINT}
       LLM_MODEL_ID: ${CODEGEN_LLM_MODEL_ID}
       HUGGINGFACEHUB_API_TOKEN: ${CODEGEN_HUGGINGFACEHUB_API_TOKEN}
+      HF_TOKEN: ${CODEGEN_HUGGINGFACEHUB_API_TOKEN}
+      LLM_COMPONENT_NAME: "OpeaTextGenService"
     restart: unless-stopped
   codegen-backend-server:
     image: ${REGISTRY:-opea}/codegen:${TAG:-latest}

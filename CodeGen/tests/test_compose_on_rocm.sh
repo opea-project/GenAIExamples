@@ -100,7 +100,7 @@ function validate_services() {
 function validate_microservices() {
     # tgi for llm service
     validate_services \
-        "${ip_address}:8028/generate" \
+        "${ip_address}:${CODEGEN_TGI_SERVICE_PORT}/generate" \
         "generated_text" \
         "codegen-tgi-service" \
         "codegen-tgi-service" \
@@ -108,7 +108,7 @@ function validate_microservices() {
 
     # llm microservice
     validate_services \
-        "${ip_address}:9000/v1/chat/completions" \
+        "${ip_address}:${CODEGEN_LLM_SERVICE_PORT}/v1/chat/completions" \
         "data: " \
         "codegen-llm-server" \
         "codegen-llm-server" \
