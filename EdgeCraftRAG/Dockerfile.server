@@ -10,7 +10,7 @@ RUN apt-get update -y && apt-get install -y --no-install-recommends --fix-missin
     poppler-utils \
     tesseract-ocr
 
-RUN apt-get update && apt-get install -y gnupg wget 
+RUN apt-get update && apt-get install -y gnupg wget git
 RUN wget -qO - https://repositories.intel.com/gpu/intel-graphics.key | \
     gpg --yes --dearmor --output /usr/share/keyrings/intel-graphics.gpg
 RUN echo "deb [arch=amd64,i386 signed-by=/usr/share/keyrings/intel-graphics.gpg] https://repositories.intel.com/gpu/ubuntu jammy client" | \
@@ -41,6 +41,8 @@ RUN pip install --no-cache-dir --upgrade pip setuptools==70.0.0 && \
     pip install --no-cache-dir -r requirements.txt
 
 WORKDIR /home/user/
+RUN git clone https://github.com/openvinotoolkit/openvino.genai.git genai
+ENV PYTHONPATH="$PYTHONPATH:/home/user/genai/tools/llm_bench"
 
 USER user
 
