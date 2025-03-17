@@ -17,9 +17,8 @@ LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
 
 function build_docker_images() {
-    ## Revert this ------------------>
     cd $WORKPATH/docker_image_build
-    git clone --depth 1 --branch vllm_vision https://github.com/Spycsh/GenAIComps.git
+    git clone --depth 1 --branch main https://github.com/opea/GenAIComps.git
     docker compose -f build.yaml build --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull opea/vllm:latest

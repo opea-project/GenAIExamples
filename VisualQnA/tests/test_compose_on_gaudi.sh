@@ -18,14 +18,12 @@ LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
 
 function build_docker_images() {
-    ## Revert this ------------------>
     cd $WORKPATH/docker_image_build
-    git clone --depth 1 --branch vllm_vision https://github.com/Spycsh/GenAIComps.git
+    git clone --depth 1 --branch main https://github.com/opea/GenAIComps.git
     docker compose -f build.yaml build --no-cache > ${LOG_PATH}/docker_image_build.log
 
     git clone https://github.com/HabanaAI/vllm-fork.git
     cd ./vllm-fork/
-    git checkout f78aeb9da0712561163eddd353e3b6097cd69bac
     docker build -f Dockerfile.hpu -t opea/vllm-gaudi:${TAG} --shm-size=128g . --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy
     cd ..
     rm -rf vllm-fork

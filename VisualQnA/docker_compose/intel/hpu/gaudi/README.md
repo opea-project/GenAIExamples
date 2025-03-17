@@ -24,7 +24,6 @@ docker build --no-cache -t opea/nginx:latest --build-arg https_proxy=$https_prox
 # we will update it to stable release tag in the future
 git clone https://github.com/HabanaAI/vllm-fork.git
 cd ./vllm-fork/
-git checkout f78aeb9da0712561163eddd353e3b6097cd69bac
 docker build -f Dockerfile.hpu -t opea/vllm-gaudi:latest --shm-size=128g . --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy
 cd ..
 rm -rf vllm-fork
