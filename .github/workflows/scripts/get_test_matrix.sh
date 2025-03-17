@@ -12,6 +12,7 @@ run_matrix="{\"include\":["
 
 examples=$(printf '%s\n' "${changed_files[@]}" | grep '/' | cut -d'/' -f1 | sort -u)
 for example in ${examples}; do
+    if [[ ! -d $WORKSPACE/$example ]]; then continue; fi
     cd $WORKSPACE/$example
     if [[ ! $(find . -type f | grep ${test_mode}) ]]; then continue; fi
     cd tests
@@ -26,7 +27,10 @@ for example in ${examples}; do
 
     run_hardware=""
     if [[ $(printf '%s\n' "${changed_files[@]}" | grep ${example} | cut -d'/' -f2 | grep -E '\.py|Dockerfile*|ui|docker_image_build' ) ]]; then
-        # run test on all hardware if megaservice or ui code change
+        echo "run test on all hardware if megaservice or ui code change..."
+        run_hardware=$hardware_list
+    elif [[ $(printf '%s\n' "${changed_files[@]}" | grep ${example} | grep 'tests'| cut -d'/' -f3 | grep -vE '^test_|^_test' ) ]]; then
+        echo "run test on all hardware if common test scripts change..."
         run_hardware=$hardware_list
     else
         for hardware in ${hardware_list}; do
