@@ -7,7 +7,7 @@ on:
     inputs:
       nodes:
         default: "gaudi,xeon"
-        description: "Hardware to run test"
+        description: "Hardware to run test gaudi,gaudi3,xeon,rocm,arc"
         required: true
         type: string
       examples:
@@ -52,12 +52,12 @@ on:
         type: string
       inject_commit:
         default: false
-        description: "inject commit to docker images true or false"
+        description: "inject commit to docker images"
         required: false
         type: boolean
       use_model_cache:
         default: false
-        description: "use model cache true or false"
+        description: "use model cache"
         required: false
         type: boolean
 
@@ -96,7 +96,6 @@ jobs:
 
   run-examples:
     needs: [get-test-matrix]   #[get-test-matrix, build-deploy-gmc]
-    if: always()
     strategy:
       matrix:
         example: ${{ fromJson(needs.get-test-matrix.outputs.examples) }}
