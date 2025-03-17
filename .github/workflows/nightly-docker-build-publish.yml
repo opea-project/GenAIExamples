@@ -37,7 +37,6 @@ jobs:
     uses: ./.github/workflows/_build_comps_base_image.yml
     with:
       node: gaudi
-      inject_commit: true
 
   build-and-test:
     needs: get-build-matrix
