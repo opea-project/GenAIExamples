@@ -33,7 +33,7 @@ class RerankProcessor(BaseComponent):
 
     @model_serializer
     def ser_model(self):
-        set = {"idx": self.idx, "postprocessor_type": self.comp_subtype, "model": self.model, "top_n": self.top_n}
+        set = {"idx": self.idx, "processor_type": self.comp_subtype, "model": self.model, "top_n": self.top_n}
         return set
 
 
@@ -60,5 +60,5 @@ class MetadataReplaceProcessor(BaseComponent, MetadataReplacementPostProcessor):
 
     @model_serializer
     def ser_model(self):
-        set = {"idx": self.idx, "postprocessor_type": self.comp_subtype, "model": None, "top_n": None}
+        set = {"idx": self.idx, "processor_type": self.comp_subtype, "model": None, "top_n": None}
         return set
