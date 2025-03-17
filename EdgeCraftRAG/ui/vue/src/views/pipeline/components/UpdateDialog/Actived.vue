@@ -8,9 +8,9 @@
     autocomplete="off"
     class="form-wrap"
   >
-    <a-form-item label="Actived" name="active">
+    <a-form-item label="Activated" name="active">
       <a-radio-group v-model:value="form.active">
-        <a-radio :value="true">Actived</a-radio>
+        <a-radio :value="true">Activated</a-radio>
         <a-radio :value="false">Inactive</a-radio>
       </a-radio-group>
     </a-form-item>
@@ -38,7 +38,7 @@ const form = reactive<FormType>({
   active,
 });
 const rules = reactive({
-  active: [{ required: true, message: "Please actived", trigger: "change" }],
+  active: [{ required: true, message: "Please activated", trigger: "change" }],
 });
 // Validate the form, throw results form
 const handleValidate = (): Promise<object> => {

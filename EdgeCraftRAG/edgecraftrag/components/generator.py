@@ -5,6 +5,8 @@ import asyncio
 import dataclasses
 import json
 import os
+import urllib.request
+from urllib.parse import urlparse
 
 from comps import GeneratedDoc
 from edgecraftrag.base import BaseComponent, CompType, GeneratorType, NodeParserType
@@ -12,10 +14,7 @@ from fastapi.responses import StreamingResponse
 from langchain_core.prompts import PromptTemplate
 from llama_index.llms.openai_like import OpenAILike
 from pydantic import model_serializer
-from urllib.parse import urlparse
-import urllib.request
 from unstructured.staging.base import elements_from_base64_gzipped_json
-
 
 DEFAULT_TEMPLATE = """
 <|im_start|>System: You are an AI assistant. Your task is to learn from the following context. Then answer the user's question based on what you learned from the context but not your own knowledge.<|im_end|>
@@ -84,7 +83,7 @@ def extract_unstructured_eles(retrieved_nodes=[], text_gen_context=""):
     if image_paths:
         unstructured_str += "\n\n参考图片:\n\n"
         for image_path in image_paths:
-            unstructured_str += f'![]({image_path})'
+            unstructured_str += f"![]({image_path})"
     if link_urls:
         unstructured_str += "\n\n相关链接:\n\n"
         for link in link_urls:
@@ -138,15 +137,15 @@ class QnAGenerator(BaseComponent):
             self.model_id = llm_model().model_id
 
     def set_prompt(self, prompt):
-        if '{context}' not in prompt:
-            prompt += '\n<|im_start|>{context}<|im_end|>'
-        if '{input}' not in prompt:
-            prompt += '\n<|im_start|>{input}'
+        if "{context}" not in prompt:
+            prompt += "\n<|im_start|>{context}<|im_end|>"
+        if "{input}" not in prompt:
+            prompt += "\n<|im_start|>{input}"
         self.prompt = prompt
 
     def reset_prompt(self):
         self.prompt = DocumentedContextRagPromptTemplate.from_template(DEFAULT_TEMPLATE)
-    
+
     def clean_string(self, string):
         ret = string
         for p in self._REPLACE_PAIRS:
@@ -214,11 +213,10 @@ class QnAGenerator(BaseComponent):
             unstructured_str = extract_unstructured_eles(retrieved_nodes, text_gen_context)
         if chat_request.stream:
             return StreamingResponse(
-                stream_generator(llm, prompt_str, unstructured_str),
-                media_type="text/event-stream"
+                stream_generator(llm, prompt_str, unstructured_str), media_type="text/event-stream"
             )
         else:
-            response = llm.complete(prompt_str)   
+            response = llm.complete(prompt_str)
             response = response.text
 
             return GeneratedDoc(text=response, prompt=prompt_str)

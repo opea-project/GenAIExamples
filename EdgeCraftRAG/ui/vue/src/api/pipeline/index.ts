@@ -1,3 +1,6 @@
+// Copyright (C) 2025 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
+
 import request from "../request";
 
 export const getSystemStatus = () => {
@@ -86,6 +89,4 @@ export const getModelWeight = (model_id: string) => {
   });
 };
 
-export const importUrl = `${
-  import.meta.env.VITE_API_URL
-}v1/settings/pipelines/import`;
+export const importUrl = `${import.meta.env.VITE_API_URL}v1/settings/pipelines/import`;

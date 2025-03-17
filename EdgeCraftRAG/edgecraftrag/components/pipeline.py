@@ -1,14 +1,15 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-import os, json
+import json
+import os
 import time
 from typing import Any, Callable, List, Optional
 
 from comps.cores.proto.api_protocol import ChatCompletionRequest
 from edgecraftrag.base import BaseComponent, CallbackType, CompType, InferenceType, RetrieverType
-from edgecraftrag.components.retriever import AutoMergeRetriever, SimpleBM25Retriever, VectorSimRetriever
 from edgecraftrag.components.postprocessor import RerankProcessor
+from edgecraftrag.components.retriever import AutoMergeRetriever, SimpleBM25Retriever, VectorSimRetriever
 from fastapi.responses import StreamingResponse
 from llama_index.core.schema import Document, QueryBundle
 from pydantic import BaseModel, Field, model_serializer
@@ -34,7 +35,7 @@ class Pipeline(BaseComponent):
     def __init__(
         self,
         name,
-        origin_json = None,
+        origin_json=None,
     ):
         super().__init__(name=name, comp_type=CompType.PIPELINE)
         if self.name == "" or self.name is None:
@@ -53,14 +54,14 @@ class Pipeline(BaseComponent):
     @property
     def get_pipeline_json(self) -> str:
         return self._origin_json
-    
+
     def update_pipeline_json(self, pipeline_dict):
         origin_json = json.loads(self._origin_json)
         for k, v in pipeline_dict.items():
             if v is not None:
-                origin_json[k] = v 
+                origin_json[k] = v
         self._origin_json = json.dumps(origin_json)
-    
+
     @property
     def node_changed(self) -> bool:
         return self._node_changed

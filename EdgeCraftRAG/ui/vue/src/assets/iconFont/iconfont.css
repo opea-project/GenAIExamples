@@ -1,8 +1,9 @@
 @font-face {
   font-family: "iconfont"; /* Project id 4784207 */
-  src: url('iconfont.woff2?t=1739238081968') format('woff2'),
-       url('iconfont.woff?t=1739238081968') format('woff'),
-       url('iconfont.ttf?t=1739238081968') format('truetype');
+  src:
+    url("iconfont.woff2?t=1739238081968") format("woff2"),
+    url("iconfont.woff?t=1739238081968") format("woff"),
+    url("iconfont.ttf?t=1739238081968") format("truetype");
 }
 
 .iconfont {
@@ -96,4 +97,3 @@
 .icon-active:before {
   content: "\e795";
 }
-

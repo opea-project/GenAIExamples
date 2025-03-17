@@ -1,9 +1,11 @@
+// Copyright (C) 2025 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
+
 import { inject } from "vue";
 import { customNotification } from "./notification";
 
 export const useNotification = () => {
-  const customNotificationInjected =
-    inject<typeof customNotification>("customNotification");
+  const customNotificationInjected = inject<typeof customNotification>("customNotification");
 
   if (!customNotificationInjected) {
     throw new Error("Notification service not provided");

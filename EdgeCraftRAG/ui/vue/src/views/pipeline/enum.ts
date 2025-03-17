@@ -1,3 +1,6 @@
+// Copyright (C) 2025 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
+
 export const NodeParser = [
   {
     name: "Simple",
@@ -7,8 +10,7 @@ export const NodeParser = [
   {
     name: "Hierarchical",
     value: "hierarchical",
-    describe:
-      "Splits a document into a recursive hierarchy Nodes using a NodeParser.",
+    describe: "Splits a document into a recursive hierarchy Nodes using a NodeParser.",
   },
   {
     name: "Sentencewindow",
@@ -19,8 +21,7 @@ export const NodeParser = [
   {
     name: "Unstructured",
     value: "unstructured",
-    describe:
-      "UnstructedNodeParser is a component that processes unstructured data.",
+    describe: "UnstructedNodeParser is a component that processes unstructured data.",
   },
 ] as const;
 
@@ -50,8 +51,7 @@ export const Retriever = [
   {
     name: "Bm25",
     value: "bm25",
-    describe:
-      "A BM25 retriever that uses the BM25 algorithm to retrieve nodes.",
+    describe: "A BM25 retriever that uses the BM25 algorithm to retrieve nodes.",
   },
 ] as const;
 
@@ -64,8 +64,7 @@ export const PostProcessor = [
   {
     name: "MetadataReplace",
     value: "metadata_replace",
-    describe:
-      "Used to replace the node content with a field from the node metadata.",
+    describe: "Used to replace the node content with a field from the node metadata.",
   },
 ] as const;
 

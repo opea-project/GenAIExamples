@@ -58,7 +58,7 @@
 import { requestPipelineCreate } from "@/api/pipeline";
 import { computed, markRaw, ref } from "vue";
 import {
-  Actived,
+  Activated,
   Basic,
   Generator,
   Indexer,
@@ -111,10 +111,10 @@ const stepList = ref<EmptyArrayType>([
     component: markRaw(Generator),
   },
   {
-    label: "Actived",
+    label: "Activated",
     index: 7,
     icon: "icon-active",
-    component: markRaw(Actived),
+    component: markRaw(Activated),
   },
 ]);
 

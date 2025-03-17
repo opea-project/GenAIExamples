@@ -2,9 +2,10 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import os
+
 from edgecraftrag.api_schema import DataIn, FilesIn
 from edgecraftrag.context import ctx
-from fastapi import FastAPI, status, File, UploadFile, HTTPException
+from fastapi import FastAPI, File, HTTPException, UploadFile, status
 
 data_app = FastAPI()
 
@@ -96,7 +97,9 @@ async def delete_file(name):
 @data_app.post(path="/v1/data/file")
 async def upload_file(file: UploadFile = File(...)):
     if ctx.get_pipeline_mgr().get_active_pipeline() is None:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,detail="Please activate pipeline and upload the file")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Please activate pipeline and upload the file"
+        )
     try:
         # DIR for server to save files uploaded by UI
         UI_DIRECTORY = os.getenv("UI_TMPFILE_PATH", "/home/user/ui_cache")
@@ -107,4 +110,6 @@ async def upload_file(file: UploadFile = File(...)):
             buffer.write(await file.read())
         return file_path
     except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to upload file: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to upload file: {str(e)}"
+        )

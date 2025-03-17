@@ -36,7 +36,7 @@
               :bordered="false"
               :color="record.status?.active ? 'success' : 'default'"
             >
-              {{ record.status?.active ? "Actived" : "Inactive" }}
+              {{ record.status?.active ? "Activated" : "Inactive" }}
             </a-tag>
           </span>
         </template>
@@ -63,7 +63,7 @@
               size="small"
               class="intel-btn-warning"
               @click="handleSwitchState(record)"
-              >{{ $t("common.deactive") }}</a-button
+              >{{ $t("common.deactivate") }}</a-button
             >
             <a-button
               danger
@@ -169,11 +169,11 @@ const handleUpdate = (row: EmptyObjectType) => {
 const handleView = (row: EmptyObjectType) => {
   emit("view", row);
 };
-//activate/deactive
+//activate/deactivate
 const handleSwitchState = (row: EmptyObjectType) => {
   const { active } = row?.status;
 
-  const text = active ? "deactive" : "activate";
+  const text = active ? "deactivate" : "activate";
   Modal.confirm({
     title: "Prompt",
     content: `Are you sure ${text} this pipeline?`,

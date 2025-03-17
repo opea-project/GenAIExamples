@@ -1,7 +1,8 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-import gc, os
+import gc
+import os
 
 from edgecraftrag.api_schema import ModelIn
 from edgecraftrag.context import ctx
@@ -13,23 +14,23 @@ model_app = FastAPI()
 CONTAINER_MODEL_PATH = "/home/user/models/"
 
 
-# Search available model weight 
+# Search available model weight
 @model_app.get(path="/v1/settings/weight/{model_id:path}")
 async def get_model_weight(model_id):
     try:
         return get_available_weights(CONTAINER_MODEL_PATH + model_id)
     except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=" GET model weight failed") 
-    
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=" GET model weight failed")
 
-# Search available model id 
+
+# Search available model id
 @model_app.get(path="/v1/settings/avail-models/{model_type}")
 async def get_model_id(model_type):
     try:
         return get_available_models(model_type)
     except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=" GET model failed") 
-    
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=" GET model failed")
+
 
 # GET Models
 @model_app.get(path="/v1/settings/models")
@@ -63,14 +64,16 @@ async def update_model(model_id, request: ModelIn):
     active_pl = ctx.get_pipeline_mgr().get_active_pipeline()
     modelmgr = ctx.get_model_mgr()
     if active_pl and active_pl.model_existed(model_id):
-        raise HTTPException(status_code=status.HTTP_423_LOCKED, detail="Model is being used by active pipeline, unable to update") 
+        raise HTTPException(
+            status_code=status.HTTP_423_LOCKED, detail="Model is being used by active pipeline, unable to update"
+        )
     else:
         async with modelmgr._lock:
             if modelmgr.get_model_by_name(model_id) is None:
                 # Need to make sure original model still exists before updating model
                 # to prevent memory leak in concurrent requests situation
                 err_msg = "Model " + model_id + " not exists"
-                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=err_msg) 
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=err_msg)
             model = modelmgr.search_model(request)
             if model is None:
                 modelmgr.del_model_by_name(model_id)
@@ -87,7 +90,9 @@ async def update_model(model_id, request: ModelIn):
 async def delete_model(model_id):
     active_pl = ctx.get_pipeline_mgr().get_active_pipeline()
     if active_pl and active_pl.model_existed(model_id):
-        raise HTTPException(status_code=status.HTTP_423_LOCKED, detail="Model is being used by active pipeline, unable to remove")
+        raise HTTPException(
+            status_code=status.HTTP_423_LOCKED, detail="Model is being used by active pipeline, unable to remove"
+        )
     else:
         modelmgr = ctx.get_model_mgr()
         # Currently use asyncio.Lock() to deal with multi-requests
@@ -116,17 +121,17 @@ def get_available_models(model_type):
     if model_type == "LLM":
         items = os.listdir(CONTAINER_MODEL_PATH)
         for item in items:
-            if item == 'BAAI':
+            if item == "BAAI":
                 continue
             sub_paths = os.listdir(os.path.join(CONTAINER_MODEL_PATH, item))
             if sub_paths and "INT4" not in sub_paths[0] and "INT8" not in sub_paths[0] and "FP16" not in sub_paths[0]:
-                for sub_path in sub_paths: 
-                    avail_models.append(item + '/' + sub_path)
+                for sub_path in sub_paths:
+                    avail_models.append(item + "/" + sub_path)
             else:
                 avail_models.append(item)
     else:
-        for item in os.listdir(CONTAINER_MODEL_PATH + 'BAAI'):
-            if (model_type == "reranker" and 'rerank' in item) or (model_type == "embedding" and 'rerank' not in item):
-                avail_models.append('BAAI/' + item)
+        for item in os.listdir(CONTAINER_MODEL_PATH + "BAAI"):
+            if (model_type == "reranker" and "rerank" in item) or (model_type == "embedding" and "rerank" not in item):
+                avail_models.append("BAAI/" + item)
 
     return avail_models

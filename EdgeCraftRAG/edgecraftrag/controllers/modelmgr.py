@@ -114,12 +114,14 @@ class ModelMgr(BaseMgr):
         match model_para.model_type:
             case ModelType.LLM:
                 from optimum.intel import OVModelForCausalLM
+
                 ov_model = OVModelForCausalLM.from_pretrained(
                     model_para.model_path,
                     device=model_para.device,
                     weight=model_para.weight,
-                    )
+                )
                 from llm_bench_utils.hook_common import get_bench_hook
+
                 num_beams = 1
                 bench_hook = get_bench_hook(num_beams, ov_model)
                 model = OpenVINOLLMModel(
@@ -130,6 +132,7 @@ class ModelMgr(BaseMgr):
                     model=ov_model,
                 )
                 from transformers import AutoTokenizer
+
                 tokenizer = AutoTokenizer.from_pretrained(model_para.model_path, trust_remote_code=True)
             case ModelType.VLLM:
                 model = BaseModelComponent(model_id=model_para.model_id, model_path="", device="", weight="")

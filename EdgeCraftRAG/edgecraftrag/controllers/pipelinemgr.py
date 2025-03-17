@@ -72,7 +72,7 @@ class PipelineMgr(BaseMgr):
         prevactive = self._active_pipeline
         if prevactive:
             prevactive.status.active = False
-            prevactive.update_pipeline_json({'active' : prevactive.status.active})
+            prevactive.update_pipeline_json({"active": prevactive.status.active})
         pl.status.active = True
         self._active_pipeline = pl
 
