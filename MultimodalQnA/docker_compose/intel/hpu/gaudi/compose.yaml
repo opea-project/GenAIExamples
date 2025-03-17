@@ -195,6 +195,8 @@ services:
       LVM_MODEL_ID: ${LVM_MODEL_ID}
       WHISPER_PORT: ${WHISPER_PORT}
       WHISPER_SERVER_ENDPOINT: ${WHISPER_SERVER_ENDPOINT}
+      TTS_PORT: ${TTS_PORT}
+      TTS_ENDPOINT: ${TTS_ENDPOINT}
     ipc: host
     restart: always
   multimodalqna-ui:

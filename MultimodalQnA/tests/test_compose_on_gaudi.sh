@@ -330,6 +330,14 @@ function validate_megaservice() {
         "multimodalqna-backend-server" \
         '{"messages": "Find an apple. What color is it?"}'
 
+    echo "Validating megaservice with audio response"
+    validate_service \
+        "http://${host_ip}:${MEGA_SERVICE_PORT}/v1/multimodalqna" \
+        '"audio":{"data"' \
+        "multimodalqna" \
+        "multimodalqna-backend-server" \
+        '{"messages": "Find an apple. What color is it?", "modalities": ["text", "audio"]}'
+
     echo "Validating megaservice with first audio query"
     validate_service \
         "http://${host_ip}:${MEGA_SERVICE_PORT}/v1/multimodalqna" \
