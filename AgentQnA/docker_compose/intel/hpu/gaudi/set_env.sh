@@ -12,13 +12,12 @@ if [[ -z "${WORKDIR}" ]]; then
 fi
 echo "WORKDIR=${WORKDIR}"
 export ip_address=$(hostname -I | awk '{print $1}')
-export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
-export HF_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
 
 # LLM related environment variables
 export HF_CACHE_DIR=${HF_CACHE_DIR}
 ls $HF_CACHE_DIR
 export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+export HF_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
 export LLM_MODEL_ID="meta-llama/Meta-Llama-3.1-70B-Instruct"
 export NUM_SHARDS=4
 export LLM_ENDPOINT_URL="http://${ip_address}:8086"
@@ -42,10 +41,11 @@ if [ ! -f $WORKDIR/GenAIExamples/AgentQnA/tests/Chinook_Sqlite.sqlite ]; then
     wget  -O $WORKDIR/GenAIExamples/AgentQnA/tests/Chinook_Sqlite.sqlite  https://raw.githubusercontent.com/lerocha/chinook-database/refs/heads/master/ChinookDatabase/DataSources/Chinook_Sqlite.sqlite
 fi
 
+# configure agent ui
+echo "AGENT_URL = 'http://$ip_address:9090/v1/chat/completions'" | tee ${WORKDIR}/GenAIExamples/AgentQnA/ui/svelte/.env
+
 # retriever
 export host_ip=$(hostname -I | awk '{print $1}')
-export HF_CACHE_DIR=${HF_CACHE_DIR}
-export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
 export no_proxy=${no_proxy}
 export http_proxy=${http_proxy}
 export https_proxy=${https_proxy}
@@ -66,6 +66,5 @@ export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:6008/v1/dataprep/get"
 export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:6009/v1/dataprep/delete"
 
 
-export no_proxy="$no_proxy,rag-agent-endpoint,sql-agent-endpoint,react-agent-endpoint,agent-ui,vllm-gaudi-server"
-
-#docker compose -f $WORKDIR/GenAIExamples/DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml -f compose.yaml up -d
+export no_proxy="$no_proxy,rag-agent-endpoint,sql-agent-endpoint,react-agent-endpoint,agent-ui,vllm-gaudi-server,127.0.0.1,localhost,0.0.0.0"
+export no_proxy="$no_proxy,rag-agent-endpoint,sql-agent-endpoint,react-agent-endpoint,agent-ui,vllm-gaudi-server,jaeger,grafana,prometheus,127.0.0.1,localhost,0.0.0.0,$host_ip"

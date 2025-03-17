@@ -2,7 +2,7 @@
 
 ## Overview
 
-This example showcases a hierarchical multi-agent system for question-answering applications. The architecture diagram is shown below. The supervisor agent interfaces with the user and dispatch tasks to two worker agents to gather information and come up with answers. The worker RAG agent uses the retrieval tool to retrieve relevant documents from the knowledge base (a vector database). The worker SQL agent retrieve relevant data from the SQL database. Although not included in this example, but other tools such as a web search tool or a knowledge graph query tool can be used by the supervisor agent to gather information from additional sources.
+This example showcases a hierarchical multi-agent system for question-answering applications. The architecture diagram is shown below. The supervisor agent interfaces with the user and dispatch tasks to two worker agents to gather information and come up with answers. The worker RAG agent uses the retrieval tool to retrieve relevant documents from the knowledge base (a vector database). The worker SQL agent retrieve relevant data from the SQL database. Although not included in this example by default, but other tools such as a web search tool or a knowledge graph query tool can be used by the supervisor agent to gather information from additional sources.
 ![Architecture Overview](assets/img/agent_qna_arch.png)
 
 The AgentQnA example is implemented using the component-level microservices defined in [GenAIComps](https://github.com/opea-project/GenAIComps). The flow chart below shows the information flow between different microservices for this example.
@@ -145,42 +145,47 @@ e.g. set up for Gaudi.
 source $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/hpu/gaudi/set_env.sh
 ```
 
-### 3. Launch other tools. [Optional]
-
-<details>
-<summary> Instructions </summary>
-   In this example, we will use some of the mock APIs provided in the Meta CRAG KDD Challenge to demonstrate the benefits of gaining additional context from mock knowledge graphs.
-
-```
-docker run -d -p=8080:8000 docker.io/aicrowd/kdd-cup-24-crag-mock-api:v0
-```
-
-</details>
-
-### 4. Launch multi-agent system. </br>
+### 3. Launch multi-agent system. </br>
 
 We provide two options for `llm_engine` of the agents: 1. open-source LLMs on Intel Gaudi2, 2. OpenAI models via API calls.
 
 #### Gaudi
 
 On Gaudi2 we will serve `meta-llama/Meta-Llama-3.1-70B-Instruct` using vllm.
+By default, both RAG Agent and SQL Agent will be launched to support React Agent.  
+RAG Agent requires another compose.yaml file from DocIndexRetriever, so we need to use two compose.yaml files to the multi-agent system.
 
 ```bash
 cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/hpu/gaudi/
 docker compose -f $WORKDIR/GenAIExamples/DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml -f compose.yaml up -d
 ```
 
+##### Web Search Tool support
+
+Web search tool is also available by running with an additional compose.webtool.yaml file.  
+Google Search API is used, so proper CSE_ID and API_KEY needed to be exported.  
+Please follow this [link](https://python.langchain.com/docs/integrations/tools/google_search/) to get CSE_ID and API_KEY for a google account.
+
+```bash
+cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/hpu/gaudi/
+export GOOGLE_CSE_ID="YOUR_ID"
+export GOOGLE_API_KEY="YOUR_API_KEY"
+docker compose -f $WORKDIR/GenAIExamples/DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml -f compose.yaml -f compose.webtool.yaml up -d
+```
+
 #### Xeon
 
-To use OpenAI models, run commands below.
+To use OpenAI models, run commands below.  
+By default, both RAG Agent and SQL Agent will be launched to support React Agent.  
+RAG Agent requires another compose.yaml file from DocIndexRetriever, so we need to use two compose yaml files to the multi-agent system.
 
 ```
 export OPENAI_API_KEY=<your-openai-key>
 cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/cpu/xeon
-bash launch_agent_service_openai.sh
+docker compose -f $WORKDIR/GenAIExamples/DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml -f compose_openai.yaml up -d
 ```
 
-### 5. Ingest Data into vector database
+### 4. Ingest Data into vector database
 
 Then, ingest data into the vector database. Here we provide an example. You can ingest your own data.
 
