@@ -197,14 +197,14 @@ function validate_megaservice() {
     # Curl the Mega Service
     validate_service \
         "${ip_address}:${CHATQNA_BACKEND_PORT}/v1/chatqna" \
-        "Embeddings" \
+        "Embed" \
         "chatqna-megaservice" \
         "chatqna-gaudi-backend-server" \
         '{"messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5.","max_tokens":32}'
 
     validate_service \
         "${ip_address}:${CHATQNA_BACKEND_PORT}/v1/chatqna" \
-        "Embeddings" \
+        "Embed" \
         "chatqna-megaservice" \
         "chatqna-gaudi-backend-server" \
         '{"messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5.","max_tokens":32,"stream":false}'

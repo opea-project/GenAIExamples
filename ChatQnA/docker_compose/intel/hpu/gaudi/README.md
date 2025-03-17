@@ -176,7 +176,7 @@ This deployment may allocate more Gaudi resources to the tgi-service to optimize
 
 ### compose_faqgen.yaml - FAQ generation Deployment
 
-The FAQs(frequently asked questions and answers) generation Deployment will generate FAQs instread of normally text generation. It add a new microservice called `llm-faqgen`, which is a microservice that interacts with the TGI/vLLM LLM server to generate FAQs from input text. Chatqna backend image change from `opea/chatqna:latest` to `opea/chatqna-faqgen:latest`, which depends on `llm-faqgen`.
+The FAQs(frequently asked questions and answers) generation Deployment will generate FAQs instead of normally text generation. It add a new microservice called `llm-faqgen`, which is a microservice that interacts with the TGI/vLLM LLM server to generate FAQs from input text. Chatqna backend image change from `opea/chatqna:latest` to `opea/chatqna-faqgen:latest`, which depends on `llm-faqgen`.
 
 The TGI (Text Generation Inference) deployment and the default deployment differ primarily in their service configurations and specific focus on handling large language models (LLMs). The TGI deployment includes a unique `tgi-service`, which utilizes the `ghcr.io/huggingface/tgi-gaudi:2.0.6` image and is specifically configured to run on Gaudi hardware. This service is designed to handle LLM tasks with optimizations such as `ENABLE_HPU_GRAPH` and `USE_FLASH_ATTENTION`. The `chatqna-gaudi-backend-server` in the TGI deployment depends on the `tgi-service`, whereas in the default deployment, it relies on the `vllm-service`.
 
@@ -188,7 +188,7 @@ The TGI (Text Generation Inference) deployment and the default deployment differ
 | retriever                    | opea/retriever:latest                                 | No           |
 | tei-reranking-service        | ghcr.io/huggingface/tei-gaudi:1.5.0                   | 1 card       |
 | vllm-service                 | opea/vllm-gaudi:latest                                | Configurable |
-| llm-faqgen                   | opea/llm-faqgen:latest                                | No |
+| llm-faqgen                   | opea/llm-faqgen:latest                                | No           |
 | chatqna-gaudi-backend-server | opea/chatqna-faqgen:latest                            | No           |
 | chatqna-gaudi-ui-server      | opea/chatqna-ui:latest                                | No           |
 | chatqna-gaudi-nginx-server   | opea/nginx:latest                                     | No           |
