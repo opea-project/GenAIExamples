@@ -3,6 +3,7 @@
 ## Prerequisites
 
 Before starting, ensure the following are installed on your system:
+
 - **Docker**
 - **ROCm** (for AMD GPU support)
 - **Git**
@@ -119,13 +120,14 @@ Use AMD GPU driver utilities to determine the correct `cardN` and `renderN` IDs 
    ```
 
 2. Configure environment variables:
-    - Edit the `set_env_vllm.sh` file to set the required values. Comments in the file provide guidance for each variable.
-    - Make the script executable and apply the environment variables:
 
-      ```bash
-      chmod +x set_env_vllm.sh
-      . set_env_vllm.sh
-      ```
+   - Edit the `set_env_vllm.sh` file to set the required values. Comments in the file provide guidance for each variable.
+   - Make the script executable and apply the environment variables:
+
+     ```bash
+     chmod +x set_env_vllm.sh
+     . set_env_vllm.sh
+     ```
 
 3. Start the services:
 
