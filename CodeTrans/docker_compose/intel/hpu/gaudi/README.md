@@ -66,7 +66,7 @@ For users in China who are unable to download models directly from Huggingface, 
    export HF_ENDPOINT="https://hf-mirror.com"
    model_name="mistralai/Mistral-7B-Instruct-v0.3"
    # Start vLLM LLM Service
-   docker run -p 8008:80 -v ./data:/data --name vllm-service -e HF_ENDPOINT=$HF_ENDPOINT -e http_proxy=$http_proxy -e https_proxy=$https_proxy --shm-size 128g opea/vllm:latest --model $model_name --host 0.0.0.0 --port 80
+   docker run -p 8008:80 -v ./data:/root/.cache/huggingface/hub --name vllm-service -e HF_ENDPOINT=$HF_ENDPOINT -e http_proxy=$http_proxy -e https_proxy=$https_proxy --shm-size 128g opea/vllm:latest --model $model_name --host 0.0.0.0 --port 80
    # Start TGI LLM Service
    docker run -p 8008:80 -v ./data:/data --name tgi-service -e HF_ENDPOINT=$HF_ENDPOINT -e http_proxy=$http_proxy -e https_proxy=$https_proxy --shm-size 1g ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu --model-id $model_name
    ```
@@ -83,7 +83,7 @@ For users in China who are unable to download models directly from Huggingface, 
      export HF_TOKEN=${your_hf_token}
      export model_path="/path/to/model"
      # Start vLLM LLM Service
-     docker run -p 8008:80 -v $model_path:/data --name vllm-service --shm-size 128g opea/vllm:latest --model /data --host 0.0.0.0 --port 80
+     docker run -p 8008:80 -v $model_path:/root/.cache/huggingface/hub --name vllm-service --shm-size 128g opea/vllm:latest --model /root/.cache/huggingface/hub --host 0.0.0.0 --port 80
      # Start TGI LLM Service
      docker run -p 8008:80 -v $model_path:/data --name tgi-service --shm-size 1g ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu --model-id /data
      ```

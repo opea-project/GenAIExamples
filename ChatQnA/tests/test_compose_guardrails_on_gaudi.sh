@@ -29,7 +29,9 @@ function build_docker_images() {
     fi
     cd $WORKPATH/docker_image_build
     git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
-    git clone --depth 1 --branch v0.6.4.post2+Gaudi-1.19.0 https://github.com/HabanaAI/vllm-fork.git
+    git clone https://github.com/HabanaAI/vllm-fork.git && cd vllm-fork
+    VLLM_VER=$(git describe --tags "$(git rev-list --tags --max-count=1)")
+    git checkout ${VLLM_VER} &> /dev/null && cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
     service_list="chatqna-guardrails chatqna-ui dataprep retriever vllm-gaudi guardrails nginx"
@@ -160,7 +162,7 @@ function validate_megaservice() {
     # Curl the Mega Service
     validate_service \
         "${ip_address}:8888/v1/chatqna" \
-        "data: " \
+        "Nike" \
         "mega-chatqna" \
         "chatqna-gaudi-guardrails-server" \
         '{"messages": "What is the revenue of Nike in 2023?"}'
