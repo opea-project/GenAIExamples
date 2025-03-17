@@ -69,21 +69,21 @@ jobs:
         nodes_json=$(printf '%s\n' "${nodes[@]}" | sort -u | jq -R '.' | jq -sc '.')
         echo "nodes=$nodes_json" >> $GITHUB_OUTPUT
 
-  build-deploy-gmc:
+  build-comps-base:
     needs: [get-test-matrix]
     strategy:
       matrix:
         node: ${{ fromJson(needs.get-test-matrix.outputs.nodes) }}
-      fail-fast: false
-    uses: ./.github/workflows/_gmc-workflow.yml
+    uses: ./.github/workflows/_build_comps_base_image.yml
     with:
       node: ${{ matrix.node }}
+      build: ${{ fromJSON(inputs.build) }}
       tag: ${{ inputs.tag }}
       opea_branch: ${{ inputs.opea_branch }}
-    secrets: inherit
+      inject_commit: ${{ inputs.inject_commit }}
 
   run-examples:
-    needs: [get-test-matrix]   #[get-test-matrix, build-deploy-gmc]
+    needs: [get-test-matrix, build-comps-base]
     strategy:
       matrix:
         example: ${{ fromJson(needs.get-test-matrix.outputs.examples) }}
