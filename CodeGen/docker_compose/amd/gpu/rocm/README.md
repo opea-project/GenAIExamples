@@ -97,7 +97,7 @@ Use AMD GPU driver utilities to determine the correct `cardN` and `renderN` IDs 
 
 2. Configure environment variables:
 
-## 2. Set deploy environment variables
+## Set deploy environment variables
 
 ### Setting variables in the operating system environment
 
