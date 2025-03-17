@@ -66,7 +66,7 @@ async def ragqna(request: ChatCompletionRequest):
 
 # Upload prompt file for LLM ChatQnA
 @chatqna_app.post(path="/v1/chatqna/prompt")
-async def chatqna(file: UploadFile = File(...)):
+async def load_prompt(file: UploadFile = File(...)):
     try:
         generator = ctx.get_pipeline_mgr().get_active_pipeline().generator
         if generator:
@@ -80,7 +80,7 @@ async def chatqna(file: UploadFile = File(...)):
 
 # Reset prompt for LLM ChatQnA
 @chatqna_app.post(path="/v1/chatqna/prompt/reset")
-async def chatqna():
+async def reset_prompt():
     try:
         generator = ctx.get_pipeline_mgr().get_active_pipeline().generator
         if generator:

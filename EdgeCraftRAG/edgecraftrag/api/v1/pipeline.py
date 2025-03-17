@@ -36,7 +36,7 @@ async def get_pipeline(name):
 
 # GET Pipeline Json Data
 @pipeline_app.get(path="/v1/settings/pipelines/{name}/json")
-async def get_pipeline(name):
+async def get_pipeline_json(name):
     pl = ctx.get_pipeline_mgr().get_pipeline_by_name_or_id(name)
     if pl:
         return pl.get_pipeline_json
