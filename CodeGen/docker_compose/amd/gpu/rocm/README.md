@@ -24,6 +24,7 @@ docker pull ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
 ```
 
 After the build, we check the list of images with the command:
+
 ```bash
 docker image ls
 ```
@@ -127,6 +128,7 @@ Set the values of the variables:
   The values shown in the file set_env_vllm.sh they are the values used for the development and testing of the application, as well as configured for the environment in which the development is performed. These values must be configured in accordance with the rules of network access to your environment's server, and must not overlap with the IP ports of other applications that are already in use.
 
 # Set variables with script set_env_vllm.sh
+
 ```bash
 . set_env_vllm.sh
 ```
@@ -166,24 +168,6 @@ curl http://${HOST_IP}:${CODEGEN_BACKEND_SERVICE_PORT}/v1/codegen \
     "messages": "Implement a high-level API for a TODO list application. The API takes as input an operation request and updates the TODO list in place. If the request is invalid, raise an exception."
   }'
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 Copyright (c) 2024 Advanced Micro Devices, Inc.
 
