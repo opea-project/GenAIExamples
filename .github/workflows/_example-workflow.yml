@@ -50,6 +50,9 @@ on:
         type: boolean
 
 jobs:
+####################################################################################################
+# Image Build
+####################################################################################################
   pre-build-image-check:
     runs-on: ubuntu-latest
     outputs:
@@ -64,9 +67,6 @@ jobs:
             echo "should_skip=false" >> $GITHUB_OUTPUT
           fi
 
-####################################################################################################
-# Image Build
-####################################################################################################
   build-images:
     needs: [pre-build-image-check]
     if: ${{ needs.pre-build-image-check.outputs.should_skip == 'false' }}
@@ -133,7 +133,7 @@ jobs:
         run: |
           set -x
           run_compose="false"
-          if [[ ${{ inputs.test_compose }} ]]; then
+          if [[ "${{ inputs.test_compose }}" == "true" ]]; then
             if [[ "${{ needs.pre-build-image-check.outputs.should_skip }}" == "false" && "${{ needs.build-images.result}}" == "success" || "${{ needs.pre-build-image-check.outputs.should_skip }}" == "true" ]]; then
               run_compose="true"
             fi
