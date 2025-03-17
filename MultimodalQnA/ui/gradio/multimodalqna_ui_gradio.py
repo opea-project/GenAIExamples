@@ -25,6 +25,9 @@ from utils import (
     split_video
 )
 
+IMAGE_FORMATS = ['.png', '.gif', '.jpg', '.jpeg']
+AUDIO_FORMATS = ['.wav', '.mp3']
+
 logger = build_logger("gradio_web_server", "gradio_web_server.log")
 logflag = os.getenv("LOGFLAG", False)
 
@@ -201,7 +204,7 @@ def http_bot(state, audio_response_toggler, request: gr.Request):
                         print(f"video {state.video_file} does not exist in UI host!")
                         splited_video_path = None
                     state.split_video = splited_video_path
-                elif file_ext in [".jpg", ".jpeg", ".png", ".gif"]:
+                elif file_ext in IMAGE_FORMATS:
                     try:
                         output_image_path = make_temp_image(state.video_file, file_ext)
                     except:
@@ -353,8 +356,10 @@ def ingest_gen_caption(filepath, filetype, request: gr.Request):
     return
 
 
-def ingest_with_text(filepath, text, request: gr.Request):
+def ingest_with_caption(filepath, text_caption, audio_caption, request: gr.Request):
     yield (gr.Textbox(visible=True, value="Please wait for your uploaded image to be ingested into the database..."))
+
+    # Process the image
     verified_filepath = os.path.normpath(filepath)
     if not verified_filepath.startswith(tmp_upload_folder):
         print("Found malicious image file name!")
@@ -368,19 +373,29 @@ def ingest_with_text(filepath, text, request: gr.Request):
     basename = os.path.basename(verified_filepath)
     dest = os.path.join(static_dir, basename)
     shutil.copy(verified_filepath, dest)
-    text_basename = "{}.txt".format(os.path.splitext(basename)[0])
-    text_dest = os.path.join(static_dir, text_basename)
-    with open(text_dest, "w") as file:
-        file.write(text)
+
+    # Process the caption (can be text or audio)
+    is_audio_caption = audio_caption is not None
+    if is_audio_caption:
+        verified_audio_path = os.path.normpath(audio_caption)
+        caption_basename = "{}{}".format(os.path.splitext(basename)[0], os.path.splitext(verified_audio_path)[-1])
+        caption_file = audio_caption
+    else:
+        caption_basename = "{}.txt".format(os.path.splitext(basename)[0])
+        caption_file = os.path.join(static_dir, caption_basename)
+        with open(caption_file, "w") as file:
+            file.write(text_caption)
+
     print("Done copying uploaded files to static folder!")
     headers = {
         # 'Content-Type': 'multipart/form-data'
     }
-    files = [("files", (basename, open(dest, "rb"))), ("files", (text_basename, open(text_dest, "rb")))]
+    files = [("files", (basename, open(dest, "rb"))), ("files", (caption_basename, open(caption_file, "rb")))]
     try:
         response = requests.post(dataprep_ingest_addr, headers=headers, files=files)
     finally:
-        os.remove(text_dest)
+        if not is_audio_caption:
+            os.remove(caption_file)
     logger.info(response.status_code)
     if response.status_code == 200:
         response = response.json()
@@ -466,8 +481,8 @@ def hide_text(request: gr.Request):
     return gr.Textbox(visible=False)
 
 
-def clear_text(request: gr.Request):
-    return None
+def clear_captions(request: gr.Request):
+    return None, None
 
 
 def get_files():
@@ -544,13 +559,48 @@ with gr.Blocks() as upload_video:
 
 with gr.Blocks() as upload_image:
     gr.Markdown("# Ingest Images Using Generated or Custom Captions")
-    gr.Markdown("Use this interface to ingest an image and generate a caption for it")
+    gr.Markdown("Use this interface to ingest an image and generate a caption for it. If uploading a caption, populate it before the image.")
 
+    text_caption_label = "Text Caption"
+    audio_caption_label = "Voice Audio Caption ({}, or microphone)".format(", ".join(AUDIO_FORMATS))
     def select_upload_type(choice, request: gr.Request):
         if choice == "gen_caption":
-            return gr.Image(sources="upload", visible=True), gr.Image(sources="upload", visible=False)
+            return (
+                gr.Image(sources="upload", visible=True),
+                gr.Image(sources="upload", visible=False),
+                gr.Textbox(visible=False, interactive=True, label=text_caption_label),
+                gr.Audio(visible=False, type="filepath", label=audio_caption_label)
+            )
+        elif choice == "custom_caption":
+            return (
+                gr.Image(sources="upload", visible=False),
+                gr.Image(sources="upload", visible=True),
+                gr.Textbox(visible=True, interactive=True, label=text_caption_label),
+                gr.Audio(visible=False, type="filepath", label=audio_caption_label)
+            )
         else:
-            return gr.Image(sources="upload", visible=False), gr.Image(sources="upload", visible=True)
+            return (
+                gr.Image(sources="upload", visible=False),
+                gr.Image(sources="upload", visible=True),
+                gr.Textbox(visible=False, interactive=True, label=text_caption_label),
+                gr.Audio(visible=True, type="filepath", label=audio_caption_label)
+            )
+
+    def verify_audio_caption_type(file, request: gr.Request):
+        audio_type = os.path.splitext(file)[-1]
+        if audio_type not in AUDIO_FORMATS:
+            return (
+                None,
+                gr.Textbox(
+                    visible=True,
+                    value="The audio file format must be {}".format(" or ".join(AUDIO_FORMATS))
+                )
+            )
+        else:
+            return (
+                gr.Audio(value=file, visible=True, type="filepath", label=audio_caption_label),
+                gr.Textbox(visible=False, value=None)
+            )
 
     with gr.Row():
         with gr.Column(scale=6):
@@ -558,22 +608,34 @@ with gr.Blocks() as upload_image:
             image_upload_text = gr.Image(type="filepath", sources="upload", elem_id="image_upload_cap", visible=False)
         with gr.Column(scale=3):
             text_options_radio = gr.Radio(
-                [("Generate caption", "gen_caption"), ("Custom caption or label", "custom_caption")],
-                label="Text Options",
-                info="How should text be ingested?",
+                [
+                    ("Auto-generate a caption", "gen_caption"),
+                    ("Upload a text caption (populate before image)", "custom_caption"),
+                    ("Upload an audio caption (populate before image)", "custom_audio_caption")
+                ],
+                label="Caption Options",
+                info="How should captions be ingested?",
                 value="gen_caption",
             )
-            custom_caption = gr.Textbox(visible=True, interactive=True, label="Custom Caption or Label")
+            custom_caption = gr.Textbox(visible=False, interactive=True, label=text_caption_label)
+            custom_caption_audio = gr.Audio(visible=False, type="filepath", label=audio_caption_label)
             text_upload_result = gr.Textbox(visible=False, interactive=False, label="Upload Status")
+        custom_caption_audio.input(verify_audio_caption_type, [custom_caption_audio], [custom_caption_audio, text_upload_result])
         image_upload_cap.upload(
             ingest_gen_caption, [image_upload_cap, gr.Textbox(value="image", visible=False)], [text_upload_result]
         )
         image_upload_cap.clear(hide_text, [], [text_upload_result])
-        image_upload_text.upload(ingest_with_text, [image_upload_text, custom_caption], [text_upload_result]).then(
-            clear_text, [], [custom_caption]
-        )
+        image_upload_text.upload(
+            ingest_with_caption,
+            [image_upload_text, custom_caption, custom_caption_audio],
+            [text_upload_result]
+        ).then(clear_captions, [], [custom_caption, custom_caption_audio])
         image_upload_text.clear(hide_text, [], [text_upload_result])
-        text_options_radio.change(select_upload_type, [text_options_radio], [image_upload_cap, image_upload_text])
+        text_options_radio.change(
+            select_upload_type,
+            [text_options_radio],
+            [image_upload_cap, image_upload_text, custom_caption, custom_caption_audio]
+        )
 
 with gr.Blocks() as upload_audio:
     gr.Markdown("# Ingest Audio Using Generated Transcripts")
