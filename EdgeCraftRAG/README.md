@@ -36,7 +36,7 @@ You can select "local" type in generation field which is the default approach to
 #### vLLM with OpenVINO for Intel Arc GPU
 
 You can also select "vLLM" as generation type, to enable this type, you'll need to build the vLLM image for Intel Arc GPU before service bootstrap.
-Please follow this link [vLLM with OpenVINO](https://github.com/opea-project/GenAIComps/tree/main/comps/llms/text-generation/vllm/langchain#build-docker-image) to build the vLLM image.
+Please follow this link [vLLM with OpenVINO](https://github.com/opea-project/GenAIComps/tree/main/comps/third_parties/vllm#23-vllm-with-openvino-on-intel-gpu-and-cpu) to build the vLLM image.
 
 ### Start Edge Craft RAG Services with Docker Compose
 
@@ -190,7 +190,6 @@ Then, you can submit messages in the chat box.
 ![chat_with_rag](assets/img/chat_with_rag.png)
 
 If you want to try Gradio UI, please launch service through compose_gradio.yaml, then access http://${HOST_IP}:8082 on your browser:
-
 ```bash
 docker compose -f compose_gradio.yaml up -d
 ```
@@ -233,13 +232,11 @@ curl -X DELETE http://${HOST_IP}:16010/v1/settings/pipelines/rag_test_local_llm 
 ```
 
 #### Get pipeline json
-
 ```bash
 curl -X GET http://${HOST_IP}:16010/v1/settings/pipelines/{name}/json -H "Content-Type: application/json" | jq '.'
 ```
 
 #### Import pipeline from a json file
-
 ```bash
 curl -X POST http://${HOST_IP}:16010/v1/settings/pipelines/import -H "Content-Type: multipart/form-data" -F "file=@your_test_pipeline_json_file.txt"| jq '.'
 ```
