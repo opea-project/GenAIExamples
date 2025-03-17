@@ -444,6 +444,13 @@ def hide_text(request: gr.Request):
     return gr.Textbox(visible=False)
 
 
+def hide_text_pdf(pdf, text, request: gr.Request):
+    if pdf is not None:
+        return text
+    else:
+        return gr.Textbox(visible=False)
+
+
 def clear_captions(request: gr.Request):
     return None, None
 
@@ -624,6 +631,7 @@ with gr.Blocks() as upload_pdf:
             pdf_upload = PDF(label="PDF File")
         with gr.Column(scale=3):
             pdf_upload_result = gr.Textbox(visible=False, interactive=False, label="Upload Status")
+        pdf_upload.change(hide_text_pdf, [pdf_upload, pdf_upload_result], [pdf_upload_result])
         pdf_upload.upload(ingest_pdf, [pdf_upload], [pdf_upload_result])
 
 with gr.Blocks() as qna:
