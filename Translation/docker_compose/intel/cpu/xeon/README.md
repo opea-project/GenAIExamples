@@ -136,7 +136,7 @@ For users in China who are unable to download models directly from Huggingface, 
 
 3. Set up other environment variables:
 
-    If you want to start a code translation service (instead of text translation), change the `LLM_MODEL_ID` to "mistralai/Mistral-7B-Instruct-v0.3" in `set_env.sh`.
+   If you want to start a code translation service (instead of text translation), change the `LLM_MODEL_ID` to "mistralai/Mistral-7B-Instruct-v0.3" in `set_env.sh`.
 
    ```bash
    cd ../../../
@@ -258,7 +258,6 @@ Open this URL `http://{host_ip}:5173` in your browser to access the frontend.
 
 ![project-screenshot](../../../../assets/img/trans_ui_init.png)
 ![project-screenshot](../../../../assets/img/trans_ui_select.png)
-
 
 ### Launch with Nginx
 

@@ -67,10 +67,8 @@ class TranslationService:
             """
         else:
             raise ValueError("Invalid translate_type")
-        
-        prompt = prompt_template.format(
-            language_from=language_from, language_to=language_to, source_data=source_data
-        )
+
+        prompt = prompt_template.format(language_from=language_from, language_to=language_to, source_data=source_data)
         result_dict, runtime_graph = await self.megaservice.schedule(initial_inputs={"query": prompt})
         for node, response in result_dict.items():
             # Here it suppose the last microservice in the megaservice is LLM.
