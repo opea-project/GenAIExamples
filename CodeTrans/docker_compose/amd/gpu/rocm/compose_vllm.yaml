@@ -4,7 +4,7 @@
 
 services:
   codetrans-vllm-service:
-    image: ${REGISTRY:-opea}/llm-vllm-rocm:${TAG:-latest}
+    image: ${REGISTRY:-opea}/vllm-rocm:${TAG:-latest}
     container_name: codetrans-vllm-service
     ports:
       - "${CODETRANS_VLLM_SERVICE_PORT:-8081}:8011"

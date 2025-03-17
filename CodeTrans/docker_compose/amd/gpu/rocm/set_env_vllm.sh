@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
-# Copyright (C) 2024 Intel Corporation
-# Copyright (c) 2024 Advanced Micro Devices, Inc.
+# Copyright (c) 2025 Advanced Micro Devices, Inc.
 # SPDX-License-Identifier: Apache-2.0
 
 ### The IP address or domain name of the server on which the application is running
@@ -22,7 +21,7 @@ export CODETRANS_VLLM_SERVICE_PORT=18156
 export CODETRANS_LLM_ENDPOINT="http://${HOST_IP}:${CODETRANS_VLLM_SERVICE_PORT}"
 
 ### A token for accessing repositories with models
-export CODETRANS_HUGGINGFACEHUB_API_TOKEN=''
+export CODETRANS_HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
 
 ### The port of the LLM service. On this port, the LLM service will accept connections
 export CODETRANS_LLM_SERVICE_PORT=18157
@@ -34,7 +33,7 @@ export CODETRANS_MEGA_SERVICE_HOST_IP=${HOST_IP}
 export CODETRANS_LLM_SERVICE_HOST_IP=${HOST_IP}
 
 ### The ip address of the host on which the container with the frontend service is running
-export CODETRANS_FRONTEND_SERVICE_IP=192.165.1.21
+export CODETRANS_FRONTEND_SERVICE_IP=${HOST_IP}
 
 ### The port of the frontend service
 export CODETRANS_FRONTEND_SERVICE_PORT=18155
@@ -43,7 +42,7 @@ export CODETRANS_FRONTEND_SERVICE_PORT=18155
 export CODETRANS_BACKEND_SERVICE_NAME=codetrans
 
 ### The ip address of the host on which the container with the backend service is running
-export CODETRANS_BACKEND_SERVICE_IP=192.165.1.21
+export CODETRANS_BACKEND_SERVICE_IP=${HOST_IP}
 
 ### The port of the backend service
 export CODETRANS_BACKEND_SERVICE_PORT=18154
