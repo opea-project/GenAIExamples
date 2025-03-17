@@ -20,11 +20,6 @@ on:
         description: "Tag to apply to images"
         required: true
         type: string
-      # deploy_gmc:
-      #   default: false
-      #   description: 'Whether to deploy gmc'
-      #   required: true
-      #   type: boolean
       build:
         default: true
         description: 'Build test required images for Examples'
@@ -40,11 +35,6 @@ on:
         description: 'Test examples with helm charts'
         required: false
         type: boolean
-      # test_gmc:
-      #   default: false
-      #   description: 'Test examples with gmc'
-      #   required: false
-      #   type: boolean
       opea_branch:
         default: "main"
         description: 'OPEA branch for image build'
@@ -81,8 +71,6 @@ jobs:
 
   build-deploy-gmc:
     needs: [get-test-matrix]
-    if: false
-    #${{ fromJSON(inputs.deploy_gmc) }}
     strategy:
       matrix:
         node: ${{ fromJson(needs.get-test-matrix.outputs.nodes) }}
@@ -109,7 +97,6 @@ jobs:
       build: ${{ fromJSON(inputs.build) }}
       test_compose: ${{ fromJSON(inputs.test_compose) }}
       test_helmchart: ${{ fromJSON(inputs.test_helmchart) }}
-      # test_gmc: ${{ fromJSON(inputs.test_gmc) }}
       opea_branch: ${{ inputs.opea_branch }}
       inject_commit: ${{ inputs.inject_commit }}
       use_model_cache: ${{ inputs.use_model_cache }}
