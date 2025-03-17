@@ -22,6 +22,7 @@ docker compose -f build.yaml build ${service_list} --no-cache
 ```
 
 After the build, we check the list of images with the command:
+
 ```bash
 docker image ls
 ```
@@ -125,6 +126,7 @@ Set the values of the variables:
   The values shown in the file set_env_vllm.sh they are the values used for the development and testing of the application, as well as configured for the environment in which the development is performed. These values must be configured in accordance with the rules of network access to your environment's server, and must not overlap with the IP ports of other applications that are already in use.
 
 # Set variables with script set_env_vllm.sh
+
 ```bash
 . set_env_vllm.sh
 ```
