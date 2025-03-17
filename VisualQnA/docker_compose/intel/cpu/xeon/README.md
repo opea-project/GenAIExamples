@@ -42,19 +42,23 @@ cd GenAIExamples/VisualQnA/ui
 docker build --no-cache -t opea/visualqna-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
 ```
 
-### 4. Pull vLLM Xeon Image
+### 4. Pull vLLM/TGI Xeon Image
 
 ```bash
+# vLLM
 docker pull opea/vllm:latest
+# TGI (Optional)
+docker pull ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu
 ```
 
-Then run the command `docker images`, you will have the following 5 Docker Images:
+Then run the command `docker images`, you will have the following Docker Images:
 
 1. `opea/vllm:latest`
-2. `opea/lvm:latest`
-3. `opea/visualqna:latest`
-4. `opea/visualqna-ui:latest`
-5. `opea/nginx`
+2. `ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu` (Optional)
+3. `opea/lvm:latest`
+4. `opea/visualqna:latest`
+5. `opea/visualqna-ui:latest`
+6. `opea/nginx`
 
 ## 🚀 Start Microservices
 
@@ -78,6 +82,8 @@ cd GenAIExamples/VisualQnA/docker_compose/intel/cpu/xeon
 
 ```bash
 docker compose -f compose.yaml up -d
+# if use TGI as the LLM serving backend
+docker compose -f compose_tgi.yaml up -d
 ```
 
 ### Validate Microservices
@@ -95,7 +101,7 @@ Follow the instructions to validate MicroServices.
 2. MegaService
 
 ```bash
-curl http://${host_ip}:8899/v1/visualqna -H "Content-Type: application/json" -d '{
+curl http://${host_ip}:8888/v1/visualqna -H "Content-Type: application/json" -d '{
     "messages": [
       {
         "role": "user",
@@ -119,7 +125,7 @@ curl http://${host_ip}:8899/v1/visualqna -H "Content-Type: application/json" -d 
 
 ## 🚀 Launch the UI
 
-To access the frontend, open the following URL in your browser: http://{host_ip}:5176. By default, the UI runs on port 5176 internally. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `compose.yaml` file as shown below:
+To access the frontend, open the following URL in your browser: http://{host_ip}:5173. By default, the UI runs on port 5173 internally. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `compose.yaml` file as shown below:
 
 ```yaml
   visualqna-gaudi-ui-server:

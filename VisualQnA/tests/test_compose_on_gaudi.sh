@@ -23,24 +23,6 @@ function build_docker_images() {
     git clone --depth 1 --branch vllm_vision https://github.com/Spycsh/GenAIComps.git
     docker compose -f build.yaml build --no-cache > ${LOG_PATH}/docker_image_build.log
 
-    # opea_branch=${opea_branch:-"main"}
-    # # If the opea_branch isn't main, replace the git clone branch in Dockerfile.
-    # if [[ "${opea_branch}" != "main" ]]; then
-    #     cd $WORKPATH
-    #     OLD_STRING="RUN git clone --depth 1 https://github.com/opea-project/GenAIComps.git"
-    #     NEW_STRING="RUN git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git"
-    #     find . -type f -name "Dockerfile*" | while read -r file; do
-    #         echo "Processing file: $file"
-    #         sed -i "s|$OLD_STRING|$NEW_STRING|g" "$file"
-    #     done
-    # fi
-
-    # cd $WORKPATH/docker_image_build
-    # git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
-
-    # echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    # docker compose -f build.yaml build --no-cache > ${LOG_PATH}/docker_image_build.log
-
     git clone https://github.com/HabanaAI/vllm-fork.git
     cd ./vllm-fork/
     git checkout f78aeb9da0712561163eddd353e3b6097cd69bac
@@ -118,7 +100,7 @@ function validate_megaservice() {
     sleep 15s
     # Curl the Mega Service
     validate_services \
-    "${ip_address}:8899/v1/visualqna" \
+    "${ip_address}:8888/v1/visualqna" \
     "sign" \
     "visualqna-gaudi-backend-server" \
     "visualqna-gaudi-backend-server" \
