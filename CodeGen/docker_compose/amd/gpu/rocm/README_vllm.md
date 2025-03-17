@@ -1,3 +1,5 @@
+Copyright (c) 2025 Advanced Micro Devices, Inc.
+
 # Build and Deploy CodeGen Application on AMD GPU (ROCm)
 
 ## Build Docker Images

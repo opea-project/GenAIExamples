@@ -12,7 +12,7 @@ export EXTERNAL_HOST_IP=''
 export CODEGEN_TGI_SERVICE_PORT=8028
 
 ### A token for accessing repositories with models
-export CODEGEN_HUGGINGFACEHUB_API_TOKEN=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
+export CODEGEN_HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
 
 ### Model ID
 export CODEGEN_LLM_MODEL_ID="Qwen/Qwen2.5-Coder-7B-Instruct"
