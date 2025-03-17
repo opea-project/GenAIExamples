@@ -80,7 +80,6 @@ jobs:
       build: ${{ fromJSON(inputs.build) }}
       tag: ${{ inputs.tag }}
       opea_branch: ${{ inputs.opea_branch }}
-      inject_commit: ${{ inputs.inject_commit }}
 
   run-examples:
     needs: [get-test-matrix, build-comps-base]
