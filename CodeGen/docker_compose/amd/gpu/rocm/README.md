@@ -5,10 +5,14 @@
 ### 1. Build Docker Image
 
 ```bash
+# Create application install directory and go to it
+mkdir ~/codegen-install && cd codegen-install
 # Clone the repository GenAIExamples
 git clone https://github.com/opea-project/GenAIExamples.git
+# If you need to use a specific branch/tag of the GenAIExamples repository, then (v1.2 replace with its own value):
+git clone https://github.com/opea-project/GenAIExamples.git && cd GenAIExamples && git checkout v1.2
 # Go to build directory
-cd GenAIExamples/CodeGen/docker_image_build
+cd ~/codegen-install/GenAIExamples/CodeGen/docker_image_build
 # We are cleaning up the GenAIComps repository if it was previously cloned in this directory.
 echo Y | rm -R GenAIComps
 # Clone the repository GenAIComps
@@ -114,7 +118,7 @@ export HUGGINGFACEHUB_API_TOKEN='your_huggingfacehub_token'
 #### Set variables value in set_env\*\*\*\*.sh file:
 
 ```bash
-cd GenAIExamples/CodeGen/docker_compose/amd/gpu/rocm
+cd ~/codegen-install/GenAIExamples/CodeGen/docker_compose/amd/gpu/rocm
 ### The example uses the Nano text editor. You can use any convenient text editor
 # If you use vLLM
 nano set_env_vllm.sh
