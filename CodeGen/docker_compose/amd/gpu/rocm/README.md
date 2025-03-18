@@ -214,7 +214,7 @@ Set the values of the variables:
 . set_env.sh
 ```
 
-3. Start the services:
+### Start the services:
 
 #### If you use vLLM
 
