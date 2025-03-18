@@ -2,31 +2,32 @@
 # SPDX-License-Identifier: Apache-2.0
 
 services:
-  vllm-service:
-    image: ${REGISTRY:-opea}/vllm:${TAG:-latest}
-    container_name: vllm-service
+  llava-tgi-service:
+    image: ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu
+    container_name: tgi-llava-xeon-server
     ports:
-      - ${VLLM_PORT:-8399}:80
+      - "8399:80"
     volumes:
-      - "${MODEL_CACHE:-./data}:/root/.cache/huggingface/hub"
+      - "${MODEL_CACHE:-./data}:/data"
+    shm_size: 1g
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
-      VLLM_TORCH_PROFILER_DIR: "/mnt"
+      HF_HUB_DISABLE_PROGRESS_BARS: 1
+      HF_HUB_ENABLE_HF_TRANSFER: 0
+      host_ip: ${host_ip}
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:80/health || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://$host_ip:8399/health || exit 1"]
       interval: 10s
       timeout: 10s
-      retries: 100
-    command: --model $LVM_MODEL_ID --host 0.0.0.0 --port 80 --chat-template examples/template_llava.jinja  # https://docs.vllm.ai/en/v0.5.0/models/vlm.html
-
+      retries: 60
+    command: --model-id ${LVM_MODEL_ID} --max-input-length 4096 --max-total-tokens 8192 --cuda-graphs 0
   lvm:
     image: ${REGISTRY:-opea}/lvm:${TAG:-latest}
     container_name: lvm-xeon-server
     depends_on:
-      vllm-service:
+      llava-tgi-service:
         condition: service_healthy
     ports:
       - "9399:9399"
@@ -36,8 +37,7 @@ services:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       LVM_ENDPOINT: ${LVM_ENDPOINT}
-      LVM_COMPONENT_NAME: "OPEA_VLLM_LVM"
-      LLM_MODEL_ID: ${LVM_MODEL_ID}
+      LVM_COMPONENT_NAME: "OPEA_TGI_LLAVA_LVM"
       HF_HUB_DISABLE_PROGRESS_BARS: 1
       HF_HUB_ENABLE_HF_TRANSFER: 0
     restart: unless-stopped
@@ -45,7 +45,7 @@ services:
     image: ${REGISTRY:-opea}/visualqna:${TAG:-latest}
     container_name: visualqna-xeon-backend-server
     depends_on:
-      - vllm-service
+      - llava-tgi-service
       - lvm
     ports:
       - "8888:8888"
