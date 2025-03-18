@@ -4,28 +4,64 @@
 
 ### 1. Build Docker Image
 
+- Create application install directory and go to it:
+
 ```bash
-# Create application install directory and go to it
 mkdir ~/codegen-install && cd codegen-install
-# Clone the repository GenAIExamples
+```
+
+- Clone the repository GenAIExamples:
+
+```bash
 git clone https://github.com/opea-project/GenAIExamples.git
-# If you need to use a specific branch/tag of the GenAIExamples repository, then (v1.2 replace with its own value):
-git clone https://github.com/opea-project/GenAIExamples.git && cd GenAIExamples && git checkout v1.2
-# Go to build directory
+# If you need to use a specific branch/tag of the GenAIExamples repository, then (v1.3 replace with its own value):
+# We remind you that when using a specific version of the code, you need to use the README from this version.
+git clone https://github.com/opea-project/GenAIExamples.git && cd GenAIExamples && git checkout v1.3
+```
+
+- Go to build directory:
+
+```bash
 cd ~/codegen-install/GenAIExamples/CodeGen/docker_image_build
-# We are cleaning up the GenAIComps repository if it was previously cloned in this directory.
+```
+
+- Cleaning up the GenAIComps repository if it was previously cloned in this directory:
+
+```bash
 echo Y | rm -R GenAIComps
-# Clone the repository GenAIComps
+```
+
+- Clone the repository GenAIComps
+
+```bash
 git clone https://github.com/opea-project/GenAIComps.git
-# Setting the list of images for the build (from the build file.yaml)
-# If you want to deploy a vLLM-based or TGI-based application, then the set of services is installed as follows:
-# vLLM-based application
+# If you use a specific tag of the GenAIExamples repository, 
+# then you should also use the corresponding tag for GenAIComps. (v1.3 replace with its own value)
+# We remind you that when using a specific version of the code, you need to use the README from this version.
+git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout v1.3
+```
+
+- Setting the list of images for the build (from the build file.yaml)
+
+If you want to deploy a vLLM-based or TGI-based application, then the set of services is installed as follows:
+
+#### vLLM-based application
+```bash
 service_list="vllm-rocm llm-textgen codegen codegen-ui"
-# TGI-based application
+```
+#### TGI-based application
+```bash
 service_list="llm-textgen codegen codegen-ui"
-# Optional. Pull TGI Docker Image (Do this if you want to use TGI)
+```
+
+- Optional. Pull TGI Docker Image (Do this if you want to use TGI)
+
+```bash
 docker pull ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
-# Build Docker Images
+```
+
+- Build Docker Images
+```bash
 docker compose -f build.yaml build ${service_list} --no-cache
 ```
 
