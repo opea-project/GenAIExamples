@@ -88,14 +88,14 @@ docker image ls
 
 The list of images should include:
 
-#### vLLM-based application:
+##### vLLM-based application:
 
 - opea/vllm-rocm:latest
 - opea/llm-textgen:latest
 - opea/codegen:latest
 - opea/codegen-ui:latest
 
-#### TGI-based application:
+##### TGI-based application:
 
 - ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
 - opea/llm-textgen:latest
