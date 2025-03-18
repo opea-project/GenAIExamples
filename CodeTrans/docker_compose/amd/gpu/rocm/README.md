@@ -425,11 +425,6 @@ cd ~/codetrans-install/GenAIExamples/CodeTrans/docker_compose/amd/gpu/rocm
 docker compose -f compose.yaml down
 ```
 
-
-
-
-
-
 # Build and Deploy CodeTrans Application on AMD GPU (ROCm)
 
 ## Build Docker Images
