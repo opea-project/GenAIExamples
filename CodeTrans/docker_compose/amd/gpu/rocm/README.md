@@ -334,7 +334,7 @@ curl http://${HOST_IP}:${CODETRANS_LLM_SERVICE_PORT}/v1/chat/completions \
 
 Checking the response from the service. The response should be similar to JSON:
 
-````textmate
+```textmate
 data: {"id":"cmpl-c2acd8c385be4f59bae01d1ec31ca617","choices":[{"finish_reason":null,"index":0,"logprobs":null,"text":"   ","stop_reason":null}],"created":1742287740,"model":"Qwen/Qwen2.5-Coder-7B-Instruct","object":"text_completion","system_fingerprint":null,"usage":null}
 data: {"id":"cmpl-c2acd8c385be4f59bae01d1ec31ca617","choices":[{"finish_reason":null,"index":0,"logprobs":null,"text":" ###","stop_reason":null}],"created":1742287740,"model":"Qwen/Qwen2.5-Coder-7B-Instruct","object":"text_completion","system_fingerprint":null,"usage":null}
 data: {"id":"cmpl-c2acd8c385be4f59bae01d1ec31ca617","choices":[{"finish_reason":null,"index":0,"logprobs":null,"text":" Java","stop_reason":null}],"created":1742287740,"model":"Qwen/Qwen2.5-Coder-7B-Instruct","object":"text_completion","system_fingerprint":null,"usage":null}
@@ -349,7 +349,7 @@ data: {"id":"cmpl-c2acd8c385be4f59bae01d1ec31ca617","choices":[{"finish_reason":
 data: {"id":"cmpl-c2acd8c385be4f59bae01d1ec31ca617","choices":[{"finish_reason":null,"index":0,"logprobs":null,"text":"!\");","stop_reason":null}],"created":1742287740,"model":"Qwen/Qwen2.5-Coder-7B-Instruct","object":"text_completion","system_fingerprint":null,"usage":null}
 data: {"id":"cmpl-c2acd8c385be4f59bae01d1ec31ca617","choices":[{"finish_reason":"stop","index":0,"logprobs":null,"text":"","stop_reason":null}],"created":1742287740,"model":"Qwen/Qwen2.5-Coder-7B-Instruct","object":"text_completion","system_fingerprint":null,"usage":null}
 data: [DONE]
-````
+```
 
 If the service response has a meaningful response in the value of the "choices.text" key,
 then we consider the vLLM service to be successfully launched
