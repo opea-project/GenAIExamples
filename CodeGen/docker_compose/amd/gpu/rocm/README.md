@@ -162,16 +162,18 @@ Go to Docker Compose directory:
 
 ```bash
 cd ~/codegen-install/GenAIExamples/CodeGen/docker_compose/amd/gpu/rocm
-````
+```
 
 The example uses the Nano text editor. You can use any convenient text editor:
 
 #### If you use vLLM
+
 ```bash
 nano set_env_vllm.sh
 ```
 
 #### If you use TGI
+
 ```bash
 nano set_env.sh
 ```
@@ -195,16 +197,19 @@ Set the values of the variables:
 
   We set these values in the file set_env\*\*\*\*.sh
 
-- **Variables with names like "********_PORT"** - These variables set the IP port numbers for establishing network connections to the application services.
+- **Variables with names like "**\*\*****\_PORT"\*\* - These variables set the IP port numbers for establishing network connections to the application services.
   The values shown in the file set_env.sh or set_env_vllm they are the values used for the development and testing of the application, as well as configured for the environment in which the development is performed. These values must be configured in accordance with the rules of network access to your environment's server, and must not overlap with the IP ports of other applications that are already in use.
 
 #### Set variables with script set_env\*\*\*\*.sh
 
 #### If you use vLLM
+
 ```bash
 . set_env_vllm.sh
 ```
+
 #### If you use TGI
+
 ```bash
 . set_env.sh
 ```
@@ -218,6 +223,7 @@ docker compose -f compose_vllm.yaml up -d
 ```
 
 #### If you use TGI
+
 ```bash
 docker compose -f compose.yaml up -d
 ```
