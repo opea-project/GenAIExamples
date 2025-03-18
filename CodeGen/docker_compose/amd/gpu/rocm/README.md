@@ -290,7 +290,7 @@ Checking the response from the service. The response should be similar to JSON:
 }
 ````
 
-If the service response has a meaningful response in the value of the "choices.message.text" key,
+If the service response has a meaningful response in the value of the "choices.text" key,
 then we consider the vLLM service to be successfully launched
 
 ### 3. Validate the MegaService
@@ -324,6 +324,17 @@ To access the UI, use the URL - http://${EXTERNAL_HOST_IP}:${CODEGEN_UI_SERVICE_
 A page should open when you click through to this address:
 
 ![UI start page](../../../../assets/img/ui-starting-page.png)
+
+If a page of this type has opened, then we believe that the service is running and responding, 
+and we can proceed to functional UI testing.
+
+Let's enter the task for the service in the "Enter promt here" field. 
+For example, "Write a Python code that returns the current time and date" and press Enter.
+After that, a page with the result of the task should open:
+
+![UI result page](../../../../assets/img/ui-result-page.png)
+
+If the result shown on the page is correct, then we consider the verification of the UI service to be successful.
 
 ### 5. Stop application
 
