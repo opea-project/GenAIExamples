@@ -133,7 +133,7 @@ Set the values of the variables:
 
   If your server is located on an internal network, has an internal address, but is accessible from the Internet via a proxy/firewall/load balancer, then the HOST_IP variable will have a value equal to the internal name/address of the server, and the EXTERNAL_HOST_IP variable will have a value equal to the external name/address of the proxy/firewall/load balancer behind which the server is located.
 
-  We set these values in the file set_env****.sh
+  We set these values in the file set_env\*\*\*\*.sh
 
 - **Variables with names like "%%%%\_PORT"** - These variables set the IP port numbers for establishing network connections to the application services.
   The values shown in the file set_env.sh or set_env_vllm they are the values used for the development and testing of the application, as well as configured for the environment in which the development is performed. These values must be configured in accordance with the rules of network access to your environment's server, and must not overlap with the IP ports of other applications that are already in use.
