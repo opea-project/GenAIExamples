@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import argparse
+import glob
 import os
 import shutil
 import time
@@ -14,7 +15,16 @@ from conversation import multimodalqna_conv
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from gradio_pdf import PDF
-from utils import build_logger, make_temp_image, server_error_msg, split_video
+from utils import (
+    build_logger,
+    convert_base64_to_audio,
+    GRADIO_AUDIO_FORMATS,
+    GRADIO_IMAGE_FORMATS,
+    make_temp_image,
+    server_error_msg,
+    split_video,
+    TMP_DIR
+)
 
 IMAGE_FORMATS = ['.png', '.gif', '.jpg', '.jpeg']
 AUDIO_FORMATS = ['.wav', '.mp3']
@@ -59,78 +69,98 @@ def clear_history(state, request: gr.Request):
     if state.pdf and os.path.exists(state.pdf):
         os.remove(state.pdf)
     state = multimodalqna_conv.copy()
-    video = gr.Video(height=512, width=512, elem_id="video", visible=True, label="Media")
-    image = gr.Image(height=512, width=512, elem_id="image", visible=False, label="Media")
-    pdf = PDF(height=512, elem_id="pdf", interactive=False, visible=False, label="Media")
-    return (state, state.to_gradio_chatbot(), {"text": "", "files": []}, None, video, image, pdf) + (disable_btn,) * 1
+    state.chatbot_history = []
+    for file in glob.glob(os.path.join(TMP_DIR, "*.wav")):
+        os.remove(file)  # This removes all chatbot assistant's voice response files
+    video = gr.Video(value=None, elem_id="video", visible=True, label="Media")
+    image = gr.Image(value=None, elem_id="image", visible=False, label="Media")
+    pdf = PDF(value=None, elem_id="pdf", interactive=False, visible=False, label="Media")
+    return (state, state.to_gradio_chatbot(), None, video, image, pdf) + (disable_btn,) * 1
 
 
-def add_text(state, textbox, audio, request: gr.Request):
-    text = textbox["text"]
-    logger.info(f"add_text. ip: {request.client.host}. len: {len(text)}")
-    if audio:
-        state.audio_query_file = audio
-        state.append_message(state.roles[0], "--input placeholder--")
-        state.append_message(state.roles[1], None)
-        state.skip_next = False
-        return (state, state.to_gradio_chatbot(), None, None) + (disable_btn,) * 1
-    # If it is a image query
-    elif textbox["files"]:
-        image_file = textbox["files"][0]
-        state.image_query_files[len(state.messages)] = image_file
-        state.append_message(state.roles[0], text)
-        state.append_message(state.roles[1], None)
-        state.skip_next = False
-        return (state, state.to_gradio_chatbot(), None, None) + (disable_btn,) * 1
-    elif len(text) <= 0:
+def add_text(state, multimodal_textbox, request: gr.Request):
+    text = multimodal_textbox["text"]
+    files = multimodal_textbox["files"]
+    
+    image_file, audio_file = None, None
+    
+    text = text.strip()
+    
+    if not text and not files:
         state.skip_next = True
-        return (state, state.to_gradio_chatbot(), None, None) + (no_change_btn,) * 1
+        return (state, state.to_gradio_chatbot(), None) + (no_change_btn,) * 1
 
     text = text[:2000]  # Hard cut-off
 
-    state.append_message(state.roles[0], text)
-    state.append_message(state.roles[1], None)
     state.skip_next = False
+    
+    if files:
+        if Path(files[0]).suffix in GRADIO_IMAGE_FORMATS:
+            image_file = files[0]
+        if Path(files[0]).suffix in GRADIO_AUDIO_FORMATS or len(files) > 1:
+            audio_file = files[-1]  # Guaranteed that last file would be recorded audio
+    
+    # Add to chatbot history
+    if image_file:
+        state.image_query_file = image_file
+        state.chatbot_history.append({
+            "role": state.roles[0],
+            "content": {"path": image_file}
+        })
+    if audio_file:
+        state.audio_query_file = audio_file
+        state.chatbot_history.append({
+            "role": state.roles[0],
+            "content": {"path": audio_file}
+        })
+    
+    state.chatbot_history.append({
+        "role": state.roles[0],
+        "content": text
+    }) 
+    
+    logger.info(f"add_text. ip: {request.client.host}. len: {len(text)}")
+    
+    return (
+        state,
+        state.to_gradio_chatbot(),
+        gr.MultimodalTextbox(value=None)
+    ) + (disable_btn,) * 1
 
-    return (state, state.to_gradio_chatbot(), None, None) + (disable_btn,) * 1
 
-
-def http_bot(state, request: gr.Request):
+def http_bot(state, audio_response_toggler, request: gr.Request):
     global gateway_addr
     logger.info(f"http_bot. ip: {request.client.host}")
     url = gateway_addr
-    is_very_first_query = False
-    is_audio_query = state.audio_query_file is not None
+    
     if state.skip_next:
         # This generate call is skipped due to invalid inputs
         yield (state, state.to_gradio_chatbot(), None, None, None) + (no_change_btn,) * 1
         return
-
-    if len(state.messages) == state.offset + 2:
-        # First round of conversation
-        is_very_first_query = True
-        new_state = multimodalqna_conv.copy()
-        new_state.append_message(new_state.roles[0], state.messages[-2][1])
-        new_state.append_message(new_state.roles[1], None)
-        new_state.audio_query_file = state.audio_query_file
-        new_state.image_query_files = state.image_query_files
-        state = new_state
-
+    
+    is_very_first_query = all(True if h['role'] == 'user' else False for h in state.chatbot_history)
+    
     # Construct prompt
-    prompt = state.get_prompt()
+    prompt = state.get_prompt(is_very_first_query)
+    
+    modalities = ["text", "audio"] if audio_response_toggler else ["text"]
 
     # Make requests
     pload = {
         "messages": prompt,
+        "modalities": modalities
     }
-
+    
+    state.chatbot_history.append({
+        "role": state.roles[1],
+        "content": "▌"
+    })
+    
+    yield (state, state.to_gradio_chatbot(), state.split_video, state.image, state.pdf) + (disable_btn,) * 1
+    
     if logflag:
         logger.info(f"==== request ====\n{pload}")
     logger.info(f"==== url request ====\n{gateway_addr}")
-
-    state.messages[-1][-1] = "▌"
-
-    yield (state, state.to_gradio_chatbot(), state.split_video, state.image, state.pdf) + (disable_btn,) * 1
 
     try:
         response = requests.post(
@@ -148,9 +178,15 @@ def http_bot(state, request: gr.Request):
             choice = response["choices"][-1]
             metadata = choice["metadata"]
             message = choice["message"]["content"]
+            audio_response = None
+            if audio_response_toggler:
+                if choice["message"]["audio"]:
+                    audio_response = choice["message"]["audio"]["data"]
+                    
             if (
                 is_very_first_query
                 and not state.video_file
+                and metadata
                 and "source_video" in metadata
                 and not state.time_of_frame_ms
                 and "time_of_frame_ms" in metadata
@@ -183,31 +219,33 @@ def http_bot(state, request: gr.Request):
                         print(f"pdf {state.video_file} does not exist in UI host!")
                         output_pdf_path = None
                     state.pdf = output_pdf_path
-
         else:
             raise requests.exceptions.RequestException
+        
     except requests.exceptions.RequestException as e:
-        state.messages[-1][-1] = server_error_msg
+        if logflag:
+            logger.info(f"Request Exception occured:\n{str(e)}")
+        
+        gr.Error("Request exception occurred. See logs for details.")
+        
         yield (state, state.to_gradio_chatbot(), None, None, None) + (enable_btn,)
         return
-
-    state.messages[-1][-1] = message
-
-    if is_audio_query:
-        state.messages[-2][-1] = metadata.get("audio", "--transcribed audio not available--")
-        state.audio_query_file = None
-
+    
+    if audio_response:
+        state.chatbot_history[-1]["content"] = {'path': convert_base64_to_audio(audio_response)}
+    else:
+        state.chatbot_history[-1]["content"] = message
+    
     yield (
         state,
         state.to_gradio_chatbot(),
         gr.Video(state.split_video, visible=state.split_video is not None),
         gr.Image(state.image, visible=state.image is not None),
-        PDF(state.pdf, visible=state.pdf is not None, interactive=False, starting_page=int(state.time_of_frame_ms)),
+        PDF(state.pdf, visible=state.pdf is not None, interactive=False, starting_page=int(state.time_of_frame_ms) if state.time_of_frame_ms else 0),
     ) + (enable_btn,) * 1
 
-    logger.info(f"{state.messages[-1][-1]}")
+    logger.info(f"{state.chatbot_history[-1]['content']}")
     return
-
 
 def ingest_gen_transcript(filepath, filetype, request: gr.Request):
     yield (
@@ -636,30 +674,24 @@ with gr.Blocks() as upload_pdf:
 
 with gr.Blocks() as qna:
     state = gr.State(multimodalqna_conv.copy())
-    with gr.Row():
+    with gr.Row(equal_height=True):
         with gr.Column(scale=2):
-            video = gr.Video(height=512, width=512, elem_id="video", visible=True, label="Media")
-            image = gr.Image(height=512, width=512, elem_id="image", visible=False, label="Media")
-            pdf = PDF(height=512, elem_id="pdf", interactive=False, visible=False, label="Media")
+            video = gr.Video(elem_id="video", visible=True, label="Media")
+            image = gr.Image(elem_id="image", visible=False, label="Media")
+            pdf = PDF(elem_id="pdf", interactive=False, visible=False, label="Media")
         with gr.Column(scale=9):
-            chatbot = gr.Chatbot(elem_id="chatbot", label="MultimodalQnA Chatbot", height=390)
-            with gr.Row():
+            chatbot = gr.Chatbot(elem_id="chatbot", label="MultimodalQnA Chatbot", type="messages")
+            with gr.Row(equal_height=True):
                 with gr.Column(scale=8):
-                    with gr.Tabs():
-                        with gr.TabItem("Text & Image Query"):
-                            textbox = gr.MultimodalTextbox(
-                                show_label=False, container=True, submit_btn=False, file_types=["image"]
-                            )
-                        with gr.TabItem("Audio Query"):
-                            audio = gr.Audio(
-                                type="filepath",
-                                sources=["microphone", "upload"],
-                                show_label=False,
-                                container=False,
-                            )
-                with gr.Column(scale=1, min_width=100):
+                    multimodal_textbox = gr.MultimodalTextbox(
+                        show_label=False,
+                        file_types=GRADIO_IMAGE_FORMATS + GRADIO_AUDIO_FORMATS,
+                        sources=["microphone", "upload"],
+                        placeholder="Text, Image & Audio Query"
+                    )
+                with gr.Column(scale=1, min_width=150):
                     with gr.Row():
-                        submit_btn = gr.Button(value="Send", variant="primary", interactive=True)
+                        audio_response_toggler = gr.Checkbox(label="Audio Responses", container=False)
                     with gr.Row(elem_id="buttons") as button_row:
                         clear_btn = gr.Button(value="🗑️  Clear", interactive=False)
 
@@ -668,19 +700,21 @@ with gr.Blocks() as qna:
         [
             state,
         ],
-        [state, chatbot, textbox, audio, video, image, pdf, clear_btn],
+        [state, chatbot, multimodal_textbox, video, image, pdf, clear_btn],
     )
 
-    submit_btn.click(
+    multimodal_textbox.submit(
         add_text,
-        [state, textbox, audio],
-        [state, chatbot, textbox, audio, clear_btn],
+        [state, multimodal_textbox],
+        [state, chatbot, multimodal_textbox, clear_btn]
     ).then(
         http_bot,
-        [
-            state,
-        ],
-        [state, chatbot, video, image, pdf, clear_btn],
+        [state, audio_response_toggler],
+        [state, chatbot, video, image, pdf, clear_btn]
+    ).then(
+        lambda: gr.MultimodalTextbox(interactive=True),
+        None,
+        [multimodal_textbox]
     )
 
 with gr.Blocks() as vector_store:
