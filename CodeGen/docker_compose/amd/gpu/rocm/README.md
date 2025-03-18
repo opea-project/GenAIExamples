@@ -10,14 +10,19 @@
 mkdir ~/codegen-install && cd codegen-install
 ```
 
-- Clone the repository GenAIExamples:
+- Clone the repository GenAIExamples (the default repository branch "main" is used here):
 
 ```bash
 git clone https://github.com/opea-project/GenAIExamples.git
-# If you need to use a specific branch/tag of the GenAIExamples repository, then (v1.3 replace with its own value):
-# We remind you that when using a specific version of the code, you need to use the README from this version.
+```
+
+If you need to use a specific branch/tag of the GenAIExamples repository, then (v1.3 replace with its own value):
+
+```bash
 git clone https://github.com/opea-project/GenAIExamples.git && cd GenAIExamples && git checkout v1.3
 ```
+
+We remind you that when using a specific version of the code, you need to use the README from this version:
 
 - Go to build directory:
 
@@ -25,21 +30,27 @@ git clone https://github.com/opea-project/GenAIExamples.git && cd GenAIExamples 
 cd ~/codegen-install/GenAIExamples/CodeGen/docker_image_build
 ```
 
-- Cleaning up the GenAIComps repository if it was previously cloned in this directory:
+- Cleaning up the GenAIComps repository if it was previously cloned in this directory. 
+This is necessary if the build was performed earlier and the GenAIComps folder exists and is not empty:
 
 ```bash
 echo Y | rm -R GenAIComps
 ```
 
-- Clone the repository GenAIComps
+- Clone the repository GenAIComps (the default repository branch "main" is used here):
 
 ```bash
 git clone https://github.com/opea-project/GenAIComps.git
-# If you use a specific tag of the GenAIExamples repository, 
-# then you should also use the corresponding tag for GenAIComps. (v1.3 replace with its own value)
-# We remind you that when using a specific version of the code, you need to use the README from this version.
+```
+
+If you use a specific tag of the GenAIExamples repository, 
+then you should also use the corresponding tag for GenAIComps. (v1.3 replace with its own value):
+
+```bash
 git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout v1.3
 ```
+
+We remind you that when using a specific version of the code, you need to use the README from this version.
 
 - Setting the list of images for the build (from the build file.yaml)
 
