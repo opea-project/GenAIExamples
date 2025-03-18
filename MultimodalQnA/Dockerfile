@@ -20,8 +20,7 @@ WORKDIR $HOME
 FROM base AS git
 
 RUN apt-get update && apt-get install -y --no-install-recommends git
-# RUN git clone --depth 1 https://github.com/opea-project/GenAIComps.git
-RUN git clone --single-branch --branch="mmqna-phase3" https://github.com/mhbuehler/GenAIComps.git
+RUN git clone --depth 1 https://github.com/opea-project/GenAIComps.git
 
 # Stage 3: common layer shared by services using GenAIComps
 FROM base AS comps-base
