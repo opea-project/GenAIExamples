@@ -15,15 +15,29 @@ docker build --no-cache -t opea/lvm:latest --build-arg https_proxy=$https_proxy 
 docker build --no-cache -t opea/nginx:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/third_parties/nginx/src/Dockerfile .
 ```
 
-### 2. Pull TGI Gaudi Image
+### 2. Build vLLM/Pull TGI Gaudi Image
 
 ```bash
+# vLLM
+
+# currently you have to build the opea/vllm-gaudi with the habana_main branch and the specific commit locally
+# we will update it to stable release tag in the future
+git clone https://github.com/HabanaAI/vllm-fork.git
+cd ./vllm-fork/
+docker build -f Dockerfile.hpu -t opea/vllm-gaudi:latest --shm-size=128g . --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy
+cd ..
+rm -rf vllm-fork
+```
+
+```bash
+# TGI (Optional)
+
 docker pull ghcr.io/huggingface/tgi-gaudi:2.0.6
 ```
 
 ### 3. Build MegaService Docker Image
 
-To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `visuralqna.py` Python script. Build the MegaService Docker image using the command below:
+To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `visualqna.py` Python script. Build the MegaService Docker image using the command below:
 
 ```bash
 git clone https://github.com/opea-project/GenAIExamples.git
@@ -43,11 +57,12 @@ docker build --no-cache -t opea/visualqna-ui:latest --build-arg https_proxy=$htt
 
 Then run the command `docker images`, you will have the following 5 Docker Images:
 
-1. `ghcr.io/huggingface/tgi-gaudi:2.0.6`
-2. `opea/lvm:latest`
-3. `opea/visualqna:latest`
-4. `opea/visualqna-ui:latest`
-5. `opea/nginx`
+1. `opea/vllm-gaudi:latest`
+2. `ghcr.io/huggingface/tgi-gaudi:2.0.6` (Optional)
+3. `opea/lvm:latest`
+4. `opea/visualqna:latest`
+5. `opea/visualqna-ui:latest`
+6. `opea/nginx`
 
 ## 🚀 Start MicroServices and MegaService
 
@@ -56,18 +71,10 @@ Then run the command `docker images`, you will have the following 5 Docker Image
 Since the `compose.yaml` will consume some environment variables, you need to setup them in advance as below.
 
 ```bash
-export no_proxy=${your_no_proxy}
-export http_proxy=${your_http_proxy}
-export https_proxy=${your_http_proxy}
-export LVM_MODEL_ID="llava-hf/llava-v1.6-mistral-7b-hf"
-export LVM_ENDPOINT="http://${host_ip}:8399"
-export LVM_SERVICE_PORT=9399
-export MEGA_SERVICE_HOST_IP=${host_ip}
-export LVM_SERVICE_HOST_IP=${host_ip}
-export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/visualqna"
+source set_env.sh
 ```
 
-Note: Please replace with `host_ip` with you external IP address, do **NOT** use localhost.
+Note: Please replace with `host_ip` with you external IP address, do not use localhost.
 
 ### Start all the services Docker Containers
 
@@ -77,6 +84,8 @@ cd GenAIExamples/VisualQnA/docker_compose/intel/hpu/gaudi/
 
 ```bash
 docker compose -f compose.yaml up -d
+# if use TGI as the LLM serving backend
+docker compose -f compose_tgi.yaml up -d
 ```
 
 > **_NOTE:_** Users need at least one Gaudi cards to run the VisualQnA successfully.

@@ -6,7 +6,10 @@ pushd "../../../../../" > /dev/null
 source .set_env.sh
 popd > /dev/null
 
-export LVM_MODEL_ID="llava-hf/llava-v1.6-mistral-7b-hf"
+export host_ip=$(hostname -I | awk '{print $1}')
+export no_proxy=$host_ip,$no_proxy
+# export LVM_MODEL_ID="llava-hf/llava-v1.6-mistral-7b-hf"
+export LVM_MODEL_ID="llava-hf/llava-1.5-7b-hf"
 export LVM_ENDPOINT="http://${host_ip}:8399"
 export LVM_SERVICE_PORT=9399
 export MEGA_SERVICE_HOST_IP=${host_ip}

@@ -10,28 +10,6 @@ For detailed information about these instance types, you can refer to this [link
 
 After launching your instance, you can connect to it using SSH (for Linux instances) or Remote Desktop Protocol (RDP) (for Windows instances). From there, you'll have full access to your Xeon server, allowing you to install, configure, and manage your applications as needed.
 
-**Certain ports in the EC2 instance need to opened up in the security group, for the microservices to work with the curl commands**
-
-> See one example below. Please open up these ports in the EC2 instance based on the IP addresses you want to allow
-
-```
-llava-tgi-service
-===========
-Port 8399 - Open to 0.0.0.0/0
-
-llm
-===
-Port 9399 - Open to 0.0.0.0/0
-
-visualqna-xeon-backend-server
-==========================
-Port 8888 - Open to 0.0.0.0/0
-
-visualqna-xeon-ui-server
-=====================
-Port 5173 - Open to 0.0.0.0/0
-```
-
 ## 🚀 Build Docker Images
 
 First of all, you need to build Docker Images locally and install the python package of it.
@@ -64,19 +42,23 @@ cd GenAIExamples/VisualQnA/ui
 docker build --no-cache -t opea/visualqna-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
 ```
 
-### 4. Pull TGI Xeon Image
+### 4. Pull vLLM/TGI Xeon Image
 
 ```bash
+# vLLM
+docker pull opea/vllm:latest
+# TGI (Optional)
 docker pull ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu
 ```
 
-Then run the command `docker images`, you will have the following 5 Docker Images:
+Then run the command `docker images`, you will have the following Docker Images:
 
-1. `ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu`
-2. `opea/lvm:latest`
-3. `opea/visualqna:latest`
-4. `opea/visualqna-ui:latest`
-5. `opea/nginx`
+1. `opea/vllm:latest`
+2. `ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu` (Optional)
+3. `opea/lvm:latest`
+4. `opea/visualqna:latest`
+5. `opea/visualqna-ui:latest`
+6. `opea/nginx`
 
 ## 🚀 Start Microservices
 
@@ -84,30 +66,8 @@ Then run the command `docker images`, you will have the following 5 Docker Image
 
 Since the `compose.yaml` will consume some environment variables, you need to setup them in advance as below.
 
-**Export the value of the public IP address of your Xeon server to the `host_ip` environment variable**
-
-> Change the External_Public_IP below with the actual IPV4 value
-
-```
-export host_ip="External_Public_IP"
-```
-
-**Append the value of the public IP address to the no_proxy list**
-
-```
-export your_no_proxy="${your_no_proxy},${host_ip}"
-```
-
 ```bash
-export no_proxy=${your_no_proxy}
-export http_proxy=${your_http_proxy}
-export https_proxy=${your_http_proxy}
-export LVM_MODEL_ID="llava-hf/llava-v1.6-mistral-7b-hf"
-export LVM_ENDPOINT="http://${host_ip}:8399"
-export LVM_SERVICE_PORT=9399
-export MEGA_SERVICE_HOST_IP=${host_ip}
-export LVM_SERVICE_HOST_IP=${host_ip}
-export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/visualqna"
+source set_env.sh
 ```
 
 Note: Please replace with `host_ip` with you external IP address, do not use localhost.
@@ -122,6 +82,8 @@ cd GenAIExamples/VisualQnA/docker_compose/intel/cpu/xeon
 
 ```bash
 docker compose -f compose.yaml up -d
+# if use TGI as the LLM serving backend
+docker compose -f compose_tgi.yaml up -d
 ```
 
 ### Validate Microservices
