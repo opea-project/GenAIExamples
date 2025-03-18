@@ -6,101 +6,101 @@
 
 - #### Create application install directory and go to it:
 
-```bash
-mkdir ~/codegen-install && cd codegen-install
-```
+  ```bash
+  mkdir ~/codegen-install && cd codegen-install
+  ```
 
 - #### Clone the repository GenAIExamples (the default repository branch "main" is used here):
 
-```bash
-git clone https://github.com/opea-project/GenAIExamples.git
-```
+  ```bash
+  git clone https://github.com/opea-project/GenAIExamples.git
+  ```
 
-If you need to use a specific branch/tag of the GenAIExamples repository, then (v1.3 replace with its own value):
+  If you need to use a specific branch/tag of the GenAIExamples repository, then (v1.3 replace with its own value):
+  
+  ```bash
+  git clone https://github.com/opea-project/GenAIExamples.git && cd GenAIExamples && git checkout v1.3
+  ```
 
-```bash
-git clone https://github.com/opea-project/GenAIExamples.git && cd GenAIExamples && git checkout v1.3
-```
-
-We remind you that when using a specific version of the code, you need to use the README from this version:
+  We remind you that when using a specific version of the code, you need to use the README from this version:
 
 - #### Go to build directory:
 
-```bash
-cd ~/codegen-install/GenAIExamples/CodeGen/docker_image_build
-```
+  ```bash
+  cd ~/codegen-install/GenAIExamples/CodeGen/docker_image_build
+  ```
 
 - Cleaning up the GenAIComps repository if it was previously cloned in this directory.
   This is necessary if the build was performed earlier and the GenAIComps folder exists and is not empty:
 
-```bash
-echo Y | rm -R GenAIComps
-```
+  ```bash
+  echo Y | rm -R GenAIComps
+  ```
 
 - #### Clone the repository GenAIComps (the default repository branch "main" is used here):
 
-```bash
-git clone https://github.com/opea-project/GenAIComps.git
-```
+  ```bash
+  git clone https://github.com/opea-project/GenAIComps.git
+  ```
 
-If you use a specific tag of the GenAIExamples repository,
-then you should also use the corresponding tag for GenAIComps. (v1.3 replace with its own value):
-
-```bash
-git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout v1.3
-```
-
-We remind you that when using a specific version of the code, you need to use the README from this version.
+  If you use a specific tag of the GenAIExamples repository,
+  then you should also use the corresponding tag for GenAIComps. (v1.3 replace with its own value):
+  
+  ```bash
+  git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout v1.3
+  ```
+  
+  We remind you that when using a specific version of the code, you need to use the README from this version.
 
 - #### Setting the list of images for the build (from the build file.yaml)
 
-If you want to deploy a vLLM-based or TGI-based application, then the set of services is installed as follows:
-
-#### vLLM-based application
-
-```bash
-service_list="vllm-rocm llm-textgen codegen codegen-ui"
-```
-
-#### TGI-based application
-
-```bash
-service_list="llm-textgen codegen codegen-ui"
-```
+  If you want to deploy a vLLM-based or TGI-based application, then the set of services is installed as follows:
+  
+  #### vLLM-based application
+  
+  ```bash
+  service_list="vllm-rocm llm-textgen codegen codegen-ui"
+  ```
+  
+  #### TGI-based application
+  
+  ```bash
+  service_list="llm-textgen codegen codegen-ui"
+  ```
 
 - #### Optional. Pull TGI Docker Image (Do this if you want to use TGI)
 
-```bash
-docker pull ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
-```
+  ```bash
+  docker pull ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
+  ```
 
 - #### Build Docker Images
 
-```bash
-docker compose -f build.yaml build ${service_list} --no-cache
-```
+  ```bash
+  docker compose -f build.yaml build ${service_list} --no-cache
+  ```
 
-After the build, we check the list of images with the command:
+  After the build, we check the list of images with the command:
+  
+  ```bash
+  docker image ls
+  ```
 
-```bash
-docker image ls
-```
-
-The list of images should include:
-
-##### vLLM-based application:
-
-- opea/vllm-rocm:latest
-- opea/llm-textgen:latest
-- opea/codegen:latest
-- opea/codegen-ui:latest
-
-##### TGI-based application:
-
-- ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
-- opea/llm-textgen:latest
-- opea/codegen:latest
-- opea/codegen-ui:latest
+  The list of images should include:
+  
+  ##### vLLM-based application:
+  
+  - opea/vllm-rocm:latest
+    - opea/llm-textgen:latest
+    - opea/codegen:latest
+    - opea/codegen-ui:latest
+  
+  ##### TGI-based application:
+  
+  - ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
+    - opea/llm-textgen:latest
+    - opea/codegen:latest
+    - opea/codegen-ui:latest
 
 ---
 
