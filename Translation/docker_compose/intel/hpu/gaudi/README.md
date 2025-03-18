@@ -74,6 +74,37 @@ By default, the LLM model is set to a default value as listed below:
 
 Change the `LLM_MODEL_ID` below for your needs.
 
+For users in China who are unable to download models directly from Huggingface, you can use [ModelScope](https://www.modelscope.cn/models) or a Huggingface mirror to download models. The vLLM/TGI can load the models either online or offline as described below:
+
+1. Online
+
+   ```bash
+   export HF_TOKEN=${your_hf_token}
+   export HF_ENDPOINT="https://hf-mirror.com"
+   model_name="haoranxu/ALMA-13B"
+   # Start vLLM LLM Service
+   docker run -p 8008:80 -v ./data:/root/.cache/huggingface/hub --name vllm-service -e HF_ENDPOINT=$HF_ENDPOINT -e http_proxy=$http_proxy -e https_proxy=$https_proxy --shm-size 128g opea/vllm:latest --model $model_name --host 0.0.0.0 --port 80
+   # Start TGI LLM Service
+   docker run -p 8008:80 -v ./data:/data --name tgi-service -e HF_ENDPOINT=$HF_ENDPOINT -e http_proxy=$http_proxy -e https_proxy=$https_proxy --shm-size 1g ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu --model-id $model_name
+   ```
+
+2. Offline
+
+   - Search your model name in ModelScope. For example, check [this page](https://www.modelscope.cn/models/rubraAI/Mistral-7B-Instruct-v0.3/files) for model `haoranxu/ALMA-13B`.
+
+   - Click on `Download this model` button, and choose one way to download the model to your local path `/path/to/model`.
+
+   - Run the following command to start the LLM service.
+
+     ```bash
+     export HF_TOKEN=${your_hf_token}
+     export model_path="/path/to/model"
+     # Start vLLM LLM Service
+     docker run -p 8008:80 -v $model_path:/root/.cache/huggingface/hub --name vllm-service --shm-size 128g opea/vllm:latest --model /root/.cache/huggingface/hub --host 0.0.0.0 --port 80
+     # Start TGI LLM Service
+     docker run -p 8008:80 -v $model_path:/data --name tgi-service --shm-size 1g ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu --model-id /data
+     ```
+
 ### Setup Environment Variables
 
 1. Set the required environment variables:
@@ -105,7 +136,19 @@ Change the `LLM_MODEL_ID` below for your needs.
 ### Start Microservice Docker Containers
 
 ```bash
-docker compose up -d
+cd GenAIExamples/Translation/docker_compose/intel/cpu/gaudi
+```
+
+If use vLLM as the LLM serving backend.
+
+```bash
+docker compose -f compose.yaml up -d
+```
+
+If use TGI as the LLM serving backend.
+
+```bash
+docker compose -f compose_tgi.yaml up -d
 ```
 
 > Note: The docker images will be automatically downloaded from `docker hub`:
@@ -119,43 +162,97 @@ docker pull opea/nginx:latest
 
 ### Validate Microservices
 
-1. TGI Service
+1. LLM backend Service
+
+   In the first startup, this service will take more time to download, load and warm up the model. After it's finished, the service will be ready.
+
+   Try the command below to check whether the LLM serving is ready.
 
    ```bash
+   # vLLM service
+   docker logs translation-gaudi-vllm-service 2>&1 | grep complete
+   # If the service is ready, you will get the response like below.
+   INFO:     Application startup complete.
+   ```
+
+   ```bash
+   # TGI service
+   docker logs translation-gaudi-tgi-service | grep Connected
+   # If the service is ready, you will get the response like below.
+   2024-09-03T02:47:53.402023Z  INFO text_generation_router::server: router/src/server.rs:2311: Connected
+   ```
+
+   Then try the `cURL` command below to validate services.
+
+   ```bash
+   # either vLLM or TGI service
+   # text translation
    curl http://${host_ip}:8008/generate \
      -X POST \
-     -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":64, "do_sample": true}}' \
+     -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}' \
+     -H 'Content-Type: application/json'
+   # code translation
+   curl http://${host_ip}:8008/v1/chat/completions \
+     -X POST \
+     -d '{"inputs":"    ### System: Please translate the following Golang codes into  Python codes.    ### Original codes:    '\'''\'''\''Golang    \npackage main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n    '\'''\'''\''    ### Translated codes:","parameters":{"max_new_tokens":17, "do_sample": true}}' \
      -H 'Content-Type: application/json'
    ```
 
 2. LLM Microservice
 
    ```bash
+   # text translation
    curl http://${host_ip}:9000/v1/chat/completions \
      -X POST \
      -d '{"query":"Translate this from Chinese to English:\nChinese: 我爱机器翻译。\nEnglish:"}' \
+     -H 'Content-Type: application/json'
+   # code translation
+   curl http://${host_ip}:9000/v1/chat/completions\
+     -X POST \
+     -d '{"query":"    ### System: Please translate the following Golang codes into  Python codes.    ### Original codes:    '\'''\'''\''Golang    \npackage main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n    '\'''\'''\''    ### Translated codes:"}' \
      -H 'Content-Type: application/json'
    ```
 
 3. MegaService
 
    ```bash
+   # text translation
    curl http://${host_ip}:8888/v1/translation -H "Content-Type: application/json" -d '{
-        "language_from": "Chinese","language_to": "English","source_language": "我爱机器翻译。"}'
+        "language_from": "Chinese","language_to": "English","source_language": "我爱机器翻译。","translate_type":"text"}'
+   # code translation
+   curl http://${host_ip}:8888/v1/translation \
+       -H "Content-Type: application/json" \
+       -d '{"language_from": "Golang","language_to": "Python","source_code": "package main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n}","translate_type":"code"}'
    ```
 
 4. Nginx Service
 
    ```bash
+   # text translation
    curl http://${host_ip}:${NGINX_PORT}/v1/translation \
        -H "Content-Type: application/json" \
-       -d '{"language_from": "Chinese","language_to": "English","source_language": "我爱机器翻译。"}'
+       -d '{"language_from": "Chinese","language_to": "English","source_language": "我爱机器翻译。","translate_type":"text"}'
+   # code translation
+   curl http://${host_ip}:${NGINX_PORT}/v1/translation \
+       -H "Content-Type: application/json" \
+       -d '{"language_from": "Golang","language_to": "Python","source_code": "package main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n}","translate_type":"code"}'
    ```
 
 Following the validation of all aforementioned microservices, we are now prepared to construct a mega-service.
 
 ## 🚀 Launch the UI
 
+### Launch with origin port
+
 Open this URL `http://{host_ip}:5173` in your browser to access the frontend.
+
 ![project-screenshot](../../../../assets/img/trans_ui_init.png)
 ![project-screenshot](../../../../assets/img/trans_ui_select.png)
+
+### Launch with Nginx
+
+If you want to launch the UI using Nginx, open this URL: `http://{host_ip}:{NGINX_PORT}` in your browser to access the frontend.
+
+![image](https://github.com/intel-ai-tce/GenAIExamples/assets/21761437/71214938-819c-4979-89cb-c03d937cd7b5)
+
+![image](https://github.com/intel-ai-tce/GenAIExamples/assets/21761437/be543e96-ddcd-4ee0-9f2c-4e99fee77e37)
