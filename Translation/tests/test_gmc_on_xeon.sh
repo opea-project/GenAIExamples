@@ -37,7 +37,7 @@ function validate_translation() {
     kubectl exec "$CLIENT_POD" -n $APP_NAMESPACE -- curl $accessUrl  -X POST  -d '{"query":"Translate this from Chinese to English:\nChinese: 我爱机器翻译。\nEnglish:"}' -H 'Content-Type: application/json' > $LOG_PATH/gmc_translation.log
     exit_code=$?
     if [ $exit_code -ne 0 ]; then
-        echo "chatqna failed, please check the logs in ${LOG_PATH}!"
+        echo "translation failed, please check the logs in ${LOG_PATH}!"
         exit 1
     fi
 
