@@ -268,7 +268,27 @@ curl http://${HOST_IP}:${CODETRANS_VLLM_SERVICE_PORT}/v1/chat/completions \
 Checking the response from the service. The response should be similar to JSON:
 
 ```json
-{"id":"chatcmpl-9080fdc16f0f4f43a4e1b0de1e29af1f","object":"chat.completion","created":1742286287,"model":"Qwen/Qwen2.5-Coder-7B-Instruct","choices":[{"index":0,"message":{"role":"assistant","content":"Deep Learning is a subset of Machine Learning that encompasses a wide range of algorithms and models","tool_calls":[]},"logprobs":null,"finish_reason":"length","stop_reason":null}],"usage":{"prompt_tokens":34,"total_tokens":51,"completion_tokens":17,"prompt_tokens_details":null},"prompt_logprobs":null}
+{
+  "id": "chatcmpl-9080fdc16f0f4f43a4e1b0de1e29af1f",
+  "object": "chat.completion",
+  "created": 1742286287,
+  "model": "Qwen/Qwen2.5-Coder-7B-Instruct",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "Deep Learning is a subset of Machine Learning that encompasses a wide range of algorithms and models",
+        "tool_calls": []
+      },
+      "logprobs": null,
+      "finish_reason": "length",
+      "stop_reason": null
+    }
+  ],
+  "usage": { "prompt_tokens": 34, "total_tokens": 51, "completion_tokens": 17, "prompt_tokens_details": null },
+  "prompt_logprobs": null
+}
 ```
 
 If the service response has a meaningful response in the value of the "choices.message.content" key,
