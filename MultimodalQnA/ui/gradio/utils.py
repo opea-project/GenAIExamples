@@ -14,6 +14,7 @@ import cv2
 from moviepy.video.io.VideoFileClip import VideoFileClip
 
 LOGDIR = "."
+TMP_DIR = "/tmp"
 
 server_error_msg = "**NETWORK ERROR DUE TO HIGH TRAFFIC. PLEASE REGENERATE OR REFRESH THIS PAGE.**"
 moderation_msg = "YOUR INPUT VIOLATES OUR CONTENT MODERATION GUIDELINES. PLEASE TRY AGAIN."
@@ -197,7 +198,7 @@ def convert_base64_to_audio(b64_str):
     audio_data = base64.b64decode(b64_str)
 
     # Create a temporary file
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as temp_audio:
+    with tempfile.NamedTemporaryFile(dir=TMP_DIR, delete=False, suffix=".wav") as temp_audio:
         temp_audio.write(audio_data)
         temp_audio_path = temp_audio.name  # Store the path
 
