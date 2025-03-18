@@ -156,7 +156,7 @@ Use AMD GPU driver utilities to determine the correct `cardN` and `renderN` IDs 
 export HUGGINGFACEHUB_API_TOKEN='your_huggingfacehub_token'
 ```
 
-##### Set variables value in set_env\*\*\*\*.sh file:
+#### Set variables value in set_env\*\*\*\*.sh file:
 
 Go to Docker Compose directory:
 
