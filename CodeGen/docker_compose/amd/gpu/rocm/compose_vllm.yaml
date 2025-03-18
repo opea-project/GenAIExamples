@@ -42,7 +42,8 @@ services:
     image: ${REGISTRY:-opea}/llm-textgen:${TAG:-latest}
     container_name: codegen-llm-server
     depends_on:
-      - codegen-vllm-service
+      codegen-vllm-service:
+        condition: service_healthy
     ports:
       - "${CODEGEN_LLM_SERVICE_PORT:-9000}:9000"
     ipc: host
