@@ -50,6 +50,11 @@ services:
       HUGGINGFACEHUB_API_TOKEN: ${CODEGEN_HUGGINGFACEHUB_API_TOKEN}
       HF_TOKEN: ${CODEGEN_HUGGINGFACEHUB_API_TOKEN}
       LLM_COMPONENT_NAME: "OpeaTextGenService"
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://${HOST_IP}:${CODEGEN_VLLM_SERVICE_PORT:-8028}/health || exit 1" ]
+      interval: 10s
+      timeout: 10s
+      retries: 100
     restart: unless-stopped
   codegen-backend-server:
     image: ${REGISTRY:-opea}/codegen:${TAG:-latest}
