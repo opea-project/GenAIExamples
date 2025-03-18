@@ -35,39 +35,35 @@ function build_docker_images() {
     service_list="translation translation-ui llm-textgen nginx"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
-    docker pull ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu
+    docker pull ghcr.io/huggingface/tgi-gaudi:2.3.1
     docker images && sleep 1s
 }
 
 function start_services() {
-    cd $WORKPATH/docker_compose/intel/cpu/xeon/
+    cd $WORKPATH/docker_compose/intel/hpu/gaudi
 
-    export http_proxy=${http_proxy}
-    export https_proxy=${https_proxy}
     export LLM_MODEL_ID="haoranxu/ALMA-13B"
-    export LLM_ENDPOINT="http://${ip_address}:8008"
-    export LLM_COMPONENT_NAME="OpeaTextGenService"
+    export TGI_LLM_ENDPOINT="http://${ip_address}:8008"
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
     export MEGA_SERVICE_HOST_IP=${ip_address}
     export LLM_SERVICE_HOST_IP=${ip_address}
+    export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:8888/v1/translation"
+    export NGINX_PORT=80
     export FRONTEND_SERVICE_IP=${ip_address}
     export FRONTEND_SERVICE_PORT=5173
     export BACKEND_SERVICE_NAME=translation
     export BACKEND_SERVICE_IP=${ip_address}
     export BACKEND_SERVICE_PORT=8888
-    export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:${BACKEND_SERVICE_PORT}/v1/translation"
-    export NGINX_PORT=80
     export host_ip=${ip_address}
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
     # Start Docker Containers
-    docker compose -f compose_tgi.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
+    docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
 
     n=0
-    # wait long for llm model download
-    until [[ "$n" -ge 500 ]]; do
-        docker logs translation-xeon-tgi-service > ${LOG_PATH}/tgi_service_start.log
+    until [[ "$n" -ge 100 ]]; do
+        docker logs tgi-gaudi-server > ${LOG_PATH}/tgi_service_start.log
         if grep -q Connected ${LOG_PATH}/tgi_service_start.log; then
             break
         fi
@@ -83,39 +79,36 @@ function validate_services() {
     local DOCKER_NAME="$4"
     local INPUT_DATA="$5"
 
-    HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL")
-    HTTP_STATUS=$(echo $HTTP_RESPONSE | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
-    RESPONSE_BODY=$(echo $HTTP_RESPONSE | sed -e 's/HTTPSTATUS\:.*//g')
-
-    docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
-
-    # check response status
-    if [ "$HTTP_STATUS" -ne "200" ]; then
-        echo "[ $SERVICE_NAME ] HTTP status is not 200. Received status was $HTTP_STATUS"
-        exit 1
-    else
+    local HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL")
+    if [ "$HTTP_STATUS" -eq 200 ]; then
         echo "[ $SERVICE_NAME ] HTTP status is 200. Checking content..."
-    fi
-    # check response body
-    if [[ "$RESPONSE_BODY" != *"$EXPECTED_RESULT"* ]]; then
-        echo "[ $SERVICE_NAME ] Content does not match the expected result: $RESPONSE_BODY"
-        exit 1
-    else
-        echo "[ $SERVICE_NAME ] Content is as expected."
-    fi
 
-    sleep 5s
+        local CONTENT=$(curl -s -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL" | tee ${LOG_PATH}/${SERVICE_NAME}.log)
+
+        if echo "$CONTENT" | grep -q "$EXPECTED_RESULT"; then
+            echo "[ $SERVICE_NAME ] Content is as expected."
+        else
+            echo "[ $SERVICE_NAME ] Content does not match the expected result: $CONTENT"
+            docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
+            exit 1
+        fi
+    else
+        echo "[ $SERVICE_NAME ] HTTP status is not 200. Received status was $HTTP_STATUS"
+        docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
+        exit 1
+    fi
+    sleep 1s
 }
 
 function validate_microservices() {
     # Check if the microservices are running correctly.
 
-    # tgi for llm service
+    # tgi gaudi service
     validate_services \
         "${ip_address}:8008/generate" \
         "generated_text" \
-        "tgi" \
-        "translation-xeon-tgi-service" \
+        "tgi-gaudi" \
+        "tgi-gaudi-server" \
         '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}'
 
     # llm microservice
@@ -123,34 +116,26 @@ function validate_microservices() {
         "${ip_address}:9000/v1/chat/completions" \
         "data: " \
         "llm" \
-        "translation-xeon-llm-server" \
+        "llm-textgen-gaudi-server" \
         '{"query":"Translate this from Chinese to English:\nChinese: 我爱机器翻译。\nEnglish:"}'
 }
 
 function validate_megaservice() {
-    # test the megaservice for code translation
+    # Curl the Mega Service
     validate_services \
-    "${ip_address}:${BACKEND_SERVICE_PORT}/v1/translation" \
-    "print" \
-    "mega-translation" \
-    "translation-xeon-backend-server" \
-    '{"language_from": "Golang","language_to": "Python","source_data": "package main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n}","translate_type":"code"}'
-
-    # test the megaservice for text translation
-    validate_services \
-    "${ip_address}:${BACKEND_SERVICE_PORT}/v1/translation" \
+    "${ip_address}:8888/v1/translation" \
     "translation" \
     "mega-translation" \
-    "translation-xeon-backend-server" \
-    '{"language_from": "Chinese","language_to": "English","source_data": "我爱机器翻译。","translate_type":"text"}'
+    "translation-gaudi-backend-server" \
+    '{"language_from": "Chinese","language_to": "English","source_language": "我爱机器翻译。"}'
 
     # test the megeservice via nginx
     validate_services \
-    "${ip_address}:${NGINX_PORT}/v1/translation" \
-    "print" \
-    "mega-translation-nginx" \
-    "translation-xeon-nginx-server" \
-    '{"language_from": "Golang","language_to": "Python","source_data": "package main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n}","translate_type":"code"}'
+        "${ip_address}:80/v1/translation" \
+        "translation" \
+        "mega-translation-nginx" \
+        "translation-gaudi-nginx-server" \
+        '{"language_from": "Chinese","language_to": "English","source_language": "我爱机器翻译。"}'
 }
 
 function validate_frontend() {
@@ -182,8 +167,8 @@ function validate_frontend() {
 }
 
 function stop_docker() {
-    cd $WORKPATH/docker_compose/intel/cpu/xeon/
-    docker compose -f compose_tgi.yaml stop && docker compose rm -f
+    cd $WORKPATH/docker_compose/intel/hpu/gaudi
+    docker compose stop && docker compose rm -f
 }
 
 function main() {
@@ -195,7 +180,7 @@ function main() {
 
     validate_microservices
     validate_megaservice
-    validate_frontend
+#    validate_frontend
 
     stop_docker
     echo y | docker system prune

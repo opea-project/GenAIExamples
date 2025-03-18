@@ -55,12 +55,12 @@ function start_services() {
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
     export MEGA_SERVICE_HOST_IP=${ip_address}
     export LLM_SERVICE_HOST_IP=${ip_address}
-    export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:8888/v1/translation"
     export FRONTEND_SERVICE_IP=${ip_address}
     export FRONTEND_SERVICE_PORT=5173
     export BACKEND_SERVICE_NAME=translation
     export BACKEND_SERVICE_IP=${ip_address}
     export BACKEND_SERVICE_PORT=8888
+    export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:${BACKEND_SERVICE_PORT}/v1/translation"
     export NGINX_PORT=80
     export host_ip=${ip_address}
 
@@ -114,9 +114,6 @@ function validate_microservices() {
 }
 
 function validate_megaservice() {
-    export BACKEND_SERVICE_PORT=8887
-    export NGINX_PORT=80
-
     # test the megaservice for code translation
     validate_services \
     "${ip_address}:${BACKEND_SERVICE_PORT}/v1/translation" \
