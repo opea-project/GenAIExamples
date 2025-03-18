@@ -96,7 +96,7 @@ Use AMD GPU driver utilities to determine the correct `cardN` and `renderN` IDs 
 
 ### Set deploy environment variables
 
-#### Setting variables in the operating system environment
+#### Setting variables in the operating system environment:
 
 ##### Set variable HUGGINGFACEHUB_API_TOKEN:
 
