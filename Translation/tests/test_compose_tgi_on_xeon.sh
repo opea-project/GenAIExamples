@@ -30,14 +30,9 @@ function build_docker_images() {
 
     cd $WORKPATH/docker_image_build
     git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
-    git clone https://github.com/vllm-project/vllm.git && cd vllm
-    VLLM_VER="$(git describe --tags "$(git rev-list --tags --max-count=1)" )"
-    echo "Check out vLLM tag ${VLLM_VER}"
-    git checkout ${VLLM_VER} &> /dev/null
-    cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="translation translation-ui llm-textgen vllm nginx"
+    service_list="translation translation-ui llm-textgen nginx"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu
@@ -47,8 +42,6 @@ function build_docker_images() {
 function start_services() {
     cd $WORKPATH/docker_compose/intel/cpu/xeon/
 
-    export http_proxy=${http_proxy}
-    export https_proxy=${http_proxy}
     export LLM_MODEL_ID="haoranxu/ALMA-13B"
     export TGI_LLM_ENDPOINT="http://${ip_address}:8008"
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
@@ -66,13 +59,13 @@ function start_services() {
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
     # Start Docker Containers
-    docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
+    docker compose -f compose_tgi.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
 
     n=0
     # wait long for llm model download
     until [[ "$n" -ge 500 ]]; do
-        docker logs translation-xeon-vllm-service > ${LOG_PATH}/vllm_service_start.log
-        if grep -q complete ${LOG_PATH}/vllm_service_start.log; then
+        docker logs translation-xeon-tgi-service > ${LOG_PATH}/tgi_service_start.log
+        if grep -q Connected ${LOG_PATH}/tgi_service_start.log; then
             break
         fi
         sleep 5s
@@ -109,6 +102,16 @@ function validate_services() {
 }
 
 function validate_microservices() {
+    # Check if the microservices are running correctly.
+
+    # tgi for llm service
+    validate_services \
+        "${ip_address}:8008/generate" \
+        "generated_text" \
+        "tgi" \
+        "translation-xeon-tgi-service" \
+        '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}'
+
     # llm microservice
     validate_services \
         "${ip_address}:9000/v1/chat/completions" \
@@ -166,7 +169,7 @@ function validate_frontend() {
 
 function stop_docker() {
     cd $WORKPATH/docker_compose/intel/cpu/xeon/
-    docker compose -f compose.yaml stop && docker compose rm -f
+    docker compose -f compose_tgi.yaml stop && docker compose rm -f
 }
 
 function main() {

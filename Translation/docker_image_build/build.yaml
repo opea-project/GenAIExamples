@@ -27,13 +27,13 @@ services:
     build:
       context: vllm
       dockerfile: Dockerfile.cpu
-    extends: codetrans
+    extends: translation
     image: ${REGISTRY:-opea}/vllm:${TAG:-latest}
   vllm-gaudi:
     build:
       context: vllm-fork
       dockerfile: Dockerfile.hpu
-    extends: codetrans
+    extends: translation
     image: ${REGISTRY:-opea}/vllm-gaudi:${TAG:-latest}
   nginx:
     build:
