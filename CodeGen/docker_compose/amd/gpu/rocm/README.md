@@ -4,13 +4,13 @@
 
 ### 1. Build Docker Image
 
-- Create application install directory and go to it:
+- #### Create application install directory and go to it:
 
 ```bash
 mkdir ~/codegen-install && cd codegen-install
 ```
 
-- Clone the repository GenAIExamples (the default repository branch "main" is used here):
+- #### Clone the repository GenAIExamples (the default repository branch "main" is used here):
 
 ```bash
 git clone https://github.com/opea-project/GenAIExamples.git
@@ -24,7 +24,7 @@ git clone https://github.com/opea-project/GenAIExamples.git && cd GenAIExamples 
 
 We remind you that when using a specific version of the code, you need to use the README from this version:
 
-- Go to build directory:
+- #### Go to build directory:
 
 ```bash
 cd ~/codegen-install/GenAIExamples/CodeGen/docker_image_build
@@ -37,7 +37,7 @@ This is necessary if the build was performed earlier and the GenAIComps folder e
 echo Y | rm -R GenAIComps
 ```
 
-- Clone the repository GenAIComps (the default repository branch "main" is used here):
+- #### Clone the repository GenAIComps (the default repository branch "main" is used here):
 
 ```bash
 git clone https://github.com/opea-project/GenAIComps.git
@@ -52,7 +52,7 @@ git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git
 
 We remind you that when using a specific version of the code, you need to use the README from this version.
 
-- Setting the list of images for the build (from the build file.yaml)
+- #### Setting the list of images for the build (from the build file.yaml)
 
 If you want to deploy a vLLM-based or TGI-based application, then the set of services is installed as follows:
 
@@ -65,13 +65,13 @@ service_list="vllm-rocm llm-textgen codegen codegen-ui"
 service_list="llm-textgen codegen codegen-ui"
 ```
 
-- Optional. Pull TGI Docker Image (Do this if you want to use TGI)
+- #### Optional. Pull TGI Docker Image (Do this if you want to use TGI)
 
 ```bash
 docker pull ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
 ```
 
-- Build Docker Images
+- #### Build Docker Images
 ```bash
 docker compose -f build.yaml build ${service_list} --no-cache
 ```
