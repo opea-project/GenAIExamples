@@ -48,19 +48,20 @@ function start_services() {
     cd $WORKPATH/docker_compose/intel/cpu/xeon/
 
     export http_proxy=${http_proxy}
-    export https_proxy=${http_proxy}
-    export LLM_MODEL_ID="haoranxu/ALMA-13B"
+    export https_proxy=${https_proxy}
+    export LLM_MODEL_ID="mistralai/Mistral-7B-Instruct-v0.3"
     export LLM_ENDPOINT="http://${ip_address}:8008"
+    export LLM_COMPONENT_NAME="OpeaTextGenService"
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
     export MEGA_SERVICE_HOST_IP=${ip_address}
     export LLM_SERVICE_HOST_IP=${ip_address}
     export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:8888/v1/translation"
-    export NGINX_PORT=80
     export FRONTEND_SERVICE_IP=${ip_address}
     export FRONTEND_SERVICE_PORT=5173
     export BACKEND_SERVICE_NAME=translation
     export BACKEND_SERVICE_IP=${ip_address}
     export BACKEND_SERVICE_PORT=8888
+    export NGINX_PORT=80
     export host_ip=${ip_address}
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
@@ -68,16 +69,7 @@ function start_services() {
     # Start Docker Containers
     docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
 
-    n=0
-    # wait long for llm model download
-    until [[ "$n" -ge 500 ]]; do
-        docker logs translation-xeon-vllm-service > ${LOG_PATH}/vllm_service_start.log
-        if grep -q complete ${LOG_PATH}/vllm_service_start.log; then
-            break
-        fi
-        sleep 5s
-        n=$((n+1))
-    done
+    sleep 5s
 }
 
 function validate_services() {
@@ -87,24 +79,27 @@ function validate_services() {
     local DOCKER_NAME="$4"
     local INPUT_DATA="$5"
 
-    local HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL")
-    if [ "$HTTP_STATUS" -eq 200 ]; then
-        echo "[ $SERVICE_NAME ] HTTP status is 200. Checking content..."
+    HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL")
+    HTTP_STATUS=$(echo $HTTP_RESPONSE | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
+    RESPONSE_BODY=$(echo $HTTP_RESPONSE | sed -e 's/HTTPSTATUS\:.*//g')
 
-        local CONTENT=$(curl -s -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL" | tee ${LOG_PATH}/${SERVICE_NAME}.log)
+    docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
 
-        if echo "$CONTENT" | grep -q "$EXPECTED_RESULT"; then
-            echo "[ $SERVICE_NAME ] Content is as expected."
-        else
-            echo "[ $SERVICE_NAME ] Content does not match the expected result: $CONTENT"
-            docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
-            exit 1
-        fi
-    else
+    # check response status
+    if [ "$HTTP_STATUS" -ne "200" ]; then
         echo "[ $SERVICE_NAME ] HTTP status is not 200. Received status was $HTTP_STATUS"
-        docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
         exit 1
+    else
+        echo "[ $SERVICE_NAME ] HTTP status is 200. Checking content..."
     fi
+    # check response body
+    if [[ "$RESPONSE_BODY" != *"$EXPECTED_RESULT"* ]]; then
+        echo "[ $SERVICE_NAME ] Content does not match the expected result: $RESPONSE_BODY"
+        exit 1
+    else
+        echo "[ $SERVICE_NAME ] Content is as expected."
+    fi
+
     sleep 5s
 }
 
@@ -115,25 +110,36 @@ function validate_microservices() {
         "data: " \
         "llm" \
         "translation-xeon-llm-server" \
-        '{"query":"Translate this from Chinese to English:\nChinese: 我爱机器翻译。\nEnglish:"}'
+        '{"query":"    ### System: Please translate the following Golang codes into  Python codes.    ### Original codes:    '\'''\'''\''Golang    \npackage main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n    '\'''\'''\''    ### Translated codes:"}'
 }
 
 function validate_megaservice() {
-    # Curl the Mega Service
+    export BACKEND_SERVICE_PORT=8887
+    export NGINX_PORT=80
+
+    # test the megaservice for code translation
+    validate_services \
+    "${ip_address}:${BACKEND_SERVICE_PORT}/v1/translation" \
+    "print" \
+    "mega-translation" \
+    "translation-xeon-backend-server" \
+    '{"language_from": "Golang","language_to": "Python","source_data": "package main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n}","translate_type":"code"}'
+
+    # test the megaservice for text translation
     validate_services \
     "${ip_address}:${BACKEND_SERVICE_PORT}/v1/translation" \
     "translation" \
     "mega-translation" \
     "translation-xeon-backend-server" \
-    '{"language_from": "Chinese","language_to": "English","source_language": "我爱机器翻译。","translate_type":"text"}'
+    '{"language_from": "Chinese","language_to": "English","source_data": "我爱机器翻译。","translate_type":"text"}'
 
     # test the megeservice via nginx
     validate_services \
-        "${ip_address}:${NGINX_PORT}/v1/translation" \
-        "translation" \
-        "mega-translation-nginx" \
-        "translation-xeon-nginx-server" \
-        '{"language_from": "Chinese","language_to": "English","source_language": "我爱机器翻译。","translate_type":"text"}'
+    "${ip_address}:${NGINX_PORT}/v1/translation" \
+    "print" \
+    "mega-translation-nginx" \
+    "translation-xeon-nginx-server" \
+    '{"language_from": "Golang","language_to": "Python","source_data": "package main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n}","translate_type":"code"}'
 }
 
 function validate_frontend() {

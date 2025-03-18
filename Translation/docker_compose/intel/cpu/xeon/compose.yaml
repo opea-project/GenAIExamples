@@ -50,7 +50,7 @@ services:
       - vllm-service
       - llm
     ports:
-      - "8888:8888"
+      - "${BACKEND_SERVICE_PORT:-8888}:8888"
     environment:
       - no_proxy=${no_proxy}
       - https_proxy=${https_proxy}
@@ -65,7 +65,7 @@ services:
     depends_on:
       - translation-xeon-backend-server
     ports:
-      - "5173:5173"
+      - "${FRONTEND_SERVICE_PORT:-5173}:5173"
     environment:
       - no_proxy=${no_proxy}
       - https_proxy=${https_proxy}
