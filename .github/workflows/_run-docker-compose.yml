@@ -104,7 +104,7 @@ jobs:
 
   compose-test:
     needs: [get-test-case]
-    if: ${{ needs.get-test-case.outputs.test_cases != '' }}
+    if: ${{ needs.get-test-case.outputs.test_cases != '[]' }}
     strategy:
       matrix:
         test_case: ${{ fromJSON(needs.get-test-case.outputs.test_cases) }}
@@ -155,6 +155,7 @@ jobs:
           test_case: ${{ matrix.test_case }}
           use_model_cache: ${{ inputs.use_model_cache }}
         run: |
+          set -x
           cd ${{ github.workspace }}/$example/tests
           if [[ "$IMAGE_REPO" == "" ]]; then export IMAGE_REPO="${OPEA_IMAGE_REPO}opea"; fi
           if [[ "$use_model_cache" == "true" ]]; then
@@ -165,7 +166,7 @@ jobs:
               export model_cache="~/.cache/huggingface/hub"
             fi
           fi
-          if [ -f ${test_case} ]; then timeout 30m bash ${test_case}; else echo "Test script {${test_case}} not found, skip test!"; fi
+          if [ -f "${test_case}" ]; then timeout 30m bash "${test_case}"; else echo "Test script {${test_case}} not found, skip test!"; fi
 
       - name: Clean up container after test
         shell: bash
