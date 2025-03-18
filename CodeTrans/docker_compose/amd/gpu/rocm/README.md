@@ -302,9 +302,9 @@ then we consider the TGI service to be successfully launched
 ### 2. Validate the LLM Service
 
 ```bash
-DATA='{"query":"    ### System: Please translate the following Golang codes into  Python codes.    '\
-'### Original codes:    '\'''\'''\''Golang    \npackage main\n\nimport \"fmt\"\nfunc main() '\
-'{\n    fmt.Println(\"Hello, World!\");\n    '\'''\'''\''    ### Translated codes:"}'
+DATA='{"query":"    ### System: Please translate the following Python codes into  Java codes.    '\
+'### Original codes:    '\'''\'''\''Python    \nprint(\"Hello, World!\");\n    '\'''\'''\''    '\
+'### Translated codes:"}'
 
 curl http://${HOST_IP}:${CODETRANS_LLM_SERVICE_PORT}/v1/chat/completions \
   -X POST \
@@ -314,31 +314,21 @@ curl http://${HOST_IP}:${CODETRANS_LLM_SERVICE_PORT}/v1/chat/completions \
 
 Checking the response from the service. The response should be similar to JSON:
 
-````json
-{
-  "id": "cmpl-4e89a590b1af46bfb37ce8f12b2996f8",
-  "choices": [
-    {
-      "finish_reason": "length",
-      "index": 0,
-      "logprobs": null,
-      "text": " The API should support the following operations:\n\n1. Add a new task to the TODO list.\n2. Remove a task from the TODO list.\n3. Mark a task as completed.\n4. Retrieve the list of all tasks.\n\nThe API should also support the following features:\n\n1. The ability to filter tasks based on their completion status.\n2. The ability to sort tasks based on their priority.\n3. The ability to search for tasks based on their description.\n\nHere is an example of how the API can be used:\n\n```python\ntodo_list = []\napi = TodoListAPI(todo_list)\n\n# Add tasks\napi.add_task(\"Buy groceries\")\napi.add_task(\"Finish homework\")\n\n# Mark a task as completed\napi.mark_task_completed(\"Buy groceries\")\n\n# Retrieve the list of all tasks\nprint(api.get_all_tasks())\n\n# Filter tasks based on completion status\nprint(api.filter_tasks(completed=True))\n\n# Sort tasks based on priority\napi.sort_tasks(priority=\"high\")\n\n# Search for tasks based on description\nprint(api.search_tasks(description=\"homework\"))\n```\n\nIn this example, the `TodoListAPI` class is used to manage the TODO list. The `add_task` method adds a new task to the list, the `mark_task_completed` method",
-      "stop_reason": null,
-      "prompt_logprobs": null
-    }
-  ],
-  "created": 1742270567,
-  "model": "Qwen/Qwen2.5-Coder-7B-Instruct",
-  "object": "text_completion",
-  "system_fingerprint": null,
-  "usage": {
-    "completion_tokens": 256,
-    "prompt_tokens": 37,
-    "total_tokens": 293,
-    "completion_tokens_details": null,
-    "prompt_tokens_details": null
-  }
-}
+````textmate
+data: {"id":"cmpl-c2acd8c385be4f59bae01d1ec31ca617","choices":[{"finish_reason":null,"index":0,"logprobs":null,"text":"   ","stop_reason":null}],"created":1742287740,"model":"Qwen/Qwen2.5-Coder-7B-Instruct","object":"text_completion","system_fingerprint":null,"usage":null}
+data: {"id":"cmpl-c2acd8c385be4f59bae01d1ec31ca617","choices":[{"finish_reason":null,"index":0,"logprobs":null,"text":" ###","stop_reason":null}],"created":1742287740,"model":"Qwen/Qwen2.5-Coder-7B-Instruct","object":"text_completion","system_fingerprint":null,"usage":null}
+data: {"id":"cmpl-c2acd8c385be4f59bae01d1ec31ca617","choices":[{"finish_reason":null,"index":0,"logprobs":null,"text":" Java","stop_reason":null}],"created":1742287740,"model":"Qwen/Qwen2.5-Coder-7B-Instruct","object":"text_completion","system_fingerprint":null,"usage":null}
+data: {"id":"cmpl-c2acd8c385be4f59bae01d1ec31ca617","choices":[{"finish_reason":null,"index":0,"logprobs":null,"text":"\n","stop_reason":null}],"created":1742287740,"model":"Qwen/Qwen2.5-Coder-7B-Instruct","object":"text_completion","system_fingerprint":null,"usage":null}
+data: {"id":"cmpl-c2acd8c385be4f59bae01d1ec31ca617","choices":[{"finish_reason":null,"index":0,"logprobs":null,"text":"","stop_reason":null}],"created":1742287740,"model":"Qwen/Qwen2.5-Coder-7B-Instruct","object":"text_completion","system_fingerprint":null,"usage":null}
+data: {"id":"cmpl-c2acd8c385be4f59bae01d1ec31ca617","choices":[{"finish_reason":null,"index":0,"logprobs":null,"text":".out","stop_reason":null}],"created":1742287740,"model":"Qwen/Qwen2.5-Coder-7B-Instruct","object":"text_completion","system_fingerprint":null,"usage":null}
+data: {"id":"cmpl-c2acd8c385be4f59bae01d1ec31ca617","choices":[{"finish_reason":null,"index":0,"logprobs":null,"text":".println","stop_reason":null}],"created":1742287740,"model":"Qwen/Qwen2.5-Coder-7B-Instruct","object":"text_completion","system_fingerprint":null,"usage":null}
+data: {"id":"cmpl-c2acd8c385be4f59bae01d1ec31ca617","choices":[{"finish_reason":null,"index":0,"logprobs":null,"text":"(\"","stop_reason":null}],"created":1742287740,"model":"Qwen/Qwen2.5-Coder-7B-Instruct","object":"text_completion","system_fingerprint":null,"usage":null}
+data: {"id":"cmpl-c2acd8c385be4f59bae01d1ec31ca617","choices":[{"finish_reason":null,"index":0,"logprobs":null,"text":"Hello","stop_reason":null}],"created":1742287740,"model":"Qwen/Qwen2.5-Coder-7B-Instruct","object":"text_completion","system_fingerprint":null,"usage":null}
+data: {"id":"cmpl-c2acd8c385be4f59bae01d1ec31ca617","choices":[{"finish_reason":null,"index":0,"logprobs":null,"text":",","stop_reason":null}],"created":1742287740,"model":"Qwen/Qwen2.5-Coder-7B-Instruct","object":"text_completion","system_fingerprint":null,"usage":null}
+data: {"id":"cmpl-c2acd8c385be4f59bae01d1ec31ca617","choices":[{"finish_reason":null,"index":0,"logprobs":null,"text":" World","stop_reason":null}],"created":1742287740,"model":"Qwen/Qwen2.5-Coder-7B-Instruct","object":"text_completion","system_fingerprint":null,"usage":null}
+data: {"id":"cmpl-c2acd8c385be4f59bae01d1ec31ca617","choices":[{"finish_reason":null,"index":0,"logprobs":null,"text":"!\");","stop_reason":null}],"created":1742287740,"model":"Qwen/Qwen2.5-Coder-7B-Instruct","object":"text_completion","system_fingerprint":null,"usage":null}
+data: {"id":"cmpl-c2acd8c385be4f59bae01d1ec31ca617","choices":[{"finish_reason":"stop","index":0,"logprobs":null,"text":"","stop_reason":null}],"created":1742287740,"model":"Qwen/Qwen2.5-Coder-7B-Instruct","object":"text_completion","system_fingerprint":null,"usage":null}
+data: [DONE]
 ````
 
 If the service response has a meaningful response in the value of the "choices.text" key,
@@ -347,11 +337,10 @@ then we consider the vLLM service to be successfully launched
 ### 3. Validate the MegaService
 
 ```bash
-DATA='{"messages": "Implement a high-level API for a TODO list application. '\
-'The API takes as input an operation request and updates the TODO list in place. '\
-'If the request is invalid, raise an exception."}'
+DATA='{"language_from": "Python","language_to": "Java","source_code": '\
+'"print(\"Hello, World!\");\n}"}'
 
-curl http://${HOST_IP}:${CODEGEN_BACKEND_SERVICE_PORT}/v1/codetrans \
+curl http://${HOST_IP}:${CODETRANS_BACKEND_SERVICE_PORT}/v1/codetrans \
   -H "Content-Type: application/json" \
   -d "$DATA"
 ```
@@ -359,11 +348,15 @@ curl http://${HOST_IP}:${CODEGEN_BACKEND_SERVICE_PORT}/v1/codetrans \
 Checking the response from the service. The response should be similar to text:
 
 ```textmate
-data: {"id":"cmpl-cc5dc73819c640469f7c7c7424fe57e6","choices":[{"finish_reason":null,"index":0,"logprobs":null,"text":" of","stop_reason":null}],"created":1742270725,"model":"Qwen/Qwen2.5-Coder-7B-Instruct","object":"text_completion","system_fingerprint":null,"usage":null}
-...........
-data: {"id":"cmpl-cc5dc73819c640469f7c7c7424fe57e6","choices":[{"finish_reason":null,"index":0,"logprobs":null,"text":" all","stop_reason":null}],"created":1742270725,"model":"Qwen/Qwen2.5-Coder-7B-Instruct","object":"text_completion","system_fingerprint":null,"usage":null}
-data: {"id":"cmpl-cc5dc73819c640469f7c7c7424fe57e6","choices":[{"finish_reason":null,"index":0,"logprobs":null,"text":" tasks","stop_reason":null}],"created":1742270725,"model":"Qwen/Qwen2.5-Coder-7B-Instruct","object":"text_completion","system_fingerprint":null,"usage":null}
-data: {"id":"cmpl-cc5dc73819c640469f7c7c7424fe57e6","choices":[{"finish_reason":"length","index":0,"logprobs":null,"text":",","stop_reason":null}],"created":1742270725,"model":"Qwen/Qwen2.5-Coder-7B-Instruct","object":"text_completion","system_fingerprint":null,"usage":null}
+data: {"id":"cmpl-b63a51caccd34687b26614eb46c0abc6","choices":[{"finish_reason":null,"index":0,"logprobs":null,"text":"Java","stop_reason":null}],"created":1742287989,"model":"Qwen/Qwen2.5-Coder-7B-Instruct","object":"text_completion","system_fingerprint":null,"usage":null}
+..............
+data: {"id":"cmpl-b63a51caccd34687b26614eb46c0abc6","choices":[{"finish_reason":null,"index":0,"logprobs":null,"text":"\n","stop_reason":null}],"created":1742287989,"model":"Qwen/Qwen2.5-Coder-7B-Instruct","object":"text_completion","system_fingerprint":null,"usage":null}
+data: {"id":"cmpl-b63a51caccd34687b26614eb46c0abc6","choices":[{"finish_reason":null,"index":0,"logprobs":null,"text":"        ","stop_reason":null}],"created":1742287989,"model":"Qwen/Qwen2.5-Coder-7B-Instruct","object":"text_completion","system_fingerprint":null,"usage":null}
+data: {"id":"cmpl-b63a51caccd34687b26614eb46c0abc6","choices":[{"finish_reason":null,"index":0,"logprobs":null,"text":" public","stop_reason":null}],"created":1742287989,"model":"Qwen/Qwen2.5-Coder-7B-Instruct","object":"text_completion","system_fingerprint":null,"usage":null}
+data: {"id":"cmpl-b63a51caccd34687b26614eb46c0abc6","choices":[{"finish_reason":null,"index":0,"logprobs":null,"text":" class","stop_reason":null}],"created":1742287989,"model":"Qwen/Qwen2.5-Coder-7B-Instruct","object":"text_completion","system_fingerprint":null,"usage":null}
+data: {"id":"cmpl-b63a51caccd34687b26614eb46c0abc6","choices":[{"finish_reason":null,"index":0,"logprobs":null,"text":" HelloWorld","stop_reason":null}],"created":1742287989,"model":"Qwen/Qwen2.5-Coder-7B-Instruct","object":"text_completion","system_fingerprint":null,"usage":null}
+data: {"id":"cmpl-b63a51caccd34687b26614eb46c0abc6","choices":[{"finish_reason":null,"index":0,"logprobs":null,"text":" {\n","stop_reason":null}],"created":1742287989,"model":"Qwen/Qwen2.5-Coder-7B-Instruct","object":"text_completion","system_fingerprint":null,"usage":null}
+data: {"id":"cmpl-b63a51caccd34687b26614eb46c0abc6","choices":[{"finish_reason":"length","index":0,"logprobs":null,"text":"            ","stop_reason":null}],"created":1742287989,"model":"Qwen/Qwen2.5-Coder-7B-Instruct","object":"text_completion","system_fingerprint":null,"usage":null}
 data: [DONE]
 ```
 
