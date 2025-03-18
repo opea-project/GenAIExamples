@@ -130,19 +130,19 @@ function validate_microservices() {
 function validate_megaservice() {
     # test the megaservice for text translation
     validate_services \
-    "${TRANSLATION_HOST_IP}:${TRANSLATION_BACKEND_SERVICE_PORT}/v1/translation" \
-    "translation" \
-    "translation-backend-server" \
-    "translation-backend-server" \
-    '{"language_from": "Chinese","language_to": "English","source_language": "我爱机器翻译。","translate_type":"text"}'
+        "${TRANSLATION_HOST_IP}:${TRANSLATION_BACKEND_SERVICE_PORT}/v1/translation" \
+        "translation" \
+        "translation-backend-server" \
+        "translation-backend-server" \
+        '{"language_from": "Chinese","language_to": "English","source_language": "我爱机器翻译。","translate_type":"text"}'
 
     # test the megaservice for code translation
     validate_services \
-    "${TRANSLATION_HOST_IP}:${TRANSLATION_BACKEND_SERVICE_PORT}/v1/translation" \
-    "print" \
-    "translation-backend-server" \
-    "translation-backend-server" \
-    '{"language_from": "Golang","language_to": "Python","source_data": "package main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n}","translate_type":"code"}'
+        "${TRANSLATION_HOST_IP}:${TRANSLATION_BACKEND_SERVICE_PORT}/v1/translation" \
+        "print" \
+        "translation-backend-server" \
+        "translation-backend-server" \
+        '{"language_from": "Golang","language_to": "Python","source_data": "package main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n}","translate_type":"code"}'
 
     # test the megeservice via nginx
     validate_services \

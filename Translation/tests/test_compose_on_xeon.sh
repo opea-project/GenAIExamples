@@ -67,7 +67,7 @@ function start_services() {
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
     # Start Docker Containers
-    docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
+    docker compose -f compose.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
 
     sleep 5s
 }
@@ -116,27 +116,27 @@ function validate_microservices() {
 function validate_megaservice() {
     # test the megaservice for code translation
     validate_services \
-    "${ip_address}:${BACKEND_SERVICE_PORT}/v1/translation" \
-    "print" \
-    "mega-translation" \
-    "translation-xeon-backend-server" \
-    '{"language_from": "Golang","language_to": "Python","source_data": "package main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n}","translate_type":"code"}'
+        "${ip_address}:${BACKEND_SERVICE_PORT}/v1/translation" \
+        "print" \
+        "mega-translation" \
+        "translation-xeon-backend-server" \
+        '{"language_from": "Golang","language_to": "Python","source_data": "package main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n}","translate_type":"code"}'
 
     # test the megaservice for text translation
     validate_services \
-    "${ip_address}:${BACKEND_SERVICE_PORT}/v1/translation" \
-    "translation" \
-    "mega-translation" \
-    "translation-xeon-backend-server" \
-    '{"language_from": "Chinese","language_to": "English","source_data": "我爱机器翻译。","translate_type":"text"}'
+        "${ip_address}:${BACKEND_SERVICE_PORT}/v1/translation" \
+        "translation" \
+        "mega-translation" \
+        "translation-xeon-backend-server" \
+        '{"language_from": "Chinese","language_to": "English","source_data": "我爱机器翻译。","translate_type":"text"}'
 
     # test the megeservice via nginx
     validate_services \
-    "${ip_address}:${NGINX_PORT}/v1/translation" \
-    "print" \
-    "mega-translation-nginx" \
-    "translation-xeon-nginx-server" \
-    '{"language_from": "Golang","language_to": "Python","source_data": "package main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n}","translate_type":"code"}'
+        "${ip_address}:${NGINX_PORT}/v1/translation" \
+        "print" \
+        "mega-translation-nginx" \
+        "translation-xeon-nginx-server" \
+        '{"language_from": "Golang","language_to": "Python","source_data": "package main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n}","translate_type":"code"}'
 }
 
 function validate_frontend() {

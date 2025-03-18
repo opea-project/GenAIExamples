@@ -4,7 +4,7 @@
 services:
   tgi-service:
     image: ghcr.io/huggingface/tgi-gaudi:2.3.1
-    container_name: tgi-gaudi-server
+    container_name: translation-gaudi-tgi-service
     ports:
       - "8008:80"
     volumes:
@@ -34,7 +34,7 @@ services:
     command: --model-id ${LLM_MODEL_ID} --max-input-length 1024 --max-total-tokens 2048
   llm:
     image: ${REGISTRY:-opea}/llm-textgen:${TAG:-latest}
-    container_name: llm-textgen-gaudi-server
+    container_name: translation-gaudi-llm-server
     depends_on:
       tgi-service:
         condition: service_healthy
@@ -47,6 +47,7 @@ services:
       https_proxy: ${https_proxy}
       LLM_ENDPOINT: ${LLM_ENDPOINT}
       LLM_MODEL_ID: ${LLM_MODEL_ID}
+      LLM_COMPONENT_NAME: ${LLM_COMPONENT_NAME}
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       HF_HUB_DISABLE_PROGRESS_BARS: 1
       HF_HUB_ENABLE_HF_TRANSFER: 0
@@ -58,7 +59,7 @@ services:
       - tgi-service
       - llm
     ports:
-      - "8888:8888"
+      - "${BACKEND_SERVICE_PORT:-8888}:8888"
     environment:
       - no_proxy=${no_proxy}
       - https_proxy=${https_proxy}
@@ -73,7 +74,7 @@ services:
     depends_on:
       - translation-gaudi-backend-server
     ports:
-      - "5173:5173"
+      - "${FRONTEND_SERVICE_PORT:-5173}:5173"
     environment:
      - no_proxy=${no_proxy}
       - https_proxy=${https_proxy}
