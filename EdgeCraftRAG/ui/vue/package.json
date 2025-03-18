@@ -28,7 +28,6 @@
     "vue-i18n": "^10.0.5",
     "vue-json-pretty": "^2.4.0",
     "vue-router": "^4.5.0",
-    "vue3-markdown-it": "^1.0.10",
     "ws": "^8.18.0"
   },
   "devDependencies": {
