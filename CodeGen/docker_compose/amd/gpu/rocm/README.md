@@ -104,18 +104,18 @@ Use AMD GPU driver utilities to determine the correct `cardN` and `renderN` IDs 
 
 2. Configure environment variables:
 
-## Set deploy environment variables
+### Set deploy environment variables
 
-### Setting variables in the operating system environment
+#### Setting variables in the operating system environment
 
-#### Set variable HUGGINGFACEHUB_API_TOKEN:
+##### Set variable HUGGINGFACEHUB_API_TOKEN:
 
 ```bash
 ### Replace the string 'your_huggingfacehub_token' with your HuggingFacehub repository access token.
 export HUGGINGFACEHUB_API_TOKEN='your_huggingfacehub_token'
 ```
 
-#### Set variables value in set_env\*\*\*\*.sh file:
+##### Set variables value in set_env\*\*\*\*.sh file:
 
 ```bash
 cd ~/codegen-install/GenAIExamples/CodeGen/docker_compose/amd/gpu/rocm
@@ -148,7 +148,7 @@ Set the values of the variables:
 - **Variables with names like "%%%%\_PORT"** - These variables set the IP port numbers for establishing network connections to the application services.
   The values shown in the file set_env.sh or set_env_vllm they are the values used for the development and testing of the application, as well as configured for the environment in which the development is performed. These values must be configured in accordance with the rules of network access to your environment's server, and must not overlap with the IP ports of other applications that are already in use.
 
-# Set variables with script set_env\*\*\*\*.sh
+#### Set variables with script set_env\*\*\*\*.sh
 
 ```bash
 # If you use vLLM
