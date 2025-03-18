@@ -45,7 +45,7 @@ function start_services() {
     export http_proxy=${http_proxy}
     export https_proxy=${https_proxy}
     export LLM_MODEL_ID="mistralai/Mistral-7B-Instruct-v0.3"
-    export TGI_LLM_ENDPOINT="http://${ip_address}:8008"
+    export LLM_ENDPOINT="http://${ip_address}:8008"
     export LLM_COMPONENT_NAME="OpeaTextGenService"
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
     export MEGA_SERVICE_HOST_IP=${ip_address}
@@ -132,7 +132,7 @@ function validate_megaservice() {
         "${ip_address}:${BACKEND_SERVICE_PORT}/v1/translation" \
         "print" \
         "mega-translation" \
-        "translation-xeon-backend-server" \
+        "translation-gaudi-backend-server" \
         '{"language_from": "Golang","language_to": "Python","source_data": "package main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n}","translate_type":"code"}'
 
     # test the megaservice for text translation
@@ -140,7 +140,7 @@ function validate_megaservice() {
         "${ip_address}:${BACKEND_SERVICE_PORT}/v1/translation" \
         "translation" \
         "mega-translation" \
-        "translation-xeon-backend-server" \
+        "translation-gaudi-backend-server" \
         '{"language_from": "Chinese","language_to": "English","source_data": "我爱机器翻译。","translate_type":"text"}'
 
     # test the megeservice via nginx
@@ -148,7 +148,7 @@ function validate_megaservice() {
         "${ip_address}:${NGINX_PORT}/v1/translation" \
         "print" \
         "mega-translation-nginx" \
-        "translation-xeon-nginx-server" \
+        "translation-gaudi-nginx-server" \
         '{"language_from": "Golang","language_to": "Python","source_data": "package main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n}","translate_type":"code"}'
 
 }
@@ -183,7 +183,7 @@ function validate_frontend() {
 
 function stop_docker() {
     cd $WORKPATH/docker_compose/intel/hpu/gaudi
-    docker compose stop && docker compose rm -f
+    docker compose -f compose_tgi.yaml stop && docker compose rm -f
 }
 
 function main() {
@@ -195,7 +195,7 @@ function main() {
 
     validate_microservices
     validate_megaservice
-#    validate_frontend
+    validate_frontend
 
     stop_docker
     echo y | docker system prune

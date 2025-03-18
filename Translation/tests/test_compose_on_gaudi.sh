@@ -30,9 +30,12 @@ function build_docker_images() {
 
     cd $WORKPATH/docker_image_build
     git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
+    git clone https://github.com/HabanaAI/vllm-fork.git && cd vllm-fork
+    VLLM_VER=$(git describe --tags "$(git rev-list --tags --max-count=1)")
+    git checkout ${VLLM_VER} &> /dev/null && cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="translation translation-ui llm-textgen nginx"
+    service_list="translation translation-ui llm-textgen vllm-gaudi nginx"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker images && sleep 1s
@@ -46,6 +49,10 @@ function start_services() {
     export LLM_MODEL_ID="mistralai/Mistral-7B-Instruct-v0.3"
     export LLM_ENDPOINT="http://${ip_address}:8008"
     export LLM_COMPONENT_NAME="OpeaTextGenService"
+    export NUM_CARDS=1
+    export BLOCK_SIZE=128
+    export MAX_NUM_SEQS=256
+    export MAX_SEQ_LEN_TO_CAPTURE=2048
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
     export MEGA_SERVICE_HOST_IP=${ip_address}
     export LLM_SERVICE_HOST_IP=${ip_address}
@@ -73,6 +80,12 @@ function validate_services() {
     local DOCKER_NAME="$4"
     local INPUT_DATA="$5"
 
+    HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL")
+    HTTP_STATUS=$(echo $HTTP_RESPONSE | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
+    RESPONSE_BODY=$(echo $HTTP_RESPONSE | sed -e 's/HTTPSTATUS\:.*//g')
+
+    docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
+
     # check response status
     if [ "$HTTP_STATUS" -ne "200" ]; then
         echo "[ $SERVICE_NAME ] HTTP status is not 200. Received status was $HTTP_STATUS"
@@ -97,7 +110,7 @@ function validate_microservices() {
         "${ip_address}:9000/v1/chat/completions" \
         "data: " \
         "llm" \
-        "llm-textgen-gaudi-server" \
+        "translation-gaudi-llm-server" \
         '{"query":"Translate this from Chinese to English:\nChinese: 我爱机器翻译。\nEnglish:"}'
 }
 
@@ -107,7 +120,7 @@ function validate_megaservice() {
         "${ip_address}:${BACKEND_SERVICE_PORT}/v1/translation" \
         "print" \
         "mega-translation" \
-        "translation-xeon-backend-server" \
+        "translation-gaudi-backend-server" \
         '{"language_from": "Golang","language_to": "Python","source_data": "package main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n}","translate_type":"code"}'
 
     # test the megaservice for text translation
@@ -115,7 +128,7 @@ function validate_megaservice() {
         "${ip_address}:${BACKEND_SERVICE_PORT}/v1/translation" \
         "translation" \
         "mega-translation" \
-        "translation-xeon-backend-server" \
+        "translation-gaudi-backend-server" \
         '{"language_from": "Chinese","language_to": "English","source_data": "我爱机器翻译。","translate_type":"text"}'
 
     # test the megeservice via nginx
@@ -123,7 +136,7 @@ function validate_megaservice() {
         "${ip_address}:${NGINX_PORT}/v1/translation" \
         "print" \
         "mega-translation-nginx" \
-        "translation-xeon-nginx-server" \
+        "translation-gaudi-nginx-server" \
         '{"language_from": "Golang","language_to": "Python","source_data": "package main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n}","translate_type":"code"}'
 
 }
