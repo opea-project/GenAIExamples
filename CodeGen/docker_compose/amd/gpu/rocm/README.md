@@ -30,8 +30,8 @@ We remind you that when using a specific version of the code, you need to use th
 cd ~/codegen-install/GenAIExamples/CodeGen/docker_image_build
 ```
 
-- Cleaning up the GenAIComps repository if it was previously cloned in this directory. 
-This is necessary if the build was performed earlier and the GenAIComps folder exists and is not empty:
+- Cleaning up the GenAIComps repository if it was previously cloned in this directory.
+  This is necessary if the build was performed earlier and the GenAIComps folder exists and is not empty:
 
 ```bash
 echo Y | rm -R GenAIComps
@@ -43,7 +43,7 @@ echo Y | rm -R GenAIComps
 git clone https://github.com/opea-project/GenAIComps.git
 ```
 
-If you use a specific tag of the GenAIExamples repository, 
+If you use a specific tag of the GenAIExamples repository,
 then you should also use the corresponding tag for GenAIComps. (v1.3 replace with its own value):
 
 ```bash
@@ -57,10 +57,13 @@ We remind you that when using a specific version of the code, you need to use th
 If you want to deploy a vLLM-based or TGI-based application, then the set of services is installed as follows:
 
 #### vLLM-based application
+
 ```bash
 service_list="vllm-rocm llm-textgen codegen codegen-ui"
 ```
+
 #### TGI-based application
+
 ```bash
 service_list="llm-textgen codegen codegen-ui"
 ```
@@ -72,6 +75,7 @@ docker pull ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
 ```
 
 - #### Build Docker Images
+
 ```bash
 docker compose -f build.yaml build ${service_list} --no-cache
 ```
