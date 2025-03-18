@@ -43,7 +43,7 @@ function start_services() {
     cd $WORKPATH/docker_compose/intel/cpu/xeon/
 
     export LLM_MODEL_ID="haoranxu/ALMA-13B"
-    export TGI_LLM_ENDPOINT="http://${ip_address}:8008"
+    export LLM_ENDPOINT="http://${ip_address}:8008"
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
     export MEGA_SERVICE_HOST_IP=${ip_address}
     export LLM_SERVICE_HOST_IP=${ip_address}
@@ -128,7 +128,7 @@ function validate_megaservice() {
     "translation" \
     "mega-translation" \
     "translation-xeon-backend-server" \
-    '{"language_from": "Chinese","language_to": "English","source_language": "我爱机器翻译。"}'
+    '{"language_from": "Chinese","language_to": "English","source_language": "我爱机器翻译。","translate_type":"text"}'
 
     # test the megeservice via nginx
     validate_services \
@@ -136,7 +136,7 @@ function validate_megaservice() {
         "translation" \
         "mega-translation-nginx" \
         "translation-xeon-nginx-server" \
-        '{"language_from": "Chinese","language_to": "English","source_language": "我爱机器翻译。"}'
+        '{"language_from": "Chinese","language_to": "English","source_language": "我爱机器翻译。","translate_type":"text"}'
 }
 
 function validate_frontend() {

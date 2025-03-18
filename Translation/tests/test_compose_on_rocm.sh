@@ -41,9 +41,12 @@ function build_docker_images() {
 function start_services() {
     cd $WORKPATH/docker_compose/amd/gpu/rocm/
 
+    export http_proxy=${http_proxy}
+    export https_proxy=${http_proxy}
+    export TRANSLATION_TGI_SERVICE_PORT=8008
     export TRANSLATION_HOST_IP=${ip_address}
     export TRANSLATION_LLM_MODEL_ID="haoranxu/ALMA-13B"
-    export TRANSLATION_TGI_LLM_ENDPOINT="http://${TRANSLATION_HOST_IP}:8008"
+    export TRANSLATION_TGI_LLM_ENDPOINT="http://${TRANSLATION_HOST_IP}:${TRANSLATION_TGI_SERVICE_PORT}"
     export TRANSLATION_HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
     export TRANSLATION_MEGA_SERVICE_HOST_IP=${TRANSLATION_HOST_IP}
     export TRANSLATION_LLM_SERVICE_HOST_IP=${TRANSLATION_HOST_IP}
@@ -106,7 +109,7 @@ function validate_microservices() {
 
     # tgi for llm service
     validate_services \
-        "${TRANSLATION_HOST_IP}:8008/generate" \
+        "${TRANSLATION_HOST_IP}:${TRANSLATION_TGI_SERVICE_PORT}/generate" \
         "generated_text" \
         "translation-tgi-service" \
         "translation-tgi-service" \
@@ -128,7 +131,7 @@ function validate_megaservice() {
     "translation" \
     "translation-backend-server" \
     "translation-backend-server" \
-    '{"language_from": "Chinese","language_to": "English","source_language": "我爱机器翻译。"}'
+    '{"language_from": "Chinese","language_to": "English","source_language": "我爱机器翻译。","translate_type":"text"}'
 
     # test the megeservice via nginx
     validate_services \
@@ -136,7 +139,7 @@ function validate_megaservice() {
         "translation" \
         "translation-nginx-server" \
         "translation-nginx-server" \
-        '{"language_from": "Chinese","language_to": "English","source_language": "我爱机器翻译。"}'
+        '{"language_from": "Chinese","language_to": "English","source_language": "我爱机器翻译。","translate_type":"text"}'
 }
 
 function validate_frontend() {

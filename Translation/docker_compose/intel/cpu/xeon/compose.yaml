@@ -27,7 +27,7 @@ services:
     image: ${REGISTRY:-opea}/llm-textgen:${TAG:-latest}
     container_name: translation-xeon-llm-server
     depends_on:
-      tgi-service:
+      vllm-service:
         condition: service_healthy
     ports:
       - "9000:9000"
@@ -47,7 +47,7 @@ services:
     image: ${REGISTRY:-opea}/translation:${TAG:-latest}
     container_name: translation-xeon-backend-server
     depends_on:
-      - tgi-service
+      - vllm-service
       - llm
     ports:
       - "8888:8888"
