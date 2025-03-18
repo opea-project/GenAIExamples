@@ -325,10 +325,10 @@ A page should open when you click through to this address:
 
 ![UI start page](../../../../assets/img/ui-starting-page.png)
 
-If a page of this type has opened, then we believe that the service is running and responding, 
+If a page of this type has opened, then we believe that the service is running and responding,
 and we can proceed to functional UI testing.
 
-Let's enter the task for the service in the "Enter promt here" field. 
+Let's enter the task for the service in the "Enter prompt here" field.
 For example, "Write a Python code that returns the current time and date" and press Enter.
 After that, a page with the result of the task should open:
 
