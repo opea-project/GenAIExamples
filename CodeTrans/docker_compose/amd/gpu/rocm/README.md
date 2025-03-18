@@ -259,7 +259,7 @@ All containers should be running and should not restart:
 ```bash
 DATA='{"model": "Qwen/Qwen2.5-Coder-7B-Instruct", "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens": 17}' \
 
-curl http://${HOST_IP}:${CODEGEN_VLLM_SERVICE_PORT}/v1/chat/completions \
+curl http://${HOST_IP}:${CODETRANS_VLLM_SERVICE_PORT}/v1/chat/completions \
   -X POST \
   -d "$DATA" \
   -H 'Content-Type: application/json'
@@ -267,29 +267,9 @@ curl http://${HOST_IP}:${CODEGEN_VLLM_SERVICE_PORT}/v1/chat/completions \
 
 Checking the response from the service. The response should be similar to JSON:
 
-````json
-{
-  "id": "chatcmpl-142f34ef35b64a8db3deedd170fed951",
-  "object": "chat.completion",
-  "created": 1742270316,
-  "model": "Qwen/Qwen2.5-Coder-7B-Instruct",
-  "choices": [
-    {
-      "index": 0,
-      "message": {
-        "role": "assistant",
-        "content": "```python\nfrom typing import Optional, List, Dict, Union\nfrom pydantic import BaseModel, validator\n\nclass OperationRequest(BaseModel):\n    # Assuming OperationRequest is already defined as per the given text\n    pass\n\nclass UpdateOperation(OperationRequest):\n    new_items: List[str]\n\n    def apply_and_maybe_raise(self, updatable_item: \"Updatable todo list\") -> None:\n        # Assuming updatable_item is an instance of Updatable todo list\n        self.validate()\n        updatable_item.add_items(self.new_items)\n\nclass Updatable:\n    # Abstract class for items that can be updated\n    pass\n\nclass TodoList(Updatable):\n    # Class that represents a todo list\n    items: List[str]\n\n    def add_items(self, new_items: List[str]) -> None:\n        self.items.extend(new_items)\n\ndef handle_request(operation_request: OperationRequest) -> None:\n    # Function to handle an operation request\n    if isinstance(operation_request, UpdateOperation):\n        operation_request.apply_and_maybe_raise(get_todo_list_for_update())\n    else:\n        raise ValueError(\"Invalid operation request\")\n\ndef get_todo_list_for_update() -> TodoList:\n    # Function to get the todo list for update\n    # Assuming this function returns the",
-        "tool_calls": []
-      },
-      "logprobs": null,
-      "finish_reason": "length",
-      "stop_reason": null
-    }
-  ],
-  "usage": { "prompt_tokens": 66, "total_tokens": 322, "completion_tokens": 256, "prompt_tokens_details": null },
-  "prompt_logprobs": null
-}
-````
+```json
+{"id":"chatcmpl-9080fdc16f0f4f43a4e1b0de1e29af1f","object":"chat.completion","created":1742286287,"model":"Qwen/Qwen2.5-Coder-7B-Instruct","choices":[{"index":0,"message":{"role":"assistant","content":"Deep Learning is a subset of Machine Learning that encompasses a wide range of algorithms and models","tool_calls":[]},"logprobs":null,"finish_reason":"length","stop_reason":null}],"usage":{"prompt_tokens":34,"total_tokens":51,"completion_tokens":17,"prompt_tokens_details":null},"prompt_logprobs":null}
+```
 
 If the service response has a meaningful response in the value of the "choices.message.content" key,
 then we consider the vLLM service to be successfully launched
@@ -322,13 +302,11 @@ then we consider the TGI service to be successfully launched
 ### 2. Validate the LLM Service
 
 ```bash
-DATA='{"query":"Implement a high-level API for a TODO list application. '\
-'The API takes as input an operation request and updates the TODO list in place. '\
-'If the request is invalid, raise an exception.",'\
-'"max_tokens":256,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,'\
-'"repetition_penalty":1.03,"stream":false}'
+DATA='{"query":"    ### System: Please translate the following Golang codes into  Python codes.    '\
+'### Original codes:    '\'''\'''\''Golang    \npackage main\n\nimport \"fmt\"\nfunc main() '\
+'{\n    fmt.Println(\"Hello, World!\");\n    '\'''\'''\''    ### Translated codes:"}'
 
-curl http://${HOST_IP}:${CODEGEN_LLM_SERVICE_PORT}/v1/chat/completions \
+curl http://${HOST_IP}:${CODETRANS_LLM_SERVICE_PORT}/v1/chat/completions \
   -X POST \
   -d "$DATA" \
   -H 'Content-Type: application/json'

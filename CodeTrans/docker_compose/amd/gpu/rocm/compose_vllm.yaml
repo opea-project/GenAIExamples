@@ -70,6 +70,7 @@ services:
       http_proxy: ${http_proxy}
       MEGA_SERVICE_HOST_IP: ${HOST_IP}
       LLM_SERVICE_HOST_IP: ${HOST_IP}
+      LLM_SERVICE_PORT: ${CODETRANS_LLM_SERVICE_PORT}
     ipc: host
     restart: always
   codetrans-ui-server:
