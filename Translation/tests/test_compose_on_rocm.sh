@@ -135,7 +135,7 @@ function validate_megaservice() {
         "translation" \
         "translation-backend-server" \
         "translation-backend-server" \
-        '{"language_from": "Chinese","language_to": "English","source_language": "我爱机器翻译。","translate_type":"text"}'
+        '{"language_from": "Chinese","language_to": "English","source_data": "我爱机器翻译。","translate_type":"text"}'
 
     # test the megaservice for code translation
     validate_services \
@@ -151,7 +151,7 @@ function validate_megaservice() {
         "translation" \
         "translation-nginx-server" \
         "translation-nginx-server" \
-        '{"language_from": "Chinese","language_to": "English","source_language": "我爱机器翻译。","translate_type":"text"}'
+        '{"language_from": "Chinese","language_to": "English","source_data": "我爱机器翻译。","translate_type":"text"}'
 }
 
 function validate_frontend() {
