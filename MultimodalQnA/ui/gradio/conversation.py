@@ -44,6 +44,8 @@ class Conversation:
 
     def get_prompt(self, is_very_first_query):
         conv_dict = [{'role': 'user', 'content': []}]
+        caption_flag = True
+        is_image_query = False
         
         for record in self.chatbot_history:
             role = record['role']
@@ -54,6 +56,7 @@ class Conversation:
                 if conv_dict[-1]['role'] != 'user':
                     conv_dict.append({'role': 'user', 'content': []})
             elif role == 'assistant':
+                caption_flag = False
                 # Check if last entry of conv_dict has role assistant
                 if conv_dict[-1]['role'] != 'assistant':
                     conv_dict.append({'role': 'assistant', 'content': []})
@@ -61,13 +64,20 @@ class Conversation:
             # Add content to the last conv_dict record. The single space has only effect on first image-only
             # query for the similarity search results to get expected response.
             if isinstance(content, str):
-                conv_dict[-1]['content'].append({'type': 'text', 'text': content + self._template_caption() + " "})
+                if caption_flag:
+                    content += " " + self._template_caption()
+                conv_dict[-1]['content'].append({'type': 'text', 'text': content})
             
             if isinstance(content, dict) and 'path' in content:
                 if Path(content['path']).suffix in GRADIO_IMAGE_FORMATS:
+                    is_image_query = True
                     conv_dict[-1]['content'].append({'type': 'image_url', 'image_url': {'url': get_b64_frame_from_timestamp(content['path'], 0)}})
                 if Path(content['path']).suffix in GRADIO_AUDIO_FORMATS:
                     conv_dict[-1]['content'].append({'type': 'audio', 'audio': convert_audio_to_base64(content['path'])})
+            
+            # include the image from the assistant's response given the user's is not a image query
+            if not is_image_query and caption_flag and self.image:
+                conv_dict[-1]['content'].append({'type': 'image_url', 'image_url': {'url': get_b64_frame_from_timestamp(self.image, 0)}})
                                         
         return conv_dict        
 
