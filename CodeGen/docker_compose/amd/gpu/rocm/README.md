@@ -51,6 +51,8 @@ The list of images should include:
 - opea/codegen:latest
 - opea/codegen-ui:latest
 
+---
+
 ## Deploy the CodeGen Application
 
 ### Docker Compose Configuration for AMD GPUs
@@ -91,18 +93,6 @@ security_opt:
 
 **How to Identify GPU Device IDs:**
 Use AMD GPU driver utilities to determine the correct `cardN` and `renderN` IDs for your GPU.
-
----
-
-### Launch the Application
-
-1. Navigate to the Docker Compose directory:
-
-   ```bash
-   cd GenAIExamples/CodeGen/docker_compose/amd/gpu/rocm
-   ```
-
-2. Configure environment variables:
 
 ### Set deploy environment variables
 
@@ -181,6 +171,8 @@ If you use TGI:
 - codegen-llm-server
 - codegen-backend-server
 - codegen-ui-server
+
+---
 
 ## Validate the Services
 
