@@ -350,7 +350,7 @@ function validate_megaservice() {
         '"time_of_frame_ms":' \
         "multimodalqna" \
         "multimodalqna-backend-server" \
-        '{"messages": [{"role": "user", "content": [{"type": "text", "text": "hello, "}, {"type": "image_url", "image_url": {"url": "https://www.ilankelman.org/stopsigns/australia.jpg"}}]}, {"role": "assistant", "content": "opea project! "}, {"role": "user", "content": "chao, "}], "max_tokens": 10, "modalities": ["text", "audio"]}'
+        '{"messages": [{"role": "user", "content": [{"type": "text", "text": "hello, "}, {"type": "image_url", "image_url": {"url": "https://www.ilankelman.org/stopsigns/australia.jpg"}}]}], "max_tokens": 10, "modalities": ["text", "audio"]}'
     echo "Validating megaservice with follow-up query"
     validate_service \
         "http://${host_ip}:${MEGA_SERVICE_PORT}/v1/multimodalqna" \
