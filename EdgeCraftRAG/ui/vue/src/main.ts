@@ -11,7 +11,6 @@ import { antConfig } from "@/utils/other";
 import dayjs from "dayjs";
 import "dayjs/locale/en";
 import "dayjs/locale/zh-cn";
-import "highlight.js/styles/monokai.css";
 import "@/assets/iconFont/iconfont.css";
 import { Local } from "@/utils/storage";
 
