@@ -18,6 +18,11 @@ services:
       HF_HUB_ENABLE_HF_TRANSFER: 0
       WILM_USE_TRITON_FLASH_ATTENTION: 0
       PYTORCH_JIT: 0
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://${HOST_IP}:${CODEGEN_VLLM_SERVICE_PORT:-8028}/health || exit 1" ]
+      interval: 10s
+      timeout: 10s
+      retries: 100
     volumes:
       - "./data:/data"
     shm_size: 20G
@@ -50,11 +55,6 @@ services:
       HUGGINGFACEHUB_API_TOKEN: ${CODEGEN_HUGGINGFACEHUB_API_TOKEN}
       HF_TOKEN: ${CODEGEN_HUGGINGFACEHUB_API_TOKEN}
       LLM_COMPONENT_NAME: "OpeaTextGenService"
-    healthcheck:
-      test: [ "CMD-SHELL", "curl -f http://${HOST_IP}:${CODEGEN_VLLM_SERVICE_PORT:-8028}/health || exit 1" ]
-      interval: 10s
-      timeout: 10s
-      retries: 100
     restart: unless-stopped
   codegen-backend-server:
     image: ${REGISTRY:-opea}/codegen:${TAG:-latest}
