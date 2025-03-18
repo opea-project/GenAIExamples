@@ -65,12 +65,6 @@ services:
       dockerfile: comps/asr/src/integrations/dependency/whisper/Dockerfile
     extends: multimodalqna
     image: ${REGISTRY:-opea}/whisper:${TAG:-latest}
-  speecht5-gaudi:
-    build:
-      context: GenAIComps
-      dockerfile: comps/tts/src/integrations/dependency/speecht5/Dockerfile.intel_hpu
-    extends: multimodalqna
-    image: ${REGISTRY:-opea}/speecht5-gaudi:${TAG:-latest}
   speecht5:
     build:
       context: GenAIComps
