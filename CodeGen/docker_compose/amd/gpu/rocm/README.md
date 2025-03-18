@@ -230,14 +230,14 @@ docker compose -f compose.yaml up -d
 
 All containers should be running and should not restart:
 
-If you use vLLM:
+##### If you use vLLM:
 
 - codegen-vllm-service
 - codegen-llm-server
 - codegen-backend-server
 - codegen-ui-server
 
-If you use TGI:
+##### If you use TGI:
 
 - codegen-tgi-service
 - codegen-llm-server
