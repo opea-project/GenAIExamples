@@ -7,6 +7,8 @@ import { SyntheticEvent, useEffect, useState } from 'react'
 import { useAppDispatch, useAppSelector } from '../../redux/store'
 import { conversationSelector, deleteInDataSource, getAllFilesInDataSource, submitDataSourceURL, uploadFile } from '../../redux/Conversation/ConversationSlice'
 import styleClasses from './dataSource.module.scss'
+import keycloak from '../../keycloack'
+import { ADMIN } from '../../common/constant'
 
 
 
@@ -16,7 +18,7 @@ export default function DataSource() {
   const [url, setURL] = useState<string>("");
   const dispatch = useAppDispatch()
   const { filesInDataSource } = useAppSelector(conversationSelector)
-  
+
   const handleFileUpload = () => {
     if (file)
       dispatch(uploadFile({ file }))
@@ -32,12 +34,12 @@ export default function DataSource() {
   }
 
   const handleDelete = (file: string) => {
-    dispatch(deleteInDataSource({file}))
+    dispatch(deleteInDataSource({ file }))
   }
 
-  useEffect(()=>{
-    dispatch(getAllFilesInDataSource({knowledgeBaseId:"default"}))
-  },[])
+  useEffect(() => {
+    dispatch(getAllFilesInDataSource({ knowledgeBaseId: "default" }))
+  }, [])
 
   return (
     <div className={styleClasses.dataSourceWrapper}>
@@ -50,25 +52,25 @@ export default function DataSource() {
 
 
       <Container styles={{
-        root: { paddingTop: '40px', display:'flex', flexDirection:'column', alignItems:'center' }
+        root: { paddingTop: '40px', display: 'flex', flexDirection: 'column', alignItems: 'center' }
       }}>
-        <Button.Group styles={{ group:{alignSelf:'center'}}} >
+        <Button.Group styles={{ group: { alignSelf: 'center' } }} >
           <Button variant={isFile ? 'filled' : 'default'} onClick={() => setIsFile(true)}>Upload File</Button>
           <Button variant={!isFile ? 'filled' : 'default'} onClick={() => setIsFile(false)}>Use Link</Button>
         </Button.Group>
       </Container>
 
-      <Container styles={{root:{paddingTop: '40px'}}}>
+      <Container styles={{ root: { paddingTop: '40px' } }}>
         <div>
           {isFile ? (
             <>
-              <FileInput value={file} onChange={setFile} placeholder="Choose File" description={"choose a file to upload for RAG"}/>
-              <Button style={{marginTop:'5px'}} onClick={handleFileUpload} disabled={!file}>Upload</Button>
+              <FileInput value={file} onChange={setFile} placeholder="Choose File" disabled={!keycloak.hasRealmRole(ADMIN)} description={"choose a file to upload for RAG"} />
+              <Button style={{ marginTop: '5px' }} onClick={handleFileUpload} disabled={!file}>Upload</Button>
             </>
           ) : (
             <>
-              <TextInput value={url} onChange={handleChange} placeholder='URL' description={"Use semicolons (;) to separate multiple URLs."} />
-                <Button style={{ marginTop: '5px' }} onClick={handleSubmit} disabled={!url}>Upload</Button>
+              <TextInput value={url} onChange={handleChange} placeholder='URL' disabled={!keycloak.hasRealmRole(ADMIN)} description={"Use semicolons (;) to separate multiple URLs."} />
+              <Button style={{ marginTop: '5px' }} onClick={handleSubmit} disabled={!url}>Upload</Button>
             </>
           )}
         </div>
@@ -77,16 +79,17 @@ export default function DataSource() {
         <Title order={2} styles={{ root: { margin: '10px' } }}>
           Files
         </Title>
-        {filesInDataSource.map(file=> {
+        {filesInDataSource.map(file => {
           return (
-            <div style={{display:'flex' }}>
+            <div style={{ display: 'flex' }}>
               <IconFile />
               <Text>{file.name}</Text>
-              <ActionIcon onClick={()=>handleDelete(file.name)} size={32} variant="default">
+              <ActionIcon onClick={() => handleDelete(file.name)} disabled={!keycloak.hasRealmRole(ADMIN)} size={32} variant="default">
                 <IconTrash />
-              </ActionIcon>              
+              </ActionIcon>
             </div>
-        )})}
+          )
+        })}
       </Container>
     </div>
   )
