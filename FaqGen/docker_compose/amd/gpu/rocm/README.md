@@ -90,17 +90,17 @@
 
   ##### vLLM-based application:
 
-    - opea/vllm-rocm:latest
-    - opea/llm-faqgen:latest
-    - opea/faqgen:latest
-    - opea/faqgen-ui:latest
+  - opea/vllm-rocm:latest
+  - opea/llm-faqgen:latest
+  - opea/faqgen:latest
+  - opea/faqgen-ui:latest
 
   ##### TGI-based application:
 
-    - ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
-    - opea/llm-faqgen:latest
-    - opea/faqgen:latest
-    - opea/faqgen-ui:latest
+  - ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
+  - opea/llm-faqgen:latest
+  - opea/faqgen:latest
+  - opea/faqgen-ui:latest
 
 ---
 
@@ -422,8 +422,6 @@ docker compose -f compose_vllm.yaml down
 cd ~/faqgen-install/GenAIExamples/FaqGen/docker_compose/amd/gpu/rocm
 docker compose -f compose.yaml down
 ```
-
-
 
 # Build and deploy FaqGen Application on AMD GPU (ROCm)
 
