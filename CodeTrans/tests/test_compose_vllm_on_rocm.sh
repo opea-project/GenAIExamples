@@ -112,7 +112,7 @@ function validate_microservices() {
         "codetrans-vllm-service" \
         "codetrans-vllm-service" \
         '{"model": "Qwen/Qwen2.5-Coder-7B-Instruct", "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens": 17}'
-
+    sleep 10
     # llm microservice
     validate_services \
         "${ip_address}:${CODETRANS_LLM_SERVICE_PORT}/v1/chat/completions" \
