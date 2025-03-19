@@ -16,7 +16,7 @@ services:
       host_ip: ${host_ip}
       DOCSUM_TGI_SERVICE_PORT: ${DOCSUM_TGI_SERVICE_PORT}
     healthcheck:
-      test: [ "CMD-SHELL", "curl -f http://localhost:80/health || exit 1" ]
+      test: [ "CMD-SHELL", "curl -f http://${HOST_IP}:${DOCSUM_TGI_SERVICE_PORT}/health || exit 1" ]
       interval: 10s
       timeout: 10s
       retries: 100
