@@ -253,13 +253,13 @@ class MultimodalQnAService:
 
         response = response.json()
         return response["asr_result"]
-    
+
     def convert_text_to_audio(self, text):
         if isinstance(text, dict):
             input_dict = {"text": text["text"]}
         else:
             input_dict = {"text": text}
-        
+
         response = requests.post(TTS_ENDPOINT, data=json.dumps(input_dict))
 
         if response.status_code != 200:

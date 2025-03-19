@@ -16,18 +16,18 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from gradio_pdf import PDF
 from utils import (
-    build_logger,
-    convert_base64_to_audio,
     GRADIO_AUDIO_FORMATS,
     GRADIO_IMAGE_FORMATS,
+    TMP_DIR,
+    build_logger,
+    convert_base64_to_audio,
     make_temp_image,
     server_error_msg,
     split_video,
-    TMP_DIR
 )
 
-IMAGE_FORMATS = ['.png', '.gif', '.jpg', '.jpeg']
-AUDIO_FORMATS = ['.wav', '.mp3']
+IMAGE_FORMATS = [".png", ".gif", ".jpg", ".jpeg"]
+AUDIO_FORMATS = [".wav", ".mp3"]
 
 logger = build_logger("gradio_web_server", "gradio_web_server.log")
 logflag = os.getenv("LOGFLAG", False)
@@ -81,11 +81,11 @@ def clear_history(state, request: gr.Request):
 def add_text(state, multimodal_textbox, request: gr.Request):
     text = multimodal_textbox["text"]
     files = multimodal_textbox["files"]
-    
+
     image_file, audio_file = None, None
-    
+
     text = text.strip()
-    
+
     if not text and not files:
         state.skip_next = True
         return (state, state.to_gradio_chatbot(), None) + (no_change_btn,) * 1
@@ -93,71 +93,52 @@ def add_text(state, multimodal_textbox, request: gr.Request):
     text = text[:2000]  # Hard cut-off
 
     state.skip_next = False
-    
+
     if files:
         if Path(files[0]).suffix in GRADIO_IMAGE_FORMATS:
             image_file = files[0]
         if Path(files[0]).suffix in GRADIO_AUDIO_FORMATS or len(files) > 1:
             audio_file = files[-1]  # Guaranteed that last file would be recorded audio
-    
+
     # Add to chatbot history
     if image_file:
         state.image_query_file = image_file
-        state.chatbot_history.append({
-            "role": state.roles[0],
-            "content": {"path": image_file}
-        })
+        state.chatbot_history.append({"role": state.roles[0], "content": {"path": image_file}})
     if audio_file:
         state.audio_query_file = audio_file
-        state.chatbot_history.append({
-            "role": state.roles[0],
-            "content": {"path": audio_file}
-        })
-    
-    state.chatbot_history.append({
-        "role": state.roles[0],
-        "content": text
-    }) 
-    
+        state.chatbot_history.append({"role": state.roles[0], "content": {"path": audio_file}})
+
+    state.chatbot_history.append({"role": state.roles[0], "content": text})
+
     logger.info(f"add_text. ip: {request.client.host}. len: {len(text)}")
-    
-    return (
-        state,
-        state.to_gradio_chatbot(),
-        gr.MultimodalTextbox(value=None)
-    ) + (disable_btn,) * 1
+
+    return (state, state.to_gradio_chatbot(), gr.MultimodalTextbox(value=None)) + (disable_btn,) * 1
 
 
 def http_bot(state, audio_response_toggler, request: gr.Request):
     global gateway_addr
     logger.info(f"http_bot. ip: {request.client.host}")
     url = gateway_addr
-    
+
     if state.skip_next:
         # This generate call is skipped due to invalid inputs
         yield (state, state.to_gradio_chatbot(), None, None, None) + (no_change_btn,) * 1
         return
-    
-    is_very_first_query = all(True if h['role'] == 'user' else False for h in state.chatbot_history)
-    
+
+    is_very_first_query = all(True if h["role"] == "user" else False for h in state.chatbot_history)
+
     # Construct prompt
     prompt = state.get_prompt(is_very_first_query)
-    
+
     modalities = ["text", "audio"] if audio_response_toggler else ["text"]
 
     # Make requests
-    pload = {
-        "messages": prompt,
-        "modalities": modalities
-    }
-    
-    state.chatbot_history.append({
-        "role": state.roles[1],
-        "content": "▌"
-    })
-    
+    pload = {"messages": prompt, "modalities": modalities}
+
+    state.chatbot_history.append({"role": state.roles[1], "content": "▌"})
+
     yield (state, state.to_gradio_chatbot(), state.split_video, state.image, state.pdf) + (disable_btn,) * 1
-    
+
     if logflag:
         logger.info(f"==== request ====\n{pload}")
     logger.info(f"==== url request ====\n{gateway_addr}")
@@ -182,7 +163,7 @@ def http_bot(state, audio_response_toggler, request: gr.Request):
             if audio_response_toggler:
                 if choice["message"]["audio"]:
                     audio_response = choice["message"]["audio"]["data"]
-                    
+
             if (
                 is_very_first_query
                 and not state.video_file
@@ -221,31 +202,37 @@ def http_bot(state, audio_response_toggler, request: gr.Request):
                     state.pdf = output_pdf_path
         else:
             raise requests.exceptions.RequestException
-        
+
     except requests.exceptions.RequestException as e:
         if logflag:
-            logger.info(f"Request Exception occured:\n{str(e)}")
-        
+            logger.info(f"Request Exception occurred:\n{str(e)}")
+
         gr.Error("Request exception occurred. See logs for details.")
-        
+
         yield (state, state.to_gradio_chatbot(), None, None, None) + (enable_btn,)
         return
-    
+
     if audio_response:
-        state.chatbot_history[-1]["content"] = {'path': convert_base64_to_audio(audio_response)}
+        state.chatbot_history[-1]["content"] = {"path": convert_base64_to_audio(audio_response)}
     else:
         state.chatbot_history[-1]["content"] = message
-    
+
     yield (
         state,
         state.to_gradio_chatbot(),
         gr.Video(state.split_video, visible=state.split_video is not None),
         gr.Image(state.image, visible=state.image is not None),
-        PDF(state.pdf, visible=state.pdf is not None, interactive=False, starting_page=int(state.time_of_frame_ms) if state.time_of_frame_ms else 0),
+        PDF(
+            state.pdf,
+            visible=state.pdf is not None,
+            interactive=False,
+            starting_page=int(state.time_of_frame_ms) if state.time_of_frame_ms else 0,
+        ),
     ) + (enable_btn,) * 1
 
     logger.info(f"{state.chatbot_history[-1]['content']}")
     return
+
 
 def ingest_gen_transcript(filepath, filetype, request: gr.Request):
     yield (
@@ -500,14 +487,10 @@ def get_files():
         files = response.json()
         if files:
             html_content = "<ul>" + "".join(f"<li>{item}</li>" for item in files) + "</ul>"
-            yield (
-                gr.HTML(html_content, visible=True, max_height=200)
-            )
+            yield (gr.HTML(html_content, visible=True, max_height=200))
             return
         else:
-            yield (
-                gr.HTML("Vector store is empty.", visible=True)
-            )
+            yield (gr.HTML("Vector store is empty.", visible=True))
             return
     except Exception as e:
         logger.info(f"Error getting files from vector store: {str(e)}")
@@ -567,31 +550,34 @@ with gr.Blocks() as upload_video:
 
 with gr.Blocks() as upload_image:
     gr.Markdown("# Ingest Images Using Generated or Custom Captions")
-    gr.Markdown("Use this interface to ingest an image and generate a caption for it. If uploading a caption, populate it before the image.")
+    gr.Markdown(
+        "Use this interface to ingest an image and generate a caption for it. If uploading a caption, populate it before the image."
+    )
 
     text_caption_label = "Text Caption"
     audio_caption_label = "Voice Audio Caption ({}, or microphone)".format(", ".join(AUDIO_FORMATS))
+
     def select_upload_type(choice, request: gr.Request):
         if choice == "gen_caption":
             return (
                 gr.Image(sources="upload", visible=True),
                 gr.Image(sources="upload", visible=False),
                 gr.Textbox(visible=False, interactive=True, label=text_caption_label),
-                gr.Audio(visible=False, type="filepath", label=audio_caption_label)
+                gr.Audio(visible=False, type="filepath", label=audio_caption_label),
             )
         elif choice == "custom_caption":
             return (
                 gr.Image(sources="upload", visible=False),
                 gr.Image(sources="upload", visible=True),
                 gr.Textbox(visible=True, interactive=True, label=text_caption_label),
-                gr.Audio(visible=False, type="filepath", label=audio_caption_label)
+                gr.Audio(visible=False, type="filepath", label=audio_caption_label),
             )
         else:
             return (
                 gr.Image(sources="upload", visible=False),
                 gr.Image(sources="upload", visible=True),
                 gr.Textbox(visible=False, interactive=True, label=text_caption_label),
-                gr.Audio(visible=True, type="filepath", label=audio_caption_label)
+                gr.Audio(visible=True, type="filepath", label=audio_caption_label),
             )
 
     def verify_audio_caption_type(file, request: gr.Request):
@@ -599,15 +585,12 @@ with gr.Blocks() as upload_image:
         if audio_type not in AUDIO_FORMATS:
             return (
                 None,
-                gr.Textbox(
-                    visible=True,
-                    value="The audio file format must be {}".format(" or ".join(AUDIO_FORMATS))
-                )
+                gr.Textbox(visible=True, value="The audio file format must be {}".format(" or ".join(AUDIO_FORMATS))),
             )
         else:
             return (
                 gr.Audio(value=file, visible=True, type="filepath", label=audio_caption_label),
-                gr.Textbox(visible=False, value=None)
+                gr.Textbox(visible=False, value=None),
             )
 
     with gr.Row():
@@ -619,7 +602,7 @@ with gr.Blocks() as upload_image:
                 [
                     ("Auto-generate a caption", "gen_caption"),
                     ("Upload a text caption (populate before image)", "custom_caption"),
-                    ("Upload an audio caption (populate before image)", "custom_audio_caption")
+                    ("Upload an audio caption (populate before image)", "custom_audio_caption"),
                 ],
                 label="Caption Options",
                 info="How should captions be ingested?",
@@ -628,21 +611,21 @@ with gr.Blocks() as upload_image:
             custom_caption = gr.Textbox(visible=False, interactive=True, label=text_caption_label)
             custom_caption_audio = gr.Audio(visible=False, type="filepath", label=audio_caption_label)
             text_upload_result = gr.Textbox(visible=False, interactive=False, label="Upload Status")
-        custom_caption_audio.input(verify_audio_caption_type, [custom_caption_audio], [custom_caption_audio, text_upload_result])
+        custom_caption_audio.input(
+            verify_audio_caption_type, [custom_caption_audio], [custom_caption_audio, text_upload_result]
+        )
         image_upload_cap.upload(
             ingest_gen_caption, [image_upload_cap, gr.Textbox(value="image", visible=False)], [text_upload_result]
         )
         image_upload_cap.clear(hide_text, [], [text_upload_result])
         image_upload_text.upload(
-            ingest_with_caption,
-            [image_upload_text, custom_caption, custom_caption_audio],
-            [text_upload_result]
+            ingest_with_caption, [image_upload_text, custom_caption, custom_caption_audio], [text_upload_result]
         ).then(clear_captions, [], [custom_caption, custom_caption_audio])
         image_upload_text.clear(hide_text, [], [text_upload_result])
         text_options_radio.change(
             select_upload_type,
             [text_options_radio],
-            [image_upload_cap, image_upload_text, custom_caption, custom_caption_audio]
+            [image_upload_cap, image_upload_text, custom_caption, custom_caption_audio],
         )
 
 with gr.Blocks() as upload_audio:
@@ -687,7 +670,7 @@ with gr.Blocks() as qna:
                         show_label=False,
                         file_types=GRADIO_IMAGE_FORMATS + GRADIO_AUDIO_FORMATS,
                         sources=["microphone", "upload"],
-                        placeholder="Text, Image & Audio Query"
+                        placeholder="Text, Image & Audio Query",
                     )
                 with gr.Column(scale=1, min_width=150):
                     with gr.Row():
@@ -704,17 +687,9 @@ with gr.Blocks() as qna:
     )
 
     multimodal_textbox.submit(
-        add_text,
-        [state, multimodal_textbox],
-        [state, chatbot, multimodal_textbox, clear_btn]
-    ).then(
-        http_bot,
-        [state, audio_response_toggler],
-        [state, chatbot, video, image, pdf, clear_btn]
-    ).then(
-        lambda: gr.MultimodalTextbox(interactive=True),
-        None,
-        [multimodal_textbox]
+        add_text, [state, multimodal_textbox], [state, chatbot, multimodal_textbox, clear_btn]
+    ).then(http_bot, [state, audio_response_toggler], [state, chatbot, video, image, pdf, clear_btn]).then(
+        lambda: gr.MultimodalTextbox(interactive=True), None, [multimodal_textbox]
     )
 
 with gr.Blocks() as vector_store:

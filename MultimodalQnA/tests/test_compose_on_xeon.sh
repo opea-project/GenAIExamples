@@ -76,7 +76,7 @@ function setup_env() {
     export WHISPER_MODEL="base"
     export WHISPER_SERVER_ENDPOINT="http://${host_ip}:${WHISPER_PORT}/v1/asr"
     export TTS_PORT=7055
-    export TTS_ENDPOINT="http://${host_ip}:${TTS_PORT}/v1/tts" 
+    export TTS_ENDPOINT="http://${host_ip}:${TTS_PORT}/v1/tts"
     export REDIS_DB_PORT=6379
     export REDIS_INSIGHTS_PORT=8001
     export REDIS_URL="redis://${host_ip}:${REDIS_DB_PORT}"
@@ -305,7 +305,7 @@ function validate_microservices() {
         "Data preparation succeeded" \
         "dataprep-multimodal-redis-caption" \
         "dataprep-multimodal-redis"
-    
+
     echo "Validating Text to speech service"
     validate_service \
         "${TTS_ENDPOINT}" \
@@ -313,7 +313,7 @@ function validate_microservices() {
         "speecht5-service" \
         "speecht5-service" \
         '{"text": "Who are you?"}'
- 
+
 
     sleep 3m
 }

@@ -447,6 +447,7 @@ curl http://${host_ip}:${MEGA_SERVICE_PORT}/v1/multimodalqna  \
 ```
 
 Test the MegaService with a back and forth conversation between the user and assistant including a text to speech response from the assistant using `"modalities": ["text", "audio"]'`:
+
 ```bash
 curl http://${host_ip}:${MEGA_SERVICE_PORT}/v1/multimodalqna \
     -H "Content-Type: application/json" \

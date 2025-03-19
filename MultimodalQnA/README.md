@@ -98,20 +98,20 @@ In the below, we provide a table that describes for each microservice component 
 <details>
 <summary><b>Gaudi and Xeon default compose.yaml settings</b></summary>
 
-| MicroService | Open Source Project   | HW    | Port | Endpoint                                                    |
-| ------------ | --------------------- | ----- | ---- | ----------------------------------------------------------- |
-| Dataprep     | Redis, Langchain, TGI | Xeon  | 6007 | /v1/generate_transcripts, /v1/generate_captions, /v1/ingest |
-| Embedding    | Langchain             | Xeon  | 6000 | /v1/embeddings                                              |
-| LVM          | Langchain, Transformers | Xeon | 9399 | /v1/lvm                                                    |
-| Retriever    | Langchain, Redis      | Xeon  | 7000 | /v1/retrieval                                               |
-| SpeechT5     | Transformers          | Xeon  | 7055 | /v1/tts                                                     |
-| Whisper      | Transformers          | Xeon  | 7066 | /v1/asr                                                     |
-| Dataprep     | Redis, Langchain, TGI | Gaudi | 6007 | /v1/generate_transcripts, /v1/generate_captions, /v1/ingest |
-| Embedding    | Langchain             | Gaudi | 6000 | /v1/embeddings                                              |
-| LVM          | Langchain, TGI        | Gaudi | 9399 | /v1/lvm                                                     |
-| Retriever    | Langchain, Redis      | Gaudi | 7000 | /v1/retrieval                                               |
-| SpeechT5     | Transformers          | Gaudi | 7055 | /v1/tts                                                     |
-| Whisper      | Transformers          | Gaudi | 7066 | /v1/asr                                                     |
+| MicroService | Open Source Project     | HW    | Port | Endpoint                                                    |
+| ------------ | ----------------------- | ----- | ---- | ----------------------------------------------------------- |
+| Dataprep     | Redis, Langchain, TGI   | Xeon  | 6007 | /v1/generate_transcripts, /v1/generate_captions, /v1/ingest |
+| Embedding    | Langchain               | Xeon  | 6000 | /v1/embeddings                                              |
+| LVM          | Langchain, Transformers | Xeon  | 9399 | /v1/lvm                                                     |
+| Retriever    | Langchain, Redis        | Xeon  | 7000 | /v1/retrieval                                               |
+| SpeechT5     | Transformers            | Xeon  | 7055 | /v1/tts                                                     |
+| Whisper      | Transformers            | Xeon  | 7066 | /v1/asr                                                     |
+| Dataprep     | Redis, Langchain, TGI   | Gaudi | 6007 | /v1/generate_transcripts, /v1/generate_captions, /v1/ingest |
+| Embedding    | Langchain               | Gaudi | 6000 | /v1/embeddings                                              |
+| LVM          | Langchain, TGI          | Gaudi | 9399 | /v1/lvm                                                     |
+| Retriever    | Langchain, Redis        | Gaudi | 7000 | /v1/retrieval                                               |
+| SpeechT5     | Transformers            | Gaudi | 7055 | /v1/tts                                                     |
+| Whisper      | Transformers            | Gaudi | 7066 | /v1/asr                                                     |
 
 </details>
 
@@ -128,7 +128,7 @@ By default, the embedding and LVM models are set to a default value as listed be
 | embedding | Gaudi | BridgeTower/bridgetower-large-itm-mlm-itc |
 | LVM       | Gaudi | llava-hf/llava-v1.6-vicuna-13b-hf         |
 | SpeechT5  | Gaudi | microsoft/speecht5_tts                    |
-| Whisper   | Gaudi  | openai/whisper-small                     |
+| Whisper   | Gaudi | openai/whisper-small                      |
 
 You can choose other LVM models, such as `llava-hf/llava-1.5-7b-hf ` and `llava-hf/llava-1.5-13b-hf`, as needed.
 
