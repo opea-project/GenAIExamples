@@ -410,14 +410,14 @@ If the result shown on the page is correct, then we consider the verification of
 
 ### 5. Stop application
 
-##### If you use vLLM
+#### If you use vLLM
 
 ```bash
 cd ~/codegen-install/GenAIExamples/CodeGen/docker_compose/amd/gpu/rocm
 docker compose -f compose_vllm.yaml down
 ```
 
-##### If you use TGI
+#### If you use TGI
 
 ```bash
 cd ~/codegen-install/GenAIExamples/CodeGen/docker_compose/amd/gpu/rocm
