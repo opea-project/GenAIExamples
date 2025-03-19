@@ -19,17 +19,13 @@ export FAQGEN_LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
 export FAQGEN_TGI_SERVICE_PORT=8008
 export FAQGEN_LLM_SERVER_PORT=9000
 export FAQGEN_HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
-export FAQGEN_CARD_ID="card1"
-export FAQGEN_RENDER_ID="renderD136"
 export FAQGEN_BACKEND_SERVER_PORT=8888
 export FAGGEN_UI_PORT=5173
 export LLM_ENDPOINT="http://${ip_address}:8008"
 export MEGA_SERVICE_HOST_IP=${ip_address}
 export LLM_SERVICE_HOST_IP=${ip_address}
-export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:8888/v1/faqgen"
+export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:${FAQGEN_BACKEND_SERVER_PORT}/v1/faqgen"
 export PATH="~/miniconda3/bin:$PATH"
-export FAQGen_COMPONENT_NAME="OpeaFaqGenTgi"
-export LOGFLAG=True
 
 function build_docker_images() {
     opea_branch=${opea_branch:-"main"}
@@ -103,7 +99,7 @@ function validate_microservices() {
         "tgi-service" \
         "faqgen-tgi-service" \
         '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}'
-
+    sleep 10
     # llm microservice
     validate_services \
         "${ip_address}:9000/v1/faqgen" \

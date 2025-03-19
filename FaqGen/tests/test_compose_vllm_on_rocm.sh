@@ -104,7 +104,7 @@ function validate_microservices() {
         "faqgen-vllm-service" \
         "faqgen-vllm-service" \
         '{"model": "meta-llama/Meta-Llama-3-8B-Instruct", "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens": 17}'
-
+    sleep 10
     # llm microservice
     validate_services \
         "${HOST_IP}:${FAQGEN_LLM_SERVER_PORT}/v1/faqgen" \
