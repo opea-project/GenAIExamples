@@ -15,6 +15,7 @@ WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
 
+
 export HOST_IP=${ip_address}
 export CHATQNA_TGI_SERVICE_IMAGE="ghcr.io/huggingface/text-generation-inference:2.3.1-rocm"
 export CHATQNA_EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
@@ -265,7 +266,7 @@ function main() {
     validate_megaservice
     echo "==== megaservice validated ===="
     validate_frontend
-    echo "==== frontend validated ===="
+    echo "==== frontend validated ====="
 
     stop_docker
     echo y | docker system prune
