@@ -71,6 +71,7 @@ services:
       http_proxy: ${http_proxy}
       MEGA_SERVICE_HOST_IP: ${HOST_IP}
       LLM_SERVICE_HOST_IP: ${HOST_IP}
+      LLM_SERVICE_PORT: ${FAQGEN_LLM_SERVER_PORT}
     ipc: host
     restart: always
 
