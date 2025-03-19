@@ -265,9 +265,25 @@ curl http://${HOST_IP}:${FAQGEN_VLLM_SERVICE_PORT}/v1/completions \
 
 Checking the response from the service. The response should be similar to JSON:
 
-````json
-{"id":"cmpl-0844e21b824c4472b77f2851a177eca2","object":"text_completion","created":1742385979,"model":"meta-llama/Meta-Llama-3-8B-Instruct","choices":[{"index":0,"text":" Deep learning is a subset of machine learning that involves the use of artificial neural networks to analyze and interpret data. It is called \"deep\" because it","logprobs":null,"finish_reason":"length","stop_reason":null,"prompt_logprobs":null}],"usage":{"prompt_tokens":7,"total_tokens":37,"completion_tokens":30,"prompt_tokens_details":null}}
-````
+```json
+{
+  "id": "cmpl-0844e21b824c4472b77f2851a177eca2",
+  "object": "text_completion",
+  "created": 1742385979,
+  "model": "meta-llama/Meta-Llama-3-8B-Instruct",
+  "choices": [
+    {
+      "index": 0,
+      "text": " Deep learning is a subset of machine learning that involves the use of artificial neural networks to analyze and interpret data. It is called \"deep\" because it",
+      "logprobs": null,
+      "finish_reason": "length",
+      "stop_reason": null,
+      "prompt_logprobs": null
+    }
+  ],
+  "usage": { "prompt_tokens": 7, "total_tokens": 37, "completion_tokens": 30, "prompt_tokens_details": null }
+}
+```
 
 If the service response has a meaningful response in the value of the "choices.text" key,
 then we consider the vLLM service to be successfully launched
@@ -308,9 +324,13 @@ curl http://${HOST_IP}:${FAQGEN_LLM_SERVER_PORT}/v1/faqgen \
 
 Checking the response from the service. The response should be similar to JSON:
 
-````json
-{"id":"1e47daf13a8bc73495dbfd9836eaa7e4","text":" Q: What is Deep Learning?\n         A: Deep Learning is a subset of Machine Learning that involves the use of artificial neural networks to analyze and interpret data. It is called \"deep\" because it involves multiple layers of interconnected nodes or \"neurons\" that process and transform the data.\n\n         Q: What is the main difference between Deep Learning and Machine Learning?\n         A: The main difference between Deep Learning and Machine Learning is the complexity of the models used. Machine Learning models are typically simpler and more linear, while Deep Learning models are more complex and non-linear, allowing them to learn and represent more abstract and nuanced patterns in data.\n\n         Q: What are some common applications of Deep Learning?\n         A: Some common applications of Deep Learning include image and speech recognition, natural language processing, recommender systems, and autonomous vehicles.\n\n         Q: Is Deep Learning a new field?\n         A: Deep Learning is not a new field, but it has gained significant attention and popularity in recent years due to advances in computing power, data storage, and algorithms.\n\n         Q: Can Deep Learning be used for any type of data?\n         A: Deep Learning can be used for any type of data that can be represented as a numerical array, such as images, audio, text, and time series data.\n\n         Q: Is Deep Learning a replacement for traditional Machine Learning?\n         A: No, Deep Learning is not a replacement for traditional Machine Learning. Instead, it is a complementary technology that can be used in conjunction with traditional Machine Learning techniques to solve complex problems.\n\n         Q: What are some of the challenges associated with Deep Learning?\n         A: Some of the challenges associated with Deep Learning include the need for large amounts of data, the risk of overfitting, and the difficulty of interpreting the results of the models.\n\n         Q: Can Deep Learning be used for real-time applications?\n         A: Yes, Deep Learning can be used for real-time applications, such as image and speech recognition, and autonomous vehicles.\n\n         Q: Is Deep Learning a field that requires a lot of mathematical knowledge?\n         A: While some mathematical knowledge is helpful, it is not necessary to have a deep understanding of mathematics to work with Deep Learning. Many Deep Learning libraries and frameworks provide pre-built functions and tools that can be used to implement Deep Learning models.","prompt":"What is Deep Learning?"}
-````
+```json
+{
+  "id": "1e47daf13a8bc73495dbfd9836eaa7e4",
+  "text": " Q: What is Deep Learning?\n         A: Deep Learning is a subset of Machine Learning that involves the use of artificial neural networks to analyze and interpret data. It is called \"deep\" because it involves multiple layers of interconnected nodes or \"neurons\" that process and transform the data.\n\n         Q: What is the main difference between Deep Learning and Machine Learning?\n         A: The main difference between Deep Learning and Machine Learning is the complexity of the models used. Machine Learning models are typically simpler and more linear, while Deep Learning models are more complex and non-linear, allowing them to learn and represent more abstract and nuanced patterns in data.\n\n         Q: What are some common applications of Deep Learning?\n         A: Some common applications of Deep Learning include image and speech recognition, natural language processing, recommender systems, and autonomous vehicles.\n\n         Q: Is Deep Learning a new field?\n         A: Deep Learning is not a new field, but it has gained significant attention and popularity in recent years due to advances in computing power, data storage, and algorithms.\n\n         Q: Can Deep Learning be used for any type of data?\n         A: Deep Learning can be used for any type of data that can be represented as a numerical array, such as images, audio, text, and time series data.\n\n         Q: Is Deep Learning a replacement for traditional Machine Learning?\n         A: No, Deep Learning is not a replacement for traditional Machine Learning. Instead, it is a complementary technology that can be used in conjunction with traditional Machine Learning techniques to solve complex problems.\n\n         Q: What are some of the challenges associated with Deep Learning?\n         A: Some of the challenges associated with Deep Learning include the need for large amounts of data, the risk of overfitting, and the difficulty of interpreting the results of the models.\n\n         Q: Can Deep Learning be used for real-time applications?\n         A: Yes, Deep Learning can be used for real-time applications, such as image and speech recognition, and autonomous vehicles.\n\n         Q: Is Deep Learning a field that requires a lot of mathematical knowledge?\n         A: While some mathematical knowledge is helpful, it is not necessary to have a deep understanding of mathematics to work with Deep Learning. Many Deep Learning libraries and frameworks provide pre-built functions and tools that can be used to implement Deep Learning models.",
+  "prompt": "What is Deep Learning?"
+}
+```
 
 If the service response has a meaningful response in the value of the "text" key,
 then we consider the vLLM service to be successfully launched
@@ -328,7 +348,24 @@ curl http://${HOST_IP}:${FAQGEN_BACKEND_SERVER_PORT}/v1/faqgen \
 Checking the response from the service. The response should be similar to text:
 
 ```json
-{"id":"chatcmpl-tjwp8giP2vyvRRxnqzc3FU","object":"chat.completion","created":1742386156,"model":"faqgen","choices":[{"index":0,"message":{"role":"assistant","content":" Q: What is Deep Learning?\n         A: Deep Learning is a subset of Machine Learning that involves the use of artificial neural networks to analyze and interpret data. It is called \"deep\" because it involves multiple layers of interconnected nodes or \"neurons\" that process and transform the data.\n\n         Q: What is the main difference between Deep Learning and Machine Learning?\n         A: The main difference between Deep Learning and Machine Learning is the complexity of the models used. Machine Learning models are typically simpler and"},"finish_reason":"stop","metadata":null}],"usage":{"prompt_tokens":0,"total_tokens":0,"completion_tokens":0}}
+{
+  "id": "chatcmpl-tjwp8giP2vyvRRxnqzc3FU",
+  "object": "chat.completion",
+  "created": 1742386156,
+  "model": "faqgen",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": " Q: What is Deep Learning?\n         A: Deep Learning is a subset of Machine Learning that involves the use of artificial neural networks to analyze and interpret data. It is called \"deep\" because it involves multiple layers of interconnected nodes or \"neurons\" that process and transform the data.\n\n         Q: What is the main difference between Deep Learning and Machine Learning?\n         A: The main difference between Deep Learning and Machine Learning is the complexity of the models used. Machine Learning models are typically simpler and"
+      },
+      "finish_reason": "stop",
+      "metadata": null
+    }
+  ],
+  "usage": { "prompt_tokens": 0, "total_tokens": 0, "completion_tokens": 0 }
+}
 ```
 
 If the service response has a meaningful response in the value of the "choices.message.content" key,
