@@ -300,7 +300,9 @@ curl http://${HOST_IP}:${FAQGEN_TGI_SERVICE_PORT}/generate \
 Checking the response from the service. The response should be similar to JSON:
 
 ```json
-{"generated_text":" In-Depth Explanation\nDeep Learning involves the use of artificial neural networks (ANNs) with multiple layers to analyze and interpret complex data. In this article, we will explore what is deep learning, its types, and how it works.\n\n### What is Deep Learning?\n\nDeep Learning is a subset of Machine Learning that involves"}
+{
+  "generated_text": " In-Depth Explanation\nDeep Learning involves the use of artificial neural networks (ANNs) with multiple layers to analyze and interpret complex data. In this article, we will explore what is deep learning, its types, and how it works.\n\n### What is Deep Learning?\n\nDeep Learning is a subset of Machine Learning that involves"
+}
 ```
 
 If the service response has a meaningful response in the value of the "generated_text" key,
