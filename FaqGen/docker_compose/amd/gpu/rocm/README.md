@@ -291,23 +291,16 @@ then we consider the vLLM service to be successfully launched
 #### If you use TGI:
 
 ```bash
-DATA='{"inputs":"Implement a high-level API for a TODO list application. '\
-'The API takes as input an operation request and updates the TODO list in place. '\
-'If the request is invalid, raise an exception.",'\
-'"parameters":{"max_new_tokens":256,"do_sample": true}}'
-
-curl http://${HOST_IP}:${CODEGEN_TGI_SERVICE_PORT}/generate \
+curl http://${HOST_IP}:${FAQGEN_TGI_SERVICE_PORT}/generate \
   -X POST \
-  -d "$DATA" \
+  -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":64, "do_sample": true}}' \
   -H 'Content-Type: application/json'
 ```
 
 Checking the response from the service. The response should be similar to JSON:
 
 ````json
-{
-  "generated_text": " The supported operations are \"add_task\", \"complete_task\", and \"remove_task\". Each operation can be defined with a corresponding function in the API.\n\nAdd your API in the following format:\n\n```\nTODO App API\n\nsupported operations:\n\noperation name           description\n-----------------------  ------------------------------------------------\n<operation_name>         <operation description>\n```\n\nUse type hints for function parameters and return values. Specify a text description of the API's supported operations.\n\nUse the following code snippet as a starting point for your high-level API function:\n\n```\nclass TodoAPI:\n    def __init__(self, tasks: List[str]):\n        self.tasks = tasks  # List of tasks to manage\n\n    def add_task(self, task: str) -> None:\n        self.tasks.append(task)\n\n    def complete_task(self, task: str) -> None:\n        self.tasks = [t for t in self.tasks if t != task]\n\n    def remove_task(self, task: str) -> None:\n        self.tasks = [t for t in self.tasks if t != task]\n\n    def handle_request(self, request: Dict[str, str]) -> None:\n        operation = request.get('operation')\n        if operation == 'add_task':\n            self.add_task(request.get('task'))\n        elif"
-}
+{"generated_text":" In-Depth Explanation\nDeep Learning involves the use of artificial neural networks (ANNs) with multiple layers to analyze and interpret complex data. In this article, we will explore what is deep learning, its types, and how it works.\n\n### What is Deep Learning?\n\nDeep Learning is a subset of Machine Learning that involves"}````
 ````
 
 If the service response has a meaningful response in the value of the "generated_text" key,
