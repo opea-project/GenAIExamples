@@ -415,4 +415,3 @@ docker compose -f compose_vllm.yaml down
 cd ~/codetrans-install/GenAIExamples/CodeTrans/docker_compose/amd/gpu/rocm
 docker compose -f compose.yaml down
 ```
-
