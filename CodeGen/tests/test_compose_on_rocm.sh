@@ -105,7 +105,7 @@ function validate_microservices() {
         "codegen-tgi-service" \
         "codegen-tgi-service" \
         '{"inputs":"def print_hello_world():","parameters":{"max_new_tokens":256, "do_sample": true}}'
-
+    sleep 10
     # llm microservice
     validate_services \
         "${ip_address}:${CODEGEN_LLM_SERVICE_PORT}/v1/chat/completions" \
