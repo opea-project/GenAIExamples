@@ -80,7 +80,7 @@ services:
     depends_on:
       - faqgen-backend-server
     ports:
-      - "${FAGGEN_UI_PORT:-5173}:5173"
+      - "${FAQGEN_UI_PORT:-5173}:5173"
     environment:
       no_proxy: ${no_proxy}
       https_proxy: ${https_proxy}
