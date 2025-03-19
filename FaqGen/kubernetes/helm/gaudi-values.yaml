@@ -1,0 +1,39 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+tgi:
+  accelDevice: "gaudi"
+  image:
+    repository: ghcr.io/huggingface/tgi-gaudi
+    tag: "2.3.1"
+  resources:
+    limits:
+      habana.ai/gaudi: 1
+  MAX_INPUT_LENGTH: "1024"
+  MAX_TOTAL_TOKENS: "2048"
+  CUDA_GRAPHS: "0"
+  OMPI_MCA_btl_vader_single_copy_mechanism: "none"
+  ENABLE_HPU_GRAPH: "true"
+  LIMIT_HPU_GRAPH: "true"
+  USE_FLASH_ATTENTION: "true"
+  FLASH_ATTENTION_RECOMPUTE: "true"
+  PREFILL_BATCH_BUCKET_SIZE: 1
+  BATCH_BUCKET_SIZE: 8
+  extraCmdArgs:
+    - "--max-batch-total-tokens"
+    - "65536"
+    - "--max-batch-prefill-tokens"
+    - "4096"
+  livenessProbe:
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    timeoutSeconds: 1
+  readinessProbe:
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    timeoutSeconds: 1
+  startupProbe:
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    timeoutSeconds: 1
+    failureThreshold: 120

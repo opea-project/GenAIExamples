@@ -1,0 +1,45 @@
+// Copyright (C) 2024 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
+
+@import "../../styles/styles";
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+.faqGenWrapper {
+  @include flex(row, nowrap, flex-start, flex-start);
+  flex: 1 1 auto;
+  height: 100%;
+  & > * {
+    height: 100%;
+  }
+  .faqGenContent {
+    flex: 1 1 auto;
+    position: relative;
+    .faqGenContentMessages {
+      @include absolutes;
+      @include flex(column, nowrap, normal, normal);
+      > * {
+        padding: 8px 24px;
+      }
+      .faqGenTitle {
+        @include flex(row, nowrap, center, flex-start);
+        height: 60px;
+        border-bottom: 1px solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
+      }
+      .faqGenContentButtonGroup {
+        @include flex(row, nowrap, center, center);
+        height: 60px;
+      }
+      .faqGenInput {
+        .faqGenFileUpload {
+          @include flex(row, nowrap, center, center);
+        }
+      }
+      .faqGenResult {
+        overflow-y: auto;
+      }
+    }
+  }
+}
