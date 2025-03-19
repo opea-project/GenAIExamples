@@ -59,13 +59,13 @@
   #### vLLM-based application
 
   ```bash
-  service_list="vllm-rocm llm-faqgen faqgen faqgen-ui faqgen-react-ui"
+  service_list="vllm-rocm llm-faqgen faqgen faqgen-ui"
   ```
 
   #### TGI-based application
 
   ```bash
-  service_list="llm-faqgen faqgen faqgen-ui faqgen-react-ui"
+  service_list="llm-faqgen faqgen faqgen-ui"
   ```
 
 - #### Optional. Pull TGI Docker Image (Do this if you want to use TGI)

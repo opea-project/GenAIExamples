@@ -92,21 +92,6 @@ services:
     ipc: host
     restart: always
 
-  faqgen-react-ui-server:
-    image: ${REGISTRY:-opea}/faqgen-react-ui:${TAG:-latest}
-    container_name: faqgen-react-ui-server
-    environment:
-      no_proxy: ${no_proxy}
-      https_proxy: ${https_proxy}
-      http_proxy: ${http_proxy}
-      VITE_FAQ_GEN_URL: ${FAQGEN_BACKEND_ENDPOINT}
-    ports:
-      - "${FAGGEN_REACT_UI_PORT:-5174}:80"
-    depends_on:
-      - faqgen-backend-server
-    ipc: host
-    restart: always
-
 networks:
   default:
     driver: bridge
