@@ -24,7 +24,7 @@ services:
     container_name: dataprep-multimodal-redis
     depends_on:
       - redis-vector-db
-      - lvm-llava
+      - vllm-service
     ports:
       - "${DATAPREP_MMR_PORT}:5000"
     environment:
@@ -97,24 +97,31 @@ services:
       LOGFLAG: ${LOGFLAG}
       RETRIEVER_COMPONENT_NAME: "OPEA_RETRIEVER_REDIS"
     restart: unless-stopped
-  lvm-llava:
-    image: ${REGISTRY:-opea}/lvm-llava:${TAG:-latest}
-    container_name: lvm-llava
+  vllm-service:
+    image: ${REGISTRY:-opea}/vllm:${TAG:-latest}
+    container_name: vllm-service
     ports:
-      - "${LLAVA_SERVER_PORT}:${LLAVA_SERVER_PORT}"
+      - ${VLLM_PORT:-8399}:80
+    volumes:
+      - "${MODEL_CACHE:-./data}:/root/.cache/huggingface/hub"
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      LLAVA_SERVER_PORT: ${LLAVA_SERVER_PORT}
-      LVM_PORT: ${LVM_PORT}
-    entrypoint: ["python", "llava_server.py", "--device", "cpu", "--model_name_or_path", $LVM_MODEL_ID]
-    restart: unless-stopped
+      HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      VLLM_TORCH_PROFILER_DIR: "/mnt"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:80/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 100
+    command: --model $LVM_MODEL_ID --host 0.0.0.0 --port 80 --chat-template examples/template_llava.jinja  # https://docs.vllm.ai/en/v0.5.0/models/vlm.html
+
   lvm:
     image: ${REGISTRY:-opea}/lvm:${TAG:-latest}
     container_name: lvm
     depends_on:
-      - lvm-llava
+      - vllm-service
     ports:
       - "${LVM_PORT}:${LVM_PORT}"
     ipc: host
@@ -122,11 +129,10 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      LVM_COMPONENT_NAME: "OPEA_LLAVA_LVM"
+      LVM_COMPONENT_NAME: "OPEA_VLLM_LVM"
       LVM_ENDPOINT: ${LVM_ENDPOINT}
       LLAVA_SERVER_PORT: ${LLAVA_SERVER_PORT}
       LVM_PORT: ${LVM_PORT}
-      MAX_IMAGES: ${MAX_IMAGES:-1}
     restart: unless-stopped
   multimodalqna:
     image: ${REGISTRY:-opea}/multimodalqna:${TAG:-latest}

@@ -10,115 +10,17 @@ For detailed information about these instance types, you can refer to this [link
 
 After launching your instance, you can connect to it using SSH (for Linux instances) or Remote Desktop Protocol (RDP) (for Windows instances). From there, you'll have full access to your Xeon server, allowing you to install, configure, and manage your applications as needed.
 
-**Certain ports in the EC2 instance need to opened up in the security group, for the microservices to work with the curl commands**
-
-> See one example below. Please open up these ports in the EC2 instance based on the IP addresses you want to allow
-
-```
-redis-vector-db
-===============
-Port 6379 - Open to 0.0.0.0/0
-Port 8001 - Open to 0.0.0.0/0
-
-embedding-multimodal-bridgetower
-=====================
-Port 6006 - Open to 0.0.0.0/0
-
-embedding
-=========
-Port 6000 - Open to 0.0.0.0/0
-
-retriever-multimodal-redis
-=========
-Port 7000 - Open to 0.0.0.0/0
-
-lvm-llava
-================
-Port 8399 - Open to 0.0.0.0/0
-
-lvm
-===
-Port 9399 - Open to 0.0.0.0/0
-
-whisper
-===
-port 7066 - Open to 0.0.0.0/0
-
-dataprep-multimodal-redis
-===
-Port 6007 - Open to 0.0.0.0/0
-
-multimodalqna
-==========================
-Port 8888 - Open to 0.0.0.0/0
-
-multimodalqna-ui
-=====================
-Port 5173 - Open to 0.0.0.0/0
-```
 
 ## Setup Environment Variables
 
 Since the `compose.yaml` will consume some environment variables, you need to setup them in advance as below.
 
-**Export the value of the public IP address of your Xeon server to the `host_ip` environment variable**
-
-> Change the External_Public_IP below with the actual IPV4 value
-
-```
-export host_ip="External_Public_IP"
-```
-
-**Append the value of the public IP address to the no_proxy list**
-
 ```bash
-export your_no_proxy=${your_no_proxy},"External_Public_IP"
-```
-
-```bash
-export no_proxy=${your_no_proxy}
-export http_proxy=${your_http_proxy}
-export https_proxy=${your_http_proxy}
-export MM_EMBEDDING_SERVICE_HOST_IP=${host_ip}
-export MM_RETRIEVER_SERVICE_HOST_IP=${host_ip}
-export LVM_SERVICE_HOST_IP=${host_ip}
-export MEGA_SERVICE_HOST_IP=${host_ip}
-export WHISPER_PORT=7066
-export WHISPER_SERVER_ENDPOINT="http://${host_ip}:${WHISPER_PORT}/v1/asr"
-export WHISPER_MODEL="base"
-export MAX_IMAGES=1
-export REDIS_DB_PORT=6379
-export REDIS_INSIGHTS_PORT=8001
-export REDIS_URL="redis://${host_ip}:${REDIS_DB_PORT}"
-export REDIS_HOST=${host_ip}
-export INDEX_NAME="mm-rag-redis"
-export DATAPREP_MMR_PORT=6007
-export DATAPREP_INGEST_SERVICE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/dataprep/ingest"
-export DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/dataprep/generate_transcripts"
-export DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/dataprep/generate_captions"
-export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/dataprep/get"
-export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/dataprep/delete"
-export EMM_BRIDGETOWER_PORT=6006
-export EMBEDDING_MODEL_ID="BridgeTower/bridgetower-large-itm-mlm-itc"
-export BRIDGE_TOWER_EMBEDDING=true
-export MMEI_EMBEDDING_ENDPOINT="http://${host_ip}:$EMM_BRIDGETOWER_PORT"
-export MM_EMBEDDING_PORT_MICROSERVICE=6000
-export REDIS_RETRIEVER_PORT=7000
-export LVM_PORT=9399
-export LLAVA_SERVER_PORT=8399
-export LVM_MODEL_ID="llava-hf/llava-1.5-7b-hf"
-export LVM_ENDPOINT="http://${host_ip}:$LLAVA_SERVER_PORT"
-export MEGA_SERVICE_PORT=8888
-export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:$MEGA_SERVICE_PORT/v1/multimodalqna"
-export UI_PORT=5173
+source set_env.sh
 ```
 
 Note: Please replace with `host_ip` with you external IP address, do not use localhost.
 
-> Note: The `MAX_IMAGES` environment variable is used to specify the maximum number of images that will be sent from the LVM service to the LLaVA server.
-> If an image list longer than `MAX_IMAGES` is sent to the LVM server, a shortened image list will be sent to the LLaVA service. If the image list
-> needs to be shortened, the most recent images (the ones at the end of the list) are prioritized to send to the LLaVA service. Some LLaVA models have not
-> been trained with multiple images and may lead to inaccurate results. If `MAX_IMAGES` is not set, it will default to `1`.
 
 ## 🚀 Build Docker Images
 
@@ -146,7 +48,13 @@ docker build --no-cache -t opea/retriever:latest --build-arg https_proxy=$https_
 
 ### 3. Build LVM Images
 
-Build lvm-llava image
+Pull vllm image
+
+```bash
+docker pull opea/vllm:latest
+```
+
+Build lvm-llava image (Optional)
 
 ```bash
 docker build --no-cache -t opea/lvm-llava:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/lvms/src/integrations/dependency/llava/Dockerfile .
@@ -197,14 +105,15 @@ Then run the command `docker images`, you will have the following 11 Docker Imag
 
 1. `opea/dataprep:latest`
 2. `opea/lvm:latest`
-3. `opea/lvm-llava:latest`
-4. `opea/retriever:latest`
-5. `opea/whisper:latest`
-6. `opea/redis-vector-db`
-7. `opea/embedding:latest`
-8. `opea/embedding-multimodal-bridgetower:latest`
-9. `opea/multimodalqna:latest`
-10. `opea/multimodalqna-ui:latest`
+3. `opea/vllm:latest`
+4. `opea/lvm-llava:latest` (Optional)
+5. `opea/retriever:latest`
+6. `opea/whisper:latest`
+7. `opea/redis-vector-db`
+8. `opea/embedding:latest`
+9. `opea/embedding-multimodal-bridgetower:latest`
+10. `opea/multimodalqna:latest`
+11. `opea/multimodalqna-ui:latest`
 
 ## 🚀 Start Microservices
 
@@ -264,7 +173,7 @@ curl http://${host_ip}:$MM_EMBEDDING_PORT_MICROSERVICE/v1/embeddings \
 
 ```bash
 export your_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(512)]; print(embedding)")
-curl http://${host_ip}:${REDIS_RETRIEVER_PORT}/v1/multimodal_retrieval \
+curl http://${host_ip}:${REDIS_RETRIEVER_PORT}/v1/retrieval \
     -X POST \
     -H "Content-Type: application/json" \
     -d "{\"text\":\"test\",\"embedding\":${your_embedding}}"
@@ -279,7 +188,7 @@ curl ${WHISPER_SERVER_ENDPOINT} \
     -d '{"audio" : "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA"}'
 ```
 
-5. lvm-llava
+5. lvm-llava (Optional)
 
 ```bash
 curl http://${host_ip}:${LLAVA_SERVER_PORT}/generate \
