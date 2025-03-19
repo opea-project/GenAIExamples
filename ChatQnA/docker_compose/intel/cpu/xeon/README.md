@@ -153,35 +153,13 @@ docker build -t opea/llm-faqgen:latest --build-arg https_proxy=$https_proxy --bu
 
 ### 4. Build MegaService Docker Image
 
-1. MegaService with Rerank
+To construct the Mega Service with Rerank, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `chatqna.py` Python script. Build MegaService Docker image via below command:
 
-   To construct the Mega Service with Rerank, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `chatqna.py` Python script. Build MegaService Docker image via below command:
-
-   ```bash
-   git clone https://github.com/opea-project/GenAIExamples.git
-   cd GenAIExamples/ChatQnA
-   docker build --no-cache -t opea/chatqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
-   ```
-
-2. MegaService without Rerank
-
-   To construct the Mega Service without Rerank, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `chatqna_without_rerank.py` Python script. Build MegaService Docker image via below command:
-
-   ```bash
-   git clone https://github.com/opea-project/GenAIExamples.git
-   cd GenAIExamples/ChatQnA
-   docker build --no-cache -t opea/chatqna-without-rerank:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile.without_rerank .
-   ```
-
-3. MegaService with FaqGen
-
-   To use FAQ generation instead of normal text generation LLM, please use the below command:
-
-   ```bash
-   git clone https://github.com/opea-project/GenAIExamples.git
-   cd GenAIExamples/ChatQnA
-   docker build --no-cache -t opea/chatqna-faqgen:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile.faqgen .
-   ```
+```bash
+git clone https://github.com/opea-project/GenAIExamples.git
+cd GenAIExamples/ChatQnA
+docker build --no-cache -t opea/chatqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
+```
 
 ### 5. Build UI Docker Image
 
@@ -214,7 +192,7 @@ Then run the command `docker images`, you will have the following 5 Docker Image
 
 1. `opea/dataprep:latest`
 2. `opea/retriever:latest`
-3. `opea/chatqna:latest` or `opea/chatqna-without-rerank:latest` or `opea/chatqna-faqgen:latest`
+3. `opea/chatqna:latest`
 4. `opea/chatqna-ui:latest`
 5. `opea/nginx:latest`
 

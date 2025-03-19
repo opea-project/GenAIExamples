@@ -115,25 +115,14 @@ docker build -t opea/llm-faqgen:latest --build-arg https_proxy=$https_proxy --bu
 
 ### 5. Build MegaService Docker Image
 
-1. MegaService with text generation
-   To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `chatqna.py` Python script. Build the MegaService Docker image using the command below:
+To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `chatqna.py` Python script. Build the MegaService Docker image using the command below:
 
-   ```bash
-   git clone https://github.com/opea-project/GenAIExamples.git
-   cd GenAIExamples/ChatQnA/docker
-   docker build --no-cache -t opea/chatqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
-   cd ../../..
-   ```
-
-2. MegaService with FAQ generation
-
-   To use FAQ generation instead of normal text generation LLM, please use the below command:
-
-   ```bash
-   git clone https://github.com/opea-project/GenAIExamples.git
-   cd GenAIExamples/ChatQnA
-   docker build --no-cache -t opea/chatqna-faqgen:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile.faqgen .
-   ```
+```bash
+git clone https://github.com/opea-project/GenAIExamples.git
+cd GenAIExamples/ChatQnA/docker
+docker build --no-cache -t opea/chatqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
+cd ../../..
+```
 
 ### 6. Build UI Docker Image
 
@@ -166,7 +155,7 @@ Then run the command `docker images`, you will have the following 5 Docker Image
 
 1. `opea/retriever:latest`
 2. `opea/dataprep:latest`
-3. `opea/chatqna:latest` or `opea/chatqna-faqgen:latest`
+3. `opea/chatqna:latest`
 4. `opea/chatqna-ui:latest` or `opea/chatqna-react-ui:latest`
 5. `opea/nginx:latest`
 

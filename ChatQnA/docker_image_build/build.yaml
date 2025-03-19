@@ -11,24 +11,6 @@ services:
       context: ../
       dockerfile: ./Dockerfile
     image: ${REGISTRY:-opea}/chatqna:${TAG:-latest}
-  chatqna-guardrails:
-    build:
-      context: ../
-      dockerfile: ./Dockerfile.guardrails
-    extends: chatqna
-    image: ${REGISTRY:-opea}/chatqna-guardrails:${TAG:-latest}
-  chatqna-without-rerank:
-    build:
-      context: ../
-      dockerfile: ./Dockerfile.without_rerank
-    extends: chatqna
-    image: ${REGISTRY:-opea}/chatqna-without-rerank:${TAG:-latest}
-  chatqna-faqgen:
-    build:
-      context: ../
-      dockerfile: ./Dockerfile.faqgen
-    extends: chatqna
-    image: ${REGISTRY:-opea}/chatqna-faqgen:${TAG:-latest}
   chatqna-ui:
     build:
       context: ../ui

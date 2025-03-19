@@ -136,7 +136,7 @@ services:
       LOGFLAG: ${LOGFLAG:-False}
     restart: unless-stopped
   chatqna-backend-server:
-    image: ${REGISTRY:-opea}/chatqna-faqgen:${TAG:-latest}
+    image: ${REGISTRY:-opea}/chatqna:${TAG:-latest}
     container_name: chatqna-backend-server
     depends_on:
       - chatqna-redis-vector-db
@@ -160,6 +160,7 @@ services:
       - LLM_SERVER_HOST_IP=${HOST_IP}
       - LLM_SERVER_PORT=${CHATQNA_LLM_FAQGEN_PORT:-9000}
       - LLM_MODEL=${CHATQNA_LLM_MODEL_ID}
+      - CHATQNA_TYPE=${CHATQNA_TYPE:-CHATQNA_FAQGEN}
     ipc: host
     restart: always
   chatqna-ui-server:

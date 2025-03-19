@@ -118,7 +118,7 @@ services:
       LOGFLAG: ${LOGFLAG:-False}
     restart: unless-stopped
   chatqna-xeon-backend-server:
-    image: ${REGISTRY:-opea}/chatqna-faqgen:${TAG:-latest}
+    image: ${REGISTRY:-opea}/chatqna:${TAG:-latest}
     container_name: chatqna-xeon-backend-server
     depends_on:
       - redis-vector-db
@@ -144,6 +144,7 @@ services:
       - LLM_SERVER_PORT=9000
       - LLM_MODEL=${LLM_MODEL_ID}
       - LOGFLAG=${LOGFLAG}
+      - CHATQNA_TYPE=${CHATQNA_TYPE:-CHATQNA_FAQGEN}
     ipc: host
     restart: always
   chatqna-xeon-ui-server:
