@@ -1,7 +1,0 @@
-# Copyright (C) 2024 Intel Corporation
-# SPDX-License-Identifier: Apache-2.0
-
-tgi:
-  MAX_INPUT_LENGTH: "4096"
-  MAX_TOTAL_TOKENS: "8192"
-  LLM_MODEL_ID: llava-hf/llava-v1.6-mistral-7b-hf
