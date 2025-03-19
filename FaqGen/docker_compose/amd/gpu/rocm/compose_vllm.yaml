@@ -3,7 +3,7 @@
 
 services:
   faqgen-vllm-service:
-    image: ${REGISTRY:-opea}/llm-vllm-rocm:${TAG:-latest}
+    image: ${REGISTRY:-opea}/vllm-rocm:${TAG:-latest}
     container_name: faqgen-vllm-service
     ports:
       - "${FAQGEN_VLLM_SERVICE_PORT:-8081}:8011"
