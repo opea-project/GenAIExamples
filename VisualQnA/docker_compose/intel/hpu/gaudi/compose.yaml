@@ -2,41 +2,42 @@
 # SPDX-License-Identifier: Apache-2.0
 
 services:
-  llava-tgi-service:
-    image: ghcr.io/huggingface/tgi-gaudi:2.3.1
-    container_name: tgi-llava-gaudi-server
+  vllm-gaudi-service:
+    image: ${REGISTRY:-opea}/vllm-gaudi:${TAG:-latest}
+    container_name: vllm-gaudi-service
     ports:
-      - "8399:80"
+      - ${VLLM_PORT:-8399}:80
     volumes:
-      - "${MODEL_CACHE:-./data}:/data"
+      - "./data:/root/.cache/huggingface/hub"
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      HF_HUB_DISABLE_PROGRESS_BARS: 1
-      HF_HUB_ENABLE_HF_TRANSFER: 0
+      HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       HABANA_VISIBLE_DEVICES: all
       OMPI_MCA_btl_vader_single_copy_mechanism: none
-      HUGGING_FACE_HUB_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
-      ENABLE_HPU_GRAPH: true
-      LIMIT_HPU_GRAPH: true
-      USE_FLASH_ATTENTION: true
-      FLASH_ATTENTION_RECOMPUTE: true
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://$host_ip:8399/health || exit 1"]
-      interval: 10s
-      timeout: 10s
-      retries: 60
+      LLM_MODEL_ID: ${LVM_MODEL_ID}
+      VLLM_TORCH_PROFILER_DIR: "/mnt"
+      VLLM_SKIP_WARMUP: ${VLLM_SKIP_WARMUP:-false}
+      MAX_MODEL_LEN: ${MAX_TOTAL_TOKENS:-4096}
+      MAX_SEQ_LEN_TO_CAPTURE: ${MAX_TOTAL_TOKENS:-4096}
+      PT_HPUGRAPH_DISABLE_TENSOR_CACHE: false # https://github.com/HabanaAI/vllm-fork/issues/841#issuecomment-2700421704
     runtime: habana
     cap_add:
       - SYS_NICE
     ipc: host
-    command: --model-id ${LVM_MODEL_ID} --max-input-length 4096 --max-total-tokens 8192
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:80/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 150
+    command: --model $LVM_MODEL_ID --tensor-parallel-size 1 --host 0.0.0.0 --port 80 --chat-template examples/template_llava.jinja  # https://docs.vllm.ai/en/v0.5.0/models/vlm.html
   lvm:
     image: ${REGISTRY:-opea}/lvm:${TAG:-latest}
-    container_name: lvm-gaudi-server
+    container_name: lvm-vllm-gaudi-service
     depends_on:
-      - llava-tgi-service
+      vllm-gaudi-service:
+        condition: service_healthy
     ports:
       - "9399:9399"
     ipc: host
@@ -45,7 +46,8 @@ services:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       LVM_ENDPOINT: ${LVM_ENDPOINT}
-      LVM_COMPONENT_NAME: "OPEA_TGI_LLAVA_LVM"
+      LVM_COMPONENT_NAME: "OPEA_VLLM_LVM"
+      LLM_MODEL_ID: ${LVM_MODEL_ID}
       HF_HUB_DISABLE_PROGRESS_BARS: 1
       HF_HUB_ENABLE_HF_TRANSFER: 0
     restart: unless-stopped
@@ -53,7 +55,7 @@ services:
     image: ${REGISTRY:-opea}/visualqna:${TAG:-latest}
     container_name: visualqna-gaudi-backend-server
     depends_on:
-      - llava-tgi-service
+      - vllm-gaudi-service
       - lvm
     ports:
       - "8888:8888"

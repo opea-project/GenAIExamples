@@ -32,9 +32,9 @@ on:
         type: string
       inject_commit:
         default: false
-        description: "inject commit to docker images true or false"
+        description: "inject commit to docker images"
         required: false
-        type: string
+        type: boolean
 
 jobs:
   get-test-matrix:

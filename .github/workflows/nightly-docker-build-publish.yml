@@ -32,6 +32,12 @@ jobs:
           echo "TAG=$TAG" >> $GITHUB_OUTPUT
           echo "PUBLISH_TAGS=$PUBLISH_TAGS" >> $GITHUB_OUTPUT
 
+  build-comps-base:
+    needs: [get-build-matrix]
+    uses: ./.github/workflows/_build_comps_base_image.yml
+    with:
+      node: gaudi
+
   build-and-test:
     needs: get-build-matrix
     if: ${{ needs.get-build-matrix.outputs.examples_json != '' }}

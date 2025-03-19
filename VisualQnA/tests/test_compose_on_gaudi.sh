@@ -10,51 +10,32 @@ echo "TAG=IMAGE_TAG=${IMAGE_TAG}"
 export REGISTRY=${IMAGE_REPO}
 export TAG=${IMAGE_TAG}
 export MODEL_CACHE=${model_cache:-"./data"}
+export NGINX_PORT=81
+export VLLM_SKIP_WARMUP=true
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
 
 function build_docker_images() {
-    opea_branch=${opea_branch:-"main"}
-    # If the opea_branch isn't main, replace the git clone branch in Dockerfile.
-    if [[ "${opea_branch}" != "main" ]]; then
-        cd $WORKPATH
-        OLD_STRING="RUN git clone --depth 1 https://github.com/opea-project/GenAIComps.git"
-        NEW_STRING="RUN git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git"
-        find . -type f -name "Dockerfile*" | while read -r file; do
-            echo "Processing file: $file"
-            sed -i "s|$OLD_STRING|$NEW_STRING|g" "$file"
-        done
-    fi
-
     cd $WORKPATH/docker_image_build
-    git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
-
-    echo "Build all the images with --no-cache, check docker_image_build.log for details..."
+    git clone --depth 1 --branch main https://github.com/opea-project/GenAIComps.git
     docker compose -f build.yaml build --no-cache > ${LOG_PATH}/docker_image_build.log
 
-    docker pull ghcr.io/huggingface/tgi-gaudi:2.0.6
+    git clone https://github.com/HabanaAI/vllm-fork.git
+    cd ./vllm-fork/
+    docker build -f Dockerfile.hpu -t opea/vllm-gaudi:${TAG} --shm-size=128g . --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy
+    cd ..
+    rm -rf vllm-fork
+
     docker images && sleep 1s
 }
 
 function start_services() {
     cd $WORKPATH/docker_compose/intel/hpu/gaudi
 
-    export LVM_MODEL_ID="llava-hf/llava-v1.6-mistral-7b-hf"
-    export LVM_ENDPOINT="http://${ip_address}:8399"
-    export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
-    export LVM_SERVICE_PORT=9399
-    export MEGA_SERVICE_HOST_IP=${ip_address}
-    export LVM_SERVICE_HOST_IP=${ip_address}
-    export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:8888/v1/visualqna"
-    export FRONTEND_SERVICE_IP=${ip_address}
-    export FRONTEND_SERVICE_PORT=5173
-    export BACKEND_SERVICE_NAME=visualqna
-    export BACKEND_SERVICE_IP=${ip_address}
-    export BACKEND_SERVICE_PORT=8888
-    export NGINX_PORT=80
-    export host_ip=${ip_address}
+    source ./set_env.sh
+
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
@@ -63,8 +44,8 @@ function start_services() {
 
     n=0
     until [[ "$n" -ge 100 ]]; do
-        docker logs lvm-gaudi-server > ${LOG_PATH}/lvm_tgi_service_start.log
-        if grep -q Connected ${LOG_PATH}/lvm_tgi_service_start.log; then
+        docker logs vllm-gaudi-service > ${LOG_PATH}/lvm_vllm_service_start.log
+        if grep -q Starting ${LOG_PATH}/lvm_vllm_service_start.log; then
             break
         fi
         sleep 5s
@@ -101,22 +82,24 @@ function validate_services() {
 }
 
 function validate_microservices() {
+    sleep 15s
     # Check if the microservices are running correctly.
 
     # lvm microservice
     validate_services \
         "${ip_address}:9399/v1/lvm" \
-        "The image" \
+        "yellow" \
         "lvm" \
-        "lvm-gaudi-server" \
+        "lvm-vllm-gaudi-service" \
         '{"image": "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8/5+hnoEIwDiqkL4KAcT9GO0U4BxoAAAAAElFTkSuQmCC", "prompt":"What is this?"}'
 }
 
 function validate_megaservice() {
+    sleep 15s
     # Curl the Mega Service
     validate_services \
     "${ip_address}:8888/v1/visualqna" \
-    "The image" \
+    "sign" \
     "visualqna-gaudi-backend-server" \
     "visualqna-gaudi-backend-server" \
     '{
@@ -142,8 +125,8 @@ function validate_megaservice() {
 
     # test the megeservice via nginx
     validate_services \
-    "${ip_address}:80/v1/visualqna" \
-    "The image" \
+    "${ip_address}:${NGINX_PORT}/v1/visualqna" \
+    "sign" \
     "visualqna-gaudi-nginx-server" \
     "visualqna-gaudi-nginx-server" \
     '{
