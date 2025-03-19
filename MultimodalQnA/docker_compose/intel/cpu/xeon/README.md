@@ -10,7 +10,6 @@ For detailed information about these instance types, you can refer to this [link
 
 After launching your instance, you can connect to it using SSH (for Linux instances) or Remote Desktop Protocol (RDP) (for Windows instances). From there, you'll have full access to your Xeon server, allowing you to install, configure, and manage your applications as needed.
 
-
 ## Setup Environment Variables
 
 Since the `compose.yaml` will consume some environment variables, you need to setup them in advance as below.
@@ -20,7 +19,6 @@ source set_env.sh
 ```
 
 Note: Please replace with `host_ip` with you external IP address, do not use localhost.
-
 
 ## 🚀 Build Docker Images
 
