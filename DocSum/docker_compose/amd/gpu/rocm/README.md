@@ -90,19 +90,19 @@
 
   ##### vLLM-based application:
 
-    - opea/vllm-rocm:latest
-    - opea/llm-docsum:latest
-    - opea/whisper:latest
-    - opea/docsum:latest
-    - opea/docsum-gradio-ui:latest
+  - opea/vllm-rocm:latest
+  - opea/llm-docsum:latest
+  - opea/whisper:latest
+  - opea/docsum:latest
+  - opea/docsum-gradio-ui:latest
 
   ##### TGI-based application:
 
-    - ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
-    - opea/llm-docsum:latest
-    - opea/whisper:latest
-    - opea/docsum:latest
-    - opea/docsum-gradio-ui:latest
+  - ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
+  - opea/llm-docsum:latest
+  - opea/whisper:latest
+  - opea/docsum:latest
+  - opea/docsum-gradio-ui:latest
 
 ---
 
