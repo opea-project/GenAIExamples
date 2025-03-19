@@ -128,12 +128,18 @@ export http_proxy="Your_HTTP_Proxy"
 export https_proxy="Your_HTTPs_Proxy"
 # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
 export no_proxy="Your_No_Proxy"
+```
 
-# for using open-source llms
+##### for using open-source llms
+
+```
 export HUGGINGFACEHUB_API_TOKEN=<your-HF-token>
 export HF_CACHE_DIR=<directory-where-llms-are-downloaded> #so that no need to redownload every time
+```
 
-# optional: OPANAI_API_KEY if you want to use OpenAI models
+##### optional: OPANAI_API_KEY if you want to use OpenAI models
+
+```
 export OPENAI_API_KEY=<your-openai-key>
 ```
 
@@ -160,11 +166,13 @@ cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/hpu/gaudi/
 docker compose -f $WORKDIR/GenAIExamples/DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml -f compose.yaml up -d
 ```
 
-##### Web Search Tool support
+##### Web Search Tool support [Optional]
 
+<details>
+<summary> Instructions </summary>
 Web search tool is also available by running with an additional compose.webtool.yaml file.  
-Google Search API is used, so proper CSE_ID and API_KEY needed to be exported.  
-Please follow this [link](https://python.langchain.com/docs/integrations/tools/google_search/) to get CSE_ID and API_KEY for a google account.
+Google Search API is used, so proper CSE_ID and API_KEY needed to be exported.    
+Please follow this https://python.langchain.com/docs/integrations/tools/google_search/ to get CSE_ID and API_KEY for a google account.
 
 ```bash
 cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/hpu/gaudi/
@@ -172,6 +180,8 @@ export GOOGLE_CSE_ID="YOUR_ID"
 export GOOGLE_API_KEY="YOUR_API_KEY"
 docker compose -f $WORKDIR/GenAIExamples/DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml -f compose.yaml -f compose.webtool.yaml up -d
 ```
+
+</details>
 
 #### Xeon
 
