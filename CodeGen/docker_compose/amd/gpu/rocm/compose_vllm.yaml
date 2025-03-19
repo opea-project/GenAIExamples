@@ -69,7 +69,8 @@ services:
       https_proxy: ${https_proxy}
       http_proxy: ${http_proxy}
       MEGA_SERVICE_HOST_IP: ${CODEGEN_MEGA_SERVICE_HOST_IP}
-      LLM_SERVICE_HOST_IP: "codegen-llm-server"
+      LLM_SERVICE_HOST_IP: ${HOST_IP}
+      LLM_SERVICE_PORT: ${CODEGEN_LLM_SERVICE_PORT}
     ipc: host
     restart: always
   codegen-ui-server:
