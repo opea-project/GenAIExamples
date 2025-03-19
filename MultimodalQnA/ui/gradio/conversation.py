@@ -2,12 +2,11 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import dataclasses
-
 from enum import Enum, auto
 from pathlib import Path
-from typing import Dict, List, Any, Literal
+from typing import Any, Dict, List, Literal
 
-from utils import convert_audio_to_base64, get_b64_frame_from_timestamp, GRADIO_IMAGE_FORMATS, GRADIO_AUDIO_FORMATS
+from utils import GRADIO_AUDIO_FORMATS, GRADIO_IMAGE_FORMATS, convert_audio_to_base64, get_b64_frame_from_timestamp
 
 
 class SeparatorStyle(Enum):
@@ -43,43 +42,49 @@ class Conversation:
         return out
 
     def get_prompt(self, is_very_first_query):
-        conv_dict = [{'role': 'user', 'content': []}]
+        conv_dict = [{"role": "user", "content": []}]
         caption_flag = True
         is_image_query = False
-        
+
         for record in self.chatbot_history:
-            role = record['role']
-            content = record['content']
-            
-            if role == 'user':
+            role = record["role"]
+            content = record["content"]
+
+            if role == "user":
                 # Check if last entry of conv_dict has role user
-                if conv_dict[-1]['role'] != 'user':
-                    conv_dict.append({'role': 'user', 'content': []})
-            elif role == 'assistant':
+                if conv_dict[-1]["role"] != "user":
+                    conv_dict.append({"role": "user", "content": []})
+            elif role == "assistant":
                 caption_flag = False
                 # Check if last entry of conv_dict has role assistant
-                if conv_dict[-1]['role'] != 'assistant':
-                    conv_dict.append({'role': 'assistant', 'content': []})
-            
+                if conv_dict[-1]["role"] != "assistant":
+                    conv_dict.append({"role": "assistant", "content": []})
+
             # Add content to the last conv_dict record. The single space has only effect on first image-only
             # query for the similarity search results to get expected response.
             if isinstance(content, str):
                 if caption_flag:
                     content += " " + self._template_caption()
-                conv_dict[-1]['content'].append({'type': 'text', 'text': content})
-            
-            if isinstance(content, dict) and 'path' in content:
-                if Path(content['path']).suffix in GRADIO_IMAGE_FORMATS:
+                conv_dict[-1]["content"].append({"type": "text", "text": content})
+
+            if isinstance(content, dict) and "path" in content:
+                if Path(content["path"]).suffix in GRADIO_IMAGE_FORMATS:
                     is_image_query = True
-                    conv_dict[-1]['content'].append({'type': 'image_url', 'image_url': {'url': get_b64_frame_from_timestamp(content['path'], 0)}})
-                if Path(content['path']).suffix in GRADIO_AUDIO_FORMATS:
-                    conv_dict[-1]['content'].append({'type': 'audio', 'audio': convert_audio_to_base64(content['path'])})
-            
+                    conv_dict[-1]["content"].append(
+                        {"type": "image_url", "image_url": {"url": get_b64_frame_from_timestamp(content["path"], 0)}}
+                    )
+                if Path(content["path"]).suffix in GRADIO_AUDIO_FORMATS:
+                    conv_dict[-1]["content"].append(
+                        {"type": "audio", "audio": convert_audio_to_base64(content["path"])}
+                    )
+
             # include the image from the assistant's response given the user's is not a image query
             if not is_image_query and caption_flag and self.image:
-                conv_dict[-1]['content'].append({'type': 'image_url', 'image_url': {'url': get_b64_frame_from_timestamp(self.image, 0)}})
-                                        
-        return conv_dict        
+                conv_dict[-1]["content"].append(
+                    {"type": "image_url", "image_url": {"url": get_b64_frame_from_timestamp(self.image, 0)}}
+                )
+
+        return conv_dict
 
     def get_b64_image(self):
         b64_img = None
@@ -97,7 +102,7 @@ class Conversation:
 
     def to_gradio_chatbot(self):
         return self.chatbot_history
-        
+
     def copy(self):
         return Conversation(
             system=self.system,

@@ -84,7 +84,7 @@ function setup_env() {
     export WHISPER_MODEL="base"
     export WHISPER_SERVER_ENDPOINT="http://${host_ip}:${WHISPER_PORT}/v1/asr"
     export TTS_PORT=7055
-    export TTS_ENDPOINT="http://${host_ip}:${TTS_PORT}/v1/tts" 
+    export TTS_ENDPOINT="http://${host_ip}:${TTS_PORT}/v1/tts"
     export DATAPREP_MMR_PORT=6007
     export DATAPREP_INGEST_SERVICE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/dataprep/ingest"
     export DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/dataprep/generate_transcripts"
@@ -231,7 +231,7 @@ function validate_microservices() {
         "Data preparation succeeded" \
         "dataprep-multimodal-redis-ingest" \
         "dataprep-multimodal-redis"
-    
+
     echo "Validating Data Prep with Image & Audio Caption Ingestion"
     validate_service \
         "${DATAPREP_INGEST_SERVICE_ENDPOINT}" \

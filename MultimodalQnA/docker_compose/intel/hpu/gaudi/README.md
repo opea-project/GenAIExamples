@@ -163,7 +163,6 @@ Then run the command `docker images`, you will have the following 11 Docker Imag
 
 By default, the multimodal-embedding and LVM models are set to a default value as listed below:
 
-
 | Service   | Model                                       |
 | --------- | ------------------------------------------- |
 | embedding | BridgeTower/bridgetower-large-itm-mlm-gaudi |
