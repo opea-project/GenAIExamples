@@ -38,7 +38,7 @@ export db_name=Chinook
 export db_path="sqlite:////home/user/chinook-db/Chinook_Sqlite.sqlite"
 if [ ! -f $WORKDIR/GenAIExamples/AgentQnA/tests/Chinook_Sqlite.sqlite ]; then
     echo "Download Chinook_Sqlite!"
-    wget  -O $WORKDIR/GenAIExamples/AgentQnA/tests/Chinook_Sqlite.sqlite  https://raw.githubusercontent.com/lerocha/chinook-database/refs/heads/master/ChinookDatabase/DataSources/Chinook_Sqlite.sqlite
+    wget  -O $WORKDIR/GenAIExamples/AgentQnA/tests/Chinook_Sqlite.sqlite  https://github.com/lerocha/chinook-database/releases/download/v1.4.5/Chinook_Sqlite.sqlite
 fi
 
 # configure agent ui

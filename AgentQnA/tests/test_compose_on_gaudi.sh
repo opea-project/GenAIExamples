@@ -77,14 +77,9 @@ echo "=================== #1 Building docker images===================="
 build_agent_docker_image
 echo "=================== #1 Building docker images completed===================="
 
-
-echo "=================== #4 Start agent and API server===================="
-bash step4_launch_and_validate_agent_gaudi.sh
-echo "=================== #4 Agent test passed ===================="
-
-echo "=================== #3 Ingest data and validate retrieval===================="
-bash step3_ingest_data_and_validate_retrieval.sh
-echo "=================== #3 Data ingestion and validation completed===================="
+echo "=================== #4 Start agent, API server, retrieval, and ingest data===================="
+bash $WORKPATH/tests/step4_launch_and_validate_agent_gaudi.sh
+echo "=================== #4 Agent, retrieval test passed ===================="
 
 echo "=================== #5 Stop agent and API server===================="
 stop_crag

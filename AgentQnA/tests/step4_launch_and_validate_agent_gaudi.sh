@@ -89,7 +89,7 @@ function validate_agent_service() {
     echo "======================Testing worker rag agent======================"
     export agent_port="9095"
     prompt="Tell me about Michael Jackson song Thriller"
-    local CONTENT=$(python3 $WORKDIR/GenAIExamples/AgentQnA/tests/test.py --prompt "$prompt" --agent_role "worker" --ext_port $agent_port)
+    local CONTENT=$(python3 $WORKDIR/GenAIExamples/AgentQnA/tests/test.py --prompt "$prompt" --agent_role "worker" --ip_addr $ip_address  --ext_port $agent_port)
     # echo $CONTENT
     local EXIT_CODE=$(validate "$CONTENT" "Thriller" "rag-agent-endpoint")
     echo $EXIT_CODE
@@ -103,7 +103,7 @@ function validate_agent_service() {
     echo "======================Testing worker sql agent======================"
     export agent_port="9096"
     prompt="How many employees are there in the company?"
-    local CONTENT=$(python3 $WORKDIR/GenAIExamples/AgentQnA/tests/test.py --prompt "$prompt" --agent_role "worker" --ext_port $agent_port)
+    local CONTENT=$(python3 $WORKDIR/GenAIExamples/AgentQnA/tests/test.py --prompt "$prompt" --agent_role "worker" --ip_addr $ip_address --ext_port $agent_port)
     local EXIT_CODE=$(validate "$CONTENT" "8" "sql-agent-endpoint")
     echo $CONTENT
     # echo $EXIT_CODE
@@ -116,7 +116,7 @@ function validate_agent_service() {
     # test supervisor react agent
     echo "======================Testing supervisor react agent======================"
     export agent_port="9090"
-    local CONTENT=$(python3 $WORKDIR/GenAIExamples/AgentQnA/tests/test.py --agent_role "supervisor" --ext_port $agent_port --stream)
+    local CONTENT=$(python3 $WORKDIR/GenAIExamples/AgentQnA/tests/test.py --agent_role "supervisor" --ip_addr $ip_address  --ext_port $agent_port --stream)
     local EXIT_CODE=$(validate "$CONTENT" "Iron" "react-agent-endpoint")
     # echo $CONTENT
     echo $EXIT_CODE
@@ -137,6 +137,52 @@ function remove_chinook_data(){
     echo "Chinook data removed!"
 }
 
+export host_ip=$ip_address
+echo "ip_address=${ip_address}"
+
+
+function validate() {
+    local CONTENT="$1"
+    local EXPECTED_RESULT="$2"
+    local SERVICE_NAME="$3"
+
+    if echo "$CONTENT" | grep -q "$EXPECTED_RESULT"; then
+        echo "[ $SERVICE_NAME ] Content is as expected: $CONTENT"
+        echo 0
+    else
+        echo "[ $SERVICE_NAME ] Content does not match the expected result: $CONTENT"
+        echo 1
+    fi
+}
+
+function ingest_data_and_validate() {
+    echo "Ingesting data"
+    cd $WORKDIR/GenAIExamples/AgentQnA/retrieval_tool/
+    echo $PWD
+    local CONTENT=$(bash run_ingest_data.sh)
+    local EXIT_CODE=$(validate "$CONTENT" "Data preparation succeeded" "dataprep-redis-server")
+    echo "$EXIT_CODE"
+    local EXIT_CODE="${EXIT_CODE:0-1}"
+    echo "return value is $EXIT_CODE"
+    if [ "$EXIT_CODE" == "1" ]; then
+        docker logs dataprep-redis-server
+        return 1
+    fi
+}
+
+function validate_retrieval_tool() {
+    echo "----------------Test retrieval tool ----------------"
+    local CONTENT=$(http_proxy="" curl http://${ip_address}:8889/v1/retrievaltool -X POST -H "Content-Type: application/json" -d '{
+     "text": "Who sang Thriller"
+    }')
+    local EXIT_CODE=$(validate "$CONTENT" "Thriller" "retrieval-tool")
+
+    if [ "$EXIT_CODE" == "1" ]; then
+        docker logs retrievaltool-xeon-backend-server
+        exit 1
+    fi
+}
+
 function main() {
     echo "==================== Prepare data ===================="
     download_chinook_data
@@ -145,6 +191,14 @@ function main() {
     echo "==================== Start all services ===================="
     start_all_services
     echo "==================== all services started ===================="
+
+    echo "==================== Ingest data ===================="
+    ingest_data_and_validate
+    echo "==================== Data ingestion completed ===================="
+
+    echo "==================== Validate retrieval tool ===================="
+    validate_retrieval_tool
+    echo "==================== Retrieval tool validated ===================="
 
     echo "==================== Validate agent service ===================="
     validate_agent_service
