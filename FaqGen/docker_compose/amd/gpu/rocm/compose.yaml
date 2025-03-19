@@ -85,7 +85,7 @@ services:
       no_proxy: ${no_proxy}
       https_proxy: ${https_proxy}
       http_proxy: ${http_proxy}
-      DOC_BASE_URL: "http://${EXTERNAL_HOST_IP}:${FAQGEN_BACKEND_SERVER_PORT}/v1/faqgen"
+      FAQ_BASE_URL: ${FAQGEN_BACKEND_ENDPOINT}
     ipc: host
     restart: always
 networks:
