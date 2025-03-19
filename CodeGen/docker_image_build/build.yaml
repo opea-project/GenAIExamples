@@ -29,3 +29,15 @@ services:
       dockerfile: comps/llms/src/text-generation/Dockerfile
     extends: codegen
     image: ${REGISTRY:-opea}/llm-textgen:${TAG:-latest}
+  vllm:
+    build:
+      context: vllm
+      dockerfile: Dockerfile.cpu
+    extends: codegen
+    image: ${REGISTRY:-opea}/vllm:${TAG:-latest}
+  vllm-gaudi:
+    build:
+      context: vllm-fork
+      dockerfile: Dockerfile.hpu
+    extends: codegen
+    image: ${REGISTRY:-opea}/vllm-gaudi:${TAG:-latest}
