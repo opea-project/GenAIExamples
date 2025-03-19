@@ -7,15 +7,20 @@ import logging.handlers
 import os
 import shutil
 import sys
+import tempfile
 from pathlib import Path
 
 import cv2
 from moviepy.video.io.VideoFileClip import VideoFileClip
 
 LOGDIR = "."
+TMP_DIR = "/tmp"
 
 server_error_msg = "**NETWORK ERROR DUE TO HIGH TRAFFIC. PLEASE REGENERATE OR REFRESH THIS PAGE.**"
 moderation_msg = "YOUR INPUT VIOLATES OUR CONTENT MODERATION GUIDELINES. PLEASE TRY AGAIN."
+
+GRADIO_IMAGE_FORMATS = [".jpeg", ".png", ".jpg", ".gif"]
+GRADIO_AUDIO_FORMATS = [".wav", ".mp3",]
 
 handler = None
 save_log = False
@@ -186,3 +191,15 @@ def convert_audio_to_base64(audio_path):
     """Convert .wav file to base64 string."""
     encoded_string = base64.b64encode(open(audio_path, "rb").read())
     return encoded_string.decode("utf-8")
+
+def convert_base64_to_audio(b64_str):
+    """Decodes the base64 encoded audio data and returns a saved filepath."""
+    
+    audio_data = base64.b64decode(b64_str)
+
+    # Create a temporary file
+    with tempfile.NamedTemporaryFile(dir=TMP_DIR, delete=False, suffix=".wav") as temp_audio:
+        temp_audio.write(audio_data)
+        temp_audio_path = temp_audio.name  # Store the path
+
+    return temp_audio_path
