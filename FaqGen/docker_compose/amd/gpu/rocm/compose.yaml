@@ -22,12 +22,11 @@ services:
       timeout: 10s
       retries: 100
     volumes:
-      - "/var/opea/faqgen-service/data:/data"
+      - "./data:/data"
     shm_size: 1g
     devices:
       - /dev/kfd:/dev/kfd
-      - /dev/dri/${FAQGEN_CARD_ID}:/dev/dri/${FAQGEN_CARD_ID}
-      - /dev/dri/${FAQGEN_RENDER_ID}:/dev/dri/${FAQGEN_RENDER_ID}
+      - /dev/dri:/dev/dri
     cap_add:
       - SYS_PTRACE
     group_add:
@@ -36,6 +35,7 @@ services:
       - seccomp:unconfined
     ipc: host
     command: --model-id ${FAQGEN_LLM_MODEL_ID}
+
   faqgen-llm-server:
     image: ${REGISTRY:-opea}/llm-faqgen:${TAG:-latest}
     container_name: faqgen-llm-server
@@ -53,9 +53,10 @@ services:
       HUGGINGFACEHUB_API_TOKEN: ${FAQGEN_HUGGINGFACEHUB_API_TOKEN}
       HUGGING_FACE_HUB_TOKEN: ${FAQGEN_HUGGINGFACEHUB_API_TOKEN}
       LLM_MODEL_ID: ${FAQGEN_LLM_MODEL_ID}
-      FAQGen_COMPONENT_NAME: ${FAQGen_COMPONENT_NAME}
+      FAQGen_COMPONENT_NAME: "OpeaFaqGenvLLM"
       LOGFLAG: ${LOGFLAG:-False}
     restart: unless-stopped
+
   faqgen-backend-server:
     image: ${REGISTRY:-opea}/faqgen:${TAG:-latest}
     container_name: faqgen-backend-server
@@ -65,13 +66,14 @@ services:
     ports:
       - "${FAQGEN_BACKEND_SERVER_PORT:-8888}:8888"
     environment:
-      - no_proxy=${no_proxy}
-      - https_proxy=${https_proxy}
-      - http_proxy=${http_proxy}
-      - MEGA_SERVICE_HOST_IP=${HOST_IP}
-      - LLM_SERVICE_HOST_IP=${HOST_IP}
+      no_proxy: ${no_proxy}
+      https_proxy: ${https_proxy}
+      http_proxy: ${http_proxy}
+      MEGA_SERVICE_HOST_IP: ${HOST_IP}
+      LLM_SERVICE_HOST_IP: ${HOST_IP}
     ipc: host
     restart: always
+
   faqgen-ui-server:
     image: ${REGISTRY:-opea}/faqgen-ui:${TAG:-latest}
     container_name: faqgen-ui-server
@@ -80,10 +82,10 @@ services:
     ports:
       - "${FAGGEN_UI_PORT:-5173}:5173"
     environment:
-      - no_proxy=${no_proxy}
-      - https_proxy=${https_proxy}
-      - http_proxy=${http_proxy}
-      - DOC_BASE_URL="http://${HOST_IP}:${FAQGEN_BACKEND_SERVER_PORT}/v1/faqgen"
+      no_proxy: ${no_proxy}
+      https_proxy: ${https_proxy}
+      http_proxy: ${http_proxy}
+      DOC_BASE_URL: "http://${EXTERNAL_HOST_IP}:${FAQGEN_BACKEND_SERVER_PORT}/v1/faqgen"
     ipc: host
     restart: always
 networks:
