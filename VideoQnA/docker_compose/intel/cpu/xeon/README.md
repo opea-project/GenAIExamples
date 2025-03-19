@@ -321,7 +321,7 @@ docker compose up -d
    curl http://${host_ip}:${LVM_PORT}/v1/lvm\
      -X POST \
      -d '{"video_url":"https://github.com/DAMO-NLP-SG/Video-LLaMA/raw/main/examples/silence_girl.mp4","chunk_start": 0,"chunk_duration": 7,"prompt":"What is the man doing?","max_new_tokens": 50}'
- \
+   \
      -H 'Content-Type: application/json'
    ```
 
