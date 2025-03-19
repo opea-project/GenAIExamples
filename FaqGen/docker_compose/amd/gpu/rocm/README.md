@@ -59,13 +59,13 @@
   #### vLLM-based application
 
   ```bash
-  service_list="vllm-rocm llm-faqgen faqgen faqgen-ui"
+  service_list="vllm-rocm llm-faqgen faqgen faqgen-ui faqgen-react-ui"
   ```
 
   #### TGI-based application
 
   ```bash
-  service_list="llm-faqgen faqgen faqgen-ui"
+  service_list="llm-faqgen faqgen faqgen-ui faqgen-react-ui"
   ```
 
 - #### Optional. Pull TGI Docker Image (Do this if you want to use TGI)
@@ -266,30 +266,10 @@ curl http://${HOST_IP}:${FAQGEN_VLLM_SERVICE_PORT}/v1/completions \
 Checking the response from the service. The response should be similar to JSON:
 
 ````json
-{
-  "id": "chatcmpl-142f34ef35b64a8db3deedd170fed951",
-  "object": "chat.completion",
-  "created": 1742270316,
-  "model": "Qwen/Qwen2.5-Coder-7B-Instruct",
-  "choices": [
-    {
-      "index": 0,
-      "message": {
-        "role": "assistant",
-        "content": "```python\nfrom typing import Optional, List, Dict, Union\nfrom pydantic import BaseModel, validator\n\nclass OperationRequest(BaseModel):\n    # Assuming OperationRequest is already defined as per the given text\n    pass\n\nclass UpdateOperation(OperationRequest):\n    new_items: List[str]\n\n    def apply_and_maybe_raise(self, updatable_item: \"Updatable todo list\") -> None:\n        # Assuming updatable_item is an instance of Updatable todo list\n        self.validate()\n        updatable_item.add_items(self.new_items)\n\nclass Updatable:\n    # Abstract class for items that can be updated\n    pass\n\nclass TodoList(Updatable):\n    # Class that represents a todo list\n    items: List[str]\n\n    def add_items(self, new_items: List[str]) -> None:\n        self.items.extend(new_items)\n\ndef handle_request(operation_request: OperationRequest) -> None:\n    # Function to handle an operation request\n    if isinstance(operation_request, UpdateOperation):\n        operation_request.apply_and_maybe_raise(get_todo_list_for_update())\n    else:\n        raise ValueError(\"Invalid operation request\")\n\ndef get_todo_list_for_update() -> TodoList:\n    # Function to get the todo list for update\n    # Assuming this function returns the",
-        "tool_calls": []
-      },
-      "logprobs": null,
-      "finish_reason": "length",
-      "stop_reason": null
-    }
-  ],
-  "usage": { "prompt_tokens": 66, "total_tokens": 322, "completion_tokens": 256, "prompt_tokens_details": null },
-  "prompt_logprobs": null
-}
+{"id":"cmpl-0844e21b824c4472b77f2851a177eca2","object":"text_completion","created":1742385979,"model":"meta-llama/Meta-Llama-3-8B-Instruct","choices":[{"index":0,"text":" Deep learning is a subset of machine learning that involves the use of artificial neural networks to analyze and interpret data. It is called \"deep\" because it","logprobs":null,"finish_reason":"length","stop_reason":null,"prompt_logprobs":null}],"usage":{"prompt_tokens":7,"total_tokens":37,"completion_tokens":30,"prompt_tokens_details":null}}
 ````
 
-If the service response has a meaningful response in the value of the "choices.message.content" key,
+If the service response has a meaningful response in the value of the "choices.text" key,
 then we consider the vLLM service to be successfully launched
 
 #### If you use TGI:
@@ -320,78 +300,43 @@ then we consider the TGI service to be successfully launched
 ### 2. Validate the LLM Service
 
 ```bash
-DATA='{"query":"Implement a high-level API for a TODO list application. '\
-'The API takes as input an operation request and updates the TODO list in place. '\
-'If the request is invalid, raise an exception.",'\
-'"max_tokens":256,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,'\
-'"repetition_penalty":1.03,"stream":false}'
-
-curl http://${HOST_IP}:${CODEGEN_LLM_SERVICE_PORT}/v1/chat/completions \
-  -X POST \
-  -d "$DATA" \
-  -H 'Content-Type: application/json'
+curl http://${HOST_IP}:${FAQGEN_LLM_SERVER_PORT}/v1/faqgen \
+     -X POST \
+     -d '{"messages":"What is Deep Learning?"}' \
+     -H 'Content-Type: application/json'
 ```
 
 Checking the response from the service. The response should be similar to JSON:
 
 ````json
-{
-  "id": "cmpl-4e89a590b1af46bfb37ce8f12b2996f8",
-  "choices": [
-    {
-      "finish_reason": "length",
-      "index": 0,
-      "logprobs": null,
-      "text": " The API should support the following operations:\n\n1. Add a new task to the TODO list.\n2. Remove a task from the TODO list.\n3. Mark a task as completed.\n4. Retrieve the list of all tasks.\n\nThe API should also support the following features:\n\n1. The ability to filter tasks based on their completion status.\n2. The ability to sort tasks based on their priority.\n3. The ability to search for tasks based on their description.\n\nHere is an example of how the API can be used:\n\n```python\ntodo_list = []\napi = TodoListAPI(todo_list)\n\n# Add tasks\napi.add_task(\"Buy groceries\")\napi.add_task(\"Finish homework\")\n\n# Mark a task as completed\napi.mark_task_completed(\"Buy groceries\")\n\n# Retrieve the list of all tasks\nprint(api.get_all_tasks())\n\n# Filter tasks based on completion status\nprint(api.filter_tasks(completed=True))\n\n# Sort tasks based on priority\napi.sort_tasks(priority=\"high\")\n\n# Search for tasks based on description\nprint(api.search_tasks(description=\"homework\"))\n```\n\nIn this example, the `TodoListAPI` class is used to manage the TODO list. The `add_task` method adds a new task to the list, the `mark_task_completed` method",
-      "stop_reason": null,
-      "prompt_logprobs": null
-    }
-  ],
-  "created": 1742270567,
-  "model": "Qwen/Qwen2.5-Coder-7B-Instruct",
-  "object": "text_completion",
-  "system_fingerprint": null,
-  "usage": {
-    "completion_tokens": 256,
-    "prompt_tokens": 37,
-    "total_tokens": 293,
-    "completion_tokens_details": null,
-    "prompt_tokens_details": null
-  }
-}
+{"id":"1e47daf13a8bc73495dbfd9836eaa7e4","text":" Q: What is Deep Learning?\n         A: Deep Learning is a subset of Machine Learning that involves the use of artificial neural networks to analyze and interpret data. It is called \"deep\" because it involves multiple layers of interconnected nodes or \"neurons\" that process and transform the data.\n\n         Q: What is the main difference between Deep Learning and Machine Learning?\n         A: The main difference between Deep Learning and Machine Learning is the complexity of the models used. Machine Learning models are typically simpler and more linear, while Deep Learning models are more complex and non-linear, allowing them to learn and represent more abstract and nuanced patterns in data.\n\n         Q: What are some common applications of Deep Learning?\n         A: Some common applications of Deep Learning include image and speech recognition, natural language processing, recommender systems, and autonomous vehicles.\n\n         Q: Is Deep Learning a new field?\n         A: Deep Learning is not a new field, but it has gained significant attention and popularity in recent years due to advances in computing power, data storage, and algorithms.\n\n         Q: Can Deep Learning be used for any type of data?\n         A: Deep Learning can be used for any type of data that can be represented as a numerical array, such as images, audio, text, and time series data.\n\n         Q: Is Deep Learning a replacement for traditional Machine Learning?\n         A: No, Deep Learning is not a replacement for traditional Machine Learning. Instead, it is a complementary technology that can be used in conjunction with traditional Machine Learning techniques to solve complex problems.\n\n         Q: What are some of the challenges associated with Deep Learning?\n         A: Some of the challenges associated with Deep Learning include the need for large amounts of data, the risk of overfitting, and the difficulty of interpreting the results of the models.\n\n         Q: Can Deep Learning be used for real-time applications?\n         A: Yes, Deep Learning can be used for real-time applications, such as image and speech recognition, and autonomous vehicles.\n\n         Q: Is Deep Learning a field that requires a lot of mathematical knowledge?\n         A: While some mathematical knowledge is helpful, it is not necessary to have a deep understanding of mathematics to work with Deep Learning. Many Deep Learning libraries and frameworks provide pre-built functions and tools that can be used to implement Deep Learning models.","prompt":"What is Deep Learning?"}
 ````
 
-If the service response has a meaningful response in the value of the "choices.text" key,
+If the service response has a meaningful response in the value of the "text" key,
 then we consider the vLLM service to be successfully launched
 
 ### 3. Validate the MegaService
 
 ```bash
-DATA='{"messages": "Implement a high-level API for a TODO list application. '\
-'The API takes as input an operation request and updates the TODO list in place. '\
-'If the request is invalid, raise an exception."}'
-
-curl http://${HOST_IP}:${CODEGEN_BACKEND_SERVICE_PORT}/v1/faqgen \
-  -H "Content-Type: application/json" \
-  -d "$DATA"
+curl http://${HOST_IP}:${FAQGEN_BACKEND_SERVER_PORT}/v1/faqgen \
+  -H "Content-Type: multipart/form-data" \
+  -F "messages=What is Deep Learning?" \
+  -F "max_tokens=100" \
+  -F "stream=False"
 ```
 
 Checking the response from the service. The response should be similar to text:
 
-```textmate
-data: {"id":"cmpl-cc5dc73819c640469f7c7c7424fe57e6","choices":[{"finish_reason":null,"index":0,"logprobs":null,"text":" of","stop_reason":null}],"created":1742270725,"model":"Qwen/Qwen2.5-Coder-7B-Instruct","object":"text_completion","system_fingerprint":null,"usage":null}
-...........
-data: {"id":"cmpl-cc5dc73819c640469f7c7c7424fe57e6","choices":[{"finish_reason":null,"index":0,"logprobs":null,"text":" all","stop_reason":null}],"created":1742270725,"model":"Qwen/Qwen2.5-Coder-7B-Instruct","object":"text_completion","system_fingerprint":null,"usage":null}
-data: {"id":"cmpl-cc5dc73819c640469f7c7c7424fe57e6","choices":[{"finish_reason":null,"index":0,"logprobs":null,"text":" tasks","stop_reason":null}],"created":1742270725,"model":"Qwen/Qwen2.5-Coder-7B-Instruct","object":"text_completion","system_fingerprint":null,"usage":null}
-data: {"id":"cmpl-cc5dc73819c640469f7c7c7424fe57e6","choices":[{"finish_reason":"length","index":0,"logprobs":null,"text":",","stop_reason":null}],"created":1742270725,"model":"Qwen/Qwen2.5-Coder-7B-Instruct","object":"text_completion","system_fingerprint":null,"usage":null}
-data: [DONE]
+```json
+{"id":"chatcmpl-tjwp8giP2vyvRRxnqzc3FU","object":"chat.completion","created":1742386156,"model":"faqgen","choices":[{"index":0,"message":{"role":"assistant","content":" Q: What is Deep Learning?\n         A: Deep Learning is a subset of Machine Learning that involves the use of artificial neural networks to analyze and interpret data. It is called \"deep\" because it involves multiple layers of interconnected nodes or \"neurons\" that process and transform the data.\n\n         Q: What is the main difference between Deep Learning and Machine Learning?\n         A: The main difference between Deep Learning and Machine Learning is the complexity of the models used. Machine Learning models are typically simpler and"},"finish_reason":"stop","metadata":null}],"usage":{"prompt_tokens":0,"total_tokens":0,"completion_tokens":0}}
 ```
 
-If the output lines in the "choices.text" keys contain words (tokens) containing meaning, then the service is considered launched successfully.
+If the service response has a meaningful response in the value of the "choices.message.content" key,
+then we consider the MegaService to be successfully launched
 
 ### 4. Validate the Frontend (UI)
 
-To access the UI, use the URL - http://${EXTERNAL_HOST_IP}:${CODEGEN_UI_SERVICE_PORT}
+To access the UI, use the URL - http://${EXTERNAL_HOST_IP}:${FAGGEN_UI_PORT}
 A page should open when you click through to this address:
 
 ![UI start page](../../../../assets/img/ui-starting-page.png)
@@ -399,8 +344,8 @@ A page should open when you click through to this address:
 If a page of this type has opened, then we believe that the service is running and responding,
 and we can proceed to functional UI testing.
 
-Let's enter the task for the service in the "Enter prompt here" field.
-For example, "Write a Python code that returns the current time and date" and press Enter.
+For example, let's take the description of water from the Wiki.
+Copy the first few paragraphs from the Wiki and put them in the text field and then click Generate FAQs.
 After that, a page with the result of the task should open:
 
 ![UI result page](../../../../assets/img/ui-result-page.png)
@@ -422,137 +367,3 @@ docker compose -f compose_vllm.yaml down
 cd ~/faqgen-install/GenAIExamples/FaqGen/docker_compose/amd/gpu/rocm
 docker compose -f compose.yaml down
 ```
-
-# Build and deploy FaqGen Application on AMD GPU (ROCm)
-
-## Build images
-
-### Build the LLM Docker Image
-
-```bash
-### Cloning repo
-git clone https://github.com/opea-project/GenAIComps.git
-cd GenAIComps
-
-### Build Docker image
-docker build -t opea/llm-textgen:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/src/text-generation/Dockerfile .
-```
-
-## 🚀 Start Microservices and MegaService
-
-### Required Models
-
-Default model is "meta-llama/Meta-Llama-3-8B-Instruct". Change "LLM_MODEL_ID" in environment variables below if you want to use another model.
-
-For gated models, you also need to provide [HuggingFace token](https://huggingface.co/docs/hub/security-tokens) in "HUGGINGFACEHUB_API_TOKEN" environment variable.
-
-### Setup Environment Variables
-
-Since the `compose.yaml` will consume some environment variables, you need to setup them in advance as below.
-
-```bash
-export FAQGEN_LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
-export HOST_IP=${your_no_proxy}
-export FAQGEN_TGI_SERVICE_PORT=8008
-export FAQGEN_LLM_SERVER_PORT=9000
-export FAQGEN_HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
-export FAQGEN_BACKEND_SERVER_PORT=8888
-export FAGGEN_UI_PORT=5173
-export LLM_ENDPOINT="http://${HOST_IP}:${FAQGEN_TGI_SERVICE_PORT}"
-export FAQGen_COMPONENT_NAME="OpeaFaqGenTgi"
-```
-
-Note: Please replace with `host_ip` with your external IP address, do not use localhost.
-
-Note: In order to limit access to a subset of GPUs, please pass each device individually using one or more -device /dev/dri/rendered<node>, where <node> is the card index, starting from 128. (https://rocm.docs.amd.com/projects/install-on-linux/en/latest/how-to/docker.html#docker-restrict-gpus)
-
-Example for set isolation for 1 GPU
-
-```
-      - /dev/dri/card0:/dev/dri/card0
-      - /dev/dri/renderD128:/dev/dri/renderD128
-```
-
-Example for set isolation for 2 GPUs
-
-```
-      - /dev/dri/card0:/dev/dri/card0
-      - /dev/dri/renderD128:/dev/dri/renderD128
-      - /dev/dri/card0:/dev/dri/card0
-      - /dev/dri/renderD129:/dev/dri/renderD129
-```
-
-Please find more information about accessing and restricting AMD GPUs in the link (https://rocm.docs.amd.com/projects/install-on-linux/en/latest/how-to/docker.html#docker-restrict-gpus)
-
-### Start Microservice Docker Containers
-
-```bash
-cd GenAIExamples/FaqGen/docker_compose/amd/gpu/rocm/
-docker compose up -d
-```
-
-### Validate Microservices
-
-1. TGI Service
-
-   ```bash
-   curl http://${host_ip}:8008/generate \
-     -X POST \
-     -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}' \
-     -H 'Content-Type: application/json'
-   ```
-
-2. LLM Microservice
-
-   ```bash
-   curl http://${host_ip}:9000/v1/faqgen \
-     -X POST \
-     -d '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}' \
-     -H 'Content-Type: application/json'
-   ```
-
-3. MegaService
-
-   ```bash
-   curl http://${host_ip}:8888/v1/faqgen \
-   -H "Content-Type: multipart/form-data" \
-   -F "messages=Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5." \
-   -F "max_tokens=32" \
-   -F "stream=false"
-   ```
-
-   Following the validation of all aforementioned microservices, we are now prepared to construct a mega-service.
-
-## 🚀 Launch the UI
-
-Open this URL `http://{host_ip}:5173` in your browser to access the frontend.
-
-![project-screenshot](../../../../assets/img/faqgen_ui_text.png)
-
-## 🚀 Launch the React UI (Optional)
-
-To access the FAQGen (react based) frontend, modify the UI service in the `compose.yaml` file. Replace `faqgen-rocm-ui-server` service with the `faqgen-rocm-react-ui-server` service as per the config below:
-
-```bash
-  faqgen-rocm-react-ui-server:
-    image: opea/faqgen-react-ui:latest
-    container_name: faqgen-rocm-react-ui-server
-    environment:
-      - no_proxy=${no_proxy}
-      - https_proxy=${https_proxy}
-      - http_proxy=${http_proxy}
-    ports:
-      - 5174:80
-    depends_on:
-      - faqgen-rocm-backend-server
-    ipc: host
-    restart: always
-```
-
-Open this URL `http://{host_ip}:5174` in your browser to access the react based frontend.
-
-- Create FAQs from Text input
-  ![project-screenshot](../../../../assets/img/faqgen_react_ui_text.png)
-
-- Create FAQs from Text Files
-  ![project-screenshot](../../../../assets/img/faqgen_react_ui_text_file.png)
