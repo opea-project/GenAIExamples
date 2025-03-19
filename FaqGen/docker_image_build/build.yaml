@@ -19,6 +19,8 @@ services:
     image: ${REGISTRY:-opea}/faqgen-ui:${TAG:-latest}
   faqgen-react-ui:
     build:
+      args:
+        BACKEND_SERVICE_ENDPOINT: $FAQGEN_BACKEND_ENDPOINT
       context: ../ui
       dockerfile: ./docker/Dockerfile.react
     extends: faqgen
