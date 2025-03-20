@@ -47,8 +47,7 @@ git clone https://github.com/opea-project/GenAIComps.git
 cd GenAIComps
 ```
 
-
-  We remind you that when using a specific version of the code, you need to use the README from this version.
+We remind you that when using a specific version of the code, you need to use the README from this version.
 
 - #### Setting the list of images for the build (from the build file.yaml)
 
@@ -71,7 +70,7 @@ cd GenAIComps
   ```bash
   docker pull ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
   ```
-  
+
 - #### Build Docker Images
 
   ```bash
@@ -233,7 +232,7 @@ All containers should be running and should not restart:
 - audioqna-vllm-service
 - whisper-service
 - speecht5-service
-- audioqna-backend-server 
+- audioqna-backend-server
 - audioqna-ui-server
 
 ##### If you use TGI:
@@ -241,7 +240,7 @@ All containers should be running and should not restart:
 - audioqna-tgi-service
 - whisper-service
 - speecht5-service
-- audioqna-backend-server 
+- audioqna-backend-server
 - audioqna-ui-server
 
 ---
@@ -355,7 +354,6 @@ curl http://${host_ip}:7055/v1/tts \
 ```
 
 ### 4. Stop application
-
 ##### If you use vLLM
 
 ```bash
