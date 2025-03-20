@@ -9,6 +9,7 @@ echo "WORKDIR=${WORKDIR}"
 export ip_address=$(hostname -I | awk '{print $1}')
 export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
 export TOOLSET_PATH=$WORKDIR/GenAIExamples/AgentQnA/tools/
+export MODEL_CACHE="./data"
 
 function stop_crag() {
     cid=$(docker ps -aq --filter "name=kdd-cup-24-crag-service")
