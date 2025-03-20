@@ -1,0 +1,72 @@
+.intel-markdown {
+  color: var(--font-main-color);
+  strong {
+    font-weight: 600;
+  }
+  code,
+  pre,
+  samp,
+  tt {
+    font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas,
+      Liberation Mono, monospace;
+  }
+  code,
+  tt {
+    background-color: var(--color-primaryBg);
+    border-radius: 6px;
+    font-size: 85%;
+    margin: 0;
+    padding: 0.2em 0.4em;
+    white-space: break-spaces;
+  }
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-weight: 600;
+    line-height: 1.8;
+    margin: 0.6em 0;
+  }
+
+  h1 {
+    font-size: 1.3em;
+  }
+
+  h2 {
+    font-size: 1.15em;
+  }
+
+  h3,
+  h4,
+  h5 {
+    font-size: 1em;
+  }
+  a {
+    background-color: transparent;
+    color: var(--color-primary-hover);
+    text-decoration: none;
+    &:hover {
+      text-decoration: underline;
+    }
+    &:focus {
+      box-shadow: none;
+      outline: 2px solid var(--color-primary-hover);
+      outline-offset: -2px;
+    }
+  }
+  img {
+    width: 100%;
+    max-width: 320px;
+    height: auto;
+    cursor: pointer;
+  }
+  img[align="right"] {
+    padding-left: 20px;
+  }
+
+  img[align="left"] {
+    padding-right: 20px;
+  }
+}

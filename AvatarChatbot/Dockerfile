@@ -32,7 +32,7 @@ COPY --from=git $HOME/GenAIComps/comps $HOME/GenAIComps/comps
 COPY --from=git $HOME/GenAIComps/*.* $HOME/GenAIComps/LICENSE $HOME/GenAIComps/
 
 WORKDIR $HOME/GenAIComps
-RUN pip install --no-cache-dir --upgrade pip && \
+RUN pip install --no-cache-dir --upgrade pip setuptools && \
     pip install --no-cache-dir -r $HOME/GenAIComps/requirements.txt
 WORKDIR $HOME
 

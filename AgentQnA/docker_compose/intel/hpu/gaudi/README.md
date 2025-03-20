@@ -23,6 +23,7 @@ For more details, please refer to the deployment guide [here](../../../../README
    export no_proxy="Your_No_Proxy"
 
    export TOOLSET_PATH=$WORKDIR/GenAIExamples/AgentQnA/tools/
+
    # for using open-source llms
    export HUGGINGFACEHUB_API_TOKEN=<your-HF-token>
    # Example export HF_CACHE_DIR=$WORKDIR so that no need to redownload every time
@@ -78,6 +79,7 @@ For more details, please refer to the deployment guide [here](../../../../README
 
    ```bash
    vllm_port=8086
+   vllm_volume=$HF_CACHE_DIR # you should have set this env var in previous step
    model="meta-llama/Meta-Llama-3.1-70B-Instruct"
    docker run -d --runtime=habana --rm --name "vllm-gaudi-server" -e HABANA_VISIBLE_DEVICES=0,1,2,3 -p $vllm_port:8000 -v $vllm_volume:/data -e HF_TOKEN=$HF_TOKEN -e HUGGING_FACE_HUB_TOKEN=$HF_TOKEN -e HF_HOME=/data -e OMPI_MCA_btl_vader_single_copy_mechanism=none -e PT_HPU_ENABLE_LAZY_COLLECTIVES=true -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e no_proxy=$no_proxy -e VLLM_SKIP_WARMUP=true --cap-add=sys_nice --ipc=host opea/vllm-gaudi:latest --model ${model} --max-seq-len-to-capture 16384 --tensor-parallel-size 4
    ```

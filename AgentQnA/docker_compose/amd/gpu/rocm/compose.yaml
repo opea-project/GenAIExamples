@@ -8,7 +8,7 @@ services:
     ports:
       - "${AGENTQNA_TGI_SERVICE_PORT-8085}:80"
     volumes:
-      - /var/opea/agent-service/:/data
+      - ${HF_CACHE_DIR:-/var/opea/agent-service/}:/data
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}

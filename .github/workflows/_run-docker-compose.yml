@@ -28,6 +28,10 @@ on:
         required: false
         type: string
         default: ""
+      use_model_cache:
+        required: false
+        type: boolean
+        default: false
 jobs:
   get-test-case:
     runs-on: ubuntu-latest
@@ -60,9 +64,14 @@ jobs:
           cd ${{ github.workspace }}/${{ inputs.example }}/tests
           run_test_cases=""
 
-          default_test_case=$(find . -type f -name "test_compose_on_${{ inputs.hardware }}.sh" | cut -d/ -f2)
+          if [ "${{ inputs.hardware }}" == "gaudi2" ] || [ "${{ inputs.hardware }}" == "gaudi3" ]; then
+            hardware="gaudi"
+          else
+            hardware="${{ inputs.hardware }}"
+          fi
+          default_test_case=$(find . -type f -name "test_compose_on_$hardware.sh" | cut -d/ -f2)
           if [ "$default_test_case" ]; then run_test_cases="$default_test_case"; fi
-          other_test_cases=$(find . -type f -name "test_compose_*_on_${{ inputs.hardware }}.sh" | cut -d/ -f2)
+          other_test_cases=$(find . -type f -name "test_compose_*_on_$hardware.sh" | cut -d/ -f2)
           echo "default_test_case=$default_test_case"
           echo "other_test_cases=$other_test_cases"
 
@@ -95,7 +104,7 @@ jobs:
 
   compose-test:
     needs: [get-test-case]
-    if: ${{ needs.get-test-case.outputs.test_cases != '' }}
+    if: ${{ needs.get-test-case.outputs.test_cases != '[""]' }}
     strategy:
       matrix:
         test_case: ${{ fromJSON(needs.get-test-case.outputs.test_cases) }}
@@ -144,10 +153,19 @@ jobs:
           example: ${{ inputs.example }}
           hardware: ${{ inputs.hardware }}
           test_case: ${{ matrix.test_case }}
+          use_model_cache: ${{ inputs.use_model_cache }}
         run: |
           cd ${{ github.workspace }}/$example/tests
           if [[ "$IMAGE_REPO" == "" ]]; then export IMAGE_REPO="${OPEA_IMAGE_REPO}opea"; fi
-          if [ -f ${test_case} ]; then timeout 30m bash ${test_case}; else echo "Test script {${test_case}} not found, skip test!"; fi
+          if [[ "$use_model_cache" == "true" ]]; then
+            if [ -d "/data2/hf_model" ]; then
+              export model_cache="/data2/hf_model"
+            else
+              echo "Model cache directory /data2/hf_model does not exist"
+              export model_cache="~/.cache/huggingface/hub"
+            fi
+          fi
+          if [ -f "${test_case}" ]; then timeout 30m bash "${test_case}"; else echo "Test script {${test_case}} not found, skip test!"; fi
 
       - name: Clean up container after test
         shell: bash
