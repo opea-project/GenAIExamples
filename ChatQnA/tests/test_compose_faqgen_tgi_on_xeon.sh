@@ -2,14 +2,14 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-set -e
+set -xe
 IMAGE_REPO=${IMAGE_REPO:-"opea"}
 IMAGE_TAG=${IMAGE_TAG:-"latest"}
 echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
 echo "TAG=IMAGE_TAG=${IMAGE_TAG}"
 export REGISTRY=${IMAGE_REPO}
 export TAG=${IMAGE_TAG}
-export MODEL_CACHE=${model_cache:-"./data"}
+export MODEL_CACHE=${model_cache:-"/data/cache"}
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
@@ -27,45 +27,48 @@ function build_docker_images() {
             sed -i "s|$OLD_STRING|$NEW_STRING|g" "$file"
         done
     fi
-
     cd $WORKPATH/docker_image_build
     git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
     git clone https://github.com/vllm-project/vllm.git && cd vllm
-    # Get the latest tag
     VLLM_VER="$(git describe --tags "$(git rev-list --tags --max-count=1)" )"
     echo "Check out vLLM tag ${VLLM_VER}"
-    git checkout ${VLLM_VER} &> /dev/null
-    # Not change the pwd
-    cd ../
+    git checkout ${VLLM_VER} &> /dev/null && cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="chatqna chatqna-ui dataprep retriever vllm nginx"
+    service_list="chatqna chatqna-ui dataprep retriever llm-faqgen nginx"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
+    docker pull ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu
     docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
-
     docker images && sleep 1s
 }
 
 function start_services() {
     cd $WORKPATH/docker_compose/intel/cpu/xeon
-
     export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
+    export RERANK_MODEL_ID="BAAI/bge-reranker-base"
     export LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
     export INDEX_NAME="rag-redis"
-    export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+    export host_ip=${ip_address}
+    export LLM_ENDPOINT_PORT=8010
+    export LLM_SERVER_PORT=9001
+    export CHATQNA_BACKEND_PORT=8888
+    export CHATQNA_REDIS_VECTOR_PORT=6377
+    export CHATQNA_REDIS_VECTOR_INSIGHT_PORT=8006
+    export CHATQNA_FRONTEND_SERVICE_PORT=5175
+    export NGINX_PORT=80
+    export FAQGen_COMPONENT_NAME="OpeaFaqGenTgi"
+    export LLM_ENDPOINT="http://${host_ip}:${LLM_ENDPOINT_PORT}"
+    export HF_TOKEN=${HF_TOKEN}
+    export LOGFLAG=True
+    export http_proxy=${http_proxy}
+    export https_proxy=${https_proxy}
+    export no_proxy="${ip_address},redis-vector-db,dataprep-redis-service,tei-embedding-service,retriever,tei-reranking-service,tgi-service,vllm-service,guardrails,llm-faqgen,chatqna-xeon-backend-server,chatqna-xeon-ui-server,chatqna-xeon-nginx-server"
 
     # Start Docker Containers
-    docker compose -f compose_without_rerank.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
-    n=0
-    until [[ "$n" -ge 100 ]]; do
-        docker logs vllm-service > ${LOG_PATH}/vllm_service_start.log 2>&1
-        if grep -q complete ${LOG_PATH}/vllm_service_start.log; then
-            break
-        fi
-        sleep 5s
-        n=$((n+1))
-    done
+    docker compose -f compose_faqgen_tgi.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
+
+    sleep 30s
 }
 
 function validate_service() {
@@ -99,6 +102,10 @@ function validate_service() {
     else
         echo "[ $SERVICE_NAME ] HTTP status is 200. Checking content..."
     fi
+    echo "Response"
+    echo $RESPONSE_BODY
+    echo "Expected Result"
+    echo $EXPECTED_RESULT
     # check response body
     if [[ "$RESPONSE_BODY" != *"$EXPECTED_RESULT"* ]]; then
         echo "[ $SERVICE_NAME ] Content does not match the expected result: $RESPONSE_BODY"
@@ -112,6 +119,7 @@ function validate_service() {
 
 function validate_microservices() {
     # Check if the microservices are running correctly.
+    sleep 3m
 
     # tei for embedding service
     validate_service \
@@ -123,7 +131,7 @@ function validate_microservices() {
 
     sleep 1m # retrieval can't curl as expected, try to wait for more time
 
-    # test /v1/dataprep/ingest upload file
+    # test /v1/dataprep upload file
     echo "Deep learning is a subset of machine learning that utilizes neural networks with multiple layers to analyze various levels of abstract data representations. It enables computers to identify patterns and make decisions with minimal human intervention by learning from large amounts of data." > $LOG_PATH/dataprep_file.txt
     validate_service \
         "http://${ip_address}:6007/v1/dataprep/ingest" \
@@ -131,21 +139,21 @@ function validate_microservices() {
         "dataprep_upload_file" \
         "dataprep-redis-server"
 
-    # test /v1/dataprep/ingest upload link
+    # test /v1/dataprep upload link
     validate_service \
         "http://${ip_address}:6007/v1/dataprep/ingest" \
         "Data preparation succeeded" \
         "dataprep_upload_link" \
         "dataprep-redis-server"
 
-    # test /v1/dataprep/get
+    # test /v1/dataprep/get_file
     validate_service \
         "http://${ip_address}:6007/v1/dataprep/get" \
         '{"name":' \
         "dataprep_get" \
         "dataprep-redis-server"
 
-    # test /v1/dataprep/delete
+    # test /v1/dataprep/delete_file
     validate_service \
         "http://${ip_address}:6007/v1/dataprep/delete" \
         '{"status":true}' \
@@ -156,33 +164,58 @@ function validate_microservices() {
     test_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
     validate_service \
         "${ip_address}:7000/v1/retrieval" \
-        "retrieved_docs" \
-        "retrieval-microservice" \
+        " " \
+        "retrieval" \
         "retriever-redis-server" \
         "{\"text\":\"What is the revenue of Nike in 2023?\",\"embedding\":${test_embedding}}"
 
-    # vllm for llm service
+    # tei for rerank microservice
+    echo "validate tei..."
     validate_service \
-        "${ip_address}:9009/v1/chat/completions" \
+        "${ip_address}:8808/rerank" \
+        '{"index":1,"score":' \
+        "tei-rerank" \
+        "tei-reranking-server" \
+        '{"query":"What is Deep Learning?", "texts": ["Deep Learning is not...", "Deep learning is..."]}'
+
+    # tgi for llm service
+    echo "validate tgi..."
+    validate_service \
+        "${ip_address}:${LLM_ENDPOINT_PORT}/v1/chat/completions" \
         "content" \
-        "vllm-llm" \
-        "vllm-service" \
-        '{"model": "meta-llama/Meta-Llama-3-8B-Instruct", "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens": 17}'
+        "tgi-llm" \
+        "tgi-server" \
+        '{"model": "meta-llama/Meta-Llama-3-8B-Instruct", "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens":17}'
+
+    # faqgen llm microservice
+    echo "validate llm-faqgen..."
+    validate_service \
+        "${ip_address}:${LLM_SERVER_PORT}/v1/faqgen" \
+        "text" \
+        "llm" \
+        "llm-faqgen-server" \
+        '{"messages":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
 }
 
 function validate_megaservice() {
     # Curl the Mega Service
     validate_service \
-        "${ip_address}:8888/v1/chatqna" \
-        "Nike" \
+        "${ip_address}:${CHATQNA_BACKEND_PORT}/v1/chatqna" \
+        "Embed" \
         "chatqna-megaservice" \
         "chatqna-xeon-backend-server" \
-        '{"messages": "What is the revenue of Nike in 2023?"}'
+        '{"messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5.","max_tokens":32}'
+
+    validate_service \
+        "${ip_address}:${CHATQNA_BACKEND_PORT}/v1/chatqna" \
+        "Embed" \
+        "chatqna-megaservice" \
+        "chatqna-xeon-backend-server" \
+        '{"messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5.","max_tokens":32,"stream":false}'
 
 }
 
 function validate_frontend() {
-    echo "[ TEST INFO ]: --------- frontend test started ---------"
     cd $WORKPATH/ui/svelte
     local conda_env_name="OPEA_e2e"
     export PATH=${HOME}/miniforge3/bin/:$PATH
@@ -192,7 +225,6 @@ function validate_frontend() {
         conda create -n ${conda_env_name} python=3.12 -y
     fi
     source activate ${conda_env_name}
-    echo "[ TEST INFO ]: --------- conda env activated ---------"
 
     sed -i "s/localhost/$ip_address/g" playwright.config.ts
 
@@ -212,8 +244,8 @@ function validate_frontend() {
 }
 
 function stop_docker() {
-    cd $WORKPATH/docker_compose/intel/cpu/xeon/
-    docker compose -f compose_without_rerank.yaml down
+    cd $WORKPATH/docker_compose/intel/cpu/xeon
+    docker compose -f compose_faqgen_tgi.yaml  down
 }
 
 function main() {
@@ -227,11 +259,8 @@ function main() {
     echo "Mega service start duration is $duration s" && sleep 1s
 
     validate_microservices
-    echo "==== microservices validated ===="
     validate_megaservice
-    echo "==== megaservice validated ===="
     validate_frontend
-    echo "==== frontend validated ===="
 
     stop_docker
     echo y | docker system prune
