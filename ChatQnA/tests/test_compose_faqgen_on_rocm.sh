@@ -1,19 +1,53 @@
 #!/bin/bash
-# Copyright (C) 2024 Intel Corporation
+# Copyright (C) 2024 Advanced Micro Devices, Inc.
 # SPDX-License-Identifier: Apache-2.0
 
-set -e
+set -xe
 IMAGE_REPO=${IMAGE_REPO:-"opea"}
 IMAGE_TAG=${IMAGE_TAG:-"latest"}
 echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
 echo "TAG=IMAGE_TAG=${IMAGE_TAG}"
 export REGISTRY=${IMAGE_REPO}
 export TAG=${IMAGE_TAG}
-export MODEL_CACHE=${model_cache:-"./data"}
+export MODEL_CACHE=${model_cache:-"/var/opea/chatqna-service/data"}
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
+
+export HOST_IP=${ip_address}
+export CHATQNA_TGI_SERVICE_IMAGE="ghcr.io/huggingface/text-generation-inference:2.3.1-rocm"
+export CHATQNA_EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
+export CHATQNA_RERANK_MODEL_ID="BAAI/bge-reranker-base"
+export CHATQNA_LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
+export CHATQNA_TGI_SERVICE_PORT=9009
+export CHATQNA_TEI_EMBEDDING_PORT=8090
+export CHATQNA_TEI_EMBEDDING_ENDPOINT="http://${HOST_IP}:${CHATQNA_TEI_EMBEDDING_PORT}"
+export CHATQNA_TEI_RERANKING_PORT=8808
+export CHATQNA_REDIS_VECTOR_PORT=6379
+export CHATQNA_REDIS_VECTOR_INSIGHT_PORT=8001
+export CHATQNA_REDIS_DATAPREP_PORT=6007
+export CHATQNA_REDIS_RETRIEVER_PORT=7000
+export CHATQNA_LLM_FAQGEN_PORT=18010
+export CHATQNA_INDEX_NAME="rag-redis"
+export CHATQNA_MEGA_SERVICE_HOST_IP=${HOST_IP}
+export CHATQNA_RETRIEVER_SERVICE_HOST_IP=${HOST_IP}
+export CHATQNA_BACKEND_SERVICE_ENDPOINT="http://127.0.0.1:${CHATQNA_BACKEND_SERVICE_PORT}/v1/chatqna"
+export CHATQNA_DATAPREP_SERVICE_ENDPOINT="http://127.0.0.1:${CHATQNA_REDIS_DATAPREP_PORT}/v1/dataprep/ingest"
+export CHATQNA_DATAPREP_GET_FILE_ENDPOINT="http://127.0.0.1:${CHATQNA_REDIS_DATAPREP_PORT}/v1/dataprep/get"
+export CHATQNA_DATAPREP_DELETE_FILE_ENDPOINT="http://127.0.0.1:${CHATQNA_REDIS_DATAPREP_PORT}/v1/dataprep/delete"
+export CHATQNA_FRONTEND_SERVICE_IP=${HOST_IP}
+export CHATQNA_FRONTEND_SERVICE_PORT=15173
+export CHATQNA_BACKEND_SERVICE_NAME=chatqna
+export CHATQNA_BACKEND_SERVICE_IP=${HOST_IP}
+export CHATQNA_BACKEND_SERVICE_PORT=8888
+export CHATQNA_REDIS_URL="redis://${HOST_IP}:${CHATQNA_REDIS_VECTOR_PORT}"
+export CHATQNA_EMBEDDING_SERVICE_HOST_IP=${HOST_IP}
+export CHATQNA_RERANK_SERVICE_HOST_IP=${HOST_IP}
+export CHATQNA_LLM_SERVICE_HOST_IP=${HOST_IP}
+export CHATQNA_NGINX_PORT=80
+export CHATQNA_HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+export PATH="~/miniconda3/bin:$PATH"
 
 function build_docker_images() {
     opea_branch=${opea_branch:-"main"}
@@ -30,42 +64,34 @@ function build_docker_images() {
 
     cd $WORKPATH/docker_image_build
     git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
-    git clone https://github.com/vllm-project/vllm.git && cd vllm
-    # Get the latest tag
-    VLLM_VER="$(git describe --tags "$(git rev-list --tags --max-count=1)" )"
-    echo "Check out vLLM tag ${VLLM_VER}"
-    git checkout ${VLLM_VER} &> /dev/null
-    # Not change the pwd
-    cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="chatqna chatqna-ui dataprep retriever vllm nginx"
-    docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
+    service_list="chatqna chatqna-ui dataprep retriever llm-faqgen nginx"
+    docker compose -f build.yaml build ${service_list} --no-cache > "${LOG_PATH}"/docker_image_build.log
 
+    docker pull ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
     docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
 
     docker images && sleep 1s
 }
 
 function start_services() {
-    cd $WORKPATH/docker_compose/intel/cpu/xeon
-
-    export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
-    export LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
-    export INDEX_NAME="rag-redis"
-    export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+    cd "$WORKPATH"/docker_compose/amd/gpu/rocm
 
     # Start Docker Containers
-    docker compose -f compose_without_rerank.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
+    docker compose -f compose_faqgen.yaml up -d > "${LOG_PATH}"/start_services_with_compose.log
+
     n=0
-    until [[ "$n" -ge 100 ]]; do
-        docker logs vllm-service > ${LOG_PATH}/vllm_service_start.log 2>&1
-        if grep -q complete ${LOG_PATH}/vllm_service_start.log; then
+    until [[ "$n" -ge 160 ]]; do
+        docker logs chatqna-tgi-server > "${LOG_PATH}"/tgi_service_start.log
+        if grep -q Connected "${LOG_PATH}"/tgi_service_start.log; then
             break
         fi
         sleep 5s
         n=$((n+1))
     done
+
+    echo "all containers start!"
 }
 
 function validate_service() {
@@ -76,7 +102,7 @@ function validate_service() {
     local INPUT_DATA="$5"
 
     if [[ $SERVICE_NAME == *"dataprep_upload_file"* ]]; then
-        cd $LOG_PATH
+        cd "$LOG_PATH"
         HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -F 'files=@./dataprep_file.txt' -H 'Content-Type: multipart/form-data' "$URL")
     elif [[ $SERVICE_NAME == *"dataprep_upload_link"* ]]; then
         HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -F 'link_list=["https://www.ces.tech/"]' "$URL")
@@ -87,10 +113,10 @@ function validate_service() {
     else
         HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL")
     fi
-    HTTP_STATUS=$(echo $HTTP_RESPONSE | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
-    RESPONSE_BODY=$(echo $HTTP_RESPONSE | sed -e 's/HTTPSTATUS\:.*//g')
+    HTTP_STATUS=$(echo "$HTTP_RESPONSE" | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
+    RESPONSE_BODY=$(echo "$HTTP_RESPONSE" | sed -e 's/HTTPSTATUS\:.*//g')
 
-    docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
+    docker logs "${DOCKER_NAME}" >> "${LOG_PATH}"/"${SERVICE_NAME}".log
 
     # check response status
     if [ "$HTTP_STATUS" -ne "200" ]; then
@@ -115,16 +141,16 @@ function validate_microservices() {
 
     # tei for embedding service
     validate_service \
-        "${ip_address}:6006/embed" \
+        "${ip_address}:8090/embed" \
         "[[" \
         "tei-embedding" \
-        "tei-embedding-server" \
+        "chatqna-tei-embedding-server" \
         '{"inputs":"What is Deep Learning?"}'
 
     sleep 1m # retrieval can't curl as expected, try to wait for more time
 
     # test /v1/dataprep/ingest upload file
-    echo "Deep learning is a subset of machine learning that utilizes neural networks with multiple layers to analyze various levels of abstract data representations. It enables computers to identify patterns and make decisions with minimal human intervention by learning from large amounts of data." > $LOG_PATH/dataprep_file.txt
+    echo "Deep learning is a subset of machine learning that utilizes neural networks with multiple layers to analyze various levels of abstract data representations. It enables computers to identify patterns and make decisions with minimal human intervention by learning from large amounts of data." > "$LOG_PATH"/dataprep_file.txt
     validate_service \
         "http://${ip_address}:6007/v1/dataprep/ingest" \
         "Data preparation succeeded" \
@@ -158,32 +184,57 @@ function validate_microservices() {
         "${ip_address}:7000/v1/retrieval" \
         "retrieved_docs" \
         "retrieval-microservice" \
-        "retriever-redis-server" \
+        "chatqna-retriever-redis-server" \
         "{\"text\":\"What is the revenue of Nike in 2023?\",\"embedding\":${test_embedding}}"
 
-    # vllm for llm service
+    # tei for rerank microservice
     validate_service \
-        "${ip_address}:9009/v1/chat/completions" \
-        "content" \
-        "vllm-llm" \
-        "vllm-service" \
-        '{"model": "meta-llama/Meta-Llama-3-8B-Instruct", "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens": 17}'
+        "${ip_address}:8808/rerank" \
+        '{"index":1,"score":' \
+        "tei-rerank" \
+        "chatqna-tei-reranking-server" \
+        '{"query":"What is Deep Learning?", "texts": ["Deep Learning is not...", "Deep learning is..."]}'
+
+    # tgi for llm service
+    validate_service \
+        "${ip_address}:9009/generate" \
+        "generated_text" \
+        "tgi-llm" \
+        "chatqna-tgi-server" \
+        '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}'
+
+    # faqgen llm microservice
+    echo "validate llm-faqgen..."
+    validate_service \
+        "${ip_address}:${CHATQNA_LLM_FAQGEN_PORT}/v1/faqgen" \
+        "text" \
+        "llm" \
+        "llm-faqgen-server" \
+        '{"messages":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
+
 }
 
 function validate_megaservice() {
     # Curl the Mega Service
     validate_service \
         "${ip_address}:8888/v1/chatqna" \
-        "Nike" \
+        "Embed" \
         "chatqna-megaservice" \
-        "chatqna-xeon-backend-server" \
-        '{"messages": "What is the revenue of Nike in 2023?"}'
+        "chatqna-backend-server" \
+        '{"messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5.","max_tokens":32}'
+
+    validate_service \
+        "${ip_address}:8888/v1/chatqna" \
+        "Embed" \
+        "chatqna-megaservice" \
+        "chatqna-backend-server" \
+        '{"messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5.","max_tokens":32,"stream":false}'
 
 }
 
 function validate_frontend() {
     echo "[ TEST INFO ]: --------- frontend test started ---------"
-    cd $WORKPATH/ui/svelte
+    cd "$WORKPATH"/ui/svelte
     local conda_env_name="OPEA_e2e"
     export PATH=${HOME}/miniforge3/bin/:$PATH
     if conda info --envs | grep -q "$conda_env_name"; then
@@ -212,8 +263,8 @@ function validate_frontend() {
 }
 
 function stop_docker() {
-    cd $WORKPATH/docker_compose/intel/cpu/xeon/
-    docker compose -f compose_without_rerank.yaml down
+    cd "$WORKPATH"/docker_compose/amd/gpu/rocm
+    docker compose -f compose_faqgen.yaml stop && docker compose rm -f
 }
 
 function main() {

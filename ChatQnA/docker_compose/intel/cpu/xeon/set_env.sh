@@ -20,3 +20,13 @@ export OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=grpc://$JAEGER_IP:4317
 export TELEMETRY_ENDPOINT=http://$JAEGER_IP:4318/v1/traces
 # Set no proxy
 export no_proxy="$no_proxy,chatqna-xeon-ui-server,chatqna-xeon-backend-server,dataprep-redis-service,tei-embedding-service,retriever,tei-reranking-service,tgi-service,vllm-service,jaeger,prometheus,grafana,node-exporter,$JAEGER_IP"
+
+export LLM_ENDPOINT_PORT=8010
+export LLM_SERVER_PORT=9000
+export CHATQNA_BACKEND_PORT=8888
+export CHATQNA_REDIS_VECTOR_PORT=6379
+export CHATQNA_REDIS_VECTOR_INSIGHT_PORT=8001
+export CHATQNA_FRONTEND_SERVICE_PORT=5173
+export NGINX_PORT=80
+export FAQGen_COMPONENT_NAME="OpeaFaqGenvLLM"
+export LLM_ENDPOINT="http://${host_ip}:${LLM_ENDPOINT_PORT}"
