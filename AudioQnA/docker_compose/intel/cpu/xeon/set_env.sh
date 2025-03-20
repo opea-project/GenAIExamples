@@ -8,7 +8,7 @@ export host_ip=$(hostname -I | awk '{print $1}')
 export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
 # <token>
 
-export LLM_MODEL_ID=Intel/neural-chat-7b-v3-3
+export LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
 
 export MEGA_SERVICE_HOST_IP=${host_ip}
 export WHISPER_SERVER_HOST_IP=${host_ip}

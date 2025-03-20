@@ -15,7 +15,7 @@ services:
     volumes:
       - ${MODEL_PATH:-${PWD}}:/home/user/models
       - ${DOC_PATH:-${PWD}}:/home/user/docs
-      - ${GRADIO_PATH:-${PWD}}:/home/user/gradio_cache
+      - ${UI_TMPFILE_PATH:-${PWD}}:/home/user/ui_cache
       - ${HF_CACHE:-${HOME}/.cache}:/home/user/.cache
       - ${PROMPT_PATH:-${PWD}}:/templates/custom
     ports:
@@ -54,7 +54,7 @@ services:
       UI_SERVICE_PORT: ${UI_SERVICE_PORT:-8082}
       UI_SERVICE_HOST_IP: ${UI_SERVICE_HOST_IP:-0.0.0.0}
     volumes:
-      - ${GRADIO_PATH:-${PWD}}:/home/user/gradio_cache
+      - ${UI_TMPFILE_PATH:-${PWD}}:/home/user/ui_cache
     ports:
       - ${UI_SERVICE_PORT:-8082}:${UI_SERVICE_PORT:-8082}
     restart: always
