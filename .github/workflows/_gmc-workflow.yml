@@ -44,7 +44,7 @@ jobs:
 # Image Build and Scan
 ####################################################################################################
   image-build:
-    runs-on: "docker-build-${{ inputs.node }}"
+    runs-on: "image-build-${{ inputs.node }}"
     steps:
       - name: Checkout GenAIInfra repository
         uses: actions/checkout@v4
