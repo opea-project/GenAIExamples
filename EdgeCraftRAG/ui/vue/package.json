@@ -1,0 +1,51 @@
+{
+  "name": "ec-rag-ui",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@vueuse/i18n": "^4.0.0-beta.12",
+    "ant-design-vue": "^4.0.0-rc.6",
+    "axios": "^1.7.9",
+    "echarts": "^5.5.1",
+    "event-source-polyfill": "^1.0.31",
+    "http": "^0.0.1-security",
+    "js-cookie": "^3.0.5",
+    "lodash": "^4.17.21",
+    "marked": "^15.0.6",
+    "pinia": "^2.3.0",
+    "pinia-plugin-persistedstate": "^4.2.0",
+    "qs": "^6.13.1",
+    "socket.io-client": "^4.8.1",
+    "vite-plugin-compression": "^0.5.1",
+    "vue": "^3.5.13",
+    "vue-echarts": "^7.0.3",
+    "vue-i18n": "^10.0.5",
+    "vue-json-pretty": "^2.4.0",
+    "vue-router": "^4.5.0",
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "@types/eventsource": "^1.1.15",
+    "@types/js-cookie": "^3.0.6",
+    "@types/node": "^22.10.2",
+    "@vitejs/plugin-vue": "^5.2.1",
+    "less": "^4.2.1",
+    "less-loader": "^12.2.0",
+    "typescript": "~5.6.2",
+    "unplugin-auto-import": "^0.19.0",
+    "unplugin-vue-components": "^0.27.5",
+    "vite": "^6.0.1",
+    "vue-tsc": "^2.1.10"
+  },
+  "description": "This template should help get you started developing with Vue 3 and TypeScript in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.",
+  "main": "index.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

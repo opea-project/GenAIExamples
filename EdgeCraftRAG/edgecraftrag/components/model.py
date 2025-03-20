@@ -77,10 +77,11 @@ class OpenVINORerankModel(BaseModelComponent, OpenVINORerank):
 
 class OpenVINOLLMModel(BaseModelComponent, OpenVINOLLM):
 
-    def __init__(self, model_id, model_path, device, weight):
+    def __init__(self, model_id, model_path, device, weight, model=None):
         OpenVINOLLM.__init__(
             self,
             model_id_or_path=model_path,
+            model=model,
             device_map=device,
         )
         self.comp_type = CompType.MODEL

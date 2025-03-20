@@ -1,9 +1,11 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+import os
+
 from edgecraftrag.api_schema import DataIn, FilesIn
 from edgecraftrag.context import ctx
-from fastapi import FastAPI
+from fastapi import FastAPI, File, HTTPException, UploadFile, status
 
 data_app = FastAPI()
 
@@ -11,8 +13,6 @@ data_app = FastAPI()
 # Upload a text or files
 @data_app.post(path="/v1/data")
 async def add_data(request: DataIn):
-    nodelist = None
-
     docs = []
     if request.text is not None:
         docs.extend(ctx.get_file_mgr().add_text(text=request.text))
@@ -20,28 +20,41 @@ async def add_data(request: DataIn):
         docs.extend(ctx.get_file_mgr().add_files(docs=request.local_path))
 
     nodelist = ctx.get_pipeline_mgr().run_data_prepare(docs=docs)
-    if nodelist is None:
-        return "Error"
+    if nodelist is None or len(nodelist) == 0:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="File not found")
     pl = ctx.get_pipeline_mgr().get_active_pipeline()
-    # TODO: Need bug fix, when node_parser is None
     ctx.get_node_mgr().add_nodes(pl.node_parser.idx, nodelist)
+    return "Done"
+
+
+# Reindex all files
+@data_app.post(path="/v1/data/reindex")
+async def redindex_data():
+    pl = ctx.get_pipeline_mgr().get_active_pipeline()
+
+    ctx.get_node_mgr().del_nodes_by_np_idx(pl.node_parser.idx)
+    pl.indexer.reinitialize_indexer()
+    pl.update_indexer_to_retriever()
+
+    all_docs = ctx.get_file_mgr().get_all_docs()
+    nodelist = ctx.get_pipeline_mgr().run_data_prepare(docs=all_docs)
+    if nodelist is not None and len(nodelist) > 0:
+        ctx.get_node_mgr().add_nodes(pl.node_parser.idx, nodelist)
+
     return "Done"
 
 
 # Upload files by a list of file_path
 @data_app.post(path="/v1/data/files")
 async def add_files(request: FilesIn):
-    nodelist = None
-
     docs = []
     if request.local_paths is not None:
         docs.extend(ctx.get_file_mgr().add_files(docs=request.local_paths))
 
     nodelist = ctx.get_pipeline_mgr().run_data_prepare(docs=docs)
-    if nodelist is None:
-        return "Error"
+    if nodelist is None or len(nodelist) == 0:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="File not found")
     pl = ctx.get_pipeline_mgr().get_active_pipeline()
-    # TODO: Need bug fix, when node_parser is None
     ctx.get_node_mgr().add_nodes(pl.node_parser.idx, nodelist)
     return "Done"
 
@@ -62,41 +75,41 @@ async def get_file_docs(name):
 @data_app.delete(path="/v1/data/files/{name}")
 async def delete_file(name):
     if ctx.get_file_mgr().del_file(name):
-        # TODO: delete the nodes related to the file
-        all_docs = ctx.get_file_mgr().get_all_docs()
-
-        nodelist = ctx.get_pipeline_mgr().run_data_update(docs=all_docs)
-        if nodelist is None:
-            return "Error"
         pl = ctx.get_pipeline_mgr().get_active_pipeline()
+
+        # Current solution: reindexing all docs after deleting one file
+        # TODO: delete the nodes related to the file
         ctx.get_node_mgr().del_nodes_by_np_idx(pl.node_parser.idx)
-        ctx.get_node_mgr().add_nodes(pl.node_parser.idx, nodelist)
+        pl.indexer.reinitialize_indexer()
+        pl.update_indexer_to_retriever()
+
+        all_docs = ctx.get_file_mgr().get_all_docs()
+        nodelist = ctx.get_pipeline_mgr().run_data_prepare(docs=all_docs)
+        if nodelist is not None and len(nodelist) > 0:
+            ctx.get_node_mgr().add_nodes(pl.node_parser.idx, nodelist)
+
         return f"File {name} is deleted"
     else:
         return f"File {name} not found"
 
 
-# UPDATE a file
-@data_app.patch(path="/v1/data/files/{name}")
-async def update_file(name, request: DataIn):
-    # 1. Delete
-    if ctx.get_file_mgr().del_file(name):
-        # 2. Add
-        docs = []
-        if request.text is not None:
-            docs.extend(ctx.get_file_mgr().add_text(text=request.text))
-        if request.local_path is not None:
-            docs.extend(ctx.get_file_mgr().add_files(docs=request.local_path))
-
-        # 3. Re-run the pipeline
-        # TODO: update the nodes related to the file
-        all_docs = ctx.get_file_mgr().get_all_docs()
-        nodelist = ctx.get_pipeline_mgr().run_data_update(docs=all_docs)
-        if nodelist is None:
-            return "Error"
-        pl = ctx.get_pipeline_mgr().get_active_pipeline()
-        ctx.get_node_mgr().del_nodes_by_np_idx(pl.node_parser.idx)
-        ctx.get_node_mgr().add_nodes(pl.node_parser.idx, nodelist)
-        return f"File {name} is updated"
-    else:
-        return f"File {name} not found"
+# Upload & save a file from UI
+@data_app.post(path="/v1/data/file")
+async def upload_file(file: UploadFile = File(...)):
+    if ctx.get_pipeline_mgr().get_active_pipeline() is None:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Please activate pipeline and upload the file"
+        )
+    try:
+        # DIR for server to save files uploaded by UI
+        UI_DIRECTORY = os.getenv("UI_TMPFILE_PATH", "/home/user/ui_cache")
+        UPLOAD_DIRECTORY = os.path.join(UI_DIRECTORY, "documents")
+        os.makedirs(UPLOAD_DIRECTORY, exist_ok=True)
+        file_path = os.path.join(UPLOAD_DIRECTORY, file.filename)
+        with open(file_path, "wb") as buffer:
+            buffer.write(await file.read())
+        return file_path
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to upload file: {str(e)}"
+        )
