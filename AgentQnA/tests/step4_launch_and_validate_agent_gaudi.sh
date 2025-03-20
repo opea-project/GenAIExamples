@@ -88,8 +88,9 @@ function validate_agent_service() {
     # # test worker rag agent
     echo "======================Testing worker rag agent======================"
     export agent_port="9095"
+    export agent_ip="127.0.0.1"
     prompt="Tell me about Michael Jackson song Thriller"
-    local CONTENT=$(python3 $WORKDIR/GenAIExamples/AgentQnA/tests/test.py --prompt "$prompt" --agent_role "worker" --ip_addr $ip_address  --ext_port $agent_port)
+    local CONTENT=$(python3 $WORKDIR/GenAIExamples/AgentQnA/tests/test.py --prompt "$prompt" --agent_role "worker" --ip_addr $agent_ip  --ext_port $agent_port)
     # echo $CONTENT
     local EXIT_CODE=$(validate "$CONTENT" "Thriller" "rag-agent-endpoint")
     echo $EXIT_CODE
@@ -103,7 +104,7 @@ function validate_agent_service() {
     echo "======================Testing worker sql agent======================"
     export agent_port="9096"
     prompt="How many employees are there in the company?"
-    local CONTENT=$(python3 $WORKDIR/GenAIExamples/AgentQnA/tests/test.py --prompt "$prompt" --agent_role "worker" --ip_addr $ip_address --ext_port $agent_port)
+    local CONTENT=$(python3 $WORKDIR/GenAIExamples/AgentQnA/tests/test.py --prompt "$prompt" --agent_role "worker" --ip_addr $agent_ip --ext_port $agent_port)
     local EXIT_CODE=$(validate "$CONTENT" "8" "sql-agent-endpoint")
     echo $CONTENT
     # echo $EXIT_CODE
@@ -116,7 +117,7 @@ function validate_agent_service() {
     # test supervisor react agent
     echo "======================Testing supervisor react agent======================"
     export agent_port="9090"
-    local CONTENT=$(python3 $WORKDIR/GenAIExamples/AgentQnA/tests/test.py --agent_role "supervisor" --ip_addr $ip_address  --ext_port $agent_port --stream)
+    local CONTENT=$(python3 $WORKDIR/GenAIExamples/AgentQnA/tests/test.py --agent_role "supervisor" --ip_addr $agent_ip  --ext_port $agent_port --stream)
     local EXIT_CODE=$(validate "$CONTENT" "Iron" "react-agent-endpoint")
     # echo $CONTENT
     echo $EXIT_CODE

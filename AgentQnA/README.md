@@ -99,6 +99,7 @@ git clone https://github.com/opea-project/GenAIExamples.git
 #### Second, set up environment variables.
 
 ##### For proxy environments only
+
 ```
 export http_proxy="Your_HTTP_Proxy"
 export https_proxy="Your_HTTPs_Proxy"
@@ -122,18 +123,15 @@ export OPENAI_API_KEY=<your-openai-key>
 #### Third, set up environment variables for the selected hardware using the corresponding `set_env.sh`
 
 ##### Gaudi
+
 ```
 source $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/hpu/gaudi/set_env.sh
 ```
 
 ##### Xeon
+
 ```
 source $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/cpu/xeon/set_env.sh
-```
-
-### ROCM
-```
-source $WORKDIR/GenAIExamples/AgentQnA/docker_compose/amd/gpu/rocm/set_env.sh
 ```
 
 ### 3. Launch the multi-agent system. </br>
@@ -144,9 +142,9 @@ Two options are provided for the `llm_engine` of the agents: 1. open-source LLMs
 
 On Gaudi, `meta-llama/Meta-Llama-3.1-70B-Instruct` will be served using vllm.
 By default, both the RAG agent and SQL agent will be launched to support the React Agent.  
-The React Agent requires the DocIndexRetriever's [`compose.yaml`](../DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml) file, so two `compose.yaml` files need to be run with docker compose to start the multi-agent system. 
+The React Agent requires the DocIndexRetriever's [`compose.yaml`](../DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml) file, so two `compose.yaml` files need to be run with docker compose to start the multi-agent system.
 
->**Note**: To enable the web search tool, skip this step and proceed to the "[Optional] Web Search Tool Support" section.
+> **Note**: To enable the web search tool, skip this step and proceed to the "[Optional] Web Search Tool Support" section.
 
 ```bash
 cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/hpu/gaudi/
@@ -190,7 +188,7 @@ cd  $WORKDIR/GenAIExamples/AgentQnA/retrieval_tool/
 bash run_ingest_data.sh
 ```
 
->**Note**: This is a one-time operation.
+> **Note**: This is a one-time operation.
 
 ## Launch the UI
 
