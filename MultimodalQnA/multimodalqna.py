@@ -310,11 +310,11 @@ class MultimodalQnAService:
                 prompt = messages
                 initial_inputs = {"prompt": prompt, "image": ""}
         else:
-            # This is the first query. Ignore image input
+            # This is the first query.
             cur_megaservice = self.megaservice
             if isinstance(messages, tuple):
                 prompt, b64_types = messages
-                initial_inputs = {"text": prompt}
+                initial_inputs = {"text": prompt.rstrip("\n")}
                 if "audio" in b64_types:
                     # for metadata storage purposes
                     decoded_audio_input = b64_types["audio"]
@@ -323,7 +323,7 @@ class MultimodalQnAService:
                     initial_inputs["text"] = {"text": prompt}
                     initial_inputs["image"] = {"base64_image": b64_types["image"][0]}
             else:
-                initial_inputs = {"text": messages}
+                initial_inputs = {"text": messages.rstrip("\n")}
 
         parameters = LLMParams(
             max_new_tokens=chat_request.max_tokens if chat_request.max_tokens else 1024,
