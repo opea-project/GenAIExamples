@@ -354,14 +354,15 @@ curl http://${host_ip}:7055/v1/tts \
 ```
 
 ### 4. Stop application
-##### If you use vLLM
+
+#### If you use vLLM
 
 ```bash
 cd ~/audioqna-install/GenAIExamples/AudioQnA/docker_compose/amd/gpu/rocm
 docker compose -f compose_vllm.yaml down
 ```
 
-##### If you use TGI
+#### If you use TGI
 
 ```bash
 cd ~/audioqna-install/GenAIExamples/AudioQnA/docker_compose/amd/gpu/rocm
