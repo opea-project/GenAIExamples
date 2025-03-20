@@ -318,7 +318,7 @@ Checking the response from the service. The response should be similar to JSON:
 If the service response has a meaningful response in the value of the "generated_text" key,
 then we consider the TGI service to be successfully launched
 
-#### 2. Validate MegaServices
+### 2. Validate MegaServices
 
 Test the AudioQnA megaservice by recording a .wav file, encoding the file into the base64 format, and then sending the
 base64 string to the megaservice endpoint. The megaservice will return a spoken response as a base64 string. To listen
@@ -332,7 +332,7 @@ curl http://${host_ip}:3008/v1/audioqna \
   -H 'Content-Type: application/json' | sed 's/^"//;s/"$//' | base64 -d > output.wav
 ```
 
-#### 3. Validate MicroServices
+### 3. Validate MicroServices
 
 ```bash
 # whisper service
@@ -354,8 +354,7 @@ curl http://${host_ip}:7055/v1/tts \
   -H 'Content-Type: application/json'
 ```
 
-
-### 5. Stop application
+### 4. Stop application
 
 ##### If you use vLLM
 
