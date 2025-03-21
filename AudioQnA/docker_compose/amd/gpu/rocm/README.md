@@ -263,7 +263,7 @@ curl http://${HOST_IP}:${AUDIOQNA_VLLM_SERVICE_PORT}/v1/chat/completions \
 
 Checking the response from the service. The response should be similar to JSON:
 
-````json
+```json
 {
   "id": "chatcmpl-142f34ef35b64a8db3deedd170fed951",
   "object": "chat.completion",
@@ -285,7 +285,7 @@ Checking the response from the service. The response should be similar to JSON:
   "usage": { "prompt_tokens": 66, "total_tokens": 322, "completion_tokens": 256, "prompt_tokens_details": null },
   "prompt_logprobs": null
 }
-````
+```
 
 If the service response has a meaningful response in the value of the "choices.message.content" key,
 then we consider the vLLM service to be successfully launched
@@ -304,11 +304,11 @@ curl http://${HOST_IP}:${AUDIOQNA_TGI_SERVICE_PORT}/generate \
 
 Checking the response from the service. The response should be similar to JSON:
 
-````json
+```json
 {
   "generated_text": " "
 }
-````
+```
 
 If the service response has a meaningful response in the value of the "generated_text" key,
 then we consider the TGI service to be successfully launched
