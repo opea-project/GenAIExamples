@@ -56,13 +56,13 @@ We remind you that when using a specific version of the code, you need to use th
   #### vLLM-based application
 
   ```bash
-  service_list="vllm-rocm whisper speecht5 audioqna"
+  service_list="vllm-rocm whisper speecht5 audioqna audioqna-ui"
   ```
 
   #### TGI-based application
 
   ```bash
-  service_list="whisper speecht5 audioqna"
+  service_list="whisper speecht5 audioqna audioqna-ui"
   ```
 
 - #### Optional. Pull TGI Docker Image (Do this if you want to use TGI)
@@ -253,9 +253,7 @@ All containers should be running and should not restart:
 
 ```bash
 DATA='{"model": "Intel/neural-chat-7b-v3-3t", '\
-'"messages": [{"role": "user", "content": "Implement a high-level API for a TODO list application. '\
-'The API takes as input an operation request and updates the TODO list in place. '\
-'If the request is invalid, raise an exception."}], "max_tokens": 256}'
+'"messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens": 256}'
 
 curl http://${HOST_IP}:${AUDIOQNA_VLLM_SERVICE_PORT}/v1/chat/completions \
   -X POST \
@@ -276,7 +274,7 @@ Checking the response from the service. The response should be similar to JSON:
       "index": 0,
       "message": {
         "role": "assistant",
-        "content": "```python\nfrom typing import Optional, List, Dict, Union\nfrom pydantic import BaseModel, validator\n\nclass OperationRequest(BaseModel):\n    # Assuming OperationRequest is already defined as per the given text\n    pass\n\nclass UpdateOperation(OperationRequest):\n    new_items: List[str]\n\n    def apply_and_maybe_raise(self, updatable_item: \"Updatable todo list\") -> None:\n        # Assuming updatable_item is an instance of Updatable todo list\n        self.validate()\n        updatable_item.add_items(self.new_items)\n\nclass Updatable:\n    # Abstract class for items that can be updated\n    pass\n\nclass TodoList(Updatable):\n    # Class that represents a todo list\n    items: List[str]\n\n    def add_items(self, new_items: List[str]) -> None:\n        self.items.extend(new_items)\n\ndef handle_request(operation_request: OperationRequest) -> None:\n    # Function to handle an operation request\n    if isinstance(operation_request, UpdateOperation):\n        operation_request.apply_and_maybe_raise(get_todo_list_for_update())\n    else:\n        raise ValueError(\"Invalid operation request\")\n\ndef get_todo_list_for_update() -> TodoList:\n    # Function to get the todo list for update\n    # Assuming this function returns the",
+        "content": "",
         "tool_calls": []
       },
       "logprobs": null,
@@ -295,9 +293,7 @@ then we consider the vLLM service to be successfully launched
 #### If you use TGI:
 
 ```bash
-DATA='{"inputs":"Implement a high-level API for a TODO list application. '\
-'The API takes as input an operation request and updates the TODO list in place. '\
-'If the request is invalid, raise an exception.",'\
+DATA='{"inputs":"What is Deep Learning?",'\
 '"parameters":{"max_new_tokens":256,"do_sample": true}}'
 
 curl http://${HOST_IP}:${AUDIOQNA_TGI_SERVICE_PORT}/generate \
@@ -310,7 +306,7 @@ Checking the response from the service. The response should be similar to JSON:
 
 ````json
 {
-  "generated_text": " The supported operations are \"add_task\", \"complete_task\", and \"remove_task\". Each operation can be defined with a corresponding function in the API.\n\nAdd your API in the following format:\n\n```\nTODO App API\n\nsupported operations:\n\noperation name           description\n-----------------------  ------------------------------------------------\n<operation_name>         <operation description>\n```\n\nUse type hints for function parameters and return values. Specify a text description of the API's supported operations.\n\nUse the following code snippet as a starting point for your high-level API function:\n\n```\nclass TodoAPI:\n    def __init__(self, tasks: List[str]):\n        self.tasks = tasks  # List of tasks to manage\n\n    def add_task(self, task: str) -> None:\n        self.tasks.append(task)\n\n    def complete_task(self, task: str) -> None:\n        self.tasks = [t for t in self.tasks if t != task]\n\n    def remove_task(self, task: str) -> None:\n        self.tasks = [t for t in self.tasks if t != task]\n\n    def handle_request(self, request: Dict[str, str]) -> None:\n        operation = request.get('operation')\n        if operation == 'add_task':\n            self.add_task(request.get('task'))\n        elif"
+  "generated_text": " "
 }
 ````
 
@@ -338,12 +334,6 @@ curl http://${host_ip}:3008/v1/audioqna \
 curl http://${host_ip}:7066/v1/asr \
   -X POST \
   -d '{"audio": "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA"}' \
-  -H 'Content-Type: application/json'
-
-# tgi service
-curl http://${host_ip}:3006/generate \
-  -X POST \
-  -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}' \
   -H 'Content-Type: application/json'
 
 # speecht5 service
