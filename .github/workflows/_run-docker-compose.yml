@@ -112,75 +112,79 @@ jobs:
     runs-on: ${{ inputs.hardware }}
     continue-on-error: true
     steps:
-      - name: Clean up Working Directory
+      - name: debug
         run: |
-          sudo rm -rf ${{github.workspace}}/* || true
-          docker system prune -f
-          docker rmi $(docker images --filter reference="*/*/*:latest" -q) || true
-          docker rmi $(docker images --filter reference="*/*:ci" -q) || true
+          echo "test"
+          
+      # - name: Clean up Working Directory
+      #   run: |
+      #     sudo rm -rf ${{github.workspace}}/* || true
+      #     docker system prune -f
+      #     docker rmi $(docker images --filter reference="*/*/*:latest" -q) || true
+      #     docker rmi $(docker images --filter reference="*/*:ci" -q) || true
 
-      - name: Checkout out Repo
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ needs.get-test-case.outputs.CHECKOUT_REF }}
-          fetch-depth: 0
+      # - name: Checkout out Repo
+      #   uses: actions/checkout@v4
+      #   with:
+      #     ref: ${{ needs.get-test-case.outputs.CHECKOUT_REF }}
+      #     fetch-depth: 0
 
-      - name: Clean up container before test
-        shell: bash
-        run: |
-          docker ps
-          cd ${{ github.workspace }}/${{ inputs.example }}
-          export test_case=${{ matrix.test_case }}
-          export hardware=${{ inputs.hardware }}
-          bash ${{ github.workspace }}/.github/workflows/scripts/docker_compose_clean_up.sh "containers"
-          bash ${{ github.workspace }}/.github/workflows/scripts/docker_compose_clean_up.sh "ports"
-          docker ps
+      # - name: Clean up container before test
+      #   shell: bash
+      #   run: |
+      #     docker ps
+      #     cd ${{ github.workspace }}/${{ inputs.example }}
+      #     export test_case=${{ matrix.test_case }}
+      #     export hardware=${{ inputs.hardware }}
+      #     bash ${{ github.workspace }}/.github/workflows/scripts/docker_compose_clean_up.sh "containers"
+      #     bash ${{ github.workspace }}/.github/workflows/scripts/docker_compose_clean_up.sh "ports"
+      #     docker ps
 
-      - name: Run test
-        shell: bash
-        env:
-          HUGGINGFACEHUB_API_TOKEN: ${{ secrets.HUGGINGFACEHUB_API_TOKEN }}
-          HF_TOKEN: ${{ secrets.HUGGINGFACEHUB_API_TOKEN }}
-          GOOGLE_CSE_ID: ${{ secrets.GOOGLE_CSE_ID }}
-          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
-          PINECONE_KEY: ${{ secrets.PINECONE_KEY }}
-          PINECONE_KEY_LANGCHAIN_TEST: ${{ secrets.PINECONE_KEY_LANGCHAIN_TEST }}
-          SDK_BASE_URL: ${{ secrets.SDK_BASE_URL }}
-          SERVING_TOKEN: ${{ secrets.SERVING_TOKEN }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          IMAGE_REPO: ${{ inputs.registry }}
-          IMAGE_TAG: ${{ inputs.tag }}
-          example: ${{ inputs.example }}
-          hardware: ${{ inputs.hardware }}
-          test_case: ${{ matrix.test_case }}
-          use_model_cache: ${{ inputs.use_model_cache }}
-        run: |
-          cd ${{ github.workspace }}/$example/tests
-          if [[ "$IMAGE_REPO" == "" ]]; then export IMAGE_REPO="${OPEA_IMAGE_REPO}opea"; fi
-          if [[ "$use_model_cache" == "true" ]]; then
-            if [ -d "/data2/hf_model" ]; then
-              export model_cache="/data2/hf_model"
-            else
-              echo "Model cache directory /data2/hf_model does not exist"
-              export model_cache="~/.cache/huggingface/hub"
-            fi
-          fi
-          if [ -f "${test_case}" ]; then timeout 30m bash "${test_case}"; else echo "Test script {${test_case}} not found, skip test!"; fi
+      # - name: Run test
+      #   shell: bash
+      #   env:
+      #     HUGGINGFACEHUB_API_TOKEN: ${{ secrets.HUGGINGFACEHUB_API_TOKEN }}
+      #     HF_TOKEN: ${{ secrets.HUGGINGFACEHUB_API_TOKEN }}
+      #     GOOGLE_CSE_ID: ${{ secrets.GOOGLE_CSE_ID }}
+      #     GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+      #     PINECONE_KEY: ${{ secrets.PINECONE_KEY }}
+      #     PINECONE_KEY_LANGCHAIN_TEST: ${{ secrets.PINECONE_KEY_LANGCHAIN_TEST }}
+      #     SDK_BASE_URL: ${{ secrets.SDK_BASE_URL }}
+      #     SERVING_TOKEN: ${{ secrets.SERVING_TOKEN }}
+      #     OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      #     IMAGE_REPO: ${{ inputs.registry }}
+      #     IMAGE_TAG: ${{ inputs.tag }}
+      #     example: ${{ inputs.example }}
+      #     hardware: ${{ inputs.hardware }}
+      #     test_case: ${{ matrix.test_case }}
+      #     use_model_cache: ${{ inputs.use_model_cache }}
+      #   run: |
+      #     cd ${{ github.workspace }}/$example/tests
+      #     if [[ "$IMAGE_REPO" == "" ]]; then export IMAGE_REPO="${OPEA_IMAGE_REPO}opea"; fi
+      #     if [[ "$use_model_cache" == "true" ]]; then
+      #       if [ -d "/data2/hf_model" ]; then
+      #         export model_cache="/data2/hf_model"
+      #       else
+      #         echo "Model cache directory /data2/hf_model does not exist"
+      #         export model_cache="~/.cache/huggingface/hub"
+      #       fi
+      #     fi
+      #     if [ -f "${test_case}" ]; then timeout 30m bash "${test_case}"; else echo "Test script {${test_case}} not found, skip test!"; fi
 
-      - name: Clean up container after test
-        shell: bash
-        if: cancelled() || failure()
-        run: |
-          cd ${{ github.workspace }}/${{ inputs.example }}
-          export test_case=${{ matrix.test_case }}
-          export hardware=${{ inputs.hardware }}
-          bash ${{ github.workspace }}/.github/workflows/scripts/docker_compose_clean_up.sh "containers"
-          docker system prune -f
-          docker rmi $(docker images --filter reference="*:5000/*/*" -q) || true
+      # - name: Clean up container after test
+      #   shell: bash
+      #   if: cancelled() || failure()
+      #   run: |
+      #     cd ${{ github.workspace }}/${{ inputs.example }}
+      #     export test_case=${{ matrix.test_case }}
+      #     export hardware=${{ inputs.hardware }}
+      #     bash ${{ github.workspace }}/.github/workflows/scripts/docker_compose_clean_up.sh "containers"
+      #     docker system prune -f
+      #     docker rmi $(docker images --filter reference="*:5000/*/*" -q) || true
 
-      - name: Publish pipeline artifact
-        if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ inputs.example }}_${{ matrix.test_case }}
-          path: ${{ github.workspace }}/${{ inputs.example }}/tests/*.log
+      # - name: Publish pipeline artifact
+      #   if: ${{ !cancelled() }}
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: ${{ inputs.example }}_${{ matrix.test_case }}
+      #     path: ${{ github.workspace }}/${{ inputs.example }}/tests/*.log

@@ -53,101 +53,23 @@ jobs:
 ####################################################################################################
 # Image Build
 ####################################################################################################
-  pre-build-image-check:
-    runs-on: ubuntu-latest
-    outputs:
-      should_skip: ${{ steps.check-skip.outputs.should_skip }}
-    steps:
-      - name: Check if job should be skipped
-        id: check-skip
-        run: |
-          if [[ "${{ inputs.node }}" == "gaudi3" || "${{ inputs.node }}" == "rocm" || "${{ inputs.node }}" == "arc" ]]; then
-            echo "should_skip=true" >> $GITHUB_OUTPUT
-          else
-            echo "should_skip=false" >> $GITHUB_OUTPUT
-          fi
-
   build-images:
-    needs: [pre-build-image-check]
-    if: ${{ needs.pre-build-image-check.outputs.should_skip == 'false' }}
-    runs-on: "docker-build-${{ inputs.node }}"
-    steps:
-      - name: Clean Up Working Directory
-        run: sudo rm -rf ${{github.workspace}}/*
-
-      - name: Get Checkout Ref
-        run: |
-          if [ "${{ github.event_name }}" == "pull_request" ] || [ "${{ github.event_name }}" == "pull_request_target" ]; then
-            echo "CHECKOUT_REF=refs/pull/${{ github.event.number }}/merge" >> $GITHUB_ENV
-          else
-            echo "CHECKOUT_REF=${{ github.ref }}" >> $GITHUB_ENV
-          fi
-
-      - name: Checkout out GenAIExamples
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ env.CHECKOUT_REF }}
-          fetch-depth: 0
-
-      - name: Clone Required Repo
-        run: |
-          cd ${{ github.workspace }}/${{ inputs.example }}/docker_image_build
-          docker_compose_path=${{ github.workspace }}/${{ inputs.example }}/docker_image_build/build.yaml
-          if [[ $(grep -c "vllm:" ${docker_compose_path}) != 0 ]]; then
-              git clone https://github.com/vllm-project/vllm.git && cd vllm
-              # Get the latest tag
-              VLLM_VER=$(git describe --tags "$(git rev-list --tags --max-count=1)")
-              echo "Check out vLLM tag ${VLLM_VER}"
-              git checkout ${VLLM_VER} &> /dev/null && cd ../
-          fi
-          if [[ $(grep -c "vllm-gaudi:" ${docker_compose_path}) != 0 ]]; then
-              git clone https://github.com/HabanaAI/vllm-fork.git && cd vllm-fork
-              # Get the latest tag
-              VLLM_VER=$(git describe --tags "$(git rev-list --tags --max-count=1)")
-              echo "Check out vLLM tag ${VLLM_VER}"
-              git checkout ${VLLM_VER} &> /dev/null && cd ../
-          fi
-          git clone --depth 1 --branch ${{ inputs.opea_branch }} https://github.com/opea-project/GenAIComps.git
-          cd GenAIComps && git rev-parse HEAD && cd ../
-
-      - name: Build Image
-        if: ${{ fromJSON(inputs.build) }}
-        uses: opea-project/validation/actions/image-build@main
-        with:
-          work_dir: ${{ github.workspace }}/${{ inputs.example }}/docker_image_build
-          docker_compose_path: ${{ github.workspace }}/${{ inputs.example }}/docker_image_build/build.yaml
-          service_list: ${{ inputs.services }}
-          registry: ${OPEA_IMAGE_REPO}opea
-          inject_commit: ${{ inputs.inject_commit }}
-          tag: ${{ inputs.tag }}
-
-  pre-compose-test-check:
-    needs: [pre-build-image-check, build-images]
-    if: always()
-    runs-on: ubuntu-latest
-    outputs:
-      run_compose: ${{ steps.check-compose.outputs.run_compose }}
-    steps:
-      - name: Check if job should be skipped
-        id: check-compose
-        run: |
-          set -x
-          run_compose="false"
-          if [[ "${{ inputs.test_compose }}" == "true" ]]; then
-            if [[ "${{ needs.pre-build-image-check.outputs.should_skip }}" == "false" && "${{ needs.build-images.result}}" == "success" || "${{ needs.pre-build-image-check.outputs.should_skip }}" == "true" ]]; then
-              run_compose="true"
-            fi
-          fi
-          echo "run_compose=$run_compose"
-          echo "run_compose=$run_compose" >> $GITHUB_OUTPUT
-
+    uses: ./.github/workflows/_build_image.yml
+    with:
+      node: ${{ inputs.node }}
+      build: ${{ fromJSON(inputs.build) }}
+      example: ${{ inputs.example }}
+      services: ${{ inputs.services }}
+      tag: ${{ inputs.tag }}
+      opea_branch: ${{ inputs.opea_branch }}
+      inject_commit: ${{ inputs.inject_commit }}
 
 ####################################################################################################
 # Docker Compose Test
 ####################################################################################################
   test-example-compose:
-    needs: [pre-compose-test-check]
-    if: ${{ always() && needs.pre-compose-test-check.outputs.run_compose == 'true' }}
+    needs: [build-images]
+    if: ${{ inputs.test_compose }}
     uses: ./.github/workflows/_run-docker-compose.yml
     with:
       tag: ${{ inputs.tag }}
