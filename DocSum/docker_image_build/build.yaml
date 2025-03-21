@@ -5,8 +5,6 @@ services:
   docsum:
     build:
       args:
-        IMAGE_REPO: ${REGISTRY}
-        BASE_TAG: ${TAG}
         http_proxy: ${http_proxy}
         https_proxy: ${https_proxy}
         no_proxy: ${no_proxy}
@@ -49,3 +47,8 @@ services:
       dockerfile: comps/llms/src/doc-summarization/Dockerfile
     extends: docsum
     image: ${REGISTRY:-opea}/llm-docsum:${TAG:-latest}
+  vllm-rocm:
+    build:
+      context: GenAIComps
+      dockerfile: comps/third_parties/vllm/src/Dockerfile.amd_gpu
+    image: ${REGISTRY:-opea}/vllm-rocm:${TAG:-latest}
