@@ -5,5 +5,6 @@ ARG BASE_TAG=latest
 FROM opea/comps-base:$BASE_TAG
 
 COPY ./chatqna.py $HOME/chatqna.py
+COPY ./entrypoint.sh $HOME/entrypoint.sh
 
-ENTRYPOINT ["python", "chatqna.py"]
+ENTRYPOINT ["bash", "entrypoint.sh"]
