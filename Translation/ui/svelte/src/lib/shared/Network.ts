@@ -24,7 +24,7 @@ export async function fetchLanguageResponse(input: string, transform: string, tr
     language_from: transform,
     language_to: transTo,
     source_data: input,
-    translate_type: "text"
+    translate_type: "text",
   };
   url = `${BASE_URL}`;
 
