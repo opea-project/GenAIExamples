@@ -39,7 +39,8 @@ services:
     image: ${REGISTRY:-opea}/llm-docsum:${TAG:-latest}
     container_name: docsum-llm-server
     depends_on:
-      - docsum-tgi-service
+      docsum-tgi-service:
+        condition: service_healthy
     ports:
       - "${DOCSUM_LLM_SERVER_PORT}:9000"
     ipc: host
