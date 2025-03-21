@@ -27,7 +27,6 @@ from utils import (
     split_video,
 )
 
-
 logger = build_logger("gradio_web_server", "gradio_web_server.log")
 logflag = os.getenv("LOGFLAG", False)
 
@@ -140,7 +139,9 @@ def http_bot(state, audio_response_toggler, request: gr.Request):
 
     state.chatbot_history.append({"role": state.roles[1], "content": "▌"})
 
-    yield (state, state.to_gradio_chatbot(), state.split_audio, state.split_video, state.image, state.pdf) + (disable_btn,) * 1
+    yield (state, state.to_gradio_chatbot(), state.split_audio, state.split_video, state.image, state.pdf) + (
+        disable_btn,
+    ) * 1
 
     if logflag:
         logger.info(f"==== request ====\n{pload}")
@@ -192,7 +193,10 @@ def http_bot(state, audio_response_toggler, request: gr.Request):
                 elif file_ext in AUDIO_FORMATS:
                     try:
                         splited_audio_path = split_audio(
-                            state.video_file, state.time_of_frame_ms, audio_tmp_dir, f"{state.time_of_frame_ms}__{video_file}"
+                            state.video_file,
+                            state.time_of_frame_ms,
+                            audio_tmp_dir,
+                            f"{state.time_of_frame_ms}__{video_file}",
                         )
                     except:
                         print(f"audio {state.video_file} does not exist in UI host!")
