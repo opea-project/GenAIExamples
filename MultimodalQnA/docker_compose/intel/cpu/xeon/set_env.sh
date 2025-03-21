@@ -8,10 +8,6 @@ popd > /dev/null
 
 export host_ip=$(hostname -I | awk '{print $1}')
 
-export no_proxy=${your_no_proxy}
-export http_proxy=${your_http_proxy}
-export https_proxy=${your_http_proxy}
-
 export MM_EMBEDDING_SERVICE_HOST_IP=${host_ip}
 export MM_RETRIEVER_SERVICE_HOST_IP=${host_ip}
 export LVM_SERVICE_HOST_IP=${host_ip}
@@ -44,6 +40,9 @@ export BRIDGE_TOWER_EMBEDDING=true
 export REDIS_RETRIEVER_PORT=7000
 
 export LVM_PORT=9399
+# for vllm server
+export VLLM_PORT=8399
+# for llava naive server
 export LLAVA_SERVER_PORT=8399
 export LVM_MODEL_ID="llava-hf/llava-1.5-7b-hf"
 export LVM_ENDPOINT="http://${host_ip}:${LLAVA_SERVER_PORT}"
