@@ -315,16 +315,24 @@ then we consider the TGI service to be successfully launched
 ### 2. Validate the LLM Service
 
 ```bash
+DATA='{"messages":"Water is an inorganic compound with the chemical formula H2O. It is a transparent, '\
+'tasteless, odorless,[c] and nearly colorless chemical substance. It is the main constituent of Earths '\
+'hydrosphere and the fluids of all known living organisms (in which it acts as a solvent[20]). '\
+'It is vital for all known forms of life, despite not providing food energy or organic micronutrients. '\
+'Its chemical formula, H2O, indicates that each of its molecules contains one oxygen and two hydrogen atoms, '\
+'connected by covalent bonds. The hydrogen atoms are attached to the oxygen atom at an angle of 104.45 '\
+'In liquid form, H2O is also called water at standard temperature and pressure."}'
+
 curl http://${HOST_IP}:${DOCSUM_LLM_SERVER_PORT}/v1/docsum \
-     -X POST \
-     -d '{"messages":"What is Deep Learning?"}' \
-     -H 'Content-Type: application/json'
+  -X POST \
+  -d "$DATA" \
+  -H 'Content-Type: application/json'
 ```
 
 Checking the response from the service. The response should be similar to JSON:
 
 ```json
-{"id":"0c3caefce20752f36cd5f2dbe9894b25","text":" Deep Learning is a subset of Machine Learning that utilizes complex algorithms and multiple layers of artificial neural networks to mimic the human brain's learning process, enabling computers to learn from data, recognize patterns, and make intelligent decisions without explicit programming. It has revolutionized various fields such as image recognition, natural language processing, and speech recognition.","prompt":"What is Deep Learning?"}
+{"id":"e97003abd1be457623a9f80214c0793b","text":" Water is an essential inorganic compound with the chemical formula H2O, serving as the primary component of Earth's hydrosphere and living organisms. It is vital for all life, despite not providing food energy or micronutrients. Its molecules consist of one oxygen atom and two hydrogen atoms connected by covalent bonds. In liquid form, it is commonly referred to as water at standard temperature and pressure.","prompt":"Water is an inorganic compound with the chemical formula H2O. It is a transparent, tasteless, odorless,[c] and nearly colorless chemical substance. It is the main constituent of Earths hydrosphere and the fluids of all known living organisms (in which it acts as a solvent[20]). It is vital for all known forms of life, despite not providing food energy or organic micronutrients. Its chemical formula, H2O, indicates that each of its molecules contains one oxygen and two hydrogen atoms, connected by covalent bonds. The hydrogen atoms are attached to the oxygen atom at an angle of 104.45 In liquid form, H2O is also called water at standard temperature and pressure."}
 ```
 
 If the service response has a meaningful response in the value of the "text" key,
@@ -333,42 +341,41 @@ then we consider the vLLM service to be successfully launched
 ### 3. Validate the MegaService
 
 ```bash
+DATA='messages=Water is an inorganic compound with the chemical formula H2O. It is a transparent, '\
+'tasteless, odorless,[c] and nearly colorless chemical substance. It is the main constituent of Earths '\
+'hydrosphere and the fluids of all known living organisms (in which it acts as a solvent[20]). '\
+'It is vital for all known forms of life, despite not providing food energy or organic micronutrients. '\
+'Its chemical formula, H2O, indicates that each of its molecules contains one oxygen and two hydrogen atoms, '\
+'connected by covalent bonds. The hydrogen atoms are attached to the oxygen atom at an angle of 104.45 '\
+'In liquid form, H2O is also called water at standard temperature and pressure.'
+
 curl http://${HOST_IP}:${DOCSUM_BACKEND_SERVER_PORT}/v1/docsum \
   -H "Content-Type: multipart/form-data" \
-  -F "messages=What is Deep Learning?" \
-  -F "max_tokens=100" \
-  -F "stream=False"
+  -F "type=text" \
+  -F "$DATA" \
+  -F "max_tokens=64" \
+  -F "language=en" \
+  -F "stream=True"
 ```
 
 Checking the response from the service. The response should be similar to text:
 
-```json
-{
-  "id": "chatcmpl-tjwp8giP2vyvRRxnqzc3FU",
-  "object": "chat.completion",
-  "created": 1742386156,
-  "model": "docsum",
-  "choices": [
-    {
-      "index": 0,
-      "message": {
-        "role": "assistant",
-        "content": " Q: What is Deep Learning?\n         A: Deep Learning is a subset of Machine Learning that involves the use of artificial neural networks to analyze and interpret data. It is called \"deep\" because it involves multiple layers of interconnected nodes or \"neurons\" that process and transform the data.\n\n         Q: What is the main difference between Deep Learning and Machine Learning?\n         A: The main difference between Deep Learning and Machine Learning is the complexity of the models used. Machine Learning models are typically simpler and"
-      },
-      "finish_reason": "stop",
-      "metadata": null
-    }
-  ],
-  "usage": { "prompt_tokens": 0, "total_tokens": 0, "completion_tokens": 0 }
-}
+```textmate
+.......
+data: {"ops":[{"op":"add","path":"/logs/HuggingFaceEndpoint/streamed_output_str/-","value":" and"},{"op":"add","path":"/logs/HuggingFaceEndpoint/streamed_output/-","value":" and"}]}
+data: {"ops":[{"op":"add","path":"/logs/HuggingFaceEndpoint/streamed_output_str/-","value":" two"},{"op":"add","path":"/logs/HuggingFaceEndpoint/streamed_output/-","value":" two"}]}
+data: {"ops":[{"op":"add","path":"/logs/HuggingFaceEndpoint/streamed_output_str/-","value":" hydro"},{"op":"add","path":"/logs/HuggingFaceEndpoint/streamed_output/-","value":" hydro"}]}
+data: {"ops":[{"op":"add","path":"/logs/HuggingFaceEndpoint/final_output","value":{"generations":[[{"text":" Water is an essential inorganic compound with the chemical formula H2O, serving as the primary component of Earth's hydrosphere and living organisms. It is vital for all life forms, despite not providing food energy or micronutrients. Its molecules consist of one oxygen atom and two hydro","generation_info":null,"type":"Generation"}]],"llm_output":null,"run":null,"type":"LLMResult"}},{"op":"add","path":"/logs/HuggingFaceEndpoint/end_time","value":"2025-03-21T05:17:58.700+00:00"}]}
+data: {"ops":[{"op":"add","path":"/logs/LLMChain/final_output","value":{"text":" Water is an essential inorganic compound with the chemical formula H2O, serving as the primary component of Earth's hydrosphere and living organisms. It is vital for all life forms, despite not providing food energy or micronutrients. Its molecules consist of one oxygen atom and two hydro"}},{"op":"add","path":"/logs/LLMChain/end_time","value":"2025-03-21T05:17:58.700+00:00"}]}
+data: {"ops":[{"op":"add","path":"/streamed_output/-","value":{"input_documents":[{"id":null,"metadata":{},"page_content":"Water is an inorganic compound with the chemical formula H2O. It is a transparent, tasteless, odorless,[c] and nearly colorless chemical substance. It is the main constituent of Earths hydrosphere and the fluids of all known living organisms (in which it acts as a solvent[20]). It is vital for all known forms of life, despite not providing food energy or organic micronutrients. Its chemical formula, H2O, indicates that each of its molecules contains one oxygen and two hydrogen atoms, connected by covalent bonds. The hydrogen atoms are attached to the oxygen atom at an angle of 104.45 In liquid form, H2O is also called water at standard temperature and pressure.","type":"Document"}],"output_text":" Water is an essential inorganic compound with the chemical formula H2O, serving as the primary component of Earth's hydrosphere and living organisms. It is vital for all life forms, despite not providing food energy or micronutrients. Its molecules consist of one oxygen atom and two hydro"}},{"op":"replace","path":"/final_output","value":{"input_documents":[{"id":null,"metadata":{},"page_content":"Water is an inorganic compound with the chemical formula H2O. It is a transparent, tasteless, odorless,[c] and nearly colorless chemical substance. It is the main constituent of Earths hydrosphere and the fluids of all known living organisms (in which it acts as a solvent[20]). It is vital for all known forms of life, despite not providing food energy or organic micronutrients. Its chemical formula, H2O, indicates that each of its molecules contains one oxygen and two hydrogen atoms, connected by covalent bonds. The hydrogen atoms are attached to the oxygen atom at an angle of 104.45 In liquid form, H2O is also called water at standard temperature and pressure.","type":"Document"}],"output_text":" Water is an essential inorganic compound with the chemical formula H2O, serving as the primary component of Earth's hydrosphere and living organisms. It is vital for all life forms, despite not providing food energy or micronutrients. Its molecules consist of one oxygen atom and two hydro"}}]}
+data: [DONE]
 ```
 
-If the service response has a meaningful response in the value of the "choices.message.content" key,
-then we consider the MegaService to be successfully launched
+If the service response contains the output_text field in the last JSON, and it contains a meaningful summarized value, then we consider the service verification successful.
 
 ### 4. Validate the Frontend (UI)
 
-To access the UI, use the URL - http://${EXTERNAL_HOST_IP}:${FAGGEN_UI_PORT}
+To access the UI, use the URL - http://${EXTERNAL_HOST_IP}:${DOCSUM_FRONTEND_PORT}
 A page should open when you click through to this address:
 
 ![UI start page](../../../../assets/img/ui-starting-page.png)
