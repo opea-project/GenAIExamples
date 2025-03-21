@@ -257,7 +257,7 @@ All containers should be running and should not restart:
 #### If you use vLLM:
 
 ```bash
-curl http://${HOST_IP}:${FAQGEN_VLLM_SERVICE_PORT}/v1/completions \
+curl http://${HOST_IP}:${DOCSUM_VLLM_SERVICE_PORT}/v1/completions \
 -H "Content-Type: application/json" \
 -d '{
     "model": "meta-llama/Meta-Llama-3-8B-Instruct",
@@ -295,7 +295,7 @@ then we consider the vLLM service to be successfully launched
 #### If you use TGI:
 
 ```bash
-curl http://${HOST_IP}:${FAQGEN_TGI_SERVICE_PORT}/generate \
+curl http://${HOST_IP}:${DOCSUM_TGI_SERVICE_PORT}/generate \
   -X POST \
   -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":64, "do_sample": true}}' \
   -H 'Content-Type: application/json'
@@ -315,7 +315,7 @@ then we consider the TGI service to be successfully launched
 ### 2. Validate the LLM Service
 
 ```bash
-curl http://${HOST_IP}:${FAQGEN_LLM_SERVER_PORT}/v1/docsum \
+curl http://${HOST_IP}:${DOCSUM_LLM_SERVER_PORT}/v1/docsum \
      -X POST \
      -d '{"messages":"What is Deep Learning?"}' \
      -H 'Content-Type: application/json'
@@ -324,11 +324,7 @@ curl http://${HOST_IP}:${FAQGEN_LLM_SERVER_PORT}/v1/docsum \
 Checking the response from the service. The response should be similar to JSON:
 
 ```json
-{
-  "id": "1e47daf13a8bc73495dbfd9836eaa7e4",
-  "text": " Q: What is Deep Learning?\n         A: Deep Learning is a subset of Machine Learning that involves the use of artificial neural networks to analyze and interpret data. It is called \"deep\" because it involves multiple layers of interconnected nodes or \"neurons\" that process and transform the data.\n\n         Q: What is the main difference between Deep Learning and Machine Learning?\n         A: The main difference between Deep Learning and Machine Learning is the complexity of the models used. Machine Learning models are typically simpler and more linear, while Deep Learning models are more complex and non-linear, allowing them to learn and represent more abstract and nuanced patterns in data.\n\n         Q: What are some common applications of Deep Learning?\n         A: Some common applications of Deep Learning include image and speech recognition, natural language processing, recommender systems, and autonomous vehicles.\n\n         Q: Is Deep Learning a new field?\n         A: Deep Learning is not a new field, but it has gained significant attention and popularity in recent years due to advances in computing power, data storage, and algorithms.\n\n         Q: Can Deep Learning be used for any type of data?\n         A: Deep Learning can be used for any type of data that can be represented as a numerical array, such as images, audio, text, and time series data.\n\n         Q: Is Deep Learning a replacement for traditional Machine Learning?\n         A: No, Deep Learning is not a replacement for traditional Machine Learning. Instead, it is a complementary technology that can be used in conjunction with traditional Machine Learning techniques to solve complex problems.\n\n         Q: What are some of the challenges associated with Deep Learning?\n         A: Some of the challenges associated with Deep Learning include the need for large amounts of data, the risk of overfitting, and the difficulty of interpreting the results of the models.\n\n         Q: Can Deep Learning be used for real-time applications?\n         A: Yes, Deep Learning can be used for real-time applications, such as image and speech recognition, and autonomous vehicles.\n\n         Q: Is Deep Learning a field that requires a lot of mathematical knowledge?\n         A: While some mathematical knowledge is helpful, it is not necessary to have a deep understanding of mathematics to work with Deep Learning. Many Deep Learning libraries and frameworks provide pre-built functions and tools that can be used to implement Deep Learning models.",
-  "prompt": "What is Deep Learning?"
-}
+{"id":"0c3caefce20752f36cd5f2dbe9894b25","text":" Deep Learning is a subset of Machine Learning that utilizes complex algorithms and multiple layers of artificial neural networks to mimic the human brain's learning process, enabling computers to learn from data, recognize patterns, and make intelligent decisions without explicit programming. It has revolutionized various fields such as image recognition, natural language processing, and speech recognition.","prompt":"What is Deep Learning?"}
 ```
 
 If the service response has a meaningful response in the value of the "text" key,
@@ -337,7 +333,7 @@ then we consider the vLLM service to be successfully launched
 ### 3. Validate the MegaService
 
 ```bash
-curl http://${HOST_IP}:${FAQGEN_BACKEND_SERVER_PORT}/v1/docsum \
+curl http://${HOST_IP}:${DOCSUM_BACKEND_SERVER_PORT}/v1/docsum \
   -H "Content-Type: multipart/form-data" \
   -F "messages=What is Deep Learning?" \
   -F "max_tokens=100" \
