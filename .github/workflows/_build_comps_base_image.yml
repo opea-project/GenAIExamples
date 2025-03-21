@@ -45,7 +45,7 @@ jobs:
   build-images:
     needs: [ pre-build-image-check ]
     if: ${{ needs.pre-build-image-check.outputs.should_skip == 'false' && fromJSON(inputs.build) }}
-    runs-on: "image-build-${{ inputs.node }}"
+    runs-on: "docker-build-${{ inputs.node }}"
     steps:
       - name: Clean Up Working Directory
         run: sudo rm -rf ${{github.workspace}}/*
