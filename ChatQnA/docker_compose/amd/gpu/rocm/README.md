@@ -395,7 +395,7 @@ If the service response contains the output_text field in the last JSON, and it 
 
 ### 4. Validate the Frontend (UI)
 
-To access the UI, use the URL - http://${EXTERNAL_HOST_IP}:${DOCSUM_FRONTEND_PORT}
+To access the UI, use the URL - http://${EXTERNAL_HOST_IP}:${CHATQNA_NGINX_PORT}
 A page should open when you click through to this address:
 
 ![UI start page](../../../../assets/img/ui-starting-page.png)
