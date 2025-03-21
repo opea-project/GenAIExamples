@@ -72,7 +72,7 @@ services:
       HF_HUB_ENABLE_HF_TRANSFER: 0
     command: --model-id ${CHATQNA_RERANK_MODEL_ID} --auto-truncate
   chatqna-vllm-service:
-    image: ${REGISTRY:-opea}/llm-vllm-rocm:${TAG:-latest}
+    image: ${REGISTRY:-opea}/vllm-rocm:${TAG:-latest}
     container_name: chatqna-vllm-service
     ports:
       - "${CHATQNA_VLLM_SERVICE_PORT:-8081}:8011"
