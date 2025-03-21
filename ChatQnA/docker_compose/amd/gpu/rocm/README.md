@@ -398,6 +398,7 @@ If the service response contains the output_text field in the last JSON, and it 
 To access the UI, use the URL - http://${EXTERNAL_HOST_IP}:${CHATQNA_NGINX_PORT}
 A page should open when you click through to this address:
 
+
 ![UI start page](../../../../assets/img/ui-starting-page.png)
 
 If a page of this type has opened, then we believe that the service is running and responding,
