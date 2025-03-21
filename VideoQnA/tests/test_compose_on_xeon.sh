@@ -63,7 +63,7 @@ function start_services() {
     sleep 1m
 
     # List of containers running uvicorn
-    list=("dataprep-vdms-server" "embedding-multimodal-server" "retriever-vdms-server" "reranking-tei-server" "lvm-video-llama" "lvm-video-llama" "videoqna-xeon-backend-server")
+    list=("dataprep-vdms-server" "clip-embedding-server" "retriever-vdms-server" "reranking-tei-server" "lvm-video-llama" "videoqna-xeon-backend-server")
 
     # Define the maximum time limit in seconds
     TIME_LIMIT=5400
@@ -151,7 +151,7 @@ function validate_services() {
 
 function validate_microservices() {
     # Check if the microservices are running correctly.
-    cd $WORKPATH/docker_compose/intel/cpu/xeon//data
+    cd $WORKPATH/docker_compose/intel/cpu/xeon/data
 
     # dataprep microservice
     HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST http://${ip_address}:6007/v1/dataprep/ingest \
@@ -169,10 +169,10 @@ function validate_microservices() {
     # Embedding Microservice
     validate_services \
         "${ip_address}:6000/v1/embeddings" \
-        "Sample text" \
         "embedding" \
-        "embedding-multimodal-server" \
-        '{"text":"Sample text"}'
+        "embedding" \
+        "clip-embedding-server" \
+        '{"input":"Sample text"}'
 
     # Retriever Microservice
     export your_embedding=$(python -c "import random; embedding = [random.uniform(-1, 1) for _ in range(512)]; print(embedding)")
@@ -260,4 +260,4 @@ function main() {
 
 }
 
-# main
+main
