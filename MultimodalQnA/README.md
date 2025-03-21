@@ -239,7 +239,11 @@ docker compose -f compose.yaml up -d
 
 ### Text Query following the ingestion of an image
 
-![MultimodalQnA-video-query-screenshot](./assets/img/image-query.png)
+![MultimodalQnA-video-query-screenshot](./assets/img/image-query-text.png)
+
+### Text Query following the ingestion of an image using text-to-speech
+
+![MultimodalQnA-video-query-screenshot](./assets/img/image-query-tts.png)
 
 ### Audio Ingestion
 
@@ -251,8 +255,12 @@ docker compose -f compose.yaml up -d
 
 ### PDF Ingestion
 
-![MultimodalQnA-upload-pdf-screenshot](./assets/img/ingest_pdf.png)
+![MultimodalQnA-upload-pdf-screenshot](./assets/img/pdf-ingestion.png)
 
 ### Text query following the ingestion of a PDF
 
 ![MultimodalQnA-pdf-query-example-screenshot](./assets/img/pdf-query.png)
+
+### View, Refresh, and Delete ingested media in the Vector Store
+
+![MultimodalQnA-pdf-query-example-screenshot](./assets/img/vector-store.png)
