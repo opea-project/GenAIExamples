@@ -41,9 +41,13 @@ function build_docker_images() {
 function start_services() {
     cd $WORKPATH/docker_compose/amd/gpu/rocm/
 
+    export http_proxy=${http_proxy}
+    export https_proxy=${http_proxy}
+    export TRANSLATION_TGI_SERVICE_PORT=8008
     export TRANSLATION_HOST_IP=${ip_address}
     export TRANSLATION_LLM_MODEL_ID="haoranxu/ALMA-13B"
-    export TRANSLATION_TGI_LLM_ENDPOINT="http://${TRANSLATION_HOST_IP}:8008"
+    export TRANSLATION_TGI_LLM_ENDPOINT="http://${TRANSLATION_HOST_IP}:${TRANSLATION_TGI_SERVICE_PORT}"
+    export TRANSLATION_LLM_COMPONENT_NAME="OpeaTextGenService"
     export TRANSLATION_HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
     export TRANSLATION_MEGA_SERVICE_HOST_IP=${TRANSLATION_HOST_IP}
     export TRANSLATION_LLM_SERVICE_HOST_IP=${TRANSLATION_HOST_IP}
@@ -80,25 +84,28 @@ function validate_services() {
     local DOCKER_NAME="$4"
     local INPUT_DATA="$5"
 
-    local HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL")
-    if [ "$HTTP_STATUS" -eq 200 ]; then
-        echo "[ $SERVICE_NAME ] HTTP status is 200. Checking content..."
+    HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL")
+    HTTP_STATUS=$(echo $HTTP_RESPONSE | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
+    RESPONSE_BODY=$(echo $HTTP_RESPONSE | sed -e 's/HTTPSTATUS\:.*//g')
 
-        local CONTENT=$(curl -s -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL" | tee ${LOG_PATH}/${SERVICE_NAME}.log)
+    docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
 
-        if echo "$CONTENT" | grep -q "$EXPECTED_RESULT"; then
-            echo "[ $SERVICE_NAME ] Content is as expected."
-        else
-            echo "[ $SERVICE_NAME ] Content does not match the expected result: $CONTENT"
-            docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
-            exit 1
-        fi
-    else
+    # check response status
+    if [ "$HTTP_STATUS" -ne "200" ]; then
         echo "[ $SERVICE_NAME ] HTTP status is not 200. Received status was $HTTP_STATUS"
-        docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
         exit 1
+    else
+        echo "[ $SERVICE_NAME ] HTTP status is 200. Checking content..."
     fi
-    sleep 1s
+    # check response body
+    if [[ "$RESPONSE_BODY" != *"$EXPECTED_RESULT"* ]]; then
+        echo "[ $SERVICE_NAME ] Content does not match the expected result: $RESPONSE_BODY"
+        exit 1
+    else
+        echo "[ $SERVICE_NAME ] Content is as expected."
+    fi
+
+    sleep 5s
 }
 
 function validate_microservices() {
@@ -106,7 +113,7 @@ function validate_microservices() {
 
     # tgi for llm service
     validate_services \
-        "${TRANSLATION_HOST_IP}:8008/generate" \
+        "${TRANSLATION_HOST_IP}:${TRANSLATION_TGI_SERVICE_PORT}/generate" \
         "generated_text" \
         "translation-tgi-service" \
         "translation-tgi-service" \
@@ -122,13 +129,21 @@ function validate_microservices() {
 }
 
 function validate_megaservice() {
-    # Curl the Mega Service
+    # test the megaservice for text translation
     validate_services \
-    "${TRANSLATION_HOST_IP}:8888/v1/translation" \
-    "translation" \
-    "translation-backend-server" \
-    "translation-backend-server" \
-    '{"language_from": "Chinese","language_to": "English","source_language": "我爱机器翻译。"}'
+        "${TRANSLATION_HOST_IP}:${TRANSLATION_BACKEND_SERVICE_PORT}/v1/translation" \
+        "translation" \
+        "translation-backend-server" \
+        "translation-backend-server" \
+        '{"language_from": "Chinese","language_to": "English","source_data": "我爱机器翻译。","translate_type":"text"}'
+
+    # test the megaservice for code translation
+    validate_services \
+        "${TRANSLATION_HOST_IP}:${TRANSLATION_BACKEND_SERVICE_PORT}/v1/translation" \
+        "print" \
+        "translation-backend-server" \
+        "translation-backend-server" \
+        '{"language_from": "Golang","language_to": "Python","source_data": "package main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n}","translate_type":"code"}'
 
     # test the megeservice via nginx
     validate_services \
@@ -136,7 +151,7 @@ function validate_megaservice() {
         "translation" \
         "translation-nginx-server" \
         "translation-nginx-server" \
-        '{"language_from": "Chinese","language_to": "English","source_language": "我爱机器翻译。"}'
+        '{"language_from": "Chinese","language_to": "English","source_data": "我爱机器翻译。","translate_type":"text"}'
 }
 
 function validate_frontend() {

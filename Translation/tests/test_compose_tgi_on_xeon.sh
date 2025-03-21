@@ -30,29 +30,23 @@ function build_docker_images() {
 
     cd $WORKPATH/docker_image_build
     git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
-    git clone https://github.com/HabanaAI/vllm-fork.git && cd vllm-fork
-    VLLM_VER=$(git describe --tags "$(git rev-list --tags --max-count=1)")
-    git checkout ${VLLM_VER} &> /dev/null && cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="translation translation-ui llm-textgen vllm-gaudi nginx"
+    service_list="translation translation-ui llm-textgen nginx"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
+    docker pull ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu
     docker images && sleep 1s
 }
 
 function start_services() {
-    cd $WORKPATH/docker_compose/intel/hpu/gaudi
+    cd $WORKPATH/docker_compose/intel/cpu/xeon/
 
     export http_proxy=${http_proxy}
     export https_proxy=${https_proxy}
     export LLM_MODEL_ID="mistralai/Mistral-7B-Instruct-v0.3"
     export LLM_ENDPOINT="http://${ip_address}:8008"
     export LLM_COMPONENT_NAME="OpeaTextGenService"
-    export NUM_CARDS=1
-    export BLOCK_SIZE=128
-    export MAX_NUM_SEQS=256
-    export MAX_SEQ_LEN_TO_CAPTURE=2048
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
     export MEGA_SERVICE_HOST_IP=${ip_address}
     export LLM_SERVICE_HOST_IP=${ip_address}
@@ -68,9 +62,18 @@ function start_services() {
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
     # Start Docker Containers
-    docker compose -f compose.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
+    docker compose -f compose_tgi.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
 
-    sleep 5s
+    n=0
+    # wait long for llm model download
+    until [[ "$n" -ge 500 ]]; do
+        docker logs translation-xeon-tgi-service > ${LOG_PATH}/tgi_service_start.log
+        if grep -q Connected ${LOG_PATH}/tgi_service_start.log; then
+            break
+        fi
+        sleep 5s
+        n=$((n+1))
+    done
 }
 
 function validate_services() {
@@ -105,12 +108,22 @@ function validate_services() {
 }
 
 function validate_microservices() {
+    # Check if the microservices are running correctly.
+
+    # tgi for llm service
+    validate_services \
+        "${ip_address}:8008/generate" \
+        "generated_text" \
+        "tgi" \
+        "translation-xeon-tgi-service" \
+        '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}'
+
     # llm microservice
     validate_services \
         "${ip_address}:9000/v1/chat/completions" \
         "data: " \
         "llm" \
-        "translation-gaudi-llm-server" \
+        "translation-xeon-llm-server" \
         '{"query":"Translate this from Chinese to English:\nChinese: 我爱机器翻译。\nEnglish:"}'
 }
 
@@ -120,7 +133,7 @@ function validate_megaservice() {
         "${ip_address}:${BACKEND_SERVICE_PORT}/v1/translation" \
         "print" \
         "mega-translation" \
-        "translation-gaudi-backend-server" \
+        "translation-xeon-backend-server" \
         '{"language_from": "Golang","language_to": "Python","source_data": "package main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n}","translate_type":"code"}'
 
     # test the megaservice for text translation
@@ -128,7 +141,7 @@ function validate_megaservice() {
         "${ip_address}:${BACKEND_SERVICE_PORT}/v1/translation" \
         "translation" \
         "mega-translation" \
-        "translation-gaudi-backend-server" \
+        "translation-xeon-backend-server" \
         '{"language_from": "Chinese","language_to": "English","source_data": "我爱机器翻译。","translate_type":"text"}'
 
     # test the megeservice via nginx
@@ -136,9 +149,8 @@ function validate_megaservice() {
         "${ip_address}:${NGINX_PORT}/v1/translation" \
         "print" \
         "mega-translation-nginx" \
-        "translation-gaudi-nginx-server" \
+        "translation-xeon-nginx-server" \
         '{"language_from": "Golang","language_to": "Python","source_data": "package main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n}","translate_type":"code"}'
-
 }
 
 function validate_frontend() {
@@ -170,8 +182,8 @@ function validate_frontend() {
 }
 
 function stop_docker() {
-    cd $WORKPATH/docker_compose/intel/hpu/gaudi
-    docker compose -f compose.yaml stop && docker compose rm -f
+    cd $WORKPATH/docker_compose/intel/cpu/xeon/
+    docker compose -f compose_tgi.yaml stop && docker compose rm -f
 }
 
 function main() {
