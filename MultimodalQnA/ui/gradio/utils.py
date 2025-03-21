@@ -11,19 +11,18 @@ import tempfile
 from pathlib import Path
 
 import cv2
+from moviepy.audio.io.AudioFileClip import AudioFileClip
 from moviepy.video.io.VideoFileClip import VideoFileClip
 
 LOGDIR = "."
 TMP_DIR = "/tmp"
 
+IMAGE_FORMATS = [".png", ".gif", ".jpg", ".jpeg"]
+AUDIO_FORMATS = [".wav", ".mp3"]
+
 server_error_msg = "**NETWORK ERROR DUE TO HIGH TRAFFIC. PLEASE REGENERATE OR REFRESH THIS PAGE.**"
 moderation_msg = "YOUR INPUT VIOLATES OUR CONTENT MODERATION GUIDELINES. PLEASE TRY AGAIN."
 
-GRADIO_IMAGE_FORMATS = [".jpeg", ".png", ".jpg", ".gif"]
-GRADIO_AUDIO_FORMATS = [
-    ".wav",
-    ".mp3",
-]
 
 handler = None
 save_log = False
@@ -159,6 +158,28 @@ def split_video(
         new = video.subclip(start_time, end_time)
         new.write_videofile(output_video, audio_codec="aac")
     return output_video
+
+
+# function to split audio at a timestamp
+def split_audio(
+    audio_path,
+    timestamp_in_ms,
+    output_audio_path: str = "./public/splitted_audios",
+    output_audio_name: str = "audio_tmp.wav",
+    play_before_sec: int = 5,
+    play_after_sec: int = 5,
+):
+    timestamp_in_sec = int(timestamp_in_ms) / 1000
+    # create output_audio_name folder if not exist:
+    Path(output_audio_path).mkdir(parents=True, exist_ok=True)
+    output_audio = os.path.join(output_audio_path, output_audio_name)
+    with AudioFileClip(audio_path) as audio:
+        duration = audio.duration
+        start_time = max(timestamp_in_sec - play_before_sec, 0)
+        end_time = min(timestamp_in_sec + play_after_sec, duration)
+        new = audio.subclip(start_time, end_time)
+        new.write_audiofile(output_audio)
+    return output_audio
 
 
 def delete_split_video(video_path):
