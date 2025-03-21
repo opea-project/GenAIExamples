@@ -20,7 +20,7 @@ docker build -t opea/whisper:latest --build-arg https_proxy=$https_proxy --build
 
 ### 3. Build LLM Image
 
-For compose for ROCm example AMD optimized image hosted in huggingface repo will be used for TGI service: ghcr.io/huggingface/text-generation-inference:2.3.1-rocm (https://github.com/huggingface/text-generation-inference)
+For compose for ROCm example AMD optimized image hosted in huggingface repo will be used for TGI service: ghcr.io/huggingface/text-generation-inference:2.4.1-rocm (https://github.com/huggingface/text-generation-inference)
 
 ### 4. Build TTS Image
 
