@@ -30,13 +30,20 @@ case "$1" in
         echo "$ports"
         for port in $ports; do
           if [[ $port =~ [a-zA-Z_-] ]]; then
-            port=$(grep -E "export $port=" tests/$test_case | cut -d'=' -f2)
+            echo "Search port value $port from the test case..."
+            port_fix=$(grep -E "export $port=" tests/$test_case | cut -d'=' -f2)
+            if [[ "$port_fix" == "" ]]; then
+              echo "Can't find the port value from the test case, use the default value in yaml..."
+              port_fix=$(yq '.services[].ports[]' $yaml_file | grep $port | cut -d':' -f2 |  grep -o '[0-9a-zA-Z]\+')
+            fi
+            port=$port_fix
           fi
           if [[ $port =~ [0-9] ]]; then
             if [[ $port == 5000 ]]; then
               echo "Error: Port 5000 is used by local docker registry, please DO NOT use it in docker compose deployment!!!"
               exit 1
             fi
+            echo "Check port $port..."
             cid=$(docker ps --filter "publish=${port}" --format "{{.ID}}")
             if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid && echo "release $port"; fi
           fi
