@@ -384,7 +384,7 @@ If a page of this type has opened, then we believe that the service is running a
 and we can proceed to functional UI testing.
 
 For example, let's take the description of water from the Wiki.
-Copy the first few paragraphs from the Wiki and put them in the text field and then click Generate FAQs.
+Copy the first few paragraphs from the Wiki and put them in the text field and then click Generate Summary.
 After that, a page with the result of the task should open:
 
 ![UI result page](../../../../assets/img/ui-result-page.png)
