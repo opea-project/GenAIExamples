@@ -105,7 +105,7 @@
     - opea/searchqna:latest
     - opea/searchqna-ui:latest
     - opea/web-retriever:latest
-    
+
 ---
 
 ## Deploy the SearchQnA Application
@@ -259,6 +259,7 @@ All containers should be running and should not restart:
 - search-ui-server
 
 ---
+
 ## Validate the Services
 
 ### 1. Validate the vLLM/TGI Service
@@ -430,8 +431,6 @@ curl http://${SEARCH_HOST_IP}:3008/v1/searchqna -H "Content-Type: application/js
      "stream": "True"
      }'
 ```
-
-
 
 ### 5. Stop application
 

@@ -12,6 +12,21 @@ GenAIExamples are designed to give developers an easy entry into generative AI, 
 
 [GenAIEval](https://github.com/opea-project/GenAIEval) measures service performance metrics such as throughput, latency, and accuracy for GenAIExamples. This feature helps users compare performance across various hardware configurations easily.
 
+## Use Cases
+
+Below are some highlighted GenAI use cases across various application scenarios:
+
+| Scenario                     | Use Case                                                                                                                              |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| <b>Question Answering<b/>    | [ChatQnA](ChatQnA) ✨: Chatbot with Retrieval Augmented Generation (RAG). <br/> [VisualQnA](VisualQnA) ✨: Visual Question-answering. |
+| <b>Image Generation<b/>      | [Text2Image](Text2Image) ✨: Text-to-image generation.                                                                                |
+| <b>Content Summarization<b/> | [DocSum](DocSum): Document Summarization Application.                                                                                 |
+| <b>Code Generation<b/>       | [CodeGen](CodeGen): Gen-AI Powered Code Generator.                                                                                    |
+| <b>Information Retrieval<b/> | [DocIndexRetriever](DocIndexRetriever): Document Retrieval with Retrieval Augmented Generation (RAG).                                 |
+| <b>Fine-tuning<b/>           | [InstructionTuning](InstructionTuning): Application of Instruction Tuning.                                                            |
+
+For the full list of the available use cases and their supported deployment type, please refer [here](#deploy-examples).
+
 ## Documentation
 
 The GenAIExamples [documentation](https://opea-project.github.io/latest/examples/index.html) contains a comprehensive guide on all available examples including architecture, deployment guides, and more. Information on GenAIComps, GenAIInfra, and GenAIEval can also be found there.
@@ -56,7 +71,6 @@ Deployment is based on released docker images by default - check [docker image l
 | CodeTrans         | [Xeon Instructions](CodeTrans/docker_compose/intel/cpu/xeon/README.md)         | [Gaudi Instructions](CodeTrans/docker_compose/intel/hpu/gaudi/README.md)     | [ROCm Instructions](CodeTrans/docker_compose/amd/gpu/rocm/README.md)     | [CodeTrans with Helm Charts](CodeTrans/kubernetes/helm/README.md)   | [CodeTrans with GMC](CodeTrans/kubernetes/gmc/README.md)     |
 | DocSum            | [Xeon Instructions](DocSum/docker_compose/intel/cpu/xeon/README.md)            | [Gaudi Instructions](DocSum/docker_compose/intel/hpu/gaudi/README.md)        | [ROCm Instructions](DocSum/docker_compose/amd/gpu/rocm/README.md)        | [DocSum with Helm Charts](DocSum/kubernetes/helm/README.md)         | [DocSum with GMC](DocSum/kubernetes/gmc/README.md)           |
 | SearchQnA         | [Xeon Instructions](SearchQnA/docker_compose/intel/cpu/xeon/README.md)         | [Gaudi Instructions](SearchQnA/docker_compose/intel/hpu/gaudi/README.md)     | Not Supported                                                            | [SearchQnA with Helm Charts](SearchQnA/kubernetes/helm/README.md)   | [SearchQnA with GMC](SearchQnA/kubernetes/gmc/README.md)     |
-| FaqGen            | [Xeon Instructions](FaqGen/docker_compose/intel/cpu/xeon/README.md)            | [Gaudi Instructions](FaqGen/docker_compose/intel/hpu/gaudi/README.md)        | [ROCm Instructions](FaqGen/docker_compose/amd/gpu/rocm/README.md)        | [FaqGen with Helm Charts](FaqGen/kubernetes/helm/README.md)         | Not supported                                                |
 | Translation       | [Xeon Instructions](Translation/docker_compose/intel/cpu/xeon/README.md)       | [Gaudi Instructions](Translation/docker_compose/intel/hpu/gaudi/README.md)   | [ROCm Instructions](Translation/docker_compose/amd/gpu/rocm/README.md)   | Not Supported                                                       | [Translation with GMC](Translation/kubernetes/gmc/README.md) |
 | AudioQnA          | [Xeon Instructions](AudioQnA/docker_compose/intel/cpu/xeon/README.md)          | [Gaudi Instructions](AudioQnA/docker_compose/intel/hpu/gaudi/README.md)      | [ROCm Instructions](AudioQnA/docker_compose/amd/gpu/rocm/README.md)      | [AudioQnA with Helm Charts](AudioQnA/kubernetes/helm/README.md)     | [AudioQnA with GMC](AudioQnA/kubernetes/gmc/README.md)       |
 | VisualQnA         | [Xeon Instructions](VisualQnA/docker_compose/intel/cpu/xeon/README.md)         | [Gaudi Instructions](VisualQnA/docker_compose/intel/hpu/gaudi/README.md)     | [ROCm Instructions](VisualQnA/docker_compose/amd/gpu/rocm/README.md)     | [VisualQnA with Helm Charts](VisualQnA/kubernetes/helm/README.md)   | [VisualQnA with GMC](VisualQnA/kubernetes/gmc/README.md)     |
