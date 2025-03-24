@@ -40,8 +40,7 @@ class VectorIndexer(BaseComponent, VectorStoreIndex):
                 VectorStoreIndex.__init__(self, embed_model=embed_model, nodes=[], storage_context=faiss_store)
 
     def reinitialize_indexer(self):
-        if self.comp_subtype == IndexerType.FAISS_VECTOR:
-            self._initialize_indexer(self.model, IndexerType.FAISS_VECTOR)
+        self._initialize_indexer(self.model, self.comp_subtype)
 
     def run(self, **kwargs) -> Any:
         pass

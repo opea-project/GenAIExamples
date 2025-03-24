@@ -42,7 +42,8 @@ function build_vllm_docker_image() {
         git clone https://github.com/HabanaAI/vllm-fork.git
     fi
     cd ./vllm-fork
-    git checkout v0.6.4.post2+Gaudi-1.19.0
+    VLLM_VER=$(git describe --tags "$(git rev-list --tags --max-count=1)")
+    git checkout ${VLLM_VER} &> /dev/null
     docker build --no-cache -f Dockerfile.hpu -t opea/vllm-gaudi:ci --shm-size=128g . --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy
     if [ $? -ne 0 ]; then
         echo "opea/vllm-gaudi:ci failed"

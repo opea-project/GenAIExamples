@@ -9,6 +9,7 @@ echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
 echo "TAG=IMAGE_TAG=${IMAGE_TAG}"
 export REGISTRY=${IMAGE_REPO}
 export TAG=${IMAGE_TAG}
+export MODEL_CACHE=${model_cache:-"./data"}
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
@@ -180,7 +181,7 @@ function validate_megaservice() {
     # Curl the Mega Service
     validate_service \
         "${ip_address}:8888/v1/chatqna" \
-        "data: " \
+        "Nike" \
         "chatqna-megaservice" \
         "chatqna-xeon-backend-server" \
         '{"messages": "What is the revenue of Nike in 2023?"}'
@@ -240,6 +241,8 @@ function main() {
     echo "==== microservices validated ===="
     validate_megaservice
     echo "==== megaservice validated ===="
+    validate_frontend
+    echo "==== frontend validated ===="
 
     stop_docker
     echo y | docker system prune

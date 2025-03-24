@@ -105,7 +105,15 @@ docker build --no-cache -t opea/retriever:latest --build-arg https_proxy=$https_
 docker build --no-cache -t opea/dataprep:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/src/Dockerfile .
 ```
 
-### 4. Build MegaService Docker Image
+### 4. Build FaqGen LLM Image (Optional)
+
+If you want to enable FAQ generation LLM in the pipeline, please use the below command:
+
+```bash
+docker build -t opea/llm-faqgen:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/src/faq-generation/Dockerfile .
+```
+
+### 5. Build MegaService Docker Image
 
 To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `chatqna.py` Python script. Build the MegaService Docker image using the command below:
 
@@ -116,7 +124,7 @@ docker build --no-cache -t opea/chatqna:latest --build-arg https_proxy=$https_pr
 cd ../../..
 ```
 
-### 5. Build UI Docker Image
+### 6. Build UI Docker Image
 
 Construct the frontend Docker image using the command below:
 
@@ -126,7 +134,7 @@ docker build --no-cache -t opea/chatqna-ui:latest --build-arg https_proxy=$https
 cd ../../../..
 ```
 
-### 6. Build React UI Docker Image (Optional)
+### 7. Build React UI Docker Image (Optional)
 
 Construct the frontend Docker image using the command below:
 
@@ -136,7 +144,7 @@ docker build --no-cache -t opea/chatqna-react-ui:latest --build-arg https_proxy=
 cd ../../../..
 ```
 
-### 7. Build Nginx Docker Image
+### 8. Build Nginx Docker Image
 
 ```bash
 cd GenAIComps
@@ -150,6 +158,10 @@ Then run the command `docker images`, you will have the following 5 Docker Image
 3. `opea/chatqna:latest`
 4. `opea/chatqna-ui:latest` or `opea/chatqna-react-ui:latest`
 5. `opea/nginx:latest`
+
+If FaqGen docker image is built, you will find one more image:
+
+- `opea/llm-faqgen:latest`
 
 ## 🚀 Start MicroServices and MegaService
 
@@ -190,6 +202,7 @@ Change the `xxx_MODEL_ID` below for your needs.
    export CHATQNA_REDIS_VECTOR_INSIGHT_PORT=8001
    export CHATQNA_REDIS_DATAPREP_PORT=6007
    export CHATQNA_REDIS_RETRIEVER_PORT=7000
+   export CHATQNA_LLM_FAQGEN_PORT=9000
    export CHATQNA_INDEX_NAME="rag-redis"
    export CHATQNA_MEGA_SERVICE_HOST_IP=${HOST_IP}
    export CHATQNA_RETRIEVER_SERVICE_HOST_IP=${HOST_IP}
@@ -246,7 +259,10 @@ Please find more information about accessing and restricting AMD GPUs in the lin
 
 ```bash
 cd GenAIExamples/ChatQnA/docker_compose/amd/gpu/rocm
+## for text generation
 docker compose up -d
+## for FAQ generation
+docker compose -f compose_faqgen.yaml up -d
 ```
 
 ### Validate MicroServices and MegaService
@@ -310,7 +326,16 @@ docker compose up -d
      -H 'Content-Type: application/json'
    ```
 
-5. MegaService
+5. FaqGen LLM Microservice (if enabled)
+
+```bash
+curl http://${host_ip}:${CHATQNA_LLM_FAQGEN_PORT}/v1/faqgen \
+  -X POST \
+  -d '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}' \
+  -H 'Content-Type: application/json'
+```
+
+6. MegaService
 
    ```bash
    curl http://${host_ip}:8888/v1/chatqna -H "Content-Type: application/json" -d '{
@@ -318,7 +343,7 @@ docker compose up -d
         }'
    ```
 
-6. Nginx Service
+7. Nginx Service
 
    ```bash
    curl http://${host_ip}:${NGINX_PORT}/v1/chatqna \
@@ -326,7 +351,7 @@ docker compose up -d
        -d '{"messages": "What is the revenue of Nike in 2023?"}'
    ```
 
-7. Dataprep Microservice（Optional）
+8. Dataprep Microservice（Optional）
 
 If you want to update the default knowledge base, you can use the following commands:
 

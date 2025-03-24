@@ -7,6 +7,24 @@ import requests
 from tools.pycragapi import CRAG
 
 
+def search_web_base(query: str) -> str:
+    import os
+
+    from langchain_core.tools import Tool
+    from langchain_google_community import GoogleSearchAPIWrapper
+
+    search = GoogleSearchAPIWrapper()
+
+    tool = Tool(
+        name="google_search",
+        description="Search Google for recent results.",
+        func=search.run,
+    )
+
+    response = tool.run(query)
+    return response
+
+
 def search_knowledge_base(query: str) -> str:
     """Search a knowledge base about music and singers for a given query.
 
