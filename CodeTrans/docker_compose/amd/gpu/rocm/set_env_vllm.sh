@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Copyright (c) 2024 Advanced Micro Devices, Inc.
+# Copyright (c) 2025 Advanced Micro Devices, Inc.
 # SPDX-License-Identifier: Apache-2.0
 
 ### The IP address or domain name of the server on which the application is running
@@ -15,10 +15,10 @@ export EXTERNAL_HOST_IP=''
 export CODETRANS_LLM_MODEL_ID="Qwen/Qwen2.5-Coder-7B-Instruct"
 
 ### The port of the TGI service. On this port, the TGI service will accept connections
-export CODETRANS_TGI_SERVICE_PORT=18156
+export CODETRANS_VLLM_SERVICE_PORT=18156
 
 ### The endpoint of the TGI service to which requests to this service will be sent (formed from previously set variables)
-export CODETRANS_TGI_LLM_ENDPOINT="http://${HOST_IP}:${CODETRANS_TGI_SERVICE_PORT}"
+export CODETRANS_LLM_ENDPOINT="http://${HOST_IP}:${CODETRANS_VLLM_SERVICE_PORT}"
 
 ### A token for accessing repositories with models
 export CODETRANS_HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
