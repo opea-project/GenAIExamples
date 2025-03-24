@@ -332,7 +332,11 @@ curl http://${HOST_IP}:${DOCSUM_LLM_SERVER_PORT}/v1/docsum \
 Checking the response from the service. The response should be similar to JSON:
 
 ```json
-{"id":"e97003abd1be457623a9f80214c0793b","text":" Water is an essential inorganic compound with the chemical formula H2O, serving as the primary component of Earth's hydrosphere and living organisms. It is vital for all life, despite not providing food energy or micronutrients. Its molecules consist of one oxygen atom and two hydrogen atoms connected by covalent bonds. In liquid form, it is commonly referred to as water at standard temperature and pressure.","prompt":"Water is an inorganic compound with the chemical formula H2O. It is a transparent, tasteless, odorless,[c] and nearly colorless chemical substance. It is the main constituent of Earths hydrosphere and the fluids of all known living organisms (in which it acts as a solvent[20]). It is vital for all known forms of life, despite not providing food energy or organic micronutrients. Its chemical formula, H2O, indicates that each of its molecules contains one oxygen and two hydrogen atoms, connected by covalent bonds. The hydrogen atoms are attached to the oxygen atom at an angle of 104.45 In liquid form, H2O is also called water at standard temperature and pressure."}
+{
+  "id": "e97003abd1be457623a9f80214c0793b",
+  "text": " Water is an essential inorganic compound with the chemical formula H2O, serving as the primary component of Earth's hydrosphere and living organisms. It is vital for all life, despite not providing food energy or micronutrients. Its molecules consist of one oxygen atom and two hydrogen atoms connected by covalent bonds. In liquid form, it is commonly referred to as water at standard temperature and pressure.",
+  "prompt": "Water is an inorganic compound with the chemical formula H2O. It is a transparent, tasteless, odorless,[c] and nearly colorless chemical substance. It is the main constituent of Earths hydrosphere and the fluids of all known living organisms (in which it acts as a solvent[20]). It is vital for all known forms of life, despite not providing food energy or organic micronutrients. Its chemical formula, H2O, indicates that each of its molecules contains one oxygen and two hydrogen atoms, connected by covalent bonds. The hydrogen atoms are attached to the oxygen atom at an angle of 104.45 In liquid form, H2O is also called water at standard temperature and pressure."
+}
 ```
 
 If the service response has a meaningful response in the value of the "text" key,
