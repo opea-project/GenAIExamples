@@ -92,4 +92,23 @@ services:
       LANGCHAIN_PROJECT: "opea-supervisor-agent-service"
       CRAG_SERVER: $CRAG_SERVER
       WORKER_AGENT_URL: $WORKER_AGENT_URL
+      SQL_AGENT_URL: $SQL_AGENT_URL
       port: 9090
+  mock-api:
+    image: docker.io/aicrowd/kdd-cup-24-crag-mock-api:v0
+    container_name: mock-api
+    ports:
+      - "8080:8000"
+    ipc: host
+  agent-ui:
+    image: opea:agent-ui
+    container_name: agent-ui
+    volumes:
+      - ${WORKDIR}/GenAIExamples/AgentQnA/ui/svelte/.env:/home/user/svelte/.env # test db
+    ports:
+      - "5173:5173"
+    ipc: host
+
+networks:
+  default:
+    driver: bridge

@@ -39,7 +39,7 @@ services:
     ports:
       - "6006:80"
     volumes:
-      - "./data_embedding:/data"
+      - "${MODEL_CACHE:-./data_embedding}:/data"
     shm_size: 1g
     environment:
       no_proxy: ${no_proxy}
@@ -95,7 +95,7 @@ services:
     ports:
       - "8808:80"
     volumes:
-      - "./data_tei:/data"
+      - "${MODEL_CACHE:-./data_tei}:/data"
     shm_size: 1g
     environment:
       no_proxy: ${no_proxy}
@@ -136,7 +136,7 @@ services:
     ports:
       - "9009:80"
     volumes:
-      - "./data:/data"
+      - "${MODEL_CACHE:-./data}:/data"
     shm_size: 1g
     environment:
       no_proxy: ${no_proxy}
@@ -209,7 +209,7 @@ services:
     ports:
       - "8028:80"
     volumes:
-      - "./data_codegen:/data"
+      - "${MODEL_CACHE:-./data_codegen}:/data"
     shm_size: 1g
     environment:
       no_proxy: ${no_proxy}
@@ -280,24 +280,6 @@ services:
       FAQGen_COMPONENT_NAME: ${FAQGen_COMPONENT_NAME}
       LOGFLAG: ${LOGFLAG:-False}
     restart: unless-stopped
-  faqgen-xeon-backend-server:
-    image: ${REGISTRY:-opea}/faqgen:${TAG:-latest}
-    container_name: faqgen-xeon-backend-server
-    depends_on:
-      - tgi_service
-      - llm_faqgen
-    ports:
-      - "8889:8888"
-    environment:
-      no_proxy: ${no_proxy}
-      https_proxy: ${https_proxy}
-      http_proxy: ${http_proxy}
-      MEGA_SERVICE_HOST_IP: ${MEGA_SERVICE_HOST_IP}
-      LLM_SERVICE_PORT: ${LLM_SERVICE_HOST_PORT_FAQGEN}
-      LLM_SERVICE_HOST_IP: ${LLM_SERVICE_HOST_IP_FAQGEN}
-      LOGFLAG: ${LOGFLAG}
-    ipc: host
-    restart: always
   mongo:
     image: mongo:7.0.11
     container_name: mongodb
@@ -362,7 +344,6 @@ services:
       - APP_BACKEND_SERVICE_ENDPOINT_CHATQNA=${BACKEND_SERVICE_ENDPOINT_CHATQNA}
       - APP_BACKEND_SERVICE_ENDPOINT_CODEGEN=${BACKEND_SERVICE_ENDPOINT_CODEGEN}
       - APP_BACKEND_SERVICE_ENDPOINT_DOCSUM=${BACKEND_SERVICE_ENDPOINT_DOCSUM}
-      - APP_BACKEND_SERVICE_ENDPOINT_FAQGEN=${BACKEND_SERVICE_ENDPOINT_FAQGEN}
       - APP_DATAPREP_SERVICE_ENDPOINT=${DATAPREP_SERVICE_ENDPOINT}
       - APP_DATAPREP_GET_FILE_ENDPOINT=${DATAPREP_GET_FILE_ENDPOINT}
       - APP_DATAPREP_DELETE_FILE_ENDPOINT=${DATAPREP_DELETE_FILE_ENDPOINT}
