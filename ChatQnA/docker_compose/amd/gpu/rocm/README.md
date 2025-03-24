@@ -75,6 +75,7 @@
   ```
 
 - #### Pull Docker Images
+
   ```bash
   docker pull redis/redis-stack:7.2.0-v9
   docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
@@ -96,25 +97,25 @@
 
   ##### vLLM-based application:
 
-   - redis/redis-stack:7.2.0-v9
-   - opea/dataprep:latest
-   - ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
-   - opea/retriever:latest
-   - opea/vllm-rocm:latest
-   - opea/chatqna:latest
-   - opea/chatqna-ui:latest
-   - opea/nginx:latest
+  - redis/redis-stack:7.2.0-v9
+  - opea/dataprep:latest
+  - ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+  - opea/retriever:latest
+  - opea/vllm-rocm:latest
+  - opea/chatqna:latest
+  - opea/chatqna-ui:latest
+  - opea/nginx:latest
 
   ##### TGI-based application:
 
-   - redis/redis-stack:7.2.0-v9
-   - opea/dataprep:latest
-   - ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
-   - opea/retriever:latest
-   - ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
-   - opea/chatqna:latest
-   - opea/chatqna-ui:latest
-   - opea/nginx:latest
+  - redis/redis-stack:7.2.0-v9
+  - opea/dataprep:latest
+  - ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+  - opea/retriever:latest
+  - ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
+  - opea/chatqna:latest
+  - opea/chatqna-ui:latest
+  - opea/nginx:latest
 
 ---
 
@@ -352,7 +353,11 @@ curl http://${HOST_IP}:${DOCSUM_LLM_SERVER_PORT}/v1/docsum \
 Checking the response from the service. The response should be similar to JSON:
 
 ```json
-{"id":"e97003abd1be457623a9f80214c0793b","text":" Water is an essential inorganic compound with the chemical formula H2O, serving as the primary component of Earth's hydrosphere and living organisms. It is vital for all life, despite not providing food energy or micronutrients. Its molecules consist of one oxygen atom and two hydrogen atoms connected by covalent bonds. In liquid form, it is commonly referred to as water at standard temperature and pressure.","prompt":"Water is an inorganic compound with the chemical formula H2O. It is a transparent, tasteless, odorless,[c] and nearly colorless chemical substance. It is the main constituent of Earths hydrosphere and the fluids of all known living organisms (in which it acts as a solvent[20]). It is vital for all known forms of life, despite not providing food energy or organic micronutrients. Its chemical formula, H2O, indicates that each of its molecules contains one oxygen and two hydrogen atoms, connected by covalent bonds. The hydrogen atoms are attached to the oxygen atom at an angle of 104.45 In liquid form, H2O is also called water at standard temperature and pressure."}
+{
+  "id": "e97003abd1be457623a9f80214c0793b",
+  "text": " Water is an essential inorganic compound with the chemical formula H2O, serving as the primary component of Earth's hydrosphere and living organisms. It is vital for all life, despite not providing food energy or micronutrients. Its molecules consist of one oxygen atom and two hydrogen atoms connected by covalent bonds. In liquid form, it is commonly referred to as water at standard temperature and pressure.",
+  "prompt": "Water is an inorganic compound with the chemical formula H2O. It is a transparent, tasteless, odorless,[c] and nearly colorless chemical substance. It is the main constituent of Earths hydrosphere and the fluids of all known living organisms (in which it acts as a solvent[20]). It is vital for all known forms of life, despite not providing food energy or organic micronutrients. Its chemical formula, H2O, indicates that each of its molecules contains one oxygen and two hydrogen atoms, connected by covalent bonds. The hydrogen atoms are attached to the oxygen atom at an angle of 104.45 In liquid form, H2O is also called water at standard temperature and pressure."
+}
 ```
 
 If the service response has a meaningful response in the value of the "text" key,
@@ -398,7 +403,6 @@ If the service response contains the output_text field in the last JSON, and it 
 To access the UI, use the URL - http://${EXTERNAL_HOST_IP}:${CHATQNA_NGINX_PORT}
 A page should open when you click through to this address:
 
-
 ![UI start page](../../../../assets/img/ui-starting-page.png)
 
 If a page of this type has opened, then we believe that the service is running and responding,
@@ -427,13 +431,6 @@ docker compose -f compose_vllm.yaml down
 cd ~/docsum-install/GenAIExamples/DocSum/docker_compose/amd/gpu/rocm
 docker compose -f compose.yaml down
 ```
-
-
-
-
-
-
-
 
 # Build and deploy CodeGen Application on AMD GPU (ROCm)
 
