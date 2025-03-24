@@ -32,10 +32,9 @@ function build_docker_images() {
     git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="codetrans codetrans-ui llm-textgen nginx"
+    service_list="vllm-rocm llm-textgen codetrans codetrans-ui nginx"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
-    docker pull ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
     docker images && sleep 1s
 }
 
@@ -43,10 +42,11 @@ function start_services() {
     cd $WORKPATH/docker_compose/amd/gpu/rocm/
     export http_proxy=${http_proxy}
     export https_proxy=${http_proxy}
-    export CODETRANS_TGI_SERVICE_PORT=8008
+    export HOST_IP=${ip_address}
+    export CODETRANS_VLLM_SERVICE_PORT=8008
     export CODETRANS_LLM_SERVICE_PORT=9000
     export CODETRANS_LLM_MODEL_ID="Qwen/Qwen2.5-Coder-7B-Instruct"
-    export CODETRANS_TGI_LLM_ENDPOINT="http://${ip_address}:${CODETRANS_TGI_SERVICE_PORT}"
+    export CODETRANS_LLM_ENDPOINT="http://${ip_address}:${CODETRANS_VLLM_SERVICE_PORT}"
     export CODETRANS_HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
     export CODETRANS_MEGA_SERVICE_HOST_IP=${ip_address}
     export CODETRANS_LLM_SERVICE_HOST_IP=${ip_address}
@@ -62,15 +62,15 @@ function start_services() {
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
     # Start Docker Containers
-    docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
+    docker compose -f compose_vllm.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
 
     n=0
-    until [[ "$n" -ge 100 ]]; do
-        docker logs codetrans-tgi-service > ${LOG_PATH}/tgi_service_start.log
-        if grep -q Connected ${LOG_PATH}/tgi_service_start.log; then
+    until [[ "$n" -ge 500 ]]; do
+        docker logs codetrans-vllm-service >& "${LOG_PATH}"/codetrans-vllm-service_start.log
+        if grep -q "Application startup complete" "${LOG_PATH}"/codetrans-vllm-service_start.log; then
             break
         fi
-        sleep 5s
+        sleep 20s
         n=$((n+1))
     done
 }
@@ -105,12 +105,13 @@ function validate_services() {
 
 function validate_microservices() {
     # tgi for embedding service
+    # vLLM for llm service
     validate_services \
-        "${ip_address}:${CODETRANS_TGI_SERVICE_PORT}/generate" \
-        "generated_text" \
-        "codetrans-tgi-service" \
-        "codetrans-tgi-service" \
-        '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}'
+        "${ip_address}:${CODETRANS_VLLM_SERVICE_PORT}/v1/chat/completions" \
+        "content" \
+        "codetrans-vllm-service" \
+        "codetrans-vllm-service" \
+        '{"model": "Qwen/Qwen2.5-Coder-7B-Instruct", "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens": 17}'
     sleep 10
     # llm microservice
     validate_services \
@@ -171,7 +172,7 @@ function validate_frontend() {
 
 function stop_docker() {
     cd $WORKPATH/docker_compose/amd/gpu/rocm/
-    docker compose stop && docker compose rm -f
+    docker compose -f compose_vllm.yaml stop && docker compose -f compose_vllm.yaml rm -f
 }
 
 function main() {
