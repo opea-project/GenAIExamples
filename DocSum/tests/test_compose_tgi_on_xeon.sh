@@ -27,6 +27,7 @@ export DocSum_COMPONENT_NAME="OpeaDocSumTgi"
 export MEGA_SERVICE_HOST_IP=${host_ip}
 export LLM_SERVICE_HOST_IP=${host_ip}
 export ASR_SERVICE_HOST_IP=${host_ip}
+export FRONTEND_SERVICE_PORT=5173
 export BACKEND_SERVICE_PORT=8888
 export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:${BACKEND_SERVICE_PORT}/v1/docsum"
 export LOGFLAG=True
@@ -84,70 +85,46 @@ input_data_for_test() {
     esac
 }
 
-function validate_services_json() {
+function validate_service() {
     local URL="$1"
     local EXPECTED_RESULT="$2"
     local SERVICE_NAME="$3"
     local DOCKER_NAME="$4"
-    local INPUT_DATA="$5"
+    local VALIDATE_TYPE="$5"
+    local INPUT_DATA="$6"
+    local FORM_DATA1="$7"
+    local FORM_DATA2="$8"
+    local FORM_DATA3="$9"
+    local FORM_DATA4="$10"
+    local FORM_DATA5="$11"
 
-    local HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL")
-
-    echo "==========================================="
-
-    if [ "$HTTP_STATUS" -eq 200 ]; then
-        echo "[ $SERVICE_NAME ] HTTP status is 200. Checking content..."
-
-        local CONTENT=$(curl -s -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL" | tee ${LOG_PATH}/${SERVICE_NAME}.log)
-
-        if echo "$CONTENT" | grep -q "$EXPECTED_RESULT"; then
-            echo "[ $SERVICE_NAME ] Content is as expected."
-        else
-            echo "EXPECTED_RESULT==> $EXPECTED_RESULT"
-            echo "CONTENT==> $CONTENT"
-            echo "[ $SERVICE_NAME ] Content does not match the expected result: $CONTENT"
-            docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
-            exit 1
-
-        fi
+    if [[ $VALIDATE_TYPE == *"json"* ]]; then
+        HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL")
     else
-        echo "[ $SERVICE_NAME ] HTTP status is not 200. Received status was $HTTP_STATUS"
-        docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
-        exit 1
+        HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -F "$FORM_DATA1" -F "$FORM_DATA2" -F "$FORM_DATA3" -F "$FORM_DATA4" -F "$FORM_DATA5" -H 'Content-Type: multipart/form-data' "$URL")
     fi
-    sleep 1s
-}
+    HTTP_STATUS=$(echo $HTTP_RESPONSE | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
+    RESPONSE_BODY=$(echo $HTTP_RESPONSE | sed -e 's/HTTPSTATUS\:.*//g')
 
-function validate_services_form() {
-    local URL="$1"
-    local EXPECTED_RESULT="$2"
-    local SERVICE_NAME="$3"
-    local DOCKER_NAME="$4"
-    local FORM_DATA1="$5"
-    local FORM_DATA2="$6"
-    local FORM_DATA3="$7"
-    local FORM_DATA4="$8"
-    local FORM_DATA5="$9"
+    docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
 
-    local HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST -F "$FORM_DATA1" -F "$FORM_DATA2" -F "$FORM_DATA3" -F "$FORM_DATA4" -F "$FORM_DATA5" -H 'Content-Type: multipart/form-data' "$URL")
-
-    if [ "$HTTP_STATUS" -eq 200 ]; then
-        echo "[ $SERVICE_NAME ] HTTP status is 200. Checking content..."
-
-        local CONTENT=$(curl -s -X POST -F "$FORM_DATA1" -F "$FORM_DATA2" -F "$FORM_DATA3" -F "$FORM_DATA4" -F "$FORM_DATA5" -H 'Content-Type: multipart/form-data' "$URL" | tee ${LOG_PATH}/${SERVICE_NAME}.log)
-
-        if echo "$CONTENT" | grep -q "$EXPECTED_RESULT"; then
-            echo "[ $SERVICE_NAME ] Content is as expected."
-        else
-            echo "[ $SERVICE_NAME ] Content does not match the expected result: $CONTENT"
-            docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
-            exit 1
-        fi
+    # check response status
+    if [ "$HTTP_STATUS" -ne "200" ]; then
+        echo "[ $SERVICE_NAME ] HTTP status is not 200. Received status was $HTTP_STATUS"
+        exit 1
     else
-        echo "[ $SERVICE_NAME ] HTTP status is not 200. Received status was $HTTP_STATUS"
-        docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
-        exit 1
+        echo "[ $SERVICE_NAME ] HTTP status is 200. Checking content..."
     fi
+    # check response body
+    if [[ "$RESPONSE_BODY" != *"$EXPECTED_RESULT"* ]]; then
+        echo "EXPECTED_RESULT==> $EXPECTED_RESULT"
+        echo "RESPONSE_BODY==> $RESPONSE_BODY"
+        echo "[ $SERVICE_NAME ] Content does not match the expected result: $RESPONSE_BODY"
+        exit 1
+    else
+        echo "[ $SERVICE_NAME ] Content is as expected."
+    fi
+
     sleep 1s
 }
 
@@ -155,47 +132,52 @@ function validate_microservices() {
     # Check if the microservices are running correctly.
 
     # tgi for llm service
-    validate_services_json \
+    validate_service \
         "${host_ip}:${LLM_ENDPOINT_PORT}/generate" \
         "generated_text" \
         "tgi-server" \
-        "tgi-server" \
+        "docsum-xeon-tgi-server" \
+        "json" \
         '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}'
 
     # llm microservice
-    validate_services_json \
+    validate_service \
         "${host_ip}:${LLM_PORT}/v1/docsum" \
         "text" \
         "llm-docsum-tgi" \
-        "llm-docsum-server" \
+        "docsum-xeon-llm-server" \
+        "json" \
         '{"messages":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
 
     # whisper microservice
     ulimit -s 65536
-    validate_services_json \
+    validate_service \
         "${host_ip}:7066/v1/asr" \
         '{"asr_result":"well"}' \
         "whisper" \
-        "whisper-server" \
+        "docsum-xeon-whisper-server" \
+        "json" \
         "{\"audio\": \"$(input_data_for_test "audio")\"}"
 
 }
 
 function validate_megaservice_text() {
     echo ">>> Checking text data in json format"
-    validate_services_json \
+    validate_service \
         "${host_ip}:${BACKEND_SERVICE_PORT}/v1/docsum" \
         "[DONE]" \
         "docsum-xeon-backend-server" \
         "docsum-xeon-backend-server" \
+        "json" \
         '{"type": "text", "messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
 
     echo ">>> Checking text data in form format, set language=en"
-    validate_services_form \
+    validate_service \
         "${host_ip}:${BACKEND_SERVICE_PORT}/v1/docsum" \
         "[DONE]" \
         "docsum-xeon-backend-server" \
         "docsum-xeon-backend-server" \
+        "media" "" \
         "type=text" \
         "messages=Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5." \
         "max_tokens=32" \
@@ -203,11 +185,12 @@ function validate_megaservice_text() {
         "stream=True"
 
     echo ">>> Checking text data in form format, set language=zh"
-    validate_services_form \
+    validate_service \
         "${host_ip}:${BACKEND_SERVICE_PORT}/v1/docsum" \
         "[DONE]" \
         "docsum-xeon-backend-server" \
         "docsum-xeon-backend-server" \
+        "media" "" \
         "type=text" \
         "messages=2024年9月26日，北京——今日，英特尔正式发布英特尔® 至强® 6性能核处理器（代号Granite Rapids），为AI、数据分析、科学计算等计算密集型业务提供卓越性能。" \
         "max_tokens=32" \
@@ -215,11 +198,12 @@ function validate_megaservice_text() {
         "stream=True"
 
     echo ">>> Checking text data in form format, upload file"
-    validate_services_form \
+    validate_service \
         "${host_ip}:${BACKEND_SERVICE_PORT}/v1/docsum" \
         "[DONE]" \
         "docsum-xeon-backend-server" \
         "docsum-xeon-backend-server" \
+        "media" "" \
         "type=text" \
         "messages=" \
         "files=@$ROOT_FOLDER/data/short.txt" \
@@ -229,19 +213,21 @@ function validate_megaservice_text() {
 
 function validate_megaservice_multimedia() {
     echo ">>> Checking audio data in json format"
-    validate_services_json \
+    validate_service \
         "${host_ip}:${BACKEND_SERVICE_PORT}/v1/docsum" \
         "[DONE]" \
         "docsum-xeon-backend-server" \
         "docsum-xeon-backend-server" \
+        "json" \
         "{\"type\": \"audio\",  \"messages\": \"$(input_data_for_test "audio")\"}"
 
     echo ">>> Checking audio data in form format"
-    validate_services_form \
+    validate_service \
         "${host_ip}:${BACKEND_SERVICE_PORT}/v1/docsum" \
         "[DONE]" \
         "docsum-xeon-backend-server" \
         "docsum-xeon-backend-server" \
+        "media" "" \
         "type=audio" \
         "messages=UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA" \
         "max_tokens=32" \
@@ -249,19 +235,21 @@ function validate_megaservice_multimedia() {
         "stream=True"
 
     echo ">>> Checking video data in json format"
-    validate_services_json \
+    validate_service \
         "${host_ip}:${BACKEND_SERVICE_PORT}/v1/docsum" \
         "[DONE]" \
         "docsum-xeon-backend-server" \
         "docsum-xeon-backend-server" \
+        "json" \
         "{\"type\": \"video\",  \"messages\": \"$(input_data_for_test "video")\"}"
 
     echo ">>> Checking video data in form format"
-    validate_services_form \
+    validate_service \
         "${host_ip}:${BACKEND_SERVICE_PORT}/v1/docsum" \
         "[DONE]" \
         "docsum-xeon-backend-server" \
         "docsum-xeon-backend-server" \
+        "media" "" \
         "type=video" \
         "messages=\"$(input_data_for_test "video")\"" \
         "max_tokens=32" \
@@ -271,11 +259,12 @@ function validate_megaservice_multimedia() {
 
 function validate_megaservice_long_text() {
     echo ">>> Checking long text data in form format, set summary_type=auto"
-    validate_services_form \
+    validate_service \
         "${host_ip}:${BACKEND_SERVICE_PORT}/v1/docsum" \
         "[DONE]" \
         "docsum-xeon-backend-server" \
         "docsum-xeon-backend-server" \
+        "media" "" \
         "type=text" \
         "messages=" \
         "files=@$ROOT_FOLDER/data/long.txt" \
@@ -283,11 +272,12 @@ function validate_megaservice_long_text() {
         "summary_type=auto"
 
     echo ">>> Checking long text data in form format, set summary_type=stuff"
-    validate_services_form \
+    validate_service \
         "${host_ip}:${BACKEND_SERVICE_PORT}/v1/docsum" \
         "[DONE]" \
         "docsum-xeon-backend-server" \
         "docsum-xeon-backend-server" \
+        "media" "" \
         "type=text" \
         "messages=" \
         "files=@$ROOT_FOLDER/data/long.txt" \
@@ -295,11 +285,12 @@ function validate_megaservice_long_text() {
         "summary_type=stuff"
 
     echo ">>> Checking long text data in form format, set summary_type=truncate"
-    validate_services_form \
+    validate_service \
         "${host_ip}:${BACKEND_SERVICE_PORT}/v1/docsum" \
         "[DONE]" \
         "docsum-xeon-backend-server" \
         "docsum-xeon-backend-server" \
+        "media" "" \
         "type=text" \
         "messages=" \
         "files=@$ROOT_FOLDER/data/long.txt" \
@@ -307,11 +298,12 @@ function validate_megaservice_long_text() {
         "summary_type=truncate"
 
     echo ">>> Checking long text data in form format, set summary_type=map_reduce"
-    validate_services_form \
+    validate_service \
         "${host_ip}:${BACKEND_SERVICE_PORT}/v1/docsum" \
         "[DONE]" \
         "docsum-xeon-backend-server" \
         "docsum-xeon-backend-server" \
+        "media" "" \
         "type=text" \
         "messages=" \
         "files=@$ROOT_FOLDER/data/long.txt" \
@@ -319,11 +311,12 @@ function validate_megaservice_long_text() {
         "summary_type=map_reduce"
 
     echo ">>> Checking long text data in form format, set summary_type=refine"
-    validate_services_form \
+    validate_service \
         "${host_ip}:${BACKEND_SERVICE_PORT}/v1/docsum" \
         "[DONE]" \
         "docsum-xeon-backend-server" \
         "docsum-xeon-backend-server" \
+        "media" "" \
         "type=text" \
         "messages=" \
         "files=@$ROOT_FOLDER/data/long.txt" \
