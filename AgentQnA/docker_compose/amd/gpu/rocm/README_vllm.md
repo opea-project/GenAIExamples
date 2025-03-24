@@ -78,7 +78,7 @@ The output of the command should contain images:
 - opea/embedding:latest
 - opea/retriever:latest
 - opea/reranking:latest
-- opea/dataprep:lates
+- opea/dataprep:latest
 - opea/llm-vllm-rocm
 - opea/agent:latest
 - opea/agent-ui:latest
