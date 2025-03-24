@@ -8,12 +8,25 @@ from edgecraftrag.api.v1.chatqna import chatqna_app
 from edgecraftrag.api.v1.data import data_app
 from edgecraftrag.api.v1.model import model_app
 from edgecraftrag.api.v1.pipeline import pipeline_app
+from edgecraftrag.api.v1.system import system_app
+from edgecraftrag.utils import UI_DIRECTORY
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from llama_index.core.settings import Settings
 
 app = FastAPI()
+app.mount(UI_DIRECTORY, StaticFiles(directory=UI_DIRECTORY), name=UI_DIRECTORY)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-sub_apps = [data_app, model_app, pipeline_app, chatqna_app]
+
+sub_apps = [data_app, model_app, pipeline_app, chatqna_app, system_app]
 for sub_app in sub_apps:
     for route in sub_app.routes:
         app.router.routes.append(route)
