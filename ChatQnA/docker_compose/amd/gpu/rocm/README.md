@@ -79,7 +79,7 @@
   ```bash
   service_list="dataprep retriever llm-faqgen chatqna chatqna-ui nginx"
   ```
-  
+
 - #### Pull Docker Images
 
   ```bash
@@ -109,26 +109,26 @@
 
   ##### vLLM-based application:
 
-    - redis/redis-stack:7.2.0-v9
-    - opea/dataprep:latest
-    - ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
-    - opea/retriever:latest
-    - opea/vllm-rocm:latest
-    - opea/chatqna:latest
-    - opea/chatqna-ui:latest
-    - opea/nginx:latest
+  - redis/redis-stack:7.2.0-v9
+  - opea/dataprep:latest
+  - ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+  - opea/retriever:latest
+  - opea/vllm-rocm:latest
+  - opea/chatqna:latest
+  - opea/chatqna-ui:latest
+  - opea/nginx:latest
 
   ##### vLLM-based application with FaqGen:
 
-    - redis/redis-stack:7.2.0-v9
-    - opea/dataprep:latest
-    - ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
-    - opea/retriever:latest
-    - opea/vllm-rocm:latest
-    - opea/llm-faqgen:latest
-    - opea/chatqna:latest
-    - opea/chatqna-ui:latest
-    - opea/nginx:latest
+  - redis/redis-stack:7.2.0-v9
+  - opea/dataprep:latest
+  - ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+  - opea/retriever:latest
+  - opea/vllm-rocm:latest
+  - opea/llm-faqgen:latest
+  - opea/chatqna:latest
+  - opea/chatqna-ui:latest
+  - opea/nginx:latest
 
   ##### TGI-based application:
 
