@@ -267,11 +267,9 @@ All containers should be running and should not restart:
 
 ```bash
 DATA='{"model": "Intel/neural-chat-7b-v3-3", '\
-'"messages": [{"role": "user", "content": "Implement a high-level API for a TODO list application. '\
-'The API takes as input an operation request and updates the TODO list in place. '\
-'If the request is invalid, raise an exception."}], "max_tokens": 256}'
+'"messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens": 256}'
 
-curl http://${HOST_IP}:${A_VLLM_SERVICE_PORT}/v1/chat/completions \
+curl http://${HOST_IP}:${SEARCHQNA_VLLM_SERVICE_PORT}/v1/chat/completions \
   -X POST \
   -d "$DATA" \
   -H 'Content-Type: application/json'
@@ -281,25 +279,24 @@ Checking the response from the service. The response should be similar to JSON:
 
 ````json
 {
-  "id": "chatcmpl-142f34ef35b64a8db3deedd170fed951",
-  "object": "chat.completion",
-  "created": 1742270316,
-  "model": "Intel/neural-chat-7b-v3-3",
-  "choices": [
-    {
-      "index": 0,
-      "message": {
-        "role": "assistant",
-        "content": "```python\nfrom typing import Optional, List, Dict, Union\nfrom pydantic import BaseModel, validator\n\nclass OperationRequest(BaseModel):\n    # Assuming OperationRequest is already defined as per the given text\n    pass\n\nclass UpdateOperation(OperationRequest):\n    new_items: List[str]\n\n    def apply_and_maybe_raise(self, updatable_item: \"Updatable todo list\") -> None:\n        # Assuming updatable_item is an instance of Updatable todo list\n        self.validate()\n        updatable_item.add_items(self.new_items)\n\nclass Updatable:\n    # Abstract class for items that can be updated\n    pass\n\nclass TodoList(Updatable):\n    # Class that represents a todo list\n    items: List[str]\n\n    def add_items(self, new_items: List[str]) -> None:\n        self.items.extend(new_items)\n\ndef handle_request(operation_request: OperationRequest) -> None:\n    # Function to handle an operation request\n    if isinstance(operation_request, UpdateOperation):\n        operation_request.apply_and_maybe_raise(get_todo_list_for_update())\n    else:\n        raise ValueError(\"Invalid operation request\")\n\ndef get_todo_list_for_update() -> TodoList:\n    # Function to get the todo list for update\n    # Assuming this function returns the",
-        "tool_calls": []
+   "id":"chatcmpl-512d16e876774d13a323514e96122cbc",
+   "object":"chat.completion",
+   "created":1742819098,
+   "model":"Intel/neural-chat-7b-v3-3",
+   "choices":[
+     {
+       "index":0,
+       "message":{
+       "role":"assistant",
+       "content":" Deep Learning is a subset of Machine Learning that relies on Artificial Neural Networks to perform tasks like image recognition, natural language processing, and predictive analytics. It aims to model the inner workings of the human brain through the intelligent analysis of big data. Essentially, Deep Learning algorithms try to process and learn from raw data in multiple layers to extract patterns, ultimately enabling systems to recognize complex patterns and make predictions more accurately. Although thoughest it involves much data and computation power, recently it is often referred through increasingly simple approaches thanks to advances in computation hardware. Deep Learning developed from previous techniques like neural networks, but has proven more powerful and effective for various tasks that involve massive data volumes and complex decisions.",
+       "tool_calls":[]
       },
-      "logprobs": null,
-      "finish_reason": "length",
-      "stop_reason": null
-    }
-  ],
-  "usage": { "prompt_tokens": 66, "total_tokens": 322, "completion_tokens": 256, "prompt_tokens_details": null },
-  "prompt_logprobs": null
+    "logprobs":null,
+    "finish_reason":"stop",
+    "stop_reason":null}
+    ],
+  "usage":{"prompt_tokens":15,"total_tokens":161,"completion_tokens":146,"prompt_tokens_details":null},
+  "prompt_logprobs":null
 }
 ````
 
@@ -309,12 +306,10 @@ then we consider the vLLM service to be successfully launched
 #### If you use TGI:
 
 ```bash
-DATA='{"inputs":"Implement a high-level API for a TODO list application. '\
-'The API takes as input an operation request and updates the TODO list in place. '\
-'If the request is invalid, raise an exception.",'\
+DATA='{"inputs":"IWhat is Deep Learning?",'\
 '"parameters":{"max_new_tokens":256,"do_sample": true}}'
 
-curl http://${HOST_IP}:${CODEGEN_TGI_SERVICE_PORT}/generate \
+curl http://${HOST_IP}:${SEARCHQNA_TGI_SERVICE_PORT}/generate \
   -X POST \
   -d "$DATA" \
   -H 'Content-Type: application/json'
@@ -324,7 +319,7 @@ Checking the response from the service. The response should be similar to JSON:
 
 ````json
 {
-  "generated_text": " The supported operations are \"add_task\", \"complete_task\", and \"remove_task\". Each operation can be defined with a corresponding function in the API.\n\nAdd your API in the following format:\n\n```\nTODO App API\n\nsupported operations:\n\noperation name           description\n-----------------------  ------------------------------------------------\n<operation_name>         <operation description>\n```\n\nUse type hints for function parameters and return values. Specify a text description of the API's supported operations.\n\nUse the following code snippet as a starting point for your high-level API function:\n\n```\nclass TodoAPI:\n    def __init__(self, tasks: List[str]):\n        self.tasks = tasks  # List of tasks to manage\n\n    def add_task(self, task: str) -> None:\n        self.tasks.append(task)\n\n    def complete_task(self, task: str) -> None:\n        self.tasks = [t for t in self.tasks if t != task]\n\n    def remove_task(self, task: str) -> None:\n        self.tasks = [t for t in self.tasks if t != task]\n\n    def handle_request(self, request: Dict[str, str]) -> None:\n        operation = request.get('operation')\n        if operation == 'add_task':\n            self.add_task(request.get('task'))\n        elif"
+  "generated_text":"\n\nDeep Learning is a subset of machine learning, which focuses on developing methods inspired by the functioning of the human brain; more specifically, the way it processes and acquires various types of knowledge and information. To enable deep learning, the networks are composed of multiple processing layers that form a hierarchy, with each layer learning more complex and abstraction levels of data representation.\n\nThe principle of Deep Learning is to emulate the structure of neurons in the human brain to construct artificial neural networks capable to accomplish complicated pattern recognition tasks more effectively and accurately. Therefore, these neural networks contain a series of hierarchical components, where units in earlier layers receive simple inputs and are activated by these inputs. The activation of the units in later layers are the results of multiple nonlinear transformations generated from reconstructing and integrating the information in previous layers. In other words, by combining various pieces of information at each layer, a Deep Learning network can extract the input features that best represent the structure of data, providing their outputs at the last layer or final level of abstraction.\n\nThe main idea of using these 'deep' networks in contrast to regular algorithms is that they are capable of representing hierarchical relationships that exist within the data and learn these representations by"
 }
 ````
 
@@ -334,13 +329,11 @@ then we consider the TGI service to be successfully launched
 ### 2. Validate the LLM Service
 
 ```bash
-DATA='{"query":"Implement a high-level API for a TODO list application. '\
-'The API takes as input an operation request and updates the TODO list in place. '\
-'If the request is invalid, raise an exception.",'\
+DATA='{"query":"What is Deep Learning?",'\
 '"max_tokens":256,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,'\
 '"repetition_penalty":1.03,"stream":false}'
 
-curl http://${HOST_IP}:${CODEGEN_LLM_SERVICE_PORT}/v1/chat/completions \
+curl http://${HOST_IP}:${SEARCHQNA}/v1/chat/completions \
   -X POST \
   -d "$DATA" \
   -H 'Content-Type: application/json'
@@ -350,35 +343,31 @@ Checking the response from the service. The response should be similar to JSON:
 
 ````json
 {
-  "id": "cmpl-4e89a590b1af46bfb37ce8f12b2996f8",
-  "choices": [
-    {
-      "finish_reason": "length",
-      "index": 0,
-      "logprobs": null,
-      "text": " The API should support the following operations:\n\n1. Add a new task to the TODO list.\n2. Remove a task from the TODO list.\n3. Mark a task as completed.\n4. Retrieve the list of all tasks.\n\nThe API should also support the following features:\n\n1. The ability to filter tasks based on their completion status.\n2. The ability to sort tasks based on their priority.\n3. The ability to search for tasks based on their description.\n\nHere is an example of how the API can be used:\n\n```python\ntodo_list = []\napi = TodoListAPI(todo_list)\n\n# Add tasks\napi.add_task(\"Buy groceries\")\napi.add_task(\"Finish homework\")\n\n# Mark a task as completed\napi.mark_task_completed(\"Buy groceries\")\n\n# Retrieve the list of all tasks\nprint(api.get_all_tasks())\n\n# Filter tasks based on completion status\nprint(api.filter_tasks(completed=True))\n\n# Sort tasks based on priority\napi.sort_tasks(priority=\"high\")\n\n# Search for tasks based on description\nprint(api.search_tasks(description=\"homework\"))\n```\n\nIn this example, the `TodoListAPI` class is used to manage the TODO list. The `add_task` method adds a new task to the list, the `mark_task_completed` method",
-      "stop_reason": null,
-      "prompt_logprobs": null
-    }
-  ],
-  "created": 1742270567,
-  "model": "Qwen/Qwen2.5-Coder-7B-Instruct",
-  "object": "text_completion",
-  "system_fingerprint": null,
-  "usage": {
-    "completion_tokens": 256,
-    "prompt_tokens": 37,
-    "total_tokens": 293,
-    "completion_tokens_details": null,
-    "prompt_tokens_details": null
-  }
+   "id":"chatcmpl-512d16e876774d13a323514e96122cbc",
+   "object":"chat.completion",
+   "created":1742819098,
+   "model":"Intel/neural-chat-7b-v3-3",
+   "choices":[
+     {
+       "index":0,
+       "message":{
+       "role":"assistant",
+       "content":" Deep Learning is a subset of Machine Learning that relies on Artificial Neural Networks to perform tasks like image recognition, natural language processing, and predictive analytics. It aims to model the inner workings of the human brain through the intelligent analysis of big data. Essentially, Deep Learning algorithms try to process and learn from raw data in multiple layers to extract patterns, ultimately enabling systems to recognize complex patterns and make predictions more accurately. Although thoughest it involves much data and computation power, recently it is often referred through increasingly simple approaches thanks to advances in computation hardware. Deep Learning developed from previous techniques like neural networks, but has proven more powerful and effective for various tasks that involve massive data volumes and complex decisions.",
+       "tool_calls":[]
+      },
+    "logprobs":null,
+    "finish_reason":"stop",
+    "stop_reason":null}
+    ],
+  "usage":{"prompt_tokens":15,"total_tokens":161,"completion_tokens":146,"prompt_tokens_details":null},
+  "prompt_logprobs":null
 }
 ````
 
 If the service response has a meaningful response in the value of the "choices.text" key,
 then we consider the vLLM service to be successfully launched
 
-### 2. Validate Embedding service
+### 3. Validate Embedding service
 
 ```bash
 curl http://${SEARCH_HOST_IP}:3002/v1/embeddings\
