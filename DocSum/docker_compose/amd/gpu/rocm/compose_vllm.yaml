@@ -23,7 +23,7 @@ services:
       timeout: 10s
       retries: 100
     volumes:
-      - "./data:/data"
+      - "${MODEL_CACHE:-./data}:/data"
     shm_size: 20G
     devices:
       - /dev/kfd:/dev/kfd
