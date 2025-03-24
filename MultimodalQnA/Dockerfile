@@ -20,7 +20,7 @@ WORKDIR $HOME
 FROM base AS git
 
 RUN apt-get update && apt-get install -y --no-install-recommends git
-# RUN git clone --depth 1 https://github.com/opea-project/GenAIComps.git
+#RUN git clone --depth 1 https://github.com/opea-project/GenAIComps.git
 RUN git clone --single-branch --branch="mmqna-phase3" https://github.com/mhbuehler/GenAIComps.git
 
 # Stage 3: common layer shared by services using GenAIComps
@@ -43,7 +43,9 @@ USER user
 # Stage 4: unique part
 FROM comps-base
 
+#ARG BASE_TAG=latest
+#FROM opea/comps-base:$BASE_TAG
+
 COPY ./multimodalqna.py $HOME/multimodalqna.py
 
 ENTRYPOINT ["python", "multimodalqna.py"]
-# ENTRYPOINT ["/usr/bin/sleep", "infinity"]
