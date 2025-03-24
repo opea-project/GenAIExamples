@@ -1,5 +1,6 @@
 #!/bin/bash
 # Copyright (C) 2024 Intel Corporation
+# Copyright (c) 2024 Advanced Micro Devices, Inc.
 # SPDX-License-Identifier: Apache-2.0
 
 set -xe
@@ -31,10 +32,9 @@ function build_docker_images() {
     git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="codegen codegen-ui llm-textgen"
+    service_list="vllm-rocm llm-textgen codegen codegen-ui"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
-    docker pull ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
     docker images && sleep 1s
 }
 
@@ -42,8 +42,8 @@ function start_services() {
     cd $WORKPATH/docker_compose/amd/gpu/rocm/
 
     export CODEGEN_LLM_MODEL_ID="Qwen/Qwen2.5-Coder-7B-Instruct"
-    export CODEGEN_TGI_SERVICE_PORT=8028
-    export CODEGEN_TGI_LLM_ENDPOINT="http://${ip_address}:${CODEGEN_TGI_SERVICE_PORT}"
+    export CODEGEN_VLLM_SERVICE_PORT=8028
+    export CODEGEN_VLLM_ENDPOINT="http://${ip_address}:${CODEGEN_VLLM_SERVICE_PORT}"
     export CODEGEN_LLM_SERVICE_PORT=9000
     export CODEGEN_HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
     export CODEGEN_MEGA_SERVICE_HOST_IP=${ip_address}
@@ -56,15 +56,15 @@ function start_services() {
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
     # Start Docker Containers
-    docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
+    docker compose -f compose_vllm.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
 
     n=0
-    until [[ "$n" -ge 100 ]]; do
-        docker logs codegen-tgi-service > ${LOG_PATH}/codegen_tgi_service_start.log
-        if grep -q Connected ${LOG_PATH}/codegen_tgi_service_start.log; then
+    until [[ "$n" -ge 500 ]]; do
+        docker logs codegen-vllm-service >& "${LOG_PATH}"/codegen-vllm-service_start.log
+        if grep -q "Application startup complete" "${LOG_PATH}"/codegen-vllm-service_start.log; then
             break
         fi
-        sleep 5s
+        sleep 20s
         n=$((n+1))
     done
 }
@@ -98,13 +98,13 @@ function validate_services() {
 }
 
 function validate_microservices() {
-    # tgi for llm service
+    # vLLM for llm service
     validate_services \
-        "${ip_address}:${CODEGEN_TGI_SERVICE_PORT}/generate" \
-        "generated_text" \
-        "codegen-tgi-service" \
-        "codegen-tgi-service" \
-        '{"inputs":"def print_hello_world():","parameters":{"max_new_tokens":256, "do_sample": true}}'
+        "${ip_address}:${CODEGEN_VLLM_SERVICE_PORT}/v1/chat/completions" \
+        "content" \
+        "codegen-vllm-service" \
+        "codegen-vllm-service" \
+        '{"model": "Qwen/Qwen2.5-Coder-7B-Instruct", "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens": 17}'
     sleep 10
     # llm microservice
     validate_services \
@@ -119,7 +119,7 @@ function validate_microservices() {
 function validate_megaservice() {
     # Curl the Mega Service
     validate_services \
-        "${ip_address}:7778/v1/codegen" \
+        "${ip_address}:${CODEGEN_BACKEND_SERVICE_PORT}/v1/codegen" \
         "print" \
         "codegen-backend-server" \
         "codegen-backend-server" \
@@ -157,14 +157,14 @@ function validate_frontend() {
 
 
 function stop_docker() {
+    echo "OPENAI_API_KEY - ${OPENAI_API_KEY}"
     cd $WORKPATH/docker_compose/amd/gpu/rocm/
-    docker compose stop && docker compose rm -f
+    docker compose -f compose_vllm.yaml stop && docker compose -f compose_vllm.yaml rm -f
 }
 
 function main() {
 
     stop_docker
-
     if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
     start_services
 
