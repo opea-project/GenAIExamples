@@ -132,10 +132,26 @@
 
   ##### TGI-based application:
 
-  - ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
-  - opea/llm-textgen:latest
-  - opea/codegen:latest
-  - opea/chatqna-ui:latest
+    - redis/redis-stack:7.2.0-v9
+    - opea/dataprep:latest
+    - ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+    - opea/retriever:latest
+    - ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
+    - opea/chatqna:latest
+    - opea/chatqna-ui:latest
+    - opea/nginx:latest
+  
+  ##### TGI-based application with FaqGen:
+
+    - redis/redis-stack:7.2.0-v9
+    - opea/dataprep:latest
+    - ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+    - opea/retriever:latest
+    - ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
+    - opea/llm-faqgen:latest
+    - opea/chatqna:latest
+    - opea/chatqna-ui:latest
+    - opea/nginx:latest
 
 ---
 
@@ -146,13 +162,15 @@
 To enable GPU support for AMD GPUs, the following configuration is added to the Docker Compose file:
 
 - compose_vllm.yaml - for vLLM-based application
+- compose_faqgen_vllm.yaml - for vLLM-based application with FaqGen
 - compose.yaml - for TGI-based
+- compose_faqgen.yaml - for TGI-based application with FaqGen
 
 ```yaml
 shm_size: 1g
 devices:
   - /dev/kfd:/dev/kfd
-  - /dev/dri/:/dev/dri/
+  - /dev/dri:/dev/dri
 cap_add:
   - SYS_PTRACE
 group_add:
@@ -201,16 +219,28 @@ cd ~/chatqna-install/GenAIExamples/ChatQnA/docker_compose/amd/gpu/rocm
 
 The example uses the Nano text editor. You can use any convenient text editor:
 
-#### If you use vLLM
+#### If you use vLLM based application
 
 ```bash
 nano set_env_vllm.sh
 ```
 
-#### If you use TGI
+#### If you use vLLM based application with FaqGen
+
+```bash
+nano set_env_vllm_faqgen.sh
+```
+
+#### If you use TGI based application
 
 ```bash
 nano set_env.sh
+```
+
+#### If you use TGI based application with FaqGen
+
+```bash
+nano set_env_faqgen.sh
 ```
 
 If you are in a proxy environment, also set the proxy-related environment variables:
@@ -237,47 +267,107 @@ Set the values of the variables:
 
 #### Set variables with script set_env\*\*\*\*.sh
 
-#### If you use vLLM
+#### If you use vLLM based application
 
 ```bash
 . set_env_vllm.sh
 ```
 
-#### If you use TGI
+#### If you use vLLM based application with FaqGen
+
+```bash
+. set_env_vllm_faqgen.sh
+```
+
+#### If you use TGI based application
 
 ```bash
 . set_env.sh
 ```
 
+#### If you use TGI based application with FaqGen
+
+```bash
+. set_env_faqgen.sh
+```
+
 ### Start the services:
 
-#### If you use vLLM
+#### If you use vLLM based application
 
 ```bash
 docker compose -f compose_vllm.yaml up -d
 ```
 
-#### If you use TGI
+#### If you use vLLM based application with FaqGen
+
+```bash
+docker compose -f compose_faqgen_vllm.yaml up -d
+```
+
+#### If you use TGI based application
 
 ```bash
 docker compose -f compose.yaml up -d
 ```
 
+#### If you use TGI based application with FaqGen
+
+```bash
+docker compose -f compose_faqgen.yaml up -d
+```
+
 All containers should be running and should not restart:
 
-##### If you use vLLM:
+##### If you use vLLM based application:
 
+- chatqna-redis-vector-db
+- chatqna-dataprep-service
+- chatqna-tei-embedding-service
+- chatqna-retriever
+- chatqna-tei-reranking-service
 - chatqna-vllm-service
-- chatqna-llm-server
 - chatqna-backend-server
 - chatqna-ui-server
+- chatqna-nginx-server
 
-##### If you use TGI:
+##### If you use vLLM based application with FaqGen:
 
+- chatqna-redis-vector-db
+- chatqna-dataprep-service
+- chatqna-tei-embedding-service
+- chatqna-retriever
+- chatqna-tei-reranking-service
+- chatqna-vllm-service
+- chatqna-llm-faqgen
+- chatqna-backend-server
+- chatqna-ui-server
+- chatqna-nginx-server
+
+##### If you use TGI based application:
+
+- chatqna-redis-vector-db
+- chatqna-dataprep-service
+- chatqna-tei-embedding-service
+- chatqna-retriever
+- chatqna-tei-reranking-service
 - chatqna-tgi-service
-- chatqna-llm-server
 - chatqna-backend-server
 - chatqna-ui-server
+- chaqna-nginx-server
+
+##### If you use TGI based application with FaqGen:
+
+- chatqna-redis-vector-db
+- chatqna-dataprep-service
+- chatqna-tei-embedding-service
+- chatqna-retriever
+- chatqna-tei-reranking-service
+- chatqna-tgi-service
+- chatqna-llm-faqgen
+- chatqna-backend-server
+- chatqna-ui-server
+- chaqna-nginx-server
 
 ---
 
