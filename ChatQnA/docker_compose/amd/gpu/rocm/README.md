@@ -477,12 +477,10 @@ then we consider the vLLM service to be successfully launched
 #### If you use TGI:
 
 ```bash
-DATA='{"inputs":"Implement a high-level API for a TODO list application. '\
-'The API takes as input an operation request and updates the TODO list in place. '\
-'If the request is invalid, raise an exception.",'\
-'"parameters":{"max_new_tokens":256,"do_sample": true}}'
+DATA='{"inputs":"What is a Deep Learning?",'\
+'"parameters":{"max_new_tokens":64,"do_sample": true}}'
 
-curl http://${HOST_IP}:${CODEGEN_TGI_SERVICE_PORT}/generate \
+curl http://${HOST_IP}:${CHATQNA_TGI_SERVICE_PORT}/generate \
   -X POST \
   -d "$DATA" \
   -H 'Content-Type: application/json'
@@ -491,9 +489,7 @@ curl http://${HOST_IP}:${CODEGEN_TGI_SERVICE_PORT}/generate \
 Checking the response from the service. The response should be similar to JSON:
 
 ````json
-{
-  "generated_text": " The supported operations are \"add_task\", \"complete_task\", and \"remove_task\". Each operation can be defined with a corresponding function in the API.\n\nAdd your API in the following format:\n\n```\nTODO App API\n\nsupported operations:\n\noperation name           description\n-----------------------  ------------------------------------------------\n<operation_name>         <operation description>\n```\n\nUse type hints for function parameters and return values. Specify a text description of the API's supported operations.\n\nUse the following code snippet as a starting point for your high-level API function:\n\n```\nclass TodoAPI:\n    def __init__(self, tasks: List[str]):\n        self.tasks = tasks  # List of tasks to manage\n\n    def add_task(self, task: str) -> None:\n        self.tasks.append(task)\n\n    def complete_task(self, task: str) -> None:\n        self.tasks = [t for t in self.tasks if t != task]\n\n    def remove_task(self, task: str) -> None:\n        self.tasks = [t for t in self.tasks if t != task]\n\n    def handle_request(self, request: Dict[str, str]) -> None:\n        operation = request.get('operation')\n        if operation == 'add_task':\n            self.add_task(request.get('task'))\n        elif"
-}
+{"generated_text":" What is its application in Computer Vision?\nWhat is a Deep Learning?\nDeep learning is a subfield of machine learning that involves the use of artificial neural networks to model high-level abstractions in data. It involves the use of deep neural networks, which are composed of multiple layers, to learn complex patterns in data. The"}
 ````
 
 If the service response has a meaningful response in the value of the "generated_text" key,
@@ -570,7 +566,7 @@ is considered launched successfully.
 
 ### 7. Validate the Frontend (UI)
 
-To access the UI, use the URL - http://${EXTERNAL_HOST_IP}:${CODEGEN_UI_SERVICE_PORT}
+To access the UI, use the URL - http://${EXTERNAL_HOST_IP}:${CHATQNA_NGINX_PORT}
 A page should open when you click through to this address:
 
 ![UI start page](../../../../assets/img/ui-starting-page.png)
@@ -579,10 +575,16 @@ If a page of this type has opened, then we believe that the service is running a
 and we can proceed to functional UI testing.
 
 Let's enter the task for the service in the "Enter prompt here" field.
-For example, "Write a Python code that returns the current time and date" and press Enter.
+For example, "What is a Deep Learning?" and press Enter.
 After that, a page with the result of the task should open:
 
+#### If used application without FaqGen
+
 ![UI result page](../../../../assets/img/ui-result-page.png)
+
+#### If used application with FaqGen
+
+![UI result page](../../../../assets/img/ui-result-page-faqgen.png)
 
 If the result shown on the page is correct, then we consider the verification of the UI service to be successful.
 
@@ -595,9 +597,23 @@ cd ~/chatqna-install/GenAIExamples/ChatQnA/docker_compose/amd/gpu/rocm
 docker compose -f compose_vllm.yaml down
 ```
 
+#### If you use vLLM with FaqGen
+
+```bash
+cd ~/chatqna-install/GenAIExamples/ChatQnA/docker_compose/amd/gpu/rocm
+docker compose -f compose_faqgen_vllm.yaml down
+```
+
 #### If you use TGI
 
 ```bash
 cd ~/chatqna-install/GenAIExamples/ChatQnA/docker_compose/amd/gpu/rocm
 docker compose -f compose.yaml down
+```
+
+#### If you use TGI with FaqGen
+
+```bash
+cd ~/chatqna-install/GenAIExamples/ChatQnA/docker_compose/amd/gpu/rocm
+docker compose -f compose_faqgen.yaml down
 ```
