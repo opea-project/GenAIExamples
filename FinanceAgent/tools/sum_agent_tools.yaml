@@ -1,0 +1,11 @@
+Summarization_agent:
+  description: Searches KV store for summary, if it doesn't exist pulls full document and summarize it
+  callable_api: sum_agent_tools.py:summarize
+  args_schema:
+    doc_name:
+      type: str
+      description: Descriptive name of the document
+    company:
+      type: str
+      description: Name of the company document belongs to
+  return_output: summary

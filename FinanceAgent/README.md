@@ -28,6 +28,7 @@ If deploy on Gaudi, also need to build vllm image.
 cd $WORKDIR
 git clone https://github.com/HabanaAI/vllm-fork.git
 # get the latest release tag of vllm gaudi
+cd vllm-fork
 VLLM_VER=$(git describe --tags "$(git rev-list --tags --max-count=1)")
 echo "Check out vLLM tag ${VLLM_VER}"
 git checkout ${VLLM_VER}
@@ -49,7 +50,7 @@ The commands below will upload some example files into the knowledge base. You c
 
 First, launch the redis databases and the dataprep microservice.
 ```bash
-docker compose -f $WORKDIR/GenAIExamples/FinanceAgent/docker_compose/intel/hpu/gaudi/dataprep.yaml up -d
+docker compose -f $WORKDIR/GenAIExamples/FinanceAgent/docker_compose/intel/hpu/gaudi/dataprep_compose.yaml up -d
 ```
 
 ### 3.3 Launch the multi-agent system
