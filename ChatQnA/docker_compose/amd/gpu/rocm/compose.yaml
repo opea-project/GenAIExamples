@@ -32,7 +32,7 @@ services:
     ports:
       - "${CHATQNA_TEI_EMBEDDING_PORT}:80"
     volumes:
-      - "${MODEL_CACHE:./data}:/data"
+      - "${MODEL_CACHE:-./data}:/data"
     shm_size: 1g
     ipc: host
     environment:
