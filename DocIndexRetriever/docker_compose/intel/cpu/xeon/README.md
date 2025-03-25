@@ -66,7 +66,7 @@ In that case, start Docker Containers with compose_without_rerank.yaml
 export host_ip="YOUR IP ADDR"
 export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
 export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
-cd GenAIExamples/DocIndexRetriever/intel/cpu/xoen/
+cd GenAIExamples/DocIndexRetriever/intel/cpu/xeon/
 docker compose -f compose_without_rerank.yaml up -d
 ```
 
