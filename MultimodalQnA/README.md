@@ -90,7 +90,7 @@ In the below, we provide a table that describes for each microservice component 
 | MicroService | Open Source Project   | HW    | Port | Endpoint                                                    |
 | ------------ | --------------------- | ----- | ---- | ----------------------------------------------------------- |
 | Embedding    | Langchain             | Xeon  | 6000 | /v1/embeddings                                              |
-| Retriever    | Langchain, Redis      | Xeon  | 7000 | /v1/multimodal_retrieval                                    |
+| Retriever    | Langchain, Redis      | Xeon  | 7000 | /v1/retrieval                                               |
 | LVM          | Langchain, TGI        | Gaudi | 9399 | /v1/lvm                                                     |
 | Dataprep     | Redis, Langchain, TGI | Gaudi | 6007 | /v1/generate_transcripts, /v1/generate_captions, /v1/ingest |
 
