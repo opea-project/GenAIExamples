@@ -137,18 +137,21 @@ You will have the following Docker Images:
 
    In the first startup, this service will take more time to download, load and warm up the model. After it's finished, the service will be ready.
    Try the command below to check whether the LLM serving is ready.
+
    ```bash
    # vLLM service
    docker logs docsum-xeon-vllm-service 2>&1 | grep complete
    # If the service is ready, you will get the response like below.
    INFO:     Application startup complete.
    ```
+
    ```bash
    # TGI service
    docker logs docsum-xeon-tgi-service | grep Connected
    # If the service is ready, you will get the response like below.
    2024-09-03T02:47:53.402023Z  INFO text_generation_router::server: router/src/server.rs:2311: Connected
    ```
+
    Then try the `cURL` command below to validate services.
 
    ```bash
