@@ -127,7 +127,7 @@ function main() {
     if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
     start_services
 
-    sleep 2m
+    sleep 5m
 
     validate_megaservice
     validate_frontend
