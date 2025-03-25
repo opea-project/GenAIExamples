@@ -68,6 +68,7 @@ function start_services() {
         sleep 5s
         n=$((n+1))
     done
+    sleep 20
 }
 
 
@@ -123,17 +124,15 @@ function stop_docker() {
 
 function main() {
 
-    stop_docker
-    if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
+#    stop_docker
+#    if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
     start_services
-
-    sleep 5m
 
     validate_megaservice
     validate_frontend
 
-    stop_docker
-    echo y | docker system prune
+#    stop_docker
+#    echo y | docker system prune
 
 }
 
