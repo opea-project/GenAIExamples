@@ -404,10 +404,10 @@ curl http://${HOST_IP}:${CHATQNA_REDIS_RETRIEVER_PORT}/v1/retrieval \
 Checking the response from the service. The response should be similar to JSON:
 
 ```json
-{"id":"e191846168aed1f80b2ea12df80844d2","retrieved_docs":[],"initial_query":"test","top_n":1,"metadata":[]}
+{ "id": "e191846168aed1f80b2ea12df80844d2", "retrieved_docs": [], "initial_query": "test", "top_n": 1, "metadata": [] }
 ```
 
-If the response corresponds to the form of the provided JSON, then we consider the 
+If the response corresponds to the form of the provided JSON, then we consider the
 Retriever Microservice verification successful.
 
 ### 3. Validate TEI Reranking Service
@@ -422,10 +422,13 @@ curl http://${HOST_IP}:${CHATQNA_TEI_RERANKING_PORT}/rerank \
 Checking the response from the service. The response should be similar to JSON:
 
 ```json
-[{"index":1,"score":0.94238955},{"index":0,"score":0.120219156}]
+[
+  { "index": 1, "score": 0.94238955 },
+  { "index": 0, "score": 0.120219156 }
+]
 ```
 
-If the response corresponds to the form of the provided JSON, then we consider the TEI Reranking Service 
+If the response corresponds to the form of the provided JSON, then we consider the TEI Reranking Service
 verification successful.
 
 ### 4. Validate the vLLM/TGI Service
@@ -444,9 +447,29 @@ curl http://${HOST_IP}:${CHATQNA_VLLM_SERVICE_PORT}/v1/chat/completions \
 
 Checking the response from the service. The response should be similar to JSON:
 
-````json
-{"id":"chatcmpl-91003647d1c7469a89e399958f390f67","object":"chat.completion","created":1742877228,"model":"meta-llama/Meta-Llama-3-8B-Instruct","choices":[{"index":0,"message":{"role":"assistant","content":"Deep Learning ( DL) is a subfield of Machine Learning (ML) that focuses on the design of algorithms and architectures inspired by the structure and function of the human brain. These algorithms are designed to analyze and interpret data that is presented in the form of patterns or signals, and they often mimic the way the human brain","tool_calls":[]},"logprobs":null,"finish_reason":"length","stop_reason":null}],"usage":{"prompt_tokens":16,"total_tokens":80,"completion_tokens":64,"prompt_tokens_details":null},"prompt_logprobs":null}
-````
+```json
+{
+  "id": "chatcmpl-91003647d1c7469a89e399958f390f67",
+  "object": "chat.completion",
+  "created": 1742877228,
+  "model": "meta-llama/Meta-Llama-3-8B-Instruct",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "Deep Learning ( DL) is a subfield of Machine Learning (ML) that focuses on the design of algorithms and architectures inspired by the structure and function of the human brain. These algorithms are designed to analyze and interpret data that is presented in the form of patterns or signals, and they often mimic the way the human brain",
+        "tool_calls": []
+      },
+      "logprobs": null,
+      "finish_reason": "length",
+      "stop_reason": null
+    }
+  ],
+  "usage": { "prompt_tokens": 16, "total_tokens": 80, "completion_tokens": 64, "prompt_tokens_details": null },
+  "prompt_logprobs": null
+}
+```
 
 If the service response has a meaningful response in the value of the "choices.message.content" key,
 then we consider the vLLM service to be successfully launched
@@ -491,9 +514,13 @@ curl http://${HOST_IP}:${CHATQNA_LLM_FAQGEN_PORT}/v1/faqgen \
 
 Checking the response from the service. The response should be similar to JSON:
 
-````json
-{"id":"58f0632f5f03af31471b895b0d0d397b","text":" Q: What is Text Embeddings Inference (TEI)?\n         A: TEI is a toolkit for deploying and serving open source text embeddings and sequence classification models.\n\n         Q: What models does TEI support?\n         A: TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5.\n\n         Q: What is the purpose of TEI?\n         A: The purpose of TEI is to enable high-performance extraction for text embeddings and sequence classification models.\n\n         Q: What are the benefits of using TEI?\n         A: The benefits of using TEI include high","prompt":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}
-````
+```json
+{
+  "id": "58f0632f5f03af31471b895b0d0d397b",
+  "text": " Q: What is Text Embeddings Inference (TEI)?\n         A: TEI is a toolkit for deploying and serving open source text embeddings and sequence classification models.\n\n         Q: What models does TEI support?\n         A: TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5.\n\n         Q: What is the purpose of TEI?\n         A: The purpose of TEI is to enable high-performance extraction for text embeddings and sequence classification models.\n\n         Q: What are the benefits of using TEI?\n         A: The benefits of using TEI include high",
+  "prompt": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."
+}
+```
 
 If the service response has a meaningful response in the value of the "text" key,
 then we consider the LLM service to be successfully launched
@@ -538,7 +565,7 @@ data: [DONE]
 
 ```
 
-If the output lines in the "data" keys contain words (tokens) containing meaning, then the service 
+If the output lines in the "data" keys contain words (tokens) containing meaning, then the service
 is considered launched successfully.
 
 ### 7. Validate the Frontend (UI)
