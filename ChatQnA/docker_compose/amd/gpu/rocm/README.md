@@ -276,7 +276,7 @@ Set the values of the variables:
 #### If you use vLLM based application with FaqGen
 
 ```bash
-. set_env_vllm_faqgen.sh
+. set_env_faqgen_vllm.sh
 ```
 
 #### If you use TGI based application
