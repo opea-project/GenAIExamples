@@ -51,7 +51,7 @@ export CHATQNA_TEI_EMBEDDING_ENDPOINT="http://${HOST_IP}:${CHATQNA_TEI_EMBEDDING
 export CHATQNA_BACKEND_SERVICE_NAME=chatqna
 export CHATQNA_INDEX_NAME="rag-redis"
 
-export PATH="~/miniforge3/bin:$PATH"
+export PATH="~/miniconda3/bin:$PATH"
 
 function build_docker_images() {
     opea_branch=${opea_branch:-"main"}
@@ -224,7 +224,7 @@ function validate_frontend() {
     echo "[ TEST INFO ]: --------- frontend test started ---------"
     cd "$WORKPATH"/ui/svelte
     local conda_env_name="OPEA_e2e"
-    export PATH=${HOME}/miniforge3/bin/:$PATH
+    export PATH=${HOME}/miniconda3/bin/:$PATH
     if conda info --envs | grep -q "$conda_env_name"; then
         echo "$conda_env_name exist!"
     else
