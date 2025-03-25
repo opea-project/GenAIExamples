@@ -132,26 +132,26 @@
 
   ##### TGI-based application:
 
-    - redis/redis-stack:7.2.0-v9
-    - opea/dataprep:latest
-    - ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
-    - opea/retriever:latest
-    - ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
-    - opea/chatqna:latest
-    - opea/chatqna-ui:latest
-    - opea/nginx:latest
-  
+  - redis/redis-stack:7.2.0-v9
+  - opea/dataprep:latest
+  - ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+  - opea/retriever:latest
+  - ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
+  - opea/chatqna:latest
+  - opea/chatqna-ui:latest
+  - opea/nginx:latest
+
   ##### TGI-based application with FaqGen:
 
-    - redis/redis-stack:7.2.0-v9
-    - opea/dataprep:latest
-    - ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
-    - opea/retriever:latest
-    - ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
-    - opea/llm-faqgen:latest
-    - opea/chatqna:latest
-    - opea/chatqna-ui:latest
-    - opea/nginx:latest
+  - redis/redis-stack:7.2.0-v9
+  - opea/dataprep:latest
+  - ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+  - opea/retriever:latest
+  - ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
+  - opea/llm-faqgen:latest
+  - opea/chatqna:latest
+  - opea/chatqna-ui:latest
+  - opea/nginx:latest
 
 ---
 
