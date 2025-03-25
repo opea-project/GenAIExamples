@@ -373,13 +373,68 @@ All containers should be running and should not restart:
 
 ## Validate the Services
 
-### 1. Validate the vLLM/TGI Service
+### 1. Validate TEI Embedding Service
+
+```bash
+curl http://${HOST_IP}:${CHATQNA_TEI_EMBEDDING_PORT}/embed \
+    -X POST \
+    -d '{"inputs":"What is Deep Learning?"}' \
+    -H 'Content-Type: application/json'
+```
+
+Checking the response from the service. The response should be similar to text:
+
+```textmate
+[[0.00037115702,-0.06356819,0.0024758505,..................,0.022725677,0.016026087,-0.02125421,-0.02984927,-0.0049473033]]
+```
+
+If the service response has a meaningful response in the value,
+then we consider the TEI Embedding Service to be successfully launched
+
+### 2. Validate Retriever Microservice
+
+```bash
+export your_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
+curl http://${HOST_IP}:${CHATQNA_REDIS_RETRIEVER_PORT}/v1/retrieval \
+  -X POST \
+  -d "{\"text\":\"test\",\"embedding\":${your_embedding}}" \
+  -H 'Content-Type: application/json'
+```
+
+Checking the response from the service. The response should be similar to JSON:
+
+```json
+{"id":"e191846168aed1f80b2ea12df80844d2","retrieved_docs":[],"initial_query":"test","top_n":1,"metadata":[]}
+```
+
+If the response corresponds to the form of the provided JSON, then we consider the 
+Retriever Microservice verification successful.
+
+### 3. Validate TEI Reranking Service
+
+```bash
+curl http://${HOST_IP}:${CHATQNA_TEI_RERANKING_PORT}/rerank \
+    -X POST \
+    -d '{"query":"What is Deep Learning?", "texts": ["Deep Learning is not...", "Deep learning is..."]}' \
+    -H 'Content-Type: application/json'
+```
+
+Checking the response from the service. The response should be similar to JSON:
+
+```json
+[{"index":1,"score":0.94238955},{"index":0,"score":0.120219156}]
+```
+
+If the response corresponds to the form of the provided JSON, then we consider the TEI Reranking Service 
+verification successful.
+
+### 4. Validate the vLLM/TGI Service
 
 #### If you use vLLM:
 
 ```bash
 DATA='{"model": "meta-llama/Meta-Llama-3-8B-Instruct", '\
-'"messages": [{"role": "user", "content": "What is a Deep Learning?"}], "max_tokens": 256}'
+'"messages": [{"role": "user", "content": "What is a Deep Learning?"}], "max_tokens": 64}'
 
 curl http://${HOST_IP}:${CHATQNA_VLLM_SERVICE_PORT}/v1/chat/completions \
   -X POST \
@@ -390,27 +445,7 @@ curl http://${HOST_IP}:${CHATQNA_VLLM_SERVICE_PORT}/v1/chat/completions \
 Checking the response from the service. The response should be similar to JSON:
 
 ````json
-{
-  "id": "chatcmpl-142f34ef35b64a8db3deedd170fed951",
-  "object": "chat.completion",
-  "created": 1742270316,
-  "model": "Qwen/Qwen2.5-Coder-7B-Instruct",
-  "choices": [
-    {
-      "index": 0,
-      "message": {
-        "role": "assistant",
-        "content": "```python\nfrom typing import Optional, List, Dict, Union\nfrom pydantic import BaseModel, validator\n\nclass OperationRequest(BaseModel):\n    # Assuming OperationRequest is already defined as per the given text\n    pass\n\nclass UpdateOperation(OperationRequest):\n    new_items: List[str]\n\n    def apply_and_maybe_raise(self, updatable_item: \"Updatable todo list\") -> None:\n        # Assuming updatable_item is an instance of Updatable todo list\n        self.validate()\n        updatable_item.add_items(self.new_items)\n\nclass Updatable:\n    # Abstract class for items that can be updated\n    pass\n\nclass TodoList(Updatable):\n    # Class that represents a todo list\n    items: List[str]\n\n    def add_items(self, new_items: List[str]) -> None:\n        self.items.extend(new_items)\n\ndef handle_request(operation_request: OperationRequest) -> None:\n    # Function to handle an operation request\n    if isinstance(operation_request, UpdateOperation):\n        operation_request.apply_and_maybe_raise(get_todo_list_for_update())\n    else:\n        raise ValueError(\"Invalid operation request\")\n\ndef get_todo_list_for_update() -> TodoList:\n    # Function to get the todo list for update\n    # Assuming this function returns the",
-        "tool_calls": []
-      },
-      "logprobs": null,
-      "finish_reason": "length",
-      "stop_reason": null
-    }
-  ],
-  "usage": { "prompt_tokens": 66, "total_tokens": 322, "completion_tokens": 256, "prompt_tokens_details": null },
-  "prompt_logprobs": null
-}
+{"id":"chatcmpl-91003647d1c7469a89e399958f390f67","object":"chat.completion","created":1742877228,"model":"meta-llama/Meta-Llama-3-8B-Instruct","choices":[{"index":0,"message":{"role":"assistant","content":"Deep Learning ( DL) is a subfield of Machine Learning (ML) that focuses on the design of algorithms and architectures inspired by the structure and function of the human brain. These algorithms are designed to analyze and interpret data that is presented in the form of patterns or signals, and they often mimic the way the human brain","tool_calls":[]},"logprobs":null,"finish_reason":"length","stop_reason":null}],"usage":{"prompt_tokens":16,"total_tokens":80,"completion_tokens":64,"prompt_tokens_details":null},"prompt_logprobs":null}
 ````
 
 If the service response has a meaningful response in the value of the "choices.message.content" key,
@@ -441,16 +476,14 @@ Checking the response from the service. The response should be similar to JSON:
 If the service response has a meaningful response in the value of the "generated_text" key,
 then we consider the TGI service to be successfully launched
 
-### 2. Validate the LLM Service
+### 5. Validate the LLM Service (if your used application with FaqGen)
 
 ```bash
-DATA='{"query":"Implement a high-level API for a TODO list application. '\
-'The API takes as input an operation request and updates the TODO list in place. '\
-'If the request is invalid, raise an exception.",'\
-'"max_tokens":256,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,'\
-'"repetition_penalty":1.03,"stream":false}'
+DATA='{"messages":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source '\
+'text embeddings and sequence classification models. TEI enables high-performance extraction for the most '\
+'popular models, including FlagEmbedding, Ember, GTE and E5.","max_tokens": 128}'
 
-curl http://${HOST_IP}:${CODEGEN_LLM_SERVICE_PORT}/v1/chat/completions \
+curl http://${HOST_IP}:${CHATQNA_LLM_FAQGEN_PORT}/v1/faqgen \
   -X POST \
   -d "$DATA" \
   -H 'Content-Type: application/json'
@@ -459,61 +492,56 @@ curl http://${HOST_IP}:${CODEGEN_LLM_SERVICE_PORT}/v1/chat/completions \
 Checking the response from the service. The response should be similar to JSON:
 
 ````json
-{
-  "id": "cmpl-4e89a590b1af46bfb37ce8f12b2996f8",
-  "choices": [
-    {
-      "finish_reason": "length",
-      "index": 0,
-      "logprobs": null,
-      "text": " The API should support the following operations:\n\n1. Add a new task to the TODO list.\n2. Remove a task from the TODO list.\n3. Mark a task as completed.\n4. Retrieve the list of all tasks.\n\nThe API should also support the following features:\n\n1. The ability to filter tasks based on their completion status.\n2. The ability to sort tasks based on their priority.\n3. The ability to search for tasks based on their description.\n\nHere is an example of how the API can be used:\n\n```python\ntodo_list = []\napi = TodoListAPI(todo_list)\n\n# Add tasks\napi.add_task(\"Buy groceries\")\napi.add_task(\"Finish homework\")\n\n# Mark a task as completed\napi.mark_task_completed(\"Buy groceries\")\n\n# Retrieve the list of all tasks\nprint(api.get_all_tasks())\n\n# Filter tasks based on completion status\nprint(api.filter_tasks(completed=True))\n\n# Sort tasks based on priority\napi.sort_tasks(priority=\"high\")\n\n# Search for tasks based on description\nprint(api.search_tasks(description=\"homework\"))\n```\n\nIn this example, the `TodoListAPI` class is used to manage the TODO list. The `add_task` method adds a new task to the list, the `mark_task_completed` method",
-      "stop_reason": null,
-      "prompt_logprobs": null
-    }
-  ],
-  "created": 1742270567,
-  "model": "Qwen/Qwen2.5-Coder-7B-Instruct",
-  "object": "text_completion",
-  "system_fingerprint": null,
-  "usage": {
-    "completion_tokens": 256,
-    "prompt_tokens": 37,
-    "total_tokens": 293,
-    "completion_tokens_details": null,
-    "prompt_tokens_details": null
-  }
-}
+{"id":"58f0632f5f03af31471b895b0d0d397b","text":" Q: What is Text Embeddings Inference (TEI)?\n         A: TEI is a toolkit for deploying and serving open source text embeddings and sequence classification models.\n\n         Q: What models does TEI support?\n         A: TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5.\n\n         Q: What is the purpose of TEI?\n         A: The purpose of TEI is to enable high-performance extraction for text embeddings and sequence classification models.\n\n         Q: What are the benefits of using TEI?\n         A: The benefits of using TEI include high","prompt":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}
 ````
 
-If the service response has a meaningful response in the value of the "choices.text" key,
-then we consider the vLLM service to be successfully launched
+If the service response has a meaningful response in the value of the "text" key,
+then we consider the LLM service to be successfully launched
 
-### 3. Validate the MegaService
+### 6. Validate the MegaService
 
 ```bash
-DATA='{"messages": "Implement a high-level API for a TODO list application. '\
-'The API takes as input an operation request and updates the TODO list in place. '\
-'If the request is invalid, raise an exception."}'
-
-curl http://${HOST_IP}:${CODEGEN_BACKEND_SERVICE_PORT}/v1/codegen \
+curl http://${HOST_IP}:${CHATQNA_BACKEND_SERVICE_PORT}/v1/chatqna \
   -H "Content-Type: application/json" \
-  -d "$DATA"
+  -d '{"messages": "What is the revenue of Nike in 2023?"}'
 ```
 
 Checking the response from the service. The response should be similar to text:
 
 ```textmate
-data: {"id":"cmpl-cc5dc73819c640469f7c7c7424fe57e6","choices":[{"finish_reason":null,"index":0,"logprobs":null,"text":" of","stop_reason":null}],"created":1742270725,"model":"Qwen/Qwen2.5-Coder-7B-Instruct","object":"text_completion","system_fingerprint":null,"usage":null}
-...........
-data: {"id":"cmpl-cc5dc73819c640469f7c7c7424fe57e6","choices":[{"finish_reason":null,"index":0,"logprobs":null,"text":" all","stop_reason":null}],"created":1742270725,"model":"Qwen/Qwen2.5-Coder-7B-Instruct","object":"text_completion","system_fingerprint":null,"usage":null}
-data: {"id":"cmpl-cc5dc73819c640469f7c7c7424fe57e6","choices":[{"finish_reason":null,"index":0,"logprobs":null,"text":" tasks","stop_reason":null}],"created":1742270725,"model":"Qwen/Qwen2.5-Coder-7B-Instruct","object":"text_completion","system_fingerprint":null,"usage":null}
-data: {"id":"cmpl-cc5dc73819c640469f7c7c7424fe57e6","choices":[{"finish_reason":"length","index":0,"logprobs":null,"text":",","stop_reason":null}],"created":1742270725,"model":"Qwen/Qwen2.5-Coder-7B-Instruct","object":"text_completion","system_fingerprint":null,"usage":null}
+data: b' What'
+data: b' is'
+data: b' the'
+data: b' revenue'
+data: b' of'
+data: b' Nike'
+data: b' in'
+data: b' '
+data: b'202'
+data: b'3'
+data: b'?\n'
+data: b'        '
+data: b' Answer'
+data: b':'
+data: b' According'
+data: b' to'
+data: b' the'
+data: b' search'
+data: b' results'
+data: b','
+data: b' the'
+data: b' revenue'
+data: b' of'
+data: b''
+
 data: [DONE]
+
 ```
 
-If the output lines in the "choices.text" keys contain words (tokens) containing meaning, then the service is considered launched successfully.
+If the output lines in the "data" keys contain words (tokens) containing meaning, then the service 
+is considered launched successfully.
 
-### 4. Validate the Frontend (UI)
+### 7. Validate the Frontend (UI)
 
 To access the UI, use the URL - http://${EXTERNAL_HOST_IP}:${CODEGEN_UI_SERVICE_PORT}
 A page should open when you click through to this address:
