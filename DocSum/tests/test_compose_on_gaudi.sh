@@ -116,11 +116,16 @@ function validate_service() {
     local FORM_DATA3="$9"
     local FORM_DATA4="${10}"
     local FORM_DATA5="${11}"
+    local FORM_DATA6="${12}"
 
     if [[ $VALIDATE_TYPE == *"json"* ]]; then
         HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL")
     else
-        HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -F "$FORM_DATA1" -F "$FORM_DATA2" -F "$FORM_DATA3" -F "$FORM_DATA4" -F "$FORM_DATA5" -H 'Content-Type: multipart/form-data' "$URL")
+        CURL_CMD=(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -F "$FORM_DATA1" -F "$FORM_DATA2" -F "$FORM_DATA3" -F "$FORM_DATA4" -F "$FORM_DATA5" -H 'Content-Type: multipart/form-data' "$URL")
+        if [[ -n "$FORM_DATA6" ]]; then
+            CURL_CMD+=(-F "$FORM_DATA6")
+        fi
+        HTTP_RESPONSE=$("${CURL_CMD[@]}")
     fi
     HTTP_STATUS=$(echo $HTTP_RESPONSE | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
     RESPONSE_BODY=$(echo $HTTP_RESPONSE | sed -e 's/HTTPSTATUS\:.*//g')
@@ -210,7 +215,7 @@ function validate_megaservice_text() {
     echo ">>> Checking text data in form format, upload file"
     validate_service \
         "${host_ip}:${BACKEND_SERVICE_PORT}/v1/docsum" \
-        "[DONE]" \
+        "TEI" \
         "docsum-gaudi-backend-server" \
         "docsum-gaudi-backend-server" \
         "media" "" \
@@ -218,23 +223,24 @@ function validate_megaservice_text() {
         "messages=" \
         "files=@$ROOT_FOLDER/data/short.txt" \
         "max_tokens=32" \
-        "language=en"
+        "language=en" \
+        "stream=False"
 }
 
 function validate_megaservice_multimedia() {
     echo ">>> Checking audio data in json format"
     validate_service \
         "${host_ip}:${BACKEND_SERVICE_PORT}/v1/docsum" \
-        "[DONE]" \
+        "well" \
         "docsum-gaudi-backend-server" \
         "docsum-gaudi-backend-server" \
         "json" \
-        "{\"type\": \"audio\",  \"messages\": \"$(input_data_for_test "audio")\"}"
+        "{\"type\": \"audio\",  \"messages\": \"$(input_data_for_test "audio")\", \"stream\": \"False\"}"
 
     echo ">>> Checking audio data in form format"
     validate_service \
         "${host_ip}:${BACKEND_SERVICE_PORT}/v1/docsum" \
-        "[DONE]" \
+        "you" \
         "docsum-gaudi-backend-server" \
         "docsum-gaudi-backend-server" \
         "media" "" \
@@ -242,21 +248,21 @@ function validate_megaservice_multimedia() {
         "messages=UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA" \
         "max_tokens=32" \
         "language=en" \
-        "stream=True"
+        "stream=False"
 
     echo ">>> Checking video data in json format"
     validate_service \
         "${host_ip}:${BACKEND_SERVICE_PORT}/v1/docsum" \
-        "[DONE]" \
+        "bye" \
         "docsum-gaudi-backend-server" \
         "docsum-gaudi-backend-server" \
         "json" \
-        "{\"type\": \"video\",  \"messages\": \"$(input_data_for_test "video")\"}"
+        "{\"type\": \"video\",  \"messages\": \"$(input_data_for_test "video")\", \"stream\": \"False\"}"
 
     echo ">>> Checking video data in form format"
     validate_service \
         "${host_ip}:${BACKEND_SERVICE_PORT}/v1/docsum" \
-        "[DONE]" \
+        "bye" \
         "docsum-gaudi-backend-server" \
         "docsum-gaudi-backend-server" \
         "media" "" \
@@ -264,7 +270,7 @@ function validate_megaservice_multimedia() {
         "messages=\"$(input_data_for_test "video")\"" \
         "max_tokens=32" \
         "language=en" \
-        "stream=True"
+        "stream=False"
 }
 
 function validate_megaservice_long_text() {
@@ -279,7 +285,8 @@ function validate_megaservice_long_text() {
         "messages=" \
         "files=@$ROOT_FOLDER/data/long.txt" \
         "max_tokens=128" \
-        "summary_type=auto"
+        "summary_type=auto" \
+        "stream=False"
 
     echo ">>> Checking long text data in form format, set summary_type=stuff"
     validate_service \
@@ -292,7 +299,8 @@ function validate_megaservice_long_text() {
         "messages=" \
         "files=@$ROOT_FOLDER/data/long.txt" \
         "max_tokens=128" \
-        "summary_type=stuff"
+        "summary_type=stuff" \
+        "stream=False"
 
     echo ">>> Checking long text data in form format, set summary_type=truncate"
     validate_service \
@@ -305,7 +313,8 @@ function validate_megaservice_long_text() {
         "messages=" \
         "files=@$ROOT_FOLDER/data/long.txt" \
         "max_tokens=128" \
-        "summary_type=truncate"
+        "summary_type=truncate" \
+        "stream=False"
 
     echo ">>> Checking long text data in form format, set summary_type=map_reduce"
     validate_service \
@@ -318,7 +327,8 @@ function validate_megaservice_long_text() {
         "messages=" \
         "files=@$ROOT_FOLDER/data/long.txt" \
         "max_tokens=128" \
-        "summary_type=map_reduce"
+        "summary_type=map_reduce" \
+        "stream=False"
 
     echo ">>> Checking long text data in form format, set summary_type=refine"
     validate_service \
@@ -331,7 +341,8 @@ function validate_megaservice_long_text() {
         "messages=" \
         "files=@$ROOT_FOLDER/data/long.txt" \
         "max_tokens=128" \
-        "summary_type=refine"
+        "summary_type=refine" \
+        "stream=False"
 }
 
 function stop_docker() {
