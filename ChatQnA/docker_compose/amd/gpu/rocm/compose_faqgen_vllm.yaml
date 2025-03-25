@@ -8,6 +8,7 @@ services:
     ports:
       - "${CHATQNA_REDIS_VECTOR_PORT}:6379"
       - "${CHATQNA_REDIS_VECTOR_INSIGHT_PORT}:8001"
+
   chatqna-dataprep-redis-service:
     image: ${REGISTRY:-opea}/dataprep:${TAG:-latest}
     container_name: chatqna-dataprep-service
@@ -24,6 +25,7 @@ services:
       INDEX_NAME: ${CHATQNA_INDEX_NAME}
       TEI_ENDPOINT: ${CHATQNA_TEI_EMBEDDING_ENDPOINT}
       HUGGINGFACEHUB_API_TOKEN: ${CHATQNA_HUGGINGFACEHUB_API_TOKEN}
+
   chatqna-tei-embedding-service:
     image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
     container_name: chatqna-tei-embedding-service
@@ -71,6 +73,7 @@ services:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       HF_API_TOKEN: ${CHATQNA_HUGGINGFACEHUB_API_TOKEN}
+      HUGGINGFACEHUB_API_TOKEN: ${CHATQNA_HUGGINGFACEHUB_API_TOKEN}
       HF_HUB_DISABLE_PROGRESS_BARS: 1
       HF_HUB_ENABLE_HF_TRANSFER: 0
     command: --model-id ${CHATQNA_RERANK_MODEL_ID} --auto-truncate

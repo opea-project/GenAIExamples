@@ -8,6 +8,7 @@ services:
     ports:
       - "${CHATQNA_REDIS_VECTOR_PORT:-6379}:6379"
       - "${CHATQNA_REDIS_VECTOR_INSIGHT_PORT:-8001}:8001"
+
   chatqna-dataprep-service:
     image: ${REGISTRY:-opea}/dataprep:${TAG:-latest}
     container_name: chatqna-dataprep-service
@@ -24,6 +25,7 @@ services:
       INDEX_NAME: ${CHATQNA_INDEX_NAME}
       TEI_ENDPOINT: ${CHATQNA_TEI_EMBEDDING_ENDPOINT}
       HUGGINGFACEHUB_API_TOKEN: ${CHATQNA_HUGGINGFACEHUB_API_TOKEN}
+
   chatqna-tei-embedding-service:
     image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
     container_name: chatqna-tei-embedding-service
@@ -38,6 +40,7 @@ services:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
     command: --model-id ${CHATQNA_EMBEDDING_MODEL_ID} --auto-truncate
+
   chatqna-retriever:
     image: ${REGISTRY:-opea}/retriever:${TAG:-latest}
     container_name: chatqna-retriever
@@ -55,6 +58,7 @@ services:
       TEI_EMBEDDING_ENDPOINT: ${CHATQNA_TEI_EMBEDDING_ENDPOINT}
       HUGGINGFACEHUB_API_TOKEN: ${CHATQNA_HUGGINGFACEHUB_API_TOKEN}
     restart: unless-stopped
+
   chatqna-tei-reranking-service:
     image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
     container_name: chatqna-tei-reranking-service
@@ -71,6 +75,7 @@ services:
       HF_HUB_DISABLE_PROGRESS_BARS: 1
       HF_HUB_ENABLE_HF_TRANSFER: 0
     command: --model-id ${CHATQNA_RERANK_MODEL_ID} --auto-truncate
+
   chatqna-vllm-service:
     image: ${REGISTRY:-opea}/vllm-rocm:${TAG:-latest}
     container_name: chatqna-vllm-service
@@ -101,6 +106,7 @@ services:
       - apparmor=unconfined
     command: "--model ${CHATQNA_LLM_MODEL_ID} --swap-space 16 --disable-log-requests --dtype float16 --tensor-parallel-size 4 --host 0.0.0.0 --port 8011 --num-scheduler-steps 1 --distributed-executor-backend \"mp\""
     ipc: host
+
   chatqna-backend-server:
     image: ${REGISTRY:-opea}/chatqna:${TAG:-latest}
     container_name: chatqna-backend-server
@@ -127,6 +133,7 @@ services:
       LLM_MODEL: ${CHATQNA_LLM_MODEL_ID}
     ipc: host
     restart: always
+
   chatqna-ui-server:
     image: ${REGISTRY:-opea}/chatqna-ui:${TAG:-latest}
     container_name: chatqna-ui-server
@@ -144,6 +151,7 @@ services:
       DELETE_FILE: ${CHATQNA_DATAPREP_DELETE_FILE_ENDPOINT}
     ipc: host
     restart: always
+
   chatqna-nginx-server:
     image: ${REGISTRY:-opea}/nginx:${TAG:-latest}
     container_name: chatqna-nginx-server

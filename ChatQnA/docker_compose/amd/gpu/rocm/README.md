@@ -378,12 +378,10 @@ All containers should be running and should not restart:
 #### If you use vLLM:
 
 ```bash
-DATA='{"model": "Qwen/Qwen2.5-Coder-7B-Instruct", '\
-'"messages": [{"role": "user", "content": "Implement a high-level API for a TODO list application. '\
-'The API takes as input an operation request and updates the TODO list in place. '\
-'If the request is invalid, raise an exception."}], "max_tokens": 256}'
+DATA='{"model": "meta-llama/Meta-Llama-3-8B-Instruct", '\
+'"messages": [{"role": "user", "content": "What is a Deep Learning?"}], "max_tokens": 256}'
 
-curl http://${HOST_IP}:${CODEGEN_VLLM_SERVICE_PORT}/v1/chat/completions \
+curl http://${HOST_IP}:${CHATQNA_VLLM_SERVICE_PORT}/v1/chat/completions \
   -X POST \
   -d "$DATA" \
   -H 'Content-Type: application/json'
