@@ -13,6 +13,8 @@ services:
   dataprep-redis-service:
     image: ${REGISTRY:-opea}/dataprep:${TAG:-latest}
     container_name: dataprep-redis-server
+    # volumes:
+    #   - $WORKDIR/GenAIExamples/DocIndexRetriever/docker_image_build/GenAIComps/comps:/home/user/comps
     depends_on:
       - redis-vector-db
     ports:
@@ -36,7 +38,7 @@ services:
     ports:
       - "6006:80"
     volumes:
-      - "./data:/data"
+      - "${MODEL_CACHE:-./data}:/data"
     shm_size: 1g
     environment:
       no_proxy: ${no_proxy}
@@ -52,6 +54,8 @@ services:
   embedding:
     image: ${REGISTRY:-opea}/embedding:${TAG:-latest}
     container_name: embedding-server
+    # volumes:
+    #   - $WORKDIR/GenAIExamples/DocIndexRetriever/docker_image_build/GenAIComps/comps:/home/comps
     ports:
       - "6000:6000"
     ipc: host
@@ -92,7 +96,7 @@ services:
     ports:
       - "8808:80"
     volumes:
-      - "./data:/data"
+      - "${MODEL_CACHE:-./data}:/data"
     shm_size: 1g
     environment:
       no_proxy: ${no_proxy}
@@ -110,6 +114,8 @@ services:
   reranking:
     image: ${REGISTRY:-opea}/reranking:${TAG:-latest}
     container_name: reranking-tei-xeon-server
+    # volumes:
+    #   - $WORKDIR/GenAIExamples/DocIndexRetriever/docker_image_build/GenAIComps/comps:/home/user/comps
     depends_on:
       tei-reranking-service:
         condition: service_healthy
@@ -142,11 +148,9 @@ services:
       - no_proxy=${no_proxy}
       - https_proxy=${https_proxy}
       - http_proxy=${http_proxy}
-      - MEGA_SERVICE_HOST_IP=${MEGA_SERVICE_HOST_IP}
       - EMBEDDING_SERVICE_HOST_IP=${EMBEDDING_SERVICE_HOST_IP}
       - RETRIEVER_SERVICE_HOST_IP=${RETRIEVER_SERVICE_HOST_IP}
       - RERANK_SERVICE_HOST_IP=${RERANK_SERVICE_HOST_IP}
-      - LLM_SERVICE_HOST_IP=${LLM_SERVICE_HOST_IP}
     ipc: host
     restart: always
 

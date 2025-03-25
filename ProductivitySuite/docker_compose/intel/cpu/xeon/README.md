@@ -45,13 +45,13 @@ docker build --no-cache -t opea/dataprep:latest --build-arg https_proxy=$https_p
 ### 6. Build Prompt Registry Image
 
 ```bash
-docker build -t opea/promptregistry-mongo-server:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/prompt_registry/src/Dockerfile .
+docker build -t opea/promptregistry-mongo:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/prompt_registry/src/Dockerfile .
 ```
 
 ### 7. Build Chat History Image
 
 ```bash
-docker build -t opea/chathistory-mongo-server:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/chathistory/src/Dockerfile .
+docker build -t opea/chathistory-mongo:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/chathistory/src/Dockerfile .
 cd ..
 ```
 
@@ -79,13 +79,6 @@ docker build --no-cache -t opea/docsum:latest --build-arg https_proxy=$https_pro
 ```bash
 cd GenAIExamples/CodeGen
 docker build --no-cache -t opea/codegen:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
-```
-
-#### 8.4 Build FAQGen Megaservice Docker Images
-
-```bash
-cd GenAIExamples/FaqGen
-docker build --no-cache -t opea/faqgen:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
 ```
 
 ### 9. Build UI Docker Image
@@ -159,7 +152,6 @@ export TGI_LLM_ENDPOINT_FAQGEN="http://${host_ip}:9009"
 export TGI_LLM_ENDPOINT_DOCSUM="http://${host_ip}:9009"
 export BACKEND_SERVICE_ENDPOINT_CHATQNA="http://${host_ip}:8888/v1/chatqna"
 export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:5000/v1/dataprep/delete"
-export BACKEND_SERVICE_ENDPOINT_FAQGEN="http://${host_ip}:8889/v1/faqgen"
 export BACKEND_SERVICE_ENDPOINT_CODEGEN="http://${host_ip}:7778/v1/codegen"
 export BACKEND_SERVICE_ENDPOINT_DOCSUM="http://${host_ip}:8890/v1/docsum"
 export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:5000/v1/dataprep/ingest"
@@ -316,15 +308,7 @@ Please refer to **[keycloak_setup_guide](keycloak_setup_guide.md)** for more det
          }'
     ```
 
-13. FAQGen MegaService
-
-    ```bash
-    curl http://${host_ip}:8889/v1/faqgen -H "Content-Type: application/json" -d '{
-         "messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."
-         }'
-    ```
-
-14. DocSum MegaService
+13. DocSum MegaService
 
     ```bash
     curl http://${host_ip}:8890/v1/docsum -H "Content-Type: application/json" -d '{
@@ -332,7 +316,7 @@ Please refer to **[keycloak_setup_guide](keycloak_setup_guide.md)** for more det
          }'
     ```
 
-15. CodeGen MegaService
+14. CodeGen MegaService
 
     ```bash
     curl http://${host_ip}:7778/v1/codegen -H "Content-Type: application/json" -d '{
@@ -340,7 +324,7 @@ Please refer to **[keycloak_setup_guide](keycloak_setup_guide.md)** for more det
          }'
     ```
 
-16. Dataprep Microservice
+15. Dataprep Microservice
 
     If you want to update the default knowledge base, you can use the following commands:
 
@@ -390,7 +374,7 @@ Please refer to **[keycloak_setup_guide](keycloak_setup_guide.md)** for more det
          -H "Content-Type: application/json"
     ```
 
-17. Prompt Registry Microservice
+16. Prompt Registry Microservice
 
     If you want to update the default Prompts in the application for your user, you can use the following commands:
 
@@ -433,7 +417,7 @@ Please refer to **[keycloak_setup_guide](keycloak_setup_guide.md)** for more det
       "user": "test", "prompt_id":"{prompt_id to be deleted}"}'
     ```
 
-18. Chat History Microservice
+17. Chat History Microservice
 
     To validate the chatHistory Microservice, you can use the following commands.
 

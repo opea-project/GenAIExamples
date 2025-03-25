@@ -9,6 +9,7 @@ echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
 echo "TAG=IMAGE_TAG=${IMAGE_TAG}"
 export REGISTRY=${IMAGE_REPO}
 export TAG=${IMAGE_TAG}
+export MODEL_CACHE=${model_cache:-"./data"}
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
@@ -29,7 +30,12 @@ function build_docker_images() {
 
     cd $WORKPATH/docker_image_build
     git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
-    git clone --depth 1 https://github.com/vllm-project/vllm.git
+    git clone https://github.com/vllm-project/vllm.git && cd vllm
+    VLLM_VER="$(git describe --tags "$(git rev-list --tags --max-count=1)" )"
+    echo "Check out vLLM tag ${VLLM_VER}"
+    git checkout ${VLLM_VER} &> /dev/null
+    # make sure NOT change the pwd
+    cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
     service_list="chatqna chatqna-ui dataprep retriever vllm nginx"
@@ -96,6 +102,7 @@ function validate_service() {
 
 function validate_microservices() {
     # Check if the microservices are running correctly.
+    sleep 3m
 
     # tei for embedding service
     validate_service \
@@ -104,8 +111,6 @@ function validate_microservices() {
         "tei-embedding" \
         "tei-embedding-server" \
         '{"inputs":"What is Deep Learning?"}'
-
-    sleep 1m # retrieval can't curl as expected, try to wait for more time
 
     # retrieval microservice
     test_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
@@ -137,7 +142,7 @@ function validate_megaservice() {
     # Curl the Mega Service
     validate_service \
         "${ip_address}:8888/v1/chatqna" \
-        "data" \
+        "Nike" \
         "mega-chatqna" \
         "chatqna-xeon-backend-server" \
         '{"messages": "What is the revenue of Nike in 2023?"}'
@@ -188,13 +193,9 @@ function main() {
     duration=$((end_time-start_time))
     echo "Mega service start duration is $duration s" && sleep 1s
 
-    if [ "${mode}" == "perf" ]; then
-        python3 $WORKPATH/tests/chatqna_benchmark.py
-    elif [ "${mode}" == "" ]; then
-        validate_microservices
-        validate_megaservice
-        # validate_frontend
-    fi
+    validate_microservices
+    validate_megaservice
+    validate_frontend
 
     stop_docker
     echo y | docker system prune
