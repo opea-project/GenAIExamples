@@ -24,6 +24,7 @@ export CHATQNA_RERANK_MODEL_ID="BAAI/bge-reranker-base"
 
 export CHATQNA_BACKEND_SERVICE_PORT=8888
 export CHATQNA_FRONTEND_SERVICE_PORT=5173
+export CHATQNA_LLM_FAQGEN_PORT=18011
 export CHATQNA_NGINX_PORT=18104
 export CHATQNA_REDIS_DATAPREP_PORT=18103
 export CHATQNA_REDIS_RETRIEVER_PORT=7000
@@ -38,18 +39,16 @@ export CHATQNA_BACKEND_SERVICE_IP=${HOST_IP_EXTERNAL}
 export CHATQNA_DATAPREP_DELETE_FILE_ENDPOINT="http://${HOST_IP_EXTERNAL}:${CHATQNA_REDIS_DATAPREP_PORT}/v1/dataprep/delete"
 export CHATQNA_DATAPREP_GET_FILE_ENDPOINT="http://${HOST_IP_EXTERNAL}:${CHATQNA_REDIS_DATAPREP_PORT}/v1/dataprep/get"
 export CHATQNA_DATAPREP_SERVICE_ENDPOINT="http://${HOST_IP_EXTERNAL}:${CHATQNA_REDIS_DATAPREP_PORT}/v1/dataprep/ingest"
-export CHATQNA_EMBEDDING_SERVICE_HOST_IP=${HOST_IP}
 export CHATQNA_FRONTEND_SERVICE_IP=${HOST_IP}
-export CHATQNA_LLM_SERVICE_HOST_IP=${HOST_IP}
 export CHATQNA_MEGA_SERVICE_HOST_IP=${HOST_IP}
 export CHATQNA_REDIS_URL="redis://${HOST_IP}:${CHATQNA_REDIS_VECTOR_PORT}"
-export CHATQNA_RERANK_SERVICE_HOST_IP=${HOST_IP}
-export CHATQNA_RETRIEVER_SERVICE_HOST_IP=${HOST_IP}
 export CHATQNA_TEI_EMBEDDING_ENDPOINT="http://${HOST_IP}:${CHATQNA_TEI_EMBEDDING_PORT}"
+export LLM_ENDPOINT="http://${HOST_IP}:${CHATQNA_VLLM_SERVICE_PORT}"
 
 export CHATQNA_BACKEND_SERVICE_NAME=chatqna
 export CHATQNA_INDEX_NAME="rag-redis"
-
+export CHATQNA_TYPE="CHATQNA_FAQGEN"
+export FAQGen_COMPONENT_NAME="OpeaFaqGenvLLM"
 
 function build_docker_images() {
     opea_branch=${opea_branch:-"main"}
@@ -69,7 +68,7 @@ function build_docker_images() {
     git clone --depth 1 https://github.com/vllm-project/vllm.git
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="chatqna chatqna-ui dataprep retriever vllm-rocm nginx"
+    service_list="chatqna chatqna-ui dataprep retriever vllm-rocm llm-faqgen nginx"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker images && sleep 1s
