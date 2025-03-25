@@ -114,7 +114,7 @@ services:
       - chatqna-tei-reranking-service
       - chatqna-tgi-service
     ports:
-      - "${CHATQNA_BACKEND_SERVICE_PORT}:8888"
+      - "${CHATQNA_BACKEND_SERVICE_PORT:-8888}:8888"
     environment:
       no_proxy: ${no_proxy}
       https_proxy: ${https_proxy}
@@ -137,7 +137,7 @@ services:
     depends_on:
       - chatqna-backend-server
     ports:
-      - "${CHATQNA_FRONTEND_SERVICE_PORT}:5173"
+      - "${CHATQNA_FRONTEND_SERVICE_PORT:-5173}:5173"
     environment:
       no_proxy: ${no_proxy}
       https_proxy: ${https_proxy}
