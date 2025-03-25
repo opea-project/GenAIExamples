@@ -51,7 +51,7 @@ export CHATQNA_TEI_EMBEDDING_ENDPOINT="http://${HOST_IP}:${CHATQNA_TEI_EMBEDDING
 export CHATQNA_BACKEND_SERVICE_NAME=chatqna
 export CHATQNA_INDEX_NAME="rag-redis"
 
-export PATH="~/miniconda3/bin:$PATH"
+export PATH="~/miniforge3/bin:$PATH"
 
 function build_docker_images() {
     opea_branch=${opea_branch:-"main"}
