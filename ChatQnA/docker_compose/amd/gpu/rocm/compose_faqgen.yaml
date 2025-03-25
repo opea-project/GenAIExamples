@@ -79,7 +79,7 @@ services:
 
   chatqna-tgi-service:
     image: ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
-    container_name: chatqna-tgi-server
+    container_name: chatqna-tgi-service
     ports:
       - "${CHATQNA_TGI_SERVICE_PORT}:80"
     environment:
