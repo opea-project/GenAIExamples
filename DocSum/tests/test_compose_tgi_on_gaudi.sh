@@ -262,7 +262,7 @@ function validate_megaservice_long_text() {
     echo ">>> Checking long text data in form format, set summary_type=auto"
     validate_service \
         "${host_ip}:${BACKEND_SERVICE_PORT}/v1/docsum" \
-        "[DONE]" \
+        "Intel" \
         "docsum-gaudi-backend-server" \
         "docsum-gaudi-backend-server" \
         "media" "" \
@@ -275,7 +275,7 @@ function validate_megaservice_long_text() {
     echo ">>> Checking long text data in form format, set summary_type=stuff"
     validate_service \
         "${host_ip}:${BACKEND_SERVICE_PORT}/v1/docsum" \
-        "[DONE]" \
+        "Intel" \
         "docsum-gaudi-backend-server" \
         "docsum-gaudi-backend-server" \
         "media" "" \
@@ -288,7 +288,7 @@ function validate_megaservice_long_text() {
     echo ">>> Checking long text data in form format, set summary_type=truncate"
     validate_service \
         "${host_ip}:${BACKEND_SERVICE_PORT}/v1/docsum" \
-        "[DONE]" \
+        "Intel" \
         "docsum-gaudi-backend-server" \
         "docsum-gaudi-backend-server" \
         "media" "" \
@@ -301,7 +301,7 @@ function validate_megaservice_long_text() {
     echo ">>> Checking long text data in form format, set summary_type=map_reduce"
     validate_service \
         "${host_ip}:${BACKEND_SERVICE_PORT}/v1/docsum" \
-        "[DONE]" \
+        "Intel" \
         "docsum-gaudi-backend-server" \
         "docsum-gaudi-backend-server" \
         "media" "" \
@@ -314,7 +314,7 @@ function validate_megaservice_long_text() {
     echo ">>> Checking long text data in form format, set summary_type=refine"
     validate_service \
         "${host_ip}:${BACKEND_SERVICE_PORT}/v1/docsum" \
-        "[DONE]" \
+        "Intel" \
         "docsum-gaudi-backend-server" \
         "docsum-gaudi-backend-server" \
         "media" "" \
