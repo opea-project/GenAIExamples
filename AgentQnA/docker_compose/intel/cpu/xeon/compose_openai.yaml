@@ -101,7 +101,7 @@ services:
       - "8080:8000"
     ipc: host
   agent-ui:
-    image: opea:agent-ui
+    image: opea/agent-ui
     container_name: agent-ui
     volumes:
       - ${WORKDIR}/GenAIExamples/AgentQnA/ui/svelte/.env:/home/user/svelte/.env # test db
