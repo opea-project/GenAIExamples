@@ -117,13 +117,13 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      TGI_LLM_ENDPOINT: ${SEARCH_TGI_LLM_ENDPOINT}
       HUGGINGFACEHUB_API_TOKEN: ${SEARCH_HUGGINGFACEHUB_API_TOKEN}
       LLM_ENDPOINT: ${SEARCH_TGI_LLM_ENDPOINT}
       LLM_MODEL_ID: ${SEARCH_LLM_MODEL_ID}
       LLM_MODEL: ${SEARCH_LLM_MODEL_ID}
       HF_TOKEN: ${SEARCH_HUGGINGFACEHUB_API_TOKEN}
-      OPENAI_API_KEY: ${SEARCH_OPENAI_API_KEY}
+      LLM_COMPONENT_NAME: "OpeaTextGenService"
+
     restart: unless-stopped
   search-backend-server:
     image: ${REGISTRY:-opea}/searchqna:${TAG:-latest}
