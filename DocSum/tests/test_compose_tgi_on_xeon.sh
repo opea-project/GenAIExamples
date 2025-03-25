@@ -95,8 +95,8 @@ function validate_service() {
     local FORM_DATA1="$7"
     local FORM_DATA2="$8"
     local FORM_DATA3="$9"
-    local FORM_DATA4="$10"
-    local FORM_DATA5="$11"
+    local FORM_DATA4="${10}"
+    local FORM_DATA5="${11}"
 
     if [[ $VALIDATE_TYPE == *"json"* ]]; then
         HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL")
