@@ -488,9 +488,11 @@ curl http://${HOST_IP}:${CHATQNA_TGI_SERVICE_PORT}/generate \
 
 Checking the response from the service. The response should be similar to JSON:
 
-````json
-{"generated_text":" What is its application in Computer Vision?\nWhat is a Deep Learning?\nDeep learning is a subfield of machine learning that involves the use of artificial neural networks to model high-level abstractions in data. It involves the use of deep neural networks, which are composed of multiple layers, to learn complex patterns in data. The"}
-````
+```json
+{
+  "generated_text": " What is its application in Computer Vision?\nWhat is a Deep Learning?\nDeep learning is a subfield of machine learning that involves the use of artificial neural networks to model high-level abstractions in data. It involves the use of deep neural networks, which are composed of multiple layers, to learn complex patterns in data. The"
+}
+```
 
 If the service response has a meaningful response in the value of the "generated_text" key,
 then we consider the TGI service to be successfully launched
