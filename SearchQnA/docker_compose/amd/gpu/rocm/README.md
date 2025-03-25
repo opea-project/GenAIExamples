@@ -278,28 +278,29 @@ curl http://${HOST_IP}:${SEARCHQNA_VLLM_SERVICE_PORT}/v1/chat/completions \
 
 Checking the response from the service. The response should be similar to JSON:
 
-````json
+```json
 {
-   "id":"chatcmpl-512d16e876774d13a323514e96122cbc",
-   "object":"chat.completion",
-   "created":1742819098,
-   "model":"Intel/neural-chat-7b-v3-3",
-   "choices":[
-     {
-       "index":0,
-       "message":{
-       "role":"assistant",
-       "content":" Deep Learning is a subset of Machine Learning that relies on Artificial Neural Networks to perform tasks like image recognition, natural language processing, and predictive analytics. It aims to model the inner workings of the human brain through the intelligent analysis of big data. Essentially, Deep Learning algorithms try to process and learn from raw data in multiple layers to extract patterns, ultimately enabling systems to recognize complex patterns and make predictions more accurately. Although thoughest it involves much data and computation power, recently it is often referred through increasingly simple approaches thanks to advances in computation hardware. Deep Learning developed from previous techniques like neural networks, but has proven more powerful and effective for various tasks that involve massive data volumes and complex decisions.",
-       "tool_calls":[]
+  "id": "chatcmpl-512d16e876774d13a323514e96122cbc",
+  "object": "chat.completion",
+  "created": 1742819098,
+  "model": "Intel/neural-chat-7b-v3-3",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": " Deep Learning is a subset of Machine Learning that relies on Artificial Neural Networks to perform tasks like image recognition, natural language processing, and predictive analytics. It aims to model the inner workings of the human brain through the intelligent analysis of big data. Essentially, Deep Learning algorithms try to process and learn from raw data in multiple layers to extract patterns, ultimately enabling systems to recognize complex patterns and make predictions more accurately. Although thoughest it involves much data and computation power, recently it is often referred through increasingly simple approaches thanks to advances in computation hardware. Deep Learning developed from previous techniques like neural networks, but has proven more powerful and effective for various tasks that involve massive data volumes and complex decisions.",
+        "tool_calls": []
       },
-    "logprobs":null,
-    "finish_reason":"stop",
-    "stop_reason":null}
-    ],
-  "usage":{"prompt_tokens":15,"total_tokens":161,"completion_tokens":146,"prompt_tokens_details":null},
-  "prompt_logprobs":null
+      "logprobs": null,
+      "finish_reason": "stop",
+      "stop_reason": null
+    }
+  ],
+  "usage": { "prompt_tokens": 15, "total_tokens": 161, "completion_tokens": 146, "prompt_tokens_details": null },
+  "prompt_logprobs": null
 }
-````
+```
 
 If the service response has a meaningful response in the value of the "choices.message.content" key,
 then we consider the vLLM service to be successfully launched
@@ -318,11 +319,11 @@ curl http://${HOST_IP}:${SEARCHQNA_TGI_SERVICE_PORT}/generate \
 
 Checking the response from the service. The response should be similar to JSON:
 
-````json
+```json
 {
-  "generated_text":"\n\nDeep Learning is a subset of machine learning, which focuses on developing methods inspired by the functioning of the human brain; more specifically, the way it processes and acquires various types of knowledge and information. To enable deep learning, the networks are composed of multiple processing layers that form a hierarchy, with each layer learning more complex and abstraction levels of data representation.\n\nThe principle of Deep Learning is to emulate the structure of neurons in the human brain to construct artificial neural networks capable to accomplish complicated pattern recognition tasks more effectively and accurately. Therefore, these neural networks contain a series of hierarchical components, where units in earlier layers receive simple inputs and are activated by these inputs. The activation of the units in later layers are the results of multiple nonlinear transformations generated from reconstructing and integrating the information in previous layers. In other words, by combining various pieces of information at each layer, a Deep Learning network can extract the input features that best represent the structure of data, providing their outputs at the last layer or final level of abstraction.\n\nThe main idea of using these 'deep' networks in contrast to regular algorithms is that they are capable of representing hierarchical relationships that exist within the data and learn these representations by"
+  "generated_text": "\n\nDeep Learning is a subset of machine learning, which focuses on developing methods inspired by the functioning of the human brain; more specifically, the way it processes and acquires various types of knowledge and information. To enable deep learning, the networks are composed of multiple processing layers that form a hierarchy, with each layer learning more complex and abstraction levels of data representation.\n\nThe principle of Deep Learning is to emulate the structure of neurons in the human brain to construct artificial neural networks capable to accomplish complicated pattern recognition tasks more effectively and accurately. Therefore, these neural networks contain a series of hierarchical components, where units in earlier layers receive simple inputs and are activated by these inputs. The activation of the units in later layers are the results of multiple nonlinear transformations generated from reconstructing and integrating the information in previous layers. In other words, by combining various pieces of information at each layer, a Deep Learning network can extract the input features that best represent the structure of data, providing their outputs at the last layer or final level of abstraction.\n\nThe main idea of using these 'deep' networks in contrast to regular algorithms is that they are capable of representing hierarchical relationships that exist within the data and learn these representations by"
 }
-````
+```
 
 If the service response has a meaningful response in the value of the "generated_text" key,
 then we consider the TGI service to be successfully launched
@@ -342,28 +343,29 @@ curl http://${HOST_IP}:${SEARCHQNA_TGI_SERVICE_PORT}/v1/chat/completions \
 
 Checking the response from the service. The response should be similar to JSON:
 
-````json
+```json
 {
-   "id":"chatcmpl-512d16e876774d13a323514e96122cbc",
-   "object":"chat.completion",
-   "created":1742819098,
-   "model":"Intel/neural-chat-7b-v3-3",
-   "choices":[
-     {
-       "index":0,
-       "message":{
-       "role":"assistant",
-       "content":" Deep Learning is a subset of Machine Learning that relies on Artificial Neural Networks to perform tasks like image recognition, natural language processing, and predictive analytics. It aims to model the inner workings of the human brain through the intelligent analysis of big data. Essentially, Deep Learning algorithms try to process and learn from raw data in multiple layers to extract patterns, ultimately enabling systems to recognize complex patterns and make predictions more accurately. Although thoughest it involves much data and computation power, recently it is often referred through increasingly simple approaches thanks to advances in computation hardware. Deep Learning developed from previous techniques like neural networks, but has proven more powerful and effective for various tasks that involve massive data volumes and complex decisions.",
-       "tool_calls":[]
+  "id": "chatcmpl-512d16e876774d13a323514e96122cbc",
+  "object": "chat.completion",
+  "created": 1742819098,
+  "model": "Intel/neural-chat-7b-v3-3",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": " Deep Learning is a subset of Machine Learning that relies on Artificial Neural Networks to perform tasks like image recognition, natural language processing, and predictive analytics. It aims to model the inner workings of the human brain through the intelligent analysis of big data. Essentially, Deep Learning algorithms try to process and learn from raw data in multiple layers to extract patterns, ultimately enabling systems to recognize complex patterns and make predictions more accurately. Although thoughest it involves much data and computation power, recently it is often referred through increasingly simple approaches thanks to advances in computation hardware. Deep Learning developed from previous techniques like neural networks, but has proven more powerful and effective for various tasks that involve massive data volumes and complex decisions.",
+        "tool_calls": []
       },
-    "logprobs":null,
-    "finish_reason":"stop",
-    "stop_reason":null}
-    ],
-  "usage":{"prompt_tokens":15,"total_tokens":161,"completion_tokens":146,"prompt_tokens_details":null},
-  "prompt_logprobs":null
+      "logprobs": null,
+      "finish_reason": "stop",
+      "stop_reason": null
+    }
+  ],
+  "usage": { "prompt_tokens": 15, "total_tokens": 161, "completion_tokens": 146, "prompt_tokens_details": null },
+  "prompt_logprobs": null
 }
-````
+```
 
 If the service response has a meaningful response in the value of the "choices.text" key,
 then we consider the vLLM service to be successfully launched
