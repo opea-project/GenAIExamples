@@ -78,7 +78,7 @@ services:
     command: --model-id ${CHATQNA_RERANK_MODEL_ID} --auto-truncate
 
   chatqna-tgi-service:
-    image: ${CHATQNA_TGI_SERVICE_IMAGE}
+    image: ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
     container_name: chatqna-tgi-server
     ports:
       - "${CHATQNA_TGI_SERVICE_PORT}:80"
