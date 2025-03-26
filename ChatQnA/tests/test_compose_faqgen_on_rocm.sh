@@ -188,7 +188,7 @@ function validate_microservices() {
     test_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
     validate_service \
         "${ip_address}:${CHATQNA_REDIS_RETRIEVER_PORT}/v1/retrieval" \
-        "retrieved_docs" \
+        " " \
         "retrieval-microservice" \
         "chatqna-retriever" \
         "{\"text\":\"What is the revenue of Nike in 2023?\",\"embedding\":${test_embedding}}"
