@@ -549,6 +549,16 @@ If the response text is similar to the one above, then we consider the service v
 
 ### 9. Validate Frontend
 
+To access the UI, use the URL - http://${EXTERNAL_HOST_IP}:${SEARCH_FRONTEND_SERVICE_PORT} A page should open when you click through to this address:
+![UI start page](../../../../assets/img/searchqna-ui-starting-page.png)
+
+If a page of this type has opened, then we believe that the service is running and responding, and we can proceed to functional UI testing.
+
+Let's enter the task for the service in the "Enter prompt here" field. For example, "What is DeepLearning?" and press Enter. After that, a page with the result of the task should open:
+
+![UI start page](../../../../assets/img/searchqna-ui-response-example.png)
+If the result shown on the page is correct, then we consider the verification of the UI service to be successful.
+
 ### 10. Stop application
 
 #### If you use vLLM
