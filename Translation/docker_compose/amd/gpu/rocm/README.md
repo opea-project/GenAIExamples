@@ -395,7 +395,7 @@ To access the UI, use the URL - http://${EXTERNAL_HOST_IP}:${TRANSLATION_FRONTEN
 
 If a page of this type has opened, then we believe that the service is running and responding, and we can proceed to functional UI testing.
 
-Let's enter the task for the service in the "Enter prompt here" field. For example, "What is DeepLearning?" and press Enter. After that, a page with the result of the task should open:
+Let's enter the task for the service in the "Input" field. For example, "我爱机器翻译" with selected "German" as language source and press Enter. After that, a page with the result of the task should open:
 
 ![UI start page](../../../../assets/img/translation-ui-response-example.png)
 If the result shown on the page is correct, then we consider the verification of the UI service to be successful.
