@@ -99,7 +99,7 @@ services:
       WORKER_SUM_AGENT_URL: $WORKER_SUM_AGENT_URL
       DOCSUM_ENDPOINT: $DOCSUM_ENDPOINT
       port: 9090
-  
+
   docsum-vllm-gaudi:
     image: opea/llm-docsum:latest
     container_name: docsum-vllm-gaudi

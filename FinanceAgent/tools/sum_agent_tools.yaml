@@ -1,3 +1,6 @@
+# Copyright (C) 2025 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 Summarization_agent:
   description: Searches KV store for summary, if it doesn't exist pulls full document and summarize it
   callable_api: sum_agent_tools.py:summarize

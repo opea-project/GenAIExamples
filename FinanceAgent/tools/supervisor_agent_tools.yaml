@@ -1,3 +1,6 @@
+# Copyright (C) 2025 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 finqa_agent:
   description: answer financial questions about a company.
   callable_api: supervisor_tools.py:finqa_agent
