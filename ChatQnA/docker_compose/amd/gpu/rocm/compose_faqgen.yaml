@@ -117,8 +117,8 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      LLM_ENDPOINT: ${LLM_ENDPOINT}
-      LLM_MODEL_ID: ${LLM_MODEL_ID}
+      LLM_ENDPOINT: ${CHATQNA_LLM_ENDPOINT}
+      LLM_MODEL_ID: ${CHATQNA_LLM_MODEL_ID}
       HF_TOKEN: ${CHATQNA_HUGGINGFACEHUB_API_TOKEN}
       FAQGen_COMPONENT_NAME: ${FAQGen_COMPONENT_NAME:-OpeaFaqGenTgi}
       LOGFLAG: ${LOGFLAG:-False}

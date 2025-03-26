@@ -149,6 +149,15 @@ function validate_microservices() {
         "chatqna-tei-reranking-service" \
         '{"query":"What is Deep Learning?", "texts": ["Deep Learning is not...", "Deep learning is..."]}'
 
+    # faqgen llm microservice
+    echo "validate llm-faqgen..."
+    validate_service \
+      "${ip_address}:${CHATQNA_LLM_FAQGEN_PORT}/v1/faqgen" \
+      "text" \
+      "llm" \
+      "llm-faqgen-server" \
+      '{"messages":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
+
     # vllm for llm service
     validate_service \
         "${ip_address}:${CHATQNA_VLLM_SERVICE_PORT}/v1/chat/completions" \
