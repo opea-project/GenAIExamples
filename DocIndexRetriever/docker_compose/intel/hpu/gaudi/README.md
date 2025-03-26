@@ -60,6 +60,14 @@ cd GenAIExamples/DocIndexRetriever/intel/hpu/gaudi/
 docker compose up -d
 ```
 
+To run the DocRetriever with Rerank pipeline using the Milvus vector database, use the compose_milvus.yaml configuration file and set the MILVUS_HOST environment variable.
+
+```bash
+export MILVUS_HOST=${host_ip}
+cd GenAIExamples/DocIndexRetriever/docker_compose/intel/hpu/gaudi
+docker compose -f compose_milvus.yaml up -d
+```
+
 ## 4. Validation
 
 Add Knowledge Base via HTTP Links:
