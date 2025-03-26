@@ -16,11 +16,10 @@ def get_summary_else_doc(query, company):
     print(f"Company {company}")
     
     # search most similar doc title
-    index_name = "titles"
+    index_name = f"titles_{company}"
     vector_store = get_vectorstore_titles(index_name)
     k = 1
     docs = vector_store.similarity_search(query, k=k)
-    #docs = hybrid_similarity_search(vector_store, k, query, company, year=None, quarter=None)
     if docs:
         doc = docs[0]
         doc_title = doc.page_content
@@ -62,16 +61,16 @@ def save_doc_summary(summary, doc_title, company):
 def summarize(doc_name, company):
     ip_address = os.environ.get("ip_address")
     #docsum_url = f"http://{ip_address}:9000/v1/docsum"
-    docsum_url = os.environ.get("DOCSUM_URL")
+    docsum_url = os.environ.get("DOCSUM_ENDPOINT")
     print(f"Docsum Endpoint URL: {docsum_url}")
 
 
-    doc_title, sum, is_summary = get_summary_else_doc(doc_name, company) #needs to be defined in this same file
+    doc_title, sum, is_summary = get_summary_else_doc(doc_name, company)
     print(f"Summary or full doc from get_summary_else_doc: {sum[:100]} \n -------\n")
     if is_summary == False:
         data = {
             "messages": sum,
-            "max_tokens": 300,
+            "max_tokens": 512,
             "language": "en",
             "stream": False,
             "summary_type": "auto", 
@@ -94,3 +93,17 @@ def summarize(doc_name, company):
         return ret
     else:
         return sum
+
+if __name__ == "__main__":
+    company="Gap"
+    year="2024"
+    quarter="Q4"
+
+    # company="Costco"
+    # year="2025"
+    # quarter="Q2"
+
+    print("testing summarize")
+    doc_name = f"{company} {year} {quarter} earning call"
+    summarize(doc_name, company)
+    print("="*50)
