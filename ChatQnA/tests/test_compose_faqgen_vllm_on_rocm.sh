@@ -155,7 +155,7 @@ function validate_microservices() {
       "${ip_address}:${CHATQNA_LLM_FAQGEN_PORT}/v1/faqgen" \
       "text" \
       "llm" \
-      "llm-faqgen-server" \
+      "chatqna-llm-faqgen" \
       '{"messages":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
 
     # vllm for llm service
