@@ -38,7 +38,7 @@ services:
     ports:
       - "6006:80"
     volumes:
-      - "${MODEL_CACHE}:/data"
+      - "${MODEL_CACHE:-./data}:/data"
     shm_size: 1g
     environment:
       no_proxy: ${no_proxy}
@@ -96,7 +96,7 @@ services:
     ports:
       - "8808:80"
     volumes:
-      - "${MODEL_CACHE}:/data"
+      - "${MODEL_CACHE:-./data}:/data"
     shm_size: 1g
     environment:
       no_proxy: ${no_proxy}
@@ -148,11 +148,9 @@ services:
       - no_proxy=${no_proxy}
       - https_proxy=${https_proxy}
       - http_proxy=${http_proxy}
-      - MEGA_SERVICE_HOST_IP=${MEGA_SERVICE_HOST_IP}
       - EMBEDDING_SERVICE_HOST_IP=${EMBEDDING_SERVICE_HOST_IP}
       - RETRIEVER_SERVICE_HOST_IP=${RETRIEVER_SERVICE_HOST_IP}
       - RERANK_SERVICE_HOST_IP=${RERANK_SERVICE_HOST_IP}
-      - LLM_SERVICE_HOST_IP=${LLM_SERVICE_HOST_IP}
     ipc: host
     restart: always
 

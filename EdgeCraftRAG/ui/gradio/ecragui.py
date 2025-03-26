@@ -3,14 +3,12 @@
 
 import argparse
 import base64
-import json
 import os
 import platform
+import re
 import time
-import urllib.request
 from datetime import datetime
 from threading import Timer
-from urllib.parse import urlparse
 
 import cpuinfo
 import distro  # if running Python 3.8 or above
@@ -29,7 +27,6 @@ from platform_config import (
     get_available_weights,
     get_local_available_models,
 )
-from unstructured.staging.base import elements_from_base64_gzipped_json
 
 pipeline_df = []
 
@@ -51,22 +48,6 @@ def get_image_base64(image_path):
         # Encode the image data to Base64
         image_base64 = base64.b64encode(image_data).decode("utf-8")
     return image_base64
-
-
-def extract_urls(text):
-    urls = []
-    words = text.split()
-    for word in words:
-        parsed_url = urlparse(word)
-        if parsed_url.scheme and parsed_url.netloc:
-            url = parsed_url.geturl()
-            try:
-                response = urllib.request.urlopen(url)
-                if response.status == 200:
-                    urls.append(url)
-            except (urllib.error.URLError, urllib.error.HTTPError, Exception):
-                pass
-    return urls
 
 
 def get_system_status():
@@ -177,63 +158,20 @@ def build_app(cfg, args):
 
         # Async for stream response
         partial_text = ""
-        link_urls = []
-        image_paths = []
-        reference_docs = set()
-        IMAGE_NUMBER = 2
         async with httpx.AsyncClient() as client:
             async with client.stream("POST", f"{server_addr}/v1/chatqna", json=new_req, timeout=None) as response:
-                image_count = 0
                 async for chunk in response.aiter_text():
-                    if chunk.strip():
-                        try:
-                            data = json.loads(chunk)
-                            if "llm_res" in data:
-                                partial_text = partial_text + data["llm_res"]
-                            elif "score" in data:
-                                # show referenced docs
-                                if "filename" in data:
-                                    reference_doc = (
-                                        data["filename"]
-                                        if "page_number" not in data
-                                        else data["filename"] + " --page" + str(data["page_number"])
-                                    )
-                                    reference_docs.add(reference_doc)
-                                # show hyperlinks in chunk
-                                if data["score"] > 0.5 and "link_urls" in data:
-                                    if isinstance(data["link_urls"], str):
-                                        try:
-                                            url_list = json.loads(data["link_urls"])
-                                            link_urls.extend(url_list)
-                                        except json.JSONDecodeError:
-                                            print("link_urls is not a valid JSON string.")
-                                # show images in chunk
-                                if image_count < IMAGE_NUMBER and "orig_elements" in data:
-                                    elements = elements_from_base64_gzipped_json(data["orig_elements"])
-                                    for element in elements:
-                                        if element.metadata.image_path:
-                                            image_paths.append(element.metadata.image_path)
-                                            image_count += 1
-                            elif "retrieved_text" in data:
-                                link_urls.extend(extract_urls(data["retrieved_text"]))
-                        except json.JSONDecodeError:
-                            print(f"Received non-JSON chunk: {chunk}")
+                    wrap_text = chunk
+                    if "参考图片" in chunk:
+                        image_paths = re.compile(r"!\[\]\((.*?)\)").findall(chunk)
+                        for image_path in image_paths:
+                            image_base64 = get_image_base64(image_path)
+                            wrap_text = chunk.replace(
+                                f"![]({image_path})", f'<img src="data:image/png;base64,{image_base64}">'
+                            )
+                    partial_text = partial_text + wrap_text
                     history[-1][1] = partial_text
                     yield history
-        if image_paths:
-            history[-1][1] += "\n参考图片:\n"
-            for image_path in image_paths:
-                image_base64 = get_image_base64(image_path)
-                history[-1][1] += f'<img src="data:image/png;base64,{image_base64}">'
-        if link_urls:
-            history[-1][1] += "\n相关链接:\n"
-            for link in link_urls:
-                history[-1][1] += f"{link}\n"
-        if reference_docs:
-            history[-1][1] += "\n内容来源:\n"
-            for reference_doc in reference_docs:
-                history[-1][1] += f"{reference_doc}\n"
-        yield history
 
     avail_llms = get_local_available_models("llm")
     avail_embed_models = get_local_available_models("embed")
@@ -520,7 +458,7 @@ def build_app(cfg, args):
                 pl["indexer"]["indexer_type"],
                 pl["retriever"]["retriever_type"],
                 pl["retriever"]["retrieve_topk"],
-                pl["postprocessor"][0]["postprocessor_type"],
+                pl["postprocessor"][0]["processor_type"],
                 pl["generator"]["generator_type"],
                 pl["generator"]["inference_type"],
                 pl["generator"]["model"]["model_id"],
@@ -697,6 +635,7 @@ def build_app(cfg, args):
             return cli.get_files()
 
         def create_vectordb(docs, spliter):
+
             res = cli.create_vectordb(docs, spliter)
             return gr.update(value=get_files()), res, None
 
