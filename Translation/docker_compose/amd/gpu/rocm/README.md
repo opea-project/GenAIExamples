@@ -103,6 +103,7 @@
     - opea/nginx:latest
     - opea/translation:latest
     - opea/translation-ui:latest
+
 ---
 
 ### Docker Compose Configuration for AMD GPUs
@@ -232,21 +233,22 @@ All containers should be running and should not restart:
 ##### If you use vLLM:
 
 - translationn-vllm-service
-- translation-tgi-service 
+- translation-tgi-service
 - translation-llm
 - translation-backend-server
 - translation-ui-server
-- translation-nginx-server 
+- translation-nginx-server
 
 ##### If you use TGI:
 
-- translation-tgi-service 
+- translation-tgi-service
 - translation-llm
 - translation-backend-server
 - translation-ui-server
-- translation-nginx-server 
+- translation-nginx-server
 
 ---
+
 ## Validate the Services
 
 ### 1. Validate the vLLM/TGI Service
@@ -332,30 +334,28 @@ Checking the response from the service. The response should be similar to JSON:
 
 ```json
 {
-  "id":"",
+  "id": "",
   "choices": [
     {
-      "finish_reason":"length",
-      "index":0,
-      "logprobs":null,
-      "text":" Deep Learning is a subset of machine learning. It attempts to mimic the way the human brain learns. Deep Learning is a subset of machine learning."
+      "finish_reason": "length",
+      "index": 0,
+      "logprobs": null,
+      "text": " Deep Learning is a subset of machine learning. It attempts to mimic the way the human brain learns. Deep Learning is a subset of machine learning."
     }
   ],
-  "created":1742978568,
-  "model":"haoranxu/ALMA-13B",
-  "object":"text_completion",
-  "system_fingerprint":"2.3.1-sha-a094729-rocm",
-  "usage":
-    {
-      "completion_tokens":32,
-      "prompt_tokens":6,
-      "total_tokens":38,
-      "completion_tokens_details":null,
-      "prompt_tokens_details":null
-    }
+  "created": 1742978568,
+  "model": "haoranxu/ALMA-13B",
+  "object": "text_completion",
+  "system_fingerprint": "2.3.1-sha-a094729-rocm",
+  "usage": {
+    "completion_tokens": 32,
+    "prompt_tokens": 6,
+    "total_tokens": 38,
+    "completion_tokens_details": null,
+    "prompt_tokens_details": null
+  }
 }
 ```
-
 
 ### 3. Validate MegaService
 
@@ -414,3 +414,4 @@ docker compose -f compose_vllm.yaml down
 ```bash
 cd ~/searchqna-install/GenAIExamples/Translation/docker_compose/amd/gpu/rocm
 docker compose -f compose.yaml down
+```
