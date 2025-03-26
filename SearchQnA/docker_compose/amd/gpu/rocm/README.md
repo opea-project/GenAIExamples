@@ -253,7 +253,7 @@ All containers should be running and should not restart:
 ##### If you use TGI:
 
 - search-tgi-service
-- search-llm-serverr
+- search-llm-server
 - search-web-retriever-server
 - search-tei-embedding-server
 - search-tei-reranking-server
