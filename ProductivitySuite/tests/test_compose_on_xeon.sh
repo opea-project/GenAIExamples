@@ -58,7 +58,6 @@ function start_services() {
     export TGI_LLM_ENDPOINT_FAQGEN="http://${ip_address}:9009"
     export TGI_LLM_ENDPOINT_DOCSUM="http://${ip_address}:9009"
     export BACKEND_SERVICE_ENDPOINT_CHATQNA="http://${ip_address}:8888/v1/chatqna"
-    export BACKEND_SERVICE_ENDPOINT_FAQGEN="http://${ip_address}:8889/v1/faqgen"
     export DATAPREP_DELETE_FILE_ENDPOINT="http://${ip_address}:5000/v1/dataprep/delete"
     export BACKEND_SERVICE_ENDPOINT_CODEGEN="http://${ip_address}:7778/v1/codegen"
     export DATAPREP_SERVICE_ENDPOINT="http://${ip_address}:5000/v1/dataprep/ingest"
@@ -116,9 +115,6 @@ function validate_service() {
         HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -H 'Content-Type: application/json' "$URL")
     elif [[ $SERVICE_NAME == *"dataprep_del"* ]]; then
         HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -d '{"file_path": "all"}' -H 'Content-Type: application/json' "$URL")
-    elif [[ $SERVICE_NAME == *"faqgen-xeon-backend-server"* ]]; then
-        local INPUT_DATA="messages=Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."
-        HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -F "$INPUT_DATA" -F "max_tokens=32" -F "stream=False" -H 'Content-Type: multipart/form-data' "$URL")
     else
         HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL")
     fi
@@ -142,33 +138,6 @@ function validate_service() {
         echo "[ $SERVICE_NAME ] Content is as expected."
     fi
 
-    sleep 1s
-}
-
-function validate_faqgen_megaservice() {
-    local URL="$1"
-    local SERVICE_NAME="$2"
-    local DOCKER_NAME="$3"
-    local EXPECTED_RESULT="Embeddings"
-    local INPUT_DATA="messages=Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."
-    local HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST -F "$INPUT_DATA" -F "max_tokens=32" -F "stream=False" -H 'Content-Type: multipart/form-data' "$URL")
-    if [ "$HTTP_STATUS" -eq 200 ]; then
-        echo "[ $SERVICE_NAME ] HTTP status is 200. Checking content..."
-
-        local CONTENT=$(curl -s -X POST -F "$INPUT_DATA"  -F "max_tokens=32" -F "stream=False" -H 'Content-Type: multipart/form-data' "$URL" | tee ${LOG_PATH}/${SERVICE_NAME}.log)
-
-        if echo "$CONTENT" | grep -q "$EXPECTED_RESULT"; then
-            echo "[ $SERVICE_NAME ] Content is as expected."
-        else
-            echo "[ $SERVICE_NAME ] Content does not match the expected result: $CONTENT"
-            docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
-            exit 1
-        fi
-    else
-        echo "[ $SERVICE_NAME ] HTTP status is not 200. Received status was $HTTP_STATUS"
-        docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
-        exit 1
-    fi
     sleep 1s
 }
 
@@ -350,12 +319,6 @@ function validate_megaservice() {
         "chatqna-megaservice" \
         "chatqna-xeon-backend-server" \
         '{"messages": "What is the revenue of Nike in 2023?"}'\
-
-    # Curl the FAQGenMega Service
-    validate_faqgen_megaservice \
-        "${ip_address}:8889/v1/faqgen" \
-        "faqgen-xeon-backend-server" \
-        "faqgen-xeon-backend-server"
 
     # Curl the CodeGen Mega Service
     validate_service \
