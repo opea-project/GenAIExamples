@@ -91,20 +91,20 @@
   ##### vLLM-based application:
 
   - opea/vllm-rocm:latest
-    - opea/llm-textgen:latest
-    - opea/reranking:latest
-    - opea/searchqna:latest
-    - opea/searchqna-ui:latest
-    - opea/web-retriever:latest
+  - opea/llm-textgen:latest
+  - opea/reranking:latest
+  - opea/searchqna:latest
+  - opea/searchqna-ui:latest
+  - opea/web-retriever:latest
 
   ##### TGI-based application:
 
   - ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
-    - opea/llm-textgen:latest
-    - opea/reranking:latest
-    - opea/searchqna:latest
-    - opea/searchqna-ui:latest
-    - opea/web-retriever:latest
+  - opea/llm-textgen:latest
+  - opea/reranking:latest
+  - opea/searchqna:latest
+  - opea/searchqna-ui:latest
+  - opea/web-retriever:latest
 
 ---
 
@@ -121,7 +121,7 @@ To enable GPU support for AMD GPUs, the following configuration is added to the 
 shm_size: 1g
 devices:
   - /dev/kfd:/dev/kfd
-  - /dev/dri/:/dev/dri/
+  - /dev/dri:/dev/dri
 cap_add:
   - SYS_PTRACE
 group_add:
@@ -158,6 +158,10 @@ Use AMD GPU driver utilities to determine the correct `cardN` and `renderN` IDs 
 ```bash
 ### Replace the string 'your_huggingfacehub_token' with your HuggingFacehub repository access token.
 export HUGGINGFACEHUB_API_TOKEN='your_huggingfacehub_token'
+### Replace the string 'your_google_api_token' with your Google API access token
+export GOOGLE_API_KEY='your_google_api_token'
+### Replace the string 'your_google_cse_id' with your Google CSE ID
+export GOOGLE_CSE_ID='your_google_cse_id'
 ```
 
 #### Set variables value in set_env\*\*\*\*.sh file:
