@@ -283,7 +283,27 @@ curl http://${HOST_IP}:${SEARCH_VLLM_SERVICE_PORT}/v1/chat/completions \
 Checking the response from the service. The response should be similar to JSON:
 
 ```json
-{"id":"chatcmpl-a3761920c4034131b3cab073b8e8b841","object":"chat.completion","created":1742959065,"model":"Intel/neural-chat-7b-v3-3","choices":[{"index":0,"message":{"role":"assistant","content":" Deep Learning refers to a modern approach of Artificial Intelligence that aims to replicate the way human brains process information by teaching computers to learn from data without extensive programming","tool_calls":[]},"logprobs":null,"finish_reason":"length","stop_reason":null}],"usage":{"prompt_tokens":15,"total_tokens":47,"completion_tokens":32,"prompt_tokens_details":null},"prompt_logprobs":null}
+{
+  "id": "chatcmpl-a3761920c4034131b3cab073b8e8b841",
+  "object": "chat.completion",
+  "created": 1742959065,
+  "model": "Intel/neural-chat-7b-v3-3",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": " Deep Learning refers to a modern approach of Artificial Intelligence that aims to replicate the way human brains process information by teaching computers to learn from data without extensive programming",
+        "tool_calls": []
+      },
+      "logprobs": null,
+      "finish_reason": "length",
+      "stop_reason": null
+    }
+  ],
+  "usage": { "prompt_tokens": 15, "total_tokens": 47, "completion_tokens": 32, "prompt_tokens_details": null },
+  "prompt_logprobs": null
+}
 ```
 
 If the service response has a meaningful response in the value of the "choices.message.content" key,
@@ -328,7 +348,30 @@ curl http://${HOST_IP}:${SEARCH_LLM_SERVICE_PORT}/v1/chat/completions \
 Checking the response from the service. The response should be similar to JSON:
 
 ```json
-{"id":"cmpl-0b974d00a7604c2ab8b721ebf6b88ae3","choices":[{"finish_reason":"length","index":0,"logprobs":null,"text":"\n\nDeep Learning is a subset of Machine Learning that is concerned with algorithms inspired by the structure and function of the brain. It is a part of Artificial","stop_reason":null,"prompt_logprobs":null}],"created":1742959134,"model":"Intel/neural-chat-7b-v3-3","object":"text_completion","system_fingerprint":null,"usage":{"completion_tokens":32,"prompt_tokens":6,"total_tokens":38,"completion_tokens_details":null,"prompt_tokens_details":null}}
+{
+  "id": "cmpl-0b974d00a7604c2ab8b721ebf6b88ae3",
+  "choices": [
+    {
+      "finish_reason": "length",
+      "index": 0,
+      "logprobs": null,
+      "text": "\n\nDeep Learning is a subset of Machine Learning that is concerned with algorithms inspired by the structure and function of the brain. It is a part of Artificial",
+      "stop_reason": null,
+      "prompt_logprobs": null
+    }
+  ],
+  "created": 1742959134,
+  "model": "Intel/neural-chat-7b-v3-3",
+  "object": "text_completion",
+  "system_fingerprint": null,
+  "usage": {
+    "completion_tokens": 32,
+    "prompt_tokens": 6,
+    "total_tokens": 38,
+    "completion_tokens_details": null,
+    "prompt_tokens_details": null
+  }
+}
 ```
 
 ### 3. Validate TEI Embedding service
@@ -360,7 +403,14 @@ curl http://${HOST_IP}:${SEARCH_EMBEDDING_SERVICE_PORT}/v1/embeddings \
 Checking the response from the service. The response should be similar to JSON:
 
 ```json
-{"object":"list","model":"BAAI/bge-base-en-v1.5","data":[{"index":0,"object":"embedding","embedding":[0.010614655,0.019818036,"******",0.06571652,-0.019738553]}],"usage":{"prompt_tokens":4,"total_tokens":4,"completion_tokens":0}}
+{
+  "object": "list",
+  "model": "BAAI/bge-base-en-v1.5",
+  "data": [
+    { "index": 0, "object": "embedding", "embedding": [0.010614655, 0.019818036, "******", 0.06571652, -0.019738553] }
+  ],
+  "usage": { "prompt_tokens": 4, "total_tokens": 4, "completion_tokens": 0 }
+}
 ```
 
 If the response JSON is similar to the one above, then we consider the service verification successful.
@@ -378,7 +428,33 @@ curl http://${HOST_IP}:${SEARCH_WEB_RETRIEVER_SERVICE_PORT}/v1/web_retrieval \
 Checking the response from the service. The response should be similar to JSON:
 
 ```json
-{"id":"ec32c767e0ae107c4943b634648c9752","retrieved_docs":[{"downstream_black_list":[],"id":"ab002cd89cd20d9229adae1e091c7e2d","text":"2025\n\n    * ###  New Year’s Day 2024/2025 \n\nWednesday, January 1, 2025  Early Close (2:00 p.m. Eastern Time): Tuesday,\nDecember 31, 2024\n\n    * ###  Martin Luther King Day \n\nMonday, January 20, 2025\n\n    * ###  Presidents Day \n\nMonday, February 17, 2025\n\n    * ###  Good Friday \n\nFriday, April 18, 2025  Early Close (2:00 p.m. Eastern Time): Thursday, April\n17, 2025\n\n    * ###  Memorial Day \n\nMonday, May 26, 2025  Early Close (2:00 p.m. Eastern Time): Friday, May 23,\n2025\n\n    * ###  Juneteenth \n\nThursday, June 19, 2025\n\n    * ###  U.S. Independence Day \n\nFriday, July 4, 2025  Early Close (2:00 p.m. Eastern Time): Thursday, July 3,\n2025\n\n    * ###  Labor Day \n\nMonday, September 1, 2025\n\n    * ###  Columbus Day \n\nMonday, October 13, 2025\n\n    * ###  Veterans Day \n\nTuesday, November 11, 2025\n\n    * ###  Thanksgiving Day \n\nThursday, November 27, 2025  Early Close (2:00 p.m. Eastern Time): Friday,\nNovember 28, 2025\n\n    * ###  Christmas Day \n\nThursday, December 25, 2025  Early Close (2:00 p.m. Eastern Time): Wednesday,\nDecember 24, 2025\n\n    * ###  New Year’s Day 2025/2026 \n\nThursday, January 1, 2026  Early Close (2:00 p.m. Eastern Time): Wednesday,\nDecember 31, 2025\n\n2026\n\n    * ###  New Year’s Day 2025/2026 \n\nThursday, January 1, 2026  Early Close (2:00 p.m. Eastern Time): Wednesday,\nDecember 31, 2025\n\n    * ###  Martin Luther King Day \n\nMonday, January 19, 2026\n\n    * ###  Presidents Day \n\nMonday, February 16, 2026\n\n    * ###  Good Friday \n description:  \n \n title: \n                  Holiday Schedule - SIFMA - Holiday Schedule - SIFMA\n               \n \n source: https://www.sifma.org/resources/general/holiday-schedule/ \n"},{"downstream_black_list":[],"id":"f498f4a1357bfbc631a5d67663c64680","text":"Monday, May 26, 2025\n\n    * ###  Juneteenth \n\nThursday, June 19, 2025\n\n    * ###  U.S. Independence Day \n\nFriday, July 4, 2025\n\n    * ###  Summer Bank Holiday \n\nMonday, August 25, 2025\n\n    * ###  Labor Day \n\nMonday, September 1, 2025\n\n    * ###  Columbus Day \n\nMonday, October 13, 2025\n\n    * ###  Veterans Day \n\nTuesday, November 11, 2025\n\n    * ###  Thanksgiving Day \n\nThursday, November 27, 2025\n\n    * ###  Christmas Day \n\nThursday, December 25, 2025\n\n    * ###  Boxing Day \n\nFriday, December 26, 2025\n\n    * ###  New Year’s Day 2025/2026 \n\nThursday, January 1, 2026\n\n2026\n\n    * ###  New Year’s Day 2025/2026 \n\nThursday, January 1, 2026\n\n    * ###  Martin Luther King Day \n\nMonday, January 19, 2026\n\n    * ###  Presidents Day \n\nMonday, February 16, 2026\n\n    * ###  Good Friday \n\nFriday, April 3, 2026\n\n    * ###  Easter Monday \n\nMonday, April 6, 2026\n\n    * ###  May Day \n\nMonday, May 4, 2026\n\n    * ###  Memorial Day \n\nMonday, May 25, 2026\n\n    * ###  Spring Bank Holiday \n\nMonday, May 25, 2026\n\n    * ###  Juneteenth \n\nFriday, June 19, 2026\n\n    * ###  U.S. Independence Day \n\nFriday, July 3, 2026\n\n    * ###  Summer Bank Holiday \n\nMonday, August 31, 2026\n\n    * ###  Labor Day \n\nMonday, September 7, 2026\n\n    * ###  Columbus Day \n\nMonday, October 12, 2026\n\n    * ###  Veterans Day \n\nWednesday, November 11, 2026\n\n    * ###  Thanksgiving Day \n\nThursday, November 26, 2026\n\n    * ###  Christmas Day \n\nFriday, December 25, 2026\n\n    * ###  Boxing Day (Substitute) \n description:  \n \n title: \n                  Holiday Schedule - SIFMA - Holiday Schedule - SIFMA\n               \n \n source: https://www.sifma.org/resources/general/holiday-schedule/ \n"},{"downstream_black_list":[],"id":"3a845fba37a225ee3a67601cfa51f6d6","text":"**Holiday** | **2024** | **Non-Management, Supervisory Units** | **Department of Corrections Employees** | **State Police Unit** | **Exempt, Managerial, and Confidential**  \n---|---|---|---|---|---  \n**New Year’s Day** | **Monday, January 1, 2024** | Observed | Observed | Observed | Observed  \n**Martin Luther King Jr. Day** | **Monday, January 15, 2024** | Observed | Observed | Observed | Observed  \n**Presidents' Day** | **Monday, February 19, 2024** | Observed | Observed | Observed | Observed  \n**Town Meeting Day** | **Tuesday,    \nMarch 5, 2024** | Observed | Observed | Observed | Observed  \n**Memorial Day** | **Monday,    \nMay 27, 2024** | Observed | Observed | Observed | Observed  \n**Independence Day** | **Thursday,    \nJuly 4, 2024** | Observed | Observed | Observed | Observed  \n**Bennington Battle Day** | **Friday,    \nAugust 16, 2024** | Observed | **Not Observed** | **Not Observed** | Observed  \n**Labor Day** | **Monday, September 2, 2024** | Observed | Observed | Observed | Observed  \n**Indigenous Peoples' Day** | **Monday, October 14, 2024** | **Not Observed** | Observed | Observed | **Not Observed**  \n**Veterans' Day** | **Monday, November 11, 2024** | Observed | Observed | Observed | Observed  \n**Thanksgiving Day** | **Thursday, November 28, 2024** | Observed | Observed | Observed | Observed  \n**Christmas Day** | **Wednesday, December 25, 2024** | Observed | Observed | Observed | Observed  \n title: State Holiday Schedule | Department of Human Resources \n \n source: https://humanresources.vermont.gov/benefits-wellness/holiday-schedule \n"},{"downstream_black_list":[],"id":"34926c9655c38d2af761833d57c8ab8a","text":"* ###  Good Friday \n\nNone  Early Close (12:00 p.m. Eastern Time): Friday, April 3, 2026 - Tentative\n- pending confirmation of scheduled release of BLS employment report\n\n    * ###  Memorial Day \n\nMonday, May 25, 2026  Early Close (2:00 p.m. Eastern Time): Friday, May 22,\n2026\n\n    * ###  Juneteenth \n\nFriday, June 19, 2026\n\n    * ###  U.S. Independence Day (observed) \n\nFriday, July 3, 2026  Early Close (2:00 p.m. Eastern Time): Thursday, July 2,\n2026\n\n    * ###  Labor Day \n\nMonday, September 7, 2026\n\n    * ###  Columbus Day \n\nMonday, October 12, 2026\n\n    * ###  Veterans Day \n\nWednesday, November 11, 2026\n\n    * ###  Thanksgiving Day \n\nThursday, November 26, 2026  Early Close (2:00 p.m. Eastern Time): Friday,\nNovember 27, 2026\n\n    * ###  Christmas Day \n\nFriday, December 25, 2026  Early Close (2:00 p.m. Eastern Time): Thursday,\nDecember 24, 2026\n\n    * ###  New Year’s Day 2026/2027 \n\nFriday, January 1, 2027  Early Close (2:00 p.m. Eastern Time): Thursday,\nDecember 31, 2026\n\nArchive\n\n###  U.K. Holiday Recommendations\n\n2025\n\n    * ###  New Year’s Day 2024/2025 \n\nWednesday, January 1, 2025\n\n    * ###  Martin Luther King Day \n\nMonday, January 20, 2025\n\n    * ###  Presidents Day \n\nMonday, February 17, 2025\n\n    * ###  Good Friday \n\nFriday, April 18, 2025\n\n    * ###  Easter Monday \n\nMonday, April 21, 2025\n\n    * ###  May Day \n\nMonday, May 5, 2025\n\n    * ###  Memorial Day \n\nMonday, May 26, 2025\n\n    * ###  Spring Bank Holiday \n\nMonday, May 26, 2025\n\n    * ###  Juneteenth \n description:  \n \n title: \n                  Holiday Schedule - SIFMA - Holiday Schedule - SIFMA\n               \n \n source: https://www.sifma.org/resources/general/holiday-schedule/ \n"}],"initial_query":"What is the 2024 holiday schedule?","top_n":1}
+{
+  "id": "ec32c767e0ae107c4943b634648c9752",
+  "retrieved_docs": [
+    {
+      "downstream_black_list": [],
+      "id": "ab002cd89cd20d9229adae1e091c7e2d",
+      "text": "2025\n\n    * ###  New Year’s Day 2024/2025 \n\nWednesday, January 1, 2025  Early Close (2:00 p.m. Eastern Time): Tuesday,\nDecember 31, 2024\n\n    * ###  Martin Luther King Day \n\nMonday, January 20, 2025\n\n    * ###  Presidents Day \n\nMonday, February 17, 2025\n\n    * ###  Good Friday \n\nFriday, April 18, 2025  Early Close (2:00 p.m. Eastern Time): Thursday, April\n17, 2025\n\n    * ###  Memorial Day \n\nMonday, May 26, 2025  Early Close (2:00 p.m. Eastern Time): Friday, May 23,\n2025\n\n    * ###  Juneteenth \n\nThursday, June 19, 2025\n\n    * ###  U.S. Independence Day \n\nFriday, July 4, 2025  Early Close (2:00 p.m. Eastern Time): Thursday, July 3,\n2025\n\n    * ###  Labor Day \n\nMonday, September 1, 2025\n\n    * ###  Columbus Day \n\nMonday, October 13, 2025\n\n    * ###  Veterans Day \n\nTuesday, November 11, 2025\n\n    * ###  Thanksgiving Day \n\nThursday, November 27, 2025  Early Close (2:00 p.m. Eastern Time): Friday,\nNovember 28, 2025\n\n    * ###  Christmas Day \n\nThursday, December 25, 2025  Early Close (2:00 p.m. Eastern Time): Wednesday,\nDecember 24, 2025\n\n    * ###  New Year’s Day 2025/2026 \n\nThursday, January 1, 2026  Early Close (2:00 p.m. Eastern Time): Wednesday,\nDecember 31, 2025\n\n2026\n\n    * ###  New Year’s Day 2025/2026 \n\nThursday, January 1, 2026  Early Close (2:00 p.m. Eastern Time): Wednesday,\nDecember 31, 2025\n\n    * ###  Martin Luther King Day \n\nMonday, January 19, 2026\n\n    * ###  Presidents Day \n\nMonday, February 16, 2026\n\n    * ###  Good Friday \n description:  \n \n title: \n                  Holiday Schedule - SIFMA - Holiday Schedule - SIFMA\n               \n \n source: https://www.sifma.org/resources/general/holiday-schedule/ \n"
+    },
+    {
+      "downstream_black_list": [],
+      "id": "f498f4a1357bfbc631a5d67663c64680",
+      "text": "Monday, May 26, 2025\n\n    * ###  Juneteenth \n\nThursday, June 19, 2025\n\n    * ###  U.S. Independence Day \n\nFriday, July 4, 2025\n\n    * ###  Summer Bank Holiday \n\nMonday, August 25, 2025\n\n    * ###  Labor Day \n\nMonday, September 1, 2025\n\n    * ###  Columbus Day \n\nMonday, October 13, 2025\n\n    * ###  Veterans Day \n\nTuesday, November 11, 2025\n\n    * ###  Thanksgiving Day \n\nThursday, November 27, 2025\n\n    * ###  Christmas Day \n\nThursday, December 25, 2025\n\n    * ###  Boxing Day \n\nFriday, December 26, 2025\n\n    * ###  New Year’s Day 2025/2026 \n\nThursday, January 1, 2026\n\n2026\n\n    * ###  New Year’s Day 2025/2026 \n\nThursday, January 1, 2026\n\n    * ###  Martin Luther King Day \n\nMonday, January 19, 2026\n\n    * ###  Presidents Day \n\nMonday, February 16, 2026\n\n    * ###  Good Friday \n\nFriday, April 3, 2026\n\n    * ###  Easter Monday \n\nMonday, April 6, 2026\n\n    * ###  May Day \n\nMonday, May 4, 2026\n\n    * ###  Memorial Day \n\nMonday, May 25, 2026\n\n    * ###  Spring Bank Holiday \n\nMonday, May 25, 2026\n\n    * ###  Juneteenth \n\nFriday, June 19, 2026\n\n    * ###  U.S. Independence Day \n\nFriday, July 3, 2026\n\n    * ###  Summer Bank Holiday \n\nMonday, August 31, 2026\n\n    * ###  Labor Day \n\nMonday, September 7, 2026\n\n    * ###  Columbus Day \n\nMonday, October 12, 2026\n\n    * ###  Veterans Day \n\nWednesday, November 11, 2026\n\n    * ###  Thanksgiving Day \n\nThursday, November 26, 2026\n\n    * ###  Christmas Day \n\nFriday, December 25, 2026\n\n    * ###  Boxing Day (Substitute) \n description:  \n \n title: \n                  Holiday Schedule - SIFMA - Holiday Schedule - SIFMA\n               \n \n source: https://www.sifma.org/resources/general/holiday-schedule/ \n"
+    },
+    {
+      "downstream_black_list": [],
+      "id": "3a845fba37a225ee3a67601cfa51f6d6",
+      "text": "**Holiday** | **2024** | **Non-Management, Supervisory Units** | **Department of Corrections Employees** | **State Police Unit** | **Exempt, Managerial, and Confidential**  \n---|---|---|---|---|---  \n**New Year’s Day** | **Monday, January 1, 2024** | Observed | Observed | Observed | Observed  \n**Martin Luther King Jr. Day** | **Monday, January 15, 2024** | Observed | Observed | Observed | Observed  \n**Presidents' Day** | **Monday, February 19, 2024** | Observed | Observed | Observed | Observed  \n**Town Meeting Day** | **Tuesday,    \nMarch 5, 2024** | Observed | Observed | Observed | Observed  \n**Memorial Day** | **Monday,    \nMay 27, 2024** | Observed | Observed | Observed | Observed  \n**Independence Day** | **Thursday,    \nJuly 4, 2024** | Observed | Observed | Observed | Observed  \n**Bennington Battle Day** | **Friday,    \nAugust 16, 2024** | Observed | **Not Observed** | **Not Observed** | Observed  \n**Labor Day** | **Monday, September 2, 2024** | Observed | Observed | Observed | Observed  \n**Indigenous Peoples' Day** | **Monday, October 14, 2024** | **Not Observed** | Observed | Observed | **Not Observed**  \n**Veterans' Day** | **Monday, November 11, 2024** | Observed | Observed | Observed | Observed  \n**Thanksgiving Day** | **Thursday, November 28, 2024** | Observed | Observed | Observed | Observed  \n**Christmas Day** | **Wednesday, December 25, 2024** | Observed | Observed | Observed | Observed  \n title: State Holiday Schedule | Department of Human Resources \n \n source: https://humanresources.vermont.gov/benefits-wellness/holiday-schedule \n"
+    },
+    {
+      "downstream_black_list": [],
+      "id": "34926c9655c38d2af761833d57c8ab8a",
+      "text": "* ###  Good Friday \n\nNone  Early Close (12:00 p.m. Eastern Time): Friday, April 3, 2026 - Tentative\n- pending confirmation of scheduled release of BLS employment report\n\n    * ###  Memorial Day \n\nMonday, May 25, 2026  Early Close (2:00 p.m. Eastern Time): Friday, May 22,\n2026\n\n    * ###  Juneteenth \n\nFriday, June 19, 2026\n\n    * ###  U.S. Independence Day (observed) \n\nFriday, July 3, 2026  Early Close (2:00 p.m. Eastern Time): Thursday, July 2,\n2026\n\n    * ###  Labor Day \n\nMonday, September 7, 2026\n\n    * ###  Columbus Day \n\nMonday, October 12, 2026\n\n    * ###  Veterans Day \n\nWednesday, November 11, 2026\n\n    * ###  Thanksgiving Day \n\nThursday, November 26, 2026  Early Close (2:00 p.m. Eastern Time): Friday,\nNovember 27, 2026\n\n    * ###  Christmas Day \n\nFriday, December 25, 2026  Early Close (2:00 p.m. Eastern Time): Thursday,\nDecember 24, 2026\n\n    * ###  New Year’s Day 2026/2027 \n\nFriday, January 1, 2027  Early Close (2:00 p.m. Eastern Time): Thursday,\nDecember 31, 2026\n\nArchive\n\n###  U.K. Holiday Recommendations\n\n2025\n\n    * ###  New Year’s Day 2024/2025 \n\nWednesday, January 1, 2025\n\n    * ###  Martin Luther King Day \n\nMonday, January 20, 2025\n\n    * ###  Presidents Day \n\nMonday, February 17, 2025\n\n    * ###  Good Friday \n\nFriday, April 18, 2025\n\n    * ###  Easter Monday \n\nMonday, April 21, 2025\n\n    * ###  May Day \n\nMonday, May 5, 2025\n\n    * ###  Memorial Day \n\nMonday, May 26, 2025\n\n    * ###  Spring Bank Holiday \n\nMonday, May 26, 2025\n\n    * ###  Juneteenth \n description:  \n \n title: \n                  Holiday Schedule - SIFMA - Holiday Schedule - SIFMA\n               \n \n source: https://www.sifma.org/resources/general/holiday-schedule/ \n"
+    }
+  ],
+  "initial_query": "What is the 2024 holiday schedule?",
+  "top_n": 1
+}
 ```
 
 If the response JSON is similar to the one above, then we consider the service verification successful.
@@ -396,7 +472,10 @@ curl http://${HOST_IP}:${SEARCH_TEI_RERANKING_PORT}/rerank \
 Checking the response from the service. The response should be similar to JSON:
 
 ```json
-[{"index":1,"score":0.94238955},{"index":0,"score":0.120219156}]
+[
+  { "index": 1, "score": 0.94238955 },
+  { "index": 0, "score": 0.120219156 }
+]
 ```
 
 If the response JSON is similar to the one above, then we consider the service verification successful.
@@ -416,7 +495,24 @@ curl http://${HOST_IP}:${SEARCH_RERANK_SERVICE_PORT}/v1/reranking \
 Checking the response from the service. The response should be similar to JSON:
 
 ```json
-{"id":"d44b5be4002e8e2cc3b6a4861e396093","model":null,"query":"What is Deep Learning?","max_tokens":1024,"max_new_tokens":1024,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,"frequency_penalty":0.0,"presence_penalty":0.0,"repetition_penalty":1.03,"stream":true,"language":"auto","chat_template":null,"documents":["Deep learning is..."]}
+{
+  "id": "d44b5be4002e8e2cc3b6a4861e396093",
+  "model": null,
+  "query": "What is Deep Learning?",
+  "max_tokens": 1024,
+  "max_new_tokens": 1024,
+  "top_k": 10,
+  "top_p": 0.95,
+  "typical_p": 0.95,
+  "temperature": 0.01,
+  "frequency_penalty": 0.0,
+  "presence_penalty": 0.0,
+  "repetition_penalty": 1.03,
+  "stream": true,
+  "language": "auto",
+  "chat_template": null,
+  "documents": ["Deep learning is..."]
+}
 ```
 
 If the response JSON is similar to the one above, then we consider the service verification successful.
@@ -452,8 +548,6 @@ data: [DONE]
 If the response text is similar to the one above, then we consider the service verification successful.
 
 ### 9. Validate Frontend
-
-
 
 ### 10. Stop application
 
