@@ -40,7 +40,7 @@ function start_services() {
     export SEARCH_LLM_MODEL_ID='Intel/neural-chat-7b-v3-3'
     export SEARCH_RERANK_MODEL_ID='BAAI/bge-reranker-base'
 
-    export MODEL_PATH="./data"
+    export MODEL_CACHE="./data"
 
     export SEARCH_BACKEND_SERVICE_PORT=3008
     export SEARCH_EMBEDDING_SERVICE_PORT=3002
