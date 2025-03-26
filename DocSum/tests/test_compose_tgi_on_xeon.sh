@@ -247,7 +247,7 @@ function validate_megaservice_multimedia() {
         "docsum-xeon-backend-server" \
         "docsum-xeon-backend-server" \
         "json" \
-        "{\"type\": \"video\",  \"messages\": \"$(input_data_for_test "video")\", \"stream\": \"False\"s}"
+        "{\"type\": \"video\",  \"messages\": \"$(input_data_for_test "video")\", \"stream\": \"False\"}"
 
     echo ">>> Checking video data in form format"
     validate_service \
