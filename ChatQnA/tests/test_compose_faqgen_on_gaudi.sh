@@ -50,6 +50,7 @@ function start_services() {
     export NUM_CARDS=1
     export INDEX_NAME="rag-redis"
     export host_ip=${ip_address}
+
     export LLM_ENDPOINT_PORT=8010
     export LLM_SERVER_PORT=9001
     export CHATQNA_BACKEND_PORT=8888
@@ -61,6 +62,7 @@ function start_services() {
     export LLM_ENDPOINT="http://${host_ip}:${LLM_ENDPOINT_PORT}"
     export HF_TOKEN=${HF_TOKEN}
     export VLLM_SKIP_WARMUP=true
+
     export LOGFLAG=True
     export http_proxy=${http_proxy}
     export https_proxy=${https_proxy}
@@ -124,7 +126,7 @@ function validate_microservices() {
     # tei for embedding service
     validate_service \
         "${ip_address}:8090/embed" \
-        "[[" \
+        "]]" \
         "tei-embedding" \
         "tei-embedding-gaudi-server" \
         '{"inputs":"What is Deep Learning?"}'
@@ -164,7 +166,7 @@ function validate_microservices() {
     test_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
     validate_service \
         "${ip_address}:7000/v1/retrieval" \
-        " " \
+        "retrieved_docs" \
         "retrieval" \
         "retriever-redis-server" \
         "{\"text\":\"What is the revenue of Nike in 2023?\",\"embedding\":${test_embedding}}"
