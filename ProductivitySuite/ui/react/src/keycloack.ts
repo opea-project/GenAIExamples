@@ -9,4 +9,10 @@ const keycloak = new Keycloak({
   clientId: "productivitysuite",
 });
 
+//auto refresh access token when expired
+keycloak.onTokenExpired = async () => {
+  console.log("token expired", keycloak.token);
+  await keycloak.updateToken(30);
+};
+
 export default keycloak;
