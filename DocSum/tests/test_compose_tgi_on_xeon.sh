@@ -295,7 +295,7 @@ function validate_megaservice_long_text() {
     echo ">>> Checking long text data in form format, set summary_type=truncate"
     validate_service \
         "${host_ip}:${BACKEND_SERVICE_PORT}/v1/docsum" \
-        "Intel" \
+        "TEI" \
         "docsum-xeon-backend-server" \
         "docsum-xeon-backend-server" \
         "media" "" \
