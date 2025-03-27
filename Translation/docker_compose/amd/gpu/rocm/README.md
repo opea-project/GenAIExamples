@@ -367,6 +367,24 @@ curl http://${HOST_IP}:${TRANSLATION_LLM_SERVICE_PORT}/v1/translation  \
   -H 'Content-Type: application/json'
 ```
 
+Checking the response from the service. The response should be similar to JSON:
+
+```textmate
+data: {"id":"","choices":[{"finish_reason":"","index":0,"logprobs":null,"text":" I"}],"created":1743062099,"model":"haoranxu/ALMA-13B","object":"text_completion","system_fingerprint":"2.3.1-sha-a094729-rocm","usage":null}
+
+data: {"id":"","choices":[{"finish_reason":"","index":0,"logprobs":null,"text":" love"}],"created":1743062099,"model":"haoranxu/ALMA-13B","object":"text_completion","system_fingerprint":"2.3.1-sha-a094729-rocm","usage":null}
+
+data: {"id":"","choices":[{"finish_reason":"","index":0,"logprobs":null,"text":" machine"}],"created":1743062099,"model":"haoranxu/ALMA-13B","object":"text_completion","system_fingerprint":"2.3.1-sha-a094729-rocm","usage":null}
+
+data: {"id":"","choices":[{"finish_reason":"","index":0,"logprobs":null,"text":" translation"}],"created":1743062099,"model":"haoranxu/ALMA-13B","object":"text_completion","system_fingerprint":"2.3.1-sha-a094729-rocm","usage":null}
+
+data: {"id":"","choices":[{"finish_reason":"","index":0,"logprobs":null,"text":"."}],"created":1743062099,"model":"haoranxu/ALMA-13B","object":"text_completion","system_fingerprint":"2.3.1-sha-a094729-rocm","usage":null}
+
+data: {"id":"","choices":[{"finish_reason":"eos_token","index":0,"logprobs":null,"text":"</s>"}],"created":1743062099,"model":"haoranxu/ALMA-13B","object":"text_completion","system_fingerprint":"2.3.1-sha-a094729-rocm","usage":{"completion_tokens":6,"prompt_tokens":3071,"total_tokens":3077,"completion_tokens_details":null,"prompt_tokens_details":null}}
+
+data: [DONE]
+```
+
 ### 4. Validate MegaService
 
 ```bash
