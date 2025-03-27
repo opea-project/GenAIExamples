@@ -196,11 +196,18 @@ All containers should be running and should not restart:
 
 ##### If you use vLLM:
 
-- agentqna-vllm-service
-- whisper-service
-- speecht5-service
-- agentqna-backend-server
-- agentqna-ui-server
+- dataprep-redis-server
+- doc-index-retriever-server
+- embedding-server
+- rag-agent-endpoint
+- react-agent-endpoint
+- redis-vector-db
+- reranking-tei-xeon-server
+- retriever-redis-server
+- sql-agent-endpoint
+- tei-embedding-server
+- tei-reranking-server
+- vllm-service
 
 ##### If you use TGI:
 
