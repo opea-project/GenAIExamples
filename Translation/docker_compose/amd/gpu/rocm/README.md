@@ -256,8 +256,7 @@ All containers should be running and should not restart:
 #### If you use vLLM:
 
 ```bash
-DATA='{"model": "haoranxu/ALMA-13B", '\
-'"messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens": 32}'
+DATA='{"model": "haoranxu/ALMA-13B", "prompt": "What is Deep Learning?", "max_tokens": 100, "temperature": 0}'
 
 curl http://${HOST_IP}:${TRANSLATION_VLLM_SERVICE_PORT}/v1/chat/completions \
   -X POST \
@@ -269,25 +268,27 @@ Checking the response from the service. The response should be similar to JSON:
 
 ```json
 {
-  "id": "chatcmpl-a3761920c4034131b3cab073b8e8b841",
-  "object": "chat.completion",
-  "created": 1742959065,
-  "model": "Intel/neural-chat-7b-v3-3",
-  "choices": [
+  "id":"cmpl-059dd7fb311a46c2b807e0b3315e730c",
+  "object":"text_completion",
+  "created":1743063706,
+  "model":"haoranxu/ALMA-13B",
+  "choices":[
     {
-      "index": 0,
-      "message": {
-        "role": "assistant",
-        "content": " Deep Learning refers to a modern approach of Artificial Intelligence that aims to replicate the way human brains process information by teaching computers to learn from data without extensive programming",
-        "tool_calls": []
-      },
-      "logprobs": null,
-      "finish_reason": "length",
-      "stop_reason": null
-    }
-  ],
-  "usage": { "prompt_tokens": 15, "total_tokens": 47, "completion_tokens": 32, "prompt_tokens_details": null },
-  "prompt_logprobs": null
+      "index":0,
+      "text":" Deep Learning is a subset of machine learning. It attempts to mimic the way the human brain learns. Deep Learning is a subset of machine learning. It attempts to mimic the way the human brain learns. Deep Learning is a subset of machine learning. It attempts to mimic the way the human brain learns. Deep Learning is a subset of machine learning. It attempts to mimic the way the human brain learns. Deep Learning is a subset of machine learning",
+      "logprobs":null,
+      "finish_reason":"length",
+      "stop_reason":null,
+      "prompt_logprobs":null}
+      ],
+      
+    "usage":
+      {
+        "prompt_tokens":6,
+        "total_tokens":106,
+        "completion_tokens":100,
+        "prompt_tokens_details":null
+      }
 }
 ```
 
@@ -300,7 +301,7 @@ then we consider the vLLM service to be successfully launched
 DATA='{"inputs":"What is Deep Learning?",'\
 '"parameters":{"max_new_tokens":256,"do_sample": true}}'
 
-curl http://${HOST_IP}:${SEARCH_TGI_SERVICE_PORT}/generate \
+curl http://${HOST_IP}:${TRANSLATION_TGI_SERVICE_PORT}/generate \
   -X POST \
   -d "$DATA" \
   -H 'Content-Type: application/json'
@@ -433,13 +434,13 @@ If the result shown on the page is correct, then we consider the verification of
 #### If you use vLLM
 
 ```bash
-cd ~/searchqna-install/GenAIExamples/Translation/docker_compose/amd/gpu/rocm
+cd ~/translation-install/GenAIExamples/Translation/docker_compose/amd/gpu/rocm
 docker compose -f compose_vllm.yaml down
 ```
 
 #### If you use TGI
 
 ```bash
-cd ~/searchqna-install/GenAIExamples/Translation/docker_compose/amd/gpu/rocm
+cd ~/translation-install/GenAIExamples/Translation/docker_compose/amd/gpu/rocm
 docker compose -f compose.yaml down
 ```
