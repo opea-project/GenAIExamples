@@ -79,7 +79,9 @@ cd GenAIExamples/Translation/docker_compose/amd/gpu/rocm
 
 ### Set environments
 
-In the file "GenAIExamples/Translation/docker_compose/amd/gpu/rocm/set_env.sh " it is necessary to set the required values. Parameter assignments are specified in the comments for each variable setting command
+In the file "GenAIExamples/Translation/docker_compose/amd/gpu/rocm/set_env.sh " it is necessary to set the required values. Parameter assignments are specified in the comments for each variable setting command.
+
+if you need to start a Translation service for code (instead of texts), change the `TRANSLATION_LLM_MODEL_ID` in `set_env.sh` to "Qwen/Qwen2.5-Coder-7B-Instruct".
 
 ```bash
 chmod +x set_env.sh
@@ -97,32 +99,54 @@ docker compose up -d
 ## Validate TGI service
 
 ```bash
+# text translation
 curl http://${TRANSLATION_HOST_IP}:${TRANSLATIONS_TGI_SERVICE_PORT}/generate \
   -X POST \
   -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}' \
+  -H 'Content-Type: application/json'
+# code translation
+curl http://${TRANSLATION_HOST_IP}:${TRANSLATIONS_TGI_SERVICE_PORT}/generate \
+  -X POST \
+  -d '{"inputs":"    ### System: Please translate the following Golang codes into  Python codes.    ### Original codes:    '\'''\'''\''Golang    \npackage main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n    '\'''\'''\''    ### Translated codes:","parameters":{"max_new_tokens":17, "do_sample": true}}' \
   -H 'Content-Type: application/json'
 ```
 
 ## Validate LLM service
 
 ```bash
+# text translation
 curl http://${TRANSLATION_HOST_IP}:9000/v1/chat/completions \
   -X POST \
   -d '{"query":"Translate this from Chinese to English:\nChinese: 我爱机器翻译。\nEnglish:"}' \
+  -H 'Content-Type: application/json'
+# code translation
+curl http://${TRANSLATION_HOST_IP}:9000/v1/chat/completions \
+  -X POST \
+  -d '{"query":"    ### System: Please translate the following Golang codes into  Python codes.    ### Original codes:    '\'''\'''\''Golang    \npackage main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n    '\'''\'''\''    ### Translated codes:"}' \
   -H 'Content-Type: application/json'
 ```
 
 ## Validate MegaService
 
 ```bash
+# text translation
 curl http://${TRANSLATION_HOST_IP}:${TRANSLATION_BACKEND_SERVICE_PORT}/v1/translation -H "Content-Type: application/json" -d '{
-     "language_from": "Chinese","language_to": "English","source_language": "我爱机器翻译。"}'
+     "language_from": "Chinese","language_to": "English","source_language": "我爱机器翻译。","translate_type":"text"}'
+# code translation
+curl http://${TRANSLATION_HOST_IP}:${TRANSLATION_BACKEND_SERVICE_PORT}/v1/translation \
+  -H "Content-Type: application/json" \
+  -d '{"language_from": "Golang","language_to": "Python","source_code": "package main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n}","translate_type":"code"}'
 ```
 
 ## Validate Nginx service
 
 ```bash
+# text translation
 curl http://${TRANSLATION_HOST_IP}:${TRANSLATION_NGINX_PORT}/v1/translation \
     -H "Content-Type: application/json" \
-    -d '{"language_from": "Chinese","language_to": "English","source_language": "我爱机器翻译。"}'
+    -d '{"language_from": "Chinese","language_to": "English","source_language": "我爱机器翻译。","translate_type":"text"}'
+# code translation
+curl http://${TRANSLATION_HOST_IP}:${TRANSLATION_NGINX_PORT}/v1/translation \
+  -H "Content-Type: application/json" \
+  -d '{"language_from": "Golang","language_to": "Python","source_code": "package main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n}","translate_type":"code"}'
 ```
