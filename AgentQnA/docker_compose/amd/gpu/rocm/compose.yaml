@@ -8,7 +8,7 @@ services:
     ports:
       - "${AGENTQNA_TGI_SERVICE_PORT-8085}:80"
     volumes:
-      - ${HF_CACHE_DIR:-/var/opea/agent-service/}:/data
+      - "${MODEL_CACHE:-./data}:/data"
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
@@ -19,8 +19,7 @@ services:
     shm_size: 1g
     devices:
       - /dev/kfd:/dev/kfd
-      - /dev/dri/${AGENTQNA_CARD_ID}:/dev/dri/${AGENTQNA_CARD_ID}
-      - /dev/dri/${AGENTQNA_RENDER_ID}:/dev/dri/${AGENTQNA_RENDER_ID}
+      - /dev/dri:/dev/dri
     cap_add:
       - SYS_PTRACE
     group_add:

@@ -8,10 +8,8 @@ export AGENTQNA_TGI_IMAGE=ghcr.io/huggingface/text-generation-inference:2.3.1-ro
 export AGENTQNA_TGI_SERVICE_PORT="8085"
 
 # LLM related environment variables
-export AGENTQNA_CARD_ID="card1"
-export AGENTQNA_RENDER_ID="renderD136"
 export HF_CACHE_DIR=${HF_CACHE_DIR}
-ls $HF_CACHE_DIR
+
 export LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
 #export NUM_SHARDS=4
 export LLM_ENDPOINT_URL="http://${ip_address}:${AGENTQNA_TGI_SERVICE_PORT}"
