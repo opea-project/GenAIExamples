@@ -71,4 +71,4 @@ echo Y | rm -R ~/agentqna-install/GenAIExamples/AgentQnA/tests/Chinook_Sqlite.sq
 cp chinook-database/ChinookDatabase/DataSources/Chinook_Sqlite.sqlite ~/agentqna-install/GenAIExamples/AgentQnA/tests
 
 docker compose -f ../../../../../DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml up -d
-docker compose -f compose_vllm.yaml up -d
+docker compose -f compose.yaml up -d
