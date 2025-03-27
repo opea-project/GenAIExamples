@@ -359,6 +359,15 @@ Checking the response from the service. The response should be similar to JSON:
 
 ### 3. Validate Nginx Service
 
+```bash
+DATA='{"language_from": "Chinese","language_to": "English","source_language": "我爱机器翻译。"}'
+
+curl http://${HOST_IP}:${TRANSLATION_LLM_SERVICE_PORT}/v1/translation  \
+  -d "$DATA" \
+  -H 'Content-Type: application/json'
+```
+
+
 ### 4. Validate MegaService
 
 ```bash
