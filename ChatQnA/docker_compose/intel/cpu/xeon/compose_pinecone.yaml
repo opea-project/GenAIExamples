@@ -23,7 +23,7 @@ services:
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       DATAPREP_COMPONENT_NAME: "OPEA_DATAPREP_PINECONE"
   tei-embedding-service:
-    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.6
     container_name: tei-embedding-server
     ports:
       - "6006:80"
@@ -54,7 +54,7 @@ services:
       RETRIEVER_COMPONENT_NAME: "OPEA_RETRIEVER_PINECONE"
     restart: unless-stopped
   tei-reranking-service:
-    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.6
     container_name: tei-reranking-server
     ports:
       - "8808:80"
