@@ -161,7 +161,7 @@ export HUGGINGFACEHUB_API_TOKEN='your_huggingfacehub_token'
 Go to Docker Compose directory:
 
 ```bash
-cd ~/codegen-install/GenAIExamples/Translation/docker_compose/amd/gpu/rocm
+cd ~/translation-install/GenAIExamples/Translation/docker_compose/amd/gpu/rocm
 ```
 
 The example uses the Nano text editor. You can use any convenient text editor:
