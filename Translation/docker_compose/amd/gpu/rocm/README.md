@@ -356,6 +356,7 @@ Checking the response from the service. The response should be similar to JSON:
   }
 }
 ```
+
 ### 3. Validate Nginx Service
 
 ### 4. Validate MegaService
