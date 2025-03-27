@@ -84,13 +84,13 @@ We remind you that when using a specific version of the code, you need to use th
 
   ##### vLLM-based application:
 
-   - opea/vllm-rocm:latest
-   - opea/agent:latest
+  - opea/vllm-rocm:latest
+  - opea/agent:latest
 
   ##### TGI-based application:
 
-   - ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
-   - opea/agent:latest
+  - ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
+  - opea/agent:latest
 
 ---
 
