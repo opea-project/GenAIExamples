@@ -21,7 +21,7 @@ summarization_tool:
       type: str
       description: Name of the company document belongs to
   return_output: summary
-  
+
 # research_agent:
 #   description: generate research report on a specified company with fundamentals analysis, sentiment analysis and risk analysis.
 #   callable_api: supervisor_tools.py:research_agent
