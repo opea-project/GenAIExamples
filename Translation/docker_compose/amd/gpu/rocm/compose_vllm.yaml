@@ -84,7 +84,7 @@ services:
     ipc: host
     restart: always
   translation-nginx-server:
-    image: ${REGISTRY:-opea}/nginx:${TAG:-latest}
+    image: ${REGISTRY:-opea}/nginx:${TAG:-1.1}
     container_name: translation-nginx-server
     depends_on:
       - translation-backend-server
