@@ -57,6 +57,7 @@ def test_chat_completion_multi_turn(args):
     add_message_and_run(url, user_message, thread_id, stream=args.stream)
     print("===============End of second turn==================")
 
+
 def test_supervisor_agent_single_turn(args):
     url = f"http://{args.ip_addr}:{args.ext_port}/v1/chat/completions"
     query_list = [
@@ -67,9 +68,7 @@ def test_supervisor_agent_single_turn(args):
     for query in query_list:
         thread_id = f"{uuid.uuid4()}"
         add_message_and_run(url, query, thread_id, stream=args.stream)
-        print("="*50)
-
-    
+        print("=" * 50)
 
 
 if __name__ == "__main__":

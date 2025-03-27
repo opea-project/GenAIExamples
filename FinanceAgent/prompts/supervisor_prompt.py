@@ -1,3 +1,6 @@
+# Copyright (C) 2025 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 REACT_AGENT_LLAMA_PROMPT = """\
 You are a helpful assistant engaged in multi-turn conversations with users.
 You have the following worker agents working for you. You can call them as calling tools.

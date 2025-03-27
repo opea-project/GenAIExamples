@@ -1,3 +1,6 @@
+# Copyright (C) 2025 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 search_knowledge_base:
   description: Search knowledge base of SEC filings.
   callable_api: finqa_tools.py:get_context_bm25_llm

@@ -150,7 +150,7 @@ function stop_dataprep() {
     echo "Stopping databases"
     cid=$(docker ps -aq --filter "name=dataprep-redis-server*" --filter "name=redis-*" --filter "name=tei-embedding-*")
     if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid && sleep 1s; fi
-    
+
 }
 
 function start_agents() {

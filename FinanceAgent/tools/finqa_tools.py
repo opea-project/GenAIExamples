@@ -1,24 +1,28 @@
+# Copyright (C) 2025 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 from tools.utils import *
 
-def get_context_bm25_llm(query, company, year, quarter = ""):
+
+def get_context_bm25_llm(query, company, year, quarter=""):
     k = 5
-    
+
     company_list = get_company_list()
     company = get_company_name_in_kb(company, company_list)
     if "Cannot find" in company or "Database is empty" in company:
         return company
-    
+
     print(f"Company: {company}")
     # chunks
-    index_name=f"chunks_{company}"
+    index_name = f"chunks_{company}"
     vector_store = get_vectorstore(index_name)
     chunks_bm25 = bm25_search_broad(query, company, year, quarter, k=k, doc_type="chunks")
     chunks_sim = similarity_search(vector_store, k, query, company, year, quarter)
     chunks = chunks_bm25 + chunks_sim
-    
+
     # tables
     try:
-        index_name=f"tables_{company}"
+        index_name = f"tables_{company}"
         vector_store_table = get_vectorstore(index_name)
         # get tables matching metadata
         tables_bm25 = bm25_search_broad(query, company, year, quarter, k=k, doc_type="tables")
@@ -28,7 +32,7 @@ def get_context_bm25_llm(query, company, year, quarter = ""):
         tables = []
 
     # get unique results
-    context = get_unique_docs(chunks+tables)
+    context = get_unique_docs(chunks + tables)
     print("Context:\n", context[:500])
 
     if context:
@@ -50,7 +54,7 @@ def search_full_doc(query, company):
     company = get_company_name_in_kb(company, company_list)
     if "Cannot find" in company or "Database is empty" in company:
         return company
-    
+
     # search most similar doc title
     index_name = f"titles_{company}"
     vector_store = get_vectorstore_titles(index_name)
@@ -60,8 +64,8 @@ def search_full_doc(query, company):
         doc = docs[0]
         doc_title = doc.page_content
         print(f"Most similar doc title: {doc_title}")
-    
-    kvstore= RedisKVStore(redis_uri=REDIS_URL_KV)
+
+    kvstore = RedisKVStore(redis_uri=REDIS_URL_KV)
     doc = kvstore.get(doc_title, f"full_doc_{company}")
     content = doc["full_doc"]
     doc_length = doc["doc_length"]
@@ -80,16 +84,16 @@ if __name__ == "__main__":
     # year="2024"
     # quarter="Q4"
 
-    company="Costco"
-    year="2025"
-    quarter="Q2"
+    company = "Costco"
+    year = "2025"
+    quarter = "Q2"
 
-    collection_name=f"chunks_{company}"
+    collection_name = f"chunks_{company}"
     search_metadata = ("company", company)
-    
+
     resp = get_context_bm25_llm("revenue", company, year, quarter)
     print("***Response:\n", resp)
-    print("="*50)
+    print("=" * 50)
 
     print("testing retrieve full doc")
     query = f"{company} {year} {quarter} earning call"
