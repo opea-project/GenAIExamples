@@ -72,7 +72,7 @@ def summarize(doc_name, company):
 
     doc_title, sum, is_summary = get_summary_else_doc(doc_name, company)
     print(f"Summary or full doc from get_summary_else_doc: {sum[:100]} \n -------\n")
-    if is_summary == False:
+    if not is_summary:
         data = {
             "messages": sum,
             "max_tokens": 512,

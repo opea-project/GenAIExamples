@@ -10,15 +10,18 @@ finqa_agent:
       description: should include company name and time, for example, which business unit had the highest growth for Microsoft in 2024.
   return_output: retrieved_data
 
-summarization_agent:
-  description: generate high-lelvel summary of a financial document.
-  callable_api: supervisor_tools.py:summarize_agent
+summarization_tool:
+  description: Searches KV store for summary, if it doesn't exist pulls full document and summarize it
+  callable_api: sum_agent_tools.py:summarize
   args_schema:
-    doc_title:
+    doc_name:
       type: str
-      description: the description of the document, should include company name and time, for example, Apple 2023 Q4 earnings call.
+      description: Descriptive name of the document
+    company:
+      type: str
+      description: Name of the company document belongs to
   return_output: summary
-
+  
 # research_agent:
 #   description: generate research report on a specified company with fundamentals analysis, sentiment analysis and risk analysis.
 #   callable_api: supervisor_tools.py:research_agent

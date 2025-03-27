@@ -68,7 +68,6 @@ services:
     container_name: supervisor-agent-endpoint
     depends_on:
       - worker-finqa-agent
-      - worker-sum-agent
       # - worker-research-agent
     volumes:
       - ${TOOLSET_PATH}:/home/user/tools/
@@ -96,8 +95,11 @@ services:
       https_proxy: ${https_proxy}
       WORKER_FINQA_AGENT_URL: $WORKER_FINQA_AGENT_URL
       WORKER_RESEARCH_AGENT_URL: $WORKER_RESEARCH_AGENT_URL
-      WORKER_SUM_AGENT_URL: $WORKER_SUM_AGENT_URL
+      #WORKER_SUM_AGENT_URL: $WORKER_SUM_AGENT_URL
       DOCSUM_ENDPOINT: $DOCSUM_ENDPOINT
+      REDIS_URL_VECTOR: $REDIS_URL_VECTOR
+      REDIS_URL_KV: $REDIS_URL_KV
+      TEI_EMBEDDING_ENDPOINT: $TEI_EMBEDDING_ENDPOINT
       port: 9090
 
   docsum-vllm-gaudi:
@@ -118,38 +120,3 @@ services:
       MAX_TOTAL_TOKENS: ${MAX_TOTAL_TOKENS}
       DocSum_COMPONENT_NAME: ${DocSum_COMPONENT_NAME:-OpeaDocSumvLLM}
     restart: unless-stopped
-
-  worker-sum-agent:
-    image: opea/agent:latest
-    container_name: sum-agent-endpoint
-    depends_on:
-      - docsum-vllm-gaudi
-    volumes:
-      - ${TOOLSET_PATH}:/home/user/tools/
-      - ${PROMPT_PATH}:/home/user/prompts/
-    ports:
-      - "9097:9097"
-    ipc: host
-    environment:
-      ip_address: ${ip_address}
-      strategy: react_llama
-      with_memory: false
-      recursion_limit: ${recursion_limit_worker}
-      llm_engine: vllm
-      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
-      llm_endpoint_url: ${LLM_ENDPOINT_URL}
-      model: ${LLM_MODEL_ID}
-      temperature: ${TEMPERATURE}
-      max_new_tokens: ${MAX_TOKENS}
-      stream: false
-      tools: /home/user/tools/sum_agent_tools.yaml
-      custom_prompt: /home/user/prompts/sum_prompt.py
-      require_human_feedback: false
-      no_proxy: ${no_proxy}
-      http_proxy: ${http_proxy}
-      https_proxy: ${https_proxy}
-      REDIS_URL_VECTOR: $REDIS_URL_VECTOR
-      REDIS_URL_KV: $REDIS_URL_KV
-      TEI_EMBEDDING_ENDPOINT: $TEI_EMBEDDING_ENDPOINT
-      DOCSUM_ENDPOINT: $DOCSUM_ENDPOINT
-      port: 9097

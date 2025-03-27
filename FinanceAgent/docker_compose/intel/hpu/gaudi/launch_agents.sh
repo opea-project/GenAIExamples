@@ -29,7 +29,6 @@ export MAX_INPUT_TOKENS=2048
 export MAX_TOTAL_TOKENS=4096
 export DocSum_COMPONENT_NAME="OpeaDocSumvLLM"
 export DOCSUM_ENDPOINT="http://${ip_address}:9000/v1/docsum"
-export WORKER_SUM_AGENT_URL="http://${ip_address}:9097/v1/chat/completions"
 
 
 
