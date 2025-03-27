@@ -268,27 +268,27 @@ Checking the response from the service. The response should be similar to JSON:
 
 ```json
 {
-  "id":"cmpl-059dd7fb311a46c2b807e0b3315e730c",
-  "object":"text_completion",
-  "created":1743063706,
-  "model":"haoranxu/ALMA-13B",
-  "choices":[
+  "id": "cmpl-059dd7fb311a46c2b807e0b3315e730c",
+  "object": "text_completion",
+  "created": 1743063706,
+  "model": "haoranxu/ALMA-13B",
+  "choices": [
     {
-      "index":0,
-      "text":" Deep Learning is a subset of machine learning. It attempts to mimic the way the human brain learns. Deep Learning is a subset of machine learning. It attempts to mimic the way the human brain learns. Deep Learning is a subset of machine learning. It attempts to mimic the way the human brain learns. Deep Learning is a subset of machine learning. It attempts to mimic the way the human brain learns. Deep Learning is a subset of machine learning",
-      "logprobs":null,
-      "finish_reason":"length",
-      "stop_reason":null,
-      "prompt_logprobs":null}
-      ],
-      
-    "usage":
-      {
-        "prompt_tokens":6,
-        "total_tokens":106,
-        "completion_tokens":100,
-        "prompt_tokens_details":null
-      }
+      "index": 0,
+      "text": " Deep Learning is a subset of machine learning. It attempts to mimic the way the human brain learns. Deep Learning is a subset of machine learning. It attempts to mimic the way the human brain learns. Deep Learning is a subset of machine learning. It attempts to mimic the way the human brain learns. Deep Learning is a subset of machine learning. It attempts to mimic the way the human brain learns. Deep Learning is a subset of machine learning",
+      "logprobs": null,
+      "finish_reason": "length",
+      "stop_reason": null,
+      "prompt_logprobs": null
+    }
+  ],
+
+  "usage": {
+    "prompt_tokens": 6,
+    "total_tokens": 106,
+    "completion_tokens": 100,
+    "prompt_tokens_details": null
+  }
 }
 ```
 
