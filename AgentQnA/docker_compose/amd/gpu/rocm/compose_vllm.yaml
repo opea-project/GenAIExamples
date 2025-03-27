@@ -3,7 +3,7 @@
 
 services:
   vllm-service:
-    image: ${REGISTRY:-opea}/llm-vllm-rocm:${TAG:-latest}
+    image: ${REGISTRY:-opea}/vllm-rocm:${TAG:-latest}
     container_name: vllm-service
     ports:
       - "${VLLM_SERVICE_PORT:-8081}:8011"
@@ -18,7 +18,7 @@ services:
       WILM_USE_TRITON_FLASH_ATTENTION: 0
       PYTORCH_JIT: 0
     volumes:
-      - "${HF_CACHE_DIR:-./data}:/data"
+      - "${MODEL_CACHE:-./data}:/data"
     shm_size: 20G
     devices:
       - /dev/kfd:/dev/kfd
