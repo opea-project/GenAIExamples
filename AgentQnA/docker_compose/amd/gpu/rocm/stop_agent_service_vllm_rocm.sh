@@ -74,5 +74,5 @@ if [ -d "chinook-database" ]; then
 fi
 echo "Chinook data removed!"
 
-docker compose -f ../../../../../DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml down
 docker compose -f compose_vllm.yaml down
+docker compose -f ../../../../../DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml down

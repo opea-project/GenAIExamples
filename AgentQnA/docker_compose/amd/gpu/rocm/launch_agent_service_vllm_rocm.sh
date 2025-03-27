@@ -68,6 +68,7 @@ echo ${CRAG_SERVER_PORT} > ${WORKPATH}/CRAG_SERVER_PORT_tmp
 
 echo "Downloading chinook data..."
 git clone https://github.com/lerocha/chinook-database.git
+echo Y | rm -R ~/agentqna-install/GenAIExamples/AgentQnA/tests/Chinook_Sqlite.sqlite
 cp chinook-database/ChinookDatabase/DataSources/Chinook_Sqlite.sqlite ~/agentqna-install/GenAIExamples/AgentQnA/tests
 
 docker compose -f ../../../../../DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml up -d
