@@ -3,7 +3,7 @@
 
 services:
   translation-vllm-service:
-    image: ${REGISTRY:-opea}/llm-vllm-rocm:${TAG:-latest}
+    image: ${REGISTRY:-opea}/vllm-rocm:${TAG:-latest}
     container_name: translation-vllm-service
     ports:
       - "${TRANSLATION_VLLM_SERVICE_PORT:-8081}:8011"

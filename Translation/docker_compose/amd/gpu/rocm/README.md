@@ -356,8 +356,9 @@ Checking the response from the service. The response should be similar to JSON:
   }
 }
 ```
+### 3. Validate Nginx Service
 
-### 3. Validate MegaService
+### 4. Validate MegaService
 
 ```bash
 DATA='{"language_from": "Chinese","language_to": "English","source_language": "我爱机器翻译。"}'
@@ -388,7 +389,7 @@ data: [DONE]
 
 If the response text is similar to the one above, then we consider the service verification successful.
 
-### 4. Validate Frontend
+### 5. Validate Frontend
 
 To access the UI, use the URL - http://${EXTERNAL_HOST_IP}:${TRANSLATION_FRONTEND_SERVICE_PORT} A page should open when you click through to this address:
 ![UI start page](../../../../assets/img/translation-ui-starting-page.png)
@@ -400,7 +401,7 @@ Let's enter the task for the service in the "Input" field. For example, "我爱�
 ![UI start page](../../../../assets/img/translation-ui-response-example.png)
 If the result shown on the page is correct, then we consider the verification of the UI service to be successful.
 
-### 5. Stop application
+### 6. Stop application
 
 #### If you use vLLM
 
