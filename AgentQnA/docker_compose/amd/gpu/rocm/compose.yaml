@@ -27,7 +27,7 @@ services:
     security_opt:
       - seccomp:unconfined
     ipc: host
-    command: --model-id ${LLM_MODEL_ID} --max-input-length 4096 --max-total-tokens 8192
+    command: --model-id ${LLM_MODEL_ID}
 
   worker-rag-agent:
     image: opea/agent:latest
