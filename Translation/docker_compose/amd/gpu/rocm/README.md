@@ -367,7 +367,6 @@ curl http://${HOST_IP}:${TRANSLATION_LLM_SERVICE_PORT}/v1/translation  \
   -H 'Content-Type: application/json'
 ```
 
-
 ### 4. Validate MegaService
 
 ```bash
