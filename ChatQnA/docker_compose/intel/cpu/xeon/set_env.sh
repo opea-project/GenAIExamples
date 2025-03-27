@@ -30,3 +30,6 @@ export CHATQNA_FRONTEND_SERVICE_PORT=5173
 export NGINX_PORT=80
 export FAQGen_COMPONENT_NAME="OpeaFaqGenvLLM"
 export LLM_ENDPOINT="http://${host_ip}:${LLM_ENDPOINT_PORT}"
+pushd "grafana/dashboards" > /dev/null
+source download_opea_dashboard.sh
+popd > /dev/null
