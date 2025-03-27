@@ -74,7 +74,7 @@ We remind you that when using a specific version of the code, you need to use th
   ```
 
 - #### Build DocIndexRetriever Docker Images
-  
+
   ```bash
   cd ~/agentqna-install/GenAIExamples/DocIndexRetriever/docker_image_build/
   git clone https://github.com/opea-project/GenAIComps.git
@@ -83,7 +83,7 @@ We remind you that when using a specific version of the code, you need to use th
   ```
 
 - #### Pull DocIndexRetriever Docker Images
-  
+
   ```bash
   docker pull redis/redis-stack:7.2.0-v9
   docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
@@ -99,25 +99,25 @@ We remind you that when using a specific version of the code, you need to use th
 
   ##### vLLM-based application:
 
-   - opea/vllm-rocm:latest
-   - opea/agent:latest
-   - redis/redis-stack:7.2.0-v9
-   - ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
-   - opea/embedding:latest
-   - opea/retriever:latest
-   - opea/reranking:latest
-   - opea/doc-index-retriever:latest
+  - opea/vllm-rocm:latest
+  - opea/agent:latest
+  - redis/redis-stack:7.2.0-v9
+  - ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+  - opea/embedding:latest
+  - opea/retriever:latest
+  - opea/reranking:latest
+  - opea/doc-index-retriever:latest
 
   ##### TGI-based application:
 
-   - ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
-   - opea/agent:latest
-   - redis/redis-stack:7.2.0-v9
-   - ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
-   - opea/embedding:latest
-   - opea/retriever:latest
-   - opea/reranking:latest
-   - opea/doc-index-retriever:latest
+  - ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
+  - opea/agent:latest
+  - redis/redis-stack:7.2.0-v9
+  - ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+  - opea/embedding:latest
+  - opea/retriever:latest
+  - opea/reranking:latest
+  - opea/doc-index-retriever:latest
 
 ---
 
