@@ -41,7 +41,6 @@
 
 ```bash
 git clone https://github.com/opea-project/GenAIComps.git
-cd GenAIComps
 ```
 
 We remind you that when using a specific version of the code, you need to use the README from this version.
@@ -74,6 +73,22 @@ We remind you that when using a specific version of the code, you need to use th
   docker compose -f build.yaml build ${service_list} --no-cache
   ```
 
+- #### Build DocIndexRetriever Docker Images
+  
+  ```bash
+  cd ~/agentqna-install/GenAIExamples/DocIndexRetriever/docker_image_build/
+  git clone https://github.com/opea-project/GenAIComps.git
+  service_list="doc-index-retriever dataprep embedding retriever reranking"
+  docker compose -f build.yaml build ${service_list} --no-cache
+  ```
+
+- #### Pull DocIndexRetriever Docker Images
+  
+  ```bash
+  docker pull redis/redis-stack:7.2.0-v9
+  docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+  ```
+
   After the build, we check the list of images with the command:
 
   ```bash
@@ -86,11 +101,23 @@ We remind you that when using a specific version of the code, you need to use th
 
    - opea/vllm-rocm:latest
    - opea/agent:latest
+   - redis/redis-stack:7.2.0-v9
+   - ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+   - opea/embedding:latest
+   - opea/retriever:latest
+   - opea/reranking:latest
+   - opea/doc-index-retriever:latest
 
   ##### TGI-based application:
 
    - ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
    - opea/agent:latest
+   - redis/redis-stack:7.2.0-v9
+   - ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+   - opea/embedding:latest
+   - opea/retriever:latest
+   - opea/reranking:latest
+   - opea/doc-index-retriever:latest
 
 ---
 
@@ -139,9 +166,9 @@ Use AMD GPU driver utilities to determine the correct `cardN` and `renderN` IDs 
 
 #### Setting variables in the operating system environment:
 
-##### Set variable HUGGINGFACEHUB_API_TOKEN:
-
 ```bash
+### Replace the string 'server_address' with your local server IP address
+export host_ip='server_address'
 ### Replace the string 'your_huggingfacehub_token' with your HuggingFacehub repository access token.
 export HUGGINGFACEHUB_API_TOKEN='your_huggingfacehub_token'
 ### Replace the string 'your_langchain_api_key' with your LANGCHAIN API KEY.
@@ -149,76 +176,20 @@ export LANGCHAIN_API_KEY='your_langchain_api_key'
 export LANGCHAIN_TRACING_V2=""
 ```
 
-#### Set variables value in set_env\*\*\*\*.sh file:
-
-Go to Docker Compose directory:
-
-```bash
-cd ~/agentqna-install/GenAIExamples/AgentQnA/docker_compose/amd/gpu/rocm
-```
-
-The example uses the Nano text editor. You can use any convenient text editor:
-
-#### If you use vLLM
-
-```bash
-nano set_env_vllm.sh
-```
-
-#### If you use TGI
-
-```bash
-nano set_env.sh
-```
-
-If you are in a proxy environment, also set the proxy-related environment variables:
-
-```bash
-export http_proxy="Your_HTTP_Proxy"
-export https_proxy="Your_HTTPs_Proxy"
-```
-
-Set the values of the variables:
-
-- **HOST_IP, HOST_IP_EXTERNAL** - These variables are used to configure the name/address of the service in the operating system environment for the application services to interact with each other and with the outside world.
-
-  If your server uses only an internal address and is not accessible from the Internet, then the values for these two variables will be the same and the value will be equal to the server's internal name/address.
-
-  If your server uses only an external, Internet-accessible address, then the values for these two variables will be the same and the value will be equal to the server's external name/address.
-
-  If your server is located on an internal network, has an internal address, but is accessible from the Internet via a proxy/firewall/load balancer, then the HOST_IP variable will have a value equal to the internal name/address of the server, and the EXTERNAL_HOST_IP variable will have a value equal to the external name/address of the proxy/firewall/load balancer behind which the server is located.
-
-  We set these values in the file set_env\*\*\*\*.sh
-
-- **Variables with names like "**\*\*\*\*\*\*\_PORT"\*\* - These variables set the IP port numbers for establishing network connections to the application services.
-  The values shown in the file set_env.sh or set_env_vllm they are the values used for the development and testing of the application, as well as configured for the environment in which the development is performed. These values must be configured in accordance with the rules of network access to your environment's server, and must not overlap with the IP ports of other applications that are already in use.
-
-#### Set variables with script set_env\*\*\*\*.sh
-
-#### If you use vLLM
-
-```bash
-. set_env_vllm.sh
-```
-
-#### If you use TGI
-
-```bash
-. set_env.sh
-```
-
 ### Start the services:
 
 #### If you use vLLM
 
 ```bash
-docker compose -f compose_vllm.yaml up -d
+cd ~/agentqna-install/GenAIExamples/AgentQnA/docker_compose/amd/gpu/rocm
+bash launch_agent_service_vllm_rocm.sh
 ```
 
 #### If you use TGI
 
 ```bash
-docker compose -f compose.yaml up -d
+cd ~/agentqna-install/GenAIExamples/AgentQnA/docker_compose/amd/gpu/rocm
+bash launch_agent_service_tgi_rocm.sh
 ```
 
 All containers should be running and should not restart:
