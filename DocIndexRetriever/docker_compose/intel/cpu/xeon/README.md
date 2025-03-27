@@ -55,7 +55,7 @@ export RETRIEVER_SERVICE_HOST_IP=${host_ip}
 export RERANK_SERVICE_HOST_IP=${host_ip}
 export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8000/v1/retrievaltool"
 export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/ingest"
-cd GenAIExamples/DocIndexRetriever/intel/cpu/xoen/
+cd GenAIExamples/DocIndexRetriever/docker_compose/intel/cpu/xeon
 docker compose up -d
 ```
 
@@ -66,8 +66,16 @@ In that case, start Docker Containers with compose_without_rerank.yaml
 export host_ip="YOUR IP ADDR"
 export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
 export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
-cd GenAIExamples/DocIndexRetriever/intel/cpu/xoen/
+cd GenAIExamples/DocIndexRetriever/docker_compose/intel/cpu/xeon
 docker compose -f compose_without_rerank.yaml up -d
+```
+
+To run the DocRetriever with Rerank pipeline using the Milvus vector database, use the compose_milvus.yaml configuration file and set the MILVUS_HOST environment variable.
+
+```bash
+export MILVUS_HOST=${host_ip}
+cd GenAIExamples/DocIndexRetriever/docker_compose/intel/cpu/xeon
+docker compose -f compose_milvus.yaml up -d
 ```
 
 ## 4. Validation
