@@ -2,9 +2,9 @@
 # SPDX-License-Identifier: Apache-2.0
 
 services:
-  tgi-server:
+  tgi-service:
     image: ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
-    container_name: agent-tgi-server
+    container_name: tgi-service
     ports:
       - "${TGI_SERVICE_PORT-8085}:80"
     volumes:
