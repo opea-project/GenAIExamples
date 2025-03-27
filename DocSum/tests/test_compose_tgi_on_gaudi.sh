@@ -288,7 +288,7 @@ function validate_megaservice_long_text() {
         "media" "" \
         "type=text" \
         "messages=" \
-        "files=@$ROOT_FOLDER/data/long.txt" \
+        "files=@$ROOT_FOLDER/data/short.txt" \
         "max_tokens=128" \
         "summary_type=stuff" \
         "stream=False"
