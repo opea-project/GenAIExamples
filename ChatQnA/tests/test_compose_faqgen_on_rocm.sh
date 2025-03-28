@@ -16,7 +16,7 @@ LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
 
 export HOST_IP=${ip_address}
-export CHATQNA_TGI_SERVICE_IMAGE="ghcr.io/huggingface/text-generation-inference:2.3.1-rocm"
+export CHATQNA_TGI_SERVICE_IMAGE="ghcr.io/huggingface/text-generation-inference:2.4.1-rocm"
 export CHATQNA_EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
 export CHATQNA_RERANK_MODEL_ID="BAAI/bge-reranker-base"
 export CHATQNA_LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
@@ -69,7 +69,7 @@ function build_docker_images() {
     service_list="chatqna chatqna-ui dataprep retriever llm-faqgen nginx"
     docker compose -f build.yaml build ${service_list} --no-cache > "${LOG_PATH}"/docker_image_build.log
 
-    docker pull ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
+    docker pull ghcr.io/huggingface/text-generation-inference:2.4.1-rocm
     docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
 
     docker images && sleep 1s
