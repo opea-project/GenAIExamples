@@ -2,14 +2,15 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-set -e
+set -xe
 IMAGE_REPO=${IMAGE_REPO:-"opea"}
 IMAGE_TAG=${IMAGE_TAG:-"latest"}
 echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
 echo "TAG=IMAGE_TAG=${IMAGE_TAG}"
 export REGISTRY=${IMAGE_REPO}
 export TAG=${IMAGE_TAG}
-
+export MODEL_CACHE=${model_cache:-"./data"}
+echo "MODEL_CACHE=${MODEL_CACHE}"
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
 if ls $LOG_PATH/*.log 1> /dev/null 2>&1; then
