@@ -109,7 +109,7 @@ To set up environment variables for deploying Document Summarization services, f
 ### Start Microservice Docker Containers
 
 ```bash
-cd GenAIExamples/DocSum/docker_compose/intel/cpu/gaudi
+cd GenAIExamples/DocSum/docker_compose/intel/hpu/gaudi
 ```
 
 If use vLLM as the LLM serving backend.
