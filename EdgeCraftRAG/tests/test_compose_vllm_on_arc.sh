@@ -61,7 +61,7 @@ function start_services() {
     # Start Docker Containers
     docker compose -f $COMPOSE_FILE up -d > ${LOG_PATH}/start_services_with_compose.log
     n=0
-    until [[ "$n" -ge 150 ]]; do
+    until [[ "$n" -ge 100 ]]; do
         docker logs vllm-openvino-server > ${LOG_PATH}/vllm_service_start.log
         if grep -q "metrics.py" ${LOG_PATH}/vllm_service_start.log; then
             break
