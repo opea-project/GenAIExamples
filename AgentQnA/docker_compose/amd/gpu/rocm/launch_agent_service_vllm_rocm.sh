@@ -11,7 +11,7 @@
 export ip_address=${host_ip}
 
 # Set services IP ports
-export TGI_SERVICE_PORT="18110"
+export VLLM_SERVICE_PORT="18110"
 export WORKER_RAG_AGENT_PORT="18111"
 export WORKER_SQL_AGENT_PORT="18112"
 export SUPERVISOR_REACT_AGENT_PORT="18113"
@@ -20,14 +20,15 @@ export CRAG_SERVER_PORT="18114"
 export WORKPATH=$(dirname "$PWD")
 export WORKDIR=${WORKPATH}/../../../
 export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
-export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
+export VLLM_LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
 export HF_CACHE_DIR="./data"
 export MODEL_CACHE="./data"
 export TOOLSET_PATH=${WORKPATH}/../../../tools/
 export recursion_limit_worker=12
-export LLM_ENDPOINT_URL=http://${ip_address}:${TGI_SERVICE_PORT}
+export LLM_ENDPOINT_URL=http://${ip_address}:${VLLM_SERVICE_PORT}
+export LLM_MODEL_ID=${VLLM_LLM_MODEL_ID}
 export temperature=0.01
-export max_new_tokens=1024
+export max_new_tokens=512
 export RETRIEVAL_TOOL_URL="http://${ip_address}:8889/v1/retrievaltool"
 export LANGCHAIN_API_KEY=${LANGCHAIN_API_KEY}
 export LANGCHAIN_TRACING_V2=${LANGCHAIN_TRACING_V2}
@@ -70,4 +71,4 @@ echo Y | rm -R ~/agentqna-install/GenAIExamples/AgentQnA/tests/Chinook_Sqlite.sq
 cp chinook-database/ChinookDatabase/DataSources/Chinook_Sqlite.sqlite ~/agentqna-install/GenAIExamples/AgentQnA/tests
 
 docker compose -f ../../../../../DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml up -d
-docker compose -f compose.yaml up -d
+docker compose -f compose_vllm.yaml up -d
