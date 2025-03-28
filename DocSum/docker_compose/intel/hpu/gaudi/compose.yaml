@@ -20,7 +20,7 @@ services:
       NUM_CARDS: ${NUM_CARDS}
       VLLM_TORCH_PROFILER_DIR: "/mnt"
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://$host_ip:8008/health || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://localhost:80/health || exit 1"]
       interval: 10s
       timeout: 10s
       retries: 100
