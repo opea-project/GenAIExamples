@@ -49,3 +49,15 @@ services:
       dockerfile: comps/llms/src/doc-summarization/Dockerfile
     extends: docsum
     image: ${REGISTRY:-opea}/llm-docsum:${TAG:-latest}
+  vllm:
+    build:
+      context: vllm
+      dockerfile: Dockerfile.cpu
+    extends: docsum
+    image: ${REGISTRY:-opea}/vllm:${TAG:-latest}
+  vllm-gaudi:
+    build:
+      context: vllm-fork
+      dockerfile: Dockerfile.hpu
+    extends: docsum
+    image: ${REGISTRY:-opea}/vllm-gaudi:${TAG:-latest}
