@@ -4,6 +4,15 @@ Chatbots are the most widely adopted use case for leveraging the powerful chat a
 
 RAG bridges the knowledge gap by dynamically fetching relevant information from external sources, ensuring that responses generated remain factual and current. The core of this architecture are vector databases, which are instrumental in enabling efficient and semantic retrieval of information. These databases store data as vectors, allowing RAG to swiftly access the most pertinent documents or data points based on semantic similarity.
 
+# Table of contents
+
+1. [Automated Terraform Deployment](#automated-deployment-to-ubuntu-based-systemif-not-using-terraform-using-intel-optimized-cloud-modules-for-ansible)
+2. [Automated Deployment to Ubuntu based system](#automated-deployment-to-ubuntu-based-systemif-not-using-terraform-using-intel-optimized-cloud-modules-for-ansible)
+3. [Manually Deployment](#manually-deploy-chatqna-service)
+4. [Architecture and Deploy Details](#architecture-and-deploy-details)
+5. [Consume Service](#consume-chatqna-service-with-rag)
+6. [Monitoring and Tracing](#monitoring-opea-service-with-prometheus-and-grafana-dashboard)
+
 ## 🤖 Automated Terraform Deployment using Intel® Optimized Cloud Modules for **Terraform**
 
 | Cloud Provider       | Intel Architecture                | Intel Optimized Cloud Module for Terraform                                                                                         | Comments                                                             |
