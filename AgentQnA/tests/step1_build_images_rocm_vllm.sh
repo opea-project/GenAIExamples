@@ -36,13 +36,13 @@ function build_agent_docker_image() {
     docker images && sleep 3s
 }
 
-function build_vllm_docker_image() {
-    echo "Building the vllm docker image"
-    cd $WORKPATH/
-    docker build --no-cache -t opea/llm-vllm-rocm:ci -f Dockerfile-vllm-rocm .
-
-    docker images && sleep 3s
-}
+#function build_vllm_docker_image() {
+#    echo "Building the vllm docker image"
+#    cd $WORKPATH/
+#    docker build --no-cache -t opea/llm-vllm-rocm:ci -f Dockerfile-vllm-rocm .
+#
+#    docker images && sleep 3s
+#}
 
 
 function main() {
@@ -54,9 +54,9 @@ function main() {
     build_agent_docker_image
     echo "==================== Build agent docker image completed ===================="
 
-    echo "==================== Build vllm docker image ===================="
-    build_vllm_docker_image
-    echo "==================== Build vllm docker image completed ===================="
+#    echo "==================== Build vllm docker image ===================="
+#    build_vllm_docker_image
+#    echo "==================== Build vllm docker image completed ===================="
 
     docker image ls | grep vllm
 }
