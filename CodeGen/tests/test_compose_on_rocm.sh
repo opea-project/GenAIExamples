@@ -34,7 +34,7 @@ function build_docker_images() {
     service_list="codegen codegen-ui llm-textgen"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
-    docker pull ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu
+    docker pull ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
     docker images && sleep 1s
 }
 
@@ -51,7 +51,7 @@ function start_services() {
     export CODEGEN_BACKEND_SERVICE_PORT=7778
     export CODEGEN_BACKEND_SERVICE_URL="http://${ip_address}:${CODEGEN_BACKEND_SERVICE_PORT}/v1/codegen"
     export CODEGEN_UI_SERVICE_PORT=5173
-    export host_ip=${ip_address}
+    export HOST_IP=${ip_address}
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
@@ -100,15 +100,15 @@ function validate_services() {
 function validate_microservices() {
     # tgi for llm service
     validate_services \
-        "${ip_address}:8028/generate" \
+        "${ip_address}:${CODEGEN_TGI_SERVICE_PORT}/generate" \
         "generated_text" \
         "codegen-tgi-service" \
         "codegen-tgi-service" \
         '{"inputs":"def print_hello_world():","parameters":{"max_new_tokens":256, "do_sample": true}}'
-
+    sleep 10
     # llm microservice
     validate_services \
-        "${ip_address}:9000/v1/chat/completions" \
+        "${ip_address}:${CODEGEN_LLM_SERVICE_PORT}/v1/chat/completions" \
         "data: " \
         "codegen-llm-server" \
         "codegen-llm-server" \
