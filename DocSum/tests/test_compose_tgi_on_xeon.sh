@@ -19,15 +19,11 @@ export TAG=${IMAGE_TAG}
 export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
 export LLM_ENDPOINT_PORT=8008
 export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
-export NUM_CARDS=1
-export BLOCK_SIZE=128
-export MAX_NUM_SEQS=256
-export MAX_SEQ_LEN_TO_CAPTURE=2048
 export MAX_INPUT_TOKENS=2048
 export MAX_TOTAL_TOKENS=4096
 export LLM_PORT=9000
 export LLM_ENDPOINT="http://${host_ip}:${LLM_ENDPOINT_PORT}"
-export DocSum_COMPONENT_NAME="OpeaDocSumvLLM"
+export DocSum_COMPONENT_NAME="OpeaDocSumTgi"
 export MEGA_SERVICE_HOST_IP=${host_ip}
 export LLM_SERVICE_HOST_IP=${host_ip}
 export ASR_SERVICE_HOST_IP=${host_ip}
@@ -39,43 +35,28 @@ export LOGFLAG=True
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
 
-
 # Get the root folder of the current script
 ROOT_FOLDER=$(dirname "$(readlink -f "$0")")
 
 function build_docker_images() {
     opea_branch=${opea_branch:-"main"}
-    # If the opea_branch isn't main, replace the git clone branch in Dockerfile.
-    if [[ "${opea_branch}" != "main" ]]; then
-        cd $WORKPATH
-        OLD_STRING="RUN git clone --depth 1 https://github.com/opea-project/GenAIComps.git"
-        NEW_STRING="RUN git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git"
-        find . -type f -name "Dockerfile*" | while read -r file; do
-            echo "Processing file: $file"
-            sed -i "s|$OLD_STRING|$NEW_STRING|g" "$file"
-        done
-    fi
-
     cd $WORKPATH/docker_image_build
     git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
     pushd GenAIComps
     docker build --no-cache -t ${REGISTRY}/comps-base:${TAG} --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
     popd && sleep 1s
 
-    git clone https://github.com/HabanaAI/vllm-fork.git && cd vllm-fork
-    VLLM_VER=$(git describe --tags "$(git rev-list --tags --max-count=1)")
-    git checkout ${VLLM_VER} &> /dev/null && cd ../
-
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="docsum docsum-gradio-ui whisper llm-docsum vllm-gaudi"
+    service_list="docsum docsum-gradio-ui whisper llm-docsum"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
+    docker pull ghcr.io/huggingface/text-generation-inference:1.4
     docker images && sleep 1s
 }
 
 function start_services() {
-    cd $WORKPATH/docker_compose/intel/hpu/gaudi
-    docker compose -f compose.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
+    cd $WORKPATH/docker_compose/intel/cpu/xeon/
+    docker compose -f compose_tgi.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
     sleep 1m
 }
 
@@ -155,12 +136,21 @@ function validate_service() {
 function validate_microservices() {
     # Check if the microservices are running correctly.
 
+    # tgi for llm service
+    validate_service \
+        "${host_ip}:${LLM_ENDPOINT_PORT}/generate" \
+        "generated_text" \
+        "tgi-server" \
+        "docsum-xeon-tgi-server" \
+        "json" \
+        '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}'
+
     # llm microservice
     validate_service \
         "${host_ip}:${LLM_PORT}/v1/docsum" \
         "text" \
-        "llm-docsum-vllm" \
-        "docsum-gaudi-llm-server" \
+        "llm-docsum-tgi" \
+        "docsum-xeon-llm-server" \
         "json" \
         '{"messages":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
 
@@ -170,7 +160,7 @@ function validate_microservices() {
         "${host_ip}:7066/v1/asr" \
         '{"asr_result":"well"}' \
         "whisper" \
-        "docsum-gaudi-whisper-server" \
+        "docsum-xeon-whisper-server" \
         "json" \
         "{\"audio\": \"$(input_data_for_test "audio")\"}"
 
@@ -181,8 +171,8 @@ function validate_megaservice_text() {
     validate_service \
         "${host_ip}:${BACKEND_SERVICE_PORT}/v1/docsum" \
         "[DONE]" \
-        "docsum-gaudi-backend-server" \
-        "docsum-gaudi-backend-server" \
+        "docsum-xeon-backend-server" \
+        "docsum-xeon-backend-server" \
         "json" \
         '{"type": "text", "messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
 
@@ -190,8 +180,8 @@ function validate_megaservice_text() {
     validate_service \
         "${host_ip}:${BACKEND_SERVICE_PORT}/v1/docsum" \
         "[DONE]" \
-        "docsum-gaudi-backend-server" \
-        "docsum-gaudi-backend-server" \
+        "docsum-xeon-backend-server" \
+        "docsum-xeon-backend-server" \
         "media" "" \
         "type=text" \
         "messages=Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5." \
@@ -203,8 +193,8 @@ function validate_megaservice_text() {
     validate_service \
         "${host_ip}:${BACKEND_SERVICE_PORT}/v1/docsum" \
         "[DONE]" \
-        "docsum-gaudi-backend-server" \
-        "docsum-gaudi-backend-server" \
+        "docsum-xeon-backend-server" \
+        "docsum-xeon-backend-server" \
         "media" "" \
         "type=text" \
         "messages=2024年9月26日，北京——今日，英特尔正式发布英特尔® 至强® 6性能核处理器（代号Granite Rapids），为AI、数据分析、科学计算等计算密集型业务提供卓越性能。" \
@@ -216,8 +206,8 @@ function validate_megaservice_text() {
     validate_service \
         "${host_ip}:${BACKEND_SERVICE_PORT}/v1/docsum" \
         "TEI" \
-        "docsum-gaudi-backend-server" \
-        "docsum-gaudi-backend-server" \
+        "docsum-xeon-backend-server" \
+        "docsum-xeon-backend-server" \
         "media" "" \
         "type=text" \
         "messages=" \
@@ -232,8 +222,8 @@ function validate_megaservice_multimedia() {
     validate_service \
         "${host_ip}:${BACKEND_SERVICE_PORT}/v1/docsum" \
         "well" \
-        "docsum-gaudi-backend-server" \
-        "docsum-gaudi-backend-server" \
+        "docsum-xeon-backend-server" \
+        "docsum-xeon-backend-server" \
         "json" \
         "{\"type\": \"audio\",  \"messages\": \"$(input_data_for_test "audio")\", \"stream\": \"False\"}"
 
@@ -241,8 +231,8 @@ function validate_megaservice_multimedia() {
     validate_service \
         "${host_ip}:${BACKEND_SERVICE_PORT}/v1/docsum" \
         "you" \
-        "docsum-gaudi-backend-server" \
-        "docsum-gaudi-backend-server" \
+        "docsum-xeon-backend-server" \
+        "docsum-xeon-backend-server" \
         "media" "" \
         "type=audio" \
         "messages=UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA" \
@@ -254,8 +244,8 @@ function validate_megaservice_multimedia() {
     validate_service \
         "${host_ip}:${BACKEND_SERVICE_PORT}/v1/docsum" \
         "bye" \
-        "docsum-gaudi-backend-server" \
-        "docsum-gaudi-backend-server" \
+        "docsum-xeon-backend-server" \
+        "docsum-xeon-backend-server" \
         "json" \
         "{\"type\": \"video\",  \"messages\": \"$(input_data_for_test "video")\", \"stream\": \"False\"}"
 
@@ -263,8 +253,8 @@ function validate_megaservice_multimedia() {
     validate_service \
         "${host_ip}:${BACKEND_SERVICE_PORT}/v1/docsum" \
         "bye" \
-        "docsum-gaudi-backend-server" \
-        "docsum-gaudi-backend-server" \
+        "docsum-xeon-backend-server" \
+        "docsum-xeon-backend-server" \
         "media" "" \
         "type=video" \
         "messages=\"$(input_data_for_test "video")\"" \
@@ -278,8 +268,8 @@ function validate_megaservice_long_text() {
     validate_service \
         "${host_ip}:${BACKEND_SERVICE_PORT}/v1/docsum" \
         "Intel" \
-        "docsum-gaudi-backend-server" \
-        "docsum-gaudi-backend-server" \
+        "docsum-xeon-backend-server" \
+        "docsum-xeon-backend-server" \
         "media" "" \
         "type=text" \
         "messages=" \
@@ -292,8 +282,8 @@ function validate_megaservice_long_text() {
     validate_service \
         "${host_ip}:${BACKEND_SERVICE_PORT}/v1/docsum" \
         "TEI" \
-        "docsum-gaudi-backend-server" \
-        "docsum-gaudi-backend-server" \
+        "docsum-xeon-backend-server" \
+        "docsum-xeon-backend-server" \
         "media" "" \
         "type=text" \
         "messages=" \
@@ -306,8 +296,8 @@ function validate_megaservice_long_text() {
     validate_service \
         "${host_ip}:${BACKEND_SERVICE_PORT}/v1/docsum" \
         "Intel" \
-        "docsum-gaudi-backend-server" \
-        "docsum-gaudi-backend-server" \
+        "docsum-xeon-backend-server" \
+        "docsum-xeon-backend-server" \
         "media" "" \
         "type=text" \
         "messages=" \
@@ -320,8 +310,8 @@ function validate_megaservice_long_text() {
     validate_service \
         "${host_ip}:${BACKEND_SERVICE_PORT}/v1/docsum" \
         "Intel" \
-        "docsum-gaudi-backend-server" \
-        "docsum-gaudi-backend-server" \
+        "docsum-xeon-backend-server" \
+        "docsum-xeon-backend-server" \
         "media" "" \
         "type=text" \
         "messages=" \
@@ -334,8 +324,8 @@ function validate_megaservice_long_text() {
     validate_service \
         "${host_ip}:${BACKEND_SERVICE_PORT}/v1/docsum" \
         "Intel" \
-        "docsum-gaudi-backend-server" \
-        "docsum-gaudi-backend-server" \
+        "docsum-xeon-backend-server" \
+        "docsum-xeon-backend-server" \
         "media" "" \
         "type=text" \
         "messages=" \
@@ -346,8 +336,8 @@ function validate_megaservice_long_text() {
 }
 
 function stop_docker() {
-    cd $WORKPATH/docker_compose/intel/hpu/gaudi
-    docker compose -f compose.yaml stop && docker compose rm -f
+    cd $WORKPATH/docker_compose/intel/cpu/xeon/
+    docker compose -f compose_tgi.yaml stop && docker compose rm -f
 }
 
 function main() {
