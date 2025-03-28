@@ -32,7 +32,7 @@ services:
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       LOGFLAG: ${LOGFLAG}
   tei-embedding-service:
-    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.6
     entrypoint: /bin/sh -c "apt-get update && apt-get install -y curl && text-embeddings-router --json-output --model-id ${EMBEDDING_MODEL_ID} --auto-truncate"
     container_name: tei-embedding-server
     ports:
@@ -90,7 +90,7 @@ services:
       RETRIEVER_COMPONENT_NAME: "OPEA_RETRIEVER_REDIS"
     restart: unless-stopped
   tei-reranking-service:
-    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.6
     entrypoint: /bin/sh -c "apt-get update && apt-get install -y curl && text-embeddings-router --json-output --model-id ${RERANK_MODEL_ID} --auto-truncate"
     container_name: tei-reranking-server
     ports:

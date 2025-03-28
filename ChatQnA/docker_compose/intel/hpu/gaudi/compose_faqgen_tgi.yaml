@@ -27,7 +27,7 @@ services:
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       LOGFLAG: ${LOGFLAG}
   tei-embedding-service:
-    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.6
     container_name: tei-embedding-gaudi-server
     ports:
       - "8090:80"
