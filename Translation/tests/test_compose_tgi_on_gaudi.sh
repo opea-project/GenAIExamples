@@ -30,14 +30,12 @@ function build_docker_images() {
 
     cd $WORKPATH/docker_image_build
     git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
-    git clone https://github.com/HabanaAI/vllm-fork.git && cd vllm-fork
-    VLLM_VER=$(git describe --tags "$(git rev-list --tags --max-count=1)")
-    git checkout ${VLLM_VER} &> /dev/null && cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="translation translation-ui llm-textgen vllm-gaudi nginx"
+    service_list="translation translation-ui llm-textgen nginx"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
+    docker pull ghcr.io/huggingface/tgi-gaudi:2.3.1
     docker images && sleep 1s
 }
 
@@ -49,10 +47,6 @@ function start_services() {
     export LLM_MODEL_ID="mistralai/Mistral-7B-Instruct-v0.3"
     export LLM_ENDPOINT="http://${ip_address}:8008"
     export LLM_COMPONENT_NAME="OpeaTextGenService"
-    export NUM_CARDS=1
-    export BLOCK_SIZE=128
-    export MAX_NUM_SEQS=256
-    export MAX_SEQ_LEN_TO_CAPTURE=2048
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
     export MEGA_SERVICE_HOST_IP=${ip_address}
     export LLM_SERVICE_HOST_IP=${ip_address}
@@ -68,9 +62,17 @@ function start_services() {
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
     # Start Docker Containers
-    docker compose -f compose.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
+    docker compose -f compose_tgi.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
 
-    sleep 5s
+    n=0
+    until [[ "$n" -ge 100 ]]; do
+        docker logs translation-gaudi-tgi-service > ${LOG_PATH}/tgi_service_start.log
+        if grep -q Connected ${LOG_PATH}/tgi_service_start.log; then
+            break
+        fi
+        sleep 5s
+        n=$((n+1))
+    done
 }
 
 function validate_services() {
@@ -105,6 +107,16 @@ function validate_services() {
 }
 
 function validate_microservices() {
+    # Check if the microservices are running correctly.
+
+    # tgi gaudi service
+    validate_services \
+        "${ip_address}:8008/generate" \
+        "generated_text" \
+        "tgi-gaudi" \
+        "translation-gaudi-tgi-service" \
+        '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}'
+
     # llm microservice
     validate_services \
         "${ip_address}:9000/v1/chat/completions" \
@@ -171,7 +183,7 @@ function validate_frontend() {
 
 function stop_docker() {
     cd $WORKPATH/docker_compose/intel/hpu/gaudi
-    docker compose -f compose.yaml stop && docker compose rm -f
+    docker compose -f compose_tgi.yaml stop && docker compose rm -f
 }
 
 function main() {

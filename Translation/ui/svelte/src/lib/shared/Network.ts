@@ -23,7 +23,8 @@ export async function fetchLanguageResponse(input: string, transform: string, tr
   payload = {
     language_from: transform,
     language_to: transTo,
-    source_language: input,
+    source_data: input,
+    translate_type: "text",
   };
   url = `${BASE_URL}`;
 

@@ -30,9 +30,14 @@ function build_docker_images() {
 
     cd $WORKPATH/docker_image_build
     git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
+    git clone https://github.com/vllm-project/vllm.git && cd vllm
+    VLLM_VER="$(git describe --tags "$(git rev-list --tags --max-count=1)" )"
+    echo "Check out vLLM tag ${VLLM_VER}"
+    git checkout ${VLLM_VER} &> /dev/null
+    cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="translation translation-ui llm-textgen nginx"
+    service_list="translation translation-ui llm-textgen vllm nginx"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu
@@ -42,35 +47,29 @@ function build_docker_images() {
 function start_services() {
     cd $WORKPATH/docker_compose/intel/cpu/xeon/
 
-    export LLM_MODEL_ID="haoranxu/ALMA-13B"
-    export TGI_LLM_ENDPOINT="http://${ip_address}:8008"
+    export http_proxy=${http_proxy}
+    export https_proxy=${https_proxy}
+    export LLM_MODEL_ID="mistralai/Mistral-7B-Instruct-v0.3"
+    export LLM_ENDPOINT="http://${ip_address}:8008"
+    export LLM_COMPONENT_NAME="OpeaTextGenService"
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
     export MEGA_SERVICE_HOST_IP=${ip_address}
     export LLM_SERVICE_HOST_IP=${ip_address}
-    export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:8888/v1/translation"
-    export NGINX_PORT=80
     export FRONTEND_SERVICE_IP=${ip_address}
     export FRONTEND_SERVICE_PORT=5173
     export BACKEND_SERVICE_NAME=translation
     export BACKEND_SERVICE_IP=${ip_address}
     export BACKEND_SERVICE_PORT=8888
+    export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:${BACKEND_SERVICE_PORT}/v1/translation"
+    export NGINX_PORT=80
     export host_ip=${ip_address}
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
     # Start Docker Containers
-    docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
+    docker compose -f compose.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
 
-    n=0
-    # wait long for llm model download
-    until [[ "$n" -ge 500 ]]; do
-        docker logs tgi-service > ${LOG_PATH}/tgi_service_start.log
-        if grep -q Connected ${LOG_PATH}/tgi_service_start.log; then
-            break
-        fi
-        sleep 10s
-        n=$((n+1))
-    done
+    sleep 5s
 }
 
 function validate_services() {
@@ -80,63 +79,64 @@ function validate_services() {
     local DOCKER_NAME="$4"
     local INPUT_DATA="$5"
 
-    local HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL")
-    if [ "$HTTP_STATUS" -eq 200 ]; then
-        echo "[ $SERVICE_NAME ] HTTP status is 200. Checking content..."
+    HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL")
+    HTTP_STATUS=$(echo $HTTP_RESPONSE | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
+    RESPONSE_BODY=$(echo $HTTP_RESPONSE | sed -e 's/HTTPSTATUS\:.*//g')
 
-        local CONTENT=$(curl -s -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL" | tee ${LOG_PATH}/${SERVICE_NAME}.log)
+    docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
 
-        if echo "$CONTENT" | grep -q "$EXPECTED_RESULT"; then
-            echo "[ $SERVICE_NAME ] Content is as expected."
-        else
-            echo "[ $SERVICE_NAME ] Content does not match the expected result: $CONTENT"
-            docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
-            exit 1
-        fi
-    else
+    # check response status
+    if [ "$HTTP_STATUS" -ne "200" ]; then
         echo "[ $SERVICE_NAME ] HTTP status is not 200. Received status was $HTTP_STATUS"
-        docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
         exit 1
+    else
+        echo "[ $SERVICE_NAME ] HTTP status is 200. Checking content..."
     fi
-    sleep 1s
+    # check response body
+    if [[ "$RESPONSE_BODY" != *"$EXPECTED_RESULT"* ]]; then
+        echo "[ $SERVICE_NAME ] Content does not match the expected result: $RESPONSE_BODY"
+        exit 1
+    else
+        echo "[ $SERVICE_NAME ] Content is as expected."
+    fi
+
+    sleep 5s
 }
 
 function validate_microservices() {
-    # Check if the microservices are running correctly.
-
-    # tgi for llm service
-    validate_services \
-        "${ip_address}:8008/generate" \
-        "generated_text" \
-        "tgi" \
-        "tgi-service" \
-        '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}'
-
     # llm microservice
     validate_services \
         "${ip_address}:9000/v1/chat/completions" \
         "data: " \
         "llm" \
-        "llm-textgen-server" \
-        '{"query":"Translate this from Chinese to English:\nChinese: 我爱机器翻译。\nEnglish:"}'
+        "translation-xeon-llm-server" \
+        '{"query":"    ### System: Please translate the following Golang codes into  Python codes.    ### Original codes:    '\'''\'''\''Golang    \npackage main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n    '\'''\'''\''    ### Translated codes:"}'
 }
 
 function validate_megaservice() {
-    # Curl the Mega Service
+    # test the megaservice for code translation
     validate_services \
-    "${ip_address}:8888/v1/translation" \
-    "translation" \
-    "mega-translation" \
-    "translation-xeon-backend-server" \
-    '{"language_from": "Chinese","language_to": "English","source_language": "我爱机器翻译。"}'
+        "${ip_address}:${BACKEND_SERVICE_PORT}/v1/translation" \
+        "print" \
+        "mega-translation" \
+        "translation-xeon-backend-server" \
+        '{"language_from": "Golang","language_to": "Python","source_data": "package main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n}","translate_type":"code"}'
+
+    # test the megaservice for text translation
+    validate_services \
+        "${ip_address}:${BACKEND_SERVICE_PORT}/v1/translation" \
+        "translation" \
+        "mega-translation" \
+        "translation-xeon-backend-server" \
+        '{"language_from": "Chinese","language_to": "English","source_data": "我爱机器翻译。","translate_type":"text"}'
 
     # test the megeservice via nginx
     validate_services \
-        "${ip_address}:80/v1/translation" \
-        "translation" \
+        "${ip_address}:${NGINX_PORT}/v1/translation" \
+        "print" \
         "mega-translation-nginx" \
         "translation-xeon-nginx-server" \
-        '{"language_from": "Chinese","language_to": "English","source_language": "我爱机器翻译。"}'
+        '{"language_from": "Golang","language_to": "Python","source_data": "package main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n}","translate_type":"code"}'
 }
 
 function validate_frontend() {
@@ -169,7 +169,7 @@ function validate_frontend() {
 
 function stop_docker() {
     cd $WORKPATH/docker_compose/intel/cpu/xeon/
-    docker compose stop && docker compose rm -f
+    docker compose -f compose.yaml stop && docker compose rm -f
 }
 
 function main() {
