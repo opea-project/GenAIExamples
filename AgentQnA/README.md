@@ -151,11 +151,19 @@ cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/hpu/gaudi/
 docker compose -f $WORKDIR/GenAIExamples/DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml -f compose.yaml up -d
 ```
 
+To enable Open Telemetry Tracing, compose.telemetry.yaml file need to be merged along with default compose.yaml file.
+Gaudi example with Open Telemetry feature:
+
+````bash
+cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/hpu/gaudi/
+docker compose -f $WORKDIR/GenAIExamples/DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml -f compose.yaml -f compose.telemetry.yaml up -d
+``
+
 ##### [Optional] Web Search Tool Support
 
 <details>
 <summary> Instructions </summary>
-A web search tool is supported in this example and can be enabled by running docker compose with the `compose.webtool.yaml` file.  
+A web search tool is supported in this example and can be enabled by running docker compose with the `compose.webtool.yaml` file.
 The Google Search API is used. Follow the [instructions](https://python.langchain.com/docs/integrations/tools/google_search) to create an API key and enable the Custom Search API on a Google account. The environment variables `GOOGLE_CSE_ID` and `GOOGLE_API_KEY` need to be set.
 
 ```bash
@@ -163,7 +171,7 @@ cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/hpu/gaudi/
 export GOOGLE_CSE_ID="YOUR_ID"
 export GOOGLE_API_KEY="YOUR_API_KEY"
 docker compose -f $WORKDIR/GenAIExamples/DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml -f compose.yaml -f compose.webtool.yaml up -d
-```
+````
 
 </details>
 
