@@ -29,3 +29,8 @@ services:
       dockerfile: comps/third_parties/nginx/src/Dockerfile
     extends: translation
     image: ${REGISTRY:-opea}/nginx:${TAG:-latest}
+  vllm-rocm:
+    build:
+      context: GenAIComps
+      dockerfile: comps/third_parties/vllm/src/Dockerfile.amd_gpu
+    image: ${REGISTRY:-opea}/vllm-rocm:${TAG:-latest}
