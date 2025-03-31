@@ -2,39 +2,33 @@
 # SPDX-License-Identifier: Apache-2.0
 
 services:
-  vllm-service:
-    image: ${REGISTRY:-opea}/vllm-gaudi:${TAG:-latest}
-    container_name: docsum-gaudi-vllm-service
+  tgi-server:
+    image: ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu
+    container_name: docsum-xeon-tgi-server
     ports:
-      - "8008:80"
+      - ${LLM_ENDPOINT_PORT:-8008}:80
     volumes:
-      - "${MODEL_CACHE:-./data}:/root/.cache/huggingface/hub"
+      - "${MODEL_CACHE:-./data}:/data"
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
-      HABANA_VISIBLE_DEVICES: all
-      OMPI_MCA_btl_vader_single_copy_mechanism: none
-      LLM_MODEL_ID: ${LLM_MODEL_ID}
-      NUM_CARDS: ${NUM_CARDS}
-      VLLM_TORCH_PROFILER_DIR: "/mnt"
+      TGI_LLM_ENDPOINT: ${TGI_LLM_ENDPOINT}
+      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      host_ip: ${host_ip}
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:80/health || exit 1"]
       interval: 10s
       timeout: 10s
       retries: 100
-    runtime: habana
-    cap_add:
-      - SYS_NICE
-    ipc: host
-    command: --model $LLM_MODEL_ID --tensor-parallel-size ${NUM_CARDS} --host 0.0.0.0 --port 80 --block-size ${BLOCK_SIZE} --max-num-seqs ${MAX_NUM_SEQS} --max-seq_len-to-capture ${MAX_SEQ_LEN_TO_CAPTURE}
+    shm_size: 1g
+    command: --model-id ${LLM_MODEL_ID} --cuda-graphs 0  --max-input-length ${MAX_INPUT_TOKENS} --max-total-tokens ${MAX_TOTAL_TOKENS}
 
-  llm-docsum-vllm:
+  llm-docsum-tgi:
     image: ${REGISTRY:-opea}/llm-docsum:${TAG:-latest}
-    container_name: docsum-gaudi-llm-server
+    container_name: docsum-xeon-llm-server
     depends_on:
-      vllm-service:
+      tgi-server:
         condition: service_healthy
     ports:
       - ${LLM_PORT:-9000}:9000
@@ -43,18 +37,18 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
+      LLM_ENDPOINT: ${LLM_ENDPOINT}
+      LLM_MODEL_ID: ${LLM_MODEL_ID}
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       MAX_INPUT_TOKENS: ${MAX_INPUT_TOKENS}
       MAX_TOTAL_TOKENS: ${MAX_TOTAL_TOKENS}
-      LLM_ENDPOINT: ${LLM_ENDPOINT}
-      LLM_MODEL_ID: ${LLM_MODEL_ID}
       DocSum_COMPONENT_NAME: ${DocSum_COMPONENT_NAME}
       LOGFLAG: ${LOGFLAG:-False}
     restart: unless-stopped
 
   whisper:
     image: ${REGISTRY:-opea}/whisper:${TAG:-latest}
-    container_name: docsum-gaudi-whisper-server
+    container_name: docsum-xeon-whisper-server
     ports:
       - "7066:7066"
     ipc: host
@@ -62,19 +56,14 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      HABANA_VISIBLE_DEVICES: all
-      OMPI_MCA_btl_vader_single_copy_mechanism: none
-    runtime: habana
-    cap_add:
-      - SYS_NICE
     restart: unless-stopped
 
-  docsum-gaudi-backend-server:
+  docsum-xeon-backend-server:
     image: ${REGISTRY:-opea}/docsum:${TAG:-latest}
-    container_name: docsum-gaudi-backend-server
+    container_name: docsum-xeon-backend-server
     depends_on:
-      - vllm-service
-      - llm-docsum-vllm
+      - tgi-server
+      - llm-docsum-tgi
     ports:
       - "${BACKEND_SERVICE_PORT:-8888}:8888"
     environment:
@@ -84,15 +73,14 @@ services:
       - MEGA_SERVICE_HOST_IP=${MEGA_SERVICE_HOST_IP}
       - LLM_SERVICE_HOST_IP=${LLM_SERVICE_HOST_IP}
       - ASR_SERVICE_HOST_IP=${ASR_SERVICE_HOST_IP}
-
     ipc: host
     restart: always
 
   docsum-gradio-ui:
     image: ${REGISTRY:-opea}/docsum-gradio-ui:${TAG:-latest}
-    container_name: docsum-gaudi-ui-server
+    container_name: docsum-xeon-ui-server
     depends_on:
-      - docsum-gaudi-backend-server
+      - docsum-xeon-backend-server
     ports:
       - "${FRONTEND_SERVICE_PORT:-5173}:5173"
     environment:
