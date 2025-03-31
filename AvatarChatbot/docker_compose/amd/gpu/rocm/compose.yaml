@@ -42,7 +42,7 @@ services:
     environment:
       TTS_ENDPOINT: ${TTS_ENDPOINT}
   tgi-service:
-    image: ghcr.io/huggingface/text-generation-inference:2.4.1-rocm
+    image: ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
     container_name: tgi-service
     ports:
       - "${TGI_SERVICE_PORT:-3006}:80"
