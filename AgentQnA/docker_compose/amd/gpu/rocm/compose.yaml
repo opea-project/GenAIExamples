@@ -70,7 +70,7 @@ services:
     ipc: host
     environment:
       ip_address: ${ip_address}
-      strategy: sql_agent_llama
+      strategy: sql_agent
       with_memory: false
       db_name: ${db_name}
       db_path: ${db_path}
