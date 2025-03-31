@@ -9,7 +9,6 @@ echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
 echo "TAG=IMAGE_TAG=${IMAGE_TAG}"
 export REGISTRY=${IMAGE_REPO}
 export TAG=${IMAGE_TAG}
-export MODEL_CACHE=${model_cache:-"./data"}
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
@@ -24,8 +23,10 @@ function build_docker_images() {
     service_list="dataprep embedding retriever reranking doc-index-retriever"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
-    docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.6
-    docker pull redis/redis-stack:7.2.0-v9
+    docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+    docker pull quay.io/coreos/etcd:v3.5.5
+    docker pull minio/minio:RELEASE.2023-03-20T20-16-18Z
+    docker pull milvusdb/milvus:v2.4.6
     docker images && sleep 1s
 
     echo "Docker images built!"
@@ -39,8 +40,7 @@ function start_services() {
     export TEI_EMBEDDING_ENDPOINT="http://${ip_address}:6006"
     export TEI_RERANKING_ENDPOINT="http://${ip_address}:8808"
     export TGI_LLM_ENDPOINT="http://${ip_address}:8008"
-    export REDIS_URL="redis://${ip_address}:6379"
-    export INDEX_NAME="rag-redis"
+    export MILVUS_HOST=${ip_address}
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
     export MEGA_SERVICE_HOST_IP=${ip_address}
     export EMBEDDING_SERVICE_HOST_IP=${ip_address}
@@ -48,12 +48,13 @@ function start_services() {
     export RERANK_SERVICE_HOST_IP=${ip_address}
     export LLM_SERVICE_HOST_IP=${ip_address}
     export host_ip=${ip_address}
+    export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/ingest"
     export RERANK_TYPE="tei"
     export LOGFLAG=true
 
     # Start Docker Containers
-    docker compose up -d
-    sleep 5m
+    docker compose -f compose_milvus.yaml up -d
+    sleep 2m
     echo "Docker services started!"
 }
 
@@ -76,12 +77,12 @@ function validate_megaservice() {
     local CONTENT=$(http_proxy="" curl -X POST "http://${ip_address}:6007/v1/dataprep/ingest" \
      -H "Content-Type: multipart/form-data" \
      -F 'link_list=["https://opea.dev/"]')
-    local EXIT_CODE=$(validate "$CONTENT" "Data preparation succeeded" "dataprep-redis-service-xeon")
+    local EXIT_CODE=$(validate "$CONTENT" "Data preparation succeeded" "dataprep-milvus-service-xeon")
     echo "$EXIT_CODE"
     local EXIT_CODE="${EXIT_CODE:0-1}"
     echo "return value is $EXIT_CODE"
     if [ "$EXIT_CODE" == "1" ]; then
-        docker logs dataprep-redis-server | tee -a ${LOG_PATH}/dataprep-redis-service-xeon.log
+        docker logs dataprep-milvus-server | tee -a ${LOG_PATH}/dataprep-milvus-service-xeon.log
         return 1
     fi
 
@@ -100,7 +101,7 @@ function validate_megaservice() {
         echo "=============Embedding container log=================="
         docker logs embedding-server | tee -a ${LOG_PATH}/doc-index-retriever-service-xeon.log
         echo "=============Retriever container log=================="
-        docker logs retriever-redis-server | tee -a ${LOG_PATH}/doc-index-retriever-service-xeon.log
+        docker logs retriever-milvus-server | tee -a ${LOG_PATH}/doc-index-retriever-service-xeon.log
         echo "=============TEI Reranking log=================="
         docker logs tei-reranking-server | tee -a ${LOG_PATH}/doc-index-retriever-service-xeon.log
         echo "=============Reranking container log=================="
@@ -114,8 +115,9 @@ function validate_megaservice() {
 
 function stop_docker() {
     cd $WORKPATH/docker_compose/intel/cpu/xeon
-    container_list=$(cat compose.yaml | grep container_name | cut -d':' -f2)
+    container_list=$(cat compose_milvus.yaml | grep container_name | cut -d':' -f2)
     for container_name in $container_list; do
+	echo $container_name
         cid=$(docker ps -aq --filter "name=$container_name")
         echo "Stopping container $container_name"
         if [[ ! -z "$cid" ]]; then docker rm $cid -f && sleep 1s; fi
