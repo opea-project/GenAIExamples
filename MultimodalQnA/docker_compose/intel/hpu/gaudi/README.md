@@ -97,7 +97,7 @@ docker build --no-cache -t opea/retriever:latest --build-arg https_proxy=$https_
 Build TGI Gaudi image
 
 ```bash
-docker pull ghcr.io/huggingface/tgi-gaudi:2.0.6
+docker pull ghcr.io/huggingface/tgi-gaudi:2.3.1
 ```
 
 Build lvm microservice image
@@ -143,7 +143,7 @@ Then run the command `docker images`, you will have the following 11 Docker Imag
 
 1. `opea/dataprep:latest`
 2. `opea/lvm:latest`
-3. `ghcr.io/huggingface/tgi-gaudi:2.0.6`
+3. `ghcr.io/huggingface/tgi-gaudi:2.3.1`
 4. `opea/retriever:latest`
 5. `opea/whisper:latest`
 6. `opea/redis-vector-db`
