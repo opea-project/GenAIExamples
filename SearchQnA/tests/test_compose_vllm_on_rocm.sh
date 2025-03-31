@@ -20,12 +20,11 @@ function build_docker_images() {
     git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="searchqna searchqna-ui embedding web-retriever reranking llm-textgen"
+    service_list="searchqna searchqna-ui embedding web-retriever reranking llm-textgen vllm-rocm"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
-    docker pull ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
-    docker images && sleep 1s
+    docker images && sleep 3s
 }
 
 function start_services() {
@@ -41,6 +40,8 @@ function start_services() {
     export SEARCH_LLM_MODEL_ID='Intel/neural-chat-7b-v3-3'
     export SEARCH_RERANK_MODEL_ID='BAAI/bge-reranker-base'
 
+    export MODEL_CACHE="./data"
+
     export SEARCH_BACKEND_SERVICE_PORT=3008
     export SEARCH_EMBEDDING_SERVICE_PORT=3002
     export SEARCH_FRONTEND_SERVICE_PORT=5173
@@ -48,38 +49,37 @@ function start_services() {
     export SEARCH_RERANK_SERVICE_PORT=3005
     export SEARCH_TEI_EMBEDDING_PORT=3001
     export SEARCH_TEI_RERANKING_PORT=3004
-    export SEARCH_TGI_SERVICE_PORT=3006
+    export SEARCH_VLLM_SERVICE_PORT=3080
     export SEARCH_WEB_RETRIEVER_SERVICE_PORT=3003
 
     export SEARCH_BACKEND_SERVICE_ENDPOINT=http://${EXTERNAL_HOST_IP}:${SEARCH_BACKEND_SERVICE_PORT}/v1/searchqna
     export SEARCH_EMBEDDING_SERVICE_HOST_IP=${HOST_IP}
+    export SEARCH_LLM_ENDPOINT=http://${HOST_IP}:${SEARCH_VLLM_SERVICE_PORT}
     export SEARCH_LLM_SERVICE_HOST_IP=${HOST_IP}
     export SEARCH_MEGA_SERVICE_HOST_IP=${HOST_IP}
     export SEARCH_RERANK_SERVICE_HOST_IP=${HOST_IP}
     export SEARCH_TEI_EMBEDDING_ENDPOINT=http://${HOST_IP}:${SEARCH_TEI_EMBEDDING_PORT}
     export SEARCH_TEI_RERANKING_ENDPOINT=http://${HOST_IP}:${SEARCH_TEI_RERANKING_PORT}
-    export SEARCH_TGI_LLM_ENDPOINT=http://${HOST_IP}:${SEARCH_TGI_SERVICE_PORT}
     export SEARCH_WEB_RETRIEVER_SERVICE_HOST_IP=${HOST_IP}
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
     # Start Docker Containers
-    docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
+    docker compose -f compose_vllm.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
     n=0
     until [[ "$n" -ge 100 ]]; do
-        docker logs search-tgi-service > $LOG_PATH/search-tgi-service_start.log
-        if grep -q Connected $LOG_PATH/search-tgi-service_start.log; then
+        docker logs search-vllm-service >& $LOG_PATH/search-vllm-service_start.log
+        if grep -q "Application startup complete" $LOG_PATH/search-vllm-service_start.log; then
             break
         fi
-        sleep 5s
+        sleep 10s
         n=$((n+1))
     done
-    sleep 20
 }
 
 
 function validate_megaservice() {
-    result=$(http_proxy="" curl http://${ip_address}:3008/v1/searchqna -XPOST -d '{"messages": "What is black myth wukong?", "stream": "False"}' -H 'Content-Type: application/json')
+    result=$(http_proxy="" curl http://${HOST_IP}:${SEARCH_BACKEND_SERVICE_PORT}/v1/searchqna -XPOST -d '{"messages": "What is black myth wukong?", "stream": "False"}' -H 'Content-Type: application/json')
     echo $result
 
     if [[ $result == *"the"* ]]; then
@@ -125,7 +125,7 @@ function validate_frontend() {
 
 function stop_docker() {
     cd $WORKPATH/docker_compose/amd/gpu/rocm/
-    docker compose stop && docker compose rm -f
+    docker compose -f compose_vllm.yaml stop && docker compose -f compose_vllm.yaml rm -f
 }
 
 function main() {
@@ -133,6 +133,8 @@ function main() {
     stop_docker
     if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
     start_services
+
+    sleep 20
 
     validate_megaservice
     validate_frontend
