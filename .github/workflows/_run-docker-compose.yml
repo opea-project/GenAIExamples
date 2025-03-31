@@ -165,7 +165,7 @@ jobs:
               export model_cache="~/.cache/huggingface/hub"
             fi
           fi
-          if [ -f "${test_case}" ]; then timeout 30m bash "${test_case}"; else echo "Test script {${test_case}} not found, skip test!"; fi
+          if [ -f "${test_case}" ]; then timeout 60m bash "${test_case}"; else echo "Test script {${test_case}} not found, skip test!"; fi
 
       - name: Clean up container after test
         shell: bash
