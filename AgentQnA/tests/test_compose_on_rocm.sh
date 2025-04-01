@@ -43,7 +43,7 @@ function stop_retrieval_tool() {
 }
 echo "workpath: $WORKPATH"
 echo "=================== Stop containers ===================="
-#stop_crag
+stop_crag
 #stop_agent_docker
 #stop_retrieval_tool
 
@@ -66,7 +66,7 @@ bash step4a_launch_and_validate_agent_tgi_on_rocm.sh
 echo "=================== #4 Agent test passed ===================="
 
 echo "=================== #5 Stop agent and API server===================="
-#stop_crag
+stop_crag
 #stop_agent_docker
 #stop_retrieval_tool
 echo "=================== #5 Agent and API server stopped===================="
