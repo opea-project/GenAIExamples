@@ -1,7 +1,7 @@
 # Copyright (C) 2024 Advanced Micro Devices, Inc.
 # SPDX-License-Identifier: Apache-2.0
 
-WORKPATH=$(dirname "$PWD")/..
+WORKPATH=$(dirname "$PWD")
 export ip_address=${host_ip}
 export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
 export AGENTQNA_TGI_IMAGE=ghcr.io/huggingface/text-generation-inference:2.4.1-rocm
@@ -20,7 +20,7 @@ export max_new_tokens=512
 
 # agent related environment variables
 export AGENTQNA_WORKER_AGENT_SERVICE_PORT="9095"
-export TOOLSET_PATH=$WORKPATH/GenAIExamples/AgentQnA/tools/
+export TOOLSET_PATH=$WORKPATH/AgentQnA/tools/
 echo "TOOLSET_PATH=${TOOLSET_PATH}"
 export recursion_limit_worker=12
 export recursion_limit_supervisor=10
