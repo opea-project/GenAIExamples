@@ -1,5 +1,13 @@
 # Agents for Question Answering
 
+## Table of contents
+
+1. [Overview](#overview)
+2. [Deploy with Docker](#deploy-with-docker)
+3. [Launch the UI](#launch-the-ui)
+4. [Validate Services](#validate-services)
+5. [Register Tools](#how-to-register-other-tools-with-the-ai-agent)
+
 ## Overview
 
 This example showcases a hierarchical multi-agent system for question-answering applications. The architecture diagram below shows a supervisor agent that interfaces with the user and dispatches tasks to two worker agents to gather information and come up with answers. The worker RAG agent uses the retrieval tool to retrieve relevant documents from a knowledge base - a vector database. The worker SQL agent retrieves relevant data from a SQL database. Although not included in this example by default, other tools such as a web search tool or a knowledge graph query tool can be used by the supervisor agent to gather information from additional sources.
