@@ -9,6 +9,7 @@ echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
 echo "TAG=IMAGE_TAG=${IMAGE_TAG}"
 export REGISTRY=${IMAGE_REPO}
 export TAG=${IMAGE_TAG}
+export MODEL_CACHE=${model_cache:-"./data"}
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
@@ -40,7 +41,7 @@ function build_docker_images() {
     service_list="chatqna chatqna-ui dataprep retriever vllm nginx"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
-    docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+    docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.6
 
     docker images && sleep 1s
 }
@@ -101,6 +102,7 @@ function validate_service() {
 
 function validate_microservices() {
     # Check if the microservices are running correctly.
+    sleep 3m
 
     # tei for embedding service
     validate_service \
@@ -109,8 +111,6 @@ function validate_microservices() {
         "tei-embedding" \
         "tei-embedding-server" \
         '{"inputs":"What is Deep Learning?"}'
-
-    sleep 1m # retrieval can't curl as expected, try to wait for more time
 
     # retrieval microservice
     test_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
@@ -142,7 +142,7 @@ function validate_megaservice() {
     # Curl the Mega Service
     validate_service \
         "${ip_address}:8888/v1/chatqna" \
-        "data" \
+        "Nike" \
         "mega-chatqna" \
         "chatqna-xeon-backend-server" \
         '{"messages": "What is the revenue of Nike in 2023?"}'
@@ -195,7 +195,7 @@ function main() {
 
     validate_microservices
     validate_megaservice
-    # validate_frontend
+    validate_frontend
 
     stop_docker
     echo y | docker system prune

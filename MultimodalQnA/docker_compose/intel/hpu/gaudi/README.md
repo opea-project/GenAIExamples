@@ -97,7 +97,7 @@ docker build --no-cache -t opea/retriever:latest --build-arg https_proxy=$https_
 Build TGI Gaudi image
 
 ```bash
-docker pull ghcr.io/huggingface/tgi-gaudi:2.0.6
+docker pull ghcr.io/huggingface/tgi-gaudi:2.3.1
 ```
 
 Build lvm microservice image
@@ -143,7 +143,7 @@ Then run the command `docker images`, you will have the following 11 Docker Imag
 
 1. `opea/dataprep:latest`
 2. `opea/lvm:latest`
-3. `ghcr.io/huggingface/tgi-gaudi:2.0.6`
+3. `ghcr.io/huggingface/tgi-gaudi:2.3.1`
 4. `opea/retriever:latest`
 5. `opea/whisper:latest`
 6. `opea/redis-vector-db`
@@ -210,7 +210,7 @@ curl http://${host_ip}:$MM_EMBEDDING_PORT_MICROSERVICE/v1/embeddings \
 
 ```bash
 export your_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(512)]; print(embedding)")
-curl http://${host_ip}:7000/v1/multimodal_retrieval \
+curl http://${host_ip}:7000/v1/retrieval \
     -X POST \
     -H "Content-Type: application/json" \
     -d "{\"text\":\"test\",\"embedding\":${your_embedding}}"
@@ -336,6 +336,7 @@ To delete all uploaded files along with data indexed with `$INDEX_NAME` in REDIS
 ```bash
 curl -X POST \
     -H "Content-Type: application/json" \
+    -d '{"file_path": "all"}' \
     ${DATAPREP_DELETE_FILE_ENDPOINT}
 ```
 
