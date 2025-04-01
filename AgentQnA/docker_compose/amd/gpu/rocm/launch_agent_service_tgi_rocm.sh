@@ -13,6 +13,7 @@ export ip_address=${host_ip}
 # Set services IP ports
 export TGI_SERVICE_PORT="18110"
 export WORKER_RAG_AGENT_PORT="18111"
+export WORKER_SQL_AGENT_PORT="18112"
 export SUPERVISOR_REACT_AGENT_PORT="18113"
 export CRAG_SERVER_PORT="18114"
 
@@ -30,10 +31,13 @@ export max_new_tokens=512
 export RETRIEVAL_TOOL_URL="http://${ip_address}:8889/v1/retrievaltool"
 export LANGCHAIN_API_KEY=${LANGCHAIN_API_KEY}
 export LANGCHAIN_TRACING_V2=${LANGCHAIN_TRACING_V2}
+export db_name=Chinook
+export db_path="sqlite:////home/user/chinook-db/Chinook_Sqlite.sqlite"
 export recursion_limit_worker=12
 export recursion_limit_supervisor=10
 export CRAG_SERVER=http://${ip_address}:${CRAG_SERVER_PORT}
 export WORKER_AGENT_URL="http://${ip_address}:${WORKER_RAG_AGENT_PORT}/v1/chat/completions"
+export SQL_AGENT_URL="http://${ip_address}:${WORKER_SQL_AGENT_PORT}/v1/chat/completions"
 export HF_CACHE_DIR=${HF_CACHE_DIR}
 export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
 export no_proxy=${no_proxy}
@@ -77,3 +81,6 @@ until [[ "$n" -ge 100 ]]; do
     sleep 10s
     n=$((n+1))
 done
+
+echo "Starting CRAG server"
+docker run -d --runtime=runc --name=kdd-cup-24-crag-service -p=${CRAG_SERVER_PORT}:8000 docker.io/aicrowd/kdd-cup-24-crag-mock-api:v0
