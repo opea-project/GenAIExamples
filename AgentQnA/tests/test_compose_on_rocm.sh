@@ -10,7 +10,7 @@ export WORKDIR=$WORKPATH/../../
 echo "WORKDIR=${WORKDIR}"
 export ip_address=$(hostname -I | awk '{print $1}')
 export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
-export TOOLSET_PATH=$WORKDIR/AgentQnA/tools/
+export TOOLSET_PATH=$WORKPATH/tools/
 export MODEL_CACHE="./data"
 
 function stop_crag() {
