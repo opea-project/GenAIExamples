@@ -86,4 +86,3 @@ done
 
 echo "Starting CRAG server"
 docker run -d --runtime=runc --name=kdd-cup-24-crag-service -p=${CRAG_SERVER_PORT}:8000 docker.io/aicrowd/kdd-cup-24-crag-mock-api:v0
-
