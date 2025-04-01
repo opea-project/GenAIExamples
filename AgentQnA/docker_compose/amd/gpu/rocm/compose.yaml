@@ -15,7 +15,7 @@ services:
       TGI_LLM_ENDPOINT: "http://${HOST_IP}:${AGENTQNA_TGI_SERVICE_PORT}"
       HUGGING_FACE_HUB_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
-    shm_size: 1g
+    shm_size: 32g
     devices:
       - /dev/kfd:/dev/kfd
       - /dev/dri:/dev/dri
