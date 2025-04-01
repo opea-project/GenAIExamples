@@ -61,9 +61,20 @@ echo ${SUPERVISOR_REACT_AGENT_PORT} > ${WORKPATH}/SUPERVISOR_REACT_AGENT_PORT_tm
 echo ${CRAG_SERVER_PORT} > ${WORKPATH}/CRAG_SERVER_PORT_tmp
 
 echo "Downloading chinook data..."
+echo Y | rm -R chinook-database
 git clone https://github.com/lerocha/chinook-database.git
-echo Y | rm -R ~/agentqna-install/GenAIExamples/AgentQnA/tests/Chinook_Sqlite.sqlite
-cp chinook-database/ChinookDatabase/DataSources/Chinook_Sqlite.sqlite ~/agentqna-install/GenAIExamples/AgentQnA/tests
+echo Y | rm -R ../../../../../AgentQnA/tests/Chinook_Sqlite.sqlite
+cp chinook-database/ChinookDatabase/DataSources/Chinook_Sqlite.sqlite ../../../../../AgentQnA/tests
 
 docker compose -f ../../../../../DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml up -d
 docker compose -f compose_vllm.yaml up -d
+
+n=0
+until [[ "$n" -ge 100 ]]; do
+    docker logs tgi-service > ${WORKPATH}/tgi_service_start.log
+    if grep -q Connected ${WORKPATH}/tgi_service_start.log; then
+        break
+    fi
+    sleep 10s
+    n=$((n+1))
+done
