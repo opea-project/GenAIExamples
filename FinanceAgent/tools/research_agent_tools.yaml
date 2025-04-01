@@ -1,2 +1,35 @@
 # Copyright (C) 2025 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
+
+get_company_profile:
+  description: get a company's profile information.
+  callable_api: research_tools.py:get_company_profile
+  args_schema:
+    symbol:
+      type: str
+      description: the company name or ticker symbol.
+  return_output: profile
+
+get_company_news:
+  description: retrieve market news related to designated company.
+  callable_api: research_tools.py:get_company_news
+  args_schema:
+    symbol:
+      type: str
+      description: the company name or ticker symbol.
+    start_date:
+      type: str
+      description: start date of the search period for the company's basic financials, yyyy-mm-dd.
+    end_date:
+      type: str
+      description: end date of the search period for the company's basic financials, yyyy-mm-dd.
+    max_news_num:
+      type: int
+      description: maximum number of news to return, default to 10.
+  return_output: news
+
+get_current_date:
+  description: get current date.
+  callable_api: research_tools.py:get_current_date
+  return_output: current_date
+
