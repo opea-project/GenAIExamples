@@ -11,7 +11,7 @@
 export ip_address=${host_ip}
 
 # Set services IP ports
-export VLLM_SERVICE_PORT="18110"
+export TGI_SERVICE_PORT="18110"
 export WORKER_RAG_AGENT_PORT="18111"
 export SUPERVISOR_REACT_AGENT_PORT="18113"
 export CRAG_SERVER_PORT="18114"
@@ -19,13 +19,12 @@ export CRAG_SERVER_PORT="18114"
 export WORKPATH=$(dirname "$PWD")
 export WORKDIR=${WORKPATH}/../../../
 export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
-export VLLM_LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
+export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
 export HF_CACHE_DIR="./data"
 export MODEL_CACHE="./data"
 export TOOLSET_PATH=${WORKPATH}/../../../tools/
 export recursion_limit_worker=12
-export LLM_ENDPOINT_URL=http://${ip_address}:${VLLM_SERVICE_PORT}
-export LLM_MODEL_ID=${VLLM_LLM_MODEL_ID}
+export LLM_ENDPOINT_URL=http://${ip_address}:${TGI_SERVICE_PORT}
 export temperature=0.01
 export max_new_tokens=512
 export RETRIEVAL_TOOL_URL="http://${ip_address}:8889/v1/retrievaltool"
