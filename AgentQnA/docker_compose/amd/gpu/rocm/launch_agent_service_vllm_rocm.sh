@@ -73,3 +73,13 @@ cp chinook-database/ChinookDatabase/DataSources/Chinook_Sqlite.sqlite ../../../.
 
 docker compose -f ../../../../../DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml up -d
 docker compose -f compose_vllm.yaml up -d
+
+n=0
+until [[ "$n" -ge 500 ]]; do
+    docker logs vllm-service >& "${WORKPATH}"/vllm-service_start.log
+    if grep -q "Application startup complete" "${WORKPATH}"/vllm-service_start.log; then
+        break
+    fi
+    sleep 20s
+    n=$((n+1))
+done
