@@ -69,7 +69,7 @@ echo "Downloading chinook data..."
 echo Y | rm -R chinook-database
 git clone https://github.com/lerocha/chinook-database.git
 echo Y | rm -R ../../../../../AgentQnA/tests/Chinook_Sqlite.sqlite
-cp chinook-database/ChinookDatabase/DataSources/Chinook_Sqlite.sqlite ~/agentqna-install/GenAIExamples/AgentQnA/tests
+cp chinook-database/ChinookDatabase/DataSources/Chinook_Sqlite.sqlite ../../../../../AgentQnA/tests
 
 docker compose -f ../../../../../DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml up -d
 docker compose -f compose_vllm.yaml up -d
