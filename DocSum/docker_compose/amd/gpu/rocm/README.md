@@ -257,7 +257,7 @@ All containers should be running and should not restart:
 #### If you use vLLM:
 
 ```bash
-curl http://${HOST_IP}:${DOCSUM_VLLM_SERVICE_PORT}/v1/completions \
+curl http://${HOST_IP}:${FAQGEN_VLLM_SERVICE_PORT}/v1/completions \
 -H "Content-Type: application/json" \
 -d '{
     "model": "meta-llama/Meta-Llama-3-8B-Instruct",
@@ -295,7 +295,7 @@ then we consider the vLLM service to be successfully launched
 #### If you use TGI:
 
 ```bash
-curl http://${HOST_IP}:${DOCSUM_TGI_SERVICE_PORT}/generate \
+curl http://${HOST_IP}:${FAQGEN_TGI_SERVICE_PORT}/generate \
   -X POST \
   -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":64, "do_sample": true}}' \
   -H 'Content-Type: application/json'
@@ -315,27 +315,19 @@ then we consider the TGI service to be successfully launched
 ### 2. Validate the LLM Service
 
 ```bash
-DATA='{"messages":"Water is an inorganic compound with the chemical formula H2O. It is a transparent, '\
-'tasteless, odorless,[c] and nearly colorless chemical substance. It is the main constituent of Earths '\
-'hydrosphere and the fluids of all known living organisms (in which it acts as a solvent[20]). '\
-'It is vital for all known forms of life, despite not providing food energy or organic micronutrients. '\
-'Its chemical formula, H2O, indicates that each of its molecules contains one oxygen and two hydrogen atoms, '\
-'connected by covalent bonds. The hydrogen atoms are attached to the oxygen atom at an angle of 104.45 '\
-'In liquid form, H2O is also called water at standard temperature and pressure."}'
-
-curl http://${HOST_IP}:${DOCSUM_LLM_SERVER_PORT}/v1/docsum \
-  -X POST \
-  -d "$DATA" \
-  -H 'Content-Type: application/json'
+curl http://${HOST_IP}:${FAQGEN_LLM_SERVER_PORT}/v1/docsum \
+     -X POST \
+     -d '{"messages":"What is Deep Learning?"}' \
+     -H 'Content-Type: application/json'
 ```
 
 Checking the response from the service. The response should be similar to JSON:
 
 ```json
 {
-  "id": "e97003abd1be457623a9f80214c0793b",
-  "text": " Water is an essential inorganic compound with the chemical formula H2O, serving as the primary component of Earth's hydrosphere and living organisms. It is vital for all life, despite not providing food energy or micronutrients. Its molecules consist of one oxygen atom and two hydrogen atoms connected by covalent bonds. In liquid form, it is commonly referred to as water at standard temperature and pressure.",
-  "prompt": "Water is an inorganic compound with the chemical formula H2O. It is a transparent, tasteless, odorless,[c] and nearly colorless chemical substance. It is the main constituent of Earths hydrosphere and the fluids of all known living organisms (in which it acts as a solvent[20]). It is vital for all known forms of life, despite not providing food energy or organic micronutrients. Its chemical formula, H2O, indicates that each of its molecules contains one oxygen and two hydrogen atoms, connected by covalent bonds. The hydrogen atoms are attached to the oxygen atom at an angle of 104.45 In liquid form, H2O is also called water at standard temperature and pressure."
+  "id": "1e47daf13a8bc73495dbfd9836eaa7e4",
+  "text": " Q: What is Deep Learning?\n         A: Deep Learning is a subset of Machine Learning that involves the use of artificial neural networks to analyze and interpret data. It is called \"deep\" because it involves multiple layers of interconnected nodes or \"neurons\" that process and transform the data.\n\n         Q: What is the main difference between Deep Learning and Machine Learning?\n         A: The main difference between Deep Learning and Machine Learning is the complexity of the models used. Machine Learning models are typically simpler and more linear, while Deep Learning models are more complex and non-linear, allowing them to learn and represent more abstract and nuanced patterns in data.\n\n         Q: What are some common applications of Deep Learning?\n         A: Some common applications of Deep Learning include image and speech recognition, natural language processing, recommender systems, and autonomous vehicles.\n\n         Q: Is Deep Learning a new field?\n         A: Deep Learning is not a new field, but it has gained significant attention and popularity in recent years due to advances in computing power, data storage, and algorithms.\n\n         Q: Can Deep Learning be used for any type of data?\n         A: Deep Learning can be used for any type of data that can be represented as a numerical array, such as images, audio, text, and time series data.\n\n         Q: Is Deep Learning a replacement for traditional Machine Learning?\n         A: No, Deep Learning is not a replacement for traditional Machine Learning. Instead, it is a complementary technology that can be used in conjunction with traditional Machine Learning techniques to solve complex problems.\n\n         Q: What are some of the challenges associated with Deep Learning?\n         A: Some of the challenges associated with Deep Learning include the need for large amounts of data, the risk of overfitting, and the difficulty of interpreting the results of the models.\n\n         Q: Can Deep Learning be used for real-time applications?\n         A: Yes, Deep Learning can be used for real-time applications, such as image and speech recognition, and autonomous vehicles.\n\n         Q: Is Deep Learning a field that requires a lot of mathematical knowledge?\n         A: While some mathematical knowledge is helpful, it is not necessary to have a deep understanding of mathematics to work with Deep Learning. Many Deep Learning libraries and frameworks provide pre-built functions and tools that can be used to implement Deep Learning models.",
+  "prompt": "What is Deep Learning?"
 }
 ```
 
@@ -345,41 +337,42 @@ then we consider the vLLM service to be successfully launched
 ### 3. Validate the MegaService
 
 ```bash
-DATA='messages=Water is an inorganic compound with the chemical formula H2O. It is a transparent, '\
-'tasteless, odorless,[c] and nearly colorless chemical substance. It is the main constituent of Earths '\
-'hydrosphere and the fluids of all known living organisms (in which it acts as a solvent[20]). '\
-'It is vital for all known forms of life, despite not providing food energy or organic micronutrients. '\
-'Its chemical formula, H2O, indicates that each of its molecules contains one oxygen and two hydrogen atoms, '\
-'connected by covalent bonds. The hydrogen atoms are attached to the oxygen atom at an angle of 104.45 '\
-'In liquid form, H2O is also called water at standard temperature and pressure.'
-
-curl http://${HOST_IP}:${DOCSUM_BACKEND_SERVER_PORT}/v1/docsum \
+curl http://${HOST_IP}:${FAQGEN_BACKEND_SERVER_PORT}/v1/docsum \
   -H "Content-Type: multipart/form-data" \
-  -F "type=text" \
-  -F "$DATA" \
-  -F "max_tokens=64" \
-  -F "language=en" \
-  -F "stream=True"
+  -F "messages=What is Deep Learning?" \
+  -F "max_tokens=100" \
+  -F "stream=False"
 ```
 
 Checking the response from the service. The response should be similar to text:
 
-```textmate
-.......
-data: {"ops":[{"op":"add","path":"/logs/HuggingFaceEndpoint/streamed_output_str/-","value":" and"},{"op":"add","path":"/logs/HuggingFaceEndpoint/streamed_output/-","value":" and"}]}
-data: {"ops":[{"op":"add","path":"/logs/HuggingFaceEndpoint/streamed_output_str/-","value":" two"},{"op":"add","path":"/logs/HuggingFaceEndpoint/streamed_output/-","value":" two"}]}
-data: {"ops":[{"op":"add","path":"/logs/HuggingFaceEndpoint/streamed_output_str/-","value":" hydro"},{"op":"add","path":"/logs/HuggingFaceEndpoint/streamed_output/-","value":" hydro"}]}
-data: {"ops":[{"op":"add","path":"/logs/HuggingFaceEndpoint/final_output","value":{"generations":[[{"text":" Water is an essential inorganic compound with the chemical formula H2O, serving as the primary component of Earth's hydrosphere and living organisms. It is vital for all life forms, despite not providing food energy or micronutrients. Its molecules consist of one oxygen atom and two hydro","generation_info":null,"type":"Generation"}]],"llm_output":null,"run":null,"type":"LLMResult"}},{"op":"add","path":"/logs/HuggingFaceEndpoint/end_time","value":"2025-03-21T05:17:58.700+00:00"}]}
-data: {"ops":[{"op":"add","path":"/logs/LLMChain/final_output","value":{"text":" Water is an essential inorganic compound with the chemical formula H2O, serving as the primary component of Earth's hydrosphere and living organisms. It is vital for all life forms, despite not providing food energy or micronutrients. Its molecules consist of one oxygen atom and two hydro"}},{"op":"add","path":"/logs/LLMChain/end_time","value":"2025-03-21T05:17:58.700+00:00"}]}
-data: {"ops":[{"op":"add","path":"/streamed_output/-","value":{"input_documents":[{"id":null,"metadata":{},"page_content":"Water is an inorganic compound with the chemical formula H2O. It is a transparent, tasteless, odorless,[c] and nearly colorless chemical substance. It is the main constituent of Earths hydrosphere and the fluids of all known living organisms (in which it acts as a solvent[20]). It is vital for all known forms of life, despite not providing food energy or organic micronutrients. Its chemical formula, H2O, indicates that each of its molecules contains one oxygen and two hydrogen atoms, connected by covalent bonds. The hydrogen atoms are attached to the oxygen atom at an angle of 104.45 In liquid form, H2O is also called water at standard temperature and pressure.","type":"Document"}],"output_text":" Water is an essential inorganic compound with the chemical formula H2O, serving as the primary component of Earth's hydrosphere and living organisms. It is vital for all life forms, despite not providing food energy or micronutrients. Its molecules consist of one oxygen atom and two hydro"}},{"op":"replace","path":"/final_output","value":{"input_documents":[{"id":null,"metadata":{},"page_content":"Water is an inorganic compound with the chemical formula H2O. It is a transparent, tasteless, odorless,[c] and nearly colorless chemical substance. It is the main constituent of Earths hydrosphere and the fluids of all known living organisms (in which it acts as a solvent[20]). It is vital for all known forms of life, despite not providing food energy or organic micronutrients. Its chemical formula, H2O, indicates that each of its molecules contains one oxygen and two hydrogen atoms, connected by covalent bonds. The hydrogen atoms are attached to the oxygen atom at an angle of 104.45 In liquid form, H2O is also called water at standard temperature and pressure.","type":"Document"}],"output_text":" Water is an essential inorganic compound with the chemical formula H2O, serving as the primary component of Earth's hydrosphere and living organisms. It is vital for all life forms, despite not providing food energy or micronutrients. Its molecules consist of one oxygen atom and two hydro"}}]}
-data: [DONE]
+```json
+{
+  "id": "chatcmpl-tjwp8giP2vyvRRxnqzc3FU",
+  "object": "chat.completion",
+  "created": 1742386156,
+  "model": "docsum",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": " Q: What is Deep Learning?\n         A: Deep Learning is a subset of Machine Learning that involves the use of artificial neural networks to analyze and interpret data. It is called \"deep\" because it involves multiple layers of interconnected nodes or \"neurons\" that process and transform the data.\n\n         Q: What is the main difference between Deep Learning and Machine Learning?\n         A: The main difference between Deep Learning and Machine Learning is the complexity of the models used. Machine Learning models are typically simpler and"
+      },
+      "finish_reason": "stop",
+      "metadata": null
+    }
+  ],
+  "usage": { "prompt_tokens": 0, "total_tokens": 0, "completion_tokens": 0 }
+}
 ```
 
-If the service response contains the output_text field in the last JSON, and it contains a meaningful summarized value, then we consider the service verification successful.
+If the service response has a meaningful response in the value of the "choices.message.content" key,
+then we consider the MegaService to be successfully launched
 
 ### 4. Validate the Frontend (UI)
 
-To access the UI, use the URL - http://${EXTERNAL_HOST_IP}:${DOCSUM_FRONTEND_PORT}
+To access the UI, use the URL - http://${EXTERNAL_HOST_IP}:${FAGGEN_UI_PORT}
 A page should open when you click through to this address:
 
 ![UI start page](../../../../assets/img/ui-starting-page.png)
@@ -388,7 +381,7 @@ If a page of this type has opened, then we believe that the service is running a
 and we can proceed to functional UI testing.
 
 For example, let's take the description of water from the Wiki.
-Copy the first few paragraphs from the Wiki and put them in the text field and then click Generate Summary.
+Copy the first few paragraphs from the Wiki and put them in the text field and then click Generate FAQs.
 After that, a page with the result of the task should open:
 
 ![UI result page](../../../../assets/img/ui-result-page.png)

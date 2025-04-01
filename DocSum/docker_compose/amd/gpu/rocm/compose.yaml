@@ -15,11 +15,6 @@ services:
       HUGGINGFACEHUB_API_TOKEN: ${DOCSUM_HUGGINGFACEHUB_API_TOKEN}
       host_ip: ${host_ip}
       DOCSUM_TGI_SERVICE_PORT: ${DOCSUM_TGI_SERVICE_PORT}
-    healthcheck:
-      test: [ "CMD-SHELL", "curl -f http://${HOST_IP}:${DOCSUM_TGI_SERVICE_PORT}/health || exit 1" ]
-      interval: 10s
-      timeout: 10s
-      retries: 100
     volumes:
       - "${MODEL_CACHE:-./data}:/data"
     shm_size: 1g
@@ -33,7 +28,12 @@ services:
     security_opt:
       - seccomp:unconfined
     ipc: host
-    command: --model-id ${DOCSUM_LLM_MODEL_ID} --max-input-length ${DOCSUM_MAX_INPUT_TOKENS} --max-total-tokens ${DOCSUM_MAX_TOTAL_TOKENS}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://${host_ip}:${DOCSUM_TGI_SERVICE_PORT}/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 100
+    command: --model-id ${DOCSUM_LLM_MODEL_ID} --max-input-length ${MAX_INPUT_TOKENS} --max-total-tokens ${MAX_TOTAL_TOKENS}
 
   docsum-llm-server:
     image: ${REGISTRY:-opea}/llm-docsum:${TAG:-latest}
@@ -95,7 +95,7 @@ services:
     depends_on:
       - docsum-backend-server
     ports:
-      - "${DOCSUM_FRONTEND_PORT:-5173}:5173"
+      - "5173:5173"
     environment:
       no_proxy: ${no_proxy}
       https_proxy: ${https_proxy}
