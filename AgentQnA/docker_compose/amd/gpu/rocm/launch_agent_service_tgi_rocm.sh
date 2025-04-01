@@ -13,7 +13,6 @@ export ip_address=${host_ip}
 # Set services IP ports
 export TGI_SERVICE_PORT="18110"
 export WORKER_RAG_AGENT_PORT="18111"
-export WORKER_SQL_AGENT_PORT="18112"
 export SUPERVISOR_REACT_AGENT_PORT="18113"
 export CRAG_SERVER_PORT="18114"
 
