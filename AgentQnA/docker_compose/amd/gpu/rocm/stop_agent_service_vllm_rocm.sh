@@ -74,11 +74,11 @@ if [ -d "chinook-database" ]; then
 fi
 echo "Chinook data removed!"
 
-echo "Stoping CRAG server"
+echo "Stopping CRAG server"
 docker rm kdd-cup-24-crag-service --force
 
-echo "Stoping Agent services"
+echo "Stopping Agent services"
 docker compose -f compose_vllm.yaml down
 
-echo "Stoping Retrieval services"
+echo "Stopping Retrieval services"
 docker compose -f ../../../../../DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml down
