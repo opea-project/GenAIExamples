@@ -12,7 +12,7 @@ export AGENTQNA_CARD_ID="card1"
 export AGENTQNA_RENDER_ID="renderD136"
 export HF_CACHE_DIR=${HF_CACHE_DIR}
 ls $HF_CACHE_DIR
-export LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
+export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
 #export NUM_SHARDS=4
 export LLM_ENDPOINT_URL="http://${ip_address}:${AGENTQNA_TGI_SERVICE_PORT}"
 export temperature=0.01
