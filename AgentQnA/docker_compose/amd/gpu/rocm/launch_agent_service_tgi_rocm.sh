@@ -20,7 +20,7 @@ export max_new_tokens=512
 
 # agent related environment variables
 export AGENTQNA_WORKER_AGENT_SERVICE_PORT="9095"
-export TOOLSET_PATH=/home/huggingface/datamonsters/amd-opea/GenAIExamples/AgentQnA/tools/
+export TOOLSET_PATH=$WORKPATH/tools/
 echo "TOOLSET_PATH=${TOOLSET_PATH}"
 export recursion_limit_worker=12
 export recursion_limit_supervisor=10
