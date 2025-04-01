@@ -55,7 +55,7 @@ function start_services() {
     export CHATQNA_BACKEND_PORT=8888
     export CHATQNA_REDIS_VECTOR_PORT=6377
     export CHATQNA_REDIS_VECTOR_INSIGHT_PORT=8006
-    export CHATQNA_FRONTEND_SERVICE_PORT=5173
+    export CHATQNA_FRONTEND_SERVICE_PORT=5175
     export NGINX_PORT=80
     export FAQGen_COMPONENT_NAME="OpeaFaqGenvLLM"
     export LLM_ENDPOINT="http://${host_ip}:${LLM_ENDPOINT_PORT}"
