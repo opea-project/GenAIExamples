@@ -31,7 +31,7 @@ function build_docker_images() {
     service_list="text2sql text2sql-react-ui"
 
     docker compose -f build.yaml build ${service_list} --no-cache > "${LOG_PATH}"/docker_image_build.log
-    docker pull ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
+    docker pull ghcr.io/huggingface/text-generation-inference:2.4.1-rocm
     docker images && sleep 1s
 }
 

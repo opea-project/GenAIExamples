@@ -4,7 +4,7 @@
 
 services:
   codetrans-tgi-service:
-    image: ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
+    image: ghcr.io/huggingface/text-generation-inference:2.4.1-rocm
     container_name: codetrans-tgi-service
     ports:
       - "${CODETRANS_TGI_SERVICE_PORT:-8008}:80"

@@ -3,7 +3,7 @@
 
 services:
   docsum-tgi-service:
-    image: ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
+    image: ghcr.io/huggingface/text-generation-inference:2.4.1-rocm
     container_name: docsum-tgi-service
     ports:
       - "${DOCSUM_TGI_SERVICE_PORT}:80"

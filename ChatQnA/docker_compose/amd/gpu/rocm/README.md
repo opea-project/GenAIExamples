@@ -190,7 +190,7 @@ Change the `xxx_MODEL_ID` below for your needs.
    # Example: NGINX_PORT=80
    export HOST_IP=${host_ip}
    export NGINX_PORT=${your_nginx_port}
-   export CHATQNA_TGI_SERVICE_IMAGE="ghcr.io/huggingface/text-generation-inference:2.3.1-rocm"
+   export CHATQNA_TGI_SERVICE_IMAGE="ghcr.io/huggingface/text-generation-inference:2.4.1-rocm"
    export CHATQNA_EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
    export CHATQNA_RERANK_MODEL_ID="BAAI/bge-reranker-base"
    export CHATQNA_LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
