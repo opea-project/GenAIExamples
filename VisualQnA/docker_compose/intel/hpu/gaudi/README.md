@@ -32,7 +32,7 @@ rm -rf vllm-fork
 ```bash
 # TGI (Optional)
 
-docker pull ghcr.io/huggingface/tgi-gaudi:2.0.6
+docker pull ghcr.io/huggingface/tgi-gaudi:2.3.1
 ```
 
 ### 3. Build MegaService Docker Image
@@ -58,7 +58,7 @@ docker build --no-cache -t opea/visualqna-ui:latest --build-arg https_proxy=$htt
 Then run the command `docker images`, you will have the following 5 Docker Images:
 
 1. `opea/vllm-gaudi:latest`
-2. `ghcr.io/huggingface/tgi-gaudi:2.0.6` (Optional)
+2. `ghcr.io/huggingface/tgi-gaudi:2.3.1` (Optional)
 3. `opea/lvm:latest`
 4. `opea/visualqna:latest`
 5. `opea/visualqna-ui:latest`
