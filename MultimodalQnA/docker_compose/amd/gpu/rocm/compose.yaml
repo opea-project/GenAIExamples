@@ -93,7 +93,7 @@ services:
       RETRIEVER_COMPONENT_NAME: "OPEA_RETRIEVER_REDIS"
     restart: unless-stopped
   tgi-rocm:
-    image: ghcr.io/huggingface/text-generation-inference:3.0.1-rocm
+    image: ghcr.io/huggingface/text-generation-inference:2.4.1-rocm
     container_name: tgi-llava-rocm-server
     ports:
       - "8399:80"
