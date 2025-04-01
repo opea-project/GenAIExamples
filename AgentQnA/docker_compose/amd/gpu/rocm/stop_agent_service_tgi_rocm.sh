@@ -44,3 +44,13 @@ export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8889/v1/retrievaltool"
 export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/ingest"
 export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/get"
 export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/delete"
+
+echo "Removing chinook data..."
+echo Y | rm -R chinook-database
+if [ -d "chinook-database" ]; then
+    rm -rf chinook-database
+fi
+echo "Chinook data removed!"
+
+docker compose -f compose.yaml down
+docker compose -f ../../../../../DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml down
