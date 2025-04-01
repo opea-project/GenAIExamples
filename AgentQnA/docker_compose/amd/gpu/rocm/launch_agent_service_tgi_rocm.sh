@@ -67,7 +67,7 @@ echo Y | rm -R ../../../../../AgentQnA/tests/Chinook_Sqlite.sqlite
 cp chinook-database/ChinookDatabase/DataSources/Chinook_Sqlite.sqlite ../../../../../AgentQnA/tests
 
 docker compose -f ../../../../../DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml up -d
-docker compose -f compose_vllm.yaml up -d
+docker compose -f compose.yaml up -d
 
 n=0
 until [[ "$n" -ge 100 ]]; do
