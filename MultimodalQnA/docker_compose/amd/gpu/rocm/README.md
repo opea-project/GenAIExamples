@@ -116,8 +116,10 @@ After launching your instance, you can connect to it using SSH (for Linux instan
     - opea/embedding:latest
     - opea/embedding-multimodal-bridgetower:latest
     - opea/retriever:latest
-    - opea/whisper:latest    
+    - opea/whisper:latest
+
 ---
+
 ## Deploy the MultimodalQnA Application
 
 ### Docker Compose Configuration for AMD GPUs
@@ -214,7 +216,6 @@ Set the values of the variables:
 - **Variables with names like "**\*\*\*\*\*\*\_PORT"\*\* - These variables set the IP port numbers for establishing network connections to the application services.
   The values shown in the file set_env.sh or set_env_vllm they are the values used for the development and testing of the application, as well as configured for the environment in which the development is performed. These values must be configured in accordance with the rules of network access to your environment's server, and must not overlap with the IP ports of other applications that are already in use.
 
-  
 #### Required Models
 
 By default, the multimodal-embedding and LVM models are set to a default value as listed below:
@@ -262,30 +263,31 @@ All containers should be running and should not restart:
 ##### If you use vLLM:
 
 - multimodalqna-vllm-service
-- multimodalqna-lvm 
+- multimodalqna-lvm
 - multimodalqna-backend-server
 - multimodalqna-gradio-ui-server
 - whisper-service
-- embedding-multimodal-bridgetower 
+- embedding-multimodal-bridgetower
 - redis-vector-db
 - embedding
-- retriever-redis 
+- retriever-redis
 - dataprep-multimodal-redis
 
 ##### If you use TGI:
 
 - tgi-llava-rocm-server
-- multimodalqna-lvm 
+- multimodalqna-lvm
 - multimodalqna-backend-server
 - multimodalqna-gradio-ui-server
 - whisper-service
-- embedding-multimodal-bridgetower 
+- embedding-multimodal-bridgetower
 - redis-vector-db
 - embedding
-- retriever-redis 
+- retriever-redis
 - dataprep-multimodal-redis
 
 ---
+
 ## Validate the Services
 
 ### 1. Validate the vLLM/TGI Service
@@ -304,9 +306,9 @@ curl http://${HOST_IP}:${MULTIMODALQNA_VLLM_SERVICE_PORT}/v1/chat/completions \
 
 Checking the response from the service. The response should be similar to JSON:
 
-````json
+```json
 
-````
+```
 
 If the service response has a meaningful response in the value of the "choices.message.content" key,
 then we consider the vLLM service to be successfully launched
@@ -325,9 +327,9 @@ curl http://${HOST_IP}:${MULTIMODALQNA_TGI_SERVICE_PORT}/generate \
 
 Checking the response from the service. The response should be similar to JSON:
 
-````json
+```json
 
-````
+```
 
 If the service response has a meaningful response in the value of the "generated_text" key,
 then we consider the TGI service to be successfully launched
@@ -347,9 +349,9 @@ curl http://${HOST_IP}:${MULTIMODALQNA_LLM_SERVICE_PORT}/v1/chat/completions \
 
 Checking the response from the service. The response should be similar to JSON:
 
-````json
+```json
 
-````
+```
 
 If the service response has a meaningful response in the value of the "choices.text" key,
 then we consider the vLLM service to be successfully launched
@@ -369,6 +371,7 @@ curl http://${HOST_IP}:${MULTIMODALQNA_BACKEND_SERVICE_PORT}/v1/multimodalqna \
 Checking the response from the service. The response should be similar to text:
 
 ```textmate
+
 ```
 
 If the output lines in the "choices.text" keys contain words (tokens) containing meaning, then the service is considered launched successfully.
@@ -386,6 +389,7 @@ curl http://${host_ip}:7066/v1/asr \
 Checking the response from the service. The response should be similar to text:
 
 ```textmate
+
 ```
 
 ### 4. Validate the Frontend (UI)
@@ -413,4 +417,3 @@ docker compose -f compose_vllm.yaml down
 cd ~/multimodalqna-install/GenAIExamples/MultimodalQnA/docker_compose/amd/gpu/rocm
 docker compose -f compose.yaml down
 ```
-
