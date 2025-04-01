@@ -1,4 +1,5 @@
 # Copyright (C) 2024 Intel Corporation
+# Copyright (c) 2024 Advanced Micro Devices, Inc.
 # SPDX-License-Identifier: Apache-2.0
 
 services:
@@ -15,9 +16,9 @@ services:
       https_proxy: ${https_proxy}
       HUGGING_FACE_HUB_TOKEN: ${CODEGEN_HUGGINGFACEHUB_API_TOKEN}
       HUGGINGFACEHUB_API_TOKEN: ${CODEGEN_HUGGINGFACEHUB_API_TOKEN}
-      host_ip: ${host_ip}
+      host_ip: ${HOST_IP}
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://$host_ip:${CODEGEN_TGI_SERVICE_PORT:-8028}/health || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://${HOST_IP}:${CODEGEN_TGI_SERVICE_PORT:-8028}/health || exit 1"]
       interval: 10s
       timeout: 10s
       retries: 100
@@ -46,9 +47,11 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      LLM_ENDPOINT: "http://codegen-tgi-service"
+      LLM_ENDPOINT: ${CODEGEN_TGI_LLM_ENDPOINT}
       LLM_MODEL_ID: ${CODEGEN_LLM_MODEL_ID}
       HUGGINGFACEHUB_API_TOKEN: ${CODEGEN_HUGGINGFACEHUB_API_TOKEN}
+      HF_TOKEN: ${CODEGEN_HUGGINGFACEHUB_API_TOKEN}
+      LLM_COMPONENT_NAME: "OpeaTextGenService"
     restart: unless-stopped
   codegen-backend-server:
     image: ${REGISTRY:-opea}/codegen:${TAG:-latest}
@@ -62,7 +65,8 @@ services:
       https_proxy: ${https_proxy}
       http_proxy: ${http_proxy}
       MEGA_SERVICE_HOST_IP: ${CODEGEN_MEGA_SERVICE_HOST_IP}
-      LLM_SERVICE_HOST_IP: "codegen-llm-server"
+      LLM_SERVICE_HOST_IP: ${HOST_IP}
+      LLM_SERVICE_PORT: ${CODEGEN_LLM_SERVICE_PORT}
     ipc: host
     restart: always
   codegen-ui-server:

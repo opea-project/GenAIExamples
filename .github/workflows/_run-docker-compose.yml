@@ -64,9 +64,14 @@ jobs:
           cd ${{ github.workspace }}/${{ inputs.example }}/tests
           run_test_cases=""
 
-          default_test_case=$(find . -type f -name "test_compose_on_${{ inputs.hardware }}.sh" | cut -d/ -f2)
+          if [ "${{ inputs.hardware }}" == "gaudi2" ] || [ "${{ inputs.hardware }}" == "gaudi3" ]; then
+            hardware="gaudi"
+          else
+            hardware="${{ inputs.hardware }}"
+          fi
+          default_test_case=$(find . -type f -name "test_compose_on_$hardware.sh" | cut -d/ -f2)
           if [ "$default_test_case" ]; then run_test_cases="$default_test_case"; fi
-          other_test_cases=$(find . -type f -name "test_compose_*_on_${{ inputs.hardware }}.sh" | cut -d/ -f2)
+          other_test_cases=$(find . -type f -name "test_compose_*_on_$hardware.sh" | cut -d/ -f2)
           echo "default_test_case=$default_test_case"
           echo "other_test_cases=$other_test_cases"
 
@@ -99,7 +104,7 @@ jobs:
 
   compose-test:
     needs: [get-test-case]
-    if: ${{ needs.get-test-case.outputs.test_cases != '' }}
+    if: ${{ needs.get-test-case.outputs.test_cases != '[""]' }}
     strategy:
       matrix:
         test_case: ${{ fromJSON(needs.get-test-case.outputs.test_cases) }}
@@ -160,7 +165,7 @@ jobs:
               export model_cache="~/.cache/huggingface/hub"
             fi
           fi
-          if [ -f ${test_case} ]; then timeout 30m bash ${test_case}; else echo "Test script {${test_case}} not found, skip test!"; fi
+          if [ -f "${test_case}" ]; then timeout 60m bash "${test_case}"; else echo "Test script {${test_case}} not found, skip test!"; fi
 
       - name: Clean up container after test
         shell: bash

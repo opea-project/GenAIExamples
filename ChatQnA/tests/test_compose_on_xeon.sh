@@ -9,6 +9,7 @@ echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
 echo "TAG=IMAGE_TAG=${IMAGE_TAG}"
 export REGISTRY=${IMAGE_REPO}
 export TAG=${IMAGE_TAG}
+export MODEL_CACHE=${model_cache:-"./data"}
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
@@ -40,7 +41,7 @@ function build_docker_images() {
     service_list="chatqna chatqna-ui dataprep retriever vllm nginx"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
-    docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+    docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.6
 
     docker images && sleep 1s
 }

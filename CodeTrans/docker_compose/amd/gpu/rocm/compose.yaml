@@ -1,4 +1,5 @@
 # Copyright (C) 2024 Intel Corporation
+# Copyright (c) 2024 Advanced Micro Devices, Inc.
 # SPDX-License-Identifier: Apache-2.0
 
 services:
@@ -19,7 +20,7 @@ services:
       HUGGINGFACEHUB_API_TOKEN: ${CODEGEN_HUGGINGFACEHUB_API_TOKEN}
       host_ip: ${host_ip}
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://$host_ip:8008/health || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://${HOST_IP}:${CODETRANS_TGI_SERVICE_PORT}/health || exit 1"]
       interval: 10s
       timeout: 10s
       retries: 100

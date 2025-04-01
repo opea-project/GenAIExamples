@@ -2,47 +2,42 @@
 # SPDX-License-Identifier: Apache-2.0
 
 services:
-  tgi-gaudi-server:
-    image: ghcr.io/huggingface/tgi-gaudi:2.3.1
-    container_name: tgi-gaudi-server
+  vllm-service:
+    image: ${REGISTRY:-opea}/vllm-gaudi:${TAG:-latest}
+    container_name: docsum-gaudi-vllm-service
     ports:
-      - ${LLM_ENDPOINT_PORT:-8008}:80
+      - "8008:80"
     volumes:
-      - "${DATA_PATH:-./data}:/data"
+      - "${MODEL_CACHE:-./data}:/root/.cache/huggingface/hub"
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      HUGGING_FACE_HUB_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
-      HF_HUB_DISABLE_PROGRESS_BARS: 1
-      HF_HUB_ENABLE_HF_TRANSFER: 0
+      HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       HABANA_VISIBLE_DEVICES: all
       OMPI_MCA_btl_vader_single_copy_mechanism: none
-      ENABLE_HPU_GRAPH: true
-      LIMIT_HPU_GRAPH: true
-      USE_FLASH_ATTENTION: true
-      FLASH_ATTENTION_RECOMPUTE: true
-      host_ip: ${host_ip}
-      LLM_ENDPOINT_PORT: ${LLM_ENDPOINT_PORT}
+      LLM_MODEL_ID: ${LLM_MODEL_ID}
+      NUM_CARDS: ${NUM_CARDS}
+      VLLM_TORCH_PROFILER_DIR: "/mnt"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:80/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 100
     runtime: habana
     cap_add:
       - SYS_NICE
     ipc: host
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://${host_ip}:${LLM_ENDPOINT_PORT}/health || exit 1"]
-      interval: 10s
-      timeout: 10s
-      retries: 100
-    command: --model-id ${LLM_MODEL_ID} --max-input-length ${MAX_INPUT_TOKENS} --max-total-tokens ${MAX_TOTAL_TOKENS}
+    command: --model $LLM_MODEL_ID --tensor-parallel-size ${NUM_CARDS} --host 0.0.0.0 --port 80 --block-size ${BLOCK_SIZE} --max-num-seqs ${MAX_NUM_SEQS} --max-seq_len-to-capture ${MAX_SEQ_LEN_TO_CAPTURE}
 
-  llm-docsum-tgi:
+  llm-docsum-vllm:
     image: ${REGISTRY:-opea}/llm-docsum:${TAG:-latest}
-    container_name: llm-docsum-gaudi-server
+    container_name: docsum-gaudi-llm-server
     depends_on:
-      tgi-gaudi-server:
+      vllm-service:
         condition: service_healthy
     ports:
-      - ${DOCSUM_PORT:-9000}:9000
+      - ${LLM_PORT:-9000}:9000
     ipc: host
     environment:
       no_proxy: ${no_proxy}
@@ -59,7 +54,7 @@ services:
 
   whisper:
     image: ${REGISTRY:-opea}/whisper:${TAG:-latest}
-    container_name: whisper-server
+    container_name: docsum-gaudi-whisper-server
     ports:
       - "7066:7066"
     ipc: host
@@ -78,10 +73,10 @@ services:
     image: ${REGISTRY:-opea}/docsum:${TAG:-latest}
     container_name: docsum-gaudi-backend-server
     depends_on:
-      - tgi-gaudi-server
-      - llm-docsum-tgi
+      - vllm-service
+      - llm-docsum-vllm
     ports:
-      - "8888:8888"
+      - "${BACKEND_SERVICE_PORT:-8888}:8888"
     environment:
       - no_proxy=${no_proxy}
       - https_proxy=${https_proxy}
@@ -99,7 +94,7 @@ services:
     depends_on:
       - docsum-gaudi-backend-server
     ports:
-      - "5173:5173"
+      - "${FRONTEND_SERVICE_PORT:-5173}:5173"
     environment:
       - no_proxy=${no_proxy}
       - https_proxy=${https_proxy}
