@@ -15,7 +15,7 @@ export MAX_INPUT_TOKENS=1024
 export MAX_TOTAL_TOKENS=2048
 export REGISTRY=${IMAGE_REPO}
 export TAG=${IMAGE_TAG}
-export DOCSUM_TGI_IMAGE="ghcr.io/huggingface/text-generation-inference:2.3.1-rocm"
+export DOCSUM_TGI_IMAGE="ghcr.io/huggingface/text-generation-inference:2.4.1-rocm"
 export DOCSUM_LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
 export HOST_IP=${ip_address}
 export host_ip=${ip_address}
@@ -45,7 +45,7 @@ function build_docker_images() {
     service_list="docsum docsum-gradio-ui whisper llm-docsum"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
-    docker pull ghcr.io/huggingface/text-generation-inference:1.4
+    docker pull ghcr.io/huggingface/text-generation-inference:2.4.1
     docker images && sleep 1s
 }
 
