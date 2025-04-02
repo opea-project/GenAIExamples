@@ -53,4 +53,4 @@ export MEGA_SERVICE_PORT=8888
 export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:${MEGA_SERVICE_PORT}/v1/multimodalqna"
 
 export UI_PORT=5173
-export UI_TIMEOUT=200
+export UI_TIMEOUT=240
