@@ -72,6 +72,7 @@ function setup_env() {
     export DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT="http://${HOST_IP}:6007/v1/dataprep/generate_captions"
     export DATAPREP_GET_FILE_ENDPOINT="http://${HOST_IP}:6007/v1/dataprep/get"
     export DATAPREP_DELETE_FILE_ENDPOINT="http://${HOST_IP}:6007/v1/dataprep/delete"
+    export MODEL_CACHE="/var/opea/multimodalqna-service/data"
 }
 
 function start_services() {
