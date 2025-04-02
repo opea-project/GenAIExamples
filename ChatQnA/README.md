@@ -20,7 +20,7 @@ To deploy to existing Xeon Ubuntu based system, use our Intel Optimized Cloud Mo
 Use this if you are not using Terraform and have provisioned your system with another tool or manually including bare metal.
 
 | Operating System | Intel Optimized Cloud Module for Ansible                                                                          |
-|------------------|-------------------------------------------------------------------------------------------------------------------|
+| ---------------- | ----------------------------------------------------------------------------------------------------------------- |
 | Ubuntu 20.04     | [ChatQnA Ansible Module](https://github.com/intel/optimized-cloud-recipes/tree/main/recipes/ai-opea-chatqna-xeon) |
 | Ubuntu 22.04     | Work-in-progress                                                                                                  |
 
@@ -215,7 +215,7 @@ In the below, we provide a table that describes for each microservice component 
 Gaudi default compose.yaml
 
 | MicroService | Open Source Project | HW    | Port | Endpoint             |
-|--------------|---------------------|-------|------|----------------------|
+| ------------ | ------------------- | ----- | ---- | -------------------- |
 | Embedding    | Langchain           | Xeon  | 6000 | /v1/embeddings       |
 | Retriever    | Langchain, Redis    | Xeon  | 7000 | /v1/retrieval        |
 | Reranking    | Langchain, TEI      | Gaudi | 8000 | /v1/reranking        |
