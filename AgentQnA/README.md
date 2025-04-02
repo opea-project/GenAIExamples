@@ -142,7 +142,7 @@ source $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/hpu/gaudi/set_env.sh
 source $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/cpu/xeon/set_env.sh
 ```
 
-### 3. Launch the multi-agent system. </br>
+### 2. Launch the multi-agent system. </br>
 
 Two options are provided for the `llm_engine` of the agents: 1. open-source LLMs on Gaudi, 2. OpenAI models via API calls.
 
@@ -162,10 +162,10 @@ docker compose -f $WORKDIR/GenAIExamples/DocIndexRetriever/docker_compose/intel/
 To enable Open Telemetry Tracing, compose.telemetry.yaml file need to be merged along with default compose.yaml file.
 Gaudi example with Open Telemetry feature:
 
-````bash
+```bash
 cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/hpu/gaudi/
 docker compose -f $WORKDIR/GenAIExamples/DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml -f compose.yaml -f compose.telemetry.yaml up -d
-``
+```
 
 ##### [Optional] Web Search Tool Support
 
@@ -179,7 +179,7 @@ cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/hpu/gaudi/
 export GOOGLE_CSE_ID="YOUR_ID"
 export GOOGLE_API_KEY="YOUR_API_KEY"
 docker compose -f $WORKDIR/GenAIExamples/DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml -f compose.yaml -f compose.webtool.yaml up -d
-````
+```
 
 </details>
 
@@ -195,7 +195,7 @@ cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/cpu/xeon
 docker compose -f $WORKDIR/GenAIExamples/DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml -f compose_openai.yaml up -d
 ```
 
-### 4. Ingest Data into the vector database
+### 3. Ingest Data into the vector database
 
 The `run_ingest_data.sh` script will use an example jsonl file to ingest example documents into a vector database. Other ways to ingest data and other types of documents supported can be found in the OPEA dataprep microservice located in the opea-project/GenAIComps repo.
 
