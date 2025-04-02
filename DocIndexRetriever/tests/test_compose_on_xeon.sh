@@ -24,7 +24,7 @@ function build_docker_images() {
     service_list="dataprep embedding retriever reranking doc-index-retriever"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
-    docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+    docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.6
     docker pull redis/redis-stack:7.2.0-v9
     docker images && sleep 1s
 

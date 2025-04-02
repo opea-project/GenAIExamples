@@ -42,7 +42,7 @@ def align_outputs(self, data, cur_node, inputs, runtime_graph, llm_parameters_di
         next_data = {
             "input": inputs["input"],
             "messages": inputs["input"],
-            "embedding": data,  # [item["embedding"] for item in data["data"]],
+            "embedding": [item["embedding"] for item in data["data"]],
             "k": kwargs["k"] if "k" in kwargs else 4,
             "search_type": kwargs["search_type"] if "search_type" in kwargs else "similarity",
             "distance_threshold": kwargs["distance_threshold"] if "distance_threshold" in kwargs else None,

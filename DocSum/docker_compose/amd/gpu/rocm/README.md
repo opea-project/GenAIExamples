@@ -72,7 +72,7 @@ For gated models, you also need to provide [HuggingFace token](https://huggingfa
 Since the `compose.yaml` will consume some environment variables, you need to setup them in advance as below.
 
 ```bash
-export DOCSUM_TGI_IMAGE="ghcr.io/huggingface/text-generation-inference:2.3.1-rocm"
+export DOCSUM_TGI_IMAGE="ghcr.io/huggingface/text-generation-inference:2.4.1-rocm"
 export DOCSUM_LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
 export HOST_IP=${host_ip}
 export DOCSUM_TGI_SERVICE_PORT="18882"

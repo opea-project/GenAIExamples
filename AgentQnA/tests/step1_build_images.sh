@@ -22,7 +22,7 @@ function build_docker_images_for_retrieval_tool(){
     echo "Build all the images with --no-cache..."
     service_list="doc-index-retriever dataprep embedding retriever reranking"
     docker compose -f build.yaml build ${service_list} --no-cache
-    docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+    docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.6
 
     docker images && sleep 1s
 }

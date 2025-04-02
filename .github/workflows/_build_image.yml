@@ -1,0 +1,103 @@
+# Copyright (C) 2025 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+name: Build Images
+permissions: read-all
+on:
+  workflow_call:
+    inputs:
+      node:
+        required: true
+        type: string
+      build:
+        default: true
+        required: false
+        type: boolean
+      example:
+        required: true
+        type: string
+      services:
+        default: ""
+        required: false
+        type: string
+      tag:
+        default: "latest"
+        required: false
+        type: string
+      opea_branch:
+        default: "main"
+        required: false
+        type: string
+      inject_commit:
+        default: false
+        required: false
+        type: boolean
+
+jobs:
+  pre-build-image-check:
+    runs-on: ubuntu-latest
+    outputs:
+      should_skip: ${{ steps.check-skip.outputs.should_skip }}
+    steps:
+      - name: Check if job should be skipped
+        id: check-skip
+        run: |
+          should_skip=false
+          if [[ "${{ inputs.node }}" == "gaudi3" || "${{ inputs.node }}" == "rocm" || "${{ inputs.node }}" == "arc" ]]; then
+            should_skip=true
+          fi
+          echo "should_skip=$should_skip"
+          echo "should_skip=$should_skip" >> $GITHUB_OUTPUT
+
+  build-images:
+    needs: [ pre-build-image-check ]
+    if: ${{ needs.pre-build-image-check.outputs.should_skip == 'false' && fromJSON(inputs.build) }}
+    runs-on: "docker-build-${{ inputs.node }}"
+    steps:
+      - name: Clean Up Working Directory
+        run: sudo rm -rf ${{github.workspace}}/*
+
+      - name: Get Checkout Ref
+        run: |
+          if [ "${{ github.event_name }}" == "pull_request" ] || [ "${{ github.event_name }}" == "pull_request_target" ]; then
+            echo "CHECKOUT_REF=refs/pull/${{ github.event.number }}/merge" >> $GITHUB_ENV
+          else
+            echo "CHECKOUT_REF=${{ github.ref }}" >> $GITHUB_ENV
+          fi
+
+      - name: Checkout out GenAIExamples
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.CHECKOUT_REF }}
+          fetch-depth: 0
+
+      - name: Clone Required Repo
+        run: |
+          cd ${{ github.workspace }}/${{ inputs.example }}/docker_image_build
+          docker_compose_path=${{ github.workspace }}/${{ inputs.example }}/docker_image_build/build.yaml
+          if [[ $(grep -c "vllm:" ${docker_compose_path}) != 0 ]]; then
+              git clone https://github.com/vllm-project/vllm.git && cd vllm
+              # Get the latest tag
+              VLLM_VER=$(git describe --tags "$(git rev-list --tags --max-count=1)")
+              echo "Check out vLLM tag ${VLLM_VER}"
+              git checkout ${VLLM_VER} &> /dev/null && cd ../
+          fi
+          if [[ $(grep -c "vllm-gaudi:" ${docker_compose_path}) != 0 ]]; then
+              git clone https://github.com/HabanaAI/vllm-fork.git && cd vllm-fork
+              # Get the latest tag
+              VLLM_VER=$(git describe --tags "$(git rev-list --tags --max-count=1)")
+              echo "Check out vLLM tag ${VLLM_VER}"
+              git checkout ${VLLM_VER} &> /dev/null && cd ../
+          fi
+          git clone --depth 1 --branch ${{ inputs.opea_branch }} https://github.com/opea-project/GenAIComps.git
+          cd GenAIComps && git rev-parse HEAD && cd ../
+
+      - name: Build Image
+        uses: opea-project/validation/actions/image-build@main
+        with:
+          work_dir: ${{ github.workspace }}/${{ inputs.example }}/docker_image_build
+          docker_compose_path: ${{ github.workspace }}/${{ inputs.example }}/docker_image_build/build.yaml
+          service_list: ${{ inputs.services }}
+          registry: ${OPEA_IMAGE_REPO}opea
+          inject_commit: ${{ inputs.inject_commit }}
+          tag: ${{ inputs.tag }}

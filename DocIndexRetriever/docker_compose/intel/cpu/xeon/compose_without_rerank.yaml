@@ -30,7 +30,7 @@ services:
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       LOGFLAG: ${LOGFLAG}
   tei-embedding-service:
-    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.6
     entrypoint: /bin/sh -c "apt-get update && apt-get install -y curl && text-embeddings-router --json-output --model-id ${EMBEDDING_MODEL_ID} --auto-truncate"
     container_name: tei-embedding-server
     ports:
@@ -99,7 +99,6 @@ services:
       no_proxy: ${no_proxy}
       https_proxy: ${https_proxy}
       http_proxy: ${http_proxy}
-      MEGA_SERVICE_HOST_IP: ${MEGA_SERVICE_HOST_IP:-0.0.0.0}
       EMBEDDING_SERVICE_HOST_IP: embedding
       EMBEDDING_SERVICE_PORT: ${EMBEDDING_SERVER_PORT:-6000}
       RETRIEVER_SERVICE_HOST_IP: retriever

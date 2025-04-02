@@ -1,25 +1,29 @@
-FROM python:3.11-slim
-
-RUN apt-get update -y && apt-get install -y --no-install-recommends --fix-missing \
-    libgl1-mesa-glx \
-    libjemalloc-dev 
-
+FROM node:20.18.1 AS vue-app
+ 
+RUN apt-get update -y && apt-get install -y git
+ 
 RUN useradd -m -s /bin/bash user && \
     mkdir -p /home/user && \
     chown -R user /home/user/
-
-COPY ./ui/gradio /home/user/ui
-COPY ./edgecraftrag /home/user/edgecraftrag
-
-RUN mkdir -p /home/user/gradio_cache 
-ENV GRADIO_TEMP_DIR=/home/user/gradio_cache
-
+ 
+COPY ./ui/vue /home/user/ui
+ 
+RUN mkdir -p /home/user/ui
+ENV UI_TMPFILE_PATH=/home/user/ui
+ 
 WORKDIR /home/user/ui
-RUN pip install --no-cache-dir --upgrade pip setuptools==70.0.0 && \
-    pip install --no-cache-dir -r requirements.txt
+ 
+RUN npm install
+ 
+RUN npm run build
 
-USER user
+FROM nginx:stable-alpine
 
-RUN echo 'ulimit -S -n 999999' >> ~/.bashrc
+COPY --from=vue-app home/user/ui/dist /usr/share/nginx/html
 
-ENTRYPOINT ["python", "ecragui.py"]
+COPY ./ui/vue/nginx.conf /etc/nginx/nginx.conf
+ 
+EXPOSE 8082
+ 
+CMD ["nginx", "-g", "daemon off;"]
+ 

@@ -80,7 +80,7 @@ services:
       - /:/rootfs:ro
       - /dev:/dev
     ports:
-      - 41611:41611
+      - 41612:41611
     restart: always
     deploy:
       mode: global

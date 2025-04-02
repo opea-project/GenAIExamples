@@ -2,26 +2,30 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-set -ex
+set -e
 
 WORKPATH=$(dirname "$PWD")
+export LOG_PATH=${WORKPATH}
 export WORKDIR=$WORKPATH/../../
 echo "WORKDIR=${WORKDIR}"
 export ip_address=$(hostname -I | awk '{print $1}')
-export TOOLSET_PATH=$WORKDIR/GenAIExamples/AgentQnA/tools/
-export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+export host_ip=${ip_address}
+export TOOLSET_PATH=$WORKPATH/tools/
 
-export HF_CACHE_DIR=${model_cache:-"$WORKDIR/hf_cache"}
+export HF_CACHE_DIR=$WORKPATH/data2/huggingface
 if [ ! -d "$HF_CACHE_DIR" ]; then
+    HF_CACHE_DIR=$WORKDIR/hf_cache
     mkdir -p "$HF_CACHE_DIR"
 fi
-ls $HF_CACHE_DIR
 
+function download_chinook_data(){
+    echo "Downloading chinook data..."
+    cd $WORKDIR
+    git clone https://github.com/lerocha/chinook-database.git
+    cp chinook-database/ChinookDatabase/DataSources/Chinook_Sqlite.sqlite ${WORKPATH}/tests/
+}
 
 function start_agent_and_api_server() {
-    echo "Starting CRAG server"
-    docker run -d --runtime=runc --name=kdd-cup-24-crag-service -p=8080:8000 docker.io/aicrowd/kdd-cup-24-crag-mock-api:v0
-
     echo "Starting Agent services"
     cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/amd/gpu/rocm
     bash launch_agent_service_tgi_rocm.sh
@@ -42,28 +46,63 @@ function validate() {
 }
 
 function validate_agent_service() {
-    echo "----------------Test agent ----------------"
-    local CONTENT=$(http_proxy="" curl http://${ip_address}:9095/v1/chat/completions -X POST -H "Content-Type: application/json" -d '{
-     "query": "Tell me about Michael Jackson song thriller"
-    }')
-    local EXIT_CODE=$(validate "$CONTENT" "Thriller" "react-agent-endpoint")
-    docker logs rag-agent-endpoint
+    # # test worker rag agent
+    echo "======================Testing worker rag agent======================"
+    export agent_port=$(cat ${WORKPATH}/docker_compose/amd/gpu/WORKER_RAG_AGENT_PORT_tmp)
+    prompt="Tell me about Michael Jackson song Thriller"
+    local CONTENT=$(python3 $WORKDIR/GenAIExamples/AgentQnA/tests/test.py --prompt "$prompt" --agent_role "worker" --ext_port $agent_port)
+    # echo $CONTENT
+    local EXIT_CODE=$(validate "$CONTENT" "Thriller" "rag-agent-endpoint")
+    echo $EXIT_CODE
+    local EXIT_CODE="${EXIT_CODE:0-1}"
     if [ "$EXIT_CODE" == "1" ]; then
+        docker logs rag-agent-endpoint
         exit 1
     fi
 
-    local CONTENT=$(http_proxy="" curl http://${ip_address}:9090/v1/chat/completions -X POST -H "Content-Type: application/json" -d '{
-     "query": "Tell me about Michael Jackson song thriller"
-    }')
-    local EXIT_CODE=$(validate "$CONTENT" "Thriller" "react-agent-endpoint")
-    docker logs react-agent-endpoint
+     # test worker sql agent
+    echo "======================Testing worker sql agent======================"
+    export agent_port=$(cat ${WORKPATH}/docker_compose/amd/gpu/WORKER_SQL_AGENT_PORT_tmp)
+    prompt="How many employees are there in the company?"
+    local CONTENT=$(python3 $WORKDIR/GenAIExamples/AgentQnA/tests/test.py --prompt "$prompt" --agent_role "worker" --ext_port $agent_port)
+    local EXIT_CODE=$(validate "$CONTENT" "8" "sql-agent-endpoint")
+    echo $CONTENT
+    # echo $EXIT_CODE
+    local EXIT_CODE="${EXIT_CODE:0-1}"
     if [ "$EXIT_CODE" == "1" ]; then
+        docker logs sql-agent-endpoint
+        exit 1
+    fi
+
+    # test supervisor react agent
+    echo "======================Testing supervisor react agent======================"
+    export agent_port=$(cat ${WORKPATH}/docker_compose/amd/gpu/SUPERVISOR_REACT_AGENT_PORT_tmp)
+    local CONTENT=$(python3 $WORKDIR/GenAIExamples/AgentQnA/tests/test.py --agent_role "supervisor" --ext_port $agent_port --stream)
+    local EXIT_CODE=$(validate "$CONTENT" "Iron" "react-agent-endpoint")
+    # echo $CONTENT
+    echo $EXIT_CODE
+    local EXIT_CODE="${EXIT_CODE:0-1}"
+    if [ "$EXIT_CODE" == "1" ]; then
+        docker logs react-agent-endpoint
         exit 1
     fi
 
 }
 
+function remove_chinook_data(){
+    echo "Removing chinook data..."
+    cd $WORKDIR
+    if [ -d "chinook-database" ]; then
+        rm -rf chinook-database
+    fi
+    echo "Chinook data removed!"
+}
+
 function main() {
+    echo "==================== Prepare data ===================="
+    download_chinook_data
+    echo "==================== Data prepare done ===================="
+
     echo "==================== Start agent ===================="
     start_agent_and_api_server
     echo "==================== Agent started ===================="
@@ -73,4 +112,9 @@ function main() {
     echo "==================== Agent service validated ===================="
 }
 
+
+remove_chinook_data
+
 main
+
+remove_chinook_data

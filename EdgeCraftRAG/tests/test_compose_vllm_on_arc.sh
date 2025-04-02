@@ -24,7 +24,7 @@ EC_RAG_SERVICE_PORT=16010
 MODEL_PATH="/home/media/models"
 # MODEL_PATH="$WORKPATH/models"
 DOC_PATH="$WORKPATH/tests"
-GRADIO_PATH="$WORKPATH/tests"
+UI_TMPFILE_PATH="$WORKPATH/tests"
 
 #HF_ENDPOINT=https://hf-mirror.com
 LLM_MODEL="Qwen/Qwen2-7B-Instruct"
@@ -48,7 +48,7 @@ function build_docker_images() {
 function start_services() {
     export MODEL_PATH=${MODEL_PATH}
     export DOC_PATH=${DOC_PATH}
-    export GRADIO_PATH=${GRADIO_PATH}
+    export UI_TMPFILE_PATH=${UI_TMPFILE_PATH}
     export HOST_IP=${HOST_IP}
     export LLM_MODEL=${LLM_MODEL}
     export HF_ENDPOINT=${HF_ENDPOINT}

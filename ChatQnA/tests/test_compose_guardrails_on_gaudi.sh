@@ -34,11 +34,11 @@ function build_docker_images() {
     git checkout ${VLLM_VER} &> /dev/null && cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="chatqna-guardrails chatqna-ui dataprep retriever vllm-gaudi guardrails nginx"
+    service_list="chatqna chatqna-ui dataprep retriever vllm-gaudi guardrails nginx"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
-    docker pull ghcr.io/huggingface/tgi-gaudi:2.0.6
-    docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+    docker pull ghcr.io/huggingface/tgi-gaudi:2.3.1
+    docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.6
     docker pull ghcr.io/huggingface/tei-gaudi:1.5.0
 
     docker images && sleep 1s

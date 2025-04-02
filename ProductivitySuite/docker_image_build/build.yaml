@@ -68,18 +68,12 @@ services:
       context: ../../CodeGen/
       dockerfile: ./Dockerfile
     image: ${REGISTRY:-opea}/codegen:${TAG:-latest}
-  faqgen:
+  llm-faqgen:
     build:
       args:
         http_proxy: ${http_proxy}
         https_proxy: ${https_proxy}
         no_proxy: ${no_proxy}
-      context: ../../FaqGen/
-      dockerfile: ./Dockerfile
-    image: ${REGISTRY:-opea}/faqgen:${TAG:-latest}
-  llm-faqgen:
-    build:
       context: GenAIComps
       dockerfile: comps/llms/src/faq-generation/Dockerfile
-    extends: faqgen
     image: ${REGISTRY:-opea}/llm-faqgen:${TAG:-latest}

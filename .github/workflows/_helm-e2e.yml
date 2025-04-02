@@ -134,7 +134,7 @@ jobs:
           CHART_NAME="${example,,}"  # CodeGen
           echo "CHART_NAME=$CHART_NAME" >> $GITHUB_ENV
           echo "RELEASE_NAME=${CHART_NAME}$(date +%Y%m%d%H%M%S)" >> $GITHUB_ENV
-          echo "NAMESPACE=${CHART_NAME}-$(date +%Y%m%d%H%M%S)" >> $GITHUB_ENV
+          echo "NAMESPACE=${CHART_NAME}-$(head -c 4 /dev/urandom | xxd -p)" >> $GITHUB_ENV
           echo "ROLLOUT_TIMEOUT_SECONDS=600s" >> $GITHUB_ENV
           echo "TEST_TIMEOUT_SECONDS=600s" >> $GITHUB_ENV
           echo "KUBECTL_TIMEOUT_SECONDS=60s" >> $GITHUB_ENV
@@ -173,7 +173,7 @@ jobs:
             $RELEASE_NAME \
             oci://ghcr.io/opea-project/charts/${CHART_NAME} \
             --set global.HUGGINGFACEHUB_API_TOKEN=${HFTOKEN} \
-            --set global.modelUseHostPath=/home/sdp/.cache/huggingface/hub \
+            --set global.modelUseHostPath=/data2/hf_model \
             --set GOOGLE_API_KEY=${{ env.GOOGLE_API_KEY}} \
             --set GOOGLE_CSE_ID=${{ env.GOOGLE_CSE_ID}} \
             --set web-retriever.GOOGLE_API_KEY=${{ env.GOOGLE_API_KEY}} \
