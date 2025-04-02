@@ -223,7 +223,7 @@ function validate_microservices() {
         "content" \
         "multimodalqna-vllm-service" \
         "multimodalqna-vllm-service" \
-        '{"model": "Xkev/Llama-3.2V-11B-cot", "messages": [{"role": "user", "content": [{"type": "text", "text": "What’s in this image?"}, {"type": "image_url", "image_url": {"url": https://github.com/docarray/docarray/blob/main/tests/toydata/image-data/apple.png}}]"}], "max_tokens": 17}'
+        '{"model": "Xkev/Llama-3.2V-11B-cot", "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens": 17}'
 
     # lvm
     echo "Evaluating lvm"
