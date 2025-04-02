@@ -358,7 +358,7 @@ then we consider the vLLM service to be successfully launched
 
 ### 3. Validate MicroServices
 
-###### embedding-multimodal-bridgetower
+#### embedding-multimodal-bridgetower
 
 Text example:
 
@@ -390,7 +390,7 @@ Checking the response from the service. The response should be similar to text:
 {"embedding":[0.024372786283493042,-0.003916610032320023,0.07578050345182419,...,-0.046543147414922714]}
 ```
 
-###### embedding
+#### embedding
 
 Text example:
 
@@ -422,7 +422,7 @@ Checking the response from the service. The response should be similar to text:
 {"id":"cce4eab623255c4c632fb920e277dcf7","text":"This is some sample text.","embedding":[0.02613169699907303,-0.049398183822631836,...,0.03544217720627785],"search_type":"similarity","k":4,"distance_threshold":null,"fetch_k":20,"lambda_mult":0.5,"score_threshold":0.2,"constraints":null,"url":"https://github.com/docarray/docarray/blob/main/tests/toydata/image-data/apple.png?raw=true","base64_image":"iVBORw0KGgoAAAANSUhEUgAAAoEAAAJqCAMAAABjDmrLAAAABGdBTUEAALGPC/.../BCU5wghOc4AQnOMEJTnCCE5zgBCc4wQlOcILzqvO/ARWd2ns+lvHkAAAAAElFTkSuQmCC"}
 ```
 
-###### retriever-multimodal-redis
+#### retriever-multimodal-redis
 
 set "your_embedding" variable:
 
@@ -445,7 +445,7 @@ Checking the response from the service. The response should be similar to text:
 {"id":"80a4f3fc5f5d5cd31ab1e3912f6b6042","retrieved_docs":[],"initial_query":"test","top_n":1,"metadata":[]}
 ```
 
-###### whisper service
+#### whisper service
 
 ```bash
 curl http://${host_ip}:7066/v1/asr \
@@ -460,7 +460,7 @@ Checking the response from the service. The response should be similar to text:
 {"asr_result":"you"}
 ```
 
-###### lvm
+#### lvm
 
 ```bash
 
