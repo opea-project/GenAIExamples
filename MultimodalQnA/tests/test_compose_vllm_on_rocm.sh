@@ -59,7 +59,7 @@ function setup_env() {
     export INDEX_NAME="mm-rag-redis"
     export LVM_ENDPOINT="http://${HOST_IP}:8399"
     export EMBEDDING_MODEL_ID="BridgeTower/bridgetower-large-itm-mlm-itc"
-    export LVM_MODEL_ID="Xkev/Llama-3.2V-11B-cot"
+    export MULTIMODAL_LVM_MODEL_ID="Xkev/Llama-3.2V-11B-cot"
     export WHISPER_MODEL="base"
     export MM_EMBEDDING_SERVICE_HOST_IP=${HOST_IP}
     export MM_RETRIEVER_SERVICE_HOST_IP=${HOST_IP}
