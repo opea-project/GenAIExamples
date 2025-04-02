@@ -4,7 +4,7 @@
 WORKPATH=$(dirname "$PWD")/..
 export ip_address=${host_ip}
 export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
-export AGENTQNA_TGI_IMAGE=ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
+export AGENTQNA_TGI_IMAGE=ghcr.io/huggingface/text-generation-inference:2.4.1-rocm
 export AGENTQNA_TGI_SERVICE_PORT="8085"
 
 # LLM related environment variables
