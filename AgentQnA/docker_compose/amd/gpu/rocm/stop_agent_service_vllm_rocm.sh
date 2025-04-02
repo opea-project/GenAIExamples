@@ -1,6 +1,7 @@
 # Copyright (C) 2024 Advanced Micro Devices, Inc.
 # SPDX-License-Identifier: Apache-2.0
 
+
 # Before start script:
 # export host_ip="your_host_ip_or_host_name"
 # export HUGGINGFACEHUB_API_TOKEN="your_huggingface_api_token"
@@ -11,7 +12,7 @@
 export ip_address=${host_ip}
 
 # Set services IP ports
-export TGI_SERVICE_PORT="18110"
+export VLLM_SERVICE_PORT="18110"
 export WORKER_RAG_AGENT_PORT="18111"
 export WORKER_SQL_AGENT_PORT="18112"
 export SUPERVISOR_REACT_AGENT_PORT="18113"
@@ -20,12 +21,14 @@ export CRAG_SERVER_PORT="18114"
 export WORKPATH=$(dirname "$PWD")
 export WORKDIR=${WORKPATH}/../../../
 export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
-export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
+export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+export VLLM_LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
 export HF_CACHE_DIR="./data"
 export MODEL_CACHE="./data"
 export TOOLSET_PATH=${WORKPATH}/../../../tools/
 export recursion_limit_worker=12
-export LLM_ENDPOINT_URL=http://${ip_address}:${TGI_SERVICE_PORT}
+export LLM_ENDPOINT_URL=http://${ip_address}:${VLLM_SERVICE_PORT}
+export LLM_MODEL_ID=${VLLM_LLM_MODEL_ID}
 export temperature=0.01
 export max_new_tokens=512
 export RETRIEVAL_TOOL_URL="http://${ip_address}:8889/v1/retrievaltool"
@@ -64,24 +67,18 @@ echo ${WORKER_SQL_AGENT_PORT} > ${WORKPATH}/WORKER_SQL_AGENT_PORT_tmp
 echo ${SUPERVISOR_REACT_AGENT_PORT} > ${WORKPATH}/SUPERVISOR_REACT_AGENT_PORT_tmp
 echo ${CRAG_SERVER_PORT} > ${WORKPATH}/CRAG_SERVER_PORT_tmp
 
-echo "Downloading chinook data..."
+echo "Removing chinook data..."
 echo Y | rm -R chinook-database
-git clone https://github.com/lerocha/chinook-database.git
-echo Y | rm -R ../../../../../AgentQnA/tests/Chinook_Sqlite.sqlite
-cp chinook-database/ChinookDatabase/DataSources/Chinook_Sqlite.sqlite ../../../../../AgentQnA/tests
+if [ -d "chinook-database" ]; then
+    rm -rf chinook-database
+fi
+echo "Chinook data removed!"
 
-docker compose -f ../../../../../DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml up -d
-docker compose -f compose.yaml up -d
+echo "Stopping CRAG server"
+docker rm kdd-cup-24-crag-service --force
 
-n=0
-until [[ "$n" -ge 100 ]]; do
-    docker logs tgi-service > ${WORKPATH}/tgi_service_start.log
-    if grep -q Connected ${WORKPATH}/tgi_service_start.log; then
-        break
-    fi
-    sleep 10s
-    n=$((n+1))
-done
+echo "Stopping Agent services"
+docker compose -f compose_vllm.yaml down
 
-echo "Starting CRAG server"
-docker run -d --runtime=runc --name=kdd-cup-24-crag-service -p=${CRAG_SERVER_PORT}:8000 docker.io/aicrowd/kdd-cup-24-crag-mock-api:v0
+echo "Stopping Retrieval services"
+docker compose -f ../../../../../DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml down
