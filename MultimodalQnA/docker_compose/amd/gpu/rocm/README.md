@@ -296,7 +296,7 @@ All containers should be running and should not restart:
 
 ```bash
 DATA='{"model": "Xkev/Llama-3.2V-11B-cot", '\
-'"messages": [{"role": "user", "content": ""}], "max_tokens": 256}'
+'"messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens": 256}'
 
 curl http://${HOST_IP}:${MULTIMODALQNA_VLLM_SERVICE_PORT}/v1/chat/completions \
   -X POST \
@@ -307,7 +307,27 @@ curl http://${HOST_IP}:${MULTIMODALQNA_VLLM_SERVICE_PORT}/v1/chat/completions \
 Checking the response from the service. The response should be similar to JSON:
 
 ```json
-
+{
+  "id": "chatcmpl-a3761920c4034131b3cab073b8e8b841",
+  "object": "chat.completion",
+  "created": 1742959065,
+  "model": "Intel/neural-chat-7b-v3-3",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": " Deep Learning refers to a modern approach of Artificial Intelligence that aims to replicate the way human brains process information by teaching computers to learn from data without extensive programming",
+        "tool_calls": []
+      },
+      "logprobs": null,
+      "finish_reason": "length",
+      "stop_reason": null
+    }
+  ],
+  "usage": { "prompt_tokens": 15, "total_tokens": 47, "completion_tokens": 32, "prompt_tokens_details": null },
+  "prompt_logprobs": null
+}
 ```
 
 If the service response has a meaningful response in the value of the "choices.message.content" key,
@@ -316,7 +336,7 @@ then we consider the vLLM service to be successfully launched
 #### If you use TGI:
 
 ```bash
-DATA='{"inputs":"",'\
+DATA='{"inputs":"What is Deep Learning?",'\
 '"parameters":{"max_new_tokens":256,"do_sample": true}}'
 
 curl http://${HOST_IP}:${MULTIMODALQNA_TGI_SERVICE_PORT}/generate \
@@ -328,7 +348,9 @@ curl http://${HOST_IP}:${MULTIMODALQNA_TGI_SERVICE_PORT}/generate \
 Checking the response from the service. The response should be similar to JSON:
 
 ```json
-
+{
+  "generated_text": "\n\nDeep Learning is a subset of machine learning, which focuses on developing methods inspired by the functioning of the human brain; more specifically, the way it processes and acquires various types of knowledge and information. To enable deep learning, the networks are composed of multiple processing layers that form a hierarchy, with each layer learning more complex and abstraction levels of data representation.\n\nThe principle of Deep Learning is to emulate the structure of neurons in the human brain to construct artificial neural networks capable to accomplish complicated pattern recognition tasks more effectively and accurately. Therefore, these neural networks contain a series of hierarchical components, where units in earlier layers receive simple inputs and are activated by these inputs. The activation of the units in later layers are the results of multiple nonlinear transformations generated from reconstructing and integrating the information in previous layers. In other words, by combining various pieces of information at each layer, a Deep Learning network can extract the input features that best represent the structure of data, providing their outputs at the last layer or final level of abstraction.\n\nThe main idea of using these 'deep' networks in contrast to regular algorithms is that they are capable of representing hierarchical relationships that exist within the data and learn these representations by"
+}
 ```
 
 If the service response has a meaningful response in the value of the "generated_text" key,
