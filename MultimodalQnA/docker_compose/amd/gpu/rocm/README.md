@@ -361,6 +361,7 @@ then we consider the vLLM service to be successfully launched
 ##### embedding-multimodal-bridgetower
 
 Text example:
+
 ```bash
 curl http://${host_ip}:${EMM_BRIDGETOWER_PORT}/v1/encode \
      -X POST \
@@ -375,6 +376,7 @@ Checking the response from the service. The response should be similar to text:
 ```
 
 Image example:
+
 ```bash
 curl http://${host_ip}:${EMM_BRIDGETOWER_PORT}/v1/encode \
      -X POST \
@@ -391,6 +393,7 @@ Checking the response from the service. The response should be similar to text:
 ##### embedding
 
 Text example:
+
 ```bash
 curl http://${host_ip}:$MM_EMBEDDING_PORT_MICROSERVICE/v1/embeddings \
     -X POST \
@@ -405,6 +408,7 @@ Checking the response from the service. The response should be similar to text:
 ```
 
 Image example:
+
 ```bash
 curl http://${host_ip}:${EMM_BRIDGETOWER_PORT}/v1/encode \
      -X POST \
@@ -418,15 +422,16 @@ Checking the response from the service. The response should be similar to text:
 {"id":"cce4eab623255c4c632fb920e277dcf7","text":"This is some sample text.","embedding":[0.02613169699907303,-0.049398183822631836,...,0.03544217720627785],"search_type":"similarity","k":4,"distance_threshold":null,"fetch_k":20,"lambda_mult":0.5,"score_threshold":0.2,"constraints":null,"url":"https://github.com/docarray/docarray/blob/main/tests/toydata/image-data/apple.png?raw=true","base64_image":"iVBORw0KGgoAAAANSUhEUgAAAoEAAAJqCAMAAABjDmrLAAAABGdBTUEAALGPC/.../BCU5wghOc4AQnOMEJTnCCE5zgBCc4wQlOcILzqvO/ARWd2ns+lvHkAAAAAElFTkSuQmCC"}
 ```
 
-
 ##### retriever-multimodal-redis
 
 set "your_embedding" variable:
+
 ```bash
 export your_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(512)]; print(embedding)")
 ```
 
 Test Redis retriever
+
 ```bash
 curl http://${host_ip}:${REDIS_RETRIEVER_PORT}/v1/retrieval \
     -X POST \
@@ -439,8 +444,6 @@ Checking the response from the service. The response should be similar to text:
 ```textmate
 {"id":"80a4f3fc5f5d5cd31ab1e3912f6b6042","retrieved_docs":[],"initial_query":"test","top_n":1,"metadata":[]}
 ```
-
-
 
 ##### whisper service
 
@@ -486,8 +489,6 @@ Checking the response from the service. The response should be similar to text:
 ```
 
 If the output lines in the "choices.text" keys contain words (tokens) containing meaning, then the service is considered launched successfully.
-
-
 
 ### 5. Validate the Frontend (UI)
 
