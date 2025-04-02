@@ -28,7 +28,7 @@ function download_chinook_data(){
 function start_agent_and_api_server() {
     echo "Starting Agent services"
     cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/amd/gpu/rocm
-    bash launch_agent_service_tgi_rocm.sh
+    bash launch_agent_service_vllm_rocm.sh
 }
 
 function validate() {
