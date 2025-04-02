@@ -54,3 +54,15 @@ services:
       context: GenAIComps
       dockerfile: comps/third_parties/vllm/src/Dockerfile.amd_gpu
     image: ${REGISTRY:-opea}/vllm-rocm:${TAG:-latest}
+  vllm:
+    build:
+      context: vllm
+      dockerfile: Dockerfile.cpu
+    extends: docsum
+    image: ${REGISTRY:-opea}/vllm:${TAG:-latest}
+  vllm-gaudi:
+    build:
+      context: vllm-fork
+      dockerfile: Dockerfile.hpu
+    extends: docsum
+    image: ${REGISTRY:-opea}/vllm-gaudi:${TAG:-latest}
