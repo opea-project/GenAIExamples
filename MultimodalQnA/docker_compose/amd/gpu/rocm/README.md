@@ -356,30 +356,95 @@ Checking the response from the service. The response should be similar to JSON:
 If the service response has a meaningful response in the value of the "choices.text" key,
 then we consider the vLLM service to be successfully launched
 
-### 3. Validate the MegaService
+### 3. Validate MicroServices
 
+##### embedding-multimodal-bridgetower
+
+Text example:
 ```bash
-DATA='{"messages": "Implement a high-level API for a TODO list application. '\
-'The API takes as input an operation request and updates the TODO list in place. '\
-'If the request is invalid, raise an exception."}'
-
-curl http://${HOST_IP}:${MULTIMODALQNA_BACKEND_SERVICE_PORT}/v1/multimodalqna \
-  -H "Content-Type: application/json" \
-  -d "$DATA"
+curl http://${host_ip}:${EMM_BRIDGETOWER_PORT}/v1/encode \
+     -X POST \
+     -H "Content-Type:application/json" \
+     -d '{"text":"This is example"}'
 ```
 
 Checking the response from the service. The response should be similar to text:
 
 ```textmate
-
+{"embedding":[0.036936961114406586,-0.0022056063171476126,0.0891181230545044,-0.019263656809926033,-0.049174826592206955,-0.05129311606287956,-0.07172256708145142,0.04365323856472969,0.03275766223669052,0.0059910244308412075,-0.0301326...,-0.0031989417038857937,0.042092420160770416]}
 ```
 
-If the output lines in the "choices.text" keys contain words (tokens) containing meaning, then the service is considered launched successfully.
+Image example:
+```bash
+curl http://${host_ip}:${EMM_BRIDGETOWER_PORT}/v1/encode \
+     -X POST \
+     -H "Content-Type:application/json" \
+     -d '{"text":"This is example", "img_b64_str": "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8/5+hnoEIwDiqkL4KAcT9GO0U4BxoAAAAAElFTkSuQmCC"}'
+```
 
-### 4. Validate MicroServices
+Checking the response from the service. The response should be similar to text:
+
+```textmate
+{"embedding":[0.024372786283493042,-0.003916610032320023,0.07578050345182419,...,-0.046543147414922714]}
+```
+
+##### embedding
+
+Text example:
+```bash
+curl http://${host_ip}:$MM_EMBEDDING_PORT_MICROSERVICE/v1/embeddings \
+    -X POST \
+    -H "Content-Type: application/json" \
+    -d '{"text" : "This is some sample text."}'
+```
+
+Checking the response from the service. The response should be similar to text:
+
+```textmate
+{"id":"4fb722012a2719e38188190e1cb37ed3","text":"This is some sample text.","embedding":[0.043303076177835464,-0.051807764917612076,...,-0.0005179636646062136,-0.0027774290647357702],"search_type":"similarity","k":4,"distance_threshold":null,"fetch_k":20,"lambda_mult":0.5,"score_threshold":0.2,"constraints":null,"url":null,"base64_image":null}
+```
+
+Image example:
+```bash
+curl http://${host_ip}:${EMM_BRIDGETOWER_PORT}/v1/encode \
+     -X POST \
+     -H "Content-Type:application/json" \
+     -d '{"text":"This is example", "img_b64_str": "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8/5+hnoEIwDiqkL4KAcT9GO0U4BxoAAAAAElFTkSuQmCC"}'
+```
+
+Checking the response from the service. The response should be similar to text:
+
+```textmate
+{"id":"cce4eab623255c4c632fb920e277dcf7","text":"This is some sample text.","embedding":[0.02613169699907303,-0.049398183822631836,...,0.03544217720627785],"search_type":"similarity","k":4,"distance_threshold":null,"fetch_k":20,"lambda_mult":0.5,"score_threshold":0.2,"constraints":null,"url":"https://github.com/docarray/docarray/blob/main/tests/toydata/image-data/apple.png?raw=true","base64_image":"iVBORw0KGgoAAAANSUhEUgAAAoEAAAJqCAMAAABjDmrLAAAABGdBTUEAALGPC/.../BCU5wghOc4AQnOMEJTnCCE5zgBCc4wQlOcILzqvO/ARWd2ns+lvHkAAAAAElFTkSuQmCC"}
+```
+
+
+##### retriever-multimodal-redis
+
+set "your_embedding" variable:
+```bash
+export your_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(512)]; print(embedding)")
+```
+
+Test Redis retriever
+```bash
+curl http://${host_ip}:${REDIS_RETRIEVER_PORT}/v1/retrieval \
+    -X POST \
+    -H "Content-Type: application/json" \
+    -d "{\"text\":\"test\",\"embedding\":${your_embedding}}"
+```
+
+Checking the response from the service. The response should be similar to text:
+
+```textmate
+{"id":"80a4f3fc5f5d5cd31ab1e3912f6b6042","retrieved_docs":[],"initial_query":"test","top_n":1,"metadata":[]}
+```
+
+
+
+##### whisper service
 
 ```bash
-# whisper service
 curl http://${host_ip}:7066/v1/asr \
   -X POST \
   -d '{"audio": "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA"}' \
@@ -389,20 +454,52 @@ curl http://${host_ip}:7066/v1/asr \
 Checking the response from the service. The response should be similar to text:
 
 ```textmate
+{"asr_result":"you"}
+```
+
+##### lvm
+
+```bash
 
 ```
 
-### 4. Validate the Frontend (UI)
+Checking the response from the service. The response should be similar to text:
+
+```textmate
+
+```
+
+### 4. Validate the MegaService
+
+```bash
+DATA='{"messages": [{"role": "user", "content": [{"type": "audio", "audio": "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA"}]}]}'
+
+curl http://${HOST_IP}:${MULTIMODALQNA_BACKEND_SERVICE_PORT}/v1/multimodalqna \
+  -H "Content-Type: application/json" \
+  -d "$DATA"
+```
+
+Checking the response from the service. The response should be similar to text:
+
+```textmate
+{"id":"chatcmpl-75aK2KWCfxZmVcfh5tiiHj","object":"chat.completion","created":1743568232,"model":"multimodalqna","choices":[{"index":0,"message":{"role":"assistant","content":"There is no video segments retrieved given the query!"},"finish_reason":"stop","metadata":{"audio":"you"}}],"usage":{"prompt_tokens":0,"total_tokens":0,"completion_tokens":0}}
+```
+
+If the output lines in the "choices.text" keys contain words (tokens) containing meaning, then the service is considered launched successfully.
+
+
+
+### 5. Validate the Frontend (UI)
 
 To access the UI, use the URL - http://${EXTERNAL_HOST_IP}:${MULTIMODALQNA_UI_SERVICE_PORT}
 A page should open when you click through to this address:
 
-![UI start page](../../../../assets/img/ui-starting-page.png)
+![UI start page](../../../../assets/img/mmqna-ui.png)
 
 If a page of this type has opened, then we believe that the service is running and responding,
 and we can proceed to functional UI testing.
 
-### 5. Stop application
+### 6. Stop application
 
 ##### If you use vLLM
 
