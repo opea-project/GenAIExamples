@@ -334,23 +334,19 @@ Checking the response from the service. The response should be similar to JSON:
 If the service response has a meaningful response in the value of the "generated_text" key,
 then we consider the TGI service to be successfully launched
 
-### 2. Validate the LLM Service
+### 2. Validate the LVM Service
 
-```bash
-DATA='{"query":"",'\
-'"max_tokens":256,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,'\
-'"repetition_penalty":1.03,"stream":false}'
-
-curl http://${HOST_IP}:${MULTIMODALQNA_LLM_SERVICE_PORT}/v1/chat/completions \
-  -X POST \
-  -d "$DATA" \
-  -H 'Content-Type: application/json'
+```bash  
+curl http://${host_ip}:${MULTIMODALQNA_LVM_PORT}/v1/lvm \
+    -X POST \
+    -H 'Content-Type: application/json' \
+    -d '{"retrieved_docs": [], "initial_query": "What is this?", "top_n": 1, "metadata": [], "chat_template":"The caption of the image is: '\''{context}'\''. {question}"}'
 ```
 
 Checking the response from the service. The response should be similar to JSON:
 
-```json
-
+```textmate
+{"downstream_black_list":[],"id":"1b17e903e8c773be909bde0e7cfdb53f","text":" I will analyze the image and provide a detailed description based on its visual characteristics. I will then compare these characteristics to the standard answer provided to ensure accuracy.\n\n1. **Examine the Image**: The image is a solid color, which appears to be a shade of yellow. There are no additional elements or patterns present in the image.\n\n2. **Compare with Standard Answer**: The standard answer describes the image as a \"yellow image\" without any additional details or context. This matches the observed characteristics of the image being a single, uniform yellow color.\n\n3. **Conclusion**: Based on the visual analysis and comparison with the standard answer, the image can be accurately described as a \"yellow image.\" There are no other features or elements present that would alter this description.\n\nFINAL ANSWER: The image is a yellow image.","metadata":{"video_id":"8c7461df-b373-4a00-8696-9a2234359fe0","source_video":"WeAreGoingOnBullrun_8c7461df-b373-4a00-8696-9a2234359fe0.mp4","time_of_frame_ms":"37000000","transcript_for_inference":"yellow image"}}
 ```
 
 If the service response has a meaningful response in the value of the "choices.text" key,
@@ -460,17 +456,6 @@ Checking the response from the service. The response should be similar to text:
 {"asr_result":"you"}
 ```
 
-#### lvm
-
-```bash
-
-```
-
-Checking the response from the service. The response should be similar to text:
-
-```textmate
-
-```
 
 ### 4. Validate the MegaService
 
@@ -490,17 +475,7 @@ Checking the response from the service. The response should be similar to text:
 
 If the output lines in the "choices.text" keys contain words (tokens) containing meaning, then the service is considered launched successfully.
 
-### 5. Validate the Frontend (UI)
-
-To access the UI, use the URL - http://${EXTERNAL_HOST_IP}:${MULTIMODALQNA_UI_SERVICE_PORT}
-A page should open when you click through to this address:
-
-![UI start page](../../../../assets/img/mmqna-ui.png)
-
-If a page of this type has opened, then we believe that the service is running and responding,
-and we can proceed to functional UI testing.
-
-### 6. Stop application
+### 5. Stop application
 
 #### If you use vLLM
 

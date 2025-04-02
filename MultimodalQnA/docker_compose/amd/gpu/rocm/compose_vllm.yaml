@@ -126,7 +126,7 @@ services:
     image: ${REGISTRY:-opea}/lvm:${TAG:-latest}
     container_name: lvm
     depends_on:
-      - tgi-rocm
+      - multimodalqna-vllm-service
     ports:
       - "9399:9399"
     ipc: host
@@ -134,8 +134,9 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      LVM_COMPONENT_NAME: "OPEA_TGI_LLAVA_LVM"
+      LVM_COMPONENT_NAME: "OPEA_VLLM_LVM"
       LVM_ENDPOINT: ${LVM_ENDPOINT}
+      LLM_MODEL_ID: ${MULTIMODAL_LLM_MODEL_ID}
       HF_HUB_DISABLE_PROGRESS_BARS: 1
       HF_HUB_ENABLE_HF_TRANSFER: 0
     restart: unless-stopped
@@ -159,7 +160,7 @@ services:
       MM_EMBEDDING_PORT_MICROSERVICE: ${MM_EMBEDDING_PORT_MICROSERVICE}
       MM_RETRIEVER_SERVICE_HOST_IP: ${MM_RETRIEVER_SERVICE_HOST_IP}
       LVM_SERVICE_HOST_IP: ${LVM_SERVICE_HOST_IP}
-      WHISPER_SERVER_PORT: ${WHISPER_SERVER_PORT}
+      WHISPER_SERVER_PORT: ${WHISPER_PORT}
       WHISPER_SERVER_ENDPOINT: ${WHISPER_SERVER_ENDPOINT}
     ipc: host
     restart: always
