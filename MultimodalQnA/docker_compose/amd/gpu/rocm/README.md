@@ -502,14 +502,14 @@ and we can proceed to functional UI testing.
 
 ### 6. Stop application
 
-##### If you use vLLM
+#### If you use vLLM
 
 ```bash
 cd ~/multimodalqna-install/GenAIExamples/MultimodalQnA/docker_compose/amd/gpu/rocm
 docker compose -f compose_vllm.yaml down
 ```
 
-##### If you use TGI
+#### If you use TGI
 
 ```bash
 cd ~/multimodalqna-install/GenAIExamples/MultimodalQnA/docker_compose/amd/gpu/rocm

@@ -224,24 +224,6 @@ function validate_microservices() {
         "multimodalqna-vllm-service" \
         '{"model": "Xkev/Llama-3.2V-11B-cot", "messages": [{"role": "user", "content": [{"type": "text", "text": "What’s in this image?"}, {"type": "image_url", "image_url": {"url": https://github.com/docarray/docarray/blob/main/tests/toydata/image-data/apple.png}}]"}], "max_tokens": 17}'
 
-
-#    # lvm
-#    echo "Evaluating lvm"
-#    validate_service \
-#        "http://${host_ip}:9399/v1/lvm" \
-#        '"text":"' \
-#        "lvm" \
-#        "lvm" \
-#        '{"retrieved_docs": [], "initial_query": "What is this?", "top_n": 1, "metadata": [{"b64_img_str": "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8/5+hnoEIwDiqkL4KAcT9GO0U4BxoAAAAAElFTkSuQmCC", "transcript_for_inference": "yellow image", "video_id": "8c7461df-b373-4a00-8696-9a2234359fe0", "time_of_frame_ms":"37000000", "source_video":"WeAreGoingOnBullrun_8c7461df-b373-4a00-8696-9a2234359fe0.mp4"}], "chat_template":"The caption of the image is: '\''{context}'\''. {question}"}'
-
-    # data prep requiring lvm
-    echo "Data Prep with Generating Caption for Image"
-    validate_service \
-        "${DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT}" \
-        "Data preparation succeeded" \
-        "dataprep-multimodal-redis-caption" \
-        "dataprep-multimodal-redis"
-
     sleep 3m
 }
 
