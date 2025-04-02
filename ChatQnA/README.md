@@ -19,10 +19,10 @@ RAG bridges the knowledge gap by dynamically fetching relevant information from 
 To deploy to existing Xeon Ubuntu based system, use our Intel Optimized Cloud Modules for Ansible. This is the same Ansible playbook used by Terraform.
 Use this if you are not using Terraform and have provisioned your system with another tool or manually including bare metal.
 
-| Operating System | Intel Optimized Cloud Module for Ansible |
-|------------------|------------------------------------------|
-| Ubuntu 20.04 | [ChatQnA Ansible Module](https://github.com/intel/optimized-cloud-recipes/tree/main/recipes/ai-opea-chatqna-xeon) |
-| Ubuntu 22.04 | Work-in-progress |
+| Operating System | Intel Optimized Cloud Module for Ansible                                                                          |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------- |
+| Ubuntu 20.04     | [ChatQnA Ansible Module](https://github.com/intel/optimized-cloud-recipes/tree/main/recipes/ai-opea-chatqna-xeon) |
+| Ubuntu 22.04     | Work-in-progress                                                                                                  |
 
 ## Manually Deploy ChatQnA Service
 
