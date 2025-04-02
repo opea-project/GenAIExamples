@@ -108,7 +108,7 @@ services:
       WILM_USE_TRITON_FLASH_ATTENTION: 0
       PYTORCH_JIT: 0
     volumes:
-      - "./data:/data"
+      - "${MODEL_CACHE:-./data}:/data"
     shm_size: 20G
     devices:
       - /dev/kfd:/dev/kfd
