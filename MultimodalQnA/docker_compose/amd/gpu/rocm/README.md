@@ -336,7 +336,7 @@ then we consider the TGI service to be successfully launched
 
 ### 2. Validate the LVM Service
 
-```bash  
+```bash
 curl http://${host_ip}:${MULTIMODALQNA_LVM_PORT}/v1/lvm \
     -X POST \
     -H 'Content-Type: application/json' \
@@ -455,7 +455,6 @@ Checking the response from the service. The response should be similar to text:
 ```textmate
 {"asr_result":"you"}
 ```
-
 
 ### 4. Validate the MegaService
 
