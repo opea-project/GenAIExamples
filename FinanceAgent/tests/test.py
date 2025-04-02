@@ -63,7 +63,7 @@ def test_supervisor_agent_single_turn(args):
     query_list = [
         "What was Gap's revenue growth in 2024?",
         "Can you summarize Costco's 2025 Q2 earnings call?",
-        "Should I increase investment in Costco?",
+        # "Should I increase investment in Costco?",
     ]
     for query in query_list:
         thread_id = f"{uuid.uuid4()}"

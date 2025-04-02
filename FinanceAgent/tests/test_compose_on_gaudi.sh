@@ -7,12 +7,14 @@ export WORKPATH=$(dirname "$PWD")
 export WORKDIR=$WORKPATH/../../
 echo "WORKDIR=${WORKDIR}"
 export ip_address=$(hostname -I | awk '{print $1}')
+LOG_PATH=$WORKPATH
 
 #### env vars for LLM endpoint #############
 model=meta-llama/Llama-3.3-70B-Instruct
+vllm_image=opea/vllm-gaudi:latest
 vllm_port=8086
 vllm_image=$vllm_image
-HF_CACHE_DIR=/data2/huggingface
+# HF_CACHE_DIR=/data2/huggingface
 vllm_volume=${HF_CACHE_DIR}
 #######################################
 
@@ -29,7 +31,6 @@ export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
 export TEI_EMBEDDING_ENDPOINT="http://${ip_address}:${TEI_EMBEDDER_PORT}"
 #######################################
 
-#### env vars for agent #############
 
 
 function get_genai_comps() {
@@ -163,7 +164,7 @@ function start_agents() {
 
 function validate_agent_service() {
     # # test worker finqa agent
-    echo "======================Testing worker rag agent======================"
+    echo "======================Testing worker finqa agent======================"
     export agent_port="9095"
     prompt="What is Gap's revenue in 2024?"
     local CONTENT=$(python3 $WORKDIR/GenAIExamples/FinanceAgent/tests/test.py --prompt "$prompt" --agent_role "worker" --ext_port $agent_port)
@@ -194,8 +195,8 @@ function validate_agent_service() {
     echo "======================Testing supervisor agent: single turns ======================"
     export agent_port="9090"
     local CONTENT=$(python3 $WORKDIR/GenAIExamples/FinanceAgent/tests/test.py --agent_role "supervisor" --ext_port $agent_port --stream)
-    # echo $CONTENT
-    # local EXIT_CODE=$(validate "$CONTENT" "Iron" "react-agent-endpoint")
+    echo $CONTENT
+    # local EXIT_CODE=$(validate "$CONTENT" "" "react-agent-endpoint")
     # echo $EXIT_CODE
     # local EXIT_CODE="${EXIT_CODE:0-1}"
     # if [ "$EXIT_CODE" == "1" ]; then
@@ -203,6 +204,16 @@ function validate_agent_service() {
     #     exit 1
     # fi
 
+    echo "======================Testing supervisor agent: multi turns ======================"
+    local CONTENT=$(python3 $WORKDIR/GenAIExamples/FinanceAgent/tests/test.py --agent_role "supervisor" --ext_port $agent_port --multi-turn --stream)
+    echo $CONTENT
+    # local EXIT_CODE=$(validate "$CONTENT" "" "react-agent-endpoint")
+    # echo $EXIT_CODE
+    # local EXIT_CODE="${EXIT_CODE:0-1}"
+    # if [ "$EXIT_CODE" == "1" ]; then
+    #     docker logs react-agent-endpoint
+    #     exit 1
+    # fi
 }
 
 function stop_agent_docker() {
@@ -220,7 +231,7 @@ echo "workpath: $WORKPATH"
 # echo "=================== Stop containers ===================="
 # stop_llm
 stop_agent_docker
-# stop_dataprep
+stop_dataprep
 
 cd $WORKPATH/tests
 
@@ -237,8 +248,8 @@ cd $WORKPATH/tests
 # echo "=================== #2 vllm endpoint started===================="
 
 # echo "=================== #3 Start dataprep and ingest data ===================="
-# start_dataprep
-# ingest_validate_dataprep
+start_dataprep
+ingest_validate_dataprep
 # echo "=================== #3 Data ingestion and validation completed===================="
 
 echo "=================== #4 Start agents ===================="

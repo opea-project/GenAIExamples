@@ -4,22 +4,16 @@
 import json
 
 import requests
-from tools.redis_kv import RedisKVStore
-from tools.utils import *
+try:
+    from tools.redis_kv import RedisKVStore
+    from tools.utils import *
+except ImportError:
+    from redis_kv import RedisKVStore
+    from utils import *
+
 
 
 def get_summary_else_doc(query, company):
-    company = company.upper()
-
-    # decide if company is in company list
-    company_list = get_company_list()
-    print(f"company_list {company_list}")
-    company = get_company_name_in_kb(company, company_list)
-    if "Cannot find" in company or "Database is empty" in company:
-        print(f"Company not found in knowledge base: {company}")
-        return company
-    print(f"Company {company}")
-
     # search most similar doc title
     index_name = f"titles_{company}"
     vector_store = get_vectorstore_titles(index_name)
@@ -30,18 +24,22 @@ def get_summary_else_doc(query, company):
         doc_title = doc.page_content
         print(f"Most similar doc title: {doc_title}")
 
-    kvstore = RedisKVStore(redis_uri=REDIS_URL_KV)
-    doc = kvstore.get(doc_title, f"full_doc_{company}")
-    doc_length = doc["doc_length"]
-    print(f"Doc length: {doc_length}")
-    if "summary" not in doc:
-        content = doc["full_doc"]
-        print(f"is_summary: {False}")
+        kvstore = RedisKVStore(redis_uri=REDIS_URL_KV)
+        try:
+            # Check if summary already exists in the KV store
+            content = kvstore.get(f"{doc_title}_summary", f"full_doc_{company}")["summary"]
+            is_summary = True
+            print("Summary already exists in KV store.")
+        except Exception as e:
+            doc = kvstore.get(doc_title, f"full_doc_{company}")
+            content = doc["full_doc"]
+            is_summary = False
+            print("No summary found in KV store, returning full document content.")
+    else:
+        print(f"No similar document found for query: {query}")
+        doc_title = None
+        content = None
         is_summary = False
-        return doc_title, content, is_summary
-    content = doc["summary"]
-    is_summary = True
-    print(f"Summary already exists in KV store: {is_summary}")
     return doc_title, content, is_summary
 
 
@@ -55,23 +53,25 @@ def save_doc_summary(summary, doc_title, company):
         company: The company associated with the document.
     """
     kvstore = RedisKVStore(redis_uri=REDIS_URL_KV)
-    doc_dict = kvstore.get(doc_title, f"full_doc_{company}")
+    # doc_dict = kvstore.get(doc_title, f"full_doc_{company}")
 
-    # Add the summary to the dictionary
-    doc_dict["summary"] = summary
+    # # Add the summary to the dictionary
+    # doc_dict["summary"] = summary
 
     # Save the updated value back to the store
-    kvstore.put(doc_title, doc_dict, collection=f"full_doc_{company}")
+    kvstore.put(f"{doc_title}_summary", {"summary":summary}, collection=f"full_doc_{company}")
 
 
 def summarize(doc_name, company):
-    ip_address = os.environ.get("ip_address")
-    # docsum_url = f"http://{ip_address}:9000/v1/docsum"
     docsum_url = os.environ.get("DOCSUM_ENDPOINT")
     print(f"Docsum Endpoint URL: {docsum_url}")
 
+    company = format_company_name(company)
+    
     doc_title, sum, is_summary = get_summary_else_doc(doc_name, company)
-    print(f"Summary or full doc from get_summary_else_doc: {sum[:100]} \n -------\n")
+    if not doc_title:
+        return(f"Cannot find documents related to {doc_title} in KV store.")
+
     if not is_summary:
         data = {
             "messages": sum,
@@ -86,7 +86,7 @@ def summarize(doc_name, company):
         try:
             print("Computing Summary with OPEA DocSum...")
             resp = requests.post(url=docsum_url, data=json.dumps(data), headers=headers)
-            ret = resp.text
+            ret = resp.json()["text"]
             resp.raise_for_status()  # Raise an exception for unsuccessful HTTP status codes
         except requests.exceptions.RequestException as e:
             ret = f"An error occurred:{e}"
@@ -99,15 +99,16 @@ def summarize(doc_name, company):
 
 
 if __name__ == "__main__":
-    company = "Gap"
-    year = "2024"
-    quarter = "Q4"
+    # company = "Gap"
+    # year = "2024"
+    # quarter = "Q4"
 
-    # company="Costco"
-    # year="2025"
-    # quarter="Q2"
+    company="Costco"
+    year="2025"
+    quarter="Q2"
 
     print("testing summarize")
     doc_name = f"{company} {year} {quarter} earning call"
-    summarize(doc_name, company)
+    ret = summarize(doc_name, company)
+    print("Summary: ", ret)
     print("=" * 50)

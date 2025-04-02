@@ -9,7 +9,10 @@ from langchain_core.documents import Document
 from langchain_huggingface import HuggingFaceEndpointEmbeddings
 from langchain_redis import RedisConfig, RedisVectorStore
 from openai import OpenAI
-from tools.redis_kv import RedisKVStore
+try:
+    from tools.redis_kv import RedisKVStore
+except ImportError:
+    from redis_kv import RedisKVStore
 
 # Embedding model
 EMBED_MODEL = os.getenv("EMBED_MODEL", "BAAI/bge-base-en-v1.5")
@@ -46,6 +49,17 @@ Question: {query}
 Now take a deep breath and think step by step to answer the question. Wrap your final answer in {{}}. Example: {{The company has a revenue of $100 million.}}
 """
 
+def format_company_name(company):
+    company = company.upper()
+
+    # decide if company is in company list
+    company_list = get_company_list()
+    print(f"company_list {company_list}")
+    company = get_company_name_in_kb(company, company_list)
+    if "Cannot find" in company or "Database is empty" in company:
+        raise ValueError(f"Company not found in knowledge base: {company}")
+    print(f"Company: {company}")
+    return company
 
 def get_embedder():
     if TEI_EMBEDDING_ENDPOINT:
