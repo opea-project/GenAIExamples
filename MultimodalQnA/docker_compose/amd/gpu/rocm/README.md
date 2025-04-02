@@ -358,7 +358,7 @@ then we consider the vLLM service to be successfully launched
 
 ### 3. Validate MicroServices
 
-##### embedding-multimodal-bridgetower
+###### embedding-multimodal-bridgetower
 
 Text example:
 ```bash
@@ -388,7 +388,7 @@ Checking the response from the service. The response should be similar to text:
 {"embedding":[0.024372786283493042,-0.003916610032320023,0.07578050345182419,...,-0.046543147414922714]}
 ```
 
-##### embedding
+###### embedding
 
 Text example:
 ```bash
@@ -419,7 +419,7 @@ Checking the response from the service. The response should be similar to text:
 ```
 
 
-##### retriever-multimodal-redis
+###### retriever-multimodal-redis
 
 set "your_embedding" variable:
 ```bash
@@ -442,7 +442,7 @@ Checking the response from the service. The response should be similar to text:
 
 
 
-##### whisper service
+###### whisper service
 
 ```bash
 curl http://${host_ip}:7066/v1/asr \
@@ -457,7 +457,7 @@ Checking the response from the service. The response should be similar to text:
 {"asr_result":"you"}
 ```
 
-##### lvm
+###### lvm
 
 ```bash
 
