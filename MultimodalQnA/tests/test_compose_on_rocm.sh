@@ -80,8 +80,8 @@ function start_services() {
     docker compose -f compose.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
     n=0
     until [[ "$n" -ge 100 ]]; do
-        docker logs tgi-llava-rocm-server >& $LOG_PATH/search-vllm-service_start.log
-        if grep -q "Connected" $LOG_PATH/search-vllm-service_start.log; then
+        docker logs tgi-llava-rocm-server >& $LOG_PATH/tgi-llava-rocm-server_start.log
+        if grep -q "Connected" $LOG_PATH/tgi-llava-rocm-server_start.log; then
             break
         fi
         sleep 10s
