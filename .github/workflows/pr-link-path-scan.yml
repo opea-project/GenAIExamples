@@ -73,6 +73,7 @@ jobs:
 
       - name: Checking Relative Path Validity
         run: |
+          set -x
           cd ${{github.workspace}}
           fail="FALSE"
           repo_name=${{ github.event.pull_request.head.repo.full_name }}
