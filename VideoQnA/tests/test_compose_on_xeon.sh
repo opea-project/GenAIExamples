@@ -61,6 +61,7 @@ function setup_env() {
     export BACKEND_PORT=8888
     export DATAPREP_PORT=6007
     export EMBEDDER_PORT=6990
+    export MULTIMODAL_CLIP_EMBEDDER_PORT=6991
     export LVM_PORT=9399
     export RERANKING_PORT=8000
     export RETRIEVER_PORT=7000
@@ -70,6 +71,7 @@ function setup_env() {
 
     export BACKEND_HEALTH_CHECK_ENDPOINT="http://${host_ip}:${BACKEND_PORT}/v1/health_check"
     export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:${BACKEND_PORT}/v1/videoqna"
+    export CLIP_EMBEDDING_ENDPOINT="http://${host_ip}:${MULTIMODAL_CLIP_EMBEDDER_PORT}"
     export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:${DATAPREP_PORT}/v1/dataprep/get"
     export DATAPREP_GET_VIDEO_LIST_ENDPOINT="http://${host_ip}:${DATAPREP_PORT}/v1/dataprep/get_videos"
     export DATAPREP_INGEST_SERVICE_ENDPOINT="http://${host_ip}:${DATAPREP_PORT}/v1/dataprep/ingest_videos"
