@@ -206,10 +206,10 @@ Set the values of the variables:
 
 By default, LVM models are set to a default value as listed below:
 
-| Service   | Model                                       |
-| --------- | ------------------------------------------- |
-| LVM       | llava-hf/llava-1.5-7b-hf                    |
-| LVM       | Xkev/Llama-3.2V-11B-cot                     |
+| Service | Model                    |
+| ------- | ------------------------ |
+| LVM     | llava-hf/llava-1.5-7b-hf |
+| LVM     | Xkev/Llama-3.2V-11B-cot  |
 
 Note:
 
@@ -252,7 +252,6 @@ All containers should be running and should not restart:
 - visualqna-rocm-backend-server
 - visualqna-rocm-ui-server
 - visualqna-rocm-nginx-server
-
 
 ##### If you use TGI:
 
@@ -353,25 +352,25 @@ then we consider the vLLM service to be successfully launched
 ### 3. Validate the MegaService
 
 ```bash
-DATA='{ 
-    "messages": [ 
-      { 
-        "role": "user", 
-        "content": [ 
-          { 
-            "type": "text", 
-            "text": "What'\''s in this image?" 
-          }, 
-          { 
-            "type": "image_url", 
-            "image_url": { 
-              "url": "https://www.ilankelman.org/stopsigns/australia.jpg" 
-            } 
-          } 
-        ] 
-      } 
-    ], 
-    "max_tokens": 300 
+DATA='{
+    "messages": [
+      {
+        "role": "user",
+        "content": [
+          {
+            "type": "text",
+            "text": "What'\''s in this image?"
+          },
+          {
+            "type": "image_url",
+            "image_url": {
+              "url": "https://www.ilankelman.org/stopsigns/australia.jpg"
+            }
+          }
+        ]
+      }
+    ],
+    "max_tokens": 300
     }'
 
 curl http://${HOST_IP}:${VISUALQNA_BACKEND_SERVICE_PORT}/v1/visualqna \
@@ -397,7 +396,7 @@ A page should open when you click through to this address:
 If a page of this type has opened, then we believe that the service is running and responding,
 and we can proceed to functional UI testing.
 
-To check that service is working push on one of the example pictures and whait for the answer: 
+To check that service is working push on one of the example pictures and whait for the answer:
 
 ![UI result page](../../../../assets/img/visualqna-ui-result-page.png)
 
