@@ -80,11 +80,11 @@ To set up environment variables for deploying ChatQnA services, follow these ste
    # on Gaudi
    cd GenAIExamples/ChatQnA/docker_compose/intel/hpu/gaudi/
    source ./set_env.sh
-   export no_proxy="Your_No_Proxy",chatqna-gaudi-ui-server,chatqna-gaudi-backend-server,dataprep-redis-service,tei-embedding-service,retriever,tei-reranking-service,tgi-service,vllm-service,guardrails,jaeger,prometheus,grafana,gaudi-node-exporter-1
+   export no_proxy="Your_No_Proxy",chatqna-gaudi-ui-server,chatqna-gaudi-backend-server,dataprep-redis-service,tei-embedding-service,retriever,tei-reranking-service,tgi-service,vllm-service,guardrails,jaeger,prometheus,grafana,node-exporter,gaudi-exporter
    # on Xeon
    cd GenAIExamples/ChatQnA/docker_compose/intel/cpu/xeon/
    source ./set_env.sh
-   export no_proxy="Your_No_Proxy",chatqna-xeon-ui-server,chatqna-xeon-backend-server,dataprep-redis-service,tei-embedding-service,retriever,tei-reranking-service,tgi-service,vllm-service,jaeger,prometheus,grafana,xeon-node-exporter-1
+   export no_proxy="Your_No_Proxy",chatqna-xeon-ui-server,chatqna-xeon-backend-server,dataprep-redis-service,tei-embedding-service,retriever,tei-reranking-service,tgi-service,vllm-service,jaeger,prometheus,grafana,node-exporter
    # on Nvidia GPU
    cd GenAIExamples/ChatQnA/docker_compose/nvidia/gpu
    source ./set_env.sh
@@ -355,11 +355,7 @@ Two ways of consuming ChatQnA Service:
 
 2. Access via frontend
 
-   To access the frontend, open the following URL in your browser: `http://{host_ip}:5173`
-
-   By default, the UI runs on port 5173 internally.
-
-   If you choose conversational UI, use this URL: `http://{host_ip}:5174`
+   To access the frontend, open the following URL in your browser: `http://{host_ip}`
 
 ## Troubleshooting
 
