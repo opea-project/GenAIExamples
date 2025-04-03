@@ -3,7 +3,7 @@
 
 import os
 
-from comps import CustomLogger, MegaServiceEndpoint, MicroService, ServiceOrchestrator, ServiceRoleType, ServiceType
+from comps import MegaServiceEndpoint, MicroService, ServiceOrchestrator, ServiceRoleType, ServiceType
 from comps.cores.mega.utils import handle_message
 from comps.cores.proto.api_protocol import (
     ChatCompletionRequest,
@@ -15,9 +15,6 @@ from comps.cores.proto.api_protocol import (
 from comps.cores.proto.docarray import LLMParams, TextDoc
 from fastapi import Request
 from fastapi.responses import StreamingResponse
-
-logger = CustomLogger("videoqna")
-logflag = os.getenv("LOGFLAG", False)
 
 MEGA_SERVICE_PORT = int(os.getenv("BACKEND_PORT", 8888))
 EMBEDDING_SERVICE_HOST_IP = os.getenv("EMBEDDING_SERVICE_HOST_IP", "0.0.0.0")
@@ -32,8 +29,6 @@ LVM_SERVICE_PORT = int(os.getenv("LVM_PORT", 9399))
 
 def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **kwargs):
     service_type = self.services[cur_node].service_type
-    if logflag:
-        logger.info(f"[VideoQnAService {service_type} - align_inputs] inputs: {inputs}")
     if service_type == ServiceType.EMBEDDING:
         if "input" in inputs:
             input_text = inputs["input"]["text"] if isinstance(inputs["input"], dict) else inputs["input"]
@@ -42,11 +37,6 @@ def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **k
 
 
 def align_outputs(self, data, cur_node, inputs, runtime_graph, llm_parameters_dict, **kwargs):
-    service_type = self.services[cur_node].service_type
-    if logflag:
-        logger.info(f"[VideoQnAService {service_type} - align_outputs] inputs: {inputs}")
-        logger.info(f"[VideoQnAService {service_type} - align_outputs] data: {data}")
-
     if self.services[cur_node].service_type == ServiceType.EMBEDDING:
         return {"text": inputs["text"], "embedding": data["embedding"]}
     else:
@@ -61,8 +51,6 @@ class VideoQnAService:
         ServiceOrchestrator.align_outputs = align_outputs
         self.megaservice = ServiceOrchestrator()
         self.endpoint = str(MegaServiceEndpoint.VIDEO_RAG_QNA)
-        if logflag:
-            logger.log_message(10, "[VideoQnAService] Processing ...")
 
     def add_remote_service(self):
         embedding = MicroService(
