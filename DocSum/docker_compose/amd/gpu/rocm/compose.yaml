@@ -17,7 +17,7 @@ services:
       DOCSUM_TGI_SERVICE_PORT: ${DOCSUM_TGI_SERVICE_PORT}
     volumes:
       - "${MODEL_CACHE:-./data}:/data"
-    shm_size: 1g
+    shm_size: 20g
     devices:
       - /dev/kfd:/dev/kfd
       - /dev/dri/:/dev/dri/
