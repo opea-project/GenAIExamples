@@ -44,4 +44,3 @@ get_current_date:
   description: get current date.
   callable_api: research_tools.py:get_current_date
   return_output: current_date
-

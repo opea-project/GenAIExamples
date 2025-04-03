@@ -9,6 +9,7 @@ from langchain_core.documents import Document
 from langchain_huggingface import HuggingFaceEndpointEmbeddings
 from langchain_redis import RedisConfig, RedisVectorStore
 from openai import OpenAI
+
 try:
     from tools.redis_kv import RedisKVStore
 except ImportError:
@@ -49,6 +50,7 @@ Question: {query}
 Now take a deep breath and think step by step to answer the question. Wrap your final answer in {{}}. Example: {{The company has a revenue of $100 million.}}
 """
 
+
 def format_company_name(company):
     company = company.upper()
 
@@ -60,6 +62,7 @@ def format_company_name(company):
         raise ValueError(f"Company not found in knowledge base: {company}")
     print(f"Company: {company}")
     return company
+
 
 def get_embedder():
     if TEI_EMBEDDING_ENDPOINT:

@@ -4,13 +4,13 @@
 import json
 
 import requests
+
 try:
     from tools.redis_kv import RedisKVStore
     from tools.utils import *
 except ImportError:
     from redis_kv import RedisKVStore
     from utils import *
-
 
 
 def get_summary_else_doc(query, company):
@@ -59,7 +59,7 @@ def save_doc_summary(summary, doc_title, company):
     # doc_dict["summary"] = summary
 
     # Save the updated value back to the store
-    kvstore.put(f"{doc_title}_summary", {"summary":summary}, collection=f"full_doc_{company}")
+    kvstore.put(f"{doc_title}_summary", {"summary": summary}, collection=f"full_doc_{company}")
 
 
 def summarize(doc_name, company):
@@ -67,10 +67,10 @@ def summarize(doc_name, company):
     print(f"Docsum Endpoint URL: {docsum_url}")
 
     company = format_company_name(company)
-    
+
     doc_title, sum, is_summary = get_summary_else_doc(doc_name, company)
     if not doc_title:
-        return(f"Cannot find documents related to {doc_title} in KV store.")
+        return f"Cannot find documents related to {doc_title} in KV store."
 
     if not is_summary:
         data = {
@@ -103,9 +103,9 @@ if __name__ == "__main__":
     # year = "2024"
     # quarter = "Q4"
 
-    company="Costco"
-    year="2025"
-    quarter="Q2"
+    company = "Costco"
+    year = "2025"
+    quarter = "Q2"
 
     print("testing summarize")
     doc_name = f"{company} {year} {quarter} earning call"
