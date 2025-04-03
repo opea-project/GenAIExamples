@@ -1,5 +1,5 @@
 secrets:
-  HUGGINGFACEHUB_API_TOKEN: ''
+  HUGGINGFACEHUB_API_TOKEN: "hf_foken"
 
 vllm:
   replicaCount: 1
@@ -10,12 +10,7 @@ vllm:
   env:
     LLM_MODEL_ID: "Intel/neural-chat-7b-v3-3"
     HIP_VISIBLE_DEVICES: "0"
-    HF_HUB_DISABLE_PROGRESS_BARS: "1"
-    HF_HUB_ENABLE_HF_TRANSFER: "0"
     TENSOR_PARALLEL_SIZE: "1"
-    VLLM_USE_TRITON_FLASH_ATTN: "0"
-    VLLM_WORKER_MULTIPROC_METHOD: "spawn"
-    PYTORCH_JIT: "0"
   service:
     type: ClusterIP
     port: 8081

@@ -24,13 +24,13 @@ spec:
               protocol: TCP
           env:
             - name: HUGGINGFACEHUB_API_TOKEN
-              value: {{ .Values.secrets.HUGGINGFACEHUB_API_TOKEN }}
+              value: "{{ .Values.secrets.HUGGINGFACEHUB_API_TOKEN }}"
             - name: LLM_ENDPOINT
-              value: http://docsum-vllm-service:{{ .Values.vllm.service.port }}
+              value: "http://docsum-vllm-service:{{ .Values.vllm.service.port }}"
             - name: LLM_MODEL_ID
-              value: {{ .Values.vllm.env.LLM_MODEL_ID }}
+              value: "{{ .Values.vllm.env.LLM_MODEL_ID }}"
             - name: DocSum_COMPONENT_NAME
-              value: OpeaDocSumvLLM
+              value: "OpeaDocSumvLLM"
           {{- if .Values.llm.env }}
             {{- range $k,$v := .Values.llm.env }}
             - name: {{ tpl (toString $k ) $ | trim | quote }}

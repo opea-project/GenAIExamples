@@ -38,7 +38,17 @@ spec:
                  "--distributed-executor-backend", "mp"]
           env:
             - name: HUGGINGFACEHUB_API_TOKEN
-              value: {{ .Values.secrets.HUGGINGFACEHUB_API_TOKEN }}
+              value: "{{ .Values.secrets.HUGGINGFACEHUB_API_TOKEN }}"
+            - name: HF_HUB_DISABLE_PROGRESS_BARS
+              value: "1"
+            - name: HF_HUB_ENABLE_HF_TRANSFER
+              value: "0"
+            - name: VLLM_USE_TRITON_FLASH_ATTN
+              value: "0"
+            - name: VLLM_WORKER_MULTIPROC_METHOD
+              value: "spawn"
+            - name: PYTORCH_JIT
+              value: "0"
           {{- if .Values.vllm.env }}
             {{- range $k,$v := .Values.vllm.env }}
             - name: {{ tpl (toString $k ) $ | trim | quote }}
