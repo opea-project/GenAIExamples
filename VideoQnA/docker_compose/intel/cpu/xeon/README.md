@@ -35,11 +35,11 @@ lvm
 ===
 Port 9399 - Open to 0.0.0.0/0
 
-videona-xeon-backend-server
+videoqna-xeon-backend-server
 ==========================
 Port 8888 - Open to 0.0.0.0/0
 
-videona-xeon-ui-server
+videoqna-xeon-ui-server
 =====================
 Port 5173 - Open to 0.0.0.0/0
 ```
@@ -150,7 +150,6 @@ export no_proxy=${your_no_proxy}
 export http_proxy=${your_http_proxy}
 export https_proxy=${your_http_proxy}
 
-export CACHE_DIR=/home/$USER/.cache/
 export HF_TOKEN=${HF_TOKEN}
 export HUGGINGFACEHUB_API_TOKEN=${HF_TOKEN}
 
@@ -172,6 +171,7 @@ export VDMS_HOST=${host_ip}
 export BACKEND_PORT=8888
 export DATAPREP_PORT=6007
 export EMBEDDER_PORT=6990
+export MULTIMODAL_CLIP_EMBEDDER_PORT=6991
 export LVM_PORT=9399
 export RERANKING_PORT=8000
 export RETRIEVER_PORT=7000
@@ -181,6 +181,7 @@ export VIDEO_LLAMA_PORT=9009
 
 export BACKEND_HEALTH_CHECK_ENDPOINT="http://${host_ip}:${BACKEND_PORT}/v1/health_check"
 export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:${BACKEND_PORT}/v1/videoqna"
+export CLIP_EMBEDDING_ENDPOINT="http://${host_ip}:${MULTIMODAL_CLIP_EMBEDDER_PORT}"
 export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:${DATAPREP_PORT}/v1/dataprep/get"
 export DATAPREP_GET_VIDEO_LIST_ENDPOINT="http://${host_ip}:${DATAPREP_PORT}/v1/dataprep/get_videos"
 export DATAPREP_INGEST_SERVICE_ENDPOINT="http://${host_ip}:${DATAPREP_PORT}/v1/dataprep/ingest"
@@ -193,10 +194,10 @@ export RETRIEVER_ENDPOINT="http://${host_ip}:${RETRIEVER_PORT}/v1/retrieval"
 export TEI_RERANKING_ENDPOINT="http://${host_ip}:${TEI_RERANKING_PORT}"
 export UI_ENDPOINT="http://${host_ip}:${UI_PORT}/_stcore/health"
 
-export no_proxy="${NO_PROXY},${host_ip},vdms-vector-db,dataprep-vdms-server,clip-embedding-server,multimodal-clip-embedding,reranking-tei-server,retriever-vdms-server,lvm-video-llama,lvm,videoqna-xeon-backend-server,videoqna-xeon-ui-server"
+export no_proxy="${NO_PROXY},${host_ip},vdms-vector-db,dataprep-vdms-server,clip-embedding-server,reranking-tei-server,retriever-vdms-server,lvm-video-llama,lvm,videoqna-xeon-backend-server,videoqna-xeon-ui-server"
 ```
 
-Note: Replace with `host_ip` with you external IP address, do not use localhost. You can also modify `CACHE_DIR` if needed.
+Note: Replace with `host_ip` with you external IP address, do not use localhost.
 
 ### Start all the services with Docker Containers
 

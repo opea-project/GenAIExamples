@@ -8,7 +8,6 @@ popd > /dev/null
 
 host_ip=$(hostname -I | awk '{print $1}')
 
-export CACHE_DIR=/home/$USER/.cache/
 export HF_TOKEN=${HF_TOKEN}
 export HUGGINGFACEHUB_API_TOKEN=${HF_TOKEN}
 
