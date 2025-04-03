@@ -67,7 +67,16 @@ flowchart LR
 
 ```
 
-## Deploy CodeGen Service
+## 🤖 Automated Terraform Deployment using Intel® Optimized Cloud Modules for **Terraform**
+
+| Cloud Provider       | Intel Architecture                | Intel Optimized Cloud Module for Terraform                                                                    | Comments |
+| -------------------- | --------------------------------- | ------------------------------------------------------------------------------------------------------------- | -------- |
+| AWS                  | 4th Gen Intel Xeon with Intel AMX | [AWS Deployment](https://github.com/intel/terraform-intel-aws-vm/tree/main/examples/gen-ai-xeon-opea-codegen) |          |
+| GCP                  | 4th/5th Gen Intel Xeon            | [GCP Deployment](https://github.com/intel/terraform-intel-gcp-vm/tree/main/examples/gen-ai-xeon-opea-codegen) |          |
+| Azure                | 4th/5th Gen Intel Xeon            | Work-in-progress                                                                                              |          |
+| Intel Tiber AI Cloud | 5th Gen Intel Xeon with Intel AMX | Work-in-progress                                                                                              |          |
+
+## Manual Deployment of CodeGen Service
 
 The CodeGen service can be effortlessly deployed on either Intel Gaudi2 or Intel Xeon Scalable Processor.
 
