@@ -23,7 +23,7 @@ RAG bridges the knowledge gap by dynamically fetching relevant information from 
 | Azure                | 5th Gen Intel Xeon with Intel AMX | Work-in-progress                                                                                                                   | Work-in-progress                                                     |
 | Intel Tiber AI Cloud | 5th Gen Intel Xeon with Intel AMX | Work-in-progress                                                                                                                   | Work-in-progress                                                     |
 
-## Automated Deployment to Ubuntu based system(if not using Terraform) using Intel® Optimized Cloud Modules for **Ansible**
+## Automated Deployment to Ubuntu based system (if not using Terraform) using Intel® Optimized Cloud Modules for **Ansible**
 
 To deploy to existing Xeon Ubuntu based system, use our Intel Optimized Cloud Modules for Ansible. This is the same Ansible playbook used by Terraform.
 Use this if you are not using Terraform and have provisioned your system with another tool or manually including bare metal.
