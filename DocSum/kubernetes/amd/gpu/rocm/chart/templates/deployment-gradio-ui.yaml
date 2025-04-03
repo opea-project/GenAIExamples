@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: docsum-gradio-ui
+  labels:
+    name: docsum-gradio-ui
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: docsum-gradio-ui
+  template:
+    metadata:
+      labels:
+        name: docsum-gradio-ui
+    spec:
+      containers:
+        - name: docsum-gradio-ui
+          image: "{{ .Values.ui.image.name }}:{{ .Values.ui.image.tag }}"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: api
+              containerPort: {{ .Values.ui.port }}
+              protocol: TCP
+          env:
+            - name: no_proxy
+            - name: https_proxy
+            - name: http_proxy
+            - name: BACKEND_SERVICE_ENDPOINT
+              value: "http://docsum-backend-service:{{ .Values.backend.service.port }}/v1/docsum"
+            - name: DOC_BASE_URL
+              value: "http://docsum-backend-service:{{ .Values.backend.service.port }}/v1/docsum"
+          {{- if .Values.ui.env }}
+            {{- range $k,$v := .Values.ui.env }}
+            - name: {{ tpl (toString $k ) $ | trim | quote }}
+              value: {{ tpl (toString $v ) $ | trim | quote }}
+            {{- end -}}
+          {{- end }}

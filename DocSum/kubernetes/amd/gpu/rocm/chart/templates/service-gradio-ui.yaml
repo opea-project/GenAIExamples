@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: docsum-gradio-ui
+  labels:
+    name: docsum-gradio-ui-service
+spec:
+  type: {{ .Values.ui.service.type }}
+  ports:
+    - port: {{ .Values.ui.service.port }}
+      targetPort: api
+      protocol: TCP
+      name: api
+  selector:
+    name: docsum-gradio-ui

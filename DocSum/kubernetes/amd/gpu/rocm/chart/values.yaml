@@ -1,0 +1,64 @@
+secrets:
+  HUGGINGFACEHUB_API_TOKEN: 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
+
+vllm:
+  replicaCount: 1
+  image:
+    name: opea/vllm-rocm
+    tag: latest
+  port: 8081
+  env:
+    LLM_MODEL_ID: "Intel/neural-chat-7b-v3-3"
+    HIP_VISIBLE_DEVICES: "0"
+    HF_HUB_DISABLE_PROGRESS_BARS: "1"
+    HF_HUB_ENABLE_HF_TRANSFER: "0"
+    TENSOR_PARALLEL_SIZE: "1"
+    VLLM_USE_TRITON_FLASH_ATTN: "0"
+    VLLM_WORKER_MULTIPROC_METHOD: "spawn"
+    PYTORCH_JIT: "0"
+  service:
+    type: ClusterIP
+    port: 8081
+
+llm:
+  replicaCount: 1
+  image:
+    name: opea/llm-docsum
+    tag: latest
+  port: 9000
+  env:
+    MAX_INPUT_TOKENS: "2048"
+    MAX_TOTAL_TOKENS: "4096"
+  service:
+    type: ClusterIP
+    port: 9000
+
+whisper:
+  replicaCount: 1
+  image:
+    name: opea/whisper
+    tag: latest
+  port: 7066
+  service:
+    type: ClusterIP
+    port: 7066
+
+backend:
+  replicaCount: 1
+  image:
+    name: opea/docsum
+    tag: latest
+  port: 8888
+  service:
+    type: ClusterIP
+    port: 8888
+
+ui:
+  replicaCount: 1
+  image:
+    name: opea/docsum-gradio-ui
+    tag: latest
+  port: 5173
+  service:
+    type: ClusterIP
+    port: 5173

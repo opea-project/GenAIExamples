@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: docsum-vllm-service
+  labels:
+    name: docsum-vllm-service
+spec:
+  type: {{ .Values.vllm.service.type }}
+  ports:
+    - port: {{ .Values.vllm.service.port }}
+      targetPort: api
+      protocol: TCP
+      name: api
+  selector:
+    name: docsum-vllm

@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: docsum-vllm
+  labels:
+    name: docsum-vllm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: docsum-vllm
+  template:
+    metadata:
+      labels:
+        name: docsum-vllm
+    spec:
+      volumes:
+        - name: model-cache
+          emptyDir:
+            sizeLimit: 160Gi
+      containers:
+        - name: docsum-vllm
+          image: "{{ .Values.vllm.image.name }}:{{ .Values.vllm.image.tag }}"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: api
+              containerPort: {{ .Values.vllm.port }}
+              protocol: TCP
+          command: ["python3", "/workspace/api_server.py"]
+          args: ["--model", "{{ .Values.vllm.env.LLM_MODEL_ID }}",
+                 "--swap-space", "16",
+                 "--disable-log-requests",
+                 "--dtype", "float16",
+                 "--tensor-parallel-size", "{{ .Values.vllm.env.TENSOR_PARALLEL_SIZE }}",
+                 "--host", "0.0.0.0",
+                 "--port", "{{ .Values.vllm.port }}",
+                 "--num-scheduler-steps", "1",
+                 "--distributed-executor-backend", "mp"]
+          env:
+            - name: HUGGINGFACEHUB_API_TOKEN
+              value: {{ .Values.secrets.HUGGINGFACEHUB_API_TOKEN }}
+          {{- if .Values.vllm.env }}
+            {{- range $k,$v := .Values.vllm.env }}
+            - name: {{ tpl (toString $k ) $ | trim | quote }}
+              value: {{ tpl (toString $v ) $ | trim | quote }}
+            {{- end -}}
+          {{- end }}
+          volumeMounts:
+            - mountPath: /data
+              name: model-cache
+          resources:
+            limits:
+              amd.com/gpu: "{{ .Values.vllm.env.TENSOR_PARALLEL_SIZE }}"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: api
+            initialDelaySeconds: 300
+            periodSeconds: 5
+            successThreshold: 1
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: api
+            initialDelaySeconds: 120
+            periodSeconds: 5
+            successThreshold: 3
+            failureThreshold: 100
+

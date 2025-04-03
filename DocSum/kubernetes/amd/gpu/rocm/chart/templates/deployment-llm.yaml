@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: docsum-llm
+  labels:
+    name: docsum-llm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: docsum-llm
+  template:
+    metadata:
+      labels:
+        name: docsum-llm
+    spec:
+      containers:
+        - name: docsum-llm
+          image: "{{ .Values.llm.image.name }}:{{ .Values.llm.image.tag }}"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: api
+              containerPort: {{ .Values.llm.port }}
+              protocol: TCP
+          env:
+            - name: HUGGINGFACEHUB_API_TOKEN
+              value: {{ .Values.secrets.HUGGINGFACEHUB_API_TOKEN }}
+            - name: LLM_ENDPOINT
+              value: http://docsum-vllm-service:{{ .Values.vllm.service.port }}
+            - name: LLM_MODEL_ID
+              value: {{ .Values.vllm.env.LLM_MODEL_ID }}
+            - name: DocSum_COMPONENT_NAME
+              value: OpeaDocSumvLLM
+          {{- if .Values.llm.env }}
+            {{- range $k,$v := .Values.llm.env }}
+            - name: {{ tpl (toString $k ) $ | trim | quote }}
+              value: {{ tpl (toString $v ) $ | trim | quote }}
+            {{- end -}}
+          {{- end }}
