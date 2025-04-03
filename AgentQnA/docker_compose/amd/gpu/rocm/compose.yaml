@@ -2,7 +2,7 @@
 
 services:
   tgi-service:
-    image: ghcr.io/huggingface/text-generation-inference:3.0.0-rocm
+    image: ghcr.io/huggingface/text-generation-inference:2.4.1-rocm
     container_name: tgi-service
     ports:
       - "${TGI_SERVICE_PORT-8085}:80"
