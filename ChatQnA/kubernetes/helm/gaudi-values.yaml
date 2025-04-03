@@ -16,18 +16,7 @@ vllm:
     limits:
       habana.ai/gaudi: 1
   startupProbe:
-    initialDelaySeconds: 5
-    periodSeconds: 5
-    timeoutSeconds: 1
-    failureThreshold: 180
-  readinessProbe:
-    initialDelaySeconds: 5
-    periodSeconds: 5
-    timeoutSeconds: 1
-  livenessProbe:
-    initialDelaySeconds: 5
-    periodSeconds: 5
-    timeoutSeconds: 1
+    failureThreshold: 360
 
   PT_HPU_ENABLE_LAZY_COLLECTIVES: "true"
   OMPI_MCA_btl_vader_single_copy_mechanism: "none"
@@ -55,7 +44,5 @@ teirerank:
       habana.ai/gaudi: 1
   securityContext:
     readOnlyRootFilesystem: false
-  livenessProbe:
-    timeoutSeconds: 1
   readinessProbe:
     timeoutSeconds: 1
