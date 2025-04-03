@@ -23,14 +23,15 @@ RAG bridges the knowledge gap by dynamically fetching relevant information from 
 | Azure                | 5th Gen Intel Xeon with Intel AMX | Work-in-progress                                                                                                                   | Work-in-progress                                                     |
 | Intel Tiber AI Cloud | 5th Gen Intel Xeon with Intel AMX | Work-in-progress                                                                                                                   | Work-in-progress                                                     |
 
-## Automated Deployment to Ubuntu based system(if not using Terraform) using Intel® Optimized Cloud Modules for **Ansible**
+## Automated Deployment to Ubuntu based system (if not using Terraform) using Intel® Optimized Cloud Modules for **Ansible**
 
 To deploy to existing Xeon Ubuntu based system, use our Intel Optimized Cloud Modules for Ansible. This is the same Ansible playbook used by Terraform.
 Use this if you are not using Terraform and have provisioned your system with another tool or manually including bare metal.
-| Operating System | Intel Optimized Cloud Module for Ansible |
-|------------------|------------------------------------------|
-| Ubuntu 20.04 | [ChatQnA Ansible Module](https://github.com/intel/optimized-cloud-recipes/tree/main/recipes/ai-opea-chatqna-xeon) |
-| Ubuntu 22.04 | Work-in-progress |
+
+| Operating System | Intel Optimized Cloud Module for Ansible                                                                          |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------- |
+| Ubuntu 20.04     | [ChatQnA Ansible Module](https://github.com/intel/optimized-cloud-recipes/tree/main/recipes/ai-opea-chatqna-xeon) |
+| Ubuntu 22.04     | Work-in-progress                                                                                                  |
 
 ## Manually Deploy ChatQnA Service
 
@@ -48,7 +49,7 @@ Note:
 
 1. If you do not have docker installed you can run this script to install docker : `bash docker_compose/install_docker.sh`.
 
-2. The default LLM is `meta-llama/Meta-Llama-3-8B-Instruct`. Before deploying the application, please make sure either you've requested and been granted the access to it on [Huggingface](https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct) or you've downloaded the model locally from [ModelScope](https://www.modelscope.cn/models).
+2. The default LLM is `meta-llama/Meta-Llama-3-8B-Instruct`. Before deploying the application, please make sure either you've requested and been granted the access to it on [Huggingface](https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct) `or` you've downloaded the model locally from [ModelScope](https://www.modelscope.cn/models).
 
 ### Quick Start: 1.Setup Environment Variable
 
@@ -221,13 +222,14 @@ This ChatQnA use case performs RAG using LangChain, Redis VectorDB and Text Gene
 In the below, we provide a table that describes for each microservice component in the ChatQnA architecture, the default configuration of the open source project, hardware, port, and endpoint.
 
 Gaudi default compose.yaml
-| MicroService | Open Source Project | HW | Port | Endpoint |
+
+| MicroService | Open Source Project | HW    | Port | Endpoint             |
 | ------------ | ------------------- | ----- | ---- | -------------------- |
-| Embedding | Langchain | Xeon | 6000 | /v1/embeddings |
-| Retriever | Langchain, Redis | Xeon | 7000 | /v1/retrieval |
-| Reranking | Langchain, TEI | Gaudi | 8000 | /v1/reranking |
-| LLM | Langchain, TGI | Gaudi | 9000 | /v1/chat/completions |
-| Dataprep | Redis, Langchain | Xeon | 6007 | /v1/dataprep/ingest |
+| Embedding    | Langchain           | Xeon  | 6000 | /v1/embeddings       |
+| Retriever    | Langchain, Redis    | Xeon  | 7000 | /v1/retrieval        |
+| Reranking    | Langchain, TEI      | Gaudi | 8000 | /v1/reranking        |
+| LLM          | Langchain, TGI      | Gaudi | 9000 | /v1/chat/completions |
+| Dataprep     | Redis, Langchain    | Xeon  | 6007 | /v1/dataprep/ingest  |
 
 ### Required Models
 
