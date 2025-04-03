@@ -1,15 +1,14 @@
 #!/bin/bash
-# Copyright (C) 2024 Advanced Micro Devices, Inc.
+# Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-set -xe
+set -e
 IMAGE_REPO=${IMAGE_REPO:-"opea"}
 IMAGE_TAG=${IMAGE_TAG:-"latest"}
 echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
 echo "TAG=IMAGE_TAG=${IMAGE_TAG}"
 export REGISTRY=${IMAGE_REPO}
 export TAG=${IMAGE_TAG}
-export MODEL_CACHE=${model_cache:-"/var/opea/chatqna-service/data"}
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
@@ -32,10 +31,10 @@ export CHATQNA_REDIS_VECTOR_INSIGHT_PORT=8001
 export CHATQNA_REDIS_VECTOR_PORT=6379
 export CHATQNA_TEI_EMBEDDING_PORT=18090
 export CHATQNA_TEI_RERANKING_PORT=18808
-export CHATQNA_TGI_SERVICE_PORT=18008
+export CHATQNA_VLLM_SERVICE_PORT=18008
 
 export CHATQNA_BACKEND_SERVICE_ENDPOINT="http://${HOST_IP_EXTERNAL}:${CHATQNA_BACKEND_SERVICE_PORT}/v1/chatqna"
-export CHATQNA_BACKEND_SERVICE_IP=${HOST_IP}
+export CHATQNA_BACKEND_SERVICE_IP=${HOST_IP_EXTERNAL}
 export CHATQNA_DATAPREP_DELETE_FILE_ENDPOINT="http://${HOST_IP_EXTERNAL}:${CHATQNA_REDIS_DATAPREP_PORT}/v1/dataprep/delete"
 export CHATQNA_DATAPREP_GET_FILE_ENDPOINT="http://${HOST_IP_EXTERNAL}:${CHATQNA_REDIS_DATAPREP_PORT}/v1/dataprep/get"
 export CHATQNA_DATAPREP_SERVICE_ENDPOINT="http://${HOST_IP_EXTERNAL}:${CHATQNA_REDIS_DATAPREP_PORT}/v1/dataprep/ingest"
@@ -51,7 +50,6 @@ export CHATQNA_TEI_EMBEDDING_ENDPOINT="http://${HOST_IP}:${CHATQNA_TEI_EMBEDDING
 export CHATQNA_BACKEND_SERVICE_NAME=chatqna
 export CHATQNA_INDEX_NAME="rag-redis"
 
-export PATH="~/miniconda3/bin:$PATH"
 
 function build_docker_images() {
     opea_branch=${opea_branch:-"main"}
@@ -68,13 +66,11 @@ function build_docker_images() {
 
     cd $WORKPATH/docker_image_build
     git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
+    git clone --depth 1 https://github.com/vllm-project/vllm.git
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="chatqna chatqna-ui dataprep retriever nginx"
-    docker compose -f build.yaml build ${service_list} --no-cache > "${LOG_PATH}"/docker_image_build.log
-
-    docker pull ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
-    docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+    service_list="chatqna chatqna-ui dataprep retriever vllm-rocm nginx"
+    docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker images && sleep 1s
 }
@@ -83,19 +79,17 @@ function start_services() {
     cd "$WORKPATH"/docker_compose/amd/gpu/rocm
 
     # Start Docker Containers
-    docker compose -f compose.yaml up -d > "${LOG_PATH}"/start_services_with_compose.log
+    docker compose -f compose_vllm.yaml up -d > "${LOG_PATH}"/start_services_with_compose.log
 
     n=0
-    until [[ "$n" -ge 160 ]]; do
-        docker logs chatqna-tgi-service > "${LOG_PATH}"/tgi_service_start.log
-        if grep -q Connected "${LOG_PATH}"/tgi_service_start.log; then
+    until [[ "$n" -ge 500 ]]; do
+        docker logs chatqna-vllm-service >& "${LOG_PATH}"/chatqna-vllm-service_start.log
+        if grep -q "Application startup complete" "${LOG_PATH}"/chatqna-vllm-service_start.log; then
             break
         fi
-        sleep 5s
+        sleep 20s
         n=$((n+1))
     done
-
-    echo "all containers start!"
 }
 
 function validate_service() {
@@ -105,38 +99,24 @@ function validate_service() {
     local DOCKER_NAME="$4"
     local INPUT_DATA="$5"
 
-    if [[ $SERVICE_NAME == *"dataprep_upload_file"* ]]; then
-        cd "$LOG_PATH"
-        HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -F 'files=@./dataprep_file.txt' -H 'Content-Type: multipart/form-data' "$URL")
-    elif [[ $SERVICE_NAME == *"dataprep_upload_link"* ]]; then
-        HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -F 'link_list=["https://www.ces.tech/"]' "$URL")
-    elif [[ $SERVICE_NAME == *"dataprep_get"* ]]; then
-        HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -H 'Content-Type: application/json' "$URL")
-    elif [[ $SERVICE_NAME == *"dataprep_del"* ]]; then
-        HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -d '{"file_path": "all"}' -H 'Content-Type: application/json' "$URL")
-    else
-        HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL")
-    fi
-    HTTP_STATUS=$(echo "$HTTP_RESPONSE" | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
-    RESPONSE_BODY=$(echo "$HTTP_RESPONSE" | sed -e 's/HTTPSTATUS\:.*//g')
-
-    docker logs "${DOCKER_NAME}" >> "${LOG_PATH}"/"${SERVICE_NAME}".log
-
-    # check response status
-    if [ "$HTTP_STATUS" -ne "200" ]; then
-        echo "[ $SERVICE_NAME ] HTTP status is not 200. Received status was $HTTP_STATUS"
-        exit 1
-    else
+    local HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL")
+    if [ "$HTTP_STATUS" -eq 200 ]; then
         echo "[ $SERVICE_NAME ] HTTP status is 200. Checking content..."
-    fi
-    # check response body
-    if [[ "$RESPONSE_BODY" != *"$EXPECTED_RESULT"* ]]; then
-        echo "[ $SERVICE_NAME ] Content does not match the expected result: $RESPONSE_BODY"
-        exit 1
-    else
-        echo "[ $SERVICE_NAME ] Content is as expected."
-    fi
 
+        local CONTENT=$(curl -s -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL" | tee ${LOG_PATH}/${SERVICE_NAME}.log)
+
+        if echo "$CONTENT" | grep -q "$EXPECTED_RESULT"; then
+            echo "[ $SERVICE_NAME ] Content is as expected."
+        else
+            echo "[ $SERVICE_NAME ] Content does not match the expected result: $CONTENT"
+            docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
+            exit 1
+        fi
+    else
+        echo "[ $SERVICE_NAME ] HTTP status is not 200. Received status was $HTTP_STATUS"
+        docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
+        exit 1
+    fi
     sleep 1s
 }
 
@@ -146,7 +126,7 @@ function validate_microservices() {
     # tei for embedding service
     validate_service \
         "${ip_address}:${CHATQNA_TEI_EMBEDDING_PORT}/embed" \
-        "[[" \
+        "\[\[" \
         "tei-embedding" \
         "chatqna-tei-embedding-service" \
         '{"inputs":"What is Deep Learning?"}'
@@ -158,7 +138,7 @@ function validate_microservices() {
     validate_service \
         "${ip_address}:${CHATQNA_REDIS_RETRIEVER_PORT}/v1/retrieval" \
         " " \
-        "retrieval-microservice" \
+        "retrieval" \
         "chatqna-retriever" \
         "{\"text\":\"What is the revenue of Nike in 2023?\",\"embedding\":${test_embedding}}"
 
@@ -170,30 +150,28 @@ function validate_microservices() {
         "chatqna-tei-reranking-service" \
         '{"query":"What is Deep Learning?", "texts": ["Deep Learning is not...", "Deep learning is..."]}'
 
-    # tgi for llm service
+    # vllm for llm service
     validate_service \
-        "${ip_address}:${CHATQNA_TGI_SERVICE_PORT}/generate" \
-        "generated_text" \
-        "tgi-llm" \
-        "chatqna-tgi-service" \
-        '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}'
-
+        "${ip_address}:${CHATQNA_VLLM_SERVICE_PORT}/v1/chat/completions" \
+        "content" \
+        "vllm-llm" \
+        "chatqna-vllm-service" \
+        '{"model": "meta-llama/Meta-Llama-3-8B-Instruct", "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens": 17}'
 }
 
 function validate_megaservice() {
     # Curl the Mega Service
     validate_service \
         "${ip_address}:${CHATQNA_BACKEND_SERVICE_PORT}/v1/chatqna" \
-        "Nike" \
-        "chatqna-megaservice" \
+        "data" \
+        "mega-chatqna" \
         "chatqna-backend-server" \
         '{"messages": "What is the revenue of Nike in 2023?"}'
 
 }
 
 function validate_frontend() {
-    echo "[ TEST INFO ]: --------- frontend test started ---------"
-    cd "$WORKPATH"/ui/svelte
+    cd $WORKPATH/ui/svelte
     local conda_env_name="OPEA_e2e"
     export PATH=${HOME}/miniconda3/bin/:$PATH
     if conda info --envs | grep -q "$conda_env_name"; then
@@ -201,8 +179,8 @@ function validate_frontend() {
     else
         conda create -n ${conda_env_name} python=3.12 -y
     fi
+
     source activate ${conda_env_name}
-    echo "[ TEST INFO ]: --------- conda env activated ---------"
 
     sed -i "s/localhost/$ip_address/g" playwright.config.ts
 
@@ -222,8 +200,8 @@ function validate_frontend() {
 }
 
 function stop_docker() {
-    cd "$WORKPATH"/docker_compose/amd/gpu/rocm
-    docker compose stop && docker compose rm -f
+    cd $WORKPATH/docker_compose/amd/gpu/rocm
+    docker compose -f compose_vllm.yaml down
 }
 
 function main() {
@@ -236,12 +214,13 @@ function main() {
     duration=$((end_time-start_time))
     echo "Mega service start duration is $duration s" && sleep 1s
 
-    validate_microservices
-    echo "==== microservices validated ===="
-    validate_megaservice
-    echo "==== megaservice validated ===="
-    validate_frontend
-    echo "==== frontend validated ===="
+    if [ "${mode}" == "perf" ]; then
+        python3 $WORKPATH/tests/chatqna_benchmark.py
+    elif [ "${mode}" == "" ]; then
+        validate_microservices
+        validate_megaservice
+        validate_frontend
+    fi
 
     stop_docker
     echo y | docker system prune
