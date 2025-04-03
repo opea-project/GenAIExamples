@@ -1,0 +1,51 @@
+From 490b92b0f3df48973445d6847ca5953951eb101e Mon Sep 17 00:00:00 2001
+From: lkk12014402 <kaokao.lv@intel.com>
+Date: Thu, 3 Apr 2025 15:00:08 +0000
+Subject: [PATCH] update for opea tool content.
+
+---
+ backend/open_webui/utils/middleware.py | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+
+diff --git a/backend/open_webui/utils/middleware.py b/backend/open_webui/utils/middleware.py
+index 532f17387..1dc87179d 100644
+--- a/backend/open_webui/utils/middleware.py
++++ b/backend/open_webui/utils/middleware.py
+@@ -1520,6 +1520,7 @@ async def process_chat_response(
+             solution_tags = [("|begin_of_solution|", "|end_of_solution|")]
+ 
+             try:
++                """
+                 for event in events:
+                     await event_emitter(
+                         {
+@@ -1536,6 +1537,7 @@ async def process_chat_response(
+                             **event,
+                         },
+                     )
++                """
+ 
+                 async def stream_body_handler(response):
+                     nonlocal content
+@@ -1561,6 +1563,18 @@ async def process_chat_response(
+                         try:
+                             data = json.loads(data)
+ 
++                            if data.get("tool_name"):
++                                sources.append(
++                                    {
++                                        "source": {
++                                            "name": f"TOOL:{data.get('tool_name')}"},
++                                        "document": [data.get("tool_content")],
++                                        "metadata": [{
++                                            "source": f"TOOL:{data.get('tool_name')}"}],
++                                    }
++                                )
++                                events.append({"sources": sources})
++
+                             data, _ = await process_filter_functions(
+                                 request=request,
+                                 filter_functions=filter_functions,
+-- 
+2.34.1
+
