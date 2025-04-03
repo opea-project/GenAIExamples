@@ -3,7 +3,7 @@
 
 services:
   tgi-service:
-    image: ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu
+    image: ghcr.io/huggingface/text-generation-inference:2.4.1-intel-cpu
     container_name: codetrans-xeon-tgi-service
     ports:
       - "8008:80"

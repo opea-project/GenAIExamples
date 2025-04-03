@@ -48,13 +48,13 @@ docker build --no-cache -t opea/visualqna-ui:latest --build-arg https_proxy=$htt
 # vLLM
 docker pull opea/vllm:latest
 # TGI (Optional)
-docker pull ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu
+docker pull ghcr.io/huggingface/text-generation-inference:2.4.1-intel-cpu
 ```
 
 Then run the command `docker images`, you will have the following Docker Images:
 
 1. `opea/vllm:latest`
-2. `ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu` (Optional)
+2. `ghcr.io/huggingface/text-generation-inference:2.4.1-intel-cpu` (Optional)
 3. `opea/lvm:latest`
 4. `opea/visualqna:latest`
 5. `opea/visualqna-ui:latest`

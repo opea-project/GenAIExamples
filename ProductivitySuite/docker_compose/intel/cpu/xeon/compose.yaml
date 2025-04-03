@@ -131,7 +131,7 @@ services:
       LOGFLAG: ${LOGFLAG}
     restart: unless-stopped
   tgi_service:
-    image: ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu
+    image: ghcr.io/huggingface/text-generation-inference:2.4.1-intel-cpu
     container_name: tgi-service
     ports:
       - "9009:80"
@@ -204,7 +204,7 @@ services:
     ipc: host
     restart: always
   tgi_service_codegen:
-    image: ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu
+    image: ghcr.io/huggingface/text-generation-inference:2.4.1-intel-cpu
     container_name: tgi_service_codegen
     ports:
       - "8028:80"
