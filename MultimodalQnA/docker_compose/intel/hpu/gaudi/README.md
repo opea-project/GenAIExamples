@@ -8,7 +8,7 @@ Since the `compose.yaml` will consume some environment variables, you need to se
 
 **Export the value of the public IP address of your Gaudi server to the `host_ip` environment variable**
 
-> Change the External_Public_IP below with the actual IPV4 value
+> Change the External_Public_IP below with the actual IPv4 value when setting the `host_ip` value (do not use localhost).
 
 ```
 export host_ip="External_Public_IP"
@@ -17,13 +17,10 @@ export host_ip="External_Public_IP"
 **Append the value of the public IP address to the no_proxy list**
 
 ```bash
-export your_no_proxy=${your_no_proxy},"External_Public_IP"
+export no_proxy=${no_proxy},${host_ip}
 ```
 
 ```bash
-export no_proxy=${your_no_proxy}
-export http_proxy=${your_http_proxy}
-export https_proxy=${your_http_proxy}
 export MM_EMBEDDING_SERVICE_HOST_IP=${host_ip}
 export MM_RETRIEVER_SERVICE_HOST_IP=${host_ip}
 export LVM_SERVICE_HOST_IP=${host_ip}
@@ -57,9 +54,8 @@ export LVM_ENDPOINT="http://${host_ip}:${LLAVA_SERVER_PORT}"
 export MEGA_SERVICE_PORT=8888
 export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:${MEGA_SERVICE_PORT}/v1/multimodalqna"
 export UI_PORT=5173
+export UI_TIMEOUT=240
 ```
-
-Note: Please replace with `host_ip` with you external IP address, do not use localhost.
 
 > Note: The `MAX_IMAGES` environment variable is used to specify the maximum number of images that will be sent from the LVM service to the LLaVA server.
 > If an image list longer than `MAX_IMAGES` is sent to the LVM server, a shortened image list will be sent to the LLaVA service. If the image list
@@ -120,7 +116,15 @@ Build whisper server image
 docker build --no-cache -t opea/whisper:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/asr/src/integrations/dependency/whisper/Dockerfile .
 ```
 
-### 6. Build MegaService Docker Image
+### 6. Build TTS Server Image
+
+Build TTS server image
+
+```bash
+docker build --no-cache -t opea/speecht5:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/tts/src/integrations/dependency/speecht5/Dockerfile .
+```
+
+### 7. Build MegaService Docker Image
 
 To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the [multimodalqna.py](../../../../multimodalqna.py) Python script. Build MegaService Docker image via below command:
 
@@ -130,7 +134,7 @@ cd GenAIExamples/MultimodalQnA
 docker build --no-cache -t opea/multimodalqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
 ```
 
-### 6. Build UI Docker Image
+### 8. Build UI Docker Image
 
 Build frontend Docker image via below command:
 
@@ -146,11 +150,12 @@ Then run the command `docker images`, you will have the following 11 Docker Imag
 3. `ghcr.io/huggingface/tgi-gaudi:2.3.1`
 4. `opea/retriever:latest`
 5. `opea/whisper:latest`
-6. `opea/redis-vector-db`
-7. `opea/embedding:latest`
-8. `opea/embedding-multimodal-bridgetower:latest`
-9. `opea/multimodalqna:latest`
-10. `opea/multimodalqna-ui:latest`
+6. `opea/speech5:latest`
+7. `opea/redis-vector-db`
+8. `opea/embedding:latest`
+9. `opea/embedding-multimodal-bridgetower:latest`
+10. `opea/multimodalqna:latest`
+11. `opea/multimodalqna-ui:latest`
 
 ## 🚀 Start Microservices
 
@@ -210,7 +215,7 @@ curl http://${host_ip}:$MM_EMBEDDING_PORT_MICROSERVICE/v1/embeddings \
 
 ```bash
 export your_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(512)]; print(embedding)")
-curl http://${host_ip}:7000/v1/retrieval \
+curl http://${host_ip}:${REDIS_RETRIEVER_PORT}/v1/retrieval \
     -X POST \
     -H "Content-Type: application/json" \
     -d "{\"text\":\"test\",\"embedding\":${your_embedding}}"
@@ -234,7 +239,16 @@ curl http://${host_ip}:${LLAVA_SERVER_PORT}/generate \
     -H 'Content-Type: application/json'
 ```
 
-6. lvm
+6. tts
+
+```bash
+curl ${TTS_ENDPOINT} \
+  -X POST \
+  -d '{"text": "Who are you?"}' \
+  -H 'Content-Type: application/json'
+```
+
+7. lvm
 
 ```bash
 curl http://${host_ip}:${LVM_PORT}/v1/lvm \
@@ -259,9 +273,9 @@ curl http://${host_ip}:${LVM_PORT}/v1/lvm \
     -d '{"retrieved_docs": [], "initial_query": "What is this?", "top_n": 1, "metadata": [], "chat_template":"The caption of the image is: '\''{context}'\''. {question}"}'
 ```
 
-7. Multimodal Dataprep Microservice
+8. Multimodal Dataprep Microservice
 
-Download a sample video, image, PDF, and audio file and create a caption
+Download a sample video (.mp4), image (.png, .gif, .jpg), pdf, and audio file (.wav, .mp3) and create a caption
 
 ```bash
 export video_fn="WeAreGoingOnBullrun.mp4"
@@ -280,7 +294,7 @@ export audio_fn="AudioSample.wav"
 wget https://github.com/intel/intel-extension-for-transformers/raw/main/intel_extension_for_transformers/neural_chat/assets/audio/sample.wav -O ${audio_fn}
 ```
 
-Test dataprep microservice with generating transcript. This command updates a knowledge base by uploading a local video .mp4 and an audio .wav file.
+Test dataprep microservice with generating transcript. This command updates a knowledge base by uploading a local video .mp4 and an audio .wav or .mp3 file.
 
 ```bash
 curl --silent --write-out "HTTPSTATUS:%{http_code}" \
@@ -300,7 +314,7 @@ curl --silent --write-out "HTTPSTATUS:%{http_code}" \
     -X POST -F "files=@./${image_fn}"
 ```
 
-Now, test the microservice with posting a custom caption along with an image and a PDF containing images and text.
+Now, test the microservice with posting a custom caption along with an image and a PDF containing images and text. The image caption can be provided as a text (`.txt`) or as spoken audio (`.wav` or `.mp3`).
 
 ```bash
 curl --silent --write-out "HTTPSTATUS:%{http_code}" \
@@ -340,7 +354,7 @@ curl -X POST \
     ${DATAPREP_DELETE_FILE_ENDPOINT}
 ```
 
-8. MegaService
+9. MegaService
 
 Test the MegaService with a text query:
 
@@ -367,10 +381,10 @@ curl http://${host_ip}:${MEGA_SERVICE_PORT}/v1/multimodalqna \
     -d  '{"messages": [{"role": "user", "content": [{"type": "text", "text": "Green bananas in a tree"}, {"type": "image_url", "image_url": {"url": "http://images.cocodataset.org/test-stuff2017/000000004248.jpg"}}]}]}'
 ```
 
-Test the MegaService with a back and forth conversation between the user and assistant:
+Test the MegaService with a back and forth conversation between the user and assistant including a text to speech response from the assistant using `"modalities": ["text", "audio"]'`:
 
 ```bash
 curl http://${host_ip}:${MEGA_SERVICE_PORT}/v1/multimodalqna \
 	-H "Content-Type: application/json" \
-	-d '{"messages": [{"role": "user", "content": [{"type": "text", "text": "hello, "}, {"type": "image_url", "image_url": {"url": "https://www.ilankelman.org/stopsigns/australia.jpg"}}]}, {"role": "assistant", "content": "opea project! "}, {"role": "user", "content": "chao, "}], "max_tokens": 10}'
+	-d '{"messages": [{"role": "user", "content": [{"type": "text", "text": "hello, "}, {"type": "image_url", "image_url": {"url": "https://www.ilankelman.org/stopsigns/australia.jpg"}}]}, {"role": "assistant", "content": "opea project! "}, {"role": "user", "content": "chao, "}], "max_tokens": 10, "modalities": ["text", "audio"]}'
 ```

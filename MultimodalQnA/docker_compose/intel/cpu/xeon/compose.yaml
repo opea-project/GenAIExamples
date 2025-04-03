@@ -13,6 +13,19 @@ services:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
     restart: unless-stopped
+  speecht5-service:
+    image: ${REGISTRY:-opea}/speecht5:${TAG:-latest}
+    container_name: speecht5-service
+    ports:
+      - "${TTS_PORT}:7055"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      TTS_PORT: ${TTS_PORT}
+      TTS_ENDPOINT: ${TTS_ENDPOINT}
+    restart: unless-stopped
   redis-vector-db:
     image: redis/redis-stack:7.2.0-v9
     container_name: redis-vector-db
@@ -152,6 +165,8 @@ services:
       LVM_MODEL_ID: ${LVM_MODEL_ID}
       WHISPER_PORT: ${WHISPER_PORT}
       WHISPER_SERVER_ENDPOINT: ${WHISPER_SERVER_ENDPOINT}
+      TTS_PORT: ${TTS_PORT}
+      TTS_ENDPOINT: ${TTS_ENDPOINT}
     ipc: host
     restart: always
   multimodalqna-ui:
@@ -169,8 +184,11 @@ services:
       - DATAPREP_INGEST_SERVICE_ENDPOINT=${DATAPREP_INGEST_SERVICE_ENDPOINT}
       - DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT=${DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT}
       - DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT=${DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT}
+      - DATAPREP_GET_FILE_ENDPOINT=${DATAPREP_GET_FILE_ENDPOINT}
+      - DATAPREP_DELETE_FILE_ENDPOINT=${DATAPREP_DELETE_FILE_ENDPOINT}
       - MEGA_SERVICE_PORT:=${MEGA_SERVICE_PORT}
       - UI_PORT=${UI_PORT}
+      - UI_TIMEOUT=${UI_TIMEOUT}
       - DATAPREP_MMR_PORT=${DATAPREP_MMR_PORT}
     ipc: host
     restart: always
