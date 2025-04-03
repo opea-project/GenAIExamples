@@ -5,7 +5,7 @@
 
 services:
   vdms-vector-db:
-    image: intellabs/vdms:v2.10.0
+    image: intellabs/vdms:latest
     container_name: vdms-vector-db
     ports:
       - "${VDMS_PORT}:55555"
