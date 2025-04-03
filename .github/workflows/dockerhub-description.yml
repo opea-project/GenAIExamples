@@ -1,0 +1,984 @@
+# Copyright (C) 2025 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+name: Update Docker Hub Description
+on:
+  schedule:
+    - cron: "0 0 * * 0"
+  workflow_dispatch:
+
+jobs:
+  dockerHubDescription:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout current repository
+      uses: actions/checkout@v4
+
+    - name: Description for audioqna
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/audioqna
+        short-description: "The docker image served as an audioqna gateway and using language modeling to generate answers to user queries by converting audio input to text, and then using text-to-speech (TTS) to convert those answers back to speech for interaction."
+        readme-filepath: AudioQnA/README.md
+        enable-url-completion: true
+
+    - name: Description for audioqna-ui
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/audioqna-ui
+        short-description: "The docker image acted as the audioqna UI entry for enabling seamless interaction with users"
+        readme-filepath: AudioQnA/ui/svelte/README.md
+        enable-url-completion: false
+
+    - name: Description for audioqna-multilang
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/audioqna-multilang
+        short-description: "The docker image served as an audioqna gateway and using language modeling to generate answers to user queries by converting multilingual audio input to text, and then use multilingual text-to-speech (TTS) to convert those answers back to speech for interaction."
+        readme-filepath: AudioQnA/README.md
+        enable-url-completion: false
+
+    - name: Description for avatarchatbot
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/avatarchatbot
+        short-description: "The docker image served as a avatarchatbot gateway and interacted with users by understanding their questions and providing relevant answers."
+        readme-filepath: AvatarChatbot/README.md
+        enable-url-completion: false
+
+    - name: Description for chatqna
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/chatqna
+        short-description: "The docker image served as a chatqna gateway and interacted with users by understanding their questions and providing relevant answers."
+        readme-filepath: ChatQnA/README.md
+        enable-url-completion: false
+
+    - name: Description for chatqna-ui
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/chatqna-ui
+        short-description: "The docker image acted as the chatqna UI entry for facilitating interaction with users for question answering"
+        readme-filepath: ChatQnA/ui/svelte/README.md
+        enable-url-completion: false
+
+    - name: Description for chatqna-conversation-ui
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/chatqna-conversation-ui
+        short-description: "The purpose of the docker image is to provide a user interface for chat-based Q&A using React. It allows for interaction with users and supports continuing conversations with a history that is stored in the browser's local storage."
+        readme-filepath: ChatQnA/ui/react/README.md
+        enable-url-completion: false
+
+    - name: Description for codegen
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/codegen
+        short-description: "The docker image served as the codegen gateway to provide service of the automatic creation of source code from a higher-level representation"
+        readme-filepath: CodeGen/README.md
+        enable-url-completion: false
+
+    - name: Description for codegen-ui
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/codegen-ui
+        short-description: "The docker image acted as the codegen UI entry for facilitating interaction with users for automatically generating code from user's description"
+        readme-filepath: CodeGen/ui/svelte/README.md
+        enable-url-completion: false
+
+    - name: Description for codegen-react-ui
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/codegen-react-ui
+        short-description: "The purpose of the docker image is to provide a user interface for Codegen using React. It allows generating the appropriate code based on the current user input."
+        readme-filepath: CodeGen/ui/react/README.md
+        enable-url-completion: false
+
+    - name: Description for codetrans
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/codetrans
+        short-description: "The docker image served as a codetrans gateway to provide service of converting source code written in one programming language into an equivalent version in another programming language"
+        readme-filepath: CodeTrans/README.md
+        enable-url-completion: false
+
+    - name: Description for codetrans-ui
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/codetrans-ui
+        short-description: "The docker image acted as the codetrans UI entry for facilitating interaction with users for translating one programming language to another one"
+        readme-filepath:  CodeTrans/ui/svelte/README.md
+        enable-url-completion: false
+
+    - name: Description for doc-index-retriever
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/doc-index-retriever
+        short-description: "The docker image acts as a DocRetriever gateway, It uses different methods to match user queries with a set of free text records."
+        readme-filepath: DocIndexRetriever/README.md
+        enable-url-completion: false
+
+    - name: Description for docsum
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/docsum
+        short-description: "The docker image served as a docsum gateway to provide service of capturing the main points and essential details of the original text"
+        readme-filepath: Docsum/README.md
+        enable-url-completion: false
+
+    - name: Description for docsum-ui
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/docsum-ui
+        short-description: "The docker image acted as the docsum UI entry for facilitating interaction with users for document summarization"
+        readme-filepath: Docsum/ui/svelte/README.md
+        enable-url-completion: false
+
+    - name: Description for docsum-react-ui
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/docsum-react-ui
+        short-description: "The purpose of the docker image is to provide a user interface for document summary using React. It allows upload a file or paste text and then click on “Generate Summary” to get a condensed summary of the generated content and automatically scroll to the bottom of the summary."
+        readme-filepath: Docsum/ui/react/README.md
+        enable-url-completion: false
+
+    - name: Description for docsum-gradio-ui
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/docsum-gradio-ui
+        short-description: "The purpose of the docker image is to provides a user interface for summarizing documents and text using a Dockerized frontend application. Users can upload files or paste text to generate summaries."
+        readme-filepath: Docsum/ui/gradio/README.md
+        enable-url-completion: false
+
+    - name: Description for edgecraftrag
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/edgecraftrag
+        short-description: "The docker image served as an Edge Craft RAG (EC-RAG) gateway, delivering a customizable and production-ready Retrieval-Augmented Generation system optimized for edge solutions."
+        readme-filepath: EdgeCraftRag/README.md
+        enable-url-completion: false
+
+    - name: Description for edgecraftrag-ui
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/edgecraftrag-ui
+        short-description: "The docker image acted as the Edge Craft RAG (EC-RAG) UI entry. It ensuring high-quality, performant interactions tailored for edge environments."
+        readme-filepath: EdgeCraftRag/README.md
+        enable-url-completion: false
+
+    - name: Description for edgecraftrag-server
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/edgecraftrag-server
+        short-description: "The docker image served as an Edge Craft RAG (EC-RAG) server, delivering a customizable and production-ready Retrieval-Augmented Generation system optimized for edge solutions."
+        readme-filepath: EdgeCraftRag/README.md
+        enable-url-completion: false
+
+    - name: Description for graphrag
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/graphrag
+        short-description: "The docker image served as a GraphRAG gateway, leveraging a knowledge graph derived from source documents to address both local and global queries."
+        readme-filepath: GraphRag/README.md
+        enable-url-completion: false
+
+    - name: Description for graphrag-ui
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/graphrag-ui
+        short-description: "The docker image acted as the GraphRAG UI entry for facilitating interaction with users"
+        readme-filepath: GraphRag/ui/svelte/README.md
+        enable-url-completion: false
+
+    - name: Description for graphrag-react-ui
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/graphrag-react-ui
+        short-description: "The purpose of the docker image is to provide a user interface for GraphRAG using React."
+        readme-filepath: GraphRag/ui/react/README.md
+        enable-url-completion: false
+
+    - name: Description for multimodalqna
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/multimodalqna
+        short-description: "The docker image served as a multimodalqna gateway and dynamically fetches the most relevant multimodal information (frames, transcripts, and/or subtitles) from the user's video collection to solve the problem."
+        readme-filepath: MultimodalQnA/README.md
+        enable-url-completion: false
+
+    - name: Description for multimodalqna-ui
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/multimodalqna-ui
+        short-description: "The docker image serves as the multimodalqna UI entry point for easy interaction with users. Answers to questions are generated from videos uploaded by users."
+        readme-filepath: MultimodalQnA/README.md
+        enable-url-completion: false
+
+    - name: Description for productivity-suite-react-ui-server
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/productivity-suite-react-ui-server
+        short-description: "The purpose of the docker image is to provide a user interface for Productivity Suite Application using React. It allows interaction by uploading documents and inputs."
+        readme-filepath: ProductivitySuite/ui/react/README.md
+        enable-url-completion: false
+
+    - name: Description for searchqna
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/searchqna
+        short-description: "The docker image served as the searchqna gateway to provide service of retrieving accurate and relevant answers to user queries from a knowledge base or dataset"
+        readme-filepath: SearchQnA/README.md
+        enable-url-completion: false
+
+    - name: Description for searchqna-ui
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/searchqna-ui
+        short-description: "The docker image acted as the searchqna UI entry for facilitating interaction with users for question answering"
+        readme-filepath: SearchQnA/ui/svelte/README.md
+        enable-url-completion: false
+
+    - name: Description for translation
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/translation
+        short-description: "The docker image served as the translation gateway to provide service of language translation"
+        readme-filepath: Translation/README.md
+        enable-url-completion: false
+
+    - name: Description for translation-ui
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/translation-ui
+        short-description: "The docker image acted as the translation UI entry for facilitating interaction with users for language translation"
+        readme-filepath: Translation/ui/svelte/README.md
+        enable-url-completion: false
+
+    - name: Description for videoqna
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/videoqna
+        short-description: "The docker image acts as videoqna gateway, interacting with the user by retrieving videos based on user prompts"
+        readme-filepath: VideoQnA/README.md
+        enable-url-completion: false
+
+    - name: Description for videoqna-ui
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/videoqna-ui
+        short-description: "The docker image serves as the user interface entry point for the videoqna, facilitating interaction with the user and retrieving the video based on user prompts."
+        readme-filepath: VideoQnA/README.md
+        enable-url-completion: false
+
+    - name: Description for visualqna
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/visualqna
+        short-description: "The docker image acts as a videoqna gateway, outputting answers in natural language based on a combination of images and questions"
+        readme-filepath: VisualQnA/README.md
+        enable-url-completion: false
+
+    - name: Description for visualqna-ui
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/visualqna-ui
+        short-description: "The docker image serves as the user interface portal for VisualQnA, facilitating interaction with the user and outputting answers in natural language based on a combination of images and questions from the user."
+        readme-filepath: VisualQnA/README.md
+        enable-url-completion: false
+
+    - name: Description for
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/agent-ui
+        short-description: "The docker image exposed the OPEA agent microservice UI entry for GenAI application use."
+        readme-filepath: AgentQnA/README.md
+        enable-url-completion: false
+
+    - name: Description for text2image-ui
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/text2image-ui
+        short-description: "The docker image exposed the OPEA text-to-image microservice UI entry for GenAI application use."
+        readme-filepath: Text2Image/README.md
+        enable-url-completion: false
+
+    - name: Description for text2sql-react-ui
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/text2sql-react-ui
+        short-description: "The docker image exposed the OPEA text to Structured Query Language microservice react UI entry for GenAI application use."
+        readme-filepath: DBQnA/README.md
+        enable-url-completion: false
+
+    - name: Checkout GenAIComps
+      uses: actions/checkout@v4
+      with:
+        repository: opea-project/GenAIComps
+        path: GenAIComps
+
+    - name: Description for agent
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/agent
+        short-description: "The docker image exposed the OPEA agent microservice for GenAI application use."
+        readme-filepath: GenAIComps/comps/agent/src/README.md
+        enable-url-completion: false
+
+    - name: Description for
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/asr
+        short-description: "The docker image exposed the OPEA Audio-Speech-Recognition microservice for GenAI application use."
+        readme-filepath: GenAIComps/comps/asr/src/README.md
+        enable-url-completion: false
+
+    - name: Description for
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/animation
+        short-description: "The purpose of the Docker image is to expose the OPEA Avatar Animation microservice for GenAI application use."
+        readme-filepath: GenAIComps/comps/animation/src/README.md
+        enable-url-completion: false
+
+    - name: Description for
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/chathistory-mongo
+        short-description: "The docker image exposes OPEA Chat History microservice which based on MongoDB database, designed to allow user to store, retrieve and manage chat conversations"
+        readme-filepath: GenAIComps/comps/chathistory/src/README.md
+        enable-url-completion: false
+
+    - name: Description for
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/dataprep
+        short-description: "The docker image exposed the OPEA dataprep microservice for GenAI application use."
+        readme-filepath: GenAIComps/comps/dataprep/README.md
+        enable-url-completion: false
+
+    - name: Description for
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/embedding
+        short-description: "The docker image exposed the OPEA mosec embedding microservice  for GenAI application use."
+        readme-filepath: GenAIComps/comps/embeddings/src/README.md
+        enable-url-completion: false
+
+    - name: Description for
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/embedding-multimodal-clip
+        short-description: "The docker image exposed the OPEA mosec embedding microservice base on Langchain framework for GenAI application use."
+        readme-filepath: GenAIComps/comps/third_parties/clip/src/README.md
+        enable-url-completion: false
+
+    - name: Description for
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/embedding-multimodal-bridgetower
+        short-description: "The docker image exposes OPEA multimodal embedded microservices based on bridgetower for use by GenAI applications."
+        readme-filepath: GenAIComps/comps/third_parties/bridgetower/src/README.md
+        enable-url-completion: false
+
+    - name: Description for
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/embedding-multimodal-bridgetower-gaudi
+        short-description: "The docker image exposes OPEA multimodal embedded microservices based on bridgetower for use by GenAI applications on the Gaudi."
+        readme-filepath: GenAIComps/comps/third_parties/bridgetower/src/README.md
+        enable-url-completion: false
+
+    - name: Description for
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/feedbackmanagement-mongo
+        short-description: "The docker image exposes that the OPEA feedback management microservice uses a MongoDB database for GenAI applications."
+        readme-filepath: GenAIComps/comps/feedback_management/src/README.md
+        enable-url-completion: false
+
+    - name: Description for
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/finetuning
+        short-description: "The docker image exposed the OPEA Fine-tuning microservice for GenAI application use."
+        readme-filepath: GenAIComps/comps/finetuning/src/README.md
+        enable-url-completion: false
+
+    - name: Description for
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/finetuning-gaudi
+        short-description: "The docker image exposed the OPEA Fine-tuning microservice for GenAI application use on the Gaudi."
+        readme-filepath: GenAIComps/comps/finetuning/src/README.md
+        enable-url-completion: false
+
+    - name: Description for
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/gpt-sovits
+        short-description: "The docker image exposed the OPEA GPT-SoVITS service for GenAI application use."
+        readme-filepath: GenAIComps/comps/tts/src/integrations/dependency/gpt-sovits/README.md
+        enable-url-completion: false
+
+    - name: Description for
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/guardrails
+        short-description: "The docker image exposed the OPEA guardrail microservice for GenAI application use."
+        readme-filepath: GenAIComps/comps/guardrails/src/guardrails/README.md
+        enable-url-completion: false
+
+    - name: Description for
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/guardrails-toxicity-predictionguard
+        short-description: "The docker image exposed the OPEA guardrail microservice to provide toxicity detection for GenAI application use."
+        readme-filepath: GenAIComps/comps/guardrails/src/toxicity_detection/README.md
+        enable-url-completion: false
+
+    - name: Description for
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/guardrails-pii-predictionguard
+        short-description: "The docker image exposed the OPEA guardrail microservice to provide PII detection for GenAI application use."
+        readme-filepath: GenAIComps/comps/guardrails/src/pii_detection/README.md
+        enable-url-completion: false
+
+    - name: Description for
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/guardrails-injection-predictionguard
+        short-description: "The docker image exposed the OPEA guardrail microservice to provide injection predictionguard for GenAI application use."
+        readme-filepath: GenAIComps/comps/guardrails/src/prompt_injection/README.md
+        enable-url-completion: false
+
+    - name: Description for
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/guardrails-hallucination-detection
+        short-description: "The docker image exposed the OPEA guardrail microservice to provide hallucination detection for GenAI application use."
+        readme-filepath: GenAIComps/comps/guardrails/src/hallucination_detection/README.md
+        enable-url-completion: false
+
+    - name: Description for
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/guardrails-factuality-predictionguard
+        short-description: "The docker image exposed the OPEA guardrail microservice to provide factuality predictionguard for GenAI application use."
+        readme-filepath: GenAIComps/comps/guardrails/src/factuality_alignment/README.md
+        enable-url-completion: false
+
+    - name: Description for
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/guardrails-bias-detection
+        short-description: "The docker image exposed the OPEA guardrail microservice to provide bias detection for GenAI application use."
+        readme-filepath: GenAIComps/comps/guardrails/src/bias_detection/README.md
+        enable-url-completion: false
+
+    - name: Description for
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/image2image-gaudi
+        short-description: "The purpose of the Docker image is to expose the OPEA Image-to-Image microservice for GenAI application use on the Gaudi."
+        readme-filepath: GenAIComps/comps/image2image/src/README.md
+        enable-url-completion: false
+
+    - name: Description for
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/image2image
+        short-description: "The purpose of the Docker image is to expose the OPEA Image-to-Image microservice for GenAI application use."
+        readme-filepath: GenAIComps/comps/image2image/src/README.md
+        enable-url-completion: false
+
+    - name: Description for
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/image2video-gaudi
+        short-description: "The purpose of the Docker image is to expose the OPEA image-to-video microservice for GenAI application use on the Gaudi."
+        readme-filepath: GenAIComps/comps/image2image/src/README.md
+        enable-url-completion: false
+
+    - name: Description for
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/image2video
+        short-description: "The purpose of the Docker image is to expose the OPEA image-to-video microservice for GenAI application use."
+        readme-filepath: GenAIComps/comps/image2video/src/README.md
+        enable-url-completion: false
+
+    - name: Description for
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/llm-textgen
+        short-description: "The docker image exposed the OPEA LLM microservice upon textgen docker image for GenAI application use."
+        readme-filepath: GenAIComps/comps/llms/src/text-generation/README.md
+        enable-url-completion: false
+
+    - name: Description for
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/llm-textgen-gaudi
+        short-description: "The docker image exposed the OPEA LLM microservice upon textgen docker image for GenAI application use on the Gaudi2."
+        readme-filepath: GenAIComps/comps/llms/src/text-generation/README.md
+        enable-url-completion: false
+
+    - name: Description for
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/llm-eval
+        short-description: "The docker image exposed the OPEA LLM microservice upon eval docker image for GenAI application use."
+        readme-filepath: GenAIComps/comps/llms/utils/lm-eval/README.md
+        enable-url-completion: false
+
+    - name: Description for
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/llm-docsum
+        short-description: "The docker image exposed the OPEA LLM microservice upon docsum docker image for GenAI application use."
+        readme-filepath: GenAIComps/comps/llms/src/doc-summarization/README.md
+        enable-url-completion: false
+
+    - name: Description for
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/llm-faqgen
+        short-description: "This docker image is designed to build a frequently asked questions microservice using the HuggingFace Text Generation Inference(TGI) framework. The microservice accepts document input and generates a FAQ."
+        readme-filepath: GenAIComps/comps/llms/src/faq-generation/README.md
+        enable-url-completion: false
+
+    - name: Description for
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/lvm
+        short-description: "The docker image exposed the OPEA large visual model (LVM) microservice for GenAI application use."
+        readme-filepath: GenAIComps/comps/lvms/src/README.md
+        enable-url-completion: false
+
+    - name: Description for
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/lvm-llava
+        short-description: "The docker image exposed the OPEA microservice running LLaVA as a large visual model (LVM) server for GenAI application use."
+        readme-filepath: GenAIComps/comps/lvms/src/integrations/dependency/llava/README.md
+        enable-url-completion: false
+
+    - name: Description for
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/lvm-video-llama
+        short-description: "The docker image exposed the OPEA microservice running Video-Llama as a large visual model (LVM) for GenAI application use."
+        readme-filepath: GenAIComps/comps/lvms/src/integrations/dependency/video-llama/README.md
+        enable-url-completion: false
+
+    - name: Description for
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/lvm-predictionguard
+        short-description: "The docker image exposed the OPEA microservice running predictionguard as a large visual model (LVM) server for GenAI application use."
+        readme-filepath: GenAIComps/comps/lvms/src/integrations/dependency/predictionguard/README.md
+        enable-url-completion: false
+
+    - name: Description for
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/llava-gaudi
+        short-description: "The docker image exposed the OPEA microservice running LLaVA as a large visual model (LVM) service for GenAI application use on the Gaudi2."
+        readme-filepath: GenAIComps/comps/lvms/src/integrations/dependency/llava/README.md
+        enable-url-completion: false
+
+    - name: Description for
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/lvm-llama-vision
+        short-description: "The docker image exposed the OPEA microservice running Llama Vision as the base large visual model service for GenAI application use."
+        readme-filepath: GenAIComps/comps/lvms/src/integrations/dependency/llama-vision/README.md
+        enable-url-completion: false
+
+    - name: Description for
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/lvm-llama-vision-tp
+        short-description: "The docker image exposed the OPEA microservice running Llama Vision with deepspeed as the base large visual model service for GenAI application use."
+        readme-filepath: GenAIComps/comps/lvms/src/integrations/dependency/llama-vision/README.md
+        enable-url-completion: false
+
+    - name: Description for lvm-llama-vision-guard
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/lvm-llama-vision-guard
+        short-description: "The docker image exposed the OPEA microservice running Llama Vision Guard as the base large visual model service for GenAI application use."
+        readme-filepath: GenAIComps/comps/lvms/src/integrations/dependency/llama-vision/README.md
+        enable-url-completion: false
+
+    - name: Description for promptregistry-mongo
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/promptregistry-mongo
+        short-description: "The docker image exposes the OPEA Prompt Registry microservices which based on MongoDB database, designed to store and retrieve user's preferred prompts."
+        readme-filepath: GenAIComps/comps/prompt_registry/src/README.md
+        enable-url-completion: false
+
+    - name: Description for reranking
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/reranking
+        short-description: "The docker image exposed the OPEA reranking microservice for GenAI application use."
+        readme-filepath: GenAIComps/comps/rerankings/src/README.md
+        enable-url-completion: false
+
+    - name: Description for retriever
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/retriever
+        short-description: "The docker image exposed the OPEA retrieval microservice for GenAI application use."
+        readme-filepath: GenAIComps/comps/retrievers/README.md
+        enable-url-completion: false
+
+    - name: Description for text2image
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/text2image
+        short-description: "The docker image exposed the OPEA text-to-image microservice for GenAI application use."
+        readme-filepath: GenAIComps/comps/text2image/src/README.md
+        enable-url-completion: false
+
+    - name: Description for text2image-gaudi
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/text2image-gaudi
+        short-description: "The docker image exposed the OPEA text-to-image microservice for GenAI application use on the Gaudi."
+        readme-filepath: GenAIComps/comps/text2image/src/README.md
+        enable-url-completion: false
+
+    - name: Description for text2sql
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/text2sql
+        short-description: "The docker image exposed the OPEA text to Structured Query Language microservice for GenAI application use."
+        readme-filepath: GenAIComps/comps/text2sql/src/README.md
+        enable-url-completion: false
+
+    - name: Description for tts
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/tts
+        short-description: "The docker image exposed the OPEA Text-To-Speech microservice for GenAI application use."
+        readme-filepath: GenAIComps/comps/tts/src/README.md
+        enable-url-completion: false
+
+    - name: Description for speecht5
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/speecht5
+        short-description: "The docker image exposed the OPEA SpeechT5 service for GenAI application use."
+        readme-filepath: GenAIComps/comps/tts/src/README.md
+        enable-url-completion: false
+
+    - name: Description for speecht5-gaudi
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/speecht5-gaudi
+        short-description: "The docker image exposed the OPEA SpeechT5 service on Gaudi2 for GenAI application use."
+        readme-filepath: GenAIComps/comps/tts/src/README.md
+        enable-url-completion: false
+
+    - name: Description for gpt-sovits
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/gpt-sovits
+        short-description: "The docker image exposed the OPEA gpt-sovits service for GenAI application use."
+        readme-filepath: GenAIComps/comps/tts/src/integrations/dependency/gpt-sovits/README.md
+        enable-url-completion: false
+
+    - name: Description for nginx
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/nginx
+        short-description: "The docker image exposed the OPEA nginx microservice for GenAI application use."
+        readme-filepath: GenAIComps/comps/third_parties/nginx/deployment/kubernetes/README.md
+        enable-url-completion: false
+
+    - name: Description for vectorstore-pathway
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/vectorstore-pathway
+        short-description: "The docker image exposed the OPEA Vectorstores microservice with Pathway for GenAI application use."
+        readme-filepath: GenAIComps/comps/third_parties/pathway/src/README.md
+        enable-url-completion: false
+
+    - name: Description for wav2lip
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/wav2lip
+        short-description: "The docker image exposed the OPEA Generate lip movements from audio files microservice with Pathway for GenAI application use."
+        readme-filepath: GenAIComps/comps/third_parties/wav2lip/deployment/kubernetes/README.md
+        enable-url-completion: false
+
+    - name: Description for wav2lip-gaudi
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/wav2lip-gaudi
+        short-description: "The docker image exposed the OPEA Generate lip movements from audio files microservice with Pathway for GenAI application use on the Gaudi2."
+        readme-filepath: GenAIComps/comps/third_parties/wav2lip/deployment/kubernetes/README.md
+        enable-url-completion: false
+
+    - name: Description for vllm-arc
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/vllm-arc
+        short-description: "The docker image powered by vllm-project for deploying and serving vllm Models on Arc."
+        readme-filepath: GenAIComps/comps/third_parties/vllm/README.md
+        enable-url-completion: false
+
+    - name: Description for whisper-gaudi
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/whisper-gaudi
+        short-description: "The docker image exposed the OPEA Whisper service on Gaudi2 for GenAI application use."
+        readme-filepath: GenAIComps/comps/asr/src/README.md
+        enable-url-completion: false
+
+    - name: Description for whisper
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/whisper
+        short-description: "The docker image exposed the OPEA Whisper service for GenAI application use."
+        readme-filepath: GenAIComps/comps/asr/src/README.md
+        enable-url-completion: false
+
+    - name: Description for web-retriever
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/web-retriever
+        short-description: "The docker image exposed the OPEA retrieval microservice based on chroma vectordb for GenAI application use."
+        readme-filepath: GenAIComps/comps/web_retrievers/src/README.md
+        enable-url-completion: false
+
+    - name: Checkout vllm-openvino
+      uses: actions/checkout@v4
+      with:
+        repository: vllm-project/vllm
+        path: vllm
+
+    - name: Description for vllm-openvino
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/vllm-openvino
+        short-description: "The docker image powered by vllm-project for deploying and serving vllm Models of the Openvino Framework."
+        readme-filepath: vllm/README.md
+        enable-url-completion: false
+
+    - name: Checkout vllm-gaudi
+      uses: actions/checkout@v4
+      with:
+        repository: HabanaAI/vllm-fork
+        ref: habana_main
+        path: vllm-fork
+
+    - name: Description for vllm-gaudi
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/vllm-gaudi
+        short-description: "The docker image powered by vllm-project for deploying and serving vllm Models on Gaudi2."
+        readme-filepath: vllm-fork/README.md
+        enable-url-completion: false
+
+    - name: Description for vllm
+      uses: peter-evans/dockerhub-description@v4
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: opea/vllm
+        short-description: "The docker image powered by vllm-project for deploying and serving vllm Models."
+        readme-filepath: vllm-fork/README.md
+        enable-url-completion: false
