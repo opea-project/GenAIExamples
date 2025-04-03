@@ -211,11 +211,18 @@ All containers should be running and should not restart:
 
 ##### If you use TGI:
 
-- agentqna-tgi-service
-- whisper-service
-- speecht5-service
-- agentqna-backend-server
-- agentqna-ui-server
+- dataprep-redis-server
+- doc-index-retriever-server
+- embedding-server
+- rag-agent-endpoint
+- react-agent-endpoint
+- redis-vector-db
+- reranking-tei-xeon-server
+- retriever-redis-server
+- sql-agent-endpoint
+- tei-embedding-server
+- tei-reranking-server
+- tgi-service
 
 ---
 
@@ -229,7 +236,7 @@ All containers should be running and should not restart:
 DATA='{"model": "Intel/neural-chat-7b-v3-3t", '\
 '"messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens": 256}'
 
-curl http://${HOST_IP}:${AUDIOQNA_VLLM_SERVICE_PORT}/v1/chat/completions \
+curl http://${HOST_IP}:${VLLM_SERVICE_PORT}/v1/chat/completions \
   -X POST \
   -d "$DATA" \
   -H 'Content-Type: application/json'
@@ -270,7 +277,7 @@ then we consider the vLLM service to be successfully launched
 DATA='{"inputs":"What is Deep Learning?",'\
 '"parameters":{"max_new_tokens":256,"do_sample": true}}'
 
-curl http://${HOST_IP}:${AUDIOQNA_TGI_SERVICE_PORT}/generate \
+curl http://${HOST_IP}:${TGI_SERVICE_PORT}/generate \
   -X POST \
   -d "$DATA" \
   -H 'Content-Type: application/json'
@@ -287,48 +294,49 @@ Checking the response from the service. The response should be similar to JSON:
 If the service response has a meaningful response in the value of the "generated_text" key,
 then we consider the TGI service to be successfully launched
 
-### 2. Validate MegaServices
+### 2. Validate Agent Services
 
-Test the AgentQnA megaservice by recording a .wav file, encoding the file into the base64 format, and then sending the
-base64 string to the megaservice endpoint. The megaservice will return a spoken response as a base64 string. To listen
-to the response, decode the base64 string and save it as a .wav file.
+#### Validate Rag Agent Service
 
 ```bash
-# voice can be "default" or "male"
-curl http://${host_ip}:3008/v1/agentqna \
-  -X POST \
-  -d '{"audio": "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA", "max_tokens":64, "voice":"default"}' \
-  -H 'Content-Type: application/json' | sed 's/^"//;s/"$//' | base64 -d > output.wav
+export agent_port=${WORKER_RAG_AGENT_PORT}
+prompt="Tell me about Michael Jackson song Thriller"
+python3 ~/agentqna-install/GenAIExamples/AgentQnA/tests/test.py --prompt "$prompt" --agent_role "worker" --ext_port $agent_port
 ```
 
-### 3. Validate MicroServices
+The response must contain the meaningful text of the response to the request from the "prompt" variable
+
+#### Validate Sql Agent Service
 
 ```bash
-# whisper service
-curl http://${host_ip}:7066/v1/asr \
-  -X POST \
-  -d '{"audio": "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA"}' \
-  -H 'Content-Type: application/json'
-
-# speecht5 service
-curl http://${host_ip}:7055/v1/tts \
-  -X POST \
-  -d '{"text": "Who are you?"}' \
-  -H 'Content-Type: application/json'
+export agent_port=${WORKER_SQL_AGENT_PORT}
+prompt="How many employees are there in the company?"
+python3 ~/agentqna-install/GenAIExamples/AgentQnA/tests/test.py --prompt "$prompt" --agent_role "worker" --ext_port $agent_port
 ```
 
-### 4. Stop application
+The answer should make sense - "8 employees in the company"
+
+#### Validate React (Supervisor) Agent Service
+
+```bash
+export agent_port=${SUPERVISOR_REACT_AGENT_PORT}
+python3 ~/agentqna-install/GenAIExamples/AgentQnA/tests/test.py --agent_role "supervisor" --ext_port $agent_port --stream
+```
+
+The response should contain "Iron Maiden"
+
+### 3. Stop application
 
 #### If you use vLLM
 
 ```bash
 cd ~/agentqna-install/GenAIExamples/AgentQnA/docker_compose/amd/gpu/rocm
-docker compose -f compose_vllm.yaml down
+bash stop_agent_service_vllm_rocm.sh
 ```
 
 #### If you use TGI
 
 ```bash
 cd ~/agentqna-install/GenAIExamples/AgentQnA/docker_compose/amd/gpu/rocm
-docker compose -f compose.yaml down
+bash stop_agent_service_tgi_rocm.sh
 ```
