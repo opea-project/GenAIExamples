@@ -44,6 +44,10 @@ whisper
 ===
 port 7066 - Open to 0.0.0.0/0
 
+speecht5-service
+===
+port 7055 - Open to 0.0.0.0/0
+
 dataprep-multimodal-redis
 ===
 Port 6007 - Open to 0.0.0.0/0
@@ -63,7 +67,7 @@ Since the `compose.yaml` will consume some environment variables, you need to se
 
 **Export the value of the public IP address of your Xeon server to the `host_ip` environment variable**
 
-> Change the External_Public_IP below with the actual IPV4 value
+> Change the External_Public_IP below with the actual IPv4 value when setting the `host_ip` value (do not use localhost).
 
 ```
 export host_ip="External_Public_IP"
@@ -72,13 +76,10 @@ export host_ip="External_Public_IP"
 **Append the value of the public IP address to the no_proxy list**
 
 ```bash
-export your_no_proxy=${your_no_proxy},"External_Public_IP"
+export no_proxy=${no_proxy},${host_ip}
 ```
 
 ```bash
-export no_proxy=${your_no_proxy}
-export http_proxy=${your_http_proxy}
-export https_proxy=${your_http_proxy}
 export MM_EMBEDDING_SERVICE_HOST_IP=${host_ip}
 export MM_RETRIEVER_SERVICE_HOST_IP=${host_ip}
 export LVM_SERVICE_HOST_IP=${host_ip}
@@ -86,6 +87,8 @@ export MEGA_SERVICE_HOST_IP=${host_ip}
 export WHISPER_PORT=7066
 export WHISPER_SERVER_ENDPOINT="http://${host_ip}:${WHISPER_PORT}/v1/asr"
 export WHISPER_MODEL="base"
+export TTS_PORT=7055
+export TTS_ENDPOINT="http://${host_ip}:${TTS_PORT}/v1/tts"
 export MAX_IMAGES=1
 export REDIS_DB_PORT=6379
 export REDIS_INSIGHTS_PORT=8001
@@ -111,9 +114,8 @@ export LVM_ENDPOINT="http://${host_ip}:$LLAVA_SERVER_PORT"
 export MEGA_SERVICE_PORT=8888
 export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:$MEGA_SERVICE_PORT/v1/multimodalqna"
 export UI_PORT=5173
+export UI_TIMEOUT=240
 ```
-
-Note: Please replace with `host_ip` with you external IP address, do not use localhost.
 
 > Note: The `MAX_IMAGES` environment variable is used to specify the maximum number of images that will be sent from the LVM service to the LLaVA server.
 > If an image list longer than `MAX_IMAGES` is sent to the LVM server, a shortened image list will be sent to the LLaVA service. If the image list
@@ -172,7 +174,13 @@ Build whisper server image
 docker build --no-cache -t opea/whisper:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/asr/src/integrations/dependency/whisper/Dockerfile .
 ```
 
-### 6. Build MegaService Docker Image
+### 6. Build TTS Image
+
+```bash
+docker build --no-cache -t opea/speecht5:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/tts/src/integrations/dependency/speecht5/Dockerfile .
+```
+
+### 7. Build MegaService Docker Image
 
 To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the [multimodalqna.py](../../../../multimodalqna.py) Python script. Build MegaService Docker image via below command:
 
@@ -183,7 +191,7 @@ docker build --no-cache -t opea/multimodalqna:latest --build-arg https_proxy=$ht
 cd ../..
 ```
 
-### 7. Build UI Docker Image
+### 8. Build UI Docker Image
 
 Build frontend Docker image via below command:
 
@@ -200,11 +208,12 @@ Then run the command `docker images`, you will have the following 11 Docker Imag
 3. `opea/lvm-llava:latest`
 4. `opea/retriever:latest`
 5. `opea/whisper:latest`
-6. `opea/redis-vector-db`
-7. `opea/embedding:latest`
-8. `opea/embedding-multimodal-bridgetower:latest`
-9. `opea/multimodalqna:latest`
-10. `opea/multimodalqna-ui:latest`
+6. `opea/speech5:latest`
+7. `opea/redis-vector-db`
+8. `opea/embedding:latest`
+9. `opea/embedding-multimodal-bridgetower:latest`
+10. `opea/multimodalqna:latest`
+11. `opea/multimodalqna-ui:latest`
 
 ## 🚀 Start Microservices
 
@@ -279,7 +288,16 @@ curl ${WHISPER_SERVER_ENDPOINT} \
     -d '{"audio" : "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA"}'
 ```
 
-5. lvm-llava
+5. tts
+
+```bash
+curl ${TTS_ENDPOINT} \
+  -X POST \
+  -d '{"text": "Who are you?"}' \
+  -H 'Content-Type: application/json'
+```
+
+6. lvm-llava
 
 ```bash
 curl http://${host_ip}:${LLAVA_SERVER_PORT}/generate \
@@ -288,7 +306,7 @@ curl http://${host_ip}:${LLAVA_SERVER_PORT}/generate \
      -d '{"prompt":"Describe the image please.", "img_b64_str": "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8/5+hnoEIwDiqkL4KAcT9GO0U4BxoAAAAAElFTkSuQmCC"}'
 ```
 
-6. lvm
+7. lvm
 
 ```bash
 curl http://${host_ip}:${LVM_PORT}/v1/lvm \
@@ -313,9 +331,9 @@ curl http://${host_ip}:${LVM_PORT}/v1/lvm \
     -d '{"retrieved_docs": [], "initial_query": "What is this?", "top_n": 1, "metadata": [], "chat_template":"The caption of the image is: '\''{context}'\''. {question}"}'
 ```
 
-7. dataprep-multimodal-redis
+8. dataprep-multimodal-redis
 
-Download a sample video, image, pdf, and audio file and create a caption
+Download a sample video (.mp4), image (.png, .gif, .jpg), pdf, and audio file (.wav, .mp3) and create a caption
 
 ```bash
 export video_fn="WeAreGoingOnBullrun.mp4"
@@ -334,7 +352,7 @@ export audio_fn="AudioSample.wav"
 wget https://github.com/intel/intel-extension-for-transformers/raw/main/intel_extension_for_transformers/neural_chat/assets/audio/sample.wav -O ${audio_fn}
 ```
 
-Test dataprep microservice with generating transcript. This command updates a knowledge base by uploading a local video .mp4 and an audio .wav file.
+Test dataprep microservice with generating transcript. This command updates a knowledge base by uploading a local video .mp4 and an audio .wav or .mp3 file.
 
 ```bash
 curl --silent --write-out "HTTPSTATUS:%{http_code}" \
@@ -354,7 +372,7 @@ curl --silent --write-out "HTTPSTATUS:%{http_code}" \
     -X POST -F "files=@./${image_fn}"
 ```
 
-Now, test the microservice with posting a custom caption along with an image and a PDF containing images and text.
+Now, test the microservice with posting a custom caption along with an image and a PDF containing images and text. The image caption can be provided as a text (`.txt`) or as spoken audio (`.wav` or `.mp3`).
 
 ```bash
 curl --silent --write-out "HTTPSTATUS:%{http_code}" \
@@ -393,7 +411,7 @@ curl -X POST \
     ${DATAPREP_DELETE_FILE_ENDPOINT}
 ```
 
-8. MegaService
+9. MegaService
 
 Test the MegaService with a text query:
 
@@ -428,8 +446,10 @@ curl http://${host_ip}:${MEGA_SERVICE_PORT}/v1/multimodalqna  \
     -d '{"messages": [{"role": "user", "content": [{"type": "audio", "audio": "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA"}]}]}'
 ```
 
+Test the MegaService with a back and forth conversation between the user and assistant including a text to speech response from the assistant using `"modalities": ["text", "audio"]'`:
+
 ```bash
 curl http://${host_ip}:${MEGA_SERVICE_PORT}/v1/multimodalqna \
     -H "Content-Type: application/json" \
-    -d '{"messages": [{"role": "user", "content": [{"type": "text", "text": "hello, "}, {"type": "image_url", "image_url": {"url": "https://www.ilankelman.org/stopsigns/australia.jpg"}}]}, {"role": "assistant", "content": "opea project! "}, {"role": "user", "content": "chao, "}], "max_tokens": 10}'
+    -d '{"messages": [{"role": "user", "content": [{"type": "text", "text": "hello, "}, {"type": "image_url", "image_url": {"url": "https://www.ilankelman.org/stopsigns/australia.jpg"}}]}, {"role": "assistant", "content": "opea project! "}, {"role": "user", "content": "chao, "}], "max_tokens": 10, "modalities": ["text", "audio"]}'
 ```
