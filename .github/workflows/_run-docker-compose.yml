@@ -115,6 +115,11 @@ jobs:
       - name: Clean up Working Directory
         run: |
           sudo rm -rf ${{github.workspace}}/* || true
+
+          # clean up containers use ports
+          cid=$(docker ps --format '{{.Names}} : {{.Ports}}' | grep -v ' : $' | grep -v 5000 | awk -F' : ' '{print $1}')
+          if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid && sleep 1s; fi
+
           docker system prune -f
           docker rmi $(docker images --filter reference="*/*/*:latest" -q) || true
           docker rmi $(docker images --filter reference="*/*:ci" -q) || true
@@ -175,6 +180,11 @@ jobs:
           export test_case=${{ matrix.test_case }}
           export hardware=${{ inputs.hardware }}
           bash ${{ github.workspace }}/.github/workflows/scripts/docker_compose_clean_up.sh "containers"
+
+          # clean up containers use ports
+          cid=$(docker ps --format '{{.Names}} : {{.Ports}}' | grep -v ' : $' | grep -v 5000 | awk -F' : ' '{print $1}')
+          if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid && sleep 1s; fi
+
           docker system prune -f
           docker rmi $(docker images --filter reference="*:5000/*/*" -q) || true
 
