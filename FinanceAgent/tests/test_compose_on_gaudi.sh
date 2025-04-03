@@ -177,19 +177,19 @@ function validate_agent_service() {
         exit 1
     fi
 
-    # # # test worker research agent
-    # echo "======================Testing worker sql agent======================"
-    # export agent_port="9096"
-    # prompt="How many employees are there in the company?"
-    # local CONTENT=$(python3 $WORKDIR/GenAIExamples/AgentQnA/tests/test.py --prompt "$prompt" --agent_role "worker" --ext_port $agent_port)
-    # local EXIT_CODE=$(validate "$CONTENT" "8" "sql-agent-endpoint")
-    # echo $CONTENT
-    # # echo $EXIT_CODE
-    # local EXIT_CODE="${EXIT_CODE:0-1}"
-    # if [ "$EXIT_CODE" == "1" ]; then
-    #     docker logs sql-agent-endpoint
-    #     exit 1
-    # fi
+    # # test worker research agent
+    echo "======================Testing worker research agent======================"
+    export agent_port="9096"
+    prompt="generate NVDA financial research report"
+    local CONTENT=$(python3 $WORKDIR/GenAIExamples/AgentQnA/tests/test.py --prompt "$prompt" --agent_role "worker" --ext_port $agent_port)
+    local EXIT_CODE=$(validate "$CONTENT" "NVDA" "research-agent-endpoint")
+    echo $CONTENT
+    echo $EXIT_CODE
+    local EXIT_CODE="${EXIT_CODE:0-1}"
+    if [ "$EXIT_CODE" == "1" ]; then
+	docker logs research-agent-endpoint
+	exit 1
+    fi
 
     # test supervisor react agent
     echo "======================Testing supervisor agent: single turns ======================"
