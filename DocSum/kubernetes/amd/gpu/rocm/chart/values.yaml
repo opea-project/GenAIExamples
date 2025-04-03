@@ -1,5 +1,5 @@
 secrets:
-  HUGGINGFACEHUB_API_TOKEN: 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
+  HUGGINGFACEHUB_API_TOKEN: ''
 
 vllm:
   replicaCount: 1
