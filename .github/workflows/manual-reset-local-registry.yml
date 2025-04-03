@@ -33,6 +33,7 @@ jobs:
 
   clean-up:
     needs: get-build-matrix
+    if: ${{ needs.get-image-list.outputs.matrix != '' }}
     strategy:
       matrix:
         node: ${{ fromJson(needs.get-build-matrix.outputs.nodes) }}
@@ -47,6 +48,7 @@ jobs:
 
   build:
     needs: [get-build-matrix, clean-up]
+    if: ${{ needs.get-image-list.outputs.matrix != '' }}
     strategy:
       matrix:
         example: ${{ fromJson(needs.get-build-matrix.outputs.examples) }}

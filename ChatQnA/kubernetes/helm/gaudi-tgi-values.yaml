@@ -1,0 +1,79 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+# Accelerate inferencing in heaviest components to improve performance
+# by overriding their subchart values
+
+vllm:
+  enabled: false
+# TGI: largest bottleneck for ChatQnA
+tgi:
+  enabled: true
+  accelDevice: "gaudi"
+  image:
+    repository: ghcr.io/huggingface/tgi-gaudi
+    tag: "2.3.1"
+  resources:
+    limits:
+      habana.ai/gaudi: 1
+  # higher limits are needed with extra input tokens added by rerank
+  MAX_INPUT_LENGTH: "2048"
+  MAX_TOTAL_TOKENS: "4096"
+  CUDA_GRAPHS: ""
+  OMPI_MCA_btl_vader_single_copy_mechanism: "none"
+  ENABLE_HPU_GRAPH: "true"
+  LIMIT_HPU_GRAPH: "true"
+  USE_FLASH_ATTENTION: "true"
+  FLASH_ATTENTION_RECOMPUTE: "true"
+
+  livenessProbe:
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    timeoutSeconds: 1
+  readinessProbe:
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    timeoutSeconds: 1
+  startupProbe:
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    timeoutSeconds: 1
+    failureThreshold: 120
+
+# Reranking: second largest bottleneck when reranking is in use
+# (i.e. query context docs have been uploaded with data-prep)
+teirerank:
+  accelDevice: "gaudi"
+  OMPI_MCA_btl_vader_single_copy_mechanism: "none"
+  MAX_WARMUP_SEQUENCE_LENGTH: "512"
+  image:
+    repository: ghcr.io/huggingface/tei-gaudi
+    tag: 1.5.0
+  resources:
+    limits:
+      habana.ai/gaudi: 1
+  securityContext:
+    readOnlyRootFilesystem: false
+  livenessProbe:
+    timeoutSeconds: 1
+  readinessProbe:
+    timeoutSeconds: 1
+
+# Embedding: Second largest bottleneck without rerank
+# By default tei on gaudi is disabled.
+# tei:
+#   accelDevice: "gaudi"
+#   OMPI_MCA_btl_vader_single_copy_mechanism: "none"
+#   MAX_WARMUP_SEQUENCE_LENGTH: "512"
+#   image:
+#     repository: ghcr.io/huggingface/tei-gaudi
+#     tag: 1.5.0
+#   resources:
+#     limits:
+#       habana.ai/gaudi: 1
+#   securityContext:
+#     readOnlyRootFilesystem: false
+#   livenessProbe:
+#     timeoutSeconds: 1
+#   readinessProbe:
+#     timeoutSeconds: 1

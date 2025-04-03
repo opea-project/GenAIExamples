@@ -12,13 +12,13 @@ services:
       - "6379:6379"
       - "8001:8001"
   dataprep-redis-service:
-    image: ${REGISTRY:-opea}/dataprep-redis:${TAG:-latest}
+    image: ${REGISTRY:-opea}/dataprep:${TAG:-latest}
     container_name: dataprep-redis-server
     depends_on:
       - redis-vector-db
       - tei-embedding-service
     ports:
-      - "6007:6007"
+      - "6007:5000"
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
@@ -34,7 +34,7 @@ services:
     ports:
       - "8090:80"
     volumes:
-      - "./data:/data"
+      - "${MODEL_CACHE:-./data}:/data"
     runtime: habana
     cap_add:
       - SYS_NICE
@@ -72,7 +72,7 @@ services:
       LOGFLAG: ${LOGFLAG}
     restart: unless-stopped
   retriever:
-    image: ${REGISTRY:-opea}/retriever-redis:${TAG:-latest}
+    image: ${REGISTRY:-opea}/retriever:${TAG:-latest}
     container_name: retriever-redis-server
     depends_on:
       - redis-vector-db
@@ -86,15 +86,16 @@ services:
       REDIS_URL: ${REDIS_URL}
       INDEX_NAME: ${INDEX_NAME}
       LOGFLAG: ${LOGFLAG}
+      RETRIEVER_COMPONENT_NAME: "OPEA_RETRIEVER_REDIS"
     restart: unless-stopped
   tei-reranking-service:
-    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.6
     entrypoint: /bin/sh -c "apt-get update && apt-get install -y curl && text-embeddings-router --json-output --model-id ${RERANK_MODEL_ID} --auto-truncate"
     container_name: tei-reranking-gaudi-server
     ports:
       - "8808:80"
     volumes:
-      - "./data:/data"
+      - "${MODEL_CACHE:-./data}:/data"
     shm_size: 1g
     environment:
       no_proxy: ${no_proxy}
@@ -144,11 +145,9 @@ services:
       - no_proxy=${no_proxy}
       - https_proxy=${https_proxy}
       - http_proxy=${http_proxy}
-      - MEGA_SERVICE_HOST_IP=${MEGA_SERVICE_HOST_IP}
       - EMBEDDING_SERVICE_HOST_IP=${EMBEDDING_SERVICE_HOST_IP}
       - RETRIEVER_SERVICE_HOST_IP=${RETRIEVER_SERVICE_HOST_IP}
       - RERANK_SERVICE_HOST_IP=${RERANK_SERVICE_HOST_IP}
-      - LLM_SERVICE_HOST_IP=${LLM_SERVICE_HOST_IP}
       - LOGFLAG=${LOGFLAG}
     ipc: host
     restart: always

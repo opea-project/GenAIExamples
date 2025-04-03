@@ -52,6 +52,7 @@ RETRIEVER_SERVICE_HOST_IP = os.getenv("RETRIEVER_SERVICE_HOST_IP", "0.0.0.0")
 RETRIEVER_SERVICE_PORT = int(os.getenv("RETRIEVER_SERVICE_PORT", 7000))
 LLM_SERVER_HOST_IP = os.getenv("LLM_SERVER_HOST_IP", "0.0.0.0")
 LLM_SERVER_PORT = int(os.getenv("LLM_SERVER_PORT", 80))
+LLM_MODEL_ID = os.getenv("LLM_MODEL_ID", "meta-llama/Meta-Llama-3.1-8B-Instruct")
 
 
 def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **kwargs):
@@ -60,7 +61,7 @@ def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **k
     elif self.services[cur_node].service_type == ServiceType.LLM:
         # convert TGI/vLLM to unified OpenAI /v1/chat/completions format
         next_inputs = {}
-        next_inputs["model"] = "tgi"  # specifically clarify the fake model to make the format unified
+        next_inputs["model"] = LLM_MODEL_ID
         next_inputs["messages"] = [{"role": "user", "content": inputs["inputs"]}]
         next_inputs["max_tokens"] = llm_parameters_dict["max_tokens"]
         next_inputs["top_p"] = llm_parameters_dict["top_p"]
@@ -109,7 +110,7 @@ def align_outputs(self, data, cur_node, inputs, runtime_graph, llm_parameters_di
 
 
 def align_generator(self, gen, **kwargs):
-    # openai reaponse format
+    # OpenAI response format
     # b'data:{"id":"","object":"text_completion","created":1725530204,"model":"meta-llama/Meta-Llama-3-8B-Instruct","system_fingerprint":"2.0.1-native","choices":[{"index":0,"delta":{"role":"assistant","content":"?"},"logprobs":null,"finish_reason":null}]}\n\n'
     print("generator in align generator:\n", gen)
     for line in gen:

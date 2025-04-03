@@ -9,7 +9,7 @@ services:
     ports:
       - "3001:80"
     volumes:
-      - "./data:/data"
+      - "${MODEL_CACHE:-./data}:/data"
     runtime: habana
     cap_add:
       - SYS_NICE
@@ -61,13 +61,13 @@ services:
       GOOGLE_CSE_ID: ${GOOGLE_CSE_ID}
     restart: unless-stopped
   tei-reranking-service:
-    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.6
     entrypoint: /bin/sh -c "apt-get update && apt-get install -y curl && text-embeddings-router --json-output --model-id ${RERANK_MODEL_ID} --auto-truncate"
     container_name: tei-reranking-server
     ports:
       - "3004:80"
     volumes:
-      - "./data:/data"
+      - "${MODEL_CACHE:-./data}:/data"
     shm_size: 1g
     environment:
       no_proxy: ${no_proxy}
@@ -98,12 +98,12 @@ services:
       LOGFLAG: ${LOGFLAG}
     restart: unless-stopped
   tgi-service:
-    image: ghcr.io/huggingface/tgi-gaudi:2.0.6
+    image: ghcr.io/huggingface/tgi-gaudi:2.3.1
     container_name: tgi-gaudi-server
     ports:
       - "3006:80"
     volumes:
-      - "./data:/data"
+      - "${MODEL_CACHE:-./data}:/data"
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
@@ -118,10 +118,10 @@ services:
       USE_FLASH_ATTENTION: true
       FLASH_ATTENTION_RECOMPUTE: true
     healthcheck:
-      test: ["CMD-SHELL", "sleep 800 && exit 0"]
-      interval: 1s
-      timeout: 805s
-      retries: 1
+      test: ["CMD-SHELL", "curl -f http://$host_ip:3006/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 100
     runtime: habana
     cap_add:
       - SYS_NICE

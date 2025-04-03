@@ -28,19 +28,20 @@ jobs:
     if: ${{ !github.event.pull_request.draft }}
     uses: ./.github/workflows/_get-test-matrix.yml
     with:
-      diff_excluded_files: '\.github|\.md|\.txt|kubernetes|manifest|gmc|assets|benchmark'
+      diff_excluded_files: '\.github|\.md|\.txt|kubernetes|gmc|assets|benchmark'
 
   example-test:
     needs: [get-test-matrix]
+    if: ${{ needs.get-test-matrix.outputs.run_matrix != '' }}
     strategy:
       matrix: ${{ fromJSON(needs.get-test-matrix.outputs.run_matrix) }}
       fail-fast: false
-    if: ${{ !github.event.pull_request.draft }}
     uses: ./.github/workflows/_run-docker-compose.yml
     with:
       registry: "opea"
       tag: "ci"
       example: ${{ matrix.example }}
       hardware: ${{ matrix.hardware }}
-      diff_excluded_files: '\.github|\.md|\.txt|kubernetes|manifest|gmc|assets|benchmark'
+      use_model_cache: true
+      diff_excluded_files: '\.github|\.md|\.txt|kubernetes|gmc|assets|benchmark'
     secrets: inherit

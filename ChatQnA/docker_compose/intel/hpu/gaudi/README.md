@@ -1,62 +1,106 @@
-# Build MegaService of ChatQnA on Gaudi
+# Example ChatQnA deployments on an Intel® Gaudi® Platform
 
-This document outlines the deployment process for a ChatQnA application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on Intel Gaudi server. The steps include Docker image creation, container deployment via Docker Compose, and service execution to integrate microservices such as embedding, retriever, rerank, and llm. We will publish the Docker images to Docker Hub, it will simplify the deployment process for this service.
+This example covers the single-node on-premises deployment of the ChatQnA example using OPEA components. There are various ways to enable ChatQnA, but this example will focus on four options available for deploying the ChatQnA pipeline to Intel® Gaudi® AI Accelerators. This example begins with a Quick Start section and then documents how to modify deployments, leverage new models and configure the number of allocated devices.
 
-Quick Start:
+This example includes the following sections:
 
-1. Set up the environment variables.
-2. Run Docker Compose.
-3. Consume the ChatQnA Service.
+- [ChatQnA Quick Start Deployment](#chatqna-quick-start-deployment): Demonstrates how to quickly deploy a ChatQnA application/pipeline on a Intel® Gaudi® platform.
+- [ChatQnA Docker Compose Files](#chatqna-docker-compose-files): Describes some example deployments and their docker compose files.
+- [ChatQnA Service Configuration](#chatqna-service-configuration): Describes the services and possible configuration changes.
 
-## Quick Start: 1.Setup Environment Variable
+**Note** This example requires access to a properly installed Intel® Gaudi® platform with a functional Docker service configured to use the habanalabs-container-runtime. Please consult the [Intel® Gaudi® software Installation Guide](https://docs.habana.ai/en/v1.20.0/Installation_Guide/Driver_Installation.html) for more information.
 
-To set up environment variables for deploying ChatQnA services, follow these steps:
+## ChatQnA Quick Start Deployment
 
-1. Set the required environment variables:
+This section describes how to quickly deploy and test the ChatQnA service manually on an Intel® Gaudi® platform. The basic steps are:
 
-   ```bash
-   # Example: host_ip="192.168.1.1"
-   export host_ip="External_Public_IP"
-   export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
-   ```
+1. [Access the Code](#access-the-code)
+2. [Generate a HuggingFace Access Token](#generate-a-huggingface-access-token)
+3. [Configure the Deployment Environment](#configure-the-deployment-environment)
+4. [Deploy the Services Using Docker Compose](#deploy-the-services-using-docker-compose)
+5. [Check the Deployment Status](#check-the-deployment-status)
+6. [Test the Pipeline](#test-the-pipeline)
+7. [Cleanup the Deployment](#cleanup-the-deployment)
 
-2. If you are in a proxy environment, also set the proxy-related environment variables:
+### Access the Code
 
-   ```bash
-   export http_proxy="Your_HTTP_Proxy"
-   export https_proxy="Your_HTTPs_Proxy"
-   # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
-   export no_proxy="Your_No_Proxy",chatqna-gaudi-ui-server,chatqna-gaudi-backend-server,dataprep-redis-service,tei-embedding-service,retriever,tei-reranking-service,tgi-service,vllm-service,guardrails
-   ```
+Clone the GenAIExample repository and access the ChatQnA Intel® Gaudi® platform Docker Compose files and supporting scripts:
 
-3. Set up other environment variables:
+```
+git clone https://github.com/opea-project/GenAIExamples.git
+cd GenAIExamples/ChatQnA/docker_compose/intel/hpu/gaudi/
+```
 
-   ```bash
-   source ./set_env.sh
-   ```
+Checkout a released version, such as v1.2:
 
-## Quick Start: 2.Run Docker Compose
+```
+git checkout v1.2
+```
+
+### Generate a HuggingFace Access Token
+
+Some HuggingFace resources, such as some models, are only accessible if you have an access token. If you do not already have a HuggingFace access token, you can create one by first creating an account by following the steps provided at [HuggingFace](https://huggingface.co/) and then generating a [user access token](https://huggingface.co/docs/transformers.js/en/guides/private#step-1-generating-a-user-access-token).
+
+### Configure the Deployment Environment
+
+To set up environment variables for deploying ChatQnA services, source the _setup_env.sh_ script in this directory:
+
+```
+source ./set_env.sh
+```
+
+The _set_env.sh_ script will prompt for required and optional environment variables used to configure the ChatQnA services. If a value is not entered, the script will use a default value for the same. It will also generate a _.env_ file defining the desired configuration. Consult the section on [ChatQnA Service configuration](#chatqna-service-configuration) for information on how service specific configuration parameters affect deployments.
+
+### Deploy the Services Using Docker Compose
+
+To deploy the ChatQnA services, execute the `docker compose up` command with the appropriate arguments. For a default deployment, execute:
 
 ```bash
 docker compose up -d
 ```
 
-It will automatically download the docker image on `docker hub`:
+The ChatQnA docker images should automatically be downloaded from the `OPEA registry` and deployed on the Intel® Gaudi® Platform:
 
-```bash
-docker pull opea/chatqna:latest
-docker pull opea/chatqna-ui:latest
+```
+[+] Running 10/10
+ ✔ Network gaudi_default                   Created                                                                      0.1s
+ ✔ Container tei-reranking-gaudi-server    Started                                                                      0.7s
+ ✔ Container vllm-gaudi-server             Started                                                                      0.7s
+ ✔ Container tei-embedding-gaudi-server    Started                                                                      0.3s
+ ✔ Container redis-vector-db               Started                                                                      0.6s
+ ✔ Container retriever-redis-server        Started                                                                      1.1s
+ ✔ Container dataprep-redis-server         Started                                                                      1.1s
+ ✔ Container chatqna-gaudi-backend-server  Started                                                                      1.3s
+ ✔ Container chatqna-gaudi-ui-server       Started                                                                      1.7s
+ ✔ Container chatqna-gaudi-nginx-server    Started                                                                      1.9s
 ```
 
-In following cases, you could build docker image from source by yourself.
+### Check the Deployment Status
 
-- Failed to download the docker image.
+After running docker compose, check if all the containers launched via docker compose have started:
 
-- If you want to use a specific version of Docker image.
+```
+docker ps -a
+```
 
-Please refer to 'Build Docker Images' in below.
+For the default deployment, the following 10 containers should have started:
 
-## QuickStart: 3.Consume the ChatQnA Service
+```
+CONTAINER ID   IMAGE                                                                                           COMMAND                  CREATED         STATUS                      PORTS                                                                                  NAMES
+8365b0a6024d   opea/nginx:latest                                                                               "/docker-entrypoint.…"   2 minutes ago   Up 2 minutes                0.0.0.0:80->80/tcp, :::80->80/tcp                                                      chatqna-gaudi-nginx-server
+f090fe262c74   opea/chatqna-ui:latest                                                                          "docker-entrypoint.s…"   2 minutes ago   Up 2 minutes                0.0.0.0:5173->5173/tcp, :::5173->5173/tcp                                              chatqna-gaudi-ui-server
+ec97d7651c96   opea/chatqna:latest                                                                             "python chatqna.py"      2 minutes ago   Up 2 minutes                0.0.0.0:8888->8888/tcp, :::8888->8888/tcp                                              chatqna-gaudi-backend-server
+a61fb7dc4fae   opea/dataprep:latest                                                                            "sh -c 'python $( [ …"   2 minutes ago   Up 2 minutes                0.0.0.0:6007->5000/tcp, [::]:6007->5000/tcp                                            dataprep-redis-server
+d560c232b120   opea/retriever:latest                                                                           "python opea_retriev…"   2 minutes ago   Up 2 minutes                0.0.0.0:7000->7000/tcp, :::7000->7000/tcp                                              retriever-redis-server
+a1d7ca2d3787   ghcr.io/huggingface/tei-gaudi:1.5.0                                                             "text-embeddings-rou…"   2 minutes ago   Up 2 minutes                0.0.0.0:8808->80/tcp, [::]:8808->80/tcp                                                tei-reranking-gaudi-server
+9a9f3fd4fd4c   opea/vllm-gaudi:latest                                                                          "python3 -m vllm.ent…"   2 minutes ago   Exited (1) 2 minutes ago                                                                                           vllm-gaudi-server
+1ab9bbdf5182   redis/redis-stack:7.2.0-v9                                                                      "/entrypoint.sh"         2 minutes ago   Up 2 minutes                0.0.0.0:6379->6379/tcp, :::6379->6379/tcp, 0.0.0.0:8001->8001/tcp, :::8001->8001/tcp   redis-vector-db
+9ee0789d819e   ghcr.io/huggingface/text-embeddings-inference:cpu-1.6                                           "text-embeddings-rou…"   2 minutes ago   Up 2 minutes                0.0.0.0:8090->80/tcp, [::]:8090->80/tcp                                                tei-embedding-gaudi-server
+```
+
+### Test the Pipeline
+
+Once the ChatQnA services are running, test the pipeline using the following command:
 
 ```bash
 curl http://${host_ip}:8888/v1/chatqna \
@@ -66,489 +110,190 @@ curl http://${host_ip}:8888/v1/chatqna \
     }'
 ```
 
-## 🚀 Build Docker Images
+**Note** The value of _host_ip_ was set using the _set_env.sh_ script and can be found in the _.env_ file.
 
-First of all, you need to build Docker Images locally. This step can be ignored after the Docker images published to Docker hub.
+### Cleanup the Deployment
 
-```bash
-git clone https://github.com/opea-project/GenAIComps.git
-cd GenAIComps
+To stop the containers associated with the deployment, execute the following command:
+
+```
+docker compose -f compose.yaml down
 ```
 
-### 1. Build Retriever Image
-
-```bash
-docker build --no-cache -t opea/retriever-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/redis/langchain/Dockerfile .
+```
+[+] Running 10/10
+ ✔ Container chatqna-gaudi-nginx-server    Removed                                                                                                 10.5s
+ ✔ Container dataprep-redis-server         Removed                                                                                                 10.5s
+ ✔ Container chatqna-gaudi-ui-server       Removed                                                                                                 10.3s
+ ✔ Container chatqna-gaudi-backend-server  Removed                                                                                                 10.3s
+ ✔ Container vllm-gaudi-server             Removed                                                                                                  0.0s
+ ✔ Container retriever-redis-server        Removed                                                                                                 10.4s
+ ✔ Container tei-reranking-gaudi-server    Removed                                                                                                  2.0s
+ ✔ Container tei-embedding-gaudi-server    Removed                                                                                                  1.2s
+ ✔ Container redis-vector-db               Removed                                                                                                  0.4s
+ ✔ Network gaudi_default                   Removed                                                                                                  0.4s
 ```
 
-### 2. Build Dataprep Image
+All the ChatQnA containers will be stopped and then removed on completion of the "down" command.
 
-```bash
-docker build --no-cache -t opea/dataprep-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/redis/langchain/Dockerfile .
+## ChatQnA Docker Compose Files
+
+In the context of deploying a ChatQnA pipeline on an Intel® Gaudi® platform, the allocation and utilization of Gaudi devices across different services are important considerations for optimizing performance and resource efficiency. Each of the four example deployments, defined by the example Docker compose yaml files, demonstrates a unique approach to leveraging Gaudi hardware, reflecting different priorities and operational strategies.
+
+### compose.yaml - Default Deployment
+
+The default deployment utilizes Gaudi devices primarily for the `vllm-service`, which handles large language model (LLM) tasks. This service is configured to maximize the use of Gaudi's capabilities, potentially allocating multiple devices to enhance parallel processing and throughput. The `tei-reranking-service` also uses Gaudi hardware (1 card), however, indicating a balanced approach where both LLM processing and reranking tasks benefit from Gaudi's performance enhancements.
+
+| Service Name                 | Image Name                                            | Gaudi Use    |
+| ---------------------------- | ----------------------------------------------------- | ------------ |
+| redis-vector-db              | redis/redis-stack:7.2.0-v9                            | No           |
+| dataprep-redis-service       | opea/dataprep:latest                                  | No           |
+| tei-embedding-service        | ghcr.io/huggingface/text-embeddings-inference:cpu-1.6 | No           |
+| retriever                    | opea/retriever:latest                                 | No           |
+| tei-reranking-service        | ghcr.io/huggingface/tei-gaudi:1.5.0                   | 1 card       |
+| vllm-service                 | opea/vllm-gaudi:latest                                | Configurable |
+| chatqna-gaudi-backend-server | opea/chatqna:latest                                   | No           |
+| chatqna-gaudi-ui-server      | opea/chatqna-ui:latest                                | No           |
+| chatqna-gaudi-nginx-server   | opea/nginx:latest                                     | No           |
+
+### compose_tgi.yaml - TGI Deployment
+
+The TGI (Text Generation Inference) deployment and the default deployment differ primarily in their service configurations and specific focus on handling large language models (LLMs). The TGI deployment includes a unique `tgi-service`, which utilizes the `ghcr.io/huggingface/tgi-gaudi:2.3.1` image and is specifically configured to run on Gaudi hardware. This service is designed to handle LLM tasks with optimizations such as `ENABLE_HPU_GRAPH` and `USE_FLASH_ATTENTION`. The `chatqna-gaudi-backend-server` in the TGI deployment depends on the `tgi-service`, whereas in the default deployment, it relies on the `vllm-service`.
+
+| Service Name                 | Image Name                                            | Gaudi Specific |
+| ---------------------------- | ----------------------------------------------------- | -------------- |
+| redis-vector-db              | redis/redis-stack:7.2.0-v9                            | No             |
+| dataprep-redis-service       | opea/dataprep:latest                                  | No             |
+| tei-embedding-service        | ghcr.io/huggingface/text-embeddings-inference:cpu-1.6 | No             |
+| retriever                    | opea/retriever:latest                                 | No             |
+| tei-reranking-service        | ghcr.io/huggingface/tei-gaudi:1.5.0                   | 1 card         |
+| **tgi-service**              | ghcr.io/huggingface/tgi-gaudi:2.3.1                   | Configurable   |
+| chatqna-gaudi-backend-server | opea/chatqna:latest                                   | No             |
+| chatqna-gaudi-ui-server      | opea/chatqna-ui:latest                                | No             |
+| chatqna-gaudi-nginx-server   | opea/nginx:latest                                     | No             |
+
+This deployment may allocate more Gaudi resources to the tgi-service to optimize LLM tasks depending on the specific configuration and workload requirements.
+
+### compose_faqgen.yaml - FAQ generation Deployment
+
+The FAQs(frequently asked questions and answers) generation Deployment will generate FAQs instead of normally text generation. It add a new microservice called `llm-faqgen`, which is a microservice that interacts with the TGI/vLLM LLM server to generate FAQs from input text.
+
+The TGI (Text Generation Inference) deployment and the default deployment differ primarily in their service configurations and specific focus on handling large language models (LLMs). The TGI deployment includes a unique `tgi-service`, which utilizes the `ghcr.io/huggingface/tgi-gaudi:2.3.1` image and is specifically configured to run on Gaudi hardware. This service is designed to handle LLM tasks with optimizations such as `ENABLE_HPU_GRAPH` and `USE_FLASH_ATTENTION`. The `chatqna-gaudi-backend-server` in the TGI deployment depends on the `tgi-service`, whereas in the default deployment, it relies on the `vllm-service`.
+
+| Service Name                 | Image Name                                            | Gaudi Use    |
+| ---------------------------- | ----------------------------------------------------- | ------------ |
+| redis-vector-db              | redis/redis-stack:7.2.0-v9                            | No           |
+| dataprep-redis-service       | opea/dataprep:latest                                  | No           |
+| tei-embedding-service        | ghcr.io/huggingface/text-embeddings-inference:cpu-1.6 | No           |
+| retriever                    | opea/retriever:latest                                 | No           |
+| tei-reranking-service        | ghcr.io/huggingface/tei-gaudi:1.5.0                   | 1 card       |
+| vllm-service                 | opea/vllm-gaudi:latest                                | Configurable |
+| **llm-faqgen**               | **opea/llm-faqgen:latest**                            | No           |
+| chatqna-gaudi-backend-server | opea/chatqna:latest                                   | No           |
+| chatqna-gaudi-ui-server      | opea/chatqna-ui:latest                                | No           |
+| chatqna-gaudi-nginx-server   | opea/nginx:latest                                     | No           |
+
+We also provided a TGI based deployment for FAQ generation `compose_faqgen_tgi.yaml`, which only replace `vllm-service` with `tgi-service`.
+
+### compose_without_rerank.yaml - No ReRank Deployment
+
+The _compose_without_rerank.yaml_ Docker Compose file is distinct from the default deployment primarily due to the exclusion of the reranking service. In this version, the `tei-reranking-service`, which is typically responsible for providing reranking capabilities for text embeddings and is configured to run on Gaudi hardware, is absent. This omission simplifies the service architecture by removing a layer of processing that would otherwise enhance the ranking of text embeddings. As a result, the backend server's dependencies are adjusted, without the need for the reranking service. This streamlined setup may impact the application's functionality and performance by focusing on core operations without the additional processing layer provided by reranking, potentially making it more efficient for scenarios where reranking is not essential and freeing Intel® Gaudi® accelerators for other tasks.
+
+| Service Name                 | Image Name                                            | Gaudi Specific |
+| ---------------------------- | ----------------------------------------------------- | -------------- |
+| redis-vector-db              | redis/redis-stack:7.2.0-v9                            | No             |
+| dataprep-redis-service       | opea/dataprep:latest                                  | No             |
+| tei-embedding-service        | ghcr.io/huggingface/text-embeddings-inference:cpu-1.6 | No             |
+| retriever                    | opea/retriever:latest                                 | No             |
+| vllm-service                 | opea/vllm-gaudi:latest                                | Configurable   |
+| chatqna-gaudi-backend-server | opea/chatqna:latest                                   | No             |
+| chatqna-gaudi-ui-server      | opea/chatqna-ui:latest                                | No             |
+| chatqna-gaudi-nginx-server   | opea/nginx:latest                                     | No             |
+
+This setup might allow for more Gaudi devices to be dedicated to the `vllm-service`, enhancing LLM processing capabilities and accommodating larger models. However, it also means that the benefits of reranking are sacrificed, which could impact the overall quality of the pipeline's output.
+
+### compose_guardrails.yaml - Guardrails Deployment
+
+The _compose_guardrails.yaml_ Docker Compose file introduces enhancements over the default deployment by incorporating additional services focused on safety and ChatQnA response control. Notably, it includes the `tgi-guardrails-service` and `guardrails` services. The `tgi-guardrails-service` uses the `ghcr.io/huggingface/tgi-gaudi:2.3.1` image and is configured to run on Gaudi hardware, providing functionality to manage input constraints and ensure safe operations within defined limits. The guardrails service, using the `opea/guardrails:latest` image, acts as a safety layer that interfaces with the `tgi-guardrails-service` to enforce safety protocols and manage interactions with the large language model (LLM). This backend server now depends on the `tgi-guardrails-service` and `guardrails`, alongside existing dependencies like `redis-vector-db`, `tei-embedding-service`, `retriever`, `tei-reranking-service`, and `vllm-service`. The environment configurations for the backend are also updated to include settings for the guardrail services.
+
+| Service Name                 | Image Name                                            | Gaudi Specific | Uses LLM |
+| ---------------------------- | ----------------------------------------------------- | -------------- | -------- |
+| redis-vector-db              | redis/redis-stack:7.2.0-v9                            | No             | No       |
+| dataprep-redis-service       | opea/dataprep:latest                                  | No             | No       |
+| _tgi-guardrails-service_     | ghcr.io/huggingface/tgi-gaudi:2.3.1                   | 1 card         | Yes      |
+| _guardrails_                 | opea/guardrails:latest                                | No             | No       |
+| tei-embedding-service        | ghcr.io/huggingface/text-embeddings-inference:cpu-1.6 | No             | No       |
+| retriever                    | opea/retriever:latest                                 | No             | No       |
+| tei-reranking-service        | ghcr.io/huggingface/tei-gaudi:1.5.0                   | 1 card         | No       |
+| vllm-service                 | opea/vllm-gaudi:latest                                | Configurable   | Yes      |
+| chatqna-gaudi-backend-server | opea/chatqna:latest                                   | No             | No       |
+| chatqna-gaudi-ui-server      | opea/chatqna-ui:latest                                | No             | No       |
+| chatqna-gaudi-nginx-server   | opea/nginx:latest                                     | No             | No       |
+
+The deployment with guardrails introduces additional Gaudi-specific services, such as the `tgi-guardrails-service`, which necessitates careful consideration of Gaudi allocation. This deployment aims to balance safety and performance, potentially requiring a strategic distribution of Gaudi devices between the guardrail services and the LLM tasks to maintain both operational safety and efficiency.
+
+### Telemetry Enablement - compose.telemetry.yaml and compose_tgi.telemetry.yaml
+
+The telemetry Docker Compose files are incremental configurations designed to enhance existing deployments by integrating telemetry metrics, thereby providing valuable insights into the performance and behavior of certain services. This setup modifies specific services, such as the `tgi-service`, `tei-embedding-service` and `tei-reranking-service`, by adding a command-line argument that specifies an OpenTelemetry Protocol (OTLP) endpoint. This enables these services to export telemetry data to a designated endpoint, facilitating detailed monitoring and analysis. The `chatqna-gaudi-backend-server` is configured with environment variables that enable telemetry and specify the telemetry endpoint, ensuring that the backend server's operations are also monitored.
+
+Additionally, the telemetry files introduce a new service, `jaeger`, which uses the `jaegertracing/all-in-one:latest` image. Jaeger is a powerful open-source tool for tracing and monitoring distributed systems, offering a user-friendly interface for visualizing traces and understanding the flow of requests through the system.
+
+To enable Open Telemetry Tracing, compose.telemetry.yaml file needs to be merged along with default compose.yaml file on deployment:
+
+```
+docker compose -f compose.yaml -f compose.telemetry.yaml up -d
 ```
 
-### 3. Build Guardrails Docker Image (Optional)
+For a TGI Deployment, this would become:
 
-To fortify AI initiatives in production, Guardrails microservice can secure model inputs and outputs, building Trustworthy, Safe, and Secure LLM-based Applications.
-
-```bash
-docker build -t opea/guardrails:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/guardrails/src/guardrails/Dockerfile .
+```
+docker compose -f compose_tgi.yaml -f compose_tgi.telemetry.yaml up -d
 ```
 
-### 4. Build MegaService Docker Image
+## ChatQnA Service Configuration
 
-1. MegaService with Rerank
+The table provides a comprehensive overview of the ChatQnA services utilized across various deployments as illustrated in the example Docker Compose files. Each row in the table represents a distinct service, detailing its possible images used to enable it and a concise description of its function within the deployment architecture. These services collectively enable functionalities such as data storage and management, text embedding, retrieval, reranking, and large language model processing. Additionally, specialized services like `tgi-service` and `guardrails` are included to enhance text generation inference and ensure operational safety, respectively. The table also highlights the integration of telemetry through the `jaeger` service, which provides tracing and monitoring capabilities.
 
-   To construct the Mega Service with Rerank, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `chatqna.py` Python script. Build the MegaService Docker image using the command below:
+| Service Name                 | Possible Image Names                                  | Optional | Description                                                                                        |
+| ---------------------------- | ----------------------------------------------------- | -------- | -------------------------------------------------------------------------------------------------- |
+| redis-vector-db              | redis/redis-stack:7.2.0-v9                            | No       | Acts as a Redis database for storing and managing data.                                            |
+| dataprep-redis-service       | opea/dataprep:latest                                  | No       | Prepares data and interacts with the Redis database.                                               |
+| tei-embedding-service        | ghcr.io/huggingface/text-embeddings-inference:cpu-1.6 | No       | Provides text embedding services, often using Hugging Face models.                                 |
+| retriever                    | opea/retriever:latest                                 | No       | Retrieves data from the Redis database and interacts with embedding services.                      |
+| tei-reranking-service        | ghcr.io/huggingface/tei-gaudi:1.5.0                   | Yes      | Reranks text embeddings, typically using Gaudi hardware for enhanced performance.                  |
+| vllm-service                 | opea/vllm-gaudi:latest                                | No       | Handles large language model (LLM) tasks, utilizing Gaudi hardware.                                |
+| tgi-service                  | ghcr.io/huggingface/tgi-gaudi:2.3.1                   | Yes      | Specific to the TGI deployment, focuses on text generation inference using Gaudi hardware.         |
+| tgi-guardrails-service       | ghcr.io/huggingface/tgi-gaudi:2.3.1                   | Yes      | Provides guardrails functionality, ensuring safe operations within defined limits.                 |
+| guardrails                   | opea/guardrails:latest                                | Yes      | Acts as a safety layer, interfacing with the `tgi-guardrails-service` to enforce safety protocols. |
+| chatqna-gaudi-backend-server | opea/chatqna:latest                                   | No       | Serves as the backend for the ChatQnA application, with variations depending on the deployment.    |
+| chatqna-gaudi-ui-server      | opea/chatqna-ui:latest                                | No       | Provides the user interface for the ChatQnA application.                                           |
+| chatqna-gaudi-nginx-server   | opea/nginx:latest                                     | No       | Acts as a reverse proxy, managing traffic between the UI and backend services.                     |
+| jaeger                       | jaegertracing/all-in-one:latest                       | Yes      | Provides tracing and monitoring capabilities for distributed systems.                              |
 
-   ```bash
-   git clone https://github.com/opea-project/GenAIExamples.git
-   cd GenAIExamples/ChatQnA
-   docker build --no-cache -t opea/chatqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
-   ```
+Many of these services provide pipeline support required for all ChatQnA deployments, and are not specific to supporting the Intel® Gaudi® platform. Therefore, while the `redis-vector-db`, `dataprep-redis-service`, `retriever`, `chatqna-gaudi-backend-server`, `chatqna-gaudi-ui-server`, `chatqna-gaudi-nginx-server`, `jaeger` are configurable, they will not be covered by this example, which will focus on the configuration specifics of the services modified to support the Intel® Gaudi® platform.
 
-2. MegaService with Guardrails
+### vllm-service & tgi-service
 
-   If you want to enable guardrails microservice in the pipeline, please use the below command instead:
+In the configuration of the `vllm-service` and the `tgi-service`, two variables play a primary role in determining the service's performance and functionality: `LLM_MODEL_ID` and `NUM_CARDS`. Both can be set using the appropriate environment variables. The `LLM_MODEL_ID` parameter specifies the particular large language model (LLM) that the service will utilize, effectively determining the capabilities and characteristics of the language processing tasks it can perform. This model identifier ensures that the service is aligned with the specific requirements of the application, whether it involves text generation, comprehension, or other language-related tasks. The `NUM_CARDS` parameter dictates the number of Gaudi devices allocated to the service. A higher number of Gaudi devices can enhance parallel processing capabilities, reduce latency, and improve throughput.
 
-   ```bash
-   git clone https://github.com/opea-project/GenAIExamples.git
-   cd GenAIExamples/ChatQnA/
-   docker build --no-cache -t opea/chatqna-guardrails:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile.guardrails .
-   ```
+However, developers need to be aware of the models that have been tested with the respective service image supporting the `vllm-service` and `tgi-service`. For example, documentation for the OPEA GenAIComps v1.0 release specify the list of [validated LLM models](https://github.com/opea-project/GenAIComps/blob/v1.0/comps/llms/text-generation/README.md#validated-llm-models) for each Gaudi enabled service image. Specific models may have stringent requirements on the number of Intel® Gaudi® devices required to support them.
 
-3. MegaService without Rerank
+#### Deepseek Model Support for Intel® Gaudi® Platform ChatQnA pipeline
 
-   To construct the Mega Service without Rerank, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `chatqna_without_rerank.py` Python script. Build MegaService Docker image via below command:
+ChatQnA now supports running the latest DeepSeek models, including [deepseek-ai/DeepSeek-R1-Distill-Llama-70B](https://huggingface.co/deepseek-ai/DeepSeek-R1-Distill-Llama-70B) and [deepseek-ai/DeepSeek-R1-Distill-Qwen-32B](https://huggingface.co/deepseek-ai/DeepSeek-R1-Distill-Qwen-32B) on Gaudi accelerators. To run `deepseek-ai/DeepSeek-R1-Distill-Llama-70B`, set the `LLM_MODEL_ID` appropriately and the `NUM_CARDS` to 8. To run `deepseek-ai/DeepSeek-R1-Distill-Qwen-32B`, update the `LLM_MODEL_ID` appropriately and set the `NUM_CARDS` to 4.
 
-   ```bash
-   git clone https://github.com/opea-project/GenAIExamples.git
-   cd GenAIExamples/ChatQnA
-   docker build --no-cache -t opea/chatqna-without-rerank:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile.without_rerank .
-   ```
+### tei-embedding-service & tei-reranking-service
 
-### 5. Build UI Docker Image
+The `ghcr.io/huggingface/text-embeddings-inference:cpu-1.6` image supporting `tei-embedding-service` and `tei-reranking-service` depends on the `EMBEDDING_MODEL_ID` or `RERANK_MODEL_ID` environment variables respectively to specify the embedding model and reranking model used for converting text into vector representations and rankings. This choice impacts the quality and relevance of the embeddings rerankings for various applications. Unlike the `vllm-service`, the `tei-embedding-service` and `tei-reranking-service` each typically acquires only one Gaudi device and does not use the `NUM_CARDS` parameter; embedding and reranking tasks generally do not require extensive parallel processing and one Gaudi per service is appropriate. The list of [supported embedding and reranking models](https://github.com/huggingface/tei-gaudi?tab=readme-ov-file#supported-models) can be found at the the [huggingface/tei-gaudi](https://github.com/huggingface/tei-gaudi?tab=readme-ov-file#supported-models) website.
 
-Construct the frontend Docker image using the command below:
+### tgi-gaurdrails-service
 
-```bash
-cd GenAIExamples/ChatQnA/ui
-docker build --no-cache -t opea/chatqna-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
-```
+The `tgi-guardrails-service` uses the `GUARDRAILS_MODEL_ID` parameter to select a [supported model](https://github.com/huggingface/tgi-gaudi?tab=readme-ov-file#tested-models-and-configurations) for the associated `ghcr.io/huggingface/tgi-gaudi:2.3.1` image. Like the `tei-embedding-service` and `tei-reranking-service` services, it doesn't use the `NUM_CARDS` parameter.
 
-### 6. Build Conversational React UI Docker Image (Optional)
+## Conclusion
 
-Build frontend Docker image that enables Conversational experience with ChatQnA megaservice via below command:
+In examining the various services and configurations across different deployments, developers should gain a comprehensive understanding of how each component contributes to the overall functionality and performance of a ChatQnA pipeline on an Intel® Gaudi® platform. Key services such as the `vllm-service`, `tei-embedding-service`, `tei-reranking-service`, and `tgi-guardrails-service` each consume Gaudi accelerators, leveraging specific models and hardware resources to optimize their respective tasks. The `LLM_MODEL_ID`, `EMBEDDING_MODEL_ID`, `RERANK_MODEL_ID`, and `GUARDRAILS_MODEL_ID` parameters specify the models used, directly impacting the quality and effectiveness of language processing, embedding, reranking, and safety operations.
 
-**Export the value of the public IP address of your Gaudi node to the `host_ip` environment variable**
+The allocation of Gaudi devices, affected by the Gaudi dependent services and the `NUM_CARDS` parameter supporting the `vllm-service` or `tgi-service`, determines where computational power is utilized to enhance performance.
 
-```bash
-cd GenAIExamples/ChatQnA/ui
-docker build --no-cache -t opea/chatqna-conversation-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile.react .
-```
-
-### 7. Build Nginx Docker Image
-
-```bash
-cd GenAIComps
-docker build -t opea/nginx:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/third_parties/nginx/src/Dockerfile .
-```
-
-Then run the command `docker images`, you will have the following 5 Docker Images:
-
-- `opea/retriever-redis:latest`
-- `opea/dataprep-redis:latest`
-- `opea/chatqna:latest`
-- `opea/chatqna-ui:latest`
-- `opea/nginx:latest`
-
-If Conversation React UI is built, you will find one more image:
-
-- `opea/chatqna-conversation-ui:latest`
-
-If Guardrails docker image is built, you will find one more image:
-
-- `opea/guardrails:latest`
-
-## 🚀 Start MicroServices and MegaService
-
-### Required Models
-
-By default, the embedding, reranking and LLM models are set to a default value as listed below:
-
-| Service   | Model                     |
-| --------- | ------------------------- |
-| Embedding | BAAI/bge-base-en-v1.5     |
-| Reranking | BAAI/bge-reranker-base    |
-| LLM       | Intel/neural-chat-7b-v3-3 |
-
-Change the `xxx_MODEL_ID` below for your needs.
-
-For users in China who are unable to download models directly from Huggingface, you can use [ModelScope](https://www.modelscope.cn/models) or a Huggingface mirror to download models. TGI can load the models either online or offline as described below:
-
-1. Online
-
-   ```bash
-   export HF_TOKEN=${your_hf_token}
-   export HF_ENDPOINT="https://hf-mirror.com"
-   model_name="Intel/neural-chat-7b-v3-3"
-   docker run -p 8008:80 -v ./data:/data --name tgi-service -e HF_ENDPOINT=$HF_ENDPOINT -e http_proxy=$http_proxy -e https_proxy=$https_proxy --runtime=habana -e HABANA_VISIBLE_DEVICES=all -e OMPI_MCA_btl_vader_single_copy_mechanism=none -e HUGGING_FACE_HUB_TOKEN=$HF_TOKEN -e ENABLE_HPU_GRAPH=true -e LIMIT_HPU_GRAPH=true -e USE_FLASH_ATTENTION=true -e FLASH_ATTENTION_RECOMPUTE=true --cap-add=sys_nice --ipc=host ghcr.io/huggingface/tgi-gaudi:2.0.6 --model-id $model_name --max-input-tokens 1024 --max-total-tokens 2048
-   ```
-
-2. Offline
-
-   - Search your model name in ModelScope. For example, check [this page](https://www.modelscope.cn/models/ai-modelscope/neural-chat-7b-v3-1/files) for model `neural-chat-7b-v3-1`.
-
-   - Click on `Download this model` button, and choose one way to download the model to your local path `/path/to/model`.
-
-   - Run the following command to start TGI service.
-
-     ```bash
-     export HF_TOKEN=${your_hf_token}
-     export model_path="/path/to/model"
-     docker run -p 8008:80 -v $model_path:/data --name tgi_service --runtime=habana -e HABANA_VISIBLE_DEVICES=all -e OMPI_MCA_btl_vader_single_copy_mechanism=none -e HUGGING_FACE_HUB_TOKEN=$HF_TOKEN -e ENABLE_HPU_GRAPH=true -e LIMIT_HPU_GRAPH=true -e USE_FLASH_ATTENTION=true -e FLASH_ATTENTION_RECOMPUTE=true --cap-add=sys_nice --ipc=host ghcr.io/huggingface/tgi-gaudi:2.0.6 --model-id /data --max-input-tokens 1024 --max-total-tokens 2048
-     ```
-
-### Setup Environment Variables
-
-1. Set the required environment variables:
-
-   ```bash
-   # Example: host_ip="192.168.1.1"
-   export host_ip="External_Public_IP"
-   export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
-   # Example: NGINX_PORT=80
-   export NGINX_PORT=${your_nginx_port}
-   ```
-
-2. If you are in a proxy environment, also set the proxy-related environment variables:
-
-   ```bash
-   export http_proxy="Your_HTTP_Proxy"
-   export https_proxy="Your_HTTPs_Proxy"
-   # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
-   export no_proxy="Your_No_Proxy",chatqna-gaudi-ui-server,chatqna-gaudi-backend-server,dataprep-redis-service,tei-embedding-service,retriever,tei-reranking-service,tgi-service,vllm-service,guardrails
-   ```
-
-3. Set up other environment variables:
-
-   ```bash
-   source ./set_env.sh
-   ```
-
-### Start all the services Docker Containers
-
-```bash
-cd GenAIExamples/ChatQnA/docker_compose/intel/hpu/gaudi/
-```
-
-If use tgi for llm backend.
-
-```bash
-# Start ChatQnA with Rerank Pipeline
-docker compose -f compose.yaml up -d
-# Start ChatQnA without Rerank Pipeline
-docker compose -f compose_without_rerank.yaml up -d
-```
-
-If use vllm for llm backend.
-
-```bash
-docker compose -f compose_vllm.yaml up -d
-```
-
-If you want to enable guardrails microservice in the pipeline, please follow the below command instead:
-
-```bash
-cd GenAIExamples/ChatQnA/docker_compose/intel/hpu/gaudi/
-docker compose -f compose_guardrails.yaml up -d
-```
-
-> **_NOTE:_** Users need at least two Gaudi cards to run the ChatQnA successfully.
-
-### Validate MicroServices and MegaService
-
-Follow the instructions to validate MicroServices.
-For validation details, please refer to [how-to-validate_service](./how_to_validate_service.md).
-
-1. TEI Embedding Service
-
-   ```bash
-   curl ${host_ip}:8090/embed \
-       -X POST \
-       -d '{"inputs":"What is Deep Learning?"}' \
-       -H 'Content-Type: application/json'
-   ```
-
-2. Retriever Microservice
-
-   To consume the retriever microservice, you need to generate a mock embedding vector by Python script. The length of embedding vector
-   is determined by the embedding model.
-   Here we use the model `EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"`, which vector size is 768.
-
-   Check the vecotor dimension of your embedding model, set `your_embedding` dimension equals to it.
-
-   ```bash
-   export your_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
-   curl http://${host_ip}:7000/v1/retrieval \
-     -X POST \
-     -d "{\"text\":\"test\",\"embedding\":${your_embedding}}" \
-     -H 'Content-Type: application/json'
-   ```
-
-3. TEI Reranking Service
-
-   > Skip for ChatQnA without Rerank pipeline
-
-   ```bash
-   curl http://${host_ip}:8808/rerank \
-       -X POST \
-       -d '{"query":"What is Deep Learning?", "texts": ["Deep Learning is not...", "Deep learning is..."]}' \
-       -H 'Content-Type: application/json'
-   ```
-
-4. LLM backend Service
-
-   In first startup, this service will take more time to download the model files. After it's finished, the service will be ready.
-
-   Try the command below to check whether the LLM serving is ready.
-
-   ```bash
-   docker logs tgi-gaudi-server | grep Connected
-   ```
-
-   If the service is ready, you will get the response like below.
-
-   ```
-   2024-09-03T02:47:53.402023Z  INFO text_generation_router::server: router/src/server.rs:2311: Connected
-   ```
-
-   Then try the `cURL` command below to validate services.
-
-   ```bash
-   # TGI service
-   curl http://${host_ip}:8005/v1/chat/completions \
-     -X POST \
-     -d '{"model": ${LLM_MODEL_ID}, "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens":17}' \
-     -H 'Content-Type: application/json'
-   ```
-
-   ```bash
-   # vLLM Service
-   curl http://${host_ip}:8007/v1/chat/completions \
-     -H "Content-Type: application/json" \
-     -d '{"model": ${LLM_MODEL_ID}, "messages": [{"role": "user", "content": "What is Deep Learning?"}]}'
-   ```
-
-5. MegaService
-
-   ```bash
-   curl http://${host_ip}:8888/v1/chatqna -H "Content-Type: application/json" -d '{
-         "messages": "What is the revenue of Nike in 2023?"
-         }'
-   ```
-
-6. Nginx Service
-
-   ```bash
-   curl http://${host_ip}:${NGINX_PORT}/v1/chatqna \
-       -H "Content-Type: application/json" \
-       -d '{"messages": "What is the revenue of Nike in 2023?"}'
-   ```
-
-7. Dataprep Microservice（Optional）
-
-If you want to update the default knowledge base, you can use the following commands:
-
-Update Knowledge Base via Local File Upload:
-
-```bash
-curl -X POST "http://${host_ip}:6007/v1/dataprep" \
-     -H "Content-Type: multipart/form-data" \
-     -F "files=@./nke-10k-2023.pdf"
-```
-
-This command updates a knowledge base by uploading a local file for processing. Update the file path according to your environment.
-
-Add Knowledge Base via HTTP Links:
-
-```bash
-curl -X POST "http://${host_ip}:6007/v1/dataprep" \
-     -H "Content-Type: multipart/form-data" \
-     -F 'link_list=["https://opea.dev"]'
-```
-
-This command updates a knowledge base by submitting a list of HTTP links for processing.
-
-Also, you are able to get the file/link list that you uploaded:
-
-```bash
-curl -X POST "http://${host_ip}:6007/v1/dataprep/get_file" \
-     -H "Content-Type: application/json"
-```
-
-Then you will get the response JSON like this. Notice that the returned `name`/`id` of the uploaded link is `https://xxx.txt`.
-
-```json
-[
-  {
-    "name": "nke-10k-2023.pdf",
-    "id": "nke-10k-2023.pdf",
-    "type": "File",
-    "parent": ""
-  },
-  {
-    "name": "https://opea.dev.txt",
-    "id": "https://opea.dev.txt",
-    "type": "File",
-    "parent": ""
-  }
-]
-```
-
-To delete the file/link you uploaded:
-
-```bash
-# delete link
-curl -X POST "http://${host_ip}:6007/v1/dataprep/delete_file" \
-     -d '{"file_path": "https://opea.dev.txt"}' \
-     -H "Content-Type: application/json"
-
-# delete file
-curl -X POST "http://${host_ip}:6007/v1/dataprep/delete_file" \
-     -d '{"file_path": "nke-10k-2023.pdf"}' \
-     -H "Content-Type: application/json"
-
-# delete all uploaded files and links
-curl -X POST "http://${host_ip}:6007/v1/dataprep/delete_file" \
-     -d '{"file_path": "all"}' \
-     -H "Content-Type: application/json"
-```
-
-8. Guardrails (Optional)
-
-```bash
-curl http://${host_ip}:9090/v1/guardrails\
-  -X POST \
-  -d '{"text":"How do you buy a tiger in the US?","parameters":{"max_new_tokens":32}}' \
-  -H 'Content-Type: application/json'
-```
-
-### Profile Microservices
-
-To further analyze MicroService Performance, users could follow the instructions to profile MicroServices.
-
-#### 1. vLLM backend Service
-
-Users could follow previous section to testing vLLM microservice or ChatQnA MegaService.  
- By default, vLLM profiling is not enabled. Users could start and stop profiling by following commands.
-
-##### Start vLLM profiling
-
-```bash
-curl http://${host_ip}:9009/start_profile \
-  -H "Content-Type: application/json" \
-  -d '{"model": ${LLM_MODEL_ID}}'
-```
-
-Users would see below docker logs from vllm-service if profiling is started correctly.
-
-```bash
-INFO api_server.py:361] Starting profiler...
-INFO api_server.py:363] Profiler started.
-INFO:     x.x.x.x:35940 - "POST /start_profile HTTP/1.1" 200 OK
-```
-
-After vLLM profiling is started, users could start asking questions and get responses from vLLM MicroService  
- or ChatQnA MicroService.
-
-##### Stop vLLM profiling
-
-By following command, users could stop vLLM profliing and generate a \*.pt.trace.json.gz file as profiling result  
- under /mnt folder in vllm-service docker instance.
-
-```bash
-# vLLM Service
-curl http://${host_ip}:9009/stop_profile \
-  -H "Content-Type: application/json" \
-  -d '{"model": ${LLM_MODEL_ID}}'
-```
-
-Users would see below docker logs from vllm-service if profiling is stopped correctly.
-
-```bash
-INFO api_server.py:368] Stopping profiler...
-INFO api_server.py:370] Profiler stopped.
-INFO:     x.x.x.x:41614 - "POST /stop_profile HTTP/1.1" 200 OK
-```
-
-After vllm profiling is stopped, users could use below command to get the \*.pt.trace.json.gz file under /mnt folder.
-
-```bash
-docker cp  vllm-service:/mnt/ .
-```
-
-##### Check profiling result
-
-Open a web browser and type "chrome://tracing" or "ui.perfetto.dev", and then load the json.gz file, you should be able  
- to see the vLLM profiling result as below diagram.
-![image](https://github.com/user-attachments/assets/487c52c8-d187-46dc-ab3a-43f21d657d41)
-
-![image](https://github.com/user-attachments/assets/e3c51ce5-d704-4eb7-805e-0d88b0c158e3)
-
-## 🚀 Launch the UI
-
-### Launch with origin port
-
-To access the frontend, open the following URL in your browser: http://{host_ip}:5173. By default, the UI runs on port 5173 internally. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `compose.yaml` file as shown below:
-
-```yaml
-  chatqna-gaudi-ui-server:
-    image: opea/chatqna-ui:latest
-    ...
-    ports:
-      - "80:5173"
-```
-
-### Launch with Nginx
-
-If you want to launch the UI using Nginx, open this URL: `http://${host_ip}:${NGINX_PORT}` in your browser to access the frontend.
-
-## 🚀 Launch the Conversational UI (Optional)
-
-To access the Conversational UI (react based) frontend, modify the UI service in the `compose.yaml` file. Replace `chatqna-gaudi-ui-server` service with the `chatqna-gaudi-conversation-ui-server` service as per the config below:
-
-```yaml
-chatqna-gaudi-conversation-ui-server:
-  image: opea/chatqna-conversation-ui:latest
-  container_name: chatqna-gaudi-conversation-ui-server
-  environment:
-    - APP_BACKEND_SERVICE_ENDPOINT=${BACKEND_SERVICE_ENDPOINT}
-    - APP_DATA_PREP_SERVICE_URL=${DATAPREP_SERVICE_ENDPOINT}
-  ports:
-    - "5174:80"
-  depends_on:
-    - chatqna-gaudi-backend-server
-  ipc: host
-  restart: always
-```
-
-Once the services are up, open the following URL in your browser: http://{host_ip}:5174. By default, the UI runs on port 80 internally. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `compose.yaml` file as shown below:
-
-```yaml
-  chatqna-gaudi-conversation-ui-server:
-    image: opea/chatqna-conversation-ui:latest
-    ...
-    ports:
-      - "80:80"
-```
-
-![project-screenshot](../../../../assets/img/chat_ui_init.png)
-
-Here is an example of running ChatQnA:
-
-![project-screenshot](../../../../assets/img/chat_ui_response.png)
-
-Here is an example of running ChatQnA with Conversational UI (React):
-
-![project-screenshot](../../../../assets/img/conversation_ui_response.png)
+Overall, the strategic configuration of these services, through careful selection of models and resource allocation, enables a balanced and efficient deployment. This approach ensures that the ChatQnA pipeline can meet diverse operational needs, from high-performance language model processing to robust safety protocols, all while optimizing the use of available hardware resources.

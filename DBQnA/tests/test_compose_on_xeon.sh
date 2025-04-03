@@ -10,6 +10,7 @@ echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
 echo "TAG=IMAGE_TAG=${IMAGE_TAG}"
 export REGISTRY=${IMAGE_REPO}
 export TAG=${IMAGE_TAG}
+export MODEL_CACHE=${model_cache:-"./data"}
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
@@ -18,10 +19,13 @@ tgi_port=8008
 
 function build_docker_images() {
     cd $WORKPATH/docker_image_build
-    git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
+    git clone --single-branch --branch "${opea_branch:-"main"}" https://github.com/opea-project/GenAIComps.git
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
     docker compose -f build.yaml build --no-cache > ${LOG_PATH}/docker_image_build.log
+
+    docker pull ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu
+    docker images && sleep 1s
 }
 
 function start_service() {

@@ -26,20 +26,27 @@ MM_EMBEDDING_PORT_MICROSERVICE = int(os.getenv("MM_EMBEDDING_PORT_MICROSERVICE",
 MM_RETRIEVER_SERVICE_HOST_IP = os.getenv("MM_RETRIEVER_SERVICE_HOST_IP", "0.0.0.0")
 MM_RETRIEVER_SERVICE_PORT = int(os.getenv("MM_RETRIEVER_SERVICE_PORT", 7000))
 LVM_SERVICE_HOST_IP = os.getenv("LVM_SERVICE_HOST_IP", "0.0.0.0")
-LVM_SERVICE_PORT = int(os.getenv("LVM_SERVICE_PORT", 9399))
-WHISPER_SERVER_ENDPOINT = os.getenv("WHISPER_SERVER_ENDPOINT", "http://0.0.0.0:7066/v1/asr")
+LVM_SERVICE_PORT = int(os.getenv("LVM_PORT", 9399))
+WHISPER_PORT = int(os.getenv("WHISPER_PORT", 7066))
+WHISPER_SERVER_ENDPOINT = os.getenv("WHISPER_SERVER_ENDPOINT", f"http://0.0.0.0:{WHISPER_PORT}/v1/asr")
+TTS_PORT = int(os.getenv("TTS_PORT", 7055))
+TTS_ENDPOINT = os.getenv("TTS_ENDPOINT", f"http://0.0.0.0:{TTS_PORT}/v1/tts")
 
 
 def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **kwargs):
     if self.services[cur_node].service_type == ServiceType.EMBEDDING:
+        if "text" in inputs:
+            input_text = inputs["text"]["text"] if isinstance(inputs["text"], dict) else inputs["text"]
+        if "image" in inputs:
+            input_image = inputs["image"]["base64_image"] if isinstance(inputs["image"], dict) else inputs["image"]
         if "text" in inputs and "image" in inputs:
-            text_doc = TextDoc(text=inputs["text"])
-            image_doc = ImageDoc(base64_image=inputs["image"])
+            text_doc = TextDoc(text=input_text)
+            image_doc = ImageDoc(base64_image=input_image)
             inputs = TextImageDoc(text=text_doc, image=image_doc).dict()
         elif "image" in inputs:
-            inputs = ImageDoc(base64_image=inputs["image"]).dict()
+            inputs = ImageDoc(base64_image=input_image).dict()
         elif "text" in inputs:
-            inputs = TextDoc(text=inputs["text"]).dict()
+            inputs = TextDoc(text=input_text).dict()
     return inputs
 
 
@@ -48,6 +55,7 @@ class MultimodalQnAService:
     def __init__(self, host="0.0.0.0", port=8000):
         self.host = host
         self.port = port
+        self._role_labels = self._get_role_labels()
         ServiceOrchestrator.align_inputs = align_inputs
         self.lvm_megaservice = ServiceOrchestrator()
         self.megaservice = ServiceOrchestrator()
@@ -88,6 +96,31 @@ class MultimodalQnAService:
         # for lvm megaservice
         self.lvm_megaservice.add(lvm)
 
+    def _get_role_labels(self):
+        """Returns a dictionary of role labels that are used in the chat prompt based on the LVM_MODEL_ID
+        environment variable.
+
+        The function defines the role labels used by the llava-1.5, llava-v1.6-vicuna,
+        llava-v1.6-mistral, and llava-interleave models, and then defaults to use "USER:" and "ASSISTANT:" if the
+        LVM_MODEL_ID is not one of those.
+        """
+        lvm_model = os.getenv("LVM_MODEL_ID", "")
+
+        # Default to labels used by llava-1.5 and llava-v1.6-vicuna models
+        role_labels = {"user": "USER:", "assistant": "ASSISTANT:"}
+
+        if "llava-interleave" in lvm_model:
+            role_labels["user"] = "<|im_start|>user"
+            role_labels["assistant"] = "<|im_end|><|im_start|>assistant"
+        elif "llava-v1.6-mistral" in lvm_model:
+            role_labels["user"] = "[INST]"
+            role_labels["assistant"] = " [/INST]"
+        elif "llava-1.5" not in lvm_model and "llava-v1.6-vicuna" not in lvm_model:
+            print(f"[ MultimodalQnAGateway ] Using default role labels for prompt formatting: {role_labels}")
+
+        return role_labels
+
+    # this overrides _handle_message method of Gateway
     def _handle_message(self, messages):
         images = []
         audios = []
@@ -100,6 +133,7 @@ class MultimodalQnAService:
             messages_dict = {}
             system_prompt = ""
             prompt = ""
+            role_label_dict = self._role_labels
             for message in messages:
                 msg_role = message["role"]
                 messages_dict = {}
@@ -142,20 +176,24 @@ class MultimodalQnAService:
                 for role, message in messages_dict.items():
                     if isinstance(message, tuple):
                         text, decoded_audio_input, image_list = message
+                        # Remove empty items from the image list
+                        image_list = [x for x in image_list if x]
+                        # Add image indicators within the conversation
+                        image_tags = "<image>\n" * len(image_list)
                         if i == 0:
                             # do not add role for the very first message.
                             # this will be added by llava_server
                             if text:
-                                prompt += text + "\n"
+                                prompt += image_tags + text + "\n"
                             elif decoded_audio_input:
-                                prompt += decoded_audio_input + "\n"
+                                prompt += image_tags + decoded_audio_input + "\n"
                         else:
                             if text:
-                                prompt += role.upper() + ": " + text + "\n"
+                                prompt += role_label_dict[role] + " " + image_tags + text + "\n"
                             elif decoded_audio_input:
-                                prompt += role.upper() + ": " + decoded_audio_input + "\n"
+                                prompt += role_label_dict[role] + " " + image_tags + decoded_audio_input + "\n"
                             else:
-                                prompt += role.upper() + ":"
+                                prompt += role_label_dict[role] + " " + image_tags
 
                         if image_list:
                             for img in image_list:
@@ -186,9 +224,9 @@ class MultimodalQnAService:
                                 prompt += message + "\n"
                         else:
                             if message:
-                                prompt += role.upper() + ": " + message + "\n"
+                                prompt += role_label_dict[role] + " " + message + "\n"
                             else:
-                                prompt += role.upper() + ":"
+                                prompt += role_label_dict[role]
 
         if images:
             b64_types["image"] = images
@@ -216,14 +254,42 @@ class MultimodalQnAService:
         response = response.json()
         return response["asr_result"]
 
+    def convert_text_to_audio(self, text):
+        if isinstance(text, dict):
+            input_dict = {"text": text["text"]}
+        else:
+            input_dict = {"text": text}
+
+        response = requests.post(TTS_ENDPOINT, data=json.dumps(input_dict))
+
+        if response.status_code != 200:
+            return JSONResponse(
+                status_code=503, content={"message": "Unable to convert text to audio. {}".format(response.text)}
+            )
+
+        response = response.json()
+        return response["tts_result"]
+
     async def handle_request(self, request: Request):
+        """MultimodalQnA accepts input queries as text, images, and/or audio.
+
+        The messages in the request can be a single
+        message (which would be assumed to be a first query from the user) or back and forth conversation between the
+        user and the assistant.
+        Audio queries are converted to text before being sent to the megaservice and the translated text is returned
+        as part of the metadata in the response.
+        First queries are sent to the full Multimodal megaserivce, which includes using the embedding microservice and
+        retriever, in order to get relevant information from the vector store to send to the LVM along with the user's
+        query. Follow up queries are sent directly to the LVM without searching for more similar information from the
+        vector store.
+        """
         data = await request.json()
         stream_opt = bool(data.get("stream", False))
         if stream_opt:
             print("[ MultimodalQnAService ] stream=True not used, this has not support stream yet!")
             stream_opt = False
         chat_request = ChatCompletionRequest.model_validate(data)
-        # Multimodal RAG QnA With Videos has not yet accepts image as input during QnA.
+        modalities = chat_request.modalities
         num_messages = len(data["messages"]) if isinstance(data["messages"], list) else 1
         messages = self._handle_message(chat_request.messages)
         decoded_audio_input = ""
@@ -237,23 +303,27 @@ class MultimodalQnAService:
                     # for metadata storage purposes
                     decoded_audio_input = b64_types["audio"]
                 if "image" in b64_types:
-                    initial_inputs = {"prompt": prompt, "image": b64_types["image"][0]}
+                    initial_inputs = {"prompt": prompt, "image": b64_types["image"]}
                 else:
                     initial_inputs = {"prompt": prompt, "image": ""}
             else:
                 prompt = messages
                 initial_inputs = {"prompt": prompt, "image": ""}
         else:
-            # This is the first query. Ignore image input
+            # This is the first query.
             cur_megaservice = self.megaservice
             if isinstance(messages, tuple):
                 prompt, b64_types = messages
+                initial_inputs = {"text": prompt.rstrip("\n")}
                 if "audio" in b64_types:
                     # for metadata storage purposes
                     decoded_audio_input = b64_types["audio"]
+                if "image" in b64_types and len(b64_types["image"]) > 0:
+                    # Format initial inputs to match TextImageDoc
+                    initial_inputs["text"] = {"text": prompt}
+                    initial_inputs["image"] = {"base64_image": b64_types["image"][0]}
             else:
-                prompt = messages
-            initial_inputs = {"text": prompt}
+                initial_inputs = {"text": messages.rstrip("\n")}
 
         parameters = LLMParams(
             max_new_tokens=chat_request.max_tokens if chat_request.max_tokens else 1024,
@@ -282,8 +352,12 @@ class MultimodalQnAService:
                 return response
         last_node = runtime_graph.all_leaves()[-1]
 
+        tts_audio = None
         if "text" in result_dict[last_node].keys():
             response = result_dict[last_node]["text"]
+            # Toggle for TTS
+            if "audio" in modalities:
+                tts_audio = {"data": self.convert_text_to_audio(response)}
         else:
             # text is not in response message
             # something wrong, for example due to empty retrieval results
@@ -308,7 +382,7 @@ class MultimodalQnAService:
         choices.append(
             ChatCompletionResponseChoice(
                 index=0,
-                message=ChatMessage(role="assistant", content=response),
+                message=ChatMessage(role="assistant", content=response, audio=tts_audio),
                 finish_reason="stop",
                 metadata=metadata,
             )

@@ -7,7 +7,7 @@ on:
     inputs:
       nodes:
         default: "gaudi,xeon"
-        description: "Hardware to run test"
+        description: "Hardware to run test gaudi,gaudi3,xeon,rocm,arc"
         required: true
         type: string
       examples:
@@ -20,11 +20,6 @@ on:
         description: "Tag to apply to images"
         required: true
         type: string
-      deploy_gmc:
-        default: false
-        description: 'Whether to deploy gmc'
-        required: true
-        type: boolean
       build:
         default: true
         description: 'Build test required images for Examples'
@@ -35,14 +30,9 @@ on:
         description: 'Test examples with docker compose'
         required: false
         type: boolean
-      test_k8s:
-        default: false
-        description: 'Test examples with k8s'
-        required: false
-        type: boolean
-      test_gmc:
-        default: false
-        description: 'Test examples with gmc'
+      test_helmchart:
+        default: true
+        description: 'Test examples with helm charts'
         required: false
         type: boolean
       opea_branch:
@@ -52,9 +42,14 @@ on:
         type: string
       inject_commit:
         default: false
-        description: "inject commit to docker images true or false"
+        description: "inject commit to docker images"
         required: false
-        type: string
+        type: boolean
+      use_model_cache:
+        default: false
+        description: "use model cache"
+        required: false
+        type: boolean
 
 permissions: read-all
 jobs:
@@ -74,23 +69,20 @@ jobs:
         nodes_json=$(printf '%s\n' "${nodes[@]}" | sort -u | jq -R '.' | jq -sc '.')
         echo "nodes=$nodes_json" >> $GITHUB_OUTPUT
 
-  build-deploy-gmc:
+  build-comps-base:
     needs: [get-test-matrix]
-    if: ${{ fromJSON(inputs.deploy_gmc) }}
     strategy:
       matrix:
         node: ${{ fromJson(needs.get-test-matrix.outputs.nodes) }}
-      fail-fast: false
-    uses: ./.github/workflows/_gmc-workflow.yml
+    uses: ./.github/workflows/_build_comps_base_image.yml
     with:
       node: ${{ matrix.node }}
+      build: ${{ fromJSON(inputs.build) }}
       tag: ${{ inputs.tag }}
       opea_branch: ${{ inputs.opea_branch }}
-    secrets: inherit
 
   run-examples:
-    needs: [get-test-matrix, build-deploy-gmc]
-    if: always()
+    needs: [get-test-matrix, build-comps-base]
     strategy:
       matrix:
         example: ${{ fromJson(needs.get-test-matrix.outputs.examples) }}
@@ -103,8 +95,8 @@ jobs:
       tag: ${{ inputs.tag }}
       build: ${{ fromJSON(inputs.build) }}
       test_compose: ${{ fromJSON(inputs.test_compose) }}
-      test_k8s: ${{ fromJSON(inputs.test_k8s) }}
-      test_gmc: ${{ fromJSON(inputs.test_gmc) }}
+      test_helmchart: ${{ fromJSON(inputs.test_helmchart) }}
       opea_branch: ${{ inputs.opea_branch }}
       inject_commit: ${{ inputs.inject_commit }}
+      use_model_cache: ${{ inputs.use_model_cache }}
     secrets: inherit

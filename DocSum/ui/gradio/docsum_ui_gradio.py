@@ -296,8 +296,8 @@ class DocSumUI:
                     audio_ui.render()
                 with gr.TabItem("Upload Video"):
                     video_ui.render()
-                with gr.TabItem("Enter URL"):
-                    url_ui.render()
+                # with gr.TabItem("Enter URL"):
+                #     url_ui.render()
 
         return self.demo
 
@@ -313,11 +313,17 @@ app = gr.mount_gradio_app(app, demo, path="/")
 if __name__ == "__main__":
     import argparse
 
+    import nltk
+
     parser = argparse.ArgumentParser()
     parser.add_argument("--host", type=str, default="0.0.0.0")
     parser.add_argument("--port", type=int, default=5173)
 
     args = parser.parse_args()
     logger.info(">>> Starting server at %s:%d", args.host, args.port)
+
+    # Needed for UnstructuredURLLoader when reading content from a URL
+    nltk.download("punkt_tab")
+    nltk.download("averaged_perceptron_tagger_eng")
 
     uvicorn.run(app, host=args.host, port=args.port)

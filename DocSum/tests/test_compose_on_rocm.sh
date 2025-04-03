@@ -8,8 +8,6 @@ IMAGE_TAG=${IMAGE_TAG:-"latest"}
 echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
 echo "TAG=IMAGE_TAG=${IMAGE_TAG}"
 
-
-
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
@@ -17,7 +15,7 @@ export MAX_INPUT_TOKENS=1024
 export MAX_TOTAL_TOKENS=2048
 export REGISTRY=${IMAGE_REPO}
 export TAG=${IMAGE_TAG}
-export DOCSUM_TGI_IMAGE="ghcr.io/huggingface/text-generation-inference:2.3.1-rocm"
+export DOCSUM_TGI_IMAGE="ghcr.io/huggingface/text-generation-inference:2.4.1-rocm"
 export DOCSUM_LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
 export HOST_IP=${ip_address}
 export host_ip=${ip_address}
@@ -32,28 +30,31 @@ export ASR_SERVICE_HOST_IP=${host_ip}
 export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:8888/v1/docsum"
 export DOCSUM_CARD_ID="card1"
 export DOCSUM_RENDER_ID="renderD136"
-export DocSum_COMPONENT_NAME="OPEADocSum_TGI"
+export DocSum_COMPONENT_NAME="OpeaDocSumTgi"
 export LOGFLAG=True
 
 function build_docker_images() {
+    opea_branch=${opea_branch:-"main"}
     cd $WORKPATH/docker_image_build
-    git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
+    git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
+    pushd GenAIComps
+    docker build --no-cache -t ${REGISTRY}/comps-base:${TAG} --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
+    popd && sleep 1s
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
     service_list="docsum docsum-gradio-ui whisper llm-docsum"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
-    docker pull ghcr.io/huggingface/text-generation-inference:1.4
+    docker pull ghcr.io/huggingface/text-generation-inference:2.4.1
     docker images && sleep 1s
 }
 
 function start_services() {
     cd "$WORKPATH"/docker_compose/amd/gpu/rocm
     sed -i "s/backend_address/$ip_address/g" "$WORKPATH"/ui/svelte/.env
-
     # Start Docker Containers
     docker compose up -d > "${LOG_PATH}"/start_services_with_compose.log
-    sleep 3m
+    sleep 1m
 }
 
 function validate_services() {
@@ -138,10 +139,10 @@ function validate_microservices() {
     # llm microservice
     validate_services \
         "${host_ip}:9000/v1/docsum" \
-        "data: " \
+        "text" \
         "docsum-llm-server" \
         "docsum-llm-server" \
-        '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
+        '{"messages":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
 
 }
 

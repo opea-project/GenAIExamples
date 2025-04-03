@@ -24,7 +24,7 @@ EC_RAG_SERVICE_PORT=16010
 MODEL_PATH="/home/media/models"
 # MODEL_PATH="$WORKPATH/models"
 DOC_PATH="$WORKPATH/tests"
-GRADIO_PATH="$WORKPATH/tests"
+UI_TMPFILE_PATH="$WORKPATH/tests"
 
 #HF_ENDPOINT=https://hf-mirror.com
 LLM_MODEL="Qwen/Qwen2-7B-Instruct"
@@ -38,8 +38,8 @@ function build_docker_images() {
     docker compose -f build.yaml build --no-cache > ${LOG_PATH}/docker_image_build.log
 
     echo "Build vllm_openvino image from GenAIComps..."
-    cd $WORKPATH && git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}"
-    cd comps/llms/text-generation/vllm/langchain/dependency
+    cd $WORKPATH && git clone --single-branch --branch "${opea_branch:-"main"}" https://github.com/opea-project/GenAIComps.git
+    cd GenAIComps/comps/third_parties/vllm/src/
     bash ./build_docker_vllm_openvino.sh gpu
 
     docker images && sleep 1s
@@ -48,7 +48,7 @@ function build_docker_images() {
 function start_services() {
     export MODEL_PATH=${MODEL_PATH}
     export DOC_PATH=${DOC_PATH}
-    export GRADIO_PATH=${GRADIO_PATH}
+    export UI_TMPFILE_PATH=${UI_TMPFILE_PATH}
     export HOST_IP=${HOST_IP}
     export LLM_MODEL=${LLM_MODEL}
     export HF_ENDPOINT=${HF_ENDPOINT}

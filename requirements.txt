@@ -1,0 +1,10 @@
+kubernetes
+locust
+numpy
+opea-eval>=1.2
+prometheus_client
+pytest
+pyyaml
+requests
+sseclient-py
+transformers

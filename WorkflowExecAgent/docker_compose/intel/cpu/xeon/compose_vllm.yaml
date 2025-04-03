@@ -3,7 +3,7 @@
 
 services:
   worflowexec-agent:
-    image: ${REGISTRY:-opea}/agent-langchain:${TAG:-latest}
+    image: ${REGISTRY:-opea}/agent:${TAG:-latest}
     container_name: workflowexec-agent-endpoint
     volumes:
       - ${WORKDIR}/GenAIComps/comps/agent/src/:/home/user/comps/agent/src/

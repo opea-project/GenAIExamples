@@ -45,13 +45,13 @@ docker build --no-cache -t opea/lvm-llava:latest --build-arg https_proxy=$https_
 ### 3. Build retriever-multimodal-redis Image
 
 ```bash
-docker build --no-cache -t opea/retriever-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/redis/langchain/Dockerfile .
+docker build --no-cache -t opea/retriever:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/src/Dockerfile .
 ```
 
 ### 4. Build dataprep-multimodal-redis Image
 
 ```bash
-docker build --no-cache -t opea/dataprep-multimodal-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/multimodal/redis/langchain/Dockerfile .
+docker build --no-cache -t opea/dataprep:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/src/Dockerfile .
 ```
 
 ### 5. Build MegaService Docker Image
@@ -83,10 +83,10 @@ docker pull ghcr.io/huggingface/text-generation-inference:2.4.1-rocm
 
 Then run the command `docker images`, you will have the following 8 Docker Images:
 
-1. `opea/dataprep-multimodal-redis:latest`
+1. `opea/dataprep:latest`
 2. `ghcr.io/huggingface/text-generation-inference:2.4.1-rocm`
 3. `opea/lvm:latest`
-4. `opea/retriever-multimodal-redis:latest`
+4. `opea/retriever:latest`
 5. `opea/embedding:latest`
 6. `opea/embedding-multimodal-bridgetower:latest`
 7. `opea/multimodalqna:latest`
@@ -178,7 +178,7 @@ curl http://${host_ip}:$MM_EMBEDDING_PORT_MICROSERVICE/v1/embeddings \
 
 ```bash
 export your_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(512)]; print(embedding)")
-curl http://${host_ip}:7000/v1/multimodal_retrieval \
+curl http://${host_ip}:7000/v1/retrieval \
     -X POST \
     -H "Content-Type: application/json" \
     -d "{\"text\":\"test\",\"embedding\":${your_embedding}}"
@@ -289,6 +289,7 @@ To delete all uploaded files along with data indexed with `$INDEX_NAME` in REDIS
 ```bash
 curl -X POST \
     -H "Content-Type: application/json" \
+    -d '{"file_path": "all"}' \
     ${DATAPREP_DELETE_FILE_ENDPOINT}
 ```
 

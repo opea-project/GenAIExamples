@@ -17,12 +17,12 @@ services:
       dockerfile: comps/embeddings/src/Dockerfile
     extends: chatqna
     image: ${REGISTRY:-opea}/embedding:${TAG:-latest}
-  retriever-redis:
+  retriever:
     build:
       context: GenAIComps
-      dockerfile: comps/retrievers/redis/langchain/Dockerfile
+      dockerfile: comps/retrievers/src/Dockerfile
     extends: chatqna
-    image: ${REGISTRY:-opea}/retriever-redis:${TAG:-latest}
+    image: ${REGISTRY:-opea}/retriever:${TAG:-latest}
   reranking:
     build:
       context: GenAIComps
@@ -35,24 +35,24 @@ services:
       dockerfile: comps/llms/src/text-generation/Dockerfile
     extends: chatqna
     image: ${REGISTRY:-opea}/llm-textgen:${TAG:-latest}
-  dataprep-redis:
+  dataprep:
     build:
       context: GenAIComps
-      dockerfile: comps/dataprep/redis/langchain/Dockerfile
+      dockerfile: comps/dataprep/src/Dockerfile
     extends: chatqna
-    image: ${REGISTRY:-opea}/dataprep-redis:${TAG:-latest}
-  promptregistry-mongo-server:
+    image: ${REGISTRY:-opea}/dataprep:${TAG:-latest}
+  promptregistry-mongo:
     build:
       context: GenAIComps
       dockerfile: comps/prompt_registry/src/Dockerfile
     extends: chatqna
-    image: ${REGISTRY:-opea}/promptregistry-mongo-server:${TAG:-latest}
-  chathistory-mongo-server:
+    image: ${REGISTRY:-opea}/promptregistry-mongo:${TAG:-latest}
+  chathistory-mongo:
     build:
       context: GenAIComps
-      dockerfile: comps/chathistory/mongo/Dockerfile
+      dockerfile: comps/chathistory/src/Dockerfile
     extends: chatqna
-    image: ${REGISTRY:-opea}/chathistory-mongo-server:${TAG:-latest}
+    image: ${REGISTRY:-opea}/chathistory-mongo:${TAG:-latest}
   productivity-suite-react-ui-server:
     build:
       context: ../ui
@@ -68,18 +68,12 @@ services:
       context: ../../CodeGen/
       dockerfile: ./Dockerfile
     image: ${REGISTRY:-opea}/codegen:${TAG:-latest}
-  faqgen:
+  llm-faqgen:
     build:
       args:
         http_proxy: ${http_proxy}
         https_proxy: ${https_proxy}
         no_proxy: ${no_proxy}
-      context: ../../FaqGen/
-      dockerfile: ./Dockerfile
-    image: ${REGISTRY:-opea}/faqgen:${TAG:-latest}
-  llm-faqgen:
-    build:
       context: GenAIComps
       dockerfile: comps/llms/src/faq-generation/Dockerfile
-    extends: faqgen
     image: ${REGISTRY:-opea}/llm-faqgen:${TAG:-latest}

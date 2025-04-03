@@ -15,7 +15,7 @@ DocRetriever are the most widely adopted use case for leveraging the different m
 - Retriever Vector store Image
 
   ```bash
-  docker build -t opea/retriever-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/redis/langchain/Dockerfile .
+  docker build -t opea/retriever:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/src/Dockerfile .
   ```
 
 - Rerank TEI Image
@@ -27,7 +27,7 @@ DocRetriever are the most widely adopted use case for leveraging the different m
 - Dataprep Image
 
   ```bash
-  docker build -t opea/dataprep-on-ray-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/redis/langchain_ray/Dockerfile .
+  docker build -t opea/dataprep:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/src/Dockerfile .
   ```
 
 ## 2. Build Images for MegaService
@@ -48,17 +48,14 @@ export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
 export RERANK_MODEL_ID="BAAI/bge-reranker-base"
 export TEI_EMBEDDING_ENDPOINT="http://${host_ip}:6006"
 export TEI_RERANKING_ENDPOINT="http://${host_ip}:8808"
-export TGI_LLM_ENDPOINT="http://${host_ip}:8008"
 export REDIS_URL="redis://${host_ip}:6379"
 export INDEX_NAME="rag-redis"
-export MEGA_SERVICE_HOST_IP=${host_ip}
 export EMBEDDING_SERVICE_HOST_IP=${host_ip}
 export RETRIEVER_SERVICE_HOST_IP=${host_ip}
 export RERANK_SERVICE_HOST_IP=${host_ip}
-export LLM_SERVICE_HOST_IP=${host_ip}
 export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8000/v1/retrievaltool"
-export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/dataprep"
-cd GenAIExamples/DocIndexRetriever/intel/cpu/xoen/
+export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/ingest"
+cd GenAIExamples/DocIndexRetriever/docker_compose/intel/cpu/xeon
 docker compose up -d
 ```
 
@@ -69,8 +66,16 @@ In that case, start Docker Containers with compose_without_rerank.yaml
 export host_ip="YOUR IP ADDR"
 export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
 export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
-cd GenAIExamples/DocIndexRetriever/intel/cpu/xoen/
+cd GenAIExamples/DocIndexRetriever/docker_compose/intel/cpu/xeon
 docker compose -f compose_without_rerank.yaml up -d
+```
+
+To run the DocRetriever with Rerank pipeline using the Milvus vector database, use the compose_milvus.yaml configuration file and set the MILVUS_HOST environment variable.
+
+```bash
+export MILVUS_HOST=${host_ip}
+cd GenAIExamples/DocIndexRetriever/docker_compose/intel/cpu/xeon
+docker compose -f compose_milvus.yaml up -d
 ```
 
 ## 4. Validation
@@ -78,7 +83,7 @@ docker compose -f compose_without_rerank.yaml up -d
 Add Knowledge Base via HTTP Links:
 
 ```bash
-curl -X POST "http://${host_ip}:6007/v1/dataprep" \
+curl -X POST "http://${host_ip}:6007/v1/dataprep/ingest" \
      -H "Content-Type: multipart/form-data" \
      -F 'link_list=["https://opea.dev"]'
 

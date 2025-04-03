@@ -1,32 +1,17 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-FROM python:3.11-slim
+ARG IMAGE_REPO=opea
+ARG BASE_TAG=latest
+FROM $IMAGE_REPO/comps-base:$BASE_TAG
 
-RUN apt-get update -y && apt-get install -y --no-install-recommends --fix-missing \
-    libgl1-mesa-glx \
-    libjemalloc-dev \
-    git \
-    ffmpeg
-
-RUN useradd -m -s /bin/bash user && \
-    mkdir -p /home/user && \
-    chown -R user /home/user/
-
-WORKDIR /home/user
-RUN git clone https://github.com/opea-project/GenAIComps.git
-
-WORKDIR /home/user/GenAIComps
-RUN pip install --no-cache-dir --upgrade pip setuptools && \
-    pip install --no-cache-dir -r /home/user/GenAIComps/requirements.txt
-
-COPY ./docsum.py /home/user/docsum.py
-
-ENV PYTHONPATH=$PYTHONPATH:/home/user/GenAIComps
-
+USER root
+# FFmpeg needed for media processing
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends ffmpeg && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 USER user
 
-WORKDIR /home/user
+COPY ./docsum.py $HOME/docsum.py
 
 ENTRYPOINT ["python", "docsum.py"]
-
