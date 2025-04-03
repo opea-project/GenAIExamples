@@ -64,6 +64,9 @@ export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8889/v1/retrievaltool"
 export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/ingest"
 export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:6008/v1/dataprep/get"
 export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:6009/v1/dataprep/delete"
+# Set OpenTelemetry Tracing Endpoint
+export JAEGER_IP=$(ip route get 8.8.8.8 | grep -oP 'src \K[^ ]+')
+export OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=grpc://$JAEGER_IP:4317
+export TELEMETRY_ENDPOINT=http://$JAEGER_IP:4318/v1/traces
 
-
-export no_proxy="$no_proxy,rag-agent-endpoint,sql-agent-endpoint,react-agent-endpoint,agent-ui,vllm-gaudi-server,jaeger,grafana,prometheus,127.0.0.1,localhost,0.0.0.0,$host_ip"
+export no_proxy="$no_proxy,rag-agent-endpoint,sql-agent-endpoint,react-agent-endpoint,agent-ui,vllm-gaudi-server,jaeger,grafana,prometheus,node-exporter,gaudi-exporter,127.0.0.1,localhost,0.0.0.0,$host_ip,,$JAEGER_IP"

@@ -28,7 +28,7 @@ function start_tgi(){
     echo "Starting tgi-gaudi server"
     cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/hpu/gaudi
     source set_env.sh
-    docker compose -f $WORKDIR/GenAIExamples/DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml -f compose.yaml tgi_gaudi.yaml up -d
+    docker compose -f $WORKDIR/GenAIExamples/DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml -f compose.yaml tgi_gaudi.yaml -f compose.telemetry.yaml up -d
 
 }
 
@@ -40,7 +40,7 @@ function start_all_services() {
     echo "**************model is $model**************"
     cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/hpu/gaudi
     source set_env.sh
-    docker compose -f $WORKDIR/GenAIExamples/DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml -f compose.yaml up -d
+    docker compose -f $WORKDIR/GenAIExamples/DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml -f compose.yaml -f compose.telemetry.yaml up -d
     sleep 5s
     echo "Waiting vllm gaudi ready"
     n=0
