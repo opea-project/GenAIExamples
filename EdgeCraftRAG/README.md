@@ -17,7 +17,7 @@ quality and performance.
 
 ### (Optional) Build Docker Images for Mega Service, Server and UI by your own
 
-If you want to build the images by your own, please follow the steps:
+**All the docker images can be automatically‌ pulled**, If you want to build the images by your own, please follow the steps:
 
 ```bash
 cd GenAIExamples/EdgeCraftRAG
@@ -99,6 +99,26 @@ export vLLM_ENDPOINT="http://${HOST_IP}:${VLLM_SERVICE_PORT}"
 export HUGGINGFACEHUB_API_TOKEN=#your HF token
 
 docker compose -f compose_vllm.yaml up -d
+```
+
+#### Launch services with vLLM for multi Intel Arc GPUs inference service
+
+The docker file can be pulled automatically‌, you can also pull the image manually:
+
+```bash
+docker pull intelanalytics/ipex-llm-serving-xpu:latest
+```
+
+Set up Additional Environment Variables and start with compose_vllm_multi-arc.yaml
+
+```bash
+export LLM_MODEL=#your model id
+export VLLM_SERVICE_PORT=8008
+export vLLM_ENDPOINT="http://${HOST_IP}:${VLLM_SERVICE_PORT}"
+export LLM_MODEL_PATH=#your model path
+export TENSOR_PARALLEL_SIZE=#your Intel Arc GPU number to do inference
+
+docker compose -f compose_vllm_multi-arc.yaml up -d
 ```
 
 ### ChatQnA with LLM Example (Command Line)
