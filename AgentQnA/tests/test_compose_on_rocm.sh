@@ -5,11 +5,13 @@
 set -xe
 
 WORKPATH=$(dirname "$PWD")
+ls $WORKPATH
 export WORKDIR=$WORKPATH/../../
 echo "WORKDIR=${WORKDIR}"
 export ip_address=$(hostname -I | awk '{print $1}')
 export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
-export TOOLSET_PATH=$WORKDIR/GenAIExamples/AgentQnA/tools/
+export TOOLSET_PATH=$WORKPATH/tools/
+export MODEL_CACHE="./data"
 
 function stop_crag() {
     cid=$(docker ps -aq --filter "name=kdd-cup-24-crag-service")
@@ -19,13 +21,7 @@ function stop_crag() {
 
 function stop_agent_docker() {
     cd $WORKPATH/docker_compose/amd/gpu/rocm
-    # docker compose -f compose.yaml down
-    container_list=$(cat compose.yaml | grep container_name | cut -d':' -f2)
-    for container_name in $container_list; do
-        cid=$(docker ps -aq --filter "name=$container_name")
-        echo "Stopping container $container_name"
-        if [[ ! -z "$cid" ]]; then docker rm $cid -f && sleep 1s; fi
-    done
+    bash stop_agent_service_tgi_rocm.sh
 }
 
 function stop_retrieval_tool() {
