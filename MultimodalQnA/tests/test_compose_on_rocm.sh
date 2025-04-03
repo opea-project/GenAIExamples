@@ -78,7 +78,15 @@ function setup_env() {
 function start_services() {
     cd $WORKPATH/docker_compose/amd/gpu/rocm
     docker compose -f compose.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
-    sleep 5m
+    n=0
+    until [[ "$n" -ge 100 ]]; do
+        docker logs tgi-rocm >& $LOG_PATH/search-vllm-service_start.log
+        if grep -q "Connected" $LOG_PATH/search-vllm-service_start.log; then
+            break
+        fi
+        sleep 10s
+        n=$((n+1))
+    done
 }
 
 function prepare_data() {
