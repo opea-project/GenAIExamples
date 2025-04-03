@@ -49,6 +49,11 @@ services:
       dockerfile: comps/llms/src/doc-summarization/Dockerfile
     extends: docsum
     image: ${REGISTRY:-opea}/llm-docsum:${TAG:-latest}
+  vllm-rocm:
+    build:
+      context: GenAIComps
+      dockerfile: comps/third_parties/vllm/src/Dockerfile.amd_gpu
+    image: ${REGISTRY:-opea}/vllm-rocm:${TAG:-latest}
   vllm:
     build:
       context: vllm

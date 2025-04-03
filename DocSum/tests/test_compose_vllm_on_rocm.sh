@@ -11,36 +11,37 @@ export REGISTRY=${IMAGE_REPO}
 export TAG=${IMAGE_TAG}
 export MODEL_CACHE="./data"
 
+
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
 
-export HOST_IP=${ip_address}
 export host_ip=${ip_address}
-export DOCSUM_MAX_INPUT_TOKENS="2048"
-export DOCSUM_MAX_TOTAL_TOKENS="4096"
+export HOST_IP=${ip_address}
+export EXTERNAL_HOST_IP=${ip_address}
+export DOCSUM_HUGGINGFACEHUB_API_TOKEN="${HUGGINGFACEHUB_API_TOKEN}"
+export DOCSUM_MAX_INPUT_TOKENS=2048
+export DOCSUM_MAX_TOTAL_TOKENS=4096
 export DOCSUM_LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
-export DOCSUM_TGI_SERVICE_PORT="8008"
-export DOCSUM_TGI_LLM_ENDPOINT="http://${HOST_IP}:${DOCSUM_TGI_SERVICE_PORT}"
-export DOCSUM_HUGGINGFACEHUB_API_TOKEN=''
+export DOCSUM_VLLM_SERVICE_PORT="8008"
+export DOCSUM_LLM_ENDPOINT="http://${HOST_IP}:${DOCSUM_VLLM_SERVICE_PORT}"
 export DOCSUM_WHISPER_PORT="7066"
 export ASR_SERVICE_HOST_IP="${HOST_IP}"
 export DOCSUM_LLM_SERVER_PORT="9000"
 export DOCSUM_BACKEND_SERVER_PORT="18072"
 export DOCSUM_FRONTEND_PORT="18073"
-export BACKEND_SERVICE_ENDPOINT="http://${HOST_IP}:${DOCSUM_BACKEND_SERVER_PORT}/v1/docsum"
+export BACKEND_SERVICE_ENDPOINT="http://${EXTERNAL_HOST_IP}:${DOCSUM_BACKEND_SERVER_PORT}/v1/docsum"
 
 function build_docker_images() {
     opea_branch=${opea_branch:-"main"}
     cd $WORKPATH/docker_image_build
     git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
-
     pushd GenAIComps
     docker build --no-cache -t ${REGISTRY}/comps-base:${TAG} --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
     popd && sleep 1s
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="docsum docsum-gradio-ui whisper llm-docsum"
+    service_list="docsum docsum-gradio-ui whisper llm-docsum vllm-rocm"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
@@ -51,11 +52,11 @@ function start_services() {
     cd "$WORKPATH"/docker_compose/amd/gpu/rocm
     sed -i "s/backend_address/$ip_address/g" "$WORKPATH"/ui/svelte/.env
     # Start Docker Containers
-    docker compose up -d > "${LOG_PATH}"/start_services_with_compose.log
+    docker compose -f compose_vllm.yaml up -d > "${LOG_PATH}"/start_services_with_compose.log
     n=0
     until [[ "$n" -ge 500 ]]; do
-        docker logs docsum-tgi-service >& "${LOG_PATH}"/docsum-tgi-service_start.log
-        if grep -q "Connected" "${LOG_PATH}"/docsum-tgi-service_start.log; then
+        docker logs docsum-vllm-service >& "${LOG_PATH}"/docsum-vllm-service_start.log
+        if grep -q "Application startup complete" "${LOG_PATH}"/docsum-vllm-service_start.log; then
             break
         fi
         sleep 10s
@@ -135,13 +136,13 @@ function validate_microservices() {
         "whisper-service" \
         "{\"audio\": \"$(input_data_for_test "audio")\"}"
 
-    # tgi for llm service
+    # vLLM service
     validate_services \
-        "${host_ip}:${DOCSUM_TGI_SERVICE_PORT}/generate" \
-        "generated_text" \
-        "docsum-tgi-service" \
-        "docsum-tgi-service" \
-        '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}'
+        "${host_ip}:${DOCSUM_VLLM_SERVICE_PORT}/v1/chat/completions" \
+        "content" \
+        "docsum-vllm-service" \
+        "docsum-vllm-service" \
+        '{"model": "Intel/neural-chat-7b-v3-3", "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens": 17}'
 
     # llm microservice
     validate_services \
@@ -149,7 +150,7 @@ function validate_microservices() {
         "text" \
         "docsum-llm-server" \
         "docsum-llm-server" \
-        '{"messages":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
+        '{"messages":"What is a Deep Learning?"}'
 
 }
 
@@ -214,7 +215,7 @@ function validate_megaservice_json() {
 
 function stop_docker() {
     cd $WORKPATH/docker_compose/amd/gpu/rocm/
-    docker compose stop && docker compose rm -f
+    docker compose -f compose_vllm.yaml stop && docker compose -f compose_vllm.yaml rm -f
 }
 
 function main() {
