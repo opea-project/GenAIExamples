@@ -109,4 +109,3 @@ services:
 networks:
   default:
     driver: bridge
-
