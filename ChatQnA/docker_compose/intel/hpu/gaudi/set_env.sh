@@ -65,6 +65,9 @@ if [[ "$telemetry" == "yes" || "$telemetry" == "y" ]]; then
     export OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=grpc://$JAEGER_IP:4317
     export TELEMETRY_ENDPOINT=http://$JAEGER_IP:4318/v1/traces
     telemetry_flag=true
+    pushd "grafana/dashboards" > /dev/null
+    source download_opea_dashboard.sh
+    popd > /dev/null
 else
     telemetry_flag=false
 fi
