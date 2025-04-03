@@ -6,7 +6,7 @@ RAG bridges the knowledge gap by dynamically fetching relevant information from 
 
 # Table of contents
 
-1. [Automated Terraform Deployment](#automated-deployment-to-ubuntu-based-systemif-not-using-terraform-using-intel-optimized-cloud-modules-for-ansible)
+1. [Automated Terraform Deployment](#automated-deployment-to-ubuntu-based-system-if-not-using-terraform-using-intel-optimized-cloud-modules-for-ansible)
 2. [Automated Deployment to Ubuntu based system](#automated-deployment-to-ubuntu-based-systemif-not-using-terraform-using-intel-optimized-cloud-modules-for-ansible)
 3. [Manually Deployment](#manually-deploy-chatqna-service)
 4. [Architecture and Deploy Details](#architecture-and-deploy-details)
