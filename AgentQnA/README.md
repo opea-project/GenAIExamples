@@ -1,5 +1,13 @@
 # Agents for Question Answering
 
+## Table of contents
+
+1. [Overview](#overview)
+2. [Deploy with Docker](#deploy-with-docker)
+3. [Launch the UI](#launch-the-ui)
+4. [Validate Services](#validate-services)
+5. [Register Tools](#how-to-register-other-tools-with-the-ai-agent)
+
 ## Overview
 
 This example showcases a hierarchical multi-agent system for question-answering applications. The architecture diagram below shows a supervisor agent that interfaces with the user and dispatches tasks to two worker agents to gather information and come up with answers. The worker RAG agent uses the retrieval tool to retrieve relevant documents from a knowledge base - a vector database. The worker SQL agent retrieves relevant data from a SQL database. Although not included in this example by default, other tools such as a web search tool or a knowledge graph query tool can be used by the supervisor agent to gather information from additional sources.
@@ -134,7 +142,7 @@ source $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/hpu/gaudi/set_env.sh
 source $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/cpu/xeon/set_env.sh
 ```
 
-### 3. Launch the multi-agent system. </br>
+### 2. Launch the multi-agent system. </br>
 
 Two options are provided for the `llm_engine` of the agents: 1. open-source LLMs on Gaudi, 2. OpenAI models via API calls.
 
@@ -151,11 +159,19 @@ cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/hpu/gaudi/
 docker compose -f $WORKDIR/GenAIExamples/DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml -f compose.yaml up -d
 ```
 
+To enable Open Telemetry Tracing, compose.telemetry.yaml file need to be merged along with default compose.yaml file.
+Gaudi example with Open Telemetry feature:
+
+```bash
+cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/hpu/gaudi/
+docker compose -f $WORKDIR/GenAIExamples/DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml -f compose.yaml -f compose.telemetry.yaml up -d
+```
+
 ##### [Optional] Web Search Tool Support
 
 <details>
 <summary> Instructions </summary>
-A web search tool is supported in this example and can be enabled by running docker compose with the `compose.webtool.yaml` file.  
+A web search tool is supported in this example and can be enabled by running docker compose with the `compose.webtool.yaml` file.
 The Google Search API is used. Follow the [instructions](https://python.langchain.com/docs/integrations/tools/google_search) to create an API key and enable the Custom Search API on a Google account. The environment variables `GOOGLE_CSE_ID` and `GOOGLE_API_KEY` need to be set.
 
 ```bash
@@ -179,7 +195,7 @@ cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/cpu/xeon
 docker compose -f $WORKDIR/GenAIExamples/DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml -f compose_openai.yaml up -d
 ```
 
-### 4. Ingest Data into the vector database
+### 3. Ingest Data into the vector database
 
 The `run_ingest_data.sh` script will use an example jsonl file to ingest example documents into a vector database. Other ways to ingest data and other types of documents supported can be found in the OPEA dataprep microservice located in the opea-project/GenAIComps repo.
 
