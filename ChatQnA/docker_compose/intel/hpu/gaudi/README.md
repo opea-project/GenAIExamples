@@ -95,7 +95,7 @@ d560c232b120   opea/retriever:latest                                            
 a1d7ca2d3787   ghcr.io/huggingface/tei-gaudi:1.5.0                                                             "text-embeddings-rou…"   2 minutes ago   Up 2 minutes                0.0.0.0:8808->80/tcp, [::]:8808->80/tcp                                                tei-reranking-gaudi-server
 9a9f3fd4fd4c   opea/vllm-gaudi:latest                                                                          "python3 -m vllm.ent…"   2 minutes ago   Exited (1) 2 minutes ago                                                                                           vllm-gaudi-server
 1ab9bbdf5182   redis/redis-stack:7.2.0-v9                                                                      "/entrypoint.sh"         2 minutes ago   Up 2 minutes                0.0.0.0:6379->6379/tcp, :::6379->6379/tcp, 0.0.0.0:8001->8001/tcp, :::8001->8001/tcp   redis-vector-db
-9ee0789d819e   ghcr.io/huggingface/text-embeddings-inference:cpu-1.5                                           "text-embeddings-rou…"   2 minutes ago   Up 2 minutes                0.0.0.0:8090->80/tcp, [::]:8090->80/tcp                                                tei-embedding-gaudi-server
+9ee0789d819e   ghcr.io/huggingface/text-embeddings-inference:cpu-1.6                                           "text-embeddings-rou…"   2 minutes ago   Up 2 minutes                0.0.0.0:8090->80/tcp, [::]:8090->80/tcp                                                tei-embedding-gaudi-server
 ```
 
 ### Test the Pipeline
@@ -148,7 +148,7 @@ The default deployment utilizes Gaudi devices primarily for the `vllm-service`, 
 | ---------------------------- | ----------------------------------------------------- | ------------ |
 | redis-vector-db              | redis/redis-stack:7.2.0-v9                            | No           |
 | dataprep-redis-service       | opea/dataprep:latest                                  | No           |
-| tei-embedding-service        | ghcr.io/huggingface/text-embeddings-inference:cpu-1.5 | No           |
+| tei-embedding-service        | ghcr.io/huggingface/text-embeddings-inference:cpu-1.6 | No           |
 | retriever                    | opea/retriever:latest                                 | No           |
 | tei-reranking-service        | ghcr.io/huggingface/tei-gaudi:1.5.0                   | 1 card       |
 | vllm-service                 | opea/vllm-gaudi:latest                                | Configurable |
@@ -158,16 +158,16 @@ The default deployment utilizes Gaudi devices primarily for the `vllm-service`, 
 
 ### compose_tgi.yaml - TGI Deployment
 
-The TGI (Text Generation Inference) deployment and the default deployment differ primarily in their service configurations and specific focus on handling large language models (LLMs). The TGI deployment includes a unique `tgi-service`, which utilizes the `ghcr.io/huggingface/tgi-gaudi:2.0.6` image and is specifically configured to run on Gaudi hardware. This service is designed to handle LLM tasks with optimizations such as `ENABLE_HPU_GRAPH` and `USE_FLASH_ATTENTION`. The `chatqna-gaudi-backend-server` in the TGI deployment depends on the `tgi-service`, whereas in the default deployment, it relies on the `vllm-service`.
+The TGI (Text Generation Inference) deployment and the default deployment differ primarily in their service configurations and specific focus on handling large language models (LLMs). The TGI deployment includes a unique `tgi-service`, which utilizes the `ghcr.io/huggingface/tgi-gaudi:2.3.1` image and is specifically configured to run on Gaudi hardware. This service is designed to handle LLM tasks with optimizations such as `ENABLE_HPU_GRAPH` and `USE_FLASH_ATTENTION`. The `chatqna-gaudi-backend-server` in the TGI deployment depends on the `tgi-service`, whereas in the default deployment, it relies on the `vllm-service`.
 
 | Service Name                 | Image Name                                            | Gaudi Specific |
 | ---------------------------- | ----------------------------------------------------- | -------------- |
 | redis-vector-db              | redis/redis-stack:7.2.0-v9                            | No             |
 | dataprep-redis-service       | opea/dataprep:latest                                  | No             |
-| tei-embedding-service        | ghcr.io/huggingface/text-embeddings-inference:cpu-1.5 | No             |
+| tei-embedding-service        | ghcr.io/huggingface/text-embeddings-inference:cpu-1.6 | No             |
 | retriever                    | opea/retriever:latest                                 | No             |
 | tei-reranking-service        | ghcr.io/huggingface/tei-gaudi:1.5.0                   | 1 card         |
-| **tgi-service**              | ghcr.io/huggingface/tgi-gaudi:2.0.6                   | Configurable   |
+| **tgi-service**              | ghcr.io/huggingface/tgi-gaudi:2.3.1                   | Configurable   |
 | chatqna-gaudi-backend-server | opea/chatqna:latest                                   | No             |
 | chatqna-gaudi-ui-server      | opea/chatqna-ui:latest                                | No             |
 | chatqna-gaudi-nginx-server   | opea/nginx:latest                                     | No             |
@@ -178,13 +178,13 @@ This deployment may allocate more Gaudi resources to the tgi-service to optimize
 
 The FAQs(frequently asked questions and answers) generation Deployment will generate FAQs instead of normally text generation. It add a new microservice called `llm-faqgen`, which is a microservice that interacts with the TGI/vLLM LLM server to generate FAQs from input text.
 
-The TGI (Text Generation Inference) deployment and the default deployment differ primarily in their service configurations and specific focus on handling large language models (LLMs). The TGI deployment includes a unique `tgi-service`, which utilizes the `ghcr.io/huggingface/tgi-gaudi:2.0.6` image and is specifically configured to run on Gaudi hardware. This service is designed to handle LLM tasks with optimizations such as `ENABLE_HPU_GRAPH` and `USE_FLASH_ATTENTION`. The `chatqna-gaudi-backend-server` in the TGI deployment depends on the `tgi-service`, whereas in the default deployment, it relies on the `vllm-service`.
+The TGI (Text Generation Inference) deployment and the default deployment differ primarily in their service configurations and specific focus on handling large language models (LLMs). The TGI deployment includes a unique `tgi-service`, which utilizes the `ghcr.io/huggingface/tgi-gaudi:2.3.1` image and is specifically configured to run on Gaudi hardware. This service is designed to handle LLM tasks with optimizations such as `ENABLE_HPU_GRAPH` and `USE_FLASH_ATTENTION`. The `chatqna-gaudi-backend-server` in the TGI deployment depends on the `tgi-service`, whereas in the default deployment, it relies on the `vllm-service`.
 
 | Service Name                 | Image Name                                            | Gaudi Use    |
 | ---------------------------- | ----------------------------------------------------- | ------------ |
 | redis-vector-db              | redis/redis-stack:7.2.0-v9                            | No           |
 | dataprep-redis-service       | opea/dataprep:latest                                  | No           |
-| tei-embedding-service        | ghcr.io/huggingface/text-embeddings-inference:cpu-1.5 | No           |
+| tei-embedding-service        | ghcr.io/huggingface/text-embeddings-inference:cpu-1.6 | No           |
 | retriever                    | opea/retriever:latest                                 | No           |
 | tei-reranking-service        | ghcr.io/huggingface/tei-gaudi:1.5.0                   | 1 card       |
 | vllm-service                 | opea/vllm-gaudi:latest                                | Configurable |
@@ -203,7 +203,7 @@ The _compose_without_rerank.yaml_ Docker Compose file is distinct from the defau
 | ---------------------------- | ----------------------------------------------------- | -------------- |
 | redis-vector-db              | redis/redis-stack:7.2.0-v9                            | No             |
 | dataprep-redis-service       | opea/dataprep:latest                                  | No             |
-| tei-embedding-service        | ghcr.io/huggingface/text-embeddings-inference:cpu-1.5 | No             |
+| tei-embedding-service        | ghcr.io/huggingface/text-embeddings-inference:cpu-1.6 | No             |
 | retriever                    | opea/retriever:latest                                 | No             |
 | vllm-service                 | opea/vllm-gaudi:latest                                | Configurable   |
 | chatqna-gaudi-backend-server | opea/chatqna:latest                                   | No             |
@@ -214,15 +214,15 @@ This setup might allow for more Gaudi devices to be dedicated to the `vllm-servi
 
 ### compose_guardrails.yaml - Guardrails Deployment
 
-The _compose_guardrails.yaml_ Docker Compose file introduces enhancements over the default deployment by incorporating additional services focused on safety and ChatQnA response control. Notably, it includes the `tgi-guardrails-service` and `guardrails` services. The `tgi-guardrails-service` uses the `ghcr.io/huggingface/tgi-gaudi:2.0.6` image and is configured to run on Gaudi hardware, providing functionality to manage input constraints and ensure safe operations within defined limits. The guardrails service, using the `opea/guardrails:latest` image, acts as a safety layer that interfaces with the `tgi-guardrails-service` to enforce safety protocols and manage interactions with the large language model (LLM). This backend server now depends on the `tgi-guardrails-service` and `guardrails`, alongside existing dependencies like `redis-vector-db`, `tei-embedding-service`, `retriever`, `tei-reranking-service`, and `vllm-service`. The environment configurations for the backend are also updated to include settings for the guardrail services.
+The _compose_guardrails.yaml_ Docker Compose file introduces enhancements over the default deployment by incorporating additional services focused on safety and ChatQnA response control. Notably, it includes the `tgi-guardrails-service` and `guardrails` services. The `tgi-guardrails-service` uses the `ghcr.io/huggingface/tgi-gaudi:2.3.1` image and is configured to run on Gaudi hardware, providing functionality to manage input constraints and ensure safe operations within defined limits. The guardrails service, using the `opea/guardrails:latest` image, acts as a safety layer that interfaces with the `tgi-guardrails-service` to enforce safety protocols and manage interactions with the large language model (LLM). This backend server now depends on the `tgi-guardrails-service` and `guardrails`, alongside existing dependencies like `redis-vector-db`, `tei-embedding-service`, `retriever`, `tei-reranking-service`, and `vllm-service`. The environment configurations for the backend are also updated to include settings for the guardrail services.
 
 | Service Name                 | Image Name                                            | Gaudi Specific | Uses LLM |
 | ---------------------------- | ----------------------------------------------------- | -------------- | -------- |
 | redis-vector-db              | redis/redis-stack:7.2.0-v9                            | No             | No       |
 | dataprep-redis-service       | opea/dataprep:latest                                  | No             | No       |
-| _tgi-guardrails-service_     | ghcr.io/huggingface/tgi-gaudi:2.0.6                   | 1 card         | Yes      |
+| _tgi-guardrails-service_     | ghcr.io/huggingface/tgi-gaudi:2.3.1                   | 1 card         | Yes      |
 | _guardrails_                 | opea/guardrails:latest                                | No             | No       |
-| tei-embedding-service        | ghcr.io/huggingface/text-embeddings-inference:cpu-1.5 | No             | No       |
+| tei-embedding-service        | ghcr.io/huggingface/text-embeddings-inference:cpu-1.6 | No             | No       |
 | retriever                    | opea/retriever:latest                                 | No             | No       |
 | tei-reranking-service        | ghcr.io/huggingface/tei-gaudi:1.5.0                   | 1 card         | No       |
 | vllm-service                 | opea/vllm-gaudi:latest                                | Configurable   | Yes      |
@@ -258,12 +258,12 @@ The table provides a comprehensive overview of the ChatQnA services utilized acr
 | ---------------------------- | ----------------------------------------------------- | -------- | -------------------------------------------------------------------------------------------------- |
 | redis-vector-db              | redis/redis-stack:7.2.0-v9                            | No       | Acts as a Redis database for storing and managing data.                                            |
 | dataprep-redis-service       | opea/dataprep:latest                                  | No       | Prepares data and interacts with the Redis database.                                               |
-| tei-embedding-service        | ghcr.io/huggingface/text-embeddings-inference:cpu-1.5 | No       | Provides text embedding services, often using Hugging Face models.                                 |
+| tei-embedding-service        | ghcr.io/huggingface/text-embeddings-inference:cpu-1.6 | No       | Provides text embedding services, often using Hugging Face models.                                 |
 | retriever                    | opea/retriever:latest                                 | No       | Retrieves data from the Redis database and interacts with embedding services.                      |
 | tei-reranking-service        | ghcr.io/huggingface/tei-gaudi:1.5.0                   | Yes      | Reranks text embeddings, typically using Gaudi hardware for enhanced performance.                  |
 | vllm-service                 | opea/vllm-gaudi:latest                                | No       | Handles large language model (LLM) tasks, utilizing Gaudi hardware.                                |
-| tgi-service                  | ghcr.io/huggingface/tgi-gaudi:2.0.6                   | Yes      | Specific to the TGI deployment, focuses on text generation inference using Gaudi hardware.         |
-| tgi-guardrails-service       | ghcr.io/huggingface/tgi-gaudi:2.0.6                   | Yes      | Provides guardrails functionality, ensuring safe operations within defined limits.                 |
+| tgi-service                  | ghcr.io/huggingface/tgi-gaudi:2.3.1                   | Yes      | Specific to the TGI deployment, focuses on text generation inference using Gaudi hardware.         |
+| tgi-guardrails-service       | ghcr.io/huggingface/tgi-gaudi:2.3.1                   | Yes      | Provides guardrails functionality, ensuring safe operations within defined limits.                 |
 | guardrails                   | opea/guardrails:latest                                | Yes      | Acts as a safety layer, interfacing with the `tgi-guardrails-service` to enforce safety protocols. |
 | chatqna-gaudi-backend-server | opea/chatqna:latest                                   | No       | Serves as the backend for the ChatQnA application, with variations depending on the deployment.    |
 | chatqna-gaudi-ui-server      | opea/chatqna-ui:latest                                | No       | Provides the user interface for the ChatQnA application.                                           |
@@ -284,11 +284,11 @@ ChatQnA now supports running the latest DeepSeek models, including [deepseek-ai/
 
 ### tei-embedding-service & tei-reranking-service
 
-The `ghcr.io/huggingface/text-embeddings-inference:cpu-1.5` image supporting `tei-embedding-service` and `tei-reranking-service` depends on the `EMBEDDING_MODEL_ID` or `RERANK_MODEL_ID` environment variables respectively to specify the embedding model and reranking model used for converting text into vector representations and rankings. This choice impacts the quality and relevance of the embeddings rerankings for various applications. Unlike the `vllm-service`, the `tei-embedding-service` and `tei-reranking-service` each typically acquires only one Gaudi device and does not use the `NUM_CARDS` parameter; embedding and reranking tasks generally do not require extensive parallel processing and one Gaudi per service is appropriate. The list of [supported embedding and reranking models](https://github.com/huggingface/tei-gaudi?tab=readme-ov-file#supported-models) can be found at the the [huggingface/tei-gaudi](https://github.com/huggingface/tei-gaudi?tab=readme-ov-file#supported-models) website.
+The `ghcr.io/huggingface/text-embeddings-inference:cpu-1.6` image supporting `tei-embedding-service` and `tei-reranking-service` depends on the `EMBEDDING_MODEL_ID` or `RERANK_MODEL_ID` environment variables respectively to specify the embedding model and reranking model used for converting text into vector representations and rankings. This choice impacts the quality and relevance of the embeddings rerankings for various applications. Unlike the `vllm-service`, the `tei-embedding-service` and `tei-reranking-service` each typically acquires only one Gaudi device and does not use the `NUM_CARDS` parameter; embedding and reranking tasks generally do not require extensive parallel processing and one Gaudi per service is appropriate. The list of [supported embedding and reranking models](https://github.com/huggingface/tei-gaudi?tab=readme-ov-file#supported-models) can be found at the the [huggingface/tei-gaudi](https://github.com/huggingface/tei-gaudi?tab=readme-ov-file#supported-models) website.
 
 ### tgi-gaurdrails-service
 
-The `tgi-guardrails-service` uses the `GUARDRAILS_MODEL_ID` parameter to select a [supported model](https://github.com/huggingface/tgi-gaudi?tab=readme-ov-file#tested-models-and-configurations) for the associated `ghcr.io/huggingface/tgi-gaudi:2.0.6` image. Like the `tei-embedding-service` and `tei-reranking-service` services, it doesn't use the `NUM_CARDS` parameter.
+The `tgi-guardrails-service` uses the `GUARDRAILS_MODEL_ID` parameter to select a [supported model](https://github.com/huggingface/tgi-gaudi?tab=readme-ov-file#tested-models-and-configurations) for the associated `ghcr.io/huggingface/tgi-gaudi:2.3.1` image. Like the `tei-embedding-service` and `tei-reranking-service` services, it doesn't use the `NUM_CARDS` parameter.
 
 ## Conclusion
 

@@ -28,7 +28,9 @@ MM_RETRIEVER_SERVICE_PORT = int(os.getenv("MM_RETRIEVER_SERVICE_PORT", 7000))
 LVM_SERVICE_HOST_IP = os.getenv("LVM_SERVICE_HOST_IP", "0.0.0.0")
 LVM_SERVICE_PORT = int(os.getenv("LVM_PORT", 9399))
 WHISPER_PORT = int(os.getenv("WHISPER_PORT", 7066))
-WHISPER_SERVER_ENDPOINT = os.getenv("WHISPER_SERVER_ENDPOINT", "http://0.0.0.0:$WHISPER_PORT/v1/asr")
+WHISPER_SERVER_ENDPOINT = os.getenv("WHISPER_SERVER_ENDPOINT", f"http://0.0.0.0:{WHISPER_PORT}/v1/asr")
+TTS_PORT = int(os.getenv("TTS_PORT", 7055))
+TTS_ENDPOINT = os.getenv("TTS_ENDPOINT", f"http://0.0.0.0:{TTS_PORT}/v1/tts")
 
 
 def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **kwargs):
@@ -252,6 +254,22 @@ class MultimodalQnAService:
         response = response.json()
         return response["asr_result"]
 
+    def convert_text_to_audio(self, text):
+        if isinstance(text, dict):
+            input_dict = {"text": text["text"]}
+        else:
+            input_dict = {"text": text}
+
+        response = requests.post(TTS_ENDPOINT, data=json.dumps(input_dict))
+
+        if response.status_code != 200:
+            return JSONResponse(
+                status_code=503, content={"message": "Unable to convert text to audio. {}".format(response.text)}
+            )
+
+        response = response.json()
+        return response["tts_result"]
+
     async def handle_request(self, request: Request):
         """MultimodalQnA accepts input queries as text, images, and/or audio.
 
@@ -271,6 +289,7 @@ class MultimodalQnAService:
             print("[ MultimodalQnAService ] stream=True not used, this has not support stream yet!")
             stream_opt = False
         chat_request = ChatCompletionRequest.model_validate(data)
+        modalities = chat_request.modalities
         num_messages = len(data["messages"]) if isinstance(data["messages"], list) else 1
         messages = self._handle_message(chat_request.messages)
         decoded_audio_input = ""
@@ -291,11 +310,11 @@ class MultimodalQnAService:
                 prompt = messages
                 initial_inputs = {"prompt": prompt, "image": ""}
         else:
-            # This is the first query. Ignore image input
+            # This is the first query.
             cur_megaservice = self.megaservice
             if isinstance(messages, tuple):
                 prompt, b64_types = messages
-                initial_inputs = {"text": prompt}
+                initial_inputs = {"text": prompt.rstrip("\n")}
                 if "audio" in b64_types:
                     # for metadata storage purposes
                     decoded_audio_input = b64_types["audio"]
@@ -304,7 +323,7 @@ class MultimodalQnAService:
                     initial_inputs["text"] = {"text": prompt}
                     initial_inputs["image"] = {"base64_image": b64_types["image"][0]}
             else:
-                initial_inputs = {"text": messages}
+                initial_inputs = {"text": messages.rstrip("\n")}
 
         parameters = LLMParams(
             max_new_tokens=chat_request.max_tokens if chat_request.max_tokens else 1024,
@@ -333,8 +352,12 @@ class MultimodalQnAService:
                 return response
         last_node = runtime_graph.all_leaves()[-1]
 
+        tts_audio = None
         if "text" in result_dict[last_node].keys():
             response = result_dict[last_node]["text"]
+            # Toggle for TTS
+            if "audio" in modalities:
+                tts_audio = {"data": self.convert_text_to_audio(response)}
         else:
             # text is not in response message
             # something wrong, for example due to empty retrieval results
@@ -359,7 +382,7 @@ class MultimodalQnAService:
         choices.append(
             ChatCompletionResponseChoice(
                 index=0,
-                message=ChatMessage(role="assistant", content=response),
+                message=ChatMessage(role="assistant", content=response, audio=tts_audio),
                 finish_reason="stop",
                 metadata=metadata,
             )
