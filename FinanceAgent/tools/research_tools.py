@@ -55,7 +55,7 @@ def get_company_news(
         "end date of the search period for the company's basic financials, yyyy-mm-dd",
     ],
     max_news_num: Annotated[int, "maximum number of news to return, default to 10"] = 10,
-) -> pd.DataFrame:
+) -> str:
     """Retrieve market news related to designated company."""
     news = finnhub_client.company_news(symbol, _from=start_date, to=end_date)
     if len(news) == 0:
@@ -74,7 +74,7 @@ def get_company_news(
     news.sort(key=lambda x: x["date"])
     output = pd.DataFrame(news)
 
-    return output
+    return output.to_json(orient="split")
 
 
 def get_basic_financials_history(
@@ -95,7 +95,7 @@ def get_basic_financials_history(
         list[str] | None,
         "List of column names of news to return, should be chosen from 'assetTurnoverTTM', 'bookValue', 'cashRatio', 'currentRatio', 'ebitPerShare', 'eps', 'ev', 'fcfMargin', 'fcfPerShareTTM', 'grossMargin', 'inventoryTurnoverTTM', 'longtermDebtTotalAsset', 'longtermDebtTotalCapital', 'longtermDebtTotalEquity', 'netDebtToTotalCapital', 'netDebtToTotalEquity', 'netMargin', 'operatingMargin', 'payoutRatioTTM', 'pb', 'peTTM', 'pfcfTTM', 'pretaxMargin', 'psTTM', 'ptbv', 'quickRatio', 'receivablesTurnoverTTM', 'roaTTM', 'roeTTM', 'roicTTM', 'rotcTTM', 'salesPerShare', 'sgaToSale', 'tangibleBookValue', 'totalDebtToEquity', 'totalDebtToTotalAsset', 'totalDebtToTotalCapital', 'totalRatio'",
     ] = None,
-) -> pd.DataFrame:
+) -> str:
 
     if freq not in ["annual", "quarterly"]:
         return f"Invalid reporting frequency {freq}. Please specify either 'annual' or 'quarterly'."
@@ -115,7 +115,7 @@ def get_basic_financials_history(
     financials_output = pd.DataFrame(output_dict)
     financials_output = financials_output.rename_axis(index="date")
 
-    return financials_output
+    return financials_output.to_json(orient="split")
 
 
 def get_basic_financials(
@@ -135,11 +135,12 @@ def get_basic_financials(
         value = value_list[0]
         output_dict.update({metric: value["v"]})
 
-    for k in output_dict.keys():
-        if selected_columns and k not in selected_columns:
-            output_dict.pop(k)
+    results = {}
+    for k in selected_columns:
+        if k in output_dict:
+            results[k] = output_dict[k]
 
-    return json.dumps(output_dict, indent=2)
+    return json.dumps(results, indent=2)
 
 
 def get_current_date():
