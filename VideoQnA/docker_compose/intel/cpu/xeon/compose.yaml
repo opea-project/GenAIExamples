@@ -28,8 +28,8 @@ services:
       COLLECTION_NAME: ${INDEX_NAME}
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
     volumes:
-      - ${CACHE_DIR}/clip:/home/user/.cache/clip
-      - ${CACHE_DIR}/huggingface/hub:/home/user/.cache/huggingface/hub
+      - ${CACHE_DIR}/clip:/root/.cache/clip
+      - ${CACHE_DIR}/huggingface/hub:/root/.cache/huggingface/hub
   embedding:
     image: ${REGISTRY:-opea}/embedding-multimodal-clip:${TAG:-latest}
     container_name: clip-embedding-server
@@ -40,10 +40,11 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
+      CLIP_EMBEDDING_ENDPOINT: ${CLIP_EMBEDDING_ENDPOINT}
       EMBEDDING_COMPONENT_NAME: "OPEA_CLIP_EMBEDDING"
       LOGFLAG: ${LOGFLAG:-False}
     volumes:
-      - ${CACHE_DIR}/huggingface/hub:/home/user/.cache/huggingface/hub
+      - ${CACHE_DIR}/huggingface/hub:/root/.cache/huggingface/hub
     restart: unless-stopped
   retriever:
     image: ${REGISTRY:-opea}/retriever:${TAG:-latest}
@@ -67,7 +68,7 @@ services:
       NUMBA_CACHE_DIR: "/tmp/numba_cache"
     restart: unless-stopped
     volumes:
-      - ${CACHE_DIR}/huggingface/hub:/home/user/.cache/huggingface/hub
+      - ${CACHE_DIR}/huggingface/hub:/root/.cache/huggingface/hub
   reranking:
     image: ${REGISTRY:-opea}/reranking:${TAG:-latest}
     container_name: reranking-tei-server
@@ -95,7 +96,7 @@ services:
       no_proxy: ${no_proxy}
       llm_download: ${LLM_DOWNLOAD}
     volumes:
-      - video-llama-model:/home/user/model
+      - video-llama-model:/root/model
     restart: unless-stopped
   lvm:
     image: ${REGISTRY:-opea}/lvm:${TAG:-latest}
