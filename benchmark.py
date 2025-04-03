@@ -402,7 +402,7 @@ def run_benchmark(benchmark_config, chart_name, namespace, node_num=1, llm_model
 
     dataset = None
     query_data = None
-
+    os.environ["MODEL_NAME"] = test_suite_config.get("llm_model", "meta-llama/Meta-Llama-3-8B-Instruct")
     # Do benchmark in for-loop for different llm_max_token_size
     for llm_max_token in parsed_data["llm_max_token_size"]:
         print(f"[OPEA BENCHMARK] 🚀 Run benchmark on {dataset} with llm max-output-token {llm_max_token}.")
