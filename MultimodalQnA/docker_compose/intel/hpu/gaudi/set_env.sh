@@ -13,15 +13,14 @@ export MM_RETRIEVER_SERVICE_HOST_IP=${host_ip}
 export LVM_SERVICE_HOST_IP=${host_ip}
 export MEGA_SERVICE_HOST_IP=${host_ip}
 
-export no_proxy=${your_no_proxy}
-export http_proxy=${your_http_proxy}
-export https_proxy=${your_http_proxy}
-
 export REDIS_DB_PORT=6379
 export REDIS_INSIGHTS_PORT=8001
 export REDIS_URL="redis://${host_ip}:${REDIS_DB_PORT}"
 export REDIS_HOST=${host_ip}
 export INDEX_NAME="mm-rag-redis"
+
+export TTS_PORT=7055
+export TTS_ENDPOINT="http://${host_ip}:${TTS_PORT}/v1/tts"
 
 export WHISPER_MODEL="base"
 export WHISPER_PORT=7066
@@ -54,3 +53,4 @@ export MEGA_SERVICE_PORT=8888
 export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:${MEGA_SERVICE_PORT}/v1/multimodalqna"
 
 export UI_PORT=5173
+export UI_TIMEOUT=240
