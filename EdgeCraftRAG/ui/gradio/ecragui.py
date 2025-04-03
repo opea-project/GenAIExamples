@@ -85,9 +85,9 @@ def get_system_status():
 
 def get_benchmark():
     time.sleep(0.5)
-    active_pipeline_nam = get_actived_pipeline()
-    if active_pipeline_nam:
-        data = cli.get_benchmark(active_pipeline_nam)
+    active_pipeline_name = get_actived_pipeline()
+    if active_pipeline_name:
+        data = cli.get_benchmark(active_pipeline_name)
         if data:
             return gr.update(
                 visible=True,

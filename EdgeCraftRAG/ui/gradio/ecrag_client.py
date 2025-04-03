@@ -156,13 +156,16 @@ def get_benchmark(name):
 
         if data.get("Benchmark enabled", False):
             benchmark_data = data.get("last_benchmark_data", {})
-            if benchmark_data.get("generator", "N/A"):
-                benchmark = (
-                    f"Retrieval: {benchmark_data.get('retriever', 0.0):.4f}s      "
-                    f"Post-process: {benchmark_data.get('postprocessor', 0.0):.4f}s      "
-                    f"Generation: {benchmark_data.get('generator', 0.0):.4f}s"
-                ).rstrip()
-                return benchmark
+            if benchmark_data and "generator" in benchmark_data:
+                if benchmark_data.get("generator", "N/A"):
+                    benchmark = (
+                        f"Retrieval: {benchmark_data.get('retriever', 0.0):.4f}s      "
+                        f"Post-process: {benchmark_data.get('postprocessor', 0.0):.4f}s      "
+                        f"Generation: {benchmark_data.get('generator', 0.0):.4f}s"
+                    ).rstrip()
+                    return benchmark
+                else:
+                    return None
             else:
                 return None
         else:
