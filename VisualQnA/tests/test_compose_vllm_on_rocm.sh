@@ -15,13 +15,13 @@ ip_address=$(hostname -I | awk '{print $1}')
 export REGISTRY=${IMAGE_REPO}
 export TAG=${IMAGE_TAG}
 export HOST_IP=${ip_address}
-export VISUALQNA_TGI_SERVICE_PORT="8399"
+export VISUALQNA_VLLM_SERVICE_PORT="8399"
 export VISUALQNA_HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
 export VISUALQNA_CARD_ID="card1"
 export VISUALQNA_RENDER_ID="renderD136"
-export LVM_MODEL_ID="Xkev/Llama-3.2V-11B-cot"
+export VISUALQNA_LVM_MODEL_ID="Xkev/Llama-3.2V-11B-cot"
 export MODEL="llava-hf/llava-v1.6-mistral-7b-hf"
-export LVM_ENDPOINT="http://${HOST_IP}:8399"
+export LVM_ENDPOINT="http://${HOST_IP}:${VISUALQNA_VLLM_SERVICE_PORT}"
 export LVM_SERVICE_PORT=9399
 export MEGA_SERVICE_HOST_IP=${HOST_IP}
 export LVM_SERVICE_HOST_IP=${HOST_IP}
@@ -63,15 +63,15 @@ function start_services() {
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
     # Start Docker Containers
-    docker compose -f compose.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
+    docker compose -f compose_vllm.yam up -d > ${LOG_PATH}/start_services_with_compose.log
 
     n=0
     until [[ "$n" -ge 100 ]]; do
-        docker logs visualqna-tgi-service > ${LOG_PATH}/lvm_tgi_service_start.log
-        if grep -q Connected ${LOG_PATH}/lvm_tgi_service_start.log; then
+        docker logs multimodalqna-vllm-service > ${LOG_PATH}/search-vllm-service_start.log
+        if grep -q "Application startup complete" $LOG_PATH/search-vllm-service_start.log; then
             break
         fi
-        sleep 5s
+        sleep 10s
         n=$((n+1))
     done
 }
