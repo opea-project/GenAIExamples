@@ -67,7 +67,7 @@ function start_services() {
 
     n=0
     until [[ "$n" -ge 100 ]]; do
-        docker logs visualqna-vllm-service > ${LOG_PATH}/visualqna-vllm-service_start.log
+        docker logs visualqna-vllm-service >& ${LOG_PATH}/visualqna-vllm-service_start.log
         if grep -q "Application startup complete" $LOG_PATH/visualqna-vllm-service_start.log; then
             break
         fi
@@ -112,7 +112,7 @@ function validate_microservices() {
         "${ip_address}:9399/v1/lvm" \
         "The image" \
         "lvm" \
-        "visualqna-tgi-service" \
+        "visualqna-vllm-service" \
         '{"image": "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8/5+hnoEIwDiqkL4KAcT9GO0U4BxoAAAAAElFTkSuQmCC", "prompt":"What is this?"}'
 }
 

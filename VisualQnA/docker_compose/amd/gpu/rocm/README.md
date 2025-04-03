@@ -397,7 +397,7 @@ A page should open when you click through to this address:
 If a page of this type has opened, then we believe that the service is running and responding,
 and we can proceed to functional UI testing.
 
-To check that service is working push on example picture and whait for the answer: 
+To check that service is working push on one of the example pictures and whait for the answer: 
 
 ![UI result page](../../../../assets/img/visualqna-ui-result-page.png)
 
