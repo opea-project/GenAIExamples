@@ -78,7 +78,7 @@ function setup_env() {
 function start_services() {
     cd $WORKPATH/docker_compose/amd/gpu/rocm
     docker compose -f compose.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
-    sleep 1m
+    sleep 5m
 }
 
 function prepare_data() {
