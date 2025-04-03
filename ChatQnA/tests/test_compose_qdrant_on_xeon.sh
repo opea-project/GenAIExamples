@@ -166,6 +166,11 @@ function validate_frontend() {
     cd $WORKPATH/ui/svelte
     local conda_env_name="OPEA_e2e"
     export PATH=${HOME}/miniforge3/bin/:$PATH
+    if conda info --envs | grep -q "$conda_env_name"; then
+        echo "$conda_env_name exist!"
+    else
+        conda create -n ${conda_env_name} python=3.12 -y
+    fi
     source activate ${conda_env_name}
 
     sed -i "s/localhost/$ip_address/g" playwright.config.ts
