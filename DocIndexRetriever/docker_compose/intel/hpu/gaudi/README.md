@@ -48,19 +48,24 @@ export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
 export RERANK_MODEL_ID="BAAI/bge-reranker-base"
 export TEI_EMBEDDING_ENDPOINT="http://${host_ip}:8090"
 export TEI_RERANKING_ENDPOINT="http://${host_ip}:8808"
-export TGI_LLM_ENDPOINT="http://${host_ip}:8008"
 export REDIS_URL="redis://${host_ip}:6379"
 export INDEX_NAME="rag-redis"
-export MEGA_SERVICE_HOST_IP=${host_ip}
 export EMBEDDING_SERVICE_HOST_IP=${host_ip}
 export RETRIEVER_SERVICE_HOST_IP=${host_ip}
 export RERANK_SERVICE_HOST_IP=${host_ip}
-export LLM_SERVICE_HOST_IP=${host_ip}
 export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8000/v1/retrievaltool"
 export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/ingest"
 export llm_hardware='cpu/xeon' #cpu/xeon, xpu, hpu/gaudi
 cd GenAIExamples/DocIndexRetriever/intel/hpu/gaudi/
 docker compose up -d
+```
+
+To run the DocRetriever with Rerank pipeline using the Milvus vector database, use the compose_milvus.yaml configuration file and set the MILVUS_HOST environment variable.
+
+```bash
+export MILVUS_HOST=${host_ip}
+cd GenAIExamples/DocIndexRetriever/docker_compose/intel/hpu/gaudi
+docker compose -f compose_milvus.yaml up -d
 ```
 
 ## 4. Validation

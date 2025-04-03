@@ -57,7 +57,7 @@ class HierarchyNodeParser(BaseComponent, HierarchicalNodeParser):
         set = {
             "idx": self.idx,
             "parser_type": self.comp_subtype,
-            "chunk_size": self.chunk_sizes,
+            "chunk_sizes": self.chunk_sizes,
             "chunk_overlap": None,
         }
         return set
