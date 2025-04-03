@@ -102,7 +102,7 @@ services:
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://${host_ip}:${LLM_ENDPOINT_PORT}/health || exit 1"]
       interval: 10s
-      timeout: 10s
+      timeout: 60s
       retries: 100
     runtime: habana
     cap_add:

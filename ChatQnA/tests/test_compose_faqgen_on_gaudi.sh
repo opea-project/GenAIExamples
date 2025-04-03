@@ -13,7 +13,7 @@ export MODEL_CACHE=${model_cache:-"/data/cache"}
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
-ip_address=$(hostname -I | awk '{print $1}')
+host_ip=$(hostname -I | awk '{print $1}')
 
 function build_docker_images() {
     opea_branch=${opea_branch:-"main"}
@@ -38,12 +38,17 @@ function build_docker_images() {
 
 function start_services() {
     cd $WORKPATH/docker_compose/intel/hpu/gaudi
-    export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
-    export RERANK_MODEL_ID="BAAI/bge-reranker-base"
-    export LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
-    export NUM_CARDS=1
-    export INDEX_NAME="rag-redis"
-    export host_ip=${ip_address}
+    export NON_INTERACTIVE=true
+    # export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
+    # export RERANK_MODEL_ID="BAAI/bge-reranker-base"
+    # export LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
+    # export NUM_CARDS=1
+    # export INDEX_NAME="rag-redis"
+    # export host_ip=${host_ip}
+    # export LOGFLAG=True
+    # export http_proxy=${http_proxy}
+    # export https_proxy=${https_proxy}
+
     export LLM_ENDPOINT_PORT=8010
     export LLM_SERVER_PORT=9001
     export CHATQNA_BACKEND_PORT=8888
@@ -55,10 +60,9 @@ function start_services() {
     export LLM_ENDPOINT="http://${host_ip}:${LLM_ENDPOINT_PORT}"
     export HF_TOKEN=${HF_TOKEN}
     export VLLM_SKIP_WARMUP=true
-    export LOGFLAG=True
-    export http_proxy=${http_proxy}
-    export https_proxy=${https_proxy}
-    export no_proxy="${ip_address},redis-vector-db,dataprep-redis-service,tei-embedding-service,retriever,tei-reranking-service,tgi-service,vllm-service,guardrails,llm-faqgen,chatqna-gaudi-backend-server,chatqna-gaudi-ui-server,chatqna-gaudi-nginx-server"
+
+    export no_proxy="${host_ip},redis-vector-db,dataprep-redis-service,tei-embedding-service,retriever,tei-reranking-service,tgi-service,vllm-service,guardrails,llm-faqgen,chatqna-gaudi-backend-server,chatqna-gaudi-ui-server,chatqna-gaudi-nginx-server"
+    source set_env.sh
 
     # Start Docker Containers
     docker compose -f compose_faqgen.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
@@ -117,8 +121,8 @@ function validate_microservices() {
 
     # tei for embedding service
     validate_service \
-        "${ip_address}:8090/embed" \
-        "[[" \
+        "${host_ip}:8090/embed" \
+        "]]" \
         "tei-embedding" \
         "tei-embedding-gaudi-server" \
         '{"inputs":"What is Deep Learning?"}'
@@ -128,28 +132,28 @@ function validate_microservices() {
     # test /v1/dataprep upload file
     echo "Deep learning is a subset of machine learning that utilizes neural networks with multiple layers to analyze various levels of abstract data representations. It enables computers to identify patterns and make decisions with minimal human intervention by learning from large amounts of data." > $LOG_PATH/dataprep_file.txt
     validate_service \
-        "http://${ip_address}:6007/v1/dataprep/ingest" \
+        "http://${host_ip}:6007/v1/dataprep/ingest" \
         "Data preparation succeeded" \
         "dataprep_upload_file" \
         "dataprep-redis-server"
 
     # test /v1/dataprep upload link
     validate_service \
-        "http://${ip_address}:6007/v1/dataprep/ingest" \
+        "http://${host_ip}:6007/v1/dataprep/ingest" \
         "Data preparation succeeded" \
         "dataprep_upload_link" \
         "dataprep-redis-server"
 
     # test /v1/dataprep/get_file
     validate_service \
-        "http://${ip_address}:6007/v1/dataprep/get" \
+        "http://${host_ip}:6007/v1/dataprep/get" \
         '{"name":' \
         "dataprep_get" \
         "dataprep-redis-server"
 
     # test /v1/dataprep/delete_file
     validate_service \
-        "http://${ip_address}:6007/v1/dataprep/delete" \
+        "http://${host_ip}:6007/v1/dataprep/delete" \
         '{"status":true}' \
         "dataprep_del" \
         "dataprep-redis-server"
@@ -157,8 +161,8 @@ function validate_microservices() {
     # retrieval microservice
     test_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
     validate_service \
-        "${ip_address}:7000/v1/retrieval" \
-        " " \
+        "${host_ip}:7000/v1/retrieval" \
+        "retrieved_docs" \
         "retrieval" \
         "retriever-redis-server" \
         "{\"text\":\"What is the revenue of Nike in 2023?\",\"embedding\":${test_embedding}}"
@@ -166,7 +170,7 @@ function validate_microservices() {
     # tei for rerank microservice
     echo "validate tei..."
     validate_service \
-        "${ip_address}:8808/rerank" \
+        "${host_ip}:8808/rerank" \
         '{"index":1,"score":' \
         "tei-rerank" \
         "tei-reranking-gaudi-server" \
@@ -175,7 +179,7 @@ function validate_microservices() {
     # vllm for llm service
     echo "validate vllm..."
     validate_service \
-        "${ip_address}:${LLM_ENDPOINT_PORT}/v1/chat/completions" \
+        "${host_ip}:${LLM_ENDPOINT_PORT}/v1/chat/completions" \
         "content" \
         "vllm-llm" \
         "vllm-gaudi-server" \
@@ -184,7 +188,7 @@ function validate_microservices() {
     # faqgen llm microservice
     echo "validate llm-faqgen..."
     validate_service \
-        "${ip_address}:${LLM_SERVER_PORT}/v1/faqgen" \
+        "${host_ip}:${LLM_SERVER_PORT}/v1/faqgen" \
         "text" \
         "llm" \
         "llm-faqgen-server" \
@@ -194,14 +198,14 @@ function validate_microservices() {
 function validate_megaservice() {
     # Curl the Mega Service
     validate_service \
-        "${ip_address}:${CHATQNA_BACKEND_PORT}/v1/chatqna" \
+        "${host_ip}:${CHATQNA_BACKEND_PORT}/v1/chatqna" \
         "Embed" \
         "chatqna-megaservice" \
         "chatqna-gaudi-backend-server" \
         '{"messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5.","max_tokens":32}'
 
     validate_service \
-        "${ip_address}:${CHATQNA_BACKEND_PORT}/v1/chatqna" \
+        "${host_ip}:${CHATQNA_BACKEND_PORT}/v1/chatqna" \
         "Embed" \
         "chatqna-megaservice" \
         "chatqna-gaudi-backend-server" \
@@ -220,7 +224,7 @@ function validate_frontend() {
     fi
     source activate ${conda_env_name}
 
-    sed -i "s/localhost/$ip_address/g" playwright.config.ts
+    sed -i "s/localhost/$host_ip/g" playwright.config.ts
 
     conda install -c conda-forge nodejs=22.6.0 -y
     npm install && npm ci && npx playwright install --with-deps
