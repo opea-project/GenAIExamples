@@ -38,7 +38,7 @@ function build_docker_images() {
     git checkout ${VLLM_VER} &> /dev/null && cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="audioqna audioqna-ui whisper gpt-sovits vllm"
+    service_list="audioqna-multilang audioqna-ui whisper gpt-sovits vllm"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker images && sleep 1s
