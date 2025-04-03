@@ -1,0 +1,12 @@
+# Copyright (C) 2025 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+CHATQNA_TYPE: "CHATQNA_FAQGEN"
+llm-uservice:
+  enabled: true
+  image:
+    repository: opea/llm-faqgen
+  LLM_MODEL_ID: meta-llama/Meta-Llama-3-8B-Instruct
+  FAQGEN_BACKEND: "vLLM"
+  service:
+    port: 80
