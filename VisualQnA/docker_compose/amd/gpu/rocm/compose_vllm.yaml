@@ -2,21 +2,24 @@
 # SPDX-License-Identifier: Apache-2.0
 
 services:
-  visualqna-llava-tgi-service:
-    image: ghcr.io/huggingface/text-generation-inference:2.4.1-rocm
-    container_name: visualqna-tgi-service
+  visualqna-vllm-service:
+    image: ${REGISTRY:-opea}/vllm-rocm:${TAG:-latest}
+    container_name: visualqna-vllm-service
     ports:
-      - "${VISUALQNA_TGI_SERVICE_PORT:-8399}:80"
+      - "${VISUALQNA_VLLM_SERVICE_PORT:-8081}:8011"
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      TGI_LLM_ENDPOINT: "http://${HOST_IP}:${VISUALQNA_TGI_SERVICE_PORT}"
       HUGGINGFACEHUB_API_TOKEN: ${VISUALQNA_HUGGINGFACEHUB_API_TOKEN}
-      HUGGING_FACE_HUB_TOKEN: ${VISUALQNA_HUGGINGFACEHUB_API_TOKEN}
+      HF_TOKEN: ${VISUALQNA_HUGGINGFACEHUB_API_TOKEN}
+      HF_HUB_DISABLE_PROGRESS_BARS: 1
+      HF_HUB_ENABLE_HF_TRANSFER: 0
+      WILM_USE_TRITON_FLASH_ATTENTION: 0
+      PYTORCH_JIT: 0
     volumes:
       - "${MODEL_CACHE:-./data}:/data"
-    shm_size: 64g
+    shm_size: 20G
     devices:
       - /dev/kfd:/dev/kfd
       - /dev/dri/:/dev/dri/
@@ -26,13 +29,14 @@ services:
       - video
     security_opt:
       - seccomp:unconfined
+      - apparmor=unconfined
+    command: "--model ${VISUALQNA_LVM_MODEL_ID} --swap-space 16 --disable-log-requests --dtype float16 --tensor-parallel-size 1 --host 0.0.0.0 --port 8011 --num-scheduler-steps 1 --distributed-executor-backend \"mp\""
     ipc: host
-    command: --model-id ${LVM_MODEL_ID} --max-input-length 4096 --max-total-tokens 8192
   lvm:
     image: ${REGISTRY:-opea}/lvm:${TAG:-latest}
     container_name: lvm-server
     depends_on:
-      - visualqna-llava-tgi-service
+      - visualqna-vllm-service
     ports:
       - "9399:9399"
     ipc: host
@@ -40,8 +44,9 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
+      LVM_COMPONENT_NAME: "OPEA_VLLM_LVM"
       LVM_ENDPOINT: ${LVM_ENDPOINT}
-      LVM_COMPONENT_NAME: "OPEA_TGI_LLAVA_LVM"
+      LLM_MODEL_ID: ${VISUALQNA_LVM_MODEL_ID}
       HF_HUB_DISABLE_PROGRESS_BARS: 1
       HF_HUB_ENABLE_HF_TRANSFER: 0
     restart: unless-stopped
@@ -49,7 +54,7 @@ services:
     image: ${REGISTRY:-opea}/visualqna:${TAG:-latest}
     container_name: visualqna-rocm-backend-server
     depends_on:
-      - visualqna-llava-tgi-service
+      - visualqna-vllm-service
       - lvm
     ports:
       - "${BACKEND_SERVICE_PORT:-8888}:8888"
