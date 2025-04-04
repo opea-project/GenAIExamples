@@ -150,6 +150,7 @@ export no_proxy=${your_no_proxy}
 export http_proxy=${your_http_proxy}
 export https_proxy=${your_http_proxy}
 
+export CACHE_DIR=/home/$USER/.cache
 export HF_TOKEN=${HF_TOKEN}
 export HUGGINGFACEHUB_API_TOKEN=${HF_TOKEN}
 
@@ -197,7 +198,7 @@ export UI_ENDPOINT="http://${host_ip}:${UI_PORT}/_stcore/health"
 export no_proxy="${NO_PROXY},${host_ip},vdms-vector-db,dataprep-vdms-server,clip-embedding-server,reranking-tei-server,retriever-vdms-server,lvm-video-llama,lvm,videoqna-xeon-backend-server,videoqna-xeon-ui-server"
 ```
 
-Note: Replace with `host_ip` with you external IP address, do not use localhost.
+Note: Replace with `host_ip` with you external IP address, do not use localhost. You can also modify `CACHE_DIR` if needed.
 
 ### Start all the services with Docker Containers
 
