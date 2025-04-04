@@ -23,6 +23,12 @@ services:
       dockerfile: ./docker/Dockerfile.react
     extends: codegen
     image: ${REGISTRY:-opea}/codegen-react-ui:${TAG:-latest}
+  codegen-gradio-ui:
+    build:
+      context: ../ui
+      dockerfile: ./docker/Dockerfile.gradio
+    extends: codegen
+    image: ${REGISTRY:-opea}/codegen-gradio-ui:${TAG:-latest}
   llm-textgen:
     build:
       context: GenAIComps
