@@ -39,7 +39,6 @@ function build_docker_images() {
 }
 
 function setup_env() {
-    export CACHE_DIR="/home/$USER/.cache"
     export HF_TOKEN=${HF_TOKEN}
     export HUGGINGFACEHUB_API_TOKEN=${HF_TOKEN}
 
