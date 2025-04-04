@@ -49,7 +49,7 @@ export CHATQNA_BACKEND_SERVICE_NAME=chatqna
 export CHATQNA_INDEX_NAME="rag-redis"
 export CHATQNA_TYPE="CHATQNA_FAQGEN"
 export FAQGen_COMPONENT_NAME="OpeaFaqGenvLLM"
-export MODEL_CACHE=${model_cache:-"~/opea/chatqna-service/data"}
+export MODEL_CACHE=${model_cache:-"~/opea/data"}
 
 function build_docker_images() {
     opea_branch=${opea_branch:-"main"}

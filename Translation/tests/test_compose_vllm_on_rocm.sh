@@ -55,7 +55,7 @@ function start_services() {
     export TRANSLATION_BACKEND_SERVICE_PORT=8089
     export TRANSLATION_BACKEND_SERVICE_ENDPOINT="http://${EXTERNAL_HOST_IP}:${TRANSLATION_BACKEND_SERVICE_PORT}/v1/translation"
     export TRANSLATION_NGINX_PORT=8090
-    export MODEL_CACHE=${model_cache:-"~/opea/translation-service/data"}
+    export MODEL_CACHE=${model_cache:-"~/opea/data"}
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
