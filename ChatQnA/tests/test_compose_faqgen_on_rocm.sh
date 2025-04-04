@@ -55,6 +55,7 @@ export CHATQNA_INDEX_NAME="rag-redis"
 export FAQGen_COMPONENT_NAME="OpeaFaqGenTgi"
 
 export PATH="~/miniconda3/bin:$PATH"
+export MODEL_CACHE=${model_cache:-"~/opea/chatqna-service/data"}
 
 function build_docker_images() {
     opea_branch=${opea_branch:-"main"}

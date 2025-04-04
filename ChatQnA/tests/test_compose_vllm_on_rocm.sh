@@ -49,6 +49,7 @@ export CHATQNA_TEI_EMBEDDING_ENDPOINT="http://${HOST_IP}:${CHATQNA_TEI_EMBEDDING
 
 export CHATQNA_BACKEND_SERVICE_NAME=chatqna
 export CHATQNA_INDEX_NAME="rag-redis"
+export MODEL_CACHE=${model_cache:-"~/opea/chatqna-service/data"}
 
 
 function build_docker_images() {

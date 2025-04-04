@@ -61,6 +61,7 @@ function start_services() {
     export SEARCH_TEI_EMBEDDING_ENDPOINT=http://${HOST_IP}:${SEARCH_TEI_EMBEDDING_PORT}
     export SEARCH_TEI_RERANKING_ENDPOINT=http://${HOST_IP}:${SEARCH_TEI_RERANKING_PORT}
     export SEARCH_WEB_RETRIEVER_SERVICE_HOST_IP=${HOST_IP}
+    export MODEL_CACHE=${model_cache:-"~/opea/searchqna-service/data"}
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 

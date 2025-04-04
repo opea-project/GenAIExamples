@@ -60,6 +60,8 @@ function start_services() {
 
     export BACKEND_SERVICE_ENDPOINT=http://${external_host_ip}:${BACKEND_SERVICE_PORT}/v1/audioqna
 
+    export MODEL_CACHE=${model_cache:-"~/opea/audioqna-service/data"}
+
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
     # Start Docker Containers
