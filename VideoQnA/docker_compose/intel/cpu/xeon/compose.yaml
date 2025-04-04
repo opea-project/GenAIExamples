@@ -45,7 +45,7 @@ services:
       LOGFLAG: ${LOGFLAG:-False}
     restart: unless-stopped
     volumes:
-      - /home/$USER/.cache/.cache/huggingface/hub:/home/user/.cache/huggingface/hub
+      - /home/$USER/.cache/huggingface/hub:/home/user/.cache/huggingface/hub
   retriever:
     image: ${REGISTRY:-opea}/retriever:${TAG:-latest}
     container_name: retriever-vdms-server
