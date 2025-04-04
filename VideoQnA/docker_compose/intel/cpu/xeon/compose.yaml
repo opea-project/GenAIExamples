@@ -68,7 +68,7 @@ services:
       NUMBA_CACHE_DIR: "/tmp/numba_cache"
     restart: unless-stopped
     volumes:
-      - ${CACHE_DIR}/huggingface/hub:/root/.cache/huggingface/hub
+      - ${CACHE_DIR}/huggingface/hub:/home/user/.cache/huggingface/hub
   reranking:
     image: ${REGISTRY:-opea}/reranking:${TAG:-latest}
     container_name: reranking-tei-server
