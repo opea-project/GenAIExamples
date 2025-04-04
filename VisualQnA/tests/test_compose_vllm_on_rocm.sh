@@ -33,6 +33,7 @@ export BACKEND_SERVICE_IP=${HOST_IP}
 export BACKEND_SERVICE_PORT=8888
 export NGINX_PORT=18003
 export PATH="~/miniconda3/bin:$PATH"
+export MODEL_CACHE=${model_cache:-"/var/opea/multimodalqna-service/data"}
 
 function build_docker_images() {
     opea_branch=${opea_branch:-"main"}
