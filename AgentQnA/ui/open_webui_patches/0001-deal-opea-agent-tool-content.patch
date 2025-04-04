@@ -1,0 +1,77 @@
+From 799dcc304b3aecf2e2969df47c8dcac16d2267b0 Mon Sep 17 00:00:00 2001
+From: lkk12014402 <kaokao.lv@intel.com>
+Date: Fri, 4 Apr 2025 07:40:30 +0000
+Subject: [PATCH] deal opea agent tool content.
+
+---
+ backend/open_webui/utils/middleware.py | 54 ++++++++++++++++++++++++++
+ 1 file changed, 54 insertions(+)
+
+diff --git a/backend/open_webui/utils/middleware.py b/backend/open_webui/utils/middleware.py
+index 289d887df..afa0edf1e 100644
+--- a/backend/open_webui/utils/middleware.py
++++ b/backend/open_webui/utils/middleware.py
+@@ -1486,6 +1486,60 @@ async def process_chat_response(
+                         try:
+                             data = json.loads(data)
+ 
++                            tool_content_block = []
++                            if data.get("tool_name"):
++                                sources.append(
++                                    {
++                                        "source": {
++                                            "name": f"TOOL:{data.get('tool_name')}"},
++                                        "document": [data.get("tool_content")],
++                                        "metadata": [{
++                                            "source": f"TOOL:{data.get('tool_name')}"}],
++                                    }
++                                )
++                                events.append({"sources": sources})
++
++                                await event_emitter(
++                                    {
++                                        "type": "chat:completion",
++                                        "data": {"sources": sources},
++                                    }
++                                )
++                                tool_content_block = [
++                                    {
++                                        "type": "tool_calls",
++                                        "content": [
++                                            {"id": data.get('tool_name'), "function": {"name": data.get('tool_name')}}
++                                        ]
++                                    }
++                                ]
++
++                                await event_emitter(
++                                    {
++                                        "type": "chat:completion",
++                                        "data": {
++                                            "content": serialize_content_blocks(tool_content_block),
++                                        },
++                                    }
++                                )
++
++                                tool_content_block = [
++                                        {
++                                            "type": "tool_calls",
++                                            "content": [
++                                                {"id": data.get('tool_name'), "function": {"name": data.get('tool_name')}}
++                                            ],
++                                            "results": [
++                                                {"tool_call_id": data.get('tool_name'), "content": data.get("tool_content")}
++                                            ]
++                                        },
++                                        {
++                                            "type": "text",
++                                            "content": "",
++                                        }
++                                ]
++                                content_blocks.extend(tool_content_block)
++
+                             data, _ = await process_filter_functions(
+                                 request=request,
+                                 filter_functions=filter_functions,
+-- 
+2.34.1
+
