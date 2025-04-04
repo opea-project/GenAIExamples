@@ -27,6 +27,9 @@ services:
       INDEX_NAME: ${INDEX_NAME}
       COLLECTION_NAME: ${INDEX_NAME}
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+    volumes:
+      - ${CACHE_DIR}/clip:/home/user/.cache/clip
+      - ${CACHE_DIR}/huggingface/hub:/home/user/.cache/huggingface/hub
   embedding:
     image: ${REGISTRY:-opea}/embedding-multimodal-clip:${TAG:-latest}
     container_name: clip-embedding-server
@@ -41,6 +44,8 @@ services:
       EMBEDDING_COMPONENT_NAME: "OPEA_CLIP_EMBEDDING"
       LOGFLAG: ${LOGFLAG:-False}
     restart: unless-stopped
+    volumes:
+      - ${CACHE_DIR}/huggingface/hub:/home/user/.cache/huggingface/hub
   retriever:
     image: ${REGISTRY:-opea}/retriever:${TAG:-latest}
     container_name: retriever-vdms-server
@@ -62,6 +67,8 @@ services:
       VDMS_USE_CLIP: ${USECLIP}
       NUMBA_CACHE_DIR: "/tmp/numba_cache"
     restart: unless-stopped
+    volumes:
+      - ${CACHE_DIR}/huggingface/hub:/root/.cache/huggingface/hub
   reranking:
     image: ${REGISTRY:-opea}/reranking:${TAG:-latest}
     container_name: reranking-tei-server
