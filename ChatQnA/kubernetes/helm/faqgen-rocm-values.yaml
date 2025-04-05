@@ -1,0 +1,59 @@
+# Copyright (C) 2025 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+CHATQNA_TYPE: "CHATQNA_FAQGEN"
+llm-uservice:
+  enabled: true
+  image:
+    repository: opea/llm-faqgen
+  LLM_MODEL_ID: meta-llama/Meta-Llama-3-8B-Instruct
+  FAQGEN_BACKEND: "vLLM"
+  service:
+    port: 80
+tgi:
+  enabled: false
+vllm:
+  enabled: true
+  accelDevice: "rocm"
+  image:
+    repository: opea/vllm-rocm
+    tag: latest
+  env:
+    HIP_VISIBLE_DEVICES: "0"
+    TENSOR_PARALLEL_SIZE: "1"
+    HF_HUB_DISABLE_PROGRESS_BARS: "1"
+    HF_HUB_ENABLE_HF_TRANSFER: "0"
+    VLLM_USE_TRITON_FLASH_ATTN: "0"
+    VLLM_WORKER_MULTIPROC_METHOD: "spawn"
+    PYTORCH_JIT: "0"
+    HF_HOME: "/data"
+  extraCmd:
+    command: [ "python3", "/workspace/api_server.py" ]
+  extraCmdArgs: [ "--swap-space", "16",
+                  "--disable-log-requests",
+                  "--dtype", "float16",
+                  "--num-scheduler-steps", "1",
+                  "--distributed-executor-backend", "mp" ]
+  resources:
+    limits:
+      amd.com/gpu: "1"
+  startupProbe:
+    failureThreshold: 180
+  securityContext:
+    readOnlyRootFilesystem: false
+    runAsNonRoot: false
+    runAsUser: 0
+
+# Reranking: second largest bottleneck when reranking is in use
+# (i.e. query context docs have been uploaded with data-prep)
+#
+# TODO: could vLLM be used also for reranking / embedding?
+teirerank:
+  accelDevice: "cpu"
+  image:
+    repository: ghcr.io/huggingface/text-embeddings-inference
+    tag: cpu-1.5
+  # securityContext:
+  #   readOnlyRootFilesystem: false
+  readinessProbe:
+    timeoutSeconds: 1
