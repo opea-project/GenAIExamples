@@ -62,6 +62,11 @@ export MODELNAME="meta-llama/Meta-Llama-3-8B-Instruct"
 nano ~/chatqna-k8s-install/GenAIExamples/ChatQnA/kubernetes/helm/rocm-values.yaml
 ```
 
+#### If deploy FaqGen based application on AMD ROCm device with vLLM
+```bash
+nano ~/chatqna-k8s-install/GenAIExamples/ChatQnA/kubernetes/helm/faqgen-rocm-values.yaml
+```
+
 - HIP_VISIBLE_DEVICES - this variable specifies the ID of the GPU that you want to use.
   You can specify either one or several comma-separated ones - "0" or "0,1,2,3"
 - TENSOR_PARALLEL_SIZE - must match the number of GPUs used
@@ -75,6 +80,12 @@ nano ~/chatqna-k8s-install/GenAIExamples/ChatQnA/kubernetes/helm/rocm-values.yam
 
 ```bash
 nano ~/chatqna-k8s-install/GenAIExamples/ChatQnA/kubernetes/helm/rocm-tgi-values.yaml
+```
+
+#### If deploy FaqGen based application on AMD ROCm device with TGI
+
+```bash
+nano ~/chatqna-k8s-install/GenAIExamples/ChatQnA/kubernetes/helm/faqgen-rocm-tgi-values.yaml
 ```
 
 - HIP_VISIBLE_DEVICES - this variable specifies the ID of the GPU that you want to use.
@@ -100,6 +111,20 @@ helm upgrade --install chatqna oci://ghcr.io/opea-project/charts/chatqna \
 helm upgrade --install chatqna oci://ghcr.io/opea-project/charts/chatqna \
     --set global.HUGGINGFACEHUB_API_TOKEN=${HFTOKEN} \
     --values rocm-tgi-values.yaml
+```
+
+#### If deploy FaqGen based application on AMD ROCm device with vLLM
+```bash
+helm upgrade --install chatqna oci://ghcr.io/opea-project/charts/chatqna \
+    --set global.HUGGINGFACEHUB_API_TOKEN=${HFTOKEN} \
+    --values faqgen-rocm-values.yaml
+```
+
+#### If deploy FaqGen based application on AMD ROCm device with TGI
+```bash
+helm upgrade --install chatqna oci://ghcr.io/opea-project/charts/chatqna \
+    --set global.HUGGINGFACEHUB_API_TOKEN=${HFTOKEN} \
+    --values faqgen-rocm-tgi-values.yaml
 ```
 
 ## Deploy on AMD ROCm using Helm charts from Git repositories
