@@ -163,5 +163,3 @@ helm upgrade --install docsum docsum \
     --set global.HUGGINGFACEHUB_API_TOKEN=${HFTOKEN} \
     --values ../../GenAIExamples/DocSum/kubernetes/helm/rocm-tgi-values.yaml
 ```
-
-
