@@ -16,7 +16,7 @@ class NodeMgr:
     # idx: index of node_parser
     def add_nodes(self, np_idx, nodes):
         if np_idx in self.nodes:
-            self.nodes[np_idx].append(nodes)
+            self.nodes[np_idx].extend(nodes)
         else:
             self.nodes[np_idx] = nodes
 

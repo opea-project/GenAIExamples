@@ -34,8 +34,8 @@ function build_docker_images() {
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
     service_list="audioqna audioqna-ui whisper speecht5"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
-    echo "docker pull ghcr.io/huggingface/text-generation-inference:2.3.1-rocm"
-    docker pull ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
+    echo "docker pull ghcr.io/huggingface/text-generation-inference:2.4.1-rocm"
+    docker pull ghcr.io/huggingface/text-generation-inference:2.4.1-rocm
     docker images && sleep 1s
 }
 

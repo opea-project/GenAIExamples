@@ -10,8 +10,8 @@ from PIL import Image as Img
 from unstructured.documents.elements import ElementMetadata, Image
 from unstructured.partition.docx import DocxPartitionerOptions
 
-GRADIO_TEMP_DIR = os.getenv("GRADIO_TEMP_DIR", "/home/user/gradio_cache")
-IMG_OUTPUT_DIR = os.path.join(GRADIO_TEMP_DIR, "pic")
+UI_DIRECTORY = os.getenv("UI_TMPFILE_PATH", "/home/user/ui_cache")
+IMG_OUTPUT_DIR = os.path.join(UI_DIRECTORY, "pic")
 os.makedirs(IMG_OUTPUT_DIR, exist_ok=True)
 
 

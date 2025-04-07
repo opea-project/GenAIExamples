@@ -7,17 +7,17 @@ quality and performance.
 
 ## What's New in this release?
 
-- Support image/url data retrieval and display in EC-RAG
-- Support display of document source used by LLM in UI
-- Support pipeline remove operation in RESTful API and UI
-- Support RAG pipeline performance benchmark and display in UI
+- A sleek new UI with enhanced user experience, built on Vue and Ant Design
+- Support concurrent multi-requests handling on vLLM inference backend
+- Support pipeline configuration through json file
+- Support system prompt modification through API
 - Fixed known issues in EC-RAG UI and server
 
 ## Quick Start Guide
 
 ### (Optional) Build Docker Images for Mega Service, Server and UI by your own
 
-If you want to build the images by your own, please follow the steps:
+**All the docker images can be automatically‌ pulled**, If you want to build the images by your own, please follow the steps:
 
 ```bash
 cd GenAIExamples/EdgeCraftRAG
@@ -36,7 +36,7 @@ You can select "local" type in generation field which is the default approach to
 #### vLLM with OpenVINO for Intel Arc GPU
 
 You can also select "vLLM" as generation type, to enable this type, you'll need to build the vLLM image for Intel Arc GPU before service bootstrap.
-Please follow this link [vLLM with OpenVINO](https://github.com/opea-project/GenAIComps/tree/main/comps/llms/text-generation/vllm/langchain#build-docker-image) to build the vLLM image.
+Please follow this link [vLLM with OpenVINO](https://github.com/opea-project/GenAIComps/tree/main/comps/third_parties/vllm#23-vllm-with-openvino-on-intel-gpu-and-cpu) to build the vLLM image.
 
 ### Start Edge Craft RAG Services with Docker Compose
 
@@ -45,12 +45,12 @@ cd GenAIExamples/EdgeCraftRAG/docker_compose/intel/gpu/arc
 
 export MODEL_PATH="your model path for all your models"
 export DOC_PATH="your doc path for uploading a dir of files"
-export GRADIO_PATH="your gradio cache path for transferring files"
+export UI_TMPFILE_PATH="your UI cache path for transferring files"
 # If you have a specific prompt template, please uncomment the following line
 # export PROMPT_PATH="your prompt path for prompt templates"
 
 # Make sure all 3 folders have 1000:1000 permission, otherwise
-# chown 1000:1000 ${MODEL_PATH} ${DOC_PATH} ${GRADIO_PATH}
+# chown 1000:1000 ${MODEL_PATH} ${DOC_PATH} ${UI_TMPFILE_PATH}
 # In addition, also make sure the .cache folder has 1000:1000 permission, otherwise
 # chown 1000:1000 $HOME/.cache
 
@@ -99,6 +99,26 @@ export vLLM_ENDPOINT="http://${HOST_IP}:${VLLM_SERVICE_PORT}"
 export HUGGINGFACEHUB_API_TOKEN=#your HF token
 
 docker compose -f compose_vllm.yaml up -d
+```
+
+#### Launch services with vLLM for multi Intel Arc GPUs inference service
+
+The docker file can be pulled automatically‌, you can also pull the image manually:
+
+```bash
+docker pull intelanalytics/ipex-llm-serving-xpu:latest
+```
+
+Set up Additional Environment Variables and start with compose_vllm_multi-arc.yaml
+
+```bash
+export LLM_MODEL=#your model id
+export VLLM_SERVICE_PORT=8008
+export vLLM_ENDPOINT="http://${HOST_IP}:${VLLM_SERVICE_PORT}"
+export LLM_MODEL_PATH=#your model path
+export TENSOR_PARALLEL_SIZE=#your Intel Arc GPU number to do inference
+
+docker compose -f compose_vllm_multi-arc.yaml up -d
 ```
 
 ### ChatQnA with LLM Example (Command Line)
@@ -189,6 +209,12 @@ After the pipeline creation, you can upload your data in the `Chatbot` page.
 Then, you can submit messages in the chat box.
 ![chat_with_rag](assets/img/chat_with_rag.png)
 
+If you want to try Gradio UI, please launch service through compose_gradio.yaml, then access http://${HOST_IP}:8082 on your browser:
+
+```bash
+docker compose -f compose_gradio.yaml up -d
+```
+
 ## Advanced User Guide
 
 ### Pipeline Management
@@ -226,7 +252,25 @@ curl -X PATCH http://${HOST_IP}:16010/v1/settings/pipelines/rag_test_local_llm -
 curl -X DELETE http://${HOST_IP}:16010/v1/settings/pipelines/rag_test_local_llm -H "Content-Type: application/json" | jq '.'
 ```
 
+#### Get pipeline json
+
+```bash
+curl -X GET http://${HOST_IP}:16010/v1/settings/pipelines/{name}/json -H "Content-Type: application/json" | jq '.'
+```
+
+#### Import pipeline from a json file
+
+```bash
+curl -X POST http://${HOST_IP}:16010/v1/settings/pipelines/import -H "Content-Type: multipart/form-data" -F "file=@your_test_pipeline_json_file.txt"| jq '.'
+```
+
 #### Enable and check benchmark for pipelines
+
+##### ⚠️ NOTICE ⚠️
+
+Benchmarking activities may significantly reduce system performance.
+
+**DO NOT** perform benchmarking in a production environment.
 
 ```bash
 # Set ENABLE_BENCHMARK as true before launch services
@@ -307,4 +351,12 @@ curl -X DELETE http://${HOST_IP}:16010/v1/data/files/test2.docx -H "Content-Type
 
 ```bash
 curl -X PATCH http://${HOST_IP}:16010/v1/data/files/test.pdf -H "Content-Type: application/json" -d '{"local_path":"docs/#REPLACE WITH YOUR FILE WITHIN MOUNTED DOC PATH#"}' | jq '.'
+```
+
+### System Prompt Management
+
+#### Use custom system prompt
+
+```bash
+curl -X POST http://${HOST_IP}:16010/v1/chatqna/prompt -H "Content-Type: multipart/form-data" -F "file=@your_prompt_file.txt"
 ```
