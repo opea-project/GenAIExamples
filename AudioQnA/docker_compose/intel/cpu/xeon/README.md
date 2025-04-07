@@ -28,7 +28,7 @@ git clone https://github.com/vllm-project/vllm.git
 cd ./vllm/
 VLLM_VER="$(git describe --tags "$(git rev-list --tags --max-count=1)" )"
 git checkout ${VLLM_VER}
-docker build --no-cache --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile.cpu -t opea/vllm:latest --shm-size=128g .
+docker build --no-cache --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile.cpu -t opea/vllm:latest --shm-size=128g .
 ```
 
 ### 4. Build TTS Image
