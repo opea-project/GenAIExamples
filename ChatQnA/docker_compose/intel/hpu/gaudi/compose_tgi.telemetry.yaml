@@ -72,8 +72,9 @@ services:
     deploy:
       mode: global
   gaudi-exporter:
-    image: vault.habana.ai/gaudi-metric-exporter/metric-exporter:1.19.2-32
+    image: vault.habana.ai/gaudi-metric-exporter/metric-exporter:latest
     container_name: gaudi-exporter
+    privileged: true
     volumes:
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro

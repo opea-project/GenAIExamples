@@ -17,18 +17,12 @@ ip_address=$(hostname -I | awk '{print $1}')
 
 function build_docker_images() {
     opea_branch=${opea_branch:-"main"}
-    # If the opea_branch isn't main, replace the git clone branch in Dockerfile.
-    if [[ "${opea_branch}" != "main" ]]; then
-        cd $WORKPATH
-        OLD_STRING="RUN git clone --depth 1 https://github.com/opea-project/GenAIComps.git"
-        NEW_STRING="RUN git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git"
-        find . -type f -name "Dockerfile*" | while read -r file; do
-            echo "Processing file: $file"
-            sed -i "s|$OLD_STRING|$NEW_STRING|g" "$file"
-        done
-    fi
     cd $WORKPATH/docker_image_build
     git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
+    pushd GenAIComps
+    echo "GenAIComps test commit is $(git rev-parse HEAD)"
+    docker build --no-cache -t ${REGISTRY}/comps-base:${TAG} --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
+    popd && sleep 1s
     git clone https://github.com/HabanaAI/vllm-fork.git && cd vllm-fork
     VLLM_VER=$(git describe --tags "$(git rev-list --tags --max-count=1)")
     git checkout ${VLLM_VER} &> /dev/null && cd ../
@@ -58,7 +52,7 @@ function start_services() {
     # Start Docker Containers
     docker compose -f compose.yaml -f compose.telemetry.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
     n=0
-    until [[ "$n" -ge 160 ]]; do
+    until [[ "$n" -ge 200 ]]; do
         echo "n=$n"
         docker logs vllm-gaudi-server > vllm_service_start.log
         if grep -q "Warmup finished" vllm_service_start.log; then
@@ -101,16 +95,19 @@ function validate_microservices() {
     # Check if the microservices are running correctly.
 
     # tei for embedding service
+    echo "::group:: test tei-embedding"
     validate_service \
         "${ip_address}:8090/embed" \
         "\[\[" \
         "tei-embedding" \
         "tei-embedding-gaudi-server" \
         '{"inputs":"What is Deep Learning?"}'
+    echo "::endgroup::"
 
     sleep 1m # retrieval can't curl as expected, try to wait for more time
 
     # retrieval microservice
+    echo "::group:: test retriever"
     test_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
     validate_service \
         "${ip_address}:7000/v1/retrieval" \
@@ -118,22 +115,27 @@ function validate_microservices() {
         "retrieval" \
         "retriever-redis-server" \
         "{\"text\":\"What is the revenue of Nike in 2023?\",\"embedding\":${test_embedding}}"
+    echo "::endgroup::"
 
     # tei for rerank microservice
+    echo "::group:: test tei-rerank"
     validate_service \
         "${ip_address}:8808/rerank" \
         '{"index":1,"score":' \
         "tei-rerank" \
         "tei-reranking-gaudi-server" \
         '{"query":"What is Deep Learning?", "texts": ["Deep Learning is not...", "Deep learning is..."]}'
+    echo "::endgroup::"
 
     # vllm for llm service
+    echo "::group:: test vllm-llm"
     validate_service \
         "${ip_address}:8007/v1/chat/completions" \
         "content" \
         "vllm-llm" \
         "vllm-gaudi-server" \
         '{"model": "meta-llama/Meta-Llama-3-8B-Instruct", "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens":17}'
+    echo "::endgroup::"
 }
 
 function validate_megaservice() {
@@ -182,20 +184,35 @@ function stop_docker() {
 
 function main() {
 
+    echo "::group::start_docker"
     stop_docker
+    echo "::endgroup::"
+
+    echo "::group::build_docker_images"
     if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
-    start_time=$(date +%s)
+    echo "::endgroup::"
+
+    echo "::group::start_services"
     start_services
-    end_time=$(date +%s)
-    duration=$((end_time-start_time))
-    echo "Mega service start duration is $duration s"
+    echo "::endgroup::"
 
+    echo "::group::validate_microservices"
     validate_microservices
-    validate_megaservice
-    validate_frontend
+    echo "::endgroup::"
 
+    echo "::group::validate_megaservice"
+    validate_megaservice
+    echo "::endgroup::"
+
+    echo "::group::validate_frontend"
+    validate_frontend
+    echo "::endgroup::"
+
+    echo "::group::stop_docker"
     stop_docker
-    echo y | docker system prune
+    echo "::endgroup::"
+
+    docker system prune -f
 
 }
 
