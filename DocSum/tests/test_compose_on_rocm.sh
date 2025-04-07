@@ -11,7 +11,7 @@ echo "TAG=IMAGE_TAG=${IMAGE_TAG}"
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
-export MODEL_CACHE=${model_cache:-"/var/opea/docsum-service/data"}
+export MODEL_CACHE=${model_cache:-"/var/lib/GenAI/data"}
 export MAX_INPUT_TOKENS=1024
 export MAX_TOTAL_TOKENS=2048
 export REGISTRY=${IMAGE_REPO}

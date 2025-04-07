@@ -16,7 +16,7 @@ services:
       host_ip: ${host_ip}
       DOCSUM_TGI_SERVICE_PORT: ${DOCSUM_TGI_SERVICE_PORT}
     volumes:
-      - "${MODEL_CACHE}:/data"
+      - "${MODEL_CACHE:-/var/opea/docsum-service/data}:/data"
     shm_size: 1g
     devices:
       - /dev/kfd:/dev/kfd
