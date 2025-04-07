@@ -81,7 +81,7 @@ jobs:
               # VLLM_VER=$(git describe --tags "$(git rev-list --tags --max-count=1)")
               # echo "Check out vLLM tag ${VLLM_VER}"
               # git checkout ${VLLM_VER} &> /dev/null && cd ../
-              git checkout v0.8.2 &> /dev/null && cd ../
+              git checkout v0.8.2 &> /dev/null && ls && cd ../
           fi
           if [[ $(grep -c "vllm-gaudi:" ${docker_compose_path}) != 0 ]]; then
               git clone https://github.com/HabanaAI/vllm-fork.git && cd vllm-fork
