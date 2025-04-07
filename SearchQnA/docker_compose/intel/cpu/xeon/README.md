@@ -34,7 +34,8 @@ docker build --no-cache -t opea/llm-textgen:latest --build-arg https_proxy=$http
 
 ```bash
 docker build --no-cache -t opea/nginx:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/third_parties/nginx/src/Dockerfile .
-```
+
+````
 
 ### 6. Build MegaService Docker Image
 
@@ -44,7 +45,7 @@ To construct the Mega Service, we utilize the [GenAIComps](https://github.com/op
 git clone https://github.com/opea-project/GenAIExamples.git
 cd GenAIExamples/SearchQnA
 docker build --no-cache -t opea/searchqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
-```
+````
 
 ### 7. Build UI Docker Image
 
@@ -62,8 +63,8 @@ Then run the command `docker images`, you will have following images ready:
 3. `opea/reranking:latest`
 4. `opea/llm-textgen:latest`
 5. `opea/nginx:latest`
-5. `opea/searchqna:latest`
-6. `opea/searchqna-ui:latest`
+6. `opea/searchqna:latest`
+7. `opea/searchqna-ui:latest`
 
 ## 🚀 Set the environment variables
 
@@ -71,7 +72,6 @@ Then run the command `docker images`, you will have following images ready:
 ```bash
 cd GenAIExamples/SearchQnA/docker_compose/
 ```
-
 
 Before starting the services with `docker compose`, you have to recheck the following environment variables. Create a file to store
 your custom environment variables.
@@ -179,6 +179,8 @@ wget https://github.com/cloudflare/cloudflared/releases/latest/download/cloudfla
 sudo dpkg -i cloudflared-linux-amd64.deb
 
 cloudflared tunnel --url http://localhost:80
+
 ```
 
 Alternatively a [gradio tunnel](https://console.cloud.intel.com/docs/tutorials/expose_app_tunnels.html) (see bottom).
+```

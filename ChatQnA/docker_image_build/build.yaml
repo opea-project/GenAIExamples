@@ -5,24 +5,14 @@ services:
   chatqna:
     build:
       args:
+        IMAGE_REPO: ${REGISTRY}
+        BASE_TAG: ${TAG}
         http_proxy: ${http_proxy}
         https_proxy: ${https_proxy}
         no_proxy: ${no_proxy}
       context: ../
       dockerfile: ./Dockerfile
     image: ${REGISTRY:-opea}/chatqna:${TAG:-latest}
-  chatqna-guardrails:
-    build:
-      context: ../
-      dockerfile: ./Dockerfile.guardrails
-    extends: chatqna
-    image: ${REGISTRY:-opea}/chatqna-guardrails:${TAG:-latest}
-  chatqna-without-rerank:
-    build:
-      context: ../
-      dockerfile: ./Dockerfile.without_rerank
-    extends: chatqna
-    image: ${REGISTRY:-opea}/chatqna-without-rerank:${TAG:-latest}
   chatqna-ui:
     build:
       context: ../ui
@@ -59,6 +49,12 @@ services:
       dockerfile: comps/llms/src/text-generation/Dockerfile
     extends: chatqna
     image: ${REGISTRY:-opea}/llm-textgen:${TAG:-latest}
+  llm-faqgen:
+    build:
+      context: GenAIComps
+      dockerfile: comps/llms/src/faq-generation/Dockerfile
+    extends: chatqna
+    image: ${REGISTRY:-opea}/llm-faqgen:${TAG:-latest}
   dataprep:
     build:
       context: GenAIComps
@@ -71,6 +67,11 @@ services:
       dockerfile: comps/guardrails/src/guardrails/Dockerfile
     extends: chatqna
     image: ${REGISTRY:-opea}/guardrails:${TAG:-latest}
+  vllm-rocm:
+    build:
+      context: GenAIComps
+      dockerfile: comps/third_parties/vllm/src/Dockerfile.amd_gpu
+    image: ${REGISTRY:-opea}/vllm-rocm:${TAG:-latest}
   vllm:
     build:
       context: vllm
