@@ -33,7 +33,8 @@ docker build --no-cache -t opea/llm-textgen:latest --build-arg https_proxy=$http
 ### 5. Build Nginx Image
 
 docker build --no-cache -t opea/nginx:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/third_parties/nginx/src/Dockerfile .
-```
+
+````
 
 ### 6. Build MegaService Docker Image
 
@@ -43,7 +44,7 @@ To construct the Mega Service, we utilize the [GenAIComps](https://github.com/op
 git clone https://github.com/opea-project/GenAIExamples.git
 cd GenAIExamples/SearchQnA
 docker build --no-cache -t opea/searchqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
-```
+````
 
 ### 7. Build UI Docker Image
 
@@ -61,22 +62,20 @@ Then run the command `docker images`, you will have following images ready:
 3. `opea/reranking:latest`
 4. `opea/llm-textgen:latest`
 5. `opea/nginx:latest`
-5. `opea/searchqna:latest`
-6. `opea/searchqna-ui:latest`
+6. `opea/searchqna:latest`
+7. `opea/searchqna-ui:latest`
 
 ## 🚀 Set the environment variables
-
 
 ```
 cd GenAIExamples/SearchQnA/docker_compose/intel/cpu/xeon
 ```
 
-
 Before starting the services with `docker compose`, you have to recheck the following environment variables. Create a file to store
 your custom environment variables.
 
 ```
-nano setenv_searchqna.sh  
+nano setenv_searchqna.sh
 ```
 
 And paste in the following near top:
@@ -96,6 +95,7 @@ source set_env.sh
 ```
 
 Then source the environment file:
+
 ```
 source setenv_searchqna.sh
 ```
@@ -169,12 +169,15 @@ curl http://${host_ip}:3008/v1/searchqna -H "Content-Type: application/json" -d 
 A quick way to test the frontend with public URL is via Cloudflare TryCloudflare tunnel.
 
 ```
+
 sudo apt update
 sudo apt install -y wget
 wget https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
 sudo dpkg -i cloudflared-linux-amd64.deb
 
 cloudflared tunnel --url http://localhost:80
+
 ```
 
 Alternatively a [gradio tunnel](https://console.cloud.intel.com/docs/tutorials/expose_app_tunnels.html) (see bottom).
+```
