@@ -21,10 +21,22 @@ Here're some of the project's features:
    cd AgentQnA/ui/svelte
    ```
 
-3. Modify the required .env variables.
+3. Modify the required .env variables. The `AGENT_URL` should be in the form of the following:
 
    ```
-   AGENT_URL = ''
+   AGENT_URL = "http://${ip_address}:${agent_port}/v1/chat/completions"
+   ```
+
+   For example: assume that the ip address of the host machine is 10.10.10.1, and the agent port is 9090,then
+
+   ```
+   AGENT_URL = "http://10.10.10.1:9090/v1/chat/completions"
+   ```
+
+   You can get the ip address of the host machine by running the command below:
+
+   ```bash
+    export ip_address=$(hostname -I | awk '{print $1}')
    ```
 
 4. **For Local Development:**
@@ -57,4 +69,4 @@ Here're some of the project's features:
   docker run -d -p 5173:5173 --name agent-ui opea:agent-ui
   ```
 
-- The application will be available at `http://localhost:5173`.
+- The application will be available at `http://${ip_address}:5173`. You can access it with a web browser on your laptop. Note the `ip_address` should be the ip address of the host machine where the UI container runs.
