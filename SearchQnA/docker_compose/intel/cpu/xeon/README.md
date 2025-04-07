@@ -32,6 +32,7 @@ docker build --no-cache -t opea/llm-textgen:latest --build-arg https_proxy=$http
 
 ### 5. Build Nginx Image
 
+```bash
 docker build --no-cache -t opea/nginx:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/third_parties/nginx/src/Dockerfile .
 ```
 
@@ -67,15 +68,15 @@ Then run the command `docker images`, you will have following images ready:
 ## 🚀 Set the environment variables
 
 
-```
-cd GenAIExamples/SearchQnA/docker_compose/intel/cpu/xeon
+```bash
+cd GenAIExamples/SearchQnA/docker_compose/
 ```
 
 
 Before starting the services with `docker compose`, you have to recheck the following environment variables. Create a file to store
 your custom environment variables.
 
-```
+```bash
 nano setenv_searchqna.sh  
 ```
 
@@ -96,9 +97,12 @@ source set_env.sh
 ```
 
 Then source the environment file:
-```
+
+```bash
 source setenv_searchqna.sh
 ```
+
+Sourcing this will also source the standard environment variables in `set_env.sh`. 
 
 ## 🚀 Start the MegaService
 
@@ -168,7 +172,7 @@ curl http://${host_ip}:3008/v1/searchqna -H "Content-Type: application/json" -d 
 
 A quick way to test the frontend with public URL is via Cloudflare TryCloudflare tunnel.
 
-```
+```bash
 sudo apt update
 sudo apt install -y wget
 wget https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
