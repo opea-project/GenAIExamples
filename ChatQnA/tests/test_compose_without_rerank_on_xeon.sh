@@ -24,8 +24,8 @@ function build_docker_images() {
     docker build --no-cache -t ${REGISTRY}/comps-base:${TAG} --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
     popd && sleep 1s
     git clone https://github.com/vllm-project/vllm.git && cd vllm
-    # Get the latest tag
-    VLLM_VER="$(git describe --tags "$(git rev-list --tags --max-count=1)" )"
+
+    VLLM_VER="v0.8.2"
     echo "Check out vLLM tag ${VLLM_VER}"
     git checkout ${VLLM_VER} &> /dev/null
     # Not change the pwd
