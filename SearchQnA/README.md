@@ -23,67 +23,55 @@ The workflow falls into the following architecture:
 The SearchQnA example is implemented using the component-level microservices defined in [GenAIComps](https://github.com/opea-project/GenAIComps). The flow chart below shows the information flow between different microservices for this example.
 
 ```mermaid
----
-config:
-  flowchart:
-    nodeSpacing: 400
-    rankSpacing: 100
-    curve: linear
-  themeVariables:
-    fontSize: 50px
----
+%% SearchQnA Architecture Diagram
+%% Horizontal layout with LLM Service below MegaService
+%% Hugging Face services shown as yellow circles
+
 flowchart LR
-    %% Colors %%
+    %% Colors and Shapes %%
     classDef blue fill:#ADD8E6,stroke:#ADD8E6,stroke-width:2px,fill-opacity:0.5
-    classDef orange fill:#FBAA60,stroke:#ADD8E6,stroke-width:2px,fill-opacity:0.5
-    classDef orchid fill:#C26DBC,stroke:#ADD8E6,stroke-width:2px,fill-opacity:0.5
-    classDef invisible fill:transparent,stroke:transparent;
-    style SearchQnA-MegaService stroke:#000000
+    classDef yellow fill:#FBAA60,stroke:#FBAA60,stroke-width:2px,fill-opacity:0.5,width:200,height:200
+    classDef orchid fill:#C26DBC,stroke:#C26DBC,stroke-width:2px,fill-opacity:0.5
 
-    %% Subgraphs %%
-    subgraph SearchQnA-MegaService["SearchQnA MegaService "]
-        direction LR
-        EM([Embedding MicroService]):::blue
-        RET([Web Retrieval MicroService]):::blue
-        RER([Rerank MicroService]):::blue
-        LLM([LLM MicroService]):::blue
-    end
-    subgraph UserInterface[" User Interface "]
-        direction LR
-        a([User Input Query]):::orchid
-        UI([UI server<br>]):::orchid
+    %% Main Flow %%
+    subgraph UserInterface["User Interface"]
+        a["User Input Query"]:::orchid
+        UI["UI server<br/>(docker: searchqna-xeon-ui-server)"]:::orchid
     end
 
+    GW["SearchQnA GateWay<br/>(docker: searchqna-xeon-backend-server)"]
 
+    subgraph SearchQnA-MegaService["SearchQnA MegaService"]
+        EM["Embedding MicroService<br/>(docker: embedding-server)"]:::blue
+        RET["Web Retrieval MicroService<br/>(docker: web-retriever-server)"]:::blue
+        RER["Rerank MicroService<br/>(docker: reranking-tei-xeon-server)"]:::blue
+        LLM["LLM MicroService<br/>(docker: llm-textgen-server)"]:::blue
+    end
 
-    TEI_RER{{Reranking service<br>}}
-    TEI_EM{{Embedding service <br>}}
-    VDB{{Vector DB<br><br>}}
-    R_RET{{Web Retriever service <br>}}
-    LLM_gen{{LLM Service <br>}}
-    GW([SearchQnA GateWay<br>]):::orange
+    %% OPEA wrapped microservices services e.g. Hugging Face, Google/Langchain (yellow circles) %%
+    TEI_EM(("TEI Embedding<br/>(docker: tei-embedding-server)")):::yellow
+    R_RET(("Web Retriever<br/>(docker: web-retriever-server)")):::yellow
+    TEI_RER(("TEI Reranking<br/>(docker: tei-reranking-server)")):::yellow
+    
+    %% LLM Service positioned below MegaService %%
+    LLM_gen(("LLM Service<br/>(docker: tgi-service)")):::yellow
+    
+    %% Vertical positioning %%
+    subgraph vertical[" "]
+        direction TB
+        SearchQnA-MegaService --> LLM_gen
+    end
 
-    %% Questions interaction
-    direction LR
-    a[User Input Query] --> UI
-    UI --> GW
+    %% Connections %%
+    a --> UI --> GW
     GW <==> SearchQnA-MegaService
-    EM ==> RET
-    RET ==> RER
-    RER ==> LLM
-
-    %% Embedding service flow
-    direction LR
+    EM ==> RET ==> RER ==> LLM
     EM <-.-> TEI_EM
     RET <-.-> R_RET
     RER <-.-> TEI_RER
     LLM <-.-> LLM_gen
-
-    direction TB
-    %% Vector DB interaction
-    R_RET <-.-> VDB
-
 ```
+
 
 ## Deploy SearchQnA Service
 

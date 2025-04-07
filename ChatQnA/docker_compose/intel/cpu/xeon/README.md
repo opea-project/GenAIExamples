@@ -365,6 +365,13 @@ For details on how to verify the correctness of the response, refer to [how-to-v
      -X POST \
      -d '{"model": "meta-llama/Meta-Llama-3-8B-Instruct", "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens":17}' \
      -H 'Content-Type: application/json'
+
+   curl http://${host_ip}:9009/v1/chat/completions \
+     -X POST \
+     -d '{
+     "model": "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B",
+     "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens":17}' \
+     -H 'Content-Type: application/json'
    ```
 
 5. MegaService

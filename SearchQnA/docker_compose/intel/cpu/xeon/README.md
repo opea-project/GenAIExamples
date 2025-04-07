@@ -30,7 +30,12 @@ docker build --no-cache -t opea/reranking:latest --build-arg https_proxy=$https_
 docker build --no-cache -t opea/llm-textgen:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/src/text-generation/Dockerfile .
 ```
 
-### 5. Build MegaService Docker Image
+### 5. Build Nginx Image
+
+docker build --no-cache -t opea/nginx:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/third_parties/nginx/src/Dockerfile .
+```
+
+### 6. Build MegaService Docker Image
 
 To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `searchqna.py` Python script. Build the MegaService Docker image using the command below:
 
@@ -40,7 +45,7 @@ cd GenAIExamples/SearchQnA
 docker build --no-cache -t opea/searchqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
 ```
 
-### 6. Build UI Docker Image
+### 7. Build UI Docker Image
 
 Build frontend Docker image via below command:
 
@@ -55,38 +60,44 @@ Then run the command `docker images`, you will have following images ready:
 2. `opea/web-retriever:latest`
 3. `opea/reranking:latest`
 4. `opea/llm-textgen:latest`
+5. `opea/nginx:latest`
 5. `opea/searchqna:latest`
 6. `opea/searchqna-ui:latest`
 
 ## 🚀 Set the environment variables
 
-Before starting the services with `docker compose`, you have to recheck the following environment variables.
+
+```
+cd GenAIExamples/SearchQnA/docker_compose/intel/cpu/xeon
+```
+
+
+Before starting the services with `docker compose`, you have to recheck the following environment variables. Create a file to store
+your custom environment variables.
+
+```
+nano setenv_searchqna.sh  
+```
+
+And paste in the following near top:
 
 ```bash
-export host_ip=<your External Public IP>    # export host_ip=$(hostname -I | awk '{print $1}')
-export GOOGLE_CSE_ID=<your cse id>
-export GOOGLE_API_KEY=<your google api key>
-export HUGGINGFACEHUB_API_TOKEN=<your HF token>
+export host_ip=$(hostname -I | awk '{print $1}')
+export no_proxy=""
+# Create a Google Programmable / Custom Search Engine:  https://programmablesearchengine.google.com/controlpanel/create
+export GOOGLE_CSE_ID="my google programmable search key"
+# Obtain key: https://developers.google.com/custom-search/v1/introduction
+export GOOGLE_API_KEY="my google API key"
+export HUGGINGFACEHUB_API_TOKEN="my hugging face token"
+export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
+echo "LLM_MODEL_ID=${LLM_MODEL_ID}"
+export LOGFLAG=True
+source set_env.sh
+```
 
-export EMBEDDING_MODEL_ID=BAAI/bge-base-en-v1.5
-export TEI_EMBEDDING_ENDPOINT=http://${host_ip}:3001
-export RERANK_MODEL_ID=BAAI/bge-reranker-base
-export TEI_RERANKING_ENDPOINT=http://${host_ip}:3004
-export BACKEND_SERVICE_ENDPOINT=http://${host_ip}:3008/v1/searchqna
-
-export TGI_LLM_ENDPOINT=http://${host_ip}:3006
-export LLM_MODEL_ID=Intel/neural-chat-7b-v3-3
-
-export MEGA_SERVICE_HOST_IP=${host_ip}
-export EMBEDDING_SERVICE_HOST_IP=${host_ip}
-export WEB_RETRIEVER_SERVICE_HOST_IP=${host_ip}
-export RERANK_SERVICE_HOST_IP=${host_ip}
-export LLM_SERVICE_HOST_IP=${host_ip}
-
-export EMBEDDING_SERVICE_PORT=3002
-export WEB_RETRIEVER_SERVICE_PORT=3003
-export RERANK_SERVICE_PORT=3005
-export LLM_SERVICE_PORT=3007
+Then source the environment file:
+```
+source setenv_searchqna.sh
 ```
 
 ## 🚀 Start the MegaService
@@ -106,7 +117,7 @@ curl http://${host_ip}:3001/embed \
     -H 'Content-Type: application/json'
 
 # embedding microservice
-curl http://${host_ip}:3002/v1/embeddings\
+curl http://${host_ip}:3002/v1/embeddings \
   -X POST \
   -d '{"text":"hello"}' \
   -H 'Content-Type: application/json'
@@ -134,13 +145,13 @@ curl http://${host_ip}:3005/v1/reranking\
 # tgi service
 curl http://${host_ip}:3006/generate \
   -X POST \
-  -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}' \
+  -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":100, "do_sample": true}}' \
   -H 'Content-Type: application/json'
 
 # llm microservice
 curl http://${host_ip}:3007/v1/chat/completions\
   -X POST \
-  -d '{"query":"What is Deep Learning?","max_tokens":17,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,"repetition_penalty":1.03,"stream":true}' \
+  -d '{"query":"What is Deep Learning?","max_tokens":100,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,"repetition_penalty":1.03,"stream":false}' \
   -H 'Content-Type: application/json'
 
 ```
@@ -150,6 +161,20 @@ curl http://${host_ip}:3007/v1/chat/completions\
 ```bash
 curl http://${host_ip}:3008/v1/searchqna -H "Content-Type: application/json" -d '{
      "messages": "What is the latest news? Give me also the source link.",
-     "stream": "True"
+     "stream": "False"
      }'
+
+##.  Access frontend
+
+A quick way to test the frontend with public URL is via Cloudflare TryCloudflare tunnel.
+
 ```
+sudo apt update
+sudo apt install -y wget
+wget https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
+sudo dpkg -i cloudflared-linux-amd64.deb
+
+cloudflared tunnel --url http://localhost:80
+```
+
+Alternatively a [gradio tunnel](https://console.cloud.intel.com/docs/tutorials/expose_app_tunnels.html) (see bottom).
