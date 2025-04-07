@@ -209,6 +209,7 @@ bash run_ingest_data.sh
 ## Launch the UI
 
 Open a web browser to http://localhost:5173 to access the UI.
+
 1. `create Admin Account` with a random value
 2. add opea agent endpoint `http://$ip_address:9090/v1` which is a openai compatible api
 
@@ -217,7 +218,6 @@ Open a web browser to http://localhost:5173 to access the UI.
 3. test opea agent with ui
 
 ![opea-agent-test](assets/img/opea-agent-test.png)
-
 
 ## [Optional] Deploy using Helm Charts
 
