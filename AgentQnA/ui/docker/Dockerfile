@@ -1,26 +1,35 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-# Use node 20.11.1 as the base image
-FROM node:20.11.1
+FROM python:3.11-slim
 
-# Update package manager and install Git
-RUN apt-get update -y && apt-get install -y git
+ENV LANG=C.UTF-8
+ARG ARCH=cpu
 
-# Copy the front-end code repository
-COPY svelte /home/user/svelte
+RUN apt-get update -y && apt-get install -y --no-install-recommends --fix-missing \
+    build-essential \
+    libgl1-mesa-glx \
+    libjemalloc-dev \
+    git
 
-# Set the working directory
-WORKDIR /home/user/svelte
 
-# Install front-end dependencies
-RUN npm install
+WORKDIR /root/
 
-# Build the front-end application
-RUN npm run build
+COPY open_webui_patches /root/patches
 
-# Expose the port of the front-end application
-EXPOSE 5173
+RUN git clone https://github.com/open-webui/open-webui.git && \
+    git config --global user.name "opea" && git config --global user.email "" && \
+    cd open-webui && git checkout v0.5.20 && \
+    git am ../patches/*.patch && \
+    pip install open-webui==0.5.20 && \
+    cp /root/open-webui/backend/open_webui/utils/middleware.py /usr/local/lib/python3.11/site-packages/open_webui/utils/middleware.py
+    #pip install -e .
 
-# Run the front-end application in preview mode
-CMD ["npm", "run", "preview", "--", "--port", "5173", "--host", "0.0.0.0"]
+ENV LANG=en_US.UTF-8
+
+WORKDIR /root/
+
+# CMD ["/bin/bash"]
+ENTRYPOINT ["open-webui", "serve"]
+
+
