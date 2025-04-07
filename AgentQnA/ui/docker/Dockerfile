@@ -21,9 +21,8 @@ RUN git clone https://github.com/open-webui/open-webui.git && \
     git config --global user.name "opea" && git config --global user.email "" && \
     cd open-webui && git checkout v0.5.20 && \
     git am ../patches/*.patch && \
-    pip install open-webui==0.5.20 && \
+    pip install --no-cache-dir open-webui==0.5.20 && \
     cp /root/open-webui/backend/open_webui/utils/middleware.py /usr/local/lib/python3.11/site-packages/open_webui/utils/middleware.py
-    #pip install -e .
 
 ENV LANG=en_US.UTF-8
 
