@@ -1,0 +1,43 @@
+# Copyright (C) 2025 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+# [IP_ADDR]:{PORT_OUTSIDE_CONTAINER} -> {PORT_INSIDE_CONTAINER} / {PROTOCOL}
+global:
+  scrape_interval: 5s
+  external_labels:
+    monitor: "my-monitor"
+scrape_configs:
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["prometheus:9090"]
+  - job_name: "vllm"
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["vllm-service:80"]
+  - job_name: "tgi"
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["tgi-service:80"]
+  - job_name: "tei-embedding"
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["tei-embedding-server:80"]
+  - job_name: "tei-reranking"
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["tei-reranking-server:80"]
+  - job_name: "retriever"
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["retriever-redis-server:7000"]
+  - job_name: "dataprep-redis-service"
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["dataprep-redis-server:5000"]
+  - job_name: "chatqna-backend-server"
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["chatqna-xeon-backend-server:8888"]
+  - job_name: "prometheus-node-exporter"
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["node-exporter:9100"]
