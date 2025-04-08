@@ -1,11 +1,7 @@
-# Copyright (C) 2024 Intel Corporation
+# Copyright (C) 2025 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-# Accelerate inferencing in heaviest components to improve performance
-# by overriding their subchart values
-
-image:
-  repository: opea/chatqna-without-rerank
+CHATQNA_TYPE: "CHATQNA_NO_RERANK"
 
 teirerank:
   enabled: false

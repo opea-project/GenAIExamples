@@ -1,0 +1,22 @@
+# Copyright (C) 2025 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+tgi:
+  enabled: false
+vllm:
+  enabled: true
+  LLM_MODEL_ID: "meta-llama/Meta-Llama-3-8B-Instruct"
+  extraCmdArgs: ["--max-seq_len-to-capture", "16384", "--enable-auto-tool-choice", "--tool-call-parser", "llama3_json"]
+
+supervisor:
+  llm_endpoint_url: http://{{ .Release.Name }}-vllm
+  llm_engine: vllm
+  model: "meta-llama/Meta-Llama-3-8B-Instruct"
+ragagent:
+  llm_endpoint_url: http://{{ .Release.Name }}-vllm
+  llm_engine: vllm
+  model: "meta-llama/Meta-Llama-3-8B-Instruct"
+sqlagent:
+  llm_endpoint_url: http://{{ .Release.Name }}-vllm
+  llm_engine: vllm
+  model: "meta-llama/Meta-Llama-3-8B-Instruct"

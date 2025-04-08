@@ -2,11 +2,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 tgi:
-  enabled: false
+  enabled: true
 vllm:
-  enabled: true
-
-speecht5:
-  enabled: true
-gpt-sovits:
   enabled: false
+llm-uservice:
+  TEXTGEN_BACKEND: TGI

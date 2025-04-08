@@ -2,4 +2,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 tgi:
-  LLM_MODEL_ID: mistralai/Mistral-7B-Instruct-v0.3
+  enabled: false
+vllm:
+  enabled: true
+llm-uservice:
+  TEXTGEN_BACKEND: vLLM

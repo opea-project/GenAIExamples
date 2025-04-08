@@ -1,9 +1,9 @@
 # Copyright (C) 2025 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-vllm:
-  enabled: true
 tgi:
+  enabled: true
+vllm:
   enabled: false
 lvm-uservice:
-  LVM_BACKEND: "vLLM"
+  LVM_BACKEND: "TGI"

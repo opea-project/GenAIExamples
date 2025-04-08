@@ -44,11 +44,6 @@ tgi:
   #    cpu: 6
   #    memory: 65Gi
 
-  livenessProbe:
-    initialDelaySeconds: 8
-    periodSeconds: 8
-    failureThreshold: 24
-    timeoutSeconds: 4
   readinessProbe:
     initialDelaySeconds: 16
     periodSeconds: 8
@@ -65,17 +60,12 @@ teirerank:
   # Potentially suitable values for scaling CPU TEI v1.5 with BAAI/bge-reranker-base model:
   resources:
     limits:
-      cpu: 4
+      cpu: 24
       memory: 30Gi
     requests:
       cpu: 2
       memory: 25Gi
 
-  livenessProbe:
-    initialDelaySeconds: 8
-    periodSeconds: 8
-    failureThreshold: 24
-    timeoutSeconds: 4
   readinessProbe:
     initialDelaySeconds: 8
     periodSeconds: 8
@@ -91,17 +81,12 @@ tei:
   # Potentially suitable values for scaling CPU TEI 1.5 with BAAI/bge-base-en-v1.5 model:
   resources:
     limits:
-      cpu: 4
+      cpu: 24
       memory: 4Gi
     requests:
       cpu: 2
       memory: 3Gi
 
-  livenessProbe:
-    initialDelaySeconds: 5
-    periodSeconds: 5
-    failureThreshold: 24
-    timeoutSeconds: 2
   readinessProbe:
     initialDelaySeconds: 5
     periodSeconds: 5
