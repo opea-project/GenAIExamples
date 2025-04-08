@@ -116,12 +116,12 @@ jobs:
         run: |
           sudo rm -rf ${{github.workspace}}/* || true
 
-          echo "clean up containers use ports ..."
+          echo "Cleaning up containers using ports..."
           cid=$(docker ps --format '{{.Names}} : {{.Ports}}' | grep -v ' : $' | grep -v 5000 | awk -F' : ' '{print $1}')
           if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid && sleep 1s; fi
           docker system prune -f
 
-          echo "clean up images ..."
+          echo "Cleaning up images ..."
           docker images --filter reference="*/*/*:latest" -q | xargs -r docker rmi && sleep 1s
           docker images --filter reference="*/*:ci" -q | xargs -r docker rmi && sleep 1s
           docker images --filter reference="*:5000/*/*" -q | xargs -r docker rmi && sleep 1s
