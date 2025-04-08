@@ -6,6 +6,8 @@
 # the all the containers, ports and networks directly.
 # So we need to use the following script to minimize the impact of the clean up.
 
+set -x
+
 test_case=${test_case:-"test_compose_on_gaudi.sh"}
 hardware=${hardware:-"gaudi"}
 flag=${test_case%_on_*}
