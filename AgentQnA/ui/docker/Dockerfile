@@ -35,13 +35,13 @@ ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 RUN git checkout v0.5.20 && \
     git am ../patches/*.patch && \
     python -m build && \
-    pip install --no-cache-dir dist/open_webui-0.5.20-py3-none-any.whl && \
-    cd ../ && rm -fr open-webui
-    
+    pip install --no-cache-dir dist/open_webui-0.5.20-py3-none-any.whl    
 
 ENV LANG=en_US.UTF-8
 
 WORKDIR /root/
+
+RUN rm -fr /root/open-webui
 
 # CMD ["/bin/bash"]
 ENTRYPOINT ["open-webui", "serve"]
