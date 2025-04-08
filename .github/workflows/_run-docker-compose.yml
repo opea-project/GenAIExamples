@@ -141,6 +141,12 @@ jobs:
           bash ${{ github.workspace }}/.github/workflows/scripts/docker_compose_clean_up.sh "ports"
           docker ps
 
+      - name: Log in DockerHub
+        uses: docker/login-action@v3.2.0
+        with:
+          username: ${{ secrets.DOCKERHUB_USER }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
       - name: Run test
         shell: bash
         env:
