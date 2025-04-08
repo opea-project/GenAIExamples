@@ -26,13 +26,13 @@ services:
   whisper-gaudi:
     build:
       context: GenAIComps
-      dockerfile: comps/asr/src/integrations/dependency/whisper/Dockerfile.intel_hpu
+      dockerfile: comps/third_parties/whisper/src/Dockerfile.intel_hpu
     extends: audioqna
     image: ${REGISTRY:-opea}/whisper-gaudi:${TAG:-latest}
   whisper:
     build:
       context: GenAIComps
-      dockerfile: comps/asr/src/integrations/dependency/whisper/Dockerfile
+      dockerfile: comps/third_parties/whisper/src/Dockerfile
     extends: audioqna
     image: ${REGISTRY:-opea}/whisper:${TAG:-latest}
   asr:
@@ -50,13 +50,13 @@ services:
   speecht5-gaudi:
     build:
       context: GenAIComps
-      dockerfile: comps/tts/src/integrations/dependency/speecht5/Dockerfile.intel_hpu
+      dockerfile: comps/third_parties/speecht5/src/Dockerfile.intel_hpu
     extends: audioqna
     image: ${REGISTRY:-opea}/speecht5-gaudi:${TAG:-latest}
   speecht5:
     build:
       context: GenAIComps
-      dockerfile: comps/tts/src/integrations/dependency/speecht5/Dockerfile
+      dockerfile: comps/third_parties/speecht5/src/Dockerfile
     extends: audioqna
     image: ${REGISTRY:-opea}/speecht5:${TAG:-latest}
   tts:
@@ -68,7 +68,7 @@ services:
   gpt-sovits:
     build:
       context: GenAIComps
-      dockerfile: comps/tts/src/integrations/dependency/gpt-sovits/Dockerfile
+      dockerfile: comps/third_parties/gpt-sovits/src/Dockerfile
     extends: audioqna
     image: ${REGISTRY:-opea}/gpt-sovits:${TAG:-latest}
   vllm:
