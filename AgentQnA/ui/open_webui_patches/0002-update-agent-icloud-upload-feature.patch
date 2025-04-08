@@ -1,0 +1,531 @@
+From 8ad31e50644eab3c9e698d7828b1857919887841 Mon Sep 17 00:00:00 2001
+From: lkk12014402 <kaokao.lv@intel.com>
+Date: Tue, 8 Apr 2025 03:38:09 +0000
+Subject: [PATCH 2/2] update agent icloud upload feature
+
+---
+ src/lib/apis/knowledge/index.ts               |  60 +++++++
+ .../admin/Settings/Connections.svelte         |  50 +++++-
+ .../components/icons/UploadCloudIcon.svelte   |  18 ++
+ src/lib/components/workspace/Knowledge.svelte |  57 +++++-
+ .../KnowledgeBase/AddIcloudContentMenu.svelte | 164 ++++++++++++++++++
+ .../KnowledgeBase/IcloudFiles.svelte          |  37 ++++
+ src/lib/i18n/locales/zh-CN/translation.json   |  15 +-
+ 7 files changed, 396 insertions(+), 5 deletions(-)
+ create mode 100644 src/lib/components/icons/UploadCloudIcon.svelte
+ create mode 100644 src/lib/components/workspace/Knowledge/KnowledgeBase/AddIcloudContentMenu.svelte
+ create mode 100644 src/lib/components/workspace/Knowledge/KnowledgeBase/IcloudFiles.svelte
+
+diff --git a/src/lib/apis/knowledge/index.ts b/src/lib/apis/knowledge/index.ts
+index c5fad1323..32be528a7 100644
+--- a/src/lib/apis/knowledge/index.ts
++++ b/src/lib/apis/knowledge/index.ts
+@@ -345,3 +345,63 @@ export const deleteKnowledgeById = async (token: string, id: string) => {
+ 
+ 	return res;
+ };
++
++export const getIcloudFiles = async (ICLOUD_BASE_URLS: string) => {
++	let error = null;
++
++	const res = await fetch(`${ICLOUD_BASE_URLS}/dataprep/get`, {
++		method: 'POST',
++		headers: {
++			Accept: 'application/json',
++			'Content-Type': 'application/json',
++		}
++	})
++		.then(async (res) => {
++			if (!res.ok) throw await res.json();
++			return res.json();
++		})
++		.then((json) => {
++			return json;
++		})
++		.catch((err) => {
++			error = err.detail;
++
++			console.log(err);
++			return null;
++		});
++
++	if (error) {
++		throw error;
++	}
++
++	return res;
++};
++
++export const updateIcloudFiles = async (ICLOUD_BASE_URLS: string, formData: any) => {
++	let error = null;
++
++	const res = await fetch(`${ICLOUD_BASE_URLS}/dataprep/ingest`, {
++		method: 'POST',
++		body: formData
++	})
++		.then(async (res) => {
++			if (!res.ok) throw await res.json();
++			return res.json();
++		})
++		.then((json) => {
++			return json;
++		})
++		.catch((err) => {
++			error = err.detail;
++
++			console.log(err);
++			return null;
++		});
++
++	if (error) {
++		throw error;
++	}
++
++	return res;
++};
++
+diff --git a/src/lib/components/admin/Settings/Connections.svelte b/src/lib/components/admin/Settings/Connections.svelte
+index 2fcfadaec..3237744d5 100644
+--- a/src/lib/components/admin/Settings/Connections.svelte
++++ b/src/lib/components/admin/Settings/Connections.svelte
+@@ -47,6 +47,9 @@
+ 	let showAddOpenAIConnectionModal = false;
+ 	let showAddOllamaConnectionModal = false;
+ 
++	let ENABLE_ICLOUD_API: null | boolean = (localStorage.getItem('ENABLE_ICLOUD_API') === "enable");
++	let ICLOUD_BASE_URL = localStorage.getItem('ICLOUD_BASE_URL') || '';
++
+ 	const updateOpenAIHandler = async () => {
+ 		if (ENABLE_OPENAI_API !== null) {
+ 			// Remove trailing slashes
+@@ -193,10 +196,22 @@
+ 		}
+ 	});
+ 
++	const updateIcloudHandler = async () => {
++		if (ENABLE_ICLOUD_API) {
++			localStorage.setItem('ICLOUD_BASE_URL', ICLOUD_BASE_URL);
++			localStorage.setItem('ENABLE_ICLOUD_API', "enable");
++		} else {
++			localStorage.setItem('ICLOUD_BASE_URL', '');
++			localStorage.setItem('ENABLE_ICLOUD_API', "");
++		}
++		toast.success($i18n.t('Icloud API settings updated'));
++	};
++
+ 	const submitHandler = async () => {
+ 		updateOpenAIHandler();
+ 		updateOllamaHandler();
+ 		updateDirectConnectionsHandler();
++		updateIcloudHandler();
+ 
+ 		dispatch('save');
+ 	};
+@@ -301,7 +316,7 @@
+ 				</div>
+ 
+ 				{#if ENABLE_OLLAMA_API}
+-					<hr class=" border-gray-100 dark:border-gray-850 my-2" />
++					<hr class=" border-gray-100 dark:border-gray-850" />
+ 
+ 					<div class="">
+ 						<div class="flex justify-between items-center">
+@@ -358,6 +373,39 @@
+ 				{/if}
+ 			</div>
+ 
++			<hr class=" border-gray-50 dark:border-gray-850" />
++
++			<div class="pr-1.5 my-2">
++				<div class="flex justify-between items-center text-sm">
++					<div class="font-medium">{$i18n.t('Icloud File API')}</div>
++
++					<div class="mt-1">
++						<Switch 
++							bind:state={ENABLE_ICLOUD_API} 
++							on:change={async () => {
++								updateIcloudHandler();
++							}}
++						/>
++					</div>
++				</div>
++
++				{#if ENABLE_ICLOUD_API}
++					<hr class=" border-gray-50 dark:border-gray-850 my-2" />
++
++					<div class="">
++						<div class="flex w-full gap-1.5">
++							<div class="flex-1 flex flex-col gap-1.5">
++								<input
++									class="w-full text-sm bg-transparent outline-none"
++									placeholder={$i18n.t('Enter Icloud URL(e.g.') + 'http://localhost:6007/v1)'}
++									bind:value={ICLOUD_BASE_URL}
++								/>
++							</div>
++						</div>
++					</div>
++				{/if}
++			</div>
++
+ 			<hr class=" border-gray-100 dark:border-gray-850" />
+ 
+ 			<div class="pr-1.5 my-2">
+diff --git a/src/lib/components/icons/UploadCloudIcon.svelte b/src/lib/components/icons/UploadCloudIcon.svelte
+new file mode 100644
+index 000000000..eed3bd582
+--- /dev/null
++++ b/src/lib/components/icons/UploadCloudIcon.svelte
+@@ -0,0 +1,18 @@
++<script lang="ts">
++	export let className = 'w-4 h-4';
++</script>
++
++<svg
++	t="1744007283647"
++	viewBox="0 0 1491 1024"
++	version="1.1"
++	xmlns="http://www.w3.org/2000/svg"
++	p-id="1630"
++	class = {className}
++	><path
++		d="M546.047379 263.651842s-90.221363-91.423424-212.63125-16.762074c-109.521121 71.300031-90.154581 201.768179-90.154582 201.76818S0 498.498962 0 759.902727c5.431535 261.003078 264.186314 263.674325 264.186314 263.674326l388.443814 0.422947V744.565318H466.355181l279.434681-279.412421 279.390161 279.412421h-186.297208V1024l377.157796-0.422947s240.812904 0.222604 274.648698-248.092052c16.094262-271.576764-232.754643-325.113003-232.754643-325.113003S1286.205362 48.327085 936.761752 2.470681C637.181417-29.740104 546.047379 263.651842 546.047379 263.651842z"
++		fill="#507BFC"
++		p-id="1631"
++	></path></svg
++>
++
+diff --git a/src/lib/components/workspace/Knowledge.svelte b/src/lib/components/workspace/Knowledge.svelte
+index 57d45312d..43a1f305e 100644
+--- a/src/lib/components/workspace/Knowledge.svelte
++++ b/src/lib/components/workspace/Knowledge.svelte
+@@ -13,7 +13,8 @@
+ 	import {
+ 		getKnowledgeBases,
+ 		deleteKnowledgeById,
+-		getKnowledgeBaseList
++		getKnowledgeBaseList,
++		getIcloudFiles
+ 	} from '$lib/apis/knowledge';
+ 
+ 	import { goto } from '$app/navigation';
+@@ -26,6 +27,11 @@
+ 	import Spinner from '../common/Spinner.svelte';
+ 	import { capitalizeFirstLetter } from '$lib/utils';
+ 	import Tooltip from '../common/Tooltip.svelte';
++	import AddIcloudConnectionModal from '$lib/components/workspace/Knowledge/KnowledgeBase/AddIcloudContentMenu.svelte';
++	import IcloudFiles from '$lib/components/workspace/Knowledge/KnowledgeBase/IcloudFiles.svelte';
++
++	let showAddTextContentModal = false;
++	let IcloudFile = [];
+ 
+ 	let loaded = false;
+ 
+@@ -65,9 +71,26 @@
+ 	};
+ 
+ 	onMount(async () => {
++		await updateIcloudFiles();
++
+ 		knowledgeBases = await getKnowledgeBaseList(localStorage.token);
+ 		loaded = true;
+ 	});
++
++	async function updateIcloudFiles() {
++		let ICLOUD_BASE_URL = localStorage.getItem('ICLOUD_BASE_URL') || '';
++		console.log('ICLOUD_BASE_URL', ICLOUD_BASE_URL);
++		
++		if (ICLOUD_BASE_URL !== '') {
++			const res = await getIcloudFiles(ICLOUD_BASE_URL).catch((e) => {
++				toast.error(`${e}`);
++			});
++
++			if (res) {
++				IcloudFile = res;
++			}
++		}
++	}
+ </script>
+ 
+ <svelte:head>
+@@ -187,11 +210,39 @@
+ 		{/each}
+ 	</div>
+ 
+-	<div class=" text-gray-500 text-xs mt-1 mb-2">
+-		ⓘ {$i18n.t("Use '#' in the prompt input to load and include your knowledge.")}
++	<div class="flex justify-between items-center">
++		<div class="flex md:self-center text-xl font-medium px-0.5 items-center">
++			{$i18n.t('Icloud Knowledge')}
++			<div class="flex self-center w-[1px] h-6 mx-2.5 bg-gray-50 dark:bg-gray-850" />
++			<span class="text-lg font-medium text-gray-500 dark:text-gray-300">{IcloudFile.length}</span>
++		</div>
++		<div>
++			<button
++				class=" px-2 py-2 rounded-xl hover:bg-gray-700/10 dark:hover:bg-gray-100/10 dark:text-gray-300 dark:hover:text-white transition font-medium text-sm flex items-center space-x-1"
++				aria-label={$i18n.t('Upload to Icloud')}
++				on:click={() => {
++					showAddTextContentModal = !showAddTextContentModal;
++				}}
++			>
++				<Plus className="size-3.5" />
++			</button>
++		</div>
++	</div>
++	<hr class="border-gray-100 dark:border-gray-850 my-2" />
++	<div class=" flex overflow-y-auto w-full h-[15rem] scrollbar-hidden text-xs">
++		<IcloudFiles files={IcloudFile} />
+ 	</div>
+ {:else}
+ 	<div class="w-full h-full flex justify-center items-center">
+ 		<Spinner />
+ 	</div>
+ {/if}
++
++<AddIcloudConnectionModal
++	bind:show={showAddTextContentModal}
++	on:updateIcloudFile={async (e) => {
++		if (e.detail.status) {
++			await updateIcloudFiles();
++		}
++	}}
++/>
+diff --git a/src/lib/components/workspace/Knowledge/KnowledgeBase/AddIcloudContentMenu.svelte b/src/lib/components/workspace/Knowledge/KnowledgeBase/AddIcloudContentMenu.svelte
+new file mode 100644
+index 000000000..fb906a0d3
+--- /dev/null
++++ b/src/lib/components/workspace/Knowledge/KnowledgeBase/AddIcloudContentMenu.svelte
+@@ -0,0 +1,164 @@
++<script lang="ts">
++	import { toast } from 'svelte-sonner';
++	import { getContext, onMount, createEventDispatcher } from 'svelte';
++	import Modal from '$lib/components/common/Modal.svelte';
++	import UploadCloudIcon from '$lib/components/icons/UploadCloudIcon.svelte';
++	import Spinner from '$lib/components/common/Spinner.svelte';
++	import { updateIcloudFiles } from '$lib/apis/knowledge';
++
++	const i18n = getContext('i18n');
++	const dispatch = createEventDispatcher();
++
++	export let show = false;
++
++	let url = '';
++
++	let loading = false;
++
++	let selectedFile = null;
++
++	function handleFileSelect(event) {
++		selectedFile = event.target.files[0];
++	}
++
++	function parseAndValidateUrls(normalizedInput: string): string[] {
++		return normalizedInput
++			.split(',')
++			.map((candidate) => {
++				const processed = candidate.replace(/^["']+|["']+$/g, '').trim();
++
++				try {
++					new URL(processed);
++					return processed;
++				} catch {
++					return null;
++				}
++			})
++			.filter((url): url is string => url !== null);
++	}
++
++	async function submitHandler() {
++		loading = true;
++
++		if (!url && !selectedFile) {
++			loading = false;
++			show = false;
++
++			toast.error($i18n.t('URL or File are required'));
++			return;
++		}
++		if (url && selectedFile) {
++			loading = false;
++			show = false;
++
++			toast.error($i18n.t('Upload file or enter URL'));
++			url = '';
++			selectedFile = null;
++			return;
++		}
++
++		const formData = new FormData();
++		if (url) {
++			formData.append('link_list', JSON.stringify(parseAndValidateUrls(url)));
++		}
++		if (selectedFile) {
++			formData.append('files', selectedFile, selectedFile.name);
++		}
++		let ICLOUD_BASE_URL = localStorage.getItem('ICLOUD_BASE_URL') || '';
++		console.log('ICLOUD_BASE_URL', ICLOUD_BASE_URL);
++
++		if (ICLOUD_BASE_URL !== '') {
++			const res = await updateIcloudFiles(ICLOUD_BASE_URL, formData).catch((e) => {
++				toast.error(`${e}`);
++
++				return;
++			});
++
++			if (res) {
++				toast.success($i18n.t('Upload Succeed'));
++				dispatch('updateIcloudFile', { status: true });
++			}
++
++			url = '';
++			selectedFile = null;
++			loading = false;
++			show = false;
++		}
++	}
++</script>
++
++<Modal size="sm" bind:show>
++	<div class="flex flex-col justify-end">
++		<div class=" flex justify-between dark:text-gray-100 px-5 pt-4 pb-2">
++			<div class="flex-col text-lg font-medium self-center font-primary">
++				{$i18n.t('Upload Icloud file')}
++				<span class="text-sm text-gray-500">- {$i18n.t('choose URL or local file')}</span>
++			</div>
++
++			<button
++				class="self-center"
++				on:click={() => {
++					show = false;
++				}}
++			>
++				<svg
++					xmlns="http://www.w3.org/2000/svg"
++					viewBox="0 0 20 20"
++					fill="currentColor"
++					class="w-5 h-5"
++				>
++					<path
++						d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z"
++					/>
++				</svg>
++			</button>
++		</div>
++
++		<div class="flex flex-col md:flex-row w-full px-4 pb-4 md:space-x-4 dark:text-gray-200">
++			<div class=" flex flex-col w-full sm:flex-row sm:justify-center sm:space-x-6">
++				<div class="flex items-center w-full">
++					<div class="flex-1 min-w-0 mr-2">
++						<div class="flex flex-col w-full my-8 mx-2">
++							<input
++								class="w-full text-sm bg-transparent placeholder:text-gray-300 outline-none border-b-solid border-b-2 border-blue-500 rounded p-2"
++								type="text"
++								bind:value={url}
++								placeholder={$i18n.t('Upload from URL')}
++							/>
++						</div>
++					</div>
++
++					<div class="flex-none w-[1px] h-[60%] mx-2.5 bg-gray-300"></div>
++
++					<div class="flex-1 min-w-0">
++						<input type="file" id="fileInput" hidden on:change={handleFileSelect} />
++
++						<label
++							for="fileInput"
++							class="cursor-pointer flex flex-col items-center hover:bg-gray-100 rounded-lg p-2 transition-colors"
++						>
++							<UploadCloudIcon className="w-12 h-12 text-gray-500" />
++							<div class="text-xs text-gray-500 pt-2">
++								{selectedFile ? selectedFile.name : '点击上传文件'}
++							</div>
++						</label>
++					</div>
++				</div>
++			</div>
++		</div>
++		{#if loading}
++			<Spinner className="my-4 size-4" />
++		{:else}
++			<button
++				class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded text-sm"
++				on:click={(e) => {
++					e.preventDefault();
++					submitHandler();
++				}}
++			>
++				{$i18n.t('Upload Confirm')}
++			</button>
++		{/if}
++	</div>
++</Modal>
++
+diff --git a/src/lib/components/workspace/Knowledge/KnowledgeBase/IcloudFiles.svelte b/src/lib/components/workspace/Knowledge/KnowledgeBase/IcloudFiles.svelte
+new file mode 100644
+index 000000000..d6490dce2
+--- /dev/null
++++ b/src/lib/components/workspace/Knowledge/KnowledgeBase/IcloudFiles.svelte
+@@ -0,0 +1,37 @@
++<script lang="ts">
++	export let selectedFileId = null;
++	export let files = [];
++
++	export let small = false;
++</script>
++
++<div class="max-h-full flex flex-col w-full">
++	{#each files as file}
++		<div class="mt-1 px-2 flex hover:bg-gray-50 transition">
++			<div class="p-3 bg-black/20 dark:bg-white/10 text-white rounded-xl my-2">
++				<svg
++					xmlns="http://www.w3.org/2000/svg"
++					viewBox="0 0 24 24"
++					fill="currentColor"
++					class=" size-3"
++				>
++					<path
++						fill-rule="evenodd"
++						d="M5.625 1.5c-1.036 0-1.875.84-1.875 1.875v17.25c0 1.035.84 1.875 1.875 1.875h12.75c1.035 0 1.875-.84 1.875-1.875V12.75A3.75 3.75 0 0 0 16.5 9h-1.875a1.875 1.875 0 0 1-1.875-1.875V5.25A3.75 3.75 0 0 0 9 1.5H5.625ZM7.5 15a.75.75 0 0 1 .75-.75h7.5a.75.75 0 0 1 0 1.5h-7.5A.75.75 0 0 1 7.5 15Zm.75 2.25a.75.75 0 0 0 0 1.5H12a.75.75 0 0 0 0-1.5H8.25Z"
++						clip-rule="evenodd"
++					/>
++					<path
++						d="M12.971 1.816A5.23 5.23 0 0 1 14.25 5.25v1.875c0 .207.168.375.375.375H16.5a5.23 5.23 0 0 1 3.434 1.279 9.768 9.768 0 0 0-6.963-6.963Z"
++					/>
++				</svg>
++			</div>
++
++			<div class="flex flex-col justify-center -space-y-0.5 px-2.5 w-full">
++				<div class=" dark:text-gray-100 text-sm font-medium line-clamp-1 mb-1">
++					{file.name}
++				</div>
++			</div>
++		</div>
++	{/each}
++</div>
++
+diff --git a/src/lib/i18n/locales/zh-CN/translation.json b/src/lib/i18n/locales/zh-CN/translation.json
+index ebb53a1b5..d6b72e04d 100644
+--- a/src/lib/i18n/locales/zh-CN/translation.json
++++ b/src/lib/i18n/locales/zh-CN/translation.json
+@@ -1174,5 +1174,18 @@
+ 	"Your entire contribution will go directly to the plugin developer; Open WebUI does not take any percentage. However, the chosen funding platform might have its own fees.": "您的全部捐款将直接给到插件开发者，Open WebUI 不会收取任何比例。但众筹平台可能会有服务费、抽成。",
+ 	"Youtube": "YouTube",
+ 	"Youtube Language": "Youtube 语言",
+-	"Youtube Proxy URL": "Youtube 代理 URL"
++	"Youtube Proxy URL": "Youtube 代理 URL",
++	"Upload Icloud file": "上传到云端",
++	"choose URL or local file": "选择URL或本地文件",
++	"Upload from URL": "从URL上传",
++	"Upload Confirm": "确认上传",
++	"URL or File are required": "未上传文件",
++	"Upload file or enter URL": "文件与URL不能同时提交",
++	"Icloud File": "云端文件",
++	"Icloud File API": "云端存储API",
++	"Enter Icloud URL(e.g.": "输入云端存储URL（例如.",
++	"Upload to Icloud": "上传到云端",
++	"Icloud Knowledge": "云端数据库",
++	"Upload Succeed": "上传文件成功",
++	"Icloud API settings updated": "云端存储API设置已更新"
+ }
+-- 
+2.34.1
+

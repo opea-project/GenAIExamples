@@ -1,0 +1,31 @@
+From 36d61dab9306cb8f12c4497a32781d84f8cfb2e7 Mon Sep 17 00:00:00 2001
+From: lkk12014402 <kaokao.lv@intel.com>
+Date: Tue, 8 Apr 2025 07:22:36 +0000
+Subject: [PATCH 4/4] enhance tool formatting
+
+---
+ backend/open_webui/utils/middleware.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/backend/open_webui/utils/middleware.py b/backend/open_webui/utils/middleware.py
+index fddbe8ee1..9e44ed91a 100644
+--- a/backend/open_webui/utils/middleware.py
++++ b/backend/open_webui/utils/middleware.py
+@@ -1142,12 +1142,12 @@ async def process_chat_response(
+                                 result_display_content = f"{result_display_content}\n> {tool_name}: {result.get('content', '')}"
+ 
+                             if not raw:
+-                                content = f'{content}\n<details type="tool_calls" done="true" content="{html.escape(json.dumps(block_content))}" results="{html.escape(json.dumps(results))}">\n<summary>Tool Executed</summary>\n{result_display_content}\n</details>\n'
++                                content = f'{content}\n<details type="tool_calls" done="true" content="{html.escape(json.dumps(block_content))}" results="{html.escape(json.dumps(results))}">\n<summary> Tool: {tool_call.get('function', {}).get('name', '')} Executed</summary>\n{result_display_content}\n</details>\n'
+                         else:
+                             tool_calls_display_content = ""
+ 
+                             for tool_call in block_content:
+-                                tool_calls_display_content = f"{tool_calls_display_content}\n> Executing {tool_call.get('function', {}).get('name', '')}"
++                                tool_calls_display_content = f"{tool_calls_display_content}\n> Executing Tool: {tool_call.get('function', {}).get('name', '')}"
+ 
+                             if not raw:
+                                 content = f'{content}\n<details type="tool_calls" done="false" content="{html.escape(json.dumps(block_content))}">\n<summary>Tool Executing...</summary>\n{tool_calls_display_content}\n</details>\n'
+-- 
+2.34.1
+
