@@ -44,7 +44,7 @@ services:
   lvm-video-llama:
     build:
       context: GenAIComps
-      dockerfile: comps/lvms/src/integrations/dependency/video-llama/Dockerfile
+      dockerfile: comps/third_parties/video-llama/src/Dockerfile
     extends: videoqna
     image: ${REGISTRY:-opea}/lvm-video-llama:${TAG:-latest}
   lvm:
