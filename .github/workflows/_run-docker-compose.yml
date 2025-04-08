@@ -185,6 +185,8 @@ jobs:
         shell: bash
         if: cancelled() || failure()
         run: |
+          set -x 
+          
           cd ${{ github.workspace }}/${{ inputs.example }}
           export test_case=${{ matrix.test_case }}
           export hardware=${{ inputs.hardware }}
