@@ -41,7 +41,7 @@ ENV LANG=en_US.UTF-8
 
 WORKDIR /root/
 
-RUN rm -fr /root/open-webui
+RUN rm -fr /root/open-webui && rm -fr /root/patches
 
 # CMD ["/bin/bash"]
 ENTRYPOINT ["open-webui", "serve"]
