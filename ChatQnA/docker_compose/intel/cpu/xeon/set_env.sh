@@ -27,6 +27,8 @@ export CHATQNA_REDIS_VECTOR_PORT=6379
 export CHATQNA_REDIS_VECTOR_INSIGHT_PORT=8001
 export CHATQNA_FRONTEND_SERVICE_PORT=5173
 export FAQGen_COMPONENT_NAME="OpeaFaqGenvLLM"
+export LLM_FAQGen_SERVER_PORT=9000
+export LLM_FAQGen_HOST_PORT=9000
 export LLM_ENDPOINT="http://${host_ip}:${LLM_ENDPOINT_PORT}"
 pushd "grafana/dashboards" > /dev/null
 source download_opea_dashboard.sh
