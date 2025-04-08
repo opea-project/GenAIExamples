@@ -120,7 +120,7 @@ jobs:
           cid=$(docker ps --format '{{.Names}} : {{.Ports}}' | grep -v ' : $' | grep -v 5000 | awk -F' : ' '{print $1}')
           if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid && sleep 1s; fi
           docker system prune -f
-          
+
           echo "clean up images ..."
           img=$(docker images --filter reference="*/*/*:latest" -q)
           if [[ ! -z "$img" ]]; then docker rmi $img && sleep 1s; fi
@@ -128,7 +128,7 @@ jobs:
           if [[ ! -z "$img" ]]; then docker rmi $img && sleep 1s; fi
           img=$(docker images --filter reference="*:5000/*/*" -q)
           if [[ ! -z "$img" ]]; then docker rmi $img && sleep 1s; fi
-          docker images 
+          docker images
 
       - name: Checkout out Repo
         uses: actions/checkout@v4
