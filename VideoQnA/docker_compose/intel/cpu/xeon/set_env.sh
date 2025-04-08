@@ -29,7 +29,8 @@ export VDMS_HOST=${host_ip}
 export BACKEND_PORT=8888
 export DATAPREP_PORT=6007
 export EMBEDDER_PORT=6990
-export LVM_PORT=9399 # 9000, 9399
+export MULTIMODAL_CLIP_EMBEDDER_PORT=6991
+export LVM_PORT=9399
 export RERANKING_PORT=8000
 export RETRIEVER_PORT=7000
 export UI_PORT=5173
@@ -38,9 +39,10 @@ export VIDEO_LLAMA_PORT=9009
 
 export BACKEND_HEALTH_CHECK_ENDPOINT="http://${host_ip}:${BACKEND_PORT}/v1/health_check"
 export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:${BACKEND_PORT}/v1/videoqna"
+export CLIP_EMBEDDING_ENDPOINT="http://${host_ip}:${MULTIMODAL_CLIP_EMBEDDER_PORT}"
 export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:${DATAPREP_PORT}/v1/dataprep/get"
 export DATAPREP_GET_VIDEO_LIST_ENDPOINT="http://${host_ip}:${DATAPREP_PORT}/v1/dataprep/get_videos"
-export DATAPREP_INGEST_SERVICE_ENDPOINT="http://${host_ip}:${DATAPREP_PORT}/v1/dataprep/ingest"
+export DATAPREP_INGEST_SERVICE_ENDPOINT="http://${host_ip}:${DATAPREP_PORT}/v1/dataprep/ingest_videos"
 export EMBEDDING_ENDPOINT="http://${host_ip}:${EMBEDDER_PORT}/v1/embeddings"
 export FRONTEND_ENDPOINT="http://${host_ip}:${UI_PORT}/_stcore/health"
 export LVM_ENDPOINT="http://${host_ip}:${VIDEO_LLAMA_PORT}"
@@ -50,4 +52,4 @@ export RETRIEVER_ENDPOINT="http://${host_ip}:${RETRIEVER_PORT}/v1/retrieval"
 export TEI_RERANKING_ENDPOINT="http://${host_ip}:${TEI_RERANKING_PORT}"
 export UI_ENDPOINT="http://${host_ip}:${UI_PORT}/_stcore/health"
 
-export no_proxy="${NO_PROXY},${host_ip},vdms-vector-db,dataprep-vdms-server,clip-embedding-server,multimodal-clip-embedding,reranking-tei-server,retriever-vdms-server,lvm-video-llama,lvm,videoqna-xeon-backend-server,videoqna-xeon-ui-server"
+export no_proxy="${NO_PROXY},${host_ip},vdms-vector-db,dataprep-vdms-server,clip-embedding-server,reranking-tei-server,retriever-vdms-server,lvm-video-llama,lvm,videoqna-xeon-backend-server,videoqna-xeon-ui-server"
