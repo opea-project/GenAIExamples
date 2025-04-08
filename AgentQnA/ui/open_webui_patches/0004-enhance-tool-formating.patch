@@ -1,7 +1,7 @@
 From 36d61dab9306cb8f12c4497a32781d84f8cfb2e7 Mon Sep 17 00:00:00 2001
 From: lkk12014402 <kaokao.lv@intel.com>
 Date: Tue, 8 Apr 2025 07:22:36 +0000
-Subject: [PATCH 4/4] enhance tool formating
+Subject: [PATCH 4/4] enhance tool formatting
 
 ---
  backend/open_webui/utils/middleware.py | 4 ++--
