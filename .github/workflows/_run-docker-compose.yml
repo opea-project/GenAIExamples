@@ -116,13 +116,16 @@ jobs:
         run: |
           sudo rm -rf ${{github.workspace}}/* || true
 
-          # clean up containers use ports
+          echo "Cleaning up containers using ports..."
           cid=$(docker ps --format '{{.Names}} : {{.Ports}}' | grep -v ' : $' | grep -v 5000 | awk -F' : ' '{print $1}')
           if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid && sleep 1s; fi
-
           docker system prune -f
-          docker rmi $(docker images --filter reference="*/*/*:latest" -q) || true
-          docker rmi $(docker images --filter reference="*/*:ci" -q) || true
+
+          echo "Cleaning up images ..."
+          docker images --filter reference="*/*/*:latest" -q | xargs -r docker rmi && sleep 1s
+          docker images --filter reference="*/*:ci" -q | xargs -r docker rmi && sleep 1s
+          docker images --filter reference="*:5000/*/*" -q | xargs -r docker rmi && sleep 1s
+          docker images
 
       - name: Checkout out Repo
         uses: actions/checkout@v4
@@ -182,17 +185,15 @@ jobs:
         shell: bash
         if: cancelled() || failure()
         run: |
+          set -x
+
           cd ${{ github.workspace }}/${{ inputs.example }}
           export test_case=${{ matrix.test_case }}
           export hardware=${{ inputs.hardware }}
           bash ${{ github.workspace }}/.github/workflows/scripts/docker_compose_clean_up.sh "containers"
-
-          # clean up containers use ports
-          cid=$(docker ps --format '{{.Names}} : {{.Ports}}' | grep -v ' : $' | grep -v 5000 | awk -F' : ' '{print $1}')
-          if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid && sleep 1s; fi
+          echo "Finish docker clean up."
 
           docker system prune -f
-          docker rmi $(docker images --filter reference="*:5000/*/*" -q) || true
 
       - name: Publish pipeline artifact
         if: ${{ !cancelled() }}
