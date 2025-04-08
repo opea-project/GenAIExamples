@@ -106,12 +106,10 @@ services:
   agent-ui:
     image: opea/agent-ui
     container_name: agent-ui
-    volumes:
-      - ${WORKDIR}/GenAIExamples/AgentQnA/ui/svelte/.env:/home/user/svelte/.env
     environment:
       host_ip: ${host_ip}
     ports:
-      - "5173:5173"
+      - "5173:8080"
     ipc: host
   vllm-service:
     image: ${REGISTRY:-opea}/vllm-gaudi:${TAG:-latest}
