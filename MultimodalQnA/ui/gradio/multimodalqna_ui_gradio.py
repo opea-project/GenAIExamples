@@ -39,6 +39,12 @@ h1 {
     text-align: center;
     display:block;
 }
+
+#cbg .wrap {
+    display: flex; 
+    flex-direction: column; 
+    align-items: start; 
+}
 """
 tmp_upload_folder = "/tmp/gradio/"
 
@@ -501,27 +507,36 @@ def get_files():
     try:
         response = requests.post(dataprep_get_file_addr, headers=headers)
         logger.info(response.status_code)
-        files = response.json()
-        if files:
-            html_content = "<ul>" + "".join(f"<li>{item}</li>" for item in files) + "</ul>"
-            yield (gr.HTML(html_content, visible=True, max_height=200))
+        vector_store_files = response.json()
+        if vector_store_files:
+            yield (
+                vector_store_files,
+                None,
+                gr.CheckboxGroup(vector_store_files, label=f"Total files: {len(vector_store_files)}", elem_id="cbg", visible=True)
+            )
             return
         else:
-            yield (gr.HTML("Vector store is empty.", visible=True))
+            yield (None, gr.Markdown("**Vector store is empty**"), None)
             return
     except Exception as e:
         logger.info(f"Error getting files from vector store: {str(e)}")
 
 
-def delete_files():
+def delete_files(options, selected):
     import json
 
-    data = {"file_path": "all"}
+    updated_options = [f for f in options if f not in selected]
+    
+    data = {"file_path": selected}
     try:
         response = requests.post(dataprep_delete_file_addr, headers=headers, data=json.dumps(data))
         logger.info(response.status_code)
-        yield (gr.update(value="Deleted all files!"))
-        return
+        return (
+            updated_options,
+            gr.Markdown(f"**Deleted {len(selected)} files**"),
+            gr.CheckboxGroup(choices=updated_options, label=f"Total files: {len(updated_options)}", visible=True, elem_id="cbg"),
+            []
+        )
     except Exception as e:
         logger.info(f"Error deleting files from vector store: {str(e)}")
 
@@ -712,15 +727,19 @@ with gr.Blocks() as qna:
 
 with gr.Blocks() as vector_store:
     gr.Markdown("# Uploaded Files")
+    
+    state = gr.State([])
 
     with gr.Row():
         with gr.Column(scale=6):
-            files = gr.HTML(visible=False)
+            selection_text = gr.Markdown("**Hit \"↻ Refresh\" to show uploaded files**")
+            files_cbg = gr.CheckboxGroup(choices=[], visible=False, elem_id="cbg")
         with gr.Column(scale=3):
             refresh_btn = gr.Button(value="↻ Refresh", interactive=True, variant="primary")
             delete_btn = gr.Button(value="🗑️ Delete", interactive=True, variant="stop")
-        refresh_btn.click(get_files, None, [files])
-        delete_btn.click(delete_files, None, [files])
+        
+    refresh_btn.click(get_files, None, [state, selection_text, files_cbg])
+    delete_btn.click(delete_files, [state, files_cbg], [state, selection_text, files_cbg, files_cbg])
 
 with gr.Blocks(css=css) as demo:
     gr.Markdown("# MultimodalQnA")
