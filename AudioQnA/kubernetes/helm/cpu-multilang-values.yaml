@@ -7,6 +7,9 @@ vllm:
   enabled: true
 
 speecht5:
-  enabled: true
-gpt-sovits:
   enabled: false
+gpt-sovits:
+  enabled: true
+
+image:
+  repository: opea/audioqna-multilang
