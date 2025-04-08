@@ -93,7 +93,7 @@ services:
       RETRIEVER_COMPONENT_NAME: "OPEA_RETRIEVER_REDIS"
     restart: unless-stopped
   tgi-rocm:
-    image: ghcr.io/huggingface/text-generation-inference:3.0.1-rocm
+    image: ghcr.io/huggingface/text-generation-inference:2.4.1-rocm
     container_name: tgi-llava-rocm-server
     ports:
       - "8399:80"
@@ -175,6 +175,8 @@ services:
       - DATAPREP_INGEST_SERVICE_ENDPOINT=${DATAPREP_INGEST_SERVICE_ENDPOINT}
       - DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT=${DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT}
       - DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT=${DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT}
+      - DATAPREP_GET_FILE_ENDPOINT=${DATAPREP_GET_FILE_ENDPOINT}
+      - DATAPREP_DELETE_FILE_ENDPOINT=${DATAPREP_DELETE_FILE_ENDPOINT}
     ipc: host
     restart: always
 

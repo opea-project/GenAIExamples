@@ -6,7 +6,7 @@
 WORKPATH=$(dirname "$PWD")/..
 export ip_address=${host_ip}
 export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
-export AGENTQNA_TGI_IMAGE=ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
+export AGENTQNA_TGI_IMAGE=ghcr.io/huggingface/text-generation-inference:2.4.1-rocm
 export AGENTQNA_TGI_SERVICE_PORT="19001"
 
 # LLM related environment variables
@@ -14,7 +14,7 @@ export AGENTQNA_CARD_ID="card1"
 export AGENTQNA_RENDER_ID="renderD136"
 export HF_CACHE_DIR=${HF_CACHE_DIR}
 ls $HF_CACHE_DIR
-export LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
+export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
 export NUM_SHARDS=4
 export LLM_ENDPOINT_URL="http://${ip_address}:${AGENTQNA_TGI_SERVICE_PORT}"
 export temperature=0.01
@@ -44,3 +44,19 @@ export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8889/v1/retrievaltool"
 export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/ingest"
 export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/get"
 export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/delete"
+
+echo "Removing chinook data..."
+echo Y | rm -R chinook-database
+if [ -d "chinook-database" ]; then
+    rm -rf chinook-database
+fi
+echo "Chinook data removed!"
+
+echo "Stopping CRAG server"
+docker rm kdd-cup-24-crag-service --force
+
+echo "Stopping Agent services"
+docker compose -f compose.yaml down
+
+echo "Stopping Retrieval services"
+docker compose -f ../../../../../DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml down

@@ -58,7 +58,7 @@ function build_docker_images() {
     popd && sleep 1s
 
     git clone https://github.com/vllm-project/vllm.git && cd vllm
-    VLLM_VER="$(git describe --tags "$(git rev-list --tags --max-count=1)" )"
+    VLLM_VER="v0.8.2"
     echo "Check out vLLM tag ${VLLM_VER}"
     git checkout ${VLLM_VER} &> /dev/null
     cd ../
@@ -66,6 +66,8 @@ function build_docker_images() {
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
     service_list="docsum docsum-gradio-ui whisper llm-docsum vllm"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
+
+    docker pull ghcr.io/huggingface/text-generation-inference:2.4.1
 
     docker images && sleep 1s
 }
