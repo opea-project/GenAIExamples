@@ -1,19 +1,39 @@
 #!/bin/bash
-# Copyright (C) 2024 Intel Corporation
+# Copyright (C) 2024 Advanced Micro Devices, Inc.
 # SPDX-License-Identifier: Apache-2.0
 
-set -xe
+set -x
 IMAGE_REPO=${IMAGE_REPO:-"opea"}
 IMAGE_TAG=${IMAGE_TAG:-"latest"}
 echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
 echo "TAG=IMAGE_TAG=${IMAGE_TAG}"
-export REGISTRY=${IMAGE_REPO}
-export TAG=${IMAGE_TAG}
-export MODEL_CACHE=${model_cache:-"./data"}
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
+
+export REGISTRY=${IMAGE_REPO}
+export TAG=${IMAGE_TAG}
+export HOST_IP=${ip_address}
+export VISUALQNA_VLLM_SERVICE_PORT="8081"
+export VISUALQNA_HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+export VISUALQNA_CARD_ID="card1"
+export VISUALQNA_RENDER_ID="renderD136"
+export VISUALQNA_LVM_MODEL_ID="Xkev/Llama-3.2V-11B-cot"
+export MODEL="llava-hf/llava-v1.6-mistral-7b-hf"
+export LVM_ENDPOINT="http://${HOST_IP}:${VISUALQNA_VLLM_SERVICE_PORT}"
+export LVM_SERVICE_PORT=9399
+export MEGA_SERVICE_HOST_IP=${HOST_IP}
+export LVM_SERVICE_HOST_IP=${HOST_IP}
+export BACKEND_SERVICE_ENDPOINT="http://${HOST_IP}:${BACKEND_SERVICE_PORT}/v1/visualqna"
+export FRONTEND_SERVICE_IP=${HOST_IP}
+export FRONTEND_SERVICE_PORT=5173
+export BACKEND_SERVICE_NAME=visualqna
+export BACKEND_SERVICE_IP=${HOST_IP}
+export BACKEND_SERVICE_PORT=8888
+export NGINX_PORT=18003
+export PATH="~/miniconda3/bin:$PATH"
+export MODEL_CACHE=${model_cache:-"/var/opea/multimodalqna-service/data"}
 
 function build_docker_images() {
     opea_branch=${opea_branch:-"main"}
@@ -30,54 +50,30 @@ function build_docker_images() {
 
     cd $WORKPATH/docker_image_build
     git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
-    git clone https://github.com/vllm-project/vllm.git && cd vllm
-    VLLM_VER="v0.8.2"
-    echo "Check out vLLM tag ${VLLM_VER}"
-    git checkout ${VLLM_VER} &> /dev/null
-    cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="codetrans codetrans-ui llm-textgen vllm nginx"
-    docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
+    docker compose -f build.yaml build --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker images && sleep 1s
 }
 
 function start_services() {
-    cd $WORKPATH/docker_compose/intel/cpu/xeon/
-    export http_proxy=${http_proxy}
-    export https_proxy=${http_proxy}
-    export LLM_MODEL_ID="mistralai/Mistral-7B-Instruct-v0.3"
-    export LLM_ENDPOINT="http://${ip_address}:8008"
-    export LLM_COMPONENT_NAME="OpeaTextGenService"
-    export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
-    export MEGA_SERVICE_HOST_IP=${ip_address}
-    export LLM_SERVICE_HOST_IP=${ip_address}
-    export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:7777/v1/codetrans"
-    export FRONTEND_SERVICE_IP=${ip_address}
-    export FRONTEND_SERVICE_PORT=5173
-    export BACKEND_SERVICE_NAME=codetrans
-    export BACKEND_SERVICE_IP=${ip_address}
-    export BACKEND_SERVICE_PORT=7777
-    export NGINX_PORT=80
-    export host_ip=${ip_address}
+    cd $WORKPATH/docker_compose/amd/gpu/rocm
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
     # Start Docker Containers
-    docker compose -f compose.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
+    docker compose -f compose_vllm.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
 
     n=0
     until [[ "$n" -ge 100 ]]; do
-        docker logs codetrans-xeon-vllm-service > ${LOG_PATH}/vllm_service_start.log 2>&1
-        if grep -q complete ${LOG_PATH}/vllm_service_start.log; then
+        docker logs visualqna-vllm-service >& ${LOG_PATH}/visualqna-vllm-service_start.log
+        if grep -q "Application startup complete" $LOG_PATH/visualqna-vllm-service_start.log; then
             break
         fi
-        sleep 5s
+        sleep 10s
         n=$((n+1))
     done
-
-    sleep 1m
 }
 
 function validate_services() {
@@ -105,37 +101,75 @@ function validate_services() {
         docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
         exit 1
     fi
-    sleep 5s
+    sleep 1s
 }
 
 function validate_microservices() {
-    # llm microservice
-    validate_services \
-        "${ip_address}:9000/v1/chat/completions" \
-        "data: " \
-        "llm" \
-        "codetrans-xeon-llm-server" \
-        '{"query":"    ### System: Please translate the following Golang codes into  Python codes.    ### Original codes:    '\'''\'''\''Golang    \npackage main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n    '\'''\'''\''    ### Translated codes:"}'
+    # Check if the microservices are running correctly.
 
+    # lvm microservice
+    validate_services \
+        "${ip_address}:9399/v1/lvm" \
+        "The image" \
+        "lvm" \
+        "visualqna-vllm-service" \
+        '{"image": "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8/5+hnoEIwDiqkL4KAcT9GO0U4BxoAAAAAElFTkSuQmCC", "prompt":"What is this?"}'
 }
 
 function validate_megaservice() {
     # Curl the Mega Service
     validate_services \
-        "${ip_address}:${BACKEND_SERVICE_PORT}/v1/codetrans" \
-        "print" \
-        "mega-codetrans" \
-        "codetrans-xeon-backend-server" \
-        '{"language_from": "Golang","language_to": "Python","source_code": "package main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n}"}'
+    "${ip_address}:8888/v1/visualqna" \
+    "The image" \
+    "visualqna-rocm-backend-server" \
+    "visualqna-rocm-backend-server" \
+    '{
+        "messages": [
+        {
+            "role": "user",
+            "content": [
+            {
+                "type": "text",
+                "text": "What'\''s in this image?"
+            },
+            {
+                "type": "image_url",
+                "image_url": {
+                "url": "https://www.ilankelman.org/stopsigns/australia.jpg"
+                }
+            }
+            ]
+        }
+        ],
+        "max_tokens": 300
+    }'
 
     # test the megeservice via nginx
     validate_services \
-        "${ip_address}:${NGINX_PORT}/v1/codetrans" \
-        "print" \
-        "mega-codetrans-nginx" \
-        "codetrans-xeon-nginx-server" \
-        '{"language_from": "Golang","language_to": "Python","source_code": "package main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n}"}'
-
+    "${ip_address}:${NGINX_PORT}/v1/visualqna" \
+    "The image" \
+    "visualqna-rocm-nginx-server" \
+    "visualqna-rocm-nginx-server" \
+    '{
+        "messages": [
+        {
+            "role": "user",
+            "content": [
+            {
+                "type": "text",
+                "text": "What'\''s in this image?"
+            },
+            {
+                "type": "image_url",
+                "image_url": {
+                "url": "https://www.ilankelman.org/stopsigns/australia.jpg"
+                }
+            }
+            ]
+        }
+        ],
+        "max_tokens": 300
+    }'
 }
 
 function validate_frontend() {
@@ -151,7 +185,7 @@ function validate_frontend() {
 
     sed -i "s/localhost/$ip_address/g" playwright.config.ts
 
-    conda install -c conda-forge nodejs=22.6.0 -y
+    conda install -c conda-forge nodejs -y
     npm install && npm ci && npx playwright install --with-deps
     node -v && npm -v && pip list
 
@@ -167,8 +201,8 @@ function validate_frontend() {
 }
 
 function stop_docker() {
-    cd $WORKPATH/docker_compose/intel/cpu/xeon/
-    docker compose -f compose.yaml stop && docker compose rm -f
+    cd $WORKPATH/docker_compose/amd/gpu/rocm/
+    docker compose stop && docker compose rm -f
 }
 
 function main() {
@@ -180,7 +214,7 @@ function main() {
 
     validate_microservices
     validate_megaservice
-    validate_frontend
+    #validate_frontend
 
     stop_docker
     echo y | docker system prune

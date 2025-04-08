@@ -517,7 +517,7 @@ jobs:
         password: ${{ secrets.DOCKERHUB_TOKEN }}
         repository: opea/gpt-sovits
         short-description: "The docker image exposed the OPEA GPT-SoVITS service for GenAI application use."
-        readme-filepath: GenAIComps/comps/tts/src/integrations/dependency/gpt-sovits/README.md
+        readme-filepath: GenAIComps/comps/third_parties/gpt-sovits/src/README.md
         enable-url-completion: false
 
     - name: Description for
@@ -697,7 +697,7 @@ jobs:
         password: ${{ secrets.DOCKERHUB_TOKEN }}
         repository: opea/lvm-llava
         short-description: "The docker image exposed the OPEA microservice running LLaVA as a large visual model (LVM) server for GenAI application use."
-        readme-filepath: GenAIComps/comps/lvms/src/integrations/dependency/llava/README.md
+        readme-filepath: GenAIComps/comps/third_parties/llava/src/README.md
         enable-url-completion: false
 
     - name: Description for
@@ -707,7 +707,7 @@ jobs:
         password: ${{ secrets.DOCKERHUB_TOKEN }}
         repository: opea/lvm-video-llama
         short-description: "The docker image exposed the OPEA microservice running Video-Llama as a large visual model (LVM) for GenAI application use."
-        readme-filepath: GenAIComps/comps/lvms/src/integrations/dependency/video-llama/README.md
+        readme-filepath: GenAIComps/comps/third_parties/video-llama/src/README.md
         enable-url-completion: false
 
     - name: Description for
@@ -717,7 +717,7 @@ jobs:
         password: ${{ secrets.DOCKERHUB_TOKEN }}
         repository: opea/lvm-predictionguard
         short-description: "The docker image exposed the OPEA microservice running predictionguard as a large visual model (LVM) server for GenAI application use."
-        readme-filepath: GenAIComps/comps/lvms/src/integrations/dependency/predictionguard/README.md
+        readme-filepath: GenAIComps/comps/third_parties/predictionguard/src/README.md
         enable-url-completion: false
 
     - name: Description for
@@ -727,7 +727,7 @@ jobs:
         password: ${{ secrets.DOCKERHUB_TOKEN }}
         repository: opea/llava-gaudi
         short-description: "The docker image exposed the OPEA microservice running LLaVA as a large visual model (LVM) service for GenAI application use on the Gaudi2."
-        readme-filepath: GenAIComps/comps/lvms/src/integrations/dependency/llava/README.md
+        readme-filepath: GenAIComps/comps/third_parties/llava/src/README.md
         enable-url-completion: false
 
     - name: Description for
@@ -737,7 +737,7 @@ jobs:
         password: ${{ secrets.DOCKERHUB_TOKEN }}
         repository: opea/lvm-llama-vision
         short-description: "The docker image exposed the OPEA microservice running Llama Vision as the base large visual model service for GenAI application use."
-        readme-filepath: GenAIComps/comps/lvms/src/integrations/dependency/llama-vision/README.md
+        readme-filepath: GenAIComps/comps/third_parties/llama-vision/src/README.md
         enable-url-completion: false
 
     - name: Description for
@@ -747,7 +747,7 @@ jobs:
         password: ${{ secrets.DOCKERHUB_TOKEN }}
         repository: opea/lvm-llama-vision-tp
         short-description: "The docker image exposed the OPEA microservice running Llama Vision with deepspeed as the base large visual model service for GenAI application use."
-        readme-filepath: GenAIComps/comps/lvms/src/integrations/dependency/llama-vision/README.md
+        readme-filepath: GenAIComps/comps/third_parties/llama-vision/src/README.md
         enable-url-completion: false
 
     - name: Description for lvm-llama-vision-guard
@@ -757,7 +757,7 @@ jobs:
         password: ${{ secrets.DOCKERHUB_TOKEN }}
         repository: opea/lvm-llama-vision-guard
         short-description: "The docker image exposed the OPEA microservice running Llama Vision Guard as the base large visual model service for GenAI application use."
-        readme-filepath: GenAIComps/comps/lvms/src/integrations/dependency/llama-vision/README.md
+        readme-filepath: GenAIComps/comps/third_parties/llama-vision/src/README.md
         enable-url-completion: false
 
     - name: Description for promptregistry-mongo
@@ -857,7 +857,7 @@ jobs:
         password: ${{ secrets.DOCKERHUB_TOKEN }}
         repository: opea/gpt-sovits
         short-description: "The docker image exposed the OPEA gpt-sovits service for GenAI application use."
-        readme-filepath: GenAIComps/comps/tts/src/integrations/dependency/gpt-sovits/README.md
+        readme-filepath: GenAIComps/comps/third_parties/gpt-sovits/src/README.md
         enable-url-completion: false
 
     - name: Description for nginx
