@@ -122,12 +122,9 @@ jobs:
           docker system prune -f
 
           echo "clean up images ..."
-          img=$(docker images --filter reference="*/*/*:latest" -q)
-          if [[ ! -z "$img" ]]; then docker rmi $img && sleep 1s; fi
-          img=$(docker images --filter reference="*/*:ci" -q)
-          if [[ ! -z "$img" ]]; then docker rmi $img && sleep 1s; fi
-          img=$(docker images --filter reference="*:5000/*/*" -q)
-          if [[ ! -z "$img" ]]; then docker rmi $img && sleep 1s; fi
+          docker images --filter reference="*/*/*:latest" -q | xargs -r docker rmi && sleep 1s
+          docker images --filter reference="*/*:ci" -q | xargs -r docker rmi && sleep 1s
+          docker images --filter reference="*:5000/*/*" -q | xargs -r docker rmi && sleep 1s
           docker images
 
       - name: Checkout out Repo
