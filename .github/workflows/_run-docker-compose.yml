@@ -116,13 +116,19 @@ jobs:
         run: |
           sudo rm -rf ${{github.workspace}}/* || true
 
-          # clean up containers use ports
+          echo "clean up containers use ports ..."
           cid=$(docker ps --format '{{.Names}} : {{.Ports}}' | grep -v ' : $' | grep -v 5000 | awk -F' : ' '{print $1}')
           if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid && sleep 1s; fi
-
           docker system prune -f
-          docker rmi $(docker images --filter reference="*/*/*:latest" -q) || true
-          docker rmi $(docker images --filter reference="*/*:ci" -q) || true
+          
+          echo "clean up images ..."
+          img=$(docker images --filter reference="*/*/*:latest" -q)
+          if [[ ! -z "$img" ]]; then docker rmi $img && sleep 1s; fi
+          img=$(docker images --filter reference="*/*:ci" -q)
+          if [[ ! -z "$img" ]]; then docker rmi $img && sleep 1s; fi
+          img=$(docker images --filter reference="*:5000/*/*" -q)
+          if [[ ! -z "$img" ]]; then docker rmi $img && sleep 1s; fi
+          docker images 
 
       - name: Checkout out Repo
         uses: actions/checkout@v4
@@ -190,9 +196,9 @@ jobs:
           # clean up containers use ports
           cid=$(docker ps --format '{{.Names}} : {{.Ports}}' | grep -v ' : $' | grep -v 5000 | awk -F' : ' '{print $1}')
           if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid && sleep 1s; fi
+          echo "Finish docker clean up."
 
           docker system prune -f
-          docker rmi $(docker images --filter reference="*:5000/*/*" -q) || true
 
       - name: Publish pipeline artifact
         if: ${{ !cancelled() }}
