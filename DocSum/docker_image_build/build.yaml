@@ -40,7 +40,7 @@ services:
         http_proxy: ${http_proxy}
         https_proxy: ${https_proxy}
       context: GenAIComps
-      dockerfile: comps/asr/src/integrations/dependency/whisper/Dockerfile
+      dockerfile: comps/third_parties/whisper/src/Dockerfile
     extends: docsum
     image: ${REGISTRY:-opea}/whisper:${TAG:-latest}
   llm-docsum:

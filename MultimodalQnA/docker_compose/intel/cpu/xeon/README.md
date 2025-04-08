@@ -151,7 +151,7 @@ docker build --no-cache -t opea/retriever:latest --build-arg https_proxy=$https_
 Build lvm-llava image
 
 ```bash
-docker build --no-cache -t opea/lvm-llava:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/lvms/src/integrations/dependency/llava/Dockerfile .
+docker build --no-cache -t opea/lvm-llava:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/third_parties/llava/src/Dockerfile .
 ```
 
 Build lvm microservice image
@@ -171,13 +171,13 @@ docker build --no-cache -t opea/dataprep:latest --build-arg https_proxy=$https_p
 Build whisper server image
 
 ```bash
-docker build --no-cache -t opea/whisper:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/asr/src/integrations/dependency/whisper/Dockerfile .
+docker build --no-cache -t opea/whisper:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/third_parties/whisper/src/Dockerfile .
 ```
 
 ### 6. Build TTS Image
 
 ```bash
-docker build --no-cache -t opea/speecht5:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/tts/src/integrations/dependency/speecht5/Dockerfile .
+docker build --no-cache -t opea/speecht5:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/third_parties/speecht5/src/Dockerfile .
 ```
 
 ### 7. Build MegaService Docker Image

@@ -28,7 +28,7 @@ cd GenAIComps
 The Whisper Service converts audio files to text. Follow these steps to build and run the service:
 
 ```bash
-docker build -t opea/whisper:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/asr/src/integrations/dependency/whisper/Dockerfile .
+docker build -t opea/whisper:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/third_parties/whisper/src/Dockerfile .
 ```
 
 ### 2. Build MegaService Docker Image
