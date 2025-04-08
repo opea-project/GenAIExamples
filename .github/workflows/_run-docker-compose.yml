@@ -191,10 +191,6 @@ jobs:
           export test_case=${{ matrix.test_case }}
           export hardware=${{ inputs.hardware }}
           bash ${{ github.workspace }}/.github/workflows/scripts/docker_compose_clean_up.sh "containers"
-
-          # clean up containers use ports
-          cid=$(docker ps --format '{{.Names}} : {{.Ports}}' | grep -v ' : $' | grep -v 5000 | awk -F' : ' '{print $1}')
-          if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid && sleep 1s; fi
           echo "Finish docker clean up."
 
           docker system prune -f
