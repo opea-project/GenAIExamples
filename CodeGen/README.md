@@ -102,7 +102,7 @@ flowchart LR
 
 The CodeGen service can be effortlessly deployed on either Intel Gaudi2 or Intel Xeon Scalable Processor.
 
-Currently we support two ways of deploying ChatQnA services with docker compose:
+Currently we support two ways of deploying CodeGen services with docker compose:
 
 1. Start services using the docker image on `docker hub`:
 
@@ -127,7 +127,7 @@ If you choose to use `meta-llama/CodeLlama-7b-hf` as LLM model, you will need to
 
 ### Setup Environment Variable
 
-To set up environment variables for deploying ChatQnA services, follow these steps:
+To set up environment variables for deploying CodeGen services, follow these steps:
 
 1. Set the required environment variables:
 
