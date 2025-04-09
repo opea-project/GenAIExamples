@@ -70,6 +70,7 @@ Then run the command `docker images`, you will have following images ready:
 ```bash
 cd GenAIExamples/SearchQnA/docker_compose/
 ```
+
 Before starting the services with `docker compose`, you have to recheck the following environment variables. Create a file to store
 your custom environment variables.
 
@@ -165,7 +166,7 @@ curl http://${host_ip}:3008/v1/searchqna -H "Content-Type: application/json" -d 
      }'
 ```
 
-##  Access Frontend
+## Access Frontend
 
 A quick way to test the frontend with public URL is via Cloudflare TryCloudflare tunnel.
 
