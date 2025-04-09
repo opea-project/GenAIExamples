@@ -42,7 +42,7 @@ if [ ! -f $WORKDIR/GenAIExamples/AgentQnA/tests/Chinook_Sqlite.sqlite ]; then
 fi
 
 # configure agent ui
-echo "AGENT_URL = 'http://$ip_address:9090/v1/chat/completions'" | tee ${WORKDIR}/GenAIExamples/AgentQnA/ui/svelte/.env
+# echo "AGENT_URL = 'http://$ip_address:9090/v1/chat/completions'" | tee ${WORKDIR}/GenAIExamples/AgentQnA/ui/svelte/.env
 
 # retriever
 export host_ip=$(hostname -I | awk '{print $1}')
