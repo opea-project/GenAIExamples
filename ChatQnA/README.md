@@ -261,6 +261,13 @@ cd GenAIExamples/ChatQnA/docker_compose/intel/hpu/gaudi/
 docker compose -f compose.yaml -f compose.telemetry.yaml up -d
 ```
 
+To enable TEI Embedding on Gaudi for many concurrent user requests, compose.tei-embedding-gaudi.yaml file need to be merged along with default compose.yaml file.
+
+```bash
+cd GenAIExamples/ChatQnA/docker_compose/intel/hpu/gaudi/
+docker compose -f compose.yaml -f compose.tei-embedding-gaudi.yaml up -d
+```
+
 Refer to the [Gaudi Guide](./docker_compose/intel/hpu/gaudi/README.md) to build docker images from source.
 
 ### Deploy ChatQnA on Xeon

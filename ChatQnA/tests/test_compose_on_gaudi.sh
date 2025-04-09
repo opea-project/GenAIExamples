@@ -100,7 +100,7 @@ function validate_microservices() {
         "${ip_address}:8090/embed" \
         "\[\[" \
         "tei-embedding" \
-        "tei-embedding-gaudi-server" \
+        "tei-embedding-server" \
         '{"inputs":"What is Deep Learning?"}'
     echo "::endgroup::"
 

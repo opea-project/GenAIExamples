@@ -28,7 +28,7 @@ services:
       LOGFLAG: ${LOGFLAG}
   tei-embedding-service:
     image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.6
-    container_name: tei-embedding-gaudi-server
+    container_name: tei-embedding-server
     ports:
       - "8090:80"
     volumes:
