@@ -13,28 +13,77 @@ After launching your instance, you can connect to it using SSH (for Linux instan
 
 ## 🚀 Start Microservices and MegaService
 
-The CodeGen megaservice manages a single microservice called LLM within a Directed Acyclic Graph (DAG). In the diagram above, the LLM microservice is a language model microservice that generates code snippets based on the user's input query. The TGI service serves as a text generation interface, providing a RESTful API for the LLM microservice. The CodeGen Gateway acts as the entry point for the CodeGen application, invoking the Megaservice to generate code snippets in response to the user's input query.
+The CodeGen megaservice manages a several microservices including 'Embedding MicroService', 'Retrieval MicroService' and 'LLM MicroService' within a Directed Acyclic Graph (DAG). In the diagram below, the LLM microservice is a language model microservice that generates code snippets based on the user's input query. The TGI service serves as a text generation interface, providing a RESTful API for the LLM microservice. Data Preparation allows users to save/update documents or online resources to the vector database. Users can upload files or provide URLs, and manage their saved resources. The CodeGen Gateway acts as the entry point for the CodeGen application, invoking the Megaservice to generate code snippets in response to the user's input query.
 
 The mega flow of the CodeGen application, from user's input query to the application's output response, is as follows:
 
 ```mermaid
+---
+config:
+  flowchart:
+    nodeSpacing: 400
+    rankSpacing: 100
+    curve: linear
+  themeVariables:
+    fontSize: 25px
+---
 flowchart LR
-    subgraph CodeGen
+    %% Colors %%
+    classDef blue fill:#ADD8E6,stroke:#ADD8E6,stroke-width:2px,fill-opacity:0.5
+    classDef orange fill:#FBAA60,stroke:#ADD8E6,stroke-width:2px,fill-opacity:0.5
+    classDef orchid fill:#C26DBC,stroke:#ADD8E6,stroke-width:2px,fill-opacity:0.5
+    classDef invisible fill:transparent,stroke:transparent;
+    style CodeGen-MegaService stroke:#000000
+    %% Subgraphs %%
+    subgraph CodeGen-MegaService["CodeGen-MegaService"]
         direction LR
-        A[User] --> |Input query| B[CodeGen Gateway]
-        B --> |Invoke| Megaservice
-        subgraph Megaservice["Megaservice"]
-            direction TB
-            C((LLM<br>9000)) -. Post .-> D{{TGI Service<br>8028}}
-        end
-        Megaservice --> |Output| E[Response]
+        EM([Embedding<br>MicroService]):::blue
+        RET([Retrieval<br>MicroService]):::blue
+        RER([Agents]):::blue
+        LLM([LLM<br>MicroService]):::blue
+    end
+    subgraph User Interface
+        direction LR
+        a([Submit Query Tab]):::orchid
+        UI([UI server]):::orchid
+        Ingest([Manage Resources]):::orchid
     end
 
-    subgraph Legend
-        direction LR
-        G([Microservice]) ==> H([Microservice])
-        I([Microservice]) -.-> J{{Server API}}
-    end
+    CLIP_EM{{Embedding<br>service}}
+    VDB{{Vector DB}}
+    V_RET{{Retriever<br>service}}
+    Ingest{{Ingest data}}
+    DP([Data Preparation]):::blue
+    LLM_gen{{TGI Service}}
+    GW([CodeGen GateWay]):::orange
+
+    %% Data Preparation flow
+    %% Ingest data flow
+    direction LR
+    Ingest[Ingest data] --> UI
+    UI --> DP
+    DP <-.-> CLIP_EM
+
+    %% Questions interaction
+    direction LR
+    a[User Input Query] --> UI
+    UI --> GW
+    GW <==> CodeGen-MegaService
+    EM ==> RET
+    RET ==> RER
+    RER ==> LLM
+
+
+    %% Embedding service flow
+    direction LR
+    EM <-.-> CLIP_EM
+    RET <-.-> V_RET
+    LLM <-.-> LLM_gen
+
+    direction TB
+    %% Vector DB interaction
+    V_RET <-.->VDB
+    DP <-.->VDB
 ```
 
 ### Setup Environment Variables
@@ -51,37 +100,104 @@ export host_ip=${your_ip_address}
 export HUGGINGFACEHUB_API_TOKEN=you_huggingface_token
 ```
 
-2. Set Netowork Proxy
+2. Set Network Proxy
 
 **If you access public network through proxy, set the network proxy, otherwise, skip this step**
 
 ```bash
-export no_proxy=${your_no_proxy}
+export no_proxy=${no_proxy},${host_ip}
 export http_proxy=${your_http_proxy}
 export https_proxy=${your_https_proxy}
 ```
 
 ### Start the Docker Containers for All Services
 
-CodeGen support TGI service and vLLM service, you can choose start either one of them.
-
-Start CodeGen based on TGI service:
+Find the corresponding [compose.yaml](./compose.yaml). User could start CodeGen based on TGI or vLLM service:
 
 ```bash
-cd GenAIExamples/CodeGen/docker_compose
-source set_env.sh
-cd intel/cpu/xeon
+cd GenAIExamples/CodeGen/docker_compose/intel/cpu/xeon
+```
+
+#### TGI service:
+
+```bash
 docker compose --profile codegen-xeon-tgi up -d
 ```
 
-Start CodeGen based on vLLM service:
+Then run the command `docker images`, you will have the following Docker images:
+
+- `ghcr.io/huggingface/text-embeddings-inference:cpu-1.5`
+- `ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu`
+- `opea/codegen-gradio-ui`
+- `opea/codegen`
+- `opea/dataprep`
+- `opea/embedding`
+- `opea/llm-textgen`
+- `opea/retriever`
+- `redis/redis-stack`
+
+#### vLLM service:
 
 ```bash
-cd GenAIExamples/CodeGen/docker_compose
-source set_env.sh
-cd intel/cpu/xeon
 docker compose --profile codegen-xeon-vllm up -d
 ```
+
+Then run the command `docker images`, you will have the following Docker images:
+
+- `ghcr.io/huggingface/text-embeddings-inference:cpu-1.5`
+- `ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu`
+- `opea/codegen-gradio-ui`
+- `opea/codegen`
+- `opea/dataprep`
+- `opea/embedding`
+- `opea/llm-textgen`
+- `opea/retriever`
+- `redis/redis-stack`
+- `opea/vllm`
+
+### Building the Docker image locally
+
+Should the Docker image you seek not yet be available on Docker Hub, you can build the Docker image locally.
+In order to build the Docker image locally follow the instrustion provided below.
+
+#### Build the MegaService Docker Image
+
+To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `codegen.py` Python script. Build the MegaService Docker image via the command below:
+
+```bash
+git clone https://github.com/opea-project/GenAIExamples
+cd GenAIExamples/CodeGen
+docker build -t opea/codegen:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
+```
+
+#### Build the UI Gradio Image
+
+Build the frontend Gradio image via the command below:
+
+```bash
+cd GenAIExamples/CodeGen/ui
+docker build -t opea/codegen-gradio-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile.gradio .
+```
+
+#### Dataprep Microservice with Redis
+
+Follow the instrustion provided here: [opea/dataprep](https://github.com/MSCetin37/GenAIComps/blob/main/comps/dataprep/src/README_redis.md)
+
+#### Embedding Microservice with TEI
+
+Follow the instrustion provided here: [opea/embedding](https://github.com/MSCetin37/GenAIComps/blob/main/comps/embeddings/src/README_tei.md)
+
+#### LLM text generation Microservice
+
+Follow the instrustion provided here: [opea/llm-textgen](https://github.com/MSCetin37/GenAIComps/tree/main/comps/llms/src/text-generation)
+
+#### Retriever Microservice
+
+Follow the instrustion provided here: [opea/retriever](https://github.com/MSCetin37/GenAIComps/blob/main/comps/retrievers/src/README_redis.md)
+
+#### Start Redis server
+
+Follow the instrustion provided here: [redis/redis-stack](https://github.com/MSCetin37/GenAIComps/tree/main/comps/third_parties/redis/src)
 
 ### Validate the MicroServices and MegaService
 
@@ -90,8 +206,9 @@ docker compose --profile codegen-xeon-vllm up -d
    ```bash
    curl http://${host_ip}:8028/v1/chat/completions \
        -X POST \
-       -d '{"model": "Qwen/Qwen2.5-Coder-7B-Instruct", "messages": [{"role": "user", "content": "Implement a high-level API for a TODO list application. The API takes as input an operation request and updates the TODO list in place. If the request is invalid, raise an exception."}], "max_tokens":32}' \
-       -H 'Content-Type: application/json'
+       -H 'Content-Type: application/json' \
+       -d '{"model": "Qwen/Qwen2.5-Coder-7B-Instruct", "messages": [{"role": "user", "content": "Implement a high-level API for a TODO list application. The API takes as input an operation request and updates the TODO list in place. If the request is invalid, raise an exception."}], "max_tokens":32}'
+
    ```
 
 2. LLM Microservices
@@ -99,19 +216,58 @@ docker compose --profile codegen-xeon-vllm up -d
    ```bash
    curl http://${host_ip}:9000/v1/chat/completions\
      -X POST \
-     -d '{"query":"Implement a high-level API for a TODO list application. The API takes as input an operation request and updates the TODO list in place. If the request is invalid, raise an exception.","max_tokens":256,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,"repetition_penalty":1.03,"stream":true}' \
-     -H 'Content-Type: application/json'
+     -H 'Content-Type: application/json' \
+     -d '{"query":"Implement a high-level API for a TODO list application. The API takes as input an operation request and updates the TODO list in place. If the request is invalid, raise an exception.","max_tokens":256,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,"repetition_penalty":1.03,"stream":true}'
    ```
 
-3. MegaService
+3. Dataprep Microservice
+
+   Make sure to replace the file name placeholders with your correct file name
 
    ```bash
-   curl http://${host_ip}:7778/v1/codegen -H "Content-Type: application/json" -d '{
-        "messages": "Implement a high-level API for a TODO list application. The API takes as input an operation request and updates the TODO list in place. If the request is invalid, raise an exception."
-        }'
+   curl http://${host_ip}:6007/v1/dataprep/ingest \
+   -X POST \
+   -H "Content-Type: multipart/form-data" \
+   -F "files=@./file1.pdf" \
+   -F "files=@./file2.txt" \
+   -F "index_name=my_API_document"
    ```
 
-## 🚀 Launch the UI
+4. MegaService
+
+   ```bash
+   curl http://${host_ip}:7778/v1/codegen \
+     -H "Content-Type: application/json" \
+     -d '{"messages": "Implement a high-level API for a TODO list application. The API takes as input an operation request and updates the TODO list in place. If the request is invalid, raise an exception."}'
+   ```
+
+   CodeGen service with RAG and Agents activated based on an index.
+
+   ```bash
+   curl http://${host_ip}:7778/v1/codegen \
+     -H "Content-Type: application/json" \
+     -d '{"agents_flag": "True", "index_name": "my_API_document", "messages": "Implement a high-level API for a TODO list application. The API takes as input an operation request and updates the TODO list in place. If the request is invalid, raise an exception."}'
+   ```
+
+## 🚀 Launch the Gradio Based UI (Recommended)
+
+To access the Gradio frontend URL, follow the steps in [this README](../../../../ui/gradio/README.md)
+
+Code Generation Tab
+![project-screenshot](../../../../assets/img/codegen_gradio_ui_main.png)
+
+Resource Management Tab
+![project-screenshot](../../../../assets/img/codegen_gradio_ui_main.png)
+
+Uploading a Knowledge Index
+
+![project-screenshot](../../../../assets/img/codegen_gradio_ui_dataprep.png)
+
+Here is an example of running a query in the Gradio UI using an Index:
+
+![project-screenshot](../../../../assets/img/codegen_gradio_ui_query.png)
+
+## 🚀 Launch the Svelte Based UI (Optional)
 
 To access the frontend, open the following URL in your browser: `http://{host_ip}:5173`. By default, the UI runs on port 5173 internally. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `compose.yaml` file as shown below:
 
@@ -224,52 +380,3 @@ For example:
 - Ask question and get answer
 
 ![qna](../../../../assets/img/codegen_qna.png)
-
-## 🚀 Download or Build Docker Images
-
-Should the Docker image you seek not yet be available on Docker Hub, you can build the Docker image locally.
-
-### 1. Build the LLM Docker Image
-
-```bash
-git clone https://github.com/opea-project/GenAIComps.git
-cd GenAIComps
-docker build -t opea/llm-textgen:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/src/text-generation/Dockerfile .
-```
-
-### 2. Build the MegaService Docker Image
-
-To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `codegen.py` Python script. Build MegaService Docker image via the command below:
-
-```bash
-git clone https://github.com/opea-project/GenAIExamples
-cd GenAIExamples/CodeGen
-docker build -t opea/codegen:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
-```
-
-### 3. Build the UI Docker Image
-
-Build the frontend Docker image via the command below:
-
-```bash
-cd GenAIExamples/CodeGen/ui
-docker build -t opea/codegen-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
-```
-
-### 4. Build CodeGen React UI Docker Image (Optional)
-
-Build react frontend Docker image via below command:
-
-**Export the value of the public IP address of your Xeon server to the `host_ip` environment variable**
-
-```bash
-cd GenAIExamples/CodeGen/ui
-docker build --no-cache -t opea/codegen-react-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile.react .
-```
-
-Then run the command `docker images`, you will have the following Docker Images:
-
-- `opea/llm-textgen:latest`
-- `opea/codegen:latest`
-- `opea/codegen-ui:latest`
-- `opea/codegen-react-ui:latest` (optional)
