@@ -335,6 +335,9 @@ with gr.Blocks() as ui:
                 delete_all_button = gr.Button("Delete All", variant="primary", size="sm")
                 delete_all_button.click(delete_all_files, outputs=upload_status)
 
+@app.get("/health")
+def health_check():
+    return {"status": "ok"}
 
 ui.queue()
 app = gr.mount_gradio_app(app, ui, path="/")
