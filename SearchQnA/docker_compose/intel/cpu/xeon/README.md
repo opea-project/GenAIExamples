@@ -34,7 +34,6 @@ docker build --no-cache -t opea/llm-textgen:latest --build-arg https_proxy=$http
 
 ```bash
 docker build --no-cache -t opea/nginx:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/third_parties/nginx/src/Dockerfile .
-
 ```
 
 ### 6. Build MegaService Docker Image
@@ -71,7 +70,6 @@ Then run the command `docker images`, you will have following images ready:
 ```bash
 cd GenAIExamples/SearchQnA/docker_compose/
 ```
-
 Before starting the services with `docker compose`, you have to recheck the following environment variables. Create a file to store
 your custom environment variables.
 
@@ -156,18 +154,18 @@ curl http://${host_ip}:3007/v1/chat/completions\
   -X POST \
   -d '{"query":"What is Deep Learning?","max_tokens":100,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,"repetition_penalty":1.03,"stream":false}' \
   -H 'Content-Type: application/json'
-
 ```
 
 ## 🚀 Test MegaService
 
-````bash
+```bash
 curl http://${host_ip}:3008/v1/searchqna -H "Content-Type: application/json" -d '{
      "messages": "What is the latest news? Give me also the source link.",
      "stream": "False"
      }'
+```
 
-##.  Access frontend
+##  Access Frontend
 
 A quick way to test the frontend with public URL is via Cloudflare TryCloudflare tunnel.
 
@@ -178,11 +176,6 @@ wget https://github.com/cloudflare/cloudflared/releases/latest/download/cloudfla
 sudo dpkg -i cloudflared-linux-amd64.deb
 
 cloudflared tunnel --url http://localhost:80
-
-````
+```
 
 Alternatively a [gradio tunnel](https://console.cloud.intel.com/docs/tutorials/expose_app_tunnels.html) (see bottom).
-
-```
-
-```
