@@ -1,6 +1,6 @@
 # Code Generation Application
 
-Code Generation (CodeGen) Large Language Models (LLMs) are specialized AI models designed for the task of generating computer code. Such models undergo training with datasets that encompass repositories, specialized documentation, programming code, relevant web content, and other related data. They possess a deep understanding of various programming languages, coding patterns, and software development concepts. CodeGen LLMs are engineered to assist developers and programmers. When these LLMs are seamlessly integrated into the developer's Integrated Development Environment (IDE), they possess a comprehensive understanding of the coding context, which includes elements such as comments, function names, and variable names. This contextual awareness empowers them to provide more refined and contextually relevant coding suggestions.
+Code Generation (CodeGen) Large Language Models (LLMs) are specialized AI models designed for the task of generating computer code. Such models undergo training with datasets that encompass repositories, specialized documentation, programming code, relevant web content, and other related data. They possess a deep understanding of various programming languages, coding patterns, and software development concepts. CodeGen LLMs are engineered to assist developers and programmers. When these LLMs are seamlessly integrated into the developer's Integrated Development Environment (IDE), they possess a comprehensive understanding of the coding context, which includes elements such as comments, function names, and variable names. This contextual awareness empowers them to provide more refined and contextually relevant coding suggestions. Additionally Retrieval-Augmented Generation (RAG) and Agents are parts of the CodeGen example which provide an additional layer of intelligence and adaptability, ensuring that the generated code is not only relevant but also accurate, efficient, and tailored to the specific needs of the developers and programmers.
 
 The capabilities of CodeGen LLMs include:
 
@@ -28,7 +28,7 @@ config:
     rankSpacing: 100
     curve: linear
   themeVariables:
-    fontSize: 50px
+    fontSize: 25px
 ---
 flowchart LR
     %% Colors %%
@@ -37,34 +37,56 @@ flowchart LR
     classDef orchid fill:#C26DBC,stroke:#ADD8E6,stroke-width:2px,fill-opacity:0.5
     classDef invisible fill:transparent,stroke:transparent;
     style CodeGen-MegaService stroke:#000000
-
     %% Subgraphs %%
-    subgraph CodeGen-MegaService["CodeGen MegaService "]
+    subgraph CodeGen-MegaService["CodeGen-MegaService"]
         direction LR
-        LLM([LLM MicroService]):::blue
+        EM([Embedding<br>MicroService]):::blue
+        RET([Retrieval<br>MicroService]):::blue
+        RER([Agents]):::blue
+        LLM([LLM<br>MicroService]):::blue
     end
-    subgraph UserInterface[" User Interface "]
+    subgraph User Interface
         direction LR
-        a([User Input Query]):::orchid
-        UI([UI server<br>]):::orchid
+        a([Submit Query Tab]):::orchid
+        UI([UI server]):::orchid
+        Ingest([Manage Resources]):::orchid
     end
 
+    CLIP_EM{{Embedding<br>service}}
+    VDB{{Vector DB}}
+    V_RET{{Retriever<br>service}}
+    Ingest{{Ingest data}}
+    DP([Data Preparation]):::blue
+    LLM_gen{{TGI Service}}
+    GW([CodeGen GateWay]):::orange
 
-    LLM_gen{{LLM Service <br>}}
-    GW([CodeGen GateWay<br>]):::orange
-
+    %% Data Preparation flow
+    %% Ingest data flow
+    direction LR
+    Ingest[Ingest data] --> UI
+    UI --> DP
+    DP <-.-> CLIP_EM
 
     %% Questions interaction
     direction LR
     a[User Input Query] --> UI
     UI --> GW
     GW <==> CodeGen-MegaService
+    EM ==> RET
+    RET ==> RER
+    RER ==> LLM
 
 
     %% Embedding service flow
     direction LR
+    EM <-.-> CLIP_EM
+    RET <-.-> V_RET
     LLM <-.-> LLM_gen
 
+    direction TB
+    %% Vector DB interaction
+    V_RET <-.->VDB
+    DP <-.->VDB
 ```
 
 ## 🤖 Automated Terraform Deployment using Intel® Optimized Cloud Modules for **Terraform**
@@ -94,12 +116,12 @@ Currently we support two ways of deploying ChatQnA services with docker compose:
 
 By default, the LLM model is set to a default value as listed below:
 
-| Service      | Model                                                                                   |
-| ------------ | --------------------------------------------------------------------------------------- |
-| LLM_MODEL_ID | [Qwen/Qwen2.5-Coder-7B-Instruct](https://huggingface.co/Qwen/Qwen2.5-Coder-7B-Instruct) |
+| Service      | Model                                                                                     |
+| ------------ | ----------------------------------------------------------------------------------------- |
+| LLM_MODEL_ID | [Qwen/Qwen2.5-Coder-32B-Instruct](https://huggingface.co/Qwen/Qwen2.5-Coder-32B-Instruct) |
 
-[Qwen/Qwen2.5-Coder-7B-Instruct](https://huggingface.co/Qwen/Qwen2.5-Coder-7B-Instruct) may be a gated model that requires submitting an access request through Hugging Face. You can replace it with another model.
-Change the `LLM_MODEL_ID` below for your needs, such as: [deepseek-ai/deepseek-coder-6.7b-instruct](https://huggingface.co/deepseek-ai/deepseek-coder-6.7b-instruct)
+[Qwen/Qwen2.5-Coder-32B-Instruct](https://huggingface.co/Qwen/Qwen2.5-Coder-7B-Instruct) may be a gated model that requires submitting an access request through Hugging Face. You can replace it with another model for m.
+Change the `LLM_MODEL_ID` below for your needs, such as: [Qwen/Qwen2.5-Coder-7B-Instruct](https://huggingface.co/Qwen/Qwen2.5-Coder-7B-Instruct), [deepseek-ai/deepseek-coder-6.7b-instruct](https://huggingface.co/deepseek-ai/deepseek-coder-6.7b-instruct)
 
 If you choose to use `meta-llama/CodeLlama-7b-hf` as LLM model, you will need to visit [here](https://huggingface.co/meta-llama/CodeLlama-7b-hf), click the `Expand to review and access` button to ask for model access.
 
@@ -134,22 +156,44 @@ To set up environment variables for deploying ChatQnA services, follow these ste
 
 #### Deploy CodeGen on Gaudi
 
-Find the corresponding [compose.yaml](./docker_compose/intel/hpu/gaudi/compose.yaml).
+Find the corresponding [compose.yaml](./docker_compose/intel/hpu/gaudi/compose.yaml). User could start CodeGen based on TGI or vLLM service:
 
 ```bash
 cd GenAIExamples/CodeGen/docker_compose/intel/hpu/gaudi
-docker compose up -d
+```
+
+TGI service:
+
+```bash
+docker compose --profile codegen-gaudi-tgi up -d
+```
+
+vLLM service:
+
+```bash
+docker compose --profile codegen-gaudi-vllm up -d
 ```
 
 Refer to the [Gaudi Guide](./docker_compose/intel/hpu/gaudi/README.md) to build docker images from source.
 
 #### Deploy CodeGen on Xeon
 
-Find the corresponding [compose.yaml](./docker_compose/intel/cpu/xeon/compose.yaml).
+Find the corresponding [compose.yaml](./docker_compose/intel/cpu/xeon/compose.yaml). User could start CodeGen based on TGI or vLLM service:
 
 ```bash
 cd GenAIExamples/CodeGen/docker_compose/intel/cpu/xeon
-docker compose up -d
+```
+
+TGI service:
+
+```bash
+docker compose --profile codegen-xeon-tgi up -d
+```
+
+vLLM service:
+
+```bash
+docker compose --profile codegen-xeon-vllm up -d
 ```
 
 Refer to the [Xeon Guide](./docker_compose/intel/cpu/xeon/README.md) for more instructions on building docker images from source.
@@ -168,6 +212,15 @@ Two ways of consuming CodeGen Service:
    curl http://${host_ip}:7778/v1/codegen \
        -H "Content-Type: application/json" \
        -d '{"messages": "Implement a high-level API for a TODO list application. The API takes as input an operation request and updates the TODO list in place. If the request is invalid, raise an exception."}'
+   ```
+
+   If the user wants a CodeGen service with RAG and Agents based on dedicated documentation.
+
+   ```bash
+   curl http://localhost:7778/v1/codegen \
+      -H "Content-Type: application/json" \
+      -d '{"agents_flag": "True", "index_name": "my_API_document", "messages": "Implement a high-level API for a TODO list application. The API takes as input an operation request and updates the TODO list in place. If the request is invalid, raise an exception."}'
+
    ```
 
 2. Access via frontend
