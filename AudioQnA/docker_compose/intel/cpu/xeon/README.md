@@ -18,7 +18,7 @@ cd GenAIComps
 ### 2. Build ASR Image
 
 ```bash
-docker build -t opea/whisper:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/asr/src/integrations/dependency/whisper/Dockerfile .
+docker build -t opea/whisper:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/third_parties/whisper/src/Dockerfile .
 ```
 
 ### 3. Build vLLM Image
@@ -34,10 +34,10 @@ docker build --no-cache --build-arg https_proxy=$https_proxy --build-arg http_pr
 ### 4. Build TTS Image
 
 ```bash
-docker build -t opea/speecht5:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/tts/src/integrations/dependency/speecht5/Dockerfile .
+docker build -t opea/speecht5:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/third_parties/speecht5/src/Dockerfile .
 
 # multilang tts (optional)
-docker build -t opea/gpt-sovits:latest --build-arg http_proxy=$http_proxy --build-arg https_proxy=$https_proxy -f comps/tts/src/integrations/dependency/gpt-sovits/Dockerfile .
+docker build -t opea/gpt-sovits:latest --build-arg http_proxy=$http_proxy --build-arg https_proxy=$https_proxy -f comps/third_parties/gpt-sovits/src/Dockerfile .
 ```
 
 ### 5. Build MegaService Docker Image
@@ -177,7 +177,7 @@ to the response, decode the base64 string and save it as a .wav file.
 
 ```bash
 # if you are using speecht5 as the tts service, voice can be "default" or "male"
-# if you are using gpt-sovits for the tts service, you can set the reference audio following https://github.com/opea-project/GenAIComps/blob/main/comps/tts/src/integrations/dependency/gpt-sovits/README.md
+# if you are using gpt-sovits for the tts service, you can set the reference audio following https://github.com/opea-project/GenAIComps/blob/main/comps/third_parties/gpt-sovits/src/README.md
 curl http://${host_ip}:3008/v1/audioqna \
   -X POST \
   -d '{"audio": "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA", "max_tokens":64, "voice":"default"}' \
