@@ -65,7 +65,7 @@ Follow these guidelines when formulating your answer:
 3. Give concise, factual and relevant answers.
 
 **IMPORTANT:**
-* Do not generate history messages repeatly.
+* Do not generate history messages repeatedly.
 * Divide the question into sub-questions and conquer sub-questions one by one.
 * Questions may be time sensitive. Pay attention to the time when the question was asked.
 * You may need to combine information from multiple tools to answer the question.

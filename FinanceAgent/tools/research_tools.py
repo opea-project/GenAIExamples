@@ -6,8 +6,8 @@ import os
 import random
 from collections import defaultdict
 from datetime import date, datetime, timedelta
-from typing import Annotated, Any, List, Optional
 from textwrap import dedent
+from typing import Annotated, Any, List, Optional
 
 import pandas as pd
 
@@ -35,8 +35,8 @@ Docs: https://docs.financialdatasets.ai/
 import requests
 from pydantic import BaseModel
 
-
 FINANCIAL_DATASETS_BASE_URL = "https://api.financialdatasets.ai/"
+
 
 class FinancialDatasetsAPIWrapper(BaseModel):
     """Wrapper for financial datasets API."""
@@ -65,8 +65,7 @@ class FinancialDatasetsAPIWrapper(BaseModel):
         period: str,
         limit: Optional[int],
     ) -> Optional[dict]:
-        """
-        Get the income statements for a stock `ticker` over a `period` of time.
+        """Get the income statements for a stock `ticker` over a `period` of time.
 
         :param ticker: the stock ticker
         :param period: the period of time to get the balance sheets for.
@@ -96,8 +95,7 @@ class FinancialDatasetsAPIWrapper(BaseModel):
         period: str,
         limit: Optional[int],
     ) -> List[dict]:
-        """
-        Get the balance sheets for a stock `ticker` over a `period` of time.
+        """Get the balance sheets for a stock `ticker` over a `period` of time.
 
         :param ticker: the stock ticker
         :param period: the period of time to get the balance sheets for.
@@ -127,8 +125,7 @@ class FinancialDatasetsAPIWrapper(BaseModel):
         period: str,
         limit: Optional[int],
     ) -> List[dict]:
-        """
-        Get the cash flow statements for a stock `ticker` over a `period` of time.
+        """Get the cash flow statements for a stock `ticker` over a `period` of time.
 
         :param ticker: the stock ticker
         :param period: the period of time to get the balance sheets for.
@@ -181,7 +178,6 @@ try:
 
 except Exception as e:
     print(str(e))
-
 
 
 def get_company_profile(symbol: Annotated[str, "ticker symbol"]) -> str:
@@ -310,21 +306,24 @@ def combine_prompt(instruction, resource):
     prompt = f"Resource: {resource}\n\nInstruction: {instruction}"
     return prompt
 
+
 def analyze_balance_sheet(
     symbol: Annotated[str, "ticker symbol"],
-    period: Annotated[str, "the period of time to get the balance sheets for. Possible values are: annual, quarterly, ttm."],
-    limit: int = 10
+    period: Annotated[
+        str, "the period of time to get the balance sheets for. Possible values are: annual, quarterly, ttm."
+    ],
+    limit: int = 10,
 ) -> str:
-    """
-    Retrieve the balance sheet for the given ticker symbol with the related section of its 10-K report.
+    """Retrieve the balance sheet for the given ticker symbol with the related section of its 10-K report.
+
     Then return with an instruction on how to analyze the balance sheet.
     """
 
     balance_sheet = financial_datasets_client.run(
-            mode="get_balance_sheets",
-            ticker=symbol,
-            period=period,
-            limit=limit,
+        mode="get_balance_sheets",
+        ticker=symbol,
+        period=period,
+        limit=limit,
     )
 
     df_string = "Balance sheet:\n" + balance_sheet
@@ -347,19 +346,21 @@ def analyze_balance_sheet(
 
 def analyze_income_stmt(
     symbol: Annotated[str, "ticker symbol"],
-    period: Annotated[str, "the period of time to get the balance sheets for. Possible values are: annual, quarterly, ttm."],
-    limit: int = 10
+    period: Annotated[
+        str, "the period of time to get the balance sheets for. Possible values are: annual, quarterly, ttm."
+    ],
+    limit: int = 10,
 ) -> str:
-    """
-    Retrieve the income statement for the given ticker symbol with the related section of its 10-K report.
+    """Retrieve the income statement for the given ticker symbol with the related section of its 10-K report.
+
     Then return with an instruction on how to analyze the income statement.
     """
     # Retrieve the income statement
     income_stmt = financial_datasets_client.run(
-            mode="get_income_statements",
-            ticker=symbol,
-            period=period,
-            limit=limit,
+        mode="get_income_statements",
+        ticker=symbol,
+        period=period,
+        limit=limit,
     )
     df_string = "Income statement:\n" + income_stmt
 
@@ -379,19 +380,21 @@ def analyze_income_stmt(
         """
     )
 
-
     # Combine the instruction, section text, and income statement
     prompt = combine_prompt(instruction, df_string)
 
     return prompt
 
+
 def analyze_cash_flow(
     symbol: Annotated[str, "ticker symbol"],
-    period: Annotated[str, "the period of time to get the balance sheets for. Possible values are: annual, quarterly, ttm."],
-    limit: int = 10
+    period: Annotated[
+        str, "the period of time to get the balance sheets for. Possible values are: annual, quarterly, ttm."
+    ],
+    limit: int = 10,
 ) -> str:
-    """
-    Retrieve the cash flow statement for the given ticker symbol with the related section of its 10-K report.
+    """Retrieve the cash flow statement for the given ticker symbol with the related section of its 10-K report.
+
     Then return with an instruction on how to analyze the cash flow statement.
     """
 
@@ -419,29 +422,30 @@ def analyze_cash_flow(
     prompt = combine_prompt(instruction, df_string)
     return prompt
 
+
 def get_share_performance(
     symbol: Annotated[str, "Ticker symbol of the stock (e.g., 'AAPL' for Apple)"],
     end_date: Annotated[
         str,
         "end date of the search period for the company's basic financials, yyyy-mm-dd",
     ],
-    ) -> str:
+) -> str:
     """Plot the stock performance of a company compared to the S&P 500 over the past year."""
     filing_date = datetime.strptime(end_date, "%Y-%m-%d")
 
     start = (filing_date - timedelta(days=60)).strftime("%Y-%m-%d")
     end = filing_date.strftime("%Y-%m-%d")
-    interval = 'day'         # possible values are {'second', 'minute', 'day', 'week', 'month', 'year'}
-    interval_multiplier = 1     # every 1 day
+    interval = "day"  # possible values are {'second', 'minute', 'day', 'week', 'month', 'year'}
+    interval_multiplier = 1  # every 1 day
 
     # create the URL
     url = (
-        f'https://api.financialdatasets.ai/prices/'
-        f'?ticker={symbol}'
-        f'&interval={interval}'
-        f'&interval_multiplier={interval_multiplier}'
-        f'&start_date={start}'
-        f'&end_date={end}'
+        f"https://api.financialdatasets.ai/prices/"
+        f"?ticker={symbol}"
+        f"&interval={interval}"
+        f"&interval_multiplier={interval_multiplier}"
+        f"&start_date={start}"
+        f"&end_date={end}"
     )
 
     headers = {"X-API-KEY": "your_api_key_here"}
@@ -449,7 +453,7 @@ def get_share_performance(
     response = requests.get(url, headers=headers)
     # parse prices from the response
 
-    prices = response.json().get('prices')
+    prices = response.json().get("prices")
 
     df_string = "Past 60 days Stock prices:\n" + json.dumps(prices)
 
@@ -462,4 +466,3 @@ def get_share_performance(
 
     prompt = combine_prompt(instruction, df_string)
     return prompt
-
