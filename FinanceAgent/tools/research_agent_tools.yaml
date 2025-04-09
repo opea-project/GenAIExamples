@@ -65,3 +65,60 @@ get_current_date:
   description: get current date.
   callable_api: research_tools.py:get_current_date
   return_output: current_date
+
+analyze_balance_sheet:
+  description: gets balance sheets for a given ticker over a given period.
+  callable_api: research_tools.py:analyze_balance_sheet
+  args_schema:
+    symbol:
+      type: str
+      description: the company name or ticker symbol.
+    period:
+      type: str
+      description: The period of the balance sheets, possible values such as annual, quarterly, ttm. Default is 'annual'.
+    limit:
+      type: int
+      description: The number of balance sheets to return. Default is 10.
+  return_output: balance_sheet
+
+analyze_income_stmt:
+  description: gets income statements for a given ticker over a given period.
+  callable_api: research_tools.py:analyze_income_stmt
+  args_schema:
+    symbol:
+      type: str
+      description: the company name or ticker symbol.
+    period:
+      type: str
+      description: The period of the balance sheets, possible values, such as  annual, quarterly, ttm. Default is 'annual'.
+    limit:
+      type: int
+      description: The number of balance sheets to return. Default is 10.
+  return_output: income_stmt
+
+analyze_cash_flow:
+  description: gets cash flow statements for a given ticker over a given period.
+  callable_api: research_tools.py:analyze_cash_flow
+  args_schema:
+    symbol:
+      type: str
+      description: the company name or ticker symbol.
+    period:
+      type: str
+      description: The period of the balance sheets, possible values, such as annual, quarterly, ttm. Default is 'annual'.
+    limit:
+      type: int
+      description: The number of balance sheets to return. Default is 10.
+  return_output: cash_flow
+
+get_share_performance:
+  description: gets stock prices for a given ticker over 60 days.
+  callable_api: research_tools.py:get_share_performance
+  args_schema:
+    symbol:
+      type: str
+      description: the company name or ticker symbol.
+    end_date:
+      type: str
+      description: end date of the search period for the company's basic financials, yyyy-mm-dd.
+  return_output: stock_price
