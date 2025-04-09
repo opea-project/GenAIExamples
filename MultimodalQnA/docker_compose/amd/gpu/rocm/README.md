@@ -144,7 +144,7 @@ security_opt:
 
 This configuration forwards all available GPUs to the container. To use a specific GPU, specify its `cardN` and `renderN` device IDs. For example:
 
-````yaml
+```yaml
 shm_size: 1g
 devices:
   - /dev/kfd:/dev/kfd
@@ -156,7 +156,7 @@ group_add:
   - video
 security_opt:
   - seccomp:unconfined
-````
+```
 
 **How to Identify GPU Device IDs:**
 Use AMD GPU driver utilities to determine the correct `cardN` and `renderN` IDs for your GPU.
@@ -170,7 +170,7 @@ Use AMD GPU driver utilities to determine the correct `cardN` and `renderN` IDs 
 ```bash
 ### Replace the string 'your_huggingfacehub_token' with your HuggingFacehub repository access token.
 export HUGGINGFACEHUB_API_TOKEN='your_huggingfacehub_token'
-````
+```
 
 #### Set variables value in set_env\*\*\*\*.sh file:
 
