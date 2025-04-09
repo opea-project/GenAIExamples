@@ -96,6 +96,7 @@ services:
       HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       LLM_MODEL_ID: ${LLM_MODEL_ID}
       VLLM_TORCH_PROFILER_DIR: "/mnt"
+      VLLM_CPU_KVCACHE_SPACE: 40
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://$host_ip:9009/health || exit 1"]
       interval: 10s
