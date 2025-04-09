@@ -89,7 +89,6 @@ curl http://${host_ip}:8889/v1/retrievaltool -X POST -H "Content-Type: applicati
      }'
 ```
 
-
 **Note**: `messages` is the required field. You can also pass in parameters for the retriever and reranker in the request. The parameters that can changed are listed below.
 
     1. retriever

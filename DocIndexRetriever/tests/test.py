@@ -2,10 +2,10 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import os
+from typing import Any
 
 import requests
 
-from typing import Any
 
 def search_knowledge_base(query: str, args: Any) -> str:
     """Search the knowledge base for a specific query."""
@@ -35,13 +35,10 @@ def search_knowledge_base(query: str, args: Any) -> str:
 
 if __name__ == "__main__":
     import argparse
+
     parser = argparse.ArgumentParser(description="Test the knowledge base search.")
-    parser.add_argument(
-        "--k", type=int, default=5, help="retriever top k"
-    )
-    parser.add_argument(
-        "--top_n", type=int, default=2, help="reranker top n"
-    )
+    parser.add_argument("--k", type=int, default=5, help="retriever top k")
+    parser.add_argument("--top_n", type=int, default=2, help="reranker top n")
     args = parser.parse_args()
 
     resp = search_knowledge_base("What is OPEA?", args)
@@ -50,4 +47,3 @@ if __name__ == "__main__":
 
     if not resp.startswith("Error"):
         print("Test successful!")
-        

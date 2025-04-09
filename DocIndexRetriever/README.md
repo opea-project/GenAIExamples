@@ -80,12 +80,13 @@ Example usage:
 ```python
 url = "http://{host_ip}:{port}/v1/retrievaltool".format(host_ip=host_ip, port=port)
 payload = {
-    "messages": query, # must be a string, this is a required field
+    "messages": query,  # must be a string, this is a required field
     "k": 5,  # retriever top k
     "top_n": 2,  # reranker top n
 }
 response = requests.post(url, json=payload)
 ```
+
 **Note**: `messages` is the required field. You can also pass in parameters for the retriever and reranker in the request. The parameters that can changed are listed below.
 
     1. retriever

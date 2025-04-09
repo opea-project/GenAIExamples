@@ -8,10 +8,8 @@ from typing import Union
 
 from comps import MegaServiceEndpoint, MicroService, ServiceOrchestrator, ServiceRoleType, ServiceType
 from comps.cores.proto.api_protocol import ChatCompletionRequest, EmbeddingRequest
-from comps.cores.proto.docarray import LLMParamsDoc, RerankedDoc, TextDoc
-from comps.cores.proto.docarray import LLMParams, RerankerParms, RetrieverParms
+from comps.cores.proto.docarray import LLMParams, LLMParamsDoc, RerankedDoc, RerankerParms, RetrieverParms, TextDoc
 from fastapi import Request
-
 
 MEGA_SERVICE_PORT = os.getenv("MEGA_SERVICE_PORT", 8889)
 EMBEDDING_SERVICE_HOST_IP = os.getenv("EMBEDDING_SERVICE_HOST_IP", "0.0.0.0")
@@ -24,7 +22,7 @@ RERANK_SERVICE_PORT = os.getenv("RERANK_SERVICE_PORT", 8000)
 
 def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **kwargs):
     print(f"*** Inputs to {cur_node}:\n{inputs}")
-    print("--"*50)
+    print("--" * 50)
     for key, value in kwargs.items():
         print(f"{key}: {value}")
     if self.services[cur_node].service_type == ServiceType.EMBEDDING:
@@ -32,18 +30,18 @@ def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **k
         del inputs["text"]
     elif self.services[cur_node].service_type == ServiceType.RETRIEVER:
         # input is EmbedDoc
-        """
-        class EmbedDoc(BaseDoc):
-            text: Union[str, List[str]]
-            embedding: Union[conlist(float, min_length=0), List[conlist(float, min_length=0)]]
-            search_type: str = "similarity"
-            k: int = 4
-            distance_threshold: Optional[float] = None
-            fetch_k: int = 20
-            lambda_mult: float = 0.5
-            score_threshold: float = 0.2
-            constraints: Optional[Union[Dict[str, Any], List[Dict[str, Any]], None]] = None
-            index_name: Optional[str] = None
+        """Class EmbedDoc(BaseDoc):
+
+        text: Union[str, List[str]]
+        embedding: Union[conlist(float, min_length=0), List[conlist(float, min_length=0)]]
+        search_type: str = "similarity"
+        k: int = 4
+        distance_threshold: Optional[float] = None
+        fetch_k: int = 20
+        lambda_mult: float = 0.5
+        score_threshold: float = 0.2
+        constraints: Optional[Union[Dict[str, Any], List[Dict[str, Any]], None]] = None
+        index_name: Optional[str] = None
         """
         # prepare the retriever params
         retriever_parameters = kwargs.get("retriever_parameters", None)
@@ -51,25 +49,25 @@ def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **k
             inputs.update(retriever_parameters.dict())
     elif self.services[cur_node].service_type == ServiceType.RERANK:
         # input is SearchedDoc
-        """
-        class SearchedDoc(BaseDoc):
-            retrieved_docs: DocList[TextDoc]
-            initial_query: str
-            top_n: int = 1
+        """Class SearchedDoc(BaseDoc):
+
+        retrieved_docs: DocList[TextDoc]
+        initial_query: str
+        top_n: int = 1
         """
         # prepare the reranker params
         reranker_parameters = kwargs.get("reranker_parameters", None)
         if reranker_parameters:
             inputs.update(reranker_parameters.dict())
     print(f"*** Formatted Inputs to {cur_node}:\n{inputs}")
-    print("--"*50)
+    print("--" * 50)
     return inputs
 
 
 def align_outputs(self, data, cur_node, inputs, runtime_graph, llm_parameters_dict, **kwargs):
     print(f"*** Direct Outputs from {cur_node}:\n{data}")
-    print("--"*50)
-    
+    print("--" * 50)
+
     if self.services[cur_node].service_type == ServiceType.EMBEDDING:
         # direct output from Embedding microservice is EmbeddingResponse
         """
@@ -78,7 +76,7 @@ def align_outputs(self, data, cur_node, inputs, runtime_graph, llm_parameters_di
             model: Optional[str] = None
             data: List[EmbeddingResponseData]
             usage: Optional[UsageInfo] = None
-        
+
         class EmbeddingResponseData(BaseModel):
             index: int
             object: str = "embedding"
@@ -86,12 +84,12 @@ def align_outputs(self, data, cur_node, inputs, runtime_graph, llm_parameters_di
         """
         # turn it into EmbedDoc
         assert isinstance(data["data"], list)
-        next_data = {"text": inputs["input"], "embedding": data["data"][0]["embedding"]} # EmbedDoc
+        next_data = {"text": inputs["input"], "embedding": data["data"][0]["embedding"]}  # EmbedDoc
     else:
         next_data = data
 
     print(f"*** Formatted Output from {cur_node} for next node:\n", next_data)
-    print("--"*50)
+    print("--" * 50)
     return next_data
 
 
