@@ -1,0 +1,12 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+tgi:
+  enabled: true
+vllm:
+  enabled: false
+
+speecht5:
+  enabled: true
+gpt-sovits:
+  enabled: false
