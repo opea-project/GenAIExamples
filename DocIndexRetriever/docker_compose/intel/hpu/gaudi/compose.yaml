@@ -15,8 +15,10 @@ services:
     image: ${REGISTRY:-opea}/dataprep:${TAG:-latest}
     container_name: dataprep-redis-server
     depends_on:
-      - redis-vector-db
-      - tei-embedding-service
+      redis-vector-db:
+        condition: service_started
+      tei-embedding-service:
+        condition: service_healthy
     ports:
       - "6007:5000"
     environment:
