@@ -85,15 +85,16 @@ function start_services() {
     # Start Docker Containers
     docker compose up -d
     n=0
-    until [[ "$n" -ge 100 ]]; do
-       docker logs tgi-service > $LOG_PATH/tgi_service_start.log
-       if grep -q Connected $LOG_PATH/tgi_service_start.log; then
+    until [[ "$n" -ge 200 ]]; do
+       docker logs tgi-service > $LOG_PATH/tgi_service_start.log && docker logs whisper-service 2>&1 | tee $LOG_PATH/whisper_service_start.log && docker logs speecht5-service 2>&1 | tee $LOG_PATH/speecht5_service_start.log
+       if grep -q Connected $LOG_PATH/tgi_service_start.log && grep -q running $LOG_PATH/whisper_service_start.log && grep -q running $LOG_PATH/speecht5_service_start.log; then
            break
        fi
-       sleep 5s
+       sleep 10s
        n=$((n+1))
     done
     echo "All services are up and running"
+    sleep 1m
 }
 
 
@@ -104,6 +105,7 @@ function validate_megaservice() {
     if [[ $result == *"mp4"* ]]; then
         echo "Result correct."
     else
+        echo "Result wrong, print docker logs."
         docker logs whisper-service > $LOG_PATH/whisper-service.log
         docker logs speecht5-service > $LOG_PATH/speecht5-service.log
         docker logs tgi-service > $LOG_PATH/tgi-service.log
@@ -117,11 +119,6 @@ function validate_megaservice() {
 }
 
 
-#function validate_frontend() {
-
-#}
-
-
 function stop_docker() {
     cd $WORKPATH/docker_compose/intel/cpu/xeon
     docker compose down
@@ -129,7 +126,6 @@ function stop_docker() {
 
 
 function main() {
-
     stop_docker
     if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
     start_services
