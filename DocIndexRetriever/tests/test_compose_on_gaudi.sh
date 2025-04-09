@@ -84,11 +84,11 @@ function validate_megaservice() {
     fi
 
     # Curl the Mega Service
-    echo "==============Testing retriever service: Text Request================="
-    local CONTENT=$(curl http://${ip_address}:8889/v1/retrievaltool -X POST -H "Content-Type: application/json" -d '{
-     "text": "Explain the OPEA project?"
-    }')
-    local EXIT_CODE=$(validate "$CONTENT" "OPEA" "doc-index-retriever-service-gaudi")
+    echo "==============Testing retriever service================="
+    export RETRIEVAL_TOOL_URL="http://${ip_address}:8889/v1/retrievaltool"
+    local CONTENT=$(python test.py)
+
+    local EXIT_CODE=$(validate "$CONTENT" "Test successful" "doc-index-retriever-service-gaudi")
     echo "$EXIT_CODE"
     local EXIT_CODE="${EXIT_CODE:0-1}"
     echo "return value is $EXIT_CODE"
@@ -115,9 +115,9 @@ function stop_docker() {
 function main() {
 
     stop_docker
-    # if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
-    # echo "Dump current docker ps"
-    # docker ps
+    if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
+    echo "Dump current docker ps"
+    docker ps
     start_time=$(date +%s)
     start_services
     end_time=$(date +%s)
