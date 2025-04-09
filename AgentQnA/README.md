@@ -208,9 +208,16 @@ bash run_ingest_data.sh
 
 ## Launch the UI
 
-Open a web browser to http://localhost:5173 to access the UI. Ensure the environment variable `AGENT_URL` is set to http://$ip_address:9090/v1/chat/completions in [ui/svelte/.env](./ui/svelte/.env) or else the UI may not work properly.
+Open a web browser to http://localhost:5173 to access the UI.
 
-The AgentQnA UI can be deployed locally or using Docker. To customize deployment, refer to the [AgentQnA UI Guide](./ui/svelte/README.md).
+1. `create Admin Account` with a random value
+2. add opea agent endpoint `http://$ip_address:9090/v1` which is a openai compatible api
+
+![opea-agent-setting](assets/img/opea-agent-setting.png)
+
+3. test opea agent with ui
+
+![opea-agent-test](assets/img/opea-agent-test.png)
 
 ## [Optional] Deploy using Helm Charts
 
