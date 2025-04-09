@@ -156,6 +156,7 @@ group_add:
   - video
 security_opt:
   - seccomp:unconfined
+````
 
 **How to Identify GPU Device IDs:**
 Use AMD GPU driver utilities to determine the correct `cardN` and `renderN` IDs for your GPU.
