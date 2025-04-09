@@ -220,7 +220,7 @@ function validate_gradio() {
         echo "[ $SERVICE_NAME ] HTTP status is 200. UI server is running successfully..."
     else
         echo "[ $SERVICE_NAME ] UI server has failed..."
-    fi            
+    fi
 }
 
 function stop_docker() {
@@ -262,7 +262,7 @@ function main() {
         validate_microservices "${docker_llm_container_names[${i}]}"
         validate_megaservice
         validate_gradio
-        
+
         stop_docker "${docker_compose_profiles[${i}]}"
         sleep 5s
     done
