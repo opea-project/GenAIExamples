@@ -13,10 +13,11 @@ services:
   dataprep-redis-service:
     image: ${REGISTRY:-opea}/dataprep:${TAG:-latest}
     container_name: dataprep-redis-server
-    # volumes:
-    #   - $WORKDIR/GenAIExamples/DocIndexRetriever/docker_image_build/GenAIComps/comps:/home/user/comps
     depends_on:
-      - redis-vector-db
+      redis-vector-db:
+        condition: service_started
+      tei-embedding-service:
+        condition: service_healthy
     ports:
       - "6007:5000"
       - "6008:6008"
@@ -28,7 +29,7 @@ services:
       REDIS_URL: ${REDIS_URL}
       REDIS_HOST: ${REDIS_HOST}
       INDEX_NAME: ${INDEX_NAME}
-      TEI_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
+      TEI_EMBEDDING_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       LOGFLAG: ${LOGFLAG}
   tei-embedding-service:
@@ -54,8 +55,6 @@ services:
   embedding:
     image: ${REGISTRY:-opea}/embedding:${TAG:-latest}
     container_name: embedding-server
-    # volumes:
-    #   - $WORKDIR/GenAIExamples/DocIndexRetriever/docker_image_build/GenAIComps/comps:/home/comps
     ports:
       - "6000:6000"
     ipc: host
@@ -114,8 +113,6 @@ services:
   reranking:
     image: ${REGISTRY:-opea}/reranking:${TAG:-latest}
     container_name: reranking-tei-xeon-server
-    # volumes:
-    #   - $WORKDIR/GenAIExamples/DocIndexRetriever/docker_image_build/GenAIComps/comps:/home/user/comps
     depends_on:
       tei-reranking-service:
         condition: service_healthy
