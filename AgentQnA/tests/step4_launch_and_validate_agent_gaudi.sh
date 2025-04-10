@@ -8,6 +8,8 @@ WORKPATH=$(dirname "$PWD")
 export WORKDIR=$WORKPATH/../../
 echo "WORKDIR=${WORKDIR}"
 export ip_address=$(hostname -I | awk '{print $1}')
+export host_ip=$ip_address
+echo "ip_address=${ip_address}"
 export TOOLSET_PATH=$WORKPATH/tools/
 export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
 HF_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
@@ -24,12 +26,12 @@ ls $HF_CACHE_DIR
 vllm_port=8086
 vllm_volume=${HF_CACHE_DIR}
 
-function start_tgi(){
-    echo "Starting tgi-gaudi server"
+
+function start_agent_service() {
+    echo "Starting agent service"
     cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/hpu/gaudi
     source set_env.sh
-    docker compose -f $WORKDIR/GenAIExamples/DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml -f compose.yaml tgi_gaudi.yaml -f compose.telemetry.yaml up -d
-
+    docker compose -f compose.yaml up -d
 }
 
 function start_all_services() {
@@ -68,7 +70,6 @@ function download_chinook_data(){
     git clone https://github.com/lerocha/chinook-database.git
     cp chinook-database/ChinookDatabase/DataSources/Chinook_Sqlite.sqlite $WORKDIR/GenAIExamples/AgentQnA/tests/
 }
-
 
 function validate() {
     local CONTENT="$1"
@@ -136,24 +137,6 @@ function remove_chinook_data(){
         rm -rf chinook-database
     fi
     echo "Chinook data removed!"
-}
-
-export host_ip=$ip_address
-echo "ip_address=${ip_address}"
-
-
-function validate() {
-    local CONTENT="$1"
-    local EXPECTED_RESULT="$2"
-    local SERVICE_NAME="$3"
-
-    if echo "$CONTENT" | grep -q "$EXPECTED_RESULT"; then
-        echo "[ $SERVICE_NAME ] Content is as expected: $CONTENT"
-        echo 0
-    else
-        echo "[ $SERVICE_NAME ] Content does not match the expected result: $CONTENT"
-        echo 1
-    fi
 }
 
 function ingest_data_and_validate() {
