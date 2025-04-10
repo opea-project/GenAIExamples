@@ -26,7 +26,7 @@ export HF_TOKEN=<you-hf-token>
 Build docker images for dataprep, agent, agent-ui.
 
 ```bash
-cd GenAIExamples/FinanceAgent/docker_image_build 
+cd GenAIExamples/FinanceAgent/docker_image_build
 docker compose -f build.yaml build --no-cache
 ```
 
@@ -66,42 +66,49 @@ First, launch the redis databases and the dataprep microservice.
 ```bash
 docker compose -f $WORKDIR/GenAIExamples/FinanceAgent/docker_compose/intel/hpu/gaudi/dataprep_compose.yaml up -d
 ```
+
 Validate datat ingest data and retrieval from database:
-```bash 
+
+```bash
 python $WORKPATH/tests/test_redis_finance.py --port $DATAPREP_PORT --test_option ingest
 python $WORKPATH/tests/test_redis_finance.py --port $DATAPREP_PORT --test_option get
 ```
+
 ### 3.3 Launch the multi-agent system
+
 ```bash
 cd $WORKDIR/GenAIExamples/FinanceAgent/docker_compose/intel/hpu/gaudi/
 bash launch_agents.sh
 ```
 
-
 ### 3.4 Validate agents
 
 FinQA Agent:
-```bash 
+
+```bash
 export agent_port="9095"
 prompt="What is Gap's revenue in 2024?"
 python3 $WORKDIR/GenAIExamples/FinanceAgent/tests/test.py --prompt "$prompt" --agent_role "worker" --ext_port $agent_port
 ```
 
 Research Agent:
+
 ```bash
 export agent_port="9096"
 prompt="generate NVDA financial research report"
 python3 $WORKDIR/GenAIExamples/AgentQnA/tests/test.py --prompt "$prompt" --agent_role "worker" --ext_port $agent_port --tool_choice "get_current_date" --tool_choice "get_share_performance"
 ```
+
 Supervisor ReAct Agent:
+
 ```bash
 export agent_port="9090"
 python3 $WORKDIR/GenAIExamples/FinanceAgent/tests/test.py --agent_role "supervisor" --ext_port $agent_port --stream
 ```
 
 Supervisor ReAct Agent Multi turn:
+
 ```bash
 python3 $WORKDIR/GenAIExamples/FinanceAgent/tests/test.py --agent_role "supervisor" --ext_port $agent_port --multi-turn --stream
 
 ```
-    
