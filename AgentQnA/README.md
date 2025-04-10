@@ -143,10 +143,13 @@ source $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/cpu/xeon/set_env.sh
 ```
 
 ### 2. Launch the multi-agent system. </br>
+
 We make it convenient to launch the whole system with docker compose, which includes microservices for LLM, agents, UI, retrieval tool, vector database, dataprep, and telemetry. There are 3 docker compose files, which make it easy for users to pick and choose. Users can choose a different retrieval tool other than the `DocIndexRetriever` example provided in our GenAIExamples repo. Users can choose not to launch the telemetry containers.
 
 #### Launch on Gaudi
+
 On Gaudi, `meta-llama/Meta-Llama-3.3-70B-Instruct` will be served using vllm. The command below will launch the multi-agent system with the `DocIndexRetriever` as the retrieval tool for the Worker RAG agent.
+
 ```bash
 cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/hpu/gaudi/
 docker compose -f $WORKDIR/GenAIExamples/DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml -f compose.yaml up -d
@@ -200,6 +203,7 @@ bash run_ingest_data.sh
 > **Note**: This is a one-time operation.
 
 ## How to interact with the agent system with UI
+
 The UI microservice is launched in the previous step with the other microservices.
 To see the UI, open a web browser to `http://${ip_address}:5173` to access the UI. Note the `ip_address` here is the host IP of the UI microservice.
 
