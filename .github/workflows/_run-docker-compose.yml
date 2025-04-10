@@ -162,6 +162,8 @@ jobs:
           SDK_BASE_URL: ${{ secrets.SDK_BASE_URL }}
           SERVING_TOKEN: ${{ secrets.SERVING_TOKEN }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
+          FINANCIAL_DATASETS_API_KEY: ${{ secrets.FINANCIAL_DATASETS_API_KEY }}
           IMAGE_REPO: ${{ inputs.registry }}
           IMAGE_TAG: ${{ inputs.tag }}
           example: ${{ inputs.example }}
