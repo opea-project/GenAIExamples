@@ -9,7 +9,7 @@ services:
     ports:
       - "${CODETRANS_TGI_SERVICE_PORT:-8008}:80"
     volumes:
-      - "/var/lib/GenAI/codetrans/data:/data"
+      - "${MODEL_CACHE:-/var/lib/GenAI/data}:/data"
     shm_size: 1g
     environment:
       no_proxy: ${no_proxy}

@@ -12,6 +12,7 @@ WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
 
+export MODEL_CACHE=${model_cache:-"/var/lib/GenAI/data"}
 export REGISTRY=${IMAGE_REPO}
 export TAG=${IMAGE_TAG}
 export HOST_IP=${ip_address}

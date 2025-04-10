@@ -88,10 +88,10 @@ function validate_megaservice() {
     fi
 
     # Curl the Mega Service
-    echo "================Testing retriever service: Text Request ================"
+    echo "================Testing retriever service ================"
     cd $WORKPATH/tests
     local CONTENT=$(http_proxy="" curl http://${ip_address}:8889/v1/retrievaltool -X POST -H "Content-Type: application/json" -d '{
-     "text": "Explain the OPEA project?"
+     "messages": "Explain the OPEA project?"
     }')
 
     local EXIT_CODE=$(validate "$CONTENT" "OPEA" "doc-index-retriever-service-gaudi")

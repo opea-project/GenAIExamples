@@ -176,7 +176,10 @@ jobs:
               export model_cache="/data2/hf_model"
             else
               echo "Model cache directory /data2/hf_model does not exist"
-              export model_cache="~/.cache/huggingface/hub"
+              export model_cache="$HOME/.cache/huggingface/hub"
+            fi
+            if [[ "$test_case" == *"rocm"* ]]; then
+              export model_cache="/var/lib/GenAI/data"
             fi
           fi
           if [ -f "${test_case}" ]; then timeout 60m bash "${test_case}"; else echo "Test script {${test_case}} not found, skip test!"; fi

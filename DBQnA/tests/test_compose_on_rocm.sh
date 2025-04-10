@@ -22,6 +22,7 @@ export POSTGRES_DB="chinook"
 export DBQNA_TEXT_TO_SQL_PORT=9090
 export DBQNA_UI_PORT=5174
 export build_texttosql_url="${ip_address}:${DBQNA_TEXT_TO_SQL_PORT}/v1"
+export MODEL_CACHE=${model_cache:-"/var/lib/GenAI/data"}
 
 function build_docker_images() {
     cd "$WORKPATH"/docker_image_build
