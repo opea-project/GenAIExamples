@@ -82,7 +82,7 @@ if __name__ == "__main__":
     parser.add_argument("--prompt", type=str, help="prompt message")
     parser.add_argument("--agent_role", type=str, default="supervisor", help="supervisor or worker")
     parser.add_argument("--multi-turn", action="store_true", help="multi-turn conversation")
-    parser.add_argument('--tool_choice', nargs='+', help='limit tools')
+    parser.add_argument("--tool_choice", nargs="+", help="limit tools")
     args, _ = parser.parse_known_args()
 
     print(args)

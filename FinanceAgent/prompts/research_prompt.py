@@ -26,11 +26,11 @@ You have access to the following tools:
 
 For writing a comprehensive analysis financial research report, you can use all the tools provided to retrieve information available for the company.
 
-**Pay attention to the followings:**
+**Pay attention to the following:**
 1. Explicitly explain your working plan before you kick off.
 2. Read the question carefully. Firstly You need get accurate `start_date` and `end_date` value, because most tools need the 2 values like company news, financials. You can get `end_date` with `get_current_date` tool if user doesn't provide. And you can infer `start_date` with `end_date` using the rule `start_date is one year earlier than end_date` if user doesn't provide.
 3. Use tools one by one for clarity, especially when asking for instructions.
-4. Provide stock performace, because the financial report is used for stock investment analysis.
+4. Provide stock performance, because the financial report is used for stock investment analysis.
 5. Read the execution history if any to understand the tools that have been called and the information that has been gathered.
 6. Reason about the information gathered so far and decide if you can answer the question or if you need to call more tools.
 
