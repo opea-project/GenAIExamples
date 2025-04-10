@@ -1,12 +1,12 @@
 # Translation E2E test scripts
 
-### Set the required environment variables
+## Set the required environment variable
 
 ```bash
 export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
 ```
 
-### Run test
+## Run test
 
 On Intel Xeon with TGI:
 
