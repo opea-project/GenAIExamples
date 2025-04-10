@@ -14,7 +14,7 @@ model=meta-llama/Llama-3.3-70B-Instruct
 vllm_image=opea/vllm-gaudi:latest
 vllm_port=8086
 vllm_image=$vllm_image
-# HF_CACHE_DIR=/data2/huggingface
+HF_CACHE_DIR=/data2/huggingface
 vllm_volume=${HF_CACHE_DIR}
 #######################################
 
