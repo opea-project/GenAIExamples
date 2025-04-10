@@ -105,7 +105,7 @@ services:
       HUGGINGFACEHUB_API_TOKEN: ${MULTIMODAL_HUGGINGFACEHUB_API_TOKEN}
       HUGGING_FACE_HUB_TOKEN: ${MULTIMODAL_HUGGINGFACEHUB_API_TOKEN}
     volumes:
-      - "/var/opea/multimodalqna-service/data:/data"
+      - "${MODEL_CACHE:-./data}:/data"
     shm_size: 64g
     devices:
       - /dev/kfd:/dev/kfd
@@ -156,7 +156,7 @@ services:
       MM_EMBEDDING_PORT_MICROSERVICE: ${MM_EMBEDDING_PORT_MICROSERVICE}
       MM_RETRIEVER_SERVICE_HOST_IP: ${MM_RETRIEVER_SERVICE_HOST_IP}
       LVM_SERVICE_HOST_IP: ${LVM_SERVICE_HOST_IP}
-      WHISPER_SERVER_PORT: ${WHISPER_SERVER_PORT}
+      WHISPER_SERVER_PORT: ${WHISPER_PORT}
       WHISPER_SERVER_ENDPOINT: ${WHISPER_SERVER_ENDPOINT}
     ipc: host
     restart: always

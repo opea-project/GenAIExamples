@@ -38,7 +38,6 @@ function start_services() {
     export RERANK_MODEL_ID="BAAI/bge-reranker-base"
     export TEI_EMBEDDING_ENDPOINT="http://${ip_address}:8090"
     export TEI_RERANKING_ENDPOINT="http://${ip_address}:8808"
-    export TGI_LLM_ENDPOINT="http://${ip_address}:8008"
     export REDIS_URL="redis://${ip_address}:6379"
     export INDEX_NAME="rag-redis"
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
@@ -46,14 +45,13 @@ function start_services() {
     export EMBEDDING_SERVICE_HOST_IP=${ip_address}
     export RETRIEVER_SERVICE_HOST_IP=${ip_address}
     export RERANK_SERVICE_HOST_IP=${ip_address}
-    export LLM_SERVICE_HOST_IP=${ip_address}
     export host_ip=${ip_address}
     export RERANK_TYPE="tei"
     export LOGFLAG=true
 
     # Start Docker Containers
     docker compose up -d
-    sleep 30
+    sleep 1m
     echo "Docker services started!"
 }
 
@@ -86,11 +84,13 @@ function validate_megaservice() {
     fi
 
     # Curl the Mega Service
-    echo "==============Testing retriever service: Text Request================="
-    local CONTENT=$(curl http://${ip_address}:8889/v1/retrievaltool -X POST -H "Content-Type: application/json" -d '{
-     "text": "Explain the OPEA project?"
+    echo "==============Testing retriever service================="
+    local CONTENT=$(http_proxy="" curl http://${ip_address}:8889/v1/retrievaltool -X POST -H "Content-Type: application/json" -d '{
+     "messages": "Explain the OPEA project?"
     }')
+
     local EXIT_CODE=$(validate "$CONTENT" "OPEA" "doc-index-retriever-service-gaudi")
+
     echo "$EXIT_CODE"
     local EXIT_CODE="${EXIT_CODE:0-1}"
     echo "return value is $EXIT_CODE"

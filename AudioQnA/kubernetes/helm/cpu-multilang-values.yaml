@@ -1,0 +1,15 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+tgi:
+  enabled: false
+vllm:
+  enabled: true
+
+speecht5:
+  enabled: false
+gpt-sovits:
+  enabled: true
+
+image:
+  repository: opea/audioqna-multilang

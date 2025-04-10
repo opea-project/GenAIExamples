@@ -18,21 +18,21 @@ cd GenAIComps
 ### 2. Build ASR Image
 
 ```bash
-docker build -t opea/whisper-gaudi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/asr/src/integrations/dependency/whisper/Dockerfile.intel_hpu .
+docker build -t opea/whisper-gaudi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/third_parties/whisper/src/Dockerfile.intel_hpu .
 ```
 
 ### 3. Build vLLM Image
 
 git clone https://github.com/HabanaAI/vllm-fork.git
 cd vllm-fork/
-VLLM_VER=$(git describe --tags "$(git rev-list --tags --max-count=1)")
+VLLM_VER=v0.6.6.post1+Gaudi-1.20.0
 git checkout ${VLLM_VER}
 docker build --no-cache --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile.hpu -t opea/vllm-gaudi:latest --shm-size=128g .
 
 ### 4. Build TTS Image
 
 ```bash
-docker build -t opea/speecht5-gaudi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/tts/src/integrations/dependency/speecht5/Dockerfile.intel_hpu .
+docker build -t opea/speecht5-gaudi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/third_parties/speecht5/src/Dockerfile.intel_hpu .
 ```
 
 ### 5. Build MegaService Docker Image

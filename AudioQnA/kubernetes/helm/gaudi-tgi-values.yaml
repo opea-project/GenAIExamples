@@ -1,0 +1,49 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+tgi:
+  enabled: true
+  accelDevice: "gaudi"
+  image:
+    repository: ghcr.io/huggingface/tgi-gaudi
+    tag: "2.3.1"
+  resources:
+    limits:
+      habana.ai/gaudi: 1
+  MAX_INPUT_LENGTH: "1024"
+  MAX_TOTAL_TOKENS: "2048"
+  CUDA_GRAPHS: ""
+  HF_HUB_DISABLE_PROGRESS_BARS: 1
+  HF_HUB_ENABLE_HF_TRANSFER: 0
+  ENABLE_HPU_GRAPH: true
+  LIMIT_HPU_GRAPH: true
+  USE_FLASH_ATTENTION: true
+  FLASH_ATTENTION_RECOMPUTE: true
+  readinessProbe:
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    timeoutSeconds: 1
+  startupProbe:
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    timeoutSeconds: 1
+    failureThreshold: 120
+vllm:
+  enabled: false
+
+whisper:
+  image:
+    repository: opea/whisper-gaudi
+  resources:
+    limits:
+      habana.ai/gaudi: 1
+
+speecht5:
+  enabled: true
+  image:
+    repository: opea/speecht5-gaudi
+  resources:
+    limits:
+      habana.ai/gaudi: 1
+gpt-sovits:
+  enabled: false

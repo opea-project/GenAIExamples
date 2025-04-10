@@ -1,0 +1,60 @@
+# Copyright (C) 2025 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+CHATQNA_TYPE: "CHATQNA_FAQGEN"
+llm-uservice:
+  enabled: true
+  image:
+    repository: opea/llm-faqgen
+  LLM_MODEL_ID: meta-llama/Meta-Llama-3-8B-Instruct
+  FAQGEN_BACKEND: "TGI"
+  service:
+    port: 80
+vllm:
+  enabled: false
+# TGI: largest bottleneck for ChatQnA
+tgi:
+  enabled: true
+  accelDevice: "gaudi"
+  image:
+    repository: ghcr.io/huggingface/tgi-gaudi
+    tag: "2.3.1"
+  resources:
+    limits:
+      habana.ai/gaudi: 1
+  # higher limits are needed with extra input tokens added by rerank
+  MAX_INPUT_LENGTH: "2048"
+  MAX_TOTAL_TOKENS: "4096"
+  CUDA_GRAPHS: ""
+  OMPI_MCA_btl_vader_single_copy_mechanism: "none"
+  ENABLE_HPU_GRAPH: "true"
+  LIMIT_HPU_GRAPH: "true"
+  USE_FLASH_ATTENTION: "true"
+  FLASH_ATTENTION_RECOMPUTE: "true"
+
+  readinessProbe:
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    timeoutSeconds: 1
+  startupProbe:
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    timeoutSeconds: 1
+    failureThreshold: 120
+
+# Reranking: second largest bottleneck when reranking is in use
+# (i.e. query context docs have been uploaded with data-prep)
+teirerank:
+  accelDevice: "gaudi"
+  OMPI_MCA_btl_vader_single_copy_mechanism: "none"
+  MAX_WARMUP_SEQUENCE_LENGTH: "512"
+  image:
+    repository: ghcr.io/huggingface/tei-gaudi
+    tag: 1.5.0
+  resources:
+    limits:
+      habana.ai/gaudi: 1
+#  securityContext:
+#    readOnlyRootFilesystem: false
+  readinessProbe:
+    timeoutSeconds: 1

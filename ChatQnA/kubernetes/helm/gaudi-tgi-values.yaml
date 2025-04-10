@@ -26,10 +26,6 @@ tgi:
   USE_FLASH_ATTENTION: "true"
   FLASH_ATTENTION_RECOMPUTE: "true"
 
-  livenessProbe:
-    initialDelaySeconds: 5
-    periodSeconds: 5
-    timeoutSeconds: 1
   readinessProbe:
     initialDelaySeconds: 5
     periodSeconds: 5
@@ -54,8 +50,6 @@ teirerank:
       habana.ai/gaudi: 1
   securityContext:
     readOnlyRootFilesystem: false
-  livenessProbe:
-    timeoutSeconds: 1
   readinessProbe:
     timeoutSeconds: 1
 
@@ -73,7 +67,3 @@ teirerank:
 #       habana.ai/gaudi: 1
 #   securityContext:
 #     readOnlyRootFilesystem: false
-#   livenessProbe:
-#     timeoutSeconds: 1
-#   readinessProbe:
-#     timeoutSeconds: 1

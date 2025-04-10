@@ -1,0 +1,4 @@
+gradio==5.22.0
+numpy==1.26.4
+opencv-python==4.10.0.82
+Pillow==10.3.0

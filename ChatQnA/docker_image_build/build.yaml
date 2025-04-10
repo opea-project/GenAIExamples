@@ -75,7 +75,7 @@ services:
   vllm:
     build:
       context: vllm
-      dockerfile: Dockerfile.cpu
+      dockerfile: docker/Dockerfile.cpu
     extends: chatqna
     image: ${REGISTRY:-opea}/vllm:${TAG:-latest}
   vllm-gaudi:
