@@ -34,7 +34,7 @@ function build_docker_images() {
     cd $WORKPATH/docker_image_build
     git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="multimodalqna multimodalqna-ui embedding-multimodal-bridgetower embedding retriever lvm dataprep whisper"
+    service_list="multimodalqna multimodalqna-ui embedding-multimodal-bridgetower embedding retriever lvm dataprep whisper vllm-rocm"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker images && sleep 1m
@@ -44,7 +44,7 @@ function setup_env() {
     export HOST_IP=${ip_address}
     export host_ip=${ip_address}
     export MULTIMODAL_HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
-    export MULTIMODAL_TGI_SERVICE_PORT="8399"
+    export MULTIMODAL_VLLM_SERVICE_PORT="8399"
     export no_proxy=${your_no_proxy}
     export http_proxy=${your_http_proxy}
     export https_proxy=${your_http_proxy}
@@ -57,10 +57,9 @@ function setup_env() {
     export REDIS_URL="redis://${HOST_IP}:6379"
     export REDIS_HOST=${HOST_IP}
     export INDEX_NAME="mm-rag-redis"
-    export LLAVA_SERVER_PORT=8399
     export LVM_ENDPOINT="http://${HOST_IP}:8399"
     export EMBEDDING_MODEL_ID="BridgeTower/bridgetower-large-itm-mlm-itc"
-    export LVM_MODEL_ID="Xkev/Llama-3.2V-11B-cot"
+    export MULTIMODAL_LLM_MODEL_ID="Xkev/Llama-3.2V-11B-cot"
     export WHISPER_MODEL="base"
     export MM_EMBEDDING_SERVICE_HOST_IP=${HOST_IP}
     export MM_RETRIEVER_SERVICE_HOST_IP=${HOST_IP}
@@ -77,11 +76,11 @@ function setup_env() {
 
 function start_services() {
     cd $WORKPATH/docker_compose/amd/gpu/rocm
-    docker compose -f compose.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
+    docker compose -f compose_vllm.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
     n=0
     until [[ "$n" -ge 100 ]]; do
-        docker logs tgi-llava-rocm-server >& $LOG_PATH/tgi-llava-rocm-server_start.log
-        if grep -q "Connected" $LOG_PATH/tgi-llava-rocm-server_start.log; then
+        docker logs multimodalqna-vllm-service >& $LOG_PATH/search-vllm-service_start.log
+        if grep -q "Application startup complete" $LOG_PATH/search-vllm-service_start.log; then
             break
         fi
         sleep 10s
@@ -226,14 +225,14 @@ function validate_microservices() {
 
     sleep 5m
 
-    # llava server
-    echo "Evaluating lvm-llava"
+    #vLLM Service
+    echo "Evaluating vllm"
     validate_service \
-        "http://${host_ip}:${LLAVA_SERVER_PORT}/generate" \
-        '"generated_text":' \
-        "tgi-llava-rocm-server" \
-        "tgi-llava-rocm-server" \
-        '{"inputs":"![](https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/transformers/rabbit.png)What is this a picture of?\n\n","parameters":{"max_new_tokens":16, "seed": 42}}'
+        "${host_ip}:${MULTIMODAL_VLLM_SERVICE_PORT}/v1/chat/completions" \
+        "content" \
+        "multimodalqna-vllm-service" \
+        "multimodalqna-vllm-service" \
+        '{"model": "Xkev/Llama-3.2V-11B-cot", "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens": 17}'
 
     # lvm
     echo "Evaluating lvm"
@@ -260,10 +259,10 @@ function validate_megaservice() {
     echo "Validate megaservice with first query"
     validate_service \
         "http://${host_ip}:8888/v1/multimodalqna" \
-        'red' \
+        '"time_of_frame_ms":' \
         "multimodalqna" \
         "multimodalqna-backend-server" \
-        '{"messages": "Find an apple. What color is it?"}'
+        '{"messages": "What is the revenue of Nike in 2023?"}'
 
     echo "Validate megaservice with first audio query"
     validate_service \
