@@ -85,10 +85,12 @@ function validate_megaservice() {
 
     # Curl the Mega Service
     echo "==============Testing retriever service================="
-    export RETRIEVAL_TOOL_URL="http://${ip_address}:8889/v1/retrievaltool"
-    local CONTENT=$(python test.py)
+    local CONTENT=$(http_proxy="" curl http://${ip_address}:8889/v1/retrievaltool -X POST -H "Content-Type: application/json" -d '{
+     "messages": "Explain the OPEA project?"
+    }')
 
-    local EXIT_CODE=$(validate "$CONTENT" "Test successful" "doc-index-retriever-service-gaudi")
+    local EXIT_CODE=$(validate "$CONTENT" "OPEA" "doc-index-retriever-service-gaudi")
+
     echo "$EXIT_CODE"
     local EXIT_CODE="${EXIT_CODE:0-1}"
     echo "return value is $EXIT_CODE"
