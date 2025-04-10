@@ -71,8 +71,8 @@ This Translation use case performs Language Translation Inference across multipl
 
 The table below shows different deployment options to choose from. They outline in detail the implementation of this example on the selected hardware.
 
-| Category                | Deployment Option            | Description                                                                                                                                                                                                                                                       |
-| ----------------------- | ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| On-premise Deployments  | Docker compose               | [Translation deployment on Xeon](./docker_compose/intel/cpu/xeon/README.md)                                                                                                                                                                                                     |
-|                         |                              | [Translation deployment on Gaudi](./docker_compose/intel/hpu/gaudi/README.md)                                                                                                                                                                                                   |
-|                         |                              | [Translation deployment on AMD GPU](./docker_compose/amd/gpu/rocm/README.md)                                                                                                                                                                                                   |
+| Category               | Deployment Option | Description                                                                   |
+| ---------------------- | ----------------- | ----------------------------------------------------------------------------- |
+| On-premise Deployments | Docker compose    | [Translation deployment on Xeon](./docker_compose/intel/cpu/xeon/README.md)   |
+|                        |                   | [Translation deployment on Gaudi](./docker_compose/intel/hpu/gaudi/README.md) |
+|                        |                   | [Translation deployment on AMD GPU](./docker_compose/amd/gpu/rocm/README.md)  |
