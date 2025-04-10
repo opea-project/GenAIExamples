@@ -43,7 +43,7 @@ function start_services() {
     cd $WORKPATH/docker_compose
     export host_ip=${ip_address}
     source set_env.sh
-    cd intel/hpu/gaudi
+    cd intel/cpu/xeon
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
