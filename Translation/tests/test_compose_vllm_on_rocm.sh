@@ -39,8 +39,7 @@ function build_docker_images() {
 function start_services() {
     cd $WORKPATH/docker_compose/amd/gpu/rocm/
 
-    export HOST_IP=${ip_address}
-    export EXTERNAL_HOST_IP=${ip_address}
+    export host_ip=${ip_address}
     source set_env_vllm.sh
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env

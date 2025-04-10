@@ -5,8 +5,8 @@
 
 # SPDX-License-Identifier: Apache-2.0
 
-export HOST_IP=${HOST_IP}
-export EXTERNAL_HOST_IP=${EXTERNAL_HOST_IP}
+export HOST_IP=${host_ip}
+export EXTERNAL_HOST_IP=${host_ip}
 export TRANSLATION_LLM_MODEL_ID="haoranxu/ALMA-13B"
 export TRANSLATION_VLLM_SERVICE_PORT=8088
 export TRANSLATION_LLM_ENDPOINT="http://${HOST_IP}:${TRANSLATION_VLLM_SERVICE_PORT}"
