@@ -30,6 +30,7 @@ export MAX_TOTAL_TOKENS=4096
 export DocSum_COMPONENT_NAME="OpeaDocSumvLLM"
 export DOCSUM_ENDPOINT="http://${ip_address}:9000/v1/docsum"
 
-
+export FINNHUB_API_KEY=${FINNHUB_API_KEY}
+export FINANCIAL_DATASETS_API_KEY=${FINANCIAL_DATASETS_API_KEY}
 
 docker compose -f compose.yaml up -d

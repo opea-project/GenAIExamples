@@ -60,6 +60,7 @@ services:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       FINNHUB_API_KEY: ${FINNHUB_API_KEY}
+      FINANCIAL_DATASETS_API_KEY: ${FINANCIAL_DATASETS_API_KEY}
       port: 9096
 
   supervisor-react-agent:

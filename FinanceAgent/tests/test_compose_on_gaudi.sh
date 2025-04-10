@@ -59,7 +59,8 @@ function build_vllm_docker_image() {
         git clone https://github.com/HabanaAI/vllm-fork.git
     fi
     cd ./vllm-fork
-    VLLM_VER=$(git describe --tags "$(git rev-list --tags --max-count=1)")
+    # VLLM_VER=$(git describe --tags "$(git rev-list --tags --max-count=1)")
+    VLLM_VER=v0.6.6.post1+Gaudi-1.20.0
     git checkout ${VLLM_VER} &> /dev/null
     docker build --no-cache -f Dockerfile.hpu -t $vllm_image --shm-size=128g . --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy
     if [ $? -ne 0 ]; then
@@ -75,11 +76,11 @@ function start_vllm_service_70B() {
     echo "token is ${HF_TOKEN}"
     echo "start vllm gaudi service"
     echo "**************model is $model**************"
-    docker run -d --runtime=habana --rm --name "vllm-gaudi-server" -e HABANA_VISIBLE_DEVICES=0,1,2,3 -p $vllm_port:8000 -v $vllm_volume:/data -e HF_TOKEN=$HF_TOKEN -e HUGGING_FACE_HUB_TOKEN=$HF_TOKEN -e HF_HOME=/data -e OMPI_MCA_btl_vader_single_copy_mechanism=none -e PT_HPU_ENABLE_LAZY_COLLECTIVES=true -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e no_proxy=$no_proxy -e VLLM_SKIP_WARMUP=true --cap-add=sys_nice --ipc=host $vllm_image --model ${model} --max-seq-len-to-capture 16384 --tensor-parallel-size 4
-    sleep 5s
+    docker run -d --runtime=habana --rm --name "vllm-gaudi-server" -e HABANA_VISIBLE_DEVICES=all -p $vllm_port:8000 -v $vllm_volume:/data -e HF_TOKEN=$HF_TOKEN -e HUGGING_FACE_HUB_TOKEN=$HF_TOKEN -e HF_HOME=/data -e OMPI_MCA_btl_vader_single_copy_mechanism=none -e PT_HPU_ENABLE_LAZY_COLLECTIVES=true -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e no_proxy=$no_proxy -e VLLM_SKIP_WARMUP=true --cap-add=sys_nice --ipc=host $vllm_image --model ${model} --max-seq-len-to-capture 16384 --tensor-parallel-size 4
+    sleep 10s
     echo "Waiting vllm gaudi ready"
     n=0
-    until [[ "$n" -ge 100 ]] || [[ $ready == true ]]; do
+    until [[ "$n" -ge 200 ]] || [[ $ready == true ]]; do
         docker logs vllm-gaudi-server &> ${LOG_PATH}/vllm-gaudi-service.log
         n=$((n+1))
         if grep -q "Uvicorn running on" ${LOG_PATH}/vllm-gaudi-service.log; then
@@ -89,9 +90,9 @@ function start_vllm_service_70B() {
             echo "container vllm-gaudi-server not found"
             exit 1
         fi
-        sleep 5s
+        sleep 10s
     done
-    sleep 5s
+    sleep 10s
     echo "Service started successfully"
 }
 
@@ -181,7 +182,7 @@ function validate_agent_service() {
     echo "======================Testing worker research agent======================"
     export agent_port="9096"
     prompt="generate NVDA financial research report"
-    local CONTENT=$(python3 $WORKDIR/GenAIExamples/AgentQnA/tests/test.py --prompt "$prompt" --agent_role "worker" --ext_port $agent_port)
+    local CONTENT=$(python3 $WORKDIR/GenAIExamples/AgentQnA/tests/test.py --prompt "$prompt" --agent_role "worker" --ext_port $agent_port --tool_choice "get_current_date" --tool_choice "get_share_performance")
     local EXIT_CODE=$(validate "$CONTENT" "NVDA" "research-agent-endpoint")
     echo $CONTENT
     echo $EXIT_CODE
@@ -214,6 +215,7 @@ function validate_agent_service() {
     #     docker logs react-agent-endpoint
     #     exit 1
     # fi
+
 }
 
 function stop_agent_docker() {
@@ -228,23 +230,23 @@ function stop_agent_docker() {
 
 
 echo "workpath: $WORKPATH"
-# echo "=================== Stop containers ===================="
-# stop_llm
+echo "=================== Stop containers ===================="
+stop_llm
 stop_agent_docker
 stop_dataprep
 
 cd $WORKPATH/tests
 
 # echo "=================== #1 Building docker images===================="
-# build_vllm_docker_image
-# build_dataprep_agent_images
+build_vllm_docker_image
+build_dataprep_agent_images
 
 #### for local test
 # build_agent_image_local
 # echo "=================== #1 Building docker images completed===================="
 
 # echo "=================== #2 Start vllm endpoint===================="
-# start_vllm_service_70B
+start_vllm_service_70B
 # echo "=================== #2 vllm endpoint started===================="
 
 # echo "=================== #3 Start dataprep and ingest data ===================="
@@ -257,12 +259,12 @@ start_agents
 validate_agent_service
 echo "=================== #4 Agent test passed ===================="
 
-# echo "=================== #5 Stop microservices ===================="
-# stop_agent_docker
-# stop_dataprep
-# stop_llm
-# echo "=================== #5 Microservices stopped===================="
+echo "=================== #5 Stop microservices ===================="
+stop_agent_docker
+stop_dataprep
+stop_llm
+echo "=================== #5 Microservices stopped===================="
 
-# echo y | docker system prune
+echo y | docker system prune
 
-# echo "ALL DONE!!"
+echo "ALL DONE!!"
