@@ -10,6 +10,7 @@ echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
 echo "TAG=IMAGE_TAG=${IMAGE_TAG}"
 export REGISTRY=${IMAGE_REPO}
 export TAG=${IMAGE_TAG}
+export MODEL_CACHE=${model_cache:-"/var/lib/GenAI/data"}
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
@@ -35,7 +36,7 @@ function build_docker_images() {
     service_list="codetrans codetrans-ui llm-textgen nginx"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
-    docker pull ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
+    docker pull ghcr.io/huggingface/text-generation-inference:2.4.1-rocm
     docker images && sleep 1s
 }
 
@@ -57,7 +58,7 @@ function start_services() {
     export CODETRANS_BACKEND_SERVICE_PORT=7777
     export CODETRANS_NGINX_PORT=8088
     export CODETRANS_BACKEND_SERVICE_URL="http://${ip_address}:${CODETRANS_BACKEND_SERVICE_PORT}/v1/codetrans"
-    export host_ip=${ip_address}
+    export HOST_IP=${ip_address}
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
@@ -111,7 +112,7 @@ function validate_microservices() {
         "codetrans-tgi-service" \
         "codetrans-tgi-service" \
         '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}'
-
+    sleep 10
     # llm microservice
     validate_services \
         "${ip_address}:${CODETRANS_LLM_SERVICE_PORT}/v1/chat/completions" \

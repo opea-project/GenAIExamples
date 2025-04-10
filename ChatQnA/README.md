@@ -4,24 +4,35 @@ Chatbots are the most widely adopted use case for leveraging the powerful chat a
 
 RAG bridges the knowledge gap by dynamically fetching relevant information from external sources, ensuring that responses generated remain factual and current. The core of this architecture are vector databases, which are instrumental in enabling efficient and semantic retrieval of information. These databases store data as vectors, allowing RAG to swiftly access the most pertinent documents or data points based on semantic similarity.
 
+# Table of contents
+
+1. [Automated Terraform Deployment](#automated-deployment-to-ubuntu-based-systemif-not-using-terraform-using-intel-optimized-cloud-modules-for-ansible)
+2. [Automated Deployment to Ubuntu based system](#automated-deployment-to-ubuntu-based-systemif-not-using-terraform-using-intel-optimized-cloud-modules-for-ansible)
+3. [Manually Deployment](#manually-deploy-chatqna-service)
+4. [Architecture and Deploy Details](#architecture-and-deploy-details)
+5. [Consume Service](#consume-chatqna-service-with-rag)
+6. [Monitoring and Tracing](#monitoring-opea-service-with-prometheus-and-grafana-dashboard)
+
 ## 🤖 Automated Terraform Deployment using Intel® Optimized Cloud Modules for **Terraform**
 
-| Cloud Provider       | Intel Architecture                | Intel Optimized Cloud Module for Terraform                                                                                         | Comments                                                             |
-| -------------------- | --------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
-| AWS                  | 4th Gen Intel Xeon with Intel AMX | [AWS Module](https://github.com/intel/terraform-intel-aws-vm/tree/main/examples/gen-ai-xeon-opea-chatqna)                          | Uses meta-llama/Meta-Llama-3-8B-Instruct by default                  |
-| AWS Falcon2-11B      | 4th Gen Intel Xeon with Intel AMX | [AWS Module with Falcon11B](https://github.com/intel/terraform-intel-aws-vm/tree/main/examples/gen-ai-xeon-opea-chatqna-falcon11B) | Uses TII Falcon2-11B LLM Model                                       |
-| GCP                  | 5th Gen Intel Xeon with Intel AMX | [GCP Module](https://github.com/intel/terraform-intel-gcp-vm/tree/main/examples/gen-ai-xeon-opea-chatqna)                          | Also supports Confidential AI by using Intel® TDX with 4th Gen Xeon |
-| Azure                | 5th Gen Intel Xeon with Intel AMX | Work-in-progress                                                                                                                   | Work-in-progress                                                     |
-| Intel Tiber AI Cloud | 5th Gen Intel Xeon with Intel AMX | Work-in-progress                                                                                                                   | Work-in-progress                                                     |
+| Cloud Provider       | Intel Architecture                                | Intel Optimized Cloud Module for Terraform                                                                                             | Comments                                                        |
+| -------------------- | ------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| AWS                  | 4th Gen Intel Xeon with Intel AMX                 | [AWS Deployment](https://github.com/intel/terraform-intel-aws-vm/tree/main/examples/gen-ai-xeon-opea-chatqna)                          | Uses meta-llama/Meta-Llama-3-8B-Instruct by default             |
+| AWS Falcon2-11B      | 4th Gen Intel Xeon with Intel AMX                 | [AWS Deployment with Falcon11B](https://github.com/intel/terraform-intel-aws-vm/tree/main/examples/gen-ai-xeon-opea-chatqna-falcon11B) | Uses TII Falcon2-11B LLM Model                                  |
+| AWS Falcon3          | 4th Gen Intel Xeon with Intel AMX                 | [AWS Deployment with Falcon3](https://github.com/intel/terraform-intel-aws-vm/tree/main/examples/gen-ai-xeon-opea-chatqna-falcon3)     | Uses TII Falcon3 LLM Model                                      |
+| GCP                  | 4th/5th Gen Intel Xeon with Intel AMX & Intel TDX | [GCP Deployment](https://github.com/intel/terraform-intel-gcp-vm/tree/main/examples/gen-ai-xeon-opea-chatqna)                          | Supports Confidential AI by using Intel® TDX with 4th Gen Xeon |
+| Azure                | 4th/5th Gen Intel Xeon with Intel AMX & Intel TDX | [Azure Deployment](https://github.com/intel/terraform-intel-azure-linux-vm/tree/main/examples/azure-gen-ai-xeon-opea-chatqna-tdx)      | Supports Confidential AI by using Intel® TDX with 4th Gen Xeon |
+| Intel Tiber AI Cloud | 5th Gen Intel Xeon with Intel AMX                 | Work-in-progress                                                                                                                       | Work-in-progress                                                |
 
-## Automated Deployment to Ubuntu based system(if not using Terraform) using Intel® Optimized Cloud Modules for **Ansible**
+## Automated Deployment to Ubuntu based system (if not using Terraform) using Intel® Optimized Cloud Modules for **Ansible**
 
 To deploy to existing Xeon Ubuntu based system, use our Intel Optimized Cloud Modules for Ansible. This is the same Ansible playbook used by Terraform.
 Use this if you are not using Terraform and have provisioned your system with another tool or manually including bare metal.
-| Operating System | Intel Optimized Cloud Module for Ansible |
-|------------------|------------------------------------------|
-| Ubuntu 20.04 | [ChatQnA Ansible Module](https://github.com/intel/optimized-cloud-recipes/tree/main/recipes/ai-opea-chatqna-xeon) |
-| Ubuntu 22.04 | Work-in-progress |
+
+| Operating System | Intel Optimized Cloud Module for Ansible                                                                          |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------- |
+| Ubuntu 20.04     | [ChatQnA Ansible Module](https://github.com/intel/optimized-cloud-recipes/tree/main/recipes/ai-opea-chatqna-xeon) |
+| Ubuntu 22.04     | Work-in-progress                                                                                                  |
 
 ## Manually Deploy ChatQnA Service
 
@@ -39,7 +50,7 @@ Note:
 
 1. If you do not have docker installed you can run this script to install docker : `bash docker_compose/install_docker.sh`.
 
-2. The default LLM is `meta-llama/Meta-Llama-3-8B-Instruct`. Before deploying the application, please make sure either you've requested and been granted the access to it on [Huggingface](https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct) or you've downloaded the model locally from [ModelScope](https://www.modelscope.cn/models).
+2. The default LLM is `meta-llama/Meta-Llama-3-8B-Instruct`. Before deploying the application, please make sure either you've requested and been granted the access to it on [Huggingface](https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct) `or` you've downloaded the model locally from [ModelScope](https://www.modelscope.cn/models).
 
 ### Quick Start: 1.Setup Environment Variable
 
@@ -70,11 +81,11 @@ To set up environment variables for deploying ChatQnA services, follow these ste
    # on Gaudi
    cd GenAIExamples/ChatQnA/docker_compose/intel/hpu/gaudi/
    source ./set_env.sh
-   export no_proxy="Your_No_Proxy",chatqna-gaudi-ui-server,chatqna-gaudi-backend-server,dataprep-redis-service,tei-embedding-service,retriever,tei-reranking-service,tgi-service,vllm-service,guardrails
+   export no_proxy="Your_No_Proxy",chatqna-gaudi-ui-server,chatqna-gaudi-backend-server,dataprep-redis-service,tei-embedding-service,retriever,tei-reranking-service,tgi-service,vllm-service,guardrails,jaeger,prometheus,grafana,gaudi-node-exporter-1
    # on Xeon
    cd GenAIExamples/ChatQnA/docker_compose/intel/cpu/xeon/
    source ./set_env.sh
-   export no_proxy="Your_No_Proxy",chatqna-xeon-ui-server,chatqna-xeon-backend-server,dataprep-redis-service,tei-embedding-service,retriever,tei-reranking-service,tgi-service,vllm-service
+   export no_proxy="Your_No_Proxy",chatqna-xeon-ui-server,chatqna-xeon-backend-server,dataprep-redis-service,tei-embedding-service,retriever,tei-reranking-service,tgi-service,vllm-service,jaeger,prometheus,grafana,xeon-node-exporter-1
    # on Nvidia GPU
    cd GenAIExamples/ChatQnA/docker_compose/nvidia/gpu
    source ./set_env.sh
@@ -212,13 +223,14 @@ This ChatQnA use case performs RAG using LangChain, Redis VectorDB and Text Gene
 In the below, we provide a table that describes for each microservice component in the ChatQnA architecture, the default configuration of the open source project, hardware, port, and endpoint.
 
 Gaudi default compose.yaml
-| MicroService | Open Source Project | HW | Port | Endpoint |
+
+| MicroService | Open Source Project | HW    | Port | Endpoint             |
 | ------------ | ------------------- | ----- | ---- | -------------------- |
-| Embedding | Langchain | Xeon | 6000 | /v1/embeddings |
-| Retriever | Langchain, Redis | Xeon | 7000 | /v1/retrieval |
-| Reranking | Langchain, TEI | Gaudi | 8000 | /v1/reranking |
-| LLM | Langchain, TGI | Gaudi | 9000 | /v1/chat/completions |
-| Dataprep | Redis, Langchain | Xeon | 6007 | /v1/dataprep/ingest |
+| Embedding    | Langchain           | Xeon  | 6000 | /v1/embeddings       |
+| Retriever    | Langchain, Redis    | Xeon  | 7000 | /v1/retrieval        |
+| Reranking    | Langchain, TEI      | Gaudi | 8000 | /v1/reranking        |
+| LLM          | Langchain, TGI      | Gaudi | 9000 | /v1/chat/completions |
+| Dataprep     | Redis, Langchain    | Xeon  | 6007 | /v1/dataprep/ingest  |
 
 ### Required Models
 

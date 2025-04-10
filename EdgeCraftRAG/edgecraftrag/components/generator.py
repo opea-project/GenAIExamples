@@ -5,31 +5,108 @@ import asyncio
 import dataclasses
 import json
 import os
+import urllib.request
+from urllib.parse import urlparse
 
 from comps import GeneratedDoc
-from edgecraftrag.base import BaseComponent, CompType, GeneratorType
+from edgecraftrag.base import BaseComponent, CompType, GeneratorType, NodeParserType
 from fastapi.responses import StreamingResponse
 from langchain_core.prompts import PromptTemplate
 from llama_index.llms.openai_like import OpenAILike
 from pydantic import model_serializer
 from unstructured.staging.base import elements_from_base64_gzipped_json
 
+DEFAULT_TEMPLATE = """
+<|im_start|>System: You are an AI assistant. Your task is to learn from the following context. Then answer the user's question based on what you learned from the context but not your own knowledge.<|im_end|>
 
-async def stream_generator(llm, prompt_str, retrieved_nodes=[], text_gen_context=""):
+<|im_start|>{context}<|im_end|>
+
+<|im_start|>System: Pay attention to your formatting of response. If you need to reference content from context, try to keep the formatting.<|im_end|>
+<|im_start|>System: Try to summarize from the context, do some reasoning before response, then response. Make sure your response is logically sound and self-consistent.<|im_end|>
+
+<|im_start|>{input}
+"""
+
+
+def extract_urls(text):
+    urls = []
+    words = text.split()
+    for word in words:
+        parsed_url = urlparse(word)
+        if parsed_url.scheme and parsed_url.netloc:
+            url = parsed_url.geturl()
+            try:
+                response = urllib.request.urlopen(url)
+                if response.status == 200:
+                    urls.append(url)
+            except (urllib.error.URLError, urllib.error.HTTPError, Exception):
+                pass
+    return urls
+
+
+def extract_unstructured_eles(retrieved_nodes=[], text_gen_context=""):
+    IMAGE_NUMBER = 2
+    image_count = 0
+    link_urls = []
+    image_paths = []
+    reference_docs = set()
+    for node in retrieved_nodes:
+        if node.score < 0.5:
+            continue
+        metadata = node.node.metadata
+        # extract referenced docs
+        if "filename" in metadata:
+            reference_doc = (
+                metadata["filename"]
+                if "page_number" not in metadata
+                else metadata["filename"] + " --page" + str(metadata["page_number"])
+            )
+            reference_docs.add(reference_doc)
+        # extract hyperlinks in chunk
+        if "link_urls" in metadata:
+            if isinstance(metadata["link_urls"], str):
+                try:
+                    url_list = json.loads(metadata["link_urls"])
+                    link_urls.extend(url_list)
+                except json.JSONDecodeError:
+                    print("link_urls is not a valid JSON string.")
+        # extract images in chunk
+        if image_count < IMAGE_NUMBER and "orig_elements" in metadata:
+            elements = elements_from_base64_gzipped_json(metadata["orig_elements"])
+            for element in elements:
+                if element.metadata.image_path:
+                    image_paths.append(element.metadata.image_path)
+                    image_count += 1
+        # extract hyperlinks in chunk
+        link_urls.extend(extract_urls(text_gen_context))
+    unstructured_str = ""
+    if image_paths:
+        unstructured_str += "\n\n参考图片:\n\n"
+        for image_path in image_paths:
+            unstructured_str += f"![]({image_path})"
+    if link_urls:
+        unstructured_str += "\n\n相关链接:\n\n"
+        for link in link_urls:
+            unstructured_str += f"[{link}]({link})\n\n"
+    if reference_docs:
+        unstructured_str += "\n\n内容来源:\n\n"
+        for reference_doc in reference_docs:
+            unstructured_str += f"{reference_doc}\n\n"
+    return unstructured_str
+
+
+async def stream_generator(llm, prompt_str, unstructured_str):
     response = llm.stream_complete(prompt_str)
     for r in response:
-        yield json.dumps({"llm_res": r.delta})
+        yield r.delta
         await asyncio.sleep(0)
-    for node in retrieved_nodes:
-        node.node.metadata["score"] = float(node.score)
-        yield json.dumps(node.node.metadata)
-        await asyncio.sleep(0)
-    yield json.dumps({"retrieved_text": text_gen_context})
+    if unstructured_str:
+        yield unstructured_str
 
 
 class QnAGenerator(BaseComponent):
 
-    def __init__(self, llm_model, prompt_template, inference_type, **kwargs):
+    def __init__(self, llm_model, prompt_template_file, inference_type, **kwargs):
         BaseComponent.__init__(
             self,
             comp_type=CompType.GENERATOR,
@@ -40,18 +117,34 @@ class QnAGenerator(BaseComponent):
             ("\n\n", "\n"),
             ("\t\n", "\n"),
         )
-        safe_root = "/templates"
-        template = os.path.normpath(os.path.join(safe_root, prompt_template))
-        if not template.startswith(safe_root):
-            raise ValueError("Invalid template path")
-        if not os.path.exists(template):
-            raise ValueError("Template file not exists")
-        self.prompt = DocumentedContextRagPromptTemplate.from_file(template)
+
+        if prompt_template_file is None:
+            print("There is no template file, using the default template.")
+            self.prompt = DocumentedContextRagPromptTemplate.from_template(DEFAULT_TEMPLATE)
+        else:
+            safe_root = "/templates"
+            template_path = os.path.normpath(os.path.join(safe_root, prompt_template_file))
+            if not template_path.startswith(safe_root):
+                raise ValueError("Invalid template path")
+            if not os.path.exists(template_path):
+                raise ValueError("Template file not exists")
+            self.prompt = DocumentedContextRagPromptTemplate.from_file(template_path)
+
         self.llm = llm_model
         if isinstance(llm_model, str):
             self.model_id = llm_model
         else:
             self.model_id = llm_model().model_id
+
+    def set_prompt(self, prompt):
+        if "{context}" not in prompt:
+            prompt += "\n<|im_start|>{context}<|im_end|>"
+        if "{input}" not in prompt:
+            prompt += "\n<|im_start|>{input}"
+        self.prompt = prompt
+
+    def reset_prompt(self):
+        self.prompt = DocumentedContextRagPromptTemplate.from_template(DEFAULT_TEMPLATE)
 
     def clean_string(self, string):
         ret = string
@@ -72,10 +165,10 @@ class QnAGenerator(BaseComponent):
         prompt_str = self.prompt.format(input=query, context=text_gen_context)
         return text_gen_context, prompt_str
 
-    def run(self, chat_request, retrieved_nodes, **kwargs):
+    def run(self, chat_request, retrieved_nodes, node_parser_type, **kwargs):
         if self.llm() is None:
             # This could happen when User delete all LLMs through RESTful API
-            return "No LLM available, please load LLM"
+            raise ValueError("No LLM available, please load LLM")
         # query transformation
         text_gen_context, prompt_str = self.query_transform(chat_request, retrieved_nodes)
         generate_kwargs = dict(
@@ -88,21 +181,22 @@ class QnAGenerator(BaseComponent):
         )
         self.llm().generate_kwargs = generate_kwargs
         self.llm().max_new_tokens = chat_request.max_tokens
+        unstructured_str = ""
+        if node_parser_type == NodeParserType.UNSTRUCTURED:
+            unstructured_str = extract_unstructured_eles(retrieved_nodes, text_gen_context)
         if chat_request.stream:
             return StreamingResponse(
-                stream_generator(self.llm(), prompt_str, retrieved_nodes, text_gen_context),
+                stream_generator(self.llm(), prompt_str, unstructured_str),
                 media_type="text/event-stream",
             )
         else:
             return self.llm().complete(prompt_str)
 
-    def run_vllm(self, chat_request, retrieved_nodes, **kwargs):
-        if self.llm is None:
-            return "No LLM provided, please provide model_id_or_path"
+    def run_vllm(self, chat_request, retrieved_nodes, node_parser_type, **kwargs):
         # query transformation
         text_gen_context, prompt_str = self.query_transform(chat_request, retrieved_nodes)
         llm_endpoint = os.getenv("vLLM_ENDPOINT", "http://localhost:8008")
-        model_name = self.llm().model_id
+        model_name = os.getenv("LLM_MODEL", self.model_id)
         llm = OpenAILike(
             api_key="fake",
             api_base=llm_endpoint + "/v1",
@@ -114,10 +208,12 @@ class QnAGenerator(BaseComponent):
             streaming=chat_request.stream,
             repetition_penalty=chat_request.repetition_penalty,
         )
-
+        unstructured_str = ""
+        if node_parser_type == NodeParserType.UNSTRUCTURED:
+            unstructured_str = extract_unstructured_eles(retrieved_nodes, text_gen_context)
         if chat_request.stream:
             return StreamingResponse(
-                stream_generator(llm, prompt_str, retrieved_nodes, text_gen_context), media_type="text/event-stream"
+                stream_generator(llm, prompt_str, unstructured_str), media_type="text/event-stream"
             )
         else:
             response = llm.complete(prompt_str)

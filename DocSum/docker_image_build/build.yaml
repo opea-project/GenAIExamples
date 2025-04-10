@@ -5,6 +5,8 @@ services:
   docsum:
     build:
       args:
+        IMAGE_REPO: ${REGISTRY}
+        BASE_TAG: ${TAG}
         http_proxy: ${http_proxy}
         https_proxy: ${https_proxy}
         no_proxy: ${no_proxy}
@@ -38,7 +40,7 @@ services:
         http_proxy: ${http_proxy}
         https_proxy: ${https_proxy}
       context: GenAIComps
-      dockerfile: comps/asr/src/integrations/dependency/whisper/Dockerfile
+      dockerfile: comps/third_parties/whisper/src/Dockerfile
     extends: docsum
     image: ${REGISTRY:-opea}/whisper:${TAG:-latest}
   llm-docsum:
@@ -47,3 +49,20 @@ services:
       dockerfile: comps/llms/src/doc-summarization/Dockerfile
     extends: docsum
     image: ${REGISTRY:-opea}/llm-docsum:${TAG:-latest}
+  vllm-rocm:
+    build:
+      context: GenAIComps
+      dockerfile: comps/third_parties/vllm/src/Dockerfile.amd_gpu
+    image: ${REGISTRY:-opea}/vllm-rocm:${TAG:-latest}
+  vllm:
+    build:
+      context: vllm
+      dockerfile: docker/Dockerfile.cpu
+    extends: docsum
+    image: ${REGISTRY:-opea}/vllm:${TAG:-latest}
+  vllm-gaudi:
+    build:
+      context: vllm-fork
+      dockerfile: Dockerfile.hpu
+    extends: docsum
+    image: ${REGISTRY:-opea}/vllm-gaudi:${TAG:-latest}

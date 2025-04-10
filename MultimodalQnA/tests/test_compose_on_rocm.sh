@@ -72,12 +72,21 @@ function setup_env() {
     export DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT="http://${HOST_IP}:6007/v1/dataprep/generate_captions"
     export DATAPREP_GET_FILE_ENDPOINT="http://${HOST_IP}:6007/v1/dataprep/get"
     export DATAPREP_DELETE_FILE_ENDPOINT="http://${HOST_IP}:6007/v1/dataprep/delete"
+    export MODEL_CACHE=${model_cache:-"/var/opea/multimodalqna-service/data"}
 }
 
 function start_services() {
     cd $WORKPATH/docker_compose/amd/gpu/rocm
     docker compose -f compose.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
-    sleep 1m
+    n=0
+    until [[ "$n" -ge 100 ]]; do
+        docker logs tgi-llava-rocm-server >& $LOG_PATH/tgi-llava-rocm-server_start.log
+        if grep -q "Connected" $LOG_PATH/tgi-llava-rocm-server_start.log; then
+            break
+        fi
+        sleep 10s
+        n=$((n+1))
+    done
 }
 
 function prepare_data() {
@@ -251,10 +260,10 @@ function validate_megaservice() {
     echo "Validate megaservice with first query"
     validate_service \
         "http://${host_ip}:8888/v1/multimodalqna" \
-        '"time_of_frame_ms":' \
+        'red' \
         "multimodalqna" \
         "multimodalqna-backend-server" \
-        '{"messages": "What is the revenue of Nike in 2023?"}'
+        '{"messages": "Find an apple. What color is it?"}'
 
     echo "Validate megaservice with first audio query"
     validate_service \

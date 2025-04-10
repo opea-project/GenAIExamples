@@ -93,7 +93,7 @@ services:
       RETRIEVER_COMPONENT_NAME: "OPEA_RETRIEVER_REDIS"
     restart: unless-stopped
   tgi-rocm:
-    image: ghcr.io/huggingface/text-generation-inference:3.0.1-rocm
+    image: ghcr.io/huggingface/text-generation-inference:2.4.1-rocm
     container_name: tgi-llava-rocm-server
     ports:
       - "8399:80"
@@ -105,7 +105,7 @@ services:
       HUGGINGFACEHUB_API_TOKEN: ${MULTIMODAL_HUGGINGFACEHUB_API_TOKEN}
       HUGGING_FACE_HUB_TOKEN: ${MULTIMODAL_HUGGINGFACEHUB_API_TOKEN}
     volumes:
-      - "/var/opea/multimodalqna-service/data:/data"
+      - "${MODEL_CACHE:-./data}:/data"
     shm_size: 64g
     devices:
       - /dev/kfd:/dev/kfd
@@ -156,7 +156,7 @@ services:
       MM_EMBEDDING_PORT_MICROSERVICE: ${MM_EMBEDDING_PORT_MICROSERVICE}
       MM_RETRIEVER_SERVICE_HOST_IP: ${MM_RETRIEVER_SERVICE_HOST_IP}
       LVM_SERVICE_HOST_IP: ${LVM_SERVICE_HOST_IP}
-      WHISPER_SERVER_PORT: ${WHISPER_SERVER_PORT}
+      WHISPER_SERVER_PORT: ${WHISPER_PORT}
       WHISPER_SERVER_ENDPOINT: ${WHISPER_SERVER_ENDPOINT}
     ipc: host
     restart: always
@@ -175,6 +175,8 @@ services:
       - DATAPREP_INGEST_SERVICE_ENDPOINT=${DATAPREP_INGEST_SERVICE_ENDPOINT}
       - DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT=${DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT}
       - DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT=${DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT}
+      - DATAPREP_GET_FILE_ENDPOINT=${DATAPREP_GET_FILE_ENDPOINT}
+      - DATAPREP_DELETE_FILE_ENDPOINT=${DATAPREP_DELETE_FILE_ENDPOINT}
     ipc: host
     restart: always
 
