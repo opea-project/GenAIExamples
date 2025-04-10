@@ -2,6 +2,13 @@
 
 Language Translation is the communication of the meaning of a source-language text by means of an equivalent target-language text.
 
+# Table of contents
+
+1. [Architecture](#architecture)
+2. [Deployment Options](#deployment-options)
+
+## Architecture
+
 Translation architecture shows below:
 
 ![architecture](./assets/img/translation_architecture.png)
@@ -60,14 +67,12 @@ flowchart LR
 
 This Translation use case performs Language Translation Inference across multiple platforms. Currently, we provide the example for [Intel Gaudi2](https://www.intel.com/content/www/us/en/products/details/processors/ai-accelerators/gaudi-overview.html) and [Intel Xeon Scalable Processors](https://www.intel.com/content/www/us/en/products/details/processors/xeon.html), and we invite contributions from other hardware vendors to expand OPEA ecosystem.
 
-## Deploy Translation Service
+## Deployment Options
 
-The Translation service can be effortlessly deployed on either Intel Gaudi2 or Intel Xeon Scalable Processors.
+The table below shows different deployment options to choose from. They outline in detail the implementation of this example on the selected hardware.
 
-### Deploy Translation on Gaudi
-
-Refer to the [Gaudi Guide](./docker_compose/intel/hpu/gaudi/README.md) for instructions on deploying Translation on Gaudi.
-
-### Deploy Translation on Xeon
-
-Refer to the [Xeon Guide](./docker_compose/intel/cpu/xeon/README.md) for instructions on deploying Translation on Xeon.
+| Category                | Deployment Option            | Description                                                                                                                                                                                                                                                       |
+| ----------------------- | ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| On-premise Deployments  | Docker compose               | [Translation deployment on Xeon](./docker_compose/intel/cpu/xeon/README.md)                                                                                                                                                                                                     |
+|                         |                              | [Translation deployment on Gaudi](./docker_compose/intel/hpu/gaudi/README.md)                                                                                                                                                                                                   |
+|                         |                              | [Translation deployment on AMD GPU](./docker_compose/amd/gpu/rocm/README.md)                                                                                                                                                                                                   |
