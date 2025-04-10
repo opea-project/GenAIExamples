@@ -43,6 +43,7 @@ function start_services() {
     cd $WORKPATH/docker_compose
     export host_ip=${ip_address}
     source set_env.sh
+    export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
     cd intel/hpu/gaudi
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
