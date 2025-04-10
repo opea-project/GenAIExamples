@@ -16,7 +16,7 @@ export MAX_TOTAL_TOKENS=2048
 
 export LLM_PORT=9000
 export LLM_ENDPOINT="http://${host_ip}:${LLM_ENDPOINT_PORT}"
-export DocSum_COMPONENT_NAME="OpeaDocSumTgi"
+export DocSum_COMPONENT_NAME="OpeaDocSumvLLM"
 
 export MEGA_SERVICE_HOST_IP=${host_ip}
 export LLM_SERVICE_HOST_IP=${host_ip}
