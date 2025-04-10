@@ -2,32 +2,32 @@
 
 ### Set the required environment variables
 
-   ```bash
-   export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
-   ```
+```bash
+export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
+```
 
 ### Run test
 
-   On Intel Xeon with TGI:
+On Intel Xeon with TGI:
 
-   ```bash
-   bash test_compose_on_xeon.sh
-   ```
+```bash
+bash test_compose_on_xeon.sh
+```
 
-   On Intel Gaudi with TGI:
+On Intel Gaudi with TGI:
 
-   ```bash
-   bash test_compose_on_gaudi.sh
-   ```
+```bash
+bash test_compose_on_gaudi.sh
+```
 
-   On AMD ROCm with TGI:
+On AMD ROCm with TGI:
 
-   ```bash
-   bash test_compose_on_rocm.sh
-   ```
+```bash
+bash test_compose_on_rocm.sh
+```
 
-   On AMD ROCm with vLLM:
+On AMD ROCm with vLLM:
 
-   ```bash
-   bash test_compose_vllm_on_rocm.sh
-   ```
+```bash
+bash test_compose_vllm_on_rocm.sh
+```
