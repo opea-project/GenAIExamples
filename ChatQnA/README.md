@@ -16,7 +16,11 @@ The ChatQnA application is a customizable end-to-end workflow that leverages the
 
 ![architecture](./assets/img/chatqna_architecture.png)
 
+<<<<<<< HEAD
 The application is modular, leveraging components that are microservices (defined in [GenAIComps](https://github.com/opea-project/GenAIComps)) that are independently scalable. It is comprised of the data preparation, embedding, retrieval, reranker (optional), and LLM microservices. All these microservices are stitched together by the ChatQnA megaservice that routes the data through the composite microservices. The flow chart below shows the information flow between the different microservices in the ChatQnA example.
+=======
+This application is modular as it leverages each component as a microservice(as defined in [GenAIComps](https://github.com/opea-project/GenAIComps)) that can scale independently. It comprises data preparation, embedding, retrival, reranker(optional) and LLM microservices. All these microservices are stiched together by the Chatqna megaservice that orchestrates the data through these microservices. The flow chart below shows the information flow between different microservices for this example.
+>>>>>>> 83e1fdad1ba08214303c2f25cbf5da5f09ed4810
 
 ```mermaid
 ---
@@ -96,6 +100,7 @@ flowchart LR
 
 The table below lists currently available deployment options. They outline in detail the implementation of this example on selected hardware.
 
+<<<<<<< HEAD
 | Category | Deployment Option | Description |
 |------------------|------------|------------------------------|
 | On-premise Deployments | Docker compose | [ChatQnA deployment on Xeon](./docker_compose/intel/cpu/xeon) |
@@ -110,3 +115,19 @@ The table below lists currently available deployment options. They outline in de
 | | Azure | Work-in-progress  |
 | | Intel Tiber AI Cloud | Work-in-progress |
 | | Any Xeon based Ubuntu system | [ChatQnA Ansible Module for Ubuntu 20.04](https://github.com/intel/optimized-cloud-recipes/tree/main/recipes/ai-opea-chatqna-xeon) .Use this if you are not using Terraform and have provisioned your system either manually or with another tool, including directly on bare metal. |
+=======
+| Category                | Deployment Option            | Description                                                                                                                                                                                                                                                       |
+| ----------------------- | ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| On-premise Deployments  | Docker compose               | [ChatQnA deployment on Xeon](./docker_compose/intel/cpu/xeon)                                                                                                                                                                                                     |
+|                         |                              | [ChatQnA deployment on AI PC](./docker_compose/intel/cpu/aipc)                                                                                                                                                                                                    |
+|                         |                              | [ChatQnA deployment on Gaudi](./docker_compose/intel/hpu/gaudi)                                                                                                                                                                                                   |
+|                         |                              | [ChatQnA deployment on Nvidia GPU (Turing, Ampere 80, Ampere 86, Ada Lovelace, H100](./docker_compose/nvidia/gpu)                                                                                                                                                 |
+|                         |                              | [ChatQnA deployment on AMD Rocm](./docker_compose/amd/gpu/rocm)                                                                                                                                                                                                   |
+|                         | Kubernetes                   | [helm charts](./kubernetes/helm)                                                                                                                                                                                                                                  |
+| Cloud Service Providers | AWS                          | [Terraform deployment on 4th Gen Intel Xeon with Intel AMX using meta-llama/Meta-Llama-3-8B-Instruct ](https://github.com/intel/terraform-intel-aws-vm/tree/main/examples/gen-ai-xeon-opea-chatqna)                                                               |
+|                         |                              | [Terraform deployment on 4th Gen Intel Xeon with Intel AMX using TII Falcon2-11B](https://github.com/intel/terraform-intel-aws-vm/tree/main/examples/gen-ai-xeon-opea-chatqna-falcon11B)                                                                          |
+|                         | GCP                          | [Terraform deployment on 5th Gen Intel Xeon with Intel AMX(support Confidential AI by using Intel® TDX](https://github.com/intel/terraform-intel-gcp-vm/tree/main/examples/gen-ai-xeon-opea-chatqna)                                                             |
+|                         | Azure                        | Work-in-progress                                                                                                                                                                                                                                                  |
+|                         | Intel Tiber AI Cloud         | Work-in-progress                                                                                                                                                                                                                                                  |
+|                         | Any Xeon based Ubuntu system | [ChatQnA Ansible Module for Ubuntu 20.04](https://github.com/intel/optimized-cloud-recipes/tree/main/recipes/ai-opea-chatqna-xeon) . Use this if you are not using Terraform and have provisioned your system with another tool or manually including bare metal. |
+>>>>>>> 83e1fdad1ba08214303c2f25cbf5da5f09ed4810
