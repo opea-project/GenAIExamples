@@ -1,18 +1,22 @@
 # Finance Agent
 
 ## 1. Overview
+
 The architecture of this Finance Agent example is shown in the figure below. The agent has 3 main functions:
+
 1. Summarize long financial documents and provide key points.
 2. Answer questions over financial documents, such as SEC filings.
 3. Conduct research of a public company and provide an investment report of the company.
 
 ![Finance Agent Architecture](assets/finance_agent_arch.png)
 
-The `dataprep` microservice can ingest financial documents in two formats: 
+The `dataprep` microservice can ingest financial documents in two formats:
+
 1. PDF documents stored locally, such as SEC filings saved in local directory.
 2. URLs, such as earnings call transcripts ([example](https://www.fool.com/earnings/call-transcripts/2025/03/06/costco-wholesale-cost-q2-2025-earnings-call-transc/)) and online SEC filings ([example](https://investors.3m.com/financials/sec-filings/content/0000066740-25-000006/0000066740-25-000006.pdf)).
 
-Please note: 
+Please note:
+
 1. Each financial document should be about one company.
 2. URLs ending in `.htm` are not supported.
 

@@ -1,3 +1,6 @@
+# Copyright (C) 2025 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 export host_ip=${ip_address}
 export DATAPREP_PORT="6007"
 export TEI_EMBEDDER_PORT="10221"
