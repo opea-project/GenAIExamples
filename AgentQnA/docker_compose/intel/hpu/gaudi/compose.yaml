@@ -104,7 +104,7 @@ services:
       - "8080:8000"
     ipc: host
   agent-ui:
-    image: opea/agent-ui
+    image: opea/agent-ui:latest
     container_name: agent-ui
     environment:
       host_ip: ${host_ip}
@@ -138,4 +138,4 @@ services:
     cap_add:
       - SYS_NICE
     ipc: host
-    command: --model $LLM_MODEL_ID --tensor-parallel-size 4 --host 0.0.0.0 --port 8000 --block-size 128 --max-num-seqs 256 --max-seq_len-to-capture 16384
+    command: --model $LLM_MODEL_ID --tensor-parallel-size 4 --host 0.0.0.0 --port 8000 --block-size 128 --max-num-seqs 256 --max-seq-len-to-capture 16384

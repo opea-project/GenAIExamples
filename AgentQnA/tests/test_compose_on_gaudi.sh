@@ -26,15 +26,39 @@ function build_agent_docker_image() {
     docker compose -f build.yaml build --no-cache
 }
 
+function build_retrieval_docker_image() {
+    cd $WORKDIR/GenAIExamples/DocIndexRetriever/docker_image_build/
+    get_genai_comps
+    echo "Build retrieval image with --no-cache..."
+    docker compose -f build.yaml build --no-cache
+}
+
 function stop_crag() {
     cid=$(docker ps -aq --filter "name=kdd-cup-24-crag-service")
     echo "Stopping container kdd-cup-24-crag-service with cid $cid"
     if [[ ! -z "$cid" ]]; then docker rm $cid -f && sleep 1s; fi
 }
 
-function stop_agent_docker() {
+function stop_agent_containers() {
     cd $WORKPATH/docker_compose/intel/hpu/gaudi/
-    docker compose -f $WORKDIR/GenAIExamples/DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml -f compose.yaml down
+    container_list=$(cat compose.yaml | grep container_name | cut -d':' -f2)
+    for container_name in $container_list; do
+        cid=$(docker ps -aq --filter "name=$container_name")
+        echo "Stopping container $container_name"
+        if [[ ! -z "$cid" ]]; then docker rm $cid -f && sleep 1s; fi
+    done
+}
+
+function stop_telemetry_containers(){
+    cd $WORKPATH/docker_compose/intel/hpu/gaudi/
+    container_list=$(cat compose.telemetry.yaml | grep container_name | cut -d':' -f2)
+    for container_name in $container_list; do
+        cid=$(docker ps -aq --filter "name=$container_name")
+        echo "Stopping container $container_name"
+        if [[ ! -z "$cid" ]]; then docker rm $cid -f && sleep 1s; fi
+    done
+    container_list=$(cat compose.telemetry.yaml | grep container_name | cut -d':' -f2)
+
 }
 
 function stop_llm(){
@@ -69,12 +93,16 @@ function stop_retrieval_tool() {
 }
 echo "workpath: $WORKPATH"
 echo "=================== Stop containers ===================="
+stop_llm
 stop_crag
-stop_agent_docker
+stop_agent_containers
+stop_retrieval_tool
+stop_telemetry_containers
 
 cd $WORKPATH/tests
 
 echo "=================== #1 Building docker images===================="
+build_retrieval_docker_image
 build_agent_docker_image
 echo "=================== #1 Building docker images completed===================="
 
@@ -83,8 +111,11 @@ bash $WORKPATH/tests/step4_launch_and_validate_agent_gaudi.sh
 echo "=================== #4 Agent, retrieval test passed ===================="
 
 echo "=================== #5 Stop agent and API server===================="
+stop_llm
 stop_crag
-stop_agent_docker
+stop_agent_containers
+stop_retrieval_tool
+stop_telemetry_containers
 echo "=================== #5 Agent and API server stopped===================="
 
 echo y | docker system prune
