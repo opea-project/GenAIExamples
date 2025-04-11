@@ -9,7 +9,7 @@ Language Translation is the communication of the meaning of a source-language te
 
 ## Architecture
 
-Translation architecture shows below:
+The architecture of the Translation Application is illustrated below:
 
 ![architecture](./assets/img/translation_architecture.png)
 
@@ -69,10 +69,10 @@ This Translation use case performs Language Translation Inference across multipl
 
 ## Deployment Options
 
-The table below shows different deployment options to choose from. They outline in detail the implementation of this example on the selected hardware.
+The table below lists the available deployment options and their implementation details for different hardware platforms.
 
-| Category               | Deployment Option | Description                                                                   |
-| ---------------------- | ----------------- | ----------------------------------------------------------------------------- |
-| On-premise Deployments | Docker compose    | [Translation deployment on Xeon](./docker_compose/intel/cpu/xeon/README.md)   |
-|                        |                   | [Translation deployment on Gaudi](./docker_compose/intel/hpu/gaudi/README.md) |
-|                        |                   | [Translation deployment on AMD Rocm](./docker_compose/amd/gpu/rocm/README.md) |
+| Platform               | Deployment Method | Link                                                              |
+| ---------------------- | ----------------- | ----------------------------------------------------------------- |
+| Intel Xeon             | Docker compose    | [Deployment on Xeon](./docker_compose/intel/cpu/xeon/README.md)   |
+| Intel Gaudi2           | Docker compose    | [Deployment on Gaudi](./docker_compose/intel/hpu/gaudi/README.md) |
+| AMD ROCm               | Docker compose    | [Deployment on AMD Rocm](./docker_compose/amd/gpu/rocm/README.md) |
