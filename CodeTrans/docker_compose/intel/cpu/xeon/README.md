@@ -1,10 +1,13 @@
 # Deploying CodeTrans on Intel® Xeon® Processors
 
-This document outlines the single node deployment process for a CodeTrans application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservices on Intel Xeon server. The steps include Docker pulling Docker images, container deployment via Docker Compose, and service execution using microservices `llm`.
+This document outlines the single node deployment process for a CodeTrans application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservices on Intel Xeon server. The steps include pulling Docker images, container deployment via Docker Compose, and service execution using microservices `llm`.
 
 # Table of Contents
 
 1. [CodeTrans Quick Start Deployment](#codetrans-quick-start-deployment)
+2. [CodeTrans Docker Compose Files](#codetrans-docker-compose-files)
+3. [Validate Microservices](#validate-microservices)
+4. [Conclusion](#conclusion)
 
 ## CodeTrans Quick Start Deployment
 
@@ -67,6 +70,7 @@ Please refer to the table below to build different microservices from source:
 
 | Microservice | Deployment Guide                                                                              |
 | ------------ | --------------------------------------------------------------------------------------------- |
+| vLLM          | [vLLM build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/third_parties/vllm#build-docker)            |
 | LLM          | [LLM build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/llms)            |
 | Megaservice  | [Megaservice build guide](../../../../README_miscellaneous.md#build-megaservice-docker-image) |
 | UI           | [Basic UI build guide](../../../../README_miscellaneous.md#build-ui-docker-image)             |
@@ -179,7 +183,5 @@ In the context of deploying a CodeTrans pipeline on an Intel® Xeon® platform, 
    ```
 
 ## Conclusion
-
-### Launch with origin port
 
 This guide should enable developer to deploy the default configuration or any of the other compose yaml files for different configurations. It also highlights the configurable parameters that can be set before deployment.
