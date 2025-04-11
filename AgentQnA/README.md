@@ -4,7 +4,7 @@
 
 1. [Overview](#overview)
 2. [Deploy with Docker](#deploy-with-docker)
-3. [Launch the UI](#launch-the-ui)
+3. [How to interact with the agent system with UI](#how-to-interact-with-the-agent-system-with-ui)
 4. [Validate Services](#validate-services)
 5. [Register Tools](#how-to-register-other-tools-with-the-ai-agent)
 
@@ -144,20 +144,18 @@ source $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/cpu/xeon/set_env.sh
 
 ### 2. Launch the multi-agent system. </br>
 
-Two options are provided for the `llm_engine` of the agents: 1. open-source LLMs on Gaudi, 2. OpenAI models via API calls.
+We make it convenient to launch the whole system with docker compose, which includes microservices for LLM, agents, UI, retrieval tool, vector database, dataprep, and telemetry. There are 3 docker compose files, which make it easy for users to pick and choose. Users can choose a different retrieval tool other than the `DocIndexRetriever` example provided in our GenAIExamples repo. Users can choose not to launch the telemetry containers.
 
-#### Gaudi
+#### Launch on Gaudi
 
-On Gaudi, `meta-llama/Meta-Llama-3.1-70B-Instruct` will be served using vllm.
-By default, both the RAG agent and SQL agent will be launched to support the React Agent.  
-The React Agent requires the DocIndexRetriever's [`compose.yaml`](../DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml) file, so two `compose.yaml` files need to be run with docker compose to start the multi-agent system.
-
-> **Note**: To enable the web search tool, skip this step and proceed to the "[Optional] Web Search Tool Support" section.
+On Gaudi, `meta-llama/Meta-Llama-3.3-70B-Instruct` will be served using vllm. The command below will launch the multi-agent system with the `DocIndexRetriever` as the retrieval tool for the Worker RAG agent.
 
 ```bash
 cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/hpu/gaudi/
 docker compose -f $WORKDIR/GenAIExamples/DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml -f compose.yaml up -d
 ```
+
+> **Note**: To enable the web search tool, skip this step and proceed to the "[Optional] Web Search Tool Support" section.
 
 To enable Open Telemetry Tracing, compose.telemetry.yaml file need to be merged along with default compose.yaml file.
 Gaudi example with Open Telemetry feature:
@@ -183,11 +181,9 @@ docker compose -f $WORKDIR/GenAIExamples/DocIndexRetriever/docker_compose/intel/
 
 </details>
 
-#### Xeon
+#### Launch on Xeon
 
-On Xeon, only OpenAI models are supported.
-By default, both the RAG Agent and SQL Agent will be launched to support the React Agent.  
-The React Agent requires the DocIndexRetriever's [`compose.yaml`](../DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml) file, so two `compose yaml` files need to be run with docker compose to start the multi-agent system.
+On Xeon, only OpenAI models are supported. The command below will launch the multi-agent system with the `DocIndexRetriever` as the retrieval tool for the Worker RAG agent.
 
 ```bash
 export OPENAI_API_KEY=<your-openai-key>
@@ -206,9 +202,10 @@ bash run_ingest_data.sh
 
 > **Note**: This is a one-time operation.
 
-## Launch the UI
+## How to interact with the agent system with UI
 
-Open a web browser to http://localhost:5173 to access the UI.
+The UI microservice is launched in the previous step with the other microservices.
+To see the UI, open a web browser to `http://${ip_address}:5173` to access the UI. Note the `ip_address` here is the host IP of the UI microservice.
 
 1. `create Admin Account` with a random value
 2. add opea agent endpoint `http://$ip_address:9090/v1` which is a openai compatible api
