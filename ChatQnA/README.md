@@ -2,21 +2,21 @@
 
 Chatbots are the most widely adopted use case for leveraging the powerful chat and reasoning capabilities of large language models (LLMs). The retrieval augmented generation (RAG) architecture is quickly becoming the industry standard for chatbot development. It combines the benefits of a knowledge base (via a vector store) and generative models to reduce hallucinations, maintain up-to-date information, and leverage domain-specific knowledge.
 
-RAG bridges the knowledge gap by dynamically fetching relevant information from external sources, ensuring that response generated remain factual and current. The core of this architecture is vector databases, which are instrumental in enabling efficient and semantic retrieval of information. These databases store data as vectors, allowing RAG to swiftly access the most pertinent documents or data points based on semantic similarity.
+RAG bridges the knowledge gap by dynamically fetching relevant information from external sources, ensuring that the response generated remains factual and current. Vector databases are at the core of this architecture, enabling efficient retrieval of semantically relevant information. These databases store data as vectors, allowing RAG to swiftly access the most pertinent documents or data points based on semantic similarity.
 
 # Table of contents
 
-1. [Architecture](#architecture-and-deploy-details)
+1. [Architecture](#architecture)
 2. [Deployment Options](#deployment-options)
-3. [Monitoring and Tracing](#monitoring-opea-service-with-prometheus-and-grafana-dashboard)
+3. [Monitoring and Tracing](./README_miscellaneous.md#Monitoring-OPEA-Service-with-Prometheus-and-Grafana-dashboard)
 
 ## Architecture
 
-The ChatQnA application is a customizable end-to-end workflow that leverages the capabilities of LLM's and RAG efficiently. ChatQnA architecture is shown below:
+The ChatQnA application is a customizable end-to-end workflow that leverages the capabilities of LLMs and RAG efficiently. ChatQnA architecture is shown below:
 
 ![architecture](./assets/img/chatqna_architecture.png)
 
-This application is modular as it leverages each component as a microservice(as defined in [GenAIComps](https://github.com/opea-project/GenAIComps)) that can scale independently. It comprises data preparation, embedding, retrival, reranker(optinal) and LLM microservices. All these microservices are stiched together by the Chatqna megaservice that orchestrates the data through these microservices. The flow chart below shows the information flow between different microservices for this example.
+The application is modular, leveraging components that are microservices (defined in [GenAIComps](https://github.com/opea-project/GenAIComps)) that are independently scalable. It is comprised of the data preparation, embedding, retrieval, reranker (optional), and LLM microservices. All these microservices are stitched together by the ChatQnA megaservice that routes the data through the composite microservices. The flow chart below shows the information flow between the different microservices in the ChatQnA example.
 
 ```mermaid
 ---
@@ -94,19 +94,19 @@ flowchart LR
 
 ## Deployment Options
 
-The table below shows different deployment options to choose from. They outline in detail the implementation of this example on the selected hardware.
+The table below lists currently available deployment options. They outline in detail the implementation of this example on selected hardware.
 
 | Category | Deployment Option | Description |
 |------------------|------------|------------------------------|
 | On-premise Deployments | Docker compose | [ChatQnA deployment on Xeon](./docker_compose/intel/cpu/xeon) |
 | | | [ChatQnA deployment on  AI PC](./docker_compose/intel/cpu/aipc) |
 | | | [ChatQnA deployment on  Gaudi](./docker_compose/intel/hpu/gaudi) |
-| | | [ChatQnA deployment on  Nvidia GPU (Turing, Ampere 80, Ampere 86, Ada Lovelace, H100](./docker_compose/nvidia/gpu) |
-| | | [ChatQnA deployment on  AMD Rocm](./docker_compose/amd/gpu/rocm) |
-| | Kubernetes | [helm charts](./kubernetes/helm)|
+| | | [ChatQnA deployment on  Nvidia GPU](./docker_compose/nvidia/gpu) |
+| | | [ChatQnA deployment on  AMD ROCm](./docker_compose/amd/gpu/rocm) |
+| | Kubernetes | [Helm Charts](./kubernetes/helm)|
 | Cloud Service Providers |AWS | [Terraform deployment on 4th Gen Intel Xeon with Intel AMX using meta-llama/Meta-Llama-3-8B-Instruct ](https://github.com/intel/terraform-intel-aws-vm/tree/main/examples/gen-ai-xeon-opea-chatqna) |
 |  | | [Terraform deployment on 4th Gen Intel Xeon with Intel AMX using TII Falcon2-11B](https://github.com/intel/terraform-intel-aws-vm/tree/main/examples/gen-ai-xeon-opea-chatqna-falcon11B) |
 | | GCP | [Terraform deployment on 5th Gen Intel Xeon with Intel AMX(support Confidential AI by using Intel® TDX](https://github.com/intel/terraform-intel-gcp-vm/tree/main/examples/gen-ai-xeon-opea-chatqna) |
 | | Azure | Work-in-progress  |
 | | Intel Tiber AI Cloud | Work-in-progress |
-| | Any Xeon based Ubuntu system | [ChatQnA Ansible Module for Ubuntu 20.04](https://github.com/intel/optimized-cloud-recipes/tree/main/recipes/ai-opea-chatqna-xeon) . Use this if you are not using Terraform and have provisioned your system with another tool or manually including bare metal. |
+| | Any Xeon based Ubuntu system | [ChatQnA Ansible Module for Ubuntu 20.04](https://github.com/intel/optimized-cloud-recipes/tree/main/recipes/ai-opea-chatqna-xeon) .Use this if you are not using Terraform and have provisioned your system either manually or with another tool, including directly on bare metal. |

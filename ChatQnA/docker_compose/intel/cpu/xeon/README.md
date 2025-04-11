@@ -1,14 +1,14 @@
 # Deploying ChatQnA on Intel® Xeon® Processors
 
-This document outlines the single node deployment process for a ChatQnA application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on Intel Xeon server. The steps include pulling Docker images, container deployment via Docker Compose, and service execution to integrate microservices such as `embedding`, `retriever`, `rerank` and `llm`.
+This document outlines the single node deployment process for a ChatQnA application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservices on Intel Xeon server. The steps include pulling Docker images, container deployment via Docker Compose, and service execution to integrate microservices such as `embedding`, `retriever`, `rerank` and `llm`.
 
 # Table of contents
 
-1. [ChatQnA Quick Start deployment](#chatqna-quick-start-deployment)
+1. [ChatQnA Quick Start Deployment](#chatqna-quick-start-Deployment)
 2. [ChatQnA Docker Compose file Options](#chatqna-docker-compose-files)
 3. [ChatQnA with Conversational UI](#chatqna-with-conversational-ui-optional)
    
-## ChatQnA Quick Start deployment
+## ChatQnA Quick Start Deployment
 
 This section describes how to quickly deploy and test the ChatQnA service manually on an Intel® Xeon® processor. The basic steps are:
 
@@ -89,7 +89,7 @@ Please refer to the table below to build different microservices from source:
 | Reranker | https://github.com/opea-project/GenAIComps/tree/main/comps/rerankings |
 | LLM | https://github.com/opea-project/GenAIComps/tree/main/comps/llms|
 | Megaservice | [Megaservice build guide](../../../../README_miscellaneous.md#Build-MegaService-Docker-Image) |
-| UI | [Megaservice build guide](../../../../README_miscellaneous.md#Build-UI-Docker-Image) |
+| UI | [Basic UI build guide](../../../../README_miscellaneous.md#Build-UI-Docker-Image) |
 | Conversational UI | [Megaservice build guide](../../../../README_miscellaneous.md#Build-Conversational-React-UI-Docker-Image) |
 
 ### Check the Deployment Status
@@ -146,7 +146,7 @@ In the context of deploying a ChatQnA pipeline on an Intel® Xeon® platform, we
 
 | File | Description |
 |------------------|------------|
-| [compose.yaml]()  | Default compose file using vllm as serving framework and redis as vector database|
+| [compose.yaml](./compose.yaml)  | Default compose file using vllm as serving framework and redis as vector database|
 | [compose_milvus.yaml](./compose_milvus.yaml) | The vector database utilized is Milvus. All other configurations remain the same as the default |
 | [compose_pinecone.yaml](./compose_pinecone.yaml) | The vector database utilized is Pinecone. All other configurations remain the same as the default  |
 | [compose_qdrant.yaml](./compose_qdrant.yaml) | The vector database utilized is Qdrant. All other configurations remain the same as the default  |

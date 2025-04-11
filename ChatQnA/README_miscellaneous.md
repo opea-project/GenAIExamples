@@ -1,23 +1,24 @@
 # Table of contents
 
 1. [Build MegaService Docker Image](#Build-MegaService-Docker-Image)
-2. [Build UI Docker Image](#Build-UI-Docker-Image)
-3. [Build Conversational React UI Docker Image](#Build-Conversational-React-UI-Docker-Imaged)
+2. [Build Basic UI Docker Image](#Build-Basic-UI-Docker-Image)
+3. [Build Conversational React UI Docker Image](#Build-Conversational-React-UI-Docker-Image)
 4. [Troubleshooting](#Troubleshooting)
-5. [Monitoring OPEA Service with Prometheus and Grafana dashboard](#Monitoring-OPEA-Service-with-Prometheus-and-Grafana-dashboard)
-6. [Tracing Services with OpenTelemetry Tracing and Jaeger](#Tracing-Services-with-OpenTelemetry-Tracing-and-Jaeger)
+5. [Monitoring OPEA Services with Prometheus and Grafana Dashboards](#Monitoring-OPEA-Services-with-Prometheus-and-Grafana-Dashboard)
+6. [Tracing with OpenTelemetry and Jaeger](#Tracing-with-OpenTelemetry-and-Jaeger)
 
 ## Build MegaService Docker Image
 
-To construct the Mega Service with Rerank, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `chatqna.py` Python script. Build MegaService Docker image via below command:
+To construct the Mega Service with Rerank, we utilize the [GenAIExamples](https://github.com/opea-project/GenAIExamples.git) microservice pipeline within the `chatqna.py` Python script. Build MegaService Docker image via below command:
 
 ```bash
 git clone https://github.com/opea-project/GenAIExamples.git
+git fetch && git checkout tags/v1.2
 cd GenAIExamples/ChatQnA
 docker build --no-cache -t opea/chatqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
 ```
 
-## Build UI Docker Image
+## Build Basic UI Docker Image
 
 Build frontend Docker image via below command:
 
@@ -28,9 +29,9 @@ docker build --no-cache -t opea/chatqna-ui:latest --build-arg https_proxy=$https
 
 ## Build Conversational React UI Docker Image (Optional)
 
-Build frontend Docker image that enables Conversational experience with ChatQnA megaservice via below command:
+Build a frontend Docker image for an interactive conversational UI experience with ChatQnA MegaService
 
-**Export the value of the public IP address of your Xeon server to the `host_ip` environment variable**
+**Export the value of the public IP address of your host machine server to the `host_ip` environment variable**
 
 ```bash
 cd GenAIExamples/ChatQnA/ui
@@ -49,18 +50,18 @@ docker build --no-cache -t opea/chatqna-conversation-ui:latest --build-arg https
 
 3. (Docker only) If you get errors like "The container name is in use", change container name in `compose.yaml`.
 
-## Monitoring OPEA Service with Prometheus and Grafana dashboard
+## Monitoring OPEA Services with Prometheus and Grafana Dashboard
 
-OPEA microservice deployment can easily be monitored through Grafana dashboards in conjunction with Prometheus data collection. Follow the [README](https://github.com/opea-project/GenAIEval/blob/main/evals/benchmark/grafana/README.md) to setup Prometheus and Grafana servers and import dashboards to monitor the OPEA service.
+OPEA microservice deployment can easily be monitored through Grafana dashboards using data collected via Prometheus. Follow the [README](https://github.com/opea-project/GenAIEval/blob/main/evals/benchmark/grafana/README.md) to setup Prometheus and Grafana servers and import dashboards to monitor the OPEA services.
 
 ![chatqna dashboards](./assets/img/chatqna_dashboards.png)
 ![tgi dashboard](./assets/img/tgi_dashboard.png)
 
-## Tracing Services with OpenTelemetry Tracing and Jaeger
+## Tracing with OpenTelemetry and Jaeger
 
-> NOTE: This feature is disabled by default. Please check the Deploy ChatQnA sessions for how to enable this feature with compose.telemetry.yaml file.
+> NOTE: This feature is disabled by default. Please use the compose.telemetry.yaml file to enable this feature.
 
-OPEA microservice and TGI/TEI serving can easily be traced through Jaeger dashboards in conjunction with OpenTelemetry Tracing feature. Follow the [README](https://github.com/opea-project/GenAIComps/tree/main/comps/cores/telemetry#tracing) to trace additional functions if needed.
+OPEA microservice and [TGI](https://huggingface.co/docs/text-generation-inference/en/index)/[TEI](https://huggingface.co/docs/text-embeddings-inference/en/index) serving can easily be traced through [Jaeger](https://www.jaegertracing.io/) dashboards in conjunction with [OpenTelemetry](https://opentelemetry.io/) Tracing feature. Follow the [README](https://github.com/opea-project/GenAIComps/tree/main/comps/cores/telemetry#tracing) to trace additional functions if needed.
 
 Tracing data is exported to http://{EXTERNAL_IP}:4318/v1/traces via Jaeger.
 Users could also get the external IP via below command.
