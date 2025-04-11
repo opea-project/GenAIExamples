@@ -26,6 +26,7 @@ We utilize the [bigcode-evaluation-harness](https://github.com/bigcode-project/b
 ## Environment Setup
 
 1.  **Clone the Evaluation Repository:**
+
     ```shell
     git clone https://github.com/opea-project/GenAIEval
     cd GenAIEval
@@ -46,21 +47,24 @@ We utilize the [bigcode-evaluation-harness](https://github.com/bigcode-project/b
     export CODEGEN_ENDPOINT="http://{your_ip}:7778/v1/codegen"
     export CODEGEN_MODEL="{your_model_identifier}"
     ```
-    *Note: Port `7778` is the default for the CodeGen gateway; adjust if you customized it.*
+
+    _Note: Port `7778` is the default for the CodeGen gateway; adjust if you customized it._
 
 2.  **Execute the Benchmark Script:**
     The script will run the evaluation tasks (e.g., HumanEval by default) against the specified endpoint.
+
     ```shell
     bash run_acc.sh $CODEGEN_MODEL $CODEGEN_ENDPOINT
     ```
 
-    *Note: Currently, the framework runs the full task set by default. Using 'limit' parameters might affect result comparability.*
+    _Note: Currently, the framework runs the full task set by default. Using 'limit' parameters might affect result comparability._
 
 ## Understanding the Results
 
 The results will be printed to the console and saved in `evaluation_results.json`. A key metric is `pass@k`, which represents the percentage of problems solved correctly within `k` generated attempts (e.g., `pass@1` means solved on the first try).
 
 Example output snippet:
+
 ```json
 {
   "humaneval": {
@@ -97,4 +101,5 @@ Example output snippet:
   }
 }
 ```
+
 This indicates a `pass@1` score of approximately 72% on the HumanEval benchmark for the specified model via the CodeGen service endpoint.

@@ -106,39 +106,42 @@ flowchart LR
 
 This CodeGen example can be deployed manually on various hardware platforms using Docker Compose or Kubernetes. Select the appropriate guide based on your target environment:
 
-| Hardware         | Deployment Mode         | Guide Link                                                               |
-| :--------------- | :---------------------- |:-------------------------------------------------------------------------|
-| Intel Xeon CPU   | Single Node (Docker)    | [Xeon Docker Compose Guide](./docker_compose/intel/cpu/xeon/README.md)   |
-| Intel Gaudi HPU  | Single Node (Docker)    | [Gaudi Docker Compose Guide](./docker_compose/intel/hpu/gaudi/README.md) |
-| AMD ROCm GPU     | Single Node (Docker)    | [ROCm Docker Compose Guide](./docker_compose/amd/gpu/rocm/README.md)     |
-| Intel Xeon CPU   | Kubernetes (Helm)       | [Kubernetes Helm Guide](./kubernetes/helm/README.md)                     |
-| Intel Gaudi HPU  | Kubernetes (Helm)       | [Kubernetes Helm Guide](./kubernetes/helm/README.md)               |
-| Intel Xeon CPU   | Kubernetes (GMC)        | [Kubernetes GMC Guide](./kubernetes/gmc/README.md)                       |
-| Intel Gaudi HPU  | Kubernetes (GMC)        | [Kubernetes GMC Guide](./kubernetes/gmc/README.md)                       |
+| Hardware        | Deployment Mode      | Guide Link                                                               |
+| :-------------- | :------------------- | :----------------------------------------------------------------------- |
+| Intel Xeon CPU  | Single Node (Docker) | [Xeon Docker Compose Guide](./docker_compose/intel/cpu/xeon/README.md)   |
+| Intel Gaudi HPU | Single Node (Docker) | [Gaudi Docker Compose Guide](./docker_compose/intel/hpu/gaudi/README.md) |
+| AMD ROCm GPU    | Single Node (Docker) | [ROCm Docker Compose Guide](./docker_compose/amd/gpu/rocm/README.md)     |
+| Intel Xeon CPU  | Kubernetes (Helm)    | [Kubernetes Helm Guide](./kubernetes/helm/README.md)                     |
+| Intel Gaudi HPU | Kubernetes (Helm)    | [Kubernetes Helm Guide](./kubernetes/helm/README.md)                     |
+| Intel Xeon CPU  | Kubernetes (GMC)     | [Kubernetes GMC Guide](./kubernetes/gmc/README.md)                       |
+| Intel Gaudi HPU | Kubernetes (GMC)     | [Kubernetes GMC Guide](./kubernetes/gmc/README.md)                       |
 
-*Note: Building custom microservice images can be done using the resources in [GenAIComps](https://github.com/opea-project/GenAIComps).*
+_Note: Building custom microservice images can be done using the resources in [GenAIComps](https://github.com/opea-project/GenAIComps)._
 
 ## Benchmarking
 
 Guides for evaluating the performance and accuracy of this CodeGen deployment are available:
 
-| Benchmark Type | Guide Link                                              |
-| :------------- | :------------------------------------------------------ |
-| Accuracy       | [Accuracy Benchmark Guide](./benchmark/accuracy/README.md) |
+| Benchmark Type | Guide Link                                                       |
+| :------------- | :--------------------------------------------------------------- |
+| Accuracy       | [Accuracy Benchmark Guide](./benchmark/accuracy/README.md)       |
 | Performance    | [Performance Benchmark Guide](./benchmark/performance/README.md) |
 
 ## Automated Deployment using Terraform
 
 Intel® Optimized Cloud Modules for Terraform provide an automated way to deploy this CodeGen example on various Cloud Service Providers (CSPs).
 
-| Cloud Provider       | Intel Architecture                | Intel Optimized Cloud Module for Terraform                                                                    | Comments           |
-| :------------------- | :-------------------------------- | :------------------------------------------------------------------------------------------------------------ | :----------------- |
-| AWS                  | 4th Gen Intel Xeon with Intel AMX | [AWS Deployment](https://github.com/intel/terraform-intel-aws-vm/tree/main/examples/gen-ai-xeon-opea-codegen) | Available          |
-| GCP                  | 4th/5th Gen Intel Xeon            | [GCP Deployment](https://github.com/intel/terraform-intel-gcp-vm/tree/main/examples/gen-ai-xeon-opea-codegen) | Available          |
-| Azure                | 4th/5th Gen Intel Xeon            | Work-in-progress                                                                                              | Coming Soon        |
-| Intel Tiber AI Cloud | 5th Gen Intel Xeon with Intel AMX | Work-in-progress                                                                                              | Coming Soon        |
+| Cloud Provider       | Intel Architecture                | Intel Optimized Cloud Module for Terraform                                                                    | Comments    |
+| :------------------- | :-------------------------------- | :------------------------------------------------------------------------------------------------------------ | :---------- |
+| AWS                  | 4th Gen Intel Xeon with Intel AMX | [AWS Deployment](https://github.com/intel/terraform-intel-aws-vm/tree/main/examples/gen-ai-xeon-opea-codegen) | Available   |
+| GCP                  | 4th/5th Gen Intel Xeon            | [GCP Deployment](https://github.com/intel/terraform-intel-gcp-vm/tree/main/examples/gen-ai-xeon-opea-codegen) | Available   |
+| Azure                | 4th/5th Gen Intel Xeon            | Work-in-progress                                                                                              | Coming Soon |
+| Intel Tiber AI Cloud | 5th Gen Intel Xeon with Intel AMX | Work-in-progress                                                                                              | Coming Soon |
 
 ## Contribution
 
 We welcome contributions to the OPEA project. Please refer to the contribution guidelines for more information.
+
+```
+
 ```
