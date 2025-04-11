@@ -219,9 +219,13 @@ Use the `Neural Copilot` extension configured with the CodeGen backend URL: `htt
 docker compose --profile <profile_name> down
 # Example: docker compose --profile codegen-gaudi-vllm down
 ```
+
 ## Next Steps
 
 - Experiment with different models supported by TGI/vLLM on Gaudi.
 - Consult [OPEA GenAIComps](https://github.com/opea-project/GenAIComps) for microservice details.
 - Refer to the main [CodeGen README](../../../../README.md) for benchmarking and Kubernetes deployment options.
+
+```
+
 ```
