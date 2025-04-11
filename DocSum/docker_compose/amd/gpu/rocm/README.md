@@ -42,7 +42,7 @@ Some HuggingFace resources, such as some models, are only accessible if you have
 
 ### Configure the Deployment Environment
 
-To set up environment variables for deploying DocSum services, source the _setup_env.sh_ script in this directory:
+To set up environment variables for deploying DocSum services, source the _set_env.sh_ script in this directory:
 
 ```
 source ./set_env.sh
@@ -66,13 +66,13 @@ docker compose up -d
 
 Please refer to the table below to build different microservices from source:
 
-| Microservice | Deployment Guide                                                                                             |
-| ------------ | ------------------------------------------------------------------------------------------------------------ |
-| whisper      | [whisper build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/third_parties/whisper/src)  |
-| vLLM         | [vLLM build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/third_parties/vllm#build-docker)  |
+| Microservice | Deployment Guide                                                                                                                      |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------- |
+| whisper      | [whisper build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/third_parties/whisper/src)                           |
+| vLLM         | [vLLM build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/third_parties/vllm#build-docker)                        |
 | llm-docsum   | [LLM-DocSum build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/llms/src/doc-summarization#12-build-docker-image) |
-| MegaService  | [MegaService build guide](../../../../README_miscellaneous.md#build-megaservice-docker-image)                   |
-| UI           | [Basic UI build guide](../../../../README_miscellaneous.md#build-ui-docker-image)                               |
+| MegaService  | [MegaService build guide](../../../../README_miscellaneous.md#build-megaservice-docker-image)                                         |
+| UI           | [Basic UI build guide](../../../../README_miscellaneous.md#build-ui-docker-image)                                                     |
 
 ### Check the Deployment Status
 
@@ -112,14 +112,15 @@ To stop the containers associated with the deployment, execute the following com
 ```
 docker compose -f compose.yaml down
 ```
+
 All the DocSum containers will be stopped and then removed on completion of the "down" command.
 
 ## DocSum Docker Compose Files
 
 In the context of deploying a DocSum pipeline on an AMD GPU platform, we can pick and choose different large language model serving frameworks. The table below outlines the various configurations that are available as part of the application.
 
-| File                                  | Description                                                                                |
-| ------------------------------------- | ------------------------------------------------------------------------------------------ |
+| File                                     | Description                                                                                |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------ |
 | [compose.yaml](./compose.yaml)           | Default compose file using tgi as serving framework                                        |
 | [compose_vllm.yaml](./compose_vllm.yaml) | The LLM serving framework is vLLM. All other configurations remain the same as the default |
 

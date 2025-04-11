@@ -1,6 +1,6 @@
 # Example DocSum deployments on Intel® Gaudi® Platform
 
-This document outlines the deployment process for a Document Summarization application utilizing OPEA components on Intel® Gaudi® AI Accelerators. 
+This document outlines the deployment process for a Document Summarization application utilizing OPEA components on Intel® Gaudi® AI Accelerators.
 
 This example includes the following sections:
 
@@ -23,7 +23,6 @@ This section describes how to quickly deploy and test the DocSum service manuall
 6. [Test the Pipeline](#test-the-pipeline)
 7. [Cleanup the Deployment](#cleanup-the-deployment)
 
-
 ### Access the Code
 
 Clone the GenAIExample repository and access the ChatQnA Intel® Gaudi® platform Docker Compose files and supporting scripts:
@@ -43,17 +42,15 @@ git checkout v1.2
 
 Some HuggingFace resources, such as some models, are only accessible if you have an access token. If you do not already have a HuggingFace access token, you can create one by first creating an account by following the steps provided at [HuggingFace](https://huggingface.co/) and then generating a [user access token](https://huggingface.co/docs/transformers.js/en/guides/private#step-1-generating-a-user-access-token).
 
-
 ### Configure the Deployment Environment
 
-To set up environment variables for deploying DocSum services, source the _setup_env.sh_ script in this directory:
+To set up environment variables for deploying DocSum services, source the _set_env.sh_ script in this directory:
 
 ```
 source ./set_env.sh
 ```
 
 The _set_env.sh_ script will prompt for required and optional environment variables used to configure the DocSum services. If a value is not entered, the script will use a default value for the same. It will also generate a _.env_ file defining the desired configuration. Consult the section on [DocSum Service configuration](#docsum-service-configuration) for information on how service specific configuration parameters affect deployments.
-
 
 ### Deploy the Services Using Docker Compose
 
@@ -71,14 +68,13 @@ docker compose up -d
 
 Please refer to the table below to build different microservices from source:
 
-| Microservice | Deployment Guide                                                                                             |
-| ------------ | ------------------------------------------------------------------------------------------------------------ |
-| whisper      | [whisper build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/third_parties/whisper/src)  |
-| vLLM         | [vLLM build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/third_parties/vllm#build-docker)  |
+| Microservice | Deployment Guide                                                                                                                      |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------- |
+| whisper      | [whisper build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/third_parties/whisper/src)                           |
+| vLLM         | [vLLM build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/third_parties/vllm#build-docker)                        |
 | llm-docsum   | [LLM-DocSum build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/llms/src/doc-summarization#12-build-docker-image) |
-| MegaService  | [MegaService build guide](../../../../README_miscellaneous.md#build-megaservice-docker-image)                   |
-| UI           | [Basic UI build guide](../../../../README_miscellaneous.md#build-ui-docker-image)                               |
-
+| MegaService  | [MegaService build guide](../../../../README_miscellaneous.md#build-megaservice-docker-image)                                         |
+| UI           | [Basic UI build guide](../../../../README_miscellaneous.md#build-ui-docker-image)                                                     |
 
 ### Check the Deployment Status
 
@@ -108,6 +104,7 @@ curl -X POST http://${host_ip}:8888/v1/docsum \
         -H "Content-Type: application/json" \
         -d '{"type": "text", "messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
 ```
+
 **Note** The value of _host_ip_ was set using the _set_env.sh_ script and can be found in the _.env_ file.
 
 ### Cleanup the Deployment
@@ -117,6 +114,7 @@ To stop the containers associated with the deployment, execute the following com
 ```
 docker compose -f compose.yaml down
 ```
+
 All the DocSum containers will be stopped and then removed on completion of the "down" command.
 
 ## DocSum Docker Compose Files
@@ -128,11 +126,12 @@ In the context of deploying a DocSum pipeline on an Intel® Gaudi® platform, th
 | [compose.yaml](./compose.yaml)         | Default compose file using vllm as serving framework                                      |
 | [compose_tgi.yaml](./compose_tgi.yaml) | The LLM serving framework is TGI. All other configurations remain the same as the default |
 
-
 ## DocSum Detailed Usage
 
 There are also some customized usage.
+
 ### Query with text
+
 ```bash
 # form input. Use English mode (default).
 curl http://${host_ip}:8888/v1/docsum \
@@ -163,6 +162,7 @@ curl http://${host_ip}:8888/v1/docsum \
 ```
 
 ### Query with audio and video
+
 > Audio and Video file uploads are not supported in docsum with curl request, please use the Gradio-UI.
 
 Audio:
@@ -198,6 +198,7 @@ curl http://${host_ip}:8888/v1/docsum \
 ```
 
 ### Query with long context
+
 If you want to deal with long context, can set following parameters and select suitable summary type.
 
 - "summary_type": can be "auto", "stuff", "truncate", "map_reduce", "refine", default is "auto"

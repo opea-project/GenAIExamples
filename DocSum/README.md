@@ -2,7 +2,7 @@
 
 Large Language Models (LLMs) have revolutionized the way we interact with text. These models can be used to create summaries of news articles, research papers, technical documents, legal documents, multimedia documents, and other types of documents. Suppose you have a set of documents (PDFs, Notion pages, customer questions, multimedia files, etc.) and you want to summarize the content. In this example use case, we utilize LangChain to implement summarization strategies and facilitate LLM inference using Text Generation Inference.
 
-# Table of contents
+## Table of contents
 
 1. [Architecture](#architecture)
 2. [Deployment Options](#deployment-options)
@@ -73,8 +73,9 @@ flowchart LR
 
 The table below lists currently available deployment options. They outline in detail the implementation of this example on selected hardware.
 
-| Category | Deployment Option | Description |
-|------------------|------------|------------------------------|
-| On-premise Deployments | Docker compose | [DocSum deployment on Xeon](./docker_compose/intel/cpu/xeon) |
-| | | [DocSum deployment on  Gaudi](./docker_compose/intel/hpu/gaudi) |
-| | | [DocSum deployment on  AMD ROCm](./docker_compose/amd/gpu/rocm) |
+| Category               | Deployment Option         | Description                                                    |
+|------------------------|---------------------------|----------------------------------------------------------------|
+| On-premise Deployments | Docker Compose (Xeon)     | [DocSum deployment on Xeon](./docker_compose/intel/cpu/xeon)   |
+|                        | Docker Compose (Gaudi)    | [DocSum deployment on Gaudi](./docker_compose/intel/hpu/gaudi) |
+|                        | Docker Compose (ROCm)     | [DocSum deployment on AMD ROCm](./docker_compose/amd/gpu/rocm) |
+

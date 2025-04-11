@@ -7,7 +7,7 @@
 
 ## Build MegaService Docker Image
 
-To construct the Megaservice of DocSum, the [GenAIExamples](https://github.com/opea-project/GenAIExamples.git) repository if utilized. Build Megaservice Docker image via command below:
+To construct the Megaservice of DocSum, the [GenAIExamples](https://github.com/opea-project/GenAIExamples.git) repository is utilized. Build MegaService Docker image via command below:
 
 ```bash
 git clone https://github.com/opea-project/GenAIExamples.git
@@ -26,7 +26,7 @@ docker build -t opea/docsum-ui:latest --build-arg https_proxy=$https_proxy --bui
 
 ## Generate a HuggingFace Access Token
 
-Some HuggingFace resources, such as some models, are only accessible if the developer have an access token. In the absence of a HuggingFace access token, the developer can create one by first creating an account by following the steps provided at [HuggingFace](https://huggingface.co/) and then generating a [user access token](https://huggingface.co/docs/transformers.js/en/guides/private#step-1-generating-a-user-access-token).
+Some HuggingFace resources, such as certain models, are only accessible if the developer has an access token. If you don't have a HuggingFace access token, you can create one by registering at [HuggingFace](https://huggingface.co/) and following [these steps](https://huggingface.co/docs/transformers.js/en/guides/private#step-1-generating-a-user-access-token).
 
 ## Troubleshooting
 
@@ -42,4 +42,3 @@ Some HuggingFace resources, such as some models, are only accessible if the deve
 
 2. (Docker only) If all microservices work well, check the port ${host_ip}:7777, the port may be allocated by other users, you can modify the `compose.yaml`.
 3. (Docker only) If you get errors like "The container name is in use", change container name in `compose.yaml`.
-
