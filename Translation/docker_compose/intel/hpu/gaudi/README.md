@@ -1,17 +1,15 @@
-# Example Translation deployments on an Intel® Gaudi® Platform
+# Example Translation deployments on Intel® Gaudi® Platform
 
 
-This document outlines the deployment process for a Translation application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on Intel Gaudi server. The steps include Docker image creation, container deployment via Docker Compose, and service execution to integrate microservices such as `llm`. We will publish the Docker images to Docker Hub soon, it will simplify the deployment process for this service.
+This document outlines the deployment process for a Translation application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on Intel Gaudi server. This example includes the following sections:
 
-This example includes the following sections:
-
-- [Translation Quick Start Deployment](#translation-quick-start-deployment): Demonstrates how to quickly deploy a Translation application/pipeline on a Intel® Gaudi® platform.
+- [Translation Quick Start Deployment](#translation-quick-start-deployment): Demonstrates how to quickly deploy a Translation application/pipeline on Intel® Gaudi® platform.
 - [Translation Docker Compose Files](#translation-docker-compose-files): Describes some example deployments and their docker compose files.
 - [Translation Service Configuration](#translation-service-configuration): Describes the services and possible configuration changes.
 
 ## Translation Quick Start Deployment
 
-This section describes how to quickly deploy and test the Translation service manually on an Intel® Gaudi® platform. The basic steps are:
+This section describes how to quickly deploy and test the Translation service manually on Intel® Gaudi® platform. The basic steps are:
 
 1. [Access the Code](#access-the-code)
 2. [Generate a HuggingFace Access Token](#generate-a-huggingface-access-token)
@@ -61,7 +59,6 @@ docker compose up -d
 The Translation docker images should automatically be downloaded from the `OPEA registry` and deployed on the Intel® Gaudi® Platform:
 
 ```
-
 [+] Running 5/5
  ✔ Container tgi-gaudi-server                  Healthy                                                          222.4s
  ✔ Container llm-textgen-gaudi-server          Started                                                          221.7s
