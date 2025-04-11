@@ -68,8 +68,8 @@ docker compose -f compose.yaml up -d
 
 Please refer to the table below to build different microservices from source:
 
-| Microservice | Deployment Guide                                                                                            |
-| ------------ | ----------------------------------------------------------------------------------------------------------- |
+| Microservice | Deployment Guide                                                                                               |
+| ------------ | -------------------------------------------------------------------------------------------------------------- |
 | vLLM         | [vLLM build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/third_parties/vllm#build-docker) |
 | LLM          | [LLM build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/llms)                             |
 | MegaService  | [MegaService build guide](../../../../README_miscellaneous.md#build-megaservice-docker-image)                  |
@@ -120,8 +120,8 @@ docker compose -f compose.yaml down
 
 In the context of deploying a CodeTrans pipeline on an Intel® Xeon® platform, we can pick and choose different large language model serving frameworks. The table below outlines the various configurations that are available as part of the application. These configurations can be used as templates and can be extended to different components available in [GenAIComps](https://github.com/opea-project/GenAIComps.git).
 
-| File                                | Description                                                                               |
-| ----------------------------------- | ----------------------------------------------------------------------------------------- |
+| File                                   | Description                                                                               |
+| -------------------------------------- | ----------------------------------------------------------------------------------------- |
 | [compose.yaml](./compose.yaml)         | Default compose file using vllm as serving framework and redis as vector database         |
 | [compose_tgi.yaml](./compose_tgi.yaml) | The LLM serving framework is TGI. All other configurations remain the same as the default |
 
@@ -156,6 +156,7 @@ In the context of deploying a CodeTrans pipeline on an Intel® Xeon® platform, 
      -d '{"inputs":"    ### System: Please translate the following Golang codes into  Python codes.    ### Original codes:    '\'''\'''\''Golang    \npackage main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n    '\'''\'''\''    ### Translated codes:","parameters":{"max_new_tokens":17, "do_sample": true}}' \
      -H 'Content-Type: application/json'
    ```
+
 2. LLM Microservice
 
    ```bash
@@ -164,6 +165,7 @@ In the context of deploying a CodeTrans pipeline on an Intel® Xeon® platform, 
      -d '{"query":"    ### System: Please translate the following Golang codes into  Python codes.    ### Original codes:    '\'''\'''\''Golang    \npackage main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n    '\'''\'''\''    ### Translated codes:"}' \
      -H 'Content-Type: application/json'
    ```
+
 3. MegaService
 
    ```bash
@@ -171,6 +173,7 @@ In the context of deploying a CodeTrans pipeline on an Intel® Xeon® platform, 
        -H "Content-Type: application/json" \
        -d '{"language_from": "Golang","language_to": "Python","source_code": "package main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n}"}'
    ```
+
 4. Nginx Service
 
    ```bash
