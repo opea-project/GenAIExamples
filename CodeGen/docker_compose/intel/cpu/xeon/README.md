@@ -129,7 +129,7 @@ If you need to modify the microservices:
 3.  Tag your custom images appropriately (e.g., `my-custom-codegen:latest`).
 4.  Update the `image:` fields in the `compose.yaml` file to use your custom image tags.
 
-_Refer to the main [CodeGen README](../../../README.md) for links to relevant GenAIComps components._
+_Refer to the main [CodeGen README](../../../../README.md) for links to relevant GenAIComps components._
 
 ## Validate Services
 
