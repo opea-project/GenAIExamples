@@ -1,6 +1,20 @@
 # Finance Agent
 
 ## 1. Overview
+The architecture of this Finance Agent example is shown in the figure below. The agent has 3 main functions:
+1. Summarize long financial documents and provide key points.
+2. Answer questions over financial documents, such as SEC filings.
+3. Conduct research of a public company and provide an investment report of the company.
+
+![Finance Agent Architecture](assets/finance_agent_arch.png)
+
+The `dataprep` microservice can ingest financial documents in two formats: 
+1. PDF documents stored locally, such as SEC filings saved in local directory.
+2. URLs, such as earnings call transcripts ([example](https://www.fool.com/earnings/call-transcripts/2025/03/06/costco-wholesale-cost-q2-2025-earnings-call-transc/)) and online SEC filings ([example](https://investors.3m.com/financials/sec-filings/content/0000066740-25-000006/0000066740-25-000006.pdf)).
+
+Please note: 
+1. Each financial document should be about one company.
+2. URLs ending in `.htm` are not supported.
 
 ## 2. Getting started
 
@@ -50,11 +64,8 @@ docker build --no-cache -f Dockerfile.hpu -t opea/vllm-gaudi:latest --shm-size=1
 Below is the command to launch a vllm endpoint on Gaudi that serves `meta-llama/Llama-3.3-70B-Instruct` model on 4 Gaudi cards.
 
 ```bash
-export vllm_port=8086
-export vllm_volume=$HF_CACHE_DIR
-export max_length=16384
-export model="meta-llama/Llama-3.3-70B-Instruct"
-docker run -d --runtime=habana --rm --name "vllm-gaudi-server" -e HABANA_VISIBLE_DEVICES=all -p $vllm_port:8000 -v $vllm_volume:/data -e HF_TOKEN=$HF_TOKEN -e HUGGING_FACE_HUB_TOKEN=$HF_TOKEN -e HF_HOME=/data -e OMPI_MCA_btl_vader_single_copy_mechanism=none -e PT_HPU_ENABLE_LAZY_COLLECTIVES=true -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e no_proxy=$no_proxy -e VLLM_SKIP_WARMUP=true --cap-add=sys_nice --ipc=host opea/vllm-gaudi:comps --model ${model} --max-seq-len-to-capture $max_length --tensor-parallel-size 4
+cd $WORKDIR/GenAIExamples/FinanceAgent/docker_compose/intel/hpu/gaudi
+bash launch_vllm.sh
 ```
 
 ### 3.2 Prepare knowledge base
@@ -64,20 +75,21 @@ The commands below will upload some example files into the knowledge base. You c
 First, launch the redis databases and the dataprep microservice.
 
 ```bash
-docker compose -f $WORKDIR/GenAIExamples/FinanceAgent/docker_compose/intel/hpu/gaudi/dataprep_compose.yaml up -d
+# inside $WORKDIR/GenAIExamples/FinanceAgent/docker_compose/intel/hpu/gaudi/
+bash launch_dataprep.sh
 ```
 
 Validate datat ingest data and retrieval from database:
 
 ```bash
-python $WORKPATH/tests/test_redis_finance.py --port $DATAPREP_PORT --test_option ingest
-python $WORKPATH/tests/test_redis_finance.py --port $DATAPREP_PORT --test_option get
+python $WORKPATH/tests/test_redis_finance.py --port 6007 --test_option ingest
+python $WORKPATH/tests/test_redis_finance.py --port 6007 --test_option get
 ```
 
 ### 3.3 Launch the multi-agent system
 
 ```bash
-cd $WORKDIR/GenAIExamples/FinanceAgent/docker_compose/intel/hpu/gaudi/
+# inside $WORKDIR/GenAIExamples/FinanceAgent/docker_compose/intel/hpu/gaudi/
 bash launch_agents.sh
 ```
 
@@ -96,7 +108,7 @@ Research Agent:
 ```bash
 export agent_port="9096"
 prompt="generate NVDA financial research report"
-python3 $WORKDIR/GenAIExamples/AgentQnA/tests/test.py --prompt "$prompt" --agent_role "worker" --ext_port $agent_port --tool_choice "get_current_date" --tool_choice "get_share_performance"
+python3 $WORKDIR/GenAIExamples/FinanceAgent/tests/test.py --prompt "$prompt" --agent_role "worker" --ext_port $agent_port --tool_choice "get_current_date" --tool_choice "get_share_performance"
 ```
 
 Supervisor ReAct Agent:
