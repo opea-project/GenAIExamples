@@ -128,3 +128,18 @@ Supervisor ReAct Agent Multi turn:
 python3 $WORKDIR/GenAIExamples/FinanceAgent/tests/test.py --agent_role "supervisor" --ext_port $agent_port --multi-turn --stream
 
 ```
+
+## How to interact with the agent system with UI
+
+The UI microservice is launched in the previous step with the other microservices.
+To see the UI, open a web browser to `http://${ip_address}:5175` to access the UI. Note the `ip_address` here is the host IP of the UI microservice.
+
+1. `create Admin Account` with a random value
+
+2. use an opea agent endpoint, for example, the `Research Agent` endpoint `http://$ip_address:9096/v1`, which is a openai compatible api
+
+![opea-agent-setting](assets/opea-agent-setting.png)
+
+3. test opea agent with ui
+
+![opea-agent-test](assets/opea-agent-test.png)

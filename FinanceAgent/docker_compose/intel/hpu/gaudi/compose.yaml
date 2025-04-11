@@ -119,3 +119,15 @@ services:
       MAX_TOTAL_TOKENS: ${MAX_TOTAL_TOKENS}
       DocSum_COMPONENT_NAME: ${DocSum_COMPONENT_NAME:-OpeaDocSumvLLM}
     restart: unless-stopped
+
+  agent-ui:
+    image: opea/agent-ui:latest
+    container_name: agent-ui
+    environment:
+      host_ip: ${host_ip}
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+    ports:
+      - "5175:8080"
+    ipc: host
