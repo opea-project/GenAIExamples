@@ -34,12 +34,12 @@ The benchmark reports several key performance indicators:
 
 - A running CodeGen service accessible via an HTTP endpoint. Refer to the main [CodeGen README](../README.md) for deployment options (Kubernetes recommended for load balancing/scalability).
 - **If using Kubernetes:**
-    - A working Kubernetes cluster (refer to OPEA K8s setup guides if needed).
-    - `kubectl` configured to access the cluster from the node where the benchmark will run (typically the master node).
-    - Ensure sufficient `ulimit` for network connections on worker nodes hosting the service pods (e.g., `LimitNOFILE=65536` or higher in containerd/docker config).
+  - A working Kubernetes cluster (refer to OPEA K8s setup guides if needed).
+  - `kubectl` configured to access the cluster from the node where the benchmark will run (typically the master node).
+  - Ensure sufficient `ulimit` for network connections on worker nodes hosting the service pods (e.g., `LimitNOFILE=65536` or higher in containerd/docker config).
 - **General:**
-    - Python 3.8+ on the node running the benchmark script.
-    - Network access from the benchmark node to the CodeGen service endpoint.
+  - Python 3.8+ on the node running the benchmark script.
+  - Network access from the benchmark node to the CodeGen service endpoint.
 
 ## Running the Performance Benchmark
 
@@ -47,6 +47,7 @@ The benchmark reports several key performance indicators:
 
 2.  **Configure Benchmark Parameters (Optional):**
     Set environment variables to customize the test queries and output directory. The `USER_QUERIES` variable defines the number of concurrent requests for each test run.
+
     ```bash
     # Example: Four runs with 128 concurrent requests each
     export USER_QUERIES="[128, 128, 128, 128]"
@@ -55,7 +56,8 @@ The benchmark reports several key performance indicators:
     # Set the target endpoint URL
     export CODEGEN_ENDPOINT_URL="http://{your_service_ip_or_hostname}:{port}/v1/codegen"
     ```
-    *Replace `{your_service_ip_or_hostname}:{port}` with the actual accessible URL of your CodeGen gateway service.*
+
+    _Replace `{your_service_ip_or_hostname}:{port}` with the actual accessible URL of your CodeGen gateway service._
 
 3.  **Execute the Benchmark Script:**
     Run the script, optionally specifying the number of Kubernetes nodes involved if relevant for reporting context (the script itself runs from one node).
@@ -64,7 +66,7 @@ The benchmark reports several key performance indicators:
     # cd GenAIExamples/CodeGen/benchmark/performance
     bash benchmark.sh # Add '-n <node_count>' if desired for logging purposes
     ```
-    *Ensure the `benchmark.sh` script is adapted to use `CODEGEN_ENDPOINT_URL` and potentially `USER_QUERIES`, `TEST_OUTPUT_DIR`.*
+    _Ensure the `benchmark.sh` script is adapted to use `CODEGEN_ENDPOINT_URL` and potentially `USER_QUERIES`, `TEST_OUTPUT_DIR`._
 
 ## Data Collection
 

@@ -50,6 +50,7 @@ This uses the default vLLM-based deployment profile (`codegen-gaudi-vllm`).
 
 1.  **Configure Environment:**
     Set required environment variables in your shell:
+
     ```bash
     # Replace with your host's external IP address (do not use localhost or 127.0.0.1)
     export HOST_IP="your_external_ip_address"
@@ -61,9 +62,11 @@ This uses the default vLLM-based deployment profile (`codegen-gaudi-vllm`).
     # export https_proxy="your_https_proxy"
     # export no_proxy="localhost,127.0.0.1,${HOST_IP}" # Add other hosts if necessary
     ```
-    *Note: Ensure all required variables like ports (`LLM_SERVICE_PORT`, `CODEGEN_SERVICE_PORT`, etc.) are set if not using defaults from the compose file.*
+
+    _Note: Ensure all required variables like ports (`LLM_SERVICE_PORT`, `CODEGEN_SERVICE_PORT`, etc.) are set if not using defaults from the compose file._
 
 2.  **Start Services (vLLM Profile):**
+
     ```bash
     docker compose --profile codegen-gaudi-vllm up -d
     ```
@@ -77,22 +80,22 @@ The `compose.yaml` file uses Docker Compose profiles to select the LLM serving b
 
 ### Default: vLLM-based Deployment (`--profile codegen-gaudi-vllm`)
 
--   **Profile:** `codegen-gaudi-vllm`
--   **Description:** Uses vLLM optimized for Intel Gaudi HPUs as the LLM serving engine. This is the default profile used in the Quick Start.
--   **Gaudi Service:** `codegen-vllm-gaudi-server`
--   **Other Services:** `codegen-llm-server`, `codegen-tei-embedding-server` (CPU), `codegen-retriever-server` (CPU), `redis-vector-db` (CPU), `codegen-dataprep-server` (CPU), `codegen-backend-server` (CPU), `codegen-gradio-ui-server` (CPU).
+- **Profile:** `codegen-gaudi-vllm`
+- **Description:** Uses vLLM optimized for Intel Gaudi HPUs as the LLM serving engine. This is the default profile used in the Quick Start.
+- **Gaudi Service:** `codegen-vllm-gaudi-server`
+- **Other Services:** `codegen-llm-server`, `codegen-tei-embedding-server` (CPU), `codegen-retriever-server` (CPU), `redis-vector-db` (CPU), `codegen-dataprep-server` (CPU), `codegen-backend-server` (CPU), `codegen-gradio-ui-server` (CPU).
 
 ### TGI-based Deployment (`--profile codegen-gaudi-tgi`)
 
--   **Profile:** `codegen-gaudi-tgi`
--   **Description:** Uses Hugging Face Text Generation Inference (TGI) optimized for Intel Gaudi HPUs as the LLM serving engine.
--   **Gaudi Service:** `codegen-tgi-gaudi-server`
--   **Other Services:** Same CPU-based services as the vLLM profile.
--   **To Run:**
-    ```bash
-    # Ensure environment variables (HOST_IP, HUGGINGFACEHUB_API_TOKEN) are set
-    docker compose --profile codegen-gaudi-tgi up -d
-    ```
+- **Profile:** `codegen-gaudi-tgi`
+- **Description:** Uses Hugging Face Text Generation Inference (TGI) optimized for Intel Gaudi HPUs as the LLM serving engine.
+- **Gaudi Service:** `codegen-tgi-gaudi-server`
+- **Other Services:** Same CPU-based services as the vLLM profile.
+- **To Run:**
+  ```bash
+  # Ensure environment variables (HOST_IP, HUGGINGFACEHUB_API_TOKEN) are set
+  docker compose --profile codegen-gaudi-tgi up -d
+  ```
 
 ## Configuration Parameters
 
@@ -100,17 +103,17 @@ The `compose.yaml` file uses Docker Compose profiles to select the LLM serving b
 
 Key parameters are configured via environment variables set before running `docker compose up`.
 
-| Environment Variable        | Description                                                                                                        | Default (Set Externally) |
-| :-------------------------- | :----------------------------------------------------------------------------------------------------------------- | :----------------------- |
-| `HOST_IP`                   | External IP address of the host machine. **Required.**                                                            | `your_external_ip_address` |
-| `HUGGINGFACEHUB_API_TOKEN`  | Your Hugging Face Hub token for model access. **Required.**                                                        | `your_huggingface_token` |
-| `LLM_MODEL_ID`              | Hugging Face model ID for the CodeGen LLM (used by TGI/vLLM service). Configured within `compose.yaml` environment. | `Qwen/Qwen2.5-Coder-7B-Instruct` |
-| `EMBEDDING_MODEL_ID`        | Hugging Face model ID for the embedding model (used by TEI service). Configured within `compose.yaml` environment.  | `BAAI/bge-base-en-v1.5` |
-| `TGI_LLM_ENDPOINT` / `VLLM_LLM_ENDPOINT` | Internal URL for the LLM serving endpoint (used by `codegen-llm-server`). Configured in `compose.yaml`. | `http://codegen-tgi-gaudi-server:80/generate` or `http://codegen-vllm-gaudi-server:8000/v1/chat/completions` |
-| `TEI_EMBEDDING_ENDPOINT`    | Internal URL for the Embedding service (CPU). Configured in `compose.yaml`.                                       | `http://codegen-tei-embedding-server:80/embed` |
-| ... (Other service endpoints like Retriever, DataPrep, LLM Service, CodeGen Gateway) | Internal URLs configured similarly within `compose.yaml`.                                                          | Various                  |
-| `GRADIO_SERVICE_PORT`       | Host port mapping for the Gradio UI. Configured in `compose.yaml`.                                                  | `8080`                   |
-| `http_proxy` / `https_proxy`/`no_proxy` | Network proxy settings (if required).                                                               | `""`                     |
+| Environment Variable                                                                 | Description                                                                                                         | Default (Set Externally)                                                                                     |
+| :----------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------ | :----------------------------------------------------------------------------------------------------------- |
+| `HOST_IP`                                                                            | External IP address of the host machine. **Required.**                                                              | `your_external_ip_address`                                                                                   |
+| `HUGGINGFACEHUB_API_TOKEN`                                                           | Your Hugging Face Hub token for model access. **Required.**                                                         | `your_huggingface_token`                                                                                     |
+| `LLM_MODEL_ID`                                                                       | Hugging Face model ID for the CodeGen LLM (used by TGI/vLLM service). Configured within `compose.yaml` environment. | `Qwen/Qwen2.5-Coder-7B-Instruct`                                                                             |
+| `EMBEDDING_MODEL_ID`                                                                 | Hugging Face model ID for the embedding model (used by TEI service). Configured within `compose.yaml` environment.  | `BAAI/bge-base-en-v1.5`                                                                                      |
+| `TGI_LLM_ENDPOINT` / `VLLM_LLM_ENDPOINT`                                             | Internal URL for the LLM serving endpoint (used by `codegen-llm-server`). Configured in `compose.yaml`.             | `http://codegen-tgi-gaudi-server:80/generate` or `http://codegen-vllm-gaudi-server:8000/v1/chat/completions` |
+| `TEI_EMBEDDING_ENDPOINT`                                                             | Internal URL for the Embedding service (CPU). Configured in `compose.yaml`.                                         | `http://codegen-tei-embedding-server:80/embed`                                                               |
+| ... (Other service endpoints like Retriever, DataPrep, LLM Service, CodeGen Gateway) | Internal URLs configured similarly within `compose.yaml`.                                                           | Various                                                                                                      |
+| `GRADIO_SERVICE_PORT`                                                                | Host port mapping for the Gradio UI. Configured in `compose.yaml`.                                                  | `8080`                                                                                                       |
+| `http_proxy` / `https_proxy`/`no_proxy`                                              | Network proxy settings (if required).                                                                               | `""`                                                                                                         |
 
 ### Compose Profiles
 
@@ -122,16 +125,17 @@ The `compose.yaml` file includes specific configurations for Gaudi services (`co
 
 ```yaml
 # Example snippet for codegen-vllm-gaudi-server
-    runtime: habana         # Specifies the Habana runtime for Docker
-    volumes:
-      - /dev/vfio:/dev/vfio # Mount necessary device files
-    cap_add:
-      - SYS_NICE            # Add capabilities needed by Gaudi drivers/runtime
-    ipc: host               # Use host IPC namespace
-    environment:
-      HABANA_VISIBLE_DEVICES: all # Make all Gaudi devices visible
-      # Other model/service specific env vars
+runtime: habana # Specifies the Habana runtime for Docker
+volumes:
+  - /dev/vfio:/dev/vfio # Mount necessary device files
+cap_add:
+  - SYS_NICE # Add capabilities needed by Gaudi drivers/runtime
+ipc: host # Use host IPC namespace
+environment:
+  HABANA_VISIBLE_DEVICES: all # Make all Gaudi devices visible
+  # Other model/service specific env vars
 ```
+
 This setup grants the container access to Gaudi devices. Ensure the host system has the Habana Docker runtime correctly installed and configured.
 
 ## Building Custom Images (Optional)
@@ -148,10 +152,12 @@ If you need to modify microservices:
 ### Check Container Status
 
 Ensure all containers are running, especially the Gaudi-accelerated LLM service:
+
 ```bash
 docker compose --profile <profile_name> ps
 # Example: docker compose --profile codegen-gaudi-vllm ps
 ```
+
 Check logs: `docker compose logs <service_name>`. Pay attention to `codegen-vllm-gaudi-server` or `codegen-tgi-gaudi-server` logs for initialization status and errors.
 
 ### Run Validation Script/Commands
@@ -159,7 +165,7 @@ Check logs: `docker compose logs <service_name>`. Pay attention to `codegen-vllm
 Use `curl` commands targeting the main service endpoints. Ensure `HOST_IP` is correctly set.
 
 1.  **Validate LLM Serving Endpoint (Example for vLLM):**
-    *Testing via the gateway is recommended.* Direct testing might require exposing the Gaudi service port (`8000` internal for vLLM) on the host.
+    _Testing via the gateway is recommended._ Direct testing might require exposing the Gaudi service port (`8000` internal for vLLM) on the host.
 
 2.  **Validate CodeGen Gateway (MegaService, default host port 7778):**
     ```bash
@@ -177,7 +183,7 @@ UI options are similar to the Xeon deployment.
 
 Access the default Gradio UI:
 `http://{HOST_IP}:8080`
-*(Port `8080` is the default host mapping)*
+_(Port `8080` is the default host mapping)_
 
 ![Gradio UI](../../../../assets/img/codegen_gradio_ui_main.png)
 
@@ -199,13 +205,13 @@ Use the `Neural Copilot` extension configured with the CodeGen backend URL: `htt
 
 ## Troubleshooting
 
--   **Gaudi Service Issues:**
-    - Check logs (`codegen-vllm-gaudi-server` or `codegen-tgi-gaudi-server`) for Habana/Gaudi specific errors.
-    - Ensure host drivers and Habana Docker runtime are installed and working (`habana-container-runtime`).
-    - Verify `runtime: habana` and volume mounts in `compose.yaml`.
-    - Gaudi initialization can take significant time and memory. Monitor resource usage.
--   **Model Download Issues:** Check `HUGGINGFACEHUB_API_TOKEN`, internet access, proxy settings. Check LLM service logs.
--   **Connection Errors:** Verify `HOST_IP`, ports, and proxy settings. Use `docker ps` and check service logs.
+- **Gaudi Service Issues:**
+  - Check logs (`codegen-vllm-gaudi-server` or `codegen-tgi-gaudi-server`) for Habana/Gaudi specific errors.
+  - Ensure host drivers and Habana Docker runtime are installed and working (`habana-container-runtime`).
+  - Verify `runtime: habana` and volume mounts in `compose.yaml`.
+  - Gaudi initialization can take significant time and memory. Monitor resource usage.
+- **Model Download Issues:** Check `HUGGINGFACEHUB_API_TOKEN`, internet access, proxy settings. Check LLM service logs.
+- **Connection Errors:** Verify `HOST_IP`, ports, and proxy settings. Use `docker ps` and check service logs.
 
 ## Stopping the Application
 
@@ -213,4 +219,3 @@ Use the `Neural Copilot` extension configured with the CodeGen backend URL: `htt
 docker compose --profile <profile_name> down
 # Example: docker compose --profile codegen-gaudi-vllm down
 ```
-
