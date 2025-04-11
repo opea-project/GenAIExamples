@@ -168,10 +168,27 @@ services:
       - no_proxy=${no_proxy}
       - https_proxy=${https_proxy}
       - http_proxy=${http_proxy}
-      - BACKEND_BASE_URL=${BACKEND_SERVICE_ENDPOINT}
     ipc: host
     restart: always
-
+  searchqna-xeon-nginx-server:
+    image: ${REGISTRY:-opea}/nginx:${TAG:-latest}
+    container_name: searchqna-xeon-nginx-server
+    depends_on:
+      - searchqna-xeon-backend-server
+      - searchqna-xeon-ui-server
+    ports:
+      - "${NGINX_PORT:-80}:80"
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - FRONTEND_SERVICE_IP=searchqna-xeon-ui-server
+      - FRONTEND_SERVICE_PORT=5173
+      - BACKEND_SERVICE_NAME=searchqna
+      - BACKEND_SERVICE_IP=searchqna-xeon-backend-server
+      - BACKEND_SERVICE_PORT=8888
+    ipc: host
+    restart: always
 
 networks:
   default:
