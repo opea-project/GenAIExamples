@@ -1,6 +1,5 @@
 # Example Translation deployments on AMD GPU (ROCm)
 
-
 This document outlines the deployment process for a Translation application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on AMD GPU (ROCm). This example includes the following sections:
 
 - [Translation Quick Start Deployment](#translation-quick-start-deployment): Demonstrates how to quickly deploy a Translation application/pipeline on AMD GPU (ROCm).
@@ -52,7 +51,7 @@ source ./set_env.sh
 source ./set_env_vllm.sh
 ```
 
-The _setup_env.sh_ script will prompt for required and optional environment variables used to configure the Translation services based on TGI. The _setup_env_vllm.sh_  script will prompt for required and optional environment variables used to configure the Translation services based on VLLM. If a value is not entered, the script will use a default value for the same. It will also generate a _.env_ file defining the desired configuration. Consult the section on [Translation Service configuration](#translation-service-configuration) for information on how service specific configuration parameters affect deployments.
+The _setup_env.sh_ script will prompt for required and optional environment variables used to configure the Translation services based on TGI. The _setup_env_vllm.sh_ script will prompt for required and optional environment variables used to configure the Translation services based on VLLM. If a value is not entered, the script will use a default value for the same. It will also generate a _.env_ file defining the desired configuration. Consult the section on [Translation Service configuration](#translation-service-configuration) for information on how service specific configuration parameters affect deployments.
 
 ### Deploy the Services Using Docker Compose
 
@@ -132,13 +131,13 @@ All the Translation containers will be stopped and then removed on completion of
 
 The compose.yaml is default compose file using tgi as serving framework
 
-| Service Name                 | Image Name                                            |
-| ---------------------------- | ----------------------------------------------------- |
-| translation-tgi-service      | ghcr.io/huggingface/text-generation-inference:2.4.1-rocm                           |
-| translation-llm              | opea/llm-textgen:latest                                  |
-| translation-backend-server   | opea/translation:latest |
-| translation-ui-server        | opea/translation-ui:latest                                 |
-| translation-nginx-server     | opea/nginx:latest                                     |
+| Service Name               | Image Name                                               |
+| -------------------------- | -------------------------------------------------------- |
+| translation-tgi-service    | ghcr.io/huggingface/text-generation-inference:2.4.1-rocm |
+| translation-llm            | opea/llm-textgen:latest                                  |
+| translation-backend-server | opea/translation:latest                                  |
+| translation-ui-server      | opea/translation-ui:latest                               |
+| translation-nginx-server   | opea/nginx:latest                                        |
 
 ## Translation Service Configuration for AMD GPUs
 
@@ -176,16 +175,16 @@ security_opt:
   - seccomp:unconfined
 ```
 
-The table provides a comprehensive overview of the Translation services utilized across various deployments as illustrated in the example Docker Compose files. Each row in the table represents a distinct service, detailing its possible images used to enable it and a concise description of its function within the deployment architecture. 
+The table provides a comprehensive overview of the Translation services utilized across various deployments as illustrated in the example Docker Compose files. Each row in the table represents a distinct service, detailing its possible images used to enable it and a concise description of its function within the deployment architecture.
 
-| Service Name                 | Possible Image Names                                  | Optional | Description                                                                                        |
-| ---------------------------- | ----------------------------------------------------- | -------- | -------------------------------------------------------------------------------------------------- |
-| translation-tgi-service      | ghcr.io/huggingface/text-generation-inference:2.4.1-rocm | No           | Specific to the TGI deployment, focuses on text generation inference using AMD GPU (ROCm) hardware. |
-| translation-vllm-service     | opea/vllm-rocm:latest                                 | No           | Handles large language model (LLM) tasks, utilizing AMD GPU (ROCm) hardware. |
-| translation-llm              | opea/llm-textgen:latest                                  | No           | Handles large language model (LLM) tasks|
-| translation-backend-server   | opea/translation:latest | No           | Serves as the backend for the Translation application, with variations depending on the deployment.|
-| translation-ui-server        | opea/translation-ui:latest                                 | No           | Provides the user interface for the Translation application.|
-| translation-nginx-server     | opea/nginx:latest                                     | No           |A cts as a reverse proxy, managing traffic between the UI and backend services.|
+| Service Name               | Possible Image Names                                     | Optional | Description                                                                                         |
+| -------------------------- | -------------------------------------------------------- | -------- | --------------------------------------------------------------------------------------------------- |
+| translation-tgi-service    | ghcr.io/huggingface/text-generation-inference:2.4.1-rocm | No       | Specific to the TGI deployment, focuses on text generation inference using AMD GPU (ROCm) hardware. |
+| translation-vllm-service   | opea/vllm-rocm:latest                                    | No       | Handles large language model (LLM) tasks, utilizing AMD GPU (ROCm) hardware.                        |
+| translation-llm            | opea/llm-textgen:latest                                  | No       | Handles large language model (LLM) tasks                                                            |
+| translation-backend-server | opea/translation:latest                                  | No       | Serves as the backend for the Translation application, with variations depending on the deployment. |
+| translation-ui-server      | opea/translation-ui:latest                               | No       | Provides the user interface for the Translation application.                                        |
+| translation-nginx-server   | opea/nginx:latest                                        | No       | A cts as a reverse proxy, managing traffic between the UI and backend services.                     |
 
 **How to Identify GPU Device IDs:**
 Use AMD GPU driver utilities to determine the correct `cardN` and `renderN` IDs for your GPU.

@@ -75,4 +75,4 @@ The table below shows different deployment options to choose from. They outline 
 | ---------------------- | ----------------- | ----------------------------------------------------------------------------- |
 | On-premise Deployments | Docker compose    | [Translation deployment on Xeon](./docker_compose/intel/cpu/xeon/README.md)   |
 |                        |                   | [Translation deployment on Gaudi](./docker_compose/intel/hpu/gaudi/README.md) |
-|                        |                   | [Translation deployment on AMD Rocm](./docker_compose/amd/gpu/rocm/README.md)  |
+|                        |                   | [Translation deployment on AMD Rocm](./docker_compose/amd/gpu/rocm/README.md) |

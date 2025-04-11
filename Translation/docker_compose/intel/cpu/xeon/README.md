@@ -1,6 +1,5 @@
 # Example Translation deployments on Intel® Xeon® Platform
 
-
 This document outlines the deployment process for a Translation application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on Intel Xeon server. This example includes the following sections:
 
 - [Translation Quick Start Deployment](#translation-quick-start-deployment): Demonstrates how to quickly deploy a Translation application/pipeline on Intel® Xeon® platform.
@@ -122,22 +121,22 @@ All the Translation containers will be stopped and then removed on completion of
 
 The compose.yaml is default compose file using tgi as serving framework
 
-| Service Name                 | Image Name                                            |
-| ---------------------------- | ----------------------------------------------------- |
-| tgi-service                  | ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu                           |
-| llm                          | opea/llm-textgen:latest                                  |
-| translation-xeon-backend-server        | opea/translation:latest |
-| translation-xeon-ui-server   | opea/translation-ui:latest                                 |
-| translation-xeon-nginx-server| opea/nginx:latest                                     |
+| Service Name                    | Image Name                                                    |
+| ------------------------------- | ------------------------------------------------------------- |
+| tgi-service                     | ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu |
+| llm                             | opea/llm-textgen:latest                                       |
+| translation-xeon-backend-server | opea/translation:latest                                       |
+| translation-xeon-ui-server      | opea/translation-ui:latest                                    |
+| translation-xeon-nginx-server   | opea/nginx:latest                                             |
 
 ## Translation Service Configuration
 
-The table provides a comprehensive overview of the Translation services utilized across various deployments as illustrated in the example Docker Compose files. Each row in the table represents a distinct service, detailing its possible images used to enable it and a concise description of its function within the deployment architecture. 
+The table provides a comprehensive overview of the Translation services utilized across various deployments as illustrated in the example Docker Compose files. Each row in the table represents a distinct service, detailing its possible images used to enable it and a concise description of its function within the deployment architecture.
 
-| Service Name                 | Possible Image Names                                  | Optional | Description                                                                                        |
-| ---------------------------- | ----------------------------------------------------- | -------- | -------------------------------------------------------------------------------------------------- |
-| tgi-service                  | ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu | No           |Specific to the TGI deployment, focuses on text generation inference using Xeon hardware.|
-| llm                          | opea/llm-textgen:latest                                  | No           |Handles large language model (LLM) tasks|
-| translation-xeon-backend-server        | opea/translation:latest | No           |Serves as the backend for the Translation application, with variations depending on the deployment.|
-| translation-xeon-ui-server   | opea/translation-ui:latest                                 | No           |Provides the user interface for the Translation application.|
-| translation-xeon-nginx-server| opea/nginx:latest                                     | No           |Acts as a reverse proxy, managing traffic between the UI and backend services.|
+| Service Name                    | Possible Image Names                                          | Optional | Description                                                                                         |
+| ------------------------------- | ------------------------------------------------------------- | -------- | --------------------------------------------------------------------------------------------------- |
+| tgi-service                     | ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu | No       | Specific to the TGI deployment, focuses on text generation inference using Xeon hardware.           |
+| llm                             | opea/llm-textgen:latest                                       | No       | Handles large language model (LLM) tasks                                                            |
+| translation-xeon-backend-server | opea/translation:latest                                       | No       | Serves as the backend for the Translation application, with variations depending on the deployment. |
+| translation-xeon-ui-server      | opea/translation-ui:latest                                    | No       | Provides the user interface for the Translation application.                                        |
+| translation-xeon-nginx-server   | opea/nginx:latest                                             | No       | Acts as a reverse proxy, managing traffic between the UI and backend services.                      |
