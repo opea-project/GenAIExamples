@@ -10,6 +10,7 @@ vllm_port=${vllm_port}
 export WORKDIR=$WORKPATH/../../
 echo "WORKDIR=${WORKDIR}"
 export SDK_BASE_URL=$1
+echo "SDK_BASE_URL=$1"
 export SERVING_TOKEN=${SERVING_TOKEN}
 export HF_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
 export llm_engine=vllm
