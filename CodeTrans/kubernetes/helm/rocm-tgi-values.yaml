@@ -1,0 +1,43 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+tgi:
+  enabled: true
+  accelDevice: "rocm"
+  image:
+    repository: ghcr.io/huggingface/text-generation-inference
+    tag: "2.4.1-rocm"
+  MAX_INPUT_LENGTH: "1024"
+  MAX_TOTAL_TOKENS: "2048"
+  USE_FLASH_ATTENTION: "false"
+  FLASH_ATTENTION_RECOMPUTE: "false"
+  HIP_VISIBLE_DEVICES: "0"
+  MAX_BATCH_SIZE: "4"
+  extraCmdArgs: [ "--num-shard","1" ]
+  resources:
+    limits:
+      amd.com/gpu: "1"
+    requests:
+      cpu: 1
+      memory: 16Gi
+  securityContext:
+    readOnlyRootFilesystem: false
+    runAsNonRoot: false
+    runAsUser: 0
+    capabilities:
+      add:
+        - SYS_PTRACE
+  readinessProbe:
+    initialDelaySeconds: 60
+    periodSeconds: 5
+    timeoutSeconds: 1
+    failureThreshold: 120
+  startupProbe:
+    initialDelaySeconds: 60
+    periodSeconds: 5
+    timeoutSeconds: 1
+    failureThreshold: 120
+vllm:
+  enabled: false
+llm-uservice:
+  TEXTGEN_BACKEND: TGI
