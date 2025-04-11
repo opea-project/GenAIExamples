@@ -398,5 +398,5 @@ docker compose -f compose.yaml down
 ## Next Steps
 
 - Explore the alternative TGI deployment option if needed.
-- Refer to the main [CodeGen README](../../../README.md) for architecture details and links to other deployment methods (Kubernetes, Xeon).
+- Refer to the main [CodeGen README](../../../../README.md) for architecture details and links to other deployment methods (Kubernetes, Xeon).
 - Consult the [OPEA GenAIComps](https://github.com/opea-project/GenAIComps) repository for details on individual microservices.

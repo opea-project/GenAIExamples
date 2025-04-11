@@ -19,7 +19,7 @@ We utilize the [bigcode-evaluation-harness](https://github.com/bigcode-project/b
 
 ## Prerequisites
 
-- A running CodeGen service accessible via an HTTP endpoint. Refer to the main [CodeGen README](../README.md) for deployment options.
+- A running CodeGen service accessible via an HTTP endpoint. Refer to the main [CodeGen README](../../README.md) for deployment options.
 - Python 3.8+ environment.
 - Git installed.
 

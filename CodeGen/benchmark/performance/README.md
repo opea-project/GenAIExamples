@@ -32,7 +32,7 @@ The benchmark reports several key performance indicators:
 
 ## Prerequisites
 
-- A running CodeGen service accessible via an HTTP endpoint. Refer to the main [CodeGen README](../README.md) for deployment options (Kubernetes recommended for load balancing/scalability).
+- A running CodeGen service accessible via an HTTP endpoint. Refer to the main [CodeGen README](../../README.md) for deployment options (Kubernetes recommended for load balancing/scalability).
 - **If using Kubernetes:**
   - A working Kubernetes cluster (refer to OPEA K8s setup guides if needed).
   - `kubectl` configured to access the cluster from the node where the benchmark will run (typically the master node).

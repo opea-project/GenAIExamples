@@ -225,3 +225,9 @@ Users can interact with the backend service using the `Neural Copilot` VS Code e
 docker compose --profile <profile_name> down
 # Example: docker compose --profile codegen-xeon-vllm down
 ```
+
+## Next Steps
+
+- Consult the [OPEA GenAIComps](https://github.com/opea-project/GenAIComps) repository for details on individual microservices.
+- Refer to the main [CodeGen README](../../../../README.md) for links to benchmarking and Kubernetes deployment options.
+```
