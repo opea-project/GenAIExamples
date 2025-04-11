@@ -73,8 +73,8 @@ flowchart LR
 
 The table below lists currently available deployment options. They outline in detail the implementation of this example on selected hardware.
 
-| Category | Deployment Option | Description |
-|------------------|------------|------------------------------|
-| On-premise Deployments | Docker compose | [DocSum deployment on Xeon](./docker_compose/intel/cpu/xeon) |
-| | | [DocSum deployment on  Gaudi](./docker_compose/intel/hpu/gaudi) |
-| | | [DocSum deployment on  AMD ROCm](./docker_compose/amd/gpu/rocm) |
+| Category               | Deployment Option | Description                                                    |
+| ---------------------- | ----------------- | -------------------------------------------------------------- |
+| On-premise Deployments | Docker compose    | [DocSum deployment on Xeon](./docker_compose/intel/cpu/xeon)   |
+|                        |                   | [DocSum deployment on Gaudi](./docker_compose/intel/hpu/gaudi) |
+|                        |                   | [DocSum deployment on AMD ROCm](./docker_compose/amd/gpu/rocm) |
