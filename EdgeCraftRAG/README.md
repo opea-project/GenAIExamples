@@ -5,11 +5,19 @@ Retrieval-Augmented Generation system for edge solutions. It is designed to
 curate the RAG pipeline to meet hardware requirements at edge with guaranteed
 quality and performance.
 
+## What's New in this release?
+
+- A sleek new UI with enhanced user experience, built on Vue and Ant Design
+- Support concurrent multi-requests handling on vLLM inference backend
+- Support pipeline configuration through json file
+- Support system prompt modification through API
+- Fixed known issues in EC-RAG UI and server
+
 ## Quick Start Guide
 
 ### (Optional) Build Docker Images for Mega Service, Server and UI by your own
 
-If you want to build the images by your own, please follow the steps:
+**All the docker images can be automatically‌ pulled**, If you want to build the images by your own, please follow the steps:
 
 ```bash
 cd GenAIExamples/EdgeCraftRAG
@@ -28,7 +36,7 @@ You can select "local" type in generation field which is the default approach to
 #### vLLM with OpenVINO for Intel Arc GPU
 
 You can also select "vLLM" as generation type, to enable this type, you'll need to build the vLLM image for Intel Arc GPU before service bootstrap.
-Please follow this link [vLLM with OpenVINO](https://github.com/opea-project/GenAIComps/tree/main/comps/llms/text-generation/vllm/langchain#build-docker-image) to build the vLLM image.
+Please follow this link [vLLM with OpenVINO](https://github.com/opea-project/GenAIComps/tree/main/comps/third_parties/vllm#23-vllm-with-openvino-on-intel-gpu-and-cpu) to build the vLLM image.
 
 ### Start Edge Craft RAG Services with Docker Compose
 
@@ -37,12 +45,14 @@ cd GenAIExamples/EdgeCraftRAG/docker_compose/intel/gpu/arc
 
 export MODEL_PATH="your model path for all your models"
 export DOC_PATH="your doc path for uploading a dir of files"
-export GRADIO_PATH="your gradio cache path for transferring files"
+export UI_TMPFILE_PATH="your UI cache path for transferring files"
 # If you have a specific prompt template, please uncomment the following line
 # export PROMPT_PATH="your prompt path for prompt templates"
 
 # Make sure all 3 folders have 1000:1000 permission, otherwise
-# chown 1000:1000 ${MODEL_PATH} ${DOC_PATH} ${GRADIO_PATH}
+# chown 1000:1000 ${MODEL_PATH} ${DOC_PATH} ${UI_TMPFILE_PATH}
+# In addition, also make sure the .cache folder has 1000:1000 permission, otherwise
+# chown 1000:1000 $HOME/.cache
 
 # Use `ip a` to check your active ip
 export HOST_IP="your host ip"
@@ -67,7 +77,7 @@ export RENDERGROUPID=$(getent group render | cut -d: -f3)
 pip install --upgrade --upgrade-strategy eager "optimum[openvino]"
 
 optimum-cli export openvino -m BAAI/bge-small-en-v1.5 ${MODEL_PATH}/BAAI/bge-small-en-v1.5 --task sentence-similarity
-optimum-cli export openvino -m BAAI/bge-reranker-large ${MODEL_PATH}/BAAI/bge-reranker-large --task sentence-similarity
+optimum-cli export openvino -m BAAI/bge-reranker-large ${MODEL_PATH}/BAAI/bge-reranker-large --task text-classification
 optimum-cli export openvino -m Qwen/Qwen2-7B-Instruct ${MODEL_PATH}/Qwen/Qwen2-7B-Instruct/INT4_compressed_weights --weight-format int4
 
 ```
@@ -89,6 +99,26 @@ export vLLM_ENDPOINT="http://${HOST_IP}:${VLLM_SERVICE_PORT}"
 export HUGGINGFACEHUB_API_TOKEN=#your HF token
 
 docker compose -f compose_vllm.yaml up -d
+```
+
+#### Launch services with vLLM for multi Intel Arc GPUs inference service
+
+The docker file can be pulled automatically‌, you can also pull the image manually:
+
+```bash
+docker pull intelanalytics/ipex-llm-serving-xpu:latest
+```
+
+Set up Additional Environment Variables and start with compose_vllm_multi-arc.yaml
+
+```bash
+export LLM_MODEL=#your model id
+export VLLM_SERVICE_PORT=8008
+export vLLM_ENDPOINT="http://${HOST_IP}:${VLLM_SERVICE_PORT}"
+export LLM_MODEL_PATH=#your model path
+export TENSOR_PARALLEL_SIZE=#your Intel Arc GPU number to do inference
+
+docker compose -f compose_vllm_multi-arc.yaml up -d
 ```
 
 ### ChatQnA with LLM Example (Command Line)
@@ -179,6 +209,12 @@ After the pipeline creation, you can upload your data in the `Chatbot` page.
 Then, you can submit messages in the chat box.
 ![chat_with_rag](assets/img/chat_with_rag.png)
 
+If you want to try Gradio UI, please launch service through compose_gradio.yaml, then access http://${HOST_IP}:8082 on your browser:
+
+```bash
+docker compose -f compose_gradio.yaml up -d
+```
+
 ## Advanced User Guide
 
 ### Pipeline Management
@@ -192,7 +228,7 @@ curl -X POST http://${HOST_IP}:16010/v1/settings/pipelines -H "Content-Type: app
 #### Update a pipeline
 
 ```bash
-curl -X PATCH http://${HOST_IP}:16010/v1/settings/pipelines -H "Content-Type: application/json" -d @tests/test_pipeline_local_llm.json | jq '.'
+curl -X PATCH http://${HOST_IP}:16010/v1/settings/pipelines/rag_test_local_llm  -H "Content-Type: application/json" -d @tests/test_pipeline_local_llm.json | jq '.'
 ```
 
 #### Check all pipelines
@@ -204,7 +240,44 @@ curl -X GET http://${HOST_IP}:16010/v1/settings/pipelines -H "Content-Type: appl
 #### Activate a pipeline
 
 ```bash
-curl -X PATCH http://${HOST_IP}:16010/v1/settings/pipelines/test1 -H "Content-Type: application/json" -d '{"active": "true"}' | jq '.'
+curl -X PATCH http://${HOST_IP}:16010/v1/settings/pipelines/rag_test_local_llm -H "Content-Type: application/json" -d '{"active": "true"}' | jq '.'
+```
+
+#### Remove a pipeline
+
+```bash
+# Firstly, deactivate the pipeline if the pipeline status is active
+curl -X PATCH http://${HOST_IP}:16010/v1/settings/pipelines/rag_test_local_llm -H "Content-Type: application/json" -d '{"active": "false"}' | jq '.'
+# Then delete the pipeline
+curl -X DELETE http://${HOST_IP}:16010/v1/settings/pipelines/rag_test_local_llm -H "Content-Type: application/json" | jq '.'
+```
+
+#### Get pipeline json
+
+```bash
+curl -X GET http://${HOST_IP}:16010/v1/settings/pipelines/{name}/json -H "Content-Type: application/json" | jq '.'
+```
+
+#### Import pipeline from a json file
+
+```bash
+curl -X POST http://${HOST_IP}:16010/v1/settings/pipelines/import -H "Content-Type: multipart/form-data" -F "file=@your_test_pipeline_json_file.txt"| jq '.'
+```
+
+#### Enable and check benchmark for pipelines
+
+##### ⚠️ NOTICE ⚠️
+
+Benchmarking activities may significantly reduce system performance.
+
+**DO NOT** perform benchmarking in a production environment.
+
+```bash
+# Set ENABLE_BENCHMARK as true before launch services
+export ENABLE_BENCHMARK="true"
+
+# check the benchmark data for pipeline {pipeline_name}
+curl -X GET http://${HOST_IP}:16010/v1/settings/pipelines/{pipeline_name}/benchmark -H "Content-Type: application/json" | jq '.'
 ```
 
 ### Model Management
@@ -212,7 +285,7 @@ curl -X PATCH http://${HOST_IP}:16010/v1/settings/pipelines/test1 -H "Content-Ty
 #### Load a model
 
 ```bash
-curl -X POST http://${HOST_IP}:16010/v1/settings/models -H "Content-Type: application/json" -d '{"model_type": "reranker", "model_id": "BAAI/bge-reranker-large", "model_path": "./models/bge_ov_reranker", "device": "cpu"}' | jq '.'
+curl -X POST http://${HOST_IP}:16010/v1/settings/models -H "Content-Type: application/json" -d '{"model_type": "reranker", "model_id": "BAAI/bge-reranker-large", "model_path": "./models/bge_ov_reranker", "device": "cpu", "weight": "INT4"}' | jq '.'
 ```
 
 It will take some time to load the model.
@@ -226,7 +299,7 @@ curl -X GET http://${HOST_IP}:16010/v1/settings/models -H "Content-Type: applica
 #### Update a model
 
 ```bash
-curl -X PATCH http://${HOST_IP}:16010/v1/settings/models/BAAI/bge-reranker-large -H "Content-Type: application/json" -d '{"model_type": "reranker", "model_id": "BAAI/bge-reranker-large", "model_path": "./models/bge_ov_reranker", "device": "gpu"}' | jq '.'
+curl -X PATCH http://${HOST_IP}:16010/v1/settings/models/BAAI/bge-reranker-large -H "Content-Type: application/json" -d '{"model_type": "reranker", "model_id": "BAAI/bge-reranker-large", "model_path": "./models/bge_ov_reranker", "device": "gpu", "weight": "INT4"}' | jq '.'
 ```
 
 #### Check a certain model
@@ -278,4 +351,12 @@ curl -X DELETE http://${HOST_IP}:16010/v1/data/files/test2.docx -H "Content-Type
 
 ```bash
 curl -X PATCH http://${HOST_IP}:16010/v1/data/files/test.pdf -H "Content-Type: application/json" -d '{"local_path":"docs/#REPLACE WITH YOUR FILE WITHIN MOUNTED DOC PATH#"}' | jq '.'
+```
+
+### System Prompt Management
+
+#### Use custom system prompt
+
+```bash
+curl -X POST http://${HOST_IP}:16010/v1/chatqna/prompt -H "Content-Type: multipart/form-data" -F "file=@your_prompt_file.txt"
 ```

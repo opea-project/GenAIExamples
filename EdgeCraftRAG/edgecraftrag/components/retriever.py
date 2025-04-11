@@ -19,6 +19,8 @@ class VectorSimRetriever(BaseComponent, VectorIndexRetriever):
             comp_type=CompType.RETRIEVER,
             comp_subtype=RetrieverType.VECTORSIMILARITY,
         )
+        self.topk = kwargs["similarity_top_k"]
+
         VectorIndexRetriever.__init__(
             self,
             index=indexer,
@@ -79,6 +81,15 @@ class AutoMergeRetriever(BaseComponent, AutoMergingRetriever):
 
         return None
 
+    @model_serializer
+    def ser_model(self):
+        set = {
+            "idx": self.idx,
+            "retriever_type": self.comp_subtype,
+            "retrieve_topk": self.topk,
+        }
+        return set
+
 
 class SimpleBM25Retriever(BaseComponent):
     # The nodes parameter in BM25Retriever is not from index,
@@ -98,7 +109,17 @@ class SimpleBM25Retriever(BaseComponent):
         for k, v in kwargs.items():
             if k == "query":
                 nodes = cast(List[BaseNode], list(self._docstore.docs.values()))
-                bm25_retr = BM25Retriever.from_defaults(nodes=nodes, similarity_top_k=self.topk)
+                similarity_top_k = min(len(nodes), self.topk)
+                bm25_retr = BM25Retriever.from_defaults(nodes=nodes, similarity_top_k=similarity_top_k)
                 return bm25_retr.retrieve(v)
 
         return None
+
+    @model_serializer
+    def ser_model(self):
+        set = {
+            "idx": self.idx,
+            "retriever_type": self.comp_subtype,
+            "retrieve_topk": self.topk,
+        }
+        return set

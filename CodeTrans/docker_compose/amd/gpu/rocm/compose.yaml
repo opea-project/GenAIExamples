@@ -1,14 +1,15 @@
 # Copyright (C) 2024 Intel Corporation
+# Copyright (c) 2024 Advanced Micro Devices, Inc.
 # SPDX-License-Identifier: Apache-2.0
 
 services:
   codetrans-tgi-service:
-    image: ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
+    image: ghcr.io/huggingface/text-generation-inference:2.4.1-rocm
     container_name: codetrans-tgi-service
     ports:
       - "${CODETRANS_TGI_SERVICE_PORT:-8008}:80"
     volumes:
-      - "/var/lib/GenAI/codetrans/data:/data"
+      - "${MODEL_CACHE:-/var/lib/GenAI/data}:/data"
     shm_size: 1g
     environment:
       no_proxy: ${no_proxy}
@@ -17,6 +18,12 @@ services:
       TGI_LLM_ENDPOINT: ${CODETRANS_TGI_LLM_ENDPOINT}
       HUGGING_FACE_HUB_TOKEN: ${CODEGEN_HUGGINGFACEHUB_API_TOKEN}
       HUGGINGFACEHUB_API_TOKEN: ${CODEGEN_HUGGINGFACEHUB_API_TOKEN}
+      host_ip: ${host_ip}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://${HOST_IP}:${CODETRANS_TGI_SERVICE_PORT}/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 100
     devices:
       - /dev/kfd:/dev/kfd
       - /dev/dri/:/dev/dri/
@@ -29,8 +36,11 @@ services:
     ipc: host
     command: --model-id ${CODETRANS_LLM_MODEL_ID}
   codetrans-llm-server:
-    image: ${REGISTRY:-opea}/llm-tgi:${TAG:-latest}
+    image: ${REGISTRY:-opea}/llm-textgen:${TAG:-latest}
     container_name: codetrans-llm-server
+    depends_on:
+      codetrans-tgi-service:
+        condition: service_healthy
     ports:
       - "${CODETRANS_LLM_SERVICE_PORT:-9000}:9000"
     ipc: host
@@ -38,7 +48,8 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      TGI_LLM_ENDPOINT: "http://codetrans-tgi-service"
+      LLM_ENDPOINT: "http://codetrans-tgi-service"
+      LLM_MODEL_ID: ${CODETRANS_LLM_MODEL_ID}
       HUGGINGFACEHUB_API_TOKEN: ${CODETRANS_HUGGINGFACEHUB_API_TOKEN}
     restart: unless-stopped
   codetrans-backend-server:

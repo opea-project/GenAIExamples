@@ -13,19 +13,19 @@ First of all, you need to build Docker Images locally and install the python pac
 ```bash
 git clone https://github.com/opea-project/GenAIComps.git
 cd GenAIComps
-docker build --no-cache -t opea/embedding-tei:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/tei/langchain/Dockerfile .
+docker build --no-cache -t opea/embedding:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/src/Dockerfile .
 ```
 
 ### 2. Build Retriever Image
 
 ```bash
-docker build --no-cache -t opea/retriever-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/redis/langchain/Dockerfile .
+docker build --no-cache -t opea/retriever:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/src/Dockerfile .
 ```
 
 ### 3. Build Rerank Image
 
 ```bash
-docker build --no-cache -t opea/reranking-tei:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/reranks/tei/Dockerfile .
+docker build --no-cache -t opea/reranking:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/rerankings/src/Dockerfile .
 ```
 
 ### 4. Build LLM Image
@@ -33,25 +33,25 @@ docker build --no-cache -t opea/reranking-tei:latest --build-arg https_proxy=$ht
 #### Use TGI as backend
 
 ```bash
-docker build --no-cache -t opea/llm-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/text-generation/tgi/Dockerfile .
+docker build --no-cache -t opea/llm-textgen:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/src/text-generation/Dockerfile .
 ```
 
 ### 5. Build Dataprep Image
 
 ```bash
-docker build --no-cache -t opea/dataprep-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/redis/langchain/Dockerfile .
+docker build --no-cache -t opea/dataprep:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/src/Dockerfile .
 ```
 
 ### 6. Build Prompt Registry Image
 
 ```bash
-docker build -t opea/promptregistry-mongo-server:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/prompt_registry/mongo/Dockerfile .
+docker build -t opea/promptregistry-mongo:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/prompt_registry/src/Dockerfile .
 ```
 
 ### 7. Build Chat History Image
 
 ```bash
-docker build -t opea/chathistory-mongo-server:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/chathistory/mongo/Dockerfile .
+docker build -t opea/chathistory-mongo:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/chathistory/src/Dockerfile .
 cd ..
 ```
 
@@ -81,13 +81,6 @@ cd GenAIExamples/CodeGen
 docker build --no-cache -t opea/codegen:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
 ```
 
-#### 8.4 Build FAQGen Megaservice Docker Images
-
-```bash
-cd GenAIExamples/FaqGen
-docker build --no-cache -t opea/faqgen:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
-```
-
 ### 9. Build UI Docker Image
 
 Build frontend Docker image that enables via below command:
@@ -96,7 +89,7 @@ Build frontend Docker image that enables via below command:
 
 ```bash
 cd GenAIExamples/ProductivitySuite/ui
-docker build --no-cache -t ProductivitySuite/docker_compose/intel/cpu/xeon/compose.yaml docker/Dockerfile.react .
+docker build --no-cache -t opea/productivity-suite-react-ui-server:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile.react .
 ```
 
 ---
@@ -158,12 +151,11 @@ export TGI_LLM_ENDPOINT_CODEGEN="http://${host_ip}:8028"
 export TGI_LLM_ENDPOINT_FAQGEN="http://${host_ip}:9009"
 export TGI_LLM_ENDPOINT_DOCSUM="http://${host_ip}:9009"
 export BACKEND_SERVICE_ENDPOINT_CHATQNA="http://${host_ip}:8888/v1/chatqna"
-export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:6009/v1/dataprep/delete_file"
-export BACKEND_SERVICE_ENDPOINT_FAQGEN="http://${host_ip}:8889/v1/faqgen"
+export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:5000/v1/dataprep/delete"
 export BACKEND_SERVICE_ENDPOINT_CODEGEN="http://${host_ip}:7778/v1/codegen"
 export BACKEND_SERVICE_ENDPOINT_DOCSUM="http://${host_ip}:8890/v1/docsum"
-export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/dataprep"
-export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/get_file"
+export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:5000/v1/dataprep/ingest"
+export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:5000/v1/dataprep/get"
 export CHAT_HISTORY_CREATE_ENDPOINT="http://${host_ip}:6012/v1/chathistory/create"
 export CHAT_HISTORY_CREATE_ENDPOINT="http://${host_ip}:6012/v1/chathistory/create"
 export CHAT_HISTORY_DELETE_ENDPOINT="http://${host_ip}:6012/v1/chathistory/delete"
@@ -277,7 +269,7 @@ Please refer to **[keycloak_setup_guide](keycloak_setup_guide.md)** for more det
    ```bash
    curl http://${host_ip}:9000/v1/chat/completions\
      -X POST \
-     -d '{"query":"What is Deep Learning?","max_tokens":17,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,"repetition_penalty":1.03,"streaming":true}' \
+     -d '{"query":"What is Deep Learning?","max_tokens":17,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,"repetition_penalty":1.03,"stream":true}' \
      -H 'Content-Type: application/json'
    ```
 
@@ -293,7 +285,7 @@ Please refer to **[keycloak_setup_guide](keycloak_setup_guide.md)** for more det
 10. DocSum LLM Microservice
 
     ```bash
-    curl http://${host_ip}:9003/v1/chat/docsum\
+    curl http://${host_ip}:9003/v1/docsum\
       -X POST \
       -d '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5"}' \
       -H 'Content-Type: application/json'
@@ -316,15 +308,7 @@ Please refer to **[keycloak_setup_guide](keycloak_setup_guide.md)** for more det
          }'
     ```
 
-13. FAQGen MegaService
-
-    ```bash
-    curl http://${host_ip}:8889/v1/faqgen -H "Content-Type: application/json" -d '{
-         "messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."
-         }'
-    ```
-
-14. DocSum MegaService
+13. DocSum MegaService
 
     ```bash
     curl http://${host_ip}:8890/v1/docsum -H "Content-Type: application/json" -d '{
@@ -332,7 +316,7 @@ Please refer to **[keycloak_setup_guide](keycloak_setup_guide.md)** for more det
          }'
     ```
 
-15. CodeGen MegaService
+14. CodeGen MegaService
 
     ```bash
     curl http://${host_ip}:7778/v1/codegen -H "Content-Type: application/json" -d '{
@@ -340,14 +324,14 @@ Please refer to **[keycloak_setup_guide](keycloak_setup_guide.md)** for more det
          }'
     ```
 
-16. Dataprep Microservice
+15. Dataprep Microservice
 
     If you want to update the default knowledge base, you can use the following commands:
 
     Update Knowledge Base via Local File Upload:
 
     ```bash
-    curl -X POST "http://${host_ip}:6007/v1/dataprep" \
+    curl -X POST "http://${host_ip}:6007/v1/dataprep/ingest" \
          -H "Content-Type: multipart/form-data" \
          -F "files=@./nke-10k-2023.pdf"
     ```
@@ -357,7 +341,7 @@ Please refer to **[keycloak_setup_guide](keycloak_setup_guide.md)** for more det
     Add Knowledge Base via HTTP Links:
 
     ```bash
-    curl -X POST "http://${host_ip}:6007/v1/dataprep" \
+    curl -X POST "http://${host_ip}:6007/v1/dataprep/ingest" \
          -H "Content-Type: multipart/form-data" \
          -F 'link_list=["https://opea.dev"]'
     ```
@@ -367,7 +351,7 @@ Please refer to **[keycloak_setup_guide](keycloak_setup_guide.md)** for more det
     Also, you are able to get the file list that you uploaded:
 
     ```bash
-    curl -X POST "http://${host_ip}:6007/v1/dataprep/get_file" \
+    curl -X POST "http://${host_ip}:6007/v1/dataprep/get" \
          -H "Content-Type: application/json"
     ```
 
@@ -375,22 +359,22 @@ Please refer to **[keycloak_setup_guide](keycloak_setup_guide.md)** for more det
 
     ```bash
     # delete link
-    curl -X POST "http://${host_ip}:6007/v1/dataprep/delete_file" \
+    curl -X POST "http://${host_ip}:6007/v1/dataprep/delete" \
          -d '{"file_path": "https://opea.dev.txt"}' \
          -H "Content-Type: application/json"
 
     # delete file
-    curl -X POST "http://${host_ip}:6007/v1/dataprep/delete_file" \
+    curl -X POST "http://${host_ip}:6007/v1/dataprep/delete" \
          -d '{"file_path": "nke-10k-2023.pdf"}' \
          -H "Content-Type: application/json"
 
     # delete all uploaded files and links
-    curl -X POST "http://${host_ip}:6007/v1/dataprep/delete_file" \
+    curl -X POST "http://${host_ip}:6007/v1/dataprep/delete" \
          -d '{"file_path": "all"}' \
          -H "Content-Type: application/json"
     ```
 
-17. Prompt Registry Microservice
+16. Prompt Registry Microservice
 
     If you want to update the default Prompts in the application for your user, you can use the following commands:
 
@@ -433,7 +417,7 @@ Please refer to **[keycloak_setup_guide](keycloak_setup_guide.md)** for more det
       "user": "test", "prompt_id":"{prompt_id to be deleted}"}'
     ```
 
-18. Chat History Microservice
+17. Chat History Microservice
 
     To validate the chatHistory Microservice, you can use the following commands.
 

@@ -11,10 +11,11 @@ services:
       https_proxy: ${https_proxy}
       HF_ENDPOINT: ${HF_ENDPOINT}
       vLLM_ENDPOINT: ${vLLM_ENDPOINT}
+      ENABLE_BENCHMARK: ${ENABLE_BENCHMARK:-false}
     volumes:
       - ${MODEL_PATH:-${PWD}}:/home/user/models
       - ${DOC_PATH:-${PWD}}:/home/user/docs
-      - ${GRADIO_PATH:-${PWD}}:/home/user/gradio_cache
+      - ${UI_TMPFILE_PATH:-${PWD}}:/home/user/ui_cache
       - ${HF_CACHE:-${HOME}/.cache}:/home/user/.cache
       - ${PROMPT_PATH:-${PWD}}:/templates/custom
     ports:
@@ -53,7 +54,7 @@ services:
       UI_SERVICE_PORT: ${UI_SERVICE_PORT:-8082}
       UI_SERVICE_HOST_IP: ${UI_SERVICE_HOST_IP:-0.0.0.0}
     volumes:
-      - ${GRADIO_PATH:-${PWD}}:/home/user/gradio_cache
+      - ${UI_TMPFILE_PATH:-${PWD}}:/home/user/ui_cache
     ports:
       - ${UI_SERVICE_PORT:-8082}:${UI_SERVICE_PORT:-8082}
     restart: always
@@ -66,14 +67,14 @@ services:
     ports:
       - ${VLLM_SERVICE_PORT:-8008}:80
     environment:
-      HTTPS_PROXY: ${https_proxy}
-      HTTP_PROXY: ${https_proxy}
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
       VLLM_OPENVINO_DEVICE: GPU
       HF_ENDPOINT: ${HF_ENDPOINT}
       HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
     volumes:
-      - /dev/dri/by-path:/dev/dri/by-path
-      - $HOME/.cache/huggingface:/root/.cache/huggingface
+      - ${HF_CACHE:-${HOME}/.cache}:/root/.cache
     devices:
       - /dev/dri
     group_add:

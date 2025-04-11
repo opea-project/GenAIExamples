@@ -1,5 +1,5 @@
 {
-  "name": "rag_test_local_llm",
+  "name": "rag_test_vllm",
   "node_parser": {
     "chunk_size": 400,
     "chunk_overlap": 48,

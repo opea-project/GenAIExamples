@@ -2,7 +2,7 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-#set -xe
+set -e
 
 function dump_pod_log() {
     pod_name=$1
@@ -12,7 +12,7 @@ function dump_pod_log() {
     kubectl describe pod $pod_name -n $namespace
     echo "-----------------------------------"
     echo "#kubectl logs $pod_name -n $namespace"
-    kubectl logs $pod_name -n $namespace
+    kubectl logs $pod_name -n $namespace --all-containers --prefix=true
     echo "-----------------------------------"
 }
 
@@ -44,8 +44,13 @@ function dump_pods_status() {
 
 function dump_all_pod_logs() {
     namespace=$1
+    echo "------SUMMARY of POD STATUS in NS $namespace------"
+    kubectl get pods -n $namespace -o wide
+    echo "------SUMMARY of SVC STATUS in NS $namespace------"
+    kubectl get services -n $namespace -o wide
+    echo "------SUMMARY of endpoint STATUS in NS $namespace------"
+    kubectl get endpoints -n $namespace -o wide
     echo "-----DUMP POD STATUS AND LOG in NS $namespace------"
-
     pods=$(kubectl get pods -n $namespace -o jsonpath='{.items[*].metadata.name}')
     for pod_name in $pods
     do

@@ -9,21 +9,30 @@ echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
 echo "TAG=IMAGE_TAG=${IMAGE_TAG}"
 export REGISTRY=${IMAGE_REPO}
 export TAG=${IMAGE_TAG}
+export MODEL_CACHE=${model_cache:-"./data"}
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
 
 function build_docker_images() {
+    opea_branch=${opea_branch:-"main"}
     cd $WORKPATH/docker_image_build
-    git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
+    git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
+    pushd GenAIComps
+    echo "GenAIComps test commit is $(git rev-parse HEAD)"
+    docker build --no-cache -t ${REGISTRY}/comps-base:${TAG} --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
+    popd && sleep 1s
+    git clone https://github.com/HabanaAI/vllm-fork.git && cd vllm-fork
+    VLLM_VER=v0.6.6.post1+Gaudi-1.20.0
+    git checkout ${VLLM_VER} &> /dev/null && cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="chatqna-guardrails chatqna-ui dataprep-redis retriever-redis guardrails-tgi nginx"
+    service_list="chatqna chatqna-ui dataprep retriever vllm-gaudi guardrails nginx"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
-    docker pull ghcr.io/huggingface/tgi-gaudi:2.0.6
-    docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+    docker pull ghcr.io/huggingface/tgi-gaudi:2.3.1
+    docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.6
     docker pull ghcr.io/huggingface/tei-gaudi:1.5.0
 
     docker images && sleep 1s
@@ -33,7 +42,8 @@ function start_services() {
     cd $WORKPATH/docker_compose/intel/hpu/gaudi
     export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
     export RERANK_MODEL_ID="BAAI/bge-reranker-base"
-    export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
+    export LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
+    export NUM_CARDS=1
     export INDEX_NAME="rag-redis"
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
     export GURADRAILS_MODEL_ID="meta-llama/Meta-Llama-Guard-2-8B"
@@ -41,9 +51,10 @@ function start_services() {
     # Start Docker Containers
     docker compose -f compose_guardrails.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
     n=0
-    until [[ "$n" -ge 100 ]]; do
-        docker logs tgi-gaudi-server > tgi_service_start.log
-        if grep -q Connected tgi_service_start.log; then
+    until [[ "$n" -ge 200 ]]; do
+        echo "n=$n"
+        docker logs vllm-gaudi-server > vllm_service_start.log
+        if grep -q "Warmup finished" vllm_service_start.log; then
             break
         fi
         sleep 5s
@@ -51,18 +62,19 @@ function start_services() {
     done
 
     # Make sure tgi guardrails service is ready
-    n=0
-    until [[ "$n" -ge 100 ]]; do
+    m=0
+    until [[ "$m" -ge 160 ]]; do
+        echo "m=$m"
         docker logs tgi-guardrails-server > tgi_guardrails_service_start.log
         if grep -q Connected tgi_guardrails_service_start.log; then
             break
         fi
         sleep 5s
-        n=$((n+1))
+        m=$((m+1))
     done
 }
 
-function validate_services() {
+function validate_service() {
     local URL="$1"
     local EXPECTED_RESULT="$2"
     local SERVICE_NAME="$3"
@@ -97,7 +109,7 @@ function validate_microservices() {
     # Check if the microservices are running correctly.
 
     # tei for embedding service
-    validate_services \
+    validate_service \
         "${ip_address}:8090/embed" \
         "[[" \
         "tei-embedding" \
@@ -108,7 +120,7 @@ function validate_microservices() {
 
     # retrieval microservice
     test_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
-    validate_services \
+    validate_service \
         "${ip_address}:7000/v1/retrieval" \
         "retrieved_docs" \
         "retrieval" \
@@ -116,35 +128,35 @@ function validate_microservices() {
         "{\"text\":\"What is the revenue of Nike in 2023?\",\"embedding\":${test_embedding}}"
 
     # tei for rerank microservice
-    validate_services \
+    validate_service \
         "${ip_address}:8808/rerank" \
         '{"index":1,"score":' \
         "tei-rerank" \
         "tei-reranking-gaudi-server" \
         '{"query":"What is Deep Learning?", "texts": ["Deep Learning is not...", "Deep learning is..."]}'
 
-    # tgi for llm service
-    validate_services \
-        "${ip_address}:8008/generate" \
-        "generated_text" \
-        "tgi-llm" \
-        "tgi-gaudi-server" \
-        '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}'
+    # vllm for llm service
+    validate_service \
+        "${ip_address}:8008/v1/chat/completions" \
+        "content" \
+        "vllm-llm" \
+        "vllm-gaudi-server" \
+        '{"model": "meta-llama/Meta-Llama-3-8B-Instruct", "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens":17}'
 
     # guardrails microservice
-    validate_services \
+    validate_service \
         "${ip_address}:9090/v1/guardrails" \
         "Violated policies" \
         "guardrails" \
-        "guardrails-tgi-gaudi-server" \
+        "guardrails-gaudi-server" \
         '{"text":"How do you buy a tiger in the US?"}'
 }
 
 function validate_megaservice() {
     # Curl the Mega Service
-    validate_services \
+    validate_service \
         "${ip_address}:8888/v1/chatqna" \
-        "data: " \
+        "Nike" \
         "mega-chatqna" \
         "chatqna-gaudi-guardrails-server" \
         '{"messages": "What is the revenue of Nike in 2023?"}'
@@ -186,20 +198,35 @@ function stop_docker() {
 
 function main() {
 
+    echo "::group::start_docker"
     stop_docker
+    echo "::endgroup::"
+
+    echo "::group::build_docker_images"
     if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
-    start_time=$(date +%s)
+    echo "::endgroup::"
+
+    echo "::group::start_services"
     start_services
-    end_time=$(date +%s)
-    duration=$((end_time-start_time))
-    echo "Mega service start duration is $duration s"
+    echo "::endgroup::"
 
+    echo "::group::validate_microservices"
     validate_microservices
-    validate_megaservice
-    validate_frontend
+    echo "::endgroup::"
 
+    echo "::group::validate_megaservice"
+    validate_megaservice
+    echo "::endgroup::"
+
+    echo "::group::validate_frontend"
+    validate_frontend
+    echo "::endgroup::"
+
+    echo "::group::stop_docker"
     stop_docker
-    echo y | docker system prune
+    echo "::endgroup::"
+
+    docker system prune -f
 
 }
 

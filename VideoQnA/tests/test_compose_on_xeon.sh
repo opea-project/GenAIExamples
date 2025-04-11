@@ -15,8 +15,20 @@ LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
 
 function build_docker_images() {
+    opea_branch=${opea_branch:-"main"}
+    # If the opea_branch isn't main, replace the git clone branch in Dockerfile.
+    if [[ "${opea_branch}" != "main" ]]; then
+        cd $WORKPATH
+        OLD_STRING="RUN git clone --depth 1 https://github.com/opea-project/GenAIComps.git"
+        NEW_STRING="RUN git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git"
+        find . -type f -name "Dockerfile*" | while read -r file; do
+            echo "Processing file: $file"
+            sed -i "s|$OLD_STRING|$NEW_STRING|g" "$file"
+        done
+    fi
+
     cd $WORKPATH/docker_image_build
-    git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
+    git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
     docker compose -f build.yaml build --no-cache > ${LOG_PATH}/docker_image_build.log
@@ -35,7 +47,7 @@ function start_services() {
     sleep 30s
 
     # Insert some sample data to the DB
-    HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST http://${ip_address}:6007/v1/dataprep \
+    HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST http://${ip_address}:6007/v1/dataprep/ingest \
     -H "Content-Type: multipart/form-data" \
     -F "files=@./data/op_1_0320241830.mp4")
 
@@ -51,7 +63,7 @@ function start_services() {
     sleep 1m
 
     # List of containers running uvicorn
-    list=("dataprep-vdms-server" "embedding-multimodal-server" "retriever-vdms-server" "reranking-videoqna-server" "video-llama-lvm-server" "lvm-video-llama" "videoqna-xeon-backend-server")
+    list=("dataprep-vdms-server" "embedding-multimodal-server" "retriever-vdms-server" "reranking-tei-server" "lvm-video-llama" "lvm-video-llama" "videoqna-xeon-backend-server")
 
     # Define the maximum time limit in seconds
     TIME_LIMIT=5400
@@ -142,7 +154,7 @@ function validate_microservices() {
     cd $WORKPATH/docker_compose/intel/cpu/xeon//data
 
     # dataprep microservice
-    HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST http://${ip_address}:6007/v1/dataprep \
+    HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST http://${ip_address}:6007/v1/dataprep/ingest \
     -H "Content-Type: multipart/form-data" \
     -F "files=@./op_1_0320241830.mp4")
 
@@ -176,7 +188,7 @@ function validate_microservices() {
         "${ip_address}:8000/v1/reranking" \
         "video_url" \
         "reranking" \
-        "reranking-videoqna-server" \
+        "reranking-tei-server" \
         '{
             "retrieved_docs": [{"doc": [{"text": "retrieved text"}]}],
             "initial_query": "query",
@@ -248,4 +260,4 @@ function main() {
 
 }
 
-main
+# main

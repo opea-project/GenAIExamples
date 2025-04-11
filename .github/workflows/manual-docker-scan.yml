@@ -12,7 +12,7 @@ on:
         type: string
       examples:
         default: ""
-        description: 'List of examples to publish "AgentQnA,AudioQnA,ChatQnA,CodeGen,CodeTrans,DocIndexRetriever,DocSum,FaqGen,InstructionTuning,MultimodalQnA,ProductivitySuite,RerankFinetuning,SearchQnA,Translation,VideoQnA,VisualQnA"'
+        description: 'List of examples to publish "AgentQnA,AudioQnA,ChatQnA,CodeGen,CodeTrans,DocIndexRetriever,DocSum,InstructionTuning,MultimodalQnA,ProductivitySuite,RerankFinetuning,SearchQnA,Translation,VideoQnA,VisualQnA"'
         required: false
         type: string
       images:
@@ -47,6 +47,7 @@ jobs:
   scan-docker:
     needs: get-image-list
     runs-on: "docker-build-${{ inputs.node }}"
+    if: ${{ needs.get-image-list.outputs.matrix != '' }}
     strategy:
       matrix:
         image: ${{ fromJson(needs.get-image-list.outputs.matrix) }}

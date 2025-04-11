@@ -2,6 +2,8 @@
 
 This document outlines the deployment process for a Document Summarization application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on an Intel Xeon server. The steps include Docker image creation, container deployment via Docker Compose, and service execution to integrate microservices such as `llm`. We will publish the Docker images to Docker Hub soon, which will simplify the deployment process for this service.
 
+The default pipeline deploys with vLLM as the LLM serving component. It also provides options of using TGI backend for LLM microservice, please refer to [start-microservice-docker-containers](#start-microservice-docker-containers) section in this page.
+
 ## 🚀 Apply Intel Xeon Server on AWS
 
 To apply a Intel Xeon server on AWS, start by creating an AWS account if you don't have one already. Then, head to the [EC2 Console](https://console.aws.amazon.com/ec2/v2/home) to begin the process. Within the EC2 service, select the Amazon EC2 M7i or M7i-flex instance type to leverage 4th Generation Intel Xeon Scalable processors. These instances are optimized for high-performance computing and demanding workloads.
@@ -26,7 +28,7 @@ cd GenAIComps
 The Whisper Service converts audio files to text. Follow these steps to build and run the service:
 
 ```bash
-docker build -t opea/whisper:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/asr/whisper/dependency/Dockerfile .
+docker build -t opea/whisper:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/third_parties/whisper/src/Dockerfile .
 ```
 
 ### 2. Build MegaService Docker Image
@@ -116,22 +118,53 @@ To set up environment variables for deploying Document Summarization services, f
 
 ```bash
 cd GenAIExamples/DocSum/docker_compose/intel/cpu/xeon
+```
+
+If use vLLM as the LLM serving backend.
+
+```bash
 docker compose -f compose.yaml up -d
+```
+
+If use TGI as the LLM serving backend.
+
+```bash
+docker compose -f compose_tgi.yaml up -d
 ```
 
 You will have the following Docker Images:
 
 1. `opea/docsum-ui:latest`
 2. `opea/docsum:latest`
-3. `opea/llm-docsum-tgi:latest`
+3. `opea/llm-docsum:latest`
 4. `opea/whisper:latest`
 
 ### Validate Microservices
 
-1. TGI Service
+1. LLM backend Service
+
+   In the first startup, this service will take more time to download, load and warm up the model. After it's finished, the service will be ready.
+   Try the command below to check whether the LLM serving is ready.
 
    ```bash
-   curl http://${host_ip}:8008/generate \
+   # vLLM service
+   docker logs docsum-xeon-vllm-service 2>&1 | grep complete
+   # If the service is ready, you will get the response like below.
+   INFO:     Application startup complete.
+   ```
+
+   ```bash
+   # TGI service
+   docker logs docsum-xeon-tgi-service | grep Connected
+   # If the service is ready, you will get the response like below.
+   2024-09-03T02:47:53.402023Z  INFO text_generation_router::server: router/src/server.rs:2311: Connected
+   ```
+
+   Then try the `cURL` command below to validate services.
+
+   ```bash
+   # either vLLM or TGI service
+   curl http://${host_ip}:8008/v1/chat/completions \
      -X POST \
      -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}' \
      -H 'Content-Type: application/json'
@@ -140,7 +173,7 @@ You will have the following Docker Images:
 2. LLM Microservice
 
    ```bash
-   curl http://${host_ip}:9000/v1/chat/docsum \
+   curl http://${host_ip}:9000/v1/docsum \
      -X POST \
      -d '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}' \
      -H 'Content-Type: application/json'
@@ -289,7 +322,7 @@ You will have the following Docker Images:
 
    **summary_type=map_reduce**
 
-   Map_reduce mode will split the inputs into multiple chunks, map each document to an individual summary, then consolidate those summaries into a single global summary. `streaming=True` is not allowed here.
+   Map_reduce mode will split the inputs into multiple chunks, map each document to an individual summary, then consolidate those summaries into a single global summary. `stream=True` is not allowed here.
 
    In this mode, default `chunk_size` is set to be `min(MAX_TOTAL_TOKENS - input.max_tokens - 50, MAX_INPUT_TOKENS)`
 

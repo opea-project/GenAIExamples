@@ -25,7 +25,7 @@ class ChatTemplate:
     @staticmethod
     def generate_rag_prompt(question, documents):
         context_str = "\n".join(documents)
-        if context_str and len(re.findall("[\u4E00-\u9FFF]", context_str)) / len(context_str) >= 0.3:
+        if context_str and len(re.findall("[\u4e00-\u9fff]", context_str)) / len(context_str) >= 0.3:
             # chinese context
             template = """
 ### 你将扮演一个乐于助人、尊重他人并诚实的助手，你的目标是帮助用户解答问题。有效地利用来自本地知识库的搜索结果。确保你的回答中只包含相关信息。如果你不确定问题的答案，请避免分享不准确的信息。
@@ -57,7 +57,7 @@ RERANK_SERVER_HOST_IP = os.getenv("RERANK_SERVER_HOST_IP", "0.0.0.0")
 RERANK_SERVER_PORT = int(os.getenv("RERANK_SERVER_PORT", 80))
 LLM_SERVER_HOST_IP = os.getenv("LLM_SERVER_HOST_IP", "0.0.0.0")
 LLM_SERVER_PORT = int(os.getenv("LLM_SERVER_PORT", 80))
-LLM_MODEL = os.getenv("LLM_MODEL", "Intel/neural-chat-7b-v3-3")
+LLM_MODEL = os.getenv("LLM_MODEL", "meta-llama/Meta-Llama-3-8B-Instruct")
 
 
 def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **kwargs):
@@ -76,7 +76,7 @@ def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **k
         next_inputs["messages"] = [{"role": "user", "content": inputs["inputs"]}]
         next_inputs["max_tokens"] = llm_parameters_dict["max_tokens"]
         next_inputs["top_p"] = llm_parameters_dict["top_p"]
-        next_inputs["stream"] = inputs["streaming"]
+        next_inputs["stream"] = inputs["stream"]
         next_inputs["frequency_penalty"] = inputs["frequency_penalty"]
         # next_inputs["presence_penalty"] = inputs["presence_penalty"]
         # next_inputs["repetition_penalty"] = inputs["repetition_penalty"]
@@ -158,8 +158,11 @@ def align_outputs(self, data, cur_node, inputs, runtime_graph, llm_parameters_di
 
         next_data["inputs"] = prompt
 
-    elif self.services[cur_node].service_type == ServiceType.LLM and not llm_parameters_dict["streaming"]:
-        next_data["text"] = data["choices"][0]["message"]["content"]
+    elif self.services[cur_node].service_type == ServiceType.LLM and not llm_parameters_dict["stream"]:
+        if "faqgen" in self.services[cur_node].endpoint:
+            next_data = data
+        else:
+            next_data["text"] = data["choices"][0]["message"]["content"]
     else:
         next_data = data
 
@@ -167,7 +170,7 @@ def align_outputs(self, data, cur_node, inputs, runtime_graph, llm_parameters_di
 
 
 def align_generator(self, gen, **kwargs):
-    # openai reaponse format
+    # OpenAI response format
     # b'data:{"id":"","object":"text_completion","created":1725530204,"model":"meta-llama/Meta-Llama-3-8B-Instruct","system_fingerprint":"2.0.1-native","choices":[{"index":0,"delta":{"role":"assistant","content":"?"},"logprobs":null,"finish_reason":null}]}\n\n'
     for line in gen:
         line = line.decode("utf-8")
@@ -178,7 +181,12 @@ def align_generator(self, gen, **kwargs):
         try:
             # sometimes yield empty chunk, do a fallback here
             json_data = json.loads(json_str)
-            if (
+            if "ops" in json_data and "op" in json_data["ops"][0]:
+                if "value" in json_data["ops"][0] and isinstance(json_data["ops"][0]["value"], str):
+                    yield f"data: {repr(json_data['ops'][0]['value'].encode('utf-8'))}\n\n"
+                else:
+                    pass
+            elif (
                 json_data["choices"][0]["finish_reason"] != "eos_token"
                 and "content" in json_data["choices"][0]["delta"]
             ):
@@ -329,6 +337,48 @@ class ChatQnAService:
         self.megaservice.flow_to(rerank, llm)
         # self.megaservice.flow_to(llm, guardrail_out)
 
+    def add_remote_service_faqgen(self):
+
+        embedding = MicroService(
+            name="embedding",
+            host=EMBEDDING_SERVER_HOST_IP,
+            port=EMBEDDING_SERVER_PORT,
+            endpoint="/embed",
+            use_remote_service=True,
+            service_type=ServiceType.EMBEDDING,
+        )
+
+        retriever = MicroService(
+            name="retriever",
+            host=RETRIEVER_SERVICE_HOST_IP,
+            port=RETRIEVER_SERVICE_PORT,
+            endpoint="/v1/retrieval",
+            use_remote_service=True,
+            service_type=ServiceType.RETRIEVER,
+        )
+
+        rerank = MicroService(
+            name="rerank",
+            host=RERANK_SERVER_HOST_IP,
+            port=RERANK_SERVER_PORT,
+            endpoint="/rerank",
+            use_remote_service=True,
+            service_type=ServiceType.RERANK,
+        )
+
+        llm = MicroService(
+            name="llm",
+            host=LLM_SERVER_HOST_IP,
+            port=LLM_SERVER_PORT,
+            endpoint="/v1/faqgen",
+            use_remote_service=True,
+            service_type=ServiceType.LLM,
+        )
+        self.megaservice.add(embedding).add(retriever).add(rerank).add(llm)
+        self.megaservice.flow_to(embedding, retriever)
+        self.megaservice.flow_to(retriever, rerank)
+        self.megaservice.flow_to(rerank, llm)
+
     async def handle_request(self, request: Request):
         data = await request.json()
         stream_opt = data.get("stream", True)
@@ -342,8 +392,9 @@ class ChatQnAService:
             frequency_penalty=chat_request.frequency_penalty if chat_request.frequency_penalty else 0.0,
             presence_penalty=chat_request.presence_penalty if chat_request.presence_penalty else 0.0,
             repetition_penalty=chat_request.repetition_penalty if chat_request.repetition_penalty else 1.03,
-            streaming=stream_opt,
+            stream=stream_opt,
             chat_template=chat_request.chat_template if chat_request.chat_template else None,
+            model=chat_request.model if chat_request.model else None,
         )
         retriever_parameters = RetrieverParms(
             search_type=chat_request.search_type if chat_request.search_type else "similarity",
@@ -399,6 +450,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--without-rerank", action="store_true")
     parser.add_argument("--with-guardrails", action="store_true")
+    parser.add_argument("--faqgen", action="store_true")
 
     args = parser.parse_args()
 
@@ -407,6 +459,8 @@ if __name__ == "__main__":
         chatqna.add_remote_service_without_rerank()
     elif args.with_guardrails:
         chatqna.add_remote_service_with_guardrails()
+    elif args.faqgen:
+        chatqna.add_remote_service_faqgen()
     else:
         chatqna.add_remote_service()
 

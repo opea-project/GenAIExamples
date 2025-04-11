@@ -1,0 +1,97 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+# Override CPU resource request and probe timing values in specific subcharts
+#
+# RESOURCES
+#
+# Resource request matching actual resource usage (with enough slack)
+# is important when service is scaled up, so that right amount of pods
+# get scheduled to right nodes.
+#
+# Because resource usage depends on the used devices, model, data type
+# and SW versions, and this top-level chart has overrides for them,
+# resource requests need to be specified here too.
+#
+# To test service without resource request, use "resources: {}".
+#
+# PROBES
+#
+# Inferencing pods startup / warmup takes *much* longer on CPUs than
+# with acceleration devices, and their responses are also slower,
+# especially when node is running several instances of these services.
+#
+# Kubernetes restarting pod before its startup finishes, or not
+# sending it queries because it's not in ready state due to slow
+# readiness responses, does really NOT help in getting faster responses.
+#
+# => probe timings need to be increased when running on CPU.
+
+vllm:
+  enabled: false
+tgi:
+  enabled: true
+  # TODO: add Helm value also for TGI data type option:
+  # https://github.com/opea-project/GenAIExamples/issues/330
+  LLM_MODEL_ID: meta-llama/Meta-Llama-3-8B-Instruct
+
+  # Potentially suitable values for scaling CPU TGI 2.2 with Intel/neural-chat-7b-v3-3 @ 32-bit:
+  #resources:
+  #  limits:
+  #    cpu: 8
+  #    memory: 70Gi
+  #  requests:
+  #    cpu: 6
+  #    memory: 65Gi
+
+  readinessProbe:
+    initialDelaySeconds: 16
+    periodSeconds: 8
+    timeoutSeconds: 4
+  startupProbe:
+    initialDelaySeconds: 10
+    periodSeconds: 5
+    failureThreshold: 180
+    timeoutSeconds: 2
+
+teirerank:
+  RERANK_MODEL_ID: "BAAI/bge-reranker-base"
+
+  # Potentially suitable values for scaling CPU TEI v1.5 with BAAI/bge-reranker-base model:
+  resources:
+    limits:
+      cpu: 24
+      memory: 30Gi
+    requests:
+      cpu: 2
+      memory: 25Gi
+
+  readinessProbe:
+    initialDelaySeconds: 8
+    periodSeconds: 8
+    timeoutSeconds: 4
+  startupProbe:
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    failureThreshold: 120
+
+tei:
+  EMBEDDING_MODEL_ID: "BAAI/bge-base-en-v1.5"
+
+  # Potentially suitable values for scaling CPU TEI 1.5 with BAAI/bge-base-en-v1.5 model:
+  resources:
+    limits:
+      cpu: 24
+      memory: 4Gi
+    requests:
+      cpu: 2
+      memory: 3Gi
+
+  readinessProbe:
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    timeoutSeconds: 2
+  startupProbe:
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    failureThreshold: 120

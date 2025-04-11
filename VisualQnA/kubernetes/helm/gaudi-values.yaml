@@ -1,0 +1,24 @@
+# Copyright (C) 2025 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+vllm:
+  enabled: true
+  accelDevice: "gaudi"
+  image:
+    repository: opea/vllm-gaudi
+    tag: "latest"
+  LLM_MODEL_ID: llava-hf/llava-1.5-7b-hf
+  VLLM_SKIP_WARMUP: true
+  OMPI_MCA_btl_vader_single_copy_mechanism: none
+  PT_HPUGRAPH_DISABLE_TENSOR_CACHE: "false"
+  extraCmdArgs: ["--tensor-parallel-size","1","--chat-template","examples/template_llava.jinja"]
+  resources:
+    limits:
+      habana.ai/gaudi: 1
+tgi:
+  enabled: false
+lvm-uservice:
+  LVM_BACKEND: "vLLM"
+  # The default model is not stable on Gaudi, use the older model.
+  # https://github.com/HabanaAI/vllm-fork/issues/841
+  LLM_MODEL_ID: llava-hf/llava-1.5-7b-hf

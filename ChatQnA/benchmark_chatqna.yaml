@@ -1,0 +1,112 @@
+# Copyright (C) 2025 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+deploy:
+  device: gaudi
+  version: 1.2.0
+  modelUseHostPath: /mnt/models
+  HUGGINGFACEHUB_API_TOKEN: "" # mandatory
+  node: [1, 2, 4, 8]
+  namespace: ""
+  timeout: 1000  # timeout in seconds for services to be ready, default 30 minutes
+  interval: 5    # interval in seconds between service ready checks, default 5 seconds
+
+  services:
+    backend:
+      resources:
+        enabled: False
+        cores_per_instance: "16"
+        memory_capacity: "8000Mi"
+      replicaCount: [1, 2, 4, 8]
+
+    teirerank:
+      enabled: True
+      model_id: ""
+      resources:
+        enabled: False
+        cards_per_instance: 1
+      replicaCount: [1, 1, 1, 1]
+
+    tei:
+      model_id: ""
+      resources:
+        enabled: False
+        cores_per_instance: "80"
+        memory_capacity: "20000Mi"
+      replicaCount: [1, 2, 4, 8]
+
+    llm:
+      engine: vllm  # or tgi
+      model_id: "meta-llama/Meta-Llama-3-8B-Instruct" # mandatory
+      replicaCount:
+        with_teirerank: [7, 15, 31, 63]     # When teirerank.enabled is True
+        without_teirerank: [8, 16, 32, 64]   # When teirerank.enabled is False
+      resources:
+        enabled: False
+        cards_per_instance: 1
+      model_params:
+        vllm:  # VLLM specific parameters
+          batch_params:
+            enabled: True
+            max_num_seqs: [1, 2, 4, 8]    # Each value triggers an LLM service upgrade
+          token_params:
+            enabled: False
+            max_input_length: ""
+            max_total_tokens: ""
+            max_batch_total_tokens: ""
+            max_batch_prefill_tokens: ""
+        tgi:   # TGI specific parameters
+          batch_params:
+            enabled: True
+            max_batch_size: [1, 2, 4, 8]  # Each value triggers an LLM service upgrade
+          token_params:
+            enabled: False
+            max_input_length: "1280"
+            max_total_tokens: "2048"
+            max_batch_total_tokens: "65536"
+            max_batch_prefill_tokens: "4096"
+
+    data-prep:
+      resources:
+        enabled: False
+        cores_per_instance: ""
+        memory_capacity: ""
+      replicaCount: [1, 1, 1, 1]
+
+    retriever-usvc:
+      resources:
+        enabled: False
+        cores_per_instance: "8"
+        memory_capacity: "8000Mi"
+      replicaCount: [1, 2, 4, 8]
+
+    redis-vector-db:
+      resources:
+        enabled: False
+        cores_per_instance: ""
+        memory_capacity: ""
+      replicaCount: [1, 1, 1, 1]
+
+    chatqna-ui:
+      replicaCount: [1, 1, 1, 1]
+
+    nginx:
+      replicaCount: [1, 1, 1, 1]
+
+benchmark:
+  # http request behavior related fields
+  user_queries:              [640]
+  concurrency:               [128]
+  load_shape_type:           "constant" # "constant" or "poisson"
+  poisson_arrival_rate:      1.0  # only used when load_shape_type is "poisson"
+  warmup_iterations:         10
+  seed:                      1024
+
+  # workload, all of the test cases will run for benchmark
+  bench_target: [chatqnafixed, chatqna_qlist_pubmed] # specify the bench_target for benchmark
+  dataset: ["/home/sdp/upload_file.txt", "/home/sdp/pubmed_10000.txt"]  # specify the absolute path to the dataset file
+  prompt: [10, 1000]  # set the prompt length for the chatqna_qlist_pubmed workload, set to 10 for chatqnafixed workload
+
+  llm:
+    # specify the llm output token size
+    max_token_size:          [128, 256]

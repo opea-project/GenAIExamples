@@ -79,7 +79,7 @@ const DBConnect: React.FC = () => {
       };
 
       let api_response: Record<string, any>;
-      api_response = await axios.post(`${TEXT_TO_SQL_URL}/texttosql`, payload);
+      api_response = await axios.post(`${TEXT_TO_SQL_URL}/text2sql`, payload);
 
       setSqlQuery(api_response.data.result.sql); // Assuming the API returns an SQL query
       setQueryOutput(api_response.data.result.output);
@@ -163,7 +163,7 @@ const DBConnect: React.FC = () => {
       </div>
 
       {/* DBQnA Section */}
-      <div className={styleClasses.textToSQLSection}>
+      <div className={styleClasses.text2SQLSection}>
         <Title order={1}>DBQnA</Title>
         {isConnected && (
           <form className={styleClasses.form} onSubmit={handleGenerateSQL}>

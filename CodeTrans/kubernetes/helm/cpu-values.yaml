@@ -1,0 +1,9 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+tgi:
+  enabled: false
+vllm:
+  enabled: true
+llm-uservice:
+  TEXTGEN_BACKEND: vLLM

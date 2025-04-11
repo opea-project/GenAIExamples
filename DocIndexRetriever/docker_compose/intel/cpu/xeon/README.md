@@ -9,25 +9,25 @@ DocRetriever are the most widely adopted use case for leveraging the different m
   ```bash
   git clone https://github.com/opea-project/GenAIComps.git
   cd GenAIComps
-  docker build -t opea/embedding-tei:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/tei/langchain/Dockerfile .
+  docker build -t opea/embedding:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/src/Dockerfile .
   ```
 
 - Retriever Vector store Image
 
   ```bash
-  docker build -t opea/retriever-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/redis/langchain/Dockerfile .
+  docker build -t opea/retriever:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/src/Dockerfile .
   ```
 
 - Rerank TEI Image
 
   ```bash
-  docker build -t opea/reranking-tei:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/reranks/tei/Dockerfile .
+  docker build -t opea/reranking:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/rerankings/src/Dockerfile .
   ```
 
 - Dataprep Image
 
   ```bash
-  docker build -t opea/dataprep-on-ray-redis:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/redis/langchain_ray/Dockerfile .
+  docker build -t opea/dataprep:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/src/Dockerfile .
   ```
 
 ## 2. Build Images for MegaService
@@ -48,17 +48,14 @@ export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
 export RERANK_MODEL_ID="BAAI/bge-reranker-base"
 export TEI_EMBEDDING_ENDPOINT="http://${host_ip}:6006"
 export TEI_RERANKING_ENDPOINT="http://${host_ip}:8808"
-export TGI_LLM_ENDPOINT="http://${host_ip}:8008"
 export REDIS_URL="redis://${host_ip}:6379"
 export INDEX_NAME="rag-redis"
-export MEGA_SERVICE_HOST_IP=${host_ip}
 export EMBEDDING_SERVICE_HOST_IP=${host_ip}
 export RETRIEVER_SERVICE_HOST_IP=${host_ip}
 export RERANK_SERVICE_HOST_IP=${host_ip}
-export LLM_SERVICE_HOST_IP=${host_ip}
 export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8000/v1/retrievaltool"
-export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/dataprep"
-cd GenAIExamples/DocIndexRetriever/intel/cpu/xoen/
+export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/ingest"
+cd GenAIExamples/DocIndexRetriever/docker_compose/intel/cpu/xeon
 docker compose up -d
 ```
 
@@ -69,8 +66,16 @@ In that case, start Docker Containers with compose_without_rerank.yaml
 export host_ip="YOUR IP ADDR"
 export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
 export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
-cd GenAIExamples/DocIndexRetriever/intel/cpu/xoen/
+cd GenAIExamples/DocIndexRetriever/docker_compose/intel/cpu/xeon
 docker compose -f compose_without_rerank.yaml up -d
+```
+
+To run the DocRetriever with Rerank pipeline using the Milvus vector database, use the compose_milvus.yaml configuration file and set the MILVUS_HOST environment variable.
+
+```bash
+export MILVUS_HOST=${host_ip}
+cd GenAIExamples/DocIndexRetriever/docker_compose/intel/cpu/xeon
+docker compose -f compose_milvus.yaml up -d
 ```
 
 ## 4. Validation
@@ -78,7 +83,7 @@ docker compose -f compose_without_rerank.yaml up -d
 Add Knowledge Base via HTTP Links:
 
 ```bash
-curl -X POST "http://${host_ip}:6007/v1/dataprep" \
+curl -X POST "http://${host_ip}:6007/v1/dataprep/ingest" \
      -H "Content-Type: multipart/form-data" \
      -F 'link_list=["https://opea.dev"]'
 
@@ -92,9 +97,6 @@ Retrieval from KnowledgeBase
 curl http://${host_ip}:8889/v1/retrievaltool -X POST -H "Content-Type: application/json" -d '{
      "messages": "Explain the OPEA project?"
      }'
-
-# expected output
-{"id":"354e62c703caac8c547b3061433ec5e8","reranked_docs":[{"id":"06d5a5cefc06cf9a9e0b5fa74a9f233c","text":"Close SearchsearchMenu WikiNewsCommunity Daysx-twitter linkedin github searchStreamlining implementation of enterprise-grade Generative AIEfficiently integrate secure, performant, and cost-effective Generative AI workflows into business value.TODAYOPEA..."}],"initial_query":"Explain the OPEA project?"}
 ```
 
 **Note**: `messages` is the required field. You can also pass in parameters for the retriever and reranker in the request. The parameters that can changed are listed below.
@@ -123,9 +125,9 @@ curl http://${host_ip}:8889/v1/retrievaltool -X POST -H "Content-Type: applicati
    # embedding microservice
    curl http://${host_ip}:6000/v1/embeddings \
      -X POST \
-     -d '{"text":"Explain the OPEA project"}' \
+     -d '{"messages":"Explain the OPEA project"}' \
      -H 'Content-Type: application/json' > query
-   docker container logs embedding-tei-server
+   docker container logs embedding-server
 
    # if you used tei-gaudi
    docker container logs tei-embedding-gaudi-server

@@ -26,48 +26,69 @@ services:
   whisper-gaudi:
     build:
       context: GenAIComps
-      dockerfile: comps/asr/whisper/dependency/Dockerfile.intel_hpu
+      dockerfile: comps/third_parties/whisper/src/Dockerfile.intel_hpu
     extends: audioqna
     image: ${REGISTRY:-opea}/whisper-gaudi:${TAG:-latest}
   whisper:
     build:
       context: GenAIComps
-      dockerfile: comps/asr/whisper/dependency/Dockerfile
+      dockerfile: comps/third_parties/whisper/src/Dockerfile
     extends: audioqna
     image: ${REGISTRY:-opea}/whisper:${TAG:-latest}
   asr:
     build:
       context: GenAIComps
-      dockerfile: comps/asr/whisper/Dockerfile
+      dockerfile: comps/asr/src/Dockerfile
     extends: audioqna
     image: ${REGISTRY:-opea}/asr:${TAG:-latest}
-  llm-tgi:
+  llm-textgen:
     build:
       context: GenAIComps
-      dockerfile: comps/llms/text-generation/tgi/Dockerfile
+      dockerfile: comps/llms/src/text-generation/Dockerfile
     extends: audioqna
-    image: ${REGISTRY:-opea}/llm-tgi:${TAG:-latest}
+    image: ${REGISTRY:-opea}/llm-textgen:${TAG:-latest}
   speecht5-gaudi:
     build:
       context: GenAIComps
-      dockerfile: comps/tts/speecht5/dependency/Dockerfile.intel_hpu
+      dockerfile: comps/third_parties/speecht5/src/Dockerfile.intel_hpu
     extends: audioqna
     image: ${REGISTRY:-opea}/speecht5-gaudi:${TAG:-latest}
   speecht5:
     build:
       context: GenAIComps
-      dockerfile: comps/tts/speecht5/dependency/Dockerfile
+      dockerfile: comps/third_parties/speecht5/src/Dockerfile
     extends: audioqna
     image: ${REGISTRY:-opea}/speecht5:${TAG:-latest}
   tts:
     build:
       context: GenAIComps
-      dockerfile: comps/tts/speecht5/Dockerfile
+      dockerfile: comps/tts/src/Dockerfile
     extends: audioqna
     image: ${REGISTRY:-opea}/tts:${TAG:-latest}
   gpt-sovits:
     build:
       context: GenAIComps
-      dockerfile: comps/tts/gpt-sovits/Dockerfile
+      dockerfile: comps/third_parties/gpt-sovits/src/Dockerfile
     extends: audioqna
     image: ${REGISTRY:-opea}/gpt-sovits:${TAG:-latest}
+  vllm:
+    build:
+      context: vllm
+      dockerfile: docker/Dockerfile.cpu
+    extends: audioqna
+    image: ${REGISTRY:-opea}/vllm:${TAG:-latest}
+  vllm-gaudi:
+    build:
+      context: vllm-fork
+      dockerfile: Dockerfile.hpu
+    extends: audioqna
+    image: ${REGISTRY:-opea}/vllm-gaudi:${TAG:-latest}
+  vllm-rocm:
+    build:
+      args:
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
+        no_proxy: ${no_proxy}
+      context: GenAIComps
+      dockerfile: comps/third_parties/vllm/src/Dockerfile.amd_gpu
+    image: ${REGISTRY:-opea}/vllm-rocm:${TAG:-latest}

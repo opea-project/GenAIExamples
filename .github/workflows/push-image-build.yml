@@ -24,6 +24,7 @@ jobs:
 
   image-build:
     needs: job1
+    if: ${{ needs.job1.outputs.run_matrix != '{"include":[]}' }}
     strategy:
       matrix: ${{ fromJSON(needs.job1.outputs.run_matrix) }}
       fail-fast: false

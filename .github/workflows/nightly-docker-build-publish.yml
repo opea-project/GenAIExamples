@@ -32,8 +32,15 @@ jobs:
           echo "TAG=$TAG" >> $GITHUB_OUTPUT
           echo "PUBLISH_TAGS=$PUBLISH_TAGS" >> $GITHUB_OUTPUT
 
+  build-comps-base:
+    needs: [get-build-matrix]
+    uses: ./.github/workflows/_build_comps_base_image.yml
+    with:
+      node: gaudi
+
   build-and-test:
     needs: get-build-matrix
+    if: ${{ needs.get-build-matrix.outputs.examples_json != '' }}
     strategy:
       matrix:
         example: ${{ fromJSON(needs.get-build-matrix.outputs.examples_json) }}
@@ -43,6 +50,7 @@ jobs:
       node: gaudi
       example: ${{ matrix.example }}
       test_compose: true
+      inject_commit: true
     secrets: inherit
 
   get-image-list:
@@ -53,9 +61,11 @@ jobs:
 
   publish:
     needs: [get-build-matrix, get-image-list, build-and-test]
+    if: always() && ${{ needs.get-image-list.outputs.matrix != '' }}
     strategy:
       matrix:
         image: ${{ fromJSON(needs.get-image-list.outputs.matrix) }}
+      fail-fast: false
     runs-on: "docker-build-gaudi"
     steps:
       - uses: docker/login-action@v3.2.0
