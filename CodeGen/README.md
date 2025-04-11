@@ -142,6 +142,3 @@ Intel® Optimized Cloud Modules for Terraform provide an automated way to deploy
 
 We welcome contributions to the OPEA project. Please refer to the contribution guidelines for more information.
 
-```
-
-```

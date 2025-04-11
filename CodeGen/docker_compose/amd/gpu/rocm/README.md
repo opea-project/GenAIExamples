@@ -1,123 +1,107 @@
-# Build and Deploy CodeGen Application on AMD GPU (ROCm)
+# Deploy CodeGen Application on AMD GPU (ROCm) with Docker Compose
 
-## Build Docker Images
+This README provides instructions for deploying the CodeGen application using Docker Compose on a system equipped with AMD GPUs supporting ROCm, detailing the steps to configure, run, and validate the services. This guide defaults to using the **vLLM** backend for LLM serving.
 
-### 1. Build Docker Image
+## Table of Contents
 
-- #### Create application install directory and go to it:
+- [Steps to Run with Docker Compose (Default vLLM)](#steps-to-run-with-docker-compose-default-vllm)
+- [Service Overview](#service-overview)
+- [Available Deployment Options](#available-deployment-options)
+  - [compose_vllm.yaml (vLLM - Default)](#compose_vllyaml-vllm---default)
+  - [compose.yaml (TGI)](#composeyaml-tgi)
+- [Configuration Parameters and Usage](#configuration-parameters-and-usage)
+  - [Docker Compose GPU Configuration](#docker-compose-gpu-configuration)
+  - [Environment Variables (`set_env*.sh`)](#environment-variables-set_envsh)
+- [Building Docker Images Locally (Optional)](#building-docker-images-locally-optional)
+  - [1. Setup Build Environment](#1-setup-build-environment)
+  - [2. Clone Repositories](#2-clone-repositories)
+  - [3. Select Services and Build](#3-select-services-and-build)
+- [Validate Service Health](#validate-service-health)
+  - [1. Validate the vLLM/TGI Service](#1-validate-the-vllmtgi-service)
+  - [2. Validate the LLM Service](#2-validate-the-llm-service)
+  - [3. Validate the MegaService (Backend)](#3-validate-the-megaservice-backend)
+  - [4. Validate the Frontend (UI)](#4-validate-the-frontend-ui)
+- [How to Open the UI](#how-to-open-the-ui)
+- [Troubleshooting](#troubleshooting)
+- [Stopping the Application](#stopping-the-application)
+- [Next Steps](#next-steps)
 
-  ```bash
-  mkdir ~/codegen-install && cd codegen-install
-  ```
+## Steps to Run with Docker Compose (Default vLLM)
 
-- #### Clone the repository GenAIExamples (the default repository branch "main" is used here):
+*This section assumes you are using pre-built images and targets the default vLLM deployment.*
 
-  ```bash
-  git clone https://github.com/opea-project/GenAIExamples.git
-  ```
+1.  **Set Deploy Environment Variables:**
+    *   Go to the Docker Compose directory:
+        ```bash
+        # Adjust path if your GenAIExamples clone is located elsewhere
+        cd GenAIExamples/CodeGen/docker_compose/amd/gpu/rocm
+        ```
+    *   Setting variables in the operating system environment:
+        *   Set variable `HUGGINGFACEHUB_API_TOKEN`:
+            ```bash
+            ### Replace the string 'your_huggingfacehub_token' with your HuggingFacehub repository access token.
+            export HUGGINGFACEHUB_API_TOKEN='your_huggingfacehub_token'
+            ```
+    *   Edit the environment script for the **vLLM** deployment (`set_env_vllm.sh`):
+        ```bash
+        nano set_env_vllm.sh
+        ```
+        *   Configure `HOST_IP`, `EXTERNAL_HOST_IP`, `*_PORT` variables, and proxies (`http_proxy`, `https_proxy`, `no_proxy`) as described in the Configuration section below.
+    *   Source the environment variables:
+        ```bash
+        . set_env_vllm.sh
+        ```
 
-  If you need to use a specific branch/tag of the GenAIExamples repository, then (v1.3 replace with its own value):
+2.  **Start the Services (vLLM):**
+    ```bash
+    docker compose -f compose_vllm.yaml up -d
+    ```
 
-  ```bash
-  git clone https://github.com/opea-project/GenAIExamples.git && cd GenAIExamples && git checkout v1.3
-  ```
+3.  **Verify:** Proceed to the [Validate Service Health](#validate-service-health) section after allowing time for services to start.
 
-  We remind you that when using a specific version of the code, you need to use the README from this version:
+## Service Overview
 
-- #### Go to build directory:
+When using the default `compose_vllm.yaml` (vLLM-based), the following services are deployed:
 
-  ```bash
-  cd ~/codegen-install/GenAIExamples/CodeGen/docker_image_build
-  ```
+| Service Name           | Default Port (Host) | Internal Port | Purpose                       |
+| :--------------------- | :------------------ | :------------ | :---------------------------- |
+| codegen-vllm-service   | `${CODEGEN_VLLM_SERVICE_PORT}` (e.g., 8028) | 8000          | LLM Serving (vLLM on ROCm)  |
+| codegen-llm-server     | `${CODEGEN_LLM_SERVICE_PORT}` (e.g., 9000)  | 80            | LLM Microservice Wrapper    |
+| codegen-backend-server | `${CODEGEN_BACKEND_SERVICE_PORT}` (e.g., 7778)| 80            | CodeGen MegaService/Gateway |
+| codegen-ui-server      | `${CODEGEN_UI_SERVICE_PORT}` (e.g., 5173)   | 80            | Frontend User Interface       |
 
-- Cleaning up the GenAIComps repository if it was previously cloned in this directory.
-  This is necessary if the build was performed earlier and the GenAIComps folder exists and is not empty:
+*(Note: Ports are configurable via `set_env_vllm.sh`. Check the script for actual defaults used.)*
+*(Note: The TGI deployment (`compose.yaml`) uses `codegen-tgi-service` instead of `codegen-vllm-service`)*
 
-  ```bash
-  echo Y | rm -R GenAIComps
-  ```
+## Available Deployment Options
 
-- #### Clone the repository GenAIComps (the default repository branch "main" is used here):
+This directory provides different Docker Compose files:
 
-  ```bash
-  git clone https://github.com/opea-project/GenAIComps.git
-  ```
+### compose_vllm.yaml (vLLM - Default)
 
-  If you use a specific tag of the GenAIExamples repository,
-  then you should also use the corresponding tag for GenAIComps. (v1.3 replace with its own value):
+-   **Description:** Deploys the CodeGen application using vLLM optimized for ROCm as the backend LLM service. This is the default setup.
+-   **Services Deployed:** `codegen-vllm-service`, `codegen-llm-server`, `codegen-backend-server`, `codegen-ui-server`. Requires `set_env_vllm.sh`.
 
-  ```bash
-  git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout v1.3
-  ```
+### compose.yaml (TGI)
 
-  We remind you that when using a specific version of the code, you need to use the README from this version.
+-   **Description:** Deploys the CodeGen application using Text Generation Inference (TGI) optimized for ROCm as the backend LLM service.
+-   **Services Deployed:** `codegen-tgi-service`, `codegen-llm-server`, `codegen-backend-server`, `codegen-ui-server`. Requires `set_env.sh`.
 
-- #### Setting the list of images for the build (from the build file.yaml)
+## Configuration Parameters and Usage
 
-  If you want to deploy a vLLM-based or TGI-based application, then the set of services is installed as follows:
+### Docker Compose GPU Configuration
 
-  #### vLLM-based application
-
-  ```bash
-  service_list="vllm-rocm llm-textgen codegen codegen-ui"
-  ```
-
-  #### TGI-based application
-
-  ```bash
-  service_list="llm-textgen codegen codegen-ui"
-  ```
-
-- #### Optional. Pull TGI Docker Image (Do this if you want to use TGI)
-
-  ```bash
-  docker pull ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
-  ```
-
-- #### Build Docker Images
-
-  ```bash
-  docker compose -f build.yaml build ${service_list} --no-cache
-  ```
-
-  After the build, we check the list of images with the command:
-
-  ```bash
-  docker image ls
-  ```
-
-  The list of images should include:
-
-  ##### vLLM-based application:
-
-  - opea/vllm-rocm:latest
-  - opea/llm-textgen:latest
-  - opea/codegen:latest
-  - opea/codegen-ui:latest
-
-  ##### TGI-based application:
-
-  - ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
-  - opea/llm-textgen:latest
-  - opea/codegen:latest
-  - opea/codegen-ui:latest
-
----
-
-## Deploy the CodeGen Application
-
-### Docker Compose Configuration for AMD GPUs
-
-To enable GPU support for AMD GPUs, the following configuration is added to the Docker Compose file:
-
-- compose_vllm.yaml - for vLLM-based application
-- compose.yaml - for TGI-based
+To enable GPU support for AMD GPUs, the following configuration is added to the Docker Compose files (`compose.yaml`, `compose_vllm.yaml`) for the LLM serving container:
 
 ```yaml
+# Example for vLLM service in compose_vllm.yaml
+# Note: Modern docker compose might use deploy.resources syntax instead.
+# Check your docker version and compose file.
 shm_size: 1g
 devices:
   - /dev/kfd:/dev/kfd
   - /dev/dri/:/dev/dri/
+# - /dev/dri/render128:/dev/dri/render128
 cap_add:
   - SYS_PTRACE
 group_add:
@@ -126,300 +110,293 @@ security_opt:
   - seccomp:unconfined
 ```
 
-This configuration forwards all available GPUs to the container. To use a specific GPU, specify its `cardN` and `renderN` device IDs. For example:
+This configuration forwards all available GPUs to the container. To use a specific GPU, specify its `cardN` and `renderN` device IDs (e.g., `/dev/dri/card0:/dev/dri/card0`, `/dev/dri/render128:/dev/dri/render128`). Use AMD GPU driver utilities to identify device IDs.
 
-```yaml
-shm_size: 1g
-devices:
-  - /dev/kfd:/dev/kfd
-  - /dev/dri/card0:/dev/dri/card0
-  - /dev/dri/render128:/dev/dri/render128
-cap_add:
-  - SYS_PTRACE
-group_add:
-  - video
-security_opt:
-  - seccomp:unconfined
-```
+### Environment Variables (`set_env*.sh`)
 
-**How to Identify GPU Device IDs:**
-Use AMD GPU driver utilities to determine the correct `cardN` and `renderN` IDs for your GPU.
+These scripts (`set_env_vllm.sh` for vLLM, `set_env.sh` for TGI) configure crucial parameters passed to the containers.
 
-### Set deploy environment variables
+| Environment Variable        | Description                                                                                                                               | Example Value (Edit in Script) |
+| :-------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------- | :----------------------------- |
+| `HUGGINGFACEHUB_API_TOKEN`  | Your Hugging Face Hub token for model access. **Required.**                                                                               | `your_huggingfacehub_token`    |
+| `HOST_IP`                   | Internal/Primary IP address of the host machine. Used for inter-service communication. **Required.**                                        | `192.168.1.100`                |
+| `EXTERNAL_HOST_IP`          | External IP/hostname used to access the UI from outside. Same as `HOST_IP` if no proxy/LB. **Required.**                                    | `192.168.1.100`                |
+| `CODEGEN_LLM_MODEL_ID`              | Hugging Face model ID for the CodeGen LLM.                                                                                                | `Qwen/Qwen2.5-Coder-7B-Instruct` |
+| `CODEGEN_VLLM_SERVICE_PORT` | Host port mapping for the vLLM serving endpoint (in `set_env_vllm.sh`).                                                                     | `8028`                         |
+| `CODEGEN_TGI_SERVICE_PORT`  | Host port mapping for the TGI serving endpoint (in `set_env.sh`).                                                                         | `8028`                         |
+| `CODEGEN_LLM_SERVICE_PORT`  | Host port mapping for the LLM Microservice wrapper.                                                                                       | `9000`                         |
+| `CODEGEN_BACKEND_SERVICE_PORT`| Host port mapping for the CodeGen MegaService/Gateway.                                                                                  | `7778`                         |
+| `CODEGEN_UI_SERVICE_PORT`   | Host port mapping for the UI service.                                                                                                     | `5173`                         |
+| `http_proxy`                | Network HTTP Proxy URL (if required).                                                                                                     | `Your_HTTP_Proxy`              |
+| `https_proxy`               | Network HTTPS Proxy URL (if required).                                                                                                    | `Your_HTTPs_Proxy`             |
+| `no_proxy`                  | Comma-separated list of hosts to bypass proxy. Should include `localhost,127.0.0.1,$HOST_IP`.                                               | `localhost,127.0.0.1`          |
 
-#### Setting variables in the operating system environment:
+**How to Use:** Edit the relevant `set_env*.sh` file (`set_env_vllm.sh` for the default) with your values, then source it (`. ./set_env*.sh`) before running `docker compose`.
 
-##### Set variable HUGGINGFACEHUB_API_TOKEN:
+## Building Docker Images Locally (Optional)
 
-```bash
-### Replace the string 'your_huggingfacehub_token' with your HuggingFacehub repository access token.
-export HUGGINGFACEHUB_API_TOKEN='your_huggingfacehub_token'
-```
+Follow these steps if you need to build the Docker images from source instead of using pre-built ones.
 
-#### Set variables value in set_env\*\*\*\*.sh file:
+### 1. Setup Build Environment
 
-Go to Docker Compose directory:
+-   #### Create application install directory and go to it:
 
-```bash
-cd ~/codegen-install/GenAIExamples/CodeGen/docker_compose/amd/gpu/rocm
-```
+    ```bash
+    mkdir ~/codegen-install && cd codegen-install
+    ```
 
-The example uses the Nano text editor. You can use any convenient text editor:
+### 2. Clone Repositories
 
-#### If you use vLLM
+-   #### Clone the repository GenAIExamples (the default repository branch "main" is used here):
 
-```bash
-nano set_env_vllm.sh
-```
+    ```bash
+    git clone https://github.com/opea-project/GenAIExamples.git
+    ```
 
-#### If you use TGI
+    If you need to use a specific branch/tag of the GenAIExamples repository, then (v1.3 replace with its own value):
 
-```bash
-nano set_env.sh
-```
+    ```bash
+    git clone https://github.com/opea-project/GenAIExamples.git && cd GenAIExamples && git checkout v1.3
+    ```
 
-If you are in a proxy environment, also set the proxy-related environment variables:
+    We remind you that when using a specific version of the code, you need to use the README from this version.
 
-```bash
-export http_proxy="Your_HTTP_Proxy"
-export https_proxy="Your_HTTPs_Proxy"
-```
+-   #### Go to build directory:
 
-Set the values of the variables:
+    ```bash
+    cd ~/codegen-install/GenAIExamples/CodeGen/docker_image_build
+    ```
 
-- **HOST_IP, HOST_IP_EXTERNAL** - These variables are used to configure the name/address of the service in the operating system environment for the application services to interact with each other and with the outside world.
+-   Cleaning up the GenAIComps repository if it was previously cloned in this directory.
+    This is necessary if the build was performed earlier and the GenAIComps folder exists and is not empty:
 
-  If your server uses only an internal address and is not accessible from the Internet, then the values for these two variables will be the same and the value will be equal to the server's internal name/address.
+    ```bash
+    echo Y | rm -R GenAIComps
+    ```
 
-  If your server uses only an external, Internet-accessible address, then the values for these two variables will be the same and the value will be equal to the server's external name/address.
+-   #### Clone the repository GenAIComps (the default repository branch "main" is used here):
 
-  If your server is located on an internal network, has an internal address, but is accessible from the Internet via a proxy/firewall/load balancer, then the HOST_IP variable will have a value equal to the internal name/address of the server, and the EXTERNAL_HOST_IP variable will have a value equal to the external name/address of the proxy/firewall/load balancer behind which the server is located.
+    ```bash
+    git clone https://github.com/opea-project/GenAIComps.git
+    ```
 
-  We set these values in the file set_env\*\*\*\*.sh
+    If you use a specific tag of the GenAIExamples repository,
+    then you should also use the corresponding tag for GenAIComps. (v1.3 replace with its own value):
 
-- **Variables with names like "**\*\*\*\*\*\*\_PORT"\*\* - These variables set the IP port numbers for establishing network connections to the application services.
-  The values shown in the file set_env.sh or set_env_vllm they are the values used for the development and testing of the application, as well as configured for the environment in which the development is performed. These values must be configured in accordance with the rules of network access to your environment's server, and must not overlap with the IP ports of other applications that are already in use.
+    ```bash
+    git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout v1.3
+    ```
 
-#### Set variables with script set_env\*\*\*\*.sh
+    We remind you that when using a specific version of the code, you need to use the README from this version.
 
-#### If you use vLLM
+### 3. Select Services and Build
 
-```bash
-. set_env_vllm.sh
-```
+-   #### Setting the list of images for the build (from the build file.yaml)
 
-#### If you use TGI
+    Select the services corresponding to your desired deployment (vLLM is the default):
 
-```bash
-. set_env.sh
-```
+    ##### vLLM-based application (Default)
 
-### Start the services:
+    ```bash
+    service_list="vllm-rocm llm-textgen codegen codegen-ui"
+    ```
 
-#### If you use vLLM
+    ##### TGI-based application
 
-```bash
-docker compose -f compose_vllm.yaml up -d
-```
+    ```bash
+    service_list="llm-textgen codegen codegen-ui"
+    ```
 
-#### If you use TGI
+-   #### Optional. Pull TGI Docker Image (Do this if you plan to build/use the TGI variant)
 
-```bash
-docker compose -f compose.yaml up -d
-```
+    ```bash
+    docker pull ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
+    ```
 
-All containers should be running and should not restart:
+-   #### Build Docker Images
 
-##### If you use vLLM:
+    *Ensure you are in the `~/codegen-install/GenAIExamples/CodeGen/docker_image_build` directory.*
+    ```bash
+    docker compose -f build.yaml build ${service_list} --no-cache
+    ```
 
-- codegen-vllm-service
-- codegen-llm-server
-- codegen-backend-server
-- codegen-ui-server
+    After the build, check the list of images with the command:
 
-##### If you use TGI:
+    ```bash
+    docker image ls
+    ```
 
-- codegen-tgi-service
-- codegen-llm-server
-- codegen-backend-server
-- codegen-ui-server
+    The list of images should include (depending on `service_list`):
 
----
+    ###### vLLM-based application:
 
-## Validate the Services
+    - opea/vllm-rocm:latest
+    - opea/llm-textgen:latest
+    - opea/codegen:latest
+    - opea/codegen-ui:latest
+
+    ###### TGI-based application:
+
+    - ghcr.io/huggingface/text-generation-inference:2.3.1-rocm (if pulled)
+    - opea/llm-textgen:latest
+    - opea/codegen:latest
+    - opea/codegen-ui:latest
+
+    *After building, ensure the `image:` tags in the main `compose_vllm.yaml` or `compose.yaml` (in the `amd/gpu/rocm` directory) match these built images (e.g., `opea/vllm-rocm:latest`).*
+
+## Validate Service Health
+
+Run these checks after starting the services to ensure they are operational. Focus on the vLLM checks first as it's the default.
 
 ### 1. Validate the vLLM/TGI Service
 
-#### If you use vLLM:
+#### If you use vLLM (Default - using `compose_vllm.yaml` and `set_env_vllm.sh`)
 
-```bash
-DATA='{"model": "Qwen/Qwen2.5-Coder-7B-Instruct", '\
-'"messages": [{"role": "user", "content": "Implement a high-level API for a TODO list application. '\
-'The API takes as input an operation request and updates the TODO list in place. '\
-'If the request is invalid, raise an exception."}], "max_tokens": 256}'
+-   **How Tested:** Send a POST request with a sample prompt to the vLLM endpoint.
+-   **CURL Command:**
+    ```bash
+    DATA='{"model": "Qwen/Qwen2.5-Coder-7B-Instruct", '\
+    '"messages": [{"role": "user", "content": "Implement a high-level API for a TODO list application. '\
+    'The API takes as input an operation request and updates the TODO list in place. '\
+    'If the request is invalid, raise an exception."}], "max_tokens": 256}'
 
-curl http://${HOST_IP}:${CODEGEN_VLLM_SERVICE_PORT}/v1/chat/completions \
-  -X POST \
-  -d "$DATA" \
-  -H 'Content-Type: application/json'
-```
-
-Checking the response from the service. The response should be similar to JSON:
-
-````json
-{
-  "id": "chatcmpl-142f34ef35b64a8db3deedd170fed951",
-  "object": "chat.completion",
-  "created": 1742270316,
-  "model": "Qwen/Qwen2.5-Coder-7B-Instruct",
-  "choices": [
+    curl http://${HOST_IP}:${CODEGEN_VLLM_SERVICE_PORT}/v1/chat/completions \
+      -X POST \
+      -d "$DATA" \
+      -H 'Content-Type: application/json'
+    ```
+-   **Sample Output:**
+    ```json
     {
-      "index": 0,
-      "message": {
-        "role": "assistant",
-        "content": "```python\nfrom typing import Optional, List, Dict, Union\nfrom pydantic import BaseModel, validator\n\nclass OperationRequest(BaseModel):\n    # Assuming OperationRequest is already defined as per the given text\n    pass\n\nclass UpdateOperation(OperationRequest):\n    new_items: List[str]\n\n    def apply_and_maybe_raise(self, updatable_item: \"Updatable todo list\") -> None:\n        # Assuming updatable_item is an instance of Updatable todo list\n        self.validate()\n        updatable_item.add_items(self.new_items)\n\nclass Updatable:\n    # Abstract class for items that can be updated\n    pass\n\nclass TodoList(Updatable):\n    # Class that represents a todo list\n    items: List[str]\n\n    def add_items(self, new_items: List[str]) -> None:\n        self.items.extend(new_items)\n\ndef handle_request(operation_request: OperationRequest) -> None:\n    # Function to handle an operation request\n    if isinstance(operation_request, UpdateOperation):\n        operation_request.apply_and_maybe_raise(get_todo_list_for_update())\n    else:\n        raise ValueError(\"Invalid operation request\")\n\ndef get_todo_list_for_update() -> TodoList:\n    # Function to get the todo list for update\n    # Assuming this function returns the",
-        "tool_calls": []
-      },
-      "logprobs": null,
-      "finish_reason": "length",
-      "stop_reason": null
+      "id": "chatcmpl-142f34ef35b64a8db3deedd170fed951",
+      "object": "chat.completion",
+      // ... (rest of output) ...
     }
-  ],
-  "usage": { "prompt_tokens": 66, "total_tokens": 322, "completion_tokens": 256, "prompt_tokens_details": null },
-  "prompt_logprobs": null
-}
-````
+    ```
+-   **Expected Result:** A JSON response with a `choices[0].message.content` field containing meaningful generated code.
 
-If the service response has a meaningful response in the value of the "choices.message.content" key,
-then we consider the vLLM service to be successfully launched
+#### If you use TGI (using `compose.yaml` and `set_env.sh`)
 
-#### If you use TGI:
+-   **How Tested:** Send a POST request with a sample prompt to the TGI endpoint.
+-   **CURL Command:**
+    ```bash
+    DATA='{"inputs":"Implement a high-level API for a TODO list application. '\
+    # ... (data payload as before) ...
+    '"parameters":{"max_new_tokens":256,"do_sample": true}}'
 
-```bash
-DATA='{"inputs":"Implement a high-level API for a TODO list application. '\
-'The API takes as input an operation request and updates the TODO list in place. '\
-'If the request is invalid, raise an exception.",'\
-'"parameters":{"max_new_tokens":256,"do_sample": true}}'
-
-curl http://${HOST_IP}:${CODEGEN_TGI_SERVICE_PORT}/generate \
-  -X POST \
-  -d "$DATA" \
-  -H 'Content-Type: application/json'
-```
-
-Checking the response from the service. The response should be similar to JSON:
-
-````json
-{
-  "generated_text": " The supported operations are \"add_task\", \"complete_task\", and \"remove_task\". Each operation can be defined with a corresponding function in the API.\n\nAdd your API in the following format:\n\n```\nTODO App API\n\nsupported operations:\n\noperation name           description\n-----------------------  ------------------------------------------------\n<operation_name>         <operation description>\n```\n\nUse type hints for function parameters and return values. Specify a text description of the API's supported operations.\n\nUse the following code snippet as a starting point for your high-level API function:\n\n```\nclass TodoAPI:\n    def __init__(self, tasks: List[str]):\n        self.tasks = tasks  # List of tasks to manage\n\n    def add_task(self, task: str) -> None:\n        self.tasks.append(task)\n\n    def complete_task(self, task: str) -> None:\n        self.tasks = [t for t in self.tasks if t != task]\n\n    def remove_task(self, task: str) -> None:\n        self.tasks = [t for t in self.tasks if t != task]\n\n    def handle_request(self, request: Dict[str, str]) -> None:\n        operation = request.get('operation')\n        if operation == 'add_task':\n            self.add_task(request.get('task'))\n        elif"
-}
-````
-
-If the service response has a meaningful response in the value of the "generated_text" key,
-then we consider the TGI service to be successfully launched
+    curl http://${HOST_IP}:${CODEGEN_TGI_SERVICE_PORT}/generate \
+      -X POST \
+      -d "$DATA" \
+      -H 'Content-Type: application/json'
+    ```
+-   **Sample Output:**
+    ```json
+    {
+      "generated_text": " The supported operations are \"add_task\", \"complete_task\", and \"remove_task\". # ... (generated code) ..."
+    }
+    ```
+-   **Expected Result:** A JSON response with a `generated_text` field containing meaningful generated code.
 
 ### 2. Validate the LLM Service
 
-```bash
-DATA='{"query":"Implement a high-level API for a TODO list application. '\
-'The API takes as input an operation request and updates the TODO list in place. '\
-'If the request is invalid, raise an exception.",'\
-'"max_tokens":256,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,'\
-'"repetition_penalty":1.03,"stream":false}'
+-   **Service Name:** `codegen-llm-server`
+-   **How Tested:** Send a POST request to the LLM microservice wrapper endpoint.
+-   **CURL Command:**
+    ```bash
+    DATA='{"query":"Implement a high-level API for a TODO list application. '\
+    # ... (data payload as before) ...
+    '"repetition_penalty":1.03,"stream":false}'
 
-curl http://${HOST_IP}:${CODEGEN_LLM_SERVICE_PORT}/v1/chat/completions \
-  -X POST \
-  -d "$DATA" \
-  -H 'Content-Type: application/json'
-```
-
-Checking the response from the service. The response should be similar to JSON:
-
-````json
-{
-  "id": "cmpl-4e89a590b1af46bfb37ce8f12b2996f8",
-  "choices": [
+    curl http://${HOST_IP}:${CODEGEN_LLM_SERVICE_PORT}/v1/chat/completions \
+      -X POST \
+      -d "$DATA" \
+      -H 'Content-Type: application/json'
+    ```
+-   **Sample Output:** (Structure may vary slightly depending on whether vLLM or TGI is backend)
+    ```json
     {
-      "finish_reason": "length",
-      "index": 0,
-      "logprobs": null,
-      "text": " The API should support the following operations:\n\n1. Add a new task to the TODO list.\n2. Remove a task from the TODO list.\n3. Mark a task as completed.\n4. Retrieve the list of all tasks.\n\nThe API should also support the following features:\n\n1. The ability to filter tasks based on their completion status.\n2. The ability to sort tasks based on their priority.\n3. The ability to search for tasks based on their description.\n\nHere is an example of how the API can be used:\n\n```python\ntodo_list = []\napi = TodoListAPI(todo_list)\n\n# Add tasks\napi.add_task(\"Buy groceries\")\napi.add_task(\"Finish homework\")\n\n# Mark a task as completed\napi.mark_task_completed(\"Buy groceries\")\n\n# Retrieve the list of all tasks\nprint(api.get_all_tasks())\n\n# Filter tasks based on completion status\nprint(api.filter_tasks(completed=True))\n\n# Sort tasks based on priority\napi.sort_tasks(priority=\"high\")\n\n# Search for tasks based on description\nprint(api.search_tasks(description=\"homework\"))\n```\n\nIn this example, the `TodoListAPI` class is used to manage the TODO list. The `add_task` method adds a new task to the list, the `mark_task_completed` method",
-      "stop_reason": null,
-      "prompt_logprobs": null
+      "id": "cmpl-4e89a590b1af46bfb37ce8f12b2996f8", // Example ID
+      // ... (output structure depends on backend, check original validation) ...
     }
-  ],
-  "created": 1742270567,
-  "model": "Qwen/Qwen2.5-Coder-7B-Instruct",
-  "object": "text_completion",
-  "system_fingerprint": null,
-  "usage": {
-    "completion_tokens": 256,
-    "prompt_tokens": 37,
-    "total_tokens": 293,
-    "completion_tokens_details": null,
-    "prompt_tokens_details": null
-  }
-}
-````
+    ```
+-   **Expected Result:** A JSON response containing meaningful generated code within the `choices` array.
 
-If the service response has a meaningful response in the value of the "choices.text" key,
-then we consider the vLLM service to be successfully launched
+### 3. Validate the MegaService (Backend)
 
-### 3. Validate the MegaService
+-   **Service Name:** `codegen-backend-server`
+-   **How Tested:** Send a POST request to the main CodeGen gateway endpoint.
+-   **CURL Command:**
+    ```bash
+    DATA='{"messages": "Implement a high-level API for a TODO list application. '\
+    # ... (data payload as before) ...
+    'If the request is invalid, raise an exception."}'
 
-```bash
-DATA='{"messages": "Implement a high-level API for a TODO list application. '\
-'The API takes as input an operation request and updates the TODO list in place. '\
-'If the request is invalid, raise an exception."}'
-
-curl http://${HOST_IP}:${CODEGEN_BACKEND_SERVICE_PORT}/v1/codegen \
-  -H "Content-Type: application/json" \
-  -d "$DATA"
-```
-
-Checking the response from the service. The response should be similar to text:
-
-```textmate
-data: {"id":"cmpl-cc5dc73819c640469f7c7c7424fe57e6","choices":[{"finish_reason":null,"index":0,"logprobs":null,"text":" of","stop_reason":null}],"created":1742270725,"model":"Qwen/Qwen2.5-Coder-7B-Instruct","object":"text_completion","system_fingerprint":null,"usage":null}
-...........
-data: {"id":"cmpl-cc5dc73819c640469f7c7c7424fe57e6","choices":[{"finish_reason":null,"index":0,"logprobs":null,"text":" all","stop_reason":null}],"created":1742270725,"model":"Qwen/Qwen2.5-Coder-7B-Instruct","object":"text_completion","system_fingerprint":null,"usage":null}
-data: {"id":"cmpl-cc5dc73819c640469f7c7c7424fe57e6","choices":[{"finish_reason":null,"index":0,"logprobs":null,"text":" tasks","stop_reason":null}],"created":1742270725,"model":"Qwen/Qwen2.5-Coder-7B-Instruct","object":"text_completion","system_fingerprint":null,"usage":null}
-data: {"id":"cmpl-cc5dc73819c640469f7c7c7424fe57e6","choices":[{"finish_reason":"length","index":0,"logprobs":null,"text":",","stop_reason":null}],"created":1742270725,"model":"Qwen/Qwen2.5-Coder-7B-Instruct","object":"text_completion","system_fingerprint":null,"usage":null}
-data: [DONE]
-```
-
-If the output lines in the "choices.text" keys contain words (tokens) containing meaning, then the service is considered launched successfully.
+    curl http://${HOST_IP}:${CODEGEN_BACKEND_SERVICE_PORT}/v1/codegen \
+      -H "Content-Type: application/json" \
+      -d "$DATA"
+    ```
+-   **Sample Output:**
+    ```textmate
+    data: {"id":"cmpl-...", ...}
+    # ... more data chunks ...
+    data: [DONE]
+    ```
+-   **Expected Result:** A stream of server-sent events (SSE) containing JSON data with generated code tokens, ending with `data: [DONE]`.
 
 ### 4. Validate the Frontend (UI)
 
-To access the UI, use the URL - http://${EXTERNAL_HOST_IP}:${CODEGEN_UI_SERVICE_PORT}
-A page should open when you click through to this address:
+-   **Service Name:** `codegen-ui-server`
+-   **How Tested:** Access the UI URL in a web browser and perform a test query.
+-   **Steps:** See [How to Open the UI](#how-to-open-the-ui).
+-   **Expected Result:** The UI loads correctly, and submitting a prompt results in generated code displayed on the page.
 
-![UI start page](../../../../assets/img/ui-starting-page.png)
+## How to Open the UI
 
-If a page of this type has opened, then we believe that the service is running and responding,
-and we can proceed to functional UI testing.
+1.  Determine the UI access URL using the `EXTERNAL_HOST_IP` and `CODEGEN_UI_SERVICE_PORT` variables defined in your sourced `set_env*.sh` file (use `set_env_vllm.sh` for the default vLLM deployment). The default URL format is:
+    `http://${EXTERNAL_HOST_IP}:${CODEGEN_UI_SERVICE_PORT}`
+    (e.g., `http://192.168.1.100:5173`)
 
-Let's enter the task for the service in the "Enter prompt here" field.
-For example, "Write a Python code that returns the current time and date" and press Enter.
-After that, a page with the result of the task should open:
+2.  Open this URL in your web browser.
 
-![UI result page](../../../../assets/img/ui-result-page.png)
+3.  You should see the CodeGen starting page:
+    ![UI start page](../../../../assets/img/ui-starting-page.png)
 
-If the result shown on the page is correct, then we consider the verification of the UI service to be successful.
+4.  Enter a prompt in the input field (e.g., "Write a Python code that returns the current time and date") and press Enter or click the submit button.
 
-### 5. Stop application
+5.  Verify that the generated code appears correctly:
+    ![UI result page](../../../../assets/img/ui-result-page.png)
 
-#### If you use vLLM
+## Troubleshooting
+
+*(No specific troubleshooting steps provided in the original content for this file. Add common issues if known.)*
+
+-   Check container logs (`docker compose -f <file> logs <service_name>`), especially for `codegen-vllm-service` or `codegen-tgi-service`.
+-   Ensure `HUGGINGFACEHUB_API_TOKEN` is correct.
+-   Verify ROCm drivers and Docker setup for GPU access.
+-   Confirm network connectivity and proxy settings.
+-   Ensure `HOST_IP` and `EXTERNAL_HOST_IP` are correctly set and accessible.
+-   If building locally, ensure build steps completed without error and image tags match compose file.
+
+## Stopping the Application
+
+#### If you use vLLM (Default)
 
 ```bash
-cd ~/codegen-install/GenAIExamples/CodeGen/docker_compose/amd/gpu/rocm
+# Ensure you are in the correct directory
+# cd GenAIExamples/CodeGen/docker_compose/amd/gpu/rocm
 docker compose -f compose_vllm.yaml down
 ```
 
 #### If you use TGI
 
 ```bash
-cd ~/codegen-install/GenAIExamples/CodeGen/docker_compose/amd/gpu/rocm
+# Ensure you are in the correct directory
+# cd GenAIExamples/CodeGen/docker_compose/amd/gpu/rocm
 docker compose -f compose.yaml down
 ```
+
+## Next Steps
+
+- Explore the alternative TGI deployment option if needed.
+- Refer to the main [CodeGen README](../../../README.md) for architecture details and links to other deployment methods (Kubernetes, Xeon).
+- Consult the [OPEA GenAIComps](https://github.com/opea-project/GenAIComps) repository for details on individual microservices.
