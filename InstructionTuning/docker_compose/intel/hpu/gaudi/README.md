@@ -3,6 +3,7 @@
 This document outlines the deployment process for a Instruction Tuning Service utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice on Intel Gaudi server. The steps include Docker image creation, container deployment. We will publish the Docker images to Docker Hub, it will simplify the deployment process for this service.
 
 # Table of contents
+
 1. [Instruction Tuning Quick Start deployment](#Instruction-Tuning-Quick-Start-deployment)
 
 ## Instruction Tuning Quick Start deployment
