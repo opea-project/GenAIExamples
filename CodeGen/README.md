@@ -71,7 +71,7 @@ flowchart LR
     V_RET{{Retriever<br>service}}
     Ingest{{Ingest data}}
     DP([Data Preparation]):::blue
-    LLM_gen{{LLM Serving<br>(TGI/vLLM)}}
+    LLM_gen{{LLM Serving}}
     GW([CodeGen GateWay]):::orange
 
     %% Data Preparation flow
