@@ -15,4 +15,4 @@ pip install virtualenv && \
     source venv/bin/activate && \
     pip install -r requirements.txt
 
-uvicorn main:app --reload --port=5000 --host=0.0.0.0
+uvicorn main:app --reload --port=5005 --host=0.0.0.0

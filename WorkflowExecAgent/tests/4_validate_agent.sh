@@ -27,8 +27,8 @@ function validate() {
 
 function validate_agent_service() {
     echo "----------------Test agent ----------------"
-    local CONTENT=$(curl http://${ip_address}:9090/v1/chat/completions -X POST -H "Content-Type: application/json" -d '{
-     "query": "'"${query}"'"
+    local CONTENT=$(curl http://${ip_address}:9091/v1/chat/completions -X POST -H "Content-Type: application/json" -d '{
+     "messages": "'"${query}"'"
     }')
     validate "$CONTENT" "$validate_result" "workflowexec-agent-endpoint"
     docker logs workflowexec-agent-endpoint

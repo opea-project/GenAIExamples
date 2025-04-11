@@ -5,7 +5,7 @@
 set -e
 
 wf_api_port=${wf_api_port}
-[[ -z "$wf_api_port" ]] && wf_api_port=5000
+[[ -z "$wf_api_port" ]] && wf_api_port=5005
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests/example_workflow"
 export WORKDIR=$WORKPATH/../../
