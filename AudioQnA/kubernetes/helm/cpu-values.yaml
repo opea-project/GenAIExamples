@@ -2,4 +2,11 @@
 # SPDX-License-Identifier: Apache-2.0
 
 tgi:
-  LLM_MODEL_ID: Intel/neural-chat-7b-v3-3
+  enabled: false
+vllm:
+  enabled: true
+
+speecht5:
+  enabled: true
+gpt-sovits:
+  enabled: false
