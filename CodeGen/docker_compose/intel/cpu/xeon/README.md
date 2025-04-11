@@ -230,4 +230,7 @@ docker compose --profile <profile_name> down
 
 - Consult the [OPEA GenAIComps](https://github.com/opea-project/GenAIComps) repository for details on individual microservices.
 - Refer to the main [CodeGen README](../../../../README.md) for links to benchmarking and Kubernetes deployment options.
+
+```
+
 ```
