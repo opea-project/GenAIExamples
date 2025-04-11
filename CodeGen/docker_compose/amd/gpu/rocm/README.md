@@ -390,7 +390,7 @@ _(No specific troubleshooting steps provided in the original content for this fi
 
 ## Stopping the Application
 
-#### If you use vLLM (Default)
+### If you use vLLM (Default)
 
 ```bash
 # Ensure you are in the correct directory
@@ -398,7 +398,7 @@ _(No specific troubleshooting steps provided in the original content for this fi
 docker compose -f compose_vllm.yaml down
 ```
 
-#### If you use TGI
+### If you use TGI
 
 ```bash
 # Ensure you are in the correct directory
