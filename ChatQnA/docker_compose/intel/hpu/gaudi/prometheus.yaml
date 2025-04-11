@@ -20,7 +20,7 @@ scrape_configs:
   - job_name: "tei-embedding"
     metrics_path: /metrics
     static_configs:
-      - targets: ["tei-embedding-gaudi-server:80"]
+      - targets: ["tei-embedding-server:80"]
   - job_name: "tei-reranking"
     metrics_path: /metrics
     static_configs:

@@ -66,7 +66,7 @@ The ChatQnA docker images should automatically be downloaded from the `OPEA regi
  ✔ Network gaudi_default                   Created                                                                      0.1s
  ✔ Container tei-reranking-gaudi-server    Started                                                                      0.7s
  ✔ Container vllm-gaudi-server             Started                                                                      0.7s
- ✔ Container tei-embedding-gaudi-server    Started                                                                      0.3s
+ ✔ Container tei-embedding-server          Started                                                                      0.3s
  ✔ Container redis-vector-db               Started                                                                      0.6s
  ✔ Container retriever-redis-server        Started                                                                      1.1s
  ✔ Container dataprep-redis-server         Started                                                                      1.1s
@@ -95,7 +95,7 @@ d560c232b120   opea/retriever:latest                                            
 a1d7ca2d3787   ghcr.io/huggingface/tei-gaudi:1.5.0                                                             "text-embeddings-rou…"   2 minutes ago   Up 2 minutes                0.0.0.0:8808->80/tcp, [::]:8808->80/tcp                                                tei-reranking-gaudi-server
 9a9f3fd4fd4c   opea/vllm-gaudi:latest                                                                          "python3 -m vllm.ent…"   2 minutes ago   Exited (1) 2 minutes ago                                                                                           vllm-gaudi-server
 1ab9bbdf5182   redis/redis-stack:7.2.0-v9                                                                      "/entrypoint.sh"         2 minutes ago   Up 2 minutes                0.0.0.0:6379->6379/tcp, :::6379->6379/tcp, 0.0.0.0:8001->8001/tcp, :::8001->8001/tcp   redis-vector-db
-9ee0789d819e   ghcr.io/huggingface/text-embeddings-inference:cpu-1.6                                           "text-embeddings-rou…"   2 minutes ago   Up 2 minutes                0.0.0.0:8090->80/tcp, [::]:8090->80/tcp                                                tei-embedding-gaudi-server
+9ee0789d819e   ghcr.io/huggingface/text-embeddings-inference:cpu-1.6                                           "text-embeddings-rou…"   2 minutes ago   Up 2 minutes                0.0.0.0:8090->80/tcp, [::]:8090->80/tcp                                                tei-embedding-server
 ```
 
 ### Test the Pipeline
@@ -129,7 +129,7 @@ docker compose -f compose.yaml down
  ✔ Container vllm-gaudi-server             Removed                                                                                                  0.0s
  ✔ Container retriever-redis-server        Removed                                                                                                 10.4s
  ✔ Container tei-reranking-gaudi-server    Removed                                                                                                  2.0s
- ✔ Container tei-embedding-gaudi-server    Removed                                                                                                  1.2s
+ ✔ Container tei-embedding-server          Removed                                                                                                  1.2s
  ✔ Container redis-vector-db               Removed                                                                                                  0.4s
  ✔ Network gaudi_default                   Removed                                                                                                  0.4s
 ```
