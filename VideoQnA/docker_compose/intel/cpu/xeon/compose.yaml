@@ -96,7 +96,7 @@ services:
       llm_download: ${LLM_DOWNLOAD}
     volumes:
       - videoqna-cache:/home/user/.cache
-      - "./data:/home/user/model"
+      - video-llama-model:/home/user/model
     restart: unless-stopped
   lvm:
     image: ${REGISTRY:-opea}/lvm:${TAG:-latest}
@@ -162,7 +162,6 @@ volumes:
   video-llama-model:
     external: true
   videoqna-cache:
-    external: true
 networks:
   default:
     driver: bridge

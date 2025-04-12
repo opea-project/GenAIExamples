@@ -79,6 +79,13 @@ function build_docker_images() {
     cd $WORKPATH/docker_image_build
     git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git GenAIComps
 
+    # Create .cache directory for cache volume to connect (avoids permission denied error)
+    OLD_STRING="mkdir -p /home/user "
+    NEW_STRING="mkdir -p /home/user/.cache "
+    sed -i "s|$OLD_STRING|$NEW_STRING|g" "GenAIComps/comps/dataprep/src/Dockerfile"
+    sed -i "s|$OLD_STRING|$NEW_STRING|g" "GenAIComps/comps/retrievers/src/Dockerfile"
+    sed -i "s|$OLD_STRING|$NEW_STRING|g" "GenAIComps/comps/third_parties/clip/src/Dockerfile"
+
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
     docker compose -f build.yaml build --no-cache 2>&1 > ${LOG_PATH}/docker_image_build.log
 
