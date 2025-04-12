@@ -67,10 +67,8 @@ Then run the command `docker images`, you will have following images ready:
 
 ## 🚀 Set the environment variables
 
-
-
 Before starting the services with `docker compose`, you need to set the following environment variables
-in your terminal.  
+in your terminal.
 
 ```bash
 export host_ip=$(hostname -I | awk '{print $1}')
