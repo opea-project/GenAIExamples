@@ -1,6 +1,6 @@
 # Deploying SearchQnA on Intel® Xeon® Processors
 
-This document outlines the single node deployment process for a SearchQnA application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservices on Intel Xeon server. 
+This document outlines the single node deployment process for a SearchQnA application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservices on Intel Xeon server.
 
 # Table of Contents
 
@@ -70,14 +70,14 @@ docker compose -f compose.yaml up -d
 
 Please refer to the table below to build different microservices from source:
 
-| Microservice | Deployment Guide                                                                                               |
-| ------------ | -------------------------------------------------------------------------------------------------------------- |
+| Microservice | Deployment Guide                                                                                   |
+| ------------ | -------------------------------------------------------------------------------------------------- |
 | Embedding    | [Embedding build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/embeddings/src) |
 | Retriever    | [Retriever build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/retrievers/src) |
 | Reranking    | [Reranking build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/rerankings/src) |
-| LLM          | [LLM build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/llms)                             |
-| MegaService  | [MegaService build guide](../../../../README_miscellaneous.md#build-megaservice-docker-image)                  |
-| UI           | [Basic UI build guide](../../../../README_miscellaneous.md#build-ui-docker-image)                              |
+| LLM          | [LLM build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/llms)                 |
+| MegaService  | [MegaService build guide](../../../../README_miscellaneous.md#build-megaservice-docker-image)      |
+| UI           | [Basic UI build guide](../../../../README_miscellaneous.md#build-ui-docker-image)                  |
 
 ### Check the Deployment Status
 
@@ -132,7 +132,7 @@ In the context of deploying a SearchQnA pipeline on an Intel® Xeon® platform, 
         -H 'Content-Type: application/json'
    ```
 
-2. Embedding Microservice   
+2. Embedding Microservice
 
    ```bash
     curl http://${host_ip}:3002/v1/embeddings\
@@ -141,7 +141,7 @@ In the context of deploying a SearchQnA pipeline on an Intel® Xeon® platform, 
       -H 'Content-Type: application/json'
    ```
 
-3. Web Retriever Microservice   
+3. Web Retriever Microservice
 
    ```bash
     export your_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
@@ -151,34 +151,34 @@ In the context of deploying a SearchQnA pipeline on an Intel® Xeon® platform, 
       -H 'Content-Type: application/json'
    ```
 
-4. Reranking backend Service   
+4. Reranking backend Service
 
-  ```bash
-   # TEI Reranking service
-    curl http://${host_ip}:3004/rerank \
-        -X POST \
-        -d '{"query":"What is Deep Learning?", "texts": ["Deep Learning is not...", "Deep learning is..."]}' \
-        -H 'Content-Type: application/json'
-   ```
-
-5. Reranking Microservice   
-
-  ```bash
-    curl http://${host_ip}:3005/v1/reranking\
+```bash
+ # TEI Reranking service
+  curl http://${host_ip}:3004/rerank \
       -X POST \
-      -d '{"initial_query":"What is Deep Learning?", "retrieved_docs": [{"text":"Deep Learning is not..."}, {"text":"Deep learning is..."}]}' \
+      -d '{"query":"What is Deep Learning?", "texts": ["Deep Learning is not...", "Deep learning is..."]}' \
       -H 'Content-Type: application/json'
-   ```
+```
 
-6. LLM backend Service   
+5. Reranking Microservice
 
-  ```bash
-   # TGI service
-    curl http://${host_ip}:3006/generate \
-      -X POST \
-      -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}' \
-      -H 'Content-Type: application/json'
-   ``` 
+```bash
+  curl http://${host_ip}:3005/v1/reranking\
+    -X POST \
+    -d '{"initial_query":"What is Deep Learning?", "retrieved_docs": [{"text":"Deep Learning is not..."}, {"text":"Deep learning is..."}]}' \
+    -H 'Content-Type: application/json'
+```
+
+6. LLM backend Service
+
+```bash
+ # TGI service
+  curl http://${host_ip}:3006/generate \
+    -X POST \
+    -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}' \
+    -H 'Content-Type: application/json'
+```
 
 7. LLM Microservice
 

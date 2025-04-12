@@ -1,6 +1,6 @@
 # Example SearchQnA deployments on AMD GPU (ROCm)
 
-This document outlines the deployment process for a SearchQnA application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on AMD GPU (ROCm). 
+This document outlines the deployment process for a SearchQnA application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on AMD GPU (ROCm).
 
 This example includes the following sections:
 
@@ -77,15 +77,15 @@ docker compose -f compose_vllm.yaml up -d
 
 Please refer to the table below to build different microservices from source:
 
-| Microservice | Deployment Guide                                                                                                                      |
-| ------------ | ------------------------------------------------------------------------------------------------------------------------------------- |
-| Reranking      | [whisper build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/rerankings/src)                           |
-| vLLM         | [vLLM build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/third_parties/vllm#build-docker)                        |
-| LLM-TextGen  | [LLM-TextGen build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/llms/src/text-generation#1-build-docker-image) |
-| Web-Retriever      | [Web-Retriever build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/web_retrievers/src)                           |
-| Embedding      | [Embedding build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/embeddings/src)                           |
-| MegaService  | [MegaService build guide](../../../../README_miscellaneous.md#build-megaservice-docker-image)                                         |
-| UI           | [Basic UI build guide](../../../../README_miscellaneous.md#build-ui-docker-image)                                                     |
+| Microservice  | Deployment Guide                                                                                                                    |
+| ------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| Reranking     | [whisper build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/rerankings/src)                                    |
+| vLLM          | [vLLM build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/third_parties/vllm#build-docker)                      |
+| LLM-TextGen   | [LLM-TextGen build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/llms/src/text-generation#1-build-docker-image) |
+| Web-Retriever | [Web-Retriever build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/web_retrievers/src)                          |
+| Embedding     | [Embedding build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/embeddings/src)                                  |
+| MegaService   | [MegaService build guide](../../../../README_miscellaneous.md#build-megaservice-docker-image)                                       |
+| UI            | [Basic UI build guide](../../../../README_miscellaneous.md#build-ui-docker-image)                                                   |
 
 ### Check the Deployment Status
 

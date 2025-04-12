@@ -27,7 +27,6 @@ The architecture of the SearchQnA Application is illustrated below:
 
 ![architecture](./assets/img/searchqna.png)
 
-
 The SearchQnA example is implemented using the component-level microservices defined in [GenAIComps](https://github.com/opea-project/GenAIComps). The flow chart below shows the information flow between different microservices for this example.
 
 ```mermaid
