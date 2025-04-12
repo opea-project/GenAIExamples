@@ -67,37 +67,32 @@ Then run the command `docker images`, you will have following images ready:
 
 ## 🚀 Set the environment variables
 
-```bash
-cd GenAIExamples/SearchQnA/docker_compose/
-```
 
-Before starting the services with `docker compose`, you have to recheck the following environment variables. Create a file to store
-your custom environment variables.
 
-```bash
-nano setenv_searchqna.sh
-```
-
-And paste in the following near top:
+Before starting the services with `docker compose`, you need to set the following environment variables
+in your terminal.  
 
 ```bash
 export host_ip=$(hostname -I | awk '{print $1}')
 export no_proxy=""
+
 # Create a Google Programmable / Custom Search Engine:  https://programmablesearchengine.google.com/controlpanel/create
 export GOOGLE_CSE_ID="my google programmable search key"
 # Obtain key: https://developers.google.com/custom-search/v1/introduction
 export GOOGLE_API_KEY="my google API key"
 export HUGGINGFACEHUB_API_TOKEN="my hugging face token"
+
 export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
-echo "LLM_MODEL_ID=${LLM_MODEL_ID}"
 export LOGFLAG=True
-source set_env.sh
 ```
+
+Please note that it's best practice not to store secrets in plain text, however you may use a secrets manager e.g., infisical, hashicorp, GCP, AWS, Azure.
 
 Then source the environment file:
 
 ```bash
-source setenv_searchqna.sh
+cd GenAIExamples/SearchQnA/docker_compose/
+source set_env.sh
 ```
 
 Sourcing this will also source the standard environment variables in `set_env.sh`.
