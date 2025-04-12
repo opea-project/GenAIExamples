@@ -28,8 +28,7 @@ services:
       COLLECTION_NAME: ${INDEX_NAME}
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
     volumes:
-      - "./data:/root/.cache/clip"
-      - "./data:/root/.cache/huggingface/hub"
+      - videoqna-cache:/home/user/.cache
   embedding:
     image: ${REGISTRY:-opea}/embedding-multimodal-clip:${TAG:-latest}
     container_name: clip-embedding-server
@@ -45,7 +44,7 @@ services:
       LOGFLAG: ${LOGFLAG:-False}
     restart: unless-stopped
     volumes:
-      - "./data:/root/.cache/huggingface/hub"
+      - videoqna-cache:/home/user/.cache
   retriever:
     image: ${REGISTRY:-opea}/retriever:${TAG:-latest}
     container_name: retriever-vdms-server
@@ -68,7 +67,7 @@ services:
       NUMBA_CACHE_DIR: "/tmp/numba_cache"
     restart: unless-stopped
     volumes:
-      - "./data:/root/.cache/huggingface/hub"
+      - videoqna-cache:/home/user/.cache
   reranking:
     image: ${REGISTRY:-opea}/reranking:${TAG:-latest}
     container_name: reranking-tei-server
@@ -96,7 +95,7 @@ services:
       no_proxy: ${no_proxy}
       llm_download: ${LLM_DOWNLOAD}
     volumes:
-      - "./data:/home/user/.cache"
+      - videoqna-cache:/home/user/.cache
       - "./data:/home/user/model"
     restart: unless-stopped
   lvm:
@@ -161,6 +160,8 @@ services:
     restart: always
 volumes:
   video-llama-model:
+    external: true
+  videoqna-cache:
     external: true
 networks:
   default:

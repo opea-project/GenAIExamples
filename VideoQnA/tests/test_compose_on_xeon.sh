@@ -15,29 +15,6 @@ LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
 export host_ip=${ip_address}
 
-function build_docker_images() {
-    opea_branch=${opea_branch:-"main"}
-    # If the opea_branch isn't main, replace the git clone branch in Dockerfile.
-    if [[ "${opea_branch}" != "main" ]]; then
-        cd $WORKPATH
-        OLD_STRING="RUN git clone --depth 1 https://github.com/opea-project/GenAIComps.git"
-        NEW_STRING="RUN git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git"
-        find . -type f -name "Dockerfile*" | while read -r file; do
-            echo "Processing file: $file"
-            sed -i "s|$OLD_STRING|$NEW_STRING|g" "$file"
-        done
-    fi
-
-    cd $WORKPATH/docker_image_build
-    git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git GenAIComps
-
-    echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    docker compose -f build.yaml build --no-cache 2>&1 > ${LOG_PATH}/docker_image_build.log
-
-	docker pull intellabs/vdms:latest
-    docker images && sleep 1s
-}
-
 function setup_env() {
     export HF_TOKEN=${HF_TOKEN}
     export HUGGINGFACEHUB_API_TOKEN=${HF_TOKEN}
@@ -86,11 +63,35 @@ function setup_env() {
     export no_proxy="${NO_PROXY},${host_ip},vdms-vector-db,dataprep-vdms-server,clip-embedding-server,reranking-tei-server,retriever-vdms-server,lvm-video-llama,lvm,videoqna-xeon-backend-server,videoqna-xeon-ui-server"
 }
 
+function build_docker_images() {
+    opea_branch=${opea_branch:-"main"}
+    # If the opea_branch isn't main, replace the git clone branch in Dockerfile.
+    if [[ "${opea_branch}" != "main" ]]; then
+        cd $WORKPATH
+        OLD_STRING="RUN git clone --depth 1 https://github.com/opea-project/GenAIComps.git"
+        NEW_STRING="RUN git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git"
+        find . -type f -name "Dockerfile*" | while read -r file; do
+            echo "Processing file: $file"
+            sed -i "s|$OLD_STRING|$NEW_STRING|g" "$file"
+        done
+    fi
+
+    cd $WORKPATH/docker_image_build
+    git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git GenAIComps
+
+    echo "Build all the images with --no-cache, check docker_image_build.log for details..."
+    docker compose -f build.yaml build --no-cache 2>&1 > ${LOG_PATH}/docker_image_build.log
+
+	docker pull intellabs/vdms:latest
+    docker images && sleep 1s
+}
+
 function start_services() {
     echo "Starting services..."
     cd $WORKPATH/docker_compose/intel/cpu/xeon/
 
     docker volume create video-llama-model
+    docker volume create videoqna-cache
     docker compose up vdms-vector-db dataprep -d
     sleep 30s
 
@@ -318,6 +319,7 @@ function stop_docker() {
     cd $WORKPATH/docker_compose/intel/cpu/xeon/
     docker compose stop && docker compose rm -f
     docker volume rm video-llama-model
+    docker volume rm videoqna-cache
     echo "Docker stopped."
 }
 
