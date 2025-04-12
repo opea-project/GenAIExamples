@@ -213,7 +213,8 @@ In the deploy steps, you need to start the VDMS DB and dataprep firstly, then in
 ```bash
 cd GenAIExamples/VideoQnA/docker_compose/intel/cpu/xeon/
 
-docker volume create video-llama-model
+docker volume create video-llama-
+docker volume create videoqna-cache
 docker compose up vdms-vector-db dataprep -d
 sleep 30s
 
@@ -368,4 +369,5 @@ To clean the volume:
 
 ```bash
 docker volume rm video-llama-model
+docker volume rm videoqna-cache
 ```
