@@ -119,7 +119,6 @@ In the context of deploying a SearchQnA pipeline on an Intel® Xeon® platform, 
 | File                                   | Description                                                                               |
 | -------------------------------------- | ----------------------------------------------------------------------------------------- |
 | [compose.yaml](./compose.yaml)         | Default compose file using vllm as serving framework and redis as vector database         |
-| [compose_tgi.yaml](./compose_tgi.yaml) | The LLM serving framework is TGI. All other configurations remain the same as the default |
 
 ## Validate Microservices
 
