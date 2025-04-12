@@ -57,7 +57,6 @@ flowchart LR
 
 ```
 
-
 ## Deploy SearchQnA Service
 
 The SearchQnA service can be effortlessly deployed on either Intel Gaudi2 or Intel Xeon Scalable Processors.
