@@ -23,38 +23,36 @@ The workflow falls into the following architecture:
 The SearchQnA example is implemented using the component-level microservices defined in [GenAIComps](https://github.com/opea-project/GenAIComps). The flow chart below shows the information flow between different microservices for this example.
 
 ```mermaid
----
-config:
-  layout: fixed
----
-flowchart RL
- subgraph MegaService["MegaService"]
-        LLM["LLM<br>llm-textgen-server"]
-        Reranker["Reranker<br>reranking-tei-server"]
-        Retriever["Retriever<br>web-retriever-server"]
-        Embedding["Embedding<br>embedding-server"]
-  end
- subgraph Backend["searchqna-backend-server"]
-    direction TB
-        MegaService
-        Gateway["Backend Endpoint"]
-  end
-    User["User"] --> Nginx["Nginx<br>searchqna-nginx-server"]
-    Nginx --> UI["UI<br>searchqna-ui-server"] & Gateway & User
+flowchart LR
+    User["User"] --> Nginx["Nginx<br>searchqna-xeon-nginx-server"]
+    Nginx --> UI["UI<br>searchqna-xeon-ui-server"] & Gateway & User
     UI --> Nginx
-    Gateway --> Nginx
+    Gateway --> Nginx & Embedding
     Embedding --> Retriever
     Retriever --> Reranker
     Reranker --> LLM
     LLM --> Gateway
+    LLM <-.-> TGI_Service["LLM<br>tgi-service"]
     Embedding <-.-> TEI_Embedding["TEI Embedding<br>tei-embedding-server"]
     Reranker <-.-> TEI_Reranker["TEI Reranker<br>tei-reranking-server"]
-    LLM <-.-> TGI_Service["LLM<br>tgi-service"]
+
      TEI_Embedding:::ext
      TEI_Reranker:::ext
      TGI_Service:::ext
-    classDef default fill:#fff,stroke:#000
-    classDef ext fill:#f9cb9c,stroke:#000
+
+ subgraph MegaService["MegaService"]
+        LLM["LLM<br>llm-textgen-server"]
+        Reranker["Reranker<br>reranking-tei-xeon-server"]
+        Retriever["Retriever<br>web-retriever-server"]
+        Embedding["Embedding<br>embedding-server"]
+  end
+ subgraph Backend["searchqna-xeon-backend-server"]
+    direction TB
+        MegaService
+        Gateway["Backend Endpoint"]
+ end
+    classDef default fill:#fff,stroke:#000,color:#000
+    classDef ext fill:#f9cb9c,stroke:#000,color:#000
     style MegaService margin-top:20px,margin-bottom:20px
 
 ```
