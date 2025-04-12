@@ -5,69 +5,74 @@
 
 services:
   vdms-vector-db:
-    image: intellabs/vdms:v2.8.0
+    image: intellabs/vdms:latest
     container_name: vdms-vector-db
     ports:
-      - "8001:55555"
+      - "${VDMS_PORT}:55555"
   dataprep:
     image: ${REGISTRY:-opea}/dataprep:${TAG:-latest}
     container_name: dataprep-vdms-server
     depends_on:
       - vdms-vector-db
     ports:
-      - "6007:5000"
+      - "${DATAPREP_PORT}:5000"
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
+      MULTIMODAL_DATAPREP: true
+      DATAPREP_COMPONENT_NAME: "OPEA_DATAPREP_MULTIMODALVDMS"
       VDMS_HOST: ${VDMS_HOST}
       VDMS_PORT: ${VDMS_PORT}
       INDEX_NAME: ${INDEX_NAME}
-      MULTIMODAL_DATAPREP: true
-    entrypoint: sh -c 'sleep 15 && python ingest_videos.py'
+      COLLECTION_NAME: ${INDEX_NAME}
+      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
     volumes:
-      - /home/$USER/.cache/clip:/home/user/.cache/clip
-      - /home/$USER/.cache/huggingface/hub:/home/user/.cache/huggingface/hub
+      - videoqna-cache:/home/user/.cache
   embedding:
     image: ${REGISTRY:-opea}/embedding-multimodal-clip:${TAG:-latest}
-    container_name: embedding-multimodal-server
+    container_name: clip-embedding-server
     ports:
-      - "6000:6000"
+      - "${EMBEDDER_PORT:-6990}:6990"
     ipc: host
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-    volumes:
-      - /home/$USER/.cache/huggingface/hub:/home/user/.cache/huggingface/hub
+      CLIP_EMBEDDING_ENDPOINT: ${CLIP_EMBEDDING_ENDPOINT}
+      EMBEDDING_COMPONENT_NAME: "OPEA_CLIP_EMBEDDING"
+      LOGFLAG: ${LOGFLAG:-False}
     restart: unless-stopped
+    volumes:
+      - videoqna-cache:/home/user/.cache
   retriever:
     image: ${REGISTRY:-opea}/retriever:${TAG:-latest}
     container_name: retriever-vdms-server
     depends_on:
       - vdms-vector-db
     ports:
-      - "7000:7000"
+      - "${RETRIEVER_PORT}:7000"
     ipc: host
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
+      INDEX_NAME: ${INDEX_NAME}
+      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      RETRIEVER_COMPONENT_NAME: "OPEA_RETRIEVER_VDMS"
       VDMS_INDEX_NAME: ${INDEX_NAME}
       VDMS_HOST: ${VDMS_HOST}
       VDMS_PORT: ${VDMS_PORT}
       VDMS_USE_CLIP: ${USECLIP}
-      LOGFLAG: ${LOGFLAG}
-      RETRIEVER_COMPONENT_NAME: "OPEA_RETRIEVER_VDMS"
-    entrypoint: sh -c 'sleep 30 && python retriever_vdms.py'
+      NUMBA_CACHE_DIR: "/tmp/numba_cache"
     restart: unless-stopped
     volumes:
-      - /home/$USER/.cache/huggingface/hub:/home/user/.cache/huggingface/hub
+      - videoqna-cache:/home/user/.cache
   reranking:
     image: ${REGISTRY:-opea}/reranking:${TAG:-latest}
     container_name: reranking-tei-server
     ports:
-      - "8000:8000"
+      - "${RERANKING_PORT}:8000"
     ipc: host
     environment:
       no_proxy: ${no_proxy}
@@ -76,12 +81,13 @@ services:
       CHUNK_DURATION: ${CHUNK_DURATION}
       FILE_SERVER_ENDPOINT: ${DATAPREP_GET_FILE_ENDPOINT}
       DATAPREP_GET_VIDEO_LIST_ENDPOINT: ${DATAPREP_GET_VIDEO_LIST_ENDPOINT}
+      RERANK_COMPONENT_NAME: ${RERANK_COMPONENT_NAME:-OPEA_VIDEO_RERANKING}
     restart: unless-stopped
   lvm-video-llama:
     image: ${REGISTRY:-opea}/lvm-video-llama:${TAG:-latest}
     container_name: lvm-video-llama
     ports:
-      - "9009:9009"
+      - ${VIDEO_LLAMA_PORT:-9009}:9009
     ipc: host
     environment:
       http_proxy: ${http_proxy}
@@ -89,20 +95,20 @@ services:
       no_proxy: ${no_proxy}
       llm_download: ${LLM_DOWNLOAD}
     volumes:
-      - "/home/$USER/.cache:/home/user/.cache"
+      - videoqna-cache:/home/user/.cache
       - video-llama-model:/home/user/model
     restart: unless-stopped
   lvm:
     image: ${REGISTRY:-opea}/lvm:${TAG:-latest}
     container_name: lvm
     ports:
-      - "9000:9000"
+      - "${LVM_PORT}:9399"
     ipc: host
     environment:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       no_proxy: ${no_proxy}
-      LVM_COMPONENT_NAME: "OPEA_VIDEO_LLAMA_LVM"
+      LVM_COMPONENT_NAME: ${LVM_COMPONENT_NAME:-OPEA_VIDEO_LLAMA_LVM}
       LVM_ENDPOINT: ${LVM_ENDPOINT}
     restart: unless-stopped
     depends_on:
@@ -119,13 +125,14 @@ services:
       - lvm-video-llama
       - lvm
     ports:
-      - "8888:8888"
-    entrypoint: sh -c 'sleep 45 && python videoqna.py'
+      - "${BACKEND_PORT}:8888"
     environment:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       no_proxy: ${no_proxy}
+      LOGFLAG: ${LOGFLAG:-False}
       MEGA_SERVICE_HOST_IP: ${MEGA_SERVICE_HOST_IP}
+      BACKEND_PORT: ${BACKEND_PORT}
       EMBEDDING_SERVICE_HOST_IP: ${EMBEDDING_SERVICE_HOST_IP}
       RETRIEVER_SERVICE_HOST_IP: ${RETRIEVER_SERVICE_HOST_IP}
       RERANK_SERVICE_HOST_IP: ${RERANK_SERVICE_HOST_IP}
@@ -138,18 +145,23 @@ services:
     depends_on:
       - videoqna-xeon-backend-server
     ports:
-      - "5173:5173"
+      - "${UI_PORT}:5173"
     environment:
       https_proxy: ${https_proxy}
       http_proxy: ${http_proxy}
       no_proxy: ${no_proxy}
       BACKEND_SERVICE_ENDPOINT: ${BACKEND_SERVICE_ENDPOINT}
       BACKEND_HEALTH_CHECK_ENDPOINT: ${BACKEND_HEALTH_CHECK_ENDPOINT}
+      DATAPREP_INGEST_SERVICE_ENDPOINT: ${DATAPREP_INGEST_SERVICE_ENDPOINT}
+      DATAPREP_PORT: ${DATAPREP_PORT}
+      BACKEND_PORT: ${BACKEND_PORT}
+      UI_PORT: ${UI_PORT}
     ipc: host
     restart: always
 volumes:
   video-llama-model:
     external: true
+  videoqna-cache:
 networks:
   default:
     driver: bridge
