@@ -4,7 +4,6 @@ This document outlines the single node deployment process for a AudioQnA applica
 
 Note: The default LLM is `meta-llama/Meta-Llama-3-8B-Instruct`. Before deploying the application, please make sure either you've requested and been granted the access to it on [Huggingface](https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct) or you've downloaded the model locally from [ModelScope](https://www.modelscope.cn/models).
 
-
 # Table of Contents
 
 1. [AudioQnA Quick Start Deployment](#audioqna-quick-start-deployment)
@@ -71,15 +70,14 @@ docker compose -f compose.yaml up -d
 
 Please refer to the table below to build different microservices from source:
 
-| Microservice | Deployment Guide                                                                                               |
-| ------------ | -------------------------------------------------------------------------------------------------------------- |
-| vLLM-gaudi         | [vLLM build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/third_parties/vllm#build-docker-1) |
-| LLM          | [LLM build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/llms)                             |
-| WHISPER      | [Whisper build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/asr/src#211-whisper-server-image)                              |
-| SPEECHT5     | [SpeechT5 build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/tts/src#211-speecht5-server-image)                              |
-| MegaService  | [MegaService build guide](../../../../README_miscellaneous.md#build-megaservice-docker-image)                  |
-| UI           | [Basic UI build guide](../../../../README_miscellaneous.md#build-ui-docker-image)                              |
-
+| Microservice | Deployment Guide                                                                                                     |
+| ------------ | -------------------------------------------------------------------------------------------------------------------- |
+| vLLM-gaudi   | [vLLM build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/third_parties/vllm#build-docker-1)     |
+| LLM          | [LLM build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/llms)                                   |
+| WHISPER      | [Whisper build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/asr/src#211-whisper-server-image)   |
+| SPEECHT5     | [SpeechT5 build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/tts/src#211-speecht5-server-image) |
+| MegaService  | [MegaService build guide](../../../../README_miscellaneous.md#build-megaservice-docker-image)                        |
+| UI           | [Basic UI build guide](../../../../README_miscellaneous.md#build-ui-docker-image)                                    |
 
 ### Check the Deployment Status
 
@@ -100,7 +98,6 @@ dbd585f0a95a   opea/speecht5-gaudi:latest                                       
 ```
 
 If any issues are encountered during deployment, refer to the [Troubleshooting](../../../../README_miscellaneous.md#troubleshooting) section.
-
 
 ### Validate the Pipeline
 
@@ -130,6 +127,7 @@ To stop the containers associated with the deployment, execute the following com
 ```bash
 docker compose -f compose.yaml down
 ```
+
 ## AudioQnA Docker Compose Files
 
 In the context of deploying an AudioQnA pipeline on an Intel® Gaudi® platform, we can pick and choose different large language model serving frameworks. The table below outlines the various configurations that are available as part of the application. These configurations can be used as templates and can be extended to different components available in [GenAIComps](https://github.com/opea-project/GenAIComps.git).
@@ -138,7 +136,6 @@ In the context of deploying an AudioQnA pipeline on an Intel® Gaudi® platform,
 | -------------------------------------- | ----------------------------------------------------------------------------------------- |
 | [compose.yaml](./compose.yaml)         | Default compose file using vllm as serving framework and redis as vector database         |
 | [compose_tgi.yaml](./compose_tgi.yaml) | The LLM serving framework is TGI. All other configurations remain the same as the default |
-
 
 ## Validate MicroServices
 

@@ -8,7 +8,6 @@ AudioQnA is an example that demonstrates the integration of Generative AI (GenAI
 2. [Deployment Options](#deployment-options)
 3. [Monitoring and Tracing](./README_miscellaneous.md)
 
-
 ## Architecture
 
 The AudioQnA example is implemented using the component-level microservices defined in [GenAIComps](https://github.com/opea-project/GenAIComps). The flow chart below shows the information flow between different microservices for this example.
@@ -68,14 +67,13 @@ flowchart LR
 
 ```
 
-
 ## Deployment Options
 
 The table below lists currently available deployment options. They outline in detail the implementation of this example on selected hardware.
 
-| Category               | Deployment Option    | Description                                                       |
-| ---------------------- | -------------------- | ----------------------------------------------------------------- |
-| On-premise Deployments | Docker compose       | [AudioQnA deployment on Xeon](./docker_compose/intel/cpu/xeon)   |
-|                        |                      | [AudioQnA deployment on Gaudi](./docker_compose/intel/hpu/gaudi) |
-|                        |                      | [AudioQnA deployment on AMD ROCm](./docker_compose/amd/gpu/rocm) |
-|                        | Kubernetes           | [Helm Charts](./kubernetes/helm)                                  |
+| Category               | Deployment Option | Description                                                      |
+| ---------------------- | ----------------- | ---------------------------------------------------------------- |
+| On-premise Deployments | Docker compose    | [AudioQnA deployment on Xeon](./docker_compose/intel/cpu/xeon)   |
+|                        |                   | [AudioQnA deployment on Gaudi](./docker_compose/intel/hpu/gaudi) |
+|                        |                   | [AudioQnA deployment on AMD ROCm](./docker_compose/amd/gpu/rocm) |
+|                        | Kubernetes        | [Helm Charts](./kubernetes/helm)                                 |
