@@ -92,11 +92,11 @@ docker ps -a
 For the default deployment, the following 5 containers should have started:
 
 ```
-1c67e44c39d2   opea/audioqna-ui:latest   "docker-entrypoint.s…"   About a minute ago   Up About a minute             0.0.0.0:5173->5173/tcp, :::5173->5173/tcp   audioqna-gaudi-ui-server
-833a42677247   opea/audioqna:latest      "python audioqna.py"     About a minute ago   Up About a minute             0.0.0.0:3008->8888/tcp, :::3008->8888/tcp   audioqna-gaudi-backend-server
-5dc4eb9bf499   opea/speecht5-gaudi:latest      "python speecht5_ser…"   About a minute ago   Up About a minute             0.0.0.0:7055->7055/tcp, :::7055->7055/tcp   speecht5-service
-814e6efb1166   opea/vllm-gaudi:latest          "python3 -m vllm.ent…"   About a minute ago   Up About a minute (healthy)   0.0.0.0:3006->80/tcp, :::3006->80/tcp       vllm-service
-46f7a00f4612   opea/whisper-gaudi:latest       "python whisper_serv…"   About a minute ago   Up About a minute             0.0.0.0:7066->7066/tcp, :::7066->7066/tcp   whisper-service
+23f27dab14a5   opea/whisper-gaudi:latest                                                                   "python whisper_serv…"   18 minutes ago   Up 18 minutes             0.0.0.0:7066->7066/tcp, :::7066->7066/tcp                                              whisper-service
+629da06b7fb2   opea/audioqna-ui:latest                                                                     "docker-entrypoint.s…"   19 minutes ago   Up 18 minutes             0.0.0.0:5173->5173/tcp, :::5173->5173/tcp                                              audioqna-gaudi-ui-server
+8a74d9806b87   opea/audioqna:latest                                                                        "python audioqna.py"     19 minutes ago   Up 18 minutes             0.0.0.0:3008->8888/tcp, [::]:3008->8888/tcp                                            audioqna-gaudi-backend-server
+29324430f42e   opea/vllm-gaudi:latest                                                                      "python3 -m vllm.ent…"   19 minutes ago   Up 19 minutes (healthy)   0.0.0.0:3006->80/tcp, [::]:3006->80/tcp                                                vllm-gaudi-service
+dbd585f0a95a   opea/speecht5-gaudi:latest                                                                  "python speecht5_ser…"   19 minutes ago   Up 19 minutes             0.0.0.0:7055->7055/tcp, :::7055->7055/tcp                                              speecht5-service
 ```
 
 If any issues are encountered during deployment, refer to the [Troubleshooting](../../../../README_miscellaneous.md#troubleshooting) section.
