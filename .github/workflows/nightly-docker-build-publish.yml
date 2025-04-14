@@ -9,8 +9,7 @@ on:
   workflow_dispatch:
 
 env:
-  # EXAMPLES: ${{ vars.NIGHTLY_RELEASE_EXAMPLES }}
-  EXAMPLES: "CodeGen,DocSum"
+  EXAMPLES: ${{ vars.NIGHTLY_RELEASE_EXAMPLES }}
   TAG: "latest"
   PUBLISH_TAGS: "latest"
 
