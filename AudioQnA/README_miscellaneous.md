@@ -1,4 +1,4 @@
-# Table of Contents
+## Table of Contents
 
 1. [Build MegaService Docker Image](#build-megaservice-docker-image)
 2. [Build UI Docker Image](#build-ui-docker-image)
@@ -26,7 +26,7 @@ docker build -t opea/audioqna-ui:latest --build-arg https_proxy=$https_proxy --b
 
 ## Generate a HuggingFace Access Token
 
-Some HuggingFace resources, such as some models, are only accessible if the developer have an access token. In the absence of a HuggingFace access token, the developer can create one by first creating an account by following the steps provided at [HuggingFace](https://huggingface.co/) and then generating a [user access token](https://huggingface.co/docs/transformers.js/en/guides/private#step-1-generating-a-user-access-token).
+Some HuggingFace resources, such as some models, are only accessible if the developer has an access token. In the absence of a HuggingFace access token, the developer can create one by first creating an account by following the steps provided at [HuggingFace](https://huggingface.co/) and then generating a [user access token](https://huggingface.co/docs/transformers.js/en/guides/private#step-1-generating-a-user-access-token).
 
 ## Troubleshooting
 
