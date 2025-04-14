@@ -54,4 +54,3 @@ jobs:
       test_compose: true
       test_helmchart: true
     secrets: inherit
-
