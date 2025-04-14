@@ -56,6 +56,8 @@ function start_services() {
     export TRANSLATION_BACKEND_SERVICE_ENDPOINT="http://${EXTERNAL_HOST_IP}:${TRANSLATION_BACKEND_SERVICE_PORT}/v1/translation"
     export TRANSLATION_NGINX_PORT=8090
     export MODEL_CACHE=${model_cache:-"~/opea/data"}
+    export host_ip=${ip_address}
+    source set_env_vllm.sh
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 

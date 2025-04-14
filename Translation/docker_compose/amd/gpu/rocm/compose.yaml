@@ -9,6 +9,7 @@ services:
       - "${TRANSLATION_TGI_SERVICE_PORT:-8008}:80"
     volumes:
       - "${MODEL_CACHE:-./data}:/data"
+
     shm_size: 8g
     environment:
       no_proxy: ${no_proxy}
