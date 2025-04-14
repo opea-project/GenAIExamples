@@ -118,7 +118,7 @@ curl http://${host_ip}:3008/v1/audioqna \
   | sed 's/^"//;s/"$//' | base64 -d > output.wav
 ```
 
-**Note** : Access the AudioQnA UI by web browser through this URL: `http://${host_ip}:5173`. Please confirm the `5173` port is opened in the firewall. To validate each microservie used in the pipeline refer to the [Validate Microservices](#validate-microservices) section.
+**Note** : Access the AudioQnA UI by web browser through this URL: `http://${host_ip}:5173`. Please confirm the `5173` port is opened in the firewall. To validate each microservice used in the pipeline refer to the [Validate Microservices](#validate-microservices) section.
 
 ### Cleanup the Deployment
 
