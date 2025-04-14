@@ -3,7 +3,7 @@
 ## Table of Contents
 
 - [Overview](#overview)
-- [Problem Statement](#problem-statement)
+- [Problem Motivation](#problem-motivation)
 - [Architecture](#architecture)
   - [High-Level Diagram](#high-level-diagram)
   - [OPEA Microservices Diagram](#opea-microservices-diagram)
@@ -18,7 +18,7 @@ The Code Generation (CodeGen) example demonstrates an AI application designed to
 
 This example showcases how developers can quickly deploy and utilize a CodeGen service, potentially integrating it into their IDEs or development workflows to accelerate tasks like code completion, translation, summarization, refactoring, and error detection.
 
-## Problem Statement
+## Problem Motivation
 
 Writing, understanding, and maintaining code can be time-consuming and complex. Developers often perform repetitive coding tasks, struggle with translating between languages, or need assistance understanding large codebases. CodeGen LLMs address this by automating code generation, providing intelligent suggestions, and assisting with various code-related tasks, thereby boosting productivity and reducing development friction. This OPEA example provides a blueprint for deploying such a capability using optimized components.
 

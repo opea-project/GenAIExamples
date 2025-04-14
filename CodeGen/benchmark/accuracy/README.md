@@ -97,7 +97,7 @@ Example output snippet:
     "prompt": "prompt",
     "max_memory_per_gpu": null,
     "check_references": false,
-    "codegen_url": "http://192.168.123.104:31234/v1/codegen"
+    "codegen_url": "http://192.168.123.104:7778/v1/codegen"
   }
 }
 ```
