@@ -7,7 +7,7 @@
 
 ## Build MegaService Docker Image
 
-To construct the Megaservice of CodeTrans, the [GenAIExamples](https://github.com/opea-project/GenAIExamples.git) repository if utilized. Build Megaservice Docker image via command below:
+To construct the Megaservice of CodeTrans, the [GenAIExamples](https://github.com/opea-project/GenAIExamples.git) repository is utilized. Build Megaservice Docker image via command below:
 
 ```bash
 git clone https://github.com/opea-project/GenAIExamples.git
@@ -39,6 +39,5 @@ Some HuggingFace resources, such as some models, are only accessible if the deve
      -d '{"inputs":"    ### System: Please translate the following Golang codes into  Python codes.    ### Original codes:    '\'''\'''\''Golang    \npackage main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n    '\'''\'''\''    ### Translated codes:","parameters":{"max_tokens":17, "do_sample": true}}' \
      -H 'Content-Type: application/json'
    ```
-
 2. (Docker only) If all microservices work well, check the port ${host_ip}:7777, the port may be allocated by other users, you can modify the `compose.yaml`.
 3. (Docker only) If you get errors like "The container name is in use", change container name in `compose.yaml`.
