@@ -32,7 +32,7 @@ body:
         - Mac
         - BSD
         - Other (Please let us know in description)
-        - NA
+        - N/A
     validations:
       required: true
 
@@ -57,7 +57,7 @@ body:
         - GPU-Nvidia
         - GPU-AMD
         - GPU-other (Please let us know in description)
-        - NA
+        - N/A
     validations:
       required: true
 
@@ -69,7 +69,7 @@ body:
         - Single Node
         - Multiple Nodes
         - Other
-        - NA
+        - N/A
       default: 0
     validations:
       required: true
