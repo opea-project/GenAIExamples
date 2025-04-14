@@ -1,0 +1,20 @@
+# Copyright (C) 2025 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+search_knowledge_base:
+  description: Search knowledge base of SEC filings.
+  callable_api: finqa_tools.py:get_context_bm25_llm
+  args_schema:
+    query:
+      type: str
+      description: the query to search for. Should be detailed. Do not include the company name.
+    company:
+      type: str
+      description: the company of interest.
+    year:
+      type: str
+      description: the year of interest, can only specify one year. can be an empty string.
+    quarter:
+      type: str
+      description: the quarter of interest, can only specify one quarter. can be 'Q1', 'Q2', 'Q3', 'Q4'. can be an empty string.
+  return_output: retrieved_data
