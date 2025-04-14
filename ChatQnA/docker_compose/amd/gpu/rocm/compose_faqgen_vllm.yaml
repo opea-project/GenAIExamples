@@ -151,7 +151,7 @@ services:
         condition: service_started
       chatqna-llm-faqgen:
         condition: service_started
-      chatqna-dataprep-service:
+      chatqna-dataprep-redis-service:
         condition: service_healthy
     ports:
       - "${CHATQNA_BACKEND_SERVICE_PORT}:8888"
