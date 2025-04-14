@@ -46,6 +46,8 @@ jobs:
               example=$(echo "$values_file" | cut -d'/' -f1) # CodeGen
               if [[ "$valuefile" == *"gaudi"* ]]; then
                 hardware="gaudi"
+              elif [[ "$valuefile" == *"rocm"* ]]; then
+                hardware="rocm"
               elif [[ "$valuefile" == *"nv"* ]]; then
                 continue
               else
