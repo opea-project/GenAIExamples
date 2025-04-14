@@ -75,7 +75,7 @@ jobs:
       examples: ${{ needs.get-build-matrix.outputs.EXAMPLES }}
 
   publish:
-    needs: [get-image-list, build-images]
+    needs: [get-build-matrix, get-image-list, build-images]
     if: always()
     strategy:
       matrix:
