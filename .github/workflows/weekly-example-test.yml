@@ -9,8 +9,7 @@ on:
   workflow_dispatch:
 
 env:
-  # EXAMPLES: ${{ vars.NIGHTLY_RELEASE_EXAMPLES }}
-  EXAMPLES: "CodeGen,CodeTrans"
+  EXAMPLES: ${{ vars.NIGHTLY_RELEASE_EXAMPLES }}
   NODES: "gaudi,xeon,rocm,arc"
 
 jobs:
@@ -26,7 +25,7 @@ jobs:
           examples=($(echo ${EXAMPLES} | tr ',' ' '))
           examples_json=$(printf '%s\n' "${examples[@]}" | sort -u | jq -R '.' | jq -sc '.')
           echo "examples=$examples_json" >> $GITHUB_OUTPUT
-          nodes=($(echo ${{ NODES }} | tr ',' ' '))
+          nodes=($(echo ${NODES} | tr ',' ' '))
           nodes_json=$(printf '%s\n' "${nodes[@]}" | sort -u | jq -R '.' | jq -sc '.')
           echo "nodes=$nodes_json" >> $GITHUB_OUTPUT
 
