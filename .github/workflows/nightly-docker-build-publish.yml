@@ -39,8 +39,7 @@ jobs:
       node: gaudi
 
   build-images:
-    needs: [build-comps-base]
-    if: ${{ needs.get-build-matrix.outputs.examples_json != '' }}
+    needs: [get-build-matrix, build-comps-base]
     strategy:
       matrix:
         example: ${{ fromJSON(needs.get-build-matrix.outputs.examples_json) }}
@@ -75,7 +74,7 @@ jobs:
       examples: ${{ needs.get-build-matrix.outputs.EXAMPLES }}
 
   publish:
-    needs: [build-images]
+    needs: [get-image-list, build-images]
     if: always()
     strategy:
       matrix:
