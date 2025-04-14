@@ -5,7 +5,7 @@ name: Nightly build/publish latest docker images
 
 on:
   schedule:
-    - cron: "30 14 * * *" # UTC time
+    - cron: "30 14 * * 1-5" # UTC time
   workflow_dispatch:
 
 env:
@@ -38,8 +38,21 @@ jobs:
     with:
       node: gaudi
 
-  build-and-test:
-    needs: get-build-matrix
+  build-images:
+    needs: [get-build-matrix, build-comps-base]
+    strategy:
+      matrix:
+        example: ${{ fromJSON(needs.get-build-matrix.outputs.examples_json) }}
+      fail-fast: false
+    uses: ./.github/workflows/_build_image.yml
+    with:
+      node: gaudi
+      example: ${{ matrix.example }}
+      inject_commit: true
+    secrets: inherit
+
+  test-example:
+    needs: [get-build-matrix]
     if: ${{ needs.get-build-matrix.outputs.examples_json != '' }}
     strategy:
       matrix:
@@ -47,21 +60,22 @@ jobs:
       fail-fast: false
     uses: ./.github/workflows/_example-workflow.yml
     with:
-      node: gaudi
+      node: xeon
+      build: false
       example: ${{ matrix.example }}
       test_compose: true
       inject_commit: true
     secrets: inherit
 
   get-image-list:
-    needs: get-build-matrix
+    needs: [get-build-matrix]
     uses: ./.github/workflows/_get-image-list.yml
     with:
       examples: ${{ needs.get-build-matrix.outputs.EXAMPLES }}
 
   publish:
-    needs: [get-build-matrix, get-image-list, build-and-test]
-    if: always() && ${{ needs.get-image-list.outputs.matrix != '' }}
+    needs: [get-build-matrix, get-image-list, build-images]
+    if: always()
     strategy:
       matrix:
         image: ${{ fromJSON(needs.get-image-list.outputs.matrix) }}
