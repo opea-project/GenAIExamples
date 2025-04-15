@@ -95,7 +95,7 @@ Please refer to the table below to build different microservices from source:
 | Reranker | https://github.com/opea-project/GenAIComps/tree/main/comps/rerankings |
 | LLM | https://github.com/opea-project/GenAIComps/tree/main/comps/llms|
 | Megaservice | [Megaservice build guide](../../../../README_miscellaneous.md#build-megaservice-docker-image) |
-| UI | [Basic UI build guide](../../../../README_miscellaneous.md#Build-UI-Docker-Image) |
+| UI | [Basic UI build guide](../../../../README_miscellaneous.md#build-ui-docker-image) |
 =======
 | Microservice      | Deployment Guide                                                                                          |
 | ----------------- | --------------------------------------------------------------------------------------------------------- |
