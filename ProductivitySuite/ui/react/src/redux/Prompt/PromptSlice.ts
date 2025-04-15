@@ -1,21 +1,19 @@
-// Copyright (C) 2024 Intel Corporation
-// SPDX-License-Identifier: Apache-2.0
-
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { createAsyncThunkWrapper } from "../thunkUtil";
-import client from "../../common/client";
-import { RootState } from "../store";
-import { notifications } from "@mantine/notifications";
-import { PROMPT_MANAGER_CREATE, PROMPT_MANAGER_GET } from "../../config";
+import { createAsyncThunkWrapper } from "@redux/thunkUtil";
+import { RootState } from "@redux/store";
+import { PROMPT_MANAGER_CREATE, PROMPT_MANAGER_GET, PROMPT_MANAGER_DELETE } from "@root/config";
+import { NotificationSeverity, notify } from "@components/Notification/Notification";
+import axios from 'axios';
 
 type promptReducer = {
   prompts: Prompt[];
 };
 
-type Prompt = {
+export type Prompt = {
   id: string;
   prompt_text: string;
   user: string;
+  type: string
 };
 
 const initialState: promptReducer = {
@@ -31,14 +29,14 @@ export const PromptSlice = createSlice({
     },
   },
   extraReducers(builder) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     builder.addCase(getPrompts.fulfilled, (state, action: PayloadAction<any>) => {
       state.prompts = action.payload;
     });
     builder.addCase(addPrompt.fulfilled, () => {
-      notifications.show({
-        message: "Prompt added SuccessFully",
-      });
+      notify("Prompt added Successfully", NotificationSeverity.SUCCESS);
+    });
+    builder.addCase(deletePrompt.fulfilled, () => {
+      notify("Prompt deleted Successfully", NotificationSeverity.SUCCESS);
     });
   },
 });
@@ -49,11 +47,10 @@ export default PromptSlice.reducer;
 
 export const getPrompts = createAsyncThunkWrapper(
   "prompts/getPrompts",
-  async ({ promptText }: { promptText: string | null }, { getState }) => {
+  async (_: void, { getState }) => {
     // @ts-ignore
     const state: RootState = getState();
-    const response = await client.post(PROMPT_MANAGER_GET, {
-      promptText: promptText,
+    const response = await axios.post(PROMPT_MANAGER_GET, {
       user: state.userReducer.name,
     });
     return response.data;
@@ -62,13 +59,41 @@ export const getPrompts = createAsyncThunkWrapper(
 
 export const addPrompt = createAsyncThunkWrapper(
   "prompts/addPrompt",
-  async ({ promptText }: { promptText: string }, { getState }) => {
+  async ({ promptText }: { promptText: string }, { dispatch, getState }) => {
     // @ts-ignore
     const state: RootState = getState();
-    const response = await client.post(PROMPT_MANAGER_CREATE, {
+    const response = await axios.post(PROMPT_MANAGER_CREATE, {
       prompt_text: promptText,
       user: state.userReducer.name,
+      //TODO: Would be nice to support type to set prompts for each
+      // type: state.conversationReducer.type // TODO: this might be crashing chatqna endpoint?
     });
+
+    dispatch(getPrompts())
+
     return response.data;
   },
 );
+
+//TODO delete prompt doesnt actually work, but responds 200
+export const deletePrompt = createAsyncThunkWrapper(
+  "prompts/deletePrompt",
+  async ({ promptId, promptText }: { promptId: string, promptText: string }, { dispatch, getState }) => {
+
+    // @ts-ignore
+    const state: RootState = getState();
+    const user = state.userReducer.name;
+
+    const response = await axios.post(PROMPT_MANAGER_DELETE, {
+      user: user, 
+      prompt_id: promptId,
+      prompt_text: promptText
+    });
+
+    dispatch(getPrompts())
+
+    return response.data;
+  },
+);
+
+

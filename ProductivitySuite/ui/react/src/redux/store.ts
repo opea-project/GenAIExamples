@@ -1,10 +1,7 @@
-// Copyright (C) 2024 Intel Corporation
-// SPDX-License-Identifier: Apache-2.0
-
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
-import userReducer from "./User/userSlice";
-import conversationReducer from "./Conversation/ConversationSlice";
-import promptReducer from "./Prompt/PromptSlice";
+import userReducer from "@redux/User/userSlice";
+import conversationReducer from "@redux/Conversation/ConversationSlice";
+import promptReducer from "@redux/Prompt/PromptSlice";
 import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
 
 export const store = configureStore({
