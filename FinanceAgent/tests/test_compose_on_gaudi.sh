@@ -76,7 +76,7 @@ function start_vllm_service_70B() {
     echo "token is ${HF_TOKEN}"
     echo "start vllm gaudi service"
     echo "**************model is $model**************"
-    docker run -d --runtime=habana --rm --name "vllm-gaudi-server-mh" -e HABANA_VISIBLE_DEVICES=0,2,3,4 -p $vllm_port:8000 -v $vllm_volume:/data -e HF_TOKEN=$HF_TOKEN -e HUGGING_FACE_HUB_TOKEN=$HF_TOKEN -e HF_HOME=/data -e OMPI_MCA_btl_vader_single_copy_mechanism=none -e PT_HPU_ENABLE_LAZY_COLLECTIVES=true -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e no_proxy=$no_proxy -e VLLM_SKIP_WARMUP=true --cap-add=sys_nice --ipc=host $vllm_image --model ${model} --max-seq-len-to-capture 16384 --tensor-parallel-size 4
+    docker run -d --runtime=habana --rm --name "vllm-gaudi-server" -e HABANA_VISIBLE_DEVICES=all -p $vllm_port:8000 -v $vllm_volume:/data -e HF_TOKEN=$HF_TOKEN -e HUGGING_FACE_HUB_TOKEN=$HF_TOKEN -e HF_HOME=/data -e OMPI_MCA_btl_vader_single_copy_mechanism=none -e PT_HPU_ENABLE_LAZY_COLLECTIVES=true -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e no_proxy=$no_proxy -e VLLM_SKIP_WARMUP=true --cap-add=sys_nice --ipc=host $vllm_image --model ${model} --max-seq-len-to-capture 16384 --tensor-parallel-size 4
     sleep 10s
     echo "Waiting vllm gaudi ready"
     n=0
