@@ -156,7 +156,7 @@ To see the UI, open a web browser to `http://${ip_address}:5175` to access the U
 
 3. Upload documents with UI
 
-    Click on the `Workplace` icon in the top left corner. Click `Knowledge`. Click on the "+" sign to the right of `Icloud Knowledge`. You can paste an url in the left hand side of the pop-up window, or upload a local file by click on the cloud icon on the right hand side of the pop-up window. Then click on the `Upload Confirm` button. Wait till the processing is done and the pop-up window will be closed on its own when the data ingestion is done. See the screenshot below.
+   Click on the `Workplace` icon in the top left corner. Click `Knowledge`. Click on the "+" sign to the right of `Icloud Knowledge`. You can paste an url in the left hand side of the pop-up window, or upload a local file by click on the cloud icon on the right hand side of the pop-up window. Then click on the `Upload Confirm` button. Wait till the processing is done and the pop-up window will be closed on its own when the data ingestion is done. See the screenshot below.
 
    Note: the data ingestion may take a few minutes depending on the length of the document. Please wait patiently and do not close the pop-up window.
 
