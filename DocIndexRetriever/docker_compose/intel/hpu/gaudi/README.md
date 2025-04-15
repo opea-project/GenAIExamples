@@ -48,19 +48,24 @@ export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
 export RERANK_MODEL_ID="BAAI/bge-reranker-base"
 export TEI_EMBEDDING_ENDPOINT="http://${host_ip}:8090"
 export TEI_RERANKING_ENDPOINT="http://${host_ip}:8808"
-export TGI_LLM_ENDPOINT="http://${host_ip}:8008"
 export REDIS_URL="redis://${host_ip}:6379"
 export INDEX_NAME="rag-redis"
-export MEGA_SERVICE_HOST_IP=${host_ip}
 export EMBEDDING_SERVICE_HOST_IP=${host_ip}
 export RETRIEVER_SERVICE_HOST_IP=${host_ip}
 export RERANK_SERVICE_HOST_IP=${host_ip}
-export LLM_SERVICE_HOST_IP=${host_ip}
 export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8000/v1/retrievaltool"
 export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/ingest"
 export llm_hardware='cpu/xeon' #cpu/xeon, xpu, hpu/gaudi
 cd GenAIExamples/DocIndexRetriever/intel/hpu/gaudi/
 docker compose up -d
+```
+
+To run the DocRetriever with Rerank pipeline using the Milvus vector database, use the compose_milvus.yaml configuration file and set the MILVUS_HOST environment variable.
+
+```bash
+export MILVUS_HOST=${host_ip}
+cd GenAIExamples/DocIndexRetriever/docker_compose/intel/hpu/gaudi
+docker compose -f compose_milvus.yaml up -d
 ```
 
 ## 4. Validation
@@ -82,9 +87,6 @@ Retrieval from KnowledgeBase
 curl http://${host_ip}:8889/v1/retrievaltool -X POST -H "Content-Type: application/json" -d '{
      "messages": "Explain the OPEA project?"
      }'
-
-# expected output
-{"id":"354e62c703caac8c547b3061433ec5e8","reranked_docs":[{"id":"06d5a5cefc06cf9a9e0b5fa74a9f233c","text":"Close SearchsearchMenu WikiNewsCommunity Daysx-twitter linkedin github searchStreamlining implementation of enterprise-grade Generative AIEfficiently integrate secure, performant, and cost-effective Generative AI workflows into business value.TODAYOPEA..."}],"initial_query":"Explain the OPEA project?"}
 ```
 
 **Note**: `messages` is the required field. You can also pass in parameters for the retriever and reranker in the request. The parameters that can changed are listed below.
@@ -113,7 +115,7 @@ curl http://${host_ip}:8889/v1/retrievaltool -X POST -H "Content-Type: applicati
    # embedding microservice
    curl http://${host_ip}:6000/v1/embeddings \
      -X POST \
-     -d '{"text":"Explain the OPEA project"}' \
+     -d '{"messages":"Explain the OPEA project"}' \
      -H 'Content-Type: application/json' > query
    docker container logs embedding-server
 

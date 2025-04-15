@@ -1,8 +1,16 @@
 # Agents for Question Answering
 
+## Table of contents
+
+1. [Overview](#overview)
+2. [Deploy with Docker](#deploy-with-docker)
+3. [How to interact with the agent system with UI](#how-to-interact-with-the-agent-system-with-ui)
+4. [Validate Services](#validate-services)
+5. [Register Tools](#how-to-register-other-tools-with-the-ai-agent)
+
 ## Overview
 
-This example showcases a hierarchical multi-agent system for question-answering applications. The architecture diagram is shown below. The supervisor agent interfaces with the user and dispatch tasks to two worker agents to gather information and come up with answers. The worker RAG agent uses the retrieval tool to retrieve relevant documents from the knowledge base (a vector database). The worker SQL agent retrieve relevant data from the SQL database. Although not included in this example, but other tools such as a web search tool or a knowledge graph query tool can be used by the supervisor agent to gather information from additional sources.
+This example showcases a hierarchical multi-agent system for question-answering applications. The architecture diagram below shows a supervisor agent that interfaces with the user and dispatches tasks to two worker agents to gather information and come up with answers. The worker RAG agent uses the retrieval tool to retrieve relevant documents from a knowledge base - a vector database. The worker SQL agent retrieves relevant data from a SQL database. Although not included in this example by default, other tools such as a web search tool or a knowledge graph query tool can be used by the supervisor agent to gather information from additional sources.
 ![Architecture Overview](assets/img/agent_qna_arch.png)
 
 The AgentQnA example is implemented using the component-level microservices defined in [GenAIComps](https://github.com/opea-project/GenAIComps). The flow chart below shows the information flow between different microservices for this example.
@@ -75,190 +83,173 @@ flowchart LR
 
 ```
 
-### Why Agent for question answering?
+### Why should AI Agents be used for question-answering?
 
-1. Improve relevancy of retrieved context.
-   RAG agent can rephrase user queries, decompose user queries, and iterate to get the most relevant context for answering user's questions. Compared to conventional RAG, RAG agent can significantly improve the correctness and relevancy of the answer.
-2. Expand scope of the agent.
-   The supervisor agent can interact with multiple worker agents that specialize in different domains with different skills (e.g., retrieve documents, write SQL queries, etc.), and thus can answer questions in multiple domains.
-3. Hierarchical multi-agents can improve performance.
-   Expert worker agents, such as RAG agent and SQL agent, can provide high-quality output for different aspects of a complex query, and the supervisor agent can aggregate the information together to provide a comprehensive answer. If we only use one agent and provide all the tools to this single agent, it may get overwhelmed and not able to provide accurate answers.
+1. **Improve relevancy of retrieved context.**
+   RAG agents can rephrase user queries, decompose user queries, and iterate to get the most relevant context for answering a user's question. Compared to conventional RAG, RAG agents significantly improve the correctness and relevancy of the answer because of the iterations it goes through.
+2. **Expand scope of skills.**
+   The supervisor agent interacts with multiple worker agents that specialize in different skills (e.g., retrieve documents, write SQL queries, etc.). Thus, it can answer questions with different methods.
+3. **Hierarchical multi-agents improve performance.**
+   Expert worker agents, such as RAG agents and SQL agents, can provide high-quality output for different aspects of a complex query, and the supervisor agent can aggregate the information to provide a comprehensive answer. If only one agent is used and all tools are provided to this single agent, it can lead to large overhead or not use the best tool to provide accurate answers.
 
 ## Deploy with docker
 
-1. Build agent docker image [Optional]
+### 1. Set up environment </br>
 
-> [!NOTE]
-> the step is optional. The docker images will be automatically pulled when running the docker compose commands. This step is only needed if pulling images failed.
-
-First, clone the opea GenAIComps repo.
+#### First, clone the `GenAIExamples` repo.
 
 ```
 export WORKDIR=<your-work-directory>
 cd $WORKDIR
-git clone https://github.com/opea-project/GenAIComps.git
+git clone https://github.com/opea-project/GenAIExamples.git
 ```
 
-Then build the agent docker image. Both the supervisor agent and the worker agent will use the same docker image, but when we launch the two agents we will specify different strategies and register different tools.
+#### Second, set up environment variables.
+
+##### For proxy environments only
 
 ```
-cd GenAIComps
-docker build -t opea/agent:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/agent/src/Dockerfile .
+export http_proxy="Your_HTTP_Proxy"
+export https_proxy="Your_HTTPs_Proxy"
+# Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
+export no_proxy="Your_No_Proxy"
 ```
 
-2. Set up environment for this example </br>
+##### For using open-source llms
 
-   First, clone this repo.
+```
+export HUGGINGFACEHUB_API_TOKEN=<your-HF-token>
+export HF_CACHE_DIR=<directory-where-llms-are-downloaded> #so that no need to redownload every time
+```
 
-   ```
-   export WORKDIR=<your-work-directory>
-   cd $WORKDIR
-   git clone https://github.com/opea-project/GenAIExamples.git
-   ```
+##### [Optional] OPANAI_API_KEY to use OpenAI models
 
-   Second, set up env vars.
+```
+export OPENAI_API_KEY=<your-openai-key>
+```
 
-   ```
-   # Example: host_ip="192.168.1.1" or export host_ip="External_Public_IP"
-   export host_ip=$(hostname -I | awk '{print $1}')
-   # if you are in a proxy environment, also set the proxy-related environment variables
-   export http_proxy="Your_HTTP_Proxy"
-   export https_proxy="Your_HTTPs_Proxy"
-   # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
-   export no_proxy="Your_No_Proxy"
+#### Third, set up environment variables for the selected hardware using the corresponding `set_env.sh`
 
-   export TOOLSET_PATH=$WORKDIR/GenAIExamples/AgentQnA/tools/
-   # for using open-source llms
-   export HUGGINGFACEHUB_API_TOKEN=<your-HF-token>
-   export HF_CACHE_DIR=<directory-where-llms-are-downloaded> #so that no need to redownload every time
+##### Gaudi
 
-   # optional: OPANAI_API_KEY if you want to use OpenAI models
-   export OPENAI_API_KEY=<your-openai-key>
-   ```
+```
+source $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/hpu/gaudi/set_env.sh
+```
 
-3. Deploy the retrieval tool (i.e., DocIndexRetriever mega-service)
+##### Xeon
 
-   First, launch the mega-service.
+```
+source $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/cpu/xeon/set_env.sh
+```
 
-   ```
-   cd $WORKDIR/GenAIExamples/AgentQnA/retrieval_tool
-   bash launch_retrieval_tool.sh
-   ```
+### 2. Launch the multi-agent system. </br>
 
-   Then, ingest data into the vector database. Here we provide an example. You can ingest your own data.
+We make it convenient to launch the whole system with docker compose, which includes microservices for LLM, agents, UI, retrieval tool, vector database, dataprep, and telemetry. There are 3 docker compose files, which make it easy for users to pick and choose. Users can choose a different retrieval tool other than the `DocIndexRetriever` example provided in our GenAIExamples repo. Users can choose not to launch the telemetry containers.
 
-   ```
-   bash run_ingest_data.sh
-   ```
+#### Launch on Gaudi
 
-4. Prepare SQL database
-   In this example, we will use the Chinook SQLite database. Run the commands below.
+On Gaudi, `meta-llama/Meta-Llama-3.3-70B-Instruct` will be served using vllm. The command below will launch the multi-agent system with the `DocIndexRetriever` as the retrieval tool for the Worker RAG agent.
 
-   ```
-   # Download data
-   cd $WORKDIR
-   git clone https://github.com/lerocha/chinook-database.git
-   cp chinook-database/ChinookDatabase/DataSources/Chinook_Sqlite.sqlite $WORKDIR/GenAIExamples/AgentQnA/tests/
-   ```
+```bash
+cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/hpu/gaudi/
+docker compose -f $WORKDIR/GenAIExamples/DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml -f compose.yaml up -d
+```
 
-5. Launch other tools. </br>
-   In this example, we will use some of the mock APIs provided in the Meta CRAG KDD Challenge to demonstrate the benefits of gaining additional context from mock knowledge graphs.
+> **Note**: To enable the web search tool, skip this step and proceed to the "[Optional] Web Search Tool Support" section.
 
-   ```
-   docker run -d -p=8080:8000 docker.io/aicrowd/kdd-cup-24-crag-mock-api:v0
-   ```
+To enable Open Telemetry Tracing, compose.telemetry.yaml file need to be merged along with default compose.yaml file.
+Gaudi example with Open Telemetry feature:
 
-6. Launch multi-agent system. </br>
-   We provide two options for `llm_engine` of the agents: 1. open-source LLMs on Intel Gaudi2, 2. OpenAI models via API calls.
+```bash
+cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/hpu/gaudi/
+docker compose -f $WORKDIR/GenAIExamples/DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml -f compose.yaml -f compose.telemetry.yaml up -d
+```
 
-   ::::{tab-set}
-   :::{tab-item} Gaudi
-   :sync: Gaudi
+##### [Optional] Web Search Tool Support
 
-   On Gaudi2 we will serve `meta-llama/Meta-Llama-3.1-70B-Instruct` using vllm.
+<details>
+<summary> Instructions </summary>
+A web search tool is supported in this example and can be enabled by running docker compose with the `compose.webtool.yaml` file.
+The Google Search API is used. Follow the [instructions](https://python.langchain.com/docs/integrations/tools/google_search) to create an API key and enable the Custom Search API on a Google account. The environment variables `GOOGLE_CSE_ID` and `GOOGLE_API_KEY` need to be set.
 
-   First build vllm-gaudi docker image.
+```bash
+cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/hpu/gaudi/
+export GOOGLE_CSE_ID="YOUR_ID"
+export GOOGLE_API_KEY="YOUR_API_KEY"
+docker compose -f $WORKDIR/GenAIExamples/DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml -f compose.yaml -f compose.webtool.yaml up -d
+```
 
-   ```bash
-   cd $WORKDIR
-   git clone https://github.com/vllm-project/vllm.git
-   cd ./vllm
-   git checkout v0.6.6
-   docker build --no-cache -f Dockerfile.hpu -t opea/vllm-gaudi:latest --shm-size=128g . --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy
-   ```
+</details>
 
-   Then launch vllm on Gaudi2 with the command below.
+#### Launch on Xeon
 
-   ```bash
-   vllm_port=8086
-   model="meta-llama/Meta-Llama-3.1-70B-Instruct"
-   docker run -d --runtime=habana --rm --name "vllm-gaudi-server" -e HABANA_VISIBLE_DEVICES=0,1,2,3 -p $vllm_port:8000 -v $vllm_volume:/data -e HF_TOKEN=$HF_TOKEN -e HUGGING_FACE_HUB_TOKEN=$HF_TOKEN -e HF_HOME=/data -e OMPI_MCA_btl_vader_single_copy_mechanism=none -e PT_HPU_ENABLE_LAZY_COLLECTIVES=true -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e no_proxy=$no_proxy -e VLLM_SKIP_WARMUP=true --cap-add=sys_nice --ipc=host opea/vllm-gaudi:latest --model ${model} --max-seq-len-to-capture 16384 --tensor-parallel-size 4
-   ```
+On Xeon, only OpenAI models are supported. The command below will launch the multi-agent system with the `DocIndexRetriever` as the retrieval tool for the Worker RAG agent.
 
-   Then launch Agent microservices.
+```bash
+export OPENAI_API_KEY=<your-openai-key>
+cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/cpu/xeon
+docker compose -f $WORKDIR/GenAIExamples/DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml -f compose_openai.yaml up -d
+```
 
-   ```bash
-   cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/hpu/gaudi/
-   bash launch_agent_service_gaudi.sh
-   ```
+### 3. Ingest Data into the vector database
 
-   :::
-   :::{tab-item} Xeon
-   :sync: Xeon
+The `run_ingest_data.sh` script will use an example jsonl file to ingest example documents into a vector database. Other ways to ingest data and other types of documents supported can be found in the OPEA dataprep microservice located in the opea-project/GenAIComps repo.
 
-   To use OpenAI models, run commands below.
+```bash
+cd  $WORKDIR/GenAIExamples/AgentQnA/retrieval_tool/
+bash run_ingest_data.sh
+```
 
-   ```
-   export OPENAI_API_KEY=<your-openai-key>
-   cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/cpu/xeon
-   bash launch_agent_service_openai.sh
-   ```
+> **Note**: This is a one-time operation.
 
-   :::
-   ::::
+## How to interact with the agent system with UI
 
-## Deploy AgentQnA UI
+The UI microservice is launched in the previous step with the other microservices.
+To see the UI, open a web browser to `http://${ip_address}:5173` to access the UI. Note the `ip_address` here is the host IP of the UI microservice.
 
-The AgentQnA UI can be deployed locally or using Docker.
+1. `create Admin Account` with a random value
+2. add opea agent endpoint `http://$ip_address:9090/v1` which is a openai compatible api
 
-For detailed instructions on deploying AgentQnA UI, refer to the [AgentQnA UI Guide](./ui/svelte/README.md).
+![opea-agent-setting](assets/img/opea-agent-setting.png)
 
-## Deploy using Helm Chart
+3. test opea agent with ui
+
+![opea-agent-test](assets/img/opea-agent-test.png)
+
+## [Optional] Deploy using Helm Charts
 
 Refer to the [AgentQnA helm chart](./kubernetes/helm/README.md) for instructions on deploying AgentQnA on Kubernetes.
 
-## Validate services
+## Validate Services
 
-1. First look at logs of the agent docker containers:
+1. First look at logs for each of the agent docker containers:
 
-```
+```bash
 # worker RAG agent
 docker logs rag-agent-endpoint
 
 # worker SQL agent
 docker logs sql-agent-endpoint
-```
 
-```
 # supervisor agent
 docker logs react-agent-endpoint
 ```
 
-You should see something like "HTTP server setup successful" if the docker containers are started successfully.</p>
+Look for the message "HTTP server setup successful" to confirm the agent docker container has started successfully.</p>
 
-2. You can use python to validate the agent system
+2. Use python to validate each agent is working properly:
 
 ```bash
 # RAG worker agent
-python tests/test.py --prompt "Tell me about Michael Jackson song Thriller" --agent_role "worker" --ext_port 9095
+python $WORKDIR/GenAIExamples/AgentQnA/tests/test.py --prompt "Tell me about Michael Jackson song Thriller" --agent_role "worker" --ext_port 9095
 
 # SQL agent
-python tests/test.py --prompt "How many employees in company" --agent_role "worker" --ext_port 9096
+python $WORKDIR/GenAIExamples/AgentQnA/tests/test.py --prompt "How many employees in company" --agent_role "worker" --ext_port 9096
 
 # supervisor agent: this will test a two-turn conversation
-python tests/test.py --agent_role "supervisor" --ext_port 9090
+python $WORKDIR/GenAIExamples/AgentQnA/tests/test.py --agent_role "supervisor" --ext_port 9090
 ```
 
-## How to register your own tools with agent
+## How to register other tools with the AI agent
 
-You can take a look at the tools yaml and python files in this example. For more details, please refer to the "Provide your own tools" section in the instructions [here](https://github.com/opea-project/GenAIComps/tree/main/comps/agent/src/README.md).
+The [tools](./tools) folder contains YAML and Python files for additional tools for the supervisor and worker agents. Refer to the "Provide your own tools" section in the instructions [here](https://github.com/opea-project/GenAIComps/tree/main/comps/agent/src/README.md) to add tools and customize the AI agents.

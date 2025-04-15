@@ -65,6 +65,9 @@ if [[ "$telemetry" == "yes" || "$telemetry" == "y" ]]; then
     export OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=grpc://$JAEGER_IP:4317
     export TELEMETRY_ENDPOINT=http://$JAEGER_IP:4318/v1/traces
     telemetry_flag=true
+    pushd "grafana/dashboards" > /dev/null
+    source download_opea_dashboard.sh
+    popd > /dev/null
 else
     telemetry_flag=false
 fi
@@ -83,11 +86,11 @@ export NUM_CARDS=${NUM_CARDS}
 export host_ip=${host_ip}
 export http_proxy=${http_proxy}
 export https_proxy=${https_proxy}
-export no_proxy=${no_proxy}
 export LOGFLAG=${LOGFLAG}
 export JAEGER_IP=${JAEGER_IP}
 export OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=${OTEL_EXPORTER_OTLP_TRACES_ENDPOINT}
 export TELEMETRY_ENDPOINT=${TELEMETRY_ENDPOINT}
+export no_proxy="${no_proxy},chatqna-gaudi-ui-server,chatqna-gaudi-backend-server,dataprep-redis-service,tei-embedding-service,retriever,tei-reranking-service,tgi-service,vllm-service,guardrails,jaeger,prometheus,grafana,gaudi-exporter,node-exporter,$JAEGER_IP"
 EOF
 
 echo ".env file has been created with the following content:"

@@ -10,7 +10,7 @@ class ModelIn(BaseModel):
     model_type: Optional[str] = "LLM"
     model_id: Optional[str]
     model_path: Optional[str] = "./"
-    weight: Optional[str]
+    weight: Optional[str] = "INT4"
     device: Optional[str] = "cpu"
 
 

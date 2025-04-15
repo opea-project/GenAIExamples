@@ -4,7 +4,7 @@
 services:
   edgecraftrag-server:
     build:
-      context: ..
+      context: ../
       args:
         http_proxy: ${http_proxy}
         https_proxy: ${https_proxy}
@@ -12,15 +12,23 @@ services:
     image: ${REGISTRY:-opea}/edgecraftrag-server:${TAG:-latest}
   edgecraftrag-ui:
     build:
-      context: ..
+      context: ../
       args:
         http_proxy: ${http_proxy}
         https_proxy: ${https_proxy}
       dockerfile: ./ui/docker/Dockerfile.ui
     image: ${REGISTRY:-opea}/edgecraftrag-ui:${TAG:-latest}
+  edgecraftrag-ui-gradio:
+    build:
+      context: ../
+      args:
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
+      dockerfile: ./ui/docker/Dockerfile.gradio
+    image: ${REGISTRY:-opea}/edgecraftrag-ui-gradio:${TAG:-latest}
   edgecraftrag:
     build:
-      context: ..
+      context: ../
       args:
         http_proxy: ${http_proxy}
         https_proxy: ${https_proxy}

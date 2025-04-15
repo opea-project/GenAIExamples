@@ -41,3 +41,8 @@ services:
       dockerfile: comps/llms/src/text-generation/Dockerfile
     extends: searchqna
     image: ${REGISTRY:-opea}/llm-textgen:${TAG:-latest}
+  vllm-rocm:
+    build:
+      context: GenAIComps
+      dockerfile: comps/third_parties/vllm/src/Dockerfile.amd_gpu
+    image: ${REGISTRY:-opea}/vllm-rocm:${TAG:-latest}
