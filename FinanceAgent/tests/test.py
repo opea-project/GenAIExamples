@@ -76,8 +76,8 @@ def test_chat_completion_multi_turn(args):
 def test_supervisor_agent_single_turn(args):
     url = f"http://{args.ip_addr}:{args.ext_port}/v1/chat/completions"
     query_list = [
-        # "What was Gap's revenue growth in 2024?",
-        # "Can you summarize Costco's 2025 Q2 earnings call?",
+        "What was Gap's revenue growth in 2024?",
+        "Can you summarize Costco's 2025 Q2 earnings call?",
         "Should I increase investment in Johnson & Johnson?",
     ]
     for query in query_list:
