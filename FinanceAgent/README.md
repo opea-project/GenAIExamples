@@ -36,7 +36,8 @@ genaiexamples
 ```bash
 export HF_CACHE_DIR=/path/to/your/model/cache/
 export HF_TOKEN=<you-hf-token>
-
+export FINNHUB_API_KEY=<your-finnhub-api-key> # go to https://finnhub.io/ to get your free api key
+export FINANCIAL_DATASETS_API_KEY=<your-api-key> # go to 
 ```
 
 ### 2.3 Build docker images

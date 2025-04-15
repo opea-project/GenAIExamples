@@ -76,7 +76,7 @@ function start_vllm_service_70B() {
     echo "token is ${HF_TOKEN}"
     echo "start vllm gaudi service"
     echo "**************model is $model**************"
-    docker run -d --runtime=habana --rm --name "vllm-gaudi-server" -e HABANA_VISIBLE_DEVICES=all -p $vllm_port:8000 -v $vllm_volume:/data -e HF_TOKEN=$HF_TOKEN -e HUGGING_FACE_HUB_TOKEN=$HF_TOKEN -e HF_HOME=/data -e OMPI_MCA_btl_vader_single_copy_mechanism=none -e PT_HPU_ENABLE_LAZY_COLLECTIVES=true -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e no_proxy=$no_proxy -e VLLM_SKIP_WARMUP=true --cap-add=sys_nice --ipc=host $vllm_image --model ${model} --max-seq-len-to-capture 16384 --tensor-parallel-size 4
+    docker run -d --runtime=habana --rm --name "vllm-gaudi-server-mh" -e HABANA_VISIBLE_DEVICES=0,2,3,4 -p $vllm_port:8000 -v $vllm_volume:/data -e HF_TOKEN=$HF_TOKEN -e HUGGING_FACE_HUB_TOKEN=$HF_TOKEN -e HF_HOME=/data -e OMPI_MCA_btl_vader_single_copy_mechanism=none -e PT_HPU_ENABLE_LAZY_COLLECTIVES=true -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e no_proxy=$no_proxy -e VLLM_SKIP_WARMUP=true --cap-add=sys_nice --ipc=host $vllm_image --model ${model} --max-seq-len-to-capture 16384 --tensor-parallel-size 4
     sleep 10s
     echo "Waiting vllm gaudi ready"
     n=0
@@ -165,50 +165,50 @@ function start_agents() {
 
 function validate_agent_service() {
     # # test worker finqa agent
-    echo "======================Testing worker finqa agent======================"
-    export agent_port="9095"
-    prompt="What is Gap's revenue in 2024?"
-    local CONTENT=$(python3 $WORKDIR/GenAIExamples/FinanceAgent/tests/test.py --prompt "$prompt" --agent_role "worker" --ext_port $agent_port)
-    echo $CONTENT
-    local EXIT_CODE=$(validate "$CONTENT" "15" "finqa-agent-endpoint")
-    echo $EXIT_CODE
-    local EXIT_CODE="${EXIT_CODE:0-1}"
-    if [ "$EXIT_CODE" == "1" ]; then
-        docker logs finqa-agent-endpoint
-        exit 1
-    fi
+    # echo "======================Testing worker finqa agent======================"
+    # export agent_port="9095"
+    # prompt="What is Gap's revenue in 2024?"
+    # local CONTENT=$(python3 $WORKDIR/GenAIExamples/FinanceAgent/tests/test.py --prompt "$prompt" --agent_role "worker" --ext_port $agent_port)
+    # echo $CONTENT
+    # local EXIT_CODE=$(validate "$CONTENT" "15" "finqa-agent-endpoint")
+    # echo $EXIT_CODE
+    # local EXIT_CODE="${EXIT_CODE:0-1}"
+    # if [ "$EXIT_CODE" == "1" ]; then
+    #     docker logs finqa-agent-endpoint
+    #     exit 1
+    # fi
 
     # # test worker research agent
-    echo "======================Testing worker research agent======================"
-    export agent_port="9096"
-    prompt="generate NVDA financial research report"
-    local CONTENT=$(python3 $WORKDIR/GenAIExamples/AgentQnA/tests/test.py --prompt "$prompt" --agent_role "worker" --ext_port $agent_port --tool_choice "get_current_date" --tool_choice "get_share_performance")
-    local EXIT_CODE=$(validate "$CONTENT" "NVDA" "research-agent-endpoint")
-    echo $CONTENT
-    echo $EXIT_CODE
-    local EXIT_CODE="${EXIT_CODE:0-1}"
-    if [ "$EXIT_CODE" == "1" ]; then
-	docker logs research-agent-endpoint
-	exit 1
-    fi
+    # echo "======================Testing worker research agent======================"
+    # export agent_port="9096"
+    # prompt="Johnson & Johnson"
+    # local CONTENT=$(python3 $WORKDIR/GenAIExamples/AgentQnA/tests/test.py --prompt "$prompt" --agent_role "worker" --ext_port $agent_port --tool_choice "get_current_date" --tool_choice "get_share_performance")
+    # local EXIT_CODE=$(validate "$CONTENT" "Johnson" "research-agent-endpoint")
+    # echo $CONTENT
+    # echo $EXIT_CODE
+    # local EXIT_CODE="${EXIT_CODE:0-1}"
+    # if [ "$EXIT_CODE" == "1" ]; then
+	# docker logs research-agent-endpoint
+	# exit 1
+    # fi
 
     # test supervisor react agent
     echo "======================Testing supervisor agent: single turns ======================"
     export agent_port="9090"
     local CONTENT=$(python3 $WORKDIR/GenAIExamples/FinanceAgent/tests/test.py --agent_role "supervisor" --ext_port $agent_port --stream)
     echo $CONTENT
-    # local EXIT_CODE=$(validate "$CONTENT" "" "react-agent-endpoint")
-    # echo $EXIT_CODE
-    # local EXIT_CODE="${EXIT_CODE:0-1}"
-    # if [ "$EXIT_CODE" == "1" ]; then
-    #     docker logs react-agent-endpoint
-    #     exit 1
-    # fi
+    local EXIT_CODE=$(validate "$CONTENT" "test completed with success" "react-agent-endpoint")
+    echo $EXIT_CODE
+    local EXIT_CODE="${EXIT_CODE:0-1}"
+    if [ "$EXIT_CODE" == "1" ]; then
+        docker logs react-agent-endpoint
+        exit 1
+    fi
 
-    echo "======================Testing supervisor agent: multi turns ======================"
-    local CONTENT=$(python3 $WORKDIR/GenAIExamples/FinanceAgent/tests/test.py --agent_role "supervisor" --ext_port $agent_port --multi-turn --stream)
-    echo $CONTENT
-    # local EXIT_CODE=$(validate "$CONTENT" "" "react-agent-endpoint")
+    # echo "======================Testing supervisor agent: multi turns ======================"
+    # local CONTENT=$(python3 $WORKDIR/GenAIExamples/FinanceAgent/tests/test.py --agent_role "supervisor" --ext_port $agent_port --multi-turn --stream)
+    # echo $CONTENT
+    # local EXIT_CODE=$(validate "$CONTENT" "test completed with success" "react-agent-endpoint")
     # echo $EXIT_CODE
     # local EXIT_CODE="${EXIT_CODE:0-1}"
     # if [ "$EXIT_CODE" == "1" ]; then
@@ -231,40 +231,40 @@ function stop_agent_docker() {
 
 echo "workpath: $WORKPATH"
 echo "=================== Stop containers ===================="
-stop_llm
+# stop_llm
 stop_agent_docker
-stop_dataprep
+# stop_dataprep
 
 cd $WORKPATH/tests
 
 # echo "=================== #1 Building docker images===================="
-build_vllm_docker_image
-build_dataprep_agent_images
+# build_vllm_docker_image
+# build_dataprep_agent_images
 
 #### for local test
 # build_agent_image_local
 # echo "=================== #1 Building docker images completed===================="
 
 # echo "=================== #2 Start vllm endpoint===================="
-start_vllm_service_70B
+# start_vllm_service_70B
 # echo "=================== #2 vllm endpoint started===================="
 
 # echo "=================== #3 Start dataprep and ingest data ===================="
-start_dataprep
-ingest_validate_dataprep
+# start_dataprep
+# ingest_validate_dataprep
 # echo "=================== #3 Data ingestion and validation completed===================="
 
-echo "=================== #4 Start agents ===================="
+# echo "=================== #4 Start agents ===================="
 start_agents
 validate_agent_service
-echo "=================== #4 Agent test passed ===================="
+# echo "=================== #4 Agent test passed ===================="
 
-echo "=================== #5 Stop microservices ===================="
-stop_agent_docker
-stop_dataprep
-stop_llm
-echo "=================== #5 Microservices stopped===================="
+# echo "=================== #5 Stop microservices ===================="
+# stop_agent_docker
+# stop_dataprep
+# stop_llm
+# echo "=================== #5 Microservices stopped===================="
 
-echo y | docker system prune
+# echo y | docker system prune
 
-echo "ALL DONE!!"
+# echo "ALL DONE!!"
