@@ -264,10 +264,10 @@ The table provides a comprehensive overview of the ChatQnA services utilized acr
 | vllm-service                 | opea/vllm-gaudi:latest                                | No       | Handles large language model (LLM) tasks, utilizing Gaudi hardware.                                |
 | tgi-guardrails-service       | ghcr.io/huggingface/tgi-gaudi:2.3.1                   | Yes      | Specific to the TGI deployment, focuses on text generation inference using Gaudi hardware.         |
 | guardrails                   | opea/guardrails:latest                                | Yes      | Acts as a safety layer, interfacing with the `vllm-guardrails-service` to enforce safety protocols. |
-| chatqna-gaudi-backend-server | opea/chatqna:latest                                   | No       | Serves as the backend for the ChatQnA application, with variations depending on the deployment.    |
-| chatqna-gaudi-ui-server      | opea/chatqna-ui:latest                                | No       | Provides the user interface for the ChatQnA application.                                           |
-| chatqna-gaudi-nginx-server   | opea/nginx:latest                                     | No       | Acts as a reverse proxy, managing traffic between the UI and backend services.                     |
-| jaeger                       | jaegertracing/all-in-one:latest                       | Yes      | Provides tracing and monitoring capabilities for distributed systems.                              |
+| chatqna-gaudi-backend-server | opea/chatqna:latest                                   | No       | Serves as the backend for the ChatQnA application, with variations depending on the deployment.     |
+| chatqna-gaudi-ui-server      | opea/chatqna-ui:latest                                | No       | Provides the user interface for the ChatQnA application.                                            |
+| chatqna-gaudi-nginx-server   | opea/nginx:latest                                     | No       | Acts as a reverse proxy, managing traffic between the UI and backend services.                      |
+| jaeger                       | jaegertracing/all-in-one:latest                       | Yes      | Provides tracing and monitoring capabilities for distributed systems.                               |
 
 Many of these services provide pipeline support required for all ChatQnA deployments, and are not specific to supporting the Intel® Gaudi® platform. Therefore, while the `redis-vector-db`, `dataprep-redis-service`, `retriever`, `chatqna-gaudi-backend-server`, `chatqna-gaudi-ui-server`, `chatqna-gaudi-nginx-server`, `jaeger` are configurable, they will not be covered by this example, which will focus on the configuration specifics of the services modified to support the Intel® Gaudi® platform.
 
