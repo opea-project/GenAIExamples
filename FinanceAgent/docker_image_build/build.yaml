@@ -20,4 +20,3 @@ services:
         https_proxy: ${https_proxy}
         no_proxy: ${no_proxy}
     image: ${REGISTRY:-opea}/agent:${TAG:-latest}
-

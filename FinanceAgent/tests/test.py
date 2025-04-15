@@ -73,6 +73,7 @@ def test_chat_completion_multi_turn(args):
     print("===============End of second turn==================")
     return "test completed with success"
 
+
 def test_supervisor_agent_single_turn(args):
     url = f"http://{args.ip_addr}:{args.ext_port}/v1/chat/completions"
     query_list = [
@@ -88,6 +89,7 @@ def test_supervisor_agent_single_turn(args):
             return "error"
         print("=" * 50)
     return "test completed with success"
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
