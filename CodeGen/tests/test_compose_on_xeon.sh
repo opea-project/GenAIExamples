@@ -10,10 +10,20 @@ echo "TAG=IMAGE_TAG=${IMAGE_TAG}"
 export REGISTRY=${IMAGE_REPO}
 export TAG=${IMAGE_TAG}
 export MODEL_CACHE=${model_cache:-"./data"}
+export REDIS_DB_PORT=6379
+export REDIS_INSIGHTS_PORT=8001
+export REDIS_RETRIEVER_PORT=7000
+export EMBEDDER_PORT=6000
+export TEI_EMBEDDER_PORT=8090
+export DATAPREP_REDIS_PORT=6007
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
+
+export http_proxy=${http_proxy}
+export https_proxy=${https_proxy}
+export no_proxy=${no_proxy},${ip_address}
 
 function build_docker_images() {
     opea_branch=${opea_branch:-"main"}
@@ -32,13 +42,14 @@ function build_docker_images() {
     git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
 
     git clone https://github.com/vllm-project/vllm.git && cd vllm
-    VLLM_VER="v0.8.2"
+    VLLM_VER="v0.8.3"
     echo "Check out vLLM tag ${VLLM_VER}"
     git checkout ${VLLM_VER} &> /dev/null
     cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="codegen codegen-ui llm-textgen vllm"
+    service_list="codegen codegen-gradio-ui llm-textgen vllm dataprep retriever embedding"
+
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu
@@ -54,12 +65,21 @@ function start_services() {
     export LLM_MODEL_ID="Qwen/Qwen2.5-Coder-7B-Instruct"
     export LLM_ENDPOINT="http://${ip_address}:8028"
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+    export MEGA_SERVICE_PORT=7778
     export MEGA_SERVICE_HOST_IP=${ip_address}
     export LLM_SERVICE_HOST_IP=${ip_address}
-    export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:7778/v1/codegen"
+    export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:${MEGA_SERVICE_PORT}/v1/codegen"
     export host_ip=${ip_address}
 
-    sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
+    export REDIS_URL="redis://${host_ip}:${REDIS_DB_PORT}"
+    export RETRIEVAL_SERVICE_HOST_IP=${host_ip}
+    export RETRIEVER_COMPONENT_NAME="OPEA_RETRIEVER_REDIS"
+    export INDEX_NAME="CodeGen"
+
+    export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
+    export TEI_EMBEDDING_HOST_IP=${host_ip}
+    export TEI_EMBEDDING_ENDPOINT="http://${host_ip}:${TEI_EMBEDDER_PORT}"
+    export DATAPREP_ENDPOINT="http://${host_ip}:${DATAPREP_REDIS_PORT}/v1/dataprep"
 
     # Start Docker Containers
     docker compose --profile ${compose_profile} up -d > ${LOG_PATH}/start_services_with_compose.log
@@ -82,23 +102,34 @@ function validate_services() {
     local DOCKER_NAME="$4"
     local INPUT_DATA="$5"
 
-    local HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL")
-    if [ "$HTTP_STATUS" -eq 200 ]; then
-        echo "[ $SERVICE_NAME ] HTTP status is 200. Checking content..."
+    if [[ "$SERVICE_NAME" == "ingest" ]]; then
+        local HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST -F "$INPUT_DATA" -F index_name=test_redis -H 'Content-Type: multipart/form-data' "$URL")
 
-        local CONTENT=$(curl -s -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL" | tee ${LOG_PATH}/${SERVICE_NAME}.log)
-
-        if echo "$CONTENT" | grep -q "$EXPECTED_RESULT"; then
-            echo "[ $SERVICE_NAME ] Content is as expected."
+        if [ "$HTTP_STATUS" -eq 200 ]; then
+            echo "[ $SERVICE_NAME ] HTTP status is 200. Data preparation succeeded..."
         else
-            echo "[ $SERVICE_NAME ] Content does not match the expected result: $CONTENT"
+            echo "[ $SERVICE_NAME ] Data preparation failed..."
+        fi
+
+    else
+        local HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL")
+        if [ "$HTTP_STATUS" -eq 200 ]; then
+            echo "[ $SERVICE_NAME ] HTTP status is 200. Checking content..."
+
+            local CONTENT=$(curl -s -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL" | tee ${LOG_PATH}/${SERVICE_NAME}.log)
+
+            if echo "$CONTENT" | grep -q "$EXPECTED_RESULT"; then
+                echo "[ $SERVICE_NAME ] Content is as expected."
+            else
+                echo "[ $SERVICE_NAME ] Content does not match the expected result: $CONTENT"
+                docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
+                exit 1
+            fi
+        else
+            echo "[ $SERVICE_NAME ] HTTP status is not 200. Received status was $HTTP_STATUS"
             docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
             exit 1
         fi
-    else
-        echo "[ $SERVICE_NAME ] HTTP status is not 200. Received status was $HTTP_STATUS"
-        docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
-        exit 1
     fi
     sleep 5s
 }
@@ -122,6 +153,14 @@ function validate_microservices() {
         "llm-textgen-server" \
         '{"query":"def print_hello_world():", "max_tokens": 256}'
 
+    # Data ingest microservice
+    validate_services \
+        "${ip_address}:6007/v1/dataprep/ingest" \
+        "Data preparation succeeded" \
+        "ingest" \
+        "dataprep-redis-server" \
+        'link_list=["https://modin.readthedocs.io/en/latest/index.html"]'
+
 }
 
 function validate_megaservice() {
@@ -132,6 +171,14 @@ function validate_megaservice() {
         "mega-codegen" \
         "codegen-xeon-backend-server" \
         '{"messages": "def print_hello_world():", "max_tokens": 256}'
+
+    # Curl the Mega Service with index_name and agents_flag
+    validate_services \
+        "${ip_address}:7778/v1/codegen" \
+        "" \
+        "mega-codegen" \
+        "codegen-xeon-backend-server" \
+        '{ "index_name": "test_redis", "agents_flag": "True", "messages": "def print_hello_world():", "max_tokens": 256}'
 
 }
 
@@ -163,6 +210,17 @@ function validate_frontend() {
     fi
 }
 
+function validate_gradio() {
+    local URL="http://${ip_address}:5173/health"
+    local HTTP_STATUS=$(curl "$URL")
+    local SERVICE_NAME="Gradio"
+
+    if [ "$HTTP_STATUS" = '{"status":"ok"}' ]; then
+        echo "[ $SERVICE_NAME ] HTTP status is 200. UI server is running successfully..."
+    else
+        echo "[ $SERVICE_NAME ] UI server has failed..."
+    fi
+}
 
 function stop_docker() {
     local docker_profile="$1"
@@ -202,7 +260,7 @@ function main() {
 
         validate_microservices "${docker_llm_container_names[${i}]}"
         validate_megaservice
-        validate_frontend
+        validate_gradio
 
         stop_docker "${docker_compose_profiles[${i}]}"
         sleep 5s

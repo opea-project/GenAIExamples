@@ -1,4 +1,4 @@
-# Build Mega Service of MultimodalQnA for AMD ROCm
+# Build and Deploy MultimodalQnA Application on AMD GPU (ROCm)
 
 This document outlines the deployment process for a MultimodalQnA application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on AMD server with ROCm GPUs. The steps include Docker image creation, container deployment via Docker Compose, and service execution to integrate microservices such as `multimodal_embedding` that employs [BridgeTower](https://huggingface.co/BridgeTower/bridgetower-large-itm-mlm-gaudi) model as embedding model, `multimodal_retriever`, `lvm`, and `multimodal-data-prep`. We will publish the Docker images to Docker Hub soon, it will simplify the deployment process for this service.
 
@@ -6,95 +6,217 @@ For detailed information about these instance types, you can refer to this [link
 
 After launching your instance, you can connect to it using SSH (for Linux instances) or Remote Desktop Protocol (RDP) (for Windows instances). From there, you'll have full access to your Xeon server, allowing you to install, configure, and manage your applications as needed.
 
-## Setup Environment Variables
+## Build Docker Images
 
-Since the `compose.yaml` will consume some environment variables, you need to setup them in advance as below.
+### 1. Build Docker Image
 
-Please use `./set_env.sh` (. set_env.sh) script to set up all needed Environment Variables.
+- #### Create application install directory and go to it:
 
-**Export the value of the public IP address of your server to the `host_ip` environment variable**
+  ```bash
+  mkdir ~/multimodalqna-install && cd multimodalqna-install
+  ```
 
-Note: Please replace with `host_ip` with you external IP address, do not use localhost.
+- #### Clone the repository GenAIExamples (the default repository branch "main" is used here):
 
-## 🚀 Build Docker Images
+  ```bash
+  git clone https://github.com/opea-project/GenAIExamples.git
+  ```
 
-### 1. Build embedding-multimodal-bridgetower Image
+  If you need to use a specific branch/tag of the GenAIExamples repository, then (v1.3 replace with its own value):
 
-Build embedding-multimodal-bridgetower docker image
+  ```bash
+  git clone https://github.com/opea-project/GenAIExamples.git && cd GenAIExamples && git checkout v1.3
+  ```
 
-```bash
-git clone https://github.com/opea-project/GenAIComps.git
-cd GenAIComps
-docker build --no-cache -t opea/embedding-multimodal-bridgetower:latest --build-arg EMBEDDER_PORT=$EMBEDDER_PORT --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/third_parties/bridgetower/src/Dockerfile .
+  We remind you that when using a specific version of the code, you need to use the README from this version:
+
+- #### Go to build directory:
+
+  ```bash
+  cd ~/multimodalqna-install/GenAIExamples/MultimodalQnA/docker_image_build
+  ```
+
+- Cleaning up the GenAIComps repository if it was previously cloned in this directory.
+  This is necessary if the build was performed earlier and the GenAIComps folder exists and is not empty:
+
+  ```bash
+  echo Y | rm -R GenAIComps
+  ```
+
+- #### Clone the repository GenAIComps (the default repository branch "main" is used here):
+
+  ```bash
+  git clone https://github.com/opea-project/GenAIComps.git
+  ```
+
+  If you use a specific tag of the GenAIExamples repository,
+  then you should also use the corresponding tag for GenAIComps. (v1.3 replace with its own value):
+
+  ```bash
+  git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout v1.3
+  ```
+
+  We remind you that when using a specific version of the code, you need to use the README from this version.
+
+- #### Setting the list of images for the build (from the build file.yaml)
+
+  If you want to deploy a vLLM-based or TGI-based application, then the set of services is installed as follows:
+
+  #### vLLM-based application
+
+  ```bash
+  service_list="multimodalqna multimodalqna-ui embedding-multimodal-bridgetower embedding retriever lvm dataprep whisper vllm-rocm"
+  ```
+
+  #### TGI-based application
+
+  ```bash
+  service_list="multimodalqna multimodalqna-ui embedding-multimodal-bridgetower embedding retriever lvm dataprep whisper"
+  ```
+
+- #### Optional. Pull TGI Docker Image (Do this if you want to use TGI)
+
+  ```bash
+  docker pull ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
+  ```
+
+- #### Build Docker Images
+
+  ```bash
+  docker compose -f build.yaml build ${service_list} --no-cache
+  ```
+
+  After the build, we check the list of images with the command:
+
+  ```bash
+  docker image ls
+  ```
+
+  The list of images should include:
+
+  ##### vLLM-based application:
+
+  - opea/vllm-rocm:latest
+    - opea/lvm:latest
+    - opea/multimodalqna:latest
+    - opea/multimodalqna-ui:latest
+    - opea/dataprep:latest
+    - opea/embedding:latest
+    - opea/embedding-multimodal-bridgetower:latest
+    - opea/retriever:latest
+    - opea/whisper:latest
+
+  ##### TGI-based application:
+
+  - ghcr.io/huggingface/text-generation-inference:2.4.1-rocm
+    - opea/lvm:latest
+    - opea/multimodalqna:latest
+    - opea/multimodalqna-ui:latest
+    - opea/dataprep:latest
+    - opea/embedding:latest
+    - opea/embedding-multimodal-bridgetower:latest
+    - opea/retriever:latest
+    - opea/whisper:latest
+
+---
+
+## Deploy the MultimodalQnA Application
+
+### Docker Compose Configuration for AMD GPUs
+
+To enable GPU support for AMD GPUs, the following configuration is added to the Docker Compose file:
+
+- compose_vllm.yaml - for vLLM-based application
+- compose.yaml - for TGI-based
+
+```yaml
+shm_size: 1g
+devices:
+  - /dev/kfd:/dev/kfd
+  - /dev/dri/:/dev/dri/
+cap_add:
+  - SYS_PTRACE
+group_add:
+  - video
+security_opt:
+  - seccomp:unconfined
 ```
 
-Build embedding microservice image
+This configuration forwards all available GPUs to the container. To use a specific GPU, specify its `cardN` and `renderN` device IDs. For example:
 
-```bash
-docker build --no-cache -t opea/embedding:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/src/Dockerfile .
+```yaml
+shm_size: 1g
+devices:
+  - /dev/kfd:/dev/kfd
+  - /dev/dri/card0:/dev/dri/card0
+  - /dev/dri/renderD128:/dev/dri/renderD128
+cap_add:
+  - SYS_PTRACE
+group_add:
+  - video
+security_opt:
+  - seccomp:unconfined
 ```
 
-### 2. Build LVM Images
+**How to Identify GPU Device IDs:**
+Use AMD GPU driver utilities to determine the correct `cardN` and `renderN` IDs for your GPU.
 
-Build lvm-llava image
+### Set deploy environment variables
 
-```bash
-docker build --no-cache -t opea/lvm-llava:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/third_parties/whisper/src/Dockerfile .
-```
+#### Setting variables in the operating system environment:
 
-### 3. Build retriever-multimodal-redis Image
-
-```bash
-docker build --no-cache -t opea/retriever:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/src/Dockerfile .
-```
-
-### 4. Build dataprep-multimodal-redis Image
+##### Set variable HUGGINGFACEHUB_API_TOKEN:
 
 ```bash
-docker build --no-cache -t opea/dataprep:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/src/Dockerfile .
+### Replace the string 'your_huggingfacehub_token' with your HuggingFacehub repository access token.
+export HUGGINGFACEHUB_API_TOKEN='your_huggingfacehub_token'
 ```
 
-### 5. Build MegaService Docker Image
+#### Set variables value in set_env\*\*\*\*.sh file:
 
-To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the [multimodalqna.py](../../../../multimodalqna.py) Python script. Build MegaService Docker image via below command:
+Go to Docker Compose directory:
 
 ```bash
-git clone https://github.com/opea-project/GenAIExamples.git
-cd GenAIExamples/MultimodalQnA
-docker build --no-cache -t opea/multimodalqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
-cd ../..
+cd ~/multimodalqna-install/GenAIExamples/MultimodalQnA/docker_compose/amd/gpu/rocm
 ```
 
-### 6. Build UI Docker Image
+The example uses the Nano text editor. You can use any convenient text editor:
 
-Build frontend Docker image via below command:
+#### If you use vLLM
 
 ```bash
-cd GenAIExamples/MultimodalQnA/ui/
-docker build --no-cache -t opea/multimodalqna-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
-cd ../../../
+nano set_env_vllm.sh
 ```
 
-### 7. Pull TGI AMD ROCm Image
+#### If you use TGI
 
 ```bash
-docker pull ghcr.io/huggingface/text-generation-inference:2.4.1-rocm
+nano set_env.sh
 ```
 
-Then run the command `docker images`, you will have the following 8 Docker Images:
+If you are in a proxy environment, also set the proxy-related environment variables:
 
-1. `opea/dataprep:latest`
-2. `ghcr.io/huggingface/text-generation-inference:2.4.1-rocm`
-3. `opea/lvm:latest`
-4. `opea/retriever:latest`
-5. `opea/embedding:latest`
-6. `opea/embedding-multimodal-bridgetower:latest`
-7. `opea/multimodalqna:latest`
-8. `opea/multimodalqna-ui:latest`
+```bash
+export http_proxy="Your_HTTP_Proxy"
+export https_proxy="Your_HTTPs_Proxy"
+```
 
-## 🚀 Start Microservices
+Set the values of the variables:
 
-### Required Models
+- **HOST_IP, HOST_IP_EXTERNAL** - These variables are used to configure the name/address of the service in the operating system environment for the application services to interact with each other and with the outside world.
+
+  If your server uses only an internal address and is not accessible from the Internet, then the values for these two variables will be the same and the value will be equal to the server's internal name/address.
+
+  If your server uses only an external, Internet-accessible address, then the values for these two variables will be the same and the value will be equal to the server's external name/address.
+
+  If your server is located on an internal network, has an internal address, but is accessible from the Internet via a proxy/firewall/load balancer, then the HOST_IP variable will have a value equal to the internal name/address of the server, and the EXTERNAL_HOST_IP variable will have a value equal to the external name/address of the proxy/firewall/load balancer behind which the server is located.
+
+  We set these values in the file set_env\*\*\*\*.sh
+
+- **Variables with names like "**\*\*\*\*\*\*\_PORT"\*\* - These variables set the IP port numbers for establishing network connections to the application services.
+  The values shown in the file set_env.sh or set_env_vllm they are the values used for the development and testing of the application, as well as configured for the environment in which the development is performed. These values must be configured in accordance with the rules of network access to your environment's server, and must not overlap with the IP ports of other applications that are already in use.
+
+#### Required Models
 
 By default, the multimodal-embedding and LVM models are set to a default value as listed below:
 
@@ -108,57 +230,187 @@ Note:
 
 For AMD ROCm System "Xkev/Llama-3.2V-11B-cot" is recommended to run on ghcr.io/huggingface/text-generation-inference:2.4.1-rocm
 
-### Start all the services Docker Containers
+#### Set variables with script set_env\*\*\*\*.sh
 
-> Before running the docker compose command, you need to be in the folder that has the docker compose yaml file
+#### If you use vLLM
 
 ```bash
-cd GenAIExamples/MultimodalQnA/docker_compose/amd/gpu/rocm
+. set_env_vllm.sh
+```
+
+#### If you use TGI
+
+```bash
 . set_env.sh
+```
+
+### Start the services:
+
+#### If you use vLLM
+
+```bash
+docker compose -f compose_vllm.yaml up -d
+```
+
+#### If you use TGI
+
+```bash
 docker compose -f compose.yaml up -d
 ```
 
-Note: Please replace with `host_ip` with your external IP address, do not use localhost.
+All containers should be running and should not restart:
 
-Note: In order to limit access to a subset of GPUs, please pass each device individually using one or more -device /dev/dri/rendered<node>, where <node> is the card index, starting from 128. (https://rocm.docs.amd.com/projects/install-on-linux/en/latest/how-to/docker.html#docker-restrict-gpus)
+##### If you use vLLM:
 
-Example for set isolation for 1 GPU
+- multimodalqna-vllm-service
+- multimodalqna-lvm
+- multimodalqna-backend-server
+- multimodalqna-gradio-ui-server
+- whisper-service
+- embedding-multimodal-bridgetower
+- redis-vector-db
+- embedding
+- retriever-redis
+- dataprep-multimodal-redis
 
-```
-      - /dev/dri/card0:/dev/dri/card0
-      - /dev/dri/renderD128:/dev/dri/renderD128
-```
+##### If you use TGI:
 
-Example for set isolation for 2 GPUs
+- tgi-llava-rocm-server
+- multimodalqna-lvm
+- multimodalqna-backend-server
+- multimodalqna-gradio-ui-server
+- whisper-service
+- embedding-multimodal-bridgetower
+- redis-vector-db
+- embedding
+- retriever-redis
+- dataprep-multimodal-redis
 
-```
-      - /dev/dri/card0:/dev/dri/card0
-      - /dev/dri/renderD128:/dev/dri/renderD128
-      - /dev/dri/card1:/dev/dri/card1
-      - /dev/dri/renderD129:/dev/dri/renderD129
-```
+---
 
-Please find more information about accessing and restricting AMD GPUs in the link (https://rocm.docs.amd.com/projects/install-on-linux/en/latest/how-to/docker.html#docker-restrict-gpus)
+## Validate the Services
 
-### Validate Microservices
+### 1. Validate the vLLM/TGI Service
 
-1. embedding-multimodal-bridgetower
+#### If you use vLLM:
 
 ```bash
-curl http://${host_ip}:${EMBEDDER_PORT}/v1/encode \
+DATA='{"model": "Xkev/Llama-3.2V-11B-cot", '\
+'"messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens": 256}'
+
+curl http://${HOST_IP}:${MULTIMODALQNA_VLLM_SERVICE_PORT}/v1/chat/completions \
+  -X POST \
+  -d "$DATA" \
+  -H 'Content-Type: application/json'
+```
+
+Checking the response from the service. The response should be similar to JSON:
+
+```json
+{
+  "id": "chatcmpl-a3761920c4034131b3cab073b8e8b841",
+  "object": "chat.completion",
+  "created": 1742959065,
+  "model": "Intel/neural-chat-7b-v3-3",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": " Deep Learning refers to a modern approach of Artificial Intelligence that aims to replicate the way human brains process information by teaching computers to learn from data without extensive programming",
+        "tool_calls": []
+      },
+      "logprobs": null,
+      "finish_reason": "length",
+      "stop_reason": null
+    }
+  ],
+  "usage": { "prompt_tokens": 15, "total_tokens": 47, "completion_tokens": 32, "prompt_tokens_details": null },
+  "prompt_logprobs": null
+}
+```
+
+If the service response has a meaningful response in the value of the "choices.message.content" key,
+then we consider the vLLM service to be successfully launched
+
+#### If you use TGI:
+
+```bash
+DATA='{"inputs":"What is Deep Learning?",'\
+'"parameters":{"max_new_tokens":256,"do_sample": true}}'
+
+curl http://${HOST_IP}:${MULTIMODALQNA_TGI_SERVICE_PORT}/generate \
+  -X POST \
+  -d "$DATA" \
+  -H 'Content-Type: application/json'
+```
+
+Checking the response from the service. The response should be similar to JSON:
+
+```json
+{
+  "generated_text": "\n\nDeep Learning is a subset of machine learning, which focuses on developing methods inspired by the functioning of the human brain; more specifically, the way it processes and acquires various types of knowledge and information. To enable deep learning, the networks are composed of multiple processing layers that form a hierarchy, with each layer learning more complex and abstraction levels of data representation.\n\nThe principle of Deep Learning is to emulate the structure of neurons in the human brain to construct artificial neural networks capable to accomplish complicated pattern recognition tasks more effectively and accurately. Therefore, these neural networks contain a series of hierarchical components, where units in earlier layers receive simple inputs and are activated by these inputs. The activation of the units in later layers are the results of multiple nonlinear transformations generated from reconstructing and integrating the information in previous layers. In other words, by combining various pieces of information at each layer, a Deep Learning network can extract the input features that best represent the structure of data, providing their outputs at the last layer or final level of abstraction.\n\nThe main idea of using these 'deep' networks in contrast to regular algorithms is that they are capable of representing hierarchical relationships that exist within the data and learn these representations by"
+}
+```
+
+If the service response has a meaningful response in the value of the "generated_text" key,
+then we consider the TGI service to be successfully launched
+
+### 2. Validate the LVM Service
+
+```bash
+curl http://${host_ip}:${MULTIMODALQNA_LVM_PORT}/v1/lvm \
+    -X POST \
+    -H 'Content-Type: application/json' \
+    -d '{"retrieved_docs": [], "initial_query": "What is this?", "top_n": 1, "metadata": [], "chat_template":"The caption of the image is: '\''{context}'\''. {question}"}'
+```
+
+Checking the response from the service. The response should be similar to JSON:
+
+```textmate
+{"downstream_black_list":[],"id":"1b17e903e8c773be909bde0e7cfdb53f","text":" I will analyze the image and provide a detailed description based on its visual characteristics. I will then compare these characteristics to the standard answer provided to ensure accuracy.\n\n1. **Examine the Image**: The image is a solid color, which appears to be a shade of yellow. There are no additional elements or patterns present in the image.\n\n2. **Compare with Standard Answer**: The standard answer describes the image as a \"yellow image\" without any additional details or context. This matches the observed characteristics of the image being a single, uniform yellow color.\n\n3. **Conclusion**: Based on the visual analysis and comparison with the standard answer, the image can be accurately described as a \"yellow image.\" There are no other features or elements present that would alter this description.\n\nFINAL ANSWER: The image is a yellow image.","metadata":{"video_id":"8c7461df-b373-4a00-8696-9a2234359fe0","source_video":"WeAreGoingOnBullrun_8c7461df-b373-4a00-8696-9a2234359fe0.mp4","time_of_frame_ms":"37000000","transcript_for_inference":"yellow image"}}
+```
+
+If the service response has a meaningful response in the value of the "choices.text" key,
+then we consider the vLLM service to be successfully launched
+
+### 3. Validate MicroServices
+
+#### embedding-multimodal-bridgetower
+
+Text example:
+
+```bash
+curl http://${host_ip}:${EMM_BRIDGETOWER_PORT}/v1/encode \
      -X POST \
      -H "Content-Type:application/json" \
      -d '{"text":"This is example"}'
 ```
 
+Checking the response from the service. The response should be similar to text:
+
+```textmate
+{"embedding":[0.036936961114406586,-0.0022056063171476126,0.0891181230545044,-0.019263656809926033,-0.049174826592206955,-0.05129311606287956,-0.07172256708145142,0.04365323856472969,0.03275766223669052,0.0059910244308412075,-0.0301326...,-0.0031989417038857937,0.042092420160770416]}
+```
+
+Image example:
+
 ```bash
-curl http://${host_ip}:${EMBEDDER_PORT}/v1/encode \
+curl http://${host_ip}:${EMM_BRIDGETOWER_PORT}/v1/encode \
      -X POST \
      -H "Content-Type:application/json" \
      -d '{"text":"This is example", "img_b64_str": "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8/5+hnoEIwDiqkL4KAcT9GO0U4BxoAAAAAElFTkSuQmCC"}'
 ```
 
-2. embedding
+Checking the response from the service. The response should be similar to text:
+
+```textmate
+{"embedding":[0.024372786283493042,-0.003916610032320023,0.07578050345182419,...,-0.046543147414922714]}
+```
+
+#### embedding
+
+Text example:
 
 ```bash
 curl http://${host_ip}:$MM_EMBEDDING_PORT_MICROSERVICE/v1/embeddings \
@@ -167,143 +419,95 @@ curl http://${host_ip}:$MM_EMBEDDING_PORT_MICROSERVICE/v1/embeddings \
     -d '{"text" : "This is some sample text."}'
 ```
 
-```bash
-curl http://${host_ip}:$MM_EMBEDDING_PORT_MICROSERVICE/v1/embeddings \
-    -X POST \
-    -H "Content-Type: application/json" \
-    -d '{"text": {"text" : "This is some sample text."}, "image" : {"url": "https://github.com/docarray/docarray/blob/main/tests/toydata/image-data/apple.png?raw=true"}}'
+Checking the response from the service. The response should be similar to text:
+
+```textmate
+{"id":"4fb722012a2719e38188190e1cb37ed3","text":"This is some sample text.","embedding":[0.043303076177835464,-0.051807764917612076,...,-0.0005179636646062136,-0.0027774290647357702],"search_type":"similarity","k":4,"distance_threshold":null,"fetch_k":20,"lambda_mult":0.5,"score_threshold":0.2,"constraints":null,"url":null,"base64_image":null}
 ```
 
-3. retriever-multimodal-redis
+Image example:
+
+```bash
+curl http://${host_ip}:${EMM_BRIDGETOWER_PORT}/v1/encode \
+     -X POST \
+     -H "Content-Type:application/json" \
+     -d '{"text":"This is example", "img_b64_str": "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8/5+hnoEIwDiqkL4KAcT9GO0U4BxoAAAAAElFTkSuQmCC"}'
+```
+
+Checking the response from the service. The response should be similar to text:
+
+```textmate
+{"id":"cce4eab623255c4c632fb920e277dcf7","text":"This is some sample text.","embedding":[0.02613169699907303,-0.049398183822631836,...,0.03544217720627785],"search_type":"similarity","k":4,"distance_threshold":null,"fetch_k":20,"lambda_mult":0.5,"score_threshold":0.2,"constraints":null,"url":"https://github.com/docarray/docarray/blob/main/tests/toydata/image-data/apple.png?raw=true","base64_image":"iVBORw0KGgoAAAANSUhEUgAAAoEAAAJqCAMAAABjDmrLAAAABGdBTUEAALGPC/.../BCU5wghOc4AQnOMEJTnCCE5zgBCc4wQlOcILzqvO/ARWd2ns+lvHkAAAAAElFTkSuQmCC"}
+```
+
+#### retriever-multimodal-redis
+
+set "your_embedding" variable:
 
 ```bash
 export your_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(512)]; print(embedding)")
-curl http://${host_ip}:7000/v1/retrieval \
+```
+
+Test Redis retriever
+
+```bash
+curl http://${host_ip}:${REDIS_RETRIEVER_PORT}/v1/retrieval \
     -X POST \
     -H "Content-Type: application/json" \
     -d "{\"text\":\"test\",\"embedding\":${your_embedding}}"
 ```
 
-4. lvm-llava
+Checking the response from the service. The response should be similar to text:
 
-```bash
-curl http://${host_ip}:${LLAVA_SERVER_PORT}/generate \
-     -X POST \
-     -H "Content-Type:application/json" \
-     -d '{"prompt":"Describe the image please.", "img_b64_str": "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8/5+hnoEIwDiqkL4KAcT9GO0U4BxoAAAAAElFTkSuQmCC"}'
+```textmate
+{"id":"80a4f3fc5f5d5cd31ab1e3912f6b6042","retrieved_docs":[],"initial_query":"test","top_n":1,"metadata":[]}
 ```
 
-5. lvm
+#### whisper service
 
 ```bash
-curl http://${host_ip}:9399/v1/lvm \
-    -X POST \
-    -H 'Content-Type: application/json' \
-    -d '{"retrieved_docs": [], "initial_query": "What is this?", "top_n": 1, "metadata": [{"b64_img_str": "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8/5+hnoEIwDiqkL4KAcT9GO0U4BxoAAAAAElFTkSuQmCC", "transcript_for_inference": "yellow image", "video_id": "8c7461df-b373-4a00-8696-9a2234359fe0", "time_of_frame_ms":"37000000", "source_video":"WeAreGoingOnBullrun_8c7461df-b373-4a00-8696-9a2234359fe0.mp4"}], "chat_template":"The caption of the image is: '\''{context}'\''. {question}"}'
+curl http://${host_ip}:7066/v1/asr \
+  -X POST \
+  -d '{"audio": "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA"}' \
+  -H 'Content-Type: application/json'
 ```
 
-```bash
-curl http://${host_ip}:9399/v1/lvm  \
-    -X POST \
-    -H 'Content-Type: application/json' \
-    -d '{"image": "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8/5+hnoEIwDiqkL4KAcT9GO0U4BxoAAAAAElFTkSuQmCC", "prompt":"What is this?"}'
+Checking the response from the service. The response should be similar to text:
+
+```textmate
+{"asr_result":"you"}
 ```
 
-Also, validate LVM Microservice with empty retrieval results
+### 4. Validate the MegaService
 
 ```bash
-curl http://${host_ip}:9399/v1/lvm \
-    -X POST \
-    -H 'Content-Type: application/json' \
-    -d '{"retrieved_docs": [], "initial_query": "What is this?", "top_n": 1, "metadata": [], "chat_template":"The caption of the image is: '\''{context}'\''. {question}"}'
+DATA='{"messages": [{"role": "user", "content": [{"type": "audio", "audio": "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA"}]}]}'
+
+curl http://${HOST_IP}:${MULTIMODALQNA_BACKEND_SERVICE_PORT}/v1/multimodalqna \
+  -H "Content-Type: application/json" \
+  -d "$DATA"
 ```
 
-6. dataprep-multimodal-redis
+Checking the response from the service. The response should be similar to text:
 
-Download a sample video, image, and audio file and create a caption
-
-```bash
-export video_fn="WeAreGoingOnBullrun.mp4"
-wget http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4 -O ${video_fn}
-
-export image_fn="apple.png"
-wget https://github.com/docarray/docarray/blob/main/tests/toydata/image-data/apple.png?raw=true -O ${image_fn}
-
-export caption_fn="apple.txt"
-echo "This is an apple."  > ${caption_fn}
-
-export audio_fn="AudioSample.wav"
-wget https://github.com/intel/intel-extension-for-transformers/raw/main/intel_extension_for_transformers/neural_chat/assets/audio/sample.wav -O ${audio_fn}
+```textmate
+{"id":"chatcmpl-75aK2KWCfxZmVcfh5tiiHj","object":"chat.completion","created":1743568232,"model":"multimodalqna","choices":[{"index":0,"message":{"role":"assistant","content":"There is no video segments retrieved given the query!"},"finish_reason":"stop","metadata":{"audio":"you"}}],"usage":{"prompt_tokens":0,"total_tokens":0,"completion_tokens":0}}
 ```
 
-Test dataprep microservice with generating transcript. This command updates a knowledge base by uploading a local video .mp4 and an audio .wav file.
+If the output lines in the "choices.text" keys contain words (tokens) containing meaning, then the service is considered launched successfully.
+
+### 5. Stop application
+
+#### If you use vLLM
 
 ```bash
-curl --silent --write-out "HTTPSTATUS:%{http_code}" \
-    ${DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT} \
-    -H 'Content-Type: multipart/form-data' \
-    -X POST \
-    -F "files=@./${video_fn}" \
-    -F "files=@./${audio_fn}"
+cd ~/multimodalqna-install/GenAIExamples/MultimodalQnA/docker_compose/amd/gpu/rocm
+docker compose -f compose_vllm.yaml down
 ```
 
-Also, test dataprep microservice with generating an image caption using lvm microservice
+#### If you use TGI
 
 ```bash
-curl --silent --write-out "HTTPSTATUS:%{http_code}" \
-    ${DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT} \
-    -H 'Content-Type: multipart/form-data' \
-    -X POST -F "files=@./${image_fn}"
-```
-
-Now, test the microservice with posting a custom caption along with an image
-
-```bash
-curl --silent --write-out "HTTPSTATUS:%{http_code}" \
-    ${DATAPREP_INGEST_SERVICE_ENDPOINT} \
-    -H 'Content-Type: multipart/form-data' \
-    -X POST -F "files=@./${image_fn}" -F "files=@./${caption_fn}"
-```
-
-Also, you are able to get the list of all files that you uploaded:
-
-```bash
-curl -X POST \
-    -H "Content-Type: application/json" \
-    ${DATAPREP_GET_FILE_ENDPOINT}
-```
-
-Then you will get the response python-style LIST like this. Notice the name of each uploaded file e.g., `videoname.mp4` will become `videoname_uuid.mp4` where `uuid` is a unique ID for each uploaded file. The same files that are uploaded twice will have different `uuid`.
-
-```bash
-[
-    "WeAreGoingOnBullrun_7ac553a1-116c-40a2-9fc5-deccbb89b507.mp4",
-    "WeAreGoingOnBullrun_6d13cf26-8ba2-4026-a3a9-ab2e5eb73a29.mp4",
-    "apple_fcade6e6-11a5-44a2-833a-3e534cbe4419.png",
-    "AudioSample_976a85a6-dc3e-43ab-966c-9d81beef780c.wav
-]
-```
-
-To delete all uploaded files along with data indexed with `$INDEX_NAME` in REDIS.
-
-```bash
-curl -X POST \
-    -H "Content-Type: application/json" \
-    -d '{"file_path": "all"}' \
-    ${DATAPREP_DELETE_FILE_ENDPOINT}
-```
-
-7. MegaService
-
-```bash
-curl http://${host_ip}:8888/v1/multimodalqna \
-    -H "Content-Type: application/json" \
-    -X POST \
-    -d '{"messages": "What is the revenue of Nike in 2023?"}'
-```
-
-```bash
-curl http://${host_ip}:8888/v1/multimodalqna \
-    -H "Content-Type: application/json" \
-    -d '{"messages": [{"role": "user", "content": [{"type": "text", "text": "hello, "}, {"type": "image_url", "image_url": {"url": "https://www.ilankelman.org/stopsigns/australia.jpg"}}]}, {"role": "assistant", "content": "opea project! "}, {"role": "user", "content": "chao, "}], "max_tokens": 10}'
+cd ~/multimodalqna-install/GenAIExamples/MultimodalQnA/docker_compose/amd/gpu/rocm
+docker compose -f compose.yaml down
 ```
