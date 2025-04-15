@@ -148,7 +148,7 @@ curl http://${host_ip}:8888/v1/chatqna \
     }'
 ```
 
-**Note** : Access the ChatQnA UI by web browser through this URL: `http://${host_ip}:80`. Please confirm the `80` port is opened in the firewall. To validate each microservie used in the pipeline refer to the [Validate microservicess](#Validate-Microservices) section.
+**Note** : Access the ChatQnA UI by web browser through this URL: `http://${host_ip}:80`. Please confirm the `80` port is opened in the firewall. To validate each microservie used in the pipeline refer to the [Validate microservicess](#validate-microservices) section.
 
 ### Cleanup the Deployment
 
