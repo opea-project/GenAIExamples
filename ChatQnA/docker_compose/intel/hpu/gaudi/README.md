@@ -158,7 +158,7 @@ The default deployment utilizes Gaudi devices primarily for the `vllm-service`, 
 
 ### compose_tgi.yaml - TGI Deployment
 
-The TGI (Text Generation Inference) deployment and the default deployment differ primarily in their service configurations and specific focus on handling large language models (LLMs). The TGI deployment includes a unique `tgi-guardrails-service`, which utilizes the `ghcr.io/huggingface/tgi-gaudi:2.3.1` image and is specifically configured to run on Gaudi hardware. This service is designed to handle LLM tasks with optimizations such as `ENABLE_HPU_GRAPH` and `USE_FLASH_ATTENTION`. The `chatqna-gaudi-backend-server` in the TGI deployment depends on the `tgi-guardrails-service`, whereas in the default deployment, it relies on the `vllm-service`.
+The TGI (Text Generation Inference) deployment and the default deployment differ primarily in their service configurations and specific focus on handling large language models (LLMs). The TGI deployment includes a unique `tgi-service`, which utilizes the `ghcr.io/huggingface/tgi-gaudi:2.3.1` image and is specifically configured to run on Gaudi hardware. This service is designed to handle LLM tasks with optimizations such as `ENABLE_HPU_GRAPH` and `USE_FLASH_ATTENTION`. The `chatqna-gaudi-backend-server` in the TGI deployment depends on the `tgi-service`, whereas in the default deployment, it relies on the `vllm-service`.
 
 | Service Name                 | Image Name                                            | Gaudi Specific |
 | ---------------------------- | ----------------------------------------------------- | -------------- |
@@ -167,18 +167,18 @@ The TGI (Text Generation Inference) deployment and the default deployment differ
 | tei-embedding-service        | ghcr.io/huggingface/text-embeddings-inference:cpu-1.6 | No             |
 | retriever                    | opea/retriever:latest                                 | No             |
 | tei-reranking-service        | ghcr.io/huggingface/tei-gaudi:1.5.0                   | 1 card         |
-| **tgi-guardrails-service**   | ghcr.io/huggingface/tgi-gaudi:2.3.1                   | Configurable   |
+| **tgi-service**              | ghcr.io/huggingface/tgi-gaudi:2.3.1                   | Configurable   |
 | chatqna-gaudi-backend-server | opea/chatqna:latest                                   | No             |
 | chatqna-gaudi-ui-server      | opea/chatqna-ui:latest                                | No             |
 | chatqna-gaudi-nginx-server   | opea/nginx:latest                                     | No             |
 
-This deployment may allocate more Gaudi resources to the vllm-guardrails-service to optimize LLM tasks depending on the specific configuration and workload requirements.
+This deployment may allocate more Gaudi resources to the tgi-service to optimize LLM tasks depending on the specific configuration and workload requirements.
 
 ### compose_faqgen.yaml - FAQ generation Deployment
 
 The FAQs(frequently asked questions and answers) generation Deployment will generate FAQs instead of normally text generation. It add a new microservice called `llm-faqgen`, which is a microservice that interacts with the TGI/vLLM LLM server to generate FAQs from input text.
 
-The TGI (Text Generation Inference) deployment and the default deployment differ primarily in their service configurations and specific focus on handling large language models (LLMs). The TGI deployment includes a unique `vllm-guardrails-service`, which utilizes the `ghcr.io/huggingface/tgi-gaudi:2.3.1` image and is specifically configured to run on Gaudi hardware. This service is designed to handle LLM tasks with optimizations such as `ENABLE_HPU_GRAPH` and `USE_FLASH_ATTENTION`. The `chatqna-gaudi-backend-server` in the TGI deployment depends on the `vllm-guardrails-service`, whereas in the default deployment, it relies on the `vllm-service`.
+The TGI (Text Generation Inference) deployment and the default deployment differ primarily in their service configurations and specific focus on handling large language models (LLMs). The TGI deployment includes a unique `tgi-service`, which utilizes the `ghcr.io/huggingface/tgi-gaudi:2.3.1` image and is specifically configured to run on Gaudi hardware. This service is designed to handle LLM tasks with optimizations such as `ENABLE_HPU_GRAPH` and `USE_FLASH_ATTENTION`. The `chatqna-gaudi-backend-server` in the TGI deployment depends on the `tgi-service`, whereas in the default deployment, it relies on the `vllm-service`.
 
 | Service Name                 | Image Name                                            | Gaudi Use    |
 | ---------------------------- | ----------------------------------------------------- | ------------ |
@@ -193,7 +193,7 @@ The TGI (Text Generation Inference) deployment and the default deployment differ
 | chatqna-gaudi-ui-server      | opea/chatqna-ui:latest                                | No           |
 | chatqna-gaudi-nginx-server   | opea/nginx:latest                                     | No           |
 
-We also provided a TGI based deployment for FAQ generation `compose_faqgen_tgi.yaml`, which only replace `vllm-service` with `vllm-guardrails-service`.
+We also provided a TGI based deployment for FAQ generation `compose_faqgen_tgi.yaml`, which only replace `vllm-service` with `tgi-service`.
 
 ### compose_without_rerank.yaml - No ReRank Deployment
 
@@ -234,7 +234,7 @@ The deployment with guardrails introduces additional Gaudi-specific services, su
 
 ### Telemetry Enablement - compose.telemetry.yaml and compose_tgi.telemetry.yaml
 
-The telemetry Docker Compose files are incremental configurations designed to enhance existing deployments by integrating telemetry metrics, thereby providing valuable insights into the performance and behavior of certain services. This setup modifies specific services, such as the `tgi-guardrails-service`, `tei-embedding-service` and `tei-reranking-service`, by adding a command-line argument that specifies an OpenTelemetry Protocol (OTLP) endpoint. This enables these services to export telemetry data to a designated endpoint, facilitating detailed monitoring and analysis. The `chatqna-gaudi-backend-server` is configured with environment variables that enable telemetry and specify the telemetry endpoint, ensuring that the backend server's operations are also monitored.
+The telemetry Docker Compose files are incremental configurations designed to enhance existing deployments by integrating telemetry metrics, thereby providing valuable insights into the performance and behavior of certain services. This setup modifies specific services, such as the `tgi-service`, `tei-embedding-service` and `tei-reranking-service`, by adding a command-line argument that specifies an OpenTelemetry Protocol (OTLP) endpoint. This enables these services to export telemetry data to a designated endpoint, facilitating detailed monitoring and analysis. The `chatqna-gaudi-backend-server` is configured with environment variables that enable telemetry and specify the telemetry endpoint, ensuring that the backend server's operations are also monitored.
 
 Additionally, the telemetry files introduce a new service, `jaeger`, which uses the `jaegertracing/all-in-one:latest` image. Jaeger is a powerful open-source tool for tracing and monitoring distributed systems, offering a user-friendly interface for visualizing traces and understanding the flow of requests through the system.
 
@@ -252,7 +252,7 @@ docker compose -f compose_tgi.yaml -f compose_tgi.telemetry.yaml up -d
 
 ## ChatQnA Service Configuration
 
-The table provides a comprehensive overview of the ChatQnA services utilized across various deployments as illustrated in the example Docker Compose files. Each row in the table represents a distinct service, detailing its possible images used to enable it and a concise description of its function within the deployment architecture. These services collectively enable functionalities such as data storage and management, text embedding, retrieval, reranking, and large language model processing. Additionally, specialized services like `vllm-guardrails-service` and `guardrails` are included to enhance text generation inference and ensure operational safety, respectively. The table also highlights the integration of telemetry through the `jaeger` service, which provides tracing and monitoring capabilities.
+The table provides a comprehensive overview of the ChatQnA services utilized across various deployments as illustrated in the example Docker Compose files. Each row in the table represents a distinct service, detailing its possible images used to enable it and a concise description of its function within the deployment architecture. These services collectively enable functionalities such as data storage and management, text embedding, retrieval, reranking, and large language model processing. Additionally, specialized services like `tgi-service` and `guardrails` are included to enhance text generation inference and ensure operational safety, respectively. The table also highlights the integration of telemetry through the `jaeger` service, which provides tracing and monitoring capabilities.
 
 | Service Name                 | Possible Image Names                                  | Optional | Description                                                                                        |
 | ---------------------------- | ----------------------------------------------------- | -------- | -------------------------------------------------------------------------------------------------- |
@@ -262,7 +262,8 @@ The table provides a comprehensive overview of the ChatQnA services utilized acr
 | retriever                    | opea/retriever:latest                                 | No       | Retrieves data from the Redis database and interacts with embedding services.                      |
 | tei-reranking-service        | ghcr.io/huggingface/tei-gaudi:1.5.0                   | Yes      | Reranks text embeddings, typically using Gaudi hardware for enhanced performance.                  |
 | vllm-service                 | opea/vllm-gaudi:latest                                | No       | Handles large language model (LLM) tasks, utilizing Gaudi hardware.                                |
-| tgi-guardrails-service       | ghcr.io/huggingface/tgi-gaudi:2.3.1                   | Yes      | Specific to the TGI deployment, focuses on text generation inference using Gaudi hardware.         |
+| tgi-service                  | ghcr.io/huggingface/tgi-gaudi:2.3.1                   | Yes      | Specific to the TGI deployment, focuses on text generation inference using Gaudi hardware.         |
+| tgi-guardrails-service       | ghcr.io/huggingface/tgi-gaudi:2.3.1                   | Yes      | Provides guardrails functionality, ensuring safe operations within defined limits.                 |
 | guardrails                   | opea/guardrails:latest                                | Yes      | Acts as a safety layer, interfacing with the `vllm-guardrails-service` to enforce safety protocols. |
 | chatqna-gaudi-backend-server | opea/chatqna:latest                                   | No       | Serves as the backend for the ChatQnA application, with variations depending on the deployment.     |
 | chatqna-gaudi-ui-server      | opea/chatqna-ui:latest                                | No       | Provides the user interface for the ChatQnA application.                                            |
@@ -271,11 +272,11 @@ The table provides a comprehensive overview of the ChatQnA services utilized acr
 
 Many of these services provide pipeline support required for all ChatQnA deployments, and are not specific to supporting the Intel® Gaudi® platform. Therefore, while the `redis-vector-db`, `dataprep-redis-service`, `retriever`, `chatqna-gaudi-backend-server`, `chatqna-gaudi-ui-server`, `chatqna-gaudi-nginx-server`, `jaeger` are configurable, they will not be covered by this example, which will focus on the configuration specifics of the services modified to support the Intel® Gaudi® platform.
 
-### vllm-service & vllm-guardrails-service
+### vllm-service & tgi-service
 
-In the configuration of the `vllm-service` and the `vllm-guardrails-service`, two variables play a primary role in determining the service's performance and functionality: `LLM_MODEL_ID` and `NUM_CARDS`. Both can be set using the appropriate environment variables. The `LLM_MODEL_ID` parameter specifies the particular large language model (LLM) that the service will utilize, effectively determining the capabilities and characteristics of the language processing tasks it can perform. This model identifier ensures that the service is aligned with the specific requirements of the application, whether it involves text generation, comprehension, or other language-related tasks. The `NUM_CARDS` parameter dictates the number of Gaudi devices allocated to the service. A higher number of Gaudi devices can enhance parallel processing capabilities, reduce latency, and improve throughput.
+In the configuration of the `vllm-service` and the `tgi-service`, two variables play a primary role in determining the service's performance and functionality: `LLM_MODEL_ID` and `NUM_CARDS`. Both can be set using the appropriate environment variables. The `LLM_MODEL_ID` parameter specifies the particular large language model (LLM) that the service will utilize, effectively determining the capabilities and characteristics of the language processing tasks it can perform. This model identifier ensures that the service is aligned with the specific requirements of the application, whether it involves text generation, comprehension, or other language-related tasks. The `NUM_CARDS` parameter dictates the number of Gaudi devices allocated to the service. A higher number of Gaudi devices can enhance parallel processing capabilities, reduce latency, and improve throughput.
 
-However, developers need to be aware of the models that have been tested with the respective service image supporting the `vllm-service` and `vllm-guardrails-service`. For example, documentation for the OPEA GenAIComps v1.0 release specify the list of [validated LLM models](https://github.com/opea-project/GenAIComps/blob/v1.0/comps/llms/text-generation/README.md#validated-llm-models) for each Gaudi enabled service image. Specific models may have stringent requirements on the number of Intel® Gaudi® devices required to support them.
+However, developers need to be aware of the models that have been tested with the respective service image supporting the `vllm-service` and `tgi-service`. For example, documentation for the OPEA GenAIComps v1.0 release specify the list of [validated LLM models](https://github.com/opea-project/GenAIComps/blob/v1.0/comps/llms/text-generation/README.md#validated-llm-models) for each Gaudi enabled service image. Specific models may have stringent requirements on the number of Intel® Gaudi® devices required to support them.
 
 #### Deepseek Model Support for Intel® Gaudi® Platform ChatQnA pipeline
 
@@ -285,14 +286,18 @@ ChatQnA now supports running the latest DeepSeek models, including [deepseek-ai/
 
 The `ghcr.io/huggingface/text-embeddings-inference:cpu-1.6` image supporting `tei-embedding-service` and `tei-reranking-service` depends on the `EMBEDDING_MODEL_ID` or `RERANK_MODEL_ID` environment variables respectively to specify the embedding model and reranking model used for converting text into vector representations and rankings. This choice impacts the quality and relevance of the embeddings rerankings for various applications. Unlike the `vllm-service`, the `tei-embedding-service` and `tei-reranking-service` each typically acquires only one Gaudi device and does not use the `NUM_CARDS` parameter; embedding and reranking tasks generally do not require extensive parallel processing and one Gaudi per service is appropriate. The list of [supported embedding and reranking models](https://github.com/huggingface/tei-gaudi?tab=readme-ov-file#supported-models) can be found at the the [huggingface/tei-gaudi](https://github.com/huggingface/tei-gaudi?tab=readme-ov-file#supported-models) website.
 
-### vllm-gaurdrails-service
+### tgi-gaurdrails-service
 
-The `vllm-guardrails-service` uses the `GUARDRAILS_MODEL_ID` parameter to select a [supported model](https://github.com/huggingface/tgi-gaudi?tab=readme-ov-file#tested-models-and-configurations) for the associated `ghcr.io/huggingface/tgi-gaudi:2.3.1` image. Like the `tei-embedding-service` and `tei-reranking-service` services, it doesn't use the `NUM_CARDS` parameter.
+The `tgi-guardrails-service` uses the `GUARDRAILS_MODEL_ID` parameter to select a [supported model](https://github.com/huggingface/tgi-gaudi?tab=readme-ov-file#tested-models-and-configurations) for the associated `opea/vllm-gaudi:latest` image. It uses the `NUM_CARDS` parameter.
+
+### vllm--gaurdrails-service
+
+The `vllm-guardrails-service` uses the `GUARDRAILS_MODEL_ID` parameter to select a [supported model](https://docs.vllm.ai/en/latest/models/supported_models.html) for the associated `ghcr.io/huggingface/tgi-gaudi:2.3.1` image. Like the `tei-embedding-service` and `tei-reranking-service` services, it doesn't use the `NUM_CARDS` parameter.
 
 ## Conclusion
 
-In examining the various services and configurations across different deployments, developers should gain a comprehensive understanding of how each component contributes to the overall functionality and performance of a ChatQnA pipeline on an Intel® Gaudi® platform. Key services such as the `vllm-service`, `tei-embedding-service`, `tei-reranking-service`, and `vllm-guardrails-service` each consume Gaudi accelerators, leveraging specific models and hardware resources to optimize their respective tasks. The `LLM_MODEL_ID`, `EMBEDDING_MODEL_ID`, `RERANK_MODEL_ID`, and `GUARDRAILS_MODEL_ID` parameters specify the models used, directly impacting the quality and effectiveness of language processing, embedding, reranking, and safety operations.
+In examining the various services and configurations across different deployments, developers should gain a comprehensive understanding of how each component contributes to the overall functionality and performance of a ChatQnA pipeline on an Intel® Gaudi® platform. Key services such as the `vllm-service`, `tei-embedding-service`, `tei-reranking-service`, `tgi-guardrails-service`and `vllm-guardrails-service` each consume Gaudi accelerators, leveraging specific models and hardware resources to optimize their respective tasks. The `LLM_MODEL_ID`, `EMBEDDING_MODEL_ID`, `RERANK_MODEL_ID`, and `GUARDRAILS_MODEL_ID` parameters specify the models used, directly impacting the quality and effectiveness of language processing, embedding, reranking, and safety operations.
 
-The allocation of Gaudi devices, affected by the Gaudi dependent services and the `NUM_CARDS` parameter supporting the `vllm-service` or `vllm-guardrails-service`, determines where computational power is utilized to enhance performance.
+The allocation of Gaudi devices, affected by the Gaudi dependent services and the `NUM_CARDS` parameter supporting the `vllm-service` or `tgi-service`, determines where computational power is utilized to enhance performance.
 
 Overall, the strategic configuration of these services, through careful selection of models and resource allocation, enables a balanced and efficient deployment. This approach ensures that the ChatQnA pipeline can meet diverse operational needs, from high-performance language model processing to robust safety protocols, all while optimizing the use of available hardware resources.
