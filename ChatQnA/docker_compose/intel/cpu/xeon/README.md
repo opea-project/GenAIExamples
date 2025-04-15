@@ -160,7 +160,7 @@ docker compose -f compose.yaml down
 
 ## ChatQnA Docker Compose Files
 
-In the context of deploying a ChatQnA pipeline on an Intel® Xeon® platform, we can pick and choose different vector databases, large language model serving frameworks, and remove pieces of the pipeline such as the reranker. The table below outlines the various configurations that are available as part of the application. These configurations can be used as templates and can be extended to different components available in ](https://github.com/opea-project/GenAIComps.git).
+In the context of deploying a ChatQnA pipeline on an Intel® Xeon® platform, we can pick and choose different vector databases, large language model serving frameworks, and remove pieces of the pipeline such as the reranker. The table below outlines the various configurations that are available as part of the application. These configurations can be used as templates and can be extended to different components available in [GenAIComps](https://github.com/opea-project/GenAIComps.git).
 
 <<<<<<< HEAD
 | File | Description |
