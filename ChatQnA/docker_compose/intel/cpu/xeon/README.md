@@ -134,7 +134,7 @@ b98fa07a4f5c   opea/vllm:${RELEASE_VERSION}                                     
 4943e5f6cd80   ghcr.io/huggingface/text-embeddings-inference:cpu-1.2   "text-embeddings-rou…"   32 hours ago   Up 2 hours   0.0.0.0:8808->80/tcp, :::8808->80/tcp
 ```
 
-If tany issues are encountered during deployment, refer to the [troubleshooting](../../../../README_miscellaneous.md##Troubleshooting) section.
+If any issues are encountered during deployment, refer to the [troubleshooting](../../../../README_miscellaneous.md##troubleshooting) section.
 
 ### Test the Pipeline
 
