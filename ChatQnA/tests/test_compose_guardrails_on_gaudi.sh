@@ -45,6 +45,7 @@ function start_services() {
     export NUM_CARDS=1
     export INDEX_NAME="rag-redis"
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+    export host_ip=${ip_address}
     export GURADRAILS_MODEL_ID="meta-llama/Meta-Llama-Guard-2-8B"
 
     # Start Docker Containers
@@ -62,10 +63,10 @@ function start_services() {
 
     # Make sure vllm guardrails service is ready
     m=0
-    until [[ "$m" -ge 160 ]]; do
+    until [[ "$m" -ge 200 ]]; do
         echo "m=$m"
         docker logs vllm-guardrails-server > vllm_guardrails_service_start.log
-        if grep -q Connected vllm_guardrails_service_start.log; then
+        if grep -q "Warmup finished" vllm_guardrails_service_start.log; then
             break
         fi
         sleep 5s
