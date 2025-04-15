@@ -95,7 +95,9 @@ python $WORKPATH/tests/test_redis_finance.py --port 6007 --test_option get
 ```
 
 ### 3.3 Launch the multi-agent system
+
 The command below will launch 3 agent microservices, 1 docsum microservice, 1 UI microservice.
+
 ```bash
 # inside $WORKDIR/GenAIExamples/FinanceAgent/docker_compose/intel/hpu/gaudi/
 bash launch_agents.sh
@@ -142,30 +144,28 @@ To see the UI, open a web browser to `http://${ip_address}:5175` to access the U
 
 2. Enter the endpoints in the `Connections` settings
 
-    First, click on the user icon in the upper right corner to open `Settings`. Click on `Admin Settings`. Click on `Connections`. 
+   First, click on the user icon in the upper right corner to open `Settings`. Click on `Admin Settings`. Click on `Connections`.
 
-    Then, enter the supervisor agent endpoint in the `OpenAI API` section: `http://${ip_address}:9090/v1`. Enter the API key as "empty". Add an arbitrary model id in `Model IDs`, for example, "opea_agent". The `ip_address` here should be the host ip of the agent microservice.
+   Then, enter the supervisor agent endpoint in the `OpenAI API` section: `http://${ip_address}:9090/v1`. Enter the API key as "empty". Add an arbitrary model id in `Model IDs`, for example, "opea_agent". The `ip_address` here should be the host ip of the agent microservice.
 
-    Then, enter the dataprep endpoint in the `Icloud File API` section. You first need to enable `Icloud File API` by clicking on the button on the right to turn it into green and then enter the endpoint url, for example, `http://${ip_address}:6007/v1`. The `ip_address` here should be the host ip of the dataprep microservice.
+   Then, enter the dataprep endpoint in the `Icloud File API` section. You first need to enable `Icloud File API` by clicking on the button on the right to turn it into green and then enter the endpoint url, for example, `http://${ip_address}:6007/v1`. The `ip_address` here should be the host ip of the dataprep microservice.
 
-    You should see screen like the screenshot below when the settings are done.
+   You should see screen like the screenshot below when the settings are done.
 
 ![opea-agent-setting](assets/ui_connections_settings.png)
 
 3. Upload documents with UI
 
-    Click on the `Workplace` icon in the top left corner. Click `Knowledge`. Click on the "+" sign to the right of `Icloud Knowledge`. You can paste in an url the the left hand side of the pop-up window, or upload a local file by click on the cloud icon on the right hand side of the pop-up window. Then click on the `Upload Confirm` button. Wait till the processing is done and the pop-up window will be closed on its own when the data ingestion is done. See the screenshot below.
+   Click on the `Workplace` icon in the top left corner. Click `Knowledge`. Click on the "+" sign to the right of `Icloud Knowledge`. You can paste in an url the the left hand side of the pop-up window, or upload a local file by click on the cloud icon on the right hand side of the pop-up window. Then click on the `Upload Confirm` button. Wait till the processing is done and the pop-up window will be closed on its own when the data ingestion is done. See the screenshot below.
 
-    Note: the data ingestion may take a few minutes depending on the length of the document. Please wait patiently and do not close the pop-up window.
+   Note: the data ingestion may take a few minutes depending on the length of the document. Please wait patiently and do not close the pop-up window.
 
 ![upload-doc-ui](assets/upload_doc_ui.png)
 
 4. Test agent with UI
 
-    After the settings are done and documents are ingested, you can start to ask questions to the agent. Click on the `New Chat` icon in the top left corner, and type in your questions in the text box in the middle of the UI. 
+   After the settings are done and documents are ingested, you can start to ask questions to the agent. Click on the `New Chat` icon in the top left corner, and type in your questions in the text box in the middle of the UI.
 
-    The UI will stream the agent's response tokens. You need to expand the `Thinking` tab to see the agent's reasoning process. After the agent made tool calls, you would also see the tool output after the tool returns output to the agent. Note: it may take a while to get the tool output back if the tool execution takes time.
+   The UI will stream the agent's response tokens. You need to expand the `Thinking` tab to see the agent's reasoning process. After the agent made tool calls, you would also see the tool output after the tool returns output to the agent. Note: it may take a while to get the tool output back if the tool execution takes time.
 
 ![opea-agent-test](assets/opea-agent-test.png)
-
-
