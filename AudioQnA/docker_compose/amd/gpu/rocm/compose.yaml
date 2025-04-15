@@ -30,7 +30,7 @@ services:
     ports:
       - "3006:80"
     volumes:
-     - "./data:/data"
+     - "${MODEL_CACHE:-./data}:/data"
     shm_size: 1g
     devices:
       - /dev/kfd:/dev/kfd
