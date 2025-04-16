@@ -14,7 +14,7 @@ if [ ! -f set_env.sh ]; then
 fi
 
 # Source environment variables
-source ./set_env.sh[[3](https://www.google.com/url?sa=E&q=https%3A%2F%2Fvertexaisearch.cloud.google.com%2Fgrounding-api-redirect%2FAQXblrzJdVR5EXosjXbjSi13_w8_AjDsxY1z8tpwlX2Ht4FdLy1NFE8mDnpUWrLd1KeksZBRzGExdccSmovlOVd5GIk44_Ibde4YqSvt0wI6BvhM3TOJUVyxcWF7BH0XBGtNMn3rQueGW5X0aAetveHZAe6Q6d_fzeFIwluKFo_DQe-i)]
+source ./set_env.sh
 
 # Check if required environment variables are set
 if [ -z "$BACKEND_SERVICE_ENDPOINT" ] || [ -z "$DATAPREP_SERVICE_ENDPOINT" ]; then
@@ -35,7 +35,7 @@ if ! grep -q "chatqna-xeon-backend-server" compose.yaml; then
 fi
 
 
-# 3. Set/Update environment variables.[[1](https://www.google.com/url?sa=E&q=https%3A%2F%2Fvertexaisearch.cloud.google.com%2Fgrounding-api-redirect%2FAQXblrwgB6_YzDOTrTgyLG3NtwEG15FrZHMecr3XB8K2P25wkEejiD4vju6T4kZXRPfD04MDBipmSplTw5Un2PE0JOmfhjGg8RZh8mvDlbG5DNgqFpV0UJDYEk5h5GJqKf7mPdHHbuG0rUE8xzH-dSdWt3tWZIowiL1Atg%3D%3D)][[3](https://www.google.com/url?sa=E&q=https%3A%2F%2Fvertexaisearch.cloud.google.com%2Fgrounding-api-redirect%2FAQXblrzJdVR5EXosjXbjSi13_w8_AjDsxY1z8tpwlX2Ht4FdLy1NFE8mDnpUWrLd1KeksZBRzGExdccSmovlOVd5GIk44_Ibde4YqSvt0wI6BvhM3TOJUVyxcWF7BH0XBGtNMn3rQueGW5X0aAetveHZAe6Q6d_fzeFIwluKFo_DQe-i)][[4](https://www.google.com/url?sa=E&q=https%3A%2F%2Fvertexaisearch.cloud.google.com%2Fgrounding-api-redirect%2FAQXblrz98WVP-aqDwR0GmOl-zwhQqj4VN6J7_FW4BIPLfYfOGmlIsagBsD6r9wmEAHpUG0kCx5ylsMFtWWdchucxJFxid4qk8F6vAIAeDnRx34CigKDkn7xrxF5CkGBxLfHvw1iaD8B97YkpDl1T1qsYuomNEuOROXzdOKYAFEhHWU5uS3LL68mhLRKzMyKPhEe3vzIRe70gmt9aedCQQ0SbJZlt3roK7jHA__tTZ0s%3D)][[5](https://www.google.com/url?sa=E&q=https%3A%2F%2Fvertexaisearch.cloud.google.com%2Fgrounding-api-redirect%2FAQXblry_dQaxUGNibABkk3NezjT1i3K9C7qAUDw-8AZfkFBmNth5Y70HVR8yPMp5ZBnGqvVZKQFt9Ydp9m1jgKEH1JOqxLNaOU3l5tMErwVnYsozL9dC1Z_VwW02Dw9c4vgAd9yK7W1lAwaUdxmHKWFSzc65VQ8i7HO1s4PG3leeXbSJz74xajRuyDJUkrxkjMgMsj1ozTPVNzBJQz_AhzjIbOMkIJO0qZbl44xqsQ2w)][[6](https://www.google.com/url?sa=E&q=https%3A%2F%2Fvertexaisearch.cloud.google.com%2Fgrounding-api-redirect%2FAQXblryJfN6Pys1D4un81GYQvY33Yth_PGQFA2-FrzGwRtE-Iv1KKGEKlKB5l9uy8tT7WypRwGpN_ukIBhpqth33VyRuLVmOg2pZkVZETVY3u0KFxldRVG16axEN-fgN5fsiC5gHrMtiV5bFuWj05wP0iw%3D%3D)]
+# 3. Set/Update environment variables.
 sed -i "/APP_BACKEND_SERVICE_ENDPOINT/d" compose.yaml  # Remove any existing lines
 sed -i "/APP_DATA_PREP_SERVICE_URL/d" compose.yaml     # Remove any existing lines
 sed -i "/chatqna-xeon-conversation-ui-server:/a \ \ environment:" compose.yaml
@@ -57,7 +57,7 @@ if ! grep -q "chatqna-xeon-conversation-ui-server" compose.yaml; then
     mv temp_compose.yaml compose.yaml
 fi
 
-echo "Conversational UI setup complete.  Run 'docker compose up -d' to start."[[1](https://www.google.com/url?sa=E&q=https%3A%2F%2Fvertexaisearch.cloud.google.com%2Fgrounding-api-redirect%2FAQXblrwgB6_YzDOTrTgyLG3NtwEG15FrZHMecr3XB8K2P25wkEejiD4vju6T4kZXRPfD04MDBipmSplTw5Un2PE0JOmfhjGg8RZh8mvDlbG5DNgqFpV0UJDYEk5h5GJqKf7mPdHHbuG0rUE8xzH-dSdWt3tWZIowiL1Atg%3D%3D)][[3](https://www.google.com/url?sa=E&q=https%3A%2F%2Fvertexaisearch.cloud.google.com%2Fgrounding-api-redirect%2FAQXblrzJdVR5EXosjXbjSi13_w8_AjDsxY1z8tpwlX2Ht4FdLy1NFE8mDnpUWrLd1KeksZBRzGExdccSmovlOVd5GIk44_Ibde4YqSvt0wI6BvhM3TOJUVyxcWF7BH0XBGtNMn3rQueGW5X0aAetveHZAe6Q6d_fzeFIwluKFo_DQe-i)]
+echo "Conversational UI setup complete.  Run 'docker compose up -d' to start.
 
 # Make the script executable
 #chmod +x use_conversation_ui.sh
