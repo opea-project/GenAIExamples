@@ -1,10 +1,10 @@
-# Example Translation deployments on Intel® Gaudi® Platform
+# Example Translation Deployment on Intel® Gaudi® Platform
 
-This document outlines the deployment process for a Translation application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on Intel Gaudi server. This example includes the following sections:
+This document outlines the deployment process for a Translation service utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on Intel Gaudi server. This example includes the following sections:
 
-- [Translation Quick Start Deployment](#translation-quick-start-deployment): Demonstrates how to quickly deploy a Translation application/pipeline on Intel® Gaudi® platform.
+- [Translation Quick Start Deployment](#translation-quick-start-deployment): Demonstrates how to quickly deploy a Translation service/pipeline on Intel® Gaudi® platform.
 - [Translation Docker Compose Files](#translation-docker-compose-files): Describes some example deployments and their docker compose files.
-- [Translation Service Configuration](#translation-service-configuration): Describes the services and possible configuration changes.
+- [Translation Service Configuration](#translation-service-configuration): Describes the service and possible configuration changes.
 
 ## Translation Quick Start Deployment
 
@@ -13,7 +13,7 @@ This section describes how to quickly deploy and test the Translation service ma
 1. [Access the Code](#access-the-code)
 2. [Generate a HuggingFace Access Token](#generate-a-huggingface-access-token)
 3. [Configure the Deployment Environment](#configure-the-deployment-environment)
-4. [Deploy the Services Using Docker Compose](#deploy-the-services-using-docker-compose)
+4. [Deploy the Service Using Docker Compose](#deploy-the-service-using-docker-compose)
 5. [Check the Deployment Status](#check-the-deployment-status)
 6. [Test the Pipeline](#test-the-pipeline)
 7. [Cleanup the Deployment](#cleanup-the-deployment)
@@ -39,17 +39,17 @@ Some HuggingFace resources, such as some models, are only accessible if you have
 
 ### Configure the Deployment Environment
 
-To set up environment variables for deploying Translation services, source the _setup_env.sh_ script in this directory:
+To set up environment variables for deploying Translation service, source the _set_env.sh_ script in this directory:
 
 ```
 source ../set_env.sh
 ```
 
-The _set_env.sh_ script will prompt for required and optional environment variables used to configure the Translation services. If a value is not entered, the script will use a default value for the same. It will also generate a _.env_ file defining the desired configuration. Consult the section on [Translation Service configuration](#translation-service-configuration) for information on how service specific configuration parameters affect deployments.
+The _set_env.sh_ script will prompt for required and optional environment variables used to configure the Translation service. If a value is not entered, the script will use a default value for the same. It will also generate a _.env_ file defining the desired configuration. Consult the section on [Translation Service configuration](#translation-service-configuration) for information on how service specific configuration parameters affect deployments.
 
-### Deploy the Services Using Docker Compose
+### Deploy the Service Using Docker Compose
 
-To deploy the Translation services, execute the `docker compose up` command with the appropriate arguments. For a default deployment, execute:
+To deploy the Translation service, execute the `docker compose up` command with the appropriate arguments. For a default deployment, execute:
 
 ```bash
 docker compose up -d
@@ -74,7 +74,7 @@ After running docker compose, check if all the containers launched via docker co
 docker ps -a
 ```
 
-For the default deployment, the following 5 containers should have started:
+For the default deployment, the following 5 containers should be running:
 
 ```
 CONTAINER ID   IMAGE                                 COMMAND                  CREATED         STATUS                   PORTS                                       NAMES
@@ -87,7 +87,7 @@ f4764d0c1817   ghcr.io/huggingface/tgi-gaudi:2.3.1   "/tgi-entrypoint.sh …"   
 
 ### Test the Pipeline
 
-Once the Translation services are running, test the pipeline using the following command:
+Once the Translation service are running, test the pipeline using the following command:
 
 ```bash
 curl http://${host_ip}:8888/v1/translation -H "Content-Type: application/json" -d '{
@@ -130,12 +130,12 @@ The compose.yaml is default compose file using tgi as serving framework
 
 ## Translation Service Configuration
 
-The table provides a comprehensive overview of the Translation services utilized across various deployments as illustrated in the example Docker Compose files. Each row in the table represents a distinct service, detailing its possible images used to enable it and a concise description of its function within the deployment architecture.
+The table provides a comprehensive overview of the Translation service utilized across various deployments as illustrated in the example Docker Compose files. Each row in the table represents a distinct service, detailing its possible images used to enable it and a concise description of its function within the deployment architecture.
 
 | Service Name                     | Possible Image Names                | Optional | Description                                                                                         |
 | -------------------------------- | ----------------------------------- | -------- | --------------------------------------------------------------------------------------------------- |
 | tgi-service                      | ghcr.io/huggingface/tgi-gaudi:2.3.1 | No       | Specific to the TGI deployment, focuses on text generation inference using Gaudi hardware.          |
 | llm                              | opea/llm-textgen:latest             | No       | Handles large language model (LLM) tasks                                                            |
-| translation-gaudi-backend-server | opea/translation:latest             | No       | Serves as the backend for the Translation application, with variations depending on the deployment. |
-| translation-gaudi-ui-server      | opea/translation-ui:latest          | No       | Provides the user interface for the Translation application.                                        |
+| translation-gaudi-backend-server | opea/translation:latest             | No       | Serves as the backend for the Translation service, with variations depending on the deployment. |
+| translation-gaudi-ui-server      | opea/translation-ui:latest          | No       | Provides the user interface for the Translation service.                                        |
 | translation-gaudi-nginx-server   | opea/nginx:latest                   | No       | Acts as a reverse proxy, managing traffic between the UI and backend services.                      |
