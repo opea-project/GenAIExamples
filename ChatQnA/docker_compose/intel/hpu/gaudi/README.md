@@ -290,7 +290,7 @@ The `ghcr.io/huggingface/text-embeddings-inference:cpu-1.6` image supporting `te
 
 The `tgi-guardrails-service` uses the `GUARDRAILS_MODEL_ID` parameter to select a [supported model](https://github.com/huggingface/tgi-gaudi?tab=readme-ov-file#tested-models-and-configurations) for the associated `ghcr.io/huggingface/tgi-gaudi:2.3.1` image. Like the `tei-embedding-service` and `tei-reranking-service` services, it doesn't use the `NUM_CARDS` parameter.
 
-### vllm--gaurdrails-service
+### vllm-gaurdrails-service
 
 The `vllm-guardrails-service` uses the `GUARDRAILS_MODEL_ID` parameter to select a [supported model](https://docs.vllm.ai/en/latest/models/supported_models.html) for the associated `opea/vllm-gaudi:latest` image. It uses the `NUM_CARDS` parameter.
 
