@@ -15,22 +15,24 @@ RAG bridges the knowledge gap by dynamically fetching relevant information from 
 
 ## 🤖 Automated Terraform Deployment using Intel® Optimized Cloud Modules for **Terraform**
 
-| Cloud Provider       | Intel Architecture                | Intel Optimized Cloud Module for Terraform                                                                                         | Comments                                                             |
-| -------------------- | --------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
-| AWS                  | 4th Gen Intel Xeon with Intel AMX | [AWS Module](https://github.com/intel/terraform-intel-aws-vm/tree/main/examples/gen-ai-xeon-opea-chatqna)                          | Uses meta-llama/Meta-Llama-3-8B-Instruct by default                  |
-| AWS Falcon2-11B      | 4th Gen Intel Xeon with Intel AMX | [AWS Module with Falcon11B](https://github.com/intel/terraform-intel-aws-vm/tree/main/examples/gen-ai-xeon-opea-chatqna-falcon11B) | Uses TII Falcon2-11B LLM Model                                       |
-| GCP                  | 5th Gen Intel Xeon with Intel AMX | [GCP Module](https://github.com/intel/terraform-intel-gcp-vm/tree/main/examples/gen-ai-xeon-opea-chatqna)                          | Also supports Confidential AI by using Intel® TDX with 4th Gen Xeon |
-| Azure                | 5th Gen Intel Xeon with Intel AMX | Work-in-progress                                                                                                                   | Work-in-progress                                                     |
-| Intel Tiber AI Cloud | 5th Gen Intel Xeon with Intel AMX | Work-in-progress                                                                                                                   | Work-in-progress                                                     |
+| Cloud Provider       | Intel Architecture                                | Intel Optimized Cloud Module for Terraform                                                                                             | Comments                                                        |
+| -------------------- | ------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| AWS                  | 4th Gen Intel Xeon with Intel AMX                 | [AWS Deployment](https://github.com/intel/terraform-intel-aws-vm/tree/main/examples/gen-ai-xeon-opea-chatqna)                          | Uses meta-llama/Meta-Llama-3-8B-Instruct by default             |
+| AWS Falcon2-11B      | 4th Gen Intel Xeon with Intel AMX                 | [AWS Deployment with Falcon11B](https://github.com/intel/terraform-intel-aws-vm/tree/main/examples/gen-ai-xeon-opea-chatqna-falcon11B) | Uses TII Falcon2-11B LLM Model                                  |
+| AWS Falcon3          | 4th Gen Intel Xeon with Intel AMX                 | [AWS Deployment with Falcon3](https://github.com/intel/terraform-intel-aws-vm/tree/main/examples/gen-ai-xeon-opea-chatqna-falcon3)     | Uses TII Falcon3 LLM Model                                      |
+| GCP                  | 4th/5th Gen Intel Xeon with Intel AMX & Intel TDX | [GCP Deployment](https://github.com/intel/terraform-intel-gcp-vm/tree/main/examples/gen-ai-xeon-opea-chatqna)                          | Supports Confidential AI by using Intel® TDX with 4th Gen Xeon |
+| Azure                | 4th/5th Gen Intel Xeon with Intel AMX & Intel TDX | [Azure Deployment](https://github.com/intel/terraform-intel-azure-linux-vm/tree/main/examples/azure-gen-ai-xeon-opea-chatqna-tdx)      | Supports Confidential AI by using Intel® TDX with 4th Gen Xeon |
+| Intel Tiber AI Cloud | 5th Gen Intel Xeon with Intel AMX                 | Work-in-progress                                                                                                                       | Work-in-progress                                                |
 
-## Automated Deployment to Ubuntu based system(if not using Terraform) using Intel® Optimized Cloud Modules for **Ansible**
+## Automated Deployment to Ubuntu based system (if not using Terraform) using Intel® Optimized Cloud Modules for **Ansible**
 
 To deploy to existing Xeon Ubuntu based system, use our Intel Optimized Cloud Modules for Ansible. This is the same Ansible playbook used by Terraform.
 Use this if you are not using Terraform and have provisioned your system with another tool or manually including bare metal.
-| Operating System | Intel Optimized Cloud Module for Ansible |
-|------------------|------------------------------------------|
-| Ubuntu 20.04 | [ChatQnA Ansible Module](https://github.com/intel/optimized-cloud-recipes/tree/main/recipes/ai-opea-chatqna-xeon) |
-| Ubuntu 22.04 | Work-in-progress |
+
+| Operating System | Intel Optimized Cloud Module for Ansible                                                                          |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------- |
+| Ubuntu 20.04     | [ChatQnA Ansible Module](https://github.com/intel/optimized-cloud-recipes/tree/main/recipes/ai-opea-chatqna-xeon) |
+| Ubuntu 22.04     | Work-in-progress                                                                                                  |
 
 ## Manually Deploy ChatQnA Service
 
@@ -48,7 +50,7 @@ Note:
 
 1. If you do not have docker installed you can run this script to install docker : `bash docker_compose/install_docker.sh`.
 
-2. The default LLM is `meta-llama/Meta-Llama-3-8B-Instruct`. Before deploying the application, please make sure either you've requested and been granted the access to it on [Huggingface](https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct) or you've downloaded the model locally from [ModelScope](https://www.modelscope.cn/models).
+2. The default LLM is `meta-llama/Meta-Llama-3-8B-Instruct`. Before deploying the application, please make sure either you've requested and been granted the access to it on [Huggingface](https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct) `or` you've downloaded the model locally from [ModelScope](https://www.modelscope.cn/models).
 
 ### Quick Start: 1.Setup Environment Variable
 
@@ -221,13 +223,14 @@ This ChatQnA use case performs RAG using LangChain, Redis VectorDB and Text Gene
 In the below, we provide a table that describes for each microservice component in the ChatQnA architecture, the default configuration of the open source project, hardware, port, and endpoint.
 
 Gaudi default compose.yaml
-| MicroService | Open Source Project | HW | Port | Endpoint |
+
+| MicroService | Open Source Project | HW    | Port | Endpoint             |
 | ------------ | ------------------- | ----- | ---- | -------------------- |
-| Embedding | Langchain | Xeon | 6000 | /v1/embeddings |
-| Retriever | Langchain, Redis | Xeon | 7000 | /v1/retrieval |
-| Reranking | Langchain, TEI | Gaudi | 8000 | /v1/reranking |
-| LLM | Langchain, TGI | Gaudi | 9000 | /v1/chat/completions |
-| Dataprep | Redis, Langchain | Xeon | 6007 | /v1/dataprep/ingest |
+| Embedding    | Langchain           | Xeon  | 6000 | /v1/embeddings       |
+| Retriever    | Langchain, Redis    | Xeon  | 7000 | /v1/retrieval        |
+| Reranking    | Langchain, TEI      | Gaudi | 8000 | /v1/reranking        |
+| LLM          | Langchain, TGI      | Gaudi | 9000 | /v1/chat/completions |
+| Dataprep     | Redis, Langchain    | Xeon  | 6007 | /v1/dataprep/ingest  |
 
 ### Required Models
 

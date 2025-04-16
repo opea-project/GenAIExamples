@@ -7,36 +7,34 @@ IMAGE_REPO=${IMAGE_REPO:-"opea"}
 IMAGE_TAG=${IMAGE_TAG:-"latest"}
 echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
 echo "TAG=IMAGE_TAG=${IMAGE_TAG}"
+export REGISTRY=${IMAGE_REPO}
+export TAG=${IMAGE_TAG}
+export MODEL_CACHE=${model_cache:-"./data"}
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
-export MAX_INPUT_TOKENS=1024
-export MAX_TOTAL_TOKENS=2048
-export REGISTRY=${IMAGE_REPO}
-export TAG=${IMAGE_TAG}
-export DOCSUM_TGI_IMAGE="ghcr.io/huggingface/text-generation-inference:2.4.1-rocm"
-export DOCSUM_LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
+
 export HOST_IP=${ip_address}
 export host_ip=${ip_address}
+export DOCSUM_MAX_INPUT_TOKENS="2048"
+export DOCSUM_MAX_TOTAL_TOKENS="4096"
+export DOCSUM_LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
 export DOCSUM_TGI_SERVICE_PORT="8008"
-export DOCSUM_HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+export DOCSUM_TGI_LLM_ENDPOINT="http://${HOST_IP}:${DOCSUM_TGI_SERVICE_PORT}"
+export DOCSUM_HUGGINGFACEHUB_API_TOKEN=''
+export DOCSUM_WHISPER_PORT="7066"
+export ASR_SERVICE_HOST_IP="${HOST_IP}"
 export DOCSUM_LLM_SERVER_PORT="9000"
-export DOCSUM_BACKEND_SERVER_PORT="8888"
-export DOCSUM_FRONTEND_PORT="5552"
-export MEGA_SERVICE_HOST_IP=${host_ip}
-export LLM_SERVICE_HOST_IP=${host_ip}
-export ASR_SERVICE_HOST_IP=${host_ip}
-export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:8888/v1/docsum"
-export DOCSUM_CARD_ID="card1"
-export DOCSUM_RENDER_ID="renderD136"
-export DocSum_COMPONENT_NAME="OpeaDocSumTgi"
-export LOGFLAG=True
+export DOCSUM_BACKEND_SERVER_PORT="18072"
+export DOCSUM_FRONTEND_PORT="18073"
+export BACKEND_SERVICE_ENDPOINT="http://${HOST_IP}:${DOCSUM_BACKEND_SERVER_PORT}/v1/docsum"
 
 function build_docker_images() {
     opea_branch=${opea_branch:-"main"}
     cd $WORKPATH/docker_image_build
     git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
+
     pushd GenAIComps
     docker build --no-cache -t ${REGISTRY}/comps-base:${TAG} --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
     popd && sleep 1s
@@ -45,8 +43,8 @@ function build_docker_images() {
     service_list="docsum docsum-gradio-ui whisper llm-docsum"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
-    docker pull ghcr.io/huggingface/text-generation-inference:2.4.1
-    docker images && sleep 1s
+    docker pull ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
+    docker images && sleep 3s
 }
 
 function start_services() {
@@ -54,7 +52,16 @@ function start_services() {
     sed -i "s/backend_address/$ip_address/g" "$WORKPATH"/ui/svelte/.env
     # Start Docker Containers
     docker compose up -d > "${LOG_PATH}"/start_services_with_compose.log
-    sleep 1m
+    n=0
+    until [[ "$n" -ge 500 ]]; do
+        docker logs docsum-tgi-service >& "${LOG_PATH}"/docsum-tgi-service_start.log
+        if grep -q "Connected" "${LOG_PATH}"/docsum-tgi-service_start.log; then
+            break
+        fi
+        sleep 10s
+        n=$((n+1))
+    done
+    sleep 5s
 }
 
 function validate_services() {
@@ -122,7 +129,7 @@ function validate_microservices() {
     # whisper microservice
     ulimit -s 65536
     validate_services \
-        "${host_ip}:7066/v1/asr" \
+        "${host_ip}:${DOCSUM_WHISPER_PORT}/v1/asr" \
         '{"asr_result":"well"}' \
         "whisper-service" \
         "whisper-service" \
@@ -130,7 +137,7 @@ function validate_microservices() {
 
     # tgi for llm service
     validate_services \
-        "${host_ip}:8008/generate" \
+        "${host_ip}:${DOCSUM_TGI_SERVICE_PORT}/generate" \
         "generated_text" \
         "docsum-tgi-service" \
         "docsum-tgi-service" \
@@ -138,7 +145,7 @@ function validate_microservices() {
 
     # llm microservice
     validate_services \
-        "${host_ip}:9000/v1/docsum" \
+        "${host_ip}:${DOCSUM_LLM_SERVER_PORT}/v1/docsum" \
         "text" \
         "docsum-llm-server" \
         "docsum-llm-server" \
@@ -151,7 +158,7 @@ function validate_megaservice() {
     local DOCKER_NAME="docsum-backend-server"
     local EXPECTED_RESULT="[DONE]"
     local INPUT_DATA="messages=Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."
-    local URL="${host_ip}:8888/v1/docsum"
+    local URL="${host_ip}:${DOCSUM_BACKEND_SERVER_PORT}/v1/docsum"
     local DATA_TYPE="type=text"
 
     local HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST -F "$DATA_TYPE" -F "$INPUT_DATA" -H 'Content-Type: multipart/form-data' "$URL")
@@ -181,7 +188,7 @@ function validate_megaservice_json() {
     echo ""
     echo ">>> Checking text data with Content-Type: application/json"
     validate_services \
-        "${host_ip}:8888/v1/docsum" \
+        "${host_ip}:${DOCSUM_BACKEND_SERVER_PORT}/v1/docsum" \
         "[DONE]" \
         "docsum-backend-server" \
         "docsum-backend-server" \
@@ -189,7 +196,7 @@ function validate_megaservice_json() {
 
     echo ">>> Checking audio data"
     validate_services \
-        "${host_ip}:8888/v1/docsum" \
+        "${host_ip}:${DOCSUM_BACKEND_SERVER_PORT}/v1/docsum" \
         "[DONE]" \
         "docsum-backend-server" \
         "docsum-backend-server" \
@@ -197,7 +204,7 @@ function validate_megaservice_json() {
 
     echo ">>> Checking video data"
     validate_services \
-        "${host_ip}:8888/v1/docsum" \
+        "${host_ip}:${DOCSUM_BACKEND_SERVER_PORT}/v1/docsum" \
         "[DONE]" \
         "docsum-backend-server" \
         "docsum-backend-server" \

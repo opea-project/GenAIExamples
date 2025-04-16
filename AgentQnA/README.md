@@ -1,5 +1,13 @@
 # Agents for Question Answering
 
+## Table of contents
+
+1. [Overview](#overview)
+2. [Deploy with Docker](#deploy-with-docker)
+3. [How to interact with the agent system with UI](#how-to-interact-with-the-agent-system-with-ui)
+4. [Validate Services](#validate-services)
+5. [Register Tools](#how-to-register-other-tools-with-the-ai-agent)
+
 ## Overview
 
 This example showcases a hierarchical multi-agent system for question-answering applications. The architecture diagram below shows a supervisor agent that interfaces with the user and dispatches tasks to two worker agents to gather information and come up with answers. The worker RAG agent uses the retrieval tool to retrieve relevant documents from a knowledge base - a vector database. The worker SQL agent retrieves relevant data from a SQL database. Although not included in this example by default, other tools such as a web search tool or a knowledge graph query tool can be used by the supervisor agent to gather information from additional sources.
@@ -134,28 +142,34 @@ source $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/hpu/gaudi/set_env.sh
 source $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/cpu/xeon/set_env.sh
 ```
 
-### 3. Launch the multi-agent system. </br>
+### 2. Launch the multi-agent system. </br>
 
-Two options are provided for the `llm_engine` of the agents: 1. open-source LLMs on Gaudi, 2. OpenAI models via API calls.
+We make it convenient to launch the whole system with docker compose, which includes microservices for LLM, agents, UI, retrieval tool, vector database, dataprep, and telemetry. There are 3 docker compose files, which make it easy for users to pick and choose. Users can choose a different retrieval tool other than the `DocIndexRetriever` example provided in our GenAIExamples repo. Users can choose not to launch the telemetry containers.
 
-#### Gaudi
+#### Launch on Gaudi
 
-On Gaudi, `meta-llama/Meta-Llama-3.1-70B-Instruct` will be served using vllm.
-By default, both the RAG agent and SQL agent will be launched to support the React Agent.  
-The React Agent requires the DocIndexRetriever's [`compose.yaml`](../DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml) file, so two `compose.yaml` files need to be run with docker compose to start the multi-agent system.
-
-> **Note**: To enable the web search tool, skip this step and proceed to the "[Optional] Web Search Tool Support" section.
+On Gaudi, `meta-llama/Meta-Llama-3.3-70B-Instruct` will be served using vllm. The command below will launch the multi-agent system with the `DocIndexRetriever` as the retrieval tool for the Worker RAG agent.
 
 ```bash
 cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/hpu/gaudi/
 docker compose -f $WORKDIR/GenAIExamples/DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml -f compose.yaml up -d
 ```
 
+> **Note**: To enable the web search tool, skip this step and proceed to the "[Optional] Web Search Tool Support" section.
+
+To enable Open Telemetry Tracing, compose.telemetry.yaml file need to be merged along with default compose.yaml file.
+Gaudi example with Open Telemetry feature:
+
+```bash
+cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/hpu/gaudi/
+docker compose -f $WORKDIR/GenAIExamples/DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml -f compose.yaml -f compose.telemetry.yaml up -d
+```
+
 ##### [Optional] Web Search Tool Support
 
 <details>
 <summary> Instructions </summary>
-A web search tool is supported in this example and can be enabled by running docker compose with the `compose.webtool.yaml` file.  
+A web search tool is supported in this example and can be enabled by running docker compose with the `compose.webtool.yaml` file.
 The Google Search API is used. Follow the [instructions](https://python.langchain.com/docs/integrations/tools/google_search) to create an API key and enable the Custom Search API on a Google account. The environment variables `GOOGLE_CSE_ID` and `GOOGLE_API_KEY` need to be set.
 
 ```bash
@@ -167,11 +181,9 @@ docker compose -f $WORKDIR/GenAIExamples/DocIndexRetriever/docker_compose/intel/
 
 </details>
 
-#### Xeon
+#### Launch on Xeon
 
-On Xeon, only OpenAI models are supported.
-By default, both the RAG Agent and SQL Agent will be launched to support the React Agent.  
-The React Agent requires the DocIndexRetriever's [`compose.yaml`](../DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml) file, so two `compose yaml` files need to be run with docker compose to start the multi-agent system.
+On Xeon, only OpenAI models are supported. The command below will launch the multi-agent system with the `DocIndexRetriever` as the retrieval tool for the Worker RAG agent.
 
 ```bash
 export OPENAI_API_KEY=<your-openai-key>
@@ -179,7 +191,7 @@ cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/cpu/xeon
 docker compose -f $WORKDIR/GenAIExamples/DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml -f compose_openai.yaml up -d
 ```
 
-### 4. Ingest Data into the vector database
+### 3. Ingest Data into the vector database
 
 The `run_ingest_data.sh` script will use an example jsonl file to ingest example documents into a vector database. Other ways to ingest data and other types of documents supported can be found in the OPEA dataprep microservice located in the opea-project/GenAIComps repo.
 
@@ -190,11 +202,19 @@ bash run_ingest_data.sh
 
 > **Note**: This is a one-time operation.
 
-## Launch the UI
+## How to interact with the agent system with UI
 
-Open a web browser to http://localhost:5173 to access the UI. Ensure the environment variable `AGENT_URL` is set to http://$ip_address:9090/v1/chat/completions in [ui/svelte/.env](./ui/svelte/.env) or else the UI may not work properly.
+The UI microservice is launched in the previous step with the other microservices.
+To see the UI, open a web browser to `http://${ip_address}:5173` to access the UI. Note the `ip_address` here is the host IP of the UI microservice.
 
-The AgentQnA UI can be deployed locally or using Docker. To customize deployment, refer to the [AgentQnA UI Guide](./ui/svelte/README.md).
+1. `create Admin Account` with a random value
+2. add opea agent endpoint `http://$ip_address:9090/v1` which is a openai compatible api
+
+![opea-agent-setting](assets/img/opea-agent-setting.png)
+
+3. test opea agent with ui
+
+![opea-agent-test](assets/img/opea-agent-test.png)
 
 ## [Optional] Deploy using Helm Charts
 

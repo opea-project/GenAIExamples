@@ -28,7 +28,7 @@ services:
     cap_add:
       - SYS_NICE
     ipc: host
-    command: --model $LLM_MODEL_ID --tensor-parallel-size ${NUM_CARDS} --host 0.0.0.0 --port 80 --block-size ${BLOCK_SIZE} --max-num-seqs ${MAX_NUM_SEQS} --max-seq_len-to-capture ${MAX_SEQ_LEN_TO_CAPTURE}
+    command: --model $LLM_MODEL_ID --tensor-parallel-size ${NUM_CARDS} --host 0.0.0.0 --port 80 --block-size ${BLOCK_SIZE} --max-num-seqs ${MAX_NUM_SEQS} --max-seq-len-to-capture ${MAX_SEQ_LEN_TO_CAPTURE}
   llm:
     image: ${REGISTRY:-opea}/llm-textgen:${TAG:-latest}
     container_name: codetrans-xeon-llm-server

@@ -1,175 +1,405 @@
-# Build and deploy DocSum Application on AMD GPU (ROCm)
+# Build and Deploy DocSum Application on AMD GPU (ROCm)
 
-## Build images
+## Build Docker Images
 
-## 🚀 Build Docker Images
+### 1. Build Docker Image
 
-First of all, you need to build Docker Images locally and install the python package of it.
+- #### Create application install directory and go to it:
 
-### 1. Build LLM Image
+  ```bash
+  mkdir ~/docsum-install && cd docsum-install
+  ```
 
-```bash
-git clone https://github.com/opea-project/GenAIComps.git
-cd GenAIComps
-docker build -t opea/llm-docsum-tgi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/src/doc-summarization/Dockerfile .
-```
+- #### Clone the repository GenAIExamples (the default repository branch "main" is used here):
 
-Then run the command `docker images`, you will have the following four Docker Images:
+  ```bash
+  git clone https://github.com/opea-project/GenAIExamples.git
+  ```
 
-### 2. Build MegaService Docker Image
+  If you need to use a specific branch/tag of the GenAIExamples repository, then (v1.3 replace with its own value):
 
-To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `docsum.py` Python script. Build the MegaService Docker image via below command:
+  ```bash
+  git clone https://github.com/opea-project/GenAIExamples.git && cd GenAIExamples && git checkout v1.3
+  ```
 
-```bash
-git clone https://github.com/opea-project/GenAIExamples
-cd GenAIExamples/DocSum/
-docker build -t opea/docsum:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
-```
+  We remind you that when using a specific version of the code, you need to use the README from this version:
 
-### 3. Build UI Docker Image
+- #### Go to build directory:
 
-Build the frontend Docker image via below command:
+  ```bash
+  cd ~/docsum-install/GenAIExamples/DocSum/docker_image_build
+  ```
 
-```bash
-cd GenAIExamples/DocSum/ui
-docker build -t opea/docsum-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
-```
+- Cleaning up the GenAIComps repository if it was previously cloned in this directory.
+  This is necessary if the build was performed earlier and the GenAIComps folder exists and is not empty:
 
-Then run the command `docker images`, you will have the following Docker Images:
+  ```bash
+  echo Y | rm -R GenAIComps
+  ```
 
-1. `opea/llm-docsum-tgi:latest`
-2. `opea/docsum:latest`
-3. `opea/docsum-ui:latest`
+- #### Clone the repository GenAIComps (the default repository branch "main" is used here):
 
-### 4. Build React UI Docker Image
+  ```bash
+  git clone https://github.com/opea-project/GenAIComps.git
+  ```
 
-Build the frontend Docker image via below command:
+  If you use a specific tag of the GenAIExamples repository,
+  then you should also use the corresponding tag for GenAIComps. (v1.3 replace with its own value):
 
-```bash
-cd GenAIExamples/DocSum/ui
-export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/docsum"
-docker build -t opea/docsum-react-ui:latest --build-arg BACKEND_SERVICE_ENDPOINT=$BACKEND_SERVICE_ENDPOINT -f ./docker/Dockerfile.react .
+  ```bash
+  git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout v1.3
+  ```
 
-docker build -t opea/docsum-react-ui:latest --build-arg BACKEND_SERVICE_ENDPOINT=$BACKEND_SERVICE_ENDPOINT --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy  -f ./docker/Dockerfile.react .
-```
+  We remind you that when using a specific version of the code, you need to use the README from this version.
 
-Then run the command `docker images`, you will have the following Docker Images:
+- #### Setting the list of images for the build (from the build file.yaml)
 
-1. `opea/llm-docsum-tgi:latest`
-2. `opea/docsum:latest`
-3. `opea/docsum-ui:latest`
-4. `opea/docsum-react-ui:latest`
+  If you want to deploy a vLLM-based or TGI-based application, then the set of services is installed as follows:
 
-## 🚀 Start Microservices and MegaService
+  #### vLLM-based application
 
-### Required Models
+  ```bash
+  service_list="docsum docsum-gradio-ui whisper llm-docsum vllm-rocm"
+  ```
 
-Default model is "Intel/neural-chat-7b-v3-3". Change "LLM_MODEL_ID" in environment variables below if you want to use another model.
-For gated models, you also need to provide [HuggingFace token](https://huggingface.co/docs/hub/security-tokens) in "HUGGINGFACEHUB_API_TOKEN" environment variable.
+  #### TGI-based application
 
-### Setup Environment Variables
+  ```bash
+  service_list="docsum docsum-gradio-ui whisper llm-docsum"
+  ```
 
-Since the `compose.yaml` will consume some environment variables, you need to setup them in advance as below.
+- #### Optional. Pull TGI Docker Image (Do this if you want to use TGI)
 
-```bash
-export DOCSUM_TGI_IMAGE="ghcr.io/huggingface/text-generation-inference:2.4.1-rocm"
-export DOCSUM_LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
-export HOST_IP=${host_ip}
-export DOCSUM_TGI_SERVICE_PORT="18882"
-export DOCSUM_TGI_LLM_ENDPOINT="http://${HOST_IP}:${DOCSUM_TGI_SERVICE_PORT}"
-export DOCSUM_HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
-export DOCSUM_LLM_SERVER_PORT="8008"
-export DOCSUM_BACKEND_SERVER_PORT="8888"
-export DOCSUM_FRONTEND_PORT="5173"
-export DocSum_COMPONENT_NAME="OpeaDocSumTgi"
-```
+  ```bash
+  docker pull ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
+  ```
 
-Note: Please replace with `host_ip` with your external IP address, do not use localhost.
+- #### Build Docker Images
 
-Note: In order to limit access to a subset of GPUs, please pass each device individually using one or more -device /dev/dri/rendered<node>, where <node> is the card index, starting from 128. (https://rocm.docs.amd.com/projects/install-on-linux/en/latest/how-to/docker.html#docker-restrict-gpus)
+  ```bash
+  docker compose -f build.yaml build ${service_list} --no-cache
+  ```
 
-Example for set isolation for 1 GPU
+  After the build, we check the list of images with the command:
 
-```
-      - /dev/dri/card0:/dev/dri/card0
-      - /dev/dri/renderD128:/dev/dri/renderD128
-```
+  ```bash
+  docker image ls
+  ```
 
-Example for set isolation for 2 GPUs
+  The list of images should include:
 
-```
-      - /dev/dri/card0:/dev/dri/card0
-      - /dev/dri/renderD128:/dev/dri/renderD128
-      - /dev/dri/card1:/dev/dri/card1
-      - /dev/dri/renderD129:/dev/dri/renderD129
-```
+  ##### vLLM-based application:
 
-Please find more information about accessing and restricting AMD GPUs in the link (https://rocm.docs.amd.com/projects/install-on-linux/en/latest/how-to/docker.html#docker-restrict-gpus)
+  - opea/vllm-rocm:latest
+  - opea/llm-docsum:latest
+  - opea/whisper:latest
+  - opea/docsum:latest
+  - opea/docsum-gradio-ui:latest
 
-### Start Microservice Docker Containers
+  ##### TGI-based application:
 
-```bash
-cd GenAIExamples/DocSum/docker_compose/amd/gpu/rocm
-docker compose up -d
-```
+  - ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
+  - opea/llm-docsum:latest
+  - opea/whisper:latest
+  - opea/docsum:latest
+  - opea/docsum-gradio-ui:latest
 
-### Validate Microservices
+---
 
-1. TGI Service
+## Deploy the DocSum Application
 
-   ```bash
-   curl http://${host_ip}:8008/generate \
-     -X POST \
-     -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":64, "do_sample": true}}' \
-     -H 'Content-Type: application/json'
-   ```
+### Docker Compose Configuration for AMD GPUs
 
-2. LLM Microservice
+To enable GPU support for AMD GPUs, the following configuration is added to the Docker Compose file:
 
-   ```bash
-   curl http://${host_ip}:9000/v1/docsum \
-     -X POST \
-     -d '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}' \
-     -H 'Content-Type: application/json'
-   ```
-
-3. MegaService
-
-   ```bash
-   curl http://${host_ip}:8888/v1/docsum -H "Content-Type: application/json" -d '{
-        "messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5.","max_tokens":32, "language":"en", "stream":false
-        }'
-   ```
-
-## 🚀 Launch the Svelte UI
-
-Open this URL `http://{host_ip}:5173` in your browser to access the frontend.
-
-![project-screenshot](https://github.com/intel-ai-tce/GenAIExamples/assets/21761437/93b1ed4b-4b76-4875-927e-cc7818b4825b)
-
-Here is an example for summarizing a article.
-
-![image](https://github.com/intel-ai-tce/GenAIExamples/assets/21761437/67ecb2ec-408d-4e81-b124-6ded6b833f55)
-
-## 🚀 Launch the React UI (Optional)
-
-To access the React-based frontend, modify the UI service in the `compose.yaml` file. Replace `docsum-rocm-ui-server` service with the `docsum-rocm-react-ui-server` service as per the config below:
+- compose_vllm.yaml - for vLLM-based application
+- compose.yaml - for TGI-based
 
 ```yaml
-docsum-rocm-react-ui-server:
-  image: ${REGISTRY:-opea}/docsum-react-ui:${TAG:-latest}
-  container_name: docsum-rocm-react-ui-server
-  depends_on:
-    - docsum-rocm-backend-server
-  ports:
-    - "5174:80"
-  environment:
-    - no_proxy=${no_proxy}
-    - https_proxy=${https_proxy}
-    - http_proxy=${http_proxy}
-    - DOC_BASE_URL=${BACKEND_SERVICE_ENDPOINT}
+shm_size: 1g
+devices:
+  - /dev/kfd:/dev/kfd
+  - /dev/dri/:/dev/dri/
+cap_add:
+  - SYS_PTRACE
+group_add:
+  - video
+security_opt:
+  - seccomp:unconfined
 ```
 
-Open this URL `http://{host_ip}:5175` in your browser to access the frontend.
+This configuration forwards all available GPUs to the container. To use a specific GPU, specify its `cardN` and `renderN` device IDs. For example:
 
-![project-screenshot](../../../../assets/img/docsum-ui-react.png)
+```yaml
+shm_size: 1g
+devices:
+  - /dev/kfd:/dev/kfd
+  - /dev/dri/card0:/dev/dri/card0
+  - /dev/dri/render128:/dev/dri/render128
+cap_add:
+  - SYS_PTRACE
+group_add:
+  - video
+security_opt:
+  - seccomp:unconfined
+```
+
+**How to Identify GPU Device IDs:**
+Use AMD GPU driver utilities to determine the correct `cardN` and `renderN` IDs for your GPU.
+
+### Set deploy environment variables
+
+#### Setting variables in the operating system environment:
+
+##### Set variable HUGGINGFACEHUB_API_TOKEN:
+
+```bash
+### Replace the string 'your_huggingfacehub_token' with your HuggingFacehub repository access token.
+export HUGGINGFACEHUB_API_TOKEN='your_huggingfacehub_token'
+```
+
+#### Set variables value in set_env\*\*\*\*.sh file:
+
+Go to Docker Compose directory:
+
+```bash
+cd ~/docsum-install/GenAIExamples/DocSum/docker_compose/amd/gpu/rocm
+```
+
+The example uses the Nano text editor. You can use any convenient text editor:
+
+#### If you use vLLM
+
+```bash
+nano set_env_vllm.sh
+```
+
+#### If you use TGI
+
+```bash
+nano set_env.sh
+```
+
+If you are in a proxy environment, also set the proxy-related environment variables:
+
+```bash
+export http_proxy="Your_HTTP_Proxy"
+export https_proxy="Your_HTTPs_Proxy"
+```
+
+Set the values of the variables:
+
+- **HOST_IP, HOST_IP_EXTERNAL** - These variables are used to configure the name/address of the service in the operating system environment for the application services to interact with each other and with the outside world.
+
+  If your server uses only an internal address and is not accessible from the Internet, then the values for these two variables will be the same and the value will be equal to the server's internal name/address.
+
+  If your server uses only an external, Internet-accessible address, then the values for these two variables will be the same and the value will be equal to the server's external name/address.
+
+  If your server is located on an internal network, has an internal address, but is accessible from the Internet via a proxy/firewall/load balancer, then the HOST_IP variable will have a value equal to the internal name/address of the server, and the EXTERNAL_HOST_IP variable will have a value equal to the external name/address of the proxy/firewall/load balancer behind which the server is located.
+
+  We set these values in the file set_env\*\*\*\*.sh
+
+- **Variables with names like "**\*\*\*\*\*\*\_PORT"\*\* - These variables set the IP port numbers for establishing network connections to the application services.
+  The values shown in the file set_env.sh or set_env_vllm they are the values used for the development and testing of the application, as well as configured for the environment in which the development is performed. These values must be configured in accordance with the rules of network access to your environment's server, and must not overlap with the IP ports of other applications that are already in use.
+
+#### Set variables with script set_env\*\*\*\*.sh
+
+#### If you use vLLM
+
+```bash
+. set_env_vllm.sh
+```
+
+#### If you use TGI
+
+```bash
+. set_env.sh
+```
+
+### Start the services:
+
+#### If you use vLLM
+
+```bash
+docker compose -f compose_vllm.yaml up -d
+```
+
+#### If you use TGI
+
+```bash
+docker compose -f compose.yaml up -d
+```
+
+All containers should be running and should not restart:
+
+##### If you use vLLM:
+
+- docsum-vllm-service
+- docsum-llm-server
+- whisper-service
+- docsum-backend-server
+- docsum-ui-server
+
+##### If you use TGI:
+
+- docsum-tgi-service
+- docsum-llm-server
+- whisper-service
+- docsum-backend-server
+- docsum-ui-server
+
+---
+
+## Validate the Services
+
+### 1. Validate the vLLM/TGI Service
+
+#### If you use vLLM:
+
+```bash
+curl http://${HOST_IP}:${FAQGEN_VLLM_SERVICE_PORT}/v1/completions \
+-H "Content-Type: application/json" \
+-d '{
+    "model": "meta-llama/Meta-Llama-3-8B-Instruct",
+    "prompt": "What is a Deep Learning?",
+    "max_tokens": 30,
+    "temperature": 0
+}'
+```
+
+Checking the response from the service. The response should be similar to JSON:
+
+```json
+{
+  "id": "cmpl-0844e21b824c4472b77f2851a177eca2",
+  "object": "text_completion",
+  "created": 1742385979,
+  "model": "meta-llama/Meta-Llama-3-8B-Instruct",
+  "choices": [
+    {
+      "index": 0,
+      "text": " Deep learning is a subset of machine learning that involves the use of artificial neural networks to analyze and interpret data. It is called \"deep\" because it",
+      "logprobs": null,
+      "finish_reason": "length",
+      "stop_reason": null,
+      "prompt_logprobs": null
+    }
+  ],
+  "usage": { "prompt_tokens": 7, "total_tokens": 37, "completion_tokens": 30, "prompt_tokens_details": null }
+}
+```
+
+If the service response has a meaningful response in the value of the "choices.text" key,
+then we consider the vLLM service to be successfully launched
+
+#### If you use TGI:
+
+```bash
+curl http://${HOST_IP}:${FAQGEN_TGI_SERVICE_PORT}/generate \
+  -X POST \
+  -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":64, "do_sample": true}}' \
+  -H 'Content-Type: application/json'
+```
+
+Checking the response from the service. The response should be similar to JSON:
+
+```json
+{
+  "generated_text": " In-Depth Explanation\nDeep Learning involves the use of artificial neural networks (ANNs) with multiple layers to analyze and interpret complex data. In this article, we will explore what is deep learning, its types, and how it works.\n\n### What is Deep Learning?\n\nDeep Learning is a subset of Machine Learning that involves"
+}
+```
+
+If the service response has a meaningful response in the value of the "generated_text" key,
+then we consider the TGI service to be successfully launched
+
+### 2. Validate the LLM Service
+
+```bash
+curl http://${HOST_IP}:${FAQGEN_LLM_SERVER_PORT}/v1/docsum \
+     -X POST \
+     -d '{"messages":"What is Deep Learning?"}' \
+     -H 'Content-Type: application/json'
+```
+
+Checking the response from the service. The response should be similar to JSON:
+
+```json
+{
+  "id": "1e47daf13a8bc73495dbfd9836eaa7e4",
+  "text": " Q: What is Deep Learning?\n         A: Deep Learning is a subset of Machine Learning that involves the use of artificial neural networks to analyze and interpret data. It is called \"deep\" because it involves multiple layers of interconnected nodes or \"neurons\" that process and transform the data.\n\n         Q: What is the main difference between Deep Learning and Machine Learning?\n         A: The main difference between Deep Learning and Machine Learning is the complexity of the models used. Machine Learning models are typically simpler and more linear, while Deep Learning models are more complex and non-linear, allowing them to learn and represent more abstract and nuanced patterns in data.\n\n         Q: What are some common applications of Deep Learning?\n         A: Some common applications of Deep Learning include image and speech recognition, natural language processing, recommender systems, and autonomous vehicles.\n\n         Q: Is Deep Learning a new field?\n         A: Deep Learning is not a new field, but it has gained significant attention and popularity in recent years due to advances in computing power, data storage, and algorithms.\n\n         Q: Can Deep Learning be used for any type of data?\n         A: Deep Learning can be used for any type of data that can be represented as a numerical array, such as images, audio, text, and time series data.\n\n         Q: Is Deep Learning a replacement for traditional Machine Learning?\n         A: No, Deep Learning is not a replacement for traditional Machine Learning. Instead, it is a complementary technology that can be used in conjunction with traditional Machine Learning techniques to solve complex problems.\n\n         Q: What are some of the challenges associated with Deep Learning?\n         A: Some of the challenges associated with Deep Learning include the need for large amounts of data, the risk of overfitting, and the difficulty of interpreting the results of the models.\n\n         Q: Can Deep Learning be used for real-time applications?\n         A: Yes, Deep Learning can be used for real-time applications, such as image and speech recognition, and autonomous vehicles.\n\n         Q: Is Deep Learning a field that requires a lot of mathematical knowledge?\n         A: While some mathematical knowledge is helpful, it is not necessary to have a deep understanding of mathematics to work with Deep Learning. Many Deep Learning libraries and frameworks provide pre-built functions and tools that can be used to implement Deep Learning models.",
+  "prompt": "What is Deep Learning?"
+}
+```
+
+If the service response has a meaningful response in the value of the "text" key,
+then we consider the vLLM service to be successfully launched
+
+### 3. Validate the MegaService
+
+```bash
+curl http://${HOST_IP}:${FAQGEN_BACKEND_SERVER_PORT}/v1/docsum \
+  -H "Content-Type: multipart/form-data" \
+  -F "messages=What is Deep Learning?" \
+  -F "max_tokens=100" \
+  -F "stream=False"
+```
+
+Checking the response from the service. The response should be similar to text:
+
+```json
+{
+  "id": "chatcmpl-tjwp8giP2vyvRRxnqzc3FU",
+  "object": "chat.completion",
+  "created": 1742386156,
+  "model": "docsum",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": " Q: What is Deep Learning?\n         A: Deep Learning is a subset of Machine Learning that involves the use of artificial neural networks to analyze and interpret data. It is called \"deep\" because it involves multiple layers of interconnected nodes or \"neurons\" that process and transform the data.\n\n         Q: What is the main difference between Deep Learning and Machine Learning?\n         A: The main difference between Deep Learning and Machine Learning is the complexity of the models used. Machine Learning models are typically simpler and"
+      },
+      "finish_reason": "stop",
+      "metadata": null
+    }
+  ],
+  "usage": { "prompt_tokens": 0, "total_tokens": 0, "completion_tokens": 0 }
+}
+```
+
+If the service response has a meaningful response in the value of the "choices.message.content" key,
+then we consider the MegaService to be successfully launched
+
+### 4. Validate the Frontend (UI)
+
+To access the UI, use the URL - http://${EXTERNAL_HOST_IP}:${FAGGEN_UI_PORT}
+A page should open when you click through to this address:
+
+![UI start page](../../../../assets/img/ui-starting-page.png)
+
+If a page of this type has opened, then we believe that the service is running and responding,
+and we can proceed to functional UI testing.
+
+For example, let's take the description of water from the Wiki.
+Copy the first few paragraphs from the Wiki and put them in the text field and then click Generate FAQs.
+After that, a page with the result of the task should open:
+
+![UI result page](../../../../assets/img/ui-result-page.png)
+
+If the result shown on the page is correct, then we consider the verification of the UI service to be successful.
+
+### 5. Stop application
+
+#### If you use vLLM
+
+```bash
+cd ~/docsum-install/GenAIExamples/DocSum/docker_compose/amd/gpu/rocm
+docker compose -f compose_vllm.yaml down
+```
+
+#### If you use TGI
+
+```bash
+cd ~/docsum-install/GenAIExamples/DocSum/docker_compose/amd/gpu/rocm
+docker compose -f compose.yaml down
+```
