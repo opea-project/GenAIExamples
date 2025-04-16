@@ -25,9 +25,9 @@ services:
       INDEX_NAME: ${INDEX_NAME}
       TEI_ENDPOINT: http://tei-embedding-service:80
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
-  tgi-guardrails-service:
-    image: ghcr.io/huggingface/tgi-gaudi:2.3.1
-    container_name: tgi-guardrails-server
+  vllm-guardrails-service:
+    image: ${REGISTRY:-opea}/vllm-gaudi:${TAG:-latest}
+    container_name: vllm-guardrails-server
     ports:
       - "8088:80"
     volumes:
@@ -36,32 +36,37 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      HUGGING_FACE_HUB_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
-      HF_HUB_DISABLE_PROGRESS_BARS: 1
-      HF_HUB_ENABLE_HF_TRANSFER: 0
+      HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       HABANA_VISIBLE_DEVICES: all
       OMPI_MCA_btl_vader_single_copy_mechanism: none
-      ENABLE_HPU_GRAPH: true
-      LIMIT_HPU_GRAPH: true
-      USE_FLASH_ATTENTION: true
-      FLASH_ATTENTION_RECOMPUTE: true
+      GURADRAILS_MODEL_ID: ${GURADRAILS_MODEL_ID}
+      NUM_CARDS: ${NUM_CARDS}
+      VLLM_TORCH_PROFILER_DIR: "/mnt"
     runtime: habana
     cap_add:
       - SYS_NICE
     ipc: host
-    command: --model-id ${GURADRAILS_MODEL_ID} --max-input-length 1024 --max-total-tokens 2048
+    command: --model ${GURADRAILS_MODEL_ID} --tensor-parallel-size ${NUM_CARDS} --host 0.0.0.0 --port 80 --block-size 128 --max-num-seqs 256 --max-seq-len-to-capture 2048
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://$host_ip:8088/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 150
   guardrails:
     image: ${REGISTRY:-opea}/guardrails:${TAG:-latest}
     container_name: guardrails-gaudi-server
     ports:
       - "9090:9090"
     ipc: host
+    depends_on:
+      vllm-guardrails-service:
+        condition: service_healthy
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       SAFETY_GUARD_MODEL_ID: ${GURADRAILS_MODEL_ID}
-      SAFETY_GUARD_ENDPOINT: http://tgi-guardrails-service:80
+      SAFETY_GUARD_ENDPOINT: http://vllm-guardrails-service:80
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
     restart: unless-stopped
   tei-embedding-service:
@@ -140,12 +145,17 @@ services:
       - SYS_NICE
     ipc: host
     command: --model ${LLM_MODEL_ID} --tensor-parallel-size ${NUM_CARDS} --host 0.0.0.0 --port 80 --block-size 128 --max-num-seqs 256 --max-seq-len-to-capture 2048
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://$host_ip:8008/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 150
   chatqna-gaudi-backend-server:
     image: ${REGISTRY:-opea}/chatqna:${TAG:-latest}
     container_name: chatqna-gaudi-guardrails-server
     depends_on:
       - redis-vector-db
-      - tgi-guardrails-service
+      - vllm-guardrails-service
       - guardrails
       - tei-embedding-service
       - retriever
