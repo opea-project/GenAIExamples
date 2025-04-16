@@ -6,6 +6,9 @@ port=6007
 FILEDIR=${WORKDIR}/GenAIExamples/AgentQnA/example_data/
 FILENAME=test_docs_music.jsonl
 
+# AgentQnA ingestion script requires following packages
+packages=("requests" "tqdm")
+
 # Check if packages are installed
 for package in "${packages[@]}"; do
   if pip freeze | grep -q "$package="; then
