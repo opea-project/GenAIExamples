@@ -16,7 +16,7 @@ The ChatQnA application is a customizable end-to-end workflow that leverages the
 
 ![architecture](./assets/img/chatqna_architecture.png)
 
-<<<<<<< HEAD
+
 The application is modular, leveraging components that are microservices (defined in [GenAIComps](https://github.com/opea-project/GenAIComps)) that are independently scalable. It is comprised of the data preparation, embedding, retrieval, reranker (optional), and LLM microservices. All these microservices are stitched together by the ChatQnA megaservice that routes the data through the composite microservices. The flow chart below shows the information flow between the different microservices in the ChatQnA example.
 =======
 This application is modular as it leverages each component as a microservice(as defined in [GenAIComps](https://github.com/opea-project/GenAIComps)) that can scale independently. It comprises data preparation, embedding, retrival, reranker(optional) and LLM microservices. All these microservices are stiched together by the Chatqna megaservice that orchestrates the data through these microservices. The flow chart below shows the information flow between different microservices for this example.
