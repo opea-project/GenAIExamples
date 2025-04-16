@@ -36,7 +36,7 @@ services:
       test: ["CMD-SHELL", "curl -f http://localhost:5000/v1/health_check || exit 1"]
       interval: 10s
       timeout: 5s
-      retries: 10
+      retries: 50
     restart: unless-stopped
   tei-embedding-service:
     image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.6
@@ -233,10 +233,10 @@ services:
       HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       host_ip: ${host_ip}
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://$host_ip:8028/health || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://localhost:80/health || exit 1"]
       interval: 10s
       timeout: 10s
-      retries: 30
+      retries: 100
     command: --model-id ${LLM_MODEL_ID_CODEGEN}
   llm_codegen:
     image: ${REGISTRY:-opea}/llm-textgen:${TAG:-latest}
