@@ -208,24 +208,35 @@ function stop_docker() {
 
 function main() {
 
+    echo "::group::stop_docker"
     stop_docker
+    echo "::endgroup::"
+
+    echo "::group::build_docker_images"
     if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
-    start_time=$(date +%s)
+    echo "::endgroup::"
+
+    echo "::group::start_services"
     start_services
-    end_time=$(date +%s)
-    duration=$((end_time-start_time))
-    echo "Mega service start duration is $duration s" && sleep 1s
+    echo "::endgroup::"
 
-    if [ "${mode}" == "perf" ]; then
-        python3 $WORKPATH/tests/chatqna_benchmark.py
-    elif [ "${mode}" == "" ]; then
-        validate_microservices
-        validate_megaservice
-        validate_frontend
-    fi
+    echo "::group::validate_microservices"
+    validate_microservices
+    echo "::endgroup::"
 
+    echo "::group::validate_megaservice"
+    validate_megaservice
+    echo "::endgroup::"
+
+    echo "::group::validate_frontend"
+    validate_frontend
+    echo "::endgroup::"
+
+    echo "::group::stop_docker"
     stop_docker
-    echo y | docker system prune
+    echo "::endgroup::"
+
+    docker system prune -f
 
 }
 
