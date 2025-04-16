@@ -334,12 +334,12 @@ function validate_frontend() {
     cd $WORKPATH/ui/react
     local conda_env_name="OPEA_e2e"
     export PATH=${HOME}/miniforge3/bin/:$PATH
-#    conda remove -n ${conda_env_name} --all -y
-#    conda create -n ${conda_env_name} python=3.12 -y
+    conda remove -n ${conda_env_name} --all -y
+    conda create -n ${conda_env_name} python=3.12 -y
     source activate ${conda_env_name}
     echo "[ TEST INFO ]: --------- conda env activated ---------"
 
-#    conda install -c conda-forge nodejs=22.6.0 -y
+    conda install -c conda-forge nodejs=22.6.0 -y
     npm install && npm ci
     node -v && npm -v && pip list
 
