@@ -589,8 +589,7 @@ docker compose up -d
 
 If you prefer to make the changes manually, follow these steps:
 
-1. Open `compose.yaml`: Edit the `compose.yaml` file in the `http://{host_ip}:5174` directory.
-
+1. Open `compose.yaml`: Edit the `compose.yaml` file located in the project directory where the Docker Compose configuration files are stored.
 2. To access the Conversational UI (react based) frontend, modify the UI service in the `compose.yaml` file. Replace `chaqna-xeon-ui-server` service with the `chatqna-xeon-conversation-ui-server` service as per the config below:
 
 ```yaml
