@@ -64,8 +64,10 @@ jobs:
           cd ${{ github.workspace }}/${{ inputs.example }}/tests
           run_test_cases=""
 
-          if [ "${{ inputs.hardware }}" == "gaudi2" ] || [ "${{ inputs.hardware }}" == "gaudi3" ]; then
+          if [[ "${{ inputs.hardware }}" == "gaudi"* ]]; then
             hardware="gaudi"
+          elif [[ "${{ inputs.hardware }}" == "xeon"* ]]; then
+            hardware="xeon"
           else
             hardware="${{ inputs.hardware }}"
           fi
