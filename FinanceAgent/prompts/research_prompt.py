@@ -33,6 +33,7 @@ For writing a comprehensive analysis financial research report, you can use all 
 4. Provide stock performance, because the financial report is used for stock investment analysis.
 5. Read the execution history if any to understand the tools that have been called and the information that has been gathered.
 6. Reason about the information gathered so far and decide if you can answer the question or if you need to call more tools.
+7. Most of the tools need ticker symbol, use your knowledge to convert the company name to the ticker symbol if user only provides the company name.
 
 **Output format:**
 You should output your thought process:

@@ -18,13 +18,13 @@ def process_request(url, query, is_stream=False):
         else:
             for line in resp.iter_lines(decode_unicode=True):
                 print(line)
-            ret = None
+            ret = "Done"
 
         resp.raise_for_status()  # Raise an exception for unsuccessful HTTP status codes
         return ret
     except requests.exceptions.RequestException as e:
-        ret = f"An error occurred:{e}"
-        return None
+        ret = f"ERROR OCCURRED IN TEST:{e}"
+        return ret
 
 
 def test_worker_agent(args):
@@ -35,6 +35,11 @@ def test_worker_agent(args):
         query = {"role": "user", "messages": args.prompt, "stream": "false", "tool_choice": args.tool_choice}
     ret = process_request(url, query)
     print("Response: ", ret)
+    if "ERROR OCCURRED IN TEST" in ret.lower():
+        print("Error in response, please check the server.")
+        return "ERROR OCCURRED IN TEST"
+    else:
+        return "test completed with success"
 
 
 def add_message_and_run(url, user_message, thread_id, stream=False):
@@ -42,6 +47,7 @@ def add_message_and_run(url, user_message, thread_id, stream=False):
     query = {"role": "user", "messages": user_message, "thread_id": thread_id, "stream": stream}
     ret = process_request(url, query, is_stream=stream)
     print("Response: ", ret)
+    return ret
 
 
 def test_chat_completion_multi_turn(args):
@@ -51,14 +57,21 @@ def test_chat_completion_multi_turn(args):
     # first turn
     print("===============First turn==================")
     user_message = "Key takeaways of Gap's 2024 Q4 earnings call?"
-    add_message_and_run(url, user_message, thread_id, stream=args.stream)
+    ret = add_message_and_run(url, user_message, thread_id, stream=args.stream)
+    if "ERROR OCCURRED IN TEST" in ret:
+        print("Error in response, please check the server.")
+        return "ERROR OCCURRED IN TEST"
     print("===============End of first turn==================")
 
     # second turn
     print("===============Second turn==================")
     user_message = "What was Gap's forecast for 2025?"
-    add_message_and_run(url, user_message, thread_id, stream=args.stream)
+    ret = add_message_and_run(url, user_message, thread_id, stream=args.stream)
+    if "ERROR OCCURRED IN TEST" in ret:
+        print("Error in response, please check the server.")
+        return "ERROR OCCURRED IN TEST"
     print("===============End of second turn==================")
+    return "test completed with success"
 
 
 def test_supervisor_agent_single_turn(args):
@@ -66,12 +79,16 @@ def test_supervisor_agent_single_turn(args):
     query_list = [
         "What was Gap's revenue growth in 2024?",
         "Can you summarize Costco's 2025 Q2 earnings call?",
-        # "Should I increase investment in Costco?",
+        "Should I increase investment in Johnson & Johnson?",
     ]
     for query in query_list:
         thread_id = f"{uuid.uuid4()}"
-        add_message_and_run(url, query, thread_id, stream=args.stream)
+        ret = add_message_and_run(url, query, thread_id, stream=args.stream)
+        if "ERROR OCCURRED IN TEST" in ret:
+            print("Error in response, please check the server.")
+            return "ERROR OCCURRED IN TEST"
         print("=" * 50)
+    return "test completed with success"
 
 
 if __name__ == "__main__":
@@ -89,10 +106,12 @@ if __name__ == "__main__":
 
     if args.agent_role == "supervisor":
         if args.multi_turn:
-            test_chat_completion_multi_turn(args)
+            ret = test_chat_completion_multi_turn(args)
         else:
-            test_supervisor_agent_single_turn(args)
+            ret = test_supervisor_agent_single_turn(args)
+        print(ret)
     elif args.agent_role == "worker":
-        test_worker_agent(args)
+        ret = test_worker_agent(args)
+        print(ret)
     else:
         raise ValueError("Invalid agent role")

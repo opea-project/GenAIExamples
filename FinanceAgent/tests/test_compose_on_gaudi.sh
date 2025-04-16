@@ -181,9 +181,9 @@ function validate_agent_service() {
     # # test worker research agent
     echo "======================Testing worker research agent======================"
     export agent_port="9096"
-    prompt="generate NVDA financial research report"
+    prompt="Johnson & Johnson"
     local CONTENT=$(python3 $WORKDIR/GenAIExamples/AgentQnA/tests/test.py --prompt "$prompt" --agent_role "worker" --ext_port $agent_port --tool_choice "get_current_date" --tool_choice "get_share_performance")
-    local EXIT_CODE=$(validate "$CONTENT" "NVDA" "research-agent-endpoint")
+    local EXIT_CODE=$(validate "$CONTENT" "Johnson" "research-agent-endpoint")
     echo $CONTENT
     echo $EXIT_CODE
     local EXIT_CODE="${EXIT_CODE:0-1}"
@@ -197,24 +197,24 @@ function validate_agent_service() {
     export agent_port="9090"
     local CONTENT=$(python3 $WORKDIR/GenAIExamples/FinanceAgent/tests/test.py --agent_role "supervisor" --ext_port $agent_port --stream)
     echo $CONTENT
-    # local EXIT_CODE=$(validate "$CONTENT" "" "react-agent-endpoint")
-    # echo $EXIT_CODE
-    # local EXIT_CODE="${EXIT_CODE:0-1}"
-    # if [ "$EXIT_CODE" == "1" ]; then
-    #     docker logs react-agent-endpoint
-    #     exit 1
-    # fi
+    local EXIT_CODE=$(validate "$CONTENT" "test completed with success" "supervisor-agent-endpoint")
+    echo $EXIT_CODE
+    local EXIT_CODE="${EXIT_CODE:0-1}"
+    if [ "$EXIT_CODE" == "1" ]; then
+        docker logs supervisor-agent-endpoint
+        exit 1
+    fi
 
-    echo "======================Testing supervisor agent: multi turns ======================"
+    # echo "======================Testing supervisor agent: multi turns ======================"
     local CONTENT=$(python3 $WORKDIR/GenAIExamples/FinanceAgent/tests/test.py --agent_role "supervisor" --ext_port $agent_port --multi-turn --stream)
     echo $CONTENT
-    # local EXIT_CODE=$(validate "$CONTENT" "" "react-agent-endpoint")
-    # echo $EXIT_CODE
-    # local EXIT_CODE="${EXIT_CODE:0-1}"
-    # if [ "$EXIT_CODE" == "1" ]; then
-    #     docker logs react-agent-endpoint
-    #     exit 1
-    # fi
+    local EXIT_CODE=$(validate "$CONTENT" "test completed with success" "supervisor-agent-endpoint")
+    echo $EXIT_CODE
+    local EXIT_CODE="${EXIT_CODE:0-1}"
+    if [ "$EXIT_CODE" == "1" ]; then
+        docker logs supervisor-agent-endpoint
+        exit 1
+    fi
 
 }
 
@@ -237,7 +237,7 @@ stop_dataprep
 
 cd $WORKPATH/tests
 
-# echo "=================== #1 Building docker images===================="
+echo "=================== #1 Building docker images===================="
 build_vllm_docker_image
 build_dataprep_agent_images
 
@@ -245,14 +245,14 @@ build_dataprep_agent_images
 # build_agent_image_local
 # echo "=================== #1 Building docker images completed===================="
 
-# echo "=================== #2 Start vllm endpoint===================="
+echo "=================== #2 Start vllm endpoint===================="
 start_vllm_service_70B
-# echo "=================== #2 vllm endpoint started===================="
+echo "=================== #2 vllm endpoint started===================="
 
-# echo "=================== #3 Start dataprep and ingest data ===================="
+echo "=================== #3 Start dataprep and ingest data ===================="
 start_dataprep
 ingest_validate_dataprep
-# echo "=================== #3 Data ingestion and validation completed===================="
+echo "=================== #3 Data ingestion and validation completed===================="
 
 echo "=================== #4 Start agents ===================="
 start_agents
