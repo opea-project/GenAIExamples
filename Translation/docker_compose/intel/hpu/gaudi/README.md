@@ -132,10 +132,10 @@ The compose.yaml is default compose file using tgi as serving framework
 
 The table provides a comprehensive overview of the Translation service utilized across various deployments as illustrated in the example Docker Compose files. Each row in the table represents a distinct service, detailing its possible images used to enable it and a concise description of its function within the deployment architecture.
 
-| Service Name                     | Possible Image Names                | Optional | Description                                                                                         |
-| -------------------------------- | ----------------------------------- | -------- | --------------------------------------------------------------------------------------------------- |
-| tgi-service                      | ghcr.io/huggingface/tgi-gaudi:2.3.1 | No       | Specific to the TGI deployment, focuses on text generation inference using Gaudi hardware.          |
-| llm                              | opea/llm-textgen:latest             | No       | Handles large language model (LLM) tasks                                                            |
+| Service Name                     | Possible Image Names                | Optional | Description                                                                                     |
+| -------------------------------- | ----------------------------------- | -------- | ----------------------------------------------------------------------------------------------- |
+| tgi-service                      | ghcr.io/huggingface/tgi-gaudi:2.3.1 | No       | Specific to the TGI deployment, focuses on text generation inference using Gaudi hardware.      |
+| llm                              | opea/llm-textgen:latest             | No       | Handles large language model (LLM) tasks                                                        |
 | translation-gaudi-backend-server | opea/translation:latest             | No       | Serves as the backend for the Translation service, with variations depending on the deployment. |
 | translation-gaudi-ui-server      | opea/translation-ui:latest          | No       | Provides the user interface for the Translation service.                                        |
-| translation-gaudi-nginx-server   | opea/nginx:latest                   | No       | Acts as a reverse proxy, managing traffic between the UI and backend services.                      |
+| translation-gaudi-nginx-server   | opea/nginx:latest                   | No       | Acts as a reverse proxy, managing traffic between the UI and backend services.                  |

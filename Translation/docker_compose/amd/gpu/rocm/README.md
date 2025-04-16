@@ -182,8 +182,8 @@ The table provides a comprehensive overview of the Translation service utilized 
 | translation-tgi-service    | ghcr.io/huggingface/text-generation-inference:2.4.1-rocm | No       | Specific to the TGI deployment, focuses on text generation inference using AMD GPU (ROCm) hardware. |
 | translation-vllm-service   | opea/vllm-rocm:latest                                    | No       | Handles large language model (LLM) tasks, utilizing AMD GPU (ROCm) hardware.                        |
 | translation-llm            | opea/llm-textgen:latest                                  | No       | Handles large language model (LLM) tasks                                                            |
-| translation-backend-server | opea/translation:latest                                  | No       | Serves as the backend for the Translation service, with variations depending on the deployment. |
-| translation-ui-server      | opea/translation-ui:latest                               | No       | Provides the user interface for the Translation service.                                        |
+| translation-backend-server | opea/translation:latest                                  | No       | Serves as the backend for the Translation service, with variations depending on the deployment.     |
+| translation-ui-server      | opea/translation-ui:latest                               | No       | Provides the user interface for the Translation service.                                            |
 | translation-nginx-server   | opea/nginx:latest                                        | No       | A cts as a reverse proxy, managing traffic between the UI and backend services.                     |
 
 **How to Identify GPU Device IDs:**
