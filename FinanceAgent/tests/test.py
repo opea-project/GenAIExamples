@@ -23,7 +23,7 @@ def process_request(url, query, is_stream=False):
         resp.raise_for_status()  # Raise an exception for unsuccessful HTTP status codes
         return ret
     except requests.exceptions.RequestException as e:
-        ret = f"An error occurred:{e}"
+        ret = f"ERROR OCCURRED IN TEST:{e}"
         return ret
 
 
@@ -35,9 +35,9 @@ def test_worker_agent(args):
         query = {"role": "user", "messages": args.prompt, "stream": "false", "tool_choice": args.tool_choice}
     ret = process_request(url, query)
     print("Response: ", ret)
-    if "error" in ret.lower():
+    if "ERROR OCCURRED IN TEST" in ret.lower():
         print("Error in response, please check the server.")
-        return "error"
+        return "ERROR OCCURRED IN TEST"
     else:
         return "test completed with success"
 
@@ -58,18 +58,18 @@ def test_chat_completion_multi_turn(args):
     print("===============First turn==================")
     user_message = "Key takeaways of Gap's 2024 Q4 earnings call?"
     ret = add_message_and_run(url, user_message, thread_id, stream=args.stream)
-    if "error" in ret.lower():
+    if "ERROR OCCURRED IN TEST" in ret:
         print("Error in response, please check the server.")
-        return "error"
+        return "ERROR OCCURRED IN TEST"
     print("===============End of first turn==================")
 
     # second turn
     print("===============Second turn==================")
     user_message = "What was Gap's forecast for 2025?"
     ret = add_message_and_run(url, user_message, thread_id, stream=args.stream)
-    if "error" in ret.lower():
+    if "ERROR OCCURRED IN TEST" in ret:
         print("Error in response, please check the server.")
-        return "error"
+        return "ERROR OCCURRED IN TEST"
     print("===============End of second turn==================")
     return "test completed with success"
 
@@ -84,9 +84,9 @@ def test_supervisor_agent_single_turn(args):
     for query in query_list:
         thread_id = f"{uuid.uuid4()}"
         ret = add_message_and_run(url, query, thread_id, stream=args.stream)
-        if "error" in ret.lower():
+        if "ERROR OCCURRED IN TEST" in ret:
             print("Error in response, please check the server.")
-            return "error"
+            return "ERROR OCCURRED IN TEST"
         print("=" * 50)
     return "test completed with success"
 

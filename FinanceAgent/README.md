@@ -2,13 +2,19 @@
 
 ## 1. Overview
 
-The architecture of this Finance Agent example is shown in the figure below. The agent has 3 main functions:
+The architecture of this Finance Agent example is shown in the figure below. The agent is a hierarchical multi-agent system and has 3 main functions:
 
-1. Summarize long financial documents and provide key points.
-2. Answer questions over financial documents, such as SEC filings.
-3. Conduct research of a public company and provide an investment report of the company.
+1. Summarize long financial documents and provide key points (using OPEA DocSum).
+2. Answer questions over financial documents, such as SEC filings (using a worker agent).
+3. Conduct research of a public company and provide an investment report of the company (using a worker agent).
+
+The user interacts with the supervisor agent through the graphical UI. The supervisor agent gets the requests from the user and dispatches tasks to worker agents or to the summarization microservice. The user can also uploads documents through the UI.
 
 ![Finance Agent Architecture](assets/finance_agent_arch.png)
+
+The architectural diagram of the `dataprep` microservice is shown below. We use [docling](https://github.com/docling-project/docling) to extract text from PDFs and URLs into markdown format. Both the full document content and tables are extracted. We then use an LLM to extract metadata from the document, including the company name, year, quarter, document type, and document title. The full document markdown then gets chunked, and LLM is used to summarize each chunk, and the summaries are embedded and saved to a vector database. Each table is also summarized by LLM and the summaries are embedded and saved to the vector database. The chunks and tables are also saved into a KV store. The pipeline is designed as such to improve retrieval accuracy of the `search_knowledge_base` tool used by the Question Answering worker agent.
+
+![dataprep architecture](assets/fin_agent_dataprep.png)
 
 The `dataprep` microservice can ingest financial documents in two formats:
 
@@ -19,6 +25,10 @@ Please note:
 
 1. Each financial document should be about one company.
 2. URLs ending in `.htm` are not supported.
+
+The Question Answering worker agent uses `search_knowledge_base` tool to get relevant information. The tool uses a dense retriever and a BM25 retriever to get many pieces of information including financial statement tables. Then an LLM is used to extract useful information related to the query from the retrieved documents. Refer to the diagram below. We found that using this method significantly improves agent performance.
+
+![finqa search tool arch](assets/finqa_tool.png)
 
 ## 2. Getting started
 
