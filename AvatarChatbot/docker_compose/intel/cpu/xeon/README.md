@@ -19,7 +19,7 @@ docker build -t opea/whisper:latest --build-arg https_proxy=$https_proxy --build
 
 ### 3. Build LLM Image
 
-Intel Xeon optimized image hosted in huggingface repo will be used for TGI service: ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu (https://github.com/huggingface/text-generation-inference)
+Intel Xeon optimized image hosted in huggingface repo will be used for TGI service: ghcr.io/huggingface/text-generation-inference:2.4.1-intel-cpu (https://github.com/huggingface/text-generation-inference)
 
 ### 4. Build TTS Image
 

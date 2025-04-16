@@ -77,7 +77,7 @@ After launching your instance, you can connect to it using SSH (for Linux instan
 - #### Optional. Pull TGI Docker Image (Do this if you want to use TGI)
 
   ```bash
-  docker pull ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
+  docker pull ghcr.io/huggingface/text-generation-inference:2.4.1-rocm
   ```
 
 - #### Build Docker Images
