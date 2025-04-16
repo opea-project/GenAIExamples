@@ -1,0 +1,48 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+# Accelerate inferencing in heaviest components to improve performance
+# by overriding their subchart values
+
+tgi:
+  enabled: false
+vllm:
+  enabled: true
+  shmSize: 1Gi
+  accelDevice: "gaudi"
+  image:
+    repository: opea/vllm-gaudi
+  resources:
+    limits:
+      habana.ai/gaudi: 1
+  startupProbe:
+    failureThreshold: 360
+
+  PT_HPU_ENABLE_LAZY_COLLECTIVES: "true"
+  OMPI_MCA_btl_vader_single_copy_mechanism: "none"
+
+  extraCmdArgs: [
+    "--tensor-parallel-size", "1",
+    "--block-size", "128",
+    "--max-num-seqs", "256",
+    "--max-seq-len-to-capture", "2048"
+  ]
+
+# Reranking: second largest bottleneck when reranking is in use
+# (i.e. query context docs have been uploaded with data-prep)
+#
+# TODO: could vLLM be used also for reranking / embedding?
+teirerank:
+  accelDevice: "gaudi"
+  OMPI_MCA_btl_vader_single_copy_mechanism: "none"
+  MAX_WARMUP_SEQUENCE_LENGTH: "512"
+  image:
+    repository: ghcr.io/huggingface/tei-gaudi
+    tag: 1.5.0
+  resources:
+    limits:
+      habana.ai/gaudi: 1
+  securityContext:
+    readOnlyRootFilesystem: false
+  readinessProbe:
+    timeoutSeconds: 1
