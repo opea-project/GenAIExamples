@@ -83,7 +83,7 @@ function start_services() {
         if grep -q "Application startup complete" $LOG_PATH/search-vllm-service_start.log; then
             break
         fi
-        sleep 10s
+        sleep 15s
         n=$((n+1))
     done
 }
