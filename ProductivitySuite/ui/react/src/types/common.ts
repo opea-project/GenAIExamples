@@ -1,11 +1,10 @@
 export interface ErrorResponse {
-    response?: {
-        data?: {
-            error?: {
-                message?: string;
-            };
-        };
+  response?: {
+    data?: {
+      error?: {
+        message?: string;
+      };
     };
-    message: string;
+  };
+  message: string;
 }
-

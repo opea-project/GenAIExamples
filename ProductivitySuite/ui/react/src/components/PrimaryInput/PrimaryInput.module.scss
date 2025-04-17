@@ -1,46 +1,46 @@
-.inputWrapper{
-    position: relative;
+.inputWrapper {
+  position: relative;
 }
 
-.primaryInput{
+.primaryInput {
+  border-radius: var(--input-radius);
+  overflow: hidden;
+  position: relative;
+  display: flex;
 
-    border-radius: var(--input-radius);
-    overflow: hidden;
-    position: relative;
+  .inputActions {
     display: flex;
+    flex-direction: row;
+    align-items: center;
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+  }
 
-    .inputActions{
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        position: absolute;
-        right: 10px;
-        bottom: 10px;
+  .circleButton {
+    border-radius: 40px;
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    margin-left: 10px;
+  }
+
+  .textAreaAuto {
+    font-family: "Inter", serif;
+    padding: var(--header-gutter) 100px var(--header-gutter)
+      var(--header-gutter);
+    border: 0;
+    width: 100%;
+    resize: none;
+    background-color: transparent;
+
+    &:focus {
+      outline: none;
     }
 
-    .circleButton{
-        border-radius: 40px;
-        width: 40px;
-        height: 40px;
-        min-width: 40px;
-        margin-left: 10px;
+    &.summaryInput {
+      padding: var(--header-gutter) 70px var(--header-gutter)
+        var(--header-gutter);
     }
-
-    .textAreaAuto{
-        font-family: "Inter", serif;
-        padding: var(--header-gutter) 100px var(--header-gutter) var(--header-gutter);
-        border: 0;
-        width: 100%;
-        resize: none;
-        background-color: transparent;
-
-        &:focus{
-            outline: none;
-        }
-
-        &.summaryInput{
-            padding: var(--header-gutter) 70px var(--header-gutter) var(--header-gutter);
-        }
-    }
-
+  }
 }

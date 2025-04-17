@@ -1,5 +1,3 @@
-
-
 // export interface Model {
 //     model_type: string;
 //     token_limit: number;
@@ -16,43 +14,41 @@
 //     data_insights_output_token: number;
 // }
 
-
-
 export interface InferenceSettings {
-    model: string;
-    temperature: number;
-    token_limit: number;
-    input_token?: number;
-    output_token?: number;
-    tags?: null;
-    maxTokenLimit?: number;
-    minTokenLimit?: number;
-    maxTemperatureLimit?: number;
-    minTemperatureLimit?: number;
+  model: string;
+  temperature: number;
+  token_limit: number;
+  input_token?: number;
+  output_token?: number;
+  tags?: null;
+  maxTokenLimit?: number;
+  minTokenLimit?: number;
+  maxTemperatureLimit?: number;
+  minTemperatureLimit?: number;
 }
 
 export interface Feedback {
-    comment: string;
-    rating: number;
-    is_thumbs_up: boolean;
+  comment: string;
+  rating: number;
+  is_thumbs_up: boolean;
 }
 
 export interface SuccessResponse {
-    message: string;
+  message: string;
 }
 
 export interface PromptsResponse {
-    prompt_text: string;
-    tags: [];
-    tag_category: string;
-    author: string;
+  prompt_text: string;
+  tags: [];
+  tag_category: string;
+  author: string;
 }
 
 export interface StreamChatProps {
-    user_id: string,
-    conversation_id: string,
-    use_case: string,
-    query: string,
-    tags: string[],
-    settings: InferenceSettings
+  user_id: string;
+  conversation_id: string;
+  use_case: string;
+  query: string;
+  tags: string[];
+  settings: InferenceSettings;
 }

@@ -10,13 +10,22 @@ interface MainLayoutProps {
   dataView?: boolean;
 }
 
-const MainLayout: React.FC<MainLayoutProps> = ({ chatView = false, historyView = false, dataView = false }) => {
-
+const MainLayout: React.FC<MainLayoutProps> = ({
+  chatView = false,
+  historyView = false,
+  dataView = false,
+}) => {
   const [asideOpen, setAsideOpen] = useState(false);
 
   return (
     <div className={styles.mainLayout}>
-      <Header setAsideOpen={setAsideOpen} asideOpen={asideOpen} chatView={chatView} historyView={historyView} dataView={dataView} />
+      <Header
+        setAsideOpen={setAsideOpen}
+        asideOpen={asideOpen}
+        chatView={chatView}
+        historyView={historyView}
+        dataView={dataView}
+      />
       <div className={styles.mainWrapper}>
         <SideBarSpacer asideOpen={asideOpen} />
         <div className={styles.contentWrapper}>

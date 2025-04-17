@@ -1,9 +1,16 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { createAsyncThunkWrapper } from "@redux/thunkUtil";
 import { RootState } from "@redux/store";
-import { PROMPT_MANAGER_CREATE, PROMPT_MANAGER_GET, PROMPT_MANAGER_DELETE } from "@root/config";
-import { NotificationSeverity, notify } from "@components/Notification/Notification";
-import axios from 'axios';
+import {
+  PROMPT_MANAGER_CREATE,
+  PROMPT_MANAGER_GET,
+  PROMPT_MANAGER_DELETE,
+} from "@root/config";
+import {
+  NotificationSeverity,
+  notify,
+} from "@components/Notification/Notification";
+import axios from "axios";
 
 type promptReducer = {
   prompts: Prompt[];
@@ -13,7 +20,7 @@ export type Prompt = {
   id: string;
   prompt_text: string;
   user: string;
-  type: string
+  type: string;
 };
 
 const initialState: promptReducer = {
@@ -29,9 +36,12 @@ export const PromptSlice = createSlice({
     },
   },
   extraReducers(builder) {
-    builder.addCase(getPrompts.fulfilled, (state, action: PayloadAction<any>) => {
-      state.prompts = action.payload;
-    });
+    builder.addCase(
+      getPrompts.fulfilled,
+      (state, action: PayloadAction<any>) => {
+        state.prompts = action.payload;
+      },
+    );
     builder.addCase(addPrompt.fulfilled, () => {
       notify("Prompt added Successfully", NotificationSeverity.SUCCESS);
     });
@@ -69,7 +79,7 @@ export const addPrompt = createAsyncThunkWrapper(
       // type: state.conversationReducer.type // TODO: this might be crashing chatqna endpoint?
     });
 
-    dispatch(getPrompts())
+    dispatch(getPrompts());
 
     return response.data;
   },
@@ -78,22 +88,22 @@ export const addPrompt = createAsyncThunkWrapper(
 //TODO delete prompt doesnt actually work, but responds 200
 export const deletePrompt = createAsyncThunkWrapper(
   "prompts/deletePrompt",
-  async ({ promptId, promptText }: { promptId: string, promptText: string }, { dispatch, getState }) => {
-
+  async (
+    { promptId, promptText }: { promptId: string; promptText: string },
+    { dispatch, getState },
+  ) => {
     // @ts-ignore
     const state: RootState = getState();
     const user = state.userReducer.name;
 
     const response = await axios.post(PROMPT_MANAGER_DELETE, {
-      user: user, 
+      user: user,
       prompt_id: promptId,
-      prompt_text: promptText
+      prompt_text: promptText,
     });
 
-    dispatch(getPrompts())
+    dispatch(getPrompts());
 
     return response.data;
   },
 );
-
-

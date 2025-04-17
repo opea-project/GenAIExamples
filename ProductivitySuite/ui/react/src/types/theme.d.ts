@@ -1,8 +1,7 @@
-import '@mui/material/styles';
-import { PaletteChip, PaletteColor } from '@mui/material/styles';
+import "@mui/material/styles";
+import { PaletteChip, PaletteColor } from "@mui/material/styles";
 
-declare module '@mui/material/styles' {
-
+declare module "@mui/material/styles" {
   interface Theme {
     customStyles: Record<string, Record<string, any>>;
   }

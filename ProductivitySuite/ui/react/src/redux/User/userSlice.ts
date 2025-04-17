@@ -5,7 +5,7 @@ import { User } from "./user";
 const initialState: User = {
   name: "",
   isAuthenticated: false,
-  role: 'User'
+  role: "User",
 };
 
 export const userSlice = createSlice({
@@ -15,7 +15,7 @@ export const userSlice = createSlice({
     setUser: (state, action: PayloadAction<User>) => {
       state.name = action.payload.name;
       state.isAuthenticated = action.payload.isAuthenticated;
-      state.role = action.payload.role
+      state.role = action.payload.role;
     },
     removeUser: (state) => {
       state.name = "";

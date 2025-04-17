@@ -1,4 +1,8 @@
-import { createAsyncThunk, AsyncThunkPayloadCreator, AsyncThunk } from "@reduxjs/toolkit";
+import {
+  createAsyncThunk,
+  AsyncThunkPayloadCreator,
+  AsyncThunk,
+} from "@reduxjs/toolkit";
 
 interface ThunkAPIConfig {}
 
