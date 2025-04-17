@@ -77,17 +77,6 @@ services:
       context: GenAIComps
       dockerfile: comps/llms/src/faq-generation/Dockerfile
     image: ${REGISTRY:-opea}/llm-faqgen:${TAG:-latest}
-  docsum:
-    build:
-      args:
-        IMAGE_REPO: ${REGISTRY}
-        BASE_TAG: ${TAG}
-        http_proxy: ${http_proxy}
-        https_proxy: ${https_proxy}
-        no_proxy: ${no_proxy}
-      context: ../
-      dockerfile: ./Dockerfile
-    image: ${REGISTRY:-opea}/docsum:${TAG:-latest}
   llm-docsum:
     build:
       context: GenAIComps
