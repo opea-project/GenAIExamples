@@ -83,4 +83,4 @@ services:
       dockerfile: comps/llms/src/doc-summarization/Dockerfile
     extends: docsum
     image: ${REGISTRY:-opea}/llm-docsum:${TAG:-latest}
-  
+
