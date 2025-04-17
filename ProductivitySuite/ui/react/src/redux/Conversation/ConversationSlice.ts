@@ -31,16 +31,8 @@ import config, {
   DOC_SUM_URL,
   FAQ_GEN_URL,
 } from "@root/config";
-import {
-  NotificationSeverity,
-  notify,
-} from "@components/Notification/Notification";
-import {
-  ChatBubbleOutline,
-  CodeOutlined,
-  Description,
-  QuizOutlined,
-} from "@mui/icons-material";
+import { NotificationSeverity, notify } from "@components/Notification/Notification";
+import { ChatBubbleOutline, CodeOutlined, Description, QuizOutlined } from "@mui/icons-material";
 
 const urlMap: any = {
   summary: DOC_SUM_URL,
@@ -141,9 +133,7 @@ export const ConversationSlice = createSlice({
         // in case of upload / history conversation that clears model name, we want to reset to defaults
         const currentType = state.type;
         if (currentType) {
-          const approvedModel = state.models.find((item: Model) =>
-            item.types.includes(currentType),
-          );
+          const approvedModel = state.models.find((item: Model) => item.types.includes(currentType));
           if (approvedModel) {
             state.model = approvedModel.model_name;
             state.token = approvedModel.minToken;
@@ -161,10 +151,7 @@ export const ConversationSlice = createSlice({
     setSelectedConversationId: (state, action: PayloadAction<string>) => {
       state.selectedConversationId = action.payload;
     },
-    setSelectedConversationHistory: (
-      state,
-      action: PayloadAction<Message[]>,
-    ) => {
+    setSelectedConversationHistory: (state, action: PayloadAction<Message[]>) => {
       state.selectedConversationHistory = action.payload;
     },
     setTemperature: (state, action: PayloadAction<number>) => {
@@ -207,9 +194,7 @@ export const ConversationSlice = createSlice({
           break;
       }
 
-      let firstModel = state.models.find((model: Model) =>
-        model.types.includes(action.payload),
-      );
+      let firstModel = state.models.find((model: Model) => model.types.includes(action.payload));
       state.model = firstModel?.model_name || state.models[0].model_name;
     },
     setUploadInProgress: (state, action: PayloadAction<boolean>) => {
@@ -227,10 +212,7 @@ export const ConversationSlice = createSlice({
     setSystemPrompt: (state, action: PayloadAction<string>) => {
       state.systemPrompt = action.payload;
     },
-    setAbortController: (
-      state,
-      action: PayloadAction<AbortController | null>,
-    ) => {
+    setAbortController: (state, action: PayloadAction<AbortController | null>) => {
       state.abortController = action.payload;
     },
     abortStream: (state) => {
@@ -313,9 +295,7 @@ export const getSupportedUseCases = createAsyncThunkWrapper(
 
     // setDefault use case if not stored / already set by localStorage
     if (!currentUseCase) {
-      const approvedAccess = response.data.find(
-        (item: UseCase) => item.access_level === userAccess,
-      );
+      const approvedAccess = response.data.find((item: UseCase) => item.access_level === userAccess);
       if (approvedAccess) store.dispatch(setUseCase(approvedAccess));
     }
 
@@ -337,9 +317,7 @@ export const getSupportedModels = createAsyncThunkWrapper(
     // setDefault use case if not stored  / already set by localStorage
     // TODO: revisit if type also gets stored and not defaulted on state
     if (!currentModel && currentType) {
-      const approvedModel = response.data.find((item: Model) =>
-        item.types.includes(currentType),
-      );
+      const approvedModel = response.data.find((item: Model) => item.types.includes(currentType));
       if (approvedModel) store.dispatch(setModel(approvedModel));
     }
 
@@ -361,10 +339,7 @@ export const getAllConversations = createAsyncThunkWrapper(
 
 export const getConversationHistory = createAsyncThunkWrapper(
   "conversation/getConversationHistory",
-  async (
-    { user, conversationId }: { user: string; conversationId: string },
-    {},
-  ) => {
+  async ({ user, conversationId }: { user: string; conversationId: string }, {}) => {
     const response = await axios.post(CHAT_HISTORY_GET, {
       user,
       id: conversationId,
@@ -441,10 +416,7 @@ export const deleteMultipleInDataSource = createAsyncThunkWrapper(
         notify("Files deleted successfully", NotificationSeverity.SUCCESS);
       })
       .catch((err) => {
-        notify(
-          "Error deleting on or more of your files",
-          NotificationSeverity.ERROR,
-        );
+        notify("Error deleting on or more of your files", NotificationSeverity.ERROR);
         console.error("Error deleting on or more of your files", err);
       })
       .finally(() => {
@@ -466,14 +438,10 @@ export const deleteInDataSource = createAsyncThunkWrapper(
 
 export const saveConversationtoDatabase = createAsyncThunkWrapper(
   "conversation/saveConversationtoDatabase",
-  async (
-    { conversation }: { conversation: Conversation },
-    { dispatch, getState },
-  ) => {
+  async ({ conversation }: { conversation: Conversation }, { dispatch, getState }) => {
     // @ts-ignore
     const state: RootState = getState();
-    const selectedConversationHistory =
-      state.conversationReducer.selectedConversationHistory;
+    const selectedConversationHistory = state.conversationReducer.selectedConversationHistory;
 
     //TODO: if we end up with a systemPrompt for code change this
     const firstMessageIndex = state.conversationReducer.type === "code" ? 0 : 1;
@@ -505,11 +473,7 @@ export const saveConversationtoDatabase = createAsyncThunkWrapper(
 export const deleteConversations = createAsyncThunkWrapper(
   "conversation/deleteConversations",
   async (
-    {
-      user,
-      conversationIds,
-      useCase,
-    }: { user: string; conversationIds: string[]; useCase: string },
+    { user, conversationIds, useCase }: { user: string; conversationIds: string[]; useCase: string },
     { dispatch },
   ) => {
     const promises = conversationIds.map((id) =>
@@ -529,16 +493,10 @@ export const deleteConversations = createAsyncThunkWrapper(
 
     await Promise.all(promises)
       .then(() => {
-        notify(
-          "Conversations deleted successfully",
-          NotificationSeverity.SUCCESS,
-        );
+        notify("Conversations deleted successfully", NotificationSeverity.SUCCESS);
       })
       .catch((err) => {
-        notify(
-          "Error deleting on or more of your conversations",
-          NotificationSeverity.ERROR,
-        );
+        notify("Error deleting on or more of your conversations", NotificationSeverity.ERROR);
         console.error("Error deleting on or more of your conversations", err);
       })
       .finally(() => {
@@ -550,11 +508,7 @@ export const deleteConversations = createAsyncThunkWrapper(
 export const deleteConversation = createAsyncThunkWrapper(
   "conversation/delete",
   async (
-    {
-      user,
-      conversationId,
-      useCase,
-    }: { user: string; conversationId: string; useCase: string },
+    { user, conversationId, useCase }: { user: string; conversationId: string; useCase: string },
     { dispatch },
   ) => {
     const response = await axios.post(CHAT_HISTORY_DELETE, {
@@ -571,15 +525,7 @@ export const deleteConversation = createAsyncThunkWrapper(
 export const doConversation = (conversationRequest: ConversationRequest) => {
   store.dispatch(setIsPending(true));
 
-  const {
-    conversationId,
-    userPrompt,
-    messages,
-    model,
-    token,
-    temperature,
-    type,
-  } = conversationRequest;
+  const { conversationId, userPrompt, messages, model, token, temperature, type } = conversationRequest;
 
   // TODO: MAYBE... check first message if 'system' already exists... on dev during page edits the
   // hot module reloads and instantly adds more system messages to the total messages
@@ -605,16 +551,7 @@ export const doConversation = (conversationRequest: ConversationRequest) => {
 export const doSummaryFaq = (summaryFaqRequest: SummaryFaqRequest) => {
   store.dispatch(setIsPending(true));
 
-  const {
-    conversationId,
-    model,
-    token,
-    temperature,
-    type,
-    messages,
-    files,
-    userPrompt,
-  } = summaryFaqRequest;
+  const { conversationId, model, token, temperature, type, messages, files, userPrompt } = summaryFaqRequest;
 
   const postWithFiles = files && files.length > 0;
 
@@ -648,8 +585,7 @@ export const doSummaryFaq = (summaryFaqRequest: SummaryFaqRequest) => {
 export const doCodeGen = (codeRequest: CodeRequest) => {
   store.dispatch(setIsPending(true));
 
-  const { conversationId, userPrompt, model, token, temperature, type } =
-    codeRequest;
+  const { conversationId, userPrompt, model, token, temperature, type } = codeRequest;
 
   store.dispatch(addMessageToMessages(userPrompt));
 
@@ -683,11 +619,7 @@ const eventStream = (type: string, body: any, conversationId: string = "") => {
         if (response.ok) {
           store.dispatch(setIsPending(false));
           return;
-        } else if (
-          response.status >= 400 &&
-          response.status < 500 &&
-          response.status !== 429
-        ) {
+        } else if (response.status >= 400 && response.status < 500 && response.status !== 429) {
           const e = await response.json();
           console.log(e);
           throw Error(e.error.message);
@@ -716,20 +648,18 @@ const eventStream = (type: string, body: any, conversationId: string = "") => {
               //text summary/faq for data: "ops string"
               const res = JSON.parse(msg.data); // Parse valid JSON
               const logs = res.ops;
-              logs.forEach(
-                (log: { op: string; path: string; value: string }) => {
-                  if (log.op === "add") {
-                    if (
-                      log.value !== "</s>" &&
-                      log.path.endsWith("/streamed_output/-") &&
-                      log.path.length > "/streamed_output/-".length
-                    ) {
-                      result += log.value;
-                      if (log.value) store.dispatch(setOnGoingResult(result));
-                    }
+              logs.forEach((log: { op: string; path: string; value: string }) => {
+                if (log.op === "add") {
+                  if (
+                    log.value !== "</s>" &&
+                    log.path.endsWith("/streamed_output/-") &&
+                    log.path.length > "/streamed_output/-".length
+                  ) {
+                    result += log.value;
+                    if (log.value) store.dispatch(setOnGoingResult(result));
                   }
-                },
-              );
+                }
+              });
             }
           } catch (e) {
             console.log("something wrong in msg", e);
@@ -820,29 +750,21 @@ const formDataEventStream = async (url: string, formData: any) => {
                   const res = JSON.parse(jsonStr); // Parse valid JSON
 
                   const logs = res.ops;
-                  logs.forEach(
-                    (log: { op: string; path: string; value: string }) => {
-                      if (log.op === "add") {
-                        if (
-                          log.value !== "</s>" &&
-                          log.path.endsWith("/streamed_output/-") &&
-                          log.path.length > "/streamed_output/-".length
-                        ) {
-                          result += log.value;
-                          if (log.value)
-                            store.dispatch(setOnGoingResult(result));
-                        }
+                  logs.forEach((log: { op: string; path: string; value: string }) => {
+                    if (log.op === "add") {
+                      if (
+                        log.value !== "</s>" &&
+                        log.path.endsWith("/streamed_output/-") &&
+                        log.path.length > "/streamed_output/-".length
+                      ) {
+                        result += log.value;
+                        if (log.value) store.dispatch(setOnGoingResult(result));
                       }
-                    },
-                  );
+                    }
+                  });
                 }
               } catch (error) {
-                console.warn(
-                  "Error parsing JSON:",
-                  error,
-                  "Raw Data:",
-                  jsonStr,
-                );
+                console.warn("Error parsing JSON:", error, "Raw Data:", jsonStr);
               }
             } else {
               const m: Message = {
@@ -895,6 +817,5 @@ export const {
   setDataSourceUrlStatus,
   uploadChat,
 } = ConversationSlice.actions;
-export const conversationSelector = (state: RootState) =>
-  state.conversationReducer;
+export const conversationSelector = (state: RootState) => state.conversationReducer;
 export default ConversationSlice.reducer;

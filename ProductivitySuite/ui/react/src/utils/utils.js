@@ -20,11 +20,7 @@ export const smartTrim = (string, maxLength) => {
   var toremove = string.length - maxLength;
   var lstrip = Math.ceil(toremove / 2);
   var rstrip = toremove - lstrip;
-  return (
-    string.substring(0, midpoint - lstrip) +
-    "..." +
-    string.substring(midpoint + rstrip)
-  );
+  return string.substring(0, midpoint - lstrip) + "..." + string.substring(midpoint + rstrip);
 };
 
 export const QueryStringFromArr = (paramsArr = []) => {
@@ -62,9 +58,7 @@ export function addPropsToChildren(children, props) {
   if (!Array.isArray(children)) {
     return addPropsToReactElement(children, props);
   }
-  return children.map((childElement, i) =>
-    addPropsToReactElement(childElement, props, i),
-  );
+  return children.map((childElement, i) => addPropsToReactElement(childElement, props, i));
 }
 
 export const getCurrentTimeStamp = () => {
@@ -73,10 +67,7 @@ export const getCurrentTimeStamp = () => {
 
 export const uuidv4 = () => {
   return "10000000-1000-4000-8000-100000000000".replace(/[018]/g, (c) =>
-    (
-      +c ^
-      (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (+c / 4)))
-    ).toString(16),
+    (+c ^ (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (+c / 4)))).toString(16),
   );
 };
 
