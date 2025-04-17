@@ -7,7 +7,7 @@ get_company_profile:
   args_schema:
     symbol:
       type: str
-      description: the company name or ticker symbol.
+      description: the ticker symbol.
   return_output: profile
 
 get_company_news:
@@ -16,7 +16,7 @@ get_company_news:
   args_schema:
     symbol:
       type: str
-      description: the company name or ticker symbol.
+      description: the ticker symbol.
     start_date:
       type: str
       description: start date of the search period for the company's basic financials, yyyy-mm-dd.
@@ -34,7 +34,7 @@ get_basic_financials_history:
   args_schema:
     symbol:
       type: str
-      description: the company name or ticker symbol.
+      description: the ticker symbol.
     freq:
       type: str
       description: reporting frequency of the company's basic financials, such as annual, quarterly.
@@ -55,7 +55,7 @@ get_basic_financials:
   args_schema:
     symbol:
       type: str
-      description: the company name or ticker symbol.
+      description: the ticker symbol.
     selected_columns:
       type: list
       description: List of column names of news to return, should be chosen from 'assetTurnoverTTM', 'bookValue', 'cashRatio', 'currentRatio', 'ebitPerShare', 'eps', 'ev', 'fcfMargin', 'fcfPerShareTTM', 'grossMargin', 'inventoryTurnoverTTM', 'longtermDebtTotalAsset', 'longtermDebtTotalCapital', 'longtermDebtTotalEquity', 'netDebtToTotalCapital', 'netDebtToTotalEquity', 'netMargin', 'operatingMargin', 'payoutRatioTTM', 'pb', 'peTTM', 'pfcfTTM', 'pretaxMargin', 'psTTM', 'ptbv', 'quickRatio', 'receivablesTurnoverTTM', 'roaTTM', 'roeTTM', 'roicTTM', 'rotcTTM', 'salesPerShare', 'sgaToSale', 'tangibleBookValue', 'totalDebtToEquity', 'totalDebtToTotalAsset', 'totalDebtToTotalCapital', 'totalRatio','10DayAverageTradingVolume', '13WeekPriceReturnDaily', '26WeekPriceReturnDaily', '3MonthADReturnStd', '3MonthAverageTradingVolume', '52WeekHigh', '52WeekHighDate', '52WeekLow', '52WeekLowDate', '52WeekPriceReturnDaily', '5DayPriceReturnDaily', 'assetTurnoverAnnual', 'assetTurnoverTTM', 'beta', 'bookValuePerShareAnnual', 'bookValuePerShareQuarterly', 'bookValueShareGrowth5Y', 'capexCagr5Y', 'cashFlowPerShareAnnual', 'cashFlowPerShareQuarterly', 'cashFlowPerShareTTM', 'cashPerSharePerShareAnnual', 'cashPerSharePerShareQuarterly', 'currentDividendYieldTTM', 'currentEv/freeCashFlowAnnual', 'currentEv/freeCashFlowTTM', 'currentRatioAnnual', 'currentRatioQuarterly', 'dividendGrowthRate5Y', 'dividendPerShareAnnual', 'dividendPerShareTTM', 'dividendYieldIndicatedAnnual', 'ebitdPerShareAnnual', 'ebitdPerShareTTM', 'ebitdaCagr5Y', 'ebitdaInterimCagr5Y', 'enterpriseValue', 'epsAnnual', 'epsBasicExclExtraItemsAnnual', 'epsBasicExclExtraItemsTTM', 'epsExclExtraItemsAnnual', 'epsExclExtraItemsTTM', 'epsGrowth3Y', 'epsGrowth5Y', 'epsGrowthQuarterlyYoy', 'epsGrowthTTMYoy', 'epsInclExtraItemsAnnual', 'epsInclExtraItemsTTM', 'epsNormalizedAnnual', 'epsTTM', 'focfCagr5Y', 'grossMargin5Y', 'grossMarginAnnual', 'grossMarginTTM', 'inventoryTurnoverAnnual', 'inventoryTurnoverTTM', 'longTermDebt/equityAnnual', 'longTermDebt/equityQuarterly', 'marketCapitalization', 'monthToDatePriceReturnDaily', 'netIncomeEmployeeAnnual', 'netIncomeEmployeeTTM', 'netInterestCoverageAnnual', 'netInterestCoverageTTM', 'netMarginGrowth5Y', 'netProfitMargin5Y', 'netProfitMarginAnnual', 'netProfitMarginTTM', 'operatingMargin5Y'.
@@ -72,7 +72,7 @@ analyze_balance_sheet:
   args_schema:
     symbol:
       type: str
-      description: the company name or ticker symbol.
+      description: the ticker symbol.
     period:
       type: str
       description: The period of the balance sheets, possible values such as annual, quarterly, ttm. Default is 'annual'.
@@ -87,7 +87,7 @@ analyze_income_stmt:
   args_schema:
     symbol:
       type: str
-      description: the company name or ticker symbol.
+      description: the ticker symbol.
     period:
       type: str
       description: The period of the balance sheets, possible values, such as  annual, quarterly, ttm. Default is 'annual'.
@@ -102,7 +102,7 @@ analyze_cash_flow:
   args_schema:
     symbol:
       type: str
-      description: the company name or ticker symbol.
+      description: the ticker symbol.
     period:
       type: str
       description: The period of the balance sheets, possible values, such as annual, quarterly, ttm. Default is 'annual'.
@@ -117,7 +117,7 @@ get_share_performance:
   args_schema:
     symbol:
       type: str
-      description: the company name or ticker symbol.
+      description: the ticker symbol.
     end_date:
       type: str
       description: end date of the search period for the company's basic financials, yyyy-mm-dd.

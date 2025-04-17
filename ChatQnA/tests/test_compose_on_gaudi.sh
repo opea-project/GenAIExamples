@@ -95,19 +95,16 @@ function validate_microservices() {
     # Check if the microservices are running correctly.
 
     # tei for embedding service
-    echo "::group:: test tei-embedding"
     validate_service \
         "${ip_address}:8090/embed" \
         "\[\[" \
         "tei-embedding" \
         "tei-embedding-gaudi-server" \
         '{"inputs":"What is Deep Learning?"}'
-    echo "::endgroup::"
 
     sleep 1m # retrieval can't curl as expected, try to wait for more time
 
     # retrieval microservice
-    echo "::group:: test retriever"
     test_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
     validate_service \
         "${ip_address}:7000/v1/retrieval" \
@@ -115,27 +112,22 @@ function validate_microservices() {
         "retrieval" \
         "retriever-redis-server" \
         "{\"text\":\"What is the revenue of Nike in 2023?\",\"embedding\":${test_embedding}}"
-    echo "::endgroup::"
 
     # tei for rerank microservice
-    echo "::group:: test tei-rerank"
     validate_service \
         "${ip_address}:8808/rerank" \
         '{"index":1,"score":' \
         "tei-rerank" \
         "tei-reranking-gaudi-server" \
         '{"query":"What is Deep Learning?", "texts": ["Deep Learning is not...", "Deep learning is..."]}'
-    echo "::endgroup::"
 
     # vllm for llm service
-    echo "::group:: test vllm-llm"
     validate_service \
         "${ip_address}:8007/v1/chat/completions" \
         "content" \
         "vllm-llm" \
         "vllm-gaudi-server" \
         '{"model": "meta-llama/Meta-Llama-3-8B-Instruct", "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens":17}'
-    echo "::endgroup::"
 }
 
 function validate_megaservice() {
@@ -184,7 +176,7 @@ function stop_docker() {
 
 function main() {
 
-    echo "::group::start_docker"
+    echo "::group::stop_docker"
     stop_docker
     echo "::endgroup::"
 
