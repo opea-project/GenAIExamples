@@ -393,7 +393,7 @@ export const deleteMultipleInDataSource = createAsyncThunkWrapper(
     const promises = files.map((file) =>
       axios
       .post(DATA_PREP_DELETE_URL,  {
-        file_path: file,
+        file_path: file.split("_")[1],
       })
       .then((response) => {
           return response.data;
@@ -555,6 +555,7 @@ export const doSummaryFaq = (summaryFaqRequest: SummaryFaqRequest) => {
     formData.append("messages", '')
     formData.append("model", model)
     formData.append("max_tokens", token.toString())
+    formData.append("type", "text")
     formData.append("temperature", temperature.toString())
 
     files.forEach((file) => {
@@ -564,11 +565,11 @@ export const doSummaryFaq = (summaryFaqRequest: SummaryFaqRequest) => {
     formDataEventStream(urlMap[type], formData)
 
   } else {
-
     body.messages = messages;
     body.model = model;
     body.max_tokens = token,
     body.temperature = temperature;
+    body.type = "text";
 
     eventStream(type, body, conversationId);
 
@@ -631,7 +632,11 @@ const eventStream = (type: string, body: any, conversationId: string = '') => {
         if (msg?.data != "[DONE]") {
 
           try {
-
+            if(type === 'code'){
+              const parsedData = JSON.parse(msg.data);
+              result += parsedData.choices[0].text;
+              store.dispatch(setOnGoingResult(result));
+            }
             if(type !== 'summary' && type !== 'faq'){
 
               //parse content for data: "b"

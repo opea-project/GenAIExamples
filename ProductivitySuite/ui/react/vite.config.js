@@ -31,34 +31,34 @@ export default defineConfig({
         port: 5173,
     },
     build: {
-        sourcemap: true,
+        sourcemap: false,
         rollupOptions: {
-            output: {
-                manualChunks(id) {
-                    if (id.includes('node_modules')) {
+            // output: {
+            //     manualChunks(id) {
+            //         if (id.includes('node_modules')) {
                         
-                        if (id.match(/react-dom|react-router|react-redux/)) {
-                            return 'react-vendor'; 
-                        }
+            //             if (id.match(/react-dom|react-router|react-redux/)) {
+            //                 return 'react-vendor'; 
+            //             }
 
-                        // Code render files
-                        if (id.match(/react-syntax-highlighter|react-markdown|gfm|remark|refractor|micromark|highlight|mdast/)) {
-                            return 'code-vendor'; 
-                        }
+            //             // // Code render files
+            //             // if (id.match(/react-syntax-highlighter|react-markdown|gfm|remark|refractor|micromark|highlight|mdast/)) {
+            //             //     return 'code-vendor'; 
+            //             // }
 
-                        if (id.match(/emotion|mui|styled-components/)) {
-                            return 'style-vendor'; 
-                        }
+            //             if (id.match(/emotion|mui|styled-components/)) {
+            //                 return 'style-vendor'; 
+            //             }
 
-                        if (id.match(/keycloak-js|axios|notistack|reduxjs|fetch-event-source|azure/)) {
-                            return 'utils-vendor'; 
-                        }
+            //             if (id.match(/keycloak-js|axios|notistack|reduxjs|fetch-event-source|azure/)) {
+            //                 return 'utils-vendor'; 
+            //             }
 
-                        const packages = id.toString().split('node_modules/')[1].split('/')[0];
-                        return `vendor-${packages}`;
-                    }
-                }
-            },
+            //             const packages = id.toString().split('node_modules/')[1].split('/')[0];
+            //             return `vendor-${packages}`;
+            //         }
+            //     }
+            // },
             plugins: [
                 terser({
                     format: { comments: false },

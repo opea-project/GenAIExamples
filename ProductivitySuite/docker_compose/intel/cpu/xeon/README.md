@@ -142,6 +142,7 @@ export CHAT_HISTORY_DELETE_ENDPOINT="http://${host_ip}:6012/v1/chathistory/delet
 export CHAT_HISTORY_GET_ENDPOINT="http://${host_ip}:6012/v1/chathistory/get"
 export PROMPT_SERVICE_GET_ENDPOINT="http://${host_ip}:6018/v1/prompt/get"
 export PROMPT_SERVICE_CREATE_ENDPOINT="http://${host_ip}:6018/v1/prompt/create"
+export PROMPT_SERVICE_DELETE_ENDPOINT="http://${host_ip}:6018/v1/prompt/delete"
 export KEYCLOAK_SERVICE_ENDPOINT="http://${host_ip}:8080"
 export DocSum_COMPONENT_NAME="OpeaDocSumTgi"
 
@@ -180,16 +181,7 @@ Please refer to **[keycloak_setup_guide](keycloak_setup_guide.md)** for more det
        -H 'Content-Type: application/json'
    ```
 
-2. Embedding Microservice
-
-   ```bash
-   curl http://${host_ip}:6000/v1/embeddings\
-     -X POST \
-     -d '{"text":"hello"}' \
-     -H 'Content-Type: application/json'
-   ```
-
-3. Retriever Microservice
+2. Retriever Microservice
 
    To consume the retriever microservice, you need to generate a mock embedding vector by Python script. The length of embedding vector
    is determined by the embedding model.
@@ -205,7 +197,7 @@ Please refer to **[keycloak_setup_guide](keycloak_setup_guide.md)** for more det
      -H 'Content-Type: application/json'
    ```
 
-4. TEI Reranking Service
+3. TEI Reranking Service
 
    ```bash
    curl http://${host_ip}:8808/rerank \
@@ -214,16 +206,7 @@ Please refer to **[keycloak_setup_guide](keycloak_setup_guide.md)** for more det
        -H 'Content-Type: application/json'
    ```
 
-5. Reranking Microservice
-
-   ```bash
-   curl http://${host_ip}:8000/v1/reranking\
-     -X POST \
-     -d '{"initial_query":"What is Deep Learning?", "retrieved_docs": [{"text":"Deep Learning is not..."}, {"text":"Deep learning is..."}]}' \
-     -H 'Content-Type: application/json'
-   ```
-
-6. LLM backend Service (ChatQnA, DocSum)
+4. LLM backend Service (ChatQnA, DocSum)
 
    ```bash
    curl http://${host_ip}:9009/generate \
@@ -232,7 +215,7 @@ Please refer to **[keycloak_setup_guide](keycloak_setup_guide.md)** for more det
      -H 'Content-Type: application/json'
    ```
 
-7. LLM backend Service (CodeGen)
+5. LLM backend Service (CodeGen)
 
    ```bash
    curl http://${host_ip}:8028/generate \
@@ -241,16 +224,7 @@ Please refer to **[keycloak_setup_guide](keycloak_setup_guide.md)** for more det
      -H 'Content-Type: application/json'
    ```
 
-8. ChatQnA LLM Microservice
-
-   ```bash
-   curl http://${host_ip}:9000/v1/chat/completions\
-     -X POST \
-     -d '{"query":"What is Deep Learning?","max_tokens":17,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,"repetition_penalty":1.03,"stream":true}' \
-     -H 'Content-Type: application/json'
-   ```
-
-9. CodeGen LLM Microservice
+6. CodeGen LLM Microservice
 
    ```bash
    curl http://${host_ip}:9001/v1/chat/completions\
@@ -259,17 +233,16 @@ Please refer to **[keycloak_setup_guide](keycloak_setup_guide.md)** for more det
      -H 'Content-Type: application/json'
    ```
 
-10. DocSum LLM Microservice
+7. DocSum LLM Microservice
 
     ```bash
     curl http://${host_ip}:9003/v1/docsum\
       -X POST \
-      -d '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5"}' \
+      -d '{"messages":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5", "type": "text"}' \
       -H 'Content-Type: application/json'
     ```
 
-
-11. ChatQnA MegaService
+8. ChatQnA MegaService
 
     ```bash
     curl http://${host_ip}:8888/v1/chatqna -H "Content-Type: application/json" -d '{
@@ -277,15 +250,16 @@ Please refer to **[keycloak_setup_guide](keycloak_setup_guide.md)** for more det
          }'
     ```
 
-12. DocSum MegaService
+9. DocSum MegaService
 
     ```bash
     curl http://${host_ip}:8890/v1/docsum -H "Content-Type: application/json" -d '{
-         "messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."
+         "messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5.",
+         "type": "text"
          }'
     ```
 
-13. CodeGen MegaService
+10. CodeGen MegaService
 
     ```bash
     curl http://${host_ip}:7778/v1/codegen -H "Content-Type: application/json" -d '{
@@ -293,7 +267,7 @@ Please refer to **[keycloak_setup_guide](keycloak_setup_guide.md)** for more det
          }'
     ```
 
-14. Dataprep Microservice
+11. Dataprep Microservice
 
     If you want to update the default knowledge base, you can use the following commands:
 
@@ -343,7 +317,7 @@ Please refer to **[keycloak_setup_guide](keycloak_setup_guide.md)** for more det
          -H "Content-Type: application/json"
     ```
 
-15. Prompt Registry Microservice
+12. Prompt Registry Microservice
 
     If you want to update the default Prompts in the application for your user, you can use the following commands:
 
@@ -386,7 +360,7 @@ Please refer to **[keycloak_setup_guide](keycloak_setup_guide.md)** for more det
       "user": "test", "prompt_id":"{prompt_id to be deleted}"}'
     ```
 
-16. Chat History Microservice
+13. Chat History Microservice
 
     To validate the chatHistory Microservice, you can use the following commands.
 
@@ -496,7 +470,5 @@ Here're some of the project's features:
 
 #### Screenshots
 
-![project-screenshot](../../../../assets/img/doc_summary_paste.png)
-![project-screenshot](../../../../assets/img/doc_summary_file.png)
-
+![project-screenshot](../../../../assets/img/doc_summary.png)
 
