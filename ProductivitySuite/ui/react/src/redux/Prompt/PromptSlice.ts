@@ -32,12 +32,9 @@ export const PromptSlice = createSlice({
     },
   },
   extraReducers(builder) {
-    builder.addCase(
-      getPrompts.fulfilled,
-      (state, action: PayloadAction<any>) => {
-        state.prompts = action.payload;
-      },
-    );
+    builder.addCase(getPrompts.fulfilled, (state, action: PayloadAction<any>) => {
+      state.prompts = action.payload;
+    });
     builder.addCase(addPrompt.fulfilled, () => {
       notify("Prompt added Successfully", NotificationSeverity.SUCCESS);
     });

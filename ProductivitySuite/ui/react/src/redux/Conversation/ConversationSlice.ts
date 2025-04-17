@@ -31,16 +31,8 @@ import config, {
   DOC_SUM_URL,
   FAQ_GEN_URL,
 } from "@root/config";
-import {
-  NotificationSeverity,
-  notify,
-} from "@components/Notification/Notification";
-import {
-  ChatBubbleOutline,
-  CodeOutlined,
-  Description,
-  QuizOutlined,
-} from "@mui/icons-material";
+import { NotificationSeverity, notify } from "@components/Notification/Notification";
+import { ChatBubbleOutline, CodeOutlined, Description, QuizOutlined } from "@mui/icons-material";
 
 const urlMap: any = {
   summary: DOC_SUM_URL,
@@ -141,9 +133,7 @@ export const ConversationSlice = createSlice({
         // in case of upload / history conversation that clears model name, we want to reset to defaults
         const currentType = state.type;
         if (currentType) {
-          const approvedModel = state.models.find((item: Model) =>
-            item.types.includes(currentType),
-          );
+          const approvedModel = state.models.find((item: Model) => item.types.includes(currentType));
           if (approvedModel) {
             state.model = approvedModel.model_name;
             state.token = approvedModel.minToken;
@@ -161,10 +151,7 @@ export const ConversationSlice = createSlice({
     setSelectedConversationId: (state, action: PayloadAction<string>) => {
       state.selectedConversationId = action.payload;
     },
-    setSelectedConversationHistory: (
-      state,
-      action: PayloadAction<Message[]>,
-    ) => {
+    setSelectedConversationHistory: (state, action: PayloadAction<Message[]>) => {
       state.selectedConversationHistory = action.payload;
     },
     setTemperature: (state, action: PayloadAction<number>) => {
@@ -225,10 +212,7 @@ export const ConversationSlice = createSlice({
     setSystemPrompt: (state, action: PayloadAction<string>) => {
       state.systemPrompt = action.payload;
     },
-    setAbortController: (
-      state,
-      action: PayloadAction<AbortController | null>,
-    ) => {
+    setAbortController: (state, action: PayloadAction<AbortController | null>) => {
       state.abortController = action.payload;
     },
     abortStream: (state) => {
@@ -333,9 +317,7 @@ export const getSupportedModels = createAsyncThunkWrapper(
     // setDefault use case if not stored  / already set by localStorage
     // TODO: revisit if type also gets stored and not defaulted on state
     if (!currentModel && currentType) {
-      const approvedModel = response.data.find((item: Model) =>
-        item.types.includes(currentType),
-      );
+      const approvedModel = response.data.find((item: Model) => item.types.includes(currentType));
       if (approvedModel) store.dispatch(setModel(approvedModel));
     }
 
@@ -459,8 +441,7 @@ export const saveConversationtoDatabase = createAsyncThunkWrapper(
   async ({ conversation }: { conversation: Conversation }, { dispatch, getState }) => {
     // @ts-ignore
     const state: RootState = getState();
-    const selectedConversationHistory =
-      state.conversationReducer.selectedConversationHistory;
+    const selectedConversationHistory = state.conversationReducer.selectedConversationHistory;
 
     //TODO: if we end up with a systemPrompt for code change this
     const firstMessageIndex = state.conversationReducer.type === "code" ? 0 : 1;
@@ -633,11 +614,7 @@ const eventStream = (type: string, body: any, conversationId: string = "") => {
         if (response.ok) {
           store.dispatch(setIsPending(false));
           return;
-        } else if (
-          response.status >= 400 &&
-          response.status < 500 &&
-          response.status !== 429
-        ) {
+        } else if (response.status >= 400 && response.status < 500 && response.status !== 429) {
           const e = await response.json();
           console.log(e);
           throw Error(e.error.message);
