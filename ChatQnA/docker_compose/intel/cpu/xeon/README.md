@@ -1,56 +1,63 @@
-# Build Mega Service of ChatQnA on Xeon
+# Deploying ChatQnA on Intel® Xeon® Processors
 
-This document outlines the deployment process for a ChatQnA application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on Intel Xeon server. The steps include Docker image creation, container deployment via Docker Compose, and service execution to integrate microservices such as `embedding`, `retriever`, `rerank`,`llm` and `faqgen`.
+This document outlines the single node deployment process for a ChatQnA application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservices on Intel Xeon server. The steps include pulling Docker images, container deployment via Docker Compose, and service execution to integrate microservices such as `embedding`, `retriever`, `rerank` and `llm`.
 
-The default pipeline deploys with vLLM as the LLM serving component and leverages rerank component. It also provides options of not using rerank in the pipeline and using TGI backend for LLM microservice, please refer to [start-all-the-services-docker-containers](#start-all-the-services-docker-containers) section in this page. Besides, refer to [Build with Pinecone VectorDB](./README_pinecone.md) and [Build with Qdrant VectorDB](./README_qdrant.md) for other deployment variants.
+# Table of contents
 
-Quick Start:
+1. [ChatQnA Quick Start Deployment](#chatqna-quick-start-Deployment)
+2. [ChatQnA Docker Compose file Options](#chatqna-docker-compose-files)
+3. [ChatQnA with Conversational UI](#chatqna-with-conversational-ui-optional)
 
-1. Set up the environment variables.
-2. Run Docker Compose.
-3. Consume the ChatQnA Service.
+## ChatQnA Quick Start Deployment
 
-Note: The default LLM is `meta-llama/Meta-Llama-3-8B-Instruct`. Before deploying the application, please make sure either you've requested and been granted the access to it on [Huggingface](https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct) or you've downloaded the model locally from [ModelScope](https://www.modelscope.cn/models).
+This section describes how to quickly deploy and test the ChatQnA service manually on an Intel® Xeon® processor. The basic steps are:
 
-## Quick Start: 1.Setup Environment Variable
+1. [Access the Code](#access-the-code)
+2. [Generate a HuggingFace Access Token](#generate-a-huggingface-access-token)
+3. [Configure the Deployment Environment](#configure-the-deployment-environment)
+4. [Deploy the Services Using Docker Compose](#deploy-the-services-using-docker-compose)
+5. [Check the Deployment Status](#check-the-deployment-status)
+6. [Test the Pipeline](#test-the-pipeline)
+7. [Cleanup the Deployment](#cleanup-the-deployment)
 
-To set up environment variables for deploying ChatQnA services, follow these steps:
+### Access the Code
 
-1. Set the required environment variables:
+Clone the GenAIExample repository and access the ChatQnA Intel® Gaudi® platform Docker Compose files and supporting scripts:
 
-   ```bash
-   # Example: host_ip="192.168.1.1"
-   export host_ip="External_Public_IP"
-   export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
-   ```
+```
+git clone https://github.com/opea-project/GenAIExamples.git
+cd GenAIExamples/ChatQnA/docker_compose/intel/cpu/xeon/
+```
 
-2. If you are in a proxy environment, also set the proxy-related environment variables:
+Checkout a released version, such as v1.2:
 
-   ```bash
-   export http_proxy="Your_HTTP_Proxy"
-   export https_proxy="Your_HTTPs_Proxy"
-   # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
-   export no_proxy="Your_No_Proxy",chatqna-xeon-ui-server,chatqna-xeon-backend-server,dataprep-redis-service,tei-embedding-service,retriever,tei-reranking-service,tgi-service,vllm-service,llm-faqgen
-   ```
+```
+git checkout v1.2
+```
 
-3. Set up other environment variables:
+### Generate a HuggingFace Access Token
 
-   ```bash
-   source ./set_env.sh
-   ```
+Some HuggingFace resources, such as some models, are only accessible if the developer have an access token. In the absence of a HuggingFace access token, the developer can create one by first creating an account by following the steps provided at [HuggingFace](https://huggingface.co/) and then generating a [user access token](https://huggingface.co/docs/transformers.js/en/guides/private#step-1-generating-a-user-access-token).
 
-4. Change Model for LLM serving
+### Configure the Deployment Environment
 
-   By default, Meta-Llama-3-8B-Instruct is used for LLM serving, the default model can be changed to other validated LLM models.  
-   Please pick a [validated llm models](https://github.com/opea-project/GenAIComps/tree/main/comps/llms/src/text-generation#validated-llm-models) from the table.  
-   To change the default model defined in set_env.sh, overwrite it by exporting LLM_MODEL_ID to the new model or by modifying set_env.sh, and then repeat step 3.  
-   For example, change to Llama-2-7b-chat-hf using the following command.
+To set up environment variables for deploying ChatQnA services, set up some parameters specific to the deployment environment and source the _setup_env.sh_ script in this directory:
 
-   ```bash
-   export LLM_MODEL_ID="meta-llama/Llama-2-7b-chat-hf"
-   ```
+```
+export host_ip="External_Public_IP"           #ip address of the node
+export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
+export http_proxy="Your_HTTP_Proxy"           #http proxy if any
+export https_proxy="Your_HTTPs_Proxy"         #https proxy if any
+export no_proxy=localhost,127.0.0.1,$host_ip  #additional no proxies if needed
+export no_proxy=$no_proxy,chatqna-xeon-ui-server,chatqna-xeon-backend-server,dataprep-redis-service,tei-embedding-service,retriever,tei-reranking-service,tgi-service,vllm-service,llm-faqgen
+source ./set_env.sh
+```
 
-## Quick Start: 2.Run Docker Compose
+Consult the section on [ChatQnA Service configuration](#chatqna-configuration) for information on how service specific configuration parameters affect deployments.
+
+### Deploy the Services Using Docker Compose
+
+To deploy the ChatQnA services, execute the `docker compose up` command with the appropriate arguments. For a default deployment, execute the command below. It uses the 'compose.yaml' file.
 
 ```bash
 docker compose up -d
@@ -66,22 +73,54 @@ CPU example with Open Telemetry feature:
 docker compose -f compose.yaml -f compose.telemetry.yaml up -d
 ```
 
-It will automatically download the docker image on `docker hub`:
+**Note**: developers should build docker image from source when:
 
-```bash
-docker pull opea/chatqna:latest
-docker pull opea/chatqna-ui:latest
+- Developing off the git main branch (as the container's ports in the repo may be different from the published docker image).
+- Unable to download the docker image.
+- Use a specific version of Docker image.
+
+Please refer to the table below to build different microservices from source:
+
+| Microservice | Deployment Guide                                                                              |
+| ------------ | --------------------------------------------------------------------------------------------- |
+| Dataprep     | https://github.com/opea-project/GenAIComps/tree/main/comps/dataprep                           |
+| Embedding    | https://github.com/opea-project/GenAIComps/tree/main/comps/embeddings                         |
+| Retriever    | https://github.com/opea-project/GenAIComps/tree/main/comps/retrievers                         |
+| Reranker     | https://github.com/opea-project/GenAIComps/tree/main/comps/rerankings                         |
+| LLM          | https://github.com/opea-project/GenAIComps/tree/main/comps/llms                               |
+| Megaservice  | [Megaservice build guide](../../../../README_miscellaneous.md#build-megaservice-docker-image) |
+| UI           | [Basic UI build guide](../../../../README_miscellaneous.md#build-ui-docker-image)             |
+
+### Check the Deployment Status
+
+After running docker compose, check if all the containers launched via docker compose have started:
+
+```
+docker ps -a
 ```
 
-NB: You should build docker image from source by yourself if:
+For the default deployment, the following 10 containers should have started:
 
-- You are developing off the git main branch (as the container's ports in the repo may be different from the published docker image).
-- You can't download the docker image.
-- You want to use a specific version of Docker image.
+```
+CONTAINER ID   IMAGE                                                   COMMAND                  CREATED        STATUS        PORTS                                                                                  NAMES
+3b5fa9a722da   opea/chatqna-ui:${RELEASE_VERSION}                                  "docker-entrypoint.s…"   32 hours ago   Up 2 hours   0.0.0.0:5173->5173/tcp, :::5173->5173/tcp                                              chatqna-xeon-ui-server
+d3b37f3d1faa   opea/chatqna:${RELEASE_VERSION}                                     "python chatqna.py"      32 hours ago   Up 2 hours   0.0.0.0:8888->8888/tcp, :::8888->8888/tcp                                              chatqna-xeon-backend-server
+b3e1388fa2ca   opea/reranking-tei:${RELEASE_VERSION}                               "python reranking_te…"   32 hours ago   Up 2 hours   0.0.0.0:8000->8000/tcp, :::8000->8000/tcp                                              reranking-tei-xeon-server
+24a240f8ad1c   opea/retriever-redis:${RELEASE_VERSION}                             "python retriever_re…"   32 hours ago   Up 2 hours   0.0.0.0:7000->7000/tcp, :::7000->7000/tcp                                              retriever-redis-server
+9c0d2a2553e8   opea/embedding-tei:${RELEASE_VERSION}                               "python embedding_te…"   32 hours ago   Up 2 hours   0.0.0.0:6000->6000/tcp, :::6000->6000/tcp                                              embedding-tei-server
+24cae0db1a70   opea/llm-vllm:${RELEASE_VERSION}                                    "bash entrypoint.sh"     32 hours ago   Up 2 hours   0.0.0.0:9000->9000/tcp, :::9000->9000/tcp                                              llm-vllm-server
+ea3986c3cf82   opea/dataprep-redis:${RELEASE_VERSION}                              "python prepare_doc_…"   32 hours ago   Up 2 hours   0.0.0.0:6007->6007/tcp, :::6007->6007/tcp                                              dataprep-redis-server
+e10dd14497a8   redis/redis-stack:7.2.0-v9                              "/entrypoint.sh"         32 hours ago   Up 2 hours   0.0.0.0:6379->6379/tcp, :::6379->6379/tcp, 0.0.0.0:8001->8001/tcp, :::8001->8001/tcp   redis-vector-db
+b98fa07a4f5c   opea/vllm:${RELEASE_VERSION}                                        "python3 -m vllm.ent…"   32 hours ago   Up 2 hours   0.0.0.0:9009->80/tcp, :::9009->80/tcp                                                  vllm-service
+79276cf45a47   ghcr.io/huggingface/text-embeddings-inference:cpu-1.2   "text-embeddings-rou…"   32 hours ago   Up 2 hours   0.0.0.0:6006->80/tcp, :::6006->80/tcp                                                  tei-embedding-server
+4943e5f6cd80   ghcr.io/huggingface/text-embeddings-inference:cpu-1.2   "text-embeddings-rou…"   32 hours ago   Up 2 hours   0.0.0.0:8808->80/tcp, :::8808->80/tcp
+```
 
-Please refer to ['Build Docker Images'](#🚀-build-docker-images) in below.
+If any issues are encountered during deployment, refer to the [troubleshooting](../../../../README_miscellaneous.md##troubleshooting) section.
 
-## QuickStart: 3.Consume the ChatQnA Service
+### Test the Pipeline
+
+Once the ChatQnA services are running, test the pipeline using the following command:
 
 ```bash
 curl http://${host_ip}:8888/v1/chatqna \
@@ -91,217 +130,67 @@ curl http://${host_ip}:8888/v1/chatqna \
     }'
 ```
 
-## 🚀 Apply Xeon Server on AWS
+**Note** : Access the ChatQnA UI by web browser through this URL: `http://${host_ip}:80`. Please confirm the `80` port is opened in the firewall. To validate each microservie used in the pipeline refer to the [Validate microservicess](#validate-microservices) section.
 
-To apply a Xeon server on AWS, start by creating an AWS account if you don't have one already. Then, head to the [EC2 Console](https://console.aws.amazon.com/ec2/v2/home) to begin the process. Within the EC2 service, select the Amazon EC2 M7i or M7i-flex instance type to leverage 4th Generation Intel Xeon Scalable processors that are optimized for demanding workloads.
+### Cleanup the Deployment
 
-For detailed information about these instance types, you can refer to this [link](https://aws.amazon.com/ec2/instance-types/m7i/). Once you've chosen the appropriate instance type, proceed with configuring your instance settings, including network configurations, security groups, and storage options.
+To stop the containers associated with the deployment, execute the following command:
 
-After launching your instance, you can connect to it using SSH (for Linux instances) or Remote Desktop Protocol (RDP) (for Windows instances). From there, you'll have full access to your Xeon server, allowing you to install, configure, and manage your applications as needed.
-
-### Network Port & Security
-
-- Access the ChatQnA UI by web browser
-
-  It supports to access by `80` port. Please confirm the `80` port is opened in the firewall of EC2 instance.
-
-- Access the microservice by tool or API
-
-  1. Login to the EC2 instance and access by **local IP address** and port.
-
-     It's recommended and do nothing of the network port setting.
-
-  2. Login to a remote client and access by **public IP address** and port.
-
-     You need to open the port of the microservice in the security group setting of firewall of EC2 instance setting.
-
-     For detailed guide, please refer to [Validate Microservices](#validate-microservices).
-
-     Note, it will increase the risk of security, so please confirm before do it.
-
-## 🚀 Build Docker Images
-
-First of all, you need to build Docker Images locally and install the python package of it.
-
-```bash
-git clone https://github.com/opea-project/GenAIComps.git
-cd GenAIComps
+```
+docker compose -f compose.yaml down
 ```
 
-### 1. Build Retriever Image
+## ChatQnA Docker Compose Files
 
-```bash
-docker build --no-cache -t opea/retriever:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/src/Dockerfile .
+In the context of deploying a ChatQnA pipeline on an Intel® Xeon® platform, we can pick and choose different vector databases, large language model serving frameworks, and remove pieces of the pipeline such as the reranker. The table below outlines the various configurations that are available as part of the application. These configurations can be used as templates and can be extended to different components available in [GenAIComps](https://github.com/opea-project/GenAIComps.git).
+
+| File                                                         | Description                                                                                            |
+| ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------ |
+| [compose.yaml](./compose.yaml)                               | Default compose file using vllm as serving framework and redis as vector database                      |
+| [compose_milvus.yaml](./compose_milvus.yaml)                 | The vector database utilized is Milvus. All other configurations remain the same as the default        |
+| [compose_pinecone.yaml](./compose_pinecone.yaml)             | The vector database utilized is Pinecone. All other configurations remain the same as the default      |
+| [compose_qdrant.yaml](./compose_qdrant.yaml)                 | The vector database utilized is Qdrant. All other configurations remain the same as the default        |
+| [compose_tgi.yaml](./compose_tgi.yaml)                       | The LLM serving framework is TGI. All other configurations remain the same as the default              |
+| [compose_without_rerank.yaml](./compose_without_rerank.yaml) | Default configuration without the reranker                                                             |
+| [compose.telemetry.yaml](./compose.telemetry.yaml)           | Helper file for telemetry features for vllm. Can be used along with any compose files that serves vllm |
+| [compose_tgi.telemetry.yaml](./compose_tgi.telemetry.yaml)   | Helper file for telemetry features for tgi. Can be used along with any compose files that serves tgi   |
+
+## ChatQnA with Conversational UI (Optional)
+
+To access the Conversational UI (react based) frontend, modify the UI service in the `compose` file used to deploy. Replace `chaqna-xeon-ui-server` service with the `chatqna-xeon-conversation-ui-server` service as per the config below:
+
+```yaml
+chaqna-xeon-conversation-ui-server:
+  image: opea/chatqna-conversation-ui:latest
+  container_name: chatqna-xeon-conversation-ui-server
+  environment:
+    - APP_BACKEND_SERVICE_ENDPOINT=${BACKEND_SERVICE_ENDPOINT}
+    - APP_DATA_PREP_SERVICE_URL=${DATAPREP_SERVICE_ENDPOINT}
+  ports:
+    - "5174:80"
+  depends_on:
+    - chaqna-xeon-backend-server
+  ipc: host
+  restart: always
 ```
 
-### 2. Build Dataprep Image
+Once the services are up, open the following URL in the browser: http://{host_ip}:5174. By default, the UI runs on port 80 internally. If the developer prefers to use a different host port to access the frontend, it can be modiied by port mapping in the `compose.yaml` file as shown below:
 
-```bash
-docker build --no-cache -t opea/dataprep:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/src/Dockerfile .
-cd ..
+```yaml
+  chaqna-gaudi-conversation-ui-server:
+    image: opea/chatqna-conversation-ui:latest
+    ...
+    ports:
+      - "80:80"
 ```
 
-### 3. Build FaqGen LLM Image (Optional)
+Here is an example of running ChatQnA (default UI):
 
-If you want to enable FAQ generation LLM in the pipeline, please use the below command:
+![project-screenshot](../../../../assets/img/chat_ui_response.png)
 
-```bash
-git clone https://github.com/opea-project/GenAIComps.git
-cd GenAIComps
-docker build -t opea/llm-faqgen:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/src/faq-generation/Dockerfile .
-```
+Here is an example of running ChatQnA with Conversational UI (React):
 
-### 4. Build MegaService Docker Image
-
-To construct the Mega Service with Rerank, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `chatqna.py` Python script. Build MegaService Docker image via below command:
-
-```bash
-git clone https://github.com/opea-project/GenAIExamples.git
-cd GenAIExamples/ChatQnA
-docker build --no-cache -t opea/chatqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
-```
-
-### 5. Build UI Docker Image
-
-Build frontend Docker image via below command:
-
-```bash
-cd GenAIExamples/ChatQnA/ui
-docker build --no-cache -t opea/chatqna-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
-```
-
-### 6. Build Conversational React UI Docker Image (Optional)
-
-Build frontend Docker image that enables Conversational experience with ChatQnA megaservice via below command:
-
-**Export the value of the public IP address of your Xeon server to the `host_ip` environment variable**
-
-```bash
-cd GenAIExamples/ChatQnA/ui
-docker build --no-cache -t opea/chatqna-conversation-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile.react .
-```
-
-### 7. Build Nginx Docker Image
-
-```bash
-cd GenAIComps
-docker build -t opea/nginx:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/third_parties/nginx/src/Dockerfile .
-```
-
-Then run the command `docker images`, you will have the following 5 Docker Images:
-
-1. `opea/dataprep:latest`
-2. `opea/retriever:latest`
-3. `opea/chatqna:latest`
-4. `opea/chatqna-ui:latest`
-5. `opea/nginx:latest`
-
-If FaqGen related docker image is built, you will find one more image:
-
-- `opea/llm-faqgen:latest`
-
-## 🚀 Start Microservices
-
-### Required Models
-
-By default, the embedding, reranking and LLM models are set to a default value as listed below:
-
-| Service   | Model                               |
-| --------- | ----------------------------------- |
-| Embedding | BAAI/bge-base-en-v1.5               |
-| Reranking | BAAI/bge-reranker-base              |
-| LLM       | meta-llama/Meta-Llama-3-8B-Instruct |
-
-Change the `xxx_MODEL_ID` below for your needs.
-
-For users in China who are unable to download models directly from Huggingface, you can use [ModelScope](https://www.modelscope.cn/models) or a Huggingface mirror to download models. The vLLM/TGI can load the models either online or offline as described below:
-
-1. Online
-
-   ```bash
-   export HF_TOKEN=${your_hf_token}
-   export HF_ENDPOINT="https://hf-mirror.com"
-   model_name="meta-llama/Meta-Llama-3-8B-Instruct"
-   # Start vLLM LLM Service
-   docker run -p 8008:80 -v ./data:/root/.cache/huggingface/hub --name vllm-service -e HF_ENDPOINT=$HF_ENDPOINT -e http_proxy=$http_proxy -e https_proxy=$https_proxy --shm-size 128g opea/vllm:latest --model $model_name --host 0.0.0.0 --port 80
-   # Start TGI LLM Service
-   docker run -p 8008:80 -v ./data:/data --name tgi-service -e HF_ENDPOINT=$HF_ENDPOINT -e http_proxy=$http_proxy -e https_proxy=$https_proxy --shm-size 1g ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu --model-id $model_name
-   ```
-
-2. Offline
-
-   - Search your model name in ModelScope. For example, check [this page](https://modelscope.cn/models/LLM-Research/Meta-Llama-3-8B-Instruct/files) for model `Meta-Llama-3-8B-Instruct`.
-
-   - Click on `Download this model` button, and choose one way to download the model to your local path `/path/to/model`.
-
-   - Run the following command to start the LLM service.
-
-     ```bash
-     export HF_TOKEN=${your_hf_token}
-     export model_path="/path/to/model"
-     # Start vLLM LLM Service
-     docker run -p 8008:80 -v $model_path:/root/.cache/huggingface/hub --name vllm-service --shm-size 128g opea/vllm:latest --model /root/.cache/huggingface/hub --host 0.0.0.0 --port 80
-     # Start TGI LLM Service
-     docker run -p 8008:80 -v $model_path:/data --name tgi-service --shm-size 1g ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu --model-id /data
-     ```
-
-### Setup Environment Variables
-
-1. Set the required environment variables:
-
-   ```bash
-   # Example: host_ip="192.168.1.1"
-   export host_ip="External_Public_IP"
-   export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
-   # Example: NGINX_PORT=80
-   export NGINX_PORT=${your_nginx_port}
-   ```
-
-2. If you are in a proxy environment, also set the proxy-related environment variables:
-
-   ```bash
-   export http_proxy="Your_HTTP_Proxy"
-   export https_proxy="Your_HTTPs_Proxy"
-   # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
-   export no_proxy="Your_No_Proxy",chatqna-xeon-ui-server,chatqna-xeon-backend-server,dataprep-redis-service,tei-embedding-service,retriever,tei-reranking-service,tgi-service,vllm-service
-   ```
-
-3. Set up other environment variables:
-
-   ```bash
-   source ./set_env.sh
-   ```
-
-### Start all the services Docker Containers
-
-> Before running the docker compose command, you need to be in the folder that has the docker compose yaml file
-
-```bash
-cd GenAIExamples/ChatQnA/docker_compose/intel/cpu/xeon/
-```
-
-If use vLLM as the LLM serving backend.
-
-```bash
-# Start ChatQnA with Rerank Pipeline
-docker compose -f compose.yaml up -d
-# Start ChatQnA without Rerank Pipeline
-docker compose -f compose_without_rerank.yaml up -d
-# Start ChatQnA with Rerank Pipeline and Open Telemetry Tracing
-docker compose -f compose.yaml -f compose.telemetry.yaml up -d
-# Start ChatQnA with FaqGen Pipeline
-docker compose -f compose_faqgen.yaml up -d
-```
-
-If use TGI as the LLM serving backend.
-
-```bash
-docker compose -f compose_tgi.yaml up -d
-# Start ChatQnA with Open Telemetry Tracing
-docker compose -f compose_tgi.yaml -f compose_tgi.telemetry.yaml up -d
-# Start ChatQnA with FaqGen Pipeline
-docker compose -f compose_faqgen_tgi.yaml up -d
-```
+![project-screenshot](../../../../assets/img/conversation_ui_response.png)
 
 ### Validate Microservices
 
@@ -375,16 +264,7 @@ For details on how to verify the correctness of the response, refer to [how-to-v
      -H 'Content-Type: application/json'
    ```
 
-5. FaqGen LLM Microservice (if enabled)
-
-```bash
-curl http://${host_ip}:${LLM_SERVICE_PORT}/v1/faqgen \
-  -X POST \
-  -d '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}' \
-  -H 'Content-Type: application/json'
-```
-
-6. MegaService
+5. MegaService
 
    ```bash
     curl http://${host_ip}:8888/v1/chatqna -H "Content-Type: application/json" -d '{
@@ -392,7 +272,7 @@ curl http://${host_ip}:${LLM_SERVICE_PORT}/v1/faqgen \
           }'
    ```
 
-7. Nginx Service
+6. Nginx Service
 
    ```bash
    curl http://${host_ip}:${NGINX_PORT}/v1/chatqna \
@@ -400,7 +280,7 @@ curl http://${host_ip}:${LLM_SERVICE_PORT}/v1/faqgen \
        -d '{"messages": "What is the revenue of Nike in 2023?"}'
    ```
 
-8. Dataprep Microservice（Optional）
+7. Dataprep Microservice（Optional）
 
 If you want to update the default knowledge base, you can use the following commands:
 
@@ -539,59 +419,6 @@ Open a web browser and type "chrome://tracing" or "ui.perfetto.dev", and then lo
  to see the vLLM profiling result as below diagram.
 ![image](https://github.com/user-attachments/assets/55c7097e-5574-41dc-97a7-5e87c31bc286)
 
-## 🚀 Launch the UI
+## Conclusion
 
-### Launch with origin port
-
-To access the frontend, open the following URL in your browser: http://{host_ip}:5173. By default, the UI runs on port 5173 internally. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `compose.yaml` file as shown below:
-
-```yaml
-  chaqna-gaudi-ui-server:
-    image: opea/chatqna-ui:latest
-    ...
-    ports:
-      - "80:5173"
-```
-
-### Launch with Nginx
-
-If you want to launch the UI using Nginx, open this URL: `http://${host_ip}:${NGINX_PORT}` in your browser to access the frontend.
-
-## 🚀 Launch the Conversational UI (Optional)
-
-To access the Conversational UI (react based) frontend, modify the UI service in the `compose.yaml` file. Replace `chaqna-xeon-ui-server` service with the `chatqna-xeon-conversation-ui-server` service as per the config below:
-
-```yaml
-chaqna-xeon-conversation-ui-server:
-  image: opea/chatqna-conversation-ui:latest
-  container_name: chatqna-xeon-conversation-ui-server
-  environment:
-    - APP_BACKEND_SERVICE_ENDPOINT=${BACKEND_SERVICE_ENDPOINT}
-    - APP_DATA_PREP_SERVICE_URL=${DATAPREP_SERVICE_ENDPOINT}
-  ports:
-    - "5174:80"
-  depends_on:
-    - chaqna-xeon-backend-server
-  ipc: host
-  restart: always
-```
-
-Once the services are up, open the following URL in your browser: http://{host_ip}:5174. By default, the UI runs on port 80 internally. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `compose.yaml` file as shown below:
-
-```yaml
-  chaqna-gaudi-conversation-ui-server:
-    image: opea/chatqna-conversation-ui:latest
-    ...
-    ports:
-      - "80:80"
-```
-
-![project-screenshot](../../../../assets/img/chat_ui_init.png)
-
-Here is an example of running ChatQnA:
-
-![project-screenshot](../../../../assets/img/chat_ui_response.png)
-
-Here is an example of running ChatQnA with Conversational UI (React):
-
-![project-screenshot](../../../../assets/img/conversation_ui_response.png)
+This guide should enable developer to deploy the default configuration or any of the other compose yaml files for different configurations. It also highlights the configurable parameters that can be set before deployment.
