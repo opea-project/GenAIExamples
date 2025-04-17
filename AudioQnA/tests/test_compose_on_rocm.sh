@@ -55,7 +55,6 @@ function start_services() {
     export LLM_SERVER_PORT=3006
 
     export BACKEND_SERVICE_ENDPOINT=http://${ip_address}:3008/v1/audioqna
-    export MODEL_CACHE=${model_cache:-"~/opea/data"}
 
     # sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
