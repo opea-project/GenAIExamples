@@ -315,7 +315,7 @@ def _run_service_test(example, service, test_suite_config, namespace):
         run_yaml_path = stresscli_conf["run_yaml_path"]
         print(f"[OPEA BENCHMARK] 🚀 The {index} time test is running, run yaml: {run_yaml_path}...")
         os.environ["MAX_TOKENS"] = str(service.get("max_output"))
- 
+
         dataset = None
         if stresscli_conf.get("envs") is not None:
             for key, value in stresscli_conf.get("envs").items():
@@ -381,7 +381,7 @@ def run_benchmark(benchmark_config, chart_name, namespace, node_num=1, llm_model
         "run_time": "30m",  # The max total run time for the test suite, set to 60m by default
         "collect_service_metric": (
             parsed_data["collect_service_metric"] if parsed_data["collect_service_metric"] else False
-        ), # Metrics collection set to False by default
+        ),  # Metrics collection set to False by default
         "llm_model": llm_model,  # The LLM model used for the test
         "deployment_type": "k8s",  # Default is "k8s", can also be "docker"
         "service_ip": None,  # Leave as None for k8s, specify for Docker
@@ -410,7 +410,7 @@ def run_benchmark(benchmark_config, chart_name, namespace, node_num=1, llm_model
         "stream": parsed_data["stream"],
     }
 
-    if parsed_data["dataset"]: # This checks if user provided dataset/document for DocSum service
+    if parsed_data["dataset"]:  # This checks if user provided dataset/document for DocSum service
         dataset = parsed_data["dataset"]
     else:
         dataset = None
@@ -454,7 +454,7 @@ def run_benchmark(benchmark_config, chart_name, namespace, node_num=1, llm_model
                 "stream": parsed_data["stream"],
                 "max_output": llm_max_token,  # max number of output tokens
                 "summary_type": parsed_data["summary_type"],  # Summary_type for DocSum
-                "dataset": dataset, # Dataset used for document summary
+                "dataset": dataset,  # Dataset used for document summary
             }
 
         output_folder = _run_service_test(chart_name, case_data, test_suite_config, namespace)
