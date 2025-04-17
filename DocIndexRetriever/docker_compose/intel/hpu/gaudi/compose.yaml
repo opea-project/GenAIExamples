@@ -29,6 +29,12 @@ services:
       INDEX_NAME: ${INDEX_NAME}
       TEI_EMBEDDING_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:5000/v1/health_check || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
   tei-embedding-service:
     image: ghcr.io/huggingface/tei-gaudi:1.5.0
     entrypoint: /bin/sh -c "apt-get update && apt-get install -y curl && text-embeddings-router --json-output --model-id ${EMBEDDING_MODEL_ID} --auto-truncate"
@@ -52,7 +58,7 @@ services:
       ENABLE_EXPERIMENTAL_FLAGS: true
       host_ip: ${host_ip}
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://$host_ip:8090/health || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://localhost:80/health || exit 1"]
       interval: 10s
       timeout: 10s
       retries: 60
@@ -110,7 +116,7 @@ services:
       HF_HUB_ENABLE_HF_TRANSFER: 0
       host_ip: ${host_ip}
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://$host_ip:8808/health || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://localhost:80/health || exit 1"]
       interval: 10s
       timeout: 10s
       retries: 60
@@ -138,11 +144,18 @@ services:
     image: ${REGISTRY:-opea}/doc-index-retriever:${TAG:-latest}
     container_name: doc-index-retriever-server
     depends_on:
-      - redis-vector-db
-      - tei-embedding-service
-      - embedding
-      - retriever
-      - reranking
+      redis-vector-db:
+        condition: service_started
+      tei-embedding-service:
+        condition: service_healthy
+      embedding:
+        condition: service_started
+      dataprep-redis-service:
+        condition: service_healthy
+      retriever:
+        condition: service_started
+      reranking:
+        condition: service_started
     ports:
       - "8889:8889"
     environment:

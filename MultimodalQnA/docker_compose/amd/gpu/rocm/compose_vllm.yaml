@@ -38,6 +38,11 @@ services:
       HUGGINGFACEHUB_API_TOKEN: ${MULTIMODAL_HUGGINGFACEHUB_API_TOKEN}
       MULTIMODAL_DATAPREP: true
       DATAPREP_COMPONENT_NAME: "OPEA_DATAPREP_MULTIMODALREDIS"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:5000/v1/health_check || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
     restart: unless-stopped
   embedding-multimodal-bridgetower:
     image: ${REGISTRY:-opea}/embedding-multimodal-bridgetower:${TAG:-latest}
@@ -144,11 +149,16 @@ services:
     image: ${REGISTRY:-opea}/multimodalqna:${TAG:-latest}
     container_name: multimodalqna-backend-server
     depends_on:
-      - redis-vector-db
-      - dataprep-multimodal-redis
-      - embedding
-      - retriever-redis
-      - lvm
+      redis-vector-db:
+        condition: service_started
+      dataprep-multimodal-redis:
+        condition: service_healthy
+      embedding:
+        condition: service_started
+      retriever-redis:
+        condition: service_started
+      lvm:
+        condition: service_started
     ports:
       - "8888:8888"
     environment:
