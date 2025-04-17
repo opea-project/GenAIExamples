@@ -135,7 +135,7 @@ services:
         condition: service_started
       tei-reranking-service:
         condition: service_healthy
-      tgi_service:
+      tgi-service:
         condition: service_healthy
     ports:
       - "8888:8888"
