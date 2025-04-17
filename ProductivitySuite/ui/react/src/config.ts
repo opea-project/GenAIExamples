@@ -1,9 +1,6 @@
-<<<<<<< HEAD
-=======
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
->>>>>>> c0c9e16f6c42465d9409bab8b48848105085a8a7
 const config = {
   companyName: "My Company",
   logo: "/logo512.png",
@@ -39,15 +36,9 @@ export const CHAT_HISTORY_GET = import.meta.env.VITE_CHAT_HISTORY_GET_ENDPOINT;
 export const CHAT_HISTORY_DELETE = import.meta.env
   .VITE_CHAT_HISTORY_DELETE_ENDPOINT;
 
-<<<<<<< HEAD
 export const PROMPT_MANAGER_GET = import.meta.env
   .VITE_PROMPT_SERVICE_GET_ENDPOINT;
 export const PROMPT_MANAGER_CREATE = import.meta.env
   .VITE_PROMPT_SERVICE_CREATE_ENDPOINT;
 export const PROMPT_MANAGER_DELETE = import.meta.env
   .VITE_PROMPT_SERVICE_DELETE_ENDPOINT;
-=======
-export const PROMPT_MANAGER_GET = import.meta.env.VITE_PROMPT_SERVICE_GET_ENDPOINT;
-export const PROMPT_MANAGER_CREATE = import.meta.env.VITE_PROMPT_SERVICE_CREATE_ENDPOINT;
-export const PROMPT_MANAGER_DELETE = import.meta.env.VITE_PROMPT_SERVICE_DELETE_ENDPOINT;
->>>>>>> c0c9e16f6c42465d9409bab8b48848105085a8a7

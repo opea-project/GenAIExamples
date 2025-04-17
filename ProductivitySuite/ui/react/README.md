@@ -73,6 +73,7 @@ Here're some of the project's features:
     VITE_PROMPT_COLLECTION_NAME="prompt"
    ```
 4. There is models_config.json file under public folder. It is in the below format. The types key in the below json array shows that the model is used for following types.
+
    ```
      [
 
@@ -90,6 +91,7 @@ Here're some of the project's features:
 
      ]
    ```
+
 5. Execute `npm install` to install the corresponding dependencies.
 
 6. Execute `npm run dev`

@@ -58,13 +58,10 @@ const Home = () => {
     }
   }, []);
 
-    useEffect(()=>{
-        // clean up and reset. Can happen on going home from history/upload convo
-        // if convo is missing one of these
-        if(!model || !token || !temperature){
-            dispatch(newConversation(true))
-        }
-    }, [])
+  return (
+    <div className={styles.homeView}>
+      {/* <AtomAnimation/> */}
+      <AtomIcon />
 
       <HomeTitle className={styles.title} variant="h1">
         Hi, {name}. {config.tagline}
