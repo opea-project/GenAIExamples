@@ -75,7 +75,7 @@ export const addPrompt = createAsyncThunkWrapper(
   },
 );
 
-//TODO delete prompt doesnt actually work, but responds 200
+//TODO delete prompt doesn't actually work, but responds 200
 export const deletePrompt = createAsyncThunkWrapper(
   "prompts/deletePrompt",
   async ({ promptId, promptText }: { promptId: string; promptText: string }, { dispatch, getState }) => {

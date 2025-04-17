@@ -47,7 +47,6 @@ const App = () => {
   const { useCase } = useAppSelector(conversationSelector);
 
   useEffect(() => {
-    if (keycloak?.idTokenParsed) console.log(keycloak?.idTokenParsed);
 
     //TODO: get role from keyCloack scope, defaulting to Admin
     dispatch(
