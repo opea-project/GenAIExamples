@@ -23,7 +23,7 @@ services:
       USE_FLASH_ATTENTION: true
       FLASH_ATTENTION_RECOMPUTE: true
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://$host_ip:8028/health || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://localhost:80/health || exit 1"]
       interval: 10s
       timeout: 10s
       retries: 100
@@ -53,7 +53,7 @@ services:
       NUM_CARDS: ${NUM_CARDS:-1}
       VLLM_TORCH_PROFILER_DIR: "/mnt"
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://$host_ip:8028/health || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://localhost:80/health || exit 1"]
       interval: 10s
       timeout: 10s
       retries: 100
@@ -99,7 +99,10 @@ services:
     image: ${REGISTRY:-opea}/codegen:${TAG:-latest}
     container_name: codegen-gaudi-backend-server
     depends_on:
-      - llm-base
+      llm-base:
+        condition: service_started
+      dataprep-redis-server:
+        condition: service_healthy
     ports:
       - "7778:7778"
     environment:
@@ -155,6 +158,11 @@ services:
       INDEX_NAME: ${INDEX_NAME}
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       LOGFLAG: true
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:5000/v1/health_check || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
     restart: unless-stopped
   tei-embedding-serving:
     image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
@@ -172,7 +180,7 @@ services:
       host_ip: ${host_ip}
       HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://${host_ip}:${TEI_EMBEDDER_PORT}/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
       interval: 10s
       timeout: 6s
       retries: 48
