@@ -1,6 +1,5 @@
 .tableDiv {
-
-  &:first-of-type{
+  &:first-of-type {
     padding-top: 0px !important;
   }
 
@@ -19,12 +18,12 @@
   }
 }
 
-.markdownWrapper{
-  > p:first-of-type{
-      margin-top: .25rem;
+.markdownWrapper {
+  > p:first-of-type {
+    margin-top: 0.25rem;
   }
 
-  > p:last-of-type{
-      margin-bottom: .25rem;
+  > p:last-of-type {
+    margin-bottom: 0.25rem;
   }
 }

@@ -51,7 +51,7 @@ const Home = () => {
     }
 
     useEffect(()=>{
-        // clean up and reset. Can happen on going home from history/updload convo
+        // clean up and reset. Can happen on going home from history/upload convo
         // if convo is missing one of these
         if(!model || !token || !temperature){
             dispatch(newConversation(true))

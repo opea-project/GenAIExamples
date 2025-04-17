@@ -1,3 +1,6 @@
+// Copyright (C) 2025 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
+
 export interface UseCase {
   use_case: string;
   display_name: string;
@@ -33,7 +36,7 @@ export type CodeRequest = {
   type: string;
   token?: number;
   temperature?: number;
-}
+};
 
 export type SummaryFaqRequest = {
   conversationId: string;
@@ -44,7 +47,7 @@ export type SummaryFaqRequest = {
   temperature: number;
   token: number;
   type: string;
-}
+};
 
 export enum MessageRole {
   Assistant = "assistant",
@@ -60,8 +63,8 @@ export interface Message {
 }
 
 export interface ChatMessageProps {
-    message: Message;
-    pending?: boolean;
+  message: Message;
+  pending?: boolean;
 }
 
 export interface Conversation {
@@ -73,7 +76,8 @@ export type file = {
   name: string;
   id: string;
   type: string;
-  parent: string;};
+  parent: string;
+};
 
 export interface ConversationReducer {
   selectedConversationId: string;
@@ -84,9 +88,9 @@ export interface ConversationReducer {
   isPending: boolean;
   filesInDataSource: file[];
   dataSourceUrlStatus: string;
-  
+
   useCase: string;
-  useCases: UseCase[],
+  useCases: UseCase[];
   model: string;
   models: Model[];
   type: string;
@@ -101,8 +105,8 @@ export interface ConversationReducer {
   sourceType: string;
   sourceLinks: string[];
   sourceFiles: any[];
-  
+
   abortController: AbortController | null;
 
-  uploadInProgress: boolean
+  uploadInProgress: boolean;
 }

@@ -41,14 +41,13 @@ Here're some of the project's features:
 
 ### DOC SUMMARY
 
-- Summarizing Uploaded Files: Upload files from their local device, then click up arrow button to summarize the content of the uploaded file. 
+- Summarizing Uploaded Files: Upload files from their local device, then click up arrow button to summarize the content of the uploaded file.
 - Summarizing Text via Pasting: Paste the text to be summarized into the text box, then click up arrow button to produce a condensed summary of the content, which will be displayed in the new page
 - Scroll to Bottom: The summarized content will automatically scroll to the bottom.
 
 #### Screen Shot
 
 ![project-screenshot](../../assets/img/doc_summary.png)
-
 
 ## 🛠️ Get it Running
 
@@ -73,24 +72,24 @@ Here're some of the project's features:
     VITE_KEYCLOAK_SERVICE_ENDPOINT=""
     VITE_PROMPT_COLLECTION_NAME="prompt"
    ```
-  4. There is models_config.json file under public folder. It is in the below format. The types key in the below json array shows that the model is used for following types.
-      ```
-        [
-            
-            {
-                "model_name": "Intel/neural-chat-7b-v3-3",
-                "displayName": "Intel Neural Chat",
-                "minToken": 100,
-                "maxToken": 2000,
-                "types": [
-                    "chat",
-                    "summary",
-                    "code"
-                ]
-            }
-            
-        ]
-      ```
+4. There is models_config.json file under public folder. It is in the below format. The types key in the below json array shows that the model is used for following types.
+   ```
+     [
+
+         {
+             "model_name": "Intel/neural-chat-7b-v3-3",
+             "displayName": "Intel Neural Chat",
+             "minToken": 100,
+             "maxToken": 2000,
+             "types": [
+                 "chat",
+                 "summary",
+                 "code"
+             ]
+         }
+
+     ]
+   ```
 5. Execute `npm install` to install the corresponding dependencies.
 
 6. Execute `npm run dev`

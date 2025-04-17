@@ -38,7 +38,7 @@ flowchart LR
         direction LR
         LLM_CG([LLM MicroService]):::blue
     end
-    
+
     subgraph UserInterface[" User Interface "]
         direction LR
         a([User Input Query]):::orchid
@@ -60,7 +60,7 @@ flowchart LR
     LLM_gen_CG{{LLM Service <br>}}
     GW_CG([CodeGen GateWay<br>]):::orange
     LLM_gen_F{{LLM Service <br>}}
-   
+
     PR([Prompt Registry MicroService]):::blue
     CH([Chat History MicroService]):::blue
     MDB{{Mongo DB<br><br>}}
@@ -149,7 +149,6 @@ Engage in intelligent conversations with your documents using our advanced **Ret
 ### 📄 Content Summarization
 
 Summarize lengthy documents or articles, enabling you to grasp key takeaways quickly. Save time and effort with our intelligent summarization feature!
-
 
 ### 💻 Code Generation
 

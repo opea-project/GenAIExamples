@@ -1,58 +1,56 @@
 // Before javascript styles
 
 html {
-    font-size: 16px;
+  font-size: 16px;
 }
 
 body {
-    margin: 0;
-    font-family: "Inter", serif;
-    font-optical-sizing: auto;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    height: 100vh;
-    line-height: 1.5;
+  margin: 0;
+  font-family: "Inter", serif;
+  font-optical-sizing: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  height: 100vh;
+  line-height: 1.5;
 }
 
 #root {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
 }
 
 code {
-    font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-        monospace;
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
 }
 
 :root {
-    --header-height: 72px;
-    --header-gutter: 1.5rem;
-    --sidebar-width: 260px;
-    --vertical-spacer: 2rem;
-    --content-width: 800px;
-    --content-gutter: 3rem;
-    --input-radius: 30px;
-    --copy-color: #3D447F;
+  --header-height: 72px;
+  --header-gutter: 1.5rem;
+  --sidebar-width: 260px;
+  --vertical-spacer: 2rem;
+  --content-width: 800px;
+  --content-gutter: 3rem;
+  --input-radius: 30px;
+  --copy-color: #3d447f;
 }
 
-
 ::-webkit-scrollbar {
-    background: transparent;
-    width: 10px;
+  background: transparent;
+  width: 10px;
 }
 
 /* Style the thumb (the draggable part of the scrollbar) */
 ::-webkit-scrollbar-thumb {
-    height: 20px;
-    background-color: rgba(0, 0, 0, 0.3);
-    /* Thumb color */
-    border-radius: 5px;
-    /* Optional, for rounded corners */
+  height: 20px;
+  background-color: rgba(0, 0, 0, 0.3);
+  /* Thumb color */
+  border-radius: 5px;
+  /* Optional, for rounded corners */
 }
 
 /* Optionally, you can add hover effects for the thumb */
 ::-webkit-scrollbar-thumb:hover {
-    background-color: rgba(0, 0, 0, 0.5);
-    /* Darker thumb when hovered */
+  background-color: rgba(0, 0, 0, 0.5);
+  /* Darker thumb when hovered */
 }

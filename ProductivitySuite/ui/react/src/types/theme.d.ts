@@ -1,8 +1,10 @@
-import '@mui/material/styles';
-import { PaletteChip, PaletteColor } from '@mui/material/styles';
+// Copyright (C) 2025 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
 
-declare module '@mui/material/styles' {
+import "@mui/material/styles";
+import { PaletteChip, PaletteColor } from "@mui/material/styles";
 
+declare module "@mui/material/styles" {
   interface Theme {
     customStyles: Record<string, Record<string, any>>;
   }
