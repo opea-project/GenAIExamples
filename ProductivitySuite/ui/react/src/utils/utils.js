@@ -20,11 +20,7 @@ export const smartTrim = (string, maxLength) => {
   var toremove = string.length - maxLength;
   var lstrip = Math.ceil(toremove / 2);
   var rstrip = toremove - lstrip;
-  return (
-    string.substring(0, midpoint - lstrip) +
-    "..." +
-    string.substring(midpoint + rstrip)
-  );
+  return string.substring(0, midpoint - lstrip) + "..." + string.substring(midpoint + rstrip);
 };
 
 export const QueryStringFromArr = (paramsArr = []) => {
@@ -62,9 +58,7 @@ export function addPropsToChildren(children, props) {
   if (!Array.isArray(children)) {
     return addPropsToReactElement(children, props);
   }
-  return children.map((childElement, i) =>
-    addPropsToReactElement(childElement, props, i),
-  );
+  return children.map((childElement, i) => addPropsToReactElement(childElement, props, i));
 }
 
 export const getCurrentTimeStamp = () => {

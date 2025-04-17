@@ -27,8 +27,7 @@
 
   .textAreaAuto {
     font-family: "Inter", serif;
-    padding: var(--header-gutter) 100px var(--header-gutter)
-      var(--header-gutter);
+    padding: var(--header-gutter) 100px var(--header-gutter) var(--header-gutter);
     border: 0;
     width: 100%;
     resize: none;
@@ -39,8 +38,7 @@
     }
 
     &.summaryInput {
-      padding: var(--header-gutter) 70px var(--header-gutter)
-        var(--header-gutter);
+      padding: var(--header-gutter) 70px var(--header-gutter) var(--header-gutter);
     }
   }
 }
