@@ -1,3 +1,6 @@
+// Copyright (C) 2025 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
+
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import userReducer from "@redux/User/userSlice";
 import conversationReducer from "@redux/Conversation/ConversationSlice";

@@ -235,29 +235,29 @@ Please refer to **[keycloak_setup_guide](keycloak_setup_guide.md)** for more det
 
 7. DocSum LLM Microservice
 
-    ```bash
-    curl http://${host_ip}:9003/v1/docsum\
-      -X POST \
-      -d '{"messages":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5", "type": "text"}' \
-      -H 'Content-Type: application/json'
-    ```
+   ```bash
+   curl http://${host_ip}:9003/v1/docsum\
+     -X POST \
+     -d '{"messages":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5", "type": "text"}' \
+     -H 'Content-Type: application/json'
+   ```
 
 8. ChatQnA MegaService
 
-    ```bash
-    curl http://${host_ip}:8888/v1/chatqna -H "Content-Type: application/json" -d '{
-         "messages": "What is the revenue of Nike in 2023?"
-         }'
-    ```
+   ```bash
+   curl http://${host_ip}:8888/v1/chatqna -H "Content-Type: application/json" -d '{
+        "messages": "What is the revenue of Nike in 2023?"
+        }'
+   ```
 
 9. DocSum MegaService
 
-    ```bash
-    curl http://${host_ip}:8890/v1/docsum -H "Content-Type: application/json" -d '{
-         "messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5.",
-         "type": "text"
-         }'
-    ```
+   ```bash
+   curl http://${host_ip}:8890/v1/docsum -H "Content-Type: application/json" -d '{
+        "messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5.",
+        "type": "text"
+        }'
+   ```
 
 10. CodeGen MegaService
 
@@ -471,4 +471,3 @@ Here're some of the project's features:
 #### Screenshots
 
 ![project-screenshot](../../../../assets/img/doc_summary.png)
-

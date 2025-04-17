@@ -1,15 +1,11 @@
+// Copyright (C) 2025 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
+
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { createAsyncThunkWrapper } from "@redux/thunkUtil";
 import { RootState } from "@redux/store";
-import {
-  PROMPT_MANAGER_CREATE,
-  PROMPT_MANAGER_GET,
-  PROMPT_MANAGER_DELETE,
-} from "@root/config";
-import {
-  NotificationSeverity,
-  notify,
-} from "@components/Notification/Notification";
+import { PROMPT_MANAGER_CREATE, PROMPT_MANAGER_GET, PROMPT_MANAGER_DELETE } from "@root/config";
+import { NotificationSeverity, notify } from "@components/Notification/Notification";
 import axios from "axios";
 
 type promptReducer = {
@@ -55,17 +51,14 @@ export const { clearPrompts } = PromptSlice.actions;
 export const promptSelector = (state: RootState) => state.promptReducer;
 export default PromptSlice.reducer;
 
-export const getPrompts = createAsyncThunkWrapper(
-  "prompts/getPrompts",
-  async (_: void, { getState }) => {
-    // @ts-ignore
-    const state: RootState = getState();
-    const response = await axios.post(PROMPT_MANAGER_GET, {
-      user: state.userReducer.name,
-    });
-    return response.data;
-  },
-);
+export const getPrompts = createAsyncThunkWrapper("prompts/getPrompts", async (_: void, { getState }) => {
+  // @ts-ignore
+  const state: RootState = getState();
+  const response = await axios.post(PROMPT_MANAGER_GET, {
+    user: state.userReducer.name,
+  });
+  return response.data;
+});
 
 export const addPrompt = createAsyncThunkWrapper(
   "prompts/addPrompt",
@@ -88,10 +81,7 @@ export const addPrompt = createAsyncThunkWrapper(
 //TODO delete prompt doesnt actually work, but responds 200
 export const deletePrompt = createAsyncThunkWrapper(
   "prompts/deletePrompt",
-  async (
-    { promptId, promptText }: { promptId: string; promptText: string },
-    { dispatch, getState },
-  ) => {
+  async ({ promptId, promptText }: { promptId: string; promptText: string }, { dispatch, getState }) => {
     // @ts-ignore
     const state: RootState = getState();
     const user = state.userReducer.name;

@@ -1,8 +1,7 @@
-import {
-  createAsyncThunk,
-  AsyncThunkPayloadCreator,
-  AsyncThunk,
-} from "@reduxjs/toolkit";
+// Copyright (C) 2025 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
+
+import { createAsyncThunk, AsyncThunkPayloadCreator, AsyncThunk } from "@reduxjs/toolkit";
 
 interface ThunkAPIConfig {}
 

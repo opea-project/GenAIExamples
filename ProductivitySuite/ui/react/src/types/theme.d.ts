@@ -1,3 +1,6 @@
+// Copyright (C) 2025 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
+
 import "@mui/material/styles";
 import { PaletteChip, PaletteColor } from "@mui/material/styles";
 
