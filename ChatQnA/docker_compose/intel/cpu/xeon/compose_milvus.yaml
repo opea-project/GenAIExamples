@@ -78,6 +78,11 @@ services:
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       EMBEDDING_MODEL_ID: ${EMBEDDING_MODEL_ID}
       LOGFLAG: ${LOGFLAG}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:5000/v1/health_check || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 50
     restart: unless-stopped
     depends_on:
       milvus-standalone:
@@ -154,7 +159,7 @@ services:
       LLM_MODEL_ID: ${LLM_MODEL_ID}
       VLLM_TORCH_PROFILER_DIR: "/mnt"
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://$host_ip:9009/health || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://localhost:80/health || exit 1"]
       interval: 10s
       timeout: 10s
       retries: 100
@@ -164,12 +169,16 @@ services:
     image: ${REGISTRY:-opea}/chatqna:${TAG:-latest}
     container_name: chatqna-xeon-backend-server
     depends_on:
-      - milvus-standalone
-      - tei-embedding-service
-      - dataprep-milvus-service
-      - retriever
-      - tei-reranking-service
-      - vllm-service
+      tei-embedding-service:
+        condition: service_started
+      dataprep-milvus-service:
+        condition: service_healthy
+      retriever:
+        condition: service_started
+      tei-reranking-service:
+        condition: service_started
+      vllm-service:
+        condition: service_healthy
     ports:
       - "8888:8888"
     environment:

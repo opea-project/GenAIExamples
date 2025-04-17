@@ -25,6 +25,12 @@ services:
       INDEX_NAME: ${CHATQNA_INDEX_NAME}
       TEI_ENDPOINT: ${CHATQNA_TEI_EMBEDDING_ENDPOINT}
       HUGGINGFACEHUB_API_TOKEN: ${CHATQNA_HUGGINGFACEHUB_API_TOKEN}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:5000/v1/health_check || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 50
+    restart: unless-stopped
 
   chatqna-tei-embedding-service:
     image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
@@ -133,12 +139,20 @@ services:
     image: ${REGISTRY:-opea}/chatqna:${TAG:-latest}
     container_name: chatqna-backend-server
     depends_on:
-      - chatqna-redis-vector-db
-      - chatqna-tei-embedding-service
-      - chatqna-retriever
-      - chatqna-tei-reranking-service
-      - chatqna-vllm-service
-      - chatqna-llm-faqgen
+      chatqna-redis-vector-db:
+        condition: service_started
+      chatqna-tei-embedding-service:
+        condition: service_started
+      chatqna-retriever:
+        condition: service_started
+      chatqna-tei-reranking-service:
+        condition: service_started
+      chatqna-vllm-service:
+        condition: service_started
+      chatqna-llm-faqgen:
+        condition: service_started
+      chatqna-dataprep-redis-service:
+        condition: service_healthy
     ports:
       - "${CHATQNA_BACKEND_SERVICE_PORT}:8888"
     environment:

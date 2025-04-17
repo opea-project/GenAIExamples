@@ -26,6 +26,12 @@ services:
       TEI_EMBEDDING_ENDPOINT: http://tei-embedding-service:80
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       DATAPREP_COMPONENT_NAME: "OPEA_DATAPREP_QDRANT"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:5000/v1/health_check || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 50
+    restart: unless-stopped
   tei-embedding-service:
     image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
     container_name: tei-embedding-server
@@ -94,11 +100,18 @@ services:
     image: ${REGISTRY:-opea}/chatqna:${TAG:-latest}
     container_name: chatqna-xeon-backend-server
     depends_on:
-      - qdrant-vector-db
-      - tei-embedding-service
-      - retriever
-      - tei-reranking-service
-      - vllm-service
+      qdrant-vector-db:
+        condition: service_started
+      dataprep-qdrant-service:
+        condition: service_healthy
+      tei-embedding-service:
+        condition: service_started
+      retriever:
+        condition: service_started
+      tei-reranking-service:
+        condition: service_started
+      vllm-service:
+        condition: service_started
     ports:
       - "8912:8888"
     environment:
