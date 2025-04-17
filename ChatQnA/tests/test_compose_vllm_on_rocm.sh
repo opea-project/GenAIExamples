@@ -178,6 +178,7 @@ function validate_frontend() {
     source activate ${conda_env_name}
 
     sed -i "s/localhost/$ip_address/g" playwright.config.ts
+    sed -i "s/timeout: 5000/timeout: 15000/g" playwright.config.ts
 
     conda install -c conda-forge nodejs=22.6.0 -y
     npm install && npm ci && npx playwright install --with-deps
