@@ -204,14 +204,16 @@ def get_files(index=None):
     headers = {
         # "Content-Type: multipart/form-data"
     }
-    if index == "All Files":
-        index = None
 
     if index:
-        index = {"index_name": index}
-        response = requests.post(url=dataprep_get_files_endpoint, headers=headers, data=index)
-        table = response.json()
-        return table
+        if index == "All":
+            response = requests.post(url=dataprep_get_files_endpoint, headers=headers, data='{"index_name": "all"}')
+            table = response.json()
+            return table
+        else:
+            response = requests.post(url=dataprep_get_files_endpoint, headers=headers, data=f'{{"index_name": "{index}"}}')
+            table = response.json()
+            return table
     else:
         response = requests.post(url=dataprep_get_files_endpoint, headers=headers)
         table = response.json()
@@ -229,25 +231,18 @@ def update_table(index=None):
         df = pd.DataFrame(files)
         return df
 
-
-def update_indices():
-    indices = get_indices()
-    df = pd.DataFrame(indices, columns=["File Indices"])
-    return df
-
-
 def delete_file(file, index=None):
     # Remove the selected file from the file list
     headers = {
         # "Content-Type: application/json"
     }
     if index:
-        file_input = {"files": open(file, "rb"), "index_name": index}
+        file_input = f'{{"file_path": "{file}", "index_name": "{index}"}}'
     else:
-        file_input = {"files": open(file, "rb")}
+        f'{{"file_path": "{file}"}}'
     response = requests.post(url=dataprep_delete_files_endpoint, headers=headers, data=file_input)
     table = update_table()
-    return response.text
+    return table
 
 
 def delete_all_files(index=None):
@@ -255,10 +250,13 @@ def delete_all_files(index=None):
     headers = {
         # "Content-Type: application/json"
     }
-    response = requests.post(url=dataprep_delete_files_endpoint, headers=headers, data='{"file_path": "all"}')
+    if index:
+        response = requests.post(url=dataprep_delete_files_endpoint, headers=headers, data=f'{{"file_path": "all", "index_name": "{index}"}}')
+    else:
+        response = requests.post(url=dataprep_delete_files_endpoint, headers=headers, data='{"file_path": "all"}')
     table = update_table()
 
-    return "Delete All status: " + response.text
+    return table
 
 
 def get_indices():
@@ -266,13 +264,21 @@ def get_indices():
         # "Content-Type: application/json"
     }
     response = requests.post(url=dataprep_get_indices_endpoint, headers=headers)
-    indices = ["None"]
+    indices = ["None", "All"]
     indices += response.json()
     return indices
 
 
 def update_indices_dropdown():
     new_dd = gr.update(choices=get_indices(), value="None")
+    return new_dd
+
+def update_files_dropdown(index):
+    choice = []
+    files = get_files(index)
+    for file in files:
+        choice.append(file["name"])
+    new_dd = gr.update(choices=choice, value="None")
     return new_dd
 
 
@@ -322,10 +328,12 @@ with gr.Blocks() as ui:
                 upload_button = gr.Button("Upload", variant="primary")
                 upload_status = gr.Textbox(label="Upload Status")
                 file_upload.change(get_file_names, inputs=file_upload, outputs=url_input)
-            with gr.Column(scale=1):
-                file_table = gr.Dataframe(interactive=False, value=update_indices())
+            with gr.Column(scale=2):
+                file_dropdown = gr.Dropdown(choices=get_indices(), label="Select an Index")
+                files_dataframe = gr.Dataframe()
+                file_dropdown.change(fn=update_table, inputs=file_dropdown, outputs=files_dataframe)
                 refresh_button = gr.Button("Refresh", variant="primary", size="sm")
-                refresh_button.click(update_indices, outputs=file_table)
+                refresh_button.click(update_indices_dropdown, outputs=file_dropdown)
                 upload_button.click(
                     upload_media,
                     inputs=[url_input, index_name_input, chunk_size_input, chunk_overlap_input],
@@ -333,7 +341,14 @@ with gr.Blocks() as ui:
                 )
 
                 delete_all_button = gr.Button("Delete All", variant="primary", size="sm")
-                delete_all_button.click(delete_all_files, outputs=upload_status)
+                delete_all_button.click(delete_all_files, inputs=file_dropdown, outputs=files_dataframe)
+
+                files = get_files(file_dropdown)
+                delete_dropdown = gr.Dropdown(choices=files, label="Select a file to delete")
+                file_dropdown.change(fn=update_files_dropdown, inputs=file_dropdown, outputs=delete_dropdown)
+
+                delete_file_button = gr.Button("Delete Selected File", variant="primary", size="sm")
+                delete_file_button.click(delete_file, inputs=[delete_dropdown, file_dropdown], outputs=files_dataframe)
 
 
 @app.get("/health")
