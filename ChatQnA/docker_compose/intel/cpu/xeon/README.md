@@ -81,15 +81,15 @@ docker compose -f compose.yaml -f compose.telemetry.yaml up -d
 
 Please refer to the table below to build different microservices from source:
 
-| Microservice | Deployment Guide |
-|------------------|------------|
-| Dataprep | https://github.com/opea-project/GenAIComps/tree/main/comps/dataprep |
-| Embedding | https://github.com/opea-project/GenAIComps/tree/main/comps/embeddings|
-| Retriever | https://github.com/opea-project/GenAIComps/tree/main/comps/retrievers|
-| Reranker | https://github.com/opea-project/GenAIComps/tree/main/comps/rerankings |
-| LLM | https://github.com/opea-project/GenAIComps/tree/main/comps/llms|
-| Megaservice | [Megaservice build guide](../../../../README_miscellaneous.md#build-megaservice-docker-image) |
-| UI | [Basic UI build guide](../../../../README_miscellaneous.md#build-ui-docker-image) |
+| Microservice | Deployment Guide                                                                              |
+| ------------ | --------------------------------------------------------------------------------------------- |
+| Dataprep     | https://github.com/opea-project/GenAIComps/tree/main/comps/dataprep                           |
+| Embedding    | https://github.com/opea-project/GenAIComps/tree/main/comps/embeddings                         |
+| Retriever    | https://github.com/opea-project/GenAIComps/tree/main/comps/retrievers                         |
+| Reranker     | https://github.com/opea-project/GenAIComps/tree/main/comps/rerankings                         |
+| LLM          | https://github.com/opea-project/GenAIComps/tree/main/comps/llms                               |
+| Megaservice  | [Megaservice build guide](../../../../README_miscellaneous.md#build-megaservice-docker-image) |
+| UI           | [Basic UI build guide](../../../../README_miscellaneous.md#build-ui-docker-image)             |
 
 ### Check the Deployment Status
 
@@ -144,16 +144,16 @@ docker compose -f compose.yaml down
 
 In the context of deploying a ChatQnA pipeline on an Intel® Xeon® platform, we can pick and choose different vector databases, large language model serving frameworks, and remove pieces of the pipeline such as the reranker. The table below outlines the various configurations that are available as part of the application. These configurations can be used as templates and can be extended to different components available in [GenAIComps](https://github.com/opea-project/GenAIComps.git).
 
-| File | Description |
-|------------------|------------|
-| [compose.yaml](./compose.yaml) | Default compose file using vllm as serving framework and redis as vector database|
-| [compose_milvus.yaml](./compose_milvus.yaml) | The vector database utilized is Milvus. All other configurations remain the same as the default |
-| [compose_pinecone.yaml](./compose_pinecone.yaml) | The vector database utilized is Pinecone. All other configurations remain the same as the default |
-| [compose_qdrant.yaml](./compose_qdrant.yaml) | The vector database utilized is Qdrant. All other configurations remain the same as the default |
-| [compose_tgi.yaml](./compose_tgi.yaml) | The LLM serving framework is TGI. All other configurations remain the same as the default |
-| [compose_without_rerank.yaml](./compose_without_rerank.yaml) | Default configuration without the reranker |
-| [compose.telemetry.yaml](./compose.telemetry.yaml) | Helper file for telemetry features for vllm. Can be used along with any compose files that serves vllm |
-| [compose_tgi.telemetry.yaml](./compose_tgi.telemetry.yaml) | Helper file for telemetry features for tgi. Can be used along with any compose files that serves tgi |
+| File                                                         | Description                                                                                            |
+| ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------ |
+| [compose.yaml](./compose.yaml)                               | Default compose file using vllm as serving framework and redis as vector database                      |
+| [compose_milvus.yaml](./compose_milvus.yaml)                 | The vector database utilized is Milvus. All other configurations remain the same as the default        |
+| [compose_pinecone.yaml](./compose_pinecone.yaml)             | The vector database utilized is Pinecone. All other configurations remain the same as the default      |
+| [compose_qdrant.yaml](./compose_qdrant.yaml)                 | The vector database utilized is Qdrant. All other configurations remain the same as the default        |
+| [compose_tgi.yaml](./compose_tgi.yaml)                       | The LLM serving framework is TGI. All other configurations remain the same as the default              |
+| [compose_without_rerank.yaml](./compose_without_rerank.yaml) | Default configuration without the reranker                                                             |
+| [compose.telemetry.yaml](./compose.telemetry.yaml)           | Helper file for telemetry features for vllm. Can be used along with any compose files that serves vllm |
+| [compose_tgi.telemetry.yaml](./compose_tgi.telemetry.yaml)   | Helper file for telemetry features for tgi. Can be used along with any compose files that serves tgi   |
 
 ## ChatQnA with Conversational UI (Optional)
 
