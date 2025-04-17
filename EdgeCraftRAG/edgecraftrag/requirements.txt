@@ -14,3 +14,6 @@ pillow>=10.4.0
 python-docx==1.1.2
 unstructured==0.16.11
 unstructured[pdf]
+EbookLib>=0.18
+html2text>=2025.4.15
+py-cpuinfo>=9.0.0
