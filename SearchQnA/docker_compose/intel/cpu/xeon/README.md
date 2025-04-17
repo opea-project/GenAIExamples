@@ -98,11 +98,11 @@ Once the SearchQnA services are running, test the pipeline using the following c
 ```bash
 curl http://${host_ip}:3008/v1/searchqna -H "Content-Type: application/json" -d '{
      "messages": "What is the latest news? Give me also the source link.",
-     "stream": "True"
+     "stream": "true"
      }'
 ```
 
-**Note** : Access the SearchQnA UI by web browser through this URL: `http://${host_ip}:80`. Please confirm the `80` port is opened in the firewall. To validate each microservie used in the pipeline refer to the [Validate Microservices](#validate-microservices) section.
+**Note** : Access the SearchQnA UI by web browser through this URL: `http://${host_ip}:80`. Please confirm the `80` port is opened in the firewall. To validate each microservice used in the pipeline refer to the [Validate Microservices](#validate-microservices) section.
 
 ### Cleanup the Deployment
 
@@ -193,7 +193,7 @@ In the context of deploying a SearchQnA pipeline on an Intel® Xeon® platform, 
    ```bash
     curl http://${host_ip}:3008/v1/searchqna -H "Content-Type: application/json" -d '{
         "messages": "What is the latest news? Give me also the source link.",
-        "stream": "True"
+        "stream": "true"
         }'
    ```
 
@@ -204,7 +204,7 @@ In the context of deploying a SearchQnA pipeline on an Intel® Xeon® platform, 
        -H "Content-Type: application/json" \
        -d '{
         "messages": "What is the latest news? Give me also the source link.",
-        "stream": "True"
+        "stream": "true"
         }'
    ```
 

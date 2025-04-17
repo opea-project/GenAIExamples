@@ -7,7 +7,7 @@
 
 ## Build MegaService Docker Image
 
-To construct the Megaservice of SearchQnA, the [GenAIExamples](https://github.com/opea-project/GenAIExamples.git) repository if utilized. Build Megaservice Docker image via command below:
+To construct the Megaservice of SearchQnA, the [GenAIExamples](https://github.com/opea-project/GenAIExamples.git) repository is utilized. Build Megaservice Docker image via command below:
 
 ```bash
 git clone https://github.com/opea-project/GenAIExamples.git
@@ -26,7 +26,7 @@ docker build -t opea/searchqna-ui:latest --build-arg https_proxy=$https_proxy --
 
 ## Generate a HuggingFace Access Token
 
-Some HuggingFace resources, such as some models, are only accessible if the developer have an access token. In the absence of a HuggingFace access token, the developer can create one by first creating an account by following the steps provided at [HuggingFace](https://huggingface.co/) and then generating a [user access token](https://huggingface.co/docs/transformers.js/en/guides/private#step-1-generating-a-user-access-token).
+Some HuggingFace resources, such as some models, are only accessible if the developer has an access token. In the absence of a HuggingFace access token, the developer can create one by first creating an account on [HuggingFace](https://huggingface.co/) and then generating a [user access token](https://huggingface.co/docs/transformers.js/en/guides/private#step-1-generating-a-user-access-token).
 
 ## Troubleshooting
 
@@ -40,6 +40,6 @@ Some HuggingFace resources, such as some models, are only accessible if the deve
        -H 'Content-Type: application/json'
    ```
 
-2. (Docker only) If all microservices work well, check the port ${host_ip}:3008, the port may be allocated by other users, you can modify the `compose.yaml`.
+2. (Docker only) If all microservices work well, check the port ${host_ip}:3008, the port might already be in use by another service, you can modify the `compose.yaml`.
 
 3. (Docker only) If you get errors like "The container name is in use", change container name in `compose.yaml`.
