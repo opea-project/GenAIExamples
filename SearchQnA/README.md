@@ -16,7 +16,7 @@ Operating within the LangChain framework, the Google Search QnA chatbot mimics h
 
 By integrating search capabilities with LLMs within the LangChain framework, this Google Search QnA chatbot delivers comprehensive and precise answers, akin to human search behavior.
 
-# Table of contents
+## Table of contents
 
 1. [Architecture](#architecture)
 2. [Deployment Options](#deployment-options)
