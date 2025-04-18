@@ -68,7 +68,7 @@ function start_services() {
 
     export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
     export TEI_EMBEDDING_HOST_IP=${HOST_IP}
-    export TEI_EMBEDDING_ENDPOINT="http://${HOST_IPp}:${TEI_EMBEDDER_PORT}"
+    export TEI_EMBEDDING_ENDPOINT="http://${HOST_IP}:${TEI_EMBEDDER_PORT}"
     export DATAPREP_ENDPOINT="http://${HOST_IP}:${DATAPREP_REDIS_PORT}/v1/dataprep"
 
 
