@@ -1,11 +1,11 @@
-# Table of contents
+# ChatQnA Docker Image Build
+
+## Table of contents
 
 1. [Build MegaService Docker Image](#Build-MegaService-Docker-Image)
 2. [Build Basic UI Docker Image](#Build-Basic-UI-Docker-Image)
 3. [Build Conversational React UI Docker Image](#Build-Conversational-React-UI-Docker-Image)
 4. [Troubleshooting](#Troubleshooting)
-5. [Monitoring OPEA Services with Prometheus and Grafana Dashboards](#Monitoring-OPEA-Services-with-Prometheus-and-Grafana-Dashboard)
-6. [Tracing with OpenTelemetry and Jaeger](#Tracing-with-OpenTelemetry-and-Jaeger)
 
 ## Build MegaService Docker Image
 
