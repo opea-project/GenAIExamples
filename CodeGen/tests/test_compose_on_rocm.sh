@@ -11,6 +11,13 @@ export REGISTRY=${IMAGE_REPO}
 export TAG=${IMAGE_TAG}
 export MODEL_CACHE=${model_cache:-"/var/lib/GenAI/data"}
 
+export REDIS_DB_PORT=6379
+export REDIS_INSIGHTS_PORT=8001
+export REDIS_RETRIEVER_PORT=7000
+export EMBEDDER_PORT=6000
+export TEI_EMBEDDER_PORT=8090
+export DATAPREP_REDIS_PORT=6007
+
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
