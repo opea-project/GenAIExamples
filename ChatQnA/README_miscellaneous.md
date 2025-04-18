@@ -1,11 +1,13 @@
-# Table of contents
+# ChatQnA Docker Image Build, Monitor and Trace
+
+## Table of contents
 
 1. [Build MegaService Docker Image](#Build-MegaService-Docker-Image)
 2. [Build Basic UI Docker Image](#Build-Basic-UI-Docker-Image)
 3. [Build Conversational React UI Docker Image](#Build-Conversational-React-UI-Docker-Image)
 4. [Troubleshooting](#Troubleshooting)
-5. [Monitoring OPEA Services with Prometheus and Grafana Dashboards](#Monitoring-OPEA-Services-with-Prometheus-and-Grafana-Dashboard)
-6. [Tracing with OpenTelemetry and Jaeger](#Tracing-with-OpenTelemetry-and-Jaeger)
+5. [Monitoring OPEA Services with Prometheus and Grafana Dashboards](https://opea-project.github.io/latest/tutorial/OpenTelemetry/OpenTelemetry_OPEA_Guide.html#how-to-monitor)
+6. [Tracing with OpenTelemetry and Jaeger](https://opea-project.github.io/latest/tutorial/OpenTelemetry/deploy/ChatQnA.html)
 
 ## Build MegaService Docker Image
 
