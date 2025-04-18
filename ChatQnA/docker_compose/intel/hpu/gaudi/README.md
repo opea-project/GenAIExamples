@@ -176,7 +176,7 @@ This deployment may allocate more Gaudi resources to the tgi-service to optimize
 
 ### compose_faqgen.yaml - FAQ generation Deployment
 
-The FAQs(frequently asked questions and answers) generation Deployment will generate FAQs instead of normally text generation. It add a new microservice called `llm-faqgen`, which is a microservice that interacts with the TGI/vLLM LLM server to generate FAQs from input text.
+The FAQs (frequently asked questions and answers) generation Deployment will generate FAQs instead of normally text generation. It adds a new microservice called `llm-faqgen`, which is a microservice that interacts with the TGI/vLLM LLM server to generate FAQs from input text.
 
 The TGI (Text Generation Inference) deployment and the default deployment differ primarily in their service configurations and specific focus on handling large language models (LLMs). The TGI deployment includes a unique `tgi-service`, which utilizes the `ghcr.io/huggingface/tgi-gaudi:2.3.1` image and is specifically configured to run on Gaudi hardware. This service is designed to handle LLM tasks with optimizations such as `ENABLE_HPU_GRAPH` and `USE_FLASH_ATTENTION`. The `chatqna-gaudi-backend-server` in the TGI deployment depends on the `tgi-service`, whereas in the default deployment, it relies on the `vllm-service`.
 
@@ -284,13 +284,13 @@ ChatQnA now supports running the latest DeepSeek models, including [deepseek-ai/
 
 ### tei-embedding-service & tei-reranking-service
 
-The `ghcr.io/huggingface/text-embeddings-inference:cpu-1.6` image supporting `tei-embedding-service` and `tei-reranking-service` depends on the `EMBEDDING_MODEL_ID` or `RERANK_MODEL_ID` environment variables respectively to specify the embedding model and reranking model used for converting text into vector representations and rankings. This choice impacts the quality and relevance of the embeddings rerankings for various applications. Unlike the `vllm-service`, the `tei-embedding-service` and `tei-reranking-service` each typically acquires only one Gaudi device and does not use the `NUM_CARDS` parameter; embedding and reranking tasks generally do not require extensive parallel processing and one Gaudi per service is appropriate. The list of [supported embedding and reranking models](https://github.com/huggingface/tei-gaudi?tab=readme-ov-file#supported-models) can be found at the the [huggingface/tei-gaudi](https://github.com/huggingface/tei-gaudi?tab=readme-ov-file#supported-models) website.
+The `ghcr.io/huggingface/text-embeddings-inference:cpu-1.6` image supporting `tei-embedding-service` and `tei-reranking-service` depends on the `EMBEDDING_MODEL_ID` or `RERANK_MODEL_ID` environment variables respectively to specify the embedding model and reranking model used for converting text into vector representations and rankings. This choice impacts the quality and relevance of the embeddings rerankings for various applications. Unlike the `vllm-service`, the `tei-embedding-service` and `tei-reranking-service` each typically acquires only one Gaudi device and does not use the `NUM_CARDS` parameter; embedding and reranking tasks generally do not require extensive parallel processing and one Gaudi per service is appropriate. The list of [supported embedding and reranking models](https://github.com/huggingface/tei-gaudi?tab=readme-ov-file#supported-models) can be found at the [huggingface/tei-gaudi](https://github.com/huggingface/tei-gaudi?tab=readme-ov-file#supported-models) website.
 
-### tgi-gaurdrails-service
+### tgi-guardrails-service
 
 The `tgi-guardrails-service` uses the `GUARDRAILS_MODEL_ID` parameter to select a [supported model](https://github.com/huggingface/tgi-gaudi?tab=readme-ov-file#tested-models-and-configurations) for the associated `ghcr.io/huggingface/tgi-gaudi:2.3.1` image. Like the `tei-embedding-service` and `tei-reranking-service` services, it doesn't use the `NUM_CARDS` parameter.
 
-### vllm-gaurdrails-service
+### vllm-guardrails-service
 
 The `vllm-guardrails-service` uses the `GUARDRAILS_MODEL_ID` parameter to select a [supported model](https://docs.vllm.ai/en/latest/models/supported_models.html) for the associated `opea/vllm-gaudi:latest` image. It uses the `NUM_CARDS` parameter.
 

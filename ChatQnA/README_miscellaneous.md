@@ -9,7 +9,7 @@
 
 ## Build MegaService Docker Image
 
-To construct the Mega Service with Rerank, we utilize the [GenAIExamples](https://github.com/opea-project/GenAIExamples.git) microservice pipeline within the `chatqna.py` Python script. Build MegaService Docker image via below command:
+To construct the MegaService with Rerank, we utilize the [GenAIExamples](https://github.com/opea-project/GenAIExamples.git) microservice pipeline within the `chatqna.py` Python script. Build the MegaService Docker image using the command below:
 
 ```bash
 git clone https://github.com/opea-project/GenAIExamples.git
@@ -20,7 +20,7 @@ docker build --no-cache -t opea/chatqna:latest --build-arg https_proxy=$https_pr
 
 ## Build Basic UI Docker Image
 
-Build frontend Docker image via below command:
+Build the Frontend Docker Image using the command below:
 
 ```bash
 cd GenAIExamples/ChatQnA/ui
@@ -40,7 +40,7 @@ docker build --no-cache -t opea/chatqna-conversation-ui:latest --build-arg https
 
 ## Troubleshooting
 
-1. If you get errors like "Access Denied", [validate micro service](https://github.com/opea-project/GenAIExamples/tree/main/ChatQnA/docker_compose/intel/cpu/xeon/README.md#validate-microservices) first. A simple example:
+1. If you get errors like "Access Denied", [validate microservices](https://github.com/opea-project/GenAIExamples/tree/main/ChatQnA/docker_compose/intel/cpu/xeon/README.md#validate-microservices) first. A simple example:
 
    ```bash
    http_proxy="" curl ${host_ip}:6006/embed -X POST  -d '{"inputs":"What is Deep Learning?"}' -H 'Content-Type: application/json'
@@ -81,6 +81,6 @@ Here is a screenshot for one tracing of TGI serving request.
 There are also OPEA related tracings. Users could understand the time breakdown of each service request by looking into each opea:schedule operation.
 ![image](https://github.com/user-attachments/assets/6137068b-b374-4ff8-b345-993343c0c25f)
 
-There could be async function such as `llm/MicroService_asyn_generate` and user needs to check the trace of the async function in another operation like
+There could be asynchronous function such as `llm/MicroService_asyn_generate` and user needs to check the trace of the asynchronous function in another operation like
 opea:llm_generate_stream.
 ![image](https://github.com/user-attachments/assets/a973d283-198f-4ce2-a7eb-58515b77503e)

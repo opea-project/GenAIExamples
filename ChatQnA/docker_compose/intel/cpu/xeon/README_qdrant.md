@@ -1,71 +1,19 @@
-# Build Mega Service of ChatQnA (with Qdrant) on Xeon
+# Deploying ChatQnA with Qdrant on Intel® Xeon® Processors
 
-This document outlines the deployment process for a ChatQnA application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on Intel Xeon server. The steps include Docker image creation, container deployment via Docker Compose, and service execution to integrate microservices such as `embedding`, `retriever`, `rerank`, and `llm`.
+This document outlines the deployment process for a ChatQnA application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on Intel® Xeon® servers. The pipeline integrates **Qdrant** as the vector database (VectorDB) and includes microservices such as `embedding`, `retriever`, `rerank`, and `llm`.
 
-The default pipeline deploys with vLLM as the LLM serving component and leverages rerank component.
+---
 
-Note: The default LLM is `meta-llama/Meta-Llama-3-8B-Instruct`. Before deploying the application, please make sure either you've requested and been granted the access to it on [Huggingface](https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct) or you've downloaded the model locally from [ModelScope](https://www.modelscope.cn/models).
+## Table of Contents
 
-## 🚀 Apply Xeon Server on AWS
+1. [Build Docker Images](#build-docker-images)
+2. [Validate Microservices](#validate-microservices)
+3. [Launch the UI](#launch-the-ui)
+4. [Launch the Conversational UI (Optional)](#launch-the-conversational-ui-optional)
 
-To apply a Xeon server on AWS, start by creating an AWS account if you don't have one already. Then, head to the [EC2 Console](https://console.aws.amazon.com/ec2/v2/home) to begin the process. Within the EC2 service, select the Amazon EC2 M7i or M7i-flex instance type to leverage the power of 4th Generation Intel Xeon Scalable processors. These instances are optimized for high-performance computing and demanding workloads.
+---
 
-For detailed information about these instance types, you can refer to this [link](https://aws.amazon.com/ec2/instance-types/m7i/). Once you've chosen the appropriate instance type, proceed with configuring your instance settings, including network configurations, security groups, and storage options.
-
-After launching your instance, you can connect to it using SSH (for Linux instances) or Remote Desktop Protocol (RDP) (for Windows instances). From there, you'll have full access to your Xeon server, allowing you to install, configure, and manage your applications as needed.
-
-**Certain ports in the EC2 instance need to opened up in the security group, for the microservices to work with the curl commands**
-
-> See one example below. Please open up these ports in the EC2 instance based on the IP addresses you want to allow
-
-```
-qdrant-vector-db
-===============
-Port 6333 - Open to 0.0.0.0/0
-Port 6334 - Open to 0.0.0.0/0
-
-dataprep-qdrant-server
-======================
-Port 6043 - Open to 0.0.0.0/0
-
-tei_embedding_service
-=====================
-Port 6040 - Open to 0.0.0.0/0
-
-embedding
-=========
-Port 6044 - Open to 0.0.0.0/0
-
-retriever
-=========
-Port 6045 - Open to 0.0.0.0/0
-
-tei_reranking_service
-================
-Port 6041 - Open to 0.0.0.0/0
-
-reranking
-=========
-Port 6046 - Open to 0.0.0.0/0
-
-vllm-service
-===========
-Port 6042 - Open to 0.0.0.0/0
-
-llm
-===
-Port 6047 - Open to 0.0.0.0/0
-
-chaqna-xeon-backend-server
-==========================
-Port 8912 - Open to 0.0.0.0/0
-
-chaqna-xeon-ui-server
-=====================
-Port 5173 - Open to 0.0.0.0/0
-```
-
-## 🚀 Build Docker Images
+## Build Docker Images
 
 First of all, you need to build Docker Images locally and install the python package of it.
 
@@ -137,7 +85,7 @@ Then run the command `docker images`, you will have the following 5 Docker Image
 4. `opea/chatqna-ui:latest`
 5. `opea/nginx:latest`
 
-## 🚀 Start Microservices
+## Start Microservices
 
 ### Required Models
 
@@ -292,7 +240,7 @@ For details on how to verify the correctness of the response, refer to [how-to-v
         -F 'link_list=["https://opea.dev"]'
    ```
 
-## 🚀 Launch the UI
+## Launch the UI
 
 To access the frontend, open the following URL in your browser: http://{host_ip}:5173. By default, the UI runs on port 5173 internally. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `compose.yaml` file as shown below:
 
@@ -304,7 +252,7 @@ To access the frontend, open the following URL in your browser: http://{host_ip}
       - "80:5173"
 ```
 
-## 🚀 Launch the Conversational UI (react)
+## Launch the Conversational UI (Optional)
 
 To access the Conversational UI frontend, open the following URL in your browser: http://{host_ip}:5174. By default, the UI runs on port 80 internally. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `compose.yaml` file as shown below:
 
