@@ -2,7 +2,7 @@
 
 Language Translation is the communication of the meaning of a source-language text by means of an equivalent target-language text.
 
-# Table of contents
+## Table of contents
 
 1. [Architecture](#architecture)
 2. [Deployment Options](#deployment-options)
