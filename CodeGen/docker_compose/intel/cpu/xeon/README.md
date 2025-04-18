@@ -127,7 +127,7 @@ docker compose --profile codegen-xeon-tgi up -d
 Then run the command `docker images`, you will have the following Docker images:
 
 - `ghcr.io/huggingface/text-embeddings-inference:cpu-1.5`
-- `ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu`
+- `ghcr.io/huggingface/text-generation-inference:2.4.1-intel-cpu`
 - `opea/codegen-gradio-ui`
 - `opea/codegen`
 - `opea/dataprep`
@@ -145,7 +145,7 @@ docker compose --profile codegen-xeon-vllm up -d
 Then run the command `docker images`, you will have the following Docker images:
 
 - `ghcr.io/huggingface/text-embeddings-inference:cpu-1.5`
-- `ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu`
+- `ghcr.io/huggingface/text-generation-inference:2.4.1-intel-cpu`
 - `opea/codegen-gradio-ui`
 - `opea/codegen`
 - `opea/dataprep`

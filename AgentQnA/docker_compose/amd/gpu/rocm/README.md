@@ -64,7 +64,7 @@ We remind you that when using a specific version of the code, you need to use th
 - #### Optional. Pull TGI Docker Image (Do this if you want to use TGI)
 
   ```bash
-  docker pull ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
+  docker pull ghcr.io/huggingface/text-generation-inference:2.4.1-rocm
   ```
 
 - #### Build Docker Images
@@ -110,7 +110,7 @@ We remind you that when using a specific version of the code, you need to use th
 
   ##### TGI-based application:
 
-  - ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
+  - ghcr.io/huggingface/text-generation-inference:2.4.1-rocm
   - opea/agent:latest
   - redis/redis-stack:7.2.0-v9
   - ghcr.io/huggingface/text-embeddings-inference:cpu-1.5

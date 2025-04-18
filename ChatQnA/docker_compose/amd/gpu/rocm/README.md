@@ -90,7 +90,7 @@
 - #### Optional. Pull TGI Docker Image (Do this if you want to use TGI)
 
   ```bash
-  docker pull ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
+  docker pull ghcr.io/huggingface/text-generation-inference:2.4.1-rocm
   ```
 
 - #### Build Docker Images
@@ -136,7 +136,7 @@
   - opea/dataprep:latest
   - ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
   - opea/retriever:latest
-  - ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
+  - ghcr.io/huggingface/text-generation-inference:2.4.1-rocm
   - opea/chatqna:latest
   - opea/chatqna-ui:latest
   - opea/nginx:latest
@@ -147,7 +147,7 @@
   - opea/dataprep:latest
   - ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
   - opea/retriever:latest
-  - ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
+  - ghcr.io/huggingface/text-generation-inference:2.4.1-rocm
   - opea/llm-faqgen:latest
   - opea/chatqna:latest
   - opea/chatqna-ui:latest
