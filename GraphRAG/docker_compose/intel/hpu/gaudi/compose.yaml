@@ -48,7 +48,7 @@ services:
       host_ip: ${host_ip}
       HF_TOKEN: ${HF_TOKEN}
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://${host_ip}:${TEI_EMBEDDER_PORT}/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
       interval: 10s
       timeout: 6s
       retries: 48
@@ -83,7 +83,7 @@ services:
       - SYS_NICE
     ipc: host
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://${host_ip}:${LLM_ENDPOINT_PORT}/health || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://localhost:80/health || exit 1"]
       interval: 10s
       timeout: 10s
       retries: 100
@@ -122,6 +122,11 @@ services:
       HUGGINGFACEHUB_API_TOKEN: ${HF_TOKEN}
       HF_TOKEN: ${HF_TOKEN}
       MAX_INPUT_TOKENS: ${MAX_INPUT_TOKENS:-4096}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:5000/v1/health_check || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
     restart: unless-stopped
   retriever-neo4j:
     image: ${REGISTRY:-opea}/retriever:${TAG:-latest}
@@ -157,10 +162,16 @@ services:
     image: ${REGISTRY:-opea}/graphrag:${TAG:-latest}
     container_name: graphrag-gaudi-backend-server
     depends_on:
-      - neo4j-apoc
-      - tei-embedding-serving
-      - retriever-neo4j
-      - tgi-gaudi-server
+      neo4j-apoc:
+        condition: service_healthy
+      tei-embedding-serving:
+        condition: service_healthy
+      dataprep-neo4j-llamaindex:
+        condition: service_healthy
+      retriever-neo4j:
+        condition: service_started
+      tgi-gaudi-server:
+        condition: service_healthy
     ports:
       - "8888:8888"
       - "${MEGA_SERVICE_PORT:-8888}:8888"
