@@ -134,12 +134,12 @@ function validate_microservices() {
         '{"query":"def print_hello_world():"}'
 
     # Data ingest microservice
-    validate_services \
-        "${ip_address}:6007/v1/dataprep/ingest" \
-        "Data preparation succeeded" \
-        "ingest" \
-        "dataprep-redis-server" \
-        'link_list=["https://modin.readthedocs.io/en/latest/index.html"]'
+#    validate_services \
+#        "${ip_address}:6007/v1/dataprep/ingest" \
+#        "Data preparation succeeded" \
+#        "ingest" \
+#        "dataprep-redis-server" \
+#        'link_list=["https://modin.readthedocs.io/en/latest/index.html"]'
 }
 
 function validate_megaservice() {

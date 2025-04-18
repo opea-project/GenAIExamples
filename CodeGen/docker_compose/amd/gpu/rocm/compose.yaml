@@ -57,7 +57,10 @@ services:
     image: ${REGISTRY:-opea}/codegen:${TAG:-latest}
     container_name: codegen-backend-server
     depends_on:
-      - codegen-llm-server
+      codegen-llm-server:
+        condition: service_started
+      dataprep-redis-server:
+        condition: service_healthy
     ports:
       - "${CODEGEN_BACKEND_SERVICE_PORT:-7778}:7778"
     environment:
