@@ -23,7 +23,7 @@ services:
       dockerfile: comps/dataprep/src/Dockerfile
     extends: videoqna
     image: ${REGISTRY:-opea}/dataprep:${TAG:-latest}
-  embedding-multimodal-clip:
+  embedding:
     build:
       context: GenAIComps
       dockerfile: comps/third_parties/clip/src/Dockerfile
