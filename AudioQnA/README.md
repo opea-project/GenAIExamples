@@ -2,7 +2,7 @@
 
 AudioQnA is an example that demonstrates the integration of Generative AI (GenAI) models for performing question-answering (QnA) on audio files, with the added functionality of Text-to-Speech (TTS) for generating spoken responses. The example showcases how to convert audio input to text using Automatic Speech Recognition (ASR), generate answers to user queries using a language model, and then convert those answers back to speech using Text-to-Speech (TTS).
 
-# Table of Contents
+## Table of Contents
 
 1. [Architecture](#architecture)
 2. [Deployment Options](#deployment-options)
