@@ -1,0 +1,125 @@
+# Copyright (C) 2025 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+
+  codegen-xeon-backend-server:
+    image: ${REGISTRY:-opea}/codegen:${TAG:-latest}
+    container_name: codegen-xeon-backend-server
+    ports:
+      - "7778:7778"
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - MEGA_SERVICE_HOST_IP=${MEGA_SERVICE_HOST_IP}
+      - LLM_SERVICE_HOST_IP=${REMOTE_ENDPOINT}
+      - OPENAI_API_KEY= ${OPENAI_API_KEY}
+      - RETRIEVAL_SERVICE_HOST_IP=${RETRIEVAL_SERVICE_HOST_IP}
+      - REDIS_RETRIEVER_PORT=${REDIS_RETRIEVER_PORT}
+      - TEI_EMBEDDING_HOST_IP=${TEI_EMBEDDING_HOST_IP}
+      - EMBEDDER_PORT=${EMBEDDER_PORT}
+    ipc: host
+    restart: always
+  codegen-xeon-ui-server:
+    image: ${REGISTRY:-opea}/codegen-gradio-ui:${TAG:-latest}
+    container_name: codegen-xeon-ui-server
+    depends_on:
+      - codegen-xeon-backend-server
+    ports:
+      - "5173:5173"
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - BASIC_URL=${BACKEND_SERVICE_ENDPOINT}
+      - MEGA_SERVICE_PORT=${MEGA_SERVICE_PORT}
+      - host_ip=${host_ip}
+      - DATAPREP_ENDPOINT=${DATAPREP_ENDPOINT}
+      - DATAPREP_REDIS_PORT=${DATAPREP_REDIS_PORT}
+    ipc: host
+    restart: always
+  redis-vector-db:
+    image: redis/redis-stack:7.2.0-v9
+    container_name: redis-vector-db
+    ports:
+      - "${REDIS_DB_PORT}:${REDIS_DB_PORT}"
+      - "${REDIS_INSIGHTS_PORT}:${REDIS_INSIGHTS_PORT}"
+  dataprep-redis-server:
+    image: ${REGISTRY:-opea}/dataprep:${TAG:-latest}
+    container_name: dataprep-redis-server
+    depends_on:
+      - redis-vector-db
+    ports:
+      - "${DATAPREP_REDIS_PORT}:5000"
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      REDIS_URL: ${REDIS_URL}
+      REDIS_HOST: ${host_ip}
+      INDEX_NAME: ${INDEX_NAME}
+      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      LOGFLAG: true
+    restart: unless-stopped
+  tei-embedding-serving:
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+    container_name: tei-embedding-serving
+    entrypoint: /bin/sh -c "apt-get update && apt-get install -y curl && text-embeddings-router --json-output --model-id ${EMBEDDING_MODEL_ID} --auto-truncate"
+    ports:
+      - "${TEI_EMBEDDER_PORT:-12000}:80"
+    volumes:
+      - "./data:/data"
+    shm_size: 1g
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      host_ip: ${host_ip}
+      HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://${host_ip}:${TEI_EMBEDDER_PORT}/health"]
+      interval: 10s
+      timeout: 6s
+      retries: 48
+  tei-embedding-server:
+    image: ${REGISTRY:-opea}/embedding:${TAG:-latest}
+    container_name: tei-embedding-server
+    ports:
+      - "${EMBEDDER_PORT:-10201}:6000"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      TEI_EMBEDDING_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
+      EMBEDDING_COMPONENT_NAME: "OPEA_TEI_EMBEDDING"
+    depends_on:
+      tei-embedding-serving:
+        condition: service_healthy
+    restart: unless-stopped
+  retriever-redis:
+    image: ${REGISTRY:-opea}/retriever:${TAG:-latest}
+    container_name: retriever-redis
+    depends_on:
+      - redis-vector-db
+    ports:
+      - "${REDIS_RETRIEVER_PORT}:${REDIS_RETRIEVER_PORT}"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      REDIS_URL: ${REDIS_URL}
+      REDIS_DB_PORT: ${REDIS_DB_PORT}
+      REDIS_INSIGHTS_PORT: ${REDIS_INSIGHTS_PORT}
+      REDIS_RETRIEVER_PORT: ${REDIS_RETRIEVER_PORT}
+      INDEX_NAME: ${INDEX_NAME}
+      TEI_EMBEDDING_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
+      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      LOGFLAG: ${LOGFLAG}
+      RETRIEVER_COMPONENT_NAME: ${RETRIEVER_COMPONENT_NAME:-OPEA_RETRIEVER_REDIS}
+    restart: unless-stopped
+networks:
+  default:
+    driver: bridge
