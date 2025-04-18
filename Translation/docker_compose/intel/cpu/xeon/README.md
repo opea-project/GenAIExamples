@@ -39,7 +39,7 @@ Some HuggingFace resources, such as some models, are only accessible if you have
 
 ### Configure the Deployment Environment
 
-To set up environment variables for deploying Translation service, source the _set_env.sh_ script in this directory:
+To set up environment variables for deploying Translation service, source the set_env.sh script in this directory:
 
 ```
 source ../set_env.sh
