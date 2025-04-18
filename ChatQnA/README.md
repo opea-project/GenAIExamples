@@ -4,7 +4,7 @@ Chatbots are the most widely adopted use case for leveraging the powerful chat a
 
 RAG bridges the knowledge gap by dynamically fetching relevant information from external sources, ensuring that the response generated remains factual and current. Vector databases are at the core of this architecture, enabling efficient retrieval of semantically relevant information. These databases store data as vectors, allowing RAG to swiftly access the most pertinent documents or data points based on semantic similarity.
 
-# Table of contents
+## Table of contents
 
 1. [Architecture](#architecture)
 2. [Deployment Options](#deployment-options)
@@ -107,6 +107,10 @@ The table below lists currently available deployment options. They outline in de
 | Cloud Service Providers | AWS                          | [Terraform deployment on 4th Gen Intel Xeon with Intel AMX using meta-llama/Meta-Llama-3-8B-Instruct ](https://github.com/intel/terraform-intel-aws-vm/tree/main/examples/gen-ai-xeon-opea-chatqna)                                                                                  |
 |                         |                              | [Terraform deployment on 4th Gen Intel Xeon with Intel AMX using TII Falcon2-11B](https://github.com/intel/terraform-intel-aws-vm/tree/main/examples/gen-ai-xeon-opea-chatqna-falcon11B)                                                                                             |
 |                         | GCP                          | [Terraform deployment on 5th Gen Intel Xeon with Intel AMX(support Confidential AI by using Intel® TDX](https://github.com/intel/terraform-intel-gcp-vm/tree/main/examples/gen-ai-xeon-opea-chatqna)                                                                                |
-|                         | Azure                        | Work-in-progress                                                                                                                                                                                                                                                                     |
+|                         | Azure                        | [Terraform deployment on 4th/5th Gen Intel Xeon with Intel AMX & Intel TDX](https://github.com/intel/terraform-intel-azure-linux-vm/tree/main/examples/azure-gen-ai-xeon-opea-chatqna-tdx)                                                                                           |
 |                         | Intel Tiber AI Cloud         | Work-in-progress                                                                                                                                                                                                                                                                     |
 |                         | Any Xeon based Ubuntu system | [ChatQnA Ansible Module for Ubuntu 20.04](https://github.com/intel/optimized-cloud-recipes/tree/main/recipes/ai-opea-chatqna-xeon) .Use this if you are not using Terraform and have provisioned your system either manually or with another tool, including directly on bare metal. |
+
+## FAQ Generation Application
+
+FAQ Generation Application leverages the power of large language models (LLMs) to revolutionize the way you interact with and comprehend complex textual data. By harnessing cutting-edge natural language processing techniques, our application can automatically generate comprehensive and natural-sounding frequently asked questions (FAQs) from your documents, legal texts, customer queries, and other sources. We merged the FaqGen into the ChatQnA example, which utilize LangChain to implement FAQ Generation and facilitate LLM inference using Text Generation Inference on Intel Xeon and Gaudi2 processors.

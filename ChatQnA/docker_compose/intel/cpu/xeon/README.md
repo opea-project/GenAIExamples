@@ -2,7 +2,7 @@
 
 This document outlines the single node deployment process for a ChatQnA application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservices on Intel Xeon server. The steps include pulling Docker images, container deployment via Docker Compose, and service execution to integrate microservices such as `embedding`, `retriever`, `rerank` and `llm`.
 
-# Table of contents
+## Table of contents
 
 1. [ChatQnA Quick Start Deployment](#chatqna-quick-start-Deployment)
 2. [ChatQnA Docker Compose file Options](#chatqna-docker-compose-files)
