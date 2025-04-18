@@ -159,7 +159,7 @@ function validate_megaservice() {
         "print" \
         "codegen-backend-server" \
         "codegen-backend-server" \
-        '{"index_name": "CodeGen", "messages": "def print_hello_world():", "max_tokens": 256}'
+        '{"messages": "def print_hello_world():", "max_tokens": 256}'
 
     # Curl the Mega Service with index_name and agents_flag
     validate_services \
