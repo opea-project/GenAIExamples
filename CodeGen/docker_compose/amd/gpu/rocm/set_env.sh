@@ -37,3 +37,24 @@ export CODEGEN_LLM_SERVICE_HOST_IP=${HOST_IP}
 
 ### The CodeGen service UI port
 export CODEGEN_UI_SERVICE_PORT=18151
+
+
+export REDIS_DB_PORT=6379
+export REDIS_INSIGHTS_PORT=8001
+export REDIS_RETRIEVER_PORT=7000
+export REDIS_URL="redis://${host_ip}:${REDIS_DB_PORT}"
+export RETRIEVAL_SERVICE_HOST_IP=${host_ip}
+export RETRIEVER_COMPONENT_NAME="OPEA_RETRIEVER_REDIS"
+export INDEX_NAME="CodeGen"
+
+export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
+export EMBEDDER_PORT=6000
+export TEI_EMBEDDER_PORT=8090
+export TEI_EMBEDDING_HOST_IP=${host_ip}
+export TEI_EMBEDDING_ENDPOINT="http://${host_ip}:${TEI_EMBEDDER_PORT}"
+
+export DATAPREP_REDIS_PORT=6007
+export DATAPREP_ENDPOINT="http://${host_ip}:${DATAPREP_REDIS_PORT}/v1/dataprep"
+export LOGFLAG=false
+export MODEL_CACHE="./data"
+export NUM_CARDS=1
