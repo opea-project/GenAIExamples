@@ -202,7 +202,9 @@ def get_files(index=None):
             table = response.json()
             return table
         else:
-            response = requests.post(url=dataprep_get_files_endpoint, headers=headers, data=f'{{"index_name": "{index}"}}')
+            response = requests.post(
+                url=dataprep_get_files_endpoint, headers=headers, data=f'{{"index_name": "{index}"}}'
+            )
             table = response.json()
             return table
     else:
@@ -222,6 +224,7 @@ def update_table(index=None):
         df = pd.DataFrame(files)
         return df
 
+
 def delete_file(file, index=None):
     # Remove the selected file from the file list
     headers = {}
@@ -238,7 +241,9 @@ def delete_all_files(index=None):
     # Remove all files from the file list
     headers = {}
     if index:
-        response = requests.post(url=dataprep_delete_files_endpoint, headers=headers, data=f'{{"file_path": "all", "index_name": "{index}"}}')
+        response = requests.post(
+            url=dataprep_delete_files_endpoint, headers=headers, data=f'{{"file_path": "all", "index_name": "{index}"}}'
+        )
     else:
         response = requests.post(url=dataprep_delete_files_endpoint, headers=headers, data='{"file_path": "all"}')
     table = update_table()
@@ -257,6 +262,7 @@ def get_indices():
 def update_indices_dropdown():
     new_dd = gr.update(choices=get_indices(), value="All")
     return new_dd
+
 
 def update_files_dropdown(index):
     choice = []
