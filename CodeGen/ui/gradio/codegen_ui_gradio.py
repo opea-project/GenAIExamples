@@ -152,13 +152,10 @@ def generate_code(query, index=None, use_agent=False):
 
 
 def ingest_file(file, index=None, chunk_size=100, chunk_overlap=150):
-    headers = {
-        # "Content-Type: multipart/form-data"
-    }
+    headers = {}
     file_input = {"files": open(file, "rb")}
 
     if index:
-        print("Index is", index)
         data = {"index_name": index, "chunk_size": chunk_size, "chunk_overlap": chunk_overlap}
     else:
         data = {"chunk_size": chunk_size, "chunk_overlap": chunk_overlap}
@@ -173,10 +170,7 @@ def ingest_url(url, index=None, chunk_size=100, chunk_overlap=150):
     if not is_valid_url(url):
         return "Invalid URL entered. Please enter a valid URL"
 
-    headers = {
-        # "Content-Type: multipart/form-data"
-    }
-
+    headers = {}
     if index:
         url_input = {
             "link_list": json.dumps([url]),
@@ -201,10 +195,7 @@ def is_valid_url(url):
 
 
 def get_files(index=None):
-    headers = {
-        # "Content-Type: multipart/form-data"
-    }
-
+    headers = {}
     if index:
         if index == "All":
             response = requests.post(url=dataprep_get_files_endpoint, headers=headers, data='{"index_name": "all"}')
@@ -233,9 +224,7 @@ def update_table(index=None):
 
 def delete_file(file, index=None):
     # Remove the selected file from the file list
-    headers = {
-        # "Content-Type: application/json"
-    }
+    headers = {}
     if index:
         file_input = f'{{"file_path": "{file}", "index_name": "{index}"}}'
     else:
@@ -247,9 +236,7 @@ def delete_file(file, index=None):
 
 def delete_all_files(index=None):
     # Remove all files from the file list
-    headers = {
-        # "Content-Type: application/json"
-    }
+    headers = {}
     if index:
         response = requests.post(url=dataprep_delete_files_endpoint, headers=headers, data=f'{{"file_path": "all", "index_name": "{index}"}}')
     else:
@@ -260,9 +247,7 @@ def delete_all_files(index=None):
 
 
 def get_indices():
-    headers = {
-        # "Content-Type: application/json"
-    }
+    headers = {}
     response = requests.post(url=dataprep_get_indices_endpoint, headers=headers)
     indices = ["None", "All"]
     indices += response.json()
