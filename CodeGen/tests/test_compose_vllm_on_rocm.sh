@@ -41,6 +41,7 @@ function build_docker_images() {
 function start_services() {
     cd $WORKPATH/docker_compose/amd/gpu/rocm/
 
+    export HOST_IP=${ip_address}
     export CODEGEN_LLM_MODEL_ID="Qwen/Qwen2.5-Coder-7B-Instruct"
     export CODEGEN_VLLM_SERVICE_PORT=8028
     export CODEGEN_VLLM_ENDPOINT="http://${ip_address}:${CODEGEN_VLLM_SERVICE_PORT}"
@@ -48,10 +49,10 @@ function start_services() {
     export CODEGEN_HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
     export CODEGEN_MEGA_SERVICE_HOST_IP=${ip_address}
     export CODEGEN_LLM_SERVICE_HOST_IP=${ip_address}
-    export CODEGEN_BACKEND_SERVICE_PORT=7778
+    export CODEGEN_BACKEND_SERVICE_PORT=18150
     export CODEGEN_BACKEND_SERVICE_URL="http://${ip_address}:${CODEGEN_BACKEND_SERVICE_PORT}/v1/codegen"
     export CODEGEN_UI_SERVICE_PORT=5173
-    export HOST_IP=${ip_address}
+
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
@@ -174,6 +175,8 @@ function main() {
     stop_docker
     if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
     start_services
+
+    sleep 5m
 
     validate_microservices
     validate_megaservice
