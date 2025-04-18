@@ -8,7 +8,7 @@ RAG bridges the knowledge gap by dynamically fetching relevant information from 
 
 1. [Architecture](#architecture)
 2. [Deployment Options](#deployment-options)
-3. [Monitoring and Tracing](./README_miscellaneous.md#Monitoring-OPEA-Service-with-Prometheus-and-Grafana-dashboard)
+3. [Monitoring and Tracing](#monitor-and-tracing)
 
 ## Architecture
 
@@ -110,6 +110,11 @@ The table below lists currently available deployment options. They outline in de
 |                         | Azure                        | [Terraform deployment on 4th/5th Gen Intel Xeon with Intel AMX & Intel TDX](https://github.com/intel/terraform-intel-azure-linux-vm/tree/main/examples/azure-gen-ai-xeon-opea-chatqna-tdx)                                                                                           |
 |                         | Intel Tiber AI Cloud         | Work-in-progress                                                                                                                                                                                                                                                                     |
 |                         | Any Xeon based Ubuntu system | [ChatQnA Ansible Module for Ubuntu 20.04](https://github.com/intel/optimized-cloud-recipes/tree/main/recipes/ai-opea-chatqna-xeon) .Use this if you are not using Terraform and have provisioned your system either manually or with another tool, including directly on bare metal. |
+
+## Monitor and Tracing
+
+Follow [OpenTelemetry OPEA Guide](https://opea-project.github.io/latest/tutorial/OpenTelemetry/OpenTelemetry_OPEA_Guide.html) to understand how to use OpenTelemetry tracing and metrics in OPEA.  
+For ChatQnA specific tracing and metrics monitoring, follow [OpenTelemetry on ChatQnA](https://opea-project.github.io/latest/tutorial/OpenTelemetry/deploy/ChatQnA.html) section.
 
 ## FAQ Generation Application
 
