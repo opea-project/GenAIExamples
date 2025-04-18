@@ -149,7 +149,7 @@ function validate_megaservice() {
         "print" \
         "codegen-backend-server" \
         "codegen-backend-server" \
-        '{"messages": "def print_hello_world():", "max_tokens": 256}'
+        '{ "index_name": "CodeGen", "agents_flag": "False", "messages": "def print_hello_world():", "max_tokens": 256}'
     # Curl the Mega Service with index_name and agents_flag
     validate_services \
         "${ip_address}:${CODEGEN_BACKEND_SERVICE_PORT}/v1/codegen" \

@@ -74,7 +74,6 @@ services:
       REDIS_RETRIEVER_PORT: ${REDIS_RETRIEVER_PORT}
       TEI_EMBEDDING_HOST_IP: ${TEI_EMBEDDING_HOST_IP}
       EMBEDDER_PORT: ${EMBEDDER_PORT}
-      INDEX_NAME: ${INDEX_NAME}
     ipc: host
     restart: always
   codegen-ui-server:
