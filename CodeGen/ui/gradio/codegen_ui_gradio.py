@@ -241,7 +241,7 @@ def delete_file(file, index=None):
     else:
         f'{{"file_path": "{file}"}}'
     response = requests.post(url=dataprep_delete_files_endpoint, headers=headers, data=file_input)
-    table = update_table()
+    table = update_table(index)
     return table
 
 
@@ -270,7 +270,7 @@ def get_indices():
 
 
 def update_indices_dropdown():
-    new_dd = gr.update(choices=get_indices(), value="None")
+    new_dd = gr.update(choices=get_indices(), value="All")
     return new_dd
 
 def update_files_dropdown(index):
