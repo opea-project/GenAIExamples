@@ -2,7 +2,7 @@
 
 This document outlines the single node deployment process for a SearchQnA application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservices on Intel Xeon server.
 
-# Table of Contents
+## Table of Contents
 
 1. [SearchQnA Quick Start Deployment](#searchqna-quick-start-deployment)
 2. [SearchQnA Docker Compose Files](#searchqna-docker-compose-files)
