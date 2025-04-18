@@ -51,7 +51,7 @@ services:
       LLM_MODEL_ID: ${CODEGEN_LLM_MODEL_ID}
       HUGGINGFACEHUB_API_TOKEN: ${CODEGEN_HUGGINGFACEHUB_API_TOKEN}
       HF_TOKEN: ${CODEGEN_HUGGINGFACEHUB_API_TOKEN}
-      LLM_COMPONENT_NAME: "OpeaTextGenService"
+#      LLM_COMPONENT_NAME: "OpeaTextGenService"
     restart: unless-stopped
   codegen-backend-server:
     image: ${REGISTRY:-opea}/codegen:${TAG:-latest}
