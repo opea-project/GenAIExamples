@@ -39,7 +39,7 @@ function build_docker_images() {
     git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="codegen codegen-ui llm-textgen"
+    service_list="codegen codegen-gradio-ui llm-textgen dataprep retriever embedding"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
