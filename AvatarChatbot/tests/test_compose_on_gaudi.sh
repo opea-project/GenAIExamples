@@ -2,7 +2,7 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-set -e
+set -xe
 IMAGE_REPO=${IMAGE_REPO:-"opea"}
 IMAGE_TAG=${IMAGE_TAG:-"latest"}
 echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
@@ -42,7 +42,7 @@ function build_docker_images() {
     service_list="avatarchatbot whisper-gaudi speecht5-gaudi wav2lip-gaudi animation"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
-    docker pull ghcr.io/huggingface/tgi-gaudi:2.0.6
+    docker pull ghcr.io/huggingface/tgi-gaudi:2.3.1
 
     docker images && sleep 1s
 }
@@ -84,7 +84,7 @@ function start_services() {
     export FPS=10
 
     # Start Docker Containers
-    docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
+    docker compose up -d 2>&1 | tee ${LOG_PATH}/start_services_with_compose.log
     n=0
     until [[ "$n" -ge 200 ]]; do
        docker logs tgi-gaudi-server > $LOG_PATH/tgi_service_start.log && docker logs whisper-service 2>&1 | tee $LOG_PATH/whisper_service_start.log && docker logs speecht5-service 2>&1 | tee $LOG_PATH/speecht5_service_start.log
