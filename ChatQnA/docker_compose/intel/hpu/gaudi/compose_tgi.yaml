@@ -25,6 +25,12 @@ services:
       INDEX_NAME: ${INDEX_NAME}
       TEI_ENDPOINT: http://tei-embedding-service:80
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:5000/v1/health_check || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 50
+    restart: unless-stopped
   tei-embedding-service:
     image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.6
     container_name: tei-embedding-gaudi-server
@@ -109,11 +115,18 @@ services:
     image: ${REGISTRY:-opea}/chatqna:${TAG:-latest}
     container_name: chatqna-gaudi-backend-server
     depends_on:
-      - redis-vector-db
-      - tei-embedding-service
-      - retriever
-      - tei-reranking-service
-      - tgi-service
+      redis-vector-db:
+        condition: service_started
+      tei-embedding-service:
+        condition: service_started
+      dataprep-redis-service:
+        condition: service_healthy
+      retriever:
+        condition: service_started
+      tei-reranking-service:
+        condition: service_started
+      tgi-service:
+        condition: service_started
     ports:
       - "8888:8888"
     environment:

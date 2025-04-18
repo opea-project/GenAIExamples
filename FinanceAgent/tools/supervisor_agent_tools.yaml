@@ -22,11 +22,11 @@ summarization_tool:
       description: Name of the company document belongs to
   return_output: summary
 
-# research_agent:
-#   description: generate research report on a specified company with fundamentals analysis, sentiment analysis and risk analysis.
-#   callable_api: supervisor_tools.py:research_agent
-#   args_schema:
-#     company:
-#       type: str
-#       description: the company name
-#   return_output: report
+research_agent:
+  description: generate research report on a specified company with fundamentals analysis, sentiment analysis and risk analysis.
+  callable_api: supervisor_tools.py:research_agent
+  args_schema:
+    company:
+      type: str
+      description: the company name
+  return_output: report
