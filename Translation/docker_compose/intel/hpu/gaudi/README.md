@@ -43,7 +43,7 @@ To set up environment variables for deploying Translation service, source the _s
 
 ```
 cd ../../../
-source ../set_env.sh
+source set_env.sh
 cd intel/hpu/gaudi/
 ```
 
