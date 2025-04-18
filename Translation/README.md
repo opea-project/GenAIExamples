@@ -1,6 +1,6 @@
 # Translation Application
 
-Language Translation is the communication of the meaning of a source-language text by means of an equivalent target-language text.
+The Translation example demonstrates the implementation of language translation using OPEA component-level microservices.
 
 ## Table of contents
 
