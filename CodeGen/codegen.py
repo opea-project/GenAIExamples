@@ -29,6 +29,7 @@ RETRIEVAL_SERVICE_HOST_IP = os.getenv("RETRIEVAL_SERVICE_HOST_IP", "0.0.0.0")
 REDIS_RETRIEVER_PORT = int(os.getenv("REDIS_RETRIEVER_PORT", 7000))
 TEI_EMBEDDING_HOST_IP = os.getenv("TEI_EMBEDDING_HOST_IP", "0.0.0.0")
 EMBEDDER_PORT = int(os.getenv("EMBEDDER_PORT", 6000))
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", None)
 
 grader_prompt = """You are a grader assessing relevance of a retrieved document to a user question. \n
 Here is the user question: {question} \n
@@ -113,6 +114,7 @@ class CodeGenService:
             name="llm",
             host=LLM_SERVICE_HOST_IP,
             port=LLM_SERVICE_PORT,
+            api_key=OPENAI_API_KEY,
             endpoint="/v1/chat/completions",
             use_remote_service=True,
             service_type=ServiceType.LLM,
