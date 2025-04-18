@@ -1,0 +1,14 @@
+# Copyright (C) 2025 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+redis-vector-db:
+  enabled: false
+milvus:
+  enabled: true
+
+data-prep:
+  DATAPREP_BACKEND: "MILVUS"
+  COLLECTION_NAME: "rag_milvus"
+retriever-usvc:
+  RETRIEVER_BACKEND: "MILVUS"
+  COLLECTION_NAME: "rag_milvus"

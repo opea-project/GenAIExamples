@@ -1,5 +1,10 @@
 # Copyright (C) 2025 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-image:
-  repository: opea/chatqna
+vllm:
+  LLM_MODEL_ID: meta-llama/Meta-Llama-3-8B-Instruct
+  # Uncomment the following model specific settings for DeepSeek models
+  #VLLM_CPU_KVCACHE_SPACE: 40
+  #resources:
+  #  requests:
+  #    memory: 60Gi # 40G for KV cache, and 20G for DeepSeek-R1-Distill-Qwen-7B, need to adjust it for other models
