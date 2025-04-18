@@ -23,66 +23,38 @@ The workflow falls into the following architecture:
 The SearchQnA example is implemented using the component-level microservices defined in [GenAIComps](https://github.com/opea-project/GenAIComps). The flow chart below shows the information flow between different microservices for this example.
 
 ```mermaid
----
-config:
-  flowchart:
-    nodeSpacing: 400
-    rankSpacing: 100
-    curve: linear
-  themeVariables:
-    fontSize: 50px
----
+%% Orange are microservices from third parties that are 'wrapped' as OPEA components.
 flowchart LR
-    %% Colors %%
-    classDef blue fill:#ADD8E6,stroke:#ADD8E6,stroke-width:2px,fill-opacity:0.5
-    classDef orange fill:#FBAA60,stroke:#ADD8E6,stroke-width:2px,fill-opacity:0.5
-    classDef orchid fill:#C26DBC,stroke:#ADD8E6,stroke-width:2px,fill-opacity:0.5
-    classDef invisible fill:transparent,stroke:transparent;
-    style SearchQnA-MegaService stroke:#000000
+    User["User"] --> Nginx["Nginx<br>searchqna-nginx-server"]
+    Nginx --> UI["UI<br>searchqna-ui-server"] & Gateway & User
+    UI --> Nginx
+    Gateway --> Nginx & Embedding
+    Embedding --> Retriever
+    Retriever --> Reranker
+    Reranker --> LLM
+    LLM --> Gateway
+    LLM <-.-> TGI_Service["LLM<br>tgi-service"]
+    Embedding <-.-> TEI_Embedding["TEI Embedding<br>tei-embedding-server"]
+    Reranker <-.-> TEI_Reranker["TEI Reranker<br>tei-reranking-server"]
 
-    %% Subgraphs %%
-    subgraph SearchQnA-MegaService["SearchQnA MegaService "]
-        direction LR
-        EM([Embedding MicroService]):::blue
-        RET([Web Retrieval MicroService]):::blue
-        RER([Rerank MicroService]):::blue
-        LLM([LLM MicroService]):::blue
-    end
-    subgraph UserInterface[" User Interface "]
-        direction LR
-        a([User Input Query]):::orchid
-        UI([UI server<br>]):::orchid
-    end
+     TEI_Embedding:::ext
+     TEI_Reranker:::ext
+     TGI_Service:::ext
 
-
-
-    TEI_RER{{Reranking service<br>}}
-    TEI_EM{{Embedding service <br>}}
-    VDB{{Vector DB<br><br>}}
-    R_RET{{Web Retriever service <br>}}
-    LLM_gen{{LLM Service <br>}}
-    GW([SearchQnA GateWay<br>]):::orange
-
-    %% Questions interaction
-    direction LR
-    a[User Input Query] --> UI
-    UI --> GW
-    GW <==> SearchQnA-MegaService
-    EM ==> RET
-    RET ==> RER
-    RER ==> LLM
-
-    %% Embedding service flow
-    direction LR
-    EM <-.-> TEI_EM
-    RET <-.-> R_RET
-    RER <-.-> TEI_RER
-    LLM <-.-> LLM_gen
-
+ subgraph MegaService["MegaService"]
+        LLM["LLM<br>llm-textgen-server"]
+        Reranker["Reranker<br>reranking-tei-server"]
+        Retriever["Retriever<br>web-retriever-server"]
+        Embedding["Embedding<br>embedding-server"]
+  end
+ subgraph Backend["searchqna-backend-server"]
     direction TB
-    %% Vector DB interaction
-    R_RET <-.-> VDB
-
+        MegaService
+        Gateway["Backend Endpoint"]
+ end
+    classDef default fill:#fff,stroke:#000,color:#000
+    classDef ext fill:#f9cb9c,stroke:#000,color:#000
+    style MegaService margin-top:20px,margin-bottom:20px
 ```
 
 ## Deploy SearchQnA Service
