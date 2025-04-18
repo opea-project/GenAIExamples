@@ -11,7 +11,13 @@ echo "WORKDIR=${WORKDIR}"
 export ip_address=$(hostname -I | awk '{print $1}')
 export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
 export TOOLSET_PATH=$WORKPATH/tools/
-export MODEL_CACHE="./data"
+IMAGE_REPO=${IMAGE_REPO:-"opea"}
+IMAGE_TAG=${IMAGE_TAG:-"latest"}
+echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
+echo "TAG=IMAGE_TAG=${IMAGE_TAG}"
+export REGISTRY=${IMAGE_REPO}
+export TAG=${IMAGE_TAG}
+export MODEL_CACHE=${model_cache:-"./data"}
 
 function stop_crag() {
     cid=$(docker ps -aq --filter "name=kdd-cup-24-crag-service")
@@ -41,7 +47,7 @@ echo "::endgroup::"
 cd $WORKPATH/tests
 
 echo "::group::=================== #1 Building docker images===================="
-bash step1_build_images_rocm_vllm.sh
+bash step1_build_images.sh rocm_vllm
 echo "::endgroup::=================== #1 Building docker images completed===================="
 
 echo "::group::=================== #2 Start retrieval tool===================="
