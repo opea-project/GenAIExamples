@@ -10,6 +10,12 @@ echo "TAG=IMAGE_TAG=${IMAGE_TAG}"
 export REGISTRY=${IMAGE_REPO}
 export TAG=${IMAGE_TAG}
 export MODEL_CACHE=${model_cache:-"/var/lib/GenAI/data"}
+export REDIS_DB_PORT=6379
+export REDIS_INSIGHTS_PORT=8001
+export REDIS_RETRIEVER_PORT=7000
+export EMBEDDER_PORT=6000
+export TEI_EMBEDDER_PORT=8090
+export DATAPREP_REDIS_PORT=6007
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
@@ -125,7 +131,15 @@ function validate_megaservice() {
         "print" \
         "codegen-backend-server" \
         "codegen-backend-server" \
-        '{"messages": "def print_hello_world():"}'
+        '{"messages": "def print_hello_world():", "max_tokens": 256}'
+
+    # Curl the Mega Service with index_name and agents_flag
+    validate_services \
+        "${ip_address}:7778/v1/codegen" \
+        "" \
+        "codegen-backend-server" \
+        "codegen-backend-server" \
+        '{ "index_name": "test_redis", "agents_flag": "True", "messages": "def print_hello_world():", "max_tokens": 256}'
 
 }
 
