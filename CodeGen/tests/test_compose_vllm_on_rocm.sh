@@ -94,23 +94,34 @@ function validate_services() {
     local DOCKER_NAME="$4"
     local INPUT_DATA="$5"
 
-    local HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL")
-    if [ "$HTTP_STATUS" -eq 200 ]; then
-        echo "[ $SERVICE_NAME ] HTTP status is 200. Checking content..."
+    if [[ "$SERVICE_NAME" == "ingest" ]]; then
+        local HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST -F "$INPUT_DATA" -F index_name=test_redis -H 'Content-Type: multipart/form-data' "$URL")
 
-        local CONTENT=$(curl -s -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL" | tee ${LOG_PATH}/${SERVICE_NAME}.log)
-
-        if echo "$CONTENT" | grep -q "$EXPECTED_RESULT"; then
-            echo "[ $SERVICE_NAME ] Content is as expected."
+        if [ "$HTTP_STATUS" -eq 200 ]; then
+            echo "[ $SERVICE_NAME ] HTTP status is 200. Data preparation succeeded..."
         else
-            echo "[ $SERVICE_NAME ] Content does not match the expected result: $CONTENT"
+            echo "[ $SERVICE_NAME ] Data preparation failed..."
+        fi
+
+    else
+        local HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL")
+        if [ "$HTTP_STATUS" -eq 200 ]; then
+            echo "[ $SERVICE_NAME ] HTTP status is 200. Checking content..."
+
+            local CONTENT=$(curl -s -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL" | tee ${LOG_PATH}/${SERVICE_NAME}.log)
+
+            if echo "$CONTENT" | grep -q "$EXPECTED_RESULT"; then
+                echo "[ $SERVICE_NAME ] Content is as expected."
+            else
+                echo "[ $SERVICE_NAME ] Content does not match the expected result: $CONTENT"
+                docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
+                exit 1
+            fi
+        else
+            echo "[ $SERVICE_NAME ] HTTP status is not 200. Received status was $HTTP_STATUS"
             docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
             exit 1
         fi
-    else
-        echo "[ $SERVICE_NAME ] HTTP status is not 200. Received status was $HTTP_STATUS"
-        docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
-        exit 1
     fi
     sleep 5s
 }
@@ -132,12 +143,12 @@ function validate_microservices() {
         "codegen-llm-server" \
         '{"query":"def print_hello_world():"}'
     # Data ingest microservice
-#    validate_services \
-#        "${ip_address}:6007/v1/dataprep/ingest" \
-#        "Data preparation succeeded" \
-#        "ingest" \
-#        "dataprep-redis-server" \
-#        'link_list=["https://modin.readthedocs.io/en/latest/index.html"]'
+    validate_services \
+        "${ip_address}:6007/v1/dataprep/ingest" \
+        "Data preparation succeeded" \
+        "ingest" \
+        "dataprep-redis-server" \
+        'link_list=["https://modin.readthedocs.io/en/latest/index.html"]'
 
 }
 
@@ -148,7 +159,7 @@ function validate_megaservice() {
         "print" \
         "codegen-backend-server" \
         "codegen-backend-server" \
-        '{ "index_name": "CodeGen", "agents_flag": "False", "messages": "def print_hello_world():", "max_tokens": 256}'
+        '{"messages": "def print_hello_world():", "max_tokens": 256}'
     # Curl the Mega Service with index_name and agents_flag
     validate_services \
         "${ip_address}:${CODEGEN_BACKEND_SERVICE_PORT}/v1/codegen" \
