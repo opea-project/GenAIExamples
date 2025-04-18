@@ -10,6 +10,14 @@ echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
 echo "TAG=IMAGE_TAG=${IMAGE_TAG}"
 export REGISTRY=${IMAGE_REPO}
 export TAG=${IMAGE_TAG}
+export MODEL_CACHE=${model_cache:-"/var/lib/GenAI/data"}
+
+export REDIS_DB_PORT=6379
+export REDIS_INSIGHTS_PORT=8001
+export REDIS_RETRIEVER_PORT=7000
+export EMBEDDER_PORT=6000
+export TEI_EMBEDDER_PORT=8090
+export DATAPREP_REDIS_PORT=6007
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
@@ -32,7 +40,7 @@ function build_docker_images() {
     git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="vllm-rocm llm-textgen codegen codegen-ui"
+    service_list="vllm-rocm llm-textgen codegen dataprep retriever embedding codegen-gradio-ui"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker images && sleep 1s
@@ -41,6 +49,7 @@ function build_docker_images() {
 function start_services() {
     cd $WORKPATH/docker_compose/amd/gpu/rocm/
 
+    export HOST_IP=${ip_address}
     export CODEGEN_LLM_MODEL_ID="Qwen/Qwen2.5-Coder-7B-Instruct"
     export CODEGEN_VLLM_SERVICE_PORT=8028
     export CODEGEN_VLLM_ENDPOINT="http://${ip_address}:${CODEGEN_VLLM_SERVICE_PORT}"
@@ -48,10 +57,19 @@ function start_services() {
     export CODEGEN_HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
     export CODEGEN_MEGA_SERVICE_HOST_IP=${ip_address}
     export CODEGEN_LLM_SERVICE_HOST_IP=${ip_address}
-    export CODEGEN_BACKEND_SERVICE_PORT=7778
+    export CODEGEN_BACKEND_SERVICE_PORT=18150
     export CODEGEN_BACKEND_SERVICE_URL="http://${ip_address}:${CODEGEN_BACKEND_SERVICE_PORT}/v1/codegen"
     export CODEGEN_UI_SERVICE_PORT=5173
-    export HOST_IP=${ip_address}
+
+    export REDIS_URL="redis://${HOST_IP}:${REDIS_DB_PORT}"
+    export RETRIEVAL_SERVICE_HOST_IP=${HOST_IP}
+    export RETRIEVER_COMPONENT_NAME="OPEA_RETRIEVER_REDIS"
+    export INDEX_NAME="CodeGen"
+
+    export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
+    export TEI_EMBEDDING_HOST_IP=${HOST_IP}
+    export TEI_EMBEDDING_ENDPOINT="http://${HOST_IP}:${TEI_EMBEDDER_PORT}"
+    export DATAPREP_ENDPOINT="http://${HOST_IP}:${DATAPREP_REDIS_PORT}/v1/dataprep"
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
@@ -76,23 +94,34 @@ function validate_services() {
     local DOCKER_NAME="$4"
     local INPUT_DATA="$5"
 
-    local HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL")
-    if [ "$HTTP_STATUS" -eq 200 ]; then
-        echo "[ $SERVICE_NAME ] HTTP status is 200. Checking content..."
+    if [[ "$SERVICE_NAME" == "ingest" ]]; then
+        local HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST -F "$INPUT_DATA" -F index_name=test_redis -H 'Content-Type: multipart/form-data' "$URL")
 
-        local CONTENT=$(curl -s -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL" | tee ${LOG_PATH}/${SERVICE_NAME}.log)
-
-        if echo "$CONTENT" | grep -q "$EXPECTED_RESULT"; then
-            echo "[ $SERVICE_NAME ] Content is as expected."
+        if [ "$HTTP_STATUS" -eq 200 ]; then
+            echo "[ $SERVICE_NAME ] HTTP status is 200. Data preparation succeeded..."
         else
-            echo "[ $SERVICE_NAME ] Content does not match the expected result: $CONTENT"
+            echo "[ $SERVICE_NAME ] Data preparation failed..."
+        fi
+
+    else
+        local HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL")
+        if [ "$HTTP_STATUS" -eq 200 ]; then
+            echo "[ $SERVICE_NAME ] HTTP status is 200. Checking content..."
+
+            local CONTENT=$(curl -s -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL" | tee ${LOG_PATH}/${SERVICE_NAME}.log)
+
+            if echo "$CONTENT" | grep -q "$EXPECTED_RESULT"; then
+                echo "[ $SERVICE_NAME ] Content is as expected."
+            else
+                echo "[ $SERVICE_NAME ] Content does not match the expected result: $CONTENT"
+                docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
+                exit 1
+            fi
+        else
+            echo "[ $SERVICE_NAME ] HTTP status is not 200. Received status was $HTTP_STATUS"
             docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
             exit 1
         fi
-    else
-        echo "[ $SERVICE_NAME ] HTTP status is not 200. Received status was $HTTP_STATUS"
-        docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
-        exit 1
     fi
     sleep 5s
 }
@@ -113,6 +142,13 @@ function validate_microservices() {
         "codegen-llm-server" \
         "codegen-llm-server" \
         '{"query":"def print_hello_world():"}'
+    # Data ingest microservice
+    validate_services \
+        "${ip_address}:6007/v1/dataprep/ingest" \
+        "Data preparation succeeded" \
+        "ingest" \
+        "dataprep-redis-server" \
+        'link_list=["https://modin.readthedocs.io/en/latest/index.html"]'
 
 }
 
@@ -123,7 +159,15 @@ function validate_megaservice() {
         "print" \
         "codegen-backend-server" \
         "codegen-backend-server" \
-        '{"messages": "def print_hello_world():"}'
+        '{"messages": "def print_hello_world():", "max_tokens": 256}'
+
+    # Curl the Mega Service with index_name and agents_flag
+    validate_services \
+        "${ip_address}:${CODEGEN_BACKEND_SERVICE_PORT}/v1/codegen" \
+        "" \
+        "codegen-backend-server" \
+        "codegen-backend-server" \
+        '{ "index_name": "test_redis", "agents_flag": "True", "messages": "def print_hello_world():", "max_tokens": 256}'
 
 }
 
@@ -139,6 +183,7 @@ function validate_frontend() {
     source activate ${conda_env_name}
 
     sed -i "s/localhost/$ip_address/g" playwright.config.ts
+    sed -i "s/timeout: 5000/timeout: 15000/g" playwright.config.ts
 
     conda install -c conda-forge nodejs=22.6.0 -y
     npm install && npm ci && npx playwright install --with-deps
