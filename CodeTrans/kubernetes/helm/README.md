@@ -26,7 +26,7 @@ mkdir ~/codetrans-k8s-install && cd ~/codetrans-k8s-install
 ### Cloning repos
 
 ```bash
-git clone git clone https://github.com/opea-project/GenAIExamples.git
+git clone https://github.com/opea-project/GenAIExamples.git
 ```
 
 ### Go to the installation directory
@@ -97,8 +97,8 @@ mkdir ~/codetrans-k8s-install && cd ~/codetrans-k8s-install
 ### Cloning repos
 
 ```bash
-git clone git clone https://github.com/opea-project/GenAIExamples.git
-git clone git clone https://github.com/opea-project/GenAIInfra.git
+git clone https://github.com/opea-project/GenAIExamples.git
+git clone https://github.com/opea-project/GenAIInfra.git
 ```
 
 ### Go to the installation directory
