@@ -14,7 +14,6 @@ This document outlines the deployment process for a ChatQnA application utilizin
 
 ---
 
-
 ## Quick Start
 
 ### 1.Set up Environment Variable

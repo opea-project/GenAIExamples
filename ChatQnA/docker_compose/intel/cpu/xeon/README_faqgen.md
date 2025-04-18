@@ -202,7 +202,6 @@ curl http://${host_ip}:${FAQGEN_BACKEND_PORT}/v1/faqgen \
 
 Following the validation of all aforementioned microservices, we are now prepared to construct a mega-service.
 
-
 ## Launch the UI
 
 To access the frontend, open the following URL in your browser: http://{host_ip}:5173. By default, the UI runs on port 5173 internally. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `compose.yaml` file as shown below:

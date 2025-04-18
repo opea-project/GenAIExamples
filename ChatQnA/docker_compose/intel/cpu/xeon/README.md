@@ -144,18 +144,18 @@ docker compose -f compose.yaml down
 
 In the context of deploying a ChatQnA pipeline on an Intel® Xeon® platform, we can pick and choose different vector databases, large language model serving frameworks, and remove pieces of the pipeline such as the reranker. The table below outlines the various configurations that are available as part of the application. These configurations can be used as templates and can be extended to different components available in [GenAIComps](https://github.com/opea-project/GenAIComps.git).
 
-| File                                                         | Description                                                                                            |
-| ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------ |
-| [compose.yaml](./compose.yaml)                               | Default compose file using vllm as serving framework and redis as vector database                      |
-| [compose_milvus.yaml](./compose_milvus.yaml)                 | Uses Milvus as the vector database. All other configurations remain the same as the default        |
-| [compose_pinecone.yaml](./compose_pinecone.yaml)             | Uses Pinecone as the vector database. All other configurations remain the same as the default. For more details, refer to [README_pinecone.md](./README_pinecone.md).      |
-| [compose_qdrant.yaml](./compose_qdrant.yaml)                 | Uses Qdrant as the vector database. All other configurations remain the same as the default. For more details, refer to [README_qdrant.md](./README_qdrant.md).         |
-| [compose_tgi.yaml](./compose_tgi.yaml)                       | Uses TGI as the LLM serving framework. All other configurations remain the same as the default              |
-| [compose_without_rerank.yaml](./compose_without_rerank.yaml) | Default configuration without the reranker                                                             |
-| [compose_faqgen.yaml](./compose_faqgen.yaml)                 | Enables FAQ generation using vLLM as the LLM serving framework. For more details, refer to [README_faqgen.md](./README_faqgen.md). |
-| [compose_faqgen_tgi.yaml](./compose_faqgen_tgi.yaml)         | Enables FAQ generation using TGI as the LLM serving framework. For more details, refer to [README_faqgen.md](./README_faqgen.md). |
-| [compose.telemetry.yaml](./compose.telemetry.yaml)           | Helper file for telemetry features for vllm. Can be used along with any compose files that serves vllm |
-| [compose_tgi.telemetry.yaml](./compose_tgi.telemetry.yaml)   | Helper file for telemetry features for tgi. Can be used along with any compose files that serves tgi   |
+| File                                                         | Description                                                                                                                                                           |
+| ------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [compose.yaml](./compose.yaml)                               | Default compose file using vllm as serving framework and redis as vector database                                                                                     |
+| [compose_milvus.yaml](./compose_milvus.yaml)                 | Uses Milvus as the vector database. All other configurations remain the same as the default                                                                           |
+| [compose_pinecone.yaml](./compose_pinecone.yaml)             | Uses Pinecone as the vector database. All other configurations remain the same as the default. For more details, refer to [README_pinecone.md](./README_pinecone.md). |
+| [compose_qdrant.yaml](./compose_qdrant.yaml)                 | Uses Qdrant as the vector database. All other configurations remain the same as the default. For more details, refer to [README_qdrant.md](./README_qdrant.md).       |
+| [compose_tgi.yaml](./compose_tgi.yaml)                       | Uses TGI as the LLM serving framework. All other configurations remain the same as the default                                                                        |
+| [compose_without_rerank.yaml](./compose_without_rerank.yaml) | Default configuration without the reranker                                                                                                                            |
+| [compose_faqgen.yaml](./compose_faqgen.yaml)                 | Enables FAQ generation using vLLM as the LLM serving framework. For more details, refer to [README_faqgen.md](./README_faqgen.md).                                    |
+| [compose_faqgen_tgi.yaml](./compose_faqgen_tgi.yaml)         | Enables FAQ generation using TGI as the LLM serving framework. For more details, refer to [README_faqgen.md](./README_faqgen.md).                                     |
+| [compose.telemetry.yaml](./compose.telemetry.yaml)           | Helper file for telemetry features for vllm. Can be used along with any compose files that serves vllm                                                                |
+| [compose_tgi.telemetry.yaml](./compose_tgi.telemetry.yaml)   | Helper file for telemetry features for tgi. Can be used along with any compose files that serves tgi                                                                  |
 
 ## ChatQnA with Conversational UI (Optional)
 
@@ -201,13 +201,15 @@ Follow the instructions to validate MicroServices.
 For details on how to verify the correctness of the response, refer to [how-to-validate_service](../../hpu/gaudi/how_to_validate_service.md).
 
 1. **TEI Embedding Service**
-  Send a test request to the TEI Embedding Service to ensure it is running correctly:
+   Send a test request to the TEI Embedding Service to ensure it is running correctly:
+
    ```bash
    curl http://${host_ip}:6006/embed \
        -X POST \
        -d '{"inputs":"What is Deep Learning?"}' \
        -H 'Content-Type: application/json'
    ```
+
    If you receive a connection error, ensure that the service is running and the port 6006 is open in the firewall.
 
 2. **Retriever Microservice**
@@ -225,6 +227,7 @@ For details on how to verify the correctness of the response, refer to [how-to-v
      -d "{\"text\":\"test\",\"embedding\":${your_embedding}}" \
      -H 'Content-Type: application/json'
    ```
+
    If the response indicates an invalid embedding vector, verify that the vector size matches the model's expected dimension.
 
 3. **TEI Reranking Service**
