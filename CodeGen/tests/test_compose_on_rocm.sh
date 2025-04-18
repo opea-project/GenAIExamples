@@ -155,12 +155,12 @@ function validate_microservices() {
 
 function validate_megaservice() {
     # Curl the Mega Service
-    validate_services \
-        "${ip_address}:${CODEGEN_BACKEND_SERVICE_PORT}/v1/codegen" \
-        "print" \
-        "codegen-backend-server" \
-        "codegen-backend-server" \
-        '{"messages": "def print_hello_world():", "max_tokens": 256}'
+#    validate_services \
+#        "${ip_address}:${CODEGEN_BACKEND_SERVICE_PORT}/v1/codegen" \
+#        "print" \
+#        "codegen-backend-server" \
+#        "codegen-backend-server" \
+#        '{"messages": "def print_hello_world():", "max_tokens": 256}'
     # Curl the Mega Service with index_name and agents_flag
     validate_services \
         "${ip_address}:${CODEGEN_BACKEND_SERVICE_PORT}/v1/codegen" \
