@@ -16,10 +16,11 @@ export MODELDIR="/mnt/opea-models"
 export MODELNAME="Intel/neural-chat-7b-v3-3"
 
 function install_docsum() {
-    kubectl delete ns $APP_NAMESPACE
-    kubectl create ns $APP_NAMESPACE
-    echo Y | rm -R GenAIInfra
-    git clone https://github.com/opea-project/GenAIInfra.git
+    opea_branch=${opea_branch:-"main"}
+#    kubectl delete ns $APP_NAMESPACE
+#    kubectl create ns $APP_NAMESPACE
+    echo Y | rm -Rf GenAIInfra
+    sudo git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIInfra.git
     cd GenAIInfra/helm-charts
     ./update_dependency.sh
     helm dependency update docsum
