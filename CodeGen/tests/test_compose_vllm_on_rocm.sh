@@ -53,6 +53,15 @@ function start_services() {
     export CODEGEN_BACKEND_SERVICE_URL="http://${ip_address}:${CODEGEN_BACKEND_SERVICE_PORT}/v1/codegen"
     export CODEGEN_UI_SERVICE_PORT=5173
 
+    export REDIS_URL="redis://${HOST_IP}:${REDIS_DB_PORT}"
+    export RETRIEVAL_SERVICE_HOST_IP=${HOST_IP}
+    export RETRIEVER_COMPONENT_NAME="OPEA_RETRIEVER_REDIS"
+    export INDEX_NAME="CodeGen"
+
+    export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
+    export TEI_EMBEDDING_HOST_IP=${HOST_IP}
+    export TEI_EMBEDDING_ENDPOINT="http://${HOST_IPp}:${TEI_EMBEDDER_PORT}"
+    export DATAPREP_ENDPOINT="http://${HOST_IP}:${DATAPREP_REDIS_PORT}/v1/dataprep"
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
@@ -147,6 +156,7 @@ function validate_frontend() {
     source activate ${conda_env_name}
 
     sed -i "s/localhost/$ip_address/g" playwright.config.ts
+    sed -i "s/timeout: 5000/timeout: 15000/g" playwright.config.ts
 
     conda install -c conda-forge nodejs=22.6.0 -y
     npm install && npm ci && npx playwright install --with-deps
