@@ -1,0 +1,25 @@
+From 4723fb2df86df3e1c300f12fc0649823ea1a753b Mon Sep 17 00:00:00 2001
+From: lkk12014402 <kaokao.lv@intel.com>
+Date: Tue, 8 Apr 2025 08:09:36 +0000
+Subject: [PATCH 5/5] fix tool call typo.
+
+---
+ backend/open_webui/utils/middleware.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/backend/open_webui/utils/middleware.py b/backend/open_webui/utils/middleware.py
+index 9e44ed91a..82aed5346 100644
+--- a/backend/open_webui/utils/middleware.py
++++ b/backend/open_webui/utils/middleware.py
+@@ -1142,7 +1142,7 @@ async def process_chat_response(
+                                 result_display_content = f"{result_display_content}\n> {tool_name}: {result.get('content', '')}"
+ 
+                             if not raw:
+-                                content = f'{content}\n<details type="tool_calls" done="true" content="{html.escape(json.dumps(block_content))}" results="{html.escape(json.dumps(results))}">\n<summary> Tool: {tool_call.get('function', {}).get('name', '')} Executed</summary>\n{result_display_content}\n</details>\n'
++                                content = f'{content}\n<details type="tool_calls" done="true" content="{html.escape(json.dumps(block_content))}" results="{html.escape(json.dumps(results))}">\n<summary> Tool: {tool_call.get("function", {}).get("name", "")} Executed</summary>\n{result_display_content}\n</details>\n'
+                         else:
+                             tool_calls_display_content = ""
+ 
+-- 
+2.34.1
+

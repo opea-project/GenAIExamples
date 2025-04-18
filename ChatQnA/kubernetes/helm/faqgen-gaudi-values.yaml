@@ -1,0 +1,53 @@
+# Copyright (C) 2025 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+CHATQNA_TYPE: "CHATQNA_FAQGEN"
+llm-uservice:
+  enabled: true
+  image:
+    repository: opea/llm-faqgen
+  LLM_MODEL_ID: meta-llama/Meta-Llama-3-8B-Instruct
+  FAQGEN_BACKEND: "vLLM"
+  service:
+    port: 80
+tgi:
+  enabled: false
+vllm:
+  enabled: true
+  shmSize: 1Gi
+  accelDevice: "gaudi"
+  image:
+    repository: opea/vllm-gaudi
+  resources:
+    limits:
+      habana.ai/gaudi: 1
+
+  PT_HPU_ENABLE_LAZY_COLLECTIVES: "true"
+  OMPI_MCA_btl_vader_single_copy_mechanism: "none"
+  VLLM_SKIP_WARMUP: true
+
+  extraCmdArgs: [
+    "--tensor-parallel-size", "1",
+    "--block-size", "128",
+    "--max-num-seqs", "256",
+    "--max-seq-len-to-capture", "2048"
+  ]
+
+# Reranking: second largest bottleneck when reranking is in use
+# (i.e. query context docs have been uploaded with data-prep)
+#
+# TODO: could vLLM be used also for reranking / embedding?
+teirerank:
+  accelDevice: "gaudi"
+  OMPI_MCA_btl_vader_single_copy_mechanism: "none"
+  MAX_WARMUP_SEQUENCE_LENGTH: "512"
+  image:
+    repository: ghcr.io/huggingface/tei-gaudi
+    tag: 1.5.0
+  resources:
+    limits:
+      habana.ai/gaudi: 1
+  # securityContext:
+  #   readOnlyRootFilesystem: false
+  readinessProbe:
+    timeoutSeconds: 1

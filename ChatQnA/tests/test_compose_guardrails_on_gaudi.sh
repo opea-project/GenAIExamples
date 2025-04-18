@@ -24,14 +24,13 @@ function build_docker_images() {
     docker build --no-cache -t ${REGISTRY}/comps-base:${TAG} --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
     popd && sleep 1s
     git clone https://github.com/HabanaAI/vllm-fork.git && cd vllm-fork
-    VLLM_VER=$(git describe --tags "$(git rev-list --tags --max-count=1)")
+    VLLM_VER=v0.6.6.post1+Gaudi-1.20.0
     git checkout ${VLLM_VER} &> /dev/null && cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
     service_list="chatqna chatqna-ui dataprep retriever vllm-gaudi guardrails nginx"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
-    docker pull ghcr.io/huggingface/tgi-gaudi:2.3.1
     docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.6
     docker pull ghcr.io/huggingface/tei-gaudi:1.5.0
 
@@ -46,6 +45,7 @@ function start_services() {
     export NUM_CARDS=1
     export INDEX_NAME="rag-redis"
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+    export host_ip=${ip_address}
     export GURADRAILS_MODEL_ID="meta-llama/Meta-Llama-Guard-2-8B"
 
     # Start Docker Containers
@@ -61,12 +61,12 @@ function start_services() {
         n=$((n+1))
     done
 
-    # Make sure tgi guardrails service is ready
+    # Make sure vllm guardrails service is ready
     m=0
-    until [[ "$m" -ge 160 ]]; do
+    until [[ "$m" -ge 200 ]]; do
         echo "m=$m"
-        docker logs tgi-guardrails-server > tgi_guardrails_service_start.log
-        if grep -q Connected tgi_guardrails_service_start.log; then
+        docker logs vllm-guardrails-server > vllm_guardrails_service_start.log
+        if grep -q "Warmup finished" vllm_guardrails_service_start.log; then
             break
         fi
         sleep 5s
@@ -198,7 +198,7 @@ function stop_docker() {
 
 function main() {
 
-    echo "::group::start_docker"
+    echo "::group::stop_docker"
     stop_docker
     echo "::endgroup::"
 

@@ -23,6 +23,12 @@ services:
       dockerfile: ./docker/Dockerfile.react
     extends: codegen
     image: ${REGISTRY:-opea}/codegen-react-ui:${TAG:-latest}
+  codegen-gradio-ui:
+    build:
+      context: ../ui
+      dockerfile: ./docker/Dockerfile.gradio
+    extends: codegen
+    image: ${REGISTRY:-opea}/codegen-gradio-ui:${TAG:-latest}
   llm-textgen:
     build:
       context: GenAIComps
@@ -37,7 +43,7 @@ services:
   vllm:
     build:
       context: vllm
-      dockerfile: Dockerfile.cpu
+      dockerfile: docker/Dockerfile.cpu
     extends: codegen
     image: ${REGISTRY:-opea}/vllm:${TAG:-latest}
   vllm-gaudi:
@@ -46,3 +52,21 @@ services:
       dockerfile: Dockerfile.hpu
     extends: codegen
     image: ${REGISTRY:-opea}/vllm-gaudi:${TAG:-latest}
+  dataprep:
+    build:
+      context: GenAIComps
+      dockerfile: comps/dataprep/src/Dockerfile
+    extends: codegen
+    image: ${REGISTRY:-opea}/dataprep:${TAG:-latest}
+  retriever:
+    build:
+      context: GenAIComps
+      dockerfile: comps/retrievers/src/Dockerfile
+    extends: codegen
+    image: ${REGISTRY:-opea}/retriever:${TAG:-latest}
+  embedding:
+    build:
+      context: GenAIComps
+      dockerfile: comps/embeddings/src/Dockerfile
+    extends: codegen
+    image: ${REGISTRY:-opea}/embedding:${TAG:-latest}
