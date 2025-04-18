@@ -66,7 +66,6 @@ function start_services() {
 
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
-    sed -i "s/timeout: 5000/timeout: 15000/g" playwright.config.ts
 
     # Start Docker Containers
     docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
@@ -159,6 +158,7 @@ function validate_frontend() {
     source activate ${conda_env_name}
 
     sed -i "s/localhost/$ip_address/g" playwright.config.ts
+    sed -i "s/timeout: 5000/timeout: 15000/g" playwright.config.ts
 
     conda install -c conda-forge nodejs=22.6.0 -y
     npm install && npm ci && npx playwright install --with-deps
