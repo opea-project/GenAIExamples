@@ -1,4 +1,5 @@
-# Table of Contents
+# SearchQnA Docker Image Build
+## Table of Contents
 
 1. [Build MegaService Docker Image](#build-megaservice-docker-image)
 2. [Build UI Docker Image](#build-ui-docker-image)
