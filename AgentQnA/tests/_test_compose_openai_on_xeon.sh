@@ -31,7 +31,7 @@ function stop_retrieval_tool() {
 }
 
 echo "=================== #1 Building docker images===================="
-bash step1_build_images.sh
+bash step1_build_images.sh xeon
 echo "=================== #1 Building docker images completed===================="
 
 echo "=================== #2 Start retrieval tool===================="
