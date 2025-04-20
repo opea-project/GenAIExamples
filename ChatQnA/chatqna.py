@@ -25,7 +25,7 @@ class ChatTemplate:
     @staticmethod
     def generate_rag_prompt(question, documents):
         context_str = "\n".join(documents)
-        if context_str and len(re.findall("[\u4E00-\u9FFF]", context_str)) / len(context_str) >= 0.3:
+        if context_str and len(re.findall("[\u4e00-\u9fff]", context_str)) / len(context_str) >= 0.3:
             # chinese context
             template = """
 ### 你将扮演一个乐于助人、尊重他人并诚实的助手，你的目标是帮助用户解答问题。有效地利用来自本地知识库的搜索结果。确保你的回答中只包含相关信息。如果你不确定问题的答案，请避免分享不准确的信息。
@@ -58,6 +58,7 @@ RERANK_SERVER_PORT = int(os.getenv("RERANK_SERVER_PORT", 80))
 LLM_SERVER_HOST_IP = os.getenv("LLM_SERVER_HOST_IP", "0.0.0.0")
 LLM_SERVER_PORT = int(os.getenv("LLM_SERVER_PORT", 80))
 LLM_MODEL = os.getenv("LLM_MODEL", "meta-llama/Meta-Llama-3-8B-Instruct")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", None)
 
 
 def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **kwargs):
@@ -239,6 +240,7 @@ class ChatQnAService:
             name="llm",
             host=LLM_SERVER_HOST_IP,
             port=LLM_SERVER_PORT,
+            api_key=OPENAI_API_KEY,
             endpoint="/v1/chat/completions",
             use_remote_service=True,
             service_type=ServiceType.LLM,
@@ -272,6 +274,7 @@ class ChatQnAService:
             name="llm",
             host=LLM_SERVER_HOST_IP,
             port=LLM_SERVER_PORT,
+            api_key=OPENAI_API_KEY,
             endpoint="/v1/chat/completions",
             use_remote_service=True,
             service_type=ServiceType.LLM,
@@ -317,6 +320,7 @@ class ChatQnAService:
             name="llm",
             host=LLM_SERVER_HOST_IP,
             port=LLM_SERVER_PORT,
+            api_key=OPENAI_API_KEY,
             endpoint="/v1/chat/completions",
             use_remote_service=True,
             service_type=ServiceType.LLM,
