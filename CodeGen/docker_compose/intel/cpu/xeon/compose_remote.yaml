@@ -3,91 +3,9 @@
 
 services:
 
-  tgi-service:
-    image: ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu
-    container_name: tgi-server
-    profiles:
-      - codegen-xeon-tgi
-    ports:
-      - "8028:80"
-    volumes:
-      - "${MODEL_CACHE:-./data}:/data"
-    shm_size: 1g
-    environment:
-      no_proxy: ${no_proxy}
-      http_proxy: ${http_proxy}
-      https_proxy: ${https_proxy}
-      HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
-      host_ip: ${host_ip}
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:80/health || exit 1"]
-      interval: 10s
-      timeout: 10s
-      retries: 100
-    command: --model-id ${LLM_MODEL_ID} --cuda-graphs 0
-  vllm-service:
-    image: ${REGISTRY:-opea}/vllm:${TAG:-latest}
-    container_name: vllm-server
-    profiles:
-      - codegen-xeon-vllm
-    ports:
-      - "8028:80"
-    volumes:
-      - "${MODEL_CACHE:-./data}:/root/.cache/huggingface/hub"
-    shm_size: 1g
-    environment:
-      no_proxy: ${no_proxy}
-      http_proxy: ${http_proxy}
-      https_proxy: ${https_proxy}
-      HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
-      host_ip: ${host_ip}
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:80/health || exit 1"]
-      interval: 10s
-      timeout: 10s
-      retries: 100
-    command: --model ${LLM_MODEL_ID} --host 0.0.0.0 --port 80
-  llm-base:
-    image: ${REGISTRY:-opea}/llm-textgen:${TAG:-latest}
-    container_name: llm-textgen-server
-    environment:
-      no_proxy: ${no_proxy}
-      http_proxy: ${http_proxy}
-      https_proxy: ${https_proxy}
-      LLM_ENDPOINT: ${LLM_ENDPOINT}
-      LLM_MODEL_ID: ${LLM_MODEL_ID}
-      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
-    restart: unless-stopped
-  llm-tgi-service:
-    extends: llm-base
-    container_name: llm-codegen-tgi-server
-    profiles:
-      - codegen-xeon-tgi
-    ports:
-      - "9000:9000"
-    ipc: host
-    depends_on:
-      tgi-service:
-        condition: service_healthy
-  llm-vllm-service:
-    extends: llm-base
-    container_name: llm-codegen-vllm-server
-    profiles:
-      - codegen-xeon-vllm
-    ports:
-      - "9000:9000"
-    ipc: host
-    depends_on:
-      vllm-service:
-        condition: service_healthy
   codegen-xeon-backend-server:
     image: ${REGISTRY:-opea}/codegen:${TAG:-latest}
     container_name: codegen-xeon-backend-server
-    depends_on:
-      llm-base:
-        condition: service_started
-      dataprep-redis-server:
-        condition: service_healthy
     ports:
       - "7778:7778"
     environment:
@@ -95,7 +13,8 @@ services:
       - https_proxy=${https_proxy}
       - http_proxy=${http_proxy}
       - MEGA_SERVICE_HOST_IP=${MEGA_SERVICE_HOST_IP}
-      - LLM_SERVICE_HOST_IP=${LLM_SERVICE_HOST_IP}
+      - LLM_SERVICE_HOST_IP=${REMOTE_ENDPOINT}
+      - OPENAI_API_KEY= ${OPENAI_API_KEY}
       - RETRIEVAL_SERVICE_HOST_IP=${RETRIEVAL_SERVICE_HOST_IP}
       - REDIS_RETRIEVER_PORT=${REDIS_RETRIEVER_PORT}
       - TEI_EMBEDDING_HOST_IP=${TEI_EMBEDDING_HOST_IP}
@@ -142,11 +61,6 @@ services:
       INDEX_NAME: ${INDEX_NAME}
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       LOGFLAG: true
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:5000/v1/health_check || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 10
     restart: unless-stopped
   tei-embedding-serving:
     image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
@@ -164,7 +78,7 @@ services:
       host_ip: ${host_ip}
       HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
+      test: ["CMD", "curl", "-f", "http://${host_ip}:${TEI_EMBEDDER_PORT}/health"]
       interval: 10s
       timeout: 6s
       retries: 48
