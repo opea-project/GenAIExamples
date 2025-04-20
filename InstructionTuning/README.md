@@ -10,8 +10,7 @@ Instruction tuning is the process of further training LLMs on a dataset consisti
 
 ## Architecture
 
-The instruction tuning application is a customizable end-to-end workflow that take user provided instruction dataset to finetune the user specified LLMs.
-
+The instruction tuning application is a customizable end-to-end workflow that takes user provided instruction dataset to finetune the user specified LLMs.
 ## Deployment Options
 
 ### Deploy Instruction Tuning Service on Xeon
