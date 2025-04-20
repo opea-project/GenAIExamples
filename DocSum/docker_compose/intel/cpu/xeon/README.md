@@ -1,376 +1,303 @@
-# Build Mega Service of Document Summarization on Intel Xeon Processor
+# Example DocSum deployments on Intel Xeon Processor
 
-This document outlines the deployment process for a Document Summarization application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on an Intel Xeon server. The steps include Docker image creation, container deployment via Docker Compose, and service execution to integrate microservices such as `llm`. We will publish the Docker images to Docker Hub soon, which will simplify the deployment process for this service.
+This document outlines the deployment process for a Document Summarization application utilizing OPEA components on an Intel Xeon server.
 
-The default pipeline deploys with vLLM as the LLM serving component. It also provides options of using TGI backend for LLM microservice, please refer to [start-microservice-docker-containers](#start-microservice-docker-containers) section in this page.
+This example includes the following sections:
 
-## 🚀 Apply Intel Xeon Server on AWS
+- [DocSum Quick Start Deployment](#docsum-quick-start-deployment): Demonstrates how to quickly deploy a DocSum application/pipeline on Intel Xeon platform.
+- [DocSum Docker Compose Files](#docsum-docker-compose-files): Describes some example deployments and their docker compose files.
+- [DocSum Detailed Usage](#docsum-detailed-usage): Provide more detailed usage.
+- [Launch the UI](#launch-the-ui): Guideline for UI usage
 
-To apply a Intel Xeon server on AWS, start by creating an AWS account if you don't have one already. Then, head to the [EC2 Console](https://console.aws.amazon.com/ec2/v2/home) to begin the process. Within the EC2 service, select the Amazon EC2 M7i or M7i-flex instance type to leverage 4th Generation Intel Xeon Scalable processors. These instances are optimized for high-performance computing and demanding workloads.
+## DocSum Quick Start Deployment
 
-For detailed information about these instance types, you can refer to this [link](https://aws.amazon.com/ec2/instance-types/m7i/). Once you've chosen the appropriate instance type, proceed with configuring your instance settings, including network configurations, security groups, and storage options.
+This section describes how to quickly deploy and test the DocSum service manually on an Intel Xeon platform. The basic steps are:
 
-After launching your instance, you can connect to it using SSH (for Linux instances) or Remote Desktop Protocol (RDP) (for Windows instances). From there, you'll have full access to your Xeon server, allowing you to install, configure, and manage your applications as needed.
+1. [Access the Code](#access-the-code)
+2. [Generate a HuggingFace Access Token](#generate-a-huggingface-access-token)
+3. [Configure the Deployment Environment](#configure-the-deployment-environment)
+4. [Deploy the Services Using Docker Compose](#deploy-the-services-using-docker-compose)
+5. [Check the Deployment Status](#check-the-deployment-status)
+6. [Test the Pipeline](#test-the-pipeline)
+7. [Cleanup the Deployment](#cleanup-the-deployment)
 
-## 🚀 Build Docker Images
+### Access the Code
 
-### 1. Build MicroService Docker Image
+Clone the GenAIExample repository and access the ChatQnA Intel Xeon platform Docker Compose files and supporting scripts:
 
-First of all, you need to build Docker Images locally and install the python package of it.
-
-```bash
-git clone https://github.com/opea-project/GenAIComps.git
-cd GenAIComps
+```
+git clone https://github.com/opea-project/GenAIExamples.git
+cd GenAIExamples/DocSum/docker_compose/intel/cpu/xeon/
 ```
 
-#### Whisper Service
+Checkout a released version, such as v1.2:
 
-The Whisper Service converts audio files to text. Follow these steps to build and run the service:
-
-```bash
-docker build -t opea/whisper:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/third_parties/whisper/src/Dockerfile .
+```
+git checkout v1.2
 ```
 
-### 2. Build MegaService Docker Image
+### Generate a HuggingFace Access Token
 
-To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `docsum.py` Python script. Build the MegaService Docker image via below command:
+Some HuggingFace resources, such as some models, are only accessible if you have an access token. If you do not already have a HuggingFace access token, you can create one by first creating an account by following the steps provided at [HuggingFace](https://huggingface.co/) and then generating a [user access token](https://huggingface.co/docs/transformers.js/en/guides/private#step-1-generating-a-user-access-token).
 
-```bash
-git clone https://github.com/opea-project/GenAIExamples
-cd GenAIExamples/DocSum/
-docker build -t opea/docsum:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
+### Configure the Deployment Environment
+
+To set up environment variables for deploying DocSum services, source the _set_env.sh_ script in this directory:
+
+```
+source ./set_env.sh
 ```
 
-### 3. Build UI Docker Image
+The _set_env.sh_ script will prompt for required and optional environment variables used to configure the DocSum services. If a value is not entered, the script will use a default value for the same. It will also generate a _.env_ file defining the desired configuration. Consult the section on [DocSum Service configuration](#docsum-service-configuration) for information on how service specific configuration parameters affect deployments.
 
-Several UI options are provided. If you need to work with multimedia documents, .doc, or .pdf files, suggested to use Gradio UI.
+### Deploy the Services Using Docker Compose
 
-#### Gradio UI
-
-Build the Gradio UI frontend Docker image using the following command:
+To deploy the DocSum services, execute the `docker compose up` command with the appropriate arguments. For a default deployment, execute:
 
 ```bash
-cd GenAIExamples/DocSum/ui
-docker build -t opea/docsum-gradio-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile.gradio .
+docker compose up -d
 ```
 
-#### Svelte UI
+**Note**: developers should build docker image from source when:
 
-Build the frontend Docker image via below command:
+- Developing off the git main branch (as the container's ports in the repo may be different from the published docker image).
+- Unable to download the docker image.
+- Use a specific version of Docker image.
+
+Please refer to the table below to build different microservices from source:
+
+| Microservice | Deployment Guide                                                                                                                      |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------- |
+| whisper      | [whisper build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/third_parties/whisper/src)                           |
+| vLLM         | [vLLM build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/third_parties/vllm#build-docker)                        |
+| llm-docsum   | [LLM-DocSum build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/llms/src/doc-summarization#12-build-docker-image) |
+| MegaService  | [MegaService build guide](../../../../README_miscellaneous.md#build-megaservice-docker-image)                                         |
+| UI           | [Basic UI build guide](../../../../README_miscellaneous.md#build-ui-docker-image)                                                     |
+
+### Check the Deployment Status
+
+After running docker compose, check if all the containers launched via docker compose have started:
+
+```
+docker ps -a
+```
+
+For the default deployment, the following 5 containers should have started:
+
+```
+CONTAINER ID   IMAGE                                 COMMAND                  CREATED         STATUS                   PORTS                                       NAMES
+748f577b3c78   opea/whisper:latest                   "python whisper_s…"      5 minutes ago   Up About a minute        0.0.0.0:7066->7066/tcp, :::7066->7066/tcp   docsum-xeon-whisper-server
+4eq8b7034fd9   opea/docsum-gradio-ui:latest          "docker-entrypoint.s…"   5 minutes ago   Up About a minute        0.0.0.0:5173->5173/tcp, :::5173->5173/tcp   docsum-xeon-ui-server
+fds3dd5b9fd8   opea/docsum:latest                    "python docsum.py"       5 minutes ago   Up About a minute        0.0.0.0:8888->8888/tcp, :::8888->8888/tcp   docsum-xeon-backend-server
+78fsd6fabfs7   opea/llm-docsum:latest                "bash entrypoint.sh"     5 minutes ago   Up About a minute        0.0.0.0:9000->9000/tcp, :::9000->9000/tcp   docsum-xeon-llm-server
+78964d0c1hg5   opea/vllm:latest                "python3 -m vllm.en …"   5 minutes ago   Up 5 minutes (healthy)   0.0.0.0:8008->80/tcp, [::]:8008->80/tcp     docsum-xeon-vllm-service
+```
+
+### Test the Pipeline
+
+Once the DocSum services are running, test the pipeline using the following command:
 
 ```bash
-cd GenAIExamples/DocSum/ui
-docker build -t opea/docsum-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
-```
-
-#### React UI
-
-Build the frontend Docker image via below command:
-
-```bash
-cd GenAIExamples/DocSum/ui
-export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/docsum"
-docker build -t opea/docsum-react-ui:latest --build-arg BACKEND_SERVICE_ENDPOINT=$BACKEND_SERVICE_ENDPOINT -f ./docker/Dockerfile.react .
-
-docker build -t opea/docsum-react-ui:latest --build-arg BACKEND_SERVICE_ENDPOINT=$BACKEND_SERVICE_ENDPOINT --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy  -f ./docker/Dockerfile.react .
-```
-
-## 🚀 Start Microservices and MegaService
-
-### Required Models
-
-Default model is "Intel/neural-chat-7b-v3-3". Change "LLM_MODEL_ID" environment variable in commands below if you want to use another model.
-
-```bash
-export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
-```
-
-When using gated models, you also need to provide [HuggingFace token](https://huggingface.co/docs/hub/security-tokens) to "HUGGINGFACEHUB_API_TOKEN" environment variable.
-
-### Setup Environment Variable
-
-To set up environment variables for deploying Document Summarization services, follow these steps:
-
-1. Set the required environment variables:
-
-   ```bash
-   # Example: host_ip="192.168.1.1"
-   export host_ip="External_Public_IP"
-   # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
-   export no_proxy="Your_No_Proxy"
-   export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
-   ```
-
-2. If you are in a proxy environment, also set the proxy-related environment variables:
-
-   ```bash
-   export http_proxy="Your_HTTP_Proxy"
-   export https_proxy="Your_HTTPs_Proxy"
-   ```
-
-3. Set up other environment variables:
-
-   ```bash
-   source GenAIExamples/DocSum/docker_compose/set_env.sh
-   ```
-
-### Start Microservice Docker Containers
-
-```bash
-cd GenAIExamples/DocSum/docker_compose/intel/cpu/xeon
-```
-
-If use vLLM as the LLM serving backend.
-
-```bash
-docker compose -f compose.yaml up -d
-```
-
-If use TGI as the LLM serving backend.
-
-```bash
-docker compose -f compose_tgi.yaml up -d
-```
-
-You will have the following Docker Images:
-
-1. `opea/docsum-ui:latest`
-2. `opea/docsum:latest`
-3. `opea/llm-docsum:latest`
-4. `opea/whisper:latest`
-
-### Validate Microservices
-
-1. LLM backend Service
-
-   In the first startup, this service will take more time to download, load and warm up the model. After it's finished, the service will be ready.
-   Try the command below to check whether the LLM serving is ready.
-
-   ```bash
-   # vLLM service
-   docker logs docsum-xeon-vllm-service 2>&1 | grep complete
-   # If the service is ready, you will get the response like below.
-   INFO:     Application startup complete.
-   ```
-
-   ```bash
-   # TGI service
-   docker logs docsum-xeon-tgi-service | grep Connected
-   # If the service is ready, you will get the response like below.
-   2024-09-03T02:47:53.402023Z  INFO text_generation_router::server: router/src/server.rs:2311: Connected
-   ```
-
-   Then try the `cURL` command below to validate services.
-
-   ```bash
-   # either vLLM or TGI service
-   curl http://${host_ip}:8008/v1/chat/completions \
-     -X POST \
-     -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}' \
-     -H 'Content-Type: application/json'
-   ```
-
-2. LLM Microservice
-
-   ```bash
-   curl http://${host_ip}:9000/v1/docsum \
-     -X POST \
-     -d '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}' \
-     -H 'Content-Type: application/json'
-   ```
-
-3. Whisper Microservice
-
-   ```bash
-    curl http://${host_ip}:7066/v1/asr \
-        -X POST \
-        -d '{"audio":"UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA"}' \
-        -H 'Content-Type: application/json'
-   ```
-
-   Expected output:
-
-   ```bash
-     {"asr_result":"you"}
-   ```
-
-4. MegaService
-
-   Text:
-
-   ```bash
-   ## json input
-   curl -X POST http://${host_ip}:8888/v1/docsum \
+curl -X POST http://${host_ip}:8888/v1/docsum \
         -H "Content-Type: application/json" \
         -d '{"type": "text", "messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
+```
 
-   # form input, use English mode (default).
-   curl http://${host_ip}:8888/v1/docsum \
-       -H "Content-Type: multipart/form-data" \
-       -F "type=text" \
-       -F "messages=Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5." \
-       -F "max_tokens=32" \
-       -F "language=en" \
-       -F "stream=true"
+**Note** The value of _host_ip_ was set using the _set_env.sh_ script and can be found in the _.env_ file.
 
-   # Use Chinese mode.
-   curl http://${host_ip}:8888/v1/docsum \
-       -H "Content-Type: multipart/form-data" \
-       -F "type=text" \
-       -F "messages=2024年9月26日，北京——今日，英特尔正式发布英特尔® 至强® 6性能核处理器（代号Granite Rapids），为AI、数据分析、科学计算等计算密集型业务提供卓越性能。" \
-       -F "max_tokens=32" \
-       -F "language=zh" \
-       -F "stream=true"
+### Cleanup the Deployment
 
-   # Upload file
-   curl http://${host_ip}:8888/v1/docsum \
+To stop the containers associated with the deployment, execute the following command:
+
+```
+docker compose -f compose.yaml down
+```
+
+All the DocSum containers will be stopped and then removed on completion of the "down" command.
+
+## DocSum Docker Compose Files
+
+In the context of deploying a DocSum pipeline on an Intel® Xeon® platform, we can pick and choose different large language model serving frameworks. The table below outlines the various configurations that are available as part of the application.
+
+| File                                   | Description                                                                               |
+| -------------------------------------- | ----------------------------------------------------------------------------------------- |
+| [compose.yaml](./compose.yaml)         | Default compose file using vllm as serving framework                                      |
+| [compose_tgi.yaml](./compose_tgi.yaml) | The LLM serving framework is TGI. All other configurations remain the same as the default |
+
+## DocSum Detailed Usage
+
+There are also some customized usage.
+
+### Query with text
+
+```bash
+# form input. Use English mode (default).
+curl http://${host_ip}:8888/v1/docsum \
       -H "Content-Type: multipart/form-data" \
       -F "type=text" \
-      -F "messages=" \
-      -F "files=@/path to your file (.txt, .docx, .pdf)" \
+      -F "messages=Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5." \
       -F "max_tokens=32" \
       -F "language=en" \
-      -F "stream=true"
-   ```
+      -F "stream=True"
 
-   > Audio and Video file uploads are not supported in docsum with curl request, please use the Gradio-UI. You can still pass base64 string of the audio or video file as follows:
-
-   Audio:
-
-   ```bash
-   curl -X POST http://${host_ip}:8888/v1/docsum \
-      -H "Content-Type: application/json" \
-      -d '{"type": "audio", "messages": "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA"}'
-
-   curl http://${host_ip}:8888/v1/docsum \
-      -H "Content-Type: multipart/form-data" \
-      -F "type=audio" \
-      -F "messages=UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA" \
-      -F "max_tokens=32" \
-      -F "language=en" \
-      -F "stream=true"
-   ```
-
-   Video:
-
-   ```bash
-   curl -X POST http://${host_ip}:8888/v1/docsum \
-      -H "Content-Type: application/json" \
-      -d '{"type": "video", "messages": "convert your video to base64 data type"}'
-
-   curl http://${host_ip}:8888/v1/docsum \
-      -H "Content-Type: multipart/form-data" \
-      -F "type=video" \
-      -F "messages=convert your video to base64 data type" \
-      -F "max_tokens=32" \
-      -F "language=en" \
-      -F "stream=true"
-   ```
-
-5. MegaService with long context
-
-   If you want to deal with long context, can set following parameters and select suitable summary type.
-
-   - "summary_type": can be "auto", "stuff", "truncate", "map_reduce", "refine", default is "auto"
-   - "chunk_size": max token length for each chunk. Set to be different default value according to "summary_type".
-   - "chunk_overlap": overlap token length between each chunk, default is 0.1\*chunk_size
-
-   **summary_type=auto**
-
-   "summary_type" is set to be "auto" by default, in this mode we will check input token length, if it exceed `MAX_INPUT_TOKENS`, `summary_type` will automatically be set to `refine` mode, otherwise will be set to `stuff` mode.
-
-   ```bash
-   curl http://${host_ip}:8888/v1/docsum \
+# Use Chinese mode.
+curl http://${host_ip}:8888/v1/docsum \
       -H "Content-Type: multipart/form-data" \
       -F "type=text" \
-      -F "messages=" \
+      -F "messages=2024年9月26日，北京——今日，英特尔正式发布英特尔® 至强® 6性能核处理器（代号Granite Rapids），为AI、数据分析、科学计算等计算密集型业务提供卓越性能。" \
       -F "max_tokens=32" \
-      -F "files=@/path to your file (.txt, .docx, .pdf)" \
-      -F "language=en" \
-      -F "summary_type=auto"
-   ```
+      -F "language=zh" \
+      -F "stream=True"
 
-   **summary_type=stuff**
+# Upload file
+curl http://${host_ip}:8888/v1/docsum \
+   -H "Content-Type: multipart/form-data" \
+   -F "type=text" \
+   -F "messages=" \
+   -F "files=@/path to your file (.txt, .docx, .pdf)" \
+   -F "max_tokens=32" \
+   -F "language=en" \
+```
 
-   In this mode LLM generate summary based on complete input text. In this case please carefully set `MAX_INPUT_TOKENS` and `MAX_TOTAL_TOKENS` according to your model and device memory, otherwise it may exceed LLM context limit and raise error when meet long context.
+### Query with audio and video
 
-   ```bash
-   curl http://${host_ip}:8888/v1/docsum \
-      -H "Content-Type: multipart/form-data" \
-      -F "type=text" \
-      -F "messages=" \
-      -F "max_tokens=32" \
-      -F "files=@/path to your file (.txt, .docx, .pdf)" \
-      -F "language=en" \
-      -F "summary_type=stuff"
-   ```
+> Audio and Video file uploads are not supported in docsum with curl request, please use the Gradio-UI.
 
-   **summary_type=truncate**
+Audio:
 
-   Truncate mode will truncate the input text and keep only the first chunk, whose length is equal to `min(MAX_TOTAL_TOKENS - input.max_tokens - 50, MAX_INPUT_TOKENS)`
+```bash
+curl -X POST http://${host_ip}:8888/v1/docsum \
+   -H "Content-Type: application/json" \
+   -d '{"type": "audio", "messages": "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA"}'
 
-   ```bash
-   curl http://${host_ip}:8888/v1/docsum \
-      -H "Content-Type: multipart/form-data" \
-      -F "type=text" \
-      -F "messages=" \
-      -F "max_tokens=32" \
-      -F "files=@/path to your file (.txt, .docx, .pdf)" \
-      -F "language=en" \
-      -F "summary_type=truncate"
-   ```
+curl http://${host_ip}:8888/v1/docsum \
+   -H "Content-Type: multipart/form-data" \
+   -F "type=audio" \
+   -F "messages=UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA" \
+   -F "max_tokens=32" \
+   -F "language=en" \
+   -F "stream=True"
+```
 
-   **summary_type=map_reduce**
+Video:
 
-   Map_reduce mode will split the inputs into multiple chunks, map each document to an individual summary, then consolidate those summaries into a single global summary. `stream=True` is not allowed here.
+```bash
+curl -X POST http://${host_ip}:8888/v1/docsum \
+   -H "Content-Type: application/json" \
+   -d '{"type": "video", "messages": "convert your video to base64 data type"}'
 
-   In this mode, default `chunk_size` is set to be `min(MAX_TOTAL_TOKENS - input.max_tokens - 50, MAX_INPUT_TOKENS)`
+curl http://${host_ip}:8888/v1/docsum \
+   -H "Content-Type: multipart/form-data" \
+   -F "type=video" \
+   -F "messages=convert your video to base64 data type" \
+   -F "max_tokens=32" \
+   -F "language=en" \
+   -F "stream=True"
+```
 
-   ```bash
-   curl http://${host_ip}:8888/v1/docsum \
-      -H "Content-Type: multipart/form-data" \
-      -F "type=text" \
-      -F "messages=" \
-      -F "max_tokens=32" \
-      -F "files=@/path to your file (.txt, .docx, .pdf)" \
-      -F "language=en" \
-      -F "summary_type=map_reduce"
-   ```
+### Query with long context
 
-   **summary_type=refine**
+If you want to deal with long context, can set following parameters and select suitable summary type.
 
-   Refin mode will split the inputs into multiple chunks, generate summary for the first one, then combine with the second, loops over every remaining chunks to get the final summary.
+- "summary_type": can be "auto", "stuff", "truncate", "map_reduce", "refine", default is "auto"
+- "chunk_size": max token length for each chunk. Set to be different default value according to "summary_type".
+- "chunk_overlap": overlap token length between each chunk, default is 0.1\*chunk_size
 
-   In this mode, default `chunk_size` is set to be `min(MAX_TOTAL_TOKENS - 2 * input.max_tokens - 128, MAX_INPUT_TOKENS)`.
+**summary_type=auto**
 
-   ```bash
-   curl http://${host_ip}:8888/v1/docsum \
-      -H "Content-Type: multipart/form-data" \
-      -F "type=text" \
-      -F "messages=" \
-      -F "max_tokens=32" \
-      -F "files=@/path to your file (.txt, .docx, .pdf)" \
-      -F "language=en" \
-      -F "summary_type=refine"
-   ```
+"summary_type" is set to be "auto" by default, in this mode we will check input token length, if it exceed `MAX_INPUT_TOKENS`, `summary_type` will automatically be set to `refine` mode, otherwise will be set to `stuff` mode.
 
-## 🚀 Launch the UI
+```bash
+curl http://${host_ip}:8888/v1/docsum \
+   -H "Content-Type: multipart/form-data" \
+   -F "type=text" \
+   -F "messages=" \
+   -F "max_tokens=32" \
+   -F "files=@/path to your file (.txt, .docx, .pdf)" \
+   -F "language=en" \
+   -F "summary_type=auto"
+```
+
+**summary_type=stuff**
+
+In this mode LLM generate summary based on complete input text. In this case please carefully set `MAX_INPUT_TOKENS` and `MAX_TOTAL_TOKENS` according to your model and device memory, otherwise it may exceed LLM context limit and raise error when meet long context.
+
+```bash
+curl http://${host_ip}:8888/v1/docsum \
+   -H "Content-Type: multipart/form-data" \
+   -F "type=text" \
+   -F "messages=" \
+   -F "max_tokens=32" \
+   -F "files=@/path to your file (.txt, .docx, .pdf)" \
+   -F "language=en" \
+   -F "summary_type=stuff"
+```
+
+**summary_type=truncate**
+
+Truncate mode will truncate the input text and keep only the first chunk, whose length is equal to `min(MAX_TOTAL_TOKENS - input.max_tokens - 50, MAX_INPUT_TOKENS)`
+
+```bash
+curl http://${host_ip}:8888/v1/docsum \
+   -H "Content-Type: multipart/form-data" \
+   -F "type=text" \
+   -F "messages=" \
+   -F "max_tokens=32" \
+   -F "files=@/path to your file (.txt, .docx, .pdf)" \
+   -F "language=en" \
+   -F "summary_type=truncate"
+```
+
+**summary_type=map_reduce**
+
+Map_reduce mode will split the inputs into multiple chunks, map each document to an individual summary, then consolidate those summaries into a single global summary. `stream=True` is not allowed here.
+
+In this mode, default `chunk_size` is set to be `min(MAX_TOTAL_TOKENS - input.max_tokens - 50, MAX_INPUT_TOKENS)`
+
+```bash
+curl http://${host_ip}:8888/v1/docsum \
+   -H "Content-Type: multipart/form-data" \
+   -F "type=text" \
+   -F "messages=" \
+   -F "max_tokens=32" \
+   -F "files=@/path to your file (.txt, .docx, .pdf)" \
+   -F "language=en" \
+   -F "summary_type=map_reduce"
+```
+
+**summary_type=refine**
+
+Refin mode will split the inputs into multiple chunks, generate summary for the first one, then combine with the second, loops over every remaining chunks to get the final summary.
+
+In this mode, default `chunk_size` is set to be `min(MAX_TOTAL_TOKENS - 2 * input.max_tokens - 128, MAX_INPUT_TOKENS)`.
+
+```bash
+curl http://${host_ip}:8888/v1/docsum \
+   -H "Content-Type: multipart/form-data" \
+   -F "type=text" \
+   -F "messages=" \
+   -F "max_tokens=32" \
+   -F "files=@/path to your file (.txt, .docx, .pdf)" \
+   -F "language=en" \
+   -F "summary_type=refine"
+```
+
+## Launch the UI
 
 Several UI options are provided. If you need to work with multimedia documents, .doc, or .pdf files, suggested to use Gradio UI.
 
 ### Gradio UI
 
 Open this URL `http://{host_ip}:5173` in your browser to access the Gradio based frontend.
-
 ![project-screenshot](../../../../assets/img/docSum_ui_gradio_text.png)
 
-### Svelte UI
+### Launch the Svelte UI
 
 Open this URL `http://{host_ip}:5173` in your browser to access the Svelte based frontend.
 
 ![project-screenshot](../../../../assets/img/docSum_ui_text.png)
 
-### React UI (Optional)
+### Launch the React UI (Optional)
 
 Open this URL `http://{host_ip}:5174` in your browser to access the React based frontend.
 
@@ -392,4 +319,8 @@ docsum-xeon-react-ui-server:
   restart: always
 ```
 
-![preject-react-screenshot](../../../../assets/img/docsum-ui-react.png)
+![project-react-screenshot](../../../../assets/img/docsum-ui-react.png)
+
+Open this URL `http://{host_ip}:5175` in your browser to access the frontend.
+
+![project-screenshot](../../../../assets/img/docsum-ui-react.png)
