@@ -1,116 +1,149 @@
-# Build and deploy Translation Application on AMD GPU (ROCm)
+# Example Translation Deployment on AMD GPU (ROCm)
 
-## Build Docker Images
+This document outlines the deployment process for a Translation service utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on AMD GPU (ROCm). This example includes the following sections:
 
-### 1. Build Docker Image
+- [Translation Quick Start Deployment](#translation-quick-start-deployment): Demonstrates how to quickly deploy a Translation service/pipeline on AMD GPU (ROCm).
+- [Translation Docker Compose Files](#translation-docker-compose-files): Describes some example deployments and their docker compose files.
+- [Translation Service Configuration](#translation-service-configuration): Describes the service and possible configuration changes.
 
-- #### Create application install directory and go to it:
+## Translation Quick Start Deployment
 
-  ```bash
-  mkdir ~/translation-install && cd translation-install
-  ```
+This section describes how to quickly deploy and test the Translation service manually on AMD GPU (ROCm). The basic steps are:
 
-- #### Clone the repository GenAIExamples (the default repository branch "main" is used here):
+1. [Access the Code](#access-the-code)
+2. [Generate a HuggingFace Access Token](#generate-a-huggingface-access-token)
+3. [Configure the Deployment Environment](#configure-the-deployment-environment)
+4. [Deploy the Service Using Docker Compose](#deploy-the-service-using-docker-compose)
+5. [Check the Deployment Status](#check-the-deployment-status)
+6. [Test the Pipeline](#test-the-pipeline)
+7. [Cleanup the Deployment](#cleanup-the-deployment)
 
-  ```bash
-  git clone https://github.com/opea-project/GenAIExamples.git
-  ```
+### Access the Code
 
-  If you need to use a specific branch/tag of the GenAIExamples repository, then (v1.3 replace with its own value):
+Clone the GenAIExample repository and access the Translation AMD GPU (ROCm) Docker Compose files and supporting scripts:
 
-  ```bash
-  git clone https://github.com/opea-project/GenAIExamples.git && cd GenAIExamples && git checkout v1.3
-  ```
+```
+git clone https://github.com/opea-project/GenAIExamples.git
+cd GenAIExamples/Translation/docker_compose/amd/gpu/rocm/
+```
 
-  We remind you that when using a specific version of the code, you need to use the README from this version:
+Checkout a released version, such as v1.2:
 
-- #### Go to build directory:
+```
+git checkout v1.2
+```
 
-  ```bash
-  cd ~/translation-install/GenAIExamples/Translation/docker_image_build
-  ```
+### Generate a HuggingFace Access Token
 
-- Cleaning up the GenAIComps repository if it was previously cloned in this directory.
-  This is necessary if the build was performed earlier and the GenAIComps folder exists and is not empty:
+Some HuggingFace resources, such as some models, are only accessible if you have an access token. If you do not already have a HuggingFace access token, you can create one by first creating an account by following the steps provided at [HuggingFace](https://huggingface.co/) and then generating a [user access token](https://huggingface.co/docs/transformers.js/en/guides/private#step-1-generating-a-user-access-token).
 
-  ```bash
-  echo Y | rm -R GenAIComps
-  ```
+### Configure the Deployment Environment
 
-- #### Clone the repository GenAIComps (the default repository branch "main" is used here):
+To set up environment variables for deploying Translation service, source the _set_env.sh_ or _set_env_vllm.sh_ script in this directory:
 
-  ```bash
-  git clone https://github.com/opea-project/GenAIComps.git
-  ```
+```
+//with TGI:
+source ./set_env.sh
+```
 
-  If you use a specific tag of the GenAIExamples repository,
-  then you should also use the corresponding tag for GenAIComps. (v1.3 replace with its own value):
+```
+//with VLLM:
+source ./set_env_vllm.sh
+```
 
-  ```bash
-  git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout v1.3
-  ```
+The _set_env.sh_ script will prompt for required and optional environment variables used to configure the Translation service based on TGI. The _set_env_vllm.sh_ script will prompt for required and optional environment variables used to configure the Translation service based on VLLM. If a value is not entered, the script will use a default value for the same. It will also generate a _.env_ file defining the desired configuration. Consult the section on [Translation Service configuration](#translation-service-configuration) for information on how service specific configuration parameters affect deployments.
 
-  We remind you that when using a specific version of the code, you need to use the README from this version.
+### Deploy the Service Using Docker Compose
 
-- #### Setting the list of images for the build (from the build file.yaml)
+To deploy the Translation service, execute the `docker compose up` command with the appropriate arguments. For a default deployment, execute:
 
-  If you want to deploy a vLLM-based or TGI-based application, then the set of services is installed as follows:
+```bash
+//with TGI:
+docker compose -f compose.yaml up -d
+```
 
-  #### vLLM-based application
+```bash
+//with VLLM:
+docker compose -f compose_vllm.yaml up -d
+```
 
-  ```bash
-  service_list="vllm-rocm translation translation-ui llm-textgen nginx"
-  ```
+The Translation docker images should automatically be downloaded from the `OPEA registry` and deployed on the AMD GPU (ROCm)
 
-  #### TGI-based application
+### Check the Deployment Status
 
-  ```bash
-  service_list="translation translation-ui llm-textgen nginx"
-  ```
+After running docker compose, check if all the containers launched via docker compose have started:
 
-- #### Optional. Pull TGI Docker Image (Do this if you want to use TGI)
+```
+docker ps -a
+```
 
-  ```bash
-  docker pull ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
-  ```
+For the default deployment, the following 5 containers should be running.
 
-- #### Build Docker Images
+### Test the Pipeline
 
-  ```bash
-  docker compose -f build.yaml build ${service_list} --no-cache
-  ```
+Once the Translation service are running, test the pipeline using the following command:
 
-  After the build, we check the list of images with the command:
+```bash
+DATA='{"language_from": "Chinese","language_to": "English","source_language": "我爱机器翻译。"}'
 
-  ```bash
-  docker image ls
-  ```
+curl http://${HOST_IP}:${TRANSLATION_LLM_SERVICE_PORT}/v1/translation  \
+  -d "$DATA" \
+  -H 'Content-Type: application/json'
+```
 
-  The list of images should include:
+Checking the response from the service. The response should be similar to JSON:
 
-  ##### vLLM-based application:
+```textmate
+data: {"id":"","choices":[{"finish_reason":"","index":0,"logprobs":null,"text":" I"}],"created":1743062099,"model":"haoranxu/ALMA-13B","object":"text_completion","system_fingerprint":"2.3.1-sha-a094729-rocm","usage":null}
 
-  - opea/vllm-rocm:latest
-    - opea/llm-textgen:latest
-    - opea/nginx:latest
-    - opea/translation:latest
-    - opea/translation-ui:latest
+data: {"id":"","choices":[{"finish_reason":"","index":0,"logprobs":null,"text":" love"}],"created":1743062099,"model":"haoranxu/ALMA-13B","object":"text_completion","system_fingerprint":"2.3.1-sha-a094729-rocm","usage":null}
 
-  ##### TGI-based application:
+data: {"id":"","choices":[{"finish_reason":"","index":0,"logprobs":null,"text":" machine"}],"created":1743062099,"model":"haoranxu/ALMA-13B","object":"text_completion","system_fingerprint":"2.3.1-sha-a094729-rocm","usage":null}
 
-  - ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
-    - opea/llm-textgen:latest
-    - opea/nginx:latest
-    - opea/translation:latest
-    - opea/translation-ui:latest
+data: {"id":"","choices":[{"finish_reason":"","index":0,"logprobs":null,"text":" translation"}],"created":1743062099,"model":"haoranxu/ALMA-13B","object":"text_completion","system_fingerprint":"2.3.1-sha-a094729-rocm","usage":null}
 
----
+data: {"id":"","choices":[{"finish_reason":"","index":0,"logprobs":null,"text":"."}],"created":1743062099,"model":"haoranxu/ALMA-13B","object":"text_completion","system_fingerprint":"2.3.1-sha-a094729-rocm","usage":null}
 
-### Docker Compose Configuration for AMD GPUs
+data: {"id":"","choices":[{"finish_reason":"eos_token","index":0,"logprobs":null,"text":"</s>"}],"created":1743062099,"model":"haoranxu/ALMA-13B","object":"text_completion","system_fingerprint":"2.3.1-sha-a094729-rocm","usage":{"completion_tokens":6,"prompt_tokens":3071,"total_tokens":3077,"completion_tokens_details":null,"prompt_tokens_details":null}}
+
+data: [DONE]
+```
+
+**Note** The value of _host_ip_ was set using the _set_env.sh_ script and can be found in the _.env_ file.
+
+### Cleanup the Deployment
+
+To stop the containers associated with the deployment, execute the following command:
+
+```
+//with TGI:
+docker compose -f compose.yaml down
+```
+
+```bash
+//with VLLM:
+docker compose -f compose_vllm.yaml up -d
+```
+
+All the Translation containers will be stopped and then removed on completion of the "down" command.
+
+## Translation Docker Compose Files
+
+The compose.yaml is default compose file using tgi as serving framework
+
+| Service Name               | Image Name                                               |
+| -------------------------- | -------------------------------------------------------- |
+| translation-tgi-service    | ghcr.io/huggingface/text-generation-inference:2.4.1-rocm |
+| translation-llm            | opea/llm-textgen:latest                                  |
+| translation-backend-server | opea/translation:latest                                  |
+| translation-ui-server      | opea/translation-ui:latest                               |
+| translation-nginx-server   | opea/nginx:latest                                        |
+
+## Translation Service Configuration for AMD GPUs
 
 To enable GPU support for AMD GPUs, the following configuration is added to the Docker Compose file:
 
-- compose_vllm.yaml - for vLLM-based application
+- compose_vllm.yaml - for vLLM-based service
 - compose.yaml - for TGI-based
 
 ```yaml
@@ -142,305 +175,16 @@ security_opt:
   - seccomp:unconfined
 ```
 
+The table provides a comprehensive overview of the Translation service utilized across various deployments as illustrated in the example Docker Compose files. Each row in the table represents a distinct service, detailing its possible images used to enable it and a concise description of its function within the deployment architecture.
+
+| Service Name               | Possible Image Names                                     | Optional | Description                                                                                         |
+| -------------------------- | -------------------------------------------------------- | -------- | --------------------------------------------------------------------------------------------------- |
+| translation-tgi-service    | ghcr.io/huggingface/text-generation-inference:2.4.1-rocm | No       | Specific to the TGI deployment, focuses on text generation inference using AMD GPU (ROCm) hardware. |
+| translation-vllm-service   | opea/vllm-rocm:latest                                    | No       | Handles large language model (LLM) tasks, utilizing AMD GPU (ROCm) hardware.                        |
+| translation-llm            | opea/llm-textgen:latest                                  | No       | Handles large language model (LLM) tasks                                                            |
+| translation-backend-server | opea/translation:latest                                  | No       | Serves as the backend for the Translation service, with variations depending on the deployment.     |
+| translation-ui-server      | opea/translation-ui:latest                               | No       | Provides the user interface for the Translation service.                                            |
+| translation-nginx-server   | opea/nginx:latest                                        | No       | A cts as a reverse proxy, managing traffic between the UI and backend services.                     |
+
 **How to Identify GPU Device IDs:**
 Use AMD GPU driver utilities to determine the correct `cardN` and `renderN` IDs for your GPU.
-
-### Set deploy environment variables
-
-#### Setting variables in the operating system environment:
-
-##### Set variable HUGGINGFACEHUB_API_TOKEN:
-
-```bash
-### Replace the string 'your_huggingfacehub_token' with your HuggingFacehub repository access token.
-export HUGGINGFACEHUB_API_TOKEN='your_huggingfacehub_token'
-```
-
-#### Set variables value in set_env\*\*\*\*.sh file:
-
-Go to Docker Compose directory:
-
-```bash
-cd ~/translation-install/GenAIExamples/Translation/docker_compose/amd/gpu/rocm
-```
-
-The example uses the Nano text editor. You can use any convenient text editor:
-
-#### If you use vLLM
-
-```bash
-nano set_env_vllm.sh
-```
-
-#### If you use TGI
-
-```bash
-nano set_env.sh
-```
-
-If you are in a proxy environment, also set the proxy-related environment variables:
-
-```bash
-export http_proxy="Your_HTTP_Proxy"
-export https_proxy="Your_HTTPs_Proxy"
-```
-
-Set the values of the variables:
-
-- **HOST_IP, HOST_IP_EXTERNAL** - These variables are used to configure the name/address of the service in the operating system environment for the application services to interact with each other and with the outside world.
-
-  If your server uses only an internal address and is not accessible from the Internet, then the values for these two variables will be the same and the value will be equal to the server's internal name/address.
-
-  If your server uses only an external, Internet-accessible address, then the values for these two variables will be the same and the value will be equal to the server's external name/address.
-
-  If your server is located on an internal network, has an internal address, but is accessible from the Internet via a proxy/firewall/load balancer, then the HOST_IP variable will have a value equal to the internal name/address of the server, and the EXTERNAL_HOST_IP variable will have a value equal to the external name/address of the proxy/firewall/load balancer behind which the server is located.
-
-  We set these values in the file set_env\*\*\*\*.sh
-
-- **Variables with names like "**\*\*\*\*\*\*\_PORT"\*\* - These variables set the IP port numbers for establishing network connections to the application services.
-  The values shown in the file set_env.sh or set_env_vllm they are the values used for the development and testing of the application, as well as configured for the environment in which the development is performed. These values must be configured in accordance with the rules of network access to your environment's server, and must not overlap with the IP ports of other applications that are already in use.
-
-#### Set variables with script set_env\*\*\*\*.sh
-
-#### If you use vLLM
-
-```bash
-. set_env_vllm.sh
-```
-
-#### If you use TGI
-
-```bash
-. set_env.sh
-```
-
-### Start the services:
-
-#### If you use vLLM
-
-```bash
-docker compose -f compose_vllm.yaml up -d
-```
-
-#### If you use TGI
-
-```bash
-docker compose -f compose.yaml up -d
-```
-
-All containers should be running and should not restart:
-
-##### If you use vLLM:
-
-- translationn-vllm-service
-- translation-tgi-service
-- translation-llm
-- translation-backend-server
-- translation-ui-server
-- translation-nginx-server
-
-##### If you use TGI:
-
-- translation-tgi-service
-- translation-llm
-- translation-backend-server
-- translation-ui-server
-- translation-nginx-server
-
----
-
-## Validate the Services
-
-### 1. Validate the vLLM/TGI Service
-
-#### If you use vLLM:
-
-```bash
-DATA='{"model": "haoranxu/ALMA-13B", "prompt": "What is Deep Learning?", "max_tokens": 100, "temperature": 0}'
-
-curl http://${HOST_IP}:${TRANSLATION_VLLM_SERVICE_PORT}/v1/chat/completions \
-  -X POST \
-  -d "$DATA" \
-  -H 'Content-Type: application/json'
-```
-
-Checking the response from the service. The response should be similar to JSON:
-
-```json
-{
-  "id": "cmpl-059dd7fb311a46c2b807e0b3315e730c",
-  "object": "text_completion",
-  "created": 1743063706,
-  "model": "haoranxu/ALMA-13B",
-  "choices": [
-    {
-      "index": 0,
-      "text": " Deep Learning is a subset of machine learning. It attempts to mimic the way the human brain learns. Deep Learning is a subset of machine learning. It attempts to mimic the way the human brain learns. Deep Learning is a subset of machine learning. It attempts to mimic the way the human brain learns. Deep Learning is a subset of machine learning. It attempts to mimic the way the human brain learns. Deep Learning is a subset of machine learning",
-      "logprobs": null,
-      "finish_reason": "length",
-      "stop_reason": null,
-      "prompt_logprobs": null
-    }
-  ],
-
-  "usage": {
-    "prompt_tokens": 6,
-    "total_tokens": 106,
-    "completion_tokens": 100,
-    "prompt_tokens_details": null
-  }
-}
-```
-
-If the service response has a meaningful response in the value of the "choices.message.content" key,
-then we consider the vLLM service to be successfully launched
-
-#### If you use TGI:
-
-```bash
-DATA='{"inputs":"What is Deep Learning?",'\
-'"parameters":{"max_new_tokens":256,"do_sample": true}}'
-
-curl http://${HOST_IP}:${TRANSLATION_TGI_SERVICE_PORT}/generate \
-  -X POST \
-  -d "$DATA" \
-  -H 'Content-Type: application/json'
-```
-
-Checking the response from the service. The response should be similar to JSON:
-
-```json
-{
-  "generated_text": "\n\n What can it Do? What's the Hype? What Should You Do If"
-}
-```
-
-If the service response has a meaningful response in the value of the "generated_text" key,
-then we consider the TGI service to be successfully launched
-
-### 2. Validate the LLM Service
-
-```bash
-DATA='{"query":"What is Deep Learning?",'\
-'"max_tokens":32,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,'\
-'"repetition_penalty":1.03,"stream":false}'
-
-curl http://${HOST_IP}:${TRANSLATION_LLM_SERVICE_PORT}/v1/chat/completions \
-  -X POST \
-  -d "$DATA" \
-  -H 'Content-Type: application/json'
-```
-
-Checking the response from the service. The response should be similar to JSON:
-
-```json
-{
-  "id": "",
-  "choices": [
-    {
-      "finish_reason": "length",
-      "index": 0,
-      "logprobs": null,
-      "text": " Deep Learning is a subset of machine learning. It attempts to mimic the way the human brain learns. Deep Learning is a subset of machine learning."
-    }
-  ],
-  "created": 1742978568,
-  "model": "haoranxu/ALMA-13B",
-  "object": "text_completion",
-  "system_fingerprint": "2.3.1-sha-a094729-rocm",
-  "usage": {
-    "completion_tokens": 32,
-    "prompt_tokens": 6,
-    "total_tokens": 38,
-    "completion_tokens_details": null,
-    "prompt_tokens_details": null
-  }
-}
-```
-
-### 3. Validate Nginx Service
-
-```bash
-DATA='{"language_from": "Chinese","language_to": "English","source_language": "我爱机器翻译。"}'
-
-curl http://${HOST_IP}:${TRANSLATION_LLM_SERVICE_PORT}/v1/translation  \
-  -d "$DATA" \
-  -H 'Content-Type: application/json'
-```
-
-Checking the response from the service. The response should be similar to JSON:
-
-```textmate
-data: {"id":"","choices":[{"finish_reason":"","index":0,"logprobs":null,"text":" I"}],"created":1743062099,"model":"haoranxu/ALMA-13B","object":"text_completion","system_fingerprint":"2.3.1-sha-a094729-rocm","usage":null}
-
-data: {"id":"","choices":[{"finish_reason":"","index":0,"logprobs":null,"text":" love"}],"created":1743062099,"model":"haoranxu/ALMA-13B","object":"text_completion","system_fingerprint":"2.3.1-sha-a094729-rocm","usage":null}
-
-data: {"id":"","choices":[{"finish_reason":"","index":0,"logprobs":null,"text":" machine"}],"created":1743062099,"model":"haoranxu/ALMA-13B","object":"text_completion","system_fingerprint":"2.3.1-sha-a094729-rocm","usage":null}
-
-data: {"id":"","choices":[{"finish_reason":"","index":0,"logprobs":null,"text":" translation"}],"created":1743062099,"model":"haoranxu/ALMA-13B","object":"text_completion","system_fingerprint":"2.3.1-sha-a094729-rocm","usage":null}
-
-data: {"id":"","choices":[{"finish_reason":"","index":0,"logprobs":null,"text":"."}],"created":1743062099,"model":"haoranxu/ALMA-13B","object":"text_completion","system_fingerprint":"2.3.1-sha-a094729-rocm","usage":null}
-
-data: {"id":"","choices":[{"finish_reason":"eos_token","index":0,"logprobs":null,"text":"</s>"}],"created":1743062099,"model":"haoranxu/ALMA-13B","object":"text_completion","system_fingerprint":"2.3.1-sha-a094729-rocm","usage":{"completion_tokens":6,"prompt_tokens":3071,"total_tokens":3077,"completion_tokens_details":null,"prompt_tokens_details":null}}
-
-data: [DONE]
-```
-
-### 4. Validate MegaService
-
-```bash
-DATA='{"language_from": "Chinese","language_to": "English","source_language": "我爱机器翻译。"}'
-
-curl http://${HOST_IP}:${TRANSLATION_BACKEND_SERVICE_PORT}/v1/translation \
-  -H "Content-Type: application/json" \
-  -d "$DATA"
-```
-
-Checking the response from the service. The response should be similar to JSON:
-
-```textmate
-data: {"id":"","choices":[{"finish_reason":"","index":0,"logprobs":null,"text":" I"}],"created":1742978968,"model":"haoranxu/ALMA-13B","object":"text_completion","system_fingerprint":"2.3.1-sha-a094729-rocm","usage":null}
-
-data: {"id":"","choices":[{"finish_reason":"","index":0,"logprobs":null,"text":" love"}],"created":1742978968,"model":"haoranxu/ALMA-13B","object":"text_completion","system_fingerprint":"2.3.1-sha-a094729-rocm","usage":null}
-
-data: {"id":"","choices":[{"finish_reason":"","index":0,"logprobs":null,"text":" machine"}],"created":1742978968,"model":"haoranxu/ALMA-13B","object":"text_completion","system_fingerprint":"2.3.1-sha-a094729-rocm","usage":null}
-
-data: {"id":"","choices":[{"finish_reason":"","index":0,"logprobs":null,"text":" translation"}],"created":1742978968,"model":"haoranxu/ALMA-13B","object":"text_completion","system_fingerprint":"2.3.1-sha-a094729-rocm","usage":null}
-
-data: {"id":"","choices":[{"finish_reason":"","index":0,"logprobs":null,"text":"."}],"created":1742978968,"model":"haoranxu/ALMA-13B","object":"text_completion","system_fingerprint":"2.3.1-sha-a094729-rocm","usage":null}
-
-data: {"id":"","choices":[{"finish_reason":"eos_token","index":0,"logprobs":null,"text":"</s>"}],"created":1742978968,"model":"haoranxu/ALMA-13B","object":"text_completion","system_fingerprint":"2.3.1-sha-a094729-rocm","usage":{"completion_tokens":6,"prompt_tokens":3071,"total_tokens":3077,"completion_tokens_details":null,"prompt_tokens_details":null}}
-
-data: [DONE]
-
-```
-
-If the response text is similar to the one above, then we consider the service verification successful.
-
-### 5. Validate Frontend
-
-To access the UI, use the URL - http://${EXTERNAL_HOST_IP}:${TRANSLATION_FRONTEND_SERVICE_PORT} A page should open when you click through to this address:
-![UI start page](../../../../assets/img/translation-ui-starting-page.png)
-
-If a page of this type has opened, then we believe that the service is running and responding, and we can proceed to functional UI testing.
-
-Let's enter the task for the service in the "Input" field. For example, "我爱机器翻译" with selected "German" as language source and press Enter. After that, a page with the result of the task should open:
-
-![UI start page](../../../../assets/img/translation-ui-response-example.png)
-If the result shown on the page is correct, then we consider the verification of the UI service to be successful.
-
-### 6. Stop application
-
-#### If you use vLLM
-
-```bash
-cd ~/translation-install/GenAIExamples/Translation/docker_compose/amd/gpu/rocm
-docker compose -f compose_vllm.yaml down
-```
-
-#### If you use TGI
-
-```bash
-cd ~/translation-install/GenAIExamples/Translation/docker_compose/amd/gpu/rocm
-docker compose -f compose.yaml down
-```
