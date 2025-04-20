@@ -24,6 +24,9 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
+      llm_download: ${llm_download:-True}
+    # volumes:
+    #  - ./pretrained_models/:/home/user/GPT-SoVITS/GPT_SoVITS/pretrained_models/
     restart: unless-stopped
   vllm-service:
     image: ${REGISTRY:-opea}/vllm:${TAG:-latest}
