@@ -2,7 +2,17 @@
 
 Instruction tuning is the process of further training LLMs on a dataset consisting of (instruction, output) pairs in a supervised fashion, which bridges the gap between the next-word prediction objective of LLMs and the users' objective of having LLMs adhere to human instructions. This implementation deploys a Ray cluster for the task.
 
-## Deploy Instruction Tuning Service
+# Table of contents
+
+1. [Architecture](#Architecture)
+2. [Deployment Options](#Deployment-Options)
+3. [Instruction Tuning Service Usage](#Instruction-Tuning-Service-Usage)
+
+## Architecture
+
+The instruction tuning application is a customizable end-to-end workflow that takes user provided instruction dataset to finetune the user specified LLMs.
+
+## Deployment Options
 
 ### Deploy Instruction Tuning Service on Xeon
 
@@ -12,7 +22,7 @@ Refer to the [Xeon Guide](./docker_compose/intel/cpu/xeon/README.md) for detail.
 
 Refer to the [Gaudi Guide](./docker_compose/intel/hpu/gaudi/README.md) for detail.
 
-## Consume Instruction Tuning Service
+## Instruction Tuning Service Usage
 
 ### 1. Upload a training file
 
