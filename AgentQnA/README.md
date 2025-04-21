@@ -7,6 +7,7 @@
 3. [How to interact with the agent system with UI](#how-to-interact-with-the-agent-system-with-ui)
 4. [Validate Services](#validate-services)
 5. [Register Tools](#how-to-register-other-tools-with-the-ai-agent)
+6. [Monitoring and Tracing](#monitor-and-tracing)
 
 ## Overview
 
@@ -253,3 +254,8 @@ python $WORKDIR/GenAIExamples/AgentQnA/tests/test.py --agent_role "supervisor" -
 ## How to register other tools with the AI agent
 
 The [tools](./tools) folder contains YAML and Python files for additional tools for the supervisor and worker agents. Refer to the "Provide your own tools" section in the instructions [here](https://github.com/opea-project/GenAIComps/tree/main/comps/agent/src/README.md) to add tools and customize the AI agents.
+
+## Monitor and Tracing
+
+Follow [OpenTelemetry OPEA Guide](https://opea-project.github.io/latest/tutorial/OpenTelemetry/OpenTelemetry_OPEA_Guide.html) to understand how to use OpenTelemetry tracing and metrics in OPEA.  
+For AgentQnA specific tracing and metrics monitoring, follow [OpenTelemetry on AgentQnA](https://opea-project.github.io/latest/tutorial/OpenTelemetry/deploy/AgentQnA.html) section.
