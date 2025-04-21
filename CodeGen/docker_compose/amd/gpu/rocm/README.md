@@ -9,6 +9,7 @@ This example includes the following sections:
 - [CodeGen Service Configuration](#CodeGen-service-configuration): Describes the services and possible configuration changes.
 
 **Note** This example requires access to a properly installed AMD ROCm platform with a functional Docker service configured
+
 ## CodeGen Quick Start Deployment
 
 This section describes how to quickly deploy and test the CodeGen service manually on an AMD GPU (ROCm) platform. The basic steps are:
@@ -35,6 +36,7 @@ This section describes how to quickly deploy and test the CodeGen service manual
   git clone https://github.com/opea-project/GenAIExamples.git
   cd GenAIExamples/CodeGen/docker_compose/amd/gpu/rocm/
 ```
+
 Checkout a released version, such as v1.3:
 
 ```bash
@@ -67,6 +69,7 @@ Key parameters are configured via environment variables set before running `dock
 To set up environment variables for deploying CodeGen services, source the _setup_env.sh_ script in this directory:
 
 For TGI
+
 ```bash
 export host_ip="External_Public_IP"           #ip address of the node
 export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
@@ -74,10 +77,11 @@ export http_proxy="Your_HTTP_Proxy"           #http proxy if any
 export https_proxy="Your_HTTPs_Proxy"         #https proxy if any
 export no_proxy=localhost,127.0.0.1,$host_ip  #additional no proxies if needed
 export no_proxy=$no_proxy
-source ./set_env.sh  
+source ./set_env.sh
 ```
 
 For vLLM
+
 ```bash
 export host_ip="External_Public_IP"           #ip address of the node
 export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
@@ -85,12 +89,10 @@ export http_proxy="Your_HTTP_Proxy"           #http proxy if any
 export https_proxy="Your_HTTPs_Proxy"         #https proxy if any
 export no_proxy=localhost,127.0.0.1,$host_ip  #additional no proxies if needed
 export no_proxy=$no_proxy
-source ./set_env_vllm.sh  
+source ./set_env_vllm.sh
 ```
 
 ### Deploy the Services Using Docker Compose
-
-
 
 Please refer to the table below to build different microservices from source:
 
@@ -104,13 +106,11 @@ Please refer to the table below to build different microservices from source:
 | Megaservice  | [Megaservice build guide](../../../../README_miscellaneous.md#build-megaservice-docker-image) |
 | UI           | [Basic UI build guide](../../../../README_miscellaneous.md#build-ui-docker-image)             |
 
-
 To deploy the CodeGen services, execute the `docker compose up` command with the appropriate arguments. For a vLLM deployment, execute:
 
 ```bash
 docker compose -f compose_vllm.sh up -d
 ```
-
 
 The CodeGen docker images should automatically be downloaded from the `OPEA registry` and deployed on the AMD GPU (ROCM) Platform:
 
@@ -123,13 +123,11 @@ The CodeGen docker images should automatically be downloaded from the `OPEA regi
  ✔ Container codegen-ui-server       Started                                                              101.9s
 ```
 
-
 # To deploy the CodeGen services, execute the `docker compose up` command with the appropriate arguments. For a TGI deployment, execute:
 
 ```
 docker compose  up -d
 ```
-
 
 The CodeGen docker images should automatically be downloaded from the `OPEA registry` and deployed on the AMD GPU (ROCM) Platform:
 
@@ -152,7 +150,6 @@ If you need to modify the microservices:
 4.  Update the `image:` fields in the `compose.yaml` file to use your custom image tags.
 
 _Refer to the main [CodeGen README](../../../../README.md) for links to relevant GenAIComps components._
-
 
 ## Validate Services
 
@@ -210,7 +207,7 @@ curl http://${HOST_IP}:${CODEGEN_VLLM_SERVICE_PORT}/v1/chat/completions \
 
 Checking the response from the service. The response should be similar to JSON:
 
-```json
+````json
 {
   "id": "chatcmpl-142f34ef35b64a8db3deedd170fed951",
   "object": "chat.completion",
@@ -232,13 +229,10 @@ Checking the response from the service. The response should be similar to JSON:
   "usage": { "prompt_tokens": 66, "total_tokens": 322, "completion_tokens": 256, "prompt_tokens_details": null },
   "prompt_logprobs": null
 }
-```
+````
 
 If the service response has a meaningful response in the value of the "choices.message.content" key,
 then we consider the vLLM service to be successfully launched
-
-
-
 
 ### If you use TGI:
 
@@ -256,11 +250,12 @@ curl http://${HOST_IP}:${CODEGEN_TGI_SERVICE_PORT}/generate \
 
 Checking the response from the service. The response should be similar to JSON:
 
-```json
+````json
 {
   "generated_text": " The supported operations are \"add_task\", \"complete_task\", and \"remove_task\". Each operation can be defined with a corresponding function in the API.\n\nAdd your API in the following format:\n\n```\nTODO App API\n\nsupported operations:\n\noperation name           description\n-----------------------  ------------------------------------------------\n<operation_name>         <operation description>\n```\n\nUse type hints for function parameters and return values. Specify a text description of the API's supported operations.\n\nUse the following code snippet as a starting point for your high-level API function:\n\n```\nclass TodoAPI:\n    def __init__(self, tasks: List[str]):\n        self.tasks = tasks  # List of tasks to manage\n\n    def add_task(self, task: str) -> None:\n        self.tasks.append(task)\n\n    def complete_task(self, task: str) -> None:\n        self.tasks = [t for t in self.tasks if t != task]\n\n    def remove_task(self, task: str) -> None:\n        self.tasks = [t for t in self.tasks if t != task]\n\n    def handle_request(self, request: Dict[str, str]) -> None:\n        operation = request.get('operation')\n        if operation == 'add_task':\n            self.add_task(request.get('task'))\n        elif"
 }
-```
+````
+
 If the service response has a meaningful response in the value of the "generated_text" key,
 then we consider the TGI service to be successfully launched
 
@@ -281,7 +276,7 @@ curl http://${HOST_IP}:${CODEGEN_LLM_SERVICE_PORT}/v1/chat/completions \
 
 Checking the response from the service. The response should be similar to JSON:
 
-```json
+````json
 {
   "id": "cmpl-4e89a590b1af46bfb37ce8f12b2996f8",
   "choices": [
@@ -306,13 +301,12 @@ Checking the response from the service. The response should be similar to JSON:
     "prompt_tokens_details": null
   }
 }
-```
+````
 
 If the service response has a meaningful response in the value of the "choices.text" key,
 then we consider the vLLM service to be successfully launched
 
 **Note** The value of _host_ip_ was set using the _set_env.sh_ script and can be found in the _.env_ file.
-
 
 ## Accessing the User Interface (UI)
 
@@ -357,50 +351,47 @@ docker compose -f compose.yaml down
 
 ```bash
 [+] Running 0/1
-[+] Running 1/2degen-ui-server  Stopping                                                                                               0.4s 
-[+] Running 2/3degen-ui-server       Removed                                                                                          10.5s 
-[+] Running 2/3degen-ui-server       Removed                                                                                          10.5s 
-[+] Running 3/4degen-ui-server       Removed                                                                                          10.5s 
-[+] Running 5/5degen-ui-server       Removed                                                                                          10.5s 
- ✔ Container codegen-ui-server       Removed                                                                                         10.5s 
- ✔ Container codegen-backend-server  Removed                                                                                         10.4s 
- ✔ Container codegen-llm-server      Removed                                                                                         10.4s 
- ✔ Container codegen-tgi-service     Removed                                                                                          8.0s 
- ✔ Network rocm_default              Removed                                                                                          0.6s 
+[+] Running 1/2degen-ui-server  Stopping                                                                                               0.4s
+[+] Running 2/3degen-ui-server       Removed                                                                                          10.5s
+[+] Running 2/3degen-ui-server       Removed                                                                                          10.5s
+[+] Running 3/4degen-ui-server       Removed                                                                                          10.5s
+[+] Running 5/5degen-ui-server       Removed                                                                                          10.5s
+ ✔ Container codegen-ui-server       Removed                                                                                         10.5s
+ ✔ Container codegen-backend-server  Removed                                                                                         10.4s
+ ✔ Container codegen-llm-server      Removed                                                                                         10.4s
+ ✔ Container codegen-tgi-service     Removed                                                                                          8.0s
+ ✔ Network rocm_default              Removed                                                                                          0.6s
 ```
 
 ### compose.yaml - TGI Deployment
-The TGI (Text Generation Inference) deployment and the default deployment differ primarily in their service configurations and specific focus on handling large language models (LLMs). The TGI deployment includes a unique `codegen-tgi-service`, which utilizes the `ghcr.io/huggingface/text-generation-inference:2.4.1-rocm` image and is specifically configured to run on AMD  hardware. 
 
+The TGI (Text Generation Inference) deployment and the default deployment differ primarily in their service configurations and specific focus on handling large language models (LLMs). The TGI deployment includes a unique `codegen-tgi-service`, which utilizes the `ghcr.io/huggingface/text-generation-inference:2.4.1-rocm` image and is specifically configured to run on AMD hardware.
 
-| Service Name                 | Image Name                                              | AMD Use     |
-| ---------------------------- | -----------------------------------------------------   | ------------|
-| codegen-backend-server       | opea/codegen:latest                                     | no          |
-| codegen-llm-server           | opea/codegen:latest                                     | no          |
-| codegen-tgi-service          | ghcr.io/huggingface/text-generation-inference:2.4.1-rocm| yes         |                                       
-| codegen-ui-server            | opea/codegen-ui:latest                                  | no          |
-
+| Service Name           | Image Name                                               | AMD Use |
+| ---------------------- | -------------------------------------------------------- | ------- |
+| codegen-backend-server | opea/codegen:latest                                      | no      |
+| codegen-llm-server     | opea/codegen:latest                                      | no      |
+| codegen-tgi-service    | ghcr.io/huggingface/text-generation-inference:2.4.1-rocm | yes     |
+| codegen-ui-server      | opea/codegen-ui:latest                                   | no      |
 
 ### compose_vllm.yaml - vLLM Deployment
 
-The vLLM deployment utilizes AMD devices primarily for the `vllm-service`, which handles large language model (LLM) tasks. This service is configured to maximize the use of AMD's capabilities, potentially allocating multiple devices to enhance parallel processing and throughput. 
+The vLLM deployment utilizes AMD devices primarily for the `vllm-service`, which handles large language model (LLM) tasks. This service is configured to maximize the use of AMD's capabilities, potentially allocating multiple devices to enhance parallel processing and throughput.
 
-
-| Service Name                 | Image Name                                              | AMD Use     |
-| ---------------------------- | -----------------------------------------------------   | ------------|
-| codegen-backend-server       | opea/codegen:latest                                     | no          |
-| codegen-llm-server           | opea/codegen:latest                                     | no          |
-| codegen-vllm-service         | opea/vllm-rocm:latest                                   | yes         |                                       
-| codegen-ui-server            | opea/codegen-ui:latest                                  | no          |
-
+| Service Name           | Image Name             | AMD Use |
+| ---------------------- | ---------------------- | ------- |
+| codegen-backend-server | opea/codegen:latest    | no      |
+| codegen-llm-server     | opea/codegen:latest    | no      |
+| codegen-vllm-service   | opea/vllm-rocm:latest  | yes     |
+| codegen-ui-server      | opea/codegen-ui:latest | no      |
 
 ## CodeGen Service Configuration
-The table provides a comprehensive overview of the CodeGen services utilized across various deployments as illustrated in the example Docker Compose files. Each row in the table represents a distinct service, detailing its possible images used to enable it and a concise description of its function within the deployment architecture. These services collectively enable functionalities such as data storage and management, text embedding, retrieval, reranking, and large language model processing. 
 
-ex.:  (From ChatQna)
-| Service Name                 | Possible Image Names                                  | Optional | Description
-| redis-vector-db              | redis/redis-stack:7.2.0-v9                            | No       | Acts as a Redis database for storing and managing
+The table provides a comprehensive overview of the CodeGen services utilized across various deployments as illustrated in the example Docker Compose files. Each row in the table represents a distinct service, detailing its possible images used to enable it and a concise description of its function within the deployment architecture. These services collectively enable functionalities such as data storage and management, text embedding, retrieval, reranking, and large language model processing.
 
+ex.: (From ChatQna)
+| Service Name | Possible Image Names | Optional | Description
+| redis-vector-db | redis/redis-stack:7.2.0-v9 | No | Acts as a Redis database for storing and managing
 
 ## Conclusion
 
@@ -408,9 +399,7 @@ In the configuration of the `vllm-service` and the `tgi-service`, two variables 
 
 However, developers need to be aware of the models that have been tested with the respective service image supporting the `vllm-service` and `tgi-service`. For example, documentation for the OPEA GenAIComps v1.0 release specify the list of [validated LLM models](https://github.com/opea-project/GenAIComps/blob/v1.0/comps/llms/text-generation/README.md#validated-llm-models) for each AMD ROCm enabled service image. Specific models may have stringent requirements on the number of AMD ROCm devices required to support them.
 
-
 This guide should enable developer to deploy the default configuration or any of the other compose yaml files for different configurations. It also highlights the configurable parameters that can be set before deployment.
-
 
 ## Next Steps
 
