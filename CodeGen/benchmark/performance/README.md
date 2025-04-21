@@ -1,77 +1,73 @@
-# CodeGen Benchmarking
+# CodeGen Performance Benchmark
 
-This folder contains a collection of scripts to enable inference benchmarking by leveraging a comprehensive benchmarking tool, [GenAIEval](https://github.com/opea-project/GenAIEval/blob/main/evals/benchmark/README.md), that enables throughput analysis to assess inference performance.
+## Table of Contents
 
-By following this guide, you can run benchmarks on your deployment and share the results with the OPEA community.
+- [Purpose](#purpose)
+- [Benchmarking Tool](#benchmarking-tool)
+- [Metrics Measured](#metrics-measured)
+- [Prerequisites](#prerequisites)
+- [Running the Performance Benchmark](#running-the-performance-benchmark)
+- [Data Collection](#data-collection)
 
 ## Purpose
 
-We aim to run these benchmarks and share them with the OPEA community for three primary reasons:
+This guide describes how to benchmark the inference performance (throughput and latency) of a deployed CodeGen service. The results help understand the service's capacity under load and compare different deployment configurations or models. This benchmark primarily targets Kubernetes deployments but can be adapted for Docker.
 
-- To offer insights on inference throughput in real-world scenarios, helping you choose the best service or deployment for your needs.
-- To establish a baseline for validating optimization solutions across different implementations, providing clear guidance on which methods are most effective for your use case.
-- To inspire the community to build upon our benchmarks, allowing us to better quantify new solutions in conjunction with current leading llms, serving frameworks etc.
+## Benchmarking Tool
 
-## Metrics
+We use the [GenAIEval](https://github.com/opea-project/GenAIEval/blob/main/evals/benchmark/README.md) tool for performance benchmarking, which simulates concurrent users sending requests to the service endpoint.
 
-The benchmark will report the below metrics, including:
+## Metrics Measured
 
-- Number of Concurrent Requests
-- End-to-End Latency: P50, P90, P99 (in milliseconds)
-- End-to-End First Token Latency: P50, P90, P99 (in milliseconds)
-- Average Next Token Latency (in milliseconds)
-- Average Token Latency (in milliseconds)
-- Requests Per Second (RPS)
-- Output Tokens Per Second
-- Input Tokens Per Second
+The benchmark reports several key performance indicators:
 
-Results will be displayed in the terminal and saved as CSV file named `1_testspec.yaml`.
+- **Concurrency:** Number of concurrent requests simulated.
+- **End-to-End Latency:** Time from request submission to final response received (P50, P90, P99 in ms).
+- **End-to-End First Token Latency:** Time from request submission to first token received (P50, P90, P99 in ms).
+- **Average Next Token Latency:** Average time between subsequent generated tokens (in ms).
+- **Average Token Latency:** Average time per generated token (in ms).
+- **Requests Per Second (RPS):** Throughput of the service.
+- **Output Tokens Per Second:** Rate of token generation.
+- **Input Tokens Per Second:** Rate of token consumption.
 
-## Getting Started
+## Prerequisites
 
-We recommend using Kubernetes to deploy the CodeGen service, as it offers benefits such as load balancing and improved scalability. However, you can also deploy the service using Docker if that better suits your needs.
+- A running CodeGen service accessible via an HTTP endpoint. Refer to the main [CodeGen README](../../README.md) for deployment options (Kubernetes recommended for load balancing/scalability).
+- **If using Kubernetes:**
+  - A working Kubernetes cluster (refer to OPEA K8s setup guides if needed).
+  - `kubectl` configured to access the cluster from the node where the benchmark will run (typically the master node).
+  - Ensure sufficient `ulimit` for network connections on worker nodes hosting the service pods (e.g., `LimitNOFILE=65536` or higher in containerd/docker config).
+- **General:**
+  - Python 3.8+ on the node running the benchmark script.
+  - Network access from the benchmark node to the CodeGen service endpoint.
 
-### Prerequisites
+## Running the Performance Benchmark
 
-- Install Kubernetes by following [this guide](https://github.com/opea-project/docs/blob/main/guide/installation/k8s_install/k8s_install_kubespray.md).
+1.  **Deploy CodeGen Service:** Ensure your CodeGen service is deployed and accessible. Note the service endpoint URL (e.g., obtained via `kubectl get svc` or your ingress configuration if using Kubernetes, or `http://{host_ip}:{port}` for Docker).
 
-- Every node has direct internet access
-- Set up kubectl on the master node with access to the Kubernetes cluster.
-- Install Python 3.8+ on the master node for running GenAIEval.
-- Ensure all nodes have a local /mnt/models folder, which will be mounted by the pods.
-- Ensure that the container's ulimit can meet the the number of requests.
+2.  **Configure Benchmark Parameters (Optional):**
+    Set environment variables to customize the test queries and output directory. The `USER_QUERIES` variable defines the number of concurrent requests for each test run.
 
-```bash
-# The way to modify the containered ulimit:
-sudo systemctl edit containerd
-# Add two lines:
-[Service]
-LimitNOFILE=65536:1048576
+    ```bash
+    # Example: Four runs with 128 concurrent requests each
+    export USER_QUERIES="[128, 128, 128, 128]"
+    # Example: Output directory
+    export TEST_OUTPUT_DIR="/tmp/benchmark_output"
+    # Set the target endpoint URL
+    export CODEGEN_ENDPOINT_URL="http://{your_service_ip_or_hostname}:{port}/v1/codegen"
+    ```
 
-sudo systemctl daemon-reload; sudo systemctl restart containerd
-```
+    _Replace `{your_service_ip_or_hostname}:{port}` with the actual accessible URL of your CodeGen gateway service._
 
-### Test Steps
+3.  **Execute the Benchmark Script:**
+    Run the script, optionally specifying the number of Kubernetes nodes involved if relevant for reporting context (the script itself runs from one node).
+    ```bash
+    # Clone GenAIExamples if you haven't already
+    # cd GenAIExamples/CodeGen/benchmark/performance
+    bash benchmark.sh # Add '-n <node_count>' if desired for logging purposes
+    ```
+    _Ensure the `benchmark.sh` script is adapted to use `CODEGEN_ENDPOINT_URL` and potentially `USER_QUERIES`, `TEST_OUTPUT_DIR`._
 
-Please deploy CodeGen service before benchmarking.
+## Data Collection
 
-#### Run Benchmark Test
-
-Before the benchmark, we can configure the number of test queries and test output directory by:
-
-```bash
-export USER_QUERIES="[128, 128, 128, 128]"
-export TEST_OUTPUT_DIR="/tmp/benchmark_output"
-```
-
-And then run the benchmark by:
-
-```bash
-bash benchmark.sh -n <node_count>
-```
-
-The argument `-n` refers to the number of test nodes.
-
-#### Data collection
-
-All the test results will come to this folder `/tmp/benchmark_output` configured by the environment variable `TEST_OUTPUT_DIR` in previous steps.
+Benchmark results will be displayed in the terminal upon completion. Detailed results, typically including raw data and summary statistics, will be saved in the directory specified by `TEST_OUTPUT_DIR` (defaulting to `/tmp/benchmark_output`). CSV files (e.g., `1_testspec.yaml.csv`) containing metrics for each run are usually generated here.
