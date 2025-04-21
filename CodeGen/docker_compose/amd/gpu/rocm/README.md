@@ -13,7 +13,7 @@ This example includes the following sections:
 
 This section describes how to quickly deploy and test the CodeGen service manually on an AMD GPU (ROCm) platform. The basic steps are:
 
-1. [Access the Code](#access-the-code)
+1. [Prerequisites](#зrerequisites)
 2. [Generate a HuggingFace Access Token](#generate-a-huggingface-access-token)
 3. [Configure the Deployment Environment](#configure-the-deployment-environment)
 4. [Deploy the Services Using Docker Compose](#deploy-the-services-using-docker-compose)
@@ -21,7 +21,16 @@ This section describes how to quickly deploy and test the CodeGen service manual
 6. [Test the Pipeline](#test-the-pipeline)
 7. [Cleanup the Deployment](#cleanup-the-deployment)
 
-## Access the Code
+## Prerequisites
+
+- Docker and Docker Compose installed.
+- x86 Intel or AMD CPU.
+- 4x AMD Instinct MI300X Accelerators.
+- Git installed (for cloning repository).
+- Hugging Face Hub API Token (for downloading models).
+- Access to the internet (or a private model cache).
+- Clone the `GenAIExamples` repository:
+
 ```bash
   git clone https://github.com/opea-project/GenAIExamples.git
   cd GenAIExamples/CodeGen/docker_compose/amd/gpu/rocm/
