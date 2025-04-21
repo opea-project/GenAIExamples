@@ -1,376 +1,292 @@
-# Build and Deploy DocSum Application on AMD GPU (ROCm)
+# Example DocSum deployments on AMD GPU (ROCm)
 
-## Build Docker Images
+This document outlines the deployment process for a Document Summarization application utilizing OPEA components on an AMD GPU server.
 
-### 1. Build Docker Image
+This example includes the following sections:
 
-- #### Create application install directory and go to it:
+- [DocSum Quick Start Deployment](#docsum-quick-start-deployment): Demonstrates how to quickly deploy a DocSum application/pipeline on AMD GPU platform.
+- [DocSum Docker Compose Files](#docsum-docker-compose-files): Describes some example deployments and their docker compose files.
+- [DocSum Detailed Usage](#docsum-detailed-usage): Provide more detailed usage.
+- [Launch the UI](#launch-the-ui): Guideline for UI usage
 
-  ```bash
-  mkdir ~/docsum-install && cd docsum-install
-  ```
+## DocSum Quick Start Deployment
 
-- #### Clone the repository GenAIExamples (the default repository branch "main" is used here):
+This section describes how to quickly deploy and test the DocSum service manually on an AMD GPU platform. The basic steps are:
 
-  ```bash
-  git clone https://github.com/opea-project/GenAIExamples.git
-  ```
+1. [Access the Code](#access-the-code)
+2. [Generate a HuggingFace Access Token](#generate-a-huggingface-access-token)
+3. [Configure the Deployment Environment](#configure-the-deployment-environment)
+4. [Deploy the Services Using Docker Compose](#deploy-the-services-using-docker-compose)
+5. [Check the Deployment Status](#check-the-deployment-status)
+6. [Test the Pipeline](#test-the-pipeline)
+7. [Cleanup the Deployment](#cleanup-the-deployment)
 
-  If you need to use a specific branch/tag of the GenAIExamples repository, then (v1.3 replace with its own value):
+### Access the Code
 
-  ```bash
-  git clone https://github.com/opea-project/GenAIExamples.git && cd GenAIExamples && git checkout v1.3
-  ```
+Clone the GenAIExample repository and access the ChatQnA AMD GPU platform Docker Compose files and supporting scripts:
 
-  We remind you that when using a specific version of the code, you need to use the README from this version:
-
-- #### Go to build directory:
-
-  ```bash
-  cd ~/docsum-install/GenAIExamples/DocSum/docker_image_build
-  ```
-
-- Cleaning up the GenAIComps repository if it was previously cloned in this directory.
-  This is necessary if the build was performed earlier and the GenAIComps folder exists and is not empty:
-
-  ```bash
-  echo Y | rm -R GenAIComps
-  ```
-
-- #### Clone the repository GenAIComps (the default repository branch "main" is used here):
-
-  ```bash
-  git clone https://github.com/opea-project/GenAIComps.git
-  ```
-
-  If you use a specific tag of the GenAIExamples repository,
-  then you should also use the corresponding tag for GenAIComps. (v1.3 replace with its own value):
-
-  ```bash
-  git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout v1.3
-  ```
-
-  We remind you that when using a specific version of the code, you need to use the README from this version.
-
-- #### Setting the list of images for the build (from the build file.yaml)
-
-  If you want to deploy a vLLM-based or TGI-based application, then the set of services is installed as follows:
-
-  #### vLLM-based application
-
-  ```bash
-  service_list="docsum docsum-gradio-ui whisper llm-docsum vllm-rocm"
-  ```
-
-  #### TGI-based application
-
-  ```bash
-  service_list="docsum docsum-gradio-ui whisper llm-docsum"
-  ```
-
-- #### Optional. Pull TGI Docker Image (Do this if you want to use TGI)
-
-  ```bash
-  docker pull ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
-  ```
-
-- #### Build Docker Images
-
-  ```bash
-  docker compose -f build.yaml build ${service_list} --no-cache
-  ```
-
-  After the build, we check the list of images with the command:
-
-  ```bash
-  docker image ls
-  ```
-
-  The list of images should include:
-
-  ##### vLLM-based application:
-
-  - opea/vllm-rocm:latest
-  - opea/llm-docsum:latest
-  - opea/whisper:latest
-  - opea/docsum:latest
-  - opea/docsum-gradio-ui:latest
-
-  ##### TGI-based application:
-
-  - ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
-  - opea/llm-docsum:latest
-  - opea/whisper:latest
-  - opea/docsum:latest
-  - opea/docsum-gradio-ui:latest
-
----
-
-## Deploy the DocSum Application
-
-### Docker Compose Configuration for AMD GPUs
-
-To enable GPU support for AMD GPUs, the following configuration is added to the Docker Compose file:
-
-- compose_vllm.yaml - for vLLM-based application
-- compose.yaml - for TGI-based
-
-```yaml
-shm_size: 1g
-devices:
-  - /dev/kfd:/dev/kfd
-  - /dev/dri/:/dev/dri/
-cap_add:
-  - SYS_PTRACE
-group_add:
-  - video
-security_opt:
-  - seccomp:unconfined
+```
+git clone https://github.com/opea-project/GenAIExamples.git
+cd GenAIExamples/DocSum/docker_compose/amd/gpu/rocm
 ```
 
-This configuration forwards all available GPUs to the container. To use a specific GPU, specify its `cardN` and `renderN` device IDs. For example:
+Checkout a released version, such as v1.2:
 
-```yaml
-shm_size: 1g
-devices:
-  - /dev/kfd:/dev/kfd
-  - /dev/dri/card0:/dev/dri/card0
-  - /dev/dri/render128:/dev/dri/render128
-cap_add:
-  - SYS_PTRACE
-group_add:
-  - video
-security_opt:
-  - seccomp:unconfined
+```
+git checkout v1.2
 ```
 
-**How to Identify GPU Device IDs:**
-Use AMD GPU driver utilities to determine the correct `cardN` and `renderN` IDs for your GPU.
+### Generate a HuggingFace Access Token
 
-### Set deploy environment variables
+Some HuggingFace resources, such as some models, are only accessible if you have an access token. If you do not already have a HuggingFace access token, you can create one by first creating an account by following the steps provided at [HuggingFace](https://huggingface.co/) and then generating a [user access token](https://huggingface.co/docs/transformers.js/en/guides/private#step-1-generating-a-user-access-token).
 
-#### Setting variables in the operating system environment:
+### Configure the Deployment Environment
 
-##### Set variable HUGGINGFACEHUB_API_TOKEN:
+To set up environment variables for deploying DocSum services, source the _set_env.sh_ script in this directory:
+
+```
+source ./set_env.sh
+```
+
+The _set_env.sh_ script will prompt for required and optional environment variables used to configure the DocSum services. If a value is not entered, the script will use a default value for the same. It will also generate a _.env_ file defining the desired configuration. Consult the section on [DocSum Service configuration](#docsum-service-configuration) for information on how service specific configuration parameters affect deployments.
+
+### Deploy the Services Using Docker Compose
+
+To deploy the DocSum services, execute the `docker compose up` command with the appropriate arguments. For a default deployment, execute:
 
 ```bash
-### Replace the string 'your_huggingfacehub_token' with your HuggingFacehub repository access token.
-export HUGGINGFACEHUB_API_TOKEN='your_huggingfacehub_token'
+docker compose up -d
 ```
 
-#### Set variables value in set_env\*\*\*\*.sh file:
+**Note**: developers should build docker image from source when:
 
-Go to Docker Compose directory:
+- Developing off the git main branch (as the container's ports in the repo may be different from the published docker image).
+- Unable to download the docker image.
+- Use a specific version of Docker image.
+
+Please refer to the table below to build different microservices from source:
+
+| Microservice | Deployment Guide                                                                                                                      |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------- |
+| whisper      | [whisper build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/third_parties/whisper/src)                           |
+| vLLM         | [vLLM build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/third_parties/vllm#build-docker)                        |
+| llm-docsum   | [LLM-DocSum build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/llms/src/doc-summarization#12-build-docker-image) |
+| MegaService  | [MegaService build guide](../../../../README_miscellaneous.md#build-megaservice-docker-image)                                         |
+| UI           | [Basic UI build guide](../../../../README_miscellaneous.md#build-ui-docker-image)                                                     |
+
+### Check the Deployment Status
+
+After running docker compose, check if all the containers launched via docker compose have started:
+
+```
+docker ps -a
+```
+
+For the default deployment, the following 5 containers should have started:
+
+```
+CONTAINER ID   IMAGE                                                         COMMAND                  CREATED         STATUS                   PORTS                                       NAMES
+748f577b3c78   opea/whisper:latest                                           "python whisper_s…"      5 minutes ago   Up About a minute        0.0.0.0:7066->7066/tcp, :::7066->7066/tcp   whisper-service
+4eq8b7034fd9   opea/docsum-gradio-ui:latest                                  "docker-entrypoint.s…"   5 minutes ago   Up About a minute        0.0.0.0:5173->5173/tcp, :::5173->5173/tcp   docsum-ui-server
+fds3dd5b9fd8   opea/docsum:latest                                            "python docsum.py"       5 minutes ago   Up About a minute        0.0.0.0:8888->8888/tcp, :::8888->8888/tcp   docsum-backend-server
+78fsd6fabfs7   opea/llm-docsum:latest                                        "bash entrypoint.sh"     5 minutes ago   Up About a minute        0.0.0.0:9000->9000/tcp, :::9000->9000/tcp   docsum-llm-server
+78964d0c1hg5   ghcr.io/huggingface/text-generation-inference:2.4.1-rocm      "/tgi-entrypoint.sh"     5 minutes ago   Up 5 minutes (healthy)   0.0.0.0:8008->80/tcp, [::]:8008->80/tcp     docsum-tgi-service
+```
+
+### Test the Pipeline
+
+Once the DocSum services are running, test the pipeline using the following command:
 
 ```bash
-cd ~/docsum-install/GenAIExamples/DocSum/docker_compose/amd/gpu/rocm
+curl -X POST http://${host_ip}:8888/v1/docsum \
+        -H "Content-Type: application/json" \
+        -d '{"type": "text", "messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
 ```
 
-The example uses the Nano text editor. You can use any convenient text editor:
+**Note** The value of _host_ip_ was set using the _set_env.sh_ script and can be found in the _.env_ file.
 
-#### If you use vLLM
+### Cleanup the Deployment
+
+To stop the containers associated with the deployment, execute the following command:
+
+```
+docker compose -f compose.yaml down
+```
+
+All the DocSum containers will be stopped and then removed on completion of the "down" command.
+
+## DocSum Docker Compose Files
+
+In the context of deploying a DocSum pipeline on an AMD GPU platform, we can pick and choose different large language model serving frameworks. The table below outlines the various configurations that are available as part of the application.
+
+| File                                     | Description                                                                                |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------ |
+| [compose.yaml](./compose.yaml)           | Default compose file using tgi as serving framework                                        |
+| [compose_vllm.yaml](./compose_vllm.yaml) | The LLM serving framework is vLLM. All other configurations remain the same as the default |
+
+## DocSum Detailed Usage
+
+There are also some customized usage.
+
+### Query with text
 
 ```bash
-nano set_env_vllm.sh
+# form input. Use English mode (default).
+curl http://${host_ip}:8888/v1/docsum \
+      -H "Content-Type: multipart/form-data" \
+      -F "type=text" \
+      -F "messages=Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5." \
+      -F "max_tokens=32" \
+      -F "language=en" \
+      -F "stream=True"
+
+# Use Chinese mode.
+curl http://${host_ip}:8888/v1/docsum \
+      -H "Content-Type: multipart/form-data" \
+      -F "type=text" \
+      -F "messages=2024年9月26日，北京——今日，英特尔正式发布英特尔® 至强® 6性能核处理器（代号Granite Rapids），为AI、数据分析、科学计算等计算密集型业务提供卓越性能。" \
+      -F "max_tokens=32" \
+      -F "language=zh" \
+      -F "stream=True"
+
+# Upload file
+curl http://${host_ip}:8888/v1/docsum \
+   -H "Content-Type: multipart/form-data" \
+   -F "type=text" \
+   -F "messages=" \
+   -F "files=@/path to your file (.txt, .docx, .pdf)" \
+   -F "max_tokens=32" \
+   -F "language=en" \
 ```
 
-#### If you use TGI
+### Query with audio and video
+
+> Audio and Video file uploads are not supported in docsum with curl request, please use the Gradio-UI.
+
+Audio:
 
 ```bash
-nano set_env.sh
+curl -X POST http://${host_ip}:8888/v1/docsum \
+   -H "Content-Type: application/json" \
+   -d '{"type": "audio", "messages": "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA"}'
+
+curl http://${host_ip}:8888/v1/docsum \
+   -H "Content-Type: multipart/form-data" \
+   -F "type=audio" \
+   -F "messages=UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA" \
+   -F "max_tokens=32" \
+   -F "language=en" \
+   -F "stream=True"
 ```
 
-If you are in a proxy environment, also set the proxy-related environment variables:
+Video:
 
 ```bash
-export http_proxy="Your_HTTP_Proxy"
-export https_proxy="Your_HTTPs_Proxy"
+curl -X POST http://${host_ip}:8888/v1/docsum \
+   -H "Content-Type: application/json" \
+   -d '{"type": "video", "messages": "convert your video to base64 data type"}'
+
+curl http://${host_ip}:8888/v1/docsum \
+   -H "Content-Type: multipart/form-data" \
+   -F "type=video" \
+   -F "messages=convert your video to base64 data type" \
+   -F "max_tokens=32" \
+   -F "language=en" \
+   -F "stream=True"
 ```
 
-Set the values of the variables:
+### Query with long context
 
-- **HOST_IP, HOST_IP_EXTERNAL** - These variables are used to configure the name/address of the service in the operating system environment for the application services to interact with each other and with the outside world.
+If you want to deal with long context, can set following parameters and select suitable summary type.
 
-  If your server uses only an internal address and is not accessible from the Internet, then the values for these two variables will be the same and the value will be equal to the server's internal name/address.
+- "summary_type": can be "auto", "stuff", "truncate", "map_reduce", "refine", default is "auto"
+- "chunk_size": max token length for each chunk. Set to be different default value according to "summary_type".
+- "chunk_overlap": overlap token length between each chunk, default is 0.1\*chunk_size
 
-  If your server uses only an external, Internet-accessible address, then the values for these two variables will be the same and the value will be equal to the server's external name/address.
+**summary_type=auto**
 
-  If your server is located on an internal network, has an internal address, but is accessible from the Internet via a proxy/firewall/load balancer, then the HOST_IP variable will have a value equal to the internal name/address of the server, and the EXTERNAL_HOST_IP variable will have a value equal to the external name/address of the proxy/firewall/load balancer behind which the server is located.
-
-  We set these values in the file set_env\*\*\*\*.sh
-
-- **Variables with names like "**\*\*\*\*\*\*\_PORT"\*\* - These variables set the IP port numbers for establishing network connections to the application services.
-  The values shown in the file set_env.sh or set_env_vllm they are the values used for the development and testing of the application, as well as configured for the environment in which the development is performed. These values must be configured in accordance with the rules of network access to your environment's server, and must not overlap with the IP ports of other applications that are already in use.
-
-#### Set variables with script set_env\*\*\*\*.sh
-
-#### If you use vLLM
+"summary_type" is set to be "auto" by default, in this mode we will check input token length, if it exceed `MAX_INPUT_TOKENS`, `summary_type` will automatically be set to `refine` mode, otherwise will be set to `stuff` mode.
 
 ```bash
-. set_env_vllm.sh
+curl http://${host_ip}:8888/v1/docsum \
+   -H "Content-Type: multipart/form-data" \
+   -F "type=text" \
+   -F "messages=" \
+   -F "max_tokens=32" \
+   -F "files=@/path to your file (.txt, .docx, .pdf)" \
+   -F "language=en" \
+   -F "summary_type=auto"
 ```
 
-#### If you use TGI
+**summary_type=stuff**
+
+In this mode LLM generate summary based on complete input text. In this case please carefully set `MAX_INPUT_TOKENS` and `MAX_TOTAL_TOKENS` according to your model and device memory, otherwise it may exceed LLM context limit and raise error when meet long context.
 
 ```bash
-. set_env.sh
+curl http://${host_ip}:8888/v1/docsum \
+   -H "Content-Type: multipart/form-data" \
+   -F "type=text" \
+   -F "messages=" \
+   -F "max_tokens=32" \
+   -F "files=@/path to your file (.txt, .docx, .pdf)" \
+   -F "language=en" \
+   -F "summary_type=stuff"
 ```
 
-### Start the services:
+**summary_type=truncate**
 
-#### If you use vLLM
+Truncate mode will truncate the input text and keep only the first chunk, whose length is equal to `min(MAX_TOTAL_TOKENS - input.max_tokens - 50, MAX_INPUT_TOKENS)`
 
 ```bash
-docker compose -f compose_vllm.yaml up -d
+curl http://${host_ip}:8888/v1/docsum \
+   -H "Content-Type: multipart/form-data" \
+   -F "type=text" \
+   -F "messages=" \
+   -F "max_tokens=32" \
+   -F "files=@/path to your file (.txt, .docx, .pdf)" \
+   -F "language=en" \
+   -F "summary_type=truncate"
 ```
 
-#### If you use TGI
+**summary_type=map_reduce**
+
+Map_reduce mode will split the inputs into multiple chunks, map each document to an individual summary, then consolidate those summaries into a single global summary. `stream=True` is not allowed here.
+
+In this mode, default `chunk_size` is set to be `min(MAX_TOTAL_TOKENS - input.max_tokens - 50, MAX_INPUT_TOKENS)`
 
 ```bash
-docker compose -f compose.yaml up -d
+curl http://${host_ip}:8888/v1/docsum \
+   -H "Content-Type: multipart/form-data" \
+   -F "type=text" \
+   -F "messages=" \
+   -F "max_tokens=32" \
+   -F "files=@/path to your file (.txt, .docx, .pdf)" \
+   -F "language=en" \
+   -F "summary_type=map_reduce"
 ```
 
-All containers should be running and should not restart:
+**summary_type=refine**
 
-##### If you use vLLM:
+Refin mode will split the inputs into multiple chunks, generate summary for the first one, then combine with the second, loops over every remaining chunks to get the final summary.
 
-- docsum-vllm-service
-- docsum-llm-server
-- whisper-service
-- docsum-backend-server
-- docsum-ui-server
-
-##### If you use TGI:
-
-- docsum-tgi-service
-- docsum-llm-server
-- whisper-service
-- docsum-backend-server
-- docsum-ui-server
-
----
-
-## Validate the Services
-
-### 1. Validate the vLLM/TGI Service
-
-#### If you use vLLM:
+In this mode, default `chunk_size` is set to be `min(MAX_TOTAL_TOKENS - 2 * input.max_tokens - 128, MAX_INPUT_TOKENS)`.
 
 ```bash
-curl http://${HOST_IP}:${FAQGEN_VLLM_SERVICE_PORT}/v1/completions \
--H "Content-Type: application/json" \
--d '{
-    "model": "meta-llama/Meta-Llama-3-8B-Instruct",
-    "prompt": "What is a Deep Learning?",
-    "max_tokens": 30,
-    "temperature": 0
-}'
+curl http://${host_ip}:8888/v1/docsum \
+   -H "Content-Type: multipart/form-data" \
+   -F "type=text" \
+   -F "messages=" \
+   -F "max_tokens=32" \
+   -F "files=@/path to your file (.txt, .docx, .pdf)" \
+   -F "language=en" \
+   -F "summary_type=refine"
 ```
 
-Checking the response from the service. The response should be similar to JSON:
+## Launch the UI
 
-```json
-{
-  "id": "cmpl-0844e21b824c4472b77f2851a177eca2",
-  "object": "text_completion",
-  "created": 1742385979,
-  "model": "meta-llama/Meta-Llama-3-8B-Instruct",
-  "choices": [
-    {
-      "index": 0,
-      "text": " Deep learning is a subset of machine learning that involves the use of artificial neural networks to analyze and interpret data. It is called \"deep\" because it",
-      "logprobs": null,
-      "finish_reason": "length",
-      "stop_reason": null,
-      "prompt_logprobs": null
-    }
-  ],
-  "usage": { "prompt_tokens": 7, "total_tokens": 37, "completion_tokens": 30, "prompt_tokens_details": null }
-}
-```
+Several UI options are provided. If you need to work with multimedia documents, .doc, or .pdf files, suggested to use Gradio UI.
 
-If the service response has a meaningful response in the value of the "choices.text" key,
-then we consider the vLLM service to be successfully launched
-
-#### If you use TGI:
-
-```bash
-curl http://${HOST_IP}:${FAQGEN_TGI_SERVICE_PORT}/generate \
-  -X POST \
-  -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":64, "do_sample": true}}' \
-  -H 'Content-Type: application/json'
-```
-
-Checking the response from the service. The response should be similar to JSON:
-
-```json
-{
-  "generated_text": " In-Depth Explanation\nDeep Learning involves the use of artificial neural networks (ANNs) with multiple layers to analyze and interpret complex data. In this article, we will explore what is deep learning, its types, and how it works.\n\n### What is Deep Learning?\n\nDeep Learning is a subset of Machine Learning that involves"
-}
-```
-
-If the service response has a meaningful response in the value of the "generated_text" key,
-then we consider the TGI service to be successfully launched
-
-### 2. Validate the LLM Service
-
-```bash
-curl http://${HOST_IP}:${FAQGEN_LLM_SERVER_PORT}/v1/docsum \
-     -X POST \
-     -d '{"messages":"What is Deep Learning?"}' \
-     -H 'Content-Type: application/json'
-```
-
-Checking the response from the service. The response should be similar to JSON:
-
-```json
-{
-  "id": "1e47daf13a8bc73495dbfd9836eaa7e4",
-  "text": " Q: What is Deep Learning?\n         A: Deep Learning is a subset of Machine Learning that involves the use of artificial neural networks to analyze and interpret data. It is called \"deep\" because it involves multiple layers of interconnected nodes or \"neurons\" that process and transform the data.\n\n         Q: What is the main difference between Deep Learning and Machine Learning?\n         A: The main difference between Deep Learning and Machine Learning is the complexity of the models used. Machine Learning models are typically simpler and more linear, while Deep Learning models are more complex and non-linear, allowing them to learn and represent more abstract and nuanced patterns in data.\n\n         Q: What are some common applications of Deep Learning?\n         A: Some common applications of Deep Learning include image and speech recognition, natural language processing, recommender systems, and autonomous vehicles.\n\n         Q: Is Deep Learning a new field?\n         A: Deep Learning is not a new field, but it has gained significant attention and popularity in recent years due to advances in computing power, data storage, and algorithms.\n\n         Q: Can Deep Learning be used for any type of data?\n         A: Deep Learning can be used for any type of data that can be represented as a numerical array, such as images, audio, text, and time series data.\n\n         Q: Is Deep Learning a replacement for traditional Machine Learning?\n         A: No, Deep Learning is not a replacement for traditional Machine Learning. Instead, it is a complementary technology that can be used in conjunction with traditional Machine Learning techniques to solve complex problems.\n\n         Q: What are some of the challenges associated with Deep Learning?\n         A: Some of the challenges associated with Deep Learning include the need for large amounts of data, the risk of overfitting, and the difficulty of interpreting the results of the models.\n\n         Q: Can Deep Learning be used for real-time applications?\n         A: Yes, Deep Learning can be used for real-time applications, such as image and speech recognition, and autonomous vehicles.\n\n         Q: Is Deep Learning a field that requires a lot of mathematical knowledge?\n         A: While some mathematical knowledge is helpful, it is not necessary to have a deep understanding of mathematics to work with Deep Learning. Many Deep Learning libraries and frameworks provide pre-built functions and tools that can be used to implement Deep Learning models.",
-  "prompt": "What is Deep Learning?"
-}
-```
-
-If the service response has a meaningful response in the value of the "text" key,
-then we consider the vLLM service to be successfully launched
-
-### 3. Validate the MegaService
-
-```bash
-curl http://${HOST_IP}:${FAQGEN_BACKEND_SERVER_PORT}/v1/docsum \
-  -H "Content-Type: multipart/form-data" \
-  -F "messages=What is Deep Learning?" \
-  -F "max_tokens=100" \
-  -F "stream=False"
-```
-
-Checking the response from the service. The response should be similar to text:
-
-```json
-{
-  "id": "chatcmpl-tjwp8giP2vyvRRxnqzc3FU",
-  "object": "chat.completion",
-  "created": 1742386156,
-  "model": "docsum",
-  "choices": [
-    {
-      "index": 0,
-      "message": {
-        "role": "assistant",
-        "content": " Q: What is Deep Learning?\n         A: Deep Learning is a subset of Machine Learning that involves the use of artificial neural networks to analyze and interpret data. It is called \"deep\" because it involves multiple layers of interconnected nodes or \"neurons\" that process and transform the data.\n\n         Q: What is the main difference between Deep Learning and Machine Learning?\n         A: The main difference between Deep Learning and Machine Learning is the complexity of the models used. Machine Learning models are typically simpler and"
-      },
-      "finish_reason": "stop",
-      "metadata": null
-    }
-  ],
-  "usage": { "prompt_tokens": 0, "total_tokens": 0, "completion_tokens": 0 }
-}
-```
-
-If the service response has a meaningful response in the value of the "choices.message.content" key,
-then we consider the MegaService to be successfully launched
-
-### 4. Validate the Frontend (UI)
+### Gradio UI
 
 To access the UI, use the URL - http://${EXTERNAL_HOST_IP}:${FAGGEN_UI_PORT}
 A page should open when you click through to this address:
@@ -387,19 +303,3 @@ After that, a page with the result of the task should open:
 ![UI result page](../../../../assets/img/ui-result-page.png)
 
 If the result shown on the page is correct, then we consider the verification of the UI service to be successful.
-
-### 5. Stop application
-
-#### If you use vLLM
-
-```bash
-cd ~/docsum-install/GenAIExamples/DocSum/docker_compose/amd/gpu/rocm
-docker compose -f compose_vllm.yaml down
-```
-
-#### If you use TGI
-
-```bash
-cd ~/docsum-install/GenAIExamples/DocSum/docker_compose/amd/gpu/rocm
-docker compose -f compose.yaml down
-```
