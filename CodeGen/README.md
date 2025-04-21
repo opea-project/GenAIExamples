@@ -14,7 +14,7 @@
 
 ## Overview
 
-The Code Generation (CodeGen) example demonstrates an AI application designed to assist developers by generating computer code based on natural language prompts or existing code context. It leverages Large Language Models (LLMs) specialized for code, trained on vast datasets of repositories, documentation, and programming code.
+The Code Generation (CodeGen) example demonstrates an AI application designed to assist developers by generating computer code based on natural language prompts or existing code context. It leverages Large Language Models (LLMs) trained on vast datasets of repositories, documentation, and code for programming.
 
 This example showcases how developers can quickly deploy and utilize a CodeGen service, potentially integrating it into their IDEs or development workflows to accelerate tasks like code completion, translation, summarization, refactoring, and error detection.
 
