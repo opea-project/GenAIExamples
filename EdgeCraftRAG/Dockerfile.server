@@ -36,6 +36,8 @@ COPY ./edgecraftrag /home/user/edgecraftrag
 RUN mkdir -p /home/user/ui_cache 
 ENV UI_UPLOAD_PATH=/home/user/ui_cache
 
+USER user
+
 WORKDIR /home/user/edgecraftrag
 RUN pip install --no-cache-dir --upgrade pip setuptools==70.0.0 && \
     pip install --no-cache-dir -r requirements.txt
@@ -44,6 +46,5 @@ WORKDIR /home/user/
 RUN git clone https://github.com/openvinotoolkit/openvino.genai.git genai
 ENV PYTHONPATH="$PYTHONPATH:/home/user/genai/tools/llm_bench"
 
-USER user
 
 ENTRYPOINT ["python", "-m", "edgecraftrag.server"]
