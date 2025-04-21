@@ -5,6 +5,8 @@ services:
   audioqna:
     build:
       args:
+        IMAGE_REPO: ${REGISTRY}
+        BASE_TAG: ${TAG}
         http_proxy: ${http_proxy}
         https_proxy: ${https_proxy}
         no_proxy: ${no_proxy}
@@ -85,10 +87,7 @@ services:
     image: ${REGISTRY:-opea}/vllm-gaudi:${TAG:-latest}
   vllm-rocm:
     build:
-      args:
-        http_proxy: ${http_proxy}
-        https_proxy: ${https_proxy}
-        no_proxy: ${no_proxy}
       context: GenAIComps
       dockerfile: comps/third_parties/vllm/src/Dockerfile.amd_gpu
+    extends: audioqna
     image: ${REGISTRY:-opea}/vllm-rocm:${TAG:-latest}

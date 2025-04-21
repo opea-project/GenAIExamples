@@ -88,22 +88,21 @@ echo "::endgroup::"
 
 cd $WORKPATH/tests
 
-echo "::group::=================== #1 Building docker images===================="
+echo "::group::=================== Building docker images===================="
 bash step1_build_images.sh gaudi_vllm > docker_image_build.log
 echo "::endgroup::"
 
-echo "::endgroup::=================== #4 Start agent, API server, retrieval, and ingest data===================="
+echo "::group::=================== Start agent, API server, retrieval, and ingest data===================="
 bash step4_launch_and_validate_agent_gaudi.sh
 echo "::endgroup::"
 
-echo "::endgroup::=================== #5 Stop agent and API server===================="
+echo "::group::=================== Stop agent and API server===================="
 stop_llm
 stop_crag
 stop_agent_containers
 stop_retrieval_tool
 stop_telemetry_containers
-echo "::endgroup::"
-
 echo y | docker system prune
+echo "::endgroup::"
 
 echo "ALL DONE!!"
