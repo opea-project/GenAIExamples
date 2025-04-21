@@ -1,0 +1,87 @@
+# Copyright (C) 2025 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+deploy:
+  device: gaudi
+  version: 1.2.0
+  modelUseHostPath: /mnt/models
+  HUGGINGFACEHUB_API_TOKEN: "" # mandatory
+  node: [1]
+  namespace: ""
+  node_name: []
+  timeout: 1000  # timeout in seconds for services to be ready, default 30 minutes
+  interval: 5    # interval in seconds between service ready checks, default 5 seconds
+
+  services:
+    backend:
+      resources:
+        enabled: False
+        cores_per_instance: "16"
+        memory_capacity: "8000Mi"
+      replicaCount: [1]
+
+    teirerank:
+      enabled: False
+
+    llm:
+      engine: vllm  # or tgi
+      model_id: "meta-llama/Llama-3.2-3B-Instruct" # mandatory
+      replicaCount:
+        without_teirerank: [1]   # When teirerank.enabled is False
+      resources:
+        enabled: False
+        cards_per_instance: 1
+      model_params:
+        vllm:  # VLLM specific parameters
+          batch_params:
+            enabled: True
+            max_num_seqs: "8"    # Each value triggers an LLM service upgrade
+          token_params:
+            enabled: True
+            max_input_length: ""
+            max_total_tokens: ""
+            max_batch_total_tokens: ""
+            max_batch_prefill_tokens: ""
+        tgi:   # TGI specific parameters
+          batch_params:
+            enabled: True
+            max_batch_size: [1]  # Each value triggers an LLM service upgrade
+          token_params:
+            enabled: False
+            max_input_length: "1280"
+            max_total_tokens: "2048"
+            max_batch_total_tokens: "65536"
+            max_batch_prefill_tokens: "4096"
+
+    docsum-ui:
+      replicaCount: [1]
+
+    whisper:
+      replicaCount: [1]
+
+    llm-uservice:
+      model_id: "meta-llama/Llama-3.2-3B-Instruct" # mandatory
+      replicaCount: [1]
+
+    nginx:
+      replicaCount: [1]
+
+benchmark:
+  # http request behavior related fields
+  user_queries:              [16]
+  concurrency:               [4]
+  load_shape_type:           "constant" # "constant" or "poisson"
+  poisson_arrival_rate:      1.0  # only used when load_shape_type is "poisson"
+  warmup_iterations:         10
+  seed:                      1024
+  collect_service_metric:    True
+
+  # workload, all of the test cases will run for benchmark
+  bench_target: ["docsumfixed"] # specify the bench_target for benchmark
+  dataset: "/home/sdp/upload.txt"  # specify the absolute path to the dataset file
+  summary_type: "stuff"
+  stream: True
+
+  llm:
+    # specify the llm output token size
+    max_token_size:          [1024]
