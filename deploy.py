@@ -177,6 +177,8 @@ def configure_models(values, deploy_config):
             values[service_name]["EMBEDDING_MODEL_ID"] = model_id
         elif service_name == "teirerank":
             values[service_name]["RERANK_MODEL_ID"] = model_id
+        elif service_name == "llm-uservice":
+            values[service_name]["LLM_MODEL_ID"] = model_id
 
     return values
 
