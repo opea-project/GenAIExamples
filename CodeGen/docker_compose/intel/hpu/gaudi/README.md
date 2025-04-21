@@ -103,17 +103,23 @@ The `compose.yaml` file uses Docker Compose profiles to select the LLM serving b
 
 Key parameters are configured via environment variables set before running `docker compose up`.
 
-| Environment Variable                                                                 | Description                                                                                                         | Default (Set Externally)                                                                                     |
-| :----------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------ | :----------------------------------------------------------------------------------------------------------- |
-| `HOST_IP`                                                                            | External IP address of the host machine. **Required.**                                                              | `your_external_ip_address`                                                                                   |
-| `HUGGINGFACEHUB_API_TOKEN`                                                           | Your Hugging Face Hub token for model access. **Required.**                                                         | `your_huggingface_token`                                                                                     |
-| `LLM_MODEL_ID`                                                                       | Hugging Face model ID for the CodeGen LLM (used by TGI/vLLM service). Configured within `compose.yaml` environment. | `Qwen/Qwen2.5-Coder-7B-Instruct`                                                                             |
-| `EMBEDDING_MODEL_ID`                                                                 | Hugging Face model ID for the embedding model (used by TEI service). Configured within `compose.yaml` environment.  | `BAAI/bge-base-en-v1.5`                                                                                      |
-| `TGI_LLM_ENDPOINT` / `VLLM_LLM_ENDPOINT`                                             | Internal URL for the LLM serving endpoint (used by `codegen-llm-server`). Configured in `compose.yaml`.             | `http://codegen-tgi-gaudi-server:80/generate` or `http://codegen-vllm-gaudi-server:8000/v1/chat/completions` |
-| `TEI_EMBEDDING_ENDPOINT`                                                             | Internal URL for the Embedding service (CPU). Configured in `compose.yaml`.                                         | `http://codegen-tei-embedding-server:80/embed`                                                               |
-| ... (Other service endpoints like Retriever, DataPrep, LLM Service, CodeGen Gateway) | Internal URLs configured similarly within `compose.yaml`.                                                           | Various                                                                                                      |
-| `GRADIO_SERVICE_PORT`                                                                | Host port mapping for the Gradio UI. Configured in `compose.yaml`.                                                  | `8080`                                                                                                       |
-| `http_proxy` / `https_proxy`/`no_proxy`                                              | Network proxy settings (if required).                                                                               | `""`                                                                                                         |
+| Environment Variable                    | Description                                                                                                         | Default (Set Externally)                                                                         |
+|:----------------------------------------| :------------------------------------------------------------------------------------------------------------------ | :----------------------------------------------------------------------------------------------- |
+| `HOST_IP`                               | External IP address of the host machine. **Required.**                                                              | `your_external_ip_address`                                                                       |
+| `HUGGINGFACEHUB_API_TOKEN`              | Your Hugging Face Hub token for model access. **Required.**                                                         | `your_huggingface_token`                                                                         |
+| `LLM_MODEL_ID`                          | Hugging Face model ID for the CodeGen LLM (used by TGI/vLLM service). Configured within `compose.yaml` environment. | `Qwen/Qwen2.5-Coder-7B-Instruct`                                                                 |
+| `EMBEDDING_MODEL_ID`                    | Hugging Face model ID for the embedding model (used by TEI service). Configured within `compose.yaml` environment.  | `BAAI/bge-base-en-v1.5`                                                                          |
+| `LLM_ENDPOINT`                          | Internal URL for the LLM serving endpoint (used by `codegen-llm-server`). Configured in `compose.yaml`.             | `http://codegen-tgi-server:80/generate` or `http://codegen-vllm-server:8000/v1/chat/completions` |
+| `TEI_EMBEDDING_ENDPOINT`                | Internal URL for the Embedding service. Configured in `compose.yaml`.                                               | `http://codegen-tei-embedding-server:80/embed`                                                   |
+| `DATAPREP_ENDPOINT`                     | Internal URL for the Data Preparation service. Configured in `compose.yaml`.                                        | `http://codegen-dataprep-server:80/dataprep`                                                     |
+| `BACKEND_SERVICE_ENDPOINT`              | External URL for the CodeGen Gateway (MegaService). Derived from `HOST_IP` and port `7778`.                         | `http://${HOST_IP}:7778/v1/codegen`                                                              |
+| `*_PORT` (Internal)                     | Internal container ports (e.g., `80`, `6379`). Defined in `compose.yaml`.                                           | N/A                                                                                              |
+| `http_proxy` / `https_proxy`/`no_proxy` | Network proxy settings (if required).                                                                               | `""`                                                                                             |
+
+Most of these parameters are in `set_env.sh`, you can either modify this file or overwrite the env variables by setting them.
+```shell
+source CodeGen/docker_compose/set_env.sh
+```
 
 ### Compose Profiles
 
@@ -158,14 +164,21 @@ docker compose --profile <profile_name> ps
 # Example: docker compose --profile codegen-gaudi-vllm ps
 ```
 
-Check logs: `docker compose logs <service_name>`. Pay attention to `codegen-vllm-gaudi-server` or `codegen-tgi-gaudi-server` logs for initialization status and errors.
+Check logs: `docker compose logs <service_name>`. Pay attention to `vllm-gaudi-server` or `tgi-gaudi-server` logs for initialization status and errors.
 
 ### Run Validation Script/Commands
 
 Use `curl` commands targeting the main service endpoints. Ensure `HOST_IP` is correctly set.
 
-1.  **Validate LLM Serving Endpoint (Example for vLLM):**
-    _Testing via the gateway is recommended._ Direct testing might require exposing the Gaudi service port (`8000` internal for vLLM) on the host.
+1.  **Validate LLM Serving Endpoint (Example for vLLM on default port 8000 internally, exposed differently):**
+
+    ```bash
+    # This command structure targets the OpenAI-compatible vLLM endpoint
+    curl http://${HOST_IP}:8000/v1/chat/completions \
+       -X POST \
+       -H 'Content-Type: application/json' \
+       -d '{"model": "Qwen/Qwen2.5-Coder-7B-Instruct", "messages": [{"role": "user", "content": "Implement a basic Python class"}], "max_tokens":32}'
+    ```
 
 2.  **Validate CodeGen Gateway (MegaService, default host port 7778):**
     ```bash
