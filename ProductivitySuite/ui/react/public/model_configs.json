@@ -4,13 +4,6 @@
     "displayName": "Intel Neural Chat",
     "minToken": 100,
     "maxToken": 2000,
-    "types": ["chat", "summary"]
-  },
-  {
-    "model_name": "meta-llama/CodeLlama-7b-hf",
-    "displayName": "Code Llama",
-    "minToken": 100,
-    "maxToken": 2000,
-    "types": ["code"]
+    "types": ["chat", "summary", "code"]
   }
 ]

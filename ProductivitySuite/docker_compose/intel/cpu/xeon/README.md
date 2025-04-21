@@ -191,7 +191,7 @@ Please refer to **[keycloak_setup_guide](keycloak_setup_guide.md)** for more det
 
    ```bash
    export your_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
-   curl http://${host_ip}:7000/v1/retrieval \
+   curl http://${host_ip}:7001/v1/retrieval \
      -X POST \
      -d "{\"text\":\"test\",\"embedding\":${your_embedding}}" \
      -H 'Content-Type: application/json'
@@ -323,7 +323,7 @@ Please refer to **[keycloak_setup_guide](keycloak_setup_guide.md)** for more det
 
     ```bash
     curl -X 'POST' \
-      http://{host_ip}:6018/v1/prompt/create \
+      "http://${host_ip}:6018/v1/prompt/create" \
       -H 'accept: application/json' \
       -H 'Content-Type: application/json' \
       -d '{
@@ -335,14 +335,14 @@ Please refer to **[keycloak_setup_guide](keycloak_setup_guide.md)** for more det
 
     ```bash
     curl -X 'POST' \
-      http://{host_ip}:6018/v1/prompt/get \
+      "http://${host_ip}:6018/v1/prompt/get" \
       -H 'accept: application/json' \
       -H 'Content-Type: application/json' \
       -d '{
       "user": "test"}'
 
     curl -X 'POST' \
-      http://{host_ip}:6018/v1/prompt/get \
+      "http://${host_ip}:6018/v1/prompt/get" \
       -H 'accept: application/json' \
       -H 'Content-Type: application/json' \
       -d '{
@@ -353,7 +353,7 @@ Please refer to **[keycloak_setup_guide](keycloak_setup_guide.md)** for more det
 
     ```bash
     curl -X 'POST' \
-      http://{host_ip}:6018/v1/prompt/delete \
+      "http://${host_ip}:6018/v1/prompt/delete" \
       -H 'accept: application/json' \
       -H 'Content-Type: application/json' \
       -d '{

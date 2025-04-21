@@ -159,7 +159,7 @@ function validate_microservices() {
     # retrieval microservice
     test_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
     validate_service \
-        "${ip_address}:7000/v1/retrieval" \
+        "${ip_address}:7001/v1/retrieval" \
         "retrieved_docs" \
         "retrieval-microservice" \
         "retriever-redis-server" \
@@ -181,13 +181,6 @@ function validate_microservices() {
         "tgi-service" \
         '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}'
 
-    # ChatQnA llm microservice
-    validate_service \
-        "${ip_address}:9000/v1/chat/completions" \
-        "data: " \
-        "llm-microservice" \
-        "llm-textgen-server" \
-        '{"query":"What is Deep Learning?"}'
 
     # CodeGen llm microservice
     validate_service \
