@@ -201,7 +201,7 @@ jobs:
           echo "Cleaning up images ..."
           if [[ "${{ inputs.hardware }}" == "xeon"* ]]; then
               docker system prune -a -f
-          else 
+          else
               docker images --filter reference="*/*/*:latest" -q | xargs -r docker rmi && sleep 1s
               docker images --filter reference="*/*:ci" -q | xargs -r docker rmi && sleep 1s
               docker images --filter reference="*:5000/*/*" -q | xargs -r docker rmi && sleep 1s
