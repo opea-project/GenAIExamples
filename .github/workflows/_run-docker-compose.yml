@@ -64,8 +64,10 @@ jobs:
           cd ${{ github.workspace }}/${{ inputs.example }}/tests
           run_test_cases=""
 
-          if [ "${{ inputs.hardware }}" == "gaudi2" ] || [ "${{ inputs.hardware }}" == "gaudi3" ]; then
+          if [[ "${{ inputs.hardware }}" == "gaudi"* ]]; then
             hardware="gaudi"
+          elif [[ "${{ inputs.hardware }}" == "xeon"* ]]; then
+            hardware="xeon"
           else
             hardware="${{ inputs.hardware }}"
           fi
@@ -117,7 +119,7 @@ jobs:
           sudo rm -rf ${{github.workspace}}/* || true
 
           echo "Cleaning up containers using ports..."
-          cid=$(docker ps --format '{{.Names}} : {{.Ports}}' | grep -v ' : $' | grep -v 5000 | awk -F' : ' '{print $1}')
+          cid=$(docker ps --format '{{.Names}} : {{.Ports}}' | grep -v ' : $' | grep -v 0.0.0.0:5000 | awk -F' : ' '{print $1}')
           if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid && sleep 1s; fi
           docker system prune -f
 
@@ -125,6 +127,7 @@ jobs:
           docker images --filter reference="*/*/*:latest" -q | xargs -r docker rmi && sleep 1s
           docker images --filter reference="*/*:ci" -q | xargs -r docker rmi && sleep 1s
           docker images --filter reference="*:5000/*/*" -q | xargs -r docker rmi && sleep 1s
+          docker images --filter reference="opea/comps-base" -q | xargs -r docker rmi && sleep 1s
           docker images
 
       - name: Checkout out Repo
@@ -187,22 +190,29 @@ jobs:
           if [ -f "${test_case}" ]; then timeout 60m bash "${test_case}"; else echo "Test script {${test_case}} not found, skip test!"; fi
 
       - name: Clean up container after test
-        shell: bash
-        if: cancelled() || failure()
+        if: always()
         run: |
           set -x
 
-          cd ${{ github.workspace }}/${{ inputs.example }}
-          export test_case=${{ matrix.test_case }}
-          export hardware=${{ inputs.hardware }}
-          bash ${{ github.workspace }}/.github/workflows/scripts/docker_compose_clean_up.sh "containers"
-          echo "Finish docker clean up."
+          echo "Cleaning up containers using ports..."
+          cid=$(docker ps --format '{{.Names}} : {{.Ports}}' | grep -v ' : $' | grep -v 0.0.0.0:5000 | awk -F' : ' '{print $1}')
+          if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid && sleep 1s; fi
 
-          docker system prune -f
+          echo "Cleaning up images ..."
+          if [[ "${{ inputs.hardware }}" == "xeon"* ]]; then
+              docker system prune -a -f
+          else
+              docker images --filter reference="*/*/*:latest" -q | xargs -r docker rmi && sleep 1s
+              docker images --filter reference="*/*:ci" -q | xargs -r docker rmi && sleep 1s
+              docker images --filter reference="*:5000/*/*" -q | xargs -r docker rmi && sleep 1s
+              docker images --filter reference="opea/comps-base" -q | xargs -r docker rmi && sleep 1s
+              docker system prune -f
+          fi
+          docker images
 
       - name: Publish pipeline artifact
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ inputs.example }}_${{ matrix.test_case }}
+          name: ${{ inputs.hardware }}_${{ inputs.example }}_${{ matrix.test_case }}
           path: ${{ github.workspace }}/${{ inputs.example }}/tests/*.log
