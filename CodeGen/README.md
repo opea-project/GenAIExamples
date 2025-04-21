@@ -20,7 +20,7 @@ This example showcases how developers can quickly deploy and utilize a CodeGen s
 
 ## Problem Motivation
 
-Writing, understanding, and maintaining code can be time-consuming and complex. Developers often perform repetitive coding tasks, struggle with translating between languages, or need assistance understanding large codebases. CodeGen LLMs address this by automating code generation, providing intelligent suggestions, and assisting with various code-related tasks, thereby boosting productivity and reducing development friction. This OPEA example provides a blueprint for deploying such a capability using optimized components.
+Writing, understanding, and maintaining code can be time-consuming and complex. Developers often perform repetitive coding tasks, struggle with translating between languages, or need assistance understanding large codebases. CodeGen LLMs address this by automating code generation, providing intelligent suggestions, and assisting with various code-related tasks, thereby boosting productivity and reducing development friction. This OPEA example provides a blueprint for deploying such capabilities using optimized components.
 
 ## Architecture
 
