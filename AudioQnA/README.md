@@ -2,6 +2,13 @@
 
 AudioQnA is an example that demonstrates the integration of Generative AI (GenAI) models for performing question-answering (QnA) on audio files, with the added functionality of Text-to-Speech (TTS) for generating spoken responses. The example showcases how to convert audio input to text using Automatic Speech Recognition (ASR), generate answers to user queries using a language model, and then convert those answers back to speech using Text-to-Speech (TTS).
 
+## Table of Contents
+
+1. [Architecture](#architecture)
+2. [Deployment Options](#deployment-options)
+
+## Architecture
+
 The AudioQnA example is implemented using the component-level microservices defined in [GenAIComps](https://github.com/opea-project/GenAIComps). The flow chart below shows the information flow between different microservices for this example.
 
 ```mermaid
@@ -59,37 +66,13 @@ flowchart LR
 
 ```
 
-## Deploy AudioQnA Service
+## Deployment Options
 
-The AudioQnA service can be deployed on either Intel Gaudi2 or Intel Xeon Scalable Processor.
+The table below lists currently available deployment options. They outline in detail the implementation of this example on selected hardware.
 
-### Deploy AudioQnA on Gaudi
-
-Refer to the [Gaudi Guide](./docker_compose/intel/hpu/gaudi/README.md) for instructions on deploying AudioQnA on Gaudi.
-
-### Deploy AudioQnA on Xeon
-
-Refer to the [Xeon Guide](./docker_compose/intel/cpu/xeon/README.md) for instructions on deploying AudioQnA on Xeon.
-
-## Deploy using Helm Chart
-
-Refer to the [AudioQnA helm chart](./kubernetes/helm/README.md) for instructions on deploying AudioQnA on Kubernetes.
-
-## Supported Models
-
-### ASR
-
-The default model is [openai/whisper-small](https://huggingface.co/openai/whisper-small). It also supports all models in the Whisper family, such as `openai/whisper-large-v3`, `openai/whisper-medium`, `openai/whisper-base`, `openai/whisper-tiny`, etc.
-
-To replace the model, please edit the `compose.yaml` and add the `command` line to pass the name of the model you want to use:
-
-```yaml
-services:
-  whisper-service:
-    ...
-    command: --model_name_or_path openai/whisper-tiny
-```
-
-### TTS
-
-The default model is [microsoft/SpeechT5](https://huggingface.co/microsoft/speecht5_tts). We currently do not support replacing the model. More models under the commercial license will be added in the future.
+| Category               | Deployment Option | Description                                                      |
+| ---------------------- | ----------------- | ---------------------------------------------------------------- |
+| On-premise Deployments | Docker compose    | [AudioQnA deployment on Xeon](./docker_compose/intel/cpu/xeon)   |
+|                        |                   | [AudioQnA deployment on Gaudi](./docker_compose/intel/hpu/gaudi) |
+|                        |                   | [AudioQnA deployment on AMD ROCm](./docker_compose/amd/gpu/rocm) |
+|                        | Kubernetes        | [Helm Charts](./kubernetes/helm)                                 |
