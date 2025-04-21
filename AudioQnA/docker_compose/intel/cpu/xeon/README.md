@@ -46,7 +46,7 @@ export host_ip="External_Public_IP"           # ip address of the node
 export HUGGINGFACEHUB_API_TOKEN="Your_HuggingFace_API_Token"
 export http_proxy="Your_HTTP_Proxy"           # http proxy if any
 export https_proxy="Your_HTTPs_Proxy"         # https proxy if any
-export no_proxy=localhost,127.0.0.1,$host_ip  # additional no proxies if needed
+export no_proxy=localhost,127.0.0.1,$host_ip,whisper-service,speecht5-service,vllm-service,tgi-service,audioqna-xeon-backend-server,audioqna-xeon-ui-server  # additional no proxies if needed
 export NGINX_PORT=${your_nginx_port}          # your usable port for nginx, 80 for example
 source ./set_env.sh
 ```

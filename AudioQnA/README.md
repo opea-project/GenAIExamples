@@ -6,7 +6,6 @@ AudioQnA is an example that demonstrates the integration of Generative AI (GenAI
 
 1. [Architecture](#architecture)
 2. [Deployment Options](#deployment-options)
-3. [Monitoring and Tracing](./README_miscellaneous.md)
 
 ## Architecture
 

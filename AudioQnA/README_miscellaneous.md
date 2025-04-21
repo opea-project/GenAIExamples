@@ -7,7 +7,7 @@
 
 ## Build MegaService Docker Image
 
-To construct the Megaservice of AudioQnA, the [GenAIExamples](https://github.com/opea-project/GenAIExamples.git) repository is utilized. Build Megaservice Docker image via command below:
+To construct the Megaservice of AudioQnA, the [GenAIExamples](https://github.com/opea-project/GenAIExamples.git) repository is utilized. Build Megaservice Docker image using command below:
 
 ```bash
 git clone https://github.com/opea-project/GenAIExamples.git
@@ -17,7 +17,7 @@ docker build --no-cache -t opea/audioqna:latest --build-arg https_proxy=$https_p
 
 ## Build UI Docker Image
 
-Build frontend Docker image via below command:
+Build frontend Docker image using below command:
 
 ```bash
 cd GenAIExamples/AudioQnA/ui
