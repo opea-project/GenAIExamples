@@ -119,7 +119,7 @@ jobs:
           sudo rm -rf ${{github.workspace}}/* || true
 
           echo "Cleaning up containers using ports..."
-          cid=$(docker ps --format '{{.Names}} : {{.Ports}}' | grep -v ' : $' | grep -v 5000 | awk -F' : ' '{print $1}')
+          cid=$(docker ps --format '{{.Names}} : {{.Ports}}' | grep -v ' : $' | grep -v 0.0.0.0:5000 | awk -F' : ' '{print $1}')
           if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid && sleep 1s; fi
           docker system prune -f
 
@@ -190,17 +190,24 @@ jobs:
 
       - name: Clean up container after test
         shell: bash
-        if: cancelled() || failure()
+        if: always()
         run: |
           set -x
 
-          cd ${{ github.workspace }}/${{ inputs.example }}
-          export test_case=${{ matrix.test_case }}
-          export hardware=${{ inputs.hardware }}
-          bash ${{ github.workspace }}/.github/workflows/scripts/docker_compose_clean_up.sh "containers"
-          echo "Finish docker clean up."
+          echo "Cleaning up containers using ports..."
+          cid=$(docker ps --format '{{.Names}} : {{.Ports}}' | grep -v ' : $' | grep -v 0.0.0.0:5000 | awk -F' : ' '{print $1}')
+          if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid && sleep 1s; fi
 
-          docker system prune -f
+          echo "Cleaning up images ..."
+          if [[ "${{ inputs.hardware }}" == "xeon"* ]]; then
+              docker system prune -a -f
+          else 
+              docker images --filter reference="*/*/*:latest" -q | xargs -r docker rmi && sleep 1s
+              docker images --filter reference="*/*:ci" -q | xargs -r docker rmi && sleep 1s
+              docker images --filter reference="*:5000/*/*" -q | xargs -r docker rmi && sleep 1s
+              docker system prune -f
+          fi
+          docker images
 
       - name: Publish pipeline artifact
         if: ${{ !cancelled() }}
