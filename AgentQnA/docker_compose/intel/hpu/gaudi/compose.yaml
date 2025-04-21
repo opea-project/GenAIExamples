@@ -3,7 +3,7 @@
 
 services:
   worker-rag-agent:
-    image: opea/agent:latest
+    image: ${REGISTRY:-opea}/agent:${TAG:-latest}
     container_name: rag-agent-endpoint
     volumes:
       - ${TOOLSET_PATH}:/home/user/tools/
@@ -34,7 +34,7 @@ services:
       port: 9095
 
   worker-sql-agent:
-    image: opea/agent:latest
+    image: ${REGISTRY:-opea}/agent:${TAG:-latest}
     container_name: sql-agent-endpoint
     volumes:
       - ${WORKDIR}/GenAIExamples/AgentQnA/tests:/home/user/chinook-db # test db
@@ -63,7 +63,7 @@ services:
       port: 9096
 
   supervisor-react-agent:
-    image: opea/agent:latest
+    image: ${REGISTRY:-opea}/agent:${TAG:-latest}
     container_name: react-agent-endpoint
     depends_on:
       - worker-rag-agent
@@ -104,7 +104,7 @@ services:
       - "8080:8000"
     ipc: host
   agent-ui:
-    image: opea/agent-ui:latest
+    image: ${REGISTRY:-opea}/agent-ui:${TAG:-latest}
     container_name: agent-ui
     environment:
       host_ip: ${host_ip}
@@ -117,7 +117,7 @@ services:
     ports:
       - "8086:8000"
     volumes:
-      - "./data:/data"
+      - "${MODEL_CACHE:-./data}:/data"
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
