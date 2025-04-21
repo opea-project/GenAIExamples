@@ -46,5 +46,4 @@ WORKDIR /home/user/
 RUN git clone https://github.com/openvinotoolkit/openvino.genai.git genai
 ENV PYTHONPATH="$PYTHONPATH:/home/user/genai/tools/llm_bench"
 
-
 ENTRYPOINT ["python", "-m", "edgecraftrag.server"]

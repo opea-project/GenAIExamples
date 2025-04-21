@@ -29,3 +29,17 @@ class DocxParagraphPicturePartitioner:
                 image.save(image_path)
                 element_metadata = ElementMetadata(image_path=image_path)
             yield Image(text="IMAGE", metadata=element_metadata)
+
+
+def serialize_node_with_score(node_with_score):
+    return {
+        "node": node_with_score.node.__dict__,
+        "score": node_with_score.score.item() if hasattr(node_with_score.score, "item") else node_with_score.score,
+    }
+
+
+def serialize_contexts(contexts):
+    return {
+        key: [serialize_node_with_score(node) for node in nodes]
+        for key, nodes in contexts.items()
+    }

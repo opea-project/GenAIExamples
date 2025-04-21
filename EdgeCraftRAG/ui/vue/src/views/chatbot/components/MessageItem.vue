@@ -1,6 +1,6 @@
 <template>
   <div id="message-container">
-    <template v-if="message.author === 'Bot'">
+    <template v-if="message.role === 'assistant'">
       <div class="chatbot-session">
         <div class="avatar-wrap">
           <SvgIcon name="icon-chatbot" :size="24" />
@@ -50,6 +50,9 @@
 import { marked } from "marked";
 import { PropType, reactive, ref } from "vue";
 import { Benchmark, IMessage } from "../type";
+import { CheckCircleFilled, UpOutlined } from "@ant-design/icons-vue";
+import CustomRenderer from "@/utils/customRenderer";
+import "highlight.js/styles/atom-one-dark.css";
 
 const props = defineProps({
   message: {
@@ -71,20 +74,11 @@ const isExpanded = ref<boolean>(false);
 
 const renderer = new marked.Renderer();
 
-renderer.link = ({ href, title, text }) => {
-  let link = `<a href="${href}" target="_blank" rel="noopener noreferrer"`;
-  if (title) {
-    link += ` title="${title}"`;
-  }
-  link += `>${text}</a>`;
-  return link;
-};
-
 marked.setOptions({
   pedantic: false,
   gfm: true,
   breaks: false,
-  renderer: renderer,
+  renderer: CustomRenderer,
 });
 
 const renderedMarkdown = computed(() => marked(props.message.content));

@@ -6,6 +6,69 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "43924556",
+      "name": "export",
+      "font_class": "export",
+      "unicode": "e619",
+      "unicode_decimal": 58905
+    },
+    {
+      "icon_id": "43924554",
+      "name": "rename",
+      "font_class": "rename",
+      "unicode": "e618",
+      "unicode_decimal": 58904
+    },
+    {
+      "icon_id": "2570142",
+      "name": "delete",
+      "font_class": "delete",
+      "unicode": "e664",
+      "unicode_decimal": 58980
+    },
+    {
+      "icon_id": "13253937",
+      "name": "setting",
+      "font_class": "setting1",
+      "unicode": "e61b",
+      "unicode_decimal": 58907
+    },
+    {
+      "icon_id": "43796752",
+      "name": "upload",
+      "font_class": "upload",
+      "unicode": "e617",
+      "unicode_decimal": 58903
+    },
+    {
+      "icon_id": "42194548",
+      "name": "clear",
+      "font_class": "clear",
+      "unicode": "e765",
+      "unicode_decimal": 59237
+    },
+    {
+      "icon_id": "1198529",
+      "name": "copy-success",
+      "font_class": "copy-success",
+      "unicode": "e666",
+      "unicode_decimal": 58982
+    },
+    {
+      "icon_id": "9080698",
+      "name": "copy",
+      "font_class": "copy",
+      "unicode": "e660",
+      "unicode_decimal": 58976
+    },
+    {
+      "icon_id": "796912",
+      "name": "地铁",
+      "font_class": "subway",
+      "unicode": "e6ed",
+      "unicode_decimal": 59117
+    },
+    {
       "icon_id": "42853460",
       "name": "stop",
       "font_class": "stop",

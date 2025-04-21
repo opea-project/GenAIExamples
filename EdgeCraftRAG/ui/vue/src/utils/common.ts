@@ -5,7 +5,8 @@ import { inject } from "vue";
 import { customNotification } from "./notification";
 
 export const useNotification = () => {
-  const customNotificationInjected = inject<typeof customNotification>("customNotification");
+  const customNotificationInjected =
+    inject<typeof customNotification>("customNotification");
 
   if (!customNotificationInjected) {
     throw new Error("Notification service not provided");
@@ -18,4 +19,16 @@ export const useNotification = () => {
 export const formatDecimals = (num: number, decimalPlaces: number = 2) => {
   const factor = Math.pow(10, decimalPlaces);
   return Math.round(num * factor) / factor;
+};
+
+export const formatCapitalize = (
+  string: string,
+  start: number = 0,
+  length: number = 1
+) => {
+  const end = start + length;
+  const part1 = string.slice(0, start);
+  const part2 = string.slice(start, end).toUpperCase();
+  const part3 = string.slice(end);
+  return part1 + part2 + part3;
 };

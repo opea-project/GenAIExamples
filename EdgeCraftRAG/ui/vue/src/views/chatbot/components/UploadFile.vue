@@ -21,7 +21,7 @@
           Supported formats: PDF,PPT,PPTX,TXT,DOC,DOCX,HTML,MD,CSV,ENEX,EPUB and
           ODT.
         </p>
-        <p>Single file size not exceeding 20M.</p>
+        <p>Single file size not exceeding 50M.</p>
       </div>
     </a-upload-dragger>
     <div class="uploaded-wrap" v-if="uploadedList.length">
@@ -93,10 +93,10 @@ const displayFiles = computed(() =>
   isExpanded.value ? uploadedList.value : uploadedList.value.slice(0, 10)
 );
 const handleBeforeUpload = (file: UploadProps["fileList"][number]) => {
-  const isFileSize = file.size / 1024 / 1024 < 20;
+  const isFileSize = file.size / 1024 / 1024 < 50;
 
   if (!isFileSize) {
-    message.error("Single file size not exceeding 20M.");
+    message.error("Single file size not exceeding 50M.");
   }
 
   return isFileSize;
