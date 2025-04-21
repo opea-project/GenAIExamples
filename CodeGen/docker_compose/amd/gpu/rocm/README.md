@@ -13,7 +13,7 @@ This example includes the following sections:
 
 This section describes how to quickly deploy and test the CodeGen service manually on an AMD GPU (ROCm) platform. The basic steps are:
 
-1. [Prerequisites](#зrerequisites)
+1. [Prerequisites](#prerequisites)
 2. [Generate a HuggingFace Access Token](#generate-a-huggingface-access-token)
 3. [Configure the Deployment Environment](#configure-the-deployment-environment)
 4. [Deploy the Services Using Docker Compose](#deploy-the-services-using-docker-compose)
