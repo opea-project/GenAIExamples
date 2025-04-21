@@ -189,7 +189,6 @@ jobs:
           if [ -f "${test_case}" ]; then timeout 60m bash "${test_case}"; else echo "Test script {${test_case}} not found, skip test!"; fi
 
       - name: Clean up container after test
-        shell: bash
         if: always()
         run: |
           set -x
