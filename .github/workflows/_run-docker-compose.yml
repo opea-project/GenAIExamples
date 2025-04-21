@@ -127,6 +127,7 @@ jobs:
           docker images --filter reference="*/*/*:latest" -q | xargs -r docker rmi && sleep 1s
           docker images --filter reference="*/*:ci" -q | xargs -r docker rmi && sleep 1s
           docker images --filter reference="*:5000/*/*" -q | xargs -r docker rmi && sleep 1s
+          docker images --filter reference="opea/comps-base" -q | xargs -r docker rmi && sleep 1s
           docker images
 
       - name: Checkout out Repo
@@ -204,6 +205,7 @@ jobs:
               docker images --filter reference="*/*/*:latest" -q | xargs -r docker rmi && sleep 1s
               docker images --filter reference="*/*:ci" -q | xargs -r docker rmi && sleep 1s
               docker images --filter reference="*:5000/*/*" -q | xargs -r docker rmi && sleep 1s
+              docker images --filter reference="opea/comps-base" -q | xargs -r docker rmi && sleep 1s
               docker system prune -f
           fi
           docker images
