@@ -10,8 +10,9 @@ CHATQNA_TYPE: "CHATQNA_GUARDRAILS"
 # guardrails related config
 guardrails-usvc:
   enabled: true
-  # SAFETY_GUARD_ENDPOINT: "http://{{ .Release.Name }}-tgi-guardrails"
+  SAFETY_GUARD_ENDPOINT: "http://{{ .Release.Name }}-vllm-guardrails"
   SAFETY_GUARD_MODEL_ID: "meta-llama/Meta-Llama-Guard-2-8B"
+  retryTimeoutSeconds: 720
 
 # gaudi related config
 # tei running on CPU by default
@@ -41,33 +42,24 @@ teirerank:
   readinessProbe:
     timeoutSeconds: 1
 
-tgi-guardrails:
+vllm-guardrails:
   enabled: true
   accelDevice: "gaudi"
-  LLM_MODEL_ID: "meta-llama/Meta-Llama-Guard-2-8B"
   image:
-    repository: ghcr.io/huggingface/tgi-gaudi
-    tag: "2.3.1"
+    repository: opea/vllm-gaudi
+  LLM_MODEL_ID: "meta-llama/Meta-Llama-Guard-2-8B"
   resources:
     limits:
       habana.ai/gaudi: 1
-  MAX_INPUT_LENGTH: "1024"
-  MAX_TOTAL_TOKENS: "2048"
-  CUDA_GRAPHS: ""
-  OMPI_MCA_btl_vader_single_copy_mechanism: "none"
-  ENABLE_HPU_GRAPH: "true"
-  LIMIT_HPU_GRAPH: "true"
-  USE_FLASH_ATTENTION: "true"
-  FLASH_ATTENTION_RECOMPUTE: "true"
-  readinessProbe:
-    initialDelaySeconds: 5
-    periodSeconds: 5
-    timeoutSeconds: 1
+  extraCmdArgs: [
+    "--tensor-parallel-size", "1",
+    "--block-size", "128",
+    "--max-num-seqs", "256",
+    "--max-seq-len-to-capture", "2048"
+  ]
   startupProbe:
-    initialDelaySeconds: 5
-    periodSeconds: 5
-    timeoutSeconds: 1
-    failureThreshold: 120
+    failureThreshold: 360
+  OMPI_MCA_btl_vader_single_copy_mechanism: "none"
 
 tgi:
   enabled: false
