@@ -241,7 +241,7 @@ docker compose -f compose.yaml up -d
 export MILVUS_HOST=${host_ip}
 export MILVUS_PORT=19530
 export MILVUS_RETRIEVER_PORT=7000
-export COLLECTION_NAME=mm_rag_milvus
+export COLLECTION_NAME=LangChainCollection
 cd GenAIExamples/MultimodalQnA/docker_compose/intel/cpu/xeon/
 docker compose -f compose_milvus.yaml up -d
 ```
@@ -384,6 +384,8 @@ curl --silent --write-out "HTTPSTATUS:%{http_code}" \
 ```
 
 Now, test the microservice with posting a custom caption along with an image and a PDF containing images and text. The image caption can be provided as a text (`.txt`) or as spoken audio (`.wav` or `.mp3`).
+
+> Note: Audio captions for images are currently only supported when using the Redis data prep backend.
 
 ```bash
 curl --silent --write-out "HTTPSTATUS:%{http_code}" \
