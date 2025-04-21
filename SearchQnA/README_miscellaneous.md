@@ -31,7 +31,6 @@ docker build -t opea/searchqna-ui:latest --build-arg https_proxy=$https_proxy --
 
 Some HuggingFace resources require an access token. Developers can create one by first signing up on [HuggingFace](https://huggingface.co/) and then generating a [user access token](https://huggingface.co/docs/transformers.js/en/guides/private#step-1-generating-a-user-access-token).
 
-
 ## Troubleshooting
 
 1. If errors such as "Access Denied" occur, validate the [microservice](https://github.com/opea-project/GenAIExamples/tree/main/ChatQnA/docker_compose/intel/cpu/xeon/README.md#validate-microservices) that is querying the embed API. A simple example:
