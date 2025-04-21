@@ -91,6 +91,7 @@ async def reset_prompt():
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
+
 def convert_message(messages, history_prompt: str = None):
     messages_list = []
     if isinstance(messages, str):
@@ -109,8 +110,9 @@ def convert_message(messages, history_prompt: str = None):
                 if isinstance(content, str):
                     messages_list.append((msg_role, content))
                 else:
-                    raise ValueError(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                                     detail="Only text content is supported.")
+                    raise ValueError(
+                        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Only text content is supported."
+                    )
             else:
                 raise ValueError(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Unknown role: {msg_role}")
 

@@ -1,3 +1,6 @@
+// Copyright (C) 2025 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
+
 import { marked } from "marked";
 import hljs from "highlight.js";
 import { formatCapitalize } from "./common";
@@ -44,10 +47,8 @@ class ClipboardManager {
     this.observer = new MutationObserver((mutations) => {
       const hasNewButtons = mutations.some((mutation) =>
         Array.from(mutation.addedNodes).some(
-          (node) =>
-            node instanceof HTMLElement &&
-            (node.matches(".copy-btn") || node.querySelector(".copy-btn"))
-        )
+          (node) => node instanceof HTMLElement && (node.matches(".copy-btn") || node.querySelector(".copy-btn")),
+        ),
       );
       if (hasNewButtons) this.init(".copy-btn");
     });
@@ -95,9 +96,7 @@ const createCustomRenderer = () => {
   const renderer = new marked.Renderer();
 
   renderer.link = ({ href, title, text }) => {
-    return `<a href="${href}" target="_blank" rel="noopener noreferrer" ${
-      title ? `title="${title}"` : ""
-    }>${text}</a>`;
+    return `<a href="${href}" target="_blank" rel="noopener noreferrer" ${title ? `title="${title}"` : ""}>${text}</a>`;
   };
 
   renderer.code = ({ text, lang }: CodeRenderParams) => {
@@ -106,9 +105,7 @@ const createCustomRenderer = () => {
     const codeHtml = hljs.highlight(text, {
       language: language || "plaintext",
     }).value;
-    const uniqueId = `code-${Date.now()}-${Math.random()
-      .toString(16)
-      .slice(2)}`;
+    const uniqueId = `code-${Date.now()}-${Math.random().toString(16).slice(2)}`;
 
     return `
       <div  class="intel-highlighter">

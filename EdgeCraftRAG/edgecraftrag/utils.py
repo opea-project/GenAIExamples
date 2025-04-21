@@ -39,7 +39,4 @@ def serialize_node_with_score(node_with_score):
 
 
 def serialize_contexts(contexts):
-    return {
-        key: [serialize_node_with_score(node) for node in nodes]
-        for key, nodes in contexts.items()
-    }
+    return {key: [serialize_node_with_score(node) for node in nodes] for key, nodes in contexts.items()}
