@@ -385,7 +385,7 @@ curl --silent --write-out "HTTPSTATUS:%{http_code}" \
 
 Now, test the microservice with posting a custom caption along with an image and a PDF containing images and text. The image caption can be provided as a text (`.txt`) or as spoken audio (`.wav` or `.mp3`).
 
-> Note: Audio captions are unsupported when using the Milvus vector dataset.
+> Note: Audio captions for images are currently only supported when using the Redis data prep backend.
 
 ```bash
 curl --silent --write-out "HTTPSTATUS:%{http_code}" \
