@@ -37,7 +37,7 @@ git checkout v1.2
 
 ### Generate a HuggingFace Access Token
 
-Some HuggingFace resources, such as some models, are only accessible if you have an access token. If you do not already have a HuggingFace access token, you can create one by first creating an account by following the steps provided at [HuggingFace](https://huggingface.co/) and then generating a [user access token](https://huggingface.co/docs/transformers.js/en/guides/private#step-1-generating-a-user-access-token).
+Some HuggingFace resources require an access token. Developers can create one by first signing up on [HuggingFace](https://huggingface.co/) and then generating a [user access token](https://huggingface.co/docs/transformers.js/en/guides/private#step-1-generating-a-user-access-token).
 
 ### Configure the Deployment Environment
 
@@ -89,7 +89,7 @@ Please refer to the table below to build different microservices from source:
 
 ### Check the Deployment Status
 
-After running docker compose, we check the list of images with the command:
+After running Docker Compose, the list of images can be checked using the following command:
 
 ```
 docker ps -a
@@ -129,7 +129,7 @@ data: {"id":"cmpl-f095893d094a4e9989423c2364f00bc1","choices":[{"finish_reason":
 data: [DONE]
 ```
 
-If the response text is similar to the one above, then we consider the service verification successful.
+A response text similar to the one above indicates that the service verification was successful.
 
 ### Cleanup the Deployment
 
@@ -149,7 +149,7 @@ All the SearchQnA containers will be stopped and then removed on completion of t
 
 ## SearchQnA Docker Compose Files
 
-In the context of deploying a SearchQnA pipeline on AMD GPU (ROCm), we can pick and choose different large language model serving frameworks. The table below outlines the various configurations that are available as part of the application.
+When deploying the SearchQnA pipeline on AMD GPUs (ROCm), different large language model serving frameworks can be selected. The table below outlines the available configurations included in the application.
 
 | File                                     | Description                                                                                |
 | ---------------------------------------- | ------------------------------------------------------------------------------------------ |
@@ -158,12 +158,12 @@ In the context of deploying a SearchQnA pipeline on AMD GPU (ROCm), we can pick 
 
 ## Launch the UI
 
-To access the UI, use the URL - http://${EXTERNAL_HOST_IP}:${SEARCH_FRONTEND_SERVICE_PORT} A page should open when you click through to this address:
+Access the UI at http://${EXTERNAL_HOST_IP}:${SEARCH_FRONTEND_SERVICE_PORT}. A page should open when navigating to this address.
 ![UI start page](../../../../assets/img/searchqna-ui-starting-page.png)
 
-If a page of this type has opened, then we believe that the service is running and responding, and we can proceed to functional UI testing.
+The appearance of such a page indicates that the service is operational and responsive, allowing functional UI testing to proceed.
 
 Let's enter the task for the service in the "Enter prompt here" field. For example, "What is DeepLearning?" and press Enter. After that, a page with the result of the task should open:
 
 ![UI start page](../../../../assets/img/searchqna-ui-response-example.png)
-If the result shown on the page is correct, then we consider the verification of the UI service to be successful.
+A correct result displayed on the page indicates that the UI service has been successfully verified.

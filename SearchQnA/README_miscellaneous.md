@@ -9,7 +9,8 @@
 
 ## Build MegaService Docker Image
 
-To construct the Megaservice of SearchQnA, the [GenAIExamples](https://github.com/opea-project/GenAIExamples.git) repository is utilized. Build Megaservice Docker image via command below:
+To build the SearchQnA Megaservice, use the [GenAIExamples](https://github.com/opea-project/GenAIExamples.git) repository.
+Use the following command to build the Megaservice Docker image:
 
 ```bash
 git clone https://github.com/opea-project/GenAIExamples.git
@@ -28,11 +29,12 @@ docker build -t opea/searchqna-ui:latest --build-arg https_proxy=$https_proxy --
 
 ## Generate a HuggingFace Access Token
 
-Some HuggingFace resources, such as some models, are only accessible if the developer has an access token. In the absence of a HuggingFace access token, the developer can create one by first creating an account on [HuggingFace](https://huggingface.co/) and then generating a [user access token](https://huggingface.co/docs/transformers.js/en/guides/private#step-1-generating-a-user-access-token).
+Some HuggingFace resources require an access token. Developers can create one by first signing up on [HuggingFace](https://huggingface.co/) and then generating a [user access token](https://huggingface.co/docs/transformers.js/en/guides/private#step-1-generating-a-user-access-token).
+
 
 ## Troubleshooting
 
-1. If you get errors like "Access Denied", [validate micro service](https://github.com/opea-project/GenAIExamples/tree/main/ChatQnA/docker_compose/intel/cpu/xeon/README.md#validate-microservices) first. A simple example:
+1. If errors such as "Access Denied" occur, validate the [microservice](https://github.com/opea-project/GenAIExamples/tree/main/ChatQnA/docker_compose/intel/cpu/xeon/README.md#validate-microservices) that is querying the embed API. A simple example:
 
    ```bash
    http_proxy=""

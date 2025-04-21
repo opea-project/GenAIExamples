@@ -92,14 +92,14 @@ flowchart LR
 
 ```
 
-This SearchQnA use case performs Search-augmented Question Answering across multiple platforms. Currently, we provide the example for Intel Gaudi2 and Intel Xeon Scalable Processors, and we invite contributions from other hardware vendors to expand OPEA ecosystem.
+This SearchQnA use case performs Search-augmented Question Answering across multiple platforms. Currently, we provide the example for Intel® Gaudi® 2 and Intel® Xeon® Scalable Processors, and we invite contributions from other hardware vendors to expand OPEA ecosystem.
 
 ## Deployment Options
 
 The table below lists the available deployment options and their implementation details for different hardware platforms.
 
-| Platform     | Deployment Method | Link                                                              |
-| ------------ | ----------------- | ----------------------------------------------------------------- |
-| Intel Xeon   | Docker compose    | [Deployment on Xeon](./docker_compose/intel/cpu/xeon/README.md)   |
-| Intel Gaudi2 | Docker compose    | [Deployment on Gaudi](./docker_compose/intel/hpu/gaudi/README.md) |
-| AMD ROCm     | Docker compose    | [Deployment on AMD Rocm](./docker_compose/amd/gpu/rocm/README.md) |
+| Category               | Deployment Option      | Description                                                    |
+| ---------------------- | ---------------------- | -------------------------------------------------------------- |
+| On-premise Deployments | Docker Compose (Xeon)  | [DocSum deployment on Xeon](./docker_compose/intel/cpu/xeon)   |
+|                        | Docker Compose (Gaudi) | [DocSum deployment on Gaudi](./docker_compose/intel/hpu/gaudi) |
+|                        | Docker Compose (ROCm)  | [DocSum deployment on AMD ROCm](./docker_compose/amd/gpu/rocm) |

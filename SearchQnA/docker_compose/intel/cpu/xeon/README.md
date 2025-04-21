@@ -114,7 +114,7 @@ docker compose -f compose.yaml down
 
 ## SearchQnA Docker Compose Files
 
-In the context of deploying a SearchQnA pipeline on an Intel® Xeon® platform, we can pick and choose different large language model serving frameworks. The table below outlines the various configurations that are available as part of the application. These configurations can be used as templates and can be extended to different components available in [GenAIComps](https://github.com/opea-project/GenAIComps.git).
+When deploying a SearchQnA pipeline on an Intel® Xeon® platform, different large language model serving frameworks can be selected. The table below outlines the available configurations included in the application. These configurations can serve as templates and be extended to other components available in [GenAIComps](https://github.com/opea-project/GenAIComps.git).
 
 | File                           | Description                                                                       |
 | ------------------------------ | --------------------------------------------------------------------------------- |
