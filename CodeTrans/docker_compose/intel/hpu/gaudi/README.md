@@ -2,7 +2,7 @@
 
 This document outlines the single node deployment process for a CodeTrans application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservices on Intel Gaudi server. The steps include pulling Docker images, container deployment via Docker Compose, and service execution using microservices `llm`.
 
-# Table of Contents
+## Table of Contents
 
 1. [CodeTrans Quick Start Deployment](#codetrans-quick-start-deployment)
 2. [CodeTrans Docker Compose Files](#codetrans-docker-compose-files)
