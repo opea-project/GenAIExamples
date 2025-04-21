@@ -52,7 +52,7 @@ echo "::endgroup::=================== Stop containers completed ================
 cd $WORKPATH/tests
 
 echo "::group::=================== #1 Building docker images===================="
-bash step1_build_images.sh rocm
+bash step1_build_images.sh rocm > docker_image_build.log
 echo "::endgroup::=================== #1 Building docker images completed===================="
 
 echo "::group::=================== #2 Start retrieval tool===================="

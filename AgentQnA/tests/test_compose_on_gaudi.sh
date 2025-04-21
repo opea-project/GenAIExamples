@@ -89,7 +89,7 @@ echo "::endgroup::"
 cd $WORKPATH/tests
 
 echo "::group::=================== #1 Building docker images===================="
-bash step1_build_images.sh gaudi_vllm
+bash step1_build_images.sh gaudi_vllm > docker_image_build.log
 echo "::endgroup::"
 
 echo "::endgroup::=================== #4 Start agent, API server, retrieval, and ingest data===================="

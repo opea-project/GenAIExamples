@@ -5,7 +5,6 @@
 set -e
 
 WORKPATH=$(dirname "$PWD")
-export LOG_PATH=${WORKPATH}
 export WORKDIR=${WORKPATH}/../../
 echo "WORKDIR=${WORKDIR}"
 export ip_address=$(hostname -I | awk '{print $1}')
@@ -47,7 +46,7 @@ echo "::endgroup::"
 cd $WORKPATH/tests
 
 echo "::group::=================== #1 Building docker images===================="
-bash step1_build_images.sh rocm_vllm
+bash step1_build_images.sh rocm_vllm > docker_image_build.log
 echo "::endgroup::=================== #1 Building docker images completed===================="
 
 echo "::group::=================== #2 Start retrieval tool===================="
