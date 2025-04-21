@@ -94,10 +94,6 @@ function main() {
             ;;
     esac
 
-    echo "==================== Build agent docker image ===================="
-    build_agent_docker_image
-    echo "==================== Build agent docker image completed ===================="
-
     docker image ls | grep vllm
 }
 
