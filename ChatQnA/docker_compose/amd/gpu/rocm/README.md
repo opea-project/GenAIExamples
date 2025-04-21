@@ -97,109 +97,175 @@ After running docker compose, check if all the containers launched via docker co
 docker ps -a
 ```
 
-For the default deployment, the following 5 containers should have started:
+For the default deployment with TGI, the following 9 containers should have started:
 
 ```
-1c67e44c39d2   opea/chatqna-ui:latest   "docker-entrypoint.s…"   About a minute ago   Up About a minute             0.0.0.0:5173->5173/tcp, :::5173->5173/tcp   audioqna-xeon-ui-server
-833a42677247   opea/chatqna:latest      "python audioqna.py"     About a minute ago   Up About a minute             0.0.0.0:3008->8888/tcp, :::3008->8888/tcp   audioqna-xeon-backend-server
-5dc4eb9bf499   opea/speecht5:latest      "python speecht5_ser…"   About a minute ago   Up About a minute             0.0.0.0:7055->7055/tcp, :::7055->7055/tcp   speecht5-service
-814e6efb1166   opea/vllm:latest          "python3 -m vllm.ent…"   About a minute ago   Up About a minute (healthy)   0.0.0.0:3006->80/tcp, :::3006->80/tcp       vllm-service
-46f7a00f4612   opea/whisper:latest       "python whisper_serv…"   About a minute ago   Up About a minute             0.0.0.0:7066->7066/tcp, :::7066->7066/tcp   whisper-service
+CONTAINER ID   IMAGE                                                   COMMAND                  CREATED          STATUS                    PORTS                                                                                      NAMES
+eaf24161aca8   opea/nginx:latest                                       "/docker-entrypoint.…"   37 seconds ago   Up 5 seconds              0.0.0.0:18104->80/tcp, [::]:18104->80/tcp                                                  chaqna-nginx-server
+2fce48a4c0f4   opea/chatqna-ui:latest                                  "docker-entrypoint.s…"   37 seconds ago   Up 5 seconds              0.0.0.0:18101->5173/tcp, [::]:18101->5173/tcp                                              chatqna-ui-server
+613c384979f4   opea/chatqna:latest                                     "bash entrypoint.sh"     37 seconds ago   Up 5 seconds              0.0.0.0:18102->8888/tcp, [::]:18102->8888/tcp                                              chatqna-backend-server
+05512bd29fee   opea/dataprep:latest                                    "sh -c 'python $( [ …"   37 seconds ago   Up 36 seconds (healthy)   0.0.0.0:18103->5000/tcp, [::]:18103->5000/tcp                                              chatqna-dataprep-service
+49844d339d1d   opea/retriever:latest                                   "python opea_retriev…"   37 seconds ago   Up 36 seconds             0.0.0.0:7000->7000/tcp, [::]:7000->7000/tcp                                                chatqna-retriever
+75b698fe7de0   ghcr.io/huggingface/text-embeddings-inference:cpu-1.5   "text-embeddings-rou…"   37 seconds ago   Up 36 seconds             0.0.0.0:18808->80/tcp, [::]:18808->80/tcp                                                  chatqna-tei-reranking-service
+342f01bfdbb2   ghcr.io/huggingface/text-generation-inference:2.3.1-rocm"python3 /workspace/…"   37 seconds ago   Up 36 seconds             0.0.0.0:18008->8011/tcp, [::]:18008->8011/tcp                                              chatqna-tgi-service
+6081eb1c119d   redis/redis-stack:7.2.0-v9                              "/entrypoint.sh"         37 seconds ago   Up 36 seconds             0.0.0.0:6379->6379/tcp, [::]:6379->6379/tcp, 0.0.0.0:8001->8001/tcp, [::]:8001->8001/tcp   chatqna-redis-vector-db
+eded17420782   ghcr.io/huggingface/text-embeddings-inference:cpu-1.5   "text-embeddings-rou…"   37 seconds ago   Up 36 seconds             0.0.0.0:18090->80/tcp, [::]:18090->80/tcp                                                  chatqna-tei-embedding-service
+```
+
+if used TGI with FaqGen:
+```
+CONTAINER ID   IMAGE                                                   COMMAND                  CREATED          STATUS                    PORTS                                                                                      NAMES
+eaf24161aca8   opea/nginx:latest                                       "/docker-entrypoint.…"   37 seconds ago   Up 5 seconds              0.0.0.0:18104->80/tcp, [::]:18104->80/tcp                                                  chaqna-nginx-server
+2fce48a4c0f4   opea/chatqna-ui:latest                                  "docker-entrypoint.s…"   37 seconds ago   Up 5 seconds              0.0.0.0:18101->5173/tcp, [::]:18101->5173/tcp                                              chatqna-ui-server
+613c384979f4   opea/chatqna:latest                                     "bash entrypoint.sh"     37 seconds ago   Up 5 seconds              0.0.0.0:18102->8888/tcp, [::]:18102->8888/tcp                                              chatqna-backend-server
+e0ef1ea67640   opea/llm-faqgen:latest                                  "bash entrypoint.sh"     37 seconds ago   Up 36 seconds             0.0.0.0:18011->9000/tcp, [::]:18011->9000/tcp                                              chatqna-llm-faqgen
+05512bd29fee   opea/dataprep:latest                                    "sh -c 'python $( [ …"   37 seconds ago   Up 36 seconds (healthy)   0.0.0.0:18103->5000/tcp, [::]:18103->5000/tcp                                              chatqna-dataprep-service
+49844d339d1d   opea/retriever:latest                                   "python opea_retriev…"   37 seconds ago   Up 36 seconds             0.0.0.0:7000->7000/tcp, [::]:7000->7000/tcp                                                chatqna-retriever
+75b698fe7de0   ghcr.io/huggingface/text-embeddings-inference:cpu-1.5   "text-embeddings-rou…"   37 seconds ago   Up 36 seconds             0.0.0.0:18808->80/tcp, [::]:18808->80/tcp                                                  chatqna-tei-reranking-service
+342f01bfdbb2   ghcr.io/huggingface/text-generation-inference:2.3.1-rocm"python3 /workspace/…"   37 seconds ago   Up 36 seconds             0.0.0.0:18008->8011/tcp, [::]:18008->8011/tcp                                              chatqna-tgi-service
+6081eb1c119d   redis/redis-stack:7.2.0-v9                              "/entrypoint.sh"         37 seconds ago   Up 36 seconds             0.0.0.0:6379->6379/tcp, [::]:6379->6379/tcp, 0.0.0.0:8001->8001/tcp, [::]:8001->8001/tcp   chatqna-redis-vector-db
+eded17420782   ghcr.io/huggingface/text-embeddings-inference:cpu-1.5   "text-embeddings-rou…"   37 seconds ago   Up 36 seconds             0.0.0.0:18090->80/tcp, [::]:18090->80/tcp                                                  chatqna-tei-embedding-service
+```
+
+if used vLLM:
+```
+CONTAINER ID   IMAGE                                                   COMMAND                  CREATED          STATUS                    PORTS                                                                                      NAMES
+eaf24161aca8   opea/nginx:latest                                       "/docker-entrypoint.…"   37 seconds ago   Up 5 seconds              0.0.0.0:18104->80/tcp, [::]:18104->80/tcp                                                  chaqna-nginx-server
+2fce48a4c0f4   opea/chatqna-ui:latest                                  "docker-entrypoint.s…"   37 seconds ago   Up 5 seconds              0.0.0.0:18101->5173/tcp, [::]:18101->5173/tcp                                              chatqna-ui-server
+613c384979f4   opea/chatqna:latest                                     "bash entrypoint.sh"     37 seconds ago   Up 5 seconds              0.0.0.0:18102->8888/tcp, [::]:18102->8888/tcp                                              chatqna-backend-server
+05512bd29fee   opea/dataprep:latest                                    "sh -c 'python $( [ …"   37 seconds ago   Up 36 seconds (healthy)   0.0.0.0:18103->5000/tcp, [::]:18103->5000/tcp                                              chatqna-dataprep-service
+49844d339d1d   opea/retriever:latest                                   "python opea_retriev…"   37 seconds ago   Up 36 seconds             0.0.0.0:7000->7000/tcp, [::]:7000->7000/tcp                                                chatqna-retriever
+75b698fe7de0   ghcr.io/huggingface/text-embeddings-inference:cpu-1.5   "text-embeddings-rou…"   37 seconds ago   Up 36 seconds             0.0.0.0:18808->80/tcp, [::]:18808->80/tcp                                                  chatqna-tei-reranking-service
+342f01bfdbb2   opea/vllm-rocm:latest                                   "python3 /workspace/…"   37 seconds ago   Up 36 seconds             0.0.0.0:18008->8011/tcp, [::]:18008->8011/tcp                                              chatqna-vllm-service
+6081eb1c119d   redis/redis-stack:7.2.0-v9                              "/entrypoint.sh"         37 seconds ago   Up 36 seconds             0.0.0.0:6379->6379/tcp, [::]:6379->6379/tcp, 0.0.0.0:8001->8001/tcp, [::]:8001->8001/tcp   chatqna-redis-vector-db
+eded17420782   ghcr.io/huggingface/text-embeddings-inference:cpu-1.5   "text-embeddings-rou…"   37 seconds ago   Up 36 seconds             0.0.0.0:18090->80/tcp, [::]:18090->80/tcp                                                  chatqna-tei-embedding-service
+```
+
+if used vLLM with FaqGen:
+```
+CONTAINER ID   IMAGE                                                   COMMAND                  CREATED          STATUS                    PORTS                                                                                      NAMES
+eaf24161aca8   opea/nginx:latest                                       "/docker-entrypoint.…"   37 seconds ago   Up 5 seconds              0.0.0.0:18104->80/tcp, [::]:18104->80/tcp                                                  chaqna-nginx-server
+2fce48a4c0f4   opea/chatqna-ui:latest                                  "docker-entrypoint.s…"   37 seconds ago   Up 5 seconds              0.0.0.0:18101->5173/tcp, [::]:18101->5173/tcp                                              chatqna-ui-server
+613c384979f4   opea/chatqna:latest                                     "bash entrypoint.sh"     37 seconds ago   Up 5 seconds              0.0.0.0:18102->8888/tcp, [::]:18102->8888/tcp                                              chatqna-backend-server
+e0ef1ea67640   opea/llm-faqgen:latest                                  "bash entrypoint.sh"     37 seconds ago   Up 36 seconds             0.0.0.0:18011->9000/tcp, [::]:18011->9000/tcp                                              chatqna-llm-faqgen
+05512bd29fee   opea/dataprep:latest                                    "sh -c 'python $( [ …"   37 seconds ago   Up 36 seconds (healthy)   0.0.0.0:18103->5000/tcp, [::]:18103->5000/tcp                                              chatqna-dataprep-service
+49844d339d1d   opea/retriever:latest                                   "python opea_retriev…"   37 seconds ago   Up 36 seconds             0.0.0.0:7000->7000/tcp, [::]:7000->7000/tcp                                                chatqna-retriever
+75b698fe7de0   ghcr.io/huggingface/text-embeddings-inference:cpu-1.5   "text-embeddings-rou…"   37 seconds ago   Up 36 seconds             0.0.0.0:18808->80/tcp, [::]:18808->80/tcp                                                  chatqna-tei-reranking-service
+342f01bfdbb2   opea/vllm-rocm:latest                                   "python3 /workspace/…"   37 seconds ago   Up 36 seconds             0.0.0.0:18008->8011/tcp, [::]:18008->8011/tcp                                              chatqna-vllm-service
+6081eb1c119d   redis/redis-stack:7.2.0-v9                              "/entrypoint.sh"         37 seconds ago   Up 36 seconds             0.0.0.0:6379->6379/tcp, [::]:6379->6379/tcp, 0.0.0.0:8001->8001/tcp, [::]:8001->8001/tcp   chatqna-redis-vector-db
+eded17420782   ghcr.io/huggingface/text-embeddings-inference:cpu-1.5   "text-embeddings-rou…"   37 seconds ago   Up 36 seconds             0.0.0.0:18090->80/tcp, [::]:18090->80/tcp                                                  chatqna-tei-embedding-service
 ```
 
 If any issues are encountered during deployment, refer to the [Troubleshooting](../../../../README_miscellaneous.md#troubleshooting) section.
 
 ### Validate the Pipeline
 
-Once the AudioQnA services are running, test the pipeline using the following command:
+Once the ChatQnA services are running, test the pipeline using the following command:
 
 ```bash
-# Test the AudioQnA megaservice by recording a .wav file, encoding the file into the base64 format, and then sending the base64 string to the megaservice endpoint.
-# The megaservice will return a spoken response as a base64 string. To listen to the response, decode the base64 string and save it as a .wav file.
-wget https://github.com/intel/intel-extension-for-transformers/raw/refs/heads/main/intel_extension_for_transformers/neural_chat/assets/audio/sample_2.wav
-base64_audio=$(base64 -w 0 sample_2.wav)
-
-# if you are using speecht5 as the tts service, voice can be "default" or "male"
-# if you are using gpt-sovits for the tts service, you can set the reference audio following https://github.com/opea-project/GenAIComps/blob/main/comps/third_parties/gpt-sovits/src/README.md
-
-curl http://${host_ip}:3008/v1/audioqna \
-  -X POST \
+curl http://${HOST_IP}:${CHATQNA_BACKEND_SERVICE_PORT}/v1/chatqna \
   -H "Content-Type: application/json" \
-  -d "{\"audio\": \"${base64_audio}\", \"max_tokens\": 64, \"voice\": \"default\"}" \
-  | sed 's/^"//;s/"$//' | base64 -d > output.wav
+  -d '{"messages": "What is the revenue of Nike in 2023?"}'
 ```
 
-**Note** : Access the AudioQnA UI by web browser through this URL: `http://${host_ip}:5173`. Please confirm the `5173` port is opened in the firewall. To validate each microservice used in the pipeline refer to the [Validate Microservices](#validate-microservices) section.
+**Note** : Access the ChatQnA UI by web browser through this URL: `http://${HOST_IP_EXTERNAL}:${CHATQNA_NGINX_PORT}`
 
 ### Cleanup the Deployment
 
 To stop the containers associated with the deployment, execute the following command:
 
 ```bash
+# if used TGI
 docker compose -f compose.yaml down
+# if used TGI with FaqGen
+# docker compose -f compose_faqgen.yaml down
+# if used vLLM
+# docker compose -f compose_vllm.yaml down
+# if used vLLM with FaqGen
+# docker compose -f compose_faqgen_vllm.yaml down
+
+
 ```
 
-## AudioQnA Docker Compose Files
+## ChatQnA Docker Compose Files
 
 In the context of deploying an AudioQnA pipeline on an Intel® Xeon® platform, we can pick and choose different large language model serving frameworks, or single English TTS/multi-language TTS component. The table below outlines the various configurations that are available as part of the application. These configurations can be used as templates and can be extended to different components available in [GenAIComps](https://github.com/opea-project/GenAIComps.git).
 
-| File                                               | Description                                                                               |
-| -------------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| [compose.yaml](./compose.yaml)                     | Default compose file using vllm as serving framework and redis as vector database         |
-| [compose_tgi.yaml](./compose_tgi.yaml)             | The LLM serving framework is TGI. All other configurations remain the same as the default |
-| [compose_multilang.yaml](./compose_multilang.yaml) | The TTS component is GPT-SoVITS. All other configurations remain the same as the default  |
+| File                                                   | Description                                                                                                              |
+|--------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
+| [compose.yaml](./compose.yaml)                         | The LLM serving framework is TGI. Default compose file using TGI as serving framework and redis as vector database       |
+| [compose_faqgen.yaml](./compose_faqgen.yaml)           | The LLM serving framework is TGI with FaqGen. All other configurations remain the same as the default                    |
+| [compose_vllm.yaml](./compose_vllm.yaml)               | The LLM serving framework is vLLM. Compose file using vllm as serving framework and redis as vector database             |
+| [compose_faqgen_vllm.yaml](./compose_faqgen_vllm.yaml) | The LLM serving framework is vLLM with FaqGen. Compose file using vllm as serving framework and redis as vector database |
 
 ## Validate MicroServices
 
-1. Whisper Service
+1. TEI Embedding Service
 
    ```bash
-   wget https://github.com/intel/intel-extension-for-transformers/raw/main/intel_extension_for_transformers/neural_chat/assets/audio/sample.wav
-   curl http://${host_ip}:${WHISPER_SERVER_PORT}/v1/audio/transcriptions \
-     -H "Content-Type: multipart/form-data" \
-     -F file="@./sample.wav" \
-     -F model="openai/whisper-small"
+   curl http://${HOST_IP}:${CHATQNA_TEI_EMBEDDING_PORT}/embed \
+   -X POST \
+   -d '{"inputs":"What is Deep Learning?"}' \
+   -H 'Content-Type: application/json'
    ```
 
-2. LLM backend Service
-
-   In the first startup, this service will take more time to download, load and warm up the model. After it's finished, the service will be ready and the container (`vllm-service` or `tgi-service`) status shown via `docker ps` will be `healthy`. Before that, the status will be `health: starting`.
-
-   Or try the command below to check whether the LLM serving is ready.
+2. Retriever Microservice
 
    ```bash
-   # vLLM service
-   docker logs vllm-service 2>&1 | grep complete
-   # If the service is ready, you will get the response like below.
-   INFO:     Application startup complete.
-   ```
-
-   ```bash
-   # TGI service
-   docker logs tgi-service | grep Connected
-   # If the service is ready, you will get the response like below.
-   2024-09-03T02:47:53.402023Z  INFO text_generation_router::server: router/src/server.rs:2311: Connected
-   ```
-
-   Then try the `cURL` command below to validate services.
-
-   ```bash
-   # either vLLM or TGI service
-   curl http://${host_ip}:${LLM_SERVER_PORT}/v1/chat/completions \
+   export your_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
+   curl http://${HOST_IP}:${CHATQNA_REDIS_RETRIEVER_PORT}/v1/retrieval \
      -X POST \
-     -d '{"model": "meta-llama/Meta-Llama-3-8B-Instruct", "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens":17}' \
+     -d "{\"text\":\"test\",\"embedding\":${your_embedding}}" \
+     -H 'Content-Type: application/json'
+   ```
+3. TEI Reranking Service
+
+   ```bash
+   curl http://${HOST_IP}:${CHATQNA_TEI_RERANKING_PORT}/rerank \
+   -X POST \
+   -d '{"query":"What is Deep Learning?", "texts": ["Deep Learning is not...", "Deep learning is..."]}' \
+   -H 'Content-Type: application/json'
+   ```
+
+4. vLLM/TGI Service
+
+   If you use vLLM:
+   
+   ```bash
+   DATA='{"model": "meta-llama/Meta-Llama-3-8B-Instruct", '\
+   '"messages": [{"role": "user", "content": "What is a Deep Learning?"}], "max_tokens": 64}'
+   
+   curl http://${HOST_IP}:${CHATQNA_VLLM_SERVICE_PORT}/v1/chat/completions \
+     -X POST \
+     -d "$DATA" \
      -H 'Content-Type: application/json'
    ```
 
-3. TTS Service
+   If you use TGI:
 
    ```bash
-   # speecht5 service
-   curl http://${host_ip}:${SPEECHT5_SERVER_PORT}/v1/audio/speech -XPOST -d '{"input": "Who are you?"}' -H 'Content-Type: application/json' --output speech.mp3
-
-   # gpt-sovits service (optional)
-   curl http://${host_ip}:${GPT_SOVITS_SERVER_PORT}/v1/audio/speech -XPOST -d '{"input": "Who are you?"}' -H 'Content-Type: application/json' --output speech.mp3
+   DATA='{"inputs":"What is a Deep Learning?",'\
+   '"parameters":{"max_new_tokens":64,"do_sample": true}}'
+   
+   curl http://${HOST_IP}:${CHATQNA_TGI_SERVICE_PORT}/generate \
+   -X POST \
+   -d "$DATA" \
+   -H 'Content-Type: application/json'
    ```
+
+5. LLM Service (if your used application with FaqGen)
+
+   ```bash
+   DATA='{"messages":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source '\
+   'text embeddings and sequence classification models. TEI enables high-performance extraction for the most '\
+   'popular models, including FlagEmbedding, Ember, GTE and E5.","max_tokens": 128}'
+   
+   curl http://${HOST_IP}:${CHATQNA_LLM_FAQGEN_PORT}/v1/faqgen \
+     -X POST \
+     -d "$DATA" \
+     -H 'Content-Type: application/json'
+   ```
+
 
 ## Conclusion
 
