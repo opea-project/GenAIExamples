@@ -46,6 +46,22 @@ To set up environment variables for deploying ChatQnA services, set up some para
 - if used TGI - set_env.sh
 - if used TGI with FaqGen - set_env_faqgen.sh
 
+Set the values of the variables:
+
+- **HOST_IP, HOST_IP_EXTERNAL** - These variables are used to configure the name/address of the service in the operating system environment for the application services to interact with each other and with the outside world.
+
+  If your server uses only an internal address and is not accessible from the Internet, then the values for these two variables will be the same and the value will be equal to the server's internal name/address.
+
+  If your server uses only an external, Internet-accessible address, then the values for these two variables will be the same and the value will be equal to the server's external name/address.
+
+  If your server is located on an internal network, has an internal address, but is accessible from the Internet via a proxy/firewall/load balancer, then the HOST_IP variable will have a value equal to the internal name/address of the server, and the EXTERNAL_HOST_IP variable will have a value equal to the external name/address of the proxy/firewall/load balancer behind which the server is located.
+
+  We set these values in the file set_env\*\*\*\*.sh
+
+- **Variables with names like "**\*\*\*\*\*\*\_PORT"\*\* - These variables set the IP port numbers for establishing network connections to the application services.
+  The values shown in the file set_env.sh or set_env_vllm they are the values used for the development and testing of the application, as well as configured for the environment in which the development is performed. These values must be configured in accordance with the rules of network access to your environment's server, and must not overlap with the IP ports of other applications that are already in use.
+
+Setting variables in the operating system environment:
 ```bash
 export HUGGINGFACEHUB_API_TOKEN="Your_HuggingFace_API_Token"
 source ./set_env_*.sh # replace the script name with the appropriate one
@@ -67,9 +83,46 @@ docker compose -f compose.yaml up -d
 # docker compose -f compose_vllm.yaml up -d
 # if used vLLM with FaqGen
 # docker compose -f compose_faqgen_vllm.yaml up -d
-
-
 ```
+
+To enable GPU support for AMD GPUs, the following configuration is added to the Docker Compose file:
+
+- compose_vllm.yaml - for vLLM-based application
+- compose_faqgen_vllm.yaml - for vLLM-based application with FaqGen
+- compose.yaml - for TGI-based
+- compose_faqgen.yaml - for TGI-based application with FaqGen
+
+```yaml
+shm_size: 1g
+devices:
+  - /dev/kfd:/dev/kfd
+  - /dev/dri:/dev/dri
+cap_add:
+  - SYS_PTRACE
+group_add:
+  - video
+security_opt:
+  - seccomp:unconfined
+```
+
+This configuration forwards all available GPUs to the container. To use a specific GPU, specify its `cardN` and `renderN` device IDs. For example:
+
+```yaml
+shm_size: 1g
+devices:
+  - /dev/kfd:/dev/kfd
+  - /dev/dri/card0:/dev/dri/card0
+  - /dev/dri/render128:/dev/dri/render128
+cap_add:
+  - SYS_PTRACE
+group_add:
+  - video
+security_opt:
+  - seccomp:unconfined
+```
+
+**How to Identify GPU Device IDs:**
+Use AMD GPU driver utilities to determine the correct `cardN` and `renderN` IDs for your GPU.
 
 > **Note**: developers should build docker image from source when:
 >
