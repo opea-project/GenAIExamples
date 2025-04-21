@@ -4,7 +4,7 @@ This document outlines the single node deployment process for a AudioQnA applica
 
 Note: The default LLM is `meta-llama/Meta-Llama-3-8B-Instruct`. Before deploying the application, please make sure either you've requested and been granted the access to it on [Huggingface](https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct) or you've downloaded the model locally from [ModelScope](https://www.modelscope.cn/models).
 
-# Table of Contents
+## Table of Contents
 
 1. [AudioQnA Quick Start Deployment](#audioqna-quick-start-deployment)
 2. [AudioQnA Docker Compose Files](#audioqna-docker-compose-files)
