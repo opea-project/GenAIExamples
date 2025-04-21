@@ -1,0 +1,136 @@
+.header {
+  height: var(--header-height);
+  backdrop-filter: blur(5px);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
+  padding: var(--header-gutter);
+  position: relative;
+  z-index: 999;
+}
+
+.viewContext {
+  display: inline-flex;
+  max-width: 200px;
+
+  &.titleWrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    :global {
+      svg {
+        min-width: 30px;
+      }
+    }
+  }
+
+  &.capitalize {
+    text-transform: capitalize;
+  }
+
+  @media screen and (max-width: 900px) {
+    display: none;
+
+    &.titleWrap {
+      display: none;
+    }
+  }
+}
+
+.sideWrapper {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 999;
+  width: 50px;
+  margin-right: calc(var(--header-gutter) * 2);
+  min-width: 0px;
+  max-width: var(--sidebar-width);
+  transition:
+    width 0.3s,
+    min-width 0.3s;
+
+  .chatCopy {
+    opacity: 0;
+    max-width: 0;
+    transition:
+      opacity 0.3s,
+      max-width 0.3s;
+    font-size: 0.75rem;
+    margin-right: 0.5rem;
+    white-space: nowrap;
+  }
+
+  .chatWrapper {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
+
+  &.sideWrapperOpen {
+    width: calc(var(--sidebar-width) - (var(--header-gutter) * 2));
+    min-width: calc(var(--sidebar-width) - (var(--header-gutter) * 2));
+
+    .chatCopy {
+      max-width: 100px; // enough to show the text
+      opacity: 1;
+    }
+  }
+}
+
+.rightSide {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.rightActions {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.companyName {
+  font-weight: 600;
+  @media screen and (max-width: 899px) {
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+}
+
+.desktopUser {
+  display: none;
+  @media screen and (min-width: 900px) {
+    display: inline-block;
+  }
+}
+
+.accessDropDown {
+  :global {
+    .MuiList-root {
+      padding: 0;
+
+      .MuiButtonBase-root {
+        padding: 0;
+        margin-left: -10px;
+        padding: 0 10px;
+
+        .MuiListItemText-root {
+          margin: 0px;
+        }
+
+        .MuiTypography-root {
+          font-size: 12px !important;
+          font-style: italic;
+        }
+      }
+    }
+  }
+}

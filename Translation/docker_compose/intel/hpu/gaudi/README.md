@@ -1,161 +1,143 @@
-# Build MegaService of Translation on Gaudi
+# Example Translation Deployment on Intel® Gaudi® Platform
 
-This document outlines the deployment process for a Translation application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on Intel Gaudi server. The steps include Docker image creation, container deployment via Docker Compose, and service execution to integrate microservices such as We will publish the Docker images to Docker Hub, it will simplify the deployment process for this service.
+This document outlines the deployment process for a Translation service utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on Intel Gaudi server. This example includes the following sections:
 
-## 🚀 Prepare Docker Images
+- [Translation Quick Start Deployment](#translation-quick-start-deployment): Demonstrates how to quickly deploy a Translation service/pipeline on Intel® Gaudi® platform.
+- [Translation Docker Compose Files](#translation-docker-compose-files): Describes some example deployments and their docker compose files.
+- [Translation Service Configuration](#translation-service-configuration): Describes the service and possible configuration changes.
 
-For Docker Images, you have two options to prepare them.
+## Translation Quick Start Deployment
 
-1. Pull the docker images from docker hub.
+This section describes how to quickly deploy and test the Translation service manually on Intel® Gaudi® platform. The basic steps are:
 
-   - More stable to use.
-   - Will be automatically downloaded when using docker compose command.
+1. [Access the Code](#access-the-code)
+2. [Generate a HuggingFace Access Token](#generate-a-huggingface-access-token)
+3. [Configure the Deployment Environment](#configure-the-deployment-environment)
+4. [Deploy the Service Using Docker Compose](#deploy-the-service-using-docker-compose)
+5. [Check the Deployment Status](#check-the-deployment-status)
+6. [Test the Pipeline](#test-the-pipeline)
+7. [Cleanup the Deployment](#cleanup-the-deployment)
 
-2. Build the docker images from source.
+### Access the Code
 
-   - Contain the latest new features.
+Clone the GenAIExample repository and access the Translation Intel® Gaudi® platform Docker Compose files and supporting scripts:
 
-   - Need to be manually build.
-
-If you choose to pull docker images form docker hub, skip to [Start Microservices](#start-microservices) part directly.
-
-Follow the instructions below to build the docker images from source.
-
-### 1. Build LLM Image
-
-```bash
-git clone https://github.com/opea-project/GenAIComps.git
-cd GenAIComps
-docker build -t opea/llm-textgen:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/src/text-generation/Dockerfile .
+```
+git clone https://github.com/opea-project/GenAIExamples.git
+cd GenAIExamples/Translation/docker_compose/intel/hpu/gaudi/
 ```
 
-### 2. Build MegaService Docker Image
+Checkout a released version, such as v1.2:
 
-To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `translation.py` Python script. Build the MegaService Docker image using the command below:
-
-```bash
-git clone https://github.com/opea-project/GenAIExamples
-cd GenAIExamples/Translation
-docker build -t opea/translation:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
+```
+git checkout v1.2
 ```
 
-### 3. Build UI Docker Image
+### Generate a HuggingFace Access Token
 
-Construct the frontend Docker image using the command below:
+Some HuggingFace resources, such as some models, are only accessible if you have an access token. If you do not already have a HuggingFace access token, you can create one by first creating an account by following the steps provided at [HuggingFace](https://huggingface.co/) and then generating a [user access token](https://huggingface.co/docs/transformers.js/en/guides/private#step-1-generating-a-user-access-token).
 
-```bash
-cd GenAIExamples/Translation/ui/
-docker build -t opea/translation-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
+### Configure the Deployment Environment
+
+To set up environment variables for deploying Translation service, source the _set_env.sh_ script in this directory:
+
+```
+cd ../../../
+source set_env.sh
+cd intel/hpu/gaudi/
 ```
 
-### 4. Build Nginx Docker Image
+The set_env.sh script will prompt for required and optional environment variables used to configure the Translation service. If a value is not entered, the script will use a default value for the same. It will also generate a env file defining the desired configuration. Consult the section on [Translation Service configuration](#translation-service-configuration) for information on how service specific configuration parameters affect deployments.
 
-```bash
-cd GenAIComps
-docker build -t opea/nginx:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/third_parties/nginx/src/Dockerfile .
-```
+### Deploy the Service Using Docker Compose
 
-Then run the command `docker images`, you will have the following four Docker Images:
-
-1. `opea/llm-textgen:latest`
-2. `opea/translation:latest`
-3. `opea/translation-ui:latest`
-4. `opea/nginx:latest`
-
-## 🚀 Start Microservices
-
-### Required Models
-
-By default, the LLM model is set to a default value as listed below:
-
-| Service | Model             |
-| ------- | ----------------- |
-| LLM     | haoranxu/ALMA-13B |
-
-Change the `LLM_MODEL_ID` below for your needs.
-
-### Setup Environment Variables
-
-1. Set the required environment variables:
-
-   ```bash
-   # Example: host_ip="192.168.1.1"
-   export host_ip="External_Public_IP"
-   # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
-   export no_proxy="Your_No_Proxy"
-   export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
-   # Example: NGINX_PORT=80
-   export NGINX_PORT=${your_nginx_port}
-   ```
-
-2. If you are in a proxy environment, also set the proxy-related environment variables:
-
-   ```bash
-   export http_proxy="Your_HTTP_Proxy"
-   export https_proxy="Your_HTTPs_Proxy"
-   ```
-
-3. Set up other environment variables:
-
-   ```bash
-   cd ../../../
-   source set_env.sh
-   ```
-
-### Start Microservice Docker Containers
+To deploy the Translation service, execute the `docker compose up` command with the appropriate arguments. For a default deployment, execute:
 
 ```bash
 docker compose up -d
 ```
 
-> Note: The docker images will be automatically downloaded from `docker hub`:
+The Translation docker images should automatically be downloaded from the `OPEA registry` and deployed on the Intel® Gaudi® Platform:
 
-```bash
-docker pull opea/llm-textgen:latest
-docker pull opea/translation:latest
-docker pull opea/translation-ui:latest
-docker pull opea/nginx:latest
+```
+[+] Running 5/5
+ ✔ Container tgi-gaudi-server                  Healthy                                                          222.4s
+ ✔ Container llm-textgen-gaudi-server          Started                                                          221.7s
+ ✔ Container translation-gaudi-backend-server  Started                                                          222.0s
+ ✔ Container translation-gaudi-ui-server       Started                                                          222.2s
+ ✔ Container translation-gaudi-nginx-server    Started                                                          222.6s
 ```
 
-### Validate Microservices
+### Check the Deployment Status
 
-1. TGI Service
+After running docker compose, check if all the containers launched via docker compose have started:
 
-   ```bash
-   curl http://${host_ip}:8008/generate \
-     -X POST \
-     -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":64, "do_sample": true}}' \
-     -H 'Content-Type: application/json'
-   ```
+```
+docker ps -a
+```
 
-2. LLM Microservice
+For the default deployment, the following 5 containers should be running:
 
-   ```bash
-   curl http://${host_ip}:9000/v1/chat/completions \
-     -X POST \
-     -d '{"query":"Translate this from Chinese to English:\nChinese: 我爱机器翻译。\nEnglish:"}' \
-     -H 'Content-Type: application/json'
-   ```
+```
+CONTAINER ID   IMAGE                                 COMMAND                  CREATED         STATUS                   PORTS                                       NAMES
+097f577b3a53   opea/nginx:latest                     "/docker-entrypoint.…"   5 minutes ago   Up About a minute        0.0.0.0:80->80/tcp, :::80->80/tcp           translation-gaudi-nginx-server
+0578b7034af3   opea/translation-ui:latest            "docker-entrypoint.s…"   5 minutes ago   Up About a minute        0.0.0.0:5173->5173/tcp, :::5173->5173/tcp   translation-gaudi-ui-server
+bc23dd5b9cb0   opea/translation:latest               "python translation.…"   5 minutes ago   Up About a minute        0.0.0.0:8888->8888/tcp, :::8888->8888/tcp   translation-gaudi-backend-server
+2cf6fabaa7c7   opea/llm-textgen:latest               "bash entrypoint.sh"     5 minutes ago   Up About a minute        0.0.0.0:9000->9000/tcp, :::9000->9000/tcp   llm-textgen-gaudi-server
+f4764d0c1817   ghcr.io/huggingface/tgi-gaudi:2.3.1   "/tgi-entrypoint.sh …"   5 minutes ago   Up 5 minutes (healthy)   0.0.0.0:8008->80/tcp, [::]:8008->80/tcp     tgi-gaudi-server
+```
 
-3. MegaService
+### Test the Pipeline
 
-   ```bash
-   curl http://${host_ip}:8888/v1/translation -H "Content-Type: application/json" -d '{
-        "language_from": "Chinese","language_to": "English","source_language": "我爱机器翻译。"}'
-   ```
+Once the Translation service are running, test the pipeline using the following command:
 
-4. Nginx Service
+```bash
+curl http://${host_ip}:8888/v1/translation -H "Content-Type: application/json" -d '{
+     "language_from": "Chinese","language_to": "English","source_language": "我爱机器翻译。"}'
+```
 
-   ```bash
-   curl http://${host_ip}:${NGINX_PORT}/v1/translation \
-       -H "Content-Type: application/json" \
-       -d '{"language_from": "Chinese","language_to": "English","source_language": "我爱机器翻译。"}'
-   ```
+**Note** The value of _host_ip_ was set using the _set_env.sh_ script and can be found in the _.env_ file.
 
-Following the validation of all aforementioned microservices, we are now prepared to construct a mega-service.
+### Cleanup the Deployment
 
-## 🚀 Launch the UI
+To stop the containers associated with the deployment, execute the following command:
 
-Open this URL `http://{host_ip}:5173` in your browser to access the frontend.
-![project-screenshot](../../../../assets/img/trans_ui_init.png)
-![project-screenshot](../../../../assets/img/trans_ui_select.png)
+```
+docker compose -f compose.yaml down
+```
+
+```
+[+] Running 6/6
+ ✔ Container translation-gaudi-nginx-server    Removed                                                                                                                                                10.5s
+ ✔ Container translation-gaudi-ui-server       Removed                                                                                                                                                10.3s
+ ✔ Container translation-gaudi-backend-server  Removed                                                                                                                                                10.4s
+ ✔ Container llm-textgen-gaudi-server          Removed                                                                                                                                                10.4s
+ ✔ Container tgi-gaudi-server                  Removed                                                                                                                                                12.0s
+ ✔ Network gaudi_default                       Removed                                                                                                                                                 0.4s
+```
+
+All the Translation containers will be stopped and then removed on completion of the "down" command.
+
+## Translation Docker Compose Files
+
+The compose.yaml is default compose file using tgi as serving framework
+
+| Service Name                     | Image Name                          |
+| -------------------------------- | ----------------------------------- |
+| tgi-service                      | ghcr.io/huggingface/tgi-gaudi:2.3.1 |
+| llm                              | opea/llm-textgen:latest             |
+| translation-gaudi-backend-server | opea/translation:latest             |
+| translation-gaudi-ui-server      | opea/translation-ui:latest          |
+| translation-gaudi-nginx-server   | opea/nginx:latest                   |
+
+## Translation Service Configuration
+
+The table provides a comprehensive overview of the Translation service utilized across various deployments as illustrated in the example Docker Compose files. Each row in the table represents a distinct service, detailing its possible images used to enable it and a concise description of its function within the deployment architecture.
+
+| Service Name                     | Possible Image Names                | Optional | Description                                                                                     |
+| -------------------------------- | ----------------------------------- | -------- | ----------------------------------------------------------------------------------------------- |
+| tgi-service                      | ghcr.io/huggingface/tgi-gaudi:2.3.1 | No       | Specific to the TGI deployment, focuses on text generation inference using Gaudi hardware.      |
+| llm                              | opea/llm-textgen:latest             | No       | Handles large language model (LLM) tasks                                                        |
+| translation-gaudi-backend-server | opea/translation:latest             | No       | Serves as the backend for the Translation service, with variations depending on the deployment. |
+| translation-gaudi-ui-server      | opea/translation-ui:latest          | No       | Provides the user interface for the Translation service.                                        |
+| translation-gaudi-nginx-server   | opea/nginx:latest                   | No       | Acts as a reverse proxy, managing traffic between the UI and backend services.                  |
