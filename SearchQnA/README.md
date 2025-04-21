@@ -16,7 +16,14 @@ Operating within the LangChain framework, the Google Search QnA chatbot mimics h
 
 By integrating search capabilities with LLMs within the LangChain framework, this Google Search QnA chatbot delivers comprehensive and precise answers, akin to human search behavior.
 
-The workflow falls into the following architecture:
+## Table of contents
+
+1. [Architecture](#architecture)
+2. [Deployment Options](#deployment-options)
+
+## Architecture
+
+The architecture of the SearchQnA Application is illustrated below:
 
 ![architecture](./assets/img/searchqna.png)
 
@@ -85,104 +92,14 @@ flowchart LR
 
 ```
 
-## Deploy SearchQnA Service
+This SearchQnA use case performs Search-augmented Question Answering across multiple platforms. Currently, we provide the example for Intel® Gaudi® 2 and Intel® Xeon® Scalable Processors, and we invite contributions from other hardware vendors to expand OPEA ecosystem.
 
-The SearchQnA service can be effortlessly deployed on either Intel Gaudi2 or Intel Xeon Scalable Processors.
+## Deployment Options
 
-Currently we support two ways of deploying SearchQnA services with docker compose:
+The table below lists the available deployment options and their implementation details for different hardware platforms.
 
-1. Start services using the docker image on `docker hub`:
-
-   ```bash
-   docker pull opea/searchqna:latest
-   ```
-
-2. Start services using the docker images `built from source`: [Guide](https://github.com/opea-project/GenAIExamples/tree/main/SearchQnA/docker_compose/)
-
-### Setup Environment Variable
-
-To set up environment variables for deploying SearchQnA services, follow these steps:
-
-1. Set the required environment variables:
-
-   ```bash
-   # Example: host_ip="192.168.1.1"
-   export host_ip="External_Public_IP"
-   # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
-   export no_proxy="Your_No_Proxy"
-   export GOOGLE_CSE_ID="Your_CSE_ID"
-   export GOOGLE_API_KEY="Your_Google_API_Key"
-   export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
-   ```
-
-2. If you are in a proxy environment, also set the proxy-related environment variables:
-
-   ```bash
-   export http_proxy="Your_HTTP_Proxy"
-   export https_proxy="Your_HTTPs_Proxy"
-   ```
-
-3. Set up other environment variables:
-
-   ```bash
-   source ./docker_compose/set_env.sh
-   ```
-
-### Deploy SearchQnA on Gaudi
-
-If your version of `Habana Driver` < 1.16.0 (check with `hl-smi`), run the following command directly to start SearchQnA services. Find the corresponding [compose.yaml](./docker_compose/intel/hpu/gaudi/compose.yaml).
-
-```bash
-cd GenAIExamples/SearchQnA/docker_compose/intel/hpu/gaudi/
-docker compose up -d
-```
-
-Refer to the [Gaudi Guide](./docker_compose/intel/hpu/gaudi/README.md) to build docker images from source.
-
-### Deploy SearchQnA on Xeon
-
-Find the corresponding [compose.yaml](./docker_compose/intel/cpu/xeon/compose.yaml).
-
-```bash
-cd GenAIExamples/SearchQnA/docker_compose/intel/cpu/xeon/
-docker compose up -d
-```
-
-Refer to the [Xeon Guide](./docker_compose/intel/cpu/xeon/README.md) for more instructions on building docker images from source.
-
-## Consume SearchQnA Service
-
-Two ways of consuming SearchQnA Service:
-
-1. Use cURL command on terminal
-
-   ```bash
-   curl http://${host_ip}:3008/v1/searchqna \
-       -H "Content-Type: application/json" \
-       -d '{
-           "messages": "What is the latest news? Give me also the source link.",
-           "stream": "True"
-       }'
-   ```
-
-2. Access via frontend
-
-   To access the frontend, open the following URL in your browser: http://{host_ip}:5173.
-
-   By default, the UI runs on port 5173 internally.
-
-## Troubleshooting
-
-1. If you get errors like "Access Denied", [validate micro service](https://github.com/opea-project/GenAIExamples/tree/main/ChatQnA/docker_compose/intel/cpu/xeon/README.md#validate-microservices) first. A simple example:
-
-   ```bash
-   http_proxy=""
-   curl http://${host_ip}:3001/embed \
-       -X POST \
-       -d '{"inputs":"What is Deep Learning?"}' \
-       -H 'Content-Type: application/json'
-   ```
-
-2. (Docker only) If all microservices work well, check the port ${host_ip}:3008, the port may be allocated by other users, you can modify the `compose.yaml`.
-
-3. (Docker only) If you get errors like "The container name is in use", change container name in `compose.yaml`.
+| Category               | Deployment Option      | Description                                                    |
+| ---------------------- | ---------------------- | -------------------------------------------------------------- |
+| On-premise Deployments | Docker Compose (Xeon)  | [DocSum deployment on Xeon](./docker_compose/intel/cpu/xeon)   |
+|                        | Docker Compose (Gaudi) | [DocSum deployment on Gaudi](./docker_compose/intel/hpu/gaudi) |
+|                        | Docker Compose (ROCm)  | [DocSum deployment on AMD ROCm](./docker_compose/amd/gpu/rocm) |
