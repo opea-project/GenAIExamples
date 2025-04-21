@@ -13,6 +13,7 @@ from kubernetes import client, config
 service_endpoints = {
     "chatqna": "/v1/chatqna",
     "docsum": "/v1/docsum",
+}
 
 def load_yaml(file_path):
     with open(file_path, "r") as f:
