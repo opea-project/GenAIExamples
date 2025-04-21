@@ -96,13 +96,13 @@ source ./set_env_vllm.sh
 
 Please refer to the table below to build different microservices from source:
 
-| Microservice | Deployment Guide                                                                              |
-| ------------ | --------------------------------------------------------------------------------------------- |
-| Dataprep     | https://github.com/opea-project/GenAIComps/tree/main/comps/dataprep                           |
-| Embedding    | https://github.com/opea-project/GenAIComps/tree/main/comps/embeddings                         |
-| Retriever    | https://github.com/opea-project/GenAIComps/tree/main/comps/retrievers                         |
-| Reranker     | https://github.com/opea-project/GenAIComps/tree/main/comps/rerankings                         |
-| LLM          | https://github.com/opea-project/GenAIComps/tree/main/comps/llms                               |
+| Microservice | Deployment Guide                                                                                 |
+| ------------ | ------------------------------------------------------------------------------------------------ |
+| Dataprep     | https://github.com/opea-project/GenAIComps/tree/main/comps/dataprep                              |
+| Embedding    | https://github.com/opea-project/GenAIComps/tree/main/comps/embeddings                            |
+| Retriever    | https://github.com/opea-project/GenAIComps/tree/main/comps/retrievers                            |
+| Reranker     | https://github.com/opea-project/GenAIComps/tree/main/comps/rerankings                            |
+| LLM          | https://github.com/opea-project/GenAIComps/tree/main/comps/llms                                  |
 | Megaservice  | [Megaservice build guide](../../../../../README_miscellaneous.md#build-megaservice-docker-image) |
 | UI           | [Basic UI build guide](../../../../../README_miscellaneous.md#build-ui-docker-image)             |
 
