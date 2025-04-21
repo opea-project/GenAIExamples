@@ -105,7 +105,7 @@ The `compose.yaml` file uses Docker Compose profiles to select the LLM serving b
 Key parameters are configured via environment variables set before running `docker compose up`.
 
 | Environment Variable                    | Description                                                                                                         | Default (Set Externally)                                                                         |
-|:----------------------------------------| :------------------------------------------------------------------------------------------------------------------ | :----------------------------------------------------------------------------------------------- |
+| :-------------------------------------- | :------------------------------------------------------------------------------------------------------------------ | :----------------------------------------------------------------------------------------------- |
 | `HOST_IP`                               | External IP address of the host machine. **Required.**                                                              | `your_external_ip_address`                                                                       |
 | `HUGGINGFACEHUB_API_TOKEN`              | Your Hugging Face Hub token for model access. **Required.**                                                         | `your_huggingface_token`                                                                         |
 | `LLM_MODEL_ID`                          | Hugging Face model ID for the CodeGen LLM (used by TGI/vLLM service). Configured within `compose.yaml` environment. | `Qwen/Qwen2.5-Coder-7B-Instruct`                                                                 |
@@ -118,6 +118,7 @@ Key parameters are configured via environment variables set before running `dock
 | `http_proxy` / `https_proxy`/`no_proxy` | Network proxy settings (if required).                                                                               | `""`                                                                                             |
 
 Most of these parameters are in `set_env.sh`, you can either modify this file or overwrite the env variables by setting them.
+
 ```shell
 source CodeGen/docker_compose/set_env.sh
 ```
