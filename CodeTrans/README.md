@@ -2,7 +2,7 @@
 
 Code translation is the process of converting code written in one programming language to another programming language while maintaining the same functionality. This process is also known as code conversion, source-to-source translation, or transpilation. Code translation is often performed when developers want to take advantage of new programming languages, improve code performance, or maintain legacy systems. Some common examples include translating code from Python to Java, or from JavaScript to TypeScript.
 
-# Table of Contents
+## Table of Contents
 
 1. [Architecture](#architecture)
 2. [Deployment Options](#deployment-options)
