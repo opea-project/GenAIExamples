@@ -2,6 +2,8 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+# ===== Deprecated =====
+
 set -xe
 USER_ID=$(whoami)
 LOG_PATH=/home/$(whoami)/logs

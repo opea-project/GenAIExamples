@@ -235,6 +235,17 @@ cd GenAIExamples/MultimodalQnA/docker_compose/intel/cpu/xeon/
 docker compose -f compose.yaml up -d
 ```
 
+> Alternatively, you can run docker compose with `compose_milvus.yaml` to use the Milvus vector database:
+
+```bash
+export MILVUS_HOST=${host_ip}
+export MILVUS_PORT=19530
+export MILVUS_RETRIEVER_PORT=7000
+export COLLECTION_NAME=mm_rag_milvus
+cd GenAIExamples/MultimodalQnA/docker_compose/intel/cpu/xeon/
+docker compose -f compose_milvus.yaml up -d
+```
+
 ### Validate Microservices
 
 1. embedding-multimodal-bridgetower

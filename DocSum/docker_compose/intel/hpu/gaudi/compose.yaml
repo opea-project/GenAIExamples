@@ -107,3 +107,6 @@ services:
 networks:
   default:
     driver: bridge
+
+volumes:
+  data:

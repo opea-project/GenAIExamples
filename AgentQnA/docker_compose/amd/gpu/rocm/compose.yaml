@@ -29,7 +29,7 @@ services:
     command: --model-id ${LLM_MODEL_ID} --max-input-length 4096 --max-total-tokens 8192
 
   worker-rag-agent:
-    image: opea/agent:latest
+    image: ${REGISTRY:-opea}/agent:${TAG:-latest}
     container_name: rag-agent-endpoint
     volumes:
       - "${TOOLSET_PATH}:/home/user/tools/"
@@ -60,7 +60,7 @@ services:
       port: 9095
 
   worker-sql-agent:
-    image: opea/agent:latest
+    image: ${REGISTRY:-opea}/agent:${TAG:-latest}
     container_name: sql-agent-endpoint
     volumes:
       - "${WORKDIR}/tests/Chinook_Sqlite.sqlite:/home/user/chinook-db/Chinook_Sqlite.sqlite:rw"
@@ -89,7 +89,7 @@ services:
       port: 9096
 
   supervisor-react-agent:
-    image: opea/agent:latest
+    image: ${REGISTRY:-opea}/agent:${TAG:-latest}
     container_name: react-agent-endpoint
     depends_on:
       - worker-rag-agent
