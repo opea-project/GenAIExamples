@@ -41,10 +41,10 @@ git checkout v1.2
 
 To set up environment variables for deploying ChatQnA services, set up some parameters specific to the deployment environment and source the `set_env_*.sh` script in this directory:
 
-if used vLLM - set_env_vllm.sh
-if used vLLM with FaqGen - set_env_faqgen_vllm.sh
-if used TGI - set_env.sh
-if used TGI with FaqGen - set_env_faqgen.sh
+- if used vLLM - set_env_vllm.sh
+- if used vLLM with FaqGen - set_env_faqgen_vllm.sh
+- if used TGI - set_env.sh
+- if used TGI with FaqGen - set_env_faqgen.sh
 
 ```bash
 export HUGGINGFACEHUB_API_TOKEN="Your_HuggingFace_API_Token"
@@ -79,15 +79,19 @@ docker compose -f compose.yaml up -d
 
 Please refer to the table below to build different microservices from source:
 
-| Microservice | Deployment Guide                                                                                                                  |
-| ------------ | --------------------------------------------------------------------------------------------------------------------------------- |
-| vLLM         | [vLLM build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/third_parties/vllm#build-docker)                    |
-| LLM          | [LLM build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/llms)                                                |
-| WHISPER      | [Whisper build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/asr/src#211-whisper-server-image)                |
-| SPEECHT5     | [SpeechT5 build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/tts/src#211-speecht5-server-image)              |
-| GPT-SOVITS   | [GPT-SOVITS build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/third_parties/gpt-sovits/src#build-the-image) |
-| MegaService  | [MegaService build guide](../../../../README_miscellaneous.md#build-megaservice-docker-image)                                     |
-| UI           | [Basic UI build guide](../../../../README_miscellaneous.md#build-ui-docker-image)                                                 |
+| Microservice    | Deployment Guide                                                                                                    |
+|-----------------|---------------------------------------------------------------------------------------------------------------------|
+| vLLM            | [vLLM build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/third_parties/vllm#build-docker)      |
+| TGI             | [TGI project](https://github.com/huggingface/text-generation-inference.git)                                         |
+| LLM             | [LLM build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/llms)                                  |
+| Redis Vector DB | [Redis](https://github.com/redis/redis.git)                                                                         |
+| Dataprep        | [Dataprep build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/dataprep/src/README_redis.md)     |
+| TEI Embedding   | [TEI guide](https://github.com/huggingface/text-embeddings-inference.git)                                           |
+| Retriever       | [Retriever build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/retrievers/src/README_redis.md ) |
+| TEI Reranking   | [TEI guide](https://github.com/huggingface/text-embeddings-inference.git)                                           |
+| MegaService     | [MegaService guide](../../../../README.md)                                                                          |
+| UI              | [UI guide](../../../../ui/react/README.md)                                                                          |
+| Nginx           | [Nginx guide](https://github.com/opea-project/GenAIComps/tree/main/comps/third_parties/nginx)                       |
 
 ### Check the Deployment Status
 
