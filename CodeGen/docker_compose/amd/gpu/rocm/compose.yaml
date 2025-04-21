@@ -77,23 +77,38 @@ services:
     ipc: host
     restart: always
   codegen-ui-server:
-    image: ${REGISTRY:-opea}/codegen-gradio-ui:${TAG:-latest}
+    image: ${REGISTRY:-opea}/codegen-ui:${TAG:-latest}
     container_name: codegen-ui-server
     depends_on:
       - codegen-backend-server
     ports:
-      - "5173:5173"
+      - "${CODEGEN_UI_SERVICE_PORT:-5173}:5173"
     environment:
-      - no_proxy=${no_proxy}
-      - https_proxy=${https_proxy}
-      - http_proxy=${http_proxy}
-      - BASIC_URL=${CODEGEN_BACKEND_SERVICE_URL}
-      - MEGA_SERVICE_PORT=${CODEGEN_BACKEND_SERVICE_PORT}
-      - host_ip=${HOST_IP}
-      - DATAPREP_ENDPOINT=${DATAPREP_ENDPOINT}
-      - DATAPREP_REDIS_PORT=${DATAPREP_REDIS_PORT}
+      no_proxy: ${no_proxy}
+      https_proxy: ${https_proxy}
+      http_proxy: ${http_proxy}
+      BASIC_URL: ${CODEGEN_BACKEND_SERVICE_URL}
+      BACKEND_SERVICE_ENDPOINT: ${CODEGEN_BACKEND_SERVICE_URL}
     ipc: host
     restart: always
+  # codegen-ui-server:
+  #   image: ${REGISTRY:-opea}/codegen-gradio-ui:${TAG:-latest}
+  #   container_name: codegen-ui-server
+  #   depends_on:
+  #     - codegen-backend-server
+  #   ports:
+  #     - "5173:5173"
+  #   environment:
+  #     - no_proxy=${no_proxy}
+  #     - https_proxy=${https_proxy}
+  #     - http_proxy=${http_proxy}
+  #     - BASIC_URL=${CODEGEN_BACKEND_SERVICE_URL}
+  #     - MEGA_SERVICE_PORT=${CODEGEN_BACKEND_SERVICE_PORT}
+  #     - host_ip=${HOST_IP}
+  #     - DATAPREP_ENDPOINT=${DATAPREP_ENDPOINT}
+  #     - DATAPREP_REDIS_PORT=${DATAPREP_REDIS_PORT}
+  #   ipc: host
+  #   restart: always
 
   redis-vector-db:
     image: redis/redis-stack:7.2.0-v9
