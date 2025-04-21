@@ -1,0 +1,36 @@
+.code {
+  margin: 7px 0px;
+
+  .codeHead {
+    padding: 0px 10px !important;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: space-between;
+
+    .codeTitle {
+    }
+
+    .codeActionGroup {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: nowrap;
+      align-items: center;
+      justify-content: flex-start;
+    }
+  }
+
+  .codeHighlighterDiv {
+    margin: 0px !important;
+    white-space: pre-wrap !important;
+
+    code {
+      white-space: pre-wrap !important;
+    }
+  }
+}
+
+.inlineCode {
+  background: #fff;
+}

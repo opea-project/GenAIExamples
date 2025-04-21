@@ -1,0 +1,71 @@
+.dataView {
+  height: 100%;
+  width: 100%;
+  max-width: var(--content-width);
+  width: 100%;
+  margin: 0px auto;
+  padding: calc(var(--header-gutter) * 2);
+}
+
+.dataItem {
+  margin-bottom: 1rem;
+  position: relative;
+  padding: 0;
+
+  :global {
+    .MuiCheckbox-root {
+      position: absolute;
+      right: 100%;
+      margin-right: 0.25rem;
+      top: 50%;
+      transform: translateY(-50%);
+      @media screen and (min-width: 901px) {
+        margin-right: 1rem;
+      }
+    }
+  }
+}
+
+.dataName {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
+  padding: 1rem;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.searchInput {
+  width: 100%;
+  margin-bottom: 1rem;
+  background: none;
+
+  // padding: var(--header-gutter);
+  border: 0;
+  margin-bottom: 2rem;
+  // margin-right: 45px;
+  &:focus {
+    outline: none;
+  }
+
+  :global {
+    .MuiInputBase-root {
+      border-radius: var(--input-radius);
+    }
+  }
+}
+
+.dataInputWrapper {
+  width: 100%;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.actions button {
+  margin-left: 0.5rem;
+}

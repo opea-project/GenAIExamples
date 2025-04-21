@@ -1,0 +1,63 @@
+.dropDown {
+  .noWrap {
+    white-space: nowrap;
+    display: flex;
+
+    &.ellipsis span {
+      white-space: nowrap;
+      display: inline-block;
+      width: 150px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin: 0;
+    }
+  }
+
+  .unsetMin {
+    min-width: unset;
+  }
+
+  .chevron {
+    transform: rotate(0deg);
+    transition: transform 0.5s;
+
+    &.open {
+      transform: rotate(180deg);
+    }
+  }
+
+  &.border {
+    border-radius: 8px;
+    margin-left: 0.5rem;
+
+    :global {
+      .MuiList-padding {
+        margin-left: 0 !important;
+      }
+
+      .MuiListItemIcon-root {
+        min-width: unset;
+      }
+    }
+
+    :global {
+      .MuiListItemText-root {
+        margin-top: 3px;
+        margin-bottom: 3px;
+      }
+
+      .MuiList-root {
+        padding: 0;
+        margin-left: 0.5rem;
+
+        .MuiButtonBase-root {
+          padding: 0 0.5rem;
+        }
+      }
+    }
+  }
+}
+
+.leftGap {
+  margin-left: 0.5rem !important;
+}

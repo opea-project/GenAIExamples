@@ -41,24 +41,13 @@ Here're some of the project's features:
 
 ### DOC SUMMARY
 
-- Summarizing Uploaded Files: Upload files from their local device, then click 'Generate Summary' to summarize the content of the uploaded file. The summary will be displayed on the 'Summary' box.
-- Summarizing Text via Pasting: Paste the text to be summarized into the text box, then click 'Generate Summary' to produce a condensed summary of the content, which will be displayed in the 'Summary' box on the right.
+- Summarizing Uploaded Files: Upload files from their local device, then click up arrow button to summarize the content of the uploaded file.
+- Summarizing Text via Pasting: Paste the text to be summarized into the text box, then click up arrow button to produce a condensed summary of the content, which will be displayed in the new page
 - Scroll to Bottom: The summarized content will automatically scroll to the bottom.
 
 #### Screen Shot
 
-![project-screenshot](../../assets/img/doc_summary_paste.png)
-![project-screenshot](../../assets/img/doc_summary_file.png)
-
-### FAQ Generator
-
-- Generate FAQs from Text via Pasting: Paste the text to into the text box, then click 'Generate FAQ' to produce a condensed FAQ of the content, which will be displayed in the 'FAQ' box below.
-
-- Generate FAQs from Text via txt file Upload: Upload the file in the Upload bar, then click 'Generate FAQ' to produce a condensed FAQ of the content, which will be displayed in the 'FAQ' box below.
-
-#### Screen Shot
-
-![project-screenshot](../../assets/img/faq_generator.png)
+![project-screenshot](../../assets/img/doc_summary.png)
 
 ## 🛠️ Get it Running
 
@@ -68,22 +57,43 @@ Here're some of the project's features:
 
 3. create a .env file and add the following variables and values.
    ```
-   VITE_BACKEND_SERVICE_ENDPOINT_CHATQNA=''
-   VITE_BACKEND_SERVICE_ENDPOINT_CODEGEN=''
-   VITE_BACKEND_SERVICE_ENDPOINT_DOCSUM=''
-   VITE_BACKEND_SERVICE_ENDPOINT_FAQGEN=''
-   VITE_KEYCLOAK_SERVICE_ENDPOINT=''
-   VITE_DATAPREP_SERVICE_ENDPOINT=''
-   VITE_DATAPREP_GET_FILE_ENDPOINT=''
-   VITE_DATAPREP_DELETE_FILE_ENDPOINT=''
-   VITE_CHAT_HISTORY_CREATE_ENDPOINT=''
-   VITE_CHAT_HISTORY_GET_ENDPOINT=''
-   VITE_CHAT_HISTORY_DELETE_ENDPOINT=''
-   VITE_PROMPT_SERVICE_GET_ENDPOINT=''
-   VITE_PROMPT_SERVICE_CREATE_ENDPOINT=''
+    VITE_BACKEND_SERVICE_ENDPOINT_CHATQNA=""
+    VITE_DATAPREP_DELETE_FILE_ENDPOINT=""
+    VITE_BACKEND_SERVICE_ENDPOINT_CODEGEN=""
+    VITE_BACKEND_SERVICE_ENDPOINT_DOCSUM=""
+    VITE_DATAPREP_SERVICE_ENDPOINT=""
+    VITE_DATAPREP_GET_FILE_ENDPOINT=""
+    VITE_CHAT_HISTORY_CREATE_ENDPOINT=""
+    VITE_CHAT_HISTORY_DELETE_ENDPOINT=""
+    VITE_CHAT_HISTORY_GET_ENDPOINT=""
+    VITE_PROMPT_SERVICE_GET_ENDPOINT=""
+    VITE_PROMPT_SERVICE_CREATE_ENDPOINT=""
+    VITE_PROMPT_SERVICE_DELETE_ENDPOINT=""
+    VITE_KEYCLOAK_SERVICE_ENDPOINT=""
+    VITE_PROMPT_COLLECTION_NAME="prompt"
    ```
-4. Execute `npm install` to install the corresponding dependencies.
+4. There is models_config.json file under public folder. It is in the below format. The types key in the below json array shows that the model is used for following types.
 
-5. Execute `npm run dev`
+   ```
+     [
 
-6. open http://localhost:5174 in browser to the see the UI
+         {
+             "model_name": "Intel/neural-chat-7b-v3-3",
+             "displayName": "Intel Neural Chat",
+             "minToken": 100,
+             "maxToken": 2000,
+             "types": [
+                 "chat",
+                 "summary",
+                 "code"
+             ]
+         }
+
+     ]
+   ```
+
+5. Execute `npm install` to install the corresponding dependencies.
+
+6. Execute `npm run dev`
+
+7. open http://localhost:5174 in browser to the see the UI

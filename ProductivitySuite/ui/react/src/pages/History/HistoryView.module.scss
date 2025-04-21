@@ -1,0 +1,82 @@
+.historyView {
+  height: 100%;
+  width: 100%;
+  max-width: var(--content-width);
+  width: 100%;
+  margin: 0px auto;
+  padding: calc(var(--header-gutter) * 2);
+
+  .historyListWrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    @media screen and (min-width: 901px) {
+      flex-direction: row;
+      justify-content: space-between;
+    }
+  }
+
+  .actions button {
+    margin-left: 0.5rem;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+    &:first-of-type {
+      margin-left: 0;
+    }
+    @media screen and (min-width: 901px) {
+      margin-left: 0.5rem;
+      margin-bottom: 0;
+      margin-top: 0;
+      &:first-of-type {
+        margin-left: 0.5rem;
+      }
+    }
+  }
+}
+
+.historyItem {
+  margin-bottom: 1rem;
+  position: relative;
+  padding: 0;
+
+  :global {
+    .MuiCheckbox-root {
+      position: absolute;
+      right: 100%;
+      margin-right: 0.25rem;
+      top: 50%;
+      transform: translateY(-50%);
+
+      @media screen and (min-width: 901px) {
+        margin-right: 1rem;
+      }
+    }
+  }
+
+  a {
+    text-decoration: none;
+  }
+
+  .title {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    word-break: break-word;
+    max-width: 100%;
+  }
+}
+
+.historyLink {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
+  padding: 1rem;
+  margin: 0;
+  line-height: 1.5;
+}

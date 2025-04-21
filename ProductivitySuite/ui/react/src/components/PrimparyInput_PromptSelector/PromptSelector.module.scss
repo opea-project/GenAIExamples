@@ -1,0 +1,87 @@
+.promptsWrapper {
+  position: absolute;
+
+  z-index: 99;
+  width: 100%;
+  padding: 0 40px;
+
+  .expand {
+    width: 25px;
+    height: 25px;
+    border-radius: 25px;
+    min-width: unset;
+    border-width: 1px;
+    border-style: solid;
+    transform: rotate(180deg);
+    transition: transform 0.5s;
+    margin-top: -20px;
+    position: relative;
+    z-index: 9999;
+
+    &.open {
+      transform: rotate(0deg);
+    }
+  }
+}
+
+.promptText {
+  color: var(--copy-color) !important;
+}
+
+.promptsListWrapper {
+  margin-top: -23px;
+  max-height: 0px;
+  transition: max-height 0.5s;
+  overflow: hidden;
+  // background: #fff;
+  width: 100%;
+  z-index: 999;
+
+  &.open {
+    max-height: 250px;
+    overflow-y: auto;
+  }
+
+  ul {
+    padding: 0;
+  }
+
+  li {
+    border-bottom: 1px solid;
+    padding: 0;
+    justify-content: space-between;
+
+    button {
+      padding: 1rem;
+      width: 100%;
+      justify-content: flex-start;
+      text-align: left;
+      border-radius: 0px;
+      box-shadow: none;
+    }
+
+    &:first-of-type button {
+      padding-top: 1.2rem;
+
+      span {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 3; // Limits to 2 lines
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+
+    .delete {
+      width: 40px;
+      height: 40px;
+      border-radius: 40px;
+      margin: 0 0.5rem;
+      justify-content: center;
+
+      path {
+        fill: #cc0000;
+      }
+    }
+  }
+}

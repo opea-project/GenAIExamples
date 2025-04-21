@@ -1,0 +1,117 @@
+.aside {
+  max-width: var(--sidebar-width);
+  position: fixed;
+  width: 0;
+  overflow: hidden;
+  transition: width 0.3s;
+  height: 100vh;
+  top: 0;
+  left: 0;
+  z-index: 998;
+  padding-top: var(--header-height);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  &.open {
+    max-width: var(--sidebar-width);
+    width: var(--sidebar-width);
+  }
+
+  .asideContent {
+    width: var(--sidebar-width);
+    min-width: var(--sidebar-width);
+    display: flex;
+    flex-direction: column;
+    list-style: none;
+    overflow: auto;
+    max-height: 100%;
+    margin-bottom: auto;
+
+    .emptySvg {
+      width: 24px;
+      height: 24px;
+      min-width: 24px;
+    }
+
+    li,
+    a {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+    }
+
+    li {
+      padding-left: var(--header-gutter);
+      padding-right: var(--header-gutter);
+    }
+
+    a {
+      width: 100%;
+      max-width: 100%;
+      text-decoration: none;
+    }
+
+    :global {
+      .MuiListItemText-root {
+        margin-left: 10px;
+      }
+
+      .MuiTypography-root {
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+
+    .viewAll span {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: flex-start;
+
+      svg {
+        margin-left: 0.5rem;
+        transform: rotate(180deg);
+      }
+    }
+
+    .divider {
+      height: 0;
+      margin: 10px var(--header-gutter);
+    }
+  }
+}
+
+.asideSpacer {
+  width: 0;
+  transition: width 0.3s;
+
+  &.asideSpacerOpen {
+    width: var(--sidebar-width);
+  }
+}
+
+@media screen and (max-width: 1200px) {
+  .asideSpacer {
+    display: none;
+  }
+}
+
+.mobileUser {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: var(--sidebar-width);
+  min-width: var(--sidebar-width);
+  padding: var(--header-gutter);
+
+  :global {
+    .themeToggle {
+      margin-left: -15px;
+      margin-bottom: 1rem;
+    }
+  }
+  @media screen and (min-width: 900px) {
+    display: none;
+  }
+}

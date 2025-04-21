@@ -1,0 +1,47 @@
+.sourceWrapper {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  width: var(--content-width);
+  margin: 0 auto var(--vertical-spacer);
+  max-width: 100%;
+}
+
+.iconWrap {
+  border: none;
+  border-radius: 6px;
+  margin-right: 0.5rem;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sourceBox {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  margin-left: 1rem;
+  padding: 5px;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+}
+
+.title {
+  margin: 0 0.5rem 0 0;
+  white-space: nowrap;
+  display: inline-block;
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 400;
+}
+
+.chip {
+  border-radius: 8px;
+  padding: 3px;
+  font-size: 12px;
+}

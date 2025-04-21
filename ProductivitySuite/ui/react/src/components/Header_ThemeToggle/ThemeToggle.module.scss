@@ -1,0 +1,65 @@
+.toggleWrapper {
+  position: relative;
+  margin-right: 10px;
+  display: flex;
+  align-items: center;
+
+  .toggle {
+    width: 100px;
+    height: 34px;
+    padding: 7px;
+  }
+
+  .copy {
+    position: absolute;
+    z-index: 99;
+    margin: 0 26px;
+    font-size: 14px;
+  }
+
+  :global {
+    .MuiSwitch-switchBase {
+      margin: 1px;
+      padding: 0;
+      transform: translateX(6px);
+      transition: transform 0.3s;
+
+      &.Mui-checked {
+        color: #fff;
+        transform: translateX(62px);
+
+        .MuiSwitch-track {
+          opacity: 1;
+        }
+      }
+    }
+
+    .MuiSwitch-track {
+      opacity: 1;
+      height: 30px;
+      border-radius: 30px;
+      margin-top: -5px;
+      background-color: transparent !important;
+    }
+
+    .MuiSwitch-thumb {
+      // background-color: transparent !important;
+      width: 26px;
+      height: 26px;
+      position: relative;
+      margin-top: 3px;
+      margin-left: 2px;
+      box-shadow: none;
+      &::before {
+        content: "";
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        left: 0;
+        top: 0;
+        background-repeat: no-repeat;
+        background-position: center;
+      }
+    }
+  }
+}

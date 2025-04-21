@@ -1,0 +1,39 @@
+.homeView {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100%;
+  padding: calc(var(--header-gutter) * 2);
+
+  .title {
+    text-align: center;
+
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .buttonRow {
+    margin-top: var(--vertical-spacer);
+    justify-content: center;
+  }
+
+  .promptWrapper {
+    width: 100%;
+    max-width: 775px;
+  }
+
+  .inputContainer {
+    width: 100%;
+    max-width: 800px;
+    margin-top: var(--vertical-spacer);
+  }
+
+  .disclaimer {
+    width: 100%;
+    max-width: 600px;
+    margin-top: var(--vertical-spacer);
+    font-size: 14px;
+  }
+}

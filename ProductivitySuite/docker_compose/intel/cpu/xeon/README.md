@@ -108,68 +108,46 @@ Since the `compose.yaml` will consume some environment variables, you need to se
 export host_ip="External_Public_IP"
 ```
 
-**Export the value of your Huggingface API token to the `your_hf_api_token` environment variable**
+**Export the value of your Huggingface API token to the `HUGGINGFACEHUB_API_TOKEN` environment variable**
 
 > Change the Your_Huggingface_API_Token below with tyour actual Huggingface API Token value
 
 ```
-export your_hf_api_token="Your_Huggingface_API_Token"
+export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
 ```
 
 **Append the value of the public IP address to the no_proxy list**
 
 ```
-export your_no_proxy=${your_no_proxy},"External_Public_IP"
+export no_proxy=${no_proxy},"External_Public_IP"
 ```
 
 ```bash
-export MONGO_HOST=${host_ip}
-export MONGO_PORT=27017
-export DB_NAME="test"
-export COLLECTION_NAME="Conversations"
+export DB_NAME="opea"
 export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
 export RERANK_MODEL_ID="BAAI/bge-reranker-base"
 export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
 export LLM_MODEL_ID_CODEGEN="meta-llama/CodeLlama-7b-hf"
-export TEI_EMBEDDING_ENDPOINT="http://${host_ip}:6006"
-export TEI_RERANKING_ENDPOINT="http://${host_ip}:8808"
-export TGI_LLM_ENDPOINT="http://${host_ip}:9009"
-export REDIS_URL="redis://${host_ip}:6379"
 export INDEX_NAME="rag-redis"
-export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
-export MEGA_SERVICE_HOST_IP=${host_ip}
-export EMBEDDING_SERVICE_HOST_IP=${host_ip}
-export RETRIEVER_SERVICE_HOST_IP=${host_ip}
-export RERANK_SERVICE_HOST_IP=${host_ip}
-export LLM_SERVICE_HOST_IP=${host_ip}
-export LLM_SERVICE_HOST_IP_DOCSUM=${host_ip}
-export LLM_SERVICE_HOST_IP_FAQGEN=${host_ip}
-export LLM_SERVICE_HOST_IP_CODEGEN=${host_ip}
-export LLM_SERVICE_HOST_IP_CHATQNA=${host_ip}
-export TGI_LLM_ENDPOINT_CHATQNA="http://${host_ip}:9009"
-export TGI_LLM_ENDPOINT_CODEGEN="http://${host_ip}:8028"
-export TGI_LLM_ENDPOINT_FAQGEN="http://${host_ip}:9009"
-export TGI_LLM_ENDPOINT_DOCSUM="http://${host_ip}:9009"
+export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
 export BACKEND_SERVICE_ENDPOINT_CHATQNA="http://${host_ip}:8888/v1/chatqna"
-export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:5000/v1/dataprep/delete"
+export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/delete"
 export BACKEND_SERVICE_ENDPOINT_CODEGEN="http://${host_ip}:7778/v1/codegen"
 export BACKEND_SERVICE_ENDPOINT_DOCSUM="http://${host_ip}:8890/v1/docsum"
-export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:5000/v1/dataprep/ingest"
-export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:5000/v1/dataprep/get"
+export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/ingest"
+export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/get"
 export CHAT_HISTORY_CREATE_ENDPOINT="http://${host_ip}:6012/v1/chathistory/create"
 export CHAT_HISTORY_CREATE_ENDPOINT="http://${host_ip}:6012/v1/chathistory/create"
 export CHAT_HISTORY_DELETE_ENDPOINT="http://${host_ip}:6012/v1/chathistory/delete"
 export CHAT_HISTORY_GET_ENDPOINT="http://${host_ip}:6012/v1/chathistory/get"
 export PROMPT_SERVICE_GET_ENDPOINT="http://${host_ip}:6018/v1/prompt/get"
 export PROMPT_SERVICE_CREATE_ENDPOINT="http://${host_ip}:6018/v1/prompt/create"
+export PROMPT_SERVICE_DELETE_ENDPOINT="http://${host_ip}:6018/v1/prompt/delete"
 export KEYCLOAK_SERVICE_ENDPOINT="http://${host_ip}:8080"
-export LLM_SERVICE_HOST_PORT_FAQGEN=9002
-export LLM_SERVICE_HOST_PORT_CODEGEN=9001
-export LLM_SERVICE_HOST_PORT_DOCSUM=9003
-export PROMPT_COLLECTION_NAME="prompt"
-export RERANK_SERVER_PORT=8808
-export EMBEDDING_SERVER_PORT=6006
-export LLM_SERVER_PORT=9009
+export DocSum_COMPONENT_NAME="OpeaDocSumTgi"
+
+#Set no proxy
+export no_proxy="$no_proxy,tgi_service_codegen,llm_codegen,tei-embedding-service,tei-reranking-service,chatqna-xeon-backend-server,retriever,tgi-service,redis-vector-db,whisper,llm-docsum-tgi,docsum-xeon-backend-server,mongo,codegen"
 ```
 
 Note: Please replace with `host_ip` with you external IP address, do not use localhost.
@@ -203,16 +181,7 @@ Please refer to **[keycloak_setup_guide](keycloak_setup_guide.md)** for more det
        -H 'Content-Type: application/json'
    ```
 
-2. Embedding Microservice
-
-   ```bash
-   curl http://${host_ip}:6000/v1/embeddings\
-     -X POST \
-     -d '{"text":"hello"}' \
-     -H 'Content-Type: application/json'
-   ```
-
-3. Retriever Microservice
+2. Retriever Microservice
 
    To consume the retriever microservice, you need to generate a mock embedding vector by Python script. The length of embedding vector
    is determined by the embedding model.
@@ -222,13 +191,13 @@ Please refer to **[keycloak_setup_guide](keycloak_setup_guide.md)** for more det
 
    ```bash
    export your_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
-   curl http://${host_ip}:7000/v1/retrieval \
+   curl http://${host_ip}:7001/v1/retrieval \
      -X POST \
      -d "{\"text\":\"test\",\"embedding\":${your_embedding}}" \
      -H 'Content-Type: application/json'
    ```
 
-4. TEI Reranking Service
+3. TEI Reranking Service
 
    ```bash
    curl http://${host_ip}:8808/rerank \
@@ -237,16 +206,7 @@ Please refer to **[keycloak_setup_guide](keycloak_setup_guide.md)** for more det
        -H 'Content-Type: application/json'
    ```
 
-5. Reranking Microservice
-
-   ```bash
-   curl http://${host_ip}:8000/v1/reranking\
-     -X POST \
-     -d '{"initial_query":"What is Deep Learning?", "retrieved_docs": [{"text":"Deep Learning is not..."}, {"text":"Deep learning is..."}]}' \
-     -H 'Content-Type: application/json'
-   ```
-
-6. LLM backend Service (ChatQnA, DocSum, FAQGen)
+4. LLM backend Service (ChatQnA, DocSum)
 
    ```bash
    curl http://${host_ip}:9009/generate \
@@ -255,7 +215,7 @@ Please refer to **[keycloak_setup_guide](keycloak_setup_guide.md)** for more det
      -H 'Content-Type: application/json'
    ```
 
-7. LLM backend Service (CodeGen)
+5. LLM backend Service (CodeGen)
 
    ```bash
    curl http://${host_ip}:8028/generate \
@@ -264,16 +224,7 @@ Please refer to **[keycloak_setup_guide](keycloak_setup_guide.md)** for more det
      -H 'Content-Type: application/json'
    ```
 
-8. ChatQnA LLM Microservice
-
-   ```bash
-   curl http://${host_ip}:9000/v1/chat/completions\
-     -X POST \
-     -d '{"query":"What is Deep Learning?","max_tokens":17,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,"repetition_penalty":1.03,"stream":true}' \
-     -H 'Content-Type: application/json'
-   ```
-
-9. CodeGen LLM Microservice
+6. CodeGen LLM Microservice
 
    ```bash
    curl http://${host_ip}:9001/v1/chat/completions\
@@ -282,41 +233,33 @@ Please refer to **[keycloak_setup_guide](keycloak_setup_guide.md)** for more det
      -H 'Content-Type: application/json'
    ```
 
-10. DocSum LLM Microservice
+7. DocSum LLM Microservice
 
-    ```bash
-    curl http://${host_ip}:9003/v1/docsum\
-      -X POST \
-      -d '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5"}' \
-      -H 'Content-Type: application/json'
-    ```
+   ```bash
+   curl http://${host_ip}:9003/v1/docsum\
+     -X POST \
+     -d '{"messages":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5", "type": "text"}' \
+     -H 'Content-Type: application/json'
+   ```
 
-11. FAQGen LLM Microservice
+8. ChatQnA MegaService
 
-    ```bash
-    curl http://${host_ip}:9002/v1/faqgen\
-      -X POST \
-      -d '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5"}' \
-      -H 'Content-Type: application/json'
-    ```
+   ```bash
+   curl http://${host_ip}:8888/v1/chatqna -H "Content-Type: application/json" -d '{
+        "messages": "What is the revenue of Nike in 2023?"
+        }'
+   ```
 
-12. ChatQnA MegaService
+9. DocSum MegaService
 
-    ```bash
-    curl http://${host_ip}:8888/v1/chatqna -H "Content-Type: application/json" -d '{
-         "messages": "What is the revenue of Nike in 2023?"
-         }'
-    ```
+   ```bash
+   curl http://${host_ip}:8890/v1/docsum -H "Content-Type: application/json" -d '{
+        "messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5.",
+        "type": "text"
+        }'
+   ```
 
-13. DocSum MegaService
-
-    ```bash
-    curl http://${host_ip}:8890/v1/docsum -H "Content-Type: application/json" -d '{
-         "messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."
-         }'
-    ```
-
-14. CodeGen MegaService
+10. CodeGen MegaService
 
     ```bash
     curl http://${host_ip}:7778/v1/codegen -H "Content-Type: application/json" -d '{
@@ -324,7 +267,7 @@ Please refer to **[keycloak_setup_guide](keycloak_setup_guide.md)** for more det
          }'
     ```
 
-15. Dataprep Microservice
+11. Dataprep Microservice
 
     If you want to update the default knowledge base, you can use the following commands:
 
@@ -374,13 +317,13 @@ Please refer to **[keycloak_setup_guide](keycloak_setup_guide.md)** for more det
          -H "Content-Type: application/json"
     ```
 
-16. Prompt Registry Microservice
+12. Prompt Registry Microservice
 
     If you want to update the default Prompts in the application for your user, you can use the following commands:
 
     ```bash
     curl -X 'POST' \
-      http://{host_ip}:6018/v1/prompt/create \
+      "http://${host_ip}:6018/v1/prompt/create" \
       -H 'accept: application/json' \
       -H 'Content-Type: application/json' \
       -d '{
@@ -392,14 +335,14 @@ Please refer to **[keycloak_setup_guide](keycloak_setup_guide.md)** for more det
 
     ```bash
     curl -X 'POST' \
-      http://{host_ip}:6018/v1/prompt/get \
+      "http://${host_ip}:6018/v1/prompt/get" \
       -H 'accept: application/json' \
       -H 'Content-Type: application/json' \
       -d '{
       "user": "test"}'
 
     curl -X 'POST' \
-      http://{host_ip}:6018/v1/prompt/get \
+      "http://${host_ip}:6018/v1/prompt/get" \
       -H 'accept: application/json' \
       -H 'Content-Type: application/json' \
       -d '{
@@ -410,14 +353,14 @@ Please refer to **[keycloak_setup_guide](keycloak_setup_guide.md)** for more det
 
     ```bash
     curl -X 'POST' \
-      http://{host_ip}:6018/v1/prompt/delete \
+      "http://${host_ip}:6018/v1/prompt/delete" \
       -H 'accept: application/json' \
       -H 'Content-Type: application/json' \
       -d '{
       "user": "test", "prompt_id":"{prompt_id to be deleted}"}'
     ```
 
-17. Chat History Microservice
+13. Chat History Microservice
 
     To validate the chatHistory Microservice, you can use the following commands.
 
@@ -527,15 +470,4 @@ Here're some of the project's features:
 
 #### Screenshots
 
-![project-screenshot](../../../../assets/img/doc_summary_paste.png)
-![project-screenshot](../../../../assets/img/doc_summary_file.png)
-
-### ❓ FAQ Generator
-
-- **Generate FAQs from Text via Pasting**: Paste the text to into the text box, then click 'Generate FAQ' to produce a condensed FAQ of the content, which will be displayed in the 'FAQ' box below.
-
-- **Generate FAQs from Text via txt file Upload**: Upload the file in the Upload bar, then click 'Generate FAQ' to produce a condensed FAQ of the content, which will be displayed in the 'FAQ' box below.
-
-#### Screenshots
-
-![project-screenshot](../../../../assets/img/faq_generator.png)
+![project-screenshot](../../../../assets/img/doc_summary.png)
