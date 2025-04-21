@@ -1,0 +1,256 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  whisper-service:
+    image: ${REGISTRY:-opea}/whisper:${TAG:-latest}
+    container_name: whisper-service
+    ports:
+      - "${WHISPER_PORT}:${WHISPER_PORT}"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      WHISPER_PORT: ${WHISPER_PORT}
+      WHISPER_SERVER_ENDPOINT: ${WHISPER_SERVER_ENDPOINT}
+    restart: unless-stopped
+  milvus-etcd:
+    container_name: milvus-etcd
+    image: quay.io/coreos/etcd:v3.5.5
+    environment:
+      - ETCD_AUTO_COMPACTION_MODE=revision
+      - ETCD_AUTO_COMPACTION_RETENTION=1000
+      - ETCD_QUOTA_BACKEND_BYTES=4294967296
+      - ETCD_SNAPSHOT_COUNT=50000
+    volumes:
+      - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/etcd:/etcd
+    command: etcd -advertise-client-urls=http://127.0.0.1:2379 -listen-client-urls http://0.0.0.0:2379 --data-dir /etcd
+    healthcheck:
+      test: ["CMD", "etcdctl", "endpoint", "health"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+  milvus-minio:
+    container_name: milvus-minio
+    image: minio/minio:RELEASE.2023-03-20T20-16-18Z
+    environment:
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin
+    ports:
+      - "${MINIO_PORT1:-5044}:9001"
+      - "${MINIO_PORT2:-5043}:9000"
+    volumes:
+      - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/minio:/minio_data
+    command: minio server /minio_data --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+  milvus-standalone:
+    container_name: milvus-standalone
+    image: milvusdb/milvus:v2.4.6
+    command: ["milvus", "run", "standalone"]
+    security_opt:
+      - seccomp:unconfined
+    environment:
+      ETCD_ENDPOINTS: milvus-etcd:2379
+      MINIO_ADDRESS: milvus-minio:9000
+    volumes:
+      - ${DOCKER_VOLUME_DIRECTORY:-.}/config/milvus.yaml:/milvus/configs/milvus.yaml
+      - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/milvus:/var/lib/milvus
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9091/healthz"]
+      interval: 30s
+      start_period: 90s
+      timeout: 20s
+      retries: 3
+    ports:
+      - "19530:19530"
+      - "${MILVUS_STANDALONE_PORT:-9091}:9091"
+    depends_on:
+      - "milvus-etcd"
+      - "milvus-minio"
+  dataprep-multimodal-milvus:
+    image: ${REGISTRY:-opea}/dataprep:${TAG:-latest}
+    container_name: dataprep-multimodal-milvus
+    depends_on:
+      - "milvus-standalone"
+      - "lvm"
+    ports:
+      - "${DATAPREP_MMR_PORT}:5000"
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      MULTIMODAL_DATAPREP: true
+      DATAPREP_COMPONENT_NAME: "OPEA_DATAPREP_MULTIMODALMILVUS"
+      MILVUS_HOST: ${MILVUS_HOST}
+      COLLECTION_NAME: ${COLLECTION_NAME}
+      LVM_ENDPOINT: "http://${LVM_SERVICE_HOST_IP}:${LVM_PORT}/v1/lvm"
+      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+    restart: unless-stopped
+  embedding-multimodal-bridgetower-gaudi:
+    image: ${REGISTRY:-opea}/embedding-multimodal-bridgetower-gaudi:${TAG:-latest}
+    container_name: embedding-multimodal-bridgetower-gaudi
+    ports:
+      - ${EMM_BRIDGETOWER_PORT}:${EMM_BRIDGETOWER_PORT}
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      PORT: ${EMM_BRIDGETOWER_PORT}
+      HABANA_VISIBLE_DEVICES: all
+    runtime: habana
+    cap_add:
+      - SYS_NICE
+    healthcheck:
+      test: ["CMD-SHELL", "http_proxy='' curl -f http://localhost:${EMM_BRIDGETOWER_PORT}/v1/health_check"]
+      interval: 10s
+      timeout: 6s
+      retries: 18
+      start_period: 30s
+    entrypoint: ["python", "bridgetower_server.py", "--device", "hpu", "--model_name_or_path", $EMBEDDING_MODEL_ID]
+    restart: unless-stopped
+  embedding:
+    image: ${REGISTRY:-opea}/embedding:${TAG:-latest}
+    container_name: embedding
+    depends_on:
+      embedding-multimodal-bridgetower-gaudi:
+        condition: service_healthy
+    ports:
+      - ${MM_EMBEDDING_PORT_MICROSERVICE}:${MM_EMBEDDING_PORT_MICROSERVICE}
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      MMEI_EMBEDDING_ENDPOINT: ${MMEI_EMBEDDING_ENDPOINT}
+      MM_EMBEDDING_PORT_MICROSERVICE: ${MM_EMBEDDING_PORT_MICROSERVICE}
+      EMM_BRIDGETOWER_PORT: ${EMM_BRIDGETOWER_PORT}
+      MULTIMODAL_EMBEDDING: true
+    restart: unless-stopped
+  retriever-milvus:
+    image: ${REGISTRY:-opea}/retriever:${TAG:-latest}
+    container_name: retriever-milvus
+    depends_on:
+      - milvus-standalone
+    ports:
+      - "${MILVUS_RETRIEVER_PORT}:${MILVUS_RETRIEVER_PORT}"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      MILVUS_HOST: ${host_ip}
+      BRIDGE_TOWER_EMBEDDING: ${BRIDGE_TOWER_EMBEDDING}
+      LOGFLAG: ${LOGFLAG}
+      RETRIEVER_COMPONENT_NAME: "OPEA_RETRIEVER_MILVUS"
+      COLLECTION_NAME: ${COLLECTION_NAME}
+    restart: unless-stopped
+  tgi-gaudi:
+    image: ghcr.io/huggingface/tgi-gaudi:2.3.1
+    container_name: tgi-llava-gaudi-server
+    ports:
+      - ${TGI_GAUDI_PORT}
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      TGI_GAUDI_PORT: ${TGI_GAUDI_PORT}
+      LLAVA_SERVER_PORT: ${LLAVA_SERVER_PORT}
+      LVM_PORT: ${LVM_PORT}
+      HF_HUB_DISABLE_PROGRESS_BARS: 1
+      HF_HUB_ENABLE_HF_TRANSFER: 0
+      HABANA_VISIBLE_DEVICES: all
+      OMPI_MCA_btl_vader_single_copy_mechanism: none
+      PREFILL_BATCH_BUCKET_SIZE: 1
+      BATCH_BUCKET_SIZE: 1
+      MAX_BATCH_TOTAL_TOKENS: 4096
+      ENABLE_HPU_GRAPH: true
+      LIMIT_HPU_GRAPH: true
+      USE_FLASH_ATTENTION: true
+      FLASH_ATTENTION_RECOMPUTE: true
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://${host_ip}:8399/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 100
+    runtime: habana
+    cap_add:
+      - SYS_NICE
+    ipc: host
+    command: --model-id ${LVM_MODEL_ID} --max-input-tokens 3048 --max-total-tokens 4096
+    restart: unless-stopped
+  lvm:
+    image: ${REGISTRY:-opea}/lvm:${TAG:-latest}
+    container_name: lvm
+    depends_on:
+      - tgi-gaudi
+    ports:
+      - "${LVM_PORT}:${LVM_PORT}"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      LVM_COMPONENT_NAME: "OPEA_TGI_LLAVA_LVM"
+      LVM_ENDPOINT: ${LVM_ENDPOINT}
+      LLAVA_SERVER_PORT: ${LLAVA_SERVER_PORT}
+      LVM_PORT: ${LVM_PORT}
+      HF_HUB_DISABLE_PROGRESS_BARS: 1
+      HF_HUB_ENABLE_HF_TRANSFER: 0
+      MAX_IMAGES: ${MAX_IMAGES:-1}
+    restart: unless-stopped
+  multimodalqna:
+    image: ${REGISTRY:-opea}/multimodalqna:${TAG:-latest}
+    container_name: multimodalqna-backend-server
+    depends_on:
+      - milvus-standalone
+      - dataprep-multimodal-milvus
+      - embedding
+      - retriever-milvus
+      - lvm
+    ports:
+      - "${MEGA_SERVICE_PORT}:${MEGA_SERVICE_PORT}"
+    environment:
+      no_proxy: ${no_proxy}
+      https_proxy: ${https_proxy}
+      http_proxy: ${http_proxy}
+      MEGA_SERVICE_HOST_IP: ${MEGA_SERVICE_HOST_IP}
+      MEGA_SERVICE_PORT: ${MEGA_SERVICE_PORT}
+      MM_EMBEDDING_SERVICE_HOST_IP: ${MM_EMBEDDING_SERVICE_HOST_IP}
+      MM_EMBEDDING_PORT_MICROSERVICE: ${MM_EMBEDDING_PORT_MICROSERVICE}
+      MM_RETRIEVER_SERVICE_HOST_IP: ${MM_RETRIEVER_SERVICE_HOST_IP}
+      LVM_SERVICE_HOST_IP: ${LVM_SERVICE_HOST_IP}
+      LVM_MODEL_ID: ${LVM_MODEL_ID}
+      WHISPER_PORT: ${WHISPER_PORT}
+      WHISPER_SERVER_ENDPOINT: ${WHISPER_SERVER_ENDPOINT}
+    ipc: host
+    restart: always
+  multimodalqna-ui:
+    image: ${REGISTRY:-opea}/multimodalqna-ui:${TAG:-latest}
+    container_name: multimodalqna-gradio-ui-server
+    depends_on:
+      - multimodalqna
+    ports:
+      - "${UI_PORT}:${UI_PORT}"
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - BACKEND_SERVICE_ENDPOINT=${BACKEND_SERVICE_ENDPOINT}
+      - DATAPREP_INGEST_SERVICE_ENDPOINT=${DATAPREP_INGEST_SERVICE_ENDPOINT}
+      - DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT=${DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT}
+      - DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT=${DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT}
+      - MEGA_SERVICE_PORT:=${MEGA_SERVICE_PORT}
+      - UI_PORT=${UI_PORT}
+      - DATAPREP_MMR_PORT=${DATAPREP_MMR_PORT}
+    ipc: host
+    restart: always
+
+networks:
+  default:
+    driver: bridge
