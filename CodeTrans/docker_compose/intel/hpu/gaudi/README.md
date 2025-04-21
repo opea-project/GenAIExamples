@@ -29,10 +29,10 @@ git clone https://github.com/opea-project/GenAIExamples.git
 cd GenAIExamples/CodeTrans
 ```
 
-Then checkout a released version, such as v1.2:
+Then checkout a released version, such as v1.3:
 
 ```bash
-git checkout v1.2
+git checkout v1.3
 ```
 
 ### Configure the Deployment Environment
@@ -115,6 +115,22 @@ To stop the containers associated with the deployment, execute the following com
 ```bash
 docker compose -f compose.yaml down
 ```
+
+## Configuration Parameters
+
+Key parameters are configured via environment variables set before running `docker compose up`.
+
+| Environment Variable                     | Description                                                                                                         | Default (Set Externally)                                                                         |
+| :--------------------------------------- | :------------------------------------------------------------------------------------------------------------------ | :----------------------------------------------------------------------------------------------- |
+| `HOST_IP`                                | External IP address of the host machine. **Required.**                                                              | `your_external_ip_address`                                                                       |
+| `HUGGINGFACEHUB_API_TOKEN`               | Your Hugging Face Hub token for model access. **Required.**                                                         | `your_huggingface_token`                                                                         |
+| `LLM_MODEL_ID`                           | Hugging Face model ID for the CodeTrans LLM (used by TGI/vLLM service). Configured within `compose.yaml` environment. | `mistralai/Mistral-7B-Instruct-v0.3`                                                                 |
+| `LLM_ENDPOINT` | Internal URL for the LLM serving endpoint (used by `codetrans-gaudi-llm-server`). Configured in `compose.yaml`.             | `http://${HOST_IP}:8008` |
+| `LLM_COMPONENT_NAME` | LLM component name for the LLM Microservice.  | `OpeaTextGenService` |
+| `BACKEND_SERVICE_ENDPOINT`               | External URL for the CodeTrans Gateway (MegaService). Derived from `HOST_IP` and port `7778`.                         | `http://${HOST_IP}:7777/v1/codetrans`                                                              |
+| `FRONTEND_SERVICE_PORT`                    | Host port mapping for the frontend UI. Configured in `compose.yaml`.                                                  | `5173`                                                                                           |
+| `BACKEND_SERVICE_PORT`        | Host port mapping for the backend MegaService. Configured in `compose.yaml`.                                           | `7777`                               |
+| `http_proxy` / `https_proxy`/`no_proxy`  | Network proxy settings (if required).                                                                               | `""`                                              |
 
 ## CodeTrans Docker Compose Files
 
