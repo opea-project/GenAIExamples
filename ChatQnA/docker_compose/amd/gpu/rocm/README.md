@@ -62,6 +62,7 @@ Set the values of the variables:
   The values shown in the file set_env.sh or set_env_vllm they are the values used for the development and testing of the application, as well as configured for the environment in which the development is performed. These values must be configured in accordance with the rules of network access to your environment's server, and must not overlap with the IP ports of other applications that are already in use.
 
 Setting variables in the operating system environment:
+
 ```bash
 export HUGGINGFACEHUB_API_TOKEN="Your_HuggingFace_API_Token"
 source ./set_env_*.sh # replace the script name with the appropriate one
@@ -132,19 +133,19 @@ Use AMD GPU driver utilities to determine the correct `cardN` and `renderN` IDs 
 
 Please refer to the table below to build different microservices from source:
 
-| Microservice    | Deployment Guide                                                                                                    |
-|-----------------|---------------------------------------------------------------------------------------------------------------------|
-| vLLM            | [vLLM build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/third_parties/vllm#build-docker)      |
-| TGI             | [TGI project](https://github.com/huggingface/text-generation-inference.git)                                         |
-| LLM             | [LLM build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/llms)                                  |
-| Redis Vector DB | [Redis](https://github.com/redis/redis.git)                                                                         |
-| Dataprep        | [Dataprep build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/dataprep/src/README_redis.md)     |
-| TEI Embedding   | [TEI guide](https://github.com/huggingface/text-embeddings-inference.git)                                           |
-| Retriever       | [Retriever build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/retrievers/src/README_redis.md ) |
-| TEI Reranking   | [TEI guide](https://github.com/huggingface/text-embeddings-inference.git)                                           |
-| MegaService     | [MegaService guide](../../../../README.md)                                                                          |
-| UI              | [UI guide](../../../../ui/react/README.md)                                                                          |
-| Nginx           | [Nginx guide](https://github.com/opea-project/GenAIComps/tree/main/comps/third_parties/nginx)                       |
+| Microservice    | Deployment Guide                                                                                                   |
+| --------------- | ------------------------------------------------------------------------------------------------------------------ |
+| vLLM            | [vLLM build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/third_parties/vllm#build-docker)     |
+| TGI             | [TGI project](https://github.com/huggingface/text-generation-inference.git)                                        |
+| LLM             | [LLM build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/llms)                                 |
+| Redis Vector DB | [Redis](https://github.com/redis/redis.git)                                                                        |
+| Dataprep        | [Dataprep build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/dataprep/src/README_redis.md)    |
+| TEI Embedding   | [TEI guide](https://github.com/huggingface/text-embeddings-inference.git)                                          |
+| Retriever       | [Retriever build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/retrievers/src/README_redis.md) |
+| TEI Reranking   | [TEI guide](https://github.com/huggingface/text-embeddings-inference.git)                                          |
+| MegaService     | [MegaService guide](../../../../README.md)                                                                         |
+| UI              | [UI guide](../../../../ui/react/README.md)                                                                         |
+| Nginx           | [Nginx guide](https://github.com/opea-project/GenAIComps/tree/main/comps/third_parties/nginx)                      |
 
 ### Check the Deployment Status
 
@@ -170,6 +171,7 @@ eded17420782   ghcr.io/huggingface/text-embeddings-inference:cpu-1.5   "text-emb
 ```
 
 if used TGI with FaqGen:
+
 ```
 CONTAINER ID   IMAGE                                                   COMMAND                  CREATED          STATUS                    PORTS                                                                                      NAMES
 eaf24161aca8   opea/nginx:latest                                       "/docker-entrypoint.…"   37 seconds ago   Up 5 seconds              0.0.0.0:18104->80/tcp, [::]:18104->80/tcp                                                  chaqna-nginx-server
@@ -185,6 +187,7 @@ eded17420782   ghcr.io/huggingface/text-embeddings-inference:cpu-1.5   "text-emb
 ```
 
 if used vLLM:
+
 ```
 CONTAINER ID   IMAGE                                                   COMMAND                  CREATED          STATUS                    PORTS                                                                                      NAMES
 eaf24161aca8   opea/nginx:latest                                       "/docker-entrypoint.…"   37 seconds ago   Up 5 seconds              0.0.0.0:18104->80/tcp, [::]:18104->80/tcp                                                  chaqna-nginx-server
@@ -199,6 +202,7 @@ eded17420782   ghcr.io/huggingface/text-embeddings-inference:cpu-1.5   "text-emb
 ```
 
 if used vLLM with FaqGen:
+
 ```
 CONTAINER ID   IMAGE                                                   COMMAND                  CREATED          STATUS                    PORTS                                                                                      NAMES
 eaf24161aca8   opea/nginx:latest                                       "/docker-entrypoint.…"   37 seconds ago   Up 5 seconds              0.0.0.0:18104->80/tcp, [::]:18104->80/tcp                                                  chaqna-nginx-server
@@ -249,7 +253,7 @@ docker compose -f compose.yaml down
 In the context of deploying an ChatQnA pipeline on an Intel® Xeon® platform, we can pick and choose different large language model serving frameworks, or single English TTS/multi-language TTS component. The table below outlines the various configurations that are available as part of the application. These configurations can be used as templates and can be extended to different components available in [GenAIComps](https://github.com/opea-project/GenAIComps.git).
 
 | File                                                   | Description                                                                                                              |
-|--------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
+| ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------ |
 | [compose.yaml](./compose.yaml)                         | The LLM serving framework is TGI. Default compose file using TGI as serving framework and redis as vector database       |
 | [compose_faqgen.yaml](./compose_faqgen.yaml)           | The LLM serving framework is TGI with FaqGen. All other configurations remain the same as the default                    |
 | [compose_vllm.yaml](./compose_vllm.yaml)               | The LLM serving framework is vLLM. Compose file using vllm as serving framework and redis as vector database             |
@@ -275,6 +279,7 @@ In the context of deploying an ChatQnA pipeline on an Intel® Xeon® platform, w
      -d "{\"text\":\"test\",\"embedding\":${your_embedding}}" \
      -H 'Content-Type: application/json'
    ```
+
 3. TEI Reranking Service
 
    ```bash
@@ -287,11 +292,11 @@ In the context of deploying an ChatQnA pipeline on an Intel® Xeon® platform, w
 4. vLLM/TGI Service
 
    If you use vLLM:
-   
+
    ```bash
    DATA='{"model": "meta-llama/Meta-Llama-3-8B-Instruct", '\
    '"messages": [{"role": "user", "content": "What is a Deep Learning?"}], "max_tokens": 64}'
-   
+
    curl http://${HOST_IP}:${CHATQNA_VLLM_SERVICE_PORT}/v1/chat/completions \
      -X POST \
      -d "$DATA" \
@@ -303,7 +308,7 @@ In the context of deploying an ChatQnA pipeline on an Intel® Xeon® platform, w
    ```bash
    DATA='{"inputs":"What is a Deep Learning?",'\
    '"parameters":{"max_new_tokens":64,"do_sample": true}}'
-   
+
    curl http://${HOST_IP}:${CHATQNA_TGI_SERVICE_PORT}/generate \
    -X POST \
    -d "$DATA" \
@@ -316,13 +321,12 @@ In the context of deploying an ChatQnA pipeline on an Intel® Xeon® platform, w
    DATA='{"messages":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source '\
    'text embeddings and sequence classification models. TEI enables high-performance extraction for the most '\
    'popular models, including FlagEmbedding, Ember, GTE and E5.","max_tokens": 128}'
-   
+
    curl http://${HOST_IP}:${CHATQNA_LLM_FAQGEN_PORT}/v1/faqgen \
      -X POST \
      -d "$DATA" \
      -H 'Content-Type: application/json'
    ```
-
 
 ## Conclusion
 
