@@ -8,7 +8,7 @@ RAG bridges the knowledge gap by dynamically fetching relevant information from 
 
 1. [Architecture](#architecture)
 2. [Deployment Options](#deployment-options)
-3. [Monitoring and Tracing](./README_miscellaneous.md#Monitoring-OPEA-Service-with-Prometheus-and-Grafana-dashboard)
+3. [Monitoring and Tracing](#monitor-and-tracing)
 
 ## Architecture
 
@@ -16,7 +16,7 @@ The ChatQnA application is a customizable end-to-end workflow that leverages the
 
 ![architecture](./assets/img/chatqna_architecture.png)
 
-This application is modular as it leverages each component as a microservice(as defined in [GenAIComps](https://github.com/opea-project/GenAIComps)) that can scale independently. It comprises data preparation, embedding, retrieval, reranker(optional) and LLM microservices. All these microservices are stiched together by the Chatqna megaservice that orchestrates the data through these microservices. The flow chart below shows the information flow between different microservices for this example.
+This application is modular as it leverages each component as a microservice(as defined in [GenAIComps](https://github.com/opea-project/GenAIComps)) that can scale independently. It comprises data preparation, embedding, retrieval, reranker(optional) and LLM microservices. All these microservices are stitched together by the ChatQnA megaservice that orchestrates the data through these microservices. The flow chart below shows the information flow between different microservices for this example.
 
 ```mermaid
 ---
@@ -108,8 +108,13 @@ The table below lists currently available deployment options. They outline in de
 |                         |                              | [Terraform deployment on 4th Gen Intel Xeon with Intel AMX using TII Falcon2-11B](https://github.com/intel/terraform-intel-aws-vm/tree/main/examples/gen-ai-xeon-opea-chatqna-falcon11B)                                                                                             |
 |                         | GCP                          | [Terraform deployment on 5th Gen Intel Xeon with Intel AMX(support Confidential AI by using Intel® TDX](https://github.com/intel/terraform-intel-gcp-vm/tree/main/examples/gen-ai-xeon-opea-chatqna)                                                                                |
 |                         | Azure                        | [Terraform deployment on 4th/5th Gen Intel Xeon with Intel AMX & Intel TDX](https://github.com/intel/terraform-intel-azure-linux-vm/tree/main/examples/azure-gen-ai-xeon-opea-chatqna-tdx)                                                                                           |
-|                         | Intel Tiber AI Cloud         | Work-in-progress                                                                                                                                                                                                                                                                     |
+|                         | Intel Tiber AI Cloud         | Coming Soon                                                                                                                                                                                                                                                                          |
 |                         | Any Xeon based Ubuntu system | [ChatQnA Ansible Module for Ubuntu 20.04](https://github.com/intel/optimized-cloud-recipes/tree/main/recipes/ai-opea-chatqna-xeon) .Use this if you are not using Terraform and have provisioned your system either manually or with another tool, including directly on bare metal. |
+
+## Monitor and Tracing
+
+Follow [OpenTelemetry OPEA Guide](https://opea-project.github.io/latest/tutorial/OpenTelemetry/OpenTelemetry_OPEA_Guide.html) to understand how to use OpenTelemetry tracing and metrics in OPEA.  
+For ChatQnA specific tracing and metrics monitoring, follow [OpenTelemetry on ChatQnA](https://opea-project.github.io/latest/tutorial/OpenTelemetry/deploy/ChatQnA.html) section.
 
 ## FAQ Generation Application
 
