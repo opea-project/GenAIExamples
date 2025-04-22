@@ -38,7 +38,3 @@ vllm:
     readOnlyRootFilesystem: false
     runAsNonRoot: false
     runAsUser: 0
-
-
-
-
