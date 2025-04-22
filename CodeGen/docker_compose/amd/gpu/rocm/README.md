@@ -111,7 +111,7 @@ security_opt:
   - seccomp:unconfined
 ```
 
-This configuration forwards all available GPUs to the container. To use a specific GPU, specify its `cardN` and `renderN` device IDs (e.g., `/dev/dri/card0:/dev/dri/card0`, `/dev/dri/render128:/dev/dri/render128`).  For example:
+This configuration forwards all available GPUs to the container. To use a specific GPU, specify its `cardN` and `renderN` device IDs (e.g., `/dev/dri/card0:/dev/dri/card0`, `/dev/dri/render128:/dev/dri/render128`). For example:
 
 ```yaml
 shm_size: 1g
@@ -129,7 +129,6 @@ security_opt:
 
 **How to Identify GPU Device IDs:**
 Use AMD GPU driver utilities to determine the correct `cardN` and `renderN` IDs for your GPU.
-
 
 ### Environment Variables (`set_env*.sh`)
 
