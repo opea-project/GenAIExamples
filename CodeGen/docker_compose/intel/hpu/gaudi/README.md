@@ -1,373 +1,246 @@
-# Build MegaService of CodeGen on Gaudi
+# Deploy CodeGen Application on Intel Gaudi HPU with Docker Compose
 
-This document outlines the deployment process for a CodeGen application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on Intel Gaudi2 server. The steps include Docker images creation, container deployment via Docker Compose, and service execution to integrate microservices such as `llm`. We will publish the Docker images to the Docker Hub soon, further simplifying the deployment process for this service.
+This README provides instructions for deploying the CodeGen application using Docker Compose on systems equipped with Intel Gaudi HPUs.
 
-The default pipeline deploys with vLLM as the LLM serving component. It also provides options of using TGI backend for LLM microservice.
+## Table of Contents
 
-## 🚀 Start MicroServices and MegaService
+- [Overview](#overview)
+- [Prerequisites](#prerequisites)
+- [Quick Start](#quick-start)
+- [Available Deployment Options](#available-deployment-options)
+  - [Default: vLLM-based Deployment (`--profile codegen-gaudi-vllm`)](#default-vllm-based-deployment---profile-codegen-gaudi-vllm)
+  - [TGI-based Deployment (`--profile codegen-gaudi-tgi`)](#tgi-based-deployment---profile-codegen-gaudi-tgi)
+- [Configuration Parameters](#configuration-parameters)
+  - [Environment Variables](#environment-variables)
+  - [Compose Profiles](#compose-profiles)
+  - [Docker Compose Gaudi Configuration](#docker-compose-gaudi-configuration)
+- [Building Custom Images (Optional)](#building-custom-images-optional)
+- [Validate Services](#validate-services)
+  - [Check Container Status](#check-container-status)
+  - [Run Validation Script/Commands](#run-validation-scriptcommands)
+- [Accessing the User Interface (UI)](#accessing-the-user-interface-ui)
+  - [Gradio UI (Default)](#gradio-ui-default)
+  - [Svelte UI (Optional)](#svelte-ui-optional)
+  - [React UI (Optional)](#react-ui-optional)
+  - [VS Code Extension (Optional)](#vs-code-extension-optional)
+- [Troubleshooting](#troubleshooting)
+- [Stopping the Application](#stopping-the-application)
+- [Next Steps](#next-steps)
 
-The CodeGen megaservice manages a several microservices including 'Embedding MicroService', 'Retrieval MicroService' and 'LLM MicroService' within a Directed Acyclic Graph (DAG). In the diagram below, the LLM microservice is a language model microservice that generates code snippets based on the user's input query. The TGI service serves as a text generation interface, providing a RESTful API for the LLM microservice. Data Preparation allows users to save/update documents or online resources to the vector database. Users can upload files or provide URLs, and manage their saved resources. The CodeGen Gateway acts as the entry point for the CodeGen application, invoking the Megaservice to generate code snippets in response to the user's input query.
+## Overview
 
-The mega flow of the CodeGen application, from user's input query to the application's output response, is as follows:
+This guide focuses on running the pre-configured CodeGen service using Docker Compose on Intel Gaudi HPUs. It leverages containers optimized for Gaudi for the LLM serving component (vLLM or TGI), along with CPU-based containers for other microservices like embedding, retrieval, data preparation, the main gateway, and the UI.
 
-```mermaid
----
-config:
-  flowchart:
-    nodeSpacing: 400
-    rankSpacing: 100
-    curve: linear
-  themeVariables:
-    fontSize: 25px
----
-flowchart LR
-    %% Colors %%
-    classDef blue fill:#ADD8E6,stroke:#ADD8E6,stroke-width:2px,fill-opacity:0.5
-    classDef orange fill:#FBAA60,stroke:#ADD8E6,stroke-width:2px,fill-opacity:0.5
-    classDef orchid fill:#C26DBC,stroke:#ADD8E6,stroke-width:2px,fill-opacity:0.5
-    classDef invisible fill:transparent,stroke:transparent;
-    style CodeGen-MegaService stroke:#000000
-    %% Subgraphs %%
-    subgraph CodeGen-MegaService["CodeGen-MegaService"]
-        direction LR
-        EM([Embedding<br>MicroService]):::blue
-        RET([Retrieval<br>MicroService]):::blue
-        RER([Agents]):::blue
-        LLM([LLM<br>MicroService]):::blue
-    end
-    subgraph User Interface
-        direction LR
-        a([Submit Query Tab]):::orchid
-        UI([UI server]):::orchid
-        Ingest([Manage Resources]):::orchid
-    end
+## Prerequisites
 
-    CLIP_EM{{Embedding<br>service}}
-    VDB{{Vector DB}}
-    V_RET{{Retriever<br>service}}
-    Ingest{{Ingest data}}
-    DP([Data Preparation]):::blue
-    LLM_gen{{TGI Service}}
-    GW([CodeGen GateWay]):::orange
+- Docker and Docker Compose installed.
+- Intel Gaudi HPU(s) with the necessary drivers and software stack installed on the host system. (Refer to [Intel Gaudi Documentation](https://docs.habana.ai/en/latest/)).
+- Git installed (for cloning repository).
+- Hugging Face Hub API Token (for downloading models).
+- Access to the internet (or a private model cache).
+- Clone the `GenAIExamples` repository:
+  ```bash
+  git clone https://github.com/opea-project/GenAIExamples.git
+  cd GenAIExamples/CodeGen/docker_compose/intel/hpu/gaudi
+  ```
 
-    %% Data Preparation flow
-    %% Ingest data flow
-    direction LR
-    Ingest[Ingest data] --> UI
-    UI --> DP
-    DP <-.-> CLIP_EM
+## Quick Start
 
-    %% Questions interaction
-    direction LR
-    a[User Input Query] --> UI
-    UI --> GW
-    GW <==> CodeGen-MegaService
-    EM ==> RET
-    RET ==> RER
-    RER ==> LLM
+This uses the default vLLM-based deployment profile (`codegen-gaudi-vllm`).
 
+1.  **Configure Environment:**
+    Set required environment variables in your shell:
 
-    %% Embedding service flow
-    direction LR
-    EM <-.-> CLIP_EM
-    RET <-.-> V_RET
-    LLM <-.-> LLM_gen
+    ```bash
+    # Replace with your host's external IP address (do not use localhost or 127.0.0.1)
+    export HOST_IP="your_external_ip_address"
+    # Replace with your Hugging Face Hub API token
+    export HUGGINGFACEHUB_API_TOKEN="your_huggingface_token"
 
-    direction TB
-    %% Vector DB interaction
-    V_RET <-.->VDB
-    DP <-.->VDB
+    # Optional: Configure proxy if needed
+    # export http_proxy="your_http_proxy"
+    # export https_proxy="your_https_proxy"
+    # export no_proxy="localhost,127.0.0.1,${HOST_IP}" # Add other hosts if necessary
+    source ../../../set_env.sh
+    ```
+
+    _Note: Ensure all required variables like ports (`LLM_SERVICE_PORT`, `MEGA_SERVICE_PORT`, etc.) are set if not using defaults from the compose file._
+
+2.  **Start Services (vLLM Profile):**
+
+    ```bash
+    docker compose --profile codegen-gaudi-vllm up -d
+    ```
+
+3.  **Validate:**
+    Wait several minutes for models to download and services to initialize (Gaudi initialization can take time). Check container logs (`docker compose logs -f <service_name>`, especially `codegen-vllm-gaudi-server` or `codegen-tgi-gaudi-server`) or proceed to the validation steps below.
+
+## Available Deployment Options
+
+The `compose.yaml` file uses Docker Compose profiles to select the LLM serving backend accelerated on Gaudi.
+
+### Default: vLLM-based Deployment (`--profile codegen-gaudi-vllm`)
+
+- **Profile:** `codegen-gaudi-vllm`
+- **Description:** Uses vLLM optimized for Intel Gaudi HPUs as the LLM serving engine. This is the default profile used in the Quick Start.
+- **Gaudi Service:** `codegen-vllm-gaudi-server`
+- **Other Services:** `codegen-llm-server`, `codegen-tei-embedding-server` (CPU), `codegen-retriever-server` (CPU), `redis-vector-db` (CPU), `codegen-dataprep-server` (CPU), `codegen-backend-server` (CPU), `codegen-gradio-ui-server` (CPU).
+
+### TGI-based Deployment (`--profile codegen-gaudi-tgi`)
+
+- **Profile:** `codegen-gaudi-tgi`
+- **Description:** Uses Hugging Face Text Generation Inference (TGI) optimized for Intel Gaudi HPUs as the LLM serving engine.
+- **Gaudi Service:** `codegen-tgi-gaudi-server`
+- **Other Services:** Same CPU-based services as the vLLM profile.
+- **To Run:**
+  ```bash
+  # Ensure environment variables (HOST_IP, HUGGINGFACEHUB_API_TOKEN) are set
+  docker compose --profile codegen-gaudi-tgi up -d
+  ```
+
+## Configuration Parameters
+
+### Environment Variables
+
+Key parameters are configured via environment variables set before running `docker compose up`.
+
+| Environment Variable                    | Description                                                                                                         | Default (Set Externally)                                                                         |
+| :-------------------------------------- | :------------------------------------------------------------------------------------------------------------------ | :----------------------------------------------------------------------------------------------- |
+| `HOST_IP`                               | External IP address of the host machine. **Required.**                                                              | `your_external_ip_address`                                                                       |
+| `HUGGINGFACEHUB_API_TOKEN`              | Your Hugging Face Hub token for model access. **Required.**                                                         | `your_huggingface_token`                                                                         |
+| `LLM_MODEL_ID`                          | Hugging Face model ID for the CodeGen LLM (used by TGI/vLLM service). Configured within `compose.yaml` environment. | `Qwen/Qwen2.5-Coder-7B-Instruct`                                                                 |
+| `EMBEDDING_MODEL_ID`                    | Hugging Face model ID for the embedding model (used by TEI service). Configured within `compose.yaml` environment.  | `BAAI/bge-base-en-v1.5`                                                                          |
+| `LLM_ENDPOINT`                          | Internal URL for the LLM serving endpoint (used by `codegen-llm-server`). Configured in `compose.yaml`.             | `http://codegen-tgi-server:80/generate` or `http://codegen-vllm-server:8000/v1/chat/completions` |
+| `TEI_EMBEDDING_ENDPOINT`                | Internal URL for the Embedding service. Configured in `compose.yaml`.                                               | `http://codegen-tei-embedding-server:80/embed`                                                   |
+| `DATAPREP_ENDPOINT`                     | Internal URL for the Data Preparation service. Configured in `compose.yaml`.                                        | `http://codegen-dataprep-server:80/dataprep`                                                     |
+| `BACKEND_SERVICE_ENDPOINT`              | External URL for the CodeGen Gateway (MegaService). Derived from `HOST_IP` and port `7778`.                         | `http://${HOST_IP}:7778/v1/codegen`                                                              |
+| `*_PORT` (Internal)                     | Internal container ports (e.g., `80`, `6379`). Defined in `compose.yaml`.                                           | N/A                                                                                              |
+| `http_proxy` / `https_proxy`/`no_proxy` | Network proxy settings (if required).                                                                               | `""`                                                                                             |
+
+Most of these parameters are in `set_env.sh`, you can either modify this file or overwrite the env variables by setting them.
+
+```shell
+source CodeGen/docker_compose/set_env.sh
 ```
 
-### Setup Environment Variables
+### Compose Profiles
 
-Since the `compose.yaml` will consume some environment variables, you need to setup them in advance as below.
+Docker Compose profiles (`codegen-gaudi-vllm`, `codegen-gaudi-tgi`) select the Gaudi-accelerated LLM serving backend (vLLM or TGI). CPU-based services run under both profiles.
 
-1. set the host_ip and huggingface token
+### Docker Compose Gaudi Configuration
 
-> [!NOTE]
-> Please replace the `your_ip_address` with you external IP address, do not use `localhost`.
+The `compose.yaml` file includes specific configurations for Gaudi services (`codegen-vllm-gaudi-server`, `codegen-tgi-gaudi-server`):
+
+```yaml
+# Example snippet for codegen-vllm-gaudi-server
+runtime: habana # Specifies the Habana runtime for Docker
+volumes:
+  - /dev/vfio:/dev/vfio # Mount necessary device files
+cap_add:
+  - SYS_NICE # Add capabilities needed by Gaudi drivers/runtime
+ipc: host # Use host IPC namespace
+environment:
+  HABANA_VISIBLE_DEVICES: all # Make all Gaudi devices visible
+  # Other model/service specific env vars
+```
+
+This setup grants the container access to Gaudi devices. Ensure the host system has the Habana Docker runtime correctly installed and configured.
+
+## Building Custom Images (Optional)
+
+If you need to modify microservices:
+
+1.  **For Gaudi Services (TGI/vLLM):** Refer to specific build instructions for TGI-Gaudi or vLLM-Gaudi within [OPEA GenAIComps](https://github.com/opea-project/GenAIComps) or their respective upstream projects. Building Gaudi-optimized images often requires a specific build environment.
+2.  **For CPU Services:** Follow instructions in `GenAIComps` component directories (e.g., `comps/codegen`, `comps/ui/gradio`). Use the provided Dockerfiles.
+3.  Tag your custom images.
+4.  Update the `image:` fields in the `compose.yaml` file.
+
+## Validate Services
+
+### Check Container Status
+
+Ensure all containers are running, especially the Gaudi-accelerated LLM service:
 
 ```bash
-export host_ip=${your_ip_address}
-export HUGGINGFACEHUB_API_TOKEN=you_huggingface_token
+docker compose --profile <profile_name> ps
+# Example: docker compose --profile codegen-gaudi-vllm ps
 ```
 
-2. Set Network Proxy
+Check logs: `docker compose logs <service_name>`. Pay attention to `vllm-gaudi-server` or `tgi-gaudi-server` logs for initialization status and errors.
 
-**If you access public network through proxy, set the network proxy, otherwise, skip this step**
+### Run Validation Script/Commands
 
-```bash
-export no_proxy=${no_proxy},${host_ip}
-export http_proxy=${your_http_proxy}
-export https_proxy=${your_https_proxy}
-```
+Use `curl` commands targeting the main service endpoints. Ensure `HOST_IP` is correctly set.
 
-### Start the Docker Containers for All Services
+1.  **Validate LLM Serving Endpoint (Example for vLLM on default port 8000 internally, exposed differently):**
 
-Find the corresponding [compose.yaml](./compose.yaml). User could start CodeGen based on TGI or vLLM service:
-
-```bash
-cd GenAIExamples/CodeGen/docker_compose/intel/hpu/gaudi
-```
-
-#### TGI service:
-
-```bash
-docker compose --profile codegen-gaudi-tgi up -d
-```
-
-Then run the command `docker images`, you will have the following Docker images:
-
-- `ghcr.io/huggingface/text-embeddings-inference:cpu-1.5`
-- `ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu`
-- `opea/codegen-gradio-ui`
-- `opea/codegen`
-- `opea/dataprep`
-- `opea/embedding`
-- `opea/llm-textgen`
-- `opea/retriever`
-- `redis/redis-stack`
-
-#### vLLM service:
-
-```bash
-docker compose --profile codegen-gaudi-vllm up -d
-```
-
-Then run the command `docker images`, you will have the following Docker images:
-
-- `ghcr.io/huggingface/text-embeddings-inference:cpu-1.5`
-- `ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu`
-- `opea/codegen-gradio-ui`
-- `opea/codegen`
-- `opea/dataprep`
-- `opea/embedding`
-- `opea/llm-textgen`
-- `opea/retriever`
-- `redis/redis-stack`
-- `opea/vllm`
-
-Refer to the [Gaudi Guide](./README.md) to build docker images from source.
-
-### Building the Docker image locally
-
-Should the Docker image you seek not yet be available on Docker Hub, you can build the Docker image locally.
-In order to build the Docker image locally follow the instrustion provided below.
-
-#### Build the MegaService Docker Image
-
-To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `codegen.py` Python script. Build the MegaService Docker image via the command below:
-
-```bash
-git clone https://github.com/opea-project/GenAIExamples
-cd GenAIExamples/CodeGen
-docker build -t opea/codegen:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
-```
-
-#### Build the UI Gradio Image
-
-Build the frontend Gradio image via the command below:
-
-```bash
-cd GenAIExamples/CodeGen/ui
-docker build -t opea/codegen-gradio-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile.gradio .
-```
-
-#### Dataprep Microservice with Redis
-
-Follow the instrustion provided here: [opea/dataprep](https://github.com/MSCetin37/GenAIComps/blob/main/comps/dataprep/src/README_redis.md)
-
-#### Embedding Microservice with TEI
-
-Follow the instrustion provided here: [opea/embedding](https://github.com/MSCetin37/GenAIComps/blob/main/comps/embeddings/src/README_tei.md)
-
-#### LLM text generation Microservice
-
-Follow the instrustion provided here: [opea/llm-textgen](https://github.com/MSCetin37/GenAIComps/tree/main/comps/llms/src/text-generation)
-
-#### Retriever Microservice
-
-Follow the instrustion provided here: [opea/retriever](https://github.com/MSCetin37/GenAIComps/blob/main/comps/retrievers/src/README_redis.md)
-
-#### Start Redis server
-
-Follow the instrustion provided here: [redis/redis-stack](https://github.com/MSCetin37/GenAIComps/tree/main/comps/third_parties/redis/src)
-
-### Validate the MicroServices and MegaService
-
-1. LLM Service (for TGI, vLLM)
-
-   ```bash
-   curl http://${host_ip}:8028/v1/chat/completions \
+    ```bash
+    # This command structure targets the OpenAI-compatible vLLM endpoint
+    curl http://${HOST_IP}:8000/v1/chat/completions \
        -X POST \
        -H 'Content-Type: application/json' \
-       -d '{"model": "Qwen/Qwen2.5-Coder-7B-Instruct", "messages": [{"role": "user", "content": "Implement a high-level API for a TODO list application. The API takes as input an operation request and updates the TODO list in place. If the request is invalid, raise an exception."}], "max_tokens":32}'
+       -d '{"model": "Qwen/Qwen2.5-Coder-7B-Instruct", "messages": [{"role": "user", "content": "Implement a basic Python class"}], "max_tokens":32}'
+    ```
 
-   ```
+2.  **Validate CodeGen Gateway (MegaService, default host port 7778):**
+    ```bash
+    curl http://${HOST_IP}:7778/v1/codegen \
+      -H "Content-Type: application/json" \
+      -d '{"messages": "Implement a sorting algorithm in Python."}'
+    ```
+    - **Expected Output:** Stream of JSON data chunks with generated code, ending in `data: [DONE]`.
 
-2. LLM Microservices
+## Accessing the User Interface (UI)
 
-   ```bash
-   curl http://${host_ip}:9000/v1/chat/completions\
-     -X POST \
-     -H 'Content-Type: application/json' \
-     -d '{"query":"Implement a high-level API for a TODO list application. The API takes as input an operation request and updates the TODO list in place. If the request is invalid, raise an exception.","max_tokens":256,"top_k":10,"top_p":0.95,"typical_p":0.95,"temperature":0.01,"repetition_penalty":1.03,"stream":true}'
-   ```
+UI options are similar to the Xeon deployment.
 
-3. Dataprep Microservice
+### Gradio UI (Default)
 
-   Make sure to replace the file name placeholders with your correct file name
+Access the default Gradio UI:
+`http://{HOST_IP}:8080`
+_(Port `8080` is the default host mapping)_
 
-   ```bash
-   curl http://${host_ip}:6007/v1/dataprep/ingest \
-   -X POST \
-   -H "Content-Type: multipart/form-data" \
-   -F "files=@./file1.pdf" \
-   -F "files=@./file2.txt" \
-   -F "index_name=my_API_document"
-   ```
+![Gradio UI](../../../../assets/img/codegen_gradio_ui_main.png)
 
-4. MegaService
+### Svelte UI (Optional)
 
-   ```bash
-   curl http://${host_ip}:7778/v1/codegen \
-     -H "Content-Type: application/json" \
-     -d '{"messages": "Implement a high-level API for a TODO list application. The API takes as input an operation request and updates the TODO list in place. If the request is invalid, raise an exception."}'
-   ```
+1.  Modify `compose.yaml`: Swap Gradio service for Svelte (`codegen-gaudi-ui-server`), check port map (e.g., `5173:5173`).
+2.  Restart: `docker compose --profile <profile_name> up -d`
+3.  Access: `http://{HOST_IP}:5173`
 
-   CodeGen service with RAG and Agents activated based on an index.
+### React UI (Optional)
 
-   ```bash
-   curl http://${host_ip}$:7778/v1/codegen \
-     -H "Content-Type: application/json" \
-     -d '{"agents_flag": "True", "index_name": "my_API_document", "messages": "Implement a high-level API for a TODO list application. The API takes as input an operation request and updates the TODO list in place. If the request is invalid, raise an exception."}'
-   ```
+1.  Modify `compose.yaml`: Swap Gradio service for React (`codegen-gaudi-react-ui-server`), check port map (e.g., `5174:80`).
+2.  Restart: `docker compose --profile <profile_name> up -d`
+3.  Access: `http://{HOST_IP}:5174`
 
-## 🚀 Launch the Gradio Based UI (Recommended)
+### VS Code Extension (Optional)
 
-To access the Gradio frontend URL, follow the steps in [this README](../../../../ui/gradio/README.md)
+Use the `Neural Copilot` extension configured with the CodeGen backend URL: `http://${HOST_IP}:7778/v1/codegen`. (See Xeon README for detailed setup screenshots).
 
-Code Generation Tab
-![project-screenshot](../../../../assets/img/codegen_gradio_ui_main.png)
+## Troubleshooting
 
-Resource Management Tab
-![project-screenshot](../../../../assets/img/codegen_gradio_ui_main.png)
+- **Gaudi Service Issues:**
+  - Check logs (`codegen-vllm-gaudi-server` or `codegen-tgi-gaudi-server`) for Habana/Gaudi specific errors.
+  - Ensure host drivers and Habana Docker runtime are installed and working (`habana-container-runtime`).
+  - Verify `runtime: habana` and volume mounts in `compose.yaml`.
+  - Gaudi initialization can take significant time and memory. Monitor resource usage.
+- **Model Download Issues:** Check `HUGGINGFACEHUB_API_TOKEN`, internet access, proxy settings. Check LLM service logs.
+- **Connection Errors:** Verify `HOST_IP`, ports, and proxy settings. Use `docker ps` and check service logs.
 
-Uploading a Knowledge Index
+## Stopping the Application
 
-![project-screenshot](../../../../assets/img/codegen_gradio_ui_dataprep.png)
-
-Here is an example of running a query in the Gradio UI using an Index:
-
-![project-screenshot](../../../../assets/img/codegen_gradio_ui_query.png)
-
-## 🚀 Launch the Svelte Based UI (Optional)
-
-To access the frontend, open the following URL in your browser: `http://{host_ip}:5173`. By default, the UI runs on port 5173 internally. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `compose.yaml` file as shown below:
-
-```yaml
-  codegen-gaudi-ui-server:
-    image: opea/codegen-ui:latest
-    ...
-    ports:
-      - "80:5173"
+```bash
+docker compose --profile <profile_name> down
+# Example: docker compose --profile codegen-gaudi-vllm down
 ```
 
-![project-screenshot](../../../../assets/img/codeGen_ui_init.jpg)
+## Next Steps
 
-## 🚀 Launch the React Based UI (Optional)
+- Experiment with different models supported by TGI/vLLM on Gaudi.
+- Consult [OPEA GenAIComps](https://github.com/opea-project/GenAIComps) for microservice details.
+- Refer to the main [CodeGen README](../../../../README.md) for benchmarking and Kubernetes deployment options.
 
-To access the React-based frontend, modify the UI service in the `compose.yaml` file. Replace `codegen-gaudi-ui-server` service with the `codegen-gaudi-react-ui-server` service as per the config below:
-
-```yaml
-codegen-gaudi-react-ui-server:
-  image: ${REGISTRY:-opea}/codegen-react-ui:${TAG:-latest}
-  container_name: codegen-gaudi-react-ui-server
-  environment:
-    - no_proxy=${no_proxy}
-    - https_proxy=${https_proxy}
-    - http_proxy=${http_proxy}
-    - APP_CODE_GEN_URL=${BACKEND_SERVICE_ENDPOINT}
-  depends_on:
-    - codegen-gaudi-backend-server
-  ports:
-    - "5174:80"
-  ipc: host
-  restart: always
 ```
 
-![project-screenshot](../../../../assets/img/codegen_react.png)
-
-## Install Copilot VSCode extension from Plugin Marketplace as the frontend
-
-In addition to the Svelte UI, users can also install the Copilot VSCode extension from the Plugin Marketplace as the frontend.
-
-Install `Neural Copilot` in VSCode as below.
-
-![Install-screenshot](../../../../assets/img/codegen_copilot.png)
-
-### How to Use
-
-#### Service URL Setting
-
-Please adjust the service URL in the extension settings based on the endpoint of the CodeGen backend service.
-
-![Setting-screenshot](../../../../assets/img/codegen_settings.png)
-![Setting-screenshot](../../../../assets/img/codegen_endpoint.png)
-
-#### Customize
-
-The Copilot enables users to input their corresponding sensitive information and tokens in the user settings according to their own needs. This customization enhances the accuracy and output content to better meet individual requirements.
-
-![Customize](../../../../assets/img/codegen_customize.png)
-
-#### Code Suggestion
-
-To trigger inline completion, you'll need to type `# {your keyword} (start with your programming language's comment keyword, like // in C++ and # in python)`. Make sure the `Inline Suggest` is enabled from the VS Code Settings.
-For example:
-
-![code suggestion](../../../../assets/img/codegen_suggestion.png)
-
-To provide programmers with a smooth experience, the Copilot supports multiple ways to trigger inline code suggestions. If you are interested in the details, they are summarized as follows:
-
-- Generate code from single-line comments: The simplest way introduced before.
-- Generate code from consecutive single-line comments:
-
-![codegen from single-line comments](../../../../assets/img/codegen_single_line.png)
-
-- Generate code from multi-line comments, which will not be triggered until there is at least one `space` outside the multi-line comment):
-
-![codegen from multi-line comments](../../../../assets/img/codegen_multi_line.png)
-
-- Automatically complete multi-line comments:
-
-![auto complete](../../../../assets/img/codegen_auto_complete.jpg)
-
-### Chat with AI assistant
-
-You can start a conversation with the AI programming assistant by clicking on the robot icon in the plugin bar on the left:
-
-![icon](../../../../assets/img/codegen_icon.png)
-
-Then you can see the conversation window on the left, where you can chat with the AI assistant:
-
-![dialog](../../../../assets/img/codegen_dialog.png)
-
-There are 4 areas worth noting as shown in the screenshot above:
-
-1. Enter and submit your question
-2. Your previous questions
-3. Answers from AI assistant (Code will be highlighted properly according to the programming language it is written in, also support stream output)
-4. Copy or replace code with one click (Note that you need to select the code in the editor first and then click "replace", otherwise the code will be inserted)
-
-You can also select the code in the editor and ask the AI assistant questions about the code directly.
-For example:
-
-- Select code
-
-![select code](../../../../assets/img/codegen_select_code.png)
-
-- Ask question and get answer
-
-![qna](../../../../assets/img/codegen_qna.png)
+```

@@ -1,24 +1,38 @@
-# Code Generation Application
+# Code Generation Example (CodeGen)
 
-Code Generation (CodeGen) Large Language Models (LLMs) are specialized AI models designed for the task of generating computer code. Such models undergo training with datasets that encompass repositories, specialized documentation, programming code, relevant web content, and other related data. They possess a deep understanding of various programming languages, coding patterns, and software development concepts. CodeGen LLMs are engineered to assist developers and programmers. When these LLMs are seamlessly integrated into the developer's Integrated Development Environment (IDE), they possess a comprehensive understanding of the coding context, which includes elements such as comments, function names, and variable names. This contextual awareness empowers them to provide more refined and contextually relevant coding suggestions. Additionally Retrieval-Augmented Generation (RAG) and Agents are parts of the CodeGen example which provide an additional layer of intelligence and adaptability, ensuring that the generated code is not only relevant but also accurate, efficient, and tailored to the specific needs of the developers and programmers.
+## Table of Contents
 
-The capabilities of CodeGen LLMs include:
+- [Overview](#overview)
+- [Problem Motivation](#problem-motivation)
+- [Architecture](#architecture)
+  - [High-Level Diagram](#high-level-diagram)
+  - [OPEA Microservices Diagram](#opea-microservices-diagram)
+- [Deployment Options](#deployment-options)
+- [Benchmarking](#benchmarking)
+- [Automated Deployment using Terraform](#automated-deployment-using-terraform)
+- [Contribution](#contribution)
 
-- Code Generation: Streamline coding through Code Generation, enabling non-programmers to describe tasks for code creation.
-- Code Completion: Accelerate coding by suggesting contextually relevant snippets as developers type.
-- Code Translation and Modernization: Translate and modernize code across multiple programming languages, aiding interoperability and updating legacy projects.
-- Code Summarization: Extract key insights from codebases, improving readability and developer productivity.
-- Code Refactoring: Offer suggestions for code refactoring, enhancing code performance and efficiency.
-- AI-Assisted Testing: Assist in creating test cases, ensuring code robustness and accelerating development cycles.
-- Error Detection and Debugging: Detect errors in code and provide detailed descriptions and potential fixes, expediting debugging processes.
+## Overview
 
-In this example, we present a Code Copilot application to showcase how code generation can be executed on either Intel Gaudi2 platform or Intel Xeon Processor platform. This CodeGen use case involves code generation utilizing open-source models such as `m-a-p/OpenCodeInterpreter-DS-6.7B` and `deepseek-ai/deepseek-coder-33b-instruct` with Text Generation Inference (TGI) for serving deployment.
+The Code Generation (CodeGen) example demonstrates an AI application designed to assist developers by generating computer code based on natural language prompts or existing code context. It leverages Large Language Models (LLMs) trained on vast datasets of repositories, documentation, and code for programming.
 
-The workflow falls into the following architecture:
+This example showcases how developers can quickly deploy and utilize a CodeGen service, potentially integrating it into their IDEs or development workflows to accelerate tasks like code completion, translation, summarization, refactoring, and error detection.
 
-![architecture](./assets/img/codegen_architecture.png)
+## Problem Motivation
 
-The CodeGen example is implemented using the component-level microservices defined in [GenAIComps](https://github.com/opea-project/GenAIComps). The flow chart below shows the information flow between different microservices for this example.
+Writing, understanding, and maintaining code can be time-consuming and complex. Developers often perform repetitive coding tasks, struggle with translating between languages, or need assistance understanding large codebases. CodeGen LLMs address this by automating code generation, providing intelligent suggestions, and assisting with various code-related tasks, thereby boosting productivity and reducing development friction. This OPEA example provides a blueprint for deploying such capabilities using optimized components.
+
+## Architecture
+
+### High-Level Diagram
+
+The CodeGen application follows a microservice-based architecture enabling scalability and flexibility. User requests are processed through a gateway, which orchestrates interactions between various backend services, including the core LLM for code generation and potentially retrieval-augmented generation (RAG) components for context-aware responses.
+
+![High-level Architecture](./assets/img/codegen_architecture.png)
+
+### OPEA Microservices Diagram
+
+This example utilizes several microservices from the [OPEA GenAIComps](https://github.com/opea-project/GenAIComps) repository. The diagram below illustrates the interaction between these components for a typical CodeGen request, potentially involving RAG using a vector database.
 
 ```mermaid
 ---
@@ -57,11 +71,10 @@ flowchart LR
     V_RET{{Retriever<br>service}}
     Ingest{{Ingest data}}
     DP([Data Preparation]):::blue
-    LLM_gen{{TGI Service}}
+    LLM_gen{{LLM Serving}}
     GW([CodeGen GateWay]):::orange
 
     %% Data Preparation flow
-    %% Ingest data flow
     direction LR
     Ingest[Ingest data] --> UI
     UI --> DP
@@ -89,161 +102,42 @@ flowchart LR
     DP <-.->VDB
 ```
 
-## 🤖 Automated Terraform Deployment using Intel® Optimized Cloud Modules for **Terraform**
+## Deployment Options
 
-| Cloud Provider       | Intel Architecture                | Intel Optimized Cloud Module for Terraform                                                                    | Comments |
-| -------------------- | --------------------------------- | ------------------------------------------------------------------------------------------------------------- | -------- |
-| AWS                  | 4th Gen Intel Xeon with Intel AMX | [AWS Deployment](https://github.com/intel/terraform-intel-aws-vm/tree/main/examples/gen-ai-xeon-opea-codegen) |          |
-| GCP                  | 4th/5th Gen Intel Xeon            | [GCP Deployment](https://github.com/intel/terraform-intel-gcp-vm/tree/main/examples/gen-ai-xeon-opea-codegen) |          |
-| Azure                | 4th/5th Gen Intel Xeon            | Work-in-progress                                                                                              |          |
-| Intel Tiber AI Cloud | 5th Gen Intel Xeon with Intel AMX | Work-in-progress                                                                                              |          |
+This CodeGen example can be deployed manually on various hardware platforms using Docker Compose or Kubernetes. Select the appropriate guide based on your target environment:
 
-## Manual Deployment of CodeGen Service
+| Hardware        | Deployment Mode      | Guide Link                                                               |
+| :-------------- | :------------------- | :----------------------------------------------------------------------- |
+| Intel Xeon CPU  | Single Node (Docker) | [Xeon Docker Compose Guide](./docker_compose/intel/cpu/xeon/README.md)   |
+| Intel Gaudi HPU | Single Node (Docker) | [Gaudi Docker Compose Guide](./docker_compose/intel/hpu/gaudi/README.md) |
+| AMD ROCm GPU    | Single Node (Docker) | [ROCm Docker Compose Guide](./docker_compose/amd/gpu/rocm/README.md)     |
+| Intel Xeon CPU  | Kubernetes (Helm)    | [Kubernetes Helm Guide](./kubernetes/helm/README.md)                     |
+| Intel Gaudi HPU | Kubernetes (Helm)    | [Kubernetes Helm Guide](./kubernetes/helm/README.md)                     |
+| Intel Xeon CPU  | Kubernetes (GMC)     | [Kubernetes GMC Guide](./kubernetes/gmc/README.md)                       |
+| Intel Gaudi HPU | Kubernetes (GMC)     | [Kubernetes GMC Guide](./kubernetes/gmc/README.md)                       |
 
-The CodeGen service can be effortlessly deployed on either Intel Gaudi2 or Intel Xeon Scalable Processor.
+_Note: Building custom microservice images can be done using the resources in [GenAIComps](https://github.com/opea-project/GenAIComps)._
 
-Currently we support two ways of deploying CodeGen services with docker compose:
+## Benchmarking
 
-1. Start services using the docker image on `docker hub`:
+Guides for evaluating the performance and accuracy of this CodeGen deployment are available:
 
-   ```bash
-   docker pull opea/codegen:latest
-   ```
+| Benchmark Type | Guide Link                                                       |
+| :------------- | :--------------------------------------------------------------- |
+| Accuracy       | [Accuracy Benchmark Guide](./benchmark/accuracy/README.md)       |
+| Performance    | [Performance Benchmark Guide](./benchmark/performance/README.md) |
 
-2. Start services using the docker images built from source. See the [Gaudi Guide](./docker_compose/intel/hpu/gaudi/README.md) or [Xeon Guide](./docker_compose/intel/cpu/xeon/README.md) for more information.
+## Automated Deployment using Terraform
 
-### Required Models
+Intel® Optimized Cloud Modules for Terraform provide an automated way to deploy this CodeGen example on various Cloud Service Providers (CSPs).
 
-By default, the LLM model is set to a default value as listed below:
+| Cloud Provider       | Intel Architecture                | Intel Optimized Cloud Module for Terraform                                                                    | Comments    |
+| :------------------- | :-------------------------------- | :------------------------------------------------------------------------------------------------------------ | :---------- |
+| AWS                  | 4th Gen Intel Xeon with Intel AMX | [AWS Deployment](https://github.com/intel/terraform-intel-aws-vm/tree/main/examples/gen-ai-xeon-opea-codegen) | Available   |
+| GCP                  | 4th/5th Gen Intel Xeon            | [GCP Deployment](https://github.com/intel/terraform-intel-gcp-vm/tree/main/examples/gen-ai-xeon-opea-codegen) | Available   |
+| Azure                | 4th/5th Gen Intel Xeon            | Work-in-progress                                                                                              | Coming Soon |
+| Intel Tiber AI Cloud | 5th Gen Intel Xeon with Intel AMX | Work-in-progress                                                                                              | Coming Soon |
 
-| Service      | Model                                                                                     |
-| ------------ | ----------------------------------------------------------------------------------------- |
-| LLM_MODEL_ID | [Qwen/Qwen2.5-Coder-32B-Instruct](https://huggingface.co/Qwen/Qwen2.5-Coder-32B-Instruct) |
+## Contribution
 
-[Qwen/Qwen2.5-Coder-32B-Instruct](https://huggingface.co/Qwen/Qwen2.5-Coder-7B-Instruct) may be a gated model that requires submitting an access request through Hugging Face. You can replace it with another model for m.
-Change the `LLM_MODEL_ID` below for your needs, such as: [Qwen/Qwen2.5-Coder-7B-Instruct](https://huggingface.co/Qwen/Qwen2.5-Coder-7B-Instruct), [deepseek-ai/deepseek-coder-6.7b-instruct](https://huggingface.co/deepseek-ai/deepseek-coder-6.7b-instruct)
-
-If you choose to use `meta-llama/CodeLlama-7b-hf` as LLM model, you will need to visit [here](https://huggingface.co/meta-llama/CodeLlama-7b-hf), click the `Expand to review and access` button to ask for model access.
-
-### Setup Environment Variable
-
-To set up environment variables for deploying CodeGen services, follow these steps:
-
-1. Set the required environment variables:
-
-   ```bash
-   # Example: host_ip="192.168.1.1"
-   export host_ip="External_Public_IP"
-   # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
-   export no_proxy="Your_No_Proxy"
-   export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
-   ```
-
-2. If you are in a proxy environment, also set the proxy-related environment variables:
-
-   ```bash
-   export http_proxy="Your_HTTP_Proxy"
-   export https_proxy="Your_HTTPs_Proxy"
-   ```
-
-3. Set up other environment variables:
-
-   ```bash
-   source ./docker_compose/set_env.sh
-   ```
-
-### Deploy CodeGen using Docker
-
-#### Deploy CodeGen on Gaudi
-
-Find the corresponding [compose.yaml](./docker_compose/intel/hpu/gaudi/compose.yaml). User could start CodeGen based on TGI or vLLM service:
-
-```bash
-cd GenAIExamples/CodeGen/docker_compose/intel/hpu/gaudi
-```
-
-TGI service:
-
-```bash
-docker compose --profile codegen-gaudi-tgi up -d
-```
-
-vLLM service:
-
-```bash
-docker compose --profile codegen-gaudi-vllm up -d
-```
-
-Refer to the [Gaudi Guide](./docker_compose/intel/hpu/gaudi/README.md) to build docker images from source.
-
-#### Deploy CodeGen on Xeon
-
-Find the corresponding [compose.yaml](./docker_compose/intel/cpu/xeon/compose.yaml). User could start CodeGen based on TGI or vLLM service:
-
-```bash
-cd GenAIExamples/CodeGen/docker_compose/intel/cpu/xeon
-```
-
-TGI service:
-
-```bash
-docker compose --profile codegen-xeon-tgi up -d
-```
-
-vLLM service:
-
-```bash
-docker compose --profile codegen-xeon-vllm up -d
-```
-
-Refer to the [Xeon Guide](./docker_compose/intel/cpu/xeon/README.md) for more instructions on building docker images from source.
-
-### Deploy CodeGen on Kubernetes using Helm Chart
-
-Refer to the [CodeGen helm chart](./kubernetes/helm/README.md) for instructions on deploying CodeGen on Kubernetes.
-
-## Consume CodeGen Service
-
-Two ways of consuming CodeGen Service:
-
-1. Use cURL command on terminal
-
-   ```bash
-   curl http://${host_ip}:7778/v1/codegen \
-       -H "Content-Type: application/json" \
-       -d '{"messages": "Implement a high-level API for a TODO list application. The API takes as input an operation request and updates the TODO list in place. If the request is invalid, raise an exception."}'
-   ```
-
-   If the user wants a CodeGen service with RAG and Agents based on dedicated documentation.
-
-   ```bash
-   curl http://localhost:7778/v1/codegen \
-      -H "Content-Type: application/json" \
-      -d '{"agents_flag": "True", "index_name": "my_API_document", "messages": "Implement a high-level API for a TODO list application. The API takes as input an operation request and updates the TODO list in place. If the request is invalid, raise an exception."}'
-
-   ```
-
-2. Access via frontend
-
-   To access the frontend, open the following URL in your browser: http://{host_ip}:5173.
-
-   By default, the UI runs on port 5173 internally.
-
-## Troubleshooting
-
-1. If you get errors like "Access Denied", [validate micro service](https://github.com/opea-project/GenAIExamples/tree/main/CodeGen/docker_compose/intel/cpu/xeon/README.md#validate-microservices) first. A simple example:
-
-   ```bash
-   http_proxy=""
-   curl http://${host_ip}:8028/generate \
-     -X POST \
-     -d '{"inputs":"Implement a high-level API for a TODO list application. The API takes as input an operation request and updates the TODO list in place. If the request is invalid, raise an exception.","parameters":{"max_tokens":256, "do_sample": true}}' \
-     -H 'Content-Type: application/json'
-   ```
-
-2. If you get errors like "aiohttp.client_exceptions.ClientConnectorError: Cannot connect to host xx.xx.xx.xx:8028", check the `tgi service` first. If there is "Cannot access gated repo for url
-   https://huggingface.co/meta-llama/CodeLlama-7b-hf/resolve/main/config.json." error of `tgi service`, Then you need to ask for model access first. Follow the instruction in the [Required Models](#required-models) section for more information.
-
-3. (Docker only) If all microservices work well, check the port ${host_ip}:7778, the port may be allocated by other users, you can modify the `compose.yaml`.
-
-4. (Docker only) If you get errors like "The container name is in use", change container name in `compose.yaml`.
+We welcome contributions to the OPEA project. Please refer to the contribution guidelines for more information.
