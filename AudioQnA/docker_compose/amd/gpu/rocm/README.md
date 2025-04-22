@@ -62,7 +62,7 @@ security_opt:
   - seccomp:unconfined
 ```
 
-#### Environment Variables (`set_env*.sh`) 
+#### Environment Variables (`set_env*.sh`)
 
 These scripts (`set_env_vllm.sh` for vLLM, `set_env.sh` for TGI) configure crucial parameters passed to the containers.
 
@@ -192,11 +192,10 @@ docker compose -f compose.yaml down
 
 In the context of deploying an AudioQnA pipeline on an Intel® Xeon® platform, we can pick and choose different large language model serving frameworks, or single English TTS/multi-language TTS component. The table below outlines the various configurations that are available as part of the application. These configurations can be used as templates and can be extended to different components available in [GenAIComps](https://github.com/opea-project/GenAIComps.git).
 
-| File                                               | Description                                                                               |
-| -------------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| [compose_vllm.yaml](./compose.yaml)                     | Default compose file using vllm as serving framework and redis as vector database         |
-| [compose.yaml](./compose_tgi.yaml)             | The LLM serving framework is TGI. All other configurations remain the same as the default |
-
+| File                                | Description                                                                               |
+| ----------------------------------- | ----------------------------------------------------------------------------------------- |
+| [compose_vllm.yaml](./compose.yaml) | Default compose file using vllm as serving framework and redis as vector database         |
+| [compose.yaml](./compose_tgi.yaml)  | The LLM serving framework is TGI. All other configurations remain the same as the default |
 
 ### Validate the vLLM/TGI Service
 
