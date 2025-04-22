@@ -1,18 +1,22 @@
-# Build Mega Service of ChatQnA on Xeon
+# Deploying ChatQnA with Pinecone on Intel® Xeon® Processors
 
-This document outlines the deployment process for a ChatQnA application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on Intel Xeon server. The steps include Docker image creation, container deployment via Docker Compose, and service execution to integrate microservices such as `embedding`, `retriever`, `rerank`, and `llm`.
+This document outlines the deployment process for a ChatQnA application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on Intel® Xeon® servers. The pipeline integrates **Pinecone** as the vector database (VectorDB) and includes microservices such as `embedding`, `retriever`, `rerank`, and `llm`.
 
-The default pipeline deploys with vLLM as the LLM serving component and leverages rerank component.
+---
 
-Quick Start:
+## Table of Contents
 
-1. Set up the environment variables.
-2. Run Docker Compose.
-3. Consume the ChatQnA Service.
+1. [Quick Start](#quick-start)
+2. [Build Docker Images](#build-docker-images)
+3. [Validate Microservices](#validate-microservices)
+4. [Launch the UI](#launch-the-ui)
+5. [Launch the Conversational UI (Optional)](#launch-the-conversational-ui-optional)
 
-Note: The default LLM is `meta-llama/Meta-Llama-3-8B-Instruct`. Before deploying the application, please make sure either you've requested and been granted the access to it on [Huggingface](https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct) or you've downloaded the model locally from [ModelScope](https://www.modelscope.cn/models).
+---
 
-## Quick Start: 1.Setup Environment Variable
+## Quick Start
+
+### 1.Set up Environment Variable
 
 To set up environment variables for deploying ChatQnA services, follow these steps:
 
@@ -31,8 +35,8 @@ To set up environment variables for deploying ChatQnA services, follow these ste
 
    ```bash
    export http_proxy="Your_HTTP_Proxy"
-   export https_proxy="Your_HTTPs_Proxy"
-   # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
+   export https_proxy="Your_HTTPS_Proxy"
+   # Example: no_proxy="localhost,127.0.0.1,192.168.1.1"
    export no_proxy="Your_No_Proxy",chatqna-xeon-ui-server,chatqna-xeon-backend-server,dataprep-pinecone-service,tei-embedding-service,retriever,tei-reranking-service,tgi-service,vllm-service
    ```
 
@@ -41,28 +45,28 @@ To set up environment variables for deploying ChatQnA services, follow these ste
    source ./set_env.sh
    ```
 
-## Quick Start: 2.Run Docker Compose
+### 2.Run Docker Compose
 
 ```bash
 docker compose -f compose_pinecone.yaml up -d
 ```
 
-It will automatically download the docker image on `docker hub`:
+It will automatically download the Docker image on `Docker hub`:
 
 ```bash
 docker pull opea/chatqna:latest
 docker pull opea/chatqna-ui:latest
 ```
 
-NB: You should build docker image from source by yourself if:
+Note: You should build docker image from source by yourself if:
 
 - You are developing off the git main branch (as the container's ports in the repo may be different from the published docker image).
 - You can't download the docker image.
 - You want to use a specific version of Docker image.
 
-Please refer to ['Build Docker Images'](#🚀-build-docker-images) in below.
+Please refer to ['Build Docker Images'](#build-docker-images) in below.
 
-## QuickStart: 3.Consume the ChatQnA Service
+### 3.Consume the ChatQnA Service
 
 ```bash
 curl http://${host_ip}:8888/v1/chatqna \
@@ -72,35 +76,7 @@ curl http://${host_ip}:8888/v1/chatqna \
     }'
 ```
 
-## 🚀 Apply Xeon Server on AWS
-
-To apply a Xeon server on AWS, start by creating an AWS account if you don't have one already. Then, head to the [EC2 Console](https://console.aws.amazon.com/ec2/v2/home) to begin the process. Within the EC2 service, select the Amazon EC2 M7i or M7i-flex instance type to leverage 4th Generation Intel Xeon Scalable processors that are optimized for demanding workloads.
-
-For detailed information about these instance types, you can refer to this [link](https://aws.amazon.com/ec2/instance-types/m7i/). Once you've chosen the appropriate instance type, proceed with configuring your instance settings, including network configurations, security groups, and storage options.
-
-After launching your instance, you can connect to it using SSH (for Linux instances) or Remote Desktop Protocol (RDP) (for Windows instances). From there, you'll have full access to your Xeon server, allowing you to install, configure, and manage your applications as needed.
-
-### Network Port & Security
-
-- Access the ChatQnA UI by web browser
-
-  It supports to access by `80` port. Please confirm the `80` port is opened in the firewall of EC2 instance.
-
-- Access the microservice by tool or API
-
-  1. Login to the EC2 instance and access by **local IP address** and port.
-
-     It's recommended and do nothing of the network port setting.
-
-  2. Login to a remote client and access by **public IP address** and port.
-
-     You need to open the port of the microservice in the security group setting of firewall of EC2 instance setting.
-
-     For detailed guide, please refer to [Validate Microservices](#validate-microservices).
-
-     Note, it will increase the risk of security, so please confirm before do it.
-
-## 🚀 Build Docker Images
+## Build Docker Images
 
 First of all, you need to build Docker Images locally and install the python package of it.
 
@@ -218,7 +194,7 @@ For users in China who are unable to download models directly from Huggingface, 
      docker run -p 8008:80 -v $model_path:/root/.cache/huggingface/hub --name vllm-service --shm-size 128g opea/vllm:latest --model /root/.cache/huggingface/hub --host 0.0.0.0 --port 80
      ```
 
-### Setup Environment Variables
+### Set up Environment Variables
 
 1. Set the required environment variables:
 
@@ -263,7 +239,7 @@ If use vLLM backend.
 docker compose -f compose_pinecone.yaml up -d
 ```
 
-### Validate Microservices
+## Validate Microservices
 
 Note, when verify the microservices by curl or API from remote client, please make sure the **ports** of the microservices are opened in the firewall of the cloud node.
 Follow the instructions to validate MicroServices.
@@ -383,12 +359,12 @@ To delete the files/link you uploaded:
 
 ```bash
 # delete all uploaded files and links
-curl -X POST "http://${host_ip}:6009/v1/dataprep/delete" \
+curl -X POST "http://${host_ip}:6007/v1/dataprep/delete" \
      -d '{"file_path": "all"}' \
      -H "Content-Type: application/json"
 ```
 
-## 🚀 Launch the UI
+## Launch the UI
 
 ### Launch with origin port
 
@@ -406,7 +382,7 @@ To access the frontend, open the following URL in your browser: http://{host_ip}
 
 If you want to launch the UI using Nginx, open this URL: `http://${host_ip}:${NGINX_PORT}` in your browser to access the frontend.
 
-## 🚀 Launch the Conversational UI (Optional)
+## Launch the Conversational UI (Optional)
 
 To access the Conversational UI (react based) frontend, modify the UI service in the `compose.yaml` file. Replace `chaqna-xeon-ui-server` service with the `chatqna-xeon-conversation-ui-server` service as per the config below:
 

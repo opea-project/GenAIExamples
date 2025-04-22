@@ -1,0 +1,17 @@
+.searchInput {
+  width: 100%;
+  margin-bottom: 1rem;
+  border-radius: var(--input-radius);
+  border: 0;
+  margin-bottom: 2rem;
+
+  &:focus {
+    outline: none;
+  }
+
+  :global {
+    .MuiInputBase-root {
+      border-radius: var(--input-radius);
+    }
+  }
+}

@@ -32,6 +32,7 @@ body:
         - Mac
         - BSD
         - Other (Please let us know in description)
+        - N/A
     validations:
       required: true
 
@@ -56,6 +57,7 @@ body:
         - GPU-Nvidia
         - GPU-AMD
         - GPU-other (Please let us know in description)
+        - N/A
     validations:
       required: true
 
@@ -67,6 +69,7 @@ body:
         - label: Pull docker images from hub.docker.com
         - label: Build docker images from source
         - label: Other
+        - label: N/A
     validations:
       required: true
 
@@ -80,6 +83,7 @@ body:
         - label: Kubernetes Helm Charts
         - label: Kubernetes GMC
         - label: Other
+        - label: N/A
     validations:
       required: true
 
@@ -91,6 +95,7 @@ body:
         - Single Node
         - Multiple Nodes
         - Other
+        - N/A
       default: 0
     validations:
       required: true

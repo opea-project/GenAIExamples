@@ -15,42 +15,52 @@ function get_genai_comps() {
     fi
 }
 
-
 function build_docker_images_for_retrieval_tool(){
     cd $WORKDIR/GenAIExamples/DocIndexRetriever/docker_image_build/
     get_genai_comps
     echo "Build all the images with --no-cache..."
-    service_list="doc-index-retriever dataprep embedding retriever reranking"
-    docker compose -f build.yaml build ${service_list} --no-cache
-    docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.6
-
+    docker compose -f build.yaml build --no-cache
     docker images && sleep 1s
 }
 
-function build_agent_docker_image() {
+function build_agent_docker_image_xeon() {
     cd $WORKDIR/GenAIExamples/AgentQnA/docker_image_build/
     get_genai_comps
+
     echo "Build agent image with --no-cache..."
-    docker compose -f build.yaml build --no-cache
+    service_list="agent agent-ui"
+    docker compose -f build.yaml build ${service_list} --no-cache
 }
 
-function build_vllm_docker_image() {
-    echo "Building the vllm docker image"
-    cd $WORKPATH
-    echo $WORKPATH
-    if [ ! -d "./vllm-fork" ]; then
-        git clone https://github.com/HabanaAI/vllm-fork.git
-    fi
-    cd ./vllm-fork
+function build_agent_docker_image_gaudi_vllm() {
+    cd $WORKDIR/GenAIExamples/AgentQnA/docker_image_build/
+    get_genai_comps
+
+    git clone https://github.com/HabanaAI/vllm-fork.git && cd vllm-fork
     VLLM_VER=v0.6.6.post1+Gaudi-1.20.0
-    git checkout ${VLLM_VER} &> /dev/null
-    docker build --no-cache -f Dockerfile.hpu -t opea/vllm-gaudi:ci --shm-size=128g . --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy
-    if [ $? -ne 0 ]; then
-        echo "opea/vllm-gaudi:ci failed"
-        exit 1
-    else
-        echo "opea/vllm-gaudi:ci successful"
-    fi
+    git checkout ${VLLM_VER} &> /dev/null && cd ../
+
+    echo "Build agent image with --no-cache..."
+    service_list="agent agent-ui vllm-gaudi"
+    docker compose -f build.yaml build ${service_list} --no-cache
+}
+
+function build_agent_docker_image_rocm() {
+    cd $WORKDIR/GenAIExamples/AgentQnA/docker_image_build/
+    get_genai_comps
+
+    echo "Build agent image with --no-cache..."
+    service_list="agent agent-ui"
+    docker compose -f build.yaml build ${service_list} --no-cache
+}
+
+function build_agent_docker_image_rocm_vllm() {
+    cd $WORKDIR/GenAIExamples/AgentQnA/docker_image_build/
+    get_genai_comps
+
+    echo "Build agent image with --no-cache..."
+    service_list="agent agent-ui vllm-rocm"
+    docker compose -f build.yaml build ${service_list} --no-cache
 }
 
 
@@ -59,15 +69,32 @@ function main() {
     build_docker_images_for_retrieval_tool
     echo "==================== Build docker images for retrieval tool completed ===================="
 
-    echo "==================== Build agent docker image ===================="
-    build_agent_docker_image
-    echo "==================== Build agent docker image completed ===================="
+    sleep 3s
 
-    echo "==================== Build vllm docker image ===================="
-    build_vllm_docker_image
-    echo "==================== Build vllm docker image completed ===================="
+    case $1 in
+        "rocm")
+            echo "==================== Build agent docker image for ROCm ===================="
+            build_agent_docker_image_rocm
+            ;;
+        "rocm_vllm")
+            echo "==================== Build agent docker image for ROCm VLLM ===================="
+            build_agent_docker_image_rocm_vllm
+            ;;
+        "gaudi_vllm")
+            echo "==================== Build agent docker image for Gaudi ===================="
+            build_agent_docker_image_gaudi_vllm
+            ;;
+        "xeon")
+            echo "==================== Build agent docker image for Xeon ===================="
+            build_agent_docker_image_xeon
+            ;;
+        *)
+            echo "Invalid argument"
+            exit 1
+            ;;
+    esac
 
     docker image ls | grep vllm
 }
 
-main
+main $1

@@ -216,7 +216,7 @@ function stop_docker() {
 
 function main() {
 
-    echo "::group::start_docker"
+    echo "::group::stop_docker"
     stop_docker
     echo "::endgroup::"
 

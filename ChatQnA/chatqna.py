@@ -58,6 +58,7 @@ RERANK_SERVER_PORT = int(os.getenv("RERANK_SERVER_PORT", 80))
 LLM_SERVER_HOST_IP = os.getenv("LLM_SERVER_HOST_IP", "0.0.0.0")
 LLM_SERVER_PORT = int(os.getenv("LLM_SERVER_PORT", 80))
 LLM_MODEL = os.getenv("LLM_MODEL", "meta-llama/Meta-Llama-3-8B-Instruct")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", None)
 
 
 def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **kwargs):
@@ -239,6 +240,7 @@ class ChatQnAService:
             name="llm",
             host=LLM_SERVER_HOST_IP,
             port=LLM_SERVER_PORT,
+            api_key=OPENAI_API_KEY,
             endpoint="/v1/chat/completions",
             use_remote_service=True,
             service_type=ServiceType.LLM,
@@ -272,6 +274,7 @@ class ChatQnAService:
             name="llm",
             host=LLM_SERVER_HOST_IP,
             port=LLM_SERVER_PORT,
+            api_key=OPENAI_API_KEY,
             endpoint="/v1/chat/completions",
             use_remote_service=True,
             service_type=ServiceType.LLM,
@@ -317,6 +320,7 @@ class ChatQnAService:
             name="llm",
             host=LLM_SERVER_HOST_IP,
             port=LLM_SERVER_PORT,
+            api_key=OPENAI_API_KEY,
             endpoint="/v1/chat/completions",
             use_remote_service=True,
             service_type=ServiceType.LLM,

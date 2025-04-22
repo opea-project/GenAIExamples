@@ -81,6 +81,10 @@ jobs:
                 if [[ "${{ inputs.hardware }}" == "gaudi" ]]; then
                   value_files="${value_files}\"${filename}\","
                 fi
+              elif [[ "$filename" == *"rocm"* ]]; then
+                if [[ "${{ inputs.hardware }}" == "rocm" ]]; then
+                  value_files="${value_files}\"${filename}\","
+                fi
               elif [[ "$filename" == *"nv"* ]]; then
                 continue
               else

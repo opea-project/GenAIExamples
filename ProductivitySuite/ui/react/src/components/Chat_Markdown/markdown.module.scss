@@ -1,0 +1,29 @@
+.tableDiv {
+  &:first-of-type {
+    padding-top: 0px !important;
+  }
+
+  table,
+  th,
+  td {
+    border: 1px solid black;
+    border-collapse: collapse;
+    padding: 5px;
+  }
+}
+
+.md {
+  li {
+    margin-left: 35px; /* Adjust the value based on your preference */
+  }
+}
+
+.markdownWrapper {
+  > p:first-of-type {
+    margin-top: 0.25rem;
+  }
+
+  > p:last-of-type {
+    margin-bottom: 0.25rem;
+  }
+}

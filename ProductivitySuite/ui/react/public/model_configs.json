@@ -1,0 +1,9 @@
+[
+  {
+    "model_name": "Intel/neural-chat-7b-v3-3",
+    "displayName": "Intel Neural Chat",
+    "minToken": 100,
+    "maxToken": 2000,
+    "types": ["chat", "summary", "code"]
+  }
+]

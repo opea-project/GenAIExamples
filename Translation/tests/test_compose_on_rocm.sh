@@ -42,20 +42,8 @@ function build_docker_images() {
 function start_services() {
     cd $WORKPATH/docker_compose/amd/gpu/rocm/
 
-    export TRANSLATION_HOST_IP=${ip_address}
-    export TRANSLATION_LLM_MODEL_ID="haoranxu/ALMA-13B"
-    export TRANSLATION_TGI_LLM_ENDPOINT="http://${TRANSLATION_HOST_IP}:8008"
-    export TRANSLATION_HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
-    export TRANSLATION_MEGA_SERVICE_HOST_IP=${TRANSLATION_HOST_IP}
-    export TRANSLATION_LLM_SERVICE_HOST_IP=${TRANSLATION_HOST_IP}
-    export TRANSLATION_FRONTEND_SERVICE_IP=${TRANSLATION_HOST_IP}
-    export TRANSLATION_FRONTEND_SERVICE_PORT=5173
-    export TRANSLATION_BACKEND_SERVICE_NAME=translation
-    export TRANSLATION_BACKEND_SERVICE_IP=${TRANSLATION_HOST_IP}
-    export TRANSLATION_BACKEND_SERVICE_PORT=8888
-    export TRANSLATION_BACKEND_SERVICE_ENDPOINT="http://${TRANSLATION_HOST_IP}:${TRANSLATION_BACKEND_SERVICE_PORT}/v1/translation"
-    export TRANSLATION_NGINX_PORT=8084
     export host_ip=${ip_address}
+    source set_env.sh
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 

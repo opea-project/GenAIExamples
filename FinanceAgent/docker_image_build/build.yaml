@@ -1,0 +1,22 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  dataprep:
+    build:
+      context: GenAIComps
+      dockerfile: comps/dataprep/src/Dockerfile
+      args:
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
+        no_proxy: ${no_proxy}
+    image: ${REGISTRY:-opea}/dataprep:${TAG:-latest}
+  agent:
+    build:
+      context: GenAIComps
+      dockerfile: comps/agent/src/Dockerfile
+      args:
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
+        no_proxy: ${no_proxy}
+    image: ${REGISTRY:-opea}/agent:${TAG:-latest}

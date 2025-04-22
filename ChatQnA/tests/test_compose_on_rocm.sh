@@ -68,7 +68,7 @@ function build_docker_images() {
     docker compose -f build.yaml build ${service_list} --no-cache > "${LOG_PATH}"/docker_image_build.log
 
     docker pull ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
-    docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+    docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.6
 
     docker images && sleep 1s
 }
@@ -222,7 +222,7 @@ function stop_docker() {
 
 function main() {
 
-    echo "::group::start_docker"
+    echo "::group::stop_docker"
     stop_docker
     echo "::endgroup::"
 

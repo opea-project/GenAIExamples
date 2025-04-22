@@ -1,0 +1,124 @@
+# Copyright (C) 2025 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+get_company_profile:
+  description: get a company's profile information.
+  callable_api: research_tools.py:get_company_profile
+  args_schema:
+    symbol:
+      type: str
+      description: the ticker symbol.
+  return_output: profile
+
+get_company_news:
+  description: retrieve market news related to designated company.
+  callable_api: research_tools.py:get_company_news
+  args_schema:
+    symbol:
+      type: str
+      description: the ticker symbol.
+    start_date:
+      type: str
+      description: start date of the search period for the company's basic financials, yyyy-mm-dd.
+    end_date:
+      type: str
+      description: end date of the search period for the company's basic financials, yyyy-mm-dd.
+    max_news_num:
+      type: int
+      description: maximum number of news to return, default to 10.
+  return_output: news
+
+get_basic_financials_history:
+  description: get historical basic financials for a designated company.
+  callable_api: research_tools.py:get_basic_financials_history
+  args_schema:
+    symbol:
+      type: str
+      description: the ticker symbol.
+    freq:
+      type: str
+      description: reporting frequency of the company's basic financials, such as annual, quarterly.
+    start_date:
+      type: str
+      description: start date of the search period for the company's basic financials, yyyy-mm-dd.
+    end_date:
+      type: str
+      description: end date of the search period for the company's basic financials, yyyy-mm-dd.
+    selected_columns:
+      type: list
+      description: List of column names of news to return, should be chosen from 'assetTurnoverTTM', 'bookValue', 'cashRatio', 'currentRatio', 'ebitPerShare', 'eps', 'ev', 'fcfMargin', 'fcfPerShareTTM', 'grossMargin', 'inventoryTurnoverTTM', 'longtermDebtTotalAsset', 'longtermDebtTotalCapital', 'longtermDebtTotalEquity', 'netDebtToTotalCapital', 'netDebtToTotalEquity', 'netMargin', 'operatingMargin', 'payoutRatioTTM', 'pb', 'peTTM', 'pfcfTTM', 'pretaxMargin', 'psTTM', 'ptbv', 'quickRatio', 'receivablesTurnoverTTM', 'roaTTM', 'roeTTM', 'roicTTM', 'rotcTTM', 'salesPerShare', 'sgaToSale', 'tangibleBookValue', 'totalDebtToEquity', 'totalDebtToTotalAsset', 'totalDebtToTotalCapital', 'totalRatio','10DayAverageTradingVolume', '13WeekPriceReturnDaily', '26WeekPriceReturnDaily', '3MonthADReturnStd', '3MonthAverageTradingVolume', '52WeekHigh', '52WeekHighDate', '52WeekLow', '52WeekLowDate', '52WeekPriceReturnDaily', '5DayPriceReturnDaily', 'assetTurnoverAnnual', 'assetTurnoverTTM', 'beta', 'bookValuePerShareAnnual', 'bookValuePerShareQuarterly', 'bookValueShareGrowth5Y', 'capexCagr5Y', 'cashFlowPerShareAnnual', 'cashFlowPerShareQuarterly', 'cashFlowPerShareTTM', 'cashPerSharePerShareAnnual', 'cashPerSharePerShareQuarterly', 'currentDividendYieldTTM', 'currentEv/freeCashFlowAnnual', 'currentEv/freeCashFlowTTM', 'currentRatioAnnual', 'currentRatioQuarterly', 'dividendGrowthRate5Y', 'dividendPerShareAnnual', 'dividendPerShareTTM', 'dividendYieldIndicatedAnnual', 'ebitdPerShareAnnual', 'ebitdPerShareTTM', 'ebitdaCagr5Y', 'ebitdaInterimCagr5Y', 'enterpriseValue', 'epsAnnual', 'epsBasicExclExtraItemsAnnual', 'epsBasicExclExtraItemsTTM', 'epsExclExtraItemsAnnual', 'epsExclExtraItemsTTM', 'epsGrowth3Y', 'epsGrowth5Y', 'epsGrowthQuarterlyYoy', 'epsGrowthTTMYoy', 'epsInclExtraItemsAnnual', 'epsInclExtraItemsTTM', 'epsNormalizedAnnual', 'epsTTM', 'focfCagr5Y', 'grossMargin5Y', 'grossMarginAnnual', 'grossMarginTTM', 'inventoryTurnoverAnnual', 'inventoryTurnoverTTM', 'longTermDebt/equityAnnual', 'longTermDebt/equityQuarterly', 'marketCapitalization', 'monthToDatePriceReturnDaily', 'netIncomeEmployeeAnnual', 'netIncomeEmployeeTTM', 'netInterestCoverageAnnual', 'netInterestCoverageTTM', 'netMarginGrowth5Y', 'netProfitMargin5Y', 'netProfitMarginAnnual', 'netProfitMarginTTM', 'operatingMargin5Y'.
+  return_output: history_financials
+
+get_basic_financials:
+  description: get latest basic financials for a designated company.
+  callable_api: research_tools.py:get_basic_financials
+  args_schema:
+    symbol:
+      type: str
+      description: the ticker symbol.
+    selected_columns:
+      type: list
+      description: List of column names of news to return, should be chosen from 'assetTurnoverTTM', 'bookValue', 'cashRatio', 'currentRatio', 'ebitPerShare', 'eps', 'ev', 'fcfMargin', 'fcfPerShareTTM', 'grossMargin', 'inventoryTurnoverTTM', 'longtermDebtTotalAsset', 'longtermDebtTotalCapital', 'longtermDebtTotalEquity', 'netDebtToTotalCapital', 'netDebtToTotalEquity', 'netMargin', 'operatingMargin', 'payoutRatioTTM', 'pb', 'peTTM', 'pfcfTTM', 'pretaxMargin', 'psTTM', 'ptbv', 'quickRatio', 'receivablesTurnoverTTM', 'roaTTM', 'roeTTM', 'roicTTM', 'rotcTTM', 'salesPerShare', 'sgaToSale', 'tangibleBookValue', 'totalDebtToEquity', 'totalDebtToTotalAsset', 'totalDebtToTotalCapital', 'totalRatio','10DayAverageTradingVolume', '13WeekPriceReturnDaily', '26WeekPriceReturnDaily', '3MonthADReturnStd', '3MonthAverageTradingVolume', '52WeekHigh', '52WeekHighDate', '52WeekLow', '52WeekLowDate', '52WeekPriceReturnDaily', '5DayPriceReturnDaily', 'assetTurnoverAnnual', 'assetTurnoverTTM', 'beta', 'bookValuePerShareAnnual', 'bookValuePerShareQuarterly', 'bookValueShareGrowth5Y', 'capexCagr5Y', 'cashFlowPerShareAnnual', 'cashFlowPerShareQuarterly', 'cashFlowPerShareTTM', 'cashPerSharePerShareAnnual', 'cashPerSharePerShareQuarterly', 'currentDividendYieldTTM', 'currentEv/freeCashFlowAnnual', 'currentEv/freeCashFlowTTM', 'currentRatioAnnual', 'currentRatioQuarterly', 'dividendGrowthRate5Y', 'dividendPerShareAnnual', 'dividendPerShareTTM', 'dividendYieldIndicatedAnnual', 'ebitdPerShareAnnual', 'ebitdPerShareTTM', 'ebitdaCagr5Y', 'ebitdaInterimCagr5Y', 'enterpriseValue', 'epsAnnual', 'epsBasicExclExtraItemsAnnual', 'epsBasicExclExtraItemsTTM', 'epsExclExtraItemsAnnual', 'epsExclExtraItemsTTM', 'epsGrowth3Y', 'epsGrowth5Y', 'epsGrowthQuarterlyYoy', 'epsGrowthTTMYoy', 'epsInclExtraItemsAnnual', 'epsInclExtraItemsTTM', 'epsNormalizedAnnual', 'epsTTM', 'focfCagr5Y', 'grossMargin5Y', 'grossMarginAnnual', 'grossMarginTTM', 'inventoryTurnoverAnnual', 'inventoryTurnoverTTM', 'longTermDebt/equityAnnual', 'longTermDebt/equityQuarterly', 'marketCapitalization', 'monthToDatePriceReturnDaily', 'netIncomeEmployeeAnnual', 'netIncomeEmployeeTTM', 'netInterestCoverageAnnual', 'netInterestCoverageTTM', 'netMarginGrowth5Y', 'netProfitMargin5Y', 'netProfitMarginAnnual', 'netProfitMarginTTM', 'operatingMargin5Y'.
+  return_output: basic_financials
+
+get_current_date:
+  description: get current date.
+  callable_api: research_tools.py:get_current_date
+  return_output: current_date
+
+analyze_balance_sheet:
+  description: gets balance sheets for a given ticker over a given period.
+  callable_api: research_tools.py:analyze_balance_sheet
+  args_schema:
+    symbol:
+      type: str
+      description: the ticker symbol.
+    period:
+      type: str
+      description: The period of the balance sheets, possible values such as annual, quarterly, ttm. Default is 'annual'.
+    limit:
+      type: int
+      description: The number of balance sheets to return. Default is 10.
+  return_output: balance_sheet
+
+analyze_income_stmt:
+  description: gets income statements for a given ticker over a given period.
+  callable_api: research_tools.py:analyze_income_stmt
+  args_schema:
+    symbol:
+      type: str
+      description: the ticker symbol.
+    period:
+      type: str
+      description: The period of the balance sheets, possible values, such as  annual, quarterly, ttm. Default is 'annual'.
+    limit:
+      type: int
+      description: The number of balance sheets to return. Default is 10.
+  return_output: income_stmt
+
+analyze_cash_flow:
+  description: gets cash flow statements for a given ticker over a given period.
+  callable_api: research_tools.py:analyze_cash_flow
+  args_schema:
+    symbol:
+      type: str
+      description: the ticker symbol.
+    period:
+      type: str
+      description: The period of the balance sheets, possible values, such as annual, quarterly, ttm. Default is 'annual'.
+    limit:
+      type: int
+      description: The number of balance sheets to return. Default is 10.
+  return_output: cash_flow
+
+get_share_performance:
+  description: gets stock prices for a given ticker over 60 days.
+  callable_api: research_tools.py:get_share_performance
+  args_schema:
+    symbol:
+      type: str
+      description: the ticker symbol.
+    end_date:
+      type: str
+      description: end date of the search period for the company's basic financials, yyyy-mm-dd.
+  return_output: stock_price

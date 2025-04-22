@@ -1,52 +1,69 @@
-# CodeGen Accuracy
+# CodeGen Accuracy Benchmark
+
+## Table of Contents
+
+- [Purpose](#purpose)
+- [Evaluation Framework](#evaluation-framework)
+- [Prerequisites](#prerequisites)
+- [Environment Setup](#environment-setup)
+- [Running the Accuracy Benchmark](#running-the-accuracy-benchmark)
+- [Understanding the Results](#understanding-the-results)
+
+## Purpose
+
+This guide explains how to evaluate the accuracy of a deployed CodeGen service using standardized code generation benchmarks. It helps quantify the model's ability to generate correct and functional code based on prompts.
 
 ## Evaluation Framework
 
-We evaluate accuracy by [bigcode-evaluation-harness](https://github.com/bigcode-project/bigcode-evaluation-harness). It is a framework for the evaluation of code generation models.
+We utilize the [bigcode-evaluation-harness](https://github.com/bigcode-project/bigcode-evaluation-harness), a framework specifically designed for evaluating code generation models. It supports various standard benchmarks such as [HumanEval](https://huggingface.co/datasets/openai_humaneval), [MBPP](https://huggingface.co/datasets/mbpp), and others.
 
-## Evaluation FAQs
+## Prerequisites
 
-### Launch CodeGen microservice
+- A running CodeGen service accessible via an HTTP endpoint. Refer to the main [CodeGen README](../../README.md) for deployment options.
+- Python 3.8+ environment.
+- Git installed.
 
-Please refer to [CodeGen Examples](https://github.com/opea-project/GenAIExamples/tree/main/CodeGen/README.md), follow the guide to deploy CodeGen megeservice.
+## Environment Setup
 
-Use `curl` command to test codegen service and ensure that it has started properly
+1.  **Clone the Evaluation Repository:**
 
-```bash
-export CODEGEN_ENDPOINT="http://${your_ip}:7778/v1/codegen"
-curl $CODEGEN_ENDPOINT \
-    -H "Content-Type: application/json" \
-    -d '{"messages": "Implement a high-level API for a TODO list application. The API takes as input an operation request and updates the TODO list in place. If the request is invalid, raise an exception."}'
+    ```shell
+    git clone https://github.com/opea-project/GenAIEval
+    cd GenAIEval
+    ```
 
-```
+2.  **Install Dependencies:**
+    ```shell
+    pip install -r requirements.txt
+    pip install -e .
+    ```
 
-### Generation and Evaluation
+## Running the Accuracy Benchmark
 
-For evaluating the models on coding tasks or specifically coding LLMs, we follow the [bigcode-evaluation-harness](https://github.com/bigcode-project/bigcode-evaluation-harness) and provide the command line usage and function call usage. [HumanEval](https://huggingface.co/datasets/openai_humaneval), [HumanEval+](https://huggingface.co/datasets/evalplus/humanevalplus), [InstructHumanEval](https://huggingface.co/datasets/codeparrot/instructhumaneval), [APPS](https://huggingface.co/datasets/codeparrot/apps), [MBPP](https://huggingface.co/datasets/mbpp), [MBPP+](https://huggingface.co/datasets/evalplus/mbppplus), and [DS-1000](https://github.com/HKUNLP/DS-1000/) for both completion (left-to-right) and insertion (FIM) mode are available.
+1.  **Set Environment Variables:**
+    Replace `{your_ip}` with the IP address of your deployed CodeGen service and `{your_model_identifier}` with the identifier of the model being tested (e.g., `Qwen/CodeQwen1.5-7B-Chat`).
 
-#### Environment
+    ```shell
+    export CODEGEN_ENDPOINT="http://{your_ip}:7778/v1/codegen"
+    export CODEGEN_MODEL="{your_model_identifier}"
+    ```
 
-```shell
-git clone https://github.com/opea-project/GenAIEval
-cd GenAIEval
-pip install -r requirements.txt
-pip install -e .
+    _Note: Port `7778` is the default for the CodeGen gateway; adjust if you customized it._
 
-```
+2.  **Execute the Benchmark Script:**
+    The script will run the evaluation tasks (e.g., HumanEval by default) against the specified endpoint.
 
-#### Evaluation
+    ```shell
+    bash run_acc.sh $CODEGEN_MODEL $CODEGEN_ENDPOINT
+    ```
 
-```
-export CODEGEN_ENDPOINT="http://${your_ip}:7778/v1/codegen"
-export CODEGEN_MODEL=your_model
-bash run_acc.sh $CODEGEN_MODEL $CODEGEN_ENDPOINT
-```
+    _Note: Currently, the framework runs the full task set by default. Using 'limit' parameters might affect result comparability._
 
-**_Note:_** Currently, our framework is designed to execute tasks in full. To ensure the accuracy of results, we advise against using the 'limit' or 'limit_start' parameters to restrict the number of test samples.
+## Understanding the Results
 
-### accuracy Result
+The results will be printed to the console and saved in `evaluation_results.json`. A key metric is `pass@k`, which represents the percentage of problems solved correctly within `k` generated attempts (e.g., `pass@1` means solved on the first try).
 
-Here is the tested result for your reference
+Example output snippet:
 
 ```json
 {
@@ -54,20 +71,7 @@ Here is the tested result for your reference
     "pass@1": 0.7195121951219512
   },
   "config": {
-    "prefix": "",
-    "do_sample": true,
-    "temperature": 0.2,
-    "top_k": 0,
-    "top_p": 0.95,
-    "n_samples": 1,
-    "eos": "<|endoftext|>",
-    "seed": 0,
     "model": "Qwen/CodeQwen1.5-7B-Chat",
-    "modeltype": "causal",
-    "peft_model": null,
-    "revision": null,
-    "use_auth_token": false,
-    "trust_remote_code": false,
     "tasks": "humaneval",
     "instruction_tokens": null,
     "batch_size": 1,
@@ -93,7 +97,9 @@ Here is the tested result for your reference
     "prompt": "prompt",
     "max_memory_per_gpu": null,
     "check_references": false,
-    "codegen_url": "http://192.168.123.104:31234/v1/codegen"
+    "codegen_url": "http://192.168.123.104:7778/v1/codegen"
   }
 }
 ```
+
+This indicates a `pass@1` score of approximately 72% on the HumanEval benchmark for the specified model via the CodeGen service endpoint.

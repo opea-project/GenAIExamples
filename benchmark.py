@@ -12,6 +12,7 @@ from kubernetes import client, config
 # only support chatqna for now
 service_endpoints = {
     "chatqna": "/v1/chatqna",
+    "docsum": "/v1/docsum",
 }
 
 
@@ -35,6 +36,9 @@ def construct_benchmark_config(test_suite_config):
         "dataset": test_suite_config.get("dataset", ""),
         "prompt": test_suite_config.get("prompt", [10]),
         "llm_max_token_size": test_suite_config.get("llm", {}).get("max_token_size", [128]),
+        "collect_service_metric": test_suite_config.get("collect_service_metric", False),
+        "summary_type": test_suite_config.get("summary_type", "auto"),
+        "stream": test_suite_config.get("stream", "auto"),
     }
 
 
@@ -144,6 +148,8 @@ def _create_yaml_content(service, base_url, bench_target, test_phase, num_querie
                 "llm-model": test_params["llm_model"],
                 "deployment-type": test_params["deployment_type"],
                 "load-shape": load_shape,
+                "summary_type": test_params.get("summary_type", "auto"),
+                "stream": test_params.get("stream", True),
             },
             "runs": [{"name": test_phase, "users": concurrency, "max-request": num_queries}],
         }
@@ -373,7 +379,9 @@ def run_benchmark(benchmark_config, chart_name, namespace, node_num=1, llm_model
         "user_queries": parsed_data["user_queries"],  # num of user queries
         "random_prompt": False,  # whether to use random prompt, set to False by default
         "run_time": "30m",  # The max total run time for the test suite, set to 60m by default
-        "collect_service_metric": False,  # whether to collect service metrics, set to False by default
+        "collect_service_metric": (
+            parsed_data["collect_service_metric"] if parsed_data["collect_service_metric"] else False
+        ),  # Metrics collection set to False by default
         "llm_model": llm_model,  # The LLM model used for the test
         "deployment_type": "k8s",  # Default is "k8s", can also be "docker"
         "service_ip": None,  # Leave as None for k8s, specify for Docker
@@ -398,9 +406,15 @@ def run_benchmark(benchmark_config, chart_name, namespace, node_num=1, llm_model
         "dataset": parsed_data["dataset"],
         "prompt": parsed_data["prompt"],
         "llm_max_token_size": parsed_data["llm_max_token_size"],
+        "summary_type": parsed_data["summary_type"],
+        "stream": parsed_data["stream"],
     }
 
-    dataset = None
+    if parsed_data["dataset"]:  # This checks if user provided dataset/document for DocSum service
+        dataset = parsed_data["dataset"]
+    else:
+        dataset = None
+
     query_data = None
     os.environ["MODEL_NAME"] = test_suite_config.get("llm_model", "meta-llama/Meta-Llama-3-8B-Instruct")
     # Do benchmark in for-loop for different llm_max_token_size
@@ -428,6 +442,21 @@ def run_benchmark(benchmark_config, chart_name, namespace, node_num=1, llm_model
                 "max_output": llm_max_token,  # max number of output tokens
                 "k": 1,  # number of retrieved documents
             }
+        if chart_name == "docsum":
+            case_data = {
+                "run_test": True,
+                "service_name": "docsum",
+                "service_list": [
+                    "docsum",
+                    "docsum-llm-uservice",
+                    "docsum-vllm",
+                ],
+                "stream": parsed_data["stream"],
+                "max_output": llm_max_token,  # max number of output tokens
+                "summary_type": parsed_data["summary_type"],  # Summary_type for DocSum
+                "dataset": dataset,  # Dataset used for document summary
+            }
+
         output_folder = _run_service_test(chart_name, case_data, test_suite_config, namespace)
 
     print(f"[OPEA BENCHMARK] 🚀 Test Finished. Output saved in {output_folder}.")
