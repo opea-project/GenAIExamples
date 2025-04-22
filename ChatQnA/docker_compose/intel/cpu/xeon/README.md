@@ -120,7 +120,7 @@ If any issues are encountered during deployment, refer to the [troubleshooting](
 
 ### Test the Pipeline
 
-Once the ChatQnA services are running, test the pipeline using the following command:
+Once the ChatQnA services are running, test the pipeline using the following command. This will send a sample query to the ChatQnA service and return a response.
 
 ```bash
 curl http://${host_ip}:8888/v1/chatqna \
@@ -130,7 +130,7 @@ curl http://${host_ip}:8888/v1/chatqna \
     }'
 ```
 
-**Note** : Access the ChatQnA UI by web browser through this URL: `http://${host_ip}:80`. Please confirm the `80` port is opened in the firewall. To validate each microservie used in the pipeline refer to the [Validate microservicess](#validate-microservices) section.
+**Note** : Access the ChatQnA UI by web browser through this URL: `http://${host_ip}:80`. Please confirm the `80` port is opened in the firewall. To validate each microservice used in the pipeline refer to the [Validate microservices](#validate-microservices) section.
 
 ### Cleanup the Deployment
 
@@ -144,23 +144,25 @@ docker compose -f compose.yaml down
 
 In the context of deploying a ChatQnA pipeline on an Intel® Xeon® platform, we can pick and choose different vector databases, large language model serving frameworks, and remove pieces of the pipeline such as the reranker. The table below outlines the various configurations that are available as part of the application. These configurations can be used as templates and can be extended to different components available in [GenAIComps](https://github.com/opea-project/GenAIComps.git).
 
-| File                                                         | Description                                                                                            |
-| ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------ |
-| [compose.yaml](./compose.yaml)                               | Default compose file using vllm as serving framework and redis as vector database                      |
-| [compose_milvus.yaml](./compose_milvus.yaml)                 | The vector database utilized is Milvus. All other configurations remain the same as the default        |
-| [compose_pinecone.yaml](./compose_pinecone.yaml)             | The vector database utilized is Pinecone. All other configurations remain the same as the default      |
-| [compose_qdrant.yaml](./compose_qdrant.yaml)                 | The vector database utilized is Qdrant. All other configurations remain the same as the default        |
-| [compose_tgi.yaml](./compose_tgi.yaml)                       | The LLM serving framework is TGI. All other configurations remain the same as the default              |
-| [compose_without_rerank.yaml](./compose_without_rerank.yaml) | Default configuration without the reranker                                                             |
-| [compose.telemetry.yaml](./compose.telemetry.yaml)           | Helper file for telemetry features for vllm. Can be used along with any compose files that serves vllm |
-| [compose_tgi.telemetry.yaml](./compose_tgi.telemetry.yaml)   | Helper file for telemetry features for tgi. Can be used along with any compose files that serves tgi   |
+| File                                                         | Description                                                                                                                                                           |
+| ------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [compose.yaml](./compose.yaml)                               | Default compose file using vllm as serving framework and redis as vector database                                                                                     |
+| [compose_milvus.yaml](./compose_milvus.yaml)                 | Uses Milvus as the vector database. All other configurations remain the same as the default                                                                           |
+| [compose_pinecone.yaml](./compose_pinecone.yaml)             | Uses Pinecone as the vector database. All other configurations remain the same as the default. For more details, refer to [README_pinecone.md](./README_pinecone.md). |
+| [compose_qdrant.yaml](./compose_qdrant.yaml)                 | Uses Qdrant as the vector database. All other configurations remain the same as the default. For more details, refer to [README_qdrant.md](./README_qdrant.md).       |
+| [compose_tgi.yaml](./compose_tgi.yaml)                       | Uses TGI as the LLM serving framework. All other configurations remain the same as the default                                                                        |
+| [compose_without_rerank.yaml](./compose_without_rerank.yaml) | Default configuration without the reranker                                                                                                                            |
+| [compose_faqgen.yaml](./compose_faqgen.yaml)                 | Enables FAQ generation using vLLM as the LLM serving framework. For more details, refer to [README_faqgen.md](./README_faqgen.md).                                    |
+| [compose_faqgen_tgi.yaml](./compose_faqgen_tgi.yaml)         | Enables FAQ generation using TGI as the LLM serving framework. For more details, refer to [README_faqgen.md](./README_faqgen.md).                                     |
+| [compose.telemetry.yaml](./compose.telemetry.yaml)           | Helper file for telemetry features for vllm. Can be used along with any compose files that serves vllm                                                                |
+| [compose_tgi.telemetry.yaml](./compose_tgi.telemetry.yaml)   | Helper file for telemetry features for tgi. Can be used along with any compose files that serves tgi                                                                  |
 
 ## ChatQnA with Conversational UI (Optional)
 
 To access the Conversational UI (react based) frontend, modify the UI service in the `compose` file used to deploy. Replace `chaqna-xeon-ui-server` service with the `chatqna-xeon-conversation-ui-server` service as per the config below:
 
 ```yaml
-chaqna-xeon-conversation-ui-server:
+chatqna-xeon-conversation-ui-server:
   image: opea/chatqna-conversation-ui:latest
   container_name: chatqna-xeon-conversation-ui-server
   environment:
@@ -174,7 +176,7 @@ chaqna-xeon-conversation-ui-server:
   restart: always
 ```
 
-Once the services are up, open the following URL in the browser: http://{host_ip}:5174. By default, the UI runs on port 80 internally. If the developer prefers to use a different host port to access the frontend, it can be modiied by port mapping in the `compose.yaml` file as shown below:
+Once the services are up, open the following URL in the browser: http://{host_ip}:5174. By default, the UI runs on port 80 internally. If the developer prefers to use a different host port to access the frontend, it can be modified by port mapping in the `compose.yaml` file as shown below:
 
 ```yaml
   chaqna-gaudi-conversation-ui-server:
@@ -194,11 +196,12 @@ Here is an example of running ChatQnA with Conversational UI (React):
 
 ### Validate Microservices
 
-Note, when verify the microservices by curl or API from remote client, please make sure the **ports** of the microservices are opened in the firewall of the cloud node.  
+Note, when verifying the microservices by curl or API from remote client, please make sure the **ports** of the microservices are opened in the firewall of the cloud node.  
 Follow the instructions to validate MicroServices.
 For details on how to verify the correctness of the response, refer to [how-to-validate_service](../../hpu/gaudi/how_to_validate_service.md).
 
-1. TEI Embedding Service
+1. **TEI Embedding Service**
+   Send a test request to the TEI Embedding Service to ensure it is running correctly:
 
    ```bash
    curl http://${host_ip}:6006/embed \
@@ -207,13 +210,15 @@ For details on how to verify the correctness of the response, refer to [how-to-v
        -H 'Content-Type: application/json'
    ```
 
-2. Retriever Microservice
+   If you receive a connection error, ensure that the service is running and the port 6006 is open in the firewall.
+
+2. **Retriever Microservice**
 
    To consume the retriever microservice, you need to generate a mock embedding vector by Python script. The length of embedding vector
    is determined by the embedding model.
    Here we use the model `EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"`, which vector size is 768.
 
-   Check the vector dimension of your embedding model, set `your_embedding` dimension equals to it.
+   Check the vector dimension of your embedding model, set `your_embedding` dimension equal to it.
 
    ```bash
    export your_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
@@ -223,7 +228,11 @@ For details on how to verify the correctness of the response, refer to [how-to-v
      -H 'Content-Type: application/json'
    ```
 
-3. TEI Reranking Service
+   If the response indicates an invalid embedding vector, verify that the vector size matches the model's expected dimension.
+
+3. **TEI Reranking Service**
+
+   To test the TEI Reranking Service, use the following `curl` command:
 
    > Skip for ChatQnA without Rerank pipeline
 
@@ -234,7 +243,7 @@ For details on how to verify the correctness of the response, refer to [how-to-v
        -H 'Content-Type: application/json'
    ```
 
-4. LLM backend Service
+4. **LLM Backend Service**
 
    In the first startup, this service will take more time to download, load and warm up the model. After it's finished, the service will be ready.
 
@@ -264,7 +273,9 @@ For details on how to verify the correctness of the response, refer to [how-to-v
      -H 'Content-Type: application/json'
    ```
 
-5. MegaService
+5. **MegaService**
+
+   Use the following `curl` command to test the MegaService:
 
    ```bash
     curl http://${host_ip}:8888/v1/chatqna -H "Content-Type: application/json" -d '{
@@ -272,7 +283,9 @@ For details on how to verify the correctness of the response, refer to [how-to-v
           }'
    ```
 
-6. Nginx Service
+6. **Nginx Service**
+
+   Use the following curl command to test the Nginx Service:
 
    ```bash
    curl http://${host_ip}:${NGINX_PORT}/v1/chatqna \
@@ -280,84 +293,84 @@ For details on how to verify the correctness of the response, refer to [how-to-v
        -d '{"messages": "What is the revenue of Nike in 2023?"}'
    ```
 
-7. Dataprep Microservice（Optional）
+7. **Dataprep Microservice(Optional) **
 
-If you want to update the default knowledge base, you can use the following commands:
+   If you want to update the default knowledge base, you can use the following commands:
 
-Update Knowledge Base via Local File [nke-10k-2023.pdf](https://github.com/opea-project/GenAIComps/blob/v1.1/comps/retrievers/redis/data/nke-10k-2023.pdf). Or
-click [here](https://raw.githubusercontent.com/opea-project/GenAIComps/v1.1/comps/retrievers/redis/data/nke-10k-2023.pdf) to download the file via any web browser.
-Or run this command to get the file on a terminal.
+   Update Knowledge Base via Local File [nke-10k-2023.pdf](https://github.com/opea-project/GenAIComps/blob/v1.1/comps/retrievers/redis/data/nke-10k-2023.pdf). Or
+   click [here](https://raw.githubusercontent.com/opea-project/GenAIComps/v1.1/comps/retrievers/redis/data/nke-10k-2023.pdf) to download the file via any web browser.
+   Or run this command to get the file on a terminal.
 
-```bash
-wget https://raw.githubusercontent.com/opea-project/GenAIComps/v1.1/comps/retrievers/redis/data/nke-10k-2023.pdf
-```
+   ```bash
+   wget https://raw.githubusercontent.com/opea-project/GenAIComps/v1.1/comps/retrievers/redis/data/nke-10k-2023.pdf
+   ```
 
-Upload:
+   Upload:
 
-```bash
-curl -X POST "http://${host_ip}:6007/v1/dataprep/ingest" \
-     -H "Content-Type: multipart/form-data" \
-     -F "files=@./nke-10k-2023.pdf"
-```
+   ```bash
+   curl -X POST "http://${host_ip}:6007/v1/dataprep/ingest" \
+       -H "Content-Type: multipart/form-data" \
+       -F "files=@./nke-10k-2023.pdf"
+   ```
 
-This command updates a knowledge base by uploading a local file for processing. Update the file path according to your environment.
+   This command updates a knowledge base by uploading a local file for processing. Update the file path according to your environment.
 
-Add Knowledge Base via HTTP Links:
+   Add Knowledge Base via HTTP Links:
 
-```bash
-curl -X POST "http://${host_ip}:6007/v1/dataprep/ingest" \
-     -H "Content-Type: multipart/form-data" \
-     -F 'link_list=["https://opea.dev"]'
-```
+   ```bash
+   curl -X POST "http://${host_ip}:6007/v1/dataprep/ingest" \
+       -H "Content-Type: multipart/form-data" \
+       -F 'link_list=["https://opea.dev"]'
+   ```
 
-This command updates a knowledge base by submitting a list of HTTP links for processing.
+   This command updates a knowledge base by submitting a list of HTTP links for processing.
 
-Also, you are able to get the file list that you uploaded:
+   Also, you are able to get the file list that you uploaded:
 
-```bash
-curl -X POST "http://${host_ip}:6007/v1/dataprep/get" \
-     -H "Content-Type: application/json"
-```
+   ```bash
+   curl -X POST "http://${host_ip}:6007/v1/dataprep/get" \
+       -H "Content-Type: application/json"
+   ```
 
-Then you will get the response JSON like this. Notice that the returned `name`/`id` of the uploaded link is `https://xxx.txt`.
+   Then you will get the response JSON like this. Notice that the returned `name`/`id` of the uploaded link is `https://xxx.txt`.
 
-```json
-[
-  {
-    "name": "nke-10k-2023.pdf",
-    "id": "nke-10k-2023.pdf",
-    "type": "File",
-    "parent": ""
-  },
-  {
-    "name": "https://opea.dev.txt",
-    "id": "https://opea.dev.txt",
-    "type": "File",
-    "parent": ""
-  }
-]
-```
+   ```json
+   [
+     {
+       "name": "nke-10k-2023.pdf",
+       "id": "nke-10k-2023.pdf",
+       "type": "File",
+       "parent": ""
+     },
+     {
+       "name": "https://opea.dev.txt",
+       "id": "https://opea.dev.txt",
+       "type": "File",
+       "parent": ""
+     }
+   ]
+   ```
 
-To delete the file/link you uploaded:
+   To delete the file/link you uploaded:
 
-The `file_path` here should be the `id` get from `/v1/dataprep/get` API.
+   The `file_path` here should be the `id` get from `/v1/dataprep/get` API.
 
-```bash
-# delete link
-curl -X POST "http://${host_ip}:6007/v1/dataprep/delete" \
-     -d '{"file_path": "https://opea.dev.txt"}' \
-     -H "Content-Type: application/json"
+   ```bash
+   # delete link
+   curl -X POST "http://${host_ip}:6007/v1/dataprep/delete" \
+       -d '{"file_path": "https://opea.dev.txt"}' \
+       -H "Content-Type: application/json"
 
-# delete file
-curl -X POST "http://${host_ip}:6007/v1/dataprep/delete" \
-     -d '{"file_path": "nke-10k-2023.pdf"}' \
-     -H "Content-Type: application/json"
+   # delete file
+   curl -X POST "http://${host_ip}:6007/v1/dataprep/delete" \
+       -d '{"file_path": "nke-10k-2023.pdf"}' \
+       -H "Content-Type: application/json"
 
-# delete all uploaded files and links
-curl -X POST "http://${host_ip}:6007/v1/dataprep/delete" \
-     -d '{"file_path": "all"}' \
-     -H "Content-Type: application/json"
-```
+   # delete all uploaded files and links
+   curl -X POST "http://${host_ip}:6007/v1/dataprep/delete" \
+       -d '{"file_path": "all"}' \
+       -H "Content-Type: application/json"
+   ```
 
 ### Profile Microservices
 
@@ -389,7 +402,7 @@ After vLLM profiling is started, users could start asking questions and get resp
 
 ##### Stop vLLM profiling
 
-By following command, users could stop vLLM profliing and generate a \*.pt.trace.json.gz file as profiling result  
+By following command, users could stop vLLM profiling and generate a \*.pt.trace.json.gz file as profiling result  
  under /mnt folder in vllm-service docker instance.
 
 ```bash

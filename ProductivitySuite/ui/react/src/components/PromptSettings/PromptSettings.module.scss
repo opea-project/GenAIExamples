@@ -1,0 +1,76 @@
+.promptSettingsWrapper {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 775px;
+
+  .summarySource {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  :global {
+    .MuiFormGroup-root {
+      margin-bottom: 0.75rem;
+
+      label {
+        margin-left: 0;
+      }
+
+      &:not(:last-of-type) {
+        margin-right: 1.5rem;
+      }
+    }
+  }
+}
+
+.promptSettings {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  margin-top: calc(var(--vertical-spacer) / 2);
+  flex-wrap: wrap;
+  width: 100%;
+
+  @media screen and (max-width: 900px) {
+    padding: 0 var(--content-gutter);
+  }
+
+  :global {
+    .MuiFormControlLabel-label,
+    .MuiTypography-root {
+      font-size: 13px;
+      font-weight: 400;
+    }
+  }
+
+  &.readOnly {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0;
+    margin-top: 0;
+
+    :global {
+      .MuiFormGroup-root {
+        margin-bottom: 0;
+        margin-right: 0;
+
+        label {
+          width: 100%;
+          align-items: flex-start;
+          margin: 0;
+        }
+      }
+
+      @media screen and (max-width: 900px) {
+        .MuiFormGroup-root:not(:last-of-type) {
+          margin-bottom: 0;
+        }
+      }
+    }
+  }
+}
