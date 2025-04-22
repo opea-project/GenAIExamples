@@ -50,7 +50,7 @@ flowchart LR
 
 ### 💬 SQL Query Generation
 
-The key feature of DBQnA app is that it converts a user's natural language query into an SQL query and automatically executes the generated SQL query on the database to return the relevant results. BAsically ask questions to database, receive corresponding SQL query and real-time query execution output, all without needing any SQL knowledge.
+The key feature of DBQnA app is that it converts a user's natural language query into an SQL query and automatically executes the generated SQL query on the database to return the relevant results. Basically ask questions to database, receive corresponding SQL query and real-time query execution output, all without needing any SQL knowledge.
 
 ---
 
