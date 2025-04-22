@@ -1,0 +1,19 @@
+.inputWrapper {
+  width: 100%;
+  max-width: 700px;
+  margin-top: 1rem;
+}
+
+.dataList {
+  width: 100%;
+  margin-top: 2rem;
+  max-height: 300;
+  overflow: auto;
+  border: 1px solid;
+  border-radius: 8px;
+  padding: 1rem;
+
+  li:not(:last-of-type) {
+    margin-bottom: 1rem;
+  }
+}
