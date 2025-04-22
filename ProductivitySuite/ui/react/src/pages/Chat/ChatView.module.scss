@@ -1,0 +1,39 @@
+.chatView {
+  display: flex;
+  flex-direction: column;
+  max-height: 100%;
+  height: 100%;
+
+  .messagesWrapper {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    padding: calc(var(--header-gutter) * 2) calc(var(--header-gutter));
+    max-height: 100%;
+    overflow-x: auto;
+
+    @media screen and (min-width: 1200px) {
+      padding: calc(var(--header-gutter) * 2);
+    }
+
+    .messageContent {
+      width: 100%;
+      max-width: var(--content-width);
+      margin: 0px auto;
+
+      pre {
+        margin: 0;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+      }
+    }
+  }
+
+  .inputWrapper {
+    display: block;
+    margin: 0px auto;
+    padding: calc(var(--header-gutter) * 1.5) calc(var(--header-gutter) * 1);
+    max-width: calc((var(--header-gutter) * 2) + 800px);
+    width: 100%;
+  }
+}
