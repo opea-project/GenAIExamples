@@ -2,7 +2,7 @@
 
 This document outlines the single node deployment process for a AudioQnA application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservices on server with AMD ROCm processing accelerators. The steps include pulling Docker images, container deployment via Docker Compose, and service execution using microservices `llm`.
 
-Note: The default LLM is `meta-llama/Meta-Llama-3-8B-Instruct`. Before deploying the application, please make sure either you've requested and been granted the access to it on [Huggingface](https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct) or you've downloaded the model locally from [ModelScope](https://www.modelscope.cn/models).
+Note: The default LLM is `Intel/neural-chat-7b-v3-3`. Before deploying the application, please make sure either you've requested and been granted the access to it on [Huggingface](https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct) or you've downloaded the model locally from [ModelScope](https://www.modelscope.cn/models).
 
 ## Table of Contents
 
@@ -132,6 +132,8 @@ Please refer to the table below to build different microservices from source:
 
 After running docker compose, check if all the containers launched via docker compose have started:
 
+#### For TGI inference deployment
+
 ```bash
 docker ps -a
 ```
@@ -139,11 +141,28 @@ docker ps -a
 For the default deployment, the following 5 containers should have started:
 
 ```
-1c67e44c39d2   opea/audioqna-ui:latest   "docker-entrypoint.s…"   About a minute ago   Up About a minute             0.0.0.0:5173->5173/tcp, :::5173->5173/tcp   audioqna-xeon-ui-server
-833a42677247   opea/audioqna:latest      "python audioqna.py"     About a minute ago   Up About a minute             0.0.0.0:3008->8888/tcp, :::3008->8888/tcp   audioqna-xeon-backend-server
-5dc4eb9bf499   opea/speecht5:latest      "python speecht5_ser…"   About a minute ago   Up About a minute             0.0.0.0:7055->7055/tcp, :::7055->7055/tcp   speecht5-service
-814e6efb1166   opea/vllm:latest          "python3 -m vllm.ent…"   About a minute ago   Up About a minute (healthy)   0.0.0.0:3006->80/tcp, :::3006->80/tcp       vllm-service
-46f7a00f4612   opea/whisper:latest       "python whisper_serv…"   About a minute ago   Up About a minute             0.0.0.0:7066->7066/tcp, :::7066->7066/tcp   whisper-service
+CONTAINER ID   IMAGE                                                      COMMAND                  CREATED          STATUS          PORTS                                         NAMES
+d8007690868d   opea/audioqna:latest                                       "python audioqna.py"     21 seconds ago   Up 19 seconds   0.0.0.0:3008->8888/tcp, [::]:3008->8888/tcp   audioqna-rocm-backend-server
+87ba9a1d56ae   ghcr.io/huggingface/text-generation-inference:2.4.1-rocm   "/tgi-entrypoint.sh …"   21 seconds ago   Up 20 seconds   0.0.0.0:3006->80/tcp, [::]:3006->80/tcp       tgi-service
+59e869acd742   opea/speecht5:latest                                       "python speecht5_ser…"   21 seconds ago   Up 20 seconds   0.0.0.0:7055->7055/tcp, :::7055->7055/tcp     speecht5-service
+0143267a4327   opea/whisper:latest                                        "python whisper_serv…"   21 seconds ago   Up 20 seconds   0.0.0.0:7066->7066/tcp, :::7066->7066/tcp     whisper-service
+```
+
+### For vLLM inference deployment
+
+```bash
+docker ps -a
+```
+
+For the default deployment, the following 5 containers should have started:
+
+```
+CONTAINER ID   IMAGE                     COMMAND                  CREATED          STATUS          PORTS                                           NAMES
+f3e6893a69fa   opea/audioqna-ui:latest   "docker-entrypoint.s…"   37 seconds ago   Up 35 seconds   0.0.0.0:18039->5173/tcp, [::]:18039->5173/tcp   audioqna-ui-server
+f943e5cd21e9   opea/audioqna:latest      "python audioqna.py"     37 seconds ago   Up 35 seconds   0.0.0.0:18038->8888/tcp, [::]:18038->8888/tcp   audioqna-backend-server
+074e8c418f52   opea/speecht5:latest      "python speecht5_ser…"   37 seconds ago   Up 36 seconds   0.0.0.0:7055->7055/tcp, :::7055->7055/tcp       speecht5-service
+77abe498e427   opea/vllm-rocm:latest     "python3 /workspace/…"   37 seconds ago   Up 36 seconds   0.0.0.0:8081->8011/tcp, [::]:8081->8011/tcp     audioqna-vllm-service
+9074a95bb7a6   opea/whisper:latest       "python whisper_serv…"   37 seconds ago   Up 36 seconds   0.0.0.0:7066->7066/tcp, :::7066->7066/tcp       whisper-service
 ```
 
 If any issues are encountered during deployment, refer to the [Troubleshooting](../../../../README_miscellaneous.md#troubleshooting) section.
