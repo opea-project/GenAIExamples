@@ -57,4 +57,3 @@ teirerank:
     readOnlyRootFilesystem: false
   readinessProbe:
     timeoutSeconds: 1
-
