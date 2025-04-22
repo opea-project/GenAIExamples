@@ -103,7 +103,7 @@ Please refer to the table below to build different microservices from source:
 | Retriever    | https://github.com/opea-project/GenAIComps/tree/main/comps/retrievers |
 | Reranker     | https://github.com/opea-project/GenAIComps/tree/main/comps/rerankings |
 | LLM          | https://github.com/opea-project/GenAIComps/tree/main/comps/llms       |
-| Megaservice  | [Megaservice build guide](#building-bustom-images-(optional\l))        |
+| Megaservice  | [Megaservice build guide](#building-bustom-images-(optional\))        |
 | UI           | [Basic UI build guide](#building-bustom-images-\(optional\)           |
 
 To deploy the CodeGen services, execute the `docker compose up` command with the appropriate arguments. For a vLLM deployment, execute:
