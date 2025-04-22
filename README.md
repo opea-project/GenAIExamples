@@ -90,7 +90,7 @@ Together, we can make OPEA the go-to platform for enterprise AI solutions. Let's
 
 Please check the [Contributing guidelines](https://github.com/opea-project/docs/tree/main/community/CONTRIBUTING.md) for a detailed guide on how to contribute a GenAI component and all the ways you can contribute!
 
-Thank you for being a part of this journey. We can't wait to see what we can achieve together!
+Thank you for being a part of this journey. We can't wait to see what we can achieve together!！
 
 ## Additional Content
 
