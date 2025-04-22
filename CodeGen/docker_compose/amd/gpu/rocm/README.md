@@ -96,15 +96,15 @@ source ./set_env_vllm.sh
 
 Please refer to the table below to build different microservices from source:
 
-| Microservice | Deployment Guide                                                                                 |
-| ------------ | ------------------------------------------------------------------------------------------------ |
-| Dataprep     | https://github.com/opea-project/GenAIComps/tree/main/comps/dataprep                              |
-| Embedding    | https://github.com/opea-project/GenAIComps/tree/main/comps/embeddings                            |
-| Retriever    | https://github.com/opea-project/GenAIComps/tree/main/comps/retrievers                            |
-| Reranker     | https://github.com/opea-project/GenAIComps/tree/main/comps/rerankings                            |
-| LLM          | https://github.com/opea-project/GenAIComps/tree/main/comps/llms                                  |
-| Megaservice  | [Megaservice build guide](#Building Custom Images \(Optional))                                    |
-| UI           | [Basic UI build guide](#Building Custom Images \(Optional))                                       |
+| Microservice | Deployment Guide                                                      |
+| ------------ | --------------------------------------------------------------------- |
+| Dataprep     | https://github.com/opea-project/GenAIComps/tree/main/comps/dataprep   |
+| Embedding    | https://github.com/opea-project/GenAIComps/tree/main/comps/embeddings |
+| Retriever    | https://github.com/opea-project/GenAIComps/tree/main/comps/retrievers |
+| Reranker     | https://github.com/opea-project/GenAIComps/tree/main/comps/rerankings |
+| LLM          | https://github.com/opea-project/GenAIComps/tree/main/comps/llms       |
+| Megaservice  | [Megaservice build guide](#Building Custom Images \(Optional))        |
+| UI           | [Basic UI build guide](#Building Custom Images \(Optional))           |
 
 To deploy the CodeGen services, execute the `docker compose up` command with the appropriate arguments. For a vLLM deployment, execute:
 
