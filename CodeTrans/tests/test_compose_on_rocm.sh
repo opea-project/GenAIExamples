@@ -61,6 +61,8 @@ function start_services() {
     export HOST_IP=${ip_address}
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
+    sed -i "s/timeout: 30 * 1000/timeout: 30 * 5000/g" $WORKPATH/ui/svelte/playwright.config.ts
+    sed -i "s/timeout: 5000/timeout: 15000/g" $WORKPATH/ui/svelte/playwright.config.ts
 
     # Start Docker Containers
     docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
