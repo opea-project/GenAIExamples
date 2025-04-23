@@ -5,35 +5,35 @@ This README provides instructions for deploying the CodeGen application using Do
 If the service response has a meaningful response in the value of the "choices.text" key,
 then we consider the vLLM service to be successfully launched
 
-## Available Deployment Options
+## Table of Contents
 
-This directory provides different Docker Compose files:
+- [Overview](#overview)
+- [Prerequisites](#prerequisites)
+- [Quick Start](#quick-start)
+- [Available Deployment Options](#available-deployment-options)
+  - [Default: vLLM-based Deployment (`--profile codegen-xeon-vllm`)](#default-vllm-based-deployment---profile-codegen-xeon-vllm)
+  - [TGI-based Deployment (`--profile codegen-xeon-tgi`)](#tgi-based-deployment---profile-codegen-xeon-tgi)
+- [Configuration Parameters](#configuration-parameters)
+  - [Environment Variables](#environment-variables)
+  - [Compose Profiles](#compose-profiles)
+- [Building Custom Images (Optional)](#building-custom-images-optional)
+- [Validate Services](#validate-services)
+  - [Check Container Status](#check-container-status)
+  - [Run Validation Script/Commands](#run-validation-scriptcommands)
+- [Accessing the User Interface (UI)](#accessing-the-user-interface-ui)
+  - [Gradio UI (Default)](#gradio-ui-default)
+  - [Svelte UI (Optional)](#svelte-ui-optional)
+  - [React UI (Optional)](#react-ui-optional)
+  - [VS Code Extension (Optional)](#vs-code-extension-optional)
+- [Troubleshooting](#troubleshooting)
+- [Stopping the Application](#stopping-the-application)
+- [Next Steps](#next-steps)
 
-### compose_vllm.yaml (vLLM - Default)
 
-- **Description:** Deploys the CodeGen application using vLLM optimized for ROCm as the backend LLM service. This is the default setup.
-- **Services Deployed:** `codegen-vllm-service`, `codegen-llm-server`, `codegen-backend-server`, `codegen-ui-server`. Requires `set_env_vllm.sh`.
+## Overview
 
-### compose.yaml (TGI)
+This guide focuses on running the pre-configured CodeGen service using Docker Compose on AMD ROCm processing acelarating platform. It leverages containers optimized for Intel architecture for the CodeGen gateway, LLM serving (vLLM or TGI), and UI.
 
-- **Description:** Deploys the CodeGen application using Text Generation Inference (TGI) optimized for ROCm as the backend LLM service.
-- **Services Deployed:** `codegen-tgi-service`, `codegen-llm-server`, `codegen-backend-server`, `codegen-ui-server`. Requires `set_env.sh`.
-
-## Configuration Parameters and Usage
-
-### Environment Variables (`set_env*.sh`)
-
-These scripts (`set_env_vllm.sh` for vLLM, `set_env.sh` for TGI) configure crucial parameters passed to the containers.
-
-This example covers the single-node on-premises deployment of the CodeGen example using OPEA components. There are various ways to enable CodeGen, but this example will focus on four options available for deploying the CodeGen pipeline to AMD ROCm AI Accelerators. This example begins with a Quick Start section and then documents how to modify deployments, leverage new models and configure the number of allocated devices.
-
-This example includes the following sections:
-
-- [CodeGen Quick Start Deployment](#CodeGen-quick-start-deployment): Demonstrates how to quickly deploy a CodeGen application/pipeline on AMD GPU (ROCm) platform.
-- [CodeGen Docker Compose Files](#CodeGen-docker-compose-files): Describes some example deployments and their docker compose files.
-- [CodeGen Service Configuration](#CodeGen-service-configuration): Describes the services and possible configuration changes.
-
-**Note** This example requires access to a properly installed AMD ROCm platform with a functional Docker service configured
 
 ## CodeGen Quick Start Deployment
 
@@ -67,6 +67,37 @@ Checkout a released version, such as v1.3:
 ```bash
 git checkout v1.3
 ```
+
+
+## Available Deployment Options
+
+This directory provides different Docker Compose files:
+
+### compose_vllm.yaml (vLLM - Default)
+
+- **Description:** Deploys the CodeGen application using vLLM optimized for ROCm as the backend LLM service. This is the default setup.
+- **Services Deployed:** `codegen-vllm-service`, `codegen-llm-server`, `codegen-backend-server`, `codegen-ui-server`. Requires `set_env_vllm.sh`.
+
+### compose.yaml (TGI)
+
+- **Description:** Deploys the CodeGen application using Text Generation Inference (TGI) optimized for ROCm as the backend LLM service.
+- **Services Deployed:** `codegen-tgi-service`, `codegen-llm-server`, `codegen-backend-server`, `codegen-ui-server`. Requires `set_env.sh`.
+
+## Configuration Parameters and Usage
+
+### Environment Variables (`set_env*.sh`)
+
+These scripts (`set_env_vllm.sh` for vLLM, `set_env.sh` for TGI) configure crucial parameters passed to the containers.
+
+This example covers the single-node on-premises deployment of the CodeGen example using OPEA components. There are various ways to enable CodeGen, but this example will focus on four options available for deploying the CodeGen pipeline to AMD ROCm AI Accelerators. This example begins with a Quick Start section and then documents how to modify deployments, leverage new models and configure the number of allocated devices.
+
+This example includes the following sections:
+
+- [CodeGen Quick Start Deployment](#CodeGen-quick-start-deployment): Demonstrates how to quickly deploy a CodeGen application/pipeline on AMD GPU (ROCm) platform.
+- [CodeGen Docker Compose Files](#CodeGen-docker-compose-files): Describes some example deployments and their docker compose files.
+- [CodeGen Service Configuration](#CodeGen-service-configuration): Describes the services and possible configuration changes.
+
+**Note** This example requires access to a properly installed AMD ROCm platform with a functional Docker service configured
 
 ## Generate a HuggingFace Access Token
 
