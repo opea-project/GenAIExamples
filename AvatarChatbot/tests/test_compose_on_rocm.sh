@@ -65,7 +65,7 @@ function start_services() {
     export MEGA_SERVICE_PORT=8888
     export ASR_SERVICE_PORT=3001
     export TTS_SERVICE_PORT=3002
-    export LLM_SERVICE_PORT=3007
+    export LLM_SERVICE_PORT=3006
     export ANIMATION_SERVICE_PORT=3008
 
     export DEVICE="cpu"
