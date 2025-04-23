@@ -42,7 +42,7 @@ services:
     environment:
       TTS_ENDPOINT: ${TTS_ENDPOINT}
   tgi-service:
-    image: ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
+    image: ghcr.io/huggingface/text-generation-inference:2.4.1-rocm
     container_name: tgi-service
     ports:
       - "${TGI_SERVICE_PORT:-3006}:80"
@@ -66,24 +66,6 @@ services:
       - seccomp:unconfined
     ipc: host
     command: --model-id ${LLM_MODEL_ID} --max-input-length 4096 --max-total-tokens 8192
-  llm:
-    image: ${REGISTRY:-opea}/llm-textgen:${TAG:-latest}
-    container_name: llm-tgi-server
-    depends_on:
-      - tgi-service
-    ports:
-      - "3007:9000"
-    ipc: host
-    environment:
-      no_proxy: ${no_proxy}
-      http_proxy: ${http_proxy}
-      https_proxy: ${https_proxy}
-      TGI_LLM_ENDPOINT: ${TGI_LLM_ENDPOINT}
-      LLM_ENDPOINT: ${TGI_LLM_ENDPOINT}
-      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
-      HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
-      OPENAI_API_KEY: ${OPENAI_API_KEY}
-    restart: unless-stopped
   wav2lip-service:
     image: ${REGISTRY:-opea}/wav2lip:${TAG:-latest}
     container_name: wav2lip-service
@@ -125,7 +107,7 @@ services:
     container_name: avatarchatbot-backend-server
     depends_on:
       - asr
-      - llm
+      - tgi-service
       - tts
       - animation
     ports:
