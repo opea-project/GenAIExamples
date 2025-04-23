@@ -29,11 +29,9 @@ then we consider the vLLM service to be successfully launched
 - [Stopping the Application](#stopping-the-application)
 - [Next Steps](#next-steps)
 
-
 ## Overview
 
 This guide focuses on running the pre-configured CodeGen service using Docker Compose on AMD ROCm processing acelarating platform. It leverages containers optimized for Intel architecture for the CodeGen gateway, LLM serving (vLLM or TGI), and UI.
-
 
 ## CodeGen Quick Start Deployment
 
@@ -67,7 +65,6 @@ Checkout a released version, such as v1.3:
 ```bash
 git checkout v1.3
 ```
-
 
 ## Available Deployment Options
 
