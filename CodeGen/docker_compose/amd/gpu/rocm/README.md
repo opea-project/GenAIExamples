@@ -4,7 +4,7 @@ This example covers the single-node on-premises deployment of the CodeGen exampl
 
 This example includes the following sections:
 
-- [CodeGen Quick Start Deployment](#CodeGen-quick-start-deployment): Demonstrates how to quickly deploy a CodeGen application/pipeline on aAMD GPU (ROCm) platform.
+- [CodeGen Quick Start Deployment](#CodeGen-quick-start-deployment): Demonstrates how to quickly deploy a CodeGen application/pipeline on AMD GPU (ROCm) platform.
 - [CodeGen Docker Compose Files](#CodeGen-docker-compose-files): Describes some example deployments and their docker compose files.
 - [CodeGen Service Configuration](#CodeGen-service-configuration): Describes the services and possible configuration changes.
 
