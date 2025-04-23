@@ -196,8 +196,9 @@ function validate_gradio() {
 
 function stop_docker() {
     local docker_profile="$1"
-
-    cd $WORKPATH/docker_compose/intel/hpu/gaudi
+    cd $WORKPATH/docker_compose
+    source set_env.sh
+    cd intel/hpu/gaudi
     docker compose --profile ${docker_profile} down
 }
 
