@@ -107,7 +107,7 @@ services:
     container_name: avatarchatbot-backend-server
     depends_on:
       - asr
-      - llm
+      - tgi-service
       - tts
       - animation
     ports:
