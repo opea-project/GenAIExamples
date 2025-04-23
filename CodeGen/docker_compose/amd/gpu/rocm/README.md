@@ -5,7 +5,6 @@ This README provides instructions for deploying the CodeGen application using Do
 If the service response has a meaningful response in the value of the "choices.text" key,
 then we consider the vLLM service to be successfully launched
 
-
 ## Available Deployment Options
 
 This directory provides different Docker Compose files:
@@ -22,11 +21,9 @@ This directory provides different Docker Compose files:
 
 ## Configuration Parameters and Usage
 
-
 ### Environment Variables (`set_env*.sh`)
 
 These scripts (`set_env_vllm.sh` for vLLM, `set_env.sh` for TGI) configure crucial parameters passed to the containers.
-
 
 This example covers the single-node on-premises deployment of the CodeGen example using OPEA components. There are various ways to enable CodeGen, but this example will focus on four options available for deploying the CodeGen pipeline to AMD ROCm AI Accelerators. This example begins with a Quick Start section and then documents how to modify deployments, leverage new models and configure the number of allocated devices.
 
@@ -120,7 +117,6 @@ export no_proxy=$no_proxy
 source ./set_env_vllm.sh
 ```
 
-
 ### Docker Compose GPU Configuration
 
 To enable GPU support for AMD GPUs, the following configuration is added to the Docker Compose files (`compose.yaml`, `compose_vllm.yaml`) for the LLM serving container:
@@ -164,7 +160,6 @@ Use AMD GPU driver utilities to determine the correct `cardN` and `renderN` IDs 
 
 Please refer to the table below to build different microservices from source:
 
-
 When using the default `compose_vllm.yaml` (vLLM-based), the following services are deployed:
 
 | Service Name           | Default Port (Host)                            | Internal Port | Purpose                     |
@@ -173,7 +168,6 @@ When using the default `compose_vllm.yaml` (vLLM-based), the following services 
 | codegen-llm-server     | `${CODEGEN_LLM_SERVICE_PORT}` (e.g., 9000)     | 80            | LLM Microservice Wrapper    |
 | codegen-backend-server | `${CODEGEN_BACKEND_SERVICE_PORT}` (e.g., 7778) | 80            | CodeGen MegaService/Gateway |
 | codegen-ui-server      | `${CODEGEN_UI_SERVICE_PORT}` (e.g., 5173)      | 80            | Frontend User Interface     |
-
 
 To deploy the CodeGen services, execute the `docker compose up` command with the appropriate arguments. For a vLLM deployment, execute:
 
