@@ -173,7 +173,7 @@ jobs:
           FINANCIAL_DATASETS_API_KEY: ${{ secrets.FINANCIAL_DATASETS_API_KEY }}
           IMAGE_REPO: ${{ inputs.registry }}
           IMAGE_TAG: ${{ inputs.tag }}
-          opea_branch: ${{ inputs.branch }}
+          opea_branch: ${{ inputs.opea_branch }}
           example: ${{ inputs.example }}
           hardware: ${{ inputs.hardware }}
           test_case: ${{ matrix.test_case }}
