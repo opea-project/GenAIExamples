@@ -1,4 +1,32 @@
-# Example CodeGen deployments on AMD GPU (ROCm)
+# Deploy CodeGen Application on AMD GPU (ROCm) with Docker Compose
+
+This README provides instructions for deploying the CodeGen application using Docker Compose on a system equipped with AMD GPUs supporting ROCm, detailing the steps to configure, run, and validate the services. This guide defaults to using the **vLLM** backend for LLM serving.
+
+If the service response has a meaningful response in the value of the "choices.text" key,
+then we consider the vLLM service to be successfully launched
+
+
+## Available Deployment Options
+
+This directory provides different Docker Compose files:
+
+### compose_vllm.yaml (vLLM - Default)
+
+- **Description:** Deploys the CodeGen application using vLLM optimized for ROCm as the backend LLM service. This is the default setup.
+- **Services Deployed:** `codegen-vllm-service`, `codegen-llm-server`, `codegen-backend-server`, `codegen-ui-server`. Requires `set_env_vllm.sh`.
+
+### compose.yaml (TGI)
+
+- **Description:** Deploys the CodeGen application using Text Generation Inference (TGI) optimized for ROCm as the backend LLM service.
+- **Services Deployed:** `codegen-tgi-service`, `codegen-llm-server`, `codegen-backend-server`, `codegen-ui-server`. Requires `set_env.sh`.
+
+## Configuration Parameters and Usage
+
+
+### Environment Variables (`set_env*.sh`)
+
+These scripts (`set_env_vllm.sh` for vLLM, `set_env.sh` for TGI) configure crucial parameters passed to the containers.
+
 
 This example covers the single-node on-premises deployment of the CodeGen example using OPEA components. There are various ways to enable CodeGen, but this example will focus on four options available for deploying the CodeGen pipeline to AMD ROCm AI Accelerators. This example begins with a Quick Start section and then documents how to modify deployments, leverage new models and configure the number of allocated devices.
 
@@ -92,19 +120,60 @@ export no_proxy=$no_proxy
 source ./set_env_vllm.sh
 ```
 
+
+### Docker Compose GPU Configuration
+
+To enable GPU support for AMD GPUs, the following configuration is added to the Docker Compose files (`compose.yaml`, `compose_vllm.yaml`) for the LLM serving container:
+
+```yaml
+# Example for vLLM service in compose_vllm.yaml
+# Note: Modern docker compose might use deploy.resources syntax instead.
+# Check your docker version and compose file.
+shm_size: 1g
+devices:
+  - /dev/kfd:/dev/kfd
+  - /dev/dri/:/dev/dri/
+cap_add:
+  - SYS_PTRACE
+group_add:
+  - video
+security_opt:
+  - seccomp:unconfined
+```
+
+This configuration forwards all available GPUs to the container. To use a specific GPU, specify its `cardN` and `renderN` device IDs (e.g., `/dev/dri/card0:/dev/dri/card0`, `/dev/dri/render128:/dev/dri/render128`). For example:
+
+```yaml
+shm_size: 1g
+devices:
+  - /dev/kfd:/dev/kfd
+  - /dev/dri/card0:/dev/dri/card0
+  - /dev/dri/render128:/dev/dri/render128
+cap_add:
+  - SYS_PTRACE
+group_add:
+  - video
+security_opt:
+  - seccomp:unconfined
+```
+
+**How to Identify GPU Device IDs:**
+Use AMD GPU driver utilities to determine the correct `cardN` and `renderN` IDs for your GPU.
+
 ### Deploy the Services Using Docker Compose
 
 Please refer to the table below to build different microservices from source:
 
-| Microservice | Deployment Guide                                                      |
-| ------------ | --------------------------------------------------------------------- |
-| Dataprep     | https://github.com/opea-project/GenAIComps/tree/main/comps/dataprep   |
-| Embedding    | https://github.com/opea-project/GenAIComps/tree/main/comps/embeddings |
-| Retriever    | https://github.com/opea-project/GenAIComps/tree/main/comps/retrievers |
-| Reranker     | https://github.com/opea-project/GenAIComps/tree/main/comps/rerankings |
-| LLM          | https://github.com/opea-project/GenAIComps/tree/main/comps/llms       |
-| Megaservice  | [Megaservice build guide](#building-bustom-images-(optional\))        |
-| UI           | [Basic UI build guide](#building-bustom-images-\(optional\)           |
+
+When using the default `compose_vllm.yaml` (vLLM-based), the following services are deployed:
+
+| Service Name           | Default Port (Host)                            | Internal Port | Purpose                     |
+| :--------------------- | :--------------------------------------------- | :------------ | :-------------------------- |
+| codegen-vllm-service   | `${CODEGEN_VLLM_SERVICE_PORT}` (e.g., 8028)    | 8000          | LLM Serving (vLLM on ROCm)  |
+| codegen-llm-server     | `${CODEGEN_LLM_SERVICE_PORT}` (e.g., 9000)     | 80            | LLM Microservice Wrapper    |
+| codegen-backend-server | `${CODEGEN_BACKEND_SERVICE_PORT}` (e.g., 7778) | 80            | CodeGen MegaService/Gateway |
+| codegen-ui-server      | `${CODEGEN_UI_SERVICE_PORT}` (e.g., 5173)      | 80            | Frontend User Interface     |
+
 
 To deploy the CodeGen services, execute the `docker compose up` command with the appropriate arguments. For a vLLM deployment, execute:
 
@@ -302,11 +371,6 @@ Checking the response from the service. The response should be similar to JSON:
   }
 }
 ````
-
-If the service response has a meaningful response in the value of the "choices.text" key,
-then we consider the vLLM service to be successfully launched
-
-**Note** The value of _host_ip_ was set using the _set_env.sh_ script and can be found in the _.env_ file.
 
 ## Accessing the User Interface (UI)
 
