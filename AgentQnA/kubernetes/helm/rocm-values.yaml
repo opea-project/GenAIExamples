@@ -49,4 +49,3 @@ sqlagent:
   llm_endpoint_url: http://{{ .Release.Name }}-vllm
   llm_engine: vllm
   model: "meta-llama/Llama-3.3-70B-Instruct"
-
