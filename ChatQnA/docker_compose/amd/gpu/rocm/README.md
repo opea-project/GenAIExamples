@@ -59,7 +59,7 @@ Set the values of the variables:
   We set these values in the file set_env\*\*\*\*.sh
 
 - **Variables with names like "**\*\*\*\*\*\*\_PORT"\*\* - These variables set the IP port numbers for establishing network connections to the application services.
-  The values shown in the file set_env.sh or set_env_vllm they are the values used for the development and testing of the application, as well as configured for the environment in which the development is performed. These values must be configured in accordance with the rules of network access to your environment's server, and must not overlap with the IP ports of other applications that are already in use.
+  The values shown in the file set_env.sh or set_env_vllm.sh they are the values used for the development and testing of the application, as well as configured for the environment in which the development is performed. These values must be configured in accordance with the rules of network access to your environment's server, and must not overlap with the IP ports of other applications that are already in use.
 
 Setting variables in the operating system environment:
 
@@ -159,7 +159,7 @@ For the default deployment with TGI, the following 9 containers should have star
 
 ```
 CONTAINER ID   IMAGE                                                   COMMAND                  CREATED          STATUS                    PORTS                                                                                      NAMES
-eaf24161aca8   opea/nginx:latest                                       "/docker-entrypoint.…"   37 seconds ago   Up 5 seconds              0.0.0.0:18104->80/tcp, [::]:18104->80/tcp                                                  chaqna-nginx-server
+eaf24161aca8   opea/nginx:latest                                       "/docker-entrypoint.…"   37 seconds ago   Up 5 seconds              0.0.0.0:18104->80/tcp, [::]:18104->80/tcp                                                  chatqna-nginx-server
 2fce48a4c0f4   opea/chatqna-ui:latest                                  "docker-entrypoint.s…"   37 seconds ago   Up 5 seconds              0.0.0.0:18101->5173/tcp, [::]:18101->5173/tcp                                              chatqna-ui-server
 613c384979f4   opea/chatqna:latest                                     "bash entrypoint.sh"     37 seconds ago   Up 5 seconds              0.0.0.0:18102->8888/tcp, [::]:18102->8888/tcp                                              chatqna-backend-server
 05512bd29fee   opea/dataprep:latest                                    "sh -c 'python $( [ …"   37 seconds ago   Up 36 seconds (healthy)   0.0.0.0:18103->5000/tcp, [::]:18103->5000/tcp                                              chatqna-dataprep-service
@@ -174,7 +174,7 @@ if used TGI with FaqGen:
 
 ```
 CONTAINER ID   IMAGE                                                   COMMAND                  CREATED          STATUS                    PORTS                                                                                      NAMES
-eaf24161aca8   opea/nginx:latest                                       "/docker-entrypoint.…"   37 seconds ago   Up 5 seconds              0.0.0.0:18104->80/tcp, [::]:18104->80/tcp                                                  chaqna-nginx-server
+eaf24161aca8   opea/nginx:latest                                       "/docker-entrypoint.…"   37 seconds ago   Up 5 seconds              0.0.0.0:18104->80/tcp, [::]:18104->80/tcp                                                  chatqna-nginx-server
 2fce48a4c0f4   opea/chatqna-ui:latest                                  "docker-entrypoint.s…"   37 seconds ago   Up 5 seconds              0.0.0.0:18101->5173/tcp, [::]:18101->5173/tcp                                              chatqna-ui-server
 613c384979f4   opea/chatqna:latest                                     "bash entrypoint.sh"     37 seconds ago   Up 5 seconds              0.0.0.0:18102->8888/tcp, [::]:18102->8888/tcp                                              chatqna-backend-server
 e0ef1ea67640   opea/llm-faqgen:latest                                  "bash entrypoint.sh"     37 seconds ago   Up 36 seconds             0.0.0.0:18011->9000/tcp, [::]:18011->9000/tcp                                              chatqna-llm-faqgen
@@ -190,7 +190,7 @@ if used vLLM:
 
 ```
 CONTAINER ID   IMAGE                                                   COMMAND                  CREATED          STATUS                    PORTS                                                                                      NAMES
-eaf24161aca8   opea/nginx:latest                                       "/docker-entrypoint.…"   37 seconds ago   Up 5 seconds              0.0.0.0:18104->80/tcp, [::]:18104->80/tcp                                                  chaqna-nginx-server
+eaf24161aca8   opea/nginx:latest                                       "/docker-entrypoint.…"   37 seconds ago   Up 5 seconds              0.0.0.0:18104->80/tcp, [::]:18104->80/tcp                                                  chatqna-nginx-server
 2fce48a4c0f4   opea/chatqna-ui:latest                                  "docker-entrypoint.s…"   37 seconds ago   Up 5 seconds              0.0.0.0:18101->5173/tcp, [::]:18101->5173/tcp                                              chatqna-ui-server
 613c384979f4   opea/chatqna:latest                                     "bash entrypoint.sh"     37 seconds ago   Up 5 seconds              0.0.0.0:18102->8888/tcp, [::]:18102->8888/tcp                                              chatqna-backend-server
 05512bd29fee   opea/dataprep:latest                                    "sh -c 'python $( [ …"   37 seconds ago   Up 36 seconds (healthy)   0.0.0.0:18103->5000/tcp, [::]:18103->5000/tcp                                              chatqna-dataprep-service
@@ -205,7 +205,7 @@ if used vLLM with FaqGen:
 
 ```
 CONTAINER ID   IMAGE                                                   COMMAND                  CREATED          STATUS                    PORTS                                                                                      NAMES
-eaf24161aca8   opea/nginx:latest                                       "/docker-entrypoint.…"   37 seconds ago   Up 5 seconds              0.0.0.0:18104->80/tcp, [::]:18104->80/tcp                                                  chaqna-nginx-server
+eaf24161aca8   opea/nginx:latest                                       "/docker-entrypoint.…"   37 seconds ago   Up 5 seconds              0.0.0.0:18104->80/tcp, [::]:18104->80/tcp                                                  chatqna-nginx-server
 2fce48a4c0f4   opea/chatqna-ui:latest                                  "docker-entrypoint.s…"   37 seconds ago   Up 5 seconds              0.0.0.0:18101->5173/tcp, [::]:18101->5173/tcp                                              chatqna-ui-server
 613c384979f4   opea/chatqna:latest                                     "bash entrypoint.sh"     37 seconds ago   Up 5 seconds              0.0.0.0:18102->8888/tcp, [::]:18102->8888/tcp                                              chatqna-backend-server
 e0ef1ea67640   opea/llm-faqgen:latest                                  "bash entrypoint.sh"     37 seconds ago   Up 36 seconds             0.0.0.0:18011->9000/tcp, [::]:18011->9000/tcp                                              chatqna-llm-faqgen
