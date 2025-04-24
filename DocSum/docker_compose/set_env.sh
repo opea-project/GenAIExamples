@@ -2,7 +2,10 @@
 
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
+echo "from: $(pwd)"
 pushd "../../" > /dev/null
+echo "to: $(pwd)"
+ls
 source .set_env.sh
 popd > /dev/null
 
