@@ -11,7 +11,7 @@ vllm:
   image:
     repository: opea/vllm-rocm
     tag: latest
-  LLM_MODEL_ID: "meta-llama/Llama-3.3-70B-Instruct"
+  LLM_MODEL_ID: "Intel/neural-chat-7b-v3-3"
   env:
     HIP_VISIBLE_DEVICES: "0,1"
     TENSOR_PARALLEL_SIZE: "2"
@@ -40,12 +40,13 @@ vllm:
 supervisor:
   llm_endpoint_url: http://{{ .Release.Name }}-vllm
   llm_engine: vllm
-  model: "meta-llama/Llama-3.3-70B-Instruct"
+  model: "Intel/neural-chat-7b-v3-3"
 ragagent:
   llm_endpoint_url: http://{{ .Release.Name }}-vllm
   llm_engine: vllm
-  model: "meta-llama/Llama-3.3-70B-Instruct"
+  model: "Intel/neural-chat-7b-v3-3"
 sqlagent:
   llm_endpoint_url: http://{{ .Release.Name }}-vllm
   llm_engine: vllm
-  model: "meta-llama/Llama-3.3-70B-Instruct"
+  model: "Intel/neural-chat-7b-v3-3"
+
