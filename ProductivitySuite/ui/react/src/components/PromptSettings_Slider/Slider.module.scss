@@ -1,0 +1,88 @@
+.sliderWrapper {
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
+  max-width: 320px;
+
+  flex-wrap: nowrap !important;
+
+  font-size: 13px;
+  font-weight: 400;
+
+  .start {
+    margin-left: 0.5rem;
+  }
+
+  .trackWrapper {
+    margin: 0 0.5rem;
+    width: 100px;
+    display: flex;
+  }
+
+  .styledSlider {
+    height: 2px;
+    width: 100%;
+    padding: 16px 0;
+    display: inline-flex;
+    align-items: center;
+    position: relative;
+    cursor: pointer;
+    touch-action: none;
+    -webkit-tap-highlight-color: transparent;
+    flex-wrap: nowrap;
+
+    &.disabled {
+      pointer-events: none;
+      cursor: default;
+      opacity: 0.4;
+    }
+
+    :global {
+      .MuiSlider-rail {
+        display: block;
+        position: absolute;
+        width: 100%;
+        height: 2px;
+        border-radius: 2px;
+        opacity: 0.3;
+      }
+
+      .MuiSlider-track {
+        display: block;
+        position: absolute;
+        height: 0px;
+      }
+
+      .MuiSlider-thumb {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: absolute;
+        margin-left: -2px;
+        width: 10px;
+        height: 10px;
+        box-sizing: border-box;
+        border-radius: 50%;
+        outline: 0;
+        transition-property: box-shadow, transform;
+        transition-timing-function: ease;
+        transition-duration: 120ms;
+        transform-origin: center;
+
+        &:hover {
+        }
+
+        &.focusVisible {
+          outline: none;
+        }
+
+        &.active {
+          outline: none;
+        }
+
+        &.disabled {
+        }
+      }
+    }
+  }
+}

@@ -47,7 +47,7 @@ services:
       ip_address: ${ip_address}
       strategy: react_llama
       with_memory: false
-      recursion_limit: ${recursion_limit_worker}
+      recursion_limit: 25
       llm_engine: vllm
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       llm_endpoint_url: ${LLM_ENDPOINT_URL}
@@ -68,7 +68,7 @@ services:
     container_name: supervisor-agent-endpoint
     depends_on:
       - worker-finqa-agent
-      # - worker-research-agent
+      - worker-research-agent
     volumes:
       - ${TOOLSET_PATH}:/home/user/tools/
       - ${PROMPT_PATH}:/home/user/prompts/
