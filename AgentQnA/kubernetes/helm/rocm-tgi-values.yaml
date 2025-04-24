@@ -10,7 +10,7 @@ tgi:
   image:
     repository: ghcr.io/huggingface/text-generation-inference
     tag: "3.0.0-rocm"
-  LLM_MODEL_ID: "Intel/neural-chat-7b-v3-3"
+  LLM_MODEL_ID: "meta-llama/Meta-Llama-3-8B-Instruct"
   MAX_INPUT_LENGTH: "2048"
   MAX_TOTAL_TOKENS: "4096"
   USE_FLASH_ATTENTION: "true"
@@ -44,12 +44,12 @@ tgi:
 supervisor:
   llm_endpoint_url: http://{{ .Release.Name }}-tgi
   llm_engine: tgi
-  model: "Intel/neural-chat-7b-v3-3"
+  model: "meta-llama/Meta-Llama-3-8B-Instruct"
 ragagent:
   llm_endpoint_url: http://{{ .Release.Name }}-tgi
   llm_engine: tgi
-  model: "Intel/neural-chat-7b-v3-3"
+  model: "meta-llama/Meta-Llama-3-8B-Instruct"
 sqlagent:
   llm_endpoint_url: http://{{ .Release.Name }}-tgi
   llm_engine: tgi
-  model: "Intel/neural-chat-7b-v3-3"
+  model: "meta-llama/Meta-Llama-3-8B-Instruct"
