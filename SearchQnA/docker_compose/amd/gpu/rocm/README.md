@@ -1,6 +1,6 @@
 # Deploying SearchQnA on AMD ROCm Platform
 
-This document outlines the single node deployment process for a SearchQnA application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservices on on AMD ROCm Platform.
+This document outlines the single node deployment process for a SearchQnA application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservices on AMD ROCm Platform.
 
 ## Table of Contents
 
@@ -12,7 +12,7 @@ This document outlines the single node deployment process for a SearchQnA applic
 
 ## SearchQnA Quick Start Deployment
 
-This section describes how to quickly deploy and test the SearchQnA service manually on an Intel® Xeon® processor. The basic steps are:
+This section describes how to quickly deploy and test the SearchQnA service manually on an AMD ROCm Platform. The basic steps are:
 
 1. [Access the Code](#access-the-code)
 2. [Configure the Deployment Environment](#configure-the-deployment-environment)
