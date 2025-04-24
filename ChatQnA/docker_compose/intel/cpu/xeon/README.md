@@ -371,6 +371,7 @@ For details on how to verify the correctness of the response, refer to [how-to-v
        -d '{"file_path": "all"}' \
        -H "Content-Type: application/json"
    ```
+
 8. Troubleshooting Conversational UI
 
 **UI Doesn't Load or Shows Errors:**
@@ -386,6 +387,7 @@ For details on how to verify the correctness of the response, refer to [how-to-v
 - **Check Network:** Make sure the port 5174 is not blocked
 
 ![project-screenshot](../../../../assets/img/chat_ui_init.png)
+
 ### Profile Microservices
 
 To further analyze MicroService Performance, users could follow the instructions to profile MicroServices.
