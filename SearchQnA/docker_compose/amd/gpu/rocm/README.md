@@ -23,7 +23,7 @@ This section describes how to quickly deploy and test the SearchQnA service manu
 
 ### Access the Code
 
-Clone the GenAIExample repository and access the SearchQnA AMD ROCm Platfrom Docker Compose files and supporting scripts:
+Clone the GenAIExample repository and access the SearchQnA AMD ROCm Platform Docker Compose files and supporting scripts:
 
 ```bash
 git clone https://github.com/opea-project/GenAIExamples.git
@@ -58,7 +58,7 @@ export NGINX_PORT=${your_nginx_port}          # your usable port for nginx, 80 f
 source ./set_env_vllm.sh
 ```
 
-#### For TGI inference type deployment 
+#### For TGI inference type deployment
 
 ```bash
 export host_ip="External_Public_IP"           # ip address of the node
@@ -84,14 +84,13 @@ To deploy the SearchQnA services, execute the `docker compose up` command with t
 //with VLLM:
 docker compose -f compose_vllm.yaml up -d
 ```
+
 #### For TGI inference type deployment
 
 ```bash
 //with TGI:
 docker compose -f compose.yaml up -d
 ```
-
-
 
 **Note**: developers should build docker image from source when:
 
@@ -122,6 +121,7 @@ docker ps -a
 For the default deployment, the following containers should have started
 
 #### For vLLM inference type deployment (default)
+
 ```
 CONTAINER ID   IMAGE                                                   COMMAND                  CREATED              STATUS              PORTS                                           NAMES
 50e5f4a00fcc   opea/searchqna-ui:latest                                "docker-entrypoint.s…"   About a minute ago   Up About a minute   0.0.0.0:18143->5173/tcp, [::]:18143->5173/tcp   search-ui-server
@@ -199,6 +199,7 @@ To stop the containers associated with the deployment, execute the following com
 //with VLLM:
 docker compose -f compose_vllm.yaml down
 ```
+
 #### For TGI inference type deployment
 
 ```bash
@@ -315,8 +316,8 @@ The appearance of such a page indicates that the service is operational and resp
 Let's enter the task for the service in the "Enter prompt here" field. For example, "What is DeepLearning?" and press Enter. After that, a page with the result of the task should open:
 
 ![UI start page](../../../../assets/img/searchqna-ui-response-example.png)
-A correct result displayed on the page indicates that the UI service has been successfully verified.   
-   
+A correct result displayed on the page indicates that the UI service has been successfully verified.
+
 ## Conclusion
 
 This guide should enable developer to deploy the default configuration or any of the other compose yaml files for different configurations. It also highlights the configurable parameters that can be set before deployment.
