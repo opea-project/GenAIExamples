@@ -49,4 +49,3 @@ sqlagent:
   llm_endpoint_url: http://{{ .Release.Name }}-vllm
   llm_engine: vllm
   model: "Intel/neural-chat-7b-v3-3"
-
