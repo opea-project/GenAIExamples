@@ -38,5 +38,3 @@ vllm:
 llm-uservice:
   TEXTGEN_BACKEND: vLLM
   retryTimeoutSeconds: 720
-
-

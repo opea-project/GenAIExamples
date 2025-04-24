@@ -7,6 +7,7 @@ tgi:
   image:
     repository: ghcr.io/huggingface/text-generation-inference
     tag: "2.4.1-rocm"
+  LLM_MODEL_ID: Qwen/Qwen2.5-Coder-7B-Instruct
   MAX_INPUT_LENGTH: "1024"
   MAX_TOTAL_TOKENS: "2048"
   USE_FLASH_ATTENTION: "false"
@@ -41,5 +42,6 @@ vllm:
   enabled: false
 llm-uservice:
   TEXTGEN_BACKEND: TGI
+  LLM_MODEL_ID: Qwen/Qwen2.5-Coder-7B-Instruct
 
 
