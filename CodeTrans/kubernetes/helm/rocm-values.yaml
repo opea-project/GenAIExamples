@@ -10,6 +10,7 @@ vllm:
   image:
     repository: opea/vllm-rocm
     tag: latest
+  LLM_MODEL_ID: "Qwen/Qwen2.5-Coder-7B-Instruct"
   env:
     HIP_VISIBLE_DEVICES: "0"
     TENSOR_PARALLEL_SIZE: "1"
