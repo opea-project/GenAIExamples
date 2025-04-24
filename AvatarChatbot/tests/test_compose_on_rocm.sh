@@ -27,7 +27,7 @@ function build_docker_images() {
     git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="avatarchatbot whisper asr llm-textgen speecht5 tts wav2lip animation"
+    service_list="avatarchatbot whisper asr speecht5 tts wav2lip animation"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
@@ -65,7 +65,7 @@ function start_services() {
     export MEGA_SERVICE_PORT=8888
     export ASR_SERVICE_PORT=3001
     export TTS_SERVICE_PORT=3002
-    export LLM_SERVICE_PORT=3007
+    export LLM_SERVICE_PORT=3006
     export ANIMATION_SERVICE_PORT=3008
 
     export DEVICE="cpu"
