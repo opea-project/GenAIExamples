@@ -125,14 +125,14 @@ Use AMD GPU driver utilities to determine the correct `cardN` and `renderN` IDs 
 
 Please refer to the table below to build different microservices from source:
 
-| Microservice    | Deployment Guide                                                                                               |
-| --------------- |----------------------------------------------------------------------------------------------------------------|
-| vLLM            | [vLLM build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/third_parties/vllm#build-docker) |
-| TGI             | [TGI project](https://github.com/huggingface/text-generation-inference.git)                                    |
-| LLM             | [LLM build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/llms)                             |
-| MegaService     | [MegaService guide](../../../../README.md)                                                                     |
-| UI              | [UI guide](../../../../ui/svelte/README.md)                                                                    |
-| Nginx           | [Nginx guide](https://github.com/opea-project/GenAIComps/tree/main/comps/third_parties/nginx)                  |
+| Microservice | Deployment Guide                                                                                               |
+| ------------ | -------------------------------------------------------------------------------------------------------------- |
+| vLLM         | [vLLM build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/third_parties/vllm#build-docker) |
+| TGI          | [TGI project](https://github.com/huggingface/text-generation-inference.git)                                    |
+| LLM          | [LLM build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/llms)                             |
+| MegaService  | [MegaService guide](../../../../README.md)                                                                     |
+| UI           | [UI guide](../../../../ui/svelte/README.md)                                                                    |
+| Nginx        | [Nginx guide](https://github.com/opea-project/GenAIComps/tree/main/comps/third_parties/nginx)                  |
 
 ### Check the Deployment Status
 
@@ -196,10 +196,10 @@ docker compose -f compose.yaml down
 
 In the context of deploying an ChatQnA pipeline on an Intel® Xeon® platform, we can pick and choose different large language model serving frameworks, or single English TTS/multi-language TTS component. The table below outlines the various configurations that are available as part of the application. These configurations can be used as templates and can be extended to different components available in [GenAIComps](https://github.com/opea-project/GenAIComps.git).
 
-| File                                                   | Description                                                                           |
-| ------------------------------------------------------ |---------------------------------------------------------------------------------------|
-| [compose.yaml](./compose.yaml)                         | The LLM serving framework is TGI. Default compose file using TGI as serving framework |
-| [compose_vllm.yaml](./compose_vllm.yaml)               | The LLM serving framework is vLLM. Compose file using vllm as serving framework       |
+| File                                     | Description                                                                           |
+| ---------------------------------------- | ------------------------------------------------------------------------------------- |
+| [compose.yaml](./compose.yaml)           | The LLM serving framework is TGI. Default compose file using TGI as serving framework |
+| [compose_vllm.yaml](./compose_vllm.yaml) | The LLM serving framework is vLLM. Compose file using vllm as serving framework       |
 
 ## Validate MicroServices
 
@@ -209,33 +209,33 @@ In the first startup, this service will take more time to download, load and war
 
 Try the command below to check whether the LLM serving is ready.
 
-   ```bash
-   # vLLM service
-   docker logs codetrans-vllm-service 2>&1 | grep complete
-   # If the service is ready, you will get the response like below.
-   INFO:     Application startup complete.
-   ```
+```bash
+# vLLM service
+docker logs codetrans-vllm-service 2>&1 | grep complete
+# If the service is ready, you will get the response like below.
+INFO:     Application startup complete.
+```
 
-   ```bash
-   # TGI service
-   docker logs codetrans-tgi-service | grep Connected
-   # If the service is ready, you will get the response like below.
-   2024-09-03T02:47:53.402023Z  INFO text_generation_router::server: router/src/server.rs:2311: Connected
-   ```
+```bash
+# TGI service
+docker logs codetrans-tgi-service | grep Connected
+# If the service is ready, you will get the response like below.
+2024-09-03T02:47:53.402023Z  INFO text_generation_router::server: router/src/server.rs:2311: Connected
+```
 
 Then try the `cURL` command below to validate services.
 
-   ```bash
-   # either vLLM or TGI service
-   # for vllm service
-   export port=${CODETRANS_VLLM_SERVICE_PORT}
-   # for tgi service
-   export port=${CODETRANS_TGI_SERVICE_PORT}
-   curl http://${HOST_IP}:${port}/v1/chat/completions \
-     -X POST \
-     -d '{"inputs":"    ### System: Please translate the following Golang codes into  Python codes.    ### Original codes:    '\'''\'''\''Golang    \npackage main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n    '\'''\'''\''    ### Translated codes:","parameters":{"max_new_tokens":17, "do_sample": true}}' \
-     -H 'Content-Type: application/json'
-   ```
+```bash
+# either vLLM or TGI service
+# for vllm service
+export port=${CODETRANS_VLLM_SERVICE_PORT}
+# for tgi service
+export port=${CODETRANS_TGI_SERVICE_PORT}
+curl http://${HOST_IP}:${port}/v1/chat/completions \
+  -X POST \
+  -d '{"inputs":"    ### System: Please translate the following Golang codes into  Python codes.    ### Original codes:    '\'''\'''\''Golang    \npackage main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n    '\'''\'''\''    ### Translated codes:","parameters":{"max_new_tokens":17, "do_sample": true}}' \
+  -H 'Content-Type: application/json'
+```
 
 2. LLM Microservice
 
