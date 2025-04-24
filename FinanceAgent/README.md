@@ -45,7 +45,7 @@ git clone https://github.com/opea-project/GenAIExamples.git
 
 ```bash
 export ip_address="External_Public_IP"
-export no_proxy=${your_no_proxy},${ip_address},
+export no_proxy=${your_no_proxy},${ip_address}
 export HF_CACHE_DIR=/path/to/your/model/cache/
 export HF_TOKEN=<you-hf-token>
 export FINNHUB_API_KEY=<your-finnhub-api-key> # go to https://finnhub.io/ to get your free api key
