@@ -50,6 +50,7 @@ function start_services() {
 
     cd $WORKPATH/docker_compose
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+    export host_ip=${ip_address}
     source set_env.sh
     cd intel/hpu/gaudi
 
