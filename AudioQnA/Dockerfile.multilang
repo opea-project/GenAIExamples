@@ -3,7 +3,6 @@
 
 ARG IMAGE_REPO=opea
 ARG BASE_TAG=latest
-FROM opea/comps-base:$BASE_TAG
 FROM $IMAGE_REPO/comps-base:$BASE_TAG
 
 COPY ./audioqna_multilang.py $HOME/audioqna_multilang.py
