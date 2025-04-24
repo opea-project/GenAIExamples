@@ -42,8 +42,6 @@ function build_docker_images() {
 
 function start_services() {
     cd $WORKPATH/docker_compose/amd/gpu/rocm/
-    export http_proxy=${http_proxy}
-    export https_proxy=${http_proxy}
     source set_env.sh
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env

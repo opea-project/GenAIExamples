@@ -43,10 +43,6 @@ function build_docker_images() {
 
 function start_services() {
     cd $WORKPATH/docker_compose
-    export host_ip=${ip_address}
-    export http_proxy=${http_proxy}
-    export https_proxy=${http_proxy}
-
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
     export NGINX_PORT=80
     source set_env.sh
