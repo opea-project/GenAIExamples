@@ -381,3 +381,4 @@ After that, a page with the result of the task should open:
 ![UI result page](../../../../assets/img/ui-result-page.png)
 
 If the result shown on the page is correct, then we consider the verification of the UI service to be successful.
+
