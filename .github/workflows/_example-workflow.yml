@@ -76,6 +76,7 @@ jobs:
       example: ${{ inputs.example }}
       hardware: ${{ inputs.node }}
       use_model_cache: ${{ inputs.use_model_cache }}
+      opea_branch: ${{ inputs.opea_branch }}
     secrets: inherit
 
 
