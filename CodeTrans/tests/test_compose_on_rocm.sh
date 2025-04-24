@@ -42,8 +42,6 @@ function build_docker_images() {
 
 function start_services() {
     cd $WORKPATH/docker_compose/amd/gpu/rocm/
-    export http_proxy=${http_proxy}
-    export https_proxy=${http_proxy}
     export CODETRANS_TGI_SERVICE_PORT=8008
     export CODETRANS_LLM_SERVICE_PORT=9000
     export CODETRANS_LLM_MODEL_ID="Qwen/Qwen2.5-Coder-7B-Instruct"

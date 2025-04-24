@@ -41,8 +41,6 @@ function build_docker_images() {
 
 function start_services() {
     cd $WORKPATH/docker_compose/intel/cpu/xeon/
-    export http_proxy=${http_proxy}
-    export https_proxy=${http_proxy}
     export LLM_MODEL_ID="mistralai/Mistral-7B-Instruct-v0.3"
     export LLM_ENDPOINT="http://${ip_address}:8008"
     export LLM_COMPONENT_NAME="OpeaTextGenService"
