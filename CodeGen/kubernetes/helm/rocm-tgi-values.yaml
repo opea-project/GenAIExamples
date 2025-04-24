@@ -40,5 +40,3 @@ vllm:
   enabled: false
 llm-uservice:
   TEXTGEN_BACKEND: TGI
-
-
