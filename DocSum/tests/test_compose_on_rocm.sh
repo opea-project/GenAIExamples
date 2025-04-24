@@ -14,7 +14,7 @@ export MODEL_CACHE=${model_cache:-"./data"}
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
-
+export host_ip=${ip_address}
 source $WORKPATH/docker_compose/amd/gpu/rocm/set_env.sh
 
 function build_docker_images() {
