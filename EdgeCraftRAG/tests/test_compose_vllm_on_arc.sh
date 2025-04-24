@@ -62,6 +62,8 @@ function start_services() {
     export vLLM_ENDPOINT=${vLLM_ENDPOINT}
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
     export no_proxy="localhost, 127.0.0.1, 192.168.1.1"
+    export HF_CACHE=${HOME}/.cache
+    echo "HF_CACHE=${HF_CACHE}"
 
     cd $WORKPATH/docker_compose/intel/gpu/arc
 
