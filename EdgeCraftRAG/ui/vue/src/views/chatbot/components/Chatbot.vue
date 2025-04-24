@@ -102,7 +102,7 @@ const defaultBenchmark = reactive<Benchmark>({
 
 const messagesList = ref<IMessage[]>([
   {
-    author: "Bot",
+    role: "assistant",
     content: "Hello! I am an Edge AI assistant. May I help you?",
   },
 ]);
@@ -145,18 +145,27 @@ const formatFormParam = () => {
   const { configuration } = props;
 
   return Object.assign({}, configuration, {
-    messages: inputKeywords.value,
+    messages: formatHistoryMessages(),
   });
+};
+
+const formatHistoryMessages = () => {
+  const messagesData = messagesList.value.slice(1, -1);
+  const historyMessages = messagesData.map(({ role, content }) => ({
+    role,
+    content,
+  }));
+  return historyMessages;
 };
 const handleSendMessage = async () => {
   if (!inputKeywords.value.trim()) return;
   messagesList.value.push(
     {
-      author: "User",
+      role: "user",
       content: inputKeywords.value,
     },
     {
-      author: "Bot",
+      role: "assistant",
       content: "",
       benchmark: _.cloneDeep(defaultBenchmark),
     }
