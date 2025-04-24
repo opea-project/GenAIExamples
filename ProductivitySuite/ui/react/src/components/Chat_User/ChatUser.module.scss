@@ -1,0 +1,27 @@
+.userWrapper {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 2rem;
+  position: relative;
+
+  .userPrompt {
+    max-width: 80%;
+    border-radius: var(--input-radius);
+    padding: 0.75rem 2rem 0.75rem 1rem;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    word-break: break-word;
+  }
+
+  .addIcon {
+    position: absolute;
+    right: -16px;
+    top: 3px;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  &:hover .addIcon {
+    opacity: 1;
+  }
+}
