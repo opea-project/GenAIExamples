@@ -1,5 +1,6 @@
 export ip_address=$(hostname -I | awk '{print $1}')
 export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+export HF_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
 export TOOLSET_PATH=$WORKDIR/GenAIExamples/FinanceAgent/tools/
 echo "TOOLSET_PATH=${TOOLSET_PATH}"
 export PROMPT_PATH=$WORKDIR/GenAIExamples/FinanceAgent/prompts/
