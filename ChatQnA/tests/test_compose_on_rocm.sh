@@ -67,9 +67,6 @@ function build_docker_images() {
     service_list="chatqna chatqna-ui dataprep retriever nginx"
     docker compose -f build.yaml build ${service_list} --no-cache > "${LOG_PATH}"/docker_image_build.log
 
-    docker pull ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
-    docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.6
-
     docker images && sleep 1s
 }
 
