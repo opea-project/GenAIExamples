@@ -113,7 +113,7 @@ services:
     restart: unless-stopped
 
   tei-embedding-service:
-    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.6
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
     container_name: tei-embedding-server
     ports:
       - "6006:80"
@@ -127,7 +127,7 @@ services:
     command: --model-id ${EMBEDDING_MODEL_ID} --auto-truncate
 
   tei-reranking-service:
-    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.6
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
     container_name: tei-reranking-server
     ports:
       - "8808:80"
