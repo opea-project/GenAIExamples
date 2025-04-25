@@ -63,7 +63,7 @@ services:
       - ecrag
   vllm-openvino-server:
     container_name: vllm-openvino-server
-    image: opea/vllm-arc:latest
+    image: ${REGISTRY:-opea}/vllm-arc:${TAG:-latest}
     ports:
       - ${VLLM_SERVICE_PORT:-8008}:80
     environment:

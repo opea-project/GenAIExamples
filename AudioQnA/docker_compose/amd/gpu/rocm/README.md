@@ -1,120 +1,59 @@
-# Build Mega Service of AudioQnA on AMD ROCm GPU
+# Deploying AudioQnA on AMD ROCm GPU
 
-This document outlines the deployment process for a AudioQnA application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice
-pipeline on server on AMD ROCm GPU platform.
+This document outlines the single node deployment process for a AudioQnA application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservices on server with AMD ROCm processing accelerators. The steps include pulling Docker images, container deployment via Docker Compose, and service execution using microservices `llm`.
 
-## Build Docker Images
+Note: The default LLM is `Intel/neural-chat-7b-v3-3`. Before deploying the application, please make sure either you've requested and been granted the access to it on [Huggingface](https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct) or you've downloaded the model locally from [ModelScope](https://www.modelscope.cn/models).
 
-### 1. Build Docker Image
+## Table of Contents
 
-- #### Create application install directory and go to it:
+1. [AudioQnA Quick Start Deployment](#audioqna-quick-start-deployment)
+2. [AudioQnA Docker Compose Files](#audioqna-docker-compose-files)
+3. [Validate Microservices](#validate-microservices)
+4. [Conclusion](#conclusion)
 
-  ```bash
-  mkdir ~/audioqna-install && cd audioqna-install
-  ```
+## AudioQnA Quick Start Deployment
 
-- #### Clone the repository GenAIExamples (the default repository branch "main" is used here):
+This section describes how to quickly deploy and test the AudioQnA service manually on an AMD ROCm platform. The basic steps are:
 
-  ```bash
-  git clone https://github.com/opea-project/GenAIExamples.git
-  ```
+1. [Access the Code](#access-the-code)
+2. [Configure the Deployment Environment](#configure-the-deployment-environment)
+3. [Deploy the Services Using Docker Compose](#deploy-the-services-using-docker-compose)
+4. [Check the Deployment Status](#check-the-deployment-status)
+5. [Validate the Pipeline](#validate-the-pipeline)
+6. [Cleanup the Deployment](#cleanup-the-deployment)
 
-  If you need to use a specific branch/tag of the GenAIExamples repository, then (v1.3 replace with its own value):
+### Access the Code
 
-  ```bash
-  git clone https://github.com/opea-project/GenAIExamples.git && cd GenAIExamples && git checkout v1.3
-  ```
-
-  We remind you that when using a specific version of the code, you need to use the README from this version:
-
-- #### Go to build directory:
-
-  ```bash
-  cd ~/audioqna-install/GenAIExamples/AudioQnA/docker_image_build
-  ```
-
-- Cleaning up the GenAIComps repository if it was previously cloned in this directory.
-  This is necessary if the build was performed earlier and the GenAIComps folder exists and is not empty:
-
-  ```bash
-  echo Y | rm -R GenAIComps
-  ```
-
-- #### Clone the repository GenAIComps (the default repository branch "main" is used here):
+Clone the GenAIExample repository and access the AudioQnA AMD ROCm platform Docker Compose files and supporting scripts:
 
 ```bash
-git clone https://github.com/opea-project/GenAIComps.git
-cd GenAIComps
+git clone https://github.com/opea-project/GenAIExamples.git
+cd GenAIExamples/AudioQnA
 ```
 
-We remind you that when using a specific version of the code, you need to use the README from this version.
+Then checkout a released version, such as v1.3:
 
-- #### Setting the list of images for the build (from the build file.yaml)
+```bash
+git checkout v1.3
+```
 
-  If you want to deploy a vLLM-based or TGI-based application, then the set of services is installed as follows:
+### Configure the Deployment Environment
 
-  #### vLLM-based application
+#### Docker Compose GPU Configuration
 
-  ```bash
-  service_list="vllm-rocm whisper speecht5 audioqna audioqna-ui"
-  ```
+Consult the section on [AudioQnA Service configuration](#audioqna-configuration) for information on how service specific configuration parameters affect deployments.
 
-  #### TGI-based application
-
-  ```bash
-  service_list="whisper speecht5 audioqna audioqna-ui"
-  ```
-
-- #### Optional. Pull TGI Docker Image (Do this if you want to use TGI)
-
-  ```bash
-  docker pull ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
-  ```
-
-- #### Build Docker Images
-
-  ```bash
-  docker compose -f build.yaml build ${service_list} --no-cache
-  ```
-
-  After the build, we check the list of images with the command:
-
-  ```bash
-  docker image ls
-  ```
-
-  The list of images should include:
-
-  ##### vLLM-based application:
-
-  - opea/vllm-rocm:latest
-    - opea/whisper:latest
-    - opea/speecht5:latest
-    - opea/audioqna:latest
-
-  ##### TGI-based application:
-
-  - ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
-    - opea/whisper:latest
-    - opea/speecht5:latest
-    - opea/audioqna:latest
-
----
-
-## Deploy the AudioQnA Application
-
-### Docker Compose Configuration for AMD GPUs
-
-To enable GPU support for AMD GPUs, the following configuration is added to the Docker Compose file:
-
-- compose_vllm.yaml - for vLLM-based application
-- compose.yaml - for TGI-based
+To enable GPU support for AMD GPUs, the following configuration is added to the Docker Compose files (`compose.yaml`, `compose_vllm.yaml`) for the LLM serving container:
 
 ```yaml
+# Example for vLLM service in compose_vllm.yaml
+# Note: Modern docker compose might use deploy.resources syntax instead.
+# Check your docker version and compose file.
 shm_size: 1g
 devices:
   - /dev/kfd:/dev/kfd
   - /dev/dri/:/dev/dri/
+# - /dev/dri/render128:/dev/dri/render128
 cap_add:
   - SYS_PTRACE
 group_add:
@@ -123,131 +62,161 @@ security_opt:
   - seccomp:unconfined
 ```
 
-This configuration forwards all available GPUs to the container. To use a specific GPU, specify its `cardN` and `renderN` device IDs. For example:
+#### Environment Variables (`set_env*.sh`)
 
-```yaml
-shm_size: 1g
-devices:
-  - /dev/kfd:/dev/kfd
-  - /dev/dri/card0:/dev/dri/card0
-  - /dev/dri/render128:/dev/dri/render128
-cap_add:
-  - SYS_PTRACE
-group_add:
-  - video
-security_opt:
-  - seccomp:unconfined
-```
+These scripts (`set_env_vllm.sh` for vLLM, `set_env.sh` for TGI) configure crucial parameters passed to the containers.
 
-**How to Identify GPU Device IDs:**
-Use AMD GPU driver utilities to determine the correct `cardN` and `renderN` IDs for your GPU.
+To set up environment variables for deploying AudioQnA services, set up some parameters specific to the deployment environment and source the `set_env.sh` script in this directory:
 
-### Set deploy environment variables
-
-#### Setting variables in the operating system environment:
-
-##### Set variable HUGGINGFACEHUB_API_TOKEN:
+For TGI inference usage:
 
 ```bash
-### Replace the string 'your_huggingfacehub_token' with your HuggingFacehub repository access token.
-export HUGGINGFACEHUB_API_TOKEN='your_huggingfacehub_token'
+export host_ip="External_Public_IP"           # ip address of the node
+export HUGGINGFACEHUB_API_TOKEN="Your_HuggingFace_API_Token"
+export http_proxy="Your_HTTP_Proxy"           # http proxy if any
+export https_proxy="Your_HTTPs_Proxy"         # https proxy if any
+export no_proxy=localhost,127.0.0.1,$host_ip,whisper-service,speecht5-service,vllm-service,tgi-service,audioqna-xeon-backend-server,audioqna-xeon-ui-server  # additional no proxies if needed
+export NGINX_PORT=${your_nginx_port}          # your usable port for nginx, 80 for example
+source ./set_env.sh
 ```
 
-#### Set variables value in set_env\*\*\*\*.sh file:
-
-Go to Docker Compose directory:
+For vLLM inference usage
 
 ```bash
-cd ~/audioqna-install/GenAIExamples/AudioQnA/docker_compose/amd/gpu/rocm
+export host_ip="External_Public_IP"           # ip address of the node
+export HUGGINGFACEHUB_API_TOKEN="Your_HuggingFace_API_Token"
+export http_proxy="Your_HTTP_Proxy"           # http proxy if any
+export https_proxy="Your_HTTPs_Proxy"         # https proxy if any
+export no_proxy=localhost,127.0.0.1,$host_ip,whisper-service,speecht5-service,vllm-service,tgi-service,audioqna-xeon-backend-server,audioqna-xeon-ui-server  # additional no proxies if needed
+export NGINX_PORT=${your_nginx_port}          # your usable port for nginx, 80 for example
+source ./set_env_vllm.sh
 ```
 
-The example uses the Nano text editor. You can use any convenient text editor:
+### Deploy the Services Using Docker Compose
 
-#### If you use vLLM
+To deploy the AudioQnA services, execute the `docker compose up` command with the appropriate arguments. For a default deployment, execute the command below. It uses the 'compose.yaml' file.
 
-```bash
-nano set_env_vllm.sh
-```
-
-#### If you use TGI
+for TGI inference deployment
 
 ```bash
-nano set_env.sh
-```
-
-If you are in a proxy environment, also set the proxy-related environment variables:
-
-```bash
-export http_proxy="Your_HTTP_Proxy"
-export https_proxy="Your_HTTPs_Proxy"
-```
-
-Set the values of the variables:
-
-- **HOST_IP, HOST_IP_EXTERNAL** - These variables are used to configure the name/address of the service in the operating system environment for the application services to interact with each other and with the outside world.
-
-  If your server uses only an internal address and is not accessible from the Internet, then the values for these two variables will be the same and the value will be equal to the server's internal name/address.
-
-  If your server uses only an external, Internet-accessible address, then the values for these two variables will be the same and the value will be equal to the server's external name/address.
-
-  If your server is located on an internal network, has an internal address, but is accessible from the Internet via a proxy/firewall/load balancer, then the HOST_IP variable will have a value equal to the internal name/address of the server, and the EXTERNAL_HOST_IP variable will have a value equal to the external name/address of the proxy/firewall/load balancer behind which the server is located.
-
-  We set these values in the file set_env\*\*\*\*.sh
-
-- **Variables with names like "**\*\*\*\*\*\*\_PORT"\*\* - These variables set the IP port numbers for establishing network connections to the application services.
-  The values shown in the file set_env.sh or set_env_vllm they are the values used for the development and testing of the application, as well as configured for the environment in which the development is performed. These values must be configured in accordance with the rules of network access to your environment's server, and must not overlap with the IP ports of other applications that are already in use.
-
-#### Set variables with script set_env\*\*\*\*.sh
-
-#### If you use vLLM
-
-```bash
-. set_env_vllm.sh
-```
-
-#### If you use TGI
-
-```bash
-. set_env.sh
-```
-
-### Start the services:
-
-#### If you use vLLM
-
-```bash
-docker compose -f compose_vllm.yaml up -d
-```
-
-#### If you use TGI
-
-```bash
+cd docker_compose/amd/gpu/rocm
 docker compose -f compose.yaml up -d
 ```
 
-All containers should be running and should not restart:
+for vLLM inference deployment
 
-##### If you use vLLM:
+```bash
+cd docker_compose/amd/gpu/rocm
+docker compose -f compose_vllm.yaml up -d
+```
 
-- audioqna-vllm-service
-- whisper-service
-- speecht5-service
-- audioqna-backend-server
-- audioqna-ui-server
+> **Note**: developers should build docker image from source when:
+>
+> - Developing off the git main branch (as the container's ports in the repo may be different > from the published docker image).
+> - Unable to download the docker image.
+> - Use a specific version of Docker image.
 
-##### If you use TGI:
+Please refer to the table below to build different microservices from source:
 
-- audioqna-tgi-service
-- whisper-service
-- speecht5-service
-- audioqna-backend-server
-- audioqna-ui-server
+| Microservice | Deployment Guide                                                                                                                  |
+| ------------ | --------------------------------------------------------------------------------------------------------------------------------- |
+| vLLM         | [vLLM build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/third_parties/vllm#build-docker)                    |
+| LLM          | [LLM build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/llms)                                                |
+| WHISPER      | [Whisper build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/asr/src#211-whisper-server-image)                |
+| SPEECHT5     | [SpeechT5 build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/tts/src#211-speecht5-server-image)              |
+| GPT-SOVITS   | [GPT-SOVITS build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/third_parties/gpt-sovits/src#build-the-image) |
+| MegaService  | [MegaService build guide](../../../../README_miscellaneous.md#build-megaservice-docker-image)                                     |
+| UI           | [Basic UI build guide](../../../../README_miscellaneous.md#build-ui-docker-image)                                                 |
 
----
+### Check the Deployment Status
 
-## Validate the Services
+After running docker compose, check if all the containers launched via docker compose have started:
 
-### 1. Validate the vLLM/TGI Service
+#### For TGI inference deployment
+
+```bash
+docker ps -a
+```
+
+For the default deployment, the following 5 containers should have started:
+
+```
+CONTAINER ID   IMAGE                                                      COMMAND                  CREATED          STATUS          PORTS                                         NAMES
+d8007690868d   opea/audioqna:latest                                       "python audioqna.py"     21 seconds ago   Up 19 seconds   0.0.0.0:3008->8888/tcp, [::]:3008->8888/tcp   audioqna-rocm-backend-server
+87ba9a1d56ae   ghcr.io/huggingface/text-generation-inference:2.4.1-rocm   "/tgi-entrypoint.sh …"   21 seconds ago   Up 20 seconds   0.0.0.0:3006->80/tcp, [::]:3006->80/tcp       tgi-service
+59e869acd742   opea/speecht5:latest                                       "python speecht5_ser…"   21 seconds ago   Up 20 seconds   0.0.0.0:7055->7055/tcp, :::7055->7055/tcp     speecht5-service
+0143267a4327   opea/whisper:latest                                        "python whisper_serv…"   21 seconds ago   Up 20 seconds   0.0.0.0:7066->7066/tcp, :::7066->7066/tcp     whisper-service
+```
+
+### For vLLM inference deployment
+
+```bash
+docker ps -a
+```
+
+For the default deployment, the following 5 containers should have started:
+
+```
+CONTAINER ID   IMAGE                     COMMAND                  CREATED          STATUS          PORTS                                           NAMES
+f3e6893a69fa   opea/audioqna-ui:latest   "docker-entrypoint.s…"   37 seconds ago   Up 35 seconds   0.0.0.0:18039->5173/tcp, [::]:18039->5173/tcp   audioqna-ui-server
+f943e5cd21e9   opea/audioqna:latest      "python audioqna.py"     37 seconds ago   Up 35 seconds   0.0.0.0:18038->8888/tcp, [::]:18038->8888/tcp   audioqna-backend-server
+074e8c418f52   opea/speecht5:latest      "python speecht5_ser…"   37 seconds ago   Up 36 seconds   0.0.0.0:7055->7055/tcp, :::7055->7055/tcp       speecht5-service
+77abe498e427   opea/vllm-rocm:latest     "python3 /workspace/…"   37 seconds ago   Up 36 seconds   0.0.0.0:8081->8011/tcp, [::]:8081->8011/tcp     audioqna-vllm-service
+9074a95bb7a6   opea/whisper:latest       "python whisper_serv…"   37 seconds ago   Up 36 seconds   0.0.0.0:7066->7066/tcp, :::7066->7066/tcp       whisper-service
+```
+
+If any issues are encountered during deployment, refer to the [Troubleshooting](../../../../README_miscellaneous.md#troubleshooting) section.
+
+### Validate the Pipeline
+
+Once the AudioQnA services are running, test the pipeline using the following command:
+
+```bash
+# Test the AudioQnA megaservice by recording a .wav file, encoding the file into the base64 format, and then sending the base64 string to the megaservice endpoint.
+# The megaservice will return a spoken response as a base64 string. To listen to the response, decode the base64 string and save it as a .wav file.
+wget https://github.com/intel/intel-extension-for-transformers/raw/refs/heads/main/intel_extension_for_transformers/neural_chat/assets/audio/sample_2.wav
+base64_audio=$(base64 -w 0 sample_2.wav)
+
+# if you are using speecht5 as the tts service, voice can be "default" or "male"
+# if you are using gpt-sovits for the tts service, you can set the reference audio following https://github.com/opea-project/GenAIComps/blob/main/comps/third_parties/gpt-sovits/src/README.md
+
+curl http://${host_ip}:3008/v1/audioqna \
+  -X POST \
+  -H "Content-Type: application/json" \
+  -d "{\"audio\": \"${base64_audio}\", \"max_tokens\": 64, \"voice\": \"default\"}" \
+  | sed 's/^"//;s/"$//' | base64 -d > output.wav
+```
+
+**Note** : Access the AudioQnA UI by web browser through this URL: `http://${host_ip}:5173`. Please confirm the `5173` port is opened in the firewall. To validate each microservice used in the pipeline refer to the [Validate Microservices](#validate-microservices) section.
+
+### Cleanup the Deployment
+
+To stop the containers associated with the deployment, execute the following command:
+
+#### If you use vLLM
+
+```bash
+cd ~/audioqna-install/GenAIExamples/AudioQnA/docker_compose/amd/gpu/rocm
+docker compose -f compose_vllm.yaml down
+```
+
+#### If you use TGI
+
+```bash
+cd ~/audioqna-install/GenAIExamples/AudioQnA/docker_compose/amd/gpu/rocm
+docker compose -f compose.yaml down
+```
+
+## AudioQnA Docker Compose Files
+
+In the context of deploying an AudioQnA pipeline on an Intel® Xeon® platform, we can pick and choose different large language model serving frameworks, or single English TTS/multi-language TTS component. The table below outlines the various configurations that are available as part of the application. These configurations can be used as templates and can be extended to different components available in [GenAIComps](https://github.com/opea-project/GenAIComps.git).
+
+| File                                     | Description                                                                               |
+| ---------------------------------------- | ----------------------------------------------------------------------------------------- |
+| [compose_vllm.yaml](./compose_vllm.yaml) | Default compose file using vllm as serving framework and redis as vector database         |
+| [compose.yaml](./compose.yaml)           | The LLM serving framework is TGI. All other configurations remain the same as the default |
+
+### Validate the vLLM/TGI Service
 
 #### If you use vLLM:
 
@@ -313,7 +282,7 @@ Checking the response from the service. The response should be similar to JSON:
 If the service response has a meaningful response in the value of the "generated_text" key,
 then we consider the TGI service to be successfully launched
 
-### 2. Validate MegaServices
+### Validate MegaServices
 
 Test the AudioQnA megaservice by recording a .wav file, encoding the file into the base64 format, and then sending the
 base64 string to the megaservice endpoint. The megaservice will return a spoken response as a base64 string. To listen
@@ -327,7 +296,7 @@ curl http://${host_ip}:3008/v1/audioqna \
   -H 'Content-Type: application/json' | sed 's/^"//;s/"$//' | base64 -d > output.wav
 ```
 
-### 3. Validate MicroServices
+### Validate MicroServices
 
 ```bash
 # whisper service
@@ -343,18 +312,6 @@ curl http://${host_ip}:7055/v1/tts \
   -H 'Content-Type: application/json'
 ```
 
-### 4. Stop application
+## Conclusion
 
-#### If you use vLLM
-
-```bash
-cd ~/audioqna-install/GenAIExamples/AudioQnA/docker_compose/amd/gpu/rocm
-docker compose -f compose_vllm.yaml down
-```
-
-#### If you use TGI
-
-```bash
-cd ~/audioqna-install/GenAIExamples/AudioQnA/docker_compose/amd/gpu/rocm
-docker compose -f compose.yaml down
-```
+This guide should enable developers to deploy the default configuration or any of the other compose yaml files for different configurations. It also highlights the configurable parameters that can be set before deployment.

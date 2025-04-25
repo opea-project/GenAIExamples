@@ -32,6 +32,10 @@ on:
         required: false
         type: boolean
         default: false
+      opea_branch:
+        default: "main"
+        required: false
+        type: string
 jobs:
   get-test-case:
     runs-on: ubuntu-latest
@@ -169,6 +173,7 @@ jobs:
           FINANCIAL_DATASETS_API_KEY: ${{ secrets.FINANCIAL_DATASETS_API_KEY }}
           IMAGE_REPO: ${{ inputs.registry }}
           IMAGE_TAG: ${{ inputs.tag }}
+          opea_branch: ${{ inputs.opea_branch }}
           example: ${{ inputs.example }}
           hardware: ${{ inputs.hardware }}
           test_case: ${{ matrix.test_case }}

@@ -2,35 +2,33 @@
 # SPDX-License-Identifier: Apache-2.0
 
 services:
-  edgecraftrag-server:
-    build:
-      context: ../
-      args:
-        http_proxy: ${http_proxy}
-        https_proxy: ${https_proxy}
-      dockerfile: ./Dockerfile.server
-    image: ${REGISTRY:-opea}/edgecraftrag-server:${TAG:-latest}
-  edgecraftrag-ui:
-    build:
-      context: ../
-      args:
-        http_proxy: ${http_proxy}
-        https_proxy: ${https_proxy}
-      dockerfile: ./ui/docker/Dockerfile.ui
-    image: ${REGISTRY:-opea}/edgecraftrag-ui:${TAG:-latest}
-  edgecraftrag-ui-gradio:
-    build:
-      context: ../
-      args:
-        http_proxy: ${http_proxy}
-        https_proxy: ${https_proxy}
-      dockerfile: ./ui/docker/Dockerfile.gradio
-    image: ${REGISTRY:-opea}/edgecraftrag-ui-gradio:${TAG:-latest}
   edgecraftrag:
     build:
       context: ../
       args:
+        IMAGE_REPO: ${REGISTRY}
+        BASE_TAG: ${TAG}
         http_proxy: ${http_proxy}
         https_proxy: ${https_proxy}
       dockerfile: ./Dockerfile
     image: ${REGISTRY:-opea}/edgecraftrag:${TAG:-latest}
+  edgecraftrag-server:
+    build:
+      dockerfile: ./Dockerfile.server
+    extends: edgecraftrag
+    image: ${REGISTRY:-opea}/edgecraftrag-server:${TAG:-latest}
+  edgecraftrag-ui:
+    build:
+      dockerfile: ./ui/docker/Dockerfile.ui
+    extends: edgecraftrag
+    image: ${REGISTRY:-opea}/edgecraftrag-ui:${TAG:-latest}
+  edgecraftrag-ui-gradio:
+    build:
+      dockerfile: ./ui/docker/Dockerfile.gradio
+    extends: edgecraftrag
+    image: ${REGISTRY:-opea}/edgecraftrag-ui-gradio:${TAG:-latest}
+  vllm-arc:
+    build:
+      context: GenAIComps
+      dockerfile: comps/third_parties/vllm/src/Dockerfile.intel_gpu
+    image: ${REGISTRY:-opea}/vllm-arc:${TAG:-latest}
