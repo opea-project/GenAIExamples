@@ -54,7 +54,7 @@ def construct_deploy_config(deploy_config, target_node, batch_param_value=None, 
 
     # First determine which llm replicaCount to use based on teirerank.enabled
     services = new_config.get("services", {})
-    teirerank_enabled = services.get("teirerank", {}).get("enabled", True)
+    teirerank_enabled = services.get("teirerank", {}).get("enabled", False)
 
     # Process each service's configuration
     for service_name, service_config in services.items():
