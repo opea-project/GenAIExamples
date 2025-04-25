@@ -278,6 +278,9 @@ def main(yaml_file, target_node=None, test_mode="oob"):
                                 chart_dir,
                             ]
                             result = subprocess.run(cmd, check=True, capture_output=True, text=True)
+                            print("Show deploy logs...")
+                            print(result.stdout)
+                            print("End of show deploy logs.")
 
                             match = re.search(r"values_file_path: (\S+)", result.stdout)
                             if match:
@@ -306,6 +309,9 @@ def main(yaml_file, target_node=None, test_mode="oob"):
                                 "--update-service",
                             ]
                             result = subprocess.run(cmd, check=True, capture_output=True, text=True)
+                            print("Show deploy logs...")
+                            print(result.stdout)
+                            print("End of show deploy logs.")
                             if result.returncode != 0:
                                 print(f"Update failed for {node} nodes configuration with {param_name} {batch_param}")
                                 break  # Skip remaining {param_name} for this node
