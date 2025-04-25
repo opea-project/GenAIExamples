@@ -9,6 +9,7 @@ We aim to run these benchmarks and share them with the OPEA community for three 
 - To inspire the community to build upon our benchmarks, allowing us to better quantify new solutions in conjunction with current leading LLMs, serving frameworks etc.
 
 ### Support Example List
+
 - ChatQnA
 - DocSum
 
@@ -72,7 +73,7 @@ Before running the benchmarks, ensure you have:
    ```bash
    pip install -r requirements.txt
    ```
-   notes: the benchmark need `opea-eval>=1.3`, if v1.3 is not released, please build the `opea-eval` from [source](https://github.com/opea-project/GenAIEval). 
+   notes: the benchmark need `opea-eval>=1.3`, if v1.3 is not released, please build the `opea-eval` from [source](https://github.com/opea-project/GenAIEval).
 
 ## Data Preparation
 
