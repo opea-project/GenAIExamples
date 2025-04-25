@@ -7,7 +7,8 @@ echo "PROMPT_PATH=${PROMPT_PATH}"
 export recursion_limit_worker=12
 export recursion_limit_supervisor=10
 
-vllm_port=8086
+export vllm_port=8086
+export FINANCEAGENT_VLLM_SERVICE_PORT=${vllm_port}
 export LLM_MODEL_ID="meta-llama/Llama-3.3-70B-Instruct"
 export LLM_ENDPOINT_URL="http://${ip_address}:${vllm_port}"
 export TEMPERATURE=0.5

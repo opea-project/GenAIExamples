@@ -110,14 +110,14 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      HUGGINGFACEHUB_API_TOKEN: ${DOCSUM_HUGGINGFACEHUB_API_TOKEN}
-      HF_TOKEN: ${DOCSUM_HUGGINGFACEHUB_API_TOKEN}
+      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       HF_HUB_DISABLE_PROGRESS_BARS: 1
       HF_HUB_ENABLE_HF_TRANSFER: 0
       VLLM_USE_TRITON_FLASH_ATTENTION: 0
       PYTORCH_JIT: 0
     healthcheck:
-      test: [ "CMD-SHELL", "curl -f http://${HOST_IP}:${DOCSUM_VLLM_SERVICE_PORT:-8081}/health || exit 1" ]
+      test: [ "CMD-SHELL", "curl -f http://${HOST_IP}:${FINANCEAGENT_VLLM_SERVICE_PORT:-8081}/health || exit 1" ]
       interval: 10s
       timeout: 10s
       retries: 100
@@ -134,7 +134,7 @@ services:
     security_opt:
       - seccomp:unconfined
       - apparmor=unconfined
-    command: "--model ${DOCSUM_LLM_MODEL_ID} --swap-space 16 --disable-log-requests --dtype float16 --tensor-parallel-size 4 --host 0.0.0.0 --port 8011 --num-scheduler-steps 1 --distributed-executor-backend \"mp\""
+    command: "--model ${LLM_MODEL_ID} --swap-space 16 --disable-log-requests --dtype float16 --tensor-parallel-size 4 --host 0.0.0.0 --port 8011 --num-scheduler-steps 1 --distributed-executor-backend \"mp\""
     ipc: host
 
   docsum-llm-textgen:
