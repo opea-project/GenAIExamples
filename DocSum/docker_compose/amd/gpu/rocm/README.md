@@ -23,7 +23,7 @@ This section describes how to quickly deploy and test the DocSum service manuall
 
 ### Access the Code
 
-Clone the GenAIExample repository and access the ChatQnA AMD GPU platform Docker Compose files and supporting scripts:
+Clone the GenAIExample repository and access the DocSum AMD GPU platform Docker Compose files and supporting scripts:
 
 ```bash
 git clone https://github.com/opea-project/GenAIExamples.git
@@ -42,7 +42,7 @@ Some HuggingFace resources, such as some models, are only accessible if you have
 
 ### Configure the Deployment Environment
 
-To set up environment variables for deploying ChatQnA services, set up some parameters specific to the deployment environment and source the `set_env_*.sh` script in this directory:
+To set up environment variables for deploying DocSum services, set up some parameters specific to the deployment environment and source the `set_env_*.sh` script in this directory:
 
 - if used vLLM - set_env_vllm.sh
 - if used TGI - set_env.sh
