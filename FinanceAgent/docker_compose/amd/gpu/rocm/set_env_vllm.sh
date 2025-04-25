@@ -1,4 +1,5 @@
 export ip_address=$(hostname -I | awk '{print $1}')
+export HOST_IP=${ip_address}
 export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
 export HF_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
 export TOOLSET_PATH=$WORKDIR/GenAIExamples/FinanceAgent/tools/
@@ -10,7 +11,7 @@ export recursion_limit_supervisor=10
 
 export vllm_port=8086
 export FINANCEAGENT_VLLM_SERVICE_PORT=${vllm_port}
-export LLM_MODEL_ID="meta-llama/Llama-3.3-70B-Instruct"
+export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
 export LLM_ENDPOINT_URL="http://${ip_address}:${vllm_port}"
 export TEMPERATURE=0.5
 export MAX_TOKENS=4096
@@ -42,5 +43,4 @@ export DATAPREP_COMPONENT_NAME="OPEA_DATAPREP_REDIS_FINANCE"
 export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
 export TEI_EMBEDDING_ENDPOINT="http://${ip_address}:${TEI_EMBEDDER_PORT}"
 
-export LLM_MODEL_ID="meta-llama/Llama-3.3-70B-Instruct"
 export MAX_LEN=16384
