@@ -320,4 +320,4 @@ A correct result displayed on the page indicates that the UI service has been su
 
 ## Conclusion
 
-This guide should enable developer to deploy the default configuration or any of the other compose yaml files for different configurations. It also highlights the configurable parameters that can be set before deployment.
+This guide should enable developers to deploy the default configuration or any of the other compose yaml files for different configurations. It also highlights the configurable parameters that can be set before deployment.
