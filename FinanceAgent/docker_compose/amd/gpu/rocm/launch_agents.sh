@@ -1,4 +1,8 @@
+# Copyright (C) 2025 Advanced Micro Devices, Inc.
+# SPDX-License-Identifier: Apache-2.0
+
 export ip_address=$(hostname -I | awk '{print $1}')
+export WORKDIR=${PWD}
 export HOST_IP=${ip_address}
 export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
 export HF_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
@@ -11,7 +15,7 @@ export recursion_limit_supervisor=10
 
 export vllm_port=8086
 export FINANCEAGENT_VLLM_SERVICE_PORT=${vllm_port}
-export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
+export LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
 export LLM_ENDPOINT_URL="http://${ip_address}:${vllm_port}"
 export TEMPERATURE=0.5
 export MAX_TOKENS=4096
@@ -32,15 +36,4 @@ export DOCSUM_ENDPOINT="http://${ip_address}:9000/v1/docsum"
 export FINNHUB_API_KEY=${FINNHUB_API_KEY}
 export FINANCIAL_DATASETS_API_KEY=${FINANCIAL_DATASETS_API_KEY}
 
-
-export DATAPREP_PORT="6007"
-export TEI_EMBEDDER_PORT="10221"
-export REDIS_URL_VECTOR="redis://${ip_address}:6379"
-export REDIS_URL_KV="redis://${ip_address}:6380"
-export LLM_MODEL=$model
-export LLM_ENDPOINT="http://${ip_address}:${vllm_port}"
-export DATAPREP_COMPONENT_NAME="OPEA_DATAPREP_REDIS_FINANCE"
-export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
-export TEI_EMBEDDING_ENDPOINT="http://${ip_address}:${TEI_EMBEDDER_PORT}"
-
-export MAX_LEN=16384
+docker compose -f compose.yaml up -d
