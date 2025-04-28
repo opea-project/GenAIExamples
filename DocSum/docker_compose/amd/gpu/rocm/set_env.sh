@@ -3,7 +3,7 @@
 # Copyright (C) 2024 Advanced Micro Devices, Inc.
 # SPDX-License-Identifier: Apache-2.0
 
-export HOST_IP=''
+export HOST_IP=${ip_address}
 export DOCSUM_MAX_INPUT_TOKENS="2048"
 export DOCSUM_MAX_TOTAL_TOKENS="4096"
 export DOCSUM_LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
