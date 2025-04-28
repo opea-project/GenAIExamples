@@ -40,7 +40,7 @@ USER user
 
 WORKDIR /home/user/edgecraftrag
 RUN pip install --no-cache-dir --upgrade pip setuptools==70.0.0 && \
-    pip install --no-cache-dir -r requirements.txt
+    pip install --no-cache-dir --extra-index-url https://download.pytorch.org/whl/cpu -r requirements.txt 
 
 WORKDIR /home/user/
 RUN git clone https://github.com/openvinotoolkit/openvino.genai.git genai
