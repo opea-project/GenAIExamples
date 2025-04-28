@@ -42,21 +42,7 @@ function build_docker_images() {
 
 function start_services() {
     cd $WORKPATH/docker_compose/amd/gpu/rocm/
-    export CODETRANS_TGI_SERVICE_PORT=8008
-    export CODETRANS_LLM_SERVICE_PORT=9000
-    export CODETRANS_LLM_MODEL_ID="Qwen/Qwen2.5-Coder-7B-Instruct"
-    export CODETRANS_TGI_LLM_ENDPOINT="http://${ip_address}:${CODETRANS_TGI_SERVICE_PORT}"
-    export CODETRANS_HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
-    export CODETRANS_MEGA_SERVICE_HOST_IP=${ip_address}
-    export CODETRANS_LLM_SERVICE_HOST_IP=${ip_address}
-    export CODETRANS_FRONTEND_SERVICE_IP=${ip_address}
-    export CODETRANS_FRONTEND_SERVICE_PORT=5173
-    export CODETRANS_BACKEND_SERVICE_NAME=codetrans
-    export CODETRANS_BACKEND_SERVICE_IP=${ip_address}
-    export CODETRANS_BACKEND_SERVICE_PORT=7777
-    export CODETRANS_NGINX_PORT=8088
-    export CODETRANS_BACKEND_SERVICE_URL="http://${ip_address}:${CODETRANS_BACKEND_SERVICE_PORT}/v1/codetrans"
-    export HOST_IP=${ip_address}
+    source set_env.sh
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
