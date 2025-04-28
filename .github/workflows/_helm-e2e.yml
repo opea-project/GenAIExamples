@@ -131,6 +131,18 @@ jobs:
           ref: ${{ steps.get-checkout-ref.outputs.CHECKOUT_REF }}
           fetch-depth: 0
 
+      - name: Validate Inputs
+        run: |
+          cd ${{ github.workspace }}
+          folders=($(find . -maxdepth 1 -type d ! -name ".*" -printf "%f\n" | tr '[:upper:]' '[:lower:]'))
+          echo "folders: ${folders[@]}"
+          echo "example: ${{ inputs.example }}"
+          example_lower=$(echo "${{ inputs.example }}" | tr '[:upper:]' '[:lower:]')
+          if [[ ! " ${folders[@]} " =~ " ${example_lower} " ]]; then
+            echo "Error: Input '${example_lower}' is not in the list of folders."
+            exit 1
+          fi
+
       - name: Set variables
         env:
           example: ${{ inputs.example }}

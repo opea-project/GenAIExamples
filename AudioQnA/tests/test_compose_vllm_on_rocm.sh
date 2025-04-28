@@ -17,19 +17,13 @@ export PATH="~/miniconda3/bin:$PATH"
 
 function build_docker_images() {
     opea_branch=${opea_branch:-"main"}
-    # If the opea_branch isn't main, replace the git clone branch in Dockerfile.
-    if [[ "${opea_branch}" != "main" ]]; then
-        cd $WORKPATH
-        OLD_STRING="RUN git clone --depth 1 https://github.com/opea-project/GenAIComps.git"
-        NEW_STRING="RUN git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git"
-        find . -type f -name "Dockerfile*" | while read -r file; do
-            echo "Processing file: $file"
-            sed -i "s|$OLD_STRING|$NEW_STRING|g" "$file"
-        done
-    fi
 
     cd $WORKPATH/docker_image_build
     git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
+    pushd GenAIComps
+    echo "GenAIComps test commit is $(git rev-parse HEAD)"
+    docker build --no-cache -t ${REGISTRY}/comps-base:${TAG} --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
+    popd && sleep 1s
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
     service_list="audioqna audioqna-ui whisper speecht5 vllm-rocm"
@@ -92,32 +86,6 @@ function validate_megaservice() {
 
 }
 
-#function validate_frontend() {
-## Frontend tests are currently disabled
-#    cd $WORKPATH/ui/svelte
-#    local conda_env_name="OPEA_e2e"
-#    export PATH=${HOME}/miniforge3/bin/:$PATH
-##    conda remove -n ${conda_env_name} --all -y
-##    conda create -n ${conda_env_name} python=3.12 -y
-#    source activate ${conda_env_name}
-#
-#    sed -i "s/localhost/$ip_address/g" playwright.config.ts
-#
-##    conda install -c conda-forge nodejs -y
-#    npm install && npm ci && npx playwright install --with-deps
-#    node -v && npm -v && pip list
-#
-#    exit_status=0
-#    npx playwright test || exit_status=$?
-#
-#    if [ $exit_status -ne 0 ]; then
-#        echo "[TEST INFO]: ---------frontend test failed---------"
-#        exit $exit_status
-#    else
-#        echo "[TEST INFO]: ---------frontend test passed---------"
-#    fi
-#}
-
 function stop_docker() {
     cd $WORKPATH/docker_compose/amd/gpu/rocm/
     docker compose -f compose_vllm.yaml stop && docker compose -f compose_vllm.yaml rm -f
@@ -125,16 +93,26 @@ function stop_docker() {
 
 function main() {
 
+    echo "::group::stop_docker"
     stop_docker
+    echo "::endgroup::"
+
+    echo "::group::build_docker_images"
     if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
+    echo "::endgroup::"
+
+    echo "::group::start_services"
     start_services
+    echo "::endgroup::"
 
+    echo "::group::validate_megaservice"
     validate_megaservice
-    # Frontend tests are currently disabled
-    # validate_frontend
+    echo "::endgroup::"
 
+    echo "::group::stop_docker"
     stop_docker
-    echo y | docker system prune
+    docker system prune -f
+    echo "::endgroup::"
 
 }
 
