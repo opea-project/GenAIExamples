@@ -134,7 +134,8 @@ jobs:
       - name: Validate Inputs
         run: |
           cd ${{ github.workspace }}
-          folders=($(find . -maxdepth 1 -type d ! -name ".*" -printf "%f\n" | tr '[:upper:]' '[:lower:]'))
+          # folders=($(find . -maxdepth 1 -type d ! -name ".*" -printf "%f\n" | tr '[:upper:]' '[:lower:]'))
+          folders=(${{ vars.NIGHTLY_RELEASE_EXAMPLES }})
           echo "folders: ${folders[@]}"
           echo "example: ${{ inputs.example }}"
           example_lower=$(echo "${{ inputs.example }}" | tr '[:upper:]' '[:lower:]')
