@@ -19,6 +19,9 @@ concurrency:
 jobs:
   job1:
     name: Get-Test-Matrix
+    permissions:
+      contents: read
+      pull-requests: read
     runs-on: ubuntu-latest
     outputs:
       run_matrix: ${{ steps.get-test-matrix.outputs.run_matrix }}
