@@ -20,3 +20,8 @@ services:
         https_proxy: ${https_proxy}
         no_proxy: ${no_proxy}
     image: ${REGISTRY:-opea}/agent:${TAG:-latest}
+  vllm-rocm:
+    build:
+      context: GenAIComps
+      dockerfile: comps/third_parties/vllm/src/Dockerfile.amd_gpu
+    image: ${REGISTRY:-opea}/vllm-rocm:${TAG:-latest}

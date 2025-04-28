@@ -4,7 +4,7 @@
 services:
   vllm-service:
     image: ${REGISTRY:-opea}/vllm-rocm:${TAG:-latest}
-    container_name: docsum-vllm-service
+    container_name: vllm-service
     ports:
       - "${FINANCEAGENT_VLLM_SERVICE_PORT:-8081}:8011"
     environment:
