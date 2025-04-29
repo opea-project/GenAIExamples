@@ -171,7 +171,7 @@ To see the UI, open a web browser to `http://${ip_address}:5175` to access the U
 
    You should see screen like the screenshot below when the settings are done.
 
-![opea-agent-setting](assets/ui_connections_settings.png)
+![opea-agent-setting](../../../../assets/ui_connections_settings.png)
 
 3. Upload documents with UI
 
@@ -179,7 +179,7 @@ To see the UI, open a web browser to `http://${ip_address}:5175` to access the U
 
    Note: the data ingestion may take a few minutes depending on the length of the document. Please wait patiently and do not close the pop-up window.
 
-![upload-doc-ui](assets/upload_doc_ui.png)
+![upload-doc-ui](../../../../assets/upload_doc_ui.png)
 
 4. Test agent with UI
 
@@ -187,4 +187,4 @@ To see the UI, open a web browser to `http://${ip_address}:5175` to access the U
 
    The UI will stream the agent's response tokens. You need to expand the `Thinking` tab to see the agent's reasoning process. After the agent made tool calls, you would also see the tool output after the tool returns output to the agent. Note: it may take a while to get the tool output back if the tool execution takes time.
 
-![opea-agent-test](assets/opea-agent-test.png)
+![opea-agent-test](../../../../assets/opea-agent-test.png)
