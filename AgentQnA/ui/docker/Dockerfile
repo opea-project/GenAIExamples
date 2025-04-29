@@ -9,7 +9,7 @@ ARG USE_OLLAMA=false
 # Tested with cu117 for CUDA 11 and cu121 for CUDA 12 (default)
 ARG USE_CUDA_VER=cu121
 # any sentence transformer model; models to use can be found at https://huggingface.co/models?library=sentence-transformers
-# Leaderboard: https://huggingface.co/spaces/mteb/leaderboard 
+# Leaderboard: https://huggingface.co/spaces/mteb/leaderboard
 # for better performance and multilangauge support use "intfloat/multilingual-e5-large" (~2.5GB) or "intfloat/multilingual-e5-base" (~1.5GB)
 # IMPORTANT: If you change the embedding model (sentence-transformers/all-MiniLM-L6-v2) and vice versa, you aren't able to use RAG Chat with your previous documents loaded in the WebUI! You need to re-embed them.
 ARG USE_EMBEDDING_MODEL=sentence-transformers/all-MiniLM-L6-v2
@@ -33,9 +33,6 @@ COPY open_webui_patches /app/patches
 ARG WEBUI_VERSION=v0.5.20
 RUN apk add --no-cache git
 
-
-COPY open_webui_patches /app/patches
-
 # Clone code and use patch
 RUN git config --global user.name "opea" && \
     git config --global user.email "" && \
@@ -44,12 +41,11 @@ RUN git config --global user.name "opea" && \
 WORKDIR /app/open-webui
 
 RUN git checkout ${WEBUI_VERSION} && \
-    if [ -d patches ] && [ "$(ls -A patches)" ]; then git am /app/patches/*.patch; fi && \
-    rm -rf .git
+    if [ -d patches ] && [ "$(ls -A patches)" ]; then git am /app/patches/*.patch; fi
 
 WORKDIR /app
 
-RUN mv open-webui/* . && rm -fr open-webui
+RUN mv open-webui/* . && rm -fr open-webui && ls -lrth /app/backend/
 
 RUN npm install onnxruntime-node --onnxruntime-node-install-cuda=skip
 RUN apk update && \
@@ -114,7 +110,10 @@ ENV HF_HOME="/app/backend/data/cache/embedding/models"
 
 #### Other models ##########################################################
 
+COPY --from=0 /app/backend /app/backend
+
 WORKDIR /app/backend
+
 
 ENV HOME=/root
 # Create user and group if not root
@@ -156,7 +155,8 @@ RUN if [ "$USE_OLLAMA" = "true" ]; then \
     fi
 
 # install python dependencies
-COPY --chown=$UID:$GID ./backend/requirements.txt ./requirements.txt
+# COPY --chown=$UID:$GID ./backend/requirements.txt ./requirements.txt
+# RUN cp /app/backend/requirements.txt ./requirements.txt
 
 RUN pip3 install --no-cache-dir uv && \
     if [ "$USE_CUDA" = "true" ]; then \
@@ -187,7 +187,7 @@ COPY --chown=$UID:$GID --from=build /app/CHANGELOG.md /app/CHANGELOG.md
 COPY --chown=$UID:$GID --from=build /app/package.json /app/package.json
 
 # copy backend files
-COPY --chown=$UID:$GID ./backend .
+# COPY --chown=$UID:$GID ./backend .
 
 EXPOSE 8080
 
