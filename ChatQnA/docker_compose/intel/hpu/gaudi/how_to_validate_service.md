@@ -51,7 +51,7 @@ f810f3b4d329   opea/embedding:latest                               "python embed
 174bd43fa6b5   ghcr.io/huggingface/tei-gaudi:1.5.0                    "text-embeddings-rou…"   2 minutes ago   Up 2 minutes                    0.0.0.0:8090->80/tcp, :::8090->80/tcp                                                  tei-embedding-gaudi-server
 05c40b636239   ghcr.io/huggingface/tgi-gaudi:2.3.1                     "text-generation-lau…"   2 minutes ago   Exited (1) About a minute ago                                                                                          tgi-gaudi-server
 74084469aa33   redis/redis-stack:7.2.0-v9                              "/entrypoint.sh"         2 minutes ago   Up 2 minutes                    0.0.0.0:6379->6379/tcp, :::6379->6379/tcp, 0.0.0.0:8001->8001/tcp, :::8001->8001/tcp   redis-vector-db
-88399dbc9e43   ghcr.io/huggingface/text-embeddings-inference:cpu-1.6   "text-embeddings-rou…"   2 minutes ago   Up 2 minutes                    0.0.0.0:8808->80/tcp, :::8808->80/tcp                                                  tei-reranking-gaudi-server
+88399dbc9e43   ghcr.io/huggingface/text-embeddings-inference:cpu-1.5   "text-embeddings-rou…"   2 minutes ago   Up 2 minutes                    0.0.0.0:8808->80/tcp, :::8808->80/tcp                                                  tei-reranking-gaudi-server
 ```
 
 In this case, `ghcr.io/huggingface/tgi-gaudi:2.3.1` Existed.
