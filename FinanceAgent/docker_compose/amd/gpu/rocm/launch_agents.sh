@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: Apache-2.0
 
 export ip_address=$(hostname -I | awk '{print $1}')
-export WORKDIR=${PWD}
 export HOST_IP=${ip_address}
 export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
 export HF_TOKEN=${HUGGINGFACEHUB_API_TOKEN}

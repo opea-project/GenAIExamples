@@ -111,7 +111,7 @@ function ingest_validate_dataprep() {
 
     # test /v1/dataprep/get
     echo "=========== Test get ==========="
-    local CONTENT=$(python $WORKPATH/tests/test_redis_finance.py --port $DATAPREP_PORT --test_option get)
+    local CONTENT=$(python3 $WORKPATH/tests/test_redis_finance.py --port $DATAPREP_PORT --test_option get)
     local EXIT_CODE=$(validate "$CONTENT" "Request successful" "dataprep-redis-finance")
     echo "$EXIT_CODE"
     local EXIT_CODE="${EXIT_CODE:0-1}"
