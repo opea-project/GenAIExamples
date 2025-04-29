@@ -46,13 +46,18 @@ dataprep_get_indices_endpoint = f"{DATAPREP_ENDPOINT}/indices"
 
 
 # Define the functions that will be used in the app
+
+def add_to_history(prompt, history):
+    history.append([prompt["text"], ""])
+    return history, ""
+
 def conversation_history(prompt, index, use_agent, history):
     print(f"Generating code for prompt: {prompt} using index: {index} and use_agent is {use_agent}")
-    history.append([prompt, ""])
-    response_generator = generate_code(prompt, index, use_agent)
+    history = add_to_history(prompt, history)[0]
+    response_generator = generate_code(prompt["text"], index, use_agent)
     for token in response_generator:
         history[-1][-1] += token
-        yield history
+        yield history, ""
 
 
 def upload_media(media, index=None, chunk_size=1500, chunk_overlap=100):
@@ -287,20 +292,36 @@ def get_file_names(files):
 # Define UI components
 with gr.Blocks() as ui:
     with gr.Tab("Code Generation"):
-        gr.Markdown("### Generate Code from Natural Language")
-        chatbot = gr.Chatbot(label="Chat History")
-        prompt_input = gr.Textbox(label="Enter your query")
-        with gr.Column():
-            with gr.Row(equal_height=True):
+        with gr.Row():
+            with gr.Column(scale=2):
+                # with gr.Row(equal_height=True):
                 database_dropdown = gr.Dropdown(choices=get_indices(), label="Select Index", value="None", scale=10)
                 db_refresh_button = gr.Button("Refresh Dropdown", scale=0.1)
                 db_refresh_button.click(update_indices_dropdown, outputs=database_dropdown)
                 use_agent = gr.Checkbox(label="Use Agent", container=False)
 
-        generate_button = gr.Button("Generate Code")
-        generate_button.click(
-            conversation_history, inputs=[prompt_input, database_dropdown, use_agent, chatbot], outputs=chatbot
-        )
+            with gr.Column(scale=9):
+                # with gr.Row(equal_height=True):
+                gr.Markdown("### Generate Code from Natural Language")
+                chatbot = gr.Chatbot(label="Chat History")
+                # prompt_input = gr.Textbox(label="Enter your query")
+                # generate_button = gr.Button("Submit Query")
+                prompt_input = gr.MultimodalTextbox(
+                        show_label=False,
+                        interactive=True,
+                        placeholder="Enter your query",
+                        sources=[]
+                    )
+            
+        
+        # generate_button.click(
+        #     conversation_history, inputs=[prompt_input, database_dropdown, use_agent, chatbot], outputs=chatbot
+        # )
+        prompt_input.submit(add_to_history, inputs=[prompt_input, chatbot], outputs=[chatbot, prompt_input])
+
+        prompt_input.submit(
+            conversation_history, inputs=[prompt_input, database_dropdown, use_agent, chatbot], outputs=[chatbot, prompt_input]
+        )# .then(prompt_input.submit(lambda: (gr.update(value=''), [], [prompt_input])))
 
     with gr.Tab("Resource Management"):
         # File management components
@@ -315,7 +336,7 @@ with gr.Blocks() as ui:
                 )
             with gr.Column(scale=3):
                 file_upload = gr.File(label="Upload Files", file_count="multiple")
-                url_input = gr.Textbox(label="Media to be ingested (Append URL's in a new line)")
+                url_input = gr.Textbox(label="Media to be ingested. Append URL's in a new line (Shift + Enter)")
                 upload_button = gr.Button("Upload", variant="primary")
                 upload_status = gr.Textbox(label="Upload Status")
                 file_upload.change(get_file_names, inputs=file_upload, outputs=url_input)
