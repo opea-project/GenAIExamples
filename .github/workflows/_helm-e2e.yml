@@ -135,12 +135,12 @@ jobs:
         env:
           example: ${{ inputs.example }}
         run: |
-          if [[ ! "$example" =~ ^[a-z0-9-]{1,20}$ ]] || [[ "$example" =~ \.\. ]] || [[ "$example" == -* || "$example" == *- ]]; then
+          if [[ ! "$example" =~ ^[a-zA-Z]{1,20}$ ]] || [[ "$example" =~ \.\. ]] || [[ "$example" == -* || "$example" == *- ]]; then
             echo "Error: Invalid input - only lowercase alphanumeric and internal hyphens allowed"
             exit 1
           fi
-          SAFE_PREFIX="safe-"
-          CHART_NAME="${SAFE_PREFIX}$(echo "$example" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]//g')"
+          # SAFE_PREFIX="kb-"
+          CHART_NAME="${SAFE_PREFIX}$(echo "$example" | tr '[:upper:]' '[:lower:]')"
           RAND_SUFFIX=$(openssl rand -hex 2 | tr -dc 'a-f0-9')
 
           cat <<EOF >> $GITHUB_ENV
