@@ -110,7 +110,7 @@ ENV HF_HOME="/app/backend/data/cache/embedding/models"
 
 #### Other models ##########################################################
 
-COPY --from=0 /app/backend /app/backend
+COPY --from=build /app/backend /app/backend
 
 WORKDIR /app/backend
 
@@ -125,7 +125,7 @@ RUN if [ $UID -ne 0 ]; then \
     fi
 
 RUN mkdir -p $HOME/.cache/chroma
-RUN echo -n 00000000-0000-0000-0000-000000000000 > $HOME/.cache/chroma/telemetry_user_id
+RUN printf 00000000-0000-0000-0000-000000000000 > $HOME/.cache/chroma/telemetry_user_id
 
 # Make sure the user has access to the app and root directory
 RUN chown -R $UID:$GID /app $HOME
