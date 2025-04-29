@@ -14,6 +14,7 @@ services:
     image: ${REGISTRY:-opea}/edgecraftrag:${TAG:-latest}
   edgecraftrag-server:
     build:
+      context: ../
       dockerfile: ./Dockerfile.server
     extends: edgecraftrag
     image: ${REGISTRY:-opea}/edgecraftrag-server:${TAG:-latest}
