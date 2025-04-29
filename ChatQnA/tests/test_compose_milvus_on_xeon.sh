@@ -35,13 +35,10 @@ function build_docker_images() {
     service_list="chatqna chatqna-ui dataprep retriever vllm nginx"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
-    docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.6
-
     docker images && sleep 1s
 }
 function start_services() {
     cd $WORKPATH/docker_compose/intel/cpu/xeon/
-    export no_proxy=${no_proxy},${ip_address}
     export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
     export RERANK_MODEL_ID="BAAI/bge-reranker-base"
     export LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"

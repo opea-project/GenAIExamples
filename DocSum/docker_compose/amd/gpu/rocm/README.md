@@ -23,17 +23,17 @@ This section describes how to quickly deploy and test the DocSum service manuall
 
 ### Access the Code
 
-Clone the GenAIExample repository and access the ChatQnA AMD GPU platform Docker Compose files and supporting scripts:
+Clone the GenAIExample repository and access the DocSum AMD GPU platform Docker Compose files and supporting scripts:
 
-```
+```bash
 git clone https://github.com/opea-project/GenAIExamples.git
 cd GenAIExamples/DocSum/docker_compose/amd/gpu/rocm
 ```
 
-Checkout a released version, such as v1.2:
+Checkout a released version, such as v1.3:
 
 ```
-git checkout v1.2
+git checkout v1.3
 ```
 
 ### Generate a HuggingFace Access Token
@@ -42,33 +42,96 @@ Some HuggingFace resources, such as some models, are only accessible if you have
 
 ### Configure the Deployment Environment
 
-To set up environment variables for deploying DocSum services, source the _set_env.sh_ script in this directory:
+To set up environment variables for deploying DocSum services, set up some parameters specific to the deployment environment and source the `set_env_*.sh` script in this directory:
 
-```
-source ./set_env.sh
+- if used vLLM - set_env_vllm.sh
+- if used TGI - set_env.sh
+
+Set the values of the variables:
+
+- **HOST_IP, HOST_IP_EXTERNAL** - These variables are used to configure the name/address of the service in the operating system environment for the application services to interact with each other and with the outside world.
+
+  If your server uses only an internal address and is not accessible from the Internet, then the values for these two variables will be the same and the value will be equal to the server's internal name/address.
+
+  If your server uses only an external, Internet-accessible address, then the values for these two variables will be the same and the value will be equal to the server's external name/address.
+
+  If your server is located on an internal network, has an internal address, but is accessible from the Internet via a proxy/firewall/load balancer, then the HOST_IP variable will have a value equal to the internal name/address of the server, and the EXTERNAL_HOST_IP variable will have a value equal to the external name/address of the proxy/firewall/load balancer behind which the server is located.
+
+  We set these values in the file set_env\*\*\*\*.sh
+
+- **Variables with names like "**\*\*\*\*\*\*\_PORT"\*\* - These variables set the IP port numbers for establishing network connections to the application services.
+  The values shown in the file set_env.sh or set_env_vllm.sh they are the values used for the development and testing of the application, as well as configured for the environment in which the development is performed. These values must be configured in accordance with the rules of network access to your environment's server, and must not overlap with the IP ports of other applications that are already in use.
+
+Setting variables in the operating system environment:
+
+```bash
+export HUGGINGFACEHUB_API_TOKEN="Your_HuggingFace_API_Token"
+source ./set_env_*.sh # replace the script name with the appropriate one
 ```
 
-The _set_env.sh_ script will prompt for required and optional environment variables used to configure the DocSum services. If a value is not entered, the script will use a default value for the same. It will also generate a _.env_ file defining the desired configuration. Consult the section on [DocSum Service configuration](#docsum-service-configuration) for information on how service specific configuration parameters affect deployments.
+Consult the section on [DocSum Service configuration](#docsum-configuration) for information on how service specific configuration parameters affect deployments.
 
 ### Deploy the Services Using Docker Compose
 
-To deploy the DocSum services, execute the `docker compose up` command with the appropriate arguments. For a default deployment, execute:
+To deploy the DocSum services, execute the `docker compose up` command with the appropriate arguments. For a default deployment with TGI, execute the command below. It uses the 'compose.yaml' file.
 
 ```bash
-docker compose up -d
+cd docker_compose/amd/gpu/rocm
+# if used TGI
+docker compose -f compose.yaml up -d
+# if used vLLM
+# docker compose -f compose_vllm.yaml up -d
 ```
 
-**Note**: developers should build docker image from source when:
+To enable GPU support for AMD GPUs, the following configuration is added to the Docker Compose file:
 
-- Developing off the git main branch (as the container's ports in the repo may be different from the published docker image).
-- Unable to download the docker image.
-- Use a specific version of Docker image.
+- compose_vllm.yaml - for vLLM-based application
+- compose.yaml - for TGI-based
+
+```yaml
+shm_size: 1g
+devices:
+  - /dev/kfd:/dev/kfd
+  - /dev/dri:/dev/dri
+cap_add:
+  - SYS_PTRACE
+group_add:
+  - video
+security_opt:
+  - seccomp:unconfined
+```
+
+This configuration forwards all available GPUs to the container. To use a specific GPU, specify its `cardN` and `renderN` device IDs. For example:
+
+```yaml
+shm_size: 1g
+devices:
+  - /dev/kfd:/dev/kfd
+  - /dev/dri/card0:/dev/dri/card0
+  - /dev/dri/render128:/dev/dri/render128
+cap_add:
+  - SYS_PTRACE
+group_add:
+  - video
+security_opt:
+  - seccomp:unconfined
+```
+
+**How to Identify GPU Device IDs:**
+Use AMD GPU driver utilities to determine the correct `cardN` and `renderN` IDs for your GPU.
+
+> **Note**: developers should build docker image from source when:
+>
+> - Developing off the git main branch (as the container's ports in the repo may be different > from the published docker image).
+> - Unable to download the docker image.
+> - Use a specific version of Docker image.
 
 Please refer to the table below to build different microservices from source:
 
 | Microservice | Deployment Guide                                                                                                                      |
 | ------------ | ------------------------------------------------------------------------------------------------------------------------------------- |
 | whisper      | [whisper build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/third_parties/whisper/src)                           |
+| TGI          | [TGI project](https://github.com/huggingface/text-generation-inference.git)                                                           |
 | vLLM         | [vLLM build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/third_parties/vllm#build-docker)                        |
 | llm-docsum   | [LLM-DocSum build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/llms/src/doc-summarization#12-build-docker-image) |
 | MegaService  | [MegaService build guide](../../../../README_miscellaneous.md#build-megaservice-docker-image)                                         |
@@ -84,6 +147,8 @@ docker ps -a
 
 For the default deployment, the following 5 containers should have started:
 
+If used TGI:
+
 ```
 CONTAINER ID   IMAGE                                                         COMMAND                  CREATED         STATUS                   PORTS                                       NAMES
 748f577b3c78   opea/whisper:latest                                           "python whisper_s…"      5 minutes ago   Up About a minute        0.0.0.0:7066->7066/tcp, :::7066->7066/tcp   whisper-service
@@ -93,24 +158,39 @@ fds3dd5b9fd8   opea/docsum:latest                                            "py
 78964d0c1hg5   ghcr.io/huggingface/text-generation-inference:2.4.1-rocm      "/tgi-entrypoint.sh"     5 minutes ago   Up 5 minutes (healthy)   0.0.0.0:8008->80/tcp, [::]:8008->80/tcp     docsum-tgi-service
 ```
 
+If used vLLM:
+
+```
+CONTAINER ID   IMAGE                                                         COMMAND                  CREATED         STATUS                   PORTS                                       NAMES
+748f577b3c78   opea/whisper:latest                                           "python whisper_s…"      5 minutes ago   Up About a minute        0.0.0.0:7066->7066/tcp, :::7066->7066/tcp   whisper-service
+4eq8b7034fd9   opea/docsum-gradio-ui:latest                                  "docker-entrypoint.s…"   5 minutes ago   Up About a minute        0.0.0.0:5173->5173/tcp, :::5173->5173/tcp   docsum-ui-server
+fds3dd5b9fd8   opea/docsum:latest                                            "python docsum.py"       5 minutes ago   Up About a minute        0.0.0.0:8888->8888/tcp, :::8888->8888/tcp   docsum-backend-server
+78fsd6fabfs7   opea/llm-docsum:latest                                        "bash entrypoint.sh"     5 minutes ago   Up About a minute        0.0.0.0:9000->9000/tcp, :::9000->9000/tcp   docsum-llm-server
+78964d0c1hg5   opea/vllm-rocm:latest                                         "python3 /workspace/…"   5 minutes ago   Up 5 minutes (healthy)   0.0.0.0:8008->80/tcp, [::]:8008->80/tcp     docsum-vllm-service
+```
+
 ### Test the Pipeline
 
 Once the DocSum services are running, test the pipeline using the following command:
 
 ```bash
-curl -X POST http://${host_ip}:8888/v1/docsum \
+curl -X POST http://${HOST_IP}:${DOCSUM_BACKEND_SERVER_PORT}/v1/docsum \
         -H "Content-Type: application/json" \
         -d '{"type": "text", "messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
 ```
 
-**Note** The value of _host_ip_ was set using the _set_env.sh_ script and can be found in the _.env_ file.
+**Note** The value of _HOST_IP_ was set using the _set_env.sh_ script and can be found in the _.env_ file.
 
 ### Cleanup the Deployment
 
 To stop the containers associated with the deployment, execute the following command:
 
-```
+```bash
+# if used TGI
 docker compose -f compose.yaml down
+# if used vLLM
+# docker compose -f compose_vllm.yaml down
+
 ```
 
 All the DocSum containers will be stopped and then removed on completion of the "down" command.
@@ -132,7 +212,7 @@ There are also some customized usage.
 
 ```bash
 # form input. Use English mode (default).
-curl http://${host_ip}:8888/v1/docsum \
+curl http://${HOST_IP}:${DOCSUM_BACKEND_SERVER_PORT}/v1/docsum \
       -H "Content-Type: multipart/form-data" \
       -F "type=text" \
       -F "messages=Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5." \
@@ -141,7 +221,7 @@ curl http://${host_ip}:8888/v1/docsum \
       -F "stream=True"
 
 # Use Chinese mode.
-curl http://${host_ip}:8888/v1/docsum \
+curl http://${HOST_IP}:${DOCSUM_BACKEND_SERVER_PORT}/v1/docsum \
       -H "Content-Type: multipart/form-data" \
       -F "type=text" \
       -F "messages=2024年9月26日，北京——今日，英特尔正式发布英特尔® 至强® 6性能核处理器（代号Granite Rapids），为AI、数据分析、科学计算等计算密集型业务提供卓越性能。" \
@@ -150,7 +230,7 @@ curl http://${host_ip}:8888/v1/docsum \
       -F "stream=True"
 
 # Upload file
-curl http://${host_ip}:8888/v1/docsum \
+curl http://${HOST_IP}:${DOCSUM_BACKEND_SERVER_PORT}/v1/docsum \
    -H "Content-Type: multipart/form-data" \
    -F "type=text" \
    -F "messages=" \
@@ -166,11 +246,11 @@ curl http://${host_ip}:8888/v1/docsum \
 Audio:
 
 ```bash
-curl -X POST http://${host_ip}:8888/v1/docsum \
+curl -X POST http://${HOST_IP}:${DOCSUM_BACKEND_SERVER_PORT}/v1/docsum \
    -H "Content-Type: application/json" \
    -d '{"type": "audio", "messages": "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA"}'
 
-curl http://${host_ip}:8888/v1/docsum \
+curl http://${HOST_IP}:${DOCSUM_BACKEND_SERVER_PORT}/v1/docsum \
    -H "Content-Type: multipart/form-data" \
    -F "type=audio" \
    -F "messages=UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA" \
@@ -182,11 +262,11 @@ curl http://${host_ip}:8888/v1/docsum \
 Video:
 
 ```bash
-curl -X POST http://${host_ip}:8888/v1/docsum \
+curl -X POST http://${HOST_IP}:${DOCSUM_BACKEND_SERVER_PORT}/v1/docsum \
    -H "Content-Type: application/json" \
    -d '{"type": "video", "messages": "convert your video to base64 data type"}'
 
-curl http://${host_ip}:8888/v1/docsum \
+curl http://${HOST_IP}:${DOCSUM_BACKEND_SERVER_PORT}/v1/docsum \
    -H "Content-Type: multipart/form-data" \
    -F "type=video" \
    -F "messages=convert your video to base64 data type" \
@@ -208,7 +288,7 @@ If you want to deal with long context, can set following parameters and select s
 "summary_type" is set to be "auto" by default, in this mode we will check input token length, if it exceed `MAX_INPUT_TOKENS`, `summary_type` will automatically be set to `refine` mode, otherwise will be set to `stuff` mode.
 
 ```bash
-curl http://${host_ip}:8888/v1/docsum \
+curl http://${HOST_IP}:${DOCSUM_BACKEND_SERVER_PORT}/v1/docsum \
    -H "Content-Type: multipart/form-data" \
    -F "type=text" \
    -F "messages=" \
@@ -223,7 +303,7 @@ curl http://${host_ip}:8888/v1/docsum \
 In this mode LLM generate summary based on complete input text. In this case please carefully set `MAX_INPUT_TOKENS` and `MAX_TOTAL_TOKENS` according to your model and device memory, otherwise it may exceed LLM context limit and raise error when meet long context.
 
 ```bash
-curl http://${host_ip}:8888/v1/docsum \
+curl http://${HOST_IP}:${DOCSUM_BACKEND_SERVER_PORT}/v1/docsum \
    -H "Content-Type: multipart/form-data" \
    -F "type=text" \
    -F "messages=" \
@@ -238,7 +318,7 @@ curl http://${host_ip}:8888/v1/docsum \
 Truncate mode will truncate the input text and keep only the first chunk, whose length is equal to `min(MAX_TOTAL_TOKENS - input.max_tokens - 50, MAX_INPUT_TOKENS)`
 
 ```bash
-curl http://${host_ip}:8888/v1/docsum \
+curl http://${HOST_IP}:${DOCSUM_BACKEND_SERVER_PORT}/v1/docsum \
    -H "Content-Type: multipart/form-data" \
    -F "type=text" \
    -F "messages=" \
@@ -255,7 +335,7 @@ Map_reduce mode will split the inputs into multiple chunks, map each document to
 In this mode, default `chunk_size` is set to be `min(MAX_TOTAL_TOKENS - input.max_tokens - 50, MAX_INPUT_TOKENS)`
 
 ```bash
-curl http://${host_ip}:8888/v1/docsum \
+curl http://${HOST_IP}:${DOCSUM_BACKEND_SERVER_PORT}/v1/docsum \
    -H "Content-Type: multipart/form-data" \
    -F "type=text" \
    -F "messages=" \
@@ -272,7 +352,7 @@ Refin mode will split the inputs into multiple chunks, generate summary for the 
 In this mode, default `chunk_size` is set to be `min(MAX_TOTAL_TOKENS - 2 * input.max_tokens - 128, MAX_INPUT_TOKENS)`.
 
 ```bash
-curl http://${host_ip}:8888/v1/docsum \
+curl http://${HOST_IP}:${DOCSUM_BACKEND_SERVER_PORT}/v1/docsum \
    -H "Content-Type: multipart/form-data" \
    -F "type=text" \
    -F "messages=" \
@@ -288,7 +368,7 @@ Several UI options are provided. If you need to work with multimedia documents, 
 
 ### Gradio UI
 
-To access the UI, use the URL - http://${EXTERNAL_HOST_IP}:${FAGGEN_UI_PORT}
+To access the UI, use the URL - http://${HOST_IP}:${DOCSUM_FRONTEND_PORT}
 A page should open when you click through to this address:
 
 ![UI start page](../../../../assets/img/ui-starting-page.png)
