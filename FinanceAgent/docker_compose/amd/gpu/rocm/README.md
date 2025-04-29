@@ -146,10 +146,10 @@ All the Finance Agent containers will be stopped and then removed on completion 
 
 In the context of deploying a Finance Agent pipeline on an AMD GPU platform, we can pick and choose different large language model serving frameworks. The table below outlines the various configurations that are available as part of the application.
 
-| File                                             | Description                                                                          |
-| ------------------------------------------------ | ------------------------------------------------------------------------------------ |
-| [compose.yaml](./compose.yaml)                   | Default compose to run agent service                                                 |
-| [compose_vllm.yaml](./compose_vllm.yaml)         | The LLM Service serving framework is vLLM.                                           |
+| File                                             | Description                                                                           |
+| ------------------------------------------------ | ------------------------------------------------------------------------------------- |
+| [compose.yaml](./compose.yaml)                   | Default compose to run agent service                                                  |
+| [compose_vllm.yaml](./compose_vllm.yaml)         | The LLM Service serving framework is vLLM.                                            |
 | [dataprep_compose.yaml](./dataprep_compose.yaml) | Compose file to run Data Prep service such as Redis vector DB, Re-rancer and Embedder |
 
 ## How to interact with the agent system with UI
