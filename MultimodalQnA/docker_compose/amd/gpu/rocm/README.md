@@ -189,8 +189,6 @@ bac14dac272d   opea/whisper:latest                            "python whisper_se
 7d603688fc56   redis/redis-stack:7.2.0-v9                     "/entrypoint.sh"         42 seconds ago   Up 41 seconds             0.0.0.0:6379->6379/tcp, :::6379->6379/tcp, 0.0.0.0:8001->8001/tcp, :::8001->8001/tcp   redis-vector-db
 ```
 
-If any issues are encountered during deployment, refer to the [Troubleshooting](../../../../README_miscellaneous.md#troubleshooting) section.
-
 ### Validate the Pipeline
 
 Once the MultimodalQnA services are running, test the pipeline using the following command:
