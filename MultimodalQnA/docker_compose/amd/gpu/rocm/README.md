@@ -1,139 +1,99 @@
-# Build and Deploy MultimodalQnA Application on AMD GPU (ROCm)
+# Deploying MultimodalQnA on AMD ROCm GPU
 
-This document outlines the deployment process for a MultimodalQnA application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on AMD server with ROCm GPUs. The steps include Docker image creation, container deployment via Docker Compose, and service execution to integrate microservices such as `multimodal_embedding` that employs [BridgeTower](https://huggingface.co/BridgeTower/bridgetower-large-itm-mlm-gaudi) model as embedding model, `multimodal_retriever`, `lvm`, and `multimodal-data-prep`. We will publish the Docker images to Docker Hub soon, it will simplify the deployment process for this service.
+This document outlines the single node deployment process for a Multimodal application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservices on Intel Xeon server and AMD GPU. The steps include pulling Docker images, container deployment via Docker Compose, and service execution using microservices `llm`.
 
-For detailed information about these instance types, you can refer to this [link](https://aws.amazon.com/ec2/instance-types/m7i/). Once you've chosen the appropriate instance type, proceed with configuring your instance settings, including network configurations, security groups, and storage options.
+Note: The default LLM is `Xkev/Llama-3.2V-11B-co`. Before deploying the application, please make sure either you've requested and been granted the access to it on [Huggingface](https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct) or you've downloaded the model locally from [ModelScope](https://www.modelscope.cn/models).
 
-After launching your instance, you can connect to it using SSH (for Linux instances) or Remote Desktop Protocol (RDP) (for Windows instances). From there, you'll have full access to your Xeon server, allowing you to install, configure, and manage your applications as needed.
+## Table of Contents
 
-## Build Docker Images
+1. [MultimodalQnA Quick Start Deployment](#multimodalqna-quick-start-deployment)
+2. [MultimodalQnA Docker Compose Files](#multimodalqna-docker-compose-files)
+3. [Validate Microservices](#validate-microservices)
+4. [Conclusion](#conclusion)
 
-### 1. Build Docker Image
+## MultimodalQnA Quick Start Deployment
 
-- #### Create application install directory and go to it:
+This section describes how to quickly deploy and test the MultimodalQnAservice manually on an AMD ROCm GPU. The basic steps are:
 
-  ```bash
-  mkdir ~/multimodalqna-install && cd multimodalqna-install
-  ```
+1. [Access the Code](#access-the-code)
+2. [Configure the Deployment Environment](#configure-the-deployment-environment)
+3. [Deploy the Services Using Docker Compose](#deploy-the-services-using-docker-compose)
+4. [Check the Deployment Status](#check-the-deployment-status)
+5. [Validate the Pipeline](#validate-the-pipeline)
+6. [Cleanup the Deployment](#cleanup-the-deployment)
 
-- #### Clone the repository GenAIExamples (the default repository branch "main" is used here):
+### Access the Code
 
-  ```bash
-  git clone https://github.com/opea-project/GenAIExamples.git
-  ```
+Clone the GenAIExample repository and access the MultimodalQnA AMD ROCm GPU platform Docker Compose files and supporting scripts:
 
-  If you need to use a specific branch/tag of the GenAIExamples repository, then (v1.3 replace with its own value):
+```bash
+git clone https://github.com/opea-project/GenAIExamples.git
+cd GenAIExamples/MultimodalQnA
+```
 
-  ```bash
-  git clone https://github.com/opea-project/GenAIExamples.git && cd GenAIExamples && git checkout v1.3
-  ```
+Then checkout a released version, such as v1.3:
 
-  We remind you that when using a specific version of the code, you need to use the README from this version:
+```bash
+git checkout v1.3
+```
 
-- #### Go to build directory:
+### Configure the Deployment Environment
 
-  ```bash
-  cd ~/multimodalqna-install/GenAIExamples/MultimodalQnA/docker_image_build
-  ```
+To set up environment variables for deploying MultimodalQnA services, set up some parameters specific to the deployment environment and source the `set_env_*.sh` script in this directory:
 
-- Cleaning up the GenAIComps repository if it was previously cloned in this directory.
-  This is necessary if the build was performed earlier and the GenAIComps folder exists and is not empty:
+- if used vLLM - set_env_vllm.sh
+- if used TGI - set_env.sh
 
-  ```bash
-  echo Y | rm -R GenAIComps
-  ```
+Set the values of the variables:
 
-- #### Clone the repository GenAIComps (the default repository branch "main" is used here):
+- **HOST_IP, HOST_IP_EXTERNAL** - These variables are used to configure the name/address of the service in the operating system environment for the application services to interact with each other and with the outside world.
 
-  ```bash
-  git clone https://github.com/opea-project/GenAIComps.git
-  ```
+  If your server uses only an internal address and is not accessible from the Internet, then the values for these two variables will be the same and the value will be equal to the server's internal name/address.
 
-  If you use a specific tag of the GenAIExamples repository,
-  then you should also use the corresponding tag for GenAIComps. (v1.3 replace with its own value):
+  If your server uses only an external, Internet-accessible address, then the values for these two variables will be the same and the value will be equal to the server's external name/address.
 
-  ```bash
-  git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout v1.3
-  ```
+  If your server is located on an internal network, has an internal address, but is accessible from the Internet via a proxy/firewall/load balancer, then the HOST_IP variable will have a value equal to the internal name/address of the server, and the EXTERNAL_HOST_IP variable will have a value equal to the external name/address of the proxy/firewall/load balancer behind which the server is located.
 
-  We remind you that when using a specific version of the code, you need to use the README from this version.
+  We set these values in the file set_env\*\*\*\*.sh
 
-- #### Setting the list of images for the build (from the build file.yaml)
+- **Variables with names like "**\*\*\*\*\*\*\_PORT"\*\* - These variables set the IP port numbers for establishing network connections to the application services.
+  The values shown in the file set_env.sh or set_env_vllm.sh they are the values used for the development and testing of the application, as well as configured for the environment in which the development is performed. These values must be configured in accordance with the rules of network access to your environment's server, and must not overlap with the IP ports of other applications that are already in use.
 
-  If you want to deploy a vLLM-based or TGI-based application, then the set of services is installed as follows:
+Setting variables in the operating system environment:
 
-  #### vLLM-based application
+```bash
+export HUGGINGFACEHUB_API_TOKEN="Your_HuggingFace_API_Token"
+source ./set_env_*.sh # replace the script name with the appropriate one
+```
 
-  ```bash
-  service_list="multimodalqna multimodalqna-ui embedding-multimodal-bridgetower embedding retriever lvm dataprep whisper vllm-rocm"
-  ```
+Consult the section on [MultimodalQnA Service configuration](#multimodalqna-configuration) for information on how service specific configuration parameters affect deployments.
 
-  #### TGI-based application
+### Deploy the Services Using Docker Compose
 
-  ```bash
-  service_list="multimodalqna multimodalqna-ui embedding-multimodal-bridgetower embedding retriever lvm dataprep whisper"
-  ```
+To deploy the MultimodalQnA services, execute the `docker compose up` command with the appropriate arguments. For a default deployment with TGI, execute the command below. It uses the 'compose.yaml' file.
 
-- #### Optional. Pull TGI Docker Image (Do this if you want to use TGI)
+```bash
+cd docker_compose/amd/gpu/rocm
+# if used TGI
+docker compose -f compose.yaml up -d
 
-  ```bash
-  docker pull ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
-  ```
-
-- #### Build Docker Images
-
-  ```bash
-  docker compose -f build.yaml build ${service_list} --no-cache
-  ```
-
-  After the build, we check the list of images with the command:
-
-  ```bash
-  docker image ls
-  ```
-
-  The list of images should include:
-
-  ##### vLLM-based application:
-
-  - opea/vllm-rocm:latest
-    - opea/lvm:latest
-    - opea/multimodalqna:latest
-    - opea/multimodalqna-ui:latest
-    - opea/dataprep:latest
-    - opea/embedding:latest
-    - opea/embedding-multimodal-bridgetower:latest
-    - opea/retriever:latest
-    - opea/whisper:latest
-
-  ##### TGI-based application:
-
-  - ghcr.io/huggingface/text-generation-inference:2.4.1-rocm
-    - opea/lvm:latest
-    - opea/multimodalqna:latest
-    - opea/multimodalqna-ui:latest
-    - opea/dataprep:latest
-    - opea/embedding:latest
-    - opea/embedding-multimodal-bridgetower:latest
-    - opea/retriever:latest
-    - opea/whisper:latest
-
----
-
-## Deploy the MultimodalQnA Application
-
-### Docker Compose Configuration for AMD GPUs
+# if used vLLM
+ 
+docker compose -f compose_vllm.yaml up -d
+```
 
 To enable GPU support for AMD GPUs, the following configuration is added to the Docker Compose file:
 
 - compose_vllm.yaml - for vLLM-based application
+- compose_faqgen_vllm.yaml - for vLLM-based application with FaqGen
 - compose.yaml - for TGI-based
+- compose_faqgen.yaml - for TGI-based application with FaqGen
 
 ```yaml
 shm_size: 1g
 devices:
   - /dev/kfd:/dev/kfd
-  - /dev/dri/:/dev/dri/
+  - /dev/dri:/dev/dri
 cap_add:
   - SYS_PTRACE
 group_add:
@@ -149,7 +109,7 @@ shm_size: 1g
 devices:
   - /dev/kfd:/dev/kfd
   - /dev/dri/card0:/dev/dri/card0
-  - /dev/dri/renderD128:/dev/dri/renderD128
+  - /dev/dri/render128:/dev/dri/render128
 cap_add:
   - SYS_PTRACE
 group_add:
@@ -161,222 +121,122 @@ security_opt:
 **How to Identify GPU Device IDs:**
 Use AMD GPU driver utilities to determine the correct `cardN` and `renderN` IDs for your GPU.
 
-### Set deploy environment variables
+> **Note**: developers should build docker image from source when:
+>
+> - Developing off the git main branch (as the container's ports in the repo may be different > from the published docker image).
+> - Unable to download the docker image.
+> - Use a specific version of Docker image.
 
-#### Setting variables in the operating system environment:
+Please refer to the table below to build different microservices from source:
 
-##### Set variable HUGGINGFACEHUB_API_TOKEN:
+| Microservice    | Deployment Guide                                                                                                   |
+| --------------- | ------------------------------------------------------------------------------------------------------------------ |
+| vLLM            | [vLLM build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/third_parties/vllm#build-docker)     |
+| TGI             | [TGI project](https://github.com/huggingface/text-generation-inference.git)                                        |
+| LLM             | [LLM build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/llms)                                 |
+| Redis Vector DB | [Redis](https://github.com/redis/redis.git)                                                                        |
+| Dataprep        | [Dataprep build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/dataprep/src/README_redis.md)    |
+| TEI Embedding   | [TEI guide](https://github.com/huggingface/text-embeddings-inference.git)                                          |
+| Retriever       | [Retriever build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/retrievers/src/README_redis.md) |
+| TEI Reranking   | [TEI guide](https://github.com/huggingface/text-embeddings-inference.git)                                          |
+| MegaService     | [MegaService guide](../../../../README.md)                                                                         | 
+| whisper-service | [whisper build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/third_parties/whisper/src)  
+|
+| LVM             | [lvm build guide](https://github.com/opea-project/GenAIComps/blob/main/comps/lvms/src/)  
+|
+| Nginx           | [Nginx guide](https://github.com/opea-project/GenAIComps/tree/main/comps/third_parties/nginx)                      |
 
-```bash
-### Replace the string 'your_huggingfacehub_token' with your HuggingFacehub repository access token.
-export HUGGINGFACEHUB_API_TOKEN='your_huggingfacehub_token'
-```
+### Check the Deployment Status
 
-#### Set variables value in set_env\*\*\*\*.sh file:
-
-Go to Docker Compose directory:
-
-```bash
-cd ~/multimodalqna-install/GenAIExamples/MultimodalQnA/docker_compose/amd/gpu/rocm
-```
-
-The example uses the Nano text editor. You can use any convenient text editor:
-
-#### If you use vLLM
-
-```bash
-nano set_env_vllm.sh
-```
-
-#### If you use TGI
-
-```bash
-nano set_env.sh
-```
-
-If you are in a proxy environment, also set the proxy-related environment variables:
+After running docker compose, check if all the containers launched via docker compose have started:
 
 ```bash
-export http_proxy="Your_HTTP_Proxy"
-export https_proxy="Your_HTTPs_Proxy"
+docker ps -a
 ```
 
-Set the values of the variables:
+For the default deployment with TGI, the following 9 containers should have started:
 
-- **HOST_IP, HOST_IP_EXTERNAL** - These variables are used to configure the name/address of the service in the operating system environment for the application services to interact with each other and with the outside world.
+```
+CONTAINER ID   IMAGE                                                      COMMAND                  CREATED         STATUS                   PORTS                                                                                  NAMES
+427c4dde68e2   opea/multimodalqna-ui:latest                               "python multimodalqn…"   2 minutes ago   Up About a minute        0.0.0.0:5173->5173/tcp, :::5173->5173/tcp                                              multimodalqna-gradio-ui-server
+5cb2186d961a   opea/multimodalqna:latest                                  "python multimodalqn…"   2 minutes ago   Up About a minute        0.0.0.0:8888->8888/tcp, :::8888->8888/tcp                                              multimodalqna-backend-server
+70e512d483e0   opea/dataprep:latest                                       "sh -c 'python $( [ …"   2 minutes ago   Up 2 minutes (healthy)   0.0.0.0:6007->5000/tcp, [::]:6007->5000/tcp                                            dataprep-multimodal-redis
+86927af3de6d   opea/retriever:latest                                      "python opea_retriev…"   2 minutes ago   Up 2 minutes             0.0.0.0:7000->7000/tcp, :::7000->7000/tcp                                              retriever-redis
+74cc8db43457   opea/embedding:latest                                      "sh -c 'python $( [ …"   2 minutes ago   Up About a minute        0.0.0.0:6000->6000/tcp, :::6000->6000/tcp                                              embedding
+49a7c128752d   opea/lvm:latest                                            "python opea_lvm_mic…"   2 minutes ago   Up 2 minutes             0.0.0.0:9399->9399/tcp, :::9399->9399/tcp                                              lvm
+0d66fda22534   ghcr.io/huggingface/text-generation-inference:2.4.1-rocm   "/tgi-entrypoint.sh …"   2 minutes ago   Up 24 seconds            0.0.0.0:8399->80/tcp, [::]:8399->80/tcp                                                tgi-llava-rocm-server
+55908da067d7   opea/embedding-multimodal-bridgetower:latest               "python bridgetower_…"   2 minutes ago   Up 2 minutes (healthy)   0.0.0.0:6006->6006/tcp, :::6006->6006/tcp                                              embedding-multimodal-bridgetower
+8a4283f61cf5   redis/redis-stack:7.2.0-v9                                 "/entrypoint.sh"         2 minutes ago   Up 2 minutes             0.0.0.0:6379->6379/tcp, :::6379->6379/tcp, 0.0.0.0:8001->8001/tcp, :::8001->8001/tcp   redis-vector-db
+e9e5f1f3b57a   opea/whisper:latest                                        "python whisper_serv…"   2 minutes ago   Up 2 minutes             0.0.0.0:7066->7066/tcp, :::7066->7066/tcp                                              whisper-service
+3923edad3acc   opea/vllm-rocm:latest                                      "python3 /workspace/…"   24 hours ago    Up 24 hours (healthy)    0.0.0.0:8086->8011/tcp, [::]:8086->8011/tcp                                            vllm-service
+```
 
-  If your server uses only an internal address and is not accessible from the Internet, then the values for these two variables will be the same and the value will be equal to the server's internal name/address.
 
-  If your server uses only an external, Internet-accessible address, then the values for these two variables will be the same and the value will be equal to the server's external name/address.
 
-  If your server is located on an internal network, has an internal address, but is accessible from the Internet via a proxy/firewall/load balancer, then the HOST_IP variable will have a value equal to the internal name/address of the server, and the EXTERNAL_HOST_IP variable will have a value equal to the external name/address of the proxy/firewall/load balancer behind which the server is located.
+if used vLLM:
 
-  We set these values in the file set_env\*\*\*\*.sh
+```
+CONTAINER ID   IMAGE                                          COMMAND                  CREATED          STATUS                    PORTS                                                                                  NAMES
+54f8a87b82be   opea/multimodalqna-ui:latest                   "python multimodalqn…"   42 seconds ago   Up 9 seconds              0.0.0.0:5173->5173/tcp, :::5173->5173/tcp                                              multimodalqna-gradio-ui-server
+e533d862cf8e   opea/multimodalqna:latest                      "python multimodalqn…"   42 seconds ago   Up 9 seconds              0.0.0.0:8888->8888/tcp, :::8888->8888/tcp                                              multimodalqna-backend-server
+e11e96d03e54   opea/dataprep:latest                           "sh -c 'python $( [ …"   42 seconds ago   Up 40 seconds (healthy)   0.0.0.0:6007->5000/tcp, [::]:6007->5000/tcp                                            dataprep-multimodal-redis
+f5e670dae343   opea/lvm:latest                                "python opea_lvm_mic…"   42 seconds ago   Up 40 seconds             0.0.0.0:9399->9399/tcp, :::9399->9399/tcp                                              lvm
+c81bd4792b22   opea/retriever:latest                          "python opea_retriev…"   42 seconds ago   Up 40 seconds             0.0.0.0:7000->7000/tcp, :::7000->7000/tcp                                              retriever-redis
+220c1111d5e4   opea/embedding:latest                          "sh -c 'python $( [ …"   42 seconds ago   Up 15 seconds             0.0.0.0:6000->6000/tcp, :::6000->6000/tcp                                              embedding
+ece52eea577f   opea/vllm-rocm:latest                          "python3 /workspace/…"   42 seconds ago   Up 41 seconds             0.0.0.0:8081->8011/tcp, [::]:8081->8011/tcp                                            multimodalqna-vllm-service
+82bd3be58052   opea/embedding-multimodal-bridgetower:latest   "python bridgetower_…"   42 seconds ago   Up 41 seconds (healthy)   0.0.0.0:6006->6006/tcp, :::6006->6006/tcp                                              embedding-multimodal-bridgetower
+bac14dac272d   opea/whisper:latest                            "python whisper_serv…"   42 seconds ago   Up 41 seconds             0.0.0.0:7066->7066/tcp, :::7066->7066/tcp                                              whisper-service
+7d603688fc56   redis/redis-stack:7.2.0-v9                     "/entrypoint.sh"         42 seconds ago   Up 41 seconds             0.0.0.0:6379->6379/tcp, :::6379->6379/tcp, 0.0.0.0:8001->8001/tcp, :::8001->8001/tcp   redis-vector-db
+```
 
-- **Variables with names like "**\*\*\*\*\*\*\_PORT"\*\* - These variables set the IP port numbers for establishing network connections to the application services.
-  The values shown in the file set_env.sh or set_env_vllm they are the values used for the development and testing of the application, as well as configured for the environment in which the development is performed. These values must be configured in accordance with the rules of network access to your environment's server, and must not overlap with the IP ports of other applications that are already in use.
+If any issues are encountered during deployment, refer to the [Troubleshooting](../../../../README_miscellaneous.md#troubleshooting) section.
 
-#### Required Models
+### Validate the Pipeline
 
-By default, the multimodal-embedding and LVM models are set to a default value as listed below:
-
-| Service   | Model                                       |
-| --------- | ------------------------------------------- |
-| embedding | BridgeTower/bridgetower-large-itm-mlm-gaudi |
-| LVM       | llava-hf/llava-1.5-7b-hf                    |
-| LVM       | Xkev/Llama-3.2V-11B-cot                     |
-
-Note:
-
-For AMD ROCm System "Xkev/Llama-3.2V-11B-cot" is recommended to run on ghcr.io/huggingface/text-generation-inference:2.4.1-rocm
-
-#### Set variables with script set_env\*\*\*\*.sh
-
-#### If you use vLLM
+Once the MultimodalQnA services are running, test the pipeline using the following command:
 
 ```bash
-. set_env_vllm.sh
+DATA='{"messages": [{"role": "user", "content": [{"type": "audio", "audio": "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA"}]}]}'
+
+curl http://${HOST_IP}:${MULTIMODALQNA_BACKEND_SERVICE_PORT}/v1/multimodalqna \
+  -H "Content-Type: application/json" \
+  -d "$DATA"
 ```
 
-#### If you use TGI
-
-```bash
-. set_env.sh
-```
-
-### Start the services:
-
-#### If you use vLLM
-
-```bash
-docker compose -f compose_vllm.yaml up -d
-```
-
-#### If you use TGI
-
-```bash
-docker compose -f compose.yaml up -d
-```
-
-All containers should be running and should not restart:
-
-##### If you use vLLM:
-
-- multimodalqna-vllm-service
-- multimodalqna-lvm
-- multimodalqna-backend-server
-- multimodalqna-gradio-ui-server
-- whisper-service
-- embedding-multimodal-bridgetower
-- redis-vector-db
-- embedding
-- retriever-redis
-- dataprep-multimodal-redis
-
-##### If you use TGI:
-
-- tgi-llava-rocm-server
-- multimodalqna-lvm
-- multimodalqna-backend-server
-- multimodalqna-gradio-ui-server
-- whisper-service
-- embedding-multimodal-bridgetower
-- redis-vector-db
-- embedding
-- retriever-redis
-- dataprep-multimodal-redis
-
----
-
-## Validate the Services
-
-### 1. Validate the vLLM/TGI Service
-
-#### If you use vLLM:
-
-```bash
-DATA='{"model": "Xkev/Llama-3.2V-11B-cot", '\
-'"messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens": 256}'
-
-curl http://${HOST_IP}:${MULTIMODALQNA_VLLM_SERVICE_PORT}/v1/chat/completions \
-  -X POST \
-  -d "$DATA" \
-  -H 'Content-Type: application/json'
-```
-
-Checking the response from the service. The response should be similar to JSON:
-
-```json
-{
-  "id": "chatcmpl-a3761920c4034131b3cab073b8e8b841",
-  "object": "chat.completion",
-  "created": 1742959065,
-  "model": "Intel/neural-chat-7b-v3-3",
-  "choices": [
-    {
-      "index": 0,
-      "message": {
-        "role": "assistant",
-        "content": " Deep Learning refers to a modern approach of Artificial Intelligence that aims to replicate the way human brains process information by teaching computers to learn from data without extensive programming",
-        "tool_calls": []
-      },
-      "logprobs": null,
-      "finish_reason": "length",
-      "stop_reason": null
-    }
-  ],
-  "usage": { "prompt_tokens": 15, "total_tokens": 47, "completion_tokens": 32, "prompt_tokens_details": null },
-  "prompt_logprobs": null
-}
-```
-
-If the service response has a meaningful response in the value of the "choices.message.content" key,
-then we consider the vLLM service to be successfully launched
-
-#### If you use TGI:
-
-```bash
-DATA='{"inputs":"What is Deep Learning?",'\
-'"parameters":{"max_new_tokens":256,"do_sample": true}}'
-
-curl http://${HOST_IP}:${MULTIMODALQNA_TGI_SERVICE_PORT}/generate \
-  -X POST \
-  -d "$DATA" \
-  -H 'Content-Type: application/json'
-```
-
-Checking the response from the service. The response should be similar to JSON:
-
-```json
-{
-  "generated_text": "\n\nDeep Learning is a subset of machine learning, which focuses on developing methods inspired by the functioning of the human brain; more specifically, the way it processes and acquires various types of knowledge and information. To enable deep learning, the networks are composed of multiple processing layers that form a hierarchy, with each layer learning more complex and abstraction levels of data representation.\n\nThe principle of Deep Learning is to emulate the structure of neurons in the human brain to construct artificial neural networks capable to accomplish complicated pattern recognition tasks more effectively and accurately. Therefore, these neural networks contain a series of hierarchical components, where units in earlier layers receive simple inputs and are activated by these inputs. The activation of the units in later layers are the results of multiple nonlinear transformations generated from reconstructing and integrating the information in previous layers. In other words, by combining various pieces of information at each layer, a Deep Learning network can extract the input features that best represent the structure of data, providing their outputs at the last layer or final level of abstraction.\n\nThe main idea of using these 'deep' networks in contrast to regular algorithms is that they are capable of representing hierarchical relationships that exist within the data and learn these representations by"
-}
-```
-
-If the service response has a meaningful response in the value of the "generated_text" key,
-then we consider the TGI service to be successfully launched
-
-### 2. Validate the LVM Service
-
-```bash
-curl http://${host_ip}:${MULTIMODALQNA_LVM_PORT}/v1/lvm \
-    -X POST \
-    -H 'Content-Type: application/json' \
-    -d '{"retrieved_docs": [], "initial_query": "What is this?", "top_n": 1, "metadata": [], "chat_template":"The caption of the image is: '\''{context}'\''. {question}"}'
-```
-
-Checking the response from the service. The response should be similar to JSON:
+Checking the response from the service. The response should be similar to text:
 
 ```textmate
-{"downstream_black_list":[],"id":"1b17e903e8c773be909bde0e7cfdb53f","text":" I will analyze the image and provide a detailed description based on its visual characteristics. I will then compare these characteristics to the standard answer provided to ensure accuracy.\n\n1. **Examine the Image**: The image is a solid color, which appears to be a shade of yellow. There are no additional elements or patterns present in the image.\n\n2. **Compare with Standard Answer**: The standard answer describes the image as a \"yellow image\" without any additional details or context. This matches the observed characteristics of the image being a single, uniform yellow color.\n\n3. **Conclusion**: Based on the visual analysis and comparison with the standard answer, the image can be accurately described as a \"yellow image.\" There are no other features or elements present that would alter this description.\n\nFINAL ANSWER: The image is a yellow image.","metadata":{"video_id":"8c7461df-b373-4a00-8696-9a2234359fe0","source_video":"WeAreGoingOnBullrun_8c7461df-b373-4a00-8696-9a2234359fe0.mp4","time_of_frame_ms":"37000000","transcript_for_inference":"yellow image"}}
+{"id":"chatcmpl-75aK2KWCfxZmVcfh5tiiHj","object":"chat.completion","created":1743568232,"model":"multimodalqna","choices":[{"index":0,"message":{"role":"assistant","content":"There is no video segments retrieved given the query!"},"finish_reason":"stop","metadata":{"audio":"you"}}],"usage":{"prompt_tokens":0,"total_tokens":0,"completion_tokens":0}}
 ```
 
-If the service response has a meaningful response in the value of the "choices.text" key,
-then we consider the vLLM service to be successfully launched
+If the output lines in the "choices.text" keys contain words (tokens) containing meaning, then the service is considered launched successfully.
 
-### 3. Validate MicroServices
 
-#### embedding-multimodal-bridgetower
+### Cleanup the Deployment
+
+To stop the containers associated with the deployment, execute the following command:
+
+```bash
+# if used TGI
+docker compose -f compose.yaml down
+
+# if used vLLM
+ docker compose -f compose_vllm.yaml down
+```
+
+## MultimodalQnA Docker Compose Files
+
+In the context of deploying an MultimodalQnA pipeline on an AMD ROCm platform, we can pick and choose different large language model serving frameworks, or single English TTS/multi-language TTS component. The table below outlines the various configurations that are available as part of the application. These configurations can be used as templates and can be extended to different components available in [GenAIComps](https://github.com/opea-project/GenAIComps.git).
+
+| File                                                   | Description                                                                                                              |
+| ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------ |
+| [compose.yaml](./compose.yaml)                         | The LLM serving framework is TGI. Default compose file using TGI as serving framework and redis as vector database       |                   |
+| [compose_vllm.yaml](./compose_vllm.yaml)               | The LLM serving framework is vLLM. Compose file using vllm as serving framework and redis as vector database             |
+
+
+## Validate MicroServices
+
+### 1. Embedding-multimodal-bridgetower
 
 Text example:
 
@@ -408,7 +268,7 @@ Checking the response from the service. The response should be similar to text:
 {"embedding":[0.024372786283493042,-0.003916610032320023,0.07578050345182419,...,-0.046543147414922714]}
 ```
 
-#### embedding
+### 2. Embedding
 
 Text example:
 
@@ -440,7 +300,7 @@ Checking the response from the service. The response should be similar to text:
 {"id":"cce4eab623255c4c632fb920e277dcf7","text":"This is some sample text.","embedding":[0.02613169699907303,-0.049398183822631836,...,0.03544217720627785],"search_type":"similarity","k":4,"distance_threshold":null,"fetch_k":20,"lambda_mult":0.5,"score_threshold":0.2,"constraints":null,"url":"https://github.com/docarray/docarray/blob/main/tests/toydata/image-data/apple.png?raw=true","base64_image":"iVBORw0KGgoAAAANSUhEUgAAAoEAAAJqCAMAAABjDmrLAAAABGdBTUEAALGPC/.../BCU5wghOc4AQnOMEJTnCCE5zgBCc4wQlOcILzqvO/ARWd2ns+lvHkAAAAAElFTkSuQmCC"}
 ```
 
-#### retriever-multimodal-redis
+### 3. Retriever-multimodal-redis
 
 set "your_embedding" variable:
 
@@ -463,7 +323,7 @@ Checking the response from the service. The response should be similar to text:
 {"id":"80a4f3fc5f5d5cd31ab1e3912f6b6042","retrieved_docs":[],"initial_query":"test","top_n":1,"metadata":[]}
 ```
 
-#### whisper service
+### 4. Whisper service
 
 ```bash
 curl http://${host_ip}:7066/v1/asr \
@@ -478,36 +338,6 @@ Checking the response from the service. The response should be similar to text:
 {"asr_result":"you"}
 ```
 
-### 4. Validate the MegaService
+## Conclusion
 
-```bash
-DATA='{"messages": [{"role": "user", "content": [{"type": "audio", "audio": "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA"}]}]}'
-
-curl http://${HOST_IP}:${MULTIMODALQNA_BACKEND_SERVICE_PORT}/v1/multimodalqna \
-  -H "Content-Type: application/json" \
-  -d "$DATA"
-```
-
-Checking the response from the service. The response should be similar to text:
-
-```textmate
-{"id":"chatcmpl-75aK2KWCfxZmVcfh5tiiHj","object":"chat.completion","created":1743568232,"model":"multimodalqna","choices":[{"index":0,"message":{"role":"assistant","content":"There is no video segments retrieved given the query!"},"finish_reason":"stop","metadata":{"audio":"you"}}],"usage":{"prompt_tokens":0,"total_tokens":0,"completion_tokens":0}}
-```
-
-If the output lines in the "choices.text" keys contain words (tokens) containing meaning, then the service is considered launched successfully.
-
-### 5. Stop application
-
-#### If you use vLLM
-
-```bash
-cd ~/multimodalqna-install/GenAIExamples/MultimodalQnA/docker_compose/amd/gpu/rocm
-docker compose -f compose_vllm.yaml down
-```
-
-#### If you use TGI
-
-```bash
-cd ~/multimodalqna-install/GenAIExamples/MultimodalQnA/docker_compose/amd/gpu/rocm
-docker compose -f compose.yaml down
-```
+This guide should enable developers to deploy the default configuration or any of the other compose yaml files for different configurations. It also highlights the configurable parameters that can be set before deployment.
