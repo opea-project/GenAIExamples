@@ -59,6 +59,9 @@ def conversation_history(prompt, index, use_agent, history):
         history[-1][-1] += token
         yield history, ""
 
+def clear_history():
+    return ""
+
 
 def upload_media(media, index=None, chunk_size=1500, chunk_overlap=100):
     media = media.strip().split("\n")
@@ -306,22 +309,24 @@ with gr.Blocks() as ui:
                 chatbot = gr.Chatbot(label="Chat History")
                 # prompt_input = gr.Textbox(label="Enter your query")
                 # generate_button = gr.Button("Submit Query")
-                prompt_input = gr.MultimodalTextbox(
-                        show_label=False,
-                        interactive=True,
-                        placeholder="Enter your query",
-                        sources=[]
-                    )
-            
+                with gr.Row(equal_height=True):
+                    with gr.Column(scale=8):
+                        prompt_input = gr.MultimodalTextbox(
+                                show_label=False,
+                                interactive=True,
+                                placeholder="Enter your query",
+                                sources=[]
+                            )
+                    with gr.Column(scale=1, min_width=150):
+                        with gr.Row(elem_id="buttons") as button_row:
+                            clear_btn = gr.Button(value="🗑️  Clear", interactive=True)
+                            clear_btn.click(clear_history, None, chatbot)
         
-        # generate_button.click(
-        #     conversation_history, inputs=[prompt_input, database_dropdown, use_agent, chatbot], outputs=chatbot
-        # )
         prompt_input.submit(add_to_history, inputs=[prompt_input, chatbot], outputs=[chatbot, prompt_input])
 
         prompt_input.submit(
             conversation_history, inputs=[prompt_input, database_dropdown, use_agent, chatbot], outputs=[chatbot, prompt_input]
-        )# .then(prompt_input.submit(lambda: (gr.update(value=''), [], [prompt_input])))
+        )
 
     with gr.Tab("Resource Management"):
         # File management components
