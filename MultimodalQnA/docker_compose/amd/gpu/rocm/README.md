@@ -78,7 +78,7 @@ cd docker_compose/amd/gpu/rocm
 docker compose -f compose.yaml up -d
 
 # if used vLLM
- 
+
 docker compose -f compose_vllm.yaml up -d
 ```
 
@@ -139,12 +139,13 @@ Please refer to the table below to build different microservices from source:
 | TEI Embedding   | [TEI guide](https://github.com/huggingface/text-embeddings-inference.git)                                          |
 | Retriever       | [Retriever build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/retrievers/src/README_redis.md) |
 | TEI Reranking   | [TEI guide](https://github.com/huggingface/text-embeddings-inference.git)                                          |
-| MegaService     | [MegaService guide](../../../../README.md)                                                                         | 
-| whisper-service | [whisper build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/third_parties/whisper/src)  
+| MegaService     | [MegaService guide](../../../../README.md)                                                                         |
+| whisper-service | [whisper build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/third_parties/whisper/src)        |
+
 |
-| LVM             | [lvm build guide](https://github.com/opea-project/GenAIComps/blob/main/comps/lvms/src/)  
+| LVM | [lvm build guide](https://github.com/opea-project/GenAIComps/blob/main/comps/lvms/src/)  
 |
-| Nginx           | [Nginx guide](https://github.com/opea-project/GenAIComps/tree/main/comps/third_parties/nginx)                      |
+| Nginx | [Nginx guide](https://github.com/opea-project/GenAIComps/tree/main/comps/third_parties/nginx) |
 
 ### Check the Deployment Status
 
@@ -170,8 +171,6 @@ CONTAINER ID   IMAGE                                                      COMMAN
 e9e5f1f3b57a   opea/whisper:latest                                        "python whisper_serv…"   2 minutes ago   Up 2 minutes             0.0.0.0:7066->7066/tcp, :::7066->7066/tcp                                              whisper-service
 3923edad3acc   opea/vllm-rocm:latest                                      "python3 /workspace/…"   24 hours ago    Up 24 hours (healthy)    0.0.0.0:8086->8011/tcp, [::]:8086->8011/tcp                                            vllm-service
 ```
-
-
 
 if used vLLM:
 
@@ -211,7 +210,6 @@ Checking the response from the service. The response should be similar to text:
 
 If the output lines in the "choices.text" keys contain words (tokens) containing meaning, then the service is considered launched successfully.
 
-
 ### Cleanup the Deployment
 
 To stop the containers associated with the deployment, execute the following command:
@@ -228,11 +226,10 @@ docker compose -f compose.yaml down
 
 In the context of deploying an MultimodalQnA pipeline on an AMD ROCm platform, we can pick and choose different large language model serving frameworks, or single English TTS/multi-language TTS component. The table below outlines the various configurations that are available as part of the application. These configurations can be used as templates and can be extended to different components available in [GenAIComps](https://github.com/opea-project/GenAIComps.git).
 
-| File                                                   | Description                                                                                                              |
-| ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------ |
-| [compose.yaml](./compose.yaml)                         | The LLM serving framework is TGI. Default compose file using TGI as serving framework and redis as vector database       |                   |
-| [compose_vllm.yaml](./compose_vllm.yaml)               | The LLM serving framework is vLLM. Compose file using vllm as serving framework and redis as vector database             |
-
+| File                                     | Description                                                                                                        |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------ | --- |
+| [compose.yaml](./compose.yaml)           | The LLM serving framework is TGI. Default compose file using TGI as serving framework and redis as vector database |     |
+| [compose_vllm.yaml](./compose_vllm.yaml) | The LLM serving framework is vLLM. Compose file using vllm as serving framework and redis as vector database       |
 
 ## Validate MicroServices
 
