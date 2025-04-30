@@ -20,11 +20,13 @@ services:
     image: ${REGISTRY:-opea}/edgecraftrag-server:${TAG:-latest}
   edgecraftrag-ui:
     build:
+      context: ../
       dockerfile: ./ui/docker/Dockerfile.ui
     extends: edgecraftrag
     image: ${REGISTRY:-opea}/edgecraftrag-ui:${TAG:-latest}
   edgecraftrag-ui-gradio:
     build:
+      context: ../
       dockerfile: ./ui/docker/Dockerfile.gradio
     extends: edgecraftrag
     image: ${REGISTRY:-opea}/edgecraftrag-ui-gradio:${TAG:-latest}
