@@ -228,19 +228,20 @@ class DocSumUI:
 
         # File Upload UI
         file_ui = self.create_upload_ui(
-            label="Please upload a document (.pdf, .doc, .docx)", file_types=self.ACCEPTED_TEXT_FILE_TYPES
+            label=f"Please upload a document ({', '.join(self.ACCEPTED_TEXT_FILE_TYPES)})",
+            file_types=self.ACCEPTED_TEXT_FILE_TYPES
         )
 
         # Audio Upload UI
         audio_ui = self.create_upload_ui(
-            label="Please upload audio file (.wav, .mp3)",
+            label=f"Please upload audio file ({', '.join(self.ACCEPTED_AUDIO_FILE_TYPES)})",
             file_types=self.ACCEPTED_AUDIO_FILE_TYPES,
             document_type="audio",
         )
 
         # Video Upload UI
         video_ui = self.create_upload_ui(
-            label="Please upload Video file (.mp4)",
+            label=f"Please upload video file ({', '.join(self.ACCEPTED_VIDEO_FILE_TYPES)})",
             file_types=self.ACCEPTED_VIDEO_FILE_TYPES,
             document_type="video",
         )
