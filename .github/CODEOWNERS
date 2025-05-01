@@ -4,13 +4,13 @@
 /AudioQnA/ sihan.chen@intel.com wenjiao.yue@intel.com
 /AvatarChatbot/ chun.tao@intel.com kaokao.lv@intel.com
 /ChatQnA/ liang1.lv@intel.com letong.han@intel.com
-/CodeGen/ liang1.lv@intel.com xinyao.wang@intel.com
-/CodeTrans/ sihan.chen@intel.com xinyao.wang@intel.com
+/CodeGen/ liang1.lv@intel.com
+/CodeTrans/ sihan.chen@intel.com
 /DBQnA/ supriya.krishnamurthi@intel.com liang1.lv@intel.com
 /DocIndexRetriever/ kaokao.lv@intel.com chendi.xue@intel.com
-/DocSum/ letong.han@intel.com xinyao.wang@intel.com
+/DocSum/ letong.han@intel.com
 /EdgeCraftRAG/ yongbo.zhu@intel.com mingyuan.qi@intel.com
-/FaqGen/ yogesh.pandey@intel.com xinyao.wang@intel.com
+/FaqGen/ yogesh.pandey@intel.com
 /GraphRAG/ rita.brugarolas.brufau@intel.com abolfazl.shahbazi@intel.com
 /InstructionTuning/ xinyu.ye@intel.com kaokao.lv@intel.com
 /MultimodalQnA/ melanie.h.buehler@intel.com tiep.le@intel.com
@@ -19,5 +19,5 @@
 /SearchQnA/ sihan.chen@intel.com letong.han@intel.com
 /Text2Image/ wenjiao.yue@intel.com xinyu.ye@intel.com
 /Translation/ liang1.lv@intel.com sihan.chen@intel.com
-/VideoQnA/ huiling.bao@intel.com xinyao.wang@intel.com
+/VideoQnA/ huiling.bao@intel.com
 /VisualQnA/ liang1.lv@intel.com sihan.chen@intel.com
