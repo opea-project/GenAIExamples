@@ -228,8 +228,7 @@ class DocSumUI:
 
         # File Upload UI
         file_ui = self.create_upload_ui(
-            label="Please upload a document (.pdf, .doc, .docx)",
-            file_types=self.ACCEPTED_TEXT_FILE_TYPES
+            label="Please upload a document (.pdf, .doc, .docx)", file_types=self.ACCEPTED_TEXT_FILE_TYPES
         )
 
         # Audio Upload UI

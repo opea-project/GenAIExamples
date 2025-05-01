@@ -64,17 +64,17 @@ def read_pdf(file):
 
 
 def encode_file_to_base64(file_path):
-        """Encode the content of a file to a base64 string.
+    """Encode the content of a file to a base64 string.
 
-        Args:
-            file_path (str): The path to the file to be encoded.
+    Args:
+        file_path (str): The path to the file to be encoded.
 
-        Returns:
-            str: The base64 encoded string of the file content.
-        """
-        with open(file_path, "rb") as f:
-            base64_str = base64.b64encode(f.read()).decode("utf-8")
-        return base64_str
+    Returns:
+        str: The base64 encoded string of the file content.
+    """
+    with open(file_path, "rb") as f:
+        base64_str = base64.b64encode(f.read()).decode("utf-8")
+    return base64_str
 
 
 def video2audio(
@@ -217,7 +217,7 @@ class DocSumService:
                         docs = encode_file_to_base64(file_path)
                     else:
                         raise ValueError(f"Data type not recognized: {data_type}")
-                    
+
                     os.remove(file_path)
 
                     if isinstance(docs, list):
