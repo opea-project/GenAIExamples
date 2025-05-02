@@ -117,20 +117,24 @@ export no_proxy="Your_No_Proxy"
 ```
 
 ##### For using open-source llms
+
 Set up a [HuggingFace](https://huggingface.co/) account and generate a [user access token](https://huggingface.co/docs/transformers.js/en/guides/private#step-1-generating-a-user-access-token).
 
 Then set an environment variable with the token and another for a directory to download the models:
+
 ```bash
 export HUGGINGFACEHUB_API_TOKEN=<your-HF-token>
 export HF_CACHE_DIR=<directory-where-llms-are-downloaded> #  to avoid redownloading models
 ```
 
 ##### [Optional] OPENAI_API_KEY to use OpenAI models or Enterprise Inference
+
 To use OpenAI models, generate a key following these [instructions](https://platform.openai.com/api-keys).
 
 To use a remote server running Enterprise Inference, contact the cloud service provider or owner of the on-prem machine for a key to access the desired model on the server.
 
 Then set the environment variable `OPENAI_API_KEY` with the key contents:
+
 ```bash
 export OPENAI_API_KEY=<your-openai-key>
 ```
@@ -149,7 +153,7 @@ source $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/hpu/gaudi/set_env.sh
 source $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/cpu/xeon/set_env.sh
 ```
 
-For running 
+For running
 
 ### 2. Launch the multi-agent system. </br>
 
@@ -200,6 +204,7 @@ cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/cpu/xeon
 ```
 
 ##### OpenAI Models
+
 The command below will launch the multi-agent system with the `DocIndexRetriever` as the retrieval tool for the Worker RAG agent.
 
 ```bash
@@ -207,7 +212,8 @@ docker compose -f $WORKDIR/GenAIExamples/DocIndexRetriever/docker_compose/intel/
 ```
 
 ##### Models on Remote Server
-To run on Xeon with models deployed on a remote server, run with the `compose_remote.yaml` instead. Additional environment variables also need to be set. 
+
+To run on Xeon with models deployed on a remote server, run with the `compose_remote.yaml` instead. Additional environment variables also need to be set.
 
 ```bash
 export model=<name-of-model-card>
@@ -233,11 +239,12 @@ To see the UI, open a web browser to `http://${ip_address}:5173` to access the U
 
 1. Click on the arrow above `Get started`. Create an admin account with a name, email, and password.
 2. Add an OpenAI-compatible API endpoint. In the upper right, click on the circle button with the user's initial, go to `Admin Settings`->`Connections`. Under `Manage OpenAI API Connections`, click on the `+` to add a connection. Fill in these fields:
-  - **URL**: `http://${ip_address}:9090/v1`, do not forget the `v1`
-  - **Key**: any value
-  - **Model IDs**: any name i.e. `opea-agent`, then press `+` to add it
 
-  Click "Save".
+- **URL**: `http://${ip_address}:9090/v1`, do not forget the `v1`
+- **Key**: any value
+- **Model IDs**: any name i.e. `opea-agent`, then press `+` to add it
+
+Click "Save".
 
 ![opea-agent-setting](assets/img/opea-agent-setting.png)
 
