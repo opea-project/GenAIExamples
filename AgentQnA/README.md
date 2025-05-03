@@ -125,10 +125,10 @@ export HUGGINGFACEHUB_API_TOKEN=<your-HF-token>
 export HF_CACHE_DIR=<directory-where-llms-are-downloaded> #  to avoid redownloading models
 ```
 
-##### [Optional] OPENAI_API_KEY to use OpenAI models or Enterprise Inference
+##### [Optional] OPENAI_API_KEY to use OpenAI models or Intel® AI for Enterprise Inference
 To use OpenAI models, generate a key following these [instructions](https://platform.openai.com/api-keys).
 
-To use a remote server running Enterprise Inference, contact the cloud service provider or owner of the on-prem machine for a key to access the desired model on the server.
+To use a remote server running Intel® AI for Enterprise Inference, contact the cloud service provider or owner of the on-prem machine for a key to access the desired model on the server.
 
 Then set the environment variable `OPENAI_API_KEY` with the key contents:
 ```bash
@@ -207,12 +207,17 @@ docker compose -f $WORKDIR/GenAIExamples/DocIndexRetriever/docker_compose/intel/
 ```
 
 ##### Models on Remote Server
-To run on Xeon with models deployed on a remote server, run with the `compose_remote.yaml` instead. Additional environment variables also need to be set. 
+When models are deployed on a remote server with Intel® AI for Enterprise Inference, a base URL and an API key are required to access them. To run the Agent microservice on Xeon while using models deployed on a remote server, add `compose_remote.yaml` to the `docker compose` command and set additional environment variables.
+
+###### Notes
+- `OPENAI_API_KEY` is already set in a previous step.
+- `model` is used to overwrite the value set for this environment variable in `set_env.sh`. 
+- `LLM_ENDPOINT_URL` is the base URL given from the owner of the on-prem machine or cloud service provider. It will follow this format: "https://<DNS>". Here is an example: "https://api.inference.example.com".
 
 ```bash
 export model=<name-of-model-card>
 export LLM_ENDPOINT_URL=<http-endpoint-of-remote-server>
-docker compose -f $WORKDIR/GenAIExamples/DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml -f compose_remote.yaml up -d
+docker compose -f $WORKDIR/GenAIExamples/DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml -f compose_openai.yaml -f compose_remote.yaml up -d
 ```
 
 ### 3. Ingest Data into the vector database
