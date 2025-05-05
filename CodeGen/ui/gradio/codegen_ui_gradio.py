@@ -47,9 +47,11 @@ dataprep_get_indices_endpoint = f"{DATAPREP_ENDPOINT}/indices"
 
 # Define the functions that will be used in the app
 
+
 def add_to_history(prompt, history):
     history.append([prompt["text"], ""])
     return history, ""
+
 
 def conversation_history(prompt, index, use_agent, history):
     print(f"Generating code for prompt: {prompt} using index: {index} and use_agent is {use_agent}")
@@ -58,6 +60,7 @@ def conversation_history(prompt, index, use_agent, history):
     for token in response_generator:
         history[-1][-1] += token
         yield history, ""
+
 
 def clear_history():
     return ""
@@ -308,20 +311,19 @@ with gr.Blocks() as ui:
                 with gr.Row(equal_height=True):
                     with gr.Column(scale=8):
                         prompt_input = gr.MultimodalTextbox(
-                                show_label=False,
-                                interactive=True,
-                                placeholder="Enter your query",
-                                sources=[]
-                            )
+                            show_label=False, interactive=True, placeholder="Enter your query", sources=[]
+                        )
                     with gr.Column(scale=1, min_width=150):
                         with gr.Row(elem_id="buttons") as button_row:
                             clear_btn = gr.Button(value="🗑️  Clear", interactive=True)
                             clear_btn.click(clear_history, None, chatbot)
-        
+
         prompt_input.submit(add_to_history, inputs=[prompt_input, chatbot], outputs=[chatbot, prompt_input])
 
         prompt_input.submit(
-            conversation_history, inputs=[prompt_input, database_dropdown, use_agent, chatbot], outputs=[chatbot, prompt_input]
+            conversation_history,
+            inputs=[prompt_input, database_dropdown, use_agent, chatbot],
+            outputs=[chatbot, prompt_input],
         )
 
     with gr.Tab("Resource Management"):
