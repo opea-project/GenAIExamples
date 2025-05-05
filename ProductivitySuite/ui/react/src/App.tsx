@@ -1,68 +1,195 @@
-// Copyright (C) 2024 Intel Corporation
-// SPDX-License-Identifier: Apache-2.0
+import "./App.scss";
 
-import "./App.scss"
-import {MantineProvider } from "@mantine/core"
-import '@mantine/notifications/styles.css';
-import { SideNavbar, SidebarNavList } from "./components/sidebar/sidebar"
-import { IconMessages, IconFileTextAi, IconCode, IconFileInfo, IconDatabaseCog } from "@tabler/icons-react"
-import Conversation from "./components/Conversation/Conversation"
-import { Notifications } from '@mantine/notifications';
-import { BrowserRouter, Route, Routes } from "react-router-dom";
-import CodeGen from "./components/CodeGen/CodeGen";
-import DocSum from "./components/DocSum/DocSum";
-import FaqGen from "./components/FaqGen/FaqGen";
+import React, { Suspense, useEffect } from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import ProtectedRoute from "@layouts/ProtectedRoute/ProtectedRoute";
+
 import { useKeycloak } from "@react-keycloak/web";
-import DataSource from "./components/Conversation/DataSource";
-import { useAppDispatch } from "./redux/store";
-import { setUser } from "./redux/User/userSlice";
-import { useEffect } from "react";
+import { setUser, userSelector } from "@redux/User/userSlice";
 
-const title = "Chat QnA"
-const navList: SidebarNavList = [
-  { icon: IconMessages, label: "Chat Qna", path: "/", children: <Conversation title={title} /> },
-  { icon: IconCode, label: "CodeGen", path: "/codegen", children: <CodeGen /> },
-  { icon: IconFileTextAi, label: "DocSum", path: "/docsum", children: <DocSum /> },
-  { icon: IconFileInfo, label: "FaqGen", path: "/faqgen", children: <FaqGen /> },
-  { icon: IconDatabaseCog, label: "Data Management", path: "/data-management", children: <DataSource /> }
-]
+import MainLayout from "@layouts/Main/MainLayout";
+import MinimalLayout from "@layouts/Minimal/MinimalLayout";
+import Notification from "@components/Notification/Notification";
+import { Box, styled, Typography } from "@mui/material";
+import { AtomAnimation, AtomIcon } from "@icons/Atom";
 
-function App() {
+import { useAppDispatch, useAppSelector } from "@redux/store";
+import {
+  conversationSelector,
+  getAllConversations,
+  /*getStoredPromptSettings,*/ getSupportedModels,
+  getSupportedUseCases,
+} from "@redux/Conversation/ConversationSlice";
+import { getPrompts } from "@redux/Prompt/PromptSlice";
+
+import Home from "@pages/Home/Home";
+import ChatView from "@pages/Chat/ChatView";
+
+const HistoryView = React.lazy(() => import("@pages/History/HistoryView"));
+const DataSourceManagement = React.lazy(
+  () => import("@pages/DataSource/DataSourceManagement"),
+);
+
+const LoadingBox = styled(Box)({
+  display: "flex",
+  flexDirection: "column",
+  justifyContent: "center",
+  alignItems: "center",
+  height: "100vh",
+  width: "100vw",
+});
+
+const App = () => {
   const { keycloak } = useKeycloak();
-  const dispatch = useAppDispatch()
-  useEffect(()=>{
-    dispatch(setUser(keycloak?.idTokenParsed?.preferred_username))
-  },[keycloak.idTokenParsed])
-  
-  return (
-    <>
-      <MantineProvider>
-      {!keycloak.authenticated ? (
-        "redirecting to sso ..."
-      ) : (
-        <BrowserRouter>
-          
-            <Notifications position="top-right" />
-            <div className="layout-wrapper">
-              <SideNavbar navList={navList} />
-              <div className="content">
-                <Routes>
-                  {navList.map(tab => {
-                    return (<Route path={tab.path} element={tab.children} />)
-                  })}
+  const dispatch = useAppDispatch();
 
-                </Routes>
+  const { name } = useAppSelector(userSelector);
+  const { useCase } = useAppSelector(conversationSelector);
 
-                <Conversation title={title} />
-              </div>
-            </div>
-        </BrowserRouter>
-      )}
-      </MantineProvider>
+  useEffect(() => {
+    //TODO: get role from keyCloack scope, defaulting to Admin
+    dispatch(
+      setUser({
+        name: keycloak?.idTokenParsed?.preferred_username,
+        isAuthenticated: true,
+        role: "Admin",
+      }),
+    );
+  }, [keycloak.idTokenParsed]);
 
-    </>
-  )
+  const initSettings = () => {
+    if (keycloak.authenticated) {
+      dispatch(getSupportedUseCases());
+      dispatch(getSupportedModels());
+      dispatch(getPrompts());
+    }
+  };
 
-}
+  useEffect(() => {
+    if (keycloak.authenticated) initSettings();
+  }, [keycloak.authenticated]);
 
-export default App
+  //TODO: on potential useCase change get different conversation data
+  useEffect(() => {
+    if (keycloak.authenticated && useCase) {
+      dispatch(getAllConversations({ user: name, useCase: useCase }));
+      // dispatch(getSharedConversations({ usecase: selectedUseCase.use_case }));
+    }
+  }, [useCase, name]);
+
+  return !keycloak.authenticated ? (
+    <LoadingBox>
+      <AtomIcon />
+      <Typography>redirecting to sso ...</Typography>
+    </LoadingBox>
+  ) : (
+    <BrowserRouter>
+      <Suspense
+        fallback={
+          <LoadingBox>
+            <AtomIcon />
+          </LoadingBox>
+        }
+      >
+        <Routes>
+          {/* Routes wrapped in MainLayout */}
+          <Route element={<MainLayout />}>
+            <Route
+              path="/"
+              element={
+                <ProtectedRoute
+                  requiredRoles={["User", "Admin"]}
+                  component={Home}
+                />
+              }
+            />
+          </Route>
+
+          <Route element={<MainLayout dataView={true} />}>
+            <Route
+              path="/data"
+              element={
+                <ProtectedRoute
+                  requiredRoles={["Admin"]}
+                  component={DataSourceManagement}
+                />
+              }
+            />
+          </Route>
+
+          <Route element={<MainLayout historyView={true} />}>
+            <Route
+              path="/shared"
+              element={
+                <ProtectedRoute
+                  requiredRoles={["User", "Admin"]}
+                  component={(props) => (
+                    <HistoryView {...props} shared={true} />
+                  )}
+                />
+              }
+            />
+            <Route
+              path="/history"
+              element={
+                <ProtectedRoute
+                  requiredRoles={["User", "Admin"]}
+                  component={(props) => (
+                    <HistoryView {...props} shared={false} />
+                  )}
+                />
+              }
+            />
+          </Route>
+
+          <Route element={<MainLayout chatView={true} />}>
+            <Route
+              path="/faq/:conversation_id"
+              element={
+                <ProtectedRoute
+                  requiredRoles={["User", "Admin"]}
+                  component={ChatView}
+                />
+              }
+            />
+            <Route
+              path="/code/:conversation_id"
+              element={
+                <ProtectedRoute
+                  requiredRoles={["User", "Admin"]}
+                  component={ChatView}
+                />
+              }
+            />
+            <Route
+              path="/chat/:conversation_id"
+              element={
+                <ProtectedRoute
+                  requiredRoles={["User", "Admin"]}
+                  component={ChatView}
+                />
+              }
+            />
+            <Route
+              path="/summary/:conversation_id"
+              element={
+                <ProtectedRoute
+                  requiredRoles={["User", "Admin"]}
+                  component={ChatView}
+                />
+              }
+            />
+          </Route>
+
+          {/* Routes not wrapped in MainLayout */}
+          <Route element={<MinimalLayout />}>
+            {/* <Route path="/xxxx" element={<xxxx />} /> */}
+          </Route>
+        </Routes>
+        <Notification />
+      </Suspense>
+    </BrowserRouter>
+  );
+};
+
+export default App;

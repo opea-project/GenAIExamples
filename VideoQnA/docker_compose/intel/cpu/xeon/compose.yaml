@@ -29,6 +29,12 @@ services:
       HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
     volumes:
       - videoqna-cache:/home/user/.cache
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:5000/v1/health_check || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
   embedding:
     image: ${REGISTRY:-opea}/embedding-multimodal-clip:${TAG:-latest}
     container_name: clip-embedding-server
@@ -117,13 +123,20 @@ services:
     image: ${REGISTRY:-opea}/videoqna:${TAG:-latest}
     container_name: videoqna-xeon-backend-server
     depends_on:
-      - vdms-vector-db
-      - dataprep
-      - embedding
-      - retriever
-      - reranking
-      - lvm-video-llama
-      - lvm
+      vdms-vector-db:
+        condition: service_started
+      dataprep:
+        condition: service_healthy
+      embedding:
+        condition: service_started
+      retriever:
+        condition: service_started
+      reranking:
+        condition: service_started
+      lvm-video-llama:
+        condition: service_started
+      lvm:
+        condition: service_started
     ports:
       - "${BACKEND_PORT}:8888"
     environment:
