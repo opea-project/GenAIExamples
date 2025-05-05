@@ -297,18 +297,14 @@ with gr.Blocks() as ui:
     with gr.Tab("Code Generation"):
         with gr.Row():
             with gr.Column(scale=2):
-                # with gr.Row(equal_height=True):
                 database_dropdown = gr.Dropdown(choices=get_indices(), label="Select Index", value="None", scale=10)
                 db_refresh_button = gr.Button("Refresh Dropdown", scale=0.1)
                 db_refresh_button.click(update_indices_dropdown, outputs=database_dropdown)
                 use_agent = gr.Checkbox(label="Use Agent", container=False)
 
             with gr.Column(scale=9):
-                # with gr.Row(equal_height=True):
                 gr.Markdown("### Generate Code from Natural Language")
                 chatbot = gr.Chatbot(label="Chat History")
-                # prompt_input = gr.Textbox(label="Enter your query")
-                # generate_button = gr.Button("Submit Query")
                 with gr.Row(equal_height=True):
                     with gr.Column(scale=8):
                         prompt_input = gr.MultimodalTextbox(
