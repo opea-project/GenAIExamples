@@ -159,7 +159,11 @@ curl http://${host_ip}:8888/v1/docsum \
    -F "language=en"
 ```
 
+Note that the `-F "messages="` flag is required, even for file uploads. Multiple files can be uploaded in a single call with multiple `-F "files=@/path"` inputs.
+
 ### Query with audio and video
+
+> Audio and video can be passed as base64 strings or uploaded by providing a local file path.
 
 Audio:
 
