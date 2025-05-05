@@ -241,8 +241,8 @@ function validate_megaservice_multimedia() {
     validate_service \
         "${host_ip}:${BACKEND_SERVICE_PORT}/v1/docsum" \
         "well" \
-        "docsum-xeon-backend-server" \
-        "docsum-xeon-backend-server" \
+        "docsum-gaudi-backend-server" \
+        "docsum-gaudi-backend-server" \
         "media" "" \
         "type=audio" \
         "messages=" \
@@ -277,8 +277,8 @@ function validate_megaservice_multimedia() {
     validate_service \
         "${host_ip}:${BACKEND_SERVICE_PORT}/v1/docsum" \
         "bye" \
-        "docsum-xeon-backend-server" \
-        "docsum-xeon-backend-server" \
+        "docsum-gaudi-backend-server" \
+        "docsum-gaudi-backend-server" \
         "media" "" \
         "type=video" \
         "messages=" \
