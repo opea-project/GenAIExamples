@@ -2,7 +2,9 @@
 # SPDX-License-Identifier: Apache-2.0
 
 name: Helm Chart E2e Test For Call
-permissions: read-all
+permissions:
+  contents: read
+
 on:
   workflow_call:
     inputs:
