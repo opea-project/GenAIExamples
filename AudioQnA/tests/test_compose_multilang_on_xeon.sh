@@ -40,6 +40,8 @@ function build_docker_images() {
 
 function start_services() {
     cd $WORKPATH/docker_compose/intel/cpu/xeon/
+    export GPT_SOVITS_SERVER_HOST_IP=${ip_address}
+    export GPT_SOVITS_SERVER_PORT=9880
     export host_ip=${ip_address}
     source set_env.sh
     # sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
