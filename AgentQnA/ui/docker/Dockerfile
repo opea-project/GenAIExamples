@@ -40,8 +40,7 @@ RUN git config --global user.name "opea" && \
 
 WORKDIR /app/open-webui
 
-RUN git checkout ${WEBUI_VERSION} && \
-    if [ -d patches ] && [ "$(ls -A patches)" ]; then git am /app/patches/*.patch; fi
+RUN git checkout ${WEBUI_VERSION} && git am /app/patches/*.patch
 
 WORKDIR /app
 
