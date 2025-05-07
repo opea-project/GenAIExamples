@@ -72,7 +72,7 @@ jobs:
           if [ $pr_count -gt 0 ]; then
             echo "Pull Request exists"
             pr_number=$(curl -H "Authorization: token ${{ secrets.ACTION_TOKEN }}" -s "https://api.github.com/repos/${{ env.REPO_NAME }}/pulls?state=all&head=${{ env.USER_NAME }}:${{ env.BRANCH_NAME }}" | jq '.[0].number')
-            curl -X PATCH -H "Authorization: token ${{ secrets.ACTION_TOKEN }} -d "{
+            curl -X PATCH -H "Authorization: token ${{ secrets.ACTION_TOKEN }}" -d "{
               \"title\":\"Update vLLM version to ${latest_vllm_ver} and vLLM-fork version to ${latest_vllm_fork_ver}\",
               \"body\":\"Update vLLM version to ${latest_vllm_ver} and vLLM-fork version to ${latest_vllm_fork_ver}\",
               \"state\":\"open\"
