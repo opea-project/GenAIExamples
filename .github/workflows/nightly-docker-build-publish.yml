@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
 
 env:
-  EXAMPLES: ${{ vars.NIGHTLY_RELEASE_EXAMPLES }}
+  EXAMPLES: CodeGen,CodeTrans #${{ vars.NIGHTLY_RELEASE_EXAMPLES }}
   TAG: "latest"
   PUBLISH_TAGS: "latest"
 
@@ -75,7 +75,7 @@ jobs:
 
   publish:
     needs: [get-build-matrix, get-image-list, build-images]
-    if: always()
+    if: ${{ success() }}
     strategy:
       matrix:
         image: ${{ fromJSON(needs.get-image-list.outputs.matrix) }}
