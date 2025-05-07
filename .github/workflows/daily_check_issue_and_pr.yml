@@ -26,3 +26,4 @@ jobs:
           close-pr-message: "This PR was closed because it has been stalled for 7 days with no activity."
           repo-token: ${{ secrets.ACTION_TOKEN }}
           start-date: "2025-03-01T00:00:00Z"
+          exempt-issue-labels: "Backlog"
