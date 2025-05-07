@@ -83,9 +83,9 @@ jobs:
           fi
           if [[ $(grep -c "vllm-gaudi:" ${docker_compose_path}) != 0 ]]; then
               git clone https://github.com/HabanaAI/vllm-fork.git && cd vllm-fork
-              VLLM_VER=v0.6.6.post1+Gaudi-1.20.0
-              echo "Check out vLLM tag ${VLLM_VER}"
-              git checkout ${VLLM_VER} &> /dev/null && cd ../
+              VLLM_FORK_VER=v0.6.6.post1+Gaudi-1.20.0
+              echo "Check out vLLM tag ${VLLM_FORK_VER}"
+              git checkout ${VLLM_FORK_VER} &> /dev/null && cd ../
           fi
           git clone --depth 1 --branch ${{ inputs.opea_branch }} https://github.com/opea-project/GenAIComps.git
           cd GenAIComps && git rev-parse HEAD && cd ../
