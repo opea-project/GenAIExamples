@@ -1,16 +1,18 @@
-* liang1.lv@intel.com feng.tian@intel.com suyue.chen@intel.com
+# Code owners will review PRs within their respective folders.
+
+* liang1.lv@intel.com feng.tian@intel.com suyue.chen@intel.com kaokao.lv@intel.com minmin.hou@intel.com rita.brugarolas.brufau@intel.com
 /.github/ suyue.chen@intel.com ze.pan@intel.com
-/AgentQnA/ kaokao.lv@intel.com minmin.hou@intel.com
+/AgentQnA/ abolfazl.shahbazi@intel.com kaokao.lv@intel.com minmin.hou@intel.com
 /AudioQnA/ sihan.chen@intel.com wenjiao.yue@intel.com
 /AvatarChatbot/ chun.tao@intel.com kaokao.lv@intel.com
 /ChatQnA/ liang1.lv@intel.com letong.han@intel.com
 /CodeGen/ liang1.lv@intel.com
 /CodeTrans/ sihan.chen@intel.com
 /DBQnA/ supriya.krishnamurthi@intel.com liang1.lv@intel.com
-/DocIndexRetriever/ kaokao.lv@intel.com chendi.xue@intel.com
+/DocIndexRetriever/ abolfazl.shahbazi@intel.com kaokao.lv@intel.com chendi.xue@intel.com
 /DocSum/ letong.han@intel.com
 /EdgeCraftRAG/ yongbo.zhu@intel.com mingyuan.qi@intel.com
-/FaqGen/ yogesh.pandey@intel.com
+/FinanceAgent/ abolfazl.shahbazi@intel.com kaokao.lv@intel.com minmin.hou@intel.com rita.brugarolas.brufau@intel.com
 /GraphRAG/ rita.brugarolas.brufau@intel.com abolfazl.shahbazi@intel.com
 /InstructionTuning/ xinyu.ye@intel.com kaokao.lv@intel.com
 /MultimodalQnA/ melanie.h.buehler@intel.com tiep.le@intel.com
@@ -21,3 +23,4 @@
 /Translation/ liang1.lv@intel.com sihan.chen@intel.com
 /VideoQnA/ huiling.bao@intel.com
 /VisualQnA/ liang1.lv@intel.com sihan.chen@intel.com
+/WorkflowExecAgent/ joshua.jian.ern.liew@intel.com kaokao.lv@intel.com
