@@ -51,6 +51,7 @@ function start_services() {
     local llm_container_name="$2"
 
     cd $WORKPATH/docker_compose
+    export LLM_MODEL_ID="Qwen/Qwen2.5-Coder-7B-Instruct"
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
     source set_env.sh
     cd intel/cpu/xeon/
