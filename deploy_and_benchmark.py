@@ -143,7 +143,7 @@ def pull_helm_chart(chart_pull_url, version, chart_name):
     return untar_dir
 
 
-def main(yaml_file, target_node=None, test_mode="oob"):
+def main(yaml_file, target_node=None, test_mode="oob", clean_up=True):
     """Main function to process deployment configuration.
 
     Args:
@@ -378,36 +378,40 @@ def main(yaml_file, target_node=None, test_mode="oob"):
                             os.remove(temp_config_file)
 
             finally:
-                # Uninstall the deployment
-                print(f"\nUninstalling deployment for {node} nodes...")
-                cmd = [
-                    python_cmd,
-                    "deploy.py",
-                    "--chart-name",
-                    chart_name,
-                    "--namespace",
-                    namespace,
-                    "--uninstall",
-                ]
-                try:
-                    result = subprocess.run(cmd, check=True)
-                    if result.returncode != 0:
-                        print(f"Failed to uninstall deployment for {node} nodes")
-                except Exception as e:
-                    print(f"Error while uninstalling deployment for {node} nodes: {str(e)}")
+                if clean_up:
+                    # Uninstall the deployment
+                    print(f"\nUninstalling deployment for {node} nodes...")
+                    cmd = [
+                        python_cmd,
+                        "deploy.py",
+                        "--chart-name",
+                        chart_name,
+                        "--namespace",
+                        namespace,
+                        "--uninstall",
+                    ]
+                    try:
+                        result = subprocess.run(cmd, check=True)
+                        if result.returncode != 0:
+                            print(f"Failed to uninstall deployment for {node} nodes")
+                    except Exception as e:
+                        print(f"Error while uninstalling deployment for {node} nodes: {str(e)}")
 
-                # Delete labels for current node configuration
-                print(f"Deleting labels for {node} nodes...")
-                cmd = [python_cmd, "deploy.py", "--chart-name", chart_name, "--num-nodes", str(node), "--delete-label"]
-                if current_node_names:
-                    cmd.extend(["--node-names"] + current_node_names)
+                    # Delete labels for current node configuration
+                    print(f"Deleting labels for {node} nodes...")
+                    cmd = [python_cmd, "deploy.py", "--chart-name", chart_name, "--num-nodes", str(node), "--delete-label"]
+                    if current_node_names:
+                        cmd.extend(["--node-names"] + current_node_names)
 
-                try:
-                    result = subprocess.run(cmd, check=True)
-                    if result.returncode != 0:
-                        print(f"Failed to delete labels for {node} nodes")
-                except Exception as e:
-                    print(f"Error while deleting labels for {node} nodes: {str(e)}")
+                    try:
+                        result = subprocess.run(cmd, check=True)
+                        if result.returncode != 0:
+                            print(f"Failed to delete labels for {node} nodes")
+                    except Exception as e:
+                        print(f"Error while deleting labels for {node} nodes: {str(e)}")
+                else:
+                    print(f"Skipping cleanup for local debug. Manual cleanup may be required.")
+                    exit(0)
 
         except Exception as e:
             print(f"Error processing configuration for {node} nodes: {str(e)}")
@@ -425,6 +429,7 @@ if __name__ == "__main__":
     parser.add_argument("yaml_file", help="Path to the YAML configuration file")
     parser.add_argument("--target-node", type=int, help="Optional: Target number of nodes to deploy.", default=None)
     parser.add_argument("--test-mode", type=str, help="Test mode, either 'oob' (out of box) or 'tune'.", default="oob")
+    parser.add_argument("--clean-up", type=bool, help="Clean up after test, which can be closed for local debug.", default=True)
 
     args = parser.parse_args()
-    main(args.yaml_file, args.target_node, args.test_mode)
+    main(args.yaml_file, args.target_node, args.test_mode, args.clean_up)
