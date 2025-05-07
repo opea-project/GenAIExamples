@@ -53,7 +53,8 @@ function validate_microservice() {
         -d '{"input_text": "Find the total number of Albums.","conn_str": {"user": "'${POSTGRES_USER}'","password": "'${POSTGRES_PASSWORD}'","host": "'${ip_address}'", "port": "5442", "database": "'${POSTGRES_DB}'" }}' \
         -H 'Content-Type: application/json')
 
-    if [[ $result == *"output"* ]]; then
+    if echo "$response" | jq -e '.result.output' > /dev/null 2>&1; then
+    # if [[ $result == *"output"* ]]; then
         echo $result
         echo "Result correct."
     else
