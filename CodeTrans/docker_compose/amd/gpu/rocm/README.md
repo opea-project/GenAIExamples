@@ -150,7 +150,7 @@ eaf24161aca8   opea/nginx:latest                                       "/docker-
 2fce48a4c0f4   opea/codetrans-ui:latest                                  "docker-entrypoint.s…"   37 seconds ago   Up 5 seconds              0.0.0.0:18101->5173/tcp, [::]:18101->5173/tcp                                              codetrans-ui-server
 613c384979f4   opea/codetrans:latest                                     "bash entrypoint.sh"     37 seconds ago   Up 5 seconds              0.0.0.0:18102->8888/tcp, [::]:18102->8888/tcp                                              codetrans-backend-server
 e0ef1ea67640   opea/llm-textgen:latest                                  "bash entrypoint.sh"     37 seconds ago   Up 36 seconds             0.0.0.0:18011->9000/tcp, [::]:18011->9000/tcp                                              codetrans-llm-server
-342f01bfdbb2   ghcr.io/huggingface/text-generation-inference:2.3.1-rocm"python3 /workspace/…"   37 seconds ago   Up 36 seconds             0.0.0.0:18008->8011/tcp, [::]:18008->8011/tcp                                              codetrans-tgi-service
+342f01bfdbb2   ghcr.io/huggingface/text-generation-inference:2.4.1-rocm"python3 /workspace/…"   37 seconds ago   Up 36 seconds             0.0.0.0:18008->8011/tcp, [::]:18008->8011/tcp                                              codetrans-tgi-service
 ```
 
 if used vLLM:
