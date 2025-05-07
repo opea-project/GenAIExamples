@@ -15,7 +15,6 @@ export MODEL_CACHE=${model_cache:-"./data"}
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
-tgi_port=8008
 
 function build_docker_images() {
     cd $WORKPATH/docker_image_build
@@ -29,15 +28,9 @@ function build_docker_images() {
 }
 
 function start_service() {
-    cd $WORKPATH/docker_compose/intel/cpu/xeon
-    export model="mistralai/Mistral-7B-Instruct-v0.3"
-    export LLM_MODEL_ID=${model}
-    export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
-    export POSTGRES_USER=postgres
-    export POSTGRES_PASSWORD=testpwd
-    export POSTGRES_DB=chinook
-    export TEXT2SQL_PORT=9090
-    export TGI_LLM_ENDPOINT="http://${ip_address}:${tgi_port}"
+    cd $WORKPATH/docker_compose
+    source ./set_env.sh
+    cd intel/cpu/xeon
 
     # Start Docker Containers
     docker compose -f compose.yaml up -d > ${LOG_PATH}/start_services_with_compose.log

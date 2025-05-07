@@ -6,6 +6,14 @@ pushd "../../" > /dev/null
 source .set_env.sh
 popd > /dev/null
 
+export host_ip=${ip_address}
+
+export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+export HF_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+export POSTGRES_USER=postgres
+export POSTGRES_PASSWORD=testpwd
+export POSTGRES_DB=chinook
 export TGI_PORT=8008
-export TGI_LLM_ENDPOINT="http://${your_ip}:${TGI_PORT}"
+export TEXT2SQL_PORT=9090
+export TGI_LLM_ENDPOINT="http://${host_ip}:${TGI_PORT}"
 export LLM_MODEL_ID="mistralai/Mistral-7B-Instruct-v0.3"
