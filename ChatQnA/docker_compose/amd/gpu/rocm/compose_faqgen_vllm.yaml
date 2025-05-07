@@ -192,7 +192,7 @@ services:
 
   chatqna-nginx-server:
     image: ${REGISTRY:-opea}/nginx:${TAG:-latest}
-    container_name: chaqna-nginx-server
+    container_name: chatqna-nginx-server
     depends_on:
       - chatqna-backend-server
       - chatqna-ui-server

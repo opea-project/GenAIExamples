@@ -46,13 +46,24 @@ dataprep_get_indices_endpoint = f"{DATAPREP_ENDPOINT}/indices"
 
 
 # Define the functions that will be used in the app
+
+
+def add_to_history(prompt, history):
+    history.append([prompt["text"], ""])
+    return history, ""
+
+
 def conversation_history(prompt, index, use_agent, history):
     print(f"Generating code for prompt: {prompt} using index: {index} and use_agent is {use_agent}")
-    history.append([prompt, ""])
-    response_generator = generate_code(prompt, index, use_agent)
+    history = add_to_history(prompt, history)[0]
+    response_generator = generate_code(prompt["text"], index, use_agent)
     for token in response_generator:
         history[-1][-1] += token
-        yield history
+        yield history, ""
+
+
+def clear_history():
+    return ""
 
 
 def upload_media(media, index=None, chunk_size=1500, chunk_overlap=100):
@@ -152,13 +163,10 @@ def generate_code(query, index=None, use_agent=False):
 
 
 def ingest_file(file, index=None, chunk_size=100, chunk_overlap=150):
-    headers = {
-        # "Content-Type: multipart/form-data"
-    }
+    headers = {}
     file_input = {"files": open(file, "rb")}
 
     if index:
-        print("Index is", index)
         data = {"index_name": index, "chunk_size": chunk_size, "chunk_overlap": chunk_overlap}
     else:
         data = {"chunk_size": chunk_size, "chunk_overlap": chunk_overlap}
@@ -173,10 +181,7 @@ def ingest_url(url, index=None, chunk_size=100, chunk_overlap=150):
     if not is_valid_url(url):
         return "Invalid URL entered. Please enter a valid URL"
 
-    headers = {
-        # "Content-Type: multipart/form-data"
-    }
-
+    headers = {}
     if index:
         url_input = {
             "link_list": json.dumps([url]),
@@ -201,17 +206,18 @@ def is_valid_url(url):
 
 
 def get_files(index=None):
-    headers = {
-        # "Content-Type: multipart/form-data"
-    }
-    if index == "All Files":
-        index = None
-
+    headers = {}
     if index:
-        index = {"index_name": index}
-        response = requests.post(url=dataprep_get_files_endpoint, headers=headers, data=index)
-        table = response.json()
-        return table
+        if index == "All":
+            response = requests.post(url=dataprep_get_files_endpoint, headers=headers, data='{"index_name": "all"}')
+            table = response.json()
+            return table
+        else:
+            response = requests.post(
+                url=dataprep_get_files_endpoint, headers=headers, data=f'{{"index_name": "{index}"}}'
+            )
+            table = response.json()
+            return table
     else:
         response = requests.post(url=dataprep_get_files_endpoint, headers=headers)
         table = response.json()
@@ -230,49 +236,51 @@ def update_table(index=None):
         return df
 
 
-def update_indices():
-    indices = get_indices()
-    df = pd.DataFrame(indices, columns=["File Indices"])
-    return df
-
-
 def delete_file(file, index=None):
     # Remove the selected file from the file list
-    headers = {
-        # "Content-Type: application/json"
-    }
+    headers = {}
     if index:
-        file_input = {"files": open(file, "rb"), "index_name": index}
+        file_input = f'{{"file_path": "{file}", "index_name": "{index}"}}'
     else:
-        file_input = {"files": open(file, "rb")}
+        f'{{"file_path": "{file}"}}'
     response = requests.post(url=dataprep_delete_files_endpoint, headers=headers, data=file_input)
-    table = update_table()
-    return response.text
+    table = update_table(index)
+    return table
 
 
 def delete_all_files(index=None):
     # Remove all files from the file list
-    headers = {
-        # "Content-Type: application/json"
-    }
-    response = requests.post(url=dataprep_delete_files_endpoint, headers=headers, data='{"file_path": "all"}')
+    headers = {}
+    if index:
+        response = requests.post(
+            url=dataprep_delete_files_endpoint, headers=headers, data=f'{{"file_path": "all", "index_name": "{index}"}}'
+        )
+    else:
+        response = requests.post(url=dataprep_delete_files_endpoint, headers=headers, data='{"file_path": "all"}')
     table = update_table()
 
-    return "Delete All status: " + response.text
+    return table
 
 
 def get_indices():
-    headers = {
-        # "Content-Type: application/json"
-    }
+    headers = {}
     response = requests.post(url=dataprep_get_indices_endpoint, headers=headers)
-    indices = ["None"]
+    indices = ["None", "All"]
     indices += response.json()
     return indices
 
 
 def update_indices_dropdown():
-    new_dd = gr.update(choices=get_indices(), value="None")
+    new_dd = gr.update(choices=get_indices(), value="All")
+    return new_dd
+
+
+def update_files_dropdown(index):
+    choice = []
+    files = get_files(index)
+    for file in files:
+        choice.append(file["name"])
+    new_dd = gr.update(choices=choice, value="None")
     return new_dd
 
 
@@ -290,19 +298,32 @@ def get_file_names(files):
 # Define UI components
 with gr.Blocks() as ui:
     with gr.Tab("Code Generation"):
-        gr.Markdown("### Generate Code from Natural Language")
-        chatbot = gr.Chatbot(label="Chat History")
-        prompt_input = gr.Textbox(label="Enter your query")
-        with gr.Column():
-            with gr.Row(equal_height=True):
+        with gr.Row():
+            with gr.Column(scale=2):
                 database_dropdown = gr.Dropdown(choices=get_indices(), label="Select Index", value="None", scale=10)
                 db_refresh_button = gr.Button("Refresh Dropdown", scale=0.1)
                 db_refresh_button.click(update_indices_dropdown, outputs=database_dropdown)
                 use_agent = gr.Checkbox(label="Use Agent", container=False)
 
-        generate_button = gr.Button("Generate Code")
-        generate_button.click(
-            conversation_history, inputs=[prompt_input, database_dropdown, use_agent, chatbot], outputs=chatbot
+            with gr.Column(scale=9):
+                gr.Markdown("### Generate Code from Natural Language")
+                chatbot = gr.Chatbot(label="Chat History")
+                with gr.Row(equal_height=True):
+                    with gr.Column(scale=8):
+                        prompt_input = gr.MultimodalTextbox(
+                            show_label=False, interactive=True, placeholder="Enter your query", sources=[]
+                        )
+                    with gr.Column(scale=1, min_width=150):
+                        with gr.Row(elem_id="buttons") as button_row:
+                            clear_btn = gr.Button(value="🗑️  Clear", interactive=True)
+                            clear_btn.click(clear_history, None, chatbot)
+
+        prompt_input.submit(add_to_history, inputs=[prompt_input, chatbot], outputs=[chatbot, prompt_input])
+
+        prompt_input.submit(
+            conversation_history,
+            inputs=[prompt_input, database_dropdown, use_agent, chatbot],
+            outputs=[chatbot, prompt_input],
         )
 
     with gr.Tab("Resource Management"):
@@ -318,14 +339,16 @@ with gr.Blocks() as ui:
                 )
             with gr.Column(scale=3):
                 file_upload = gr.File(label="Upload Files", file_count="multiple")
-                url_input = gr.Textbox(label="Media to be ingested (Append URL's in a new line)")
+                url_input = gr.Textbox(label="Media to be ingested. Append URL's in a new line (Shift + Enter)")
                 upload_button = gr.Button("Upload", variant="primary")
                 upload_status = gr.Textbox(label="Upload Status")
                 file_upload.change(get_file_names, inputs=file_upload, outputs=url_input)
-            with gr.Column(scale=1):
-                file_table = gr.Dataframe(interactive=False, value=update_indices())
+            with gr.Column(scale=2):
+                file_dropdown = gr.Dropdown(choices=get_indices(), label="Select an Index")
+                files_dataframe = gr.Dataframe()
+                file_dropdown.change(fn=update_table, inputs=file_dropdown, outputs=files_dataframe)
                 refresh_button = gr.Button("Refresh", variant="primary", size="sm")
-                refresh_button.click(update_indices, outputs=file_table)
+                refresh_button.click(update_indices_dropdown, outputs=file_dropdown)
                 upload_button.click(
                     upload_media,
                     inputs=[url_input, index_name_input, chunk_size_input, chunk_overlap_input],
@@ -333,7 +356,14 @@ with gr.Blocks() as ui:
                 )
 
                 delete_all_button = gr.Button("Delete All", variant="primary", size="sm")
-                delete_all_button.click(delete_all_files, outputs=upload_status)
+                delete_all_button.click(delete_all_files, inputs=file_dropdown, outputs=files_dataframe)
+
+                files = get_files(file_dropdown)
+                delete_dropdown = gr.Dropdown(choices=files, label="Select a file to delete")
+                file_dropdown.change(fn=update_files_dropdown, inputs=file_dropdown, outputs=delete_dropdown)
+
+                delete_file_button = gr.Button("Delete Selected File", variant="primary", size="sm")
+                delete_file_button.click(delete_file, inputs=[delete_dropdown, file_dropdown], outputs=files_dataframe)
 
 
 @app.get("/health")

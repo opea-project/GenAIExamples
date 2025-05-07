@@ -30,58 +30,31 @@ function build_docker_images() {
 function start_services() {
     cd $WORKPATH/docker_compose/intel/cpu/xeon/
 
+    export DB_NAME="opea"
     export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
-    export RERANK_TYPE="tei"
     export RERANK_MODEL_ID="BAAI/bge-reranker-base"
     export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
     export LLM_MODEL_ID_CODEGEN="Intel/neural-chat-7b-v3-3"
-    export DATAPREP_TYPE="redis"
-    export RETRIEVER_TYPE="redis"
-    export TEI_EMBEDDING_ENDPOINT="http://${ip_address}:6006"
-    export TEI_RERANKING_ENDPOINT="http://${ip_address}:8808"
-    export TGI_LLM_ENDPOINT="http://${ip_address}:9009"
-    export REDIS_URL="redis://${ip_address}:6379"
-    export REDIS_HOST=${ip_address}
     export INDEX_NAME="rag-redis"
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
-    export MEGA_SERVICE_HOST_IP=${ip_address}
-    export EMBEDDING_SERVICE_HOST_IP=${ip_address}
-    export RETRIEVER_SERVICE_HOST_IP=${ip_address}
-    export RERANK_SERVICE_HOST_IP=${ip_address}
-    export LLM_SERVICE_HOST_IP=${ip_address}
-    export LLM_SERVICE_HOST_IP_DOCSUM=${ip_address}
-    export LLM_SERVICE_HOST_IP_FAQGEN=${ip_address}
-    export LLM_SERVICE_HOST_IP_CODEGEN=${ip_address}
-    export LLM_SERVICE_HOST_IP_CHATQNA=${ip_address}
-    export TGI_LLM_ENDPOINT_CHATQNA="http://${ip_address}:9009"
-    export TGI_LLM_ENDPOINT_CODEGEN="http://${ip_address}:8028"
-    export TGI_LLM_ENDPOINT_FAQGEN="http://${ip_address}:9009"
-    export TGI_LLM_ENDPOINT_DOCSUM="http://${ip_address}:9009"
     export BACKEND_SERVICE_ENDPOINT_CHATQNA="http://${ip_address}:8888/v1/chatqna"
-    export DATAPREP_DELETE_FILE_ENDPOINT="http://${ip_address}:5000/v1/dataprep/delete"
+    export DATAPREP_DELETE_FILE_ENDPOINT="http://${ip_address}:6007/v1/dataprep/delete"
     export BACKEND_SERVICE_ENDPOINT_CODEGEN="http://${ip_address}:7778/v1/codegen"
-    export DATAPREP_SERVICE_ENDPOINT="http://${ip_address}:5000/v1/dataprep/ingest"
-    export DATAPREP_GET_FILE_ENDPOINT="http://${ip_address}:5000/v1/dataprep/get"
+    export BACKEND_SERVICE_ENDPOINT_DOCSUM="http://${ip_address}:8890/v1/docsum"
+    export DATAPREP_SERVICE_ENDPOINT="http://${ip_address}:6007/v1/dataprep/ingest"
+    export DATAPREP_GET_FILE_ENDPOINT="http://${ip_address}:6007/v1/dataprep/get"
     export CHAT_HISTORY_CREATE_ENDPOINT="http://${ip_address}:6012/v1/chathistory/create"
     export CHAT_HISTORY_CREATE_ENDPOINT="http://${ip_address}:6012/v1/chathistory/create"
     export CHAT_HISTORY_DELETE_ENDPOINT="http://${ip_address}:6012/v1/chathistory/delete"
     export CHAT_HISTORY_GET_ENDPOINT="http://${ip_address}:6012/v1/chathistory/get"
     export PROMPT_SERVICE_GET_ENDPOINT="http://${ip_address}:6018/v1/prompt/get"
     export PROMPT_SERVICE_CREATE_ENDPOINT="http://${ip_address}:6018/v1/prompt/create"
+    export PROMPT_SERVICE_DELETE_ENDPOINT="http://${ip_address}:6018/v1/prompt/delete"
     export KEYCLOAK_SERVICE_ENDPOINT="http://${ip_address}:8080"
-    export MONGO_HOST=${ip_address}
-    export MONGO_PORT=27017
-    export DB_NAME="opea"
-    export COLLECTION_NAME="Conversations"
-    export LLM_SERVICE_HOST_PORT_FAQGEN=9002
-    export LLM_SERVICE_HOST_PORT_CODEGEN=9001
-    export RERANK_SERVER_PORT=8808
-    export EMBEDDING_SERVER_PORT=6006
-    export LLM_SERVER_PORT=9009
-    export PROMPT_COLLECTION_NAME="prompt"
+    export DocSum_COMPONENT_NAME="OpeaDocSumTgi"
     export host_ip=${ip_address}
-    export FAQGen_COMPONENT_NAME="OpeaFaqGenTgi"
     export LOGFLAG=True
+    export no_proxy="$no_proxy,tgi_service_codegen,llm_codegen,tei-embedding-service,tei-reranking-service,chatqna-xeon-backend-server,retriever,tgi-service,redis-vector-db,whisper,llm-docsum-tgi,docsum-xeon-backend-server,mongo,codegen"
 
     # Start Docker Containers
     docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
@@ -141,34 +114,6 @@ function validate_service() {
     sleep 1s
 }
 
-function validate_faqgen() {
-    local URL="$1"
-    local EXPECTED_RESULT="$2"
-    local SERVICE_NAME="$3"
-    local DOCKER_NAME="$4"
-    local INPUT_DATA="$5"
-
-    local HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL")
-    if [ "$HTTP_STATUS" -eq 200 ]; then
-        echo "[ $SERVICE_NAME ] HTTP status is 200. Checking content..."
-
-        local CONTENT=$(curl -s -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL" | tee ${LOG_PATH}/${SERVICE_NAME}.log)
-
-        if echo "$CONTENT" | grep -q "$EXPECTED_RESULT"; then
-            echo "[ $SERVICE_NAME ] Content is as expected."
-        else
-            echo "[ $SERVICE_NAME ] Content does not match the expected result: $CONTENT"
-            docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
-            exit 1
-        fi
-    else
-        echo "[ $SERVICE_NAME ] HTTP status is not 200. Received status was $HTTP_STATUS"
-        docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
-        exit 1
-    fi
-    sleep 1s
-}
-
 function validate_microservices() {
     # Check if the microservices are running correctly.
 
@@ -179,14 +124,6 @@ function validate_microservices() {
         "tei-embedding" \
         "tei-embedding-server" \
         '{"inputs":"What is Deep Learning?"}'
-
-    # embedding microservice
-    validate_service \
-        "${ip_address}:6000/v1/embeddings" \
-        '"embedding":[' \
-        "embedding-microservice" \
-        "embedding-server" \
-        '{"input":"What is Deep Learning?"}'
 
     sleep 1m # retrieval can't curl as expected, try to wait for more time
 
@@ -222,7 +159,7 @@ function validate_microservices() {
     # retrieval microservice
     test_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
     validate_service \
-        "${ip_address}:7000/v1/retrieval" \
+        "${ip_address}:7001/v1/retrieval" \
         "retrieved_docs" \
         "retrieval-microservice" \
         "retriever-redis-server" \
@@ -236,14 +173,6 @@ function validate_microservices() {
         "tei-reranking-server" \
         '{"query":"What is Deep Learning?", "texts": ["Deep Learning is not...", "Deep learning is..."]}'
 
-    # rerank microservice
-    validate_service \
-        "${ip_address}:8000/v1/reranking" \
-        "Deep learning is..." \
-        "rerank-microservice" \
-        "reranking-tei-xeon-server" \
-        '{"initial_query":"What is Deep Learning?", "retrieved_docs": [{"text":"Deep Learning is not..."}, {"text":"Deep learning is..."}]}'
-
     # tgi for llm service
     validate_service \
         "${ip_address}:9009/generate" \
@@ -252,21 +181,6 @@ function validate_microservices() {
         "tgi-service" \
         '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}'
 
-    # ChatQnA llm microservice
-    validate_service \
-        "${ip_address}:9000/v1/chat/completions" \
-        "data: " \
-        "llm-microservice" \
-        "llm-textgen-server" \
-        '{"query":"What is Deep Learning?"}'
-
-    # FAQGen llm microservice
-    validate_faqgen \
-        "${ip_address}:9002/v1/faqgen" \
-        "text" \
-        "llm_faqgen" \
-        "llm-faqgen-server" \
-        '{"messages":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
 
     # CodeGen llm microservice
     validate_service \

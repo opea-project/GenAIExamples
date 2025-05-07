@@ -9,32 +9,20 @@ IMAGE_TAG=${IMAGE_TAG:-"latest"}
 export http_proxy=$http_proxy
 export https_proxy=$https_proxy
 export host_ip=$(hostname -I | awk '{print $1}')
-
-echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
-echo "TAG=IMAGE_TAG=${IMAGE_TAG}"
-export no_proxy="${no_proxy},${host_ip}"
-export MODEL_CACHE=${model_cache:-"./data"}
-export REGISTRY=${IMAGE_REPO}
-export TAG=${IMAGE_TAG}
-export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
-export LLM_ENDPOINT_PORT=8008
-export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
-export MAX_INPUT_TOKENS=2048
-export MAX_TOTAL_TOKENS=4096
-export LLM_PORT=9000
-export LLM_ENDPOINT="http://${host_ip}:${LLM_ENDPOINT_PORT}"
-export DocSum_COMPONENT_NAME="OpeaDocSumTgi"
-export MEGA_SERVICE_HOST_IP=${host_ip}
-export LLM_SERVICE_HOST_IP=${host_ip}
-export ASR_SERVICE_HOST_IP=${host_ip}
-export FRONTEND_SERVICE_PORT=5173
-export BACKEND_SERVICE_PORT=8888
-export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:${BACKEND_SERVICE_PORT}/v1/docsum"
-export LOGFLAG=True
-
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
+echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
+echo "TAG=IMAGE_TAG=${IMAGE_TAG}"
+export REGISTRY=${IMAGE_REPO}
+export TAG=${IMAGE_TAG}
 
+source $WORKPATH/docker_compose/set_env.sh
+export MODEL_CACHE=${model_cache:-"./data"}
+
+export MAX_INPUT_TOKENS=2048
+export MAX_TOTAL_TOKENS=4096
+
+export DocSum_COMPONENT_NAME="OpeaDocSumTgi"
 
 # Get the root folder of the current script
 ROOT_FOLDER=$(dirname "$(readlink -f "$0")")
