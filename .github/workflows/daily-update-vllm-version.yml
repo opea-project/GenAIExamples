@@ -66,7 +66,7 @@ jobs:
             exit 1
           else
             git commit -s -m "Update ${{ matrix.repo }} version to ${latest_vllm_ver}"
-            git push
+            git push --set-upstream origin ${{ env.BRANCH_NAME }}_${{ matrix.repo }}
           fi
 
       - name: Create Pull Request
