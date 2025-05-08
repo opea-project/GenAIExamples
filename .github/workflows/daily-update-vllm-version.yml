@@ -26,7 +26,6 @@ jobs:
             repo_name: HabanaAI/vllm-fork
             ver_name: VLLM_FORK_VER
     permissions:
-      actions: write
       contents: write
       pull-requests: write
     steps:
