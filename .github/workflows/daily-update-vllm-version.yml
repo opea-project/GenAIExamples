@@ -61,6 +61,7 @@ jobs:
       - name: Commit changes
         run: |
           git add .
+          git diff
           if git diff-index --quiet HEAD --; then
             echo "No changes detected, skipping commit."
             exit 1
