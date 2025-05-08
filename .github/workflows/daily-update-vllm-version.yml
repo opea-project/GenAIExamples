@@ -22,9 +22,9 @@ jobs:
           - repo: vLLM
             repo_name: vllm-project/vllm
             ver_name: VLLM_VER
-          - repo: vLLM-fork
-            repo_name: HabanaAI/vllm-fork
-            ver_name: VLLM_FORK_VER
+          # - repo: vLLM-fork
+          #   repo_name: HabanaAI/vllm-fork
+          #   ver_name: VLLM_FORK_VER
     permissions:
       contents: write
       pull-requests: write
