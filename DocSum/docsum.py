@@ -63,6 +63,20 @@ def read_pdf(file):
     return docs
 
 
+def encode_file_to_base64(file_path):
+    """Encode the content of a file to a base64 string.
+
+    Args:
+        file_path (str): The path to the file to be encoded.
+
+    Returns:
+        str: The base64 encoded string of the file content.
+    """
+    with open(file_path, "rb") as f:
+        base64_str = base64.b64encode(f.read()).decode("utf-8")
+    return base64_str
+
+
 def video2audio(
     video_base64: str,
 ) -> str:
@@ -163,7 +177,6 @@ class DocSumService:
 
     async def handle_request(self, request: Request, files: List[UploadFile] = File(default=None)):
         """Accept pure text, or files .txt/.pdf.docx, audio/video base64 string."""
-
         if "application/json" in request.headers.get("content-type"):
             data = await request.json()
             stream_opt = data.get("stream", True)
@@ -193,25 +206,24 @@ class DocSumService:
                     uid = str(uuid.uuid4())
                     file_path = f"/tmp/{uid}"
 
-                    if data_type is not None and data_type in ["audio", "video"]:
-                        raise ValueError(
-                            "Audio and Video file uploads are not supported in docsum with curl request, \
-                                please use the UI or pass base64 string of the content directly."
-                        )
+                    import aiofiles
 
-                    else:
-                        import aiofiles
+                    async with aiofiles.open(file_path, "wb") as f:
+                        await f.write(await file.read())
 
-                        async with aiofiles.open(file_path, "wb") as f:
-                            await f.write(await file.read())
-
+                    if data_type == "text":
                         docs = read_text_from_file(file, file_path)
-                        os.remove(file_path)
+                    elif data_type in ["audio", "video"]:
+                        docs = encode_file_to_base64(file_path)
+                    else:
+                        raise ValueError(f"Data type not recognized: {data_type}")
 
-                        if isinstance(docs, list):
-                            file_summaries.extend(docs)
-                        else:
-                            file_summaries.append(docs)
+                    os.remove(file_path)
+
+                    if isinstance(docs, list):
+                        file_summaries.extend(docs)
+                    else:
+                        file_summaries.append(docs)
 
             if file_summaries:
                 prompt = handle_message(chat_request.messages) + "\n".join(file_summaries)

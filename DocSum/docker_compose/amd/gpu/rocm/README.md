@@ -239,13 +239,16 @@ curl http://${HOST_IP}:${DOCSUM_BACKEND_SERVER_PORT}/v1/docsum \
    -F "language=en" \
 ```
 
+Note that the `-F "messages="` flag is required, even for file uploads. Multiple files can be uploaded in a single call with multiple `-F "files=@/path"` inputs.
+
 ### Query with audio and video
 
-> Audio and Video file uploads are not supported in docsum with curl request, please use the Gradio-UI.
+> Audio and video can be passed as base64 strings or uploaded by providing a local file path.
 
 Audio:
 
 ```bash
+# Send base64 string
 curl -X POST http://${HOST_IP}:${DOCSUM_BACKEND_SERVER_PORT}/v1/docsum \
    -H "Content-Type: application/json" \
    -d '{"type": "audio", "messages": "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA"}'
@@ -257,11 +260,21 @@ curl http://${HOST_IP}:${DOCSUM_BACKEND_SERVER_PORT}/v1/docsum \
    -F "max_tokens=32" \
    -F "language=en" \
    -F "stream=True"
+
+# Upload file
+curl http://${HOST_IP}:${DOCSUM_BACKEND_SERVER_PORT}/v1/docsum \
+   -H "Content-Type: multipart/form-data" \
+   -F "type=audio" \
+   -F "messages=" \
+   -F "files=@/path to your file (.mp3, .wav)" \
+   -F "max_tokens=32" \
+   -F "language=en"
 ```
 
 Video:
 
 ```bash
+# Send base64 string
 curl -X POST http://${HOST_IP}:${DOCSUM_BACKEND_SERVER_PORT}/v1/docsum \
    -H "Content-Type: application/json" \
    -d '{"type": "video", "messages": "convert your video to base64 data type"}'
@@ -273,6 +286,15 @@ curl http://${HOST_IP}:${DOCSUM_BACKEND_SERVER_PORT}/v1/docsum \
    -F "max_tokens=32" \
    -F "language=en" \
    -F "stream=True"
+
+# Upload file
+curl http://${HOST_IP}:${DOCSUM_BACKEND_SERVER_PORT}/v1/docsum \
+   -H "Content-Type: multipart/form-data" \
+   -F "type=video" \
+   -F "messages=" \
+   -F "files=@/path to your file (.mp4)" \
+   -F "max_tokens=32" \
+   -F "language=en"
 ```
 
 ### Query with long context
