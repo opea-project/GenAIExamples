@@ -43,7 +43,7 @@ To construct the Mega Service, we utilize the [GenAIComps](https://github.com/op
 git clone https://github.com/opea-project/GenAIExamples.git
 cd GenAIExamples/ChatQnA/
 docker build --no-cache -t opea/chatqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
-cd ../../..
+cd ../..
 ```
 
 ### 4. Build UI Docker Image
@@ -53,7 +53,7 @@ Build frontend Docker image via below command:
 ```bash
 cd GenAIExamples/ChatQnA/ui
 docker build --no-cache -t opea/chatqna-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
-cd ../../../..
+cd ../../..
 ```
 
 ### 5. Build Conversational React UI Docker Image (Optional)
@@ -67,7 +67,7 @@ cd GenAIExamples/ChatQnA/ui
 export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8912/v1/chatqna"
 export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6043/v1/dataprep/ingest"
 docker build --no-cache -t opea/chatqna-conversation-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy --build-arg BACKEND_SERVICE_ENDPOINT=$BACKEND_SERVICE_ENDPOINT --build-arg DATAPREP_SERVICE_ENDPOINT=$DATAPREP_SERVICE_ENDPOINT -f ./docker/Dockerfile.react .
-cd ../../../..
+cd ../../..
 ```
 
 ### 6. Build Nginx Docker Image
@@ -101,7 +101,7 @@ Change the `xxx_MODEL_ID` below for your needs.
 
 ### Setup Environment Variables
 
-Since the `compose.yaml` will consume some environment variables, you need to setup them in advance as below.
+Since the `compose.yaml` will consume some environment variables, you need to set them up in advance as below.
 
 **Export the value of the public IP address of your Xeon server to the `host_ip` environment variable**
 

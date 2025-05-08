@@ -22,8 +22,10 @@ services:
     image: ${REGISTRY:-opea}/dataprep:${TAG:-latest}
     container_name: dataprep-mariadb-vector
     depends_on:
-      - mariadb-server
-      - tei-embedding-service
+      mariadb-server:
+        condition: service_healthy
+      tei-embedding-service:
+        condition: service_started
     ports:
       - "6007:5000"
     environment:
@@ -57,7 +59,8 @@ services:
     image: ${REGISTRY:-opea}/retriever:${TAG:-latest}
     container_name: retriever-mariadb-vector
     depends_on:
-      - mariadb-server
+      mariadb-server:
+        condition: service_healthy
     ports:
       - "7000:7000"
     ipc: host
@@ -113,7 +116,7 @@ services:
     container_name: chatqna-xeon-backend-server
     depends_on:
       mariadb-server:
-        condition: service_started
+        condition: service_healthy
       dataprep-mariadb-vector:
         condition: service_healthy
       tei-embedding-service:
