@@ -77,7 +77,7 @@ jobs:
           docker_compose_path=${{ github.workspace }}/${{ inputs.example }}/docker_image_build/build.yaml
           source ${{ github.workspace }}/.github/env/_build_image.sh
           if [[ $(grep -c "vllm:" ${docker_compose_path}) != 0 ]]; then
-              git clone -b ${VLLM_VER} --single-branch https://github.com/vllm-project/vllm.git 
+              git clone -b ${VLLM_VER} --single-branch https://github.com/vllm-project/vllm.git
           fi
           if [[ $(grep -c "vllm-gaudi:" ${docker_compose_path}) != 0 ]]; then
               git clone -b ${VLLM_FORK_VER} --single-branch https://github.com/HabanaAI/vllm-fork.git
