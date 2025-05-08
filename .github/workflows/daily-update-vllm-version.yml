@@ -22,9 +22,9 @@ jobs:
           - repo: vLLM
             repo_name: vllm-project/vllm
             ver_name: VLLM_VER
-          # - repo: vLLM-fork
-          #   repo_name: HabanaAI/vllm-fork
-          #   ver_name: VLLM_FORK_VER
+          - repo: vLLM-fork
+            repo_name: HabanaAI/vllm-fork
+            ver_name: VLLM_FORK_VER
     permissions:
       contents: write
       pull-requests: write
@@ -54,7 +54,6 @@ jobs:
 
       - name: Run script
         run: |
-          set -xe
           latest_vllm_ver=$(curl -s "https://api.github.com/repos/${{ matrix.repo_name }}/tags" | jq '.[0].name' -)
           latest_vllm_ver=$(echo "$latest_vllm_ver" | sed 's/"//g')
           echo "latest_vllm_ver=${latest_vllm_ver}" >> "$GITHUB_ENV"
@@ -62,7 +61,6 @@ jobs:
 
       - name: Commit changes
         run: |
-          set -xe
           git add .
           if git diff-index --quiet HEAD --; then
             echo "No changes detected, skipping commit."
@@ -76,7 +74,6 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.ACTION_TOKEN }}
         run: |
-          set -xe
           pr_count=$(curl -H "Authorization: token ${{ secrets.ACTION_TOKEN }}" -s "https://api.github.com/repos/${{ github.repository }}/pulls?state=all&head=${{ env.USER_NAME }}:${{ env.BRANCH_NAME }}_${{ matrix.repo }}" | jq '. | length')
           if [ $pr_count -gt 0 ]; then
             echo "Pull Request exists"
