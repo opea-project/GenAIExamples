@@ -23,7 +23,7 @@ jobs:
             repo_name: vllm-project/vllm
             ver_name: VLLM_VER
           - repo: vLLM-fork
-            repo_url: HabanaAI/vllm-fork
+            repo_name: HabanaAI/vllm-fork
             ver_name: VLLM_FORK_VER
     permissions:
       contents: write
@@ -55,8 +55,9 @@ jobs:
       - name: Run script
         run: |
           latest_vllm_ver=$(curl -s "https://api.github.com/repos/${{ matrix.repo_name }}/tags" | jq '.[0].name' -)
+          latest_vllm_ver=$(echo "$latest_vllm_ver" | sed 's/"//g')
           echo "latest_vllm_ver=${latest_vllm_ver}" >> "$GITHUB_ENV"
-          find . -type f \( -name "*.sh" -o -name "_build_image.yml" \) -exec sed -i "s/${{ matrix.ver_name }}=.*/${{ matrix.ver_name }}=${latest_vllm_ver}/" {} \;
+          find . -type f -name "*.sh" -exec sed -i "s/${{ matrix.ver_name }}=.*/${{ matrix.ver_name }}=${latest_vllm_ver}/" {} \;
 
       - name: Commit changes
         run: |
@@ -66,28 +67,27 @@ jobs:
             exit 1
           else
             git commit -s -m "Update ${{ matrix.repo }} version to ${latest_vllm_ver}"
-            git push
+            git push --set-upstream origin ${{ env.BRANCH_NAME }}_${{ matrix.repo }}
           fi
 
       - name: Create Pull Request
+        env:
+          GH_TOKEN: ${{ secrets.ACTION_TOKEN }}
         run: |
           pr_count=$(curl -H "Authorization: token ${{ secrets.ACTION_TOKEN }}" -s "https://api.github.com/repos/${{ github.repository }}/pulls?state=all&head=${{ env.USER_NAME }}:${{ env.BRANCH_NAME }}_${{ matrix.repo }}" | jq '. | length')
           if [ $pr_count -gt 0 ]; then
             echo "Pull Request exists"
             pr_number=$(curl -H "Authorization: token ${{ secrets.ACTION_TOKEN }}" -s "https://api.github.com/repos/${{ github.repository }}/pulls?state=all&head=${{ env.USER_NAME }}:${{ env.BRANCH_NAME }}_${{ matrix.repo }}" | jq '.[0].number')
-            curl -X PATCH -H "Authorization: token ${{ secrets.ACTION_TOKEN }}" -d "{
-              \"title\":\"Update ${{ matrix.repo }} version to ${latest_vllm_ver}\",
-              \"body\":\"Update ${{ matrix.repo }} version to ${latest_vllm_ver}\",
-              \"state\":\"open\"
-            }" "https://api.github.com/repos/${{ github.repository }}/pulls/${pr_number}"
+            gh pr edit ${pr_number} \
+              --title "Update ${{ matrix.repo }} version to ${latest_vllm_ver}" \
+              --body "Update ${{ matrix.repo }} version to ${latest_vllm_ver}"
             echo "Pull Request updated successfully"
           else
-            echo "Pull Request not exists..."
-            curl -H "Authorization: token ${{ secrets.ACTION_TOKEN }}" -d "{
-              \"title\":\"Update ${{ matrix.repo }} version to ${latest_vllm_ver}\",
-              \"body\":\"Update ${{ matrix.repo }} version to ${latest_vllm_ver}\",
-              \"head\":\"${{ env.USER_NAME }}:${{ env.BRANCH_NAME }}_${{ matrix.repo }}\",
-              \"base\":\"main\"
-            }" "https://api.github.com/repos/${{ github.repository }}/pulls"
+            echo "Pull Request does not exists..."
+            gh pr create \
+              -B main \
+              -H ${{ env.BRANCH_NAME }}_${{ matrix.repo }} \
+              --title "Update ${{ matrix.repo }} version to ${latest_vllm_ver}" \
+              --body "Update ${{ matrix.repo }} version to ${latest_vllm_ver}"
             echo "Pull Request created successfully"
           fi
