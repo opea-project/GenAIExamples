@@ -132,7 +132,7 @@ curl http://${host_ip}:8888/v1/docsum \
       -H "Content-Type: multipart/form-data" \
       -F "type=text" \
       -F "messages=Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5." \
-      -F "max_tokens=57" \
+      -F "max_tokens=32" \
       -F "language=en" \
       -F "stream=True"
 
