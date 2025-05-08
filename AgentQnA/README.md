@@ -99,7 +99,7 @@ flowchart LR
 
 #### First, clone the `GenAIExamples` repo.
 
-```
+```bash
 export WORKDIR=<your-work-directory>
 cd $WORKDIR
 git clone https://github.com/opea-project/GenAIExamples.git
@@ -109,7 +109,7 @@ git clone https://github.com/opea-project/GenAIExamples.git
 
 ##### For proxy environments only
 
-```
+```bash
 export http_proxy="Your_HTTP_Proxy"
 export https_proxy="Your_HTTPs_Proxy"
 # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
@@ -118,14 +118,24 @@ export no_proxy="Your_No_Proxy"
 
 ##### For using open-source llms
 
-```
+Set up a [HuggingFace](https://huggingface.co/) account and generate a [user access token](https://huggingface.co/docs/transformers.js/en/guides/private#step-1-generating-a-user-access-token).
+
+Then set an environment variable with the token and another for a directory to download the models:
+
+```bash
 export HUGGINGFACEHUB_API_TOKEN=<your-HF-token>
-export HF_CACHE_DIR=<directory-where-llms-are-downloaded> #so that no need to redownload every time
+export HF_CACHE_DIR=<directory-where-llms-are-downloaded> #  to avoid redownloading models
 ```
 
-##### [Optional] OPANAI_API_KEY to use OpenAI models
+##### [Optional] OPENAI_API_KEY to use OpenAI models or Intel® AI for Enterprise Inference
 
-```
+To use OpenAI models, generate a key following these [instructions](https://platform.openai.com/api-keys).
+
+To use a remote server running Intel® AI for Enterprise Inference, contact the cloud service provider or owner of the on-prem machine for a key to access the desired model on the server.
+
+Then set the environment variable `OPENAI_API_KEY` with the key contents:
+
+```bash
 export OPENAI_API_KEY=<your-openai-key>
 ```
 
@@ -133,15 +143,17 @@ export OPENAI_API_KEY=<your-openai-key>
 
 ##### Gaudi
 
-```
+```bash
 source $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/hpu/gaudi/set_env.sh
 ```
 
 ##### Xeon
 
-```
+```bash
 source $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/cpu/xeon/set_env.sh
 ```
+
+For running
 
 ### 2. Launch the multi-agent system. </br>
 
@@ -184,12 +196,35 @@ docker compose -f $WORKDIR/GenAIExamples/DocIndexRetriever/docker_compose/intel/
 
 #### Launch on Xeon
 
-On Xeon, only OpenAI models are supported. The command below will launch the multi-agent system with the `DocIndexRetriever` as the retrieval tool for the Worker RAG agent.
+On Xeon, OpenAI models and models deployed on a remote server are supported. Both methods require an API key.
 
 ```bash
 export OPENAI_API_KEY=<your-openai-key>
 cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/cpu/xeon
+```
+
+##### OpenAI Models
+
+The command below will launch the multi-agent system with the `DocIndexRetriever` as the retrieval tool for the Worker RAG agent.
+
+```bash
 docker compose -f $WORKDIR/GenAIExamples/DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml -f compose_openai.yaml up -d
+```
+
+##### Models on Remote Server
+
+When models are deployed on a remote server with Intel® AI for Enterprise Inference, a base URL and an API key are required to access them. To run the Agent microservice on Xeon while using models deployed on a remote server, add `compose_remote.yaml` to the `docker compose` command and set additional environment variables.
+
+###### Notes
+
+- `OPENAI_API_KEY` is already set in a previous step.
+- `model` is used to overwrite the value set for this environment variable in `set_env.sh`.
+- `LLM_ENDPOINT_URL` is the base URL given from the owner of the on-prem machine or cloud service provider. It will follow this format: "https://<DNS>". Here is an example: "https://api.inference.example.com".
+
+```bash
+export model=<name-of-model-card>
+export LLM_ENDPOINT_URL=<http-endpoint-of-remote-server>
+docker compose -f $WORKDIR/GenAIExamples/DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml -f compose_openai.yaml -f compose_remote.yaml up -d
 ```
 
 ### 3. Ingest Data into the vector database
@@ -208,12 +243,18 @@ bash run_ingest_data.sh
 The UI microservice is launched in the previous step with the other microservices.
 To see the UI, open a web browser to `http://${ip_address}:5173` to access the UI. Note the `ip_address` here is the host IP of the UI microservice.
 
-1. `create Admin Account` with a random value
-2. add opea agent endpoint `http://$ip_address:9090/v1` which is a openai compatible api
+1. Click on the arrow above `Get started`. Create an admin account with a name, email, and password.
+2. Add an OpenAI-compatible API endpoint. In the upper right, click on the circle button with the user's initial, go to `Admin Settings`->`Connections`. Under `Manage OpenAI API Connections`, click on the `+` to add a connection. Fill in these fields:
+
+- **URL**: `http://${ip_address}:9090/v1`, do not forget the `v1`
+- **Key**: any value
+- **Model IDs**: any name i.e. `opea-agent`, then press `+` to add it
+
+Click "Save".
 
 ![opea-agent-setting](assets/img/opea-agent-setting.png)
 
-3. test opea agent with ui
+3. Test OPEA agent with UI. Return to `New Chat` and ensure the model (i.e. `opea-agent`) is selected near the upper left. Enter in any prompt to interact with the agent.
 
 ![opea-agent-test](assets/img/opea-agent-test.png)
 
