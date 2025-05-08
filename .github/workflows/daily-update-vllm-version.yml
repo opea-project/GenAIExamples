@@ -1,0 +1,93 @@
+# Copyright (C) 2025 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+name: Daily update vLLM & vLLM-fork version
+
+on:
+  schedule:
+    - cron: "30 22 * * *"
+  workflow_dispatch:
+
+env:
+  BRANCH_NAME: "update"
+  USER_NAME: "CICD-at-OPEA"
+  USER_EMAIL: "CICD@opea.dev"
+
+jobs:
+  freeze-tag:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - repo: vLLM
+            repo_name: vllm-project/vllm
+            ver_name: VLLM_VER
+          - repo: vLLM-fork
+            repo_url: HabanaAI/vllm-fork
+            ver_name: VLLM_FORK_VER
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.ref }}
+
+      - name: Set up Git
+        run: |
+          git config --global user.name ${{ env.USER_NAME }}
+          git config --global user.email ${{ env.USER_EMAIL }}
+          git remote set-url origin https://${{ env.USER_NAME }}:"${{ secrets.ACTION_TOKEN }}"@github.com/${{ github.repository }}.git
+          git fetch
+
+          if git ls-remote https://github.com/${{ github.repository }}.git "refs/heads/${{ env.BRANCH_NAME }}_${{ matrix.repo }}" | grep -q "refs/heads/${{ env.BRANCH_NAME }}_${{ matrix.repo }}"; then
+            echo "branch ${{ env.BRANCH_NAME }}_${{ matrix.repo }} exists"
+            git checkout ${{ env.BRANCH_NAME }}_${{ matrix.repo }}
+          else
+            echo "branch ${{ env.BRANCH_NAME }}_${{ matrix.repo }} not exists"
+            git checkout -b ${{ env.BRANCH_NAME }}_${{ matrix.repo }}
+            git push origin ${{ env.BRANCH_NAME }}_${{ matrix.repo }}
+            echo "branch ${{ env.BRANCH_NAME }}_${{ matrix.repo }} created successfully"
+          fi
+
+      - name: Run script
+        run: |
+          latest_vllm_ver=$(curl -s "https://api.github.com/repos/${{ matrix.repo_name }}/tags" | jq '.[0].name' -)
+          echo "latest_vllm_ver=${latest_vllm_ver}" >> "$GITHUB_ENV"
+          find . -type f \( -name "*.sh" -o -name "_build_image.yml" \) -exec sed -i "s/${{ matrix.ver_name }}=.*/${{ matrix.ver_name }}=${latest_vllm_ver}/" {} \;
+
+      - name: Commit changes
+        run: |
+          git add .
+          if git diff-index --quiet HEAD --; then
+            echo "No changes detected, skipping commit."
+            exit 1
+          else
+            git commit -s -m "Update ${{ matrix.repo }} version to ${latest_vllm_ver}"
+            git push
+          fi
+
+      - name: Create Pull Request
+        run: |
+          pr_count=$(curl -H "Authorization: token ${{ secrets.ACTION_TOKEN }}" -s "https://api.github.com/repos/${{ github.repository }}/pulls?state=all&head=${{ env.USER_NAME }}:${{ env.BRANCH_NAME }}_${{ matrix.repo }}" | jq '. | length')
+          if [ $pr_count -gt 0 ]; then
+            echo "Pull Request exists"
+            pr_number=$(curl -H "Authorization: token ${{ secrets.ACTION_TOKEN }}" -s "https://api.github.com/repos/${{ github.repository }}/pulls?state=all&head=${{ env.USER_NAME }}:${{ env.BRANCH_NAME }}_${{ matrix.repo }}" | jq '.[0].number')
+            curl -X PATCH -H "Authorization: token ${{ secrets.ACTION_TOKEN }}" -d "{
+              \"title\":\"Update ${{ matrix.repo }} version to ${latest_vllm_ver}\",
+              \"body\":\"Update ${{ matrix.repo }} version to ${latest_vllm_ver}\",
+              \"state\":\"open\"
+            }" "https://api.github.com/repos/${{ github.repository }}/pulls/${pr_number}"
+            echo "Pull Request updated successfully"
+          else
+            echo "Pull Request not exists..."
+            curl -H "Authorization: token ${{ secrets.ACTION_TOKEN }}" -d "{
+              \"title\":\"Update ${{ matrix.repo }} version to ${latest_vllm_ver}\",
+              \"body\":\"Update ${{ matrix.repo }} version to ${latest_vllm_ver}\",
+              \"head\":\"${{ env.USER_NAME }}:${{ env.BRANCH_NAME }}_${{ matrix.repo }}\",
+              \"base\":\"main\"
+            }" "https://api.github.com/repos/${{ github.repository }}/pulls"
+            echo "Pull Request created successfully"
+          fi
