@@ -75,7 +75,7 @@ jobs:
         run: |
           cd ${{ github.workspace }}/${{ inputs.example }}/docker_image_build
           docker_compose_path=${{ github.workspace }}/${{ inputs.example }}/docker_image_build/build.yaml
-          source ${{ github.workspace }}/.github/workflows/env/_build_image.sh
+          source ${{ github.workspace }}/.github/env/_build_image.sh
           if [[ $(grep -c "vllm:" ${docker_compose_path}) != 0 ]]; then
               git clone https://github.com/vllm-project/vllm.git && cd vllm
               echo "Check out vLLM tag ${VLLM_VER}"
