@@ -50,7 +50,7 @@ function build_docker_images() {
     popd && sleep 1s
 
     git clone https://github.com/HabanaAI/vllm-fork.git && cd vllm-fork
-    VLLM_FORK_VER=v0.6.6.post1+Gaudi-1.20.0
+    VLLM_FORK_VER=v0.7.2+Gaudi-1.21.0
     git checkout ${VLLM_FORK_VER} &> /dev/null && cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
