@@ -3,6 +3,10 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+pushd "../../../../../" > /dev/null
+source .set_env.sh
+popd > /dev/null
+
 export host_ip=${ip_address}
 export DBQNA_HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
 export DBQNA_TGI_SERVICE_PORT=8008

@@ -28,9 +28,8 @@ function build_docker_images() {
 }
 
 function start_service() {
-    cd $WORKPATH/docker_compose
+    cd $WORKPATH/docker_compose/intel/cpu/xeon
     source ./set_env.sh
-    cd intel/cpu/xeon
 
     # Start Docker Containers
     docker compose -f compose.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
