@@ -54,12 +54,14 @@ jobs:
 
       - name: Run script
         run: |
+          set -xe
           latest_vllm_ver=$(curl -s "https://api.github.com/repos/${{ matrix.repo_name }}/tags" | jq '.[0].name' -)
           echo "latest_vllm_ver=${latest_vllm_ver}" >> "$GITHUB_ENV"
           find . -type f -name "*.sh" -exec sed -i "s/${{ matrix.ver_name }}=.*/${{ matrix.ver_name }}=${latest_vllm_ver}/" {} \;
 
       - name: Commit changes
         run: |
+          set -xe
           git add .
           git diff
           if git diff-index --quiet HEAD --; then
@@ -72,6 +74,7 @@ jobs:
 
       - name: Create Pull Request
         run: |
+          set -xe
           pr_count=$(curl -H "Authorization: token ${{ secrets.ACTION_TOKEN }}" -s "https://api.github.com/repos/${{ github.repository }}/pulls?state=all&head=${{ env.USER_NAME }}:${{ env.BRANCH_NAME }}_${{ matrix.repo }}" | jq '. | length')
           if [ $pr_count -gt 0 ]; then
             echo "Pull Request exists"
