@@ -60,7 +60,7 @@ function build_vllm_docker_image() {
     fi
     cd ./vllm-fork
 
-    VLLM_FORK_VER=v0.6.6.post1+Gaudi-1.20.0
+    VLLM_FORK_VER=v0.7.2+Gaudi-1.21.0
     git checkout ${VLLM_FORK_VER} &> /dev/null
     docker build --no-cache -f Dockerfile.hpu -t $vllm_image --shm-size=128g . --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy
     if [ $? -ne 0 ]; then
