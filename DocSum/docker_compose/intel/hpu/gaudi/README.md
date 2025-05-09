@@ -36,10 +36,10 @@ cd intel/hpu/gaudi/
 
 NOTE: vLLM is set to skip warmup by default. If you require vLLM warmup, `export VLLM_SKIP_WARMUP=false`
 
-Checkout a released version, such as v1.2:
+Checkout a released version, such as v1.3:
 
 ```bash
-git checkout v1.2
+git checkout v1.3
 ```
 
 ### Generate a HuggingFace Access Token
