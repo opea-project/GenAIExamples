@@ -115,6 +115,7 @@ jobs:
         run: |
           echo "value_file=${{ matrix.value_file }}"
           sudo rm -rf ${{github.workspace}}/*
+          echo "event is ${{ github.event_name }}"
 
       - name: Get checkout ref
         id: get-checkout-ref
@@ -161,6 +162,7 @@ jobs:
           echo "- CHART_NAME: ${CHART_NAME}" >> $GITHUB_STEP_SUMMARY
 
       - name: Helm install
+        if: ${{ github.event_name != 'pull_request' && github.event_name != 'pull_request_target' }}
         id: install
         env:
           GOOGLE_CSE_ID: ${{ secrets.GOOGLE_CSE_ID }}
@@ -250,3 +252,4 @@ jobs:
               kubectl delete ns $NAMESPACE --force --grace-period=0 --timeout=$KUBECTL_TIMEOUT_SECONDS
             fi
           fi
+
