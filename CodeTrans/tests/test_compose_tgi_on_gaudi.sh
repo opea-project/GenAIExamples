@@ -35,7 +35,7 @@ function build_docker_images() {
     service_list="codetrans codetrans-ui llm-textgen nginx"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
-    docker pull ghcr.io/huggingface/tgi-gaudi:2.0.6
+    docker pull ghcr.io/huggingface/tgi-gaudi:2.3.1
     docker images && sleep 1s
 }
 
