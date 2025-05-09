@@ -29,7 +29,7 @@ Clone the GenAIExample repository and access the ChatQnA Intel® Gaudi® platfor
 
 ```
 git clone https://github.com/opea-project/GenAIExamples.git
-cd GenAIExamples/DocSum/docker_compose/intel/hpu/gaudi/
+cd GenAIExamples/DocSum/docker_compose/intel/
 ```
 
 Checkout a released version, such as v1.2:
@@ -57,6 +57,7 @@ The _set_env.sh_ script will prompt for required and optional environment variab
 To deploy the DocSum services, execute the `docker compose up` command with the appropriate arguments. For a default deployment, execute:
 
 ```bash
+cd hpu/gaudi/
 docker compose up -d
 ```
 

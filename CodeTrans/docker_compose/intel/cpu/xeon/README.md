@@ -46,7 +46,7 @@ export http_proxy="Your_HTTP_Proxy"           # http proxy if any
 export https_proxy="Your_HTTPs_Proxy"         # https proxy if any
 export no_proxy=localhost,127.0.0.1,$host_ip  # additional no proxies if needed
 export NGINX_PORT=${your_nginx_port}          # your usable port for nginx, 80 for example
-source ./set_env.sh
+source docker_compose/intel/set_env.sh
 ```
 
 Consult the section on [CodeTrans Service configuration](#codetrans-configuration) for information on how service specific configuration parameters affect deployments.
