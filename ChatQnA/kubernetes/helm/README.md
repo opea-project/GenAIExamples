@@ -38,7 +38,7 @@ mkdir ~/chatqna-k8s-install && cd ~/chatqna-k8s-install
 ### Cloning repos
 
 ```bash
-git clone git clone https://github.com/opea-project/GenAIExamples.git
+git clone https://github.com/opea-project/GenAIExamples.git
 ```
 
 ### Go to the installation directory
