@@ -15,7 +15,6 @@ export MODEL_CACHE=${model_cache:-"./data"}
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
-tgi_port=8008
 
 function build_docker_images() {
     cd $WORKPATH/docker_image_build
@@ -30,14 +29,7 @@ function build_docker_images() {
 
 function start_service() {
     cd $WORKPATH/docker_compose/intel/cpu/xeon
-    export model="mistralai/Mistral-7B-Instruct-v0.3"
-    export LLM_MODEL_ID=${model}
-    export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
-    export POSTGRES_USER=postgres
-    export POSTGRES_PASSWORD=testpwd
-    export POSTGRES_DB=chinook
-    export TEXT2SQL_PORT=9090
-    export TGI_LLM_ENDPOINT="http://${ip_address}:${tgi_port}"
+    source ./set_env.sh
 
     # Start Docker Containers
     docker compose -f compose.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
@@ -60,7 +52,8 @@ function validate_microservice() {
         -d '{"input_text": "Find the total number of Albums.","conn_str": {"user": "'${POSTGRES_USER}'","password": "'${POSTGRES_PASSWORD}'","host": "'${ip_address}'", "port": "5442", "database": "'${POSTGRES_DB}'" }}' \
         -H 'Content-Type: application/json')
 
-    if [[ $result == *"output"* ]]; then
+    if echo "$result" | jq -e '.result.output' > /dev/null 2>&1; then
+    # if [[ $result == *"output"* ]]; then
         echo $result
         echo "Result correct."
     else
