@@ -147,7 +147,7 @@ nano ~/docsum-k8s-install/GenAIExamples/DocSum/kubernetes/helm/rocm-tgi-values.y
 #### If ROCm vLLM used
 ```bash
 cd ~/docsum-k8s-install/GenAIInfra/helm-charts
-./update_dependency.sh
+scripts/update_dependency.sh
 helm dependency update docsum
 helm upgrade --install docsum docsum \
     --set global.HUGGINGFACEHUB_API_TOKEN=${HFTOKEN} \
@@ -157,7 +157,7 @@ helm upgrade --install docsum docsum \
 #### If ROCm TGI used
 ```bash
 cd ~/docsum-k8s-install/GenAIInfra/helm-charts
-./update_dependency.sh
+scripts/update_dependency.sh
 helm dependency update docsum
 helm upgrade --install docsum docsum \
     --set global.HUGGINGFACEHUB_API_TOKEN=${HFTOKEN} \
