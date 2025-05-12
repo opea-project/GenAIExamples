@@ -18,7 +18,7 @@ Quick Start Deployment Steps:
 2. Run Docker Compose.
 3. Consume the GraphRAG Service.
 
-Note: If you do not have docker installed you can [install docker](https://docs.docker.com/engine/install/) first
+Note: If you do not have Docker installed you can [install Docker](https://docs.docker.com/engine/install/) first
 
 ### Quick Start: 1.Setup Environment Variable
 
