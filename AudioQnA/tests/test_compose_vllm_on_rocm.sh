@@ -33,27 +33,7 @@ function build_docker_images() {
 
 function start_services() {
     cd $WORKPATH/docker_compose/amd/gpu/rocm/
-
-    export host_ip=${ip_address}
-    export external_host_ip=${ip_address}
-    export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
-    export HF_CACHE_DIR="./data"
-    export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
-    export VLLM_SERVICE_PORT="8081"
-
-    export MEGA_SERVICE_HOST_IP=${host_ip}
-    export WHISPER_SERVER_HOST_IP=${host_ip}
-    export SPEECHT5_SERVER_HOST_IP=${host_ip}
-    export LLM_SERVER_HOST_IP=${host_ip}
-
-    export WHISPER_SERVER_PORT=7066
-    export SPEECHT5_SERVER_PORT=7055
-    export LLM_SERVER_PORT=${VLLM_SERVICE_PORT}
-    export BACKEND_SERVICE_PORT=3008
-    export FRONTEND_SERVICE_PORT=5173
-
-    export BACKEND_SERVICE_ENDPOINT=http://${external_host_ip}:${BACKEND_SERVICE_PORT}/v1/audioqna
-
+    source set_env_vllm.sh
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
     # Start Docker Containers
