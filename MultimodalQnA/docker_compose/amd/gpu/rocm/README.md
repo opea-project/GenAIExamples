@@ -13,7 +13,7 @@ Note: The default LLM is `Xkev/Llama-3.2V-11B-co`. Before deploying the applicat
 
 ## MultimodalQnA Quick Start Deployment
 
-This section describes how to quickly deploy and test the MultimodalQnAservice manually on an AMD ROCm GPU. The basic steps are:
+This section describes how to quickly deploy and test the MultimodalQnA Service manually on an AMD ROCm GPU. The basic steps are:
 
 1. [Access the Code](#access-the-code)
 2. [Configure the Deployment Environment](#configure-the-deployment-environment)
