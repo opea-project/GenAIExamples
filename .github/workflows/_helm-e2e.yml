@@ -137,7 +137,7 @@ jobs:
         env:
           example: ${{ inputs.example }}
         run: |
-          if [[ ! "$example" =~ ^[a-zA-Z]{1,20}$ ]] || [[ "$example" =~ \.\. ]] || [[ "$example" == -* || "$example" == *- ]]; then
+          if [[ ! "$example" =~ ^[a-zA-Z0-9]{1,20}$ ]] || [[ "$example" =~ \.\. ]] || [[ "$example" == -* || "$example" == *- ]]; then
             echo "Error: Invalid input - only lowercase alphanumeric and internal hyphens allowed"
             exit 1
           fi
