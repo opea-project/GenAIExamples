@@ -29,8 +29,3 @@ export BACKEND_SERVICE_PORT=8888
 export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:${BACKEND_SERVICE_PORT}/v1/docsum"
 
 export LOGFLAG=True
-
-export NUM_CARDS=1
-export BLOCK_SIZE=128
-export MAX_NUM_SEQS=256
-export MAX_SEQ_LEN_TO_CAPTURE=2048
