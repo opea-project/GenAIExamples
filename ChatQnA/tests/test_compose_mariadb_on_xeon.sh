@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright (C) 2024 Intel Corporation
+# Copyright (C) 2025 MariaDB Foundation
 # SPDX-License-Identifier: Apache-2.0
 
 set -e
@@ -23,37 +23,37 @@ function build_docker_images() {
     echo "GenAIComps test commit is $(git rev-parse HEAD)"
     docker build --no-cache -t ${REGISTRY}/comps-base:${TAG} --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
     popd && sleep 1s
-    git clone https://github.com/HabanaAI/vllm-fork.git && cd vllm-fork
-    VLLM_FORK_VER=v0.6.6.post1+Gaudi-1.20.0
-    git checkout ${VLLM_FORK_VER} &> /dev/null && cd ../
+    git clone https://github.com/vllm-project/vllm.git && cd vllm
+    VLLM_VER="v0.8.3"
+    echo "Check out vLLM tag ${VLLM_VER}"
+    git checkout ${VLLM_VER} &> /dev/null
+    # make sure NOT change the pwd
+    cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="chatqna chatqna-ui dataprep retriever vllm-gaudi nginx"
+    service_list="chatqna chatqna-ui dataprep retriever vllm nginx"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker images && sleep 1s
 }
 
 function start_services() {
-    cd $WORKPATH/docker_compose/intel/hpu/gaudi
+    cd $WORKPATH/docker_compose/intel/cpu/xeon
+    export MARIADB_DATABASE="vectordb"
+    export MARIADB_USER="chatqna"
+    export MARIADB_PASSWORD="test"
     export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
     export RERANK_MODEL_ID="BAAI/bge-reranker-base"
     export LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
-    export NUM_CARDS=1
-    export INDEX_NAME="rag-redis"
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
     export host_ip=${ip_address}
-    export JAEGER_IP=$(ip route get 8.8.8.8 | grep -oP 'src \K[^ ]+')
-    export OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=grpc://$JAEGER_IP:4317
-    export TELEMETRY_ENDPOINT=http://$JAEGER_IP:4318/v1/traces
 
     # Start Docker Containers
-    docker compose -f compose.yaml -f compose.telemetry.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
+    docker compose -f compose_mariadb.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
     n=0
-    until [[ "$n" -ge 200 ]]; do
-        echo "n=$n"
-        docker logs vllm-gaudi-server > vllm_service_start.log
-        if grep -q "Warmup finished" vllm_service_start.log; then
+    until [[ "$n" -ge 100 ]]; do
+        docker logs vllm-service > ${LOG_PATH}/vllm_service_start.log 2>&1
+        if grep -q complete ${LOG_PATH}/vllm_service_start.log; then
             break
         fi
         sleep 5s
@@ -91,16 +91,15 @@ function validate_service() {
 
 function validate_microservices() {
     # Check if the microservices are running correctly.
+    sleep 3m
 
     # tei for embedding service
     validate_service \
-        "${ip_address}:8090/embed" \
+        "${ip_address}:6006/embed" \
         "\[\[" \
         "tei-embedding" \
-        "tei-embedding-gaudi-server" \
+        "tei-embedding-server" \
         '{"inputs":"What is Deep Learning?"}'
-
-    sleep 1m # retrieval can't curl as expected, try to wait for more time
 
     # retrieval microservice
     test_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
@@ -108,7 +107,7 @@ function validate_microservices() {
         "${ip_address}:7000/v1/retrieval" \
         " " \
         "retrieval" \
-        "retriever-redis-server" \
+        "retriever-mariadb-vector" \
         "{\"text\":\"What is the revenue of Nike in 2023?\",\"embedding\":${test_embedding}}"
 
     # tei for rerank microservice
@@ -116,16 +115,16 @@ function validate_microservices() {
         "${ip_address}:8808/rerank" \
         '{"index":1,"score":' \
         "tei-rerank" \
-        "tei-reranking-gaudi-server" \
+        "tei-reranking-server" \
         '{"query":"What is Deep Learning?", "texts": ["Deep Learning is not...", "Deep learning is..."]}'
 
     # vllm for llm service
     validate_service \
-        "${ip_address}:8007/v1/chat/completions" \
+        "${ip_address}:9009/v1/chat/completions" \
         "content" \
         "vllm-llm" \
-        "vllm-gaudi-server" \
-        '{"model": "meta-llama/Meta-Llama-3-8B-Instruct", "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens":17}'
+        "vllm-service" \
+        '{"model": "meta-llama/Meta-Llama-3-8B-Instruct", "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens": 17}'
 }
 
 function validate_megaservice() {
@@ -134,42 +133,14 @@ function validate_megaservice() {
         "${ip_address}:8888/v1/chatqna" \
         "Nike" \
         "mega-chatqna" \
-        "chatqna-gaudi-backend-server" \
+        "chatqna-xeon-backend-server" \
         '{"messages": "What is the revenue of Nike in 2023?"}'
 
 }
 
-function validate_frontend() {
-    cd $WORKPATH/ui/svelte
-    local conda_env_name="OPEA_e2e"
-    export PATH=${HOME}/miniforge3/bin/:$PATH
-    if conda info --envs | grep -q "$conda_env_name"; then
-        echo "$conda_env_name exist!"
-    else
-        conda create -n ${conda_env_name} python=3.12 -y
-    fi
-    source activate ${conda_env_name}
-
-    sed -i "s/localhost/$ip_address/g" playwright.config.ts
-
-    conda install -c conda-forge nodejs=22.6.0 -y
-    npm install && npm ci && npx playwright install --with-deps
-    node -v && npm -v && pip list
-
-    exit_status=0
-    npx playwright test || exit_status=$?
-
-    if [ $exit_status -ne 0 ]; then
-        echo "[TEST INFO]: ---------frontend test failed---------"
-        exit $exit_status
-    else
-        echo "[TEST INFO]: ---------frontend test passed---------"
-    fi
-}
-
 function stop_docker() {
-    cd $WORKPATH/docker_compose/intel/hpu/gaudi
-    docker compose -f compose.yaml -f compose.telemetry.yaml down
+    cd $WORKPATH/docker_compose/intel/cpu/xeon
+    docker compose down
 }
 
 function main() {
@@ -192,10 +163,6 @@ function main() {
 
     echo "::group::validate_megaservice"
     validate_megaservice
-    echo "::endgroup::"
-
-    echo "::group::validate_frontend"
-    validate_frontend
     echo "::endgroup::"
 
     echo "::group::stop_docker"

@@ -22,75 +22,11 @@ logger = logging.getLogger(__name__)
 class DocSumUI:
     def __init__(self):
         """Initialize the DocSumUI class with accepted file types, headers, and backend service endpoint."""
-        self.ACCEPTED_FILE_TYPES = ["pdf", "doc", "docx"]
+        self.ACCEPTED_TEXT_FILE_TYPES = [".pdf", ".doc", ".docx"]
+        self.ACCEPTED_AUDIO_FILE_TYPES = [".mp3", ".wav"]
+        self.ACCEPTED_VIDEO_FILE_TYPES = [".mp4"]
         self.HEADERS = {"Content-Type": "application/json"}
         self.BACKEND_SERVICE_ENDPOINT = os.getenv("BACKEND_SERVICE_ENDPOINT", "http://localhost:8888/v1/docsum")
-
-    def encode_file_to_base64(self, file_path):
-        """Encode the content of a file to a base64 string.
-
-        Args:
-            file_path (str): The path to the file to be encoded.
-
-        Returns:
-            str: The base64 encoded string of the file content.
-        """
-        logger.info(">>> Encoding file to base64: %s", file_path)
-        with open(file_path, "rb") as f:
-            base64_str = base64.b64encode(f.read()).decode("utf-8")
-        return base64_str
-
-    def read_file(self, file):
-        """Read and process the content of a file.
-
-        Args:
-            file (file-like object): The file to be read.
-
-        Returns:
-            str: The content of the file or an error message if the file type is unsupported.
-        """
-        self.page_content = ""
-        self.pages = []
-
-        if file.name.endswith(".pdf"):
-            loader = PyPDFLoader(file)
-        elif file.name.endswith((".doc", ".docx")):
-            loader = Docx2txtLoader(file)
-        else:
-            msg = f"Unsupported file type '{file.name}'. Choose from {self.ACCEPTED_FILE_TYPES}"
-            logger.error(msg)
-            return msg
-
-        for page in loader.lazy_load():
-            self.page_content += page.page_content
-
-        return self.page_content
-
-    def read_audio_file(self, file):
-        """Read and process the content of an audio file.
-
-        Args:
-            file (file-like object): The audio file to be read.
-
-        Returns:
-            str: The base64 encoded content of the audio file.
-        """
-        logger.info(">>> Reading audio file: %s", file.name)
-        base64_str = self.encode_file_to_base64(file)
-        return base64_str
-
-    def read_video_file(self, file):
-        """Read and process the content of a video file.
-
-        Args:
-            file (file-like object): The video file to be read.
-
-        Returns:
-            str: The base64 encoded content of the video file.
-        """
-        logger.info(">>> Reading video file: %s", file.name)
-        base64_str = self.encode_file_to_base64(file)
-        return base64_str
 
     def is_valid_url(self, url):
         try:
@@ -128,78 +64,107 @@ class DocSumUI:
 
         return self.page_content
 
-    def generate_summary(self, doc_content, document_type="text"):
+    def process_response(self, response):
+        if response.status_code == 200:
+            try:
+                # Check if the specific log path is in the response text
+                if "/logs/LLMChain/final_output" in response.text:
+                    # Extract the relevant part of the response
+                    temp = ast.literal_eval(
+                        [
+                            i.split("data: ")[1]
+                            for i in response.text.split("\n\n")
+                            if "/logs/LLMChain/final_output" in i
+                        ][0]
+                    )["ops"]
+
+                    # Find the final output value
+                    final_output = [i["value"] for i in temp if i["path"] == "/logs/LLMChain/final_output"][0]
+                    return final_output["text"]
+                else:
+                    # Perform string replacements to clean the response text
+                    cleaned_text = response.text
+                    replacements = [
+                        ("'\n\ndata: b'", ""),
+                        ("data: b' ", ""),
+                        ("</s>'\n\ndata: [DONE]\n\n", ""),
+                        ("\n\ndata: b", ""),
+                        ("'\n\n", ""),
+                        ("'\n", ""),
+                        ('''\'"''', ""),
+                    ]
+                    for old, new in replacements:
+                        cleaned_text = cleaned_text.replace(old, new)
+                    return cleaned_text
+            except (IndexError, KeyError, ValueError) as e:
+                # Handle potential errors during parsing
+                logger.error("Error parsing response: %s", e)
+                return response.text
+
+    def generate_summary(self, document, document_type="text"):
         """Generate a summary for the given document content.
 
         Args:
-            doc_content (str): The content of the document.
+            document (str): The content or path of the document.
             document_type (str): The type of the document (default is "text").
 
         Returns:
             str: The generated summary or an error message.
         """
-
         logger.info(">>> BACKEND_SERVICE_ENDPOINT - %s", self.BACKEND_SERVICE_ENDPOINT)
 
-        data = {"max_tokens": 256, "type": document_type, "messages": doc_content}
+        data = {"max_tokens": 256, "type": document_type, "messages": ""}
 
-        try:
-            response = requests.post(
-                url=self.BACKEND_SERVICE_ENDPOINT,
-                headers=self.HEADERS,
-                data=json.dumps(data),
-                proxies={"http_proxy": os.environ["http_proxy"], "https_proxy": os.environ["https_proxy"]},
-            )
+        if os.path.exists(document):
+            file_header = "text/plain"
+            file_ext = os.path.splitext(document)[-1]
+            if file_ext == ".pdf":
+                file_header = "application/pdf"
+            elif file_ext in [".doc", ".docx"]:
+                file_header = "application/octet-stream"
+            elif file_ext in self.ACCEPTED_AUDIO_FILE_TYPES + self.ACCEPTED_VIDEO_FILE_TYPES:
+                file_header = f"{document_type}/{file_ext[-3:]}"
+            files = {"files": (os.path.basename(document), open(document, "rb"), file_header)}
+            try:
+                response = requests.post(
+                    url=self.BACKEND_SERVICE_ENDPOINT,
+                    headers={},
+                    files=files,
+                    data=data,
+                    proxies={"http_proxy": os.environ["http_proxy"], "https_proxy": os.environ["https_proxy"]},
+                )
 
-            if response.status_code == 200:
-                try:
-                    # Check if the specific log path is in the response text
-                    if "/logs/LLMChain/final_output" in response.text:
-                        # Extract the relevant part of the response
-                        temp = ast.literal_eval(
-                            [
-                                i.split("data: ")[1]
-                                for i in response.text.split("\n\n")
-                                if "/logs/LLMChain/final_output" in i
-                            ][0]
-                        )["ops"]
+                return self.process_response(response)
 
-                        # Find the final output value
-                        final_output = [i["value"] for i in temp if i["path"] == "/logs/LLMChain/final_output"][0]
-                        return final_output["text"]
-                    else:
-                        # Perform string replacements to clean the response text
-                        cleaned_text = response.text
-                        replacements = [
-                            ("'\n\ndata: b'", ""),
-                            ("data: b' ", ""),
-                            ("</s>'\n\ndata: [DONE]\n\n", ""),
-                            ("\n\ndata: b", ""),
-                            ("'\n\n", ""),
-                            ("'\n", ""),
-                            ('''\'"''', ""),
-                        ]
-                        for old, new in replacements:
-                            cleaned_text = cleaned_text.replace(old, new)
-                        return cleaned_text
-                except (IndexError, KeyError, ValueError) as e:
-                    # Handle potential errors during parsing
-                    logger.error("Error parsing response: %s", e)
-                    return response.text
+            except requests.exceptions.RequestException as e:
+                logger.error("Request exception: %s", e)
+                return str(e)
 
-        except requests.exceptions.RequestException as e:
-            logger.error("Request exception: %s", e)
-            return str(e)
+        else:
+            data["messages"] = document
+            try:
+                response = requests.post(
+                    url=self.BACKEND_SERVICE_ENDPOINT,
+                    headers=self.HEADERS,
+                    data=json.dumps(data),
+                    proxies={"http_proxy": os.environ["http_proxy"], "https_proxy": os.environ["https_proxy"]},
+                )
+
+                return self.process_response(response)
+
+            except requests.exceptions.RequestException as e:
+                logger.error("Request exception: %s", e)
+                return str(e)
 
         return str(response.status_code)
 
-    def create_upload_ui(self, label, file_types, process_function, document_type="text"):
+    def create_upload_ui(self, label, file_types, document_type="text"):
         """Create a Gradio UI for file uploads.
 
         Args:
             label (str): The label for the upload button.
             file_types (list): The list of accepted file types.
-            process_function (function): The function to process the uploaded file.
+            document_type (str): The document type (text, audio, or video). Default is text.
 
         Returns:
             gr.Blocks: The Gradio Blocks object representing the upload UI.
@@ -214,7 +179,7 @@ class DocSumUI:
                         label="Text Summary", placeholder="Summarized text will be displayed here"
                     )
             upload_btn.upload(
-                lambda file: self.generate_summary(process_function(file), document_type=document_type),
+                lambda file: self.generate_summary(file, document_type=document_type),
                 upload_btn,
                 generated_text,
             )
@@ -263,24 +228,21 @@ class DocSumUI:
 
         # File Upload UI
         file_ui = self.create_upload_ui(
-            label="Please upload a document (.pdf, .doc, .docx)",
-            file_types=[".pdf", ".doc", ".docx"],
-            process_function=self.read_file,
+            label=f"Please upload a document ({', '.join(self.ACCEPTED_TEXT_FILE_TYPES)})",
+            file_types=self.ACCEPTED_TEXT_FILE_TYPES,
         )
 
         # Audio Upload UI
         audio_ui = self.create_upload_ui(
-            label="Please upload audio file (.wav, .mp3)",
-            file_types=[".wav", ".mp3"],
-            process_function=self.read_audio_file,
+            label=f"Please upload audio file ({', '.join(self.ACCEPTED_AUDIO_FILE_TYPES)})",
+            file_types=self.ACCEPTED_AUDIO_FILE_TYPES,
             document_type="audio",
         )
 
         # Video Upload UI
         video_ui = self.create_upload_ui(
-            label="Please upload Video file (.mp4)",
-            file_types=[".mp4"],
-            process_function=self.read_video_file,
+            label=f"Please upload video file ({', '.join(self.ACCEPTED_VIDEO_FILE_TYPES)})",
+            file_types=self.ACCEPTED_VIDEO_FILE_TYPES,
             document_type="video",
         )
 
