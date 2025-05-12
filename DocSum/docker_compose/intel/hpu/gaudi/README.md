@@ -34,7 +34,7 @@ source set_env.sh
 cd intel/hpu/gaudi/
 ```
 
-NOTE: vLLM is set to skip warmup by default. If you require vLLM warmup, `export VLLM_SKIP_WARMUP=false`
+NOTE: vLLM is set to execute warmup by default. If you'd like to skip warmup, `export VLLM_SKIP_WARMUP=true`
 
 Checkout a released version, such as v1.3:
 
