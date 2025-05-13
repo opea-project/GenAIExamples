@@ -17,6 +17,20 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  check-first-contributor:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check if contributor is new
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          COMMITTER_USERNAME: ${{ github.event.pull_request.user.login }}
+          REPO_OWNER: ${{ github.repository_owner }}
+          REPO_NAME: ${{ github.event.repository.name }}
+        run: |
+          echo "${COMMITTER_USERNAME}"
+          echo "${REPO_OWNER}"
+          echo "${REPO_NAME}"
+
   job1:
     name: Get-Test-Matrix
     permissions:
