@@ -19,5 +19,5 @@ services:
       dockerfile: ./docker/Dockerfile.react
       args:
         texttosql_url: ${build_texttosql_url}
-    expends: text2sql
+    extends: text2sql
     image: ${REGISTRY:-opea}/text2sql-react-ui:${TAG:-latest}
