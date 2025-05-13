@@ -23,6 +23,7 @@ jobs:
       - name: Check the Validity of Hyperlinks
         run: |
           cd ${{github.workspace}}
+          delay=15
           fail="FALSE"
           merged_commit=$(git log -1 --format='%H')
           changed_files="$(git diff --name-status --diff-filter=ARM ${{ github.event.pull_request.base.sha }} ${merged_commit} | awk '/\.md$/ {print $NF}')"
@@ -35,14 +36,15 @@ jobs:
                   # echo $url_line
                   url=$(echo "$url_line"|cut -d '(' -f2 | cut -d ')' -f1|sed 's/\.git$//')
                   path=$(echo "$url_line"|cut -d':' -f1 | cut -d'/' -f2-)
+                  sleep $delay
                   response=$(curl -L -s -o /dev/null -w "%{http_code}" "$url")|| true
                   if [ "$response" -ne 200 ]; then
-                    echo "**********Validation failed, try again**********"
+                    echo "**********Validation failed ($response), try again**********"
                     response_retry=$(curl -s -o /dev/null -w "%{http_code}" "$url")
                     if [ "$response_retry" -eq 200 ]; then
                       echo "*****Retry successfully*****"
                     else
-                      echo "Invalid link from ${{github.workspace}}/$path: $url"
+                      echo "Invalid link ($response_retry) from ${{github.workspace}}/$path: $url"
                       fail="TRUE"
                     fi
                   fi
