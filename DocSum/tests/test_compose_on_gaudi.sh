@@ -50,8 +50,8 @@ function build_docker_images() {
     popd && sleep 1s
 
     git clone https://github.com/HabanaAI/vllm-fork.git && cd vllm-fork
-    VLLM_VER=v0.6.6.post1+Gaudi-1.20.0
-    git checkout ${VLLM_VER} &> /dev/null && cd ../
+    VLLM_FORK_VER=v0.6.6.post1+Gaudi-1.20.0
+    git checkout ${VLLM_FORK_VER} &> /dev/null && cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
     service_list="docsum docsum-gradio-ui whisper llm-docsum vllm-gaudi"
@@ -237,6 +237,20 @@ function validate_megaservice_multimedia() {
         "language=en" \
         "stream=False"
 
+    echo ">>> Checking audio data in form format, upload file"
+    validate_service \
+        "${host_ip}:${BACKEND_SERVICE_PORT}/v1/docsum" \
+        "well" \
+        "docsum-gaudi-backend-server" \
+        "docsum-gaudi-backend-server" \
+        "media" "" \
+        "type=audio" \
+        "messages=" \
+        "files=@$ROOT_FOLDER/data/test.wav" \
+        "max_tokens=32" \
+        "language=en" \
+        "stream=False"
+
     echo ">>> Checking video data in json format"
     validate_service \
         "${host_ip}:${BACKEND_SERVICE_PORT}/v1/docsum" \
@@ -255,6 +269,20 @@ function validate_megaservice_multimedia() {
         "media" "" \
         "type=video" \
         "messages=\"$(input_data_for_test "video")\"" \
+        "max_tokens=32" \
+        "language=en" \
+        "stream=False"
+
+    echo ">>> Checking video data in form format, upload file"
+    validate_service \
+        "${host_ip}:${BACKEND_SERVICE_PORT}/v1/docsum" \
+        "bye" \
+        "docsum-gaudi-backend-server" \
+        "docsum-gaudi-backend-server" \
+        "media" "" \
+        "type=video" \
+        "messages=" \
+        "files=@$ROOT_FOLDER/data/test.mp4" \
         "max_tokens=32" \
         "language=en" \
         "stream=False"
