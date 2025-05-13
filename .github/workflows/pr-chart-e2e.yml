@@ -67,10 +67,12 @@ jobs:
           run_matrix=$run_matrix"]}"
           echo "run_matrix="${run_matrix}""
           echo "run_matrix="${run_matrix}"" >> $GITHUB_OUTPUT
+          github.event.pull_request.labels.*.name
+          echo "label is ${{ github.event.pull_request.labels.*.name }}"
 
   helm-chart-test:
     needs: [job1]
-    if: always() && ${{ fromJSON(needs.job1.outputs.run_matrix).length != 0 }}
+    if: always() && ${{ fromJSON(needs.job1.outputs.run_matrix).length != 0 }} && contains(github.event.pull_request.labels.*.name, 'safe to test')
     uses: ./.github/workflows/_helm-e2e.yml
     strategy:
       matrix: ${{ fromJSON(needs.job1.outputs.run_matrix) }}
