@@ -7,7 +7,7 @@ services:
     #image: opea/text2cypher-gaudi:${TAG:-latest}
     container_name: text2cypher-gaudi-container
     ports:
-      - ${TEXT2CYPHER_PORT:-9097}:9097
+      - ${TEXT2CYPHER_SERVER_PORT:-9097}:9097
     depends_on:
       neo4j-apoc:
         condition: service_healthy
