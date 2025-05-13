@@ -216,6 +216,7 @@ function validate_megaservice_text() {
 
 function validate_megaservice_multimedia() {
     echo ">>> Checking audio data in json format"
+    sleep 20s
     validate_service \
         "${host_ip}:${BACKEND_SERVICE_PORT}/v1/docsum" \
         "well" \
