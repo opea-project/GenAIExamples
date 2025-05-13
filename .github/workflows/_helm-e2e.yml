@@ -128,7 +128,6 @@ jobs:
           echo "checkout ref ${CHECKOUT_REF}"
 
       - name: Checkout Repo
-        if: contains(github.event.pull_request.labels.*.name, 'safe to test')
         uses: actions/checkout@v4
         with:
           ref: ${{ steps.get-checkout-ref.outputs.CHECKOUT_REF }}
