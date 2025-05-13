@@ -6,7 +6,7 @@ name: E2E Test with Helm Charts
 on:
   pull_request_target:
     branches: [main]
-    types: [opened, reopened, ready_for_review, synchronize] # added `ready_for_review` since draft is skipped
+    types: [opened, reopened, ready_for_review, synchronize, labeled] # added `ready_for_review` since draft is skipped
     paths:
       - "!**.md"
       - "**/helm/**"
@@ -72,7 +72,7 @@ jobs:
 
   helm-chart-test:
     needs: [job1]
-    if: always() && ${{ fromJSON(needs.job1.outputs.run_matrix).length != 0 }} && contains(github.event.pull_request.labels.*.name, 'safe to test')
+    if: always() && ${{ fromJSON(needs.job1.outputs.run_matrix).length != 0 }}
     uses: ./.github/workflows/_helm-e2e.yml
     strategy:
       matrix: ${{ fromJSON(needs.job1.outputs.run_matrix) }}
