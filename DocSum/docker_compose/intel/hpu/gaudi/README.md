@@ -34,7 +34,7 @@ source set_env.sh
 cd intel/hpu/gaudi/
 ```
 
-NOTE: by default vLLM does "warmup" at start, to optimize its performance for the specified model and the underlying  platform, which can take long time. For development (and e.g. autoscaling) it can be skipped with `export VLLM_SKIP_WARMUP=true`.
+NOTE: by default vLLM does "warmup" at start, to optimize its performance for the specified model and the underlying platform, which can take long time. For development (and e.g. autoscaling) it can be skipped with `export VLLM_SKIP_WARMUP=true`.
 
 Checkout a released version, such as v1.3:
 
