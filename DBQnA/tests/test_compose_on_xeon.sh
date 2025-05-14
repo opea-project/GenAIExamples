@@ -27,7 +27,7 @@ function build_docker_images() {
     docker images && sleep 1s
 }
 
-function start_service() {
+function start_services() {
     cd $WORKPATH/docker_compose/intel/cpu/xeon
     source ./set_env.sh
 

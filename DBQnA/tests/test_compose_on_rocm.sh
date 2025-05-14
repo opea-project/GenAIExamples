@@ -32,7 +32,7 @@ function build_docker_images() {
     docker images && sleep 1s
 }
 
-function start_service() {
+function start_services() {
     cd "$WORKPATH"/docker_compose/amd/gpu/rocm
     # Start Docker Containers
     docker compose up -d > "${LOG_PATH}"/start_services_with_compose.log
