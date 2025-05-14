@@ -36,16 +36,20 @@ jobs:
                   # echo $url_line
                   url=$(echo "$url_line"|cut -d '(' -f2 | cut -d ')' -f1|sed 's/\.git$//')
                   path=$(echo "$url_line"|cut -d':' -f1 | cut -d'/' -f2-)
-                  sleep $delay
-                  response=$(curl -L -s -o /dev/null -w "%{http_code}" "$url")|| true
-                  if [ "$response" -ne 200 ]; then
-                    echo "**********Validation failed ($response), try again**********"
-                    response_retry=$(curl -s -o /dev/null -w "%{http_code}" "$url")
-                    if [ "$response_retry" -eq 200 ]; then
-                      echo "*****Retry successfully*****"
-                    else
-                      echo "Invalid link ($response_retry) from ${{github.workspace}}/$path: $url"
-                      fail="TRUE"
+                  if [[ "$url" == "https://platform.openai.com/api-keys"* ]]; then
+                    echo "Link "$url" from ${{github.workspace}}/$path needs to be verified by a real person."
+                  else
+                    sleep $delay
+                    response=$(curl -L -s -o /dev/null -w "%{http_code}" "$url")|| true
+                    if [ "$response" -ne 200 ]; then
+                      echo "**********Validation failed ($response), try again**********"
+                      response_retry=$(curl -s -o /dev/null -w "%{http_code}" "$url")
+                      if [ "$response_retry" -eq 200 ]; then
+                        echo "*****Retry successfully*****"
+                      else
+                        echo "Invalid link ($response_retry) from ${{github.workspace}}/$path: $url"
+                        fail="TRUE"
+                      fi
                     fi
                   fi
                 done
