@@ -10,6 +10,9 @@ pushd "../../../../../" > /dev/null
 source .set_env.sh
 popd > /dev/null
 
+host_ip=$(hostname -I | awk '{print $1}')
+export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+export HF_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
 export TEI_EMBEDDER_PORT=11633
 export LLM_ENDPOINT_PORT=11634
 export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
@@ -17,7 +20,6 @@ export OPENAI_EMBEDDING_MODEL="text-embedding-3-small"
 export LLM_MODEL_ID="meta-llama/Meta-Llama-3.1-8B-Instruct"
 export OPENAI_LLM_MODEL="gpt-4o"
 export TEI_EMBEDDING_ENDPOINT="http://${host_ip}:${TEI_EMBEDDER_PORT}"
-export LLM_MODEL_ID="meta-llama/Meta-Llama-3.1-8B-Instruct"
 export TGI_LLM_ENDPOINT="http://${host_ip}:${LLM_ENDPOINT_PORT}"
 export NEO4J_PORT1=11631
 export NEO4J_PORT2=11632
@@ -32,3 +34,4 @@ export MAX_TOTAL_TOKENS=8192
 export DATA_PATH="/mnt/nvme2n1/hf_cache"
 export DATAPREP_PORT=11103
 export RETRIEVER_PORT=11635
+export MEGA_SERVICE_PORT=8888
