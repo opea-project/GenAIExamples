@@ -24,6 +24,8 @@ function build_docker_images() {
 
     git clone https://github.com/HabanaAI/vllm-fork.git
     cd ./vllm-fork/
+    VLLM_FORK_VER=v0.6.6.post1+Gaudi-1.20.0
+    git checkout ${VLLM_FORK_VER} &> /dev/null
     docker build -f Dockerfile.hpu -t opea/vllm-gaudi:${TAG} --shm-size=128g . --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy
     cd ..
     rm -rf vllm-fork
