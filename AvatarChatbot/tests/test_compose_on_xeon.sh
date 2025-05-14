@@ -134,8 +134,6 @@ function main() {
     start_services
     echo "::endgroup::"
 
-    sleep 30
-
     echo "::group::validate_megaservice"
     validate_megaservice
     echo "::endgroup::"
