@@ -359,10 +359,19 @@ class HybridRAGService:
         structured = ""
         structured_result = self.exec_text2cypher(prompt) 
         data = structured_result.json()
-        s_str = data[0]["s"]["name"]
-        s_list = ast.literal_eval(s_str)
+        data_str = str(data)
+        start_marker = "['"
+        end_marker = "']"
 
-        structured = ', '.join(s.strip() for s in s_list)
+        # Find the start and end indices
+        start_index = data_str.find(start_marker) + len(start_marker)  # Move past the start marker
+        end_index = data_str.find(end_marker, start_index)  # Find the end marker
+
+        # Extract the substring
+        substring = data_str[start_index:end_index]
+
+        # Clean up the substring
+        structured = ','.join(item.strip().strip("'") for item in substring.split(','))
 
         initial_inputs={"text": prompt}
         result_dict, runtime_graph = await self.megaservice.schedule(

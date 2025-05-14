@@ -3,7 +3,6 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-# export host_ip=<your External Public IP>
 export host_ip=$(hostname -I | awk '{print $1}')
 export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
 export HF_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
@@ -29,7 +28,7 @@ export RETRIEVER_SERVER_HOST_IP=${host_ip}
 export RERANK_SERVER_HOST_IP=${host_ip}
 export LLM_SERVER_HOST_IP=${host_ip}
 export TEXT2CYPHER_SERVER_HOST_IP=${host_ip}
-
+export REDIS_SERVER_HOST_IP=${host_ip}
 
 export MEGA_SERVICE_PORT=8888
 export EMBEDDING_SERVER_PORT=6006
@@ -37,6 +36,7 @@ export RETRIEVER_SERVER_PORT=7000
 export RERANK_SERVER_PORT=8808
 export LLM_SERVER_PORT=9009
 export TEXT2CYPHER_SERVER_PORT=11801
+export REDIS_SERVER_PORT=6379
 
 export LLM_ENDPOINT_PORT=8010
 export LLM_ENDPOINT="http://${host_ip}:${LLM_ENDPOINT_PORT}"
@@ -46,9 +46,6 @@ export HYBRIDRAG_FRONTEND_SERVICE_PORT=5173
 export HYBRIDRAG_BACKEND_SERVICE_ENDPOINT=http://${host_ip}:8888/v1/hybridrag
 export NGINX_PORT=80
 export FAQGen_COMPONENT_NAME="OpeaFaqGenvLLM"
-
-#export TAG='comps'
-
 
 export NEO4J_PORT1=7474
 export NEO4J_PORT2=7687

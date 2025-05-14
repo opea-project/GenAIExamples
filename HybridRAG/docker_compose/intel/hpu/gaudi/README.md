@@ -101,12 +101,9 @@ curl -X POST -H "Content-Type: multipart/form-data" \
 ```
 Now test the pipeline using the following command:
 ```bash
-curl -X POST -H "Content-Type: multipart/form-data" \
-    -F "files=@./Diabetes.txt" \
-    -F "files=@./Acne_Vulgaris.txt" \
-    -F "chunk_size=300" \
-    -F "chunk_overlap=20" \
-    http://${host_ip}:6007/v1/dataprep/ingest
+curl -s -X POST -d '{"messages": "what are the symptoms for Diabetes?"}' \
+    -H 'Content-Type: application/json' \
+    "${host_ip}:8888/v1/hybridrag"
 ```
 
 To collect per request latency for the pipeline, run the following: 

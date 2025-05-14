@@ -3,56 +3,17 @@
 # SPDX-License-Identifier: Apache-2.0
 
 set -e
-# set -x
 IMAGE_REPO=${IMAGE_REPO:-"opea"}
 IMAGE_TAG=${IMAGE_TAG:-"latest"}
 echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
 echo "TAG=IMAGE_TAG=${IMAGE_TAG}"
 export REGISTRY=${IMAGE_REPO}
 export TAG=${IMAGE_TAG}
+export MODEL_CACHE=${model_cache:-"./data"}
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
-
-export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
-export RERANK_MODEL_ID="BAAI/bge-reranker-base"
-export LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
-export INDEX_NAME="rag-redis"
-# Set it as a non-null string, such as true, if you want to enable logging facility,
-# otherwise, keep it as "" to disable it.
-export LOGFLAG=""
-# Set OpenTelemetry Tracing Endpoint
-export JAEGER_IP=$(ip route get 8.8.8.8 | grep -oP 'src \K[^ ]+')
-export OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=grpc://$JAEGER_IP:4317
-export TELEMETRY_ENDPOINT=http://$JAEGER_IP:4318/v1/traces
-# Set no proxy
-export no_proxy="$no_proxy,hybridrag-gaudi-ui-server,hybridrag-gaudi-backend-server,dataprep-redis-service,tei-embedding-service,retriever,tei-reranking-service,tgi-service,vllm-service,jaeger,prometheus,grafana,node-exporter,localhost,127.0.0.1,$JAEGER_IP,${host_ip}"
-
-export LLM_ENDPOINT_PORT=8010
-export LLM_SERVER_PORT=9000
-export HYBRIDRAG_BACKEND_PORT=8888
-export HYBRIDRAG_REDIS_VECTOR_PORT=6379
-export HYBRIDRAG_REDIS_VECTOR_INSIGHT_PORT=8001
-export HYBRIDRAG_FRONTEND_SERVICE_PORT=5173
-export NGINX_PORT=80
-export FAQGen_COMPONENT_NAME="OpeaFaqGenvLLM"
-export LLM_ENDPOINT="http://${host_ip}:${LLM_ENDPOINT_PORT}"
-
-export TEXT2CYPHER_PORT=11801
-export TAG='comps'
-#export HUGGINGFACEHUB_API_TOKEN=${HF_TOKEN}
-#export HF_TOKEN=${HF_TOKEN}
-export HF_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
-export host_ip=${ip_address}
-export NEO4J_PORT1=7474
-export NEO4J_PORT2=7687
-export NEO4J_URI="bolt://${host_ip}:${NEO4J_PORT2}"
-export NEO4J_URL="bolt://${host_ip}:${NEO4J_PORT2}"
-export NEO4J_USERNAME="neo4j"
-export NEO4J_PASSWORD="neo4jtest"
-#export no_proxy="localhost,127.0.0.1,"${host_ip}
-export LOGFLAG=True
 
 function build_docker_images() {
     opea_branch=${opea_branch:-"main"}
@@ -77,7 +38,8 @@ function build_docker_images() {
     cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="hybridrag hybridrag-ui dataprep retriever vllm text2cypher nginx"
+    #service_list="hybridrag hybridrag-ui dataprep retriever vllm text2cypher"
+    service_list="hybridrag"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
@@ -87,19 +49,7 @@ function build_docker_images() {
 
 function start_services() {
     cd $WORKPATH/docker_compose/intel/hpu/gaudi
-
-    export LOGFLAG=""
-    export no_proxy="$no_proxy,hybridrag-gaudi-ui-server,hybridrag-gaudi-backend-server,dataprep-redis-service,tei-embedding-service,retriever,tei-reranking-service,tgi-service,vllm-service,jaeger,prometheus,grafana,node-exporter,localhost,127.0.0.1,$JAEGER_IP,${host_ip}"
-
-    export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
-    export RERANK_MODEL_ID="BAAI/bge-reranker-base"
-    export LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
-    export INDEX_NAME="rag-redis"
-    export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
-    export host_ip=${ip_address}
-    export JAEGER_IP=$(ip route get 8.8.8.8 | grep -oP 'src \K[^ ]+')
-    export OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=grpc://$JAEGER_IP:4317
-    export TELEMETRY_ENDPOINT=http://$JAEGER_IP:4318/v1/traces
+    source set_env.sh
 
     # Start Docker Containers
     docker compose -f compose.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
@@ -112,6 +62,19 @@ function start_services() {
         sleep 5s
         n=$((n+1))
     done
+}
+
+function dataprep() { 
+    cd $WORKPATH/tests/data
+    sleep 25s    
+    URL="http://${ip_address}:6007/v1/dataprep/ingest"
+    local CONTENT=$(curl -X POST -H "Content-Type: multipart/form-data" -F "files=@./Diabetes.txt" -F "files=@./Acne_Vulgaris.txt" -F "chunk_size=300" -F "chunk_overlap=20" "$URL")
+    if echo "$CONTENT" | grep -q "Data preparation succeeded"; then
+        echo "Data preparation succeeded."
+    else
+        echo "Data preparation failed."
+        exit 1
+    fi
 }
 
 function validate_service() {
@@ -160,7 +123,7 @@ function validate_microservices() {
     validate_service \
         "${ip_address}:7000/v1/retrieval" \
         " " \
-        "retrieval" \
+        "retriever" \
         "retriever-redis-server" \
         "{\"text\":\"What is the revenue of Nike in 2023?\",\"embedding\":${test_embedding}}"
 
@@ -168,7 +131,7 @@ function validate_microservices() {
     validate_service \
         "${ip_address}:8808/rerank" \
         '{"index":1,"score":' \
-        "tei-rerank" \
+        "tei-reranking-service" \
         "tei-reranking-server" \
         '{"query":"What is Deep Learning?", "texts": ["Deep Learning is not...", "Deep learning is..."]}'
 
@@ -176,7 +139,7 @@ function validate_microservices() {
     validate_service \
         "${ip_address}:9009/v1/chat/completions" \
         "content" \
-        "vllm-llm" \
+        "vllm-service" \
         "vllm-service" \
         '{"model": "meta-llama/Meta-Llama-3-8B-Instruct", "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens": 17}'
 }
@@ -186,7 +149,7 @@ function validate_megaservice() {
     validate_service \
         "${ip_address}:8888/v1/hybridrag" \
         "data" \
-        "mega-hybridrag" \
+        "hybridrag-xeon-backend-server" \
         "hybridrag-xeon-backend-server" \
         '{"messages": "what are the symptoms for Diabetes?"}'
 
@@ -237,8 +200,12 @@ function main() {
     echo "Mega service start duration is $duration s" && sleep 1s
 
     validate_microservices
+    dataprep
     validate_megaservice
     # validate_frontend
+
+    cd $WORKPATH/docker_image_build
+    rm -rf GenAIComps vllm
 
     stop_docker
     echo y | docker system prune
