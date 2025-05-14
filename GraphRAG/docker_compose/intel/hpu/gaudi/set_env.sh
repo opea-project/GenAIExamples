@@ -34,3 +34,4 @@ export MAX_TOTAL_TOKENS=8192
 export DATA_PATH="/mnt/nvme2n1/hf_cache"
 export DATAPREP_PORT=11103
 export RETRIEVER_PORT=11635
+export MEGA_SERVICE_PORT=8888
