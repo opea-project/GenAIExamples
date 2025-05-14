@@ -37,7 +37,7 @@ jobs:
                   url=$(echo "$url_line"|cut -d '(' -f2 | cut -d ')' -f1|sed 's/\.git$//')
                   path=$(echo "$url_line"|cut -d':' -f1 | cut -d'/' -f2-)
                   if [[ "$url" == "https://platform.openai.com/api-keys"* ]]; then
-                    echo "Link "$url" from ${{github.workspace}}/$path need to be verified by a real person."
+                    echo "Link "$url" from ${{github.workspace}}/$path needs to be verified by a real person."
                   else
                     sleep $delay
                     response=$(curl -L -s -o /dev/null -w "%{http_code}" "$url")|| true
