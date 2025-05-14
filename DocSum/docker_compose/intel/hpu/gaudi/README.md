@@ -47,7 +47,7 @@ Some HuggingFace resources, such as some models, are only accessible if you have
 To set up environment variables for deploying DocSum services, source the _set_env.sh_ script in this directory:
 
 ```
-# Please setting your HUGGINGFACE_API_TOKEN.
+# Please set your HUGGINGFACE_API_TOKEN.
 export HUGGINGFACEHUB_API_TOKEN="Your_HuggingFace_API_Token"
 
 source ./set_env.sh
