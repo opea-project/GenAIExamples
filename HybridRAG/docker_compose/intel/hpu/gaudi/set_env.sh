@@ -54,4 +54,3 @@ export NEO4J_URL="bolt://${host_ip}:${NEO4J_PORT2}"
 export NEO4J_USERNAME="neo4j"
 export NEO4J_PASSWORD="neo4jtest"
 export LOGFLAG=True
-

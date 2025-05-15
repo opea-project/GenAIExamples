@@ -63,9 +63,9 @@ function start_services() {
     done
 }
 
-function dataprep() { 
+function dataprep() {
     cd $WORKPATH/tests/data
-    sleep 25s    
+    sleep 25s
     URL="http://${ip_address}:6007/v1/dataprep/ingest"
     local CONTENT=$(curl -X POST -H "Content-Type: multipart/form-data" -F "files=@./Diabetes.txt" -F "files=@./Acne_Vulgaris.txt" -F "chunk_size=300" -F "chunk_overlap=20" "$URL")
     if echo "$CONTENT" | grep -q "Data preparation succeeded"; then
