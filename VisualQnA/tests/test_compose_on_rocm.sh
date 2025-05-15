@@ -17,8 +17,6 @@ export REGISTRY=${IMAGE_REPO}
 export TAG=${IMAGE_TAG}
 export host_ip=${ip_address}
 export MODEL="llava-hf/llava-v1.6-mistral-7b-hf"
-export FRONTEND_SERVICE_PORT=5173
-export BACKEND_SERVICE_PORT=8888
 export PATH="~/miniconda3/bin:$PATH"
 source $WORKPATH/docker_compose/amd/gpu/rocm/set_env.sh
 
