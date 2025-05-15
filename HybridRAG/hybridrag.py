@@ -184,7 +184,7 @@ def align_outputs(self, data, cur_node, inputs, runtime_graph, llm_parameters_di
             reranked_docs.append(docs[best_response["index"]])
 
         unstruct_str = "\n".join(reranked_docs)
-        fused = f"Structured: {struct_str} Unstructured: {unstruct_str}"
+        fused = f"Structured: {structured_result} Unstructured: {unstruct_str}"
 
         # handle template
         # if user provides template, then format the prompt with it
