@@ -156,7 +156,6 @@ def align_outputs(self, data, cur_node, inputs, runtime_graph, llm_parameters_di
         # rerank the inputs with the scores
         reranker_parameters = kwargs.get("reranker_parameters", None)
         prompt = inputs["query"]
-        #structured_result = kwargs.get("structured_result", "")
         hybridrag = kwargs.get("hybridrag", None)
         # retrieve structured from cache
         timeout = 120  # seconds
@@ -183,10 +182,12 @@ def align_outputs(self, data, cur_node, inputs, runtime_graph, llm_parameters_di
         for best_response in data[:top_n]:
             reranked_docs.append(docs[best_response["index"]])
 
+        unstruct_str = "\n".join(reranked_docs)
+        fused = f"Structured: {struct_str} Unstructured: {unstruct_str}"
+
         # handle template
         # if user provides template, then format the prompt with it
         # otherwise, use the default template
-        #prompt = inputs["query"]
         chat_template = llm_parameters_dict["chat_template"]
         if chat_template:
             prompt_template = PromptTemplate.from_template(chat_template)
