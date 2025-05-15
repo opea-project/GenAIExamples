@@ -118,7 +118,7 @@ export cypher_insert='
  MERGE (d)-[:PREVENTION]->(p)
 '
 ```
-If the graph database is already populated, you can skip the knowledge graph generation by setting the refresh_db environment varibale:
+If the graph database is already populated, you can skip the knowledge graph generation by setting the refresh_db environment variable:
 ```bash
 export refresh_db='False'
 ```

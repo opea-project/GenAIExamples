@@ -80,6 +80,8 @@ TEXT2CYPHER_SERVER_HOST_IP = os.getenv("TEXT2CYPHER_SERVER_HOST_IP", "0.0.0.0")
 TEXT2CYPHER_SERVER_PORT = int(os.getenv("TEXT2CYPHER_SERVER_PORT", 11801))
 REDIS_SERVER_HOST_IP = os.getenv("REDIS_SERVER_HOST_IP", "0.0.0.0")
 REDIS_SERVER_PORT = int(os.getenv("REDIS_SERVER_PORT", 6379))
+refresh_db = os.getenv("refresh_db", "True") 
+cypher_insert = os.getenv("cypher_insert", None)
 
 LLM_MODEL = os.getenv("LLM_MODEL", "meta-llama/Meta-Llama-3-8B-Instruct")
 
@@ -255,10 +257,20 @@ class HybridRAGService:
         headers = {
             "Content-Type":     "application/json"
         }
-        data = {
-            "input_text": prompt
-        }
-
+        if refresh_db == "False":
+            data = {
+                "input_text": prompt,
+                "seeding": {"refresh_db": "False"} 
+            }
+        elif cypher_insert is not None:
+            data = {
+                "input_text": prompt,
+                "seeding": {"cypher_insert": "'${cypher_insert}'","refresh_db": "True" }
+            }
+        else:
+            data = {
+                "input_text": prompt
+            }
         response = requests.post(url, json=data)
         data = response.json()
         data_str = str(data)
