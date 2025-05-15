@@ -49,7 +49,7 @@ function start_services() {
     local llm_container_name="$2"
 
     cd $WORKPATH/docker_compose
-    export LLM_MODEL_ID="Qwen/Qwen2.5-Coder-7B-Instruct"
+    export LLM_MODEL_ID="Qwen/Qwen2.5-Coder-32B-Instruct"
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
     export host_ip=${ip_address}
     source set_env.sh
@@ -117,7 +117,7 @@ function validate_microservices() {
         "completion_tokens" \
         "llm-service" \
         "${llm_container_name}" \
-        '{"model": "Qwen/Qwen2.5-Coder-7B-Instruct", "messages": [{"role": "user", "content": "def print_hello_world():"}], "max_tokens": 256}'
+        '{"model": "Qwen/Qwen2.5-Coder-32B-Instruct", "messages": [{"role": "user", "content": "def print_hello_world():"}], "max_tokens": 256}'
 
     # llm microservice
     validate_services \

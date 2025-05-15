@@ -41,6 +41,7 @@ services:
       https_proxy: ${https_proxy}
       HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       host_ip: ${host_ip}
+      VLLM_CPU_KVCACHE_SPACE: 40
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:80/health || exit 1"]
       interval: 10s
