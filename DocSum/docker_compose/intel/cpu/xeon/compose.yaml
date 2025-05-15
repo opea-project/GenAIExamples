@@ -16,7 +16,6 @@ services:
       https_proxy: ${https_proxy}
       HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       LLM_MODEL_ID: ${LLM_MODEL_ID}
-      VLLM_SKIP_WARMUP: ${VLLM_SKIP_WARMUP:-false}
       VLLM_TORCH_PROFILER_DIR: "/mnt"
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:80/health || exit 1"]
