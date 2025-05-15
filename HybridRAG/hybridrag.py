@@ -2,14 +2,14 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import argparse
-import json
 import ast
-import requests
+import asyncio
+import json
 import os
 import re
 import time
-import asyncio
 
+import requests
 from comps import MegaServiceEndpoint, MicroService, ServiceOrchestrator, ServiceRoleType, ServiceType
 from comps.cores.mega.utils import handle_message
 from comps.cores.proto.api_protocol import (
@@ -62,7 +62,7 @@ If you don't know the answer to a question, please don't share false information
 """
         else:
             template = """
-You are a knowledgeable assistant trained to integrate information for both structured and unstructured retrieval results to answer questions in a unified manner. Do not differentiate structured and unstructured information in the answer. Answer the question: {question}. Instructions: Use only the provided structured and unstructured results to answer the question. {context}. 
+You are a knowledgeable assistant trained to integrate information for both structured and unstructured retrieval results to answer questions in a unified manner. Do not differentiate structured and unstructured information in the answer. Answer the question: {question}. Instructions: Use only the provided structured and unstructured results to answer the question. {context}.
 """
         return template.format(context=context_str, question=question)
 
@@ -80,10 +80,11 @@ TEXT2CYPHER_SERVER_HOST_IP = os.getenv("TEXT2CYPHER_SERVER_HOST_IP", "0.0.0.0")
 TEXT2CYPHER_SERVER_PORT = int(os.getenv("TEXT2CYPHER_SERVER_PORT", 11801))
 REDIS_SERVER_HOST_IP = os.getenv("REDIS_SERVER_HOST_IP", "0.0.0.0")
 REDIS_SERVER_PORT = int(os.getenv("REDIS_SERVER_PORT", 6379))
-refresh_db = os.getenv("refresh_db", "True") 
+refresh_db = os.getenv("refresh_db", "True")
 cypher_insert = os.getenv("cypher_insert", None)
 
 LLM_MODEL = os.getenv("LLM_MODEL", "meta-llama/Meta-Llama-3-8B-Instruct")
+
 
 def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **kwargs):
     if self.services[cur_node].service_type == ServiceType.EMBEDDING:
@@ -156,11 +157,11 @@ def align_outputs(self, data, cur_node, inputs, runtime_graph, llm_parameters_di
         # rerank the inputs with the scores
         reranker_parameters = kwargs.get("reranker_parameters", None)
         prompt = inputs["query"]
-        #structured_result = kwargs.get("structured_result", "")
+        # structured_result = kwargs.get("structured_result", "")
         hybridrag = kwargs.get("hybridrag", None)
         # retrieve structured from cache
         timeout = 120  # seconds
-        interval = 1   # polling interval in seconds
+        interval = 1  # polling interval in seconds
         elapsed = 0
 
         retrieved = None
@@ -186,7 +187,7 @@ def align_outputs(self, data, cur_node, inputs, runtime_graph, llm_parameters_di
         # handle template
         # if user provides template, then format the prompt with it
         # otherwise, use the default template
-        #prompt = inputs["query"]
+        # prompt = inputs["query"]
         chat_template = llm_parameters_dict["chat_template"]
         if chat_template:
             prompt_template = PromptTemplate.from_template(chat_template)
@@ -254,23 +255,13 @@ class HybridRAGService:
 
     async def exec_text2cypher(self, prompt):
         url = f"http://{TEXT2CYPHER_SERVER_HOST_IP}:{TEXT2CYPHER_SERVER_PORT}/v1/text2cypher"
-        headers = {
-            "Content-Type":     "application/json"
-        }
+        headers = {"Content-Type": "application/json"}
         if refresh_db == "False":
-            data = {
-                "input_text": prompt,
-                "seeding": {"refresh_db": "False"} 
-            }
+            data = {"input_text": prompt, "seeding": {"refresh_db": "False"}}
         elif cypher_insert is not None:
-            data = {
-                "input_text": prompt,
-                "seeding": {"cypher_insert": "'${cypher_insert}'","refresh_db": "True" }
-            }
+            data = {"input_text": prompt, "seeding": {"cypher_insert": "'${cypher_insert}'", "refresh_db": "True"}}
         else:
-            data = {
-                "input_text": prompt
-            }
+            data = {"input_text": prompt}
         response = requests.post(url, json=data)
         data = response.json()
         data_str = str(data)
@@ -285,7 +276,7 @@ class HybridRAGService:
         substring = data_str[start_index:end_index]
 
         # Clean up the substring
-        structured = ','.join(item.strip().strip("'") for item in substring.split(','))
+        structured = ",".join(item.strip().strip("'") for item in substring.split(","))
 
         # save to cache
         self.cache = structured
@@ -359,22 +350,23 @@ class HybridRAGService:
             body += chunk  # Append each chunk to the body
         return body.decode("utf-8")  # Decode the accumulated byte string to a regular string
 
-
     async def process_prompt(self, prompt, llm_parameters, retriever_parameters, reranker_parameters):
         # Create tasks for concurrent execution
         exec_task = asyncio.create_task(self.exec_text2cypher(prompt))
-        schedule_task = asyncio.create_task(self.megaservice.schedule(
-            initial_inputs={"text": prompt},
-            llm_parameters=llm_parameters,
-            retriever_parameters=retriever_parameters,
-            reranker_parameters=reranker_parameters,
-            hybridrag = self,
-        ))
-    
+        schedule_task = asyncio.create_task(
+            self.megaservice.schedule(
+                initial_inputs={"text": prompt},
+                llm_parameters=llm_parameters,
+                retriever_parameters=retriever_parameters,
+                reranker_parameters=reranker_parameters,
+                hybridrag=self,
+            )
+        )
+
         # Wait for both tasks to complete
         structured_result = await exec_task
         result_dict, runtime_graph = await schedule_task
-    
+
         return result_dict, runtime_graph
 
     async def handle_request(self, request: Request):
@@ -395,7 +387,7 @@ class HybridRAGService:
         stream_opt = data.get("stream", True)
 
         # Validate and parse the chat request data
-        chat_request = ChatCompletionRequest.model_validate(data) #parse_obj(data)
+        chat_request = ChatCompletionRequest.model_validate(data)  # parse_obj(data)
 
         # Handle the chat messages to generate the prompt
         prompt = handle_message(chat_request.messages)
@@ -429,8 +421,9 @@ class HybridRAGService:
             top_n=chat_request.top_n if chat_request.top_n else 1,
         )
 
-        result_dict, runtime_graph = await self.process_prompt(prompt, llm_parameters, 
-            retriever_parameters, reranker_parameters)
+        result_dict, runtime_graph = await self.process_prompt(
+            prompt, llm_parameters, retriever_parameters, reranker_parameters
+        )
         for node, response in result_dict.items():
             if isinstance(response, StreamingResponse):
                 return response
@@ -461,6 +454,7 @@ class HybridRAGService:
 
         self.service.add_route(self.endpoint, self.handle_request, methods=["POST"])
         self.service.start()
+
 
 if __name__ == "__main__":
     hybridrag = HybridRAGService(port=MEGA_SERVICE_PORT)

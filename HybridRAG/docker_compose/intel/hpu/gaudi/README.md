@@ -1,6 +1,6 @@
 # Example HybridRAG deployments on an Intel® Gaudi® Platform
 
-This example covers the single-node on-premises deployment of the HybridRAG example using OPEA components. There are various ways to enable HybridRAG, but this example will focus on four options available for deploying the HybridRAG pipeline to Intel® Gaudi® AI Accelerators. 
+This example covers the single-node on-premises deployment of the HybridRAG example using OPEA components. There are various ways to enable HybridRAG, but this example will focus on four options available for deploying the HybridRAG pipeline to Intel® Gaudi® AI Accelerators.
 
 **Note** This example requires access to a properly installed Intel® Gaudi® platform with a functional Docker service configured to use the habanalabs-container-runtime. Please consult the [Intel® Gaudi® software Installation Guide](https://docs.habana.ai/en/v1.20.0/Installation_Guide/Driver_Installation.html) for more information.
 
@@ -64,6 +64,7 @@ To rebuild the docker image for the hybridrag-xeon-backend-server container:
 cd GenAIExamples/HybridRAG
 docker build --no-cache -t opea/hybridrag:latest -f Dockerfile .
 ```
+
 ### Check the Deployment Status
 
 After running docker compose, check if all the containers launched via docker compose have started:
@@ -90,6 +91,7 @@ a9dbf8a13365   opea/vllm:latest                                                 
 ### Test the Pipeline
 
 Once the HybridRAG services are running, run data ingestion. The following command is ingesting unstructure data:
+
 ```bash
 cd GenAIExamples/HybridRAG/tests
 curl -X POST -H "Content-Type: multipart/form-data" \
@@ -99,8 +101,10 @@ curl -X POST -H "Content-Type: multipart/form-data" \
     -F "chunk_overlap=20" \
     http://${host_ip}:6007/v1/dataprep/ingest
 ```
-By default, the application is pre-seeded with structured data and schema. To create knowledge graph with custom data and schema, 
-set the cypher_insert environment variable prior to application deployment. Below is an example: 
+
+By default, the application is pre-seeded with structured data and schema. To create knowledge graph with custom data and schema,
+set the cypher_insert environment variable prior to application deployment. Below is an example:
+
 ```bash
 export cypher_insert='
  LOAD CSV WITH HEADERS FROM "https://docs.google.com/spreadsheets/d/e/2PACX-1vQCEUxVlMZwwI2sn2T1aulBrRzJYVpsM9no8AEsYOOklCDTljoUIBHItGnqmAez62wwLpbvKMr7YoHI/pub?gid=0&single=true&output=csv" AS rows
@@ -118,18 +122,23 @@ export cypher_insert='
  MERGE (d)-[:PREVENTION]->(p)
 '
 ```
+
 If the graph database is already populated, you can skip the knowledge graph generation by setting the refresh_db environment variable:
+
 ```bash
 export refresh_db='False'
 ```
+
 Now test the pipeline using the following command:
+
 ```bash
 curl -s -X POST -d '{"messages": "what are the symptoms for Diabetes?"}' \
     -H 'Content-Type: application/json' \
     "${host_ip}:8888/v1/hybridrag"
 ```
 
-To collect per request latency for the pipeline, run the following: 
+To collect per request latency for the pipeline, run the following:
+
 ```bash
 curl -o /dev/null -s -w "Total Time: %{time_total}s\n" \
     -X POST \
@@ -149,4 +158,3 @@ docker compose -f compose.yaml down
 ```
 
 All the HybridRAG containers will be stopped and then removed on completion of the "down" command.
-

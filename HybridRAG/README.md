@@ -93,7 +93,6 @@ flowchart LR
 
 ```
 
-## Deployment 
+## Deployment
 
 [HybridRAG deployment on Intel Gaudi](./docker_compose/intel/hpu/gaudi/README.md)
-
