@@ -7,6 +7,8 @@ import ast
 import requests
 import os
 import re
+import time
+import asyncio
 
 from comps import MegaServiceEndpoint, MicroService, ServiceOrchestrator, ServiceRoleType, ServiceType
 from comps.cores.mega.utils import handle_message
@@ -76,6 +78,9 @@ LLM_SERVER_HOST_IP = os.getenv("LLM_SERVER_HOST_IP", "0.0.0.0")
 LLM_SERVER_PORT = int(os.getenv("LLM_SERVER_PORT", 80))
 TEXT2CYPHER_SERVER_HOST_IP = os.getenv("TEXT2CYPHER_SERVER_HOST_IP", "0.0.0.0")
 TEXT2CYPHER_SERVER_PORT = int(os.getenv("TEXT2CYPHER_SERVER_PORT", 11801))
+REDIS_SERVER_HOST_IP = os.getenv("REDIS_SERVER_HOST_IP", "0.0.0.0")
+REDIS_SERVER_PORT = int(os.getenv("REDIS_SERVER_PORT", 6379))
+
 LLM_MODEL = os.getenv("LLM_MODEL", "meta-llama/Meta-Llama-3-8B-Instruct")
 
 def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **kwargs):
@@ -148,7 +153,28 @@ def align_outputs(self, data, cur_node, inputs, runtime_graph, llm_parameters_di
     elif self.services[cur_node].service_type == ServiceType.RERANK:
         # rerank the inputs with the scores
         reranker_parameters = kwargs.get("reranker_parameters", None)
-        structured_result = kwargs.get("structured_result", "")
+        prompt = inputs["query"]
+        #structured_result = kwargs.get("structured_result", "")
+        hybridrag = kwargs.get("hybridrag", None)
+        # retrieve structured from cache
+        timeout = 120  # seconds
+        interval = 1   # polling interval in seconds
+        elapsed = 0
+
+        retrieved = None
+        structured_result = ""
+        while elapsed < timeout:
+            retrieved = hybridrag.cache
+            if retrieved is not None:
+                break
+            time.sleep(interval)
+            elapsed += interval
+        if retrieved:
+            structured_result = retrieved
+
+            # reset the cache
+            hybridrag.cache = None
+
         top_n = reranker_parameters.top_n if reranker_parameters else 1
         docs = inputs["texts"]
         reranked_docs = []
@@ -158,7 +184,7 @@ def align_outputs(self, data, cur_node, inputs, runtime_graph, llm_parameters_di
         # handle template
         # if user provides template, then format the prompt with it
         # otherwise, use the default template
-        prompt = inputs["query"]
+        #prompt = inputs["query"]
         chat_template = llm_parameters_dict["chat_template"]
         if chat_template:
             prompt_template = PromptTemplate.from_template(chat_template)
@@ -217,13 +243,14 @@ class HybridRAGService:
     def __init__(self, host="0.0.0.0", port=8000):
         self.host = host
         self.port = port
+        self.cache = None
         ServiceOrchestrator.align_inputs = align_inputs
         ServiceOrchestrator.align_outputs = align_outputs
         ServiceOrchestrator.align_generator = align_generator
         self.megaservice = ServiceOrchestrator()
         self.endpoint = str(MegaServiceEndpoint.HYBRID_RAG)
 
-    def exec_text2cypher(self, prompt):
+    async def exec_text2cypher(self, prompt):
         url = f"http://{TEXT2CYPHER_SERVER_HOST_IP}:{TEXT2CYPHER_SERVER_PORT}/v1/text2cypher"
         headers = {
             "Content-Type":     "application/json"
@@ -233,8 +260,24 @@ class HybridRAGService:
         }
 
         response = requests.post(url, json=data)
-        return response
+        data = response.json()
+        data_str = str(data)
+        start_marker = "['"
+        end_marker = "']"
 
+        # Find the start and end indices
+        start_index = data_str.find(start_marker) + len(start_marker)  # Move past the start marker
+        end_index = data_str.find(end_marker, start_index)  # Find the end marker
+
+        # Extract the substring
+        substring = data_str[start_index:end_index]
+
+        # Clean up the substring
+        structured = ','.join(item.strip().strip("'") for item in substring.split(','))
+
+        # save to cache
+        self.cache = structured
+        return structured
 
     def add_remote_service(self):
 
@@ -304,6 +347,24 @@ class HybridRAGService:
             body += chunk  # Append each chunk to the body
         return body.decode("utf-8")  # Decode the accumulated byte string to a regular string
 
+
+    async def process_prompt(self, prompt, llm_parameters, retriever_parameters, reranker_parameters):
+        # Create tasks for concurrent execution
+        exec_task = asyncio.create_task(self.exec_text2cypher(prompt))
+        schedule_task = asyncio.create_task(self.megaservice.schedule(
+            initial_inputs={"text": prompt},
+            llm_parameters=llm_parameters,
+            retriever_parameters=retriever_parameters,
+            reranker_parameters=reranker_parameters,
+            hybridrag = self,
+        ))
+    
+        # Wait for both tasks to complete
+        structured_result = await exec_task
+        result_dict, runtime_graph = await schedule_task
+    
+        return result_dict, runtime_graph
+
     async def handle_request(self, request: Request):
         """Handles the incoming request, processes it through the appropriate microservices,
         and returns the response.
@@ -329,7 +390,7 @@ class HybridRAGService:
 
         # Define the LLM parameters
         llm_parameters = LLMParams(
-            max_tokens=chat_request.max_tokens if chat_request.max_tokens else 1024,
+            max_tokens=chat_request.max_tokens if chat_request.max_tokens else 2048,
             top_k=chat_request.top_k if chat_request.top_k else 10,
             top_p=chat_request.top_p if chat_request.top_p else 0.95,
             temperature=chat_request.temperature if chat_request.temperature else 0.01,
@@ -356,32 +417,8 @@ class HybridRAGService:
             top_n=chat_request.top_n if chat_request.top_n else 1,
         )
 
-        structured = ""
-        structured_result = self.exec_text2cypher(prompt) 
-        data = structured_result.json()
-        data_str = str(data)
-        start_marker = "['"
-        end_marker = "']"
-
-        # Find the start and end indices
-        start_index = data_str.find(start_marker) + len(start_marker)  # Move past the start marker
-        end_index = data_str.find(end_marker, start_index)  # Find the end marker
-
-        # Extract the substring
-        substring = data_str[start_index:end_index]
-
-        # Clean up the substring
-        structured = ','.join(item.strip().strip("'") for item in substring.split(','))
-
-        initial_inputs={"text": prompt}
-        result_dict, runtime_graph = await self.megaservice.schedule(
-            initial_inputs=initial_inputs,
-            llm_parameters=llm_parameters,
-            retriever_parameters=retriever_parameters,
-            reranker_parameters=reranker_parameters,
-            structured_result = structured,
-        )
-
+        result_dict, runtime_graph = await self.process_prompt(prompt, llm_parameters, 
+            retriever_parameters, reranker_parameters)
         for node, response in result_dict.items():
             if isinstance(response, StreamingResponse):
                 return response

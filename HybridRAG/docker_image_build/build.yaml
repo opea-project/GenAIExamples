@@ -13,15 +13,9 @@ services:
       context: ../
       dockerfile: ./Dockerfile
     image: ${REGISTRY:-opea}/hybridrag:${TAG:-latest}
-#  hybridrag-ui:
-#    build:
-#      context: ../ui
-#      dockerfile: ./docker/Dockerfile
-#    extends: hybridrag
-#    image: ${REGISTRY:-opea}/hybridrag-ui:${TAG:-latest}
-#  text2cypher:
-#    build:
-#      context: GenAIComps
-#      dockerfile: comps/text2cypher/src/Dockerfile.intel_hpu
-#    extends: hybridrag
-#    image: ${REGISTRY:-opea}/text2cypher:${TAG:-latest}
+  hybridrag-ui:
+    build:
+      context: ../ui
+      dockerfile: ./docker/Dockerfile
+    extends: hybridrag
+    image: ${REGISTRY:-opea}/hybridrag-ui:${TAG:-latest}

@@ -32,11 +32,6 @@ services:
     cap_add:
       - SYS_NICE
     restart: unless-stopped
-#  struct2graph:
-#    image: ${REGISTRY:-opea}/struct2graph:${TAG:-latest}
-#    container_name: struct2graph
-#    ports:
-#      - "9090:9090"
   neo4j-apoc:
     image: neo4j:latest
     container_name: neo4j-apoc
@@ -207,7 +202,7 @@ services:
     ipc: host
     restart: always
   hybridrag-xeon-ui-server:
-    image: ${REGISTRY:-opea}/chatqna-ui:${TAG:-latest}
+    image: ${REGISTRY:-opea}/hybridrag-ui:${TAG:-latest}
     container_name: hybridrag-xeon-ui-server
     depends_on:
       - hybridrag-xeon-backend-server

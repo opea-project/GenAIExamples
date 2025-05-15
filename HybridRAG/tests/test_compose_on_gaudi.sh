@@ -38,8 +38,7 @@ function build_docker_images() {
     cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    #service_list="hybridrag hybridrag-ui dataprep retriever vllm text2cypher"
-    service_list="hybridrag"
+    service_list="hybridrag hybridrag-ui"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
@@ -202,7 +201,7 @@ function main() {
     validate_microservices
     dataprep
     validate_megaservice
-    # validate_frontend
+    validate_frontend
 
     cd $WORKPATH/docker_image_build
     rm -rf GenAIComps vllm
