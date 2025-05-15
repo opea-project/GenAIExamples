@@ -117,7 +117,7 @@ repos:
     rev: v2.4.1
     hooks:
       - id: codespell
-        args: [-w]
+        args: [-w, --skip="*.txt"]
         additional_dependencies:
           - tomli
 
