@@ -204,7 +204,7 @@ jobs:
           if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid && sleep 1s; fi
 
           echo "Cleaning up images ..."
-          df -h 
+          df -h
           sleep 1
           docker system df
           sleep 1
@@ -220,7 +220,7 @@ jobs:
           sleep 5
           docker images
           sleep 1
-          df -h 
+          df -h
           sleep 1
           docker system df
           sleep 1
