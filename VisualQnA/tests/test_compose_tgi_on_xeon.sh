@@ -200,7 +200,7 @@ function validate_frontend() {
 
 function stop_docker() {
     cd $WORKPATH/docker_compose/intel/cpu/xeon/
-    docker compose stop && docker compose rm -f
+    docker compose -f compose_tgi.yaml down
 }
 
 function main() {
