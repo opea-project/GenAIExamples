@@ -25,6 +25,10 @@ ip_address=$(hostname -I | awk '{print $1}')
 function build_docker_images() {
     cd $WORKPATH/docker_image_build
     git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
+    pushd GenAIComps
+    echo "GenAIComps test commit is $(git rev-parse HEAD)"
+    docker build --no-cache -t ${REGISTRY}/comps-base:${TAG} --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
+    popd && sleep 1s
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
     service_list="avatarchatbot whisper asr speecht5 tts wav2lip animation"
@@ -138,11 +142,6 @@ function validate_megaservice() {
 }
 
 
-#function validate_frontend() {
-
-#}
-
-
 function stop_docker() {
     cd $WORKPATH/docker_compose/amd/gpu/rocm
     docker compose down && docker compose rm -f
@@ -151,19 +150,27 @@ function stop_docker() {
 
 function main() {
 
-    echo $OPENAI_API_KEY
-    echo $OPENAI_KEY
-
+    echo "::group::stop_docker"
     stop_docker
+    echo "::endgroup::"
+
+    echo "::group::build_docker_images"
     if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
-    start_services
-    # validate_microservices
-    sleep 30
-    validate_megaservice
-    # validate_frontend
-    stop_docker
+    echo "::endgroup::"
 
-    echo y | docker system prune
+    echo "::group::start_services"
+    start_services
+    echo "::endgroup::"
+
+    echo "::group::validate_megaservice"
+    validate_megaservice
+    echo "::endgroup::"
+
+    echo "::group::stop_docker"
+    stop_docker
+    echo "::endgroup::"
+
+    docker system prune -f
 
 }
 
