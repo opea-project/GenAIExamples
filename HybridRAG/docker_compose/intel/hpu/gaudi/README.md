@@ -89,7 +89,7 @@ a9dbf8a13365   opea/vllm:latest                                                 
 
 ### Test the Pipeline
 
-Once the HybridRAG services are running, run data ingestion. The following command is ingesting sample data:
+Once the HybridRAG services are running, run data ingestion. The following command is ingesting unstructure data:
 ```bash
 cd GenAIExamples/HybridRAG/tests
 curl -X POST -H "Content-Type: multipart/form-data" \
@@ -98,6 +98,29 @@ curl -X POST -H "Content-Type: multipart/form-data" \
     -F "chunk_size=300" \
     -F "chunk_overlap=20" \
     http://${host_ip}:6007/v1/dataprep/ingest
+```
+By default, the application is pre-seeded with structured data and schema. To create knowledge graph with custom data and schema, 
+set the cypher_insert environment variable prior to application deployment. Below is an example: 
+```bash
+export cypher_insert='
+ LOAD CSV WITH HEADERS FROM "https://docs.google.com/spreadsheets/d/e/2PACX-1vQCEUxVlMZwwI2sn2T1aulBrRzJYVpsM9no8AEsYOOklCDTljoUIBHItGnqmAez62wwLpbvKMr7YoHI/pub?gid=0&single=true&output=csv" AS rows
+ MERGE (d:disease {name:rows.Disease})
+ MERGE (dt:diet {name:rows.Diet})
+ MERGE (d)-[:HOME_REMEDY]->(dt)
+
+ MERGE (m:medication {name:rows.Medication})
+ MERGE (d)-[:TREATMENT]->(m)
+
+ MERGE (s:symptoms {name:rows.Symptom})
+ MERGE (d)-[:MANIFESTATION]->(s)
+
+ MERGE (p:precaution {name:rows.Precaution})
+ MERGE (d)-[:PREVENTION]->(p)
+'
+```
+If the graph database is already populated, you can skip the knowledge graph generation by setting the refresh_db environment varibale:
+```bash
+export refresh_db='False'
 ```
 Now test the pipeline using the following command:
 ```bash
