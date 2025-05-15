@@ -42,7 +42,7 @@ function build_docker_images() {
 
 function start_services() {
     cd $WORKPATH/docker_compose/amd/gpu/rocm
-
+    export OPENAI_API_KEY=$OPENAI_API_KEY
     source set_env.sh
 
     # Start Docker Containers
