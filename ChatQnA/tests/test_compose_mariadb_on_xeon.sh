@@ -1,8 +1,8 @@
 #!/bin/bash
-# Copyright (C) 2024 Intel Corporation
+# Copyright (C) 2025 MariaDB Foundation
 # SPDX-License-Identifier: Apache-2.0
 
-set -xe
+set -e
 IMAGE_REPO=${IMAGE_REPO:-"opea"}
 IMAGE_TAG=${IMAGE_TAG:-"latest"}
 echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
@@ -17,55 +17,51 @@ ip_address=$(hostname -I | awk '{print $1}')
 
 function build_docker_images() {
     opea_branch=${opea_branch:-"main"}
-
     cd $WORKPATH/docker_image_build
     git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
     pushd GenAIComps
     echo "GenAIComps test commit is $(git rev-parse HEAD)"
     docker build --no-cache -t ${REGISTRY}/comps-base:${TAG} --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
     popd && sleep 1s
-
     git clone https://github.com/vllm-project/vllm.git && cd vllm
     VLLM_VER="v0.8.3"
     echo "Check out vLLM tag ${VLLM_VER}"
     git checkout ${VLLM_VER} &> /dev/null
+    # make sure NOT change the pwd
     cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="codetrans codetrans-ui llm-textgen vllm nginx"
+    service_list="chatqna chatqna-ui dataprep retriever vllm nginx"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker images && sleep 1s
 }
 
 function start_services() {
-    cd $WORKPATH/docker_compose
+    cd $WORKPATH/docker_compose/intel/cpu/xeon
+    export MARIADB_DATABASE="vectordb"
+    export MARIADB_USER="chatqna"
+    export MARIADB_PASSWORD="test"
+    export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
+    export RERANK_MODEL_ID="BAAI/bge-reranker-base"
+    export LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
-
-    export NGINX_PORT=80
     export host_ip=${ip_address}
-    source set_env.sh
-    cd intel/cpu/xeon/
-
-    sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
     # Start Docker Containers
-    docker compose -f compose.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
-
+    docker compose -f compose_mariadb.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
     n=0
     until [[ "$n" -ge 100 ]]; do
-        docker logs codetrans-xeon-vllm-service > ${LOG_PATH}/vllm_service_start.log 2>&1
+        docker logs vllm-service > ${LOG_PATH}/vllm_service_start.log 2>&1
         if grep -q complete ${LOG_PATH}/vllm_service_start.log; then
             break
         fi
         sleep 5s
         n=$((n+1))
     done
-
-    sleep 1m
 }
 
-function validate_services() {
+function validate_service() {
     local URL="$1"
     local EXPECTED_RESULT="$2"
     local SERVICE_NAME="$3"
@@ -90,70 +86,61 @@ function validate_services() {
         docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
         exit 1
     fi
-    sleep 5s
+    sleep 1s
 }
 
 function validate_microservices() {
-    # llm microservice
-    validate_services \
-        "${ip_address}:9000/v1/chat/completions" \
-        "data: " \
-        "llm" \
-        "codetrans-xeon-llm-server" \
-        '{"query":"    ### System: Please translate the following Golang codes into  Python codes.    ### Original codes:    '\'''\'''\''Golang    \npackage main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n    '\'''\'''\''    ### Translated codes:"}'
+    # Check if the microservices are running correctly.
+    sleep 3m
 
+    # tei for embedding service
+    validate_service \
+        "${ip_address}:6006/embed" \
+        "\[\[" \
+        "tei-embedding" \
+        "tei-embedding-server" \
+        '{"inputs":"What is Deep Learning?"}'
+
+    # retrieval microservice
+    test_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
+    validate_service \
+        "${ip_address}:7000/v1/retrieval" \
+        " " \
+        "retrieval" \
+        "retriever-mariadb-vector" \
+        "{\"text\":\"What is the revenue of Nike in 2023?\",\"embedding\":${test_embedding}}"
+
+    # tei for rerank microservice
+    validate_service \
+        "${ip_address}:8808/rerank" \
+        '{"index":1,"score":' \
+        "tei-rerank" \
+        "tei-reranking-server" \
+        '{"query":"What is Deep Learning?", "texts": ["Deep Learning is not...", "Deep learning is..."]}'
+
+    # vllm for llm service
+    validate_service \
+        "${ip_address}:9009/v1/chat/completions" \
+        "content" \
+        "vllm-llm" \
+        "vllm-service" \
+        '{"model": "meta-llama/Meta-Llama-3-8B-Instruct", "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens": 17}'
 }
 
 function validate_megaservice() {
     # Curl the Mega Service
-    validate_services \
-        "${ip_address}:${BACKEND_SERVICE_PORT}/v1/codetrans" \
-        "print" \
-        "mega-codetrans" \
-        "codetrans-xeon-backend-server" \
-        '{"language_from": "Golang","language_to": "Python","source_code": "package main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n}"}'
+    validate_service \
+        "${ip_address}:8888/v1/chatqna" \
+        "Nike" \
+        "mega-chatqna" \
+        "chatqna-xeon-backend-server" \
+        '{"messages": "What is the revenue of Nike in 2023?"}'
 
-    # test the megeservice via nginx
-    validate_services \
-        "${ip_address}:${NGINX_PORT}/v1/codetrans" \
-        "print" \
-        "mega-codetrans-nginx" \
-        "codetrans-xeon-nginx-server" \
-        '{"language_from": "Golang","language_to": "Python","source_code": "package main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n}"}'
-
-}
-
-function validate_frontend() {
-    cd $WORKPATH/ui/svelte
-    local conda_env_name="OPEA_e2e"
-    export PATH=${HOME}/miniforge3/bin/:$PATH
-    if conda info --envs | grep -q "$conda_env_name"; then
-        echo "$conda_env_name exist!"
-    else
-        conda create -n ${conda_env_name} python=3.12 -y
-    fi
-    source activate ${conda_env_name}
-
-    sed -i "s/localhost/$ip_address/g" playwright.config.ts
-
-    conda install -c conda-forge nodejs=22.6.0 -y
-    npm install && npm ci && npx playwright install --with-deps
-    node -v && npm -v && pip list
-
-    exit_status=0
-    npx playwright test || exit_status=$?
-
-    if [ $exit_status -ne 0 ]; then
-        echo "[TEST INFO]: ---------frontend test failed---------"
-        exit $exit_status
-    else
-        echo "[TEST INFO]: ---------frontend test passed---------"
-    fi
 }
 
 function stop_docker() {
-    cd $WORKPATH/docker_compose/intel/cpu/xeon/
-    docker compose -f compose.yaml stop && docker compose rm -f
+    cd $WORKPATH/docker_compose/intel/cpu/xeon
+    docker compose down
 }
 
 function main() {
@@ -176,10 +163,6 @@ function main() {
 
     echo "::group::validate_megaservice"
     validate_megaservice
-    echo "::endgroup::"
-
-    echo "::group::validate_frontend"
-    validate_frontend
     echo "::endgroup::"
 
     echo "::group::stop_docker"
