@@ -4,7 +4,6 @@
 services:
   text2cypher-gaudi:
     image: ${REGISTRY:-opea}/text2cypher-gaudi:${TAG:-latest}
-    #image: opea/text2cypher-gaudi:${TAG:-latest}
     container_name: text2cypher-gaudi-container
     ports:
       - ${TEXT2CYPHER_SERVER_PORT:-9097}:9097
