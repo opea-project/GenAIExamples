@@ -3,7 +3,7 @@
 
 #export LLM_MODEL_ID="meta-llama/Llama-3.3-70B-Instruct"
 export LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
-#export MAX_LEN=16384
-export MAX_LEN=8192
+export MAX_LEN=16384
+#export MAX_LEN=8192
 
 docker compose -f vllm_compose.yaml up -d
