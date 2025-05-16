@@ -24,15 +24,13 @@ function build_docker_images() {
     docker build --no-cache -t ${REGISTRY}/comps-base:${TAG} --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
     popd && sleep 1s
     git clone https://github.com/HabanaAI/vllm-fork.git && cd vllm-fork
-    VLLM_VER=v0.6.6.post1+Gaudi-1.20.0
-    git checkout ${VLLM_VER} &> /dev/null && cd ../
+    VLLM_FORK_VER=v0.6.6.post1+Gaudi-1.20.0
+    git checkout ${VLLM_FORK_VER} &> /dev/null && cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
     service_list="chatqna chatqna-ui dataprep retriever llm-faqgen vllm-gaudi nginx"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
-    docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.6
-    docker pull ghcr.io/huggingface/tei-gaudi:1.5.0
     docker images && sleep 1s
 }
 

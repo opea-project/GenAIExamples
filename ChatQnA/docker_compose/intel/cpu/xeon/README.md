@@ -156,6 +156,7 @@ In the context of deploying a ChatQnA pipeline on an Intel® Xeon® platform, we
 | [compose_faqgen_tgi.yaml](./compose_faqgen_tgi.yaml)         | Enables FAQ generation using TGI as the LLM serving framework. For more details, refer to [README_faqgen.md](./README_faqgen.md).                                     |
 | [compose.telemetry.yaml](./compose.telemetry.yaml)           | Helper file for telemetry features for vllm. Can be used along with any compose files that serves vllm                                                                |
 | [compose_tgi.telemetry.yaml](./compose_tgi.telemetry.yaml)   | Helper file for telemetry features for tgi. Can be used along with any compose files that serves tgi                                                                  |
+| [compose_mariadb.yaml](./compose_mariadb.yaml)               | Uses MariaDB Server as the vector database. All other configurations remain the same as the default                                                                   |
 
 ## ChatQnA with Conversational UI (Optional)
 
