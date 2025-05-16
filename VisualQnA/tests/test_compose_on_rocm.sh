@@ -15,26 +15,10 @@ ip_address=$(hostname -I | awk '{print $1}')
 export MODEL_CACHE=${model_cache:-"/var/lib/GenAI/data"}
 export REGISTRY=${IMAGE_REPO}
 export TAG=${IMAGE_TAG}
-export HOST_IP=${ip_address}
-export VISUALQNA_TGI_SERVICE_PORT="8399"
-export VISUALQNA_HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
-export VISUALQNA_CARD_ID="card1"
-export VISUALQNA_RENDER_ID="renderD136"
-export LVM_MODEL_ID="Xkev/Llama-3.2V-11B-cot"
+export host_ip=${ip_address}
 export MODEL="llava-hf/llava-v1.6-mistral-7b-hf"
-export LVM_ENDPOINT="http://${HOST_IP}:8399"
-export LVM_SERVICE_PORT=9399
-export MEGA_SERVICE_HOST_IP=${HOST_IP}
-export LVM_SERVICE_HOST_IP=${HOST_IP}
-export BACKEND_SERVICE_ENDPOINT="http://${HOST_IP}:${BACKEND_SERVICE_PORT}/v1/visualqna"
-export FRONTEND_SERVICE_IP=${HOST_IP}
-export FRONTEND_SERVICE_PORT=5173
-export BACKEND_SERVICE_NAME=visualqna
-export BACKEND_SERVICE_IP=${HOST_IP}
-export BACKEND_SERVICE_PORT=8888
-export NGINX_PORT=18003
 export PATH="~/miniconda3/bin:$PATH"
-export MODEL_CACHE=${model_cache:-"/var/opea/multimodalqna-service/data"}
+source $WORKPATH/docker_compose/amd/gpu/rocm/set_env.sh
 
 function build_docker_images() {
     opea_branch=${opea_branch:-"main"}

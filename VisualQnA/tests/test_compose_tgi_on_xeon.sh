@@ -34,20 +34,10 @@ function build_docker_images() {
 function start_services() {
     cd $WORKPATH/docker_compose/intel/cpu/xeon/
 
-    export LVM_MODEL_ID="llava-hf/llava-v1.6-mistral-7b-hf"
-    export LVM_ENDPOINT="http://${ip_address}:8399"
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
-    export LVM_SERVICE_PORT=9399
-    export MEGA_SERVICE_HOST_IP=${ip_address}
-    export LVM_SERVICE_HOST_IP=${ip_address}
-    export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:8888/v1/visualqna"
-    export FRONTEND_SERVICE_IP=${ip_address}
-    export FRONTEND_SERVICE_PORT=5173
-    export BACKEND_SERVICE_NAME=visualqna
-    export BACKEND_SERVICE_IP=${ip_address}
-    export BACKEND_SERVICE_PORT=8888
     export NGINX_PORT=80
     export host_ip=${ip_address}
+    source ./set_env.sh
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
