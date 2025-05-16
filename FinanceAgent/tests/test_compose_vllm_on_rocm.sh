@@ -11,6 +11,8 @@ LOG_PATH=$WORKPATH
 
 #### env vars for LLM endpoint #############
 model=meta-llama/Llama-3.3-70B-Instruct
+export LLM_MODEL_ID="meta-llama/Llama-3.3-70B-Instruct"
+export MAX_LEN=16384
 vllm_image=opea/vllm-rocm:latest
 vllm_port=8086
 vllm_image=$vllm_image
@@ -52,7 +54,7 @@ function build_agent_image_local(){
 }
 
 function start_vllm_service {
-    echo "start vllm gaudi service"
+    echo "start vllm service"
     docker compose -f $WORKPATH/docker_compose/amd/gpu/rocm/compose_vllm.yaml up -d
     sleep 1m
     echo "Waiting vllm rocm ready"
