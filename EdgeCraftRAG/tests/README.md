@@ -11,11 +11,11 @@ export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
 On Intel ARC with TGI:
 
 ```bash
-bash test_compose_on_rocm.sh
+bash test_compose_on_arc.sh
 ```
 
 On Intel ARC with vLLM:
 
 ```bash
-bash test_compose_vllm_on_rocm.sh
+bash test_compose_vllm_on_arc.sh
 ```
