@@ -14,7 +14,7 @@ export recursion_limit_supervisor=10
 
 export vllm_port=8086
 export FINANCEAGENT_VLLM_SERVICE_PORT=${vllm_port}
-export LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
+export LLM_MODEL_ID="meta-llama/Llama-3.3-70B-Instruct"
 export LLM_ENDPOINT_URL="http://${ip_address}:${vllm_port}"
 export TEMPERATURE=0.5
 export MAX_TOKENS=4096

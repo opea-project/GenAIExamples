@@ -14,7 +14,8 @@ model=meta-llama/Llama-3.3-70B-Instruct
 export LLM_MODEL_ID=$model
 export MAX_LEN=16384
 vllm_image=opea/vllm-rocm:latest
-vllm_port=8081
+vllm_port=8086
+export FINANCEAGENT_VLLM_SERVICE_PORT=$vllm_port
 vllm_image=$vllm_image
 HF_CACHE_DIR=${model_cache:-"./data"}
 vllm_volume=${HF_CACHE_DIR}
@@ -163,8 +164,8 @@ function validate_agent_service() {
     echo $EXIT_CODE
     local EXIT_CODE="${EXIT_CODE:0-1}"
     if [ "$EXIT_CODE" == "1" ]; then
-	docker logs research-agent-endpoint
-	exit 1
+	  docker logs research-agent-endpoint
+	  exit 1
     fi
 
     # test supervisor react agent
