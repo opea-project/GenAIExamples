@@ -43,34 +43,13 @@ function build_docker_images() {
 
 function start_services() {
 
-    cd $WORKPATH/docker_compose/intel/hpu/gaudi
-    export GOOGLE_CSE_ID=$GOOGLE_CSE_ID
-    export GOOGLE_API_KEY=$GOOGLE_API_KEY
-    export HUGGINGFACEHUB_API_TOKEN=$HUGGINGFACEHUB_API_TOKEN
-
-    export EMBEDDING_MODEL_ID=BAAI/bge-base-en-v1.5
-    export TEI_EMBEDDING_ENDPOINT=http://$ip_address:3001
-    export RERANK_MODEL_ID=BAAI/bge-reranker-base
+    cd $WORKPATH/docker_compose/intel/
     export RERANK_TYPE="tei"
-    export TEI_RERANKING_ENDPOINT=http://$ip_address:3004
-
-    export TGI_LLM_ENDPOINT=http://$ip_address:3006
-    export LLM_MODEL_ID=Intel/neural-chat-7b-v3-3
-
-    export MEGA_SERVICE_HOST_IP=${ip_address}
-    export EMBEDDING_SERVICE_HOST_IP=${ip_address}
-    export WEB_RETRIEVER_SERVICE_HOST_IP=${ip_address}
-    export RERANK_SERVICE_HOST_IP=${ip_address}
-    export LLM_SERVICE_HOST_IP=${ip_address}
-
-    export EMBEDDING_SERVICE_PORT=3002
-    export WEB_RETRIEVER_SERVICE_PORT=3003
-    export RERANK_SERVICE_PORT=3005
-    export LLM_SERVICE_PORT=3007
     export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:3008/v1/searchqna"
     export host_ip=${ip_address}
     export LOGFLAG=true
-
+    source ./set_env.sh
+    cd hpu/gaudi
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
