@@ -11,12 +11,12 @@ LOG_PATH=$WORKPATH
 
 #### env vars for LLM endpoint #############
 model=meta-llama/Llama-3.3-70B-Instruct
-export LLM_MODEL_ID="meta-llama/Llama-3.3-70B-Instruct"
+export LLM_MODEL_ID=$model
 export MAX_LEN=16384
 vllm_image=opea/vllm-rocm:latest
-vllm_port=8086
+vllm_port=8081
 vllm_image=$vllm_image
-HF_CACHE_DIR=${model_cache:-"/data2/huggingface"}
+HF_CACHE_DIR=${model_cache:-"./data"}
 vllm_volume=${HF_CACHE_DIR}
 #######################################
 
