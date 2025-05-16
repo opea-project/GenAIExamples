@@ -101,9 +101,9 @@ curl -X POST -H "Content-Type: multipart/form-data" \
     -F "chunk_overlap=20" \
     http://${host_ip}:6007/v1/dataprep/ingest
 ```
+The data files (Diabetes.txt and Acne_Vulgaris.txt) are samples downloaded from Wikipedia, and they are here to facilitate the pipeline tests. Users are encouraged to download their own datasets, and the command above should be updated with the proper file names.
 
-By default, the application is pre-seeded with structured data and schema. To create knowledge graph with custom data and schema,
-set the cypher_insert environment variable prior to application deployment. Below is an example:
+As for the structured data, the application is pre-seeded with structured data and schema by default. To create a knowledge graph with custom data and schema, set the cypher_insert environment variable prior to application deployment.
 
 ```bash
 export cypher_insert='
