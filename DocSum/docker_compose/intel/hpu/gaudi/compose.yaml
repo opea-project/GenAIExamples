@@ -18,6 +18,7 @@ services:
       OMPI_MCA_btl_vader_single_copy_mechanism: none
       LLM_MODEL_ID: ${LLM_MODEL_ID}
       NUM_CARDS: ${NUM_CARDS}
+      VLLM_SKIP_WARMUP: ${VLLM_SKIP_WARMUP:-false}
       VLLM_TORCH_PROFILER_DIR: "/mnt"
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:80/health || exit 1"]
