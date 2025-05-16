@@ -52,6 +52,7 @@ services:
       VLLM_SKIP_WARMUP: ${VLLM_SKIP_WARMUP:-false}
       NUM_CARDS: ${NUM_CARDS:-1}
       VLLM_TORCH_PROFILER_DIR: "/mnt"
+      VLLM_CPU_KVCACHE_SPACE: 40
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:80/health || exit 1"]
       interval: 10s

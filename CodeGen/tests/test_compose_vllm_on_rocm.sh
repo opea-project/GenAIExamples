@@ -40,18 +40,7 @@ function build_docker_images() {
 
 function start_services() {
     cd $WORKPATH/docker_compose/amd/gpu/rocm/
-
-    export CODEGEN_LLM_MODEL_ID="Qwen/Qwen2.5-Coder-7B-Instruct"
-    export CODEGEN_VLLM_SERVICE_PORT=8028
-    export CODEGEN_VLLM_ENDPOINT="http://${ip_address}:${CODEGEN_VLLM_SERVICE_PORT}"
-    export CODEGEN_LLM_SERVICE_PORT=9000
-    export CODEGEN_HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
-    export CODEGEN_MEGA_SERVICE_HOST_IP=${ip_address}
-    export CODEGEN_LLM_SERVICE_HOST_IP=${ip_address}
-    export CODEGEN_BACKEND_SERVICE_PORT=7778
-    export CODEGEN_BACKEND_SERVICE_URL="http://${ip_address}:${CODEGEN_BACKEND_SERVICE_PORT}/v1/codegen"
-    export CODEGEN_UI_SERVICE_PORT=5173
-    export HOST_IP=${ip_address}
+    source set_env.sh
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
@@ -104,7 +93,7 @@ function validate_microservices() {
         "content" \
         "codegen-vllm-service" \
         "codegen-vllm-service" \
-        '{"model": "Qwen/Qwen2.5-Coder-7B-Instruct", "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens": 17}'
+        '{"model": "Qwen/Qwen2.5-Coder-32B-Instruct", "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens": 17}'
     sleep 10
     # llm microservice
     validate_services \
