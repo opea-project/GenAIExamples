@@ -148,10 +148,20 @@ def align_generator(self, gen, **kwargs):
     # b'data:{"id":"","object":"text_completion","created":1725530204,"model":"meta-llama/Meta-Llama-3-8B-Instruct","system_fingerprint":"2.0.1-native","choices":[{"index":0,"delta":{"role":"assistant","content":"?"},"logprobs":null,"finish_reason":null}]}\n\n'
     for line in gen:
         line = line.decode("utf-8")
-        start = line.find("{")
-        end = line.rfind("}") + 1
+        start = -1
+        end = -1
+        try:
+            start = line.find("{")
+            end = line.rfind("}") + 1
+            if start == -1 or end <= start:
+                # Handle cases where '{' or '}' are not found or are in the wrong order
+                json_str = ""
+            else:
+                json_str = line[start:end]
+        except Exception as e:
+            print(f"Error finding JSON boundaries: {e}")
+            json_str = ""
 
-        json_str = line[start:end]
         try:
             # sometimes yield empty chunk, do a fallback here
             json_data = json.loads(json_str)
