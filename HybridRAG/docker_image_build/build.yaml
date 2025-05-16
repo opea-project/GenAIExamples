@@ -13,6 +13,36 @@ services:
       context: ../
       dockerfile: ./Dockerfile
     image: ${REGISTRY:-opea}/hybridrag:${TAG:-latest}
+  vllm:
+    build:
+      context: vllm
+      dockerfile: docker/Dockerfile.cpu
+    extends: hybridrag
+    image: ${REGISTRY:-opea}/vllm:${TAG:-latest}
+  dataprep:
+    build:
+      context: GenAIComps
+      dockerfile: comps/dataprep/src/Dockerfile
+    extends: hybridrag
+    image: ${REGISTRY:-opea}/dataprep:${TAG:-latest}
+  retriever:
+    build:
+      context: GenAIComps
+      dockerfile: comps/retrievers/src/Dockerfile
+    extends: hybridrag
+    image: ${REGISTRY:-opea}/retriever:${TAG:-latest}
+  reranking:
+    build:
+      context: GenAIComps
+      dockerfile: comps/rerankings/src/Dockerfile
+    extends: hybridrag
+    image: ${REGISTRY:-opea}/reranking:${TAG:-latest}
+  nginx:
+    build:
+      context: GenAIComps
+      dockerfile: comps/third_parties/nginx/src/Dockerfile
+    extends: hybridrag
+    image: ${REGISTRY:-opea}/nginx:${TAG:-latest}
   hybridrag-ui:
     build:
       context: ../ui
