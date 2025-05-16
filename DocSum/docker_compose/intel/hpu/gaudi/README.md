@@ -23,34 +23,28 @@ This section describes how to quickly deploy and test the DocSum service manuall
 6. [Test the Pipeline](#test-the-pipeline)
 7. [Cleanup the Deployment](#cleanup-the-deployment)
 
-### Access the Code
+### Access the Code and Set Up Environment
 
-Clone the GenAIExample repository and access the ChatQnA Intel® Gaudi® platform Docker Compose files and supporting scripts:
+Clone the GenAIExample repository and access the DocSum Intel® Gaudi® platform Docker Compose files and supporting scripts:
 
-```
+```bash
 git clone https://github.com/opea-project/GenAIExamples.git
-cd GenAIExamples/DocSum/docker_compose/intel/hpu/gaudi/
+cd GenAIExamples/DocSum/docker_compose
+source set_env.sh
+cd intel/hpu/gaudi/
 ```
 
-Checkout a released version, such as v1.2:
+NOTE: by default vLLM does "warmup" at start, to optimize its performance for the specified model and the underlying platform, which can take long time. For development (and e.g. autoscaling) it can be skipped with `export VLLM_SKIP_WARMUP=true`.
 
-```
-git checkout v1.2
+Checkout a released version, such as v1.3:
+
+```bash
+git checkout v1.3
 ```
 
 ### Generate a HuggingFace Access Token
 
 Some HuggingFace resources, such as some models, are only accessible if you have an access token. If you do not already have a HuggingFace access token, you can create one by first creating an account by following the steps provided at [HuggingFace](https://huggingface.co/) and then generating a [user access token](https://huggingface.co/docs/transformers.js/en/guides/private#step-1-generating-a-user-access-token).
-
-### Configure the Deployment Environment
-
-To set up environment variables for deploying DocSum services, source the _set_env.sh_ script in this directory:
-
-```
-source ./set_env.sh
-```
-
-The _set_env.sh_ script will prompt for required and optional environment variables used to configure the DocSum services. If a value is not entered, the script will use a default value for the same. It will also generate a _.env_ file defining the desired configuration. Consult the section on [DocSum Service configuration](#docsum-service-configuration) for information on how service specific configuration parameters affect deployments.
 
 ### Deploy the Services Using Docker Compose
 
@@ -80,13 +74,13 @@ Please refer to the table below to build different microservices from source:
 
 After running docker compose, check if all the containers launched via docker compose have started:
 
-```
+```bash
 docker ps -a
 ```
 
 For the default deployment, the following 5 containers should have started:
 
-```
+```bash
 CONTAINER ID   IMAGE                                 COMMAND                  CREATED         STATUS                   PORTS                                       NAMES
 748f577b3c78   opea/whisper:latest                   "python whisper_s…"      5 minutes ago   Up About a minute        0.0.0.0:7066->7066/tcp, :::7066->7066/tcp   docsum-gaudi-whisper-server
 4eq8b7034fd9   opea/docsum-gradio-ui:latest          "docker-entrypoint.s…"   5 minutes ago   Up About a minute        0.0.0.0:5173->5173/tcp, :::5173->5173/tcp   docsum-gaudi-ui-server
@@ -111,7 +105,7 @@ curl -X POST http://${host_ip}:8888/v1/docsum \
 
 To stop the containers associated with the deployment, execute the following command:
 
-```
+```bash
 docker compose -f compose.yaml down
 ```
 
