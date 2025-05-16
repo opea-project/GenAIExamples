@@ -49,4 +49,3 @@ services:
       dockerfile: Dockerfile.hpu
     extends: visualqna
     image: ${REGISTRY:-opea}/vllm-gaudi:${TAG:-latest}
-
