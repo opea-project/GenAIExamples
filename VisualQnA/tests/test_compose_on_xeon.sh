@@ -24,6 +24,11 @@ function build_docker_images() {
     echo "GenAIComps test commit is $(git rev-parse HEAD)"
     docker build --no-cache -t ${REGISTRY}/comps-base:${TAG} --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
     popd && sleep 1s
+    git clone https://github.com/vllm-project/vllm.git && cd vllm
+    VLLM_VER="v0.8.3"
+    echo "Check out vLLM tag ${VLLM_VER}"
+    git checkout ${VLLM_VER} &> /dev/null
+    cd ../
 
     service_list="visualqna visualqna-ui lvm nginx vllm"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
@@ -32,11 +37,8 @@ function build_docker_images() {
 
 function start_services() {
     cd $WORKPATH/docker_compose/intel/cpu/xeon/
-
     source ./set_env.sh
-
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
-
     # Start Docker Containers
     docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
 
