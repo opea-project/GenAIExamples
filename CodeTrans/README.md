@@ -26,7 +26,7 @@ The table below lists currently available deployment options. They outline in de
 | ---------------------- | -------------------- | ----------------------------------------------------------------- |
 | On-premise Deployments | Docker compose       | [CodeTrans deployment on Xeon](./docker_compose/intel/cpu/xeon)   |
 |                        |                      | [CodeTrans deployment on Gaudi](./docker_compose/intel/hpu/gaudi/README.md) |
-|                        |                      | [CodeTrans deployment on AMD ROCm](./docker_compose/amd/gpu/rocm) |
+|                        |                      | [CodeTrans deployment on AMD ROCm](./docker_compose/amd/gpu/rocm/README.md) |
 |                        | Kubernetes           | [Helm Charts](./kubernetes/helm)                                  |
 |                        | Azure                | Work-in-progress                                                  |
 |                        | Intel Tiber AI Cloud | Work-in-progress                                                  |
