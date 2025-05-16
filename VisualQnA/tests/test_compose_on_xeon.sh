@@ -17,22 +17,28 @@ LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
 
 function build_docker_images() {
+    opea_branch=${opea_branch:-"main"}
     cd $WORKPATH/docker_image_build
-    git clone --depth 1 --branch main https://github.com/opea-project/GenAIComps.git
-    docker compose -f build.yaml build --no-cache > ${LOG_PATH}/docker_image_build.log
+    git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
+    pushd GenAIComps
+    echo "GenAIComps test commit is $(git rev-parse HEAD)"
+    docker build --no-cache -t ${REGISTRY}/comps-base:${TAG} --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
+    popd && sleep 1s
+    git clone https://github.com/vllm-project/vllm.git && cd vllm
+    VLLM_VER="v0.8.3"
+    echo "Check out vLLM tag ${VLLM_VER}"
+    git checkout ${VLLM_VER} &> /dev/null
+    cd ../
 
-    docker pull opea/vllm:latest
-    docker tag opea/vllm:latest opea/vllm:${TAG}
+    service_list="visualqna visualqna-ui lvm nginx vllm"
+    docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
     docker images && sleep 1s
 }
 
 function start_services() {
     cd $WORKPATH/docker_compose/intel/cpu/xeon/
-
     source ./set_env.sh
-
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
-
     # Start Docker Containers
     docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
 
@@ -179,17 +185,31 @@ function stop_docker() {
 
 function main() {
 
+    echo "::group::stop_docker"
     stop_docker
+    echo "::endgroup::"
 
+    echo "::group::build_docker_images"
     if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
+    echo "::endgroup::"
+
+    echo "::group::start_services"
     start_services
+    echo "::endgroup::"
 
+    echo "::group::validate_microservices"
     validate_microservices
-    validate_megaservice
-    #validate_frontend
+    echo "::endgroup::"
 
+    echo "::group::validate_megaservice"
+    validate_megaservice
+    echo "::endgroup::"
+
+    echo "::group::stop_docker"
     stop_docker
-    echo y | docker system prune
+    echo "::endgroup::"
+
+    docker system prune -f
 
 }
 
