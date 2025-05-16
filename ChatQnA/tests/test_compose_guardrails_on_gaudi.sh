@@ -36,14 +36,8 @@ function build_docker_images() {
 
 function start_services() {
     cd $WORKPATH/docker_compose/intel/hpu/gaudi
-    export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
-    export RERANK_MODEL_ID="BAAI/bge-reranker-base"
-    export LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
-    export NUM_CARDS=1
-    export INDEX_NAME="rag-redis"
-    export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
-    export host_ip=${ip_address}
     export GURADRAILS_MODEL_ID="meta-llama/Meta-Llama-Guard-2-8B"
+    source set_env_faqgen.sh
 
     # Start Docker Containers
     docker compose -f compose_guardrails.yaml up -d > ${LOG_PATH}/start_services_with_compose.log

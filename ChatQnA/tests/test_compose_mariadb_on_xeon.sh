@@ -39,14 +39,8 @@ function build_docker_images() {
 
 function start_services() {
     cd $WORKPATH/docker_compose/intel/cpu/xeon
-    export MARIADB_DATABASE="vectordb"
-    export MARIADB_USER="chatqna"
     export MARIADB_PASSWORD="test"
-    export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
-    export RERANK_MODEL_ID="BAAI/bge-reranker-base"
-    export LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
-    export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
-    export host_ip=${ip_address}
+    source set_env_mariadb.sh
 
     # Start Docker Containers
     docker compose -f compose_mariadb.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
