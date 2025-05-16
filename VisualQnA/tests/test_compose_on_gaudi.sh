@@ -32,7 +32,6 @@ function build_docker_images() {
 
     service_list="visualqna visualqna-ui lvm nginx vllm-gaudi"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
-
     docker images && sleep 1s
 }
 
