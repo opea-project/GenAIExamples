@@ -10,6 +10,7 @@ tgi:
   image:
     repository: ghcr.io/huggingface/text-generation-inference
     tag: "3.0.0-rocm"
+  LLM_MODEL_ID: meta-llama/Meta-Llama-3-8B-Instruct
   MAX_INPUT_LENGTH: "2048"
   MAX_TOTAL_TOKENS: "4096"
   PYTORCH_TUNABLEOP_ENABLED: "0"
