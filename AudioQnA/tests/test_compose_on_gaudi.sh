@@ -27,9 +27,9 @@ function build_docker_images() {
 
     git clone https://github.com/HabanaAI/vllm-fork.git
     cd vllm-fork/
-    VLLM_FORK_VER=v0.6.6.post1+Gaudi-1.20.0
-    echo "Check out vLLM tag ${VLLM_FORK_VER}"
-    git checkout ${VLLM_FORK_VER} &> /dev/null && cd ../
+    VLLM_VER=v0.6.6.post1+Gaudi-1.20.0
+    echo "Check out vLLM tag ${VLLM_VER}"
+    git checkout ${VLLM_VER} &> /dev/null && cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
     service_list="audioqna audioqna-ui whisper-gaudi speecht5-gaudi vllm-gaudi"
@@ -40,8 +40,24 @@ function build_docker_images() {
 
 function start_services() {
     cd $WORKPATH/docker_compose/intel/hpu/gaudi
+    export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+    export LLM_MODEL_ID=meta-llama/Meta-Llama-3-8B-Instruct
+    export NUM_CARDS=1
+    export BLOCK_SIZE=128
+    export MAX_NUM_SEQS=256
+    export MAX_SEQ_LEN_TO_CAPTURE=2048
+
+    export MEGA_SERVICE_HOST_IP=${ip_address}
+    export WHISPER_SERVER_HOST_IP=${ip_address}
+    export SPEECHT5_SERVER_HOST_IP=${ip_address}
+    export LLM_SERVER_HOST_IP=${ip_address}
+
+    export WHISPER_SERVER_PORT=7066
+    export SPEECHT5_SERVER_PORT=7055
+    export LLM_SERVER_PORT=3006
+
+    export BACKEND_SERVICE_ENDPOINT=http://${ip_address}:3008/v1/audioqna
     export host_ip=${ip_address}
-    source set_env.sh
     # sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
     # Start Docker Containers

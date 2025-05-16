@@ -16,7 +16,21 @@ WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
 
-source $WORKPATH/docker_compose/amd/gpu/rocm/set_env_vllm.sh
+export host_ip=${ip_address}
+export HOST_IP=${ip_address}
+export EXTERNAL_HOST_IP=${ip_address}
+export DOCSUM_HUGGINGFACEHUB_API_TOKEN="${HUGGINGFACEHUB_API_TOKEN}"
+export DOCSUM_MAX_INPUT_TOKENS=2048
+export DOCSUM_MAX_TOTAL_TOKENS=4096
+export DOCSUM_LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
+export DOCSUM_VLLM_SERVICE_PORT="8008"
+export DOCSUM_LLM_ENDPOINT="http://${HOST_IP}:${DOCSUM_VLLM_SERVICE_PORT}"
+export DOCSUM_WHISPER_PORT="7066"
+export ASR_SERVICE_HOST_IP="${HOST_IP}"
+export DOCSUM_LLM_SERVER_PORT="9000"
+export DOCSUM_BACKEND_SERVER_PORT="18072"
+export DOCSUM_FRONTEND_PORT="18073"
+export BACKEND_SERVICE_ENDPOINT="http://${EXTERNAL_HOST_IP}:${DOCSUM_BACKEND_SERVER_PORT}/v1/docsum"
 
 function build_docker_images() {
     opea_branch=${opea_branch:-"main"}
@@ -116,7 +130,7 @@ function validate_microservices() {
     # whisper microservice
     ulimit -s 65536
     validate_services \
-        "${HOST_IP}:${DOCSUM_WHISPER_PORT}/v1/asr" \
+        "${host_ip}:${DOCSUM_WHISPER_PORT}/v1/asr" \
         '{"asr_result":"well"}' \
         "whisper-service" \
         "whisper-service" \
@@ -124,7 +138,7 @@ function validate_microservices() {
 
     # vLLM service
     validate_services \
-        "${HOST_IP}:${DOCSUM_VLLM_SERVICE_PORT}/v1/chat/completions" \
+        "${host_ip}:${DOCSUM_VLLM_SERVICE_PORT}/v1/chat/completions" \
         "content" \
         "docsum-vllm-service" \
         "docsum-vllm-service" \
@@ -132,7 +146,7 @@ function validate_microservices() {
 
     # llm microservice
     validate_services \
-        "${HOST_IP}:${DOCSUM_LLM_SERVER_PORT}/v1/docsum" \
+        "${host_ip}:${DOCSUM_LLM_SERVER_PORT}/v1/docsum" \
         "text" \
         "docsum-llm-server" \
         "docsum-llm-server" \
@@ -145,7 +159,7 @@ function validate_megaservice() {
     local DOCKER_NAME="docsum-backend-server"
     local EXPECTED_RESULT="[DONE]"
     local INPUT_DATA="messages=Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."
-    local URL="${HOST_IP}:${DOCSUM_BACKEND_SERVER_PORT}/v1/docsum"
+    local URL="${host_ip}:${DOCSUM_BACKEND_SERVER_PORT}/v1/docsum"
     local DATA_TYPE="type=text"
 
     local HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST -F "$DATA_TYPE" -F "$INPUT_DATA" -H 'Content-Type: multipart/form-data' "$URL")
@@ -175,7 +189,7 @@ function validate_megaservice_json() {
     echo ""
     echo ">>> Checking text data with Content-Type: application/json"
     validate_services \
-        "${HOST_IP}:${DOCSUM_BACKEND_SERVER_PORT}/v1/docsum" \
+        "${host_ip}:${DOCSUM_BACKEND_SERVER_PORT}/v1/docsum" \
         "[DONE]" \
         "docsum-backend-server" \
         "docsum-backend-server" \
@@ -183,7 +197,7 @@ function validate_megaservice_json() {
 
     echo ">>> Checking audio data"
     validate_services \
-        "${HOST_IP}:${DOCSUM_BACKEND_SERVER_PORT}/v1/docsum" \
+        "${host_ip}:${DOCSUM_BACKEND_SERVER_PORT}/v1/docsum" \
         "[DONE]" \
         "docsum-backend-server" \
         "docsum-backend-server" \
@@ -191,7 +205,7 @@ function validate_megaservice_json() {
 
     echo ">>> Checking video data"
     validate_services \
-        "${HOST_IP}:${DOCSUM_BACKEND_SERVER_PORT}/v1/docsum" \
+        "${host_ip}:${DOCSUM_BACKEND_SERVER_PORT}/v1/docsum" \
         "[DONE]" \
         "docsum-backend-server" \
         "docsum-backend-server" \

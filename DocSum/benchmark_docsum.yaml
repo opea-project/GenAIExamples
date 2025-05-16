@@ -3,7 +3,7 @@
 
 deploy:
   device: gaudi
-  version: 1.3.0
+  version: 1.2.0
   modelUseHostPath: /mnt/models
   HUGGINGFACEHUB_API_TOKEN: "" # mandatory
   node: [1]
@@ -20,10 +20,14 @@ deploy:
         memory_capacity: "8000Mi"
       replicaCount: [1]
 
+    teirerank:
+      enabled: False
+
     llm:
       engine: vllm  # or tgi
       model_id: "meta-llama/Llama-3.2-3B-Instruct" # mandatory
-      replicaCount: [1]
+      replicaCount:
+        without_teirerank: [1]   # When teirerank.enabled is False
       resources:
         enabled: False
         cards_per_instance: 1
@@ -74,7 +78,7 @@ benchmark:
 
   # workload, all of the test cases will run for benchmark
   bench_target: ["docsumfixed"] # specify the bench_target for benchmark
-  dataset: "/home/sdp/pubmed_10.txt"  # specify the absolute path to the dataset file
+  dataset: "/home/sdp/upload.txt"  # specify the absolute path to the dataset file
   summary_type: "stuff"
   stream: True
 

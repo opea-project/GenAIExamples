@@ -44,8 +44,6 @@ git clone https://github.com/opea-project/GenAIExamples.git
 ### 2.2 Set up env vars
 
 ```bash
-export ip_address="External_Public_IP"
-export no_proxy=${your_no_proxy},${ip_address}
 export HF_CACHE_DIR=/path/to/your/model/cache/
 export HF_TOKEN=<you-hf-token>
 export FINNHUB_API_KEY=<your-finnhub-api-key> # go to https://finnhub.io/ to get your free api key
@@ -102,8 +100,8 @@ bash launch_dataprep.sh
 Validate datat ingest data and retrieval from database:
 
 ```bash
-python $WORKDIR/GenAIExamples/FinanceAgent/tests/test_redis_finance.py --port 6007 --test_option ingest
-python $WORKDIR/GenAIExamples/FinanceAgent/tests/test_redis_finance.py --port 6007 --test_option get
+python $WORKPATH/tests/test_redis_finance.py --port 6007 --test_option ingest
+python $WORKPATH/tests/test_redis_finance.py --port 6007 --test_option get
 ```
 
 ### 3.3 Launch the multi-agent system
