@@ -29,32 +29,11 @@ function build_docker_images() {
 
 function start_services() {
     cd $WORKPATH/docker_compose/intel/cpu/xeon/
-
-    export DB_NAME="opea"
-    export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
-    export RERANK_MODEL_ID="BAAI/bge-reranker-base"
-    export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
-    export LLM_MODEL_ID_CODEGEN="Intel/neural-chat-7b-v3-3"
-    export INDEX_NAME="rag-redis"
-    export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
-    export BACKEND_SERVICE_ENDPOINT_CHATQNA="http://${ip_address}:8888/v1/chatqna"
-    export DATAPREP_DELETE_FILE_ENDPOINT="http://${ip_address}:6007/v1/dataprep/delete"
-    export BACKEND_SERVICE_ENDPOINT_CODEGEN="http://${ip_address}:7778/v1/codegen"
-    export BACKEND_SERVICE_ENDPOINT_DOCSUM="http://${ip_address}:8890/v1/docsum"
-    export DATAPREP_SERVICE_ENDPOINT="http://${ip_address}:6007/v1/dataprep/ingest"
-    export DATAPREP_GET_FILE_ENDPOINT="http://${ip_address}:6007/v1/dataprep/get"
-    export CHAT_HISTORY_CREATE_ENDPOINT="http://${ip_address}:6012/v1/chathistory/create"
-    export CHAT_HISTORY_CREATE_ENDPOINT="http://${ip_address}:6012/v1/chathistory/create"
-    export CHAT_HISTORY_DELETE_ENDPOINT="http://${ip_address}:6012/v1/chathistory/delete"
-    export CHAT_HISTORY_GET_ENDPOINT="http://${ip_address}:6012/v1/chathistory/get"
-    export PROMPT_SERVICE_GET_ENDPOINT="http://${ip_address}:6018/v1/prompt/get"
-    export PROMPT_SERVICE_CREATE_ENDPOINT="http://${ip_address}:6018/v1/prompt/create"
-    export PROMPT_SERVICE_DELETE_ENDPOINT="http://${ip_address}:6018/v1/prompt/delete"
-    export KEYCLOAK_SERVICE_ENDPOINT="http://${ip_address}:8080"
-    export DocSum_COMPONENT_NAME="OpeaDocSumTgi"
     export host_ip=${ip_address}
     export LOGFLAG=True
     export no_proxy="$no_proxy,tgi_service_codegen,llm_codegen,tei-embedding-service,tei-reranking-service,chatqna-xeon-backend-server,retriever,tgi-service,redis-vector-db,whisper,llm-docsum-tgi,docsum-xeon-backend-server,mongo,codegen"
+
+    source set_env.sh
 
     # Start Docker Containers
     docker compose up -d > ${LOG_PATH}/start_services_with_compose.log

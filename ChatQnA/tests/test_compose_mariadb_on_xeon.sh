@@ -134,7 +134,7 @@ function validate_megaservice() {
 
 function stop_docker() {
     cd $WORKPATH/docker_compose/intel/cpu/xeon
-    docker compose down
+    docker compose -f compose_mariadb.yaml down
 }
 
 function main() {
