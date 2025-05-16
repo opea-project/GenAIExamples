@@ -207,6 +207,8 @@ function main() {
     validate_microservices
     dataprep
     validate_megaservice
+    docker logs text2cypher-gaudi-container
+
     validate_frontend
 
     cd $WORKPATH/docker_image_build
