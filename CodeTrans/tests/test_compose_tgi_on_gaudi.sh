@@ -1,6 +1,5 @@
 #!/bin/bash
 # Copyright (C) 2024 Intel Corporation
-# Copyright (c) 2024 Advanced Micro Devices, Inc.
 # SPDX-License-Identifier: Apache-2.0
 
 set -xe
@@ -18,80 +17,34 @@ ip_address=$(hostname -I | awk '{print $1}')
 
 function build_docker_images() {
     opea_branch=${opea_branch:-"main"}
-    # If the opea_branch isn't main, replace the git clone branch in Dockerfile.
-    if [[ "${opea_branch}" != "main" ]]; then
-        cd $WORKPATH
-        OLD_STRING="RUN git clone --depth 1 https://github.com/opea-project/GenAIComps.git"
-        NEW_STRING="RUN git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git"
-        find . -type f -name "Dockerfile*" | while read -r file; do
-            echo "Processing file: $file"
-            sed -i "s|$OLD_STRING|$NEW_STRING|g" "$file"
-        done
-    fi
 
     cd $WORKPATH/docker_image_build
     git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
+    pushd GenAIComps
+    echo "GenAIComps test commit is $(git rev-parse HEAD)"
+    docker build --no-cache -t ${REGISTRY}/comps-base:${TAG} --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
+    popd && sleep 1s
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-<<<<<<<< HEAD:CodeGen/tests/test_compose_vllm_on_rocm.sh
-    service_list="vllm-rocm llm-textgen codegen codegen-ui"
-========
     service_list="codetrans codetrans-ui llm-textgen nginx"
->>>>>>>> origin/feature/ChatQnA_k8s:CodeTrans/tests/test_compose_tgi_on_gaudi.sh
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
+    docker pull ghcr.io/huggingface/tgi-gaudi:2.0.6
     docker images && sleep 1s
 }
 
 function start_services() {
-<<<<<<<< HEAD:CodeGen/tests/test_compose_vllm_on_rocm.sh
-    cd $WORKPATH/docker_compose/amd/gpu/rocm/
-
-    export CODEGEN_LLM_MODEL_ID="Qwen/Qwen2.5-Coder-7B-Instruct"
-    export CODEGEN_VLLM_SERVICE_PORT=8028
-    export CODEGEN_VLLM_ENDPOINT="http://${ip_address}:${CODEGEN_VLLM_SERVICE_PORT}"
-    export CODEGEN_LLM_SERVICE_PORT=9000
-    export CODEGEN_HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
-    export CODEGEN_MEGA_SERVICE_HOST_IP=${ip_address}
-    export CODEGEN_LLM_SERVICE_HOST_IP=${ip_address}
-    export CODEGEN_BACKEND_SERVICE_PORT=7778
-    export CODEGEN_BACKEND_SERVICE_URL="http://${ip_address}:${CODEGEN_BACKEND_SERVICE_PORT}/v1/codegen"
-    export CODEGEN_UI_SERVICE_PORT=5173
-    export HOST_IP=${ip_address}
-========
-    cd $WORKPATH/docker_compose/intel/hpu/gaudi/
-    export LLM_MODEL_ID="mistralai/Mistral-7B-Instruct-v0.3"
-    export LLM_ENDPOINT="http://${ip_address}:8008"
-    export LLM_COMPONENT_NAME="OpeaTextGenService"
+    cd $WORKPATH/docker_compose
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
-    export MEGA_SERVICE_HOST_IP=${ip_address}
-    export LLM_SERVICE_HOST_IP=${ip_address}
-    export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:7777/v1/codetrans"
-    export FRONTEND_SERVICE_IP=${ip_address}
-    export FRONTEND_SERVICE_PORT=5173
-    export BACKEND_SERVICE_NAME=codetrans
-    export BACKEND_SERVICE_IP=${ip_address}
-    export BACKEND_SERVICE_PORT=7777
+
     export NGINX_PORT=80
     export host_ip=${ip_address}
->>>>>>>> origin/feature/ChatQnA_k8s:CodeTrans/tests/test_compose_tgi_on_gaudi.sh
+    source set_env.sh
+    cd intel/hpu/gaudi/
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
     # Start Docker Containers
-<<<<<<<< HEAD:CodeGen/tests/test_compose_vllm_on_rocm.sh
-    docker compose -f compose_vllm.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
-
-    n=0
-    until [[ "$n" -ge 500 ]]; do
-        docker logs codegen-vllm-service >& "${LOG_PATH}"/codegen-vllm-service_start.log
-        if grep -q "Application startup complete" "${LOG_PATH}"/codegen-vllm-service_start.log; then
-            break
-        fi
-        sleep 20s
-        n=$((n+1))
-    done
-========
     docker compose -f compose_tgi.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
 
     n=0
@@ -105,7 +58,6 @@ function start_services() {
     done
 
     sleep 1m
->>>>>>>> origin/feature/ChatQnA_k8s:CodeTrans/tests/test_compose_tgi_on_gaudi.sh
 }
 
 function validate_services() {
@@ -137,23 +89,6 @@ function validate_services() {
 }
 
 function validate_microservices() {
-<<<<<<<< HEAD:CodeGen/tests/test_compose_vllm_on_rocm.sh
-    # vLLM for llm service
-    validate_services \
-        "${ip_address}:${CODEGEN_VLLM_SERVICE_PORT}/v1/chat/completions" \
-        "content" \
-        "codegen-vllm-service" \
-        "codegen-vllm-service" \
-        '{"model": "Qwen/Qwen2.5-Coder-7B-Instruct", "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens": 17}'
-    sleep 10
-    # llm microservice
-    validate_services \
-        "${ip_address}:${CODEGEN_LLM_SERVICE_PORT}/v1/chat/completions" \
-        "data: " \
-        "codegen-llm-server" \
-        "codegen-llm-server" \
-        '{"query":"def print_hello_world():"}'
-========
     # tgi for embedding service
     validate_services \
         "${ip_address}:8008/generate" \
@@ -169,21 +104,12 @@ function validate_microservices() {
         "llm" \
         "codetrans-gaudi-llm-server" \
         '{"query":"    ### System: Please translate the following Golang codes into  Python codes.    ### Original codes:    '\'''\'''\''Golang    \npackage main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n    '\'''\'''\''    ### Translated codes:"}'
->>>>>>>> origin/feature/ChatQnA_k8s:CodeTrans/tests/test_compose_tgi_on_gaudi.sh
 
 }
 
 function validate_megaservice() {
     # Curl the Mega Service
     validate_services \
-<<<<<<<< HEAD:CodeGen/tests/test_compose_vllm_on_rocm.sh
-        "${ip_address}:${CODEGEN_BACKEND_SERVICE_PORT}/v1/codegen" \
-        "print" \
-        "codegen-backend-server" \
-        "codegen-backend-server" \
-        '{"messages": "def print_hello_world():"}'
-
-========
         "${ip_address}:${BACKEND_SERVICE_PORT}/v1/codetrans" \
         "print" \
         "mega-codetrans" \
@@ -198,13 +124,12 @@ function validate_megaservice() {
         "codetrans-gaudi-nginx-server" \
         '{"language_from": "Golang","language_to": "Python","source_code": "package main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n}"}'
 
->>>>>>>> origin/feature/ChatQnA_k8s:CodeTrans/tests/test_compose_tgi_on_gaudi.sh
 }
 
 function validate_frontend() {
     cd $WORKPATH/ui/svelte
     local conda_env_name="OPEA_e2e"
-    export PATH=${HOME}/miniconda3/bin/:$PATH
+    export PATH=${HOME}/miniforge3/bin/:$PATH
     if conda info --envs | grep -q "$conda_env_name"; then
         echo "$conda_env_name exist!"
     else
@@ -229,31 +154,42 @@ function validate_frontend() {
     fi
 }
 
-
 function stop_docker() {
-<<<<<<<< HEAD:CodeGen/tests/test_compose_vllm_on_rocm.sh
-    echo "OPENAI_API_KEY - ${OPENAI_API_KEY}"
-    cd $WORKPATH/docker_compose/amd/gpu/rocm/
-    docker compose -f compose_vllm.yaml stop && docker compose -f compose_vllm.yaml rm -f
-========
     cd $WORKPATH/docker_compose/intel/hpu/gaudi/
     docker compose -f compose_tgi.yaml stop && docker compose rm -f
->>>>>>>> origin/feature/ChatQnA_k8s:CodeTrans/tests/test_compose_tgi_on_gaudi.sh
 }
 
 function main() {
 
+    echo "::group::stop_docker"
     stop_docker
+    echo "::endgroup::"
+
+    echo "::group::build_docker_images"
     if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
+    echo "::endgroup::"
+
+    echo "::group::start_services"
     start_services
+    echo "::endgroup::"
 
+    echo "::group::validate_microservices"
     validate_microservices
-    validate_megaservice
-    validate_frontend
+    echo "::endgroup::"
 
+    echo "::group::validate_megaservice"
+    validate_megaservice
+    echo "::endgroup::"
+
+    echo "::group::validate_frontend"
+    validate_frontend
+    echo "::endgroup::"
+
+    echo "::group::stop_docker"
     stop_docker
-    echo y | docker system prune
-    cd $WORKPATH
+    echo "::endgroup::"
+
+    docker system prune -f
 
 }
 

@@ -24,19 +24,13 @@ ip_address=$(hostname -I | awk '{print $1}')
 
 function build_docker_images() {
     opea_branch=${opea_branch:-"main"}
-    # If the opea_branch isn't main, replace the git clone branch in Dockerfile.
-    if [[ "${opea_branch}" != "main" ]]; then
-        cd $WORKPATH
-        OLD_STRING="RUN git clone --depth 1 https://github.com/opea-project/GenAIComps.git"
-        NEW_STRING="RUN git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git"
-        find . -type f -name "Dockerfile*" | while read -r file; do
-            echo "Processing file: $file"
-            sed -i "s|$OLD_STRING|$NEW_STRING|g" "$file"
-        done
-    fi
 
     cd $WORKPATH/docker_image_build
     git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
+    pushd GenAIComps
+    echo "GenAIComps test commit is $(git rev-parse HEAD)"
+    docker build --no-cache -t ${REGISTRY}/comps-base:${TAG} --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
+    popd && sleep 1s
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
     service_list="avatarchatbot whisper speecht5 wav2lip animation"
@@ -51,37 +45,7 @@ function build_docker_images() {
 function start_services() {
     cd $WORKPATH/docker_compose/intel/cpu/xeon
 
-    export HUGGINGFACEHUB_API_TOKEN=$HUGGINGFACEHUB_API_TOKEN
-    export host_ip=$(hostname -I | awk '{print $1}')
-
-    export LLM_MODEL_ID=Intel/neural-chat-7b-v3-3
-
-    export WAV2LIP_ENDPOINT=http://$host_ip:7860
-
-    export MEGA_SERVICE_HOST_IP=${host_ip}
-    export WHISPER_SERVER_HOST_IP=${host_ip}
-    export WHISPER_SERVER_PORT=7066
-    export SPEECHT5_SERVER_HOST_IP=${host_ip}
-    export SPEECHT5_SERVER_PORT=7055
-    export LLM_SERVER_HOST_IP=${host_ip}
-    export LLM_SERVER_PORT=3006
-    export ANIMATION_SERVICE_HOST_IP=${host_ip}
-    export ANIMATION_SERVICE_PORT=3008
-
-    export MEGA_SERVICE_PORT=8888
-
-    export DEVICE="cpu"
-    export WAV2LIP_PORT=7860
-    export INFERENCE_MODE='wav2lip+gfpgan'
-    export CHECKPOINT_PATH='/usr/local/lib/python3.11/site-packages/Wav2Lip/checkpoints/wav2lip_gan.pth'
-    export FACE="/home/user/comps/animation/src/assets/img/avatar5.png"
-    # export AUDIO='assets/audio/eg3_ref.wav' # audio file path is optional, will use base64str in the post request as input if is 'None'
-    export AUDIO='None'
-    export FACESIZE=96
-    export OUTFILE="/outputs/result.mp4"
-    export GFPGAN_MODEL_VERSION=1.4 # latest version, can roll back to v1.3 if needed
-    export UPSCALE_FACTOR=1
-    export FPS=10
+    source set_env.sh
 
     # Start Docker Containers
     docker compose up -d
@@ -127,16 +91,28 @@ function stop_docker() {
 
 
 function main() {
-    stop_docker
-    if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
-    start_services
-    # validate_microservices
-    validate_megaservice
-    # validate_frontend
-    stop_docker
 
-    echo y | docker builder prune --all
-    echo y | docker image prune
+    echo "::group::stop_docker"
+    stop_docker
+    echo "::endgroup::"
+
+    echo "::group::build_docker_images"
+    if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
+    echo "::endgroup::"
+
+    echo "::group::start_services"
+    start_services
+    echo "::endgroup::"
+
+    echo "::group::validate_megaservice"
+    validate_megaservice
+    echo "::endgroup::"
+
+    echo "::group::stop_docker"
+    stop_docker
+    echo "::endgroup::"
+
+    docker system prune -f
 
 }
 
