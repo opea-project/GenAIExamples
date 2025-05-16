@@ -261,6 +261,7 @@ services:
       - KEYCLOAK_ADMIN=admin
       - KEYCLOAK_ADMIN_PASSWORD=admin
       - KC_PROXY=edge
+      - KC_HTTP_RELATIVE_PATH=/keycloak/
     ipc: host
     command: start-dev
     restart: always
@@ -271,20 +272,44 @@ services:
     ports:
       - "5174:80"
     environment:
-      - APP_BACKEND_SERVICE_ENDPOINT_CHATQNA=${BACKEND_SERVICE_ENDPOINT_CHATQNA}
-      - APP_BACKEND_SERVICE_ENDPOINT_CODEGEN=${BACKEND_SERVICE_ENDPOINT_CODEGEN}
-      - APP_BACKEND_SERVICE_ENDPOINT_DOCSUM=${BACKEND_SERVICE_ENDPOINT_DOCSUM}
-      - APP_DATAPREP_SERVICE_ENDPOINT=${DATAPREP_SERVICE_ENDPOINT}
-      - APP_DATAPREP_GET_FILE_ENDPOINT=${DATAPREP_GET_FILE_ENDPOINT}
-      - APP_DATAPREP_DELETE_FILE_ENDPOINT=${DATAPREP_DELETE_FILE_ENDPOINT}
-      - APP_CHAT_HISTORY_CREATE_ENDPOINT=${CHAT_HISTORY_CREATE_ENDPOINT}
-      - APP_CHAT_HISTORY_DELETE_ENDPOINT=${CHAT_HISTORY_DELETE_ENDPOINT}
-      - APP_CHAT_HISTORY_GET_ENDPOINT=${CHAT_HISTORY_GET_ENDPOINT}
-      - APP_PROMPT_SERVICE_GET_ENDPOINT=${PROMPT_SERVICE_GET_ENDPOINT}
-      - APP_PROMPT_SERVICE_CREATE_ENDPOINT=${PROMPT_SERVICE_CREATE_ENDPOINT}
-      - APP_PROMPT_SERVICE_DELETE_ENDPOINT=${PROMPT_SERVICE_DELETE_ENDPOINT}
-      - APP_KEYCLOAK_SERVICE_ENDPOINT=${KEYCLOAK_SERVICE_ENDPOINT}
       - LOGFLAG=${LOGFLAG}
+    ipc: host
+    restart: always
+
+  productivity-suite-nginx-server:
+    image: ${REGISTRY:-opea}/nginx:${TAG:-latest}
+    container_name:  productivity-suite-nginx-server
+    depends_on:
+      - chatqna-xeon-backend-server
+      - productivity-suite-xeon-react-ui-server
+    ports:
+      - "${NGINX_PORT:-80}:80"
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - FRONTEND_SERVICE_IP=productivity-suite-xeon-react-ui-server
+      - FRONTEND_SERVICE_PORT=80
+      - BACKEND_SERVICE_NAME=chatqna
+      - BACKEND_SERVICE_IP=chatqna-xeon-backend-server
+      - BACKEND_SERVICE_PORT=8888
+      - DATAPREP_SERVICE_IP=dataprep-redis-service
+      - DATAPREP_SERVICE_PORT=5000
+      - BACKEND_CODEGEN_SERVICE_NAME=codegen
+      - BACKEND_CODEGEN_SERVICE_IP=codegen-xeon-backend-server
+      - BACKEND_CODEGEN_SERVICE_PORT=7778
+      - BACKEND_DOCSUM_SERVICE_NAME=docsum
+      - BACKEND_DOCSUM_SERVICE_IP=docsum-xeon-backend-server
+      - BACKEND_DOCSUM_SERVICE_PORT=8888
+      - BACKEND_CHAT_HISTORY_SERVICE_NAME=chathistory
+      - BACKEND_CHAT_HISTORY_SERVICE_IP=chathistory-mongo
+      - BACKEND_CHAT_HISTORY_SERVICE_PORT=6012
+      - BACKEND_PROMPT_SERVICE_NAME=prompt
+      - BACKEND_PROMPT_SERVICE_IP=promptregistry-mongo
+      - BACKEND_PROMPT_SERVICE_PORT=6018
+      - KEYCLOAK_SERVICE_NAME=keycloak
+      - KEYCLOAK_SERVICE_IP=keycloak
+      - KEYCLOAK_SERVICE_PORT=8080
     ipc: host
     restart: always
 
