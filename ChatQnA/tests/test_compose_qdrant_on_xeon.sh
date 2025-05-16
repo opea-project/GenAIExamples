@@ -39,7 +39,7 @@ function build_docker_images() {
 
 function start_services() {
     cd $WORKPATH/docker_compose/intel/cpu/xeon
-    
+
     export INDEX_NAME="rag-qdrant"
     source set_env.sh
 

@@ -1,4 +1,4 @@
-#  ChatQnA E2E test scripts
+# ChatQnA E2E test scripts
 
 ## Set the required environment variable
 
