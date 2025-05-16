@@ -2,7 +2,9 @@
 # SPDX-License-Identifier: Apache-2.0
 
 name: Helm Chart E2e Test For Call
-permissions: read-all
+permissions:
+  contents: read
+
 on:
   workflow_call:
     inputs:
@@ -135,16 +137,28 @@ jobs:
         env:
           example: ${{ inputs.example }}
         run: |
-          CHART_NAME="${example,,}"  # CodeGen
-          echo "CHART_NAME=$CHART_NAME" >> $GITHUB_ENV
-          echo "RELEASE_NAME=${CHART_NAME}$(date +%Y%m%d%H%M%S)" >> $GITHUB_ENV
-          echo "NAMESPACE=${CHART_NAME}-$(head -c 4 /dev/urandom | xxd -p)" >> $GITHUB_ENV
-          echo "ROLLOUT_TIMEOUT_SECONDS=600s" >> $GITHUB_ENV
-          echo "TEST_TIMEOUT_SECONDS=600s" >> $GITHUB_ENV
-          echo "KUBECTL_TIMEOUT_SECONDS=60s" >> $GITHUB_ENV
-          echo "should_cleanup=false" >> $GITHUB_ENV
-          echo "skip_validate=false" >> $GITHUB_ENV
-          echo "CHART_FOLDER=${example}/kubernetes/helm" >> $GITHUB_ENV
+          if [[ ! "$example" =~ ^[a-zA-Z0-9]{1,20}$ ]] || [[ "$example" =~ \.\. ]] || [[ "$example" == -* || "$example" == *- ]]; then
+            echo "Error: Invalid input - only lowercase alphanumeric and internal hyphens allowed"
+            exit 1
+          fi
+          # SAFE_PREFIX="kb-"
+          CHART_NAME="${SAFE_PREFIX}$(echo "$example" | tr '[:upper:]' '[:lower:]')"
+          RAND_SUFFIX=$(openssl rand -hex 2 | tr -dc 'a-f0-9')
+
+          cat <<EOF >> $GITHUB_ENV
+          CHART_NAME=${CHART_NAME}
+          RELEASE_NAME=${CHART_NAME}-$(date +%s)
+          NAMESPACE=ns-${CHART_NAME}-${RAND_SUFFIX}
+          ROLLOUT_TIMEOUT_SECONDS=600s
+          TEST_TIMEOUT_SECONDS=600s
+          KUBECTL_TIMEOUT_SECONDS=60s
+          should_cleanup=false
+          skip_validate=false
+          CHART_FOLDER=${example}/kubernetes/helm
+          EOF
+
+          echo "Generated safe variables:" >> $GITHUB_STEP_SUMMARY
+          echo "- CHART_NAME: ${CHART_NAME}" >> $GITHUB_STEP_SUMMARY
 
       - name: Helm install
         id: install

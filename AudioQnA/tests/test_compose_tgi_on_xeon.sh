@@ -34,21 +34,8 @@ function build_docker_images() {
 
 function start_services() {
     cd $WORKPATH/docker_compose/intel/cpu/xeon/
-    export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
-    export LLM_MODEL_ID=meta-llama/Meta-Llama-3-8B-Instruct
-
-    export MEGA_SERVICE_HOST_IP=${ip_address}
-    export WHISPER_SERVER_HOST_IP=${ip_address}
-    export SPEECHT5_SERVER_HOST_IP=${ip_address}
-    export LLM_SERVER_HOST_IP=${ip_address}
-
-    export WHISPER_SERVER_PORT=7066
-    export SPEECHT5_SERVER_PORT=7055
-    export LLM_SERVER_PORT=3006
-
-    export BACKEND_SERVICE_ENDPOINT=http://${ip_address}:3008/v1/audioqna
     export host_ip=${ip_address}
-
+    source set_env.sh
     # Start Docker Containers
     docker compose -f compose_tgi.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
     n=0
