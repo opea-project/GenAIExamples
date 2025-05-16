@@ -3,10 +3,12 @@
 
 name: E2E Test with Helm Charts
 
+permissions: read-all
+
 on:
   pull_request_target:
     branches: [main]
-    types: [opened, reopened, ready_for_review, synchronize] # added `ready_for_review` since draft is skipped
+    types: [opened, reopened, ready_for_review, synchronize, labeled] # added `ready_for_review` since draft is skipped
     paths:
       - "!**.md"
       - "**/helm/**"
@@ -17,6 +19,31 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  check-first-contributor:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check if contributor is new
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          COMMITTER_USERNAME: ${{ github.event.pull_request.user.login }}
+          REPO_OWNER: ${{ github.repository_owner }}
+          REPO_NAME: ${{ github.event.repository.name }}
+        run: |
+          echo ""https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/commits?author=$COMMITTER_USERNAME""
+          commits=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
+            "curl -s -H "Authorization: token $GITHUB_TOKEN" "https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/commits?author=$COMMITTER_USERNAME")
+
+          # Check if the contributor has any previous commits
+          if [ $(echo "$commits" | jq '. | length') -eq 1 ]; then
+            echo "This is the first contribution by $CONTRIBUTOR."
+            if [[ "${{ github.event.pull_request.labels.*.name }}" != *"safe to test"* ]]; then
+              echo "PR does not have 'safe to test' label. Failing the job."
+              exit 1
+            else
+              echo "PR has 'safe to test' label. Proceeding."
+            fi
+          fi
+
   job1:
     name: Get-Test-Matrix
     permissions:
@@ -67,6 +94,8 @@ jobs:
           run_matrix=$run_matrix"]}"
           echo "run_matrix="${run_matrix}""
           echo "run_matrix="${run_matrix}"" >> $GITHUB_OUTPUT
+          github.event.pull_request.labels.*.name
+          echo "label is ${{ github.event.pull_request.labels.*.name }}"
 
   helm-chart-test:
     needs: [job1]
