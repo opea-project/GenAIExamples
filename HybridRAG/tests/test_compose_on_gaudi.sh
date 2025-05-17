@@ -15,6 +15,9 @@ WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
 
+cd $WORKPATH/docker_compose/intel/hpu/gaudi
+source set_env.sh
+
 function build_docker_images() {
     opea_branch=${opea_branch:-"main"}
     # If the opea_branch isn't main, replace the git clone branch in Dockerfile.
