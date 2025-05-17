@@ -200,6 +200,7 @@ function main() {
 
     stop_docker
     docker ps
+    echo y | docker system prune
 
     if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
     start_time=$(date +%s)
@@ -218,8 +219,8 @@ function main() {
     cd $WORKPATH/docker_image_build
     rm -rf GenAIComps vllm
 
-    stop_docker
-    echo y | docker system prune
+    #stop_docker
+    #echo y | docker system prune
 
 }
 
