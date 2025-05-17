@@ -57,7 +57,6 @@ function build_docker_images() {
 
 function start_services() {
     cd $WORKPATH/docker_compose/intel/hpu/gaudi
-    source set_env.sh
 
     # Start Docker Containers
     docker compose -f compose.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
@@ -200,6 +199,8 @@ function stop_docker() {
 function main() {
 
     stop_docker
+    docker ps
+
     if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
     start_time=$(date +%s)
     start_services
