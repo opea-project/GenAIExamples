@@ -5,6 +5,8 @@ services:
   visualqna:
     build:
       args:
+        IMAGE_REPO: ${REGISTRY:-opea}
+        BASE_TAG: ${TAG:-latest}
         http_proxy: ${http_proxy}
         https_proxy: ${https_proxy}
         no_proxy: ${no_proxy}
@@ -33,4 +35,17 @@ services:
     build:
       context: GenAIComps
       dockerfile: comps/third_parties/vllm/src/Dockerfile.amd_gpu
+    extends: visualqna
     image: ${REGISTRY:-opea}/vllm-rocm:${TAG:-latest}
+  vllm:
+    build:
+      context: vllm
+      dockerfile: docker/Dockerfile.cpu
+    extends: visualqna
+    image: ${REGISTRY:-opea}/vllm:${TAG:-latest}
+  vllm-gaudi:
+    build:
+      context: vllm-fork
+      dockerfile: Dockerfile.hpu
+    extends: visualqna
+    image: ${REGISTRY:-opea}/vllm-gaudi:${TAG:-latest}
