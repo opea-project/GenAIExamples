@@ -101,12 +101,12 @@ function validate_service() {
             echo "[ $SERVICE_NAME ] Content is as expected."
         else
             echo "[ $SERVICE_NAME ] Content does not match the expected result: $CONTENT"
-            docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
+            docker logs ${DOCKER_NAME} 
             exit 1
         fi
     else
         echo "[ $SERVICE_NAME ] HTTP status is not 200. Received status was $HTTP_STATUS"
-        docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
+        docker logs ${DOCKER_NAME}
         exit 1
     fi
     sleep 1s
@@ -199,8 +199,6 @@ function stop_docker() {
 function main() {
 
     stop_docker
-    docker ps
-    echo y | docker system prune
 
     if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
     start_time=$(date +%s)
@@ -212,15 +210,14 @@ function main() {
     validate_microservices
     dataprep
     validate_megaservice
-    docker logs text2cypher-gaudi-container
 
     validate_frontend
 
     cd $WORKPATH/docker_image_build
     rm -rf GenAIComps vllm
 
-    #stop_docker
-    #echo y | docker system prune
+    stop_docker
+    echo y | docker system prune
 
 }
 
