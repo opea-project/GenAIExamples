@@ -3,7 +3,8 @@
 # Copyright (C) 2024 Advanced Micro Devices, Inc
 # SPDX-License-Identifier: Apache-2.0
 
-export HOST_IP=${Your_host_ip_address}
+export HOST_IP=${host_ip}
+export EXTERNAL_HOST_IP=${host_ip}
 export VISUALQNA_TGI_SERVICE_PORT="8399"
 export VISUALQNA_HUGGINGFACEHUB_API_TOKEN=${Your_HUGGINGFACEHUB_API_TOKEN}
 export VISUALQNA_CARD_ID="card1"

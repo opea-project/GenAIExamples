@@ -17,52 +17,39 @@ ip_address=$(hostname -I | awk '{print $1}')
 
 function build_docker_images() {
     opea_branch=${opea_branch:-"main"}
-    # If the opea_branch isn't main, replace the git clone branch in Dockerfile.
-    if [[ "${opea_branch}" != "main" ]]; then
-        cd $WORKPATH
-        OLD_STRING="RUN git clone --depth 1 https://github.com/opea-project/GenAIComps.git"
-        NEW_STRING="RUN git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git"
-        find . -type f -name "Dockerfile*" | while read -r file; do
-            echo "Processing file: $file"
-            sed -i "s|$OLD_STRING|$NEW_STRING|g" "$file"
-        done
-    fi
 
     cd $WORKPATH/docker_image_build
     git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
+    pushd GenAIComps
+    echo "GenAIComps test commit is $(git rev-parse HEAD)"
+    docker build --no-cache -t ${REGISTRY}/comps-base:${TAG} --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
+    popd && sleep 1s
+
+    git clone https://github.com/HabanaAI/vllm-fork.git
+    cd vllm-fork/
+    VLLM_FORK_VER=v0.6.6.post1+Gaudi-1.20.0
+    echo "Check out vLLM tag ${VLLM_FORK_VER}"
+    git checkout ${VLLM_FORK_VER} &> /dev/null && cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="audioqna audioqna-ui whisper-gaudi speecht5-gaudi"
+    service_list="audioqna audioqna-ui whisper-gaudi speecht5-gaudi vllm-gaudi"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
-    docker pull ghcr.io/huggingface/tgi-gaudi:2.0.6
     docker images && sleep 1s
 }
 
 function start_services() {
     cd $WORKPATH/docker_compose/intel/hpu/gaudi
-    export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
-    export LLM_MODEL_ID=Intel/neural-chat-7b-v3-3
-
-    export MEGA_SERVICE_HOST_IP=${ip_address}
-    export WHISPER_SERVER_HOST_IP=${ip_address}
-    export SPEECHT5_SERVER_HOST_IP=${ip_address}
-    export LLM_SERVER_HOST_IP=${ip_address}
-
-    export WHISPER_SERVER_PORT=7066
-    export SPEECHT5_SERVER_PORT=7055
-    export LLM_SERVER_PORT=3006
-
-    export BACKEND_SERVICE_ENDPOINT=http://${ip_address}:3008/v1/audioqna
     export host_ip=${ip_address}
+    source set_env.sh
     # sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
     # Start Docker Containers
     docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
     n=0
     until [[ "$n" -ge 200 ]]; do
-       docker logs tgi-gaudi-server > $LOG_PATH/tgi_service_start.log
-       if grep -q Connected $LOG_PATH/tgi_service_start.log; then
+       docker logs vllm-gaudi-service > $LOG_PATH/vllm_service_start.log 2>&1
+       if grep -q complete $LOG_PATH/vllm_service_start.log; then
            break
        fi
        sleep 5s
@@ -86,7 +73,7 @@ function validate_megaservice() {
     # always print the log
     docker logs whisper-service > $LOG_PATH/whisper-service.log
     docker logs speecht5-service > $LOG_PATH/tts-service.log
-    docker logs tgi-gaudi-server > $LOG_PATH/tgi-gaudi-server.log
+    docker logs vllm-gaudi-service > $LOG_PATH/vllm-gaudi-service.log
     docker logs audioqna-gaudi-backend-server > $LOG_PATH/audioqna-gaudi-backend-server.log
     echo "$response" | sed 's/^"//;s/"$//' | base64 -d > speech.mp3
 
@@ -96,50 +83,35 @@ function validate_megaservice() {
         echo "Result wrong."
         exit 1
     fi
-
 }
-
-#function validate_frontend() {
-#    cd $WORKPATH/ui/svelte
-#    local conda_env_name="OPEA_e2e"
-#    export PATH=${HOME}/miniforge3/bin/:$PATH
-##    conda remove -n ${conda_env_name} --all -y
-##    conda create -n ${conda_env_name} python=3.12 -y
-#    source activate ${conda_env_name}
-#
-#    sed -i "s/localhost/$ip_address/g" playwright.config.ts
-#
-##    conda install -c conda-forge nodejs=22.6.0 -y
-#    npm install && npm ci && npx playwright install --with-deps
-#    node -v && npm -v && pip list
-#
-#    exit_status=0
-#    npx playwright test || exit_status=$?
-#
-#    if [ $exit_status -ne 0 ]; then
-#        echo "[TEST INFO]: ---------frontend test failed---------"
-#        exit $exit_status
-#    else
-#        echo "[TEST INFO]: ---------frontend test passed---------"
-#    fi
-#}
 
 function stop_docker() {
     cd $WORKPATH/docker_compose/intel/hpu/gaudi
-    docker compose stop && docker compose rm -f
+    docker compose -f compose.yaml stop && docker compose rm -f
 }
 
 function main() {
 
+    echo "::group::stop_docker"
     stop_docker
+    echo "::endgroup::"
+
+    echo "::group::build_docker_images"
     if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
+    echo "::endgroup::"
+
+    echo "::group::start_services"
     start_services
+    echo "::endgroup::"
 
+    echo "::group::validate_megaservice"
     validate_megaservice
-    # validate_frontend
+    echo "::endgroup::"
 
+    echo "::group::stop_docker"
     stop_docker
-    echo y | docker system prune
+    docker system prune -f
+    echo "::endgroup::"
 
 }
 

@@ -31,8 +31,8 @@ function build_docker_images() {
     cd $WORKPATH/docker_image_build
     git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
     git clone https://github.com/HabanaAI/vllm-fork.git && cd vllm-fork
-    VLLM_VER=$(git describe --tags "$(git rev-list --tags --max-count=1)")
-    git checkout ${VLLM_VER} &> /dev/null && cd ../
+    VLLM_FORK_VER=v0.6.6.post1+Gaudi-1.20.0
+    git checkout ${VLLM_FORK_VER} &> /dev/null && cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
     service_list="codetrans codetrans-ui llm-textgen vllm-gaudi nginx"
@@ -42,28 +42,12 @@ function build_docker_images() {
 }
 
 function start_services() {
-    cd $WORKPATH/docker_compose/intel/hpu/gaudi
-
-    export http_proxy=${http_proxy}
-    export https_proxy=${http_proxy}
-    export LLM_MODEL_ID="mistralai/Mistral-7B-Instruct-v0.3"
-    export LLM_ENDPOINT="http://${ip_address}:8008"
-    export LLM_COMPONENT_NAME="OpeaTextGenService"
-    export NUM_CARDS=1
-    export BLOCK_SIZE=128
-    export MAX_NUM_SEQS=256
-    export MAX_SEQ_LEN_TO_CAPTURE=2048
+    cd $WORKPATH/docker_compose
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
-    export MEGA_SERVICE_HOST_IP=${ip_address}
-    export LLM_SERVICE_HOST_IP=${ip_address}
-    export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:7777/v1/codetrans"
-    export FRONTEND_SERVICE_IP=${ip_address}
-    export FRONTEND_SERVICE_PORT=5173
-    export BACKEND_SERVICE_NAME=codetrans
-    export BACKEND_SERVICE_IP=${ip_address}
-    export BACKEND_SERVICE_PORT=7777
     export NGINX_PORT=80
     export host_ip=${ip_address}
+    source set_env.sh
+    cd intel/hpu/gaudi
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 

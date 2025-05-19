@@ -9,6 +9,15 @@ echo "WORKDIR=${WORKDIR}"
 export ip_address=$(hostname -I | awk '{print $1}')
 export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
 export TOOLSET_PATH=$WORKDIR/GenAIExamples/AgentQnA/tools/
+export no_proxy="$no_proxy,rag-agent-endpoint,sql-agent-endpoint,react-agent-endpoint,agent-ui,vllm-gaudi-server,jaeger,grafana,prometheus,127.0.0.1,localhost,0.0.0.0,$ip_address"
+IMAGE_REPO=${IMAGE_REPO:-"opea"}
+IMAGE_TAG=${IMAGE_TAG:-"latest"}
+echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
+echo "TAG=IMAGE_TAG=${IMAGE_TAG}"
+export REGISTRY=${IMAGE_REPO}
+export TAG=${IMAGE_TAG}
+export MODEL_CACHE=${model_cache:-"./data"}
+
 
 function stop_crag() {
     cid=$(docker ps -aq --filter "name=kdd-cup-24-crag-service")
@@ -16,7 +25,7 @@ function stop_crag() {
     if [[ ! -z "$cid" ]]; then docker rm $cid -f && sleep 1s; fi
 }
 
-function stop_agent_docker() {
+function stop_agent_containers() {
     cd $WORKPATH/docker_compose/intel/hpu/gaudi/
     container_list=$(cat compose.yaml | grep container_name | cut -d':' -f2)
     for container_name in $container_list; do
@@ -24,6 +33,18 @@ function stop_agent_docker() {
         echo "Stopping container $container_name"
         if [[ ! -z "$cid" ]]; then docker rm $cid -f && sleep 1s; fi
     done
+}
+
+function stop_telemetry_containers(){
+    cd $WORKPATH/docker_compose/intel/hpu/gaudi/
+    container_list=$(cat compose.telemetry.yaml | grep container_name | cut -d':' -f2)
+    for container_name in $container_list; do
+        cid=$(docker ps -aq --filter "name=$container_name")
+        echo "Stopping container $container_name"
+        if [[ ! -z "$cid" ]]; then docker rm $cid -f && sleep 1s; fi
+    done
+    container_list=$(cat compose.telemetry.yaml | grep container_name | cut -d':' -f2)
+
 }
 
 function stop_llm(){
@@ -57,37 +78,31 @@ function stop_retrieval_tool() {
     done
 }
 echo "workpath: $WORKPATH"
-echo "=================== Stop containers ===================="
-stop_crag
+echo "::group::=================== Stop containers ===================="
 stop_llm
-stop_agent_docker
+stop_crag
+stop_agent_containers
 stop_retrieval_tool
+stop_telemetry_containers
+echo "::endgroup::"
 
 cd $WORKPATH/tests
 
-echo "=================== #1 Building docker images===================="
-bash step1_build_images.sh
-echo "=================== #1 Building docker images completed===================="
+echo "::group::=================== Building docker images===================="
+bash step1_build_images.sh gaudi_vllm > docker_image_build.log
+echo "::endgroup::"
 
-echo "=================== #2 Start retrieval tool===================="
-bash step2_start_retrieval_tool.sh
-echo "=================== #2 Retrieval tool started===================="
-
-echo "=================== #3 Ingest data and validate retrieval===================="
-bash step3_ingest_data_and_validate_retrieval.sh
-echo "=================== #3 Data ingestion and validation completed===================="
-
-echo "=================== #4 Start agent and API server===================="
+echo "::group::=================== Start agent, API server, retrieval, and ingest data===================="
 bash step4_launch_and_validate_agent_gaudi.sh
-echo "=================== #4 Agent test passed ===================="
+echo "::endgroup::"
 
-echo "=================== #5 Stop agent and API server===================="
-stop_crag
-stop_agent_docker
-stop_retrieval_tool
+echo "::group::=================== Stop agent and API server===================="
 stop_llm
-echo "=================== #5 Agent and API server stopped===================="
-
+stop_crag
+stop_agent_containers
+stop_retrieval_tool
+stop_telemetry_containers
 echo y | docker system prune
+echo "::endgroup::"
 
 echo "ALL DONE!!"

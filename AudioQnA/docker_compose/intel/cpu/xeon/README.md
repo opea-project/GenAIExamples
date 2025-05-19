@@ -1,124 +1,197 @@
-# Build Mega Service of AudioQnA on Xeon
+# Deploying AudioQnA on Intel® Xeon® Processors
 
-This document outlines the deployment process for a AudioQnA application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on Intel Xeon server.
+This document outlines the single node deployment process for a AudioQnA application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservices on Intel Xeon server. The steps include pulling Docker images, container deployment via Docker Compose, and service execution using microservices `llm`.
 
-## 🚀 Build Docker images
+Note: The default LLM is `meta-llama/Meta-Llama-3-8B-Instruct`. Before deploying the application, please make sure either you've requested and been granted the access to it on [Huggingface](https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct) or you've downloaded the model locally from [ModelScope](https://www.modelscope.cn/models).
 
-### 1. Source Code install GenAIComps
+## Table of Contents
 
-```bash
-git clone https://github.com/opea-project/GenAIComps.git
-cd GenAIComps
-```
+1. [AudioQnA Quick Start Deployment](#audioqna-quick-start-deployment)
+2. [AudioQnA Docker Compose Files](#audioqna-docker-compose-files)
+3. [Validate Microservices](#validate-microservices)
+4. [Conclusion](#conclusion)
 
-### 2. Build ASR Image
+## AudioQnA Quick Start Deployment
 
-```bash
-docker build -t opea/whisper:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/asr/src/integrations/dependency/whisper/Dockerfile .
-```
+This section describes how to quickly deploy and test the AudioQnA service manually on an Intel® Xeon® processor. The basic steps are:
 
-### 3. Build LLM Image
+1. [Access the Code](#access-the-code)
+2. [Configure the Deployment Environment](#configure-the-deployment-environment)
+3. [Deploy the Services Using Docker Compose](#deploy-the-services-using-docker-compose)
+4. [Check the Deployment Status](#check-the-deployment-status)
+5. [Validate the Pipeline](#validate-the-pipeline)
+6. [Cleanup the Deployment](#cleanup-the-deployment)
 
-Intel Xeon optimized image hosted in huggingface repo will be used for TGI service: ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu (https://github.com/huggingface/text-generation-inference)
+### Access the Code
 
-### 4. Build TTS Image
-
-```bash
-docker build -t opea/speecht5:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/tts/src/integrations/dependency/speecht5/Dockerfile .
-
-# multilang tts (optional)
-docker build -t opea/gpt-sovits:latest --build-arg http_proxy=$http_proxy --build-arg https_proxy=$https_proxy -f comps/tts/src/integrations/dependency/gpt-sovits/Dockerfile .
-```
-
-### 5. Build MegaService Docker Image
-
-To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `audioqna.py` Python script. Build the MegaService Docker image using the command below:
+Clone the GenAIExample repository and access the AudioQnA Intel® Xeon® platform Docker Compose files and supporting scripts:
 
 ```bash
 git clone https://github.com/opea-project/GenAIExamples.git
-cd GenAIExamples/AudioQnA/
-docker build --no-cache -t opea/audioqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
+cd GenAIExamples/AudioQnA
 ```
 
-Then run the command `docker images`, you will have following images ready:
-
-1. `opea/whisper:latest`
-2. `opea/speecht5:latest`
-3. `opea/audioqna:latest`
-4. `opea/gpt-sovits:latest` (optional)
-
-## 🚀 Set the environment variables
-
-Before starting the services with `docker compose`, you have to recheck the following environment variables.
+Then checkout a released version, such as v1.2:
 
 ```bash
-export host_ip=<your External Public IP>    # export host_ip=$(hostname -I | awk '{print $1}')
-export HUGGINGFACEHUB_API_TOKEN=<your HF token>
-
-export LLM_MODEL_ID=Intel/neural-chat-7b-v3-3
-
-export MEGA_SERVICE_HOST_IP=${host_ip}
-export WHISPER_SERVER_HOST_IP=${host_ip}
-export SPEECHT5_SERVER_HOST_IP=${host_ip}
-export LLM_SERVER_HOST_IP=${host_ip}
-export GPT_SOVITS_SERVER_HOST_IP=${host_ip}
-
-export WHISPER_SERVER_PORT=7066
-export SPEECHT5_SERVER_PORT=7055
-export GPT_SOVITS_SERVER_PORT=9880
-export LLM_SERVER_PORT=3006
-
-export BACKEND_SERVICE_ENDPOINT=http://${host_ip}:3008/v1/audioqna
+git checkout v1.2
 ```
 
-or use set_env.sh file to setup environment variables.
+### Configure the Deployment Environment
 
-Note: Please replace with host_ip with your external IP address, do not use localhost.
-
-## 🚀 Start the MegaService
+To set up environment variables for deploying AudioQnA services, set up some parameters specific to the deployment environment and source the `set_env.sh` script in this directory:
 
 ```bash
-cd GenAIExamples/AudioQnA/docker_compose/intel/cpu/xeon/
-docker compose up -d
-
-# multilang tts (optional)
-docker compose -f compose_multilang.yaml up -d
+export host_ip="External_Public_IP"           # ip address of the node
+export HUGGINGFACEHUB_API_TOKEN="Your_HuggingFace_API_Token"
+export http_proxy="Your_HTTP_Proxy"           # http proxy if any
+export https_proxy="Your_HTTPs_Proxy"         # https proxy if any
+export no_proxy=localhost,127.0.0.1,$host_ip,whisper-service,speecht5-service,vllm-service,tgi-service,audioqna-xeon-backend-server,audioqna-xeon-ui-server  # additional no proxies if needed
+export NGINX_PORT=${your_nginx_port}          # your usable port for nginx, 80 for example
+source ./set_env.sh
 ```
 
-## 🚀 Test MicroServices
+Consult the section on [AudioQnA Service configuration](#audioqna-configuration) for information on how service specific configuration parameters affect deployments.
+
+### Deploy the Services Using Docker Compose
+
+To deploy the AudioQnA services, execute the `docker compose up` command with the appropriate arguments. For a default deployment, execute the command below. It uses the 'compose.yaml' file.
 
 ```bash
-# whisper service
-wget https://github.com/intel/intel-extension-for-transformers/raw/main/intel_extension_for_transformers/neural_chat/assets/audio/sample.wav
-curl http://${host_ip}:7066/v1/audio/transcriptions \
-  -H "Content-Type: multipart/form-data" \
-  -F file="@./sample.wav" \
-  -F model="openai/whisper-small"
-
-# tgi service
-curl http://${host_ip}:3006/generate \
-  -X POST \
-  -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}' \
-  -H 'Content-Type: application/json'
-
-# speecht5 service
-curl http://${host_ip}:7055/v1/audio/speech -XPOST -d '{"input": "Who are you?"}' -H 'Content-Type: application/json' --output speech.mp3
-
-# gpt-sovits service (optional)
-curl http://${host_ip}:9880/v1/audio/speech -XPOST -d '{"input": "Who are you?"}' -H 'Content-Type: application/json' --output speech.mp3
+cd docker_compose/intel/cpu/xeon
+docker compose -f compose.yaml up -d
 ```
 
-## 🚀 Test MegaService
+> **Note**: developers should build docker image from source when:
+>
+> - Developing off the git main branch (as the container's ports in the repo may be different > from the published docker image).
+> - Unable to download the docker image.
+> - Use a specific version of Docker image.
 
-Test the AudioQnA megaservice by recording a .wav file, encoding the file into the base64 format, and then sending the
-base64 string to the megaservice endpoint. The megaservice will return a spoken response as a base64 string. To listen
-to the response, decode the base64 string and save it as a .wav file.
+Please refer to the table below to build different microservices from source:
+
+| Microservice | Deployment Guide                                                                                                                  |
+| ------------ | --------------------------------------------------------------------------------------------------------------------------------- |
+| vLLM         | [vLLM build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/third_parties/vllm#build-docker)                    |
+| LLM          | [LLM build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/llms)                                                |
+| WHISPER      | [Whisper build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/asr/src#211-whisper-server-image)                |
+| SPEECHT5     | [SpeechT5 build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/tts/src#211-speecht5-server-image)              |
+| GPT-SOVITS   | [GPT-SOVITS build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/third_parties/gpt-sovits/src#build-the-image) |
+| MegaService  | [MegaService build guide](../../../../README_miscellaneous.md#build-megaservice-docker-image)                                     |
+| UI           | [Basic UI build guide](../../../../README_miscellaneous.md#build-ui-docker-image)                                                 |
+
+### Check the Deployment Status
+
+After running docker compose, check if all the containers launched via docker compose have started:
 
 ```bash
+docker ps -a
+```
+
+For the default deployment, the following 5 containers should have started:
+
+```
+1c67e44c39d2   opea/audioqna-ui:latest   "docker-entrypoint.s…"   About a minute ago   Up About a minute             0.0.0.0:5173->5173/tcp, :::5173->5173/tcp   audioqna-xeon-ui-server
+833a42677247   opea/audioqna:latest      "python audioqna.py"     About a minute ago   Up About a minute             0.0.0.0:3008->8888/tcp, :::3008->8888/tcp   audioqna-xeon-backend-server
+5dc4eb9bf499   opea/speecht5:latest      "python speecht5_ser…"   About a minute ago   Up About a minute             0.0.0.0:7055->7055/tcp, :::7055->7055/tcp   speecht5-service
+814e6efb1166   opea/vllm:latest          "python3 -m vllm.ent…"   About a minute ago   Up About a minute (healthy)   0.0.0.0:3006->80/tcp, :::3006->80/tcp       vllm-service
+46f7a00f4612   opea/whisper:latest       "python whisper_serv…"   About a minute ago   Up About a minute             0.0.0.0:7066->7066/tcp, :::7066->7066/tcp   whisper-service
+```
+
+If any issues are encountered during deployment, refer to the [Troubleshooting](../../../../README_miscellaneous.md#troubleshooting) section.
+
+### Validate the Pipeline
+
+Once the AudioQnA services are running, test the pipeline using the following command:
+
+```bash
+# Test the AudioQnA megaservice by recording a .wav file, encoding the file into the base64 format, and then sending the base64 string to the megaservice endpoint.
+# The megaservice will return a spoken response as a base64 string. To listen to the response, decode the base64 string and save it as a .wav file.
+wget https://github.com/intel/intel-extension-for-transformers/raw/refs/heads/main/intel_extension_for_transformers/neural_chat/assets/audio/sample_2.wav
+base64_audio=$(base64 -w 0 sample_2.wav)
+
 # if you are using speecht5 as the tts service, voice can be "default" or "male"
-# if you are using gpt-sovits for the tts service, you can set the reference audio following https://github.com/opea-project/GenAIComps/blob/main/comps/tts/src/integrations/dependency/gpt-sovits/README.md
+# if you are using gpt-sovits for the tts service, you can set the reference audio following https://github.com/opea-project/GenAIComps/blob/main/comps/third_parties/gpt-sovits/src/README.md
+
 curl http://${host_ip}:3008/v1/audioqna \
   -X POST \
-  -d '{"audio": "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA", "max_tokens":64, "voice":"default"}' \
-  -H 'Content-Type: application/json' | sed 's/^"//;s/"$//' | base64 -d > output.wav
+  -H "Content-Type: application/json" \
+  -d "{\"audio\": \"${base64_audio}\", \"max_tokens\": 64, \"voice\": \"default\"}" \
+  | sed 's/^"//;s/"$//' | base64 -d > output.wav
 ```
+
+**Note** : Access the AudioQnA UI by web browser through this URL: `http://${host_ip}:5173`. Please confirm the `5173` port is opened in the firewall. To validate each microservice used in the pipeline refer to the [Validate Microservices](#validate-microservices) section.
+
+### Cleanup the Deployment
+
+To stop the containers associated with the deployment, execute the following command:
+
+```bash
+docker compose -f compose.yaml down
+```
+
+## AudioQnA Docker Compose Files
+
+In the context of deploying an AudioQnA pipeline on an Intel® Xeon® platform, we can pick and choose different large language model serving frameworks, or single English TTS/multi-language TTS component. The table below outlines the various configurations that are available as part of the application. These configurations can be used as templates and can be extended to different components available in [GenAIComps](https://github.com/opea-project/GenAIComps.git).
+
+| File                                               | Description                                                                               |
+| -------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| [compose.yaml](./compose.yaml)                     | Default compose file using vllm as serving framework and redis as vector database         |
+| [compose_tgi.yaml](./compose_tgi.yaml)             | The LLM serving framework is TGI. All other configurations remain the same as the default |
+| [compose_multilang.yaml](./compose_multilang.yaml) | The TTS component is GPT-SoVITS. All other configurations remain the same as the default  |
+
+## Validate MicroServices
+
+1. Whisper Service
+
+   ```bash
+   wget https://github.com/intel/intel-extension-for-transformers/raw/main/intel_extension_for_transformers/neural_chat/assets/audio/sample.wav
+   curl http://${host_ip}:${WHISPER_SERVER_PORT}/v1/audio/transcriptions \
+     -H "Content-Type: multipart/form-data" \
+     -F file="@./sample.wav" \
+     -F model="openai/whisper-small"
+   ```
+
+2. LLM backend Service
+
+   In the first startup, this service will take more time to download, load and warm up the model. After it's finished, the service will be ready and the container (`vllm-service` or `tgi-service`) status shown via `docker ps` will be `healthy`. Before that, the status will be `health: starting`.
+
+   Or try the command below to check whether the LLM serving is ready.
+
+   ```bash
+   # vLLM service
+   docker logs vllm-service 2>&1 | grep complete
+   # If the service is ready, you will get the response like below.
+   INFO:     Application startup complete.
+   ```
+
+   ```bash
+   # TGI service
+   docker logs tgi-service | grep Connected
+   # If the service is ready, you will get the response like below.
+   2024-09-03T02:47:53.402023Z  INFO text_generation_router::server: router/src/server.rs:2311: Connected
+   ```
+
+   Then try the `cURL` command below to validate services.
+
+   ```bash
+   # either vLLM or TGI service
+   curl http://${host_ip}:${LLM_SERVER_PORT}/v1/chat/completions \
+     -X POST \
+     -d '{"model": "meta-llama/Meta-Llama-3-8B-Instruct", "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens":17}' \
+     -H 'Content-Type: application/json'
+   ```
+
+3. TTS Service
+
+   ```bash
+   # speecht5 service
+   curl http://${host_ip}:${SPEECHT5_SERVER_PORT}/v1/audio/speech -XPOST -d '{"input": "Who are you?"}' -H 'Content-Type: application/json' --output speech.mp3
+
+   # gpt-sovits service (optional)
+   curl http://${host_ip}:${GPT_SOVITS_SERVER_PORT}/v1/audio/speech -XPOST -d '{"input": "Who are you?"}' -H 'Content-Type: application/json' --output speech.mp3
+   ```
+
+## Conclusion
+
+This guide should enable developers to deploy the default configuration or any of the other compose yaml files for different configurations. It also highlights the configurable parameters that can be set before deployment.

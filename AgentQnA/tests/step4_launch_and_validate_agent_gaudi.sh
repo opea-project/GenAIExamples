@@ -8,6 +8,8 @@ WORKPATH=$(dirname "$PWD")
 export WORKDIR=$WORKPATH/../../
 echo "WORKDIR=${WORKDIR}"
 export ip_address=$(hostname -I | awk '{print $1}')
+export host_ip=$ip_address
+echo "ip_address=${ip_address}"
 export TOOLSET_PATH=$WORKPATH/tools/
 export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
 HF_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
@@ -24,21 +26,23 @@ ls $HF_CACHE_DIR
 vllm_port=8086
 vllm_volume=${HF_CACHE_DIR}
 
-function start_tgi(){
-    echo "Starting tgi-gaudi server"
-    cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/hpu/gaudi
-    bash launch_tgi_gaudi.sh
 
+function start_agent_service() {
+    echo "Starting agent service"
+    cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/hpu/gaudi
+    source set_env.sh
+    docker compose -f compose.yaml up -d
 }
 
-function start_vllm_service_70B() {
+function start_all_services() {
 
     echo "token is ${HF_TOKEN}"
 
     echo "start vllm gaudi service"
     echo "**************model is $model**************"
-    vllm_image=opea/vllm-gaudi:ci
-    docker run -d --runtime=habana --rm --name "vllm-gaudi-server" -e HABANA_VISIBLE_DEVICES=0,1,2,3 -p $vllm_port:8000 -v $vllm_volume:/data -e HF_TOKEN=$HF_TOKEN -e HUGGING_FACE_HUB_TOKEN=$HF_TOKEN -e HF_HOME=/data -e OMPI_MCA_btl_vader_single_copy_mechanism=none -e PT_HPU_ENABLE_LAZY_COLLECTIVES=true -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e no_proxy=$no_proxy -e VLLM_SKIP_WARMUP=true --cap-add=sys_nice --ipc=host $vllm_image --model ${model} --max-seq-len-to-capture 16384 --tensor-parallel-size 4
+    cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/hpu/gaudi
+    source set_env.sh
+    docker compose -f $WORKDIR/GenAIExamples/DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml -f compose.yaml -f compose.telemetry.yaml up -d
     sleep 5s
     echo "Waiting vllm gaudi ready"
     n=0
@@ -67,16 +71,6 @@ function download_chinook_data(){
     cp chinook-database/ChinookDatabase/DataSources/Chinook_Sqlite.sqlite $WORKDIR/GenAIExamples/AgentQnA/tests/
 }
 
-function start_agent_and_api_server() {
-    echo "Starting CRAG server"
-    docker run -d --runtime=runc --name=kdd-cup-24-crag-service -p=8080:8000 docker.io/aicrowd/kdd-cup-24-crag-mock-api:v0
-
-    echo "Starting Agent services"
-    cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/hpu/gaudi
-    bash launch_agent_service_gaudi.sh
-    sleep 2m
-}
-
 function validate() {
     local CONTENT="$1"
     local EXPECTED_RESULT="$2"
@@ -95,8 +89,9 @@ function validate_agent_service() {
     # # test worker rag agent
     echo "======================Testing worker rag agent======================"
     export agent_port="9095"
+    export agent_ip="127.0.0.1"
     prompt="Tell me about Michael Jackson song Thriller"
-    local CONTENT=$(python3 $WORKDIR/GenAIExamples/AgentQnA/tests/test.py --prompt "$prompt" --agent_role "worker" --ext_port $agent_port)
+    local CONTENT=$(python3 $WORKDIR/GenAIExamples/AgentQnA/tests/test.py --prompt "$prompt" --agent_role "worker" --ip_addr $agent_ip  --ext_port $agent_port)
     # echo $CONTENT
     local EXIT_CODE=$(validate "$CONTENT" "Thriller" "rag-agent-endpoint")
     echo $EXIT_CODE
@@ -110,7 +105,7 @@ function validate_agent_service() {
     echo "======================Testing worker sql agent======================"
     export agent_port="9096"
     prompt="How many employees are there in the company?"
-    local CONTENT=$(python3 $WORKDIR/GenAIExamples/AgentQnA/tests/test.py --prompt "$prompt" --agent_role "worker" --ext_port $agent_port)
+    local CONTENT=$(python3 $WORKDIR/GenAIExamples/AgentQnA/tests/test.py --prompt "$prompt" --agent_role "worker" --ip_addr $agent_ip --ext_port $agent_port)
     local EXIT_CODE=$(validate "$CONTENT" "8" "sql-agent-endpoint")
     echo $CONTENT
     # echo $EXIT_CODE
@@ -123,7 +118,7 @@ function validate_agent_service() {
     # test supervisor react agent
     echo "======================Testing supervisor react agent======================"
     export agent_port="9090"
-    local CONTENT=$(python3 $WORKDIR/GenAIExamples/AgentQnA/tests/test.py --agent_role "supervisor" --ext_port $agent_port --stream)
+    local CONTENT=$(python3 $WORKDIR/GenAIExamples/AgentQnA/tests/test.py --agent_role "supervisor" --ip_addr $agent_ip  --ext_port $agent_port --stream)
     local EXIT_CODE=$(validate "$CONTENT" "Iron" "react-agent-endpoint")
     # echo $CONTENT
     echo $EXIT_CODE
@@ -144,18 +139,50 @@ function remove_chinook_data(){
     echo "Chinook data removed!"
 }
 
+function ingest_data_and_validate() {
+    echo "Ingesting data"
+    cd $WORKDIR/GenAIExamples/AgentQnA/retrieval_tool/
+    echo $PWD
+    local CONTENT=$(bash run_ingest_data.sh)
+    local EXIT_CODE=$(validate "$CONTENT" "Data preparation succeeded" "dataprep-redis-server")
+    echo "$EXIT_CODE"
+    local EXIT_CODE="${EXIT_CODE:0-1}"
+    echo "return value is $EXIT_CODE"
+    if [ "$EXIT_CODE" == "1" ]; then
+        docker logs dataprep-redis-server
+        return 1
+    fi
+}
+
+function validate_retrieval_tool() {
+    echo "----------------Test retrieval tool ----------------"
+    local CONTENT=$(http_proxy="" curl http://${ip_address}:8889/v1/retrievaltool -X POST -H "Content-Type: application/json" -d '{
+     "text": "Who sang Thriller"
+    }')
+    local EXIT_CODE=$(validate "$CONTENT" "Thriller" "retrieval-tool")
+
+    if [ "$EXIT_CODE" == "1" ]; then
+        docker logs retrievaltool-xeon-backend-server
+        exit 1
+    fi
+}
+
 function main() {
     echo "==================== Prepare data ===================="
     download_chinook_data
     echo "==================== Data prepare done ===================="
 
-    echo "==================== Start VLLM service ===================="
-    start_vllm_service_70B
-    echo "==================== VLLM service started ===================="
+    echo "==================== Start all services ===================="
+    start_all_services
+    echo "==================== all services started ===================="
 
-    echo "==================== Start agent ===================="
-    start_agent_and_api_server
-    echo "==================== Agent started ===================="
+    echo "==================== Ingest data ===================="
+    ingest_data_and_validate
+    echo "==================== Data ingestion completed ===================="
+
+    echo "==================== Validate retrieval tool ===================="
+    validate_retrieval_tool
+    echo "==================== Retrieval tool validated ===================="
 
     echo "==================== Validate agent service ===================="
     validate_agent_service

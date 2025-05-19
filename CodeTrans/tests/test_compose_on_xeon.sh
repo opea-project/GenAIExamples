@@ -31,7 +31,7 @@ function build_docker_images() {
     cd $WORKPATH/docker_image_build
     git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
     git clone https://github.com/vllm-project/vllm.git && cd vllm
-    VLLM_VER="$(git describe --tags "$(git rev-list --tags --max-count=1)" )"
+    VLLM_VER="v0.8.3"
     echo "Check out vLLM tag ${VLLM_VER}"
     git checkout ${VLLM_VER} &> /dev/null
     cd ../
@@ -44,23 +44,13 @@ function build_docker_images() {
 }
 
 function start_services() {
-    cd $WORKPATH/docker_compose/intel/cpu/xeon/
-    export http_proxy=${http_proxy}
-    export https_proxy=${http_proxy}
-    export LLM_MODEL_ID="mistralai/Mistral-7B-Instruct-v0.3"
-    export LLM_ENDPOINT="http://${ip_address}:8008"
-    export LLM_COMPONENT_NAME="OpeaTextGenService"
+    cd $WORKPATH/docker_compose
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
-    export MEGA_SERVICE_HOST_IP=${ip_address}
-    export LLM_SERVICE_HOST_IP=${ip_address}
-    export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:7777/v1/codetrans"
-    export FRONTEND_SERVICE_IP=${ip_address}
-    export FRONTEND_SERVICE_PORT=5173
-    export BACKEND_SERVICE_NAME=codetrans
-    export BACKEND_SERVICE_IP=${ip_address}
-    export BACKEND_SERVICE_PORT=7777
+
     export NGINX_PORT=80
     export host_ip=${ip_address}
+    source set_env.sh
+    cd intel/cpu/xeon/
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 

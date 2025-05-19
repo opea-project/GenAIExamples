@@ -12,6 +12,7 @@ WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
 
+export MODEL_CACHE=${model_cache:-"/var/lib/GenAI/data"}
 export REGISTRY=${IMAGE_REPO}
 export TAG=${IMAGE_TAG}
 export HOST_IP=${ip_address}
@@ -33,6 +34,7 @@ export BACKEND_SERVICE_IP=${HOST_IP}
 export BACKEND_SERVICE_PORT=8888
 export NGINX_PORT=18003
 export PATH="~/miniconda3/bin:$PATH"
+export MODEL_CACHE=${model_cache:-"/var/opea/multimodalqna-service/data"}
 
 function build_docker_images() {
     opea_branch=${opea_branch:-"main"}
@@ -63,11 +65,11 @@ function start_services() {
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
     # Start Docker Containers
-    docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
+    docker compose -f compose.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
 
     n=0
     until [[ "$n" -ge 100 ]]; do
-        docker logs visualqna-tgi-service > ${LOG_PATH}/lvm_tgi_service_start.log
+        docker logs visualqna-tgi-service >& ${LOG_PATH}/lvm_tgi_service_start.log
         if grep -q Connected ${LOG_PATH}/lvm_tgi_service_start.log; then
             break
         fi

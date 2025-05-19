@@ -1,0 +1,29 @@
+# Copyright (C) 2025 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+name: Check stale issue and pr
+
+on:
+  schedule:
+    - cron: "30 22 * * *"
+
+jobs:
+  close-issues:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+    steps:
+      - uses: actions/stale@v9
+        with:
+          days-before-issue-stale: 30
+          days-before-pr-stale: 30
+          days-before-issue-close: 7
+          days-before-pr-close: 7
+          stale-issue-message: "This issue is stale because it has been open 30 days with no activity. Remove stale label or comment or this will be closed in 7 days."
+          stale-pr-message: "This PR is stale because it has been open 30 days with no activity. Remove stale label or comment or this will be closed in 7 days."
+          close-issue-message: "This issue was closed because it has been stalled for 7 days with no activity."
+          close-pr-message: "This PR was closed because it has been stalled for 7 days with no activity."
+          repo-token: ${{ secrets.ACTION_TOKEN }}
+          start-date: "2025-03-01T00:00:00Z"
+          exempt-issue-labels: "Backlog"

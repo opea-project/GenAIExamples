@@ -1,0 +1,86 @@
+From d90ba418f866bc11848d7d6507aabc6b5e8cc3e2 Mon Sep 17 00:00:00 2001
+From: lkk12014402 <kaokao.lv@intel.com>
+Date: Mon, 7 Apr 2025 07:22:53 +0000
+Subject: [PATCH] compatible opea agent tool content
+
+---
+ backend/open_webui/utils/middleware.py | 56 ++++++++++++++++++++++++++
+ 1 file changed, 56 insertions(+)
+
+diff --git a/backend/open_webui/utils/middleware.py b/backend/open_webui/utils/middleware.py
+index 289d887df..fddbe8ee1 100644
+--- a/backend/open_webui/utils/middleware.py
++++ b/backend/open_webui/utils/middleware.py
+@@ -1465,6 +1465,8 @@ async def process_chat_response(
+                 async def stream_body_handler(response):
+                     nonlocal content
+                     nonlocal content_blocks
++                    nonlocal events
++                    sources = []
+ 
+                     response_tool_calls = []
+ 
+@@ -1486,6 +1488,60 @@ async def process_chat_response(
+                         try:
+                             data = json.loads(data)
+ 
++                            tool_content_block = []
++                            if data.get("tool_name"):
++                                sources.append(
++                                    {
++                                        "source": {
++                                            "name": f"TOOL:{data.get('tool_name')}"},
++                                        "document": [data.get("tool_content")],
++                                        "metadata": [{
++                                            "source": f"TOOL:{data.get('tool_name')}"}],
++                                    }
++                                )
++                                events.append({"sources": sources})
++
++                                await event_emitter(
++                                    {
++                                        "type": "chat:completion",
++                                        "data": {"sources": sources},
++                                    }
++                                )
++                                tool_content_block = [
++                                    {
++                                        "type": "tool_calls",
++                                        "content": [
++                                            {"id": data.get('tool_name'), "function": {"name": data.get('tool_name')}}
++                                        ]
++                                    }
++                                ]
++
++                                await event_emitter(
++                                    {
++                                        "type": "chat:completion",
++                                        "data": {
++                                            "content": serialize_content_blocks(tool_content_block),
++                                        },
++                                    }
++                                )
++
++                                tool_content_block = [
++                                        {
++                                            "type": "tool_calls",
++                                            "content": [
++                                                {"id": data.get('tool_name'), "function": {"name": data.get('tool_name')}}
++                                            ],
++                                            "results": [
++                                                {"tool_call_id": data.get('tool_name'), "content": data.get("tool_content")}
++                                            ]
++                                        },
++                                        {
++                                            "type": "text",
++                                            "content": "",
++                                        }
++                                ]
++                                content_blocks.extend(tool_content_block)
++
+                             data, _ = await process_filter_functions(
+                                 request=request,
+                                 filter_functions=filter_functions,
+-- 
+2.34.1
+

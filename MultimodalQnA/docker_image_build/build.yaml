@@ -44,7 +44,7 @@ services:
   lvm-llava:
     build:
       context: GenAIComps
-      dockerfile: comps/lvms/src/integrations/dependency/llava/Dockerfile
+      dockerfile: comps/third_parties/llava/src/Dockerfile
     extends: multimodalqna
     image: ${REGISTRY:-opea}/lvm-llava:${TAG:-latest}
   lvm:
@@ -62,6 +62,23 @@ services:
   whisper:
     build:
       context: GenAIComps
-      dockerfile: comps/asr/src/integrations/dependency/whisper/Dockerfile
+      dockerfile: comps/third_parties/whisper/src/Dockerfile
     extends: multimodalqna
     image: ${REGISTRY:-opea}/whisper:${TAG:-latest}
+  speecht5:
+    build:
+      context: GenAIComps
+      dockerfile: comps/third_parties/speecht5/src/Dockerfile
+    extends: multimodalqna
+    image: ${REGISTRY:-opea}/speecht5:${TAG:-latest}
+  tts:
+    build:
+      context: GenAIComps
+      dockerfile: comps/tts/src/Dockerfile
+    extends: multimodalqna
+    image: ${REGISTRY:-opea}/tts:${TAG:-latest}
+  vllm-rocm:
+    build:
+      context: GenAIComps
+      dockerfile: comps/third_parties/vllm/src/Dockerfile.amd_gpu
+    image: ${REGISTRY:-opea}/vllm-rocm:${TAG:-latest}

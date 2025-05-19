@@ -32,6 +32,10 @@ on:
         required: false
         type: boolean
         default: false
+      opea_branch:
+        default: "main"
+        required: false
+        type: string
 jobs:
   get-test-case:
     runs-on: ubuntu-latest
@@ -64,9 +68,16 @@ jobs:
           cd ${{ github.workspace }}/${{ inputs.example }}/tests
           run_test_cases=""
 
-          default_test_case=$(find . -type f -name "test_compose_on_${{ inputs.hardware }}.sh" | cut -d/ -f2)
+          if [[ "${{ inputs.hardware }}" == "gaudi"* ]]; then
+            hardware="gaudi"
+          elif [[ "${{ inputs.hardware }}" == "xeon"* ]]; then
+            hardware="xeon"
+          else
+            hardware="${{ inputs.hardware }}"
+          fi
+          default_test_case=$(find . -type f -name "test_compose_on_$hardware.sh" | cut -d/ -f2)
           if [ "$default_test_case" ]; then run_test_cases="$default_test_case"; fi
-          other_test_cases=$(find . -type f -name "test_compose_*_on_${{ inputs.hardware }}.sh" | cut -d/ -f2)
+          other_test_cases=$(find . -type f -name "test_compose_*_on_$hardware.sh" | cut -d/ -f2)
           echo "default_test_case=$default_test_case"
           echo "other_test_cases=$other_test_cases"
 
@@ -99,7 +110,7 @@ jobs:
 
   compose-test:
     needs: [get-test-case]
-    if: ${{ needs.get-test-case.outputs.test_cases != '' }}
+    if: ${{ needs.get-test-case.outputs.test_cases != '[""]' }}
     strategy:
       matrix:
         test_case: ${{ fromJSON(needs.get-test-case.outputs.test_cases) }}
@@ -110,9 +121,18 @@ jobs:
       - name: Clean up Working Directory
         run: |
           sudo rm -rf ${{github.workspace}}/* || true
+
+          echo "Cleaning up containers using ports..."
+          cid=$(docker ps --format '{{.Names}} : {{.Ports}}' | grep -v ' : $' | grep -v 0.0.0.0:5000 | awk -F' : ' '{print $1}')
+          if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid && sleep 1s; fi
           docker system prune -f
-          docker rmi $(docker images --filter reference="*/*/*:latest" -q) || true
-          docker rmi $(docker images --filter reference="*/*:ci" -q) || true
+
+          echo "Cleaning up images ..."
+          docker images --filter reference="*/*/*:latest" -q | xargs -r docker rmi && sleep 1s
+          docker images --filter reference="*/*:ci" -q | xargs -r docker rmi && sleep 1s
+          docker images --filter reference="*:5000/*/*" -q | xargs -r docker rmi && sleep 1s
+          docker images --filter reference="opea/comps-base" -q | xargs -r docker rmi && sleep 1s
+          docker images
 
       - name: Checkout out Repo
         uses: actions/checkout@v4
@@ -131,6 +151,12 @@ jobs:
           bash ${{ github.workspace }}/.github/workflows/scripts/docker_compose_clean_up.sh "ports"
           docker ps
 
+      - name: Log in DockerHub
+        uses: docker/login-action@v3.2.0
+        with:
+          username: ${{ secrets.DOCKERHUB_USER }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
       - name: Run test
         shell: bash
         env:
@@ -143,8 +169,11 @@ jobs:
           SDK_BASE_URL: ${{ secrets.SDK_BASE_URL }}
           SERVING_TOKEN: ${{ secrets.SERVING_TOKEN }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
+          FINANCIAL_DATASETS_API_KEY: ${{ secrets.FINANCIAL_DATASETS_API_KEY }}
           IMAGE_REPO: ${{ inputs.registry }}
           IMAGE_TAG: ${{ inputs.tag }}
+          opea_branch: ${{ inputs.opea_branch }}
           example: ${{ inputs.example }}
           hardware: ${{ inputs.hardware }}
           test_case: ${{ matrix.test_case }}
@@ -157,25 +186,38 @@ jobs:
               export model_cache="/data2/hf_model"
             else
               echo "Model cache directory /data2/hf_model does not exist"
-              export model_cache="~/.cache/huggingface/hub"
+              export model_cache="$HOME/.cache/huggingface/hub"
+            fi
+            if [[ "$test_case" == *"rocm"* ]]; then
+              export model_cache="/var/lib/GenAI/data"
             fi
           fi
-          if [ -f ${test_case} ]; then timeout 30m bash ${test_case}; else echo "Test script {${test_case}} not found, skip test!"; fi
+          if [ -f "${test_case}" ]; then timeout 60m bash "${test_case}"; else echo "Test script {${test_case}} not found, skip test!"; fi
 
       - name: Clean up container after test
-        shell: bash
-        if: cancelled() || failure()
+        if: always()
         run: |
-          cd ${{ github.workspace }}/${{ inputs.example }}
-          export test_case=${{ matrix.test_case }}
-          export hardware=${{ inputs.hardware }}
-          bash ${{ github.workspace }}/.github/workflows/scripts/docker_compose_clean_up.sh "containers"
-          docker system prune -f
-          docker rmi $(docker images --filter reference="*:5000/*/*" -q) || true
+          set -x
+
+          echo "Cleaning up containers using ports..."
+          cid=$(docker ps --format '{{.Names}} : {{.Ports}}' | grep -v ' : $' | grep -v 0.0.0.0:5000 | awk -F' : ' '{print $1}')
+          if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid && sleep 1s; fi
+
+          echo "Cleaning up images ..."
+          if [[ "${{ inputs.hardware }}" == "xeon"* ]]; then
+              docker system prune -a -f
+          else
+              docker images --filter reference="*/*/*:latest" -q | xargs -r docker rmi && sleep 1s
+              docker images --filter reference="*/*:ci" -q | xargs -r docker rmi && sleep 1s
+              docker images --filter reference="*:5000/*/*" -q | xargs -r docker rmi && sleep 1s
+              docker images --filter reference="opea/comps-base" -q | xargs -r docker rmi && sleep 1s
+              docker system prune -f
+          fi
+          docker images
 
       - name: Publish pipeline artifact
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ inputs.example }}_${{ matrix.test_case }}
+          name: ${{ inputs.hardware }}_${{ inputs.example }}_${{ matrix.test_case }}
           path: ${{ github.workspace }}/${{ inputs.example }}/tests/*.log

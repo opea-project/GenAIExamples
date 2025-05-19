@@ -10,6 +10,7 @@ echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
 echo "TAG=IMAGE_TAG=${IMAGE_TAG}"
 export REGISTRY=${IMAGE_REPO}
 export TAG=${IMAGE_TAG}
+export MODEL_CACHE=${model_cache:-"/var/lib/GenAI/data"}
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
@@ -35,29 +36,13 @@ function build_docker_images() {
     service_list="codetrans codetrans-ui llm-textgen nginx"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
-    docker pull ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
+    docker pull ghcr.io/huggingface/text-generation-inference:2.4.1-rocm
     docker images && sleep 1s
 }
 
 function start_services() {
     cd $WORKPATH/docker_compose/amd/gpu/rocm/
-    export http_proxy=${http_proxy}
-    export https_proxy=${http_proxy}
-    export CODETRANS_TGI_SERVICE_PORT=8008
-    export CODETRANS_LLM_SERVICE_PORT=9000
-    export CODETRANS_LLM_MODEL_ID="Qwen/Qwen2.5-Coder-7B-Instruct"
-    export CODETRANS_TGI_LLM_ENDPOINT="http://${ip_address}:${CODETRANS_TGI_SERVICE_PORT}"
-    export CODETRANS_HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
-    export CODETRANS_MEGA_SERVICE_HOST_IP=${ip_address}
-    export CODETRANS_LLM_SERVICE_HOST_IP=${ip_address}
-    export CODETRANS_FRONTEND_SERVICE_IP=${ip_address}
-    export CODETRANS_FRONTEND_SERVICE_PORT=5173
-    export CODETRANS_BACKEND_SERVICE_NAME=codetrans
-    export CODETRANS_BACKEND_SERVICE_IP=${ip_address}
-    export CODETRANS_BACKEND_SERVICE_PORT=7777
-    export CODETRANS_NGINX_PORT=8088
-    export CODETRANS_BACKEND_SERVICE_URL="http://${ip_address}:${CODETRANS_BACKEND_SERVICE_PORT}/v1/codetrans"
-    export host_ip=${ip_address}
+    source set_env.sh
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
@@ -111,7 +96,7 @@ function validate_microservices() {
         "codetrans-tgi-service" \
         "codetrans-tgi-service" \
         '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}'
-
+    sleep 10
     # llm microservice
     validate_services \
         "${ip_address}:${CODETRANS_LLM_SERVICE_PORT}/v1/chat/completions" \
