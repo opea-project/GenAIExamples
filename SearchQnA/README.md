@@ -72,6 +72,6 @@ The table below lists the available deployment options and their implementation 
 
 | Category               | Deployment Option      | Description                                                       |
 | ---------------------- | ---------------------- | ----------------------------------------------------------------- |
-| On-premise Deployments | Docker Compose (Xeon)  | [SearchQnA deployment on Xeon](./docker_compose/intel/cpu/xeon)   |
-|                        | Docker Compose (Gaudi) | [SearchQnA deployment on Gaudi](./docker_compose/intel/hpu/gaudi) |
-|                        | Docker Compose (ROCm)  | [SearchQnA deployment on AMD ROCm](./docker_compose/amd/gpu/rocm) |
+| On-premise Deployments | Docker Compose (Xeon)  | [SearchQnA deployment on Xeon](./docker_compose/intel/cpu/xeon/README.md)   |
+|                        | Docker Compose (Gaudi) | [SearchQnA deployment on Gaudi](./docker_compose/intel/hpu/gaudi/README.md) |
+|                        | Docker Compose (ROCm)  | [SearchQnA deployment on AMD ROCm](./docker_compose/amd/gpu/rocm/README.md) |
