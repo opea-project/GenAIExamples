@@ -235,8 +235,8 @@ function main() {
     validate_microservices
     dataprep
 
-    validate_text2cypher
-    export refresh_db="False"
+    #validate_text2cypher
+    #export refresh_db="False"
     validate_megaservice
 
     validate_frontend
