@@ -70,8 +70,8 @@ This SearchQnA use case performs Search-augmented Question Answering across mult
 
 The table below lists the available deployment options and their implementation details for different hardware platforms.
 
-| Category               | Deployment Option      | Description                                                       |
-| ---------------------- | ---------------------- | ----------------------------------------------------------------- |
+| Category               | Deployment Option      | Description                                                                 |
+| ---------------------- | ---------------------- | --------------------------------------------------------------------------- |
 | On-premise Deployments | Docker Compose (Xeon)  | [SearchQnA deployment on Xeon](./docker_compose/intel/cpu/xeon/README.md)   |
 |                        | Docker Compose (Gaudi) | [SearchQnA deployment on Gaudi](./docker_compose/intel/hpu/gaudi/README.md) |
 |                        | Docker Compose (ROCm)  | [SearchQnA deployment on AMD ROCm](./docker_compose/amd/gpu/rocm/README.md) |
