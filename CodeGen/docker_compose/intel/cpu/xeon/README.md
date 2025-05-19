@@ -69,13 +69,13 @@ This uses the default vLLM-based deployment profile (`codegen-xeon-vllm`).
     can be change to small model if needed
     export LLM_MODEL_ID="Qwen/Qwen2.5-Coder-7B-Instruct"
 
-3.  **Start Services (vLLM Profile):**
+2.  **Start Services (vLLM Profile):**
 
     ```bash
     docker compose --profile codegen-xeon-vllm up -d
     ```
 
-4.  **Validate:**
+3.  **Validate:**
     Wait several minutes for models to download (especially the first time) and services to initialize. Check container logs (`docker compose logs -f <service_name>`) or proceed to the validation steps below.
 
 ## Available Deployment Options
