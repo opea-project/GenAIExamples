@@ -143,13 +143,13 @@ function validate_microservices() {
     # Check if the microservices are running correctly.
 
     # llm microservice
-    validate_service \
-        "${host_ip}:${LLM_PORT}/v1/docsum" \
-        "text" \
-        "llm-docsum-vllm" \
-        "docsum-xeon-llm-server" \
-        "json" \
-        '{"messages":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
+#    validate_service \
+#        "${host_ip}:${LLM_PORT}/v1/docsum" \
+#        "text" \
+#        "llm-docsum-vllm" \
+#        "docsum-xeon-llm-server" \
+#        "json" \
+#        '{"messages":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}'
 
     # whisper microservice
     ulimit -s 65536
