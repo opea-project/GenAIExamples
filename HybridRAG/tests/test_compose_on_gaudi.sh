@@ -92,6 +92,12 @@ function validate_service() {
     local INPUT_DATA="$5"
 
     local HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL")
+
+    if [ "DOCKER_NAME" -eq "text2cypher-gaudi-container" ]; then
+        docker ps
+        docker logs text2cypher-gaudi-container
+    fi
+
     if [ "$HTTP_STATUS" -eq 200 ]; then
         echo "[ $SERVICE_NAME ] HTTP status is 200. Checking content..."
 
@@ -170,6 +176,16 @@ function validate_megaservice() {
 
 }
 
+function validate_text2cypher() {
+    # text2cypher service
+    validate_service \
+        "${ip_address}:11801/v1/text2cypher" \
+        "\[" \
+        "text2cypher-gaudi" \
+        "text2cypher-gaudi-container" \
+        '{"input_text": "what are the symptoms for Diabetes?"}'
+}
+
 function validate_frontend() {
     cd $WORKPATH/ui/svelte
     local conda_env_name="OPEA_e2e"
@@ -217,6 +233,9 @@ function main() {
 
     validate_microservices
     dataprep
+
+    validate_text2cypher
+    export refresh_db="False"
     validate_megaservice
 
     validate_frontend
