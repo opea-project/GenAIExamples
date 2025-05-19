@@ -33,7 +33,12 @@ function build_docker_images() {
 
     cd $WORKPATH/docker_image_build
     git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
-    cp requirements.txt GenAIComps/comps/text2cypher/src/requirements.txt
+    REQ_FILE="GenAIComps/comps/text2cypher/src/requirements.txt"
+    sed -i \
+        -e 's/^sentence-transformers\(==.*\)\?$/sentence-transformers==3.2.1/' \
+        -e 's/^transformers\(==.*\)\?$/transformers==4.45.2/' \
+        "$REQ_FILE"
+
     pushd GenAIComps
     echo "GenAIComps test commit is $(git rev-parse HEAD)"
     docker build --no-cache -t ${REGISTRY}/comps-base:${TAG} --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
