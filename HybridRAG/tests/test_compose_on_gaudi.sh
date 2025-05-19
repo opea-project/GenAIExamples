@@ -48,6 +48,7 @@ function build_docker_images() {
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
     service_list="hybridrag hybridrag-ui dataprep retriever text2cypher vllm nginx"
+    cp Dockerfile.text2cypher GenAIComps/comps/text2cypher/src/Dockerfile.intel_hpu
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5

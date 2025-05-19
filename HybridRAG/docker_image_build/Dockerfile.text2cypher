@@ -1,0 +1,49 @@
+# Copyright (C) 2025 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+# HABANA environment
+#FROM vault.habana.ai/gaudi-docker/1.20.1/ubuntu22.04/habanalabs/pytorch-installer-2.6.0 AS hpu
+FROM vault.habana.ai/gaudi-docker/1.19.0/ubuntu22.04/habanalabs/pytorch-installer-2.5.1 AS hpu
+
+ENV LANG=en_US.UTF-8
+ARG REPO=https://github.com/huggingface/optimum-habana.git
+ARG REPO_VER=v1.15.0
+
+RUN apt-get update && apt-get install -y --no-install-recommends --fix-missing \
+    git-lfs \
+    libgl1-mesa-glx \
+    libjemalloc-dev
+
+#RUN useradd -m -s /bin/bash user && \
+#    mkdir -p /home/user && \
+#    chown -R user /home/user/
+
+RUN git lfs install
+
+COPY comps /root/comps
+#RUN chown -R user /home/user/comps/text2cypher
+
+#RUN rm -rf /etc/ssh/ssh_host*
+
+RUN pip install --no-cache-dir --upgrade pip setuptools && \
+    pip install --no-cache-dir --upgrade-strategy eager optimum[habana] && \
+    pip install --no-cache-dir git+https://github.com/HabanaAI/DeepSpeed.git@1.19.0
+
+RUN git clone ${REPO} /root/optimum-habana && \
+    cd /root/optimum-habana && git checkout ${REPO_VER} && \
+    cd /root/comps/text2cypher/src && pip install --no-cache-dir -r requirements.txt && \
+    pip install --no-cache-dir --upgrade --force-reinstall pydantic numpy==1.26.3
+
+# Set environment variables
+ENV PYTHONPATH=/root:/usr/lib/habanalabs/:/root/optimum-habana
+ENV HABANA_VISIBLE_DEVICES=all
+ENV OMPI_MCA_btl_vader_single_copy_mechanism=none
+ENV DEBIAN_FRONTEND="noninteractive"  TZ=Etc/UTC
+
+#USER user
+WORKDIR /root/comps/text2cypher/src
+
+RUN echo python opea_text2cypher_microservice.py --device hpu --use_hpu_graphs --bf16 >> run.sh
+
+CMD bash run.sh
+
