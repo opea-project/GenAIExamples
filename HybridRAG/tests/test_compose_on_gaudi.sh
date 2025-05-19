@@ -101,7 +101,7 @@ function validate_service() {
             echo "[ $SERVICE_NAME ] Content is as expected."
         else
             echo "[ $SERVICE_NAME ] Content does not match the expected result: $CONTENT"
-            docker logs ${DOCKER_NAME} 
+            docker logs ${DOCKER_NAME}
             exit 1
         fi
     else
