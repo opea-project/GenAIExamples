@@ -62,6 +62,10 @@ prompt_for_env_var "no_proxy" "Enter the no_proxy." "${no_proxy}" false
 if [[ "$NON_INTERACTIVE" == "true" ]]; then
   # Query for enabling logging
   prompt_for_env_var "LOGFLAG" "Enable logging? (yes/no): " "true" false
+  export JAEGER_IP=$(ip route get 8.8.8.8 | grep -oP 'src \K[^ ]+')
+  export OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=grpc://$JAEGER_IP:4317
+  export TELEMETRY_ENDPOINT=http://$JAEGER_IP:4318/v1/traces
+  telemetry_flag=true
 else
   # Query for enabling logging
   read -p "Enable logging? (yes/no): " logging && logging=$(echo "$logging" | tr '[:upper:]' '[:lower:]')
@@ -80,20 +84,6 @@ else
   else
       telemetry_flag=false
   fi
-fi
-
-# Query for enabling OpenTelemetry Tracing Endpoint
-read -p "Enable OpenTelemetry Tracing Endpoint? (yes/no): " telemetry && telemetry=$(echo "$telemetry" | tr '[:upper:]' '[:lower:]')
-if [[ "$telemetry" == "yes" || "$telemetry" == "y" ]]; then
-    export JAEGER_IP=$(ip route get 8.8.8.8 | grep -oP 'src \K[^ ]+')
-    export OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=grpc://$JAEGER_IP:4317
-    export TELEMETRY_ENDPOINT=http://$JAEGER_IP:4318/v1/traces
-    telemetry_flag=true
-    pushd "grafana/dashboards" > /dev/null
-    source download_opea_dashboard.sh
-    popd > /dev/null
-else
-    telemetry_flag=false
 fi
 
 # Generate the .env file
