@@ -101,7 +101,7 @@ function validate_service() {
             echo "[ $SERVICE_NAME ] Content is as expected."
         else
             echo "[ $SERVICE_NAME ] Content does not match the expected result: $CONTENT"
-            docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log  
+            docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
             if [ "DOCKER_NAME" -eq "hybridrag-xeon-backend-server" ]; then
                 docker ps
                 docker logs text2cypher-gaudi-container
