@@ -43,7 +43,7 @@ Some HuggingFace resources, such as some models, are only accessible if you have
 
 ### Configure the Deployment Environment
 
-To set up environment variables for deploying ChatQnA services, source the _setup_env.sh_ script in this directory:
+To set up environment variables for deploying ChatQnA services, source the _setup_env.sh_ script in this directory (If using faqgen or guardrails, source the _set_env_faqgen.sh_):
 
 ```
 source ./set_env.sh

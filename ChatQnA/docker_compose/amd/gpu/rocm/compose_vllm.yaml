@@ -16,7 +16,7 @@ services:
       - chatqna-redis-vector-db
       - chatqna-tei-embedding-service
     ports:
-      - "${CHATQNA_REDIS_DATAPREP_PORT:-5000}:5000"
+      - "${CHATQNA_REDIS_DATAPREP_PORT:-18103}:5000"
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
