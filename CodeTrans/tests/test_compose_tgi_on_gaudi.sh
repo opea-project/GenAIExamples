@@ -34,13 +34,13 @@ function build_docker_images() {
 }
 
 function start_services() {
-    cd $WORKPATH/docker_compose
+    cd $WORKPATH/docker_compose/intel
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
 
     export NGINX_PORT=80
     export host_ip=${ip_address}
     source set_env.sh
-    cd intel/hpu/gaudi/
+    cd hpu/gaudi/
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 

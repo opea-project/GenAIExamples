@@ -80,6 +80,7 @@ jobs:
       - name: Checking Relative Path Validity
         run: |
           cd ${{github.workspace}}
+          delay=15
           fail="FALSE"
           repo_name=${{ github.event.pull_request.head.repo.full_name }}
           branch="https://github.com/$repo_name/blob/${{ github.event.pull_request.head.ref }}"
@@ -111,14 +112,15 @@ jobs:
                 if [[ "$png_line" == *#* ]]; then
                   if [ -n "changed_files" ] && echo "$changed_files" | grep -q "^${refer_path}$"; then
                     url_dev=$branch$(echo "$real_path" | sed 's|.*/GenAIExamples||')$png_path
+                    sleep $delay
                     response=$(curl -I -L -s -o /dev/null -w "%{http_code}" "$url_dev")
                     if [ "$response" -ne 200 ]; then
-                      echo "**********Validation failed, try again**********"
+                      echo "**********Validation failed ($response), try again**********"
                       response_retry=$(curl -s -o /dev/null -w "%{http_code}" "$url_dev")
                       if [ "$response_retry" -eq 200 ]; then
                         echo "*****Retry successfully*****"
                       else
-                        echo "Invalid path from ${{github.workspace}}/$refer_path: $png_path"
+                        echo "Invalid path ($response_retry) from ${{github.workspace}}/$refer_path: $png_path"
                         fail="TRUE"
                       fi
                     else

@@ -16,7 +16,7 @@ echo "TAG=IMAGE_TAG=${IMAGE_TAG}"
 export REGISTRY=${IMAGE_REPO}
 export TAG=${IMAGE_TAG}
 
-source $WORKPATH/docker_compose/set_env.sh
+source $WORKPATH/docker_compose/intel/set_env.sh
 export MODEL_CACHE=${model_cache:-"./data"}
 
 export MAX_INPUT_TOKENS=2048
