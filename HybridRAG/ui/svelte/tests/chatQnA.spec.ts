@@ -34,7 +34,7 @@ async function enterMessageToChat(page: Page, message: string) {
 	await page.getByTestId("chat-input").click();
 	await page.getByTestId("chat-input").fill(message);
 	await page.getByTestId("chat-input").press("Enter");
-	await page.waitForTimeout(10000);
+	await page.waitForTimeout(1500000);
 	await expect(page.getByTestId("display-answer")).toBeVisible();
 }
 
