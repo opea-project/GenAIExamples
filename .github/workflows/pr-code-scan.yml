@@ -4,6 +4,7 @@
 name: Code Scan
 permissions:
   contents: read
+  security-events: write
 on:
   pull_request:
     branches: [main]
