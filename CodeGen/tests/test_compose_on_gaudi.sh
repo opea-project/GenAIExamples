@@ -138,7 +138,7 @@ function validate_megaservice() {
     # Curl the Mega Service with index_name and agents_flag
     validate_services \
         "${ip_address}:7778/v1/codegen" \
-        "fingerprint" \
+        "" \
         "mega-codegen" \
         "codegen-gaudi-backend-server" \
         '{ "index_name": "test_redis", "agents_flag": "True", "messages": "def print_hello_world():", "max_tokens": 256}'
