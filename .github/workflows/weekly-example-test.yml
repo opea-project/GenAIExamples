@@ -3,6 +3,9 @@
 
 name: Weekly test all examples on multiple HWs
 
+permissions:
+  contents: read
+
 on:
   schedule:
     - cron: "30 2 * * 6" # UTC time

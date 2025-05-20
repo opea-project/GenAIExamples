@@ -3,6 +3,9 @@
 # Test
 name: Build latest images on push event
 
+permissions:
+  contents: read
+
 on:
   push:
     branches: [ 'main' ]
