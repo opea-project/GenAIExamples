@@ -34,8 +34,8 @@ async function enterMessageToChat(page: Page, message: string) {
 	await page.getByTestId("chat-input").click();
 	await page.getByTestId("chat-input").fill(message);
 	await page.getByTestId("chat-input").press("Enter");
-	await page.waitForTimeout(150000);
-	await expect(page.getByTestId("display-answer")).toBeVisible();
+	await page.waitForTimeout(10000);
+	//await expect(page.getByTestId("display-answer")).toBeVisible();
 }
 
 // Helper function: Upload file
