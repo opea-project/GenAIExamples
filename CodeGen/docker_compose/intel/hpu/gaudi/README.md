@@ -52,11 +52,12 @@ This uses the default vLLM-based deployment profile (`codegen-gaudi-vllm`).
     ```
 
     _Note: The compose file might read additional variables from set_env.sh. Ensure all required variables like ports (`LLM_SERVICE_PORT`, `MEGA_SERVICE_PORT`, etc.) are set if not using defaults from the compose file._
-    For instance, edit the set_env.sh to change the LLM model 
+    For instance, edit the set_env.sh to change the LLM model
 
     ```
     export LLM_MODEL_ID="Qwen/Qwen2.5-Coder-7B-Instruct"
     ```
+
     can be changed to other model if needed
 
     ```
@@ -101,18 +102,18 @@ The `compose.yaml` file uses Docker Compose profiles to select the LLM serving b
 
 Key parameters are configured via environment variables set before running `docker compose up`.
 
-| Environment Variable                    | Description                                                                                                         | Default (Set Externally)                                                                         |
-| :-------------------------------------- | :------------------------------------------------------------------------------------------------------------------ | :----------------------------------------------------------------------------------------------- |
-| `HOST_IP`                               | External IP address of the host machine. **Required.**                                                              | `your_external_ip_address`                                                                       |
-| `HUGGINGFACEHUB_API_TOKEN`              | Your Hugging Face Hub token for model access. **Required.**                                                         | `your_huggingface_token`                                                                         |
-| `LLM_MODEL_ID`                          | Hugging Face model ID for the CodeGen LLM (used by TGI/vLLM service). Configured within `compose.yaml` environment. | `Qwen/Qwen2.5-Coder-32B-Instruct`                                                                |
-| `EMBEDDING_MODEL_ID`                    | Hugging Face model ID for the embedding model (used by TEI service). Configured within `compose.yaml` environment.  | `BAAI/bge-base-en-v1.5`                                                                          |
-| `LLM_ENDPOINT`                          | Internal URL for the LLM serving endpoint (used by `llm-codegen-vllm-server`). Configured in `compose.yaml`.        |  http://codegen-vllm|tgi-server:9000/v1/chat/completions` |
-| `TEI_EMBEDDING_ENDPOINT`                | Internal URL for the Embedding service. Configured in `compose.yaml`.                                               | `http://codegen-tei-embedding-server:80/embed`                                                   |
-| `DATAPREP_ENDPOINT`                     | Internal URL for the Data Preparation service. Configured in `compose.yaml`.                                        | `http://codegen-dataprep-server:80/dataprep`                                                     |
-| `BACKEND_SERVICE_ENDPOINT`              | External URL for the CodeGen Gateway (MegaService). Derived from `HOST_IP` and port `7778`.                         | `http://${HOST_IP}:7778/v1/codegen`                                                              |
-| `*_PORT` (Internal)                     | Internal container ports (e.g., `80`, `6379`). Defined in `compose.yaml`.                                           | N/A                                                                                              |
-| `http_proxy` / `https_proxy`/`no_proxy` | Network proxy settings (if required).                                                                               | `""`                                                                                             |
+| Environment Variable                    | Description                                                                                                         | Default (Set Externally)                       |
+| :-------------------------------------- | :------------------------------------------------------------------------------------------------------------------ | :--------------------------------------------- | ------------------------------------ |
+| `HOST_IP`                               | External IP address of the host machine. **Required.**                                                              | `your_external_ip_address`                     |
+| `HUGGINGFACEHUB_API_TOKEN`              | Your Hugging Face Hub token for model access. **Required.**                                                         | `your_huggingface_token`                       |
+| `LLM_MODEL_ID`                          | Hugging Face model ID for the CodeGen LLM (used by TGI/vLLM service). Configured within `compose.yaml` environment. | `Qwen/Qwen2.5-Coder-32B-Instruct`              |
+| `EMBEDDING_MODEL_ID`                    | Hugging Face model ID for the embedding model (used by TEI service). Configured within `compose.yaml` environment.  | `BAAI/bge-base-en-v1.5`                        |
+| `LLM_ENDPOINT`                          | Internal URL for the LLM serving endpoint (used by `llm-codegen-vllm-server`). Configured in `compose.yaml`.        | http://codegen-vllm                            | tgi-server:9000/v1/chat/completions` |
+| `TEI_EMBEDDING_ENDPOINT`                | Internal URL for the Embedding service. Configured in `compose.yaml`.                                               | `http://codegen-tei-embedding-server:80/embed` |
+| `DATAPREP_ENDPOINT`                     | Internal URL for the Data Preparation service. Configured in `compose.yaml`.                                        | `http://codegen-dataprep-server:80/dataprep`   |
+| `BACKEND_SERVICE_ENDPOINT`              | External URL for the CodeGen Gateway (MegaService). Derived from `HOST_IP` and port `7778`.                         | `http://${HOST_IP}:7778/v1/codegen`            |
+| `*_PORT` (Internal)                     | Internal container ports (e.g., `80`, `6379`). Defined in `compose.yaml`.                                           | N/A                                            |
+| `http_proxy` / `https_proxy`/`no_proxy` | Network proxy settings (if required).                                                                               | `""`                                           |
 
 Most of these parameters are in `set_env.sh`, you can either modify this file or overwrite the env variables by setting them.
 
