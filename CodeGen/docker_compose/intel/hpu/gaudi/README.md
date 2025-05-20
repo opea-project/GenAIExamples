@@ -61,7 +61,7 @@ This uses the default vLLM-based deployment profile (`codegen-gaudi-vllm`).
     # export http_proxy="your_http_proxy"
     # export https_proxy="your_https_proxy"
     # export no_proxy="localhost,127.0.0.1,${HOST_IP}" # Add other hosts if necessary
-    source ../../../set_env.sh
+    source ../../set_env.sh
     ```
 
     _Note: Ensure all required variables like ports (`LLM_SERVICE_PORT`, `MEGA_SERVICE_PORT`, etc.) are set if not using defaults from the compose file._
