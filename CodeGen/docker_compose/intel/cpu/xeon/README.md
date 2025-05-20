@@ -6,22 +6,10 @@ This README provides instructions for deploying the CodeGen application using Do
 
 - [Overview](#overview)
 - [Prerequisites](#prerequisites)
-- [Quick Start](#quick-start)
-- [Available Deployment Options](#available-deployment-options)
-  - [Default: vLLM-based Deployment (`--profile codegen-xeon-vllm`)](#default-vllm-based-deployment---profile-codegen-xeon-vllm)
-  - [TGI-based Deployment (`--profile codegen-xeon-tgi`)](#tgi-based-deployment---profile-codegen-xeon-tgi)
-- [Configuration Parameters](#configuration-parameters)
-  - [Environment Variables](#environment-variables)
-  - [Compose Profiles](#compose-profiles)
+- [Quick Start Deployment](#quick-start-deployment)
 - [Building Custom Images (Optional)](#building-custom-images-optional)
 - [Validate Services](#validate-services)
-  - [Check Container Status](#check-container-status)
-  - [Run Validation Script/Commands](#run-validation-scriptcommands)
 - [Accessing the User Interface (UI)](#accessing-the-user-interface-ui)
-  - [Gradio UI (Default)](#gradio-ui-default)
-  - [Svelte UI (Optional)](#svelte-ui-optional)
-  - [React UI (Optional)](#react-ui-optional)
-  - [VS Code Extension (Optional)](#vs-code-extension-optional)
 - [Troubleshooting](#troubleshooting)
 - [Stopping the Application](#stopping-the-application)
 - [Next Steps](#next-steps)
@@ -43,7 +31,7 @@ This guide focuses on running the pre-configured CodeGen service using Docker Co
   cd GenAIExamples/CodeGen/docker_compose/intel/cpu/xeon
   ```
 
-## Quick Start
+## Quick Start Deployment
 
 This uses the default vLLM-based deployment profile (`codegen-xeon-vllm`).
 
@@ -64,16 +52,16 @@ This uses the default vLLM-based deployment profile (`codegen-xeon-vllm`).
     ```
 
     _Note: The compose file might read additional variables from set_env.sh. Ensure all required variables like ports (`LLM_SERVICE_PORT`, `MEGA_SERVICE_PORT`, etc.) are set if not using defaults from the compose file._
-    like
-
-    ```
-    export LLM_MODEL_ID="Qwen/Qwen2.5-Coder-32B-Instruct"
-    ```
-
-    can be changed to small model if needed
+    like edit the set_env.sh to change the LLM model
 
     ```
     export LLM_MODEL_ID="Qwen/Qwen2.5-Coder-7B-Instruct"
+    ```
+
+    can be changed to other model if needed
+
+    ```
+    export LLM_MODEL_ID="Qwen/Qwen2.5-Coder-32B-Instruct"
     ```
 
 2.  **Start Services (vLLM Profile):**
@@ -85,17 +73,17 @@ This uses the default vLLM-based deployment profile (`codegen-xeon-vllm`).
 3.  **Validate:**
     Wait several minutes for models to download (especially the first time) and services to initialize. Check container logs (`docker compose logs -f <service_name>`) or proceed to the validation steps below.
 
-## Available Deployment Options
+### Available Deployment Options
 
 The `compose.yaml` file uses Docker Compose profiles to select the LLM serving backend.
 
-### Default: vLLM-based Deployment (`--profile codegen-xeon-vllm`)
+#### Default: vLLM-based Deployment (`--profile codegen-xeon-vllm`)
 
 - **Profile:** `codegen-xeon-vllm`
 - **Description:** Uses vLLM optimized for Intel CPUs as the LLM serving engine. This is the default profile used in the Quick Start.
 - **Services Deployed:** `codegen-vllm-server`, `codegen-llm-server`, `codegen-tei-embedding-server`, `codegen-retriever-server`, `redis-vector-db`, `codegen-dataprep-server`, `codegen-backend-server`, `codegen-gradio-ui-server`.
 
-### TGI-based Deployment (`--profile codegen-xeon-tgi`)
+#### TGI-based Deployment (`--profile codegen-xeon-tgi`)
 
 - **Profile:** `codegen-xeon-tgi`
 - **Description:** Uses Hugging Face Text Generation Inference (TGI) optimized for Intel CPUs as the LLM serving engine.
@@ -106,9 +94,9 @@ The `compose.yaml` file uses Docker Compose profiles to select the LLM serving b
   docker compose --profile codegen-xeon-tgi up -d
   ```
 
-## Configuration Parameters
+### Configuration Parameters
 
-### Environment Variables
+#### Environment Variables
 
 Key parameters are configured via environment variables set before running `docker compose up`.
 
@@ -118,7 +106,7 @@ Key parameters are configured via environment variables set before running `dock
 | `HUGGINGFACEHUB_API_TOKEN`              | Your Hugging Face Hub token for model access. **Required.**                                                         | `your_huggingface_token`                                                                         |
 | `LLM_MODEL_ID`                          | Hugging Face model ID for the CodeGen LLM (used by TGI/vLLM service). Configured within `compose.yaml` environment. | `Qwen/Qwen2.5-Coder-7B-Instruct`                                                                 |
 | `EMBEDDING_MODEL_ID`                    | Hugging Face model ID for the embedding model (used by TEI service). Configured within `compose.yaml` environment.  | `BAAI/bge-base-en-v1.5`                                                                          |
-| `LLM_ENDPOINT`                          | Internal URL for the LLM serving endpoint (used by `codegen-llm-server`). Configured in `compose.yaml`.             | `http://codegen-tgi-server:80/generate` or `http://codegen-vllm-server:8000/v1/chat/completions` |
+| `LLM_ENDPOINT`                          | Internal URL for the LLM serving endpoint (used by `codegen-llm-server`). Configured in `compose.yaml`.             | `http://codegen-tgi-server:80/generate` or `http://codegen-vllm-server:9000/v1/chat/completions` |
 | `TEI_EMBEDDING_ENDPOINT`                | Internal URL for the Embedding service. Configured in `compose.yaml`.                                               | `http://codegen-tei-embedding-server:80/embed`                                                   |
 | `DATAPREP_ENDPOINT`                     | Internal URL for the Data Preparation service. Configured in `compose.yaml`.                                        | `http://codegen-dataprep-server:80/dataprep`                                                     |
 | `BACKEND_SERVICE_ENDPOINT`              | External URL for the CodeGen Gateway (MegaService). Derived from `host_ip` and port `7778`.                         | `http://${host_ip}:7778/v1/codegen`                                                              |
@@ -131,7 +119,7 @@ Most of these parameters are in `set_env.sh`, you can either modify this file or
 source CodeGen/docker_compose/set_env.sh
 ```
 
-### Compose Profiles
+#### Compose Profiles
 
 Docker Compose profiles (`codegen-xeon-vllm`, `codegen-xeon-tgi`) control which LLM serving backend (vLLM or TGI) and its associated dependencies are started. Only one profile should typically be active.
 
@@ -170,7 +158,7 @@ Use `curl` commands to test the main service endpoints. Ensure `host_ip` is corr
     curl http://${host_ip}:9000/v1/chat/completions \
        -X POST \
        -H 'Content-Type: application/json' \
-       -d '{"model": "Qwen/Qwen2.5-Coder-32B-Instruct", "messages": [{"role": "user", "content": "Implement a basic Python class"}], "max_tokens":32}'
+       -d '{"model": "Qwen/Qwen2.5-Coder-7B-Instruct", "messages": [{"role": "user", "content": "Implement a basic Python class"}], "max_tokens":32}'
     ```
 
     - **Expected Output:** A JSON response with generated code in `choices[0].message.content`.
