@@ -22,12 +22,11 @@ This Code Translation use case demonstrates Text Generation Inference across mul
 
 The table below lists currently available deployment options. They outline in detail the implementation of this example on selected hardware.
 
-| Category               | Deployment Option    | Description                                                       |
-| ---------------------- | -------------------- | ----------------------------------------------------------------- |
-| On-premise Deployments | Docker compose       | [CodeTrans deployment on Xeon](./docker_compose/intel/cpu/xeon)   |
-|                        |                      | [CodeTrans deployment on Gaudi](./docker_compose/intel/hpu/gaudi) |
-|                        |                      | [CodeTrans deployment on AMD ROCm](./docker_compose/amd/gpu/rocm) |
-|                        | Kubernetes           | [Helm Charts](./kubernetes/helm)                                  |
-|                        |                      | [GMC](./kubernetes/gmc)                                           |
-|                        | Azure                | Work-in-progress                                                  |
-|                        | Intel Tiber AI Cloud | Work-in-progress                                                  |
+| Category               | Deployment Option    | Description                                                                 |
+| ---------------------- | -------------------- | --------------------------------------------------------------------------- |
+| On-premise Deployments | Docker compose       | [CodeTrans deployment on Xeon](./docker_compose/intel/cpu/xeon/README.md)   |
+|                        |                      | [CodeTrans deployment on Gaudi](./docker_compose/intel/hpu/gaudi/README.md) |
+|                        |                      | [CodeTrans deployment on AMD ROCm](./docker_compose/amd/gpu/rocm/README.md) |
+|                        | Kubernetes           | [Helm Charts](./kubernetes/helm/README.md)                                  |
+|                        | Azure                | Work-in-progress                                                            |
+|                        | Intel Tiber AI Cloud | Work-in-progress                                                            |
