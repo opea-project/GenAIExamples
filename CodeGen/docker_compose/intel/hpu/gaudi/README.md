@@ -106,7 +106,7 @@ Key parameters are configured via environment variables set before running `dock
 | :-------------------------------------- | :------------------------------------------------------------------------------------------------------------------ | :--------------------------------------------- | ------------------------------------ |
 | `HOST_IP`                               | External IP address of the host machine. **Required.**                                                              | `your_external_ip_address`                     |
 | `HUGGINGFACEHUB_API_TOKEN`              | Your Hugging Face Hub token for model access. **Required.**                                                         | `your_huggingface_token`                       |
-| `LLM_MODEL_ID`                          | Hugging Face model ID for the CodeGen LLM (used by TGI/vLLM service). Configured within `compose.yaml` environment. | `Qwen/Qwen2.5-Coder-32B-Instruct`              |
+| `LLM_MODEL_ID`                          | Hugging Face model ID for the CodeGen LLM (used by TGI/vLLM service). Configured within `compose.yaml` environment. | `Qwen/Qwen2.5-Coder-7B-Instruct`              |
 | `EMBEDDING_MODEL_ID`                    | Hugging Face model ID for the embedding model (used by TEI service). Configured within `compose.yaml` environment.  | `BAAI/bge-base-en-v1.5`                        |
 | `LLM_ENDPOINT`                          | Internal URL for the LLM serving endpoint (used by `llm-codegen-vllm-server`). Configured in `compose.yaml`.        | http://codegen-vllm                            | tgi-server:9000/v1/chat/completions` |
 | `TEI_EMBEDDING_ENDPOINT`                | Internal URL for the Embedding service. Configured in `compose.yaml`.                                               | `http://codegen-tei-embedding-server:80/embed` |
@@ -177,7 +177,7 @@ Use `curl` commands targeting the main service endpoints. Ensure `HOST_IP` is co
     curl http://${HOST_IP}:9000/v1/chat/completions \
        -X POST \
        -H 'Content-Type: application/json' \
-       -d '{"model": "Qwen/Qwen2.5-Coder-32B-Instruct", "messages": [{"role": "user", "content": "Implement a basic Python class"}], "max_tokens":32}'
+       -d '{"model": "Qwen/Qwen2.5-Coder-7B-Instruct", "messages": [{"role": "user", "content": "Implement a basic Python class"}], "max_tokens":32}'
     ```
 
 2.  **Validate CodeGen Gateway (MegaService, default host port 7778):**
