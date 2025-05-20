@@ -2,7 +2,11 @@
 
 DocRetriever are the most widely adopted use case for leveraging the different methodologies to match user query against a set of free-text records. DocRetriever is essential to RAG system, which bridges the knowledge gap by dynamically fetching relevant information from external sources, ensuring that responses generated remain factual and current. The core of this architecture are vector databases, which are instrumental in enabling efficient and semantic retrieval of information. These databases store data as vectors, allowing RAG to swiftly access the most pertinent documents or data points based on semantic similarity.
 
-## 1. Build Images for necessary microservices. (Optional after docker image release)
+\_Note:
+
+As the related docker images were published to Docker Hub, you can ignore the below step 1 and 2， quick start from step 3.
+
+## 1. Build Images for necessary microservices. (Optional)
 
 - Embedding TEI Image
 
@@ -30,7 +34,7 @@ DocRetriever are the most widely adopted use case for leveraging the different m
   docker build -t opea/dataprep:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/src/Dockerfile .
   ```
 
-## 2. Build Images for MegaService
+## 2. Build Images for MegaService (Optional)
 
 ```bash
 cd ..
@@ -44,6 +48,19 @@ docker build --no-cache -t opea/doc-index-retriever:latest --build-arg https_pro
 ```bash
 export host_ip="YOUR IP ADDR"
 export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
+```
+
+Set environment variables by
+
+```
+cd GenAIExamples/DocIndexRetriever/docker_compose/intel/cpu/xeon
+source set_env.sh
+```
+
+Note: set_env.sh will help to set all required variables. Please ensure all required variables like ports (LLM_SERVICE_PORT, MEGA_SERVICE_PORT, etc.) are set if not using defaults from the compose file.
+or Set environment variables manually
+
+```
 export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
 export RERANK_MODEL_ID="BAAI/bge-reranker-base"
 export TEI_EMBEDDING_ENDPOINT="http://${host_ip}:6006"
