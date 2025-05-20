@@ -240,9 +240,11 @@ function main() {
     validate_microservices
     dataprep
 
-    #validate_text2cypher
-    #export refresh_db="False"
+    start_time=$(date +%s)
     validate_megaservice
+    end_time=$(date +%s)
+    duration=$((end_time-start_time))
+    echo "Mega service duration is $duration s"
 
     validate_frontend
 
