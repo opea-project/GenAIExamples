@@ -14,7 +14,7 @@ export MODEL_CACHE=${model_cache:-"./data"}
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
-
+source $WORKPATH/docker_compose/intel/set_env.sh
 function build_docker_images() {
     opea_branch=${opea_branch:-"main"}
 
@@ -42,9 +42,7 @@ function start_services() {
     local compose_profile="$1"
     local llm_container_name="$2"
 
-    cd $WORKPATH/docker_compose/intel
-    source set_env.sh
-    cd hpu/gaudi
+    cd $WORKPATH/docker_compose/intel/hpu/gaudi
 
     # Start Docker Containers
     docker compose --profile ${compose_profile} up -d | tee ${LOG_PATH}/start_services_with_compose.log
