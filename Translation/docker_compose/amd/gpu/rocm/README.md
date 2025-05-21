@@ -30,7 +30,7 @@ cd GenAIExamples/Translation/docker_compose/amd/gpu/rocm/
 Checkout a released version, such as v1.3:
 
 ```
-git checkout v1.3
+git checkout v1.2
 ```
 
 ### Generate a HuggingFace Access Token

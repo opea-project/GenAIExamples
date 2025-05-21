@@ -32,7 +32,7 @@ cd GenAIExamples/ChatQnA/docker_compose/intel/cpu/xeon/
 Checkout a released version, such as v1.3:
 
 ```
-git checkout v1.3
+git checkout v1.2
 ```
 
 ### Generate a HuggingFace Access Token
@@ -298,12 +298,12 @@ For details on how to verify the correctness of the response, refer to [how-to-v
 
    If you want to update the default knowledge base, you can use the following commands:
 
-   Update Knowledge Base via Local File [nke-10k-2023.pdf](https://github.com/opea-project/GenAIComps/blob/v1.1/comps/retrievers/redis/data/nke-10k-2023.pdf). Or
-   click [here](https://raw.githubusercontent.com/opea-project/GenAIComps/v1.1/comps/retrievers/redis/data/nke-10k-2023.pdf) to download the file via any web browser.
+   Update Knowledge Base via Local File [nke-10k-2023.pdf](https://github.com/opea-project/GenAIComps/blob/v1.3/comps/retrievers/redis/data/nke-10k-2023.pdf). Or
+   click [here](https://raw.githubusercontent.com/opea-project/GenAIComps/v1.3/comps/retrievers/redis/data/nke-10k-2023.pdf) to download the file via any web browser.
    Or run this command to get the file on a terminal.
 
    ```bash
-   wget https://raw.githubusercontent.com/opea-project/GenAIComps/v1.1/comps/retrievers/redis/data/nke-10k-2023.pdf
+   wget https://raw.githubusercontent.com/opea-project/GenAIComps/v1.3/comps/retrievers/redis/data/nke-10k-2023.pdf
    ```
 
    Upload:

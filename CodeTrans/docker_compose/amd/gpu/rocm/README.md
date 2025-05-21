@@ -34,7 +34,7 @@ cd GenAIExamples/CodeTrans
 Then checkout a released version, such as v1.3:
 
 ```bash
-git checkout v1.3
+git checkout v1.2
 ```
 
 ### Configure the Deployment Environment
