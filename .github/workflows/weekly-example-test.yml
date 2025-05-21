@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
 
 env:
-  EXAMPLES: ${{ vars.NIGHTLY_RELEASE_EXAMPLES }}
+  EXAMPLES: "CodeTrans"  #${{ vars.NIGHTLY_RELEASE_EXAMPLES }}
   NODES: "gaudi,xeon,rocm,arc"
 
 jobs:
