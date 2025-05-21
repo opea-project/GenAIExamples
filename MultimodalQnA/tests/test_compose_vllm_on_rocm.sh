@@ -43,7 +43,7 @@ function build_docker_images() {
 function setup_env() {
     export HOST_IP=${ip_address}
     export host_ip=${ip_address}
-    export MULTIMODAL_HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+    export MULTIMODAL_HUGGINGFACEHUB_API_TOKEN=${HF_TOKEN}
     export MULTIMODAL_VLLM_SERVICE_PORT="8399"
     export no_proxy=${your_no_proxy}
     export http_proxy=${your_http_proxy}

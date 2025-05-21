@@ -11,8 +11,8 @@ source .set_env.sh
 popd > /dev/null
 
 host_ip=$(hostname -I | awk '{print $1}')
-export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
-export HF_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+export HUGGINGFACEHUB_API_TOKEN=${HF_TOKEN}
+export HF_TOKEN=${HF_TOKEN}
 export TEI_EMBEDDER_PORT=11633
 export LLM_ENDPOINT_PORT=11634
 export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
