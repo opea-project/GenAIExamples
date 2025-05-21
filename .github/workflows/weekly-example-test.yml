@@ -19,7 +19,7 @@ jobs:
   get-test-matrix:
     runs-on: ubuntu-latest
     outputs:
-      examples: ${{ steps.get-matrix.outputs.examples }}
+      examples: "CodeTrans"  #${{ steps.get-matrix.outputs.examples }}
       nodes: ${{ steps.get-matrix.outputs.nodes }}
     steps:
       - name: Create Matrix
