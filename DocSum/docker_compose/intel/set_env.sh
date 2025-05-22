@@ -13,7 +13,7 @@ export https_proxy=$https_proxy
 export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
 
 export LLM_ENDPOINT_PORT=8008
-export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
+export LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
 export MAX_INPUT_TOKENS=1024
 export MAX_TOTAL_TOKENS=2048
 
