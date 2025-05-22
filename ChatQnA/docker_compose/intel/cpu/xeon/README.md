@@ -32,7 +32,7 @@ cd GenAIExamples/ChatQnA/docker_compose/intel/cpu/xeon/
 Checkout a released version, such as v1.3:
 
 ```
-git checkout v1.2
+git checkout v1.3
 ```
 
 ### Generate a HuggingFace Access Token
