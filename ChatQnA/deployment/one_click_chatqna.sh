@@ -109,9 +109,9 @@ echo
 
 # Model Configuration Parameters (Optional)
 log INFO "--- Model Configuration (optional, press Enter to use defaults from sub-scripts) ---"
-read -p "Enter Embedding Model ID (e.g., BAAI/bge-m3): " EMBED_MODEL
-read -p "Enter Reranking Model ID (e.g., BAAI/bge-reranker-v2-m3): " RERANK_MODEL_ID
-read -p "Enter LLM Model ID (e.g., Qwen/Qwen2-7B-Instruct): " LLM_MODEL_ID
+read -p "Enter Embedding Model ID (e.g., BAAI/bge-base-en-v1.5): " EMBED_MODEL
+read -p "Enter Reranking Model ID (e.g., BAAI/bge-reranker-base): " RERANK_MODEL_ID
+read -p "Enter LLM Model ID (e.g., meta-llama/Meta-Llama-3-8B-Instruct): " LLM_MODEL_ID
 read -p "Enter Data Mount Directory [default: ./data]: " MOUNT_DIR
 echo
 

@@ -8,9 +8,9 @@ source "${SCRIPT_DIR_INSTALL}/utils.sh" # Assuming utils.sh is in the same direc
 # LOG_FILE="install_chatqna.log" # Optional: specific log file
 
 # Paths
-repo_path=$(realpath "$SCRIPT_DIR_INSTALL/../")
-manifests_path="$repo_path/deployment/kubernetes"
-compose_path="$repo_path/deployment/docker_compose"
+chatqna_dir=$(realpath "$SCRIPT_DIR_INSTALL/../")
+manifests_path="$chatqna_dir/kubernetes/gmc"
+compose_path="$chatqna_dir/docker_compose"
 set_values_script_path="$SCRIPT_DIR_INSTALL/set_values.sh"
 
 # Namespaces
@@ -46,7 +46,7 @@ get_available_devices() {
     # List subdirectories that presumably correspond to devices
     (cd "$search_path" && find . -maxdepth 1 -mindepth 1 -type d -exec basename {} \; | paste -sd ',' || echo "gaudi,xeon")
 }
-available_devices=$(get_available_devices) # Call once or dynamically if DEPLOY_MODE changes before usage
+available_devices="gaudi,xeon" # Call once or dynamically if DEPLOY_MODE changes before usage
 
 function usage() {
     # Update available_devices if DEPLOY_MODE might change before this is called
@@ -267,8 +267,11 @@ function clear_k8s_deployment() {
 
 function start_docker_deployment() {
     local target_device="$1"
-    local target_compose_dir="$compose_path/$target_device"
-
+    if [ "$target_device" = "gaudi" ]; then
+        local target_compose_dir="${chatqna_dir}/docker_compose/intel/hpu/${DEVICE}"
+    elif [ "$target_device" = "xeon" ]; then
+        local target_compose_dir="${chatqna_dir}/docker_compose/intel/cpu/${DEVICE}"
+    fi
     section_header "Starting Docker Compose deployment for DEVICE: $target_device"
 
     if [ ! -d "$target_compose_dir" ]; then
