@@ -29,10 +29,10 @@ git clone https://github.com/opea-project/GenAIExamples.git
 cd GenAIExamples/SearchQnA
 ```
 
-Then checkout a released version, such as v1.2:
+Then checkout a released version, such as v1.3:
 
 ```bash
-git checkout v1.2
+git checkout v1.3
 ```
 
 ### Configure the Deployment Environment

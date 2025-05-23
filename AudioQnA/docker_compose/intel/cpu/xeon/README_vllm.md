@@ -30,8 +30,8 @@ git clone https://github.com/opea-project/GenAIComps.git
 If you are using a specific branch or tag, then we perform git checkout to the desired version.
 
 ```bash
-### Replace "v1.2" with the code version you need (branch or tag)
-cd cd ~/searchqna-test/GenAIExamples/SearchQnA/docker_image_build && git checkout v1.2
+### Replace "v1.3" with the code version you need (branch or tag)
+cd cd ~/searchqna-test/GenAIExamples/SearchQnA/docker_image_build && git checkout v1.3
 git clone https://github.com/opea-project/GenAIComps.git
 ```
 

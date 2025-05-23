@@ -13,7 +13,7 @@ To construct the MegaService with Rerank, we utilize the [GenAIExamples](https:/
 
 ```bash
 git clone https://github.com/opea-project/GenAIExamples.git
-git fetch && git checkout tags/v1.2
+git fetch && git checkout v1.3
 cd GenAIExamples/ChatQnA
 docker build --no-cache -t opea/chatqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
 ```
