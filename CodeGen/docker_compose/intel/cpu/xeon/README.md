@@ -28,7 +28,7 @@ This guide focuses on running the pre-configured CodeGen service using Docker Co
 - Clone the `GenAIExamples` repository:
   ```bash
   git clone https://github.com/opea-project/GenAIExamples.git
-  cd GenAIExamples/CodeGen/docker_compose/intel/cpu/xeon
+  cd GenAIExamples/CodeGen/docker_compose
   ```
 
 ## Quick Start Deployment
@@ -48,7 +48,8 @@ This uses the default vLLM-based deployment profile (`codegen-xeon-vllm`).
         # export http_proxy="your_http_proxy"
         # export https_proxy="your_https_proxy"
         # export no_proxy="localhost,127.0.0.1,${HOST_IP}" # Add other hosts if necessary
-        source ../../set_env.sh
+        source intel/set_env.sh
+        cd /intel/cpu/xeon
         ```
 
         _Note: The compose file might read additional variables from set_env.sh. Ensure all required variables like ports (`LLM_SERVICE_PORT`, `MEGA_SERVICE_PORT`, etc.) are set if not using defaults from the compose file._
