@@ -84,4 +84,3 @@ get_huggingface_token() {
         return 1
     fi
 }
-

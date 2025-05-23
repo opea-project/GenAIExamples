@@ -53,7 +53,7 @@ while [ -z "$HUG_TOKEN" ]; do
     fi
 done
 
-log INFO "Using Hugging Face Token: ${HUG_TOKEN:0:4}...${HUG_TOKEN: -4}" 
+log INFO "Using Hugging Face Token: ${HUG_TOKEN:0:4}...${HUG_TOKEN: -4}"
 if [ ! -f $HOME/.cache/huggingface/token ]; then
     log INFO 'Save Hugging Face Token into $HF_HOME/token'
     echo $HUG_TOKEN > $HOME/.cache/huggingface/token
@@ -174,9 +174,9 @@ if [[ "$run_update_images_lower" == "y" || "$run_update_images_lower" == "yes" ]
         log ERROR "update_images.sh not found."
         exit 1
     fi
-    
+
     update_images_args=("--tag" "$TAG" "--build") # 默认包含 build
-    
+
     # 询问是否需要 push
     read -p "Push images to registry? (y/N) [Default: N]: " push_images
     push_images_lower=$(echo "$push_images" | tr '[:upper:]' '[:lower:]')

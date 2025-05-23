@@ -105,7 +105,7 @@ log INFO "  NO_PROXY: $NO_PROXY"
 
 update_yaml_image() {
     local file_path="$1"
-    local image_base_name="$2" 
+    local image_base_name="$2"
     local new_registry="$3"
     local new_tag="$4"
     local new_image_prefix=""
