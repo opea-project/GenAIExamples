@@ -21,7 +21,7 @@ export CODETRANS_TGI_SERVICE_PORT=8008
 export CODETRANS_TGI_LLM_ENDPOINT="http://${HOST_IP}:${CODETRANS_TGI_SERVICE_PORT}"
 
 ### A token for accessing repositories with models
-export CODETRANS_HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+export CODETRANS_HUGGINGFACEHUB_API_TOKEN=${HF_TOKEN}
 
 ### The port of the LLM service. On this port, the LLM service will accept connections
 export CODETRANS_LLM_SERVICE_PORT=9000

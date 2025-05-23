@@ -6,7 +6,7 @@ export HOST_IP=${ip_address}
 export HOST_IP_EXTERNAL=${ip_address}
 
 export CHATQNA_EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
-export CHATQNA_HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+export CHATQNA_HUGGINGFACEHUB_API_TOKEN=${HF_TOKEN}
 export CHATQNA_LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
 export CHATQNA_RERANK_MODEL_ID="BAAI/bge-reranker-base"
 

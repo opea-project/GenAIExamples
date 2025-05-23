@@ -35,7 +35,7 @@ services:
       DATAPREP_COMPONENT_NAME: "OPEA_DATAPREP_MARIADBVECTOR"
       MARIADB_CONNECTION_URL: mariadb+mariadbconnector://${MARIADB_USER}:${MARIADB_PASSWORD}@mariadb-server:3306/${MARIADB_DATABASE}
       TEI_ENDPOINT: http://tei-embedding-service:80
-      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HUGGINGFACEHUB_API_TOKEN: ${HF_TOKEN}
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:5000/v1/health_check || exit 1"]
       interval: 10s
@@ -69,7 +69,7 @@ services:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       MARIADB_CONNECTION_URL: mariadb+mariadbconnector://${MARIADB_USER}:${MARIADB_PASSWORD}@mariadb-server:3306/${MARIADB_DATABASE}
-      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HUGGINGFACEHUB_API_TOKEN: ${HF_TOKEN}
       LOGFLAG: ${LOGFLAG}
       RETRIEVER_COMPONENT_NAME: "OPEA_RETRIEVER_MARIADBVECTOR"
     restart: unless-stopped
@@ -85,7 +85,7 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HUGGINGFACEHUB_API_TOKEN: ${HF_TOKEN}
       HF_HUB_DISABLE_PROGRESS_BARS: 1
       HF_HUB_ENABLE_HF_TRANSFER: 0
     command: --model-id ${RERANK_MODEL_ID} --auto-truncate
@@ -101,7 +101,7 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HF_TOKEN: ${HF_TOKEN}
       LLM_MODEL_ID: ${LLM_MODEL_ID}
       VLLM_TORCH_PROFILER_DIR: "/mnt"
       VLLM_CPU_KVCACHE_SPACE: 40

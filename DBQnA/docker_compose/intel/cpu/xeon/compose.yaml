@@ -13,8 +13,8 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
-      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HF_TOKEN: ${HF_TOKEN}
+      HUGGINGFACEHUB_API_TOKEN: ${HF_TOKEN}
     shm_size: 1g
     command: --model-id ${LLM_MODEL_ID}
 

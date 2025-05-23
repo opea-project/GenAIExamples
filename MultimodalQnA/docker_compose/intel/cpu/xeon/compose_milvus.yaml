@@ -91,7 +91,7 @@ services:
       MILVUS_HOST: ${MILVUS_HOST}
       COLLECTION_NAME: ${COLLECTION_NAME:-LangChainCollection}
       LVM_ENDPOINT: "http://${LVM_SERVICE_HOST_IP}:${LVM_PORT}/v1/lvm"
-      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HUGGINGFACEHUB_API_TOKEN: ${HF_TOKEN}
     restart: unless-stopped
 
   embedding-multimodal-bridgetower:

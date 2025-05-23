@@ -26,7 +26,7 @@ services:
       VDMS_PORT: ${VDMS_PORT}
       INDEX_NAME: ${INDEX_NAME}
       COLLECTION_NAME: ${INDEX_NAME}
-      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HUGGINGFACEHUB_API_TOKEN: ${HF_TOKEN}
     volumes:
       - videoqna-cache:/home/user/.cache
     healthcheck:
@@ -64,7 +64,7 @@ services:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       INDEX_NAME: ${INDEX_NAME}
-      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HUGGINGFACEHUB_API_TOKEN: ${HF_TOKEN}
       RETRIEVER_COMPONENT_NAME: "OPEA_RETRIEVER_VDMS"
       VDMS_INDEX_NAME: ${INDEX_NAME}
       VDMS_HOST: ${VDMS_HOST}

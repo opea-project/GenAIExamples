@@ -71,7 +71,7 @@ services:
   #     HTTP_PROXY: ${https_proxy}
   #     VLLM_OPENVINO_DEVICE: GPU
   #     HF_ENDPOINT: ${HF_ENDPOINT}
-  #     HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+  #     HF_TOKEN: ${HF_TOKEN}
   #   volumes:
   #     - /dev/dri/by-path:/dev/dri/by-path
   #     - $HOME/.cache/huggingface:/root/.cache/huggingface

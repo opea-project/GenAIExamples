@@ -9,8 +9,8 @@ popd > /dev/null
 
 export host_ip=${ip_address}
 export no_proxy=$no_proxy,$host_ip,dbqna-xeon-react-ui-server,text2sql-service,tgi-service,postgres-container
-export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
-export HF_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+export HUGGINGFACEHUB_API_TOKEN=${HF_TOKEN}
+export HF_TOKEN=${HF_TOKEN}
 export POSTGRES_USER=postgres
 export POSTGRES_PASSWORD=testpwd
 export POSTGRES_DB=chinook

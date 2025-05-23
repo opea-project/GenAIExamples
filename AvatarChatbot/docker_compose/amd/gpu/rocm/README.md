@@ -68,7 +68,7 @@ Then run the command `docker images`, you will have following images ready:
 Before starting the services with `docker compose`, you have to recheck the following environment variables.
 
 ```bash
-export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+export HUGGINGFACEHUB_API_TOKEN=${HF_TOKEN}
 export host_ip=$(hostname -I | awk '{print $1}')
 
 export TGI_SERVICE_PORT=3006

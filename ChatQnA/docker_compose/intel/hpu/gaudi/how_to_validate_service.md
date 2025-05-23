@@ -123,7 +123,7 @@ View the docker input parameters in `./ChatQnA/docker_compose/intel/hpu/gaudi/co
     environment:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      HUGGING_FACE_HUB_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HUGGING_FACE_HUB_TOKEN: ${HF_TOKEN}
       HABANA_VISIBLE_DEVICES: all
       OMPI_MCA_btl_vader_single_copy_mechanism: none
       ENABLE_HPU_GRAPH: true

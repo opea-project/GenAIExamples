@@ -75,7 +75,7 @@ services:
       MILVUS_HOST: ${host_ip}
       MILVUS_PORT: 19530
       TEI_EMBEDDING_ENDPOINT: http://tei-embedding-service:80
-      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HUGGINGFACEHUB_API_TOKEN: ${HF_TOKEN}
       EMBEDDING_MODEL_ID: ${EMBEDDING_MODEL_ID}
       LOGFLAG: ${LOGFLAG}
     healthcheck:
@@ -107,7 +107,7 @@ services:
       MILVUS_HOST: ${host_ip}
       MILVUS_PORT: 19530
       TEI_EMBEDDING_ENDPOINT: http://tei-embedding-service:80
-      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HUGGINGFACEHUB_API_TOKEN: ${HF_TOKEN}
       LOGFLAG: ${LOGFLAG}
       RETRIEVER_COMPONENT_NAME: "OPEA_RETRIEVER_MILVUS"
     restart: unless-stopped
@@ -138,7 +138,7 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HUGGINGFACEHUB_API_TOKEN: ${HF_TOKEN}
       HF_HUB_DISABLE_PROGRESS_BARS: 1
       HF_HUB_ENABLE_HF_TRANSFER: 0
     command: --model-id ${RERANK_MODEL_ID} --auto-truncate
@@ -155,7 +155,7 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HF_TOKEN: ${HF_TOKEN}
       LLM_MODEL_ID: ${LLM_MODEL_ID}
       VLLM_TORCH_PROFILER_DIR: "/mnt"
     healthcheck:

@@ -29,7 +29,7 @@ services:
       REDIS_HOST: redis-vector-db
       INDEX_NAME: ${INDEX_NAME}
       TEI_EMBEDDING_ENDPOINT: http://tei-embedding-service:80
-      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HUGGINGFACEHUB_API_TOKEN: ${HF_TOKEN}
       DATAPREP_TYPE: ${DATAPREP_TYPE}
       LOGFLAG: ${LOGFLAG}
     healthcheck:
@@ -73,7 +73,7 @@ services:
       REDIS_HOST: redis-vector-db
       INDEX_NAME: ${INDEX_NAME}
       TEI_EMBEDDING_ENDPOINT: http://tei-embedding-service:80
-      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HUGGINGFACEHUB_API_TOKEN: ${HF_TOKEN}
       LOGFLAG: ${LOGFLAG}
       RETRIEVER_COMPONENT_NAME: "OPEA_RETRIEVER_REDIS"
     restart: unless-stopped
@@ -90,7 +90,7 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HUGGINGFACEHUB_API_TOKEN: ${HF_TOKEN}
       HF_HUB_DISABLE_PROGRESS_BARS: 1
       HF_HUB_ENABLE_HF_TRANSFER: 0
       host_ip: ${host_ip}
@@ -111,7 +111,7 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HF_TOKEN: ${HF_TOKEN}
       HF_HUB_DISABLE_PROGRESS_BARS: 1
       HF_HUB_ENABLE_HF_TRANSFER: 0
       host_ip: ${host_ip}
@@ -167,7 +167,7 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HF_TOKEN: ${HF_TOKEN}
       host_ip: ${host_ip}
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:80/health || exit 1"]
@@ -190,7 +190,7 @@ services:
       https_proxy: ${https_proxy}
       LLM_ENDPOINT: http://tgi_service_codegen:80
       LLM_MODEL_ID: ${LLM_MODEL_ID_CODEGEN}
-      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HUGGINGFACEHUB_API_TOKEN: ${HF_TOKEN}
       LOGFLAG: ${LOGFLAG}
     restart: unless-stopped
   codegen-xeon-backend-server:
@@ -303,7 +303,7 @@ services:
       https_proxy: ${https_proxy}
       LLM_ENDPOINT: http://tgi-service:80
       LLM_MODEL_ID: ${LLM_MODEL_ID}
-      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HUGGINGFACEHUB_API_TOKEN: ${HF_TOKEN}
       MAX_INPUT_TOKENS: ${MAX_INPUT_TOKENS:-1024}
       MAX_TOTAL_TOKENS: ${MAX_TOTAL_TOKENS:-2048}
       DocSum_COMPONENT_NAME: ${DocSum_COMPONENT_NAME}
