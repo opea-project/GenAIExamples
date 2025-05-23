@@ -3,6 +3,9 @@
 
 name: Check hyperlinks and relative path validity
 
+permissions:
+  contents: read
+
 on:
   pull_request:
     branches: [main]

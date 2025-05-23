@@ -2,7 +2,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 name: Compose file and dockerfile path checking
-
+permissions:
+  contents: read
 on:
   pull_request:
     branches: [main]

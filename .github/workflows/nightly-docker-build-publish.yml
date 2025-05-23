@@ -2,7 +2,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 name: Nightly build/publish latest docker images
-
+permissions:
+  contents: read
 on:
   schedule:
     - cron: "30 14 * * 1-5" # UTC time

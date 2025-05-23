@@ -3,7 +3,8 @@
 
 # This workflow will only test GMC pipeline and will not install GMC any more
 name: Single GMC E2e Test For CD Workflow Call
-
+permissions:
+  contents: read
 on:
   workflow_call:
     inputs:

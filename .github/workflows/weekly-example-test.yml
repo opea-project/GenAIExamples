@@ -3,13 +3,29 @@
 
 name: Weekly test all examples on multiple HWs
 
+permissions:
+  actions: read
+  attestations: read
+  checks: read
+  deployments: read
+  discussions: read
+  issues: read
+  models: read
+  packages: read
+  pages: read
+  pull-requests: read
+  repository-projects: read
+  statuses: read
+  security-events: read
+  id-token: read
+
 on:
   schedule:
     - cron: "30 2 * * 6" # UTC time
   workflow_dispatch:
 
 env:
-  EXAMPLES: ${{ vars.NIGHTLY_RELEASE_EXAMPLES }}
+  EXAMPLES: "CodeTrans"  #${{ vars.NIGHTLY_RELEASE_EXAMPLES }}
   NODES: "gaudi,xeon,rocm,arc"
 
 jobs:

@@ -3,10 +3,12 @@
 
 name: Check the validity of links in docker_images_list.
 
+permissions:
+  contents: read
+
 on:
   push:
     branches: [main]
-    types: [opened, reopened, ready_for_review, synchronize]
 
 jobs:
   check-dockerfile-paths:
