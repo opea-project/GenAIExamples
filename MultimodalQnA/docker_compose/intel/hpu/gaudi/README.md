@@ -296,7 +296,7 @@ export image_fn="apple.png"
 wget https://github.com/docarray/docarray/blob/main/tests/toydata/image-data/apple.png?raw=true -O ${image_fn}
 
 export pdf_fn="nke-10k-2023.pdf"
-wget https://raw.githubusercontent.com/opea-project/GenAIComps/v1.1/comps/retrievers/redis/data/nke-10k-2023.pdf -O ${pdf_fn}
+wget https://raw.githubusercontent.com/opea-project/GenAIComps/v1.3/comps/third_parties/pathway/src/data/nke-10k-2023.pdf -O ${pdf_fn}
 
 export caption_fn="apple.txt"
 echo "This is an apple."  > ${caption_fn}
