@@ -2,7 +2,22 @@
 # SPDX-License-Identifier: Apache-2.0
 
 name: Example jobs
-permissions: read-all
+permissions:
+  contents: read
+  id-token: write
+  actions: read
+  attestations: read
+  checks: read
+  deployments: read
+  discussions: read
+  issues: read
+  models: read
+  packages: read
+  pages: read
+  pull-requests: read
+  repository-projects: read
+  statuses: read
+  security-events: read
 on:
   workflow_call:
     inputs:
