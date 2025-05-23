@@ -1,0 +1,61 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+# Accelerate inferencing in heaviest components to improve performance
+# by overriding their subchart values
+
+tgi:
+  enabled: true
+  accelDevice: "rocm"
+  image:
+    repository: ghcr.io/huggingface/text-generation-inference
+    tag: "3.0.0-rocm"
+  LLM_MODEL_ID: meta-llama/Meta-Llama-3-8B-Instruct
+  MAX_INPUT_LENGTH: "2048"
+  MAX_TOTAL_TOKENS: "4096"
+  PYTORCH_TUNABLEOP_ENABLED: "0"
+  USE_FLASH_ATTENTION: "true"
+  FLASH_ATTENTION_RECOMPUTE: "true"
+  HIP_VISIBLE_DEVICES: "0,1"
+  MAX_BATCH_SIZE: "4"
+  extraCmdArgs: [ "--num-shard","2" ]
+  resources:
+    limits:
+      amd.com/gpu: "2"
+    requests:
+      cpu: 1
+      memory: 16Gi
+  securityContext:
+    readOnlyRootFilesystem: false
+    runAsNonRoot: false
+    runAsUser: 0
+    capabilities:
+      add:
+        - SYS_PTRACE
+  readinessProbe:
+    initialDelaySeconds: 60
+    periodSeconds: 5
+    timeoutSeconds: 1
+    failureThreshold: 120
+  startupProbe:
+    initialDelaySeconds: 60
+    periodSeconds: 5
+    timeoutSeconds: 1
+    failureThreshold: 120
+
+vllm:
+  enabled: false
+
+# Reranking: second largest bottleneck when reranking is in use
+# (i.e. query context docs have been uploaded with data-prep)
+#
+# TODO: could vLLM be used also for reranking / embedding?
+teirerank:
+  accelDevice: "cpu"
+  image:
+    repository: ghcr.io/huggingface/text-embeddings-inference
+    tag: cpu-1.5
+  securityContext:
+    readOnlyRootFilesystem: false
+  readinessProbe:
+    timeoutSeconds: 1
