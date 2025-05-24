@@ -1,4 +1,4 @@
-# Finance Agent Example 
+# Finance Agent Example
 
 ## Table of Contents
 
@@ -10,20 +10,20 @@
 - [Deployment Options](#deployment-options)
 - [Contribution](#contribution)
 
-
-
 ## Overview
 
 The Finance Agent example showcases a hierarchical multi-agent system designed to assist users with financial document processing and analysis. It provides three main functionalities: summarizing lengthy financial documents, answering queries related to financial documents, and conducting research to generate investment reports on public companies.
 
 Users interact with the system via a graphical user interface (UI), where requests are managed by a supervisor agent that delegates tasks to worker agents or the summarization microservice. The system supports document uploads through the UI for processing.
 
-
 ## Problem Motivation
+
 Navigating and analyzing extensive financial documents can be challenging and time-consuming. Users often require concise summaries, answers to specific queries, or comprehensive investment reports. The Finance Agent addresses these needs by automating document summarization, query answering, and research tasks, thereby enhancing productivity and decision-making efficiency.
 
 ## Architecture
+
 ### High-Level Diagram
+
 The Finance Agent system is structured as a hierarchical multi-agent architecture. User interactions are managed by a supervisor agent, which coordinates tasks among worker agents and the summarization microservice. The system supports document uploads and processing through the UI.
 
 The architecture of this Finance Agent example is shown in the figure below. The agent is a hierarchical multi-agent system and has 3 main functions:
@@ -37,6 +37,7 @@ The user interacts with the supervisor agent through the graphical UI. The super
 ![Finance Agent Architecture](assets/finance_agent_arch.png)
 
 ### OPEA Microservices Diagram
+
 The architectural diagram of the `dataprep` microservice is shown below. We use [docling](https://github.com/docling-project/docling) to extract text from PDFs and URLs into markdown format. Both the full document content and tables are extracted. We then use an LLM to extract metadata from the document, including the company name, year, quarter, document type, and document title. The full document markdown then gets chunked, and LLM is used to summarize each chunk, and the summaries are embedded and saved to a vector database. Each table is also summarized by LLM and the summaries are embedded and saved to the vector database. The chunks and tables are also saved into a KV store. The pipeline is designed as such to improve retrieval accuracy of the `search_knowledge_base` tool used by the Question Answering worker agent.
 
 ![dataprep architecture](assets/fin_agent_dataprep.png)
@@ -55,8 +56,8 @@ The Question Answering worker agent uses `search_knowledge_base` tool to get rel
 
 ![finqa search tool arch](assets/finqa_tool.png)
 
-
 ## Deployment Options
+
 This CodeGen example can be deployed manually on various hardware platforms using Docker Compose or Kubernetes. Select the appropriate guide based on your target environment:
 
 | Hardware        | Deployment Mode      | Guide Link                                                               |
@@ -65,7 +66,6 @@ This CodeGen example can be deployed manually on various hardware platforms usin
 
 _Note: Building custom microservice images can be done using the resources in [GenAIComps](https://github.com/opea-project/GenAIComps)._
 
-
 ## Contribution
-We welcome contributions to the OPEA project. Please refer to the contribution guidelines for more information.
 
+We welcome contributions to the OPEA project. Please refer to the contribution guidelines for more information.

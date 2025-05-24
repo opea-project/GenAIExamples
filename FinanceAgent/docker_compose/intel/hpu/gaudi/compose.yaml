@@ -215,5 +215,3 @@ services:
     ports:
       - "5175:8080"
     ipc: host
-
-

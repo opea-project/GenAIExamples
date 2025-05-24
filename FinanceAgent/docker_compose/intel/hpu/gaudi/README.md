@@ -1,4 +1,5 @@
 # Deploy Finance Agent on Intel Gaudi HPU with Docker Compose
+
 This README provides instructions for deploying the Finance Agent application using Docker Compose on systems equipped with Intel Gaudi HPUs.
 
 ## Table of Contents
@@ -14,6 +15,7 @@ This README provides instructions for deploying the Finance Agent application us
 This guide focuses on running the pre-configured Finance Agent service using Docker Compose on Intel Gaudi HPUs. It leverages containers optimized for Gaudi for the LLM serving component, along with CPU-based containers for other microservices like embedding, retrieval, data preparation and the UI.
 
 ## Prerequisites
+
 - Docker and Docker Compose installed.
 - Intel Gaudi HPU(s) with the necessary drivers and software stack installed on the host system. (Refer to Intel Gaudi Documentation).
 - Git installed (for cloning repository).
@@ -31,8 +33,11 @@ Clone the GenAIExamples repository:
 ```
 
 ## Start Deployment
+
 This uses the default vLLM-based deployment profile (vllm-gaudi-server).
+
 ### Configure Environment
+
 Set required environment variables in your shell:
 
 ```shell
@@ -41,12 +46,12 @@ Set required environment variables in your shell:
    # Path to your model cache
    export HF_CACHE_DIR="./data"
    # Go to https://finnhub.io/ to get your free api key
-   export FINNHUB_API_KEY=<your-finnhub-api-key> 
+   export FINNHUB_API_KEY=<your-finnhub-api-key>
    # Go to https://docs.financialdatasets.ai/ to get your free api key
-   export FINANCIAL_DATASETS_API_KEY=<your-api-key> 
+   export FINANCIAL_DATASETS_API_KEY=<your-api-key>
 
    # Optional: Configure HOST_IP if needed
-   # Replace with your host's external IP address (do not use localhost or 127.0.0.1). 
+   # Replace with your host's external IP address (do not use localhost or 127.0.0.1).
    # export HOST_IP=$(hostname -I | awk '{print $1}')
    # Optional: Configure proxy if needed
    # export http_proxy="your_http_proxy"
@@ -59,19 +64,21 @@ Set required environment variables in your shell:
 Note: The compose file might read additional variables from set_env.sh. Ensure all required variables like ports (LLM_SERVICE_PORT, TEI_EMBEDDER_PORT, etc.) are set if not using defaults from the compose file. For instance, edit the set_env.sh to change the LLM model:
 
 ### Start Services
-#### Deploy with Docker Compose
-Below is the command to launch services
-   - vllm-gaudi-server
-   - tei-embedding-serving
-   - redis-vector-db
-   - redis-kv-store
-   - dataprep-redis-server-finance
-   - finqa-agent-endpoint
-   - research-agent-endpoint
-   - docsum-vllm-gaudi
-   - supervisor-agent-endpoint
-   - agent-ui
 
+#### Deploy with Docker Compose
+
+Below is the command to launch services
+
+- vllm-gaudi-server
+- tei-embedding-serving
+- redis-vector-db
+- redis-kv-store
+- dataprep-redis-server-finance
+- finqa-agent-endpoint
+- research-agent-endpoint
+- docsum-vllm-gaudi
+- supervisor-agent-endpoint
+- agent-ui
 
 ```shell
    docker compose up -d
@@ -102,14 +109,16 @@ If deploy on Gaudi, also need to build vllm image.
    docker build --no-cache -f Dockerfile.hpu -t opea/vllm-gaudi:latest --shm-size=128g . --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy
 ```
 
-
 ## Validate Services
+
 Wait several minutes for models to download and services to initialize (Gaudi initialization can take time). Check container logs (docker compose logs -f <service_name>, especially vllm-gaudi-server).
+
 ```bash
    docker logs --tail 2000 -f vllm-gaudi-server
-``` 
+```
 
 ### Validate Data Services
+
 Ingest data and retrieval from database
 
 ```bash

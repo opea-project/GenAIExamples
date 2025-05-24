@@ -32,7 +32,7 @@ export HTTP_PROXY="${http_proxy}"
 export HTTPS_PROXY="${https_proxy}"
 
 # VLLM configuration
-export VLLM_PORT="${VLLM_PORT:-8086}"  
+export VLLM_PORT="${VLLM_PORT:-8086}"
 export VLLM_VOLUME="${VLLM_VOLUME:-/data2/huggingface}"
 export VLLM_IMAGE="${VLLM_IMAGE:-opea/vllm-gaudi:latest}"
 export LLM_MODEL_ID="${LLM_MODEL_ID:-meta-llama/Llama-3.3-70B-Instruct}"
@@ -79,7 +79,7 @@ export FINANCIAL_DATASETS_API_KEY="${FINANCIAL_DATASETS_API_KEY}"
 
 
 # Toolset and prompt paths
-if check_var "WORKDIR"; then  
+if check_var "WORKDIR"; then
     export TOOLSET_PATH=$WORKDIR/GenAIExamples/FinanceAgent/tools/
     export PROMPT_PATH=$WORKDIR/GenAIExamples/FinanceAgent/prompts/
 
@@ -96,4 +96,3 @@ if check_var "WORKDIR"; then
         fi
     done
 fi
-
