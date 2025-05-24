@@ -29,7 +29,7 @@ services:
     ports:
       - "8086:8000"
     volumes:
-      - ${HF_CACHE_DIR}:/data
+      - ${HF_CACHE_DIR:-./data}:/data
     environment:
       <<: *common-env
       HF_TOKEN: ${HF_TOKEN}
@@ -59,8 +59,7 @@ services:
     ports:
       - "${TEI_EMBEDDER_PORT:-10221}:80"
     volumes:
-      # - "./data:/data"
-      - ${HF_CACHE_DIR}:/data
+      - ${HF_CACHE_DIR:-./data}:/data
     shm_size: 1g
     environment:
       <<: *common-env
