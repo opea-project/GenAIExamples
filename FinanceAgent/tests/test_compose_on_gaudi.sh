@@ -6,29 +6,28 @@ set -xe
 export WORKPATH=$(dirname "$PWD")
 export WORKDIR=$WORKPATH/../../
 echo "WORKDIR=${WORKDIR}"
-export ip_address=$(hostname -I | awk '{print $1}')
+export IP_ADDRESS=$(hostname -I | awk '{print $1}')
 LOG_PATH=$WORKPATH
 
 #### env vars for LLM endpoint #############
-model=meta-llama/Llama-3.3-70B-Instruct
-vllm_image=opea/vllm-gaudi:latest
-vllm_port=8086
-vllm_image=$vllm_image
+MODEL=meta-llama/Llama-3.3-70B-Instruct
+VLLM_IMAGE=opea/vllm-gaudi:latest
+VLLM_PORT=8086
 HF_CACHE_DIR=${model_cache:-"/data2/huggingface"}
-vllm_volume=${HF_CACHE_DIR}
+VLLM_VOLUME=${HF_CACHE_DIR}
 #######################################
 
 #### env vars for dataprep #############
-export host_ip=${ip_address}
+export hOST_IP=${IP_ADDRESS}
 export DATAPREP_PORT="6007"
 export TEI_EMBEDDER_PORT="10221"
-export REDIS_URL_VECTOR="redis://${ip_address}:6379"
-export REDIS_URL_KV="redis://${ip_address}:6380"
-export LLM_MODEL=$model
-export LLM_ENDPOINT="http://${ip_address}:${vllm_port}"
+export REDIS_URL_VECTOR="redis://${IP_ADDRESS}:6379"
+export REDIS_URL_KV="redis://${IP_ADDRESS}:6380"
+export LLM_MODEL=$MODEL
+export LLM_ENDPOINT="http://${IP_ADDRESS}:${VLLM_PORT}"
 export DATAPREP_COMPONENT_NAME="OPEA_DATAPREP_REDIS_FINANCE"
 export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
-export TEI_EMBEDDING_ENDPOINT="http://${ip_address}:${TEI_EMBEDDER_PORT}"
+export TEI_EMBEDDING_ENDPOINT="http://${IP_ADDRESS}:${TEI_EMBEDDER_PORT}"
 #######################################
 
 
@@ -62,12 +61,12 @@ function build_vllm_docker_image() {
 
     VLLM_FORK_VER=v0.6.6.post1+Gaudi-1.20.0
     git checkout ${VLLM_FORK_VER} &> /dev/null
-    docker build --no-cache -f Dockerfile.hpu -t $vllm_image --shm-size=128g . --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy
+    docker build --no-cache -f Dockerfile.hpu -t $VLLM_IMAGE --shm-size=128g . --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy
     if [ $? -ne 0 ]; then
-        echo "$vllm_image failed"
+        echo "$VLLM_IMAGE failed"
         exit 1
     else
-        echo "$vllm_image successful"
+        echo "$VLLM_IMAGE successful"
     fi
 }
 
@@ -75,8 +74,8 @@ function build_vllm_docker_image() {
 function start_vllm_service_70B() {
     echo "token is ${HF_TOKEN}"
     echo "start vllm gaudi service"
-    echo "**************model is $model**************"
-    docker run -d --runtime=habana --rm --name "vllm-gaudi-server" -e HABANA_VISIBLE_DEVICES=all -p $vllm_port:8000 -v $vllm_volume:/data -e HF_TOKEN=$HF_TOKEN -e HUGGING_FACE_HUB_TOKEN=$HF_TOKEN -e HF_HOME=/data -e OMPI_MCA_btl_vader_single_copy_mechanism=none -e PT_HPU_ENABLE_LAZY_COLLECTIVES=true -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e no_proxy=$no_proxy -e VLLM_SKIP_WARMUP=true --cap-add=sys_nice --ipc=host $vllm_image --model ${model} --max-seq-len-to-capture 16384 --tensor-parallel-size 4
+    echo "**************MODEL is $MODEL**************"
+    docker run -d --runtime=habana --rm --name "vllm-gaudi-server" -e HABANA_VISIBLE_DEVICES=all -p $VLLM_PORT:8000 -v $VLLM_VOLUME:/data -e HF_TOKEN=$HF_TOKEN -e HUGGING_FACE_HUB_TOKEN=$HF_TOKEN -e HF_HOME=/data -e OMPI_MCA_btl_vader_single_copy_mechanism=none -e PT_HPU_ENABLE_LAZY_COLLECTIVES=true -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e no_proxy=$no_proxy -e VLLM_SKIP_WARMUP=true --cap-add=sys_nice --ipc=host $VLLM_IMAGE --model ${MODEL} --max-seq-len-to-capture 16384 --tensor-parallel-size 4
     sleep 10s
     echo "Waiting vllm gaudi ready"
     n=0
@@ -104,8 +103,8 @@ function stop_llm(){
 
 }
 
-function start_dataprep(){
-    docker compose -f $WORKPATH/docker_compose/intel/hpu/gaudi/dataprep_compose.yaml up -d
+function start_dataprep_and_agent(){
+    docker compose -f $WORKPATH/docker_compose/intel/hpu/gaudi/compose.yaml up -d tei-embedding-serving redis-vector-db redis-kv-store dataprep-redis-finance worker-finqa-agent worker-research-agent docsum-vllm-gaudi supervisor-react-agent agent-ui
     sleep 1m
 }
 
@@ -154,14 +153,6 @@ function stop_dataprep() {
     if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid && sleep 1s; fi
 
 }
-
-function start_agents() {
-    echo "Starting Agent services"
-    cd $WORKDIR/GenAIExamples/FinanceAgent/docker_compose/intel/hpu/gaudi/
-    bash launch_agents.sh
-    sleep 2m
-}
-
 
 function validate_agent_service() {
     # # test worker finqa agent
@@ -249,21 +240,23 @@ echo "=================== #2 Start vllm endpoint===================="
 start_vllm_service_70B
 echo "=================== #2 vllm endpoint started===================="
 
-echo "=================== #3 Start dataprep and ingest data ===================="
-start_dataprep
+echo "=================== #3 Start data and agent services ===================="
+start_dataprep_and_agent
+echo "=================== #3 data and agent endpoint started===================="
+
+echo "=================== #4 Validate ingest_validate_dataprep ===================="
 ingest_validate_dataprep
-echo "=================== #3 Data ingestion and validation completed===================="
+echo "=================== #4 Data ingestion and validation completed===================="
 
-echo "=================== #4 Start agents ===================="
-start_agents
+echo "=================== #5 Start agents ===================="
 validate_agent_service
-echo "=================== #4 Agent test passed ===================="
+echo "=================== #5 Agent test passed ===================="
 
-echo "=================== #5 Stop microservices ===================="
+echo "=================== #6 Stop microservices ===================="
 stop_agent_docker
 stop_dataprep
 stop_llm
-echo "=================== #5 Microservices stopped===================="
+echo "=================== #6 Microservices stopped===================="
 
 echo y | docker system prune
 
