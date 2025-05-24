@@ -178,7 +178,7 @@ services:
       LOGFLAG: ${LOGFLAG:-False}
       MAX_INPUT_TOKENS: ${MAX_INPUT_TOKENS}
       MAX_TOTAL_TOKENS: ${MAX_TOTAL_TOKENS}
-      DocSum_COMPONENT_NAME: ${DocSum_COMPONENT_NAME:-OpeaDocSumvLLM}
+      DocSum_COMPONENT_NAME: ${DOCSUM_COMPONENT_NAME:-OpeaDocSumvLLM}
     restart: unless-stopped
 
   supervisor-react-agent:
