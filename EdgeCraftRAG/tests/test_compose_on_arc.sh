@@ -46,18 +46,10 @@ function build_docker_images() {
 }
 
 function start_services() {
-    export MODEL_PATH=${MODEL_PATH}
-    export DOC_PATH=${DOC_PATH}
     export UI_UPLOAD_PATH=${UI_UPLOAD_PATH}
-    export HOST_IP=${HOST_IP}
-    export LLM_MODEL=${LLM_MODEL}
-    export HF_ENDPOINT=${HF_ENDPOINT}
-    export vLLM_ENDPOINT=${vLLM_ENDPOINT}
-    export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
-    export no_proxy="localhost, 127.0.0.1, 192.168.1.1"
 
     cd $WORKPATH/docker_compose/intel/gpu/arc
-
+    source set_env.sh
     # Start Docker Containers
     docker compose -f $COMPOSE_FILE up -d > ${LOG_PATH}/start_services_with_compose.log
     sleep 20

@@ -18,7 +18,7 @@ Quick Start Deployment Steps:
 2. Run Docker Compose.
 3. Consume the GraphRAG Service.
 
-Note: If you do not have docker installed you can run this script to install docker : `bash docker_compose/install_docker.sh`
+Note: If you do not have Docker installed you can [install Docker](https://docs.docker.com/engine/install/) first
 
 ### Quick Start: 1.Setup Environment Variable
 
@@ -70,7 +70,7 @@ Here is an example of `Nike 2023` pdf.
 
 ```bash
 # download pdf file
-wget https://raw.githubusercontent.com/opea-project/GenAIComps/v1.1/comps/retrievers/redis/data/nke-10k-2023.pdf
+wget https://raw.githubusercontent.com/opea-project/GenAIComps/v1.3/comps/third_parties/pathway/src/data/nke-10k-2023.pdf
 # upload pdf file with dataprep
 curl -X POST "http://${host_ip}:11103/v1/dataprep/ingest" \
     -H "Content-Type: multipart/form-data" \
@@ -204,7 +204,7 @@ Here is an example of `Nike 2023` pdf.
 
 ```bash
 # download pdf file
-wget https://raw.githubusercontent.com/opea-project/GenAIComps/v1.1/comps/retrievers/redis/data/nke-10k-2023.pdf
+wget https://raw.githubusercontent.com/opea-project/GenAIComps/v1.3/comps/third_parties/pathway/src/data/nke-10k-2023.pdf
 # upload pdf file with dataprep
 curl -X POST "http://${host_ip}:6007/v1/dataprep/ingest" \
     -H "Content-Type: multipart/form-data" \
