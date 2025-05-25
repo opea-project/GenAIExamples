@@ -48,13 +48,14 @@ services:
       - vllm-service
       - tei-embedding-service
     ports:
-      - "6004:6004"
+      - "6004:5000"
     ipc: host
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       host_ip: ${host_ip}
+      DATAPREP_COMPONENT_NAME: "OPEA_DATAPREP_NEO4J_LLAMAINDEX"
       HUGGING_FACE_HUB_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       # HF_TOKEN: ${HF_TOKEN} # Ed; don't think this is needed for dataprep-neo4j-llamaindex
       NEO4J_URL: ${NEO4J_URL}
