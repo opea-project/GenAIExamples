@@ -333,3 +333,43 @@ OPEA microservice deployment can easily be monitored through Grafana dashboards 
 
 ![chatqna dashboards](../ChatQnA/assets/img/chatqna_dashboards.png)
 ![tgi dashboard](../ChatQnA//assets/img/tgi_dashboard.png)
+
+## Architecture
+
+The GraphRAG service architecture and container relationships are illustrated below:
+
+```mermaid
+%% Orange are services from third parties that are 'wrapped' as OPEA components.
+flowchart LR
+    User["User"] --> Nginx["Nginx<br>graphrag-xeon-nginx-server"]
+    Nginx --> UI["UI<br>graphrag-ui-server"] & Backend & User
+    UI --> Nginx
+    Backend --> Nginx & Retriever
+    Retriever --> LLM
+    LLM --> Backend
+    LLM <-.-> vLLM["vLLM<br>vllm-service"]
+    Retriever <-.-> TEI["TEI Embedding<br>tei-embedding-server"]
+    Dataprep["Dataprep<br>dataprep-neo4j-server"] <-.-> TEI
+    Dataprep <-.-> vLLM
+
+    vLLM:::ext
+    TEI:::ext
+    Neo4j:::ext
+
+ subgraph BackendService["Backend Service"]
+    direction TB
+        Backend["Backend<br>graphrag-xeon-backend-server"]
+        Retriever["Retriever<br>retriever-neo4j-llamaindex"]
+        LLM["LLM Service"]
+  end
+
+    %% Graph DB interaction
+    Neo4j["Neo4j Graph DB<br>neo4j-apoc"] <-.-> Retriever
+    Neo4j <-.-> Dataprep
+
+    classDef default fill:#fff,stroke:#000,color:#000
+    classDef ext fill:#f9cb9c,stroke:#000,color:#000
+    style BackendService margin-top:20px,margin-bottom:20px
+```
+
+This GraphRAG implementation uses component-level microservices defined in [GenAIComps](https://github.com/opea-project/GenAIComps). The flow chart above shows the information flow between different microservices and third-party components (shown in orange).
