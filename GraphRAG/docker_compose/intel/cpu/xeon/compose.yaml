@@ -110,7 +110,7 @@ services:
 
   # vllm-service is the LLM server that will be used by the retriever and backend.
   vllm-service:
-    image: ${REGISTRY:-opea}/vllm-cpu:${TAG:-test} # must build add to README.
+    image: ${REGISTRY:-opea}/vllm-cpu:${TAG:-latest} # must build add to README.
     container_name: vllm-service
     ports:
       - "9009:80" # this can be accesed by graphrag-xeon-backend-server on internal port 80. 

@@ -25,28 +25,37 @@ Note: If you do not have docker installed you can run this script to install doc
 Build vllm-service, dataprep, retriever, graph-ui images:
 
 ```bash
-
 # vllm-service
-git clone...
-
+cd $WORKPATH
+git clone https://github.com/vllm-project/vllm.git
+cd ./vllm/
+VLLM_VER="v0.8.3"
+git checkout ${VLLM_VER}
+docker build --no-cache -f docker/Dockerfile.cpu -t opea/vllm-cpu:${TAG:-latest} --shm-size=128g .
 
 # opea/dataprep
 cd GenAIComps
-docker build -t opea/dataprep:latest --build-arg no_proxy=$no_proxy --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/src/Dockerfile .
+docker build -t opea/dataprep:latest -f comps/dataprep/src/Dockerfile .
 
 # opea/retrievers
 # be careful the . docker context
 cd GenAIComps
-docker build -t opea/retriever:latest --build-arg no_proxy=$no_proxy --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/src/Dockerfile .
+docker build -t opea/retriever:latest -f comps/retrievers/src/Dockerfile .
 
 # opea/graphrag-ui
 cd GenAIExamples/GraphRAG/ui # Important to have the correct docker context for COPY to work. 
-docker build -t  opea/graphrag-ui:latest --build-arg no_proxy=$no_proxy --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
+docker build -t opea/graphrag-ui:latest -f docker/Dockerfile .
 
-
+# opea/graphrag
 cd GenAIExamples/GraphRAG
-docker build -t  opea/graphrag:latest .
+docker build -t opea/graphrag:latest .
+```
 
+Note: If you are building behind a corporate proxy, you'll need to add proxy arguments to each build command:
+
+For example:
+```bash
+docker build -t opea/dataprep:latest --build-arg http_proxy=$http_proxy --build-arg https_proxy=$https_proxy --build-arg no_proxy=$no_proxy -f comps/dataprep/src/Dockerfile .
 ```
 
 
