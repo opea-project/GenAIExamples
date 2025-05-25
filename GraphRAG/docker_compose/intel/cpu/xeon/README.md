@@ -71,7 +71,9 @@ To set up environment variables for deploying GraphRAG services, follow these st
     export OPENROUTER_KEY="mykey"  
     export HUGGINGFACEHUB_API_TOKEN="mytoken"
     
-    source set_env.sh # Below will override some of these defaults.
+    source set_env.sh 
+    
+    # Below will override some of these defaults in set_env.sh
     
     export host_ip=$(hostname -I | awk '{print $1}')
     
@@ -148,15 +150,12 @@ curl http://localhost:9009/v1/chat/completions \
 
 To chat with retrieved information, you need to upload a file using `Dataprep` service.
 
-Here is an example of `Nike 2023` pdf.
+Here is an example of uploading sample graph data (which can also be uploaded via the UI):
 
 ```bash
-# download pdf file
-wget https://raw.githubusercontent.com/opea-project/GenAIComps/v1.1/comps/retrievers/redis/data/nke-10k-2023.pdf
-# upload pdf file with dataprep
-curl -X POST "http://${host_ip}:11103/v1/dataprep/ingest" \
-    -H "Content-Type: multipart/form-data" \
-    -F "files=@./nke-10k-2023.pdf"
+cd GenAIExamples/GraphRAG/example_data
+
+curl -X POST "http://${host_ip}:6004/v1/dataprep/ingest"     -H "Content-Type: multipart/form-data"     -F "files=@./programming_languages.txt"
 ```
 
 ```bash
@@ -303,7 +302,7 @@ Two ways of consuming GraphRAG Service:
 curl http://${host_ip}:8888/v1/graphrag \
     -H "Content-Type: application/json"  \
     -d '{
-        "model": "gpt-4o-mini","messages": [{"role": "user","content": "Who is John Brady and has he had any confrontations?
+        "model": "${FINAL_LLM_MODEL_ID}","messages": [{"role": "user","content": "Who is John Brady and has he had any confrontations?
     "}]}'
 ```
 

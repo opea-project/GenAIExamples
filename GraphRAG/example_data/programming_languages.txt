@@ -1,0 +1,5 @@
+Python was created by Guido van Rossum in 1991. He was influenced by ABC, a teaching language he helped develop at CWI. Python is known for its readability and is widely used in AI development.
+
+James Gosling designed Java at Sun Microsystems in 1995. Java influenced Python's approach to object-oriented programming, while Python's success later influenced Java's addition of the var keyword and REPL features.
+
+Both Python and Java are used heavily at Google, where they maintain internal versions of these languages. Google also created Go in 2009, which borrowed ideas from both languages while focusing on simplicity and performance.
