@@ -10,7 +10,7 @@ GraphRAG was introduced by Microsoft paper "From Local to Global: A Graph RAG Ap
 
 ## Deploy GraphRAG Service
 
-The GraphRAG service can be effortlessly deployed on Intel Gaudi2, Intel Xeon Scalable Processors.
+The GraphRAG service can be effortlessly deployed on Intel Xeon Scalable Processors.
 
 Quick Start Deployment Steps:
 
@@ -66,10 +66,12 @@ To set up environment variables for deploying GraphRAG services, follow these st
 1. Set the required private environment variables:
 
    ```bash
-
+    # In this using Openrouter.ai as endpoint for both dataprep and retriever components,
+    # But this can be configured to any openAI-like endpoint.
+    export OPENROUTER_KEY="mykey"  
+    export HUGGINGFACEHUB_API_TOKEN="mytoken"
+    
     source set_env.sh # Below will override some of these defaults.
-    # export OPENROUTER_KEY="mykey"
-    # export HUGGINGFACEHUB_API_TOKEN="Your token"
     
     export host_ip=$(hostname -I | awk '{print $1}')
     
