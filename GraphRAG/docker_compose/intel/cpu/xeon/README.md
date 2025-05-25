@@ -5,12 +5,11 @@ GraphRAG was introduced by Microsoft paper "From Local to Global: A Graph RAG Ap
 
 - Uses LLM to derive an entity knowledge graph from the source documents
 - Uses hierarchical leiden algorithm to identify communities of closely-related entities and summaries are extracted for each community
-- For an input query the relevant communities are identified and partial answers are generated from each of the community summaries (query-focused summarization (QFS))
-- There is a final generation stage that responds to the query based on the intermediate community answers.
+- For an input query the relevant communities are identified and partial answers are generated from each of the community summaries with a retrieval LLM (query-focused summarization (QFS))
+- There is a final generation stage (last LLM) that responds to the query based on the intermediate community answers (QFS). See [GraphRAG Model Notes](GraphRAG_LLM_notes.md)
+- In this app three LLM models are used: dataprep (knowledge graph), retriever (query-focused summaries), and final generation. CPU (Xeon) is used for the final generation LLM, and embedding, and dataprep and retriever LLMs are used by endpoints. 
 
 ## Deploy GraphRAG Service
-
-The GraphRAG service can be effortlessly deployed on Intel Xeon Scalable Processors.
 
 Quick Start Deployment Steps:
 
@@ -25,37 +24,35 @@ Note: If you do not have docker installed you can run this script to install doc
 Build vllm-service, dataprep, retriever, graph-ui images:
 
 ```bash
+
 # vllm-service
-cd $WORKPATH
+cd ~/
+git clone https://github.com/opea-project/GenAIExamples.git
 git clone https://github.com/vllm-project/vllm.git
-cd ./vllm/
+git clone https://github.com/opea-project/GenAIComps.git
+
+cd vllm/
 VLLM_VER="v0.8.3"
 git checkout ${VLLM_VER}
 docker build --no-cache -f docker/Dockerfile.cpu -t opea/vllm-cpu:${TAG:-latest} --shm-size=128g .
 
 # opea/dataprep
-cd GenAIComps
-docker build -t opea/dataprep:latest -f comps/dataprep/src/Dockerfile .
+cd ~/GenAIComps
+docker build -t opea/dataprep:latest --build-arg no_proxy=$no_proxy --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/src/Dockerfile .
 
 # opea/retrievers
-# be careful the . docker context
-cd GenAIComps
-docker build -t opea/retriever:latest -f comps/retrievers/src/Dockerfile .
+cd ~/GenAIComps
+docker build -t opea/retriever:latest --build-arg no_proxy=$no_proxy --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/src/Dockerfile .
 
 # opea/graphrag-ui
-cd GenAIExamples/GraphRAG/ui # Important to have the correct docker context for COPY to work. 
-docker build -t opea/graphrag-ui:latest -f docker/Dockerfile .
+cd ~/GenAIExamples/GraphRAG/ui  
+docker build -t  opea/graphrag-ui:latest --build-arg no_proxy=$no_proxy --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
 
-# opea/graphrag
-cd GenAIExamples/GraphRAG
-docker build -t opea/graphrag:latest .
-```
+cd ~/GenAIExamples/GraphRAG
+docker build -t  opea/graphrag:latest .
 
-Note: If you are building behind a corporate proxy, you'll need to add proxy arguments to each build command:
 
-For example:
-```bash
-docker build -t opea/dataprep:latest --build-arg http_proxy=$http_proxy --build-arg https_proxy=$https_proxy --build-arg no_proxy=$no_proxy -f comps/dataprep/src/Dockerfile .
+Note: it's important to be in the correct path before builds so that docker has the correct context to COPY relevant code to containers.
 ```
 
 
@@ -66,8 +63,8 @@ To set up environment variables for deploying GraphRAG services, follow these st
 1. Set the required private environment variables:
 
    ```bash
-    # In this using Openrouter.ai as endpoint for both dataprep and retriever components,
-    # But this can be configured to any openAI-like endpoint.
+    # For simplicity Openrouter.ai is used as an endpoint for both dataprep and retriever components.
+    # These endpoints could be configured to any openAI-like endpoint.
     export OPENROUTER_KEY="mykey"  
     export HUGGINGFACEHUB_API_TOKEN="mytoken"
     
@@ -137,12 +134,14 @@ cd GraphRAG/docker_compose/intel/cpu/xeon
 NGINX_PORT=8080 docker compose -f compose.yaml up -d
 ```
 
-##### Test vLLM profiling
+Here NGINX_PORT=8080 because typically port 80 is used for internet browsing.
+
+##### Test Final vLLM
 
 ```
 curl http://localhost:9009/v1/chat/completions \
   -H "Content-Type: application/json" \
-  -d '{"model":"'${LLM_MODEL_ID}'","messages":[{"role":"user","content":"Tell me a joke?"}]}'
+  -d '{"model":"'${FINAL_LLM_MODEL_ID}'","messages":[{"role":"user","content":"Tell me a joke?"}]}'
 ```
 
 
@@ -153,15 +152,15 @@ To chat with retrieved information, you need to upload a file using `Dataprep` s
 Here is an example of uploading sample graph data (which can also be uploaded via the UI):
 
 ```bash
-cd GenAIExamples/GraphRAG/example_data
+cd ~/GenAIExamples/GraphRAG/example_data
 
-curl -X POST "http://${host_ip}:6004/v1/dataprep/ingest"     -H "Content-Type: multipart/form-data"     -F "files=@./programming_languages.txt"
+curl -X POST "http://${host_ip}:6006/v1/dataprep/ingest"     -H "Content-Type: multipart/form-data"     -F "files=@./programming_languages.txt"
 ```
 
 ```bash
 curl http://${host_ip}:8888/v1/graphrag \
     -H "Content-Type: application/json"  \
-    -d '{"messages": [{"role": "user","content": "where do Nike subsidiaries operate?
+    -d '{"messages": [{"role": "user","content": "what are the main themes of the programming dataset?
     "}]}'
 ```
 
@@ -241,78 +240,33 @@ flowchart LR
 
 ```
 
-> **Note**: The Dataprep and Retriever microservices use the LLM Microservice and Embedding Microservice in their implementation. For example, Dataprep uses LLM to extract entities and relationships from text to build graph and Retriever uses LLM to summarize communities (these are clusters of similar entities and their properties). Those endpoint interactions with the corresponding prompt templates are buried in the microservice implementation thus not managed by the megaservice orchestrator scheduler and not exposed in the megaservice. Shown as thin black lines in diagram.
-
-This GraphRAG use case performs RAG using Llama-index, Neo4J Graph Property Store and Text Generation Inference on [Intel Gaudi2](https://www.intel.com/content/www/us/en/products/details/processors/ai-accelerators/gaudi-overview.html) or [Intel Xeon Scalable Processors](https://www.intel.com/content/www/us/en/products/details/processors/xeon.html).
-In the below, we provide a table that describes for each microservice component in the GraphRAG architecture, the default configuration of the open source project, hardware, port, and endpoint.
-
-Gaudi default compose.yaml
-| MicroService | Open Source Project | HW | Port | Endpoint |
-| ------------ | ------------------- | ----- | ---- | -------------------- |
-| Embedding | Llama-index | Xeon | 6006 | /v1/embaddings |
-| Retriever | Llama-index, Neo4j | Xeon | 6009 | /v1/retrieval |
-| LLM | Llama-index, vLLM | Xeon | 6005 | /v1/chat/completions |
-| Dataprep | Neo4j, LlamaIndex | Endpoint | 6004 | /v1/dataprep/ingest |
+Xeon default configuration:
+| MicroService | Open Source Project | HW | Default Port | Endpoint |
+| ------------ | ------------------- | --- | ------------ | -------- |
+| Dataprep | Neo4j, LlamaIndex | OpenAI-like Endpoint | 6004 | /v1/dataprep/ingest |
+| Embedding | Llama-index, TEI | Xeon or CPU | 6006 | /v1/embeddings |  
+| Retriever | Llama-index, Neo4j | OpenAI-like Endpoint | 7000 | /v1/retrieval |
+| Final LLM | vLLM | Xeon or CPU | 9009 | /v1/chat/completions |
 
 ### Models Selection
 
-GraphRAG quality dependents heavily on the ability to extract a high quality graph. We highly recommend using the best model available to you. Table below shows default models specified in the codebase when OPENAI_API_KEY is available and for local inference w TEI/TGI. The local models are small since those will be used in CI/CD but users should improve upon these by changing the `xxx_MODEL_ID` in `docker_compose/xxx/set_env.sh`.
-
-Working on a table comparison of various model sizes vs. naive RAG with a dataset that reflects well the benefits of GraphRAG. Stay tuned!
-
-| Service   | Model                                 |
-| --------- | ------------------------------------- |
-| Embedding | BAAI/bge-base-en-v1.5                 |
-| Embedding | "text-embedding-3-small"              |
-| Graph LLM       | OpenAPI Like endpoint e.g. OpenRouter.ai                                |
-| LLM       | "Qwen/Qwen2.5-0.5B-Instruct" |
+[GraphRAG Model Notes](GraphRAG_LLM_notes.md)
 
 ## Consume GraphRAG Service with RAG
 
-### Check Service Status
+### 1. Check Service Status
 
-Before consuming GraphRAG Service, make sure each microservice is ready by checking the docker logs of each microservice. [test_compose_on_gaudi.sh](tests/test_compose_on_gaudi.sh) can be a good resource as it shows how CI/CD validated each microservices based on returned HTTP status and response body.
+Before consuming GraphRAG Service, make sure each microservice is ready by checking the docker logs of each microservice.
 
 ```bash
 docker logs container_name
 ```
 
-### Upload RAG Files
+### 2. Access via frontend
 
-To chat with retrieved information, you need to upload a file using `Dataprep` service.
-
-Here is an example of `Nike 2023` pdf.
-
-```bash
-# download pdf file
-wget https://raw.githubusercontent.com/opea-project/GenAIComps/v1.1/comps/retrievers/redis/data/nke-10k-2023.pdf
-# upload pdf file with dataprep
-curl -X POST "http://${host_ip}:6007/v1/dataprep/ingest" \
-    -H "Content-Type: multipart/form-data" \
-    -F "files=@./nke-10k-2023.pdf"
-```
-
-### Consume GraphRAG Service
-
-Two ways of consuming GraphRAG Service:
-
-1. Use cURL command on terminal
-
-```bash
-curl http://${host_ip}:8888/v1/graphrag \
-    -H "Content-Type: application/json"  \
-    -d '{
-        "model": "${FINAL_LLM_MODEL_ID}","messages": [{"role": "user","content": "Who is John Brady and has he had any confrontations?
-    "}]}'
-```
-
-2. Access via frontend
-
-   To access the frontend, open the following URL in your browser: `http://{host_ip}:5173`
+   To access the frontend, open the following URL in your browser: `http://{host_ip}:NGINX_PORT`
 
    By default, the UI runs on port 5173 internally.
-
-   If you choose conversational UI, use this URL: `http://{host_ip}:5174`
 
 ## Troubleshooting
 
@@ -332,43 +286,3 @@ OPEA microservice deployment can easily be monitored through Grafana dashboards 
 
 ![chatqna dashboards](../ChatQnA/assets/img/chatqna_dashboards.png)
 ![tgi dashboard](../ChatQnA//assets/img/tgi_dashboard.png)
-
-## Architecture
-
-The GraphRAG service architecture and container relationships are illustrated below:
-
-```mermaid
-%% Orange are services from third parties that are 'wrapped' as OPEA components.
-flowchart LR
-    User["User"] --> Nginx["Nginx<br>graphrag-xeon-nginx-server"]
-    Nginx --> UI["UI<br>graphrag-ui-server"] & Backend & User
-    UI --> Nginx
-    Backend --> Nginx & Retriever
-    Retriever --> LLM
-    LLM --> Backend
-    LLM <-.-> vLLM["vLLM<br>vllm-service"]
-    Retriever <-.-> TEI["TEI Embedding<br>tei-embedding-server"]
-    Dataprep["Dataprep<br>dataprep-neo4j-server"] <-.-> TEI
-    Dataprep <-.-> vLLM
-
-    vLLM:::ext
-    TEI:::ext
-    Neo4j:::ext
-
- subgraph BackendService["Backend Service"]
-    direction TB
-        Backend["Backend<br>graphrag-xeon-backend-server"]
-        Retriever["Retriever<br>retriever-neo4j-llamaindex"]
-        LLM["LLM Service"]
-  end
-
-    %% Graph DB interaction
-    Neo4j["Neo4j Graph DB<br>neo4j-apoc"] <-.-> Retriever
-    Neo4j <-.-> Dataprep
-
-    classDef default fill:#fff,stroke:#000,color:#000
-    classDef ext fill:#f9cb9c,stroke:#000,color:#000
-    style BackendService margin-top:20px,margin-bottom:20px
-```
-
-This GraphRAG implementation uses component-level microservices defined in [GenAIComps](https://github.com/opea-project/GenAIComps). The flow chart above shows the information flow between different microservices and third-party components (shown in orange).

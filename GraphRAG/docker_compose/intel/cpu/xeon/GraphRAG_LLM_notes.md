@@ -1,75 +1,46 @@
 # About GraphRAG LLMs
 
 ## Overview
-GraphRAG uses three distinct LLMs, each optimized for different tasks in the pipeline:
-1. Dataprep LLM
-2. Retriever LLM
-3. Final LLM
+This GraphRAG app uses three distinct LLMs, each optimized for different tasks in the pipeline:
+1. Dataprep LLM (endpoint)
+2. Retriever LLM (endpoint)
+3. Final LLM (cpu)
+
+It also uses an embedding service that runs on CPU.
 
 ## 1. Dataprep LLM
 Used during data ingestion phase to:
 - Process and understand document structure
 - Extract entities and relationships between entities 
-- Generate and store community summaries in Neo4j:
+- Generate and store community summaries in Neo4j 
 
-```python
-# neo4j_llamaindex.py
-async def generate_community_summary(self, text):
-    """Generate summary for a given text using an LLM."""
-    messages = [
-        ChatMessage(
-            role="system",
-            content=(
-                "You are provided with a set of relationships from a knowledge graph... "
-                "Your task is to create a summary of these relationships..."
-            )
-        )
-    ]
-    response = await self.llm.achat(trimmed_messages)
-```
+[dataprep code that build communities and summarizes](https://github.com/opea-project/GenAIComps/blob/main/comps/dataprep/src/integrations/neo4j_llamaindex.py#L94):
 
 **Key Requirements:**
-- High-quality model for accurate relationship understanding
+- High-quality model for accurate relationship understanding.
 - Larger context window for document processing
 - Can be slower since it's one-time processing
 
+
 ## 2. Retriever LLM
-Used during query processing to:
-- Evaluate relevance of pre-computed community summaries
+Used during retrieval to:
+- Evaluate relevance of the query to pre-computed community summaries (auery focused summarization)
 - Generate specific answers from relevant communities
 - Process multiple communities in parallel
 
-```python
-def generate_answer_from_summary(self, community_summary, query):
-    """Generate an answer from a community summary based on a given query using LLM."""
-    prompt = (
-        f"Given the community summary: {community_summary}, "
-        f"how would you answer the following query? Query: {query}"
-    )
-    response = self._llm.chat(messages)
-```
+[retriever code](https://github.com/opea-project/GenAIComps/blob/main/comps/retrievers/src/integrations/neo4j.py):
 
 **Key Requirements:**
 - Fast inference for real-time processing
 - Efficient batch processing capabilities
 - Balance between quality and speed
 
+
 ## 3. Final LLM
 Used as the last step to:
 - Process all retriever-generated answers
 - Synthesize information from multiple communities
 - Generate coherent final response
-
-```python
-# In graphrag.py
-llm = MicroService(
-    name="llm",
-    host=LLM_SERVER_HOST_IP,
-    port=LLM_SERVER_PORT,
-    endpoint="/v1/chat/completions",
-    service_type=ServiceType.LLM,
-)
-```
 
 **Key Requirements:**
 - Good at synthesizing multiple sources
