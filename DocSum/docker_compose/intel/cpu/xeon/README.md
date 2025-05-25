@@ -27,9 +27,8 @@ Clone the GenAIExample repository and access the ChatQnA Intel Xeon platform Doc
 
 ```bash
 git clone https://github.com/opea-project/GenAIExamples.git
-cd GenAIExamples/DocSum/docker_compose/intel
-source set_env.sh
-cd cpu/xeon/
+cd GenAIExamples/DocSum/docker_compose
+source intel/set_env.sh
 ```
 
 NOTE: by default vLLM does "warmup" at start, to optimize its performance for the specified model and the underlying platform, which can take long time. For development (and e.g. autoscaling) it can be skipped with `export VLLM_SKIP_WARMUP=true`.
@@ -49,7 +48,7 @@ Some HuggingFace resources, such as some models, are only accessible if you have
 To deploy the DocSum services, execute the `docker compose up` command with the appropriate arguments. For a default deployment, execute:
 
 ```bash
-cd cpu/xeon/
+cd intel/cpu/xeon/
 docker compose up -d
 ```
 
