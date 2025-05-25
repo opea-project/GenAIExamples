@@ -21,16 +21,17 @@ Note: If you do not have docker installed you can run this script to install doc
 
 ## Pre-requisites
 
-Build vllm-service, dataprep, retriever, graph-ui images:
+Build images:
 
 ```bash
 
-# vllm-service
+
 cd ~/
 git clone https://github.com/opea-project/GenAIExamples.git
 git clone https://github.com/vllm-project/vllm.git
 git clone https://github.com/opea-project/GenAIComps.git
 
+# vllm-service
 cd vllm/
 VLLM_VER="v0.8.3"
 git checkout ${VLLM_VER}
@@ -48,6 +49,7 @@ docker build -t opea/retriever:latest --build-arg no_proxy=$no_proxy --build-arg
 cd ~/GenAIExamples/GraphRAG/ui  
 docker build -t  opea/graphrag-ui:latest --build-arg no_proxy=$no_proxy --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
 
+# opea/graphrag
 cd ~/GenAIExamples/GraphRAG
 docker build -t  opea/graphrag:latest .
 
@@ -266,7 +268,7 @@ docker logs container_name
 
    To access the frontend, open the following URL in your browser: `http://{host_ip}:NGINX_PORT`
 
-   By default, the UI runs on port 5173 internally.
+   In the above example, the UI runs on port 8080 internally.
 
 ## Troubleshooting
 
