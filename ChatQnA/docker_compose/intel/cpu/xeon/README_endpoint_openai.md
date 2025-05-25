@@ -67,12 +67,11 @@ source ./set_env.sh # source environment variables then override below.
 
 export host_ip="External_Public_IP" # e.g. export host_ip=$(hostname -I | awk '{print $1}')
 export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
+export OPENAI_API_KEY="key for openAI-like endpoint"
 
 export LLM_MODEL_ID="" # e.g. "google/gemma-3-1b-it:free"
-export LLM_ENDPOINT=""  # e.g., "http://localhost:8000" (for local vLLM) or "https://openrouter.ai/api" (please make sure to omit /v1 suffix)
-export OPENAI_API_KEY="yOur api key for openAI compatible endpoint if any"
+export LLM_ENDPOINT=""  # e.g. "https://openrouter.ai/api" (please make sure to omit /v1 suffix)
 export no_proxy="" # Can set if any no proxy variables. See set_envh.sh
-
 ```
 
 Consult the section on [ChatQnA Service configuration](#chatqna-configuration) for information on how service specific configuration parameters affect deployments.
