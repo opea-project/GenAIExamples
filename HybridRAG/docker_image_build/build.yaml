@@ -1,0 +1,51 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  hybridrag:
+    build:
+      args:
+        IMAGE_REPO: ${REGISTRY}
+        BASE_TAG: ${TAG}
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
+        no_proxy: ${no_proxy}
+      context: ../
+      dockerfile: ./Dockerfile
+    image: ${REGISTRY:-opea}/hybridrag:${TAG:-latest}
+  text2cypher:
+    build:
+      context: GenAIComps
+      dockerfile:  comps/text2cypher/src/Dockerfile.intel_hpu
+    extends: hybridrag
+    image: ${REGISTRY:-opea}/text2cypher-gaudi:${TAG:-latest}
+  vllm:
+    build:
+      context: vllm
+      dockerfile: docker/Dockerfile.cpu
+    extends: hybridrag
+    image: ${REGISTRY:-opea}/vllm:${TAG:-latest}
+  dataprep:
+    build:
+      context: GenAIComps
+      dockerfile: comps/dataprep/src/Dockerfile
+    extends: hybridrag
+    image: ${REGISTRY:-opea}/dataprep:${TAG:-latest}
+  retriever:
+    build:
+      context: GenAIComps
+      dockerfile: comps/retrievers/src/Dockerfile
+    extends: hybridrag
+    image: ${REGISTRY:-opea}/retriever:${TAG:-latest}
+  nginx:
+    build:
+      context: GenAIComps
+      dockerfile: comps/third_parties/nginx/src/Dockerfile
+    extends: hybridrag
+    image: ${REGISTRY:-opea}/nginx:${TAG:-latest}
+  hybridrag-ui:
+    build:
+      context: ../ui
+      dockerfile: ./docker/Dockerfile
+    extends: hybridrag
+    image: ${REGISTRY:-opea}/hybridrag-ui:${TAG:-latest}

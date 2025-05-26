@@ -6,23 +6,10 @@ This README provides instructions for deploying the CodeGen application using Do
 
 - [Overview](#overview)
 - [Prerequisites](#prerequisites)
-- [Quick Start](#quick-start)
-- [Available Deployment Options](#available-deployment-options)
-  - [Default: vLLM-based Deployment (`--profile codegen-gaudi-vllm`)](#default-vllm-based-deployment---profile-codegen-gaudi-vllm)
-  - [TGI-based Deployment (`--profile codegen-gaudi-tgi`)](#tgi-based-deployment---profile-codegen-gaudi-tgi)
-- [Configuration Parameters](#configuration-parameters)
-  - [Environment Variables](#environment-variables)
-  - [Compose Profiles](#compose-profiles)
-  - [Docker Compose Gaudi Configuration](#docker-compose-gaudi-configuration)
+- [Quick Start Deployment](#quick-start-deployment)
 - [Building Custom Images (Optional)](#building-custom-images-optional)
 - [Validate Services](#validate-services)
-  - [Check Container Status](#check-container-status)
-  - [Run Validation Script/Commands](#run-validation-scriptcommands)
 - [Accessing the User Interface (UI)](#accessing-the-user-interface-ui)
-  - [Gradio UI (Default)](#gradio-ui-default)
-  - [Svelte UI (Optional)](#svelte-ui-optional)
-  - [React UI (Optional)](#react-ui-optional)
-  - [VS Code Extension (Optional)](#vs-code-extension-optional)
 - [Troubleshooting](#troubleshooting)
 - [Stopping the Application](#stopping-the-application)
 - [Next Steps](#next-steps)
@@ -41,10 +28,10 @@ This guide focuses on running the pre-configured CodeGen service using Docker Co
 - Clone the `GenAIExamples` repository:
   ```bash
   git clone https://github.com/opea-project/GenAIExamples.git
-  cd GenAIExamples/CodeGen/docker_compose/intel/hpu/gaudi
+  cd GenAIExamples/CodeGen/docker_compose
   ```
 
-## Quick Start
+## Quick Start Deployment
 
 This uses the default vLLM-based deployment profile (`codegen-gaudi-vllm`).
 
@@ -61,10 +48,22 @@ This uses the default vLLM-based deployment profile (`codegen-gaudi-vllm`).
     # export http_proxy="your_http_proxy"
     # export https_proxy="your_https_proxy"
     # export no_proxy="localhost,127.0.0.1,${HOST_IP}" # Add other hosts if necessary
-    source ../../../set_env.sh
+    source intel/set_env.sh
+    cd /intel/hpu/gaudi
     ```
 
-    _Note: Ensure all required variables like ports (`LLM_SERVICE_PORT`, `MEGA_SERVICE_PORT`, etc.) are set if not using defaults from the compose file._
+    _Note: The compose file might read additional variables from set_env.sh. Ensure all required variables like ports (`LLM_SERVICE_PORT`, `MEGA_SERVICE_PORT`, etc.) are set if not using defaults from the compose file._
+    For instance, edit the set_env.sh to change the LLM model
+
+    ```
+    export LLM_MODEL_ID="Qwen/Qwen2.5-Coder-7B-Instruct"
+    ```
+
+    can be changed to other model if needed
+
+    ```
+    export LLM_MODEL_ID="Qwen/Qwen2.5-Coder-32B-Instruct"
+    ```
 
 2.  **Start Services (vLLM Profile):**
 
@@ -104,18 +103,18 @@ The `compose.yaml` file uses Docker Compose profiles to select the LLM serving b
 
 Key parameters are configured via environment variables set before running `docker compose up`.
 
-| Environment Variable                    | Description                                                                                                         | Default (Set Externally)                                                                         |
-| :-------------------------------------- | :------------------------------------------------------------------------------------------------------------------ | :----------------------------------------------------------------------------------------------- |
-| `HOST_IP`                               | External IP address of the host machine. **Required.**                                                              | `your_external_ip_address`                                                                       |
-| `HUGGINGFACEHUB_API_TOKEN`              | Your Hugging Face Hub token for model access. **Required.**                                                         | `your_huggingface_token`                                                                         |
-| `LLM_MODEL_ID`                          | Hugging Face model ID for the CodeGen LLM (used by TGI/vLLM service). Configured within `compose.yaml` environment. | `Qwen/Qwen2.5-Coder-7B-Instruct`                                                                 |
-| `EMBEDDING_MODEL_ID`                    | Hugging Face model ID for the embedding model (used by TEI service). Configured within `compose.yaml` environment.  | `BAAI/bge-base-en-v1.5`                                                                          |
-| `LLM_ENDPOINT`                          | Internal URL for the LLM serving endpoint (used by `codegen-llm-server`). Configured in `compose.yaml`.             | `http://codegen-tgi-server:80/generate` or `http://codegen-vllm-server:8000/v1/chat/completions` |
-| `TEI_EMBEDDING_ENDPOINT`                | Internal URL for the Embedding service. Configured in `compose.yaml`.                                               | `http://codegen-tei-embedding-server:80/embed`                                                   |
-| `DATAPREP_ENDPOINT`                     | Internal URL for the Data Preparation service. Configured in `compose.yaml`.                                        | `http://codegen-dataprep-server:80/dataprep`                                                     |
-| `BACKEND_SERVICE_ENDPOINT`              | External URL for the CodeGen Gateway (MegaService). Derived from `HOST_IP` and port `7778`.                         | `http://${HOST_IP}:7778/v1/codegen`                                                              |
-| `*_PORT` (Internal)                     | Internal container ports (e.g., `80`, `6379`). Defined in `compose.yaml`.                                           | N/A                                                                                              |
-| `http_proxy` / `https_proxy`/`no_proxy` | Network proxy settings (if required).                                                                               | `""`                                                                                             |
+| Environment Variable                    | Description                                                                                                         | Default (Set Externally)                       |
+| :-------------------------------------- | :------------------------------------------------------------------------------------------------------------------ | :--------------------------------------------- | ------------------------------------ |
+| `HOST_IP`                               | External IP address of the host machine. **Required.**                                                              | `your_external_ip_address`                     |
+| `HUGGINGFACEHUB_API_TOKEN`              | Your Hugging Face Hub token for model access. **Required.**                                                         | `your_huggingface_token`                       |
+| `LLM_MODEL_ID`                          | Hugging Face model ID for the CodeGen LLM (used by TGI/vLLM service). Configured within `compose.yaml` environment. | `Qwen/Qwen2.5-Coder-7B-Instruct`               |
+| `EMBEDDING_MODEL_ID`                    | Hugging Face model ID for the embedding model (used by TEI service). Configured within `compose.yaml` environment.  | `BAAI/bge-base-en-v1.5`                        |
+| `LLM_ENDPOINT`                          | Internal URL for the LLM serving endpoint (used by `llm-codegen-vllm-server`). Configured in `compose.yaml`.        | http://codegen-vllm                            | tgi-server:9000/v1/chat/completions` |
+| `TEI_EMBEDDING_ENDPOINT`                | Internal URL for the Embedding service. Configured in `compose.yaml`.                                               | `http://codegen-tei-embedding-server:80/embed` |
+| `DATAPREP_ENDPOINT`                     | Internal URL for the Data Preparation service. Configured in `compose.yaml`.                                        | `http://codegen-dataprep-server:80/dataprep`   |
+| `BACKEND_SERVICE_ENDPOINT`              | External URL for the CodeGen Gateway (MegaService). Derived from `HOST_IP` and port `7778`.                         | `http://${HOST_IP}:7778/v1/codegen`            |
+| `*_PORT` (Internal)                     | Internal container ports (e.g., `80`, `6379`). Defined in `compose.yaml`.                                           | N/A                                            |
+| `http_proxy` / `https_proxy`/`no_proxy` | Network proxy settings (if required).                                                                               | `""`                                           |
 
 Most of these parameters are in `set_env.sh`, you can either modify this file or overwrite the env variables by setting them.
 
@@ -172,11 +171,11 @@ Check logs: `docker compose logs <service_name>`. Pay attention to `vllm-gaudi-s
 
 Use `curl` commands targeting the main service endpoints. Ensure `HOST_IP` is correctly set.
 
-1.  **Validate LLM Serving Endpoint (Example for vLLM on default port 8000 internally, exposed differently):**
+1.  **Validate LLM Serving Endpoint (Example for vLLM on default port 9000 internally, exposed differently):**
 
     ```bash
     # This command structure targets the OpenAI-compatible vLLM endpoint
-    curl http://${HOST_IP}:8000/v1/chat/completions \
+    curl http://${HOST_IP}:9000/v1/chat/completions \
        -X POST \
        -H 'Content-Type: application/json' \
        -d '{"model": "Qwen/Qwen2.5-Coder-7B-Instruct", "messages": [{"role": "user", "content": "Implement a basic Python class"}], "max_tokens":32}'
@@ -197,8 +196,8 @@ UI options are similar to the Xeon deployment.
 ### Gradio UI (Default)
 
 Access the default Gradio UI:
-`http://{HOST_IP}:8080`
-_(Port `8080` is the default host mapping)_
+`http://{HOST_IP}:5173`
+_(Port `5173` is the default host mapping)_
 
 ![Gradio UI](../../../../assets/img/codegen_gradio_ui_main.png)
 
