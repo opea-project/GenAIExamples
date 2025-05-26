@@ -140,11 +140,8 @@ Please refer to the table below to build different microservices from source:
 | TEI Reranking   | [TEI guide](https://github.com/huggingface/text-embeddings-inference.git)                                          |
 | MegaService     | [MegaService guide](../../../../README.md)                                                                         |
 | whisper-service | [whisper build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/third_parties/whisper/src)        |
-
-|
-| LVM | [lvm build guide](https://github.com/opea-project/GenAIComps/blob/main/comps/lvms/src/)   |
-|
-| Nginx | [Nginx guide](https://github.com/opea-project/GenAIComps/tree/main/comps/third_parties/nginx) |
+| LVM             | [lvm build guide](https://github.com/opea-project/GenAIComps/blob/main/comps/lvms/src/)                            |
+| Nginx           | [Nginx guide](https://github.com/opea-project/GenAIComps/tree/main/comps/third_parties/nginx)                      |
 
 ### Check the Deployment Status
 
