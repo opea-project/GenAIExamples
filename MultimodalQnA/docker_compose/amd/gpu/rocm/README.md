@@ -2,7 +2,6 @@
 
 This document outlines the single node deployment process for a Multimodal application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservices on Intel Xeon server and AMD GPU. The steps include pulling Docker images, container deployment via Docker Compose, and service execution using microservices `llm`.
 
-
 Note: The default LLM model is Xkev/Llama-3.2V-11B-cot. Before you deploy the application, make sure to request and obtain access to this application on [Huggingface](https://huggingface.co/Xkev/Llama-3.2V-11B-cot). Alternatively, you can download the model locally from [ModelScope](https://www.modelscope.cn/models)..
 
 ## Table of Contents
@@ -55,9 +54,9 @@ Set the values of the variables:
 
   If your server is located on an internal network, has an internal address, but is accessible from the Internet via a proxy/firewall/load balancer, then the HOST_IP variable will have a value equal to the internal name/address of the server, and the EXTERNAL_HOST_IP variable will have a value equal to the external name/address of the proxy/firewall/load balancer behind which the server is located.
 
-  We set these values in the file set_env*.sh
+  We set these values in the file set_env\*.sh
 
-- **Variables with names like "***_PORT***" - These variables set the IP port numbers to establish network connections to the application services..
+- **Variables with names like "\***\_PORT\*\*\*" - These variables set the IP port numbers to establish network connections to the application services..
   The values shown in the file set_env.sh or set_env_vllm.sh they are the values used for the development and testing of the application, as well as configured for the environment in which the development is performed. These values must be configured in accordance with the rules of network access to your environment's server, and must not overlap with the IP ports of other applications that are already in use.
 
 Setting variables in the operating system environment:
@@ -221,7 +220,7 @@ docker compose -f compose.yaml down
 In the context of deploying an MultimodalQnA pipeline on an AMD ROCm platform, we can pick and choose different large language model serving frameworks, or single English TTS/multi-language TTS component. The table below outlines the various configurations that are available as part of the application. These configurations can be used as templates and can be extended to different components available in [GenAIComps](https://github.com/opea-project/GenAIComps.git).
 
 | File                                     | Description                                                                                                         |
-| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------  | 
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
 | [compose.yaml](./compose.yaml)           | The LLM serving framework is TGI. Default compose file using TGI as serving framework and redis as vector database. |
 | [compose_vllm.yaml](./compose_vllm.yaml) | The LLM serving framework is vLLM. Compose file using vllm as serving framework and redis as vector database.       |
 
