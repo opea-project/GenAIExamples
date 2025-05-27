@@ -5,6 +5,8 @@ services:
   codetrans:
     build:
       args:
+        IMAGE_REPO: ${REGISTRY:-opea}
+        BASE_TAG: ${TAG:-latest}
         http_proxy: ${http_proxy}
         https_proxy: ${https_proxy}
         no_proxy: ${no_proxy}
@@ -45,4 +47,5 @@ services:
     build:
       context: GenAIComps
       dockerfile: comps/third_parties/vllm/src/Dockerfile.amd_gpu
+    extends: codetrans
     image: ${REGISTRY:-opea}/vllm-rocm:${TAG:-latest}

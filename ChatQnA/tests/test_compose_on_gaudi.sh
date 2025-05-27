@@ -2,7 +2,7 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-set -e
+set -xe
 IMAGE_REPO=${IMAGE_REPO:-"opea"}
 IMAGE_TAG=${IMAGE_TAG:-"latest"}
 echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
@@ -24,30 +24,22 @@ function build_docker_images() {
     docker build --no-cache -t ${REGISTRY}/comps-base:${TAG} --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
     popd && sleep 1s
     git clone https://github.com/HabanaAI/vllm-fork.git && cd vllm-fork
-    VLLM_VER=v0.6.6.post1+Gaudi-1.20.0
-    git checkout ${VLLM_VER} &> /dev/null && cd ../
+    VLLM_FORK_VER=v0.6.6.post1+Gaudi-1.20.0
+    git checkout ${VLLM_FORK_VER} &> /dev/null && cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
     service_list="chatqna chatqna-ui dataprep retriever vllm-gaudi nginx"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
-    docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.6
-    docker pull ghcr.io/huggingface/tei-gaudi:1.5.0
     docker images && sleep 1s
 }
 
 function start_services() {
     cd $WORKPATH/docker_compose/intel/hpu/gaudi
-    export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
-    export RERANK_MODEL_ID="BAAI/bge-reranker-base"
-    export LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
-    export NUM_CARDS=1
-    export INDEX_NAME="rag-redis"
-    export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+    export NON_INTERACTIVE=true
     export host_ip=${ip_address}
-    export JAEGER_IP=$(ip route get 8.8.8.8 | grep -oP 'src \K[^ ]+')
-    export OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=grpc://$JAEGER_IP:4317
-    export TELEMETRY_ENDPOINT=http://$JAEGER_IP:4318/v1/traces
+    export telemetry=yes
+    source set_env.sh
 
     # Start Docker Containers
     docker compose -f compose.yaml -f compose.telemetry.yaml up -d > ${LOG_PATH}/start_services_with_compose.log

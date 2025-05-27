@@ -41,31 +41,7 @@ function build_docker_images() {
 
 function start_services() {
     cd $WORKPATH/docker_compose/intel/hpu/gaudi
-    export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
-    export HF_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
-
-    export TEI_EMBEDDER_PORT=11633
-    export LLM_ENDPOINT_PORT=11634
-    export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
-    export OPENAI_EMBEDDING_MODEL="text-embedding-3-small"
-    export LLM_MODEL_ID="meta-llama/Meta-Llama-3.1-8B-Instruct"
-    export OPENAI_LLM_MODEL="gpt-4o"
-    export TEI_EMBEDDING_ENDPOINT="http://${host_ip}:${TEI_EMBEDDER_PORT}"
-    export LLM_MODEL_ID="meta-llama/Meta-Llama-3.1-8B-Instruct"
-    export TGI_LLM_ENDPOINT="http://${host_ip}:${LLM_ENDPOINT_PORT}"
-    export NEO4J_PORT1=11631
-    export NEO4J_PORT2=11632
-    export NEO4J_URI="bolt://${host_ip}:${NEO4J_PORT2}"
-    export NEO4J_URL="bolt://${host_ip}:${NEO4J_PORT2}"
-    export NEO4J_USERNAME="neo4j"
-    export NEO4J_PASSWORD="neo4jtest"
-    export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:5000/v1/dataprep/ingest"
-    export LOGFLAG=True
-    export MAX_INPUT_TOKENS=4096
-    export MAX_TOTAL_TOKENS=8192
-    export DATAPREP_PORT=11103
-    export RETRIEVER_PORT=11635
-    export MEGA_SERVICE_PORT=8888
+    source set_env.sh
     unset OPENAI_API_KEY
 
     # Start Docker Containers

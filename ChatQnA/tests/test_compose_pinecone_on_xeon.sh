@@ -2,7 +2,7 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-set -e
+set -xe
 IMAGE_REPO=${IMAGE_REPO:-"opea"}
 IMAGE_TAG=${IMAGE_TAG:-"latest"}
 echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
@@ -35,22 +35,17 @@ function build_docker_images() {
     service_list="chatqna chatqna-ui dataprep retriever vllm nginx"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
-    docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.6
-
     docker images && sleep 1s
 }
 
 function start_services() {
     cd $WORKPATH/docker_compose/intel/cpu/xeon/
     export no_proxy=${no_proxy},${ip_address}
-    export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
-    export RERANK_MODEL_ID="BAAI/bge-reranker-base"
-    export LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
     export PINECONE_API_KEY=${PINECONE_KEY_LANGCHAIN_TEST}
     export PINECONE_INDEX_NAME="langchain-test"
     export INDEX_NAME="langchain-test"
-    export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
     export LOGFLAG=true
+    source set_env.sh
 
     # Start Docker Containers
     docker compose -f compose_pinecone.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
