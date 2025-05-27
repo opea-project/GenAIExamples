@@ -36,10 +36,10 @@ Then run the command `docker images`, you will have the following Docker Images:
 
 We set default model as "mistralai/Mistral-7B-Instruct-v0.3", change "LLM_MODEL_ID" in following Environment Variables setting if you want to use other models.
 
-If use gated models, you also need to provide [huggingface token](https://huggingface.co/docs/hub/security-tokens) to "HUGGINGFACEHUB_API_TOKEN" environment variable.
+If use gated models, you also need to provide [huggingface token](https://huggingface.co/docs/hub/security-tokens) to "HF_TOKEN" environment variable.
 
 ```bash
-export HUGGINGFACEHUB_API_TOKEN="xxx"
+export HF_TOKEN="xxx"
 ```
 
 ### 2.1 Setup Environment Variables
@@ -108,7 +108,7 @@ docker run --name test-text2sql-postgres --ipc=host -e POSTGRES_USER=${POSTGRES_
 
 ```bash
 
-docker run -d --name="test-text2sql-tgi-endpoint" --ipc=host -p $TGI_PORT:80 -v ./data:/data --shm-size 1g -e HUGGINGFACEHUB_API_TOKEN=${HF_TOKEN} -e HF_TOKEN=${HF_TOKEN} -e model=${model} ghcr.io/huggingface/text-generation-inference:2.4.1 --model-id $model
+docker run -d --name="test-text2sql-tgi-endpoint" --ipc=host -p $TGI_PORT:80 -v ./data:/data --shm-size 1g -e HF_TOKEN=${HF_TOKEN} -e HF_TOKEN=${HF_TOKEN} -e model=${model} ghcr.io/huggingface/text-generation-inference:2.4.1 --model-id $model
 ```
 
 - Start Text-to-SQL Service

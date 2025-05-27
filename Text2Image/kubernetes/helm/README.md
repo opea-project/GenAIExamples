@@ -7,12 +7,12 @@
 
 ```
 export HFTOKEN="insert-your-huggingface-token-here"
-helm install txt2img oci://ghcr.io/opea-project/charts/txt2img  --set global.HUGGINGFACEHUB_API_TOKEN=${HFTOKEN} -f cpu-values.yaml
+helm install txt2img oci://ghcr.io/opea-project/charts/txt2img  --set global.HF_TOKEN=${HFTOKEN} -f cpu-values.yaml
 ```
 
 ## Deploy on Gaudi
 
 ```
 export HFTOKEN="insert-your-huggingface-token-here"
-helm install txt2img oci://ghcr.io/opea-project/charts/txt2img  --set global.HUGGINGFACEHUB_API_TOKEN=${HFTOKEN} -f gaudi-values.yaml
+helm install txt2img oci://ghcr.io/opea-project/charts/txt2img  --set global.HF_TOKEN=${HFTOKEN} -f gaudi-values.yaml
 ```

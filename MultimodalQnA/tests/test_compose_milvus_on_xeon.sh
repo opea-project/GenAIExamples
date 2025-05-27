@@ -70,7 +70,7 @@ function setup_env() {
     export MM_RETRIEVER_SERVICE_HOST_IP=${host_ip}
     export LVM_SERVICE_HOST_IP=${host_ip}
     export MEGA_SERVICE_HOST_IP=${host_ip}
-    export HUGGINGFACEHUB_API_TOKEN=${HF_TOKEN}
+    export HF_TOKEN=${HF_TOKEN}
     export WHISPER_PORT=7066
     export MAX_IMAGES=1
     export WHISPER_MODEL="base"

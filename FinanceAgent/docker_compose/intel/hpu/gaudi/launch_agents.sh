@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 export ip_address=$(hostname -I | awk '{print $1}')
-export HUGGINGFACEHUB_API_TOKEN=${HF_TOKEN}
+export HF_TOKEN=${HF_TOKEN}
 export TOOLSET_PATH=$WORKDIR/GenAIExamples/FinanceAgent/tools/
 echo "TOOLSET_PATH=${TOOLSET_PATH}"
 export PROMPT_PATH=$WORKDIR/GenAIExamples/FinanceAgent/prompts/

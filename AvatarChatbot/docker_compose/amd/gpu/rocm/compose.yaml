@@ -53,7 +53,7 @@ services:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       HUGGING_FACE_HUB_TOKEN: ${HF_TOKEN}
-      HUGGINGFACEHUB_API_TOKEN: ${HF_TOKEN}
+      HF_TOKEN: ${HF_TOKEN}
     shm_size: 1g
     devices:
       - /dev/kfd:/dev/kfd
