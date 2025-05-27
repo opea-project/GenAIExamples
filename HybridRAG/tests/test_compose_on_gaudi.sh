@@ -36,7 +36,7 @@ function build_docker_images() {
     REQ_FILE="GenAIComps/comps/text2cypher/src/requirements.txt"
     sed -i \
         -e 's/^sentence-transformers\(==.*\)\?$/sentence-transformers==3.2.1/' \
-        -e 's/^transformers\(==.*\)\?$/transformers>=4.50.0/' \
+        -e 's/^transformers\(==.*\)\?$/transformers==4.50.0/' \
         "$REQ_FILE"
 
     pushd GenAIComps
