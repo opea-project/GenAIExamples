@@ -1,0 +1,62 @@
+# Copyright (C) 2025 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  vllm-service:
+    image: intelanalytics/ipex-llm-serving-xpu:2.2.0-b14
+    container_name: vllm-service
+    ports:
+      - "9009:80"
+    privileged: true
+    devices:
+      - "/dev/dri:/dev/dri"
+    volumes:
+      - "${MODEL_CACHE:-./data}:/data"
+    shm_size: ${SHM_SIZE:-16g}
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      HUGGINGFACE_HUB_CACHE: "/data"
+      LLM_MODEL_ID: ${LLM_MODEL_ID}
+      LLM_MODEL_LOCAL_PATH: ${LLM_MODEL_LOCAL_PATH}
+      VLLM_TORCH_PROFILER_DIR: "/mnt"
+      DTYPE: ${DTYPE:-float16}
+      QUANTIZATION: ${QUANTIZATION:-fp8}
+      MAX_MODEL_LEN: ${MAX_MODEL_LEN:-2048}
+      MAX_NUM_BATCHED_TOKENS: ${MAX_NUM_BATCHED_TOKENS:-4000}
+      MAX_NUM_SEQS: ${MAX_NUM_SEQS:-256}
+      TENSOR_PARALLEL_SIZE: ${TENSOR_PARALLEL_SIZE:-1}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://vllm-service:80/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 100
+    entrypoint: /bin/bash -c "export CCL_WORKER_COUNT=2 &&
+                              export SYCL_CACHE_PERSISTENT=1 &&
+                              export FI_PROVIDER=shm &&
+                              export CCL_ATL_TRANSPORT=ofi &&
+                              export CCL_ZE_IPC_EXCHANGE=sockets &&
+                              export CCL_ATL_SHM=1 &&
+                              export USE_XETLA=OFF &&
+                              export SYCL_PI_LEVEL_ZERO_USE_IMMEDIATE_COMMANDLISTS=2 &&
+                              export TORCH_LLM_ALLREDUCE=0 &&
+                              export CCL_SAME_STREAM=1 &&
+                              export CCL_BLOCKING_WAIT=0 &&
+                              python -m ipex_llm.vllm.xpu.entrypoints.openai.api_server \
+                                --served-model-name $$LLM_MODEL_ID \
+                                --model $$LLM_MODEL_LOCAL_PATH \
+                                --port 80 \
+                                --trust-remote-code \
+                                --block-size 8 \
+                                --gpu-memory-utilization 0.95 \
+                                --device xpu \
+                                --dtype $$DTYPE \
+                                --enforce-eager \
+                                --load-in-low-bit $$QUANTIZATION \
+                                --max-model-len $$MAX_MODEL_LEN \
+                                --max-num-batched-tokens $$MAX_NUM_BATCHED_TOKENS \
+                                --max-num-seqs $$MAX_NUM_SEQS \
+                                --tensor-parallel-size $$TENSOR_PARALLEL_SIZE \
+                                --disable-async-output-proc \
+                                --distributed-executor-backend ray"
