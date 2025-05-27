@@ -185,6 +185,11 @@ def main(yaml_file, target_node=None, test_mode="oob", clean_up=True):
     if not chart_dir:
         return
 
+    # Set HF_TOKEN
+    HF_TOKEN = deploy_config.get("HUGGINGFACEHUB_API_TOKEN", "")
+    os.environ["HF_TOKEN"] = HF_TOKEN
+    os.environ["HUGGINGFACEHUB_API_TOKEN"] = HF_TOKEN
+
     for node in nodes_to_process:
         try:
             print(f"\nProcessing configuration for {node} nodes...")
