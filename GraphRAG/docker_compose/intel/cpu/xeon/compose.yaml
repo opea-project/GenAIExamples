@@ -39,7 +39,7 @@ services:
       HUGGING_FACE_HUB_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
     ipc: host
     command: --model-id ${EMBEDDING_MODEL_ID} --auto-truncate
-  
+
   dataprep-neo4j-llamaindex:
     image: ${REGISTRY:-opea}/dataprep:${TAG:-latest}
     container_name: dataprep-neo4j-server
@@ -71,7 +71,7 @@ services:
       EMBEDDING_MODEL_ID: ${EMBEDDING_MODEL_ID}
       LOGFLAG: ${LOGFLAG}
     restart: unless-stopped
- 
+
   retriever-neo4j-llamaindex:
     image: ${REGISTRY:-opea}/retriever:${TAG:-latest}
     container_name: retriever-neo4j-server
@@ -93,7 +93,7 @@ services:
       TGI_LLM_ENDPOINT: ${RETRIEVER_LLM_ENDPOINT}
       TGI_LLM_ENDPOINT_KEY: ${RETRIEVER_LLM_ENDPOINT_KEY}
       LLM_MODEL_ID: ${RETRIEVER_LLM_MODEL_ID} # This is used for graph indexing and different from vLLM model ID.
-      
+
       # Only used if using OpenAI models
       OPENAI_API_KEY: ${OPENAI_API_KEY}
       OPENAI_LLM_MODEL: ${OPENAI_LLM_MODEL}
@@ -114,7 +114,7 @@ services:
     image: ${REGISTRY:-opea}/vllm-cpu:${TAG:-latest} # must build add to README.
     container_name: vllm-service
     ports:
-      - "9009:80" # this can be accesed by graphrag-xeon-backend-server on internal port 80. 
+      - "9009:80" # this can be accessed by graphrag-xeon-backend-server on internal port 80.
     ipc: host
     volumes:
       - "${MODEL_CACHE:-./data}:/root/.cache/huggingface/hub"
@@ -126,7 +126,7 @@ services:
       HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       LLM_MODEL_ID: ${FINAL_LLM_MODEL_ID}
       VLLM_TORCH_PROFILER_DIR: "/mnt"
-      # Laptop environtment variables
+      # Laptop environment variables
       VLLM_USE_CPU: 1
       VLLM_CPU_OMP_THREADS_BIND: all
       VLLM_CPU_KVCACHE_SPACE: 4

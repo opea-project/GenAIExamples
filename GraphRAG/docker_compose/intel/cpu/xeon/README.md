@@ -7,7 +7,7 @@ GraphRAG was introduced by Microsoft paper "From Local to Global: A Graph RAG Ap
 - Uses hierarchical leiden algorithm to identify communities of closely-related entities and summaries are extracted for each community
 - For an input query the relevant communities are identified and partial answers are generated from each of the community summaries with a retrieval LLM (query-focused summarization (QFS))
 - There is a final generation stage (last LLM) that responds to the query based on the intermediate community answers (QFS). See [GraphRAG Model Notes](GraphRAG_LLM_notes.md)
-- In this app three LLM models are used: dataprep (knowledge graph), retriever (query-focused summaries), and final generation. CPU (Xeon) is used for the final generation LLM, and embedding, and dataprep and retriever LLMs are used by endpoints. 
+- In this app three LLM models are used: dataprep (knowledge graph), retriever (query-focused summaries), and final generation. CPU (Xeon) is used for the final generation LLM, and embedding, and dataprep and retriever LLMs are used by endpoints.
 
 ## Deploy GraphRAG Service
 
@@ -46,7 +46,7 @@ cd ~/GenAIComps
 docker build -t opea/retriever:latest --build-arg no_proxy=$no_proxy --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/src/Dockerfile .
 
 # opea/graphrag-ui
-cd ~/GenAIExamples/GraphRAG/ui  
+cd ~/GenAIExamples/GraphRAG/ui
 docker build -t  opea/graphrag-ui:latest --build-arg no_proxy=$no_proxy --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
 
 # opea/graphrag
@@ -57,7 +57,6 @@ docker build -t  opea/graphrag:latest .
 Note: it's important to be in the correct path before builds so that docker has the correct context to COPY relevant code to containers.
 ```
 
-
 ### Quick Start: 1.Setup Environment Variable
 
 To set up environment variables for deploying GraphRAG services, follow these steps:
@@ -67,15 +66,15 @@ To set up environment variables for deploying GraphRAG services, follow these st
    ```bash
     # For simplicity Openrouter.ai is used as an endpoint for both dataprep and retriever components.
     # These endpoints could be configured to any openAI-like endpoint.
-    export OPENROUTER_KEY="mykey"  
+    export OPENROUTER_KEY="mykey"
     export HUGGINGFACEHUB_API_TOKEN="mytoken"
-    
-    source set_env.sh 
-    
+
+    source set_env.sh
+
     # Below will override some of these defaults in set_env.sh
-    
+
     export host_ip=$(hostname -I | awk '{print $1}')
-    
+
     export NEO4J_PORT1=11631
     export NEO4J_PORT2=11632
     export NEO4J_URI="bolt://${host_ip}:${NEO4J_PORT2}"
@@ -83,7 +82,7 @@ To set up environment variables for deploying GraphRAG services, follow these st
 
     export NEO4J_USERNAME="neo4j"
     export NEO4J_PASSWORD="neo4jtest"
-    
+
     export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:5000/v1/dataprep/ingest"
 
     # Must explicitly override default to not use OpenAI.
@@ -103,17 +102,17 @@ To set up environment variables for deploying GraphRAG services, follow these st
     export RETRIEVER_LLM_ENDPOINT="https://openrouter.ai/api"
     export RETRIEVER_LLM_MODEL_ID="anthropic/claude-3-haiku"
     export RETRIEVER_LLM_ENDPOINT_KEY=${OPENROUTER_KEY}
-    
+
     # Final LLM to formulates response based on relevant community summaries.
     export FINAL_LLM_MODEL_ID="Qwen/Qwen2.5-0.5B-Instruct"
-    
+
     export LOGFLAG=True
     export MAX_INPUT_TOKENS=4096
     export MAX_TOTAL_TOKENS=8192
     export DATAPREP_PORT=11103
     export RETRIEVER_PORT=11635
     export MEGA_SERVICE_PORT=8888
-   
+
    ```
 
 2. If you are in a proxy environment, also set the proxy-related environment variables:
@@ -130,7 +129,6 @@ If the microservice images are available in Docker Hub they will be pulled, othe
 
 Docker compose will start 8 services: ![8 servicesi in GraphRAG](assets/8microservices.png)
 
-
 ```bash
 cd GraphRAG/docker_compose/intel/cpu/xeon
 NGINX_PORT=8080 docker compose -f compose.yaml up -d
@@ -145,7 +143,6 @@ curl http://localhost:9009/v1/chat/completions \
   -H "Content-Type: application/json" \
   -d '{"model":"'${FINAL_LLM_MODEL_ID}'","messages":[{"role":"user","content":"Tell me a joke?"}]}'
 ```
-
 
 ### QuickStart: 3.Upload RAG Files and Consume the GraphRAG Service
 
@@ -266,9 +263,9 @@ docker logs container_name
 
 ### 2. Access via frontend
 
-   To access the frontend, open the following URL in your browser: `http://{host_ip}:NGINX_PORT`
+To access the frontend, open the following URL in your browser: `http://{host_ip}:NGINX_PORT`
 
-   In the above example, the UI runs on port 8080 internally.
+In the above example, the UI runs on port 8080 internally.
 
 ## Troubleshooting
 
