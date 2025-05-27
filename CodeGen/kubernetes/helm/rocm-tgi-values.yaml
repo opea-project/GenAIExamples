@@ -43,4 +43,3 @@ vllm:
 llm-uservice:
   TEXTGEN_BACKEND: TGI
   LLM_MODEL_ID: "Qwen/Qwen2.5-Coder-7B-Instruct"
-
