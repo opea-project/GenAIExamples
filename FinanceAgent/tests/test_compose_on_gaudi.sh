@@ -7,30 +7,63 @@ export WORKPATH=$(dirname "$PWD")
 export WORKDIR=$WORKPATH/../../
 echo "WORKDIR=${WORKDIR}"
 export IP_ADDRESS=$(hostname -I | awk '{print $1}')
+export HOST_IP=${IP_ADDRESS}
 LOG_PATH=$WORKPATH
 
-#### env vars for LLM endpoint #############
+# Proxy settings
+export NO_PROXY="${NO_PROXY},${HOST_IP}"
+export HTTP_PROXY="${http_proxy}"
+export HTTPS_PROXY="${https_proxy}"
+
+# VLLM configuration
 MODEL=meta-llama/Llama-3.3-70B-Instruct
-VLLM_IMAGE=opea/vllm-gaudi:latest
-VLLM_PORT=8086
-HF_CACHE_DIR=${model_cache:-"/data2/huggingface"}
-VLLM_VOLUME=${HF_CACHE_DIR}
-#######################################
+export VLLM_PORT="${VLLM_PORT:-8086}" 
+
+# export HF_CACHE_DIR="${HF_CACHE_DIR:-"./data"}"
+export HF_CACHE_DIR=${model_cache:-"./data2/huggingface"}
+export VLLM_VOLUME="${HF_CACHE_DIR:-"./data2/huggingface"}"
+export VLLM_IMAGE="${VLLM_IMAGE:-opea/vllm-gaudi:latest}"
+export LLM_MODEL_ID="${LLM_MODEL_ID:-meta-llama/Llama-3.3-70B-Instruct}"
+export LLM_MODEL=$LLM_MODEL_ID
+export LLM_ENDPOINT="http://${IP_ADDRESS}:${VLLM_PORT}"
+export MAX_LEN="${MAX_LEN:-16384}"
+export NUM_CARDS="${NUM_CARDS:-4}"
+
+# Recursion limits
+export RECURSION_LIMIT_WORKER="${RECURSION_LIMIT_WORKER:-12}"
+export RECURSION_LIMIT_SUPERVISOR="${RECURSION_LIMIT_SUPERVISOR:-10}"
+
+# Hugging Face API token
+export HUGGINGFACEHUB_API_TOKEN="${HF_TOKEN}"
+
+# LLM configuration
+export TEMPERATURE="${TEMPERATURE:-0.5}"
+export MAX_TOKENS="${MAX_TOKENS:-4096}"
+export MAX_INPUT_TOKENS="${MAX_INPUT_TOKENS:-2048}"
+export MAX_TOTAL_TOKENS="${MAX_TOTAL_TOKENS:-4096}"
+
+# Worker URLs
+export WORKER_FINQA_AGENT_URL="http://${IP_ADDRESS}:9095/v1/chat/completions"
+export WORKER_RESEARCH_AGENT_URL="http://${IP_ADDRESS}:9096/v1/chat/completions"
+
+# DocSum configuration
+export DOCSUM_COMPONENT_NAME="${DOCSUM_COMPONENT_NAME:-"OpeaDocSumvLLM"}"
+export DOCSUM_ENDPOINT="http://${IP_ADDRESS}:9000/v1/docsum"
+
+# Toolset and prompt paths
+export TOOLSET_PATH=$WORKDIR/GenAIExamples/FinanceAgent/tools/
+export PROMPT_PATH=$WORKDIR/GenAIExamples/FinanceAgent/prompts/
 
 #### env vars for dataprep #############
-export hOST_IP=${IP_ADDRESS}
 export DATAPREP_PORT="6007"
 export TEI_EMBEDDER_PORT="10221"
 export REDIS_URL_VECTOR="redis://${IP_ADDRESS}:6379"
 export REDIS_URL_KV="redis://${IP_ADDRESS}:6380"
-export LLM_MODEL=$MODEL
-export LLM_ENDPOINT="http://${IP_ADDRESS}:${VLLM_PORT}"
+
 export DATAPREP_COMPONENT_NAME="OPEA_DATAPREP_REDIS_FINANCE"
 export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
 export TEI_EMBEDDING_ENDPOINT="http://${IP_ADDRESS}:${TEI_EMBEDDER_PORT}"
 #######################################
-
-
 
 function get_genai_comps() {
     if [ ! -d "GenAIComps" ] ; then
@@ -70,11 +103,10 @@ function build_vllm_docker_image() {
     fi
 }
 
-
 function start_vllm_service_70B() {
     echo "token is ${HF_TOKEN}"
     echo "start vllm gaudi service"
-    echo "**************MODEL is $MODEL**************"
+    echo "**************MODEL is $LLM_MODEL_ID**************"
     docker run -d --runtime=habana --rm --name "vllm-gaudi-server" -e HABANA_VISIBLE_DEVICES=all -p $VLLM_PORT:8000 -v $VLLM_VOLUME:/data -e HF_TOKEN=$HF_TOKEN -e HUGGING_FACE_HUB_TOKEN=$HF_TOKEN -e HF_HOME=/data -e OMPI_MCA_btl_vader_single_copy_mechanism=none -e PT_HPU_ENABLE_LAZY_COLLECTIVES=true -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e no_proxy=$no_proxy -e VLLM_SKIP_WARMUP=true --cap-add=sys_nice --ipc=host $VLLM_IMAGE --model ${MODEL} --max-seq-len-to-capture 16384 --tensor-parallel-size 4
     sleep 10s
     echo "Waiting vllm gaudi ready"
@@ -95,7 +127,6 @@ function start_vllm_service_70B() {
     echo "Service started successfully"
 }
 
-
 function stop_llm(){
     cid=$(docker ps -aq --filter "name=vllm-gaudi-server")
     echo "Stopping container $cid"
@@ -104,7 +135,17 @@ function stop_llm(){
 }
 
 function start_dataprep_and_agent(){
-    docker compose -f $WORKPATH/docker_compose/intel/hpu/gaudi/compose.yaml up -d tei-embedding-serving redis-vector-db redis-kv-store dataprep-redis-finance worker-finqa-agent worker-research-agent docsum-vllm-gaudi supervisor-react-agent agent-ui
+    docker compose -f $WORKPATH/docker_compose/intel/hpu/gaudi/compose.yaml up -d \
+        tei-embedding-serving \
+        redis-vector-db \
+        redis-kv-store \
+        dataprep-redis-finance \
+        worker-finqa-agent \
+        worker-research-agent \
+        docsum-vllm-gaudi \
+        supervisor-react-agent \
+        agent-ui
+
     sleep 1m
 }
 
@@ -219,7 +260,6 @@ function stop_agent_docker() {
     done
 }
 
-
 echo "workpath: $WORKPATH"
 echo "=================== Stop containers ===================="
 stop_llm
@@ -232,9 +272,9 @@ echo "=================== #1 Building docker images===================="
 build_vllm_docker_image
 build_dataprep_agent_images
 
-#### for local test
+### for local test
 # build_agent_image_local
-# echo "=================== #1 Building docker images completed===================="
+echo "=================== #1 Building docker images completed===================="
 
 echo "=================== #2 Start vllm endpoint===================="
 start_vllm_service_70B

@@ -19,7 +19,7 @@ x-common-agent-environment:
   TEI_EMBEDDING_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
   ip_address: ${IP_ADDRESS}
   strategy: react_llama
-  require_human_feedback: "false"
+  require_human_feedback: false
 
 services:
 
@@ -118,7 +118,7 @@ services:
       REDIS_URL_KV: ${REDIS_URL_KV}
       TEI_EMBEDDING_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
       LLM_ENDPOINT: ${LLM_ENDPOINT}
-      LLM_MODEL: ${LLM_MODEL_ID}
+      LLM_MODEL: ${LLM_MODEL_ID}      
       HUGGINGFACEHUB_API_TOKEN: ${HF_TOKEN}
       HF_TOKEN: ${HF_TOKEN}
       LOGFLAG: true
@@ -134,11 +134,11 @@ services:
       - "9095:9095"
     environment:
       <<: *common-agent-env
-      with_memory: "false"
+      with_memory: false
       recursion_limit: ${RECURSION_LIMIT_WORKER}
       temperature: ${TEMPERATURE}
       max_new_tokens: ${MAX_TOKENS}
-      stream: "false"
+      stream: false
       tools: /home/user/tools/finqa_agent_tools.yaml
       custom_prompt: /home/user/prompts/finqa_prompt.py
       port: 9095
@@ -154,9 +154,9 @@ services:
       - "9096:9096"
     environment:
       <<: *common-agent-env
-      with_memory: "false"
+      with_memory: false
       recursion_limit: ${RECURSION_LIMIT_WORKER}
-      stream: "false"
+      stream: false
       tools: /home/user/tools/research_agent_tools.yaml
       custom_prompt: /home/user/prompts/research_prompt.py
       FINNHUB_API_KEY: ${FINNHUB_API_KEY}
