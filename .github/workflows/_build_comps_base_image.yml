@@ -3,6 +3,11 @@
 
 name: Build Comps Base Image
 
+permissions:
+  attestations: read
+  models: read
+  security-events: read
+
 on:
   workflow_call:
     inputs:
