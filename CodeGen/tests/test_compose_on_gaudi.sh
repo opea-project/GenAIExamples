@@ -10,21 +10,11 @@ echo "TAG=IMAGE_TAG=${IMAGE_TAG}"
 export REGISTRY=${IMAGE_REPO}
 export TAG=${IMAGE_TAG}
 export MODEL_CACHE=${model_cache:-"./data"}
-export REDIS_DB_PORT=6379
-export REDIS_INSIGHTS_PORT=8001
-export REDIS_RETRIEVER_PORT=7000
-export EMBEDDER_PORT=6000
-export TEI_EMBEDDER_PORT=8090
-export DATAPREP_REDIS_PORT=6007
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
-
-export http_proxy=${http_proxy}
-export https_proxy=${https_proxy}
-export no_proxy=${no_proxy},${ip_address}
-
+source $WORKPATH/docker_compose/intel/set_env.sh
 function build_docker_images() {
     opea_branch=${opea_branch:-"main"}
 
@@ -53,28 +43,6 @@ function start_services() {
     local llm_container_name="$2"
 
     cd $WORKPATH/docker_compose/intel/hpu/gaudi
-
-    export LLM_MODEL_ID="Qwen/Qwen2.5-Coder-7B-Instruct"
-    export LLM_ENDPOINT="http://${ip_address}:8028"
-    export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
-    export MEGA_SERVICE_PORT=7778
-    export MEGA_SERVICE_HOST_IP=${ip_address}
-    export LLM_SERVICE_HOST_IP=${ip_address}
-    export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:${MEGA_SERVICE_PORT}/v1/codegen"
-    export NUM_CARDS=1
-    export host_ip=${ip_address}
-
-    export REDIS_URL="redis://${host_ip}:${REDIS_DB_PORT}"
-    export RETRIEVAL_SERVICE_HOST_IP=${host_ip}
-    export RETRIEVER_COMPONENT_NAME="OPEA_RETRIEVER_REDIS"
-    export INDEX_NAME="CodeGen"
-
-    export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
-    export TEI_EMBEDDING_HOST_IP=${host_ip}
-    export TEI_EMBEDDING_ENDPOINT="http://${host_ip}:${TEI_EMBEDDER_PORT}"
-    export DATAPREP_ENDPOINT="http://${host_ip}:${DATAPREP_REDIS_PORT}/v1/dataprep"
-
-    export INDEX_NAME="CodeGen"
 
     # Start Docker Containers
     docker compose --profile ${compose_profile} up -d | tee ${LOG_PATH}/start_services_with_compose.log
