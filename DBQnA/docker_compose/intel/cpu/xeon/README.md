@@ -73,6 +73,7 @@ or
 edit the file set_env.sh to set those environment variables,
 
 ```bash
+cd GenAIExamples/DBQnA/docker_compose/intel/cpu/xeon/
 source set_env.sh
 ```
 
