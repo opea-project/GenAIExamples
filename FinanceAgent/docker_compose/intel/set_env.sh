@@ -18,25 +18,16 @@ check_var() {
     fi
 }
 
-# Set IP address
-export IP_ADDRESS=$(hostname -I | awk '{print $1}')
-export HOST_IP="${IP_ADDRESS}"
-
 # Check critical variables
 check_var "HF_TOKEN"
 check_var "HOST_IP"
-
-# Proxy settings
-export NO_PROXY="${NO_PROXY},${HOST_IP}"
-export HTTP_PROXY="${http_proxy}"
-export HTTPS_PROXY="${https_proxy}"
 
 # VLLM configuration
 export VLLM_PORT="${VLLM_PORT:-8086}"  
 export VLLM_VOLUME="${VLLM_VOLUME:-/data2/huggingface}"
 export VLLM_IMAGE="${VLLM_IMAGE:-opea/vllm-gaudi:latest}"
 export LLM_MODEL_ID="${LLM_MODEL_ID:-meta-llama/Llama-3.3-70B-Instruct}"
-export LLM_ENDPOINT="http://${IP_ADDRESS}:${VLLM_PORT}"
+export LLM_ENDPOINT="http://${HOST_IP}:${VLLM_PORT}"
 export MAX_LEN="${MAX_LEN:-16384}"
 export NUM_CARDS="${NUM_CARDS:-4}"
 export HF_CACHE_DIR="${HF_CACHE_DIR:-"./data"}"
@@ -44,11 +35,11 @@ export HF_CACHE_DIR="${HF_CACHE_DIR:-"./data"}"
 # Data preparation and embedding configuration
 export DATAPREP_PORT="${DATAPREP_PORT:-6007}"
 export TEI_EMBEDDER_PORT="${TEI_EMBEDDER_PORT:-10221}"
-export REDIS_URL_VECTOR="redis://${IP_ADDRESS}:6379"
-export REDIS_URL_KV="redis://${IP_ADDRESS}:6380"
+export REDIS_URL_VECTOR="redis://${HOST_IP}:6379"
+export REDIS_URL_KV="redis://${HOST_IP}:6380"
 export DATAPREP_COMPONENT_NAME="${DATAPREP_COMPONENT_NAME:-OPEA_DATAPREP_REDIS_FINANCE}"
 export EMBEDDING_MODEL_ID="${EMBEDDING_MODEL_ID:-BAAI/bge-base-en-v1.5}"
-export TEI_EMBEDDING_ENDPOINT="http://${IP_ADDRESS}:${TEI_EMBEDDER_PORT}"
+export TEI_EMBEDDING_ENDPOINT="http://${HOST_IP}:${TEI_EMBEDDER_PORT}"
 
 # Hugging Face API token
 export HUGGINGFACEHUB_API_TOKEN="${HF_TOKEN}"
@@ -64,12 +55,12 @@ export MAX_INPUT_TOKENS="${MAX_INPUT_TOKENS:-2048}"
 export MAX_TOTAL_TOKENS="${MAX_TOTAL_TOKENS:-4096}"
 
 # Worker URLs
-export WORKER_FINQA_AGENT_URL="http://${IP_ADDRESS}:9095/v1/chat/completions"
-export WORKER_RESEARCH_AGENT_URL="http://${IP_ADDRESS}:9096/v1/chat/completions"
+export WORKER_FINQA_AGENT_URL="http://${HOST_IP}:9095/v1/chat/completions"
+export WORKER_RESEARCH_AGENT_URL="http://${HOST_IP}:9096/v1/chat/completions"
 
 # DocSum configuration
 export DOCSUM_COMPONENT_NAME="${DOCSUM_COMPONENT_NAME:-"OpeaDocSumvLLM"}"
-export DOCSUM_ENDPOINT="http://${IP_ADDRESS}:9000/v1/docsum"
+export DOCSUM_ENDPOINT="http://${HOST_IP}:9000/v1/docsum"
 
 # API keys
 check_var "FINNHUB_API_KEY"

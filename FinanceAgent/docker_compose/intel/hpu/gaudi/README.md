@@ -1,5 +1,5 @@
-# Deploy Finance Agent on Intel Gaudi HPU with Docker Compose
-This README provides instructions for deploying the Finance Agent application using Docker Compose on systems equipped with Intel Gaudi HPUs.
+# Deploy Finance Agent on Intel® Gaudi® AI Accelerator with Docker Compose
+This README provides instructions for deploying the Finance Agent application using Docker Compose on systems equipped with Intel® Gaudi® AI Accelerators.
 
 ## Table of Contents
 
@@ -11,11 +11,11 @@ This README provides instructions for deploying the Finance Agent application us
 
 ## Overview
 
-This guide focuses on running the pre-configured Finance Agent service using Docker Compose on Intel Gaudi HPUs. It leverages containers optimized for Gaudi for the LLM serving component, along with CPU-based containers for other microservices like embedding, retrieval, data preparation and the UI.
+This guide focuses on running the pre-configured Finance Agent service using Docker Compose on Intel® Gaudi® AI Accelerators. It leverages containers optimized for Gaudi for the LLM serving component, along with CPU-based containers for other microservices like embedding, retrieval, data preparation and the UI.
 
 ## Prerequisites
 - Docker and Docker Compose installed.
-- Intel Gaudi HPU(s) with the necessary drivers and software stack installed on the host system. (Refer to Intel Gaudi Documentation).
+- Intel® Gaudi® AI Accelerator(s) with the necessary drivers and software stack installed on the host system. (Refer to Intel Gaudi Documentation).
 - Git installed (for cloning repository).
 - Hugging Face Hub API Token (for downloading models).
 - Access to the internet (or a private model cache).
@@ -48,10 +48,11 @@ Set required environment variables in your shell:
    # Optional: Configure HOST_IP if needed
    # Replace with your host's external IP address (do not use localhost or 127.0.0.1). 
    # export HOST_IP=$(hostname -I | awk '{print $1}')
+
    # Optional: Configure proxy if needed
-   # export http_proxy="your_http_proxy"
-   # export https_proxy="your_https_proxy"
-   # export no_proxy="localhost,127.0.0.1,${HOST_IP}" # Add other hosts if necessary
+   # export HTTP_PROXY="${http_proxy}"
+   # export HTTPS_PROXY="${https_proxy}"
+   # export NO_PROXY="${NO_PROXY},${HOST_IP}"
 
    source ../../set_env.sh
 ```
@@ -74,12 +75,12 @@ Below is the command to launch services
 
 
 ```shell
-   docker compose up -d
+   docker compose -f compose.yaml up -d
 ```
 
 #### [Optional] Build docker images
 
-Only needed when docker pull failed.
+This is only needed if the Docker image is unavailable or the pull operation fails.
 
 ```bash
    cd $WORKDIR/GenAIExamples/FinanceAgent/docker_image_build
@@ -105,9 +106,19 @@ If deploy on Gaudi, also need to build vllm image.
 
 ## Validate Services
 Wait several minutes for models to download and services to initialize (Gaudi initialization can take time). Check container logs (docker compose logs -f <service_name>, especially vllm-gaudi-server).
+
 ```bash
    docker logs --tail 2000 -f vllm-gaudi-server
 ``` 
+> Expected output of the `vllm-gaudi-server` service is 
+```
+   INFO:     Started server process [1]
+   INFO:     Waiting for application startup.
+   INFO:     Application startup complete.
+   INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+   INFO:     <IP>:<Port Number> - "GET /health HTTP/1.1" 200 OK
+
+```
 
 ### Validate Data Services
 Ingest data and retrieval from database

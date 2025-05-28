@@ -6,25 +6,22 @@
 - [Problem Motivation](#problem-motivation)
 - [Architecture](#architecture)
   - [High-Level Diagram](#high-level-diagram)
-  - [OPEA Microservices Diagram](#opea-microservices-diagram)
+  - [OPEA Microservices Diagram for Data Handling](#opea-microservices-diagram-for-data-handling)
 - [Deployment Options](#deployment-options)
 - [Contribution](#contribution)
 
 
-
 ## Overview
 
-The Finance Agent example showcases a hierarchical multi-agent system designed to assist users with financial document processing and analysis. It provides three main functionalities: summarizing lengthy financial documents, answering queries related to financial documents, and conducting research to generate investment reports on public companies.
+The Finance Agent exemplifies a hierarchical multi-agent system designed to streamline financial document processing and analysis for users. It offers three core functionalities: summarizing lengthy financial documents, answering queries related to these documents, and conducting research to generate investment reports on public companies.
 
-Users interact with the system via a graphical user interface (UI), where requests are managed by a supervisor agent that delegates tasks to worker agents or the summarization microservice. The system supports document uploads through the UI for processing.
+Navigating and analyzing extensive financial documents can be both challenging and time-consuming. Users often need concise summaries, answers to specific queries, or comprehensive investment reports. The Finance Agent effectively addresses these needs by automating document summarization, query answering, and research tasks, thereby enhancing productivity and decision-making efficiency.
 
+Users interact with the system through a graphical user interface (UI), where a supervisor agent manages requests by delegating tasks to worker agents or the summarization microservice. The system also supports document uploads via the UI for processing.
 
-## Problem Motivation
-Navigating and analyzing extensive financial documents can be challenging and time-consuming. Users often require concise summaries, answers to specific queries, or comprehensive investment reports. The Finance Agent addresses these needs by automating document summarization, query answering, and research tasks, thereby enhancing productivity and decision-making efficiency.
 
 ## Architecture
 ### High-Level Diagram
-The Finance Agent system is structured as a hierarchical multi-agent architecture. User interactions are managed by a supervisor agent, which coordinates tasks among worker agents and the summarization microservice. The system supports document uploads and processing through the UI.
 
 The architecture of this Finance Agent example is shown in the figure below. The agent is a hierarchical multi-agent system and has 3 main functions:
 
@@ -57,15 +54,15 @@ The Question Answering worker agent uses `search_knowledge_base` tool to get rel
 
 
 ## Deployment Options
-This CodeGen example can be deployed manually on various hardware platforms using Docker Compose or Kubernetes. Select the appropriate guide based on your target environment:
+This Finance Agent example can be deployed manually on Docker Compose.
 
 | Hardware        | Deployment Mode      | Guide Link                                                               |
 | :-------------- | :------------------- | :----------------------------------------------------------------------- |
-| Intel Gaudi HPU | Single Node (Docker) | [Gaudi Docker Compose Guide](./docker_compose/intel/hpu/gaudi/README.md) |
+| Intel® Gaudi® AI Accelerator | Single Node (Docker) | [Gaudi Docker Compose Guide](./docker_compose/intel/hpu/gaudi/README.md) |
 
 _Note: Building custom microservice images can be done using the resources in [GenAIComps](https://github.com/opea-project/GenAIComps)._
 
 
 ## Contribution
-We welcome contributions to the OPEA project. Please refer to the contribution guidelines for more information.
+We welcome contributions to the OPEA project. Please refer to the [contribution guidelines](https://github.com/opea-project/docs/blob/main/community/CONTRIBUTING.md) for more information.
 

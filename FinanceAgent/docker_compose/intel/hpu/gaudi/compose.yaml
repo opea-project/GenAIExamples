@@ -17,7 +17,7 @@ x-common-agent-environment:
   REDIS_URL_VECTOR: ${REDIS_URL_VECTOR}
   REDIS_URL_KV: ${REDIS_URL_KV}
   TEI_EMBEDDING_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
-  ip_address: ${IP_ADDRESS}
+  ip_address: ${HOST_IP}
   strategy: react_llama
   require_human_feedback: false
 
