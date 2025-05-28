@@ -26,13 +26,13 @@ Clone the GenAIExample repository and access the SearchQnA Intel® Xeon® platfo
 
 ```bash
 git clone https://github.com/opea-project/GenAIExamples.git
-cd GenAIExamples/SearchQnA
+cd GenAIExamples/SearchQnA/docker_compose/intel
 ```
 
-Then checkout a released version, such as v1.2:
+Then checkout a released version, such as v1.3:
 
 ```bash
-git checkout v1.2
+git checkout v1.3
 ```
 
 ### Configure the Deployment Environment
@@ -58,7 +58,7 @@ Consult the section on [SearchQnA Service configuration](#SearchQnA-configuratio
 To deploy the SearchQnA services, execute the `docker compose up` command with the appropriate arguments. For a default deployment, execute the command below. It uses the 'compose.yaml' file.
 
 ```bash
-cd docker_compose/intel/cpu/xeon
+cd cpu/xeon
 docker compose -f compose.yaml up -d
 ```
 
