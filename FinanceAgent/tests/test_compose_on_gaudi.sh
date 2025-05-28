@@ -272,8 +272,9 @@ echo "=================== #1 Building docker images===================="
 build_vllm_docker_image
 build_dataprep_agent_images
 
-### for local test
-# build_agent_image_local
+# ## for local test
+# # build_agent_image_local
+
 echo "=================== #1 Building docker images completed===================="
 
 echo "=================== #2 Start vllm endpoint===================="

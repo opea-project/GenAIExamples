@@ -151,7 +151,7 @@ Supervisor Agent multi turn:
 ## Accessing the User Interface (UI)
 
 The UI microservice is launched in the previous step with the other microservices.
-To see the UI, open a web browser to `http://${ip_address}:5175` to access the UI. Note the `ip_address` here is the host IP of the UI microservice.
+To see the UI, open a web browser to `http://${HOST_IP}:5175` to access the UI. Note the `HOST_IP` here is the host IP of the UI microservice.
 
 1. Create Admin Account with a random value
 
@@ -159,9 +159,9 @@ To see the UI, open a web browser to `http://${ip_address}:5175` to access the U
 
    First, click on the user icon in the upper right corner to open `Settings`. Click on `Admin Settings`. Click on `Connections`.
 
-   Then, enter the supervisor agent endpoint in the `OpenAI API` section: `http://${ip_address}:9090/v1`. Enter the API key as "empty". Add an arbitrary model id in `Model IDs`, for example, "opea_agent". The `ip_address` here should be the host ip of the agent microservice.
+   Then, enter the supervisor agent endpoint in the `OpenAI API` section: `http://${HOST_IP}:9090/v1`. Enter the API key as "empty". Add an arbitrary model id in `Model IDs`, for example, "opea_agent". The `HOST_IP` here should be the host ip of the agent microservice.
 
-   Then, enter the dataprep endpoint in the `Icloud File API` section. You first need to enable `Icloud File API` by clicking on the button on the right to turn it into green and then enter the endpoint url, for example, `http://${ip_address}:6007/v1`. The `ip_address` here should be the host ip of the dataprep microservice.
+   Then, enter the dataprep endpoint in the `Icloud File API` section. You first need to enable `Icloud File API` by clicking on the button on the right to turn it into green and then enter the endpoint url, for example, `http://${HOST_IP}:6007/v1`. The `HOST_IP` here should be the host ip of the dataprep microservice.
 
    You should see screen like the screenshot below when the settings are done.
 
@@ -169,8 +169,8 @@ To see the UI, open a web browser to `http://${ip_address}:5175` to access the U
 
 3. Upload documents with UI
 
-   Click on the `Workplace` icon in the top left corner. Click `Knowledge`. Click on the "+" sign to the right of `Icloud Knowledge`. You can paste an url in the left hand side of the pop-up window, or upload a local file by click on the cloud icon on the right hand side of the pop-up window. Then click on the `Upload Confirm` button. Wait till the processing is done and the pop-up window will be closed on its own when the data ingestion is done. See the screenshot below.
-
+   Click on the `Workplace` icon in the top left corner. Click `Knowledge`. Click on the "+" sign to the right of `iCloud Knowledge`. You can paste an url in the left hand side of the pop-up window, or upload a local file by click on the cloud icon on the right hand side of the pop-up window. Then click on the `Upload Confirm` button. Wait till the processing is done and the pop-up window will be closed on its own when the data ingestion is done. See the screenshot below.
+   Then, enter the dataprep endpoint in the `iCloud File API` section. You first need to enable `iCloud File API` by clicking on the button on the right to turn it into green and then enter the endpoint url, for example, `http://${HOST_IP}:6007/v1`. The `HOST_IP` here should be the host ip of the dataprep microservice.
    Note: the data ingestion may take a few minutes depending on the length of the document. Please wait patiently and do not close the pop-up window.
 
 ![upload-doc-ui](../../../../assets/upload_doc_ui.png)

@@ -36,7 +36,7 @@ The user interacts with the supervisor agent through the graphical UI. The super
 
 ![Finance Agent Architecture](assets/finance_agent_arch.png)
 
-### OPEA Microservices Diagram
+### OPEA Microservices Diagram for Data Handling 
 The architectural diagram of the `dataprep` microservice is shown below. We use [docling](https://github.com/docling-project/docling) to extract text from PDFs and URLs into markdown format. Both the full document content and tables are extracted. We then use an LLM to extract metadata from the document, including the company name, year, quarter, document type, and document title. The full document markdown then gets chunked, and LLM is used to summarize each chunk, and the summaries are embedded and saved to a vector database. Each table is also summarized by LLM and the summaries are embedded and saved to the vector database. The chunks and tables are also saved into a KV store. The pipeline is designed as such to improve retrieval accuracy of the `search_knowledge_base` tool used by the Question Answering worker agent.
 
 ![dataprep architecture](assets/fin_agent_dataprep.png)
