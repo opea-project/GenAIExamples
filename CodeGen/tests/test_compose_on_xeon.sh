@@ -145,7 +145,7 @@ function validate_megaservice() {
         "mega-codegen" \
         "codegen-xeon-backend-server" \
         '{ "index_name": "test_redis", "agents_flag": "True", "messages": "def print_hello_world():", "max_tokens": 256}'
-    
+
     validate_services \
         "${ip_address}:7778/v1/codegen" \
         "class" \
