@@ -81,7 +81,7 @@ services:
       - milvus-standalone
       - lvm-llava
     ports:
-      - "${DATAPREP_MMR_PORT}:5000"
+      - "${DATAPREP_MMR_PORT:-6007}:5000"
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
