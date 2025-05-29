@@ -2,7 +2,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 name: Get Image List
-permissions: read-all
+permissions:
+  contents: read
 on:
   workflow_call:
     inputs:
