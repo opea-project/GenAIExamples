@@ -150,6 +150,7 @@ def main(yaml_file, target_node=None, test_mode="oob", clean_up=True):
         yaml_file: Path to the YAML configuration file
         target_node: Optional target number of nodes to deploy. If not specified, will process all nodes.
         test_mode: Test mode, either "oob" (out of box) or "tune". Defaults to "oob".
+        clean_up: Whether to clean up after the test. Defaults to True.
     """
     if test_mode not in ["oob", "tune"]:
         print("Error: test_mode must be either 'oob' or 'tune'")
