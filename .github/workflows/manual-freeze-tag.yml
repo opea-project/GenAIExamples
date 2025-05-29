@@ -37,8 +37,8 @@ jobs:
           echo "VERSION_MINOR ${minor}" >> version.txt
           echo "VERSION_PATCH ${patch}" >> version.txt
 
-      - name: Commit changes
-        run: |
-          git add .
-          git commit -s -m "Freeze OPEA images tag"
-          git push
+      # - name: Commit changes
+      #   run: |
+      #     git add .
+      #     git commit -s -m "Freeze OPEA images tag"
+      #     git push
