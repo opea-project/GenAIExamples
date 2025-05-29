@@ -70,7 +70,7 @@ Here is an example of `Nike 2023` pdf.
 
 ```bash
 # download pdf file
-wget https://raw.githubusercontent.com/opea-project/GenAIComps/v1.1/comps/retrievers/redis/data/nke-10k-2023.pdf
+wget https://raw.githubusercontent.com/opea-project/GenAIComps/v1.3/comps/third_parties/pathway/src/data/nke-10k-2023.pdf
 # upload pdf file with dataprep
 curl -X POST "http://${host_ip}:11103/v1/dataprep/ingest" \
     -H "Content-Type: multipart/form-data" \
@@ -204,7 +204,7 @@ Here is an example of `Nike 2023` pdf.
 
 ```bash
 # download pdf file
-wget https://raw.githubusercontent.com/opea-project/GenAIComps/v1.1/comps/retrievers/redis/data/nke-10k-2023.pdf
+wget https://raw.githubusercontent.com/opea-project/GenAIComps/v1.3/comps/third_parties/pathway/src/data/nke-10k-2023.pdf
 # upload pdf file with dataprep
 curl -X POST "http://${host_ip}:6007/v1/dataprep/ingest" \
     -H "Content-Type: multipart/form-data" \
