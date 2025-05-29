@@ -444,7 +444,10 @@ if __name__ == "__main__":
     parser.add_argument("--target-node", type=int, help="Optional: Target number of nodes to deploy.", default=None)
     parser.add_argument("--test-mode", type=str, help="Test mode, either 'oob' (out of box) or 'tune'.", default="oob")
     parser.add_argument(
-        "--clean-up", type=bool, help="Clean up after test, which can be closed for local debug.", default=True
+        "--no-clean-up",
+        action="store_false",
+        dest="clean_up",
+        help="Clean up after test, which can be closed for local debug.",
     )
 
     args = parser.parse_args()
