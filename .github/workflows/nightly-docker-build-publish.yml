@@ -4,7 +4,7 @@
 name: Nightly build/publish latest docker images
 permissions:
   security-events: read
-  
+
 on:
   schedule:
     - cron: "30 14 * * 1-5" # UTC time
