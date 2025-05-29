@@ -2,7 +2,12 @@
 # SPDX-License-Identifier: Apache-2.0
 
 name: Build Comps Base Image
-permissions: read-all
+
+permissions:
+  attestations: read
+  models: read
+  security-events: read
+
 on:
   workflow_call:
     inputs:

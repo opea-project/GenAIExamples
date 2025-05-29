@@ -2,7 +2,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 name: Build and deploy GMC system on call and manual
-
+permissions:
+  contents: read
 on:
   workflow_dispatch:
     inputs:

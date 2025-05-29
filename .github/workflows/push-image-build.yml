@@ -3,6 +3,23 @@
 # Test
 name: Build latest images on push event
 
+permissions:
+  actions: read
+  contents: read
+  checks: read
+  deployments: read
+  discussions: read
+  issues: read
+  packages: read
+  pages: read
+  pull-requests: read
+  repository-projects: read
+  statuses: read
+  security-events: read
+  id-token: write
+  attestations: read
+  models: read
+
 on:
   push:
     branches: [ 'main' ]

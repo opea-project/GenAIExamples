@@ -2,7 +2,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 name: E2E Test with Helm Charts
-
+permissions:
+  contents: read
 on:
   pull_request_target:
     branches: [main]

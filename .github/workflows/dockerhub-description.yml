@@ -2,6 +2,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 name: Update Docker Hub Description
+permissions:
+  contents: read
 on:
   schedule:
     - cron: "0 0 * * 0"

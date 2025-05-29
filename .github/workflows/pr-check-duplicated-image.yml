@@ -2,7 +2,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 name: Check Duplicated Images
-
+permissions:
+  contents: read
 on:
   pull_request:
     branches: [main]

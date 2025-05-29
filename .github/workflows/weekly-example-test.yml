@@ -3,6 +3,10 @@
 
 name: Weekly test all examples on multiple HWs
 
+permissions:
+  contents: read
+  id-token: write
+
 on:
   schedule:
     - cron: "30 2 * * 6" # UTC time
@@ -31,6 +35,10 @@ jobs:
 
   build-comps-base:
     needs: [get-test-matrix]
+    permissions:
+      attestations: read
+      models: read
+      security-events: read
     strategy:
       matrix:
         node: ${{ fromJson(needs.get-test-matrix.outputs.nodes) }}
@@ -39,6 +47,22 @@ jobs:
       node: ${{ matrix.node }}
 
   run-examples:
+    permissions:
+      contents: read
+      id-token: write
+      actions: read
+      attestations: read
+      checks: read
+      deployments: read
+      discussions: read
+      issues: read
+      models: read
+      packages: read
+      pages: read
+      pull-requests: read
+      repository-projects: read
+      statuses: read
+      security-events: read
     needs: [get-test-matrix, build-comps-base]
     strategy:
       matrix:

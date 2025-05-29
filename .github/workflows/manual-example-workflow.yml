@@ -2,6 +2,24 @@
 # SPDX-License-Identifier: Apache-2.0
 
 name: Examples CD workflow on manual event
+
+permissions:
+  actions: read
+  contents: read
+  checks: read
+  deployments: read
+  discussions: read
+  issues: read
+  packages: read
+  pages: read
+  pull-requests: read
+  repository-projects: read
+  statuses: read
+  security-events: read
+  id-token: write
+  attestations: read
+  models: read
+
 on:
   workflow_dispatch:
     inputs:
@@ -51,7 +69,6 @@ on:
         required: false
         type: boolean
 
-permissions: read-all
 jobs:
   get-test-matrix:
     runs-on: ubuntu-latest
