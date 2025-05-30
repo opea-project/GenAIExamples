@@ -5,12 +5,13 @@ import { NextLoading } from "@/utils/loading";
 import serviceManager from "@/utils/serviceManager";
 import axios, { AxiosInstance } from "axios";
 import qs from "qs";
+import i18n from "@/i18n";
 
 const antNotification = serviceManager.getService("antNotification");
 
 const service: AxiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
-  timeout: 50000,
+  timeout: 600000,
   headers: { "Content-Type": "application/json" },
 });
 
@@ -28,7 +29,7 @@ service.interceptors.request.use(
   },
   (error) => {
     return Promise.reject(error);
-  },
+  }
 );
 
 // response interceptor
@@ -38,7 +39,12 @@ service.interceptors.response.use(
     if (NextLoading) NextLoading.done();
     const res = response.data;
     if (config.showSuccessMsg) {
-      if (antNotification) antNotification("success", "Success", config.successMsg);
+      if (antNotification)
+        antNotification(
+          "success",
+          i18n.global.t("common.success"),
+          i18n.global.t(config.successMsg)
+        );
     }
     return Promise.resolve(res);
   },
@@ -53,10 +59,11 @@ service.interceptors.response.use(
     } else {
       errorMessage = error.message;
     }
-    if (antNotification) antNotification("error", "Error", errorMessage);
+    if (antNotification)
+      antNotification("error", i18n.global.t("common.error"), errorMessage);
 
     return Promise.reject(error);
-  },
+  }
 );
 
 export default service;

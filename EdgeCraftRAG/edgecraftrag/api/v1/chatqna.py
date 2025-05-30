@@ -5,6 +5,7 @@ from comps import GeneratedDoc
 from comps.cores.proto.api_protocol import ChatCompletionRequest
 from edgecraftrag.api_schema import RagOut
 from edgecraftrag.context import ctx
+from edgecraftrag.utils import serialize_contexts, set_current_session
 from fastapi import FastAPI, File, HTTPException, UploadFile, status
 from fastapi.responses import StreamingResponse
 
@@ -19,7 +20,7 @@ async def retrieval(request: ChatCompletionRequest):
     if nodeswithscore is not None:
         ret = []
         for n in nodeswithscore:
-            ret.append((n.node.node_id, n.node.text, n.score))
+            ret.append((n.node.node_id, n.node.text, round(float(n.score), 8)))
         return ret
 
     return None
@@ -29,14 +30,16 @@ async def retrieval(request: ChatCompletionRequest):
 @chatqna_app.post(path="/v1/chatqna")
 async def chatqna(request: ChatCompletionRequest):
     try:
+        sessionid = request.user
+        set_current_session(sessionid)
         generator = ctx.get_pipeline_mgr().get_active_pipeline().generator
         if generator:
             request.model = generator.model_id
         if request.stream:
-            ret, retri_res = ctx.get_pipeline_mgr().run_pipeline(chat_request=request)
+            ret, contexts = ctx.get_pipeline_mgr().run_pipeline(chat_request=request)
             return ret
         else:
-            ret, retri_res = ctx.get_pipeline_mgr().run_pipeline(chat_request=request)
+            ret, contexts = ctx.get_pipeline_mgr().run_pipeline(chat_request=request)
             return str(ret)
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
@@ -46,7 +49,7 @@ async def chatqna(request: ChatCompletionRequest):
 @chatqna_app.post(path="/v1/ragqna")
 async def ragqna(request: ChatCompletionRequest):
     try:
-        res, retri_res = ctx.get_pipeline_mgr().run_pipeline(chat_request=request)
+        res, contexts = ctx.get_pipeline_mgr().run_pipeline(chat_request=request)
         if isinstance(res, GeneratedDoc):
             res = res.text
         elif isinstance(res, StreamingResponse):
@@ -55,36 +58,9 @@ async def ragqna(request: ChatCompletionRequest):
                 collected_data.append(chunk)
             res = "".join(collected_data)
 
-        ragout = RagOut(query=request.messages, contexts=[], response=str(res))
-        for n in retri_res:
-            origin_text = n.node.get_text()
-            ragout.contexts.append(origin_text.strip())
+        serialized_contexts = serialize_contexts(contexts)
+
+        ragout = RagOut(query=request.messages, contexts=serialized_contexts, response=str(res))
         return ragout
-    except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
-
-
-# Upload prompt file for LLM ChatQnA
-@chatqna_app.post(path="/v1/chatqna/prompt")
-async def load_prompt(file: UploadFile = File(...)):
-    try:
-        generator = ctx.get_pipeline_mgr().get_active_pipeline().generator
-        if generator:
-            content = await file.read()
-            prompt_str = content.decode("utf-8")
-            generator.set_prompt(prompt_str)
-            return "Set LLM Prompt Successfully"
-    except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
-
-
-# Reset prompt for LLM ChatQnA
-@chatqna_app.post(path="/v1/chatqna/prompt/reset")
-async def reset_prompt():
-    try:
-        generator = ctx.get_pipeline_mgr().get_active_pipeline().generator
-        if generator:
-            generator.reset_prompt()
-            return "Reset LLM Prompt Successfully"
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))

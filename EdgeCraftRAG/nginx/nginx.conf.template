@@ -1,0 +1,57 @@
+user www-data;
+worker_processes auto;
+pid /run/nginx.pid;
+include /etc/nginx/modules-enabled/*.conf;
+ 
+events {
+        worker_connections 768;
+}
+ 
+http {
+        ##
+        # Basic Settings
+        ##
+        upstream multi-arc-serving-container {
+            server ${HOST_IP}:${NGINX_PORT_1};
+            server ${HOST_IP}:${NGINX_PORT_2};
+        }
+        sendfile on;
+        tcp_nopush on;
+        types_hash_max_size 2048;
+ 
+        include /etc/nginx/mime.types;
+        default_type application/octet-stream;
+ 
+        ssl_protocols TLSv1 TLSv1.1 TLSv1.2 TLSv1.3; # Dropping SSLv3, ref: POODLE
+        ssl_prefer_server_ciphers on;
+ 
+        access_log /var/log/nginx/access.log;
+        error_log /var/log/nginx/error.log;
+ 
+        gzip on;
+ 
+        include /etc/nginx/conf.d/*.conf;
+        #include /etc/nginx/sites-enabled/*;
+        server {
+            listen 8086;
+            server_name _;
+            location /v1/completions {
+                proxy_pass http://multi-arc-serving-container/v1/completions;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_http_version 1.1;
+                proxy_set_header Connection "";
+                proxy_buffering off;
+                proxy_cache off;
+                proxy_read_timeout 600s;
+                gzip off;
+                proxy_set_header Host ecrag:16011;
+                proxy_set_header X-Accel-Buffering no;
+                proxy_set_header X-Real-IP $remote_addr;
+                chunked_transfer_encoding on;
+            }
+   
+            location ~ /\. {
+                deny all;
+            }
+        }
+}
