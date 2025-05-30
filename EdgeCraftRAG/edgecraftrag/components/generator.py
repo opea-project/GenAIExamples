@@ -8,7 +8,7 @@ import os
 import urllib.request
 from urllib.parse import urlparse
 
-from edgecraftrag.base import BaseComponent, CompType, GeneratorType, NodeParserType, InferenceType
+from edgecraftrag.base import BaseComponent, CompType, GeneratorType, InferenceType, NodeParserType
 from edgecraftrag.utils import concat_history, save_history
 from fastapi.responses import StreamingResponse
 from langchain_core.prompts import PromptTemplate
@@ -93,6 +93,7 @@ def extract_unstructured_eles(retrieved_nodes=[], text_gen_context=""):
         for reference_doc in reference_docs:
             unstructured_str += f"{reference_doc}\n\n"
     return unstructured_str
+
 
 async def local_stream_generator(lock, llm, prompt_str, unstructured_str):
     async with lock:
@@ -244,7 +245,7 @@ class QnAGenerator(BaseComponent):
             result = llm.complete(prompt_str)
             save_history(str(result))
             return result
-        
+
     @model_serializer
     def ser_model(self):
         set = {

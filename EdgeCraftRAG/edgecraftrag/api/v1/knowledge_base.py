@@ -1,8 +1,12 @@
-from fastapi import FastAPI, HTTPException,status
-from edgecraftrag.context import ctx  
+# Copyright (C) 2025 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+import os
+
 from edgecraftrag.api.v1.data import add_data
 from edgecraftrag.api_schema import DataIn, KnowledgeBaseCreateIn
-import os
+from edgecraftrag.context import ctx
+from fastapi import FastAPI, HTTPException, status
 
 kb_app = FastAPI()
 
@@ -23,11 +27,11 @@ async def get_knowledge_base(knowledge_name: str):
     return kb
 
 
-# Create a new knowledge base 
+# Create a new knowledge base
 @kb_app.post(path="/v1/knowledge")
 async def create_knowledge_base(knowledge: KnowledgeBaseCreateIn):
     try:
-        kb =  ctx.knowledgemgr.create_knowledge_base(knowledge)
+        kb = ctx.knowledgemgr.create_knowledge_base(knowledge)
         if kb.active:
             await update_knowledge_base_handler(kb.get_file_paths())
         return "Create knowledge base successfully"
@@ -60,10 +64,10 @@ async def update_knowledge_base(knowledge: KnowledgeBaseCreateIn):
 
 # Add a files to the  knowledge base
 @kb_app.post(path="/v1/knowledge/{knowledge_name}/files")
-async def add_file_to_knowledge_base(knowledge_name ,file_path: DataIn):
+async def add_file_to_knowledge_base(knowledge_name, file_path: DataIn):
     try:
         kb = ctx.knowledgemgr.get_knowledge_base_by_name_or_id(knowledge_name)
-        if  os.path.isdir(file_path.local_path) :
+        if os.path.isdir(file_path.local_path):
             for root, _, files in os.walk(file_path.local_path):
                 for file in files:
                     file_full_path = os.path.join(root, file)
@@ -71,27 +75,27 @@ async def add_file_to_knowledge_base(knowledge_name ,file_path: DataIn):
                         kb.add_file_path(file_full_path)
                     else:
                         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="File upload failed")
-        elif os.path.isfile(file_path.local_path)  and file_path.local_path not in kb.get_file_paths():
+        elif os.path.isfile(file_path.local_path) and file_path.local_path not in kb.get_file_paths():
             kb.add_file_path(file_path.local_path)
         else:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="File upload failed")
-        
+
         active_kb = ctx.knowledgemgr.get_active_knowledge_base()
         if active_kb:
-            if active_kb.name == knowledge_name  or active_kb.idx == knowledge_name:  
+            if active_kb.name == knowledge_name or active_kb.idx == knowledge_name:
                 await update_knowledge_base_handler(file_path, add_file=True)
 
-        return "File upload successfully" 
+        return "File upload successfully"
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
 
 
 # Remove a file from the knowledge base
 @kb_app.delete(path="/v1/knowledge/{knowledge_name}/files")
-async def remove_file_from_knowledge_base(knowledge_name ,file_path: DataIn):
+async def remove_file_from_knowledge_base(knowledge_name, file_path: DataIn):
     try:
         kb = ctx.knowledgemgr.get_knowledge_base_by_name_or_id(knowledge_name)
-        if  file_path.local_path in kb.get_file_paths():
+        if file_path.local_path in kb.get_file_paths():
             kb.remove_file_path(file_path.local_path)
         else:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="File remove failure")
@@ -99,9 +103,9 @@ async def remove_file_from_knowledge_base(knowledge_name ,file_path: DataIn):
         file_path = kb.get_file_paths()
         active_kb = ctx.knowledgemgr.get_active_knowledge_base()
         if active_kb:
-            if active_kb.name == knowledge_name  or active_kb.idx == knowledge_name:
+            if active_kb.name == knowledge_name or active_kb.idx == knowledge_name:
                 await update_knowledge_base_handler(file_path)
-        return f"File deleted successfully"
+        return "File deleted successfully"
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
 
@@ -110,10 +114,10 @@ async def remove_file_from_knowledge_base(knowledge_name ,file_path: DataIn):
 async def update_knowledge_base_handler(file_path=None, add_file: bool = False):
     if ctx.get_pipeline_mgr().get_active_pipeline() is None:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Please activate pipeline")
-    
+
     if add_file and file_path:
         return await add_data(file_path)
-        
+
     elif file_path:
         pl = ctx.get_pipeline_mgr().get_active_pipeline()
         ctx.get_node_mgr().del_nodes_by_np_idx(pl.node_parser.idx)
@@ -123,7 +127,7 @@ async def update_knowledge_base_handler(file_path=None, add_file: bool = False):
             request = DataIn(local_path=file)
             await add_data(request)
         return "Done"
-    
+
     else:
         pl = ctx.get_pipeline_mgr().get_active_pipeline()
         ctx.get_node_mgr().del_nodes_by_np_idx(pl.node_parser.idx)

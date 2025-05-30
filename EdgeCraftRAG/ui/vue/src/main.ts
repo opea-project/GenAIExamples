@@ -25,8 +25,7 @@ const setDayjsLocale = (locale: string) => {
 
 const body = document.documentElement as HTMLElement;
 
-if (Local.get("themeInfo")?.theme === "dark")
-  body.setAttribute("data-theme", "dark");
+if (Local.get("themeInfo")?.theme === "dark") body.setAttribute("data-theme", "dark");
 else body.setAttribute("data-theme", "");
 
 // watch i18n update dayjs language
@@ -35,7 +34,7 @@ watch(
   (newLocale) => {
     setDayjsLocale(newLocale);
   },
-  { immediate: true }
+  { immediate: true },
 );
 const app = createApp(App);
 

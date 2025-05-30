@@ -110,6 +110,7 @@ docker pull intelanalytics/ipex-llm-serving-xpu:0.8.3-b18
 ```
 
 Generate your nginx config file
+
 ```bash
 export HOST_IP=#your host ip
 # If you are running with 1 vllm container:
@@ -148,6 +149,7 @@ export SELECTED_XPU_1=<which GPU to select to run for container 1>
 ```
 
 start with compose_vllm_multi-arc.yaml
+
 ```bash
 docker compose -f docker_compose/intel/gpu/arc/compose_vllm_multi-arc.yaml --profile ${CONTAINER_COUNT} up -d
 ```

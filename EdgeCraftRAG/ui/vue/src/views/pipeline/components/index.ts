@@ -10,13 +10,4 @@ import Table from "./Table.vue";
 import CreateDialog from "./UpdateDialog/CreateDialog.vue";
 import EditDialog from "./UpdateDialog/EditDialog.vue";
 
-export {
-  CreateDialog,
-  DetailDrawer,
-  EditDialog,
-  ImportDialog,
-  QuickStart,
-  System,
-  SystemChart,
-  Table,
-};
+export { CreateDialog, DetailDrawer, EditDialog, ImportDialog, QuickStart, System, SystemChart, Table };
