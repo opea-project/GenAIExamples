@@ -19,7 +19,7 @@ export JAEGER_IP=$(ip route get 8.8.8.8 | grep -oP 'src \K[^ ]+')
 export OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=grpc://$JAEGER_IP:4317
 export TELEMETRY_ENDPOINT=http://$JAEGER_IP:4318/v1/traces
 # Set no proxy
-export no_proxy="$no_proxy,hybridrag-gaudi-ui-server,hybridrag-gaudi-backend-server,dataprep-redis-service,tei-embedding-service,retriever,tei-reranking-service,tgi-service,vllm-service,jaeger,prometheus,grafana,node-exporter,localhost,127.0.0.1,$JAEGER_IP,${host_ip}"
+export no_proxy="$no_proxy,hybridrag-gaudi-ui-server,hybridrag-gaudi-backend-server,dataprep-redis-service,struct2graph,tei-embedding-service,retriever,tei-reranking-service,tgi-service,vllm-service,jaeger,prometheus,grafana,node-exporter,localhost,127.0.0.1,$JAEGER_IP,${host_ip}"
 
 
 export MEGA_SERVICE_HOST_IP=${host_ip}
@@ -37,6 +37,7 @@ export RERANK_SERVER_PORT=8808
 export LLM_SERVER_PORT=9009
 export TEXT2CYPHER_SERVER_PORT=11801
 export REDIS_SERVER_PORT=6379
+export STRUCT2GRAPH_PORT=8090
 
 export LLM_ENDPOINT_PORT=8010
 export LLM_ENDPOINT="http://${host_ip}:${LLM_ENDPOINT_PORT}"
@@ -54,3 +55,5 @@ export NEO4J_URL="bolt://${host_ip}:${NEO4J_PORT2}"
 export NEO4J_USERNAME="neo4j"
 export NEO4J_PASSWORD="neo4jtest"
 export LOGFLAG=True
+export INDEX_NAME=${INDEX_NAME:-"graph_store"}
+export LOAD_FORMAT=${LOAD_FORMAT:-"CSV"}

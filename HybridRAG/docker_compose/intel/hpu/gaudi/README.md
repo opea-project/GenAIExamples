@@ -46,7 +46,7 @@ docker compose up -d
 The HybridRAG docker images should automatically be downloaded from the `OPEA registry` and deployed on the Intel® Gaudi® Platform:
 
 ```
-[+] Running 9/9
+[+] Running 10/10
  ✔ Container redis-vector-db                Healthy                                                                           6.4s
  ✔ Container vllm-service                   Started                                                                           0.4s
  ✔ Container tei-embedding-server           Started                                                                           0.9s
@@ -54,6 +54,7 @@ The HybridRAG docker images should automatically be downloaded from the `OPEA re
  ✔ Container tei-reranking-server           Started                                                                           0.8s
  ✔ Container retriever-redis-server         Started                                                                           1.0s
  ✔ Container dataprep-redis-server          Started                                                                           6.5s
+ ✔ Container struct2graph	            Started                                                                           10.5s
  ✔ Container text2cypher-gaudi-container    Started                                                                          12.2s
  ✔ Container hybridrag-xeon-backend-server  Started                                                                          12.4s
 ```
@@ -80,6 +81,7 @@ CONTAINER ID   IMAGE                                                            
 a9286abd0015   opea/hybridrag:latest                                                                       "python hybridrag.py"    15 hours ago   Up 15 hours             0.0.0.0:8888->8888/tcp, :::8888->8888/tcp                                                        hybridrag-xeon-backend-server
 8477b154dc72   opea/text2cypher-gaudi:latest                                                               "/bin/sh -c 'bash ru…"   15 hours ago   Up 15 hours             0.0.0.0:11801->9097/tcp, [::]:11801->9097/tcp                                                    text2cypher-gaudi-container
 688e01a431fa   opea/dataprep:latest                                                                        "sh -c 'python $( [ …"   15 hours ago   Up 15 hours             0.0.0.0:6007->5000/tcp, [::]:6007->5000/tcp                                                      dataprep-redis-server
+654aghwe45nm   opea/struct2graph:latest                                                                    "sh -c 'python $( [ …"   15 hours ago   Up 15 hours             0.0.0.0:8090->8090/tcp, [::]:8090->8090/tcp                                                      struct2graph
 54f574fe54bb   opea/retriever:latest                                                                       "python opea_retriev…"   15 hours ago   Up 15 hours             0.0.0.0:7000->7000/tcp, :::7000->7000/tcp                                                        retriever-redis-server
 5028eb66617c   ghcr.io/huggingface/text-embeddings-inference:cpu-1.6                                       "text-embeddings-rou…"   15 hours ago   Up 15 hours             0.0.0.0:8808->80/tcp, [::]:8808->80/tcp                                                          tei-reranking-server
 a9dbf8a13365   opea/vllm:latest                                                                            "python3 -m vllm.ent…"   15 hours ago   Up 15 hours (healthy)   0.0.0.0:9009->80/tcp, [::]:9009->80/tcp                                                          vllm-service
@@ -93,7 +95,7 @@ a9dbf8a13365   opea/vllm:latest                                                 
 Once the HybridRAG services are running, run data ingestion. The following command is ingesting unstructure data:
 
 ```bash
-cd GenAIExamples/HybridRAG/tests
+cd GenAIExamples/HybridRAG/tests/data
 curl -X POST -H "Content-Type: multipart/form-data" \
     -F "files=@./Diabetes.txt" \
     -F "files=@./Acne_Vulgaris.txt" \
@@ -128,6 +130,19 @@ If the graph database is already populated, you can skip the knowledge graph gen
 
 ```bash
 export refresh_db='False'
+```
+Alternatively, you can also use the struct2graph microsservice for ingesting structured data (json, csv).
+
+```bash
+cd GenAIExamples/HybridRAG/tests/data
+curl -X POST http://${host_ip}:8090/v1/struct2graph \
+-H "accept: application/json" \
+-H "Content-Type: application/json" \
+-d '{
+  "input_text": "",
+  "task": "Index",
+  "cypher_cmd": "LOAD CSV WITH HEADERS FROM 'file:///diseases.csv' AS row CREATE (:DiseaseInfo {Disease: row.Disease, Medications: row.Medications, Treatments: row.Treatments, HomeRemedies: row.HomeRemedies, Symptoms: row.Symptoms})"
+}'
 ```
 
 Now test the pipeline using the following command:

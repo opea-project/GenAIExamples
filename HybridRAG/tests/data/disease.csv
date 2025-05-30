@@ -1,0 +1,359 @@
+Disease,Medications,Treatments,HomeRemedies,Symptoms
+Chronic Fatigue Syndrome,Antidepressants,Cognitive Behavioral Therapy (CBT),Low-salt diet,Severe exhaustion
+Chronic Fatigue Syndrome,Immunomodulatory agents,Graded Exercise Therapy (GET),Stress management techniques,Cognitive dysfunction
+Chronic Fatigue Syndrome,Corticosteroids,Yoga therapy like isometric yoga and  yoga nidra,Ginger tea,Inability to recover energy after rest
+Chronic Fatigue Syndrome,Rintatolimid,Immunoglobulin therapy,Regular exercise,Impairment in daily activities
+Lupus,Hydroxychloroquine,Phototherapy,Sun protection,Joint pain and swelling
+Lupus,Corticosteroids,Immunosuppressive therapy,Stress reduction,Fatigue
+Lupus,Belimumab,Physical therapy,Balanced diet,Skin rashes
+Lupus,NSAIDs,Cognitive behavioral therapy,Regular exercise,Fever
+Rheumatoid Arthritis,Methotrexate,Physical therapy,Hot/cold therapy,Joint pain and stiffness
+Rheumatoid Arthritis,"Biologics (e.g., TNF inhibitors)",Occupational therapy,Omega-3 fatty acids,Fatigue
+Rheumatoid Arthritis,Corticosteroids,Joint replacement surgery,Gentle exercise,Symmetrical joint swelling
+Rheumatoid Arthritis,NSAIDs,Cognitive behavioral therapy,Stress management,Morning stiffness
+Osteoarthritis,Acetaminophen,Physical therapy,Weight management,Joint pain
+Osteoarthritis,NSAIDs,Joint replacement surgery,Low-impact exercise,Stiffness
+Osteoarthritis,Duloxetine,Assistive devices,Hot/cold therapy,Reduced flexibility
+Osteoarthritis,Topical analgesics,Acupuncture,Glucosamine supplements,Grating sensation
+Scoliosis,Pain relievers,Bracing,Core strengthening exercises,Uneven shoulders
+Scoliosis,Muscle relaxants,Spinal fusion surgery,Yoga,Uneven waist
+Scoliosis,Steroid injections or nerve blocks,Chiropractic treatment,Postural awareness,One hip higher than the other
+Scoliosis,Nonsteroidal anti-inflammatory drugs (NSAIDs),Physical therapy,Swimming,Back pain
+Carpal Tunnel Syndrome,NSAIDs,Wrist splinting,Wrist exercises,Numbness in hand/fingers
+Carpal Tunnel Syndrome,Corticosteroid injections,Carpal tunnel release surgery,Ergonomic adjustments,Tingling sensation
+Carpal Tunnel Syndrome,Diuretics,Ultrasound therapy,Ice packs,Weakness in grip
+Carpal Tunnel Syndrome,Gabapentin,Physical therapy,Vitamin B6 supplements,Wrist pain
+Tennis Elbow,NSAIDs,Physical therapy,Rest and ice,Pain on outer part of elbow
+Tennis Elbow,Corticosteroid injections,Platelet-rich plasma injections,Compression bandage,Weakness in grip
+Tennis Elbow,Topical analgesics,Extracorporeal shock wave therapy,Eccentric exercises,Pain when lifting objects
+Tennis Elbow,Painkillers,Surgery (in severe cases),Ergonomic adjustments,Stiffness in elbow
+Gout,Colchicine,Dietary modifications,Cherry juice,Severe joint pain
+Gout,NSAIDs,Hydration therapy,Low-purine diet,Redness and swelling
+Gout,Corticosteroids,Weight management,Elevate affected limb,Warmth in affected area
+Gout,Allopurinol,Physical therapy,Apply ice packs,Limited range of motion
+Plantar Fasciitis,NSAIDs,Physical therapy,Stretching exercises,Heel pain
+Plantar Fasciitis,Corticosteroid injections,Orthotics,Ice massage,Pain worse in morning
+Plantar Fasciitis,Acetaminophen (Tylenol),Extracorporeal shock wave therapy,Night splints,Arch pain
+Plantar Fasciitis,diclofenac gel,Platelet-rich plasma injections,Supportive footwear,Difficulty walking
+Glaucoma,Prostaglandin analogs,Laser therapy,Regular exercise,Gradual vision loss
+Glaucoma,Beta blockers,Trabeculectomy,Healthy diet,Eye pain
+Glaucoma,Carbonic anhydrase inhibitors,Drainage implants,Limit caffeine intake,Blurred vision
+Glaucoma,Alpha-adrenergic agonists,Minimally invasive glaucoma surgery,Eye protection,Halos around lights
+Cataracts,N/A (surgery is primary treatment),Phacoemulsification,Quit smoking,Cloudy vision
+Cataracts,N/A (surgery is primary treatment),Extracapsular cataract extraction,Wear sunglasses,Glare sensitivity
+Cataracts,N/A (surgery is primary treatment),Femtosecond laser-assisted surgery,Improve lighting,Fading of colors
+Cataracts,N/A (surgery is primary treatment),Intraocular lens implantation,Regular eye check-ups,Double vision in one eye
+Sciatica,NSAIDs,Physical therapy,Stretching exercises,Lower back pain
+Sciatica,Muscle relaxants,Chiropractic care,Hot/cold therapy,Leg pain
+Sciatica,Corticosteroid injections,Acupuncture,Proper posture,Numbness or tingling
+Sciatica,Gabapentin,Surgery (in severe cases),Yoga,Weakness in affected leg
+Anemia,Iron supplements,Blood transfusions,Iron-rich diet,Fatigue
+Anemia,Vitamin B12 supplements,Iron infusions,Vitamin C intake,Pale skin
+Anemia,Folic acid,Erythropoiesis-stimulating agents,Cooking in cast iron pans,Shortness of breath
+Anemia,Erythropoietin,Treating underlying conditions,Avoid tea/coffee with meals,Dizziness
+Hypothyroidism,Levothyroxine,Thyroid hormone replacement therapy,Selenium-rich foods,Weight gain
+Hypothyroidism,Liothyronine,Regular thyroid function monitoring,Stress reduction techniques,Fatigue
+Hypothyroidism,Natural desiccated thyroid,Lifestyle modifications,Moderate exercise,Cold sensitivity
+Hypothyroidism,T3/T4 combination therapy,Dietary adjustments,Adequate sleep,Dry skin
+Hyperthyroidism,Methimazole,Radioactive iodine therapy,Stress management,Weight loss
+Hyperthyroidism,Propylthiouracil,Thyroidectomy,Avoiding iodine-rich foods,Rapid heartbeat
+Hyperthyroidism,Beta-blockers,Antithyroid medications,Cool compresses for eyes,Heat intolerance
+Hyperthyroidism,Potassium iodide,Regular thyroid function monitoring,Gentle exercise,Tremors
+Cushing's Syndrome,Ketoconazole,Transsphenoidal surgery,Stress reduction,Weight gain
+Cushing's Syndrome,Mitotane,Radiation therapy,Balanced diet,Round face
+Cushing's Syndrome,Mifepristone,Adrenalectomy,Regular exercise,Thin skin
+Cushing's Syndrome,Metyrapone,Gradual tapering of steroids,Adequate sleep,Muscle weakness
+Addison's Disease,Hydrocortisone,Hormone replacement therapy,Salt intake,Fatigue
+Addison's Disease,Fludrocortisone,Regular endocrine monitoring,Stress management,Weight loss
+Addison's Disease,Prednisone,Patient education,Balanced diet,Skin darkening
+Addison's Disease,DHEA supplements,Emergency steroid injections,Electrolyte balance,Low blood pressure
+Polycystic Ovary Syndrome,Metformin,Lifestyle modifications,Regular exercise,Irregular periods
+Polycystic Ovary Syndrome,Birth control pills,Weight management,Low-glycemic diet,Acne
+Polycystic Ovary Syndrome,Spironolactone,Fertility treatments,Stress reduction,Excess hair growth
+Polycystic Ovary Syndrome,Clomiphene,Laser hair removal,Adequate sleep,Weight gain
+Endometriosis,Hormonal contraceptives,Laparoscopic surgery,Heat therapy,Pelvic pain
+Endometriosis,GnRH agonists,Hormonal therapy,Anti-inflammatory diet,Heavy menstrual bleeding
+Endometriosis,Progestin therapy,Pain management,Yoga and stretching,Painful intercourse
+Endometriosis,NSAIDs,Fertility treatments,Stress reduction,Fatigue
+Fibromyalgia,Pregabalin,Cognitive behavioral therapy,Gentle exercise,Widespread pain
+Fibromyalgia,Duloxetine,Physical therapy,Stress management,Fatigue
+Fibromyalgia,Milnacipran,Acupuncture,Adequate sleep,Sleep disturbances
+Fibromyalgia,Amitriptyline,Pain management,Relaxation techniques,Cognitive difficulties
+Sleep Apnea,Acetazolamide,CPAP therapy,Weight loss,Loud snoring
+Sleep Apnea,Modafinil,Oral appliances,Sleeping on side,Gasping during sleep
+Sleep Apnea,Armodafinil,Tracheostomy,Avoiding alcohol,Excessive daytime sleepiness
+Sleep Apnea,Solriamfetol,Uvulopalatopharyngoplasty,Elevating head of bed,Morning headaches
+Insomnia,Zolpidem,Cognitive Behavioral Therapy,Relaxation techniques,Difficulty falling asleep
+Insomnia,Eszopiclone,Sleep restriction therapy,Consistent sleep schedule,Waking up during the night
+Insomnia,Ramelteon,Stimulus control therapy,Avoiding screens before bed,Daytime fatigue
+Insomnia,Doxepin,Light therapy,Regular exercise,Irritability
+Narcolepsy,Modafinil,Scheduled naps,Regular sleep schedule,Excessive daytime sleepiness
+Narcolepsy,Sodium oxybate,Cognitive Behavioral Therapy,Avoiding heavy meals,Sudden loss of muscle tone
+Narcolepsy,Pitolisant,Lifestyle modifications,Regular exercise,Sleep paralysis
+Narcolepsy,Solriamfetol,Support groups,Stress management,Hallucinations when falling asleep
+Restless Leg Syndrome,Pramipexole,Iron supplementation,Leg massages,Uncomfortable leg sensations
+Restless Leg Syndrome,Ropinirole,Pneumatic compression,Hot/cold therapy,Urge to move legs
+Restless Leg Syndrome,Gabapentin,Lifestyle modifications,Avoiding caffeine,Symptoms worsen at night
+Restless Leg Syndrome,Rotigotine,Exercise programs,Relaxation techniques,Sleep disturbances
+Schizophrenia,Risperidone,Cognitive Behavioral Therapy,Stress management,Hallucinations
+Schizophrenia,Olanzapine,Family therapy,Regular sleep schedule,Delusions
+Schizophrenia,Clozapine,Social skills training,Avoiding substance use,Disorganized speech
+Schizophrenia,Aripiprazole,Vocational rehabilitation,Healthy diet,Social withdrawal
+Bipolar Disorder,Lithium,Psychotherapy,Stress reduction,Manic episodes
+Bipolar Disorder,Valproic acid,Cognitive Behavioral Therapy,Regular sleep schedule,Depressive episodes
+Bipolar Disorder,Lamotrigine,Electroconvulsive therapy,Avoiding alcohol,Rapid mood swings
+Bipolar Disorder,Quetiapine,Family-focused therapy,Exercise,Changes in energy levels
+Obsessive-Compulsive Disorder,Fluoxetine,Exposure and Response Prevention,Mindfulness meditation,Intrusive thoughts
+Obsessive-Compulsive Disorder,Sertraline,Cognitive Behavioral Therapy,Relaxation techniques,Repetitive behaviors
+Obsessive-Compulsive Disorder,Clomipramine,Acceptance and Commitment Therapy,Regular exercise,Excessive cleaning
+Obsessive-Compulsive Disorder,Fluvoxamine,Group therapy,Stress management,Checking rituals
+Post-Traumatic Stress Disorder,Sertraline,Cognitive Processing Therapy,Mindfulness practices,Flashbacks
+Post-Traumatic Stress Disorder,Paroxetine,Prolonged Exposure Therapy,Relaxation techniques,Nightmares
+Post-Traumatic Stress Disorder,Fluoxetine,Eye Movement Desensitization and Reprocessing,Regular exercise,Hypervigilance
+Post-Traumatic Stress Disorder,Venlafaxine,Group therapy,Journaling,Avoidance behaviors
+Attention Deficit Hyperactivity Disorder,Methylphenidate,Cognitive Behavioral Therapy,Organizational strategies,Inattention
+Attention Deficit Hyperactivity Disorder,Amphetamine,Behavioral therapy,Regular exercise,Hyperactivity
+Attention Deficit Hyperactivity Disorder,Atomoxetine,Parent training,Consistent routines,Impulsivity
+Attention Deficit Hyperactivity Disorder,Guanfacine,Social skills training,Healthy diet,Difficulty focusing
+Autism Spectrum Disorder,Risperidone,Applied Behavior Analysis,Structured routines,Social communication difficulties
+Autism Spectrum Disorder,Aripiprazole,Speech therapy,Visual schedules,Repetitive behaviors
+Autism Spectrum Disorder,Fluoxetine,Occupational therapy,Sensory-friendly environment,Sensory sensitivities
+Autism Spectrum Disorder,Methylphenidate,Social skills training,Regular exercise,Restricted interests
+Epilepsy,Carbamazepine,Vagus nerve stimulation,Ketogenic diet,Seizures
+Epilepsy,Valproic acid,Responsive neurostimulation,Stress management,Loss of consciousness
+Epilepsy,Levetiracetam,Epilepsy surgery,Regular sleep schedule,Confusion
+Epilepsy,Lamotrigine,Ketogenic diet,Avoiding triggers,Muscle jerks
+Heart Disease,Statins,Angioplasty,Regular exercise,Chest pain
+Heart Disease,Beta-blockers,Coronary artery bypass grafting,Heart-healthy diet,Shortness of breath
+Heart Disease,ACE inhibitors,Cardiac rehabilitation,Stress management,Irregular heartbeat
+Heart Disease,Antiplatelet agents,Implantable cardioverter-defibrillator,Quitting smoking,Fatigue
+Stroke,Alteplase,Thrombectomy,Blood pressure control,Sudden numbness
+Stroke,Aspirin,Carotid endarterectomy,Regular exercise,Speech difficulties
+Stroke,Clopidogrel,Rehabilitation therapy,Healthy diet,Vision problems
+Stroke,Warfarin,Speech therapy,Stress management,Severe headache
+Atherosclerosis,Statins,Angioplasty,Heart-healthy diet,Chest pain
+Atherosclerosis,Antiplatelet drugs,Coronary artery bypass,Regular exercise,Shortness of breath
+Atherosclerosis,ACE inhibitors,Endarterectomy,Stress management,Leg pain
+Atherosclerosis,Beta-blockers,Lifestyle modifications,Quitting smoking,Fatigue
+Arrhythmia,Antiarrhythmic drugs,Cardioversion,Deep breathing exercises,Palpitations
+Arrhythmia,Beta-blockers,Catheter ablation,Reducing caffeine intake,Dizziness
+Arrhythmia,Calcium channel blockers,Pacemaker implantation,Yoga and meditation,Fainting
+Arrhythmia,Anticoagulants,Implantable cardioverter-defibrillator,Avoiding triggers,Shortness of breath
+Varicose Veins,Diosmin,Sclerotherapy,Compression stockings,"Visible, swollen veins"
+Varicose Veins,Hesperidin,Laser treatment,Elevating legs,Aching or heavy legs
+Varicose Veins,Ibuprofen,Radiofrequency ablation,Regular exercise,Skin discoloration
+Varicose Veins,Aspirin,Vein stripping,Avoiding prolonged standing,Itching around veins
+Deep Vein Thrombosis,Heparin,Thrombolysis,Compression stockings,Swelling in affected limb
+Deep Vein Thrombosis,Warfarin,Inferior vena cava filter,Elevating legs,Pain or tenderness
+Deep Vein Thrombosis,Rivaroxaban,Surgical thrombectomy,Regular movement,Warmth in affected area
+Deep Vein Thrombosis,Apixaban,Anticoagulation therapy,Hydration,Redness of skin
+Pulmonary Embolism,Heparin,Thrombolytic therapy,Deep breathing exercises,Sudden shortness of breath
+Pulmonary Embolism,Warfarin,Embolectomy,Staying hydrated,Chest pain
+Pulmonary Embolism,Rivaroxaban,Inferior vena cava filter,Gradual mobilization,Rapid heartbeat
+Pulmonary Embolism,Enoxaparin,Oxygen therapy,Compression stockings,Cough with bloody sputum
+Tuberculosis,Isoniazid,Directly observed therapy,Proper nutrition,Persistent cough
+Tuberculosis,Rifampin,Isolation precautions,Rest,Night sweats
+Tuberculosis,Ethambutol,Pulmonary rehabilitation,Avoiding alcohol,Weight loss
+Tuberculosis,Pyrazinamide,Surgical intervention,Quitting smoking,Fatigue
+Malaria,Chloroquine,Artemisinin-based combination therapy,Mosquito nets,Fever and chills
+Malaria,Artemisinin,Primaquine therapy,Insect repellents,Headache
+Malaria,Atovaquone-proguanil,Supportive care,Staying hydrated,Muscle aches
+Malaria,Mefloquine,Preventive medications,Rest,Fatigue
+Dengue Fever,Acetaminophen,Fluid replacement therapy,Rest,High fever
+Dengue Fever,NSAIDs (with caution),Supportive care,Staying hydrated,Severe headache
+Dengue Fever,Antihistamines,Blood transfusion (severe cases),Mosquito prevention,Joint and muscle pain
+Dengue Fever,Proton pump inhibitors,Platelet transfusion,Cool sponge baths,Skin rash
+Zika Virus,Acetaminophen,Supportive care,Rest,Mild fever
+Zika Virus,Antihistamines,Hydration therapy,Staying hydrated,Skin rash
+Zika Virus,NSAIDs (with caution),Symptomatic treatment,Mosquito prevention,Joint pain
+Zika Virus,Antiemetics,Monitoring (pregnant women),Cool compresses,Conjunctivitis
+Lyme Disease,Doxycycline,Antibiotic therapy,Tick prevention,Bull's-eye rash
+Lyme Disease,Amoxicillin,Symptomatic treatment,Rest,Fever
+Lyme Disease,Cefuroxime,Cognitive behavioral therapy,Stress reduction,Joint pain
+Lyme Disease,Azithromycin,Physical therapy,Healthy diet,Fatigue
+Mumps,Acetaminophen,Supportive care,Rest,Swollen salivary glands
+Mumps,Ibuprofen,Hydration therapy,Cold or warm compresses,Fever
+Mumps,compress ,Isolation,Soft foods diet,Headache
+Mumps,fluids,Vaccination (prevention),Gargling with salt water,Muscle aches
+Rubella,Acetaminophen,Supportive care,Rest,Mild fever
+Rubella,NSAIDs,Isolation,Staying hydrated,Skin rash
+Rubella,fluids,Vaccination (prevention),Cool compresses,Swollen lymph nodes
+Rubella,Tylenol,Monitoring (pregnant women),Humidifier use,Joint pain
+Measles,Acetaminophen,Supportive care,Rest,High fever
+Measles,Vitamin A,Isolation,Staying hydrated,Red blotchy skin rash
+Measles,Antibiotics (for complications),Vaccination (prevention),Humidifier use,Cough
+Measles,Ribavirin (severe cases),Immune globulin (post-exposure),Dim lighting,watery eyes and redness
+Chickenpox,Acyclovir,Supportive care,Calamine lotion,"Itchy, blister-like rash"
+Chickenpox,Antihistamines,Isolation,Oatmeal baths,Fever
+Chickenpox,Acetaminophen,Vaccination (prevention),Cool compresses,Fatigue
+Chickenpox,Immune globulin (high-risk),Symptomatic treatment,Avoiding scratching,Loss of appetite
+Shingles,Acyclovir,Antiviral therapy,Cool compresses,Painful skin rash
+Shingles,Valacyclovir,Pain management,Calamine lotion,Burning sensation
+Shingles,Famciclovir,Vaccination (prevention),Oatmeal baths,Itching
+Shingles,Gabapentin,Symptomatic treatment,Stress reduction,Fever
+Human Papillomavirus,Imiquimod,Cryotherapy,Boosting immune system,Genital warts
+Human Papillomavirus,Podofilox,Electrocautery,Proper hygiene,Cervical changes
+Human Papillomavirus,Sinecatechins,Surgical excision,Avoiding tobacco,Oral or throat lesions
+Human Papillomavirus,Trichloroacetic acid,Vaccination (prevention),Safe sex practices,Usually asymptomatic
+Herpes Simplex Virus,Acyclovir,Antiviral therapy,Lysine supplements,Painful blisters
+Herpes Simplex Virus,Valacyclovir,Supportive care,Cold compresses,Fever
+Herpes Simplex Virus,Famciclovir,Pain management,Stress reduction,Muscle aches
+Herpes Simplex Virus,Penciclovir (topical),Suppressive therapy,Proper hygiene,Swollen lymph nodes
+Cold,Acetaminophen,Rest,Hydration,Runny nose
+Cold,Ibuprofen,Nasal decongestants,Saltwater gargle,Sore throat
+Cold,Pseudoephedrine,Cough suppressants,Honey and lemon tea,Cough
+Cold,Dextromethorphan,Zinc supplements,Steam inhalation,Congestion
+Influenza,Oseltamivir,Antiviral medications,Rest,High fever
+Influenza,Zanamivir,Supportive care,Hydration,Body aches
+Influenza,Baloxavir marboxil,Isolation,Warm compresses,Fatigue
+Influenza,Peramivir,Vaccination (prevention),Chicken soup,Dry cough
+COVID-19,Remdesivir,Oxygen therapy,Isolation,Fever
+COVID-20,Dexamethasone,Monoclonal antibody treatment,Rest,Dry cough
+COVID-21,Tocilizumab,Prone positioning,Hydration,Loss of taste/smell
+COVID-22,Baricitinib,Vaccination (prevention),Monitoring oxygen levels,Shortness of breath
+Allergies,Cetirizine,Immunotherapy,HEPA air filters,Sneezing
+Allergies,Loratadine,Nasal corticosteroids,Nasal irrigation,Itchy eyes
+Allergies,Fexofenadine,Epinephrine (severe cases),Avoiding triggers,Runny nose
+Allergies,Montelukast,Allergy testing,Local honey consumption,Skin rash
+Hypertension,Lisinopril,Lifestyle modifications,Reducing salt intake,High blood pressure
+Hypertension,Amlodipine,DASH diet,Regular exercise,Headaches
+Hypertension,Metoprolol,Stress management,Limiting alcohol,Shortness of breath
+Hypertension,Hydrochlorothiazide,Weight loss,Meditation,Nosebleeds
+Type 2 Diabetes,Metformin,Blood glucose monitoring,Regular exercise,Increased thirst
+Type 2 Diabetes,Gliclazide,Insulin therapy,Low-carb diet,Frequent urination
+Type 2 Diabetes,Sitagliptin,Diabetes education,Weight management,Blurred vision
+Type 2 Diabetes,Empagliflozin,Regular check-ups,Stress reduction,Slow wound healing
+Asthma,Albuterol,Inhaler technique training,Avoiding triggers,Wheezing
+Asthma,Fluticasone,Pulmonary function tests,Breathing exercises,Shortness of breath
+Asthma,Montelukast,Allergy management,Air purifiers,Chest tightness
+Asthma,Tiotropium,Asthma action plan,Steam inhalation,Coughing
+Arthritis,Ibuprofen,Physical therapy,Hot/cold therapy,Joint pain
+Arthritis,Naproxen,Occupational therapy,Gentle exercise,Stiffness
+Arthritis,Methotrexate,Joint injections,Anti-inflammatory diet,Swelling
+Arthritis,Adalimumab,Joint replacement surgery,Omega-3 supplements,Reduced range of motion
+Obesity,Orlistat,Bariatric surgery,Calorie-controlled diet,Excess body fat
+Obesity,Liraglutide,Behavioral therapy,Regular exercise,Shortness of breath
+Obesity,Phentermine,Nutritional counseling,Portion control,Joint pain
+Obesity,Naltrexone-bupropion,Support groups,Stress management,Sleep apnea
+Depressive Disorder,Sertraline,Cognitive Behavioral Therapy,Regular exercise,Persistent sadness
+Depressive Disorder,Fluoxetine,Interpersonal therapy,Mindfulness meditation,Loss of interest
+Depressive Disorder,Bupropion,Electroconvulsive therapy,Healthy sleep habits,Fatigue
+Depressive Disorder,Venlafaxine,Light therapy,Social connections,Changes in appetite
+Anxiety,Escitalopram,Cognitive Behavioral Therapy,Deep breathing exercises,Excessive worry
+Anxiety,Alprazolam,Exposure therapy,Progressive muscle relaxation,Restlessness
+Anxiety,Buspirone,Mindfulness-based therapy,Regular exercise,Sleep disturbances
+Anxiety,Venlafaxine,Support groups,Limiting caffeine,Panic attacks
+Migraine,Sumatriptan,Botox injections,Identifying triggers,Severe headache
+Migraine,Propranolol,Acupuncture,Cold compresses,Sensitivity to light/sound
+Migraine,Topiramate,Biofeedback,Stress management,Nausea
+Migraine,Erenumab,Nerve stimulation,Adequate sleep,Visual disturbances
+Gastroesophageal Reflux Disease,Omeprazole,Lifestyle modifications,Elevating head of bed,Heartburn
+Gastroesophageal Reflux Disease,Famotidine,Endoscopy,Avoiding trigger foods,Regurgitation
+Gastroesophageal Reflux Disease,Ranitidine,Fundoplication surgery,Eating smaller meals,Difficulty swallowing
+Gastroesophageal Reflux Disease,Sucralfate,Weight management,Quitting smoking,Chest pain
+Acne Vulgaris,Benzoyl peroxide,Topical retinoids,Tea tree oil,Whiteheads
+Acne Vulgaris,Salicylic acid,Chemical peels,Honey masks,Blackheads
+Acne Vulgaris,Isotretinoin,Light therapy,Green tea application,Inflammatory papules
+Acne Vulgaris,Oral antibiotics,Extraction,Zinc supplements,Cystic lesions
+Eczema,Topical corticosteroids,Phototherapy,Moisturizing,Itchy skin
+Eczema,Tacrolimus,Wet wrap therapy,Oatmeal baths,"Dry, scaly patches"
+Eczema,Dupilumab,Antihistamines,Avoiding triggers,Redness
+Eczema,Crisaborole,Immunosuppressants,Cool compresses,Skin thickening
+Psoriasis,Methotrexate,Phototherapy,Aloe vera,"Red, scaly patches"
+Psoriasis,Adalimumab,Topical corticosteroids,Dead Sea salt baths,Itching
+Psoriasis,Apremilast,Excimer laser,Tea tree oil,Silvery scales
+Psoriasis,Secukinumab,Systemic medications,Stress reduction,Joint pain
+Osteoporosis,Alendronate,Weight-bearing exercises,Calcium-rich diet,Bone fractures
+Osteoporosis,Teriparatide,Bone density scans,Vitamin D supplements,Height loss
+Osteoporosis,Denosumab,Fall prevention,Quitting smoking,Back pain
+Osteoporosis,Raloxifene,Hormone therapy,Weight management,Stooped posture
+Alzheimer's Disease,Donepezil,Cognitive stimulation therapy,Mental exercises,Memory loss
+Alzheimer's Disease,Memantine,Occupational therapy,Social engagement,Confusion
+Alzheimer's Disease,Rivastigmine,Behavioral management,Regular exercise,Mood changes
+Alzheimer's Disease,Galantamine,Caregiver support,Healthy diet,Difficulty with daily tasks
+Parkinson's Disease,Levodopa,Deep brain stimulation,Regular exercise,Tremors
+Parkinson's Disease,Carbidopa,Physical therapy,Speech therapy exercises,Muscle rigidity
+Parkinson's Disease,Pramipexole,Occupational therapy,Yoga,Bradykinesia
+Parkinson's Disease,Rasagiline,Speech therapy,Meditation,Balance problems
+Multiple Sclerosis,Interferon beta-1a,Plasma exchange,Stress management,Fatigue
+Multiple Sclerosis,Glatiramer acetate,Physical therapy,Cooling techniques,Vision problems
+Multiple Sclerosis,Ocrelizumab,Occupational therapy,Yoga,Numbness or tingling
+Multiple Sclerosis,Fingolimod,Cognitive rehabilitation,Healthy diet,Balance issues
+Chronic Obstructive Pulmonary Disease,Albuterol,Pulmonary rehabilitation,Quitting smoking,Shortness of breath
+Chronic Obstructive Pulmonary Disease,Tiotropium,Oxygen therapy,Breathing exercises,Chronic cough
+Chronic Obstructive Pulmonary Disease,Fluticasone,Lung volume reduction surgery,Avoiding irritants,Wheezing
+Chronic Obstructive Pulmonary Disease,Roflumilast,Vaccinations,Staying hydrated,Chest tightness
+Bronchitis,Dextromethorphan,Rest,Humidifier use,Persistent cough
+Bronchitis,Guaifenesin,Hydration,Honey and lemon tea,Mucus production
+Bronchitis,Albuterol,Chest physiotherapy,Steam inhalation,Chest discomfort
+Bronchitis,Antibiotics (if bacterial),Oxygen therapy,Avoiding irritants,Fatigue
+Pneumonia,Amoxicillin,Oxygen therapy,Rest,Fever
+Pneumonia,Azithromycin,Chest physiotherapy,Staying hydrated,Cough with phlegm
+Pneumonia,Levofloxacin,Ventilator support (severe cases),Deep breathing exercises,Chest pain
+Pneumonia,Ceftriaxone,Pleural fluid drainage,Healthy diet,Shortness of breath
+Sinusitis,Amoxicillin,Nasal corticosteroids,Nasal irrigation,Facial pain/pressure
+Sinusitis,Pseudoephedrine,Endoscopic sinus surgery,Steam inhalation,Nasal congestion
+Sinusitis,Fluticasone,Balloon sinuplasty,Warm compresses,Thick nasal discharge
+Sinusitis,Montelukast,Allergy management,Hydration,Reduced sense of smell
+Tonsillitis,Penicillin,Tonsillectomy,Saltwater gargle,Sore throat
+Tonsillitis,Amoxicillin,Rest,Honey and lemon tea,Difficulty swallowing
+Tonsillitis,Erythromycin,Hydration,Warm compresses,Swollen tonsils
+Tonsillitis,Ibuprofen,Throat lozenges,Garlic tea,Fever
+Otitis,Amoxicillin,Ear tubes,Warm compress,Ear pain
+Otitis,Cefuroxime,Myringotomy,Garlic oil drops,Fever
+Otitis,Ciprofloxacin,Tympanocentesis,Apple cider vinegar rinse,Hearing loss
+Otitis,Hydrocortisone drops,Pain management,Olive oil drops,Drainage from ear
+Conjunctivitis,Erythromycin ointment,Artificial tears,Warm compress,Red eyes
+Conjunctivitis,Tobramycin drops,Cold compress,Chamomile tea bags,Itchy eyes
+Conjunctivitis,Olopatadine drops,Hygiene measures,Honey eye drops,Discharge
+Conjunctivitis,Prednisolone drops,Allergy management,Turmeric paste,Light sensitivity
+Urinary Tract Infection,Nitrofurantoin,Hydration,Cranberry juice,Frequent urination
+Urinary Tract Infection,Trimethoprim,Urinalysis,D-mannose supplements,Burning sensation
+Urinary Tract Infection,Ciprofloxacin,Urine culture,Probiotics,Lower abdominal pain
+Urinary Tract Infection,Fosfomycin,Antibiotic sensitivity testing,Increased water intake,Cloudy urine
+Kidney Stones,Tamsulosin,Extracorporeal shock wave lithotripsy,Lemon juice and olive oil,Severe pain in side and back
+Kidney Stones,Allopurinol,Ureteroscopy,Increased water intake,Nausea and vomiting
+Kidney Stones,Potassium citrate,Percutaneous nephrolithotomy,Apple cider vinegar,Blood in urine
+Kidney Stones,Diuretics,Dietary modifications,Basil juice,Frequent urination
+Gallstones,Ursodeoxycholic acid,Cholecystectomy,Apple juice and apple cider vinegar,Upper right abdominal pain
+Gallstones,NSAIDs,Lithotripsy,Lemon juice,Nausea
+Gallstones,Simvastatin,Oral dissolution therapy,Peppermint tea,Vomiting
+Gallstones,Morphine (for pain),Endoscopic retrograde cholangiopancreatography,Turmeric,Fever
+Irritable Bowel Syndrome,Loperamide,Dietary modifications,Peppermint oil,Abdominal pain
+Irritable Bowel Syndrome,Dicyclomine,Stress management,Probiotics,Bloating
+Irritable Bowel Syndrome,Linaclotide,Cognitive behavioral therapy,Ginger tea,Diarrhea or constipation
+Irritable Bowel Syndrome,Rifaximin,Low FODMAP diet,Yoga,Changes in bowel habits
+Crohn's Disease,Mesalamine,Immunosuppressive therapy,Turmeric,Abdominal pain
+Crohn's Disease,Prednisone,Bowel resection,Probiotics,Diarrhea
+Crohn's Disease,Infliximab,Strictureplasty,Omega-3 fatty acids,Weight loss
+Crohn's Disease,Azathioprine,Fistula repair,Aloe vera juice,Fatigue
+Ulcerative Colitis,Sulfasalazine,Immunosuppressive therapy,Probiotics,Bloody diarrhea
+Ulcerative Colitis,Mesalamine,Colectomy,Turmeric,Abdominal pain
+Ulcerative Colitis,Infliximab,J-pouch surgery,Boswellia,Urgency to defecate
+Ulcerative Colitis,Vedolizumab,Dietary modifications,Aloe vera juice,Fatigue
+Celiac Disease,Vitamin and mineral supplements,Gluten-free diet,Probiotics,Diarrhea
+Celiac Disease,Prednisone (in severe cases),Nutritional counseling,Bone broth,Abdominal pain
+Celiac Disease,Budesonide,Monitoring for complications,Digestive enzymes,Weight loss
+Celiac Disease,Azathioprine,Regular follow-ups,Aloe vera juice,Fatigue
+Hepatitis,Entecavir (for Hepatitis B),Antiviral therapy,Milk thistle,Jaundice
+Hepatitis,Sofosbuvir (for Hepatitis C),Liver function monitoring,Turmeric,Fatigue
+Hepatitis,Interferon alfa,Hepatitis A and B vaccination,Garlic,Abdominal pain
+Hepatitis,Ribavirin,Lifestyle modifications,Licorice root,Loss of appetite
+Myopia,Atropine eye drops,"Glasses, Contact lenses, Orthokeratology","Eye exercises, Outdoor time, Limiting screen time","Blurry distant vision, Squinting, Eye strain"
+Hyperopia,Cycloplegic eye drops,"Glasses, Contact lenses, LASIK surgery","Eye exercises, Proper lighting, Regular breaks","Blurry close vision, Headaches, Eye strain"
+Astigmatism,Cyclopentolate eye drops,"Glasses, Toric contact lenses, LASIK surgery","Eye massage, Reading exercises, Vision breaks","Blurry vision at all distances, Headaches, Squinting"
+Amblyopia,Atropine eye drops,"Patching, Vision therapy, Corrective lenses","Video games for lazy eye, Pencil push-ups","Poor vision in one eye, Eye turning, Depth perception issues"
+Strabismus,Botulinum toxin injections,"Eye muscle surgery, Vision therapy, Prism glasses","Pencil push-ups, Brock string exercises","Crossed eyes, Double vision, Poor depth perception"
+Tinnitus,"Antidepressants, Anxiolytics","Sound therapy, Cognitive behavioral therapy","White noise machines, Relaxation techniques","Ringing in ears, Buzzing sounds, Difficulty concentrating"
+Meniere's Disease,"Diuretics, Anti-vertigo medications","Vestibular rehabilitation, Pressure pulse treatment","Low-salt diet, Avoiding triggers, Stress management","Vertigo, Hearing loss, Tinnitus, Fullness in ear"
+Vertigo,"Antihistamines, Anti-nausea medications","Vestibular rehabilitation, Canalith repositioning","Head exercises, Avoiding sudden movements","Spinning sensation, Nausea, Balance problems"
+Stroke,"Anticoagulants, Thrombolytics","Clot removal procedures, Rehabilitation therapy","Blood pressure management, Healthy diet","Sudden numbness, Speech difficulty, Severe headache"
+Pulmonary Embolism,"Anticoagulants, Thrombolytics","Vena cava filter, Embolectomy","Compression stockings, Regular movement","Shortness of breath, Chest pain, Rapid heartbeat"
+Cirrhosis,"Diuretics, Antibiotics, Ursodiol, Beta-blockers","Liver transplant, Endoscopic procedures, Fluid drainage","Low-sodium diet, Avoiding alcohol, Eating a healthy diet, Limiting over-the-counter medicines","Fatigue, Weakness, Loss of appetite, Swelling in legs"
+Appendicitis,"Antibiotics, Pain relievers, Anti-nausea medications","Appendectomy, Laparoscopic surgery","Rest, Avoiding certain foods, Drinking fluids, Light stretching","Abdominal pain, Nausea, Fever, Loss of appetite"
+Peptic Ulcer,"Proton pump inhibitors, H2 blockers, Antibiotics, Cytoprotective agents","Endoscopy, Surgery for complications","Avoiding trigger foods, Eating smaller meals, Stress reduction, Limiting alcohol","Burning stomach pain, Bloating, Nausea, Intolerance to fatty foods"
+Gout,"Colchicine, NSAIDs, Corticosteroids, Allopurinol","Joint fluid aspiration, Dietary changes","Cherry juice, Ice packs, Elevating affected joint, Staying hydrated","Severe joint pain, Swelling, Redness, Limited range of motion"
+Plantar Fasciitis,"NSAIDs, Corticosteroid injections","Physical therapy, Orthotics, Extracorporeal shock wave therapy","Stretching exercises, Ice massage, Wearing supportive shoes, Night splints","Heel pain, Arch pain, Difficulty walking, Pain worse in morning"
+Sciatica,"NSAIDs, Muscle relaxants, Anticonvulsants, Opioids","Physical therapy, Chiropractic care, Surgery in severe cases","Stretching exercises, Hot/cold therapy, Yoga, Maintaining good posture","Lower back pain, Leg pain, Numbness, Weakness in affected leg"
+Macular Degeneration,"Anti-VEGF drugs, Photodynamic therapy drugs","Laser therapy, Photodynamic therapy, Injections","Eating a diet rich in antioxidants, Quitting smoking, Regular exercise, Wearing sunglasses","Blurred vision, Dark areas in central vision, Difficulty recognizing faces"
+Retinopathy,"Anti-VEGF drugs, Corticosteroids","Laser photocoagulation, Vitrectomy","Managing blood sugar levels, Controlling blood pressure, Regular eye exams, Quitting smoking","Blurred vision, Dark or empty areas in vision, Difficulty seeing colors, Vision loss"
