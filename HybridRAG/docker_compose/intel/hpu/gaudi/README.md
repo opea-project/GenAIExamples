@@ -131,6 +131,7 @@ If the graph database is already populated, you can skip the knowledge graph gen
 ```bash
 export refresh_db='False'
 ```
+
 Alternatively, you can also use the struct2graph microservice for ingesting structured data (json, csv).
 
 ```bash
