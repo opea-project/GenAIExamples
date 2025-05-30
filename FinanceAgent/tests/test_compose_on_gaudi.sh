@@ -17,7 +17,7 @@ export HTTPS_PROXY="${https_proxy}"
 
 # VLLM configuration
 MODEL=meta-llama/Llama-3.3-70B-Instruct
-export VLLM_PORT="${VLLM_PORT:-8086}" 
+export VLLM_PORT="${VLLM_PORT:-8086}"
 
 # export HF_CACHE_DIR="${HF_CACHE_DIR:-"./data"}"
 export HF_CACHE_DIR=${model_cache:-"./data2/huggingface"}

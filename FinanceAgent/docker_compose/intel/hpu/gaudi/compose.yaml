@@ -118,7 +118,7 @@ services:
       REDIS_URL_KV: ${REDIS_URL_KV}
       TEI_EMBEDDING_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
       LLM_ENDPOINT: ${LLM_ENDPOINT}
-      LLM_MODEL: ${LLM_MODEL_ID}      
+      LLM_MODEL: ${LLM_MODEL_ID}
       HUGGINGFACEHUB_API_TOKEN: ${HF_TOKEN}
       HF_TOKEN: ${HF_TOKEN}
       LOGFLAG: true
@@ -215,5 +215,3 @@ services:
     ports:
       - "5175:8080"
     ipc: host
-
-
