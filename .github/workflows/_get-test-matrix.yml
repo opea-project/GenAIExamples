@@ -5,19 +5,15 @@
 name: Get Test Matrix
 permissions:
   actions: read
-  attestations: read
+  contents: read
   checks: read
   deployments: read
-  discussions: read
   issues: read
-  models: read
   packages: read
   pages: read
   pull-requests: read
-  repository-projects: read
   statuses: read
   security-events: read
-  id-token: read
 on:
   workflow_call:
     inputs:
