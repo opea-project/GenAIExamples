@@ -55,8 +55,8 @@ services:
     command: --model ${GURADRAILS_MODEL_ID} --tensor-parallel-size ${NUM_CARDS} --host 0.0.0.0 --port 80 --block-size 128 --max-num-seqs 256 --max-seq-len-to-capture 2048
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://$host_ip:8088/health || exit 1"]
-      interval: 10s
-      timeout: 10s
+      interval: 100s
+      timeout: 100s
       retries: 150
   guardrails:
     image: ${REGISTRY:-opea}/guardrails:${TAG:-latest}

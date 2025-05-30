@@ -131,8 +131,8 @@ services:
       PT_HPU_ENABLE_LAZY_COLLECTIVES: true
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://$host_ip:8086/health || exit 1"]
-      interval: 10s
-      timeout: 10s
+      interval: 100s
+      timeout: 100s
       retries: 100
     runtime: habana
     cap_add:
