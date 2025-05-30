@@ -1,7 +1,7 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-from typing import Optional
+from typing import Any, Optional
 
 from pydantic import BaseModel
 
@@ -65,5 +65,15 @@ class FilesIn(BaseModel):
 
 class RagOut(BaseModel):
     query: str
-    contexts: Optional[list[str]] = None
+    contexts: Optional[dict[str, Any]] = None
     response: str
+
+
+class PromptIn(BaseModel):
+    prompt: Optional[str] = None
+
+
+class KnowledgeBaseCreateIn(BaseModel):
+    name: str
+    description: Optional[str] = None
+    active: Optional[bool] = None

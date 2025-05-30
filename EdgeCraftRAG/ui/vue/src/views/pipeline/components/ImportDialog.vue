@@ -4,7 +4,7 @@
     width="500px"
     centered
     destroyOnClose
-    title="Import Pipeline"
+    :title="$t('pipeline.import')"
     :keyboard="false"
     :maskClosable="false"
     :footer="null"
@@ -24,11 +24,13 @@
         :size="40"
         :style="{ color: 'var(--color-primary)' }"
       />
-      <p class="intel-upload-text">Click or drag file to this area to upload</p>
+      <p class="intel-upload-text">{{ $t("common.uploadTip") }}</p>
       <p class="intel-upload-hint">
-        Supports JSON format, with file size not exceeding 10M.
+        {{ $t("pipeline.pipelineFormatTip") }}
       </p>
-      <a-button type="primary" class="mt-12">Import</a-button>
+      <a-button type="primary" class="mt-12">{{
+        $t("common.import")
+      }}</a-button>
     </a-upload-dragger>
   </a-modal>
 </template>
@@ -38,7 +40,9 @@ import { importUrl } from "@/api/pipeline";
 import { ref } from "vue";
 import { useNotification } from "@/utils/common";
 import { NextLoading } from "@/utils/loading";
+import { useI18n } from "vue-i18n";
 
+const { t } = useI18n();
 const { antNotification } = useNotification();
 
 const emit = defineEmits(["search", "close"]);
@@ -55,10 +59,14 @@ const handleChange = (info: any) => {
       emit("search");
       handleClose();
       NextLoading.done();
-      antNotification("success", "Success", "Files upload successful!");
+      antNotification(
+        "success",
+        t("common.success"),
+        t("pipeline.importSuccTip")
+      );
     } else if (status === "error") {
       NextLoading.done();
-      antNotification("error", "Error", "Files upload failed!");
+      antNotification("error", t("common.error"), t("pipeline.importErrTip"));
     }
   } catch (error) {
     console.error(error);

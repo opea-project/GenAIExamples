@@ -8,11 +8,14 @@
     autocomplete="off"
     class="form-wrap"
   >
-    <a-form-item label="Retriever Type" name="retriever_type">
+    <a-form-item
+      :label="$t('pipeline.config.retrieverType')"
+      name="retriever_type"
+    >
       <a-select
         v-model:value="form.retriever_type"
         showSearch
-        placeholder="please select Retriever Type"
+        :placeholder="$t('pipeline.valid.retrieverType')"
       >
         <a-select-option
           v-for="item in retrieverList"
@@ -21,25 +24,31 @@
           >{{ item.name }}</a-select-option
         >
       </a-select>
-      <FormTooltip
-        title="The retrieval type used when retrieving relevant nodes from the index according to the user's query"
-      />
+      <FormTooltip :title="$t('pipeline.desc.retrieverType')" />
     </a-form-item>
     <div class="option-introduction">
       <InfoCircleOutlined />
-      {{ optionIntroduction }}
+      {{ $t(optionIntroduction!) }}
     </div>
-    <a-form-item label="Search top k" name="retrieve_topk" class="slider-wrap">
+    <a-form-item
+      :label="$t('pipeline.config.topk')"
+      name="retrieve_topk"
+      class="slider-wrap"
+    >
       <a-slider
         v-model:value="form.retrieve_topk"
         :min="1"
-        :max="50"
+        :max="200"
         :marks="sliderMarks.retrieval"
       />
       <a-form-item noStyle>
-        <a-input-number v-model:value="form.retrieve_topk" :min="1" :max="50" />
+        <a-input-number
+          v-model:value="form.retrieve_topk"
+          :min="1"
+          :max="200"
+        />
       </a-form-item>
-      <FormTooltip title="The number of top k results to return" />
+      <FormTooltip :title="$t('pipeline.desc.topk')" />
     </a-form-item>
   </a-form>
 </template>
@@ -49,7 +58,9 @@ import type { FormInstance } from "ant-design-vue";
 import { reactive, ref } from "vue";
 import { Retriever } from "../../enum.ts";
 import { InfoCircleOutlined } from "@ant-design/icons-vue";
+import { useI18n } from "vue-i18n";
 
+const { t } = useI18n();
 const props = defineProps({
   formData: {
     type: Object,
@@ -72,14 +83,14 @@ const rules = reactive({
   retriever_type: [
     {
       required: true,
-      message: "please select Retriever Type",
+      message: t("pipeline.valid.retrieverType"),
       trigger: "blur",
     },
   ],
   retrieve_topk: [
     {
       required: true,
-      message: "Please select Search top k",
+      message: t("pipeline.valid.topk"),
       trigger: ["change", "blur"],
     },
   ],
@@ -93,7 +104,7 @@ const optionIntroduction = computed(() => {
 const sliderMarks = reactive<EmptyObjectType>({
   retrieval: {
     1: "1",
-    50: "50",
+    200: "200",
   },
 });
 // Validate the form, throw results form

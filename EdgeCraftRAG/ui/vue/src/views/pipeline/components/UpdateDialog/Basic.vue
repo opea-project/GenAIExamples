@@ -8,13 +8,13 @@
     autocomplete="off"
     class="form-wrap"
   >
-    <a-form-item label="Name" name="name">
+    <a-form-item :label="$t('pipeline.name')" name="name">
       <a-input
         v-model:value.trim="form.name"
         :maxlength="30"
         :disabled="disabledName"
       />
-      <FormTooltip title="The name identifier of the pipeline" />
+      <FormTooltip :title="$t('pipeline.desc.name')" />
     </a-form-item>
   </a-form>
 </template>
@@ -22,6 +22,9 @@
 <script lang="ts" setup name="Basic">
 import type { FormInstance } from "ant-design-vue";
 import { reactive, ref, computed } from "vue";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 const props = defineProps({
   formData: {
@@ -48,11 +51,15 @@ const form = reactive<FormType>({
 });
 const rules = reactive({
   name: [
-    { required: true, message: "Please input name", trigger: "blur" },
+    {
+      required: true,
+      message: t("pipeline.valid.nameValid1"),
+      trigger: "blur",
+    },
     {
       min: 2,
       max: 30,
-      message: "Name should be between 2 and 30 characters",
+      message: t("pipeline.valid.nameValid2"),
       trigger: "blur",
     },
   ],

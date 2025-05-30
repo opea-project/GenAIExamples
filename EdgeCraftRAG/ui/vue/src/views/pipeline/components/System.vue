@@ -1,11 +1,11 @@
 <template>
   <div class="system-container">
     <a-collapse v-model:activeKey="activeKey" expandIconPosition="end">
-      <a-collapse-panel key="status" :header="$t('setting.systemStatus')">
+      <a-collapse-panel key="status" :header="$t('system.title')">
         <SystemChart :system-data="systemData" :chart-col="chartCol" />
         <div class="info-wrap">
           <a-descriptions
-            title="system information"
+            :title="$t('system.info')"
             :column="1"
             :label-style="{ color: 'var(--font-text-color)' }"
             :content-style="{
@@ -13,16 +13,16 @@
               justifyContent: 'end',
             }"
           >
-            <a-descriptions-item label="Kernel">{{
+            <a-descriptions-item :label="$t('system.kernel')">{{
               systemData.kernel
             }}</a-descriptions-item>
-            <a-descriptions-item label="Processor">{{
+            <a-descriptions-item :label="$t('system.processor')">{{
               systemData.processor
             }}</a-descriptions-item>
-            <a-descriptions-item label="OS">{{
+            <a-descriptions-item :label="$t('system.os')">{{
               systemData.os
             }}</a-descriptions-item>
-            <a-descriptions-item label="Current time">{{
+            <a-descriptions-item :label="$t('system.time')">{{
               systemData.currentTime
             }}</a-descriptions-item>
           </a-descriptions>
