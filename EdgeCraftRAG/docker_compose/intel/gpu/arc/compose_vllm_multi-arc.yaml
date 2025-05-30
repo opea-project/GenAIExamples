@@ -134,7 +134,7 @@ services:
       https_proxy: ${https_proxy}
       HF_ENDPOINT: ${HF_ENDPOINT}
       MODEL_PATH: "/llm/models"
-      SERVED_MODEL_NAME: ${SERVED_MODEL_NAME}
+      SERVED_MODEL_NAME: ${LLM_MODEL}
       TENSOR_PARALLEL_SIZE: ${TENSOR_PARALLEL_SIZE:-1}
       PORT: ${VLLM_SERVICE_PORT_1:-8200}
       ZE_AFFINITY_MASK: ${SELECTED_XPU_1:-1}
