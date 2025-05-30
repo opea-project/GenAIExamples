@@ -28,7 +28,21 @@ concurrency:
 
 jobs:
   get-test-matrix:
-    # permissions inherited from workflow root
+    permissions:
+      actions: read
+      attestations: read
+      checks: read
+      deployments: read
+      discussions: read
+      issues: read
+      models: read
+      packages: read
+      pages: read
+      pull-requests: read
+      repository-projects: read
+      statuses: read
+      security-events: read
+      id-token: read
     if: ${{ !github.event.pull_request.draft }}
     uses: ./.github/workflows/_get-test-matrix.yml
     with:
