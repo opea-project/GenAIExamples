@@ -66,6 +66,8 @@ function build_docker_images() {
 }
 
 function setup_env() {
+    export host_ip=${ip_address}
+    export LVM_MODEL_ID="llava-hf/llava-1.5-7b-hf"
     cd $WORKPATH/docker_compose/intel
     source set_env.sh
 }
