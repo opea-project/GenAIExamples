@@ -40,10 +40,10 @@ function build_docker_images() {
 }
 
 function start_services() {
-    cd $WORKPATH/docker_compose
+    cd $WORKPATH/docker_compose/intel
     export host_ip=${ip_address}
     source set_env.sh
-    cd intel/cpu/xeon
+    cd cpu/xeon
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 

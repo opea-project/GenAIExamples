@@ -27,10 +27,10 @@ git clone https://github.com/opea-project/GenAIExamples.git
 cd GenAIExamples/Translation/docker_compose/intel/cpu/xeon/
 ```
 
-Checkout a released version, such as v1.2:
+Checkout a released version, such as v1.3:
 
 ```
-git checkout v1.2
+git checkout v1.3
 ```
 
 ### Generate a HuggingFace Access Token
@@ -42,9 +42,9 @@ Some HuggingFace resources, such as some models, are only accessible if you have
 To set up environment variables for deploying Translation service, source the set_env.sh script in this directory:
 
 ```
-cd ../../../
+cd ../../
 source set_env.sh
-cd intel/cpu/xeon
+cd cpu/xeon
 ```
 
 The set_env.sh script will prompt for required and optional environment variables used to configure the Translation service. If a value is not entered, the script will use a default value for the same. It will also generate a env file defining the desired configuration. Consult the section on [Translation Service configuration](#translation-service-configuration) for information on how service specific configuration parameters affect deployments.

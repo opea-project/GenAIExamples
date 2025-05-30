@@ -3,6 +3,9 @@
 
 name: E2E test with docker compose
 
+permissions:
+  contents: read
+
 on:
   pull_request_target:
     branches: ["main", "*rc"]
