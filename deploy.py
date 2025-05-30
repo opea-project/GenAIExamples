@@ -192,7 +192,7 @@ def configure_rerank(values, with_rerank, deploy_config, example_type, node_sele
             values["teirerank"]["nodeSelector"] = {key: value for key, value in node_selector.items()}
     else:
         if example_type == "chatqna":
-            values["image"] = {"repository": "opea/chatqna-without-rerank"}
+            values["CHATQNA_TYPE"] = "CHATQNA_NO_RERANK"
         if "teirerank" not in values:
             values["teirerank"] = {"enabled": False}
         elif "enabled" not in values["teirerank"]:
