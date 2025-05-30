@@ -2,7 +2,17 @@
 # SPDX-License-Identifier: Apache-2.0
 
 name: Image Build
-permissions: read-all
+permissions:
+  actions: read
+  contents: read
+  checks: write
+  deployments: write
+  issues: write
+  packages: write
+  pages: write
+  pull-requests: write
+  statuses: write
+  security-events: read
 on:
   workflow_call:
     inputs:

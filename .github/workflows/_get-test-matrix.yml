@@ -3,7 +3,17 @@
 
 # Support push and pull_request events
 name: Get Test Matrix
-permissions: read-all
+permissions:
+  actions: read
+  contents: read
+  checks: read
+  deployments: read
+  issues: read
+  packages: read
+  pages: read
+  pull-requests: read
+  statuses: read
+  security-events: read
 on:
   workflow_call:
     inputs:
