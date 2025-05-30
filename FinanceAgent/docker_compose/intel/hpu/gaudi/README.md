@@ -19,15 +19,17 @@ This guide focuses on running the pre-configured Finance Agent service using Doc
 - Git installed (for cloning repository).
 - Hugging Face Hub API Token (for downloading models).
 - Access to the internet (or a private model cache).
+- Finnhub API Key. Go to https://docs.financialdatasets.ai/ to get your free api key
+- Financial Datgasets API Key. Go to https://docs.financialdatasets.ai/ to get your free api key
 
 Clone the GenAIExamples repository:
 
 ```shell
-   mkdir /path/to/your/workspace/
-   export WORKDIR=/path/to/your/workspace/
-   cd $WORKDIR
-   git clone https://github.com/opea-project/GenAIExamples.git
-   cd GenAIExamples/FinanceAgent/docker_compose/intel/hpu/gaudi
+mkdir /path/to/your/workspace/
+export WORKDIR=/path/to/your/workspace/
+cd $WORKDIR
+git clone https://github.com/opea-project/GenAIExamples.git
+cd GenAIExamples/FinanceAgent/docker_compose/intel/hpu/gaudi
 ```
 
 ## Start Deployment
@@ -36,25 +38,23 @@ This uses the default vLLM-based deployment profile (vllm-gaudi-server).
 Set required environment variables in your shell:
 
 ```shell
-   # Replace with your Hugging Face Hub API token
-   export HF_TOKEN="your_huggingface_token"
-   # Path to your model cache
-   export HF_CACHE_DIR="./data"
-   # Go to https://finnhub.io/ to get your free api key
-   export FINNHUB_API_KEY=<your-finnhub-api-key> 
-   # Go to https://docs.financialdatasets.ai/ to get your free api key
-   export FINANCIAL_DATASETS_API_KEY=<your-api-key> 
+# Path to your model cache
+export HF_CACHE_DIR="./data"
+# Some models from Hugging Face require approval beforehand. Ensure you have the necessary permissions to access them.
+export HF_TOKEN="your_huggingface_token"
+export FINNHUB_API_KEY="your-finnhub-api-key" 
+export FINANCIAL_DATASETS_API_KEY="your-financial-datgasets-api-key" 
 
-   # Optional: Configure HOST_IP if needed
-   # Replace with your host's external IP address (do not use localhost or 127.0.0.1). 
-   # export HOST_IP=$(hostname -I | awk '{print $1}')
+# Optional: Configure HOST_IP if needed
+# Replace with your host's external IP address (do not use localhost or 127.0.0.1). 
+# export HOST_IP=$(hostname -I | awk '{print $1}')
 
-   # Optional: Configure proxy if needed
-   # export HTTP_PROXY="${http_proxy}"
-   # export HTTPS_PROXY="${https_proxy}"
-   # export NO_PROXY="${NO_PROXY},${HOST_IP}"
+# Optional: Configure proxy if needed
+# export HTTP_PROXY="${http_proxy}"
+# export HTTPS_PROXY="${https_proxy}"
+# export NO_PROXY="${NO_PROXY},${HOST_IP}"
 
-   source ../../set_env.sh
+source ../../set_env.sh
 ```
 
 Note: The compose file might read additional variables from set_env.sh. Ensure all required variables like ports (LLM_SERVICE_PORT, TEI_EMBEDDER_PORT, etc.) are set if not using defaults from the compose file. For instance, edit the set_env.sh to change the LLM model:
@@ -75,7 +75,7 @@ Below is the command to launch services
 
 
 ```shell
-   docker compose -f compose.yaml up -d
+docker compose -f compose.yaml up -d
 ```
 
 #### [Optional] Build docker images
@@ -83,24 +83,24 @@ Below is the command to launch services
 This is only needed if the Docker image is unavailable or the pull operation fails.
 
 ```bash
-   cd $WORKDIR/GenAIExamples/FinanceAgent/docker_image_build
-   # get GenAIComps repo
-   git clone https://github.com/opea-project/GenAIComps.git
-   # build the images
-   docker compose -f build.yaml build --no-cache
+cd $WORKDIR/GenAIExamples/FinanceAgent/docker_image_build
+# get GenAIComps repo
+git clone https://github.com/opea-project/GenAIComps.git
+# build the images
+docker compose -f build.yaml build --no-cache
 ```
 
 If deploy on Gaudi, also need to build vllm image.
 
 ```bash
-   cd $WORKDIR
-   git clone https://github.com/HabanaAI/vllm-fork.git
-   # get the latest release tag of vllm gaudi
-   cd vllm-fork
-   VLLM_VER=$(git describe --tags "$(git rev-list --tags --max-count=1)")
-   echo "Check out vLLM tag ${VLLM_VER}"
-   git checkout ${VLLM_VER}
-   docker build --no-cache -f Dockerfile.hpu -t opea/vllm-gaudi:latest --shm-size=128g . --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy
+cd $WORKDIR
+git clone https://github.com/HabanaAI/vllm-fork.git
+# get the latest release tag of vllm gaudi
+cd vllm-fork
+VLLM_VER=$(git describe --tags "$(git rev-list --tags --max-count=1)")
+echo "Check out vLLM tag ${VLLM_VER}"
+git checkout ${VLLM_VER}
+docker build --no-cache -f Dockerfile.hpu -t opea/vllm-gaudi:latest --shm-size=128g . --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy
 ```
 
 
@@ -108,9 +108,10 @@ If deploy on Gaudi, also need to build vllm image.
 Wait several minutes for models to download and services to initialize (Gaudi initialization can take time). Check container logs (docker compose logs -f <service_name>, especially vllm-gaudi-server).
 
 ```bash
-   docker logs --tail 2000 -f vllm-gaudi-server
+docker logs --tail 2000 -f vllm-gaudi-server
 ``` 
-> Expected output of the `vllm-gaudi-server` service is 
+
+> Below is the expected output of the `vllm-gaudi-server` service.
 ```
    INFO:     Started server process [1]
    INFO:     Waiting for application startup.
@@ -124,8 +125,8 @@ Wait several minutes for models to download and services to initialize (Gaudi in
 Ingest data and retrieval from database
 
 ```bash
-   python $WORKDIR/GenAIExamples/FinanceAgent/tests/test_redis_finance.py --port 6007 --test_option ingest
-   python $WORKDIR/GenAIExamples/FinanceAgent/tests/test_redis_finance.py --port 6007 --test_option get
+python $WORKDIR/GenAIExamples/FinanceAgent/tests/test_redis_finance.py --port 6007 --test_option ingest
+python $WORKDIR/GenAIExamples/FinanceAgent/tests/test_redis_finance.py --port 6007 --test_option get
 ```
 
 ### Validate Agents
@@ -133,30 +134,30 @@ Ingest data and retrieval from database
 FinQA Agent:
 
 ```bash
-   export agent_port="9095"
-   prompt="What is Gap's revenue in 2024?"
-   python3 $WORKDIR/GenAIExamples/FinanceAgent/tests/test.py --prompt "$prompt" --agent_role "worker" --ext_port $agent_port
+export agent_port="9095"
+prompt="What is Gap's revenue in 2024?"
+python3 $WORKDIR/GenAIExamples/FinanceAgent/tests/test.py --prompt "$prompt" --agent_role "worker" --ext_port $agent_port
 ```
 
 Research Agent:
 
 ```bash
-   export agent_port="9096"
-   prompt="generate NVDA financial research report"
-   python3 $WORKDIR/GenAIExamples/FinanceAgent/tests/test.py --prompt "$prompt" --agent_role "worker" --ext_port $agent_port --tool_choice "get_current_date" --tool_choice "get_share_performance"
+export agent_port="9096"
+prompt="generate NVDA financial research report"
+python3 $WORKDIR/GenAIExamples/FinanceAgent/tests/test.py --prompt "$prompt" --agent_role "worker" --ext_port $agent_port --tool_choice "get_current_date" --tool_choice "get_share_performance"
 ```
 
 Supervisor Agent single turns:
 
 ```bash
-   export agent_port="9090"
-   python3 $WORKDIR/GenAIExamples/FinanceAgent/tests/test.py --agent_role "supervisor" --ext_port $agent_port --stream
+export agent_port="9090"
+python3 $WORKDIR/GenAIExamples/FinanceAgent/tests/test.py --agent_role "supervisor" --ext_port $agent_port --stream
 ```
 
 Supervisor Agent multi turn:
 
 ```bash
-   python3 $WORKDIR/GenAIExamples/FinanceAgent/tests/test.py --agent_role "supervisor" --ext_port $agent_port --multi-turn --stream
+python3 $WORKDIR/GenAIExamples/FinanceAgent/tests/test.py --agent_role "supervisor" --ext_port $agent_port --multi-turn --stream
 ```
 
 ## Accessing the User Interface (UI)
