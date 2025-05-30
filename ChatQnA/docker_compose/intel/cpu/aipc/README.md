@@ -22,7 +22,7 @@ cd GenAIExamples/ChatQnA/docker_compose/intel/cpu/aipc
 1. Set the required environment variables:
 
    ```bash
-   export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
+   export HF_TOKEN="Your_Huggingface_API_Token"
    ```
 
 2. If you are in a proxy environment, also set the proxy-related environment variables:
@@ -160,12 +160,12 @@ export host_ip="External_Public_IP"
 
 For Linux users, please run `hostname -I | awk '{print $1}'`. For Windows users, please run `ipconfig | findstr /i "IPv4"` to get the external public ip.
 
-**Export the value of your Huggingface API token to the `HUGGINGFACEHUB_API_TOKEN` environment variable**
+**Export the value of your Huggingface API token to the `HF_TOKEN` environment variable**
 
 > Change the Your_Huggingface_API_Token below with tyour actual Huggingface API Token value
 
 ```
-export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
+export HF_TOKEN="Your_Huggingface_API_Token"
 ```
 
 **Append the value of the public IP address to the no_proxy list if you are in a proxy environment**
@@ -183,7 +183,7 @@ export https_proxy=${your_http_proxy}
 export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
 export RERANK_MODEL_ID="BAAI/bge-reranker-base"
 export INDEX_NAME="rag-redis"
-export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+export HF_TOKEN=${HF_TOKEN}
 export OLLAMA_HOST=${host_ip}
 export OLLAMA_MODEL="llama3.2"
 ```
@@ -194,7 +194,7 @@ export OLLAMA_MODEL="llama3.2"
 set EMBEDDING_MODEL_ID=BAAI/bge-base-en-v1.5
 set RERANK_MODEL_ID=BAAI/bge-reranker-base
 set INDEX_NAME=rag-redis
-set HUGGINGFACEHUB_API_TOKEN=%HUGGINGFACEHUB_API_TOKEN%
+set HF_TOKEN=%HF_TOKEN%
 set OLLAMA_HOST=host.docker.internal
 set OLLAMA_MODEL="llama3.2"
 ```

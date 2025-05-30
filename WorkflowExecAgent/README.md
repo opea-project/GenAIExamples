@@ -85,7 +85,7 @@ Configure `GenAIExamples/WorkflowExecAgent/docker_compose/.env` file with the fo
 ```sh
 export SDK_BASE_URL=${SDK_BASE_URL}
 export SERVING_TOKEN=${SERVING_TOKEN}
-export HUGGINGFACEHUB_API_TOKEN=${HF_TOKEN}
+export HF_TOKEN=${HF_TOKEN}
 export llm_engine=${llm_engine}
 export llm_endpoint_url=${llm_endpoint_url}
 export ip_address=$(hostname -I | awk '{print $1}')

@@ -129,7 +129,7 @@ Then run the command `docker images`, you will have the following Docker Images:
 
 We set default model as "meta-llama/Meta-Llama-3-8B-Instruct", change "LLM_MODEL_ID" in following Environment Variables setting if you want to use other models.
 
-If use gated models, you also need to provide [huggingface token](https://huggingface.co/docs/hub/security-tokens) to "HUGGINGFACEHUB_API_TOKEN" environment variable.
+If use gated models, you also need to provide [huggingface token](https://huggingface.co/docs/hub/security-tokens) to "HF_TOKEN" environment variable.
 
 ### Setup Environment Variables
 
@@ -145,7 +145,7 @@ export LLM_SERVICE_PORT=9000
 export FAQGEN_BACKEND_PORT=8888
 export FAQGen_COMPONENT_NAME="OpeaFaqGenvLLM"
 export LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
-export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
+export HF_TOKEN=${your_hf_api_token}
 export MEGA_SERVICE_HOST_IP=${host_ip}
 export LLM_SERVICE_HOST_IP=${host_ip}
 export LLM_ENDPOINT="http://${host_ip}:${LLM_ENDPOINT_PORT}"

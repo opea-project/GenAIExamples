@@ -43,7 +43,7 @@ docker build --no-cache -t opea/doc-index-retriever:latest --build-arg https_pro
 
 ```bash
 export host_ip="YOUR IP ADDR"
-export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
+export HF_TOKEN=${your_hf_api_token}
 export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
 export RERANK_MODEL_ID="BAAI/bge-reranker-base"
 export TEI_EMBEDDING_ENDPOINT="http://${host_ip}:8090"

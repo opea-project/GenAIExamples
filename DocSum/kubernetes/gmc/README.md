@@ -28,7 +28,7 @@ This involves deploying the application pipeline custom resource. You can use `d
    export http_proxy=${your_http_proxy}
    export https_proxy=${your_http_proxy}
    export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
-   export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
+   export HF_TOKEN=${your_hf_api_token}
    export ns=${docsum}
    ```
 

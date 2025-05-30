@@ -5,7 +5,7 @@
 
 # export host_ip=<your External Public IP>
 export host_ip=$(hostname -I | awk '{print $1}')
-export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+export HF_TOKEN=${HF_TOKEN}
 # <token>
 
 export LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"

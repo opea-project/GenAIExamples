@@ -62,7 +62,7 @@ Set the values of the variables:
 Setting variables in the operating system environment:
 
 ```bash
-export HUGGINGFACEHUB_API_TOKEN="Your_HuggingFace_API_Token"
+export HF_TOKEN="Your_HuggingFace_API_Token"
 source ./set_env_*.sh # replace the script name with the appropriate one
 ```
 

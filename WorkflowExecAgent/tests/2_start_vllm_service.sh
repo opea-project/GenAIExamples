@@ -10,7 +10,7 @@ vllm_port=${vllm_port}
 [[ -z "$vllm_port" ]] && vllm_port=8084
 model=mistralai/Mistral-7B-Instruct-v0.3
 export WORKDIR=$WORKPATH/../../
-export HF_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+export HF_TOKEN=${HF_TOKEN}
 
 function build_vllm_docker_image() {
     echo "Building the vllm docker images"

@@ -36,7 +36,7 @@ Then run the command `docker images`, you will have the following Docker Images:
 
 We set default model as "mistralai/Mistral-7B-Instruct-v0.3", change "LLM_MODEL_ID" in following Environment Variables setting if you want to use other models.
 
-If use gated models, you also need to provide [huggingface token](https://huggingface.co/docs/hub/security-tokens) to "HUGGINGFACEHUB_API_TOKEN" environment variable.
+If use gated models, you also need to provide [huggingface token](https://huggingface.co/docs/hub/security-tokens) to "HF_TOKEN" environment variable.
 
 ### 2.1 Setup Environment Variables
 

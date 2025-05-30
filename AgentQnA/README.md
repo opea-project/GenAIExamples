@@ -123,7 +123,7 @@ Set up a [HuggingFace](https://huggingface.co/) account and generate a [user acc
 Then set an environment variable with the token and another for a directory to download the models:
 
 ```bash
-export HUGGINGFACEHUB_API_TOKEN=<your-HF-token>
+export HF_TOKEN=<your-HF-token>
 export HF_CACHE_DIR=<directory-where-llms-are-downloaded> #  to avoid redownloading models
 ```
 

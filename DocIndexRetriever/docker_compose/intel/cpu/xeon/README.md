@@ -47,7 +47,7 @@ docker build --no-cache -t opea/doc-index-retriever:latest --build-arg https_pro
 
 ```bash
 export host_ip="YOUR IP ADDR"
-export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
+export HF_TOKEN=${your_hf_api_token}
 ```
 
 Set environment variables by
@@ -81,7 +81,7 @@ In that case, start Docker Containers with compose_without_rerank.yaml
 
 ```bash
 export host_ip="YOUR IP ADDR"
-export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
+export HF_TOKEN=${your_hf_api_token}
 export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
 cd GenAIExamples/DocIndexRetriever/docker_compose/intel/cpu/xeon
 docker compose -f compose_without_rerank.yaml up -d
