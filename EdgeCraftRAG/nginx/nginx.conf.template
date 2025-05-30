@@ -12,8 +12,8 @@ http {
         # Basic Settings
         ##
         upstream multi-arc-serving-container {
+            server ${HOST_IP}:${NGINX_PORT_0};
             server ${HOST_IP}:${NGINX_PORT_1};
-            server ${HOST_IP}:${NGINX_PORT_2};
         }
         sendfile on;
         tcp_nopush on;
