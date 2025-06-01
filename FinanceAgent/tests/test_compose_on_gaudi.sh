@@ -103,14 +103,16 @@ function build_vllm_docker_image() {
     fi
 }
 
-function start_vllm_service_70B() {
-    echo "token is ${HF_TOKEN}"
-    echo "start vllm gaudi service"
-    echo "**************MODEL is $LLM_MODEL_ID**************"
-    docker run -d --runtime=habana --rm --name "vllm-gaudi-server" -e HABANA_VISIBLE_DEVICES=all -p $VLLM_PORT:8000 -v $VLLM_VOLUME:/data -e HF_TOKEN=$HF_TOKEN -e HUGGING_FACE_HUB_TOKEN=$HF_TOKEN -e HF_HOME=/data -e OMPI_MCA_btl_vader_single_copy_mechanism=none -e PT_HPU_ENABLE_LAZY_COLLECTIVES=true -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e no_proxy=$no_proxy -e VLLM_SKIP_WARMUP=true --cap-add=sys_nice --ipc=host $VLLM_IMAGE --model ${MODEL} --max-seq-len-to-capture 16384 --tensor-parallel-size 4
-    sleep 10s
-    echo "Waiting vllm gaudi ready"
-    n=0
+function stop_llm(){
+    cid=$(docker ps -aq --filter "name=vllm-gaudi-server")
+    echo "Stopping container $cid"
+    if [[ ! -z "$cid" ]]; then docker rm $cid -f && sleep 1s; fi
+
+}
+
+function start_all_services(){
+    docker compose -f $WORKPATH/docker_compose/intel/hpu/gaudi/compose.yaml up -d 
+
     until [[ "$n" -ge 200 ]] || [[ $ready == true ]]; do
         docker logs vllm-gaudi-server &> ${LOG_PATH}/vllm-gaudi-service.log
         n=$((n+1))
@@ -125,28 +127,6 @@ function start_vllm_service_70B() {
     done
     sleep 10s
     echo "Service started successfully"
-}
-
-function stop_llm(){
-    cid=$(docker ps -aq --filter "name=vllm-gaudi-server")
-    echo "Stopping container $cid"
-    if [[ ! -z "$cid" ]]; then docker rm $cid -f && sleep 1s; fi
-
-}
-
-function start_dataprep_and_agent(){
-    docker compose -f $WORKPATH/docker_compose/intel/hpu/gaudi/compose.yaml up -d \
-        tei-embedding-serving \
-        redis-vector-db \
-        redis-kv-store \
-        dataprep-redis-finance \
-        worker-finqa-agent \
-        worker-research-agent \
-        docsum-vllm-gaudi \
-        supervisor-react-agent \
-        agent-ui
-
-    sleep 1m
 }
 
 function validate() {
@@ -196,7 +176,7 @@ function stop_dataprep() {
 }
 
 function validate_agent_service() {
-    # # test worker finqa agent
+    # test worker finqa agent
     echo "======================Testing worker finqa agent======================"
     export agent_port="9095"
     prompt="What is Gap's revenue in 2024?"
@@ -210,7 +190,7 @@ function validate_agent_service() {
         exit 1
     fi
 
-    # # test worker research agent
+    # test worker research agent
     echo "======================Testing worker research agent======================"
     export agent_port="9096"
     prompt="Johnson & Johnson"
@@ -277,27 +257,23 @@ build_dataprep_agent_images
 
 echo "=================== #1 Building docker images completed===================="
 
-echo "=================== #2 Start vllm endpoint===================="
-start_vllm_service_70B
-echo "=================== #2 vllm endpoint started===================="
+echo "=================== #2 Start services ===================="
+start_all_services
+echo "=================== #2 Endpoints for services started===================="
 
-echo "=================== #3 Start data and agent services ===================="
-start_dataprep_and_agent
-echo "=================== #3 data and agent endpoint started===================="
-
-echo "=================== #4 Validate ingest_validate_dataprep ===================="
+echo "=================== #3 Validate ingest_validate_dataprep ===================="
 ingest_validate_dataprep
-echo "=================== #4 Data ingestion and validation completed===================="
+echo "=================== #3 Data ingestion and validation completed===================="
 
-echo "=================== #5 Start agents ===================="
+echo "=================== #4 Start agents ===================="
 validate_agent_service
-echo "=================== #5 Agent test passed ===================="
+echo "=================== #4 Agent test passed ===================="
 
-echo "=================== #6 Stop microservices ===================="
+echo "=================== #5 Stop microservices ===================="
 stop_agent_docker
 stop_dataprep
 stop_llm
-echo "=================== #6 Microservices stopped===================="
+echo "=================== #5 Microservices stopped===================="
 
 echo y | docker system prune
 
