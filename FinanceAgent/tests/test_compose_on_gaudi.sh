@@ -111,7 +111,7 @@ function stop_llm(){
 }
 
 function start_all_services(){
-    docker compose -f $WORKPATH/docker_compose/intel/hpu/gaudi/compose.yaml up -d 
+    docker compose -f $WORKPATH/docker_compose/intel/hpu/gaudi/compose.yaml up -d
 
     until [[ "$n" -ge 200 ]] || [[ $ready == true ]]; do
         docker logs vllm-gaudi-server &> ${LOG_PATH}/vllm-gaudi-service.log
