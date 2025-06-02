@@ -15,6 +15,10 @@ export NO_PROXY="${NO_PROXY},${HOST_IP}"
 export HTTP_PROXY="${http_proxy}"
 export HTTPS_PROXY="${https_proxy}"
 
+export no_proxy="${no_proxy},${HOST_IP}"
+export http_proxy="${http_proxy}"
+export https_proxy="${https_proxy}"
+
 # VLLM configuration
 MODEL=meta-llama/Llama-3.3-70B-Instruct
 export VLLM_PORT="${VLLM_PORT:-8086}"
@@ -227,7 +231,6 @@ function validate_agent_service() {
         docker logs supervisor-agent-endpoint
         exit 1
     fi
-
 }
 
 function stop_agent_docker() {
@@ -254,7 +257,6 @@ build_dataprep_agent_images
 
 # ## for local test
 # # build_agent_image_local
-
 echo "=================== #1 Building docker images completed===================="
 
 echo "=================== #2 Start services ===================="
