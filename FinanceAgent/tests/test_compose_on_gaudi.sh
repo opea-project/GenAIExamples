@@ -252,7 +252,7 @@ stop_dataprep
 cd $WORKPATH/tests
 
 echo "=================== #1 Building docker images===================="
-build_vllm_docker_image
+# build_vllm_docker_image
 build_dataprep_agent_images
 
 # ## for local test
