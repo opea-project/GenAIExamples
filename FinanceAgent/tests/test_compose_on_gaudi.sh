@@ -80,7 +80,7 @@ function build_dataprep_agent_images() {
 
 function build_agent_image_local(){
     cd $WORKDIR/GenAIComps/
-    docker build -t opea/agent:latest -f comps/agent/src/Dockerfile . --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy
+    docker build -t opea/agent:latest -f comps/agent/src/Dockerfile . --build-arg https_proxy=$HTTPS_PROXY --build-arg http_proxy=$HTTP_PROXY
 }
 
 function build_vllm_docker_image() {
@@ -94,7 +94,7 @@ function build_vllm_docker_image() {
 
     VLLM_FORK_VER=v0.6.6.post1+Gaudi-1.20.0
     git checkout ${VLLM_FORK_VER} &> /dev/null
-    docker build --no-cache -f Dockerfile.hpu -t $VLLM_IMAGE --shm-size=128g . --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy
+    docker build --no-cache -f Dockerfile.hpu -t $VLLM_IMAGE --shm-size=128g . --build-arg https_proxy=$HTTPS_PROXY --build-arg http_proxy=$HTTP_PROXY
     if [ $? -ne 0 ]; then
         echo "$VLLM_IMAGE failed"
         exit 1
