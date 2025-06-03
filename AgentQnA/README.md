@@ -113,7 +113,8 @@ git clone https://github.com/opea-project/GenAIExamples.git
 export http_proxy="Your_HTTP_Proxy"
 export https_proxy="Your_HTTPs_Proxy"
 # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
-export no_proxy="Your_No_Proxy"
+export host_ip=$(hostname -I | awk '{print $1}') 
+export no_proxy="Your_No_Proxy", host_ip  #include host_ip in no_proxy 
 ```
 
 ##### For using open-source llms
@@ -124,7 +125,7 @@ Then set an environment variable with the token and another for a directory to d
 
 ```bash
 export HUGGINGFACEHUB_API_TOKEN=<your-HF-token>
-export HF_CACHE_DIR=<directory-where-llms-are-downloaded> #  to avoid redownloading models
+export HF_CACHE_DIR=<directory-where-llms-are-downloaded> #  to avoid redownloading models. The directory should have write access
 ```
 
 ##### [Optional] OPENAI_API_KEY to use OpenAI models or Intel® AI for Enterprise Inference
@@ -142,6 +143,7 @@ export OPENAI_API_KEY=<your-openai-key>
 #### Third, set up environment variables for the selected hardware using the corresponding `set_env.sh`
 
 ##### Gaudi
+if your model is too big to fit on Gaudi, change the model in the `set_env.sh` file below before `source`-ing.
 
 ```bash
 source $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/hpu/gaudi/set_env.sh
@@ -239,12 +241,13 @@ bash run_ingest_data.sh
 > **Note**: This is a one-time operation.
 
 ## How to interact with the agent system with UI
+If you are runningthe containers on remote server and want to interact with UI in your local computer, please use tunneling to enable this. One way to do this: `ssh <user@remote-server-ip>  -L 5173:localhost:5173`
 
 The UI microservice is launched in the previous step with the other microservices.
-To see the UI, open a web browser to `http://${ip_address}:5173` to access the UI. Note the `ip_address` here is the host IP of the UI microservice.
+To see the UI, open a web browser to `http://${ip_address}:5173` to access the UI. Note the `ip_address` here is the host IP (`host_ip` is the same ip used while setting up `no_proxy` above) of the UI microservice. If you are using tunneling, `http://localhost:5173`
 
 1. Click on the arrow above `Get started`. Create an admin account with a name, email, and password.
-2. Add an OpenAI-compatible API endpoint. In the upper right, click on the circle button with the user's initial, go to `Admin Settings`->`Connections`. Under `Manage OpenAI API Connections`, click on the `+` to add a connection. Fill in these fields:
+2. Add an OpenAI-compatible API endpoint. In the upper right, click on the circle button with the user's initial, go to`settings` -> `Admin Settings`->`Connections`. Under `Manage OpenAI API Connections`, click on the `+` to add a connection. Fill in these fields:
 
 - **URL**: `http://${ip_address}:9090/v1`, do not forget the `v1`
 - **Key**: any value
@@ -254,7 +257,7 @@ Click "Save".
 
 ![opea-agent-setting](assets/img/opea-agent-setting.png)
 
-3. Test OPEA agent with UI. Return to `New Chat` and ensure the model (i.e. `opea-agent`) is selected near the upper left. Enter in any prompt to interact with the agent.
+3. Test OPEA agent with UI. Return to `New Chat` and ensure the model (i.e. `opea-agent`) is selected near the upper left. Enter in any prompt to interact with the agent. The chat response will be displayed. If you get blank response, please check the logs in the containers.  
 
 ![opea-agent-test](assets/img/opea-agent-test.png)
 
