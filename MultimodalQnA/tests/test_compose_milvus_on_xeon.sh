@@ -66,11 +66,11 @@ function build_docker_images() {
 
 function setup_env() {
     export COLLECTION_NAME="LangChainCollection"
-    export MILVUS_HOST=${host_ip}
+    export MILVUS_HOST=${ip_address}
     export MILVUS_RETRIEVER_PORT=7000
-    export LVM_MODEL_ID="llava-hf/llava-1.5-7b-hf"
     cd $WORKPATH/docker_compose/intel
     source set_env.sh
+    export LVM_MODEL_ID="llava-hf/llava-1.5-7b-hf"
 }
 
 
