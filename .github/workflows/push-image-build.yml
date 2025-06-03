@@ -21,8 +21,7 @@ permissions:
   models: read
 
 on:
-  # push:
-  pull_request:
+  push:
     branches: [ 'main' ]
     paths:
       - "**.py"
