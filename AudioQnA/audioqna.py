@@ -17,6 +17,7 @@ SPEECHT5_SERVER_PORT = int(os.getenv("SPEECHT5_SERVER_PORT", 7055))
 LLM_SERVER_HOST_IP = os.getenv("LLM_SERVER_HOST_IP", "0.0.0.0")
 LLM_SERVER_PORT = int(os.getenv("LLM_SERVER_PORT", 3006))
 LLM_MODEL_ID = os.getenv("LLM_MODEL_ID", "meta-llama/Meta-Llama-3-8B-Instruct")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", None)
 
 
 def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **kwargs):
@@ -63,6 +64,7 @@ class AudioQnAService:
             name="llm",
             host=LLM_SERVER_HOST_IP,
             port=LLM_SERVER_PORT,
+            api_key=OPENAI_API_KEY,
             endpoint="/v1/chat/completions",
             use_remote_service=True,
             service_type=ServiceType.LLM,
