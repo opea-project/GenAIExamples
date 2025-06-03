@@ -56,7 +56,7 @@ export RERANK_SERVICE_HOST_IP=${host_ip}
 export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8000/v1/retrievaltool"
 export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/ingest"
 export llm_hardware='cpu/xeon' #cpu/xeon, xpu, hpu/gaudi
-cd GenAIExamples/DocIndexRetriever/intel/hpu/gaudi/
+cd GenAIExamples/DocIndexRetriever/docker_compose/intel/hpu/gaudi/
 docker compose up -d
 ```
 
