@@ -83,6 +83,17 @@ jobs:
 # Docker Compose Test
 ####################################################################################################
   test-example-compose:
+    permissions:
+      actions: read
+      contents: read
+      checks: write
+      deployments: write
+      issues: write
+      packages: write
+      pages: write
+      pull-requests: write
+      statuses: write
+      security-events: read
     needs: [build-images]
     if: ${{ inputs.test_compose }}
     uses: ./.github/workflows/_run-docker-compose.yml
