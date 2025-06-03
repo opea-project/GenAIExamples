@@ -9,3 +9,17 @@
 export HFTOKEN="insert-your-huggingface-token-here"
 helm install agentqna oci://ghcr.io/opea-project/charts/agentqna  --set global.HUGGINGFACEHUB_API_TOKEN=${HFTOKEN} -f gaudi-values.yaml
 ```
+
+## Deploy on ROCm with vLLM
+
+```
+export HFTOKEN="insert-your-huggingface-token-here"
+helm upgrade --install agentqna oci://ghcr.io/opea-project/charts/agentqna  --set global.HUGGINGFACEHUB_API_TOKEN=${HFTOKEN} -f rocm-values.yaml
+```
+
+## Deploy on ROCm with TGI
+
+```
+export HFTOKEN="insert-your-huggingface-token-here"
+helm upgrade --install agentqna oci://ghcr.io/opea-project/charts/agentqna  --set global.HUGGINGFACEHUB_API_TOKEN=${HFTOKEN} -f rocm-tgi-values.yaml
+```
