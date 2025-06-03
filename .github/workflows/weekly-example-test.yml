@@ -13,8 +13,8 @@ on:
   workflow_dispatch:
 
 env:
-  EXAMPLES: "AgentQnA"  #${{ vars.NIGHTLY_RELEASE_EXAMPLES }}
-  NODES: "xeon"  #"gaudi,xeon,rocm,arc"
+  EXAMPLES: ${{ vars.NIGHTLY_RELEASE_EXAMPLES }}
+  NODES: "gaudi,xeon,arc"
 
 jobs:
   get-test-matrix:
