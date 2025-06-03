@@ -40,6 +40,11 @@ for example in ${examples}; do
         done
     fi
     for hw in ${run_hardware}; do
+        # TODO: remove this condition when ROCm hardware is available
+        if [[ "${hw}" == "rocm" ]]; then
+            echo "Skip test on ROCm hardware for 2 weeks due to lack of test machine..."
+            continue
+        fi
         run_matrix="${run_matrix}{\"example\":\"${example}\",\"hardware\":\"${hw}\"},"
     done
 done
