@@ -241,10 +241,10 @@ bash run_ingest_data.sh
 > **Note**: This is a one-time operation.
 
 ## How to interact with the agent system with UI
-If you are runningthe containers on remote server and want to interact with UI in your local computer, please use tunneling to enable this. One way to do this: `ssh <user@remote-server-ip>  -L 5173:localhost:5173`
+If you are runningthe containers on remote server and want to interact with UI in your local computer, please use tunneling to enable this. One way to do this is: `ssh <user@remote-server-ip> -L 5173:localhost:5173`
 
 The UI microservice is launched in the previous step with the other microservices.
-To see the UI, open a web browser to `http://${ip_address}:5173` to access the UI. Note the `ip_address` here is the host IP (`host_ip` is the same ip used while setting up `no_proxy` above) of the UI microservice. If you are using tunneling, `http://localhost:5173`
+To see the UI, open a web browser to `http://${ip_address}:5173` to access the UI. Note the `ip_address` here is the host IP (`host_ip` is the ip used while setting up `no_proxy` above) of the UI microservice. If you are using tunneling, `http://localhost:5173`
 
 1. Click on the arrow above `Get started`. Create an admin account with a name, email, and password.
 2. Add an OpenAI-compatible API endpoint. In the upper right, click on the circle button with the user's initial, go to`settings` -> `Admin Settings`->`Connections`. Under `Manage OpenAI API Connections`, click on the `+` to add a connection. Fill in these fields:
