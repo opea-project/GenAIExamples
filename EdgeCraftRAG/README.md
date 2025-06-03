@@ -112,6 +112,7 @@ docker pull intelanalytics/ipex-llm-serving-xpu:0.8.3-b18
 Generate your nginx config file
 ```bash
 export HOST_IP=#your host ip
+export NGINX_PORT=8086 #set port for nginx
 # If you are running with 1 vllm container:
 export NGINX_PORT_0=8100 # you can change the port to your preferrance
 export NGINX_PORT_1=8100 # you can change the port to your preferrance
