@@ -3,7 +3,21 @@
 
 name: Nightly build/publish latest docker images
 permissions:
+  actions: read
+  contents: read
+  checks: read
+  deployments: read
+  discussions: read
+  issues: read
+  packages: read
+  pages: read
+  pull-requests: read
+  repository-projects: read
+  statuses: read
   security-events: read
+  id-token: write
+  attestations: read
+  models: read
 
 on:
   schedule:
@@ -77,20 +91,20 @@ jobs:
     needs: [get-build-matrix]
     permissions:
       actions: read
-      contents: read
-      checks: read
-      deployments: read
-      discussions: read
-      issues: read
-      packages: read
-      pages: read
-      pull-requests: read
-      repository-projects: read
-      statuses: read
-      security-events: read
-      id-token: write
       attestations: read
+      discussions: read
       models: read
+      repository-projects: read
+      id-token: write
+      contents: read
+      checks: write
+      deployments: write
+      issues: write
+      packages: write
+      pages: write
+      pull-requests: write
+      statuses: write
+      security-events: read
     if: ${{ needs.get-build-matrix.outputs.examples_json != '' }}
     strategy:
       matrix:
