@@ -139,6 +139,19 @@ In the context of deploying an AudioQnA pipeline on an Intel® Xeon® platform, 
 | [compose.yaml](./compose.yaml)                     | Default compose file using vllm as serving framework and redis as vector database         |
 | [compose_tgi.yaml](./compose_tgi.yaml)             | The LLM serving framework is TGI. All other configurations remain the same as the default |
 | [compose_multilang.yaml](./compose_multilang.yaml) | The TTS component is GPT-SoVITS. All other configurations remain the same as the default  |
+| [compose_remote.yaml](./compose_remote.yaml)       | The LLM used is hosted on a remote server and an endpoint is used to access this model. Additional environment variables need to be set before running. See [instructions](#running-llm-models-deployed-on-remote-servers-with-compose_remoteyaml) below. |
+
+### Running LLM models deployed on remote servers with `compose_remote.yaml`
+
+To run the LLM model on a remote server, the environment variable `LLM_MODEL_ID` may need to be overwritten, and two new environment variables `REMOTE_ENDPOINT` and `OPENAI_API_KEY` need to be set. An example endpoint is https://api.inference.example.com, but the actual value will depend on how it is set up on the remote server. The key is used to access the remote server. 
+
+```bash
+export LLM_MODEL_ID=<name-of-llm-model-card>
+export REMOTE_ENDPOINT=<https-endpoint-of-remote-server>
+export OPENAI_API_KEY=<your-openai-api-key>
+```
+
+After setting these environment variables, run `docker compose` with `compose_remote.yaml`.
 
 ## Validate MicroServices
 
