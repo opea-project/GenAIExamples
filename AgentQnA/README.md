@@ -113,8 +113,8 @@ git clone https://github.com/opea-project/GenAIExamples.git
 export http_proxy="Your_HTTP_Proxy"
 export https_proxy="Your_HTTPs_Proxy"
 # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
-export host_ip=$(hostname -I | awk '{print $1}') 
-export no_proxy="Your_No_Proxy", host_ip  #include host_ip in no_proxy 
+export host_ip=$(hostname -I | awk '{print $1}')
+export no_proxy="Your_No_Proxy", host_ip  #include host_ip in no_proxy
 ```
 
 ##### For using open-source llms
@@ -143,6 +143,7 @@ export OPENAI_API_KEY=<your-openai-key>
 #### Third, set up environment variables for the selected hardware using the corresponding `set_env.sh`
 
 ##### Gaudi
+
 if your model is too big to fit on Gaudi, change the model in the `set_env.sh` file below before `source`-ing.
 
 ```bash
@@ -241,6 +242,7 @@ bash run_ingest_data.sh
 > **Note**: This is a one-time operation.
 
 ## How to interact with the agent system with UI
+
 If you are runningthe containers on remote server and want to interact with UI in your local computer, please use tunneling to enable this. One way to do this is: `ssh <user@remote-server-ip> -L 5173:localhost:5173`
 
 The UI microservice is launched in the previous step with the other microservices.
@@ -257,7 +259,7 @@ Click "Save".
 
 ![opea-agent-setting](assets/img/opea-agent-setting.png)
 
-3. Test OPEA agent with UI. Return to `New Chat` and ensure the model (i.e. `opea-agent`) is selected near the upper left. Enter in any prompt to interact with the agent. The chat response will be displayed. If you get blank response, please check the logs in the containers.  
+3. Test OPEA agent with UI. Return to `New Chat` and ensure the model (i.e. `opea-agent`) is selected near the upper left. Enter in any prompt to interact with the agent. The chat response will be displayed. If you get blank response, please check the logs in the containers.
 
 ![opea-agent-test](assets/img/opea-agent-test.png)
 
