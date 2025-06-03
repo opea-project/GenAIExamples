@@ -81,7 +81,7 @@ jobs:
       pages: write
       pull-requests: write
       statuses: write
-      security-events: read 
+      security-events: read
     needs: get-test-matrix
     if: ${{ needs.get-test-matrix.outputs.nodes != '' }}
     strategy:
