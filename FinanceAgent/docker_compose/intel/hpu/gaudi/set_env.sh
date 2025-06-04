@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Copyright (C) 2024 Intel Corporation
+# Copyright (C) 2025 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
 # Navigate to the parent directory and source the environment
