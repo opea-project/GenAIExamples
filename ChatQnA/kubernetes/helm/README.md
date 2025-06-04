@@ -7,14 +7,14 @@
 
 ```
 export HFTOKEN="insert-your-huggingface-token-here"
-helm install chatqna oci://ghcr.io/opea-project/charts/chatqna  --set global.HF_TOKEN=${HFTOKEN} -f cpu-values.yaml
+helm install chatqna oci://ghcr.io/opea-project/charts/chatqna  --set global.HUGGINGFACEHUB_API_TOKEN=${HFTOKEN} -f cpu-values.yaml
 ```
 
 ## Deploy on Gaudi
 
 ```
 export HFTOKEN="insert-your-huggingface-token-here"
-helm install chatqna oci://ghcr.io/opea-project/charts/chatqna  --set global.HF_TOKEN=${HFTOKEN} -f gaudi-vllm-values.yaml
+helm install chatqna oci://ghcr.io/opea-project/charts/chatqna  --set global.HUGGINGFACEHUB_API_TOKEN=${HFTOKEN} -f gaudi-vllm-values.yaml
 ```
 
 ## Deploy variants of ChatQnA
@@ -24,7 +24,7 @@ For example, to run with tgi instead of vllm inference engine on Gaudi hardware,
 
 ```
 export HFTOKEN="insert-your-huggingface-token-here"
-helm install chatqna oci://ghcr.io/opea-project/charts/chatqna  --set global.HF_TOKEN=${HFTOKEN} -f gaudi-tgi-values.yaml
+helm install chatqna oci://ghcr.io/opea-project/charts/chatqna  --set global.HUGGINGFACEHUB_API_TOKEN=${HFTOKEN} -f gaudi-tgi-values.yaml
 ```
 
 See other *-values.yaml files in this directory for more reference.
