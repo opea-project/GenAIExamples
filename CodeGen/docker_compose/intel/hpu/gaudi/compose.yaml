@@ -54,8 +54,8 @@ services:
       VLLM_TORCH_PROFILER_DIR: "/mnt"
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:80/health || exit 1"]
-      interval: 10s
-      timeout: 10s
+      interval: 100s
+      timeout: 100s
       retries: 100
     runtime: habana
     cap_add:
