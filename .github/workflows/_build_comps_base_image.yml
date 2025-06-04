@@ -2,7 +2,12 @@
 # SPDX-License-Identifier: Apache-2.0
 
 name: Build Comps Base Image
-permissions: read-all
+
+permissions:
+  attestations: read
+  models: read
+  security-events: read
+
 on:
   workflow_call:
     inputs:
@@ -35,9 +40,9 @@ jobs:
       - name: Check if job should be skipped
         id: check-skip
         run: |
-          should_skip=false
-          if [[ "${{ inputs.node }}" == "gaudi3" || "${{ inputs.node }}" == "rocm" || "${{ inputs.node }}" == "arc" ]]; then
-            should_skip=true
+          should_skip=true
+          if [[ "${{ inputs.node }}" == "gaudi" || "${{ inputs.node }}" == "xeon" ]]; then
+            should_skip=false
           fi
           echo "should_skip=$should_skip"
           echo "should_skip=$should_skip" >> $GITHUB_OUTPUT

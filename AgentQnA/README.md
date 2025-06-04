@@ -4,9 +4,10 @@
 
 1. [Overview](#overview)
 2. [Deploy with Docker](#deploy-with-docker)
-3. [Launch the UI](#launch-the-ui)
+3. [How to interact with the agent system with UI](#how-to-interact-with-the-agent-system-with-ui)
 4. [Validate Services](#validate-services)
 5. [Register Tools](#how-to-register-other-tools-with-the-ai-agent)
+6. [Monitoring and Tracing](#monitor-and-tracing)
 
 ## Overview
 
@@ -98,7 +99,7 @@ flowchart LR
 
 #### First, clone the `GenAIExamples` repo.
 
-```
+```bash
 export WORKDIR=<your-work-directory>
 cd $WORKDIR
 git clone https://github.com/opea-project/GenAIExamples.git
@@ -108,7 +109,7 @@ git clone https://github.com/opea-project/GenAIExamples.git
 
 ##### For proxy environments only
 
-```
+```bash
 export http_proxy="Your_HTTP_Proxy"
 export https_proxy="Your_HTTPs_Proxy"
 # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
@@ -117,14 +118,24 @@ export no_proxy="Your_No_Proxy"
 
 ##### For using open-source llms
 
-```
+Set up a [HuggingFace](https://huggingface.co/) account and generate a [user access token](https://huggingface.co/docs/transformers.js/en/guides/private#step-1-generating-a-user-access-token).
+
+Then set an environment variable with the token and another for a directory to download the models:
+
+```bash
 export HUGGINGFACEHUB_API_TOKEN=<your-HF-token>
-export HF_CACHE_DIR=<directory-where-llms-are-downloaded> #so that no need to redownload every time
+export HF_CACHE_DIR=<directory-where-llms-are-downloaded> #  to avoid redownloading models
 ```
 
-##### [Optional] OPANAI_API_KEY to use OpenAI models
+##### [Optional] OPENAI_API_KEY to use OpenAI models or Intel® AI for Enterprise Inference
 
-```
+To use OpenAI models, generate a key following these [instructions](https://platform.openai.com/api-keys).
+
+To use a remote server running Intel® AI for Enterprise Inference, contact the cloud service provider or owner of the on-prem machine for a key to access the desired model on the server.
+
+Then set the environment variable `OPENAI_API_KEY` with the key contents:
+
+```bash
 export OPENAI_API_KEY=<your-openai-key>
 ```
 
@@ -132,32 +143,32 @@ export OPENAI_API_KEY=<your-openai-key>
 
 ##### Gaudi
 
-```
+```bash
 source $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/hpu/gaudi/set_env.sh
 ```
 
 ##### Xeon
 
-```
+```bash
 source $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/cpu/xeon/set_env.sh
 ```
 
+For running
+
 ### 2. Launch the multi-agent system. </br>
 
-Two options are provided for the `llm_engine` of the agents: 1. open-source LLMs on Gaudi, 2. OpenAI models via API calls.
+We make it convenient to launch the whole system with docker compose, which includes microservices for LLM, agents, UI, retrieval tool, vector database, dataprep, and telemetry. There are 3 docker compose files, which make it easy for users to pick and choose. Users can choose a different retrieval tool other than the `DocIndexRetriever` example provided in our GenAIExamples repo. Users can choose not to launch the telemetry containers.
 
-#### Gaudi
+#### Launch on Gaudi
 
-On Gaudi, `meta-llama/Meta-Llama-3.1-70B-Instruct` will be served using vllm.
-By default, both the RAG agent and SQL agent will be launched to support the React Agent.  
-The React Agent requires the DocIndexRetriever's [`compose.yaml`](../DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml) file, so two `compose.yaml` files need to be run with docker compose to start the multi-agent system.
-
-> **Note**: To enable the web search tool, skip this step and proceed to the "[Optional] Web Search Tool Support" section.
+On Gaudi, `meta-llama/Meta-Llama-3.3-70B-Instruct` will be served using vllm. The command below will launch the multi-agent system with the `DocIndexRetriever` as the retrieval tool for the Worker RAG agent.
 
 ```bash
 cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/hpu/gaudi/
 docker compose -f $WORKDIR/GenAIExamples/DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml -f compose.yaml up -d
 ```
+
+> **Note**: To enable the web search tool, skip this step and proceed to the "[Optional] Web Search Tool Support" section.
 
 To enable Open Telemetry Tracing, compose.telemetry.yaml file need to be merged along with default compose.yaml file.
 Gaudi example with Open Telemetry feature:
@@ -183,16 +194,37 @@ docker compose -f $WORKDIR/GenAIExamples/DocIndexRetriever/docker_compose/intel/
 
 </details>
 
-#### Xeon
+#### Launch on Xeon
 
-On Xeon, only OpenAI models are supported.
-By default, both the RAG Agent and SQL Agent will be launched to support the React Agent.  
-The React Agent requires the DocIndexRetriever's [`compose.yaml`](../DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml) file, so two `compose yaml` files need to be run with docker compose to start the multi-agent system.
+On Xeon, OpenAI models and models deployed on a remote server are supported. Both methods require an API key.
 
 ```bash
 export OPENAI_API_KEY=<your-openai-key>
 cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/cpu/xeon
+```
+
+##### OpenAI Models
+
+The command below will launch the multi-agent system with the `DocIndexRetriever` as the retrieval tool for the Worker RAG agent.
+
+```bash
 docker compose -f $WORKDIR/GenAIExamples/DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml -f compose_openai.yaml up -d
+```
+
+##### Models on Remote Server
+
+When models are deployed on a remote server with Intel® AI for Enterprise Inference, a base URL and an API key are required to access them. To run the Agent microservice on Xeon while using models deployed on a remote server, add `compose_remote.yaml` to the `docker compose` command and set additional environment variables.
+
+###### Notes
+
+- `OPENAI_API_KEY` is already set in a previous step.
+- `model` is used to overwrite the value set for this environment variable in `set_env.sh`.
+- `LLM_ENDPOINT_URL` is the base URL given from the owner of the on-prem machine or cloud service provider. It will follow this format: "https://<DNS>". Here is an example: "https://api.inference.example.com".
+
+```bash
+export model=<name-of-model-card>
+export LLM_ENDPOINT_URL=<http-endpoint-of-remote-server>
+docker compose -f $WORKDIR/GenAIExamples/DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml -f compose_openai.yaml -f compose_remote.yaml up -d
 ```
 
 ### 3. Ingest Data into the vector database
@@ -206,11 +238,25 @@ bash run_ingest_data.sh
 
 > **Note**: This is a one-time operation.
 
-## Launch the UI
+## How to interact with the agent system with UI
 
-Open a web browser to http://localhost:5173 to access the UI. Ensure the environment variable `AGENT_URL` is set to http://$ip_address:9090/v1/chat/completions in [ui/svelte/.env](./ui/svelte/.env) or else the UI may not work properly.
+The UI microservice is launched in the previous step with the other microservices.
+To see the UI, open a web browser to `http://${ip_address}:5173` to access the UI. Note the `ip_address` here is the host IP of the UI microservice.
 
-The AgentQnA UI can be deployed locally or using Docker. To customize deployment, refer to the [AgentQnA UI Guide](./ui/svelte/README.md).
+1. Click on the arrow above `Get started`. Create an admin account with a name, email, and password.
+2. Add an OpenAI-compatible API endpoint. In the upper right, click on the circle button with the user's initial, go to `Admin Settings`->`Connections`. Under `Manage OpenAI API Connections`, click on the `+` to add a connection. Fill in these fields:
+
+- **URL**: `http://${ip_address}:9090/v1`, do not forget the `v1`
+- **Key**: any value
+- **Model IDs**: any name i.e. `opea-agent`, then press `+` to add it
+
+Click "Save".
+
+![opea-agent-setting](assets/img/opea-agent-setting.png)
+
+3. Test OPEA agent with UI. Return to `New Chat` and ensure the model (i.e. `opea-agent`) is selected near the upper left. Enter in any prompt to interact with the agent.
+
+![opea-agent-test](assets/img/opea-agent-test.png)
 
 ## [Optional] Deploy using Helm Charts
 
@@ -249,3 +295,8 @@ python $WORKDIR/GenAIExamples/AgentQnA/tests/test.py --agent_role "supervisor" -
 ## How to register other tools with the AI agent
 
 The [tools](./tools) folder contains YAML and Python files for additional tools for the supervisor and worker agents. Refer to the "Provide your own tools" section in the instructions [here](https://github.com/opea-project/GenAIComps/tree/main/comps/agent/src/README.md) to add tools and customize the AI agents.
+
+## Monitor and Tracing
+
+Follow [OpenTelemetry OPEA Guide](https://opea-project.github.io/latest/tutorial/OpenTelemetry/OpenTelemetry_OPEA_Guide.html) to understand how to use OpenTelemetry tracing and metrics in OPEA.  
+For AgentQnA specific tracing and metrics monitoring, follow [OpenTelemetry on AgentQnA](https://opea-project.github.io/latest/tutorial/OpenTelemetry/deploy/AgentQnA.html) section.

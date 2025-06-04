@@ -151,7 +151,7 @@ docker build --no-cache -t opea/retriever:latest --build-arg https_proxy=$https_
 Build lvm-llava image
 
 ```bash
-docker build --no-cache -t opea/lvm-llava:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/lvms/src/integrations/dependency/llava/Dockerfile .
+docker build --no-cache -t opea/lvm-llava:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/third_parties/llava/src/Dockerfile .
 ```
 
 Build lvm microservice image
@@ -171,13 +171,13 @@ docker build --no-cache -t opea/dataprep:latest --build-arg https_proxy=$https_p
 Build whisper server image
 
 ```bash
-docker build --no-cache -t opea/whisper:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/asr/src/integrations/dependency/whisper/Dockerfile .
+docker build --no-cache -t opea/whisper:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/third_parties/whisper/src/Dockerfile .
 ```
 
 ### 6. Build TTS Image
 
 ```bash
-docker build --no-cache -t opea/speecht5:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/tts/src/integrations/dependency/speecht5/Dockerfile .
+docker build --no-cache -t opea/speecht5:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/third_parties/speecht5/src/Dockerfile .
 ```
 
 ### 7. Build MegaService Docker Image
@@ -233,6 +233,17 @@ By default, the multimodal-embedding and LVM models are set to a default value a
 ```bash
 cd GenAIExamples/MultimodalQnA/docker_compose/intel/cpu/xeon/
 docker compose -f compose.yaml up -d
+```
+
+> Alternatively, you can run docker compose with `compose_milvus.yaml` to use the Milvus vector database:
+
+```bash
+export MILVUS_HOST=${host_ip}
+export MILVUS_PORT=19530
+export MILVUS_RETRIEVER_PORT=7000
+export COLLECTION_NAME=LangChainCollection
+cd GenAIExamples/MultimodalQnA/docker_compose/intel/cpu/xeon/
+docker compose -f compose_milvus.yaml up -d
 ```
 
 ### Validate Microservices
@@ -343,7 +354,7 @@ export image_fn="apple.png"
 wget https://github.com/docarray/docarray/blob/main/tests/toydata/image-data/apple.png?raw=true -O ${image_fn}
 
 export pdf_fn="nke-10k-2023.pdf"
-wget https://raw.githubusercontent.com/opea-project/GenAIComps/v1.1/comps/retrievers/redis/data/nke-10k-2023.pdf -O ${pdf_fn}
+wget https://raw.githubusercontent.com/opea-project/GenAIComps/v1.3/comps/third_parties/pathway/src/data/nke-10k-2023.pdf -O ${pdf_fn}
 
 export caption_fn="apple.txt"
 echo "This is an apple."  > ${caption_fn}
@@ -373,6 +384,8 @@ curl --silent --write-out "HTTPSTATUS:%{http_code}" \
 ```
 
 Now, test the microservice with posting a custom caption along with an image and a PDF containing images and text. The image caption can be provided as a text (`.txt`) or as spoken audio (`.wav` or `.mp3`).
+
+> Note: Audio captions for images are currently only supported when using the Redis data prep backend.
 
 ```bash
 curl --silent --write-out "HTTPSTATUS:%{http_code}" \

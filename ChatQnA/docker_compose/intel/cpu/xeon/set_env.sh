@@ -7,6 +7,9 @@ pushd "../../../../../" > /dev/null
 source .set_env.sh
 popd > /dev/null
 
+export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+export HF_TOKEN=${HF_TOKEN}
+export host_ip=${ip_address}
 export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
 export RERANK_MODEL_ID="BAAI/bge-reranker-base"
 export LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
@@ -30,3 +33,6 @@ export CHATQNA_FRONTEND_SERVICE_PORT=5173
 export NGINX_PORT=80
 export FAQGen_COMPONENT_NAME="OpeaFaqGenvLLM"
 export LLM_ENDPOINT="http://${host_ip}:${LLM_ENDPOINT_PORT}"
+pushd "grafana/dashboards" > /dev/null
+source download_opea_dashboard.sh
+popd > /dev/null

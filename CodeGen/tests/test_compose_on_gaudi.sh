@@ -14,30 +14,25 @@ export MODEL_CACHE=${model_cache:-"./data"}
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
-
+source $WORKPATH/docker_compose/intel/set_env.sh
 function build_docker_images() {
     opea_branch=${opea_branch:-"main"}
-    # If the opea_branch isn't main, replace the git clone branch in Dockerfile.
-    if [[ "${opea_branch}" != "main" ]]; then
-        cd $WORKPATH
-        OLD_STRING="RUN git clone --depth 1 https://github.com/opea-project/GenAIComps.git"
-        NEW_STRING="RUN git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git"
-        find . -type f -name "Dockerfile*" | while read -r file; do
-            echo "Processing file: $file"
-            sed -i "s|$OLD_STRING|$NEW_STRING|g" "$file"
-        done
-    fi
 
     cd $WORKPATH/docker_image_build
     git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
+    pushd GenAIComps
+    echo "GenAIComps test commit is $(git rev-parse HEAD)"
+    docker build --no-cache -t ${REGISTRY}/comps-base:${TAG} --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
+    popd && sleep 1s
+
     # Download Gaudi vllm of latest tag
     git clone https://github.com/HabanaAI/vllm-fork.git && cd vllm-fork
-    VLLM_VER=$(git describe --tags "$(git rev-list --tags --max-count=1)")
-    echo "Check out vLLM tag ${VLLM_VER}"
-    git checkout ${VLLM_VER} &> /dev/null && cd ../
+    VLLM_FORK_VER=v0.6.6.post1+Gaudi-1.20.0
+    echo "Check out vLLM tag ${VLLM_FORK_VER}"
+    git checkout ${VLLM_FORK_VER} &> /dev/null && cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="codegen codegen-ui llm-textgen vllm-gaudi"
+    service_list="codegen codegen-gradio-ui llm-textgen vllm-gaudi dataprep retriever embedding"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker images && sleep 1s
@@ -48,18 +43,6 @@ function start_services() {
     local llm_container_name="$2"
 
     cd $WORKPATH/docker_compose/intel/hpu/gaudi
-    export http_proxy=${http_proxy}
-    export https_proxy=${https_proxy}
-    export LLM_MODEL_ID="Qwen/Qwen2.5-Coder-7B-Instruct"
-    export LLM_ENDPOINT="http://${ip_address}:8028"
-    export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
-    export MEGA_SERVICE_HOST_IP=${ip_address}
-    export LLM_SERVICE_HOST_IP=${ip_address}
-    export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:7778/v1/codegen"
-    export NUM_CARDS=1
-    export host_ip=${ip_address}
-
-    sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
     # Start Docker Containers
     docker compose --profile ${compose_profile} up -d | tee ${LOG_PATH}/start_services_with_compose.log
@@ -82,23 +65,34 @@ function validate_services() {
     local DOCKER_NAME="$4"
     local INPUT_DATA="$5"
 
-    local HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL")
-    if [ "$HTTP_STATUS" -eq 200 ]; then
-        echo "[ $SERVICE_NAME ] HTTP status is 200. Checking content..."
+    if [[ "$SERVICE_NAME" == "ingest" ]]; then
+        local HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST -F "$INPUT_DATA" -F index_name=test_redis -H 'Content-Type: multipart/form-data' "$URL")
 
-        local CONTENT=$(curl -s -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL" | tee ${LOG_PATH}/${SERVICE_NAME}.log)
-
-        if echo "$CONTENT" | grep -q "$EXPECTED_RESULT"; then
-            echo "[ $SERVICE_NAME ] Content is as expected."
+        if [ "$HTTP_STATUS" -eq 200 ]; then
+            echo "[ $SERVICE_NAME ] HTTP status is 200. Data preparation succeeded..."
         else
-            echo "[ $SERVICE_NAME ] Content does not match the expected result: $CONTENT"
+            echo "[ $SERVICE_NAME ] Data preparation failed..."
+        fi
+
+    else
+        local HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL")
+        if [ "$HTTP_STATUS" -eq 200 ]; then
+            echo "[ $SERVICE_NAME ] HTTP status is 200. Checking content..."
+
+            local CONTENT=$(curl -s -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL" | tee ${LOG_PATH}/${SERVICE_NAME}.log)
+
+            if echo "$CONTENT" | grep -q "$EXPECTED_RESULT"; then
+                echo "[ $SERVICE_NAME ] Content is as expected."
+            else
+                echo "[ $SERVICE_NAME ] Content does not match the expected result: $CONTENT"
+                docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
+                exit 1
+            fi
+        else
+            echo "[ $SERVICE_NAME ] HTTP status is not 200. Received status was $HTTP_STATUS"
             docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
             exit 1
         fi
-    else
-        echo "[ $SERVICE_NAME ] HTTP status is not 200. Received status was $HTTP_STATUS"
-        docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
-        exit 1
     fi
     sleep 5s
 }
@@ -122,6 +116,14 @@ function validate_microservices() {
         "llm-textgen-gaudi-server" \
         '{"query":"def print_hello_world():"}'
 
+    # Data ingest microservice
+    validate_services \
+        "${ip_address}:6007/v1/dataprep/ingest" \
+        "Data preparation succeeded" \
+        "ingest" \
+        "dataprep-redis-server" \
+        'link_list=["https://modin.readthedocs.io/en/latest/index.html"]'
+
 }
 
 function validate_megaservice() {
@@ -132,6 +134,21 @@ function validate_megaservice() {
         "mega-codegen" \
         "codegen-gaudi-backend-server" \
         '{"messages": "def print_hello_world():"}'
+
+    # Curl the Mega Service with index_name and agents_flag
+    validate_services \
+        "${ip_address}:7778/v1/codegen" \
+        "" \
+        "mega-codegen" \
+        "codegen-gaudi-backend-server" \
+        '{ "index_name": "test_redis", "agents_flag": "True", "messages": "def print_hello_world():", "max_tokens": 256}'
+
+    validate_services \
+        "${ip_address}:7778/v1/codegen" \
+        "class" \
+        "mega-codegen" \
+        "codegen-xeon-backend-server" \
+        '{"model": "Qwen/Qwen2.5-Coder-7B-Instruct", "messages": [{"role": "user", "content": "Implement a basic Python class"}], "max_tokens":32}'
 
 }
 
@@ -163,6 +180,18 @@ function validate_frontend() {
     fi
 }
 
+function validate_gradio() {
+    local URL="http://${ip_address}:5173/health"
+    local HTTP_STATUS=$(curl "$URL")
+    local SERVICE_NAME="Gradio"
+
+    if [ "$HTTP_STATUS" = '{"status":"ok"}' ]; then
+        echo "[ $SERVICE_NAME ] HTTP status is 200. UI server is running successfully..."
+    else
+        echo "[ $SERVICE_NAME ] UI server has failed..."
+    fi
+}
+
 function stop_docker() {
     local docker_profile="$1"
 
@@ -190,24 +219,36 @@ function main() {
         stop_docker "${docker_compose_profiles[${i}]}"
     done
 
-    # build docker images
+    echo "::group::build_docker_images"
     if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
+    echo "::endgroup::"
 
     # loop all profiles
     for ((i = 0; i < len_profiles; i++)); do
         echo "Process [${i}]: ${docker_compose_profiles[$i]}, ${docker_llm_container_names[${i}]}"
+
+        echo "::group::start_services"
         start_services "${docker_compose_profiles[${i}]}" "${docker_llm_container_names[${i}]}"
+        echo "::endgroup::"
         docker ps -a
 
+        echo "::group::validate_microservices"
         validate_microservices "${docker_llm_container_names[${i}]}"
+        echo "::endgroup::"
+
+        echo "::group::validate_megaservice"
         validate_megaservice
-        validate_frontend
+        echo "::endgroup::"
+
+        echo "::group::validate_gradio"
+        validate_gradio
+        echo "::endgroup::"
 
         stop_docker "${docker_compose_profiles[${i}]}"
         sleep 5s
     done
 
-    echo y | docker system prune
+    docker system prune -f
 }
 
 main

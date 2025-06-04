@@ -14,7 +14,7 @@ cd GenAIComps
 ### 2. Build ASR Image
 
 ```bash
-docker build -t opea/whisper-gaudi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/asr/src/integrations/dependency/whisper/Dockerfile.intel_hpu .
+docker build -t opea/whisper-gaudi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/third_parties/whisper/src/Dockerfile.intel_hpu .
 ```
 
 ### 3. Build LLM Image
@@ -24,7 +24,7 @@ Intel Gaudi optimized image hosted in huggingface repo will be used for TGI serv
 ### 4. Build TTS Image
 
 ```bash
-docker build -t opea/speecht5-gaudi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/tts/src/integrations/dependency/speecht5/Dockerfile.intel_hpu .
+docker build -t opea/speecht5-gaudi:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/third_parties/speecht5/src/Dockerfile.intel_hpu .
 ```
 
 ### 5. Build Animation Image
@@ -174,7 +174,7 @@ python3 ui/gradio/app_gradio_demo_avatarchatbot.py
 
 The UI can be viewed at http://${host_ip}:7861  
 <img src="../../../../assets/img/UI.png" alt="UI Example" width="60%">  
-In the current version v1.0, you need to set the avatar figure image/video and the DL model choice in the environment variables before starting AvatarChatbot backend service and running the UI. Please just customize the audio question in the UI.  
+In the current version v1.3, you need to set the avatar figure image/video and the DL model choice in the environment variables before starting AvatarChatbot backend service and running the UI. Please just customize the audio question in the UI.
 \*\* We will enable change of avatar figure between runs in v2.0
 
 ## Troubleshooting

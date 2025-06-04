@@ -2,7 +2,22 @@
 # SPDX-License-Identifier: Apache-2.0
 
 name: Build Images
-permissions: read-all
+permissions:
+  actions: read
+  contents: read
+  checks: read
+  deployments: read
+  discussions: read
+  issues: read
+  packages: read
+  pages: read
+  pull-requests: read
+  repository-projects: read
+  statuses: read
+  security-events: read
+  id-token: write
+  attestations: read
+  models: read
 on:
   workflow_call:
     inputs:
@@ -42,9 +57,9 @@ jobs:
       - name: Check if job should be skipped
         id: check-skip
         run: |
-          should_skip=false
-          if [[ "${{ inputs.node }}" == "gaudi3" || "${{ inputs.node }}" == "rocm" || "${{ inputs.node }}" == "arc" ]]; then
-            should_skip=true
+          should_skip=true
+          if [[ "${{ inputs.node }}" == "gaudi" || "${{ inputs.node }}" == "xeon" ]]; then
+            should_skip=false
           fi
           echo "should_skip=$should_skip"
           echo "should_skip=$should_skip" >> $GITHUB_OUTPUT
@@ -75,19 +90,12 @@ jobs:
         run: |
           cd ${{ github.workspace }}/${{ inputs.example }}/docker_image_build
           docker_compose_path=${{ github.workspace }}/${{ inputs.example }}/docker_image_build/build.yaml
+          source ${{ github.workspace }}/.github/env/_build_image.sh
           if [[ $(grep -c "vllm:" ${docker_compose_path}) != 0 ]]; then
-              git clone https://github.com/vllm-project/vllm.git && cd vllm
-              # Get the latest tag
-              VLLM_VER=$(git describe --tags "$(git rev-list --tags --max-count=1)")
-              echo "Check out vLLM tag ${VLLM_VER}"
-              git checkout ${VLLM_VER} &> /dev/null && cd ../
+              git clone -b ${VLLM_VER} --single-branch https://github.com/vllm-project/vllm.git
           fi
           if [[ $(grep -c "vllm-gaudi:" ${docker_compose_path}) != 0 ]]; then
-              git clone https://github.com/HabanaAI/vllm-fork.git && cd vllm-fork
-              # Get the latest tag
-              VLLM_VER=$(git describe --tags "$(git rev-list --tags --max-count=1)")
-              echo "Check out vLLM tag ${VLLM_VER}"
-              git checkout ${VLLM_VER} &> /dev/null && cd ../
+              git clone -b ${VLLM_FORK_VER} --single-branch https://github.com/HabanaAI/vllm-fork.git
           fi
           git clone --depth 1 --branch ${{ inputs.opea_branch }} https://github.com/opea-project/GenAIComps.git
           cd GenAIComps && git rev-parse HEAD && cd ../
