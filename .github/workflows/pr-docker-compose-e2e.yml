@@ -15,7 +15,7 @@ on:
       - "**.py"
       - "**/docker_compose/**"
       - "**/docker_image_build/**"
-      - "**/tests/test_compose**"
+      - "**/tests/**"
       - "**/ui/**"
       - "!**.md"
       - "!**.txt"
