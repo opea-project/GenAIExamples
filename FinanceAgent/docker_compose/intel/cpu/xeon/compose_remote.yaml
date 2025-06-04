@@ -1,14 +1,6 @@
 # Copyright (C) 2025 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-x-common-environment:
-  &common-env
-  no_proxy: ${NO_PROXY}
-  http_proxy: ${HTTP_PROXY}
-  https_proxy: ${HTTPS_PROXY}
-
 x-common-agent-environment:
-  &common-agent-env
-  <<: *common-env
   llm_endpoint_url: ${REMOTE_ENDPOINT}
   api_key: ${OPENAI_API_KEY}
