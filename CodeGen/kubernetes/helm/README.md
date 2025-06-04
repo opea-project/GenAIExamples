@@ -52,7 +52,7 @@ Install the CodeGen chart from the OPEA OCI registry, providing your Hugging Fac
 
 ```bash
 helm install codegen oci://ghcr.io/opea-project/charts/codegen \
-  --set global.HUGGINGFACEHUB_API_TOKEN=${HFTOKEN} \
+  --set global.HF_TOKEN=${HFTOKEN} \
   -f cpu-values.yaml \
   --namespace codegen --create-namespace
 ```
@@ -62,7 +62,7 @@ helm install codegen oci://ghcr.io/opea-project/charts/codegen \
 
 ```bash
 helm install codegen oci://ghcr.io/opea-project/charts/codegen \
-  --set global.HUGGINGFACEHUB_API_TOKEN=${HFTOKEN} \
+  --set global.HF_TOKEN=${HFTOKEN} \
   -f gaudi-values.yaml \
   --namespace codegen --create-namespace
 ```
@@ -114,7 +114,7 @@ You can customize the deployment by:
 -   Overriding parameters using the `--set` flag during `helm install`. Example:
     ```bash
     helm install codegen oci://ghcr.io/opea-project/charts/codegen \
-      --set global.HUGGINGFACEHUB_API_TOKEN=${HFTOKEN} \
+      --set global.HF_TOKEN=${HFTOKEN} \
       --namespace codegen --create-namespace
       # Add other --set overrides or -f <your-custom-values.yaml>
     ```
