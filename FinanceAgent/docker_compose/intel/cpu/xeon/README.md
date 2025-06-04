@@ -97,13 +97,13 @@ Follow **ONE** option below to deploy these services.
 #### Option 1: Deploy with Docker Compose for OpenAI Models
 
 ```bash
-docker compose -f compose.yaml up -d
+docker compose -f compose_openai.yaml up -d
 ```
 
 #### [Optional] Option 2: Deploy with Docker Compose for Models on a Remote Server
 
 ```bash
-docker compose -f compose.yaml -f compose_remote.yaml up -d
+docker compose -f compose_openai.yaml -f compose_remote.yaml up -d
 ```
 
 #### [Optional] Build docker images
