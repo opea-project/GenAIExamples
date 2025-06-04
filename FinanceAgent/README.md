@@ -59,6 +59,7 @@ This Finance Agent example can be deployed manually on Docker Compose.
 | Hardware                       | Deployment Mode      | Guide Link                                                               |
 | :----------------------------- | :------------------- | :----------------------------------------------------------------------- |
 | Intel® Gaudi® AI Accelerator | Single Node (Docker) | [Gaudi Docker Compose Guide](./docker_compose/intel/hpu/gaudi/README.md) |
+| Intel® Xeon® Scalable processors | Single Node (Docker) [Xeon Docker Compose Guide](./docker_compose/intel/cpu/xeon/README.md) |
 
 _Note: Building custom microservice images can be done using the resources in [GenAIComps](https://github.com/opea-project/GenAIComps)._
 
