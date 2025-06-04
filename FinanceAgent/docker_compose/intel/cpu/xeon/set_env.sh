@@ -26,23 +26,23 @@ check_var "FINANCIAL_DATASETS_API_KEY"
 check_var "HOST_IP"
 
 # OpenAI and agent configuration
-export OPENAI_API_KEY=${OPENAI_API_KEY}
+export OPENAI_API_KEY="${OPENAI_API_KEY}"
 export OPENAI_LLM_MODEL_ID="${OPENAI_LLM_MODEL_ID:-gpt-4o-mini-2024-07-18}"
 export RECURSION_LIMIT_WORKER="${RECURSION_LIMIT_WORKER:-12}"
 export RECURSION_LIMIT_SUPERVISOR="${RECURSION_LIMIT_SUPERVISOR:-10}"
 export TEMPERATURE="${TEMPERATURE:-0.5}"
 export MAX_TOKENS="${MAX_TOKENS:-4096}"
-export MAX_INPUT_TOKENS="${MAX_INPUT_TOKENS:-2048}"
-export MAX_TOTAL_TOKENS="${MAX_TOTAL_TOKENS:-4096}"
 
 # Hugging Face API token
 export HUGGINGFACEHUB_API_TOKEN="${HF_TOKEN}"
 
-# LLM configuration
+# Dataprep and Docsum LLM configuration
+export HF_CACHE_DIR="${HF_CACHE_DIR:-"./data"}"
 export LLM_PORT="${LLM_PORT:-8086}"
 export LLM_ENDPOINT="http://${HOST_IP}:${LLM_PORT}"
 export LLM_MODEL_ID="${LLM_MODEL_ID:-meta-llama/Llama-3.1-8B-Instruct}"
-export HF_CACHE_DIR="${HF_CACHE_DIR:-"./data"}"
+export MAX_INPUT_TOKENS="${MAX_INPUT_TOKENS:-2048}"
+export MAX_TOTAL_TOKENS="${MAX_TOTAL_TOKENS:-4096}"
 
 # Data preparation and embedding configuration
 export DATAPREP_PORT="${DATAPREP_PORT:-6007}"
