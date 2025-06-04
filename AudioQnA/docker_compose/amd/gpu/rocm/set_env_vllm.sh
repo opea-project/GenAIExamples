@@ -1,4 +1,4 @@
-#!/usr/bin/env bash                                                                                                           set_env.sh
+#!/usr/bin/env bash
 
 # Copyright (C) 2024 Advanced Micro Devices, Inc.
 # SPDX-License-Identifier: Apache-2.0
