@@ -19,6 +19,8 @@ function build_vllm_docker_image() {
     if [ ! -d "./vllm" ]; then
         git clone https://github.com/vllm-project/vllm.git
         cd vllm
+        git tag | sort -V
+        git describe --tags
         VLLM_VER="$(git describe --tags "$(git rev-list --tags --max-count=1)" )"
         echo "Check out vLLM tag ${VLLM_VER}"
         git checkout ${VLLM_VER} &> /dev/null
@@ -40,8 +42,6 @@ function start_vllm_service() {
     export VLLM_SKIP_WARMUP=true
     docker run -d -p ${vllm_port}:${vllm_port} --rm --network=host --name test-comps-vllm-service -v ~/.cache/huggingface:/root/.cache/huggingface -v ${WORKPATH}/tests/tool_chat_template_mistral_custom.jinja:/root/tool_chat_template_mistral_custom.jinja -e HF_TOKEN=$HF_TOKEN -e http_proxy=$http_proxy -e https_proxy=$https_proxy -it vllm-cpu-env --model ${model} --port ${vllm_port} --chat-template /root/tool_chat_template_mistral_custom.jinja --enable-auto-tool-choice --tool-call-parser mistral
     echo ${LOG_PATH}/vllm-service.log
-    docker images
-    echo docker ps
     sleep 10s
     echo "Waiting vllm ready"
     n=0
