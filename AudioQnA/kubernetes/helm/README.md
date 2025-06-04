@@ -7,12 +7,12 @@
 
 ```
 export HFTOKEN="insert-your-huggingface-token-here"
-helm install audioqna oci://ghcr.io/opea-project/charts/audioqna  --set global.HF_TOKEN=${HFTOKEN} -f cpu-values.yaml
+helm install audioqna oci://ghcr.io/opea-project/charts/audioqna  --set global.HUGGINGFACEHUB_API_TOKEN=${HFTOKEN} -f cpu-values.yaml
 ```
 
 ## Deploy on Gaudi
 
 ```
 export HFTOKEN="insert-your-huggingface-token-here"
-helm install audioqna oci://ghcr.io/opea-project/charts/audioqna  --set global.HF_TOKEN=${HFTOKEN} -f gaudi-values.yaml
+helm install audioqna oci://ghcr.io/opea-project/charts/audioqna  --set global.HUGGINGFACEHUB_API_TOKEN=${HFTOKEN} -f gaudi-values.yaml
 ```
