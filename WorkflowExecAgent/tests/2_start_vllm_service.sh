@@ -26,7 +26,7 @@ function build_vllm_docker_image() {
     else
         cd ./vllm
     fi
-    docker build -f Dockerfile.cpu -t vllm-cpu-env --shm-size=100g .
+    docker build -f docker/Dockerfile.cpu -t vllm-cpu-env --shm-size=100g .
     if [ $? -ne 0 ]; then
         echo "opea/vllm:cpu failed"
         exit 1
@@ -43,9 +43,12 @@ function start_vllm_service() {
     echo "Waiting vllm ready"
     n=0
     until [[ "$n" -ge 100 ]] || [[ $ready == true ]]; do
+        if docker logs test-comps-vllm-service| grep "Error response from daemon: No such container:"; then
+            exit 1
+        fi
         docker logs test-comps-vllm-service &> ${LOG_PATH}/vllm-service.log
         n=$((n+1))
-        if grep -q "Uvicorn running on" ${LOG_PATH}/vllm-service.log; then
+        if grep -q "Application startup complete." ${LOG_PATH}/vllm-service.log; then
             break
         fi
         if grep -q "No such container" ${LOG_PATH}/vllm-service.log; then

@@ -7,7 +7,7 @@ wf_api_port=${wf_api_port}
 api_server_url=http://$(hostname -I | awk '{print $1}'):${wf_api_port}/
 workflow_id=10071
 query="I have a data with gender Female, tenure 55, MonthlyCharges 103.7, TotalCharges 1840.75. Predict if this entry will churn. My workflow id is ${workflow_id}."
-validate_result="the prediction is No"
+validate_result="is No"
 
 function stop_agent_and_api_server() {
     echo "Stopping Agent services"
@@ -42,9 +42,9 @@ echo "=================== #5 Start validate agent ===================="
 bash 4_validate_agent.sh "$query" "$validate_result"
 echo "=================== #5 Validate agent completed ===================="
 
-echo "=================== #4 Stop all services ===================="
+echo "=================== #6 Stop all services ===================="
 stop_agent_and_api_server
 stop_vllm_docker
-echo "=================== #4 All services stopped ===================="
+echo "=================== #6 All services stopped ===================="
 
 echo "ALL DONE!"

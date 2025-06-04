@@ -27,7 +27,7 @@ function start_agent() {
     cd $WORKDIR/GenAIExamples/WorkflowExecAgent/docker_compose/intel/cpu/xeon
     WORKDIR=$WORKPATH/docker_image_build/ docker compose -f compose_vllm.yaml up -d
     echo "Waiting agent service ready"
-    sleep 5s
+    sleep 10s
 }
 
 function main() {
