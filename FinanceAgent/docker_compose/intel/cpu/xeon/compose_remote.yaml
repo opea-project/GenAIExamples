@@ -6,7 +6,7 @@ services:
     environment:
       llm_endpoint_url: ${REMOTE_ENDPOINT}
       api_key: ${OPENAI_API_KEY}
-  
+
   worker-research-agent:
     environment:
       llm_endpoint_url: ${REMOTE_ENDPOINT}
