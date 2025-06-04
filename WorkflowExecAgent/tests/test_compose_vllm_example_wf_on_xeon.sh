@@ -28,6 +28,9 @@ echo "=================== #1 Building docker images completed ==================
 
 echo "=================== #2 Start vllm service ===================="
 bash 2_start_vllm_service.sh
+if [ $? -ne 0 ]; then
+    return 1
+fi
 echo "=================== #2 Start vllm service completed ===================="
 
 echo "=================== #3 Start agent service ===================="

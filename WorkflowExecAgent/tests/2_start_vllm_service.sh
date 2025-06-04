@@ -39,7 +39,7 @@ function start_vllm_service() {
     echo "start vllm service"
     docker run -d -p ${vllm_port}:${vllm_port} --rm --network=host --name test-comps-vllm-service -v ~/.cache/huggingface:/root/.cache/huggingface -v ${WORKPATH}/tests/tool_chat_template_mistral_custom.jinja:/root/tool_chat_template_mistral_custom.jinja -e HF_TOKEN=$HF_TOKEN -e http_proxy=$http_proxy -e https_proxy=$https_proxy -it vllm-cpu-env --model ${model} --port ${vllm_port} --chat-template /root/tool_chat_template_mistral_custom.jinja --enable-auto-tool-choice --tool-call-parser mistral
     echo ${LOG_PATH}/vllm-service.log
-    sleep 5s
+    sleep 10s
     echo "Waiting vllm ready"
     n=0
     until [[ "$n" -ge 100 ]] || [[ $ready == true ]]; do
