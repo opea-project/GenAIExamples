@@ -1,6 +1,7 @@
 # Example DBQnA Deployment on Intel® Xeon® Platform
 
-This document outlines the deployment process for DBQnA application which helps generating a SQL query and its output given a NLP question, utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on an Intel Xeon server. 
+This document outlines the deployment process for DBQnA application which helps generating a SQL query and its output given a NLP question, utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on an Intel Xeon server.
+
 - [DBQnA Quick Start Deployment](#dbqna-quick-start-deployment): Demonstrates how to quickly deploy a DBQnA service/pipeline on Intel® Xeon® platform.
 - [DBQnA Docker Compose Files](#dbqna-docker-compose-files): Describes some example deployments and their docker compose files.
 
@@ -43,7 +44,7 @@ To set up environment variables for deploying DBQnA service, source the set_env.
 source set_env.sh
 ```
 
-The set_env.sh script will prompt for required and optional environment variables used to configure the DBQnA service. If a value is not entered, the script will use a default value for the same. It will also generate a _.env_ file defining the desired configuration.
+The set*env.sh script will prompt for required and optional environment variables used to configure the DBQnA service. If a value is not entered, the script will use a default value for the same. It will also generate a *.env\_ file defining the desired configuration.
 
 ### Deploy the Service Using Docker Compose
 
@@ -131,5 +132,5 @@ The table provides a comprehensive overview of the DBQnA service utilized across
 | -------------------------- | ------------------------------------------------------------- | -------- | --------------------------------------------------------------------------------------------------- |
 | tgi-service                | ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu | No       | Specific to the TGI deployment, focuses on text generation inference using AMD GPU (ROCm) hardware. |
 | postgres                   | postgres:latest                                               | No       | Provides the relational database backend for storing and querying data used by the DBQnA pipeline.  |
-| text2sql                   | opea/text2sql:latest                                          | No       | Handles text-to-SQL conversion tasks.                         |
-| dbqna-xeon-react-ui-server | opea/text2sql-react-ui:latest                                 | No       | Provides the user interface for the DBQnA service.     |
+| text2sql                   | opea/text2sql:latest                                          | No       | Handles text-to-SQL conversion tasks.                                                               |
+| dbqna-xeon-react-ui-server | opea/text2sql-react-ui:latest                                 | No       | Provides the user interface for the DBQnA service.                                                  |

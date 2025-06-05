@@ -63,7 +63,7 @@ The key feature of DBQnA app is that it converts a user's natural language query
 
 The table below lists the available deployment options and their implementation details for different hardware platforms.
 
-| Platform     | Deployment Method | Link                                                              |
-| ------------ | ----------------- | ----------------------------------------------------------------- |
-| Intel Xeon   | Docker compose    | [Deployment on Xeon](./docker_compose/intel/cpu/xeon/README.md)   |
-| AMD ROCm     | Docker compose    | [Deployment on AMD Rocm](./docker_compose/amd/gpu/rocm/README.md) |
+| Platform   | Deployment Method | Link                                                              |
+| ---------- | ----------------- | ----------------------------------------------------------------- |
+| Intel Xeon | Docker compose    | [Deployment on Xeon](./docker_compose/intel/cpu/xeon/README.md)   |
+| AMD ROCm   | Docker compose    | [Deployment on AMD Rocm](./docker_compose/amd/gpu/rocm/README.md) |
