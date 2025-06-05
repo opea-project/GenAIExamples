@@ -7,15 +7,15 @@ pushd "../../../../../" > /dev/null
 source .set_env.sh
 popd > /dev/null
 
-if [ -z "${HUGGINGFACEHUB_API_TOKEN}" ]; then
-    echo "Error: HUGGINGFACEHUB_API_TOKEN is not set. Please set HUGGINGFACEHUB_API_TOKEN."
+if [ -z "${HF_TOKEN}" ]; then
+    echo "Error: HF_TOKEN is not set. Please set HF_TOKEN."
 fi
 
 export host_ip=$(hostname -I | awk '{print $1}')
 export MARIADB_DATABASE="vectordb"
 export MARIADB_USER="chatqna"
 export MARIADB_PASSWORD="password"
-export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+export HF_TOKEN=${HF_TOKEN}
 export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
 export RERANK_MODEL_ID="BAAI/bge-reranker-base"
 export LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
