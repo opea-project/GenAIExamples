@@ -176,10 +176,27 @@ services:
       no_proxy: ${no_proxy}
       https_proxy: ${https_proxy}
       http_proxy: ${http_proxy}
-      BACKEND_BASE_URL: ${SEARCH_BACKEND_SERVICE_ENDPOINT}
     ipc: host
     restart: always
-
+  search-nginx-server:
+    image: ${REGISTRY:-opea}/nginx:${TAG:-latest}
+    container_name: search-nginx-server
+    depends_on:
+      - search-backend-server
+      - search-ui-server
+    ports:
+      - "${NGINX_PORT:-80}:80"
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - FRONTEND_SERVICE_IP=search-ui-server
+      - FRONTEND_SERVICE_PORT=5173
+      - BACKEND_SERVICE_NAME=search
+      - BACKEND_SERVICE_IP=search-backend-server
+      - BACKEND_SERVICE_PORT=8888
+    ipc: host
+    restart: always
 networks:
   default:
     driver: bridge

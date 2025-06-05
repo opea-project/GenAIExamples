@@ -65,37 +65,12 @@ function build_docker_images() {
 }
 
 function setup_env() {
-    export host_ip=${ip_address}
-    export MM_EMBEDDING_SERVICE_HOST_IP=${host_ip}
-    export MM_RETRIEVER_SERVICE_HOST_IP=${host_ip}
-    export LVM_SERVICE_HOST_IP=${host_ip}
-    export MEGA_SERVICE_HOST_IP=${host_ip}
-    export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
-    export WHISPER_PORT=7066
-    export MAX_IMAGES=1
-    export WHISPER_MODEL="base"
-    export WHISPER_SERVER_ENDPOINT="http://${host_ip}:${WHISPER_PORT}/v1/asr"
     export COLLECTION_NAME="LangChainCollection"
-    export MILVUS_HOST=${host_ip}
-    export DATAPREP_MMR_PORT=6007
-    export DATAPREP_INGEST_SERVICE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/dataprep/ingest"
-    export DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/dataprep/generate_transcripts"
-    export DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/dataprep/generate_captions"
-    export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/dataprep/get"
-    export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/dataprep/delete"
-    export EMM_BRIDGETOWER_PORT=6006
-    export BRIDGE_TOWER_EMBEDDING=true
-    export EMBEDDING_MODEL_ID="BridgeTower/bridgetower-large-itm-mlm-itc"
-    export MMEI_EMBEDDING_ENDPOINT="http://${host_ip}:$EMM_BRIDGETOWER_PORT"
-    export MM_EMBEDDING_PORT_MICROSERVICE=6000
+    export MILVUS_HOST=${ip_address}
     export MILVUS_RETRIEVER_PORT=7000
-    export LVM_PORT=9399
-    export LLAVA_SERVER_PORT=8399
+    cd $WORKPATH/docker_compose/intel
+    source set_env.sh
     export LVM_MODEL_ID="llava-hf/llava-1.5-7b-hf"
-    export LVM_ENDPOINT="http://${host_ip}:$LLAVA_SERVER_PORT"
-    export MEGA_SERVICE_PORT=8888
-    export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:$MEGA_SERVICE_PORT/v1/multimodalqna"
-    export UI_PORT=5173
 }
 
 
@@ -112,7 +87,7 @@ function prepare_data() {
     echo "Downloading image and video"
     wget https://github.com/docarray/docarray/blob/main/tests/toydata/image-data/apple.png?raw=true -O ${image_fn}
     wget http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4 -O ${video_fn}
-    wget https://raw.githubusercontent.com/opea-project/GenAIComps/v1.1/comps/retrievers/redis/data/nke-10k-2023.pdf -O ${pdf_fn}
+    wget https://raw.githubusercontent.com/opea-project/GenAIComps/v1.3/comps/third_parties/pathway/src/data/nke-10k-2023.pdf -O ${pdf_fn}
     echo "Writing caption file"
     echo "This is an apple."  > ${caption_fn}
     sleep 1m

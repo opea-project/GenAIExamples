@@ -2,7 +2,17 @@
 # SPDX-License-Identifier: Apache-2.0
 
 name: Image Build
-permissions: read-all
+permissions:
+  actions: read
+  contents: read
+  checks: write
+  deployments: write
+  issues: write
+  packages: write
+  pages: write
+  pull-requests: write
+  statuses: write
+  security-events: read
 on:
   workflow_call:
     inputs:
@@ -204,6 +214,10 @@ jobs:
           if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid && sleep 1s; fi
 
           echo "Cleaning up images ..."
+          df -h
+          sleep 1
+          docker system df
+          sleep 1
           if [[ "${{ inputs.hardware }}" == "xeon"* ]]; then
               docker system prune -a -f
           else
@@ -213,7 +227,13 @@ jobs:
               docker images --filter reference="opea/comps-base" -q | xargs -r docker rmi && sleep 1s
               docker system prune -f
           fi
+          sleep 5
           docker images
+          sleep 1
+          df -h
+          sleep 1
+          docker system df
+          sleep 1
 
       - name: Publish pipeline artifact
         if: ${{ !cancelled() }}
