@@ -42,7 +42,7 @@ This uses the default vLLM-based deployment profile (`codegen-gaudi-vllm`).
     # Replace with your host's external IP address (do not use localhost or 127.0.0.1)
     export HOST_IP="your_external_ip_address"
     # Replace with your Hugging Face Hub API token
-    export HUGGINGFACEHUB_API_TOKEN="your_huggingface_token"
+    export HF_TOKEN="your_huggingface_token"
 
     # Optional: Configure proxy if needed
     # export http_proxy="your_http_proxy"
@@ -93,7 +93,7 @@ The `compose.yaml` file uses Docker Compose profiles to select the LLM serving b
 - **Other Services:** Same CPU-based services as the vLLM profile.
 - **To Run:**
   ```bash
-  # Ensure environment variables (HOST_IP, HUGGINGFACEHUB_API_TOKEN) are set
+  # Ensure environment variables (HOST_IP, HF_TOKEN) are set
   docker compose --profile codegen-gaudi-tgi up -d
   ```
 
@@ -106,7 +106,7 @@ Key parameters are configured via environment variables set before running `dock
 | Environment Variable                    | Description                                                                                                         | Default (Set Externally)                       |
 | :-------------------------------------- | :------------------------------------------------------------------------------------------------------------------ | :--------------------------------------------- | ------------------------------------ |
 | `HOST_IP`                               | External IP address of the host machine. **Required.**                                                              | `your_external_ip_address`                     |
-| `HUGGINGFACEHUB_API_TOKEN`              | Your Hugging Face Hub token for model access. **Required.**                                                         | `your_huggingface_token`                       |
+| `HF_TOKEN`                              | Your Hugging Face Hub token for model access. **Required.**                                                         | `your_huggingface_token`                       |
 | `LLM_MODEL_ID`                          | Hugging Face model ID for the CodeGen LLM (used by TGI/vLLM service). Configured within `compose.yaml` environment. | `Qwen/Qwen2.5-Coder-7B-Instruct`               |
 | `EMBEDDING_MODEL_ID`                    | Hugging Face model ID for the embedding model (used by TEI service). Configured within `compose.yaml` environment.  | `BAAI/bge-base-en-v1.5`                        |
 | `LLM_ENDPOINT`                          | Internal URL for the LLM serving endpoint (used by `llm-codegen-vllm-server`). Configured in `compose.yaml`.        | http://codegen-vllm                            | tgi-server:9000/v1/chat/completions` |
@@ -224,7 +224,7 @@ Use the `Neural Copilot` extension configured with the CodeGen backend URL: `htt
   - Ensure host drivers and Habana Docker runtime are installed and working (`habana-container-runtime`).
   - Verify `runtime: habana` and volume mounts in `compose.yaml`.
   - Gaudi initialization can take significant time and memory. Monitor resource usage.
-- **Model Download Issues:** Check `HUGGINGFACEHUB_API_TOKEN`, internet access, proxy settings. Check LLM service logs.
+- **Model Download Issues:** Check `HF_TOKEN`, internet access, proxy settings. Check LLM service logs.
 - **Connection Errors:** Verify `HOST_IP`, ports, and proxy settings. Use `docker ps` and check service logs.
 
 ## Stopping the Application

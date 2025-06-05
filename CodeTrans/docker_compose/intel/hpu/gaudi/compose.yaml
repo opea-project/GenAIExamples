@@ -13,7 +13,7 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HF_TOKEN: ${HF_TOKEN}
       HABANA_VISIBLE_DEVICES: all
       OMPI_MCA_btl_vader_single_copy_mechanism: none
       LLM_MODEL_ID: ${LLM_MODEL_ID}
@@ -45,7 +45,7 @@ services:
       LLM_ENDPOINT: ${LLM_ENDPOINT}
       LLM_MODEL_ID: ${LLM_MODEL_ID}
       LLM_COMPONENT_NAME: ${LLM_COMPONENT_NAME}
-      HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HF_TOKEN: ${HF_TOKEN}
     restart: unless-stopped
   codetrans-gaudi-backend-server:
     image: ${REGISTRY:-opea}/codetrans:${TAG:-latest}

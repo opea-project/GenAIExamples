@@ -14,7 +14,7 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HF_TOKEN: ${HF_TOKEN}
       host_ip: ${host_ip}
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://$host_ip:8008/health || exit 1"]
@@ -38,7 +38,7 @@ services:
       LLM_ENDPOINT: ${LLM_ENDPOINT}
       LLM_MODEL_ID: ${LLM_MODEL_ID}
       LLM_COMPONENT_NAME: ${LLM_COMPONENT_NAME}
-      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HUGGINGFACEHUB_API_TOKEN: ${HF_TOKEN}
     restart: unless-stopped
   codetrans-xeon-backend-server:
     image: ${REGISTRY:-opea}/codetrans:${TAG:-latest}

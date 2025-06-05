@@ -41,7 +41,7 @@ To set up environment variables for deploying CodeTrans services, set up some pa
 
 ```bash
 export host_ip="External_Public_IP"           # ip address of the node
-export HUGGINGFACEHUB_API_TOKEN="Your_HuggingFace_API_Token"
+export HF_TOKEN="Your_HuggingFace_API_Token"
 export http_proxy="Your_HTTP_Proxy"           # http proxy if any
 export https_proxy="Your_HTTPs_Proxy"         # https proxy if any
 export no_proxy=localhost,127.0.0.1,$host_ip  # additional no proxies if needed
@@ -124,7 +124,7 @@ Key parameters are configured via environment variables set before running `dock
 | Environment Variable                    | Description                                                                                                           | Default (Set Externally)              |
 | :-------------------------------------- | :-------------------------------------------------------------------------------------------------------------------- | :------------------------------------ |
 | `HOST_IP`                               | External IP address of the host machine. **Required.**                                                                | `your_external_ip_address`            |
-| `HUGGINGFACEHUB_API_TOKEN`              | Your Hugging Face Hub token for model access. **Required.**                                                           | `your_huggingface_token`              |
+| `HF_TOKEN`                              | Your Hugging Face Hub token for model access. **Required.**                                                           | `your_huggingface_token`              |
 | `LLM_MODEL_ID`                          | Hugging Face model ID for the CodeTrans LLM (used by TGI/vLLM service). Configured within `compose.yaml` environment. | `mistralai/Mistral-7B-Instruct-v0.3`  |
 | `LLM_ENDPOINT`                          | Internal URL for the LLM serving endpoint (used by `codetrans-gaudi-llm-server`). Configured in `compose.yaml`.       | `http://${HOST_IP}:8008`              |
 | `LLM_COMPONENT_NAME`                    | LLM component name for the LLM Microservice.                                                                          | `OpeaTextGenService`                  |
