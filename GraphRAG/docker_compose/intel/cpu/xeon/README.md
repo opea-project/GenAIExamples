@@ -31,28 +31,39 @@ git clone https://github.com/opea-project/GenAIComps.git
 
 # vllm-service
 cd vllm/
-VLLM_VER="v0.8.3"
-git checkout ${VLLM_VER}
-docker build --no-cache -f docker/Dockerfile.cpu -t opea/vllm-cpu:${TAG:-latest} --shm-size=128g .
+VLLM_VER=v0.8.3
+git checkout "${VLLM_VER}"
+docker build --no-cache -f docker/Dockerfile.cpu -t opea/vllm-cpu:"${TAG:-latest}" --shm-size=128g .
 
 # opea/dataprep
 cd ~/GenAIComps
-docker build -t opea/dataprep:latest --build-arg no_proxy=$no_proxy --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/src/Dockerfile .
+docker build -t opea/dataprep:latest \
+    --build-arg "no_proxy=${no_proxy}" \
+    --build-arg "https_proxy=${https_proxy}" \
+    --build-arg "http_proxy=${http_proxy}" \
+    -f comps/dataprep/src/Dockerfile .
 
 # opea/retrievers
 cd ~/GenAIComps
-docker build -t opea/retriever:latest --build-arg no_proxy=$no_proxy --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/src/Dockerfile .
+docker build -t opea/retriever:latest \
+    --build-arg "no_proxy=${no_proxy}" \
+    --build-arg "https_proxy=${https_proxy}" \
+    --build-arg "http_proxy=${http_proxy}" \
+    -f comps/retrievers/src/Dockerfile .
 
 # opea/graphrag-ui
 cd ~/GenAIExamples/GraphRAG/ui
-docker build -t  opea/graphrag-ui:latest --build-arg no_proxy=$no_proxy --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
+docker build -t opea/graphrag-ui:latest \
+    --build-arg "no_proxy=${no_proxy}" \
+    --build-arg "https_proxy=${https_proxy}" \
+    --build-arg "http_proxy=${http_proxy}" \
+    -f docker/Dockerfile .
 
 # opea/graphrag
 cd ~/GenAIExamples/GraphRAG
-docker build -t  opea/graphrag:latest .
+docker build -t opea/graphrag:latest .
 
-
-Note: it's important to be in the correct path before builds so that docker has the correct context to COPY relevant code to containers.
+# Note: it is important to be in the correct path before builds so that docker has the correct context to COPY relevant code to containers.
 ```
 
 ### Quick Start: 1.Setup Environment Variable
@@ -70,7 +81,6 @@ To set up environment variables for deploying GraphRAG services, follow these st
     source set_env.sh
 
     # Below will override some of these defaults in set_env.sh
-
     export host_ip=$(hostname -I | awk '{print $1}')
 
     export NEO4J_PORT1=11631
@@ -110,7 +120,6 @@ To set up environment variables for deploying GraphRAG services, follow these st
     export DATAPREP_PORT=11103
     export RETRIEVER_PORT=11635
     export MEGA_SERVICE_PORT=8888
-
    ```
 
 2. If you are in a proxy environment, also set the proxy-related environment variables:
@@ -172,10 +181,14 @@ Here is an example of uploading sample graph data (which can also be uploaded vi
 cd ~/GenAIExamples/GraphRAG/example_data
 
 # First file
-curl -X POST "http://${host_ip}:6004/v1/dataprep/ingest"     -H "Content-Type: multipart/form-data"     -F "files=@./programming_languages.txt"
+curl -X POST "http://${host_ip}:6004/v1/dataprep/ingest" \
+    -H "Content-Type: multipart/form-data" \
+    -F "files=@./programming_languages.txt"
 
 # Second file
-curl -X POST "http://${host_ip}:6004/v1/dataprep/ingest"     -H "Content-Type: multipart/form-data"     -F "files=@./programming_languages2.txt"
+curl -X POST "http://${host_ip}:6004/v1/dataprep/ingest" \
+    -H "Content-Type: multipart/form-data" \
+    -F "files=@./programming_languages2.txt"
 ```
 
 To login into the Neo4j UI you may browse to http://localhost:{NEO4J_PORT1}/browser, and login with your NEO4J login and password defined in the environment variables section.
@@ -184,8 +197,7 @@ The backend graphrag service can be queried via curl:
 ```bash
 curl http://${host_ip}:8888/v1/graphrag \
     -H "Content-Type: application/json"  \
-    -d '{"messages": [{"role": "user","content": "what are the main themes of the programming dataset?
-    "}]}'
+    -d '{"messages": [{"role": "user","content": "what are the main themes of the programming dataset?"}]}'
 ```
 
 ## Architecture and Deploy details
