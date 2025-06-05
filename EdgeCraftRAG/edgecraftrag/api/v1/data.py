@@ -95,7 +95,7 @@ async def delete_file(name):
 
 # Upload & save a file from UI
 @data_app.post(path="/v1/data/file/{file_name}")
-async def upload_file(file_name: str,file: UploadFile = File(...)):
+async def upload_file(file_name: str, file: UploadFile = File(...)):
     if ctx.get_pipeline_mgr().get_active_pipeline() is None:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Please activate pipeline and upload the file"
