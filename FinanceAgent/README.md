@@ -3,7 +3,6 @@
 ## Table of Contents
 
 - [Overview](#overview)
-- [Problem Motivation](#problem-motivation)
 - [Architecture](#architecture)
   - [High-Level Diagram](#high-level-diagram)
   - [OPEA Microservices Diagram for Data Handling](#opea-microservices-diagram-for-data-handling)

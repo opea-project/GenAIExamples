@@ -71,7 +71,7 @@ Note: The compose file might read additional variables from `set_env.sh`. Ensure
 To run models on a remote server i.e. deployed using Intel® AI for Enterprise Inference, a base URL and an API key are required to access them. To run the Agent microservice on Xeon while using models deployed on a remote server, set additional environment variables shown below.
 
 ```bash
-# Overwrite this environment variable previously set in set_env.sh with a new value for the desired model
+# Overwrite this environment variable previously set in set_env.sh with a new value for the desired model. The default value is gpt-4o-mini-2024-07-18.
 export OPENAI_LLM_MODEL_ID=<name-of-model-card>
 
 # The base URL given from the owner of the on-prem machine or cloud service provider. It will follow this format: "https://<DNS>". Here is an example: "https://api.inference.example.com".
