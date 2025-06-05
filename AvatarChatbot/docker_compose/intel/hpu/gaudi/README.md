@@ -58,7 +58,7 @@ Then run the command `docker images`, you will have following images ready:
 Before starting the services with `docker compose`, you have to recheck the following environment variables.
 
 ```bash
-export HUGGINGFACEHUB_API_TOKEN=<your_hf_token>
+export HF_TOKEN=<your_hf_token>
 export host_ip=$(hostname -I | awk '{print $1}')
 
 export LLM_MODEL_ID=Intel/neural-chat-7b-v3-3
@@ -183,7 +183,7 @@ In the current version v1.3, you need to set the avatar figure image/video and t
 cd GenAIExamples/AvatarChatbot/tests
 export IMAGE_REPO="opea"
 export IMAGE_TAG="latest"
-export HUGGINGFACEHUB_API_TOKEN=<your_hf_token>
+export HF_TOKEN=<your_hf_token>
 
 test_avatarchatbot_on_gaudi.sh
 ```
