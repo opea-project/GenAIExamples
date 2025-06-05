@@ -193,5 +193,6 @@ Choose "oob" mode when you want to selectively enable optimizations, or "tune" m
 
 Note: Always ensure there are no leftover Helm chart directories from previous failed runs before starting a new deployment.
 
-### ChatQnA Release Data 
+### ChatQnA Release Data
+
 The ChatQnA benchmark results are available in the [ChatQnA/benchmark_results.md](./ChatQnA/benchmark_results.md).
