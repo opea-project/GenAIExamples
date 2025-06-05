@@ -55,7 +55,7 @@ services:
     ports:
       - ${NGINX_PORT:-8086}:8086
     volumes:
-      - ${NGINX_CONFIG_PATH}:/etc/nginx/nginx.conf
+      - ${NGINX_CONFIG_PATH:-${PWD}}:/etc/nginx/nginx.conf
     depends_on:
       - server
     profiles:
