@@ -9,7 +9,7 @@ source .set_env.sh
 popd > /dev/null
 
 export host_ip=${ip_address}
-export DBQNA_HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+export DBQNA_HUGGINGFACEHUB_API_TOKEN=${HF_TOKEN}
 export DBQNA_TGI_SERVICE_PORT=8008
 export DBQNA_TGI_LLM_ENDPOINT="http://${host_ip}:${DBQNA_TGI_SERVICE_PORT}"
 export DBQNA_LLM_MODEL_ID="mistralai/Mistral-7B-Instruct-v0.3"
