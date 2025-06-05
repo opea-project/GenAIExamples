@@ -24,8 +24,6 @@ Note: If you do not have docker installed you can run this script to install doc
 Build images:
 
 ```bash
-
-
 cd ~/
 git clone https://github.com/opea-project/GenAIExamples.git
 git clone https://github.com/vllm-project/vllm.git
