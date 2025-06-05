@@ -154,7 +154,7 @@ function main() {
     echo "::endgroup::"
 
     echo "::group::build_docker_images"
-    # if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
+    if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
     echo "::endgroup::"
 
     echo "::group::start_services"
