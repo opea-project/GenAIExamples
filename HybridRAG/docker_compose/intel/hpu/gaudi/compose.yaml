@@ -42,6 +42,7 @@ services:
         - ./data/neo4j/config:/config
         - ./data/neo4j/data:/data
         - ./data/neo4j/plugins:/plugins
+        - ./data:/var/lib/neo4j/import
     ipc: host
     environment:
       - no_proxy=${no_proxy}
@@ -61,6 +62,40 @@ services:
       timeout: 10s
       retries: 20
       start_period: 3s
+  struct2graph:
+    image: opea/struct2graph:latest
+    container_name: struct2graph
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - NEO4J_URI=${NEO4J_URI}
+      - NEO4J_URL=${NEO4J_URI}
+      - NEO4J_USERNAME=${NEO4J_USERNAME}
+      - NEO4J_PASSWORD=${NEO4J_PASSWORD}
+      - NEO4J_server_directories_import=import
+      - NEO4J_PLUGINS=["apoc"]
+      - NEO4J_dbms_security_allow__csv__import__from__file__urls=true
+      - NEO4J_server_directories_import='/var/lib/neo4j/import'
+      - NEO4J_dbms_security_procedures_unrestricted=apoc.\\\* neo4j:5.23.0
+      - STRUCT2GRAPH_PORT=${STRUCT2GRAPH_PORT:-8090}
+      - NEO4J_PORT1=${NEO4J_PORT1}
+      - NEO4J_PORT2=${NEO4J_PORT2}
+      - INDEX_NAME=${INDEX_NAME:-graph_store}
+      - LOAD_FORMAT=${LOAD_FORMAT:-CSV}
+    ports:
+      - "8090:8090"
+    depends_on:
+      neo4j-apoc:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7474"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    ipc: host
+    restart: always
   redis-vector-db:
     image: redis/redis-stack:7.2.0-v9
     container_name: redis-vector-db
@@ -232,6 +267,8 @@ services:
       - BACKEND_SERVICE_PORT=8888
       - DATAPREP_SERVICE_IP=dataprep-redis-service
       - DATAPREP_SERVICE_PORT=5000
+      - STRUCT2GRAPH_SERVICE_IP=struct2graph
+      - STRUCT2GRAPH_SERVICE_PORT=8090
     ipc: host
     restart: always
 
