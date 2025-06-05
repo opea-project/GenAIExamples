@@ -9,7 +9,6 @@ from comps.cores.proto.docarray import LLMParams
 from fastapi import Request
 
 MEGA_SERVICE_PORT = int(os.getenv("MEGA_SERVICE_PORT", 8888))
-
 WHISPER_SERVER_HOST_IP = os.getenv("WHISPER_SERVER_HOST_IP", "0.0.0.0")
 WHISPER_SERVER_PORT = int(os.getenv("WHISPER_SERVER_PORT", 7066))
 SPEECHT5_SERVER_HOST_IP = os.getenv("SPEECHT5_SERVER_HOST_IP", "0.0.0.0")
@@ -42,11 +41,50 @@ def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **k
     return inputs
 
 
+def align_outputs(self, data, cur_node, inputs, runtime_graph, llm_parameters_dict, **kwargs):
+    next_data = {}
+    if self.services[cur_node].service_type == ServiceType.LLM and not llm_parameters_dict["stream"]:
+        if "faqgen" in self.services[cur_node].endpoint:
+            next_data = data
+        else:
+            next_data["text"] = data["choices"][0]["message"]["content"]
+    else:
+        next_data = data
+
+    return next_data
+
+
+def align_generator(self, gen, **kwargs):
+    # OpenAI response format
+    # b'data:{"id":"","object":"text_completion","created":1725530204,"model":"meta-llama/Meta-Llama-3-8B-Instruct","system_fingerprint":"2.0.1-native","choices":[{"index":0,"delta":{"role":"assistant","content":"?"},"logprobs":null,"finish_reason":null}]}\n\n'
+    for line in gen:
+        line = line.decode("utf-8")
+        start = line.find("{")
+        end = line.rfind("}") + 1
+
+        json_str = line[start:end]
+        try:
+            # sometimes yield empty chunk, do a fallback here
+            json_data = json.loads(json_str)
+            if "ops" in json_data and "op" in json_data["ops"][0]:
+                if "value" in json_data["ops"][0] and isinstance(json_data["ops"][0]["value"], str):
+                    yield f"data: {repr(json_data['ops'][0]['value'].encode('utf-8'))}\n\n"
+                else:
+                    pass
+            elif "content" in json_data["choices"][0]["delta"]:
+                yield f"data: {repr(json_data['choices'][0]['delta']['content'].encode('utf-8'))}\n\n"
+        except Exception as e:
+            yield f"data: {repr(json_str.encode('utf-8'))}\n\n"
+    yield "data: [DONE]\n\n"
+
+
 class AudioQnAService:
     def __init__(self, host="0.0.0.0", port=8000):
         self.host = host
         self.port = port
         ServiceOrchestrator.align_inputs = align_inputs
+        ServiceOrchestrator.align_outputs = align_outputs
+        ServiceOrchestrator.align_generator = align_generator
         self.megaservice = ServiceOrchestrator()
 
         self.endpoint = str(MegaServiceEndpoint.AUDIO_QNA)
