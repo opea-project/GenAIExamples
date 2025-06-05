@@ -29,19 +29,16 @@ UI_UPLOAD_PATH="$WORKPATH/tests"
 HF_ENDPOINT=https://hf-mirror.com
 NGINX_PORT=8086
 NGINX_PORT_0=8100 
-NGINX_PORT_1=8200 
+NGINX_PORT_1=8100 
 VLLM_SERVICE_PORT_0=8100
-VLLM_SERVICE_PORT_1=8200
 TENSOR_PARALLEL_SIZE=1
 SELECTED_XPU_0=0
-SELECTED_XPU_1=1
 vLLM_ENDPOINT="http://${HOST_IP}:${NGINX_PORT}"
 CONTAINER_COUNT="single_container"
 LLM_MODEL=Qwen/Qwen2-7B-Instruct
 LLM_MODEL_PATH=$MODEL_PATH/Qwen/Qwen2-7B-Instruct
-touch $WORKPATH/edgecraftrag/nginx.conf
-envsubst < $WORKPATH/nginx/nginx.conf.template  >  $WORKPATH/edgecraftrag/nginx.conf
-NGINX_CONFIG_PATH="$WORKPATH/edgecraftrag/nginx.conf"
+NGINX_CONFIG_PATH="$WORKPATH/nginx/nginx.conf"
+envsubst < $WORKPATH/nginx/nginx.conf.template >  $WORKPATH/nginx/nginx.conf
 
 function build_docker_images() {
     echo "Pull intelanalytics/ipex-llm-serving-xpu image"
@@ -157,7 +154,7 @@ function main() {
     echo "::endgroup::"
 
     echo "::group::build_docker_images"
-    if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
+    # if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
     echo "::endgroup::"
 
     echo "::group::start_services"
