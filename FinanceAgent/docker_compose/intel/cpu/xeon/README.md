@@ -92,7 +92,7 @@ The following services will be launched:
 - supervisor-agent-endpoint
 - agent-ui
 
-Follow **ONE** option below to deploy these services. 
+Follow **ONE** option below to deploy these services.
 
 #### Option 1: Deploy with Docker Compose for OpenAI Models
 
@@ -120,7 +120,7 @@ docker compose -f build.yaml build --no-cache
 
 ## Validate Services
 
-Wait several minutes for models to download and services to initialize. Check container logs with this command: 
+Wait several minutes for models to download and services to initialize. Check container logs with this command:
 
 ```bash
 docker compose logs -f <service_name>.

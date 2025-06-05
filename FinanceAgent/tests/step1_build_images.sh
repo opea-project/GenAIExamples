@@ -49,7 +49,7 @@ function build_vllm_docker_image() {
 }
 
 function main() {
-    case $1 in 
+    case $1 in
         "gaudi_vllm")
             echo "==================== Build agent docker image for Gaudi ===================="
             echo "Build vLLM docker image if needed"
