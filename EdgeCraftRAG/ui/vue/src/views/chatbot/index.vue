@@ -21,7 +21,7 @@
                 <SvgIcon :name="menu.icon" :size="22" inherit
               /></span>
 
-              {{ menu.label }}
+              {{ $t(menu.label) }}
             </div>
           </div>
           <div class="footer-menu">
@@ -102,13 +102,13 @@ let systemData = reactive<EmptyObjectType>({});
 
 const componentList = ref<EmptyArrayType>([
   {
-    label: t("chat.title"),
+    label: "chat.title",
     id: "chat",
     icon: "icon-chat",
     component: markRaw(Chatbot),
   },
   {
-    label: t("knowledge.title"),
+    label: "knowledge.title",
     id: "knowledge",
     icon: "icon-knowledge",
     component: markRaw(KnowledgeDetial),

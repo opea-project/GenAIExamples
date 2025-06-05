@@ -43,6 +43,8 @@ class KnowledgeManager(BaseMgr):
         for _, kb in self.components.items():
             if kb.name == knowledge.name:
                 raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="The knowledge base already exists.")
+        if knowledge.active is None:
+            knowledge.active = False
         kb = Knowledge(name=knowledge.name,description=knowledge.description,active=knowledge.active)
         self.add(kb)
         if knowledge.active:
@@ -66,7 +68,7 @@ class KnowledgeManager(BaseMgr):
         
         if knowledge.active is not None and kb.active != knowledge.active:
             kb = self.active_knowledge(knowledge)
-        return kb.get_file_paths()
+        return "Knowledge base update successfully"
 
 
     def get_all_knowledge_bases(self) -> List[Dict[str, Any]]:
