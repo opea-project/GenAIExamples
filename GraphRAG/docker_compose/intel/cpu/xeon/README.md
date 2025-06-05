@@ -125,9 +125,8 @@ To set up environment variables for deploying GraphRAG services, follow these st
 
 ### Quick Start: 2.Run Docker Compose
 
-If the microservice images are available in Docker Hub they will be pulled, otherwise you will need to build the container images manually. Please refer to the 'Build Docker Images' in [Guide](../ChatQnA/docker_compose/intel/cpu/xeon/README.md). [test_compose_on_xeon.sh](tests/test_compose_on_xeon.sh) can be a good resource as it shows how to do image build, starting services, validated each microservices and megaservices. This is what is used in CI/CD.
+If the microservice images are available in Docker Hub they will be pulled, otherwise you will need to build the container images manually. Please refer to the 'Build Docker Images' in [Guide](../../../../../ChatQnA/docker_compose/intel/cpu/xeon/README.md). [test_compose_on_xeon.sh](../../../../../ChatQnA/tests/test_compose_on_xeon.sh) can be a good resource as it shows how to do image build, starting services, validated each microservices and megaservices. This is what is used in CI/CD.
 
-Docker compose will start 8 services: ![8 servicesi in GraphRAG](assets/8microservices.png)
 
 ```bash
 cd GraphRAG/docker_compose/intel/cpu/xeon
@@ -135,6 +134,31 @@ NGINX_PORT=8080 docker compose -f compose.yaml up -d
 ```
 
 Here NGINX_PORT=8080 because typically port 80 is used for internet browsing.
+
+
+#### Check the Deployment Status
+
+After running docker compose, check if all the containers launched via docker compose have started:
+
+
+```bash
+docker ps -a
+```
+
+The following containers should have started:
+
+```bash
+CONTAINER ID   IMAGE                                                   COMMAND                  CREATED       STATUS                 PORTS                                                                                                    NAMES
+740d0061fce2   opea/nginx:latest                                       "/docker-entrypoint.…"   3 hours ago   Up 3 hours             0.0.0.0:8080->80/tcp, [::]:8080->80/tcp                                                                  graphrag-xeon-nginx-server
+3010243786cd   opea/graphrag-ui:latest                                 "docker-entrypoint.s…"   3 hours ago   Up 3 hours             0.0.0.0:5173->5173/tcp, :::5173->5173/tcp                                                                graphrag-ui-server
+f63d10453e22   opea/graphrag:latest                                    "python graphrag.py"     3 hours ago   Up 3 hours             0.0.0.0:8888->8888/tcp, :::8888->8888/tcp                                                                graphrag-xeon-backend-server
+a48d0fba13e6   opea/dataprep:latest                                    "sh -c 'python $( [ …"   3 hours ago   Up 3 hours             0.0.0.0:6004->5000/tcp, [::]:6004->5000/tcp                                                              dataprep-neo4j-server
+9301a833f220   opea/retriever:latest                                   "python opea_retriev…"   3 hours ago   Up 3 hours             0.0.0.0:7000->7000/tcp, :::7000->7000/tcp                                                                retriever-neo4j-server
+eda369268406   ghcr.io/huggingface/text-embeddings-inference:cpu-1.5   "text-embeddings-rou…"   3 hours ago   Up 3 hours             0.0.0.0:6006->80/tcp, [::]:6006->80/tcp                                                                  tei-embedding-server
+f21e82efa1fa   opea/vllm-cpu:latest                                    "python3 -m vllm.ent…"   3 hours ago   Up 3 hours (healthy)   0.0.0.0:9009->80/tcp, [::]:9009->80/tcp                                                                  vllm-service
+3b541ceeaf9f   neo4j:latest                                            "tini -g -- /startup…"   3 hours ago   Up 3 hours             7473/tcp, 0.0.0.0:11631->7474/tcp, [::]:11631->7474/tcp, 0.0.0.0:11632->7687/tcp, [::]:11632->7687/tcp   neo4j-apoc
+```
+
 
 ##### Test Final vLLM
 
@@ -153,14 +177,16 @@ Here is an example of uploading sample graph data (which can also be uploaded vi
 ```bash
 cd ~/GenAIExamples/GraphRAG/example_data
 
+# First file
 curl -X POST "http://${host_ip}:6004/v1/dataprep/ingest"     -H "Content-Type: multipart/form-data"     -F "files=@./programming_languages.txt"
 
-
+# Second file
 curl -X POST "http://${host_ip}:6004/v1/dataprep/ingest"     -H "Content-Type: multipart/form-data"     -F "files=@./programming_languages2.txt"
 ```
 
-To login into the Neo4j UI you may browse to http://localhost:{NEO4J_PORT1}/browser, and login with your NEO4J login and password defined in the environment variables section. http://localhost:{NEO4J_PORT1}/ will allow you to interact with the database.
+To login into the Neo4j UI you may browse to http://localhost:{NEO4J_PORT1}/browser, and login with your NEO4J login and password defined in the environment variables section.
 
+The backend graphrag service can be queried via curl:
 
 ```bash
 curl http://${host_ip}:8888/v1/graphrag \
@@ -273,21 +299,6 @@ To access the frontend, open the following URL in your browser: `http://{host_ip
 
 In the above example, the UI runs on port 8080 internally.
 
-## Troubleshooting
-
-1. If you get errors like "Access Denied", [validate micro service](https://github.com/opea-project/GenAIExamples/blob/main/ChatQnA/docker_compose/intel/cpu/xeon/README.md#validate-microservices) first. A simple example:
-
-   ```bash
-   http_proxy="" curl ${host_ip}:6006/embed -X POST  -d '{"inputs":"What is Deep Learning?"}' -H 'Content-Type: application/json'
-   ```
-
-2. (Docker only) If all microservices work well, check the port ${host_ip}:8888, the port may be allocated by other users, you can modify the `compose.yaml`.
-
-3. (Docker only) If you get errors like "The container name is in use", change container name in `compose.yaml`.
-
 ## Monitoring OPEA Service with Prometheus and Grafana dashboard
 
 OPEA microservice deployment can easily be monitored through Grafana dashboards in conjunction with Prometheus data collection. Follow the [README](https://github.com/opea-project/GenAIEval/blob/main/evals/benchmark/grafana/README.md) to setup Prometheus and Grafana servers and import dashboards to monitor the OPEA service.
-
-![chatqna dashboards](../ChatQnA/assets/img/chatqna_dashboards.png)
-![tgi dashboard](../ChatQnA//assets/img/tgi_dashboard.png)
