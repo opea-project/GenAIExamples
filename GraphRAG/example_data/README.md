@@ -36,10 +36,10 @@ A concise dataset that showcases GraphRAG's ability to:
 This dataset is ideal for testing queries like:
 
 1. "What are the main themes of the programming dataset?"
-   2 "What's the relationship between Google and these programming languages?"
-2. "How did early teaching languages influence modern programming languages?"
-3. "Trace the evolution of programming language features through these languages."
-4. "What role did corporate entities play in language development?"
+2. "What's the relationship between Google and these programming languages?"
+3. "How did early teaching languages influence modern programming languages?"
+4. "Trace the evolution of programming language features through these languages."
+5. "What role did corporate entities play in language development?"
 
 ### Community Detection
 

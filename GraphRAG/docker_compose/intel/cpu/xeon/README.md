@@ -153,10 +153,13 @@ Here is an example of uploading sample graph data (which can also be uploaded vi
 ```bash
 cd ~/GenAIExamples/GraphRAG/example_data
 
-curl -X POST "http://${host_ip}:6006/v1/dataprep/ingest"     -H "Content-Type: multipart/form-data"     -F "files=@./programming_languages.txt"
+curl -X POST "http://${host_ip}:6004/v1/dataprep/ingest"     -H "Content-Type: multipart/form-data"     -F "files=@./programming_languages.txt"
+
+
+curl -X POST "http://${host_ip}:6004/v1/dataprep/ingest"     -H "Content-Type: multipart/form-data"     -F "files=@./programming_languages2.txt"
 ```
 
-To login into the Neo4j UI you may browse to http://localhost:{NEO4J_PORT2}/browser, and login with your NEO4J login and password defined in the environment variables section. http://localhost:{NEO4J_PORT1}/ will allow you to interact with the database.
+To login into the Neo4j UI you may browse to http://localhost:{NEO4J_PORT1}/browser, and login with your NEO4J login and password defined in the environment variables section. http://localhost:{NEO4J_PORT1}/ will allow you to interact with the database.
 
 
 ```bash
