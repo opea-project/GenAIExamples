@@ -29,13 +29,11 @@ def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **k
         next_inputs["top_p"] = llm_parameters_dict["top_p"]
         next_inputs["stream"] = inputs["stream"]  # False as default
         next_inputs["frequency_penalty"] = inputs["frequency_penalty"]
-        # next_inputs["presence_penalty"] = inputs["presence_penalty"]
-        # next_inputs["repetition_penalty"] = inputs["repetition_penalty"]
         next_inputs["temperature"] = inputs["temperature"]
         inputs = next_inputs
     elif self.services[cur_node].service_type == ServiceType.TTS:
         next_inputs = {}
-        next_inputs["text"] = inputs["choices"][0]["message"]["content"]
+        next_inputs["text"] = inputs["text"]
         next_inputs["voice"] = kwargs["voice"]
         inputs = next_inputs
     return inputs
