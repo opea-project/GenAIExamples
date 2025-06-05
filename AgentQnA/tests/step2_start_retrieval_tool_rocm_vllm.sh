@@ -20,7 +20,7 @@ function start_retrieval_tool() {
     cd $WORKPATH/../DocIndexRetriever/docker_compose/intel/cpu/xeon
     host_ip=$(hostname -I | awk '{print $1}')
     export HF_CACHE_DIR=${HF_CACHE_DIR}
-    export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+    export HF_TOKEN=${HF_TOKEN}
     export no_proxy=${no_proxy}
     export http_proxy=${http_proxy}
     export https_proxy=${https_proxy}

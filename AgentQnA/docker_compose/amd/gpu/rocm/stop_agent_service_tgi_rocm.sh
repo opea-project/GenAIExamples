@@ -5,7 +5,7 @@
 
 WORKPATH=$(dirname "$PWD")/..
 export ip_address=${host_ip}
-export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
+export HF_TOKEN=${HF_TOKEN}
 export AGENTQNA_TGI_IMAGE=ghcr.io/huggingface/text-generation-inference:2.4.1-rocm
 export AGENTQNA_TGI_SERVICE_PORT="19001"
 

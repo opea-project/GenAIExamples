@@ -9,7 +9,7 @@ ls $WORKPATH
 export WORKDIR=$WORKPATH/../../
 echo "WORKDIR=${WORKDIR}"
 export ip_address=$(hostname -I | awk '{print $1}')
-export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+export HF_TOKEN=${HF_TOKEN}
 export TOOLSET_PATH=$WORKPATH/tools/
 IMAGE_REPO=${IMAGE_REPO:-"opea"}
 IMAGE_TAG=${IMAGE_TAG:-"latest"}
