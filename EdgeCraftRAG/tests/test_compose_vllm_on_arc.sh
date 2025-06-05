@@ -36,7 +36,7 @@ SELECTED_XPU_0=0
 vLLM_ENDPOINT="http://${HOST_IP}:${NGINX_PORT}"
 CONTAINER_COUNT="single_container"
 LLM_MODEL=Qwen/Qwen2-7B-Instruct
-LLM_MODEL_PATH=$MODEL_PATH/Qwen/Qwen2-7B-Instruct
+LLM_MODEL_PATH=$MODEL_PATH
 NGINX_CONFIG_PATH="$WORKPATH/nginx/nginx.conf"
 
 function build_docker_images() {
