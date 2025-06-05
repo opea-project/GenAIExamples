@@ -125,7 +125,6 @@ To set up environment variables for deploying GraphRAG services, follow these st
 
 If the microservice images are available in Docker Hub they will be pulled, otherwise you will need to build the container images manually. Please refer to the 'Build Docker Images' in [Guide](../../../../../ChatQnA/docker_compose/intel/cpu/xeon/README.md). [test_compose_on_xeon.sh](../../../../../ChatQnA/tests/test_compose_on_xeon.sh) can be a good resource as it shows how to do image build, starting services, validated each microservices and megaservices. This is what is used in CI/CD.
 
-
 ```bash
 cd GraphRAG/docker_compose/intel/cpu/xeon
 NGINX_PORT=8080 docker compose -f compose.yaml up -d
@@ -133,11 +132,9 @@ NGINX_PORT=8080 docker compose -f compose.yaml up -d
 
 Here NGINX_PORT=8080 because typically port 80 is used for internet browsing.
 
-
 #### Check the Deployment Status
 
 After running docker compose, check if all the containers launched via docker compose have started:
-
 
 ```bash
 docker ps -a
@@ -156,7 +153,6 @@ eda369268406   ghcr.io/huggingface/text-embeddings-inference:cpu-1.5   "text-emb
 f21e82efa1fa   opea/vllm-cpu:latest                                    "python3 -m vllm.ent…"   3 hours ago   Up 3 hours (healthy)   0.0.0.0:9009->80/tcp, [::]:9009->80/tcp                                                                  vllm-service
 3b541ceeaf9f   neo4j:latest                                            "tini -g -- /startup…"   3 hours ago   Up 3 hours             7473/tcp, 0.0.0.0:11631->7474/tcp, [::]:11631->7474/tcp, 0.0.0.0:11632->7687/tcp, [::]:11632->7687/tcp   neo4j-apoc
 ```
-
 
 ##### Test Final vLLM
 
