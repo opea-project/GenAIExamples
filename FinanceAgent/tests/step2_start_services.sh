@@ -32,6 +32,18 @@ function start_all_services() {
         "xeon")
             echo "==================== Start all services for Xeon ===================="
             docker compose -f $WORKPATH/docker_compose/intel/cpu/xeon/compose_openai.yaml up -d
+            until [[ "$n" -ge 200 ]] || [[ $ready == true ]]; do
+                docker logs docsum-vllm-xeon &> ${LOG_PATH}/docsum-vllm-xeon-service.log
+                n=$((n+1))
+                if grep -q "Uvicorn running on" ${LOG_PATH}/docsum-vllm-xeon-service.log; then
+                    break
+                fi
+                if grep -q "No such container" ${LOG_PATH}/docsum-vllm-xeon-service.log; then
+                    echo "container docsum-vllm-xeon not found"
+                    exit 1
+                fi
+                sleep 10s
+            done
             ;;
         *)
             echo "Invalid argument"
