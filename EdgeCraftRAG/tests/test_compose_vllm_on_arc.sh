@@ -15,9 +15,9 @@ export TAG=${IMAGE_TAG}
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
 
-
 ip_address=$(hostname -I | awk '{print $1}')
 HOST_IP=$ip_address
+
 COMPOSE_FILE="compose_vllm_multi-arc.yaml"
 EC_RAG_SERVICE_PORT=16010
 
@@ -38,13 +38,19 @@ CONTAINER_COUNT="single_container"
 LLM_MODEL=Qwen/Qwen2-7B-Instruct
 LLM_MODEL_PATH=$MODEL_PATH/Qwen/Qwen2-7B-Instruct
 NGINX_CONFIG_PATH="$WORKPATH/nginx/nginx.conf"
-envsubst < $WORKPATH/nginx/nginx.conf.template >  $WORKPATH/nginx/nginx.conf
 
 function build_docker_images() {
+    opea_branch=${opea_branch:-"main"}
+    cd $WORKPATH/docker_image_build
+    git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
+    pushd GenAIComps
+    echo "GenAIComps test commit is $(git rev-parse HEAD)"
+    docker build --no-cache -t ${REGISTRY}/comps-base:${TAG} --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
+    popd && sleep 1s
+
     echo "Pull intelanalytics/ipex-llm-serving-xpu image"
     docker pull intelanalytics/ipex-llm-serving-xpu:0.8.3-b18
 
-    cd $WORKPATH/docker_image_build
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
     docker compose -f build.yaml build --no-cache > ${LOG_PATH}/docker_image_build.log
 
@@ -54,6 +60,7 @@ function build_docker_images() {
 function start_services() {
     cd $WORKPATH/docker_compose/intel/gpu/arc
     source set_env.sh
+    envsubst < $WORKPATH/nginx/nginx.conf.template > $WORKPATH/nginx/nginx.conf
     # Start Docker Containers
     docker compose -f $COMPOSE_FILE --profile $CONTAINER_COUNT up -d > ${LOG_PATH}/start_services_with_compose.log
     echo "ipex-llm-serving-xpu is booting, please wait."
