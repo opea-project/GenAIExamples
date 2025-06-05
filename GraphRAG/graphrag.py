@@ -12,11 +12,8 @@ from typing import Dict, List, Union
 
 # Configure logging
 logger = logging.getLogger(__name__)
-log_level = logging.DEBUG if os.getenv('LOGFLAG', '').lower() == 'true' else logging.INFO
-logging.basicConfig(
-    level=log_level,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
+log_level = logging.DEBUG if os.getenv("LOGFLAG", "").lower() == "true" else logging.INFO
+logging.basicConfig(level=log_level, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 
 from comps import MegaServiceEndpoint, MicroService, ServiceOrchestrator, ServiceRoleType, ServiceType
 from comps.cores.mega.utils import handle_message
@@ -86,11 +83,11 @@ def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **k
 
     # Convert Pydantic models to dict before logging
     log_inputs = inputs
-    if hasattr(inputs, 'model_dump'):  # Pydantic v2
+    if hasattr(inputs, "model_dump"):  # Pydantic v2
         log_inputs = inputs.model_dump()
-    elif hasattr(inputs, 'dict'):  # Pydantic v1
+    elif hasattr(inputs, "dict"):  # Pydantic v1
         log_inputs = inputs.dict()
-        
+
     logger.debug(f"Inputs after alignment:\n{json.dumps(log_inputs, indent=2)}")
     return inputs
 
@@ -116,7 +113,9 @@ def align_outputs(self, data, cur_node, inputs, runtime_graph, llm_parameters_di
             elif input_variables == ["question"]:
                 prompt = prompt_template.format(question=prompt)
             else:
-                logger.warning(f"Template {prompt_template} not used - only supporting input variables ['question', 'context']")
+                logger.warning(
+                    f"Template {prompt_template} not used - only supporting input variables ['question', 'context']"
+                )
                 prompt = ChatTemplate.generate_rag_prompt(prompt, docs)
         else:
             logger.debug("Using default chat template (no rerank or custom template provided)")
@@ -129,9 +128,9 @@ def align_outputs(self, data, cur_node, inputs, runtime_graph, llm_parameters_di
     return next_data
 
 
-
 def align_generator(self, gen, **kwargs):
     """Aligns the generator output to match ChatQnA's format of sending bytes.
+
     The UI expects messages in the format: b'content' which it can then decode.
     """
     for line in gen:
@@ -149,17 +148,18 @@ def align_generator(self, gen, **kwargs):
             if "ops" in json_data and "op" in json_data["ops"][0]:
                 if "value" in json_data["ops"][0] and isinstance(json_data["ops"][0]["value"], str):
                     yield f"data: {repr(json_data['ops'][0]['value'].encode('utf-8'))}\n\n"
-            elif ("choices" in json_data 
-                  and "delta" in json_data["choices"][0]
-                  and "content" in json_data["choices"][0]["delta"]):
+            elif (
+                "choices" in json_data
+                and "delta" in json_data["choices"][0]
+                and "content" in json_data["choices"][0]["delta"]
+            ):
                 content = json_data["choices"][0]["delta"]["content"]
                 yield f"data: {repr(content.encode('utf-8'))}\n\n"
         except Exception as e:
             # If JSON parsing fails, send the raw string as bytes
             yield f"data: {repr(json_str.encode('utf-8'))}\n\n"
-    
-    yield "data: [DONE]\n\n"
 
+    yield "data: [DONE]\n\n"
 
 
 class GraphRAGService:
