@@ -174,6 +174,9 @@ services:
       - https_proxy=${https_proxy}
       - http_proxy=${http_proxy}
       - LLM_MODEL_ID=${FINAL_LLM_MODEL_ID} # this is the LLM model ID for payload request
+      - UPLOAD_FILE_BASE_URL=http://${host_ip}:6004/v1/dataprep/ingest
+      - GET_FILE=http://${host_ip}:6004/v1/dataprep/get
+      - DELETE_FILE=http://${host_ip}:6004/v1/dataprep/delete
     ipc: host
     restart: always
 
