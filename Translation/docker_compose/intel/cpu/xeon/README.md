@@ -85,7 +85,7 @@ CONTAINER ID   IMAGE                                                           C
 68b8b86a737e   opea/translation-ui:latest                                      "docker-entrypoint.s…"   7 minutes ago   Up About a minute        0.0.0.0:5173->5173/tcp, :::5173->5173/tcp   translation-xeon-ui-server
 8400903275b5   opea/translation:latest                                         "python translation.…"   7 minutes ago   Up About a minute        0.0.0.0:8888->8888/tcp, :::8888->8888/tcp   translation-xeon-backend-server
 2da5545cb18c   opea/llm-textgen:latest                                         "bash entrypoint.sh"     7 minutes ago   Up About a minute        0.0.0.0:9000->9000/tcp, :::9000->9000/tcp   llm-textgen-server
-dee02c1fb538   ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu   "text-generation-lau…"   7 minutes ago   Up 7 minutes (healthy)   0.0.0.0:8008->80/tcp, [::]:8008->80/tcp     tgi-service
+dee02c1fb538   ghcr.io/huggingface/text-generation-inference:2.4.1-intel-cpu   "text-generation-lau…"   7 minutes ago   Up 7 minutes (healthy)   0.0.0.0:8008->80/tcp, [::]:8008->80/tcp     tgi-service
 ```
 
 ### Test the Pipeline
@@ -125,7 +125,7 @@ The compose.yaml is default compose file using tgi as serving framework
 
 | Service Name                    | Image Name                                                    |
 | ------------------------------- | ------------------------------------------------------------- |
-| tgi-service                     | ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu |
+| tgi-service                     | ghcr.io/huggingface/text-generation-inference:2.4.1-intel-cpu |
 | llm                             | opea/llm-textgen:latest                                       |
 | translation-xeon-backend-server | opea/translation:latest                                       |
 | translation-xeon-ui-server      | opea/translation-ui:latest                                    |
@@ -137,7 +137,7 @@ The table provides a comprehensive overview of the Translation service utilized 
 
 | Service Name                    | Possible Image Names                                          | Optional | Description                                                                                     |
 | ------------------------------- | ------------------------------------------------------------- | -------- | ----------------------------------------------------------------------------------------------- |
-| tgi-service                     | ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu | No       | Specific to the TGI deployment, focuses on text generation inference using Xeon hardware.       |
+| tgi-service                     | ghcr.io/huggingface/text-generation-inference:2.4.1-intel-cpu | No       | Specific to the TGI deployment, focuses on text generation inference using Xeon hardware.       |
 | llm                             | opea/llm-textgen:latest                                       | No       | Handles large language model (LLM) tasks                                                        |
 | translation-xeon-backend-server | opea/translation:latest                                       | No       | Serves as the backend for the Translation service, with variations depending on the deployment. |
 | translation-xeon-ui-server      | opea/translation-ui:latest                                    | No       | Provides the user interface for the Translation service.                                        |
