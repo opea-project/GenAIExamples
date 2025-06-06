@@ -10,10 +10,15 @@ export host_ip=$(hostname -I | awk '{print $1}') # Example: host_ip="192.168.1.1
 export no_proxy="${no_proxy},${host_ip}" # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
 export http_proxy=$http_proxy
 export https_proxy=$https_proxy
-export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+export HF_TOKEN=${HF_TOKEN}
 
 export LLM_ENDPOINT_PORT=8008
 export LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
+
+export BLOCK_SIZE=128
+export MAX_NUM_SEQS=256
+export MAX_SEQ_LEN_TO_CAPTURE=2048
+export NUM_CARDS=1
 export MAX_INPUT_TOKENS=1024
 export MAX_TOTAL_TOKENS=2048
 
