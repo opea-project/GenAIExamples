@@ -43,7 +43,7 @@ To set up environment variables for deploying SearchQnA services, set up some pa
 export host_ip="External_Public_IP"           # ip address of the node
 export GOOGLE_CSE_ID="your cse id"
 export GOOGLE_API_KEY="your google api key"
-export HUGGINGFACEHUB_API_TOKEN="Your_HuggingFace_API_Token"
+export HF_TOKEN="Your_HuggingFace_API_Token"
 export http_proxy="Your_HTTP_Proxy"           # http proxy if any
 export https_proxy="Your_HTTPs_Proxy"         # https proxy if any
 export no_proxy=localhost,127.0.0.1,$host_ip  # additional no proxies if needed
