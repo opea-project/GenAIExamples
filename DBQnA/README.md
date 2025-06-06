@@ -2,6 +2,15 @@
 
 Experience a revolutionary way to interact with your database using our DBQnA app! Harnessing the power of OPEA microservices, our application seamlessly translates natural language queries into SQL and delivers real-time database results, all designed to optimize workflows and enhance productivity for modern enterprises.
 
+## Table of contents
+
+1. [Architecture](#architecture)
+2. [Deployment Options](#deployment-options)
+
+## Architecture
+
+The flow chart below shows the information flow between different microservices for this example.
+
 ---
 
 ```mermaid
@@ -46,14 +55,15 @@ flowchart LR
 
 ---
 
-## 🛠️ Key Features
-
-### 💬 SQL Query Generation
-
 The key feature of DBQnA app is that it converts a user's natural language query into an SQL query and automatically executes the generated SQL query on the database to return the relevant results. Basically ask questions to database, receive corresponding SQL query and real-time query execution output, all without needing any SQL knowledge.
 
 ---
 
-## 📚 Setup Guide
+## Deployment Options
 
-- **[Xeon Guide](./docker_compose/intel/cpu/xeon/README.md)**: Instructions to build Docker images from source and run the application via Docker Compose.
+The table below lists the available deployment options and their implementation details for different hardware platforms.
+
+| Platform   | Deployment Method | Link                                                              |
+| ---------- | ----------------- | ----------------------------------------------------------------- |
+| Intel Xeon | Docker compose    | [Deployment on Xeon](./docker_compose/intel/cpu/xeon/README.md)   |
+| AMD ROCm   | Docker compose    | [Deployment on AMD Rocm](./docker_compose/amd/gpu/rocm/README.md) |
