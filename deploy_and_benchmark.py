@@ -187,7 +187,7 @@ def main(yaml_file, target_node=None, test_mode="oob", clean_up=True):
         return
 
     # Set HF_TOKEN
-    HF_TOKEN = deploy_config.get("HUGGINGFACEHUB_API_TOKEN", "")
+    HF_TOKEN = deploy_config.get("HF_TOKEN", "")
     os.environ["HF_TOKEN"] = HF_TOKEN
     os.environ["HUGGINGFACEHUB_API_TOKEN"] = HF_TOKEN
 
