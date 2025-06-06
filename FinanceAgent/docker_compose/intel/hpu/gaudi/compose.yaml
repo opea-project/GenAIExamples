@@ -11,7 +11,7 @@ x-common-environment:
 x-common-agent-environment:
   &common-agent-env
   <<: *common-env
-  HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+  HUGGINGFACEHUB_API_TOKEN: ${HF_TOKEN}
   llm_endpoint_url: ${LLM_ENDPOINT}
   model: ${LLM_MODEL_ID}
   REDIS_URL_VECTOR: ${REDIS_URL_VECTOR}

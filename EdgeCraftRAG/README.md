@@ -96,7 +96,7 @@ Set up Additional Environment Variables and start with compose_vllm.yaml
 export LLM_MODEL=#your model id
 export VLLM_SERVICE_PORT=8008
 export vLLM_ENDPOINT="http://${HOST_IP}:${VLLM_SERVICE_PORT}"
-export HUGGINGFACEHUB_API_TOKEN=#your HF token
+export HF_TOKEN=#your HF token
 
 docker compose -f compose_vllm.yaml up -d
 ```
