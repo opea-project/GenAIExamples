@@ -25,7 +25,7 @@ To set up environment variables for deploying ChatQnA services, follow these ste
    ```bash
    # Example: host_ip="192.168.1.1"
    export host_ip="External_Public_IP"
-   export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
+   export HF_TOKEN="Your_Huggingface_API_Token"
    export PINECONE_API_KEY="Pinecone_API_Key"
    export PINECONE_INDEX_NAME="Pinecone_Index_Name"
    export INDEX_NAME="Pinecone_Index_Name"
@@ -201,7 +201,7 @@ For users in China who are unable to download models directly from Huggingface, 
    ```bash
    # Example: host_ip="192.168.1.1"
    export host_ip="External_Public_IP"
-   export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
+   export HF_TOKEN="Your_Huggingface_API_Token"
    # Example: NGINX_PORT=80
    export NGINX_PORT=${your_nginx_port}
    export PINECONE_API_KEY="Pinecone_API_Key"
@@ -326,12 +326,12 @@ For details on how to verify the correctness of the response, refer to [how-to-v
 
 If you want to update the default knowledge base, you can use the following commands:
 
-Update Knowledge Base via Local File [nke-10k-2023.pdf](https://github.com/opea-project/GenAIComps/blob/v1.1/comps/retrievers/redis/data/nke-10k-2023.pdf). Or
-click [here](https://raw.githubusercontent.com/opea-project/GenAIComps/v1.1/comps/retrievers/redis/data/nke-10k-2023.pdf) to download the file via any web browser.
+Update Knowledge Base via Local File [nke-10k-2023.pdf](https://raw.githubusercontent.com/opea-project/GenAIComps/v1.3/comps/third_parties/pathway/src/data/nke-10k-2023.pdf). Or
+click [here](https://raw.githubusercontent.com/opea-project/GenAIComps/v1.3/comps/third_parties/pathway/src/data/nke-10k-2023.pdf) to download the file via any web browser.
 Or run this command to get the file on a terminal.
 
 ```bash
-wget https://raw.githubusercontent.com/opea-project/GenAIComps/v1.1/comps/retrievers/redis/data/nke-10k-2023.pdf
+wget https://raw.githubusercontent.com/opea-project/GenAIComps/v1.3/comps/third_parties/pathway/src/data/nke-10k-2023.pdf
 
 ```
 

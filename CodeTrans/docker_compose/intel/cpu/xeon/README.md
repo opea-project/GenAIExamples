@@ -41,12 +41,13 @@ To set up environment variables for deploying CodeTrans services, set up some pa
 
 ```bash
 export host_ip="External_Public_IP"           # ip address of the node
-export HUGGINGFACEHUB_API_TOKEN="Your_HuggingFace_API_Token"
+export HF_TOKEN="Your_HuggingFace_API_Token"
 export http_proxy="Your_HTTP_Proxy"           # http proxy if any
 export https_proxy="Your_HTTPs_Proxy"         # https proxy if any
 export no_proxy=localhost,127.0.0.1,$host_ip  # additional no proxies if needed
 export NGINX_PORT=${your_nginx_port}          # your usable port for nginx, 80 for example
-source docker_compose/intel/set_env.sh
+cd docker_compose/intel/
+source set_env.sh
 ```
 
 Consult the section on [CodeTrans Service configuration](#codetrans-configuration) for information on how service specific configuration parameters affect deployments.
@@ -56,7 +57,7 @@ Consult the section on [CodeTrans Service configuration](#codetrans-configuratio
 To deploy the CodeTrans services, execute the `docker compose up` command with the appropriate arguments. For a default deployment, execute the command below. It uses the 'compose.yaml' file.
 
 ```bash
-cd docker_compose/intel/cpu/xeon
+cd cpu/xeon
 docker compose -f compose.yaml up -d
 ```
 
@@ -123,7 +124,7 @@ Key parameters are configured via environment variables set before running `dock
 | Environment Variable                    | Description                                                                                                           | Default (Set Externally)              |
 | :-------------------------------------- | :-------------------------------------------------------------------------------------------------------------------- | :------------------------------------ |
 | `HOST_IP`                               | External IP address of the host machine. **Required.**                                                                | `your_external_ip_address`            |
-| `HUGGINGFACEHUB_API_TOKEN`              | Your Hugging Face Hub token for model access. **Required.**                                                           | `your_huggingface_token`              |
+| `HF_TOKEN`                              | Your Hugging Face Hub token for model access. **Required.**                                                           | `your_huggingface_token`              |
 | `LLM_MODEL_ID`                          | Hugging Face model ID for the CodeTrans LLM (used by TGI/vLLM service). Configured within `compose.yaml` environment. | `mistralai/Mistral-7B-Instruct-v0.3`  |
 | `LLM_ENDPOINT`                          | Internal URL for the LLM serving endpoint (used by `codetrans-xeon-llm-server`). Configured in `compose.yaml`.        | `http://${HOST_IP}:8008`              |
 | `LLM_COMPONENT_NAME`                    | LLM component name for the LLM Microservice.                                                                          | `OpeaTextGenService`                  |

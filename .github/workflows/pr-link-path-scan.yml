@@ -3,6 +3,9 @@
 
 name: Check hyperlinks and relative path validity
 
+permissions:
+  contents: read
+
 on:
   pull_request:
     branches: [main]
@@ -23,7 +26,7 @@ jobs:
       - name: Check the Validity of Hyperlinks
         run: |
           cd ${{github.workspace}}
-          delay=15
+          delay=1
           fail="FALSE"
           merged_commit=$(git log -1 --format='%H')
           changed_files="$(git diff --name-status --diff-filter=ARM ${{ github.event.pull_request.base.sha }} ${merged_commit} | awk '/\.md$/ {print $NF}')"
@@ -80,7 +83,7 @@ jobs:
       - name: Checking Relative Path Validity
         run: |
           cd ${{github.workspace}}
-          delay=15
+          delay=1
           fail="FALSE"
           repo_name=${{ github.event.pull_request.head.repo.full_name }}
           branch="https://github.com/$repo_name/blob/${{ github.event.pull_request.head.ref }}"
