@@ -3,6 +3,7 @@
 
 import { inject } from "vue";
 import { customNotification } from "./notification";
+import { Local } from "./storage";
 
 export const useNotification = () => {
   const customNotificationInjected = inject<typeof customNotification>("customNotification");
@@ -18,4 +19,29 @@ export const useNotification = () => {
 export const formatDecimals = (num: number, decimalPlaces: number = 2) => {
   const factor = Math.pow(10, decimalPlaces);
   return Math.round(num * factor) / factor;
+};
+
+export const formatCapitalize = (string: string, start: number = 0, length: number = 1) => {
+  const end = start + length;
+  const part1 = string.slice(0, start);
+  const part2 = string.slice(start, end).toUpperCase();
+  const part3 = string.slice(end);
+  return part1 + part2 + part3;
+};
+
+export const getChatSessionId = (): string => {
+  const STORAGE_KEY = "chat_session_id";
+
+  const storedSessionId = Local.get(STORAGE_KEY);
+  if (storedSessionId) {
+    return storedSessionId;
+  }
+  const newSessionId = self.crypto?.randomUUID?.() || generateFallbackId();
+
+  Local.set(STORAGE_KEY, newSessionId);
+  return newSessionId;
+};
+
+const generateFallbackId = (): string => {
+  return `${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
 };

@@ -92,7 +92,7 @@ const cpuOption = computed(() => ({
   color: ["#5470c6", "#D8D8D8"],
   backgroundColor: currentThemeBg.value,
   title: {
-    text: "CPU Usage",
+    text: t("system.cpu"),
     left: "16",
     top: "16",
     textStyle: {
@@ -103,7 +103,7 @@ const cpuOption = computed(() => ({
   tooltip: { trigger: "item", formatter: "{b}: {c}%" },
   series: [
     {
-      name: "CPU Usage",
+      name: t("system.cpu"),
       type: "pie",
       radius: ["65%", "80%"],
       center: ["50%", "75%"],
@@ -127,12 +127,12 @@ const cpuOption = computed(() => ({
       data: [
         {
           value: props.systemData.cpuUsage,
-          name: t("setting.used"),
+          name: t("system.used"),
           label: { show: true, formatter: "{b}: {d}%" },
         },
         {
           value: 100 - props.systemData.cpuUsage,
-          name: t("setting.notUsed"),
+          name: t("system.notUsed"),
           label: { show: false },
         },
       ],
@@ -143,7 +143,7 @@ const gpuOption = computed(() => ({
   color: ["#91cc75", "#D8D8D8"],
   backgroundColor: currentThemeBg.value,
   title: {
-    text: "GPU Usage",
+    text: t("system.gpu"),
     left: "16",
     top: "16",
     textStyle: {
@@ -154,7 +154,7 @@ const gpuOption = computed(() => ({
   tooltip: { trigger: "item", formatter: "{b}: {c}%" },
   series: [
     {
-      name: "GPU Usage",
+      name: t("system.gpu"),
       type: "pie",
       radius: ["65%", "80%"],
       center: ["50%", "75%"],
@@ -178,12 +178,12 @@ const gpuOption = computed(() => ({
       data: [
         {
           value: props.systemData.gpuUsage,
-          name: t("setting.used"),
+          name: t("system.used"),
           label: { show: true, formatter: "{b}: {d}%" },
         },
         {
           value: 100 - props.systemData.gpuUsage,
-          name: t("setting.notUsed"),
+          name: t("system.notUsed"),
           label: { show: false },
         },
       ],
@@ -194,7 +194,7 @@ const diskOption = computed(() => ({
   color: ["#fac858", "#D8D8D8"],
   backgroundColor: currentThemeBg.value,
   title: {
-    text: "Disk Usage",
+    text: t("system.disk"),
     left: "16",
     top: "16",
     textStyle: {
@@ -205,7 +205,7 @@ const diskOption = computed(() => ({
   tooltip: { trigger: "item", formatter: "{b}: {c}%" },
   series: [
     {
-      name: "Disk Usage",
+      name: t("system.disk"),
       type: "pie",
       radius: ["65%", "80%"],
       center: ["50%", "75%"],
@@ -229,12 +229,12 @@ const diskOption = computed(() => ({
       data: [
         {
           value: props.systemData.diskUsage,
-          name: t("setting.used"),
+          name: t("system.used"),
           label: { show: true, formatter: "{b}: {d}%" },
         },
         {
           value: 100 - props.systemData.diskUsage,
-          name: t("setting.notUsed"),
+          name: t("system.notUsed"),
           label: { show: false },
         },
       ],
@@ -246,7 +246,7 @@ const memoryOption = computed(() => ({
   backgroundColor: currentThemeBg.value,
   title: [
     {
-      text: "Memory Usage",
+      text: t("system.memory"),
       left: "16",
       top: "16",
       textStyle: {
@@ -265,7 +265,7 @@ const memoryOption = computed(() => ({
   tooltip: { trigger: "item", formatter: "{b}: {c}%" },
   series: [
     {
-      name: "Memory Usage",
+      name: t("system.memory"),
       type: "pie",
       radius: ["65%", "80%"],
       center: ["50%", "75%"],
@@ -289,12 +289,12 @@ const memoryOption = computed(() => ({
       data: [
         {
           value: props.systemData.memoryUsage,
-          name: t("setting.used"),
+          name: t("system.used"),
           label: { show: true, formatter: "{b}: {d}%" },
         },
         {
           value: 100 - props.systemData.memoryUsage,
-          name: t("setting.notUsed"),
+          name: t("system.notUsed"),
           label: { show: false },
         },
       ],

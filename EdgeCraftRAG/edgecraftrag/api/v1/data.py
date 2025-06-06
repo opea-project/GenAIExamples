@@ -94,8 +94,8 @@ async def delete_file(name):
 
 
 # Upload & save a file from UI
-@data_app.post(path="/v1/data/file")
-async def upload_file(file: UploadFile = File(...)):
+@data_app.post(path="/v1/data/file/{file_name}")
+async def upload_file(file_name: str, file: UploadFile = File(...)):
     if ctx.get_pipeline_mgr().get_active_pipeline() is None:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Please activate pipeline and upload the file"
@@ -103,7 +103,7 @@ async def upload_file(file: UploadFile = File(...)):
     try:
         # DIR for server to save files uploaded by UI
         UI_DIRECTORY = os.getenv("UI_TMPFILE_PATH", "/home/user/ui_cache")
-        UPLOAD_DIRECTORY = os.path.join(UI_DIRECTORY, "documents")
+        UPLOAD_DIRECTORY = os.path.join(UI_DIRECTORY, file_name)
         os.makedirs(UPLOAD_DIRECTORY, exist_ok=True)
         file_path = os.path.join(UPLOAD_DIRECTORY, file.filename)
         with open(file_path, "wb") as buffer:

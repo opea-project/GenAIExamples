@@ -54,7 +54,7 @@ def convert_text_to_documents(text) -> List[Document]:
 def convert_file_to_documents(file_path) -> List[Document]:
     from llama_index.core import SimpleDirectoryReader
 
-    supported_exts = [".pdf", ".txt", ".doc", ".docx", ".pptx", ".ppt", ".csv", ".md", ".html", ".rst"]
+    supported_exts = [".pdf", ".txt", ".doc", ".docx", ".pptx", ".ppt", ".csv", ".md", ".html", ".rst", ".epub"]
     if file_path.is_dir():
         docs = SimpleDirectoryReader(input_dir=file_path, recursive=True, required_exts=supported_exts).load_data()
     elif file_path.is_file():

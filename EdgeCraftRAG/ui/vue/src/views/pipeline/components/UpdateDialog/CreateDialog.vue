@@ -4,7 +4,7 @@
     width="900px"
     centered
     destroyOnClose
-    title="Create Pipeline"
+    :title="$t('pipeline.create')"
     :keyboard="false"
     :maskClosable="false"
     @cancel="handleClose"
@@ -34,13 +34,13 @@
         ghost
         @click="handleLast"
         v-if="currentStep > 1 && currentStep <= 7"
-        >Back</a-button
+        >{{ $t("common.back") }}</a-button
       >
       <a-button
         type="primary"
         @click="handleNext"
         v-if="currentStep >= 1 && currentStep < 7"
-        >Next</a-button
+        >{{ $t("common.next") }}</a-button
       >
       <a-button
         key="submit"
@@ -48,7 +48,7 @@
         :loading="submitLoading"
         @click="handleSubmit"
         v-if="currentStep === 7"
-        >Submit</a-button
+        >{{ $t("common.submit") }}</a-button
       >
     </template>
   </a-modal>
@@ -66,7 +66,9 @@ import {
   PostProcessor,
   Retriever,
 } from "./index";
+import { useI18n } from "vue-i18n";
 
+const { t } = useI18n();
 const emit = defineEmits(["search", "close"]);
 const modelVisible = ref<boolean>(true);
 const formData = reactive<EmptyObjectType>({});
@@ -75,43 +77,43 @@ const currentStep = ref<number>(1);
 const pipelineRef = ref<any>(null);
 const stepList = ref<EmptyArrayType>([
   {
-    label: "Basic",
+    label: t("pipeline.config.basic"),
     index: 1,
     icon: "icon-basic",
     component: markRaw(Basic),
   },
   {
-    label: "Node Parser",
+    label: t("pipeline.config.nodeParser"),
     index: 2,
     icon: "icon-node-parser",
     component: markRaw(NodeParser),
   },
   {
-    label: "Indexer",
+    label: t("pipeline.config.indexer"),
     index: 3,
     icon: "icon-indexer",
     component: markRaw(Indexer),
   },
   {
-    label: "Retriever",
+    label: t("pipeline.config.retriever"),
     index: 4,
     icon: "icon-retriever",
     component: markRaw(Retriever),
   },
   {
-    label: "PostProcessor",
+    label: t("pipeline.config.postProcessor"),
     index: 5,
     icon: "icon-post-processor",
     component: markRaw(PostProcessor),
   },
   {
-    label: "Generator",
+    label: t("pipeline.config.generator"),
     index: 6,
     icon: "icon-generator",
     component: markRaw(Generator),
   },
   {
-    label: "Activated",
+    label: t("pipeline.isActive"),
     index: 7,
     icon: "icon-active",
     component: markRaw(Activated),
@@ -141,7 +143,7 @@ const handleNext = async () => {
         currentStep.value++;
       }
     } else {
-      console.log("Form validation failed");
+      console.log(t("pipeline.validErr"));
     }
   }
 };

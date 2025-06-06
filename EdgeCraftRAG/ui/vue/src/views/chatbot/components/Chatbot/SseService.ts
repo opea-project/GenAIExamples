@@ -1,5 +1,6 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
+import { getChatSessionId } from "@/utils/common";
 
 export const handleMessageSend = async (
   url: string,
@@ -13,6 +14,7 @@ export const handleMessageSend = async (
       headers: {
         "Content-Type": "application/json",
         Accept: "text/event-stream",
+        sessionid: getChatSessionId(),
       },
       body: JSON.stringify(postData),
     });
@@ -33,7 +35,7 @@ export const handleMessageSend = async (
           break;
         }
         buffer += decoder.decode(value, { stream: true });
-        // console.log("buffer", buffer);
+
         onDisplay(buffer);
       }
     } catch (error) {

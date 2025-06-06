@@ -1,21 +1,21 @@
 <template>
   <div class="table-container">
     <div class="header-wrap">
-      <span class="title">{{ $t("setting.pipelines") }}</span>
+      <span class="title">{{ $t("pipeline.pipelines") }}</span>
       <div class="btn-wrap">
         <a-config-provider :theme="antTheme.subTheme">
           <a-button
             type="primary"
             :icon="h(CloudUploadOutlined)"
             @click="handleImport()"
-            >{{ $t("setting.import") }}</a-button
+            >{{ $t("pipeline.import") }}</a-button
           ></a-config-provider
         >
         <a-button type="primary" @click="handleCreate">
           <template #icon>
             <PlusOutlined />
           </template>
-          {{ $t("setting.create") }}</a-button
+          {{ $t("pipeline.create") }}</a-button
         >
       </div>
     </div>
@@ -36,7 +36,11 @@
               :bordered="false"
               :color="record.status?.active ? 'success' : 'default'"
             >
-              {{ record.status?.active ? "Activated" : "Inactive" }}
+              {{
+                record.status?.active
+                  ? $t("pipeline.activated")
+                  : $t("pipeline.inactive")
+              }}
             </a-tag>
           </span>
         </template>
@@ -78,7 +82,7 @@
               size="small"
               :icon="h(CommentOutlined)"
               @click="jumpChatbot"
-              >{{ $t("setting.jump") }}</a-button
+              >{{ $t("common.jump") }}</a-button
             >
           </a-space>
         </template>
@@ -110,7 +114,9 @@ import {
 } from "@ant-design/icons-vue";
 import { Modal } from "ant-design-vue";
 import { createVNode, h, ref } from "vue";
+import { useI18n } from "vue-i18n";
 
+const { t } = useI18n();
 const pipelineStore = pipelineAppStore();
 
 const props = defineProps({
@@ -128,23 +134,23 @@ const paginationData = reactive<paginationType>({
 });
 const tableColumns = ref<TableColumns[]>([
   {
-    title: "Name",
+    title: t("pipeline.name"),
     dataIndex: "name",
     width: "25%",
   },
   {
-    title: "ID",
+    title: t("pipeline.id"),
     dataIndex: "idx",
     width: "25%",
     ellipsis: true,
   },
   {
-    title: "Status",
+    title: t("pipeline.status"),
     dataIndex: "status",
     width: "20%",
   },
   {
-    title: "Operation",
+    title: t("pipeline.operation"),
     dataIndex: "operation",
     width: "30%",
     fixed: "right",
@@ -173,11 +179,11 @@ const handleView = (row: EmptyObjectType) => {
 const handleSwitchState = (row: EmptyObjectType) => {
   const { active } = row?.status;
 
-  const text = active ? "deactivate" : "activate";
+  const text = active ? t("pipeline.deactivateTip") : t("pipeline.activeTip");
   Modal.confirm({
-    title: "Prompt",
-    content: `Are you sure ${text} this pipeline?`,
-    okText: "Confirm",
+    title: t("common.prompt"),
+    content: text,
+    okText: t("common.confirm"),
     async onOk() {
       await requestPipelineSwitchState(row.name, { active: !active });
       pipelineStore.setPipelineActivate(active ? "" : row.name);
@@ -188,10 +194,10 @@ const handleSwitchState = (row: EmptyObjectType) => {
 //delete
 const handleDelete = (row: EmptyObjectType) => {
   Modal.confirm({
-    title: "Delete",
+    title: t("common.delete"),
     icon: createVNode(CloseCircleFilled, { class: "error-icon" }),
-    content: `Are you sure delete this pipeline?`,
-    okText: "Confirm",
+    content: t("pipeline.deleteTip"),
+    okText: t("common.confirm"),
     okType: "danger",
     async onOk() {
       await requestPipelineDelete(row.name);
