@@ -32,7 +32,7 @@ Tests scale concurrent users from 1 to 256, and each user send 4 queries. Measur
 ## Benchmark Results
 
 | Users | E2E Latency Avg (ms) | TTFT Avg (ms) | TPOT Avg (ms) |
-| ----- |----------------------| ------------- | ------------- |
+| ----- | -------------------- | ------------- | ------------- |
 | 256   | 35,034.7             | 1,042.8       | 33.1          |
 | 128   | 20,996.0             | 529.8         | 19.9          |
 | 64    | 16,602.1             | 404.9         | 15.8          |
@@ -56,8 +56,8 @@ deploy:
   HUGGINGFACEHUB_API_TOKEN: xxx
   node: [1]
   namespace: default
-  timeout: 1000  # timeout in seconds for services to be ready, default 30 minutes
-  interval: 5    # interval in seconds between service ready checks, default 5 seconds
+  timeout: 1000 # timeout in seconds for services to be ready, default 30 minutes
+  interval: 5 # interval in seconds between service ready checks, default 5 seconds
 
   services:
     backend:
@@ -87,13 +87,13 @@ deploy:
       engine: vllm
       model_id: "meta-llama/Llama-3.1-8B-Instruct" # mandatory
       replicaCount:
-        with_teirerank: [7, 15, 31, 63]     # When teirerank.enabled is True
-        without_teirerank: [8, 16, 32, 64]   # When teirerank.enabled is False
+        with_teirerank: [7, 15, 31, 63] # When teirerank.enabled is True
+        without_teirerank: [8, 16, 32, 64] # When teirerank.enabled is False
       resources:
         enabled: False
         cards_per_instance: 1
       model_params:
-        vllm:  # VLLM specific parameters
+        vllm: # VLLM specific parameters
           batch_params:
             enabled: True
             max_num_seqs: [256]
@@ -103,10 +103,10 @@ deploy:
             max_total_tokens: ""
             max_batch_total_tokens: ""
             max_batch_prefill_tokens: ""
-        tgi:   # TGI specific parameters
+        tgi: # TGI specific parameters
           batch_params:
             enabled: True
-            max_batch_size: [1, 2, 4, 8]  # Each value triggers an LLM service upgrade
+            max_batch_size: [1, 2, 4, 8] # Each value triggers an LLM service upgrade
           token_params:
             enabled: False
             max_input_length: "1280"
@@ -143,12 +143,12 @@ deploy:
 
 benchmark:
   # http request behavior related fields
-  user_queries: [4,8,16,32,64,128,256,512,1024]
-  concurrency: [1,2,4,8,16,32,64,128,256]
-  load_shape_type:           "constant" # "constant" or "poisson"
-  poisson_arrival_rate:      1.0  # only used when load_shape_type is "poisson"
-  warmup_iterations:         10
-  seed:                      1024
+  user_queries: [4, 8, 16, 32, 64, 128, 256, 512, 1024]
+  concurrency: [1, 2, 4, 8, 16, 32, 64, 128, 256]
+  load_shape_type: "constant" # "constant" or "poisson"
+  poisson_arrival_rate: 1.0 # only used when load_shape_type is "poisson"
+  warmup_iterations: 10
+  seed: 1024
 
   # workload, all of the test cases will run for benchmark
   bench_target: [chatqna_qlist_pubmed]
