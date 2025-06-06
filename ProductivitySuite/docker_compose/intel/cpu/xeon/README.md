@@ -108,12 +108,12 @@ Since the `compose.yaml` will consume some environment variables, you need to se
 export host_ip="External_Public_IP"
 ```
 
-**Export the value of your Huggingface API token to the `HUGGINGFACEHUB_API_TOKEN` environment variable**
+**Export the value of your Huggingface API token to the `HF_TOKEN` environment variable**
 
 > Change the Your_Huggingface_API_Token below with tyour actual Huggingface API Token value
 
 ```
-export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
+export HF_TOKEN="Your_Huggingface_API_Token"
 ```
 
 **Append the value of the public IP address to the no_proxy list**
@@ -129,7 +129,7 @@ export RERANK_MODEL_ID="BAAI/bge-reranker-base"
 export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
 export LLM_MODEL_ID_CODEGEN="meta-llama/CodeLlama-7b-hf"
 export INDEX_NAME="rag-redis"
-export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+export HF_TOKEN=${HF_TOKEN}
 export BACKEND_SERVICE_ENDPOINT_CHATQNA="http://${host_ip}:8888/v1/chatqna"
 export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/delete"
 export BACKEND_SERVICE_ENDPOINT_CODEGEN="http://${host_ip}:7778/v1/codegen"
