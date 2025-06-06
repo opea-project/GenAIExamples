@@ -39,16 +39,7 @@ function build_docker_images() {
 function start_services() {
     echo "Starting Docker Services...."
     cd $WORKPATH/docker_compose/intel/cpu/xeon
-    export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
-    export TEI_EMBEDDING_ENDPOINT="http://${ip_address}:6006"
-    export REDIS_URL="redis://${ip_address}:6379"
-    export INDEX_NAME="rag-redis"
-    export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
-    export MEGA_SERVICE_HOST_IP=${ip_address}
-    export EMBEDDING_SERVICE_HOST_IP=${ip_address}
-    export RETRIEVER_SERVICE_HOST_IP=${ip_address}
-    export host_ip=${ip_address}
-    export LOGFLAG=true
+    source ./set_env.sh
 
     # Start Docker Containers
     docker compose -f compose_without_rerank.yaml up -d
