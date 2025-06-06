@@ -31,17 +31,17 @@ Tests scale concurrent users from 1 to 256, and each user send 4 queries. Measur
 
 ## Benchmark Results
 
-| Users | E2E Latency Avg&nbsp;&nbsp;&nbsp;(ms) | TTFT Avg (ms) | TPOT Avg (ms) |
-| ----- | ------------------------------------- | ------------- | ------------- |
-| 256   | 35,034.7                              | 1,042.8       | 33.1          |
-| 128   | 20,996.0                              | 529.8         | 19.9          |
-| 64    | 16,602.1                              | 404.9         | 15.8          |
-| 32    | 14,646.5                              | 260.1         | 14.0          |
-| 16    | 13,669.3                              | 193.7         | 13.1          |
-| 8     | 13,275.2                              | 157.3         | 12.8          |
-| 4     | 13,038.8                              | 127.7         | 12.5          |
-| 2     | 13,059.0                              | 129.4         | 12.6          |
-| 1     | 12,906.5                              | 126.8         | 12.5          |
+| Users | E2E Latency Avg (ms) | TTFT Avg (ms) | TPOT Avg (ms) |
+| ----- |----------------------| ------------- | ------------- |
+| 256   | 35,034.7             | 1,042.8       | 33.1          |
+| 128   | 20,996.0             | 529.8         | 19.9          |
+| 64    | 16,602.1             | 404.9         | 15.8          |
+| 32    | 14,646.5             | 260.1         | 14.0          |
+| 16    | 13,669.3             | 193.7         | 13.1          |
+| 8     | 13,275.2             | 157.3         | 12.8          |
+| 4     | 13,038.8             | 127.7         | 12.5          |
+| 2     | 13,059.0             | 129.4         | 12.6          |
+| 1     | 12,906.5             | 126.8         | 12.5          |
 
 ## Benchmark Config Yaml
 
@@ -53,7 +53,7 @@ deploy:
   device: gaudi
   version: 1.3.0
   modelUseHostPath: /home/sdp/opea_benchmark/model
-  HUGGINGFACEHUB_API_TOKEN: ***
+  HUGGINGFACEHUB_API_TOKEN: xxx
   node: [1]
   namespace: default
   timeout: 1000  # timeout in seconds for services to be ready, default 30 minutes
