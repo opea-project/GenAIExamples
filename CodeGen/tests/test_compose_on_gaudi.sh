@@ -1,4 +1,4 @@
-
+#!/bin/bashs
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
@@ -142,6 +142,13 @@ function validate_megaservice() {
         "mega-codegen" \
         "codegen-gaudi-backend-server" \
         '{ "index_name": "test_redis", "agents_flag": "True", "messages": "def print_hello_world():", "max_tokens": 256}'
+
+    validate_services \
+        "${ip_address}:7778/v1/codegen" \
+        "class" \
+        "mega-codegen" \
+        "codegen-xeon-backend-server" \
+        '{"model": "Qwen/Qwen2.5-Coder-7B-Instruct", "messages": [{"role": "user", "content": "Implement a basic Python class"}], "max_tokens":32}'
 
 }
 

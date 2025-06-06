@@ -2,7 +2,22 @@
 # SPDX-License-Identifier: Apache-2.0
 
 name: Example jobs
-permissions: read-all
+permissions:
+  actions: read
+  contents: read
+  checks: read
+  deployments: read
+  discussions: read
+  issues: read
+  packages: read
+  pages: read
+  pull-requests: read
+  repository-projects: read
+  statuses: read
+  security-events: read
+  id-token: write
+  attestations: read
+  models: read
 on:
   workflow_call:
     inputs:
@@ -54,6 +69,22 @@ jobs:
 # Image Build
 ####################################################################################################
   build-images:
+    permissions:
+      actions: read
+      contents: read
+      checks: read
+      deployments: read
+      discussions: read
+      issues: read
+      packages: read
+      pages: read
+      pull-requests: read
+      repository-projects: read
+      statuses: read
+      security-events: read
+      id-token: write
+      attestations: read
+      models: read
     uses: ./.github/workflows/_build_image.yml
     with:
       node: ${{ inputs.node }}
@@ -68,6 +99,17 @@ jobs:
 # Docker Compose Test
 ####################################################################################################
   test-example-compose:
+    permissions:
+      actions: read
+      contents: read
+      checks: write
+      deployments: write
+      issues: write
+      packages: write
+      pages: write
+      pull-requests: write
+      statuses: write
+      security-events: read
     needs: [build-images]
     if: ${{ inputs.test_compose }}
     uses: ./.github/workflows/_run-docker-compose.yml
@@ -84,6 +126,8 @@ jobs:
 # helmchart Test
 ####################################################################################################
   test-helmchart:
+    permissions:
+      contents: read
     if: ${{ fromJSON(inputs.test_helmchart) }}
     uses: ./.github/workflows/_helm-e2e.yml
     with:
