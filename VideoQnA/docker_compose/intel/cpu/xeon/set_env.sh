@@ -9,7 +9,7 @@ popd > /dev/null
 host_ip=$(hostname -I | awk '{print $1}')
 
 export HF_TOKEN=${HF_TOKEN}
-export HUGGINGFACEHUB_API_TOKEN=${HF_TOKEN}
+export HF_TOKEN=${HF_TOKEN}
 
 export INDEX_NAME="mega-videoqna"
 export LLM_DOWNLOAD="True" # Set to "False" before redeploy LVM server to avoid model download
