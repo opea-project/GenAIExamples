@@ -9,7 +9,7 @@ Configure necessary variables as listed below. Replace the variables according t
 ```sh
 export SDK_BASE_URL=${SDK_BASE_URL}
 export SERVING_TOKEN=${SERVING_TOKEN}
-export HUGGINGFACEHUB_API_TOKEN=${HF_TOKEN}
+export HF_TOKEN=${HF_TOKEN}
 export workflow_id=${workflow_id}       # workflow_id of the serving workflow
 export vllm_port=${vllm_port}           # vllm serving port
 export ip_address=$(hostname -I | awk '{print $1}')
