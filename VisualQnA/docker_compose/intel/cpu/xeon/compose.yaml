@@ -13,7 +13,7 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HF_TOKEN: ${HF_TOKEN}
       VLLM_TORCH_PROFILER_DIR: "/mnt"
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:80/health || exit 1"]
