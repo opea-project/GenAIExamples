@@ -220,11 +220,11 @@ def generate_helm_values(example_type, deploy_config, chart_dir, action_type, no
     # Initialize base values
     values = {
         "global": {
-            "HUGGINGFACEHUB_API_TOKEN": deploy_config.get("HUGGINGFACEHUB_API_TOKEN", ""),
+            "HF_TOKEN": deploy_config.get("HF_TOKEN", ""),
             "modelUseHostPath": deploy_config.get("modelUseHostPath", ""),
         }
     }
-    os.environ["HF_TOKEN"] = deploy_config.get("HUGGINGFACEHUB_API_TOKEN", "")
+    os.environ["HF_TOKEN"] = deploy_config.get("HF_TOKEN", "")
 
     # Configure components
     values = configure_node_selectors(values, node_selector or {}, deploy_config)
