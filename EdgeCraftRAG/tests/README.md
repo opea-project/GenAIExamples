@@ -13,3 +13,9 @@ On Intel ARC with TGI:
 ```bash
 bash test_compose_on_arc.sh
 ```
+
+On Intel ARC with vLLM:
+
+```bash
+bash test_compose_vllm_on_arc.sh
+```
