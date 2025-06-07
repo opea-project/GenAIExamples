@@ -40,7 +40,7 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HF_TOKEN: ${HF_TOKEN}
       LLM_MODEL_ID: ${LLM_MODEL_ID}
       VLLM_TORCH_PROFILER_DIR: "/mnt"
       LLM_SERVER_PORT: ${LLM_SERVER_PORT}

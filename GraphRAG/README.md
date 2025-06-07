@@ -33,7 +33,7 @@ To set up environment variables for deploying GraphRAG services, follow these st
    export NEO4J_PASSWORD=${your_neo4j_password}
    export PYTHONPATH=${path_to_comps}
    export OPENAI_KEY=${your_openai_api_key} #optional, when not provided will use smaller models TGI/TEI
-   export HUGGINGFACEHUB_API_TOKEN=${your_hf_token} #needed for TGI/TEI models
+   export HF_TOKEN=${your_hf_token} #needed for TGI/TEI models
    ```
 
 2. If you are in a proxy environment, also set the proxy-related environment variables:
