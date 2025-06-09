@@ -153,7 +153,7 @@ export SELECTED_XPU_1=<which GPU to select to run for container 1>
 export MAX_NUM_SEQS=<MAX_NUM_SEQS value>
 export MAX_NUM_BATCHED_TOKENS=<MAX_NUM_BATCHED_TOKENS value>
 export MAX_MODEL_LEN=<MAX_MODEL_LEN value>
-export LOAD_IN_LOW_BIT=<the weight type value>
+export LOAD_IN_LOW_BIT=<the weight type value> # expected: sym_int4, asym_int4, sym_int5, asym_int5 or sym_int8
 export CCL_DG2_USM=<CCL_DG2_USM value> # Needed on Core to enable USM (Shared Memory GPUDirect). Xeon supports P2P and doesn't need this.
 ```
 start with compose_vllm_multi-arc.yaml
