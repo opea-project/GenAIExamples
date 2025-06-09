@@ -114,7 +114,7 @@ export host_ip="External_Public_IP"
 > Change to your actual Huggingface API Token value
 
 ```bash
-export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
+export HF_TOKEN="Your_Huggingface_API_Token"
 ```
 
 **Append the value of the public IP address to the no_proxy list if you are in a proxy environment**

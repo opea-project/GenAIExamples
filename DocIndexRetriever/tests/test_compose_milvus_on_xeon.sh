@@ -20,37 +20,21 @@ function build_docker_images() {
     if [ ! -d "GenAIComps" ] ; then
         git clone --single-branch --branch "${opea_branch:-"main"}" https://github.com/opea-project/GenAIComps.git
     fi
+    pushd GenAIComps
+    echo "GenAIComps test commit is $(git rev-parse HEAD)"
+    docker build --no-cache -t ${REGISTRY}/comps-base:${TAG} --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
+    popd && sleep 1s
+
     service_list="dataprep embedding retriever reranking doc-index-retriever"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
-    docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
-    docker pull quay.io/coreos/etcd:v3.5.5
-    docker pull minio/minio:RELEASE.2023-03-20T20-16-18Z
-    docker pull milvusdb/milvus:v2.4.6
     docker images && sleep 1s
-
-    echo "Docker images built!"
 }
 
 function start_services() {
     echo "Starting Docker Services...."
     cd $WORKPATH/docker_compose/intel/cpu/xeon
-    export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
-    export RERANK_MODEL_ID="BAAI/bge-reranker-base"
-    export TEI_EMBEDDING_ENDPOINT="http://${ip_address}:6006"
-    export TEI_RERANKING_ENDPOINT="http://${ip_address}:8808"
-    export TGI_LLM_ENDPOINT="http://${ip_address}:8008"
-    export MILVUS_HOST=${ip_address}
-    export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
-    export MEGA_SERVICE_HOST_IP=${ip_address}
-    export EMBEDDING_SERVICE_HOST_IP=${ip_address}
-    export RETRIEVER_SERVICE_HOST_IP=${ip_address}
-    export RERANK_SERVICE_HOST_IP=${ip_address}
-    export LLM_SERVICE_HOST_IP=${ip_address}
-    export host_ip=${ip_address}
-    export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/ingest"
-    export RERANK_TYPE="tei"
-    export LOGFLAG=true
+    source ./set_env.sh
 
     # Start Docker Containers
     docker compose -f compose_milvus.yaml up -d
@@ -126,19 +110,27 @@ function stop_docker() {
 
 function main() {
 
+    echo "::group::stop_docker"
     stop_docker
-    if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
-    echo "Dump current docker ps"
-    docker ps
-    start_time=$(date +%s)
-    start_services
-    end_time=$(date +%s)
-    duration=$((end_time-start_time))
-    echo "Mega service start duration is $duration s"
-    validate_megaservice
+    echo "::endgroup::"
 
+    echo "::group::build_docker_images"
+    if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
+    echo "::endgroup::"
+
+    echo "::group::start_services"
+    start_services
+    echo "::endgroup::"
+
+    echo "::group::validate_megaservice"
+    validate_megaservice
+    echo "::endgroup::"
+
+    echo "::group::stop_docker"
     stop_docker
-    echo y | docker system prune
+    echo "::endgroup::"
+
+    docker system prune -f
 
 }
 

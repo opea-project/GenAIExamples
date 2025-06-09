@@ -1,9 +1,10 @@
+#!/bin/bash
 # Copyright (C) 2024 Advanced Micro Devices, Inc.
 # SPDX-License-Identifier: Apache-2.0
 
 # Before start script:
 # export host_ip="your_host_ip_or_host_name"
-# export HUGGINGFACEHUB_API_TOKEN="your_huggingface_api_token"
+# export HF_TOKEN="your_huggingface_api_token"
 # export LANGCHAIN_API_KEY="your_langchain_api_key"
 # export LANGCHAIN_TRACING_V2=""
 
@@ -19,7 +20,7 @@ export CRAG_SERVER_PORT="18114"
 
 export WORKPATH=$(dirname "$PWD")
 export WORKDIR=${WORKPATH}/../../../
-export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+export HF_TOKEN=${HF_TOKEN}
 export VLLM_LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
 export HF_CACHE_DIR="./data"
 export MODEL_CACHE="./data"
@@ -40,7 +41,7 @@ export CRAG_SERVER=http://${ip_address}:${CRAG_SERVER_PORT}
 export WORKER_AGENT_URL="http://${ip_address}:${WORKER_RAG_AGENT_PORT}/v1/chat/completions"
 export SQL_AGENT_URL="http://${ip_address}:${WORKER_SQL_AGENT_PORT}/v1/chat/completions"
 export HF_CACHE_DIR=${HF_CACHE_DIR}
-export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+export HF_TOKEN=${HF_TOKEN}
 export no_proxy=${no_proxy}
 export http_proxy=${http_proxy}
 export https_proxy=${https_proxy}

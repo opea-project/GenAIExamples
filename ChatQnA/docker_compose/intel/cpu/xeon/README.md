@@ -29,10 +29,10 @@ git clone https://github.com/opea-project/GenAIExamples.git
 cd GenAIExamples/ChatQnA/docker_compose/intel/cpu/xeon/
 ```
 
-Checkout a released version, such as v1.2:
+Checkout a released version, such as v1.3:
 
 ```
-git checkout v1.2
+git checkout v1.3
 ```
 
 ### Generate a HuggingFace Access Token
@@ -45,7 +45,7 @@ To set up environment variables for deploying ChatQnA services, set up some para
 
 ```
 export host_ip="External_Public_IP"           #ip address of the node
-export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
+export HF_TOKEN="Your_Huggingface_API_Token"
 export http_proxy="Your_HTTP_Proxy"           #http proxy if any
 export https_proxy="Your_HTTPs_Proxy"         #https proxy if any
 export no_proxy=localhost,127.0.0.1,$host_ip  #additional no proxies if needed
@@ -298,12 +298,12 @@ For details on how to verify the correctness of the response, refer to [how-to-v
 
    If you want to update the default knowledge base, you can use the following commands:
 
-   Update Knowledge Base via Local File [nke-10k-2023.pdf](https://github.com/opea-project/GenAIComps/blob/v1.1/comps/retrievers/redis/data/nke-10k-2023.pdf). Or
-   click [here](https://raw.githubusercontent.com/opea-project/GenAIComps/v1.1/comps/retrievers/redis/data/nke-10k-2023.pdf) to download the file via any web browser.
+   Update Knowledge Base via Local File [nke-10k-2023.pdf](https://raw.githubusercontent.com/opea-project/GenAIComps/v1.3/comps/third_parties/pathway/src/data/nke-10k-2023.pdf). Or
+   click [here](https://raw.githubusercontent.com/opea-project/GenAIComps/v1.3/comps/third_parties/pathway/src/data/nke-10k-2023.pdf) to download the file via any web browser.
    Or run this command to get the file on a terminal.
 
    ```bash
-   wget https://raw.githubusercontent.com/opea-project/GenAIComps/v1.1/comps/retrievers/redis/data/nke-10k-2023.pdf
+   wget https://raw.githubusercontent.com/opea-project/GenAIComps/v1.3/comps/third_parties/pathway/src/data/nke-10k-2023.pdf
    ```
 
    Upload:

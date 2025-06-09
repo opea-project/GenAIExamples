@@ -1,0 +1,18 @@
+# Copyright (C) 2025 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  worker-rag-agent:
+    environment:
+      llm_endpoint_url: ${LLM_ENDPOINT_URL}
+      api_key: ${OPENAI_API_KEY}
+
+  worker-sql-agent:
+    environment:
+      llm_endpoint_url: ${LLM_ENDPOINT_URL}
+      api_key: ${OPENAI_API_KEY}
+
+  supervisor-react-agent:
+    environment:
+      llm_endpoint_url: ${LLM_ENDPOINT_URL}
+      api_key: ${OPENAI_API_KEY}
