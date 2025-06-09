@@ -66,3 +66,15 @@ jobs:
         with:
           name: ${{ matrix.job_name }}
           path: ${{ github.workspace }}/.github/workflows/scripts/codeScan/${{ matrix.job_name }}.*
+
+  shell-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout out Repo
+        uses: actions/checkout@v4
+
+      - name: ShellCheck
+        uses: ludeeus/action-shellcheck@2.0.0
+        with:
+          scandir: .github/workflows/scripts/codeScan
+          severity: error, warning
