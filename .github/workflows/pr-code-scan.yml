@@ -76,5 +76,5 @@ jobs:
       - name: ShellCheck
         uses: ludeeus/action-shellcheck@2.0.0
         with:
-          scandir: .github/workflows/scripts/codeScan
-          severity: error, warning
+          scandir: ${{ github.workspace }}
+          severity: warning
