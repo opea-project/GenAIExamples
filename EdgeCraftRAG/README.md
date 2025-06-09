@@ -156,6 +156,7 @@ export MAX_MODEL_LEN=<MAX_MODEL_LEN value>
 export LOAD_IN_LOW_BIT=<the weight type value> # expected: sym_int4, asym_int4, sym_int5, asym_int5 or sym_int8
 export CCL_DG2_USM=<CCL_DG2_USM value> # Needed on Core to enable USM (Shared Memory GPUDirect). Xeon supports P2P and doesn't need this.
 ```
+
 start with compose_vllm_multi-arc.yaml
 
 ```bash
