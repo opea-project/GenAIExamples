@@ -7,7 +7,7 @@ export interface Benchmark {
   retriever: string;
 }
 export interface IMessage {
-  author: string;
+  role: string;
   content: string;
   benchmark?: Benchmark | undefined;
 }

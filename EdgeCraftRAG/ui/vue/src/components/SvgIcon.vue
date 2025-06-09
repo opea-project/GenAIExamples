@@ -15,7 +15,7 @@ const props = defineProps({
   },
   color: {
     type: String,
-    default: () => "#666666",
+    default: () => "#808080",
   },
   inherit: {
     type: Boolean,

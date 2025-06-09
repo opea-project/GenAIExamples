@@ -30,8 +30,3 @@ services:
       dockerfile: ./ui/docker/Dockerfile.gradio
     extends: edgecraftrag
     image: ${REGISTRY:-opea}/edgecraftrag-ui-gradio:${TAG:-latest}
-  vllm-arc:
-    build:
-      context: GenAIComps
-      dockerfile: comps/third_parties/vllm/src/Dockerfile.intel_gpu
-    image: ${REGISTRY:-opea}/vllm-arc:${TAG:-latest}

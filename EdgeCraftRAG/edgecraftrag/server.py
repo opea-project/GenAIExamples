@@ -6,8 +6,10 @@ import os
 import uvicorn
 from edgecraftrag.api.v1.chatqna import chatqna_app
 from edgecraftrag.api.v1.data import data_app
+from edgecraftrag.api.v1.knowledge_base import kb_app
 from edgecraftrag.api.v1.model import model_app
 from edgecraftrag.api.v1.pipeline import pipeline_app
+from edgecraftrag.api.v1.prompt import prompt_app
 from edgecraftrag.api.v1.system import system_app
 from edgecraftrag.utils import UI_DIRECTORY
 from fastapi import FastAPI
@@ -26,7 +28,7 @@ app.add_middleware(
 )
 
 
-sub_apps = [data_app, model_app, pipeline_app, chatqna_app, system_app]
+sub_apps = [data_app, model_app, pipeline_app, chatqna_app, system_app, prompt_app, kb_app]
 for sub_app in sub_apps:
     for route in sub_app.routes:
         app.router.routes.append(route)

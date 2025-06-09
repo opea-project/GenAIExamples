@@ -9,13 +9,13 @@ import en from "./en";
 import zh from "./zh";
 
 const messages = {
-  "en-US": { ...en, ...enLocale },
-  "zh-CN": { ...zh, ...zhLocale },
+  en_US: { ...en, ...enLocale },
+  zh_CN: { ...zh, ...zhLocale },
 };
 
 const i18n = createI18n({
-  locale: Local.get("lang") || "en-US",
-  fallbackLocale: "en-US",
+  locale: Local.get("themeInfo")?.lang || "en_US",
+  fallbackLocale: "en_US",
   messages,
 });
 

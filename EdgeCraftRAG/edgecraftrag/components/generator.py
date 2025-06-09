@@ -8,8 +8,8 @@ import os
 import urllib.request
 from urllib.parse import urlparse
 
-from comps import GeneratedDoc
-from edgecraftrag.base import BaseComponent, CompType, GeneratorType, NodeParserType
+from edgecraftrag.base import BaseComponent, CompType, GeneratorType, InferenceType, NodeParserType
+from edgecraftrag.utils import concat_history, save_history
 from fastapi.responses import StreamingResponse
 from langchain_core.prompts import PromptTemplate
 from llama_index.llms.openai_like import OpenAILike
@@ -95,13 +95,33 @@ def extract_unstructured_eles(retrieved_nodes=[], text_gen_context=""):
     return unstructured_str
 
 
+async def local_stream_generator(lock, llm, prompt_str, unstructured_str):
+    async with lock:
+        response = llm.stream_complete(prompt_str)
+        collected_data = []
+        for r in response:
+            collected_data.append(r.delta)
+            yield r.delta
+            await asyncio.sleep(0)
+        if unstructured_str:
+            collected_data.append(unstructured_str)
+            yield unstructured_str
+        res = "".join(collected_data)
+        save_history(res)
+
+
 async def stream_generator(llm, prompt_str, unstructured_str):
     response = llm.stream_complete(prompt_str)
+    collected_data = []
     for r in response:
+        collected_data.append(r.delta)
         yield r.delta
         await asyncio.sleep(0)
     if unstructured_str:
+        collected_data.append(unstructured_str)
         yield unstructured_str
+    res = "".join(collected_data)
+    save_history(res)
 
 
 class QnAGenerator(BaseComponent):
@@ -135,6 +155,8 @@ class QnAGenerator(BaseComponent):
             self.model_id = llm_model
         else:
             self.model_id = llm_model().model_id
+        if self.inference_type == InferenceType.LOCAL:
+            self.lock = asyncio.Lock()
 
     def set_prompt(self, prompt):
         if "{context}" not in prompt:
@@ -170,6 +192,7 @@ class QnAGenerator(BaseComponent):
             # This could happen when User delete all LLMs through RESTful API
             raise ValueError("No LLM available, please load LLM")
         # query transformation
+        chat_request.messages = concat_history(chat_request.messages)
         text_gen_context, prompt_str = self.query_transform(chat_request, retrieved_nodes)
         generate_kwargs = dict(
             temperature=chat_request.temperature,
@@ -186,14 +209,17 @@ class QnAGenerator(BaseComponent):
             unstructured_str = extract_unstructured_eles(retrieved_nodes, text_gen_context)
         if chat_request.stream:
             return StreamingResponse(
-                stream_generator(self.llm(), prompt_str, unstructured_str),
+                local_stream_generator(self.lock, self.llm(), prompt_str, unstructured_str),
                 media_type="text/event-stream",
             )
         else:
-            return self.llm().complete(prompt_str)
+            result = self.llm().complete(prompt_str)
+            save_history(str(result.text))
+            return result
 
     def run_vllm(self, chat_request, retrieved_nodes, node_parser_type, **kwargs):
         # query transformation
+        chat_request.messages = concat_history(chat_request.messages)
         text_gen_context, prompt_str = self.query_transform(chat_request, retrieved_nodes)
         llm_endpoint = os.getenv("vLLM_ENDPOINT", "http://localhost:8008")
         model_name = os.getenv("LLM_MODEL", self.model_id)
@@ -216,10 +242,9 @@ class QnAGenerator(BaseComponent):
                 stream_generator(llm, prompt_str, unstructured_str), media_type="text/event-stream"
             )
         else:
-            response = llm.complete(prompt_str)
-            response = response.text
-
-            return GeneratedDoc(text=response, prompt=prompt_str)
+            result = llm.complete(prompt_str)
+            save_history(str(result))
+            return result
 
     @model_serializer
     def ser_model(self):

@@ -8,11 +8,14 @@
     autocomplete="off"
     class="form-wrap"
   >
-    <a-form-item label="Generator Type" name="generator_type">
+    <a-form-item
+      :label="$t('pipeline.config.generatorType')"
+      name="generator_type"
+    >
       <a-select
         showSearch
         v-model:value="form.generator_type"
-        placeholder="please select Generator Type"
+        :placeholder="$t('pipeline.valid.generatorType')"
       >
         <a-select-option
           v-for="item in generatorList"
@@ -21,24 +24,24 @@
           >{{ item.name }}</a-select-option
         >
       </a-select>
-      <FormTooltip title="Local inference generator or vllm generator" />
+      <FormTooltip :title="$t('pipeline.desc.generatorType')" />
     </a-form-item>
-    <a-form-item label="LLM Inference Type" name="inference_type">
+    <a-form-item :label="$t('pipeline.config.llm')" name="inference_type">
       <a-radio-group v-model:value="form.inference_type">
-        <a-radio value="local">Local</a-radio>
-        <a-radio value="vllm">Vllm</a-radio>
+        <a-radio value="local">{{ $t("pipeline.config.local") }}</a-radio>
+        <a-radio value="vllm">{{ $t("pipeline.config.vllm") }}</a-radio>
       </a-radio-group>
     </a-form-item>
     <template v-if="form.inference_type === 'local'">
       <a-form-item
-        label="Large Language Model"
+        :label="$t('pipeline.config.language')"
         :name="['model', 'model_id']"
         :rules="rules.model_id"
       >
         <a-select
           showSearch
           v-model:value="form.model.model_id"
-          placeholder="please select Large Language Model"
+          :placeholder="$t('pipeline.valid.language')"
           @change="handleModelChange"
           @dropdownVisibleChange="handleModelVisible"
         >
@@ -49,17 +52,17 @@
             >{{ item }}</a-select-option
           >
         </a-select>
-        <FormTooltip title="The large model used for generating dialogues" />
+        <FormTooltip :title="$t('pipeline.desc.language')" />
       </a-form-item>
       <a-form-item
-        label="LLM run device"
+        :label="$t('pipeline.config.llmDevice')"
         :name="['model', 'device']"
         :rules="rules.device"
       >
         <a-select
           showSearch
           v-model:value="form.model.device"
-          placeholder="please select LLM run device"
+          :placeholder="$t('pipeline.valid.llmDevice')"
           @dropdownVisibleChange="handleDeviceVisible"
         >
           <a-select-option
@@ -69,17 +72,17 @@
             >{{ item }}</a-select-option
           >
         </a-select>
-        <FormTooltip title="The device used by the  LLM" />
+        <FormTooltip :title="$t('pipeline.desc.llmDevice')" />
       </a-form-item>
       <a-form-item
-        label="Weights"
+        :label="$t('pipeline.config.weights')"
         :name="['model', 'weight']"
         :rules="rules.weight"
       >
         <a-select
           showSearch
           v-model:value="form.model.weight"
-          placeholder="please select Weights"
+          :placeholder="$t('pipeline.valid.weights')"
           @dropdownVisibleChange="handleWeightVisible"
         >
           <a-select-option
@@ -89,7 +92,7 @@
             >{{ item }}</a-select-option
           >
         </a-select>
-        <FormTooltip title="Model weight" />
+        <FormTooltip :title="t('pipeline.desc.weights')" />
       </a-form-item>
     </template>
   </a-form>
@@ -101,7 +104,9 @@ import type { FormInstance } from "ant-design-vue";
 import { reactive, ref } from "vue";
 import { Generator } from "../../enum.ts";
 import { ModelType } from "../../type.ts";
+import { useI18n } from "vue-i18n";
 
+const { t } = useI18n();
 const props = defineProps({
   formData: {
     type: Object,
@@ -134,35 +139,35 @@ const rules = reactive({
   generator_type: [
     {
       required: true,
-      message: "please select Generator Type",
+      message: t("pipeline.valid.generatorType"),
       trigger: "change",
     },
   ],
   inference_type: [
     {
       required: true,
-      message: "Please select LLM Inference Type",
+      message: t("pipeline.valid.generatorType"),
       trigger: "change",
     },
   ],
   model_id: [
     {
       required: true,
-      message: "Please select Large Language Model",
+      message: t("pipeline.valid.language"),
       trigger: "change",
     },
   ],
   device: [
     {
       required: true,
-      message: "Please select LLM run device",
+      message: t("pipeline.valid.llmDevice"),
       trigger: "change",
     },
   ],
   weight: [
     {
       required: true,
-      message: "Please select weight",
+      message: t("pipeline.valid.weights"),
       trigger: "change",
     },
   ],

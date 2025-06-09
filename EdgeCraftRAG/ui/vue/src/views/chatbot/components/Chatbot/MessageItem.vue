@@ -1,9 +1,13 @@
 <template>
   <div id="message-container">
-    <template v-if="message.author === 'Bot'">
+    <template v-if="message.role === 'assistant'">
       <div class="chatbot-session">
         <div class="avatar-wrap">
-          <SvgIcon name="icon-chatbot" :size="24" />
+          <SvgIcon
+            name="icon-chatbot"
+            :size="24"
+            :style="{ color: 'var(--color-primary)' }"
+          />
         </div>
         <div class="message-wrap">
           <div v-html="renderedMarkdown"></div>
@@ -39,8 +43,8 @@
     </template>
     <div v-else class="user-session">
       <div class="message-wrap">{{ message.content }}</div>
-      <div class="avatar-wrap">
-        <SvgIcon name="icon-user" :size="22" />
+      <div class="user-wrap">
+        <SvgIcon name="icon-user" inherit :size="22" />
       </div>
     </div>
   </div>
@@ -48,8 +52,10 @@
 
 <script lang="ts" setup name="MessageItem">
 import { marked } from "marked";
-import { PropType, reactive, ref } from "vue";
-import { Benchmark, IMessage } from "../type";
+import { PropType, ref } from "vue";
+import { IMessage, Benchmark } from "../../type";
+import CustomRenderer from "@/utils/customRenderer";
+import "highlight.js/styles/atom-one-dark.css";
 
 const props = defineProps({
   message: {
@@ -64,27 +70,17 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["preview"]);
-const benchmarkData = computed(() => {
-  return props.message?.benchmark || {};
+
+const benchmarkData = computed<Benchmark>(() => {
+  return (props.message?.benchmark || {}) as Benchmark;
 });
 const isExpanded = ref<boolean>(false);
-
-const renderer = new marked.Renderer();
-
-renderer.link = ({ href, title, text }) => {
-  let link = `<a href="${href}" target="_blank" rel="noopener noreferrer"`;
-  if (title) {
-    link += ` title="${title}"`;
-  }
-  link += `>${text}</a>`;
-  return link;
-};
 
 marked.setOptions({
   pedantic: false,
   gfm: true,
   breaks: false,
-  renderer: renderer,
+  renderer: CustomRenderer,
 });
 
 const renderedMarkdown = computed(() => marked(props.message.content));
@@ -143,34 +139,46 @@ watch(
 }
 .chatbot-session {
   margin-bottom: 16px;
-  display: flex;
-  padding-right: 40px;
-  gap: 8px;
   font-size: 16px;
+  text-align: left;
+  position: relative;
 }
 .avatar-wrap {
-  background-color: var(--bg-main-color);
+  background-color: var(--color-primaryBg);
   border-radius: 50%;
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   .vertical-center;
+  position: absolute;
+  left: -48px;
+}
+.user-wrap {
+  background-color: var(--color-scrollbar);
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  .vertical-center;
+  position: absolute;
+  right: -48px;
 }
 .message-wrap {
-  background-color: var(--bg-main-color);
+  background-color: var(--bg-content-color);
   border-radius: 6px;
   line-height: 24px;
+  min-height: 32px;
   padding: 10px 14px;
-  max-width: calc(100% - 40px);
+  width: 100%;
 }
 .user-session {
   margin-bottom: 20px;
   display: flex;
   justify-content: flex-end;
-  padding-left: 40px;
-  gap: 8px;
   font-size: 16px;
+  text-align: end;
+  position: relative;
   .message-wrap {
-    background-color: var(--color-primaryBg);
+    background-color: var(--message-bg);
+    width: auto;
   }
 }
 .benchmark-wrap {
@@ -209,7 +217,7 @@ watch(
     left: -4px;
   }
 }
-/* 定义 <transition> 的进入和离开动画 */
+
 .detail-transition-enter-active,
 .detail-transition-leave-active {
   transition: all 0.7s ease-in-out;

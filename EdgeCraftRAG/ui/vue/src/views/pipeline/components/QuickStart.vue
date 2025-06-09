@@ -12,7 +12,7 @@
     class="import-dialog"
   >
     <div class="guide-wrap">
-      <div class="guide-title">Quick Start</div>
+      <div class="guide-title">{{ $t("quickStart.title") }}</div>
       <div class="steps-wrap">
         <a-steps
           :current="0"
@@ -24,27 +24,24 @@
         <div class="item-wrap">
           <div class="left-wrap">1</div>
           <div class="right-wrap">
-            <div class="title">Create Pipeline</div>
+            <div class="title">{{ $t("quickStart.step1") }}</div>
             <div class="des">
-              Build your RAG pipeline with customized settings to maximize the
-              potential of AI information processing capability.
+              {{ $t("quickStart.step1Tip") }}
             </div>
             <a-button
               class="special-button-primary"
               :icon="h(PlusOutlined)"
               @click="handleCreate"
-              >Go Create</a-button
+              >{{ $t("quickStart.create") }}</a-button
             >
           </div>
         </div>
         <div class="item-wrap">
           <div class="left-wrap">2</div>
           <div class="right-wrap">
-            <div class="title">Use the Chatbot</div>
+            <div class="title">{{ $t("quickStart.step2") }}</div>
             <div class="des">
-              Start engaging with the intelligent chatbot, which supports file
-              uploads and information retrieval to assist you in completing
-              tasks more efficiently.
+              {{ $t("quickStart.step2Tip") }}
             </div>
           </div>
         </div>
@@ -57,7 +54,9 @@
 import { userAppStore } from "@/store/user";
 import { PlusOutlined } from "@ant-design/icons-vue";
 import { computed, h } from "vue";
+import { useI18n } from "vue-i18n";
 
+const { t } = useI18n();
 const userGuideStore = userAppStore();
 
 const emit = defineEmits(["create"]);
@@ -67,10 +66,10 @@ const modelVisible = computed(() => {
 
 const steps = ref<EmptyArrayType>([
   {
-    title: "Step 1",
+    title: t("quickStart.first"),
   },
   {
-    title: "Step 2",
+    title: t("quickStart.second"),
   },
 ]);
 const handleCreate = () => {

@@ -8,10 +8,10 @@
     autocomplete="off"
     class="form-wrap"
   >
-    <a-form-item label="Activated" name="active">
+    <a-form-item :label="$t('pipeline.isActive')" name="active">
       <a-radio-group v-model:value="form.active">
-        <a-radio :value="true">Activated</a-radio>
-        <a-radio :value="false">Inactive</a-radio>
+        <a-radio :value="true">{{ $t("pipeline.activated") }}</a-radio>
+        <a-radio :value="false">{{ $t("pipeline.inactive") }}</a-radio>
       </a-radio-group>
     </a-form-item>
   </a-form>
@@ -20,7 +20,9 @@
 <script lang="ts" setup name="Basic">
 import type { FormInstance } from "ant-design-vue";
 import { reactive, ref } from "vue";
+import { useI18n } from "vue-i18n";
 
+const { t } = useI18n();
 const props = defineProps({
   formData: {
     type: Object,
@@ -38,7 +40,7 @@ const form = reactive<FormType>({
   active,
 });
 const rules = reactive({
-  active: [{ required: true, message: "Please activated", trigger: "change" }],
+  active: [{ required: true, trigger: "change" }],
 });
 // Validate the form, throw results form
 const handleValidate = (): Promise<object> => {

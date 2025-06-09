@@ -32,7 +32,7 @@ export const requestPipelineCreate = (data: Object) => {
     data,
     showLoading: true,
     showSuccessMsg: true,
-    successMsg: "Pipeline created successfully !",
+    successMsg: "request.pipeline.createSucc",
   });
 };
 
@@ -43,7 +43,7 @@ export const requestPipelineUpdate = (name: String, data: Object) => {
     data,
     showLoading: true,
     showSuccessMsg: true,
-    successMsg: "Pipeline update successfully !",
+    successMsg: "request.pipeline.updateSucc",
   });
 };
 
@@ -53,7 +53,7 @@ export const requestPipelineDelete = (name: String) => {
     method: "delete",
     showLoading: true,
     showSuccessMsg: true,
-    successMsg: "Pipeline deleted successfully !",
+    successMsg: "request.pipeline.deleteSucc",
   });
 };
 
@@ -64,7 +64,7 @@ export const requestPipelineSwitchState = (name: String, data: Object) => {
     data,
     showLoading: true,
     showSuccessMsg: true,
-    successMsg: "Pipeline state switch successful !",
+    successMsg: "request.pipeline.switchSucc",
   });
 };
 

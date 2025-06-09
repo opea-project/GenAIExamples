@@ -1,7 +1,7 @@
 <template>
   <a-drawer
     v-model:open="drawerVisible"
-    title="Pipeline Details"
+    :title="$t('pipeline.detail')"
     destroyOnClose
     width="500px"
     @close="handleClose"
@@ -9,37 +9,48 @@
     <!-- basic -->
     <div class="basic-wrap">
       <p class="basic-item">
-        <span class="label-wrap">Name</span>
+        <span class="label-wrap">{{ $t("pipeline.name") }}</span>
         <span class="content-wrap">{{ formData.name }}</span>
       </p>
       <p class="basic-item">
-        <span class="label-wrap">Status</span>
+        <span class="label-wrap">{{ $t("pipeline.status") }}</span>
         <span
           :class="{ 'active-state': formData.active, 'content-wrap': true }"
-          >{{ formData.active ? "Activated" : "Inactive" }}</span
+          >{{
+            formData.active ? $t("pipeline.activated") : $t("pipeline.inactive")
+          }}</span
         >
       </p>
     </div>
     <!-- Node Parser -->
     <div class="module-wrap">
       <a-collapse v-model:activeKey="nodeParserActive" expandIconPosition="end">
-        <a-collapse-panel key="nodeParser" header="Node Parser">
+        <a-collapse-panel
+          key="nodeParser"
+          :header="$t('pipeline.config.nodeParser')"
+        >
           <ul class="form-wrap">
             <li class="item-wrap">
-              <span class="label-wrap">Node parser type</span>
+              <span class="label-wrap">{{
+                $t("pipeline.config.nodeParser")
+              }}</span>
               <span class="content-wrap">{{
                 formData.node_parser.parser_type
               }}</span>
             </li>
             <template v-if="!isHierarchical && !isSentencewindow">
               <li class="item-wrap">
-                <span class="label-wrap">Chunk size</span>
+                <span class="label-wrap">
+                  {{ $t("pipeline.config.chunkSize") }}</span
+                >
                 <span class="content-wrap">{{
                   formData.node_parser.chunk_size
                 }}</span>
               </li>
               <li class="item-wrap">
-                <span class="label-wrap">Chunk overlap</span>
+                <span class="label-wrap">{{
+                  $t("pipeline.config.chunkOverlap")
+                }}</span>
                 <span class="content-wrap">{{
                   formData.node_parser.chunk_overlap
                 }}</span>
@@ -47,7 +58,9 @@
             >
             <template v-if="isSentencewindow">
               <li class="item-wrap">
-                <span class="label-wrap">Window Size</span>
+                <span class="label-wrap">{{
+                  $t("pipeline.config.windowSize")
+                }}</span>
                 <span class="content-wrap">{{
                   formData.node_parser.window_size
                 }}</span>
@@ -60,22 +73,28 @@
     <!-- Indexer -->
     <div class="module-wrap">
       <a-collapse v-model:activeKey="indexerActive" expandIconPosition="end">
-        <a-collapse-panel key="indexer" header="Indexer">
+        <a-collapse-panel key="indexer" :header="$t('pipeline.config.indexer')">
           <ul class="form-wrap">
             <li class="item-wrap">
-              <span class="label-wrap">Indexer Type</span>
+              <span class="label-wrap">{{
+                $t("pipeline.config.indexerType")
+              }}</span>
               <span class="content-wrap">{{
                 formData.indexer.indexer_type
               }}</span>
             </li>
             <li class="item-wrap">
-              <span class="label-wrap">Embedding Model</span>
+              <span class="label-wrap">{{
+                $t("pipeline.config.embedding")
+              }}</span>
               <span class="content-wrap">{{
                 formData.indexer.embedding_model.model_id
               }}</span>
             </li>
             <li class="item-wrap">
-              <span class="label-wrap">Embedding run device</span>
+              <span class="label-wrap">{{
+                $t("pipeline.config.embeddingDevice")
+              }}</span>
               <span class="content-wrap">{{
                 formData.indexer.embedding_model.device
               }}</span>
@@ -87,16 +106,21 @@
     <!-- Retriever -->
     <div class="module-wrap">
       <a-collapse v-model:activeKey="retrieverActive" expandIconPosition="end">
-        <a-collapse-panel key="retriever" header="Retriever">
+        <a-collapse-panel
+          key="retriever"
+          :header="$t('pipeline.config.retriever')"
+        >
           <ul class="form-wrap">
             <li class="item-wrap">
-              <span class="label-wrap">Retriever Type</span>
+              <span class="label-wrap">{{
+                $t("pipeline.config.retrieverType")
+              }}</span>
               <span class="content-wrap">{{
                 formData.retriever.retriever_type
               }}</span>
             </li>
             <li class="item-wrap">
-              <span class="label-wrap">Search top k</span>
+              <span class="label-wrap">{{ $t("pipeline.config.topk") }}</span>
               <span class="content-wrap">{{
                 formData.retriever.retrieve_topk
               }}</span>
@@ -111,24 +135,29 @@
         v-model:activeKey="postProcessorActive"
         expandIconPosition="end"
       >
-        <a-collapse-panel key="postProcessor" header="PostProcessor">
+        <a-collapse-panel
+          key="postProcessor"
+          :header="$t('pipeline.config.postProcessor')"
+        >
           <ul
             v-for="(item, index) in formData.postprocessor"
             key="index"
             :class="['form-wrap', index ? 'bt-border' : '']"
           >
             <li class="item-wrap">
-              {{ `PostProcessor Type${index + 1}:` }}
+              {{ `${$t("pipeline.config.postProcessorType")}${index + 1}:` }}
               <span class="content-wrap">{{ item.processor_type }}</span>
             </li>
             <li class="item-wrap" v-if="item.reranker_model?.model_id">
-              <span class="label-wrap">Rerank Model</span>
+              <span class="label-wrap">{{ $t("pipeline.config.rerank") }}</span>
               <span class="content-wrap">{{
                 item.reranker_model.model_id
               }}</span>
             </li>
             <li class="item-wrap" v-if="item.reranker_model?.device">
-              <span class="label-wrap">Rerank run device</span>
+              <span class="label-wrap">{{
+                $t("pipeline.config.rerankDevice")
+              }}</span>
               <span class="content-wrap">{{ item.reranker_model.device }}</span>
             </li>
           </ul>
@@ -138,33 +167,44 @@
     <!-- Generator -->
     <div class="module-wrap">
       <a-collapse v-model:activeKey="generatorActive" expandIconPosition="end">
-        <a-collapse-panel key="generator" header="Generator">
+        <a-collapse-panel
+          key="generator"
+          :header="$t('pipeline.config.generator')"
+        >
           <ul class="form-wrap">
             <li class="item-wrap">
-              <span class="label-wrap">Generator Type</span>
+              <span class="label-wrap">{{
+                $t("pipeline.config.generatorType")
+              }}</span>
               <span class="content-wrap"> chatqna </span>
             </li>
             <li class="item-wrap">
-              <span class="label-wrap">LLM Inference Type</span>
+              <span class="label-wrap">{{ $t("pipeline.config.llm") }}</span>
               <span class="content-wrap">{{
                 formData.generator.inference_type
               }}</span>
             </li>
             <template v-if="formData.generator.inference_type === 'local'">
               <li class="item-wrap">
-                <span class="label-wrap">Large Language Model</span>
+                <span class="label-wrap">{{
+                  $t("pipeline.config.language")
+                }}</span>
                 <span class="content-wrap">{{
                   formData.generator.model.model_id
                 }}</span>
               </li>
               <li class="item-wrap">
-                <span class="label-wrap">LLM run device</span>
+                <span class="label-wrap">{{
+                  $t("pipeline.config.llmDevice")
+                }}</span>
                 <span class="content-wrap">{{
                   formData.generator.model.device
                 }}</span>
               </li>
               <li class="item-wrap">
-                <span class="label-wrap">Weights</span>
+                <span class="label-wrap">{{
+                  $t("pipeline.config.weights")
+                }}</span>
                 <span class="content-wrap">{{
                   formData.generator.model.weight
                 }}</span>

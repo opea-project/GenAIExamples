@@ -221,11 +221,13 @@ def benchmark_response(ret, benchmark, benchmark_index, benchmark_data, input_to
 
 def run_test_generator_ben(pl: Pipeline, chat_request: ChatCompletionRequest) -> Any:
     benchmark_index, benchmark_data = pl.benchmark.init_benchmark_data()
+    contexts = {}
     start = time.perf_counter()
     query = chat_request.messages
     retri_res = pl.retriever.run(query=query)
     query_bundle = QueryBundle(query)
     benchmark_data[CompType.RETRIEVER] = time.perf_counter() - start
+    contexts[CompType.RETRIEVER] = retri_res
 
     start = time.perf_counter()
     if pl.postprocessor:
@@ -236,6 +238,7 @@ def run_test_generator_ben(pl: Pipeline, chat_request: ChatCompletionRequest) ->
             ):
                 processor.top_n = chat_request.top_n
             retri_res = processor.run(retri_res=retri_res, query_bundle=query_bundle)
+            contexts[CompType.POSTPROCESSOR] = retri_res
     benchmark_data[CompType.POSTPROCESSOR] = time.perf_counter() - start
 
     if pl.generator is None:
@@ -260,12 +263,14 @@ def run_test_generator_ben(pl: Pipeline, chat_request: ChatCompletionRequest) ->
         benchmark_data[CompType.GENERATOR] = end - start
         pl.benchmark.insert_llm_data(benchmark_index, input_token_size)
         pl.benchmark.insert_benchmark_data(benchmark_data)
-    return ret, retri_res
+    return ret, contexts
 
 
 def run_test_generator(pl: Pipeline, chat_request: ChatCompletionRequest) -> Any:
     query = chat_request.messages
+    contexts = {}
     retri_res = pl.retriever.run(query=query)
+    contexts[CompType.RETRIEVER] = retri_res
     query_bundle = QueryBundle(query)
 
     if pl.postprocessor:
@@ -276,6 +281,7 @@ def run_test_generator(pl: Pipeline, chat_request: ChatCompletionRequest) -> Any
             ):
                 processor.top_n = chat_request.top_n
             retri_res = processor.run(retri_res=retri_res, query_bundle=query_bundle)
+            contexts[CompType.POSTPROCESSOR] = retri_res
 
     if pl.generator is None:
         raise ValueError("No Generator Specified")
@@ -286,4 +292,4 @@ def run_test_generator(pl: Pipeline, chat_request: ChatCompletionRequest) -> Any
         ret = pl.generator.run_vllm(chat_request, retri_res, np_type)
     else:
         raise ValueError("LLM inference_type not supported")
-    return ret, retri_res
+    return ret, contexts

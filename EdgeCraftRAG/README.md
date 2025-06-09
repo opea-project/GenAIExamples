@@ -106,19 +106,53 @@ docker compose -f compose_vllm.yaml up -d
 The docker file can be pulled automatically‌, you can also pull the image manually:
 
 ```bash
-docker pull intelanalytics/ipex-llm-serving-xpu:latest
+docker pull intelanalytics/ipex-llm-serving-xpu:0.8.3-b18
+```
+
+Generate your nginx config file
+
+```bash
+export HOST_IP=#your host ip
+export NGINX_PORT=8086 #set port for nginx
+# If you are running with 1 vllm container:
+export NGINX_PORT_0=8100 # you can change the port to your preferrance
+export NGINX_PORT_1=8100 # you can change the port to your preferrance
+# If you are running with 2 vllm containers:
+export NGINX_PORT_0=8100 # you can change the port to your preferrance
+export NGINX_PORT_1=8200 # you can change the port to your preferrance
+# Generate your nginx config file
+envsubst < GenAIExamples/EdgeCraftRAG/nginx/nginx.conf.template > <your_nginx_config_path>/nginx.conf
+# set NGINX_CONFIG_PATH
+export NGINX_CONFIG_PATH="<your_nginx_config_path>/nginx.conf"
 ```
 
 Set up Additional Environment Variables and start with compose_vllm_multi-arc.yaml
 
 ```bash
-export LLM_MODEL=#your model id
-export VLLM_SERVICE_PORT=8008
-export vLLM_ENDPOINT="http://${HOST_IP}:${VLLM_SERVICE_PORT}"
+# For 1 vLLM container(1 DP) with  multi Intel Arc GPUs
+export vLLM_ENDPOINT="http://${HOST_IP}:${NGINX_PORT}"
 export LLM_MODEL_PATH=#your model path
+export LLM_MODEL=#your model id
+export CONTAINER_COUNT="single_container"
 export TENSOR_PARALLEL_SIZE=#your Intel Arc GPU number to do inference
+export SELECTED_XPU_0=<which GPU to select to run> # example for selecting 2 Arc GPUs: SELECTED_XPU_0=0,1
+```
 
-docker compose -f compose_vllm_multi-arc.yaml up -d
+```bash
+# For 2 vLLM container(2 DP) with  multi Intel Arc GPUs
+export vLLM_ENDPOINT="http://${HOST_IP}:${NGINX_PORT}"
+export LLM_MODEL_PATH=#your model path
+export LLM_MODEL=#your model id
+export CONTAINER_COUNT="multi_container"
+export TENSOR_PARALLEL_SIZE=#your Intel Arc GPU number to do inference
+export SELECTED_XPU_0=<which GPU to select to run for container 0>
+export SELECTED_XPU_1=<which GPU to select to run for container 1>
+```
+
+start with compose_vllm_multi-arc.yaml
+
+```bash
+docker compose -f docker_compose/intel/gpu/arc/compose_vllm_multi-arc.yaml --profile ${CONTAINER_COUNT} up -d
 ```
 
 ### ChatQnA with LLM Example (Command Line)
@@ -355,8 +389,26 @@ curl -X PATCH http://${HOST_IP}:16010/v1/data/files/test.pdf -H "Content-Type: a
 
 ### System Prompt Management
 
-#### Use custom system prompt
+#### Get system prompt
 
 ```bash
-curl -X POST http://${HOST_IP}:16010/v1/chatqna/prompt -H "Content-Type: multipart/form-data" -F "file=@your_prompt_file.txt"
+curl -X GET http://${HOST_IP}:16010/v1/chatqna/prompt -H "Content-Type: application/json" | jq '.'
+```
+
+#### Update system prompt
+
+```bash
+curl -X POST http://${HOST_IP}:16010/v1/chatqna/prompt -H "Content-Type: application/json" -d '{"prompt":"This is a template prompt"}' | jq '.'
+```
+
+#### Reset system prompt
+
+```bash
+curl -X POST http://${HOST_IP}:16010/v1/chatqna/prompt/reset -H "Content-Type: application/json" | jq '.'
+```
+
+#### Use custom system prompt file
+
+```bash
+curl -X POST http://${HOST_IP}:16010/v1/chatqna/prompt-file -H "Content-Type: multipart/form-data" -F "file=@your_prompt_file.txt"
 ```

@@ -3,43 +3,71 @@
     sans-serif;
   --header-font-family: "IntelOneDisplayNormal";
   --color-white: #ffffff;
+  --color-fuzzy-white: rgba(255, 255, 255, 0.7);
   --color-primary: #00377c;
   --color-primary-hover: #0054ae;
+  --color-primary-tip: #3b82f6;
+  --color-primary-second: #1677ff;
   --color-primaryBg: #e0eaff;
+  --color-second-primaryBg: #d4e1fd;
+  --message-bg: var(--color-second-primaryBg);
   --color-error: #ce0000;
   --color-error-hover: #ff5d52;
-  --color-info: #aaaaaa;
-  --color-success: #179958;
-  --color-warning: #faad14;
-  --color-big-icon: #111111;
-  --color-successBg: #d6ffe8;
-  --color-warningBg: #feefd0;
   --color-errorBg: #ffa3a3;
+  --color-info: #aaaaaa;
   --color-infoBg: #ffffff;
+  --color-success: #179958;
+  --color-successBg: #d6ffe8;
+  --color-second-successBg: #f0fdf4;
+  --color-warning: #faad14;
+  --color-second-warning: #854d0e;
+  --color-warningBg: #feefd0;
+  --color-second-warningBg: #fefce8;
+  --color-big-icon: #111111;
   --bg-main-color: #f5f5f5;
   --bg-card-color: #f9f9f9;
+  --bg-second-card-bg: var(--color-white);
   --bg-loading-color: rgba(0, 0, 0, 0.45);
   --bg-content-color: var(--color-white);
   --font-main-color: #333333;
   --font-text-color: #595959;
   --font-info-color: #808080;
   --font-tip-color: #999999;
-  --bg-scrollbar: #dddddd;
+  --bg-scrollbar: #f5f5f5;
+  --color-scrollbar: #d5d5d5;
   --bg-scrollbar-hover: #bbbbbb;
   --bg-box-shadow: rgba(0, 0, 0, 0.05);
+  --bg-primary-shadow: rgba(0, 55, 124, 0.3);
   --bg-gradient-shadow: 0px 4px 6px -4px rgba(0, 0, 0, 0.1),
     0px 10px 15px -3px rgba(0, 0, 0, 0.1);
   --menu-bg: var(--bg-main-color);
+  --input-bg: var(--color-white);
   --color-switch-theme: #e5e7eb;
-
+  --think-done-icon: #356bfd;
+  --think-done-bg: linear-gradient(180deg, #f3f5fc 30%, #ffffff 100%);
+  --font-think-color: #5e5e5e;
+  --face-icon-bg: #a6a6a6;
+  --bg-switch: var(--color-primaryBg);
   //边框
   --border-main-color: #e5e7eb;
+  --border-fuzzy-color: rgba(255, 255, 255, 0.1);
+  --border-warning: var(--color-warningBg);
+  --border-success: var(--color-successBg);
+  --border-primary: var(--color-second-primaryBg);
 
   //黑色按钮
   --bg-black-color: #434343;
   --bg-black-hover-color: #595959;
   --bg-black-active-color: #262626;
   --border-black-color: #434343;
+
+  //md显示
+  --code-header-bg: #dddddd;
+  --code-header-font: #2c2c36;
+  --code-content-bg: #f0f0f0;
+  --table-th-bg: #dddddd;
+  --table-td-bg: #f0f0f0;
+  --blockquote-color: var(--font-info-color);
 }
 
 [data-theme="dark"] {
@@ -51,26 +79,46 @@
   --font-text-color: #e9e9e9;
   --font-info-color: #aeaeae;
   --font-tip-color: #aeaeae;
-  --bg-scrollbar: #dddddd;
-  --bg-scrollbar-hover: #bbbbbb;
+  --bg-scrollbar: #1e1e1e;
+  --color-scrollbar: #565656;
+  --bg-scrollbar-hover: #666666;
   --color-primary: #0054ae;
   --color-primary-hover: #1668dc;
-  --color-primaryBg: #95b5fa;
-  --bg-box-shadow: rgba(109, 153, 233, 0.05);
+  --color-primaryBg: #e0eaff;
+  --color-primary-second: #1677ff;
+  --color-second-primaryBg: #d4e1fd;
+  --bg-box-shadow: rgba(255, 255, 255, 0.1);
   --bg-gradient-shadow: 0px 4px 6px -4px rgba(255, 255, 255, 0.1),
     0px 5px 8px 1px rgba(255, 255, 255, 0.1);
   --menu-bg: #3e3e3e;
   --color-big-icon: #ffffff;
+  --bg-second-card-bg: #111111;
   --color-switch-theme: var(--color-primary-hover);
+  --think-done-bg: linear-gradient(180deg, #32313a 30%, #2d2d2d 100%);
+  --font-think-color: #e0ecffcc;
+  --bg-switch: var(--bg-card-color);
+  --input-bg: var(--menu-bg);
+  --message-bg: var(--bg-card-color);
 
   //边框
-  --border-main-color: #2b2b2b;
+  --border-main-color: #3b3b3b;
+  --border-warning: #f8e9ca;
+  --border-success: #d7f8e8;
+  --border-primary: #d5daf8;
 
   //黑色按钮
   --bg-black-color: #434343;
   --bg-black-hover-color: #595959;
   --bg-black-active-color: #262626;
   --border-black-color: #434343;
+
+  //md显示
+  --code-header-bg: #585a73;
+  --code-header-font: #fafafc;
+  --code-content-bg: #2c2c36;
+  --table-th-bg: #585a73;
+  --table-td-bg: #2c2c36;
+  --blockquote-color: var(--bg-scrollbar-hover);
 }
 
 @use "ant-design-vue/es/style/themes/default.less";

@@ -1,7 +1,7 @@
 <template>
   <a-drawer
     v-model:open="drawerVisible"
-    title="Ceneration Configuration"
+    :title="$t('generation.title')"
     destroyOnClose
     width="600px"
     :keyboard="false"
@@ -18,22 +18,30 @@
       class="form-wrap"
     >
       <div class="module-wrap">
-        <div class="module-title">Retriever Configuration</div>
-        <a-form-item label="Rerank top n" name="top_n" class="slider-wrap">
+        <div class="module-title">{{ $t("generation.retriever") }}</div>
+        <a-form-item
+          :label="$t('generation.config.top_n')"
+          name="top_n"
+          class="slider-wrap"
+        >
           <a-slider
             v-model:value="form.top_n"
             :min="1"
-            :max="10"
+            :max="30"
             :marks="sliderMarks.top_n"
           />
           <div class="tips-wrap">
-            <InfoCircleFilled />Number of rerank results
+            <InfoCircleFilled />{{ $t("generation.desc.top_n") }}
           </div>
         </a-form-item>
       </div>
       <div class="module-wrap">
-        <div class="module-title">Generation Configuration</div>
-        <a-form-item label="Temperature" name="temperature" class="slider-wrap">
+        <div class="module-title">{{ $t("generation.title") }}</div>
+        <a-form-item
+          :label="$t('generation.config.temperature')"
+          name="temperature"
+          class="slider-wrap"
+        >
           <a-slider
             v-model:value="form.temperature"
             :min="0"
@@ -42,11 +50,11 @@
             :marks="sliderMarks.temperature"
           />
           <div class="tips-wrap">
-            <InfoCircleFilled />Higher values produce more diverse outputs
+            <InfoCircleFilled />{{ $t("generation.desc.temperature") }}
           </div>
         </a-form-item>
         <a-form-item
-          label="Top-p (nucleus sampling)"
+          :label="$t('generation.config.top_p')"
           name="top_p"
           class="slider-wrap"
         >
@@ -58,12 +66,14 @@
             :marks="sliderMarks.temperature"
           />
           <div class="tips-wrap">
-            <InfoCircleFilled />Sample from the smallest possible set of tokens
-            whose cumulative probability exceeds top_p. Set to 1 to disable and
-            sample from all tokens.
+            <InfoCircleFilled />{{ $t("generation.desc.top_p") }}
           </div>
         </a-form-item>
-        <a-form-item label="Top-k" name="top_k" class="slider-wrap">
+        <a-form-item
+          :label="$t('generation.config.top_k')"
+          name="top_k"
+          class="slider-wrap"
+        >
           <a-slider
             v-model:value="form.top_k"
             :min="0"
@@ -71,12 +81,11 @@
             :marks="sliderMarks.top_k"
           />
           <div class="tips-wrap">
-            <InfoCircleFilled />Sample from a shortlist of top-k tokens — 0 to
-            disable and sample from all tokens.
+            <InfoCircleFilled />{{ $t("generation.desc.top_k") }}
           </div>
         </a-form-item>
         <a-form-item
-          label="Repetition Penalty"
+          :label="$t('generation.config.penalty')"
           name="repetition_penalty"
           class="slider-wrap"
         >
@@ -88,29 +97,33 @@
             :marks="sliderMarks.repetition_penalty"
           />
           <div class="tips-wrap">
-            <InfoCircleFilled />Penalize repetition — 1.0 to disable.
+            <InfoCircleFilled />{{ $t("generation.desc.penalty") }}
           </div>
         </a-form-item>
         <a-form-item
-          label="Max Token Number"
+          :label="$t('generation.config.maxToken')"
           name="max_tokens"
           class="slider-wrap"
         >
           <a-slider
             v-model:value="form.max_tokens"
             :min="1"
-            :max="8192"
+            :max="10240"
             :marks="sliderMarks.max_tokens"
           />
-          <div class="tips-wrap"><InfoCircleFilled />Set Max Output Token.</div>
+          <div class="tips-wrap">
+            <InfoCircleFilled />{{ $t("generation.desc.maxToken") }}
+          </div>
         </a-form-item>
       </div>
     </a-form>
     <template #footer>
-      <a-button style="margin-right: 8px" @click="handleClose">Cancel</a-button>
-      <a-button type="primary" :loading="submitLoading" @click="handleSubmit"
-        >Confirm</a-button
-      >
+      <a-button style="margin-right: 8px" @click="handleClose">{{
+        $t("common.cancel")
+      }}</a-button>
+      <a-button type="primary" :loading="submitLoading" @click="handleSubmit">{{
+        $t("common.confirm")
+      }}</a-button>
     </template>
   </a-drawer>
 </template>
@@ -118,7 +131,7 @@
 import { InfoCircleFilled } from "@ant-design/icons-vue";
 import { FormInstance } from "ant-design-vue";
 import { reactive, ref } from "vue";
-import { ConfigType } from "../type";
+import { ConfigType } from "../../type";
 
 const props = defineProps({
   drawerData: {
@@ -162,7 +175,7 @@ const rules = reactive({
 const sliderMarks = reactive<EmptyObjectType>({
   top_n: {
     1: "1",
-    10: "10",
+    30: "30",
   },
   temperature: {
     0: "0",
@@ -178,7 +191,7 @@ const sliderMarks = reactive<EmptyObjectType>({
   },
   max_tokens: {
     1: "1",
-    8192: "8192",
+    10240: "10240",
   },
 });
 const handleClose = () => {
