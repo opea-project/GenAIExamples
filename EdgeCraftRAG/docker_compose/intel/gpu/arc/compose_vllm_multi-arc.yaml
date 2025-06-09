@@ -49,18 +49,18 @@ services:
     profiles:
       - single_container
       - multi_container
-  # nginx:
-  #   image: nginx:latest
-  #   restart: always
-  #   ports:
-  #     - ${NGINX_PORT:-8086}:8086
-  #   volumes:
-  #     - ${NGINX_CONFIG_PATH:-${PWD}}:/etc/nginx/nginx.conf
-  #   depends_on:
-  #     - server
-  #   profiles:
-  #     - single_container
-  #     - multi_container
+  nginx:
+    image: nginx:latest
+    restart: always
+    ports:
+      - ${NGINX_PORT:-8086}:8086
+    volumes:
+      - ${NGINX_CONFIG_PATH:-${PWD}}:/etc/nginx/nginx.conf
+    depends_on:
+      - server
+    profiles:
+      - single_container
+      - multi_container
   ui:
     image: ${REGISTRY:-opea}/edgecraftrag-ui:${TAG:-latest}
     container_name: edgecraftrag-ui
