@@ -46,7 +46,7 @@ function start_services() {
     cd $WORKPATH/docker_compose/intel/hpu/gaudi
 
     # Start Docker Containers
-    docker compose -f compose.yaml up -d > ${LOG_PATH}/start_services_with_compose.log 2>&1
+    docker compose -f compose.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
     n=0
     until [[ "$n" -ge 100 ]]; do
         docker logs vllm-service > ${LOG_PATH}/vllm_service_start.log 2>&1
@@ -221,8 +221,8 @@ function main() {
     start_services
     echo "::endgroup::"
 
-    echo "::group::validate_microservice"
-    validate_microservice
+    echo "::group::validate_microservices"
+    validate_microservices
     echo "::endgroup::"
 
     echo "::group::dataprep"
