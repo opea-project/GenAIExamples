@@ -280,7 +280,15 @@ class CodeGenService:
 
         # Get the response from the last node in the runtime graph
         last_node = runtime_graph.all_leaves()[-1]
-        response = result_dict[last_node]["text"]
+
+        try:
+            response = result_dict[last_node]["choices"][0]["text"]
+        except (KeyError, IndexError, TypeError):
+            try:
+                response = result_dict[last_node]["text"]
+            except (KeyError, TypeError):
+                response = "Response Error"
+
         choices = []
         usage = UsageInfo()
         choices.append(
