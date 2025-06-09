@@ -1,0 +1,37 @@
+worker_processes  auto;
+events {
+    worker_connections  1024;
+}
+http {
+ 
+    upstream multi-arc-serving-container {
+        server ${HOST_IP}:${NGINX_PORT_0};
+        server ${HOST_IP}:${NGINX_PORT_1};
+    }
+    include /etc/nginx/mime.types;
+    default_type  application/octet-stream;
+    client_max_body_size 50M;
+    sendfile on;
+ 
+    keepalive_timeout  65;
+    keepalive_requests 1000;
+    server {
+        listen 8086;
+        server_name _;
+        location / {
+            root /usr/share/nginx/html;
+            index index.html index.htm;
+            add_header Cache-Control "no-cache";
+            try_files $uri $uri/ /index.html;
+        }
+        location /v1/completions {
+            proxy_pass http://multi-arc-serving-container/v1/completions;
+            proxy_http_version 1.1;
+            proxy_set_header Connection "";
+        }
+ 
+        location ~ /\. {
+            deny all;
+        }
+    }
+}

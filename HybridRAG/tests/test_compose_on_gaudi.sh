@@ -99,7 +99,7 @@ function validate_service() {
 
     local HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL")
 
-    if [ "DOCKER_NAME" -eq "text2cypher-gaudi-container" ]; then
+    if [ "$DOCKER_NAME" == "text2cypher-gaudi-container" ]; then
         docker ps
         docker logs text2cypher-gaudi-container
     fi
@@ -114,7 +114,7 @@ function validate_service() {
         else
             echo "[ $SERVICE_NAME ] Content does not match the expected result: $CONTENT"
             docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
-            if [ "DOCKER_NAME" -eq "hybridrag-xeon-backend-server" ]; then
+            if [ "$DOCKER_NAME" == "hybridrag-xeon-backend-server" ]; then
                 docker ps
                 docker logs text2cypher-gaudi-container
             fi
@@ -123,7 +123,7 @@ function validate_service() {
     else
         echo "[ $SERVICE_NAME ] HTTP status is not 200. Received status was $HTTP_STATUS"
         docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
-        if [ "DOCKER_NAME" -eq "hybridrag-xeon-backend-server" ]; then
+        if [ "$DOCKER_NAME" == "hybridrag-xeon-backend-server" ]; then
             docker ps
             docker logs text2cypher-gaudi-container
         fi
