@@ -11,7 +11,7 @@ First of all, you need to build Docker Images locally. This step can be ignored 
 ```bash
 git clone https://github.com/opea-project/GenAIComps.git
 cd GenAIComps
-docker build --no-cache -t opea/text2sql:comps -f comps/text2sql/src/Dockerfile .
+docker build --no-cache -t opea/text2sql:latest -f comps/text2sql/src/Dockerfile .
 
 ```
 
@@ -28,7 +28,7 @@ docker build --no-cache -t opea/text2sql-react-ui:latest -f docker/Dockerfile.re
 Then run the command `docker images`, you will have the following Docker Images:
 
 1. `opea/text2sql:latest`
-2. `opea/dbqna-react-ui:latest`
+2. `opea/text2sql-react-ui:latest`
 
 ## 🚀 Start Microservices
 
@@ -123,7 +123,7 @@ docker run -d --name="test-text2sql-server" --ipc=host -p ${text2sql_port}:8090 
 - Start React UI service
 
 ```bash
-docker run -d --name="test-dbqna-react-ui-server" --ipc=host -p 5174:80 -e no_proxy=$no_proxy -e https_proxy=$https_proxy -e http_proxy=$http_proxy opea/dbqna-react-ui:latest
+docker run -d --name="test-dbqna-react-ui-server" --ipc=host -p 5174:80 -e no_proxy=$no_proxy -e https_proxy=$https_proxy -e http_proxy=$http_proxy opea/text2sql-react-ui:latest
 ```
 
 ## 🚀 Validate Microservices
