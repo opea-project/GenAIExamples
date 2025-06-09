@@ -62,11 +62,12 @@ An OpenAI-compatible endpoint is required e.g., OpenRouter.ai.  Please obtain a 
 
 To set up environment variables for deploying ChatQnA services, set up some parameters specific to the deployment environment and source the _setup_env.sh_ script in this directory:
 
-```
-source ./set_env.sh # source environment variables then override below.
+```bash
+cd GenAIExamples/ChatQnA/docker_compose/intel/cpu/xeon
+source set_env.sh # source environment variables then override below.
 
 export host_ip="External_Public_IP" # e.g. export host_ip=$(hostname -I | awk '{print $1}')
-export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
+export HF_TOKEN="Your_Huggingface_API_Token"
 export OPENAI_API_KEY="key for openAI-like endpoint"
 
 export LLM_MODEL_ID="" # e.g. "google/gemma-3-1b-it:free"
