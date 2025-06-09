@@ -46,7 +46,7 @@ function start_services() {
     n=0
     until [[ "$n" -ge 200 ]]; do
         echo "n=$n"
-        docker logs vllm-gaudi-server > vllm_service_start.log
+        docker logs vllm-gaudi-server > vllm_service_start.log 2>&1
         if grep -q "Warmup finished" vllm_service_start.log; then
             break
         fi

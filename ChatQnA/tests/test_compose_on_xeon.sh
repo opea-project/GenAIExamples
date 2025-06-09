@@ -45,6 +45,7 @@ function start_services() {
     # Start Docker Containers
     docker compose -f compose.yaml -f compose.telemetry.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
     n=0
+    set +x
     until [[ "$n" -ge 100 ]]; do
         docker logs vllm-service > ${LOG_PATH}/vllm_service_start.log 2>&1
         if grep -q complete ${LOG_PATH}/vllm_service_start.log; then
@@ -53,6 +54,7 @@ function start_services() {
         sleep 5s
         n=$((n+1))
     done
+    set -x
 }
 
 function validate_service() {
