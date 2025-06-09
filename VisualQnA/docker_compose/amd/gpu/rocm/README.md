@@ -151,11 +151,11 @@ Use AMD GPU driver utilities to determine the correct `cardN` and `renderN` IDs 
 
 #### Setting variables in the operating system environment:
 
-##### Set variable HUGGINGFACEHUB_API_TOKEN:
+##### Set variable HF_TOKEN:
 
 ```bash
 ### Replace the string 'your_huggingfacehub_token' with your HuggingFacehub repository access token.
-export HUGGINGFACEHUB_API_TOKEN='your_huggingfacehub_token'
+export HF_TOKEN='your_huggingfacehub_token'
 ```
 
 #### Set variables value in set_env\*\*\*\*.sh file:

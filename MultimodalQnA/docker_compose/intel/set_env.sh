@@ -7,7 +7,7 @@ source .set_env.sh
 popd > /dev/null
 
 export host_ip=$(hostname -I | awk '{print $1}')
-export HUGGINGFACEHUB_API_TOKEN=${HF_TOKEN}
+export HF_TOKEN=${HF_TOKEN}
 export MM_EMBEDDING_SERVICE_HOST_IP=${host_ip}
 export MM_RETRIEVER_SERVICE_HOST_IP=${host_ip}
 export LVM_SERVICE_HOST_IP=${host_ip}
