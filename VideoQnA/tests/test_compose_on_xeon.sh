@@ -17,7 +17,6 @@ export host_ip=${ip_address}
 
 function setup_env() {
     export HF_TOKEN=${HF_TOKEN}
-    export HUGGINGFACEHUB_API_TOKEN=${HF_TOKEN}
 
     export INDEX_NAME="mega-videoqna"
     export LLM_DOWNLOAD="True" # Set to "False" before redeploy LVM server to avoid model download
