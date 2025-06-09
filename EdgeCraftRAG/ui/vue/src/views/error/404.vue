@@ -1,13 +1,13 @@
 <template>
   <div class="not-found">
     <img :src="notFound" alt="" class="not-found-icon" />
-    <p>Uh oh! It seems like you're lost</p>
+    <p>{{ $t("error.notFoundTip") }}</p>
     <a-button
       type="primary"
       size="large"
       :icon="h(HomeFilled)"
       @click="handleGoHome"
-      >GO Home
+      >{{ $t("error.back") }}
     </a-button>
   </div>
 </template>
@@ -36,6 +36,7 @@ const handleGoHome = () => {
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
+  color: #595959;
   .not-found-icon {
     margin-bottom: 16px;
   }
