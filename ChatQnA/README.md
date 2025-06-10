@@ -123,11 +123,11 @@ FAQ Generation Application leverages the power of large language models (LLMs) t
 
 ## Validated Configurations
 
-| **Deploy Method** | **LLM Engine**       | **LLM Model**                        | **Embedding** | **Vector Database**                          | **Reranking** | **Guardrails** | **Hardware**       |
-|--------------------|----------------------|---------------------------------------|---------------|----------------------------------------------|---------------|----------------|--------------------|
-| Docker Compose     | vLLM, TGI           | meta-llama/Meta-Llama-3-8B-Instruct  | TEI           | Redis                                        | w/, w/o       | w/, w/o        | Intel Gaudi        |
-| Docker Compose     | vLLM, TGI           | meta-llama/Meta-Llama-3-8B-Instruct  | TEI           | Redis, Mariadb, Milvus, Pinecone, Qdrant     | w/, w/o       | w/o            | Intel Xeon         |
-| Docker Compose     | Ollama              | llama3.2                              | TEI           | Redis                                        | w/            | w/o            | Intel AIPC         |
-| Docker Compose     | vLLM, TGI           | meta-llama/Meta-Llama-3-8B-Instruct  | TEI           | Redis                                        | w/            | w/o            | AMD ROCm           |
-| Helm Charts        | vLLM, TGI           | meta-llama/Meta-Llama-3-8B-Instruct  | TEI           | Redis                                        | w/, w/o       | w/, w/o        | Intel Gaudi        |
-| Helm Charts        | vLLM, TGI           | meta-llama/Meta-Llama-3-8B-Instruct  | TEI           | Redis, Milvus, Qdrant                        | w/, w/o       | w/o            | Intel Xeon         |
+| **Deploy Method** | **LLM Engine** | **LLM Model**                       | **Embedding** | **Vector Database**                      | **Reranking** | **Guardrails** | **Hardware** |
+| ----------------- | -------------- | ----------------------------------- | ------------- | ---------------------------------------- | ------------- | -------------- | ------------ |
+| Docker Compose    | vLLM, TGI      | meta-llama/Meta-Llama-3-8B-Instruct | TEI           | Redis                                    | w/, w/o       | w/, w/o        | Intel Gaudi  |
+| Docker Compose    | vLLM, TGI      | meta-llama/Meta-Llama-3-8B-Instruct | TEI           | Redis, Mariadb, Milvus, Pinecone, Qdrant | w/, w/o       | w/o            | Intel Xeon   |
+| Docker Compose    | Ollama         | llama3.2                            | TEI           | Redis                                    | w/            | w/o            | Intel AIPC   |
+| Docker Compose    | vLLM, TGI      | meta-llama/Meta-Llama-3-8B-Instruct | TEI           | Redis                                    | w/            | w/o            | AMD ROCm     |
+| Helm Charts       | vLLM, TGI      | meta-llama/Meta-Llama-3-8B-Instruct | TEI           | Redis                                    | w/, w/o       | w/, w/o        | Intel Gaudi  |
+| Helm Charts       | vLLM, TGI      | meta-llama/Meta-Llama-3-8B-Instruct | TEI           | Redis, Milvus, Qdrant                    | w/, w/o       | w/o            | Intel Xeon   |
