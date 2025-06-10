@@ -3,7 +3,7 @@
 ## Set the required environment variable
 
 ```bash
-export HF_TOKEN="Your_Huggingface_API_Token"
+export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
 ```
 
 ## Run test
