@@ -130,5 +130,59 @@ EXAMPLE_CONFIGS = {
         "interactive_params": [
             {"name": "llm_model", "prompt": "LLM Model ID (for Code Translation)", "type": str, "default": "codellama/CodeLlama-7b-instruct-hf", "help": "e.g., codellama/CodeLlama-7b-instruct-hf"},
         ]
+    },
+    "DocSum": {
+        "base_dir": "DocSum",
+        "docker_compose": {
+            "paths": {
+                "xeon": "docker_compose/intel/cpu/xeon/compose.yaml",
+                "gaudi": "docker_compose/intel/hpu/gaudi/compose.yaml"
+            },
+            "set_env_scripts": {
+                "xeon": "docker_compose/intel/set_env.sh",
+                "gaudi": "docker_compose/intel/set_env.sh"
+            },
+            "params_to_set_env": {
+                "llm_model": "LLM_MODEL_ID",
+                "hf_token": "HUGGINGFACEHUB_API_TOKEN"
+            }
+        },
+        "kubernetes": {
+            "helm": {
+                "chart_oci": "oci://ghcr.io/opea-project/charts/codetrans",
+                "values_files": {
+                    "cpu": "kubernetes/helm/cpu-values.yaml",
+                    "gaudi": "kubernetes/helm/gaudi-values.yaml"
+                },
+                "params_to_values": {
+                    "hf_token": "global.HUGGINGFACEHUB_API_TOKEN",
+                    "llm_model": "llm.model_name"
+                }
+            },
+            "namespace": "docsum",
+            "release_name": "docsum"
+        },
+        "supported_devices": ["xeon", "gaudi"],
+        "default_device": "xeon",
+        "ports": {
+            "docker": {"backend": "8888", "llm": "8008"},
+            "k8s_services": {"backend": "codetrans-svc", "llm": "codetrans-llm-svc"}
+        },
+        "test_connections": {
+            "main_service": {
+                "service_key": "backend", "path": "/v1/docsum", "method": "POST",
+                "payload": {"type": "audio", "messages": "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA"},
+                "headers": {"Content-Type": "application/json"}, "expect_code": 200
+            },
+             "sub_services": [{
+                    "name": "llm_docsum_check", "service_key": "llm", "path": "/v1/completions", "method": "POST",
+                    "payload_dynamic_llm_model": True, "default_llm_model_id_for_test": "meta-llama/Meta-Llama-3-8B-Instruct",
+                    "payload_template": {"prompt": "Translate to Python: function add(a, b) { return a + b; }", "max_tokens": 50},
+                    "headers": {"Content-Type": "application/json"}, "expect_code": 200
+            }]
+        },
+        "interactive_params": [
+            {"name": "llm_model", "prompt": "LLM Model ID (for DocSum)", "type": str, "default": "meta-llama/Meta-Llama-3-8B-Instruct", "help": "e.g., meta-llama/Meta-Llama-3-8B-Instruct"},
+        ]
     }
 }
