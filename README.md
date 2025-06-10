@@ -83,6 +83,7 @@ Deployment is based on released docker images by default - check [docker image l
 Check [here](./supported_examples.md) for detailed information of supported examples, models, hardwares, etc.
 
 ## Validated Configurations
+
 Check [here](./validated_configurations.md) for the validated configurations of GenAIExamples, including hardware and software versions that have been tested for each release.
 
 ## Contributing to OPEA
