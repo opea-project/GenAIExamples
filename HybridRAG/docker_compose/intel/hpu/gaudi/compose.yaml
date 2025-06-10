@@ -63,7 +63,7 @@ services:
       retries: 20
       start_period: 3s
   struct2graph:
-    image: opea/struct2graph:latest
+    image: ${REGISTRY:-opea}/struct2graph:${TAG:-latest}
     container_name: struct2graph
     environment:
       - no_proxy=${no_proxy}
