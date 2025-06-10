@@ -276,19 +276,19 @@ For details on how to verify the correctness of the response, refer to [how-to-v
 
 You may also test your underlying LLM endpoint. E.g., if OpenRouter.ai:
 
-  ```bash
-  curl https://openrouter.ai/api/v1/chat/completions \
-    -H "Content-Type: application/json" \
-    -H "Authorization: Bearer $OPENAI_API_KEY" \
-    -d '{
-    "model": ${LLM_MODEL_ID},
-    "messages": [
-      {
-        "role": "user",
-        "content": "What is the meaning of life?"
-      }
-    ]
-  }'
+```bash
+curl https://openrouter.ai/api/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $OPENAI_API_KEY" \
+  -d '{
+  "model": ${LLM_MODEL_ID},
+  "messages": [
+    {
+      "role": "user",
+      "content": "What is the meaning of life?"
+    }
+  ]
+}'
 ```
 
 To test the OPEA service that is based on the above:
