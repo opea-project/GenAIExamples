@@ -68,8 +68,10 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", None)
 
 
 def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **kwargs):
-    logger.debug(f"Aligning inputs for service: {self.services[cur_node].name}, type: {self.services[cur_node].service_type}")
-    
+    logger.debug(
+        f"Aligning inputs for service: {self.services[cur_node].name}, type: {self.services[cur_node].service_type}"
+    )
+
     if self.services[cur_node].service_type == ServiceType.EMBEDDING:
         inputs["inputs"] = inputs["text"]
         del inputs["text"]
@@ -91,7 +93,7 @@ def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **k
         # next_inputs["repetition_penalty"] = inputs["repetition_penalty"]
         next_inputs["temperature"] = inputs["temperature"]
         inputs = next_inputs
-        
+
     # Log the aligned inputs (be careful with sensitive data)
     logger.debug(f"Aligned inputs for {self.services[cur_node].name}: {type(inputs)}")
     return inputs
@@ -134,7 +136,9 @@ def align_outputs(self, data, cur_node, inputs, runtime_graph, llm_parameters_di
                 elif input_variables == ["question"]:
                     prompt = prompt_template.format(question=data["initial_query"])
                 else:
-                    logger.warning(f"{prompt_template} not used, we only support 2 input variables ['question', 'context']")
+                    logger.warning(
+                        f"{prompt_template} not used, we only support 2 input variables ['question', 'context']"
+                    )
                     prompt = ChatTemplate.generate_rag_prompt(data["initial_query"], docs)
             else:
                 prompt = ChatTemplate.generate_rag_prompt(data["initial_query"], docs)
@@ -183,7 +187,7 @@ def align_outputs(self, data, cur_node, inputs, runtime_graph, llm_parameters_di
 
 def align_generator(self, gen, **kwargs):
     """Aligns the generator output to match ChatQnA's format of sending bytes.
-    
+
     Handles different LLM output formats (TGI, OpenAI) and properly filters
     empty or null content chunks to avoid UI display issues.
     """
@@ -191,47 +195,47 @@ def align_generator(self, gen, **kwargs):
     # b'data:{"id":"","object":"text_completion","created":1725530204,"model":"meta-llama/Meta-Llama-3-8B-Instruct",
     # "system_fingerprint":"2.0.1-native","choices":[{"index":0,"delta":{"role":"assistant","content":"?"},
     # "logprobs":null,"finish_reason":null}]}\n\n'
-    
+
     for line in gen:
         try:
             line = line.decode("utf-8")
             start = line.find("{")
             end = line.rfind("}") + 1
-            
+
             # Skip lines with invalid JSON structure
             if start == -1 or end <= start:
                 logger.debug("Skipping line with invalid JSON structure")
                 continue
-                
+
             json_str = line[start:end]
-            
+
             # Parse the JSON data
             json_data = json.loads(json_str)
-            
+
             # Handle TGI format responses
             if "ops" in json_data and "op" in json_data["ops"][0]:
                 if "value" in json_data["ops"][0] and isinstance(json_data["ops"][0]["value"], str):
                     yield f"data: {repr(json_data['ops'][0]['value'].encode('utf-8'))}\n\n"
                 # Empty value chunks are silently skipped
-            
+
             # Handle OpenAI format responses
             elif "choices" in json_data and len(json_data["choices"]) > 0:
                 # Only yield content if it exists and is not null
                 if (
-                    "delta" in json_data["choices"][0] and
-                    "content" in json_data["choices"][0]["delta"] and
-                    json_data["choices"][0]["delta"]["content"] is not None
+                    "delta" in json_data["choices"][0]
+                    and "content" in json_data["choices"][0]["delta"]
+                    and json_data["choices"][0]["delta"]["content"] is not None
                 ):
                     content = json_data["choices"][0]["delta"]["content"]
                     yield f"data: {repr(content.encode('utf-8'))}\n\n"
                 # Null content chunks are silently skipped
                 elif (
-                    "delta" in json_data["choices"][0] and
-                    "content" in json_data["choices"][0]["delta"] and
-                    json_data["choices"][0]["delta"]["content"] is None
+                    "delta" in json_data["choices"][0]
+                    and "content" in json_data["choices"][0]["delta"]
+                    and json_data["choices"][0]["delta"]["content"] is None
                 ):
                     logger.debug("Skipping null content chunk")
-            
+
         except json.JSONDecodeError as e:
             # Log the error with the problematic JSON string for better debugging
             logger.error(f"JSON parsing error in align_generator: {e}\nProblematic JSON: {json_str[:200]}")

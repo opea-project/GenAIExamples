@@ -42,7 +42,7 @@ export EMBEDDING_MODEL_ID="${EMBEDDING_MODEL_ID:-BAAI/bge-base-en-v1.5}"
 export TEI_EMBEDDING_ENDPOINT="http://${HOST_IP}:${TEI_EMBEDDER_PORT}"
 
 # Hugging Face API token
-export HUGGINGFACEHUB_API_TOKEN="${HF_TOKEN}"
+export HF_TOKEN="${HF_TOKEN}"
 
 # Recursion limits
 export RECURSION_LIMIT_WORKER="${RECURSION_LIMIT_WORKER:-12}"

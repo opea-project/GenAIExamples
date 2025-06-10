@@ -10,7 +10,7 @@ vllm_port=${vllm_port}
 [[ -z "$vllm_port" ]] && vllm_port=8084
 model=mistralai/Mistral-7B-Instruct-v0.3
 export WORKDIR=$WORKPATH/../../
-export HF_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+export HF_TOKEN=${HF_TOKEN}
 
 function build_vllm_docker_image() {
     echo "Building the vllm docker images"
@@ -19,7 +19,7 @@ function build_vllm_docker_image() {
     if [ ! -d "./vllm" ]; then
         git clone https://github.com/vllm-project/vllm.git
         cd vllm
-        VLLM_VER="v0.8.3"
+        VLLM_VER=v0.9.0.1
         echo "Check out vLLM tag ${VLLM_VER}"
         git checkout ${VLLM_VER} &> /dev/null
         git rev-parse HEAD

@@ -47,10 +47,9 @@ cd GenAIExamples/ChatQnA/docker_compose/intel/cpu/xeon/
 
 Some HuggingFace resources, such as some models, are only accessible if the developer have an access token. In the absence of a HuggingFace access token, the developer can create one by first creating an account by following the steps provided at [HuggingFace](https://huggingface.co/) and then generating a [user access token](https://huggingface.co/docs/transformers.js/en/guides/private#step-1-generating-a-user-access-token).
 
-
 ## Endpoint Access
 
-An OpenAI-compatible endpoint is required e.g., OpenRouter.ai.  Please obtain a valid API key.
+An OpenAI-compatible endpoint is required e.g., OpenRouter.ai. Please obtain a valid API key.
 
 ### Configure the Deployment Environment
 
@@ -79,7 +78,7 @@ To deploy the ChatQnA services, execute the `docker compose up` command with the
 NGINX_PORT=8080 docker compose -f compose_endpoint_openai.yaml up -d
 ```
 
-Usage of NGINX_PORT=8080 allows you to access the chat console on localhost:8080 since webbrowser may use port 80. 
+Usage of NGINX_PORT=8080 allows you to access the chat console on localhost:8080 since webbrowser may use port 80.
 
 To enable Open Telemetry Tracing, compose.telemetry.yaml file need to be merged along with default compose.yaml file.  
 CPU example with Open Telemetry feature:
@@ -160,20 +159,20 @@ docker compose -f compose.yaml down
 
 In the context of deploying a ChatQnA pipeline on an Intel® Xeon® platform, we can pick and choose different vector databases, large language model serving frameworks, and remove pieces of the pipeline such as the reranker. The table below outlines the various configurations that are available as part of the application. These configurations can be used as templates and can be extended to different components available in [GenAIComps](https://github.com/opea-project/GenAIComps.git).
 
-| File                                                         | Description                                                                                                                                                           |
-| ------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [compose.yaml](./compose.yaml)                               | Default compose file using vllm as serving framework and redis as vector database                                                                                     |
-| [compose_endpoint_openai.yaml](./compose_endpoint_openai.yaml) | Uses OpenAI-compatible endpoint (remote or local) as LLM serving framework with redis as vector database.                                                                   |
-| [compose_milvus.yaml](./compose_milvus.yaml)                 | Uses Milvus as the vector database. All other configurations remain the same as the default                                                                           |
-| [compose_pinecone.yaml](./compose_pinecone.yaml)             | Uses Pinecone as the vector database. All other configurations remain the same as the default. For more details, refer to [README_pinecone.md](./README_pinecone.md). |
-| [compose_qdrant.yaml](./compose_qdrant.yaml)                 | Uses Qdrant as the vector database. All other configurations remain the same as the default. For more details, refer to [README_qdrant.md](./README_qdrant.md).       |
-| [compose_tgi.yaml](./compose_tgi.yaml)                       | Uses TGI as the LLM serving framework. All other configurations remain the same as the default                                                                        |
-| [compose_without_rerank.yaml](./compose_without_rerank.yaml) | Default configuration without the reranker                                                                                                                            |
-| [compose_faqgen.yaml](./compose_faqgen.yaml)                 | Enables FAQ generation using vLLM as the LLM serving framework. For more details, refer to [README_faqgen.md](./README_faqgen.md).                                    |
-| [compose_faqgen_tgi.yaml](./compose_faqgen_tgi.yaml)         | Enables FAQ generation using TGI as the LLM serving framework. For more details, refer to [README_faqgen.md](./README_faqgen.md).                                     |
-| [compose.telemetry.yaml](./compose.telemetry.yaml)           | Helper file for telemetry features for vllm. Can be used along with any compose files that serves vllm                                                                |
-| [compose_tgi.telemetry.yaml](./compose_tgi.telemetry.yaml)   | Helper file for telemetry features for tgi. Can be used along with any compose files that serves tgi                                                                  |
-| [compose_mariadb.yaml](./compose_mariadb.yaml)               | Uses MariaDB Server as the vector database. All other configurations remain the same as the default                                                                   |
+| File                                                           | Description                                                                                                                                                           |
+| -------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [compose.yaml](./compose.yaml)                                 | Default compose file using vllm as serving framework and redis as vector database                                                                                     |
+| [compose_endpoint_openai.yaml](./compose_endpoint_openai.yaml) | Uses OpenAI-compatible endpoint (remote or local) as LLM serving framework with redis as vector database.                                                             |
+| [compose_milvus.yaml](./compose_milvus.yaml)                   | Uses Milvus as the vector database. All other configurations remain the same as the default                                                                           |
+| [compose_pinecone.yaml](./compose_pinecone.yaml)               | Uses Pinecone as the vector database. All other configurations remain the same as the default. For more details, refer to [README_pinecone.md](./README_pinecone.md). |
+| [compose_qdrant.yaml](./compose_qdrant.yaml)                   | Uses Qdrant as the vector database. All other configurations remain the same as the default. For more details, refer to [README_qdrant.md](./README_qdrant.md).       |
+| [compose_tgi.yaml](./compose_tgi.yaml)                         | Uses TGI as the LLM serving framework. All other configurations remain the same as the default                                                                        |
+| [compose_without_rerank.yaml](./compose_without_rerank.yaml)   | Default configuration without the reranker                                                                                                                            |
+| [compose_faqgen.yaml](./compose_faqgen.yaml)                   | Enables FAQ generation using vLLM as the LLM serving framework. For more details, refer to [README_faqgen.md](./README_faqgen.md).                                    |
+| [compose_faqgen_tgi.yaml](./compose_faqgen_tgi.yaml)           | Enables FAQ generation using TGI as the LLM serving framework. For more details, refer to [README_faqgen.md](./README_faqgen.md).                                     |
+| [compose.telemetry.yaml](./compose.telemetry.yaml)             | Helper file for telemetry features for vllm. Can be used along with any compose files that serves vllm                                                                |
+| [compose_tgi.telemetry.yaml](./compose_tgi.telemetry.yaml)     | Helper file for telemetry features for tgi. Can be used along with any compose files that serves tgi                                                                  |
+| [compose_mariadb.yaml](./compose_mariadb.yaml)                 | Uses MariaDB Server as the vector database. All other configurations remain the same as the default                                                                   |
 
 ## ChatQnA with Conversational UI (Optional)
 
@@ -275,7 +274,7 @@ For details on how to verify the correctness of the response, refer to [how-to-v
 
    Then try the `cURL` command below to validate services.
 
-  You may also test your underlying LLM endpoint. E.g., if OpenRouter.ai:
+You may also test your underlying LLM endpoint. E.g., if OpenRouter.ai:
 
   ```bash
   curl https://openrouter.ai/api/v1/chat/completions \
@@ -292,15 +291,14 @@ For details on how to verify the correctness of the response, refer to [how-to-v
   }'
 ```
 
-  To test the OPEA service that is based on the above:
+To test the OPEA service that is based on the above:
 
-  ```bash
-    curl http://${host_ip}:9000/v1/chat/completions \
-      -X POST \
-      -d '{"model": "{$LLM_MODEL_ID}", "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens":17}' \
-      -H 'Content-Type: application/json'
-  ```
-
+```bash
+  curl http://${host_ip}:9000/v1/chat/completions \
+    -X POST \
+    -d '{"model": "{$LLM_MODEL_ID}", "messages": [{"role": "user", "content": "What is Deep Learning?"}], "max_tokens":17}' \
+    -H 'Content-Type: application/json'
+```
 
 5. **MegaService**
 
@@ -405,7 +403,7 @@ For details on how to verify the correctness of the response, refer to [how-to-v
 
 To further analyze MicroService Performance, users could follow the instructions to profile MicroServices.
 
-#### 1. LLM Endpoint Service 
+#### 1. LLM Endpoint Service
 
 Users can profile the performance of the endpoint service using standard HTTP/network profiling tools such as:
 
@@ -428,7 +426,7 @@ Total Time: %{time_total}s\n" \
   "model": "${LLM_MODEL_ID}",
   "messages": [
     {
-      "role": "user", 
+      "role": "user",
       "content": "What is machine learning?"
     }
   ]
@@ -445,6 +443,7 @@ ab -n 100 -c 10 -p payload.json -T 'application/json' \
 ```
 
 For detailed API latency monitoring, consider using:
+
 - Grafana for visualization
 - Prometheus for metrics collection
 - OpenTelemetry for distributed tracing
