@@ -45,8 +45,8 @@ function build_docker_images() {
     popd && sleep 1s
 
     git clone https://github.com/vllm-project/vllm.git && cd vllm
-    VLLM_VER="$(git describe --tags "$(git rev-list --tags --max-count=1)" )"
-    VLLM_VER="v0.8.3"
+    VLLM_VER=v0.9.0.1
+    VLLM_VER=v0.9.0.1
     echo "Check out vLLM tag ${VLLM_VER}"
     git checkout ${VLLM_VER} &> /dev/null
     # make sure NOT change the pwd
@@ -99,7 +99,7 @@ function validate_service() {
 
     local HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL")
 
-    if [ "DOCKER_NAME" -eq "text2cypher-gaudi-container" ]; then
+    if [ "$DOCKER_NAME" == "text2cypher-gaudi-container" ]; then
         docker ps
         docker logs text2cypher-gaudi-container
     fi
@@ -114,7 +114,7 @@ function validate_service() {
         else
             echo "[ $SERVICE_NAME ] Content does not match the expected result: $CONTENT"
             docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
-            if [ "DOCKER_NAME" -eq "hybridrag-xeon-backend-server" ]; then
+            if [ "$DOCKER_NAME" == "hybridrag-xeon-backend-server" ]; then
                 docker ps
                 docker logs text2cypher-gaudi-container
             fi
@@ -123,7 +123,7 @@ function validate_service() {
     else
         echo "[ $SERVICE_NAME ] HTTP status is not 200. Received status was $HTTP_STATUS"
         docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
-        if [ "DOCKER_NAME" -eq "hybridrag-xeon-backend-server" ]; then
+        if [ "$DOCKER_NAME" == "hybridrag-xeon-backend-server" ]; then
             docker ps
             docker logs text2cypher-gaudi-container
         fi
