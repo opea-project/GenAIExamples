@@ -41,7 +41,7 @@ services:
       - redis-vector-db
       - lvm
     ports:
-      - "${DATAPREP_MMR_PORT}:5000"
+      - "${DATAPREP_MMR_PORT:-6007}:5000"
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
@@ -51,7 +51,7 @@ services:
       DATAPREP_MMR_PORT: ${DATAPREP_MMR_PORT}
       INDEX_NAME: ${INDEX_NAME}
       LVM_ENDPOINT: "http://${LVM_SERVICE_HOST_IP}:${LVM_PORT}/v1/lvm"
-      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HUGGINGFACEHUB_API_TOKEN: ${HF_TOKEN}
       MULTIMODAL_DATAPREP: true
       DATAPREP_COMPONENT_NAME: "OPEA_DATAPREP_MULTIMODALREDIS"
     healthcheck:

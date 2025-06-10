@@ -2,6 +2,22 @@
 # SPDX-License-Identifier: Apache-2.0
 
 name: Nightly build/publish latest docker images
+permissions:
+  actions: read
+  contents: read
+  checks: read
+  deployments: read
+  discussions: read
+  issues: read
+  packages: read
+  pages: read
+  pull-requests: read
+  repository-projects: read
+  statuses: read
+  security-events: read
+  id-token: write
+  attestations: read
+  models: read
 
 on:
   schedule:
@@ -33,12 +49,32 @@ jobs:
           echo "PUBLISH_TAGS=$PUBLISH_TAGS" >> $GITHUB_OUTPUT
 
   build-comps-base:
+    permissions:
+      attestations: read
+      models: read
+      security-events: read
     needs: [get-build-matrix]
     uses: ./.github/workflows/_build_comps_base_image.yml
     with:
       node: gaudi
 
   build-images:
+    permissions:
+      actions: read
+      contents: read
+      checks: read
+      deployments: read
+      discussions: read
+      issues: read
+      packages: read
+      pages: read
+      pull-requests: read
+      repository-projects: read
+      statuses: read
+      security-events: read
+      id-token: write
+      attestations: read
+      models: read
     needs: [get-build-matrix, build-comps-base]
     strategy:
       matrix:
@@ -53,6 +89,22 @@ jobs:
 
   test-example:
     needs: [get-build-matrix]
+    permissions:
+      actions: read
+      attestations: read
+      discussions: read
+      models: read
+      repository-projects: read
+      id-token: write
+      contents: read
+      checks: write
+      deployments: write
+      issues: write
+      packages: write
+      pages: write
+      pull-requests: write
+      statuses: write
+      security-events: read
     if: ${{ needs.get-build-matrix.outputs.examples_json != '' }}
     strategy:
       matrix:
@@ -69,6 +121,8 @@ jobs:
 
   get-image-list:
     needs: [get-build-matrix]
+    permissions:
+      contents: read
     uses: ./.github/workflows/_get-image-list.yml
     with:
       examples: ${{ needs.get-build-matrix.outputs.EXAMPLES }}
