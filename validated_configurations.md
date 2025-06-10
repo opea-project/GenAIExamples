@@ -6,8 +6,8 @@ Example specific test matrix can be found in examples' README.md files, for exam
 ## v1.3 Release Test Config Overview
 
 | **HW/SW Stake**        | **Description**                                                                                              |
-| ---------------------- | ------------------------------------------------------------------------------------------------------------ |
-| **Validated Hardware** | Intel Gaudi Al Accelerators (2nd, 3rd)                                                                       |
+| ---------------------- |--------------------------------------------------------------------------------------------------------------|
+| **Validated Hardware** | Intel Gaudi AI Accelerators (2nd, 3rd)                                                                       |
 |                        | Intel Xeon Scalable processor (4th, 6th)                                                                     |
 |                        | Intel Arc Graphics GPU (A770)                                                                                |
 |                        | AMD Instinct MI300X Accelerators (CDNA3)                                                                     |
