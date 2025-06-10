@@ -88,7 +88,7 @@ services:
       HF_HUB_ENABLE_HF_TRANSFER: 0
     command: --model-id ${RERANK_MODEL_ID} --auto-truncate
   # Substitute vllm with OpeaTextGenService
-  textgen-service-endpoint-openai:  # Used in stead of vllm
+  textgen-service-endpoint-openai:  # Used instead of vllm
     image: opea/llm-textgen:${TAG:-latest} # Changed image
     container_name: textgen-service-endpoint-openai  # Updated container name
     ipc: host
