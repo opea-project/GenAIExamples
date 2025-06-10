@@ -1,7 +1,7 @@
 # Validated Configurations
 
 This document provides an overview of the validated configurations for the GenAIExamples release test, including hardware and software versions that have been tested and confirmed to work together.
-Example specific test matrix can be found in examples' README.md files, for example xxx.
+Example specific test matrix can be found in examples' README.md files, for example [ChatQnA Config](./ChatQnA/README.md#validated-configurations).
 
 ## v1.3 Release Test Config Overview
 
