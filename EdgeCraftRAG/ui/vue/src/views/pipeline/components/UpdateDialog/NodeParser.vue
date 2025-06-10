@@ -8,11 +8,14 @@
     autocomplete="off"
     class="form-wrap"
   >
-    <a-form-item label="Node Parser Type" name="parser_type">
+    <a-form-item
+      :label="$t('pipeline.config.nodeParserType')"
+      name="parser_type"
+    >
       <a-select
         v-model:value="form.parser_type"
         showSearch
-        placeholder="please select Node Parser Type"
+        :placeholder="$t('pipeline.valid.nodeParserType')"
       >
         <a-select-option
           v-for="item in nodeParserList"
@@ -21,14 +24,18 @@
           >{{ item.name }}</a-select-option
         >
       </a-select>
-      <FormTooltip title="Node parsing type when you use RAG" />
+      <FormTooltip :title="$t('pipeline.desc.nodeParserType')" />
     </a-form-item>
     <div class="option-introduction">
       <InfoCircleOutlined />
-      {{ optionIntroduction }}
+      {{ $t(optionIntroduction!) }}
     </div>
     <template v-if="!isHierarchical && !isSentencewindow">
-      <a-form-item label="Chunk Size" name="chunk_size" class="slider-wrap">
+      <a-form-item
+        :label="$t('pipeline.config.chunkSize')"
+        name="chunk_size"
+        class="slider-wrap"
+      >
         <a-slider
           v-model:value="form.chunk_size"
           :min="100"
@@ -42,10 +49,10 @@
             :max="2000"
           />
         </a-form-item>
-        <FormTooltip title="Size of each chunk for processing" />
+        <FormTooltip :title="$t('pipeline.desc.chunkSize')" />
       </a-form-item>
       <a-form-item
-        label="Chunk Overlap"
+        :label="$t('pipeline.config.chunkOverlap')"
         name="chunk_overlap"
         class="slider-wrap"
       >
@@ -62,10 +69,14 @@
             :max="400"
           />
         </a-form-item>
-        <FormTooltip title="Overlap size between chunks" /> </a-form-item
+        <FormTooltip :title="$t('pipeline.desc.chunkOverlap')" /> </a-form-item
     ></template>
     <template v-if="isSentencewindow">
-      <a-form-item label="Window Size" name="window_size" class="slider-wrap">
+      <a-form-item
+        :label="$t('pipeline.config.windowSize')"
+        name="window_size"
+        class="slider-wrap"
+      >
         <a-slider
           v-model:value="form.window_size"
           :min="1"
@@ -75,9 +86,7 @@
         <a-form-item noStyle>
           <a-input-number v-model:value="form.window_size" :min="1" :max="10" />
         </a-form-item>
-        <FormTooltip
-          title="The number of sentences on each side of a sentence to capture"
-        />
+        <FormTooltip :title="$t('pipeline.desc.windowSize')" />
       </a-form-item>
     </template>
   </a-form>
@@ -88,7 +97,9 @@ import type { FormInstance } from "ant-design-vue";
 import { computed, reactive, ref } from "vue";
 import { NodeParser } from "../../enum.ts";
 import { InfoCircleOutlined } from "@ant-design/icons-vue";
+import { useI18n } from "vue-i18n";
 
+const { t } = useI18n();
 const props = defineProps({
   formData: {
     type: Object,
@@ -106,22 +117,18 @@ interface FormType {
 const validate = {
   chunkSize: async (_rule: any, value: number) => {
     if (!value) {
-      return Promise.reject("Please select Chunk Size");
+      return Promise.reject(t("pipeline.valid.chunkSizeValid1"));
     } else if (form?.chunk_overlap && value < form?.chunk_overlap) {
-      return Promise.reject(
-        "The value of Chunk Size cannot be less than Chunk Overlap"
-      );
+      return Promise.reject(t("pipeline.valid.chunkSizeValid2"));
     } else {
       return Promise.resolve();
     }
   },
   chunkOverlap: async (_rule: any, value: number) => {
     if (!value) {
-      return Promise.reject("Please select Chunk Overlap");
+      return Promise.reject(t("pipeline.valid.chunkOverlapValid1"));
     } else if (form?.chunk_size && value > form?.chunk_size) {
-      return Promise.reject(
-        "The value of Chunk Overlap cannot be greater than Chunk Size"
-      );
+      return Promise.reject(t("pipeline.valid.chunkOverlapValid2"));
     } else {
       return Promise.resolve();
     }
@@ -148,7 +155,7 @@ const rules = reactive({
   parser_type: [
     {
       required: true,
-      message: "please select Node Parser Type",
+      message: t("pipeline.valid.retrieverType"),
       trigger: "blur",
     },
   ],
@@ -169,7 +176,7 @@ const rules = reactive({
   window_size: [
     {
       required: true,
-      message: "Please select Chunk Window Size",
+      message: t("pipeline.valid.windowSize"),
       trigger: ["change", "blur"],
     },
   ],
