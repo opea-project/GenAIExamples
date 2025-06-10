@@ -43,12 +43,6 @@ git clone https://github.com/opea-project/GenAIExamples.git
 cd GenAIExamples/ChatQnA/docker_compose/intel/cpu/xeon/
 ```
 
-Checkout a released version, such as v1.2:
-
-```
-git checkout v1.2
-```
-
 ### Generate a HuggingFace Access Token
 
 Some HuggingFace resources, such as some models, are only accessible if the developer have an access token. In the absence of a HuggingFace access token, the developer can create one by first creating an account by following the steps provided at [HuggingFace](https://huggingface.co/) and then generating a [user access token](https://huggingface.co/docs/transformers.js/en/guides/private#step-1-generating-a-user-access-token).
@@ -288,7 +282,7 @@ For details on how to verify the correctness of the response, refer to [how-to-v
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer $OPENAI_API_KEY" \
     -d '{
-    "model": ${LLM_MODEL_ID}$,
+    "model": ${LLM_MODEL_ID},
     "messages": [
       {
         "role": "user",
@@ -296,7 +290,7 @@ For details on how to verify the correctness of the response, refer to [how-to-v
       }
     ]
   }'
-  ```
+```
 
   To test the OPEA service that is based on the above:
 
