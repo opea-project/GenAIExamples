@@ -138,6 +138,14 @@ function validate_megaservice() {
         "codegen-xeon-backend-server" \
         '{"messages": "def print_hello_world():", "max_tokens": 256}'
 
+    # Curl the Mega Service with stream as false
+    validate_services \
+        "${ip_address}:7778/v1/codegen" \
+        "" \
+        "mega-codegen" \
+        "codegen-xeon-backend-server" \
+        '{ "messages": "def print_hello_world():", "max_tokens": 256, "stream": false}'
+
     # Curl the Mega Service with index_name and agents_flag
     validate_services \
         "${ip_address}:7778/v1/codegen" \
