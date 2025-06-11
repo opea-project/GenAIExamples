@@ -1,19 +1,20 @@
-import click
-import sys
+# Copyright (C) 2025 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 import logging
+import sys
 from types import SimpleNamespace
 
-from core.deployer import Deployer
+import click
 from core.config import EXAMPLE_CONFIGS
-from core.utils import setup_logging, log_message, stop_all_kubectl_port_forwards
+from core.deployer import Deployer
+from core.utils import log_message, setup_logging, stop_all_kubectl_port_forwards
 
 
 @click.command()
 @click.option("--verbose", "-v", is_flag=True, help="Enable verbose (DEBUG) logging.")
 def cli(verbose):
-    """
-    An interactive one-click deployment script for GenAIExamples.
-    """
+    """An interactive one-click deployment script for GenAIExamples."""
     setup_logging()
     if verbose:
         logging.getLogger().setLevel(logging.DEBUG)
@@ -31,10 +32,7 @@ def cli(verbose):
         example_prompt_text = "\n".join(example_prompt_lines)
 
         example_choice_num = click.prompt(
-            example_prompt_text,
-            type=click.IntRange(1, len(example_names)),
-            default=1,
-            show_default=True
+            example_prompt_text, type=click.IntRange(1, len(example_names)), default=1, show_default=True
         )
 
         example_name = example_names[example_choice_num - 1]
@@ -50,10 +48,7 @@ def cli(verbose):
         action_prompt_text = "\n".join(action_prompt_lines)
 
         action_choice_num = click.prompt(
-            action_prompt_text,
-            type=click.IntRange(1, len(actions)),
-            default=1,
-            show_default=True
+            action_prompt_text, type=click.IntRange(1, len(actions)), default=1, show_default=True
         )
 
         action = actions[action_choice_num - 1]
@@ -82,5 +77,5 @@ def cli(verbose):
         log_message("INFO", "Script finished.")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     cli()

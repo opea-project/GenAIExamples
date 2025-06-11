@@ -1,17 +1,26 @@
-import click
+# Copyright (C) 2025 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 import os
 import time
 
-from .utils import log_message, section_header, run_command, \
-    update_or_create_set_env, update_helm_values_yaml, get_huggingface_token_from_file, get_host_ip
-from .config import EXAMPLE_CONFIGS, EXAMPLES_ROOT_DIR, COMMON_SCRIPTS_DIR
+import click
+
+from .config import COMMON_SCRIPTS_DIR, EXAMPLE_CONFIGS, EXAMPLES_ROOT_DIR
 from .tester import ConnectionTester
+from .utils import (
+    get_host_ip,
+    get_huggingface_token_from_file,
+    log_message,
+    run_command,
+    section_header,
+    update_helm_values_yaml,
+    update_or_create_set_env,
+)
 
 
 class Deployer:
-    """
-    Manages the interactive deployment and clearing of a GenAIExample.
-    """
+    """Manages the interactive deployment and clearing of a GenAIExample."""
 
     def __init__(self, args_namespace):
         self.args = args_namespace
@@ -23,11 +32,14 @@ class Deployer:
     def _get_path_from_config(self, config_keys, device_specific_key=None):
         current_level = self.config
         for key in config_keys:
-            if not isinstance(current_level, dict) or key not in current_level: return None
+            if not isinstance(current_level, dict) or key not in current_level:
+                return None
             current_level = current_level[key]
-        path_str = current_level.get(device_specific_key) if device_specific_key and isinstance(current_level,
-                                                                                                dict) else (
-            current_level if isinstance(current_level, str) else None)
+        path_str = (
+            current_level.get(device_specific_key)
+            if device_specific_key and isinstance(current_level, dict)
+            else (current_level if isinstance(current_level, str) else None)
+        )
         return self.example_root / path_str if path_str else None
 
     def _get_docker_compose_file(self):
@@ -47,9 +59,7 @@ class Deployer:
         return self._get_path_from_config(["kubernetes", "helm", "values_files"], self.args.device)
 
     def run_interactive_deployment(self):
-        """
-        Orchestrates the deployment flow with automatic cleanup on failure.
-        """
+        """Orchestrates the deployment flow with automatic cleanup on failure."""
         if not self._interactive_setup_for_deploy():
             log_message("INFO", "Deployment setup aborted by user.")
             return
@@ -84,33 +94,43 @@ class Deployer:
                 log_message("ERROR", "Deployment failed. Triggering automatic cleanup.")
                 try:
                     # We need self.args.deploy_mode and self.args.device to be set for cleanup
-                    if hasattr(self, 'args') and hasattr(self.args, 'deploy_mode') and self.args.deploy_mode:
+                    if hasattr(self, "args") and hasattr(self.args, "deploy_mode") and self.args.deploy_mode:
                         self.clear_deployment()
                         log_message("OK", "Automatic cleanup has finished.")
                     else:
                         log_message("WARN", "Cannot run automatic cleanup: deployment mode not set.")
                 except Exception as cleanup_e:
-                    log_message("ERROR",
-                                f"Automatic cleanup ALSO FAILED: {cleanup_e}. Please check your environment manually.")
+                    log_message(
+                        "ERROR", f"Automatic cleanup ALSO FAILED: {cleanup_e}. Please check your environment manually."
+                    )
             else:
                 log_message("OK", "Deployment process completed successfully.")
 
     def _interactive_setup_for_deploy(self):
         section_header(f"{self.example_name} Interactive Deployment Setup")
         self.args.deploy_mode = click.prompt("Deployment Mode", type=click.Choice(["docker", "k8s"]), default="docker")
-        self.args.device = click.prompt("Target Device", type=click.Choice(self.config.get("supported_devices")),
-                                        default=self.config.get("default_device"))
+        self.args.device = click.prompt(
+            "Target Device",
+            type=click.Choice(self.config.get("supported_devices")),
+            default=self.config.get("default_device"),
+        )
         cached_token = get_huggingface_token_from_file()
-        self.args.hf_token = click.prompt(f"Hugging Face Token{' (cached found)' if cached_token else ''}",
-                                          default=cached_token or "your-hf-token-here", show_default=False)
+        self.args.hf_token = click.prompt(
+            f"Hugging Face Token{' (cached found)' if cached_token else ''}",
+            default=cached_token or "your-hf-token-here",
+            show_default=False,
+        )
         self.args.http_proxy = click.prompt("HTTP Proxy", default=os.environ.get("http_proxy", ""), show_default=True)
-        self.args.https_proxy = click.prompt("HTTPS Proxy", default=os.environ.get("https_proxy", ""),
-                                             show_default=True)
+        self.args.https_proxy = click.prompt(
+            "HTTPS Proxy", default=os.environ.get("https_proxy", ""), show_default=True
+        )
         env_no_proxy, host_ip = os.environ.get("no_proxy", ""), get_host_ip()
         user_no_proxy = click.prompt("No Proxy hosts", default=env_no_proxy, show_default=True)
         no_proxy_set = {"localhost", "127.0.0.1", host_ip}
-        if env_no_proxy: no_proxy_set.update(p.strip() for p in env_no_proxy.split(',') if p.strip())
-        if user_no_proxy: no_proxy_set.update(p.strip() for p in user_no_proxy.split(',') if p.strip())
+        if env_no_proxy:
+            no_proxy_set.update(p.strip() for p in env_no_proxy.split(",") if p.strip())
+        if user_no_proxy:
+            no_proxy_set.update(p.strip() for p in user_no_proxy.split(",") if p.strip())
         self.args.no_proxy = ",".join(sorted(list(no_proxy_set)))
 
         for param in self.config.get("interactive_params", []):
@@ -124,11 +144,7 @@ class Deployer:
             if help_text:
                 prompt_text = f"{prompt_text} ({help_text})"
 
-            user_input = click.prompt(
-                prompt_text,
-                default=param.get("default"),
-                type=param.get("type", str)
-            )
+            user_input = click.prompt(prompt_text, default=param.get("default"), type=param.get("type", str))
             setattr(self.args, param["name"], user_input)
 
         self.args.do_check_env = click.confirm("Run environment check?", default=False, show_default=True)
@@ -137,27 +153,26 @@ class Deployer:
             self.args.build_images = click.confirm("  -> Build images?", default=False, show_default=True)
             self.args.push_images = click.confirm("  -> Push images?", default=False, show_default=True)
             if self.args.push_images:
-                self.args.registry = click.prompt("     Enter container registry URL (e.g., docker.io/myuser)",
-                                                  default="", show_default=False)
+                self.args.registry = click.prompt(
+                    "     Enter container registry URL (e.g., docker.io/myuser)", default="", show_default=False
+                )
             else:
                 self.args.registry = ""
 
-        self.args.do_test_connection = click.confirm("Run connection tests after deployment?", default=False,
-                                                     show_default=True)
-        if self.args.deploy_mode == 'k8s' and self.args.do_test_connection:
+        self.args.do_test_connection = click.confirm(
+            "Run connection tests after deployment?", default=False, show_default=True
+        )
+        if self.args.deploy_mode == "k8s" and self.args.do_test_connection:
             self.args.k8s_test_local_port = click.prompt("  -> Local port for K8s test access", type=int, default=8080)
 
         section_header("Configuration Summary")
         for k, v in vars(self.args).items():
-            if v is not None and v != '':
-                log_message("INFO",
-                            f"  {k.replace('_', ' ').title()}: {'**********' if k == 'hf_token' and v else v}")
+            if v is not None and v != "":
+                log_message("INFO", f"  {k.replace('_', ' ').title()}: {'**********' if k == 'hf_token' and v else v}")
         return click.confirm("Proceed with deployment?", default=True)
 
     def run_interactive_clear(self):
-        """
-        Orchestrates the interactive clearing of a deployment.
-        """
+        """Orchestrates the interactive clearing of a deployment."""
         if not self._interactive_setup_for_clear():
             log_message("INFO", "Clear operation aborted by user.")
             return
@@ -170,29 +185,31 @@ class Deployer:
 
     def _interactive_setup_for_clear(self):
         section_header(f"{self.example_name} Interactive Clear Setup")
-        self.args.deploy_mode = click.prompt("Which deployment mode to clear?", type=click.Choice(["docker", "k8s"]),
-                                             default="docker")
+        self.args.deploy_mode = click.prompt(
+            "Which deployment mode to clear?", type=click.Choice(["docker", "k8s"]), default="docker"
+        )
 
         # Device is only relevant for finding the docker-compose file
         if self.args.deploy_mode == "docker":
-            self.args.device = click.prompt("On which target device was it deployed?",
-                                            type=click.Choice(self.config.get("supported_devices")),
-                                            default=self.config.get("default_device"))
+            self.args.device = click.prompt(
+                "On which target device was it deployed?",
+                type=click.Choice(self.config.get("supported_devices")),
+                default=self.config.get("default_device"),
+            )
         else:
             # For K8s, device is not needed for clear, but set a default to prevent errors
             self.args.device = self.config.get("default_device")
 
-        if self.args.deploy_mode == 'k8s':
+        if self.args.deploy_mode == "k8s":
             self.args.delete_namespace_on_clear = click.confirm(
-                f"Also delete the '{self.config['kubernetes']['namespace']}' namespace entirely?", default=False)
+                f"Also delete the '{self.config['kubernetes']['namespace']}' namespace entirely?", default=False
+            )
 
         log_message("INFO", f"Will attempt to clear '{self.example_name}' deployed via {self.args.deploy_mode}.")
         return click.confirm("Proceed with clearing?", default=True)
 
     def run_interactive_test(self):
-        """
-        Orchestrates the interactive testing of an existing deployment.
-        """
+        """Orchestrates the interactive testing of an existing deployment."""
         if not self._interactive_setup_for_test():
             log_message("INFO", "Test operation aborted by user.")
             return
@@ -204,40 +221,33 @@ class Deployer:
             log_message("ERROR", f"An unexpected error occurred during testing: {e}")
 
     def _interactive_setup_for_test(self):
-        """
-        Gathers necessary information interactively to run connection tests.
-        """
+        """Gathers necessary information interactively to run connection tests."""
         section_header(f"{self.example_name} Interactive Connection Test Setup")
 
         self.args.deploy_mode = click.prompt(
-            "How is the service deployed?",
-            type=click.Choice(["docker", "k8s"]),
-            default="docker"
+            "How is the service deployed?", type=click.Choice(["docker", "k8s"]), default="docker"
         )
         self.args.device = click.prompt(
             "On which target device is it running?",
             type=click.Choice(self.config.get("supported_devices")),
-            default=self.config.get("default_device")
+            default=self.config.get("default_device"),
         )
 
         # Proxies are needed for the requests session in the tester
         self.args.http_proxy = click.prompt("HTTP Proxy", default=os.environ.get("http_proxy", ""), show_default=True)
-        self.args.https_proxy = click.prompt("HTTPS Proxy", default=os.environ.get("https_proxy", ""),
-                                             show_default=True)
+        self.args.https_proxy = click.prompt(
+            "HTTPS Proxy", default=os.environ.get("https_proxy", ""), show_default=True
+        )
 
         # For k8s, we need a local port to forward to, just like in the deploy setup
-        if self.args.deploy_mode == 'k8s':
-            self.args.k8s_test_local_port = click.prompt(
-                "  -> Local port for K8s test access",
-                type=int,
-                default=8080
-            )
+        if self.args.deploy_mode == "k8s":
+            self.args.k8s_test_local_port = click.prompt("  -> Local port for K8s test access", type=int, default=8080)
 
         section_header("Configuration Summary")
         log_message("INFO", f"  Test Target: {self.example_name}")
         log_message("INFO", f"  Deployment Mode: {self.args.deploy_mode}")
         log_message("INFO", f"  Device: {self.args.device}")
-        if self.args.deploy_mode == 'k8s':
+        if self.args.deploy_mode == "k8s":
             log_message("INFO", f"  K8s Local Port: {self.args.k8s_test_local_port}")
 
         return click.confirm("Proceed with connection tests?", default=True)
@@ -246,7 +256,7 @@ class Deployer:
         section_header("Checking Environment")
         script_path = COMMON_SCRIPTS_DIR / "check_env.sh"
         if not script_path.exists():
-            log_message("WARN", f"{script_path} not found. Skipping environment check.");
+            log_message("WARN", f"{script_path} not found. Skipping environment check.")
             return True
         try:
             run_command(["bash", str(script_path), "--device", self.args.device], check=True)
@@ -257,9 +267,7 @@ class Deployer:
             return False
 
     def update_images(self):
-        """
-        Builds and/or pushes Docker images by calling the update_images.sh script.
-        """
+        """Builds and/or pushes Docker images by calling the update_images.sh script."""
         section_header("Updating Container Images")
 
         script_path = COMMON_SCRIPTS_DIR / "update_images.sh"
@@ -278,8 +286,10 @@ class Deployer:
             if self.args.registry:
                 cmd.extend(["--registry", self.args.registry])
             else:
-                log_message("WARN",
-                            "Push images was selected, but no registry was provided. The push command might fail or use a default.")
+                log_message(
+                    "WARN",
+                    "Push images was selected, but no registry was provided. The push command might fail or use a default.",
+                )
 
         if not self.args.build_images and not self.args.push_images:
             log_message("INFO", "Image update selected, but neither 'build' nor 'push' was confirmed. Skipping.")
@@ -293,7 +303,6 @@ class Deployer:
             log_message("ERROR", f"The image update script failed. Please check the logs above for details. Error: {e}")
             return False
 
-
     def configure_services(self):
         section_header(f"Configuring Services for {self.example_name} ({self.args.deploy_mode})")
 
@@ -306,10 +315,14 @@ class Deployer:
                 for arg_name, env_var in self.config["docker_compose"]["params_to_set_env"].items()
                 if hasattr(self.args, arg_name) and getattr(self.args, arg_name) is not None
             }
-            updates.update({
-                "HTTP_PROXY": self.args.http_proxy, "HTTPS_PROXY": self.args.https_proxy,
-                "NO_PROXY": self.args.no_proxy, "HOST_IP": get_host_ip()
-            })
+            updates.update(
+                {
+                    "HTTP_PROXY": self.args.http_proxy,
+                    "HTTPS_PROXY": self.args.https_proxy,
+                    "NO_PROXY": self.args.no_proxy,
+                    "HOST_IP": get_host_ip(),
+                }
+            )
 
             if update_or_create_set_env(source_env_file, local_env_file, updates):
                 log_message("OK", f"Successfully generated local config '{local_env_file.name}'.")
@@ -320,13 +333,13 @@ class Deployer:
         elif self.args.deploy_mode == "k8s":
             values_file = self._get_helm_values_file()
             if not values_file or not values_file.exists():
-                log_message("ERROR", f"Helm values file not found: {values_file}. Cannot configure.");
+                log_message("ERROR", f"Helm values file not found: {values_file}. Cannot configure.")
                 return False
 
             updates = {
                 path: getattr(self.args, name)
-                for name, path in self.config["kubernetes"]["helm"]["params_to_values"].items() if
-                hasattr(self.args, name) and getattr(self.args, name) is not None
+                for name, path in self.config["kubernetes"]["helm"]["params_to_values"].items()
+                if hasattr(self.args, name) and getattr(self.args, name) is not None
             }
             if self.example_name == "CodeTrans" and self.args.device == "cpu":
                 updates.update({"tgi.enabled": False, "vllm.enabled": True, "llm-uservice.TEXTGEN_BACKEND": "vLLM"})
@@ -345,7 +358,7 @@ class Deployer:
         if self.args.deploy_mode == "docker":
             compose_file = self._get_docker_compose_file()
             if not compose_file:
-                log_message("ERROR", "Docker Compose file not found.");
+                log_message("ERROR", "Docker Compose file not found.")
                 return False
 
             compose_filename = compose_file.name
@@ -362,7 +375,7 @@ class Deployer:
 
             log_message("INFO", "Executing deployment command in a bash subshell...")
             try:
-                run_command(cmd_string, check=True, shell=True, executable='/bin/bash')
+                run_command(cmd_string, check=True, shell=True, executable="/bin/bash")
                 log_message("OK", f"{self.example_name} deployed successfully via Docker Compose.")
                 return True
             except Exception as e:
@@ -371,15 +384,24 @@ class Deployer:
 
         elif self.args.deploy_mode == "k8s":
             cfg = self.config["kubernetes"]
-            cmd = ["helm", "install", cfg["release_name"], cfg["helm"]["chart_oci"], "--namespace", cfg["namespace"],
-                   "--create-namespace", "-f", str(self._get_helm_values_file())]
+            cmd = [
+                "helm",
+                "install",
+                cfg["release_name"],
+                cfg["helm"]["chart_oci"],
+                "--namespace",
+                cfg["namespace"],
+                "--create-namespace",
+                "-f",
+                str(self._get_helm_values_file()),
+            ]
             try:
                 run_command(cmd, check=True)
                 log_message("OK", f"Helm release '{cfg['release_name']}' deployed. Waiting for pods to stabilize...")
                 time.sleep(30)  # Give some time for pods to start
                 return True
             except Exception as e:
-                log_message("ERROR", f"Helm deployment failed: {e}");
+                log_message("ERROR", f"Helm deployment failed: {e}")
                 return False
         return False
 
@@ -389,7 +411,7 @@ class Deployer:
         if self.args.deploy_mode == "docker":
             compose_file = self._get_docker_compose_file()
             if not compose_file:
-                log_message("WARN", "Docker Compose file not found. Cannot clear.");
+                log_message("WARN", "Docker Compose file not found. Cannot clear.")
                 return True
 
             compose_dir = compose_file.parent
@@ -404,14 +426,14 @@ class Deployer:
 
             log_message("INFO", "Executing cleanup command in a bash subshell...")
             try:
-                run_command(cmd_string, check=False, shell=True, executable='/bin/bash')
+                run_command(cmd_string, check=False, shell=True, executable="/bin/bash")
                 if local_env_file.exists():
                     local_env_file.unlink()
                     log_message("INFO", f"Removed generated config file: {local_env_filename}")
                 log_message("OK", "Docker Compose deployment cleared.")
                 return True
             except Exception as e:
-                log_message("ERROR", f"Failed to clear Docker Compose deployment: {e}");
+                log_message("ERROR", f"Failed to clear Docker Compose deployment: {e}")
                 return False
 
         elif self.args.deploy_mode == "k8s":
@@ -422,14 +444,15 @@ class Deployer:
             except Exception as e:
                 log_message("WARN", f"Helm uninstall may have failed (this is often ok if it was already gone): {e}")
 
-            if getattr(self.args, 'delete_namespace_on_clear', False):
+            if getattr(self.args, "delete_namespace_on_clear", False):
                 log_message("INFO", f"Deleting namespace '{cfg['namespace']}' as requested.")
                 try:
-                    run_command(["kubectl", "delete", "namespace", cfg["namespace"], "--ignore-not-found=true"],
-                                check=True)
+                    run_command(
+                        ["kubectl", "delete", "namespace", cfg["namespace"], "--ignore-not-found=true"], check=True
+                    )
                     log_message("OK", f"Namespace '{cfg['namespace']}' deleted.")
                 except Exception as e:
-                    log_message("ERROR", f"Failed to delete namespace: {e}");
+                    log_message("ERROR", f"Failed to delete namespace: {e}")
                     return False
             return True
         return False

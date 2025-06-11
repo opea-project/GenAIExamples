@@ -1,15 +1,17 @@
-import requests
-import time
-import json
+# Copyright (C) 2025 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
 
-from .utils import log_message, get_host_ip, run_command, start_kubectl_port_forward, stop_all_kubectl_port_forwards
+import json
+import time
+
+import requests
+
 from .config import EXAMPLE_CONFIGS
+from .utils import get_host_ip, log_message, run_command, start_kubectl_port_forward, stop_all_kubectl_port_forwards
 
 
 class ConnectionTester:
-    """
-    Handles testing connections to the deployed services.
-    """
+    """Handles testing connections to the deployed services."""
 
     def __init__(self, example_name, deploy_mode, device, args_namespace):
         self.example_name = example_name
@@ -23,22 +25,32 @@ class ConnectionTester:
         self.host_ip = get_host_ip() if self.deploy_mode == "docker" else "localhost"
         self.session = requests.Session()
         if self.args.http_proxy or self.args.https_proxy:
-            self.session.proxies = {'http': self.args.http_proxy, 'https': self.args.https_proxy}
+            self.session.proxies = {"http": self.args.http_proxy, "https": self.args.https_proxy}
         self.results = {"passed": 0, "failed": 0, "skipped": 0}
 
     def _get_service_url_and_port(self, service_key):
         """Determines the URL for a service, handling Docker ports and K8s port-forwarding."""
         if self.deploy_mode == "docker":
             port = self.port_config.get("docker", {}).get(service_key)
-            if not port: return None, None
+            if not port:
+                return None, None
             return f"http://{self.host_ip}:{port}", port
 
         elif self.deploy_mode == "k8s":
             service_name = self.port_config.get("k8s_services", {}).get(service_key)
-            if not service_name: return None, None
+            if not service_name:
+                return None, None
             try:
-                cmd = ["kubectl", "get", "svc", service_name, "-n", self.k8s_namespace, "-o",
-                       "jsonpath={.spec.ports[0].port}"]
+                cmd = [
+                    "kubectl",
+                    "get",
+                    "svc",
+                    service_name,
+                    "-n",
+                    self.k8s_namespace,
+                    "-o",
+                    "jsonpath={.spec.ports[0].port}",
+                ]
                 result = run_command(cmd, capture_output=True, check=True, display_cmd=False)
                 remote_port = result.stdout.strip()
             except Exception as e:
@@ -46,9 +58,11 @@ class ConnectionTester:
                 return None, None
 
             # Use defined local port for main service, generate for others
-            local_port = self.args.k8s_test_local_port if service_key == self.test_suite_config.get("main_service",
-                                                                                                    {}).get(
-                "service_key") else (8081 + hash(service_key) % 100)
+            local_port = (
+                self.args.k8s_test_local_port
+                if service_key == self.test_suite_config.get("main_service", {}).get("service_key")
+                else (8081 + hash(service_key) % 100)
+            )
 
             if not start_kubectl_port_forward(self.k8s_namespace, service_name, local_port, remote_port):
                 return None, None
@@ -68,16 +82,13 @@ class ConnectionTester:
 
         try:
             response = self.session.request(
-                method, full_url,
+                method,
+                full_url,
                 json=test_case_config.get("payload"),
                 headers=test_case_config.get("headers", {}),
-                timeout=test_case_config.get("timeout", 120)
+                timeout=test_case_config.get("timeout", 120),
             )
-            return {
-                "status_code": response.status_code,
-                "content": response.text,
-                "url": full_url
-            }
+            return {"status_code": response.status_code, "content": response.text, "url": full_url}
         except requests.exceptions.RequestException as e:
             return {"status": "ERROR", "reason": str(e), "url": full_url}
 
@@ -96,7 +107,8 @@ class ConnectionTester:
         if expect_code and response_data["status_code"] != expect_code:
             passed = False
             error_messages.append(
-                f"Test '{test_name}': Expected status {expect_code}, got {response_data['status_code']}")
+                f"Test '{test_name}': Expected status {expect_code}, got {response_data['status_code']}"
+            )
         # print(response_data["content"])
         expect_contains = test_case_config.get("expect_response_contains")
         if expect_contains and expect_contains not in response_data["content"]:
@@ -117,8 +129,8 @@ class ConnectionTester:
         return passed
 
     def run_all_tests(self):
-        """
-        Runs the connection test for the main service.
+        """Runs the connection test for the main service.
+
         The overall result depends solely on the main_service test.
         Sub-service tests are kept as commented-out code for future diagnostic purposes.
         """
@@ -159,7 +171,9 @@ class ConnectionTester:
         if self.deploy_mode == "k8s":
             stop_all_kubectl_port_forwards()
 
-        log_message("INFO",
-                    f"Test Summary: Passed: {self.results['passed']}, Failed: {self.results['failed']}, Skipped: {self.results['skipped']}")
+        log_message(
+            "INFO",
+            f"Test Summary: Passed: {self.results['passed']}, Failed: {self.results['failed']}, Skipped: {self.results['skipped']}",
+        )
 
         return main_service_passed
