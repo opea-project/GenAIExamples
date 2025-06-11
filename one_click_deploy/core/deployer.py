@@ -2,7 +2,7 @@ import click
 import os
 import time
 
-from .utils import log_message, section_header, run_command, command_exists, \
+from .utils import log_message, section_header, run_command, \
     update_or_create_set_env, update_helm_values_yaml, get_huggingface_token_from_file, get_host_ip
 from .config import EXAMPLE_CONFIGS, EXAMPLES_ROOT_DIR, COMMON_SCRIPTS_DIR
 from .tester import ConnectionTester
@@ -136,9 +136,14 @@ class Deployer:
         if self.args.do_update_images:
             self.args.build_images = click.confirm("  -> Build images?", default=False, show_default=True)
             self.args.push_images = click.confirm("  -> Push images?", default=False, show_default=True)
-            if self.args.push_images: self.args.registry = click.prompt("     Enter container registry URL", default="", show_default=True)
+            if self.args.push_images:
+                self.args.registry = click.prompt("     Enter container registry URL (e.g., docker.io/myuser)",
+                                                  default="", show_default=False)
+            else:
+                self.args.registry = ""
 
-        self.args.do_test_connection = click.confirm("Run connection tests after deployment?", default=False, show_default=True)
+        self.args.do_test_connection = click.confirm("Run connection tests after deployment?", default=False,
+                                                     show_default=True)
         if self.args.deploy_mode == 'k8s' and self.args.do_test_connection:
             self.args.k8s_test_local_port = click.prompt("  -> Local port for K8s test access", type=int, default=8080)
 
@@ -148,7 +153,6 @@ class Deployer:
                 log_message("INFO",
                             f"  {k.replace('_', ' ').title()}: {'**********' if k == 'hf_token' and v else v}")
         return click.confirm("Proceed with deployment?", default=True)
-
 
     def run_interactive_clear(self):
         """
@@ -185,6 +189,58 @@ class Deployer:
         log_message("INFO", f"Will attempt to clear '{self.example_name}' deployed via {self.args.deploy_mode}.")
         return click.confirm("Proceed with clearing?", default=True)
 
+    def run_interactive_test(self):
+        """
+        Orchestrates the interactive testing of an existing deployment.
+        """
+        if not self._interactive_setup_for_test():
+            log_message("INFO", "Test operation aborted by user.")
+            return
+
+        try:
+            self.test_connection()
+            log_message("OK", "Testing process completed.")
+        except Exception as e:
+            log_message("ERROR", f"An unexpected error occurred during testing: {e}")
+
+    def _interactive_setup_for_test(self):
+        """
+        Gathers necessary information interactively to run connection tests.
+        """
+        section_header(f"{self.example_name} Interactive Connection Test Setup")
+
+        self.args.deploy_mode = click.prompt(
+            "How is the service deployed?",
+            type=click.Choice(["docker", "k8s"]),
+            default="docker"
+        )
+        self.args.device = click.prompt(
+            "On which target device is it running?",
+            type=click.Choice(self.config.get("supported_devices")),
+            default=self.config.get("default_device")
+        )
+
+        # Proxies are needed for the requests session in the tester
+        self.args.http_proxy = click.prompt("HTTP Proxy", default=os.environ.get("http_proxy", ""), show_default=True)
+        self.args.https_proxy = click.prompt("HTTPS Proxy", default=os.environ.get("https_proxy", ""),
+                                             show_default=True)
+
+        # For k8s, we need a local port to forward to, just like in the deploy setup
+        if self.args.deploy_mode == 'k8s':
+            self.args.k8s_test_local_port = click.prompt(
+                "  -> Local port for K8s test access",
+                type=int,
+                default=8080
+            )
+
+        section_header("Configuration Summary")
+        log_message("INFO", f"  Test Target: {self.example_name}")
+        log_message("INFO", f"  Deployment Mode: {self.args.deploy_mode}")
+        log_message("INFO", f"  Device: {self.args.device}")
+        if self.args.deploy_mode == 'k8s':
+            log_message("INFO", f"  K8s Local Port: {self.args.k8s_test_local_port}")
+
+        return click.confirm("Proceed with connection tests?", default=True)
 
     def check_environment(self):
         section_header("Checking Environment")
@@ -201,10 +257,42 @@ class Deployer:
             return False
 
     def update_images(self):
+        """
+        Builds and/or pushes Docker images by calling the update_images.sh script.
+        """
         section_header("Updating Container Images")
-        log_message("INFO", "Image update step needs implementation in common/update_images.sh")
-        # Placeholder for future implementation
-        return True
+
+        script_path = COMMON_SCRIPTS_DIR / "update_images.sh"
+        if not script_path.exists():
+            log_message("WARN", f"Image update script '{script_path}' not found. Skipping this step.")
+            return True
+
+        cmd = ["bash", str(script_path)]
+        cmd.extend(["--example", self.example_name])
+
+        if self.args.build_images:
+            cmd.append("--build")
+
+        if self.args.push_images:
+            cmd.append("--push")
+            if self.args.registry:
+                cmd.extend(["--registry", self.args.registry])
+            else:
+                log_message("WARN",
+                            "Push images was selected, but no registry was provided. The push command might fail or use a default.")
+
+        if not self.args.build_images and not self.args.push_images:
+            log_message("INFO", "Image update selected, but neither 'build' nor 'push' was confirmed. Skipping.")
+            return True
+
+        try:
+            run_command(cmd, check=True)
+            log_message("OK", "Image update process completed successfully.")
+            return True
+        except Exception as e:
+            log_message("ERROR", f"The image update script failed. Please check the logs above for details. Error: {e}")
+            return False
+
 
     def configure_services(self):
         section_header(f"Configuring Services for {self.example_name} ({self.args.deploy_mode})")
@@ -264,7 +352,6 @@ class Deployer:
             compose_dir = compose_file.parent
             local_env_file = self._get_local_env_file_path()
             local_env_file_dir = local_env_file.parent
-
 
             cmd_string = (
                 f"cd '{local_env_file_dir}' && "

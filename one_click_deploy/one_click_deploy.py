@@ -23,21 +23,41 @@ def cli(verbose):
 
     try:
         # 1. Choose an example
-        example_name = click.prompt(
-            "Choose an example to manage",
-            type=click.Choice(list(EXAMPLE_CONFIGS.keys())),
-            default=list(EXAMPLE_CONFIGS.keys())[0],
-            show_choices=True
+        example_names = list(EXAMPLE_CONFIGS.keys())
+
+        example_prompt_lines = ["Please choose an example to manage:"]
+        for i, name in enumerate(example_names, 1):
+            example_prompt_lines.append(f"  [{i}] {name}")
+        example_prompt_text = "\n".join(example_prompt_lines)
+
+        example_choice_num = click.prompt(
+            example_prompt_text,
+            type=click.IntRange(1, len(example_names)),
+            default=1,
+            show_default=True
         )
+
+        example_name = example_names[example_choice_num - 1]
+        log_message("INFO", f"Example selected: '{example_name}'")
         app_args.example = example_name
 
         # 2. Choose an action
-        action = click.prompt(
-            "Choose an action",
-            type=click.Choice(["Deploy", "Clear"]),
-            default="Deploy",
-            show_choices=True
+        actions = ["Deploy", "Clear", "Test Connection"]
+
+        action_prompt_lines = ["Please choose an action:"]
+        for i, desc in enumerate(actions, 1):
+            action_prompt_lines.append(f"  [{i}] {desc}")
+        action_prompt_text = "\n".join(action_prompt_lines)
+
+        action_choice_num = click.prompt(
+            action_prompt_text,
+            type=click.IntRange(1, len(actions)),
+            default=1,
+            show_default=True
         )
+
+        action = actions[action_choice_num - 1]
+        log_message("INFO", f"Action selected: '{action}'")
         app_args.action = action
 
         # 3. Execute
@@ -47,6 +67,8 @@ def cli(verbose):
             deployer.run_interactive_deployment()
         elif action == "Clear":
             deployer.run_interactive_clear()
+        elif action == "Test Connection":
+            deployer.run_interactive_test()
 
     except (ValueError, click.exceptions.Abort) as e:
         log_message("WARN", f"Operation aborted by user or invalid input: {e}")
