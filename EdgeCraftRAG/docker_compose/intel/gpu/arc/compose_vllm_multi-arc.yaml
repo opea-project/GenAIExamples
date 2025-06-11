@@ -30,6 +30,7 @@ services:
     profiles:
       - single_container
       - multi_container
+      - triple_container
   ecrag:
     image: ${REGISTRY:-opea}/edgecraftrag:${TAG:-latest}
     container_name: edgecraftrag
@@ -49,6 +50,7 @@ services:
     profiles:
       - single_container
       - multi_container
+      - triple_container
   nginx:
     image: nginx:latest
     restart: always
@@ -61,6 +63,7 @@ services:
     profiles:
       - single_container
       - multi_container
+      - triple_container
   ui:
     image: ${REGISTRY:-opea}/edgecraftrag-ui:${TAG:-latest}
     container_name: edgecraftrag-ui
@@ -85,6 +88,7 @@ services:
     profiles:
       - single_container
       - multi_container
+      - triple_container
   llm-serving-xpu-0:
     container_name: ipex-llm-serving-xpu-container-0
     image: intelanalytics/ipex-llm-serving-xpu:0.8.3-b18
@@ -122,6 +126,7 @@ services:
     profiles:
       - single_container
       - multi_container
+      - triple_container
   llm-serving-xpu-1:
     container_name: ipex-llm-serving-xpu-container-1
     image: intelanalytics/ipex-llm-serving-xpu:0.8.3-b18
@@ -158,6 +163,43 @@ services:
       bash start-vllm-service.sh"
     profiles:
       - multi_container
+      - triple_container
+  llm-serving-xpu-2:
+    container_name: ipex-llm-serving-xpu-container-2
+    image: intelanalytics/ipex-llm-serving-xpu:0.8.3-b18
+    privileged: true
+    restart: always
+    ports:
+      - ${VLLM_SERVICE_PORT_2:-8300}:${VLLM_SERVICE_PORT_2:-8300}
+    group_add:
+      - video
+      - ${VIDEOGROUPID:-44}
+      - ${RENDERGROUPID:-109}
+    volumes:
+      - ${LLM_MODEL_PATH:-${PWD}}:/llm/models
+    devices:
+      - /dev/dri
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      HF_ENDPOINT: ${HF_ENDPOINT}
+      MODEL_PATH: "/llm/models"
+      SERVED_MODEL_NAME: ${LLM_MODEL}
+      TENSOR_PARALLEL_SIZE: ${TENSOR_PARALLEL_SIZE:-1}
+      MAX_NUM_SEQS: ${MAX_NUM_SEQS:-256}
+      MAX_NUM_BATCHED_TOKENS: ${MAX_NUM_BATCHED_TOKENS:-4000}
+      MAX_MODEL_LEN: ${MAX_MODEL_LEN:-3000}
+      IPEX_LLM_LOWBIT: ${LOAD_IN_LOW_BIT:-"fp8"}
+      CCL_DG2_USM: ${CCL_DG2_USM:-""}
+      PORT: ${VLLM_SERVICE_PORT_2:-8300}
+      ZE_AFFINITY_MASK: ${SELECTED_XPU_2:-2}
+    shm_size: '32g'
+    entrypoint: /bin/bash -c "\
+      cd /llm && \
+      bash start-vllm-service.sh"
+    profiles:
+      - triple_container
 networks:
   default:
     driver: bridge
