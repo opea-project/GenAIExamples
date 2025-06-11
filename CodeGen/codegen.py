@@ -282,7 +282,7 @@ class CodeGenService:
         last_node = runtime_graph.all_leaves()[-1]
 
         try:
-            response = result_dict[last_node]["choices"][0]["text"]
+            response = result_dict[last_node]["choices"][0]["message"]["content"]
         except (KeyError, IndexError, TypeError):
             try:
                 response = result_dict[last_node]["text"]
