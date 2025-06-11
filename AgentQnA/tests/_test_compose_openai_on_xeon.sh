@@ -14,7 +14,7 @@ export TOOLSET_PATH=$WORKDIR/GenAIExamples/AgentQnA/tools/
 function stop_agent_and_api_server() {
     echo "Stopping CRAG server"
     cid=$(docker ps -q --filter ancestor=docker.io/aicrowd/kdd-cup-24-crag-mock-api:v0)
-    if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid && sleep 1s; fi 
+    if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid && sleep 1s; fi
     echo "Stopping Agent services"
     cid=$(docker ps -q --filter ancestor=opea/agent:latest)
     if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid && sleep 1s; fi
