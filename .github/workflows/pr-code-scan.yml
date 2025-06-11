@@ -14,7 +14,7 @@ on:
   workflow_dispatch:
     inputs:
       base:
-        default: "commit id"
+        default: "144b56a424e8a1d80a90be3a3d74ab1c223418a9"
         description: "Hardware to run test"
         required: false
         type: string
@@ -88,10 +88,12 @@ jobs:
       - name: Differential ShellCheck
         uses: redhat-plumbers-in-action/differential-shellcheck@v5
         with:
+          triggering-event: manual
           token: ${{ secrets.GITHUB_TOKEN }}
           scan-directory: ${{ github.workspace }}
           severity: warning
           base: ${{ inputs.base }}
+          head: ${{ github.sha }}
 
       # - name: ShellCheck
       #   uses: ludeeus/action-shellcheck@2.0.0
