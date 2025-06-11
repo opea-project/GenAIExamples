@@ -17,7 +17,7 @@ echo "TAG=IMAGE_TAG=${IMAGE_TAG}"
 export REGISTRY=${IMAGE_REPO}
 export TAG=${IMAGE_TAG}
 
-source $WORKPATH/docker_compose/set_env.sh
+source $WORKPATH/docker_compose/intel/set_env.sh
 export MODEL_CACHE=${model_cache:-"./data"}
 
 export MAX_INPUT_TOKENS=2048
@@ -46,7 +46,7 @@ function build_docker_images() {
     popd && sleep 1s
 
     git clone https://github.com/vllm-project/vllm.git && cd vllm
-    VLLM_VER="v0.8.3"
+    VLLM_VER=v0.9.0.1
     echo "Check out vLLM tag ${VLLM_VER}"
     git checkout ${VLLM_VER} &> /dev/null
     cd ../

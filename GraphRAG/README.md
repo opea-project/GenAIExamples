@@ -33,7 +33,7 @@ To set up environment variables for deploying GraphRAG services, follow these st
    export NEO4J_PASSWORD=${your_neo4j_password}
    export PYTHONPATH=${path_to_comps}
    export OPENAI_KEY=${your_openai_api_key} #optional, when not provided will use smaller models TGI/TEI
-   export HUGGINGFACEHUB_API_TOKEN=${your_hf_token} #needed for TGI/TEI models
+   export HF_TOKEN=${your_hf_token} #needed for TGI/TEI models
    ```
 
 2. If you are in a proxy environment, also set the proxy-related environment variables:
@@ -70,7 +70,7 @@ Here is an example of `Nike 2023` pdf.
 
 ```bash
 # download pdf file
-wget https://raw.githubusercontent.com/opea-project/GenAIComps/v1.1/comps/retrievers/redis/data/nke-10k-2023.pdf
+wget https://raw.githubusercontent.com/opea-project/GenAIComps/v1.3/comps/third_parties/pathway/src/data/nke-10k-2023.pdf
 # upload pdf file with dataprep
 curl -X POST "http://${host_ip}:11103/v1/dataprep/ingest" \
     -H "Content-Type: multipart/form-data" \
@@ -204,7 +204,7 @@ Here is an example of `Nike 2023` pdf.
 
 ```bash
 # download pdf file
-wget https://raw.githubusercontent.com/opea-project/GenAIComps/v1.1/comps/retrievers/redis/data/nke-10k-2023.pdf
+wget https://raw.githubusercontent.com/opea-project/GenAIComps/v1.3/comps/third_parties/pathway/src/data/nke-10k-2023.pdf
 # upload pdf file with dataprep
 curl -X POST "http://${host_ip}:6007/v1/dataprep/ingest" \
     -H "Content-Type: multipart/form-data" \

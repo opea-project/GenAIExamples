@@ -26,7 +26,7 @@ function build_docker_images() {
     popd && sleep 1s
 
     git clone https://github.com/vllm-project/vllm.git && cd vllm
-    VLLM_VER="v0.8.3"
+    VLLM_VER=v0.9.0.1
     echo "Check out vLLM tag ${VLLM_VER}"
     git checkout ${VLLM_VER} &> /dev/null
     cd ../
@@ -39,13 +39,13 @@ function build_docker_images() {
 }
 
 function start_services() {
-    cd $WORKPATH/docker_compose
-    export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+    cd $WORKPATH/docker_compose/intel
+    export HF_TOKEN=${HF_TOKEN}
 
     export NGINX_PORT=80
     export host_ip=${ip_address}
     source set_env.sh
-    cd intel/cpu/xeon/
+    cd cpu/xeon/
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 

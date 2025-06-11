@@ -29,6 +29,7 @@ RETRIEVAL_SERVICE_HOST_IP = os.getenv("RETRIEVAL_SERVICE_HOST_IP", "0.0.0.0")
 REDIS_RETRIEVER_PORT = int(os.getenv("REDIS_RETRIEVER_PORT", 7000))
 TEI_EMBEDDING_HOST_IP = os.getenv("TEI_EMBEDDING_HOST_IP", "0.0.0.0")
 EMBEDDER_PORT = int(os.getenv("EMBEDDER_PORT", 6000))
+LLM_MODEL_ID = os.getenv("LLM_MODEL_ID", "Qwen/Qwen2.5-Coder-7B-Instruct")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", None)
 
 grader_prompt = """You are a grader assessing relevance of a retrieved document to a user question. \n
@@ -67,11 +68,22 @@ def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **k
         inputs["input"] = inputs["query"]
 
     # Check if the current service type is RETRIEVER
-    if self.services[cur_node].service_type == ServiceType.RETRIEVER:
+    elif self.services[cur_node].service_type == ServiceType.RETRIEVER:
         # Extract the embedding from the inputs
         embedding = inputs["data"][0]["embedding"]
         # Align the inputs for the retriever service
         inputs = {"index_name": llm_parameters_dict["index_name"], "text": self.input_query, "embedding": embedding}
+    elif self.services[cur_node].service_type == ServiceType.LLM:
+        # convert TGI/vLLM to unified OpenAI /v1/chat/completions format
+        next_inputs = {}
+        next_inputs["model"] = LLM_MODEL_ID
+        next_inputs["messages"] = [{"role": "user", "content": inputs["query"]}]
+        next_inputs["max_tokens"] = llm_parameters_dict["max_tokens"]
+        next_inputs["top_p"] = llm_parameters_dict["top_p"]
+        next_inputs["stream"] = inputs["stream"]
+        next_inputs["frequency_penalty"] = inputs["frequency_penalty"]
+        next_inputs["temperature"] = inputs["temperature"]
+        inputs = next_inputs
 
     return inputs
 
@@ -268,7 +280,15 @@ class CodeGenService:
 
         # Get the response from the last node in the runtime graph
         last_node = runtime_graph.all_leaves()[-1]
-        response = result_dict[last_node]["text"]
+
+        try:
+            response = result_dict[last_node]["choices"][0]["text"]
+        except (KeyError, IndexError, TypeError):
+            try:
+                response = result_dict[last_node]["text"]
+            except (KeyError, TypeError):
+                response = "Response Error"
+
         choices = []
         usage = UsageInfo()
         choices.append(

@@ -43,7 +43,7 @@ services:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       TEI_EMBEDDING_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
-      HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HF_TOKEN: ${HF_TOKEN}
       LOGFLAG: ${LOGFLAG}
     restart: unless-stopped
   web-retriever:
@@ -94,7 +94,7 @@ services:
       https_proxy: ${https_proxy}
       RERANK_TYPE: ${RERANK_TYPE}
       TEI_RERANKING_ENDPOINT: ${TEI_RERANKING_ENDPOINT}
-      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HUGGINGFACEHUB_API_TOKEN: ${HF_TOKEN}
       LOGFLAG: ${LOGFLAG}
     restart: unless-stopped
   tgi-service:
@@ -108,7 +108,7 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      HUGGING_FACE_HUB_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HUGGING_FACE_HUB_TOKEN: ${HF_TOKEN}
       HF_HUB_DISABLE_PROGRESS_BARS: 1
       HF_HUB_ENABLE_HF_TRANSFER: 0
       HABANA_VISIBLE_DEVICES: all
@@ -142,7 +142,7 @@ services:
       https_proxy: ${https_proxy}
       LLM_ENDPOINT: ${TGI_LLM_ENDPOINT}
       LLM_MODEL_ID: ${LLM_MODEL_ID}
-      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HUGGINGFACEHUB_API_TOKEN: ${HF_TOKEN}
       HF_HUB_DISABLE_PROGRESS_BARS: 1
       HF_HUB_ENABLE_HF_TRANSFER: 0
       LOGFLAG: ${LOGFLAG}
@@ -187,7 +187,25 @@ services:
       - no_proxy=${no_proxy}
       - https_proxy=${https_proxy}
       - http_proxy=${http_proxy}
-      - BACKEND_BASE_URL=${BACKEND_SERVICE_ENDPOINT}
+    ipc: host
+    restart: always
+  searchqna-gaudi-nginx-server:
+    image: ${REGISTRY:-opea}/nginx:${TAG:-latest}
+    container_name: searchqna-gaudi-nginx-server
+    depends_on:
+      - searchqna-gaudi-backend-server
+      - searchqna-gaudi-ui-server
+    ports:
+      - "${NGINX_PORT:-80}:80"
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - FRONTEND_SERVICE_IP=searchqna-gaudi-ui-server
+      - FRONTEND_SERVICE_PORT=5173
+      - BACKEND_SERVICE_NAME=searchqna
+      - BACKEND_SERVICE_IP=searchqna-gaudi-backend-server
+      - BACKEND_SERVICE_PORT=8888
     ipc: host
     restart: always
 
