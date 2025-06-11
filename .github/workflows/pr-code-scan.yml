@@ -12,6 +12,12 @@ on:
     paths-ignore:
       - "**.md"
   workflow_dispatch:
+    inputs:
+      base:
+        default: "commit id"
+        description: "Hardware to run test"
+        required: false
+        type: string
 
 # If there is a new commit, the previous jobs will be canceled
 concurrency:
@@ -85,6 +91,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           scan-directory: ${{ github.workspace }}
           severity: warning
+          base: ${{ inputs.base }}
 
       # - name: ShellCheck
       #   uses: ludeeus/action-shellcheck@2.0.0
