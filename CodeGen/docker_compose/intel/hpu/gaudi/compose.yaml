@@ -2,41 +2,9 @@
 # SPDX-License-Identifier: Apache-2.0
 
 services:
-  tgi-service:
-    image: ghcr.io/huggingface/tgi-gaudi:2.3.1
-    container_name: tgi-gaudi-server
-    profiles:
-      - codegen-gaudi-tgi
-    ports:
-      - "8028:80"
-    volumes:
-      - "${MODEL_CACHE:-./data}:/data"
-    environment:
-      no_proxy: ${no_proxy}
-      http_proxy: ${http_proxy}
-      https_proxy: ${https_proxy}
-      HABANA_VISIBLE_DEVICES: all
-      OMPI_MCA_btl_vader_single_copy_mechanism: none
-      HUGGING_FACE_HUB_TOKEN: ${HF_TOKEN}
-      ENABLE_HPU_GRAPH: true
-      LIMIT_HPU_GRAPH: true
-      USE_FLASH_ATTENTION: true
-      FLASH_ATTENTION_RECOMPUTE: true
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:80/health || exit 1"]
-      interval: 10s
-      timeout: 10s
-      retries: 100
-    runtime: habana
-    cap_add:
-      - SYS_NICE
-    ipc: host
-    command: --model-id ${LLM_MODEL_ID} --max-input-length 1024 --max-total-tokens 2048
   vllm-service:
     image: ${REGISTRY:-opea}/vllm-gaudi:${TAG:-latest}
     container_name: vllm-gaudi-server
-    profiles:
-      - codegen-gaudi-vllm
     ports:
       - "8028:80"
     volumes:
@@ -73,22 +41,9 @@ services:
       LLM_MODEL_ID: ${LLM_MODEL_ID}
       HUGGINGFACEHUB_API_TOKEN: ${HF_TOKEN}
     restart: unless-stopped
-  llm-tgi-service:
-    extends: llm-base
-    container_name: llm-codegen-tgi-gaudi-server
-    profiles:
-      - codegen-gaudi-tgi
-    ports:
-      - "9000:9000"
-    ipc: host
-    depends_on:
-      tgi-service:
-        condition: service_healthy
   llm-vllm-service:
     extends: llm-base
     container_name: llm-codegen-gaudi-vllm-server
-    profiles:
-      - codegen-gaudi-vllm
     ports:
       - "9000:9000"
     ipc: host
