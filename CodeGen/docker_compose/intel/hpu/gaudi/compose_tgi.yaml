@@ -50,15 +50,6 @@ services:
     depends_on:
       tgi-service:
         condition: service_healthy
-  llm-vllm-service:
-    extends: llm-base
-    container_name: llm-codegen-gaudi-vllm-server
-    ports:
-      - "9000:9000"
-    ipc: host
-    depends_on:
-      vllm-service:
-        condition: service_healthy
   codegen-gaudi-backend-server:
     image: ${REGISTRY:-opea}/codegen:${TAG:-latest}
     container_name: codegen-gaudi-backend-server
