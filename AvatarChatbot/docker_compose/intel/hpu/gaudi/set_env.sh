@@ -6,7 +6,7 @@ pushd "../../../../../" > /dev/null
 source .set_env.sh
 popd > /dev/null
 
-export HUGGINGFACEHUB_API_TOKEN=$HUGGINGFACEHUB_API_TOKEN
+export HF_TOKEN=$HF_TOKEN
 export host_ip=$(hostname -I | awk '{print $1}')
 
 export LLM_MODEL_ID=Intel/neural-chat-7b-v3-3

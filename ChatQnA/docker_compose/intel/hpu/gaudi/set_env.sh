@@ -1,4 +1,4 @@
-#/usr/bin/env bash
+#!/usr/bin/env bash
 
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
@@ -42,7 +42,7 @@ popd > /dev/null
 
 # Prompt the user for each required environment variable
 prompt_for_env_var "EMBEDDING_MODEL_ID" "Enter the EMBEDDING_MODEL_ID" "BAAI/bge-base-en-v1.5" false
-prompt_for_env_var "HUGGINGFACEHUB_API_TOKEN" "Enter the HUGGINGFACEHUB_API_TOKEN" "${HF_TOKEN}" true
+prompt_for_env_var "HF_TOKEN" "Enter the HF_TOKEN" "${HF_TOKEN}" true
 prompt_for_env_var "RERANK_MODEL_ID" "Enter the RERANK_MODEL_ID" "BAAI/bge-reranker-base" false
 prompt_for_env_var "LLM_MODEL_ID" "Enter the LLM_MODEL_ID" "meta-llama/Meta-Llama-3-8B-Instruct" false
 prompt_for_env_var "INDEX_NAME" "Enter the INDEX_NAME" "rag-redis" false
@@ -92,7 +92,7 @@ cat <<EOF > .env
 # Set all required ENV values
 export TAG=${TAG}
 export EMBEDDING_MODEL_ID=${EMBEDDING_MODEL_ID}
-export HUGGINGFACEHUB_API_TOKEN=$HUGGINGFACEHUB_API_TOKEN
+export HF_TOKEN=$HF_TOKEN
 export RERANK_MODEL_ID=${RERANK_MODEL_ID}
 export LLM_MODEL_ID=${LLM_MODEL_ID}
 export INDEX_NAME=${INDEX_NAME}

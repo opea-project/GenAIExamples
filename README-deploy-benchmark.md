@@ -30,7 +30,7 @@ Before running the benchmarks, ensure you have:
    - (Optional) [Kubernetes set up guide on Intel Gaudi product](https://github.com/opea-project/GenAIInfra/blob/main/README.md#setup-kubernetes-cluster)
 
 2. **Configuration YAML**  
-   The configuration file (e.g., `./ChatQnA/benchmark_chatqna.yaml`) consists of two main sections: deployment and benchmarking. Required fields with `# mandatory` comment must be filled with valid values, such as `HUGGINGFACEHUB_API_TOKEN`. For all other fields, you can either customize them according to our needs or leave them empty ("") to use the default values from the [helm charts](https://github.com/opea-project/GenAIInfra/tree/main/helm-charts).
+   The configuration file (e.g., `./ChatQnA/benchmark_chatqna.yaml`) consists of two main sections: deployment and benchmarking. Required fields with `# mandatory` comment must be filled with valid values, such as `HF_TOKEN`. For all other fields, you can either customize them according to our needs or leave them empty ("") to use the default values from the [helm charts](https://github.com/opea-project/GenAIInfra/tree/main/helm-charts).
 
    **Default Models**:
 
@@ -192,3 +192,7 @@ Choose "oob" mode when you want to selectively enable optimizations, or "tune" m
 - After cleaning up the directory, try running the deployment again
 
 Note: Always ensure there are no leftover Helm chart directories from previous failed runs before starting a new deployment.
+
+## ChatQnA Release Data
+
+The ChatQnA benchmark results are available in the [ChatQnA/benchmark_results.md](./ChatQnA/benchmark_results.md).

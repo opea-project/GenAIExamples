@@ -3,6 +3,7 @@
 
 import asyncio
 import base64
+import json
 import os
 import subprocess
 import uuid
@@ -142,11 +143,49 @@ def read_text_from_file(file, save_file_name):
     return file_content
 
 
+def align_generator(self, gen, **kwargs):
+    # OpenAI response format
+    # b'data:{"id":"","object":"text_completion","created":1725530204,"model":"meta-llama/Meta-Llama-3-8B-Instruct","system_fingerprint":"2.0.1-native","choices":[{"index":0,"delta":{"role":"assistant","content":"?"},"logprobs":null,"finish_reason":null}]}\n\n'
+    for line in gen:
+        line = line.decode("utf-8")
+        start = -1
+        end = -1
+        try:
+            start = line.find("{")
+            end = line.rfind("}") + 1
+            if start == -1 or end <= start:
+                # Handle cases where '{' or '}' are not found or are in the wrong order
+                json_str = ""
+            else:
+                json_str = line[start:end]
+        except Exception as e:
+            print(f"Error finding JSON boundaries: {e}")
+            json_str = ""
+
+        try:
+            # sometimes yield empty chunk, do a fallback here
+            json_data = json.loads(json_str)
+            if "ops" in json_data and "op" in json_data["ops"][0]:
+                if "value" in json_data["ops"][0] and isinstance(json_data["ops"][0]["value"], str):
+                    yield f"data: {repr(json_data['ops'][0]['value'].encode('utf-8'))}\n\n"
+                else:
+                    pass
+            elif (
+                json_data["choices"][0]["finish_reason"] != "eos_token"
+                and "content" in json_data["choices"][0]["delta"]
+            ):
+                yield f"data: {repr(json_data['choices'][0]['delta']['content'].encode('utf-8'))}\n\n"
+        except Exception as e:
+            yield f"data: {repr(json_str.encode('utf-8'))}\n\n"
+    yield "data: [DONE]\n\n"
+
+
 class DocSumService:
     def __init__(self, host="0.0.0.0", port=8000):
         self.host = host
         self.port = port
         ServiceOrchestrator.align_inputs = align_inputs
+        ServiceOrchestrator.align_generator = align_generator
         self.megaservice = ServiceOrchestrator()
         self.megaservice_text_only = ServiceOrchestrator()
         self.endpoint = str(MegaServiceEndpoint.DOC_SUMMARY)
