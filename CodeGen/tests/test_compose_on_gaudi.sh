@@ -201,7 +201,7 @@ function stop_docker() {
 
 function main() {
     # all docker docker compose compose files for XEON Platform
-    docker_compose_files=("codegen-gaudi-vllm" "codegen-gaudi-tgi")
+    docker_compose_files=("compose.yaml" "compose_tgi.yaml")
     docker_llm_container_names=("vllm-gaudi-server" "tgi-gaudi-server")
 
     # get number of compose files and container
