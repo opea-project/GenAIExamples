@@ -152,7 +152,7 @@ function start_services() {
             item=${list[i]}
             if check_condition "$item"; then
                 echo "Condition met for $item, removing from list." >> ${LOG_PATH}/list_check.log
-                unset list[i]
+                unset "list[i]"
             else
                 echo "Condition not met for $item, keeping in list." >> ${LOG_PATH}/list_check.log
             fi
