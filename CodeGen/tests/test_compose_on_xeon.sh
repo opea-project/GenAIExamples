@@ -27,7 +27,7 @@ function build_docker_images() {
     popd && sleep 1s
 
     git clone https://github.com/vllm-project/vllm.git && cd vllm
-    VLLM_VER="v0.8.3"
+    VLLM_VER=v0.9.0.1
     echo "Check out vLLM tag ${VLLM_VER}"
     git checkout ${VLLM_VER} &> /dev/null
     cd ../
@@ -138,6 +138,14 @@ function validate_megaservice() {
         "codegen-xeon-backend-server" \
         '{"messages": "def print_hello_world():", "max_tokens": 256}'
 
+    # Curl the Mega Service with stream as false
+    validate_services \
+        "${ip_address}:7778/v1/codegen" \
+        "" \
+        "mega-codegen" \
+        "codegen-xeon-backend-server" \
+        '{ "messages": "def print_hello_world():", "max_tokens": 256, "stream": false}'
+
     # Curl the Mega Service with index_name and agents_flag
     validate_services \
         "${ip_address}:7778/v1/codegen" \
@@ -145,6 +153,13 @@ function validate_megaservice() {
         "mega-codegen" \
         "codegen-xeon-backend-server" \
         '{ "index_name": "test_redis", "agents_flag": "True", "messages": "def print_hello_world():", "max_tokens": 256}'
+
+    validate_services \
+        "${ip_address}:7778/v1/codegen" \
+        "class" \
+        "mega-codegen" \
+        "codegen-xeon-backend-server" \
+        '{"model": "Qwen/Qwen2.5-Coder-7B-Instruct", "messages": [{"role": "user", "content": "Implement a basic Python class"}], "max_tokens":32}'
 
 }
 

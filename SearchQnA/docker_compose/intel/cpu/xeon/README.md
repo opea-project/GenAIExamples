@@ -26,7 +26,7 @@ Clone the GenAIExample repository and access the SearchQnA Intel® Xeon® platfo
 
 ```bash
 git clone https://github.com/opea-project/GenAIExamples.git
-cd GenAIExamples/SearchQnA
+cd GenAIExamples/SearchQnA/docker_compose/intel
 ```
 
 Then checkout a released version, such as v1.3:
@@ -43,7 +43,7 @@ To set up environment variables for deploying SearchQnA services, set up some pa
 export host_ip="External_Public_IP"           # ip address of the node
 export GOOGLE_CSE_ID="your cse id"
 export GOOGLE_API_KEY="your google api key"
-export HUGGINGFACEHUB_API_TOKEN="Your_HuggingFace_API_Token"
+export HF_TOKEN="Your_HuggingFace_API_Token"
 export http_proxy="Your_HTTP_Proxy"           # http proxy if any
 export https_proxy="Your_HTTPs_Proxy"         # https proxy if any
 export no_proxy=localhost,127.0.0.1,$host_ip  # additional no proxies if needed
@@ -58,7 +58,7 @@ Consult the section on [SearchQnA Service configuration](#SearchQnA-configuratio
 To deploy the SearchQnA services, execute the `docker compose up` command with the appropriate arguments. For a default deployment, execute the command below. It uses the 'compose.yaml' file.
 
 ```bash
-cd docker_compose/intel/cpu/xeon
+cd cpu/xeon
 docker compose -f compose.yaml up -d
 ```
 

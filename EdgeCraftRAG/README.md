@@ -7,11 +7,9 @@ quality and performance.
 
 ## What's New in this release?
 
-- A sleek new UI with enhanced user experience, built on Vue and Ant Design
-- Support concurrent multi-requests handling on vLLM inference backend
-- Support pipeline configuration through json file
-- Support system prompt modification through API
-- Fixed known issues in EC-RAG UI and server
+- Chat history support for multi-session chatqna
+- Knowledge base support for EC-RAG
+- Multi-Arc support for multiple LLM inference serving engine
 
 ## Quick Start Guide
 
@@ -76,6 +74,7 @@ export RENDERGROUPID=$(getent group render | cut -d: -f3)
 # Here is the example:
 pip install --upgrade --upgrade-strategy eager "optimum[openvino]"
 
+# If below optimum-cli commands show errors, please set transformers==4.49.0 to fix: pip install transformers==4.49.0
 optimum-cli export openvino -m BAAI/bge-small-en-v1.5 ${MODEL_PATH}/BAAI/bge-small-en-v1.5 --task sentence-similarity
 optimum-cli export openvino -m BAAI/bge-reranker-large ${MODEL_PATH}/BAAI/bge-reranker-large --task text-classification
 optimum-cli export openvino -m Qwen/Qwen2-7B-Instruct ${MODEL_PATH}/Qwen/Qwen2-7B-Instruct/INT4_compressed_weights --weight-format int4
@@ -96,7 +95,7 @@ Set up Additional Environment Variables and start with compose_vllm.yaml
 export LLM_MODEL=#your model id
 export VLLM_SERVICE_PORT=8008
 export vLLM_ENDPOINT="http://${HOST_IP}:${VLLM_SERVICE_PORT}"
-export HUGGINGFACEHUB_API_TOKEN=#your HF token
+export HF_TOKEN=#your HF token
 
 docker compose -f compose_vllm.yaml up -d
 ```
@@ -106,19 +105,62 @@ docker compose -f compose_vllm.yaml up -d
 The docker file can be pulled automatically‌, you can also pull the image manually:
 
 ```bash
-docker pull intelanalytics/ipex-llm-serving-xpu:latest
+docker pull intelanalytics/ipex-llm-serving-xpu:0.8.3-b18
+```
+
+Generate your nginx config file
+
+```bash
+export HOST_IP=#your host ip
+export NGINX_PORT=8086 #set port for nginx
+# If you are running with 1 vllm container:
+export NGINX_PORT_0=8100 # you can change the port to your preferrance
+export NGINX_PORT_1=8100 # you can change the port to your preferrance
+# If you are running with 2 vllm containers:
+export NGINX_PORT_0=8100 # you can change the port to your preferrance
+export NGINX_PORT_1=8200 # you can change the port to your preferrance
+# Generate your nginx config file
+envsubst < GenAIExamples/EdgeCraftRAG/nginx/nginx.conf.template > <your_nginx_config_path>/nginx.conf
+# set NGINX_CONFIG_PATH
+export NGINX_CONFIG_PATH="<your_nginx_config_path>/nginx.conf"
 ```
 
 Set up Additional Environment Variables and start with compose_vllm_multi-arc.yaml
 
 ```bash
-export LLM_MODEL=#your model id
-export VLLM_SERVICE_PORT=8008
-export vLLM_ENDPOINT="http://${HOST_IP}:${VLLM_SERVICE_PORT}"
+# For 1 vLLM container(1 DP) with  multi Intel Arc GPUs
+export vLLM_ENDPOINT="http://${HOST_IP}:${NGINX_PORT}"
 export LLM_MODEL_PATH=#your model path
+export LLM_MODEL=#your model id
+export CONTAINER_COUNT="single_container"
 export TENSOR_PARALLEL_SIZE=#your Intel Arc GPU number to do inference
+export SELECTED_XPU_0=<which GPU to select to run> # example for selecting 2 Arc GPUs: SELECTED_XPU_0=0,1
+```
 
-docker compose -f compose_vllm_multi-arc.yaml up -d
+```bash
+# For 2 vLLM container(2 DP) with  multi Intel Arc GPUs
+export vLLM_ENDPOINT="http://${HOST_IP}:${NGINX_PORT}"
+export LLM_MODEL_PATH=#your model path
+export LLM_MODEL=#your model id
+export CONTAINER_COUNT="multi_container"
+export TENSOR_PARALLEL_SIZE=#your Intel Arc GPU number to do inference
+export SELECTED_XPU_0=<which GPU to select to run for container 0>
+export SELECTED_XPU_1=<which GPU to select to run for container 1>
+```
+
+```bash
+# Below are the extra env you can set for vllm
+export MAX_NUM_SEQS=<MAX_NUM_SEQS value>
+export MAX_NUM_BATCHED_TOKENS=<MAX_NUM_BATCHED_TOKENS value>
+export MAX_MODEL_LEN=<MAX_MODEL_LEN value>
+export LOAD_IN_LOW_BIT=<the weight type value> # expected: sym_int4, asym_int4, sym_int5, asym_int5 or sym_int8
+export CCL_DG2_USM=<CCL_DG2_USM value> # Needed on Core to enable USM (Shared Memory GPUDirect). Xeon supports P2P and doesn't need this.
+```
+
+start with compose_vllm_multi-arc.yaml
+
+```bash
+docker compose -f docker_compose/intel/gpu/arc/compose_vllm_multi-arc.yaml --profile ${CONTAINER_COUNT} up -d
 ```
 
 ### ChatQnA with LLM Example (Command Line)
@@ -355,8 +397,26 @@ curl -X PATCH http://${HOST_IP}:16010/v1/data/files/test.pdf -H "Content-Type: a
 
 ### System Prompt Management
 
-#### Use custom system prompt
+#### Get system prompt
 
 ```bash
-curl -X POST http://${HOST_IP}:16010/v1/chatqna/prompt -H "Content-Type: multipart/form-data" -F "file=@your_prompt_file.txt"
+curl -X GET http://${HOST_IP}:16010/v1/chatqna/prompt -H "Content-Type: application/json" | jq '.'
+```
+
+#### Update system prompt
+
+```bash
+curl -X POST http://${HOST_IP}:16010/v1/chatqna/prompt -H "Content-Type: application/json" -d '{"prompt":"This is a template prompt"}' | jq '.'
+```
+
+#### Reset system prompt
+
+```bash
+curl -X POST http://${HOST_IP}:16010/v1/chatqna/prompt/reset -H "Content-Type: application/json" | jq '.'
+```
+
+#### Use custom system prompt file
+
+```bash
+curl -X POST http://${HOST_IP}:16010/v1/chatqna/prompt-file -H "Content-Type: multipart/form-data" -F "file=@your_prompt_file.txt"
 ```

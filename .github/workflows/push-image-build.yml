@@ -3,6 +3,23 @@
 # Test
 name: Build latest images on push event
 
+permissions:
+  actions: read
+  contents: read
+  checks: read
+  deployments: read
+  discussions: read
+  issues: read
+  packages: read
+  pages: read
+  pull-requests: read
+  repository-projects: read
+  statuses: read
+  security-events: read
+  id-token: write
+  attestations: read
+  models: read
+
 on:
   push:
     branches: [ 'main' ]
@@ -23,6 +40,22 @@ jobs:
       test_mode: "docker_image_build"
 
   image-build:
+    permissions:
+      actions: read
+      attestations: read
+      discussions: read
+      models: read
+      repository-projects: read
+      id-token: write
+      contents: read
+      checks: write
+      deployments: write
+      issues: write
+      packages: write
+      pages: write
+      pull-requests: write
+      statuses: write
+      security-events: read
     needs: job1
     if: ${{ needs.job1.outputs.run_matrix != '{"include":[]}' }}
     strategy:

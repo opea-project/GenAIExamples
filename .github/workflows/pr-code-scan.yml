@@ -2,7 +2,9 @@
 # SPDX-License-Identifier: Apache-2.0
 
 name: Code Scan
-
+permissions:
+  contents: read
+  security-events: write
 on:
   pull_request:
     branches: [main]
