@@ -4,7 +4,7 @@
 
 function stop_agent_and_api_server() {
     echo "Stopping Agent services"
-    docker rm --force $(docker ps -a -q --filter="name=workflowexec-agent-endpoint")
+    docker rm --force "$(docker ps -a -q --filter="name=workflowexec-agent-endpoint")"
 }
 
 function stop_vllm_docker() {

@@ -13,9 +13,9 @@ export TOOLSET_PATH=$WORKDIR/GenAIExamples/AgentQnA/tools/
 
 function stop_agent_and_api_server() {
     echo "Stopping CRAG server"
-    docker stop $(docker ps -q --filter ancestor=docker.io/aicrowd/kdd-cup-24-crag-mock-api:v0)
+    docker stop "$(docker ps -q --filter ancestor=docker.io/aicrowd/kdd-cup-24-crag-mock-api:v0)"
     echo "Stopping Agent services"
-    docker stop $(docker ps -q --filter ancestor=opea/agent:latest)
+    docker stop "$(docker ps -q --filter ancestor=opea/agent:latest)"
 }
 
 function stop_retrieval_tool() {
