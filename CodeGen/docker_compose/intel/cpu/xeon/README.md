@@ -33,41 +33,43 @@ This guide focuses on running the pre-configured CodeGen service using Docker Co
 
 ## Quick Start Deployment
 
-This uses the default vLLM-based deployment profile (`codegen-xeon-vllm`).
+This uses the default vLLM-based deployment using `compose.yaml`.
 
 1.  **Configure Environment:**
     Set required environment variables in your shell:
 
-        ```bash
-        # Replace with your host's external IP address (do not use localhost or 127.0.0.1)
-        export HOST_IP="your_external_ip_address"
-        # Replace with your Hugging Face Hub API token
-        export HF_TOKEN="your_huggingface_token"
+    ```bash
+    # Replace with your host's external IP address (do not use localhost or 127.0.0.1)
+    export HOST_IP="your_external_ip_address"
+    # Replace with your Hugging Face Hub API token
+    export HF_TOKEN="your_huggingface_token"
 
-        # Optional: Configure proxy if needed
-        # export http_proxy="your_http_proxy"
-        # export https_proxy="your_https_proxy"
-        # export no_proxy="localhost,127.0.0.1,${HOST_IP}" # Add other hosts if necessary
-        source intel/set_env.sh
-        cd /intel/cpu/xeon
-        ```
+    # Optional: Configure proxy if needed
+    # export http_proxy="your_http_proxy"
+    # export https_proxy="your_https_proxy"
+    # export no_proxy="localhost,127.0.0.1,${HOST_IP}" # Add other hosts if necessary
+    source intel/set_env.sh
+    cd /intel/cpu/xeon
+    ```
 
-        _Note: The compose file might read additional variables from set_env.sh. Ensure all required variables like ports (`LLM_SERVICE_PORT`, `MEGA_SERVICE_PORT`, etc.) are set if not using defaults from the compose file._
+    _Note: The compose file might read additional variables from set_env.sh. Ensure all required variables like ports (`LLM_SERVICE_PORT`, `MEGA_SERVICE_PORT`, etc.) are set if not using defaults from the compose file._
 
     For instance, edit the set_env.sh to change the LLM model
 
-        ```
-        export LLM_MODEL_ID="Qwen/Qwen2.5-Coder-7B-Instruct"
-        ```
-        can be changed to other model if needed
-        ```
-        export LLM_MODEL_ID="Qwen/Qwen2.5-Coder-32B-Instruct"
-        ```
+    ```bash
+    export LLM_MODEL_ID="Qwen/Qwen2.5-Coder-7B-Instruct"
+    ```
 
-2.  **Start Services (vLLM Profile):**
+    can be changed to other model if needed
 
     ```bash
-    docker compose --profile codegen-xeon-vllm up -d
+    export LLM_MODEL_ID="Qwen/Qwen2.5-Coder-32B-Instruct"
+    ```
+
+2.  **Start Services (vLLM):**
+
+    ```bash
+    docker compose up -d
     ```
 
 3.  **Validate:**
@@ -75,23 +77,23 @@ This uses the default vLLM-based deployment profile (`codegen-xeon-vllm`).
 
 ### Available Deployment Options
 
-The `compose.yaml` file uses Docker Compose profiles to select the LLM serving backend.
+Different Docker Compose files are available to select the LLM serving backend.
 
-#### Default: vLLM-based Deployment (`--profile codegen-xeon-vllm`)
+#### Default: vLLM-based Deployment (`compose.yaml`)
 
-- **Profile:** `codegen-xeon-vllm`
-- **Description:** Uses vLLM optimized for Intel CPUs as the LLM serving engine. This is the default profile used in the Quick Start.
+- **Compose File:** `compose.yaml`
+- **Description:** Uses vLLM optimized for Intel CPUs as the LLM serving engine. This is the default deployment option used in the Quick Start.
 - **Services Deployed:** `codegen-vllm-server`, `codegen-llm-server`, `codegen-tei-embedding-server`, `codegen-retriever-server`, `redis-vector-db`, `codegen-dataprep-server`, `codegen-backend-server`, `codegen-gradio-ui-server`.
 
-#### TGI-based Deployment (`--profile codegen-xeon-tgi`)
+#### TGI-based Deployment (`compose_tgi.yaml`)
 
-- **Profile:** `codegen-xeon-tgi`
+- **Compose File:** `compose_tgi.yaml`
 - **Description:** Uses Hugging Face Text Generation Inference (TGI) optimized for Intel CPUs as the LLM serving engine.
 - **Services Deployed:** `codegen-tgi-server`, `codegen-llm-server`, `codegen-tei-embedding-server`, `codegen-retriever-server`, `redis-vector-db`, `codegen-dataprep-server`, `codegen-backend-server`, `codegen-gradio-ui-server`.
 - **To Run:**
   ```bash
   # Ensure environment variables (HOST_IP, HF_TOKEN) are set
-  docker compose --profile codegen-xeon-tgi up -d
+  docker compose -f compose_tgi.yaml up -d
   ```
 
 ### Configuration Parameters
@@ -100,18 +102,18 @@ The `compose.yaml` file uses Docker Compose profiles to select the LLM serving b
 
 Key parameters are configured via environment variables set before running `docker compose up`.
 
-| Environment Variable                    | Description                                                                                                         | Default (Set Externally)                       |
-| :-------------------------------------- | :------------------------------------------------------------------------------------------------------------------ | :--------------------------------------------- | ------------------------------------ |
-| `HOST_IP`                               | External IP address of the host machine. **Required.**                                                              | `your_external_ip_address`                     |
-| `HF_TOKEN`                              | Your Hugging Face Hub token for model access. **Required.**                                                         | `your_huggingface_token`                       |
-| `LLM_MODEL_ID`                          | Hugging Face model ID for the CodeGen LLM (used by TGI/vLLM service). Configured within `compose.yaml` environment. | `Qwen/Qwen2.5-Coder-7B-Instruct`               |
-| `EMBEDDING_MODEL_ID`                    | Hugging Face model ID for the embedding model (used by TEI service). Configured within `compose.yaml` environment.  | `BAAI/bge-base-en-v1.5`                        |
-| `LLM_ENDPOINT`                          | Internal URL for the LLM serving endpoint (used by `codegen-llm-server`). Configured in `compose.yaml`.             | `http://codegen-vllm                           | tgi-server:9000/v1/chat/completions` |
-| `TEI_EMBEDDING_ENDPOINT`                | Internal URL for the Embedding service. Configured in `compose.yaml`.                                               | `http://codegen-tei-embedding-server:80/embed` |
-| `DATAPREP_ENDPOINT`                     | Internal URL for the Data Preparation service. Configured in `compose.yaml`.                                        | `http://codegen-dataprep-server:80/dataprep`   |
-| `BACKEND_SERVICE_ENDPOINT`              | External URL for the CodeGen Gateway (MegaService). Derived from `HOST_IP` and port `7778`.                         | `http://${HOST_IP}:7778/v1/codegen`            |
-| `*_PORT` (Internal)                     | Internal container ports (e.g., `80`, `6379`). Defined in `compose.yaml`.                                           | N/A                                            |
-| `http_proxy` / `https_proxy`/`no_proxy` | Network proxy settings (if required).                                                                               | `""`                                           |
+| Environment Variable                    | Description                                                                                            | Default (Set Externally)                              |
+| :-------------------------------------- | :----------------------------------------------------------------------------------------------------- | :---------------------------------------------------- |
+| `HOST_IP`                               | External IP address of the host machine. **Required.**                                                 | `your_external_ip_address`                            |
+| `HF_TOKEN`                              | Your Hugging Face Hub token for model access. **Required.**                                            | `your_huggingface_token`                              |
+| `LLM_MODEL_ID`                          | Hugging Face model ID for the CodeGen LLM (used by TGI/vLLM service). Configured within composes files | `Qwen/Qwen2.5-Coder-7B-Instruct`                      |
+| `EMBEDDING_MODEL_ID`                    | Hugging Face model ID for the embedding model (used by TEI service). Configured within compose files.  | `BAAI/bge-base-en-v1.5`                               |
+| `LLM_ENDPOINT`                          | Internal URL for the LLM serving endpoint (used by `codegen-llm-server`). Configured in compose files. | `http://codegen-vllm-server:9000/v1/chat/completions` |
+| `TEI_EMBEDDING_ENDPOINT`                | Internal URL for the Embedding service. Configured in compose files.                                   | `http://codegen-tei-embedding-server:80/embed`        |
+| `DATAPREP_ENDPOINT`                     | Internal URL for the Data Preparation service. Configured in compose files.                            | `http://codegen-dataprep-server:80/dataprep`          |
+| `BACKEND_SERVICE_ENDPOINT`              | External URL for the CodeGen Gateway (MegaService). Derived from `HOST_IP` and port `7778`.            | `http://${HOST_IP}:7778/v1/codegen`                   |
+| `*_PORT` (Internal)                     | Internal container ports (e.g., `80`, `6379`). Defined in compose files.                               | N/A                                                   |
+| `http_proxy` / `https_proxy`/`no_proxy` | Network proxy settings (if required).                                                                  | `""`                                                  |
 
 Most of these parameters are in `set_env.sh`, you can either modify this file or overwrite the env variables by setting them.
 
@@ -119,9 +121,9 @@ Most of these parameters are in `set_env.sh`, you can either modify this file or
 source CodeGen/docker_compose/set_env.sh
 ```
 
-#### Compose Profiles
+#### Compose Files
 
-Docker Compose profiles (`codegen-xeon-vllm`, `codegen-xeon-tgi`) control which LLM serving backend (vLLM or TGI) and its associated dependencies are started. Only one profile should typically be active.
+Different Docker Compose files (`compose.yaml`, `compose_tgi.yaml`) control which LLM serving backend (vLLM or TGI) and its associated dependencies are started. Choose the appropriate compose file based on your requirements.
 
 ## Building Custom Images (Optional)
 
@@ -130,7 +132,7 @@ If you need to modify the microservices:
 1.  Clone the [OPEA GenAIComps](https://github.com/opea-project/GenAIComps) repository.
 2.  Follow build instructions in the respective component directories (e.g., `comps/llms/text-generation`, `comps/codegen`, `comps/ui/gradio`, etc.). Use the provided Dockerfiles (e.g., `CodeGen/Dockerfile`, `CodeGen/ui/docker/Dockerfile.gradio`).
 3.  Tag your custom images appropriately (e.g., `my-custom-codegen:latest`).
-4.  Update the `image:` fields in the `compose.yaml` file to use your custom image tags.
+4.  Update the `image:` fields in the compose files (`compose.yaml` or `compose_tgi.yaml`) to use your custom image tags.
 
 _Refer to the main [CodeGen README](../../../../README.md) for links to relevant GenAIComps components._
 
@@ -138,11 +140,12 @@ _Refer to the main [CodeGen README](../../../../README.md) for links to relevant
 
 ### Check Container Status
 
-Ensure all containers associated with the chosen profile are running:
+Ensure all containers associated with the chosen compose file are running:
 
 ```bash
-docker compose --profile <profile_name> ps
-# Example: docker compose --profile codegen-xeon-vllm ps
+docker compose -f <compose-file> ps
+# Example: docker compose ps  # for vLLM (compose.yaml)
+# Example: docker compose -f compose_tgi.yaml ps  # for TGI
 ```
 
 Check logs for specific services: `docker compose logs <service_name>`
@@ -173,7 +176,7 @@ Use `curl` commands to test the main service endpoints. Ensure `HOST_IP` is corr
 
 ## Accessing the User Interface (UI)
 
-Multiple UI options can be configured via the `compose.yaml`.
+Multiple UI options can be configured via the compose files.
 
 ### Gradio UI (Default)
 
@@ -186,16 +189,16 @@ _(Port `5173` is the default host mapping for `codegen-gradio-ui-server`)_
 
 ### Svelte UI (Optional)
 
-1.  Modify `compose.yaml`: Comment out the `codegen-gradio-ui-server` service and uncomment/add the `codegen-xeon-ui-server` (Svelte) service definition, ensuring the port mapping is correct (e.g., `"- 5173:5173"`).
-2.  Restart Docker Compose: `docker compose --profile <profile_name> up -d`
+1.  Modify the compose file (either `compose.yaml` or `compose_tgi.yaml`): Comment out the `codegen-gradio-ui-server` service and uncomment/add the `codegen-xeon-ui-server` (Svelte) service definition, ensuring the port mapping is correct (e.g., `"- 5173:5173"`).
+2.  Restart Docker Compose: `docker compose up -d` or `docker compose -f compose_tgi.yaml up -d`
 3.  Access: `http://{HOST_IP}:5173` (or the host port you mapped).
 
 ![Svelte UI Init](../../../../assets/img/codeGen_ui_init.jpg)
 
 ### React UI (Optional)
 
-1.  Modify `compose.yaml`: Comment out the default UI service and uncomment/add the `codegen-xeon-react-ui-server` definition, ensuring correct port mapping (e.g., `"- 5174:80"`).
-2.  Restart Docker Compose: `docker compose --profile <profile_name> up -d`
+1.  Modify the compose file (either `compose.yaml` or `compose_tgi.yaml`): Comment out the default UI service and uncomment/add the `codegen-xeon-react-ui-server` definition, ensuring correct port mapping (e.g., `"- 5174:80"`).
+2.  Restart Docker Compose: `docker compose up -d` or `docker compose -f compose_tgi.yaml up -d`
 3.  Access: `http://{HOST_IP}:5174` (or the host port you mapped).
 
 ![React UI](../../../../assets/img/codegen_react.png)
@@ -218,21 +221,18 @@ Users can interact with the backend service using the `Neural Copilot` VS Code e
 
 - **Model Download Issues:** Check `HF_TOKEN`. Ensure internet connectivity or correct proxy settings. Check logs of `tgi-service`/`vllm-service` and `tei-embedding-server`. Gated models need prior Hugging Face access.
 - **Connection Errors:** Verify `HOST_IP` is correct and accessible. Check `docker ps` for port mappings. Ensure `no_proxy` includes `HOST_IP` if using a proxy. Check logs of the service failing to connect (e.g., `codegen-backend-server` logs if it can't reach `codegen-llm-server`).
-- **"Container name is in use"**: Stop existing containers (`docker compose down`) or change `container_name` in `compose.yaml`.
+- **"Container name is in use"**: Stop existing containers (`docker compose down`) or change `container_name` in the compose file.
 - **Resource Issues:** CodeGen models can be memory-intensive. Monitor host RAM usage. Increase Docker resources if needed.
 
 ## Stopping the Application
 
 ```bash
-docker compose --profile <profile_name> down
-# Example: docker compose --profile codegen-xeon-vllm down
+docker compose down  # for vLLM (compose.yaml)
+# or
+docker compose -f compose_tgi.yaml down  # for TGI
 ```
 
 ## Next Steps
 
 - Consult the [OPEA GenAIComps](https://github.com/opea-project/GenAIComps) repository for details on individual microservices.
 - Refer to the main [CodeGen README](../../../../README.md) for links to benchmarking and Kubernetes deployment options.
-
-```
-
-```
