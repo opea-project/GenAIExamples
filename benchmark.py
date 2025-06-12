@@ -335,10 +335,10 @@ def _run_service_test(example, service, test_suite_config, namespace):
         bench_target = test_suite_config.get("bench_target")[0]
 
         # If benchmark target if docsum then add dataset to run yaml file
-        if bench_target in ['docsumbench', 'docsumfixed']:
+        if bench_target in ["docsumbench", "docsumfixed"]:
             run_yaml_data = {}
             # Open and read the YAML file
-            with open(run_yaml_path, 'r') as file:
+            with open(run_yaml_path, "r") as file:
                 try:
                     run_yaml_data = yaml.safe_load(file)
                 except yaml.YAMLError as exc:
@@ -351,9 +351,9 @@ def _run_service_test(example, service, test_suite_config, namespace):
             except KeyError as e:
                 print(f"❌ Error: {e}")
 
-            run_yaml_data['profile']['global-settings']['dataset'] = dataset
+            run_yaml_data["profile"]["global-settings"]["dataset"] = dataset
 
-            with open(run_yaml_path, 'w') as file:
+            with open(run_yaml_path, "w") as file:
                 try:
                     yaml.safe_dump(run_yaml_data, file)
                 except yaml.YAMLError as exc:
