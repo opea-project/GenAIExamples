@@ -1,98 +1,76 @@
-# Deploy on AMD GPU
+# Example DBQnA Deployment on AMD GPU (ROCm)
 
-This document outlines the deployment process for DBQnA application which helps generating a SQL query and its output given a NLP question, utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on an AMD GPU. The steps include Docker image creation, container deployment via Docker Compose, and service execution to integrate microservices. We will publish the Docker images to Docker Hub soon, which will simplify the deployment process for this service.
+This document outlines the deployment process for DBQnA application which helps generating a SQL query and its output given a NLP question, utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on an AMD GPU. This example includes the following sections:
 
-## 🚀 Build Docker Images
+- [DBQnA Quick Start Deployment](#dbqna-quick-start-deployment): Demonstrates how to quickly deploy a DBQnA service/pipeline on AMD GPU (ROCm).
+- [DBQnA Docker Compose Files](#dbqna-docker-compose-files): Describes some example deployments and their docker compose files.
 
-First of all, you need to build Docker Images locally. This step can be ignored once the Docker images are published to Docker hub.
+## DBQnA Quick Start Deployment
 
-### 1.1 Build Text to SQL service Image
+This section describes how to quickly deploy and test the DBQnA service manually on AMD GPU (ROCm). The basic steps are:
 
-```bash
-git clone https://github.com/opea-project/GenAIComps.git
-cd GenAIComps
-docker build --no-cache -t opea/texttosql:latest -f comps/text2sql/src/Dockerfile .
+1. [Access the Code](#access-the-code)
+2. [Generate a HuggingFace Access Token](#generate-a-huggingface-access-token)
+3. [Configure the Deployment Environment](#configure-the-deployment-environment)
+4. [Deploy the Service Using Docker Compose](#deploy-the-service-using-docker-compose)
+5. [Check the Deployment Status](#check-the-deployment-status)
+6. [Test the Pipeline](#test-the-pipeline)
+7. [Cleanup the Deployment](#cleanup-the-deployment)
+
+### Access the Code
+
+Clone the GenAIExample repository and access the DBQnA AMD GPU (ROCm) Docker Compose files and supporting scripts:
+
+```
+git clone https://github.com/opea-project/GenAIExamples.git
+cd GenAIExamples/DBQnA/docker_compose/
 ```
 
-### 1.2 Build react UI Docker Image
+Checkout a released version, such as v1.3:
 
-Build the frontend Docker image based on react framework via below command:
-
-```bash
-cd GenAIExamples/DBQnA/ui
-docker build --no-cache -t opea/dbqna-react-ui:latest --build-arg texttosql_url=$textToSql_host:$textToSql_port/v1 -f docker/Dockerfile.react .
+```
+git checkout v1.3
 ```
 
-Attention! Replace $textToSql_host and $textToSql_port with your own value.
+### Generate a HuggingFace Access Token
 
-Then run the command `docker images`, you will have the following Docker Images:
+Some HuggingFace resources, such as some models, are only accessible if you have an access token. If you do not already have a HuggingFace access token, you can create one by first creating an account by following the steps provided at [HuggingFace](https://huggingface.co/) and then generating a [user access token](https://huggingface.co/docs/transformers.js/en/guides/private#step-1-generating-a-user-access-token).
+Docker image creation, container deployment via Docker Compose, and service execution to integrate microservices. We will publish the Docker images to Docker Hub soon, which will simplify the deployment process for this service.
 
-1. `opea/texttosql:latest`
-2. `opea/dbqna-react-ui:latest`
+### Configure the Deployment Environment
 
-## 🚀 Start Microservices
+To set up environment variables for deploying DBQnA service, source the _set_env.sh_ script in this directory:
 
-### Required Models
-
-We set default model as "mistralai/Mistral-7B-Instruct-v0.3", change "LLM_MODEL_ID" in following Environment Variables setting if you want to use other models.
-
-If use gated models, you also need to provide [huggingface token](https://huggingface.co/docs/hub/security-tokens) to "HUGGINGFACEHUB_API_TOKEN" environment variable.
-
-### 2.1 Setup Environment Variables
-
-Since the `compose.yaml` will consume some environment variables, you need to setup them in advance as below.
-
-```bash
-export host_ip="host_ip_address_or_dns_name"
-export DBQNA_HUGGINGFACEHUB_API_TOKEN=""
-export DBQNA_TGI_SERVICE_PORT=8008
-export DBQNA_TGI_LLM_ENDPOINT="http://${host_ip}:${DBQNA_TGI_SERVICE_PORT}"
-export DBQNA_LLM_MODEL_ID="mistralai/Mistral-7B-Instruct-v0.3"
-export MODEL_ID="mistralai/Mistral-7B-Instruct-v0.3"
-export POSTGRES_USER="postgres"
-export POSTGRES_PASSWORD="testpwd"
-export POSTGRES_DB="chinook"
-export DBQNA_TEXT_TO_SQL_PORT=18142
-export DBQNA_UI_PORT=18143
+```
+source amd/gpu/rocm/set_env.sh
 ```
 
-Note: Please replace with `host_ip_address_or_dns_name` with your external IP address or DNS name, do not use localhost.
+The _set_env.sh_ script will prompt for required and optional environment variables used to configure the DBQnA service based on TGI. If a value is not entered, the script will use a default value for the same. It will also generate a _.env_ file defining the desired configuration.
 
-### 2.2 Start Microservice Docker Containers
+### Deploy the Service Using Docker Compose
 
-There are 2 options to start the microservice
-
-#### 2.2.1 Start the microservice using docker compose
+To deploy the DBQnA service, execute the `docker compose up` command with the appropriate arguments. For a default deployment, execute:
 
 ```bash
-cd GenAIExamples/DBQnA/docker_compose/amd/gpu/rocm
-docker compose up -d
+cd amd/gpu/rocm/
+docker compose -f compose.yaml up -d
 ```
 
-## 🚀 Validate Microservices
+The DBQnA docker images should automatically be downloaded from the `OPEA registry` and deployed on the AMD GPU (ROCm)
 
-### 3.1 TGI Service
+### Check the Deployment Status
 
-```bash
-curl http://${host_ip}:$DBQNA_TGI_SERVICE_PORT/generate \
-    -X POST \
-    -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}' \
-    -H 'Content-Type: application/json'
+After running docker compose, check if all the containers launched via docker compose have started:
+
+```
+docker ps -a
 ```
 
-### 3.2 Postgres Microservice
+For the default deployment, the following 4 containers should be running.
 
-Once Text-to-SQL microservice is started, user can use below command
+### Test the Pipeline
 
-#### 3.2.1 Test the Database connection
-
-```bash
-curl --location http://${host_ip}:${DBQNA_TEXT_TO_SQL_PORT}/v1/postgres/health \
-    --header 'Content-Type: application/json' \
-    --data '{"user": "'${POSTGRES_USER}'","password": "'${POSTGRES_PASSWORD}'","host": "'${host_ip}'", "port": "5442", "database": "'${POSTGRES_DB}'"}'
-```
-
-#### 3.2.2 Invoke the microservice.
+Once the DBQnA service are running, test the pipeline using the following command:
 
 ```bash
 curl http://${host_ip}:${DBQNA_TEXT_TO_SQL_PORT}/v1/texttosql \
@@ -101,26 +79,34 @@ curl http://${host_ip}:${DBQNA_TEXT_TO_SQL_PORT}/v1/texttosql \
     -H 'Content-Type: application/json'
 ```
 
-### 3.3 Frontend validation
+### Cleanup the Deployment
 
-We test the API in frontend validation to check if API returns HTTP_STATUS: 200 and validates if API response returns SQL query and output
+To stop the containers associated with the deployment, execute the following command:
 
-The test is present in App.test.tsx under react root folder ui/react/
-
-Command to run the test
-
-```bash
-npm run test
+```
+docker compose -f compose.yaml down
 ```
 
-## 🚀 Launch the React UI
+All the DBQnA containers will be stopped and then removed on completion of the "down" command.
 
-Open this URL `http://${host_ip}:${DBQNA_UI_PORT}` in your browser to access the frontend.
+## DBQnA Docker Compose Files
 
-![project-screenshot](../../../../assets/img/dbQnA_ui_init.png)
+The compose.yaml is default compose file using tgi as serving framework
 
-Test DB Connection
-![project-screenshot](../../../../assets/img/dbQnA_ui_successful_db_connection.png)
+| Service Name      | Image Name                                               |
+| ----------------- | -------------------------------------------------------- |
+| dbqna-tgi-service | ghcr.io/huggingface/text-generation-inference:2.4.1-rocm |
+| postgres          | postgres:latest                                          |
+| text2sql          | opea/text2sql:latest                                     |
+| text2sql-react-ui | opea/text2sql-react-ui:latest                            |
 
-Create SQL query and output for given NLP question
-![project-screenshot](../../../../assets/img/dbQnA_ui_succesful_sql_output_generation.png)
+## DBQnA Service Configuration for AMD GPUs
+
+The table provides a comprehensive overview of the DBQnA service utilized across various deployments as illustrated in the example Docker Compose files. Each row in the table represents a distinct service, detailing its possible images used to enable it and a concise description of its function within the deployment architecture.
+
+| Service Name      | Possible Image Names                                     | Optional | Description                                                                                         |
+| ----------------- | -------------------------------------------------------- | -------- | --------------------------------------------------------------------------------------------------- |
+| dbqna-tgi-service | ghcr.io/huggingface/text-generation-inference:2.4.1-rocm | No       | Specific to the TGI deployment, focuses on text generation inference using AMD GPU (ROCm) hardware. |
+| postgres          | postgres:latest                                          | No       | Provides the relational database backend for storing and querying data used by the DBQnA pipeline.  |
+| text2sql          | opea/text2sql:latest                                     | No       | Handles text-to-SQL conversion tasks.                                                               |
+| text2sql-react-ui | opea/text2sql-react-ui:latest                            | No       | Provides the user interface for the DBQnA service.                                                  |
