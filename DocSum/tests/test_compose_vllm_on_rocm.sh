@@ -9,8 +9,7 @@ echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
 echo "TAG=IMAGE_TAG=${IMAGE_TAG}"
 export REGISTRY=${IMAGE_REPO}
 export TAG=${IMAGE_TAG}
-export MODEL_CACHE="./data"
-
+export MODEL_CACHE=${model_cache:-"./data"}
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
@@ -23,6 +22,7 @@ function build_docker_images() {
     cd $WORKPATH/docker_image_build
     git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
     pushd GenAIComps
+    echo "GenAIComps test commit is $(git rev-parse HEAD)"
     docker build --no-cache -t ${REGISTRY}/comps-base:${TAG} --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
     popd && sleep 1s
 
@@ -30,7 +30,6 @@ function build_docker_images() {
     service_list="docsum docsum-gradio-ui whisper llm-docsum vllm-rocm"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
-    docker pull ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
     docker images && sleep 3s
 }
 
@@ -205,39 +204,37 @@ function stop_docker() {
 }
 
 function main() {
-    echo "==========================================="
-    echo ">>>> Stopping any running Docker containers..."
+
+    echo "::group:: Stop Docker containers..."
     stop_docker
+    echo "::endgroup::"
 
-    echo "==========================================="
-    if [[ "$IMAGE_REPO" == "opea" ]]; then
-        echo ">>>> Building Docker images..."
-        build_docker_images
-    fi
+    echo "::group::build_docker_images"
+    if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
+    echo "::endgroup::"
 
-    echo "==========================================="
-    echo ">>>> Starting Docker services..."
+    echo "::group::start_services"
     start_services
+    echo "::endgroup::"
 
-    echo "==========================================="
-    echo ">>>> Validating microservices..."
+    echo "::group:: Validating microservices"
     validate_microservices
+    echo "::endgroup::"
 
-    echo "==========================================="
-    echo ">>>> Validating megaservice..."
+    echo "::group:: Validating Mega Service"
     validate_megaservice
-    echo ">>>> Validating validate_megaservice_json..."
+    echo "::endgroup::"
+
+    echo "::group:: Validating Mega Service with JSON input"
     validate_megaservice_json
+    echo "::endgroup::"
 
-    echo "==========================================="
-    echo ">>>> Stopping Docker containers..."
+    echo "::group::Stopping Docker containers..."
     stop_docker
+    echo "::endgroup::"
 
-    echo "==========================================="
-    echo ">>>> Pruning Docker system..."
-    echo y | docker system prune
-    echo ">>>> Docker system pruned successfully."
-    echo "==========================================="
+    docker system prune -f
+
 }
 
 main

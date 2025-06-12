@@ -19,19 +19,19 @@ source $WORKPATH/docker_compose/amd/gpu/rocm/set_env.sh
 
 function build_docker_images() {
     opea_branch=${opea_branch:-"main"}
+
     cd $WORKPATH/docker_image_build
     git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
-
     pushd GenAIComps
+    echo "GenAIComps test commit is $(git rev-parse HEAD)"
     docker build --no-cache -t ${REGISTRY}/comps-base:${TAG} --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
     popd && sleep 1s
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
     service_list="docsum docsum-gradio-ui whisper llm-docsum"
-    docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
+    docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log 2>&1
 
-    docker pull ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
-    docker images && sleep 3s
+    docker images && sleep 1s
 }
 
 function start_services() {
@@ -41,7 +41,7 @@ function start_services() {
     docker compose up -d > "${LOG_PATH}"/start_services_with_compose.log
     n=0
     until [[ "$n" -ge 500 ]]; do
-        docker logs docsum-tgi-service >& "${LOG_PATH}"/docsum-tgi-service_start.log
+        docker logs docsum-tgi-service > "${LOG_PATH}"/docsum-tgi-service_start.log 2>&1
         if grep -q "Connected" "${LOG_PATH}"/docsum-tgi-service_start.log; then
             break
         fi
@@ -205,39 +205,37 @@ function stop_docker() {
 }
 
 function main() {
-    echo "==========================================="
-    echo ">>>> Stopping any running Docker containers..."
+
+    echo "::group::Stopping Docker containers..."
     stop_docker
+    echo "::endgroup::"
 
-    echo "==========================================="
-    if [[ "$IMAGE_REPO" == "opea" ]]; then
-        echo ">>>> Building Docker images..."
-        build_docker_images
-    fi
+    echo "::group::build_docker_images"
+    if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
+    echo "::endgroup::"
 
-    echo "==========================================="
-    echo ">>>> Starting Docker services..."
+
+    echo "::group::start_services"
     start_services
+    echo "::endgroup::"
 
-    echo "==========================================="
-    echo ">>>> Validating microservices..."
+    echo "::group:: Validating microservices"
     validate_microservices
+    echo "::endgroup::"
 
-    echo "==========================================="
-    echo ">>>> Validating megaservice..."
+    echo "::group::validate_megaservice"
     validate_megaservice
-    echo ">>>> Validating validate_megaservice_json..."
+    echo "::endgroup::"
+
+    echo "::group::validate_megaservice_json"
     validate_megaservice_json
+    echo "::endgroup::"
 
-    echo "==========================================="
-    echo ">>>> Stopping Docker containers..."
+    echo "::group::stop_docker"
     stop_docker
+    echo "::endgroup::"
 
-    echo "==========================================="
-    echo ">>>> Pruning Docker system..."
-    echo y | docker system prune
-    echo ">>>> Docker system pruned successfully."
-    echo "==========================================="
+    docker system prune -f
 }
 
 main
