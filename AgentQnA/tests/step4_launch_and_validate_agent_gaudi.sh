@@ -11,8 +11,7 @@ export ip_address=$(hostname -I | awk '{print $1}')
 export host_ip=$ip_address
 echo "ip_address=${ip_address}"
 export TOOLSET_PATH=$WORKPATH/tools/
-export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
-HF_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+export HF_TOKEN=${HF_TOKEN}
 model="meta-llama/Llama-3.3-70B-Instruct" #"meta-llama/Meta-Llama-3.1-70B-Instruct"
 
 export HF_CACHE_DIR=${model_cache:-"/data2/huggingface"}

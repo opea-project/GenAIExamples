@@ -8,11 +8,11 @@
     autocomplete="off"
     class="form-wrap"
   >
-    <a-form-item label="Indexer Type" name="indexer_type">
+    <a-form-item :label="$t('pipeline.config.indexerType')" name="indexer_type">
       <a-select
         showSearch
         v-model:value="form.indexer_type"
-        placeholder="please select Indexer Type"
+        :placeholder="$t('pipeline.valid.indexerType')"
       >
         <a-select-option
           v-for="item in indexerList"
@@ -21,23 +21,21 @@
           >{{ item.name }}</a-select-option
         >
       </a-select>
-      <FormTooltip
-        title="The type of index structure responsible for building based on the parsed nodes"
-      />
+      <FormTooltip :title="$t('pipeline.desc.indexerType')" />
     </a-form-item>
     <div class="option-introduction">
       <InfoCircleOutlined />
-      {{ optionIntroduction }}
+      {{ $t(optionIntroduction!) }}
     </div>
     <a-form-item
-      label="Embedding Model"
+      :label="$t('pipeline.config.embedding')"
       :name="['embedding_model', 'model_id']"
       :rules="rules.model_id"
     >
       <a-select
         showSearch
         v-model:value="form.embedding_model.model_id"
-        placeholder="please select Embedding Model"
+        :placeholder="$t('pipeline.valid.embedding')"
         @change="handleModelChange"
         @dropdownVisibleChange="handleModelVisible"
       >
@@ -45,26 +43,24 @@
           item
         }}</a-select-option>
       </a-select>
-      <FormTooltip
-        title="Embed the text data to represent it and build a vector index"
-      />
+      <FormTooltip :title="$t('pipeline.desc.embedding')" />
     </a-form-item>
     <a-form-item
-      label="Embedding run device"
+      :label="$t('pipeline.config.embeddingDevice')"
       :name="['embedding_model', 'device']"
       :rules="rules.device"
     >
       <a-select
         showSearch
         v-model:value="form.embedding_model.device"
-        placeholder="please select Embedding run device"
+        :placeholder="$t('pipeline.valid.embeddingDevice')"
         @dropdownVisibleChange="handleDeviceVisible"
       >
         <a-select-option v-for="item in deviceList" :key="item" :value="item">{{
           item
         }}</a-select-option>
       </a-select>
-      <FormTooltip title="The device used by the Embedding Model" />
+      <FormTooltip :title="$t('pipeline.desc.embeddingDevice')" />
     </a-form-item>
   </a-form>
 </template>
@@ -76,7 +72,9 @@ import { reactive, ref } from "vue";
 import { Indexer } from "../../enum.ts";
 import { ModelType } from "../../type.ts";
 import { InfoCircleOutlined } from "@ant-design/icons-vue";
+import { useI18n } from "vue-i18n";
 
+const { t } = useI18n();
 const props = defineProps({
   formData: {
     type: Object,
@@ -106,21 +104,21 @@ const rules = reactive({
   indexer_type: [
     {
       required: true,
-      message: "please select Indexer Type",
+      message: t("pipeline.valid.indexerType"),
       trigger: "change",
     },
   ],
   model_id: [
     {
       required: true,
-      message: "Please select Embedding Model",
+      message: t("pipeline.valid.embedding"),
       trigger: "change",
     },
   ],
   device: [
     {
       required: true,
-      message: "Please select device",
+      message: t("pipeline.valid.embeddingDevice"),
       trigger: "change",
     },
   ],
@@ -159,7 +157,6 @@ const handleModelVisible = async (visible: boolean) => {
 };
 //Complete model_cath
 const handleModelChange = (value: string) => {
-  // form.embedding_model.model_path = `/home/edgeai/media/models/${value}`;
   form.embedding_model.model_path = `./models/${value}`;
 };
 // Validate the form, throw results form
