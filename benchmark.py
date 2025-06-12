@@ -351,8 +351,6 @@ def _run_service_test(example, service, test_suite_config, namespace):
             except KeyError as e:
                 print(f"❌ Error: {e}")
 
-            run_yaml_data["profile"]["global-settings"]["dataset"] = dataset
-
             with open(run_yaml_path, "w") as file:
                 try:
                     yaml.safe_dump(run_yaml_data, file)
