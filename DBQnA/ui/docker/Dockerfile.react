@@ -29,7 +29,6 @@ EXPOSE 80
 
 COPY --from=vite-app /usr/app/react/dist /usr/share/nginx/html
 COPY --from=vite-app /usr/app/react/nginx.conf /etc/nginx/conf.d/default.conf
-COPY ./react/env.sh /docker-entrypoint.d/env.sh
-RUN chmod +x /docker-entrypoint.d/env.sh
+COPY --chmod=0755 ./react/env.sh /docker-entrypoint.d/env.sh
 
 ENTRYPOINT ["/docker-entrypoint.d/env.sh"]
