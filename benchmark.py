@@ -332,6 +332,34 @@ def _run_service_test(example, service, test_suite_config, namespace):
         else:
             print(f"[OPEA BENCHMARK] 🚀 Dataset is not specified for {service_name}. Check the benchmark.yaml again.")
 
+        bench_target = test_suite_config.get("bench_target")[0]
+
+        # If benchmark target if docsum then add dataset to run yaml file
+        if bench_target in ['docsumbench', 'docsumfixed']:
+            run_yaml_data = {}
+            # Open and read the YAML file
+            with open(run_yaml_path, 'r') as file:
+                try:
+                    run_yaml_data = yaml.safe_load(file)
+                except yaml.YAMLError as exc:
+                    print(f"Error reading YAML file: {exc}")
+                    exit(1)
+
+            # Modify the dataset values
+            try:
+                run_yaml_data["profile"]["global-settings"]["dataset"] = dataset
+            except KeyError as e:
+                print(f"❌ Error: {e}")
+
+            run_yaml_data['profile']['global-settings']['dataset'] = dataset
+
+            with open(run_yaml_path, 'w') as file:
+                try:
+                    yaml.safe_dump(run_yaml_data, file)
+                except yaml.YAMLError as exc:
+                    print(f"Error writing YAML file: {exc}")
+                    exit(1)
+
         # Run the benchmark test and append the output folder to the list
         print("[OPEA BENCHMARK] 🚀 Start locust_runtests at", datetime.now().strftime("%Y%m%d_%H%M%S"))
         locust_output = locust_runtests(None, run_yaml_path)
