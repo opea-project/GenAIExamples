@@ -151,6 +151,6 @@ flowchart LR
 
 The table below lists the available deployment options and their implementation details for different hardware platforms.
 
-| Platform     | Deployment Method | Link                                                              |
-| ------------ | ----------------- | ----------------------------------------------------------------- |
-| Intel Xeon   | Docker compose    | [Deployment on Xeon](./docker_compose/intel/cpu/xeon/README.md)   |
+| Platform   | Deployment Method | Link                                                            |
+| ---------- | ----------------- | --------------------------------------------------------------- |
+| Intel Xeon | Docker compose    | [Deployment on Xeon](./docker_compose/intel/cpu/xeon/README.md) |

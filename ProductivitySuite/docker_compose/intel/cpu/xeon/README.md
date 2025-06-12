@@ -16,8 +16,8 @@ This section describes how to quickly deploy and test the Productivity Suite ser
 4. [Deploy the Service Using Docker Compose](#deploy-the-service-using-docker-compose)
 5. [Check the Deployment Status](#check-the-deployment-status)
 6. [Setup Keycloak](#setup-keycloak)
-6. [Test the Pipeline](#test-the-pipeline)
-7. [Cleanup the Deployment](#cleanup-the-deployment)
+7. [Test the Pipeline](#test-the-pipeline)
+8. [Cleanup the Deployment](#cleanup-the-deployment)
 
 ### Access the Code
 
@@ -47,7 +47,6 @@ source set_env.sh
 ```
 
 The set_env.sh script will prompt for required and optional environment variables used to configure the Productivity Suite service. If a value is not entered, the script will use a default value for the same. It will also generate a env file defining the desired configuration. Consult the section on [Productivity Suite Service configuration](#productivity-suite-service-configuration) for information on how service specific configuration parameters affect deployments.
-
 
 ### Deploy the Service Using Docker Compose
 
@@ -147,7 +146,6 @@ curl http://${host_ip}:7778/v1/codegen -H "Content-Type: application/json" -d '{
       }'
 ```
 
-
 ### Cleanup the Deployment
 
 To stop the containers associated with the deployment, execute the following command:
@@ -185,48 +183,48 @@ All the Productivity Suite containers will be stopped and then removed on comple
 
 The compose.yaml is default compose file using tgi as serving framework
 
-| Service Name                              | Image Name                                                      |
-| ----------------------------------------- | --------------------------------------------------------------- |
-| chathistory-mongo-server                  | opea/chathistory-mongo:latest                                   |
-| chatqna-xeon-backend-server               | opea/chatqna:latest                                             |
-| codegen-xeon-backend-server               | opea/codegen:latest                                             |
-| dataprep-redis-server                     | opea/dataprep:latest                                            |
-| docsum-xeon-backend-server                | opea/docsum:latest                                              |
-| docsum-xeon-llm-server                    | opea/llm-docsum:latest                                          |
-| keycloak-server                           | quay.io/keycloak/keycloak:25.0.2                                |
-| llm-textgen-server-codegen                | opea/llm-textgen:latest                                         |
-| mongodb                                   | mongo:7.0.11                                                    |
-| productivity-suite-xeon-react-ui-server   | opea/productivity-suite-react-ui-server:latest                  |
-| promptregistry-mongo-server               | opea/promptregistry-mongo:latest                                |
-| redis-vector-db                           | redis/redis-stack:7.2.0-v9                                      |
-| retriever-redis-server                    | opea/retriever:latest                                           |
-| tei-embedding-server                      | ghcr.io/huggingface/text-embeddings-inference:cpu-1.6           |
-| tei-reranking-server                      | ghcr.io/huggingface/text-embeddings-inference:cpu-1.6           |
-| tgi_service_codegen                       | ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu   |
-| tgi-service                               | ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu   |
-| whisper-server                            | opea/whisper:latest                                             |
+| Service Name                            | Image Name                                                    |
+| --------------------------------------- | ------------------------------------------------------------- |
+| chathistory-mongo-server                | opea/chathistory-mongo:latest                                 |
+| chatqna-xeon-backend-server             | opea/chatqna:latest                                           |
+| codegen-xeon-backend-server             | opea/codegen:latest                                           |
+| dataprep-redis-server                   | opea/dataprep:latest                                          |
+| docsum-xeon-backend-server              | opea/docsum:latest                                            |
+| docsum-xeon-llm-server                  | opea/llm-docsum:latest                                        |
+| keycloak-server                         | quay.io/keycloak/keycloak:25.0.2                              |
+| llm-textgen-server-codegen              | opea/llm-textgen:latest                                       |
+| mongodb                                 | mongo:7.0.11                                                  |
+| productivity-suite-xeon-react-ui-server | opea/productivity-suite-react-ui-server:latest                |
+| promptregistry-mongo-server             | opea/promptregistry-mongo:latest                              |
+| redis-vector-db                         | redis/redis-stack:7.2.0-v9                                    |
+| retriever-redis-server                  | opea/retriever:latest                                         |
+| tei-embedding-server                    | ghcr.io/huggingface/text-embeddings-inference:cpu-1.6         |
+| tei-reranking-server                    | ghcr.io/huggingface/text-embeddings-inference:cpu-1.6         |
+| tgi_service_codegen                     | ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu |
+| tgi-service                             | ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu |
+| whisper-server                          | opea/whisper:latest                                           |
 
 ## Productivity Suite Service Configuration
 
 The table provides a comprehensive overview of the Productivity Suite service utilized across various deployments as illustrated in the example Docker Compose files. Each row in the table represents a distinct service, detailing its possible images used to enable it and a concise description of its function within the deployment architecture.
 
-| Service Name                              | Possible Image Names                                            | Optional | Description                                                                                     |
-| ----------------------------------------- | --------------------------------------------------------------- | -------- | ----------------------------------------------------------------------------------------------- |
-| chathistory-mongo-server                  | opea/chathistory-mongo:latest                                   | No       | Handles chat history storage and retrieval using MongoDB.  |
-| chatqna-xeon-backend-server               | opea/chatqna:latest                                             | No       | Handles question answering and chat interactions.     |
-| codegen-xeon-backend-server               | opea/codegen:latest                                             | No       | Handles code generation tasks.                             |
-| dataprep-redis-server                     | opea/dataprep:latest                                            | No       | Handles data preparation and preprocessing tasks for downstream services. |
-| docsum-xeon-backend-server                | opea/docsum:latest                                              | No       | Handles document summarization tasks. |
-| docsum-xeon-llm-server                    | opea/llm-docsum:latest                                          | No       | Handles large language model (LLM) based document summarization. |
-| keycloak-server                           | quay.io/keycloak/keycloak:25.0.2                                | No       | Handles authentication and authorization using Keycloak. |
-| llm-textgen-server-codegen                | opea/llm-textgen:latest                                         | No       | Handles large language model (LLM) text generation tasks, providing inference APIs for code and text completion. |
-| mongodb                                   | mongo:7.0.11                                                    | No       | Provides persistent storage for application data using MongoDB.                                                  |
-| productivity-suite-xeon-react-ui-server   | opea/productivity-suite-react-ui-server:latest                  | No       | Hosts the web-based user interface for interacting with the Productivity Suite services.                         |
-| promptregistry-mongo-server               | opea/promptregistry-mongo:latest                                | No       | Manages storage and retrieval of prompt templates and related metadata.                                          |
-| redis-vector-db                           | redis/redis-stack:7.2.0-v9                                      | No       | Offers in-memory data storage and vector database capabilities for fast retrieval and caching.                   |
-| retriever-redis-server                    | opea/retriever:latest                                           | No       | Handles retrieval-augmented generation tasks, enabling efficient document and context retrieval.                 |
-| tei-embedding-server                      | ghcr.io/huggingface/text-embeddings-inference:cpu-1.6           | No       | Provides text embedding and sequence classification services for downstream NLP tasks.                           |
-| tei-reranking-server                      | ghcr.io/huggingface/text-embeddings-inference:cpu-1.6           | No       | Performs reranking of retrieved documents or results using embedding-based similarity.                           |
-| tgi_service_codegen                       | ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu   | No       | Serves code generation models for inference, optimized for Intel Xeon CPUs.                                      |
-| tgi-service                               | ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu   | No       | Specific to the TGI deployment, focuses on text generation inference using Xeon hardware.                       |
-| whisper-server                            | opea/whisper:latest                                             | No       | Provides speech-to-text transcription services using Whisper models.                                             |
+| Service Name                            | Possible Image Names                                          | Optional | Description                                                                                                      |
+| --------------------------------------- | ------------------------------------------------------------- | -------- | ---------------------------------------------------------------------------------------------------------------- |
+| chathistory-mongo-server                | opea/chathistory-mongo:latest                                 | No       | Handles chat history storage and retrieval using MongoDB.                                                        |
+| chatqna-xeon-backend-server             | opea/chatqna:latest                                           | No       | Handles question answering and chat interactions.                                                                |
+| codegen-xeon-backend-server             | opea/codegen:latest                                           | No       | Handles code generation tasks.                                                                                   |
+| dataprep-redis-server                   | opea/dataprep:latest                                          | No       | Handles data preparation and preprocessing tasks for downstream services.                                        |
+| docsum-xeon-backend-server              | opea/docsum:latest                                            | No       | Handles document summarization tasks.                                                                            |
+| docsum-xeon-llm-server                  | opea/llm-docsum:latest                                        | No       | Handles large language model (LLM) based document summarization.                                                 |
+| keycloak-server                         | quay.io/keycloak/keycloak:25.0.2                              | No       | Handles authentication and authorization using Keycloak.                                                         |
+| llm-textgen-server-codegen              | opea/llm-textgen:latest                                       | No       | Handles large language model (LLM) text generation tasks, providing inference APIs for code and text completion. |
+| mongodb                                 | mongo:7.0.11                                                  | No       | Provides persistent storage for application data using MongoDB.                                                  |
+| productivity-suite-xeon-react-ui-server | opea/productivity-suite-react-ui-server:latest                | No       | Hosts the web-based user interface for interacting with the Productivity Suite services.                         |
+| promptregistry-mongo-server             | opea/promptregistry-mongo:latest                              | No       | Manages storage and retrieval of prompt templates and related metadata.                                          |
+| redis-vector-db                         | redis/redis-stack:7.2.0-v9                                    | No       | Offers in-memory data storage and vector database capabilities for fast retrieval and caching.                   |
+| retriever-redis-server                  | opea/retriever:latest                                         | No       | Handles retrieval-augmented generation tasks, enabling efficient document and context retrieval.                 |
+| tei-embedding-server                    | ghcr.io/huggingface/text-embeddings-inference:cpu-1.6         | No       | Provides text embedding and sequence classification services for downstream NLP tasks.                           |
+| tei-reranking-server                    | ghcr.io/huggingface/text-embeddings-inference:cpu-1.6         | No       | Performs reranking of retrieved documents or results using embedding-based similarity.                           |
+| tgi_service_codegen                     | ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu | No       | Serves code generation models for inference, optimized for Intel Xeon CPUs.                                      |
+| tgi-service                             | ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu | No       | Specific to the TGI deployment, focuses on text generation inference using Xeon hardware.                        |
+| whisper-server                          | opea/whisper:latest                                           | No       | Provides speech-to-text transcription services using Whisper models.                                             |
