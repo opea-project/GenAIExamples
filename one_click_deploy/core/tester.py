@@ -2,14 +2,15 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import json
-import time
-
 import os
+import time
 from abc import ABC
+
 import requests
 
 from .config import EXAMPLE_CONFIGS
 from .utils import get_host_ip, log_message, run_command, start_kubectl_port_forward, stop_all_kubectl_port_forwards
+
 
 class BaseConnectionTester(ABC):
     """Handles testing connections to the deployed services."""
@@ -70,30 +71,32 @@ class BaseConnectionTester(ABC):
 
             return f"http://localhost:{local_port}", local_port
         return None, None
-    
+
     def _gen_payload(self, test_case_config):
         """Generates the payload for the request based on the test case configuration.
-        
+
         This method can be overridden by subclasses to generate dynamic payloads
-        based on the test case configuration. For example, adding timestamps, 
+        based on the test case configuration. For example, adding timestamps,
         generating random data, or substituting variables from the environment.
-        
+
         Args:
             test_case_config: Dictionary containing the test case configuration
-            
+
         Returns:
             Dictionary containing the payload for the request
-            
+
         Raises:
             ValueError: If payload is not specified or is empty
         """
         if "payload" not in test_case_config:
             raise ValueError(f"Payload is required. Please check config.py for '{self.example_name}' example.")
-            
+
         payload = test_case_config["payload"]
         if payload is None or not payload:
-            raise ValueError(f"Payload cannot be None or empty. Please check config.py for '{self.example_name}' example.")
-            
+            raise ValueError(
+                f"Payload cannot be None or empty. Please check config.py for '{self.example_name}' example."
+            )
+
         # Return the payload as is (subclasses can override for dynamic payloads)
         return payload
 
@@ -204,53 +207,55 @@ class BaseConnectionTester(ABC):
         )
 
         return main_service_passed
-    
+
+
 class AudioQnAConnectionTester(BaseConnectionTester):
     """Specialized ConnectionTester for AudioQnA example."""
 
     def _gen_payload(self, test_case_config):
         """Generates a dynamic payload for AudioQnA test cases.
-        
+
         It handles the base64 encoding of audio files if an audio URL is provided.
-        
+
         Args:
             test_case_config: Dictionary containing the test case configuration
-            
+
         Returns:
             Dictionary containing the payload for the request
-        """    
+        """
         import base64
         from urllib.parse import urlparse
 
         payload = super()._gen_payload(test_case_config)
-        
+
         # Read audio from URL + base64 encoding if present
         if "audio" in payload and payload["audio"]:
             audio_value = payload["audio"]
-            
+
             # Check if the value is a valid URL
             parsed_url = urlparse(audio_value)
-            is_url = all([parsed_url.scheme in ('http', 'https'), parsed_url.netloc])
-            
+            is_url = all([parsed_url.scheme in ("http", "https"), parsed_url.netloc])
+
             if is_url:
                 log_message("INFO", f"Converting audio from URL: {audio_value}")
 
                 # Download the audio file content
                 audio_response = requests.get(audio_value, stream=True)
                 audio_response.raise_for_status()  # Ensure successful download
-                
+
                 # Base64 encoding
                 audio_content = audio_response.content
-                audio_base64 = base64.b64encode(audio_content).decode('utf-8')
-                
+                audio_base64 = base64.b64encode(audio_content).decode("utf-8")
+
                 # Replace the URL with the encoded audio
                 payload["audio"] = audio_base64
                 log_message("INFO", "Successfully completed base64 encoding.")
 
             else:
                 raise ValueError("Audio is not a URL. Please check config.py for 'AudioQnA' example.")
-        
+
         return payload
+
 
 class ConnectionTesterFactory:
     """Factory class to create ConnectionTester instances based on example name."""
@@ -258,13 +263,13 @@ class ConnectionTesterFactory:
     @staticmethod
     def create_tester(example_name, deploy_mode, device, args_namespace):
         """Creates a ConnectionTester instance based on the example name.
-        
+
         Args:
             example_name: Name of the example to create tester for
             deploy_mode: Deployment mode (docker, k8s)
             device: Target device
             args_namespace: Command line arguments
-            
+
         Returns:
             An appropriate ConnectionTester instance for the example
         """

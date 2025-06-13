@@ -332,7 +332,10 @@ EXAMPLE_CONFIGS = {
                 "xeon": "docker_compose/intel/cpu/xeon/compose.yaml",
                 "gaudi": "docker_compose/intel/hpu/gaudi/compose.yaml",
             },
-            "set_env_scripts": {"xeon": "docker_compose/intel/cpu/xeon/set_env.sh", "gaudi": "docker_compose/intel/hpu/gaudi/set_env.sh"},
+            "set_env_scripts": {
+                "xeon": "docker_compose/intel/cpu/xeon/set_env.sh",
+                "gaudi": "docker_compose/intel/hpu/gaudi/set_env.sh",
+            },
             "params_to_set_env": {"llm_model": "LLM_MODEL_ID", "hf_token": "HUGGINGFACEHUB_API_TOKEN"},
         },
         "kubernetes": {
@@ -359,9 +362,9 @@ EXAMPLE_CONFIGS = {
                 "path": "/v1/audioqna",
                 "method": "POST",
                 "payload": {
-                    "audio": "https://github.com/intel/intel-extension-for-transformers/raw/refs/heads/main/intel_extension_for_transformers/neural_chat/assets/audio/sample_2.wav", 
-                    "max_tokens": 64, 
-                    "voice": "default"
+                    "audio": "https://github.com/intel/intel-extension-for-transformers/raw/refs/heads/main/intel_extension_for_transformers/neural_chat/assets/audio/sample_2.wav",
+                    "max_tokens": 64,
+                    "voice": "default",
                 },
                 "headers": {"Content-Type": "application/json"},
                 "expect_code": 200,
