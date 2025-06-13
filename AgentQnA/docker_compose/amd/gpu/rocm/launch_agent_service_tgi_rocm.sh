@@ -66,9 +66,9 @@ echo ${SUPERVISOR_REACT_AGENT_PORT} > ${WORKPATH}/SUPERVISOR_REACT_AGENT_PORT_tm
 echo ${CRAG_SERVER_PORT} > ${WORKPATH}/CRAG_SERVER_PORT_tmp
 
 echo "Downloading chinook data..."
-echo Y | rm -R chinook-database
+rm -R chinook-database
 git clone https://github.com/lerocha/chinook-database.git
-echo Y | rm -R ../../../../../AgentQnA/tests/Chinook_Sqlite.sqlite
+rm -R ../../../../../AgentQnA/tests/Chinook_Sqlite.sqlite
 cp chinook-database/ChinookDatabase/DataSources/Chinook_Sqlite.sqlite ../../../../../AgentQnA/tests
 
 docker compose -f ../../../../../DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml up -d

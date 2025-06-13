@@ -46,7 +46,7 @@ export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/get"
 export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/delete"
 
 echo "Removing chinook data..."
-echo Y | rm -R chinook-database
+rm -R chinook-database
 if [ -d "chinook-database" ]; then
     rm -rf chinook-database
 fi
