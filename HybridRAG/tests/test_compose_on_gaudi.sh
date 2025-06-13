@@ -20,7 +20,6 @@ source set_env.sh
 
 function build_docker_images() {
     opea_branch=${opea_branch:-"main"}
-
     cd $WORKPATH/docker_image_build
     git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
     pushd GenAIComps

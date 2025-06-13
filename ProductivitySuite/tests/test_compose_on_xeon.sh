@@ -16,14 +16,17 @@ LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
 
 function build_docker_images() {
+    opea_branch=${opea_branch:-"main"}
     cd $WORKPATH/docker_image_build
-    git clone --depth 1 --branch ${opea_branch:-"main"} https://github.com/opea-project/GenAIComps.git
+    git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
+    pushd GenAIComps
+    echo "GenAIComps test commit is $(git rev-parse HEAD)"
+    docker build --no-cache -t ${REGISTRY}/comps-base:${TAG} --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
+    popd && sleep 1s
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
     docker compose -f build.yaml build --no-cache > ${LOG_PATH}/docker_image_build.log
 
-    docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.6
-    docker pull ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu
     docker images && sleep 1s
 }
 
@@ -41,7 +44,7 @@ function start_services() {
 
     n=0
     until [[ "$n" -ge 100 ]]; do
-        docker logs tgi_service_codegen > ${LOG_PATH}/tgi_service_codegen_start.log
+        docker logs tgi_service_codegen > ${LOG_PATH}/tgi_service_codegen_start.log 2>&1
         if grep -q Connected ${LOG_PATH}/tgi_service_codegen_start.log; then
             echo "CodeGen TGI Service Connected"
             break
@@ -260,23 +263,31 @@ function stop_docker() {
 
 function main() {
 
+    echo "::group::stop_docker"
     stop_docker
+    echo "::endgroup::"
+
+    echo "::group::build_docker_images"
     if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
-    start_time=$(date +%s)
+    echo "::endgroup::"
+
+    echo "::group::start_services"
     start_services
-    end_time=$(date +%s)
-    duration=$((end_time-start_time))
-    echo "Mega service start duration is $duration s" && sleep 1s
+    echo "::endgroup::"
 
+    echo "::group::validate_microservices"
     validate_microservices
-    echo "==== microservices validated ===="
-    validate_megaservice
-    echo "==== megaservices validated ===="
-    validate_frontend
-    echo "==== frontend validated ===="
+    echo "::endgroup::"
 
+    echo "::group::validate_frontend"
+    validate_frontend
+    echo "::endgroup::"
+
+    echo "::group::stop_docker"
     stop_docker
-    echo y | docker system prune
+    echo "::endgroup::"
+
+    docker system prune -f
 
 }
 
