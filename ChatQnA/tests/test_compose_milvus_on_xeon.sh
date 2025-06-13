@@ -43,7 +43,7 @@ function start_services() {
     source set_env.sh
 
     # Start Docker Containers
-    docker compose -f compose_milvus.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
+    docker compose -f compose_milvus.yaml up -d --quiet-pull > ${LOG_PATH}/start_services_with_compose.log
 
     n=0
     until [[ "$n" -ge 100 ]]; do
