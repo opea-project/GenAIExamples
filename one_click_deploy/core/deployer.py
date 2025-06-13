@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import os
+import shutil
 import time
 
 import click
@@ -16,6 +17,7 @@ from .utils import (
     section_header,
     update_helm_values_yaml,
     update_or_create_set_env,
+    get_var_from_shell_script,
 )
 
 
@@ -42,6 +44,7 @@ class Deployer:
         )
         return self.example_root / path_str if path_str else None
 
+    # Docker helpers
     def _get_docker_compose_file(self):
         return self._get_path_from_config(["docker_compose", "paths"], self.args.device)
 
@@ -56,7 +59,15 @@ class Deployer:
         return base_script_path.with_name(f"{base_script_path.stem}.local{base_script_path.suffix}")
 
     def _get_helm_values_file(self):
+        """Gets the original Helm values file path."""
         return self._get_path_from_config(["kubernetes", "helm", "values_files"], self.args.device)
+
+    def _get_local_helm_values_file_path(self):
+        """Constructs the path for the local (temporary) Helm values file."""
+        base_values_path = self._get_helm_values_file()
+        if not base_values_path:
+            return None
+        return base_values_path.with_name(f"{base_values_path.stem}.local{base_values_path.suffix}")
 
     def run_interactive_deployment(self):
         """Orchestrates the deployment flow with automatic cleanup on failure."""
@@ -150,9 +161,15 @@ class Deployer:
         self.args.do_check_env = click.confirm("Run environment check?", default=False, show_default=True)
         self.args.do_update_images = click.confirm("Build or Push images?", default=False, show_default=True)
         if self.args.do_update_images:
+            self.args.setup_local_registry = click.confirm(
+                "  -> Set up a local registry for this run? (creates 'localhost:5000' registry)",
+                default=False,
+                show_default=True,
+            )
             self.args.build_images = click.confirm("  -> Build images?", default=False, show_default=True)
             self.args.push_images = click.confirm("  -> Push images?", default=False, show_default=True)
-            if self.args.push_images:
+
+            if self.args.push_images and not self.args.setup_local_registry:
                 self.args.registry = click.prompt(
                     "     Enter container registry URL (e.g., docker.io/myuser)", default="", show_default=False
                 )
@@ -189,7 +206,6 @@ class Deployer:
             "Which deployment mode to clear?", type=click.Choice(["docker", "k8s"]), default="docker"
         )
 
-        # Device is only relevant for finding the docker-compose file
         if self.args.deploy_mode == "docker":
             self.args.device = click.prompt(
                 "On which target device was it deployed?",
@@ -197,7 +213,6 @@ class Deployer:
                 default=self.config.get("default_device"),
             )
         else:
-            # For K8s, device is not needed for clear, but set a default to prevent errors
             self.args.device = self.config.get("default_device")
 
         if self.args.deploy_mode == "k8s":
@@ -210,18 +225,20 @@ class Deployer:
 
     def run_interactive_test(self):
         """Orchestrates the interactive testing of an existing deployment."""
+        # Step 1: Gather all necessary parameters interactively.
         if not self._interactive_setup_for_test():
             log_message("INFO", "Test operation aborted by user.")
             return
 
         try:
+            # Step 2: With the updated self.args, call the actual test method.
             self.test_connection()
             log_message("OK", "Testing process completed.")
         except Exception as e:
             log_message("ERROR", f"An unexpected error occurred during testing: {e}")
 
     def _interactive_setup_for_test(self):
-        """Gathers necessary information interactively to run connection tests."""
+        """Gathers necessary information for testing and updates self.args. Returns False if aborted."""
         section_header(f"{self.example_name} Interactive Connection Test Setup")
 
         self.args.deploy_mode = click.prompt(
@@ -233,13 +250,21 @@ class Deployer:
             default=self.config.get("default_device"),
         )
 
-        # Proxies are needed for the requests session in the tester
+        # The following prompts populate self.args with proxy information.
         self.args.http_proxy = click.prompt("HTTP Proxy", default=os.environ.get("http_proxy", ""), show_default=True)
         self.args.https_proxy = click.prompt(
             "HTTPS Proxy", default=os.environ.get("https_proxy", ""), show_default=True
         )
 
-        # For k8s, we need a local port to forward to, just like in the deploy setup
+        env_no_proxy, host_ip = os.environ.get("no_proxy", ""), get_host_ip()
+        user_no_proxy = click.prompt("No Proxy hosts", default=env_no_proxy, show_default=True)
+        no_proxy_set = {"localhost", "127.0.0.1", host_ip}
+        if env_no_proxy:
+            no_proxy_set.update(p.strip() for p in env_no_proxy.split(",") if p.strip())
+        if user_no_proxy:
+            no_proxy_set.update(p.strip() for p in user_no_proxy.split(",") if p.strip())
+        self.args.no_proxy = ",".join(sorted(list(no_proxy_set)))
+
         if self.args.deploy_mode == "k8s":
             self.args.k8s_test_local_port = click.prompt("  -> Local port for K8s test access", type=int, default=8080)
 
@@ -247,6 +272,10 @@ class Deployer:
         log_message("INFO", f"  Test Target: {self.example_name}")
         log_message("INFO", f"  Deployment Mode: {self.args.deploy_mode}")
         log_message("INFO", f"  Device: {self.args.device}")
+        log_message("INFO", f"  HTTP Proxy: {self.args.http_proxy or 'Not set'}")
+        log_message("INFO", f"  HTTPS Proxy: {self.args.https_proxy or 'Not set'}")
+        log_message("INFO", f"  No Proxy: {self.args.no_proxy or 'Not set'}")
+
         if self.args.deploy_mode == "k8s":
             log_message("INFO", f"  K8s Local Port: {self.args.k8s_test_local_port}")
 
@@ -277,22 +306,28 @@ class Deployer:
 
         cmd = ["bash", str(script_path)]
         cmd.extend(["--example", self.example_name])
+        cmd.extend(["--device", self.args.device])
 
-        if self.args.build_images:
+        if hasattr(self.args, "setup_local_registry") and self.args.setup_local_registry:
+            cmd.append("--setup-registry")
+
+        if hasattr(self.args, "build_images") and self.args.build_images:
             cmd.append("--build")
 
-        if self.args.push_images:
+        if hasattr(self.args, "push_images") and self.args.push_images:
             cmd.append("--push")
-            if self.args.registry:
+            if hasattr(self.args, "registry") and self.args.registry and self.args.registry.strip():
                 cmd.extend(["--registry", self.args.registry])
-            else:
+            elif not (hasattr(self.args, "setup_local_registry") and self.args.setup_local_registry):
                 log_message(
                     "WARN",
-                    "Push images was selected, but no registry was provided. The push command might fail or use a default.",
+                    "Push selected but no registry provided. Push may fail or use shell script's default.",
                 )
 
-        if not self.args.build_images and not self.args.push_images:
-            log_message("INFO", "Image update selected, but neither 'build' nor 'push' was confirmed. Skipping.")
+        if not (hasattr(self.args, "build_images") and self.args.build_images) and \
+                not (hasattr(self.args, "push_images") and self.args.push_images) and \
+                not (hasattr(self.args, "setup_local_registry") and self.args.setup_local_registry):
+            log_message("INFO", "No image action ('build', 'push', 'setup-registry') confirmed. Skipping.")
             return True
 
         try:
@@ -300,7 +335,7 @@ class Deployer:
             log_message("OK", "Image update process completed successfully.")
             return True
         except Exception as e:
-            log_message("ERROR", f"The image update script failed. Please check the logs above for details. Error: {e}")
+            log_message("ERROR", f"The image update script failed. Check logs for details. Error: {e}")
             return False
 
     def configure_services(self):
@@ -310,16 +345,33 @@ class Deployer:
             source_env_file = self._get_docker_set_env_script()
             local_env_file = self._get_local_env_file_path()
 
+            # Base updates from interactive parameters
             updates = {
                 env_var: getattr(self.args, arg_name)
                 for arg_name, env_var in self.config["docker_compose"]["params_to_set_env"].items()
                 if hasattr(self.args, arg_name) and getattr(self.args, arg_name) is not None
             }
+
+            # 1. Get no_proxy values from the user/environment (already in self.args.no_proxy)
+            user_proxies = {p.strip() for p in self.args.no_proxy.split(",") if p.strip()}
+
+            # 2. Get no_proxy values from the original set_env.sh script
+            script_no_proxy_str = get_var_from_shell_script(source_env_file, "no_proxy")
+            script_proxies = set()
+            if script_no_proxy_str:
+                script_proxies = {p.strip() for p in script_no_proxy_str.split(",") if p.strip()}
+                log_message("INFO", f"Found no_proxy from '{source_env_file.name}': {script_no_proxy_str}")
+
+            # 3. Merge the two sets for a de-duplicated list
+            merged_proxies = user_proxies.union(script_proxies)
+            final_no_proxy = ",".join(sorted(list(merged_proxies)))
+            log_message("INFO", f"Final combined no_proxy list: {final_no_proxy}")
+
             updates.update(
                 {
-                    "HTTP_PROXY": self.args.http_proxy,
-                    "HTTPS_PROXY": self.args.https_proxy,
-                    "NO_PROXY": self.args.no_proxy,
+                    "http_proxy": self.args.http_proxy,
+                    "https_proxy": self.args.https_proxy,
+                    "no_proxy": final_no_proxy,
                     "HOST_IP": get_host_ip(),
                 }
             )
@@ -331,24 +383,39 @@ class Deployer:
                 return False
 
         elif self.args.deploy_mode == "k8s":
-            values_file = self._get_helm_values_file()
-            if not values_file or not values_file.exists():
-                log_message("ERROR", f"Helm values file not found: {values_file}. Cannot configure.")
+            original_values_file = self._get_helm_values_file()
+            local_values_file = self._get_local_helm_values_file_path()
+
+            if not original_values_file or not original_values_file.exists():
+                log_message("ERROR", f"Helm values file not found: {original_values_file}. Cannot configure.")
                 return False
 
-            updates = {
-                path: getattr(self.args, name)
-                for name, path in self.config["kubernetes"]["helm"]["params_to_values"].items()
-                if hasattr(self.args, name) and getattr(self.args, name) is not None
-            }
-            if self.example_name == "CodeTrans" and self.args.device == "cpu":
-                updates.update({"tgi.enabled": False, "vllm.enabled": True, "llm-uservice.TEXTGEN_BACKEND": "vLLM"})
+            try:
+                shutil.copy2(original_values_file, local_values_file)
+                log_message("INFO", f"Created local values file '{local_values_file.name}' for this deployment.")
+            except Exception as e:
+                log_message("ERROR", f"Failed to create local values file: {e}")
+                return False
 
-            if update_helm_values_yaml(values_file, updates):
-                log_message("OK", f"Successfully updated Helm values in {values_file.name}.")
+            params_to_values = self.config["kubernetes"]["helm"]["params_to_values"]
+            updates = {}
+            for name, path_or_paths in params_to_values.items():
+                if hasattr(self.args, name):
+                    value = getattr(self.args, name)
+                    if value is None:
+                        continue
+
+                    if isinstance(path_or_paths, list):
+                        for path in path_or_paths:
+                            updates[path] = value
+                    else:
+                        updates[path_or_paths] = value
+
+            if update_helm_values_yaml(local_values_file, updates):
+                log_message("OK", f"Successfully updated local Helm values in {local_values_file.name}.")
                 return True
             else:
-                log_message("ERROR", f"Failed to update Helm values in {values_file.name}.")
+                log_message("ERROR", f"Failed to update Helm values in {local_values_file.name}.")
                 return False
         return True
 
@@ -364,10 +431,10 @@ class Deployer:
             compose_filename = compose_file.name
             compose_dir = compose_file.parent
             local_env_file = self._get_local_env_file_path()
-            local_env_file_dir = local_env_file.parent
 
+            # Ensure the command sources the env file from its own directory
             cmd_string = (
-                f"cd '{local_env_file_dir}' && "
+                f"cd '{local_env_file.parent}' && "
                 f"source ./{local_env_file.name} && "
                 f"cd '{compose_dir}' && "
                 f"{self.compose_command} -f {compose_filename} up -d --remove-orphans"
@@ -384,6 +451,12 @@ class Deployer:
 
         elif self.args.deploy_mode == "k8s":
             cfg = self.config["kubernetes"]
+            local_values_file = self._get_local_helm_values_file_path()
+
+            if not local_values_file or not local_values_file.exists():
+                log_message("ERROR", f"Local Helm values file '{local_values_file}' not found. Cannot deploy.")
+                return False
+
             cmd = [
                 "helm",
                 "install",
@@ -393,7 +466,7 @@ class Deployer:
                 cfg["namespace"],
                 "--create-namespace",
                 "-f",
-                str(self._get_helm_values_file()),
+                str(local_values_file),
             ]
             try:
                 run_command(cmd, check=True)
@@ -416,20 +489,16 @@ class Deployer:
 
             compose_dir = compose_file.parent
             local_env_file = self._get_local_env_file_path()
-            local_env_filename = local_env_file.name
             compose_filename = compose_file.name
 
-            cmd_string_parts = [f"cd '{compose_dir}'"]
-
-            cmd_string_parts.append(f"{self.compose_command} -f {compose_filename} down -v --remove-orphans")
-            cmd_string = " && ".join(cmd_string_parts)
+            cmd_string = f"cd '{compose_dir}' && {self.compose_command} -f {compose_filename} down -v --remove-orphans"
 
             log_message("INFO", "Executing cleanup command in a bash subshell...")
             try:
                 run_command(cmd_string, check=False, shell=True, executable="/bin/bash")
                 if local_env_file.exists():
                     local_env_file.unlink()
-                    log_message("INFO", f"Removed generated config file: {local_env_filename}")
+                    log_message("INFO", f"Removed generated config file: {local_env_file.name}")
                 log_message("OK", "Docker Compose deployment cleared.")
                 return True
             except Exception as e:
@@ -443,6 +512,14 @@ class Deployer:
                 log_message("OK", f"Helm release '{cfg['release_name']}' uninstalled.")
             except Exception as e:
                 log_message("WARN", f"Helm uninstall may have failed (this is often ok if it was already gone): {e}")
+
+            local_values_file = self._get_local_helm_values_file_path()
+            if local_values_file and local_values_file.exists():
+                try:
+                    local_values_file.unlink()
+                    log_message("INFO", f"Removed local Helm values file: {local_values_file.name}")
+                except OSError as e:
+                    log_message("WARN", f"Could not remove local values file {local_values_file}: {e}")
 
             if getattr(self.args, "delete_namespace_on_clear", False):
                 log_message("INFO", f"Deleting namespace '{cfg['namespace']}' as requested.")
@@ -458,6 +535,10 @@ class Deployer:
         return False
 
     def test_connection(self):
+        """
+        Creates a ConnectionTester and runs all tests.
+        It uses self.args, which has been populated by the interactive setup methods.
+        """
         section_header(f"Testing Connection for {self.example_name}")
         tester = ConnectionTester(self.example_name, self.args.deploy_mode, self.args.device, self.args)
         return tester.run_all_tests()

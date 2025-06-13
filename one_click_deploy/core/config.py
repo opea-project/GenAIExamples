@@ -33,7 +33,7 @@ EXAMPLE_CONFIGS = {
             "helm": {
                 "chart_oci": "oci://ghcr.io/opea-project/charts/chatqna",
                 "values_files": {
-                    "cpu": "kubernetes/helm/cpu-values.yaml",
+                    "xeon": "kubernetes/helm/cpu-values.yaml",
                     "gaudi": "kubernetes/helm/gaudi-values.yaml",
                 },
                 "params_to_values": {
@@ -139,7 +139,7 @@ EXAMPLE_CONFIGS = {
             "helm": {
                 "chart_oci": "oci://ghcr.io/opea-project/charts/codetrans",
                 "values_files": {
-                    "cpu": "kubernetes/helm/cpu-values.yaml",
+                    "xeon": "kubernetes/helm/cpu-values.yaml",
                     "gaudi": "kubernetes/helm/gaudi-values.yaml",
                 },
                 "params_to_values": {"hf_token": "global.HUGGINGFACEHUB_API_TOKEN", "llm_model": "llm.model_name"},
@@ -205,12 +205,18 @@ EXAMPLE_CONFIGS = {
         },
         "kubernetes": {
             "helm": {
-                "chart_oci": "oci://ghcr.io/opea-project/charts/codetrans",
+                "chart_oci": "oci://ghcr.io/opea-project/charts/docsum",
                 "values_files": {
-                    "cpu": "kubernetes/helm/cpu-values.yaml",
+                    "xeon": "kubernetes/helm/cpu-values.yaml",
                     "gaudi": "kubernetes/helm/gaudi-values.yaml",
                 },
-                "params_to_values": {"hf_token": "global.HUGGINGFACEHUB_API_TOKEN", "llm_model": "llm.model_name"},
+                "params_to_values": {
+                    "hf_token": "global.HUGGINGFACEHUB_API_TOKEN",
+                    "llm_model": [
+                        "llm-uservice.LLM_MODEL_ID",
+                        "vllm.LLM_MODEL_ID"
+                    ],
+                },
             },
             "namespace": "docsum",
             "release_name": "docsum",
@@ -219,17 +225,14 @@ EXAMPLE_CONFIGS = {
         "default_device": "xeon",
         "ports": {
             "docker": {"backend": "8888", "llm": "8008"},
-            "k8s_services": {"backend": "codetrans-svc", "llm": "codetrans-llm-svc"},
+            "k8s_services": {"backend": "docsum", "llm": "llm-docsum-svc"},
         },
         "test_connections": {
             "main_service": {
                 "service_key": "backend",
                 "path": "/v1/docsum",
                 "method": "POST",
-                "payload": {
-                    "type": "audio",
-                    "messages": "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA",
-                },
+                "payload": {"type": "audio", "messages": "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA"},
                 "headers": {"Content-Type": "application/json"},
                 "expect_code": 200,
             },
@@ -242,7 +245,7 @@ EXAMPLE_CONFIGS = {
                     "payload_dynamic_llm_model": True,
                     "default_llm_model_id_for_test": "meta-llama/Meta-Llama-3-8B-Instruct",
                     "payload_template": {
-                        "prompt": "Translate to Python: function add(a, b) { return a + b; }",
+                        "prompt": "Summarize this: The quick brown fox jumps over the lazy dog.",
                         "max_tokens": 50,
                     },
                     "headers": {"Content-Type": "application/json"},
@@ -274,7 +277,7 @@ EXAMPLE_CONFIGS = {
             "helm": {
                 "chart_oci": "oci://ghcr.io/opea-project/charts/codegen",
                 "values_files": {
-                    "cpu": "kubernetes/helm/cpu-values.yaml",
+                    "xeon": "kubernetes/helm/cpu-values.yaml",
                     "gaudi": "kubernetes/helm/gaudi-values.yaml",
                 },
                 "params_to_values": {"hf_token": "global.HUGGINGFACEHUB_API_TOKEN", "llm_model": "llm.model_name"},

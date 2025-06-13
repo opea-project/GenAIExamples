@@ -13,7 +13,8 @@ LOG_FILE="${PROJECT_ROOT}/deploy.log"
 
 # --- Configuration ---
 EXAMPLE="ChatQnA"
-REGISTRY=""
+DEVICE="xeon"
+REGISTRY="opea"
 TAG="latest"
 BUILD_ACTION=false
 PUSH_ACTION=false
@@ -24,7 +25,6 @@ error_exit() {
     exit 1
 }
 
-# --- Usage Function ---
 usage() {
     echo
     echo "Usage: $0 [OPTIONS]"
@@ -35,6 +35,8 @@ usage() {
     echo "  -h, --help:                 Show this help message."
     echo "  --example <NAME>:           Specify the example to process (e.g., ChatQnA, CodeTrans, DocSum)."
     echo "                              (default: ${EXAMPLE})"
+    echo "  --device <DEVICE>:          Specify the target device (e.g., xeon, gaudi)."
+    echo "                              (default: ${DEVICE})"
     echo "  --build:                    Build all images for the specified example."
     echo "  --push:                     Push all built images for the specified example to the registry."
     echo "  --setup-registry:           Set up a local Docker registry (localhost:5000) for this run."
@@ -43,8 +45,8 @@ usage() {
     echo "  --tag <TAG>:                Specify the image tag. (default: ${TAG})"
     echo
     echo "Example:"
-    echo "  # Build all images for DocSum with default settings"
-    echo "  bash one_click_deploy/common/update_images.sh --example DocSum --build"
+    echo "  # Build all images for DocSum on Gaudi"
+    echo "  bash one_click_deploy/common/update_images.sh --example DocSum --device gaudi --build"
     echo
 }
 
@@ -52,20 +54,28 @@ usage() {
 # ==                  EXAMPLE-SPECIFIC CONFIGURATION & FUNCTIONS                ==
 # ==================================================================================
 
-# Returns the list of services to be processed for a given example.
+# Returns the list of services to be processed for a given example and device.
 # If empty, all services in the compose file will be processed.
 get_service_list() {
     local example_name=$1
+    local device_name=$2
     case "$example_name" in
         "DocSum")
-            echo "docsum docsum-gradio-ui whisper llm-docsum vllm"
+            if [[ "$device_name" == "gaudi" ]]; then
+                echo "docsum docsum-gradio-ui whisper llm-docsum vllm-gaudi"
+            else
+                echo "docsum docsum-gradio-ui whisper llm-docsum vllm"
+            fi
             ;;
         "ChatQnA")
             echo "chatqna chatqna-ui dataprep retriever vllm nginx"
             ;;
         "CodeGen")
-            # TODO: It would be great to separate this list for different platforms...
-            echo "codegen codegen-gradio-ui dataprep embedding retriever llm-textgen vllm vllm-gaudi"
+            if [[ "$device_name" == "gaudi" ]]; then
+                echo "codegen codegen-gradio-ui dataprep embedding retriever llm-textgen vllm-gaudi"
+            else
+                echo "codegen codegen-gradio-ui dataprep embedding retriever llm-textgen vllm"
+            fi
             ;;
         *)
             # Default to empty, which means docker-compose will process all services
@@ -189,8 +199,9 @@ build_codegen() {
 dispatch_build() {
     local example_name=$1
     local example_path=$2
+    local device_name=$3
 
-    section_header "Building Docker Images for ${example_name}"
+    section_header "Building Docker Images for ${example_name} on ${device_name}"
 
     export REGISTRY
     export TAG
@@ -198,7 +209,7 @@ dispatch_build() {
     export https_proxy=${https_proxy:-}
     export no_proxy=${no_proxy:-}
 
-    local service_list=$(get_service_list "$example_name")
+    local service_list=$(get_service_list "$example_name" "$device_name")
 
     case "$example_name" in
         "DocSum")
@@ -241,6 +252,7 @@ setup_local_registry() {
 push_images() {
     local example_name=$1
     local example_path=$2
+    local device_name=$3
     section_header "Pushing Docker Images for ${example_name}"
 
     cd "${example_path}/docker_image_build"
@@ -250,7 +262,8 @@ push_images() {
     export REGISTRY
     export TAG
 
-    local service_list=$(get_service_list "$example_name")
+    local service_list=$(get_service_list "$example_name" "$device_name")
+
     if [ -z "$service_list" ]; then
         log "INFO" "Pushing all services defined in build.yaml for ${example_name}..."
     else
@@ -272,6 +285,10 @@ while [[ $# -gt 0 ]]; do
             ;;
         --example)
             EXAMPLE="$2"
+            shift 2
+            ;;
+        --device)
+            DEVICE="$2"
             shift 2
             ;;
         --build)
@@ -300,6 +317,11 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
+if [ "$BUILD_ACTION" = true ] && [ -z "$REGISTRY" ] && [ "$SETUP_REGISTRY_ACTION" = false ]; then
+    log "INFO" "No registry specified for build. Defaulting to 'opea' as the registry prefix for local build."
+    REGISTRY="opea"
+fi
+
 section_header "Image Management Script Started"
 EXAMPLE_PATH="${PROJECT_ROOT}/${EXAMPLE}"
 if [ ! -d "$EXAMPLE_PATH" ]; then
@@ -308,7 +330,8 @@ fi
 
 log "INFO" "Project Root: ${PROJECT_ROOT}"
 log "INFO" "Selected Example: ${EXAMPLE}"
-log "INFO" "Image Registry: ${REGISTRY}"
+log "INFO" "Target Device: ${DEVICE}"
+log "INFO" "Image Registry: ${REGISTRY:-'Not set'}"
 log "INFO" "Image Tag: ${TAG}"
 
 if [ "$SETUP_REGISTRY_ACTION" = true ]; then
@@ -316,14 +339,14 @@ if [ "$SETUP_REGISTRY_ACTION" = true ]; then
 fi
 
 if [ "$BUILD_ACTION" = true ]; then
-    dispatch_build "$EXAMPLE" "$EXAMPLE_PATH"
+    dispatch_build "$EXAMPLE" "$EXAMPLE_PATH" "$DEVICE"
 fi
 
 if [ "$PUSH_ACTION" = true ]; then
     if [ "$REGISTRY" == "opea" ] && [ "$SETUP_REGISTRY_ACTION" = false ]; then
         log "INFO" "Warning: Pushing to default 'opea' registry. Use --registry to specify user/org, e.g., --registry docker.io/opea."
     fi
-    push_images "$EXAMPLE" "$EXAMPLE_PATH"
+    push_images "$EXAMPLE" "$EXAMPLE_PATH" "$DEVICE"
 fi
 
 if [ "$BUILD_ACTION" = false ] && [ "$PUSH_ACTION" = false ] && [ "$SETUP_REGISTRY_ACTION" = false ]; then

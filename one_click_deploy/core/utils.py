@@ -177,8 +177,10 @@ def update_or_create_set_env(source_path: pathlib.Path, dest_path: pathlib.Path,
         escaped_value = str(new_value).replace('"', '\\"')
         safe_new_value = f'"{escaped_value}"'
         found = False
+        # Match both uppercase and lowercase versions of the variable for robustness
+        # The replacement will use the key from the `updates` dictionary
         for i, line in enumerate(lines):
-            if re.match(rf"^\s*(export\s+)?{re.escape(var_name)}\s*=.*", line):
+            if re.match(rf"^\s*(export\s+)?{re.escape(var_name)}\s*=.*", line, re.IGNORECASE):
                 lines[i] = f"export {var_name}={safe_new_value}"
                 found = True
                 break
@@ -266,3 +268,40 @@ def stop_all_kubectl_port_forwards():
             except subprocess.TimeoutExpired:
                 process.kill()
             del KUBECTL_PORT_FORWARD_PIDS[f"{ns}/{svc}"]
+
+def get_var_from_shell_script(script_path: pathlib.Path, var_name: str) -> str | None:
+    """
+    Sources a shell script in a subshell and prints the value of a specified variable.
+
+    Args:
+        script_path: Path to the shell script.
+        var_name: The name of the environment variable to retrieve.
+
+    Returns:
+        The value of the variable as a string, or None if not found or an error occurs.
+    """
+    if not script_path or not script_path.exists():
+        log_message("DEBUG", f"Source script for variable extraction not found: {script_path}")
+        return None
+
+    # This command sources the script, then echos the variable. Using a subshell
+    # ensures that it doesn't affect the current process's environment.
+    command = f". {script_path.resolve()} && echo -n \"${var_name}\""
+    log_message("DEBUG", f"Extracting var '{var_name}' with command: {command}")
+
+    try:
+        # We run this with check=False because the variable might not be set, which is not an error.
+        result = run_command(command, shell=True, executable="/bin/bash", capture_output=True, check=False, display_cmd=False)
+
+        if result.returncode == 0 and result.stdout:
+            value = result.stdout.strip()
+            log_message("DEBUG", f"Extracted value for '{var_name}': {value}")
+            return value
+        else:
+            log_message("DEBUG", f"Variable '{var_name}' not found or empty in {script_path}.")
+            if result.stderr:
+                log_message("DEBUG", f"Stderr from var extraction: {result.stderr.strip()}")
+            return None
+    except Exception as e:
+        log_message("WARN", f"Failed to extract variable '{var_name}' from {script_path}: {e}")
+        return None

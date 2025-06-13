@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import json
+import os
 import time
 
 import requests
@@ -23,10 +24,24 @@ class ConnectionTester:
         self.port_config = self.config.get("ports", {})
         self.k8s_namespace = self.config.get("kubernetes", {}).get("namespace")
         self.host_ip = get_host_ip() if self.deploy_mode == "docker" else "localhost"
-        self.session = requests.Session()
-        if self.args.http_proxy or self.args.https_proxy:
-            self.session.proxies = {"http": self.args.http_proxy, "https": self.args.https_proxy}
         self.results = {"passed": 0, "failed": 0, "skipped": 0}
+
+        self.session = requests.Session()
+
+        proxies = {}
+        if self.args.http_proxy:
+            proxies['http'] = self.args.http_proxy
+        if self.args.https_proxy:
+            proxies['https'] = self.args.https_proxy
+
+        if proxies:
+            self.session.proxies = proxies
+
+        # Set NO_PROXY environment variable for the requests session to respect it
+        # This is the standard way to make requests bypass proxies for certain hosts
+        if self.args.no_proxy:
+            os.environ['NO_PROXY'] = self.args.no_proxy
+            log_message("DEBUG", f"Set NO_PROXY for this session: {self.args.no_proxy}")
 
     def _get_service_url_and_port(self, service_key):
         """Determines the URL for a service, handling Docker ports and K8s port-forwarding."""
