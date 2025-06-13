@@ -212,7 +212,7 @@ dispatch_build() {
             ;;
         "CodeGen")
             build_codegen "$example_path" "$service_list"
-            ;;            
+            ;;
         *)
             error_exit "No specific build function defined for example '${example_name}'. Please add it to the script."
             ;;

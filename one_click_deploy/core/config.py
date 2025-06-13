@@ -265,53 +265,64 @@ EXAMPLE_CONFIGS = {
         "docker_compose": {
             "paths": {
                 "xeon": "docker_compose/intel/cpu/xeon/compose.yaml",
-                "gaudi": "docker_compose/intel/hpu/gaudi/compose.yaml"
+                "gaudi": "docker_compose/intel/hpu/gaudi/compose.yaml",
             },
-            "set_env_scripts": {
-                "xeon": "docker_compose/intel/set_env.sh",
-                "gaudi": "docker_compose/intel/set_env.sh"
-            },
-            "params_to_set_env": {
-                "llm_model": "LLM_MODEL_ID",
-                "hf_token": "HUGGINGFACEHUB_API_TOKEN"
-            }
+            "set_env_scripts": {"xeon": "docker_compose/intel/set_env.sh", "gaudi": "docker_compose/intel/set_env.sh"},
+            "params_to_set_env": {"llm_model": "LLM_MODEL_ID", "hf_token": "HUGGINGFACEHUB_API_TOKEN"},
         },
         "kubernetes": {
             "helm": {
                 "chart_oci": "oci://ghcr.io/opea-project/charts/codegen",
                 "values_files": {
                     "cpu": "kubernetes/helm/cpu-values.yaml",
-                    "gaudi": "kubernetes/helm/gaudi-values.yaml"
+                    "gaudi": "kubernetes/helm/gaudi-values.yaml",
                 },
-                "params_to_values": {
-                    "hf_token": "global.HUGGINGFACEHUB_API_TOKEN",
-                    "llm_model": "llm.model_name"
-                }
+                "params_to_values": {"hf_token": "global.HUGGINGFACEHUB_API_TOKEN", "llm_model": "llm.model_name"},
             },
             "namespace": "codegen",
-            "release_name": "codegen"
+            "release_name": "codegen",
         },
         "supported_devices": ["xeon", "gaudi"],
         "default_device": "xeon",
         "ports": {
             "docker": {"backend": "7778", "llm": "8028"},
-            "k8s_services": {"backend": "codegen-svc", "llm": "codegen-llm-svc"}
+            "k8s_services": {"backend": "codegen-svc", "llm": "codegen-llm-svc"},
         },
         "test_connections": {
             "main_service": {
-                "service_key": "backend", "path": "/v1/codegen", "method": "POST",
+                "service_key": "backend",
+                "path": "/v1/codegen",
+                "method": "POST",
                 "payload": {"messages": "Write a Python function that adds two numbers."},
-                "headers": {"Content-Type": "application/json"}, "expect_code": 200
+                "headers": {"Content-Type": "application/json"},
+                "expect_code": 200,
             },
-             "sub_services": [{
-                    "name": "llm_code_trans_check", "service_key": "llm", "path": "/v1/completions", "method": "POST",
-                    "payload_dynamic_llm_model": True, "default_llm_model_id_for_test": "Qwen/Qwen2.5-Coder-7B-Instruct",
-                    "payload_template": {"model": "Qwen/Qwen2.5-Coder-7B-Instruct", "messages": [{"role": "user", "content": "Implement a basic Python class"}], "max_tokens":32},
-                    "headers": {"Content-Type": "application/json"}, "expect_code": 200
-            }]
+            "sub_services": [
+                {
+                    "name": "llm_code_trans_check",
+                    "service_key": "llm",
+                    "path": "/v1/completions",
+                    "method": "POST",
+                    "payload_dynamic_llm_model": True,
+                    "default_llm_model_id_for_test": "Qwen/Qwen2.5-Coder-7B-Instruct",
+                    "payload_template": {
+                        "model": "Qwen/Qwen2.5-Coder-7B-Instruct",
+                        "messages": [{"role": "user", "content": "Implement a basic Python class"}],
+                        "max_tokens": 32,
+                    },
+                    "headers": {"Content-Type": "application/json"},
+                    "expect_code": 200,
+                }
+            ],
         },
         "interactive_params": [
-            {"name": "llm_model", "prompt": "LLM Model ID (for Code Generation)", "type": str, "default": "Qwen/Qwen2.5-Coder-7B-Instruct", "help": "e.g., Qwen/Qwen2.5-Coder-7B-Instruct"},
-        ]
+            {
+                "name": "llm_model",
+                "prompt": "LLM Model ID (for Code Generation)",
+                "type": str,
+                "default": "Qwen/Qwen2.5-Coder-7B-Instruct",
+                "help": "e.g., Qwen/Qwen2.5-Coder-7B-Instruct",
+            },
+        ],
     },
 }
