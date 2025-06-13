@@ -12,12 +12,12 @@ from .tester import ConnectionTesterFactory
 from .utils import (
     get_host_ip,
     get_huggingface_token_from_file,
+    get_var_from_shell_script,
     log_message,
     run_command,
     section_header,
     update_helm_values_yaml,
     update_or_create_set_env,
-    get_var_from_shell_script,
 )
 
 
@@ -238,7 +238,10 @@ class Deployer:
             log_message("ERROR", f"An unexpected error occurred during testing: {e}")
 
     def _interactive_setup_for_test(self):
-        """Gathers necessary information for testing and updates self.args. Returns False if aborted."""
+        """Gathers necessary information for testing and updates self.args.
+
+        Returns False if aborted.
+        """
         section_header(f"{self.example_name} Interactive Connection Test Setup")
 
         self.args.deploy_mode = click.prompt(
@@ -324,9 +327,11 @@ class Deployer:
                     "Push selected but no registry provided. Push may fail or use shell script's default.",
                 )
 
-        if not (hasattr(self.args, "build_images") and self.args.build_images) and \
-                not (hasattr(self.args, "push_images") and self.args.push_images) and \
-                not (hasattr(self.args, "setup_local_registry") and self.args.setup_local_registry):
+        if (
+            not (hasattr(self.args, "build_images") and self.args.build_images)
+            and not (hasattr(self.args, "push_images") and self.args.push_images)
+            and not (hasattr(self.args, "setup_local_registry") and self.args.setup_local_registry)
+        ):
             log_message("INFO", "No image action ('build', 'push', 'setup-registry') confirmed. Skipping.")
             return True
 
@@ -535,8 +540,8 @@ class Deployer:
         return False
 
     def test_connection(self):
-        """
-        Creates a ConnectionTester and runs all tests.
+        """Creates a ConnectionTester and runs all tests.
+
         It uses self.args, which has been populated by the interactive setup methods.
         """
         section_header(f"Testing Connection for {self.example_name}")

@@ -212,10 +212,7 @@ EXAMPLE_CONFIGS = {
                 },
                 "params_to_values": {
                     "hf_token": "global.HUGGINGFACEHUB_API_TOKEN",
-                    "llm_model": [
-                        "llm-uservice.LLM_MODEL_ID",
-                        "vllm.LLM_MODEL_ID"
-                    ],
+                    "llm_model": ["llm-uservice.LLM_MODEL_ID", "vllm.LLM_MODEL_ID"],
                 },
             },
             "namespace": "docsum",
@@ -232,7 +229,10 @@ EXAMPLE_CONFIGS = {
                 "service_key": "backend",
                 "path": "/v1/docsum",
                 "method": "POST",
-                "payload": {"type": "audio", "messages": "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA"},
+                "payload": {
+                    "type": "audio",
+                    "messages": "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA",
+                },
                 "headers": {"Content-Type": "application/json"},
                 "expect_code": 200,
             },

@@ -34,9 +34,9 @@ class BaseConnectionTester(ABC):
 
         proxies = {}
         if self.args.http_proxy:
-            proxies['http'] = self.args.http_proxy
+            proxies["http"] = self.args.http_proxy
         if self.args.https_proxy:
-            proxies['https'] = self.args.https_proxy
+            proxies["https"] = self.args.https_proxy
 
         if proxies:
             self.session.proxies = proxies
@@ -44,7 +44,7 @@ class BaseConnectionTester(ABC):
         # Set NO_PROXY environment variable for the requests session to respect it
         # This is the standard way to make requests bypass proxies for certain hosts
         if self.args.no_proxy:
-            os.environ['NO_PROXY'] = self.args.no_proxy
+            os.environ["NO_PROXY"] = self.args.no_proxy
             log_message("DEBUG", f"Set NO_PROXY for this session: {self.args.no_proxy}")
 
     def _get_service_url_and_port(self, service_key):

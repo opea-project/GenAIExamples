@@ -269,9 +269,9 @@ def stop_all_kubectl_port_forwards():
                 process.kill()
             del KUBECTL_PORT_FORWARD_PIDS[f"{ns}/{svc}"]
 
+
 def get_var_from_shell_script(script_path: pathlib.Path, var_name: str) -> str | None:
-    """
-    Sources a shell script in a subshell and prints the value of a specified variable.
+    """Sources a shell script in a subshell and prints the value of a specified variable.
 
     Args:
         script_path: Path to the shell script.
@@ -286,12 +286,14 @@ def get_var_from_shell_script(script_path: pathlib.Path, var_name: str) -> str |
 
     # This command sources the script, then echos the variable. Using a subshell
     # ensures that it doesn't affect the current process's environment.
-    command = f". {script_path.resolve()} && echo -n \"${var_name}\""
+    command = f'. {script_path.resolve()} && echo -n "${var_name}"'
     log_message("DEBUG", f"Extracting var '{var_name}' with command: {command}")
 
     try:
         # We run this with check=False because the variable might not be set, which is not an error.
-        result = run_command(command, shell=True, executable="/bin/bash", capture_output=True, check=False, display_cmd=False)
+        result = run_command(
+            command, shell=True, executable="/bin/bash", capture_output=True, check=False, display_cmd=False
+        )
 
         if result.returncode == 0 and result.stdout:
             value = result.stdout.strip()
