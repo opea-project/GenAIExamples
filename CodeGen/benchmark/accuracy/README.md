@@ -34,6 +34,7 @@ We utilize the [bigcode-evaluation-harness](https://github.com/bigcode-project/b
 
 2.  **Install Dependencies:**
     ```shell
+    # pip install -r requirements-hpu.txt, if you deploy microservices on the Gaudi.
     pip install -r requirements.txt
     pip install -e .
     ```

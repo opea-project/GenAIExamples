@@ -121,7 +121,7 @@ Configure `GenAIExamples/WorkflowExecAgent/docker_compose/.env` file with the fo
 export wf_api_port=5000     # workflow serving API port to use
 export SDK_BASE_URL=http://$(hostname -I | awk '{print $1}'):${wf_api_port}/      # The workflow server will use this example workflow API url
 export SERVING_TOKEN=${SERVING_TOKEN}           # For example_workflow, can be empty
-export HUGGINGFACEHUB_API_TOKEN=${HF_TOKEN}
+export HF_TOKEN=${HF_TOKEN}
 export llm_engine=${llm_engine}
 export llm_endpoint_url=${llm_endpoint_url}
 export ip_address=$(hostname -I | awk '{print $1}')

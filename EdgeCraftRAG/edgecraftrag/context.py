@@ -3,6 +3,7 @@
 
 from edgecraftrag.controllers.compmgr import GeneratorMgr, IndexerMgr, NodeParserMgr, PostProcessorMgr, RetrieverMgr
 from edgecraftrag.controllers.filemgr import FilelMgr
+from edgecraftrag.controllers.knowledge_basemgr import KnowledgeManager
 from edgecraftrag.controllers.modelmgr import ModelMgr
 from edgecraftrag.controllers.nodemgr import NodeMgr
 from edgecraftrag.controllers.pipelinemgr import PipelineMgr
@@ -20,6 +21,7 @@ class Context:
         self.modmgr = ModelMgr()
         self.genmgr = GeneratorMgr()
         self.filemgr = FilelMgr()
+        self.knowledgemgr = KnowledgeManager()
 
     def get_pipeline_mgr(self):
         return self.plmgr
@@ -47,6 +49,9 @@ class Context:
 
     def get_file_mgr(self):
         return self.filemgr
+
+    def get_knowledge_mgr(self):
+        return self.knowledgemgr
 
 
 ctx = Context()
