@@ -64,8 +64,10 @@ get_service_list() {
             echo "chatqna chatqna-ui dataprep retriever vllm nginx"
             ;;
         "CodeGen")
-            # TODO: It would be great to separate this list for different platforms...
             echo "codegen codegen-gradio-ui dataprep embedding retriever llm-textgen vllm vllm-gaudi"
+            ;;
+        "AudioQnA")
+            echo "audioqna audioqna-ui whisper speecht5 vllm whisper-gaudi speecht5-gaudi vllm-gaudi"
             ;;
         *)
             # Default to empty, which means docker-compose will process all services
@@ -184,6 +186,47 @@ build_codegen() {
     cd - > /dev/null
 }
 
+# Build function for AudioQnA - standard build
+build_audioqna() {
+    local example_path=$1
+    local service_list=$2
+    local build_dir="${example_path}/docker_image_build"
+    log "INFO" "Executing custom build function for AudioQnA..."
+    cd "$build_dir"
+
+    log "INFO" "Cloning required repositories for AudioQnA..."
+    if [ ! -d "GenAIComps" ]; then
+        git clone --depth 1 https://github.com/opea-project/GenAIComps.git
+    else
+        log "INFO" "GenAIComps directory already exists, skipping clone."
+    fi
+    if [ ! -d "vllm" ]; then
+        git clone https://github.com/vllm-project/vllm.git
+        cd vllm
+        local vllm_ver="v0.8.3" # As per original script
+        log "INFO" "Checking out vLLM tag ${vllm_ver}"
+        git checkout ${vllm_ver} &> /dev/null && cd ../
+    else
+        log "INFO" "vllm directory already exists, skipping clone."
+    fi
+    if [ ! -d "vllm-fork" ]; then
+        git clone https://github.com/HabanaAI/vllm-fork.git && cd vllm-fork
+        VLLM_FORK_VER=v0.6.6.post1+Gaudi-1.20.0
+        git checkout ${VLLM_FORK_VER} &> /dev/null && cd ../
+    else
+        log "INFO" "vllm-fork directory already exists, skipping clone."
+    fi
+
+    log "INFO" "Building base image: comps-base (build-time only)"
+    pushd GenAIComps
+    docker build --no-cache -t ${REGISTRY}/comps-base:${TAG} --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
+    popd
+
+    log "INFO" "Starting build for specified DocSum services..."
+    docker compose -f build.yaml build ${service_list} --no-cache
+    cd - > /dev/null
+}
+
 # --- Build Dispatcher ---
 # This function calls the correct build function based on the example name.
 dispatch_build() {
@@ -212,6 +255,9 @@ dispatch_build() {
             ;;
         "CodeGen")
             build_codegen "$example_path" "$service_list"
+            ;;
+        "AudioQnA")
+            build_audioqna "$example_path" "$service_list"
             ;;
         *)
             error_exit "No specific build function defined for example '${example_name}'. Please add it to the script."

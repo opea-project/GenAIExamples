@@ -7,7 +7,7 @@ import time
 import click
 
 from .config import COMMON_SCRIPTS_DIR, EXAMPLE_CONFIGS, EXAMPLES_ROOT_DIR
-from .tester import ConnectionTester
+from .tester import ConnectionTesterFactory
 from .utils import (
     get_host_ip,
     get_huggingface_token_from_file,
@@ -234,10 +234,10 @@ class Deployer:
         )
 
         # Proxies are needed for the requests session in the tester
-        self.args.http_proxy = click.prompt("HTTP Proxy", default=os.environ.get("http_proxy", ""), show_default=True)
-        self.args.https_proxy = click.prompt(
-            "HTTPS Proxy", default=os.environ.get("https_proxy", ""), show_default=True
-        )
+        # self.args.http_proxy = click.prompt("HTTP Proxy", default=os.environ.get("http_proxy", ""), show_default=True)
+        # self.args.https_proxy = click.prompt(
+        #     "HTTPS Proxy", default=os.environ.get("https_proxy", ""), show_default=True
+        # )
 
         # For k8s, we need a local port to forward to, just like in the deploy setup
         if self.args.deploy_mode == "k8s":
@@ -459,5 +459,7 @@ class Deployer:
 
     def test_connection(self):
         section_header(f"Testing Connection for {self.example_name}")
-        tester = ConnectionTester(self.example_name, self.args.deploy_mode, self.args.device, self.args)
+        tester = ConnectionTesterFactory.create_tester(
+            self.example_name, self.args.deploy_mode, self.args.device, self.args
+        )
         return tester.run_all_tests()
