@@ -199,6 +199,7 @@ services:
       - no_proxy=${no_proxy}
       - https_proxy=${https_proxy}
       - http_proxy=${http_proxy}
+      - LLM_MODEL_ID=${LLM_MODEL_ID} # must be set for the UI to make request.
     ipc: host
     restart: always
   chatqna-gaudi-nginx-server:

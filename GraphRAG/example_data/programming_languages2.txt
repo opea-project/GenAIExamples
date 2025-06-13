@@ -1,0 +1,41 @@
+"Python was conceived in the late 1980s, and its implementation began in December 1989 by Guido van Rossum at Centrum Wiskunde & Informatica (CWI) in the Netherlands as a successor to the ABC programming language capable of exception handling and interfacing with the Amoeba operating system." (Wikipedia: https://en.wikipedia.org/wiki/Python_(programming_language))
+
+"TensorFlow is a free and open-source software library for machine learning and artificial intelligence. It can be used across a range of tasks but has a particular focus on training and inference of deep neural networks. TensorFlow was developed by the Google Brain team for internal Google use in research and production." (Wikipedia: https://en.wikipedia.org/wiki/TensorFlow)
+
+"PyTorch is an open source machine learning framework based on the Torch library, used for applications such as computer vision and natural language processing, originally developed by Meta AI and now part of the Linux Foundation umbrella. It is free and open-source software released under the Modified BSD license." (Wikipedia: https://en.wikipedia.org/wiki/PyTorch)
+
+"R is a programming language for statistical computing and graphics supported by the R Core Team and the R Foundation for Statistical Computing. Created by statisticians Ross Ihaka and Robert Gentleman, R is used among data miners, bioinformaticians and statisticians for data analysis and developing statistical software." (Wikipedia: https://en.wikipedia.org/wiki/R_(programming_language))
+
+"Julia is a high-level, dynamic programming language. Its features are well suited for numerical analysis and computational science. Distinctive aspects of Julia's design include a type system with parametric polymorphism and multiple dispatch as its core programming paradigm." (Wikipedia: https://en.wikipedia.org/wiki/Julia_(programming_language))
+
+"Julia was designed from the beginning for high performance. Julia programs compile to efficient native code for multiple platforms via LLVM. The language uses multiple dispatch as a paradigm, making it easy to express many object-oriented and functional programming patterns." (Julia Documentation: https://docs.julialang.org/en/v1/)
+
+"JavaScript, often abbreviated as JS, is a programming language that is one of the core technologies of the World Wide Web, alongside HTML and CSS. As of 2022, 98% of websites use JavaScript on the client side for webpage behavior, often incorporating third-party libraries. All major web browsers have a dedicated JavaScript engine to execute the code on users' devices." (Wikipedia: https://en.wikipedia.org/wiki/JavaScript)
+
+"TensorFlow.js is an open-source hardware-accelerated JavaScript library for training and deploying machine learning models in the browser and on Node.js." (TensorFlow.js Documentation: https://www.tensorflow.org/js)
+
+"Rust is a multi-paradigm, general-purpose programming language that emphasizes performance, type safety, and concurrency. It enforces memory safety—ensuring that all references point to valid memory—without requiring the use of a garbage collector or reference counting present in other memory-safe languages." (Wikipedia: https://en.wikipedia.org/wiki/Rust_(programming_language))
+
+"The Rust Foundation is an independent non-profit organization dedicated to stewarding the Rust programming language, nurturing the Rust ecosystem, and supporting the set of maintainers governing and developing the project. The Rust Foundation was established in February 2021 by its founding corporate members AWS, Google, Huawei, Microsoft, and Mozilla." (Rust Foundation: https://foundation.rust-lang.org/about/)
+
+"Lisp (historically LISP) is a family of programming languages with a long history and a distinctive, fully parenthesized prefix notation. Originally specified in 1958, Lisp is the second-oldest high-level programming language in widespread use today. Only Fortran is older, by one year." (Wikipedia: https://en.wikipedia.org/wiki/Lisp_(programming_language))
+
+"John McCarthy founded the MIT Artificial Intelligence Project in 1959, and the Stanford Artificial Intelligence Laboratory (SAIL) in 1963. During the 1970s and 1980s, Lisp became the preferred programming language for artificial intelligence (AI) research." (Wikipedia: https://en.wikipedia.org/wiki/John_McCarthy_(computer_scientist))
+
+"C++ is a high-level, general-purpose programming language created by Danish computer scientist Bjarne Stroustrup as an extension of the C programming language, or 'C with Classes'. The language has expanded significantly over time, and modern C++ now has object-oriented, generic, and functional features in addition to facilities for low-level memory manipulation." (Wikipedia: https://en.wikipedia.org/wiki/C%2B%2B)
+
+"ONNX Runtime is a cross-platform inference and training machine-learning accelerator. ONNX Runtime inference can be deployed to the cloud, edge devices, or IoT devices. ONNX Runtime training can be used for distributed training on Linux." (Microsoft Documentation: https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/models-onnx)
+
+"MATLAB (an abbreviation of 'MATrix LABoratory') is a proprietary multi-paradigm programming language and numeric computing environment developed by MathWorks. MATLAB allows matrix manipulations, plotting of functions and data, implementation of algorithms, creation of user interfaces, and interfacing with programs written in other languages." (Wikipedia: https://en.wikipedia.org/wiki/MATLAB)
+
+"The Neural Network Toolbox provides algorithms, pretrained models, and apps to create, train, visualize, and simulate neural networks. You can perform classification, regression, clustering, dimensionality reduction, time-series forecasting, and dynamic system modeling and control." (MathWorks Documentation: https://www.mathworks.com/products/deep-learning.html)
+
+"Scala is a strong statically typed high-level general-purpose programming language that supports both object-oriented programming and functional programming. Designed to be concise, many of Scala's design decisions are aimed to address criticisms of Java." (Wikipedia: https://en.wikipedia.org/wiki/Scala_(programming_language))
+
+"Scala was created by Martin Odersky and he released the first version in 2003. Scala runs on the Java platform (Java virtual machine) and is compatible with existing Java programs." (Wikipedia: https://en.wikipedia.org/wiki/Scala_(programming_language))
+
+"Apache Spark is an open-source unified analytics engine for large-scale data processing. Spark provides an interface for programming clusters with implicit data parallelism and fault tolerance. Originally developed at the University of California, Berkeley's AMPLab, the Spark codebase was later donated to the Apache Software Foundation, which has maintained it since." (Wikipedia: https://en.wikipedia.org/wiki/Apache_Spark)
+
+"Go is a statically typed, compiled programming language designed at Google by Robert Griesemer, Rob Pike, and Ken Thompson. It is syntactically similar to C, but with memory safety, garbage collection, structural typing, and CSP-style concurrency." (Wikipedia: https://en.wikipedia.org/wiki/Go_(programming_language))
+
+"Go was designed at Google in 2007 to improve programming productivity in an era of multicore, networked machines and large codebases. The designers wanted to address criticism of other languages in use at Google, but keep their useful characteristics." (Wikipedia: https://en.wikipedia.org/wiki/Go_(programming_language))

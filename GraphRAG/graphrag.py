@@ -3,8 +3,17 @@
 
 import argparse
 import json
+import logging
 import os
 import re
+import time
+import uuid
+from typing import Dict, List, Union
+
+# Configure logging
+logger = logging.getLogger(__name__)
+log_level = logging.DEBUG if os.getenv("LOGFLAG", "").lower() == "true" else logging.INFO
+logging.basicConfig(level=log_level, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 
 from comps import MegaServiceEndpoint, MicroService, ServiceOrchestrator, ServiceRoleType, ServiceType
 from comps.cores.mega.utils import handle_message
@@ -57,7 +66,7 @@ LLM_MODEL_ID = os.getenv("LLM_MODEL_ID", "meta-llama/Meta-Llama-3.1-8B-Instruct"
 
 def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **kwargs):
     if self.services[cur_node].service_type == ServiceType.RETRIEVER:
-        print("make no changes for retriever inputs. AlreadyCheckCompletionRequest")
+        logger.debug("No changes needed for retriever inputs - already a CompletionRequest")
     elif self.services[cur_node].service_type == ServiceType.LLM:
         # convert TGI/vLLM to unified OpenAI /v1/chat/completions format
         next_inputs = {}
@@ -71,7 +80,15 @@ def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **k
         # next_inputs["repetition_penalty"] = inputs["repetition_penalty"]
         next_inputs["temperature"] = inputs["temperature"]
         inputs = next_inputs
-    print("inputs after align:\n", inputs)
+
+    # Convert Pydantic models to dict before logging
+    log_inputs = inputs
+    if hasattr(inputs, "model_dump"):  # Pydantic v2
+        log_inputs = inputs.model_dump()
+    elif hasattr(inputs, "dict"):  # Pydantic v1
+        log_inputs = inputs.dict()
+
+    logger.debug(f"Inputs after alignment:\n{json.dumps(log_inputs, indent=2)}")
     return inputs
 
 
@@ -96,10 +113,12 @@ def align_outputs(self, data, cur_node, inputs, runtime_graph, llm_parameters_di
             elif input_variables == ["question"]:
                 prompt = prompt_template.format(question=prompt)
             else:
-                print(f"{prompt_template} not used, we only support 2 input variables ['question', 'context']")
+                logger.warning(
+                    f"Template {prompt_template} not used - only supporting input variables ['question', 'context']"
+                )
                 prompt = ChatTemplate.generate_rag_prompt(prompt, docs)
         else:
-            print("no rerank no chat template")
+            logger.debug("Using default chat template (no rerank or custom template provided)")
             prompt = ChatTemplate.generate_rag_prompt(prompt, docs)
 
         next_data["inputs"] = prompt
@@ -110,22 +129,36 @@ def align_outputs(self, data, cur_node, inputs, runtime_graph, llm_parameters_di
 
 
 def align_generator(self, gen, **kwargs):
-    # OpenAI response format
-    # b'data:{"id":"","object":"text_completion","created":1725530204,"model":"meta-llama/Meta-Llama-3-8B-Instruct","system_fingerprint":"2.0.1-native","choices":[{"index":0,"delta":{"role":"assistant","content":"?"},"logprobs":null,"finish_reason":null}]}\n\n'
-    print("generator in align generator:\n", gen)
+    """Aligns the generator output to match ChatQnA's format of sending bytes.
+
+    The UI expects messages in the format: b'content' which it can then decode.
+    """
     for line in gen:
         line = line.decode("utf-8")
         start = line.find("{")
         end = line.rfind("}") + 1
 
+        if start == -1 or end <= start:
+            # Skip lines with invalid json structure
+            continue
+
         json_str = line[start:end]
         try:
-            # sometimes yield empty chunk, do a fallback here
             json_data = json.loads(json_str)
-            if json_data["choices"][0]["finish_reason"] != "eos_token":
-                yield f"data: {repr(json_data['choices'][0]['delta']['content'].encode('utf-8'))}\n\n"
+            if "ops" in json_data and "op" in json_data["ops"][0]:
+                if "value" in json_data["ops"][0] and isinstance(json_data["ops"][0]["value"], str):
+                    yield f"data: {repr(json_data['ops'][0]['value'].encode('utf-8'))}\n\n"
+            elif (
+                "choices" in json_data
+                and "delta" in json_data["choices"][0]
+                and "content" in json_data["choices"][0]["delta"]
+            ):
+                content = json_data["choices"][0]["delta"]["content"]
+                yield f"data: {repr(content.encode('utf-8'))}\n\n"
         except Exception as e:
+            # If JSON parsing fails, send the raw string as bytes
             yield f"data: {repr(json_str.encode('utf-8'))}\n\n"
+
     yield "data: [DONE]\n\n"
 
 
@@ -163,12 +196,12 @@ class GraphRAGService:
     async def handle_request(self, request: Request):
         data = await request.json()
         stream_opt = data.get("stream", True)
-        chat_request = ChatCompletionRequest.parse_obj(data)
+        chat_request = ChatCompletionRequest.model_validate(data)
 
         def parser_input(data, TypeClass, key):
             chat_request = None
             try:
-                chat_request = TypeClass.parse_obj(data)
+                chat_request = TypeClass.model_validate(data)
                 query = getattr(chat_request, key)
             except:
                 query = None
