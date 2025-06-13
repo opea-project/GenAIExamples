@@ -410,7 +410,7 @@ Please refer to **[keycloak_setup_guide](keycloak_setup_guide.md)** for more det
 
 ## 🚀 Launch the UI
 
-To access the frontend, open the following URL in your browser: http://{host_ip}:5174. By default, the UI runs on port 80 internally. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `compose.yaml` file as shown below:
+To access the frontend, open the following URL in your browser: http://{host_ip}. By default, the UI runs on port 80 internally. Nginx server will route the calls to appropriate services based on the routes. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `compose.yaml` file as shown below:
 
 ```yaml
   productivity-suite-xeon-react-ui-server:
