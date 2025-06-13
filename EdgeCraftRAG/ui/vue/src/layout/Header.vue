@@ -4,10 +4,35 @@
     <div class="header-title">
       <h1>{{ $t("headerTitle") }}</h1>
     </div>
-    <div class="theme-switch" @click="handleThemeChange">
-      <div class="icon-wrap" :class="{ 'slider-on': isDark }">
-        <img v-if="!isDark" :src="LightIcon" alt="Sun" class="icon" />
-        <img v-else :src="DarkIcon" alt="Moon" class="icon" />
+    <div class="setting-wrap">
+      <a-dropdown arrow>
+        <div @click.prevent>
+          <div class="lang-icon">
+            <SvgIcon
+              class="iconfont"
+              :name="
+                currentLanguage === 'en_US' ? 'icon-lang-en' : 'icon-lang-zh'
+              "
+              :size="22"
+            />
+          </div>
+        </div>
+        <template #overlay>
+          <a-menu @click="handleLanguageChange">
+            <a-menu-item key="zh_CN" :disabled="currentLanguage === 'zh_CN'"
+              >简体中文</a-menu-item
+            >
+            <a-menu-item key="en_US" :disabled="currentLanguage === 'en_US'"
+              >English</a-menu-item
+            >
+          </a-menu>
+        </template>
+      </a-dropdown>
+      <div class="theme-switch" @click="handleThemeChange">
+        <div class="icon-wrap" :class="{ 'slider-on': isDark }">
+          <img v-if="!isDark" :src="LightIcon" alt="Sun" class="icon" />
+          <img v-else :src="DarkIcon" alt="Moon" class="icon" />
+        </div>
       </div>
     </div>
   </div>
@@ -17,12 +42,20 @@
 import DarkIcon from "@/assets/svgs/dark-icon.svg";
 import headerLog from "@/assets/svgs/header-log.svg";
 import LightIcon from "@/assets/svgs/light-icon.svg";
+import SvgIcon from "@/components/SvgIcon.vue";
 import { themeAppStore } from "@/store/theme";
+import { useI18n } from "vue-i18n";
 
+const { locale } = useI18n();
 const themeStore = themeAppStore();
 const emit = defineEmits(["change-theme"]);
 const isDark = ref<boolean>(false);
 
+const currentLanguage = computed(() => locale.value);
+const handleLanguageChange = ({ key }: { key: string }) => {
+  locale.value = key;
+  themeStore.toggleLanguage(key);
+};
 const handleThemeChange = () => {
   isDark.value = !isDark.value;
   const theme = isDark.value ? "dark" : "light";
@@ -36,9 +69,20 @@ onMounted(() => {
 </script>
 
 <style scoped lang="less">
+@keyframes logoAnimation {
+  0% {
+    transform: scale(0);
+  }
+  80% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
 .header-wrap {
   max-width: 1440px;
-  min-width: 960px;
+  // min-width: 960px;
   margin: 0 auto;
   display: flex;
   align-items: center;
@@ -80,5 +124,21 @@ onMounted(() => {
   width: 20px;
   height: 20px;
   transition: opacity 0.3s ease;
+}
+.setting-wrap {
+  .flex-end;
+  gap: 12px;
+  .lang-icon {
+    cursor: pointer;
+    position: relative;
+    top: 3px;
+    color: var(--font-tip-color);
+    height: 24px;
+    line-height: 24px;
+    &:hover i {
+      display: inline-block;
+      animation: logoAnimation 0.3s ease-in-out;
+    }
+  }
 }
 </style>

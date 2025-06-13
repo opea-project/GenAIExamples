@@ -24,7 +24,7 @@ function build_docker_images() {
     docker build --no-cache -t ${REGISTRY}/comps-base:${TAG} --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
     popd && sleep 1s
     git clone https://github.com/vllm-project/vllm.git && cd vllm
-    VLLM_VER="v0.8.3"
+    VLLM_VER=v0.9.0.1
     echo "Check out vLLM tag ${VLLM_VER}"
     git checkout ${VLLM_VER} &> /dev/null && cd ../
 
@@ -49,7 +49,7 @@ function start_services() {
     source set_env.sh
 
     # Start Docker Containers
-    docker compose -f compose_faqgen_tgi.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
+    docker compose -f compose_faqgen_tgi.yaml up -d --quiet-pull > ${LOG_PATH}/start_services_with_compose.log
 
     sleep 30s
 }

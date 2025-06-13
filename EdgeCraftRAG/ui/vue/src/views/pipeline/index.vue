@@ -8,7 +8,7 @@
           :style="{ color: 'var(--color-big-icon)' }"
           inherit
         />
-        <div>Chatbot</div>
+        <div>{{ $t("common.chatbot") }}</div>
       </div></a-affix
     >
     <!-- system status -->
@@ -61,7 +61,6 @@ import { pipelineAppStore } from "@/store/pipeline";
 import { useNotification } from "@/utils/common";
 import { onMounted, reactive, ref } from "vue";
 import {
-  Configuration,
   CreateDialog,
   DetailDrawer,
   EditDialog,
@@ -70,7 +69,9 @@ import {
   System,
   Table,
 } from "./components";
+import { useI18n } from "vue-i18n";
 
+const { t } = useI18n();
 const { antNotification } = useNotification();
 const pipelineStore = pipelineAppStore();
 const createDialog = reactive<DialogType>({
@@ -89,7 +90,6 @@ const importDialog = reactive<DialogType>({
 });
 
 const tableData = ref<EmptyArrayType>([]);
-const jsonData = ref<string>("");
 
 const queryPipelineList = async () => {
   const data: any = await getPipelineList();
@@ -130,8 +130,8 @@ const jumpChatbot = () => {
   } else {
     antNotification(
       "warning",
-      "Prompt",
-      "There is no available pipeline. Please create or activate it first."
+      t("common.prompt"),
+      t("pipeline.notActivatedTip")
     );
   }
 };

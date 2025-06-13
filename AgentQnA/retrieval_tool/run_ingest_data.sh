@@ -2,7 +2,11 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-host_ip=$(hostname -I | awk '{print $1}')
+# If host_ip is not set, assign it
+if [ -z "$host_ip" ]; then
+  host_ip=$(hostname -I | awk '{print $1}')
+fi
+
 port=6007
 FILEDIR=${WORKDIR}/GenAIExamples/AgentQnA/example_data/
 FILENAME=test_docs_music.jsonl

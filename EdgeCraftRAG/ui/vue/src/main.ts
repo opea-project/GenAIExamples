@@ -16,7 +16,7 @@ import { Local } from "@/utils/storage";
 
 // setting dayjs language
 const setDayjsLocale = (locale: string) => {
-  if (locale === "en-US") {
+  if (locale === "en_US") {
     dayjs.locale("en");
   } else {
     dayjs.locale("zh-cn");
