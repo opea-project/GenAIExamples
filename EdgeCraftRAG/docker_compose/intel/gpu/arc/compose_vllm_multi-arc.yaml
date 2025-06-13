@@ -91,7 +91,7 @@ services:
       - triple_container
   llm-serving-xpu-0:
     container_name: ipex-llm-serving-xpu-container-0
-    image: intelanalytics/ipex-llm-serving-xpu:0.8.3-b18
+    image: intelanalytics/ipex-llm-serving-xpu:0.8.3-b20
     privileged: true
     restart: always
     ports:
@@ -129,7 +129,7 @@ services:
       - triple_container
   llm-serving-xpu-1:
     container_name: ipex-llm-serving-xpu-container-1
-    image: intelanalytics/ipex-llm-serving-xpu:0.8.3-b18
+    image: intelanalytics/ipex-llm-serving-xpu:0.8.3-b20
     privileged: true
     restart: always
     ports:
@@ -166,7 +166,7 @@ services:
       - triple_container
   llm-serving-xpu-2:
     container_name: ipex-llm-serving-xpu-container-2
-    image: intelanalytics/ipex-llm-serving-xpu:0.8.3-b18
+    image: intelanalytics/ipex-llm-serving-xpu:0.8.3-b20
     privileged: true
     restart: always
     ports:
