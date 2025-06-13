@@ -38,11 +38,11 @@ function start_services() {
     source set_env.sh
 
     # Start Docker Containers
-    docker compose -f compose_tgi.yaml -f compose_tgi.telemetry.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
+    docker compose -f compose_tgi.yaml -f compose_tgi.telemetry.yaml up -d --quiet-pull > ${LOG_PATH}/start_services_with_compose.log
 
     n=0
     until [[ "$n" -ge 500 ]]; do
-        docker logs tgi-gaudi-server > ${LOG_PATH}/tgi_service_start.log
+        docker logs tgi-gaudi-server > ${LOG_PATH}/tgi_service_start.log 2>&1
         if grep -q Connected ${LOG_PATH}/tgi_service_start.log; then
             break
         fi
