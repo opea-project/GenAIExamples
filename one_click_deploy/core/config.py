@@ -328,4 +328,76 @@ EXAMPLE_CONFIGS = {
             },
         ],
     },
+    "AudioQnA": {
+        "base_dir": "AudioQnA",
+        "docker_compose": {
+            "paths": {
+                "xeon": "docker_compose/intel/cpu/xeon/compose.yaml",
+                "gaudi": "docker_compose/intel/hpu/gaudi/compose.yaml",
+            },
+            "set_env_scripts": {
+                "xeon": "docker_compose/intel/cpu/xeon/set_env.sh",
+                "gaudi": "docker_compose/intel/hpu/gaudi/set_env.sh",
+            },
+            "params_to_set_env": {"llm_model": "LLM_MODEL_ID", "hf_token": "HUGGINGFACEHUB_API_TOKEN"},
+        },
+        "kubernetes": {
+            "helm": {
+                "chart_oci": "oci://ghcr.io/opea-project/charts/audioqna",
+                "values_files": {
+                    "cpu": "kubernetes/helm/cpu-values.yaml",
+                    "gaudi": "kubernetes/helm/gaudi-values.yaml",
+                },
+                "params_to_values": {"hf_token": "global.HUGGINGFACEHUB_API_TOKEN", "llm_model": "llm.model_name"},
+            },
+            "namespace": "audioqna",
+            "release_name": "audioqna",
+        },
+        "supported_devices": ["xeon", "gaudi"],
+        "default_device": "xeon",
+        "ports": {
+            "docker": {"backend": "3008", "llm": "3006"},
+            "k8s_services": {"backend": "audioqna-backend-server-svc", "llm": "audioqna-llm-svc"},
+        },
+        "test_connections": {
+            "main_service": {
+                "service_key": "backend",
+                "path": "/v1/audioqna",
+                "method": "POST",
+                "payload": {
+                    "audio": "https://github.com/intel/intel-extension-for-transformers/raw/refs/heads/main/intel_extension_for_transformers/neural_chat/assets/audio/sample_2.wav",
+                    "max_tokens": 64,
+                    "voice": "default",
+                },
+                "headers": {"Content-Type": "application/json"},
+                "expect_code": 200,
+            },
+            "sub_services": [
+                {
+                    "name": "llm_code_trans_check",
+                    "service_key": "llm",
+                    "path": "/v1/completions",
+                    "method": "POST",
+                    "payload_dynamic_llm_model": True,
+                    "default_llm_model_id_for_test": "Qwen/Qwen2.5-Coder-7B-Instruct",
+                    "payload_template": {
+                        "model": "Qwen/Qwen2.5-Coder-7B-Instruct",
+                        "messages": [{"role": "user", "content": "Implement a basic Python class"}],
+                        "max_tokens": 32,
+                    },
+                    "headers": {"Content-Type": "application/json"},
+                    "expect_code": 200,
+                }
+            ],
+        },
+        "interactive_params": [
+            {
+                "name": "llm_model",
+                "prompt": "LLM Model ID (for Audio Q&A)",
+                "type": str,
+                "default": "meta-llama/Meta-Llama-3-8B-Instruct",
+                "help": "e.g., meta-llama/Meta-Llama-3-8B-Instruct",
+            },
+        ],
+    },
 }

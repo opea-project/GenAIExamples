@@ -8,7 +8,7 @@ import time
 import click
 
 from .config import COMMON_SCRIPTS_DIR, EXAMPLE_CONFIGS, EXAMPLES_ROOT_DIR
-from .tester import ConnectionTester
+from .tester import ConnectionTesterFactory
 from .utils import (
     get_host_ip,
     get_huggingface_token_from_file,
@@ -540,5 +540,7 @@ class Deployer:
         It uses self.args, which has been populated by the interactive setup methods.
         """
         section_header(f"Testing Connection for {self.example_name}")
-        tester = ConnectionTester(self.example_name, self.args.deploy_mode, self.args.device, self.args)
+        tester = ConnectionTesterFactory.create_tester(
+            self.example_name, self.args.deploy_mode, self.args.device, self.args
+        )
         return tester.run_all_tests()
