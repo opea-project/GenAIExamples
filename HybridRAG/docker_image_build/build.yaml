@@ -31,6 +31,12 @@ services:
       dockerfile: comps/dataprep/src/Dockerfile
     extends: hybridrag
     image: ${REGISTRY:-opea}/dataprep:${TAG:-latest}
+  struct2graph:
+    build:
+      context: GenAIComps
+      dockerfile: comps/struct2graph/src/Dockerfile
+    extends: hybridrag
+    image: ${REGISTRY:-opea}/struct2graph:${TAG:-latest}
   retriever:
     build:
       context: GenAIComps
