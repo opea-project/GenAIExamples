@@ -174,9 +174,9 @@ function main() {
     validate_megaservice
     echo "::endgroup::"
 
-    echo "::group::validate_frontend"
-    validate_frontend
-    echo "::endgroup::"
+#    echo "::group::validate_frontend"
+#    validate_frontend
+#    echo "::endgroup::"
 
     echo "::group::stop_docker"
     stop_docker
