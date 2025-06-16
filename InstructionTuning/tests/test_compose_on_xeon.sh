@@ -98,15 +98,27 @@ function stop_docker() {
 
 function main() {
 
+    echo "::group::stop_docker"
     stop_docker
+    echo "::endgroup::"
 
-    build_docker_images
-    start_service
+    echo "::group::build_docker_images"
+    if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
+    echo "::endgroup::"
 
-    validate_microservice
+    echo "::group::start_services"
+    start_services
+    echo "::endgroup::"
 
+    echo "::group::validate_microservices"
+    validate_microservices
+    echo "::endgroup::"
+
+    echo "::group::stop_docker"
     stop_docker
-    echo y | docker system prune
+    echo "::endgroup::"
+
+    docker system prune -f
 
 }
 
