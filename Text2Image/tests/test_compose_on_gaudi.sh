@@ -26,7 +26,7 @@ function build_docker_images() {
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 }
 
-function start_service() {
+function start_services() {
     cd $WORKPATH/docker_compose/intel/hpu/gaudi
     export no_proxy="localhost,127.0.0.1,"${ip_address}
     # Start Docker Containers
