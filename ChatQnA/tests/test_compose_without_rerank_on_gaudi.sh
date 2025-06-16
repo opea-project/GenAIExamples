@@ -40,11 +40,11 @@ function start_services() {
     source set_env.sh
 
     # Start Docker Containers
-    docker compose -f compose_without_rerank.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
+    docker compose -f compose_without_rerank.yaml up -d --quiet-pull > ${LOG_PATH}/start_services_with_compose.log
 
     n=0
     until [[ "$n" -ge 160 ]]; do
-        docker logs vllm-gaudi-server > vllm_service_start.log
+        docker logs vllm-gaudi-server > vllm_service_start.log 2>&1
         if grep -q "Warmup finished" vllm_service_start.log; then
             break
         fi
