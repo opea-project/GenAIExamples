@@ -289,7 +289,7 @@ EXAMPLE_CONFIGS = {
         "default_device": "xeon",
         "ports": {
             "docker": {"backend": "7778", "llm": "8028"},
-            "k8s_services": {"backend": "codegen-svc", "llm": "codegen-llm-svc"},
+            "k8s_services": {"backend": "codegen", "llm": "codegen-llm-uservice"},
         },
         "test_connections": {
             "main_service": {
@@ -345,7 +345,7 @@ EXAMPLE_CONFIGS = {
             "helm": {
                 "chart_oci": "oci://ghcr.io/opea-project/charts/audioqna",
                 "values_files": {
-                    "cpu": "kubernetes/helm/cpu-values.yaml",
+                    "xeon": "kubernetes/helm/cpu-values.yaml",
                     "gaudi": "kubernetes/helm/gaudi-values.yaml",
                 },
                 "params_to_values": {"hf_token": "global.HUGGINGFACEHUB_API_TOKEN", "llm_model": "llm.model_name"},
@@ -357,7 +357,7 @@ EXAMPLE_CONFIGS = {
         "default_device": "xeon",
         "ports": {
             "docker": {"backend": "3008", "llm": "3006"},
-            "k8s_services": {"backend": "audioqna-backend-server-svc", "llm": "audioqna-llm-svc"},
+            "k8s_services": {"backend": "audioqna", "llm": "audioqna-vllm"},
         },
         "test_connections": {
             "main_service": {
