@@ -43,6 +43,7 @@ class EdgeCraftRagService:
     async def handle_request(self, request: Request):
         input = await request.json()
         stream_opt = input.get("stream", False)
+        input["user"] = request.headers.get("sessionid", None)
         chat_request = ChatCompletionRequest.parse_obj(input)
         parameters = LLMParams(
             max_tokens=chat_request.max_tokens if chat_request.max_tokens else 1024,
