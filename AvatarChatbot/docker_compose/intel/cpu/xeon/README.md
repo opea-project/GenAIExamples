@@ -1,4 +1,5 @@
 # Example AvatarChatbot Deployment on Intel® Xeon® Platform
+
 This document outlines the deployment process for a AvatarChatbot application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on Intel Xeon server. This example includes the following sections:
 
 - [AvatarChatbot Quick Start Deployment](#avatarchatbot-quick-start-deployment): Demonstrates how to quickly deploy a AvatarChatbot service/pipeline on Intel Xeon server.
@@ -45,8 +46,6 @@ source set_env.sh
 ```
 
 The set_env.sh script will prompt for required and optional environment variables used to configure the AvatarChatbot service. If a value is not entered, the script will use a default value for the same. It will also generate a env file defining the desired configuration. Consult the section on [AvatarChatbot Service configuration](#avatarchatbot-service-configuration) for information on how service specific configuration parameters affect deployments.
-
-
 
 ### Deploy the Service Using Docker Compose
 
@@ -129,31 +128,30 @@ docker compose -f compose.yaml down
  ✔ Network xeon_default                         Removed                                                                                                         2.1s
 ```
 
-
 All the AvatarChatbot containers will be stopped and then removed on completion of the "down" command.
 
 ## AvatarChatbot Docker Compose Files
 
 The compose.yaml is default compose file using tgi as serving framework
 
-| Service Name                        | Image Name                                                    |
-| ----------------------------------- | ------------------------------------------------------------- |
-| tgi-service                         | ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu |
-| whisper-service                     | opea/whisper:latest                                           |
-| speecht5-service                    | opea/speecht5:latest                                          |
-| wav2lip-service                     | opea/wav2lip:latest                                           |
-| animation                           | opea/animation:latest                                         |
-| avatarchatbot-xeon-backend-server   | opea/avatarchatbot:latest                                     |
+| Service Name                      | Image Name                                                    |
+| --------------------------------- | ------------------------------------------------------------- |
+| tgi-service                       | ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu |
+| whisper-service                   | opea/whisper:latest                                           |
+| speecht5-service                  | opea/speecht5:latest                                          |
+| wav2lip-service                   | opea/wav2lip:latest                                           |
+| animation                         | opea/animation:latest                                         |
+| avatarchatbot-xeon-backend-server | opea/avatarchatbot:latest                                     |
 
 ## AvatarChatbot Service Configuration
 
 The table provides a comprehensive overview of the AvatarChatbot service utilized across various deployments as illustrated in the example Docker Compose files. Each row in the table represents a distinct service, detailing its possible images used to enable it and a concise description of its function within the deployment architecture.
 
-| Service Name                        | Possible Image Names                                          | Optional | Description                                                                                     |
-| ----------------------------------- | ------------------------------------------------------------- | -------- | ----------------------------------------------------------------------------------------------- |
-| tgi-service                         | ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu | No       | Specific to the TGI deployment, focuses on text generation inference using Xeon hardware.      |
-| whisper-service                     | opea/whisper:latest                                           | No       | Provides automatic speech recognition (ASR), converting spoken audio input into text.            |
-| speecht5-service                    | opea/speecht5:latest                                          | No       | Performs text-to-speech (TTS) synthesis, generating natural-sounding speech from text.           |
-| wav2lip-service                     | opea/wav2lip:latest                                           | No       | Generates realistic lip-sync animations by aligning speech audio with a video of a face.         |
-| animation                           | opea/animation:latest                                         | No       | Handles avatar animation, rendering facial expressions and movements for the chatbot avatar.      |
-| avatarchatbot-xeon-backend-server   | opea/avatarchatbot:latest                                     | No       | Orchestrates the overall AvatarChatbot pipeline, managing requests and integrating all services.  |
+| Service Name                      | Possible Image Names                                          | Optional | Description                                                                                      |
+| --------------------------------- | ------------------------------------------------------------- | -------- | ------------------------------------------------------------------------------------------------ |
+| tgi-service                       | ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu | No       | Specific to the TGI deployment, focuses on text generation inference using Xeon hardware.        |
+| whisper-service                   | opea/whisper:latest                                           | No       | Provides automatic speech recognition (ASR), converting spoken audio input into text.            |
+| speecht5-service                  | opea/speecht5:latest                                          | No       | Performs text-to-speech (TTS) synthesis, generating natural-sounding speech from text.           |
+| wav2lip-service                   | opea/wav2lip:latest                                           | No       | Generates realistic lip-sync animations by aligning speech audio with a video of a face.         |
+| animation                         | opea/animation:latest                                         | No       | Handles avatar animation, rendering facial expressions and movements for the chatbot avatar.     |
+| avatarchatbot-xeon-backend-server | opea/avatarchatbot:latest                                     | No       | Orchestrates the overall AvatarChatbot pipeline, managing requests and integrating all services. |

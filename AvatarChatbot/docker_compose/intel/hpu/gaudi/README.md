@@ -134,24 +134,24 @@ All the AvatarChatbot containers will be stopped and then removed on completion 
 
 The compose.yaml is default compose file using tgi as serving framework
 
-| Service Name                        | Image Name                          |
-| ----------------------------------- | ----------------------------------- |
-| tgi-service                         | ghcr.io/huggingface/tgi-gaudi:2.0.6 |
-| whisper-service                     | opea/whisper-gaudi:latest           |
-| speecht5-service                    | opea/speecht5-gaudi:latest          |
-| wav2lip-service                     | opea/wav2lip-gaudi:latest           |
-| animation                           | opea/animation:latest               |
-| avatarchatbot-gaudi-backend-server  | opea/avatarchatbot:latest           |
+| Service Name                       | Image Name                          |
+| ---------------------------------- | ----------------------------------- |
+| tgi-service                        | ghcr.io/huggingface/tgi-gaudi:2.0.6 |
+| whisper-service                    | opea/whisper-gaudi:latest           |
+| speecht5-service                   | opea/speecht5-gaudi:latest          |
+| wav2lip-service                    | opea/wav2lip-gaudi:latest           |
+| animation                          | opea/animation:latest               |
+| avatarchatbot-gaudi-backend-server | opea/avatarchatbot:latest           |
 
 ## AvatarChatbot Service Configuration
 
 The table provides a comprehensive overview of the AvatarChatbot service utilized across various deployments as illustrated in the example Docker Compose files. Each row in the table represents a distinct service, detailing its possible images used to enable it and a concise description of its function within the deployment architecture.
 
-| Service Name                        | Possible Image Names                | Optional | Description                                                                                     |
-| ----------------------------------- | ----------------------------------- | -------- | ----------------------------------------------------------------------------------------------- |
-| tgi-service                         | ghcr.io/huggingface/tgi-gaudi:2.0.6 | No       | Specific to the TGI deployment, focuses on text generation inference using Gaudi hardware.      |
-| whisper-service                     | opea/whisper-gaudi:latest           | No       | Provides automatic speech recognition (ASR), converting spoken audio input into text.            |
-| speecht5-service                    | opea/speecht5-gaudi:latest          | No       | Performs text-to-speech (TTS) synthesis, generating natural-sounding speech from text.           |
-| wav2lip-service                     | opea/wav2lip-gaudi:latest           | No       | Generates realistic lip-sync animations by aligning speech audio with a video of a face.         |
-| animation                           | opea/animation:latest               | No       | Handles avatar animation, rendering facial expressions and movements for the chatbot avatar.      |
-| avatarchatbot-gaudi-backend-server  | opea/avatarchatbot:latest           | No       | Orchestrates the overall AvatarChatbot pipeline, managing requests and integrating all services.  |
+| Service Name                       | Possible Image Names                | Optional | Description                                                                                      |
+| ---------------------------------- | ----------------------------------- | -------- | ------------------------------------------------------------------------------------------------ |
+| tgi-service                        | ghcr.io/huggingface/tgi-gaudi:2.0.6 | No       | Specific to the TGI deployment, focuses on text generation inference using Gaudi hardware.       |
+| whisper-service                    | opea/whisper-gaudi:latest           | No       | Provides automatic speech recognition (ASR), converting spoken audio input into text.            |
+| speecht5-service                   | opea/speecht5-gaudi:latest          | No       | Performs text-to-speech (TTS) synthesis, generating natural-sounding speech from text.           |
+| wav2lip-service                    | opea/wav2lip-gaudi:latest           | No       | Generates realistic lip-sync animations by aligning speech audio with a video of a face.         |
+| animation                          | opea/animation:latest               | No       | Handles avatar animation, rendering facial expressions and movements for the chatbot avatar.     |
+| avatarchatbot-gaudi-backend-server | opea/avatarchatbot:latest           | No       | Orchestrates the overall AvatarChatbot pipeline, managing requests and integrating all services. |
