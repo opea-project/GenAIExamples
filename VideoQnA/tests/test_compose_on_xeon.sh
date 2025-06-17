@@ -15,68 +15,15 @@ LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
 export host_ip=${ip_address}
 
-function setup_env() {
-    export HF_TOKEN=${HF_TOKEN}
-
-    export INDEX_NAME="mega-videoqna"
-    export LLM_DOWNLOAD="True" # Set to "False" before redeploy LVM server to avoid model download
-    export RERANK_COMPONENT_NAME="OPEA_VIDEO_RERANKING"
-    export LVM_COMPONENT_NAME="OPEA_VIDEO_LLAMA_LVM"
-    export EMBEDDING_COMPONENT_NAME="OPEA_CLIP_EMBEDDING"
-    export USECLIP=1
-    export LOGFLAG=True
-
-    export EMBEDDING_SERVICE_HOST_IP=${host_ip}
-    export LVM_SERVICE_HOST_IP=${host_ip}
-    export MEGA_SERVICE_HOST_IP=${host_ip}
-    export RERANK_SERVICE_HOST_IP=${host_ip}
-    export RETRIEVER_SERVICE_HOST_IP=${host_ip}
-    export VDMS_HOST=${host_ip}
-
-    export BACKEND_PORT=8888
-    export DATAPREP_PORT=6007
-    export EMBEDDER_PORT=6990
-    export MULTIMODAL_CLIP_EMBEDDER_PORT=6991
-    export LVM_PORT=9399
-    export RERANKING_PORT=8000
-    export RETRIEVER_PORT=7000
-    export UI_PORT=5173
-    export VDMS_PORT=8001
-    export VIDEO_LLAMA_PORT=9009
-
-    export BACKEND_HEALTH_CHECK_ENDPOINT="http://${host_ip}:${BACKEND_PORT}/v1/health_check"
-    export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:${BACKEND_PORT}/v1/videoqna"
-    export CLIP_EMBEDDING_ENDPOINT="http://${host_ip}:${MULTIMODAL_CLIP_EMBEDDER_PORT}"
-    export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:${DATAPREP_PORT}/v1/dataprep/get"
-    export DATAPREP_GET_VIDEO_LIST_ENDPOINT="http://${host_ip}:${DATAPREP_PORT}/v1/dataprep/get_videos"
-    export DATAPREP_INGEST_SERVICE_ENDPOINT="http://${host_ip}:${DATAPREP_PORT}/v1/dataprep/ingest_videos"
-    export EMBEDDING_ENDPOINT="http://${host_ip}:${EMBEDDER_PORT}/v1/embeddings"
-    export FRONTEND_ENDPOINT="http://${host_ip}:${UI_PORT}/_stcore/health"
-    export LVM_ENDPOINT="http://${host_ip}:${VIDEO_LLAMA_PORT}"
-    export LVM_VIDEO_ENDPOINT="http://${host_ip}:${VIDEO_LLAMA_PORT}/generate"
-    export RERANKING_ENDPOINT="http://${host_ip}:${RERANKING_PORT}/v1/reranking"
-    export RETRIEVER_ENDPOINT="http://${host_ip}:${RETRIEVER_PORT}/v1/retrieval"
-    export TEI_RERANKING_ENDPOINT="http://${host_ip}:${TEI_RERANKING_PORT}"
-    export UI_ENDPOINT="http://${host_ip}:${UI_PORT}/_stcore/health"
-
-    export no_proxy="${NO_PROXY},${host_ip},vdms-vector-db,dataprep-vdms-server,clip-embedding-server,reranking-tei-server,retriever-vdms-server,lvm-video-llama,lvm,videoqna-xeon-backend-server,videoqna-xeon-ui-server"
-}
 
 function build_docker_images() {
     opea_branch=${opea_branch:-"main"}
-    # If the opea_branch isn't main, replace the git clone branch in Dockerfile.
-    if [[ "${opea_branch}" != "main" ]]; then
-        cd $WORKPATH
-        OLD_STRING="RUN git clone --depth 1 https://github.com/opea-project/GenAIComps.git"
-        NEW_STRING="RUN git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git"
-        find . -type f -name "Dockerfile*" | while read -r file; do
-            echo "Processing file: $file"
-            sed -i "s|$OLD_STRING|$NEW_STRING|g" "$file"
-        done
-    fi
-
     cd $WORKPATH/docker_image_build
-    git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git GenAIComps
+    git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
+    pushd GenAIComps
+    echo "GenAIComps test commit is $(git rev-parse HEAD)"
+    docker build --no-cache -t ${REGISTRY}/comps-base:${TAG} --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
+    popd && sleep 1s
 
     # Create .cache directory for cache volume to connect (avoids permission denied error)
     OLD_STRING="mkdir -p /home/user "
@@ -88,13 +35,13 @@ function build_docker_images() {
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
     docker compose -f build.yaml build --no-cache > ${LOG_PATH}/docker_image_build.log 2>&1
 
-	docker pull intellabs/vdms:latest
     docker images && sleep 1s
 }
 
 function start_services() {
     echo "Starting services..."
     cd $WORKPATH/docker_compose/intel/cpu/xeon/
+    source ./set_env.sh
 
     docker volume create video-llama-model
     docker volume create videoqna-cache
@@ -331,23 +278,35 @@ function stop_docker() {
 
 function main() {
 
-    setup_env
+    echo "::group::stop_docker"
     stop_docker
+    echo "::endgroup::"
 
+    echo "::group::build_docker_images"
     if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
+    echo "::endgroup::"
 
-    start_time=$(date +%s)
+    echo "::group::start_services"
     start_services
-    end_time=$(date +%s)
-    duration=$((end_time-start_time))
-    echo "Mega service start duration is $duration s" && sleep 1s
+    echo "::endgroup::"
 
+    echo "::group::validate_microservices"
     validate_microservices
-    validate_megaservice
-    validate_frontend
+    echo "::endgroup::"
 
+    echo "::group::validate_megaservice"
+    validate_megaservice
+    echo "::endgroup::"
+
+    echo "::group::validate_frontend"
+    validate_frontend
+    echo "::endgroup::"
+
+    echo "::group::stop_docker"
     stop_docker
-    echo y | docker system prune
+    echo "::endgroup::"
+
+    docker system prune -f
 
 }
 
