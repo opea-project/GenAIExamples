@@ -7,9 +7,9 @@ source .set_env.sh
 popd > /dev/null
 
 export HOST_IP=$(hostname -I | awk '{print $1}')
-export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
-if [ -z "${HUGGINGFACEHUB_API_TOKEN}" ]; then
-    echo "Error: HUGGINGFACEHUB_API_TOKEN is not set. Please set HUGGINGFACEHUB_API_TOKEN"
+export HF_TOKEN=${HF_TOKEN}
+if [ -z "${HF_TOKEN}" ]; then
+    echo "Error: HF_TOKEN is not set. Please set HF_TOKEN"
 fi
 
 if [ -z "${HOST_IP}" ]; then

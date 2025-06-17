@@ -17,7 +17,7 @@ ip_address=$(hostname -I | awk '{print $1}')
 
 source $WORKPATH/docker_compose/amd/gpu/rocm/set_env_faqgen.sh
 
-export PATH="~/miniconda3/bin:$PATH"
+export PATH="$HOME/miniconda3/bin:$PATH"
 
 function build_docker_images() {
     opea_branch=${opea_branch:-"main"}
@@ -39,11 +39,11 @@ function start_services() {
     cd "$WORKPATH"/docker_compose/amd/gpu/rocm
 
     # Start Docker Containers
-    docker compose -f compose_faqgen.yaml up -d > "${LOG_PATH}"/start_services_with_compose.log
+    docker compose -f compose_faqgen.yaml up -d --quiet-pull > "${LOG_PATH}"/start_services_with_compose.log
 
     n=0
     until [[ "$n" -ge 160 ]]; do
-        docker logs chatqna-tgi-service > "${LOG_PATH}"/tgi_service_start.log
+        docker logs chatqna-tgi-service > "${LOG_PATH}"/tgi_service_start.log 2>&1
         if grep -q Connected "${LOG_PATH}"/tgi_service_start.log; then
             break
         fi

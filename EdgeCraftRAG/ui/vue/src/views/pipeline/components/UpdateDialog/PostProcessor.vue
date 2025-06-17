@@ -14,14 +14,14 @@
       :key="index"
     >
       <a-form-item
-        label="PostProcessor Type"
+        :label="$t('pipeline.config.postProcessorType')"
         :name="['postprocessor', index, 'processor_type']"
         :rules="rules.processor_type"
       >
         <a-select
           showSearch
           v-model:value="processor.processor_type"
-          placeholder="please select PostProcessor Type"
+          :placeholder="$t('pipeline.valid.postProcessorType')"
         >
           <a-select-option
             v-for="item in postProcessorList"
@@ -31,24 +31,22 @@
             >{{ item.name }}</a-select-option
           >
         </a-select>
-        <FormTooltip
-          title="Select postprocessors for post-processing of the context"
-        />
+        <FormTooltip :title="$t('pipeline.desc.postProcessorType')" />
       </a-form-item>
       <div class="option-introduction" v-if="processor.processor_type">
         <InfoCircleOutlined />
-        {{ getOptionIntroduction(processor.processor_type) }}
+        {{ $t(getOptionIntroduction(processor.processor_type)!) }}
       </div>
       <template v-if="processor.processor_type === 'reranker'">
         <a-form-item
-          label="Rerank Model"
+          :label="$t('pipeline.config.rerank')"
           :name="['postprocessor', index, 'reranker_model', 'model_id']"
           :rules="rules.model_id"
         >
           <a-select
             showSearch
             v-model:value="processor.reranker_model.model_id"
-            placeholder="please select Rerank Model"
+            :placeholder="$t('pipeline.valid.rerank')"
             @dropdownVisibleChange="handleModelVisible"
             @change="(value:string) => handleModelChange(processor.reranker_model, value)"
           >
@@ -59,17 +57,17 @@
               >{{ item }}</a-select-option
             >
           </a-select>
-          <FormTooltip title="Rerank Model" />
+          <FormTooltip :title="$t('pipeline.desc.rerank')" />
         </a-form-item>
         <a-form-item
-          label="Rerank run device"
+          :label="$t('pipeline.config.rerankDevice')"
           :name="['postprocessor', index, 'reranker_model', 'device']"
           :rules="rules.device"
         >
           <a-select
             showSearch
             v-model:value="processor.reranker_model.device"
-            placeholder="please select Rerank run device"
+            :placeholder="$t('pipeline.valid.rerankDevice')"
             @dropdownVisibleChange="handleDeviceVisible"
           >
             <a-select-option
@@ -79,13 +77,15 @@
               >{{ item }}</a-select-option
             >
           </a-select>
-          <FormTooltip title="Rerank run device" /> </a-form-item
+          <FormTooltip
+            :title="$t('pipeline.desc.rerankDevice')"
+          /> </a-form-item
       ></template>
       <div class="icon-wrap">
         <a-tooltip
           placement="topRight"
           arrow-point-at-center
-          title="Add"
+          :title="$t('common.add')"
           v-if="form.postprocessor?.length < 2"
         >
           <PlusCircleOutlined @click="handleAdd" />
@@ -93,7 +93,7 @@
         <a-tooltip
           placement="topRight"
           arrow-point-at-center
-          title="Delete"
+          :title="$t('common.delete')"
           v-if="form.postprocessor?.length > 1"
         >
           <MinusCircleOutlined @click="handleDelete(index)" />
@@ -111,7 +111,9 @@ import { reactive, ref } from "vue";
 import { PostProcessor } from "../../enum.ts";
 import { ModelType } from "../../type.ts";
 import { InfoCircleOutlined } from "@ant-design/icons-vue";
+import { useI18n } from "vue-i18n";
 
+const { t } = useI18n();
 const props = defineProps({
   formData: {
     type: Object,
@@ -149,21 +151,22 @@ const rules = reactive({
   processor_type: [
     {
       required: true,
-      message: "please select PostProcessor Type",
+      message: t("pipeline.valid.postProcessorType"),
       trigger: "change",
     },
   ],
   model_id: [
     {
       required: true,
-      message: "Please select Rerank Model",
+      message: t("pipeline.valid.rerank"),
       trigger: "change",
     },
   ],
   device: [
     {
       required: true,
-      message: "Please select Rerank Device",
+      message: t("pipeline.valid.rerankDevice"),
+
       trigger: "change",
     },
   ],

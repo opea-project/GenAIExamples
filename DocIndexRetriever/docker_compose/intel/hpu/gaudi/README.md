@@ -43,7 +43,7 @@ docker build --no-cache -t opea/doc-index-retriever:latest --build-arg https_pro
 
 ```bash
 export host_ip="YOUR IP ADDR"
-export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
+export HF_TOKEN=${your_hf_api_token}
 export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
 export RERANK_MODEL_ID="BAAI/bge-reranker-base"
 export TEI_EMBEDDING_ENDPOINT="http://${host_ip}:8090"
@@ -56,7 +56,7 @@ export RERANK_SERVICE_HOST_IP=${host_ip}
 export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8000/v1/retrievaltool"
 export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/ingest"
 export llm_hardware='cpu/xeon' #cpu/xeon, xpu, hpu/gaudi
-cd GenAIExamples/DocIndexRetriever/intel/hpu/gaudi/
+cd GenAIExamples/DocIndexRetriever/docker_compose/intel/hpu/gaudi/
 docker compose up -d
 ```
 
