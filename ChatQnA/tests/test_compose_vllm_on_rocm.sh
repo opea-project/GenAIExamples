@@ -38,11 +38,11 @@ function start_services() {
     cd "$WORKPATH"/docker_compose/amd/gpu/rocm
 
     # Start Docker Containers
-    docker compose -f compose_vllm.yaml up -d > "${LOG_PATH}"/start_services_with_compose.log
+    docker compose -f compose_vllm.yaml up -d --quiet-pull > "${LOG_PATH}"/start_services_with_compose.log
 
     n=0
     until [[ "$n" -ge 500 ]]; do
-        docker logs chatqna-vllm-service >& "${LOG_PATH}"/chatqna-vllm-service_start.log
+        docker logs chatqna-vllm-service > "${LOG_PATH}"/chatqna-vllm-service_start.log 2>&1
         if grep -q "Application startup complete" "${LOG_PATH}"/chatqna-vllm-service_start.log; then
             break
         fi

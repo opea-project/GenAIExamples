@@ -1,0 +1,15 @@
+"Python was conceived in the late 1980s, and its implementation began in December 1989 by Guido van Rossum at Centrum Wiskunde & Informatica (CWI) in the Netherlands as a successor to the ABC programming language capable of exception handling and interfacing with the Amoeba operating system." (Wikipedia: https://en.wikipedia.org/wiki/Python_(programming_language))
+
+"Python was designed to be highly extensible. Python can also be embedded in existing applications that need a programmable interface. This design of a small core language with a large standard library and an easily extensible interpreter was intended by Van Rossum from the start because of his frustrations with ABC, which espoused the opposite approach." (Wikipedia: https://en.wikipedia.org/wiki/Python_(programming_language)#Features_and_philosophy)
+
+"Java was originally developed by James Gosling at Sun Microsystems. It was released in May 1995 as a core component of Sun Microsystems' Java platform. The original and reference implementation Java compilers, virtual machines, and class libraries were originally released by Sun under proprietary licenses." (Wikipedia: https://en.wikipedia.org/wiki/Java_(programming_language))
+
+"In 2007, three Google employees, Robert Griesemer, Rob Pike, and Ken Thompson, started sketching the goals for a new language to address criticisms of other languages in use at Google. The new language was initially called 'Go!' but due to trademark issues, it was later renamed 'Go'." (Wikipedia: https://en.wikipedia.org/wiki/Go_(programming_language)#History)
+
+"Go was designed at Google in 2007 to improve programming productivity in an era of multicore, networked machines and large codebases. The designers wanted to address criticism of other languages in use at Google, but keep their useful characteristics." (Wikipedia: https://en.wikipedia.org/wiki/Go_(programming_language))
+
+"The designers were primarily motivated by their shared dislike of C++. Go is influenced by C, but with an emphasis on greater simplicity and safety... Go was publicly announced in November 2009, and version 1.0 was released in March 2012." (Wikipedia: https://en.wikipedia.org/wiki/Go_(programming_language)#History)
+
+"Google has invested significant resources in creating custom versions of the Java virtual machine (JVM) and Python runtime for its production systems. The company's Gotz JVM includes custom garbage collection and monitoring features optimized for large-scale applications. Similarly, Google maintains an internal Python implementation with performance enhancements for its specific use cases." (Google Engineering Blog: https://engineering.google.com/blog/)
+
+"Go addresses issues that make large-scale software development difficult, including slow builds, uncontrolled dependencies, different subsets of languages being used in different places, poor program understanding (code hard to read, poorly documented, and so on), duplicate efforts, and high update costs." (The Go Blog: https://go.dev/blog/go-at-google-language-design-in-the-service-of-software-engineering)

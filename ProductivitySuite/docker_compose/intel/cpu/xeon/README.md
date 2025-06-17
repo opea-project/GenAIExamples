@@ -1,472 +1,230 @@
-# Build Mega Service of Productivity Suite on Xeon
+# Example Productivity Suite Deployment on Intel® Xeon® Platform
 
-This document outlines the deployment process for OPEA Productivity Suite utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on Intel Xeon server and [GenAIExamples](https://github.com/opea-project/GenAIExamples.git) solutions. The steps include Docker image creation, container deployment via Docker Compose, and service execution to integrate microservices such as `embedding`, `retriever`, `rerank`, and `llm`. We will publish the Docker images to Docker Hub soon, it will simplify the deployment process for this service.
+This document outlines the deployment process for OPEA Productivity Suite utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on Intel Xeon server.This example includes the following sections:
 
----
+- [Productivity Suite Quick Start Deployment](#productivity-suite-quick-start-deployment): Demonstrates how to quickly deploy a Productivity Suite service/pipeline on Intel® Xeon® platform.
+- [Productivity Suite Docker Compose Files](#productivity-suite-docker-compose-files): Describes some example deployments and their docker compose files.
+- [Productivity Suite Service Configuration](#productivity-suite-service-configuration): Describes the service and possible configuration changes.
 
-## 🐳 Build Docker Images
+## Productivity Suite Quick Start Deployment
 
-First of all, you need to build Docker Images locally and install the python package of it.
+This section describes how to quickly deploy and test the Productivity Suite service manually on Intel® Xeon® platform. The basic steps are:
 
-### 1. Build Embedding Image
+1. [Access the Code](#access-the-code)
+2. [Generate a HuggingFace Access Token](#generate-a-huggingface-access-token)
+3. [Configure the Deployment Environment](#configure-the-deployment-environment)
+4. [Deploy the Service Using Docker Compose](#deploy-the-service-using-docker-compose)
+5. [Check the Deployment Status](#check-the-deployment-status)
+6. [Setup Keycloak](#setup-keycloak)
+7. [Test the Pipeline](#test-the-pipeline)
+8. [Cleanup the Deployment](#cleanup-the-deployment)
 
-```bash
-git clone https://github.com/opea-project/GenAIComps.git
-cd GenAIComps
-docker build --no-cache -t opea/embedding:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/embeddings/src/Dockerfile .
+### Access the Code
+
+Clone the GenAIExample repository and access the Productivity Suite Intel® Xeon® platform Docker Compose files and supporting scripts:
+
 ```
-
-### 2. Build Retriever Image
-
-```bash
-docker build --no-cache -t opea/retriever:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/retrievers/src/Dockerfile .
-```
-
-### 3. Build Rerank Image
-
-```bash
-docker build --no-cache -t opea/reranking:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/rerankings/src/Dockerfile .
-```
-
-### 4. Build LLM Image
-
-#### Use TGI as backend
-
-```bash
-docker build --no-cache -t opea/llm-textgen:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/src/text-generation/Dockerfile .
-```
-
-### 5. Build Dataprep Image
-
-```bash
-docker build --no-cache -t opea/dataprep:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/src/Dockerfile .
-```
-
-### 6. Build Prompt Registry Image
-
-```bash
-docker build -t opea/promptregistry-mongo:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/prompt_registry/src/Dockerfile .
-```
-
-### 7. Build Chat History Image
-
-```bash
-docker build -t opea/chathistory-mongo:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/chathistory/src/Dockerfile .
-cd ..
-```
-
-### 8. Build MegaService Docker Images
-
-The Productivity Suite is composed of multiple GenAIExample reference solutions composed together.
-
-#### 8.1 Build ChatQnA MegaService Docker Images
-
-```bash
 git clone https://github.com/opea-project/GenAIExamples.git
-cd GenAIExamples/ChatQnA/
-docker build --no-cache -t opea/chatqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
+cd GenAIExamples/ProductivitySuite/docker_compose/intel/cpu/xeon/
 ```
 
-#### 8.2 Build DocSum Megaservice Docker Images
+Checkout a released version, such as v1.3:
+
+```
+git checkout v1.3
+```
+
+### Generate a HuggingFace Access Token
+
+Some HuggingFace resources, such as some models, are only accessible if you have an access token. If you do not already have a HuggingFace access token, you can create one by first creating an account by following the steps provided at [HuggingFace](https://huggingface.co/) and then generating a [user access token](https://huggingface.co/docs/transformers.js/en/guides/private#step-1-generating-a-user-access-token).
+
+### Configure the Deployment Environment
+
+To set up environment variables for deploying Productivity Suite service, source the set_env.sh script in this directory:
+
+```
+source set_env.sh
+```
+
+The set_env.sh script will prompt for required and optional environment variables used to configure the Productivity Suite service. If a value is not entered, the script will use a default value for the same. It will also generate a env file defining the desired configuration. Consult the section on [Productivity Suite Service configuration](#productivity-suite-service-configuration) for information on how service specific configuration parameters affect deployments.
+
+### Deploy the Service Using Docker Compose
+
+To deploy the Productivity Suite service, execute the `docker compose up` command with the appropriate arguments. For a default deployment, execute:
 
 ```bash
-cd GenAIExamples/DocSum
-docker build --no-cache -t opea/docsum:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
+docker compose up -d
 ```
 
-#### 8.3 Build CodeGen Megaservice Docker Images
-
-```bash
-cd GenAIExamples/CodeGen
-docker build --no-cache -t opea/codegen:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
-```
-
-### 9. Build UI Docker Image
-
-Build frontend Docker image that enables via below command:
-
-**Export the value of the public IP address of your Xeon server to the `host_ip` environment variable**
-
-```bash
-cd GenAIExamples/ProductivitySuite/ui
-docker build --no-cache -t opea/productivity-suite-react-ui-server:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile.react .
-```
-
----
-
-## 🚀 Start Microservices
-
-### Setup Environment Variables
-
-Since the `compose.yaml` will consume some environment variables, you need to setup them in advance as below.
-
-**Export the value of the public IP address of your Xeon server to the `host_ip` environment variable**
-
-> Change the External_Public_IP below with the actual IPV4 value
+The Productivity Suite docker images should automatically be downloaded from the `OPEA registry` and deployed on the Intel® Xeon® Platform:
 
 ```
-export host_ip="External_Public_IP"
+[+] Running 19/19
+ ✔ Network xeon_default                               Created                                         0.1s
+ ✔ Container tgi-service                              Healthy                                       165.2s
+ ✔ Container promptregistry-mongo-server              Started                                         1.0s
+ ✔ Container redis-vector-db                          Started                                         1.7s
+ ✔ Container tei-reranking-server                     Healthy                                        61.5s
+ ✔ Container chathistory-mongo-server                 Started                                         1.7s
+ ✔ Container tgi_service_codegen                      Healthy                                       165.7s
+ ✔ Container tei-embedding-server                     Healthy                                        12.0s
+ ✔ Container keycloak-server                          Started                                         0.8s
+ ✔ Container whisper-server                           Started                                         1.4s
+ ✔ Container productivity-suite-xeon-react-ui-server  Started                                         2.1s
+ ✔ Container mongodb                                  Started                                         1.2s
+ ✔ Container dataprep-redis-server                    Healthy                                        22.9s
+ ✔ Container retriever-redis-server                   Started                                         2.2s
+ ✔ Container llm-textgen-server-codegen               Started                                       166.0s
+ ✔ Container docsum-xeon-llm-server                   Started                                       165.5s
+ ✔ Container codegen-xeon-backend-server              Started                                       166.3s
+ ✔ Container docsum-xeon-backend-server               Started                                       165.9s
+ ✔ Container chatqna-xeon-backend-server              Started                                       165.9s
 ```
 
-**Export the value of your Huggingface API token to the `HF_TOKEN` environment variable**
+### Check the Deployment Status
 
-> Change the Your_Huggingface_API_Token below with tyour actual Huggingface API Token value
-
-```
-export HF_TOKEN="Your_Huggingface_API_Token"
-```
-
-**Append the value of the public IP address to the no_proxy list**
+After running docker compose, check if all the containers launched via docker compose have started:
 
 ```
-export no_proxy=${no_proxy},"External_Public_IP"
+docker ps -a
 ```
 
-```bash
-export DB_NAME="opea"
-export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
-export RERANK_MODEL_ID="BAAI/bge-reranker-base"
-export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
-export LLM_MODEL_ID_CODEGEN="meta-llama/CodeLlama-7b-hf"
-export INDEX_NAME="rag-redis"
-export HF_TOKEN=${HF_TOKEN}
-export BACKEND_SERVICE_ENDPOINT_CHATQNA="http://${host_ip}:8888/v1/chatqna"
-export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/delete"
-export BACKEND_SERVICE_ENDPOINT_CODEGEN="http://${host_ip}:7778/v1/codegen"
-export BACKEND_SERVICE_ENDPOINT_DOCSUM="http://${host_ip}:8890/v1/docsum"
-export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/ingest"
-export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/get"
-export CHAT_HISTORY_CREATE_ENDPOINT="http://${host_ip}:6012/v1/chathistory/create"
-export CHAT_HISTORY_DELETE_ENDPOINT="http://${host_ip}:6012/v1/chathistory/delete"
-export CHAT_HISTORY_GET_ENDPOINT="http://${host_ip}:6012/v1/chathistory/get"
-export PROMPT_SERVICE_GET_ENDPOINT="http://${host_ip}:6018/v1/prompt/get"
-export PROMPT_SERVICE_CREATE_ENDPOINT="http://${host_ip}:6018/v1/prompt/create"
-export PROMPT_SERVICE_DELETE_ENDPOINT="http://${host_ip}:6018/v1/prompt/delete"
-export KEYCLOAK_SERVICE_ENDPOINT="http://${host_ip}:8080"
-export DocSum_COMPONENT_NAME="OpeaDocSumTgi"
+For the default deployment, the following 5 containers should be running:
 
-#Set no proxy
-export no_proxy="$no_proxy,tgi_service_codegen,llm_codegen,tei-embedding-service,tei-reranking-service,chatqna-xeon-backend-server,retriever,tgi-service,redis-vector-db,whisper,llm-docsum-tgi,docsum-xeon-backend-server,mongo,codegen"
+```
+CONTAINER ID   IMAGE                                                                                       COMMAND                  CREATED         STATUS                   PORTS                                                                                  NAMES
+8e3c0e9398ae   opea/chatqna:latest                                                                         "bash entrypoint.sh"     8 minutes ago   Up 5 minutes             0.0.0.0:8888->8888/tcp, :::8888->8888/tcp                                              chatqna-xeon-backend-server
+cc317e6feb89   opea/docsum:latest                                                                          "python docsum.py"       8 minutes ago   Up 5 minutes             0.0.0.0:8890->8888/tcp, :::8890->8888/tcp                                              docsum-xeon-backend-server
+683dd7cacef2   opea/codegen:latest                                                                         "python codegen.py"      8 minutes ago   Up 5 minutes             0.0.0.0:7778->7778/tcp, :::7778->7778/tcp                                              codegen-xeon-backend-server
+a38d8d906cd0   opea/llm-docsum:latest                                                                      "python opea_docsum_…"   8 minutes ago   Up 5 minutes             0.0.0.0:9003->9000/tcp, :::9003->9000/tcp                                              docsum-xeon-llm-server
+f0a61333ae16   opea/llm-textgen:latest                                                                     "bash entrypoint.sh"     8 minutes ago   Up 5 minutes             0.0.0.0:9001->9000/tcp, :::9001->9000/tcp                                              llm-textgen-server-codegen
+a942446f47c1   opea/dataprep:latest                                                                        "sh -c 'python $( [ …"   8 minutes ago   Up 8 minutes (healthy)   0.0.0.0:6007->5000/tcp, :::6007->5000/tcp                                              dataprep-redis-server
+f77b9b69fcaf   opea/retriever:latest                                                                       "python opea_retriev…"   8 minutes ago   Up 8 minutes             0.0.0.0:7001->7000/tcp, :::7001->7000/tcp                                              retriever-redis-server
+0324b9efd729   opea/productivity-suite-react-ui-server:latest                                              "/docker-entrypoint.…"   8 minutes ago   Up 8 minutes             0.0.0.0:5174->80/tcp, :::5174->80/tcp                                                  productivity-suite-xeon-react-ui-server
+747e09a5afea   ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu                               "text-generation-lau…"   8 minutes ago   Up 8 minutes (healthy)   0.0.0.0:8028->80/tcp, :::8028->80/tcp                                                  tgi_service_codegen
+ea7444faa8b2   ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu                               "text-generation-lau…"   8 minutes ago   Up 8 minutes (healthy)   0.0.0.0:9009->80/tcp, :::9009->80/tcp                                                  tgi-service
+8fdb186853ac   opea/whisper:latest                                                                         "python whisper_serv…"   8 minutes ago   Up 8 minutes             0.0.0.0:7066->7066/tcp, :::7066->7066/tcp                                              whisper-server
+7982f2d1ff89   mongo:7.0.11                                                                                "docker-entrypoint.s…"   8 minutes ago   Up 8 minutes             0.0.0.0:27017->27017/tcp, :::27017->27017/tcp                                          mongodb
+9fb471c452ec   quay.io/keycloak/keycloak:25.0.2                                                            "/opt/keycloak/bin/k…"   8 minutes ago   Up 8 minutes             8443/tcp, 0.0.0.0:8080->8080/tcp, :::8080->8080/tcp, 9000/tcp                          keycloak-server
+a00ac544abb7   ghcr.io/huggingface/text-embeddings-inference:cpu-1.6                                       "/bin/sh -c 'apt-get…"   8 minutes ago   Up 8 minutes (healthy)   0.0.0.0:6006->80/tcp, :::6006->80/tcp                                                  tei-embedding-server
+87c2996111d5   redis/redis-stack:7.2.0-v9                                                                  "/entrypoint.sh"         8 minutes ago   Up 8 minutes             0.0.0.0:6379->6379/tcp, :::6379->6379/tcp, 0.0.0.0:8001->8001/tcp, :::8001->8001/tcp   redis-vector-db
+536b71e4ec67   opea/chathistory-mongo:latest                                                               "python opea_chathis…"   8 minutes ago   Up 8 minutes             0.0.0.0:6012->6012/tcp, :::6012->6012/tcp                                              chathistory-mongo-server
+8d56c2b03431   opea/promptregistry-mongo:latest                                                            "python opea_prompt_…"   8 minutes ago   Up 8 minutes             0.0.0.0:6018->6018/tcp, :::6018->6018/tcp                                              promptregistry-mongo-server
+c48921438848   ghcr.io/huggingface/text-embeddings-inference:cpu-1.6                                       "/bin/sh -c 'apt-get…"   8 minutes ago   Up 8 minutes (healthy)   0.0.0.0:8808->80/tcp, :::8808->80/tcp                                                  tei-reranking-server
 ```
 
-Note: Please replace with `host_ip` with you external IP address, do not use localhost.
-
-### Start all the services Docker Containers
-
-> Before running the docker compose command, you need to be in the folder that has the docker compose yaml file
-
-```bash
-cd GenAIExamples/ProductivitySuite/docker_compose/intel/cpu/xeon
-
-docker compose -f compose.yaml up -d
-```
-
----
-
-### 🔐 Setup Keycloak
+### Setup Keycloak
 
 Please refer to **[keycloak_setup_guide](keycloak_setup_guide.md)** for more detail related to Keycloak configuration setup.
 
----
+### Test the Pipeline
 
-### ✅ Validate Microservices
+Once the Productivity Suite service are running, test the pipeline using the following command:
 
-1. TEI Embedding Service
+ChatQnA MegaService
 
-   ```bash
-   curl ${host_ip}:6006/embed \
-       -X POST \
-       -d '{"inputs":"What is Deep Learning?"}' \
-       -H 'Content-Type: application/json'
-   ```
-
-2. Retriever Microservice
-
-   To consume the retriever microservice, you need to generate a mock embedding vector by Python script. The length of embedding vector
-   is determined by the embedding model.
-   Here we use the model `EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"`, which vector size is 768.
-
-   Check the vector dimension of your embedding model, set `your_embedding` dimension equals to it.
-
-   ```bash
-   export your_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(768)]; print(embedding)")
-   curl http://${host_ip}:7001/v1/retrieval \
-     -X POST \
-     -d "{\"text\":\"test\",\"embedding\":${your_embedding}}" \
-     -H 'Content-Type: application/json'
-   ```
-
-3. TEI Reranking Service
-
-   ```bash
-   curl http://${host_ip}:8808/rerank \
-       -X POST \
-       -d '{"query":"What is Deep Learning?", "texts": ["Deep Learning is not...", "Deep learning is..."]}' \
-       -H 'Content-Type: application/json'
-   ```
-
-4. LLM backend Service (ChatQnA, DocSum)
-
-   ```bash
-   curl http://${host_ip}:9009/generate \
-     -X POST \
-     -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}' \
-     -H 'Content-Type: application/json'
-   ```
-
-5. LLM backend Service (CodeGen)
-
-   ```bash
-   curl http://${host_ip}:8028/generate \
-     -X POST \
-     -d '{"inputs":"def print_hello_world():","parameters":{"max_new_tokens":256, "do_sample": true}}' \
-     -H 'Content-Type: application/json'
-   ```
-
-6. CodeGen LLM Microservice
-
-   ```bash
-   curl http://${host_ip}:9001/v1/chat/completions\
-     -X POST \
-     -d '{"query":"def print_hello_world():"}' \
-     -H 'Content-Type: application/json'
-   ```
-
-7. DocSum LLM Microservice
-
-   ```bash
-   curl http://${host_ip}:9003/v1/docsum\
-     -X POST \
-     -d '{"messages":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5", "type": "text"}' \
-     -H 'Content-Type: application/json'
-   ```
-
-8. ChatQnA MegaService
-
-   ```bash
-   curl http://${host_ip}:8888/v1/chatqna -H "Content-Type: application/json" -d '{
-        "messages": "What is the revenue of Nike in 2023?"
-        }'
-   ```
-
-9. DocSum MegaService
-
-   ```bash
-   curl http://${host_ip}:8890/v1/docsum -H "Content-Type: application/json" -d '{
-        "messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5.",
-        "type": "text"
-        }'
-   ```
-
-10. CodeGen MegaService
-
-    ```bash
-    curl http://${host_ip}:7778/v1/codegen -H "Content-Type: application/json" -d '{
-         "messages": "def print_hello_world():"
-         }'
-    ```
-
-11. Dataprep Microservice
-
-    If you want to update the default knowledge base, you can use the following commands:
-
-    Update Knowledge Base via Local File Upload:
-
-    ```bash
-    curl -X POST "http://${host_ip}:6007/v1/dataprep/ingest" \
-         -H "Content-Type: multipart/form-data" \
-         -F "files=@./nke-10k-2023.pdf"
-    ```
-
-    This command updates a knowledge base by uploading a local file for processing. Update the file path according to your environment.
-
-    Add Knowledge Base via HTTP Links:
-
-    ```bash
-    curl -X POST "http://${host_ip}:6007/v1/dataprep/ingest" \
-         -H "Content-Type: multipart/form-data" \
-         -F 'link_list=["https://opea.dev"]'
-    ```
-
-    This command updates a knowledge base by submitting a list of HTTP links for processing.
-
-    Also, you are able to get the file list that you uploaded:
-
-    ```bash
-    curl -X POST "http://${host_ip}:6007/v1/dataprep/get" \
-         -H "Content-Type: application/json"
-    ```
-
-    To delete the file/link you uploaded:
-
-    ```bash
-    # delete link
-    curl -X POST "http://${host_ip}:6007/v1/dataprep/delete" \
-         -d '{"file_path": "https://opea.dev.txt"}' \
-         -H "Content-Type: application/json"
-
-    # delete file
-    curl -X POST "http://${host_ip}:6007/v1/dataprep/delete" \
-         -d '{"file_path": "nke-10k-2023.pdf"}' \
-         -H "Content-Type: application/json"
-
-    # delete all uploaded files and links
-    curl -X POST "http://${host_ip}:6007/v1/dataprep/delete" \
-         -d '{"file_path": "all"}' \
-         -H "Content-Type: application/json"
-    ```
-
-12. Prompt Registry Microservice
-
-    If you want to update the default Prompts in the application for your user, you can use the following commands:
-
-    ```bash
-    curl -X 'POST' \
-      "http://${host_ip}:6018/v1/prompt/create" \
-      -H 'accept: application/json' \
-      -H 'Content-Type: application/json' \
-      -d '{
-        "prompt_text": "test prompt", "user": "test"
+```bash
+curl http://${host_ip}:8888/v1/chatqna -H "Content-Type: application/json" -d '{
+    "messages": "What is the revenue of Nike in 2023?"
     }'
-    ```
-
-    Retrieve prompt from database based on user or prompt_id
-
-    ```bash
-    curl -X 'POST' \
-      "http://${host_ip}:6018/v1/prompt/get" \
-      -H 'accept: application/json' \
-      -H 'Content-Type: application/json' \
-      -d '{
-      "user": "test"}'
-
-    curl -X 'POST' \
-      "http://${host_ip}:6018/v1/prompt/get" \
-      -H 'accept: application/json' \
-      -H 'Content-Type: application/json' \
-      -d '{
-      "user": "test", "prompt_id":"{prompt_id returned from save prompt route above}"}'
-    ```
-
-    Delete prompt from database based on prompt_id provided
-
-    ```bash
-    curl -X 'POST' \
-      "http://${host_ip}:6018/v1/prompt/delete" \
-      -H 'accept: application/json' \
-      -H 'Content-Type: application/json' \
-      -d '{
-      "user": "test", "prompt_id":"{prompt_id to be deleted}"}'
-    ```
-
-13. Chat History Microservice
-
-    To validate the chatHistory Microservice, you can use the following commands.
-
-    Create a sample conversation and get the message ID.
-
-    ```bash
-    curl -X 'POST' \
-      http://${host_ip}:6012/v1/chathistory/create \
-      -H 'accept: application/json' \
-      -H 'Content-Type: application/json' \
-      -d '{
-      "data": {
-        "messages": "test Messages", "user": "test"
-      }
-    }'
-    ```
-
-    Retrieve the conversation based on user or conversation id
-
-    ```bash
-    curl -X 'POST' \
-      http://${host_ip}:6012/v1/chathistory/get \
-      -H 'accept: application/json' \
-      -H 'Content-Type: application/json' \
-      -d '{
-      "user": "test"}'
-
-    curl -X 'POST' \
-      http://${host_ip}:6012/v1/chathistory/get \
-      -H 'accept: application/json' \
-      -H 'Content-Type: application/json' \
-      -d '{
-      "user": "test", "id":"{Conversation id to retrieve }"}'
-    ```
-
-    Delete Conversation from database based on conversation id provided.
-
-    ```bash
-    curl -X 'POST' \
-      http://${host_ip}:6012/v1/chathistory/delete \
-      -H 'accept: application/json' \
-      -H 'Content-Type: application/json' \
-      -d '{
-      "user": "test", "id":"{Conversation id to Delete}"}'
-    ```
-
----
-
-## 🚀 Launch the UI
-
-To access the frontend, open the following URL in your browser: http://{host_ip}:5174. By default, the UI runs on port 80 internally. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `compose.yaml` file as shown below:
-
-```yaml
-  productivity-suite-xeon-react-ui-server:
-    image: opea/productivity-suite-react-ui-server:latest
-    ...
-    ports:
-      - "5715:80" # Map port 5715 on the host to port 80 in the container.
 ```
 
-Here is an example of running Productivity Suite
-![project-screenshot](../../../../assets/img/chat_qna_init.png)
-![project-screenshot](../../../../assets/img/Login_page.png)
+DocSum MegaService
 
----
+```bash
+curl http://${host_ip}:8890/v1/docsum -H "Content-Type: application/json" -d '{
+    "messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5.",
+    "type": "text"
+    }'
+```
 
-## 🛠️ Key Features
+CodeGen MegaService
 
-Here're some of the project's features:
+```bash
+curl http://${host_ip}:7778/v1/codegen -H "Content-Type: application/json" -d '{
+      "messages": "def print_hello_world():"
+      }'
+```
 
-### 💬ChatQnA
+### Cleanup the Deployment
 
-- **Start a Text Chat**：Initiate a text chat with the ability to input written conversations, where the dialogue content can also be customized based on uploaded files.
-- **Context Awareness**: The AI assistant maintains the context of the conversation, understanding references to previous statements or questions. This allows for more natural and coherent exchanges.
+To stop the containers associated with the deployment, execute the following command:
 
-### 🎛️ Data Source
+```
+docker compose -f compose.yaml down
+```
 
-- **File Upload or Remote Link**: The choice between uploading locally or copying a remote link. Chat according to uploaded knowledge base.
-- **File Management**:Uploaded File would get listed and user would be able add or remove file/links
+```
+[+] Running 19/19
+ ✔ Container mongodb                                  Removed                                                     0.5s
+ ✔ Container codegen-xeon-backend-server              Removed                                                    10.4s
+ ✔ Container docsum-xeon-backend-server               Removed                                                    10.6s
+ ✔ Container whisper-server                           Removed                                                     1.3s
+ ✔ Container promptregistry-mongo-server              Removed                                                    10.8s
+ ✔ Container chatqna-xeon-backend-server              Removed                                                    11.0s
+ ✔ Container productivity-suite-xeon-react-ui-server  Removed                                                     0.6s
+ ✔ Container keycloak-server                          Removed                                                     0.7s
+ ✔ Container chathistory-mongo-server                 Removed                                                    10.9s
+ ✔ Container llm-textgen-server-codegen               Removed                                                    10.4s
+ ✔ Container docsum-xeon-llm-server                   Removed                                                    10.4s
+ ✔ Container tei-reranking-server                     Removed                                                    13.0s
+ ✔ Container tei-embedding-server                     Removed                                                    12.8s
+ ✔ Container dataprep-redis-server                    Removed                                                    12.9s
+ ✔ Container retriever-redis-server                   Removed                                                    12.3s
+ ✔ Container tgi_service_codegen                      Removed                                                     3.1s
+ ✔ Container tgi-service                              Removed                                                     3.1s
+ ✔ Container redis-vector-db                          Removed                                                     0.5s
+ ✔ Network xeon_default                               Removed                                                     0.3s
+```
 
-#### Screenshots
+All the Productivity Suite containers will be stopped and then removed on completion of the "down" command.
 
-![project-screenshot](../../../../assets/img/data_source.png)
+## Productivity Suite Docker Compose Files
 
-- **Clear Chat**: Clear the record of the current dialog box without retaining the contents of the dialog box.
-- **Chat history**: Historical chat records can still be retained after refreshing, making it easier for users to view the context.
-- **Conversational Chat**: The application maintains a history of the conversation, allowing users to review previous messages and the AI to refer back to earlier points in the dialogue when necessary.
+The compose.yaml is default compose file using tgi as serving framework
 
-#### Screenshots
+| Service Name                            | Image Name                                                    |
+| --------------------------------------- | ------------------------------------------------------------- |
+| chathistory-mongo-server                | opea/chathistory-mongo:latest                                 |
+| chatqna-xeon-backend-server             | opea/chatqna:latest                                           |
+| codegen-xeon-backend-server             | opea/codegen:latest                                           |
+| dataprep-redis-server                   | opea/dataprep:latest                                          |
+| docsum-xeon-backend-server              | opea/docsum:latest                                            |
+| docsum-xeon-llm-server                  | opea/llm-docsum:latest                                        |
+| keycloak-server                         | quay.io/keycloak/keycloak:25.0.2                              |
+| llm-textgen-server-codegen              | opea/llm-textgen:latest                                       |
+| mongodb                                 | mongo:7.0.11                                                  |
+| productivity-suite-xeon-react-ui-server | opea/productivity-suite-react-ui-server:latest                |
+| promptregistry-mongo-server             | opea/promptregistry-mongo:latest                              |
+| redis-vector-db                         | redis/redis-stack:7.2.0-v9                                    |
+| retriever-redis-server                  | opea/retriever:latest                                         |
+| tei-embedding-server                    | ghcr.io/huggingface/text-embeddings-inference:cpu-1.6         |
+| tei-reranking-server                    | ghcr.io/huggingface/text-embeddings-inference:cpu-1.6         |
+| tgi_service_codegen                     | ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu |
+| tgi-service                             | ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu |
+| whisper-server                          | opea/whisper:latest                                           |
 
-![project-screenshot](../../../../assets/img/chat_qna_init.png)
-![project-screenshot](../../../../assets/img/chatqna_with_conversation.png)
+## Productivity Suite Service Configuration
 
-### 💻 Codegen
+The table provides a comprehensive overview of the Productivity Suite service utilized across various deployments as illustrated in the example Docker Compose files. Each row in the table represents a distinct service, detailing its possible images used to enable it and a concise description of its function within the deployment architecture.
 
-- **Generate code**: generate the corresponding code based on the current user's input.
-
-#### Screenshots
-
-![project-screenshot](../../../../assets/img/codegen.png)
-
-### 📚 Document Summarization
-
-- **Summarizing Uploaded Files**: Upload files from their local device, then click 'Generate Summary' to summarize the content of the uploaded file. The summary will be displayed on the 'Summary' box.
-- **Summarizing Text via Pasting**: Paste the text to be summarized into the text box, then click 'Generate Summary' to produce a condensed summary of the content, which will be displayed in the 'Summary' box on the right.
-- **Scroll to Bottom**: The summarized content will automatically scroll to the bottom.
-
-#### Screenshots
-
-![project-screenshot](../../../../assets/img/doc_summary.png)
+| Service Name                            | Possible Image Names                                          | Optional | Description                                                                                                      |
+| --------------------------------------- | ------------------------------------------------------------- | -------- | ---------------------------------------------------------------------------------------------------------------- |
+| chathistory-mongo-server                | opea/chathistory-mongo:latest                                 | No       | Handles chat history storage and retrieval using MongoDB.                                                        |
+| chatqna-xeon-backend-server             | opea/chatqna:latest                                           | No       | Handles question answering and chat interactions.                                                                |
+| codegen-xeon-backend-server             | opea/codegen:latest                                           | No       | Handles code generation tasks.                                                                                   |
+| dataprep-redis-server                   | opea/dataprep:latest                                          | No       | Handles data preparation and preprocessing tasks for downstream services.                                        |
+| docsum-xeon-backend-server              | opea/docsum:latest                                            | No       | Handles document summarization tasks.                                                                            |
+| docsum-xeon-llm-server                  | opea/llm-docsum:latest                                        | No       | Handles large language model (LLM) based document summarization.                                                 |
+| keycloak-server                         | quay.io/keycloak/keycloak:25.0.2                              | No       | Handles authentication and authorization using Keycloak.                                                         |
+| llm-textgen-server-codegen              | opea/llm-textgen:latest                                       | No       | Handles large language model (LLM) text generation tasks, providing inference APIs for code and text completion. |
+| mongodb                                 | mongo:7.0.11                                                  | No       | Provides persistent storage for application data using MongoDB.                                                  |
+| productivity-suite-xeon-react-ui-server | opea/productivity-suite-react-ui-server:latest                | No       | Hosts the web-based user interface for interacting with the Productivity Suite services.                         |
+| promptregistry-mongo-server             | opea/promptregistry-mongo:latest                              | No       | Manages storage and retrieval of prompt templates and related metadata.                                          |
+| redis-vector-db                         | redis/redis-stack:7.2.0-v9                                    | No       | Offers in-memory data storage and vector database capabilities for fast retrieval and caching.                   |
+| retriever-redis-server                  | opea/retriever:latest                                         | No       | Handles retrieval-augmented generation tasks, enabling efficient document and context retrieval.                 |
+| tei-embedding-server                    | ghcr.io/huggingface/text-embeddings-inference:cpu-1.6         | No       | Provides text embedding and sequence classification services for downstream NLP tasks.                           |
+| tei-reranking-server                    | ghcr.io/huggingface/text-embeddings-inference:cpu-1.6         | No       | Performs reranking of retrieved documents or results using embedding-based similarity.                           |
+| tgi_service_codegen                     | ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu | No       | Serves code generation models for inference, optimized for Intel Xeon CPUs.                                      |
+| tgi-service                             | ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu | No       | Specific to the TGI deployment, focuses on text generation inference using Xeon hardware.                        |
+| whisper-server                          | opea/whisper:latest                                           | No       | Provides speech-to-text transcription services using Whisper models.                                             |

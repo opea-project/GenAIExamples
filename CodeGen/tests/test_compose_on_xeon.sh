@@ -42,13 +42,13 @@ function build_docker_images() {
 }
 
 function start_services() {
-    local compose_profile="$1"
+    local compose_file="$1"
     local llm_container_name="$2"
 
     cd $WORKPATH/docker_compose/intel/cpu/xeon/
 
     # Start Docker Containers
-    docker compose --profile ${compose_profile} up -d > ${LOG_PATH}/start_services_with_compose.log
+    docker compose -f ${compose_file} up -d > ${LOG_PATH}/start_services_with_compose.log
 
     n=0
     until [[ "$n" -ge 100 ]]; do
@@ -204,42 +204,42 @@ function validate_gradio() {
 }
 
 function stop_docker() {
-    local docker_profile="$1"
+    local compose_file="$1"
 
     cd $WORKPATH/docker_compose/intel/cpu/xeon/
-    docker compose --profile ${docker_profile} down
+    docker compose -f ${compose_file} down
 }
 
 function main() {
-    # all docker docker compose profiles for Xeon Platform
-    docker_compose_profiles=("codegen-xeon-tgi" "codegen-xeon-vllm")
+    # all docker docker compose files for Xeon Platform
+    docker_compose_files=("compose_tgi.yaml" "compose.yaml")
     docker_llm_container_names=("tgi-server" "vllm-server")
 
-    # get number of profiels and LLM docker container names
-    len_profiles=${#docker_compose_profiles[@]}
+    # get number of compose files and LLM docker container names
+    len_compose_files=${#docker_compose_files[@]}
     len_containers=${#docker_llm_container_names[@]}
 
-    # number of profiels and docker container names must be matched
-    if [ ${len_profiles} -ne ${len_containers} ]; then
-        echo "Error: number of profiles ${len_profiles} and container names ${len_containers} mismatched"
+    # number of compose files and docker container names must be matched
+    if [ ${len_compose_files} -ne ${len_containers} ]; then
+        echo "Error: number of docker compose files ${len_compose_files} and container names ${len_containers} mismatched"
         exit 1
     fi
 
-    # stop_docker, stop all profiles
-    for ((i = 0; i < len_profiles; i++)); do
-        stop_docker "${docker_compose_profiles[${i}]}"
+    # stop_docker, stop all compose files
+    for ((i = 0; i < len_compose_files; i++)); do
+        stop_docker "${docker_compose_files[${i}]}"
     done
 
     # build docker images
     if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
 
-    # loop all profiles
-    for ((i = 0; i < len_profiles; i++)); do
-        echo "Process [${i}]: ${docker_compose_profiles[$i]}, ${docker_llm_container_names[${i}]}"
+    # loop all compose files
+    for ((i = 0; i < len_compose_files; i++)); do
+        echo "Process [${i}]: ${docker_compose_files[$i]}, ${docker_llm_container_names[${i}]}"
         docker ps -a
 
         echo "::group::start_services"
-        start_services "${docker_compose_profiles[${i}]}" "${docker_llm_container_names[${i}]}"
+        start_services "${docker_compose_files[${i}]}" "${docker_llm_container_names[${i}]}"
         echo "::endgroup::"
 
         echo "::group::validate_microservices"
@@ -254,7 +254,7 @@ function main() {
         validate_gradio
         echo "::endgroup::"
 
-        stop_docker "${docker_compose_profiles[${i}]}"
+        stop_docker "${docker_compose_files[${i}]}"
         sleep 5s
     done
 

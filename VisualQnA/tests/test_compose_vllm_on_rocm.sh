@@ -16,7 +16,7 @@ export REGISTRY=${IMAGE_REPO}
 export TAG=${IMAGE_TAG}
 export host_ip=${ip_address}
 export MODEL="llava-hf/llava-v1.6-mistral-7b-hf"
-export PATH="~/miniconda3/bin:$PATH"
+export PATH="$HOME/miniconda3/bin:$PATH"
 export MODEL_CACHE=${model_cache:-"/var/opea/multimodalqna-service/data"}
 source $WORKPATH/docker_compose/amd/gpu/rocm/set_env_vllm.sh
 

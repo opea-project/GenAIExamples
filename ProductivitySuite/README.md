@@ -2,6 +2,13 @@
 
 Productivity Suite, a tool designed to streamline your workflow and boost productivity! Our application leverages the power of OPEA microservices to deliver a comprehensive suite of features tailored to meet the diverse needs of modern enterprises.
 
+## Table of contents
+
+1. [Architecture](#architecture)
+2. [Deployment Options](#deployment-options)
+
+## Architecture
+
 The ProductivitySuite example is implemented using both megaservices and the component-level microservices defined in [GenAIComps](https://github.com/opea-project/GenAIComps). The flow chart below shows the information flow between different megaservices and microservices for this example. Prompt Registry and Chat History microservices save prompt and chat history from the ChatQnA MegaService only into the database.
 
 ```mermaid
@@ -140,31 +147,10 @@ flowchart LR
 
 ---
 
-## 🛠️ Key Features
+## Deployment Options
 
-### 💬 Chat with Documents
+The table below lists the available deployment options and their implementation details for different hardware platforms.
 
-Engage in intelligent conversations with your documents using our advanced **Retrieval-Augmented Generation (RAG)** capabilities. Ask questions, receive relevant information, and gain insights from your documents in real-time!
-
-### 📄 Content Summarization
-
-Summarize lengthy documents or articles, enabling you to grasp key takeaways quickly. Save time and effort with our intelligent summarization feature!
-
-### 💻 Code Generation
-
-Boost your coding productivity by providing a description of the functionality you require. Our application generates corresponding code snippets, saving you valuable time and effort!
-
-### 🎛️ User Context Management
-
-Maintain a seamless workflow by managing your user's context within the application. Our context management system keeps track of documents and chat history for a personalized experience.
-
-### 🔐 Identity and Access Management
-
-Utilizes the open-source platform **Keycloak** for single sign-on identity and access management. This ensures secure and convenient access to your productivity tools.
-
----
-
-## 📚 Setup Guide
-
-- **[Keycloak Configuration Guide](./docker_compose/intel/cpu/xeon/keycloak_setup_guide.md)**: Instructions to set up Keycloak for identity and access management.
-- **[Xeon Guide](./docker_compose/intel/cpu/xeon/README.md)**: Instructions to build Docker images from source and run the application via Docker Compose.
+| Platform   | Deployment Method | Link                                                            |
+| ---------- | ----------------- | --------------------------------------------------------------- |
+| Intel Xeon | Docker compose    | [Deployment on Xeon](./docker_compose/intel/cpu/xeon/README.md) |
