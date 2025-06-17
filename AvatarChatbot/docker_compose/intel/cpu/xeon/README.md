@@ -20,7 +20,7 @@ This section describes how to quickly deploy and test the AvatarChatbot service 
 
 ### Access the Code
 
-Clone the GenAIExample repository and access the AvatarChatbot Intel Xeon server Docker Compose files and supporting scripts:
+Clone the GenAIExamples repository and access the AvatarChatbot Intel Xeon server Docker Compose files and supporting scripts:
 
 ```
 git clone https://github.com/opea-project/GenAIExamples.git
