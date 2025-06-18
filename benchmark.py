@@ -170,6 +170,13 @@ def _create_stresscli_confs(case_params, test_params, test_phase, num_queries, b
             stresscli_conf["envs"] = {"DATASET": test_params["dataset"][i], "MAX_LINES": str(test_params["prompt"][i])}
         else:
             stresscli_conf["envs"] = {"MAX_LINES": str(test_params["prompt"][i])}
+        # Handle dataset for DocSum
+        if b_target in ["docsumbench", "docsumfixed"]:
+            if len(test_params["dataset"]) > i:
+                case_params["dataset"] = test_params["dataset"][i]
+            else:
+                case_params["dataset"] = None
+
         # Generate the content of stresscli configuration file
         stresscli_yaml = _create_yaml_content(
             case_params, base_url, b_target, test_phase, num_queries, test_params, concurrency
@@ -331,32 +338,6 @@ def _run_service_test(example, service, test_suite_config, namespace):
                 exit(1)
         else:
             print(f"[OPEA BENCHMARK] 🚀 Dataset is not specified for {service_name}. Check the benchmark.yaml again.")
-
-        bench_target = test_suite_config.get("bench_target")[0]
-
-        # If benchmark target if docsum then add dataset to run yaml file
-        if bench_target in ["docsumbench", "docsumfixed"]:
-            run_yaml_data = {}
-            # Open and read the YAML file
-            with open(run_yaml_path, "r") as file:
-                try:
-                    run_yaml_data = yaml.safe_load(file)
-                except yaml.YAMLError as exc:
-                    print(f"Error reading YAML file: {exc}")
-                    exit(1)
-
-            # Modify the dataset values
-            try:
-                run_yaml_data["profile"]["global-settings"]["dataset"] = dataset
-            except KeyError as e:
-                print(f"❌ Error: {e}")
-
-            with open(run_yaml_path, "w") as file:
-                try:
-                    yaml.safe_dump(run_yaml_data, file)
-                except yaml.YAMLError as exc:
-                    print(f"Error writing YAML file: {exc}")
-                    exit(1)
 
         # Run the benchmark test and append the output folder to the list
         print("[OPEA BENCHMARK] 🚀 Start locust_runtests at", datetime.now().strftime("%Y%m%d_%H%M%S"))
