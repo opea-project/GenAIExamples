@@ -26,7 +26,7 @@ EXAMPLE_CONFIGS = {
                 "embed_model": "EMBEDDING_MODEL_ID",
                 "rerank_model": "RERANK_MODEL_ID",
                 "mount_dir": "MOUNT_DIR",
-                "hf_token": "HUGGINGFACEHUB_API_TOKEN",
+                "hf_token": "HF_TOKEN",
             },
         },
         "kubernetes": {
@@ -133,7 +133,7 @@ EXAMPLE_CONFIGS = {
                 "gaudi": "docker_compose/intel/hpu/gaudi/compose.yaml",
             },
             "set_env_scripts": {"xeon": "docker_compose/intel/set_env.sh", "gaudi": "docker_compose/intel/set_env.sh"},
-            "params_to_set_env": {"llm_model": "LLM_MODEL_ID", "hf_token": "HUGGINGFACEHUB_API_TOKEN"},
+            "params_to_set_env": {"llm_model": "LLM_MODEL_ID", "hf_token": "HF_TOKEN"},
         },
         "kubernetes": {
             "helm": {
@@ -201,7 +201,7 @@ EXAMPLE_CONFIGS = {
                 "gaudi": "docker_compose/intel/hpu/gaudi/compose.yaml",
             },
             "set_env_scripts": {"xeon": "docker_compose/intel/set_env.sh", "gaudi": "docker_compose/intel/set_env.sh"},
-            "params_to_set_env": {"llm_model": "LLM_MODEL_ID", "hf_token": "HUGGINGFACEHUB_API_TOKEN"},
+            "params_to_set_env": {"llm_model": "LLM_MODEL_ID", "hf_token": "HF_TOKEN"},
         },
         "kubernetes": {
             "helm": {
@@ -271,7 +271,7 @@ EXAMPLE_CONFIGS = {
                 "gaudi": "docker_compose/intel/hpu/gaudi/compose.yaml",
             },
             "set_env_scripts": {"xeon": "docker_compose/intel/set_env.sh", "gaudi": "docker_compose/intel/set_env.sh"},
-            "params_to_set_env": {"llm_model": "LLM_MODEL_ID", "hf_token": "HUGGINGFACEHUB_API_TOKEN"},
+            "params_to_set_env": {"llm_model": "LLM_MODEL_ID", "hf_token": "HF_TOKEN"},
         },
         "kubernetes": {
             "helm": {
@@ -339,7 +339,7 @@ EXAMPLE_CONFIGS = {
                 "xeon": "docker_compose/intel/cpu/xeon/set_env.sh",
                 "gaudi": "docker_compose/intel/hpu/gaudi/set_env.sh",
             },
-            "params_to_set_env": {"llm_model": "LLM_MODEL_ID", "hf_token": "HUGGINGFACEHUB_API_TOKEN"},
+            "params_to_set_env": {"llm_model": "LLM_MODEL_ID", "hf_token": "HF_TOKEN"},
         },
         "kubernetes": {
             "helm": {
