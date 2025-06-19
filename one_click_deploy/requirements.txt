@@ -1,0 +1,5 @@
+click
+requests
+ruamel.yaml
+base64
+urllib
