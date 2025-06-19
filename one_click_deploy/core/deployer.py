@@ -8,7 +8,6 @@ import time
 import click
 
 from .config import COMMON_SCRIPTS_DIR, EXAMPLE_CONFIGS, EXAMPLES_ROOT_DIR, POST_DEPLOY_WAIT_S
-
 from .tester import ConnectionTesterFactory
 from .utils import (
     get_host_ip,

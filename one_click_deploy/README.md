@@ -10,7 +10,7 @@ Before you begin, ensure your system meets the following requirements.
 
 Hardware requirements can vary significantly depending on the example and models being used. The following are general guidelines, with more demanding examples like ChatQnA requiring more resources.
 
-- **CPU:**  For production-level performance with larger models (e.g., on Xeon), **96+ cores** are recommended.
+- **CPU:** For production-level performance with larger models (e.g., on Xeon), **96+ cores** are recommended.
 - **Memory:** A minimum of **64GB RAM**. For larger models, **128GB or more** is recommended.
 - **HPU (for Gaudi deployments):** At least **8 HPU cards** are recommended for full-scale ChatQnA deployment.
 - **Disk Space:** A minimum of **50GB** of free disk space is required for Docker images, models, and data.
@@ -68,11 +68,13 @@ The script will present you with a series of choices to configure your deploymen
 This section walks you through a typical deployment session for the `ChatQnA` example using Docker.
 
 1.  **Launch the script:**
+
     ```bash
     python3 one_click_deploy.py
     ```
 
 2.  **Choose an Example:** The script will list all available examples from the configuration.
+
     ```text
     Please choose an example to manage:
       [1] ChatQnA
@@ -84,6 +86,7 @@ This section walks you through a typical deployment session for the `ChatQnA` ex
     ```
 
 3.  **Choose an Action:** Select `Deploy` to start the installation process.
+
     ```text
     Please choose an action:
       [1] Deploy
@@ -93,6 +96,7 @@ This section walks you through a typical deployment session for the `ChatQnA` ex
     ```
 
 4.  **Configure Deployment:** The script will now ask for deployment-specific parameters.
+
     ```text
     Deployment Mode [docker/k8s] (docker): docker
     Target Device [xeon/gaudi] (xeon): xeon
@@ -103,6 +107,7 @@ This section walks you through a typical deployment session for the `ChatQnA` ex
     ```
 
 5.  **Configure Example Parameters:** Provide the model IDs and other parameters specific to the chosen example. Defaults are provided.
+
     ```text
     LLM Model ID (e.g., meta-llama/Meta-Llama-3-8B-Instruct) [meta-llama/Meta-Llama-3-8B-Instruct]:
     Embedding Model ID (e.g., BAAI/bge-base-en-v1.5) [BAAI/bge-base-en-v1.5]:
@@ -111,6 +116,7 @@ This section walks you through a typical deployment session for the `ChatQnA` ex
     ```
 
 6.  **Select Optional Steps:** Choose whether to run pre-flight checks, build images, or run post-deployment tests.
+
     ```text
     Run environment check? [y/N]: y
     Build or Push images? [y/N]: n
@@ -123,12 +129,13 @@ This section walks you through a typical deployment session for the `ChatQnA` ex
     == CONFIGURATION SUMMARY ==
     ======================================================================
 
-    📘   Deploy Mode: docker
-    📘   Target Device: xeon
-    ...
-    Proceed with deployment? [Y/n]: y
-    ```
-The script will now execute all the selected steps: check the environment, configure services, and deploy using Docker Compose.
+        📘   Deploy Mode: docker
+        📘   Target Device: xeon
+        ...
+        Proceed with deployment? [Y/n]: y
+        ```
+
+    The script will now execute all the selected steps: check the environment, configure services, and deploy using Docker Compose.
 
 ### Testing a Deployed Service
 
@@ -174,10 +181,13 @@ After the script finishes, you can manually verify that all services are running
 
 **For Docker Compose deployments:**
 Run `docker ps` to see all running containers. All service containers for the example should be in the `Up` state.
+
 ```shell
 docker ps
 ```
+
 To check the logs of a specific service (e.g., the backend):
+
 ```shell
 # Find the container name with 'docker ps' first
 docker logs chatqna-xeon-backend-server
@@ -185,12 +195,15 @@ docker logs chatqna-xeon-backend-server
 
 **For Kubernetes deployments:**
 Run `kubectl get pods -n <namespace>` to verify that all pods are in the `Running` or `Completed` state. The default namespace is typically the name of the example (e.g., `chatqna`).
+
 ```shell
 # Check pods and services in the 'chatqna' namespace
 kubectl get pods -n chatqna
 kubectl get svc -n chatqna
 ```
+
 To check the logs of a specific pod:
+
 ```shell
 # Find the pod name with 'kubectl get pods' first
 kubectl logs chatqna-backend-server-svc-xxxxxxxx-yyyyy -n chatqna
@@ -203,10 +216,12 @@ kubectl logs chatqna-backend-server-svc-xxxxxxxx-yyyyy -n chatqna
 If you encounter issues, refer to the following common problems and solutions.
 
 - **Environment Check Fails:**
+
   - **Problem:** The script reports that required commands like `docker` or `helm` are missing.
   - **Solution:** Manually install the missing software using your system's package manager. Review the output of the environment check and the log file (`one_click_deploy/deployment.log`) for details.
 
 - **Docker Image Pull Errors:**
+
   - **Problem:** Docker fails to pull images, often with an `authentication required` or `timeout` error.
   - **Solution:**
     1.  **Check HF Token:** Ensure the Hugging Face token you provided is correct and has the necessary permissions.
@@ -214,6 +229,7 @@ If you encounter issues, refer to the following common problems and solutions.
     3.  **Check Disk Space:** A `no space left on device` error indicates you need to free up disk space.
 
 - **Kubernetes Pods Stuck in `Pending` or `ImagePullBackOff`:**
+
   - **Problem:** Pods fail to start.
   - **Solution:**
     1.  Use `kubectl describe pod <pod-name> -n <namespace>` to get detailed events.
