@@ -7,7 +7,8 @@ import time
 
 import click
 
-from .config import COMMON_SCRIPTS_DIR, EXAMPLE_CONFIGS, EXAMPLES_ROOT_DIR
+from .config import COMMON_SCRIPTS_DIR, EXAMPLE_CONFIGS, EXAMPLES_ROOT_DIR, POST_DEPLOY_WAIT_S
+
 from .tester import ConnectionTesterFactory
 from .utils import (
     get_host_ip,
@@ -92,6 +93,14 @@ class Deployer:
                 success = self.deploy()
 
             if success and self.args.do_test_connection:
+                log_message(
+                    "INFO", f"Waiting for {POST_DEPLOY_WAIT_S} seconds for services to stabilize before testing..."
+                )
+                for i in range(POST_DEPLOY_WAIT_S, 0, -10):
+                    print(f"\r... {i} seconds remaining...  ", end="")
+                    time.sleep(min(10, i))
+                print("\rWait complete. Starting tests.        ")  # Clear the line
+
                 success = self.test_connection()
 
             all_steps_succeeded = success

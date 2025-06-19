@@ -8,7 +8,7 @@ from abc import ABC
 
 import requests
 
-from .config import EXAMPLE_CONFIGS
+from .config import EXAMPLE_CONFIGS, TEST_RETRY_ATTEMPTS, TEST_RETRY_DELAY_S
 from .utils import get_host_ip, log_message, run_command, start_kubectl_port_forward, stop_all_kubectl_port_forwards
 
 
@@ -176,23 +176,29 @@ class BaseConnectionTester(ABC):
         return passed
 
     def run_all_tests(self):
-        """Runs the connection test for the main service.
-
-        The overall result depends solely on the main_service test.
-        Sub-service tests are kept as commented-out code for future diagnostic purposes.
-        """
+        """Runs connection tests with a retry mechanism for the main service."""
         if not self.test_suite_config:
             log_message("WARN", "No connection tests configured. Skipping.")
-            return True  # Not a failure
+            return True
 
-        # The final result of all tests depends only on the main service.
         main_service_passed = False
-
-        # Test main service
         main_test = self.test_suite_config.get("main_service")
+
         if main_test:
-            response = self._make_request(main_test["service_key"], main_test)
-            main_service_passed = self._validate_response(response, main_test)
+            for attempt in range(1, TEST_RETRY_ATTEMPTS + 1):
+                log_message("INFO", f"Running main service test (Attempt {attempt}/{TEST_RETRY_ATTEMPTS})...")
+                response = self._make_request(main_test["service_key"], main_test)
+                # The _validate_response function updates the internal pass/fail counters
+                if self._validate_response(response, main_test):
+                    main_service_passed = True
+                    break
+
+                if attempt < TEST_RETRY_ATTEMPTS:
+                    log_message("WARN", f"Test failed. Retrying in {TEST_RETRY_DELAY_S} seconds...")
+                    time.sleep(TEST_RETRY_DELAY_S)
+                else:
+                    log_message("ERROR", f"Main service test failed after {TEST_RETRY_ATTEMPTS} attempts.")
+
         else:
             log_message("WARN", "No 'main_service' test is configured. Skipping test.")
             self.results["skipped"] += 1
