@@ -32,6 +32,7 @@ function build_docker_images() {
     cd $WORKPATH/docker_image_build
     git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
     pushd GenAIComps
+    echo "GenAIComps test commit is $(git rev-parse HEAD)"
     docker build --no-cache -t ${REGISTRY}/comps-base:${TAG} --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
     popd && sleep 1s
 
@@ -39,7 +40,6 @@ function build_docker_images() {
     service_list="docsum docsum-gradio-ui whisper llm-docsum"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
-    docker pull ghcr.io/huggingface/tgi-gaudi:2.3.1
     docker images && sleep 1s
 }
 
@@ -358,45 +358,41 @@ function stop_docker() {
 }
 
 function main() {
-    echo "==========================================="
-    echo ">>>> Stopping any running Docker containers..."
+
+    echo "::group:: Stopping any running Docker containers..."
     stop_docker
+    echo "::endgroup::"
 
-    echo "==========================================="
-    if [[ "$IMAGE_REPO" == "opea" ]]; then
-        echo ">>>> Building Docker images..."
-        build_docker_images
-    fi
+    echo "::group::build_docker_images"
+    if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
+    echo "::endgroup::"
 
-    echo "==========================================="
-    echo ">>>> Starting Docker services..."
+    echo "::group::start_services"
     start_services
+    echo "::endgroup::"
 
-    echo "==========================================="
-    echo ">>>> Validating microservices..."
+    echo "::group:: Validating microservices"
     validate_microservices
+    echo "::endgroup::"
 
-    echo "==========================================="
-    echo ">>>> Validating megaservice for text..."
+    echo "::group::validate_megaservice_text"
     validate_megaservice_text
+    echo "::endgroup::"
 
-    echo "==========================================="
-    echo ">>>> Validating megaservice for multimedia..."
+    echo "::group::validate_megaservice_multimedia"
     validate_megaservice_multimedia
+    echo "::endgroup::"
 
-    echo "==========================================="
-    echo ">>>> Validating megaservice for long text..."
+    echo "::group::validate_megaservice_long_text"
     validate_megaservice_long_text
+    echo "::endgroup::"
 
-    echo "==========================================="
-    echo ">>>> Stopping Docker containers..."
+    echo "::group::stop_docker"
     stop_docker
+    echo "::endgroup::"
 
-    echo "==========================================="
-    echo ">>>> Pruning Docker system..."
-    echo y | docker system prune
-    echo ">>>> Docker system pruned successfully."
-    echo "==========================================="
+    docker system prune -f
+
 }
 
 main

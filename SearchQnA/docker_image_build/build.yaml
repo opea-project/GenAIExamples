@@ -5,6 +5,8 @@ services:
   searchqna:
     build:
       args:
+        IMAGE_REPO: ${REGISTRY:-opea}
+        BASE_TAG: ${TAG:-latest}
         http_proxy: ${http_proxy}
         https_proxy: ${https_proxy}
         no_proxy: ${no_proxy}

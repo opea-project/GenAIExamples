@@ -18,19 +18,26 @@ LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
 HOST_IP=$ip_address
 
-COMPOSE_FILE="compose_vllm.yaml"
+COMPOSE_FILE="compose_vllm_multi-arc.yaml"
 EC_RAG_SERVICE_PORT=16010
 
-MODEL_PATH="/home/media/models"
+MODEL_PATH="/home/media/qwen"
 # MODEL_PATH="$WORKPATH/models"
 DOC_PATH="$WORKPATH/tests"
-UI_TMPFILE_PATH="$WORKPATH/tests"
+UI_UPLOAD_PATH="$WORKPATH/tests"
 
-#HF_ENDPOINT=https://hf-mirror.com
-LLM_MODEL="Qwen/Qwen2-7B-Instruct"
-VLLM_SERVICE_PORT=8008
-vLLM_ENDPOINT="http://${HOST_IP}:${VLLM_SERVICE_PORT}"
-
+HF_ENDPOINT=https://hf-mirror.com
+NGINX_PORT=8086
+NGINX_PORT_0=8100
+NGINX_PORT_1=8100
+VLLM_SERVICE_PORT_0=8100
+TENSOR_PARALLEL_SIZE=1
+SELECTED_XPU_0=0
+vLLM_ENDPOINT="http://${HOST_IP}:${NGINX_PORT}"
+CONTAINER_COUNT="single_container"
+LLM_MODEL=Qwen/Qwen2-7B-Instruct
+LLM_MODEL_PATH=$MODEL_PATH
+NGINX_CONFIG_PATH="$WORKPATH/nginx/nginx.conf"
 
 function build_docker_images() {
     opea_branch=${opea_branch:-"main"}
@@ -41,13 +48,11 @@ function build_docker_images() {
     docker build --no-cache -t ${REGISTRY}/comps-base:${TAG} --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
     popd && sleep 1s
 
+    echo "Pull intelanalytics/ipex-llm-serving-xpu image"
+    docker pull intelanalytics/ipex-llm-serving-xpu:0.8.3-b18
+
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
     docker compose -f build.yaml build --no-cache > ${LOG_PATH}/docker_image_build.log
-
-    echo "Build vllm_openvino image from GenAIComps..."
-    cd $WORKPATH && git clone --single-branch --branch "${opea_branch:-"main"}" https://github.com/opea-project/GenAIComps.git
-    cd GenAIComps/comps/third_parties/vllm/src/
-    bash ./build_docker_vllm_openvino.sh gpu
 
     docker images && sleep 1s
 }
@@ -55,16 +60,17 @@ function build_docker_images() {
 function start_services() {
     cd $WORKPATH/docker_compose/intel/gpu/arc
     source set_env.sh
-
+    envsubst < $WORKPATH/nginx/nginx.conf.template > $WORKPATH/nginx/nginx.conf
     # Start Docker Containers
-    docker compose -f $COMPOSE_FILE up -d > ${LOG_PATH}/start_services_with_compose.log
+    docker compose -f $COMPOSE_FILE --profile $CONTAINER_COUNT up -d > ${LOG_PATH}/start_services_with_compose.log
+    echo "ipex-llm-serving-xpu is booting, please wait."
     n=0
     until [[ "$n" -ge 100 ]]; do
-        docker logs vllm-openvino-server > ${LOG_PATH}/vllm_service_start.log
-        if grep -q "metrics.py" ${LOG_PATH}/vllm_service_start.log; then
+        docker logs ipex-llm-serving-xpu-container-0 > ${LOG_PATH}/ipex-llm-serving-xpu-container.log 2>&1
+        if grep -q "Starting vLLM API server on http://0.0.0.0:" ${LOG_PATH}/ipex-llm-serving-xpu-container.log; then
             break
         fi
-        sleep 5s
+        sleep 6s
         n=$((n+1))
     done
 }
@@ -112,7 +118,7 @@ function validate_rag() {
         "active" \
         "pipeline" \
         "edgecraftrag-server" \
-        '@configs/test_pipeline_vllm.json'
+        '@configs/test_pipeline_ipex_vllm.json'
 
     # add data
     validate_services \
@@ -127,7 +133,7 @@ function validate_rag() {
         "${HOST_IP}:${EC_RAG_SERVICE_PORT}/v1/chatqna" \
         "1234567890" \
         "query" \
-        "vllm-openvino-server" \
+        "ipex-llm-serving-xpu-container-0" \
         '{"messages":"What is the test id?"}'
 }
 
@@ -137,7 +143,7 @@ function validate_megaservice() {
         "${HOST_IP}:16011/v1/chatqna" \
         "1234567890" \
         "query" \
-        "vllm-openvino-server" \
+        "ipex-llm-serving-xpu-container-0" \
         '{"messages":"What is the test id?"}'
 }
 
@@ -148,7 +154,7 @@ function stop_docker() {
 
 
 function main() {
-    mkdir -p "$LOG_PATH"
+    mkdir -p $LOG_PATH
 
     echo "::group::stop_docker"
     stop_docker
