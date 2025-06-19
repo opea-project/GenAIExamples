@@ -124,7 +124,8 @@ This section walks you through a typical deployment session for the `ChatQnA` ex
     ```
 
 7.  **Confirm and Deploy:** Review the summary and confirm to start the deployment.
-    ```text
+
+    ````text
     ======================================================================
     == CONFIGURATION SUMMARY ==
     ======================================================================
@@ -136,6 +137,7 @@ This section walks you through a typical deployment session for the `ChatQnA` ex
         ```
 
     The script will now execute all the selected steps: check the environment, configure services, and deploy using Docker Compose.
+    ````
 
 ### Testing a Deployed Service
 
