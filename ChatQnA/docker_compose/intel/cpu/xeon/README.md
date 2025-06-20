@@ -74,7 +74,7 @@ docker compose -f compose.yaml -f compose.telemetry.yaml up -d
 ```
 To deploy ChatQnA services with remote endpoints, set the required environment variables mentioned below and run the 'compose_remote.yaml' file.
 
-**Note**: Set REMOTE_ENDPOINT variable value eto "https://api.inference.denvrdata.com" when the remote endpoint to access is "https://api.inference.denvrdata.com/v1/chat/completions"
+**Note**: Set REMOTE_ENDPOINT variable value to "https://api.inference.denvrdata.com" when the remote endpoint to access is "https://api.inference.denvrdata.com/v1/chat/completions"
 
 ```bash
 export REMOTE_ENDPOINT=<endpoint-url>                     
