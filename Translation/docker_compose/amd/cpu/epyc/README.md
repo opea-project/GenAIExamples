@@ -15,10 +15,10 @@ This section describes how to quickly deploy and test the Translation service ma
 3. [Determine your host's external IP address](#determine-your-host-external-IP-address)
 4. [Generate a HuggingFace Access Token](#generate-a-huggingface-access-token)
 5. [Configure the Deployment Environment](#configure-the-deployment-environment)
-7. [Deploy the Service Using Docker Compose](#deploy-the-service-using-docker-compose)
-8. [Check the Deployment Status](#check-the-deployment-status)
-9. [Test the Pipeline](#test-the-pipeline)
-10. [Cleanup the Deployment](#cleanup-the-deployment)
+6. [Deploy the Service Using Docker Compose](#deploy-the-service-using-docker-compose)
+7. [Check the Deployment Status](#check-the-deployment-status)
+8. [Test the Pipeline](#test-the-pipeline)
+9. [Cleanup the Deployment](#cleanup-the-deployment)
 
 ### Access the Code
 
@@ -30,6 +30,7 @@ cd GenAIExamples/Translation/docker_compose/amd/cpu/epyc/
 ```
 
 ### Install Docker
+
 Ensure Docker is installed on your system. If Docker is not already installed, use the provided script to set it up:
 
     source ./install_docker.sh
@@ -40,24 +41,26 @@ This script installs Docker and its dependencies. After running it, verify the i
 
 If Docker is already installed, this step can be skipped.
 
-### Determine your host external IP address  
+### Determine your host external IP address
+
 Run the following command in your terminal to list network interfaces:
-          
+
     ifconfig
-      
+
 Look for the inet address associated with your active network interface (e.g., enp99s0). For example:
-      
+
     enp99s0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
         inet 10.101.16.119  netmask 255.255.255.0  broadcast 10.101.16.255
-      
+
 In this example, the (`host_ip`) would be (`10.101.16.119`).
 
-    # Replace with your host's external IP address 
+    # Replace with your host's external IP address
     export host_ip="your_external_ip_address"
 
 ### Generate a HuggingFace Access Token
 
 Some HuggingFace resources, such as some models, are only accessible if you have an access token. If you do not already have a HuggingFace access token, you can create one by first creating an account by following the steps provided at [HuggingFace](https://huggingface.co/) and then generating a [user access token](https://huggingface.co/docs/transformers.js/en/guides/private#step-1-generating-a-user-access-token).
+
 ```bash
 export HUGGINGFACEHUB_API_TOKEN="Your_HuggingFace_API_Token"
 ```
@@ -160,7 +163,7 @@ The table provides a comprehensive overview of the Translation service utilized 
 
 | Service Name                    | Possible Image Names                                          | Optional | Description                                                                                     |
 | ------------------------------- | ------------------------------------------------------------- | -------- | ----------------------------------------------------------------------------------------------- |
-| tgi-service                     | ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu | No       | Specific to the TGI deployment, focuses on text generation inference.       |
+| tgi-service                     | ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu | No       | Specific to the TGI deployment, focuses on text generation inference.                           |
 | llm                             | opea/llm-textgen:latest                                       | No       | Handles large language model (LLM) tasks                                                        |
 | translation-epyc-backend-server | opea/translation:latest                                       | No       | Serves as the backend for the Translation service, with variations depending on the deployment. |
 | translation-epyc-ui-server      | opea/translation-ui:latest                                    | No       | Provides the user interface for the Translation service.                                        |
