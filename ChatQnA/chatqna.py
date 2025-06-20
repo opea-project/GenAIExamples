@@ -178,7 +178,7 @@ def align_generator(self, gen, **kwargs):
         chunks = [chunk.strip() for chunk in line.split("\n\n") if chunk.strip()]
         for line in chunks:
             start = line.find("{")
-            end = line.rfind("}") + 1  
+            end = line.rfind("}") + 1
             json_str = line[start:end]
             try:
                 # sometimes yield empty chunk, do a fallback here
@@ -188,9 +188,7 @@ def align_generator(self, gen, **kwargs):
                         yield f"data: {repr(json_data['ops'][0]['value'].encode('utf-8'))}\n\n"
                     else:
                         pass
-                elif (
-                    "content" in json_data["choices"][0]["delta"]
-                ):
+                elif "content" in json_data["choices"][0]["delta"]:
                     yield f"data: {repr(json_data['choices'][0]['delta']['content'].encode('utf-8'))}\n\n"
             except Exception as e:
                 yield f"data: {repr(json_str.encode('utf-8'))}\n\n"
