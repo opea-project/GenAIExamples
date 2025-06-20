@@ -72,12 +72,13 @@ CPU example with Open Telemetry feature:
 ./grafana/dashboards/download_opea_dashboard.sh
 docker compose -f compose.yaml -f compose.telemetry.yaml up -d
 ```
+
 To deploy ChatQnA services with remote endpoints, set the required environment variables mentioned below and run the 'compose_remote.yaml' file.
 
 **Note**: Set REMOTE_ENDPOINT variable value to "https://api.inference.denvrdata.com" when the remote endpoint to access is "https://api.inference.denvrdata.com/v1/chat/completions"
 
 ```bash
-export REMOTE_ENDPOINT=<endpoint-url>                     
+export REMOTE_ENDPOINT=<endpoint-url>
 export LLM_MODEL_ID=<model-id>
 export OPENAI_API_KEY=<API-KEY>
 docker compose -f compose_remote.yaml up -d
@@ -157,7 +158,7 @@ In the context of deploying a ChatQnA pipeline on an Intel® Xeon® platform, we
 | File                                                         | Description                                                                                                                                                           |
 | ------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [compose.yaml](./compose.yaml)                               | Default compose file using vllm as serving framework and redis as vector database                                                                                     |
-| [compose_remote.yaml](./compose_remote.yaml)                 | Default compose file using remote inference endpoints and redis as vector database                                                                                     |
+| [compose_remote.yaml](./compose_remote.yaml)                 | Default compose file using remote inference endpoints and redis as vector database                                                                                    |
 | [compose_milvus.yaml](./compose_milvus.yaml)                 | Uses Milvus as the vector database. All other configurations remain the same as the default                                                                           |
 | [compose_pinecone.yaml](./compose_pinecone.yaml)             | Uses Pinecone as the vector database. All other configurations remain the same as the default. For more details, refer to [README_pinecone.md](./README_pinecone.md). |
 | [compose_qdrant.yaml](./compose_qdrant.yaml)                 | Uses Qdrant as the vector database. All other configurations remain the same as the default. For more details, refer to [README_qdrant.md](./README_qdrant.md).       |
