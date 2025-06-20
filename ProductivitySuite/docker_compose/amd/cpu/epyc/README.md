@@ -34,13 +34,13 @@ Some HuggingFace resources, such as some models, are only accessible if you have
 
     # Replace with your Hugging Face Hub API token
     export HUGGINGFACEHUB_API_TOKEN="your_huggingface_token"
-        
+
 ### Configure the Deployment Environment
 
-Determine your host's external IP address: 
+Determine your host's external IP address:
 Run the following command in your terminal to list network interfaces:
 
-```          
+```
   ifconfig
 ```
 
@@ -50,10 +50,11 @@ Look for the inet address associated with your active network interface (e.g., e
   enp99s0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
     inet 10.101.16.119  netmask 255.255.255.0  broadcast 10.101.16.255
 ```
+
 In this example, the (`host_ip`) would be (`10.101.16.119`).
 
 ```
-  # Replace with your host's external IP address 
+  # Replace with your host's external IP address
   export host_ip="your_external_ip_address"
 ```
 
@@ -242,6 +243,6 @@ The table provides a comprehensive overview of the Productivity Suite service ut
 | retriever-redis-server                  | opea/retriever:latest                                         | No       | Handles retrieval-augmented generation tasks, enabling efficient document and context retrieval.                 |
 | tei-embedding-server                    | ghcr.io/huggingface/text-embeddings-inference:cpu-1.6         | No       | Provides text embedding and sequence classification services for downstream NLP tasks.                           |
 | tei-reranking-server                    | ghcr.io/huggingface/text-embeddings-inference:cpu-1.6         | No       | Performs reranking of retrieved documents or results using embedding-based similarity.                           |
-| tgi_service_codegen                     | ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu | No       | Serves code generation models for inference, optimized for AMD Epyc CPUs.                                      |
+| tgi_service_codegen                     | ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu | No       | Serves code generation models for inference, optimized for AMD Epyc CPUs.                                        |
 | tgi-service                             | ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu | No       | Specific to the TGI deployment, focuses on text generation inference using Epyc hardware.                        |
 | whisper-server                          | opea/whisper:latest                                           | No       | Provides speech-to-text transcription services using Whisper models.                                             |

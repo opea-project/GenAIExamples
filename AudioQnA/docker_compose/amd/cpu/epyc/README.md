@@ -35,6 +35,7 @@ cd GenAIExamples/AudioQnA/docker_compose/amd/cpu/epyc
 ```
 
 ### Install Docker
+
 Ensure Docker is installed on your system. If Docker is not already installed, use the provided script to set it up:
 
     source ./install_docker.sh
@@ -45,19 +46,20 @@ This script installs Docker and its dependencies. After running it, verify the i
 
 If Docker is already installed, this step can be skipped.
 
-### Determine your host external IP address  
+### Determine your host external IP address
+
 Run the following command in your terminal to list network interfaces:
-          
+
     ifconfig
-      
+
 Look for the inet address associated with your active network interface (e.g., enp99s0). For example:
-      
+
     enp99s0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
         inet 10.101.16.119  netmask 255.255.255.0  broadcast 10.101.16.255
-      
+
 In this example, the (`host_ip`) would be (`10.101.16.119`).
 
-    # Replace with your host's external IP address 
+    # Replace with your host's external IP address
     export host_ip="your_external_ip_address"
 
 ### Configure the Deployment Environment
@@ -68,6 +70,7 @@ The model_cache directory, by default, stores models in the ./data directory. To
 # Optional
 export model_cache=/home/documentation/data_audioqna/data # Path to save cache models
 ```
+
 To set up environment variables for deploying AudioQnA services, set up some parameters specific to the deployment environment and source the `set_env.sh` script in this directory:
 
 ```bash
@@ -218,6 +221,7 @@ When deploying an AudioQnA pipeline on an AMD EPYC™ platform, users can select
    # gpt-sovits service (optional)
    curl http://${host_ip}:${GPT_SOVITS_SERVER_PORT}/v1/audio/speech -XPOST -d '{"input": "Who are you?"}' -H 'Content-Type: application/json' --output speech.mp3
    ```
+
 ### Profile Microservices
 
 To further analyze MicroService Performance, users could follow the instructions to profile MicroServices.
@@ -235,7 +239,7 @@ curl http://${host_ip}:${LLM_SERVER_PORT}/start_profile \
     -H 'Content-Type: application/json'
 ```
 
-After vLLM profiling is started, users could start asking questions and get responses from vLLM MicroService  
+After vLLM profiling is started, users could start asking questions and get responses from vLLM MicroService
 
 ```bash
 curl http://${host_ip}:${LLM_SERVER_PORT}/v1/chat/completions \

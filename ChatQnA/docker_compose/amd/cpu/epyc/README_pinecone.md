@@ -27,15 +27,16 @@ To set up environment variables for deploying ChatQnA services, follow these ste
    export host_ip="External_Public_IP"
    export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
    ```
+
 2. Set the required Pinecone environment variables:
 
 Please refer to ['Getting started with Pinecone'](#https://docs.pinecone.io/guides/get-started/quickstart) to get the below details.
 
-   ```bash
-   export PINECONE_API_KEY="Pinecone_API_Key"
-   export PINECONE_INDEX_NAME="Pinecone_Index_Name"
-   export INDEX_NAME="Pinecone_Index_Name"
-   ```
+```bash
+export PINECONE_API_KEY="Pinecone_API_Key"
+export PINECONE_INDEX_NAME="Pinecone_Index_Name"
+export INDEX_NAME="Pinecone_Index_Name"
+```
 
 3. If you are in a proxy environment, also set the proxy-related environment variables:
 

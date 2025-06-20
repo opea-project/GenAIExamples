@@ -16,7 +16,7 @@ This README outlines the process for deploying the CodeGen application using Doc
 
 ## Overview
 
-This guide focuses on running the pre-configured CodeGen service using Docker Compose on AMD EPYC CPUs. 
+This guide focuses on running the pre-configured CodeGen service using Docker Compose on AMD EPYC CPUs.
 
 ## Prerequisites
 
@@ -45,42 +45,42 @@ This guide focuses on running the pre-configured CodeGen service using Docker Co
     If Docker is already installed, this step can be skipped.
 
 2.  **Configure Environment:**  
-    Set required environment variables in your shell:  
+    Set required environment variables in your shell:
 
-    ***i) Determine your host's external IP address:***  
-       Run the following command in your terminal to list network interfaces:
-          
+    **_i) Determine your host's external IP address:_**  
+     Run the following command in your terminal to list network interfaces:
+
         ifconfig
-      
-      Look for the inet address associated with your active network interface (e.g., enp99s0). For example:
-      
+
+    Look for the inet address associated with your active network interface (e.g., enp99s0). For example:
+
         enp99s0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
           inet 10.101.16.119  netmask 255.255.255.0  broadcast 10.101.16.255
-      
-      In this example, the (`host_ip`) would be (`10.101.16.119`).
 
-        # Replace with your host's external IP address 
+    In this example, the (`host_ip`) would be (`10.101.16.119`).
+
+        # Replace with your host's external IP address
         export host_ip="your_external_ip_address"
 
-    ***ii) Generate a HuggingFace Access Token:***  
-      Some HuggingFace resources, such as some models, are only accessible if you have an access token. If you do not already have a HuggingFace access token, you can create one by first creating an account by following the steps provided at [HuggingFace](https://huggingface.co/) and then generating a [user access token](https://huggingface.co/docs/transformers.js/en/guides/private#step-1-generating-a-user-access-token).
+    **_ii) Generate a HuggingFace Access Token:_**  
+     Some HuggingFace resources, such as some models, are only accessible if you have an access token. If you do not already have a HuggingFace access token, you can create one by first creating an account by following the steps provided at [HuggingFace](https://huggingface.co/) and then generating a [user access token](https://huggingface.co/docs/transformers.js/en/guides/private#step-1-generating-a-user-access-token).
 
         # Replace with your Hugging Face Hub API token
         export HUGGINGFACEHUB_API_TOKEN="your_huggingface_token"
 
-    ***iii) Set environment variables:***  
-      The model_cache directory, by default, stores models in the ./data directory. To change this, use the following command:
+    **_iii) Set environment variables:_**  
+     The model_cache directory, by default, stores models in the ./data directory. To change this, use the following command:
 
         # Optional
         export model_cache=/home/documentation/data_codegen/data # Path to save cache models
 
-      Optional: Configure proxy settings if needed:
+    Optional: Configure proxy settings if needed:
 
         # export http_proxy="your_http_proxy"
         # export https_proxy="your_https_proxy"
-        # export no_proxy="localhost,127.0.0.1,${host_ip}" # Add other hosts if necessary    
+        # export no_proxy="localhost,127.0.0.1,${host_ip}" # Add other hosts if necessary
 
-      To set other environment varibales:
+    To set other environment varibales:
 
         cd amd/cpu/epyc
         source ./set_env.sh
@@ -99,7 +99,7 @@ This guide focuses on running the pre-configured CodeGen service using Docker Co
     docker compose --profile codegen-epyc-vllm up -d
     ```
 
-3.  **Validate:**
+4.  **Validate:**
     Wait several minutes for models to download (especially the first time) and services to initialize. Check container logs (`docker compose logs -f <service_name>`) or proceed to the validation steps below.
 
 ### Available Deployment Options
@@ -116,6 +116,7 @@ The `compose.yaml` file uses Docker Compose profiles to select the LLM serving b
   # Ensure environment variables (host_ip, HUGGINGFACEHUB_API_TOKEN) are set
   docker compose --profile codegen-epyc-vllm up -d
   ```
+
 #### TGI-based Deployment (`--profile codegen-epyc-tgi`)
 
 - **Profile:** `codegen-epyc-tgi`
@@ -258,7 +259,7 @@ curl http://${host_ip}:8028/start_profile \
     -d '{"model": "Qwen/Qwen2.5-Coder-7B-Instruct"}'
 ```
 
-After vLLM profiling is started, users could start asking questions and get responses from vLLM MicroService  
+After vLLM profiling is started, users could start asking questions and get responses from vLLM MicroService
 
 ```bash
 curl http://${host_ip}:8028/v1/chat/completions \
