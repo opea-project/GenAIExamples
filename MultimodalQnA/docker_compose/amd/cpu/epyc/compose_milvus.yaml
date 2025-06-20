@@ -108,12 +108,24 @@ services:
       EMM_BRIDGETOWER_PORT: ${EMM_BRIDGETOWER_PORT}
       PORT: ${EMM_BRIDGETOWER_PORT}
     healthcheck:
-      test: ["CMD-SHELL", "http_proxy='' curl -f http://localhost:${EMM_BRIDGETOWER_PORT}/v1/health_check"]
+      test:
+        [
+          "CMD-SHELL",
+          "http_proxy='' curl -f http://localhost:${EMM_BRIDGETOWER_PORT}/v1/health_check",
+        ]
       interval: 10s
       timeout: 6s
       retries: 18
       start_period: 30s
-    entrypoint: ["python", "bridgetower_server.py", "--device", "cpu", "--model_name_or_path", $EMBEDDING_MODEL_ID]
+    entrypoint:
+      [
+        "python",
+        "bridgetower_server.py",
+        "--device",
+        "cpu",
+        "--model_name_or_path",
+        $EMBEDDING_MODEL_ID,
+      ]
     restart: unless-stopped
 
   embedding:
@@ -164,7 +176,15 @@ services:
       https_proxy: ${https_proxy}
       LLAVA_SERVER_PORT: ${LLAVA_SERVER_PORT}
       LVM_PORT: ${LVM_PORT}
-    entrypoint: ["python", "llava_server.py", "--device", "cpu", "--model_name_or_path", $LVM_MODEL_ID]
+    entrypoint:
+      [
+        "python",
+        "llava_server.py",
+        "--device",
+        "cpu",
+        "--model_name_or_path",
+        $LVM_MODEL_ID,
+      ]
     restart: unless-stopped
 
   lvm:

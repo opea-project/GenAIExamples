@@ -41,7 +41,11 @@ services:
       MODEL_CACHE: ${MODEL_CACHE}
       LLM_SERVER_PORT: ${LLM_SERVER_PORT}
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://$host_ip:${LLM_SERVER_PORT}/health || exit 1"]
+      test:
+        [
+          "CMD-SHELL",
+          "curl -f http://$host_ip:${LLM_SERVER_PORT}/health || exit 1",
+        ]
       interval: 10s
       timeout: 10s
       retries: 100

@@ -31,7 +31,9 @@ Clone the GenAIExample repository and access the SearchQnA AMD EPYC™ platform 
 git clone https://github.com/opea-project/GenAIExamples.git
 cd GenAIExamples/SearchQnA/docker_compose/amd/cpu/epyc
 ```
+
 ### Install Docker
+
 Ensure Docker is installed on your system. If Docker is not already installed, use the provided script to set it up:
 
     source ./install_docker.sh
@@ -42,19 +44,20 @@ This script installs Docker and its dependencies. After running it, verify the i
 
 If Docker is already installed, this step can be skipped.
 
-### Determine your host external IP address  
+### Determine your host external IP address
+
 Run the following command in your terminal to list network interfaces:
-          
+
     ifconfig
-      
+
 Look for the inet address associated with your active network interface (e.g., enp99s0). For example:
-      
+
     enp99s0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
         inet 10.101.16.119  netmask 255.255.255.0  broadcast 10.101.16.255
-      
+
 In this example, the (`host_ip`) would be (`10.101.16.119`).
 
-    # Replace with your host's external IP address 
+    # Replace with your host's external IP address
     export host_ip="your_external_ip_address"
 
 ### Generate a HuggingFace Access Token
@@ -77,11 +80,14 @@ export model_cache=/home/documentation/data_searchqna/data # Path to save cache 
 To set up environment variables for deploying SearchQnA services, set up some parameters specific to the deployment environment and then source the `set_env.sh` script in this directory:
 
 The environment variables `GOOGLE_CSE_ID` and `GOOGLE_API_KEY` must be set. To create an API key:
+
 1. Open the (Google Cloud Console: Credentials.)[(https://console.cloud.google.com/apis/credentials)]
 2. Click Create credentials → API key
 
 To enable the Custom Search API:
-1. To enable the Custom Search API on a Google account follow (here)[(https://programmablesearchengine.google.com/controlpanel/create] 
+
+1. To enable the Custom Search API on a Google account follow (here)[(https://programmablesearchengine.google.com/controlpanel/create]
+
 ```bash
 export GOOGLE_API_KEY="your google api key"
 export GOOGLE_CSE_ID="your cse id"
@@ -95,6 +101,7 @@ export NGINX_PORT=${your_nginx_port}          # your usable port for nginx, 80 f
 ```
 
 Finally set the other environment variables
+
 ```bash
 source ./set_env.sh
 ```

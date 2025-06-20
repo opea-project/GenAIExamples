@@ -32,7 +32,8 @@ services:
       DATAPREP_TYPE: ${DATAPREP_TYPE}
       LOGFLAG: ${LOGFLAG}
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:5000/v1/health_check || exit 1"]
+      test:
+        ["CMD-SHELL", "curl -f http://localhost:5000/v1/health_check || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 50
