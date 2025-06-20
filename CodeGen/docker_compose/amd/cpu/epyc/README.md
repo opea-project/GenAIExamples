@@ -80,7 +80,7 @@ This guide focuses on running the pre-configured CodeGen service using Docker Co
         # export https_proxy="your_https_proxy"
         # export no_proxy="localhost,127.0.0.1,${host_ip}" # Add other hosts if necessary
 
-    To set other environment varibales:
+    To set other environment variables:
 
         cd amd/cpu/epyc
         source ./set_env.sh
