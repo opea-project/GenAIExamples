@@ -400,6 +400,87 @@ EXAMPLE_CONFIGS = {
             },
         ],
     },
+    "VisualQnA": {
+        "base_dir": "VisualQnA",
+        "docker_compose": {
+            "paths": {
+                "xeon": "docker_compose/intel/cpu/xeon/compose.yaml",
+                "gaudi": "docker_compose/intel/hpu/gaudi/compose.yaml",
+            },
+            "set_env_scripts": {"xeon": "docker_compose/intel/cpu/xeon/set_env.sh", "gaudi": "docker_compose/intel/hpu/gaudi/set_env.sh"},
+            "params_to_set_env": {"lvm_model": "LVM_MODEL_ID", "hf_token": "HF_TOKEN"},
+        },
+        "kubernetes": {
+            "helm": {
+                "chart_oci": "oci://ghcr.io/opea-project/charts/visualqna",
+                "values_files": {
+                    "xeon": "kubernetes/helm/cpu-values.yaml",
+                    "gaudi": "kubernetes/helm/gaudi-values.yaml",
+                },
+                "params_to_values": {"hf_token": "global.HUGGINGFACEHUB_API_TOKEN"},
+            },
+            "namespace": "visualqna",
+            "release_name": "visualqna",
+        },
+        "supported_devices": ["xeon", "gaudi"],
+        "default_device": "xeon",
+        "ports": {
+            "docker": {"backend": "8888", "lvm": "9399", "nginx": "81"},
+            "k8s_services": {"backend": "visualqna", "lvm": "visualqna-lvm-uservice"},
+        },
+        "test_connections": {
+            "main_service": {
+                "service_key": "backend",
+                "path": "/v1/visualqna",
+                "method": "POST",
+                "payload": {
+                    "messages": [
+                    {
+                        "role": "user",
+                        "content": [
+                        {
+                            "type": "text",
+                            "text": "What'\''s in this image?"
+                        },
+                        {
+                            "type": "image_url",
+                            "image_url": {
+                            "url": "https://www.ilankelman.org/stopsigns/australia.jpg"
+                            }
+                        }
+                        ]
+                    }
+                    ],
+                    "max_tokens": 300
+                },
+                "headers": {"Content-Type": "application/json"},
+                "expect_code": 200,
+            },
+            "sub_services": [
+                {
+                    "name": "lvm_visual_qna_check",
+                    "service_key": "lvm",
+                    "path": "/v1/lvm",
+                    "method": "POST",
+                    "payload_template": {
+                        "image": "", 
+                        "prompt":"What is deep learning?"
+                    },
+                    "headers": {"Content-Type": "application/json"},
+                    "expect_code": 200,
+                }
+            ],
+        },
+        "interactive_params": [
+            {
+                "name": "lvm_model",
+                "prompt": "LVM Model ID (for Visual Q&A)",
+                "type": str,
+                "default": "llava-hf/llava-v1.6-mistral-7b-hf",
+                "help": "e.g., llava-hf/llava-v1.6-mistral-7b-hf",
+            },
+        ],
+    },
 }
 
 # --- Deployment and Testing Configurations ---

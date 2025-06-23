@@ -385,7 +385,7 @@ class Deployer:
                     "http_proxy": self.args.http_proxy,
                     "https_proxy": self.args.https_proxy,
                     "no_proxy": final_no_proxy,
-                    "HOST_IP": get_host_ip(),
+                    "host_ip": get_host_ip(),
                 }
             )
 
