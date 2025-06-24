@@ -82,14 +82,14 @@ get_service_list() {
                 echo "audioqna audioqna-ui whisper-gaudi speecht5-gaudi vllm-gaudi"
             else
                 echo "audioqna audioqna-ui whisper speecht5 vllm"
-            fi  
+            fi
             ;;
         "FaqGen")
             if [[ "$device_name" == "gaudi" ]]; then
                 echo "chatqna chatqna-ui llm-faqgen dataprep retriever nginx vllm-gaudi"
             else
                 echo "chatqna chatqna-ui llm-faqgen dataprep retriever nginx vllm"
-            fi  
+            fi
             ;;
         *)
             # Default to empty, which means docker-compose will process all services
@@ -386,7 +386,7 @@ push_images() {
 #   $1 (string): The example name (e.g. "ChatQnA")
 #
 # Returns:
-#   The absolute path to the example directory 
+#   The absolute path to the example directory
 #
 # Errors:
 #   Exits with error if the directory doesn't exist
@@ -409,7 +409,7 @@ get_example_path() {
     if [ ! -d "${example_path}" ]; then
         error_exit "Example directory not found: '$example_path'."
     fi
-    
+
     echo "${example_path}"
 }
 

@@ -545,7 +545,9 @@ EXAMPLE_CONFIGS = {
                     "service_key": "llm",
                     "path": "/v1/faqgen",
                     "method": "POST",
-                    "payload_template": {"messages":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."},
+                    "payload_template": {
+                        "messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."
+                    },
                     "headers": {"Content-Type": "application/json"},
                     "expect_code": 200,
                     "expect_response_contains": "content",
