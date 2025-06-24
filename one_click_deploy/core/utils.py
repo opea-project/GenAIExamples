@@ -9,6 +9,7 @@ import shutil
 import subprocess
 import sys
 import time
+import importlib.util
 
 try:
     import ruamel.yaml
@@ -307,3 +308,17 @@ def get_var_from_shell_script(script_path: pathlib.Path, var_name: str) -> str |
     except Exception as e:
         log_message("WARN", f"Failed to extract variable '{var_name}' from {script_path}: {e}")
         return None
+    
+def check_install_python_pkg(package, import_name=None):
+    """
+    Check if a python package is installed. If not, install it automatically.
+    
+    :param package: Name to pass to pip install (e.g., "requests")
+    :param import_name: Name used to import the package (if different from package)
+    """
+    import_name = import_name or package
+    if importlib.util.find_spec(import_name) is None:
+        log_message("INFO", f"Package '{package}' not found. Installing...")
+        subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+    else:
+        log_message("DEBUG", f"Package '{package}' is already installed.")

@@ -9,7 +9,7 @@ from abc import ABC
 import requests
 
 from .config import EXAMPLE_CONFIGS, TEST_RETRY_ATTEMPTS, TEST_RETRY_DELAY_S
-from .utils import get_host_ip, log_message, run_command, start_kubectl_port_forward, stop_all_kubectl_port_forwards
+from .utils import get_host_ip, log_message, run_command, start_kubectl_port_forward, stop_all_kubectl_port_forwards, check_install_python_pkg
 
 
 class BaseConnectionTester(ABC):
@@ -246,6 +246,11 @@ class AudioQnAConnectionTester(BaseConnectionTester):
         Returns:
             Dictionary containing the payload for the request
         """
+
+        # Ensure the required Python package is installed
+        check_install_python_pkg("pybase64")
+        check_install_python_pkg("urllib3")
+
         import base64
         from urllib.parse import urlparse
 
@@ -276,7 +281,10 @@ class AudioQnAConnectionTester(BaseConnectionTester):
 
             else:
                 raise ValueError("Audio is not a URL. Please check config.py for 'AudioQnA' example.")
-
+        else:
+            raise ValueError(
+                "Audio cannot be None or empty. Please check config.py for 'AudioQnA' example."
+            )
         return payload
 
 
