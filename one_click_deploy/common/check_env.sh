@@ -190,7 +190,7 @@ install_docker() {
     subsection_header "Installing Docker"
 
     # install docker
-    if ! sudo apt install -y docker.io &>> "$LOG_FILE"; then
+    if ! sudo apt install -y docker.io 2>&1 | tee -a "$LOG_FILE"; then
         log ERROR "Failed to install Docker."
         return 1
     fi
