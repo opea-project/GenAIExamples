@@ -268,7 +268,7 @@ class AudioQnAConnectionTester(BaseConnectionTester):
                 log_message("INFO", f"Converting audio from URL: {audio_value}")
 
                 # Download the audio file content
-                audio_response = requests.get(audio_value, stream=True)
+                audio_response = requests.get(audio_value, stream=True, timeout=60)
                 audio_response.raise_for_status()  # Ensure successful download
 
                 # Base64 encoding
