@@ -1,6 +1,7 @@
 # Copyright (C) 2025 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+import importlib.util
 import logging
 import os
 import pathlib
@@ -9,7 +10,6 @@ import shutil
 import subprocess
 import sys
 import time
-import importlib.util
 
 try:
     import ruamel.yaml
@@ -308,11 +308,11 @@ def get_var_from_shell_script(script_path: pathlib.Path, var_name: str) -> str |
     except Exception as e:
         log_message("WARN", f"Failed to extract variable '{var_name}' from {script_path}: {e}")
         return None
-    
+
+
 def check_install_python_pkg(package, import_name=None):
-    """
-    Check if a python package is installed. If not, install it automatically.
-    
+    """Check if a python package is installed. If not, install it automatically.
+
     :param package: Name to pass to pip install (e.g., "requests")
     :param import_name: Name used to import the package (if different from package)
     """

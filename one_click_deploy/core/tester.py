@@ -9,7 +9,14 @@ from abc import ABC
 import requests
 
 from .config import EXAMPLE_CONFIGS, TEST_RETRY_ATTEMPTS, TEST_RETRY_DELAY_S
-from .utils import get_host_ip, log_message, run_command, start_kubectl_port_forward, stop_all_kubectl_port_forwards, check_install_python_pkg
+from .utils import (
+    check_install_python_pkg,
+    get_host_ip,
+    log_message,
+    run_command,
+    start_kubectl_port_forward,
+    stop_all_kubectl_port_forwards,
+)
 
 
 class BaseConnectionTester(ABC):
@@ -282,9 +289,7 @@ class AudioQnAConnectionTester(BaseConnectionTester):
             else:
                 raise ValueError("Audio is not a URL. Please check config.py for 'AudioQnA' example.")
         else:
-            raise ValueError(
-                "Audio cannot be None or empty. Please check config.py for 'AudioQnA' example."
-            )
+            raise ValueError("Audio cannot be None or empty. Please check config.py for 'AudioQnA' example.")
         return payload
 
 
