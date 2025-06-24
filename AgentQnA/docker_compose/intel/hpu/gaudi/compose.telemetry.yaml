@@ -2,10 +2,6 @@
 # SPDX-License-Identifier: Apache-2.0
 
 services:
-  tei-embedding-service:
-    command: --model-id ${EMBEDDING_MODEL_ID} --auto-truncate --otlp-endpoint $OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
-  tei-reranking-service:
-    command: --model-id ${RERANK_MODEL_ID} --auto-truncate --otlp-endpoint $OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
   jaeger:
     image: jaegertracing/all-in-one:1.67.0
     container_name: jaeger

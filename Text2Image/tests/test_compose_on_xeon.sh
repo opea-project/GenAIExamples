@@ -26,7 +26,7 @@ function build_docker_images() {
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 }
 
-function start_service() {
+function start_services() {
     cd $WORKPATH/docker_compose/intel/cpu/xeon
     export no_proxy="localhost,127.0.0.1,"${ip_address}
     docker compose -f compose.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
@@ -68,15 +68,27 @@ function stop_docker() {
 
 function main() {
 
+    echo "::group::stop_docker"
     stop_docker
+    echo "::endgroup::"
 
-    build_docker_images
-    start_service
+    echo "::group::build_docker_images"
+    if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
+    echo "::endgroup::"
 
+    echo "::group::start_services"
+    start_services
+    echo "::endgroup::"
+
+    echo "::group::validate_microservice"
     validate_microservice
+    echo "::endgroup::"
 
+    echo "::group::stop_docker"
     stop_docker
-    echo y | docker system prune
+    echo "::endgroup::"
+
+    docker system prune -f
 
 }
 

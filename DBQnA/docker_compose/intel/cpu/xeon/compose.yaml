@@ -6,7 +6,7 @@ services:
     image: ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu
     container_name: tgi-service
     ports:
-      - "8008:80"
+      - "${TGI_PORT}:80"
     volumes:
       - "${MODEL_CACHE:-./data}:/data"
     environment:
@@ -35,7 +35,7 @@ services:
     image: ${REGISTRY:-opea}/text2sql:${TAG:-latest}
     container_name: text2sql-service
     ports:
-      - "9090:8080"
+      - "${TEXT2SQL_PORT}:8080"
     environment:
       - TGI_LLM_ENDPOINT=${TGI_LLM_ENDPOINT}
 
@@ -50,6 +50,7 @@ services:
       - no_proxy=${no_proxy}
       - https_proxy=${https_proxy}
       - http_proxy=${http_proxy}
+      - APP_TEXT_TO_SQL_URL=http://${host_ip}:${TEXT2SQL_PORT}/v1
     ipc: host
     restart: always
 
