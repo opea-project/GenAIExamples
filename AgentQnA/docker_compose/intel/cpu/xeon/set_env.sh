@@ -7,8 +7,12 @@ source .set_env.sh
 popd > /dev/null
 
 if [[ -z "${WORKDIR}" ]]; then
-	echo "Please set WORKDIR environment variable"
-	exit 0
+    echo "INFO: WORKDIR is not set. Calculating it automatically."
+    SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
+    export WORKDIR=$(cd "$SCRIPT_DIR/../../../../../../" && pwd)
+    echo "INFO: WORKDIR has been set to: ${WORKDIR}"
+else
+    echo "INFO: WORKDIR is already set to: ${WORKDIR}"
 fi
 echo "WORKDIR=${WORKDIR}"
 export TOOLSET_PATH=$WORKDIR/GenAIExamples/AgentQnA/tools/

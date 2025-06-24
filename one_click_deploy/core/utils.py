@@ -204,7 +204,8 @@ def update_helm_values_yaml(file_path: pathlib.Path, updates_map: dict):
         return False
     try:
         with open(file_path, "r") as f:
-            data = YAML_HANDLER.safe_load(f)
+            # Using safe_load for ruamel.yaml as well for consistency
+            data = YAML_HANDLER.safe_load(f) if hasattr(YAML_HANDLER, 'safe_load') else YAML_HANDLER.load(f)
     except Exception as e:
         log_message("ERROR", f"Failed to load YAML file {file_path}: {e}")
         return False
@@ -285,9 +286,7 @@ def get_var_from_shell_script(script_path: pathlib.Path, var_name: str) -> str |
         log_message("DEBUG", f"Source script for variable extraction not found: {script_path}")
         return None
 
-    # This command sources the script, then echos the variable. Using a subshell
-    # ensures that it doesn't affect the current process's environment.
-    command = f'. {script_path.resolve()} && echo -n "${var_name}"'
+    command = f'(. {script_path.resolve()} >/dev/null 2>&1; echo -n "${var_name}")'
     log_message("DEBUG", f"Extracting var '{var_name}' with command: {command}")
 
     try:

@@ -2,12 +2,18 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import os
+import pathlib
 import shutil
 import time
 
 import click
 
-from .config import COMMON_SCRIPTS_DIR, EXAMPLE_CONFIGS, EXAMPLES_ROOT_DIR, POST_DEPLOY_WAIT_S
+from .config import (
+    COMMON_SCRIPTS_DIR,
+    EXAMPLE_CONFIGS,
+    EXAMPLES_ROOT_DIR,
+    POST_DEPLOY_WAIT_S,
+)
 from .tester import ConnectionTesterFactory
 from .utils import (
     get_host_ip,
@@ -32,35 +38,73 @@ class Deployer:
         self.compose_command = "docker compose"
 
     def _get_path_from_config(self, config_keys, device_specific_key=None):
+        """Helper to safely retrieve a path or list of paths from the configuration."""
         current_level = self.config
         for key in config_keys:
             if not isinstance(current_level, dict) or key not in current_level:
                 return None
             current_level = current_level[key]
-        path_str = (
+
+        path_or_paths = (
             current_level.get(device_specific_key)
             if device_specific_key and isinstance(current_level, dict)
-            else (current_level if isinstance(current_level, str) else None)
+            else (current_level if isinstance(current_level, (str, list)) else None)
         )
-        return self.example_root / path_str if path_str else None
+        if not path_or_paths:
+            return None
 
-    # Docker helpers
-    def _get_docker_compose_file(self):
+        if isinstance(path_or_paths, str):
+            path_or_paths = [path_or_paths]
+
+        resolved_paths = []
+        for p in path_or_paths:
+            if os.path.isabs(p):
+                resolved_paths.append(pathlib.Path(p))
+            else:
+                resolved_paths.append(self.example_root / p)
+        return resolved_paths
+
+    def _get_device_specific_or_common_config(self, key_path):
+        """
+        Retrieves a configuration value, handling device-specific overrides.
+        """
+        current_level = self.config
+        try:
+            for key in key_path:
+                current_level = current_level[key]
+        except (KeyError, TypeError):
+            return None
+
+        if isinstance(current_level, dict) and self.args.device in current_level:
+            return current_level[self.args.device]
+
+        return current_level
+
+    def _get_docker_compose_files(self):
+        """Returns a list of Docker Compose file paths."""
         return self._get_path_from_config(["docker_compose", "paths"], self.args.device)
 
     def _get_docker_set_env_script(self):
-        return self._get_path_from_config(["docker_compose", "set_env_scripts"], self.args.device)
+        """Returns the path to the set_env script."""
+        path_or_paths = self._get_path_from_config(["docker_compose", "set_env_scripts"], self.args.device)
+        return path_or_paths[0] if path_or_paths else None
 
     def _get_local_env_file_path(self):
+        """Determines the path for the local 'set_env.local.sh' file."""
         base_script_path = self._get_docker_set_env_script()
-        if not base_script_path:
-            compose_dir = self._get_docker_compose_file().parent
-            return compose_dir / "set_env.local.sh"
-        return base_script_path.with_name(f"{base_script_path.stem}.local{base_script_path.suffix}")
+        if base_script_path:
+            return base_script_path.with_name(f"{base_script_path.stem}.local{base_script_path.suffix}")
+        else:
+            compose_files = self._get_docker_compose_files()
+            if compose_files:
+                compose_dir = compose_files[0].parent
+                return compose_dir / "set_env.local.sh"
+        return None
 
     def _get_helm_values_file(self):
         """Gets the original Helm values file path."""
-        return self._get_path_from_config(["kubernetes", "helm", "values_files"], self.args.device)
+        paths = self._get_path_from_config(["kubernetes", "helm", "values_files"], self.args.device)
+        return paths[0] if paths else None
 
     def _get_local_helm_values_file_path(self):
         """Constructs the path for the local (temporary) Helm values file."""
@@ -98,7 +142,7 @@ class Deployer:
                 for i in range(POST_DEPLOY_WAIT_S, 0, -10):
                     print(f"\r... {i} seconds remaining...  ", end="")
                     time.sleep(min(10, i))
-                print("\rWait complete. Starting tests.        ")  # Clear the line
+                print("\rWait complete. Starting tests.        ")
 
                 success = self.test_connection()
 
@@ -152,8 +196,9 @@ class Deployer:
             no_proxy_set.update(p.strip() for p in user_no_proxy.split(",") if p.strip())
         self.args.no_proxy = ",".join(sorted(list(no_proxy_set)))
 
-        for param in self.config.get("interactive_params", []):
-            # Skip parameters not relevant for the chosen deployment mode
+        interactive_params = self._get_device_specific_or_common_config(["interactive_params"]) or []
+
+        for param in interactive_params:
             if "modes" in param and self.args.deploy_mode not in param["modes"]:
                 setattr(self.args, param["name"], None)
                 continue
@@ -163,7 +208,15 @@ class Deployer:
             if help_text:
                 prompt_text = f"{prompt_text} ({help_text})"
 
-            user_input = click.prompt(prompt_text, default=param.get("default"), type=param.get("type", str))
+            default_value = param.get("default")
+            is_required = param.get("required", False)
+
+            user_input = click.prompt(prompt_text, default=default_value, type=param.get("type", str))
+
+            while is_required and (not user_input or user_input == default_value):
+                log_message("WARN", f"A valid '{param['prompt']}' is required. Please provide a real value.")
+                user_input = click.prompt(prompt_text, type=param.get("type", str), default=None)
+
             setattr(self.args, param["name"], user_input)
 
         self.args.do_check_env = click.confirm("Run environment check?", default=False, show_default=True)
@@ -193,7 +246,7 @@ class Deployer:
         section_header("Configuration Summary")
         for k, v in vars(self.args).items():
             if v is not None and v != "":
-                log_message("INFO", f"  {k.replace('_', ' ').title()}: {'**********' if k == 'hf_token' and v else v}")
+                log_message("INFO", f"  {k.replace('_', ' ').title()}: {'**********' if k == 'hf_token' or k.endswith('_key') else v}")
         return click.confirm("Proceed with deployment?", default=True)
 
     def run_interactive_clear(self):
@@ -358,10 +411,13 @@ class Deployer:
             source_env_file = self._get_docker_set_env_script()
             local_env_file = self._get_local_env_file_path()
 
-            # Base updates from interactive parameters
+            params_to_env_map = self._get_device_specific_or_common_config(
+                ["docker_compose", "params_to_set_env"]
+            ) or {}
+
             updates = {
                 env_var: getattr(self.args, arg_name)
-                for arg_name, env_var in self.config["docker_compose"]["params_to_set_env"].items()
+                for arg_name, env_var in params_to_env_map.items()
                 if hasattr(self.args, arg_name) and getattr(self.args, arg_name) is not None
             }
 
@@ -436,21 +492,21 @@ class Deployer:
         section_header(f"Deploying {self.example_name} ({self.args.deploy_mode})")
 
         if self.args.deploy_mode == "docker":
-            compose_file = self._get_docker_compose_file()
-            if not compose_file:
-                log_message("ERROR", "Docker Compose file not found.")
+            compose_files = self._get_docker_compose_files()
+            if not compose_files:
+                log_message("ERROR", "Docker Compose file(s) not found in configuration.")
                 return False
 
-            compose_filename = compose_file.name
-            compose_dir = compose_file.parent
+            compose_dir = compose_files[0].parent
             local_env_file = self._get_local_env_file_path()
 
-            # Ensure the command sources the env file from its own directory
+            f_flags = " ".join([f"-f '{f.resolve()}'" for f in compose_files])
+
             cmd_string = (
-                f"cd '{local_env_file.parent}' && "
+                f"cd '{local_env_file.parent.resolve()}' && "
                 f"source ./{local_env_file.name} && "
                 f"cd '{compose_dir}' && "
-                f"{self.compose_command} -f {compose_filename} up -d --remove-orphans"
+                f"{self.compose_command} {f_flags} up -d --remove-orphans"
             )
 
             log_message("INFO", "Executing deployment command in a bash subshell...")
@@ -484,7 +540,7 @@ class Deployer:
             try:
                 run_command(cmd, check=True)
                 log_message("OK", f"Helm release '{cfg['release_name']}' deployed. Waiting for pods to stabilize...")
-                time.sleep(30)  # Give some time for pods to start
+                time.sleep(30)
                 return True
             except Exception as e:
                 log_message("ERROR", f"Helm deployment failed: {e}")
@@ -495,21 +551,23 @@ class Deployer:
         section_header(f"Clearing Deployment for {self.example_name} ({self.args.deploy_mode})")
 
         if self.args.deploy_mode == "docker":
-            compose_file = self._get_docker_compose_file()
-            if not compose_file:
-                log_message("WARN", "Docker Compose file not found. Cannot clear.")
+            compose_files = self._get_docker_compose_files()
+            if not compose_files:
+                log_message("WARN", "Docker Compose file(s) not found. Cannot clear.")
                 return True
 
-            compose_dir = compose_file.parent
-            local_env_file = self._get_local_env_file_path()
-            compose_filename = compose_file.name
+            compose_dir = self.example_root
 
-            cmd_string = f"cd '{compose_dir}' && {self.compose_command} -f {compose_filename} down -v --remove-orphans"
+            local_env_file = self._get_local_env_file_path()
+            f_flags = " ".join([f"-f '{f.resolve()}'" for f in compose_files])
+            cmd_string = f"cd '{compose_dir}' && {self.compose_command} {f_flags} down -v --remove-orphans"
 
             log_message("INFO", "Executing cleanup command in a bash subshell...")
             try:
-                run_command(cmd_string, check=False, shell=True, executable="/bin/bash")
-                if local_env_file.exists():
+                # Docker compose down might run on a non-existent dir, so we don't cd into it
+                run_command(f"{self.compose_command} {f_flags} down -v --remove-orphans", cwd=compose_dir, check=False, shell=True)
+
+                if local_env_file and local_env_file.exists():
                     local_env_file.unlink()
                     log_message("INFO", f"Removed generated config file: {local_env_file.name}")
                 log_message("OK", "Docker Compose deployment cleared.")

@@ -38,9 +38,9 @@ EXAMPLE_CONFIGS = {
                 },
                 "params_to_values": {
                     "hf_token": "global.HUGGINGFACEHUB_API_TOKEN",
-                    "llm_model": "models.rag.llm.model_name",
-                    "embed_model": "models.rag.embedding.model_name",
-                    "rerank_model": "models.rag.reranking.model_name",
+                    "llm_model": "vllm.LLM_MODEL_ID",
+                    "embed_model": "tei.EMBEDDING_MODEL_ID",
+                    "rerank_model": "teirerank.RERANK_MODEL_ID",
                 },
             },
             "namespace": "chatqna",
@@ -562,6 +562,89 @@ EXAMPLE_CONFIGS = {
                 "help": "e.g., meta-llama/Meta-Llama-3-8B-Instruct",
             },
         ],
+    },
+    "AgentQnA": {
+        "base_dir": "AgentQnA",
+        "docker_compose": {
+            "paths": {
+                "xeon": [
+                    "docker_compose/intel/cpu/xeon/compose_openai.yaml",
+                    f"{EXAMPLES_ROOT_DIR}/DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml",
+                ],
+                "gaudi": [
+                    "docker_compose/intel/hpu/gaudi/compose.yaml",
+                    f"{EXAMPLES_ROOT_DIR}/DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml",
+                ],
+            },
+            "set_env_scripts": {
+                "xeon": "docker_compose/intel/cpu/xeon/set_env.sh",
+                "gaudi": "docker_compose/intel/hpu/gaudi/set_env.sh",
+            },
+            "params_to_set_env": {
+                "xeon": {
+                    "openai_api_key": "OPENAI_API_KEY",
+                    "hf_token": "HF_TOKEN",
+                },
+                "gaudi": {
+                    "llm_model": "LLM_MODEL_ID",
+                    "hf_token": "HF_TOKEN",
+                }
+            },
+        },
+        "kubernetes": {
+            "helm": {
+                "chart_oci": "oci://ghcr.io/opea-project/charts/agentqna",
+                "values_files": {
+                    "gaudi": "kubernetes/helm/gaudi-values.yaml",
+                },
+                "params_to_values": {
+                    "llm_model": ["vllm.LLM_MODEL_ID", "supervisor.model", "ragagent.model", "sqlagent.model"],
+                },
+            },
+            "namespace": "agentqna",
+            "release_name": "agentqna",
+            "ui_namespace": "agentqna-ui",
+        },
+        "supported_devices": ["xeon", "gaudi"],
+        "default_device": "xeon",
+        "ports": {
+            "docker": {"rag": "9095"},
+            "k8s_services": {"rag": "ragagent"},
+        },
+        "test_connections": {
+            "main_service": {
+                "service_key": "rag",
+                "path": "/v1/chat/completions",
+                "method": "POST",
+                "payload": {
+                    "messages": [{"role": "user", "content": "Tell me about Michael Jackson song Thriller"}],
+                    "max_new_tokens": 100,
+                },
+                "headers": {"Content-Type": "application/json"},
+                "expect_code": 200,
+            },
+        },
+        "interactive_params": {
+            "xeon": [
+                {
+                    "name": "openai_api_key",
+                    "prompt": "OpenAI API Key",
+                    "type": str,
+                    "default": "your-openai-api-key",
+                    "help": "Required for Xeon deployment which uses OpenAI models.",
+                    "required": True,
+                }
+            ],
+            "gaudi": [
+                {
+                    "name": "llm_model",
+                    "prompt": "LLM Model ID (for Gaudi)",
+                    "type": str,
+                    "default": "meta-llama/Meta-Llama-3-8B-Instruct",
+                    "help": "e.g., meta-llama/Meta-Llama-3-8B-Instruct",
+                },
+            ]
+        }
     },
 }
 
