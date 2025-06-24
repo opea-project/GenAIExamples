@@ -203,7 +203,8 @@ def update_helm_values_yaml(file_path: pathlib.Path, updates_map: dict):
         return False
     try:
         with open(file_path, "r") as f:
-            data = YAML_HANDLER.safe_load(f)
+            # data = YAML_HANDLER.safe_load(f)
+            data = YAML_HANDLER.load(f)
     except Exception as e:
         log_message("ERROR", f"Failed to load YAML file {file_path}: {e}")
         return False
