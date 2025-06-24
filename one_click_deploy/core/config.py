@@ -588,7 +588,7 @@ EXAMPLE_CONFIGS = {
                 "gaudi": {
                     "llm_model": "LLM_MODEL_ID",
                     "hf_token": "HF_TOKEN",
-                }
+                },
             },
         },
         "kubernetes": {
@@ -643,8 +643,8 @@ EXAMPLE_CONFIGS = {
                     "default": "meta-llama/Meta-Llama-3-8B-Instruct",
                     "help": "e.g., meta-llama/Meta-Llama-3-8B-Instruct",
                 },
-            ]
-        }
+            ],
+        },
     },
 }
 

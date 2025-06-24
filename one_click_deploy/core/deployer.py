@@ -65,9 +65,7 @@ class Deployer:
         return resolved_paths
 
     def _get_device_specific_or_common_config(self, key_path):
-        """
-        Retrieves a configuration value, handling device-specific overrides.
-        """
+        """Retrieves a configuration value, handling device-specific overrides."""
         current_level = self.config
         try:
             for key in key_path:
@@ -246,7 +244,10 @@ class Deployer:
         section_header("Configuration Summary")
         for k, v in vars(self.args).items():
             if v is not None and v != "":
-                log_message("INFO", f"  {k.replace('_', ' ').title()}: {'**********' if k == 'hf_token' or k.endswith('_key') else v}")
+                log_message(
+                    "INFO",
+                    f"  {k.replace('_', ' ').title()}: {'**********' if k == 'hf_token' or k.endswith('_key') else v}",
+                )
         return click.confirm("Proceed with deployment?", default=True)
 
     def run_interactive_clear(self):
@@ -411,9 +412,9 @@ class Deployer:
             source_env_file = self._get_docker_set_env_script()
             local_env_file = self._get_local_env_file_path()
 
-            params_to_env_map = self._get_device_specific_or_common_config(
-                ["docker_compose", "params_to_set_env"]
-            ) or {}
+            params_to_env_map = (
+                self._get_device_specific_or_common_config(["docker_compose", "params_to_set_env"]) or {}
+            )
 
             updates = {
                 env_var: getattr(self.args, arg_name)
@@ -565,7 +566,12 @@ class Deployer:
             log_message("INFO", "Executing cleanup command in a bash subshell...")
             try:
                 # Docker compose down might run on a non-existent dir, so we don't cd into it
-                run_command(f"{self.compose_command} {f_flags} down -v --remove-orphans", cwd=compose_dir, check=False, shell=True)
+                run_command(
+                    f"{self.compose_command} {f_flags} down -v --remove-orphans",
+                    cwd=compose_dir,
+                    check=False,
+                    shell=True,
+                )
 
                 if local_env_file and local_env_file.exists():
                     local_env_file.unlink()
