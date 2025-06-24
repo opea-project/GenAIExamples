@@ -52,6 +52,18 @@ cd intel/cpu/xeon/
 docker compose up -d
 ```
 
+To deploy DocSum services with remote endpoints, set the required environment variables mentioned below and run the 'compose_remote.yaml' file.
+
+**Note**: Set LLM_ENDPOINT variable value to "https://api.inference.denvrdata.com" when the remote endpoint to access is "https://api.inference.denvrdata.com/v1/chat/completions"
+
+```bash
+export LLM_ENDPOINT=<endpoint-url>
+export LLM_MODEL_ID=<model-id>
+export OPENAI_API_KEY=<API-KEY>
+
+docker compose -f compose_remote.yaml up -d
+```
+
 **Note**: developers should build docker image from source when:
 
 - Developing off the git main branch (as the container's ports in the repo may be different from the published docker image).
@@ -113,10 +125,11 @@ All the DocSum containers will be stopped and then removed on completion of the 
 
 In the context of deploying a DocSum pipeline on an Intel® Xeon® platform, we can pick and choose different large language model serving frameworks. The table below outlines the various configurations that are available as part of the application.
 
-| File                                   | Description                                                                               |
-| -------------------------------------- | ----------------------------------------------------------------------------------------- |
-| [compose.yaml](./compose.yaml)         | Default compose file using vllm as serving framework                                      |
-| [compose_tgi.yaml](./compose_tgi.yaml) | The LLM serving framework is TGI. All other configurations remain the same as the default |
+| File                                        | Description                                                                               |
+| --------------------------------------------| ----------------------------------------------------------------------------------------- |
+| [compose.yaml](./compose.yaml)              | Default compose file using vllm as serving framework                                      |
+| [compose_tgi.yaml](./compose_tgi.yaml)      | The LLM serving framework is TGI. All other configurations remain the same as  default    |
+| [compose_remote.yaml](./compose_remote.yaml)| Uses remote inference endpoints for LLMs. All other configurations are same as default    |
 
 ## DocSum Detailed Usage
 
