@@ -510,9 +510,8 @@ EXAMPLE_CONFIGS = {
                     "llm_model": ["llm-uservice.LLM_MODEL_ID", "vllm.LLM_MODEL_ID"],
                 },
             },
-            "namespace": "chatqna",
-            "release_name": "chatqna",
-            "ui_namespace": "rag-ui",
+            "namespace": "faqgen",
+            "release_name": "faqgen",
         },
         "supported_devices": ["xeon", "gaudi"],
         "default_device": "xeon",
@@ -522,8 +521,8 @@ EXAMPLE_CONFIGS = {
                 "llm": "9000",
             },
             "k8s_services": {
-                "backend": "chatqna-backend-server-svc",
-                "llm": "llm-dependency-svc",
+                "backend": "faqgen-chatqna",
+                "llm": "faqgen-llm-uservice",
             },
         },
         "test_connections": {
