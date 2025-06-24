@@ -407,7 +407,10 @@ EXAMPLE_CONFIGS = {
                 "xeon": "docker_compose/intel/cpu/xeon/compose.yaml",
                 "gaudi": "docker_compose/intel/hpu/gaudi/compose.yaml",
             },
-            "set_env_scripts": {"xeon": "docker_compose/intel/cpu/xeon/set_env.sh", "gaudi": "docker_compose/intel/hpu/gaudi/set_env.sh"},
+            "set_env_scripts": {
+                "xeon": "docker_compose/intel/cpu/xeon/set_env.sh",
+                "gaudi": "docker_compose/intel/hpu/gaudi/set_env.sh",
+            },
             "params_to_set_env": {"lvm_model": "LVM_MODEL_ID", "hf_token": "HF_TOKEN"},
         },
         "kubernetes": {
@@ -435,23 +438,18 @@ EXAMPLE_CONFIGS = {
                 "method": "POST",
                 "payload": {
                     "messages": [
-                    {
-                        "role": "user",
-                        "content": [
                         {
-                            "type": "text",
-                            "text": "What'\''s in this image?"
-                        },
-                        {
-                            "type": "image_url",
-                            "image_url": {
-                            "url": "https://www.ilankelman.org/stopsigns/australia.jpg"
-                            }
+                            "role": "user",
+                            "content": [
+                                {"type": "text", "text": "What'''s in this image?"},
+                                {
+                                    "type": "image_url",
+                                    "image_url": {"url": "https://www.ilankelman.org/stopsigns/australia.jpg"},
+                                },
+                            ],
                         }
-                        ]
-                    }
                     ],
-                    "max_tokens": 300
+                    "max_tokens": 300,
                 },
                 "headers": {"Content-Type": "application/json"},
                 "expect_code": 200,
@@ -462,10 +460,7 @@ EXAMPLE_CONFIGS = {
                     "service_key": "lvm",
                     "path": "/v1/lvm",
                     "method": "POST",
-                    "payload_template": {
-                        "image": "", 
-                        "prompt":"What is deep learning?"
-                    },
+                    "payload_template": {"image": "", "prompt": "What is deep learning?"},
                     "headers": {"Content-Type": "application/json"},
                     "expect_code": 200,
                 }
