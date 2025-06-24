@@ -280,7 +280,10 @@ EXAMPLE_CONFIGS = {
                     "xeon": "kubernetes/helm/cpu-values.yaml",
                     "gaudi": "kubernetes/helm/gaudi-values.yaml",
                 },
-                "params_to_values": {"hf_token": "global.HUGGINGFACEHUB_API_TOKEN", "llm_model": "llm.model_name"},
+                "params_to_values": {
+                    "hf_token": "global.HUGGINGFACEHUB_API_TOKEN",
+                    "llm_model": ["llm-uservice.LLM_MODEL_ID", "vllm.LLM_MODEL_ID"],
+                },
             },
             "namespace": "codegen",
             "release_name": "codegen",
@@ -302,7 +305,7 @@ EXAMPLE_CONFIGS = {
             },
             "sub_services": [
                 {
-                    "name": "llm_code_trans_check",
+                    "name": "llm_code_gen_check",
                     "service_key": "llm",
                     "path": "/v1/completions",
                     "method": "POST",
@@ -348,7 +351,10 @@ EXAMPLE_CONFIGS = {
                     "xeon": "kubernetes/helm/cpu-values.yaml",
                     "gaudi": "kubernetes/helm/gaudi-values.yaml",
                 },
-                "params_to_values": {"hf_token": "global.HUGGINGFACEHUB_API_TOKEN", "llm_model": "llm.model_name"},
+                "params_to_values": {
+                    "hf_token": "global.HUGGINGFACEHUB_API_TOKEN",
+                    "llm_model": ["llm-uservice.LLM_MODEL_ID", "vllm.LLM_MODEL_ID"],
+                },
             },
             "namespace": "audioqna",
             "release_name": "audioqna",
@@ -374,7 +380,7 @@ EXAMPLE_CONFIGS = {
             },
             "sub_services": [
                 {
-                    "name": "llm_code_trans_check",
+                    "name": "llm_audio_qna_check",
                     "service_key": "llm",
                     "path": "/v1/completions",
                     "method": "POST",
@@ -394,6 +400,86 @@ EXAMPLE_CONFIGS = {
             {
                 "name": "llm_model",
                 "prompt": "LLM Model ID (for Audio Q&A)",
+                "type": str,
+                "default": "meta-llama/Meta-Llama-3-8B-Instruct",
+                "help": "e.g., meta-llama/Meta-Llama-3-8B-Instruct",
+            },
+        ],
+    },
+    "FaqGen": {
+        "base_dir": "ChatQnA",
+        "docker_compose": {
+            "paths": {
+                "xeon": "docker_compose/intel/cpu/xeon/compose_faqgen.yaml",
+                "gaudi": "docker_compose/intel/hpu/gaudi/compose_faqgen.yaml",
+            },
+            "set_env_scripts": {
+                "xeon": "docker_compose/intel/cpu/xeon/set_env.sh",
+                "gaudi": "docker_compose/intel/hpu/gaudi/set_env_faqgen.sh",
+            },
+            "params_to_set_env": {
+                "llm_model": "LLM_MODEL_ID",
+                "hf_token": "HF_TOKEN",
+            },
+        },
+        "kubernetes": {
+            "helm": {
+                "chart_oci": "oci://ghcr.io/opea-project/charts/chatqna",
+                "values_files": {
+                    "xeon": "kubernetes/helm/faqgen-cpu-values.yaml",
+                    "gaudi": "kubernetes/helm/faqgen-gaudi-values.yaml",
+                },
+                "params_to_values": {
+                    "hf_token": "global.HUGGINGFACEHUB_API_TOKEN",
+                    "llm_model": ["llm-uservice.LLM_MODEL_ID", "vllm.LLM_MODEL_ID"],
+                },
+            },
+            "namespace": "chatqna",
+            "release_name": "chatqna",
+            "ui_namespace": "rag-ui",
+        },
+        "supported_devices": ["xeon", "gaudi"],
+        "default_device": "xeon",
+        "ports": {
+            "docker": {
+                "backend": "8888",
+                "llm": "9000",
+            },
+            "k8s_services": {
+                "backend": "chatqna-backend-server-svc",
+                "llm": "llm-dependency-svc",
+            },
+        },
+        "test_connections": {
+            "main_service": {
+                "service_key": "backend",
+                "path": "/v1/chatqna",
+                "method": "POST",
+                "payload": {
+                    "messages": "Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5.",
+                    "max_tokens": 32,
+                    "stream": False,
+                },
+                "headers": {"Content-Type": "application/json"},
+                "expect_code": 200,
+            },
+            "sub_services": [
+                {
+                    "name": "llm_check",
+                    "service_key": "llm",
+                    "path": "/v1/faqgen",
+                    "method": "POST",
+                    "payload_template": {"messages":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."},
+                    "headers": {"Content-Type": "application/json"},
+                    "expect_code": 200,
+                    "expect_response_contains": "content",
+                }
+            ],
+        },
+        "interactive_params": [
+            {
+                "name": "llm_model",
+                "prompt": "LLM Model ID",
                 "type": str,
                 "default": "meta-llama/Meta-Llama-3-8B-Instruct",
                 "help": "e.g., meta-llama/Meta-Llama-3-8B-Instruct",
