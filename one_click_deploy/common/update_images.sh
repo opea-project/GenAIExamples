@@ -78,7 +78,18 @@ get_service_list() {
             fi
             ;;
         "AudioQnA")
-            echo "audioqna audioqna-ui whisper speecht5 vllm whisper-gaudi speecht5-gaudi vllm-gaudi"
+            if [[ "$device_name" == "gaudi" ]]; then
+                echo "audioqna audioqna-ui whisper-gaudi speecht5-gaudi vllm-gaudi"
+            else
+                echo "audioqna audioqna-ui whisper speecht5 vllm"
+            fi
+            ;;
+        "FaqGen")
+            if [[ "$device_name" == "gaudi" ]]; then
+                echo "chatqna chatqna-ui llm-faqgen dataprep retriever nginx vllm-gaudi"
+            else
+                echo "chatqna chatqna-ui llm-faqgen dataprep retriever nginx vllm"
+            fi
             ;;
         *)
             # Default to empty, which means docker-compose will process all services
@@ -171,7 +182,7 @@ build_codegen() {
     if [ ! -d "vllm" ]; then
         git clone https://github.com/vllm-project/vllm.git
         cd vllm
-        local vllm_ver="v0.8.3" # As per original script
+        local vllm_ver="v0.9.0.1"
         log "INFO" "Checking out vLLM tag ${vllm_ver}"
         git checkout ${vllm_ver} &> /dev/null
         cd ..
@@ -214,7 +225,7 @@ build_audioqna() {
     if [ ! -d "vllm" ]; then
         git clone https://github.com/vllm-project/vllm.git
         cd vllm
-        local vllm_ver="v0.8.3" # As per original script
+        local vllm_ver="v0.9.0.1"
         log "INFO" "Checking out vLLM tag ${vllm_ver}"
         git checkout ${vllm_ver} &> /dev/null && cd ../
     else
@@ -222,8 +233,51 @@ build_audioqna() {
     fi
     if [ ! -d "vllm-fork" ]; then
         git clone https://github.com/HabanaAI/vllm-fork.git && cd vllm-fork
-        VLLM_FORK_VER=v0.6.6.post1+Gaudi-1.20.0
+        VLLM_FORK_VER="v0.6.6.post1+Gaudi-1.20.0"
         git checkout ${VLLM_FORK_VER} &> /dev/null && cd ../
+    else
+        log "INFO" "vllm-fork directory already exists, skipping clone."
+    fi
+
+    log "INFO" "Building base image: comps-base (build-time only)"
+    pushd GenAIComps
+    docker build --no-cache -t ${REGISTRY}/comps-base:${TAG} --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
+    popd
+
+    log "INFO" "Starting build for specified DocSum services..."
+    docker compose -f build.yaml build ${service_list} --no-cache
+    cd - > /dev/null
+}
+
+# Build function for FaqGen - includes custom pre-build steps
+build_faqgen() {
+    local example_path=$1
+    local service_list=$2
+    local build_dir="${example_path}/docker_image_build"
+    log "INFO" "Executing custom build function for FaqGen..."
+    cd "$build_dir"
+
+    log "INFO" "Cloning required repositories for FaqGen..."
+    if [ ! -d "GenAIComps" ]; then
+        git clone --depth 1 https://github.com/opea-project/GenAIComps.git
+    else
+        log "INFO" "GenAIComps directory already exists, skipping clone."
+    fi
+    if [ ! -d "vllm" ]; then
+        git clone https://github.com/vllm-project/vllm.git
+        cd vllm
+        local vllm_ver="v0.8.3" # As per original script
+        log "INFO" "Checking out vLLM tag ${vllm_ver}"
+        git checkout ${vllm_ver} &> /dev/null
+        cd ..
+    else
+        log "INFO" "vllm directory already exists, skipping clone."
+    fi
+    if [ ! -d "vllm-fork" ]; then
+        git clone https://github.com/HabanaAI/vllm-fork.git && cd vllm-fork
+        VLLM_FORK_VER=v0.6.6.post1+Gaudi-1.20.0
+        git checkout ${VLLM_FORK_VER} &> /dev/null
+        cd ..
     else
         log "INFO" "vllm-fork directory already exists, skipping clone."
     fi
@@ -270,6 +324,9 @@ dispatch_build() {
             ;;
         "AudioQnA")
             build_audioqna "$example_path" "$service_list"
+            ;;
+        "FaqGen")
+            build_faqgen "$example_path" "$service_list"
             ;;
         *)
             error_exit "No specific build function defined for example '${example_name}'. Please add it to the script."
@@ -323,6 +380,38 @@ push_images() {
     cd - > /dev/null
 }
 
+# Resolves the filesystem path for a specified GenAI example
+#
+# Args:
+#   $1 (string): The example name (e.g. "ChatQnA")
+#
+# Returns:
+#   The absolute path to the example directory
+#
+# Errors:
+#   Exits with error if the directory doesn't exist
+get_example_path() {
+    local example_name=$1
+    local example_path="n/a"
+
+    case "$example_name" in
+        "FaqGen")
+            # FaqGen was merged to ChatQnA since OPEA v1.3.
+            # It reuses ChatQnA's code structure.
+            example_path="${PROJECT_ROOT}/ChatQnA"
+            ;;
+        *)
+            # Standard case - example name matches directory name
+            example_path="${PROJECT_ROOT}/${EXAMPLE}"
+            ;;
+    esac
+
+    if [ ! -d "${example_path}" ]; then
+        error_exit "Example directory not found: '$example_path'."
+    fi
+
+    echo "${example_path}"
+}
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -370,10 +459,7 @@ if [ "$BUILD_ACTION" = true ] && [ -z "$REGISTRY" ] && [ "$SETUP_REGISTRY_ACTION
 fi
 
 section_header "Image Management Script Started"
-EXAMPLE_PATH="${PROJECT_ROOT}/${EXAMPLE}"
-if [ ! -d "$EXAMPLE_PATH" ]; then
-    error_exit "Example directory not found: '$EXAMPLE_PATH'."
-fi
+EXAMPLE_PATH=$(get_example_path "$EXAMPLE")
 
 log "INFO" "Project Root: ${PROJECT_ROOT}"
 log "INFO" "Selected Example: ${EXAMPLE}"
