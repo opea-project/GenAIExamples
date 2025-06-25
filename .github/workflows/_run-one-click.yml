@@ -23,6 +23,16 @@ on:
         description: Example to test
         required: true
         type: string
+      test_compose:
+        default: true
+        description: 'Test examples with docker compose'
+        required: false
+        type: boolean
+      test_helmchart:
+        default: true
+        description: 'Test examples with helm charts'
+        required: false
+        type: boolean
       hardware:
         description: Hardware to run the test on
         required: true
@@ -90,6 +100,7 @@ jobs:
           esac
 
       - name: deploy docker and test
+        if: ${{ inputs.test_compose || inputs.tag == 'ci' }}
         shell: bash
         env:
           HUGGINGFACEHUB_API_TOKEN: ${{ secrets.HF_TOKEN }}
@@ -133,7 +144,7 @@ jobs:
           INPUTS
 
       - name: Clean up deployment
-        if: always()
+        if: ${{ inputs.test_compose || inputs.tag == 'ci' }}
         run: |
           cd ${{ github.workspace }}/one_click_deploy
 
@@ -154,6 +165,7 @@ jobs:
           path: ${{ github.workspace }}/docker-tests/*.log
 
       - name: deploy k8s and test
+        if: ${{ inputs.test_helmchart || inputs.tag == 'ci' }}
         shell: bash
         env:
           HUGGINGFACEHUB_API_TOKEN: ${{ secrets.HF_TOKEN }}
@@ -197,7 +209,7 @@ jobs:
           INPUTS
 
       - name: Clean up deployment
-        if: always()
+        if: ${{ inputs.test_helmchart || inputs.tag == 'ci' }}
         run: |
           cd ${{ github.workspace }}/one_click_deploy
 

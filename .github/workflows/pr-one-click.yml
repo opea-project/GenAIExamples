@@ -1,7 +1,7 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-name: One Click test with docker compose
+name: One Click CI Test
 
 permissions:
   contents: read
