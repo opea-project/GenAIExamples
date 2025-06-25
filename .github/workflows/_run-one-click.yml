@@ -126,7 +126,7 @@ jobs:
         run: |
           cd ${{ github.workspace }}/$example/tests
           cd ${{ github.workspace }}/one_click_deploy
-          
+
           python3 one_click_deploy.py < INPUTS
           ${{ env.example_id }}
           1
@@ -134,7 +134,7 @@ jobs:
           $hardware
           $HF_TOKEN
 
-          
+
 
           y
           y
@@ -145,7 +145,7 @@ jobs:
         if: always()
         run: |
           cd ${{ github.workspace }}/one_click_deploy
-          
+
           python3 one_click_deploy.py < INPUTS
           ${{ env.example_id }}
           2
