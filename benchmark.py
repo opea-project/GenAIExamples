@@ -170,6 +170,13 @@ def _create_stresscli_confs(case_params, test_params, test_phase, num_queries, b
             stresscli_conf["envs"] = {"DATASET": test_params["dataset"][i], "MAX_LINES": str(test_params["prompt"][i])}
         else:
             stresscli_conf["envs"] = {"MAX_LINES": str(test_params["prompt"][i])}
+        # Handle dataset for DocSum
+        if b_target in ["docsumbench", "docsumfixed"]:
+            if len(test_params["dataset"]) > i:
+                case_params["dataset"] = test_params["dataset"][i]
+            else:
+                case_params["dataset"] = None
+
         # Generate the content of stresscli configuration file
         stresscli_yaml = _create_yaml_content(
             case_params, base_url, b_target, test_phase, num_queries, test_params, concurrency
