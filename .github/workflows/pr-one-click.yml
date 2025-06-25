@@ -8,8 +8,8 @@ permissions:
 
 on:
   pull_request:
-    branches: ["main", "*rc"]
-    types: [opened, reopened, ready_for_review, synchronize] # added `ready_for_review` since draft is skipped
+    branches: ["main", "*rc", "one_click_dev"]
+    types: [opened, reopened, synchronize] # added `ready_for_review` since draft is skipped
     paths:
       - "**/Dockerfile**"
       - "**.py"
@@ -19,7 +19,7 @@ on:
       - "**/ui/**"
       - "!**.md"
       - "!**.txt"
-      - .github/workflows/pr-docker-compose-e2e.yml
+      - .github/workflows/pr-one-click.yml
 
 # If there is a new commit, the previous jobs will be canceled
 concurrency:
