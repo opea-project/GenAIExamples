@@ -1,7 +1,7 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-name: One Click test with docker compose
+name: One Click CI Test
 
 permissions:
   contents: read
@@ -11,15 +11,7 @@ on:
     branches: ["main", "*rc", "one_click_dev"]
     types: [opened, reopened, synchronize] # added `ready_for_review` since draft is skipped
     paths:
-      - "**/Dockerfile**"
-      - "**.py"
-      - "**/docker_compose/**"
-      - "**/docker_image_build/**"
-      - "**/tests/**"
-      - "**/ui/**"
-      - "!**.md"
-      - "!**.txt"
-      - .github/workflows/pr-one-click.yml
+      - "one_click_deploy/"
 
 # If there is a new commit, the previous jobs will be canceled
 concurrency:
@@ -27,49 +19,11 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  get-test-matrix:
-    permissions:
-      actions: read
-      contents: read
-      checks: read
-      deployments: read
-      issues: read
-      packages: read
-      pages: read
-      pull-requests: read
-      statuses: read
-      security-events: read
-    runs-on: ubuntu-latest
-    if: ${{ !github.event.pull_request.draft }}
-    # uses: ./.github/workflows/_get-test-matrix.yml
-    # with:
-    #   diff_excluded_files: '\.github|\.md|\.txt|kubernetes|gmc|assets|benchmark'
-    steps:
-      - name: print something
-        run: echo "This is a placeholder for the get-test-matrix job. Replace with actual logic to generate test matrix."
-
-  # oneclick-test:
-  #   permissions:
-  #     actions: read
-  #     contents: read
-  #     checks: write
-  #     deployments: write
-  #     issues: write
-  #     packages: write
-  #     pages: write
-  #     pull-requests: write
-  #     statuses: write
-  #     security-events: read
-  #   needs: [get-test-matrix]
-  #   if: ${{ needs.get-test-matrix.outputs.run_matrix != '' }}
-  #   strategy:
-  #     matrix: ${{ fromJSON(needs.get-test-matrix.outputs.run_matrix) }}
-  #     fail-fast: false
-  #   uses: ./.github/workflows/_run-one-click.yml
-  #   with:
-  #     registry: "opea"
-  #     tag: "ci"
-  #     example: ${{ matrix.example }}
-  #     hardware: ${{ matrix.hardware }}
-  #     diff_excluded_files: '\.github|\.md|\.txt|kubernetes|gmc|assets|benchmark'
-  #   secrets: inherit
+  one-click-test:
+    uses: ./.github/workflows/_run-one-click.yml
+    with:
+      registry: "opea"
+      tag: "ci"
+      example: ChatQnA
+      hardware: gaudi
+    secrets: inherit

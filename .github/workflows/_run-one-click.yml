@@ -2,17 +2,10 @@
 # SPDX-License-Identifier: Apache-2.0
 
 name: One Click test on call
+
 permissions:
-  actions: read
   contents: read
-  checks: write
-  deployments: write
-  issues: write
-  packages: write
-  pages: write
-  pull-requests: write
-  statuses: write
-  security-events: read
+
 on:
   workflow_call:
     inputs:
@@ -30,21 +23,27 @@ on:
         description: Example to test
         required: true
         type: string
+      test_compose:
+        default: true
+        description: 'Test examples with docker compose'
+        required: false
+        type: boolean
+      test_helmchart:
+        default: true
+        description: 'Test examples with helm charts'
+        required: false
+        type: boolean
       hardware:
         description: Hardware to run the test on
         required: true
         type: string
-      diff_excluded_files:
-        required: false
-        type: string
-        default: ""
       opea_branch:
         default: "main"
         required: false
         type: string
 jobs:
-  compose-test:
-    runs-on: ${{ inputs.hardware }}
+  test:
+    runs-on: gaudi
     continue-on-error: true
     steps:
       - name: Clean up Working Directory
@@ -100,7 +99,8 @@ jobs:
             *) echo "example_id=0" >> $GITHUB_ENV ;;
           esac
 
-      - name: deploy and test
+      - name: deploy docker and test
+        if: ${{ inputs.test_compose || inputs.tag == 'ci' }}
         shell: bash
         env:
           HUGGINGFACEHUB_API_TOKEN: ${{ secrets.HF_TOKEN }}
@@ -118,15 +118,14 @@ jobs:
           IMAGE_TAG: ${{ inputs.tag }}
           opea_branch: ${{ inputs.opea_branch }}
           example: ${{ inputs.example }}
-          hardware: ${{ inputs.hardware }}
+          hardware: gaudi
           test_case: ${{ matrix.test_case }}
           use_model_cache: ${{ inputs.use_model_cache }}
         run: |
-          cd ${{ github.workspace }}/$example/tests
           cd ${{ github.workspace }}/one_click_deploy
-
-          python3 one_click_deploy.py < INPUTS
-          ${{ env.example_id }}
+          pip install -r requirements.txt
+          python3 one_click_deploy.py << INPUTS
+          1
           1
           docker
           $hardware
@@ -134,18 +133,23 @@ jobs:
 
 
 
-          y
+
+
+
+
+          N
+          N
           y
           Y
           INPUTS
 
       - name: Clean up deployment
-        if: always()
+        if: ${{ inputs.test_compose || inputs.tag == 'ci' }}
         run: |
           cd ${{ github.workspace }}/one_click_deploy
 
-          python3 one_click_deploy.py < INPUTS
-          ${{ env.example_id }}
+          python3 one_click_deploy.py << INPUTS
+          1
           2
           docker
           $hardware
@@ -153,9 +157,74 @@ jobs:
           Y
           INPUTS
 
-      - name: Publish pipeline artifact
+      - name: Publish docker pipeline artifact
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ inputs.hardware }}_${{ inputs.example }}_${{ matrix.test_case }}
-          path: ${{ github.workspace }}/${{ inputs.example }}/tests/*.log
+          name: docker
+          path: ${{ github.workspace }}/docker-tests/*.log
+
+      - name: deploy k8s and test
+        if: ${{ inputs.test_helmchart || inputs.tag == 'ci' }}
+        shell: bash
+        env:
+          HUGGINGFACEHUB_API_TOKEN: ${{ secrets.HF_TOKEN }}
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          GOOGLE_CSE_ID: ${{ secrets.GOOGLE_CSE_ID }}
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          PINECONE_KEY: ${{ secrets.PINECONE_KEY }}
+          PINECONE_KEY_LANGCHAIN_TEST: ${{ secrets.PINECONE_KEY_LANGCHAIN_TEST }}
+          SDK_BASE_URL: ${{ secrets.SDK_BASE_URL }}
+          SERVING_TOKEN: ${{ secrets.SERVING_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
+          FINANCIAL_DATASETS_API_KEY: ${{ secrets.FINANCIAL_DATASETS_API_KEY }}
+          IMAGE_REPO: ${{ inputs.registry }}
+          IMAGE_TAG: ${{ inputs.tag }}
+          opea_branch: ${{ inputs.opea_branch }}
+          example: ${{ inputs.example }}
+          hardware: gaudi
+          test_case: ${{ matrix.test_case }}
+          use_model_cache: ${{ inputs.use_model_cache }}
+        run: |
+          cd ${{ github.workspace }}/one_click_deploy
+          pip install -r requirements.txt
+          python3 one_click_deploy.py << INPUTS
+          1
+          1
+          k8s
+          $hardware
+          $HF_TOKEN
+
+
+
+
+
+
+
+          N
+          N
+          y
+          Y
+          INPUTS
+
+      - name: Clean up deployment
+        if: ${{ inputs.test_helmchart || inputs.tag == 'ci' }}
+        run: |
+          cd ${{ github.workspace }}/one_click_deploy
+
+          python3 one_click_deploy.py << INPUTS
+          1
+          2
+          k8s
+          $hardware
+          $HF_TOKEN
+          Y
+          INPUTS
+
+      - name: Publish k8s pipeline artifact
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: k8s
+          path: ${{ github.workspace }}/k8s-tests/*.log
