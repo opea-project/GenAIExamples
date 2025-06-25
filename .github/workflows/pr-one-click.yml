@@ -67,6 +67,5 @@ jobs:
       tag: "ci"
       example: ${{ matrix.example }}
       hardware: ${{ matrix.hardware }}
-      use_model_cache: true
       diff_excluded_files: '\.github|\.md|\.txt|kubernetes|gmc|assets|benchmark'
     secrets: inherit

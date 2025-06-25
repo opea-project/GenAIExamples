@@ -44,7 +44,6 @@ on:
         type: string
 jobs:
   compose-test:
-    needs: [get-test-case]
     runs-on: ${{ inputs.hardware }}
     continue-on-error: true
     steps:
@@ -88,7 +87,6 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: get example id
-        id: get example_id
         run: |
           case "${{ inputs.example }}" in
             ChatQnA) echo "example_id=1" >> $GITHUB_ENV ;;
@@ -140,7 +138,7 @@ jobs:
           y
           Y
           INPUTS
-          
+
       - name: Clean up deployment
         if: always()
         run: |
