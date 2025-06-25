@@ -124,8 +124,8 @@ jobs:
         run: |
           cd ${{ github.workspace }}/$example/tests
           cd ${{ github.workspace }}/one_click_deploy
-
-          python3 one_click_deploy.py < INPUTS
+          pip install -r requirements.txt
+          python3 one_click_deploy.py << INPUTS
           ${{ env.example_id }}
           1
           docker
@@ -134,7 +134,9 @@ jobs:
 
 
 
-          y
+
+          N
+          N
           y
           Y
           INPUTS
@@ -144,7 +146,7 @@ jobs:
         run: |
           cd ${{ github.workspace }}/one_click_deploy
 
-          python3 one_click_deploy.py < INPUTS
+          python3 one_click_deploy.py << INPUTS
           ${{ env.example_id }}
           2
           docker
