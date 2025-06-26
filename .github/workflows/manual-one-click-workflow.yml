@@ -53,11 +53,6 @@ on:
         description: 'Test examples with helm charts'
         required: false
         type: boolean
-      opea_branch:
-        default: "main"
-        description: 'OPEA branch for image build'
-        required: false
-        type: string
 
 jobs:
   get-test-matrix:
@@ -104,10 +99,7 @@ jobs:
       node: ${{ matrix.node }}
       example: ${{ matrix.example }}
       tag: ${{ inputs.tag }}
-      build: ${{ fromJSON(inputs.build) }}
+      registry: "opea"
       test_compose: ${{ fromJSON(inputs.test_compose) }}
       test_helmchart: ${{ fromJSON(inputs.test_helmchart) }}
-      opea_branch: ${{ inputs.opea_branch }}
-      inject_commit: ${{ inputs.inject_commit }}
-      use_model_cache: ${{ inputs.use_model_cache }}
     secrets: inherit
