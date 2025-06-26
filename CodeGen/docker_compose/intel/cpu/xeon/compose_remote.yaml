@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 services:
-        
+
   codegen-xeon-backend-server:
     image: ${REGISTRY:-opea}/codegen:${TAG:-latest}
     container_name: codegen-xeon-backend-server
