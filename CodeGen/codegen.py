@@ -178,7 +178,7 @@ class CodeGenService:
 
         # Validate and parse the chat request data
         chat_request = ChatCompletionRequest.model_validate(data)
-        
+
         # Handle the chat messages to generate the prompt
         prompt = handle_message(chat_request.messages)
         # Get the agents flag from the request data, default to False if not provided
