@@ -7,8 +7,6 @@ services:
     image: ${REGISTRY:-opea}/codegen:${TAG:-latest}
     container_name: codegen-xeon-backend-server
     depends_on:
-      #llm-base:
-        #condition: service_started
       dataprep-redis-server:
         condition: service_healthy
     ports:
@@ -89,7 +87,7 @@ services:
       host_ip: ${host_ip}
       HF_TOKEN: ${HF_TOKEN}
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
+      test: ["CMD", "curl", "-f", "http://${host_ip}:${TEI_EMBEDDER_PORT}/health"]
       interval: 10s
       timeout: 6s
       retries: 48
