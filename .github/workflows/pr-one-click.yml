@@ -11,7 +11,7 @@ on:
     branches: ["main", "*rc", "one_click_dev"]
     types: [opened, reopened, synchronize] # added `ready_for_review` since draft is skipped
     paths:
-      - "one_click_deploy/"
+      - "**/one_click_deploy/**"
 
 # If there is a new commit, the previous jobs will be canceled
 concurrency:
