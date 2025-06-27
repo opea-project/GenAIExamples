@@ -202,7 +202,7 @@ def update_helm_values_yaml(file_path: pathlib.Path, updates_map: dict):
     try:
         with open(file_path, "r") as f:
             # Using safe_load for ruamel.yaml as well for consistency
-            data = YAML_HANDLER.safe_load(f) if hasattr(YAML_HANDLER, 'safe_load') else YAML_HANDLER.load(f)
+            data = YAML_HANDLER.safe_load(f) if hasattr(YAML_HANDLER, "safe_load") else YAML_HANDLER.load(f)
     except Exception as e:
         log_message("ERROR", f"Failed to load YAML file {file_path}: {e}")
         return False
