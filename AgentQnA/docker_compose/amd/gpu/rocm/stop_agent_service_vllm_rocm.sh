@@ -68,7 +68,7 @@ echo ${SUPERVISOR_REACT_AGENT_PORT} > ${WORKPATH}/SUPERVISOR_REACT_AGENT_PORT_tm
 echo ${CRAG_SERVER_PORT} > ${WORKPATH}/CRAG_SERVER_PORT_tmp
 
 echo "Removing chinook data..."
-echo Y | rm -R chinook-database
+rm -R chinook-database
 if [ -d "chinook-database" ]; then
     rm -rf chinook-database
 fi

@@ -20,32 +20,14 @@ source set_env.sh
 
 function build_docker_images() {
     opea_branch=${opea_branch:-"main"}
-    # If the opea_branch isn't main, replace the git clone branch in Dockerfile.
-    if [[ "${opea_branch}" != "main" ]]; then
-        cd $WORKPATH
-        OLD_STRING="RUN git clone --depth 1 https://github.com/opea-project/GenAIComps.git"
-        NEW_STRING="RUN git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git"
-        find . -type f -name "Dockerfile*" | while read -r file; do
-            echo "Processing file: $file"
-            sed -i "s|$OLD_STRING|$NEW_STRING|g" "$file"
-        done
-    fi
-
     cd $WORKPATH/docker_image_build
     git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
-    REQ_FILE="GenAIComps/comps/text2cypher/src/requirements.txt"
-    sed -i \
-        -e 's/^sentence-transformers\(==.*\)\?$/sentence-transformers==3.2.1/' \
-        -e 's/^transformers\(==.*\)\?$/transformers==4.45.2/' \
-        "$REQ_FILE"
-
     pushd GenAIComps
     echo "GenAIComps test commit is $(git rev-parse HEAD)"
     docker build --no-cache -t ${REGISTRY}/comps-base:${TAG} --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
     popd && sleep 1s
 
     git clone https://github.com/vllm-project/vllm.git && cd vllm
-    VLLM_VER=v0.9.0.1
     VLLM_VER=v0.9.0.1
     echo "Check out vLLM tag ${VLLM_VER}"
     git checkout ${VLLM_VER} &> /dev/null
@@ -54,9 +36,7 @@ function build_docker_images() {
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
     service_list="hybridrag hybridrag-ui dataprep retriever text2cypher vllm nginx"
-    docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
-
-    docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+    docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log 2>&1
 
     docker images && sleep 1s
 }
@@ -228,31 +208,39 @@ function stop_docker() {
 
 function main() {
 
+    echo "::group::stop_docker"
     stop_docker
+    echo "::endgroup::"
 
+    echo "::group::build_docker_images"
     if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
-    start_time=$(date +%s)
+    echo "::endgroup::"
+
+    echo "::group::start_services"
     start_services
-    end_time=$(date +%s)
-    duration=$((end_time-start_time))
-    echo "Mega service start duration is $duration s" && sleep 1s
+    echo "::endgroup::"
 
+    echo "::group::validate_microservices"
     validate_microservices
+    echo "::endgroup::"
+
+    echo "::group::dataprep"
     dataprep
+    echo "::endgroup::"
 
-    start_time=$(date +%s)
+    echo "::group::validate_megaservice"
     validate_megaservice
-    end_time=$(date +%s)
-    duration=$((end_time-start_time))
-    echo "Mega service duration is $duration s"
+    echo "::endgroup::"
 
+    echo "::group::validate_frontend"
     validate_frontend
+    echo "::endgroup::"
 
-    cd $WORKPATH/docker_image_build
-    rm -rf GenAIComps vllm
-
+    echo "::group::stop_docker"
     stop_docker
-    echo y | docker system prune
+    echo "::endgroup::"
+
+    docker system prune -f
 
 }
 
