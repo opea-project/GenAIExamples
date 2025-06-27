@@ -91,6 +91,7 @@ Different Docker Compose files are available to select the LLM serving backend.
 - **Description:** Uses Hugging Face Text Generation Inference (TGI) optimized for Intel CPUs as the LLM serving engine.
 - **Services Deployed:** `codegen-tgi-server`, `codegen-llm-server`, `codegen-tei-embedding-server`, `codegen-retriever-server`, `redis-vector-db`, `codegen-dataprep-server`, `codegen-backend-server`, `codegen-gradio-ui-server`.
 - **To Run:**
+
   ```bash
   # Ensure environment variables (HOST_IP, HF_TOKEN) are set
   docker compose -f compose_tgi.yaml up -d
@@ -102,6 +103,7 @@ Different Docker Compose files are available to select the LLM serving backend.
 - **Description:** Uses remote endpoints to access the served LLM's. This is the default configurations except for the LLM serving engine.
 - **Services Deployed:** `codegen-tei-embedding-server`, `codegen-retriever-server`, `redis-vector-db`, `codegen-dataprep-server`, `codegen-backend-server`, `codegen-gradio-ui-server`.
 - **To Run:**
+
   ```bash
   export OPENAI_API_KEY=<api-key>>
   export REMOTE_ENDPOINT=<remote-endpoint> #do not include /v1

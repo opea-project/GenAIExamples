@@ -99,7 +99,7 @@ services:
       interval: 10s
       timeout: 10s
       retries: 60
-      
+
   chatqna-xeon-backend-server:
     image: ${REGISTRY:-opea}/chatqna:${TAG:-latest}
     container_name: chatqna-xeon-backend-server
