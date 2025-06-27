@@ -11,11 +11,11 @@ import time
 import click
 
 from .config import (
+    CLEANUP_ON_DEPLOY_FAILURE,
     COMMON_SCRIPTS_DIR,
     EXAMPLE_CONFIGS,
     EXAMPLES_ROOT_DIR,
     POST_DEPLOY_WAIT_S,
-    CLEANUP_ON_DEPLOY_FAILURE,
 )
 from .tester import ConnectionTesterFactory
 from .utils import (
@@ -135,9 +135,7 @@ class Deployer:
         return base_values_path.with_name(f"{base_values_path.stem}.local{base_values_path.suffix}")
 
     def run_interactive_deployment(self):
-        """
-        Orchestrates the deployment flow with intelligent pre-flight checks.
-        """
+        """Orchestrates the deployment flow with intelligent pre-flight checks."""
         if not self._interactive_setup_for_deploy():
             log_message("INFO", "Deployment setup aborted by user.")
             return
@@ -186,9 +184,7 @@ class Deployer:
                     # If not running, check for port conflicts from other applications
                     local_env_file = self._get_local_env_file_path()
                     env_vars = parse_shell_env_file(local_env_file)
-                    conflicting_ports = get_conflicting_ports_from_compose(
-                        self._get_docker_compose_files(), env_vars
-                    )
+                    conflicting_ports = get_conflicting_ports_from_compose(self._get_docker_compose_files(), env_vars)
                     if conflicting_ports:
                         log_message(
                             "ERROR",
@@ -515,7 +511,9 @@ class Deployer:
 
         user_proxies = {p.strip() for p in self.args.no_proxy.split(",") if p.strip()}
         script_no_proxy_str = get_var_from_shell_script(source_env_file, "no_proxy")
-        script_proxies = {p.strip() for p in script_no_proxy_str.split(",") if p.strip()} if script_no_proxy_str else set()
+        script_proxies = (
+            {p.strip() for p in script_no_proxy_str.split(",") if p.strip()} if script_no_proxy_str else set()
+        )
 
         merged_proxies = user_proxies.union(script_proxies)
         final_no_proxy = ",".join(sorted(list(merged_proxies)))
