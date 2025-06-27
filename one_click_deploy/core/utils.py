@@ -81,11 +81,18 @@ def section_header(title):
 
 
 def run_command(
-    cmd_list, cwd=None, env=None, check=True, capture_output=False, shell=False, executable=None, display_cmd=True
+        cmd_list, cwd=None, env=None, check=True, capture_output=False, display_cmd=True
 ):
-    """Executes a shell command with logging and error handling."""
+    """Executes a shell command with logging and error handling.
+
+    This function is secured by disallowing shell=True.
+    """
+    if not isinstance(cmd_list, list):
+        log_message("ERROR", "Security: run_command requires commands to be a list.")
+        raise TypeError("cmd_list must be a list of strings")
+
     if display_cmd:
-        cmd_str = cmd_list if isinstance(cmd_list, str) else " ".join(map(str, cmd_list))
+        cmd_str = " ".join(map(str, cmd_list))
         log_message("INFO", f"Running command: {cmd_str}")
 
     process_env = os.environ.copy()
@@ -100,8 +107,6 @@ def run_command(
             check=check,
             capture_output=capture_output,
             text=True,
-            shell=shell,
-            executable=executable,
             timeout=1800,
         )
         if capture_output:
