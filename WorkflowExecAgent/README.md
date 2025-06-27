@@ -72,9 +72,14 @@ And finally here are the results from the microservice logs:
 
 ### Start Agent Microservice
 
-Workflow Executor will have a single docker image. First, build the agent docker image.
+Workflow Executor will have a single docker image. 
+
+(Optional) Build the agent docker image with the most latest changes.   
+By default, Workflow Executor uses public [opea/vllm](https://hub.docker.com/r/opea/agent) docker image if no local built image exists.
 
 ```sh
+export WORKDIR=$PWD
+git clone https://github.com/opea-project/GenAIComps.git
 git clone https://github.com/opea-project/GenAIExamples.git
 cd GenAIExamples//WorkflowExecAgent/docker_image_build/
 docker compose -f build.yaml build --no-cache
@@ -86,7 +91,7 @@ Configure `GenAIExamples/WorkflowExecAgent/docker_compose/.env` file with the fo
 export SDK_BASE_URL=${SDK_BASE_URL}
 export SERVING_TOKEN=${SERVING_TOKEN}
 export HF_TOKEN=${HF_TOKEN}
-export llm_engine=${llm_engine}
+export llm_engine=vllm
 export llm_endpoint_url=${llm_endpoint_url}
 export ip_address=$(hostname -I | awk '{print $1}')
 export model="mistralai/Mistral-7B-Instruct-v0.3"
@@ -98,6 +103,9 @@ export TOOLSET_PATH=$WORKDIR/GenAIExamples/WorkflowExecAgent/tools/
 export http_proxy=${http_proxy}
 export https_proxy=${https_proxy}
 ```
+> Note: SDK_BASE_URL and SERVING_TOKEN can be obtained from Intel Data Insight Automation platform.   
+> For llm_endpoint_url, both local vllm service or an remote vllm endpoint work for the example. 
+
 
 Launch service by running the docker compose command.
 
