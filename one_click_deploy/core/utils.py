@@ -80,9 +80,7 @@ def section_header(title):
     logging.info(header, extra={"skip_console_handler": True})
 
 
-def run_command(
-        cmd_list, cwd=None, env=None, check=True, capture_output=False, display_cmd=True
-):
+def run_command(cmd_list, cwd=None, env=None, check=True, capture_output=False, display_cmd=True):
     """Executes a shell command with logging and error handling.
 
     This function is secured by disallowing shell=True.
