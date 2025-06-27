@@ -420,3 +420,9 @@ curl -X POST http://${HOST_IP}:16010/v1/chatqna/prompt/reset -H "Content-Type: a
 ```bash
 curl -X POST http://${HOST_IP}:16010/v1/chatqna/prompt-file -H "Content-Type: multipart/form-data" -F "file=@your_prompt_file.txt"
 ```
+
+## Validated Configurations
+
+| **Deploy Method** | **LLM Engine** | **LLM Model**                       | **Hardware** |
+| ----------------- | -------------- | ----------------------------------- | ------------ |
+| Docker Compose    | vLLM           | Qwen2-7B-instruction                | Intel Arc    |
