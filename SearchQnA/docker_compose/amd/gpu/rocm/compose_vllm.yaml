@@ -5,7 +5,7 @@
 
 services:
   search-tei-embedding-service:
-    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.7
     container_name: search-tei-embedding-server
     ports:
       - "${SEARCH_TEI_EMBEDDING_PORT:-3001}:80"
@@ -55,7 +55,7 @@ services:
     restart: unless-stopped
 
   search-tei-reranking-service:
-    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.7
     container_name: search-tei-reranking-server
     ports:
       - "${SEARCH_TEI_RERANKING_PORT:-3004}:80"

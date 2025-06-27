@@ -164,10 +164,10 @@ eaf24161aca8   opea/nginx:latest                                       "/docker-
 613c384979f4   opea/chatqna:latest                                     "bash entrypoint.sh"     37 seconds ago   Up 5 seconds              0.0.0.0:18102->8888/tcp, [::]:18102->8888/tcp                                              chatqna-backend-server
 05512bd29fee   opea/dataprep:latest                                    "sh -c 'python $( [ …"   37 seconds ago   Up 36 seconds (healthy)   0.0.0.0:18103->5000/tcp, [::]:18103->5000/tcp                                              chatqna-dataprep-service
 49844d339d1d   opea/retriever:latest                                   "python opea_retriev…"   37 seconds ago   Up 36 seconds             0.0.0.0:7000->7000/tcp, [::]:7000->7000/tcp                                                chatqna-retriever
-75b698fe7de0   ghcr.io/huggingface/text-embeddings-inference:cpu-1.5   "text-embeddings-rou…"   37 seconds ago   Up 36 seconds             0.0.0.0:18808->80/tcp, [::]:18808->80/tcp                                                  chatqna-tei-reranking-service
+75b698fe7de0   ghcr.io/huggingface/text-embeddings-inference:cpu-1.7   "text-embeddings-rou…"   37 seconds ago   Up 36 seconds             0.0.0.0:18808->80/tcp, [::]:18808->80/tcp                                                  chatqna-tei-reranking-service
 342f01bfdbb2   ghcr.io/huggingface/text-generation-inference:2.3.1-rocm"python3 /workspace/…"   37 seconds ago   Up 36 seconds             0.0.0.0:18008->8011/tcp, [::]:18008->8011/tcp                                              chatqna-tgi-service
 6081eb1c119d   redis/redis-stack:7.2.0-v9                              "/entrypoint.sh"         37 seconds ago   Up 36 seconds             0.0.0.0:6379->6379/tcp, [::]:6379->6379/tcp, 0.0.0.0:8001->8001/tcp, [::]:8001->8001/tcp   chatqna-redis-vector-db
-eded17420782   ghcr.io/huggingface/text-embeddings-inference:cpu-1.5   "text-embeddings-rou…"   37 seconds ago   Up 36 seconds             0.0.0.0:18090->80/tcp, [::]:18090->80/tcp                                                  chatqna-tei-embedding-service
+eded17420782   ghcr.io/huggingface/text-embeddings-inference:cpu-1.7   "text-embeddings-rou…"   37 seconds ago   Up 36 seconds             0.0.0.0:18090->80/tcp, [::]:18090->80/tcp                                                  chatqna-tei-embedding-service
 ```
 
 if used TGI with FaqGen:
@@ -180,10 +180,10 @@ eaf24161aca8   opea/nginx:latest                                       "/docker-
 e0ef1ea67640   opea/llm-faqgen:latest                                  "bash entrypoint.sh"     37 seconds ago   Up 36 seconds             0.0.0.0:18011->9000/tcp, [::]:18011->9000/tcp                                              chatqna-llm-faqgen
 05512bd29fee   opea/dataprep:latest                                    "sh -c 'python $( [ …"   37 seconds ago   Up 36 seconds (healthy)   0.0.0.0:18103->5000/tcp, [::]:18103->5000/tcp                                              chatqna-dataprep-service
 49844d339d1d   opea/retriever:latest                                   "python opea_retriev…"   37 seconds ago   Up 36 seconds             0.0.0.0:7000->7000/tcp, [::]:7000->7000/tcp                                                chatqna-retriever
-75b698fe7de0   ghcr.io/huggingface/text-embeddings-inference:cpu-1.5   "text-embeddings-rou…"   37 seconds ago   Up 36 seconds             0.0.0.0:18808->80/tcp, [::]:18808->80/tcp                                                  chatqna-tei-reranking-service
+75b698fe7de0   ghcr.io/huggingface/text-embeddings-inference:cpu-1.7   "text-embeddings-rou…"   37 seconds ago   Up 36 seconds             0.0.0.0:18808->80/tcp, [::]:18808->80/tcp                                                  chatqna-tei-reranking-service
 342f01bfdbb2   ghcr.io/huggingface/text-generation-inference:2.3.1-rocm"python3 /workspace/…"   37 seconds ago   Up 36 seconds             0.0.0.0:18008->8011/tcp, [::]:18008->8011/tcp                                              chatqna-tgi-service
 6081eb1c119d   redis/redis-stack:7.2.0-v9                              "/entrypoint.sh"         37 seconds ago   Up 36 seconds             0.0.0.0:6379->6379/tcp, [::]:6379->6379/tcp, 0.0.0.0:8001->8001/tcp, [::]:8001->8001/tcp   chatqna-redis-vector-db
-eded17420782   ghcr.io/huggingface/text-embeddings-inference:cpu-1.5   "text-embeddings-rou…"   37 seconds ago   Up 36 seconds             0.0.0.0:18090->80/tcp, [::]:18090->80/tcp                                                  chatqna-tei-embedding-service
+eded17420782   ghcr.io/huggingface/text-embeddings-inference:cpu-1.7   "text-embeddings-rou…"   37 seconds ago   Up 36 seconds             0.0.0.0:18090->80/tcp, [::]:18090->80/tcp                                                  chatqna-tei-embedding-service
 ```
 
 if used vLLM:
@@ -195,10 +195,10 @@ eaf24161aca8   opea/nginx:latest                                       "/docker-
 613c384979f4   opea/chatqna:latest                                     "bash entrypoint.sh"     37 seconds ago   Up 5 seconds              0.0.0.0:18102->8888/tcp, [::]:18102->8888/tcp                                              chatqna-backend-server
 05512bd29fee   opea/dataprep:latest                                    "sh -c 'python $( [ …"   37 seconds ago   Up 36 seconds (healthy)   0.0.0.0:18103->5000/tcp, [::]:18103->5000/tcp                                              chatqna-dataprep-service
 49844d339d1d   opea/retriever:latest                                   "python opea_retriev…"   37 seconds ago   Up 36 seconds             0.0.0.0:7000->7000/tcp, [::]:7000->7000/tcp                                                chatqna-retriever
-75b698fe7de0   ghcr.io/huggingface/text-embeddings-inference:cpu-1.5   "text-embeddings-rou…"   37 seconds ago   Up 36 seconds             0.0.0.0:18808->80/tcp, [::]:18808->80/tcp                                                  chatqna-tei-reranking-service
+75b698fe7de0   ghcr.io/huggingface/text-embeddings-inference:cpu-1.7   "text-embeddings-rou…"   37 seconds ago   Up 36 seconds             0.0.0.0:18808->80/tcp, [::]:18808->80/tcp                                                  chatqna-tei-reranking-service
 342f01bfdbb2   opea/vllm-rocm:latest                                   "python3 /workspace/…"   37 seconds ago   Up 36 seconds             0.0.0.0:18008->8011/tcp, [::]:18008->8011/tcp                                              chatqna-vllm-service
 6081eb1c119d   redis/redis-stack:7.2.0-v9                              "/entrypoint.sh"         37 seconds ago   Up 36 seconds             0.0.0.0:6379->6379/tcp, [::]:6379->6379/tcp, 0.0.0.0:8001->8001/tcp, [::]:8001->8001/tcp   chatqna-redis-vector-db
-eded17420782   ghcr.io/huggingface/text-embeddings-inference:cpu-1.5   "text-embeddings-rou…"   37 seconds ago   Up 36 seconds             0.0.0.0:18090->80/tcp, [::]:18090->80/tcp                                                  chatqna-tei-embedding-service
+eded17420782   ghcr.io/huggingface/text-embeddings-inference:cpu-1.7   "text-embeddings-rou…"   37 seconds ago   Up 36 seconds             0.0.0.0:18090->80/tcp, [::]:18090->80/tcp                                                  chatqna-tei-embedding-service
 ```
 
 if used vLLM with FaqGen:
@@ -211,10 +211,10 @@ eaf24161aca8   opea/nginx:latest                                       "/docker-
 e0ef1ea67640   opea/llm-faqgen:latest                                  "bash entrypoint.sh"     37 seconds ago   Up 36 seconds             0.0.0.0:18011->9000/tcp, [::]:18011->9000/tcp                                              chatqna-llm-faqgen
 05512bd29fee   opea/dataprep:latest                                    "sh -c 'python $( [ …"   37 seconds ago   Up 36 seconds (healthy)   0.0.0.0:18103->5000/tcp, [::]:18103->5000/tcp                                              chatqna-dataprep-service
 49844d339d1d   opea/retriever:latest                                   "python opea_retriev…"   37 seconds ago   Up 36 seconds             0.0.0.0:7000->7000/tcp, [::]:7000->7000/tcp                                                chatqna-retriever
-75b698fe7de0   ghcr.io/huggingface/text-embeddings-inference:cpu-1.5   "text-embeddings-rou…"   37 seconds ago   Up 36 seconds             0.0.0.0:18808->80/tcp, [::]:18808->80/tcp                                                  chatqna-tei-reranking-service
+75b698fe7de0   ghcr.io/huggingface/text-embeddings-inference:cpu-1.7   "text-embeddings-rou…"   37 seconds ago   Up 36 seconds             0.0.0.0:18808->80/tcp, [::]:18808->80/tcp                                                  chatqna-tei-reranking-service
 342f01bfdbb2   opea/vllm-rocm:latest                                   "python3 /workspace/…"   37 seconds ago   Up 36 seconds             0.0.0.0:18008->8011/tcp, [::]:18008->8011/tcp                                              chatqna-vllm-service
 6081eb1c119d   redis/redis-stack:7.2.0-v9                              "/entrypoint.sh"         37 seconds ago   Up 36 seconds             0.0.0.0:6379->6379/tcp, [::]:6379->6379/tcp, 0.0.0.0:8001->8001/tcp, [::]:8001->8001/tcp   chatqna-redis-vector-db
-eded17420782   ghcr.io/huggingface/text-embeddings-inference:cpu-1.5   "text-embeddings-rou…"   37 seconds ago   Up 36 seconds             0.0.0.0:18090->80/tcp, [::]:18090->80/tcp                                                  chatqna-tei-embedding-service
+eded17420782   ghcr.io/huggingface/text-embeddings-inference:cpu-1.7   "text-embeddings-rou…"   37 seconds ago   Up 36 seconds             0.0.0.0:18090->80/tcp, [::]:18090->80/tcp                                                  chatqna-tei-embedding-service
 ```
 
 If any issues are encountered during deployment, refer to the [Troubleshooting](../../../../README_miscellaneous.md#troubleshooting) section.
