@@ -81,14 +81,11 @@ def section_header(title):
 
 
 def run_command(
-    cmd_list, cwd=None, env=None, check=True, capture_output=False, shell=False, executable=None, display_cmd=True
+        cmd_list, cwd=None, env=None, check=True, capture_output=False, shell=False, executable=None, display_cmd=True
 ):
-    """Executes a shell command with logging and error handling.
-
-    Accepts an 'executable' argument to specify the shell (e.g., '/bin/bash').
-    """
+    """Executes a shell command with logging and error handling."""
     if display_cmd:
-        cmd_str = " ".join(cmd_list) if isinstance(cmd_list, list) else cmd_list
+        cmd_str = cmd_list if isinstance(cmd_list, str) else ' '.join(map(str, cmd_list))
         log_message("INFO", f"Running command: {cmd_str}")
 
     process_env = os.environ.copy()
@@ -273,51 +270,162 @@ def stop_all_kubectl_port_forwards():
 
 
 def get_var_from_shell_script(script_path: pathlib.Path, var_name: str) -> str | None:
-    """Sources a shell script in a subshell and prints the value of a specified variable.
-
-    Args:
-        script_path: Path to the shell script.
-        var_name: The name of the environment variable to retrieve.
-
-    Returns:
-        The value of the variable as a string, or None if not found or an error occurs.
-    """
     if not script_path or not script_path.exists():
         log_message("DEBUG", f"Source script for variable extraction not found: {script_path}")
         return None
-
-    command = f'(. {script_path.resolve()} >/dev/null 2>&1; echo -n "${var_name}")'
-    log_message("DEBUG", f"Extracting var '{var_name}' with command: {command}")
-
+    assignment_pattern = re.compile(rf"^\s*(?:export\s+)?{re.escape(var_name)}\s*=\s*(.*)")
+    self_ref_pattern = re.compile(r"^\s*(\$\{?" + re.escape(var_name) + r"\}?\,?)")
     try:
-        # We run this with check=False because the variable might not be set, which is not an error.
-        result = run_command(
-            command, shell=True, executable="/bin/bash", capture_output=True, check=False, display_cmd=False
-        )
-
-        if result.returncode == 0 and result.stdout:
-            value = result.stdout.strip()
-            log_message("DEBUG", f"Extracted value for '{var_name}': {value}")
-            return value
-        else:
-            log_message("DEBUG", f"Variable '{var_name}' not found or empty in {script_path}.")
-            if result.stderr:
-                log_message("DEBUG", f"Stderr from var extraction: {result.stderr.strip()}")
-            return None
+        lines = script_path.read_text().splitlines()
+        for line in reversed(lines):
+            match = assignment_pattern.match(line)
+            if match:
+                value = match.group(1).strip()
+                value = value.split("#", 1)[0].strip()
+                if (value.startswith('"') and value.endswith('"')) or \
+                        (value.startswith("'") and value.endswith("'")):
+                    value = value[1:-1]
+                value = self_ref_pattern.sub("", value).strip()
+                value = value.lstrip(',')
+                log_message("DEBUG", f"Extracted and cleaned value for '{var_name}': {value}")
+                return value
+        log_message("DEBUG", f"Variable '{var_name}' not found in {script_path}.")
+        return None
     except Exception as e:
-        log_message("WARN", f"Failed to extract variable '{var_name}' from {script_path}: {e}")
+        log_message("WARN", f"Failed to parse variable '{var_name}' from {script_path}: {e}")
         return None
 
 
 def check_install_python_pkg(package, import_name=None):
-    """Check if a python package is installed. If not, install it automatically.
-
-    :param package: Name to pass to pip install (e.g., "requests")
-    :param import_name: Name used to import the package (if different from package)
-    """
     import_name = import_name or package
     if importlib.util.find_spec(import_name) is None:
         log_message("INFO", f"Package '{package}' not found. Installing...")
         subprocess.check_call([sys.executable, "-m", "pip", "install", package])
     else:
         log_message("DEBUG", f"Package '{package}' is already installed.")
+
+
+def parse_shell_env_file(file_path: pathlib.Path) -> dict:
+    env_vars = {}
+    if not file_path or not file_path.exists():
+        return env_vars
+    pattern = re.compile(r"^\s*(?:export\s+)?([A-Za-z_][A-Za-z0-9_]*)=(.*)")
+    try:
+        with open(file_path, "r") as f:
+            for line in f:
+                line = line.strip()
+                if not line or line.startswith("#"):
+                    continue
+                match = pattern.match(line)
+                if match:
+                    key, value = match.groups()
+                    value = value.split("#", 1)[0].strip()
+                    if (value.startswith('"') and value.endswith('"')) or \
+                            (value.startswith("'") and value.endswith("'")):
+                        value = value[1:-1]
+                    env_vars[key] = value
+    except Exception as e:
+        log_message("WARN", f"Could not parse environment file {file_path}: {e}")
+    return env_vars
+
+
+def is_port_in_use(port: int, host: str = "0.0.0.0") -> bool:
+    """Checks if a given TCP port is already in use on the host."""
+    import socket
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        try:
+            s.bind((host, port))
+            return False
+        except OSError:
+            return True
+
+
+
+def _substitute_env_vars(content: str, env_vars: dict) -> str:
+    """
+    Mimics Docker Compose's environment variable substitution in a string.
+    Handles ${VAR}, $VAR, and ${VAR:-default}.
+    """
+    # Regex to find all forms of variables: ${VAR}, $VAR, ${VAR:-default}, ${VAR-default}
+    pattern = re.compile(r'\$(?:\{(\w+)(?:[:-](.*?))?\}|(\w+))')
+
+    def replacer(match):
+        # Determine the variable name and default value from the match groups
+        var_name = match.group(1) or match.group(3)
+        default_value = match.group(2)
+
+        # Get the value from the provided environment, or the default, or an empty string
+        value = env_vars.get(var_name)
+        if value is not None:
+            return str(value)
+        if default_value is not None:
+            return str(default_value)
+        # Docker compose substitutes with an empty string if var is not set and no default
+        return ""
+
+    return pattern.sub(replacer, content)
+
+
+def get_conflicting_ports_from_compose(compose_files: list[pathlib.Path], env_vars: dict) -> list[int]:
+    """
+    Parses Docker Compose files using the "substitute first, then parse" method,
+    and checks for port conflicts on the host. This is the robust way.
+    """
+    if not YAML_HANDLER:
+        log_message("WARN", "YAML library not available, skipping port check.")
+        return []
+
+    all_host_ports = set()
+
+    for file_path in compose_files:
+        if not file_path.exists():
+            log_message("WARN", f"Compose file for port check not found: {file_path}")
+            continue
+        try:
+            # 1. Read the raw file content
+            raw_content = file_path.read_text()
+
+            # 2. Substitute environment variables in the raw text
+            substituted_content = _substitute_env_vars(raw_content, env_vars)
+
+            # 3. Parse the substituted (clean) YAML content
+            data = YAML_HANDLER.safe_load(substituted_content) if hasattr(YAML_HANDLER,
+                                                                          'safe_load') else YAML_HANDLER.load(
+                substituted_content)
+
+            if not data or "services" not in data:
+                continue
+
+            for service_config in data.get("services", {}).values():
+                if not isinstance(service_config, dict) or "ports" not in service_config:
+                    continue
+
+                for port_mapping in service_config["ports"]:
+                    # After substitution, the mapping should be a clean string like "8080:80"
+                    # We only care about mappings that expose a host port
+                    mapping_str = str(port_mapping)
+                    if ":" in mapping_str:
+                        host_port_str = mapping_str.split(":", 1)[0]
+                        # The host port should now be a simple number
+                        if host_port_str.isdigit():
+                            all_host_ports.add(int(host_port_str))
+                        else:
+                            # This case might occur if a variable was not resolved to a number
+                            log_message("WARN",
+                                        f"Could not resolve host port '{host_port_str}' to a number in file '{file_path.name}'. Skipping.")
+
+        except Exception as e:
+            log_message("ERROR", f"Failed to process compose file {file_path} for port check: {e}")
+
+    if not all_host_ports:
+        return []
+
+    log_message("INFO", f"Checking for availability of required ports: {sorted(list(all_host_ports))}")
+
+    conflicting_ports = []
+    for port in all_host_ports:
+        if is_port_in_use(port):
+            conflicting_ports.append(port)
+
+    return conflicting_ports
+
