@@ -163,41 +163,38 @@ docker compose up -d
 
 ### Validate Microservices
 
-1. vLLM Service
-
-```bash
-curl http://${host_ip}:${LLM_ENDPOINT_PORT}/v1/chat/completions \
-  -X POST \
-  -H "Content-Type: application/json" \
-  -d '{"model": "meta-llama/Meta-Llama-3-8B-Instruct", "messages": [{"role": "user", "content": "What is Deep Learning?"}]}'
-```
-
-2. LLM Microservice
+1. LLM Microservice
 
 ```bash
 curl http://${host_ip}:${LLM_SERVICE_PORT}/v1/faqgen \
   -X POST \
-  -d '{"query":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}' \
+  -d '{"messages":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5."}' \
   -H 'Content-Type: application/json'
 ```
 
-3. MegaService
+2. MegaService
 
 ```bash
-curl http://${host_ip}:${FAQGEN_BACKEND_PORT}/v1/faqgen \
-  -H "Content-Type: multipart/form-data" \
-  -F "messages=Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5." \
-  -F "max_tokens=32" \
-  -F "stream=False"
+curl http://${host_ip}:8888/v1/chatqna \
+    -X POST \
+    -H 'Content-Type: multipart/form-data' \
+    -d '{
+	    "messages":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5.",
+	    "max_tokens": 32,
+	    "stream": false
+	}'
 ```
 
 ```bash
 ## enable stream
-curl http://${host_ip}:${FAQGEN_BACKEND_PORT}/v1/faqgen \
-  -H "Content-Type: multipart/form-data" \
-  -F "messages=Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5." \
-  -F "max_tokens=32" \
-  -F "stream=True"
+curl http://${host_ip}:8888/v1/chatqna \
+    -X POST \
+    -H 'Content-Type: multipart/form-data' \
+    -d '{
+	    "messages":"Text Embeddings Inference (TEI) is a toolkit for deploying and serving open source text embeddings and sequence classification models. TEI enables high-performance extraction for the most popular models, including FlagEmbedding, Ember, GTE and E5.",
+	    "max_tokens": 32,
+	    "stream": true
+	}'
 ```
 
 Following the validation of all aforementioned microservices, we are now prepared to construct a mega-service.
