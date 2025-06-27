@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import os
+import json
 
 from comps import MegaServiceEndpoint, MicroService, ServiceOrchestrator, ServiceRoleType, ServiceType
 from comps.cores.proto.api_protocol import AudioChatCompletionRequest, ChatCompletionResponse
