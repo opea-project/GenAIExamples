@@ -15,6 +15,7 @@ from .config import (
     EXAMPLE_CONFIGS,
     EXAMPLES_ROOT_DIR,
     POST_DEPLOY_WAIT_S,
+    CLEANUP_ON_DEPLOY_FAILURE,
 )
 from .tester import ConnectionTesterFactory
 from .utils import (
@@ -199,7 +200,6 @@ class Deployer:
                 log_message("ERROR", f"Failed during pre-deployment check: {e}")
                 return
 
-        # --- Deployment Step (The only step that triggers cleanup on failure) ---
         try:
             log_message("INFO", "Starting deployment...")
             if not self.deploy():
@@ -207,14 +207,32 @@ class Deployer:
             log_message("OK", "Deployment process completed successfully.")
         except Exception as e:
             log_message("ERROR", f"Deployment failed: {e}")
-            log_message("INFO", "Attempting automatic cleanup...")
-            try:
-                self.clear_deployment()
-                log_message("OK", "Automatic cleanup successful.")
-            except Exception as cleanup_e:
+
+            if CLEANUP_ON_DEPLOY_FAILURE:
+                log_message("INFO", "Attempting automatic cleanup as configured...")
+                try:
+                    self.clear_deployment()
+                    log_message("OK", "Automatic cleanup successful.")
+                except Exception as cleanup_e:
+                    log_message(
+                        "ERROR", f"Automatic cleanup ALSO FAILED: {cleanup_e}. Please check your environment manually."
+                    )
+            else:
                 log_message(
-                    "ERROR", f"Automatic cleanup ALSO FAILED: {cleanup_e}. Please check your environment manually."
+                    "WARN",
+                    "Automatic cleanup is disabled. The failed environment is preserved for debugging.",
                 )
+                if self.args.deploy_mode == "docker":
+                    log_message(
+                        "INFO",
+                        f"You can inspect logs using: docker compose -p {self.project_name} logs",
+                    )
+                elif self.args.deploy_mode == "k8s":
+                    ns = self.config["kubernetes"]["namespace"]
+                    log_message(
+                        "INFO",
+                        f"Inspect pods with 'kubectl get pods -n {ns}' and logs with 'kubectl logs -n {ns} <pod-name>'.",
+                    )
             return
 
         # --- Post-deployment Testing Step (Does NOT trigger cleanup) ---
@@ -409,6 +427,12 @@ class Deployer:
         log_message("INFO", f"  Test Target: {self.example_name}")
         log_message("INFO", f"  Deployment Mode: {self.args.deploy_mode}")
         log_message("INFO", f"  Device: {self.args.device}")
+        log_message("INFO", f"  HTTP Proxy: {self.args.http_proxy or 'Not set'}")
+        log_message("INFO", f"  HTTPS Proxy: {self.args.https_proxy or 'Not set'}")
+        log_message("INFO", f"  No Proxy: {self.args.no_proxy or 'Not set'}")
+
+        if self.args.deploy_mode == "k8s":
+            log_message("INFO", f"  K8s Local Port: {self.args.k8s_test_local_port}")
 
         return click.confirm("Proceed with connection tests?", default=True)
 

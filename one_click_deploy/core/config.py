@@ -142,7 +142,10 @@ EXAMPLE_CONFIGS = {
                     "xeon": "kubernetes/helm/cpu-values.yaml",
                     "gaudi": "kubernetes/helm/gaudi-values.yaml",
                 },
-                "params_to_values": {"hf_token": "global.HUGGINGFACEHUB_API_TOKEN", "llm_model": "llm.model_name"},
+                "params_to_values": {
+                    "hf_token": "global.HUGGINGFACEHUB_API_TOKEN",
+                    "llm_model": ["llm-uservice.LLM_MODEL_ID", "vllm.LLM_MODEL_ID"],
+                },
             },
             "namespace": "codetrans",
             "release_name": "codetrans",
@@ -150,7 +153,7 @@ EXAMPLE_CONFIGS = {
         "supported_devices": ["xeon", "gaudi"],
         "default_device": "xeon",
         "ports": {
-            "docker": {"backend": "7777", "llm": "8008"},
+            "docker": {"backend": "7777", "llm": "9000"},
             "k8s_services": {"backend": "codetrans-svc", "llm": "codetrans-llm-svc"},
         },
         "test_connections": {
@@ -160,8 +163,8 @@ EXAMPLE_CONFIGS = {
                 "method": "POST",
                 "payload": {
                     "source_code": "def hello():\n  print('world')",
-                    "source_lang": "python",
-                    "target_lang": "javascript",
+                    "language_from": "python",
+                    "language_to": "javascript",
                 },
                 "headers": {"Content-Type": "application/json"},
                 "expect_code": 200,
@@ -173,7 +176,7 @@ EXAMPLE_CONFIGS = {
                     "path": "/v1/completions",
                     "method": "POST",
                     "payload_dynamic_llm_model": True,
-                    "default_llm_model_id_for_test": "codellama/CodeLlama-7b-instruct-hf",
+                    "default_llm_model_id_for_test": "mistralai/Mistral-7B-Instruct-v0.3",
                     "payload_template": {
                         "prompt": "Translate to Python: function add(a, b) { return a + b; }",
                         "max_tokens": 50,
@@ -188,8 +191,8 @@ EXAMPLE_CONFIGS = {
                 "name": "llm_model",
                 "prompt": "LLM Model ID (for Code Translation)",
                 "type": str,
-                "default": "codellama/CodeLlama-7b-instruct-hf",
-                "help": "e.g., codellama/CodeLlama-7b-instruct-hf",
+                "default": "mistralai/Mistral-7B-Instruct-v0.3",
+                "help": "e.g., mistralai/Mistral-7B-Instruct-v0.3",
             },
         ],
     },
@@ -658,3 +661,5 @@ TEST_RETRY_ATTEMPTS = 3
 
 # Time in seconds to wait between each connection test retry
 TEST_RETRY_DELAY_S = 30
+
+CLEANUP_ON_DEPLOY_FAILURE = False

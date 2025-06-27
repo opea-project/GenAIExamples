@@ -81,11 +81,11 @@ def section_header(title):
 
 
 def run_command(
-        cmd_list, cwd=None, env=None, check=True, capture_output=False, shell=False, executable=None, display_cmd=True
+    cmd_list, cwd=None, env=None, check=True, capture_output=False, shell=False, executable=None, display_cmd=True
 ):
     """Executes a shell command with logging and error handling."""
     if display_cmd:
-        cmd_str = cmd_list if isinstance(cmd_list, str) else ' '.join(map(str, cmd_list))
+        cmd_str = cmd_list if isinstance(cmd_list, str) else " ".join(map(str, cmd_list))
         log_message("INFO", f"Running command: {cmd_str}")
 
     process_env = os.environ.copy()
@@ -282,11 +282,10 @@ def get_var_from_shell_script(script_path: pathlib.Path, var_name: str) -> str |
             if match:
                 value = match.group(1).strip()
                 value = value.split("#", 1)[0].strip()
-                if (value.startswith('"') and value.endswith('"')) or \
-                        (value.startswith("'") and value.endswith("'")):
+                if (value.startswith('"') and value.endswith('"')) or (value.startswith("'") and value.endswith("'")):
                     value = value[1:-1]
                 value = self_ref_pattern.sub("", value).strip()
-                value = value.lstrip(',')
+                value = value.lstrip(",")
                 log_message("DEBUG", f"Extracted and cleaned value for '{var_name}': {value}")
                 return value
         log_message("DEBUG", f"Variable '{var_name}' not found in {script_path}.")
@@ -320,8 +319,9 @@ def parse_shell_env_file(file_path: pathlib.Path) -> dict:
                 if match:
                     key, value = match.groups()
                     value = value.split("#", 1)[0].strip()
-                    if (value.startswith('"') and value.endswith('"')) or \
-                            (value.startswith("'") and value.endswith("'")):
+                    if (value.startswith('"') and value.endswith('"')) or (
+                        value.startswith("'") and value.endswith("'")
+                    ):
                         value = value[1:-1]
                     env_vars[key] = value
     except Exception as e:
@@ -332,6 +332,7 @@ def parse_shell_env_file(file_path: pathlib.Path) -> dict:
 def is_port_in_use(port: int, host: str = "0.0.0.0") -> bool:
     """Checks if a given TCP port is already in use on the host."""
     import socket
+
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         try:
             s.bind((host, port))
@@ -340,14 +341,13 @@ def is_port_in_use(port: int, host: str = "0.0.0.0") -> bool:
             return True
 
 
-
 def _substitute_env_vars(content: str, env_vars: dict) -> str:
-    """
-    Mimics Docker Compose's environment variable substitution in a string.
+    """Mimics Docker Compose's environment variable substitution in a string.
+
     Handles ${VAR}, $VAR, and ${VAR:-default}.
     """
     # Regex to find all forms of variables: ${VAR}, $VAR, ${VAR:-default}, ${VAR-default}
-    pattern = re.compile(r'\$(?:\{(\w+)(?:[:-](.*?))?\}|(\w+))')
+    pattern = re.compile(r"\$(?:\{(\w+)(?:[:-](.*?))?\}|(\w+))")
 
     def replacer(match):
         # Determine the variable name and default value from the match groups
@@ -367,9 +367,10 @@ def _substitute_env_vars(content: str, env_vars: dict) -> str:
 
 
 def get_conflicting_ports_from_compose(compose_files: list[pathlib.Path], env_vars: dict) -> list[int]:
-    """
-    Parses Docker Compose files using the "substitute first, then parse" method,
-    and checks for port conflicts on the host. This is the robust way.
+    """Parses Docker Compose files using the "substitute first, then parse" method,
+    and checks for port conflicts on the host.
+
+    This is the robust way.
     """
     if not YAML_HANDLER:
         log_message("WARN", "YAML library not available, skipping port check.")
@@ -389,9 +390,11 @@ def get_conflicting_ports_from_compose(compose_files: list[pathlib.Path], env_va
             substituted_content = _substitute_env_vars(raw_content, env_vars)
 
             # 3. Parse the substituted (clean) YAML content
-            data = YAML_HANDLER.safe_load(substituted_content) if hasattr(YAML_HANDLER,
-                                                                          'safe_load') else YAML_HANDLER.load(
-                substituted_content)
+            data = (
+                YAML_HANDLER.safe_load(substituted_content)
+                if hasattr(YAML_HANDLER, "safe_load")
+                else YAML_HANDLER.load(substituted_content)
+            )
 
             if not data or "services" not in data:
                 continue
@@ -411,8 +414,10 @@ def get_conflicting_ports_from_compose(compose_files: list[pathlib.Path], env_va
                             all_host_ports.add(int(host_port_str))
                         else:
                             # This case might occur if a variable was not resolved to a number
-                            log_message("WARN",
-                                        f"Could not resolve host port '{host_port_str}' to a number in file '{file_path.name}'. Skipping.")
+                            log_message(
+                                "WARN",
+                                f"Could not resolve host port '{host_port_str}' to a number in file '{file_path.name}'. Skipping.",
+                            )
 
         except Exception as e:
             log_message("ERROR", f"Failed to process compose file {file_path} for port check: {e}")
@@ -428,4 +433,3 @@ def get_conflicting_ports_from_compose(compose_files: list[pathlib.Path], env_va
             conflicting_ports.append(port)
 
     return conflicting_ports
-
