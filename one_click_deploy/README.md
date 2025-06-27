@@ -10,9 +10,9 @@ Before you begin, ensure your system meets the following requirements.
 
 Hardware requirements can vary significantly depending on the example and models being used. The following are general guidelines, with more demanding examples like ChatQnA requiring more resources.
 
-- **CPU:** For production-level performance with larger models (e.g., on Xeon), **96+ cores** are recommended.
+- **CPU:** For optimal performance with larger models in production (e.g., on Xeon), use CPUs with more cores.
 - **Memory:** A minimum of **64GB RAM**. For larger models, **128GB or more** is recommended.
-- **HPU (for Gaudi deployments):** At least **8 HPU cards** are recommended for full-scale ChatQnA deployment.
+- **HPU (for Gaudi deployments):** At least **2 HPU cards** are recommended for ChatQnA deployment.
 - **Disk Space:** A minimum of **50GB** of free disk space is required for Docker images, models, and data.
 
 ### 2. Software Requirements
@@ -119,7 +119,7 @@ This section walks you through a typical deployment session for the `ChatQnA` ex
 
     ```text
     Run environment check? [y/N]: y
-    Build or Push images? [y/N]: n
+    Build images? [y/N]: n
     Run connection tests after deployment? [y/N]: y
     ```
 

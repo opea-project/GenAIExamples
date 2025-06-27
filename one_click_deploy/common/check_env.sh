@@ -10,8 +10,8 @@ source "${SCRIPT_DIR_ENV}/utils.sh" # Assuming utils.sh is in the same directory
 # =================== CONFIG ===================
 REQUIRED_CMDS=("git" "docker" "curl" "vim" "nproc") # Added nproc for CPU check
 THRESHOLD_GB=5
-CHATQNA_MIN_CPU=96
-CHATQNA_MIN_HPU=8
+EXAMPLE_MIN_CPU=32
+EXAMPLE_MIN_HPU=1
 # LOG_FILE is now managed by utils.sh, can be overridden here if needed:
 # LOG_FILE="check_env.log" # Specific log file for this script
 
@@ -141,11 +141,11 @@ check_hl_cards() {
     log INFO "Total HL-SMI cards detected: $total_cards"
     log INFO "Cards reported as 'N/A' (interpreted as available): $available_cards"
 
-    if [ "$available_cards" -lt "$CHATQNA_MIN_HPU" ]; then
-        log ERROR "Available HPU cards ($available_cards) is less than required minimum ($CHATQNA_MIN_HPU)."
+    if [ "$available_cards" -lt "$EXAMPLE_MIN_HPU" ]; then
+        log ERROR "Available HPU cards ($available_cards) is less than required minimum ($EXAMPLE_MIN_HPU)."
         return 1
     else
-        log OK "Sufficient HPU cards available ($available_cards >= $CHATQNA_MIN_HPU)."
+        log OK "Sufficient HPU cards available ($available_cards >= $EXAMPLE_MIN_HPU)."
     fi
     return 0
 }
@@ -168,8 +168,8 @@ get_cpu_info() {
     log INFO "CPU Model: $cpu_model"
     log INFO "Total logical CPU cores: $total_cores"
 
-    if [ "$total_cores" -lt "$CHATQNA_MIN_CPU" ]; then
-        log ERROR "Detected CPU cores ($total_cores) is less than required minimum ($CHATQNA_MIN_CPU)."
+    if [ "$total_cores" -lt "$EXAMPLE_MIN_CPU" ]; then
+        log ERROR "Detected CPU cores ($total_cores) is less than required minimum ($EXAMPLE_MIN_CPU)."
         return 1
     else
         log OK "CPU core count ($total_cores) is sufficient."

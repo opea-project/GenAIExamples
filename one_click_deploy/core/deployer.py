@@ -40,6 +40,24 @@ class Deployer:
         self.config = EXAMPLE_CONFIGS[self.example_name]
         self.example_root = EXAMPLES_ROOT_DIR / self.config["base_dir"]
         self.compose_command = "docker compose"
+        # Project name will be set during the deployment flow
+        self.project_name = None
+
+    def _get_compose_command_base(self):
+        """Constructs the base docker compose command with project and compose files."""
+        if not self.project_name:
+            # Fallback for safety, though project_name should always be set.
+            self.project_name = f"{self.example_name.lower().replace(' ', '')}-{self.args.device}"
+
+        compose_files = self._get_docker_compose_files()
+        if not compose_files:
+            return None
+
+        cmd = self.compose_command.split()
+        cmd.extend(["-p", self.project_name])
+        for f in compose_files:
+            cmd.extend(["-f", str(f.resolve())])
+        return cmd
 
     def _get_path_from_config(self, config_keys, device_specific_key=None):
         """Helper to safely retrieve a path or list of paths from the configuration."""
@@ -116,60 +134,112 @@ class Deployer:
         return base_values_path.with_name(f"{base_values_path.stem}.local{base_values_path.suffix}")
 
     def run_interactive_deployment(self):
-        """Orchestrates the deployment flow with automatic cleanup on failure."""
+        """
+        Orchestrates the deployment flow with intelligent pre-flight checks.
+        """
         if not self._interactive_setup_for_deploy():
             log_message("INFO", "Deployment setup aborted by user.")
             return
 
-        all_steps_succeeded = False
-        try:
-            success = True
+        # --- Pre-deployment Steps ---
+        if self.args.do_check_env and not self.check_environment():
+            log_message("ERROR", "Environment check failed. Aborting deployment.")
+            return
 
-            if self.args.do_check_env:
-                success = self.check_environment()
+        if self.args.do_update_images and not self.update_images():
+            log_message("ERROR", "Image update failed. Aborting deployment.")
+            return
 
-            if success and self.args.do_update_images:
-                success = self.update_images()
+        if not self.configure_services():
+            log_message("ERROR", "Service configuration failed. Aborting deployment.")
+            return
 
-            if success:
-                success = self.configure_services()
+        # --- Pre-flight Check: Existing Deployment and Port Conflicts ---
+        if self.args.deploy_mode == "docker":
+            # Set a consistent project name for all Docker Compose operations
+            self.project_name = f"{self.example_name.lower().replace(' ', '')}-{self.args.device}"
+            log_message("INFO", f"Using Docker Compose project name: '{self.project_name}'")
 
-            if success:
-                success = self.deploy()
+            compose_base_cmd = self._get_compose_command_base()
+            if not compose_base_cmd:
+                log_message("ERROR", "Could not construct Docker Compose command. Check config.")
+                return
 
-            if success and self.args.do_test_connection:
-                log_message(
-                    "INFO", f"Waiting for {POST_DEPLOY_WAIT_S} seconds for services to stabilize before testing..."
+            try:
+                # Check if containers for this project are already running
+                result = run_command(
+                    compose_base_cmd + ["ps", "-q"], capture_output=True, check=False, display_cmd=False
                 )
-                for i in range(POST_DEPLOY_WAIT_S, 0, -10):
-                    print(f"\r... {i} seconds remaining...  ", end="")
-                    time.sleep(min(10, i))
-                print("\rWait complete. Starting tests.        ")
+                is_running = result.stdout.strip() != ""
 
-                success = self.test_connection()
-
-            all_steps_succeeded = success
-
-        except Exception as e:
-            log_message("ERROR", f"An unexpected error occurred during deployment: {e}")
-            all_steps_succeeded = False
-
-        finally:
-            if not all_steps_succeeded:
-                log_message("ERROR", "Deployment failed. Triggering automatic cleanup.")
-                try:
-                    # We need self.args.deploy_mode and self.args.device to be set for cleanup
-                    if hasattr(self, "args") and hasattr(self.args, "deploy_mode") and self.args.deploy_mode:
-                        self.clear_deployment()
-                        log_message("OK", "Automatic cleanup has finished.")
+                if is_running:
+                    log_message("WARN", f"An instance of '{self.example_name}' appears to be already running.")
+                    if click.confirm("Do you want to stop the current instance and redeploy/update it?", default=True):
+                        log_message("INFO", "Stopping existing services...")
+                        # Use the clear_deployment logic to stop the services
+                        self.clear_deployment(clear_local_config=False)  # Keep local config for re-deployment
                     else:
-                        log_message("WARN", "Cannot run automatic cleanup: deployment mode not set.")
-                except Exception as cleanup_e:
+                        log_message("INFO", "Deployment aborted by user.")
+                        return
+                else:
+                    # If not running, check for port conflicts from other applications
+                    local_env_file = self._get_local_env_file_path()
+                    env_vars = parse_shell_env_file(local_env_file)
+                    conflicting_ports = get_conflicting_ports_from_compose(
+                        self._get_docker_compose_files(), env_vars
+                    )
+                    if conflicting_ports:
+                        log_message(
+                            "ERROR",
+                            f"Deployment aborted. Ports are in use by other applications: {sorted(conflicting_ports)}",
+                        )
+                        return
+
+            except Exception as e:
+                log_message("ERROR", f"Failed during pre-deployment check: {e}")
+                return
+
+        # --- Deployment Step (The only step that triggers cleanup on failure) ---
+        try:
+            log_message("INFO", "Starting deployment...")
+            if not self.deploy():
+                raise RuntimeError("Deployment command failed to execute successfully.")
+            log_message("OK", "Deployment process completed successfully.")
+        except Exception as e:
+            log_message("ERROR", f"Deployment failed: {e}")
+            log_message("INFO", "Attempting automatic cleanup...")
+            try:
+                self.clear_deployment()
+                log_message("OK", "Automatic cleanup successful.")
+            except Exception as cleanup_e:
+                log_message(
+                    "ERROR", f"Automatic cleanup ALSO FAILED: {cleanup_e}. Please check your environment manually."
+                )
+            return
+
+        # --- Post-deployment Testing Step (Does NOT trigger cleanup) ---
+        if self.args.do_test_connection:
+            log_message("INFO", f"Waiting for {POST_DEPLOY_WAIT_S} seconds for services to stabilize before testing...")
+            for i in range(POST_DEPLOY_WAIT_S, 0, -10):
+                print(f"\r... {i} seconds remaining...  ", end="")
+                time.sleep(min(10, i))
+            print("\rWait complete. Starting tests.        ")
+
+            if not self.test_connection():
+                log_message("WARN", "Connection tests failed. The services are still running.")
+                if self.args.deploy_mode == "docker":
                     log_message(
-                        "ERROR", f"Automatic cleanup ALSO FAILED: {cleanup_e}. Please check your environment manually."
+                        "INFO",
+                        f"Please inspect logs using: docker compose -p {self.project_name} logs",
+                    )
+                elif self.args.deploy_mode == "k8s":
+                    ns = self.config["kubernetes"]["namespace"]
+                    log_message(
+                        "INFO",
+                        f"Please inspect pod status with 'kubectl get pods -n {ns}' and logs with 'kubectl logs -n {ns} <pod-name>'.",
                     )
             else:
-                log_message("OK", "Deployment process completed successfully.")
+                log_message("OK", "All connection tests passed.")
 
     def _interactive_setup_for_deploy(self):
         section_header(f"{self.example_name} Interactive Deployment Setup")
@@ -222,7 +292,7 @@ class Deployer:
             setattr(self.args, param["name"], user_input)
 
         self.args.do_check_env = click.confirm("Run environment check?", default=False, show_default=True)
-        self.args.do_update_images = click.confirm("Build or Push images?", default=False, show_default=True)
+        self.args.do_update_images = click.confirm("Build images?", default=False, show_default=True)
         if self.args.do_update_images:
             self.args.setup_local_registry = click.confirm(
                 "  -> Set up a local registry for this run? (creates 'localhost:5000' registry)",
@@ -278,6 +348,8 @@ class Deployer:
                 type=click.Choice(self.config.get("supported_devices")),
                 default=self.config.get("default_device"),
             )
+            # Set project name for clearing
+            self.project_name = f"{self.example_name.lower().replace(' ', '')}-{self.args.device}"
         else:
             self.args.device = self.config.get("default_device")
 
@@ -291,23 +363,18 @@ class Deployer:
 
     def run_interactive_test(self):
         """Orchestrates the interactive testing of an existing deployment."""
-        # Step 1: Gather all necessary parameters interactively.
         if not self._interactive_setup_for_test():
             log_message("INFO", "Test operation aborted by user.")
             return
 
         try:
-            # Step 2: With the updated self.args, call the actual test method.
             self.test_connection()
             log_message("OK", "Testing process completed.")
         except Exception as e:
             log_message("ERROR", f"An unexpected error occurred during testing: {e}")
 
     def _interactive_setup_for_test(self):
-        """Gathers necessary information for testing and updates self.args.
-
-        Returns False if aborted.
-        """
+        """Gathers necessary information for testing and updates self.args."""
         section_header(f"{self.example_name} Interactive Connection Test Setup")
 
         self.args.deploy_mode = click.prompt(
@@ -318,8 +385,9 @@ class Deployer:
             type=click.Choice(self.config.get("supported_devices")),
             default=self.config.get("default_device"),
         )
+        if self.args.deploy_mode == "docker":
+            self.project_name = f"{self.example_name.lower().replace(' ', '')}-{self.args.device}"
 
-        # The following prompts populate self.args with proxy information.
         self.args.http_proxy = click.prompt("HTTP Proxy", default=os.environ.get("http_proxy", ""), show_default=True)
         self.args.https_proxy = click.prompt(
             "HTTPS Proxy", default=os.environ.get("https_proxy", ""), show_default=True
@@ -341,12 +409,6 @@ class Deployer:
         log_message("INFO", f"  Test Target: {self.example_name}")
         log_message("INFO", f"  Deployment Mode: {self.args.deploy_mode}")
         log_message("INFO", f"  Device: {self.args.device}")
-        log_message("INFO", f"  HTTP Proxy: {self.args.http_proxy or 'Not set'}")
-        log_message("INFO", f"  HTTPS Proxy: {self.args.https_proxy or 'Not set'}")
-        log_message("INFO", f"  No Proxy: {self.args.no_proxy or 'Not set'}")
-
-        if self.args.deploy_mode == "k8s":
-            log_message("INFO", f"  K8s Local Port: {self.args.k8s_test_local_port}")
 
         return click.confirm("Proceed with connection tests?", default=True)
 
@@ -373,32 +435,25 @@ class Deployer:
             log_message("WARN", f"Image update script '{script_path}' not found. Skipping this step.")
             return True
 
-        cmd = ["bash", str(script_path)]
-        cmd.extend(["--example", self.example_name])
-        cmd.extend(["--device", self.args.device])
+        cmd = ["bash", str(script_path), "--example", self.example_name, "--device", self.args.device]
 
-        if hasattr(self.args, "setup_local_registry") and self.args.setup_local_registry:
+        if getattr(self.args, "setup_local_registry", False):
             cmd.append("--setup-registry")
-
-        if hasattr(self.args, "build_images") and self.args.build_images:
+        if getattr(self.args, "build_images", False):
             cmd.append("--build")
-
-        if hasattr(self.args, "push_images") and self.args.push_images:
+        if getattr(self.args, "push_images", False):
             cmd.append("--push")
-            if hasattr(self.args, "registry") and self.args.registry and self.args.registry.strip():
+            if getattr(self.args, "registry", None):
                 cmd.extend(["--registry", self.args.registry])
-            elif not (hasattr(self.args, "setup_local_registry") and self.args.setup_local_registry):
-                log_message(
-                    "WARN",
-                    "Push selected but no registry provided. Push may fail or use shell script's default.",
-                )
 
-        if (
-            not (hasattr(self.args, "build_images") and self.args.build_images)
-            and not (hasattr(self.args, "push_images") and self.args.push_images)
-            and not (hasattr(self.args, "setup_local_registry") and self.args.setup_local_registry)
+        if not any(
+            [
+                getattr(self.args, "setup_local_registry", False),
+                getattr(self.args, "build_images", False),
+                getattr(self.args, "push_images", False),
+            ]
         ):
-            log_message("INFO", "No image action ('build', 'push', 'setup-registry') confirmed. Skipping.")
+            log_message("INFO", "No image action selected. Skipping.")
             return True
 
         try:
@@ -413,93 +468,86 @@ class Deployer:
         section_header(f"Configuring Services for {self.example_name} ({self.args.deploy_mode})")
 
         if self.args.deploy_mode == "docker":
-            source_env_file = self._get_docker_set_env_script()
-            local_env_file = self._get_local_env_file_path()
-
-            params_to_env_map = (
-                self._get_device_specific_or_common_config(["docker_compose", "params_to_set_env"]) or {}
-            )
-
-            updates = {
-                env_var: getattr(self.args, arg_name)
-                for arg_name, env_var in params_to_env_map.items()
-                if hasattr(self.args, arg_name) and getattr(self.args, arg_name) is not None
-            }
-
-            # 1. Get no_proxy values from the user/environment (already in self.args.no_proxy)
-            user_proxies = {p.strip() for p in self.args.no_proxy.split(",") if p.strip()}
-
-            # 2. Get no_proxy values from the original set_env.sh script
-            script_no_proxy_str = get_var_from_shell_script(source_env_file, "no_proxy")
-            script_proxies = set()
-            if script_no_proxy_str:
-                script_proxies = {p.strip() for p in script_no_proxy_str.split(",") if p.strip()}
-                log_message("INFO", f"Found no_proxy from '{source_env_file.name}': {script_no_proxy_str}")
-
-            # 3. Merge the two sets for a de-duplicated list
-            merged_proxies = user_proxies.union(script_proxies)
-            final_no_proxy = ",".join(sorted(list(merged_proxies)))
-            log_message("INFO", f"Final combined no_proxy list: {final_no_proxy}")
-
-            updates.update(
-                {
-                    "http_proxy": self.args.http_proxy,
-                    "https_proxy": self.args.https_proxy,
-                    "no_proxy": final_no_proxy,
-                    "host_ip": get_host_ip(),
-                }
-            )
-
-            if update_or_create_set_env(source_env_file, local_env_file, updates):
-                log_message("OK", f"Successfully generated local config '{local_env_file.name}'.")
-                return True
-            else:
-                return False
-
+            return self._configure_docker()
         elif self.args.deploy_mode == "k8s":
-            original_values_file = self._get_helm_values_file()
-            local_values_file = self._get_local_helm_values_file_path()
-
-            if not original_values_file or not original_values_file.exists():
-                log_message("ERROR", f"Helm values file not found: {original_values_file}. Cannot configure.")
-                return False
-
-            try:
-                shutil.copy2(original_values_file, local_values_file)
-                log_message("INFO", f"Created local values file '{local_values_file.name}' for this deployment.")
-            except Exception as e:
-                log_message("ERROR", f"Failed to create local values file: {e}")
-                return False
-
-            params_to_values = self.config["kubernetes"]["helm"]["params_to_values"]
-            updates = {}
-            for name, path_or_paths in params_to_values.items():
-                if hasattr(self.args, name):
-                    value = getattr(self.args, name)
-                    if value is None:
-                        continue
-
-                    if isinstance(path_or_paths, list):
-                        for path in path_or_paths:
-                            updates[path] = value
-                    else:
-                        updates[path_or_paths] = value
-
-            if update_helm_values_yaml(local_values_file, updates):
-                log_message("OK", f"Successfully updated local Helm values in {local_values_file.name}.")
-                return True
-            else:
-                log_message("ERROR", f"Failed to update Helm values in {local_values_file.name}.")
-                return False
+            return self._configure_kubernetes()
         return True
 
+    def _configure_docker(self):
+        source_env_file = self._get_docker_set_env_script()
+        local_env_file = self._get_local_env_file_path()
+
+        if not source_env_file:
+            log_message("ERROR", "Source environment file not found in configuration.")
+            return False
+
+        params_to_env_map = self._get_device_specific_or_common_config(["docker_compose", "params_to_set_env"]) or {}
+
+        updates = {
+            env_var: getattr(self.args, arg_name)
+            for arg_name, env_var in params_to_env_map.items()
+            if hasattr(self.args, arg_name) and getattr(self.args, arg_name) is not None
+        }
+
+        user_proxies = {p.strip() for p in self.args.no_proxy.split(",") if p.strip()}
+        script_no_proxy_str = get_var_from_shell_script(source_env_file, "no_proxy")
+        script_proxies = {p.strip() for p in script_no_proxy_str.split(",") if p.strip()} if script_no_proxy_str else set()
+
+        merged_proxies = user_proxies.union(script_proxies)
+        final_no_proxy = ",".join(sorted(list(merged_proxies)))
+
+        updates.update(
+            {
+                "http_proxy": self.args.http_proxy,
+                "https_proxy": self.args.https_proxy,
+                "no_proxy": final_no_proxy,
+                "host_ip": get_host_ip(),
+            }
+        )
+        return update_or_create_set_env(source_env_file, local_env_file, updates)
+
+    def _configure_kubernetes(self):
+        original_values_file = self._get_helm_values_file()
+        local_values_file = self._get_local_helm_values_file_path()
+
+        if not original_values_file or not original_values_file.exists():
+            log_message("ERROR", f"Helm values file not found: {original_values_file}. Cannot configure.")
+            return False
+
+        try:
+            shutil.copy2(original_values_file, local_values_file)
+            log_message("INFO", f"Created local values file '{local_values_file.name}' for this deployment.")
+        except Exception as e:
+            log_message("ERROR", f"Failed to create local values file: {e}")
+            return False
+
+        params_to_values = self.config["kubernetes"]["helm"]["params_to_values"]
+        updates = {}
+        for name, path_or_paths in params_to_values.items():
+            if hasattr(self.args, name):
+                value = getattr(self.args, name)
+                if value is None:
+                    continue
+
+                if isinstance(path_or_paths, list):
+                    for path in path_or_paths:
+                        updates[path] = value
+                else:
+                    updates[path_or_paths] = value
+
+        if update_helm_values_yaml(local_values_file, updates):
+            log_message("OK", f"Successfully updated local Helm values in {local_values_file.name}.")
+            return True
+        else:
+            log_message("ERROR", f"Failed to update Helm values in {local_values_file.name}.")
+            return False
+
     def deploy(self):
-        section_header(f"Deploying {self.example_name} ({self.args.deploy_mode})")
+        section_header(f"Executing Deployment for {self.example_name} ({self.args.deploy_mode})")
 
         if self.args.deploy_mode == "docker":
-            compose_files = self._get_docker_compose_files()
-            if not compose_files:
-                log_message("ERROR", "Docker Compose file(s) not found in configuration.")
+            compose_base_cmd = self._get_compose_command_base()
+            if not compose_base_cmd:
                 return False
 
             local_env_file = self._get_local_env_file_path()
@@ -507,51 +555,24 @@ class Deployer:
                 log_message("ERROR", f"Local environment script '{local_env_file}' not found. Cannot deploy.")
                 return False
 
-            # Check for conflicting ports before attempting to deploy
-            env_vars = parse_shell_env_file(local_env_file)
-            conflicting_ports = get_conflicting_ports_from_compose(compose_files, env_vars)
-            if conflicting_ports:
-                log_message(
-                    "ERROR",
-                    f"Deployment aborted. The following required ports are already in use: {sorted(conflicting_ports)}",
-                )
-                log_message("ERROR", "Please stop the process(es) using these ports and try again.")
-                return False
-            log_message("OK", "All required ports are available. Proceeding with deployment.")
+            compose_up_cmd = " ".join(compose_base_cmd + ["up", "-d", "--remove-orphans"])
 
-
-            # Construct the docker-compose command with all -f flags
-            f_flags_list = []
-            for f in compose_files:
-                f_flags_list.extend(["-f", str(f.resolve())])
-            compose_cmd_str = f"{self.compose_command} {' '.join(f_flags_list)} up -d --remove-orphans"
-
-            # Create the content for the wrapper script
-            # Using absolute paths everywhere for robustness
+            compose_dir = self._get_docker_compose_files()[0].parent
             script_content = f"""#!/bin/bash
-# This is a temporary script generated by the one-click deployer.
-# It is used to safely source an environment and run docker-compose without using shell=True in Python.
 set -e
 echo "Sourcing environment from: {local_env_file.resolve()}"
 source "{local_env_file.resolve()}"
-echo "Executing docker-compose from: {compose_files[0].parent.resolve()}"
-cd "{compose_files[0].parent.resolve()}"
-{compose_cmd_str}
+echo "Executing command: {compose_up_cmd}"
+cd "{compose_dir.resolve()}"
+{compose_up_cmd}
 """
             temp_script_path = None
             try:
-                # Create a named temporary file that we can execute
                 with tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".sh", dir=".") as f:
                     f.write(script_content)
                     temp_script_path = f.name
-
-                # Make the temporary script executable by the owner
-                os.chmod(temp_script_path, stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR)
-
-                # Execute the wrapper script using /bin/bash
+                os.chmod(temp_script_path, stat.S_IRWXU)
                 run_command(["/bin/bash", temp_script_path], check=True)
-
-                log_message("OK", f"{self.example_name} deployed successfully via Docker Compose.")
                 return True
             except Exception as e:
                 log_message("ERROR", f"Docker Compose deployment failed: {e}")
@@ -585,37 +606,39 @@ cd "{compose_files[0].parent.resolve()}"
                 time.sleep(30)
                 return True
             except Exception as e:
-                log_message("ERROR", f"Helm deployment failed: {e}")
+                log_message("ERROR", f"Helm deployment failed during execution: {e}")
                 return False
         return False
 
-    def clear_deployment(self):
+    def clear_deployment(self, clear_local_config=True):
         section_header(f"Clearing Deployment for {self.example_name} ({self.args.deploy_mode})")
 
         if self.args.deploy_mode == "docker":
-            compose_files = self._get_docker_compose_files()
-            if not compose_files:
-                log_message("WARN", "Docker Compose file(s) not found. Cannot clear.")
+            compose_base_cmd = self._get_compose_command_base()
+            if not compose_base_cmd:
+                log_message("WARN", "Could not construct Docker Compose command. Cannot clear.")
                 return True
 
-            compose_dir = compose_files[0].parent
-            local_env_file = self._get_local_env_file_path()
-
-            cmd_list = self.compose_command.split()
-            f_flags_list = []
-            for f in compose_files:
-                f_flags_list.extend(["-f", str(f.resolve())])
-            cmd_list.extend(f_flags_list)
-            cmd_list.extend(["down", "-v", "--remove-orphans"])
+            cmd_list = compose_base_cmd + ["down", "-v", "--remove-orphans"]
 
             try:
-                # For `down`, we don't need the complex sourced environment
-                run_command(cmd_list, cwd=compose_dir, check=False)
-                if local_env_file and local_env_file.exists():
-                    local_env_file.unlink()
-                    log_message("INFO", f"Removed generated config file: {local_env_file.name}")
-                log_message("OK", "Docker Compose deployment cleared.")
-                return True
+                result = run_command(cmd_list, check=False, capture_output=True, display_cmd=True)
+                if result.returncode != 0:
+                    log_message("ERROR", f"Docker Compose down command failed with exit code {result.returncode}.")
+                    if result.stdout:
+                        log_message("ERROR", f"  STDOUT: {result.stdout.strip()}")
+                    if result.stderr:
+                        log_message("ERROR", f"  STDERR: {result.stderr.strip()}")
+                else:
+                    log_message("OK", "Docker Compose services stopped and removed.")
+
+                if clear_local_config:
+                    local_env_file = self._get_local_env_file_path()
+                    if local_env_file and local_env_file.exists():
+                        local_env_file.unlink()
+                        log_message("INFO", f"Removed generated config file: {local_env_file.name}")
+
+                return result.returncode == 0
             except Exception as e:
                 log_message("ERROR", f"Failed to clear Docker Compose deployment: {e}")
                 return False
