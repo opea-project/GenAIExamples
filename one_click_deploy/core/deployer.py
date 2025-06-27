@@ -519,7 +519,6 @@ class Deployer:
                 return False
             log_message("OK", "All required ports are available. Proceeding with deployment.")
 
-
             # Construct the docker-compose command with all -f flags
             f_flags_list = []
             for f in compose_files:
