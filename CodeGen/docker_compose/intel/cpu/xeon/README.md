@@ -96,6 +96,20 @@ Different Docker Compose files are available to select the LLM serving backend.
   docker compose -f compose_tgi.yaml up -d
   ```
 
+  #### Deployment with remote endpoints (`compose_remote.yaml`)
+
+- **Compose File:** `compose_remote.yaml`
+- **Description:** Uses remote endpoints to access the served LLM's. This is the default configurations except for the LLM serving engine.
+- **Services Deployed:** `codegen-tei-embedding-server`, `codegen-retriever-server`, `redis-vector-db`, `codegen-dataprep-server`, `codegen-backend-server`, `codegen-gradio-ui-server`.
+- **To Run:**
+  ```bash
+  export OPENAI_API_KEY=<api-key>>
+  export REMOTE_ENDPOINT=<remote-endpoint> #do not include /v1
+  export LLM_MODEL_ID=<model-id>
+
+  docker compose -f compose_remote.yaml up -d
+  ```
+
 ### Configuration Parameters
 
 #### Environment Variables
