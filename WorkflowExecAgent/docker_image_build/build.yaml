@@ -4,7 +4,7 @@
 services:
   agent:
     build:
-      context: GenAIComps
+      context: ${WORKDIR:-./}/GenAIComps
       dockerfile: comps/agent/src/Dockerfile
       args:
         http_proxy: ${http_proxy}
