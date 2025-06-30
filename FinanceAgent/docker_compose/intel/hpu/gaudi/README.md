@@ -76,7 +76,7 @@ Below is the command to launch services
 - dataprep-redis-server-finance
 - finqa-agent-endpoint
 - research-agent-endpoint
-- docsum-vllm-xeon
+- docsum-vllm-gaudi
 - supervisor-agent-endpoint
 - agent-ui
 
