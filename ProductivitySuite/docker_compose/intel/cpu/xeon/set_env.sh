@@ -6,7 +6,7 @@ source .set_env.sh
 popd > /dev/null
 
 export DB_NAME="opea"
-export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
+EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
 export RERANK_MODEL_ID="BAAI/bge-reranker-base"
 export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
 export LLM_MODEL_ID_CODEGEN="Intel/neural-chat-7b-v3-3"
