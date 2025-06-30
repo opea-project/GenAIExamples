@@ -131,8 +131,8 @@ bb46cdaf1794   opea/reranking:latest                                   "python o
 d89ab0ef3f41   opea/embedding:latest                                   "sh -c 'python $( [ …"   About a minute ago   Up About a minute   0.0.0.0:3002->6000/tcp, [::]:3002->6000/tcp     search-embedding-server
 b248e55dd20f   opea/vllm-rocm:latest                                   "python3 /workspace/…"   About a minute ago   Up About a minute   0.0.0.0:3080->8011/tcp, [::]:3080->8011/tcp     search-vllm-service
 c3800753fac5   opea/web-retriever:latest                               "python opea_web_ret…"   About a minute ago   Up About a minute   0.0.0.0:3003->7077/tcp, [::]:3003->7077/tcp     search-web-retriever-server
-0db8af486bd0   ghcr.io/huggingface/text-embeddings-inference:cpu-1.5   "text-embeddings-rou…"   About a minute ago   Up About a minute   0.0.0.0:3001->80/tcp, [::]:3001->80/tcp         search-tei-embedding-server
-3125915447ef   ghcr.io/huggingface/text-embeddings-inference:cpu-1.5   "text-embeddings-rou…"   About a minute ago   Up About a minute   0.0.0.0:3004->80/tcp, [::]:3004->80/tcp         search-tei-reranking-server
+0db8af486bd0   ghcr.io/huggingface/text-embeddings-inference:cpu-1.7   "text-embeddings-rou…"   About a minute ago   Up About a minute   0.0.0.0:3001->80/tcp, [::]:3001->80/tcp         search-tei-embedding-server
+3125915447ef   ghcr.io/huggingface/text-embeddings-inference:cpu-1.7   "text-embeddings-rou…"   About a minute ago   Up About a minute   0.0.0.0:3004->80/tcp, [::]:3004->80/tcp         search-tei-reranking-server
 ```
 
 #### For TGI inference type deployment
