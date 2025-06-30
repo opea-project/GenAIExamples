@@ -103,7 +103,3 @@ The table below lists currently available deployment options. They outline in de
 | On-premise Deployments | Docker compose       | [MultimodalQnA deployment on Xeon](./docker_compose/intel/cpu/xeon)   |
 |                        |                      | [MultimodalQnA deployment on Gaudi](./docker_compose/intel/hpu/gaudi) |
 |                        |                      | [MultimodalQnA deployment on AMD ROCm](./docker_compose/amd/gpu/rocm) |
-|                        | Kubernetes           | [Helm Charts](./kubernetes/helm)                                      |
-|                        |                      | [GMC](./kubernetes/gmc)                                               |
-|                        | Azure                | Work-in-progress                                                      |
-|                        | Intel Tiber AI Cloud | Work-in-progress                                                      |
