@@ -6,6 +6,7 @@ import { defineStore } from "pinia";
 export const themeAppStore = defineStore("theme", {
   state: () => ({
     theme: "light",
+    lang: "en_US",
   }),
   persist: {
     key: "themeInfo",
@@ -14,6 +15,9 @@ export const themeAppStore = defineStore("theme", {
   actions: {
     toggleTheme(type: string) {
       this.theme = type;
+    },
+    toggleLanguage(lang: string) {
+      this.lang = lang;
     },
   },
 });

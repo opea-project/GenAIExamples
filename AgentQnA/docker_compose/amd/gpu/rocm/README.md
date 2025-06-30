@@ -86,7 +86,7 @@ We remind you that when using a specific version of the code, you need to use th
 
   ```bash
   docker pull redis/redis-stack:7.2.0-v9
-  docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+  docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.7
   ```
 
   After the build, we check the list of images with the command:
@@ -102,7 +102,7 @@ We remind you that when using a specific version of the code, you need to use th
   - opea/vllm-rocm:latest
   - opea/agent:latest
   - redis/redis-stack:7.2.0-v9
-  - ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+  - ghcr.io/huggingface/text-embeddings-inference:cpu-1.7
   - opea/embedding:latest
   - opea/retriever:latest
   - opea/reranking:latest
@@ -113,7 +113,7 @@ We remind you that when using a specific version of the code, you need to use th
   - ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
   - opea/agent:latest
   - redis/redis-stack:7.2.0-v9
-  - ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+  - ghcr.io/huggingface/text-embeddings-inference:cpu-1.7
   - opea/embedding:latest
   - opea/retriever:latest
   - opea/reranking:latest
@@ -170,7 +170,7 @@ Use AMD GPU driver utilities to determine the correct `cardN` and `renderN` IDs 
 ### Replace the string 'server_address' with your local server IP address
 export host_ip='server_address'
 ### Replace the string 'your_huggingfacehub_token' with your HuggingFacehub repository access token.
-export HUGGINGFACEHUB_API_TOKEN='your_huggingfacehub_token'
+export HF_TOKEN='your_huggingfacehub_token'
 ### Replace the string 'your_langchain_api_key' with your LANGCHAIN API KEY.
 export LANGCHAIN_API_KEY='your_langchain_api_key'
 export LANGCHAIN_TRACING_V2=""

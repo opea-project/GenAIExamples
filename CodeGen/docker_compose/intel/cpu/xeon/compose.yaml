@@ -3,33 +3,9 @@
 
 services:
 
-  tgi-service:
-    image: ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu
-    container_name: tgi-server
-    profiles:
-      - codegen-xeon-tgi
-    ports:
-      - "8028:80"
-    volumes:
-      - "${MODEL_CACHE:-./data}:/data"
-    shm_size: 1g
-    environment:
-      no_proxy: ${no_proxy}
-      http_proxy: ${http_proxy}
-      https_proxy: ${https_proxy}
-      HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
-      host_ip: ${host_ip}
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:80/health || exit 1"]
-      interval: 10s
-      timeout: 10s
-      retries: 100
-    command: --model-id ${LLM_MODEL_ID} --cuda-graphs 0
   vllm-service:
     image: ${REGISTRY:-opea}/vllm:${TAG:-latest}
     container_name: vllm-server
-    profiles:
-      - codegen-xeon-vllm
     ports:
       - "8028:80"
     volumes:
@@ -39,7 +15,7 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HF_TOKEN: ${HF_TOKEN}
       host_ip: ${host_ip}
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:80/health || exit 1"]
@@ -56,24 +32,11 @@ services:
       https_proxy: ${https_proxy}
       LLM_ENDPOINT: ${LLM_ENDPOINT}
       LLM_MODEL_ID: ${LLM_MODEL_ID}
-      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HUGGINGFACEHUB_API_TOKEN: ${HF_TOKEN}
     restart: unless-stopped
-  llm-tgi-service:
-    extends: llm-base
-    container_name: llm-codegen-tgi-server
-    profiles:
-      - codegen-xeon-tgi
-    ports:
-      - "9000:9000"
-    ipc: host
-    depends_on:
-      tgi-service:
-        condition: service_healthy
   llm-vllm-service:
     extends: llm-base
     container_name: llm-codegen-vllm-server
-    profiles:
-      - codegen-xeon-vllm
     ports:
       - "9000:9000"
     ipc: host
@@ -140,7 +103,7 @@ services:
       REDIS_URL: ${REDIS_URL}
       REDIS_HOST: ${host_ip}
       INDEX_NAME: ${INDEX_NAME}
-      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HUGGINGFACEHUB_API_TOKEN: ${HF_TOKEN}
       LOGFLAG: true
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:5000/v1/health_check || exit 1"]
@@ -149,7 +112,7 @@ services:
       retries: 10
     restart: unless-stopped
   tei-embedding-serving:
-    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.7
     container_name: tei-embedding-serving
     entrypoint: /bin/sh -c "apt-get update && apt-get install -y curl && text-embeddings-router --json-output --model-id ${EMBEDDING_MODEL_ID} --auto-truncate"
     ports:
@@ -162,7 +125,7 @@ services:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       host_ip: ${host_ip}
-      HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HF_TOKEN: ${HF_TOKEN}
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:80/health"]
       interval: 10s
@@ -202,7 +165,7 @@ services:
       REDIS_RETRIEVER_PORT: ${REDIS_RETRIEVER_PORT}
       INDEX_NAME: ${INDEX_NAME}
       TEI_EMBEDDING_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
-      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HUGGINGFACEHUB_API_TOKEN: ${HF_TOKEN}
       LOGFLAG: ${LOGFLAG}
       RETRIEVER_COMPONENT_NAME: ${RETRIEVER_COMPONENT_NAME:-OPEA_RETRIEVER_REDIS}
     restart: unless-stopped

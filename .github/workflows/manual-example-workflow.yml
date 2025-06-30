@@ -99,6 +99,22 @@ jobs:
       opea_branch: ${{ inputs.opea_branch }}
 
   run-examples:
+    permissions:
+      actions: read
+      attestations: read
+      discussions: read
+      models: read
+      repository-projects: read
+      id-token: write
+      contents: read
+      checks: write
+      deployments: write
+      issues: write
+      packages: write
+      pages: write
+      pull-requests: write
+      statuses: write
+      security-events: read
     needs: [get-test-matrix, build-comps-base]
     strategy:
       matrix:

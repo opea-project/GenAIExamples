@@ -19,6 +19,7 @@ services:
       - ${UI_TMPFILE_PATH:-${PWD}}:/home/user/ui_cache
       - ${HF_CACHE:-${HOME}/.cache}:/home/user/.cache
       - ${PROMPT_PATH:-${PWD}}:/templates/custom
+    restart: always
     ports:
       - ${PIPELINE_SERVICE_PORT:-16010}:${PIPELINE_SERVICE_PORT:-16010}
     devices:
@@ -26,6 +27,9 @@ services:
     group_add:
       - ${VIDEOGROUPID:-44}
       - ${RENDERGROUPID:-109}
+    profiles:
+      - single_container
+      - multi_container
   ecrag:
     image: ${REGISTRY:-opea}/edgecraftrag:${TAG:-latest}
     container_name: edgecraftrag
@@ -37,10 +41,26 @@ services:
       MEGA_SERVICE_HOST_IP: ${MEGA_SERVICE_HOST_IP:-${HOST_IP}}
       PIPELINE_SERVICE_PORT: ${PIPELINE_SERVICE_PORT:-16010}
       PIPELINE_SERVICE_HOST_IP: ${PIPELINE_SERVICE_HOST_IP:-${HOST_IP}}
+    restart: always
     ports:
       - ${MEGA_SERVICE_PORT:-16011}:${MEGA_SERVICE_PORT:-16011}
     depends_on:
       - server
+    profiles:
+      - single_container
+      - multi_container
+  nginx:
+    image: nginx:latest
+    restart: always
+    ports:
+      - ${NGINX_PORT:-8086}:8086
+    volumes:
+      - ${NGINX_CONFIG_PATH:-${PWD}}:/etc/nginx/nginx.conf
+    depends_on:
+      - server
+    profiles:
+      - single_container
+      - multi_container
   ui:
     image: ${REGISTRY:-opea}/edgecraftrag-ui:${TAG:-latest}
     container_name: edgecraftrag-ui
@@ -56,18 +76,22 @@ services:
       UI_SERVICE_HOST_IP: ${UI_SERVICE_HOST_IP:-0.0.0.0}
     volumes:
       - ${UI_TMPFILE_PATH:-${PWD}}:/home/user/ui_cache
+    restart: always
     ports:
       - ${UI_SERVICE_PORT:-8082}:${UI_SERVICE_PORT:-8082}
-    restart: always
     depends_on:
       - server
       - ecrag
-  llm-serving-xpu:
-    container_name: ipex-llm-serving-xpu-container
-    image: intelanalytics/ipex-llm-serving-xpu:latest
+    profiles:
+      - single_container
+      - multi_container
+  llm-serving-xpu-0:
+    container_name: ipex-llm-serving-xpu-container-0
+    image: intelanalytics/ipex-llm-serving-xpu:0.8.3-b18
     privileged: true
+    restart: always
     ports:
-      - ${VLLM_SERVICE_PORT:-8008}:8000
+      - ${VLLM_SERVICE_PORT_0:-8100}:${VLLM_SERVICE_PORT_0:-8100}
     group_add:
       - video
       - ${VIDEOGROUPID:-44}
@@ -84,10 +108,56 @@ services:
       MODEL_PATH: "/llm/models"
       SERVED_MODEL_NAME: ${LLM_MODEL}
       TENSOR_PARALLEL_SIZE: ${TENSOR_PARALLEL_SIZE:-1}
-    shm_size: '16g'
+      MAX_NUM_SEQS: ${MAX_NUM_SEQS:-256}
+      MAX_NUM_BATCHED_TOKENS: ${MAX_NUM_BATCHED_TOKENS:-4000}
+      MAX_MODEL_LEN: ${MAX_MODEL_LEN:-3000}
+      IPEX_LLM_LOWBIT: ${LOAD_IN_LOW_BIT:-"fp8"}
+      CCL_DG2_USM: ${CCL_DG2_USM:-""}
+      PORT: ${VLLM_SERVICE_PORT_0:-8100}
+      ZE_AFFINITY_MASK: ${SELECTED_XPU_0:-0}
+    shm_size: '32g'
     entrypoint: /bin/bash -c "\
       cd /llm && \
       bash start-vllm-service.sh"
+    profiles:
+      - single_container
+      - multi_container
+  llm-serving-xpu-1:
+    container_name: ipex-llm-serving-xpu-container-1
+    image: intelanalytics/ipex-llm-serving-xpu:0.8.3-b18
+    privileged: true
+    restart: always
+    ports:
+      - ${VLLM_SERVICE_PORT_1:-8200}:${VLLM_SERVICE_PORT_1:-8200}
+    group_add:
+      - video
+      - ${VIDEOGROUPID:-44}
+      - ${RENDERGROUPID:-109}
+    volumes:
+      - ${LLM_MODEL_PATH:-${PWD}}:/llm/models
+    devices:
+      - /dev/dri
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      HF_ENDPOINT: ${HF_ENDPOINT}
+      MODEL_PATH: "/llm/models"
+      SERVED_MODEL_NAME: ${LLM_MODEL}
+      TENSOR_PARALLEL_SIZE: ${TENSOR_PARALLEL_SIZE:-1}
+      MAX_NUM_SEQS: ${MAX_NUM_SEQS:-256}
+      MAX_NUM_BATCHED_TOKENS: ${MAX_NUM_BATCHED_TOKENS:-4000}
+      MAX_MODEL_LEN: ${MAX_MODEL_LEN:-3000}
+      IPEX_LLM_LOWBIT: ${LOAD_IN_LOW_BIT:-"fp8"}
+      CCL_DG2_USM: ${CCL_DG2_USM:-""}
+      PORT: ${VLLM_SERVICE_PORT_1:-8200}
+      ZE_AFFINITY_MASK: ${SELECTED_XPU_1:-1}
+    shm_size: '32g'
+    entrypoint: /bin/bash -c "\
+      cd /llm && \
+      bash start-vllm-service.sh"
+    profiles:
+      - multi_container
 networks:
   default:
     driver: bridge
