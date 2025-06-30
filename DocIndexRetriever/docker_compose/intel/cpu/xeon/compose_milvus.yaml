@@ -95,13 +95,13 @@ services:
         condition: service_healthy
 
   tei-embedding-service:
-    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.7
     entrypoint: /bin/sh -c "apt-get update && apt-get install -y curl && text-embeddings-router --json-output --model-id ${EMBEDDING_MODEL_ID} --auto-truncate"
     container_name: tei-embedding-server
     ports:
       - "6006:80"
     volumes:
-      - "./data:/data"
+      - "${MODEL_CACHE:-./data}:/data"
     shm_size: 1g
     environment:
       no_proxy: ${no_proxy}
@@ -155,13 +155,13 @@ services:
     restart: unless-stopped
 
   tei-reranking-service:
-    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.7
     entrypoint: /bin/sh -c "apt-get update && apt-get install -y curl && text-embeddings-router --json-output --model-id ${RERANK_MODEL_ID} --auto-truncate"
     container_name: tei-reranking-server
     ports:
       - "8808:80"
     volumes:
-      - "./data:/data"
+      - "${MODEL_CACHE:-./data}:/data"
     shm_size: 1g
     environment:
       no_proxy: ${no_proxy}
