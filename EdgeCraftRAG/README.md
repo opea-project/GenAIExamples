@@ -149,6 +149,18 @@ export SELECTED_XPU_1=<which GPU to select to run for container 1>
 ```
 
 ```bash
+# For 3 vLLM container(3 DP) with  multi Intel Arc GPUs
+export vLLM_ENDPOINT="http://${HOST_IP}:${NGINX_PORT}"
+export LLM_MODEL_PATH=#your model path
+export LLM_MODEL=#your model id
+export CONTAINER_COUNT="triple_container"
+export TENSOR_PARALLEL_SIZE=#your Intel Arc GPU number to do inference
+export SELECTED_XPU_0=<which GPU to select to run for container 0>
+export SELECTED_XPU_1=<which GPU to select to run for container 1>
+export SELECTED_XPU_2=<which GPU to select to run for container 2>
+```
+
+```bash
 # Below are the extra env you can set for vllm
 export MAX_NUM_SEQS=<MAX_NUM_SEQS value>
 export MAX_NUM_BATCHED_TOKENS=<MAX_NUM_BATCHED_TOKENS value>

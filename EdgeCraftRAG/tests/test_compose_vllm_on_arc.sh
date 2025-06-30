@@ -38,6 +38,7 @@ CONTAINER_COUNT="single_container"
 LLM_MODEL=Qwen/Qwen2-7B-Instruct
 LLM_MODEL_PATH=$MODEL_PATH
 NGINX_CONFIG_PATH="$WORKPATH/nginx/nginx.conf"
+VLLM_IMAGE_TAG="0.8.3-b20"
 
 function build_docker_images() {
     opea_branch=${opea_branch:-"main"}
@@ -49,7 +50,7 @@ function build_docker_images() {
     popd && sleep 1s
 
     echo "Pull intelanalytics/ipex-llm-serving-xpu image"
-    docker pull intelanalytics/ipex-llm-serving-xpu:0.8.3-b18
+    docker pull intelanalytics/ipex-llm-serving-xpu:${VLLM_IMAGE_TAG}
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
     docker compose -f build.yaml build --no-cache > ${LOG_PATH}/docker_image_build.log
