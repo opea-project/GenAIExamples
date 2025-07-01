@@ -1,6 +1,6 @@
 # MultimodalQnA Application
 
-Multimodal question answering is the process of extracting insights from documents that contain a mix of text, images, videos, audio, and PDFs. It involves reasoning over both textual and non-textual content to answer user queries.
+Multimodal question answering is the process of extracting insights from documents that contains a mix of texts, images, videos, audios, and PDFs. It involves reasoning over both textual and non-textual contents to answer user queries.
 
 The MultimodalQnA framework enables this by leveraging the BridgeTower model, which encodes visual and textual data into a shared semantic space. During ingestion, it processes content and stores embeddings in a vector database. At query time, relevant multimodal segments are retrieved and passed to a vision-language model to generate responses in text or audio form.
 
