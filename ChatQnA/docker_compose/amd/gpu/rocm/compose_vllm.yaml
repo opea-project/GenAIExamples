@@ -24,7 +24,7 @@ services:
       REDIS_URL: ${CHATQNA_REDIS_URL}
       INDEX_NAME: ${CHATQNA_INDEX_NAME}
       TEI_ENDPOINT: ${CHATQNA_TEI_EMBEDDING_ENDPOINT}
-      HUGGINGFACEHUB_API_TOKEN: ${CHATQNA_HUGGINGFACEHUB_API_TOKEN}
+      HF_TOKEN: ${CHATQNA_HUGGINGFACEHUB_API_TOKEN}
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:5000/v1/health_check || exit 1"]
       interval: 10s
@@ -62,7 +62,7 @@ services:
       REDIS_URL: ${CHATQNA_REDIS_URL}
       INDEX_NAME: ${CHATQNA_INDEX_NAME}
       TEI_EMBEDDING_ENDPOINT: ${CHATQNA_TEI_EMBEDDING_ENDPOINT}
-      HUGGINGFACEHUB_API_TOKEN: ${CHATQNA_HUGGINGFACEHUB_API_TOKEN}
+      HF_TOKEN: ${CHATQNA_HUGGINGFACEHUB_API_TOKEN}
     restart: unless-stopped
 
   chatqna-tei-reranking-service:
@@ -77,7 +77,7 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      HUGGINGFACEHUB_API_TOKEN: ${CHATQNA_HUGGINGFACEHUB_API_TOKEN}
+      HF_TOKEN: ${CHATQNA_HUGGINGFACEHUB_API_TOKEN}
       HF_HUB_DISABLE_PROGRESS_BARS: 1
       HF_HUB_ENABLE_HF_TRANSFER: 0
     command: --model-id ${CHATQNA_RERANK_MODEL_ID} --auto-truncate
@@ -91,7 +91,6 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      HUGGINGFACEHUB_API_TOKEN: ${CHATQNA_HUGGINGFACEHUB_API_TOKEN}
       HF_TOKEN: ${CHATQNA_HUGGINGFACEHUB_API_TOKEN}
       HF_HUB_DISABLE_PROGRESS_BARS: 1
       HF_HUB_ENABLE_HF_TRANSFER: 0
