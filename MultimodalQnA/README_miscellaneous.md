@@ -6,8 +6,8 @@
 2. [Build UI Docker Image](#build-ui-docker-image)
 3. [Generate a HuggingFace Access Token](#generate-a-huggingface-access-token)
 4. [Troubleshooting](#troubleshooting)
-5. [Monitoring OPEA Services with Prometheus and Grafana Dashboard](#Monitoring OPEA Services with Prometheus and Grafana Dashboard)
-6. [Tracing with OpenTelemetry and Jaeger](#Tracing with OpenTelemetry and Jaeger)
+5. [Monitoring OPEA Services with Prometheus and Grafana Dashboard](#monitoring-opea-services-with-prometheus-and-grafana-dashboard)
+6. [Tracing with OpenTelemetry and Jaeger](#tracing-with-opentelemetry-and-jaeger)
 7. [Demo Screenshots](#demo-screenshots)
 
 ## Build MegaService Docker Image
@@ -56,7 +56,8 @@ Some HuggingFace resources, such as some models, are only accessible if the deve
 
 ## Monitoring OPEA Services with Prometheus and Grafana Dashboard
 
-OPEA microservice deployment can easily be monitored through Grafana dashboards using data collected via Prometheus. Follow the [README](https://github.com/opea-project/GenAIEval/blob/main/evals/benchmark/grafana/README.md) to setup Promet[text](assets/img)heus and Grafana servers and import dashboards to monitor the OPEA services.
+OPEA microservice deployment can easily be monitored through Grafana dashboards using data collected via Prometheus. Follow the [README](https://github.com/opea-project/GenAIEval/blob/main/evals/benchmark/grafana/README.md) to set up Prometheus and Grafana servers and import dashboards to monitor the OPEA services.
+
 
 ![example dashboards](./assets/img/example_dashboards.png)
 ![tgi dashboard](./assets/img/tgi_dashboard.png)
