@@ -6,7 +6,7 @@ source .set_env.sh
 popd > /dev/null
 
 export DB_NAME="opea"
-EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
+export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
 export RERANK_MODEL_ID="BAAI/bge-reranker-base"
 export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
 export LLM_MODEL_ID_CODEGEN="Intel/neural-chat-7b-v3-3"
@@ -25,7 +25,7 @@ export PROMPT_SERVICE_GET_ENDPOINT="http://${host_ip}:6018/v1/prompt/get"
 export PROMPT_SERVICE_CREATE_ENDPOINT="http://${host_ip}:6018/v1/prompt/create"
 export PROMPT_SERVICE_DELETE_ENDPOINT="http://${host_ip}:6018/v1/prompt/delete"
 export KEYCLOAK_SERVICE_ENDPOINT="http://${host_ip}:8080"
-export DocSum_COMPONENT_NAME="OpeaDocSumTgi"
+export DocSum_COMPONENT_NAME="OpeaDocSumvLLM"
 
 #Set no proxy
 export no_proxy="$no_proxy,tgi_service_codegen,llm_codegen,tei-embedding-service,tei-reranking-service,chatqna-xeon-backend-server,retriever,tgi-service,redis-vector-db,whisper,llm-docsum-tgi,docsum-xeon-backend-server,mongo,codegen"

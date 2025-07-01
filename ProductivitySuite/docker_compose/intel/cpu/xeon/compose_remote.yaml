@@ -143,7 +143,7 @@ services:
       no_proxy: ${no_proxy}
       https_proxy: ${https_proxy}
       http_proxy: ${http_proxy}
-      MEGA_SERVICE_HOST_IP: ${MEGA_SERVICE_HOST_IP}
+      MEGA_SERVICE_HOST_IP: ${host_ip}
       LLM_MODEL_ID: ${LLM_MODEL_ID}
       OPENAI_API_KEY: ${OPENAI_API_KEY}
       LLM_SERVICE_HOST_IP: ${REMOTE_ENDPOINT}
@@ -259,7 +259,7 @@ services:
       - no_proxy=${no_proxy}
       - https_proxy=${https_proxy}
       - http_proxy=${http_proxy}
-      - MEGA_SERVICE_HOST_IP=${MEGA_SERVICE_HOST_IP}
+      - MEGA_SERVICE_HOST_IP=${host_ip}
       - LLM_SERVICE_HOST_IP=llm-docsum-tgi
       - LLM_SERVICE_PORT=9000
       - ASR_SERVICE_HOST_IP=whisper
