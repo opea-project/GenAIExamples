@@ -135,8 +135,8 @@ export http_proxy=${http_proxy}
 export https_proxy=${https_proxy}
 ```
 
-> [!NOTE] > `SDK_BASE_URL` is the URL to your platform hosting API.
->
+> [!NOTE] 
+> `SDK_BASE_URL` is the URL to your platform hosting API.
 > `SERVING_TOKEN` is the authentication bearer token which is used in the `RequestHandler` class as `api_key`. 3rd party platforms can design their serving workflow API this way for user authentication. More details can be found under GenAIExamples/WorkflowExecAgent/tools/utils/handle_requests.py
 >
 > For more info on using these variables, refer to the example workflow API under GenAIExamples/WorkflowExecAgent/tests
