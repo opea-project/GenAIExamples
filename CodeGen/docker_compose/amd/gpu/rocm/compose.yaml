@@ -14,7 +14,6 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      HUGGING_FACE_HUB_TOKEN: ${CODEGEN_HUGGINGFACEHUB_API_TOKEN}
       HF_TOKEN: ${CODEGEN_HUGGINGFACEHUB_API_TOKEN}
       host_ip: ${HOST_IP}
     healthcheck:
