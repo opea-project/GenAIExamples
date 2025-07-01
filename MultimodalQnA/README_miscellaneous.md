@@ -58,7 +58,6 @@ Some HuggingFace resources, such as some models, are only accessible if the deve
 
 OPEA microservice deployment can easily be monitored through Grafana dashboards using data collected via Prometheus. Follow the [README](https://github.com/opea-project/GenAIEval/blob/main/evals/benchmark/grafana/README.md) to set up Prometheus and Grafana servers and import dashboards to monitor the OPEA services.
 
-
 ![example dashboards](./assets/img/example_dashboards.png)
 ![tgi dashboard](./assets/img/tgi_dashboard.png)
 
