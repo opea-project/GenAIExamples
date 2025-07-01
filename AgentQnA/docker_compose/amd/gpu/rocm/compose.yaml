@@ -13,7 +13,6 @@ services:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       TGI_LLM_ENDPOINT: "http://${ip_address}:${TGI_SERVICE_PORT}"
-      HUGGING_FACE_HUB_TOKEN: ${HF_TOKEN}
       HF_TOKEN: ${HF_TOKEN}
     shm_size: 32g
     devices:
