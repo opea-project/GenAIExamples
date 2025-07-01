@@ -66,17 +66,23 @@ source set_env.sh
 
 Note: The compose file might read additional variables from `set_env.sh`. Ensure all required variables like ports (LLM_SERVICE_PORT, TEI_EMBEDDER_PORT, etc.) are set if not using defaults from the compose file. For instance, edit the `set_env.sh` or overwrite LLM_MODEL_ID to change the LLM model.
 
-### [Optional] Running Models on a Remote Server
+### [Optional] Running LLM models with remote endpoints
 
-To run models on a remote server i.e. deployed using Intel® AI for Enterprise Inference, a base URL and an API key are required to access them. To run the Agent microservice on Xeon while using models deployed on a remote server, set additional environment variables shown below.
+When models are deployed on a remote server, a base URL and an API key are required to access them. To set up a remote server and acquire the base URL and API key, refer to [Intel® AI for Enterprise Inference](https://www.intel.com/content/www/us/en/products/docs/accelerator-engines/enterprise-ai.html) offerings.
+
+Set the following environment variables.
+
+- `REMOTE_ENDPOINT` is the HTTPS endpoint of the remote server with the model of choice (i.e. https://api.inference.denvrdata.com). **Note:** If not using LiteLLM, the second part of the model card needs to be appended to the URL i.e. `/Llama-3.3-70B-Instruct` from `meta-llama/Llama-3.3-70B-Instruct`.
+- `OPENAI_LLM_MODEL_ID` is the model card which may need to be overwritten depending on what it is set to `set_env.sh`.
 
 ```bash
-# Overwrite this environment variable previously set in set_env.sh with a new value for the desired model. The default value is gpt-4o-mini-2024-07-18.
-export OPENAI_LLM_MODEL_ID=<name-of-model-card>
-
-# The base URL given from the owner of the on-prem machine or cloud service provider. It will follow this format: "https://<DNS>". Here is an example: "https://api.inference.example.com".
-export REMOTE_ENDPOINT=<http-endpoint-of-remote-server>
+export REMOTE_ENDPOINT=<https-endpoint-of-remote-server>
+export OPENAI_LLM_MODEL_ID=<model-card>
 ```
+
+`OPENAI_API_KEY` should already be set in the previous step.
+
+After setting these environment variables, run `docker compose` by adding `compose_remote.yaml` as an additional YAML file in the [next step](#optional-option-2-deploy-with-docker-compose-for-models-on-a-remote-server).
 
 ### Start Services
 
