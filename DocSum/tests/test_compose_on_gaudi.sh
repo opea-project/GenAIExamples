@@ -328,33 +328,33 @@ function validate_megaservice_long_text() {
         "summary_type=truncate" \
         "stream=False"
 
-    # echo ">>> Checking long text data in form format, set summary_type=map_reduce"
-    # validate_service \
-    #     "${host_ip}:${BACKEND_SERVICE_PORT}/v1/docsum" \
-    #     "Intel" \
-    #     "docsum-gaudi-backend-server" \
-    #     "docsum-gaudi-backend-server" \
-    #     "media" "" \
-    #     "type=text" \
-    #     "messages=" \
-    #     "files=@$ROOT_FOLDER/data/long.txt" \
-    #     "max_tokens=128" \
-    #     "summary_type=map_reduce" \
-    #     "stream=False"
+    echo ">>> Checking long text data in form format, set summary_type=map_reduce"
+    validate_service \
+        "${host_ip}:${BACKEND_SERVICE_PORT}/v1/docsum" \
+        "Intel" \
+        "docsum-gaudi-backend-server" \
+        "docsum-gaudi-backend-server" \
+        "media" "" \
+        "type=text" \
+        "messages=" \
+        "files=@$ROOT_FOLDER/data/long.txt" \
+        "max_tokens=128" \
+        "summary_type=map_reduce" \
+        "stream=False"
 
-    # echo ">>> Checking long text data in form format, set summary_type=refine"
-    # validate_service \
-    #     "${host_ip}:${BACKEND_SERVICE_PORT}/v1/docsum" \
-    #     "Intel" \
-    #     "docsum-gaudi-backend-server" \
-    #     "docsum-gaudi-backend-server" \
-    #     "media" "" \
-    #     "type=text" \
-    #     "messages=" \
-    #     "files=@$ROOT_FOLDER/data/long.txt" \
-    #     "max_tokens=128" \
-    #     "summary_type=refine" \
-    #     "stream=False"
+    echo ">>> Checking long text data in form format, set summary_type=refine"
+    validate_service \
+        "${host_ip}:${BACKEND_SERVICE_PORT}/v1/docsum" \
+        "Intel" \
+        "docsum-gaudi-backend-server" \
+        "docsum-gaudi-backend-server" \
+        "media" "" \
+        "type=text" \
+        "messages=" \
+        "files=@$ROOT_FOLDER/data/long.txt" \
+        "max_tokens=128" \
+        "summary_type=refine" \
+        "stream=False"
 }
 
 function stop_docker() {
