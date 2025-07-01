@@ -11,7 +11,7 @@ x-common-environment:
 x-common-agent-environment:
   &common-agent-env
   <<: *common-env
-  HUGGINGFACEHUB_API_TOKEN: ${HF_TOKEN}
+  HF_TOKEN: ${HF_TOKEN}
   llm_endpoint_url: ${LLM_ENDPOINT}
   model: ${LLM_MODEL_ID}
   REDIS_URL_VECTOR: ${REDIS_URL_VECTOR}
@@ -33,7 +33,6 @@ services:
     environment:
       <<: *common-env
       HF_TOKEN: ${HF_TOKEN}
-      HUGGING_FACE_HUB_TOKEN: ${HF_TOKEN}
       HF_HOME: ./data
       HABANA_VISIBLE_DEVICES: all
       OMPI_MCA_btl_vader_single_copy_mechanism: none
@@ -119,7 +118,6 @@ services:
       TEI_EMBEDDING_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
       LLM_ENDPOINT: ${LLM_ENDPOINT}
       LLM_MODEL: ${LLM_MODEL_ID}
-      HUGGINGFACEHUB_API_TOKEN: ${HF_TOKEN}
       HF_TOKEN: ${HF_TOKEN}
       LOGFLAG: true
 

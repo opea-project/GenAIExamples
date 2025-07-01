@@ -91,7 +91,7 @@ function validate_microservices() {
         "tgi-gaudi" \
         "tgi-gaudi-server" \
         '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}'
-
+    sleep 5s
     # llm microservice
     validate_services \
         "${ip_address}:9000/v1/chat/completions" \

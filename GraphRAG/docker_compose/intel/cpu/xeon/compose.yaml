@@ -36,7 +36,7 @@ services:
       NO_PROXY: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      HUGGING_FACE_HUB_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HF_TOKEN: ${HF_TOKEN}
     ipc: host
     command: --model-id ${EMBEDDING_MODEL_ID} --auto-truncate
 
@@ -56,7 +56,7 @@ services:
       https_proxy: ${https_proxy}
       host_ip: ${host_ip}
       DATAPREP_COMPONENT_NAME: "OPEA_DATAPREP_NEO4J_LLAMAINDEX"
-      HUGGING_FACE_HUB_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HF_TOKEN: ${HF_TOKEN}
       NEO4J_URL: ${NEO4J_URL}
       NEO4J_USERNAME: ${NEO4J_USERNAME}
       NEO4J_PASSWORD: ${NEO4J_PASSWORD}
@@ -82,7 +82,7 @@ services:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       host_ip: ${host_ip}
-      HUGGING_FACE_HUB_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HF_TOKEN: ${HF_TOKEN}
       LOGFLAG: ${LOGFLAG}
       RETRIEVER_COMPONENT_NAME: "OPEA_RETRIEVER_NEO4J"
       # Embedding endpoint
@@ -122,7 +122,7 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HF_TOKEN: ${HF_TOKEN}
       LLM_MODEL_ID: ${FINAL_LLM_MODEL_ID}
       VLLM_TORCH_PROFILER_DIR: "/mnt"
       # Laptop environment variables
