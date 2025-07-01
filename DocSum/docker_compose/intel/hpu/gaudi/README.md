@@ -33,7 +33,9 @@ cd GenAIExamples/DocSum/docker_compose
 source intel/set_env.sh
 ```
 
-NOTE: by default vLLM does "warmup" at start, to optimize its performance for the specified model and the underlying platform, which can take long time. For development (and e.g. autoscaling) it can be skipped with `export VLLM_SKIP_WARMUP=true`.
+> NOTE: by default vLLM does "warmup" at start, to optimize its performance for the specified model and the underlying platform, which can take long time. For development (and e.g. autoscaling) it can be skipped with `export VLLM_SKIP_WARMUP=true`.
+
+> NOTE: If any port on your local machine is occupied (like `9000/8008/8888`, etc.), modify it in `set_env.sh`, then run `source set_env.sh` again.
 
 Checkout a released version, such as v1.3:
 

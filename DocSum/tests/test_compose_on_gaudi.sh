@@ -27,6 +27,12 @@ export MAX_SEQ_LEN_TO_CAPTURE=2048
 export MAX_INPUT_TOKENS=2048
 export MAX_TOTAL_TOKENS=4096
 
+# set service host and no_proxy
+export LLM_ENDPOINT="http://vllm-service:80"
+export LLM_SERVICE_HOST_IP="llm-docsum-vllm"
+export ASR_SERVICE_HOST_IP="whisper"
+export no_proxy=$no_proxy,$LLM_SERVICE_HOST_IP,$ASR_SERVICE_HOST_IP,"vllm-service"
+
 # Get the root folder of the current script
 ROOT_FOLDER=$(dirname "$(readlink -f "$0")")
 
@@ -54,7 +60,7 @@ function build_docker_images() {
 function start_services() {
     cd $WORKPATH/docker_compose/intel/hpu/gaudi
     docker compose -f compose.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
-    sleep 1m
+    sleep 2m
 }
 
 get_base64_str() {
