@@ -12,7 +12,6 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      HUGGINGFACEHUB_API_TOKEN: ${CODEGEN_HUGGINGFACEHUB_API_TOKEN}
       HF_TOKEN: ${CODEGEN_HUGGINGFACEHUB_API_TOKEN}
       HF_HUB_DISABLE_PROGRESS_BARS: 1
       HF_HUB_ENABLE_HF_TRANSFER: 0
@@ -53,7 +52,6 @@ services:
       https_proxy: ${https_proxy}
       LLM_ENDPOINT: ${CODEGEN_VLLM_ENDPOINT}
       LLM_MODEL_ID: ${CODEGEN_LLM_MODEL_ID}
-      HUGGINGFACEHUB_API_TOKEN: ${CODEGEN_HUGGINGFACEHUB_API_TOKEN}
       HF_TOKEN: ${CODEGEN_HUGGINGFACEHUB_API_TOKEN}
       LLM_COMPONENT_NAME: "OpeaTextGenService"
     restart: unless-stopped

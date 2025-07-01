@@ -11,7 +11,6 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      HUGGINGFACEHUB_API_TOKEN: ${DOCSUM_HUGGINGFACEHUB_API_TOKEN}
       HF_TOKEN: ${DOCSUM_HUGGINGFACEHUB_API_TOKEN}
       HF_HUB_DISABLE_PROGRESS_BARS: 1
       HF_HUB_ENABLE_HF_TRANSFER: 0
@@ -52,7 +51,7 @@ services:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       LLM_ENDPOINT: ${DOCSUM_LLM_ENDPOINT}
-      HUGGINGFACEHUB_API_TOKEN: ${DOCSUM_HUGGINGFACEHUB_API_TOKEN}
+      HF_TOKEN: ${DOCSUM_HUGGINGFACEHUB_API_TOKEN}
       MAX_INPUT_TOKENS: ${DOCSUM_MAX_INPUT_TOKENS}
       MAX_TOTAL_TOKENS: ${DOCSUM_MAX_TOTAL_TOKENS}
       LLM_MODEL_ID: ${DOCSUM_LLM_MODEL_ID}

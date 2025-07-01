@@ -14,8 +14,7 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      HUGGING_FACE_HUB_TOKEN: ${CODEGEN_HUGGINGFACEHUB_API_TOKEN}
-      HUGGINGFACEHUB_API_TOKEN: ${CODEGEN_HUGGINGFACEHUB_API_TOKEN}
+      HF_TOKEN: ${CODEGEN_HUGGINGFACEHUB_API_TOKEN}
       host_ip: ${HOST_IP}
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://${HOST_IP}:${CODEGEN_TGI_SERVICE_PORT:-8028}/health || exit 1"]
@@ -49,7 +48,6 @@ services:
       https_proxy: ${https_proxy}
       LLM_ENDPOINT: ${CODEGEN_TGI_LLM_ENDPOINT}
       LLM_MODEL_ID: ${CODEGEN_LLM_MODEL_ID}
-      HUGGINGFACEHUB_API_TOKEN: ${CODEGEN_HUGGINGFACEHUB_API_TOKEN}
       HF_TOKEN: ${CODEGEN_HUGGINGFACEHUB_API_TOKEN}
       LLM_COMPONENT_NAME: "OpeaTextGenService"
     restart: unless-stopped

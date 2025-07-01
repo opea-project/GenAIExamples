@@ -12,7 +12,7 @@ services:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       TGI_LLM_ENDPOINT: "http://${HOST_IP}:${DOCSUM_TGI_SERVICE_PORT}"
-      HUGGINGFACEHUB_API_TOKEN: ${DOCSUM_HUGGINGFACEHUB_API_TOKEN}
+      HF_TOKEN: ${DOCSUM_HUGGINGFACEHUB_API_TOKEN}
       host_ip: ${host_ip}
       DOCSUM_TGI_SERVICE_PORT: ${DOCSUM_TGI_SERVICE_PORT}
     volumes:
@@ -49,7 +49,7 @@ services:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       LLM_ENDPOINT: ${DOCSUM_TGI_LLM_ENDPOINT}
-      HUGGINGFACEHUB_API_TOKEN: ${DOCSUM_HUGGINGFACEHUB_API_TOKEN}
+      HF_TOKEN: ${DOCSUM_HUGGINGFACEHUB_API_TOKEN}
       MAX_INPUT_TOKENS: ${DOCSUM_MAX_INPUT_TOKENS}
       MAX_TOTAL_TOKENS: ${DOCSUM_MAX_TOTAL_TOKENS}
       LLM_MODEL_ID: ${DOCSUM_LLM_MODEL_ID}

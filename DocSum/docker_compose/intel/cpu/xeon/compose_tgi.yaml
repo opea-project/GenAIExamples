@@ -39,7 +39,6 @@ services:
       https_proxy: ${https_proxy}
       LLM_ENDPOINT: ${LLM_ENDPOINT}
       LLM_MODEL_ID: ${LLM_MODEL_ID}
-      HUGGINGFACEHUB_API_TOKEN: ${HF_TOKEN}
       HF_TOKEN: ${HF_TOKEN}
       MAX_INPUT_TOKENS: ${MAX_INPUT_TOKENS}
       MAX_TOTAL_TOKENS: ${MAX_TOTAL_TOKENS}
