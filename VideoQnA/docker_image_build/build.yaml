@@ -5,6 +5,8 @@ services:
   videoqna:
     build:
       args:
+        IMAGE_REPO: ${REGISTRY:-opea}
+        BASE_TAG: ${TAG:-latest}
         http_proxy: ${http_proxy}
         https_proxy: ${https_proxy}
         no_proxy: ${no_proxy}
@@ -23,7 +25,7 @@ services:
       dockerfile: comps/dataprep/src/Dockerfile
     extends: videoqna
     image: ${REGISTRY:-opea}/dataprep:${TAG:-latest}
-  embedding:
+  embedding-multimodal-clip:
     build:
       context: GenAIComps
       dockerfile: comps/third_parties/clip/src/Dockerfile
