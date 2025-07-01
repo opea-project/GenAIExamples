@@ -73,6 +73,13 @@ CPU example with Open Telemetry feature:
 docker compose -f compose.yaml -f compose.telemetry.yaml up -d
 ```
 
+To enable Xeon Optimization like AMX or Tensor Parallel for vLLM, compose.perf.yaml file need to be merged along with default compose.yaml file.  
+CPU example with optimized vLLM feature:
+
+```bash
+docker compose -f compose.yaml -f compose.perf.yaml up -d
+```
+
 **Note**: developers should build docker image from source when:
 
 - Developing off the git main branch (as the container's ports in the repo may be different from the published docker image).
