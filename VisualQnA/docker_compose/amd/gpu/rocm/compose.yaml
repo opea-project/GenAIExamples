@@ -13,7 +13,6 @@ services:
       https_proxy: ${https_proxy}
       TGI_LLM_ENDPOINT: "http://${HOST_IP}:${VISUALQNA_TGI_SERVICE_PORT}"
       HF_TOKEN: ${VISUALQNA_HUGGINGFACEHUB_API_TOKEN}
-      HUGGING_FACE_HUB_TOKEN: ${VISUALQNA_HUGGINGFACEHUB_API_TOKEN}
     volumes:
       - "${MODEL_CACHE:-./data}:/data"
     shm_size: 64g

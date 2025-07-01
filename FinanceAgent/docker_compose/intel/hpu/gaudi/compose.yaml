@@ -33,7 +33,6 @@ services:
     environment:
       <<: *common-env
       HF_TOKEN: ${HF_TOKEN}
-      HUGGING_FACE_HUB_TOKEN: ${HF_TOKEN}
       HF_HOME: ./data
       HABANA_VISIBLE_DEVICES: all
       OMPI_MCA_btl_vader_single_copy_mechanism: none

@@ -15,7 +15,6 @@ services:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       TGI_LLM_ENDPOINT: ${TRANSLATION_TGI_LLM_ENDPOINT}
-      HUGGING_FACE_HUB_TOKEN: ${TRANSLATION_HUGGINGFACEHUB_API_TOKEN}
       HF_TOKEN: ${TRANSLATION_HUGGINGFACEHUB_API_TOKEN}
       host_ip: ${host_ip}
     healthcheck:

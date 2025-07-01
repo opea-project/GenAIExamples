@@ -17,7 +17,6 @@ services:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       HF_TOKEN: ${SEARCH_HUGGINGFACEHUB_API_TOKEN}
-      HUGGING_FACE_HUB_TOKEN: ${SEARCH_HUGGINGFACEHUB_API_TOKEN}
     command: --model-id ${SEARCH_EMBEDDING_MODEL_ID} --auto-truncate
 
   search-embedding:
@@ -80,7 +79,6 @@ services:
       https_proxy: ${https_proxy}
       TEI_RERANKING_ENDPOINT: ${SEARCH_TEI_RERANKING_ENDPOINT}
       HF_TOKEN: ${SEARCH_HUGGINGFACEHUB_API_TOKEN}
-      HUGGING_FACE_HUB_TOKEN: ${SEARCH_HUGGINGFACEHUB_API_TOKEN}
     restart: unless-stopped
 
   search-tgi-service:
@@ -94,7 +92,6 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      HUGGING_FACE_HUB_TOKEN: ${SEARCH_HUGGINGFACEHUB_API_TOKEN}
       HF_TOKEN: ${SEARCH_HUGGINGFACEHUB_API_TOKEN}
     shm_size: 1g
     devices:
