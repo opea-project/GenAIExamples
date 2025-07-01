@@ -6,7 +6,9 @@
 2. [Build UI Docker Image](#build-ui-docker-image)
 3. [Generate a HuggingFace Access Token](#generate-a-huggingface-access-token)
 4. [Troubleshooting](#troubleshooting)
-5. [Demo Screenshots](#demo-screenshots)
+5. [Monitoring OPEA Services with Prometheus and Grafana Dashboar](#Monitoring OPEA Services with Prometheus and Grafana Dashboar)
+6. [Tracing with OpenTelemetry and Jaeger](#Tracing with OpenTelemetry and Jaeger)
+7. [Demo Screenshots](#demo-screenshots)
 
 ## Build MegaService Docker Image
 
