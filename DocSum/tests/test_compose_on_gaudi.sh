@@ -60,17 +60,7 @@ function build_docker_images() {
 function start_services() {
     cd $WORKPATH/docker_compose/intel/hpu/gaudi
     docker compose -f compose.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
-
-    n=0
-    until [[ "$n" -ge 200 ]]; do
-        echo "n=$n"
-        docker logs docsum-gaudi-vllm-service > ${LOG_PATH}/vllm_service_start.log
-        if grep -q "Warmup finished" ${LOG_PATH}/vllm_service_start.log; then
-            break
-        fi
-        sleep 5s
-        n=$((n+1))
-    done
+    sleep 1m
 }
 
 get_base64_str() {
