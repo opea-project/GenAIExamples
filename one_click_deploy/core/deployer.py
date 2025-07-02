@@ -588,7 +588,8 @@ class Deployer:
                 return False
 
             compose_up_cmd = " ".join(compose_base_cmd + ["up", "-d", "--remove-orphans"])
-
+            if self.example_name == "ChatQnA" and self.args.device == "gaudi":
+                compose_up_cmd = "source .env&&" + compose_up_cmd
             compose_dir = self._get_docker_compose_files()[0].parent
             local_env_dir = local_env_file.parent
 

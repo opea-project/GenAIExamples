@@ -19,7 +19,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  EXAMPLES: "CodeGen,AudioQnA,VisualQnA"
+  EXAMPLES: "ChatQnA,CodeGen,AudioQnA,VisualQnA"
 
 jobs:
   get-test-matrix:
