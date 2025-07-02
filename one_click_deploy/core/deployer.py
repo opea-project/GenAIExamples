@@ -307,10 +307,7 @@ class Deployer:
 
         self.args.do_check_env = click.confirm("Run environment check?", default=False, show_default=True)
 
-
-        self.args.do_update_images = click.confirm(
-            "Update images (build/push)?", default=False, show_default=True
-        )
+        self.args.do_update_images = click.confirm("Update images (build/push)?", default=False, show_default=True)
 
         self.args.build_images = False
         self.args.push_images = False
@@ -331,9 +328,9 @@ class Deployer:
                 if not self.args.setup_local_registry:
                     self.args.registry = click.prompt(
                         "     -> Enter the target remote registry URL (e.g., docker.io/myuser)",
-                        default="", show_default=False
+                        default="",
+                        show_default=False,
                     )
-
 
         self.args.do_test_connection = click.confirm(
             "Run connection tests after deployment?", default=False, show_default=True
