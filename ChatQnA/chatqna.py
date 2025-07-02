@@ -7,12 +7,7 @@ import logging
 import os
 import re
 
-# Configure logging
-logger = logging.getLogger(__name__)
-log_level = logging.DEBUG if os.getenv("LOGFLAG", "").lower() == "true" else logging.INFO
-logging.basicConfig(level=log_level, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
-
-from comps import MegaServiceEndpoint, MicroService, ServiceOrchestrator, ServiceRoleType, ServiceType
+from comps import MegaServiceEndpoint, MicroService, ServiceOrchestrator, ServiceRoleType, ServiceType, CustomLogger
 from comps.cores.mega.utils import handle_message
 from comps.cores.proto.api_protocol import (
     ChatCompletionRequest,
@@ -25,6 +20,10 @@ from comps.cores.proto.docarray import LLMParams, RerankerParms, RetrieverParms
 from fastapi import Request
 from fastapi.responses import StreamingResponse
 from langchain_core.prompts import PromptTemplate
+
+logger = CustomLogger(__name__)
+log_level = logging.DEBUG if os.getenv("LOGFLAG", "").lower() == "true" else logging.INFO
+logging.basicConfig(level=log_level, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 
 
 class ChatTemplate:
