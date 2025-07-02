@@ -119,7 +119,7 @@ This section walks you through a typical deployment session for the `ChatQnA` ex
 
     ```text
     Run environment check? [y/N]: y
-    Build images? [y/N]: n
+    Update images (build/push)?: n
     Run connection tests after deployment? [y/N]: y
     ```
 

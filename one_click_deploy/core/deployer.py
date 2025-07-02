@@ -306,22 +306,34 @@ class Deployer:
             setattr(self.args, param["name"], user_input)
 
         self.args.do_check_env = click.confirm("Run environment check?", default=False, show_default=True)
-        self.args.do_update_images = click.confirm("Build images?", default=False, show_default=True)
-        if self.args.do_update_images:
-            self.args.setup_local_registry = click.confirm(
-                "  -> Set up a local registry for this run? (creates 'localhost:5000' registry)",
-                default=False,
-                show_default=True,
-            )
-            self.args.build_images = click.confirm("  -> Build images?", default=False, show_default=True)
-            self.args.push_images = click.confirm("  -> Push images?", default=False, show_default=True)
 
-            if self.args.push_images and not self.args.setup_local_registry:
-                self.args.registry = click.prompt(
-                    "     Enter container registry URL (e.g., docker.io/myuser)", default="", show_default=False
+
+        self.args.do_update_images = click.confirm(
+            "Update images (build/push)?", default=False, show_default=True
+        )
+
+        self.args.build_images = False
+        self.args.push_images = False
+        self.args.setup_local_registry = False
+        self.args.registry = ""
+
+        if self.args.do_update_images:
+            self.args.build_images = click.confirm("  -> Build images locally?", default=True, show_default=True)
+
+            self.args.push_images = click.confirm("  -> Push images to a registry?", default=False, show_default=True)
+
+            if self.args.push_images:
+                self.args.setup_local_registry = click.confirm(
+                    "     -> Use a temporary local registry (localhost:5000) for this push?",
+                    default=False,
+                    show_default=True,
                 )
-            else:
-                self.args.registry = ""
+                if not self.args.setup_local_registry:
+                    self.args.registry = click.prompt(
+                        "     -> Enter the target remote registry URL (e.g., docker.io/myuser)",
+                        default="", show_default=False
+                    )
+
 
         self.args.do_test_connection = click.confirm(
             "Run connection tests after deployment?", default=False, show_default=True

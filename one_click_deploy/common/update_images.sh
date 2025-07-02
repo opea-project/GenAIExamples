@@ -91,6 +91,27 @@ get_service_list() {
                 echo "chatqna chatqna-ui llm-faqgen dataprep retriever nginx vllm"
             fi
             ;;
+        "CodeTrans")
+            if [[ "$device_name" == "gaudi" ]]; then
+                echo "codetrans codetrans-ui llm-textgen vllm-gaudi nginx"
+            else
+                echo "codetrans codetrans-ui llm-textgen vllm nginx"
+            fi
+            ;;
+        "VisualQnA")
+            if [[ "$device_name" == "gaudi" ]]; then
+                echo "visualqna visualqna-ui lvm nginx vllm-gaudi"
+            else
+                echo "visualqna visualqna-ui lvm nginx vllm"
+            fi
+            ;;
+        "AgentQnA")
+            if [[ "$device_name" == "gaudi" ]]; then
+                echo "agent agent-ui vllm-gaudi"
+            else
+                echo "agent agent-ui"
+            fi
+            ;;
         *)
             # Default to empty, which means docker-compose will process all services
             echo ""
@@ -98,206 +119,103 @@ get_service_list() {
     esac
 }
 
-# Build function for DocSum - includes custom pre-build steps
-build_docsum() {
-    local example_path=$1
-    local service_list=$2
+# --- Example-Specific Build Configurations ---
+# Defines the configurations for cloning prerequisite repositories.
+# A generic build function will use these settings.
+
+VLLM_FORK_VER="v0.6.6.post1+Gaudi-1.20.0"
+
+# Config for examples using vLLM v0.8.3
+declare -A VLLM_8_3_CONFIG=(
+    [clone_vllm]=true
+    [vllm_version]="v0.8.3"
+    [clone_vllm_fork]=true
+    [vllm_fork_version]="${VLLM_FORK_VER}"
+)
+
+# Config for examples using vLLM v0.9.0.1
+declare -A VLLM_9_0_1_CONFIG=(
+    [clone_vllm]=true
+    [vllm_version]="v0.9.0.1"
+    [clone_vllm_fork]=true
+    [vllm_fork_version]="${VLLM_FORK_VER}"
+)
+
+# Config for AgentQnA, which only needs vllm-fork
+declare -A AGENT_CONFIG=(
+    [clone_vllm]=false
+    [clone_vllm_fork]=true
+    [vllm_fork_version]="${VLLM_FORK_VER}"
+)
+
+# --- Generic Build Function ---
+# This single function handles the build process for any example,
+# using the configurations defined above.
+execute_build() {
+    local example_name=$1
+    local example_path=$2
+    local service_list=$3
+    # Use nameref to access the associative array by its name
+    declare -n config=$4
+
     local build_dir="${example_path}/docker_image_build"
-    log "INFO" "Executing custom build function for DocSum..."
+    log "INFO" "Executing generic build for ${example_name}..."
     cd "$build_dir"
 
-    log "INFO" "Cloning required repositories for DocSum..."
+    log "INFO" "Cloning required repositories for ${example_name}..."
+    # Always clone GenAIComps
     if [ ! -d "GenAIComps" ]; then
         git clone --depth 1 https://github.com/opea-project/GenAIComps.git
     else
         log "INFO" "GenAIComps directory already exists, skipping clone."
     fi
-    if [ ! -d "vllm" ]; then
-        git clone https://github.com/vllm-project/vllm.git
-        cd vllm
-        local vllm_ver="v0.8.3" # As per original script
-        log "INFO" "Checking out vLLM tag ${vllm_ver}"
-        git checkout ${vllm_ver} &> /dev/null
-        cd ..
-    else
-        log "INFO" "vllm directory already exists, skipping clone."
-    fi
-    if [ ! -d "vllm-fork" ]; then
-        git clone https://github.com/HabanaAI/vllm-fork.git && cd vllm-fork
-        VLLM_FORK_VER=v0.6.6.post1+Gaudi-1.20.0
-        git checkout ${VLLM_FORK_VER} &> /dev/null
-        cd ..
-    else
-        log "INFO" "vllm-fork directory already exists, skipping clone."
+
+    # Conditionally clone vllm based on config
+    if [[ ${config[clone_vllm]:-false} == true ]]; then
+        if [ ! -d "vllm" ]; then
+            git clone https://github.com/vllm-project/vllm.git
+            cd vllm
+            log "INFO" "Checking out vLLM tag ${config[vllm_version]}"
+            git checkout "${config[vllm_version]}" &> /dev/null
+            cd ..
+        else
+            log "INFO" "vllm directory already exists, skipping clone."
+        fi
     fi
 
-    log "INFO" "Building base image: comps-base (build-time only)"
-    pushd GenAIComps
-    docker build --no-cache -t ${REGISTRY}/comps-base:${TAG} --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
-    popd
-
-    log "INFO" "Starting build for specified DocSum services..."
-    docker compose -f build.yaml build ${service_list} --no-cache
-    cd - > /dev/null
-}
-
-# Build function for ChatQnA - standard build
-build_chatqna() {
-    local example_path=$1
-    local service_list=$2
-    local build_dir="${example_path}/docker_image_build"
-    log "INFO" "Executing standard build function for ChatQnA..."
-    cd "$build_dir"
-    log "INFO" "Starting build for ChatQnA services..."
-    docker compose -f build.yaml build ${service_list} --no-cache
-    cd - > /dev/null
-}
-
-# Build function for CodeTrans - standard build
-build_codetrans() {
-    local example_path=$1
-    local service_list=$2
-    local build_dir="${example_path}/docker_image_build"
-    log "INFO" "Executing standard build function for CodeTrans..."
-    cd "$build_dir"
-    log "INFO" "Starting build for CodeTrans services..."
-    docker compose -f build.yaml build ${service_list} --no-cache
-    cd - > /dev/null
-}
-
-# Build function for CodeGen - standard build
-build_codegen() {
-    local example_path=$1
-    local service_list=$2
-    local build_dir="${example_path}/docker_image_build"
-    log "INFO" "Executing custom build function for CodeGen..."
-    cd "$build_dir"
-
-    log "INFO" "Cloning required repositories for CodeGen..."
-    if [ ! -d "GenAIComps" ]; then
-        git clone --depth 1 https://github.com/opea-project/GenAIComps.git
-    else
-        log "INFO" "GenAIComps directory already exists, skipping clone."
-    fi
-    if [ ! -d "vllm" ]; then
-        git clone https://github.com/vllm-project/vllm.git
-        cd vllm
-        local vllm_ver="v0.9.0.1"
-        log "INFO" "Checking out vLLM tag ${vllm_ver}"
-        git checkout ${vllm_ver} &> /dev/null
-        cd ..
-    else
-        log "INFO" "vllm directory already exists, skipping clone."
-    fi
-    if [ ! -d "vllm-fork" ]; then
-        git clone https://github.com/HabanaAI/vllm-fork.git && cd vllm-fork
-        VLLM_FORK_VER=v0.6.6.post1+Gaudi-1.20.0
-        git checkout ${VLLM_FORK_VER} &> /dev/null
-        cd ..
-    else
-        log "INFO" "vllm-fork directory already exists, skipping clone."
+    # Conditionally clone vllm-fork based on config
+    if [[ ${config[clone_vllm_fork]:-false} == true ]]; then
+        if [ ! -d "vllm-fork" ]; then
+            git clone https://github.com/HabanaAI/vllm-fork.git && cd vllm-fork
+            log "INFO" "Checking out vllm-fork tag ${config[vllm_fork_version]}"
+            git checkout "${config[vllm_fork_version]}" &> /dev/null
+            cd ..
+        else
+            log "INFO" "vllm-fork directory already exists, skipping clone."
+        fi
     fi
 
     log "INFO" "Building base image: comps-base (build-time only)"
     pushd GenAIComps
-    docker build --no-cache -t ${REGISTRY}/comps-base:${TAG} --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
+    docker build --no-cache -t "${REGISTRY}/comps-base:${TAG}" \
+        --build-arg https_proxy="$https_proxy" \
+        --build-arg http_proxy="$http_proxy" \
+        -f Dockerfile .
     popd
 
-    log "INFO" "Starting build for specified DocSum services..."
+    log "INFO" "Starting build for specified ${example_name} services..."
     docker compose -f build.yaml build ${service_list} --no-cache
     cd - > /dev/null
 }
 
-# Build function for AudioQnA - standard build
-build_audioqna() {
-    local example_path=$1
-    local service_list=$2
-    local build_dir="${example_path}/docker_image_build"
-    log "INFO" "Executing custom build function for AudioQnA..."
-    cd "$build_dir"
-
-    log "INFO" "Cloning required repositories for AudioQnA..."
-    if [ ! -d "GenAIComps" ]; then
-        git clone --depth 1 https://github.com/opea-project/GenAIComps.git
-    else
-        log "INFO" "GenAIComps directory already exists, skipping clone."
-    fi
-    if [ ! -d "vllm" ]; then
-        git clone https://github.com/vllm-project/vllm.git
-        cd vllm
-        local vllm_ver="v0.9.0.1"
-        log "INFO" "Checking out vLLM tag ${vllm_ver}"
-        git checkout ${vllm_ver} &> /dev/null && cd ../
-    else
-        log "INFO" "vllm directory already exists, skipping clone."
-    fi
-    if [ ! -d "vllm-fork" ]; then
-        git clone https://github.com/HabanaAI/vllm-fork.git && cd vllm-fork
-        VLLM_FORK_VER="v0.6.6.post1+Gaudi-1.20.0"
-        git checkout ${VLLM_FORK_VER} &> /dev/null && cd ../
-    else
-        log "INFO" "vllm-fork directory already exists, skipping clone."
-    fi
-
-    log "INFO" "Building base image: comps-base (build-time only)"
-    pushd GenAIComps
-    docker build --no-cache -t ${REGISTRY}/comps-base:${TAG} --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
-    popd
-
-    log "INFO" "Starting build for specified DocSum services..."
-    docker compose -f build.yaml build ${service_list} --no-cache
-    cd - > /dev/null
-}
-
-# Build function for FaqGen - includes custom pre-build steps
-build_faqgen() {
-    local example_path=$1
-    local service_list=$2
-    local build_dir="${example_path}/docker_image_build"
-    log "INFO" "Executing custom build function for FaqGen..."
-    cd "$build_dir"
-
-    log "INFO" "Cloning required repositories for FaqGen..."
-    if [ ! -d "GenAIComps" ]; then
-        git clone --depth 1 https://github.com/opea-project/GenAIComps.git
-    else
-        log "INFO" "GenAIComps directory already exists, skipping clone."
-    fi
-    if [ ! -d "vllm" ]; then
-        git clone https://github.com/vllm-project/vllm.git
-        cd vllm
-        local vllm_ver="v0.8.3" # As per original script
-        log "INFO" "Checking out vLLM tag ${vllm_ver}"
-        git checkout ${vllm_ver} &> /dev/null
-        cd ..
-    else
-        log "INFO" "vllm directory already exists, skipping clone."
-    fi
-    if [ ! -d "vllm-fork" ]; then
-        git clone https://github.com/HabanaAI/vllm-fork.git && cd vllm-fork
-        VLLM_FORK_VER=v0.6.6.post1+Gaudi-1.20.0
-        git checkout ${VLLM_FORK_VER} &> /dev/null
-        cd ..
-    else
-        log "INFO" "vllm-fork directory already exists, skipping clone."
-    fi
-
-    log "INFO" "Building base image: comps-base (build-time only)"
-    pushd GenAIComps
-    docker build --no-cache -t ${REGISTRY}/comps-base:${TAG} --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
-    popd
-
-    log "INFO" "Starting build for specified DocSum services..."
-    docker compose -f build.yaml build ${service_list} --no-cache
-    cd - > /dev/null
-}
 
 # --- Build Dispatcher ---
-# This function calls the correct build function based on the example name.
+# This function selects the correct configuration and calls the generic build function.
 dispatch_build() {
     local example_name=$1
     local example_path=$2
     local device_name=$3
+    local config_name # This will hold the name of the config array
 
     section_header "Building Docker Images for ${example_name} on ${device_name}"
 
@@ -310,28 +228,21 @@ dispatch_build() {
     local service_list=$(get_service_list "$example_name" "$device_name")
 
     case "$example_name" in
-        "DocSum")
-            build_docsum "$example_path" "$service_list"
+        "DocSum"|"ChatQnA"|"CodeTrans"|"FaqGen"|"VisualQnA")
+            config_name="VLLM_8_3_CONFIG"
             ;;
-        "ChatQnA")
-            build_chatqna "$example_path" "$service_list"
+        "CodeGen"|"AudioQnA")
+            config_name="VLLM_9_0_1_CONFIG"
             ;;
-        "CodeTrans")
-            build_codetrans "$example_path" "$service_list"
-            ;;
-        "CodeGen")
-            build_codegen "$example_path" "$service_list"
-            ;;
-        "AudioQnA")
-            build_audioqna "$example_path" "$service_list"
-            ;;
-        "FaqGen")
-            build_faqgen "$example_path" "$service_list"
+        "AgentQnA")
+            config_name="AGENT_CONFIG"
             ;;
         *)
-            error_exit "No specific build function defined for example '${example_name}'. Please add it to the script."
+            error_exit "No build configuration defined for example '${example_name}'. Please add it to the script."
             ;;
     esac
+
+    execute_build "$example_name" "$example_path" "$service_list" "$config_name"
 
     log "OK" "Build process for ${example_name} completed successfully."
 }
@@ -402,16 +313,18 @@ get_example_path() {
             ;;
         *)
             # Standard case - example name matches directory name
-            example_path="${PROJECT_ROOT}/${EXAMPLE}"
+            example_path="${PROJECT_ROOT}/${example_name}"
             ;;
     esac
 
     if [ ! -d "${example_path}" ]; then
-        error_exit "Example directory not found: '$example_path'."
+        error_exit "Example directory not found for ${example_name}: '$example_path'."
     fi
 
     echo "${example_path}"
 }
+
+# --- Main Script Logic ---
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -462,7 +375,7 @@ section_header "Image Management Script Started"
 EXAMPLE_PATH=$(get_example_path "$EXAMPLE")
 
 log "INFO" "Project Root: ${PROJECT_ROOT}"
-log "INFO" "Selected Example: ${EXAMPLE}"
+log "INFO" "Selected Example: ${EXAMPLE} (Path: ${EXAMPLE_PATH})"
 log "INFO" "Target Device: ${DEVICE}"
 log "INFO" "Image Registry: ${REGISTRY:-'Not set'}"
 log "INFO" "Image Tag: ${TAG}"
