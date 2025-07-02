@@ -1,5 +1,27 @@
 # Workflow Executor Agent
 
+## Quick Start: Key Configuration Variables
+
+Before proceeding, here are some key configuration variables needed for the workflow executor agent.
+
+- **SDK_BASE_URL**: The URL to your platform workflow serving API.
+  
+  Example: `http://<your-server-ip>:5000/`
+  
+  This is where the agent will send workflow execution requests.
+
+- **SERVING_TOKEN**: The authentication bearer token which is used in the `RequestHandler` class as `api_key`. This is used for authenticating API requests. 3rd party platforms can design their serving workflow API this way for user authentication. 
+
+  More details can be found in the code [handle_requests.py](tools/utils/handle_requests.py#L23)
+  
+> **How to get these values:**
+> - If you are using the provided example workflow API, refer to the test [README.md](tests/README.md)
+> - For your own platform, refer to your API documentation or administrator for the correct values. If you are a platform provider you may refer to [Workflow Building Platform](#workflow-building-platform) section for prerequisites on setting up a serving workflow.
+
+For more info on using these variables, refer to the [Microservice Setup](#microservice-setup) section below on using the [Example Workflow API](tests/example_workflow/) for a working example.
+
+Set these variables in your environment before starting the service.
+
 ## Overview
 
 GenAI Workflow Executor Example showcases the capability to handle data/AI workflow operations via LangChain agents to execute custom-defined workflow-based tools. These workflow tools can be interfaced from any 3rd-party tools in the market (no-code/low-code/IDE) such as Alteryx, RapidMiner, Power BI, Intel Data Insight Automation which allows users to create complex data/AI workflow operations for different use-cases.
@@ -97,7 +119,7 @@ And finally here are the results from the microservice logs:
 
 ### Start Agent Microservice
 
-For an out-of-box experience there is an example workflow serving API service prepared for users under `tests/example_workflow` to interface with the SDK. This section will guide users on setting up this service as well. Users may modify the logic, add your own database etc for your own use-case.
+For an out-of-box experience there is an example workflow serving API service prepared for users under [Example Workflow API](tests/example_workflow/) to interface with the SDK. This section will guide users on setting up this service as well. Users may modify the logic, add your own database etc for your own use-case.
 
 There are 3 services needed for the setup:
 
@@ -120,26 +142,22 @@ Configure `GenAIExamples/WorkflowExecAgent/docker_compose/.env` file with the fo
 ```sh
 export wf_api_port=5000     # workflow serving API port to use
 export SDK_BASE_URL=http://$(hostname -I | awk '{print $1}'):${wf_api_port}/      # The workflow server will use this example workflow API url
-export SERVING_TOKEN=${SERVING_TOKEN}           # For example_workflow, can be empty
+export SERVING_TOKEN=${SERVING_TOKEN}           # Authentication token. For example_workflow test, can be empty as no authentication required.
+export ip_address=$(hostname -I | awk '{print $1}')
 export HF_TOKEN=${HF_TOKEN}
 export llm_engine=${llm_engine}
 export llm_endpoint_url=${llm_endpoint_url}
-export ip_address=$(hostname -I | awk '{print $1}')
-export model="mistralai/Mistral-7B-Instruct-v0.3"
-export recursion_limit=${recursion_limit}
-export temperature=0
-export max_new_tokens=1000
 export WORKDIR=${WORKDIR}
 export TOOLSET_PATH=$WORKDIR/GenAIExamples/WorkflowExecAgent/tools/
 export http_proxy=${http_proxy}
 export https_proxy=${https_proxy}
-```
 
-> [!NOTE]
-> `SDK_BASE_URL` is the URL to your platform hosting API.
-> `SERVING_TOKEN` is the authentication bearer token which is used in the `RequestHandler` class as `api_key`. 3rd party platforms can design their serving workflow API this way for user authentication. More details can be found under GenAIExamples/WorkflowExecAgent/tools/utils/handle_requests.py
->
-> For more info on using these variables, refer to the example workflow API under GenAIExamples/WorkflowExecAgent/tests
+# LLM variables
+export model="mistralai/Mistral-7B-Instruct-v0.3"
+export recursion_limit=${recursion_limit}
+export temperature=0
+export max_new_tokens=1000
+```
 
 Launch service by running the docker compose command.
 

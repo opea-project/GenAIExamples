@@ -10,9 +10,9 @@ Configure necessary variables as listed below. Replace the variables according t
 
 ```sh
 export SDK_BASE_URL=${SDK_BASE_URL}     # If unspecified, test script defaults to <ip_address>:<workflow_api_port>. Refer to api_server_url variable under GenAIExamples/WorkflowExecAgent/tests/test_compose_vllm_example_wf_on_xeon.sh.
-export SERVING_TOKEN=${SERVING_TOKEN}   # For example_workflow test, can be empty as no authentication required.
+export SERVING_TOKEN=${SERVING_TOKEN}   # For example workflow test, can be empty as no authentication required.
 export HF_TOKEN=${HF_TOKEN}
-export workflow_id=${workflow_id}       # workflow_id of the serving workflow
+export workflow_id=${workflow_id}       # workflow_id of the serving workflow. For example workflow can be left empty
 export vllm_port=${vllm_port}           # vllm serving port
 export ip_address=$(hostname -I | awk '{print $1}')
 export VLLM_CPU_OMP_THREADS_BIND=${VLLM_CPU_OMP_THREADS_BIND}
