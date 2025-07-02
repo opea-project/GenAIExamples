@@ -130,7 +130,6 @@ class Deployer:
             log_message("INFO", log_footer, to_console=False)
             log_message("OK", f"Diagnostic logs for K8s namespace '{ns}' saved to deployment.log")
 
-
     def _get_compose_command_base(self):
         """Constructs the base docker compose command with project and compose files."""
         if not self.project_name:
@@ -689,8 +688,15 @@ cd "{compose_dir.resolve()}"
                 return False
 
             cmd = [
-                "helm", "install", cfg["release_name"], cfg["helm"]["chart_oci"],
-                "--namespace", cfg["namespace"], "--create-namespace", "-f", str(local_values_file),
+                "helm",
+                "install",
+                cfg["release_name"],
+                cfg["helm"]["chart_oci"],
+                "--namespace",
+                cfg["namespace"],
+                "--create-namespace",
+                "-f",
+                str(local_values_file),
             ]
             try:
                 run_command(cmd, check=True)
@@ -715,8 +721,10 @@ cd "{compose_dir.resolve()}"
                 result = run_command(cmd_list, check=False, capture_output=True, display_cmd=True)
                 if result.returncode != 0:
                     log_message("ERROR", f"Docker Compose down command failed with exit code {result.returncode}.")
-                    if result.stdout: log_message("ERROR", f"  STDOUT: {result.stdout.strip()}")
-                    if result.stderr: log_message("ERROR", f"  STDERR: {result.stderr.strip()}")
+                    if result.stdout:
+                        log_message("ERROR", f"  STDOUT: {result.stdout.strip()}")
+                    if result.stderr:
+                        log_message("ERROR", f"  STDERR: {result.stderr.strip()}")
                 else:
                     log_message("OK", "Docker Compose services stopped and removed.")
                 if clear_local_config:
@@ -746,7 +754,9 @@ cd "{compose_dir.resolve()}"
             if getattr(self.args, "delete_namespace_on_clear", False):
                 log_message("INFO", f"Deleting namespace '{cfg['namespace']}' as requested.")
                 try:
-                    run_command(["kubectl", "delete", "namespace", cfg["namespace"], "--ignore-not-found=true"], check=True)
+                    run_command(
+                        ["kubectl", "delete", "namespace", cfg["namespace"], "--ignore-not-found=true"], check=True
+                    )
                     log_message("OK", f"Namespace '{cfg['namespace']}' deleted.")
                 except Exception as e:
                     log_message("ERROR", f"Failed to delete namespace: {e}")
