@@ -5,16 +5,17 @@
 Before proceeding, here are some key configuration variables needed for the workflow executor agent.
 
 - **SDK_BASE_URL**: The URL to your platform workflow serving API.
-  
+
   Example: `http://<your-server-ip>:5000/`
-  
+
   This is where the agent will send workflow execution requests.
 
-- **SERVING_TOKEN**: The authentication bearer token which is used in the `RequestHandler` class as `api_key`. This is used for authenticating API requests. 3rd party platforms can design their serving workflow API this way for user authentication. 
+- **SERVING_TOKEN**: The authentication bearer token which is used in the `RequestHandler` class as `api_key`. This is used for authenticating API requests. 3rd party platforms can design their serving workflow API this way for user authentication.
 
   More details can be found in the code [handle_requests.py](tools/utils/handle_requests.py#L23)
-  
+
 > **How to get these values:**
+>
 > - If you are using the provided example workflow API, refer to the test [README.md](tests/README.md)
 > - For your own platform, refer to your API documentation or administrator for the correct values. If you are a platform provider you may refer to [Workflow Building Platform](#workflow-building-platform) section for prerequisites on setting up a serving workflow.
 
