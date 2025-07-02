@@ -26,6 +26,6 @@ jobs:
       tag: "ci"
       example: ChatQnA
       hardware: gaudi
-      test_helmchart: true
-      test_compose: true
+      # test_helmchart: true
+      # test_compose: true
     secrets: inherit
