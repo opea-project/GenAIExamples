@@ -86,7 +86,7 @@ We remind you that when using a specific version of the code, you need to use th
 
   ```bash
   docker pull redis/redis-stack:7.2.0-v9
-  docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+  docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.7
   ```
 
   After the build, we check the list of images with the command:
@@ -102,7 +102,7 @@ We remind you that when using a specific version of the code, you need to use th
   - opea/vllm-rocm:latest
   - opea/agent:latest
   - redis/redis-stack:7.2.0-v9
-  - ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+  - ghcr.io/huggingface/text-embeddings-inference:cpu-1.7
   - opea/embedding:latest
   - opea/retriever:latest
   - opea/reranking:latest
@@ -113,7 +113,7 @@ We remind you that when using a specific version of the code, you need to use th
   - ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
   - opea/agent:latest
   - redis/redis-stack:7.2.0-v9
-  - ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+  - ghcr.io/huggingface/text-embeddings-inference:cpu-1.7
   - opea/embedding:latest
   - opea/retriever:latest
   - opea/reranking:latest
