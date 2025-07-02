@@ -25,7 +25,7 @@ jobs:
       registry: "opea"
       tag: "ci"
       example: ChatQnA
-      hardware: gaudi
-      # test_helmchart: true
-      # test_compose: true
+      hardware: xeon
+      test_helmchart: true
+      test_compose: true
     secrets: inherit

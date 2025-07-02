@@ -43,194 +43,193 @@ on:
         type: string
 jobs:
   test:
-    runs-on: ubuntu-latest
-    # ${ inputs.hardware }
+    runs-on: ${ inputs.hardware }
     continue-on-error: true
     steps:
       - name: Clean up Working Directory
         run: |
           echo "22222"
-      #     sudo rm -rf ${{github.workspace}}/* || true
+          sudo rm -rf ${{github.workspace}}/* || true
 
-      #     echo "Cleaning up containers using ports..."
-      #     cid=$(docker ps --format '{{.Names}} : {{.Ports}}' | grep -v ' : $' | grep -v 0.0.0.0:5000 | awk -F' : ' '{print $1}')
-      #     if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid && sleep 1s; fi
-      #     docker system prune -f
+          echo "Cleaning up containers using ports..."
+          cid=$(docker ps --format '{{.Names}} : {{.Ports}}' | grep -v ' : $' | grep -v 0.0.0.0:5000 | awk -F' : ' '{print $1}')
+          if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid && sleep 1s; fi
+          docker system prune -f
 
-      #     echo "Cleaning up images ..."
-      #     docker images --filter reference="*/*/*:latest" -q | xargs -r docker rmi && sleep 1s
-      #     docker images --filter reference="*/*:ci" -q | xargs -r docker rmi && sleep 1s
-      #     docker images --filter reference="*:5000/*/*" -q | xargs -r docker rmi && sleep 1s
-      #     docker images --filter reference="opea/comps-base" -q | xargs -r docker rmi && sleep 1s
-      #     docker images
+          echo "Cleaning up images ..."
+          docker images --filter reference="*/*/*:latest" -q | xargs -r docker rmi && sleep 1s
+          docker images --filter reference="*/*:ci" -q | xargs -r docker rmi && sleep 1s
+          docker images --filter reference="*:5000/*/*" -q | xargs -r docker rmi && sleep 1s
+          docker images --filter reference="opea/comps-base" -q | xargs -r docker rmi && sleep 1s
+          docker images
 
-      # - name: Checkout out Repo
-      #   uses: actions/checkout@v4
-      #   with:
-      #     ref: ${{ needs.get-test-case.outputs.CHECKOUT_REF }}
-      #     fetch-depth: 0
+      - name: Checkout out Repo
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.get-test-case.outputs.CHECKOUT_REF }}
+          fetch-depth: 0
 
-      # - name: Clean up container before test
-      #   shell: bash
-      #   run: |
-      #     docker ps
-      #     cd ${{ github.workspace }}/${{ inputs.example }}
-      #     export test_case=${{ matrix.test_case }}
-      #     export hardware=${{ inputs.hardware }}
-      #     bash ${{ github.workspace }}/.github/workflows/scripts/docker_compose_clean_up.sh "containers"
-      #     bash ${{ github.workspace }}/.github/workflows/scripts/docker_compose_clean_up.sh "ports"
-      #     docker ps
+      - name: Clean up container before test
+        shell: bash
+        run: |
+          docker ps
+          cd ${{ github.workspace }}/${{ inputs.example }}
+          export test_case=${{ matrix.test_case }}
+          export hardware=${{ inputs.hardware }}
+          bash ${{ github.workspace }}/.github/workflows/scripts/docker_compose_clean_up.sh "containers"
+          bash ${{ github.workspace }}/.github/workflows/scripts/docker_compose_clean_up.sh "ports"
+          docker ps
 
-      # - name: Log in DockerHub
-      #   uses: docker/login-action@v3.2.0
-      #   with:
-      #     username: ${{ secrets.DOCKERHUB_USER }}
-      #     password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Log in DockerHub
+        uses: docker/login-action@v3.2.0
+        with:
+          username: ${{ secrets.DOCKERHUB_USER }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # - name: get example id
-      #   run: |
-      #     case "${{ inputs.example }}" in
-      #       ChatQnA) echo "example_id=1" >> $GITHUB_ENV ;;
-      #       CodeTrans) echo "example_id=2" >> $GITHUB_ENV ;;
-      #       DocSum) echo "example_id=3" >> $GITHUB_ENV ;;
-      #       CodeGen) echo "example_id=4" >> $GITHUB_ENV ;;
-      #       AudioQnA) echo "example_id=5" >> $GITHUB_ENV ;;
-      #       VisualQnA) echo "example_id=6" >> $GITHUB_ENV ;;
-      #       FaqGen) echo "example_id=7" >> $GITHUB_ENV ;;
-      #       AgentQnA) echo "example_id=8" >> $GITHUB_ENV ;;
-      #       *) echo "example_id=0" >> $GITHUB_ENV ;;
-      #     esac
+      - name: get example id
+        run: |
+          case "${{ inputs.example }}" in
+            ChatQnA) echo "example_id=1" >> $GITHUB_ENV ;;
+            CodeTrans) echo "example_id=2" >> $GITHUB_ENV ;;
+            DocSum) echo "example_id=3" >> $GITHUB_ENV ;;
+            CodeGen) echo "example_id=4" >> $GITHUB_ENV ;;
+            AudioQnA) echo "example_id=5" >> $GITHUB_ENV ;;
+            VisualQnA) echo "example_id=6" >> $GITHUB_ENV ;;
+            FaqGen) echo "example_id=7" >> $GITHUB_ENV ;;
+            AgentQnA) echo "example_id=8" >> $GITHUB_ENV ;;
+            *) echo "example_id=0" >> $GITHUB_ENV ;;
+          esac
 
-      # - name: deploy docker and test
-      #   if: ${{ inputs.test_compose || inputs.tag == 'ci' }}
-      #   shell: bash
-      #   env:
-      #     HUGGINGFACEHUB_API_TOKEN: ${{ secrets.HF_TOKEN }}
-      #     HF_TOKEN: ${{ secrets.HF_TOKEN }}
-      #     GOOGLE_CSE_ID: ${{ secrets.GOOGLE_CSE_ID }}
-      #     GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
-      #     PINECONE_KEY: ${{ secrets.PINECONE_KEY }}
-      #     PINECONE_KEY_LANGCHAIN_TEST: ${{ secrets.PINECONE_KEY_LANGCHAIN_TEST }}
-      #     SDK_BASE_URL: ${{ secrets.SDK_BASE_URL }}
-      #     SERVING_TOKEN: ${{ secrets.SERVING_TOKEN }}
-      #     OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-      #     FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
-      #     FINANCIAL_DATASETS_API_KEY: ${{ secrets.FINANCIAL_DATASETS_API_KEY }}
-      #     IMAGE_REPO: ${{ inputs.registry }}
-      #     IMAGE_TAG: ${{ inputs.tag }}
-      #     opea_branch: ${{ inputs.opea_branch }}
-      #     example: ${{ inputs.example }}
-      #     hardware: gaudi
-      #     test_case: ${{ matrix.test_case }}
-      #     use_model_cache: ${{ inputs.use_model_cache }}
-      #   run: |
-      #     cd ${{ github.workspace }}/one_click_deploy
-      #     pip install -r requirements.txt
-      #     python3 one_click_deploy.py << INPUTS
-      #     1
-      #     1
-      #     docker
-      #     $hardware
-      #     $HF_TOKEN
-
-
-
-
-
-
-
-      #     y
-      #     y
-      #     y
-      #     y
-      #     y
-      #     y
-      #     Y
-      #     INPUTS
-
-      # - name: Clean up deployment
-      #   if: ${{ inputs.test_compose || inputs.tag == 'ci' }}
-      #   run: |
-      #     cd ${{ github.workspace }}/one_click_deploy
-
-      #     python3 one_click_deploy.py << INPUTS
-      #     1
-      #     2
-      #     docker
-      #     $hardware
-      #     Y
-      #     INPUTS
-
-      # - name: Publish docker pipeline artifact
-      #   if: ${{ !cancelled() }}
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: docker
-      #     path: ${{ github.workspace }}/docker-tests/*.log
-
-      # - name: deploy k8s and test
-      #   if: ${{ inputs.test_helmchart || inputs.tag == 'ci' }}
-      #   shell: bash
-      #   env:
-      #     HUGGINGFACEHUB_API_TOKEN: ${{ secrets.HF_TOKEN }}
-      #     HF_TOKEN: ${{ secrets.HF_TOKEN }}
-      #     GOOGLE_CSE_ID: ${{ secrets.GOOGLE_CSE_ID }}
-      #     GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
-      #     PINECONE_KEY: ${{ secrets.PINECONE_KEY }}
-      #     PINECONE_KEY_LANGCHAIN_TEST: ${{ secrets.PINECONE_KEY_LANGCHAIN_TEST }}
-      #     SDK_BASE_URL: ${{ secrets.SDK_BASE_URL }}
-      #     SERVING_TOKEN: ${{ secrets.SERVING_TOKEN }}
-      #     OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-      #     FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
-      #     FINANCIAL_DATASETS_API_KEY: ${{ secrets.FINANCIAL_DATASETS_API_KEY }}
-      #     IMAGE_REPO: ${{ inputs.registry }}
-      #     IMAGE_TAG: ${{ inputs.tag }}
-      #     opea_branch: ${{ inputs.opea_branch }}
-      #     example: ${{ inputs.example }}
-      #     hardware: gaudi
-      #     test_case: ${{ matrix.test_case }}
-      #     use_model_cache: ${{ inputs.use_model_cache }}
-      #   run: |
-      #     cd ${{ github.workspace }}/one_click_deploy
-      #     pip install -r requirements.txt
-      #     python3 one_click_deploy.py << INPUTS
-      #     1
-      #     1
-      #     k8s
-      #     $hardware
-      #     $HF_TOKEN
+      - name: deploy docker and test
+        if: ${{ inputs.test_compose || inputs.tag == 'ci' }}
+        shell: bash
+        env:
+          HUGGINGFACEHUB_API_TOKEN: ${{ secrets.HF_TOKEN }}
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          GOOGLE_CSE_ID: ${{ secrets.GOOGLE_CSE_ID }}
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          PINECONE_KEY: ${{ secrets.PINECONE_KEY }}
+          PINECONE_KEY_LANGCHAIN_TEST: ${{ secrets.PINECONE_KEY_LANGCHAIN_TEST }}
+          SDK_BASE_URL: ${{ secrets.SDK_BASE_URL }}
+          SERVING_TOKEN: ${{ secrets.SERVING_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
+          FINANCIAL_DATASETS_API_KEY: ${{ secrets.FINANCIAL_DATASETS_API_KEY }}
+          IMAGE_REPO: ${{ inputs.registry }}
+          IMAGE_TAG: ${{ inputs.tag }}
+          opea_branch: ${{ inputs.opea_branch }}
+          example: ${{ inputs.example }}
+          hardware: gaudi
+          test_case: ${{ matrix.test_case }}
+          use_model_cache: ${{ inputs.use_model_cache }}
+        run: |
+          cd ${{ github.workspace }}/one_click_deploy
+          pip install -r requirements.txt
+          python3 one_click_deploy.py << INPUTS
+          1
+          1
+          docker
+          $hardware
+          $HF_TOKEN
 
 
 
 
 
 
-      #     y
-      #     y
-      #     y
-      #     y
-      #     y
-      #     y
 
-      #     Y
-      #     INPUTS
+          y
+          y
+          y
+          y
+          y
+          y
+          Y
+          INPUTS
 
-      # - name: Clean up deployment
-      #   if: ${{ inputs.test_helmchart || inputs.tag == 'ci' }}
-      #   run: |
-      #     cd ${{ github.workspace }}/one_click_deploy
+      - name: Clean up deployment
+        if: ${{ inputs.test_compose || inputs.tag == 'ci' }}
+        run: |
+          cd ${{ github.workspace }}/one_click_deploy
 
-      #     python3 one_click_deploy.py << INPUTS
-      #     1
-      #     2
-      #     k8s
-      #     y
-      #     Y
-      #     INPUTS
+          python3 one_click_deploy.py << INPUTS
+          1
+          2
+          docker
+          $hardware
+          Y
+          INPUTS
 
-      # - name: Publish k8s pipeline artifact
-      #   if: ${{ !cancelled() }}
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: k8s
-      #     path: ${{ github.workspace }}/k8s-tests/*.log
+      - name: Publish docker pipeline artifact
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker
+          path: ${{ github.workspace }}/docker-tests/*.log
+
+      - name: deploy k8s and test
+        if: ${{ inputs.test_helmchart || inputs.tag == 'ci' }}
+        shell: bash
+        env:
+          HUGGINGFACEHUB_API_TOKEN: ${{ secrets.HF_TOKEN }}
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          GOOGLE_CSE_ID: ${{ secrets.GOOGLE_CSE_ID }}
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          PINECONE_KEY: ${{ secrets.PINECONE_KEY }}
+          PINECONE_KEY_LANGCHAIN_TEST: ${{ secrets.PINECONE_KEY_LANGCHAIN_TEST }}
+          SDK_BASE_URL: ${{ secrets.SDK_BASE_URL }}
+          SERVING_TOKEN: ${{ secrets.SERVING_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
+          FINANCIAL_DATASETS_API_KEY: ${{ secrets.FINANCIAL_DATASETS_API_KEY }}
+          IMAGE_REPO: ${{ inputs.registry }}
+          IMAGE_TAG: ${{ inputs.tag }}
+          opea_branch: ${{ inputs.opea_branch }}
+          example: ${{ inputs.example }}
+          hardware: gaudi
+          test_case: ${{ matrix.test_case }}
+          use_model_cache: ${{ inputs.use_model_cache }}
+        run: |
+          cd ${{ github.workspace }}/one_click_deploy
+          pip install -r requirements.txt
+          python3 one_click_deploy.py << INPUTS
+          1
+          1
+          k8s
+          $hardware
+          $HF_TOKEN
+
+
+
+
+
+
+          y
+          y
+          y
+          y
+          y
+          y
+
+          Y
+          INPUTS
+
+      - name: Clean up deployment
+        if: ${{ inputs.test_helmchart || inputs.tag == 'ci' }}
+        run: |
+          cd ${{ github.workspace }}/one_click_deploy
+
+          python3 one_click_deploy.py << INPUTS
+          1
+          2
+          k8s
+          y
+          Y
+          INPUTS
+
+      - name: Publish k8s pipeline artifact
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: k8s
+          path: ${{ github.workspace }}/k8s-tests/*.log
