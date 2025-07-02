@@ -5,6 +5,7 @@ import os
 import pathlib
 import shutil
 import stat
+import subprocess
 import tempfile
 import time
 
@@ -589,24 +590,32 @@ class Deployer:
             compose_up_cmd = " ".join(compose_base_cmd + ["up", "-d", "--remove-orphans"])
 
             compose_dir = self._get_docker_compose_files()[0].parent
+            local_env_dir = local_env_file.parent
             script_content = f"""#!/bin/bash
 set -e
 echo "Sourcing environment from: {local_env_file.resolve()}"
+cd "{local_env_dir.resolve()}"
 source "{local_env_file.resolve()}"
-echo "Executing command: {compose_up_cmd}"
+echo "Changing directory to: {compose_dir.resolve()}"
 cd "{compose_dir.resolve()}"
-{compose_up_cmd}
-"""
+echo "Executing command: {compose_up_cmd}"
+            {compose_up_cmd}
+            """
             temp_script_path = None
+
             try:
                 with tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".sh", dir=".") as f:
                     f.write(script_content)
                     temp_script_path = f.name
                 os.chmod(temp_script_path, stat.S_IRWXU)
-                run_command(["/bin/bash", temp_script_path], check=True)
+
+                run_command(["/bin/bash", temp_script_path], check=True, capture_output=True)
                 return True
+            except subprocess.CalledProcessError as e:
+                log_message("ERROR", "Deployment script failed to execute. See detailed logs above.")
+                return False
             except Exception as e:
-                log_message("ERROR", f"Docker Compose deployment failed: {e}")
+                log_message("ERROR", f"An unexpected error occurred during Docker Compose deployment: {e}")
                 return False
             finally:
                 if temp_script_path and os.path.exists(temp_script_path):
