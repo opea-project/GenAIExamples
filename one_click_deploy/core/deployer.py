@@ -591,25 +591,32 @@ class Deployer:
 
             compose_dir = self._get_docker_compose_files()[0].parent
             local_env_dir = local_env_file.parent
+
             script_content = f"""#!/bin/bash
 set -e
+# Add a trap to report errors with line numbers
+trap 'echo "ERROR: A command failed at line $LINENO. Exiting." >&2' ERR
+
 echo "Sourcing environment from: {local_env_file.resolve()}"
 cd "{local_env_dir.resolve()}"
 source "{local_env_file.resolve()}"
+echo "--- Environment sourced successfully ---"
+
 echo "Changing directory to: {compose_dir.resolve()}"
 cd "{compose_dir.resolve()}"
-echo "Executing command: {compose_up_cmd}"
-            {compose_up_cmd}
-            """
-            temp_script_path = None
+echo "--- Directory changed successfully ---"
 
+echo "Executing command: {compose_up_cmd}"
+{compose_up_cmd}
+"""
+            temp_script_path = None
             try:
                 with tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".sh", dir=".") as f:
                     f.write(script_content)
                     temp_script_path = f.name
                 os.chmod(temp_script_path, stat.S_IRWXU)
 
-                run_command(["/bin/bash", temp_script_path], check=True, capture_output=True)
+                run_command(["/bin/bash", temp_script_path], check=True, stream_output=True)
                 return True
             except subprocess.CalledProcessError as e:
                 log_message("ERROR", "Deployment script failed to execute. See detailed logs above.")

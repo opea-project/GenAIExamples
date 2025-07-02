@@ -80,11 +80,20 @@ def section_header(title):
     logging.info(header, extra={"skip_console_handler": True})
 
 
-def run_command(cmd_list, cwd=None, env=None, check=True, capture_output=False, display_cmd=True):
+def run_command(
+    cmd_list, cwd=None, env=None, check=True, capture_output=False, display_cmd=True, stream_output=False
+):
     """Executes a shell command with logging and error handling.
 
     This function is secured by disallowing shell=True.
+    - stream_output=True: Will print command output in real-time. In this mode,
+                          the function does not return stdout/stderr.
+    - capture_output=True: Will capture stdout/stderr and return them in the result object.
+                           Cannot be used with stream_output=True.
     """
+    if stream_output and capture_output:
+        raise ValueError("stream_output and capture_output cannot be used together.")
+
     if not isinstance(cmd_list, list):
         log_message("ERROR", "Security: run_command requires commands to be a list.")
         raise TypeError("cmd_list must be a list of strings")
@@ -96,6 +105,47 @@ def run_command(cmd_list, cwd=None, env=None, check=True, capture_output=False, 
     process_env = os.environ.copy()
     if env:
         process_env.update(env)
+
+    if stream_output:
+        try:
+            process = subprocess.Popen(
+                cmd_list,
+                cwd=cwd,
+                env=process_env,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                text=True,
+                bufsize=1,
+            )
+
+            # Read and print output line by line
+            with process.stdout:
+                for line in iter(process.stdout.readline, ""):
+                    # Print directly to console without log prefix for clean docker-compose output
+                    print(line, end="")
+                    # Also write to the main log file
+                    logging.info(line.strip(), extra={"skip_console_handler": True})
+
+            process.wait(timeout=1800)  # Wait for the process to finish
+
+            if check and process.returncode != 0:
+                # Create a CalledProcessError manually for consistent exception handling
+                raise subprocess.CalledProcessError(process.returncode, cmd_list)
+
+            return subprocess.CompletedProcess(cmd_list, process.returncode)
+
+        except subprocess.TimeoutExpired as e:
+            log_message("ERROR", f"Command timed out after 1800 seconds: {cmd_list}")
+            process.kill()
+            process.communicate()
+            if check:
+                raise
+            return e
+        except Exception as e:
+            log_message("ERROR", f"An unexpected error occurred during command streaming: {e}")
+            if check:
+                raise
+            return e
 
     try:
         result = subprocess.run(
@@ -116,9 +166,10 @@ def run_command(cmd_list, cwd=None, env=None, check=True, capture_output=False, 
     except subprocess.CalledProcessError as e:
         log_message("ERROR", f"Command failed with exit code {e.returncode}: {cmd_list}")
         if e.stdout:
-            log_message("ERROR", f"Stdout: {e.stdout.strip()}")
+            # When capture_output is True, this contains the output.
+            log_message("ERROR", f"Stdout:\n{e.stdout.strip()}")
         if e.stderr:
-            log_message("ERROR", f"Stderr: {e.stderr.strip()}")
+            log_message("ERROR", f"Stderr:\n{e.stderr.strip()}")
         if check:
             raise
         return e
@@ -127,7 +178,6 @@ def run_command(cmd_list, cwd=None, env=None, check=True, capture_output=False, 
         if check:
             raise
         return e
-
 
 def command_exists(cmd):
     return shutil.which(cmd) is not None
