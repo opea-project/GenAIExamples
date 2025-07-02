@@ -43,12 +43,12 @@ on:
         type: string
 jobs:
   test:
-    runs-on: ${ inputs.hardware }
+    runs-on: ubuntu-latest  #${ inputs.hardware }
     continue-on-error: true
     steps:
       - name: Clean up Working Directory
         run: |
-          echo "22222"
+          echo "${ inputs.hardware }"
           sudo rm -rf ${{github.workspace}}/* || true
 
           echo "Cleaning up containers using ports..."
