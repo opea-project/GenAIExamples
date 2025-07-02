@@ -42,7 +42,29 @@ on:
         required: false
         type: string
 jobs:
-  test:
+  get-example-id:
+    runs-on: ubuntu-latest
+    outputs:
+      example_id: ${{ steps.get-example-id.outputs.example_id }}
+    steps:
+      - name: Get example id
+        id: get-example-id
+        run: |
+          case "${{ inputs.example }}" in
+            ChatQnA) echo "example_id=1" >> $GITHUB_OUTPUT ;;
+            CodeTrans) echo "example_id=2" >> $GITHUB_OUTPUT ;;
+            DocSum) echo "example_id=3" >> $GITHUB_OUTPUT ;;
+            CodeGen) echo "example_id=4" >> $GITHUB_OUTPUT ;;
+            AudioQnA) echo "example_id=5" >> $GITHUB_OUTPUT ;;
+            VisualQnA) echo "example_id=6" >> $GITHUB_OUTPUT ;;
+            FaqGen) echo "example_id=7" >> $GITHUB_OUTPUT ;;
+            AgentQnA) echo "example_id=8" >> $GITHUB_OUTPUT ;;
+            *) echo "example_id=0" >> $GITHUB_OUTPUT ;;
+          esac
+
+  compose-test:
+    if: ${{ inputs.test_compose || inputs.tag == 'ci' }}
+    needs: [get-example-id]
     runs-on: ${{ inputs.hardware }}
     continue-on-error: true
     steps:
@@ -85,22 +107,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USER }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: get example id
-        run: |
-          case "${{ inputs.example }}" in
-            ChatQnA) echo "example_id=1" >> $GITHUB_ENV ;;
-            CodeTrans) echo "example_id=2" >> $GITHUB_ENV ;;
-            DocSum) echo "example_id=3" >> $GITHUB_ENV ;;
-            CodeGen) echo "example_id=4" >> $GITHUB_ENV ;;
-            AudioQnA) echo "example_id=5" >> $GITHUB_ENV ;;
-            VisualQnA) echo "example_id=6" >> $GITHUB_ENV ;;
-            FaqGen) echo "example_id=7" >> $GITHUB_ENV ;;
-            AgentQnA) echo "example_id=8" >> $GITHUB_ENV ;;
-            *) echo "example_id=0" >> $GITHUB_ENV ;;
-          esac
-
       - name: deploy docker and test
-        if: ${{ inputs.test_compose || inputs.tag == 'ci' }}
         shell: bash
         env:
           HUGGINGFACEHUB_API_TOKEN: ${{ secrets.HF_TOKEN }}
@@ -123,20 +130,20 @@ jobs:
           use_model_cache: ${{ inputs.use_model_cache }}
         run: |
           cd ${{ github.workspace }}/one_click_deploy
-          pip install -r requirements.txt
+          python3 -m pip install -r requirements.txt
+          
+          if [ "${{ needs.get-example-id.outputs.example_id }}" -eq 1 ]; then
+            empty_lines="7"
+          else
+            empty_lines="4"
+          fi
           python3 one_click_deploy.py << INPUTS
-          1
+          ${{ needs.get-example-id.outputs.example_id }}
           1
           docker
           $hardware
           $HF_TOKEN
-
-
-
-
-
-
-
+          for i in $(seq 1 $empty_lines); do echo -e ""; done
           N
           y
           y
@@ -147,12 +154,11 @@ jobs:
           INPUTS
 
       - name: Clean up deployment
-        if: ${{ inputs.test_compose || inputs.tag == 'ci' }}
         run: |
           cd ${{ github.workspace }}/one_click_deploy
 
           python3 one_click_deploy.py << INPUTS
-          1
+          ${{ needs.get-example-id.outputs.example_id }}
           2
           docker
           $hardware
@@ -166,8 +172,25 @@ jobs:
           name: docker
           path: ${{ github.workspace }}/docker-tests/*.log
 
+
+  k8s-test:
+    if: ${{ inputs.test_helmchart || inputs.tag == 'ci' }}
+    needs: [get-example-id] 
+    runs-on: k8s-${{ inputs.hardware }}
+    continue-on-error: true
+    steps:
+      - name: Clean Up Working Directory
+        run: |
+          echo "value_file=${{ matrix.value_file }}"
+          sudo rm -rf ${{github.workspace}}/*
+
+      - name: Checkout out Repo
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.get-test-case.outputs.CHECKOUT_REF }}
+          fetch-depth: 0
+
       - name: deploy k8s and test
-        if: ${{ inputs.test_helmchart || inputs.tag == 'ci' }}
         shell: bash
         env:
           HUGGINGFACEHUB_API_TOKEN: ${{ secrets.HF_TOKEN }}
@@ -190,19 +213,19 @@ jobs:
           use_model_cache: ${{ inputs.use_model_cache }}
         run: |
           cd ${{ github.workspace }}/one_click_deploy
-          pip install -r requirements.txt
+          python3 -m pip install -r requirements.txt
+          if [ "${{ needs.get-example-id.outputs.example_id }}" -eq 1 ]; then
+            empty_lines="6"
+          else
+            empty_lines="4"
+          fi
           python3 one_click_deploy.py << INPUTS
-          1
+          ${{ needs.get-example-id.outputs.example_id }}
           1
           k8s
           $hardware
           $HF_TOKEN
-
-
-
-
-
-
+          for i in $(seq 1 $empty_lines); do echo -e ""; done
           N
           y
           y
@@ -214,19 +237,17 @@ jobs:
           INPUTS
 
       - name: Clean up deployment
-        if: ${{ inputs.test_helmchart || inputs.tag == 'ci' }}
         run: |
           cd ${{ github.workspace }}/one_click_deploy
-
           python3 one_click_deploy.py << INPUTS
-          1
+          ${{ needs.get-example-id.outputs.example_id }}
           2
           k8s
           y
           Y
           INPUTS
 
-      - name: Publish k8s pipeline artifact
+      - name: Publish pipeline artifact
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
