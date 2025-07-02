@@ -26,7 +26,7 @@ function build_vllm_docker_image() {
     else
         cd ./vllm
     fi
-    docker build -f Dockerfile.cpu -t vllm-cpu-env --shm-size=100g .
+    docker build -f docker/Dockerfile.cpu -t vllm-cpu-env --shm-size=100g .
     if [ $? -ne 0 ]; then
         echo "opea/vllm:cpu failed"
         exit 1
@@ -37,15 +37,20 @@ function build_vllm_docker_image() {
 
 function start_vllm_service() {
     echo "start vllm service"
+    export VLLM_SKIP_WARMUP=true
     docker run -d -p ${vllm_port}:${vllm_port} --rm --network=host --name test-comps-vllm-service -v ~/.cache/huggingface:/root/.cache/huggingface -v ${WORKPATH}/tests/tool_chat_template_mistral_custom.jinja:/root/tool_chat_template_mistral_custom.jinja -e HF_TOKEN=$HF_TOKEN -e http_proxy=$http_proxy -e https_proxy=$https_proxy -it vllm-cpu-env --model ${model} --port ${vllm_port} --chat-template /root/tool_chat_template_mistral_custom.jinja --enable-auto-tool-choice --tool-call-parser mistral
     echo ${LOG_PATH}/vllm-service.log
-    sleep 5s
+    sleep 10s
     echo "Waiting vllm ready"
     n=0
     until [[ "$n" -ge 100 ]] || [[ $ready == true ]]; do
+        docker logs test-comps-vllm-service
+        if docker logs test-comps-vllm-service| grep "Error response from daemon: No such container:"; then
+            exit 1
+        fi
         docker logs test-comps-vllm-service &> ${LOG_PATH}/vllm-service.log
         n=$((n+1))
-        if grep -q "Uvicorn running on" ${LOG_PATH}/vllm-service.log; then
+        if grep -q "Application startup complete." ${LOG_PATH}/vllm-service.log; then
             break
         fi
         if grep -q "No such container" ${LOG_PATH}/vllm-service.log; then

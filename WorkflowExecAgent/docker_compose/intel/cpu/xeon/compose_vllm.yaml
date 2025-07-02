@@ -9,7 +9,7 @@ services:
       - ${WORKDIR}/GenAIComps/comps/agent/src/:/home/user/comps/agent/src/
       - ${TOOLSET_PATH}:/home/user/tools/
     ports:
-      - "9090:9090"
+      - "9091:9090"
     ipc: host
     environment:
       ip_address: ${ip_address}

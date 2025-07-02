@@ -3,12 +3,23 @@
 
 import time
 
-from tools.sdk import EasyDataSDK
+from tools.sdk import DataInsightAutomationSDK
 
 
 def workflow_executor(params, workflow_id: int) -> dict:
-    sdk = EasyDataSDK()
-    workflow = sdk.create_workflow(workflow_id)
+    """Workflow executor tool. Runs a workflow and returns the result.
+
+    :param int workflow_id: Servable workflow id.
+
+    :returns: workflow output results
+
+    :rtype: dict
+    """
+
+    # Replace function logic with use-case
+
+    sdk = DataInsightAutomationSDK()  # Initialize SDK instance
+    workflow = sdk.create_workflow(workflow_id)  # Create workflow instance object
 
     params = {key: str(val) for key, val in params.items()}
     start_workflow = workflow.start(params)
@@ -33,7 +44,7 @@ def workflow_executor(params, workflow_id: int) -> dict:
         if workflow_status == "failed" or workflow_status == "finished":
             break
         else:
-            time.sleep(100)  # interval between each status checking retry
+            time.sleep(100)  # interval between each status check retry
             num_retry += 1
 
     if workflow_status == "finished":
