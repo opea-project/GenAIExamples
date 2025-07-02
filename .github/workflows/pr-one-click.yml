@@ -18,13 +18,33 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+env:
+  EXAMPLES: "CodeGen,AudioQnA,VisualQnA"
+
 jobs:
+  get-test-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      examples: ${{ steps.get-matrix.outputs.examples }}
+    steps:
+      - name: Create Matrix
+        id: get-matrix
+        run: |
+          examples=($(echo ${EXAMPLES} | tr ',' ' '))
+          examples_json=$(printf '%s\n' "${examples[@]}" | sort -u | jq -R '.' | jq -sc '.')
+          echo "examples=$examples_json" >> $GITHUB_OUTPUT
+
   one-click-test:
+    needs: [get-test-matrix]
+    strategy:
+      matrix:
+        example: ${{ fromJson(needs.get-test-matrix.outputs.examples) }}
+      fail-fast: false
     uses: ./.github/workflows/_run-one-click.yml
     with:
       registry: "opea"
       tag: "ci"
-      example: ChatQnA
+      example: ${{ matrix.example }}
       hardware: gaudi
       test_helmchart: true
       test_compose: true
