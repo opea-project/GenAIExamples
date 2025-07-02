@@ -587,12 +587,14 @@ class Deployer:
         merged_proxies = user_proxies.union(script_proxies)
         final_no_proxy = ",".join(sorted(list(merged_proxies)))
 
+        host_ip_value = get_host_ip()
         updates.update(
             {
                 "http_proxy": self.args.http_proxy,
                 "https_proxy": self.args.https_proxy,
                 "no_proxy": final_no_proxy,
-                "host_ip": get_host_ip(),
+                "host_ip": host_ip_value,
+                "HOST_IP": host_ip_value,
             }
         )
         return update_or_create_set_env(source_env_file, local_env_file, updates)
