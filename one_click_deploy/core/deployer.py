@@ -63,7 +63,6 @@ class Deployer:
             log_header = f"\n\n{'='*20} DOCKER LOGS ON FAILURE ({self.project_name}) {'='*20}\n"
             log_footer = f"\n{'='*20} END OF DOCKER LOGS {'='*20}\n\n"
 
-            # 使用 to_console=False 将大量日志只输出到文件，保持控制台清洁
             log_message("INFO", log_header, to_console=False)
             if result.stdout:
                 log_message("INFO", result.stdout, to_console=False)
