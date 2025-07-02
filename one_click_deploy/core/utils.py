@@ -5,6 +5,7 @@ import importlib.util
 import logging
 import os
 import pathlib
+import random
 import re
 import shutil
 import subprocess
@@ -283,25 +284,74 @@ def update_helm_values_yaml(file_path: pathlib.Path, updates_map: dict):
 KUBECTL_PORT_FORWARD_PIDS = {}
 
 
+KUBECTL_PORT_FORWARD_PIDS = {}
+
 def start_kubectl_port_forward(namespace, service_name, local_port, remote_port):
+    """
+    Starts a kubectl port-forward process with intelligent port selection.
+
+    - If a specific `local_port` is provided, it checks for availability.
+        - If available, it's used.
+        - If occupied, it logs a warning and falls back to selecting a random port.
+    - If `local_port` is 0 or None, it selects a random available port between 59000-59999.
+    """
     key = f"{namespace}/{service_name}"
-    if key in KUBECTL_PORT_FORWARD_PIDS and KUBECTL_PORT_FORWARD_PIDS[key].poll() is None:
-        return local_port
-    cmd = ["kubectl", "port-forward", "-n", namespace, f"svc/{service_name}", f"{local_port}:{remote_port}"]
+
+    process = KUBECTL_PORT_FORWARD_PIDS.pop(key, None)
+    if process and process.poll() is None:
+        log_message("INFO", f"Stopping existing port-forward for {key} to start a new one.")
+        process.terminate()
+        try:
+            process.wait(timeout=5)
+        except subprocess.TimeoutExpired:
+            process.kill()
+
+    target_local_port = None
+
+    if local_port and local_port > 0:
+        log_message("INFO", f"Preferred local port {local_port} was provided. Checking availability...")
+        if not is_port_in_use(local_port, "127.0.0.1"):
+            log_message("OK", f"Port {local_port} is available and will be used.")
+            target_local_port = local_port
+        else:
+            log_message(
+                "WARN",
+                f"Preferred port {local_port} is already in use. A random port in the range 59000-59999 will be selected instead.",
+            )
+
+    if target_local_port is None:
+        log_message("INFO", "Finding a random available port in range 59000-59999.")
+        found_port = False
+        for _ in range(5):
+            candidate_port = random.randint(59000, 59999)
+            if not is_port_in_use(candidate_port, "127.0.0.1"):
+                target_local_port = candidate_port
+                found_port = True
+                log_message("INFO", f"Found available random port: {target_local_port}")
+                break
+        if not found_port:
+            log_message("ERROR", "Could not find an available port in the range 59000-59999 after 100 attempts.")
+            return None
+
+    cmd = ["kubectl", "port-forward", "-n", namespace, f"svc/{service_name}", f"{target_local_port}:{remote_port}"]
     log_message("INFO", f"Starting port-forward: {' '.join(cmd)}")
     try:
-        process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         KUBECTL_PORT_FORWARD_PIDS[key] = process
         time.sleep(2)
+
         if process.poll() is not None:
-            _, stderr = process.communicate()
-            log_message("ERROR", f"Port-forward failed: {stderr.decode().strip()}")
-            del KUBECTL_PORT_FORWARD_PIDS[key]
+            stdout, stderr = process.communicate()
+            log_message(
+                "ERROR",
+                f"Port-forward failed to start for {key} on port {target_local_port}. Error: {stderr.strip()}",
+            )
             return None
-        log_message("OK", f"Port-forward started (PID: {process.pid}).")
-        return local_port
+
+        log_message("OK", f"Port-forward started for {key} on localhost:{target_local_port} (PID: {process.pid}).")
+        return target_local_port
     except Exception as e:
-        log_message("ERROR", f"Exception starting port-forward: {e}")
+        log_message("ERROR", f"Exception starting port-forward for {key}: {e}")
         return None
 
 

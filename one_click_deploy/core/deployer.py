@@ -42,19 +42,102 @@ class Deployer:
         self.config = EXAMPLE_CONFIGS[self.example_name]
         self.example_root = EXAMPLES_ROOT_DIR / self.config["base_dir"]
         self.compose_command = "docker compose"
-        # Project name will be set during the deployment flow
         self.project_name = None
+
+    def _capture_docker_logs_on_failure(self):
+        """Captures logs from all services in a Docker Compose project on failure."""
+        if not self.project_name:
+            log_message("WARN", "Docker project name not set, cannot capture logs.")
+            return
+
+        log_message("INFO", f"Capturing Docker logs for project '{self.project_name}'...")
+        compose_base_cmd = self._get_compose_command_base()
+        if not compose_base_cmd:
+            log_message("ERROR", "Could not construct base command for Docker logs.")
+            return
+
+        log_cmd = compose_base_cmd + ["logs", "--no-color", "--tail=200"]
+
+        try:
+            result = run_command(log_cmd, capture_output=True, check=False, display_cmd=True)
+            log_header = f"\n\n{'='*20} DOCKER LOGS ON FAILURE ({self.project_name}) {'='*20}\n"
+            log_footer = f"\n{'='*20} END OF DOCKER LOGS {'='*20}\n\n"
+
+            # 使用 to_console=False 将大量日志只输出到文件，保持控制台清洁
+            log_message("INFO", log_header, to_console=False)
+            if result.stdout:
+                log_message("INFO", result.stdout, to_console=False)
+            if result.stderr:
+                log_message("WARN", result.stderr, to_console=False)
+            log_message("INFO", log_footer, to_console=False)
+
+            log_message("OK", f"Diagnostic logs for Docker project '{self.project_name}' saved to deployment.log")
+
+        except Exception as e:
+            log_message("ERROR", f"An exception occurred while trying to capture Docker logs: {e}")
+
+    def _capture_k8s_logs_on_failure(self):
+        """Captures pod descriptions and logs from a Kubernetes namespace on failure."""
+        ns = self.config.get("kubernetes", {}).get("namespace")
+        if not ns:
+            log_message("WARN", "Kubernetes namespace not configured, cannot capture logs.")
+            return
+
+        log_message("INFO", f"Capturing Kubernetes diagnostic info from namespace '{ns}'...")
+        log_header = f"\n\n{'='*20} KUBERNETES DIAGNOSTICS ON FAILURE ({ns}) {'='*20}\n"
+        log_footer = f"\n{'='*20} END OF K8S DIAGNOSTICS {'='*20}\n\n"
+
+        log_message("INFO", log_header, to_console=False)
+
+        try:
+            # 1. Get all pods status
+            log_message("INFO", "\n--- Pod Status ---\n", to_console=False)
+            get_pods_cmd = ["kubectl", "get", "pods", "-n", ns, "-o", "wide"]
+            pods_status = run_command(get_pods_cmd, capture_output=True, check=False, display_cmd=True)
+            if pods_status.stdout:
+                log_message("INFO", pods_status.stdout, to_console=False)
+            if pods_status.stderr:
+                log_message("WARN", pods_status.stderr, to_console=False)
+
+            # 2. Get pod names
+            get_pod_names_cmd = ["kubectl", "get", "pods", "-n", ns, "-o", "jsonpath={.items[*].metadata.name}"]
+            pod_names_result = run_command(get_pod_names_cmd, capture_output=True, check=False, display_cmd=False)
+            pod_names = pod_names_result.stdout.strip().split()
+
+            if not pod_names:
+                log_message("WARN", "No pods found in the namespace.", to_console=False)
+                return
+
+            # 3. For each pod, get description and logs
+            for pod_name in pod_names:
+                log_message("INFO", f"\n--- Description for pod: {pod_name} ---\n", to_console=False)
+                describe_cmd = ["kubectl", "describe", "pod", pod_name, "-n", ns]
+                describe_result = run_command(describe_cmd, capture_output=True, check=False, display_cmd=True)
+                if describe_result.stdout:
+                    log_message("INFO", describe_result.stdout, to_console=False)
+
+                log_message("INFO", f"\n--- Logs for pod: {pod_name} ---\n", to_console=False)
+                logs_cmd = ["kubectl", "logs", pod_name, "-n", ns, "--all-containers=true", "--tail=200"]
+                logs_result = run_command(logs_cmd, capture_output=True, check=False, display_cmd=True)
+                if logs_result.stdout:
+                    log_message("INFO", logs_result.stdout, to_console=False)
+                if logs_result.stderr:
+                    log_message("WARN", logs_result.stderr, to_console=False)
+
+        except Exception as e:
+            log_message("ERROR", f"An exception occurred while trying to capture K8s logs: {e}")
+        finally:
+            log_message("INFO", log_footer, to_console=False)
+            log_message("OK", f"Diagnostic logs for K8s namespace '{ns}' saved to deployment.log")
+
 
     def _get_compose_command_base(self):
         """Constructs the base docker compose command with project and compose files."""
         if not self.project_name:
-            # Fallback for safety, though project_name should always be set.
             self.project_name = f"{self.example_name.lower().replace(' ', '')}-{self.args.device}"
-
         compose_files = self._get_docker_compose_files()
         if not compose_files:
             return None
-
         cmd = self.compose_command.split()
         cmd.extend(["-p", self.project_name])
         for f in compose_files:
@@ -68,7 +151,6 @@ class Deployer:
             if not isinstance(current_level, dict) or key not in current_level:
                 return None
             current_level = current_level[key]
-
         path_or_paths = (
             current_level.get(device_specific_key)
             if device_specific_key and isinstance(current_level, dict)
@@ -76,10 +158,8 @@ class Deployer:
         )
         if not path_or_paths:
             return None
-
         if isinstance(path_or_paths, str):
             path_or_paths = [path_or_paths]
-
         resolved_paths = []
         for p in path_or_paths:
             if os.path.isabs(p):
@@ -96,10 +176,8 @@ class Deployer:
                 current_level = current_level[key]
         except (KeyError, TypeError):
             return None
-
         if isinstance(current_level, dict) and self.args.device in current_level:
             return current_level[self.args.device]
-
         return current_level
 
     def _get_docker_compose_files(self):
@@ -141,48 +219,37 @@ class Deployer:
             log_message("INFO", "Deployment setup aborted by user.")
             return
 
-        # --- Pre-deployment Steps ---
         if self.args.do_check_env and not self.check_environment():
             log_message("ERROR", "Environment check failed. Aborting deployment.")
             return
-
         if self.args.do_update_images and not self.update_images():
             log_message("ERROR", "Image update failed. Aborting deployment.")
             return
-
         if not self.configure_services():
             log_message("ERROR", "Service configuration failed. Aborting deployment.")
             return
 
-        # --- Pre-flight Check: Existing Deployment and Port Conflicts ---
         if self.args.deploy_mode == "docker":
-            # Set a consistent project name for all Docker Compose operations
             self.project_name = f"{self.example_name.lower().replace(' ', '')}-{self.args.device}"
             log_message("INFO", f"Using Docker Compose project name: '{self.project_name}'")
-
             compose_base_cmd = self._get_compose_command_base()
             if not compose_base_cmd:
                 log_message("ERROR", "Could not construct Docker Compose command. Check config.")
                 return
-
             try:
-                # Check if containers for this project are already running
                 result = run_command(
                     compose_base_cmd + ["ps", "-q"], capture_output=True, check=False, display_cmd=False
                 )
                 is_running = result.stdout.strip() != ""
-
                 if is_running:
                     log_message("WARN", f"An instance of '{self.example_name}' appears to be already running.")
                     if click.confirm("Do you want to stop the current instance and redeploy/update it?", default=True):
                         log_message("INFO", "Stopping existing services...")
-                        # Use the clear_deployment logic to stop the services
-                        self.clear_deployment(clear_local_config=False)  # Keep local config for re-deployment
+                        self.clear_deployment(clear_local_config=False)
                     else:
                         log_message("INFO", "Deployment aborted by user.")
                         return
                 else:
-                    # If not running, check for port conflicts from other applications
                     local_env_file = self._get_local_env_file_path()
                     env_vars = parse_shell_env_file(local_env_file)
                     conflicting_ports = get_conflicting_ports_from_compose(self._get_docker_compose_files(), env_vars)
@@ -192,7 +259,6 @@ class Deployer:
                             f"Deployment aborted. Ports are in use by other applications: {sorted(conflicting_ports)}",
                         )
                         return
-
             except Exception as e:
                 log_message("ERROR", f"Failed during pre-deployment check: {e}")
                 return
@@ -204,7 +270,11 @@ class Deployer:
             log_message("OK", "Deployment process completed successfully.")
         except Exception as e:
             log_message("ERROR", f"Deployment failed: {e}")
-
+            log_message("INFO", "Capturing diagnostic logs due to deployment failure...")
+            if self.args.deploy_mode == "docker":
+                self._capture_docker_logs_on_failure()
+            elif self.args.deploy_mode == "k8s":
+                self._capture_k8s_logs_on_failure()
             if CLEANUP_ON_DEPLOY_FAILURE:
                 log_message("INFO", "Attempting automatic cleanup as configured...")
                 try:
@@ -215,24 +285,14 @@ class Deployer:
                         "ERROR", f"Automatic cleanup ALSO FAILED: {cleanup_e}. Please check your environment manually."
                     )
             else:
-                log_message(
-                    "WARN",
-                    "Automatic cleanup is disabled. The failed environment is preserved for debugging.",
-                )
+                log_message("WARN", "Automatic cleanup is disabled. The failed environment is preserved for debugging.")
                 if self.args.deploy_mode == "docker":
-                    log_message(
-                        "INFO",
-                        f"You can inspect logs using: docker compose -p {self.project_name} logs",
-                    )
+                    log_message("INFO", f"You can inspect logs using: docker compose -p {self.project_name} logs")
                 elif self.args.deploy_mode == "k8s":
                     ns = self.config["kubernetes"]["namespace"]
-                    log_message(
-                        "INFO",
-                        f"Inspect pods with 'kubectl get pods -n {ns}' and logs with 'kubectl logs -n {ns} <pod-name>'.",
-                    )
+                    log_message("INFO", f"Inspect pods with 'kubectl get pods -n {ns}'.")
             return
 
-        # --- Post-deployment Testing Step (Does NOT trigger cleanup) ---
         if self.args.do_test_connection:
             log_message("INFO", f"Waiting for {POST_DEPLOY_WAIT_S} seconds for services to stabilize before testing...")
             for i in range(POST_DEPLOY_WAIT_S, 0, -10):
@@ -243,16 +303,15 @@ class Deployer:
             if not self.test_connection():
                 log_message("WARN", "Connection tests failed. The services are still running.")
                 if self.args.deploy_mode == "docker":
-                    log_message(
-                        "INFO",
-                        f"Please inspect logs using: docker compose -p {self.project_name} logs",
-                    )
+                    self._capture_docker_logs_on_failure()
+                elif self.args.deploy_mode == "k8s":
+                    self._capture_k8s_logs_on_failure()
+
+                if self.args.deploy_mode == "docker":
+                    log_message("INFO", f"Please inspect logs using: docker compose -p {self.project_name} logs")
                 elif self.args.deploy_mode == "k8s":
                     ns = self.config["kubernetes"]["namespace"]
-                    log_message(
-                        "INFO",
-                        f"Please inspect pod status with 'kubectl get pods -n {ns}' and logs with 'kubectl logs -n {ns} <pod-name>'.",
-                    )
+                    log_message("INFO", f"Please inspect pod status with 'kubectl get pods -n {ns}'.")
             else:
                 log_message("OK", "All connection tests passed.")
 
@@ -595,19 +654,10 @@ class Deployer:
 
             script_content = f"""#!/bin/bash
 set -e
-# Add a trap to report errors with line numbers
 trap 'echo "ERROR: A command failed at line $LINENO. Exiting." >&2' ERR
-
-echo "Sourcing environment from: {local_env_file.resolve()}"
 cd "{local_env_dir.resolve()}"
 source "{local_env_file.resolve()}"
-echo "--- Environment sourced successfully ---"
-
-echo "Changing directory to: {compose_dir.resolve()}"
 cd "{compose_dir.resolve()}"
-echo "--- Directory changed successfully ---"
-
-echo "Executing command: {compose_up_cmd}"
 {compose_up_cmd}
 """
             temp_script_path = None
@@ -616,10 +666,9 @@ echo "Executing command: {compose_up_cmd}"
                     f.write(script_content)
                     temp_script_path = f.name
                 os.chmod(temp_script_path, stat.S_IRWXU)
-
                 run_command(["/bin/bash", temp_script_path], check=True, stream_output=True)
                 return True
-            except subprocess.CalledProcessError as e:
+            except subprocess.CalledProcessError:
                 log_message("ERROR", "Deployment script failed to execute. See detailed logs above.")
                 return False
             except Exception as e:
@@ -638,15 +687,8 @@ echo "Executing command: {compose_up_cmd}"
                 return False
 
             cmd = [
-                "helm",
-                "install",
-                cfg["release_name"],
-                cfg["helm"]["chart_oci"],
-                "--namespace",
-                cfg["namespace"],
-                "--create-namespace",
-                "-f",
-                str(local_values_file),
+                "helm", "install", cfg["release_name"], cfg["helm"]["chart_oci"],
+                "--namespace", cfg["namespace"], "--create-namespace", "-f", str(local_values_file),
             ]
             try:
                 run_command(cmd, check=True)
@@ -666,26 +708,20 @@ echo "Executing command: {compose_up_cmd}"
             if not compose_base_cmd:
                 log_message("WARN", "Could not construct Docker Compose command. Cannot clear.")
                 return True
-
             cmd_list = compose_base_cmd + ["down", "-v", "--remove-orphans"]
-
             try:
                 result = run_command(cmd_list, check=False, capture_output=True, display_cmd=True)
                 if result.returncode != 0:
                     log_message("ERROR", f"Docker Compose down command failed with exit code {result.returncode}.")
-                    if result.stdout:
-                        log_message("ERROR", f"  STDOUT: {result.stdout.strip()}")
-                    if result.stderr:
-                        log_message("ERROR", f"  STDERR: {result.stderr.strip()}")
+                    if result.stdout: log_message("ERROR", f"  STDOUT: {result.stdout.strip()}")
+                    if result.stderr: log_message("ERROR", f"  STDERR: {result.stderr.strip()}")
                 else:
                     log_message("OK", "Docker Compose services stopped and removed.")
-
                 if clear_local_config:
                     local_env_file = self._get_local_env_file_path()
                     if local_env_file and local_env_file.exists():
                         local_env_file.unlink()
                         log_message("INFO", f"Removed generated config file: {local_env_file.name}")
-
                 return result.returncode == 0
             except Exception as e:
                 log_message("ERROR", f"Failed to clear Docker Compose deployment: {e}")
@@ -697,8 +733,7 @@ echo "Executing command: {compose_up_cmd}"
                 run_command(["helm", "uninstall", cfg["release_name"], "--namespace", cfg["namespace"]], check=False)
                 log_message("OK", f"Helm release '{cfg['release_name']}' uninstalled.")
             except Exception as e:
-                log_message("WARN", f"Helm uninstall may have failed (this is often ok if it was already gone): {e}")
-
+                log_message("WARN", f"Helm uninstall may have failed: {e}")
             local_values_file = self._get_local_helm_values_file_path()
             if local_values_file and local_values_file.exists():
                 try:
@@ -706,13 +741,10 @@ echo "Executing command: {compose_up_cmd}"
                     log_message("INFO", f"Removed local Helm values file: {local_values_file.name}")
                 except OSError as e:
                     log_message("WARN", f"Could not remove local values file {local_values_file}: {e}")
-
             if getattr(self.args, "delete_namespace_on_clear", False):
                 log_message("INFO", f"Deleting namespace '{cfg['namespace']}' as requested.")
                 try:
-                    run_command(
-                        ["kubectl", "delete", "namespace", cfg["namespace"], "--ignore-not-found=true"], check=True
-                    )
+                    run_command(["kubectl", "delete", "namespace", cfg["namespace"], "--ignore-not-found=true"], check=True)
                     log_message("OK", f"Namespace '{cfg['namespace']}' deleted.")
                 except Exception as e:
                     log_message("ERROR", f"Failed to delete namespace: {e}")
