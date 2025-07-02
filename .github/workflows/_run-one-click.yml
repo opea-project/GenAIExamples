@@ -62,7 +62,7 @@ jobs:
             *) echo "example_id=0" >> $GITHUB_OUTPUT ;;
           esac
 
-  compose-test:
+  docker-test:
     if: ${{ inputs.test_compose || inputs.tag == 'ci' }}
     needs: [get-example-id]
     runs-on: ${{ inputs.hardware }}
@@ -146,9 +146,8 @@ jobs:
           for i in $(seq 1 $empty_lines); do echo -e ""; done
           N
           y
-          y
-          y
-          y
+          Y
+          N
           y
           Y
           INPUTS
@@ -228,9 +227,10 @@ jobs:
           for i in $(seq 1 $empty_lines); do echo -e ""; done
           N
           y
+          Y
           y
-          y
-          y
+          N
+          100.83.111.254:5000
           y
 
           Y
