@@ -24,23 +24,26 @@ on:
         required: true
         type: string
       test_compose:
-        default: false
+        default: true
         description: 'Test examples with docker compose'
-        required: true
+        required: false
         type: boolean
       test_helmchart:
-        default: false
+        default: true
         description: 'Test examples with helm charts'
-        required: true
+        required: false
         type: boolean
       hardware:
         description: Hardware to run the test on
         required: true
         type: string
-
+      opea_branch:
+        default: "main"
+        required: false
+        type: string
 jobs:
   test:
-    runs-on: gaudi
+    runs-on: ${ inputs.hardware }
     continue-on-error: true
     steps:
       - name: Clean up Working Directory
@@ -113,6 +116,7 @@ jobs:
           FINANCIAL_DATASETS_API_KEY: ${{ secrets.FINANCIAL_DATASETS_API_KEY }}
           IMAGE_REPO: ${{ inputs.registry }}
           IMAGE_TAG: ${{ inputs.tag }}
+          opea_branch: ${{ inputs.opea_branch }}
           example: ${{ inputs.example }}
           hardware: gaudi
           test_case: ${{ matrix.test_case }}
@@ -138,6 +142,7 @@ jobs:
           y
           y
           y
+          y
           Y
           INPUTS
 
@@ -151,7 +156,6 @@ jobs:
           2
           docker
           $hardware
-          $HF_TOKEN
           Y
           INPUTS
 
@@ -179,6 +183,7 @@ jobs:
           FINANCIAL_DATASETS_API_KEY: ${{ secrets.FINANCIAL_DATASETS_API_KEY }}
           IMAGE_REPO: ${{ inputs.registry }}
           IMAGE_TAG: ${{ inputs.tag }}
+          opea_branch: ${{ inputs.opea_branch }}
           example: ${{ inputs.example }}
           hardware: gaudi
           test_case: ${{ matrix.test_case }}
@@ -198,10 +203,13 @@ jobs:
 
 
 
-
-          N
-          N
           y
+          y
+          y
+          y
+          y
+          y
+
           Y
           INPUTS
 
@@ -214,8 +222,7 @@ jobs:
           1
           2
           k8s
-          $hardware
-          $HF_TOKEN
+          y
           Y
           INPUTS
 
