@@ -59,7 +59,7 @@ EXAMPLE_CONFIGS = {
                 "llm": "9009",
             },
             "k8s_services": {
-                "backend": "chatqna-backend-server-svc",
+                "backend": "chatqna",
                 "dataprep": "dataprep-svc",
                 "embedding": "embedding-mosec-svc",
                 "retriever": "retriever-svc",
