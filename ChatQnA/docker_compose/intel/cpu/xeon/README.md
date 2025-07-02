@@ -73,17 +73,6 @@ CPU example with Open Telemetry feature:
 docker compose -f compose.yaml -f compose.telemetry.yaml up -d
 ```
 
-To deploy ChatQnA services with remote endpoints, set the required environment variables mentioned below and run the 'compose_remote.yaml' file.
-
-**Note**: Set REMOTE_ENDPOINT variable value to "https://api.inference.denvrdata.com" when the remote endpoint to access is "https://api.inference.denvrdata.com/v1/chat/completions"
-
-```bash
-export REMOTE_ENDPOINT=<endpoint-url>
-export LLM_MODEL_ID=<model-id>
-export OPENAI_API_KEY=<API-KEY>
-docker compose -f compose_remote.yaml up -d
-```
-
 **Note**: developers should build docker image from source when:
 
 - Developing off the git main branch (as the container's ports in the repo may be different from the published docker image).
@@ -169,6 +158,28 @@ In the context of deploying a ChatQnA pipeline on an Intel® Xeon® platform, we
 | [compose.telemetry.yaml](./compose.telemetry.yaml)           | Helper file for telemetry features for vllm. Can be used along with any compose files that serves vllm                                                                |
 | [compose_tgi.telemetry.yaml](./compose_tgi.telemetry.yaml)   | Helper file for telemetry features for tgi. Can be used along with any compose files that serves tgi                                                                  |
 | [compose_mariadb.yaml](./compose_mariadb.yaml)               | Uses MariaDB Server as the vector database. All other configurations remain the same as the default                                                                   |
+
+### Running LLM models with remote endpoints
+
+When models are deployed on a remote server, a base URL and an API key are required to access them. To set up a remote server and acquire the base URL and API key, refer to [Intel® AI for Enterprise Inference](https://www.intel.com/content/www/us/en/products/docs/accelerator-engines/enterprise-ai.html) offerings.
+
+Set the following environment variables.
+
+- `REMOTE_ENDPOINT` is the HTTPS endpoint of the remote server with the model of choice (i.e. https://api.inference.denvrdata.com). **Note:** If not using LiteLLM, the second part of the model card needs to be appended to the URL i.e. `/Llama-3.3-70B-Instruct` from `meta-llama/Llama-3.3-70B-Instruct`.
+- `API_KEY` is the access token or key to access the model(s) on the server.
+- `LLM_MODEL_ID` is the model card which may need to be overwritten depending on what it is set to `set_env.sh`.
+
+```bash
+export REMOTE_ENDPOINT=<https-endpoint-of-remote-server>
+export API_KEY=<your-api-key>
+export LLM_MODEL_ID=<model-card>
+```
+
+After setting these environment variables, run `docker compose` with `compose_remote.yaml`:
+
+```bash
+docker compose -f compose_remote.yaml up -d
+```
 
 ## ChatQnA with Conversational UI (Optional)
 

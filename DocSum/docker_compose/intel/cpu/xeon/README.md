@@ -52,18 +52,6 @@ cd intel/cpu/xeon/
 docker compose up -d
 ```
 
-To deploy DocSum services with remote endpoints, set the required environment variables mentioned below and run the 'compose_remote.yaml' file.
-
-**Note**: Set LLM_ENDPOINT variable value to "https://api.inference.denvrdata.com" when the remote endpoint to access is "https://api.inference.denvrdata.com/v1/chat/completions"
-
-```bash
-export LLM_ENDPOINT=<endpoint-url>
-export LLM_MODEL_ID=<model-id>
-export OPENAI_API_KEY=<API-KEY>
-
-docker compose -f compose_remote.yaml up -d
-```
-
 **Note**: developers should build docker image from source when:
 
 - Developing off the git main branch (as the container's ports in the repo may be different from the published docker image).
@@ -130,6 +118,28 @@ In the context of deploying a DocSum pipeline on an Intel® Xeon® platform, we 
 | [compose.yaml](./compose.yaml)               | Default compose file using vllm as serving framework                                   |
 | [compose_tgi.yaml](./compose_tgi.yaml)       | The LLM serving framework is TGI. All other configurations remain the same as default  |
 | [compose_remote.yaml](./compose_remote.yaml) | Uses remote inference endpoints for LLMs. All other configurations are same as default |
+
+### Running LLM models with remote endpoints
+
+When models are deployed on a remote server, a base URL and an API key are required to access them. To set up a remote server and acquire the base URL and API key, refer to [Intel® AI for Enterprise Inference](https://www.intel.com/content/www/us/en/products/docs/accelerator-engines/enterprise-ai.html) offerings.
+
+Set the following environment variables.
+
+- `REMOTE_ENDPOINT` is the HTTPS endpoint of the remote server with the model of choice (i.e. https://api.inference.denvrdata.com). **Note:** If not using LiteLLM, the second part of the model card needs to be appended to the URL i.e. `/Llama-3.3-70B-Instruct` from `meta-llama/Llama-3.3-70B-Instruct`.
+- `API_KEY` is the access token or key to access the model(s) on the server.
+- `LLM_MODEL_ID` is the model card which may need to be overwritten depending on what it is set to `set_env.sh`.
+
+```bash
+export REMOTE_ENDPOINT=<https-endpoint-of-remote-server>
+export API_KEY=<your-api-key>
+export LLM_MODEL_ID=<model-card>
+```
+
+After setting these environment variables, run `docker compose` with `compose_remote.yaml`:
+
+```bash
+docker compose -f compose_remote.yaml up -d
+```
 
 ## DocSum Detailed Usage
 
