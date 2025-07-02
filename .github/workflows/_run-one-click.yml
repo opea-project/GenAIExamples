@@ -131,7 +131,7 @@ jobs:
         run: |
           cd ${{ github.workspace }}/one_click_deploy
           python3 -m pip install -r requirements.txt
-          
+
           if [ "${{ needs.get-example-id.outputs.example_id }}" -eq 1 ]; then
             empty_lines="7"
           else
@@ -175,7 +175,7 @@ jobs:
 
   k8s-test:
     if: ${{ inputs.test_helmchart || inputs.tag == 'ci' }}
-    needs: [get-example-id] 
+    needs: [get-example-id]
     runs-on: k8s-${{ inputs.hardware }}
     continue-on-error: true
     steps:
