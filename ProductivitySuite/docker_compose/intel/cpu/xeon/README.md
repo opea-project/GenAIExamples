@@ -243,6 +243,7 @@ Set the following environment variables.
 export REMOTE_ENDPOINT=<https-endpoint-of-remote-server>
 export API_KEY=<your-api-key>
 export LLM_MODEL_ID=<model-card>
+export LLM_MODEL_ID_CODEGEN=<model-card>
 ```
 
 After setting these environment variables, run `docker compose` with `compose_remote.yaml`:
