@@ -1,3 +1,6 @@
+#!/bin/bash
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
 
 # Check if the correct number of arguments is provided
 if [ "$#" -ne 2 ]; then

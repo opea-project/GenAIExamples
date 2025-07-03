@@ -40,7 +40,7 @@ async def create_knowledge_base(knowledge: KnowledgeBaseCreateIn):
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Knowledge base names must begin with a letter or an underscore and contain only letters, numbers, and underscores")
         kb = ctx.knowledgemgr.create_knowledge_base(knowledge)
-        if active_pl.indexer.comp_subtype == "milvus_vector" and kb.active == True:
+        if active_pl.indexer.comp_subtype == "milvus_vector" and kb.active:
                     active_pl.indexer.reinitialize_indexer(kb.name)
                     active_pl.update_indexer_to_retriever()
         await save_knowledge_to_file()
@@ -79,13 +79,13 @@ async def update_knowledge_base(knowledge: KnowledgeBaseCreateIn):
             if knowledge.active  and knowledge.active != kb.active:
                 file_paths = kb.get_file_paths()  
                 await update_knowledge_base_handler(file_paths, knowledge.name)
-            elif knowledge.active ==False:  
+            elif not knowledge.active:  
                 raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Must have an acitive knowledge base")
         else:
             if knowledge.active  and knowledge.active != kb.active:
                 active_pl.indexer.reinitialize_indexer(knowledge.name)
                 active_pl.update_indexer_to_retriever()
-            elif knowledge.active ==False:  
+            elif not knowledge.active:  
                 raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Must have an acitive knowledge base")
         result = ctx.knowledgemgr.update_knowledge_base(knowledge)
         await save_knowledge_to_file()

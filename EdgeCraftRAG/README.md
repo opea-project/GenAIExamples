@@ -422,13 +422,13 @@ curl -X POST http://${HOST_IP}:16010/v1/chatqna/prompt-file -H "Content-Type: mu
 
 ## Performance BKC for Arc770 & BMG 24G(B60) 
 
-#### Performance BKC for BMG 24G(B60) 
+### Performance BKC for BMG 24G(B60) 
 
 Ubuntu: 22.04.1  
 Linux Kernel: 6.5.0-28-generic  
 Drivers: intel-i915 out-of-tree driver
 
-#### Performance BKC for BMG 24G(B60) 
+### Performance BKC for BMG 24G(B60) 
 
 Ubuntu: 25.04  
 Linux Kernel: 6.14.0 in-box  
