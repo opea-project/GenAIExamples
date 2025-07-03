@@ -133,7 +133,6 @@ There are 3 services needed for the setup:
 (Optional) Build the agent docker image with the most latest changes.  
 By default, Workflow Executor uses public [opea/vllm](https://hub.docker.com/r/opea/agent) docker image if no local built image exists.
 
-
 ```sh
 export WORKDIR=$PWD
 git clone https://github.com/opea-project/GenAIComps.git
