@@ -1,5 +1,5 @@
 {
-  "name": "rag_test_local_llm",
+  "name": "rag_test_local_ll1m",
   "node_parser": {
     "chunk_size": 400,
     "chunk_overlap": 48,
@@ -39,7 +39,7 @@
       "weight": ""
     },
     "prompt_path": "./default_prompt.txt",
-    "vllm_endpoint": "http://localhost:8086"
+    "vllm_endpoint": "http://198.175.72.235:8086"
   },
   "active": "True"
 }
