@@ -186,7 +186,7 @@
         "deploy": [
           "1",
           "1",
-          "docker",
+          "k8s",
           "$hardware",
           "$HF_TOKEN",
           "$http_proxy",
@@ -211,7 +211,7 @@
         "deploy": [
           "2",
           "1",
-          "docker",
+          "k8s",
           "$hardware",
           "$HF_TOKEN",
           "$http_proxy",
@@ -234,7 +234,7 @@
         "deploy": [
           "3",
           "1",
-          "docker",
+          "k8s",
           "$hardware",
           "$HF_TOKEN",
           "$http_proxy",
@@ -257,7 +257,7 @@
         "deploy": [
           "4",
           "1",
-          "docker",
+          "k8s",
           "$hardware",
           "$HF_TOKEN",
           "$http_proxy",
@@ -280,7 +280,7 @@
         "deploy": [
           "5",
           "1",
-          "docker",
+          "k8s",
           "$hardware",
           "$HF_TOKEN",
           "$http_proxy",
@@ -303,7 +303,7 @@
         "deploy": [
           "6",
           "1",
-          "docker",
+          "k8s",
           "$hardware",
           "$HF_TOKEN",
           "$http_proxy",
@@ -326,7 +326,7 @@
         "deploy": [
           "7",
           "1",
-          "docker",
+          "k8s",
           "$hardware",
           "$HF_TOKEN",
           "$http_proxy",
@@ -349,9 +349,8 @@
         "deploy": [
           "8",
           "1",
-          "docker",
+          "k8s",
           "$hardware",
-          "$HF_TOKEN",
           "$HF_TOKEN",
           "$http_proxy",
           "$https_proxy",
