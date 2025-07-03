@@ -90,10 +90,13 @@ class BaseConnectionTester(ABC):
                 else (8081 + hash(service_key) % 100)
             )
 
-            if not start_kubectl_port_forward(self.k8s_namespace, service_name, local_port, remote_port):
+            # Capture the actual port returned by the port-forward function
+            actual_local_port = start_kubectl_port_forward(self.k8s_namespace, service_name, local_port, remote_port)
+            if not actual_local_port:
                 return None, None
 
-            return f"http://localhost:{local_port}", local_port
+            # Use the actual_local_port to build the URL
+            return f"http://localhost:{actual_local_port}", actual_local_port
         return None, None
 
     def _gen_payload(self, test_case_config):

@@ -284,8 +284,6 @@ def update_helm_values_yaml(file_path: pathlib.Path, updates_map: dict):
 KUBECTL_PORT_FORWARD_PIDS = {}
 
 
-KUBECTL_PORT_FORWARD_PIDS = {}
-
 
 def start_kubectl_port_forward(namespace, service_name, local_port, remote_port):
     """Starts a kubectl port-forward process with intelligent port selection.
