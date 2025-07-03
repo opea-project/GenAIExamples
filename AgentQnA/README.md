@@ -225,6 +225,7 @@ export model=<model-card>
 ```
 
 After setting these environment variables, run `docker compose` by adding `compose_remote.yaml` as an additional YAML file:
+
 ```bash
 docker compose -f $WORKDIR/GenAIExamples/DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml -f compose_openai.yaml -f compose_remote.yaml up -d
 ```
