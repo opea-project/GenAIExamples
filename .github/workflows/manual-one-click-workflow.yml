@@ -96,7 +96,7 @@ jobs:
       fail-fast: false
     uses: ./.github/workflows/_run-one-click.yml
     with:
-      node: ${{ matrix.node }}
+      hardware: ${{ matrix.node }}
       example: ${{ matrix.example }}
       tag: ${{ inputs.tag }}
       registry: "opea"
