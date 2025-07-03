@@ -34,11 +34,12 @@
     "inference_type": "vllm",
     "model": {
       "model_id": "Qwen/Qwen3-8B",
-      "model_path": "./models/Qwen/Qwen3-8B/",
-      "device": "auto",
-      "weight": "INT4"
+      "model_path": "",
+      "device": "",
+      "weight": ""
     },
-    "prompt_path": "./default_prompt.txt"
+    "prompt_path": "./default_prompt.txt",
+    "vllm_endpoint": "http://198.175.72.235:8086"
   },
   "active": "True"
 }
