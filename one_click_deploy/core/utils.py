@@ -431,13 +431,24 @@ def parse_shell_env_file(file_path: pathlib.Path) -> dict:
 def is_port_in_use(port: int, host: str = "0.0.0.0") -> bool:
     """Checks if a given TCP port is already in use on the host."""
     import socket
+    import errno
 
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         try:
             s.bind((host, port))
             return False
-        except OSError:
-            return True
+        except OSError as e:
+
+            if e.errno == errno.EADDRINUSE or e.errno == getattr(errno, 'WSAEADDRINUSE', None):
+                return True
+
+            if e.errno == errno.EACCES:
+
+                log_message("WARN",
+                            f"Permission denied to check port {port}. This port is likely privileged. Run as root if you need to bind to it.")
+                return False
+
+            raise
 
 
 def _substitute_env_vars(content: str, env_vars: dict) -> str:
