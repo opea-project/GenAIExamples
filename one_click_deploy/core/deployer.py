@@ -16,8 +16,8 @@ from .config import (
     COMMON_SCRIPTS_DIR,
     EXAMPLE_CONFIGS,
     EXAMPLES_ROOT_DIR,
-    POST_DEPLOY_WAIT_S,
     K8S_VLLM_SKIP_WARMUP,
+    POST_DEPLOY_WAIT_S,
 )
 from .tester import ConnectionTesterFactory
 from .utils import (
@@ -633,7 +633,7 @@ class Deployer:
             if "vllm:" in original_values_file.read_text():
                 log_message(
                     "INFO",
-                    f"Global flag K8S_VLLM_SKIP_WARMUP is True. Adding 'vllm.VLLM_SKIP_WARMUP: True' to Helm values.",
+                    "Global flag K8S_VLLM_SKIP_WARMUP is True. Adding 'vllm.VLLM_SKIP_WARMUP: True' to Helm values.",
                 )
                 updates["vllm.VLLM_SKIP_WARMUP"] = True
             else:
