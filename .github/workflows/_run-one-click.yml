@@ -42,29 +42,8 @@ on:
         required: false
         type: string
 jobs:
-  # get-example-id:
-  #   runs-on: ubuntu-latest
-  #   outputs:
-  #     example_id: ${{ steps.get-example-id.outputs.example_id }}
-  #   steps:
-  #     - name: Get example id
-  #       id: get-example-id
-  #       run: |
-  #         case "${{ inputs.example }}" in
-  #           ChatQnA) echo "example_id=1" >> $GITHUB_OUTPUT ;;
-  #           CodeTrans) echo "example_id=2" >> $GITHUB_OUTPUT ;;
-  #           DocSum) echo "example_id=3" >> $GITHUB_OUTPUT ;;
-  #           CodeGen) echo "example_id=4" >> $GITHUB_OUTPUT ;;
-  #           AudioQnA) echo "example_id=5" >> $GITHUB_OUTPUT ;;
-  #           VisualQnA) echo "example_id=6" >> $GITHUB_OUTPUT ;;
-  #           FaqGen) echo "example_id=7" >> $GITHUB_OUTPUT ;;
-  #           AgentQnA) echo "example_id=8" >> $GITHUB_OUTPUT ;;
-  #           *) echo "example_id=0" >> $GITHUB_OUTPUT ;;
-  #         esac
-
   docker-test:
     if: ${{ inputs.test_compose || inputs.tag == 'ci' }}
-    # needs: [get-example-id]
     runs-on: ${{ inputs.hardware }}
     continue-on-error: true
     steps:
@@ -128,21 +107,22 @@ jobs:
           hardware: gaudi
           test_case: ${{ matrix.test_case }}
           use_model_cache: ${{ inputs.use_model_cache }}
-          LLM_model: meta-llama/Meta-Llama-3-8B-Instruct
-          Embedding_model: BAAI/bge-base-en-v1.5
-          Reranking_model: BAAI/bge-reranker-base
-          Mount_dir: ./data
-          CodeTrans_model: mistralai/Mistral-7B-Instruct-v0.3
-          DocSum_model: meta-llama/Meta-Llama-3-8B-Instruct
-          CodeGen_model: Qwen/Qwen2.5-Coder-7B-Instruct
-          AudioQnA_model: meta-llama/Meta-Llama-3-8B-Instruct
-          VisualQnA_model: llava-hf/llava-v1.6-mistral-7b-hf
-          FaqGen_model: meta-llama/Meta-Llama-3-8B-Instruct
         run: |
           set -x
           cd ${{ github.workspace }}/one_click_deploy
           python3 -m pip install -r requirements.txt
 
+          export LLM_model=meta-llama/Meta-Llama-3-8B-Instruct
+          export Embedding_model=BAAI/bge-base-en-v1.5
+          export Reranking_model=BAAI/bge-reranker-base
+          export Mount_dir=./data
+          export CodeTrans_model=mistralai/Mistral-7B-Instruct-v0.3
+          export DocSum_model=meta-llama/Meta-Llama-3-8B-Instruct
+          export CodeGen_model=Qwen/Qwen2.5-Coder-7B-Instruct
+          export AudioQnA_model=meta-llama/Meta-Llama-3-8B-Instruct
+          export VisualQnA_model=llava-hf/llava-v1.6-mistral-7b-hf
+          export FaqGen_model=meta-llama/Meta-Llama-3-8B-Instruct
+          
           INPUT_DATA=$(
             jq -r --arg type "docker" --arg id "${{ inputs.example }}" \
               '.[$type][$id].inputs.deploy[]' ${{ github.workspace }}/.github/workflows/one-click-inputs.json | \
@@ -159,12 +139,16 @@ jobs:
         run: |
           cd ${{ github.workspace }}/one_click_deploy
 
+          INPUT_DATA=$(
+            jq -r --arg type "docker" --arg id "${{ inputs.example }}" \
+              '.[$type][$id].inputs.clear[]' ${{ github.workspace }}/.github/workflows/one-click-inputs.json | \
+            sed "s/\$hardware/$hardware/g"
+          )
+          echo "Generated input:"
+          echo "$INPUT_DATA"
+
           python3 one_click_deploy.py << INPUTS
-          ${{ needs.get-example-id.outputs.example_id }}
-          2
-          docker
-          $hardware
-          Y
+          $INPUT_DATA
           INPUTS
 
       - name: Publish docker pipeline artifact
@@ -177,7 +161,6 @@ jobs:
 
   k8s-test:
     if: ${{ inputs.test_helmchart || inputs.tag == 'ci' }}
-    needs: [get-example-id]
     runs-on: k8s-${{ inputs.hardware }}
     continue-on-error: true
     steps:
@@ -213,41 +196,45 @@ jobs:
           hardware: gaudi
           test_case: ${{ matrix.test_case }}
           use_model_cache: ${{ inputs.use_model_cache }}
-          LLM_model: meta-llama/Meta-Llama-3-8B-Instruct
-          Embedding_model: BAAI/bge-base-en-v1.5
-          Reranking_model: BAAI/bge-reranker-base
-          Mount_dir: ./data
-          CodeTrans_model: mistralai/Mistral-7B-Instruct-v0.3
-          DocSum_model: meta-llama/Meta-Llama-3-8B-Instruct
-          CodeGen_model: Qwen/Qwen2.5-Coder-7B-Instruct
-          AudioQnA_model: meta-llama/Meta-Llama-3-8B-Instruct
-          VisualQnA_model: llava-hf/llava-v1.6-mistral-7b-hf
-          FaqGen_model: meta-llama/Meta-Llama-3-8B-Instruct
         run: |
           cd ${{ github.workspace }}/one_click_deploy
           python3 -m pip install -r requirements.txt
+          
+          export LLM_model=meta-llama/Meta-Llama-3-8B-Instruct
+          export Embedding_model=BAAI/bge-base-en-v1.5
+          export Reranking_model=BAAI/bge-reranker-base
+          export Mount_dir=./data
+          export CodeTrans_model=mistralai/Mistral-7B-Instruct-v0.3
+          export DocSum_model=meta-llama/Meta-Llama-3-8B-Instruct
+          export CodeGen_model=Qwen/Qwen2.5-Coder-7B-Instruct
+          export AudioQnA_model=meta-llama/Meta-Llama-3-8B-Instruct
+          export VisualQnA_model=llava-hf/llava-v1.6-mistral-7b-hf
+          export FaqGen_model=meta-llama/Meta-Llama-3-8B-Instruct
 
-            INPUT_DATA=$(
-              jq -r --arg type "k8s" --arg id "${{ inputs.example }}" \
-                '.[$type][$id].inputs.deploy[]' ${{ github.workspace }}/.github/workflows/one-click-inputs.json | \
-              sed "s/\$hardware/$hardware/g; s/\$HF_TOKEN/$HF_TOKEN/g"
-            )
-            echo "Generated input:"
-            echo "$INPUT_DATA"
+          INPUT_DATA=$(
+            jq -r --arg type "k8s" --arg id "${{ inputs.example }}" \
+              '.[$type][$id].inputs.deploy[]' ${{ github.workspace }}/.github/workflows/one-click-inputs.json | \
+            sed "s/\$hardware/$hardware/g; s/\$HF_TOKEN/$HF_TOKEN/g"
+          )
+          echo "Generated input:"
+          echo "$INPUT_DATA"
 
-            python3 one_click_deploy.py << INPUTS
-            $INPUT_DATA
-            INPUTS
+          python3 one_click_deploy.py << INPUTS
+          $INPUT_DATA
+          INPUTS
 
       - name: Clean up deployment
         run: |
           cd ${{ github.workspace }}/one_click_deploy
+          INPUT_DATA=$(
+            jq -r --arg type "k8s" --arg id "${{ inputs.example }}" \
+              '.[$type][$id].inputs.clear[]' ${{ github.workspace }}/.github/workflows/one-click-inputs.json
+          )
+          echo "Generated input:"
+          echo "$INPUT_DATA"
+
           python3 one_click_deploy.py << INPUTS
-          ${{ needs.get-example-id.outputs.example_id }}
-          2
-          k8s
-          y
-          Y
+          $INPUT_DATA
           INPUTS
 
       - name: Publish pipeline artifact
