@@ -231,7 +231,7 @@ def update_or_create_set_env(source_path: pathlib.Path, dest_path: pathlib.Path,
         # Match both uppercase and lowercase versions of the variable for robustness
         # The replacement will use the key from the `updates` dictionary
         for i, line in enumerate(lines):
-            if re.match(rf"^\s*(export\s+)?{re.escape(var_name)}\s*=.*", line, re.IGNORECASE):
+            if re.match(rf"^\s*(export\s+)?{re.escape(var_name)}\s*=.*", line):
                 lines[i] = f"export {var_name}={safe_new_value}"
                 found = True
                 break
