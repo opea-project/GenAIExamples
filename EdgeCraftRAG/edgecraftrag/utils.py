@@ -4,10 +4,10 @@
 import io
 import os
 from typing import Iterator, Optional
-from transformers import AutoTokenizer
 
 from docx.text.paragraph import Paragraph
 from PIL import Image as Img
+from transformers import AutoTokenizer
 from unstructured.documents.elements import ElementMetadata, Image
 from unstructured.partition.docx import DocxPartitionerOptions
 
@@ -23,6 +23,7 @@ Pay attention to your formatting of response. If you need to reference content f
 Try to summarize from the context, do some reasoning before response, then response. Make sure your response is logically sound and self-consistent.
 
 """
+
 
 class DocxParagraphPicturePartitioner:
     @classmethod
@@ -40,23 +41,21 @@ class DocxParagraphPicturePartitioner:
             yield Image(text="IMAGE", metadata=element_metadata)
 
 
-def get_prompt_template(model_id, template_path = None):
+def get_prompt_template(model_id, template_path=None):
     if template_path:
         from pathlib import Path
+
         template = Path(template_path).read_text(encoding=None)
     else:
         template = DEFAULT_TEMPLATE
     tokenizer = AutoTokenizer.from_pretrained(model_id)
-    model_id = model_id.split('/')[-1]
-    messages = [
-        {"role": "system", "content": template},
-        {"role": "user", "content": "\n{input}\n"}
-    ]
+    model_id = model_id.split("/")[-1]
+    messages = [{"role": "system", "content": template}, {"role": "user", "content": "\n{input}\n"}]
     prompt_template = tokenizer.apply_chat_template(
         messages,
         tokenize=False,
         add_generation_prompt=True,
-        enable_thinking=False # Switches between thinking and non-thinking modes. Default is True.
+        enable_thinking=False,  # Switches between thinking and non-thinking modes. Default is True.
     )
     return prompt_template
 

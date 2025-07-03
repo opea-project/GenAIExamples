@@ -1,11 +1,11 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-import os
 import json
+import os
 import weakref
 
-from edgecraftrag.api_schema import PipelineCreateIn, MilvusConnectRequest
+from edgecraftrag.api_schema import MilvusConnectRequest, PipelineCreateIn
 from edgecraftrag.base import IndexerType, InferenceType, ModelType, NodeParserType, PostProcessorType, RetrieverType
 from edgecraftrag.components.benchmark import Benchmark
 from edgecraftrag.components.generator import QnAGenerator
@@ -265,7 +265,7 @@ def load_pipeline_from_file():
     if os.path.exists(PIPELINE_FILE):
         with open(PIPELINE_FILE, "r") as f:
             all_pipelines = f.read()
-        try: 
+        try:
             all_da = json.loads(all_pipelines)
             for pipeline_data in all_da:
                 one_pipelinejson = json.loads(pipeline_data)
@@ -282,11 +282,11 @@ def save_pipeline_to_file():
 
     if not os.path.exists(CONFIG_DIR):
         os.makedirs(CONFIG_DIR, exist_ok=True)
-    try: 
-        pipelines_data =ctx.get_pipeline_mgr().get_pipelines()
+    try:
+        pipelines_data = ctx.get_pipeline_mgr().get_pipelines()
         all_pipeline_json = []
         for pipeline in pipelines_data:
-           all_pipeline_json.append(pipeline.get_pipeline_json)
+            all_pipeline_json.append(pipeline.get_pipeline_json)
         json_str = json.dumps(all_pipeline_json, indent=2)
         with open(PIPELINE_FILE, "w") as f:
             f.write(json_str)
@@ -304,9 +304,9 @@ async def check_milvus(request: MilvusConnectRequest):
         elif vector_uri.startswith("https://"):
             host_port = vector_uri.replace("https://", "")
         else:
-            host_port = vector_uri 
-        host, port = host_port.split(":", 1) 
-        connections.connect(alias="default",host=host,port=port)
+            host_port = vector_uri
+        host, port = host_port.split(":", 1)
+        connections.connect(alias="default", host=host, port=port)
 
         if connections.has_connection("default"):
             return {"status": "200", "message": "Milvus connection successful."}

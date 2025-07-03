@@ -1,18 +1,18 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+import asyncio
 import json
 import os
 import time
-import asyncio
-from typing import Any, Callable, List, Optional
 from concurrent.futures import ThreadPoolExecutor
+from typing import Any, Callable, List, Optional
 
 from comps.cores.proto.api_protocol import ChatCompletionRequest
 from edgecraftrag.base import BaseComponent, CallbackType, CompType, InferenceType, RetrieverType
 from edgecraftrag.components.postprocessor import RerankProcessor
-from edgecraftrag.components.retriever import AutoMergeRetriever, SimpleBM25Retriever, VectorSimRetriever
 from edgecraftrag.components.query_preprocess import query_search
+from edgecraftrag.components.retriever import AutoMergeRetriever, SimpleBM25Retriever, VectorSimRetriever
 from fastapi.responses import StreamingResponse
 from llama_index.core.schema import Document, QueryBundle
 from pydantic import BaseModel, Field, model_serializer
@@ -231,21 +231,23 @@ def run_generator_ben(pl: Pipeline, chat_request: ChatCompletionRequest) -> Any:
     start = time.perf_counter()
     query = chat_request.messages
     if pl.generator.inference_type == InferenceType.VLLM:
-            UI_DIRECTORY = os.getenv("UI_TMPFILE_PATH", "/home/user/ui_cache")
-            search_config_path = os.path.join(UI_DIRECTORY, "configs/search_config.yaml")
-            search_dir = os.path.join(UI_DIRECTORY, "configs/search_dir")
-            def run_async_query_search():
-                loop = asyncio.new_event_loop()
-                asyncio.set_event_loop(loop)
-                try:
-                    return loop.run_until_complete(query_search(query, search_config_path, search_dir))
-                finally:
-                    loop.close()
-            with ThreadPoolExecutor(max_workers=1) as executor:
-                future = executor.submit(run_async_query_search)
-                top1_issue, sub_questionss_result = future.result()
-            if sub_questionss_result:
-                query = query + sub_questionss_result
+        UI_DIRECTORY = os.getenv("UI_TMPFILE_PATH", "/home/user/ui_cache")
+        search_config_path = os.path.join(UI_DIRECTORY, "configs/search_config.yaml")
+        search_dir = os.path.join(UI_DIRECTORY, "configs/search_dir")
+
+        def run_async_query_search():
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            try:
+                return loop.run_until_complete(query_search(query, search_config_path, search_dir))
+            finally:
+                loop.close()
+
+        with ThreadPoolExecutor(max_workers=1) as executor:
+            future = executor.submit(run_async_query_search)
+            top1_issue, sub_questionss_result = future.result()
+        if sub_questionss_result:
+            query = query + sub_questionss_result
 
     retri_res = pl.retriever.run(query=query)
     query_bundle = QueryBundle(query)
@@ -293,21 +295,23 @@ def run_generator(pl: Pipeline, chat_request: ChatCompletionRequest) -> Any:
     query = chat_request.messages
     contexts = {}
     if pl.generator.inference_type == InferenceType.VLLM:
-            UI_DIRECTORY = os.getenv("UI_TMPFILE_PATH", "/home/user/ui_cache")
-            search_config_path = os.path.join(UI_DIRECTORY, "configs/search_config.yaml")
-            search_dir = os.path.join(UI_DIRECTORY, "configs/search_dir")
-            def run_async_query_search():
-                loop = asyncio.new_event_loop()
-                asyncio.set_event_loop(loop)
-                try:
-                    return loop.run_until_complete(query_search(query, search_config_path, search_dir))
-                finally:
-                    loop.close()
-            with ThreadPoolExecutor(max_workers=1) as executor:
-                future = executor.submit(run_async_query_search)
-                top1_issue, sub_questionss_result = future.result()
-            if sub_questionss_result:
-                query = query + sub_questionss_result
+        UI_DIRECTORY = os.getenv("UI_TMPFILE_PATH", "/home/user/ui_cache")
+        search_config_path = os.path.join(UI_DIRECTORY, "configs/search_config.yaml")
+        search_dir = os.path.join(UI_DIRECTORY, "configs/search_dir")
+
+        def run_async_query_search():
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            try:
+                return loop.run_until_complete(query_search(query, search_config_path, search_dir))
+            finally:
+                loop.close()
+
+        with ThreadPoolExecutor(max_workers=1) as executor:
+            future = executor.submit(run_async_query_search)
+            top1_issue, sub_questionss_result = future.result()
+        if sub_questionss_result:
+            query = query + sub_questionss_result
 
     retri_res = pl.retriever.run(query=query)
     contexts[CompType.RETRIEVER] = retri_res

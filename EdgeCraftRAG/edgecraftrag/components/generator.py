@@ -9,13 +9,12 @@ import urllib.request
 from urllib.parse import urlparse
 
 from edgecraftrag.base import BaseComponent, CompType, GeneratorType, InferenceType, NodeParserType
-from edgecraftrag.utils import concat_history, save_history
+from edgecraftrag.utils import concat_history, get_prompt_template, save_history
 from fastapi.responses import StreamingResponse
 from langchain_core.prompts import PromptTemplate
 from llama_index.llms.openai_like import OpenAILike
 from pydantic import model_serializer
 from unstructured.staging.base import elements_from_base64_gzipped_json
-from edgecraftrag.utils import get_prompt_template
 
 
 def extract_urls(text):
@@ -135,12 +134,16 @@ class QnAGenerator(BaseComponent):
             self.model_id = llm_model().model_id
         if self.inference_type == InferenceType.LOCAL:
             self.lock = asyncio.Lock()
-        # using the prompt template enhancement strategy(only tested on Qwen2-7B-Instruction) if template_enhance_on is true 
+        # using the prompt template enhancement strategy(only tested on Qwen2-7B-Instruction) if template_enhance_on is true
         self.template_enhance_on = True if "Qwen2" in self.model_id else False
         if prompt_template_file is None:
             print("There is no template file, using the default template.")
             prompt_template = get_prompt_template(self.model_id)
-            self.prompt = DocumentedContextRagPromptTemplate.from_template(prompt_template) if self.template_enhance_on else prompt_template
+            self.prompt = (
+                DocumentedContextRagPromptTemplate.from_template(prompt_template)
+                if self.template_enhance_on
+                else prompt_template
+            )
         else:
             safe_root = "/templates"
             template_path = os.path.normpath(os.path.join(safe_root, prompt_template_file))
@@ -160,7 +163,7 @@ class QnAGenerator(BaseComponent):
             self.model_id = llm_model().model_id
         if self.inference_type == InferenceType.LOCAL:
             self.lock = asyncio.Lock()
-        if self.inference_type ==  InferenceType.VLLM:
+        if self.inference_type == InferenceType.VLLM:
             self.vllm_name = llm_model().model_id
             if vllm_endpoint == "":
                 vllm_endpoint = os.getenv("vLLM_ENDPOINT", "http://localhost:8086")
@@ -175,7 +178,11 @@ class QnAGenerator(BaseComponent):
 
     def reset_prompt(self):
         prompt_template = get_prompt_template(self.model_id)
-        self.prompt = DocumentedContextRagPromptTemplate.from_template(prompt_template) if self.template_enhance_on else prompt_template
+        self.prompt = (
+            DocumentedContextRagPromptTemplate.from_template(prompt_template)
+            if self.template_enhance_on
+            else prompt_template
+        )
 
     def clean_string(self, string):
         ret = string
