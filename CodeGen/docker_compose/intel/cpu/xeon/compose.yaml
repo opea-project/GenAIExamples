@@ -87,8 +87,8 @@ services:
     image: redis/redis-stack:7.2.0-v9
     container_name: redis-vector-db
     ports:
-      - "${REDIS_DB_PORT}:${REDIS_DB_PORT}"
-      - "${REDIS_INSIGHTS_PORT}:${REDIS_INSIGHTS_PORT}"
+      - "${REDIS_DB_PORT:-6379}:${REDIS_DB_PORT:-6379}"
+      - "${REDIS_INSIGHTS_PORT:-8001}:${REDIS_INSIGHTS_PORT:-8001}"
   dataprep-redis-server:
     image: ${REGISTRY:-opea}/dataprep:${TAG:-latest}
     container_name: dataprep-redis-server
@@ -153,7 +153,7 @@ services:
     depends_on:
       - redis-vector-db
     ports:
-      - "${REDIS_RETRIEVER_PORT}:${REDIS_RETRIEVER_PORT}"
+      - "${REDIS_RETRIEVER_PORT:-7000}:${REDIS_RETRIEVER_PORT:-7000}"
     ipc: host
     environment:
       no_proxy: ${no_proxy}

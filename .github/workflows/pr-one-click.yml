@@ -1,0 +1,31 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+name: One Click CI Test
+
+permissions:
+  contents: read
+
+on:
+  pull_request:
+    branches: ["main", "*rc", "one_click_dev"]
+    types: [opened, reopened, synchronize] # added `ready_for_review` since draft is skipped
+    paths:
+      - "**/one_click_deploy/**"
+
+# If there is a new commit, the previous jobs will be canceled
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  one-click-test:
+    uses: ./.github/workflows/_run-one-click.yml
+    with:
+      registry: "opea"
+      tag: "ci"
+      example: ChatQnA
+      hardware: gaudi
+      test_helmchart: true
+      test_compose: true
+    secrets: inherit

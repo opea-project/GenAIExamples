@@ -1,0 +1,269 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+name: One Click test on call
+
+permissions:
+  contents: read
+
+on:
+  workflow_call:
+    inputs:
+      registry:
+        description: Container Registry URL
+        required: false
+        default: ""
+        type: string
+      tag:
+        description: Container Tag
+        required: false
+        default: "latest"
+        type: string
+      example:
+        description: Example to test
+        required: true
+        type: string
+      test_compose:
+        default: true
+        description: 'Test examples with docker compose'
+        required: false
+        type: boolean
+      test_helmchart:
+        default: true
+        description: 'Test examples with helm charts'
+        required: false
+        type: boolean
+      hardware:
+        description: Hardware to run the test on
+        required: true
+        type: string
+      opea_branch:
+        default: "main"
+        required: false
+        type: string
+jobs:
+  docker-test:
+    if: ${{ inputs.test_compose || inputs.tag == 'ci' }}
+    runs-on: ${{ inputs.hardware }}
+    continue-on-error: true
+    steps:
+      - name: Clean up Working Directory
+        run: |
+          sudo rm -rf ${{github.workspace}}/* || true
+
+          echo "Cleaning up containers using ports..."
+          cid=$(docker ps --format '{{.Names}} : {{.Ports}}' | grep -v ' : $' | grep -v 0.0.0.0:5000 | awk -F' : ' '{print $1}')
+          if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid && sleep 1s; fi
+          docker system prune -f
+
+          echo "Cleaning up images ..."
+          docker images --filter reference="*/*/*:latest" -q | xargs -r docker rmi && sleep 1s
+          docker images --filter reference="*/*:ci" -q | xargs -r docker rmi && sleep 1s
+          docker images --filter reference="*:5000/*/*" -q | xargs -r docker rmi && sleep 1s
+          docker images --filter reference="opea/comps-base" -q | xargs -r docker rmi && sleep 1s
+          docker images
+
+      - name: Checkout out Repo
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.get-test-case.outputs.CHECKOUT_REF }}
+          fetch-depth: 0
+
+      - name: Clean up container before test
+        shell: bash
+        run: |
+          docker ps
+          cd ${{ github.workspace }}/${{ inputs.example }}
+          export test_case=${{ matrix.test_case }}
+          export hardware=${{ inputs.hardware }}
+          bash ${{ github.workspace }}/.github/workflows/scripts/docker_compose_clean_up.sh "containers"
+          bash ${{ github.workspace }}/.github/workflows/scripts/docker_compose_clean_up.sh "ports"
+          docker ps
+
+      - name: Log in DockerHub
+        uses: docker/login-action@v3.2.0
+        with:
+          username: ${{ secrets.DOCKERHUB_USER }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: deploy docker and test
+        shell: bash
+        env:
+          HUGGINGFACEHUB_API_TOKEN: ${{ secrets.HF_TOKEN }}
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          GOOGLE_CSE_ID: ${{ secrets.GOOGLE_CSE_ID }}
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          PINECONE_KEY: ${{ secrets.PINECONE_KEY }}
+          PINECONE_KEY_LANGCHAIN_TEST: ${{ secrets.PINECONE_KEY_LANGCHAIN_TEST }}
+          SDK_BASE_URL: ${{ secrets.SDK_BASE_URL }}
+          SERVING_TOKEN: ${{ secrets.SERVING_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
+          FINANCIAL_DATASETS_API_KEY: ${{ secrets.FINANCIAL_DATASETS_API_KEY }}
+          IMAGE_REPO: ${{ inputs.registry }}
+          IMAGE_TAG: ${{ inputs.tag }}
+          opea_branch: ${{ inputs.opea_branch }}
+          example: ${{ inputs.example }}
+          hardware: ${{ inputs.hardware }}
+          test_case: ${{ matrix.test_case }}
+          use_model_cache: ${{ inputs.use_model_cache }}
+        run: |
+          set -x
+          sudo apt update
+          sudo apt install -y python3-pip
+          cd ${{ github.workspace }}/one_click_deploy
+          python3 -m pip install -r requirements.txt
+
+          export LLM_model=meta-llama/Meta-Llama-3-8B-Instruct
+          export Embedding_model=BAAI/bge-base-en-v1.5
+          export Reranking_model=BAAI/bge-reranker-base
+          export Mount_dir=./data
+          export CodeTrans_model=mistralai/Mistral-7B-Instruct-v0.3
+          export DocSum_model=meta-llama/Meta-Llama-3-8B-Instruct
+          export CodeGen_model=Qwen/Qwen2.5-Coder-7B-Instruct
+          export AudioQnA_model=meta-llama/Meta-Llama-3-8B-Instruct
+          export VisualQnA_model=llava-hf/llava-v1.6-mistral-7b-hf
+          export FaqGen_model=meta-llama/Meta-Llama-3-8B-Instruct
+
+          INPUT_DATA=$(
+            jq -r --arg type "docker" --arg id "${{ inputs.example }}" \
+              '.[$type][$id].inputs.deploy[]' ${{ github.workspace }}/.github/workflows/one-click-inputs-nobuild.json | \
+            sed "s|\$hardware|$hardware|g; \
+                 s|\$HF_TOKEN|$HF_TOKEN|g; \
+                 s|\$LLM_model|$LLM_model|g; \
+                 s|\$Embedding_model|$Embedding_model|g; \
+                 s|\$Reranking_model|$Reranking_model|g; \
+                 s|\$CodeTrans_model|$CodeTrans_model|g; \
+                 s|\$DocSum_model|$DocSum_model|g; \
+                 s|\$CodeGen_model|$CodeGen_model|g; \
+                 s|\$AudioQnA_model|$AudioQnA_model|g; \
+                 s|\$VisualQnA_model|$VisualQnA_model|g; \
+                 s|\$FaqGen_model|$FaqGen_model|g; \
+                 s|\$Mount_dir|$Mount_dir|g"
+          )
+          echo "Generated input:"
+          echo "$INPUT_DATA"
+
+          python3 one_click_deploy.py << INPUTS
+          $INPUT_DATA
+          INPUTS
+
+      - name: Clean up deployment
+        run: |
+          cd ${{ github.workspace }}/one_click_deploy
+
+          INPUT_DATA=$(
+            jq -r --arg type "docker" --arg id "${{ inputs.example }}" \
+              '.[$type][$id].inputs.clear[]' ${{ github.workspace }}/.github/workflows/one-click-inputs.json | \
+            sed "s/\$hardware/$hardware/g"
+          )
+          echo "Generated input:"
+          echo "$INPUT_DATA"
+
+          python3 one_click_deploy.py << INPUTS
+          $INPUT_DATA
+          INPUTS
+
+      - name: Publish docker pipeline artifact
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker
+          path: ${{ github.workspace }}/docker-tests/*.log
+
+
+  k8s-test:
+    if: ${{ inputs.test_helmchart || inputs.tag == 'ci' }}
+    runs-on: k8s-${{ inputs.hardware }}
+    continue-on-error: true
+    steps:
+      - name: Clean Up Working Directory
+        run: |
+          echo "value_file=${{ matrix.value_file }}"
+          sudo rm -rf ${{github.workspace}}/*
+
+      - name: Checkout out Repo
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.get-test-case.outputs.CHECKOUT_REF }}
+          fetch-depth: 0
+
+      - name: deploy k8s and test
+        shell: bash
+        env:
+          HUGGINGFACEHUB_API_TOKEN: ${{ secrets.HF_TOKEN }}
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          GOOGLE_CSE_ID: ${{ secrets.GOOGLE_CSE_ID }}
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          PINECONE_KEY: ${{ secrets.PINECONE_KEY }}
+          PINECONE_KEY_LANGCHAIN_TEST: ${{ secrets.PINECONE_KEY_LANGCHAIN_TEST }}
+          SDK_BASE_URL: ${{ secrets.SDK_BASE_URL }}
+          SERVING_TOKEN: ${{ secrets.SERVING_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
+          FINANCIAL_DATASETS_API_KEY: ${{ secrets.FINANCIAL_DATASETS_API_KEY }}
+          IMAGE_REPO: ${{ inputs.registry }}
+          IMAGE_TAG: ${{ inputs.tag }}
+          opea_branch: ${{ inputs.opea_branch }}
+          example: ${{ inputs.example }}
+          hardware: ${{ inputs.hardware }}
+          test_case: ${{ matrix.test_case }}
+          use_model_cache: ${{ inputs.use_model_cache }}
+        run: |
+          cd ${{ github.workspace }}/one_click_deploy
+          python3 -m pip install -r requirements.txt
+
+          export LLM_model=meta-llama/Meta-Llama-3-8B-Instruct
+          export Embedding_model=BAAI/bge-base-en-v1.5
+          export Reranking_model=BAAI/bge-reranker-base
+          export Mount_dir=./data
+          export CodeTrans_model=mistralai/Mistral-7B-Instruct-v0.3
+          export DocSum_model=meta-llama/Meta-Llama-3-8B-Instruct
+          export CodeGen_model=Qwen/Qwen2.5-Coder-7B-Instruct
+          export AudioQnA_model=meta-llama/Meta-Llama-3-8B-Instruct
+          export VisualQnA_model=llava-hf/llava-v1.6-mistral-7b-hf
+          export FaqGen_model=meta-llama/Meta-Llama-3-8B-Instruct
+
+          INPUT_DATA=$(
+            jq -r --arg type "k8s" --arg id "${{ inputs.example }}" \
+              '.[$type][$id].inputs.deploy[]' ${{ github.workspace }}/.github/workflows/one-click-inputs-nobuild.json | \
+            sed "s|\$hardware|$hardware|g; \
+                 s|\$HF_TOKEN|$HF_TOKEN|g; \
+                 s|\$LLM_model|$LLM_model|g; \
+                 s|\$Embedding_model|$Embedding_model|g; \
+                 s|\$Reranking_model|$Reranking_model|g; \
+                 s|\$CodeTrans_model|$CodeTrans_model|g; \
+                 s|\$DocSum_model|$DocSum_model|g; \
+                 s|\$CodeGen_model|$CodeGen_model|g; \
+                 s|\$AudioQnA_model|$AudioQnA_model|g; \
+                 s|\$VisualQnA_model|$VisualQnA_model|g; \
+                 s|\$FaqGen_model|$FaqGen_model|g; \
+                 s|\$Mount_dir|$Mount_dir|g"
+          )
+          echo "Generated input:"
+          echo "$INPUT_DATA"
+
+          python3 one_click_deploy.py << INPUTS
+          $INPUT_DATA
+          INPUTS
+
+      - name: Clean up deployment
+        run: |
+          cd ${{ github.workspace }}/one_click_deploy
+          INPUT_DATA=$(
+            jq -r --arg type "k8s" --arg id "${{ inputs.example }}" \
+              '.[$type][$id].inputs.clear[]' ${{ github.workspace }}/.github/workflows/one-click-inputs.json
+          )
+          echo "Generated input:"
+          echo "$INPUT_DATA"
+
+          python3 one_click_deploy.py << INPUTS
+          $INPUT_DATA
+          INPUTS
+
+      - name: Publish pipeline artifact
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: k8s
+          path: ${{ github.workspace }}/k8s-tests/*.log
