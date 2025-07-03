@@ -79,98 +79,9 @@ The table below lists currently available deployment options. They outline in de
 
 ## Validated Configurations
 
-<<<<<<< HEAD
 | **Deploy Method** | **Hardware** |
 | ----------------- | ------------ |
 | Docker Compose    | Intel Xeon   |
-=======
-![image](https://github.com/user-attachments/assets/969fefb7-543d-427f-a56c-dc70e474ae60)
-
-## Microservice Setup
-
-### Start Agent Microservice
-
-Workflow Executor will have a single docker image.
-
-(Optional) Build the agent docker image with the most latest changes.  
-By default, Workflow Executor uses public [opea/vllm](https://hub.docker.com/r/opea/agent) docker image if no local built image exists.
-
-```sh
-export WORKDIR=$PWD
-git clone https://github.com/opea-project/GenAIComps.git
-cd GenAIExamples//WorkflowExecAgent/docker_image_build/
-git clone https://github.com/opea-project/GenAIExamples.git
-docker compose -f build.yaml build --no-cache
-```
-
-<details>
-<summary> Using Remote LLM Endpoints </summary>
-When models are deployed on a remote server, a base URL and an API key are required to access them. To set up a remote server and acquire the base URL and API key, refer to <a href="https://www.intel.com/content/www/us/en/products/docs/accelerator-engines/enterprise-ai.html"> Intel® AI for Enterprise Inference </a> offerings.
-
-Set the following environment variables.
-
-- `llm_endpoint_url` is the HTTPS endpoint of the remote server with the model of choice (i.e. https://api.inference.denvrdata.com). **Note:** If not using LiteLLM, the second part of the model card needs to be appended to the URL i.e. `/Llama-3.3-70B-Instruct` from `meta-llama/Llama-3.3-70B-Instruct`.
-- `llm_endpoint_api_key` is the access token or key to access the model(s) on the server.
-- `LLM_MODEL_ID` is the model card which may need to be overwritten depending on what it is set to `set_env.sh`.
-
-```bash
-export llm_endpoint_url=<https-endpoint-of-remote-server>
-export llm_endpoint_api_key=<your-api-key>
-export LLM_MODEL_ID=<model-card>
-```
-
-</details>
-
-Configure `GenAIExamples/WorkflowExecAgent/docker_compose/.env` file with the following. Replace the variables according to your usecase.
-
-```sh
-export SDK_BASE_URL=${SDK_BASE_URL}
-export SERVING_TOKEN=${SERVING_TOKEN}
-export HF_TOKEN=${HF_TOKEN}
-export llm_engine=vllm
-export llm_endpoint_url=${llm_endpoint_url}
-export api_key=${llm_endpoint_api_key:-""}
-export ip_address=$(hostname -I | awk '{print $1}')
-export model=${LLM_MODEL_ID:-"mistralai/Mistral-7B-Instruct-v0.3"}
-export recursion_limit=${recursion_limit}
-export temperature=0
-export max_new_tokens=1000
-export WORKDIR=${WORKDIR}
-export TOOLSET_PATH=$WORKDIR/GenAIExamples/WorkflowExecAgent/tools/
-export http_proxy=${http_proxy}
-export https_proxy=${https_proxy}
-```
-
-> Note: SDK_BASE_URL and SERVING_TOKEN can be obtained from Intel Data Insight Automation platform.  
-> For llm_endpoint_url, both local vllm service or an remote vllm endpoint work for the example.
-
-Launch service by running the docker compose command.
-
-```sh
-cd $WORKDIR/GenAIExamples/WorkflowExecAgent/docker_compose
-docker compose -f compose.yaml up -d
-```
-
-### Validate service
-
-The microservice logs can be viewed using:
-
-```sh
-docker logs workflowexec-agent-endpoint
-```
-
-You should be able to see "HTTP server setup successful" upon successful startup.
-
-You can validate the service using the following command:
-
-```sh
-curl http://${ip_address}:9090/v1/chat/completions -X POST -H "Content-Type: application/json" -d '{
-     "query": "I have a data with gender Female, tenure 55, MonthlyAvgCharges 103.7. Predict if this entry will churn. My workflow id is '${workflow_id}'."
-    }'
-```
-
-Update the `query` with the workflow parameters, workflow id, etc based on the workflow context.
->>>>>>> 5b864ae7 (Enable Remote Endpoints for LLM using Intel Enterprise Inference)
 
 ## Roadmap
 
