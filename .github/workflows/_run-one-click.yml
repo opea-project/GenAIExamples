@@ -104,7 +104,7 @@ jobs:
           IMAGE_TAG: ${{ inputs.tag }}
           opea_branch: ${{ inputs.opea_branch }}
           example: ${{ inputs.example }}
-          hardware: gaudi
+          hardware: ${{ inputs.hardware }}
           test_case: ${{ matrix.test_case }}
           use_model_cache: ${{ inputs.use_model_cache }}
         run: |
@@ -128,7 +128,18 @@ jobs:
           INPUT_DATA=$(
             jq -r --arg type "docker" --arg id "${{ inputs.example }}" \
               '.[$type][$id].inputs.deploy[]' ${{ github.workspace }}/.github/workflows/one-click-inputs.json | \
-            sed "s/\$hardware/$hardware/g; s/\$HF_TOKEN/$HF_TOKEN/g"
+            sed "s|\$hardware|$hardware|g; \
+                 s|\$HF_TOKEN|$HF_TOKEN|g; \
+                 s|\$LLM_model|$LLM_model|g; \
+                 s|\$Embedding_model|$Embedding_model|g; \
+                 s|\$Reranking_model|$Reranking_model|g; \
+                 s|\$CodeTrans_model|$CodeTrans_model|g; \
+                 s|\$DocSum_model|$DocSum_model|g; \
+                 s|\$CodeGen_model|$CodeGen_model|g; \
+                 s|\$AudioQnA_model|$AudioQnA_model|g; \
+                 s|\$VisualQnA_model|$VisualQnA_model|g; \
+                 s|\$FaqGen_model|$FaqGen_model|g; \
+                 s|\$Mount_dir|$Mount_dir|g"
           )
           echo "Generated input:"
           echo "$INPUT_DATA"
@@ -195,7 +206,7 @@ jobs:
           IMAGE_TAG: ${{ inputs.tag }}
           opea_branch: ${{ inputs.opea_branch }}
           example: ${{ inputs.example }}
-          hardware: gaudi
+          hardware: ${{ inputs.hardware }}
           test_case: ${{ matrix.test_case }}
           use_model_cache: ${{ inputs.use_model_cache }}
         run: |
@@ -216,7 +227,18 @@ jobs:
           INPUT_DATA=$(
             jq -r --arg type "k8s" --arg id "${{ inputs.example }}" \
               '.[$type][$id].inputs.deploy[]' ${{ github.workspace }}/.github/workflows/one-click-inputs.json | \
-            sed "s/\$hardware/$hardware/g; s/\$HF_TOKEN/$HF_TOKEN/g"
+            sed "s|\$hardware|$hardware|g; \
+                 s|\$HF_TOKEN|$HF_TOKEN|g; \
+                 s|\$LLM_model|$LLM_model|g; \
+                 s|\$Embedding_model|$Embedding_model|g; \
+                 s|\$Reranking_model|$Reranking_model|g; \
+                 s|\$CodeTrans_model|$CodeTrans_model|g; \
+                 s|\$DocSum_model|$DocSum_model|g; \
+                 s|\$CodeGen_model|$CodeGen_model|g; \
+                 s|\$AudioQnA_model|$AudioQnA_model|g; \
+                 s|\$VisualQnA_model|$VisualQnA_model|g; \
+                 s|\$FaqGen_model|$FaqGen_model|g; \
+                 s|\$Mount_dir|$Mount_dir|g"
           )
           echo "Generated input:"
           echo "$INPUT_DATA"
