@@ -45,7 +45,7 @@ jobs:
       registry: "opea"
       tag: "ci"
       example: ${{ matrix.example }}
-      hardware: gaudi
+      hardware: xeon
       test_helmchart: true
       test_compose: true
     secrets: inherit

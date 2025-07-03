@@ -128,30 +128,20 @@ jobs:
           hardware: gaudi
           test_case: ${{ matrix.test_case }}
           use_model_cache: ${{ inputs.use_model_cache }}
+          LLM_model: meta-llama/Meta-Llama-3-8B-Instruct
+          Embedding_model: BAAI/bge-base-en-v1.5
+          Reranking_model: BAAI/bge-reranker-base
+          Mount_dir: ./data
+          CodeTrans_model: mistralai/Mistral-7B-Instruct-v0.3
+          DocSum_model: meta-llama/Meta-Llama-3-8B-Instruct
+          CodeGen_model: Qwen/Qwen2.5-Coder-7B-Instruct
+          AudioQnA_model: meta-llama/Meta-Llama-3-8B-Instruct
+          VisualQnA_model: llava-hf/llava-v1.6-mistral-7b-hf
+          FaqGen_model: meta-llama/Meta-Llama-3-8B-Instruct
         run: |
           set -x
           cd ${{ github.workspace }}/one_click_deploy
           python3 -m pip install -r requirements.txt
-
-          # if [ "${{ needs.get-example-id.outputs.example_id }}" -eq 1 ]; then
-          #   empty_lines="7"
-          # else
-          #   empty_lines="4"
-          # fi
-          # python3 one_click_deploy.py << INPUTS
-          # ${{ needs.get-example-id.outputs.example_id }}
-          # 1
-          # docker
-          # $hardware
-          # $HF_TOKEN
-          # for i in $(seq 1 $empty_lines); do echo -e ""; done
-          # N
-          # y
-          # Y
-          # N
-          # y
-          # Y
-          # INPUTS
 
           INPUT_DATA=$(
             jq -r --arg type "docker" --arg id "${{ inputs.example }}" \
@@ -160,6 +150,7 @@ jobs:
           )
           echo "Generated input:"
           echo "$INPUT_DATA"
+
           python3 one_click_deploy.py << INPUTS
           $INPUT_DATA
           INPUTS
@@ -184,84 +175,84 @@ jobs:
           path: ${{ github.workspace }}/docker-tests/*.log
 
 
-  # k8s-test:
-  #   if: ${{ inputs.test_helmchart || inputs.tag == 'ci' }}
-  #   needs: [get-example-id]
-  #   runs-on: k8s-${{ inputs.hardware }}
-  #   continue-on-error: true
-  #   steps:
-  #     - name: Clean Up Working Directory
-  #       run: |
-  #         echo "value_file=${{ matrix.value_file }}"
-  #         sudo rm -rf ${{github.workspace}}/*
+  k8s-test:
+    if: ${{ inputs.test_helmchart || inputs.tag == 'ci' }}
+    needs: [get-example-id]
+    runs-on: k8s-${{ inputs.hardware }}
+    continue-on-error: true
+    steps:
+      - name: Clean Up Working Directory
+        run: |
+          echo "value_file=${{ matrix.value_file }}"
+          sudo rm -rf ${{github.workspace}}/*
 
-  #     - name: Checkout out Repo
-  #       uses: actions/checkout@v4
-  #       with:
-  #         ref: ${{ needs.get-test-case.outputs.CHECKOUT_REF }}
-  #         fetch-depth: 0
+      - name: Checkout out Repo
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.get-test-case.outputs.CHECKOUT_REF }}
+          fetch-depth: 0
 
-  #     - name: deploy k8s and test
-  #       shell: bash
-  #       env:
-  #         HUGGINGFACEHUB_API_TOKEN: ${{ secrets.HF_TOKEN }}
-  #         HF_TOKEN: ${{ secrets.HF_TOKEN }}
-  #         GOOGLE_CSE_ID: ${{ secrets.GOOGLE_CSE_ID }}
-  #         GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
-  #         PINECONE_KEY: ${{ secrets.PINECONE_KEY }}
-  #         PINECONE_KEY_LANGCHAIN_TEST: ${{ secrets.PINECONE_KEY_LANGCHAIN_TEST }}
-  #         SDK_BASE_URL: ${{ secrets.SDK_BASE_URL }}
-  #         SERVING_TOKEN: ${{ secrets.SERVING_TOKEN }}
-  #         OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-  #         FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
-  #         FINANCIAL_DATASETS_API_KEY: ${{ secrets.FINANCIAL_DATASETS_API_KEY }}
-  #         IMAGE_REPO: ${{ inputs.registry }}
-  #         IMAGE_TAG: ${{ inputs.tag }}
-  #         opea_branch: ${{ inputs.opea_branch }}
-  #         example: ${{ inputs.example }}
-  #         hardware: gaudi
-  #         test_case: ${{ matrix.test_case }}
-  #         use_model_cache: ${{ inputs.use_model_cache }}
-  #       run: |
-  #         cd ${{ github.workspace }}/one_click_deploy
-  #         python3 -m pip install -r requirements.txt
-  #         if [ "${{ needs.get-example-id.outputs.example_id }}" -eq 1 ]; then
-  #           empty_lines="6"
-  #         else
-  #           empty_lines="4"
-  #         fi
-  #         python3 one_click_deploy.py << INPUTS
-  #         ${{ needs.get-example-id.outputs.example_id }}
-  #         1
-  #         k8s
-  #         $hardware
-  #         $HF_TOKEN
-  #         for i in $(seq 1 $empty_lines); do echo -e ""; done
-  #         N
-  #         y
-  #         Y
-  #         y
-  #         N
-  #         100.83.111.254:5000
-  #         y
+      - name: deploy k8s and test
+        shell: bash
+        env:
+          HUGGINGFACEHUB_API_TOKEN: ${{ secrets.HF_TOKEN }}
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          GOOGLE_CSE_ID: ${{ secrets.GOOGLE_CSE_ID }}
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          PINECONE_KEY: ${{ secrets.PINECONE_KEY }}
+          PINECONE_KEY_LANGCHAIN_TEST: ${{ secrets.PINECONE_KEY_LANGCHAIN_TEST }}
+          SDK_BASE_URL: ${{ secrets.SDK_BASE_URL }}
+          SERVING_TOKEN: ${{ secrets.SERVING_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
+          FINANCIAL_DATASETS_API_KEY: ${{ secrets.FINANCIAL_DATASETS_API_KEY }}
+          IMAGE_REPO: ${{ inputs.registry }}
+          IMAGE_TAG: ${{ inputs.tag }}
+          opea_branch: ${{ inputs.opea_branch }}
+          example: ${{ inputs.example }}
+          hardware: gaudi
+          test_case: ${{ matrix.test_case }}
+          use_model_cache: ${{ inputs.use_model_cache }}
+          LLM_model: meta-llama/Meta-Llama-3-8B-Instruct
+          Embedding_model: BAAI/bge-base-en-v1.5
+          Reranking_model: BAAI/bge-reranker-base
+          Mount_dir: ./data
+          CodeTrans_model: mistralai/Mistral-7B-Instruct-v0.3
+          DocSum_model: meta-llama/Meta-Llama-3-8B-Instruct
+          CodeGen_model: Qwen/Qwen2.5-Coder-7B-Instruct
+          AudioQnA_model: meta-llama/Meta-Llama-3-8B-Instruct
+          VisualQnA_model: llava-hf/llava-v1.6-mistral-7b-hf
+          FaqGen_model: meta-llama/Meta-Llama-3-8B-Instruct
+        run: |
+          cd ${{ github.workspace }}/one_click_deploy
+          python3 -m pip install -r requirements.txt
+          
+            INPUT_DATA=$(
+              jq -r --arg type "k8s" --arg id "${{ inputs.example }}" \
+                '.[$type][$id].inputs.deploy[]' ${{ github.workspace }}/.github/workflows/one-click-inputs.json | \
+              sed "s/\$hardware/$hardware/g; s/\$HF_TOKEN/$HF_TOKEN/g"
+            )
+            echo "Generated input:"
+            echo "$INPUT_DATA"
 
-  #         Y
-  #         INPUTS
+            python3 one_click_deploy.py << INPUTS
+            $INPUT_DATA
+            INPUTS
 
-  #     - name: Clean up deployment
-  #       run: |
-  #         cd ${{ github.workspace }}/one_click_deploy
-  #         python3 one_click_deploy.py << INPUTS
-  #         ${{ needs.get-example-id.outputs.example_id }}
-  #         2
-  #         k8s
-  #         y
-  #         Y
-  #         INPUTS
+      - name: Clean up deployment
+        run: |
+          cd ${{ github.workspace }}/one_click_deploy
+          python3 one_click_deploy.py << INPUTS
+          ${{ needs.get-example-id.outputs.example_id }}
+          2
+          k8s
+          y
+          Y
+          INPUTS
 
-  #     - name: Publish pipeline artifact
-  #       if: ${{ !cancelled() }}
-  #       uses: actions/upload-artifact@v4
-  #       with:
-  #         name: k8s
-  #         path: ${{ github.workspace }}/k8s-tests/*.log
+      - name: Publish pipeline artifact
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: k8s
+          path: ${{ github.workspace }}/k8s-tests/*.log
