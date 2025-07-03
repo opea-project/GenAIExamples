@@ -68,7 +68,7 @@ function start_services() {
     # Start Docker Containers
     docker compose -f $COMPOSE_FILE up -d > ${LOG_PATH}/start_services_with_compose.log
     echo "ipex-llm-serving-xpu is booting, please wait."
-    sleep 60s
+    sleep 100s
     n=0
     until [[ "$n" -ge 100 ]]; do
         docker logs ipex-llm-serving-xpu-container-0 > ${LOG_PATH}/ipex-llm-serving-xpu-container.log 2>&1
