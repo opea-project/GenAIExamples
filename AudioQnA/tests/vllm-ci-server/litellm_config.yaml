@@ -1,0 +1,6 @@
+model_list:
+  - model_name: "HuggingFaceTB/SmolLM-135M-Instruct"
+    litellm_params:
+      model: "openai/HuggingFaceTB/SmolLM-135M-Instruct"
+      api_base: "http://vllm:8000/v1"
+      api_key: "dummy"
