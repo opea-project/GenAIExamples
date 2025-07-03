@@ -130,7 +130,7 @@ function validate_rag() {
         "1234567890" \
         "query" \
         "ipex-llm-serving-xpu-container-0" \
-        '{"messages":"What is the test id?"}'
+        '{"messages":"What is the test id?","max_tokens":5}'
 }
 
 function validate_megaservice() {
@@ -140,7 +140,7 @@ function validate_megaservice() {
         "1234567890" \
         "query" \
         "ipex-llm-serving-xpu-container-0" \
-        '{"messages":"What is the test id?"}'
+        '{"messages":"What is the test id?","max_tokens":5}'
 }
 
 function stop_docker() {

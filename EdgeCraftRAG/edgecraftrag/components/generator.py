@@ -162,6 +162,8 @@ class QnAGenerator(BaseComponent):
             self.lock = asyncio.Lock()
         if self.inference_type ==  InferenceType.VLLM:
             self.vllm_name = llm_model().model_id
+            if vllm_endpoint == "":
+                vllm_endpoint = os.getenv("vLLM_ENDPOINT", "http://localhost:8086")
             self.vllm_endpoint = vllm_endpoint
 
     def set_prompt(self, prompt):
