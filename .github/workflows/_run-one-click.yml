@@ -112,7 +112,7 @@ jobs:
           sudo apt update
           sudo apt install -y python3-pip
           cd ${{ github.workspace }}/one_click_deploy
-          sudo python3 -m pip install -r requirements.txt
+          python3 -m pip install -r requirements.txt
 
           export LLM_model=meta-llama/Meta-Llama-3-8B-Instruct
           export Embedding_model=BAAI/bge-base-en-v1.5
@@ -243,7 +243,7 @@ jobs:
           echo "Generated input:"
           echo "$INPUT_DATA"
 
-          python3 one_click_deploy.py << INPUTS
+          sudo python3 one_click_deploy.py << INPUTS
           $INPUT_DATA
           INPUTS
 
@@ -257,7 +257,7 @@ jobs:
           echo "Generated input:"
           echo "$INPUT_DATA"
 
-          python3 one_click_deploy.py << INPUTS
+          sudo python3 one_click_deploy.py << INPUTS
           $INPUT_DATA
           INPUTS
 
