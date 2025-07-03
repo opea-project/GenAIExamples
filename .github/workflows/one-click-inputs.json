@@ -1,0 +1,86 @@
+{
+  "docker": {
+    "ChatQnA": {
+      "inputs": {
+        "deploy": ["1", "1", "docker", "$hardware", "$HF_TOKEN", "$http_proxy", "$https_proxy", "$no_proxy", "$LLM_model", "$Embedding_model", "$Reranking_model", "$Mount_dir", "N", "y", "Y", "N", "y", "Y"]
+      }
+    },
+    "CodeTrans": {
+      "inputs": {
+        "deploy": ["2", "1", "docker", "$hardware", "$HF_TOKEN", "$http_proxy", "$https_proxy", "$no_proxy", "$CodeTrans_model", "N", "y", "Y", "N", "y", "Y"]
+      }
+    },
+    "DocSum": {
+      "inputs": {
+        "deploy": ["3", "1", "docker", "$hardware", "$HF_TOKEN", "$http_proxy", "$https_proxy", "$no_proxy", "$DocSum_model", "N", "y", "Y", "N", "y", "Y"]
+      }
+    },
+    "CodeGen": {
+      "inputs": {
+        "deploy": ["4", "1", "docker", "$hardware", "$HF_TOKEN", "$http_proxy", "$https_proxy", "$no_proxy", "$CodeGen_model", "N", "y", "Y", "N", "y", "Y"]
+      }
+    },
+    "AudioQnA": {
+      "inputs": {
+        "deploy": ["5", "1", "docker", "$hardware", "$HF_TOKEN", "$http_proxy", "$https_proxy", "$no_proxy", "$AudioQnA_model", "N", "y", "Y", "N", "y", "Y"]
+      }
+    },
+    "VisualQnA": {
+      "inputs": {
+        "deploy": ["6", "1", "docker", "$hardware", "$HF_TOKEN", "$http_proxy", "$https_proxy", "$no_proxy", "$VisualQnA_model", "N", "y", "Y", "N", "y", "Y"]
+      }
+    },
+    "FaqGen": {
+      "inputs": {
+        "deploy": ["7", "1", "docker", "$hardware", "$HF_TOKEN", "$http_proxy", "$https_proxy", "$no_proxy", "$FaqGen_model", "N", "y", "Y", "N", "y", "Y"]
+      }
+    },
+    "AgentQnA": {
+      "inputs": {
+        "deploy": ["8", "1", "docker", "$hardware", "$HF_TOKEN", "", "", "", "", "N", "y", "Y", "N", "y", "Y"]
+      }
+    }
+  },
+  "k8s": {
+    "ChatQnA": {
+      "inputs": {
+        "deploy": ["1", "1", "docker", "$hardware", "$HF_TOKEN", "", "", "", "", "", "", "N", "y", "Y", "N", "y", "Y"]
+      }
+    },
+    "CodeTrans": {
+      "inputs": {
+        "deploy": ["2", "1", "docker", "$hardware", "$HF_TOKEN", "", "", "", "", "N", "y", "Y", "N", "y", "Y"]
+      }
+    },
+    "DocSum": {
+      "inputs": {
+        "deploy": ["3", "1", "docker", "$hardware", "$HF_TOKEN", "", "", "", "", "N", "y", "Y", "N", "y", "Y"]
+      }
+    },
+    "CodeGen": {
+      "inputs": {
+        "deploy": ["4", "1", "docker", "$hardware", "$HF_TOKEN", "", "", "", "", "N", "y", "Y", "N", "y", "Y"]
+      }
+    },
+    "AudioQnA": {
+      "inputs": {
+        "deploy": ["5", "1", "docker", "$hardware", "$HF_TOKEN", "", "", "", "", "N", "y", "Y", "N", "y", "Y"]
+      }
+    },
+    "VisualQnA": {
+      "inputs": {
+        "deploy": ["6", "1", "docker", "$hardware", "$HF_TOKEN", "", "", "", "", "N", "y", "Y", "N", "y", "Y"]
+      }
+    },
+    "FaqGen": {
+      "inputs": {
+        "deploy": ["7", "1", "docker", "$hardware", "$HF_TOKEN", "", "", "", "", "N", "y", "Y", "N", "y", "Y"]
+      }
+    },
+    "AgentQnA": {
+      "inputs": {
+        "deploy": ["8", "1", "docker", "$hardware", "$HF_TOKEN", "", "", "", "", "N", "y", "Y", "N", "y", "Y"]
+      }
+    }
+  }
+}
