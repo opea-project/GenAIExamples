@@ -21,7 +21,7 @@ HOST_IP=$ip_address
 COMPOSE_FILE="compose_vllm_multi-arc.yaml"
 EC_RAG_SERVICE_PORT=16010
 
-MODEL_PATH="${HOME}/qwen"
+MODEL_PATH="${HOME}/models"
 # MODEL_PATH="$WORKPATH/models"
 DOC_PATH="$WORKPATH/tests"
 UI_UPLOAD_PATH="$WORKPATH/tests"
@@ -34,8 +34,8 @@ VLLM_SERVICE_PORT_0=8100
 TENSOR_PARALLEL_SIZE=1
 SELECTED_XPU_0=0
 vLLM_ENDPOINT="http://${HOST_IP}:${NGINX_PORT}"
-LLM_MODEL=Qwen/Qwen3-8B
-LLM_MODEL_PATH=$MODEL_PATH
+LLM_MODEL="Qwen/Qwen3-8B"
+LLM_MODEL_PATH="${HOME}/qwen/"
 NGINX_CONFIG_PATH="$WORKPATH/nginx/nginx.conf"
 VLLM_IMAGE_TAG="0.8.3-b20"
 DP_NUM=1
@@ -68,6 +68,7 @@ function start_services() {
     # Start Docker Containers
     docker compose -f $COMPOSE_FILE up -d > ${LOG_PATH}/start_services_with_compose.log
     echo "ipex-llm-serving-xpu is booting, please wait."
+    sleep 60s
     n=0
     until [[ "$n" -ge 100 ]]; do
         docker logs ipex-llm-serving-xpu-container-0 > ${LOG_PATH}/ipex-llm-serving-xpu-container.log 2>&1
