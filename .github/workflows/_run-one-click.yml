@@ -144,7 +144,7 @@ jobs:
           echo "Generated input:"
           echo "$INPUT_DATA"
 
-          sudo python3 one_click_deploy.py << INPUTS
+          python3 one_click_deploy.py << INPUTS
           $INPUT_DATA
           INPUTS
 
@@ -160,7 +160,7 @@ jobs:
           echo "Generated input:"
           echo "$INPUT_DATA"
 
-          sudo python3 one_click_deploy.py << INPUTS
+          python3 one_click_deploy.py << INPUTS
           $INPUT_DATA
           INPUTS
 
@@ -243,7 +243,7 @@ jobs:
           echo "Generated input:"
           echo "$INPUT_DATA"
 
-          sudo python3 one_click_deploy.py << INPUTS
+          python3 one_click_deploy.py << INPUTS
           $INPUT_DATA
           INPUTS
 
@@ -257,7 +257,7 @@ jobs:
           echo "Generated input:"
           echo "$INPUT_DATA"
 
-          sudo python3 one_click_deploy.py << INPUTS
+          python3 one_click_deploy.py << INPUTS
           $INPUT_DATA
           INPUTS
 
