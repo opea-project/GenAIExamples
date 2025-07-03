@@ -20,12 +20,6 @@ On Intel Xeon with vLLM:
 bash test_compose_on_xeon.sh
 ```
 
-On Intel Xeon with remote endpoints:
-
-```bash
-bash test_compose_remote_on_xeon.sh
-```
-
 On Intel Gaudi with TGI:
 
 ```bash
