@@ -181,7 +181,9 @@ class Pipeline(BaseComponent):
 # Test callback to retrieve nodes from query
 def run_test_retrieve(pl: Pipeline, chat_request: ChatCompletionRequest) -> Any:
     query = chat_request.messages
+    contexts = {}
     retri_res = pl.retriever.run(query=query)
+    contexts[CompType.RETRIEVER] = retri_res
     query_bundle = QueryBundle(query)
     if pl.postprocessor:
         for processor in pl.postprocessor:
@@ -191,7 +193,8 @@ def run_test_retrieve(pl: Pipeline, chat_request: ChatCompletionRequest) -> Any:
             ):
                 processor.top_n = chat_request.top_n
             retri_res = processor.run(retri_res=retri_res, query_bundle=query_bundle)
-    return retri_res
+            contexts[CompType.POSTPROCESSOR] = retri_res
+    return contexts
 
 
 def run_simple_doc(pl: Pipeline, docs: List[Document]) -> Any:

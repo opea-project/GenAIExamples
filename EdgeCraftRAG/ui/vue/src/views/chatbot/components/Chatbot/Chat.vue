@@ -1,32 +1,32 @@
 <template>
   <div class="chatbot-wrap">
     <div class="message-box" ref="scrollContainer" v-if="messagesLength">
-      <div ref="messageComponent" class="intel-markdown">
-        <div v-for="(msg, index) in messagesList" :key="index" :inResponse>
-          <MessageItem
-            :message="msg"
-            ref="messageRef"
-            :inResponse
-            @preview="hadleImagePreview"
-          />
+      <div class="intel-markdown">
+        <div ref="messageComponent">
+          <div v-for="(msg, index) in messagesList" :key="index" :inResponse>
+            <MessageItem
+              :message="msg"
+              ref="messageRef"
+              :inResponse
+              @preview="hadleImagePreview"
+              @stop="isUserScrolling = true"
+            />
+          </div>
         </div>
       </div>
     </div>
-    <div v-else class="initial-input">
-      <h1 class="title-wrap">
-        <SvgIcon
-          name="icon-chatbot1"
-          :size="40"
-          :style="{ color: 'var(--color-primary)' }"
-        />
-        {{ $t("chat.tip1") }}
-      </h1>
+    <div class="initial-input" v-else>
       <div class="text-wrap">{{ $t("chat.tip2") }}</div>
       <div class="tip-wrap">
         <img :src="lightBulb" alt="" />{{ $t("chat.tip3") }}
       </div>
     </div>
-    <div class="input-wrap">
+    <div class="input-wrap" ref="inputRef">
+      <div class="bottom-wrap" v-if="showScrollToBottomBtn">
+        <div class="to-bottom" @click="scrollToBottom">
+          <ArrowDownOutlined />
+        </div>
+      </div>
       <a-textarea
         v-model:value.trim="inputKeywords"
         @keydown.enter="handleEnter"
@@ -92,6 +92,7 @@ import MessageItem from "./MessageItem.vue";
 import { handleMessageSend } from "./SseService";
 import { pipelineAppStore } from "@/store/pipeline";
 import { Local } from "@/utils/storage";
+import { ArrowDownOutlined } from "@ant-design/icons-vue";
 
 const emit = defineEmits(["config"]);
 const ENV_URL = import.meta.env;
@@ -111,7 +112,10 @@ const messageRef = ref<any>(null);
 const inResponse = ref<boolean>(false);
 const imgVisible = ref<boolean>(false);
 const imageSrc = ref<string>("");
+const isUserScrolling = ref(false);
+const showScrollToBottomBtn = ref(false);
 
+const inputRef = ref();
 const handleEnvUrl = () => {
   const { VITE_CHATBOT_URL } = ENV_URL;
 
@@ -119,8 +123,10 @@ const handleEnvUrl = () => {
 };
 
 const handleMessageDisplay = (data: any) => {
-  if (inResponse.value)
+  if (inResponse.value) {
+    isUserScrolling.value = false;
     messagesList.value[messagesList.value?.length - 1].content = data;
+  }
 };
 const notInput = computed(() => {
   return inputKeywords.value.trim() === "";
@@ -211,13 +217,42 @@ const handleNewChat = () => {
 const handleConfig = () => {
   emit("config");
 };
-const handleResize = () => {
+
+const scrollToBottom = () => {
   if (!scrollContainer.value) return;
 
-  scrollContainer.value.scrollTo({
+  scrollContainer.value?.scrollTo({
     top: scrollContainer.value.scrollHeight,
     behavior: "smooth",
   });
+  isUserScrolling.value = false;
+  showScrollToBottomBtn.value = false;
+};
+const handleResize = (entries: ResizeObserverEntry[]) => {
+  for (let entry of entries) {
+    if (!scrollContainer.value || isUserScrolling.value) return;
+
+    scrollContainer.value?.scrollTo({
+      top: entry.contentRect.height,
+      behavior: "smooth",
+    });
+  }
+};
+
+const handleScroll = () => {
+  const container = scrollContainer.value;
+  if (!container) return;
+
+  const distanceToBottom =
+    container.scrollHeight - container.scrollTop - container.clientHeight;
+
+  if (distanceToBottom > 80) {
+    isUserScrolling.value = true;
+    showScrollToBottomBtn.value = true;
+  } else {
+    isUserScrolling.value = false;
+    showScrollToBottomBtn.value = false;
+  }
 };
 
 const initResizeObserver = () => {
@@ -228,26 +263,28 @@ const initResizeObserver = () => {
 
     resizeObserver = new ResizeObserver(handleResize);
     resizeObserver.observe(messageComponent.value);
+    scrollContainer.value?.addEventListener("scroll", handleScroll);
   }
 };
 
 watch(
-  () => messagesList.value,
-  () => {
-    nextTick(() => {
-      initResizeObserver();
-      if (scrollContainer.value) {
-        scrollContainer.value.scrollTop = scrollContainer.value.scrollHeight;
-      }
-    });
+  () => messageComponent.value,
+  (domo) => {
+    if (domo) {
+      nextTick(() => {
+        initResizeObserver();
+      });
+    }
   },
-  { deep: true, immediate: true }
+  { immediate: true }
 );
 
-onUnmounted(() => {
-  if (resizeObserver) {
-    resizeObserver.disconnect();
+onBeforeUnmount(() => {
+  if (resizeObserver && messageComponent.value) {
+    resizeObserver.unobserve(messageComponent.value);
+    resizeObserver = null;
   }
+  scrollContainer.value?.removeEventListener("scroll", handleScroll);
 });
 </script>
 <style scoped lang="less">
@@ -261,59 +298,94 @@ onUnmounted(() => {
 
   .initial-input {
     text-align: center;
+
     .title-wrap {
       font-size: 28px;
       line-height: 36px;
       color: var(--font-main-color);
     }
+
     .text-wrap {
-      font-size: 16px;
-      color: var(--font-text-color);
+      font-size: 20px;
+      color: var(--font-main-color);
     }
+
     .tip-wrap {
       font-size: 12px;
       color: var(--font-tip-color);
       margin-top: 24px;
+
       img {
         margin-right: 4px;
       }
     }
   }
+
   .message-box {
     flex: 1;
     width: 100%;
     overflow-y: overlay;
-    scrollbar-gutter: stable; /* 预留滚动条空间 */
+    scrollbar-gutter: stable;
     display: flex;
     justify-content: center;
+
     .intel-markdown {
       max-width: 960px;
       width: 75%;
       position: relative;
       transition: all 0.2s;
       height: 100%;
+      min-height: 0;
       margin: 0 48px;
       padding: 24px 0;
     }
   }
+
   .input-wrap {
     padding: 8px;
     margin: 24px 0;
     border: 1px solid var(--color-primary);
-    overflow: hidden;
     border-radius: 20px;
     background-color: var(--input-bg);
     max-width: 960px;
-    min-width: 680px;
+    min-width: 500px;
     transition: all 0.2s;
     width: 75%;
     display: flow-root;
     position: relative;
     left: -2px;
+    text-align: center;
+
     &:hover {
       box-shadow: 0 4px 12px var(--bg-primary-shadow);
       border: 1px solid var(--color-primary-hover);
     }
+    .bottom-wrap {
+      position: absolute;
+      top: -40px;
+      width: 100%;
+      height: 32px;
+      .vertical-center;
+      .to-bottom {
+        .vertical-center;
+        width: 32px;
+        height: 32px;
+        cursor: pointer;
+        z-index: 20;
+        border-radius: 50%;
+        background-color: var(--bg-card-color);
+        border: 1px solid var(--border-main-color);
+        box-shadow: 0px 2px 4px 0px var(--bg-box-shadow);
+        &:hover {
+          background-color: var(--color-second-primaryBg);
+          border: 1px solid var(--color-primary-second);
+          .anticon-arrow-down {
+            color: var(--color-primary-second);
+          }
+        }
+      }
+    }
+
     textarea {
       resize: none;
     }
@@ -333,10 +405,12 @@ onUnmounted(() => {
           margin-left: 8px;
           cursor: pointer;
           .vertical-center;
+
           &:hover .icon-intel {
             color: var(--color-primary) !important;
           }
         }
+
         .icon-send {
           &:hover {
             color: var(--color-white);
@@ -366,6 +440,7 @@ onUnmounted(() => {
 
       .intel-btn-primary:disabled {
         background-color: var(--color-info);
+
         .icon-intel {
           color: var(--color-white) !important;
         }
