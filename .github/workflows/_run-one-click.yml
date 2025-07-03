@@ -226,7 +226,7 @@ jobs:
         run: |
           cd ${{ github.workspace }}/one_click_deploy
           python3 -m pip install -r requirements.txt
-          
+
             INPUT_DATA=$(
               jq -r --arg type "k8s" --arg id "${{ inputs.example }}" \
                 '.[$type][$id].inputs.deploy[]' ${{ github.workspace }}/.github/workflows/one-click-inputs.json | \
