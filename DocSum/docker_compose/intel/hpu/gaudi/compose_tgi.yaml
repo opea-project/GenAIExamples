@@ -13,7 +13,7 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      HUGGING_FACE_HUB_TOKEN: ${HF_TOKEN}
+      HF_TOKEN: ${HF_TOKEN}
       HF_HUB_DISABLE_PROGRESS_BARS: 1
       HF_HUB_ENABLE_HF_TRANSFER: 0
       HABANA_VISIBLE_DEVICES: all
@@ -48,7 +48,6 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      HUGGINGFACEHUB_API_TOKEN: ${HF_TOKEN}
       HF_TOKEN: ${HF_TOKEN}
       MAX_INPUT_TOKENS: ${MAX_INPUT_TOKENS}
       MAX_TOTAL_TOKENS: ${MAX_TOTAL_TOKENS}
@@ -62,7 +61,7 @@ services:
     image: ${REGISTRY:-opea}/whisper:${TAG:-latest}
     container_name: docsum-gaudi-whisper-server
     ports:
-      - "7066:7066"
+      - ${ASR_SERVICE_PORT:-7066}:7066
     ipc: host
     environment:
       no_proxy: ${no_proxy}
@@ -89,8 +88,9 @@ services:
       - http_proxy=${http_proxy}
       - MEGA_SERVICE_HOST_IP=${MEGA_SERVICE_HOST_IP}
       - LLM_SERVICE_HOST_IP=${LLM_SERVICE_HOST_IP}
+      - LLM_SERVICE_PORT=${LLM_PORT}
       - ASR_SERVICE_HOST_IP=${ASR_SERVICE_HOST_IP}
-
+      - ASR_SERVICE_PORT=${ASR_SERVICE_PORT}
     ipc: host
     restart: always
 

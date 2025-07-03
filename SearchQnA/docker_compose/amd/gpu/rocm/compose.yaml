@@ -17,8 +17,6 @@ services:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       HF_TOKEN: ${SEARCH_HUGGINGFACEHUB_API_TOKEN}
-      HUGGING_FACE_HUB_TOKEN: ${SEARCH_HUGGINGFACEHUB_API_TOKEN}
-      HUGGINGFACEHUB_API_TOKEN: ${SEARCH_HUGGINGFACEHUB_API_TOKEN}
     command: --model-id ${SEARCH_EMBEDDING_MODEL_ID} --auto-truncate
 
   search-embedding:
@@ -81,8 +79,6 @@ services:
       https_proxy: ${https_proxy}
       TEI_RERANKING_ENDPOINT: ${SEARCH_TEI_RERANKING_ENDPOINT}
       HF_TOKEN: ${SEARCH_HUGGINGFACEHUB_API_TOKEN}
-      HUGGING_FACE_HUB_TOKEN: ${SEARCH_HUGGINGFACEHUB_API_TOKEN}
-      HUGGINGFACEHUB_API_TOKEN: ${SEARCH_HUGGINGFACEHUB_API_TOKEN}
     restart: unless-stopped
 
   search-tgi-service:
@@ -96,8 +92,7 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      HUGGING_FACE_HUB_TOKEN: ${SEARCH_HUGGINGFACEHUB_API_TOKEN}
-      HUGGINGFACEHUB_API_TOKEN: ${SEARCH_HUGGINGFACEHUB_API_TOKEN}
+      HF_TOKEN: ${SEARCH_HUGGINGFACEHUB_API_TOKEN}
     shm_size: 1g
     devices:
       - /dev/kfd:/dev/kfd
@@ -123,11 +118,10 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      HUGGINGFACEHUB_API_TOKEN: ${SEARCH_HUGGINGFACEHUB_API_TOKEN}
+      HF_TOKEN: ${SEARCH_HUGGINGFACEHUB_API_TOKEN}
       LLM_ENDPOINT: ${SEARCH_TGI_LLM_ENDPOINT}
       LLM_MODEL_ID: ${SEARCH_LLM_MODEL_ID}
       LLM_MODEL: ${SEARCH_LLM_MODEL_ID}
-      HF_TOKEN: ${SEARCH_HUGGINGFACEHUB_API_TOKEN}
       LLM_COMPONENT_NAME: "OpeaTextGenService"
 
     restart: unless-stopped

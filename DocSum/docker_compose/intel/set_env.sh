@@ -2,7 +2,8 @@
 
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
-pushd "../../" > /dev/null
+SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+pushd "${SCRIPT_DIR}/../../.." > /dev/null
 source .set_env.sh
 popd > /dev/null
 
@@ -24,6 +25,7 @@ export MAX_TOTAL_TOKENS=2048
 
 export LLM_PORT=9000
 export LLM_ENDPOINT="http://${host_ip}:${LLM_ENDPOINT_PORT}"
+export ASR_SERVICE_PORT=7066
 export DocSum_COMPONENT_NAME="OpeaDocSumvLLM" # OpeaDocSumTgi
 export FRONTEND_SERVICE_PORT=5173
 export MEGA_SERVICE_HOST_IP=${host_ip}

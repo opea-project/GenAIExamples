@@ -8,7 +8,7 @@ from tools.components.component import Component
 
 
 class Workflow(Component):
-    """Class for handling EasyData workflow operations.
+    """Class for handling workflow operations.
 
     Attributes:
         workflow_id: workflow id
@@ -33,9 +33,10 @@ class Workflow(Component):
 
         :rtype: string
         """
+
         data = json.dumps({"params": params})
         endpoint = f"serving/servable_workflows/{self.workflow_id}/start"
-        self.wf_key = self._make_request(endpoint, "POST", data)["wf_key"]
+        self.wf_key = self._make_request(endpoint, "POST", data).get("wf_key", None)
         if self.wf_key:
             return f"Workflow successfully started. The workflow key is {self.wf_key}."
         else:

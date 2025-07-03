@@ -43,7 +43,7 @@ python post_process_FAQ.py
 We use "mistralai/Mixtral-8x7B-Instruct-v0.1" as LLM referee to evaluate the model. First we need to launch a LLM endpoint on Gaudi.
 
 ```
-export HUGGING_FACE_HUB_TOKEN="your_huggingface_token"
+export HF_TOKEN="your_huggingface_token"
 bash launch_tgi.sh
 ```
 

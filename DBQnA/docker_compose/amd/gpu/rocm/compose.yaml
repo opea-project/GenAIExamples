@@ -19,8 +19,7 @@ services:
       https_proxy: ${https_proxy}
       TGI_SERVICE_PORT: ${DBQNA_TGI_SERVICE_PORT}
       MODEL_ID: ${DBQNA_LLM_MODEL_ID}
-      HUGGING_FACE_HUB_TOKEN: ${DBQNA_HUGGINGFACEHUB_API_TOKEN}
-      HUGGINGFACEHUB_API_TOKEN: ${DBQNA_HUGGINGFACEHUB_API_TOKEN}
+      HF_TOKEN: ${DBQNA_HUGGINGFACEHUB_API_TOKEN}
     shm_size: 1g
     devices:
       - /dev/kfd:/dev/kfd

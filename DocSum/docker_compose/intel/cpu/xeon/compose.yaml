@@ -6,7 +6,7 @@ services:
     image: ${REGISTRY:-opea}/vllm:${TAG:-latest}
     container_name: docsum-xeon-vllm-service
     ports:
-      - "8008:80"
+      - ${LLM_ENDPOINT_PORT:-8008}:80
     volumes:
       - "${MODEL_CACHE:-./data}:/root/.cache/huggingface/hub"
     shm_size: 1g
@@ -40,7 +40,6 @@ services:
       https_proxy: ${https_proxy}
       LLM_ENDPOINT: ${LLM_ENDPOINT}
       LLM_MODEL_ID: ${LLM_MODEL_ID}
-      HUGGINGFACEHUB_API_TOKEN: ${HF_TOKEN}
       HF_TOKEN: ${HF_TOKEN}
       MAX_INPUT_TOKENS: ${MAX_INPUT_TOKENS}
       MAX_TOTAL_TOKENS: ${MAX_TOTAL_TOKENS}
@@ -52,7 +51,7 @@ services:
     image: ${REGISTRY:-opea}/whisper:${TAG:-latest}
     container_name: docsum-xeon-whisper-server
     ports:
-      - "7066:7066"
+      - ${ASR_SERVICE_PORT:-7066}:7066
     ipc: host
     environment:
       no_proxy: ${no_proxy}
@@ -74,7 +73,9 @@ services:
       - http_proxy=${http_proxy}
       - MEGA_SERVICE_HOST_IP=${MEGA_SERVICE_HOST_IP}
       - LLM_SERVICE_HOST_IP=${LLM_SERVICE_HOST_IP}
+      - LLM_SERVICE_PORT=${LLM_PORT}
       - ASR_SERVICE_HOST_IP=${ASR_SERVICE_HOST_IP}
+      - ASR_SERVICE_PORT=${ASR_SERVICE_PORT}
     ipc: host
     restart: always
 

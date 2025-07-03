@@ -3,7 +3,9 @@
 # Copyright (C) 2025 MariaDB Foundation
 # SPDX-License-Identifier: Apache-2.0
 
-pushd "../../../../../" > /dev/null
+SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
+
+pushd "$SCRIPT_DIR/../../../../../" > /dev/null
 source .set_env.sh
 popd > /dev/null
 
