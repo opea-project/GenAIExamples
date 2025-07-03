@@ -59,10 +59,11 @@
 import router from "@/router";
 import { onMounted, reactive } from "vue";
 import { QuickStart, SystemChart } from "../pipeline/components/index";
-
 import { getSystemStatus } from "@/api/pipeline";
 
-const currentMenu = ref<string>("/rag/chatbot");
+const route = useRoute();
+
+const currentMenu = ref<string>(route.fullPath);
 let systemData = reactive<EmptyObjectType>({});
 const componentList = ref<EmptyArrayType>([
   {

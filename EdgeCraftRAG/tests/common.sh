@@ -27,7 +27,6 @@ function validate_services() {
     sleep 1s
 }
 
-
 function check_gpu_usage() {
     echo $date > ${LOG_PATH}/gpu.log
     pci_address=$(lspci | grep -i '56a0' | awk '{print $1}')

@@ -181,17 +181,22 @@ class QnAGenerator(BaseComponent):
             ret = ret.replace(*p)
         return ret
 
-    def query_transform(self, chat_request, retrieved_nodes):
+    def query_transform(self, chat_request, retrieved_nodes, sub_questions=None):
         """Generate text_gen_context and prompt_str
         :param chat_request: Request object
         :param retrieved_nodes: List of retrieved nodes
+        :param sub_questions: Optional sub-questions string (safe parameter)
         :return: Generated text_gen_context and prompt_str."""
         text_gen_context = ""
         for n in retrieved_nodes:
             origin_text = n.node.get_text()
             text_gen_context += self.clean_string(origin_text.strip())
         query = chat_request.messages
-        prompt_str = self.prompt.format(input=query, context=text_gen_context)
+        if sub_questions:
+            final_query = f"{query}\n\n### Sub-questions ###\nThe following list is how you should consider the answer, you MUST follow these steps when responding:\n\n{sub_questions}"
+        else:
+            final_query = query
+        prompt_str = self.prompt.format(input=final_query, context=text_gen_context)
         return text_gen_context, prompt_str
 
     def run(self, chat_request, retrieved_nodes, node_parser_type, **kwargs):
@@ -200,7 +205,8 @@ class QnAGenerator(BaseComponent):
             raise ValueError("No LLM available, please load LLM")
         # query transformation
         chat_request.messages = concat_history(chat_request.messages)
-        text_gen_context, prompt_str = self.query_transform(chat_request, retrieved_nodes)
+        sub_questions = kwargs.get("sub_questions", None)
+        text_gen_context, prompt_str = self.query_transform(chat_request, retrieved_nodes, sub_questions=sub_questions)
         generate_kwargs = dict(
             temperature=chat_request.temperature,
             do_sample=chat_request.temperature > 0.0,
@@ -227,7 +233,8 @@ class QnAGenerator(BaseComponent):
     def run_vllm(self, chat_request, retrieved_nodes, node_parser_type, **kwargs):
         # query transformation
         chat_request.messages = concat_history(chat_request.messages)
-        text_gen_context, prompt_str = self.query_transform(chat_request, retrieved_nodes)
+        sub_questions = kwargs.get("sub_questions", None)
+        text_gen_context, prompt_str = self.query_transform(chat_request, retrieved_nodes, sub_questions=sub_questions)
         llm = OpenAILike(
             api_key="fake",
             api_base=self.vllm_endpoint + "/v1",
