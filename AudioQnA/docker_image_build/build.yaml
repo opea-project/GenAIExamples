@@ -82,7 +82,7 @@ services:
   vllm-gaudi:
     build:
       context: vllm-fork
-      dockerfile: Dockerfile.hpu
+      dockerfile: docker/Dockerfile.hpu
     extends: audioqna
     image: ${REGISTRY:-opea}/vllm-gaudi:${TAG:-latest}
   vllm-rocm:
