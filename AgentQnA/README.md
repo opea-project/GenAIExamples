@@ -131,7 +131,7 @@ export HF_CACHE_DIR=<directory-where-llms-are-downloaded> #  to avoid redownload
 
 To use OpenAI models, generate a key following these [instructions](https://platform.openai.com/api-keys).
 
-When models are deployed on a remote server, a base URL and an API key are required to access them. To set up a remote server and acquire the base URL and API key, refer to [Intel® AI for Enterprise Inference](https://www.intel.com/content/www/us/en/products/docs/accelerator-engines/enterprise-ai.html) offerings.
+When models are deployed on a remote server, a base URL and an API key are required to access them. To set up a remote server and acquire the base URL and API key, refer to [Intel® AI for Enterprise Inference](https://www.intel.com/content/www/us/en/developer/topic-technology/artificial-intelligence/enterprise-inference.html) offerings.
 
 Then set the environment variable `OPENAI_API_KEY` with the key contents:
 
