@@ -16,6 +16,7 @@ from .config import (
     COMMON_SCRIPTS_DIR,
     EXAMPLE_CONFIGS,
     EXAMPLES_ROOT_DIR,
+    K8S_VLLM_SKIP_WARMUP,
     POST_DEPLOY_WAIT_S,
 )
 from .tester import ConnectionTesterFactory
@@ -625,6 +626,21 @@ class Deployer:
                         updates[path] = value
                 else:
                     updates[path_or_paths] = value
+
+        if K8S_VLLM_SKIP_WARMUP:
+            # Heuristic check: only add this setting if the values.yaml seems to be for vLLM.
+            # This prevents adding it to examples that don't use vLLM.
+            if "vllm:" in original_values_file.read_text():
+                log_message(
+                    "INFO",
+                    "Global flag K8S_VLLM_SKIP_WARMUP is True. Adding 'vllm.VLLM_SKIP_WARMUP: True' to Helm values.",
+                )
+                updates["vllm.VLLM_SKIP_WARMUP"] = True
+            else:
+                log_message(
+                    "DEBUG",
+                    f"K8S_VLLM_SKIP_WARMUP is on, but 'vllm:' key not found in {original_values_file.name}. Skipping addition.",
+                )
 
         if update_helm_values_yaml(local_values_file, updates):
             log_message("OK", f"Successfully updated local Helm values in {local_values_file.name}.")

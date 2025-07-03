@@ -1,6 +1,6 @@
 # Copyright (C) 2025 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
-
+import os
 import pathlib
 
 # Project structure paths
@@ -663,3 +663,6 @@ TEST_RETRY_ATTEMPTS = 3
 TEST_RETRY_DELAY_S = 30
 
 CLEANUP_ON_DEPLOY_FAILURE = False
+
+# For CI TEST
+K8S_VLLM_SKIP_WARMUP = os.getenv("OPEA_K8S_VLLM_SKIP_WARMUP", "false").lower() in ("true", "1", "t", "yes")

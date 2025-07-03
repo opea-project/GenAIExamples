@@ -1,6 +1,6 @@
 # Copyright (C) 2025 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
-
+import copy
 import json
 import os
 import time
@@ -135,15 +135,17 @@ class BaseConnectionTester(ABC):
         log_message("INFO", f"Testing {method} {full_url}")
 
         try:
+            payload = self._gen_payload(test_case_config)
             response = self.session.request(
                 method,
                 full_url,
-                json=self._gen_payload(test_case_config),
+                json=payload,
                 headers=test_case_config.get("headers", {}),
                 timeout=test_case_config.get("timeout", 120),
             )
             return {"status_code": response.status_code, "content": response.text, "url": full_url}
-        except requests.exceptions.RequestException as e:
+        except Exception as e:
+            log_message("ERROR", f"An error occurred during the test request for '{full_url}': {e}")
             return {"status": "ERROR", "reason": str(e), "url": full_url}
 
     def _validate_response(self, response_data, test_case_config):
@@ -261,7 +263,7 @@ class AudioQnAConnectionTester(BaseConnectionTester):
         import base64
         from urllib.parse import urlparse
 
-        payload = super()._gen_payload(test_case_config)
+        payload = copy.deepcopy(super()._gen_payload(test_case_config))
 
         # Read audio from URL + base64 encoding if present
         if "audio" in payload and payload["audio"]:
@@ -287,9 +289,17 @@ class AudioQnAConnectionTester(BaseConnectionTester):
                 log_message("INFO", "Successfully completed base64 encoding.")
 
             else:
-                raise ValueError("Audio is not a URL. Please check config.py for 'AudioQnA' example.")
+                is_base64 = True
+                try:
+                    base64.b64decode(audio_value)
+                except (ValueError, TypeError):
+                    is_base64 = False
+
+                if not is_base64:
+                    raise ValueError("Audio value is not a valid URL or a Base64 string.")
+
         else:
-            raise ValueError("Audio cannot be None or empty. Please check config.py for 'AudioQnA' example.")
+            raise ValueError("Audio key not found or empty in payload. Please check config.py for 'AudioQnA' example.")
         return payload
 
 
