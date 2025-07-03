@@ -109,6 +109,8 @@ jobs:
           use_model_cache: ${{ inputs.use_model_cache }}
         run: |
           set -x
+          sudo apt update
+          sudo apt install python3-pip 
           cd ${{ github.workspace }}/one_click_deploy
           python3 -m pip install -r requirements.txt
 
@@ -122,7 +124,7 @@ jobs:
           export AudioQnA_model=meta-llama/Meta-Llama-3-8B-Instruct
           export VisualQnA_model=llava-hf/llava-v1.6-mistral-7b-hf
           export FaqGen_model=meta-llama/Meta-Llama-3-8B-Instruct
-          
+
           INPUT_DATA=$(
             jq -r --arg type "docker" --arg id "${{ inputs.example }}" \
               '.[$type][$id].inputs.deploy[]' ${{ github.workspace }}/.github/workflows/one-click-inputs.json | \
