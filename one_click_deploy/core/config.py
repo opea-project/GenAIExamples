@@ -37,10 +37,10 @@ EXAMPLE_CONFIGS = {
                     "gaudi": "kubernetes/helm/gaudi-values.yaml",
                 },
                 "params_to_values": {
-                    "hf_token": "global.HUGGINGFACEHUB_API_TOKEN",
-                    "llm_model": "vllm.LLM_MODEL_ID",
-                    "embed_model": "tei.EMBEDDING_MODEL_ID",
-                    "rerank_model": "teirerank.RERANK_MODEL_ID",
+                    "hf_token": ["global", "HUGGINGFACEHUB_API_TOKEN"],
+                    "llm_model": ["vllm", "LLM_MODEL_ID"],
+                    "embed_model": ["tei", "EMBEDDING_MODEL_ID"],
+                    "rerank_model": ["teirerank", "RERANK_MODEL_ID"],
                 },
             },
             "namespace": "chatqna",
@@ -143,8 +143,8 @@ EXAMPLE_CONFIGS = {
                     "gaudi": "kubernetes/helm/gaudi-values.yaml",
                 },
                 "params_to_values": {
-                    "hf_token": "global.HUGGINGFACEHUB_API_TOKEN",
-                    "llm_model": ["llm-uservice.LLM_MODEL_ID", "vllm.LLM_MODEL_ID"],
+                    "hf_token": ["global", "HUGGINGFACEHUB_API_TOKEN"],
+                    "llm_model": [["llm-uservice", "LLM_MODEL_ID"], ["vllm", "LLM_MODEL_ID"]],
                 },
             },
             "namespace": "codetrans",
@@ -214,8 +214,8 @@ EXAMPLE_CONFIGS = {
                     "gaudi": "kubernetes/helm/gaudi-values.yaml",
                 },
                 "params_to_values": {
-                    "hf_token": "global.HUGGINGFACEHUB_API_TOKEN",
-                    "llm_model": ["llm-uservice.LLM_MODEL_ID", "vllm.LLM_MODEL_ID"],
+                    "hf_token": ["global", "HUGGINGFACEHUB_API_TOKEN"],
+                    "llm_model": [["llm-uservice", "LLM_MODEL_ID"], ["vllm", "LLM_MODEL_ID"]],
                 },
             },
             "namespace": "docsum",
@@ -284,8 +284,8 @@ EXAMPLE_CONFIGS = {
                     "gaudi": "kubernetes/helm/gaudi-values.yaml",
                 },
                 "params_to_values": {
-                    "hf_token": "global.HUGGINGFACEHUB_API_TOKEN",
-                    "llm_model": ["llm-uservice.LLM_MODEL_ID", "vllm.LLM_MODEL_ID"],
+                    "hf_token": ["global", "HUGGINGFACEHUB_API_TOKEN"],
+                    "llm_model": [["llm-uservice", "LLM_MODEL_ID"], ["vllm", "LLM_MODEL_ID"]],
                 },
             },
             "namespace": "codegen",
@@ -355,8 +355,8 @@ EXAMPLE_CONFIGS = {
                     "gaudi": "kubernetes/helm/gaudi-values.yaml",
                 },
                 "params_to_values": {
-                    "hf_token": "global.HUGGINGFACEHUB_API_TOKEN",
-                    "llm_model": ["llm-uservice.LLM_MODEL_ID", "vllm.LLM_MODEL_ID"],
+                     "hf_token": ["global", "HUGGINGFACEHUB_API_TOKEN"],
+                    "llm_model": [["llm-uservice", "LLM_MODEL_ID"], ["vllm", "LLM_MODEL_ID"]],
                 },
             },
             "namespace": "audioqna",
@@ -429,7 +429,7 @@ EXAMPLE_CONFIGS = {
                     "xeon": "kubernetes/helm/cpu-values.yaml",
                     "gaudi": "kubernetes/helm/gaudi-values.yaml",
                 },
-                "params_to_values": {"hf_token": "global.HUGGINGFACEHUB_API_TOKEN"},
+                "params_to_values": {"hf_token": ["global", "HUGGINGFACEHUB_API_TOKEN"]},
             },
             "namespace": "visualqna",
             "release_name": "visualqna",
@@ -509,8 +509,8 @@ EXAMPLE_CONFIGS = {
                     "gaudi": "kubernetes/helm/faqgen-gaudi-values.yaml",
                 },
                 "params_to_values": {
-                    "hf_token": "global.HUGGINGFACEHUB_API_TOKEN",
-                    "llm_model": ["llm-uservice.LLM_MODEL_ID", "vllm.LLM_MODEL_ID"],
+                    "hf_token": ["global", "HUGGINGFACEHUB_API_TOKEN"],
+                    "llm_model": [["llm-uservice", "LLM_MODEL_ID"], ["vllm", "LLM_MODEL_ID"]],
                 },
             },
             "namespace": "faqgen",
@@ -591,6 +591,7 @@ EXAMPLE_CONFIGS = {
                 "gaudi": {
                     "llm_model": "LLM_MODEL_ID",
                     "hf_token": "HF_TOKEN",
+                    "num_shards": "NUM_SHARDS",
                 },
             },
         },
@@ -601,8 +602,14 @@ EXAMPLE_CONFIGS = {
                     "gaudi": "kubernetes/helm/gaudi-values.yaml",
                 },
                 "params_to_values": {
-                    "llm_model": ["vllm.LLM_MODEL_ID", "supervisor.model", "ragagent.model", "sqlagent.model"],
-                    "hf_token": "global.HUGGINGFACEHUB_API_TOKEN",
+                    "llm_model": [
+                        ["vllm", "LLM_MODEL_ID"],
+                        ["supervisor", "model"],
+                        ["ragagent", "model"],
+                        ["sqlagent", "model"]
+                    ],
+                    "hf_token": ["global", "HUGGINGFACEHUB_API_TOKEN"],
+                    "num_shards": ["vllm", "resources", "limits", "habana.ai/gaudi"],
                 },
             },
             "namespace": "agentqna",
@@ -613,7 +620,7 @@ EXAMPLE_CONFIGS = {
         "default_device": "xeon",
         "ports": {
             "docker": {"rag": "9095"},
-            "k8s_services": {"rag": "ragagent"},
+            "k8s_services": {"rag": "agentqna-ragagent"},
         },
         "test_connections": {
             "main_service": {
@@ -646,6 +653,13 @@ EXAMPLE_CONFIGS = {
                     "type": str,
                     "default": "meta-llama/Meta-Llama-3-8B-Instruct",
                     "help": "e.g., meta-llama/Meta-Llama-3-8B-Instruct",
+                },
+                {
+                    "name": "num_shards",
+                    "prompt": "Number of Gaudi HPU cards (shards)",
+                    "type": int,
+                    "default": 4,
+                    "help": "e.g., 1, 2, 4. Controls tensor parallel size.",
                 },
             ],
         },
