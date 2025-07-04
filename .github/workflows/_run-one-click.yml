@@ -73,9 +73,11 @@ jobs:
         shell: bash
         run: |
           docker ps
-          cd ${{ github.workspace }}/${{ inputs.example }}
           if [ "${{ inputs.example }}" = "FaqGen" ]; then
             export test_case=test_compose_faqgen_on_xeon.sh
+            cd ${{ github.workspace }}/ChatQnA
+          else
+            cd ${{ github.workspace }}/${{ inputs.example }}
           fi          
           export hardware=${{ inputs.hardware }}
           bash ${{ github.workspace }}/.github/workflows/scripts/docker_compose_clean_up.sh "containers"
