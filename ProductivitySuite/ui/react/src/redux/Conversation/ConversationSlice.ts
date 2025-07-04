@@ -633,8 +633,11 @@ const eventStream = (type: string, body: any, conversationId: string = "") => {
           try {
             if (type === "code") {
               const parsedData = JSON.parse(msg.data);
-              result += parsedData.choices[0].text;
-              store.dispatch(setOnGoingResult(result));
+              const content = parsedData.choices[0].delta.content;
+              if (content !== null && content !== undefined) {
+                result += content;
+                store.dispatch(setOnGoingResult(result));
+              }
             }
             if (type !== "summary" && type !== "faq") {
               //parse content for data: "b"
