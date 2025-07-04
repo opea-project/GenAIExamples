@@ -655,10 +655,10 @@ EXAMPLE_CONFIGS = {
 # --- Deployment and Testing Configurations ---
 
 # Time in seconds to wait after a deployment before starting connection tests
-POST_DEPLOY_WAIT_S = os.getenv("POST_DEPLOY_WAIT_S", 120)
+POST_DEPLOY_WAIT_S = int(os.getenv("POST_DEPLOY_WAIT_S", 120))
 
 # Number of times to retry the connection test if it fails
-TEST_RETRY_ATTEMPTS = os.getenv("TEST_RETRY_ATTEMPTS", 3)
+TEST_RETRY_ATTEMPTS = int(os.getenv("TEST_RETRY_ATTEMPTS", 3))
 
 # Time in seconds to wait between each connection test retry
 TEST_RETRY_DELAY_S = 30
