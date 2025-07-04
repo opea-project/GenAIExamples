@@ -49,10 +49,6 @@ class KnowledgeManager(BaseMgr):
 
     def delete_knowledge_base(self, name: str):
         kb = self.get_knowledge_base_by_name_or_id(name)
-        if kb.idx == self.active_knowledge_idx:
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Cannot delete a running knowledge base."
-            )
         self.remove(kb.idx)
         return "Knowledge base removed successfully"
 

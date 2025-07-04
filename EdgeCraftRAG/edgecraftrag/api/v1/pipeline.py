@@ -2,9 +2,10 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import json
+import os
 import weakref
 
-from edgecraftrag.api_schema import PipelineCreateIn
+from edgecraftrag.api_schema import MilvusConnectRequest, PipelineCreateIn
 from edgecraftrag.base import IndexerType, InferenceType, ModelType, NodeParserType, PostProcessorType, RetrieverType
 from edgecraftrag.components.benchmark import Benchmark
 from edgecraftrag.components.generator import QnAGenerator
@@ -19,6 +20,7 @@ from edgecraftrag.components.postprocessor import MetadataReplaceProcessor, Rera
 from edgecraftrag.components.retriever import AutoMergeRetriever, SimpleBM25Retriever, VectorSimRetriever
 from edgecraftrag.context import ctx
 from fastapi import FastAPI, File, HTTPException, UploadFile, status
+from pymilvus import connections
 
 pipeline_app = FastAPI()
 
@@ -76,6 +78,7 @@ async def update_pipeline(name, request: PipelineCreateIn):
             pl.update_pipeline_json(pipeline_dict)
         except (ValueError, Exception) as e:
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+    save_pipeline_to_file()
     return pl
 
 
@@ -84,6 +87,7 @@ async def update_pipeline(name, request: PipelineCreateIn):
 async def remove_pipeline(name):
     try:
         res = ctx.get_pipeline_mgr().remove_pipeline_by_name_or_id(name)
+        save_pipeline_to_file()
         return res
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
@@ -108,6 +112,7 @@ def load_pipeline(request):
         raise HTTPException(status_code=status.HTTP_423_LOCKED, detail="Unable to patch an active pipeline...")
     try:
         update_pipeline_handler(pl, request)
+        save_pipeline_to_file()
     except (ValueError, Exception) as e:
         ctx.get_pipeline_mgr().remove_pipeline_by_name_or_id(request.name)
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
@@ -163,10 +168,10 @@ def update_pipeline_handler(pl, req):
                     embed_model = ctx.get_model_mgr().load_model(ind.embedding_model)
                     ctx.get_model_mgr().add(embed_model)
             match ind.indexer_type:
-                case IndexerType.DEFAULT_VECTOR | IndexerType.FAISS_VECTOR:
+                case IndexerType.DEFAULT_VECTOR | IndexerType.FAISS_VECTOR | IndexerType.MILVUS_VECTOR:
                     # TODO: **RISK** if considering 2 pipelines with different
                     # nodes, but same indexer, what will happen?
-                    pl.indexer = VectorIndexer(embed_model, ind.indexer_type)
+                    pl.indexer = VectorIndexer(embed_model, ind.indexer_type, ind.vector_uri, pl.name)
                 case _:
                     pass
             ctx.get_indexer_mgr().add(pl.indexer)
@@ -238,7 +243,7 @@ def update_pipeline_handler(pl, req):
                 ctx.get_model_mgr().add(model)
             # Use weakref to achieve model deletion and memory release
             model_ref = weakref.ref(model)
-            pl.generator = QnAGenerator(model_ref, gen.prompt_path, gen.inference_type)
+            pl.generator = QnAGenerator(model_ref, gen.prompt_path, gen.inference_type, gen.vllm_endpoint)
             if pl.enable_benchmark:
                 if "tokenizer" not in locals() or tokenizer is None:
                     _, tokenizer, bench_hook = ctx.get_model_mgr().load_model_ben(gen.model)
@@ -251,3 +256,61 @@ def update_pipeline_handler(pl, req):
     if pl.status.active != req.active:
         ctx.get_pipeline_mgr().activate_pipeline(pl.name, req.active, ctx.get_node_mgr())
     return pl
+
+
+# Restore pipeline configuration
+def load_pipeline_from_file():
+    CONFIG_DIR = "/home/user/ui_cache/configs"
+    PIPELINE_FILE = os.path.join(CONFIG_DIR, "pipeline.json")
+    if os.path.exists(PIPELINE_FILE):
+        with open(PIPELINE_FILE, "r") as f:
+            all_pipelines = f.read()
+        try:
+            all_da = json.loads(all_pipelines)
+            for pipeline_data in all_da:
+                one_pipelinejson = json.loads(pipeline_data)
+                pipeline_req = PipelineCreateIn(**one_pipelinejson)
+                load_pipeline(pipeline_req)
+        except Exception as e:
+            print(f"Error load pipelines: {e}")
+
+
+# Configuration of the persistence pipeline
+def save_pipeline_to_file():
+    CONFIG_DIR = "/home/user/ui_cache/configs"
+    PIPELINE_FILE = os.path.join(CONFIG_DIR, "pipeline.json")
+
+    if not os.path.exists(CONFIG_DIR):
+        os.makedirs(CONFIG_DIR, exist_ok=True)
+    try:
+        pipelines_data = ctx.get_pipeline_mgr().get_pipelines()
+        all_pipeline_json = []
+        for pipeline in pipelines_data:
+            all_pipeline_json.append(pipeline.get_pipeline_json)
+        json_str = json.dumps(all_pipeline_json, indent=2)
+        with open(PIPELINE_FILE, "w") as f:
+            f.write(json_str)
+    except Exception as e:
+        print(f"Error saving pipelines: {e}")
+
+
+# Detecting if milvus is connected
+@pipeline_app.post(path="/v1/check/milvus")
+async def check_milvus(request: MilvusConnectRequest):
+    vector_uri = request.vector_uri
+    try:
+        if vector_uri.startswith("http://"):
+            host_port = vector_uri.replace("http://", "")
+        elif vector_uri.startswith("https://"):
+            host_port = vector_uri.replace("https://", "")
+        else:
+            host_port = vector_uri
+        host, port = host_port.split(":", 1)
+        connections.connect(alias="default", host=host, port=port)
+
+        if connections.has_connection("default"):
+            return {"status": "200", "message": "Milvus connection successful."}
+        else:
+            return {"status": "404", "message": "Milvus connection failed."}
+    except Exception as e:
+        return {"status": "404", "message": f"connection failed: {str(e)}"}

@@ -1,12 +1,13 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+import requests
 from comps import GeneratedDoc
 from comps.cores.proto.api_protocol import ChatCompletionRequest
 from edgecraftrag.api_schema import RagOut
 from edgecraftrag.context import ctx
 from edgecraftrag.utils import serialize_contexts, set_current_session
-from fastapi import FastAPI, File, HTTPException, UploadFile, status
+from fastapi import Body, FastAPI, File, HTTPException, UploadFile, status
 from fastapi.responses import StreamingResponse
 
 chatqna_app = FastAPI()
@@ -15,15 +16,14 @@ chatqna_app = FastAPI()
 # Retrieval
 @chatqna_app.post(path="/v1/retrieval")
 async def retrieval(request: ChatCompletionRequest):
-    nodeswithscore = ctx.get_pipeline_mgr().run_retrieve(chat_request=request)
-    print(nodeswithscore)
-    if nodeswithscore is not None:
-        ret = []
-        for n in nodeswithscore:
-            ret.append((n.node.node_id, n.node.text, round(float(n.score), 8)))
-        return ret
+    try:
+        contexts = ctx.get_pipeline_mgr().run_retrieve(chat_request=request)
+        serialized_contexts = serialize_contexts(contexts)
 
-    return None
+        ragout = RagOut(query=request.messages, contexts=serialized_contexts, response="")
+        return ragout
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 
 # ChatQnA
@@ -64,3 +64,21 @@ async def ragqna(request: ChatCompletionRequest):
         return ragout
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+
+
+# Detecting if vllm is connected
+@chatqna_app.post(path="/v1/check/vllm")
+def check_vllm(request_data: dict = Body(...)):
+    try:
+        server = request_data.get("server_address", "http://localhost:8086")
+        model = request_data.get("model_name", "Qwen/Qwen3-8B")
+        url = f"{server}/v1/completions"
+        payload = {"model": model, "prompt": "Hi", "max_tokens": 16, "temperature": 0}
+
+        response = requests.post(url, json=payload, timeout=60)
+        if response.status_code == 200:
+            return {"status": "200"}
+        else:
+            raise HTTPException(status_code=500)
+    except Exception as e:
+        return {"status": "500", "message": f"connection failed: {str(e)}"}

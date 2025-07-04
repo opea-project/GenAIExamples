@@ -9,23 +9,12 @@ import urllib.request
 from urllib.parse import urlparse
 
 from edgecraftrag.base import BaseComponent, CompType, GeneratorType, InferenceType, NodeParserType
-from edgecraftrag.utils import concat_history, save_history
+from edgecraftrag.utils import concat_history, get_prompt_template, save_history
 from fastapi.responses import StreamingResponse
 from langchain_core.prompts import PromptTemplate
 from llama_index.llms.openai_like import OpenAILike
 from pydantic import model_serializer
 from unstructured.staging.base import elements_from_base64_gzipped_json
-
-DEFAULT_TEMPLATE = """
-<|im_start|>System: You are an AI assistant. Your task is to learn from the following context. Then answer the user's question based on what you learned from the context but not your own knowledge.<|im_end|>
-
-<|im_start|>{context}<|im_end|>
-
-<|im_start|>System: Pay attention to your formatting of response. If you need to reference content from context, try to keep the formatting.<|im_end|>
-<|im_start|>System: Try to summarize from the context, do some reasoning before response, then response. Make sure your response is logically sound and self-consistent.<|im_end|>
-
-<|im_start|>{input}
-"""
 
 
 def extract_urls(text):
@@ -126,7 +115,7 @@ async def stream_generator(llm, prompt_str, unstructured_str):
 
 class QnAGenerator(BaseComponent):
 
-    def __init__(self, llm_model, prompt_template_file, inference_type, **kwargs):
+    def __init__(self, llm_model, prompt_template_file, inference_type, vllm_endpoint, **kwargs):
         BaseComponent.__init__(
             self,
             comp_type=CompType.GENERATOR,
@@ -138,9 +127,23 @@ class QnAGenerator(BaseComponent):
             ("\t\n", "\n"),
         )
 
+        self.llm = llm_model
+        if isinstance(llm_model, str):
+            self.model_id = llm_model
+        else:
+            self.model_id = llm_model().model_id
+        if self.inference_type == InferenceType.LOCAL:
+            self.lock = asyncio.Lock()
+        # using the prompt template enhancement strategy(only tested on Qwen2-7B-Instruction) if template_enhance_on is true
+        self.template_enhance_on = True if "Qwen2" in self.model_id else False
         if prompt_template_file is None:
             print("There is no template file, using the default template.")
-            self.prompt = DocumentedContextRagPromptTemplate.from_template(DEFAULT_TEMPLATE)
+            prompt_template = get_prompt_template(self.model_id)
+            self.prompt = (
+                DocumentedContextRagPromptTemplate.from_template(prompt_template)
+                if self.template_enhance_on
+                else prompt_template
+            )
         else:
             safe_root = "/templates"
             template_path = os.path.normpath(os.path.join(safe_root, prompt_template_file))
@@ -148,7 +151,10 @@ class QnAGenerator(BaseComponent):
                 raise ValueError("Invalid template path")
             if not os.path.exists(template_path):
                 raise ValueError("Template file not exists")
-            self.prompt = DocumentedContextRagPromptTemplate.from_file(template_path)
+            if self.template_enhance_on:
+                self.prompt = DocumentedContextRagPromptTemplate.from_file(template_path)
+            else:
+                self.prompt = get_prompt_template(self.model_id, template_path)
 
         self.llm = llm_model
         if isinstance(llm_model, str):
@@ -157,6 +163,11 @@ class QnAGenerator(BaseComponent):
             self.model_id = llm_model().model_id
         if self.inference_type == InferenceType.LOCAL:
             self.lock = asyncio.Lock()
+        if self.inference_type == InferenceType.VLLM:
+            self.vllm_name = llm_model().model_id
+            if vllm_endpoint == "":
+                vllm_endpoint = os.getenv("vLLM_ENDPOINT", "http://localhost:8086")
+            self.vllm_endpoint = vllm_endpoint
 
     def set_prompt(self, prompt):
         if "{context}" not in prompt:
@@ -166,7 +177,12 @@ class QnAGenerator(BaseComponent):
         self.prompt = prompt
 
     def reset_prompt(self):
-        self.prompt = DocumentedContextRagPromptTemplate.from_template(DEFAULT_TEMPLATE)
+        prompt_template = get_prompt_template(self.model_id)
+        self.prompt = (
+            DocumentedContextRagPromptTemplate.from_template(prompt_template)
+            if self.template_enhance_on
+            else prompt_template
+        )
 
     def clean_string(self, string):
         ret = string
@@ -174,17 +190,22 @@ class QnAGenerator(BaseComponent):
             ret = ret.replace(*p)
         return ret
 
-    def query_transform(self, chat_request, retrieved_nodes):
+    def query_transform(self, chat_request, retrieved_nodes, sub_questions=None):
         """Generate text_gen_context and prompt_str
         :param chat_request: Request object
         :param retrieved_nodes: List of retrieved nodes
+        :param sub_questions: Optional sub-questions string (safe parameter)
         :return: Generated text_gen_context and prompt_str."""
         text_gen_context = ""
         for n in retrieved_nodes:
             origin_text = n.node.get_text()
             text_gen_context += self.clean_string(origin_text.strip())
         query = chat_request.messages
-        prompt_str = self.prompt.format(input=query, context=text_gen_context)
+        if sub_questions:
+            final_query = f"{query}\n\n### Sub-questions ###\nThe following list is how you should consider the answer, you MUST follow these steps when responding:\n\n{sub_questions}"
+        else:
+            final_query = query
+        prompt_str = self.prompt.format(input=final_query, context=text_gen_context)
         return text_gen_context, prompt_str
 
     def run(self, chat_request, retrieved_nodes, node_parser_type, **kwargs):
@@ -193,7 +214,8 @@ class QnAGenerator(BaseComponent):
             raise ValueError("No LLM available, please load LLM")
         # query transformation
         chat_request.messages = concat_history(chat_request.messages)
-        text_gen_context, prompt_str = self.query_transform(chat_request, retrieved_nodes)
+        sub_questions = kwargs.get("sub_questions", None)
+        text_gen_context, prompt_str = self.query_transform(chat_request, retrieved_nodes, sub_questions=sub_questions)
         generate_kwargs = dict(
             temperature=chat_request.temperature,
             do_sample=chat_request.temperature > 0.0,
@@ -220,14 +242,13 @@ class QnAGenerator(BaseComponent):
     def run_vllm(self, chat_request, retrieved_nodes, node_parser_type, **kwargs):
         # query transformation
         chat_request.messages = concat_history(chat_request.messages)
-        text_gen_context, prompt_str = self.query_transform(chat_request, retrieved_nodes)
-        llm_endpoint = os.getenv("vLLM_ENDPOINT", "http://localhost:8008")
-        model_name = os.getenv("LLM_MODEL", self.model_id)
+        sub_questions = kwargs.get("sub_questions", None)
+        text_gen_context, prompt_str = self.query_transform(chat_request, retrieved_nodes, sub_questions=sub_questions)
         llm = OpenAILike(
             api_key="fake",
-            api_base=llm_endpoint + "/v1",
+            api_base=self.vllm_endpoint + "/v1",
             max_tokens=chat_request.max_tokens,
-            model=model_name,
+            model=self.vllm_name,
             top_p=chat_request.top_p,
             top_k=chat_request.top_k,
             temperature=chat_request.temperature,

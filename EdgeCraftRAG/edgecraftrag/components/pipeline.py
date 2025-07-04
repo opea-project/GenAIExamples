@@ -1,14 +1,17 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+import asyncio
 import json
 import os
 import time
+from concurrent.futures import ThreadPoolExecutor
 from typing import Any, Callable, List, Optional
 
 from comps.cores.proto.api_protocol import ChatCompletionRequest
 from edgecraftrag.base import BaseComponent, CallbackType, CompType, InferenceType, RetrieverType
 from edgecraftrag.components.postprocessor import RerankProcessor
+from edgecraftrag.components.query_preprocess import query_search
 from edgecraftrag.components.retriever import AutoMergeRetriever, SimpleBM25Retriever, VectorSimRetriever
 from fastapi.responses import StreamingResponse
 from llama_index.core.schema import Document, QueryBundle
@@ -41,8 +44,8 @@ class Pipeline(BaseComponent):
         if self.name == "" or self.name is None:
             self.name = self.idx
         self.enable_benchmark = os.getenv("ENABLE_BENCHMARK", "False").lower() == "true"
-        self.run_pipeline_cb = run_test_generator_ben if self.enable_benchmark else run_test_generator
-        self.run_retriever_cb = run_test_retrieve
+        self.run_pipeline_cb = run_generator_ben if self.enable_benchmark else run_generator
+        self.run_retriever_cb = run_retrieve
         self.run_data_prepare_cb = run_simple_doc
 
         self._node_changed = False
@@ -179,9 +182,11 @@ class Pipeline(BaseComponent):
 
 
 # Test callback to retrieve nodes from query
-def run_test_retrieve(pl: Pipeline, chat_request: ChatCompletionRequest) -> Any:
+def run_retrieve(pl: Pipeline, chat_request: ChatCompletionRequest) -> Any:
     query = chat_request.messages
+    contexts = {}
     retri_res = pl.retriever.run(query=query)
+    contexts[CompType.RETRIEVER] = retri_res
     query_bundle = QueryBundle(query)
     if pl.postprocessor:
         for processor in pl.postprocessor:
@@ -191,7 +196,8 @@ def run_test_retrieve(pl: Pipeline, chat_request: ChatCompletionRequest) -> Any:
             ):
                 processor.top_n = chat_request.top_n
             retri_res = processor.run(retri_res=retri_res, query_bundle=query_bundle)
-    return retri_res
+            contexts[CompType.POSTPROCESSOR] = retri_res
+    return contexts
 
 
 def run_simple_doc(pl: Pipeline, docs: List[Document]) -> Any:
@@ -219,11 +225,30 @@ def benchmark_response(ret, benchmark, benchmark_index, benchmark_data, input_to
         return ret
 
 
-def run_test_generator_ben(pl: Pipeline, chat_request: ChatCompletionRequest) -> Any:
+def run_generator_ben(pl: Pipeline, chat_request: ChatCompletionRequest) -> Any:
     benchmark_index, benchmark_data = pl.benchmark.init_benchmark_data()
     contexts = {}
     start = time.perf_counter()
     query = chat_request.messages
+    if pl.generator.inference_type == InferenceType.VLLM:
+        UI_DIRECTORY = os.getenv("UI_TMPFILE_PATH", "/home/user/ui_cache")
+        search_config_path = os.path.join(UI_DIRECTORY, "configs/search_config.yaml")
+        search_dir = os.path.join(UI_DIRECTORY, "configs/search_dir")
+
+        def run_async_query_search():
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            try:
+                return loop.run_until_complete(query_search(query, search_config_path, search_dir))
+            finally:
+                loop.close()
+
+        with ThreadPoolExecutor(max_workers=1) as executor:
+            future = executor.submit(run_async_query_search)
+            top1_issue, sub_questionss_result = future.result()
+        if sub_questionss_result:
+            query = query + sub_questionss_result
+
     retri_res = pl.retriever.run(query=query)
     query_bundle = QueryBundle(query)
     benchmark_data[CompType.RETRIEVER] = time.perf_counter() - start
@@ -252,7 +277,7 @@ def run_test_generator_ben(pl: Pipeline, chat_request: ChatCompletionRequest) ->
     if pl.generator.inference_type == InferenceType.LOCAL:
         ret = pl.generator.run(chat_request, retri_res, np_type)
     elif pl.generator.inference_type == InferenceType.VLLM:
-        ret = pl.generator.run_vllm(chat_request, retri_res, np_type)
+        ret = pl.generator.run_vllm(chat_request, retri_res, np_type, sub_questions=sub_questionss_result)
     else:
         raise ValueError("LLM inference_type not supported")
     end = time.perf_counter()
@@ -266,9 +291,28 @@ def run_test_generator_ben(pl: Pipeline, chat_request: ChatCompletionRequest) ->
     return ret, contexts
 
 
-def run_test_generator(pl: Pipeline, chat_request: ChatCompletionRequest) -> Any:
+def run_generator(pl: Pipeline, chat_request: ChatCompletionRequest) -> Any:
     query = chat_request.messages
     contexts = {}
+    if pl.generator.inference_type == InferenceType.VLLM:
+        UI_DIRECTORY = os.getenv("UI_TMPFILE_PATH", "/home/user/ui_cache")
+        search_config_path = os.path.join(UI_DIRECTORY, "configs/search_config.yaml")
+        search_dir = os.path.join(UI_DIRECTORY, "configs/search_dir")
+
+        def run_async_query_search():
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            try:
+                return loop.run_until_complete(query_search(query, search_config_path, search_dir))
+            finally:
+                loop.close()
+
+        with ThreadPoolExecutor(max_workers=1) as executor:
+            future = executor.submit(run_async_query_search)
+            top1_issue, sub_questionss_result = future.result()
+        if sub_questionss_result:
+            query = query + sub_questionss_result
+
     retri_res = pl.retriever.run(query=query)
     contexts[CompType.RETRIEVER] = retri_res
     query_bundle = QueryBundle(query)
@@ -289,7 +333,7 @@ def run_test_generator(pl: Pipeline, chat_request: ChatCompletionRequest) -> Any
     if pl.generator.inference_type == InferenceType.LOCAL:
         ret = pl.generator.run(chat_request, retri_res, np_type)
     elif pl.generator.inference_type == InferenceType.VLLM:
-        ret = pl.generator.run_vllm(chat_request, retri_res, np_type)
+        ret = pl.generator.run_vllm(chat_request, retri_res, np_type, sub_questions=sub_questionss_result)
     else:
         raise ValueError("LLM inference_type not supported")
     return ret, contexts

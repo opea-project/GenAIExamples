@@ -60,6 +60,7 @@ import {
   requestKnowledgeBaseCreate,
   requestKnowledgeBaseUpdate,
 } from "@/api/knowledgeBase";
+import { isValidName } from "@/utils/validate";
 import { FormInstance } from "ant-design-vue";
 import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
@@ -79,8 +80,24 @@ interface FormType {
   description: string;
   active: boolean;
 }
+
+const validateName = async (rule: any, value: string) => {
+  if (!value) {
+    return Promise.reject(t("knowledge.nameValid1"));
+  }
+  const len = value.length;
+  if (len < 2 || len > 30) {
+    return Promise.reject(t("knowledge.nameValid2"));
+  }
+  console.log(isValidName(value));
+  if (!isValidName(value)) {
+    return Promise.reject(t("knowledge.nameValid3"));
+  }
+  return Promise.resolve();
+};
+
 const { t } = useI18n();
-const emit = defineEmits(["search", "close"]);
+const emit = defineEmits(["close", "switch"]);
 const typeMap = {
   create: t("knowledge.create"),
   edit: t("knowledge.edit"),
@@ -108,14 +125,8 @@ const rules = reactive({
   name: [
     {
       required: true,
-      message: t("knowledge.nameValid1"),
-      trigger: "blur",
-    },
-    {
-      min: 2,
-      max: 30,
-      message: t("knowledge.nameValid2"),
-      trigger: "blur",
+      validator: validateName,
+      trigger: ["blur", "change"],
     },
   ],
   active: [
@@ -130,6 +141,7 @@ const rules = reactive({
 const handleSubmit = () => {
   formRef.value?.validate().then(() => {
     submitLoading.value = true;
+    const { name } = form;
     const apiUrl =
       props.dialogType === "edit"
         ? requestKnowledgeBaseUpdate
@@ -137,7 +149,7 @@ const handleSubmit = () => {
 
     apiUrl(form)
       .then(() => {
-        emit("search");
+        emit("switch", name);
         handleCancle();
       })
       .catch((error: any) => {
