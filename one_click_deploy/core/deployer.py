@@ -672,6 +672,7 @@ class Deployer:
 set -e
 trap 'echo "ERROR: A command failed at line $LINENO. Exiting." >&2' ERR
 cd "{local_env_dir.resolve()}"
+export NON_INTERACTIVE=true
 source "{local_env_file.resolve()}"
 cd "{compose_dir.resolve()}"
 {compose_up_cmd}
