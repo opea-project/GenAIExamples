@@ -355,7 +355,7 @@ EXAMPLE_CONFIGS = {
                     "gaudi": "kubernetes/helm/gaudi-values.yaml",
                 },
                 "params_to_values": {
-                     "hf_token": ["global", "HUGGINGFACEHUB_API_TOKEN"],
+                    "hf_token": ["global", "HUGGINGFACEHUB_API_TOKEN"],
                     "llm_model": [["llm-uservice", "LLM_MODEL_ID"], ["vllm", "LLM_MODEL_ID"]],
                 },
             },
@@ -606,7 +606,7 @@ EXAMPLE_CONFIGS = {
                         ["vllm", "LLM_MODEL_ID"],
                         ["supervisor", "model"],
                         ["ragagent", "model"],
-                        ["sqlagent", "model"]
+                        ["sqlagent", "model"],
                     ],
                     "hf_token": ["global", "HUGGINGFACEHUB_API_TOKEN"],
                     "num_shards": ["vllm", "resources", "limits", "habana.ai/gaudi"],

@@ -638,13 +638,19 @@ class Deployer:
             and self.args.num_shards is not None
         ):
             num_shards_str = str(self.args.num_shards)
-            log_message("INFO", f"Adding specific config for AgentQnA/Gaudi: setting extraCmdArgs with tensor-parallel-size={num_shards_str}")
+            log_message(
+                "INFO",
+                f"Adding specific config for AgentQnA/Gaudi: setting extraCmdArgs with tensor-parallel-size={num_shards_str}",
+            )
 
             updates[("vllm", "extraCmdArgs")] = [
-                "--tensor-parallel-size", num_shards_str,
-                "--max-seq-len-to-capture", "16384",
+                "--tensor-parallel-size",
+                num_shards_str,
+                "--max-seq-len-to-capture",
+                "16384",
                 "--enable-auto-tool-choice",
-                "--tool-call-parser", "llama3_json"
+                "--tool-call-parser",
+                "llama3_json",
             ]
 
         if update_helm_values_yaml(local_values_file, updates):

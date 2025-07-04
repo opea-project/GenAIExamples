@@ -421,7 +421,7 @@ def parse_shell_env_file(file_path: pathlib.Path) -> dict:
                     key, value = match.groups()
                     value = value.split("#", 1)[0].strip()
                     if (value.startswith('"') and value.endswith('"')) or (
-                            value.startswith("'") and value.endswith("'")
+                        value.startswith("'") and value.endswith("'")
                     ):
                         value = value[1:-1]
                     env_vars[key] = value
