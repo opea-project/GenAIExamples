@@ -68,7 +68,7 @@ The output of the command should contain images:
 
 ```bash
 ### Replace the string 'your_huggingfacehub_token' with your HuggingFacehub repository access token.
-export HUGGINGFACEHUB_API_TOKEN='your_huggingfacehub_token'
+export HF_TOKEN='your_huggingfacehub_token'
 ```
 
 ### Setting variables in the file set_env_vllm.sh

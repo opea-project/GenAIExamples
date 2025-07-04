@@ -2,14 +2,16 @@
 
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
-pushd "../../" > /dev/null
+SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
+
+pushd "$SCRIPT_DIR/../../../" > /dev/null
 source .set_env.sh
 popd > /dev/null
 
 export HOST_IP=$(hostname -I | awk '{print $1}')
-export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
-if [ -z "${HUGGINGFACEHUB_API_TOKEN}" ]; then
-    echo "Error: HUGGINGFACEHUB_API_TOKEN is not set. Please set HUGGINGFACEHUB_API_TOKEN"
+export HF_TOKEN=${HF_TOKEN}
+if [ -z "${HF_TOKEN}" ]; then
+    echo "Error: HF_TOKEN is not set. Please set HF_TOKEN"
 fi
 
 if [ -z "${HOST_IP}" ]; then

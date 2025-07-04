@@ -27,25 +27,22 @@ export MAX_SEQ_LEN_TO_CAPTURE=2048
 export MAX_INPUT_TOKENS=2048
 export MAX_TOTAL_TOKENS=4096
 
+# set service host and no_proxy
+export LLM_ENDPOINT="http://vllm-service:80"
+export LLM_SERVICE_HOST_IP="llm-docsum-vllm"
+export ASR_SERVICE_HOST_IP="whisper"
+export no_proxy=$no_proxy,$LLM_SERVICE_HOST_IP,$ASR_SERVICE_HOST_IP,"vllm-service"
+
 # Get the root folder of the current script
 ROOT_FOLDER=$(dirname "$(readlink -f "$0")")
 
 function build_docker_images() {
     opea_branch=${opea_branch:-"main"}
-    # If the opea_branch isn't main, replace the git clone branch in Dockerfile.
-    if [[ "${opea_branch}" != "main" ]]; then
-        cd $WORKPATH
-        OLD_STRING="RUN git clone --depth 1 https://github.com/opea-project/GenAIComps.git"
-        NEW_STRING="RUN git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git"
-        find . -type f -name "Dockerfile*" | while read -r file; do
-            echo "Processing file: $file"
-            sed -i "s|$OLD_STRING|$NEW_STRING|g" "$file"
-        done
-    fi
 
     cd $WORKPATH/docker_image_build
     git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
     pushd GenAIComps
+    echo "GenAIComps test commit is $(git rev-parse HEAD)"
     docker build --no-cache -t ${REGISTRY}/comps-base:${TAG} --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
     popd && sleep 1s
 
@@ -55,7 +52,7 @@ function build_docker_images() {
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
     service_list="docsum docsum-gradio-ui whisper llm-docsum vllm-gaudi"
-    docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
+    docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log 2>&1
 
     docker images && sleep 1s
 }
@@ -63,7 +60,7 @@ function build_docker_images() {
 function start_services() {
     cd $WORKPATH/docker_compose/intel/hpu/gaudi
     docker compose -f compose.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
-    sleep 1m
+    sleep 2m
 }
 
 get_base64_str() {
@@ -366,45 +363,41 @@ function stop_docker() {
 }
 
 function main() {
-    echo "==========================================="
-    echo ">>>> Stopping any running Docker containers..."
+
+    echo "::group:: Stopping any running Docker containers..."
     stop_docker
+    echo "::endgroup::"
 
-    echo "==========================================="
-    if [[ "$IMAGE_REPO" == "opea" ]]; then
-        echo ">>>> Building Docker images..."
-        build_docker_images
-    fi
+    echo "::group::build_docker_images"
+    if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
+    echo "::endgroup::"
 
-    echo "==========================================="
-    echo ">>>> Starting Docker services..."
+    echo "::group::start_services"
     start_services
+    echo "::endgroup::"
 
-    echo "==========================================="
-    echo ">>>> Validating microservices..."
+    echo "::group:: Validating microservices"
     validate_microservices
+    echo "::endgroup::"
 
-    echo "==========================================="
-    echo ">>>> Validating megaservice for text..."
+    echo "::group::validate_megaservice_text"
     validate_megaservice_text
+    echo "::endgroup::"
 
-    echo "==========================================="
-    echo ">>>> Validating megaservice for multimedia..."
+    echo "::group::validate_megaservice_multimedia"
     validate_megaservice_multimedia
+    echo "::endgroup::"
 
-    echo "==========================================="
-    echo ">>>> Validating megaservice for long text..."
+    echo "::group::validate_megaservice_long_text"
     validate_megaservice_long_text
+    echo "::endgroup::"
 
-    echo "==========================================="
-    echo ">>>> Stopping Docker containers..."
+    echo "::group::stop_docker"
     stop_docker
+    echo "::endgroup::"
 
-    echo "==========================================="
-    echo ">>>> Pruning Docker system..."
-    echo y | docker system prune
-    echo ">>>> Docker system pruned successfully."
-    echo "==========================================="
+    docker system prune -f
+
 }
 
 main

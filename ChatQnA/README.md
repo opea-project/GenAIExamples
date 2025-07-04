@@ -120,3 +120,14 @@ For ChatQnA specific tracing and metrics monitoring, follow [OpenTelemetry on Ch
 ## FAQ Generation Application
 
 FAQ Generation Application leverages the power of large language models (LLMs) to revolutionize the way you interact with and comprehend complex textual data. By harnessing cutting-edge natural language processing techniques, our application can automatically generate comprehensive and natural-sounding frequently asked questions (FAQs) from your documents, legal texts, customer queries, and other sources. We merged the FaqGen into the ChatQnA example, which utilize LangChain to implement FAQ Generation and facilitate LLM inference using Text Generation Inference on Intel Xeon and Gaudi2 processors.
+
+## Validated Configurations
+
+| **Deploy Method** | **LLM Engine** | **LLM Model**                       | **Embedding** | **Vector Database**                      | **Reranking** | **Guardrails** | **Hardware** |
+| ----------------- | -------------- | ----------------------------------- | ------------- | ---------------------------------------- | ------------- | -------------- | ------------ |
+| Docker Compose    | vLLM, TGI      | meta-llama/Meta-Llama-3-8B-Instruct | TEI           | Redis                                    | w/, w/o       | w/, w/o        | Intel Gaudi  |
+| Docker Compose    | vLLM, TGI      | meta-llama/Meta-Llama-3-8B-Instruct | TEI           | Redis, Mariadb, Milvus, Pinecone, Qdrant | w/, w/o       | w/o            | Intel Xeon   |
+| Docker Compose    | Ollama         | llama3.2                            | TEI           | Redis                                    | w/            | w/o            | Intel AIPC   |
+| Docker Compose    | vLLM, TGI      | meta-llama/Meta-Llama-3-8B-Instruct | TEI           | Redis                                    | w/            | w/o            | AMD ROCm     |
+| Helm Charts       | vLLM, TGI      | meta-llama/Meta-Llama-3-8B-Instruct | TEI           | Redis                                    | w/, w/o       | w/, w/o        | Intel Gaudi  |
+| Helm Charts       | vLLM, TGI      | meta-llama/Meta-Llama-3-8B-Instruct | TEI           | Redis, Milvus, Qdrant                    | w/, w/o       | w/o            | Intel Xeon   |

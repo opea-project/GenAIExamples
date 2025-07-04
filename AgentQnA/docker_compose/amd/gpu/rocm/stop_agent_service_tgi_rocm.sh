@@ -5,7 +5,7 @@
 
 WORKPATH=$(dirname "$PWD")/..
 export ip_address=${host_ip}
-export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
+export HF_TOKEN=${HF_TOKEN}
 export AGENTQNA_TGI_IMAGE=ghcr.io/huggingface/text-generation-inference:2.4.1-rocm
 export AGENTQNA_TGI_SERVICE_PORT="19001"
 
@@ -46,7 +46,7 @@ export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/get"
 export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/delete"
 
 echo "Removing chinook data..."
-echo Y | rm -R chinook-database
+rm -R chinook-database
 if [ -d "chinook-database" ]; then
     rm -rf chinook-database
 fi

@@ -123,7 +123,7 @@ Set up a [HuggingFace](https://huggingface.co/) account and generate a [user acc
 Then set an environment variable with the token and another for a directory to download the models:
 
 ```bash
-export HUGGINGFACEHUB_API_TOKEN=<your-HF-token>
+export HF_TOKEN=<your-HF-token>
 export HF_CACHE_DIR=<directory-where-llms-are-downloaded> #  to avoid redownloading models
 ```
 
@@ -300,3 +300,12 @@ The [tools](./tools) folder contains YAML and Python files for additional tools 
 
 Follow [OpenTelemetry OPEA Guide](https://opea-project.github.io/latest/tutorial/OpenTelemetry/OpenTelemetry_OPEA_Guide.html) to understand how to use OpenTelemetry tracing and metrics in OPEA.  
 For AgentQnA specific tracing and metrics monitoring, follow [OpenTelemetry on AgentQnA](https://opea-project.github.io/latest/tutorial/OpenTelemetry/deploy/AgentQnA.html) section.
+
+## Validated Configurations
+
+| **Deploy Method** | **LLM Engine** | **LLM Model**                       | **Hardware** |
+| ----------------- | -------------- | ----------------------------------- | ------------ |
+| Docker Compose    | vLLM           | meta-llama/Llama-3.3-70B-Instruct   | Intel Gaudi  |
+| Docker Compose    | vLLM, TGI      | Intel/neural-chat-7b-v3-3           | AMD ROCm     |
+| Helm Charts       | vLLM           | meta-llama/Llama-3.3-70B-Instruct   | Intel Gaudi  |
+| Helm Charts       | vLLM           | meta-llama/Meta-Llama-3-8B-Instruct | Intel Xeon   |

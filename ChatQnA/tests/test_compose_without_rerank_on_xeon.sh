@@ -25,7 +25,7 @@ function build_docker_images() {
     popd && sleep 1s
     git clone https://github.com/vllm-project/vllm.git && cd vllm
 
-    VLLM_VER="v0.8.3"
+    VLLM_VER=v0.9.0.1
     echo "Check out vLLM tag ${VLLM_VER}"
     git checkout ${VLLM_VER} &> /dev/null
     # Not change the pwd
@@ -44,7 +44,7 @@ function start_services() {
     source set_env.sh
 
     # Start Docker Containers
-    docker compose -f compose_without_rerank.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
+    docker compose -f compose_without_rerank.yaml up -d --quiet-pull > ${LOG_PATH}/start_services_with_compose.log
     n=0
     until [[ "$n" -ge 100 ]]; do
         docker logs vllm-service > ${LOG_PATH}/vllm_service_start.log 2>&1
