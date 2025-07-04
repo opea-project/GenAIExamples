@@ -8,6 +8,7 @@ services:
     ports:
       - "${DOCSUM_VLLM_SERVICE_PORT:-8081}:8011"
     environment:
+      test_env: test
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
