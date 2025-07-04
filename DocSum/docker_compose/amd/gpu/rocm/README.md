@@ -129,7 +129,7 @@ Use AMD GPU driver utilities to determine the correct `cardN` and `renderN` IDs 
 Please refer to the table below to build different microservices from source:
 
 | Microservice | Deployment Guide                                                                                                                      |
-|--------------| ------------------------------------------------------------------------------------------------------------------------------------- |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------- |
 | whisper      | [whisper build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/third_parties/whisper/src)                           |
 | TGI          | [TGI project](https://github.com/huggingface/text-generation-inference.git)                                                           |
 | vLLM         | [vLLM build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/third_parties/vllm#build-docker)                        |
@@ -148,6 +148,7 @@ docker ps -a
 For the default deployment, the following 5 containers should have started:
 
 If used TGI:
+
 ```
 CONTAINER ID   IMAGE                                                         COMMAND                  CREATED         STATUS                   PORTS                                       NAMES
 748f577b3c78   opea/whisper:latest                                           "python whisper_s…"      5 minutes ago   Up About a minute        0.0.0.0:7066->7066/tcp, :::7066->7066/tcp   whisper-service
@@ -158,6 +159,7 @@ fds3dd5b9fd8   opea/docsum:latest                                            "py
 ```
 
 If used vLLM:
+
 ```
 CONTAINER ID   IMAGE                                                         COMMAND                  CREATED         STATUS                   PORTS                                       NAMES
 748f577b3c78   opea/whisper:latest                                           "python whisper_s…"      5 minutes ago   Up About a minute        0.0.0.0:7066->7066/tcp, :::7066->7066/tcp   whisper-service
