@@ -30,7 +30,7 @@ on:
         type: string
       examples:
         default: "ChatQnA"
-        description: 'List of examples to test [ChatQnA,CodeTrans,DocSum,CodeGen,AudioQnA,VisualQnA,FaqGen]'
+        description: 'List of examples to test [ChatQnA,CodeTrans,DocSum,CodeGen,AudioQnA,VisualQnA,FaqGen,AgentQnA]'
         required: true
         type: string
       tag:
