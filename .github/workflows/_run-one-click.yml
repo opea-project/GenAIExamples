@@ -143,6 +143,8 @@ jobs:
           )
           echo "Generated input:"
           echo "$INPUT_DATA"
+          
+          export TEST_RETRY_ATTEMPTS=6
 
           python3 one_click_deploy.py << INPUTS
           $INPUT_DATA
