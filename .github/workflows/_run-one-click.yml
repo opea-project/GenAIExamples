@@ -78,7 +78,7 @@ jobs:
             cd ${{ github.workspace }}/ChatQnA
           else
             cd ${{ github.workspace }}/${{ inputs.example }}
-          fi          
+          fi
           export hardware=${{ inputs.hardware }}
           bash ${{ github.workspace }}/.github/workflows/scripts/docker_compose_clean_up.sh "containers"
           bash ${{ github.workspace }}/.github/workflows/scripts/docker_compose_clean_up.sh "ports"
