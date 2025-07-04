@@ -621,26 +621,37 @@ class Deployer:
                 if value is None:
                     continue
 
-                if isinstance(path_or_paths, list):
-                    for path in path_or_paths:
-                        updates[path] = value
+                if isinstance(path_or_paths, list) and len(path_or_paths) > 0 and isinstance(path_or_paths[0], list):
+                    for path_list in path_or_paths:
+                        updates[tuple(path_list)] = value
                 else:
-                    updates[path_or_paths] = value
+                    updates[tuple(path_or_paths)] = value
 
         if K8S_VLLM_SKIP_WARMUP:
-            # Heuristic check: only add this setting if the values.yaml seems to be for vLLM.
-            # This prevents adding it to examples that don't use vLLM.
             if "vllm:" in original_values_file.read_text():
-                log_message(
-                    "INFO",
-                    "Global flag K8S_VLLM_SKIP_WARMUP is True. Adding 'vllm.VLLM_SKIP_WARMUP: True' to Helm values.",
-                )
-                updates["vllm.VLLM_SKIP_WARMUP"] = True
-            else:
-                log_message(
-                    "DEBUG",
-                    f"K8S_VLLM_SKIP_WARMUP is on, but 'vllm:' key not found in {original_values_file.name}. Skipping addition.",
-                )
+                updates[("vllm", "VLLM_SKIP_WARMUP")] = True
+
+        if (
+            self.example_name == "AgentQnA"
+            and self.args.device == "gaudi"
+            and hasattr(self.args, "num_shards")
+            and self.args.num_shards is not None
+        ):
+            num_shards_str = str(self.args.num_shards)
+            log_message(
+                "INFO",
+                f"Adding specific config for AgentQnA/Gaudi: setting extraCmdArgs with tensor-parallel-size={num_shards_str}",
+            )
+
+            updates[("vllm", "extraCmdArgs")] = [
+                "--tensor-parallel-size",
+                num_shards_str,
+                "--max-seq-len-to-capture",
+                "16384",
+                "--enable-auto-tool-choice",
+                "--tool-call-parser",
+                "llama3_json",
+            ]
 
         if update_helm_values_yaml(local_values_file, updates):
             log_message("OK", f"Successfully updated local Helm values in {local_values_file.name}.")
@@ -672,6 +683,7 @@ class Deployer:
 set -e
 trap 'echo "ERROR: A command failed at line $LINENO. Exiting." >&2' ERR
 cd "{local_env_dir.resolve()}"
+export NON_INTERACTIVE=true
 source "{local_env_file.resolve()}"
 cd "{compose_dir.resolve()}"
 {compose_up_cmd}
