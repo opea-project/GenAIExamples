@@ -1,6 +1,6 @@
-# Deploy Finance Agent on Intel® Gaudi® AI Accelerator with Docker Compose
+# Deploy Finance Agent on Intel® Xeon® Scalable processors with Docker Compose
 
-This README provides instructions for deploying the Finance Agent application using Docker Compose on systems equipped with Intel® Gaudi® AI Accelerators.
+This README provides instructions for deploying the Finance Agent application using Docker Compose on systems equipped with Intel® Xeon® Scalable processors.
 
 ## Table of Contents
 
@@ -12,12 +12,13 @@ This README provides instructions for deploying the Finance Agent application us
 
 ## Overview
 
-This guide focuses on running the pre-configured Finance Agent service using Docker Compose on Intel® Gaudi® AI Accelerators. It leverages containers optimized for Gaudi for the LLM serving component, along with CPU-based containers for other microservices like embedding, retrieval, data preparation and the UI.
+This guide focuses on running the pre-configured Finance Agent service using Docker Compose on Intel® Xeon® Scalable processors. It runs with OpenAI LLM models, along with containers for other microservices like embedding, retrieval, data preparation and the UI.
 
 ## Prerequisites
 
 - Docker and Docker Compose installed.
-- Intel® Gaudi® AI Accelerator(s) with the necessary drivers and software stack installed on the host system. (Refer to Intel Gaudi Documentation).
+- Intel® Xeon® Scalable processors on-prem or from the cloud.
+- If running OpenAI models, generate the API key by following these [instructions](https://platform.openai.com/api-keys). If using a remote server i.e. for LLM text generation, have the base URL and API key ready from the cloud service provider or owner of the on-prem machine.
 - Git installed (for cloning repository).
 - Hugging Face Hub API Token (for downloading models).
 - Access to the internet (or a private model cache).
@@ -26,27 +27,28 @@ This guide focuses on running the pre-configured Finance Agent service using Doc
 
 Clone the GenAIExamples repository:
 
-```shell
+```bash
 mkdir /path/to/your/workspace/
 export WORKDIR=/path/to/your/workspace/
 cd $WORKDIR
 git clone https://github.com/opea-project/GenAIExamples.git
-cd GenAIExamples/FinanceAgent/docker_compose/intel/hpu/gaudi
+cd GenAIExamples/FinanceAgent/docker_compose/intel/cpu/xeon
 ```
 
 ## Start Deployment
 
-This uses the default vLLM-based deployment profile (vllm-gaudi-server).
+By default, it will run models from OpenAI.
 
 ### Configure Environment
 
 Set required environment variables in your shell:
 
-```shell
+```bash
 # Path to your model cache
 export HF_CACHE_DIR="./data"
 # Some models from Hugging Face require approval beforehand. Ensure you have the necessary permissions to access them.
 export HF_TOKEN="your_huggingface_token"
+export OPENAI_API_KEY="your-openai-api-key"
 export FINNHUB_API_KEY="your-finnhub-api-key"
 export FINANCIAL_DATASETS_API_KEY="your-financial-datasets-api-key"
 
@@ -64,11 +66,27 @@ source set_env.sh
 
 Note: The compose file might read additional variables from `set_env.sh`. Ensure all required variables like ports (LLM_SERVICE_PORT, TEI_EMBEDDER_PORT, etc.) are set if not using defaults from the compose file. For instance, edit the `set_env.sh` or overwrite LLM_MODEL_ID to change the LLM model.
 
+### [Optional] Running LLM models with remote endpoints
+
+When models are deployed on a remote server, a base URL and an API key are required to access them. To set up a remote server and acquire the base URL and API key, refer to [Intel® AI for Enterprise Inference](https://www.intel.com/content/www/us/en/developer/topic-technology/artificial-intelligence/enterprise-inference.html) offerings.
+
+Set the following environment variables.
+
+- `REMOTE_ENDPOINT` is the HTTPS endpoint of the remote server with the model of choice (i.e. https://api.inference.denvrdata.com). **Note:** If not using LiteLLM, the second part of the model card needs to be appended to the URL i.e. `/Llama-3.3-70B-Instruct` from `meta-llama/Llama-3.3-70B-Instruct`.
+- `OPENAI_LLM_MODEL_ID` is the model card which may need to be overwritten depending on what it is set to `set_env.sh`.
+
+```bash
+export REMOTE_ENDPOINT=<https-endpoint-of-remote-server>
+export OPENAI_LLM_MODEL_ID=<model-card>
+```
+
+`OPENAI_API_KEY` should already be set in the previous step.
+
+After setting these environment variables, run `docker compose` by adding `compose_remote.yaml` as an additional YAML file in the [next step](#optional-option-2-deploy-with-docker-compose-for-models-on-a-remote-server).
+
 ### Start Services
 
-#### Deploy with Docker Compose
-
-Below is the command to launch services
+The following services will be launched:
 
 - tei-embedding-serving
 - redis-vector-db
@@ -76,12 +94,22 @@ Below is the command to launch services
 - dataprep-redis-server-finance
 - finqa-agent-endpoint
 - research-agent-endpoint
-- docsum-vllm-gaudi
+- docsum-vllm-xeon
 - supervisor-agent-endpoint
 - agent-ui
 
-```shell
-docker compose -f compose.yaml up -d
+Follow **ONE** option below to deploy these services.
+
+#### Option 1: Deploy with Docker Compose for OpenAI Models
+
+```bash
+docker compose -f compose_openai.yaml up -d
+```
+
+#### [Optional] Option 2: Deploy with Docker Compose for Models on a Remote Server
+
+```bash
+docker compose -f compose_openai.yaml -f compose_remote.yaml up -d
 ```
 
 #### [Optional] Build docker images
@@ -96,36 +124,12 @@ git clone https://github.com/opea-project/GenAIComps.git
 docker compose -f build.yaml build --no-cache
 ```
 
-If deploy on Gaudi, also need to build vllm image.
-
-```bash
-cd $WORKDIR
-git clone https://github.com/HabanaAI/vllm-fork.git
-# get the latest release tag of vllm gaudi
-cd vllm-fork
-VLLM_VER=$(git describe --tags "$(git rev-list --tags --max-count=1)")
-echo "Check out vLLM tag ${VLLM_VER}"
-git checkout ${VLLM_VER}
-docker build --no-cache -f Dockerfile.hpu -t opea/vllm-gaudi:latest --shm-size=128g . --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy
-```
-
 ## Validate Services
 
-Wait several minutes for models to download and services to initialize (Gaudi initialization can take time). Check container logs (docker compose logs -f <service_name>, especially vllm-gaudi-server).
+Wait several minutes for models to download and services to initialize. Check container logs with this command:
 
 ```bash
-docker logs --tail 2000 -f vllm-gaudi-server
-```
-
-> Below is the expected output of the `vllm-gaudi-server` service.
-
-```
-   INFO:     Started server process [1]
-   INFO:     Waiting for application startup.
-   INFO:     Application startup complete.
-   INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
-   INFO:     <IP>:<Port Number> - "GET /health HTTP/1.1" 200 OK
-
+docker compose logs -f <service_name>.
 ```
 
 ### Validate Data Services
@@ -133,8 +137,8 @@ docker logs --tail 2000 -f vllm-gaudi-server
 Ingest data and retrieval from database
 
 ```bash
-python $WORKDIR/GenAIExamples/FinanceAgent/tests/test_redis_finance.py --port 6007 --test_option ingest
-python $WORKDIR/GenAIExamples/FinanceAgent/tests/test_redis_finance.py --port 6007 --test_option get
+python3 $WORKDIR/GenAIExamples/FinanceAgent/tests/test_redis_finance.py --port 6007 --test_option ingest
+python3 $WORKDIR/GenAIExamples/FinanceAgent/tests/test_redis_finance.py --port 6007 --test_option get
 ```
 
 ### Validate Agents
