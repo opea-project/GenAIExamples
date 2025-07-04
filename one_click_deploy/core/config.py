@@ -154,7 +154,7 @@ EXAMPLE_CONFIGS = {
         "default_device": "xeon",
         "ports": {
             "docker": {"backend": "7777", "llm": "9000"},
-            "k8s_services": {"backend": "codetrans-svc", "llm": "codetrans-llm-svc"},
+            "k8s_services": {"backend": "codetrans", "llm": "codetrans-llm-svc"},
         },
         "test_connections": {
             "main_service": {
