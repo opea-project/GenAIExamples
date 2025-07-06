@@ -1,0 +1,25 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  agent:
+    build:
+      context: GenAIComps
+      dockerfile: comps/agent/src/Dockerfile
+      args:
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
+        no_proxy: ${no_proxy}
+    image: ${REGISTRY:-opea}/agent:${TAG:-latest}
+  vllm-gaudi:
+    build:
+      context: vllm-fork
+      dockerfile: Dockerfile.hpu
+    extends: agent
+    image: ${REGISTRY:-opea}/vllm-gaudi:${TAG:-latest}
+  vllm-rocm:
+    build:
+      context: GenAIComps
+      dockerfile: comps/third_parties/vllm/src/Dockerfile.amd_gpu
+    extends: agent
+    image: ${REGISTRY:-opea}/vllm-rocm:${TAG:-latest}
