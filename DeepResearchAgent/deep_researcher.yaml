@@ -1,3 +1,6 @@
+# Copyright (C) 2025 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 agent:
   type: langchain_deep_researcher
   search_api: "tavily"

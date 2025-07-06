@@ -5,19 +5,19 @@ import argparse
 import json
 import os
 import re
-
-from comps import register_microservice, opea_microservices
-from comps.cores.telemetry.opea_telemetry import opea_telemetry
 from typing import List, Union
+
+from comps import opea_microservices, register_microservice
+from comps.cores.telemetry.opea_telemetry import opea_telemetry
 from pydantic import BaseModel
 from utils import *
-
 
 agent = create_agent("./deep_researcher.yaml")
 
 
 class SimpleRequest(BaseModel):
     question: Union[str, List[str]]
+
 
 @register_microservice(
     name="opea_service@deep_research_agent",
@@ -28,11 +28,10 @@ class SimpleRequest(BaseModel):
 @opea_telemetry
 async def run(request: SimpleRequest):
 
-    question = (
-        f"Question: {request.question}"
-    )
-    
+    question = f"Question: {request.question}"
+
     return agent(goal=question)
+
 
 if __name__ == "__main__":
     opea_microservices["opea_service@deep_research_agent"].start()

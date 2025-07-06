@@ -1,9 +1,15 @@
+# Copyright (C) 2025 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 from typing import Any
+
 import yaml
+
 
 def load_config(config_path: str):
     with open(config_path, "r") as file:
         return yaml.safe_load(file)
+
 
 def create_agent(config: str, return_instance: bool = False) -> Any:
 
@@ -66,7 +72,7 @@ def create_agent(config: str, return_instance: bool = False) -> Any:
         }
 
         # NOTE: add research prompt to the goal for robust benchmarking purposes
-        goal= goal + " You must perform in-depth research to answer the question."
+        goal = goal + " You must perform in-depth research to answer the question."
 
         results = []
 
@@ -75,11 +81,12 @@ def create_agent(config: str, return_instance: bool = False) -> Any:
                 results.append(event)
 
             from langgraph.types import Command
+
             async for event in graph.astream(Command(resume=True), thread, stream_mode="updates"):
                 results.append(event)
 
             final_state = graph.get_state(thread)
-            report = final_state.values.get('final_report')
+            report = final_state.values.get("final_report")
 
             return report
 
