@@ -14,7 +14,7 @@ on:
 
 env:
   EXAMPLES: ${{ vars.NIGHTLY_RELEASE_EXAMPLES }}
-  NODES: "gaudi,xeon,arc"
+  NODES: "gaudi,xeon,rocm,arc"
 
 jobs:
   get-test-matrix:
