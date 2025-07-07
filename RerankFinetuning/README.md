@@ -16,7 +16,7 @@ Refer to the [Gaudi Guide](./docker_compose/intel/hpu/gaudi/README.md) for detai
 
 ### 1. Upload a training file
 
-Download a toy example training file `toy_finetune_data.jsonl` and upload it to the server with below command, this file can be downloaded in [here](https://github.com/FlagOpen/FlagEmbedding/blob/master/examples/finetune/toy_finetune_data.jsonl):
+Download a toy example training file `toy_finetune_data.jsonl` and upload it to the server with below command, this file can be downloaded in [here](https://github.com/FlagOpen/FlagEmbedding/blob/JUNJIE99-patch-1/examples/finetune/toy_finetune_data.jsonl):
 
 ```bash
 # upload a training file
