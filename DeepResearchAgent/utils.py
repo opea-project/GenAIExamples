@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from typing import Any
-
 import yaml
 
 
@@ -23,6 +22,7 @@ def create_agent(config: str, return_instance: bool = False) -> Any:
 
         from langgraph.checkpoint.memory import MemorySaver
         from open_deep_research.graph import builder
+        from langgraph.types import Command
     except ImportError as e:
         raise ImportError(
             f"Failed to import required modules for langchain deep researcher: {e}. Make sure langgraph and open_deep_research are installed. Also make sure that the benchmark directory is in your path. Also, you might need to install the with-open-deep-research extra dependencies (see README.md)."
@@ -53,19 +53,15 @@ def create_agent(config: str, return_instance: bool = False) -> Any:
     writer_endpoint = agent_config.get("writer_endpoint")
     max_search_depth = agent_config.get("max_search_depth", 3)
 
-    def langchain_wrapper(goal: str):
-        import asyncio
-
+    async def langchain_wrapper(goal: str):
         thread = {
             "configurable": {
                 "thread_id": str(uuid.uuid4()),
                 "search_api": search_api,
                 "planner_provider": planner_provider,
                 "planner_model": planner_model,
-                "planner_model_kwargs": {"base_url": planner_endpoint},
                 "writer_provider": writer_provider,
                 "writer_model": writer_model,
-                "writer_model_kwargs": {"base_url": writer_endpoint},
                 "max_search_depth": max_search_depth,
                 "report_structure": REPORT_STRUCTURE,
             }
@@ -76,20 +72,15 @@ def create_agent(config: str, return_instance: bool = False) -> Any:
 
         results = []
 
-        async def run_graph():
-            async for event in graph.astream({"topic": goal}, thread, stream_mode="updates"):
-                results.append(event)
+        async for event in graph.astream({"topic": goal}, thread, stream_mode="updates"):
+            results.append(event)
 
-            from langgraph.types import Command
+        async for event in graph.astream(Command(resume=True), thread, stream_mode="updates"):
+            results.append(event)
 
-            async for event in graph.astream(Command(resume=True), thread, stream_mode="updates"):
-                results.append(event)
+        final_state = graph.get_state(thread)
+        report = final_state.values.get("final_report")
 
-            final_state = graph.get_state(thread)
-            report = final_state.values.get("final_report")
-
-            return report
-
-        return asyncio.run(run_graph())
+        return report
 
     return langchain_wrapper

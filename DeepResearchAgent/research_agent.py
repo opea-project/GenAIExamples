@@ -30,7 +30,9 @@ async def run(request: SimpleRequest):
 
     question = f"Question: {request.question}"
 
-    return agent(goal=question)
+    result = await agent(question)
+
+    return result
 
 
 if __name__ == "__main__":
