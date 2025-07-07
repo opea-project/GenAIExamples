@@ -73,8 +73,12 @@ jobs:
         shell: bash
         run: |
           docker ps
-          cd ${{ github.workspace }}/${{ inputs.example }}
-          export test_case=${{ matrix.test_case }}
+          if [ "${{ inputs.example }}" = "FaqGen" ]; then
+            export test_case=test_compose_faqgen_on_xeon.sh
+            cd ${{ github.workspace }}/ChatQnA
+          else
+            cd ${{ github.workspace }}/${{ inputs.example }}
+          fi
           export hardware=${{ inputs.hardware }}
           bash ${{ github.workspace }}/.github/workflows/scripts/docker_compose_clean_up.sh "containers"
           bash ${{ github.workspace }}/.github/workflows/scripts/docker_compose_clean_up.sh "ports"
@@ -143,6 +147,8 @@ jobs:
           )
           echo "Generated input:"
           echo "$INPUT_DATA"
+
+          export TEST_RETRY_ATTEMPTS=6
 
           python3 one_click_deploy.py << INPUTS
           $INPUT_DATA
@@ -242,7 +248,8 @@ jobs:
           )
           echo "Generated input:"
           echo "$INPUT_DATA"
-
+          export OPEA_K8S_VLLM_SKIP_WARMUP=TRUE
+          export TEST_RETRY_ATTEMPTS=6
           python3 one_click_deploy.py << INPUTS
           $INPUT_DATA
           INPUTS

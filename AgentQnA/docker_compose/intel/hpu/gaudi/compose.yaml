@@ -128,6 +128,7 @@ services:
       LLM_MODEL_ID: ${LLM_MODEL_ID}
       VLLM_TORCH_PROFILER_DIR: "/mnt"
       VLLM_SKIP_WARMUP: true
+      NUM_SHARDS: ${NUM_SHARDS}
       PT_HPU_ENABLE_LAZY_COLLECTIVES: true
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://$host_ip:8086/health || exit 1"]
@@ -138,4 +139,4 @@ services:
     cap_add:
       - SYS_NICE
     ipc: host
-    command: --model $LLM_MODEL_ID --tensor-parallel-size 4 --host 0.0.0.0 --port 8000 --block-size 128 --max-num-seqs 256 --max-seq-len-to-capture 16384
+    command: --model $LLM_MODEL_ID --tensor-parallel-size $NUM_SHARDS --host 0.0.0.0 --port 8000 --block-size 128 --max-num-seqs 256 --max-seq-len-to-capture 16384
