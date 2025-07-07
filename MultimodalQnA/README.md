@@ -268,7 +268,7 @@ docker compose -f compose.yaml up -d
 ## Validated Configurations
 
 | **Deploy Method** | **LLM Engine** | **LLM Model**                     | **Database**  | **Hardware** |
-| ----------------- | -------------  | --------------------------------- | ------------- | ------------ |
+| ----------------- | -------------- | --------------------------------- | ------------- | ------------ |
 | Docker Compose    | LLAVA          | llava-hf/llava-v1.6-vicuna-13b-hf | Milvus, Redis | Intel Xeon   |
 | Docker Compose    | LLAVA          | llava-hf/llava-v1.6-vicuna-13b-hf | Redis         | Intel Gaudi  |
 | Docker Compose    | TGI, vLLM      | Xkev/Llama-3.2V-11B-cot           | Redis         | AMD ROCm     |

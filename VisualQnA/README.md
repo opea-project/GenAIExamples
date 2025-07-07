@@ -148,7 +148,7 @@ Refer to the [VisualQnA helm chart](./kubernetes/helm/README.md) for instruction
 ## Validated Configurations
 
 | **Deploy Method** | **LLM Engine** | **LLM Model**                     | **Hardware** |
-| ----------------- | -------------  | --------------------------------- | ------------ |
+| ----------------- | -------------- | --------------------------------- | ------------ |
 | Docker Compose    | TGI, vLLM      | llava-hf/llava-v1.6-mistral-7b-hf | Intel Xeon   |
 | Docker Compose    | TGI, vLLM      | llava-hf/llava-1.5-7b-hf          | Intel Gaudi  |
 | Docker Compose    | TGI, vLLM      | Xkev/Llama-3.2V-11B-cot           | AMD ROCm     |
