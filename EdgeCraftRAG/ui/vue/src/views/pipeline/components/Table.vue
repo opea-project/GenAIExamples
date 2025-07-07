@@ -213,7 +213,7 @@ const handleImport = () => {
 };
 //Jump Chatbot
 const jumpChatbot = () => {
-  router.push("/chatbot");
+  router.push({ name: "Chatbot" });
 };
 
 watch(

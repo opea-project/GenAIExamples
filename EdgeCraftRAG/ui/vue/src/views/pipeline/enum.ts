@@ -35,6 +35,11 @@ export const Indexer = [
     value: "vector",
     describe: "pipeline.desc.vector",
   },
+  {
+    name: "MilvusVector",
+    value: "milvus_vector",
+    describe: "pipeline.desc.milvusVector",
+  },
 ] as const;
 export const Retriever = [
   {

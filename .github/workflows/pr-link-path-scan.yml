@@ -50,7 +50,7 @@ jobs:
                       if [ "$response_retry" -eq 200 ]; then
                         echo "*****Retry successfully*****"
                       else
-                        echo "Invalid link ($response_retry) from ${{github.workspace}}/$path: $url"
+                        echo "Invalid link ($response_retry) from ${{github.workspace}}/$(echo "$url_line"|cut -d':' -f1): $url"
                         fail="TRUE"
                       fi
                     fi

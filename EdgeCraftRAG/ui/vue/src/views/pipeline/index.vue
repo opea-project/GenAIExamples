@@ -22,8 +22,6 @@
       @import="handleImport"
       @search="handleSearch"
     />
-    <!-- configuration -->
-    <!-- <Configuration :json-data="jsonData" /> -->
     <!-- createDialog -->
     <CreateDialog
       v-if="createDialog.visible"
@@ -49,8 +47,6 @@
       @close="importDialog.visible = false"
       @search="handleSearch"
     />
-    <!-- QuickStart -->
-    <QuickStart @create="handleCreate" />
   </div>
 </template>
 
@@ -65,7 +61,6 @@ import {
   DetailDrawer,
   EditDialog,
   ImportDialog,
-  QuickStart,
   System,
   Table,
 } from "./components";
@@ -126,7 +121,7 @@ const handleImport = () => {
 //Jump Chatbot
 const jumpChatbot = () => {
   if (pipelineStore.activatedPipeline) {
-    router.push("/chatbot");
+    router.push({ name: "Chatbot" });
   } else {
     antNotification(
       "warning",
@@ -143,8 +138,12 @@ onMounted(() => {
 <style scoped lang="less">
 .setting-container {
   position: relative;
+  display: block !important;
+  padding: 24px;
+  width: 100%;
 
   .chatbot-wrap {
+    display: none;
     padding: 12px 8px;
     position: absolute;
     transform: translateY(-50%);
@@ -154,7 +153,7 @@ onMounted(() => {
     background-color: var(--bg-content-color);
     box-shadow: 0px 2px 4px 0px var(--bg-box-shadow);
     border-radius: 6px;
-    display: flex;
+    // display: flex;
     flex-direction: column;
     align-items: center;
     cursor: pointer;

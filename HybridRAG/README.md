@@ -96,3 +96,9 @@ flowchart LR
 ## Deployment
 
 [HybridRAG deployment on Intel Gaudi](./docker_compose/intel/hpu/gaudi/README.md)
+
+## Validated Configurations
+
+| **Deploy Method** | **LLM Engine** | **LLM Model**                       | **Hardware** |
+| ----------------- | -------------- | ----------------------------------- | ------------ |
+| Docker Compose    | vLLM           | meta-llama/Meta-Llama-3-8B-Instruct | Intel Gaudi  |

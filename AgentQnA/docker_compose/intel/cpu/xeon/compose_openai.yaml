@@ -6,7 +6,7 @@ services:
     image: opea/agent:latest
     container_name: rag-agent-endpoint
     volumes:
-      - ${TOOLSET_PATH}:/home/user/tools/
+      - ${TOOLSET_PATH:-../../../../tools}:/home/user/tools/
     ports:
       - "9095:9095"
     ipc: host
@@ -67,7 +67,7 @@ services:
       - worker-rag-agent
       - worker-sql-agent
     volumes:
-      - ${TOOLSET_PATH}:/home/user/tools/
+      - ${TOOLSET_PATH:-../../../../tools}:/home/user/tools/
     ports:
       - "9090:9090"
     ipc: host

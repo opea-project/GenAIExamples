@@ -67,3 +67,10 @@ The table below lists the available deployment options and their implementation 
 | ---------- | ----------------- | ----------------------------------------------------------------- |
 | Intel Xeon | Docker compose    | [Deployment on Xeon](./docker_compose/intel/cpu/xeon/README.md)   |
 | AMD ROCm   | Docker compose    | [Deployment on AMD Rocm](./docker_compose/amd/gpu/rocm/README.md) |
+
+## Validated Configurations
+
+| **Deploy Method** | **LLM Engine** | **LLM Model**                      | **Hardware** |
+| ----------------- | -------------- | ---------------------------------- | ------------ |
+| Docker Compose    | TGI            | mistralai/Mistral-7B-Instruct-v0.3 | Intel Xeon   |
+| Docker Compose    | TGI            | mistralai/Mistral-7B-Instruct-v0.3 | AMD ROCm     |

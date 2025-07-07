@@ -7,12 +7,22 @@ from typing import Iterator, Optional
 
 from docx.text.paragraph import Paragraph
 from PIL import Image as Img
+from transformers import AutoTokenizer
 from unstructured.documents.elements import ElementMetadata, Image
 from unstructured.partition.docx import DocxPartitionerOptions
 
 UI_DIRECTORY = os.getenv("UI_TMPFILE_PATH", "/home/user/ui_cache")
 IMG_OUTPUT_DIR = os.path.join(UI_DIRECTORY, "pic")
 os.makedirs(IMG_OUTPUT_DIR, exist_ok=True)
+
+DEFAULT_TEMPLATE = """You are an AI assistant. Your task is to learn from the following context. Then answer the user's question based on what you learned from the context but not your own knowledge.
+
+{context}
+
+Pay attention to your formatting of response. If you need to reference content from context, try to keep the formatting.
+Try to summarize from the context, do some reasoning before response, then response. Make sure your response is logically sound and self-consistent.
+
+"""
 
 
 class DocxParagraphPicturePartitioner:
@@ -29,6 +39,25 @@ class DocxParagraphPicturePartitioner:
                 image.save(image_path)
                 element_metadata = ElementMetadata(image_path=image_path)
             yield Image(text="IMAGE", metadata=element_metadata)
+
+
+def get_prompt_template(model_id, template_path=None):
+    if template_path:
+        from pathlib import Path
+
+        template = Path(template_path).read_text(encoding=None)
+    else:
+        template = DEFAULT_TEMPLATE
+    tokenizer = AutoTokenizer.from_pretrained(model_id)
+    model_id = model_id.split("/")[-1]
+    messages = [{"role": "system", "content": template}, {"role": "user", "content": "\n{input}\n"}]
+    prompt_template = tokenizer.apply_chat_template(
+        messages,
+        tokenize=False,
+        add_generation_prompt=True,
+        enable_thinking=False,  # Switches between thinking and non-thinking modes. Default is True.
+    )
+    return prompt_template
 
 
 def serialize_node_with_score(node_with_score):

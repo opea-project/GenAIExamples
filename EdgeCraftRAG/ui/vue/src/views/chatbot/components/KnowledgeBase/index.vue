@@ -33,7 +33,7 @@
             </div>
           </div>
           <div class="right-wrap">
-            <a-dropdown>
+            <a-dropdown arrow>
               <a @click.prevent class="expand-wrap"> ... </a>
               <template #overlay>
                 <a-menu>
@@ -73,7 +73,7 @@
       v-if="updateDialog.visible"
       :dialog-data="updateDialog.data"
       :dialog-type="updateDialog.type"
-      @search="handleSearch"
+      @switch="handleSwitch"
       @close="updateDialog.visible = false"
     />
   </div>
@@ -84,7 +84,7 @@ import { onMounted, reactive, createVNode } from "vue";
 import { UpdateDialog } from "./index";
 import {
   getKnowledgeBaseList,
-  getKnowledgeBaseDetialById,
+  getKnowledgeBaseDetialByName,
   requestKnowledgeBaseUpdate,
   requestKnowledgeBaseDelete,
 } from "@/api/knowledgeBase";
@@ -125,7 +125,7 @@ const handleCreate = () => {
 };
 //edit
 const handleUpdate = async (row: EmptyObjectType) => {
-  const data: any = await getKnowledgeBaseDetialById(row.idx);
+  const data: any = await getKnowledgeBaseDetialByName(row.name);
 
   updateDialog.data = data;
   updateDialog.type = "edit";
@@ -133,9 +133,9 @@ const handleUpdate = async (row: EmptyObjectType) => {
 };
 //detail
 const handleView = async (row: EmptyObjectType) => {
-  const { idx } = row;
+  const { idx, name } = row;
   selectedKB.value = idx;
-  emit("view", selectedKB.value);
+  emit("view", name);
 };
 //delete
 const handleDelete = (row: EmptyObjectType) => {
@@ -146,11 +146,13 @@ const handleDelete = (row: EmptyObjectType) => {
     okText: t("common.confirm"),
     okType: "danger",
     async onOk() {
-      await requestKnowledgeBaseDelete(row.idx);
+      const { idx, name } = row;
+      await requestKnowledgeBaseDelete(name);
       handleSearch();
-      if (selectedKB.value === row.idx) {
+
+      if (selectedKB.value === idx) {
         selectedKB.value = "";
-        emit("view", selectedKB.value);
+        emit("view", "");
       }
     },
   });
@@ -173,7 +175,14 @@ const handleSwitchState = (row: EmptyObjectType) => {
 const handleSearch = () => {
   queryKnowledgeBaseList();
 };
+const handleSwitch = async (name: string) => {
+  const data: any = await getKnowledgeBaseList();
 
+  kbList.value = [].concat(data);
+
+  const rowData = kbList.value.find((item) => item.name === name) || {};
+  handleView(rowData);
+};
 onMounted(() => {
   queryKnowledgeBaseList();
   eventBus.on("refresh", queryKnowledgeBaseList);

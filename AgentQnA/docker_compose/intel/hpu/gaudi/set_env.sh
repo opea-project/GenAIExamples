@@ -2,16 +2,19 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-pushd "../../../../../" > /dev/null
+SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
+
+pushd "$SCRIPT_DIR/../../../../../" > /dev/null
 source .set_env.sh
 popd > /dev/null
-WORKPATH=$(dirname "$PWD")/..
-# export WORKDIR=$WORKPATH/../../
 if [[ -z "${WORKDIR}" ]]; then
-	echo "Please set WORKDIR environment variable"
-	exit 0
+    echo "INFO: WORKDIR is not set. Calculating it automatically."
+    SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
+    export WORKDIR=$(cd "$SCRIPT_DIR/../../../../../../" && pwd)
+    echo "INFO: WORKDIR has been set to: ${WORKDIR}"
+else
+    echo "INFO: WORKDIR is already set to: ${WORKDIR}"
 fi
-echo "WORKDIR=${WORKDIR}"
 export ip_address=$(hostname -I | awk '{print $1}')
 
 # LLM related environment variables
@@ -19,7 +22,7 @@ export HF_CACHE_DIR=${HF_CACHE_DIR}
 ls $HF_CACHE_DIR
 export HF_TOKEN=${HF_TOKEN}
 export LLM_MODEL_ID="meta-llama/Llama-3.3-70B-Instruct"
-export NUM_SHARDS=4
+export NUM_SHARDS=${NUM_SHARDS:-4}
 export LLM_ENDPOINT_URL="http://${ip_address}:8086"
 export temperature=0
 export max_new_tokens=4096
