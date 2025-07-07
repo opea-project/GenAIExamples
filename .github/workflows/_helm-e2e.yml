@@ -214,6 +214,7 @@ jobs:
           else
             LOG_PATH=/home/$(whoami)/helm-logs
             chart=${{ env.CHART_NAME }}
+            mkdir -p ${LOG_PATH}
             helm test -n $NAMESPACE $RELEASE_NAME --logs --timeout "$TEST_TIMEOUT_SECONDS" | tee ${LOG_PATH}/charts-${chart}.log
             exit_code=$?
             if [ $exit_code -ne 0 ]; then
