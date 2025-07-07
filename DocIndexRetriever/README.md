@@ -102,8 +102,8 @@ response = requests.post(url, json=payload)
 
 ## Validated Configurations
 
-| **Deploy Method** | **Database**  | **Reranking**  | **Hardware** |
-| ----------------- | ------------- | -------------- | ------------ |
-| Docker Compose    | Milvus, Redis | w/             | Intel Xeon   |
-| Docker Compose    | Redis         | w/o            | Intel Xeon   |
-| Docker Compose    | Milvus, Redis | w/             | Intel Gaudi  |
+| **Deploy Method** | **Database**  | **Reranking** | **Hardware** |
+| ----------------- | ------------- | ------------- | ------------ |
+| Docker Compose    | Milvus, Redis | w/            | Intel Xeon   |
+| Docker Compose    | Redis         | w/o           | Intel Xeon   |
+| Docker Compose    | Milvus, Redis | w/            | Intel Gaudi  |
