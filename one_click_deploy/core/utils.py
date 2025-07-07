@@ -262,10 +262,12 @@ def update_helm_values_yaml(file_path: pathlib.Path, updates_map: dict):
     for key_path, value in updates_map.items():
         if value is None:
             continue
-        keys, current_level = key_path.split("."), data
+
+        keys, current_level = key_path, data
+
         try:
             for key in keys[:-1]:
-                if key not in current_level:
+                if key not in current_level or not isinstance(current_level.get(key), dict):
                     current_level[key] = {}
                 current_level = current_level[key]
             current_level[keys[-1]] = value
@@ -443,7 +445,6 @@ def is_port_in_use(port: int, host: str = "0.0.0.0") -> bool:
                 return True
 
             if e.errno == errno.EACCES:
-
                 log_message(
                     "WARN",
                     f"Permission denied to check port {port}. This port is likely privileged. Run as root if you need to bind to it.",
