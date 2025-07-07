@@ -19,3 +19,12 @@ Use below command to generate image.
 ```bash
 http_proxy="" curl http://localhost:9379/v1/text2image -XPOST -d '{"prompt":"An astronaut riding a green horse", "num_images_per_prompt":1}' -H 'Content-Type: application/json'
 ```
+
+## Validated Configurations
+
+| **Deploy Method** | **Hardware** |
+| ----------------- | ------------ |
+| Docker Compose    | Intel Xeon   |
+| Docker Compose    | Intel Gaudi  |
+| Helm Charts       | Intel Gaudi  |
+| Helm Charts       | Intel Xeon   |
