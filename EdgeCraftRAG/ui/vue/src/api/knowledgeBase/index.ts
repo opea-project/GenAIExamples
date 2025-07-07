@@ -7,15 +7,13 @@ export const getKnowledgeBaseList = () => {
   return request({
     url: "/v1/knowledge",
     method: "get",
-    showLoading: true,
   });
 };
 
-export const getKnowledgeBaseDetialById = (kbId: String) => {
+export const getKnowledgeBaseDetialByName = (kbName: String) => {
   return request({
-    url: `/v1/knowledge/${kbId}`,
+    url: `/v1/knowledge/${kbName}`,
     method: "get",
-    showLoading: true,
   });
 };
 
@@ -41,9 +39,9 @@ export const requestKnowledgeBaseUpdate = (data: Object) => {
   });
 };
 
-export const requestKnowledgeBaseDelete = (kbId: String) => {
+export const requestKnowledgeBaseDelete = (kbName: String) => {
   return request({
-    url: `/v1/knowledge/${kbId}`,
+    url: `/v1/knowledge/${kbName}`,
     method: "delete",
     showLoading: true,
     showSuccessMsg: true,
@@ -51,9 +49,9 @@ export const requestKnowledgeBaseDelete = (kbId: String) => {
   });
 };
 
-export const requestKnowledgeBaseRelation = (kbId: String, data: Object) => {
+export const requestKnowledgeBaseRelation = (kbName: String, data: Object) => {
   return request({
-    url: `/v1/knowledge/${kbId}/files`,
+    url: `/v1/knowledge/${kbName}/files`,
     method: "post",
     data,
     showLoading: true,
@@ -62,9 +60,9 @@ export const requestKnowledgeBaseRelation = (kbId: String, data: Object) => {
   });
 };
 
-export const requestFileDelete = (name: String, data: Object) => {
+export const requestFileDelete = (kbName: String, data: Object) => {
   return request({
-    url: `/v1/knowledge/${name}/files`,
+    url: `/v1/knowledge/${kbName}/files`,
     method: "delete",
     data,
     showLoading: true,

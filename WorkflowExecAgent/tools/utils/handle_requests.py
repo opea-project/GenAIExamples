@@ -21,8 +21,8 @@ class RequestHandler:
     def _make_request(self, endpoint, method="GET", data=None, stream=False):
         url = f"{self.base_url}{endpoint}"
         headers = {"Content-Type": "application/json", "Authorization": f"Bearer {self.api_key}"}
-
         error = ""
+        print(f"Making {method} request to {url}")
 
         if method == "GET":
             response = requests.get(url, headers=headers)
