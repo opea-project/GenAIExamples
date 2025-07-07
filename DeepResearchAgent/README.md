@@ -1,8 +1,6 @@
-
 ## Deep Research Agent Application
 
 Deep Research Agents are a new class of autonomous AI systems designed to perform complex, multi-step research tasks that typically require human-level reasoning, planning, and synthesis.
-
 
 ## Setup Deployment Environment
 
