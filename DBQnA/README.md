@@ -70,7 +70,7 @@ The table below lists the available deployment options and their implementation 
 
 ## Validated Configurations
 
-| **Deploy Method** | **LLM Engine** | **LLM Model**                       | **Hardware** |
-| ----------------- | -------------- | ----------------------------------- | ------------ |
-| Docker Compose    | TGI            | mistralai/Mistral-7B-Instruct-v0.3  | Intel Xeon   |
-| Docker Compose    | TGI            | mistralai/Mistral-7B-Instruct-v0.3  | AMD ROCm     |
+| **Deploy Method** | **LLM Engine** | **LLM Model**                      | **Hardware** |
+| ----------------- | -------------- | ---------------------------------- | ------------ |
+| Docker Compose    | TGI            | mistralai/Mistral-7B-Instruct-v0.3 | Intel Xeon   |
+| Docker Compose    | TGI            | mistralai/Mistral-7B-Instruct-v0.3 | AMD ROCm     |

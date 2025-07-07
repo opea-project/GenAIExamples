@@ -88,8 +88,8 @@ The table below lists the available deployment options and their implementation 
 
 ## Validated Configurations
 
-| **Deploy Method** | **LLM Engine** | **LLM Model**                       | **Hardware** |
-| ----------------- | -------------- | ----------------------------------- | ------------ |
-| Docker Compose    | TGI            | Intel/neural-chat-7b-v3-3           | Intel Gaudi  |
-| Docker Compose    | TGI            | Intel/neural-chat-7b-v3-3           | Intel Xeon   |
-| Docker Compose    | TGI            | Intel/neural-chat-7b-v3-3           | AMD ROCm     |
+| **Deploy Method** | **LLM Engine** | **LLM Model**             | **Hardware** |
+| ----------------- | -------------- | ------------------------- | ------------ |
+| Docker Compose    | TGI            | Intel/neural-chat-7b-v3-3 | Intel Gaudi  |
+| Docker Compose    | TGI            | Intel/neural-chat-7b-v3-3 | Intel Xeon   |
+| Docker Compose    | TGI            | Intel/neural-chat-7b-v3-3 | AMD ROCm     |

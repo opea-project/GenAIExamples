@@ -33,11 +33,11 @@ The table below lists currently available deployment options. They outline in de
 
 ## Validated Configurations
 
-| **Deploy Method** | **LLM Engine** | **LLM Model**                       | **Hardware** |
-| ----------------- | -------------- | ----------------------------------- | ------------ |
-| Docker Compose    | vLLM, TGI      | mistralai/Mistral-7B-Instruct-v0.3  | Intel Gaudi  |
-| Docker Compose    | vLLM, TGI      | mistralai/Mistral-7B-Instruct-v0.3  | Intel Xeon   |
-| Docker Compose    | vLLM, TGI      | Qwen/Qwen2.5-Coder-7B-Instruct      | AMD ROCm     |
-| Helm Charts       | vLLM, TGI      | mistralai/Mistral-7B-Instruct-v0.3  | Intel Gaudi  |
-| Helm Charts       | vLLM, TGI      | mistralai/Mistral-7B-Instruct-v0.3  | Intel Xeon   |
-| Helm Charts       | vLLM, TGI      | mistralai/Mistral-7B-Instruct-v0.3  | AMD ROCm     |
+| **Deploy Method** | **LLM Engine** | **LLM Model**                      | **Hardware** |
+| ----------------- | -------------- | ---------------------------------- | ------------ |
+| Docker Compose    | vLLM, TGI      | mistralai/Mistral-7B-Instruct-v0.3 | Intel Gaudi  |
+| Docker Compose    | vLLM, TGI      | mistralai/Mistral-7B-Instruct-v0.3 | Intel Xeon   |
+| Docker Compose    | vLLM, TGI      | Qwen/Qwen2.5-Coder-7B-Instruct     | AMD ROCm     |
+| Helm Charts       | vLLM, TGI      | mistralai/Mistral-7B-Instruct-v0.3 | Intel Gaudi  |
+| Helm Charts       | vLLM, TGI      | mistralai/Mistral-7B-Instruct-v0.3 | Intel Xeon   |
+| Helm Charts       | vLLM, TGI      | mistralai/Mistral-7B-Instruct-v0.3 | AMD ROCm     |

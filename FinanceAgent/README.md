@@ -68,6 +68,6 @@ We welcome contributions to the OPEA project. Please refer to the [contribution 
 
 ## Validated Configurations
 
-| **Deploy Method** | **LLM Engine** | **LLM Model**                       | **Hardware** |
-| ----------------- | -------------- | ----------------------------------- | ------------ |
-| Docker Compose    | vLLM           | meta-llama/Llama-3.3-70B-Instruct   | Intel Gaudi  |
+| **Deploy Method** | **LLM Engine** | **LLM Model**                     | **Hardware** |
+| ----------------- | -------------- | --------------------------------- | ------------ |
+| Docker Compose    | vLLM           | meta-llama/Llama-3.3-70B-Instruct | Intel Gaudi  |

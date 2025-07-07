@@ -6,7 +6,7 @@ services:
     image: ${REGISTRY:-opea}/agent:${TAG:-latest}
     container_name: rag-agent-endpoint
     volumes:
-      - ${TOOLSET_PATH}:/home/user/tools/
+      - ${TOOLSET_PATH:-../../../../tools}:/home/user/tools/
     ports:
       - "9095:9095"
     ipc: host
@@ -16,7 +16,7 @@ services:
       with_memory: false
       recursion_limit: ${recursion_limit_worker}
       llm_engine: vllm
-      HUGGINGFACEHUB_API_TOKEN: ${HF_TOKEN}
+      HF_TOKEN: ${HF_TOKEN}
       llm_endpoint_url: ${LLM_ENDPOINT_URL}
       model: ${LLM_MODEL_ID}
       temperature: ${temperature}
@@ -50,7 +50,7 @@ services:
       use_hints: false
       recursion_limit: ${recursion_limit_worker}
       llm_engine: vllm
-      HUGGINGFACEHUB_API_TOKEN: ${HF_TOKEN}
+      HF_TOKEN: ${HF_TOKEN}
       llm_endpoint_url: ${LLM_ENDPOINT_URL}
       model: ${LLM_MODEL_ID}
       temperature: ${temperature}
@@ -69,7 +69,7 @@ services:
       - worker-rag-agent
       - worker-sql-agent
     volumes:
-      - ${TOOLSET_PATH}:/home/user/tools/
+      - ${TOOLSET_PATH:-../../../../tools}:/home/user/tools/
     ports:
       - "9090:9090"
     ipc: host
@@ -79,7 +79,7 @@ services:
       with_memory: true
       recursion_limit: ${recursion_limit_supervisor}
       llm_engine: vllm
-      HUGGINGFACEHUB_API_TOKEN: ${HF_TOKEN}
+      HF_TOKEN: ${HF_TOKEN}
       llm_endpoint_url: ${LLM_ENDPOINT_URL}
       model: ${LLM_MODEL_ID}
       temperature: ${temperature}
@@ -128,6 +128,7 @@ services:
       LLM_MODEL_ID: ${LLM_MODEL_ID}
       VLLM_TORCH_PROFILER_DIR: "/mnt"
       VLLM_SKIP_WARMUP: true
+      NUM_SHARDS: ${NUM_SHARDS}
       PT_HPU_ENABLE_LAZY_COLLECTIVES: true
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://$host_ip:8086/health || exit 1"]
@@ -138,4 +139,4 @@ services:
     cap_add:
       - SYS_NICE
     ipc: host
-    command: --model $LLM_MODEL_ID --tensor-parallel-size 4 --host 0.0.0.0 --port 8000 --block-size 128 --max-num-seqs 256 --max-seq-len-to-capture 16384
+    command: --model $LLM_MODEL_ID --tensor-parallel-size $NUM_SHARDS --host 0.0.0.0 --port 8000 --block-size 128 --max-num-seqs 256 --max-seq-len-to-capture 16384

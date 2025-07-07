@@ -1,9 +1,6 @@
 <template>
   <div class="header-wrap">
     <img :height="36" :src="headerLog" />
-    <div class="header-title">
-      <h1>{{ $t("headerTitle") }}</h1>
-    </div>
     <div class="setting-wrap">
       <a-dropdown arrow>
         <div @click.prevent>
@@ -82,7 +79,7 @@ onMounted(() => {
 }
 .header-wrap {
   max-width: 1440px;
-  // min-width: 960px;
+  height: 64px;
   margin: 0 auto;
   display: flex;
   align-items: center;
