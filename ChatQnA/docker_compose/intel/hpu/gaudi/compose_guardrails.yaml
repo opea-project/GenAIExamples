@@ -109,7 +109,7 @@ services:
       RETRIEVER_COMPONENT_NAME: "OPEA_RETRIEVER_REDIS"
     restart: unless-stopped
   tei-reranking-service:
-    image: ghcr.io/huggingface/tei-gaudi:1.5.0
+    image: ghcr.io/huggingface/text-embeddings-inference:hpu-1.7
     container_name: tei-reranking-gaudi-server
     ports:
       - "8808:80"

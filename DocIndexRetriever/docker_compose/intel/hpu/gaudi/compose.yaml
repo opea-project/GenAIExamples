@@ -36,7 +36,7 @@ services:
       retries: 10
     restart: unless-stopped
   tei-embedding-service:
-    image: ghcr.io/huggingface/tei-gaudi:1.5.0
+    image: ghcr.io/huggingface/text-embeddings-inference:hpu-1.7
     entrypoint: /bin/sh -c "apt-get update && apt-get install -y curl && text-embeddings-router --json-output --model-id ${EMBEDDING_MODEL_ID} --auto-truncate"
     container_name: tei-embedding-gaudi-server
     ports:
