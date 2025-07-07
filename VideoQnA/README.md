@@ -98,3 +98,9 @@ By default, the embedding and LVM models are set to a default value as listed be
 For full instruction of deployment, please check [Guide](docker_compose/intel/cpu/xeon/README.md)
 
 Currently we support deploying VideoQnA services with docker compose, using the docker images `built from source`. Find the corresponding [compose.yaml](docker_compose/intel/cpu/xeon/compose.yaml).
+
+## Validated Configurations
+
+| **Deploy Method** | **Hardware** |
+| ----------------- | ------------ |
+| Docker Compose    | Intel Xeon   |

@@ -138,6 +138,17 @@ Intel® Optimized Cloud Modules for Terraform provide an automated way to deploy
 | Azure                | 4th/5th Gen Intel Xeon            | Work-in-progress                                                                                              | Coming Soon |
 | Intel Tiber AI Cloud | 5th Gen Intel Xeon with Intel AMX | Work-in-progress                                                                                              | Coming Soon |
 
+## Validated Configurations
+
+| **Deploy Method** | **LLM Engine** | **LLM Model**                  | **Hardware** |
+| ----------------- | -------------- | ------------------------------ | ------------ |
+| Docker Compose    | vLLM, TGI      | Qwen/Qwen2.5-Coder-7B-Instruct | Intel Gaudi  |
+| Docker Compose    | vLLM, TGI      | Qwen/Qwen2.5-Coder-7B-Instruct | Intel Xeon   |
+| Docker Compose    | vLLM, TGI      | Qwen/Qwen2.5-Coder-7B-Instruct | AMD ROCm     |
+| Helm Charts       | vLLM, TGI      | Qwen/Qwen2.5-Coder-7B-Instruct | Intel Gaudi  |
+| Helm Charts       | vLLM, TGI      | Qwen/Qwen2.5-Coder-7B-Instruct | Intel Xeon   |
+| Helm Charts       | vLLM, TGI      | Qwen/Qwen2.5-Coder-7B-Instruct | AMD ROCm     |
+
 ## Contribution
 
 We welcome contributions to the OPEA project. Please refer to the contribution guidelines for more information.

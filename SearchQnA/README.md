@@ -75,3 +75,13 @@ The table below lists the available deployment options and their implementation 
 | On-premise Deployments | Docker Compose (Xeon)  | [SearchQnA deployment on Xeon](./docker_compose/intel/cpu/xeon/README.md)   |
 |                        | Docker Compose (Gaudi) | [SearchQnA deployment on Gaudi](./docker_compose/intel/hpu/gaudi/README.md) |
 |                        | Docker Compose (ROCm)  | [SearchQnA deployment on AMD ROCm](./docker_compose/amd/gpu/rocm/README.md) |
+
+## Validated Configurations
+
+| **Deploy Method** | **LLM Engine** | **LLM Model**             | **Hardware** |
+| ----------------- | -------------- | ------------------------- | ------------ |
+| Docker Compose    | vLLM, TGI      | Intel/neural-chat-7b-v3-3 | Intel Gaudi  |
+| Docker Compose    | vLLM, TGI      | Intel/neural-chat-7b-v3-3 | Intel Xeon   |
+| Docker Compose    | vLLM, TGI      | Intel/neural-chat-7b-v3-3 | AMD ROCm     |
+| Helm Charts       | vLLM, TGI      | Intel/neural-chat-7b-v3-3 | Intel Gaudi  |
+| Helm Charts       | vLLM, TGI      | Intel/neural-chat-7b-v3-3 | Intel Xeon   |

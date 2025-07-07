@@ -67,3 +67,9 @@ curl http://${your_ip}:8015/v1/fine_tuning/jobs/cancel -X POST -H "Content-Type:
 # list checkpoints of a finetuning job
 curl http://${your_ip}:8015/v1/finetune/list_checkpoints -X POST -H "Content-Type: application/json" -d '{"fine_tuning_job_id": ${fine_tuning_job_id}}'
 ```
+
+## Validated Configurations
+
+| **Deploy Method** | **Hardware** |
+| ----------------- | ------------ |
+| Docker Compose    | Intel Xeon   |

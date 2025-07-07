@@ -76,3 +76,13 @@ The table below lists currently available deployment options. They outline in de
 |                        |                   | [AudioQnA deployment on Gaudi](./docker_compose/intel/hpu/gaudi) |
 |                        |                   | [AudioQnA deployment on AMD ROCm](./docker_compose/amd/gpu/rocm) |
 |                        | Kubernetes        | [Helm Charts](./kubernetes/helm)                                 |
+
+## Validated Configurations
+
+| **Deploy Method** | **LLM Engine**        | **LLM Model**                       | **Hardware** |
+| ----------------- | --------------------- | ----------------------------------- | ------------ |
+| Docker Compose    | vLLM, TGI             | meta-llama/Meta-Llama-3-8B-Instruct | Intel Gaudi  |
+| Docker Compose    | vLLM, TGI, GPT-SoVITS | meta-llama/Meta-Llama-3-8B-Instruct | Intel Xeon   |
+| Docker Compose    | vLLM, TGI             | Intel/neural-chat-7b-v3-3           | AMD ROCm     |
+| Helm Charts       | vLLM, TGI             | meta-llama/Meta-Llama-3-8B-Instruct | Intel Gaudi  |
+| Helm Charts       | vLLM, TGI             | meta-llama/Meta-Llama-3-8B-Instruct | Intel Xeon   |

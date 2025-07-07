@@ -85,3 +85,11 @@ The table below lists the available deployment options and their implementation 
 | Intel Xeon   | Docker compose    | [Deployment on Xeon](./docker_compose/intel/cpu/xeon/README.md)   |
 | Intel Gaudi2 | Docker compose    | [Deployment on Gaudi](./docker_compose/intel/hpu/gaudi/README.md) |
 | AMD ROCm     | Docker compose    | [Deployment on AMD Rocm](./docker_compose/amd/gpu/rocm/README.md) |
+
+## Validated Configurations
+
+| **Deploy Method** | **LLM Engine** | **LLM Model**             | **Hardware** |
+| ----------------- | -------------- | ------------------------- | ------------ |
+| Docker Compose    | TGI            | Intel/neural-chat-7b-v3-3 | Intel Gaudi  |
+| Docker Compose    | TGI            | Intel/neural-chat-7b-v3-3 | Intel Xeon   |
+| Docker Compose    | TGI            | Intel/neural-chat-7b-v3-3 | AMD ROCm     |
