@@ -199,3 +199,9 @@ Update the `query` with the workflow parameters, workflow id, etc based on the w
 ## Roadmap
 
 Phase II: Agent memory integration to enable capability to store tool intermediate results, such as workflow instance key.
+
+## Validated Configurations
+
+| **Deploy Method** | **Hardware** |
+| ----------------- | ------------ |
+| Docker Compose    | Intel Xeon   |
