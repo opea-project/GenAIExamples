@@ -624,6 +624,6 @@ echo -e "\n✅ [DONE] Environment setup complete. Please reboot your system to a
 
 ## Validated Configurations
 
-| **Deploy Method** | **LLM Engine** | **LLM Model**                       | **Hardware** |
-| ----------------- | -------------- | ----------------------------------- | ------------ |
-| Docker Compose    | vLLM           | Qwen2-7B-instruction                | Intel Arc    |
+| **Deploy Method** | **LLM Engine** | **LLM Model**        | **Hardware** |
+| ----------------- | -------------- | -------------------- | ------------ |
+| Docker Compose    | vLLM           | Qwen2-7B-instruction | Intel Arc    |

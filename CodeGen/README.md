@@ -140,14 +140,14 @@ Intel® Optimized Cloud Modules for Terraform provide an automated way to deploy
 
 ## Validated Configurations
 
-| **Deploy Method** | **LLM Engine** | **LLM Model**                       | **Hardware** |
-| ----------------- | -------------- | ----------------------------------- | ------------ |
-| Docker Compose    | vLLM, TGI      | Qwen/Qwen2.5-Coder-7B-Instruct      | Intel Gaudi  |
-| Docker Compose    | vLLM, TGI      | Qwen/Qwen2.5-Coder-7B-Instruct      | Intel Xeon   |
-| Docker Compose    | vLLM, TGI      | Qwen/Qwen2.5-Coder-7B-Instruct      | AMD ROCm     |
-| Helm Charts       | vLLM, TGI      | Qwen/Qwen2.5-Coder-7B-Instruct      | Intel Gaudi  |
-| Helm Charts       | vLLM, TGI      | Qwen/Qwen2.5-Coder-7B-Instruct      | Intel Xeon   |
-| Helm Charts       | vLLM, TGI      | Qwen/Qwen2.5-Coder-7B-Instruct      | AMD ROCm     |
+| **Deploy Method** | **LLM Engine** | **LLM Model**                  | **Hardware** |
+| ----------------- | -------------- | ------------------------------ | ------------ |
+| Docker Compose    | vLLM, TGI      | Qwen/Qwen2.5-Coder-7B-Instruct | Intel Gaudi  |
+| Docker Compose    | vLLM, TGI      | Qwen/Qwen2.5-Coder-7B-Instruct | Intel Xeon   |
+| Docker Compose    | vLLM, TGI      | Qwen/Qwen2.5-Coder-7B-Instruct | AMD ROCm     |
+| Helm Charts       | vLLM, TGI      | Qwen/Qwen2.5-Coder-7B-Instruct | Intel Gaudi  |
+| Helm Charts       | vLLM, TGI      | Qwen/Qwen2.5-Coder-7B-Instruct | Intel Xeon   |
+| Helm Charts       | vLLM, TGI      | Qwen/Qwen2.5-Coder-7B-Instruct | AMD ROCm     |
 
 ## Contribution
 

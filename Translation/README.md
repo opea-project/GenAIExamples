@@ -79,10 +79,10 @@ The table below lists the available deployment options and their implementation 
 
 ## Validated Configurations
 
-| **Deploy Method** | **LLM Engine** | **LLM Model**                       | **Hardware** |
-| ----------------- | -------------- | ----------------------------------- | ------------ |
-| Docker Compose    | vLLM, TGI      | haoranxu/ALMA-13B                   | Intel Gaudi  |
-| Docker Compose    | vLLM, TGI      | haoranxu/ALMA-13B                   | Intel Xeon   |
-| Docker Compose    | vLLM, TGI      | haoranxu/ALMA-13B                   | AMD ROCm     |
-| Helm Charts       | vLLM, TGI      | haoranxu/ALMA-13B                   | Intel Gaudi  |
-| Helm Charts       | vLLM, TGI      | haoranxu/ALMA-13B                   | Intel Xeon   |
+| **Deploy Method** | **LLM Engine** | **LLM Model**     | **Hardware** |
+| ----------------- | -------------- | ----------------- | ------------ |
+| Docker Compose    | vLLM, TGI      | haoranxu/ALMA-13B | Intel Gaudi  |
+| Docker Compose    | vLLM, TGI      | haoranxu/ALMA-13B | Intel Xeon   |
+| Docker Compose    | vLLM, TGI      | haoranxu/ALMA-13B | AMD ROCm     |
+| Helm Charts       | vLLM, TGI      | haoranxu/ALMA-13B | Intel Gaudi  |
+| Helm Charts       | vLLM, TGI      | haoranxu/ALMA-13B | Intel Xeon   |
