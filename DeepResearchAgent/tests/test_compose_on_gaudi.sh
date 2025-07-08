@@ -18,7 +18,17 @@ LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
 
 function build_docker_images() {
+    opea_branch=${opea_branch:-"main"}
     cd $WORKPATH/docker_image_build
+    git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
+    pushd GenAIComps
+    echo "GenAIComps test commit is $(git rev-parse HEAD)"
+    docker build --no-cache -t ${REGISTRY}/comps-base:${TAG} --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
+    popd && sleep 1s
+    git clone https://github.com/HabanaAI/vllm-fork.git && cd vllm-fork
+    VLLM_FORK_VER=v0.6.6.post1+Gaudi-1.20.0
+    git checkout ${VLLM_FORK_VER} &> /dev/null && cd ../
+
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
     docker compose -f build.yaml build --no-cache > ${LOG_PATH}/docker_image_build.log
 
