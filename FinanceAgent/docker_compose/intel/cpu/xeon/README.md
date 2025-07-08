@@ -70,6 +70,8 @@ Note: The compose file might read additional variables from `set_env.sh`. Ensure
 
 When models are deployed on a remote server, a base URL and an API key are required to access them. To set up a remote server and acquire the base URL and API key, refer to [Intel® AI for Enterprise Inference](https://www.intel.com/content/www/us/en/developer/topic-technology/artificial-intelligence/enterprise-inference.html) offerings.
 
+> **Note**: For FinanceAgent, the minimum hardware requirement for the remote server is Intel® Gaudi® AI Accelerators.
+
 Set the following environment variables.
 
 - `REMOTE_ENDPOINT` is the HTTPS endpoint of the remote server with the model of choice (i.e. https://api.inference.denvrdata.com). **Note:** If not using LiteLLM, the second part of the model card needs to be appended to the URL i.e. `/Llama-3.3-70B-Instruct` from `meta-llama/Llama-3.3-70B-Instruct`.
