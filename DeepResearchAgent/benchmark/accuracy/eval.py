@@ -1,15 +1,19 @@
+# Copyright (C) 2025 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 import argparse
 import concurrent.futures
 import json
 import os
 import time
 from typing import Any, Tuple
-from datasets import load_dataset
+
 import requests
+from datasets import load_dataset
+
 
 def load_questions(dataset_names: list[str] | None = None) -> list[dict[str, str]]:
-    """
-    Load questions from the specified Hugging Face dataset configurations.
+    """Load questions from the specified Hugging Face dataset configurations.
 
     Args:
         dataset_names: List of dataset configurations to load
@@ -39,8 +43,7 @@ def load_questions(dataset_names: list[str] | None = None) -> list[dict[str, str
                 if "test" in ds:
                     split_data = ds["test"]
                 else:
-                    print(
-                        f"No 'test' split found in dataset at {dataset_path}")
+                    print(f"No 'test' split found in dataset at {dataset_path}")
                     continue
 
                 for i in range(len(split_data)):
@@ -52,14 +55,12 @@ def load_questions(dataset_names: list[str] | None = None) -> list[dict[str, str
                     }
                     all_questions.append(question_data)
 
-                print(
-                    f"Loaded {len(split_data)} questions from together-search-bench dataset")
+                print(f"Loaded {len(split_data)} questions from together-search-bench dataset")
                 continue
 
             elif dataset_name == "hotpotqa":
                 # Load HotpotQA dataset (using distractor version for validation)
-                ds = load_dataset("hotpotqa/hotpot_qa",
-                                  "distractor", trust_remote_code=True)
+                ds = load_dataset("hotpotqa/hotpot_qa", "distractor", trust_remote_code=True)
                 split_name = "validation"
             elif dataset_name == "simpleqa":
                 ds = load_dataset("basicv8vc/SimpleQA")
@@ -73,7 +74,6 @@ def load_questions(dataset_names: list[str] | None = None) -> list[dict[str, str
         except Exception as e:
             print(f"Failed to load dataset {dataset_name}: {str(e)}")
             continue  # Skip this dataset if it fails to load
-
 
         print(f"Dataset structure for {dataset_name}: {ds}")
         print(f"Available splits: {list(ds)}")
@@ -120,8 +120,7 @@ def process_single_question(
     callback: ScoringFunction,
     agent_config: str = "../configs/base_llm_config.yaml",
 ) -> dict[str, Any]:
-    """
-    Process a single benchmark question with the agent.
+    """Process a single benchmark question with the agent.
 
     Args:
         question_data: Dictionary containing question and answer
@@ -137,15 +136,12 @@ def process_single_question(
     """
     question = question_data["question"]
     correct_answer = question_data["answer"]
-
-
     """
 
 
     """
 
-    result = Result(question=question, agent_answer=agent_answer,
-                    correct_answer=correct_answer)
+    result = Result(question=question, agent_answer=agent_answer, correct_answer=correct_answer)
 
     evaluation = callback(result)
 
@@ -167,8 +163,7 @@ def run_benchmark(
     agent_config: str = "../configs/base_llm_config.yaml",
     max_workers: int = 2,
 ) -> Tuple[float, list[dict[str, Any]]]:
-    """
-    Run the benchmark on a list of questions concurrently.
+    """Run the benchmark on a list of questions concurrently.
 
     Args:
         questions: List of question-answer pairs
@@ -204,33 +199,28 @@ def run_benchmark(
                 print(f"Completed question {idx+1}/{total_questions}")
             except Exception as exc:
                 import traceback
+
                 traceback.print_exc()
                 print(f"Question {idx+1} generated an exception: {exc}")
                 results.append(0)
-                details.append({"question": questions[idx]["question"], "agent_answer": str(
-                    exc), "evaluation": 0})
+                details.append({"question": questions[idx]["question"], "agent_answer": str(exc), "evaluation": 0})
 
     return sum(results) / len(results), details
 
 
 def main():
-    """
-    Main function to run the benchmark.
-    """
+    """Main function to run the benchmark."""
 
     # Set up argument parser
-    parser = argparse.ArgumentParser(
-        description="Run scoring with benchmarking options")
+    parser = argparse.ArgumentParser(description="Run scoring with benchmarking options")
     parser.add_argument(
         "--datasets",
         nargs="+",
-        choices=["smolagents:simpleqa", "hotpotqa",
-                 "simpleqa", "together-search-bench"],
+        choices=["smolagents:simpleqa", "hotpotqa", "simpleqa", "together-search-bench"],
         help="Specific datasets to load (default: all)",
         default=["together-search-bench"],
     )
-    parser.add_argument("--limit", type=int, default=None,
-                        help="Limit number of questions to process (default: all)")
+    parser.add_argument("--limit", type=int, default=None, help="Limit number of questions to process (default: all)")
     parser.add_argument(
         "--service-url",
         default="http://localhost:8022/v1/deep_research_agent",
@@ -252,7 +242,6 @@ def main():
 
     questions = load_questions(args.datasets)
 
-
     if args.limit is not None:
         questions = questions[: args.limit]
         print(f"Limited to {len(questions)} questions")
@@ -266,8 +255,7 @@ def main():
 
     print(f"Completed benchmark with {results} accuracy")
 
-    benchmark_results_dir = os.path.join(os.path.dirname(
-        os.path.dirname(__file__)), "benchmark", "benchmark_results")
+    benchmark_results_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "benchmark", "benchmark_results")
     os.makedirs(benchmark_results_dir, exist_ok=True)
 
     output_file = os.path.join(
@@ -295,4 +283,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
