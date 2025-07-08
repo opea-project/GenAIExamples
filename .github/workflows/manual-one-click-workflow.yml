@@ -43,16 +43,15 @@ on:
         description: 'Build test required images for Examples'
         required: false
         type: boolean
-      test_compose:
-        default: true
-        description: 'Test examples with docker compose'
-        required: false
-        type: boolean
-      test_helmchart:
-        default: true
-        description: 'Test examples with helm charts'
-        required: false
-        type: boolean
+      deploy_method:
+        default: "docker,k8s"
+        description: 'Test examples with docker compose or k8s charts'
+        type: choice
+        required: true
+        options:
+          - docker
+          - k8s
+          - docker,k8s
 
 jobs:
   get-test-matrix:
@@ -70,6 +69,7 @@ jobs:
         nodes=($(echo ${{ inputs.nodes }} | tr ',' ' '))
         nodes_json=$(printf '%s\n' "${nodes[@]}" | sort -u | jq -R '.' | jq -sc '.')
         echo "nodes=$nodes_json" >> $GITHUB_OUTPUT
+        deploy_methods=($
 
   run-examples:
     # permissions:
