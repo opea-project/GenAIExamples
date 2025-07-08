@@ -40,7 +40,6 @@ function start_services() {
     cd $WORKPATH/docker_compose/intel
     export HF_TOKEN=${HF_TOKEN}
     export NGINX_PORT=80
-    export host_ip=${ip_address}
     source set_env.sh
     cd hpu/gaudi
 
