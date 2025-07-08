@@ -14,6 +14,7 @@ Some noteworthy use case examples for VQA include:
 1. [Architecture](#architecture)
 2. [Deployment Options](#deployment-options)
 
+
 ## Architecture
 
 ![VQA](./assets/img/vqa.png)

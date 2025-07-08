@@ -4,13 +4,20 @@ This document outlines the deployment process for a VisualQnA application utiliz
 
 ## Table of Contents
 
+1. [VisualQnA Quick Start Deployment](#visualqna-quick-start-deployment)
+2. [Validate Microservices](#validate-microservices)
+3. [Launch the UI](#launch-the-UI)
+
+## VisualQnA Quick Start Deployment
+
+This section describes how to quickly deploy and test the CodeTrans service manually on an Intel® Xeon® processor. The basic steps are:
+
 1. [Apply Xeon Server on AWS](#apply-xeon-server-on-aws)
 2. [Build Docker Images](#build-docker-images)
-3. [Start Microservices](#start-microservices)
-4. [Validate Microservices](#validate-microservices)
-5. [Launch the UI](#launch-the-ui)
+3. [Setup Environment Variables](#setup-environment-variables)
+3. [Deploy the Services Using Docker Compose](#deploy-the-services-using-docker-compose)
 
-## Apply Xeon Server on AWS
+### Apply Xeon Server on AWS
 
 To apply a Xeon server on AWS, start by creating an AWS account if you don't have one already. Then, head to the [EC2 Console](https://console.aws.amazon.com/ec2/v2/home) to begin the process. Within the EC2 service, select the Amazon EC2 M7i or M7i-flex instance type to leverage 4th Generation Intel Xeon Scalable processors. These instances are optimized for high-performance computing and demanding workloads.
 
@@ -18,57 +25,18 @@ For detailed information about these instance types, you can refer to this [link
 
 After launching your instance, you can connect to it using SSH (for Linux instances) or Remote Desktop Protocol (RDP) (for Windows instances). From there, you'll have full access to your Xeon server, allowing you to install, configure, and manage your applications as needed.
 
-## Build Docker Images
+### Build Docker Images
 
 First of all, you need to build Docker Images locally and install the python package of it.
 
-### 1. Build LVM and NGINX Docker Images
+Please refer to the table below to build different microservices from source:
 
-```bash
-git clone https://github.com/opea-project/GenAIComps.git
-cd GenAIComps
-docker build --no-cache -t opea/lvm:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/lvms/src/Dockerfile .
-docker build --no-cache -t opea/nginx:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/third_parties/nginx/src/Dockerfile .
-```
-
-### 2. Build MegaService Docker Image
-
-To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `visualqna.py` Python script. Build MegaService Docker image via below command:
-
-```bash
-git clone https://github.com/opea-project/GenAIExamples.git
-cd GenAIExamples/VisualQnA
-docker build --no-cache -t opea/visualqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
-```
-
-### 3. Build UI Docker Image
-
-Build frontend Docker image via below command:
-
-```bash
-cd GenAIExamples/VisualQnA/ui
-docker build --no-cache -t opea/visualqna-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
-```
-
-### 4. Pull vLLM/TGI Xeon Image
-
-```bash
-# vLLM
-docker pull opea/vllm:latest
-# TGI (Optional)
-docker pull ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu
-```
-
-Then run the command `docker images`, you will have the following Docker Images:
-
-1. `opea/vllm:latest`
-2. `ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu` (Optional)
-3. `opea/lvm:latest`
-4. `opea/visualqna:latest`
-5. `opea/visualqna-ui:latest`
-6. `opea/nginx`
-
-## Start Microservices
+| Microservice | Deployment Guide                                                                                               |
+| ------------ | -------------------------------------------------------------------------------------------------------------- |
+| MegaService  | [MegaService build guide](../../../../README_miscellaneous.md#build-megaservice-docker-image)                  |
+| LVM and NGINX| [vLLM build guide](../../../../README_miscellaneous.md#build-lvm-and-nginx-docker-images)                      |
+| vLLM or TGI  | [Pull vLLM/TGI Xeon Image](../../../../README_miscellaneous.md#pull-vLLM/TGI-xeon-image)                       |
+| UI           | [Basic UI build guide](../../../../README_miscellaneous.md#build-ui-docker-image)                              |
 
 ### Setup Environment Variables
 
@@ -80,7 +48,7 @@ source set_env.sh
 
 Note: Please replace with `host_ip` with you external IP address, do not use localhost.
 
-### Start all the services Docker Containers
+### Deploy the Services Using Docker Compose
 
 > Before running the docker compose command, you need to be in the folder that has the docker compose yaml file
 
@@ -93,6 +61,17 @@ docker compose -f compose.yaml up -d
 # if use TGI as the LLM serving backend
 docker compose -f compose_tgi.yaml up -d
 ```
+
+After running docker compose, check if all the containers launched via docker compose have started:
+
+Then run the command `docker images`, you will have the following Docker Images:
+
+1. `opea/vllm:latest`
+2. `ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu` (Optional)
+3. `opea/lvm:latest`
+4. `opea/visualqna:latest`
+5. `opea/visualqna-ui:latest`
+6. `opea/nginx`
 
 ## Validate Microservices
 
