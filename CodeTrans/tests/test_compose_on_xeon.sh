@@ -43,7 +43,6 @@ function start_services() {
     export HF_TOKEN=${HF_TOKEN}
 
     export NGINX_PORT=80
-    export host_ip=${ip_address}
     source set_env.sh
     cd cpu/xeon/
 

@@ -48,10 +48,10 @@ f810f3b4d329   opea/embedding:latest                               "python embed
 2fa17d84605f   opea/dataprep:latest                              "python prepare_doc_…"   2 minutes ago   Up 2 minutes                    0.0.0.0:6007->6007/tcp, :::6007->5000/tcp                                              dataprep-redis-server
 69e1fb59e92c   opea/retriever:latest                             "/home/user/comps/re…"   2 minutes ago   Up 2 minutes                    0.0.0.0:7000->7000/tcp, :::7000->7000/tcp                                              retriever-redis-server
 313b9d14928a   opea/reranking-tei:latest                               "python reranking_te…"   2 minutes ago   Up 2 minutes                    0.0.0.0:8000->8000/tcp, :::8000->8000/tcp                                              reranking-tei-gaudi-server
-174bd43fa6b5   ghcr.io/huggingface/tei-gaudi:1.5.0                    "text-embeddings-rou…"   2 minutes ago   Up 2 minutes                    0.0.0.0:8090->80/tcp, :::8090->80/tcp                                                  tei-embedding-gaudi-server
+174bd43fa6b5   ghcr.io/huggingface/text-embeddings-inference:hpu-1.7   "text-embeddings-rou…"   2 minutes ago   Up 2 minutes                    0.0.0.0:8090->80/tcp, :::8090->80/tcp                                                  tei-embedding-gaudi-server
 05c40b636239   ghcr.io/huggingface/tgi-gaudi:2.3.1                     "text-generation-lau…"   2 minutes ago   Exited (1) About a minute ago                                                                                          tgi-gaudi-server
 74084469aa33   redis/redis-stack:7.2.0-v9                              "/entrypoint.sh"         2 minutes ago   Up 2 minutes                    0.0.0.0:6379->6379/tcp, :::6379->6379/tcp, 0.0.0.0:8001->8001/tcp, :::8001->8001/tcp   redis-vector-db
-88399dbc9e43   ghcr.io/huggingface/text-embeddings-inference:cpu-1.5   "text-embeddings-rou…"   2 minutes ago   Up 2 minutes                    0.0.0.0:8808->80/tcp, :::8808->80/tcp                                                  tei-reranking-gaudi-server
+88399dbc9e43   ghcr.io/huggingface/text-embeddings-inference:cpu-1.7   "text-embeddings-rou…"   2 minutes ago   Up 2 minutes                    0.0.0.0:8808->80/tcp, :::8808->80/tcp                                                  tei-reranking-gaudi-server
 ```
 
 In this case, `ghcr.io/huggingface/tgi-gaudi:2.3.1` Existed.
@@ -123,7 +123,7 @@ View the docker input parameters in `./ChatQnA/docker_compose/intel/hpu/gaudi/co
     environment:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      HUGGING_FACE_HUB_TOKEN: ${HF_TOKEN}
+      HF_TOKEN: ${HF_TOKEN}
       HABANA_VISIBLE_DEVICES: all
       OMPI_MCA_btl_vader_single_copy_mechanism: none
       ENABLE_HPU_GRAPH: true

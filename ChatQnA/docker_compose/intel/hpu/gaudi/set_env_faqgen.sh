@@ -2,8 +2,9 @@
 
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
+SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
 
-pushd "../../../../../" > /dev/null
+pushd "$SCRIPT_DIR/../../../../../" > /dev/null
 source .set_env.sh
 popd > /dev/null
 

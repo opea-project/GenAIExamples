@@ -251,3 +251,9 @@ OPEA microservice deployment can easily be monitored through Grafana dashboards 
 
 ![chatqna dashboards](../ChatQnA/assets/img/chatqna_dashboards.png)
 ![tgi dashboard](../ChatQnA//assets/img/tgi_dashboard.png)
+
+## Validated Configurations
+
+| **Deploy Method** | **LLM Engine** | **LLM Model**                         | **Hardware** |
+| ----------------- | -------------- | ------------------------------------- | ------------ |
+| Docker Compose    | TGI            | meta-llama/Meta-Llama-3.1-8B-Instruct | Intel Gaudi  |

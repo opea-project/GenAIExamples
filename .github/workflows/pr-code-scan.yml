@@ -88,13 +88,22 @@ jobs:
           echo "merged_commit=${merged_commit}" >> $GITHUB_ENV
           changed_files="$(git diff --name-only --diff-filter=AM ${base_commit} ${merged_commit} | grep -E '\.sh$'  | tr '\n' ' ')" || true
           echo "changed_files=${changed_files}"
-          echo "changed_files=${changed_files}" >> $GITHUB_ENV
+          # echo "changed_files=${changed_files}" >> $GITHUB_ENV
+          if [ -z "$changed_files" ]; then
+            echo "changed_files_exist=false" >> $GITHUB_OUTPUT
+          else
+            echo "changed_files=${changed_files}" >> $GITHUB_OUTPUT
+            echo "changed_files_exist=true" >> $GITHUB_OUTPUT
+          fi
 
       - name: ShellCheck
-        if: ${{ env.changed_files != '' }}
+        # if: ${{ env.changed_files != '' }}
+        if: steps.get-changed-files.outputs.changed_files_exist == 'true'
         uses: ludeeus/action-shellcheck@2.0.0
         env:
           SHELLCHECK_OPTS: -e SC2164 -e SC2154 -e SC2034 -e SC2155 -e SC1090 -e SC2153 -e SC2046
         with:
-          path: ${{ env.changed_files }}
+          # path: ${{ env.changed_files }}
+          scandir: .
+          additional_files: ${{ steps.get-changed-files.outputs.changed_files }}
           severity: warning
