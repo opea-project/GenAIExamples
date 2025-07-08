@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from typing import Any
-
 import yaml
 
 
@@ -11,7 +10,7 @@ def load_config(config_path: str):
         return yaml.safe_load(file)
 
 
-def create_agent(config: str, return_instance: bool = False) -> Any:
+def create_agent(config: str) -> Any:
 
     config_dict = load_config(config)
 
@@ -22,8 +21,8 @@ def create_agent(config: str, return_instance: bool = False) -> Any:
         import uuid
 
         from langgraph.checkpoint.memory import MemorySaver
-        from langgraph.types import Command
         from open_deep_research.graph import builder
+        from langgraph.types import Command
     except ImportError as e:
         raise ImportError(
             f"Failed to import required modules for langchain deep researcher: {e}. Make sure langgraph and open_deep_research are installed. Also make sure that the benchmark directory is in your path. Also, you might need to install the with-open-deep-research extra dependencies (see README.md)."

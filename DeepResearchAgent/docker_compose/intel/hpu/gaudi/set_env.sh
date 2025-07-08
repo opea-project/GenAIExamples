@@ -4,7 +4,9 @@
 # SPDX-License-Identifier: Apache-2.0
 
 # Navigate to the parent directory and source the environment
-pushd "../../" > /dev/null
+SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
+
+pushd "$SCRIPT_DIR/../../../../../" > /dev/null
 source .set_env.sh
 popd > /dev/null
 
@@ -43,3 +45,4 @@ export HF_TOKEN="${HF_TOKEN}"
 # API keys
 check_var "TAVILY_API_KEY"
 export TAVILY_API_KEY="${TAVILY_API_KEY}"
+

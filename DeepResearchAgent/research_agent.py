@@ -10,10 +10,10 @@ from typing import List, Union
 from comps import opea_microservices, register_microservice
 from comps.cores.telemetry.opea_telemetry import opea_telemetry
 from pydantic import BaseModel
-from utils import *
+from utils import create_agent
 
-agent = create_agent("./deep_researcher.yaml")
-
+config_path = os.path.join(os.path.dirname(__file__), "deep_researcher.yaml")
+agent = create_agent(config_path)
 
 class SimpleRequest(BaseModel):
     question: Union[str, List[str]]

@@ -50,6 +50,8 @@ services:
   deep-research-agent-server:
     image: ${REGISTRY:-opea}/deep-research-agent:${TAG:-latest}
     container_name: deep-research-agent-server
+    depends_on:
+      - vllm-service
     ports:
       - "8022:8022"
     ipc: host
