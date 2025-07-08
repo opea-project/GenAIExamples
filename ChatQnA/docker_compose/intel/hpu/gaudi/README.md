@@ -92,7 +92,7 @@ f090fe262c74   opea/chatqna-ui:latest                                           
 ec97d7651c96   opea/chatqna:latest                                                                             "python chatqna.py"      2 minutes ago   Up 2 minutes                0.0.0.0:8888->8888/tcp, :::8888->8888/tcp                                              chatqna-gaudi-backend-server
 a61fb7dc4fae   opea/dataprep:latest                                                                            "sh -c 'python $( [ …"   2 minutes ago   Up 2 minutes                0.0.0.0:6007->5000/tcp, [::]:6007->5000/tcp                                            dataprep-redis-server
 d560c232b120   opea/retriever:latest                                                                           "python opea_retriev…"   2 minutes ago   Up 2 minutes                0.0.0.0:7000->7000/tcp, :::7000->7000/tcp                                              retriever-redis-server
-a1d7ca2d3787   ghcr.io/huggingface/tei-gaudi:1.5.0                                                             "text-embeddings-rou…"   2 minutes ago   Up 2 minutes                0.0.0.0:8808->80/tcp, [::]:8808->80/tcp                                                tei-reranking-gaudi-server
+a1d7ca2d3787   ghcr.io/huggingface/text-embeddings-inference:hpu-1.7                                           "text-embeddings-rou…"   2 minutes ago   Up 2 minutes                0.0.0.0:8808->80/tcp, [::]:8808->80/tcp                                                tei-reranking-gaudi-server
 9a9f3fd4fd4c   opea/vllm-gaudi:latest                                                                          "python3 -m vllm.ent…"   2 minutes ago   Exited (1) 2 minutes ago                                                                                           vllm-gaudi-server
 1ab9bbdf5182   redis/redis-stack:7.2.0-v9                                                                      "/entrypoint.sh"         2 minutes ago   Up 2 minutes                0.0.0.0:6379->6379/tcp, :::6379->6379/tcp, 0.0.0.0:8001->8001/tcp, :::8001->8001/tcp   redis-vector-db
 9ee0789d819e   ghcr.io/huggingface/text-embeddings-inference:cpu-1.7                                           "text-embeddings-rou…"   2 minutes ago   Up 2 minutes                0.0.0.0:8090->80/tcp, [::]:8090->80/tcp                                                tei-embedding-gaudi-server
@@ -150,7 +150,7 @@ The default deployment utilizes Gaudi devices primarily for the `vllm-service`, 
 | dataprep-redis-service       | opea/dataprep:latest                                  | No           |
 | tei-embedding-service        | ghcr.io/huggingface/text-embeddings-inference:cpu-1.7 | No           |
 | retriever                    | opea/retriever:latest                                 | No           |
-| tei-reranking-service        | ghcr.io/huggingface/tei-gaudi:1.5.0                   | 1 card       |
+| tei-reranking-service        | ghcr.io/huggingface/text-embeddings-inference:hpu-1.7 | 1 card       |
 | vllm-service                 | opea/vllm-gaudi:latest                                | Configurable |
 | chatqna-gaudi-backend-server | opea/chatqna:latest                                   | No           |
 | chatqna-gaudi-ui-server      | opea/chatqna-ui:latest                                | No           |
@@ -166,7 +166,7 @@ The TGI (Text Generation Inference) deployment and the default deployment differ
 | dataprep-redis-service       | opea/dataprep:latest                                  | No             |
 | tei-embedding-service        | ghcr.io/huggingface/text-embeddings-inference:cpu-1.7 | No             |
 | retriever                    | opea/retriever:latest                                 | No             |
-| tei-reranking-service        | ghcr.io/huggingface/tei-gaudi:1.5.0                   | 1 card         |
+| tei-reranking-service        | ghcr.io/huggingface/text-embeddings-inference:hpu-1.7 | 1 card         |
 | **tgi-service**              | ghcr.io/huggingface/tgi-gaudi:2.3.1                   | Configurable   |
 | chatqna-gaudi-backend-server | opea/chatqna:latest                                   | No             |
 | chatqna-gaudi-ui-server      | opea/chatqna-ui:latest                                | No             |
@@ -186,7 +186,7 @@ The TGI (Text Generation Inference) deployment and the default deployment differ
 | dataprep-redis-service       | opea/dataprep:latest                                  | No           |
 | tei-embedding-service        | ghcr.io/huggingface/text-embeddings-inference:cpu-1.7 | No           |
 | retriever                    | opea/retriever:latest                                 | No           |
-| tei-reranking-service        | ghcr.io/huggingface/tei-gaudi:1.5.0                   | 1 card       |
+| tei-reranking-service        | ghcr.io/huggingface/text-embeddings-inference:hpu-1.7 | 1 card       |
 | vllm-service                 | opea/vllm-gaudi:latest                                | Configurable |
 | **llm-faqgen**               | **opea/llm-faqgen:latest**                            | No           |
 | chatqna-gaudi-backend-server | opea/chatqna:latest                                   | No           |
@@ -224,7 +224,7 @@ The _compose_guardrails.yaml_ Docker Compose file introduces enhancements over t
 | _guardrails_                 | opea/guardrails:latest                                | No             | No       |
 | tei-embedding-service        | ghcr.io/huggingface/text-embeddings-inference:cpu-1.7 | No             | No       |
 | retriever                    | opea/retriever:latest                                 | No             | No       |
-| tei-reranking-service        | ghcr.io/huggingface/tei-gaudi:1.5.0                   | 1 card         | No       |
+| tei-reranking-service        | ghcr.io/huggingface/text-embeddings-inference:hpu-1.7 | 1 card         | No       |
 | vllm-service                 | opea/vllm-gaudi:latest                                | Configurable   | Yes      |
 | chatqna-gaudi-backend-server | opea/chatqna:latest                                   | No             | No       |
 | chatqna-gaudi-ui-server      | opea/chatqna-ui:latest                                | No             | No       |
@@ -260,7 +260,7 @@ The table provides a comprehensive overview of the ChatQnA services utilized acr
 | dataprep-redis-service       | opea/dataprep:latest                                  | No       | Prepares data and interacts with the Redis database.                                               |
 | tei-embedding-service        | ghcr.io/huggingface/text-embeddings-inference:cpu-1.7 | No       | Provides text embedding services, often using Hugging Face models.                                 |
 | retriever                    | opea/retriever:latest                                 | No       | Retrieves data from the Redis database and interacts with embedding services.                      |
-| tei-reranking-service        | ghcr.io/huggingface/tei-gaudi:1.5.0                   | Yes      | Reranks text embeddings, typically using Gaudi hardware for enhanced performance.                  |
+| tei-reranking-service        | ghcr.io/huggingface/text-embeddings-inference:hpu-1.7 | Yes      | Reranks text embeddings, typically using Gaudi hardware for enhanced performance.                  |
 | vllm-service                 | opea/vllm-gaudi:latest                                | No       | Handles large language model (LLM) tasks, utilizing Gaudi hardware.                                |
 | tgi-service                  | ghcr.io/huggingface/tgi-gaudi:2.3.1                   | Yes      | Specific to the TGI deployment, focuses on text generation inference using Gaudi hardware.         |
 | tgi-guardrails-service       | ghcr.io/huggingface/tgi-gaudi:2.3.1                   | Yes      | Provides guardrails functionality, ensuring safe operations within defined limits.                 |

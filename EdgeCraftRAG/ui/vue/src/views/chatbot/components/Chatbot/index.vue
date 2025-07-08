@@ -60,6 +60,7 @@ onMounted(() => {
 <style scoped lang="less">
 .chatbot-container {
   position: relative;
+  height: calc(100% - 20px);
 
   .setting-icon {
     padding: 12px 8px;

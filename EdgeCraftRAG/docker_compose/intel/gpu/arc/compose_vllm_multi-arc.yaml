@@ -2,7 +2,70 @@
 # SPDX-License-Identifier: Apache-2.0
 
 services:
-  server:
+  etcd:
+    container_name: milvus-etcd
+    image: quay.io/coreos/etcd:v3.5.5
+    environment:
+      - ETCD_AUTO_COMPACTION_MODE=revision
+      - ETCD_AUTO_COMPACTION_RETENTION=1000
+      - ETCD_QUOTA_BACKEND_BYTES=4294967296
+      - ETCD_SNAPSHOT_COUNT=50000
+    volumes:
+      - ${DOCKER_VOLUME_DIRECTORY:-${PWD}}/volumes/etcd:/etcd
+    command: etcd -advertise-client-urls=http://127.0.0.1:2379 -listen-client-urls http://0.0.0.0:2379 --data-dir /etcd
+    healthcheck:
+      test: ["CMD", "etcdctl", "endpoint", "health"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    deploy:
+      replicas: ${START_MILVUS:-0}
+  minio:
+    container_name: milvus-minio
+    image: minio/minio:RELEASE.2023-03-20T20-16-18Z
+    environment:
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin
+    ports:
+      - "${MINIO_PORT1:-5044}:9001"
+      - "${MINIO_PORT2:-5043}:9000"
+    volumes:
+      - ${DOCKER_VOLUME_DIRECTORY:-${PWD}}/volumes/minio:/minio_data
+    command: minio server /minio_data --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    deploy:
+      replicas: ${START_MILVUS:-0}
+  milvus-standalone:
+    container_name: milvus-standalone
+    image: milvusdb/milvus:v2.4.6
+    command: ["milvus", "run", "standalone"]
+    security_opt:
+      - seccomp:unconfined
+    environment:
+      ETCD_ENDPOINTS: etcd:2379
+      MINIO_ADDRESS: minio:9000
+    volumes:
+      - ./milvus.yaml:/milvus/configs/milvus.yaml
+      - ${DOCKER_VOLUME_DIRECTORY:-${PWD}}/volumes/milvus:/var/lib/milvus
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9091/healthz"]
+      interval: 30s
+      start_period: 90s
+      timeout: 20s
+      retries: 3
+    ports:
+      - "19530:19530"
+      - "${MILVUS_STANDALONE_PORT:-9091}:9091"
+    depends_on:
+      - "etcd"
+      - "minio"
+    deploy:
+      replicas: ${START_MILVUS:-0}
+  edgecraftrag-server:
     image: ${REGISTRY:-opea}/edgecraftrag-server:${TAG:-latest}
     container_name: edgecraftrag-server
     environment:
@@ -27,9 +90,6 @@ services:
     group_add:
       - ${VIDEOGROUPID:-44}
       - ${RENDERGROUPID:-109}
-    profiles:
-      - single_container
-      - multi_container
   ecrag:
     image: ${REGISTRY:-opea}/edgecraftrag:${TAG:-latest}
     container_name: edgecraftrag
@@ -45,10 +105,7 @@ services:
     ports:
       - ${MEGA_SERVICE_PORT:-16011}:${MEGA_SERVICE_PORT:-16011}
     depends_on:
-      - server
-    profiles:
-      - single_container
-      - multi_container
+      - edgecraftrag-server
   nginx:
     image: nginx:latest
     restart: always
@@ -57,11 +114,8 @@ services:
     volumes:
       - ${NGINX_CONFIG_PATH:-${PWD}}:/etc/nginx/nginx.conf
     depends_on:
-      - server
-    profiles:
-      - single_container
-      - multi_container
-  ui:
+      - edgecraftrag-server
+  edgecraftrag-ui:
     image: ${REGISTRY:-opea}/edgecraftrag-ui:${TAG:-latest}
     container_name: edgecraftrag-ui
     environment:
@@ -80,14 +134,11 @@ services:
     ports:
       - ${UI_SERVICE_PORT:-8082}:${UI_SERVICE_PORT:-8082}
     depends_on:
-      - server
+      - edgecraftrag-server
       - ecrag
-    profiles:
-      - single_container
-      - multi_container
   llm-serving-xpu-0:
     container_name: ipex-llm-serving-xpu-container-0
-    image: intelanalytics/ipex-llm-serving-xpu:0.8.3-b18
+    image: intelanalytics/ipex-llm-serving-xpu:0.8.3-b20
     privileged: true
     restart: always
     ports:
@@ -108,10 +159,10 @@ services:
       MODEL_PATH: "/llm/models"
       SERVED_MODEL_NAME: ${LLM_MODEL}
       TENSOR_PARALLEL_SIZE: ${TENSOR_PARALLEL_SIZE:-1}
-      MAX_NUM_SEQS: ${MAX_NUM_SEQS:-256}
+      MAX_NUM_SEQS: ${MAX_NUM_SEQS:-64}
       MAX_NUM_BATCHED_TOKENS: ${MAX_NUM_BATCHED_TOKENS:-4000}
       MAX_MODEL_LEN: ${MAX_MODEL_LEN:-3000}
-      IPEX_LLM_LOWBIT: ${LOAD_IN_LOW_BIT:-"fp8"}
+      LOAD_IN_LOW_BIT: ${LOAD_IN_LOW_BIT:-fp8}
       CCL_DG2_USM: ${CCL_DG2_USM:-""}
       PORT: ${VLLM_SERVICE_PORT_0:-8100}
       ZE_AFFINITY_MASK: ${SELECTED_XPU_0:-0}
@@ -119,45 +170,6 @@ services:
     entrypoint: /bin/bash -c "\
       cd /llm && \
       bash start-vllm-service.sh"
-    profiles:
-      - single_container
-      - multi_container
-  llm-serving-xpu-1:
-    container_name: ipex-llm-serving-xpu-container-1
-    image: intelanalytics/ipex-llm-serving-xpu:0.8.3-b18
-    privileged: true
-    restart: always
-    ports:
-      - ${VLLM_SERVICE_PORT_1:-8200}:${VLLM_SERVICE_PORT_1:-8200}
-    group_add:
-      - video
-      - ${VIDEOGROUPID:-44}
-      - ${RENDERGROUPID:-109}
-    volumes:
-      - ${LLM_MODEL_PATH:-${PWD}}:/llm/models
-    devices:
-      - /dev/dri
-    environment:
-      no_proxy: ${no_proxy}
-      http_proxy: ${http_proxy}
-      https_proxy: ${https_proxy}
-      HF_ENDPOINT: ${HF_ENDPOINT}
-      MODEL_PATH: "/llm/models"
-      SERVED_MODEL_NAME: ${LLM_MODEL}
-      TENSOR_PARALLEL_SIZE: ${TENSOR_PARALLEL_SIZE:-1}
-      MAX_NUM_SEQS: ${MAX_NUM_SEQS:-256}
-      MAX_NUM_BATCHED_TOKENS: ${MAX_NUM_BATCHED_TOKENS:-4000}
-      MAX_MODEL_LEN: ${MAX_MODEL_LEN:-3000}
-      IPEX_LLM_LOWBIT: ${LOAD_IN_LOW_BIT:-"fp8"}
-      CCL_DG2_USM: ${CCL_DG2_USM:-""}
-      PORT: ${VLLM_SERVICE_PORT_1:-8200}
-      ZE_AFFINITY_MASK: ${SELECTED_XPU_1:-1}
-    shm_size: '32g'
-    entrypoint: /bin/bash -c "\
-      cd /llm && \
-      bash start-vllm-service.sh"
-    profiles:
-      - multi_container
 networks:
   default:
     driver: bridge
