@@ -45,7 +45,7 @@ function start_services() {
     until [[ "$n" -ge 200 ]]; do
         echo "n=$n"
         docker logs vllm-gaudi-server > vllm_service_start.log 2>&1
-        if grep -q "Warmup finished" vllm_service_start.log; then
+        if grep -q "Application startup complete" vllm_service_start.log; then
             break
         fi
         sleep 5s
