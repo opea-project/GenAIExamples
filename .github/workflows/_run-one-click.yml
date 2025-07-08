@@ -97,7 +97,7 @@ jobs:
           ref: ${{ needs.get-test-case.outputs.CHECKOUT_REF }}
           fetch-depth: 0
 
-      - name: get-default-params-from-GenAIExamples/one_click_deploy/core/config.py
+      - name: get-default-params-from-config
         id: get-default-params
         if: ${{ inputs.deploy_method == 'k8s' }}
         run: |
@@ -134,16 +134,15 @@ jobs:
           Mount_dir: ${{ env.Mount_dir }}
           LVM_model: ${{ env.LVM_model }}
         run: |
-          if [ "${{ inputs.deploy_method }}" = "docker" ]; then
-            sudo apt update
-            sudo apt install -y python3-pip
-          else
-            export OPEA_K8S_VLLM_SKIP_WARMUP=TRUE
-          fi
+          sudo apt update
+          sudo apt install -y python3-pip
 
           cd ${{ github.workspace }}/one_click_deploy
           python3 -m pip install -r requirements.txt
 
+          if [ "${{ inputs.deploy_method }}" = "k8s" ]; then
+            export OPEA_K8S_VLLM_SKIP_WARMUP=TRUE
+          fi
           export TEST_RETRY_ATTEMPTS=6
 
           INPUT_DATA=$(
