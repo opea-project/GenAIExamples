@@ -10,7 +10,7 @@ This document outlines the deployment process for a VisualQnA application utiliz
 
 ## VisualQnA Quick Start Deployment
 
-This section describes how to quickly deploy and test the CodeTrans service manually on an Intel® Xeon® processor. The basic steps are:
+This section describes how to quickly deploy and test the VisualQnA service manually on an Intel® Xeon® processor. The basic steps are:
 
 1. [Build Docker Images](#build-docker-images)
 2. [Setup Environment Variables](#setup-environment-variables)
@@ -20,7 +20,7 @@ This section describes how to quickly deploy and test the CodeTrans service manu
 
 First of all, you need to build Docker Images locally. This step can be ignored after the Docker images published to Docker hub.
 
-Please refer to the table below to build different microservices from source:
+Please refer the table below to build different microservices from source:
 
 | Microservice | Deployment Guide                                                                                               |
 | ------------ | -------------------------------------------------------------------------------------------------------------- |
@@ -28,6 +28,15 @@ Please refer to the table below to build different microservices from source:
 | LVM and NGINX| [Build LVM and NGINX Docker Images](../../../../README_miscellaneous.md#build-lvm-and-nginx-docker-images)     |
 | vLLM or TGI  | [Build vLLM or Pull TGI Gaudi Image](../../../../README_miscellaneous.md#build-vllm-or-pull-tgi-gaudi-image)   |
 | UI           | [Basic UI build guide](../../../../README_miscellaneous.md#build-ui-docker-image)                              |
+
+Then run the command `docker images`, you will have the following 5 Docker Images:
+
+1. `opea/vllm-gaudi:latest`
+2. `ghcr.io/huggingface/tgi-gaudi:2.3.1` (Optional)
+3. `opea/lvm:latest`
+4. `opea/visualqna:latest`
+5. `opea/visualqna-ui:latest`
+6. `opea/nginx`
 
 ### Setup Environment Variables
 
@@ -53,16 +62,7 @@ docker compose -f compose_tgi.yaml up -d
 
 > **_NOTE:_** Users need at least one Gaudi cards to run the VisualQnA successfully.
 
-After running docker compose, check if all the containers launched via docker compose have started:
-
-Then run the command `docker images`, you will have the following 5 Docker Images:
-
-1. `opea/vllm-gaudi:latest`
-2. `ghcr.io/huggingface/tgi-gaudi:2.3.1` (Optional)
-3. `opea/lvm:latest`
-4. `opea/visualqna:latest`
-5. `opea/visualqna-ui:latest`
-6. `opea/nginx`
+After running docker compose, check if all the containers launched via docker compose have started.
 
 ## Validate MicroServices
 

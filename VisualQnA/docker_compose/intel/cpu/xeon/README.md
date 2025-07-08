@@ -10,7 +10,7 @@ This document outlines the deployment process for a VisualQnA application utiliz
 
 ## VisualQnA Quick Start Deployment
 
-This section describes how to quickly deploy and test the CodeTrans service manually on an Intel® Xeon® processor. The basic steps are:
+This section describes how to quickly deploy and test the VisualQnA service manually on an Intel® Xeon® processor. The basic steps are:
 
 1. [Apply Xeon Server on AWS](#apply-xeon-server-on-aws)
 2. [Build Docker Images](#build-docker-images)
@@ -38,6 +38,15 @@ Please refer to the table below to build different microservices from source:
 | vLLM or TGI  | [Pull vLLM/TGI Xeon Image](../../../../README_miscellaneous.md#pull-vLLM/TGI-xeon-image)                       |
 | UI           | [Basic UI build guide](../../../../README_miscellaneous.md#build-ui-docker-image)                              |
 
+Then run the command `docker images`, you will have the following Docker Images:
+
+1. `opea/vllm:latest`
+2. `ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu` (Optional)
+3. `opea/lvm:latest`
+4. `opea/visualqna:latest`
+5. `opea/visualqna-ui:latest`
+6. `opea/nginx`
+
 ### Setup Environment Variables
 
 Since the `compose.yaml` will consume some environment variables, you need to setup them in advance as below.
@@ -62,16 +71,7 @@ docker compose -f compose.yaml up -d
 docker compose -f compose_tgi.yaml up -d
 ```
 
-After running docker compose, check if all the containers launched via docker compose have started:
-
-Then run the command `docker images`, you will have the following Docker Images:
-
-1. `opea/vllm:latest`
-2. `ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu` (Optional)
-3. `opea/lvm:latest`
-4. `opea/visualqna:latest`
-5. `opea/visualqna-ui:latest`
-6. `opea/nginx`
+After running docker compose, check if all the containers launched via docker compose have started.
 
 ## Validate Microservices
 
