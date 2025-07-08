@@ -38,12 +38,7 @@ on:
         description: "Tag to apply to images"
         required: true
         type: string
-      build:
-        default: true
-        description: 'Build test required images for Examples'
-        required: false
-        type: boolean
-      deploy_method:
+      deploy_methods:
         default: "docker,k8s"
         description: 'Test examples with docker compose or k8s charts'
         type: choice
@@ -59,6 +54,7 @@ jobs:
     outputs:
       examples: ${{ steps.get-matrix.outputs.examples }}
       nodes: ${{ steps.get-matrix.outputs.nodes }}
+      deploy_methods: ${{ steps.get-matrix.outputs.deploy_methods }}
     steps:
     - name: Create Matrix
       id: get-matrix
@@ -69,7 +65,9 @@ jobs:
         nodes=($(echo ${{ inputs.nodes }} | tr ',' ' '))
         nodes_json=$(printf '%s\n' "${nodes[@]}" | sort -u | jq -R '.' | jq -sc '.')
         echo "nodes=$nodes_json" >> $GITHUB_OUTPUT
-        deploy_methods=($
+        deploy_methods=($(echo ${{ inputs.deploy_methods }} | tr ',' ' '))
+        deploy_methods_json=$(printf '%s\n' "${deploy_methods[@]}" | sort -u | jq -R '.' | jq -sc '.')
+        echo "deploy_methods=$deploy_methods_json" >> $GITHUB_OUTPUT
 
   run-examples:
     # permissions:
@@ -92,14 +90,14 @@ jobs:
     strategy:
       matrix:
         example: ${{ fromJson(needs.get-test-matrix.outputs.examples) }}
-        node: ${{ fromJson(needs.get-test-matrix.outputs.nodes) }}
+        hardware: ${{ fromJson(needs.get-test-matrix.outputs.nodes) }}
+        deploy_method: ${{ fromJson(needs.get-test-matrix.outputs.deploy_methods) }}
       fail-fast: false
     uses: ./.github/workflows/_run-one-click.yml
     with:
-      hardware: ${{ matrix.node }}
+      hardware: ${{ matrix.hardware }}
       example: ${{ matrix.example }}
+      deploy_method: ${{ matrix.deploy_method }}
       tag: ${{ inputs.tag }}
       registry: "opea"
-      test_compose: ${{ fromJSON(inputs.test_compose) }}
-      test_helmchart: ${{ fromJSON(inputs.test_helmchart) }}
     secrets: inherit
