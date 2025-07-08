@@ -13,7 +13,6 @@ Some noteworthy use case examples for VQA include:
 
 1. [Architecture](#architecture)
 2. [Deployment Options](#deployment-options)
-3. [Monitoring and Tracing](./README_miscellaneous.md)
 
 ## Architecture
 
@@ -77,16 +76,6 @@ This example guides you through how to deploy a [LLaVA-NeXT](https://github.com/
 
 ![llava screenshot](./assets/img/llava_screenshot1.png)
 ![llava-screenshot](./assets/img/llava_screenshot2.png)
-
-## Deployment Options
-
-By default, the model is set to `llava-hf/llava-v1.6-mistral-7b-hf`. To use a different model, update the `LVM_MODEL_ID` variable in the [`set_env.sh`](./docker_compose/intel/hpu/gaudi/set_env.sh) file.
-
-```
-export LVM_MODEL_ID="llava-hf/llava-v1.6-mistral-7b-hf"
-```
-
-You can choose other llava-next models, such as `llava-hf/llava-v1.6-vicuna-13b-hf`, as needed.
 
 ## Deployment Options
 

@@ -4,7 +4,7 @@
 
 1. [Build Docker Images](#build-docker-images)
 2. [Deploy VisualQnA Application](#deploy-visualqna-application)
-3. [Validate Services](#validate-services)
+3. [Validate the Services](#validate-the-services)
 
 ## Build Docker Images
 
@@ -269,7 +269,7 @@ All containers should be running and should not restart:
 
 ---
 
-## Validate Services
+## Validate the Services
 
 ### 1. Validate the vLLM/TGI Service
 
