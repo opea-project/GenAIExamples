@@ -114,7 +114,7 @@ jobs:
           elif [ "${{ inputs.example }}" = "AgentQnA" ]; then
             echo "LLM_model=$(echo "$PARAMS_JSON" | jq -r '.gaudi.llm_model')" >> $GITHUB_ENV
           fi
-      
+
       - name: deploy and test
         shell: bash
         env:
@@ -140,7 +140,7 @@ jobs:
           else
             export OPEA_K8S_VLLM_SKIP_WARMUP=TRUE
           fi
-          
+
           cd ${{ github.workspace }}/one_click_deploy
           python3 -m pip install -r requirements.txt
 
