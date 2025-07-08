@@ -1,6 +1,13 @@
-## Deep Research Agent Application
+# Deep Research Agent Application
 
 Deep Research Agents are a new class of autonomous AI systems designed to perform complex, multi-step research tasks that typically require human-level reasoning, planning, and synthesis.
+
+## Overview
+
+In this application, we leverage the deep research agent implementation of [langchain-ai/open_deep_research](https://github.com/langchain-ai/open_deep_research), and deploy it on the Intel platform with opea microserice.
+
+![Architecture Overview](assets/img/opea-deep-research-agent.png)
+
 
 ## Setup Deployment Environment
 
@@ -37,4 +44,3 @@ curl http://${host_ip}:8022/v1/deep_research_agent \
     -H 'Content-Type: application/json'
 ```
 
-## Benchmarks
