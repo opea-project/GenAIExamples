@@ -15,6 +15,7 @@ from utils import create_agent
 config_path = os.path.join(os.path.dirname(__file__), "deep_researcher.yaml")
 agent = create_agent(config_path)
 
+
 class SimpleRequest(BaseModel):
     question: Union[str, List[str]]
 
