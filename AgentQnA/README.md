@@ -210,9 +210,11 @@ The command below will launch the multi-agent system with the `DocIndexRetriever
 docker compose -f $WORKDIR/GenAIExamples/DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml -f compose_openai.yaml up -d
 ```
 
-##### Models on Remote Server
+##### Models on Remote Servers
 
-When models are deployed on a remote server with Intel® AI for Enterprise Inference, a base URL and an API key are required to access them. To run the Agent microservice on Xeon while using models deployed on a remote server, add `compose_remote.yaml` to the `docker compose` command and set additional environment variables.
+When models are deployed on a remote server with Intel® AI for Enterprise Inference, a base URL and an API key are required to access them. To run the agent microservice on Xeon while using models deployed on a remote server, add `compose_remote.yaml` to the `docker compose` command and set additional environment variables.
+
+> **Note**: For AgentQnA, the minimum hardware requirement for the remote server is Intel® Gaudi® AI Accelerators.
 
 Set the following environment variables.
 
