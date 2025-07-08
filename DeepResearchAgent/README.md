@@ -8,7 +8,6 @@ In this application, we leverage the deep research agent implementation of [lang
 
 ![Architecture Overview](assets/img/opea-deep-research-agent.png)
 
-
 ## Setup Deployment Environment
 
 ```
@@ -43,4 +42,3 @@ curl http://${host_ip}:8022/v1/deep_research_agent \
     -d '{"question":"What is Deep Learning?"}' \
     -H 'Content-Type: application/json'
 ```
-
