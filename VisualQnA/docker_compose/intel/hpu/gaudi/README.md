@@ -1,8 +1,15 @@
-# Build MegaService of VisualQnA on Gaudi
+# Deploying VisualQnA on Intel® Gaudi® Processors
 
 This document outlines the deployment process for a VisualQnA application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on Intel Gaudi server. The steps include Docker image creation, container deployment via Docker Compose, and service execution to integrate microservices such as llm. We will publish the Docker images to Docker Hub, it will simplify the deployment process for this service.
 
-## 🚀 Build Docker Images
+## Table of Contents
+
+1. [Build Docker Images](#build-docker-images)
+2. [Start Microservices](#start-microservices)
+3. [Validate Microservices](#validate-microservices)
+4. [Launch the UI](#launch-the-ui)
+
+## Build Docker Images
 
 First of all, you need to build Docker Images locally. This step can be ignored after the Docker images published to Docker hub.
 
@@ -64,7 +71,7 @@ Then run the command `docker images`, you will have the following 5 Docker Image
 5. `opea/visualqna-ui:latest`
 6. `opea/nginx`
 
-## 🚀 Start MicroServices and MegaService
+## Start MicroServices
 
 ### Setup Environment Variables
 
@@ -90,7 +97,7 @@ docker compose -f compose_tgi.yaml up -d
 
 > **_NOTE:_** Users need at least one Gaudi cards to run the VisualQnA successfully.
 
-### Validate MicroServices and MegaService
+### Validate MicroServices
 
 Follow the instructions to validate MicroServices.
 
@@ -127,7 +134,7 @@ curl http://${host_ip}:8888/v1/visualqna -H "Content-Type: application/json" -d 
     }'
 ```
 
-## 🚀 Launch the UI
+## Launch the UI
 
 To access the frontend, open the following URL in your browser: http://{host_ip}:5173. By default, the UI runs on port 5173 internally. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `compose.yaml` file as shown below:
 

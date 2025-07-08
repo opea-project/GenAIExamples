@@ -1,8 +1,16 @@
-# Build Mega Service of VisualQnA on Xeon
+# Deploying VisualQnA on Intel® Xeon® Processors
 
 This document outlines the deployment process for a VisualQnA application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on Intel Xeon server. The steps include Docker image creation, container deployment via Docker Compose, and service execution to integrate microservices such as `llm`. We will publish the Docker images to Docker Hub soon, it will simplify the deployment process for this service.
 
-## 🚀 Apply Xeon Server on AWS
+## Table of Contents
+
+1. [Apply Xeon Server on AWS](#apply-xeon-server-on-aws)
+2. [Build Docker Images](#build-docker-images)
+3. [Start Microservices](#start-microservices)
+4. [Validate Microservices](#validate-microservices)
+5. [Launch the UI](#launch-the-ui)
+
+## Apply Xeon Server on AWS
 
 To apply a Xeon server on AWS, start by creating an AWS account if you don't have one already. Then, head to the [EC2 Console](https://console.aws.amazon.com/ec2/v2/home) to begin the process. Within the EC2 service, select the Amazon EC2 M7i or M7i-flex instance type to leverage 4th Generation Intel Xeon Scalable processors. These instances are optimized for high-performance computing and demanding workloads.
 
@@ -10,7 +18,7 @@ For detailed information about these instance types, you can refer to this [link
 
 After launching your instance, you can connect to it using SSH (for Linux instances) or Remote Desktop Protocol (RDP) (for Windows instances). From there, you'll have full access to your Xeon server, allowing you to install, configure, and manage your applications as needed.
 
-## 🚀 Build Docker Images
+## Build Docker Images
 
 First of all, you need to build Docker Images locally and install the python package of it.
 
@@ -60,7 +68,7 @@ Then run the command `docker images`, you will have the following Docker Images:
 5. `opea/visualqna-ui:latest`
 6. `opea/nginx`
 
-## 🚀 Start Microservices
+## Start Microservices
 
 ### Setup Environment Variables
 
@@ -86,7 +94,7 @@ docker compose -f compose.yaml up -d
 docker compose -f compose_tgi.yaml up -d
 ```
 
-### Validate Microservices
+## Validate Microservices
 
 Follow the instructions to validate MicroServices.
 
@@ -123,7 +131,7 @@ curl http://${host_ip}:8888/v1/visualqna -H "Content-Type: application/json" -d 
     }'
 ```
 
-## 🚀 Launch the UI
+## Launch the UI
 
 To access the frontend, open the following URL in your browser: http://{host_ip}:5173. By default, the UI runs on port 5173 internally. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `compose.yaml` file as shown below:
 
