@@ -30,14 +30,14 @@ The AgentQnA example is implemented using the component-level microservices defi
 
 The table below lists currently available deployment options. They outline in detail the implementation of this example on selected hardware.
 
-| Category               | Deployment Option    | Description                                                       |
-| ---------------------- | -------------------- | ----------------------------------------------------------------- |
+| Category               | Deployment Option    | Description                                                      |
+| ---------------------- | -------------------- | ---------------------------------------------------------------- |
 | On-premise Deployments | Docker compose       | [AgentQnA deployment on Xeon](./docker_compose/intel/cpu/xeon)   |
 |                        |                      | [AgentQnA deployment on Gaudi](./docker_compose/intel/hpu/gaudi) |
 |                        |                      | [AgentQnA deployment on AMD ROCm](./docker_compose/amd/gpu/rocm) |
-|                        | Kubernetes           | [Helm Charts](./kubernetes/helm)                                  |
-|                        | Azure                | Work-in-progress                                                  |
-|                        | Intel Tiber AI Cloud | Work-in-progress                                                  |
+|                        | Kubernetes           | [Helm Charts](./kubernetes/helm)                                 |
+|                        | Azure                | Work-in-progress                                                 |
+|                        | Intel Tiber AI Cloud | Work-in-progress                                                 |
 
 ## Validated Configurations
 
