@@ -123,16 +123,16 @@ bash stop_agent_service_tgi_rocm.sh
 
 Key parameters are configured via environment variables set before running `docker compose up`.
 
-| Environment Variable                    | Description                                                                                                           | Default (Set Externally)              |
-| :-------------------------------------- | :-------------------------------------------------------------------------------------------------------------------- | :------------------------------------ |
-| `ip_address`                               | External IP address of the host machine. **Required.**                                                                | `your_external_ip_address`            |
-| `HF_TOKEN`              | Your Hugging Face Hub token for model access. **Required.**                                                           | `your_huggingface_token`              |
-| `VLLM_LLM_MODEL_ID`                          | Hugging Face model ID for the AgentQnA LLM. Configured within `compose.yaml` environment. | `Intel/neural-chat-7b-v3-3`  |
-| `TOOLSET_PATH`                          | Local path to the tool Yaml file. Configured in `compose.yaml`.        | `${WORKPATH}/../../../tools/`              |
-| `CRAG_SERVER`              | CRAG server URL. Derived from `ip_address` and port `8080`.                         | `http://${ip_address}:8080` |
-| `WORKER_AGENT_URL`                 | Worker agent URL. Derived from `ip_address` and port `9095`.                      | `http://${ip_address}:9095/v1/chat/completions`                                |
-| `SQL_AGENT_URL`                  | SQL agent URL. Derived from `ip_address` and port `9096`.             | `http://${ip_address}:9096/v1/chat/completions`                                |
-| `http_proxy` / `https_proxy`/`no_proxy` | Network proxy settings (if required).                                                                                 | `""`                                  |
+| Environment Variable                    | Description                                                                               | Default (Set Externally)                        |
+| :-------------------------------------- | :---------------------------------------------------------------------------------------- | :---------------------------------------------- |
+| `ip_address`                            | External IP address of the host machine. **Required.**                                    | `your_external_ip_address`                      |
+| `HF_TOKEN`                              | Your Hugging Face Hub token for model access. **Required.**                               | `your_huggingface_token`                        |
+| `VLLM_LLM_MODEL_ID`                     | Hugging Face model ID for the AgentQnA LLM. Configured within `compose.yaml` environment. | `Intel/neural-chat-7b-v3-3`                     |
+| `TOOLSET_PATH`                          | Local path to the tool Yaml file. Configured in `compose.yaml`.                           | `${WORKPATH}/../../../tools/`                   |
+| `CRAG_SERVER`                           | CRAG server URL. Derived from `ip_address` and port `8080`.                               | `http://${ip_address}:8080`                     |
+| `WORKER_AGENT_URL`                      | Worker agent URL. Derived from `ip_address` and port `9095`.                              | `http://${ip_address}:9095/v1/chat/completions` |
+| `SQL_AGENT_URL`                         | SQL agent URL. Derived from `ip_address` and port `9096`.                                 | `http://${ip_address}:9096/v1/chat/completions` |
+| `http_proxy` / `https_proxy`/`no_proxy` | Network proxy settings (if required).                                                     | `""`                                            |
 
 ## AgentQnA Docker Compose Files
 

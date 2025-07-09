@@ -66,7 +66,6 @@ export OPENAI_API_KEY=<your-openai-key>
 
 #### Then, set up environment variables for the selected hardware using the corresponding `set_env.sh`
 
-
 ```bash
 source $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/hpu/gaudi/set_env.sh
 ```
@@ -136,10 +135,10 @@ docker compose -f $WORKDIR/GenAIExamples/DocIndexRetriever/docker_compose/intel/
 
 Please refer to the table below to build different microservices from source:
 
-| Microservice | Deployment Guide                                                                                               |
-| ------------ | -------------------------------------------------------------------------------------------------------------- |
-| Agent         | [Agent build guide](https://github.com/opea-project/GenAIComps/blob/main/comps/agent/src/README.md#21-build-docker-image-for-agent-microservice) |                 |
-| UI           | [Basic UI build guide](../../../../README_miscellaneous.md#build-ui-docker-image)                              |
+| Microservice | Deployment Guide                                                                                                                                 |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------ | --- |
+| Agent        | [Agent build guide](https://github.com/opea-project/GenAIComps/blob/main/comps/agent/src/README.md#21-build-docker-image-for-agent-microservice) |     |
+| UI           | [Basic UI build guide](../../../../README_miscellaneous.md#build-ui-docker-image)                                                                |
 
 ### Ingest Data into the Vector Database
 
@@ -167,24 +166,24 @@ docker compose -f compose_remote.yaml down
 
 Key parameters are configured via environment variables set before running `docker compose up`.
 
-| Environment Variable                    | Description                                                                                                           | Default (Set Externally)              |
-| :-------------------------------------- | :-------------------------------------------------------------------------------------------------------------------- | :------------------------------------ |
-| `ip_address`                               | External IP address of the host machine. **Required.**                                                                | `your_external_ip_address`            |
-| `OPENAI_API_KEY`              | Your OpenAI API key for model access. **Required.**                                                           | `your_openai_api_key`              |
-| `model`                          | Hugging Face model ID for the AgentQnA LLM. Configured within `compose.yaml` environment. | `gpt-4o-mini-2024-07-18`  |
-| `TOOLSET_PATH`                          | Local path to the tool Yaml file. Configured in `compose.yaml`.        | `$WORKDIR/GenAIExamples/AgentQnA/tools/`              |
-| `CRAG_SERVER`              | CRAG server URL. Derived from `ip_address` and port `8080`.                         | `http://${ip_address}:8080` |
-| `WORKER_AGENT_URL`                 | Worker agent URL. Derived from `ip_address` and port `9095`.                      | `http://${ip_address}:9095/v1/chat/completions`                                |
-| `SQL_AGENT_URL`                  | SQL agent URL. Derived from `ip_address` and port `9096`.             | `http://${ip_address}:9096/v1/chat/completions`                                |
-| `http_proxy` / `https_proxy`/`no_proxy` | Network proxy settings (if required).                                                                                 | `""`                                  |
+| Environment Variable                    | Description                                                                               | Default (Set Externally)                        |
+| :-------------------------------------- | :---------------------------------------------------------------------------------------- | :---------------------------------------------- |
+| `ip_address`                            | External IP address of the host machine. **Required.**                                    | `your_external_ip_address`                      |
+| `OPENAI_API_KEY`                        | Your OpenAI API key for model access. **Required.**                                       | `your_openai_api_key`                           |
+| `model`                                 | Hugging Face model ID for the AgentQnA LLM. Configured within `compose.yaml` environment. | `gpt-4o-mini-2024-07-18`                        |
+| `TOOLSET_PATH`                          | Local path to the tool Yaml file. Configured in `compose.yaml`.                           | `$WORKDIR/GenAIExamples/AgentQnA/tools/`        |
+| `CRAG_SERVER`                           | CRAG server URL. Derived from `ip_address` and port `8080`.                               | `http://${ip_address}:8080`                     |
+| `WORKER_AGENT_URL`                      | Worker agent URL. Derived from `ip_address` and port `9095`.                              | `http://${ip_address}:9095/v1/chat/completions` |
+| `SQL_AGENT_URL`                         | SQL agent URL. Derived from `ip_address` and port `9096`.                                 | `http://${ip_address}:9096/v1/chat/completions` |
+| `http_proxy` / `https_proxy`/`no_proxy` | Network proxy settings (if required).                                                     | `""`                                            |
 
 ## AgentQnA Docker Compose Files
 
 In the context of deploying a AgentQnA pipeline on an Intel® Gaudi® platform, we can pick and choose different large language model serving frameworks. The table below outlines the various configurations that are available as part of the application. These configurations can be used as templates and can be extended to different components available in [GenAIComps](https://github.com/opea-project/GenAIComps.git).
 
-| File                                   | Description                                                                               |
-| -------------------------------------- | ----------------------------------------------------------------------------------------- |
-| [compose_openai.yaml](./compose_openai.yaml)         | Default compose file using OpenAI-compatible API as the serving framework and Redis as the vector database         |
+| File                                         | Description                                                                                                                                                       |
+| -------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [compose_openai.yaml](./compose_openai.yaml) | Default compose file using OpenAI-compatible API as the serving framework and Redis as the vector database                                                        |
 | [compose_remote.yaml](./compose_remote.yaml) | This compose file is used to connect to a remote LLM service (such as a self-hosted or third-party API). All other configurations remain the same as the default. |
 
 ## Validate Services
