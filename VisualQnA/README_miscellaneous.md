@@ -5,7 +5,7 @@
 1. [Build MegaService Docker Image](#build-megaservice-docker-image)
 2. [Build LVM and NGINX Docker Images](#build-lvm-and-nginx-docker-images)
 3. [Build UI Docker Image](#build-ui-docker-image)
-4. [Pull vLLM/TGI Xeon Image](#pull-vllm/tgi-xeon-image)
+4. [Pull vLLM/TGI Xeon Image](#pull-vllm-or-tgi-xeon-image)
 5. [Build vLLM or Pull TGI Gaudi Image](#build-vllm-or-pull-tgi-gaudi-image)
 5. [Generate a HuggingFace Access Token](#generate-a-huggingface-access-token)
 6. [Troubleshooting](#troubleshooting)
@@ -29,7 +29,7 @@ docker build --no-cache -t opea/lvm:latest --build-arg https_proxy=$https_proxy 
 docker build --no-cache -t opea/nginx:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/third_parties/nginx/src/Dockerfile .
 ```
 
-## Pull vLLM/TGI Xeon Image
+## Pull vLLM or TGI Xeon Image
 
 ```bash
 # vLLM
@@ -89,9 +89,6 @@ Some HuggingFace resources, such as some models, are only accessible if the deve
 ## Monitoring OPEA Services with Prometheus and Grafana Dashboard
 
 OPEA microservice deployment can easily be monitored through Grafana dashboards using data collected via Prometheus. Follow the [README](https://github.com/opea-project/GenAIEval/blob/main/evals/benchmark/grafana/README.md) to setup Prometheus and Grafana servers and import dashboards to monitor the OPEA services.
-
-![example dashboards](./assets/img/example_dashboards.png)
-![tgi dashboard](./assets/img/tgi_dashboard.png)
 
 ## Tracing with OpenTelemetry and Jaeger
 
