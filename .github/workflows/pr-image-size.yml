@@ -1,0 +1,61 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+name: Check Docker Image Size Change
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, reopened, ready_for_review, synchronize]
+    paths:
+      - '**/Dockerfile'
+
+# If there is a new commit, the previous jobs will be canceled
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check-image-size:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Get changed Dockerfiles
+        id: changed-dockerfiles
+        run: |
+          git fetch origin ${{ github.base_ref }}
+          merged_commit=$(git log -1 --format='%H')
+          files=$(git diff --name-status --diff-filter=ARM ${{ github.event.pull_request.base.sha }} ${merged_commit} | awk '{print $2}' | grep -E 'Dockerfile$' || true)
+          echo "files<<EOF" >> $GITHUB_OUTPUT
+          echo "$files" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Build and check image sizes
+        if: steps.changed-dockerfiles.outputs.files != ''
+        run: |
+          set -e
+          while read -r dockerfile; do
+            [ -z "$dockerfile" ] && continue
+            dir=$(dirname "$dockerfile")
+            image_base="pr-image-size-base:$(echo $dir | tr '/' '-')"
+            image_pr="pr-image-size-pr:$(echo $dir | tr '/' '-')"
+
+            echo "Building base image for $dockerfile"
+            git checkout origin/${{ github.base_ref }} -- "$dockerfile"
+            docker build -f "$dockerfile" -t "$image_base" "$dir"
+            size_base=$(docker image inspect "$image_base" --format='{{.Size}}')
+
+            echo "Building PR image for $dockerfile"
+            git checkout -- "$dockerfile" # restore PR version
+            docker build -f "$dockerfile" -t "$image_pr" "$dir"
+            size_pr=$(docker image inspect "$image_pr" --format='{{.Size}}')
+
+            diff=$((size_pr - size_base))
+            echo "::notice file=$dockerfile::Image size change: $size_base -> $size_pr bytes (diff: $diff bytes)"
+          done <<< "${{ steps.changed-dockerfiles.outputs.files }}"
