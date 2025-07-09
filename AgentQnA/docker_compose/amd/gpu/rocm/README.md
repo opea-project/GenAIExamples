@@ -140,8 +140,8 @@ In the context of deploying a AgentQnA pipeline on an Intel® Xeon® platform, w
 
 | File                                   | Description                                                                               |
 | -------------------------------------- | ----------------------------------------------------------------------------------------- |
-| [compose.yaml](./compose.yaml)         | Default compose file using vllm as serving framework        |
-| [compose_tgi.yaml](./compose_tgi.yaml) | The LLM serving framework is TGI. All other configurations remain the same as the default |
+| [compose.yaml](./compose.yaml)         | Default compose file using tgi as serving framework        |
+| [compose_vllm.yaml](./compose_vllm.yaml) | The LLM serving framework is vLLM. All other configurations remain the same as the default |
 
 ## Validate Services
 
