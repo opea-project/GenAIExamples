@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 # Use node 20.11.1 as the base image
-FROM openeuler/node:latest as vite-app
+FROM openeuler/node:20.11.1-oe2403lts as vite-app
  
 COPY react /usr/app/react
 WORKDIR /usr/app/react
@@ -12,7 +12,7 @@ RUN ["npm", "install"]
 RUN ["npm", "run", "build"]
 
 
-FROM openeuler/nginx:latest
+FROM openeuler/nginx:1.29.0-oe2403lts
 
 COPY --from=vite-app /usr/app/react/dist /usr/share/nginx/html
 COPY ./react/env.sh /docker-entrypoint.d/env.sh

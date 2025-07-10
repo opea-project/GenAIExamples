@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 # Use node 20.11.1 as the base image
-FROM openeuler/node:latest
+FROM openeuler/node:20.11.1-oe2403lts
 
 # Update package manager and install Git
 RUN yum update -y && yum install -y git
