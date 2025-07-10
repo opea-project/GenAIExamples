@@ -1,0 +1,11 @@
+# Copyright (C) 2025 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+agent:
+  type: langchain_deep_researcher
+  search_api: "tavily"
+  planner_provider: "openai"
+  planner_model: "meta-llama/Llama-3.3-70B-Instruct"
+  writer_provider: "openai"
+  writer_model: "meta-llama/Llama-3.3-70B-Instruct"
+  max_search_depth: 2
