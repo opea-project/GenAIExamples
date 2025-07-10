@@ -184,7 +184,7 @@ In the context of deploying a AgentQnA pipeline on an Intel® Gaudi® platform, 
 | File                                         | Description                                                                                                                                                       |
 | -------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [compose.yaml](./compose.yaml) | Default compose file using vLLM as the serving framework                                       |
-| [compose_webtool.yaml](./compose_webtool.yaml) | This compose file is used to start a supervisor agent with webtools   |
+| [compose.webtool.yaml](./compose.webtool.yaml) | This compose file is used to start a supervisor agent with webtools   |
 | [compose.telemetry.yaml](./compose.telemetry.yaml) | This compose file is used to enable telemetry related services  |
 
 ## Validate Services
