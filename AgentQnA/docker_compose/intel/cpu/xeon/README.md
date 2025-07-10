@@ -203,15 +203,15 @@ To see the UI, open a web browser to `http://${ip_address}:5173` to access the U
 
 Click "Save".
 
-![opea-agent-setting](assets/img/opea-agent-setting.png)
+![opea-agent-setting](../../../../assets/img/opea-agent-setting.png)
 
 3. Test OPEA agent with UI. Return to `New Chat` and ensure the model (i.e. `opea-agent`) is selected near the upper left. Enter in any prompt to interact with the agent.
 
-![opea-agent-test](assets/img/opea-agent-test.png)
+![opea-agent-test](../../../../assets/img/opea-agent-test.png)
 
 ## Register other tools with the AI agent
 
-The [tools](./tools) folder contains YAML and Python files for additional tools for the supervisor and worker agents. Refer to the "Provide your own tools" section in the instructions [here](https://github.com/opea-project/GenAIComps/tree/main/comps/agent/src/README.md) to add tools and customize the AI agents.
+The [tools](../../../../tools) folder contains YAML and Python files for additional tools for the supervisor and worker agents. Refer to the "Provide your own tools" section in the instructions [here](https://github.com/opea-project/GenAIComps/tree/main/comps/agent/src/README.md) to add tools and customize the AI agents.
 
 ## Conclusion
 
