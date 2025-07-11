@@ -1,4 +1,10 @@
-# Build and Deploy VisualQnA Application on AMD GPU (ROCm)
+# Deploy VisualQnA on AMD GPU (ROCm)
+
+## Table of Contents
+
+1. [Build Docker Images](#build-docker-images)
+2. [Deploy VisualQnA Application](#deploy-visualqna-application)
+3. [Validate the Services](#validate-the-services)
 
 ## Build Docker Images
 
