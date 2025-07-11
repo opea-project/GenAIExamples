@@ -7,8 +7,8 @@
 3. [Build UI Docker Image](#build-ui-docker-image)
 4. [Pull vLLM/TGI Xeon Image](#pull-vllm-or-tgi-xeon-image)
 5. [Build vLLM or Pull TGI Gaudi Image](#build-vllm-or-pull-tgi-gaudi-image)
-5. [Generate a HuggingFace Access Token](#generate-a-huggingface-access-token)
-6. [Troubleshooting](#troubleshooting)
+6. [Generate a HuggingFace Access Token](#generate-a-huggingface-access-token)
+7. [Troubleshooting](#troubleshooting)
 
 ## Build MegaService Docker Image
 

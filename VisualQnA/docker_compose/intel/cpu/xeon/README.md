@@ -15,7 +15,7 @@ This section describes how to quickly deploy and test the VisualQnA service manu
 1. [Apply Xeon Server on AWS](#apply-xeon-server-on-aws)
 2. [Build Docker Images](#build-docker-images)
 3. [Setup Environment Variables](#setup-environment-variables)
-3. [Deploy the Services Using Docker Compose](#deploy-the-services-using-docker-compose)
+4. [Deploy the Services Using Docker Compose](#deploy-the-services-using-docker-compose)
 
 ### Apply Xeon Server on AWS
 
@@ -31,12 +31,12 @@ First of all, you need to build Docker Images locally and install the python pac
 
 Please refer to the table below to build different microservices from source:
 
-| Microservice | Deployment Guide                                                                                               |
-| ------------ | -------------------------------------------------------------------------------------------------------------- |
-| MegaService  | [MegaService build guide](../../../../README_miscellaneous.md#build-megaservice-docker-image)                  |
-| LVM and NGINX| [vLLM build guide](../../../../README_miscellaneous.md#build-lvm-and-nginx-docker-images)                      |
-| vLLM or TGI  | [Pull vLLM/TGI Xeon Image](../../../../README_miscellaneous.md#pull-vLLM/TGI-xeon-image)                       |
-| UI           | [Basic UI build guide](../../../../README_miscellaneous.md#build-ui-docker-image)                              |
+| Microservice  | Deployment Guide                                                                              |
+| ------------- | --------------------------------------------------------------------------------------------- |
+| MegaService   | [MegaService build guide](../../../../README_miscellaneous.md#build-megaservice-docker-image) |
+| LVM and NGINX | [vLLM build guide](../../../../README_miscellaneous.md#build-lvm-and-nginx-docker-images)     |
+| vLLM or TGI   | [Pull vLLM/TGI Xeon Image](../../../../README_miscellaneous.md#pull-vLLM/TGI-xeon-image)      |
+| UI            | [Basic UI build guide](../../../../README_miscellaneous.md#build-ui-docker-image)             |
 
 Then run the command `docker images`, you will have the following Docker Images:
 

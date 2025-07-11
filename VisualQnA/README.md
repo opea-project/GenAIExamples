@@ -15,7 +15,6 @@ Some noteworthy use case examples for VQA include:
 2. [Deployment Options](deployment-options)
 3. [Validated Configurations](validated-configurations)
 
-
 ## Architecture
 
 ![VQA](./assets/img/vqa.png)
@@ -85,13 +84,13 @@ The VisualQnA service can be effortlessly deployed on either Intel Gaudi2 or Int
 
 The table below lists currently available deployment options. They outline in detail the implementation of this example on selected hardware.
 
-| Category               | Deployment Option    | Description                                                       |
-| ---------------------- | -------------------- | ----------------------------------------------------------------- |
-| On-premise Deployments | Docker compose       | [VisualQnA deployment on Xeon](./docker_compose/intel/cpu/xeon)   |
-|                        |                      | [VisualQnA deployment on Gaudi](./docker_compose/intel/hpu/gaudi) |
-|                        |                      | [VisualQnA deployment on AMD ROCm](./docker_compose/amd/gpu/rocm) |
-|                        | Kubernetes           | [Helm Charts](./kubernetes/helm)                                  |
-|                        |                      | [GMC](./kubernetes/gmc)                                           |
+| Category               | Deployment Option | Description                                                       |
+| ---------------------- | ----------------- | ----------------------------------------------------------------- |
+| On-premise Deployments | Docker compose    | [VisualQnA deployment on Xeon](./docker_compose/intel/cpu/xeon)   |
+|                        |                   | [VisualQnA deployment on Gaudi](./docker_compose/intel/hpu/gaudi) |
+|                        |                   | [VisualQnA deployment on AMD ROCm](./docker_compose/amd/gpu/rocm) |
+|                        | Kubernetes        | [Helm Charts](./kubernetes/helm)                                  |
+|                        |                   | [GMC](./kubernetes/gmc)                                           |
 
 ## Validated Configurations
 

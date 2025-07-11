@@ -22,12 +22,12 @@ First of all, you need to build Docker Images locally. This step can be ignored 
 
 Please refer the table below to build different microservices from source:
 
-| Microservice | Deployment Guide                                                                                               |
-| ------------ | -------------------------------------------------------------------------------------------------------------- |
-| MegaService  | [Build MegaService Docker Image](../../../../README_miscellaneous.md#build-megaservice-docker-image)           |
-| LVM and NGINX| [Build LVM and NGINX Docker Images](../../../../README_miscellaneous.md#build-lvm-and-nginx-docker-images)     |
-| vLLM or TGI  | [Build vLLM or Pull TGI Gaudi Image](../../../../README_miscellaneous.md#build-vllm-or-pull-tgi-gaudi-image)   |
-| UI           | [Basic UI build guide](../../../../README_miscellaneous.md#build-ui-docker-image)                              |
+| Microservice  | Deployment Guide                                                                                             |
+| ------------- | ------------------------------------------------------------------------------------------------------------ |
+| MegaService   | [Build MegaService Docker Image](../../../../README_miscellaneous.md#build-megaservice-docker-image)         |
+| LVM and NGINX | [Build LVM and NGINX Docker Images](../../../../README_miscellaneous.md#build-lvm-and-nginx-docker-images)   |
+| vLLM or TGI   | [Build vLLM or Pull TGI Gaudi Image](../../../../README_miscellaneous.md#build-vllm-or-pull-tgi-gaudi-image) |
+| UI            | [Basic UI build guide](../../../../README_miscellaneous.md#build-ui-docker-image)                            |
 
 Then run the command `docker images`, you will have the following 5 Docker Images:
 
