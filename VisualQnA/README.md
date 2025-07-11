@@ -11,9 +11,9 @@ Some noteworthy use case examples for VQA include:
 
 ## Table of Contents
 
-1. [Architecture](architecture)
-2. [Deployment Options](deployment-options)
-3. [Validated Configurations](validated-configurations)
+1. [Architecture](#architecture)
+2. [Deployment Options](#deployment-options)
+3. [Validated Configurations](#validated-configurations)
 
 ## Architecture
 
