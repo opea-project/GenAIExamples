@@ -5,13 +5,13 @@ import argparse
 import json
 import os
 import time
-from typing import Any, Tuple, Callable
+from dataclasses import dataclass
+from typing import Any, Callable, Tuple
 
 import requests
-from requests.exceptions import RequestException
 from datasets import load_dataset
 from litellm import completion
-from dataclasses import dataclass
+from requests.exceptions import RequestException
 
 
 @dataclass
@@ -311,10 +311,7 @@ def main():
         print(f"Limited to {len(questions)} questions")
 
     results, details = run_benchmark(
-        questions,
-        agent_service=args.service_url,
-        model_id=args.model,
-        llm_service=args.llm_endpoint
+        questions, agent_service=args.service_url, model_id=args.model, llm_service=args.llm_endpoint
     )
 
     print(f"Completed benchmark with {results} accuracy")
