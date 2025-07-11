@@ -9,7 +9,6 @@ This README provides instructions for deploying the Finance Agent application us
 - [Validate Services](#validate-services)
 - [Accessing the User Interface (UI)](#accessing-the-user-interface-ui)
 
-
 ## Prerequisites
 
 - Docker and Docker Compose installed.
