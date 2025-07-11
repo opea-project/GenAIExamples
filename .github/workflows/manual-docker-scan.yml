@@ -79,6 +79,7 @@ jobs:
           output: ${{ matrix.image }}-trivy-scan.txt
           format: 'table'
           exit-code: '1'
+          ignorefile: ".trivyignore"
           ignore-unfixed: true
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
