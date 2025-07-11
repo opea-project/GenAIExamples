@@ -11,8 +11,9 @@ Some noteworthy use case examples for VQA include:
 
 ## Table of Contents
 
-1. [Architecture](#architecture)
-2. [Deployment Options](#deployment-options)
+1. [Architecture](architecture)
+2. [Deployment Options](deployment-options)
+3. [Validated Configurations](validated-configurations)
 
 
 ## Architecture
@@ -91,3 +92,13 @@ The table below lists currently available deployment options. They outline in de
 |                        |                      | [VisualQnA deployment on AMD ROCm](./docker_compose/amd/gpu/rocm) |
 |                        | Kubernetes           | [Helm Charts](./kubernetes/helm)                                  |
 |                        |                      | [GMC](./kubernetes/gmc)                                           |
+
+## Validated Configurations
+
+| **Deploy Method** | **LLM Engine** | **LLM Model**                     | **Hardware** |
+| ----------------- | -------------- | --------------------------------- | ------------ |
+| Docker Compose    | TGI, vLLM      | llava-hf/llava-v1.6-mistral-7b-hf | Intel Xeon   |
+| Docker Compose    | TGI, vLLM      | llava-hf/llava-1.5-7b-hf          | Intel Gaudi  |
+| Docker Compose    | TGI, vLLM      | Xkev/Llama-3.2V-11B-cot           | AMD ROCm     |
+| Helm Charts       | TGI, vLLM      | llava-hf/llava-v1.6-mistral-7b-hf | Intel Gaudi  |
+| Helm Charts       | TGI, vLLM      | llava-hf/llava-v1.6-mistral-7b-hf | Intel Xeon   |
