@@ -1,13 +1,20 @@
+#!/bin/bash
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-pushd "../../../../../" > /dev/null
+SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
+
+pushd "$SCRIPT_DIR/../../../../../" > /dev/null
 source .set_env.sh
 popd > /dev/null
 
 if [[ -z "${WORKDIR}" ]]; then
-	echo "Please set WORKDIR environment variable"
-	exit 0
+    echo "INFO: WORKDIR is not set. Calculating it automatically."
+    SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
+    export WORKDIR=$(cd "$SCRIPT_DIR/../../../../../../" && pwd)
+    echo "INFO: WORKDIR has been set to: ${WORKDIR}"
+else
+    echo "INFO: WORKDIR is already set to: ${WORKDIR}"
 fi
 echo "WORKDIR=${WORKDIR}"
 export TOOLSET_PATH=$WORKDIR/GenAIExamples/AgentQnA/tools/
@@ -33,7 +40,7 @@ fi
 # retriever
 export host_ip=$(hostname -I | awk '{print $1}')
 export HF_CACHE_DIR=${HF_CACHE_DIR}
-export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+export HF_TOKEN=${HF_TOKEN}
 export no_proxy=${no_proxy}
 export http_proxy=${http_proxy}
 export https_proxy=${https_proxy}

@@ -1,4 +1,4 @@
-
+#!/bin/bashs
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
@@ -10,36 +10,20 @@ echo "TAG=IMAGE_TAG=${IMAGE_TAG}"
 export REGISTRY=${IMAGE_REPO}
 export TAG=${IMAGE_TAG}
 export MODEL_CACHE=${model_cache:-"./data"}
-export REDIS_DB_PORT=6379
-export REDIS_INSIGHTS_PORT=8001
-export REDIS_RETRIEVER_PORT=7000
-export EMBEDDER_PORT=6000
-export TEI_EMBEDDER_PORT=8090
-export DATAPREP_REDIS_PORT=6007
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
-
-export http_proxy=${http_proxy}
-export https_proxy=${https_proxy}
-export no_proxy=${no_proxy},${ip_address}
-
+source $WORKPATH/docker_compose/intel/set_env.sh
 function build_docker_images() {
     opea_branch=${opea_branch:-"main"}
-    # If the opea_branch isn't main, replace the git clone branch in Dockerfile.
-    if [[ "${opea_branch}" != "main" ]]; then
-        cd $WORKPATH
-        OLD_STRING="RUN git clone --depth 1 https://github.com/opea-project/GenAIComps.git"
-        NEW_STRING="RUN git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git"
-        find . -type f -name "Dockerfile*" | while read -r file; do
-            echo "Processing file: $file"
-            sed -i "s|$OLD_STRING|$NEW_STRING|g" "$file"
-        done
-    fi
 
     cd $WORKPATH/docker_image_build
     git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
+    pushd GenAIComps
+    echo "GenAIComps test commit is $(git rev-parse HEAD)"
+    docker build --no-cache -t ${REGISTRY}/comps-base:${TAG} --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
+    popd && sleep 1s
 
     # Download Gaudi vllm of latest tag
     git clone https://github.com/HabanaAI/vllm-fork.git && cd vllm-fork
@@ -55,35 +39,13 @@ function build_docker_images() {
 }
 
 function start_services() {
-    local compose_profile="$1"
+    local compose_file="$1"
     local llm_container_name="$2"
 
     cd $WORKPATH/docker_compose/intel/hpu/gaudi
 
-    export LLM_MODEL_ID="Qwen/Qwen2.5-Coder-7B-Instruct"
-    export LLM_ENDPOINT="http://${ip_address}:8028"
-    export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
-    export MEGA_SERVICE_PORT=7778
-    export MEGA_SERVICE_HOST_IP=${ip_address}
-    export LLM_SERVICE_HOST_IP=${ip_address}
-    export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:${MEGA_SERVICE_PORT}/v1/codegen"
-    export NUM_CARDS=1
-    export host_ip=${ip_address}
-
-    export REDIS_URL="redis://${host_ip}:${REDIS_DB_PORT}"
-    export RETRIEVAL_SERVICE_HOST_IP=${host_ip}
-    export RETRIEVER_COMPONENT_NAME="OPEA_RETRIEVER_REDIS"
-    export INDEX_NAME="CodeGen"
-
-    export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
-    export TEI_EMBEDDING_HOST_IP=${host_ip}
-    export TEI_EMBEDDING_ENDPOINT="http://${host_ip}:${TEI_EMBEDDER_PORT}"
-    export DATAPREP_ENDPOINT="http://${host_ip}:${DATAPREP_REDIS_PORT}/v1/dataprep"
-
-    export INDEX_NAME="CodeGen"
-
     # Start Docker Containers
-    docker compose --profile ${compose_profile} up -d | tee ${LOG_PATH}/start_services_with_compose.log
+    docker compose -f ${compose_file} up -d | tee ${LOG_PATH}/start_services_with_compose.log
 
     n=0
     until [[ "$n" -ge 100 ]]; do
@@ -181,6 +143,13 @@ function validate_megaservice() {
         "codegen-gaudi-backend-server" \
         '{ "index_name": "test_redis", "agents_flag": "True", "messages": "def print_hello_world():", "max_tokens": 256}'
 
+    validate_services \
+        "${ip_address}:7778/v1/codegen" \
+        "class" \
+        "mega-codegen" \
+        "codegen-xeon-backend-server" \
+        '{"model": "Qwen/Qwen2.5-Coder-7B-Instruct", "messages": [{"role": "user", "content": "Implement a basic Python class"}], "max_tokens":32}'
+
 }
 
 function validate_frontend() {
@@ -224,50 +193,62 @@ function validate_gradio() {
 }
 
 function stop_docker() {
-    local docker_profile="$1"
+    local compose_file="$1"
 
     cd $WORKPATH/docker_compose/intel/hpu/gaudi
-    docker compose --profile ${docker_profile} down
+    docker compose -f ${compose_file} down
 }
 
 function main() {
-    # all docker docker compose profiles for XEON Platform
-    docker_compose_profiles=("codegen-gaudi-vllm" "codegen-gaudi-tgi")
+    # all docker docker compose compose files for XEON Platform
+    docker_compose_files=("compose.yaml" "compose_tgi.yaml")
     docker_llm_container_names=("vllm-gaudi-server" "tgi-gaudi-server")
 
-    # get number of profiels and container
-    len_profiles=${#docker_compose_profiles[@]}
+    # get number of compose files and container
+    len_compose_files=${#docker_compose_files[@]}
     len_containers=${#docker_llm_container_names[@]}
 
-    # number of profiels and docker container names must be matched
-    if [ ${len_profiles} -ne ${len_containers} ]; then
-        echo "Error: number of profiles ${len_profiles} and container names ${len_containers} mismatched"
+    # number of compose files and docker container names must be matched
+    if [ ${len_compose_files} -ne ${len_containers} ]; then
+        echo "Error: number of docker compose files ${len_compose_files} and container names ${len_containers} mismatched"
         exit 1
     fi
 
-    # stop_docker, stop all profiles
-    for ((i = 0; i < len_profiles; i++)); do
-        stop_docker "${docker_compose_profiles[${i}]}"
+    # stop_docker, stop all compose files
+    for ((i = 0; i < len_compose_files; i++)); do
+        stop_docker "${docker_compose_files[${i}]}"
     done
 
-    # build docker images
+    echo "::group::build_docker_images"
     if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
+    echo "::endgroup::"
 
-    # loop all profiles
-    for ((i = 0; i < len_profiles; i++)); do
-        echo "Process [${i}]: ${docker_compose_profiles[$i]}, ${docker_llm_container_names[${i}]}"
-        start_services "${docker_compose_profiles[${i}]}" "${docker_llm_container_names[${i}]}"
+    # loop all compose files
+    for ((i = 0; i < len_compose_files; i++)); do
+        echo "Process [${i}]: ${docker_compose_files[$i]}, ${docker_llm_container_names[${i}]}"
+
+        echo "::group::start_services"
+        start_services "${docker_compose_files[${i}]}" "${docker_llm_container_names[${i}]}"
+        echo "::endgroup::"
         docker ps -a
 
+        echo "::group::validate_microservices"
         validate_microservices "${docker_llm_container_names[${i}]}"
-        validate_megaservice
-        validate_gradio
+        echo "::endgroup::"
 
-        stop_docker "${docker_compose_profiles[${i}]}"
+        echo "::group::validate_megaservice"
+        validate_megaservice
+        echo "::endgroup::"
+
+        echo "::group::validate_gradio"
+        validate_gradio
+        echo "::endgroup::"
+
+        stop_docker "${docker_compose_files[${i}]}"
         sleep 5s
     done
 
-    echo y | docker system prune
+    docker system prune -f
 }
 
 main

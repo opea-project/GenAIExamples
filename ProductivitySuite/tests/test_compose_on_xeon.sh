@@ -16,45 +16,27 @@ LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
 
 function build_docker_images() {
+    opea_branch=${opea_branch:-"main"}
     cd $WORKPATH/docker_image_build
-    git clone --depth 1 --branch ${opea_branch:-"main"} https://github.com/opea-project/GenAIComps.git
+    git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
+    pushd GenAIComps
+    echo "GenAIComps test commit is $(git rev-parse HEAD)"
+    docker build --no-cache -t ${REGISTRY}/comps-base:${TAG} --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
+    popd && sleep 1s
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
     docker compose -f build.yaml build --no-cache > ${LOG_PATH}/docker_image_build.log
 
-    docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.6
-    docker pull ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu
     docker images && sleep 1s
 }
 
 function start_services() {
     cd $WORKPATH/docker_compose/intel/cpu/xeon/
-
-    export DB_NAME="opea"
-    export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
-    export RERANK_MODEL_ID="BAAI/bge-reranker-base"
-    export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
-    export LLM_MODEL_ID_CODEGEN="Intel/neural-chat-7b-v3-3"
-    export INDEX_NAME="rag-redis"
-    export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
-    export BACKEND_SERVICE_ENDPOINT_CHATQNA="http://${ip_address}:8888/v1/chatqna"
-    export DATAPREP_DELETE_FILE_ENDPOINT="http://${ip_address}:6007/v1/dataprep/delete"
-    export BACKEND_SERVICE_ENDPOINT_CODEGEN="http://${ip_address}:7778/v1/codegen"
-    export BACKEND_SERVICE_ENDPOINT_DOCSUM="http://${ip_address}:8890/v1/docsum"
-    export DATAPREP_SERVICE_ENDPOINT="http://${ip_address}:6007/v1/dataprep/ingest"
-    export DATAPREP_GET_FILE_ENDPOINT="http://${ip_address}:6007/v1/dataprep/get"
-    export CHAT_HISTORY_CREATE_ENDPOINT="http://${ip_address}:6012/v1/chathistory/create"
-    export CHAT_HISTORY_CREATE_ENDPOINT="http://${ip_address}:6012/v1/chathistory/create"
-    export CHAT_HISTORY_DELETE_ENDPOINT="http://${ip_address}:6012/v1/chathistory/delete"
-    export CHAT_HISTORY_GET_ENDPOINT="http://${ip_address}:6012/v1/chathistory/get"
-    export PROMPT_SERVICE_GET_ENDPOINT="http://${ip_address}:6018/v1/prompt/get"
-    export PROMPT_SERVICE_CREATE_ENDPOINT="http://${ip_address}:6018/v1/prompt/create"
-    export PROMPT_SERVICE_DELETE_ENDPOINT="http://${ip_address}:6018/v1/prompt/delete"
-    export KEYCLOAK_SERVICE_ENDPOINT="http://${ip_address}:8080"
-    export DocSum_COMPONENT_NAME="OpeaDocSumTgi"
     export host_ip=${ip_address}
     export LOGFLAG=True
     export no_proxy="$no_proxy,tgi_service_codegen,llm_codegen,tei-embedding-service,tei-reranking-service,chatqna-xeon-backend-server,retriever,tgi-service,redis-vector-db,whisper,llm-docsum-tgi,docsum-xeon-backend-server,mongo,codegen"
+
+    source set_env.sh
 
     # Start Docker Containers
     docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
@@ -62,7 +44,7 @@ function start_services() {
 
     n=0
     until [[ "$n" -ge 100 ]]; do
-        docker logs tgi_service_codegen > ${LOG_PATH}/tgi_service_codegen_start.log
+        docker logs tgi_service_codegen > ${LOG_PATH}/tgi_service_codegen_start.log 2>&1
         if grep -q Connected ${LOG_PATH}/tgi_service_codegen_start.log; then
             echo "CodeGen TGI Service Connected"
             break
@@ -281,23 +263,31 @@ function stop_docker() {
 
 function main() {
 
+    echo "::group::stop_docker"
     stop_docker
+    echo "::endgroup::"
+
+    echo "::group::build_docker_images"
     if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
-    start_time=$(date +%s)
+    echo "::endgroup::"
+
+    echo "::group::start_services"
     start_services
-    end_time=$(date +%s)
-    duration=$((end_time-start_time))
-    echo "Mega service start duration is $duration s" && sleep 1s
+    echo "::endgroup::"
 
+    echo "::group::validate_microservices"
     validate_microservices
-    echo "==== microservices validated ===="
-    validate_megaservice
-    echo "==== megaservices validated ===="
-    validate_frontend
-    echo "==== frontend validated ===="
+    echo "::endgroup::"
 
+    echo "::group::validate_frontend"
+    validate_frontend
+    echo "::endgroup::"
+
+    echo "::group::stop_docker"
     stop_docker
-    echo y | docker system prune
+    echo "::endgroup::"
+
+    docker system prune -f
 
 }
 

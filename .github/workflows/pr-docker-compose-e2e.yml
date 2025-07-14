@@ -3,6 +3,9 @@
 
 name: E2E test with docker compose
 
+permissions:
+  contents: read
+
 on:
   pull_request_target:
     branches: ["main", "*rc"]
@@ -12,7 +15,7 @@ on:
       - "**.py"
       - "**/docker_compose/**"
       - "**/docker_image_build/**"
-      - "**/tests/test_compose**"
+      - "**/tests/**"
       - "**/ui/**"
       - "!**.md"
       - "!**.txt"
@@ -25,12 +28,34 @@ concurrency:
 
 jobs:
   get-test-matrix:
+    permissions:
+      actions: read
+      contents: read
+      checks: read
+      deployments: read
+      issues: read
+      packages: read
+      pages: read
+      pull-requests: read
+      statuses: read
+      security-events: read
     if: ${{ !github.event.pull_request.draft }}
     uses: ./.github/workflows/_get-test-matrix.yml
     with:
       diff_excluded_files: '\.github|\.md|\.txt|kubernetes|gmc|assets|benchmark'
 
   example-test:
+    permissions:
+      actions: read
+      contents: read
+      checks: write
+      deployments: write
+      issues: write
+      packages: write
+      pages: write
+      pull-requests: write
+      statuses: write
+      security-events: read
     needs: [get-test-matrix]
     if: ${{ needs.get-test-matrix.outputs.run_matrix != '' }}
     strategy:

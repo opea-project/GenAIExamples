@@ -16,50 +16,24 @@ LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
 
 function build_docker_images() {
+    opea_branch=${opea_branch:-"main"}
     cd $WORKPATH/docker_image_build
-    git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
+    git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
+    pushd GenAIComps
+    echo "GenAIComps test commit is $(git rev-parse HEAD)"
+    docker build --no-cache -t ${REGISTRY}/comps-base:${TAG} --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
+    popd && sleep 1s
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="searchqna searchqna-ui embedding web-retriever reranking llm-textgen"
+    service_list="searchqna searchqna-ui embedding web-retriever reranking llm-textgen nginx"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
-    docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.6
-    docker pull ghcr.io/huggingface/text-generation-inference:2.4.1-rocm
     docker images && sleep 1s
 }
 
 function start_services() {
     cd $WORKPATH/docker_compose/amd/gpu/rocm/
-
-    export HOST_IP=${ip_address}
-    export EXTERNAL_HOST_IP=${ip_address}
-
-    export SEARCH_EMBEDDING_MODEL_ID='BAAI/bge-base-en-v1.5'
-    export SEARCH_GOOGLE_API_KEY=${GOOGLE_API_KEY}
-    export SEARCH_GOOGLE_CSE_ID=${GOOGLE_CSE_ID}
-    export SEARCH_HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
-    export SEARCH_LLM_MODEL_ID='Intel/neural-chat-7b-v3-3'
-    export SEARCH_RERANK_MODEL_ID='BAAI/bge-reranker-base'
-
-    export SEARCH_BACKEND_SERVICE_PORT=3008
-    export SEARCH_EMBEDDING_SERVICE_PORT=3002
-    export SEARCH_FRONTEND_SERVICE_PORT=5173
-    export SEARCH_LLM_SERVICE_PORT=3007
-    export SEARCH_RERANK_SERVICE_PORT=3005
-    export SEARCH_TEI_EMBEDDING_PORT=3001
-    export SEARCH_TEI_RERANKING_PORT=3004
-    export SEARCH_TGI_SERVICE_PORT=3006
-    export SEARCH_WEB_RETRIEVER_SERVICE_PORT=3003
-
-    export SEARCH_BACKEND_SERVICE_ENDPOINT=http://${EXTERNAL_HOST_IP}:${SEARCH_BACKEND_SERVICE_PORT}/v1/searchqna
-    export SEARCH_EMBEDDING_SERVICE_HOST_IP=${HOST_IP}
-    export SEARCH_LLM_SERVICE_HOST_IP=${HOST_IP}
-    export SEARCH_MEGA_SERVICE_HOST_IP=${HOST_IP}
-    export SEARCH_RERANK_SERVICE_HOST_IP=${HOST_IP}
-    export SEARCH_TEI_EMBEDDING_ENDPOINT=http://${HOST_IP}:${SEARCH_TEI_EMBEDDING_PORT}
-    export SEARCH_TEI_RERANKING_ENDPOINT=http://${HOST_IP}:${SEARCH_TEI_RERANKING_PORT}
-    export SEARCH_TGI_LLM_ENDPOINT=http://${HOST_IP}:${SEARCH_TGI_SERVICE_PORT}
-    export SEARCH_WEB_RETRIEVER_SERVICE_HOST_IP=${HOST_IP}
+    source ./set_env.sh
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
@@ -67,7 +41,7 @@ function start_services() {
     docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
     n=0
     until [[ "$n" -ge 100 ]]; do
-        docker logs search-tgi-service > $LOG_PATH/search-tgi-service_start.log
+        docker logs search-tgi-service > $LOG_PATH/search-tgi-service_start.log 2>&1
         if grep -q Connected $LOG_PATH/search-tgi-service_start.log; then
             break
         fi
@@ -130,15 +104,31 @@ function stop_docker() {
 
 function main() {
 
+    echo "::group::stop_docker"
     stop_docker
+    echo "::endgroup::"
+
+    echo "::group::build_docker_images"
     if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
+    echo "::endgroup::"
+
+    echo "::group::start_services"
     start_services
+    echo "::endgroup::"
 
+    echo "::group::validate_megaservice"
     validate_megaservice
-    validate_frontend
+    echo "::endgroup::"
 
+    echo "::group::validate_frontend"
+    validate_frontend
+    echo "::endgroup::"
+
+    echo "::group::stop_docker"
     stop_docker
-    echo y | docker system prune
+    echo "::endgroup::"
+
+    docker system prune -f
 
 }
 

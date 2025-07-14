@@ -1,0 +1,203 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  neo4j-apoc:
+    image: neo4j:latest
+    container_name: neo4j-apoc
+    volumes:
+        - /$HOME/neo4j/logs:/logs
+        - /$HOME/neo4j/config:/config
+        - /$HOME/neo4j/data:/data
+        - /$HOME/neo4j/plugins:/plugins
+    ipc: host
+    environment:
+      - NEO4J_AUTH=${NEO4J_USERNAME}/${NEO4J_PASSWORD}
+      - NEO4J_PLUGINS=["apoc"]
+      - NEO4J_apoc_export_file_enabled=true
+      - NEO4J_apoc_import_file_enabled=true
+      - NEO4J_apoc_import_file_use__neo4j__config=true
+      - NEO4J_dbms_security_procedures_unrestricted=apoc.\*
+    ports:
+      - "${NEO4J_PORT1:-7474}:7474"
+      - "${NEO4J_PORT2:-7687}:7687"
+    restart: always
+
+  tei-embedding-service:
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.7
+    container_name: tei-embedding-server
+    ports:
+      - "6006:80"
+    volumes:
+      - "./data:/data"
+    shm_size: 1g
+    environment:
+      no_proxy: ${no_proxy}
+      NO_PROXY: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      HF_TOKEN: ${HF_TOKEN}
+    ipc: host
+    command: --model-id ${EMBEDDING_MODEL_ID} --auto-truncate
+
+  dataprep-neo4j-llamaindex:
+    image: ${REGISTRY:-opea}/dataprep:${TAG:-latest}
+    container_name: dataprep-neo4j-server
+    depends_on:
+      - neo4j-apoc
+      - vllm-service
+      - tei-embedding-service
+    ports:
+      - "6004:5000"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      host_ip: ${host_ip}
+      DATAPREP_COMPONENT_NAME: "OPEA_DATAPREP_NEO4J_LLAMAINDEX"
+      HF_TOKEN: ${HF_TOKEN}
+      NEO4J_URL: ${NEO4J_URL}
+      NEO4J_USERNAME: ${NEO4J_USERNAME}
+      NEO4J_PASSWORD: ${NEO4J_PASSWORD}
+      TGI_LLM_ENDPOINT: ${DATAPREP_LLM_ENDPOINT}
+      TGI_LLM_ENDPOINT_KEY: ${DATAPREP_LLM_ENDPOINT_KEY}
+      LLM_MODEL_ID: ${DATAPREP_LLM_MODEL_ID}
+      TEI_EMBEDDING_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      OPENAI_EMBEDDING_MODEL: ${OPENAI_EMBEDDING_MODEL}
+      OPENAI_LLM_MODEL: ${OPENAI_LLM_MODEL}
+      EMBEDDING_MODEL_ID: ${EMBEDDING_MODEL_ID}
+      LOGFLAG: ${LOGFLAG}
+    restart: unless-stopped
+
+  retriever-neo4j-llamaindex:
+    image: ${REGISTRY:-opea}/retriever:${TAG:-latest}
+    container_name: retriever-neo4j-server
+    ports:
+      - "7000:7000"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      host_ip: ${host_ip}
+      HF_TOKEN: ${HF_TOKEN}
+      LOGFLAG: ${LOGFLAG}
+      RETRIEVER_COMPONENT_NAME: "OPEA_RETRIEVER_NEO4J"
+      # Embedding endpoint
+      TEI_EMBEDDING_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
+      EMBEDDING_MODEL_ID: ${EMBEDDING_MODEL_ID}
+      # Retriever LLM
+      TGI_LLM_ENDPOINT: ${RETRIEVER_LLM_ENDPOINT}
+      TGI_LLM_ENDPOINT_KEY: ${RETRIEVER_LLM_ENDPOINT_KEY}
+      LLM_MODEL_ID: ${RETRIEVER_LLM_MODEL_ID} # This is used for graph indexing and different from vLLM model ID.
+
+      # Only used if using OpenAI models
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      OPENAI_LLM_MODEL: ${OPENAI_LLM_MODEL}
+      OPENAI_EMBEDDING_MODEL: ${OPENAI_EMBEDDING_MODEL}
+      VDMS_USE_CLIP: 0
+      NEO4J_URL: ${NEO4J_URL}
+      NEO4J_URI: ${NEO4J_URI}
+      NEO4J_USERNAME: ${NEO4J_USERNAME}
+      NEO4J_PASSWORD: ${NEO4J_PASSWORD}
+    depends_on:
+      - neo4j-apoc
+      - vllm-service
+      - tei-embedding-service
+    restart: unless-stopped
+
+  # vllm-service is used by the final LLM to summarize retriever results in the backend.
+  vllm-service:
+    image: ${REGISTRY:-opea}/vllm-cpu:${TAG:-latest} # must build add to README.
+    container_name: vllm-service
+    ports:
+      - "9009:80" # this can be accessed by graphrag-xeon-backend-server on internal port 80.
+    ipc: host
+    volumes:
+      - "${MODEL_CACHE:-./data}:/root/.cache/huggingface/hub"
+    shm_size: 128g
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      HF_TOKEN: ${HF_TOKEN}
+      LLM_MODEL_ID: ${FINAL_LLM_MODEL_ID}
+      VLLM_TORCH_PROFILER_DIR: "/mnt"
+      # Laptop environment variables
+      VLLM_USE_CPU: 1
+      VLLM_CPU_OMP_THREADS_BIND: all
+      VLLM_CPU_KVCACHE_SPACE: 4
+      VLLM_MLA_DISABLE: 1
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://$host_ip:9009/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 100
+    command: --model $LLM_MODEL_ID --host 0.0.0.0 --port 80 --block-size ${BLOCK_SIZE:-16} # for Qwen on laptop set to 16
+
+  graphrag-xeon-backend-server:
+    image: ${REGISTRY:-opea}/graphrag:${TAG:-latest}
+    container_name: graphrag-xeon-backend-server
+    depends_on:
+      - neo4j-apoc
+      - tei-embedding-service
+      - retriever-neo4j-llamaindex
+      - vllm-service
+    ports:
+      - "8888:8888"
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - MEGA_SERVICE_HOST_IP=graphrag-xeon-backend-server
+      - RETRIEVER_SERVICE_HOST_IP=retriever-neo4j-llamaindex
+      - RETRIEVER_SERVICE_PORT=7000
+      - LLM_SERVER_HOST_IP=vllm-service # this is the final LLM server that will be used by the backend.
+      - LLM_SERVER_PORT=80
+      - LLM_MODEL_ID=${FINAL_LLM_MODEL_ID} # backend will format the input and provide model to vLLM
+      - LOGFLAG=${LOGFLAG}
+    ipc: host
+    restart: always
+
+  graphrag-ui-server:
+    image: ${REGISTRY:-opea}/graphrag-ui:${TAG:-latest}
+    container_name: graphrag-ui-server
+    depends_on:
+      - graphrag-xeon-backend-server
+    ports:
+      - "5173:5173"
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - LLM_MODEL_ID=${FINAL_LLM_MODEL_ID} # this is the LLM model ID for payload request
+    ipc: host
+    restart: always
+
+  graphrag-xeon-nginx-server:
+    image: ${REGISTRY:-opea}/nginx:${TAG:-latest}
+    container_name: graphrag-xeon-nginx-server
+    depends_on:
+      - graphrag-xeon-backend-server
+      - graphrag-ui-server
+    ports:
+      - "${NGINX_PORT:-80}:80"
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      #  Note should use all internal container ports since its on a docker network.
+      - FRONTEND_SERVICE_IP=graphrag-ui-server
+      - FRONTEND_SERVICE_PORT=5173
+      - BACKEND_SERVICE_NAME=graphrag
+      - BACKEND_SERVICE_IP=graphrag-xeon-backend-server
+      - BACKEND_SERVICE_PORT=8888
+      - DATAPREP_SERVICE_IP=dataprep-neo4j-llamaindex
+      - DATAPREP_SERVICE_PORT=5000
+    ipc: host
+    restart: always
+networks:
+  default:
+    driver: bridge

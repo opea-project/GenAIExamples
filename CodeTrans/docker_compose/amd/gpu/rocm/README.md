@@ -31,10 +31,10 @@ git clone https://github.com/opea-project/GenAIExamples.git
 cd GenAIExamples/CodeTrans
 ```
 
-Then checkout a released version, such as v1.2:
+Then checkout a released version, such as v1.3:
 
 ```bash
-git checkout v1.2
+git checkout v1.3
 ```
 
 ### Configure the Deployment Environment
@@ -62,7 +62,7 @@ Set the values of the variables:
 Setting variables in the operating system environment:
 
 ```bash
-export HUGGINGFACEHUB_API_TOKEN="Your_HuggingFace_API_Token"
+export HF_TOKEN="Your_HuggingFace_API_Token"
 source ./set_env_*.sh # replace the script name with the appropriate one
 ```
 
