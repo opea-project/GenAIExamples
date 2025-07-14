@@ -20,12 +20,15 @@ concurrency:
 
 jobs:
   one-click-test:
+    strategy:
+      matrix:
+        deploy_method: ["docker", "k8s"]
+      fail-fast: false
     uses: ./.github/workflows/_run-one-click.yml
     with:
       registry: "opea"
       tag: "ci"
       example: ChatQnA
       hardware: gaudi
-      test_helmchart: true
-      test_compose: true
+      deploy_method: ${ matrix.deploy_method }
     secrets: inherit
