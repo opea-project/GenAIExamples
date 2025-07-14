@@ -9,7 +9,7 @@ const DBConnect: React.FC = () => {
   const [formData, setFormData] = useState({
     user: 'postgres',
     database: 'chinook',
-    host: '10.223.24.113',
+    host: '127.0.0.1',
     password: 'testpwd',
     port: '5442',
   });
@@ -42,7 +42,8 @@ const DBConnect: React.FC = () => {
     e.preventDefault();
     try {
       let api_response: Record<string, any>;
-      api_response = await axios.post(`${TEXT_TO_SQL_URL}/postgres/health`, formData);
+      let unifiedConnData = {"conn_str":formData};
+      api_response = await axios.post(`${TEXT_TO_SQL_URL}/postgres/health`, unifiedConnData);
 
       setSqlStatus(null);
       setSqlError(null);
