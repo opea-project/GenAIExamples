@@ -75,11 +75,10 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.ACTION_TOKEN }}
         run: |
-          pr_count=$(curl -H "Authorization: token ${{ secrets.ACTION_TOKEN }}" -s "https://api.github.com/repos/${{ github.repository }}/pulls?state=all&head=${{ env.USER_NAME }}:${{ env.BRANCH_NAME }}_${{ matrix.repo }}" | jq '. | length')
-          if [ $pr_count -gt 0 ]; then
+          pr_url="$(gh pr list --head "${{ env.BRANCH_NAME }}_${{ matrix.repo }}" --state open --json url --jq .[].url)"
+          if [[ -n "${pr_url}" ]]; then
             echo "Pull Request exists"
-            pr_number=$(curl -H "Authorization: token ${{ secrets.ACTION_TOKEN }}" -s "https://api.github.com/repos/${{ github.repository }}/pulls?state=all&head=${{ env.USER_NAME }}:${{ env.BRANCH_NAME }}_${{ matrix.repo }}" | jq '.[0].number')
-            gh pr edit ${pr_number} \
+            gh pr edit ${pr_url} \
               --title "Update ${{ matrix.repo }} version to ${latest_vllm_ver}" \
               --body "Update ${{ matrix.repo }} version to ${latest_vllm_ver}"
             echo "Pull Request updated successfully"
