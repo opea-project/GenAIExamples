@@ -37,7 +37,6 @@ jobs:
           git fetch origin ${{ github.base_ref }}
           merged_commit=$(git log -1 --format='%H')
           files=$(git diff --name-status --diff-filter=ARM ${{ github.event.pull_request.base.sha }} ${merged_commit} | awk '{print $2}' | grep -E 'Dockerfile$' || true)
-          echo "changed_files=$files"
           echo "files<<EOF" >> $GITHUB_OUTPUT
           echo "$files" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
@@ -46,21 +45,25 @@ jobs:
         if: steps.changed-dockerfiles.outputs.files != ''
         run: |
           cd ${{github.workspace}}
+          merged_commit=$(git log -1 --format='%H')
           set -e
           while read -r dockerfile; do
             [ -z "$dockerfile" ] && continue
             dir=$(dirname "$dockerfile")
+            file=$(basename "$dockerfile")
             image_base="pr-image-size-base:$(echo $dir | tr '/' '-')"
             image_pr="pr-image-size-pr:$(echo $dir | tr '/' '-')"
             cd $dir
             echo "Building base image for $dockerfile"
-            git checkout origin/${{ github.base_ref }} -- "$dockerfile"
-            docker build -f "$dockerfile" -t "$image_base" --no-cache .
+            git checkout origin/${{ github.base_ref }}
+            docker build -f "$file" -t "$image_base" --no-cache .
+            cat $file
             size_base=$(docker image inspect "$image_base" | jq '.[0].Size / (1024 * 1024) | round')
 
             echo "Building PR image for $dockerfile"
-            git checkout -- "$dockerfile" # restore PR version
-            docker build -f "$dockerfile" -t "$image_pr" --no-cache .
+            git checkout $merged_commit
+            docker build -f "$file" -t "$image_pr" --no-cache .
+            cat $file
             size_pr=$(docker image inspect "$image_pr" | jq '.[0].Size / (1024 * 1024) | round')
 
             diff=$((size_pr - size_base))
