@@ -1,10 +1,8 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 name: Check Docker Image Size Change
-
 permissions:
   contents: read
-  pull-requests: write
 
 on:
   pull_request:
@@ -21,6 +19,9 @@ concurrency:
 jobs:
   check-image-size:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
     steps:
       - name: Checkout PR branch
         uses: actions/checkout@v4
