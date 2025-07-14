@@ -37,6 +37,7 @@ jobs:
           git fetch origin ${{ github.base_ref }}
           merged_commit=$(git log -1 --format='%H')
           files=$(git diff --name-status --diff-filter=ARM ${{ github.event.pull_request.base.sha }} ${merged_commit} | awk '{print $2}' | grep -E 'Dockerfile$' || true)
+          echo "changed_files=$files"
           echo "files<<EOF" >> $GITHUB_OUTPUT
           echo "$files" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
