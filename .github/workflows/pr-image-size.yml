@@ -43,9 +43,8 @@ jobs:
       - name: Build and check image sizes
         if: steps.changed-dockerfiles.outputs.files != ''
         run: |
-          set -e
+          set -x
           merged_commit=$(git log -1 --format='%H')
-          echo "### Images size variations" >> $GITHUB_STEP_SUMMARY
           while IFS= read -r -d '' dockerfile; do
             [ -z "$dockerfile" ] && continue
             dir=$(dirname "$dockerfile")
@@ -73,7 +72,22 @@ jobs:
             size_pr=$(docker image inspect "$image_pr" | jq '.[0].Size / (1024 * 1024) | round')
 
             diff=$((size_pr - size_base))
-            echo "::warning::Image size change: $size_base -> $size_pr MB' (diff: $diff MB)"
-            echo "File $dockerfile resulted in a change in the image size from $size_base -> $size_pr MB" >> $GITHUB_STEP_SUMMARY
+            # echo "::warning::Image size change: $size_base -> $size_pr MB' (diff: $diff MB)"
+            echo "comment to ${{ github.event.pull_request.number }}"
+            if [ "$diff" -gt 50 ]; then
+              curl -X POST \
+              -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+              -H "Accept: application/vnd.github.v3+json" \
+              "https://api.github.com/repos/opea-project/GenAIExamples/issues/${{ github.event.pull_request.number }}/comments" \
+              -d '{"body":"⚠️ File '"$dockerfile"' resulted in a change in the image size from '"$size_base"' -> '"$size_pr"' MB"}'
+            else
+              curl -X POST \
+              -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+              -H "Accept: application/vnd.github.v3+json" \
+              "https://api.github.com/repos/opea-project/GenAIExamples/issues/${{ github.event.pull_request.number }}/comments" \
+              -d '{"body":"File '"$dockerfile"' resulted in a change in the image size from '"$size_base"' -> '"$size_pr"' MB"}'
+            fi
+            
+            # echo "File $dockerfile resulted in a change in the image size from $size_base -> $size_pr MB" >> $GITHUB_STEP_SUMMARY
             docker rmi "$image_base" "$image_pr"
           done < <(echo "${{ steps.changed-dockerfiles.outputs.files }}" | tr '\n' '\0')
