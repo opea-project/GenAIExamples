@@ -37,22 +37,23 @@ jobs:
           merged_commit=$(git log -1 --format='%H')
           files=$(git diff --name-status --diff-filter=ARM ${{ github.event.pull_request.base.sha }} ${merged_commit} | awk '{print $2}' | grep -E 'Dockerfile$' || true)
           echo "files<<EOF" >> $GITHUB_OUTPUT
-          echo "$files" >> $GITHUB_OUTPUT
+          echo "$files" | tr '\0' '\n' >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Build and check image sizes
         if: steps.changed-dockerfiles.outputs.files != ''
         run: |
-          cd ${{github.workspace}}
-          merged_commit=$(git log -1 --format='%H')
           set -e
-          while read -r dockerfile; do
+          merged_commit=$(git log -1 --format='%H')
+          echo "### Images size variations" >> $GITHUB_STEP_SUMMARY
+          while IFS= read -r -d '' dockerfile; do
             [ -z "$dockerfile" ] && continue
             dir=$(dirname "$dockerfile")
             file=$(basename "$dockerfile")
             image_base="pr-image-size-base:$(echo $dir | tr '/' '-')"
             image_pr="pr-image-size-pr:$(echo $dir | tr '/' '-')"
-            cd $dir
+            cd ${{github.workspace}}/$dir
+
             echo "Building base image for $dockerfile"
             echo "Base: ${{ github.event.pull_request.base.sha }}"
             git checkout ${{ github.event.pull_request.base.sha }}
@@ -72,7 +73,7 @@ jobs:
             size_pr=$(docker image inspect "$image_pr" | jq '.[0].Size / (1024 * 1024) | round')
 
             diff=$((size_pr - size_base))
-            echo "::warning::Image size change: $size_base -> $size_pr MB}' (diff: $diff MB)"
-            echo "File $dockerfile resulted in a change in the image size from $size_base -> $size_pr MB" >> GITHUB_STEP_SUMMARY
+            echo "::warning::Image size change: $size_base -> $size_pr MB' (diff: $diff MB)"
+            echo "File $dockerfile resulted in a change in the image size from $size_base -> $size_pr MB" >> $GITHUB_STEP_SUMMARY
             docker rmi "$image_base" "$image_pr"
-          done <<< "${{ steps.changed-dockerfiles.outputs.files }}"
+          done < <(echo "${{ steps.changed-dockerfiles.outputs.files }}" | tr '\n' '\0')
