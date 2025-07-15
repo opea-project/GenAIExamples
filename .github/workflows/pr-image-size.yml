@@ -34,7 +34,6 @@ jobs:
       - name: Get changed Dockerfiles
         id: changed-dockerfiles
         run: |
-          git fetch origin ${{ github.base_ref }}
           merged_commit=$(git log -1 --format='%H')
           files=$(git diff --name-status --diff-filter=ARM ${{ github.event.pull_request.base.sha }} ${merged_commit} | awk '{print $2}' | grep -E 'Dockerfile$' || true)
           echo "files<<EOF" >> $GITHUB_OUTPUT
@@ -55,18 +54,25 @@ jobs:
             image_pr="pr-image-size-pr:$(echo $dir | tr '/' '-')"
             cd $dir
             echo "Building base image for $dockerfile"
-            git checkout origin/${{ github.base_ref }}
+            echo "Base: ${{ github.event.pull_request.base.sha }}"
+            git checkout ${{ github.event.pull_request.base.sha }}
+            echo "::group::Build image_base"
             docker build -f "$file" -t "$image_base" --no-cache .
+            echo "::endgroup::"
             cat $file
             size_base=$(docker image inspect "$image_base" | jq '.[0].Size / (1024 * 1024) | round')
 
             echo "Building PR image for $dockerfile"
             git checkout $merged_commit
+            echo "PR: $merged_commit"
+            echo "::group::Build image_pr"
             docker build -f "$file" -t "$image_pr" --no-cache .
+            echo "::endgroup::"
             cat $file
             size_pr=$(docker image inspect "$image_pr" | jq '.[0].Size / (1024 * 1024) | round')
 
             diff=$((size_pr - size_base))
-            echo "::notice file=$dockerfile::Image size change: $size_base -> $size_pr MB}' (diff: $diff MB)"
+            echo "::warning::Image size change: $size_base -> $size_pr MB}' (diff: $diff MB)"
+            echo "File $dockerfile resulted in a change in the image size from $size_base -> $size_pr MB" >> GITHUB_STEP_SUMMARY
             docker rmi "$image_base" "$image_pr"
           done <<< "${{ steps.changed-dockerfiles.outputs.files }}"

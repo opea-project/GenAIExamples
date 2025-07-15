@@ -4,9 +4,12 @@
 ARG IMAGE_REPO=opea
 ARG BASE_TAG=latest
 FROM $IMAGE_REPO/comps-base:$BASE_TAG
-RUN apt-get update && apt-get install -y --no-install-recommends --fix-missing \
-    git
-RUN git clone https://github.com/opea-project/GenAIExamples
+USER root
+# FFmpeg needed for media processing
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends ffmpeg && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
+USER user
 COPY ./searchqna.py $HOME/searchqna.py
 
 ENTRYPOINT ["python", "searchqna.py"]
