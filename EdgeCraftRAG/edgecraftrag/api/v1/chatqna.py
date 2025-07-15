@@ -7,7 +7,7 @@ from comps.cores.proto.api_protocol import ChatCompletionRequest
 from edgecraftrag.api_schema import RagOut
 from edgecraftrag.context import ctx
 from edgecraftrag.utils import serialize_contexts, set_current_session
-from fastapi import Body, FastAPI, File, HTTPException, UploadFile, status
+from fastapi import FastAPI, File, HTTPException, UploadFile, status, Body
 from fastapi.responses import StreamingResponse
 
 chatqna_app = FastAPI()
@@ -73,9 +73,9 @@ def check_vllm(request_data: dict = Body(...)):
         server = request_data.get("server_address", "http://localhost:8086")
         model = request_data.get("model_name", "Qwen/Qwen3-8B")
         url = f"{server}/v1/completions"
-        payload = {"model": model, "prompt": "Hi", "max_tokens": 16, "temperature": 0}
-
-        response = requests.post(url, json=payload, timeout=60)
+        payload = {"model": model,"prompt": "Hi","max_tokens": 16,"temperature": 0}
+       
+        response = requests.post(url,json=payload,timeout=60)
         if response.status_code == 200:
             return {"status": "200"}
         else:

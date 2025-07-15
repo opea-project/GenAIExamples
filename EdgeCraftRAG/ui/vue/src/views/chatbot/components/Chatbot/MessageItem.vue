@@ -16,7 +16,7 @@
             <span class="drop"></span>
           </div>
 
-          <div class="think-container" v-if="isThinkMode">
+          <div class="think-container" v-if="isThinkMode || isThinkEnd">
             <div
               :class="{
                 'think-title': true,
@@ -40,21 +40,19 @@
                 />
               </div>
             </div>
-            <transition-group tag="div" name="think-transition">
-              <div class="think-msg-wrap" v-show="isCollapsed">
-                <div class="state-wrap">
-                  <div v-if="isThinkEnd" class="completed-icon">
-                    <CheckCircleFilled />
-                  </div>
-                  <div v-else class="state-icon"></div>
+            <div class="think-msg-wrap" v-show="isCollapsed">
+              <div class="state-wrap">
+                <div v-if="isThinkEnd" class="completed-icon">
+                  <CheckCircleFilled />
                 </div>
-                <div
-                  class="think-message"
-                  v-html="thinkMarkdown"
-                  ref="thinkElement"
-                ></div>
+                <div v-else class="state-icon"></div>
               </div>
-            </transition-group>
+              <div
+                class="think-message"
+                v-html="thinkMarkdown"
+                ref="thinkElement"
+              ></div>
+            </div>
           </div>
           <div v-html="renderedMarkdown"></div>
         </div>
@@ -130,27 +128,41 @@ marked.setOptions({
   breaks: false,
   renderer: CustomRenderer,
 });
+const thinkTagRegexSpecial = /^[\s\S]*?<\/think>/;
 const thinkTagRegex = /<think>([\s\S]*?)<\/think>/;
-const isThinkMode = computed(() => props.message.content.includes("</think>"));
+
+const isThinkMode = computed(() => props.message.content.includes("<think>"));
 const isThinkEnd = computed(() => props.message.content.includes("</think>"));
 const getThinkMode = () => {
   const { content } = props.message;
   const endIndex = content.indexOf("</think>");
   return computed(() => {
-    return isThinkEnd.value
-      ? content.substring(0, endIndex)
-      : isThinkMode.value
+    return isThinkMode.value
       ? content
+      : isThinkEnd.value
+      ? content.substring(0, endIndex)
       : "";
   });
 };
+
 const thinkMarkdown = computed(() => {
   return marked(getThinkMode().value);
 });
+
 const renderedMarkdown = computed(() => {
-  return !isThinkMode.value || isThinkEnd.value
-    ? marked(props.message.content.replace(thinkTagRegex, ""))
-    : "";
+  const content = props.message?.content || "";
+  if (!content) return "";
+  if (isThinkMode.value && !isThinkEnd.value) {
+    return "";
+  }
+  if (isThinkEnd.value) {
+    const cleanedContent = isThinkMode.value
+      ? content.replace(thinkTagRegex, "")
+      : content.replace(thinkTagRegexSpecial, "");
+    return marked(cleanedContent);
+  }
+
+  return marked(content);
 });
 const toggleTabs = () => {
   isExpanded.value = !isExpanded.value;

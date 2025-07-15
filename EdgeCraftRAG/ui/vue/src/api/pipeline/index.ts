@@ -107,4 +107,6 @@ export const requestUrlVllm = (data: Object) => {
   });
 };
 
-export const importUrl = `${import.meta.env.VITE_API_URL}v1/settings/pipelines/import`;
+export const importUrl = `${
+  import.meta.env.VITE_API_URL
+}v1/settings/pipelines/import`;

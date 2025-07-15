@@ -18,7 +18,7 @@ events {
     worker_connections  1024;
 }
 http {
-
+ 
     upstream multi-arc-serving-container {
 EOL
 
@@ -35,7 +35,7 @@ cat <<EOL >> $2
     default_type  application/octet-stream;
     client_max_body_size 50M;
     sendfile on;
-
+ 
     keepalive_timeout  65;
     keepalive_requests 1000;
     server {
@@ -57,7 +57,7 @@ cat <<EOL >> $2
             proxy_http_version 1.1;
             proxy_set_header Connection "";
         }
-
+        
         location ~ /\. {
             deny all;
         }

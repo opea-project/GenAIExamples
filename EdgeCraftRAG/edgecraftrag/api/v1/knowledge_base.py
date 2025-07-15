@@ -1,14 +1,15 @@
 # Copyright (C) 2025 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-import json
-import os
 import re
+import os
+import json
 
 from edgecraftrag.api.v1.data import add_data
 from edgecraftrag.api_schema import DataIn, KnowledgeBaseCreateIn
 from edgecraftrag.base import IndexerType
 from edgecraftrag.context import ctx
+from edgecraftrag.utils  import compare_mappings
 from fastapi import FastAPI, HTTPException, status
 from pymilvus.exceptions import MilvusException
 
@@ -36,15 +37,13 @@ async def get_knowledge_base(knowledge_name: str):
 async def create_knowledge_base(knowledge: KnowledgeBaseCreateIn):
     try:
         active_pl = ctx.get_pipeline_mgr().get_active_pipeline()
-        if not re.match(r"^[a-zA-Z_][a-zA-Z0-9_]*$", knowledge.name):
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Knowledge base names must begin with a letter or an underscore and contain only letters, numbers, and underscores",
-            )
+        if not re.match(r'^[a-zA-Z_][a-zA-Z0-9_]*$', knowledge.name):
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail="Knowledge base names must begin with a letter or underscore")
         kb = ctx.knowledgemgr.create_knowledge_base(knowledge)
         if active_pl.indexer.comp_subtype == "milvus_vector" and kb.active:
-            active_pl.indexer.reinitialize_indexer(kb.name)
-            active_pl.update_indexer_to_retriever()
+                    active_pl.indexer.reinitialize_indexer(kb.name)
+                    active_pl.update_indexer_to_retriever()
         await save_knowledge_to_file()
         return "Create knowledge base successfully"
     except Exception as e:
@@ -55,17 +54,18 @@ async def create_knowledge_base(knowledge: KnowledgeBaseCreateIn):
 @kb_app.delete(path="/v1/knowledge/{knowledge_name}")
 async def delete_knowledge_base(knowledge_name: str):
     try:
+        rm_kb =ctx.knowledgemgr.get_knowledge_base_by_name_or_id(knowledge_name)
         active_kb = ctx.knowledgemgr.get_active_knowledge_base()
         active_pl = ctx.get_pipeline_mgr().get_active_pipeline()
         if active_kb.name == knowledge_name or active_kb.idx == knowledge_name:
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Cannot delete a running knowledge base."
-            )
-        if active_pl.indexer.comp_subtype == "milvus_vector":
-            await remove_file_handler([], knowledge_name)
-        if active_kb:
-            active_pl.indexer.reinitialize_indexer(active_kb.name)
-            active_pl.update_indexer_to_retriever()
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Cannot delete a running knowledge base.")
+        kb_file_path = rm_kb.get_file_paths()
+        if kb_file_path:
+            if active_pl.indexer.comp_subtype == "milvus_vector":
+                    await remove_file_handler([],knowledge_name)
+            if active_kb:
+                active_pl.indexer.reinitialize_indexer(active_kb.name)
+                active_pl.update_indexer_to_retriever()
         result = ctx.knowledgemgr.delete_knowledge_base(knowledge_name)
         await save_knowledge_to_file()
         return result
@@ -80,21 +80,17 @@ async def update_knowledge_base(knowledge: KnowledgeBaseCreateIn):
         kb = ctx.knowledgemgr.get_knowledge_base_by_name_or_id(knowledge.name)
         active_pl = ctx.get_pipeline_mgr().get_active_pipeline()
         if active_pl.indexer.comp_subtype != "milvus_vector":
-            if knowledge.active and knowledge.active != kb.active:
-                file_paths = kb.get_file_paths()
+            if knowledge.active  and knowledge.active != kb.active:
+                file_paths = kb.get_file_paths()  
                 await update_knowledge_base_handler(file_paths, knowledge.name)
-            elif not knowledge.active:
-                raise HTTPException(
-                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Must have an active knowledge base"
-                )
+            elif not knowledge.active:  
+                raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Must have an acitive knowledge base")
         else:
-            if knowledge.active and knowledge.active != kb.active:
+            if knowledge.active  and knowledge.active != kb.active:
                 active_pl.indexer.reinitialize_indexer(knowledge.name)
                 active_pl.update_indexer_to_retriever()
-            elif not knowledge.active:
-                raise HTTPException(
-                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Must have an active knowledge base"
-                )
+            elif not knowledge.active:  
+                raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Must have an acitive knowledge base")
         result = ctx.knowledgemgr.update_knowledge_base(knowledge)
         await save_knowledge_to_file()
         return result
@@ -137,7 +133,7 @@ async def add_file_to_knowledge_base(knowledge_name, file_path: DataIn):
                 await update_knowledge_base_handler(kb_file_path, knowledge_name)
                 active_pl.indexer.reinitialize_indexer(active_kb.name)
                 active_pl.update_indexer_to_retriever()
-        else:
+        else:  
             if active_kb:
                 if active_kb.name == knowledge_name or active_kb.idx == knowledge_name:
                     await update_knowledge_base_handler(file_path, knowledge_name, add_file=True)
@@ -175,7 +171,7 @@ async def remove_file_from_knowledge_base(knowledge_name, file_path: DataIn):
                 active_pl.update_indexer_to_retriever()
         elif active_kb:
             if active_kb.name == knowledge_name or active_kb.idx == knowledge_name:
-                await update_knowledge_base_handler(kb_file_path, knowledge_name)
+                await update_knowledge_base_handler(kb_file_path,knowledge_name)
         await save_knowledge_to_file()
         return "File deleted successfully"
     except ValueError as e:
@@ -200,7 +196,7 @@ async def update_knowledge_base_handler(file_path=None, knowledge_name: str = "d
                     request = DataIn(local_path=file)
                     await add_data(request)
         except MilvusException as e:
-            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)) 
         return "Done"
 
 
@@ -215,7 +211,7 @@ async def remove_file_handler(file_path=None, knowledge_name: str = "default_kb"
         pl.indexer.clear_milvus_collection(knowledge_name)
         pl.indexer.reinitialize_indexer(knowledge_name)
     except MilvusException as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)) 
     pl.update_indexer_to_retriever()
     if file_path:
         for file in file_path:
@@ -240,9 +236,7 @@ async def load_knowledge_from_file():
                 if Knowledgebase_data["file_map"]:
                     if active_pl.indexer.comp_subtype != "milvus_vector" and Knowledgebase_data["active"]:
                         for file_path in Knowledgebase_data["file_map"].values():
-                            await update_knowledge_base_handler(
-                                DataIn(local_path=file_path), Knowledgebase_data["name"], add_file=True
-                            )
+                            await update_knowledge_base_handler(DataIn(local_path=file_path), Knowledgebase_data["name"], add_file=True)
                             kb.add_file_path(file_path)
                     elif Knowledgebase_data["active"]:
                         active_pl.indexer.reinitialize_indexer(Knowledgebase_data["name"])
@@ -262,14 +256,67 @@ async def save_knowledge_to_file():
     KNOWLEDGEBASE_FILE = os.path.join(CONFIG_DIR, "knowledgebase.json")
     if not os.path.exists(CONFIG_DIR):
         os.makedirs(CONFIG_DIR, exist_ok=True)
-    try:
+    try: 
         kb_base = ctx.knowledgemgr.get_all_knowledge_bases()
         knowledgebases_data = []
         for kb in kb_base:
-            kb_json = {"name": kb.name, "description": kb.description, "active": kb.active, "file_map": kb.file_map}
+            kb_json= {"name": kb.name,"description":kb.description, "active": kb.active,"file_map": kb.file_map}
             knowledgebases_data.append(kb_json)
         json_str = json.dumps(knowledgebases_data, indent=2)
         with open(KNOWLEDGEBASE_FILE, "w") as f:
             f.write(json_str)
     except Exception as e:
         print(f"Error saving Knowledge base: {e}")
+
+
+old_milvus_map = {}
+async def refresh_milvus_map():
+    old_milvus_map.clear()
+    kb_list = await get_all_knowledge_bases()
+    for kb in kb_list:
+        old_milvus_map[kb.name] = kb.file_map
+
+
+async def Synchronizing_vector_data(old_active_pl, new_active_pl):
+    try:
+        active_kb = ctx.knowledgemgr.get_active_knowledge_base()
+        active_pl = ctx.get_pipeline_mgr().get_active_pipeline()
+        if not active_kb or not active_pl:
+            return True
+        if new_active_pl.indexer.comp_subtype == "milvus_vector":
+            new_milvus_map = {}
+            kb_list = await get_all_knowledge_bases()
+            for kb in kb_list:
+                new_milvus_map[kb.name] = kb.file_map
+            added_files, deleted_files = compare_mappings(new_milvus_map, old_milvus_map)
+            #Synchronization of deleted files
+            for kb_name,file_paths in deleted_files.items():
+                if file_paths:
+                    new_active_pl.indexer.clear_milvus_collection(kb_name)
+                    if kb_name not in new_milvus_map.keys():
+                        continue
+                    kb = await get_knowledge_base(kb_name)
+                    new_active_pl.indexer.reinitialize_indexer(kb)
+                    if file_paths:
+                        for file in file_paths:
+                                await add_data(DataIn(local_path=file))
+            #Synchronization of added files
+            for kb_name,file_paths in added_files.items():
+                if file_paths:
+                    for file_path in file_paths.values():
+                        new_active_pl.indexer.reinitialize_indexer(kb_name)
+                        await add_data(DataIn(local_path=file_path))
+
+            new_active_pl.indexer.reinitialize_indexer(active_kb.name)
+            new_active_pl.update_indexer_to_retriever()
+        else:
+                new_active_pl.indexer.reinitialize_indexer()
+                new_active_pl.update_indexer_to_retriever()
+                add_list = active_kb.get_file_paths()
+                for file in add_list:
+                    await add_data(DataIn(local_path=file))
+                if old_active_pl.indexer.comp_subtype == "milvus_vector":
+                    await refresh_milvus_map()
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Synchronization error")
+        
