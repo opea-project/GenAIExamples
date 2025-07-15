@@ -2,7 +2,7 @@
 
 ## Query Search
 
-Query Search features allow EC-RAG to do query pre-process before retrieval and reranking. To enable query search, vllm inference is required. Chinese version is available in [Query Search Zh](docs/Query_Search_Zh.md)
+Query Search features allow EC-RAG to do query pre-process before retrieval and reranking. To enable query search, vllm inference is required. Chinese version is available in [Query Search Zh](Query_Search_Zh.md)
 
 ### 1. Sub-question file(s) example
 
