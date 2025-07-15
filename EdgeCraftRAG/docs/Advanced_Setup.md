@@ -25,7 +25,7 @@ All sub-question files need to be placed under `${TMPFILE_PATH}/configs/search_d
 
 Configure file includes variables such as prompts, temperature, etc. 
 
-`instruction`, `input_template`, `output_template` would affect final prompt for query seach. 
+`instruction`, `input_template`, `output_template` would affect final prompt for query search. 
 `json_key` and `json_levels` are related to each other. For example, if `json_key` is set to "similarity", `json_levels` need list options for "similarity", such as "Low, Medium, High".
 
 One example for DeesSeep-R1-Distill-Qwen-32B configs is listed below:
