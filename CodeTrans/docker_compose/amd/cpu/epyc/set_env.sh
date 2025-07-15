@@ -2,6 +2,7 @@
 # Copyright (C) 2025 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+export host_ip=$(hostname -I | awk '{print $1}')
 export LLM_MODEL_ID="mistralai/Mistral-7B-Instruct-v0.3"
 export LLM_ENDPOINT="http://${host_ip}:8008"
 export LLM_COMPONENT_NAME="OpeaTextGenService"
@@ -18,3 +19,4 @@ export FRONTEND_SERVICE_PORT=5173
 export BACKEND_SERVICE_NAME=codetrans
 export BACKEND_SERVICE_IP=${host_ip}
 export BACKEND_SERVICE_PORT=7777
+export NGINX_PORT=${NGINX_PORT:-80}
