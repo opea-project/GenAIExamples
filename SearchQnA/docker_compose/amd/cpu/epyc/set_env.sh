@@ -4,6 +4,7 @@
 # Copyright (C) 2025 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+export host_ip=$(hostname -I | awk '{print $1}')
 export HUGGINGFACEHUB_API_TOKEN=$HUGGINGFACEHUB_API_TOKEN
 export EMBEDDING_MODEL_ID=BAAI/bge-base-en-v1.5
 export TEI_EMBEDDING_ENDPOINT=http://${host_ip}:3001

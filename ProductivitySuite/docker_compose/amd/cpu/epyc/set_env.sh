@@ -2,6 +2,7 @@
 # Copyright (C) 2025 Advanced Micro Devices, Inc.
 # SPDX-License-Identifier: Apache-2.0
 
+export host_ip=$(hostname -I | awk '{print $1}')
 export DB_NAME="opea"
 export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
 export RERANK_MODEL_ID="BAAI/bge-reranker-base"

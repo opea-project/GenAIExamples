@@ -1,4 +1,4 @@
-# ProductivitySuite E2E test scripts
+# Text2Image E2E test scripts
 
 ## Set the required environment variable
 
@@ -9,13 +9,7 @@ export HUGGINGFACEHUB_API_TOKEN=${HF_TOKEN}
 
 ## Run test
 
-On Intel Xeon with TGI:
-
-```bash
-bash test_compose_on_xeon.sh
-```
-
-On AMD EPYC with TGI:
+On AMD EPYC:
 
 ```bash
 bash test_compose_on_epyc.sh

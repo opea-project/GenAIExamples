@@ -4,7 +4,8 @@
 # Copyright (C) 2025 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-export host_ip=${host_ip}
+# export host_ip=<your External Public IP>
+export host_ip=$(hostname -I | awk '{print $1}')
 export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
 if [ -z "${HUGGINGFACEHUB_API_TOKEN}" ]; then
     echo "Error: HUGGINGFACEHUB_API_TOKEN is not set. Please set HUGGINGFACEHUB_API_TOKEN"
