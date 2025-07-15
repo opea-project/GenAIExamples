@@ -63,7 +63,7 @@ function start_services() {
 function validate_megaservice() {
     sleep 120s
     response=$(http_proxy="" curl --max-time 60 http://${ip_address}:3008/v1/audioqna -XPOST -d '{"audio": "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA", "max_tokens":64}' -H 'Content-Type: application/json')
-    
+
     if ! echo "$response" | sed 's/^"//;s/"$//' | base64 -d > speech.mp3 2>/dev/null || ! file speech.mp3 | grep -q "RIFF"; then
         echo "Retrying..."
         sleep 120s

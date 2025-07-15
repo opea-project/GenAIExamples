@@ -82,7 +82,7 @@ cd docker_compose/amd/cpu/epyc
          export NGINX_PORT=${your_nginx_port}          # your usable port for nginx, 80 for example
          ```
 
-    To set other environment varibales:
+    To set other environment variables:
 
          source set_env.sh
 
