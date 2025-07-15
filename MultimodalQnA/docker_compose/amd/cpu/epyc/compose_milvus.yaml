@@ -124,7 +124,7 @@ services:
         "--device",
         "cpu",
         "--model_name_or_path",
-        $EMBEDDING_MODEL_ID,
+        "$EMBEDDING_MODEL_ID",
       ]
     restart: unless-stopped
 

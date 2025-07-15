@@ -178,6 +178,7 @@ Use `curl` commands to test the main service endpoints. Ensure `host_ip` is corr
       -H "Content-Type: application/json" \
       -d '{"messages": "Write a Python function that adds two numbers."}'
     ```
+
     - **Expected Output:** A stream of JSON data chunks containing generated code, ending with `data: [DONE]`.
 
 ## Accessing the User Interface (UI)
