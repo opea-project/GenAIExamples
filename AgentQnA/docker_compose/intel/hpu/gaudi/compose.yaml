@@ -10,6 +10,9 @@ services:
     ports:
       - "9095:9095"
     ipc: host
+    depends_on:
+      vllm-service:
+        condition: service_healthy
     environment:
       ip_address: ${ip_address}
       strategy: rag_agent_llama
@@ -41,6 +44,9 @@ services:
     ports:
       - "9096:9096"
     ipc: host
+    depends_on:
+      vllm-service:
+        condition: service_healthy
     environment:
       ip_address: ${ip_address}
       strategy: sql_agent_llama
@@ -66,8 +72,12 @@ services:
     image: ${REGISTRY:-opea}/agent:${TAG:-latest}
     container_name: react-agent-endpoint
     depends_on:
-      - worker-rag-agent
-      - worker-sql-agent
+      worker-rag-agent:
+        condition: service_started
+      worker-sql-agent:
+        condition: service_started
+      vllm-service:
+        condition: service_healthy
     volumes:
       - ${TOOLSET_PATH:-../../../../tools}:/home/user/tools/
     ports:
@@ -106,11 +116,17 @@ services:
   agent-ui:
     image: ${REGISTRY:-opea}/agent-ui:${TAG:-latest}
     container_name: agent-ui
-    environment:
-      host_ip: ${host_ip}
     ports:
       - "5173:8080"
     ipc: host
+    environment:
+      host_ip: ${host_ip}
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      OPENAI_API_KEYS: "empty"
+      OPENAI_API_BASE_URLS: ${SUPERVISOR_AGENT_ENDPOINT}
+      ENABLE_OLLAMA_API: False
   vllm-service:
     image: ${REGISTRY:-opea}/vllm-gaudi:${TAG:-latest}
     container_name: vllm-gaudi-server
