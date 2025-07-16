@@ -87,7 +87,7 @@ jobs:
               "https://api.github.com/repos/opea-project/GenAIExamples/issues/${{ github.event.pull_request.number }}/comments" \
               -d '{"body":"File '"$dockerfile"' resulted in a change in the image size from '"$size_base"' -> '"$size_pr"' MB"}'
             fi
-            
+
             # echo "File $dockerfile resulted in a change in the image size from $size_base -> $size_pr MB" >> $GITHUB_STEP_SUMMARY
             docker rmi "$image_base" "$image_pr"
           done < <(echo "${{ steps.changed-dockerfiles.outputs.files }}" | tr '\n' '\0')
