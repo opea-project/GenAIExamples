@@ -183,6 +183,7 @@ To set up environment variables for deploying MultimodalQnA services, follow the
 
    When using Xeon or Gaudi, set environment variables by sourcing the [`docker_compose/intel/set_env.sh`](./docker_compose/intel/set_env.sh) script.
    For Xeon only, update `LVM_MODEL_ID` to use LLaVA 1.5 7b.
+
    ```bash
    # Set env vars for Xeon or Gaudi
    cd docker_compose/intel
