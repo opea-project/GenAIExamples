@@ -43,7 +43,7 @@ jobs:
       - name: Build and check image sizes
         if: steps.changed-dockerfiles.outputs.files != ''
         run: |
-          set -x
+          set -e
           merged_commit=$(git log -1 --format='%H')
           while IFS= read -r -d '' dockerfile; do
             [ -z "$dockerfile" ] && continue
@@ -59,7 +59,7 @@ jobs:
             echo "::group::Build image_base"
             docker build -f "$file" -t "$image_base" --no-cache .
             echo "::endgroup::"
-            cat $file
+
             size_base=$(docker image inspect "$image_base" | jq '.[0].Size / (1024 * 1024) | round')
 
             echo "Building PR image for $dockerfile"
@@ -68,7 +68,7 @@ jobs:
             echo "::group::Build image_pr"
             docker build -f "$file" -t "$image_pr" --no-cache .
             echo "::endgroup::"
-            cat $file
+
             size_pr=$(docker image inspect "$image_pr" | jq '.[0].Size / (1024 * 1024) | round')
 
             diff=$((size_pr - size_base))

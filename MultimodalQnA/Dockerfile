@@ -4,12 +4,7 @@
 ARG IMAGE_REPO=opea
 ARG BASE_TAG=latest
 FROM $IMAGE_REPO/comps-base:$BASE_TAG
-USER root
-# FFmpeg needed for media processing
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends ffmpeg && \
-    apt-get clean && rm -rf /var/lib/apt/lists/*
-USER user
+
 COPY ./multimodalqna.py $HOME/multimodalqna.py
 
 ENTRYPOINT ["python", "multimodalqna.py"]
