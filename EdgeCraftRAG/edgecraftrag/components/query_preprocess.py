@@ -151,6 +151,12 @@ def read_json_files(directory: str) -> dict:
 
 
 async def query_search(user_input, search_config_path, search_dir, pl):
+
+    top1_issue = None
+    sub_questionss_result = None
+    if not os.path.exists(search_dir):
+        return top1_issue, sub_questionss_result 
+    
     model_id = pl.generator.model_id
     vllm_endpoint = pl.generator.vllm_endpoint
 
@@ -160,14 +166,9 @@ async def query_search(user_input, search_config_path, search_dir, pl):
     query_matcher = LogitsEstimatorJSON(**cfg.query_matcher)
     maintenance_data = read_json_files(search_dir)
     issues = list(maintenance_data.keys())
-
-    top1_issue = None
-    sub_questionss_result = None
-    if not os.path.exists(search_dir):
-        return top1_issue, sub_questionss_result 
     if not issues:
         return top1_issue, sub_questionss_result
-
+    
     semaphore = asyncio.Semaphore(200)
     async def limited_compute_score(query_matcher, user_input, issue):
         async with semaphore:
