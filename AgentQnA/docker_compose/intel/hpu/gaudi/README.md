@@ -110,10 +110,10 @@ docker compose -f $WORKDIR/GenAIExamples/DocIndexRetriever/docker_compose/intel/
 
 Please refer to the table below to build different microservices from source:
 
-| Microservice | Deployment Guide        |
-| ------------ | --------------- |
+| Microservice | Deployment Guide                                                                                                                                 |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Agent        | [Agent build guide](https://github.com/opea-project/GenAIComps/blob/main/comps/agent/src/README.md#21-build-docker-image-for-agent-microservice) |
-| UI           | [Basic UI build guide](../../../../README_miscellaneous.md#build-ui-docker-image)     |
+| UI           | [Basic UI build guide](../../../../README_miscellaneous.md#build-ui-docker-image)                                                                |
 
 ### Ingest Data into the Vector Database
 

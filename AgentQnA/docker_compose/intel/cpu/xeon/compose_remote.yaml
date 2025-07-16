@@ -48,4 +48,3 @@ services:
     environment:
       llm_engine: vllm
       llm_endpoint_url: ${LLM_ENDPOINT_URL}
-
