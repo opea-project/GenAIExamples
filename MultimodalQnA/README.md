@@ -181,16 +181,15 @@ To set up environment variables for deploying MultimodalQnA services, follow the
 
 3. Set up other environment variables:
 
-   > Choose **one** command below to set env vars according to your hardware. Otherwise, the port numbers may be set incorrectly.
-
+   When using Xeon or Gaudi, set environment variables by sourcing the [`docker_compose/intel/set_env.sh`](./docker_compose/intel/set_env.sh) script.
+   For Xeon only, update `LVM_MODEL_ID` to use LLaVA 1.5 7b.
    ```bash
-   # on Gaudi
-   cd docker_compose/intel/hpu/gaudi
+   # Set env vars for Xeon or Gaudi
+   cd docker_compose/intel
    source ./set_env.sh
 
-   # on Xeon
-   cd docker_compose/intel/cpu/xeon
-   source ./set_env.sh
+   # For Xeon, update the model environment variable
+   export LVM_MODEL_ID="llava-hf/llava-1.5-7b-hf"
    ```
 
 ### Deploy MultimodalQnA on Gaudi
@@ -201,7 +200,7 @@ source, otherwise images will be pulled from Docker Hub.
 Find the corresponding [compose.yaml](./docker_compose/intel/hpu/gaudi/compose.yaml).
 
 ```bash
-# While still in the docker_compose/intel/hpu/gaudi directory, use docker compose to bring up the services
+cd hpu/gaudi
 docker compose -f compose.yaml up -d
 ```
 
@@ -215,11 +214,11 @@ source, otherwise images will be pulled from Docker Hub.
 Find the corresponding [compose.yaml](./docker_compose/intel/cpu/xeon/compose.yaml).
 
 ```bash
-# While still in the docker_compose/intel/cpu/xeon directory, use docker compose to bring up the services
+cd cpu/xeon
 docker compose -f compose.yaml up -d
 ```
 
-## MultimodalQnA Demo on Gaudi2
+## MultimodalQnA Demo on Gaudi
 
 ### Multimodal QnA UI
 
@@ -269,6 +268,6 @@ docker compose -f compose.yaml up -d
 
 | **Deploy Method** | **LLM Engine** | **LLM Model**                     | **Database**  | **Hardware** |
 | ----------------- | -------------- | --------------------------------- | ------------- | ------------ |
-| Docker Compose    | LLAVA          | llava-hf/llava-v1.6-vicuna-13b-hf | Milvus, Redis | Intel Xeon   |
+| Docker Compose    | LLAVA          | llava-hf/llava-1.5-7b-hf          | Milvus, Redis | Intel Xeon   |
 | Docker Compose    | LLAVA          | llava-hf/llava-v1.6-vicuna-13b-hf | Redis         | Intel Gaudi  |
 | Docker Compose    | TGI, vLLM      | Xkev/Llama-3.2V-11B-cot           | Redis         | AMD ROCm     |
