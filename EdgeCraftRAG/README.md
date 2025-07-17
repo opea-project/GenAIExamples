@@ -11,7 +11,7 @@ quality and performance.
 - Support EC-RAG service recovery after restart
 - Add query search in EC-RAG pipeline to improve RAG quality
 - Support Qwen3-8B as the default LLM for EC-RAG
-- Improve container scaling logic to run multi Intel Arc GPUs inference
+- Enable chat history round setting for Users
 
 ## Quick Start Guide
 
