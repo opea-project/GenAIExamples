@@ -56,7 +56,7 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Build and check image sizes
-        id: build-and-check
+        id: build-check
         env:
           dockerfile: ${{ matrix.dockerfile }}
         run: |
@@ -125,7 +125,8 @@ jobs:
       - name: Collect all comment messages
         id: collect
         run: |
-          comments=$(echo '${{ toJson(needs.build-and-check.outputs) }}' | jq -r 'to_entries[] | select(.value != null and .value != "") | .value' | sed ':a;N;$!ba;s/\n/\\n/g')
+          echo "raw outputs: ${{ toJson(needs.build-check.comment_message) }}"
+          comments=$(echo '${{ toJson(needs.build-check.comment_message) }}' | jq -r 'to_entries[] | select(.value != null and .value != "") | .value' | sed ':a;N;$!ba;s/\n/\\n/g')
           echo "all_comments=$comments"
           echo "all_comments=$comments" >> $GITHUB_OUTPUT
 
