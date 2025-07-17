@@ -95,44 +95,122 @@
         <FormTooltip :title="t('pipeline.desc.weights')" />
       </a-form-item>
     </template>
+    <template v-else>
+      <a-form-item
+        :label="$t('pipeline.config.language')"
+        name="modelName"
+        :rules="rules.modelName"
+      >
+        <a-input
+          v-model:value.trim="form.modelName"
+          :placeholder="$t('pipeline.valid.modelName')"
+        >
+        </a-input>
+        <FormTooltip :title="$t('pipeline.desc.language')" />
+      </a-form-item>
+      <a-form-item
+        :label="$t('pipeline.config.vllm_url')"
+        name="vllm_endpoint"
+        :rules="rules.vllm_endpoint"
+      >
+        <a-input
+          v-model:value="form.vllm_endpoint"
+          :addon-before="protocol"
+          :placeholder="$t('pipeline.valid.vllm_url')"
+          @change="handleUrlChange"
+        >
+          <template #addonAfter>
+            <a-button
+              type="primary"
+              class="text-btn"
+              :disabled="!isPass"
+              @click="handleTestUrl"
+            >
+              <CheckCircleFilled
+                v-if="validatePass"
+                :style="{ color: 'var(--color-success)', fontSize: '18px' }"
+              />
+              <span v-else> {{ $t("pipeline.desc.test") }}</span>
+            </a-button>
+          </template>
+        </a-input>
+        <FormTooltip :title="$t('pipeline.desc.vllm_url')" />
+      </a-form-item>
+    </template>
   </a-form>
 </template>
 
 <script lang="ts" setup name="Generator">
-import { getModelWeight, getRunDevice, getModelList } from "@/api/pipeline";
+import {
+  getModelWeight,
+  getRunDevice,
+  getModelList,
+  requestUrlVllm,
+} from "@/api/pipeline";
 import type { FormInstance } from "ant-design-vue";
-import { reactive, ref } from "vue";
+import { reactive, ref, onMounted } from "vue";
 import { Generator } from "../../enum.ts";
 import { ModelType } from "../../type.ts";
 import { useI18n } from "vue-i18n";
+import { CheckCircleFilled } from "@ant-design/icons-vue";
+import { validateIpPort } from "@/utils/validate.ts";
+import { useNotification } from "@/utils/common";
 
 const { t } = useI18n();
+const { antNotification } = useNotification();
 const props = defineProps({
   formData: {
     type: Object,
     default: () => {},
+  },
+  formType: {
+    type: String,
+    default: "create",
   },
 });
 interface FormType {
   generator_type: string;
   inference_type: string;
   model: ModelType;
+  vllm_endpoint?: string;
+  modelName?: string;
 }
+const validateUnique = async (rule: any, value: string) => {
+  if (!value) {
+    return Promise.reject(t("pipeline.valid.urlValid1"));
+  }
+  if (!validateIpPort(value)) {
+    return Promise.reject(t("pipeline.valid.urlValid2"));
+  }
+
+  isPass.value = true;
+  return Promise.resolve();
+};
+const handleUrlFormat = (url: string) => {
+  if (!url) return "";
+  return url.replace(/http:\/\//g, "");
+};
 const {
   generator_type = "chatqna",
   inference_type = "local",
+  vllm_endpoint = "",
   model = {
-    model_id: "Qwen/Qwen2-7B-Instruct",
+    model_id: undefined,
     model_path: "",
     device: "AUTO",
-    weight: "INT4",
+    weight: undefined,
   },
 } = props.formData?.generator || {};
 
+const isPass = ref<boolean>(false);
+const validatePass = ref<boolean>(false);
+const protocol = ref<string>("http://");
 const formRef = ref<FormInstance>();
 const form = reactive<FormType>({
   generator_type,
   inference_type,
+  vllm_endpoint: handleUrlFormat(vllm_endpoint),
+  modelName: inference_type === "vllm" ? model.model_id : "",
   model,
 });
 const rules = reactive({
@@ -168,6 +246,20 @@ const rules = reactive({
     {
       required: true,
       message: t("pipeline.valid.weights"),
+      trigger: "change",
+    },
+  ],
+  vllm_endpoint: [
+    {
+      required: true,
+      validator: validateUnique,
+      trigger: "blur",
+    },
+  ],
+  modelName: [
+    {
+      required: true,
+      message: t("pipeline.valid.modelName"),
       trigger: "change",
     },
   ],
@@ -238,26 +330,60 @@ const handleWeightVisible = async (visible: boolean) => {
     }
   }
 };
-
+const handleUrlChange = () => {
+  isPass.value = false;
+  validatePass.value = false;
+};
 // Format parameter
 const formatFormParam = () => {
-  const { inference_type, model } = form;
+  const { inference_type, model, modelName, vllm_endpoint } = form;
   const { model_id, weight } = model;
   model.model_path = handleModelPath(model_id, weight);
-
+  model.model_id = inference_type === "vllm" ? modelName : model_id;
   return {
     inference_type,
     prompt_path: "./default_prompt.txt",
     model,
+    vllm_endpoint:
+      inference_type === "vllm" ? protocol.value + vllm_endpoint : undefined,
   };
 };
 
+const handleTestUrl = async () => {
+  formRef.value?.validateFields(["modelName"]);
+  const { modelName } = form;
+  if (!modelName) return;
+  const server_address = protocol.value + form.vllm_endpoint;
+
+  const { status = "" } = await requestUrlVllm({
+    server_address,
+    model_name: modelName,
+  });
+  if (status !== "200") {
+    antNotification("error", t("common.error"), t("pipeline.valid.urlValid3"));
+    return;
+  }
+  validatePass.value = true;
+  antNotification(
+    "success",
+    t("common.success"),
+    t("pipeline.valid.urlValid4")
+  );
+};
 // Validate the form, throw results form
 const handleValidate = (): Promise<object> => {
   return new Promise((resolve) => {
     formRef.value
       ?.validate()
       .then(() => {
+        if (form.inference_type === "vllm" && !validatePass.value) {
+          antNotification(
+            "warning",
+            t("common.prompt"),
+            t("pipeline.valid.urlValid5")
+          );
+          return;
+        }
         resolve({
           result: true,
           data: { generator: formatFormParam() },
@@ -271,6 +397,24 @@ const handleValidate = (): Promise<object> => {
 defineExpose({
   validate: handleValidate,
 });
+onMounted(() => {
+  if (props.formType === "update") {
+    isPass.value = true;
+    validatePass.value = true;
+  }
+});
 </script>
 
-<style scoped lang="less"></style>
+<style scoped lang="less">
+:deep(.intel-input-group) {
+  .intel-input-group-addon {
+    overflow: hidden;
+  }
+}
+.text-btn {
+  width: 72px;
+  height: 30px;
+  margin: 0 -11px;
+  border-radius: 0 6px 6px 0;
+}
+</style>

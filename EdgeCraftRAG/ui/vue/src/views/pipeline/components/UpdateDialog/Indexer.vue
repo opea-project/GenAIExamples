@@ -62,31 +62,83 @@
       </a-select>
       <FormTooltip :title="$t('pipeline.desc.embeddingDevice')" />
     </a-form-item>
+    <a-form-item
+      :label="$t('pipeline.config.vector_uri')"
+      name="vector_uri"
+      :rules="rules.vector_uri"
+      v-if="form.indexer_type === 'milvus_vector'"
+    >
+      <a-input
+        v-model:value="form.vector_uri"
+        :addon-before="protocol"
+        :placeholder="$t('pipeline.valid.vector_uri')"
+        @change="handleUriChange"
+      >
+        <template #addonAfter>
+          <a-button
+            type="primary"
+            class="text-btn"
+            :disabled="!isPass"
+            @click="handleTestUrl"
+          >
+            <CheckCircleFilled
+              v-if="validatePass"
+              :style="{ color: 'var(--color-success)', fontSize: '18px' }"
+            />
+            <span v-else> {{ $t("pipeline.desc.test") }}</span>
+          </a-button>
+        </template>
+      </a-input>
+      <FormTooltip :title="$t('pipeline.desc.vector_uri')" />
+    </a-form-item>
   </a-form>
 </template>
 
 <script lang="ts" setup name="Indexer">
-import { getRunDevice, getModelList } from "@/api/pipeline";
+import { getRunDevice, getModelList, requestUrlVerify } from "@/api/pipeline";
 import type { FormInstance } from "ant-design-vue";
-import { reactive, ref } from "vue";
+import { reactive, ref, onMounted } from "vue";
 import { Indexer } from "../../enum.ts";
 import { ModelType } from "../../type.ts";
-import { InfoCircleOutlined } from "@ant-design/icons-vue";
+import { InfoCircleOutlined, CheckCircleFilled } from "@ant-design/icons-vue";
 import { useI18n } from "vue-i18n";
+import { validateIpPort } from "@/utils/validate.ts";
+import { useNotification } from "@/utils/common";
 
 const { t } = useI18n();
+const { antNotification } = useNotification();
 const props = defineProps({
   formData: {
     type: Object,
     default: () => {},
   },
+  formType: {
+    type: String,
+    default: "create",
+  },
 });
 interface FormType {
   indexer_type: string;
+  vector_uri?: string;
   embedding_model: ModelType;
 }
+const validateUnique = async (rule: any, value: string) => {
+  if (!value) {
+    return Promise.reject(t("pipeline.valid.urlValid1"));
+  }
+  if (!validateIpPort(value)) {
+    return Promise.reject(t("pipeline.valid.urlValid2"));
+  }
+  isPass.value = true;
+  return Promise.resolve();
+};
+const handleUrlFormat = (url: string) => {
+  if (!url) return "";
+  return url.replace(/http:\/\//g, "");
+};
 const {
   indexer_type = "faiss_vector",
+  vector_uri = "",
   embedding_model = {
     model_id: "BAAI/bge-small-en-v1.5",
     model_path: "./models/BAAI/bge-small-en-v1.5",
@@ -95,9 +147,13 @@ const {
   },
 } = props.formData?.indexer || {};
 
+const isPass = ref<boolean>(false);
+const validatePass = ref<boolean>(false);
+const protocol = ref<string>("http://");
 const formRef = ref<FormInstance>();
 const form = reactive<FormType>({
   indexer_type,
+  vector_uri: handleUrlFormat(vector_uri),
   embedding_model,
 });
 const rules = reactive({
@@ -120,6 +176,13 @@ const rules = reactive({
       required: true,
       message: t("pipeline.valid.embeddingDevice"),
       trigger: "change",
+    },
+  ],
+  vector_uri: [
+    {
+      required: true,
+      validator: validateUnique,
+      trigger: "blur",
     },
   ],
 });
@@ -159,15 +222,55 @@ const handleModelVisible = async (visible: boolean) => {
 const handleModelChange = (value: string) => {
   form.embedding_model.model_path = `./models/${value}`;
 };
+const handleTestUrl = async () => {
+  const vector_uri = protocol.value + form.vector_uri;
+  const { status = "" } = await requestUrlVerify({ vector_uri });
+
+  if (status !== "200") {
+    antNotification("error", t("common.error"), t("pipeline.valid.urlValid3"));
+    return;
+  }
+  validatePass.value = true;
+  antNotification(
+    "success",
+    t("common.success"),
+    t("pipeline.valid.urlValid4")
+  );
+};
+const handleUriChange = () => {
+  isPass.value = false;
+  validatePass.value = false;
+};
+// Format parameter
+const formatFormParam = () => {
+  const { indexer_type, vector_uri, embedding_model } = form;
+
+  return {
+    indexer_type,
+    embedding_model,
+    vector_uri:
+      indexer_type === "milvus_vector"
+        ? protocol.value + vector_uri
+        : undefined,
+  };
+};
 // Validate the form, throw results form
 const handleValidate = (): Promise<object> => {
   return new Promise((resolve) => {
     formRef.value
       ?.validate()
       .then(() => {
+        if (form.indexer_type === "milvus_vector" && !validatePass.value) {
+          antNotification(
+            "warning",
+            t("common.prompt"),
+            t("pipeline.valid.urlValid5")
+          );
+          return;
+        }
         resolve({
           result: true,
-          data: { indexer: form },
+          data: { indexer: formatFormParam() },
         });
       })
       .catch(() => {
@@ -178,6 +281,25 @@ const handleValidate = (): Promise<object> => {
 defineExpose({
   validate: handleValidate,
 });
+
+onMounted(() => {
+  if (props.formType === "update") {
+    isPass.value = true;
+    validatePass.value = true;
+  }
+});
 </script>
 
-<style scoped lang="less"></style>
+<style scoped lang="less">
+:deep(.intel-input-group) {
+  .intel-input-group-addon {
+    overflow: hidden;
+  }
+}
+.text-btn {
+  width: 72px;
+  height: 30px;
+  margin: 0 -11px;
+  border-radius: 0 6px 6px 0;
+}
+</style>

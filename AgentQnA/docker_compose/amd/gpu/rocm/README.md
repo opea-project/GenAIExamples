@@ -1,170 +1,43 @@
-# Build Mega Service of AgentQnA on AMD ROCm GPU
+# Deploy AgentQnA on AMD GPU (ROCm)
 
-## Build Docker Images
+This document outlines the single node deployment process for a AgentQnA application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservices on AMD GPU (ROCm) server. The steps include pulling Docker images, container deployment via Docker Compose, and service execution using microservices `agent`.
 
-### 1. Build Docker Image
+## Table of Contents
 
-- #### Create application install directory and go to it:
+1. [AgentQnA Quick Start Deployment](#agentqna-quick-start-deployment)
+2. [Configuration Parameters](#configuration-parameters)
+3. [AgentQnA Docker Compose Files](#agentqna-docker-compose-files)
+4. [Validate Services](#validate-services)
+5. [Conclusion](#conclusion)
 
-  ```bash
-  mkdir ~/agentqna-install && cd agentqna-install
-  ```
+## AgentQnA Quick Start Deployment
 
-- #### Clone the repository GenAIExamples (the default repository branch "main" is used here):
+This section describes how to quickly deploy and test the AgentQnA service manually on AMD GPU (ROCm) server. The basic steps are:
 
-  ```bash
-  git clone https://github.com/opea-project/GenAIExamples.git
-  ```
+1. [Access the Code](#access-the-code)
+2. [Configure the Deployment Environment](#configure-the-deployment-environment)
+3. [Deploy the Services Using Docker Compose](#deploy-the-services-using-docker-compose)
+4. [Ingest Data into the Vector Database](#ingest-data-into-the-vector-database)
+5. [Cleanup the Deployment](#cleanup-the-deployment)
 
-  If you need to use a specific branch/tag of the GenAIExamples repository, then (v1.3 replace with its own value):
+### Access the Code
 
-  ```bash
-  git clone https://github.com/opea-project/GenAIExamples.git && cd GenAIExamples && git checkout v1.3
-  ```
-
-  We remind you that when using a specific version of the code, you need to use the README from this version:
-
-- #### Go to build directory:
-
-  ```bash
-  cd ~/agentqna-install/GenAIExamples/AgentQnA/docker_image_build
-  ```
-
-- Cleaning up the GenAIComps repository if it was previously cloned in this directory.
-  This is necessary if the build was performed earlier and the GenAIComps folder exists and is not empty:
-
-  ```bash
-  echo Y | rm -R GenAIComps
-  ```
-
-- #### Clone the repository GenAIComps (the default repository branch "main" is used here):
+Clone the GenAIExample repository and access the AgentQnA AMD GPU (ROCm) server Docker Compose files and supporting scripts:
 
 ```bash
-git clone https://github.com/opea-project/GenAIComps.git
+export WORKDIR=<your-work-directory>
+cd $WORKDIR
+git clone https://github.com/opea-project/GenAIExamples.git
+cd GenAIExamples/AgentQnA
 ```
 
-We remind you that when using a specific version of the code, you need to use the README from this version.
+Then checkout a released version, such as v1.4:
 
-- #### Setting the list of images for the build (from the build file.yaml)
-
-  If you want to deploy a vLLM-based or TGI-based application, then the set of services is installed as follows:
-
-  #### vLLM-based application
-
-  ```bash
-  service_list="vllm-rocm agent agent-ui"
-  ```
-
-  #### TGI-based application
-
-  ```bash
-  service_list="agent agent-ui"
-  ```
-
-- #### Optional. Pull TGI Docker Image (Do this if you want to use TGI)
-
-  ```bash
-  docker pull ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
-  ```
-
-- #### Build Docker Images
-
-  ```bash
-  docker compose -f build.yaml build ${service_list} --no-cache
-  ```
-
-- #### Build DocIndexRetriever Docker Images
-
-  ```bash
-  cd ~/agentqna-install/GenAIExamples/DocIndexRetriever/docker_image_build/
-  git clone https://github.com/opea-project/GenAIComps.git
-  service_list="doc-index-retriever dataprep embedding retriever reranking"
-  docker compose -f build.yaml build ${service_list} --no-cache
-  ```
-
-- #### Pull DocIndexRetriever Docker Images
-
-  ```bash
-  docker pull redis/redis-stack:7.2.0-v9
-  docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.7
-  ```
-
-  After the build, we check the list of images with the command:
-
-  ```bash
-  docker image ls
-  ```
-
-  The list of images should include:
-
-  ##### vLLM-based application:
-
-  - opea/vllm-rocm:latest
-  - opea/agent:latest
-  - redis/redis-stack:7.2.0-v9
-  - ghcr.io/huggingface/text-embeddings-inference:cpu-1.7
-  - opea/embedding:latest
-  - opea/retriever:latest
-  - opea/reranking:latest
-  - opea/doc-index-retriever:latest
-
-  ##### TGI-based application:
-
-  - ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
-  - opea/agent:latest
-  - redis/redis-stack:7.2.0-v9
-  - ghcr.io/huggingface/text-embeddings-inference:cpu-1.7
-  - opea/embedding:latest
-  - opea/retriever:latest
-  - opea/reranking:latest
-  - opea/doc-index-retriever:latest
-
----
-
-## Deploy the AgentQnA Application
-
-### Docker Compose Configuration for AMD GPUs
-
-To enable GPU support for AMD GPUs, the following configuration is added to the Docker Compose file:
-
-- compose_vllm.yaml - for vLLM-based application
-- compose.yaml - for TGI-based
-
-```yaml
-shm_size: 1g
-devices:
-  - /dev/kfd:/dev/kfd
-  - /dev/dri:/dev/dri
-cap_add:
-  - SYS_PTRACE
-group_add:
-  - video
-security_opt:
-  - seccomp:unconfined
+```bash
+git checkout v1.4
 ```
 
-This configuration forwards all available GPUs to the container. To use a specific GPU, specify its `cardN` and `renderN` device IDs. For example:
-
-```yaml
-shm_size: 1g
-devices:
-  - /dev/kfd:/dev/kfd
-  - /dev/dri/card0:/dev/dri/card0
-  - /dev/dri/render128:/dev/dri/render128
-cap_add:
-  - SYS_PTRACE
-group_add:
-  - video
-security_opt:
-  - seccomp:unconfined
-```
-
-**How to Identify GPU Device IDs:**
-Use AMD GPU driver utilities to determine the correct `cardN` and `renderN` IDs for your GPU.
-
-### Set deploy environment variables
-
-#### Setting variables in the operating system environment:
+### Configure the Deployment Environment
 
 ```bash
 ### Replace the string 'server_address' with your local server IP address
@@ -176,25 +49,27 @@ export LANGCHAIN_API_KEY='your_langchain_api_key'
 export LANGCHAIN_TRACING_V2=""
 ```
 
-### Start the services:
+### Deploy the Services Using Docker Compose
 
 #### If you use vLLM
 
 ```bash
-cd ~/agentqna-install/GenAIExamples/AgentQnA/docker_compose/amd/gpu/rocm
+cd GenAIExamples/AgentQnA/docker_compose/amd/gpu/rocm
 bash launch_agent_service_vllm_rocm.sh
 ```
 
 #### If you use TGI
 
 ```bash
-cd ~/agentqna-install/GenAIExamples/AgentQnA/docker_compose/amd/gpu/rocm
+cd GenAIExamples/AgentQnA/docker_compose/amd/gpu/rocm
 bash launch_agent_service_tgi_rocm.sh
 ```
 
-All containers should be running and should not restart:
+### Check the Deployment Status
 
-##### If you use vLLM:
+After launching agent services, check if all the containers launched via docker compose have started:
+
+#### If you use vLLM
 
 - dataprep-redis-server
 - doc-index-retriever-server
@@ -209,7 +84,7 @@ All containers should be running and should not restart:
 - tei-reranking-server
 - vllm-service
 
-##### If you use TGI:
+#### If you use TGI
 
 - dataprep-redis-server
 - doc-index-retriever-server
@@ -226,7 +101,49 @@ All containers should be running and should not restart:
 
 ---
 
-## Validate the Services
+### Cleanup the Deployment
+
+To stop the containers associated with the deployment, execute the following command:
+
+#### If you use vLLM
+
+```bash
+cd GenAIExamples/AgentQnA/docker_compose/amd/gpu/rocm
+bash stop_agent_service_vllm_rocm.sh
+```
+
+#### If you use TGI
+
+```bash
+cd GenAIExamples/AgentQnA/docker_compose/amd/gpu/rocm
+bash stop_agent_service_tgi_rocm.sh
+```
+
+## Configuration Parameters
+
+Key parameters are configured via environment variables set before running `docker compose up`.
+
+| Environment Variable                    | Description                                                                               | Default (Set Externally)                        |
+| :-------------------------------------- | :---------------------------------------------------------------------------------------- | :---------------------------------------------- |
+| `ip_address`                            | External IP address of the host machine. **Required.**                                    | `your_external_ip_address`                      |
+| `HF_TOKEN`                              | Your Hugging Face Hub token for model access. **Required.**                               | `your_huggingface_token`                        |
+| `VLLM_LLM_MODEL_ID`                     | Hugging Face model ID for the AgentQnA LLM. Configured within `compose.yaml` environment. | `Intel/neural-chat-7b-v3-3`                     |
+| `TOOLSET_PATH`                          | Local path to the tool Yaml file. Configured in `compose.yaml`.                           | `${WORKPATH}/../../../tools/`                   |
+| `CRAG_SERVER`                           | CRAG server URL. Derived from `ip_address` and port `8080`.                               | `http://${ip_address}:8080`                     |
+| `WORKER_AGENT_URL`                      | Worker agent URL. Derived from `ip_address` and port `9095`.                              | `http://${ip_address}:9095/v1/chat/completions` |
+| `SQL_AGENT_URL`                         | SQL agent URL. Derived from `ip_address` and port `9096`.                                 | `http://${ip_address}:9096/v1/chat/completions` |
+| `http_proxy` / `https_proxy`/`no_proxy` | Network proxy settings (if required).                                                     | `""`                                            |
+
+## AgentQnA Docker Compose Files
+
+In the context of deploying a AgentQnA pipeline on an Intel® Xeon® platform, we can pick and choose different large language model serving frameworks. The table below outlines the various configurations that are available as part of the application. These configurations can be used as templates and can be extended to different components available in [GenAIComps](https://github.com/opea-project/GenAIComps.git).
+
+| File                                     | Description                                                                                |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------ |
+| [compose.yaml](./compose.yaml)           | Default compose file using tgi as serving framework                                        |
+| [compose_vllm.yaml](./compose_vllm.yaml) | The LLM serving framework is vLLM. All other configurations remain the same as the default |
+
+## Validate Services
 
 ### 1. Validate the vLLM/TGI Service
 
@@ -296,7 +213,7 @@ then we consider the TGI service to be successfully launched
 
 ### 2. Validate Agent Services
 
-#### Validate Rag Agent Service
+#### Validate RAG Agent Service
 
 ```bash
 export agent_port=${WORKER_RAG_AGENT_PORT}
@@ -306,7 +223,7 @@ python3 ~/agentqna-install/GenAIExamples/AgentQnA/tests/test.py --prompt "$promp
 
 The response must contain the meaningful text of the response to the request from the "prompt" variable
 
-#### Validate Sql Agent Service
+#### Validate SQL Agent Service
 
 ```bash
 export agent_port=${WORKER_SQL_AGENT_PORT}
@@ -325,18 +242,6 @@ python3 ~/agentqna-install/GenAIExamples/AgentQnA/tests/test.py --agent_role "su
 
 The response should contain "Iron Maiden"
 
-### 3. Stop application
+## Conclusion
 
-#### If you use vLLM
-
-```bash
-cd ~/agentqna-install/GenAIExamples/AgentQnA/docker_compose/amd/gpu/rocm
-bash stop_agent_service_vllm_rocm.sh
-```
-
-#### If you use TGI
-
-```bash
-cd ~/agentqna-install/GenAIExamples/AgentQnA/docker_compose/amd/gpu/rocm
-bash stop_agent_service_tgi_rocm.sh
-```
+This guide provides a comprehensive workflow for deploying, configuring, and validating the AgentQnA system on AMD GPU (ROCm), enabling flexible integration with both OpenAI-compatible and remote LLM services.

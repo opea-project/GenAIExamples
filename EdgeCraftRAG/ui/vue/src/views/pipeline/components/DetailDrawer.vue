@@ -184,15 +184,15 @@
                 formData.generator.inference_type
               }}</span>
             </li>
+            <li class="item-wrap">
+              <span class="label-wrap">{{
+                $t("pipeline.config.language")
+              }}</span>
+              <span class="content-wrap">{{
+                formData.generator.model.model_id
+              }}</span>
+            </li>
             <template v-if="formData.generator.inference_type === 'local'">
-              <li class="item-wrap">
-                <span class="label-wrap">{{
-                  $t("pipeline.config.language")
-                }}</span>
-                <span class="content-wrap">{{
-                  formData.generator.model.model_id
-                }}</span>
-              </li>
               <li class="item-wrap">
                 <span class="label-wrap">{{
                   $t("pipeline.config.llmDevice")

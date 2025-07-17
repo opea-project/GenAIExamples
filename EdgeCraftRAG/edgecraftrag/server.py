@@ -6,9 +6,9 @@ import os
 import uvicorn
 from edgecraftrag.api.v1.chatqna import chatqna_app
 from edgecraftrag.api.v1.data import data_app
-from edgecraftrag.api.v1.knowledge_base import kb_app
+from edgecraftrag.api.v1.knowledge_base import kb_app, load_knowledge_from_file
 from edgecraftrag.api.v1.model import model_app
-from edgecraftrag.api.v1.pipeline import pipeline_app
+from edgecraftrag.api.v1.pipeline import load_pipeline_from_file, pipeline_app
 from edgecraftrag.api.v1.prompt import prompt_app
 from edgecraftrag.api.v1.system import system_app
 from edgecraftrag.utils import UI_DIRECTORY
@@ -17,7 +17,15 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from llama_index.core.settings import Settings
 
-app = FastAPI()
+
+async def lifespan(app: FastAPI):
+    print("Restore pipeline configuration and knowledge base configuration...")
+    load_pipeline_from_file()
+    await load_knowledge_from_file()
+    yield
+
+
+app = FastAPI(lifespan=lifespan)
 app.mount(UI_DIRECTORY, StaticFiles(directory=UI_DIRECTORY), name=UI_DIRECTORY)
 app.add_middleware(
     CORSMiddleware,

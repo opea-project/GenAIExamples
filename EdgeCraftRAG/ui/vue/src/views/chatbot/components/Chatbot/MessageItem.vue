@@ -10,6 +10,52 @@
           />
         </div>
         <div class="message-wrap">
+          <div v-if="!props.message?.content" class="dot-loader">
+            <span class="drop"></span>
+            <span class="drop"></span>
+            <span class="drop"></span>
+          </div>
+
+          <div class="think-container" v-if="isThinkMode">
+            <div
+              :class="{
+                'think-title': true,
+                'completed-icon': isThinkEnd,
+              }"
+            >
+              <div
+                :class="{
+                  'title-bg': isThinkEnd,
+                }"
+                @click="toggleThink"
+              >
+                <span>
+                  {{
+                    isThinkEnd ? $t("chat.thinkStart") : $t("chat.thinkEnd")
+                  }}</span
+                >
+                <UpOutlined
+                  v-if="isThinkEnd"
+                  :class="['toggle-icon', { rotate: isCollapsed }]"
+                />
+              </div>
+            </div>
+            <transition-group tag="div" name="think-transition">
+              <div class="think-msg-wrap" v-show="isCollapsed">
+                <div class="state-wrap">
+                  <div v-if="isThinkEnd" class="completed-icon">
+                    <CheckCircleFilled />
+                  </div>
+                  <div v-else class="state-icon"></div>
+                </div>
+                <div
+                  class="think-message"
+                  v-html="thinkMarkdown"
+                  ref="thinkElement"
+                ></div>
+              </div>
+            </transition-group>
+          </div>
           <div v-html="renderedMarkdown"></div>
         </div>
       </div>
@@ -53,6 +99,7 @@
 <script lang="ts" setup name="MessageItem">
 import { marked } from "marked";
 import { PropType, ref } from "vue";
+import { CheckCircleFilled, UpOutlined } from "@ant-design/icons-vue";
 import { IMessage, Benchmark } from "../../type";
 import CustomRenderer from "@/utils/customRenderer";
 import "highlight.js/styles/atom-one-dark.css";
@@ -69,12 +116,13 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["preview"]);
+const emit = defineEmits(["preview", "stop"]);
 
 const benchmarkData = computed<Benchmark>(() => {
   return (props.message?.benchmark || {}) as Benchmark;
 });
 const isExpanded = ref<boolean>(false);
+const isCollapsed = ref(true);
 
 marked.setOptions({
   pedantic: false,
@@ -82,13 +130,37 @@ marked.setOptions({
   breaks: false,
   renderer: CustomRenderer,
 });
-
-const renderedMarkdown = computed(() => marked(props.message.content));
-
+const thinkTagRegex = /<think>([\s\S]*?)<\/think>/;
+const isThinkMode = computed(() => props.message.content.includes("</think>"));
+const isThinkEnd = computed(() => props.message.content.includes("</think>"));
+const getThinkMode = () => {
+  const { content } = props.message;
+  const endIndex = content.indexOf("</think>");
+  return computed(() => {
+    return isThinkEnd.value
+      ? content.substring(0, endIndex)
+      : isThinkMode.value
+      ? content
+      : "";
+  });
+};
+const thinkMarkdown = computed(() => {
+  return marked(getThinkMode().value);
+});
+const renderedMarkdown = computed(() => {
+  return !isThinkMode.value || isThinkEnd.value
+    ? marked(props.message.content.replace(thinkTagRegex, ""))
+    : "";
+});
 const toggleTabs = () => {
   isExpanded.value = !isExpanded.value;
 };
 
+const toggleThink = () => {
+  if (!isThinkEnd.value) return;
+  emit("stop");
+  isCollapsed.value = !isCollapsed.value;
+};
 const addClickListeners = () => {
   const images = document.querySelectorAll("#message-container img");
 
@@ -107,6 +179,14 @@ watch(
   (newValue) => {
     if (!newValue) {
       addClickListeners();
+    }
+  }
+);
+watch(
+  () => isThinkEnd.value,
+  (value) => {
+    if (value) {
+      isCollapsed.value = false;
     }
   }
 );
@@ -137,6 +217,27 @@ watch(
     transform: none;
   }
 }
+@keyframes breath-animation {
+  75%,
+  100% {
+    opacity: 0;
+    transform: scale(2);
+  }
+}
+@keyframes dotPulse {
+  0% {
+    background-color: var(--bg-card-color);
+    transform: scale(1);
+  }
+  50% {
+    background-color: var(--font-tip-color);
+    transform: scale(1.4);
+  }
+  100% {
+    background-color: var(--bg-card-color);
+    transform: scale(1);
+  }
+}
 .chatbot-session {
   margin-bottom: 16px;
   font-size: 16px;
@@ -164,9 +265,9 @@ watch(
 .message-wrap {
   background-color: var(--bg-content-color);
   border-radius: 6px;
-  line-height: 24px;
-  min-height: 32px;
-  padding: 10px 14px;
+  line-height: 22px;
+  min-height: 36px;
+  padding: 12px 16px;
   width: 100%;
 }
 .user-session {
@@ -221,5 +322,155 @@ watch(
 .detail-transition-enter-active,
 .detail-transition-leave-active {
   transition: all 0.7s ease-in-out;
+}
+.think-container {
+  color: var(--font-think-color);
+  background: var(--think-done-bg);
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 6px;
+  transition: 0.3s background cubic-bezier(0.4, 0, 0.2, 1);
+  .think-title {
+    line-height: 24px;
+    letter-spacing: 0.25px;
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    position: relative;
+    width: 100%;
+    min-width: 200px;
+    &::before {
+      content: "";
+      display: inline-block;
+      background: url("@/assets/images/think-reasoning.png") no-repeat center
+        center;
+      background-size: 100% 100%;
+      width: 18px;
+      height: 18px;
+      margin-right: 6px;
+    }
+    &.completed-icon {
+      &::before {
+        background: url("@/assets/images/think-completed.png") no-repeat center
+          center;
+        background-size: 100% 100%;
+      }
+    }
+    .title-bg {
+      width: 100%;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 4px 4px 4px 6px;
+      transition: 0.3s background-color;
+      &:hover {
+        background-color: var(--border-main-color);
+        cursor: pointer;
+      }
+    }
+    .toggle-icon {
+      font-size: 16px;
+      color: var(--font-tip-color);
+      transition: transform 0.3s ease;
+      transform: none;
+      &.rotate {
+        transform: rotate(180deg);
+        transition: transform 0.3s ease;
+      }
+    }
+  }
+  .think-msg-wrap {
+    display: flex;
+    gap: 8px;
+    width: 100%;
+    font-size: 14px;
+    .state-wrap {
+      width: 18px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      &::after {
+        content: "";
+        width: 1px;
+        height: 100%;
+        background: var(--border-main-color);
+        border-radius: 13px;
+        transition: 0.3s background cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .completed-icon {
+        margin-bottom: 4px;
+        font-size: 14px;
+        color: var(--think-done-icon);
+      }
+      .state-icon {
+        width: 16px;
+        height: 16px;
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        margin-bottom: 8px;
+        &::before {
+          content: "";
+          position: absolute;
+          transform-origin: center;
+          width: 8px;
+          height: 8px;
+          border-radius: 100%;
+          background-color: var(--think-done-icon);
+        }
+        &::after {
+          position: absolute;
+          content: "";
+          width: 10px;
+          height: 10px;
+          border: 2px solid var(--think-done-icon);
+          box-sizing: border-box;
+          border-radius: 100%;
+          background-color: transparent;
+          animation: breath-animation 1.6s cubic-bezier(0, 0, 0.2, 1) infinite;
+        }
+      }
+    }
+    .think-message {
+      line-height: 24px;
+      flex: 1;
+    }
+  }
+}
+.think-transition-enter-active,
+.think-transition-leave-active {
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.think-transition-enter-from,
+.think-transition-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+.dot-loader {
+  display: flex;
+  align-items: center;
+  height: 12px;
+  gap: 8px;
+  .drop {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: var(--bg-card-color);
+    animation: dotPulse 1.2s infinite ease-in-out;
+    &:nth-child(1) {
+      animation-delay: 0s;
+    }
+    &:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+    &:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+  }
 }
 </style>

@@ -30,7 +30,7 @@ on:
         type: string
       examples:
         default: "ChatQnA"
-        description: 'List of examples to test [ChatQnA, CodeTrans, DocSum, CodeGen, AudioQnA, VisualQnA, FaqGen, AgentQnA]'
+        description: 'List of examples to test [ChatQnA,CodeTrans,DocSum,CodeGen,AudioQnA,VisualQnA,FaqGen,AgentQnA]'
         required: true
         type: string
       tag:
@@ -96,7 +96,7 @@ jobs:
       fail-fast: false
     uses: ./.github/workflows/_run-one-click.yml
     with:
-      node: ${{ matrix.node }}
+      hardware: ${{ matrix.node }}
       example: ${{ matrix.example }}
       tag: ${{ inputs.tag }}
       registry: "opea"

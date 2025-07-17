@@ -33,12 +33,5 @@ onMounted(() => {
 </script>
 <style lang="less">
 .full-screen {
-  padding: 0 !important;
-  overflow: hidden !important;
-  .layout-view {
-    width: 100% !important;
-    min-width: 960px !important;
-    max-width: none !important;
-  }
 }
 </style>

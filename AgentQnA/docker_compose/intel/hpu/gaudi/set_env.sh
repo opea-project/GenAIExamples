@@ -22,7 +22,7 @@ export HF_CACHE_DIR=${HF_CACHE_DIR}
 ls $HF_CACHE_DIR
 export HF_TOKEN=${HF_TOKEN}
 export LLM_MODEL_ID="meta-llama/Llama-3.3-70B-Instruct"
-export NUM_SHARDS=4
+export NUM_SHARDS=${NUM_SHARDS:-4}
 export LLM_ENDPOINT_URL="http://${ip_address}:8086"
 export temperature=0
 export max_new_tokens=4096

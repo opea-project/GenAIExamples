@@ -21,7 +21,7 @@ HOST_IP=$ip_address
 COMPOSE_FILE="compose.yaml"
 EC_RAG_SERVICE_PORT=16010
 
-MODEL_PATH="/home/media/models"
+MODEL_PATH="${HOME}/models"
 # MODEL_PATH="$WORKPATH/models"
 DOC_PATH="$WORKPATH/tests"
 UI_UPLOAD_PATH="$WORKPATH/tests"

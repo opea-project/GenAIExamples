@@ -8,7 +8,7 @@ pushd "$SCRIPT_DIR/../../../" > /dev/null
 source .set_env.sh
 popd > /dev/null
 
-
+export host_ip=$(hostname -I | awk '{print $1}')
 export LLM_MODEL_ID="mistralai/Mistral-7B-Instruct-v0.3"
 export LLM_ENDPOINT="http://${host_ip}:8008"
 export LLM_COMPONENT_NAME="OpeaTextGenService"

@@ -1,0 +1,59 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+
+x-common-environment:
+  &common-env
+  no_proxy: ${no_proxy}
+  http_proxy: ${http_proxy}
+  https_proxy: ${https_proxy}
+
+x-common-agent-environment:
+  &common-agent-env
+  <<: *common-env
+  HF_TOKEN: ${HF_TOKEN}
+  model: ${LLM_MODEL_ID}
+  TAVILY_API_KEY: ${TAVILY_API_KEY}
+  OPENAI_API_KEY: ${OPENAI_API_KEY}
+  OPENAI_BASE_URL: ${OPENAI_BASE_URL}
+
+services:
+
+  vllm-service:
+    image: ${REGISTRY:-opea}/vllm-gaudi:${TAG:-latest}
+    container_name: vllm-gaudi-server
+    ports:
+      - "8000:8000"
+    volumes:
+      - ${HF_CACHE_DIR:-./data}:/data
+    environment:
+      <<: *common-env
+      HF_TOKEN: ${HF_TOKEN}
+      HF_HOME: ./data
+      HABANA_VISIBLE_DEVICES: all
+      OMPI_MCA_btl_vader_single_copy_mechanism: none
+      LLM_MODEL_ID: ${LLM_MODEL_ID}
+      VLLM_TORCH_PROFILER_DIR: "/mnt"
+      VLLM_SKIP_WARMUP: true
+      PT_HPU_ENABLE_LAZY_COLLECTIVES: true
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://$HOST_IP:8000/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 100
+    runtime: habana
+    cap_add:
+      - SYS_NICE
+    ipc: host
+    command: --model ${LLM_MODEL_ID} --tensor-parallel-size ${NUM_CARDS} --host 0.0.0.0 --port 8000 --max-seq-len-to-capture $MAX_LEN
+
+  deep-research-agent-server:
+    image: ${REGISTRY:-opea}/deep-research-agent:${TAG:-latest}
+    container_name: deep-research-agent-server
+    depends_on:
+      - vllm-service
+    ports:
+      - "8022:8022"
+    ipc: host
+    environment:
+      <<: *common-agent-env

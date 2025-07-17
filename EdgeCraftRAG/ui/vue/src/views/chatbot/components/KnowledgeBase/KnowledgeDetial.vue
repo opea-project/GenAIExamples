@@ -80,7 +80,7 @@
 import { ref, reactive, createVNode, h } from "vue";
 import {
   requestKnowledgeBaseRelation,
-  getKnowledgeBaseDetialById,
+  getKnowledgeBaseDetialByName,
   requestFileDelete,
   uploadFileUrl,
 } from "@/api/knowledgeBase";
@@ -96,7 +96,7 @@ import { NextLoading } from "@/utils/loading";
 import eventBus from "@/utils/mitt";
 
 const props = defineProps({
-  kbId: {
+  kbName: {
     type: String,
     default: "",
   },
@@ -112,15 +112,15 @@ const notFile = computed(() => {
   return Object.keys(file_map).length === 0;
 });
 const uploadFileApi = computed(() => {
-  return uploadFileUrl + knowledgeData.idx;
+  return uploadFileUrl + knowledgeData.name;
 });
 
 const queryKnowledgeBaseDetial = async () => {
-  const data: any = await getKnowledgeBaseDetialById(props.kbId);
+  const data: any = await getKnowledgeBaseDetialByName(props.kbName);
   Object.assign(knowledgeData, data);
 };
 const handleBeforeUpload = (file: UploadProps["fileList"][number]) => {
-  const isFileSize = file.size / 1024 / 1024 < 50;
+  const isFileSize = file.size / 1024 / 1024 < 200;
 
   if (!isFileSize) {
     message.error(t("knowledge.uploadValid"));
@@ -138,10 +138,10 @@ const handleChange = ({
   const el = <HTMLElement>document.querySelector(".loading-next");
   if (!el) NextLoading.start();
   const { response, status } = file;
-  const { idx } = knowledgeData;
+  const { name } = knowledgeData;
   try {
     if (status === "done") {
-      requestKnowledgeBaseRelation(idx, {
+      requestKnowledgeBaseRelation(name, {
         local_path: response,
       });
       handleSuccess(file);
@@ -176,8 +176,8 @@ const handleFileDelete = (local_path: string) => {
     okText: t("common.confirm"),
     okType: "danger",
     async onOk() {
-      const { idx } = knowledgeData;
-      await requestFileDelete(idx, { local_path });
+      const { name } = knowledgeData;
+      await requestFileDelete(name, { local_path });
       queryKnowledgeBaseDetial();
       handleRefresh();
     },
@@ -193,9 +193,9 @@ const handleRefresh = () => {
 };
 
 watch(
-  () => props.kbId,
-  (kbId) => {
-    if (kbId) queryKnowledgeBaseDetial();
+  () => props.kbName,
+  (kbName) => {
+    if (kbName) queryKnowledgeBaseDetial();
   },
   { immediate: true, deep: true }
 );

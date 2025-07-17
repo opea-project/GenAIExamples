@@ -99,3 +99,11 @@ response = requests.post(url, json=payload)
 
     2. reranker
     * top_n: int = 1
+
+## Validated Configurations
+
+| **Deploy Method** | **Database**  | **Reranking** | **Hardware** |
+| ----------------- | ------------- | ------------- | ------------ |
+| Docker Compose    | Milvus, Redis | w/            | Intel Xeon   |
+| Docker Compose    | Redis         | w/o           | Intel Xeon   |
+| Docker Compose    | Milvus, Redis | w/            | Intel Gaudi  |

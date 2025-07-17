@@ -32,8 +32,8 @@
   ],
   "generator": {
     "model": {
-      "model_id": "Qwen/Qwen2-7B-Instruct",
-      "model_path": "./models/Qwen/Qwen2-7B-Instruct/INT4_compressed_weights",
+      "model_id": "Qwen/Qwen3-8B",
+      "model_path": "./models/Qwen/Qwen3-8B/INT4_compressed_weights",
       "device": "auto",
       "weight": "INT4"
     },
