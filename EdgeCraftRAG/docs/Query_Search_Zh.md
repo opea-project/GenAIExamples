@@ -12,6 +12,7 @@ Query Search帮助EC-RAG在进入retrival和reranking阶段之前，对用户que
   "问题2": "子问题2.1？子问题2.2？子问题2.3？"
 }
 ```
+
 > 请您注意：1. Query Search至少需要一个子问题文件。2. 增加问题数量会增加EC-RAG的整体查询时间。
 
 ## 2. 子问题文件位置

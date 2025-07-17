@@ -99,7 +99,6 @@ docker compose -f docker_compose/intel/gpu/arc/compose_vllm.yaml up -d
 
 ![front_page](../assets/img/front_page.png)
 
-| **Deploy Method** | **LLM Engine** | **LLM Model**        | **Hardware** |
-| ----------------- | -------------- | -------------------- | ------------ |
-| Docker Compose    | vLLM           | Qwen3-8B             | Intel Arc    |
-
+| **Deploy Method** | **LLM Engine** | **LLM Model** | **Hardware** |
+| ----------------- | -------------- | ------------- | ------------ |
+| Docker Compose    | vLLM           | Qwen3-8B      | Intel Arc    |

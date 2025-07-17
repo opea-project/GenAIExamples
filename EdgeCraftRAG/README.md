@@ -20,7 +20,7 @@ quality and performance.
 EC-RAG supports vLLM deployment(default method) and local OpenVINO deployment for Intel Arc GPU. Prerequisites are shown as below:  
 Hardware: Intel Arc A770  
 OS: Ubuntu Server 22.04.1 or newer (at least 6.2 LTS kernel)  
-Driver & libraries: please to [Installing Client GPUs](https://dgpu-docs.intel.com/driver/client/overview.html) for detailed driver & libraries setup  
+Driver & libraries: please to [Installing Client GPUs](https://dgpu-docs.intel.com/driver/client/overview.html) for detailed driver & libraries setup
 
 Below steps are based on **vLLM** as inference engine, if you want to choose **OpenVINO**, please refer to [OpenVINO Local Inference](docs/Advanced_Setup.md#openvino-local-inference)
 
@@ -77,7 +77,7 @@ For more advanced env variables and configurations, please refer to [Prepare env
 #### Generate nginx config file
 
 ```bash
-export VLLM_SERVICE_PORT_0=8100 # You can set your own port for vllm service 
+export VLLM_SERVICE_PORT_0=8100 # You can set your own port for vllm service
 # Generate your nginx config file
 # nginx-conf-generator.sh requires 2 parameters: DP_NUM and output filepath
 bash nginx/nginx-conf-generator.sh 1 nginx/nginx.conf
@@ -106,7 +106,6 @@ Open your browser, access http://${HOST_IP}:8082
 Below is the UI front page, for detailed operations on UI and EC-RAG settings, please refer to [Explore_Edge_Craft_RAG](docs/Explore_Edge_Craft_RAG.md)
 ![front_page](assets/img/front_page.png)
 
-
-| **Deploy Method** | **LLM Engine** | **LLM Model**        | **Hardware** |
-| ----------------- | -------------- | -------------------- | ------------ |
-| Docker Compose    | vLLM           | Qwen3-8B             | Intel Arc    |
+| **Deploy Method** | **LLM Engine** | **LLM Model** | **Hardware** |
+| ----------------- | -------------- | ------------- | ------------ |
+| Docker Compose    | vLLM           | Qwen3-8B      | Intel Arc    |

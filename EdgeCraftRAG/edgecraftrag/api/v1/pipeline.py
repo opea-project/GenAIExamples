@@ -1,14 +1,14 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-import os
-import json
-import weakref
 import asyncio
+import json
+import os
+import weakref
 from concurrent.futures import ThreadPoolExecutor
 
-from edgecraftrag.api_schema import PipelineCreateIn, MilvusConnectRequest
 from edgecraftrag.api.v1.knowledge_base import Synchronizing_vector_data
+from edgecraftrag.api_schema import MilvusConnectRequest, PipelineCreateIn
 from edgecraftrag.base import IndexerType, InferenceType, ModelType, NodeParserType, PostProcessorType, RetrieverType
 from edgecraftrag.components.benchmark import Benchmark
 from edgecraftrag.components.generator import QnAGenerator
@@ -133,7 +133,7 @@ def update_pipeline_handler(pl, req):
         if active_pipeline.status.active and pl_status and req.indexer:
             if active_pipeline.indexer.comp_subtype != req.indexer.indexer_type:
                 indexer_type_changed = True
-   
+
     if req.node_parser is not None:
         np = req.node_parser
         found_parser = ctx.get_node_parser_mgr().search_parser(np)
@@ -171,7 +171,7 @@ def update_pipeline_handler(pl, req):
     if req.indexer is not None:
         ind = req.indexer
         found_indexer = ctx.get_indexer_mgr().search_indexer(ind)
-        if found_indexer is not None  and not indexer_type_changed:
+        if found_indexer is not None and not indexer_type_changed:
             pl.indexer = found_indexer
         else:
             embed_model = None
@@ -269,21 +269,25 @@ def update_pipeline_handler(pl, req):
 
     if pl.status.active != req.active:
         ctx.get_pipeline_mgr().activate_pipeline(pl.name, req.active, ctx.get_node_mgr(), kb_name)
-    
-    #Create and set up a separate event loop to run asynchronous tasks in threads
-    if  indexer_type_changed:
+
+    # Create and set up a separate event loop to run asynchronous tasks in threads
+    if indexer_type_changed:
+
         def run_async_task():
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
             try:
                 loop.run_until_complete(Synchronizing_vector_data(active_pipeline, pl))
             except Exception as e:
-                raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Synchronization error: {e}")
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Synchronization error: {e}"
+                )
             finally:
                 loop.close()
+
         with ThreadPoolExecutor(max_workers=1) as executor:
             future = executor.submit(run_async_task)
-            future.result()  
+            future.result()
     return pl
 
 
@@ -294,7 +298,7 @@ def load_pipeline_from_file():
     if os.path.exists(PIPELINE_FILE):
         with open(PIPELINE_FILE, "r") as f:
             all_pipelines = f.read()
-        try: 
+        try:
             all_da = json.loads(all_pipelines)
             for pipeline_data in all_da:
                 one_pipelinejson = json.loads(pipeline_data)
@@ -311,11 +315,11 @@ def save_pipeline_to_file():
 
     if not os.path.exists(CONFIG_DIR):
         os.makedirs(CONFIG_DIR, exist_ok=True)
-    try: 
-        pipelines_data =ctx.get_pipeline_mgr().get_pipelines()
+    try:
+        pipelines_data = ctx.get_pipeline_mgr().get_pipelines()
         all_pipeline_json = []
         for pipeline in pipelines_data:
-           all_pipeline_json.append(pipeline.get_pipeline_json)
+            all_pipeline_json.append(pipeline.get_pipeline_json)
         json_str = json.dumps(all_pipeline_json, indent=2)
         with open(PIPELINE_FILE, "w") as f:
             f.write(json_str)
@@ -333,9 +337,9 @@ async def check_milvus(request: MilvusConnectRequest):
         elif vector_uri.startswith("https://"):
             host_port = vector_uri.replace("https://", "")
         else:
-            host_port = vector_uri 
-        host, port = host_port.split(":", 1) 
-        connections.connect(alias="default",host=host,port=port)
+            host_port = vector_uri
+        host, port = host_port.split(":", 1)
+        connections.connect(alias="default", host=host, port=port)
 
         if connections.has_connection("default"):
             return {"status": "200", "message": "Milvus connection successful."}

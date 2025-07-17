@@ -23,9 +23,9 @@ All sub-question files need to be placed under `${TMPFILE_PATH}/configs/search_d
 
 ### 3. Config file example
 
-Configure file includes variables such as prompts, temperature, etc. 
+Configure file includes variables such as prompts, temperature, etc.
 
-`instruction`, `input_template`, `output_template` would affect final prompt for query search. 
+`instruction`, `input_template`, `output_template` would affect final prompt for query search.
 `json_key` and `json_levels` are related to each other. For example, if `json_key` is set to "similarity", `json_levels` need list options for "similarity", such as "Low, Medium, High".
 
 One example for DeesSeep-R1-Distill-Qwen-32B configs is listed below:
@@ -43,7 +43,6 @@ query_matcher:
 ### 4. Config file location
 
 Config file needs to be placed under `${TMPFILE_PATH}/configs` and named as `search_config.yaml`, which gives final path as `${TMPFILE_PATH}/configs/search_config.yaml`.
-
 
 ## OpenVINO Local Inference
 
@@ -121,7 +120,7 @@ docker compose -f docker_compose/intel/gpu/arc/compose.yaml up -d
 EC-RAG support run inference with multi-ARC in multiple isolated containers
 Docker Images preparation is the same as local inference section, please refer to [Build Docker Images](#1-optional-build-docker-images-for-mega-service-server-and-ui-by-your-own)
 Model preparation is the same as vLLM inference section, please refer to [Prepare models](../README.md#2-prepare-models)
-After docker images preparation and model preparation, please follow below steps to run multi-ARC Setup(Below steps show 2 vLLM container(2 DP) with  multi Intel Arc GPUs):
+After docker images preparation and model preparation, please follow below steps to run multi-ARC Setup(Below steps show 2 vLLM container(2 DP) with multi Intel Arc GPUs):
 
 ### 1. Prepare env variables and configurations
 
@@ -184,7 +183,7 @@ bash nginx/nginx-conf-generator.sh $DP_NUM nginx/nginx.conf # You can change TEM
 export NGINX_CONFIG_PATH="${PWD}/nginx/nginx.conf"
 
 # Generate compose_vllm.yaml file
-# multi-arc-yaml-generator.sh requires 2 parameters: DP_NUM and output filepath 
+# multi-arc-yaml-generator.sh requires 2 parameters: DP_NUM and output filepath
 bash docker_compose/intel/gpu/arc/multi-arc-yaml-generator.sh $DP_NUM docker_compose/intel/gpu/arc/compose_vllm.yaml
 ```
 
