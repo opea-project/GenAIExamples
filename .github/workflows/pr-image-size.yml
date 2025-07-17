@@ -56,26 +56,42 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Build and check image sizes
+
         env:
           dockerfile: ${{ matrix.dockerfile }}
         run: |
           set -e
           merged_commit=$(git log -1 --format='%H')
-          
+
           [ -z "$dockerfile" ] && continue
           dir=$(dirname "$dockerfile")
           file=$(basename "$dockerfile")
           image_base="pr-image-size-base:$(echo $dir | tr '/' '-')"
           image_pr="pr-image-size-pr:$(echo $dir | tr '/' '-')"
-          cd ${{github.workspace}}/$dir
+          
+          slash_count=$(grep -o "/" <<< "$dockerfile" | wc -l)
+          if [ "$slash_count" -eq 1 ]; then
+            cd "${{github.workspace}}/$dir"
+          elif [ "$slash_count" -gt 1 ]; then
+            if [[ "$dockerfile" == *"ui/"* ]]; then
+              cd "${{github.workspace}}/$dir/ui"
+              file=docker/$file
+              image_base="pr-image-size-base:$(echo $dir/ui | tr '/' '-')"
+              image_pr="pr-image-size-pr:$(echo $dir/ui | tr '/' '-')"
+            elif [[ "$dockerfile" == *"WorkflowExecAgent/tests"* ]]; then
+              echo "Skipping $dockerfile"
+              exit 0
+            else
+              echo "Error: Multiple '/' in dockerfile path but no 'ui/' found."
+              exit 1
+            fi
+          fi
 
           echo "Building base image for $dockerfile"
-          echo "Base: ${{ github.event.pull_request.base.sha }}"
           git checkout ${{ github.event.pull_request.base.sha }}
           echo "::group::Build image_base"
           docker build -f "$file" -t "$image_base" --no-cache .
           echo "::endgroup::"
-
           size_base=$(docker image inspect "$image_base" | jq '.[0].Size / (1024 * 1024) | round')
 
           echo "Building PR image for $dockerfile"
@@ -84,25 +100,64 @@ jobs:
           echo "::group::Build image_pr"
           docker build -f "$file" -t "$image_pr" --no-cache .
           echo "::endgroup::"
-
           size_pr=$(docker image inspect "$image_pr" | jq '.[0].Size / (1024 * 1024) | round')
 
           diff=$((size_pr - size_base))
           # echo "::warning::Image size change: $size_base -> $size_pr MB' (diff: $diff MB)"
           echo "comment to ${{ github.event.pull_request.number }}"
           if [ "$diff" -gt 50 ]; then
-            curl -X POST \
-            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            comment_message="⚠️ File '$dockerfile' resulted in a change in the image size from $size_base -> $size_pr MB (diff: $diff MB)"  
+          else
+            comment_message="File '$dockerfile' resulted in a change in the image size from $size_base -> $size_pr MB (diff: $diff MB)"
+          fi
+          echo "comment_message=$comment_message" >> $GITHUB_OUTPUT
+          echo "File $dockerfile resulted in a change in the image size from $size_base -> $size_pr MB" >> $GITHUB_STEP_SUMMARY
+          docker rmi "$image_base" "$image_pr"
+
+  collect-comments:
+    needs: build-and-check
+    runs-on: ubuntu-latest
+    outputs:
+      all_comments: ${{ steps.collect.outputs.all_comments }}
+    steps:
+      - name: Collect all comment messages
+        id: collect
+        run: |
+          comments=$(echo '${{ toJson(needs.build-and-check.outputs) }}' | jq -r 'to_entries[] | select(.value != null and .value != "") | .value' | sed ':a;N;$!ba;s/\n/\\n/g')
+          echo "all_comments=$comments" >> $GITHUB_OUTPUT
+
+  Post-comment-on-PR:
+    needs: collect-comments
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    if: needs.collect-comments.outputs.all_comments != ''
+    steps:
+      - name: Post comment on PR
+        if: always()
+        env:
+          all_comments: ${{ needs.collect-comments.outputs.all_comments }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "comment ${all_comments}"
+
+          comment_id=$(curl -s \
+            -H "Authorization: token ${GITHUB_TOKEN}" \
             -H "Accept: application/vnd.github.v3+json" \
-            "https://api.github.com/repos/opea-project/GenAIExamples/issues/${{ github.event.pull_request.number }}/comments" \
-            -d '{"body":"⚠️ File '"$dockerfile"' resulted in a change in the image size from '"$size_base"' -> '"$size_pr"' MB"}'
+            "https://api.github.com/repos/${{ github.repository }}/issues/comments/${{ github.event.pull_request.number }}" \
+            | jq '.[] | select(.user.login=="github-actions[bot]") | .id' | tail -n1)
+
+          if [ -n "$comment_id" ]; then
+            curl -X PATCH \
+              -H "Authorization: token ${GITHUB_TOKEN}" \
+              -H "Accept: application/vnd.github.v3+json" \
+              "https://api.github.com/repos/opea-project/GenAIExamples/issues/${{ github.event.pull_request.number }}/comments" \
+              -d '{"body":"'"$all_comments"'"}'
           else
             curl -X POST \
-            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            -H "Accept: application/vnd.github.v3+json" \
-            "https://api.github.com/repos/opea-project/GenAIExamples/issues/${{ github.event.pull_request.number }}/comments" \
-            -d '{"body":"File '"$dockerfile"' resulted in a change in the image size from '"$size_base"' -> '"$size_pr"' MB"}'
+              -H "Authorization: token ${GITHUB_TOKEN}" \
+              -H "Accept: application/vnd.github.v3+json" \
+              "https://api.github.com/repos/opea-project/GenAIExamples/issues/${{ github.event.pull_request.number }}/comments" \
+              -d '{"body":"'"$all_comments"'"}'
           fi
-
-          # echo "File $dockerfile resulted in a change in the image size from $size_base -> $size_pr MB" >> $GITHUB_STEP_SUMMARY
-          docker rmi "$image_base" "$image_pr"
