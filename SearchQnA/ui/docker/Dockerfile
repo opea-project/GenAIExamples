@@ -6,7 +6,7 @@ FROM node:20.11.1
 
 # Update package manager and install Git
 RUN apt-get update -y && apt-get install -y git
-
+RUN git clone https://github.com/opea-project/GenAIExamples.git
 # Copy the front-end code repository
 COPY svelte /home/user/svelte
 

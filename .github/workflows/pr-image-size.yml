@@ -17,11 +17,35 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  check-image-size:
+  get-check-list:
+    runs-on: ubuntu-latest
+    outputs:
+      files: ${{ steps.changed-dockerfiles.outputs.files }}
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get changed Dockerfiles
+        id: changed-dockerfiles
+        run: |
+          merged_commit=$(git log -1 --format='%H')
+          files=$(git diff --name-status --diff-filter=ARM ${{ github.event.pull_request.base.sha }} ${merged_commit} | awk '{print $2}' | grep -E 'Dockerfile$' | jq -R . | jq -sc .)
+          echo "files=$files"
+          echo "files=$files" >> $GITHUB_OUTPUT
+
+  build-and-check:
+    needs: get-check-list
     runs-on: ubuntu-latest
     permissions:
       contents: read
       pull-requests: write
+    if: needs.get-check-list.outputs.files != ''
+    strategy:
+      matrix:
+        dockerfile: ${{ fromJson(needs.get-check-list.outputs.files) }}
+      fail-fast: false
     steps:
       - name: Checkout PR branch
         uses: actions/checkout@v4
@@ -31,63 +55,54 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Get changed Dockerfiles
-        id: changed-dockerfiles
-        run: |
-          merged_commit=$(git log -1 --format='%H')
-          files=$(git diff --name-status --diff-filter=ARM ${{ github.event.pull_request.base.sha }} ${merged_commit} | awk '{print $2}' | grep -E 'Dockerfile$' || true)
-          echo "files<<EOF" >> $GITHUB_OUTPUT
-          echo "$files" | tr '\0' '\n' >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
-
       - name: Build and check image sizes
-        if: steps.changed-dockerfiles.outputs.files != ''
+        env:
+          dockerfile: ${{ matrix.dockerfile }}
         run: |
           set -e
           merged_commit=$(git log -1 --format='%H')
-          while IFS= read -r -d '' dockerfile; do
-            [ -z "$dockerfile" ] && continue
-            dir=$(dirname "$dockerfile")
-            file=$(basename "$dockerfile")
-            image_base="pr-image-size-base:$(echo $dir | tr '/' '-')"
-            image_pr="pr-image-size-pr:$(echo $dir | tr '/' '-')"
-            cd ${{github.workspace}}/$dir
+          
+          [ -z "$dockerfile" ] && continue
+          dir=$(dirname "$dockerfile")
+          file=$(basename "$dockerfile")
+          image_base="pr-image-size-base:$(echo $dir | tr '/' '-')"
+          image_pr="pr-image-size-pr:$(echo $dir | tr '/' '-')"
+          cd ${{github.workspace}}/$dir
 
-            echo "Building base image for $dockerfile"
-            echo "Base: ${{ github.event.pull_request.base.sha }}"
-            git checkout ${{ github.event.pull_request.base.sha }}
-            echo "::group::Build image_base"
-            docker build -f "$file" -t "$image_base" --no-cache .
-            echo "::endgroup::"
+          echo "Building base image for $dockerfile"
+          echo "Base: ${{ github.event.pull_request.base.sha }}"
+          git checkout ${{ github.event.pull_request.base.sha }}
+          echo "::group::Build image_base"
+          docker build -f "$file" -t "$image_base" --no-cache .
+          echo "::endgroup::"
 
-            size_base=$(docker image inspect "$image_base" | jq '.[0].Size / (1024 * 1024) | round')
+          size_base=$(docker image inspect "$image_base" | jq '.[0].Size / (1024 * 1024) | round')
 
-            echo "Building PR image for $dockerfile"
-            git checkout $merged_commit
-            echo "PR: $merged_commit"
-            echo "::group::Build image_pr"
-            docker build -f "$file" -t "$image_pr" --no-cache .
-            echo "::endgroup::"
+          echo "Building PR image for $dockerfile"
+          git checkout $merged_commit
+          echo "PR: $merged_commit"
+          echo "::group::Build image_pr"
+          docker build -f "$file" -t "$image_pr" --no-cache .
+          echo "::endgroup::"
 
-            size_pr=$(docker image inspect "$image_pr" | jq '.[0].Size / (1024 * 1024) | round')
+          size_pr=$(docker image inspect "$image_pr" | jq '.[0].Size / (1024 * 1024) | round')
 
-            diff=$((size_pr - size_base))
-            # echo "::warning::Image size change: $size_base -> $size_pr MB' (diff: $diff MB)"
-            echo "comment to ${{ github.event.pull_request.number }}"
-            if [ "$diff" -gt 50 ]; then
-              curl -X POST \
-              -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-              -H "Accept: application/vnd.github.v3+json" \
-              "https://api.github.com/repos/opea-project/GenAIExamples/issues/${{ github.event.pull_request.number }}/comments" \
-              -d '{"body":"⚠️ File '"$dockerfile"' resulted in a change in the image size from '"$size_base"' -> '"$size_pr"' MB"}'
-            else
-              curl -X POST \
-              -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-              -H "Accept: application/vnd.github.v3+json" \
-              "https://api.github.com/repos/opea-project/GenAIExamples/issues/${{ github.event.pull_request.number }}/comments" \
-              -d '{"body":"File '"$dockerfile"' resulted in a change in the image size from '"$size_base"' -> '"$size_pr"' MB"}'
-            fi
+          diff=$((size_pr - size_base))
+          # echo "::warning::Image size change: $size_base -> $size_pr MB' (diff: $diff MB)"
+          echo "comment to ${{ github.event.pull_request.number }}"
+          if [ "$diff" -gt 50 ]; then
+            curl -X POST \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/repos/opea-project/GenAIExamples/issues/${{ github.event.pull_request.number }}/comments" \
+            -d '{"body":"⚠️ File '"$dockerfile"' resulted in a change in the image size from '"$size_base"' -> '"$size_pr"' MB"}'
+          else
+            curl -X POST \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/repos/opea-project/GenAIExamples/issues/${{ github.event.pull_request.number }}/comments" \
+            -d '{"body":"File '"$dockerfile"' resulted in a change in the image size from '"$size_base"' -> '"$size_pr"' MB"}'
+          fi
 
-            # echo "File $dockerfile resulted in a change in the image size from $size_base -> $size_pr MB" >> $GITHUB_STEP_SUMMARY
-            docker rmi "$image_base" "$image_pr"
-          done < <(echo "${{ steps.changed-dockerfiles.outputs.files }}" | tr '\n' '\0')
+          # echo "File $dockerfile resulted in a change in the image size from $size_base -> $size_pr MB" >> $GITHUB_STEP_SUMMARY
+          docker rmi "$image_base" "$image_pr"
