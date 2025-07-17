@@ -56,11 +56,11 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Build and check image sizes
-
+        id: build-and-check
         env:
           dockerfile: ${{ matrix.dockerfile }}
         run: |
-          set -e
+          set -x
           merged_commit=$(git log -1 --format='%H')
 
           [ -z "$dockerfile" ] && continue
@@ -68,16 +68,17 @@ jobs:
           file=$(basename "$dockerfile")
           image_base="pr-image-size-base:$(echo $dir | tr '/' '-')"
           image_pr="pr-image-size-pr:$(echo $dir | tr '/' '-')"
-          
+
           slash_count=$(grep -o "/" <<< "$dockerfile" | wc -l)
           if [ "$slash_count" -eq 1 ]; then
             cd "${{github.workspace}}/$dir"
           elif [ "$slash_count" -gt 1 ]; then
             if [[ "$dockerfile" == *"ui/"* ]]; then
-              cd "${{github.workspace}}/$dir/ui"
+              dir=$(echo "$dir" | sed 's|\(.*\)/ui.*|\1/ui|')
+              cd "${{github.workspace}}/$dir"
               file=docker/$file
-              image_base="pr-image-size-base:$(echo $dir/ui | tr '/' '-')"
-              image_pr="pr-image-size-pr:$(echo $dir/ui | tr '/' '-')"
+              image_base="pr-image-size-base:$(echo $dir | tr '/' '-')"
+              image_pr="pr-image-size-pr:$(echo $dir | tr '/' '-')"
             elif [[ "$dockerfile" == *"WorkflowExecAgent/tests"* ]]; then
               echo "Skipping $dockerfile"
               exit 0
@@ -90,7 +91,7 @@ jobs:
           echo "Building base image for $dockerfile"
           git checkout ${{ github.event.pull_request.base.sha }}
           echo "::group::Build image_base"
-          docker build -f "$file" -t "$image_base" --no-cache .
+          docker build -f "$file" -t "$image_base" --no-cache . || true
           echo "::endgroup::"
           size_base=$(docker image inspect "$image_base" | jq '.[0].Size / (1024 * 1024) | round')
 
@@ -98,7 +99,7 @@ jobs:
           git checkout $merged_commit
           echo "PR: $merged_commit"
           echo "::group::Build image_pr"
-          docker build -f "$file" -t "$image_pr" --no-cache .
+          docker build -f "$file" -t "$image_pr" --no-cache . || true
           echo "::endgroup::"
           size_pr=$(docker image inspect "$image_pr" | jq '.[0].Size / (1024 * 1024) | round')
 
@@ -106,7 +107,7 @@ jobs:
           # echo "::warning::Image size change: $size_base -> $size_pr MB' (diff: $diff MB)"
           echo "comment to ${{ github.event.pull_request.number }}"
           if [ "$diff" -gt 50 ]; then
-            comment_message="⚠️ File '$dockerfile' resulted in a change in the image size from $size_base -> $size_pr MB (diff: $diff MB)"  
+            comment_message="⚠️ File '$dockerfile' resulted in a change in the image size from $size_base -> $size_pr MB (diff: $diff MB)"
           else
             comment_message="File '$dockerfile' resulted in a change in the image size from $size_base -> $size_pr MB (diff: $diff MB)"
           fi
@@ -116,6 +117,7 @@ jobs:
 
   collect-comments:
     needs: build-and-check
+    if: always()
     runs-on: ubuntu-latest
     outputs:
       all_comments: ${{ steps.collect.outputs.all_comments }}
@@ -124,6 +126,7 @@ jobs:
         id: collect
         run: |
           comments=$(echo '${{ toJson(needs.build-and-check.outputs) }}' | jq -r 'to_entries[] | select(.value != null and .value != "") | .value' | sed ':a;N;$!ba;s/\n/\\n/g')
+          echo "all_comments=$comments"
           echo "all_comments=$comments" >> $GITHUB_OUTPUT
 
   Post-comment-on-PR:
@@ -132,10 +135,9 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
-    if: needs.collect-comments.outputs.all_comments != ''
+    if: always() && needs.collect-comments.outputs.all_comments != ''
     steps:
       - name: Post comment on PR
-        if: always()
         env:
           all_comments: ${{ needs.collect-comments.outputs.all_comments }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
