@@ -155,7 +155,7 @@ jobs:
     if: always()
     runs-on: ubuntu-latest
     outputs:
-      all_comments: ${{ steps.collect.outputs.all_comments }}
+      all_comments: ${{ steps.summary.outputs.all_comments }}
     steps:
       - name: Download Summary
         uses: actions/download-artifact@v4
@@ -164,28 +164,26 @@ jobs:
           path: downloaded-files
 
       - name: Read Summary
+        id: summary
         run: |
           all_comments=$(cat downloaded-files/*.md | jq -Rs .)
           echo "all_comments=$all_comments"
           echo "all_comments=$all_comments" >> $GITHUB_OUTPUT
 
-      # - name: Remove merged-files
-      #   uses: actions/
-
-  # Post-comment-on-PR:
-  #   needs: collect-comments
-  #   runs-on: ubuntu-latest
-  #   permissions:
-  #     contents: read
-  #     pull-requests: write
-  #   if: always() && needs.collect-comments.outputs.all_comments != ''
-  #   steps:
-  #     - name: Post comment on PR
-  #       env:
-  #         all_comments: ${{ needs.collect-comments.outputs.all_comments }}
-  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  #       run: |
-  #         echo "comment ${all_comments}"
+  Post-comment-on-PR:
+    needs: collect-comments
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    if: always() && needs.collect-comments.outputs.all_comments != ''
+    steps:
+      - name: Post comment on PR
+        env:
+          all_comments: ${{ needs.collect-comments.outputs.all_comments }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "comment $all_comments"
   #         json_body=$(jq -n --arg msg "$all_comments" '{"body": $msg}')
   #         comment_id=$(curl -s \
   #           -H "Authorization: token ${GITHUB_TOKEN}" \
