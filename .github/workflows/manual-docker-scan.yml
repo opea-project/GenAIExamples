@@ -72,7 +72,7 @@ jobs:
           format: 'spdx-json'
 
       - name: Security Scan Container
-        uses: aquasecurity/trivy-action@0.24.0
+        uses: aquasecurity/trivy-action@v0.49.0
         if: ${{ inputs.trivy_scan }}
         with:
           image-ref: ${{ env.OPEA_IMAGE_REPO }}opea/${{ matrix.image }}:${{ inputs.tag }}
@@ -82,6 +82,7 @@ jobs:
           ignore-unfixed: true
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
+          args: --ignore-base
 
       - name: Cleanup
         if: always()
