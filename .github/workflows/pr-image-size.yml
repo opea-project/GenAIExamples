@@ -183,7 +183,6 @@ jobs:
         run: |
           echo "comment $all_comments"
           json_body=$(jq -n --arg msg "$all_comments" '{"body": $msg}')
-          echo "$json_body"
           comment_id=$(curl -s \
             -H "Authorization: token ${GITHUB_TOKEN}" \
             -H "Accept: application/vnd.github.v3+json" \
