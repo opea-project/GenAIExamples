@@ -91,36 +91,34 @@ jobs:
             fi
           fi
 
-          # echo "Building base image for $dockerfile"
-          # git checkout ${{ github.event.pull_request.base.sha }}
-          # echo "::group::Build image_base"
-          # docker build -f "$file" -t "$image_base" --no-cache . || true
-          # echo "::endgroup::"
-          # size_base=$(docker image inspect "$image_base" | jq '.[0].Size / (1024 * 1024) | round')
+          echo "Building base image for $dockerfile"
+          git checkout ${{ github.event.pull_request.base.sha }}
+          echo "::group::Build image_base"
+          docker build -f "$file" -t "$image_base" --no-cache . || true
+          echo "::endgroup::"
+          size_base=$(docker image inspect "$image_base" | jq '.[0].Size / (1024 * 1024) | round')
 
-          # echo "Building PR image for $dockerfile"
-          # git checkout $merged_commit
-          # echo "PR: $merged_commit"
-          # echo "::group::Build image_pr"
-          # docker build -f "$file" -t "$image_pr" --no-cache . || true
-          # echo "::endgroup::"
-          # size_pr=$(docker image inspect "$image_pr" | jq '.[0].Size / (1024 * 1024) | round')
+          echo "Building PR image for $dockerfile"
+          git checkout $merged_commit
+          echo "PR: $merged_commit"
+          echo "::group::Build image_pr"
+          docker build -f "$file" -t "$image_pr" --no-cache . || true
+          echo "::endgroup::"
+          size_pr=$(docker image inspect "$image_pr" | jq '.[0].Size / (1024 * 1024) | round')
 
-          # diff=$((size_pr - size_base))
-          # # echo "::warning::Image size change: $size_base -> $size_pr MB' (diff: $diff MB)"
-          # echo "comment to ${{ github.event.pull_request.number }}"
-          # if [ "$diff" -gt 50 ]; then
-          #   comment_message="⚠️ File '$dockerfile' resulted in a change in the image size from $size_base -> $size_pr MB (diff: $diff MB)"
-          # else
-          #   comment_message="File '$dockerfile' resulted in a change in the image size from $size_base -> $size_pr MB (diff: $diff MB)"
-          # fi
+          diff=$((size_pr - size_base))
+          # echo "::warning::Image size change: $size_base -> $size_pr MB' (diff: $diff MB)"
+          echo "comment to ${{ github.event.pull_request.number }}"
+          if [ "$diff" -gt 50 ]; then
+            comment_message="⚠️ File '$dockerfile' resulted in a change in the image size from $size_base -> $size_pr MB (diff: $diff MB)"
+          else
+            comment_message="File '$dockerfile' resulted in a change in the image size from $size_base -> $size_pr MB (diff: $diff MB)"
+          fi
 
           # echo "comment_message=$comment_message" >> $GITHUB_OUTPUT
           # echo "File $dockerfile resulted in a change in the image size from $size_base -> $size_pr MB" >> $GITHUB_STEP_SUMMARY
-          # docker rmi "$image_base" "$image_pr"
+          docker rmi "$image_base" "$image_pr"
 
-          ##For debug
-          comment_message="File size change"
           echo "$comment_message" >> $GITHUB_STEP_SUMMARY
           image_name=$(echo $dir | tr '/' '-')
           cp "$GITHUB_STEP_SUMMARY" ${{github.workspace}}/build-$image_name.md
@@ -184,23 +182,24 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo "comment $all_comments"
-  #         json_body=$(jq -n --arg msg "$all_comments" '{"body": $msg}')
-  #         comment_id=$(curl -s \
-  #           -H "Authorization: token ${GITHUB_TOKEN}" \
-  #           -H "Accept: application/vnd.github.v3+json" \
-  #           "https://api.github.com/repos/${{ github.repository }}/issues/comments/${{ github.event.pull_request.number }}" \
-  #           | jq '.[] | select(.user.login=="github-actions[bot]") | .id' | tail -n1)
+          json_body=$(jq -n --arg msg "$all_comments" '{"body": $msg}')
+          echo "$json_body"
+          comment_id=$(curl -s \
+            -H "Authorization: token ${GITHUB_TOKEN}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/repos/${{ github.repository }}/issues/comments/${{ github.event.pull_request.number }}" \
+            | jq '.[] | select(.user.login=="github-actions[bot]") | .id' | tail -n1)
 
-  #         if [ -n "$comment_id" ]; then
-  #           curl -X PATCH \
-  #             -H "Authorization: token ${GITHUB_TOKEN}" \
-  #             -H "Accept: application/vnd.github.v3+json" \
-  #             "https://api.github.com/repos/opea-project/GenAIExamples/issues/${{ github.event.pull_request.number }}/comments" \
-  #             -d "$json_body"
-  #         else
-  #           curl -X POST \
-  #             -H "Authorization: token ${GITHUB_TOKEN}" \
-  #             -H "Accept: application/vnd.github.v3+json" \
-  #             "https://api.github.com/repos/opea-project/GenAIExamples/issues/${{ github.event.pull_request.number }}/comments" \
-  #             -d "$json_body"
-  #         fi
+          if [ -n "$comment_id" ]; then
+            curl -X PATCH \
+              -H "Authorization: token ${GITHUB_TOKEN}" \
+              -H "Accept: application/vnd.github.v3+json" \
+              "https://api.github.com/repos/opea-project/GenAIExamples/issues/${{ github.event.pull_request.number }}/comments" \
+              -d "$json_body"
+          else
+            curl -X POST \
+              -H "Authorization: token ${GITHUB_TOKEN}" \
+              -H "Accept: application/vnd.github.v3+json" \
+              "https://api.github.com/repos/opea-project/GenAIExamples/issues/${{ github.event.pull_request.number }}/comments" \
+              -d "$json_body"
+          fi
