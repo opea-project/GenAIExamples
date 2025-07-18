@@ -16,6 +16,7 @@ export HF_TOKEN=${HF_TOKEN}
 export llm_engine=vllm
 export ip_address=$(hostname -I | awk '{print $1}')
 export llm_endpoint_url=http://${ip_address}:${vllm_port}
+export api_key=""
 export model=mistralai/Mistral-7B-Instruct-v0.3
 export recursion_limit=25
 export temperature=0

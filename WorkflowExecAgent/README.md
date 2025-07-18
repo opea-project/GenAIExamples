@@ -130,13 +130,34 @@ There are 3 services needed for the setup:
 
 3. workflow serving API service - specified as `SDK_BASE_URL`
 
-Workflow Executor will have a single docker image. First, build the agent docker image.
+(Optional) Build the agent docker image with the most latest changes.  
+By default, Workflow Executor uses public [opea/vllm](https://hub.docker.com/r/opea/agent) docker image if no local built image exists.
 
 ```sh
-git clone https://github.com/opea-project/GenAIExamples.git
+export WORKDIR=$PWD
+git clone https://github.com/opea-project/GenAIComps.git
 cd GenAIExamples//WorkflowExecAgent/docker_image_build/
+git clone https://github.com/opea-project/GenAIExamples.git
 docker compose -f build.yaml build --no-cache
 ```
+
+<details>
+<summary> Using Remote LLM Endpoints </summary>
+When models are deployed on a remote server, a base URL and an API key are required to access them. To set up a remote server and acquire the base URL and API key, refer to <a href="https://www.intel.com/content/www/us/en/developer/topic-technology/artificial-intelligence/enterprise-inference.html"> Intel® AI for Enterprise Inference </a> offerings.
+
+Set the following environment variables.
+
+- `llm_endpoint_url` is the HTTPS endpoint of the remote server with the model of choice (i.e. https://api.inference.denvrdata.com). **Note:** If not using LiteLLM, the second part of the model card needs to be appended to the URL i.e. `/Llama-3.3-70B-Instruct` from `meta-llama/Llama-3.3-70B-Instruct`.
+- `llm_endpoint_api_key` is the access token or key to access the model(s) on the server.
+- `LLM_MODEL_ID` is the model card which may need to be overwritten depending on what it is set to `set_env.sh`.
+
+```bash
+export llm_endpoint_url=<https-endpoint-of-remote-server>
+export llm_endpoint_api_key=<your-api-key>
+export LLM_MODEL_ID=<model-card>
+```
+
+</details>
 
 Configure `GenAIExamples/WorkflowExecAgent/docker_compose/.env` file with the following. Replace the variables according to your usecase.
 
@@ -146,8 +167,9 @@ export SDK_BASE_URL=http://$(hostname -I | awk '{print $1}'):${wf_api_port}/    
 export SERVING_TOKEN=${SERVING_TOKEN}           # Authentication token. For example_workflow test, can be empty as no authentication required.
 export ip_address=$(hostname -I | awk '{print $1}')
 export HF_TOKEN=${HF_TOKEN}
-export llm_engine=${llm_engine}
+export llm_engine=vllm
 export llm_endpoint_url=${llm_endpoint_url}
+export api_key=${llm_endpoint_api_key:-""}
 export WORKDIR=${WORKDIR}
 export TOOLSET_PATH=$WORKDIR/GenAIExamples/WorkflowExecAgent/tools/
 export http_proxy=${http_proxy}
@@ -159,6 +181,9 @@ export recursion_limit=${recursion_limit}
 export temperature=0
 export max_new_tokens=1000
 ```
+
+> Note: SDK_BASE_URL and SERVING_TOKEN can be obtained from Intel Data Insight Automation platform.  
+> For llm_endpoint_url, both local vllm service or an remote vllm endpoint work for the example.
 
 Launch service by running the docker compose command.
 
