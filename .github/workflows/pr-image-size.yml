@@ -121,8 +121,6 @@ jobs:
           echo $comment_message >> $GITHUB_STEP_SUMMARY
           image_name=$(echo $dir | tr '/' '-')
           cp $GITHUB_STEP_SUMMARY ${{github.workspace}}/build-$image_name.md
-          echo "name=comment-$image_name">> $GITHUB_ENV
-          echo "file_name=build-$image_name.md" >> $GITHUB_ENV
           echo "summary_path=${{github.workspace}}/build-$image_name.md" >> $GITHUB_ENV
 
       - name: Download origin artifact log
@@ -163,7 +161,6 @@ jobs:
       - name: Read Summary
         id: summary
         run: |
-          set -x
           all_comments=$(cat downloaded-files/*.md | jq -Rs .)
           echo "all_comments=$all_comments"
           echo "all_comments=$all_comments" >> $GITHUB_OUTPUT
@@ -181,7 +178,6 @@ jobs:
           all_comments: ${{ needs.collect-comments.outputs.all_comments }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          set -x
           all_comments=$(echo $all_comments | jq -r . | sed 's|\\n|\n|g')
           json_body=$(jq -n --arg msg "$all_comments" '{"body": $msg}')
 
@@ -191,22 +187,16 @@ jobs:
             "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments" \
             | jq '.[] | select(.user.login=="github-actions[bot]") | .id' | tail -n1)
 
-          comment_id=$(curl -s \
-            -H "Authorization: token ${GITHUB_TOKEN}" \
-            -H "Accept: application/vnd.github.v3+json" \
-            "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments" \
-            | jq 'map(select(.user.login=="github-actions[bot]")) | last | .id')
-
           if [ -n "$comment_id" ]; then
             curl -X PATCH \
               -H "Authorization: token ${GITHUB_TOKEN}" \
               -H "Accept: application/vnd.github.v3+json" \
-              "https://api.github.com/repos/opea-project/GenAIExamples/issues/comments/$comment_id" \
+              "https://api.github.com/repos/${{ github.repository }}/issues/comments/$comment_id" \
               -d "$json_body"
           else
             curl -X POST \
               -H "Authorization: token ${GITHUB_TOKEN}" \
               -H "Accept: application/vnd.github.v3+json" \
-              "https://api.github.com/repos/opea-project/GenAIExamples/issues/${{ github.event.pull_request.number }}/comments" \
+              "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments" \
               -d "$json_body"
           fi
