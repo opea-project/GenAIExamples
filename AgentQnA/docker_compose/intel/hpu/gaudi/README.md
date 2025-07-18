@@ -33,7 +33,7 @@ git clone https://github.com/opea-project/GenAIExamples.git
 cd GenAIExamples/AgentQnA
 ```
 
-Then checkout a released version, such as v1.4:
+To checkout a released version, such as v1.4:
 
 ```bash
 git checkout v1.4
@@ -49,7 +49,6 @@ export HF_TOKEN="Your_HuggingFace_API_Token"  # the huggingface API token you ap
 export http_proxy="Your_HTTP_Proxy"           # http proxy if any
 export https_proxy="Your_HTTPs_Proxy"         # https proxy if any
 export no_proxy=localhost,127.0.0.1,$host_ip  # additional no proxies if needed
-export NGINX_PORT=${your_nginx_port}          # your usable port for nginx, 80 for example
 ```
 
 #### [Optional] OPENAI_API_KEY to use OpenAI models or Intel® AI for Enterprise Inference
@@ -107,37 +106,13 @@ docker compose -f $WORKDIR/GenAIExamples/DocIndexRetriever/docker_compose/intel/
 
 </details>
 
-#### OpenAI Models
-
-The command below will launch the multi-agent system with the `DocIndexRetriever` as the retrieval tool for the Worker RAG agent.
-
-```bash
-docker compose -f $WORKDIR/GenAIExamples/DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml -f compose_openai.yaml up -d
-```
-
-#### Models on Remote Server
-
-When models are deployed on a remote server with Intel® AI for Enterprise Inference, a base URL and an API key are required to access them. To run the Agent microservice on Gaudi while using models deployed on a remote server, add `compose_remote.yaml` to the `docker compose` command and set additional environment variables.
-
-#### Notes
-
-- `OPENAI_API_KEY` is already set in a previous step.
-- `model` is used to overwrite the value set for this environment variable in `set_env.sh`.
-- `LLM_ENDPOINT_URL` is the base URL given from the owner of the on-prem machine or cloud service provider. It will follow this format: "https://<DNS>". Here is an example: "https://api.inference.example.com".
-
-```bash
-export model=<name-of-model-card>
-export LLM_ENDPOINT_URL=<http-endpoint-of-remote-server>
-docker compose -f $WORKDIR/GenAIExamples/DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml -f compose_openai.yaml -f compose_remote.yaml up -d
-```
-
 #### Build image from source
 
 Please refer to the table below to build different microservices from source:
 
 | Microservice | Deployment Guide                                                                                                                                 |
-| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------ | --- |
-| Agent        | [Agent build guide](https://github.com/opea-project/GenAIComps/blob/main/comps/agent/src/README.md#21-build-docker-image-for-agent-microservice) |     |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Agent        | [Agent build guide](https://github.com/opea-project/GenAIComps/blob/main/comps/agent/src/README.md#21-build-docker-image-for-agent-microservice) |
 | UI           | [Basic UI build guide](../../../../README_miscellaneous.md#build-ui-docker-image)                                                                |
 
 ### Ingest Data into the Vector Database
