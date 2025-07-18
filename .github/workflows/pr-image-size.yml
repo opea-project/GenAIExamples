@@ -111,7 +111,7 @@ jobs:
           if [ "$diff" -gt 50 ]; then
             comment_message="⚠️ WARNING\nFile $dockerfile resulted in a change in the image size from $size_base -> $size_pr MB (diff: $diff MB)"
           else
-            comment_message="File $dockerfile resulted in a change in the image size from $size_base -> $size_pr MB (diff: $diff MB)"
+            comment_message="ℹ️ INFO\nFile $dockerfile resulted in a change in the image size from $size_base -> $size_pr MB (diff: $diff MB)"
           fi
 
           # echo "comment_message=$comment_message" >> $GITHUB_OUTPUT
