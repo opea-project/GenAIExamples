@@ -167,7 +167,7 @@ class QnAGenerator(BaseComponent):
             self.vllm_name = llm_model().model_id
             if vllm_endpoint == "":
                 vllm_endpoint = os.getenv("vLLM_ENDPOINT", "http://localhost:8086")
-            self.vllm_endpoint = vllm_endpoint
+        self.vllm_endpoint = vllm_endpoint
 
     def set_prompt(self, prompt):
         if "{context}" not in prompt:
@@ -274,6 +274,7 @@ class QnAGenerator(BaseComponent):
             "generator_type": self.comp_subtype,
             "inference_type": self.inference_type,
             "model": self.llm(),
+            "vllm_endpoint": self.vllm_endpoint,
         }
         return set
 

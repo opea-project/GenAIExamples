@@ -100,6 +100,7 @@
 
 <script lang="ts" setup name="Table">
 import {
+  getPipelineDetialByName,
   requestPipelineDelete,
   requestPipelineSwitchState,
 } from "@/api/pipeline";
@@ -177,16 +178,23 @@ const handleView = (row: EmptyObjectType) => {
 };
 //activate/deactivate
 const handleSwitchState = (row: EmptyObjectType) => {
+  const { name } = row;
   const { active } = row?.status;
 
   const text = active ? t("pipeline.deactivateTip") : t("pipeline.activeTip");
+
   Modal.confirm({
     title: t("common.prompt"),
     content: text,
     okText: t("common.confirm"),
     async onOk() {
-      await requestPipelineSwitchState(row.name, { active: !active });
-      pipelineStore.setPipelineActivate(active ? "" : row.name);
+      const data: any = await getPipelineDetialByName(name);
+      const form = {
+        ...JSON.parse(data),
+        active: !active,
+      };
+      await requestPipelineSwitchState(name, form);
+      pipelineStore.setPipelineActivate(active ? "" : name);
       emit("search");
     },
   });

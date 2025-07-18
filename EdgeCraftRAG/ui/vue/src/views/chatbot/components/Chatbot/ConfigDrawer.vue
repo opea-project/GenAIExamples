@@ -46,7 +46,7 @@
             v-model:value="form.temperature"
             :min="0"
             :max="1"
-            :step="0.1"
+            :step="0.01"
             :marks="sliderMarks.temperature"
           />
           <div class="tips-wrap">
@@ -62,7 +62,7 @@
             v-model:value="form.top_p"
             :min="0"
             :max="1"
-            :step="0.1"
+            :step="0.01"
             :marks="sliderMarks.temperature"
           />
           <div class="tips-wrap">
@@ -93,7 +93,7 @@
             v-model:value="form.repetition_penalty"
             :min="1"
             :max="2"
-            :step="0.1"
+            :step="0.01"
             :marks="sliderMarks.repetition_penalty"
           />
           <div class="tips-wrap">
@@ -146,12 +146,12 @@ const formRef = ref<FormInstance>();
 const drawerVisible = ref<boolean>(true);
 const submitLoading = ref<boolean>(false);
 const {
-  top_n = 5,
-  temperature = 0.1,
-  top_p = 1,
-  top_k = 50,
-  repetition_penalty = 1.1,
-  max_tokens = 512,
+  top_n = 25,
+  temperature = 0.01,
+  top_p = 0.95,
+  top_k = 10,
+  repetition_penalty = 1.03,
+  max_tokens = 1024,
   stream = true,
 } = props.drawerData;
 

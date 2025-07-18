@@ -46,6 +46,7 @@
           v-model:value="form.retrieve_topk"
           :min="1"
           :max="200"
+          @change="handleTopkChange"
         />
       </a-form-item>
       <FormTooltip :title="$t('pipeline.desc.topk')" />
@@ -107,6 +108,9 @@ const sliderMarks = reactive<EmptyObjectType>({
     200: "200",
   },
 });
+const handleTopkChange = () => {
+  formRef.value?.validateFields(["retrieve_topk"]);
+};
 // Validate the form, throw results form
 const handleValidate = (): Promise<object> => {
   return new Promise((resolve) => {

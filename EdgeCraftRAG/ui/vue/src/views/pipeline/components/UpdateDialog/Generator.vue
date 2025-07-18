@@ -28,8 +28,8 @@
     </a-form-item>
     <a-form-item :label="$t('pipeline.config.llm')" name="inference_type">
       <a-radio-group v-model:value="form.inference_type">
-        <a-radio value="local">{{ $t("pipeline.config.local") }}</a-radio>
         <a-radio value="vllm">{{ $t("pipeline.config.vllm") }}</a-radio>
+        <a-radio value="local">{{ $t("pipeline.config.local") }}</a-radio>
       </a-radio-group>
     </a-form-item>
     <template v-if="form.inference_type === 'local'">
@@ -192,7 +192,7 @@ const handleUrlFormat = (url: string) => {
 };
 const {
   generator_type = "chatqna",
-  inference_type = "local",
+  inference_type = "vllm",
   vllm_endpoint = "",
   model = {
     model_id: undefined,

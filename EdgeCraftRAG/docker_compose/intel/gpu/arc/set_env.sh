@@ -8,7 +8,7 @@ popd > /dev/null
 
 export MODEL_PATH=${MODEL_PATH}
 export DOC_PATH=${DOC_PATH}
-export UI_TMPFILE_PATH=${UI_TMPFILE_PATH}
+export TMPFILE_PATH=${TMPFILE_PATH}
 export HOST_IP=${HOST_IP}
 export LLM_MODEL=${LLM_MODEL}
 export HF_ENDPOINT=${HF_ENDPOINT}

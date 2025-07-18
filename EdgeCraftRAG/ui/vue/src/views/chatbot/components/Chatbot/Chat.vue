@@ -36,11 +36,7 @@
       />
       <div class="button-wrap">
         <div class="send-btn">
-          <a-tooltip
-            v-if="messagesLength"
-            placement="top"
-            :title="$t('chat.new')"
-          >
+          <a-tooltip placement="top" :title="$t('chat.new')">
             <span class="connon-btn">
               <SvgIcon
                 name="icon-newChat"
@@ -93,6 +89,7 @@ import { handleMessageSend } from "./SseService";
 import { pipelineAppStore } from "@/store/pipeline";
 import { Local } from "@/utils/storage";
 import { ArrowDownOutlined } from "@ant-design/icons-vue";
+import { throttle } from "lodash";
 
 const emit = defineEmits(["config"]);
 const ENV_URL = import.meta.env;
@@ -114,6 +111,7 @@ const imgVisible = ref<boolean>(false);
 const imageSrc = ref<string>("");
 const isUserScrolling = ref(false);
 const showScrollToBottomBtn = ref(false);
+const resizeObserverRef = ref<ResizeObserver | null>(null);
 
 const inputRef = ref();
 const handleEnvUrl = () => {
@@ -180,6 +178,7 @@ const handleSendMessage = async () => {
   inResponse.value = true;
   toggleConnection();
   inputKeywords.value = "";
+  scrollToBottom();
 };
 const handleStopDisplay = () => {
   inResponse.value = false;
@@ -228,8 +227,9 @@ const scrollToBottom = () => {
   isUserScrolling.value = false;
   showScrollToBottomBtn.value = false;
 };
+
 const handleResize = (entries: ResizeObserverEntry[]) => {
-  for (let entry of entries) {
+  for (const entry of entries) {
     if (!scrollContainer.value || isUserScrolling.value) return;
 
     scrollContainer.value?.scrollTo({
@@ -242,28 +242,32 @@ const handleResize = (entries: ResizeObserverEntry[]) => {
 const handleScroll = () => {
   const container = scrollContainer.value;
   if (!container) return;
-
   const distanceToBottom =
     container.scrollHeight - container.scrollTop - container.clientHeight;
-
   if (distanceToBottom > 80) {
     isUserScrolling.value = true;
     showScrollToBottomBtn.value = true;
+    if (resizeObserverRef.value) resizeObserverRef.value.disconnect();
   } else {
     isUserScrolling.value = false;
     showScrollToBottomBtn.value = false;
+    if (messageComponent.value && resizeObserverRef.value)
+      resizeObserverRef.value.observe(messageComponent.value);
   }
 };
 
 const initResizeObserver = () => {
   if (messageComponent.value) {
-    if (resizeObserver) {
-      resizeObserver.disconnect();
+    if (resizeObserverRef.value) {
+      resizeObserverRef.value.disconnect();
     }
 
-    resizeObserver = new ResizeObserver(handleResize);
-    resizeObserver.observe(messageComponent.value);
-    scrollContainer.value?.addEventListener("scroll", handleScroll);
+    resizeObserverRef.value = new ResizeObserver(handleResize);
+    resizeObserverRef.value.observe(messageComponent.value);
+
+    const throttledHandleScroll = throttle(handleScroll, 100);
+
+    scrollContainer.value?.addEventListener("scroll", throttledHandleScroll);
   }
 };
 
@@ -324,8 +328,8 @@ onBeforeUnmount(() => {
   .message-box {
     flex: 1;
     width: 100%;
-    overflow-y: overlay;
-    scrollbar-gutter: stable;
+    overflow-y: auto;
+    position: relative;
     display: flex;
     justify-content: center;
 
@@ -334,7 +338,7 @@ onBeforeUnmount(() => {
       width: 75%;
       position: relative;
       transition: all 0.2s;
-      height: 100%;
+      // height: 100%;
       min-height: 0;
       margin: 0 48px;
       padding: 24px 0;

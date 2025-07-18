@@ -125,8 +125,8 @@ class LogitsEstimatorJSON(LogitsEstimator):
 
         return output_texts, output_logits
 
-    async def _calculate_logits_score(self, input0, input1):
-        query_and_chunk = self.input_template.format(input0, input1)
+    async def _calculate_logits_score(self, user_input, issue):
+        query_and_chunk = self.input_template.format(user_input, issue)
         output_instructions = self.output_template.format(
             json_key=f'"{self.json_key}"',
             json_levels="[{}]".format(", ".join([f'"{jval}"' for jval in self.json_levels])),
@@ -187,13 +187,19 @@ def read_json_files(directory: str) -> dict:
     return result
 
 
-async def query_search(user_input, search_config_path, search_dir):
+async def query_search(user_input, search_config_path, search_dir, pl):
+
     top1_issue = None
     sub_questionss_result = None
     if not os.path.exists(search_dir):
         return top1_issue, sub_questionss_result
 
+    model_id = pl.generator.model_id
+    vllm_endpoint = pl.generator.vllm_endpoint
+
     cfg = OmegaConf.load(search_config_path)
+    cfg.query_matcher.model_id = model_id
+    cfg.query_matcher.API_BASE = os.path.join(vllm_endpoint, "v1/completions")
     query_matcher = LogitsEstimatorJSON(**cfg.query_matcher)
     maintenance_data = read_json_files(search_dir)
     issues = list(maintenance_data.keys())

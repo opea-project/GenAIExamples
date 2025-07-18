@@ -34,7 +34,7 @@ services:
       timeout: 20s
       retries: 3
     deploy:
-      replicas: \${START_MILVUS:-0}
+      replicas: \${MILVUS_ENABLED:-0}
   minio:
     container_name: milvus-minio
     image: minio/minio:RELEASE.2023-03-20T20-16-18Z
@@ -53,7 +53,7 @@ services:
       timeout: 20s
       retries: 3
     deploy:
-      replicas: \${START_MILVUS:-0}
+      replicas: \${MILVUS_ENABLED:-0}
   milvus-standalone:
     container_name: milvus-standalone
     image: milvusdb/milvus:v2.4.6
@@ -79,7 +79,7 @@ services:
       - "etcd"
       - "minio"
     deploy:
-      replicas: \${START_MILVUS:-0}
+      replicas: \${MILVUS_ENABLED:-0}
   edgecraftrag-server:
     image: \${REGISTRY:-opea}/edgecraftrag-server:\${TAG:-latest}
     container_name: edgecraftrag-server
@@ -88,13 +88,15 @@ services:
       http_proxy: \${http_proxy}
       https_proxy: \${https_proxy}
       HF_ENDPOINT: \${HF_ENDPOINT}
-      vLLM_ENDPOINT: \${vLLM_ENDPOINT}
+      vLLM_ENDPOINT: \${vLLM_ENDPOINT:-http://\${HOST_IP}:\${NGINX_PORT:-8086}}
       LLM_MODEL: \${LLM_MODEL}
       ENABLE_BENCHMARK: \${ENABLE_BENCHMARK:-false}
+      MAX_MODEL_LEN: \${MAX_MODEL_LEN:-5000}
+      CHAT_HISTORY_ROUND: \${CHAT_HISTORY_ROUND:-0}
     volumes:
       - \${MODEL_PATH:-\${PWD}}:/home/user/models
       - \${DOC_PATH:-\${PWD}}:/home/user/docs
-      - \${UI_TMPFILE_PATH:-\${PWD}}:/home/user/ui_cache
+      - \${TMPFILE_PATH:-\${PWD}}:/home/user/ui_cache
       - \${HF_CACHE:-\${HOME}/.cache}:/home/user/.cache
       - \${PROMPT_PATH:-\${PWD}}:/templates/custom
     restart: always
@@ -144,7 +146,7 @@ services:
       UI_SERVICE_PORT: \${UI_SERVICE_PORT:-8082}
       UI_SERVICE_HOST_IP: \${UI_SERVICE_HOST_IP:-0.0.0.0}
     volumes:
-      - \${UI_TMPFILE_PATH:-\${PWD}}:/home/user/ui_cache
+      - \${TMPFILE_PATH:-\${PWD}}:/home/user/ui_cache
     restart: always
     ports:
       - \${UI_SERVICE_PORT:-8082}:\${UI_SERVICE_PORT:-8082}
@@ -167,7 +169,7 @@ for ((i = 0; i < PORT_NUM; i++)); do
       - \${VIDEOGROUPID:-44}
       - \${RENDERGROUPID:-109}
     volumes:
-      - \${LLM_MODEL_PATH:-\${PWD}}:/llm/models
+      - \${LLM_MODEL_PATH:-\${MODEL_PATH}/\${LLM_MODEL}}:/llm/models
     devices:
       - /dev/dri
     environment:
@@ -179,8 +181,8 @@ for ((i = 0; i < PORT_NUM; i++)); do
       SERVED_MODEL_NAME: \${LLM_MODEL}
       TENSOR_PARALLEL_SIZE: \${TENSOR_PARALLEL_SIZE:-1}
       MAX_NUM_SEQS: \${MAX_NUM_SEQS:-64}
-      MAX_NUM_BATCHED_TOKENS: \${MAX_NUM_BATCHED_TOKENS:-4000}
-      MAX_MODEL_LEN: \${MAX_MODEL_LEN:-3000}
+      MAX_NUM_BATCHED_TOKENS: \${MAX_NUM_BATCHED_TOKENS:-5000}
+      MAX_MODEL_LEN: \${MAX_MODEL_LEN:-5000}
       LOAD_IN_LOW_BIT: \${LOAD_IN_LOW_BIT:-fp8}
       CCL_DG2_USM: \${CCL_DG2_USM:-""}
       PORT: \${VLLM_SERVICE_PORT_$i:-8$((i+1))00}
@@ -197,4 +199,4 @@ networks:
     driver: bridge
 EOL
 
-echo "compose_vllm_multi-arc.yaml generated"
+echo "compose_vllm.yaml generated"

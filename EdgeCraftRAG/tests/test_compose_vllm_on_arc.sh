@@ -18,7 +18,7 @@ LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
 HOST_IP=$ip_address
 
-COMPOSE_FILE="compose_vllm_multi-arc.yaml"
+COMPOSE_FILE="compose_vllm.yaml"
 EC_RAG_SERVICE_PORT=16010
 
 MODEL_PATH="${HOME}/models"
@@ -68,7 +68,7 @@ function start_services() {
     # Start Docker Containers
     docker compose -f $COMPOSE_FILE up -d > ${LOG_PATH}/start_services_with_compose.log
     echo "ipex-llm-serving-xpu is booting, please wait."
-    sleep 100s
+    sleep 30s
     n=0
     until [[ "$n" -ge 100 ]]; do
         docker logs ipex-llm-serving-xpu-container-0 > ${LOG_PATH}/ipex-llm-serving-xpu-container.log 2>&1
