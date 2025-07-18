@@ -95,6 +95,12 @@ const querySystemStatus = async () => {
   const data = await getSystemStatus();
   Object.assign(systemData, data);
 };
+watch(
+  () => route.fullPath,
+  (value) => {
+    currentMenu.value = value;
+  }
+);
 onMounted(() => {
   querySystemStatus();
 });
