@@ -181,7 +181,7 @@ jobs:
           all_comments: ${{ needs.collect-comments.outputs.all_comments }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          set -x 
+          set -x
           all_comments=$(echo "$all_comments" | sed 's/\\n/\n/g')
           json_body=$(jq -n --arg msg "$all_comments" '{"body": $msg}')
 
@@ -201,7 +201,7 @@ jobs:
             curl -X PATCH \
               -H "Authorization: token ${GITHUB_TOKEN}" \
               -H "Accept: application/vnd.github.v3+json" \
-              "https://api.github.com/repos/opea-project/GenAIExamples/issues/${{ github.event.pull_request.number }}/comments" \
+              "https://api.github.com/repos/opea-project/GenAIExamples/issues/comments/$comment_id" \
               -d "$json_body"
           else
             curl -X POST \
