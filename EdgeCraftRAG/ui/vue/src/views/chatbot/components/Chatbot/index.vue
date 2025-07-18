@@ -22,12 +22,12 @@ import { Local } from "@/utils/storage";
 const chatbotStore = chatbotAppStore();
 
 let chatbotConfiguration = reactive<ConfigType>({
-  top_n: 5,
-  temperature: 0.1,
-  top_p: 1,
-  top_k: 50,
-  repetition_penalty: 1.1,
-  max_tokens: 512,
+  top_n: 25,
+  temperature: 0.01,
+  top_p: 0.95,
+  top_k: 10,
+  repetition_penalty: 1.03,
+  max_tokens: 1024,
   stream: true,
 });
 const configDrawer = reactive<DialogType>({

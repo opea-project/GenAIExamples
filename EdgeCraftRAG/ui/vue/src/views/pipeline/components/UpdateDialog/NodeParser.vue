@@ -47,6 +47,7 @@
             v-model:value="form.chunk_size"
             :min="100"
             :max="2000"
+            @change="handleChunkSizeChange"
           />
         </a-form-item>
         <FormTooltip :title="$t('pipeline.desc.chunkSize')" />
@@ -67,6 +68,7 @@
             v-model:value="form.chunk_overlap"
             :min="0"
             :max="400"
+            @change="handleChunkOverlapChange"
           />
         </a-form-item>
         <FormTooltip :title="$t('pipeline.desc.chunkOverlap')" /> </a-form-item
@@ -84,7 +86,12 @@
           :marks="sliderMarks.size"
         />
         <a-form-item noStyle>
-          <a-input-number v-model:value="form.window_size" :min="1" :max="10" />
+          <a-input-number
+            v-model:value="form.window_size"
+            :min="1"
+            :max="10"
+            @change="handleWindowSizeChange"
+          />
         </a-form-item>
         <FormTooltip :title="$t('pipeline.desc.windowSize')" />
       </a-form-item>
@@ -204,6 +211,15 @@ const sliderMarks = reactive<EmptyObjectType>({
     400: "400",
   },
 });
+const handleChunkSizeChange = () => {
+  formRef.value?.validateFields(["chunk_size"]);
+};
+const handleChunkOverlapChange = () => {
+  formRef.value?.validateFields(["chunk_overlap"]);
+};
+const handleWindowSizeChange = () => {
+  formRef.value?.validateFields(["window_size"]);
+};
 // Format parameter
 const formatFormParam = () => {
   const { parser_type, chunk_size, chunk_overlap, chunk_sizes, window_size } =
