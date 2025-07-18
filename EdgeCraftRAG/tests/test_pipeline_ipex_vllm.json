@@ -39,7 +39,7 @@
       "weight": ""
     },
     "prompt_path": "./default_prompt.txt",
-    "vllm_endpoint": "http://198.175.72.235:8086"
+    "vllm_endpoint": ""
   },
   "active": "True"
 }

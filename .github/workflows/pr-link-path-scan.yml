@@ -50,7 +50,7 @@ jobs:
                       if [ "$response_retry" -eq 200 ]; then
                         echo "*****Retry successfully*****"
                       else
-                        echo "Invalid link ($response_retry) from ${{github.workspace}}/$(echo "$url_line"|cut -d':' -f1): $url"
+                        echo -e "::error:: Invalid link ($response_retry) from ${{github.workspace}}/$(echo "$url_line"|cut -d':' -f1): $url"
                         fail="TRUE"
                       fi
                     fi
@@ -123,7 +123,7 @@ jobs:
                       if [ "$response_retry" -eq 200 ]; then
                         echo "*****Retry successfully*****"
                       else
-                        echo "Invalid path ($response_retry) from ${{github.workspace}}/$refer_path: $png_path"
+                        echo -e "::error:: Invalid path ($response_retry) from ${{github.workspace}}/$refer_path: $png_path"
                         fail="TRUE"
                       fi
                     else
@@ -132,7 +132,7 @@ jobs:
                   fi
                 fi
               else
-                echo "${{github.workspace}}/$refer_path:$png_path does not exist"
+                echo -e "::error:: ${{github.workspace}}/$refer_path:$png_path does not exist"
                 fail="TRUE"
               fi
             done
