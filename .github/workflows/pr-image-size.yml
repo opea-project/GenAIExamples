@@ -1,0 +1,202 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+name: Check Docker Image Size Change
+permissions:
+  contents: read
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, reopened, ready_for_review, synchronize]
+    paths:
+      - '**/Dockerfile'
+
+# If there is a new commit, the previous jobs will be canceled
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  get-check-list:
+    runs-on: ubuntu-latest
+    outputs:
+      files: ${{ steps.changed-dockerfiles.outputs.files }}
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get changed Dockerfiles
+        id: changed-dockerfiles
+        run: |
+          merged_commit=$(git log -1 --format='%H')
+          files=$(git diff --name-status --diff-filter=ARM ${{ github.event.pull_request.base.sha }} ${merged_commit} | awk '{print $2}' | grep -E 'Dockerfile$' | jq -R . | jq -sc .)
+          echo "files=$files"
+          echo "files=$files" >> $GITHUB_OUTPUT
+
+  build-and-check:
+    needs: get-check-list
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      actions: write
+    if: needs.get-check-list.outputs.files != ''
+    strategy:
+      matrix:
+        dockerfile: ${{ fromJson(needs.get-check-list.outputs.files) }}
+      fail-fast: false
+    # outputs:
+    #   comments: ${{ steps.build-check.outputs.comment_message }}
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and check image sizes
+        id: build-check
+        env:
+          dockerfile: ${{ matrix.dockerfile }}
+        run: |
+          merged_commit=$(git log -1 --format='%H')
+
+          [ -z "$dockerfile" ] && continue
+          dir=$(dirname "$dockerfile")
+          file=$(basename "$dockerfile")
+          image_base="pr-image-size-base:$(echo $dir | tr '/' '-')"
+          image_pr="pr-image-size-pr:$(echo $dir | tr '/' '-')"
+
+          slash_count=$(grep -o "/" <<< "$dockerfile" | wc -l)
+          if [ "$slash_count" -eq 1 ]; then
+            cd "${{github.workspace}}/$dir"
+          elif [ "$slash_count" -gt 1 ]; then
+            if [[ "$dockerfile" == *"ui/"* ]]; then
+              dir=$(echo "$dir" | sed 's|\(.*\)/ui.*|\1/ui|')
+              cd "${{github.workspace}}/$dir"
+              file=docker/$file
+              image_base="pr-image-size-base:$(echo $dir | tr '/' '-')"
+              image_pr="pr-image-size-pr:$(echo $dir | tr '/' '-')"
+            elif [[ "$dockerfile" == *"WorkflowExecAgent/tests"* ]]; then
+              echo "Skipping $dockerfile"
+              exit 0
+            else
+              echo "Error: Multiple '/' in dockerfile path but no 'ui/' found."
+              exit 1
+            fi
+          fi
+
+          echo "Building base image for $dockerfile"
+          git checkout ${{ github.event.pull_request.base.sha }}
+          echo "::group::Build image_base"
+          docker build -f $file -t "$image_base" --no-cache . || true
+          echo "::endgroup::"
+          size_base=$(docker image inspect "$image_base" | jq '.[0].Size / (1024 * 1024) | round')
+
+          echo "Building PR image for $dockerfile"
+          git checkout $merged_commit
+          echo "PR: $merged_commit"
+          echo "::group::Build image_pr"
+          docker build -f $file -t "$image_pr" --no-cache . || true
+          echo "::endgroup::"
+          size_pr=$(docker image inspect "$image_pr" | jq '.[0].Size / (1024 * 1024) | round')
+
+          diff=$((size_pr - size_base))
+          # echo "::warning::Image size change: $size_base -> $size_pr MB' (diff: $diff MB)"
+          echo "comment to ${{ github.event.pull_request.number }}"
+          if [ "$diff" -gt 50 ]; then
+            comment_message="⚠️ WARNING\nFile $dockerfile resulted in a change in the image size from $size_base -> $size_pr MB (diff: $diff MB)"
+          else
+            comment_message="ℹ️ INFO\nFile $dockerfile resulted in a change in the image size from $size_base -> $size_pr MB (diff: $diff MB)"
+          fi
+
+          # echo "comment_message=$comment_message" >> $GITHUB_OUTPUT
+          # echo "File $dockerfile resulted in a change in the image size from $size_base -> $size_pr MB" >> $GITHUB_STEP_SUMMARY
+          docker rmi "$image_base" "$image_pr"
+
+          echo $comment_message >> $GITHUB_STEP_SUMMARY
+          image_name=$(echo $dir | tr '/' '-')
+          cp $GITHUB_STEP_SUMMARY ${{github.workspace}}/build-$image_name.md
+          echo "summary_path=${{github.workspace}}/build-$image_name.md" >> $GITHUB_ENV
+
+      - name: Download origin artifact log
+        uses: actions/download-artifact@v4
+        with:
+          name: build-comments
+          path: merged-files
+        continue-on-error: true
+
+      - name: Merge logs
+        run: |
+          mkdir -p merged-files
+          ls merged-files/
+          cp ${{ env.summary_path }} merged-files/
+
+      - name: Save Summary as Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-comments
+          path: merged-files/
+          overwrite: true
+
+  collect-comments:
+    needs: build-and-check
+    permissions:
+      actions: read
+    if: always()
+    runs-on: ubuntu-latest
+    outputs:
+      all_comments: ${{ steps.summary.outputs.all_comments }}
+    steps:
+      - name: Download Summary
+        uses: actions/download-artifact@v4
+        with:
+          name: build-comments
+          path: downloaded-files
+
+      - name: Read Summary
+        id: summary
+        run: |
+          all_comments=$(cat downloaded-files/*.md | jq -Rs .)
+          echo "all_comments=$all_comments"
+          echo "all_comments=$all_comments" >> $GITHUB_OUTPUT
+
+  Post-comment-on-PR:
+    needs: collect-comments
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    if: always() && needs.collect-comments.outputs.all_comments != ''
+    steps:
+      - name: Post comment on PR
+        env:
+          all_comments: ${{ needs.collect-comments.outputs.all_comments }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          all_comments=$(echo $all_comments | jq -r . | sed 's|\\n|\n|g')
+          json_body=$(jq -n --arg msg "$all_comments" '{"body": $msg}')
+
+          comment_id=$(curl -s \
+            -H "Authorization: token ${GITHUB_TOKEN}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments" \
+            | jq '.[] | select(.user.login=="github-actions[bot]") | .id' | tail -n1)
+
+          if [ -n "$comment_id" ]; then
+            curl -X PATCH \
+              -H "Authorization: token ${GITHUB_TOKEN}" \
+              -H "Accept: application/vnd.github.v3+json" \
+              "https://api.github.com/repos/${{ github.repository }}/issues/comments/$comment_id" \
+              -d "$json_body"
+          else
+            curl -X POST \
+              -H "Authorization: token ${GITHUB_TOKEN}" \
+              -H "Accept: application/vnd.github.v3+json" \
+              "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments" \
+              -d "$json_body"
+          fi
