@@ -98,8 +98,12 @@ This MultimodalQnA use case performs Multimodal-RAG using LangChain, Redis Vecto
 
 The table below lists currently available deployment options. They outline in detail the implementation of this example on selected hardware.
 
-| Category               | Deployment Option | Description                                                           |
-| ---------------------- | ----------------- | --------------------------------------------------------------------- |
-| On-premise Deployments | Docker compose    | [MultimodalQnA deployment on Xeon](./docker_compose/intel/cpu/xeon)   |
-|                        |                   | [MultimodalQnA deployment on Gaudi](./docker_compose/intel/hpu/gaudi) |
-|                        |                   | [MultimodalQnA deployment on AMD ROCm](./docker_compose/amd/gpu/rocm) |
+![MultimodalQnA-pdf-query-example-screenshot](./assets/img/vector-store.png)
+
+## Validated Configurations
+
+| **Deploy Method** | **LLM Engine** | **LLM Model**                     | **Database**  | **Hardware** |
+| ----------------- | -------------- | --------------------------------- | ------------- | ------------ |
+| Docker Compose    | LLAVA          | llava-hf/llava-v1.6-vicuna-13b-hf | Milvus, Redis | Intel Xeon   |
+| Docker Compose    | LLAVA          | llava-hf/llava-v1.6-vicuna-13b-hf | Redis         | Intel Gaudi  |
+| Docker Compose    | TGI, vLLM      | Xkev/Llama-3.2V-11B-cot           | Redis         | AMD ROCm     |
