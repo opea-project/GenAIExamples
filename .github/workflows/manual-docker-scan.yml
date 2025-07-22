@@ -11,12 +11,12 @@ on:
         required: true
         type: string
       examples:
-        default: "CodeGen"
+        default: "CodeGen,CodeTrans"
         description: 'List of examples to publish "AgentQnA,AudioQnA,ChatQnA,CodeGen,CodeTrans,DocIndexRetriever,DocSum,InstructionTuning,MultimodalQnA,ProductivitySuite,RerankFinetuning,SearchQnA,Translation,VideoQnA,VisualQnA"'
         required: false
         type: string
       images:
-        default: "image2image-gaudi"
+        default: "image2image-gaudi,lvm-llava"
         description: 'List of images to publish "gmcmanager,gmcrouter"'
         required: false
         type: string
