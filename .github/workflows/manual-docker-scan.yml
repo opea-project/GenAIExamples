@@ -6,17 +6,17 @@ on:
   workflow_dispatch:
     inputs:
       node:
-        default: "gaudi"
+        default: "xeon"
         description: "Hardware to run scan"
         required: true
         type: string
       examples:
-        default: ""
+        default: "CodeGen"
         description: 'List of examples to publish "AgentQnA,AudioQnA,ChatQnA,CodeGen,CodeTrans,DocIndexRetriever,DocSum,InstructionTuning,MultimodalQnA,ProductivitySuite,RerankFinetuning,SearchQnA,Translation,VideoQnA,VisualQnA"'
         required: false
         type: string
       images:
-        default: ""
+        default: "image2image-gaudi"
         description: 'List of images to publish "gmcmanager,gmcrouter"'
         required: false
         type: string
@@ -26,7 +26,7 @@ on:
         required: true
         type: string
       sbom_scan:
-        default: true
+        default: false
         description: 'Scan images for BoM'
         required: false
         type: boolean
