@@ -161,7 +161,9 @@ function validate_frontend() {
     else
         conda create -n ${conda_env_name} python=3.12 -y
     fi
-    source activate ${conda_env_name}
+    CONDA_ROOT=$(conda info --base)
+    source "${CONDA_ROOT}/etc/profile.d/conda.sh"
+    conda activate ${conda_env_name}
 
     sed -i "s/localhost/$ip_address/g" playwright.config.ts
 
@@ -187,21 +189,21 @@ function stop_docker() {
 
 function main() {
 
-    # echo "::group::stop_docker"
-    # stop_docker
-    # echo "::endgroup::"
+    echo "::group::stop_docker"
+    stop_docker
+    echo "::endgroup::"
 
-    # echo "::group::build_docker_images"
-    # if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
-    # echo "::endgroup::"
+    echo "::group::build_docker_images"
+    if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
+    echo "::endgroup::"
 
-    # echo "::group::start_services"
-    # start_services
-    # echo "::endgroup::"
+    echo "::group::start_services"
+    start_services
+    echo "::endgroup::"
 
-    # echo "::group::validate_microservices"
-    # validate_microservices
-    # echo "::endgroup::"
+    echo "::group::validate_microservices"
+    validate_microservices
+    echo "::endgroup::"
 
     echo "::group::validate_megaservice"
     validate_megaservice

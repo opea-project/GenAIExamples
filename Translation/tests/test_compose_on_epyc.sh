@@ -130,6 +130,7 @@ function validate_frontend() {
     else
         conda create -n ${conda_env_name} python=3.12 -y
     fi
+    CONDA_ROOT=$(conda info --base)
     source "${CONDA_ROOT}/etc/profile.d/conda.sh"
     conda activate ${conda_env_name}
 
