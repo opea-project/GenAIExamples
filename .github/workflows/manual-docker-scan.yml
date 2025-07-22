@@ -39,10 +39,17 @@ on:
 permissions: read-all
 jobs:
   get-image-list:
-    uses: ./.github/workflows/_get-image-list.yml
-    with:
-      examples: ${{ inputs.examples }}
-      images: ${{ inputs.images }}
+    runs-on: ubuntu-latest
+    outputs:
+      run_matrix: ${{ jobs.get_image_list.outputs.run_matrix }}
+      matrix: ${{ jobs.get_image_list.outputs.matrix }}
+    steps:
+      - name: Get image matrix
+        uses: ./.github/workflows/_get-image-list.yml
+        id: get_image_list
+        with:
+          examples: ${{ inputs.examples }}
+          images: ${{ inputs.images }}
 
   test:
     needs: get-image-list
@@ -54,8 +61,8 @@ jobs:
     steps:
       - name: test output
         run: |
-          echo "${{ needs.get-image-list.outputs.run_matrix }}"
-          echo "${{ needs.get-image-list.outputs.matrix }}"
+          echo "${{ fromJson(needs.get_image_list.outputs.run_matrix).include[0].image }}"
+          echo "${{ needs.get_image_list.outputs.matrix }}"
 
   # scan-docker:
   #   needs: get-image-list
