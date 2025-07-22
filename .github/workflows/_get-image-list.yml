@@ -93,6 +93,7 @@ jobs:
           # echo "$image_list" | jq . | jq -r '.[]'
           # echo "end of image list..."
           # echo "matrix=$(echo ${image_list} | jq -c '.')" >> $GITHUB_OUTPUT
-          run_matrix=$run_matrix"]}"
+          run_matrix="${run_matrix%,}"
+          run_matrix="${run_matrix}]}"
           echo "run_matrix=${run_matrix}"
           echo "run_matrix=${run_matrix}" >> $GITHUB_OUTPUT
