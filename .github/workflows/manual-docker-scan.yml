@@ -47,15 +47,14 @@ jobs:
   test:
     needs: get-image-list
     runs-on: ubuntu-latest
-    # if: ${{ needs.get-image-list.outputs.run_matrix != '' }}
-    strategy:
-      matrix: ${{ fromJSON(needs.get-image-list.outputs.run_matrix) }}
-      fail-fast: false
+    # # if: ${{ needs.get-image-list.outputs.run_matrix != '' }}
+    # strategy:
+    #   matrix: ${{ fromJSON(needs.get-image-list.outputs.run_matrix) }}
+    #   fail-fast: false
     steps:
       - name: test output
         run: |
-          echo "Image: ${{ matrix.image }}"
-          echo "Dockerfile: ${{ matrix.dockerfile }}"
+          echo "${{ needs.get-image-list.outputs.run_matrix }}"
 
   # scan-docker:
   #   needs: get-image-list
