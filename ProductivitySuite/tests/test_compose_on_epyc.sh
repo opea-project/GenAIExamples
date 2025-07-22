@@ -239,6 +239,7 @@ function validate_frontend() {
         echo "[ TEST INFO ]: Conda environment '${conda_env_name}' not found. Creating..."
         conda create -n "${conda_env_name}" python=3.12 -y
     fi
+    CONDA_ROOT=$(conda info --base)
     source "${CONDA_ROOT}/etc/profile.d/conda.sh"
     conda activate ${conda_env_name}
     echo "[ TEST INFO ]: --------- conda env activated ---------"

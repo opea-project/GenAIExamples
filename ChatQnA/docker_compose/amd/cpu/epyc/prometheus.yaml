@@ -1,8 +1,8 @@
 # Copyright (C) 2025 Advanced Micro Devices, Inc.
-
 # Copyright (C) 2025 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 # [IP_ADDR]:{PORT_OUTSIDE_CONTAINER} -> {PORT_INSIDE_CONTAINER} / {PROTOCOL}
+
 global:
   scrape_interval: 5s
   external_labels:
