@@ -41,9 +41,12 @@ jobs:
   get-image-list:
     runs-on: ubuntu-latest
     outputs:
-      run_matrix: ${{ jobs.get_image_list.outputs.run_matrix }}
-      matrix: ${{ jobs.get_image_list.outputs.matrix }}
+      run_matrix: ${{ steps.get_image_list.outputs.run_matrix }}
+      matrix: ${{ steps.get_image_list.outputs.matrix }}
     steps:
+      - name: Checkout out Repo
+        uses: actions/checkout@v4
+
       - name: Get image matrix
         uses: ./.github/workflows/_get-image-list.yml
         id: get_image_list
