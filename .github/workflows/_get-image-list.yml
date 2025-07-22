@@ -25,6 +25,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.get-matrix.outputs.matrix }}
+      run_matrix: ${{ steps.get-matrix.outputs.run_matrix }}
     steps:
       - name: Checkout out Repo
         uses: actions/checkout@v4
