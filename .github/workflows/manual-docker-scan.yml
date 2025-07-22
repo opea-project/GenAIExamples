@@ -55,6 +55,7 @@ jobs:
       - name: test output
         run: |
           echo "${{ needs.get-image-list.outputs.run_matrix }}"
+          echo "${{ needs.get-image-list.outputs.matrix }}"
 
   # scan-docker:
   #   needs: get-image-list
