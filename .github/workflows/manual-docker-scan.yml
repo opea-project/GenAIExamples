@@ -46,7 +46,7 @@ jobs:
 
   test:
     needs: get-image-list
-    runs-on: "docker-build-${{ inputs.node }}"
+    runs-on: ubuntu-latest
     if: ${{ needs.get-image-list.outputs.run_matrix != '' }}
     strategy:
       matrix: ${{ fromJSON(needs.get-image-list.outputs.run_matrix) }}
