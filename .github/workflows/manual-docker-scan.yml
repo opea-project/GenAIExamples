@@ -85,7 +85,7 @@ jobs:
               e_new=$(grep $e_old ${{ matrix.dockerfile }} | head -1 | awk -F "=" '{print $2}')
               echo $e_new
               base_image=$(echo $base_image | sed "s|$env_var|$e_new|")
-              echo $base_image >> $GITHUB_OUTPUT
+              echo "base_image=$base_image" >> $GITHUB_OUTPUT
             done
           fi
 
