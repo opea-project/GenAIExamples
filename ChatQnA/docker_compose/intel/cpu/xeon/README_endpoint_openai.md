@@ -87,7 +87,7 @@ CPU example with Open Telemetry feature:
 
 ```bash
 ./grafana/dashboards/download_opea_dashboard.sh
-docker compose -f compose_endpoint_openai.yaml -f compose.telemetry.yaml up -d
+NGINX_PORT=8080 docker compose -f compose_endpoint_openai.yaml -f compose.telemetry.yaml up -d
 ```
 
 **Note**: developers should build docker image from source when:
