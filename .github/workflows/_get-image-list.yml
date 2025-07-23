@@ -19,6 +19,9 @@ on:
       matrix:
         description: "Image List"
         value: ${{ jobs.get-image-list.outputs.matrix }}
+      run_matrix:
+        description: "Run Matrix"
+        value: ${{ jobs.get-image-list.outputs.run_matrix }}
 
 jobs:
   get-image-list:
