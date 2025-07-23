@@ -44,53 +44,43 @@ jobs:
       examples: ${{ inputs.examples }}
       images: ${{ inputs.images }}
 
-  test:
-    needs: [get-image-list]
-    runs-on: ubuntu-latest
+  scan-docker:
+    needs: get-image-list
+    runs-on: "docker-build-${{ inputs.node }}"
+    if: ${{ needs.get-image-list.outputs.run_matrix != '' }}
+    strategy:
+      matrix: ${{ fromJson(needs.get-image-list.outputs.run_matrix) }}
+      fail-fast: false
     steps:
-      - name: test output
+      - name: Clean up Working Directory
         run: |
-          echo "run_matrix: ${{ needs.get-image-list.outputs.run_matrix }}"
-          
+          sudo rm -rf ${{github.workspace}}/* || true
+          docker system prune -f
 
-  # scan-docker:
-  #   needs: get-image-list
-  #   runs-on: "docker-build-${{ inputs.node }}"
-  #   if: ${{ needs.get-image-list.outputs.matrix != '' }}
-  #   strategy:
-  #     matrix:
-  #       image: ${{ fromJson(needs.get-image-list.outputs.matrix) }}
-  #     fail-fast: false
-  #   steps:
-  #     - name: Clean up Working Directory
-  #       run: |
-  #         sudo rm -rf ${{github.workspace}}/* || true
-  #         docker system prune -f
+      # - name: Pull Image
+      #   run: |
+      #     docker pull ${OPEA_IMAGE_REPO}opea/${{ matrix.image }}:${{ inputs.tag }}
+      #     echo "OPEA_IMAGE_REPO=${OPEA_IMAGE_REPO}" >> $GITHUB_ENV
 
-  #     - name: Pull Image
-  #       run: |
-  #         docker pull ${OPEA_IMAGE_REPO}opea/${{ matrix.image }}:${{ inputs.tag }}
-  #         echo "OPEA_IMAGE_REPO=${OPEA_IMAGE_REPO}" >> $GITHUB_ENV
+      # - name: SBOM Scan Container
+      #   uses: anchore/sbom-action@v0.17.1
+      #   if: ${{ inputs.sbom_scan }}
+      #   with:
+      #     image: ${{ env.OPEA_IMAGE_REPO }}opea/${{ matrix.image }}:${{ inputs.tag }}
+      #     output-file: ${{ matrix.image }}-sbom-scan.txt
+      #     format: 'spdx-json'
 
-  #     - name: SBOM Scan Container
-  #       uses: anchore/sbom-action@v0.17.1
-  #       if: ${{ inputs.sbom_scan }}
-  #       with:
-  #         image: ${{ env.OPEA_IMAGE_REPO }}opea/${{ matrix.image }}:${{ inputs.tag }}
-  #         output-file: ${{ matrix.image }}-sbom-scan.txt
-  #         format: 'spdx-json'
-
-  #     - name: Security Scan Container
-  #       uses: aquasecurity/trivy-action@0.24.0
-  #       if: ${{ inputs.trivy_scan }}
-  #       with:
-  #         image-ref: ${{ env.OPEA_IMAGE_REPO }}opea/${{ matrix.image }}:${{ inputs.tag }}
-  #         output: ${{ matrix.image }}-trivy-scan.txt
-  #         format: 'table'
-  #         exit-code: '1'
-  #         ignore-unfixed: true
-  #         vuln-type: 'os,library'
-  #         severity: 'CRITICAL,HIGH'
+      # - name: Security Scan Container
+      #   uses: aquasecurity/trivy-action@0.24.0
+      #   if: ${{ inputs.trivy_scan }}
+      #   with:
+      #     image-ref: ${{ env.OPEA_IMAGE_REPO }}opea/${{ matrix.image }}:${{ inputs.tag }}
+      #     output: ${{ matrix.image }}-trivy-scan.txt
+      #     format: 'table'
+      #     exit-code: '1'
+      #     ignore-unfixed: true
+      #     vuln-type: 'os,library'
+      #     severity: 'CRITICAL,HIGH'
 
   #     - name: Cleanup
   #       if: always()
