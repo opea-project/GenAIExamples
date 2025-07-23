@@ -44,10 +44,10 @@ jobs:
       examples: ${{ inputs.examples }}
       images: ${{ inputs.images }}
 
-  scan-docker:
-    needs: get-image-list
-    runs-on: "docker-build-${{ inputs.node }}"
-    if: ${{ needs.get-image-list.outputs.run_matrix != '' }}
+  trivy-scan:
+    needs: [get-image-list]
+    runs-on: ubuntu-latest
+    if: ${{ needs.get-image-list.outputs.run_matrix != '' && inputs.trivy_scan }}
     strategy:
       matrix: ${{ fromJson(needs.get-image-list.outputs.run_matrix) }}
       fail-fast: false
@@ -56,31 +56,129 @@ jobs:
         run: |
           sudo rm -rf ${{github.workspace}}/* || true
           docker system prune -f
+      - name: Checkout out Repo
+        uses: actions/checkout@v4
+      - name: Checkout GenAIComps Repository
+        uses: actions/checkout@v4
+        with:
+          repository: opea-project/GenAIComps
+          path: GenAIComps
+      - name: Install Trivy
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget
+          wget -qO- https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo gpg --dearmor -o /usr/share/keyrings/trivy.gpg
+          echo "deb [signed-by=/usr/share/keyrings/trivy.gpg] https://aquasecurity.github.io/trivy-repo/deb stable main" | sudo tee -a /etc/apt/sources.list.d/trivy.list
+          sudo apt-get update
+          sudo apt-get install -y trivy
+      - name: Pull Image
+        run: |
+          docker pull ${OPEA_IMAGE_REPO}opea/${{ matrix.image }}:${{ inputs.tag }}
+          echo "OPEA_IMAGE_REPO=${OPEA_IMAGE_REPO}" >> $GITHUB_ENV
 
-      # - name: Pull Image
-      #   run: |
-      #     docker pull ${OPEA_IMAGE_REPO}opea/${{ matrix.image }}:${{ inputs.tag }}
-      #     echo "OPEA_IMAGE_REPO=${OPEA_IMAGE_REPO}" >> $GITHUB_ENV
+      - name: find base image
+        id: find_base_image
+        run: |
+          cd ${github.workspace}/
+          ls
+          echo "dockerfile: ${{ matrix.dockerfile }}"
+          base_image=$(cat ${{ matrix.dockerfile }}| grep "^FROM " | head -1 | awk '{print $2}' | tr -d "\n")
+          if echo $base_image | grep -q '$'; then
+            env_var_list=$(echo $base_image | grep -o '\$[a-zA-Z_][a-zA-Z0-9_]*')
+            for env_var in $env_var_list;do
+              echo $env_var
+              e_old=${env_var#*$}
+              echo $e_old
+              e_new=$(grep $e_old ${{ matrix.dockerfile }} | head -1 | awk -F "=" '{print $2}')
+              echo $e_new
+              base_image=$(echo $base_image | sed "s|$env_var|$e_new|")
+              echo $base_image >> $GITHUB_OUTPUT
+            done
+          fi
 
-      # - name: SBOM Scan Container
-      #   uses: anchore/sbom-action@v0.17.1
-      #   if: ${{ inputs.sbom_scan }}
-      #   with:
-      #     image: ${{ env.OPEA_IMAGE_REPO }}opea/${{ matrix.image }}:${{ inputs.tag }}
-      #     output-file: ${{ matrix.image }}-sbom-scan.txt
-      #     format: 'spdx-json'
+      - name: Trivy Scan base image
+        id: trivy_base_scan
+        # if: ${{ inputs.scan_base_image }}
+        shell: bash
+        run: |
+          cd ${{ github.workspace }}
+          base_image="${{ steps.find_base_image.outputs.base_image }}"
+          trivy image --format json --severity CRITICAL,HIGH --ignore-unfixed --pkg-types os,library "$base_image" > trivy_base_scan.json
 
-      # - name: Security Scan Container
-      #   uses: aquasecurity/trivy-action@0.24.0
-      #   if: ${{ inputs.trivy_scan }}
-      #   with:
-      #     image-ref: ${{ env.OPEA_IMAGE_REPO }}opea/${{ matrix.image }}:${{ inputs.tag }}
-      #     output: ${{ matrix.image }}-trivy-scan.txt
-      #     format: 'table'
-      #     exit-code: '1'
-      #     ignore-unfixed: true
-      #     vuln-type: 'os,library'
-      #     severity: 'CRITICAL,HIGH'
+          cve_list=$(jq '[.Results[] | select((.Type=="python-pkg") or (.Target | test("requirements.txt|setup.py|Pipfile|pyproject.toml|\\.whl$|\\.egg$"))) | .Vulnerabilities[]? | select(.VulnerabilityID != null) | .VulnerabilityID] ' trivy_base_scan.json | jq -s 'add | unique')
+
+          jq -n --arg image "$base_image" --argjson cves "$cve_list" '{image: $image, cves: $cves}' > single_base_cve.json
+
+          if [ -f base_image_CVE.json ]; then
+            jq -s '.[0] + [.[1]] | unique_by(.image)' base_image_CVE.json single_base_cve.json > tmp && mv tmp base_image_CVE.json
+          else
+            jq -s '.' single_base_cve.json > base_image_CVE.json
+          fi
+          rm -rf trivy_base_scan.json single_base_cve.json
+          cat base_image_CVE.json
+
+      - name: Generate ignorefile
+        env:
+          base_image: ${{ steps.find_base_image.outputs.base_image }}
+        run: |
+          cd ${{ github.workspace }}
+          if [ -f base_image_CVE.json ]; then
+          jq -r --arg image "$base_image" '.[] | select(.image == $image) | .cves[]' base_image_CVE.json > .trivyignore
+          fi
+        shell: bash
+
+      - name: Security Scan Container
+        uses: aquasecurity/trivy-action@0.24.0
+        if: ${{ inputs.trivy_scan }}
+        with:
+          image-ref: ${{ env.OPEA_IMAGE_REPO }}opea/${{ matrix.image }}:${{ inputs.tag }}
+          output: ${{ matrix.image }}-trivy-scan.txt
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
+          ignorefile: .trivyignore
+
+
+  # scan-docker:
+  #   needs: get-image-list
+  #   runs-on: "docker-build-${{ inputs.node }}"
+  #   if: ${{ needs.get-image-list.outputs.matrix != '' }}
+  #   strategy:
+  #     matrix:
+  #       image: ${{ fromJson(needs.get-image-list.outputs.matrix) }}
+  #     fail-fast: false
+  #   steps:
+  #     - name: Clean up Working Directory
+  #       run: |
+  #         sudo rm -rf ${{github.workspace}}/* || true
+  #         docker system prune -f
+
+  #     - name: Pull Image
+  #       run: |
+  #         docker pull ${OPEA_IMAGE_REPO}opea/${{ matrix.image }}:${{ inputs.tag }}
+  #         echo "OPEA_IMAGE_REPO=${OPEA_IMAGE_REPO}" >> $GITHUB_ENV
+
+  #     - name: SBOM Scan Container
+  #       uses: anchore/sbom-action@v0.17.1
+  #       if: ${{ inputs.sbom_scan }}
+  #       with:
+  #         image: ${{ env.OPEA_IMAGE_REPO }}opea/${{ matrix.image }}:${{ inputs.tag }}
+  #         output-file: ${{ matrix.image }}-sbom-scan.txt
+  #         format: 'spdx-json'
+
+  #     - name: Security Scan Container
+  #       uses: aquasecurity/trivy-action@0.24.0
+  #       if: ${{ inputs.trivy_scan }}
+  #       with:
+  #         image-ref: ${{ env.OPEA_IMAGE_REPO }}opea/${{ matrix.image }}:${{ inputs.tag }}
+  #         output: ${{ matrix.image }}-trivy-scan.txt
+  #         format: 'table'
+  #         exit-code: '1'
+  #         ignore-unfixed: true
+  #         vuln-type: 'os,library'
+  #         severity: 'CRITICAL,HIGH'
 
   #     - name: Cleanup
   #       if: always()
