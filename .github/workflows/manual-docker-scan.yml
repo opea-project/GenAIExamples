@@ -63,14 +63,7 @@ jobs:
         with:
           repository: opea-project/GenAIComps
           path: GenAIComps
-      - name: Install Trivy
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y wget
-          wget -qO- https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo gpg --dearmor -o /usr/share/keyrings/trivy.gpg
-          echo "deb [signed-by=/usr/share/keyrings/trivy.gpg] https://aquasecurity.github.io/trivy-repo/deb stable main" | sudo tee -a /etc/apt/sources.list.d/trivy.list
-          sudo apt-get update
-          sudo apt-get install -y trivy
+
       - name: Pull Image
         run: |
           docker pull ${OPEA_IMAGE_REPO}opea/${{ matrix.image }}:${{ inputs.tag }}
@@ -103,7 +96,7 @@ jobs:
         run: |
           cd ${{ github.workspace }}
           base_image="${{ steps.find_base_image.outputs.base_image }}"
-          trivy image --format json --severity CRITICAL,HIGH --ignore-unfixed --pkg-types os,library "$base_image" > trivy_base_scan.json
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock     aquasec/trivy:latest image --format json --severity CRITICAL,HIGH --ignore-unfixed --pkg-types os,library "$base_image" > trivy_base_scan.json
 
           cve_list=$(jq '[.Results[] | select((.Type=="python-pkg") or (.Target | test("requirements.txt|setup.py|Pipfile|pyproject.toml|\\.whl$|\\.egg$"))) | .Vulnerabilities[]? | select(.VulnerabilityID != null) | .VulnerabilityID] ' trivy_base_scan.json | jq -s 'add | unique')
 
