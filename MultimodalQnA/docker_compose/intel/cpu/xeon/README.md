@@ -67,6 +67,9 @@ export https_proxy="Your_HTTPs_Proxy"         # https proxy if any
 export no_proxy=localhost,127.0.0.1,$host_ip  # additional no proxies if needed
 cd docker_compose/intel
 source set_env.sh
+
+# For Xeon, update the model environment variable
+export LVM_MODEL_ID="llava-hf/llava-1.5-7b-hf"
 ```
 
 Consult the section on [MultimodalQnA Service configuration](#multimodalqna-docker-compose-files) for information on how service specific configuration parameters affect deployments.
