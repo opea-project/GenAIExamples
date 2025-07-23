@@ -133,7 +133,7 @@ jobs:
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
           trivyignores: .trivyignore
-      
+
       - name: Cleanup
         if: always()
         run: docker rmi -f ${OPEA_IMAGE_REPO}opea/${{ matrix.image }}:${{ inputs.tag }} || true
