@@ -8,6 +8,7 @@ services:
     ports:
       - "${DOCSUM_TGI_SERVICE_PORT:-8008}:80"
     environment:
+      test_env: test
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
