@@ -73,7 +73,7 @@ jobs:
         id: find_base_image
         run: |
           cd ${{ github.workspace }}
-          ls
+          set -x
           echo "dockerfile: ${{ matrix.dockerfile }}"
           base_image=$(cat ${{ matrix.dockerfile }}| grep "^FROM " | head -1 | awk '{print $2}' | tr -d "\n")
           if echo $base_image | grep -q '$'; then
