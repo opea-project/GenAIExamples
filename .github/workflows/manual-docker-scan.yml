@@ -72,7 +72,7 @@ jobs:
       - name: find base image
         id: find_base_image
         run: |
-          cd ${github.workspace}/
+          cd ${{ github.workspace }}
           ls
           echo "dockerfile: ${{ matrix.dockerfile }}"
           base_image=$(cat ${{ matrix.dockerfile }}| grep "^FROM " | head -1 | awk '{print $2}' | tr -d "\n")
