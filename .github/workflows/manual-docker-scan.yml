@@ -76,8 +76,8 @@ jobs:
           set -x
           echo "dockerfile: ${{ matrix.dockerfile }}"
           base_image=$(cat ${{ matrix.dockerfile }}| grep "^FROM " | head -1 | awk '{print $2}' | tr -d "\n")
-          if echo $base_image | grep -q '$'; then
-            env_var_list=$(echo $base_image | grep -o '\$[a-zA-Z_][a-zA-Z0-9_]*')
+          if echo "$base_image" | grep -q '\$'; then
+            env_var_list=$(echo "$base_image" | grep -o '\$[a-zA-Z_][a-zA-Z0-9_]*')
             for env_var in $env_var_list;do
               echo $env_var
               e_old=${env_var#*$}
@@ -85,9 +85,10 @@ jobs:
               e_new=$(grep $e_old ${{ matrix.dockerfile }} | head -1 | awk -F "=" '{print $2}')
               echo $e_new
               base_image=$(echo $base_image | sed "s|$env_var|$e_new|")
-              echo "base_image=$base_image" >> $GITHUB_OUTPUT
             done
           fi
+          echo "base_image=$base_image"
+          echo "base_image=$base_image" >> $GITHUB_OUTPUT
 
       - name: Trivy Scan base image
         id: trivy_base_scan
@@ -101,7 +102,7 @@ jobs:
           cve_list=$(jq '[.Results[] | select((.Type=="python-pkg") or (.Target | test("requirements.txt|setup.py|Pipfile|pyproject.toml|\\.whl$|\\.egg$"))) | .Vulnerabilities[]? | select(.VulnerabilityID != null) | .VulnerabilityID] ' trivy_base_scan.json | jq -s 'add | unique')
 
           jq -n --arg image "$base_image" --argjson cves "$cve_list" '{image: $image, cves: $cves}' > single_base_cve.json
-
+          cat base_image_CVE.json
           if [ -f base_image_CVE.json ]; then
             jq -s '.[0] + [.[1]] | unique_by(.image)' base_image_CVE.json single_base_cve.json > tmp && mv tmp base_image_CVE.json
           else
@@ -116,7 +117,7 @@ jobs:
         run: |
           cd ${{ github.workspace }}
           if [ -f base_image_CVE.json ]; then
-          jq -r --arg image "$base_image" '.[] | select(.image == $image) | .cves[]' base_image_CVE.json > .trivyignore
+            jq -r --arg image "$base_image" '.[] | select(.image == $image) | .cves[]' base_image_CVE.json > .trivyignore
           fi
         shell: bash
 
@@ -131,8 +132,7 @@ jobs:
           ignore-unfixed: true
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
-          ignorefile: .trivyignore
-
+          trivyignores: .trivyignore
 
   # scan-docker:
   #   needs: get-image-list
