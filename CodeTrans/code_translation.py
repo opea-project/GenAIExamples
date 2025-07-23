@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import asyncio
+import json
 import os
 
 from comps import MegaServiceEndpoint, MicroService, ServiceOrchestrator, ServiceRoleType, ServiceType
@@ -18,12 +19,85 @@ from fastapi.responses import StreamingResponse
 MEGA_SERVICE_PORT = int(os.getenv("MEGA_SERVICE_PORT", 7777))
 LLM_SERVICE_HOST_IP = os.getenv("LLM_SERVICE_HOST_IP", "0.0.0.0")
 LLM_SERVICE_PORT = int(os.getenv("LLM_SERVICE_PORT", 9000))
+LLM_MODEL_ID = os.getenv("LLM_MODEL_ID", "mistralai/Mistral-7B-Instruct-v0.3")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", None)
+
+
+def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **kwargs):
+    """Aligns the inputs based on the service type of the current node.
+
+    Parameters:
+    - self: Reference to the current instance of the class.
+    - inputs: Dictionary containing the inputs for the current node.
+    - cur_node: The current node in the service orchestrator.
+    - runtime_graph: The runtime graph of the service orchestrator.
+    - llm_parameters_dict: Dictionary containing the LLM parameters.
+    - kwargs: Additional keyword arguments.
+
+    Returns:
+    - inputs: The aligned inputs for the current node.
+    """
+
+    # Check if the current service type is LLM
+    if self.services[cur_node].service_type == ServiceType.LLM:
+        # convert TGI/vLLM to unified OpenAI /v1/chat/completions format
+        next_inputs = {}
+        next_inputs["model"] = LLM_MODEL_ID
+        next_inputs["messages"] = [{"role": "user", "content": inputs["query"]}]
+        next_inputs["max_tokens"] = llm_parameters_dict["max_tokens"]
+        next_inputs["top_p"] = llm_parameters_dict["top_p"]
+        next_inputs["stream"] = inputs["stream"]
+        next_inputs["frequency_penalty"] = inputs["frequency_penalty"]
+        next_inputs["temperature"] = inputs["temperature"]
+        inputs = next_inputs
+
+    return inputs
+
+
+def align_outputs(self, data, cur_node, inputs, runtime_graph, llm_parameters_dict, **kwargs):
+    next_data = {}
+    if self.services[cur_node].service_type == ServiceType.LLM and not llm_parameters_dict["stream"]:
+        if "faqgen" in self.services[cur_node].endpoint:
+            next_data = data
+        else:
+            next_data["text"] = data["choices"][0]["message"]["content"]
+    else:
+        next_data = data
+
+    return next_data
+
+
+def align_generator(self, gen, **kwargs):
+    # OpenAI response format
+    # b'data:{"id":"","object":"text_completion","created":1725530204,"model":"meta-llama/Meta-Llama-3-8B-Instruct","system_fingerprint":"2.0.1-native","choices":[{"index":0,"delta":{"role":"assistant","content":"?"},"logprobs":null,"finish_reason":null}]}\n\n'
+    for line in gen:
+        line = line.decode("utf-8")
+        start = line.find("{")
+        end = line.rfind("}") + 1
+
+        json_str = line[start:end]
+        try:
+            # sometimes yield empty chunk, do a fallback here
+            json_data = json.loads(json_str)
+            if "ops" in json_data and "op" in json_data["ops"][0]:
+                if "value" in json_data["ops"][0] and isinstance(json_data["ops"][0]["value"], str):
+                    yield f"data: {repr(json_data['ops'][0]['value'].encode('utf-8'))}\n\n"
+                else:
+                    pass
+            elif "content" in json_data["choices"][0]["delta"]:
+                yield f"data: {repr(json_data['choices'][0]['delta']['content'].encode('utf-8'))}\n\n"
+        except Exception as e:
+            yield f"data: {repr(json_str.encode('utf-8'))}\n\n"
+    yield "data: [DONE]\n\n"
 
 
 class CodeTransService:
     def __init__(self, host="0.0.0.0", port=8000):
         self.host = host
         self.port = port
+        ServiceOrchestrator.align_inputs = align_inputs
+        ServiceOrchestrator.align_outputs = align_outputs
+        ServiceOrchestrator.align_generator = align_generator
         self.megaservice = ServiceOrchestrator()
         self.endpoint = str(MegaServiceEndpoint.CODE_TRANS)
 
@@ -32,8 +106,10 @@ class CodeTransService:
             name="llm",
             host=LLM_SERVICE_HOST_IP,
             port=LLM_SERVICE_PORT,
+            api_key=OPENAI_API_KEY,
             endpoint="/v1/chat/completions",
             use_remote_service=True,
+            service_type=ServiceType.LLM,
         )
         self.megaservice.add(llm)
 
