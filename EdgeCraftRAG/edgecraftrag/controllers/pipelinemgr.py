@@ -55,7 +55,7 @@ class PipelineMgr(BaseMgr):
     def get_pipelines(self):
         return [pl for _, pl in self.components.items()]
 
-    def activate_pipeline(self, name: str, active: bool, nm: NodeMgr):
+    def activate_pipeline(self, name: str, active: bool, nm: NodeMgr, kb_name: None):
         pl = self.get_pipeline_by_name_or_id(name)
         if pl is None:
             return
@@ -68,7 +68,7 @@ class PipelineMgr(BaseMgr):
         nodelist = None
         if pl.node_changed:
             nodelist = nm.get_nodes(pl.node_parser.idx)
-        pl.check_active(nodelist)
+        pl.check_active(nodelist, kb_name)
         prevactive = self._active_pipeline
         if prevactive:
             prevactive.status.active = False
