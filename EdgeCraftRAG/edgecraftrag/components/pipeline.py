@@ -74,11 +74,11 @@ class Pipeline(BaseComponent):
         self._index_changed = False
         self._index_to_retriever_updated = True
 
-    def check_active(self, nodelist):
+    def check_active(self, nodelist, kb_name):
         if self._node_changed:
             if not self._index_changed:
                 print("Reinitializing indexer ...")
-                self.indexer.reinitialize_indexer()
+                self.indexer.reinitialize_indexer(kb_name)
                 self._index_changed = True
                 self._index_to_retriever_updated = False
 
@@ -231,7 +231,7 @@ def run_generator_ben(pl: Pipeline, chat_request: ChatCompletionRequest) -> Any:
     start = time.perf_counter()
     query = chat_request.messages
     if pl.generator.inference_type == InferenceType.VLLM:
-        UI_DIRECTORY = os.getenv("UI_TMPFILE_PATH", "/home/user/ui_cache")
+        UI_DIRECTORY = os.getenv("TMPFILE_PATH", "/home/user/ui_cache")
         search_config_path = os.path.join(UI_DIRECTORY, "configs/search_config.yaml")
         search_dir = os.path.join(UI_DIRECTORY, "configs/search_dir")
 
@@ -239,7 +239,7 @@ def run_generator_ben(pl: Pipeline, chat_request: ChatCompletionRequest) -> Any:
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
             try:
-                return loop.run_until_complete(query_search(query, search_config_path, search_dir))
+                return loop.run_until_complete(query_search(query, search_config_path, search_dir, pl))
             finally:
                 loop.close()
 
@@ -295,7 +295,7 @@ def run_generator(pl: Pipeline, chat_request: ChatCompletionRequest) -> Any:
     query = chat_request.messages
     contexts = {}
     if pl.generator.inference_type == InferenceType.VLLM:
-        UI_DIRECTORY = os.getenv("UI_TMPFILE_PATH", "/home/user/ui_cache")
+        UI_DIRECTORY = os.getenv("TMPFILE_PATH", "/home/user/ui_cache")
         search_config_path = os.path.join(UI_DIRECTORY, "configs/search_config.yaml")
         search_dir = os.path.join(UI_DIRECTORY, "configs/search_dir")
 
@@ -303,7 +303,7 @@ def run_generator(pl: Pipeline, chat_request: ChatCompletionRequest) -> Any:
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
             try:
-                return loop.run_until_complete(query_search(query, search_config_path, search_dir))
+                return loop.run_until_complete(query_search(query, search_config_path, search_dir, pl))
             finally:
                 loop.close()
 
@@ -312,7 +312,6 @@ def run_generator(pl: Pipeline, chat_request: ChatCompletionRequest) -> Any:
             top1_issue, sub_questionss_result = future.result()
         if sub_questionss_result:
             query = query + sub_questionss_result
-
     retri_res = pl.retriever.run(query=query)
     contexts[CompType.RETRIEVER] = retri_res
     query_bundle = QueryBundle(query)
