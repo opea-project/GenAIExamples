@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 # Copyright (C) 2025 Intel Corporation
 # Copyright (C) 2025 Advanced Micro Devices, Inc.
 # SPDX-License-Identifier: Apache-2.0

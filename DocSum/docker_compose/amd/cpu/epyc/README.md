@@ -15,7 +15,7 @@ This section explains how to quickly deploy and manually test the DocSum service
 
 1. [Access the Code](#access-the-code)
 2. [Install Docker](#install-docker)
-3. [Determine your host's external IP address](#determine-your-host-external-IP-address)
+3. [Determine your host external IP address](#determine-your-host-external-ip-address)
 4. [Generate a HuggingFace Access Token](#generate-a-huggingface-access-token)
 5. [Set Up Environment](#set-up-environment)
 6. [Deploy the Services Using Docker Compose](#deploy-the-services-using-docker-compose)
