@@ -202,17 +202,17 @@ jobs:
     runs-on: ubuntu-latest   #"docker-build-${{ inputs.node }}"
     if: always()
     steps:
-      - uses: actions/upload-artifact@v4.3.4
-        with:
-          name: sbom-scan-${{ inputs.tag }}-${{ github.run_number }}
-          path: /tmp/scan-${{ inputs.tag }}-${{ github.run_number }}/*-sbom-scan.txt
-          overwrite: true
+      # - uses: actions/upload-artifact@v4.3.4
+      #   with:
+      #     name: sbom-scan-${{ inputs.tag }}-${{ github.run_number }}
+      #     path: /tmp/scan-${{ inputs.tag }}-${{ github.run_number }}/*-sbom-scan.txt
+      #     overwrite: true
 
       - uses: actions/upload-artifact@v4.3.4
         with:
           name: trivy-scan-${{ inputs.tag }}-${{ github.run_number }}
-          path: /tmp/scan-${{ inputs.tag }}-${{ github.run_number }}/*-trivy-scan.txt
+          path: /tmp/scan-trivy-${{ github.run_number }}/*-trivy-scan.txt
           overwrite: true
 
       - name: Remove Logs
-        run: rm -rf /tmp/scan-${{ inputs.tag }}-${{ github.run_number }} && rm -rf /tmp/sbom-action-*
+        run: rm -rf /tmp/scan-trivy-${{ github.run_number }} && rm -rf /tmp/sbom-action-*
