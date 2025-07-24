@@ -739,32 +739,63 @@ const formDataEventStream = async (url: string, formData: any) => {
 
         // sometimes double lines return
         const lines = textChunk.split("\n");
-
         for (let line of lines) {
           if (line.startsWith("data:")) {
             const jsonStr = line.replace(/^data:\s*/, ""); // Remove "data: "
 
             if (jsonStr !== "[DONE]") {
               try {
-                // API Response for final output regularly returns incomplete JSON,
-                // due to final response containing source summary content and exceeding
-                // token limit in the response. We don't use it anyway so don't parse it.
-                if (!jsonStr.includes('"path":"/streamed_output/-"')) {
-                  const res = JSON.parse(jsonStr); // Parse valid JSON
-
-                  const logs = res.ops;
-                  logs.forEach((log: { op: string; path: string; value: string }) => {
-                    if (log.op === "add") {
-                      if (
-                        log.value !== "</s>" &&
-                        log.path.endsWith("/streamed_output/-") &&
-                        log.path.length > "/streamed_output/-".length
-                      ) {
-                        result += log.value;
-                        if (log.value) store.dispatch(setOnGoingResult(result));
-                      }
+               // Check if this is the b'text' format (summary response)
+                if (jsonStr.includes("b'")) {
+                 
+                  // Handle summary format with b'text'
+                  let extractedText = '';
+                 
+                  if (jsonStr.startsWith('b\'')) {
+                    // Remove 'b\'' prefix
+                    let content = jsonStr.substring(2);
+                   
+                    // Remove trailing quote if present
+                    if (content.endsWith('\'')) {
+                      content = content.slice(0, -1);
                     }
-                  });
+                   
+                    extractedText = content;
+                  } else {
+                    // Fallback regex approach
+                    const match = jsonStr.match(/b'([^']*)'?/);
+                    if (match) {
+                      extractedText = match[1];
+                    }
+                  }
+                 
+                  if (extractedText && extractedText !== "</s>") {
+                    result += extractedText;
+                    store.dispatch(setOnGoingResult(result));
+                  }
+                }
+                else {
+                  // Handle the original JSON format with ops array
+                  // API Response for final output regularly returns incomplete JSON,
+                  // due to final response containing source summary content and exceeding
+                  // token limit in the response. We don't use it anyway so don't parse it.
+                  if (!jsonStr.includes('"path":"/streamed_output/-"')) {
+                    const res = JSON.parse(jsonStr); // Parse valid JSON
+ 
+                    const logs = res.ops;
+                    logs.forEach((log: { op: string; path: string; value: string }) => {
+                      if (log.op === "add") {
+                        if (
+                          log.value !== "</s>" &&
+                          log.path.endsWith("/streamed_output/-") &&
+                          log.path.length > "/streamed_output/-".length
+                        ) {
+                          result += log.value;
+                          if (log.value) store.dispatch(setOnGoingResult(result));
+                        }
+                      }
+                    });
+                  }
                 }
               } catch (error) {
                 console.warn("Error parsing JSON:", error, "Raw Data:", jsonStr);
@@ -775,7 +806,7 @@ const formDataEventStream = async (url: string, formData: any) => {
                 content: result,
                 time: getCurrentTimeStamp().toString(),
               };
-
+ 
               store.dispatch(setOnGoingResult(""));
               store.dispatch(addMessageToMessages(m));
               store.dispatch(setAbortController(null));
