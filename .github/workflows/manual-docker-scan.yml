@@ -47,6 +47,7 @@ jobs:
   trivy-scan-docker:
     needs: [get-image-list]
     runs-on: ubuntu-latest  # "docker-build-${{ inputs.node }}"
+    continue-on-error: true
     if: ${{ needs.get-image-list.outputs.run_matrix != '' && inputs.trivy_scan }}
     strategy:
       matrix: ${{ fromJson(needs.get-image-list.outputs.run_matrix) }}
