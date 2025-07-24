@@ -147,6 +147,7 @@ jobs:
         run: |
           mkdir -p /tmp/scan-trivy-${{ github.run_number }}
           mv ${{ matrix.image }}-trivy-scan.txt /tmp/scan-trivy-${{ github.run_number }}
+          ls /tmp/scan-trivy-${{ github.run_number }}
 
   # scan-docker:
   #   needs: get-image-list
