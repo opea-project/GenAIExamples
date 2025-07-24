@@ -745,21 +745,20 @@ const formDataEventStream = async (url: string, formData: any) => {
 
             if (jsonStr !== "[DONE]") {
               try {
-               // Check if this is the b'text' format (summary response)
+                // Check if this is the b'text' format (summary response)
                 if (jsonStr.includes("b'")) {
-                 
                   // Handle summary format with b'text'
-                  let extractedText = '';
-                 
-                  if (jsonStr.startsWith('b\'')) {
+                  let extractedText = "";
+
+                  if (jsonStr.startsWith("b'")) {
                     // Remove 'b\'' prefix
                     let content = jsonStr.substring(2);
-                   
+
                     // Remove trailing quote if present
-                    if (content.endsWith('\'')) {
+                    if (content.endsWith("'")) {
                       content = content.slice(0, -1);
                     }
-                   
+
                     extractedText = content;
                   } else {
                     // Fallback regex approach
@@ -768,20 +767,19 @@ const formDataEventStream = async (url: string, formData: any) => {
                       extractedText = match[1];
                     }
                   }
-                 
+
                   if (extractedText && extractedText !== "</s>") {
                     result += extractedText;
                     store.dispatch(setOnGoingResult(result));
                   }
-                }
-                else {
+                } else {
                   // Handle the original JSON format with ops array
                   // API Response for final output regularly returns incomplete JSON,
                   // due to final response containing source summary content and exceeding
                   // token limit in the response. We don't use it anyway so don't parse it.
                   if (!jsonStr.includes('"path":"/streamed_output/-"')) {
                     const res = JSON.parse(jsonStr); // Parse valid JSON
- 
+
                     const logs = res.ops;
                     logs.forEach((log: { op: string; path: string; value: string }) => {
                       if (log.op === "add") {
@@ -806,7 +804,7 @@ const formDataEventStream = async (url: string, formData: any) => {
                 content: result,
                 time: getCurrentTimeStamp().toString(),
               };
- 
+
               store.dispatch(setOnGoingResult(""));
               store.dispatch(addMessageToMessages(m));
               store.dispatch(setAbortController(null));
