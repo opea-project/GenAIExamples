@@ -46,8 +46,6 @@ jobs:
 
   trivy-scan-docker:
     needs: [get-image-list]
-    runs-on: ubuntu-latest  # "docker-build-${{ inputs.node }}"
-    continue-on-error: true
     if: ${{ needs.get-image-list.outputs.run_matrix != '' && inputs.trivy_scan }}
     strategy:
       matrix: ${{ fromJson(needs.get-image-list.outputs.run_matrix) }}
@@ -110,7 +108,7 @@ jobs:
           mv ${{ matrix.image }}-*-scan.txt /tmp/scan-${{ inputs.tag }}-${{ github.run_number }}
 
   upload-artifacts:
-    needs: BoM-scan-docker, trivy-scan-docker
+    needs: [BoM-scan-docker, trivy-scan-docker]
     runs-on: ubuntu-latest   #"docker-build-${{ inputs.node }}"
     steps:
       - uses: actions/upload-artifact@v4.3.4
