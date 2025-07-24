@@ -98,5 +98,6 @@ jobs:
           echo "matrix=$(echo ${image_list} | jq -c '.')" >> $GITHUB_OUTPUT
           run_matrix="${run_matrix%,}"
           run_matrix="${run_matrix}]}"
-          echo "run_matrix=${run_matrix}"
-          echo "run_matrix=${run_matrix}" >> $GITHUB_OUTPUT
+
+          echo "run_matrix=$(echo "${run_matrix}" | jq -c '{include: [.include | unique_by(.image)]}')"
+          echo "run_matrix=$(echo "${run_matrix}" | jq -c '{include: [.include | unique_by(.image)]}')" >> $GITHUB_OUTPUT

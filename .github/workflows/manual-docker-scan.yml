@@ -61,7 +61,7 @@ jobs:
   BoM-scan-docker:
     needs: get-image-list
     runs-on: "docker-build-${{ inputs.node }}"
-    if: ${{ needs.get-image-list.outputs.matrix != '' }}
+    if: ${{ needs.get-image-list.outputs.matrix != '' && inputs.sbom_scan }}
     strategy:
       matrix:
         image: ${{ fromJson(needs.get-image-list.outputs.matrix) }}
@@ -79,7 +79,6 @@ jobs:
 
       - name: SBOM Scan Container
         uses: anchore/sbom-action@v0.17.1
-        if: ${{ inputs.sbom_scan }}
         with:
           image: ${{ env.OPEA_IMAGE_REPO }}opea/${{ matrix.image }}:${{ inputs.tag }}
           output-file: ${{ matrix.image }}-sbom-scan.txt
