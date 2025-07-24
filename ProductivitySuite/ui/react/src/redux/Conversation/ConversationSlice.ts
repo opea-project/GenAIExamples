@@ -639,7 +639,7 @@ const eventStream = (type: string, body: any, conversationId: string = "") => {
                 store.dispatch(setOnGoingResult(result));
               }
             }
-            if (type !== "summary" && type !== "faq") {
+            if (type !== "faq") {
               //parse content for data: "b"
               const match = msg.data.match(/b'([^']*)'/);
               if (match && match[1] != "</s>") {
