@@ -136,7 +136,11 @@ jobs:
       
       - name: Cleanup
         if: always()
-        run: docker rmi -f ${OPEA_IMAGE_REPO}opea/${{ matrix.image }}:${{ inputs.tag }} || true
+        env:
+          base_image: ${{ steps.find_base_image.outputs.base_image }}
+        run: |
+        docker rmi -f ${OPEA_IMAGE_REPO}opea/${{ matrix.image }}:${{ inputs.tag }} || true
+        docker rmi -f ${base_image} || true
 
       - name: Collect Logs
         if: always()
