@@ -60,27 +60,27 @@ jobs:
 
           if [[ ! -z "${{ inputs.images }}" ]]; then
               images=($(echo ${{ inputs.images }} | tr ',' ' '))
-              finded=False
+              found=False
               for image in ${images[@]}
               do
                 for compose_file in $(ls ${{ github.workspace }}/GenAIComps/.github/workflows/docker/compose/*-compose.yaml); do
                   if grep -q "$image" "$compose_file"; then
-                    finded=True
+                    found=True
                     docker_file="$compose_file"
                   fi
                 done
 
-                if [[ "${finded}" == "False" ]]; then
+                if [[ "${found}" == "False" ]]; then
                   for build_file in $(ls ${{ github.workspace }}/*/docker_image_build/build.yaml); do
                     if grep -q "$image" "$build_file"; then
-                      finded=True
+                      found=True
                       docker_file="$build_file"
                     fi
                   done
                 fi
 
-                if [[ "${finded}" == "False" ]]; then
-                  echo "::Error:: Image ${image} not found in any compose or build file."
+                if [[ "${found}" == "False" ]]; then
+                  echo "::error:: Image ${image} not found in any compose or build file."
                   exit 1
                 fi
 
