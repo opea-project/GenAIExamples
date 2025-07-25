@@ -31,7 +31,7 @@ on:
 
 jobs:
   trivy-scan:
-    runs-on: trivy #ubuntu-latest  # "docker-build-${{ inputs.node }}"
+    runs-on: "docker-build-${{ inputs.node }}"
     continue-on-error: true
     steps:
       - name: Clean up Working Directory

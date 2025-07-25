@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       node:
-        default: "xeon"
+        default: "gaudi"
         description: "Hardware to run scan"
         required: true
         type: string
@@ -96,7 +96,7 @@ jobs:
 
   upload-artifacts:
     needs: [BoM-scan-docker, trivy-scan-docker]
-    runs-on: trivy #ubuntu-latest   #"docker-build-${{ inputs.node }}"
+    runs-on: "docker-build-${{ inputs.node }}"
     if: always()
     steps:
       - uses: actions/upload-artifact@v4.3.4

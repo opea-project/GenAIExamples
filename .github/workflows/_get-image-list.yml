@@ -42,7 +42,6 @@ jobs:
       - name: Set Matrix
         id: get-matrix
         run: |
-          set -x
           image_list=[]
           run_matrix="{\"include\":["
           if [[ ! -z "${{ inputs.examples }}" ]]; then
