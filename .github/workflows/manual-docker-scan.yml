@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       node:
-        default: "gaudi"
+        default: "xeon"
         description: "Hardware to run scan"
         required: true
         type: string
@@ -44,10 +44,24 @@ jobs:
       examples: ${{ inputs.examples }}
       images: ${{ inputs.images }}
 
-  scan-docker:
+  trivy-scan-docker:
+    needs: [get-image-list]
+    if: ${{ needs.get-image-list.outputs.run_matrix != '' && inputs.trivy_scan }}
+    strategy:
+      matrix: ${{ fromJson(needs.get-image-list.outputs.run_matrix) }}
+      fail-fast: false
+    uses: ./.github/workflows/_trivy-scan.yml
+    with:
+      registry: "opea"
+      tag: ${{ inputs.tag }}
+      image: ${{ matrix.image }}
+      dockerfile: ${{ matrix.dockerfile }}
+    secrets: inherit
+
+  BoM-scan-docker:
     needs: get-image-list
     runs-on: "docker-build-${{ inputs.node }}"
-    if: ${{ needs.get-image-list.outputs.matrix != '' }}
+    if: ${{ needs.get-image-list.outputs.matrix != '' && inputs.sbom_scan }}
     strategy:
       matrix:
         image: ${{ fromJson(needs.get-image-list.outputs.matrix) }}
@@ -65,23 +79,10 @@ jobs:
 
       - name: SBOM Scan Container
         uses: anchore/sbom-action@v0.17.1
-        if: ${{ inputs.sbom_scan }}
         with:
           image: ${{ env.OPEA_IMAGE_REPO }}opea/${{ matrix.image }}:${{ inputs.tag }}
           output-file: ${{ matrix.image }}-sbom-scan.txt
           format: 'spdx-json'
-
-      - name: Security Scan Container
-        uses: aquasecurity/trivy-action@0.24.0
-        if: ${{ inputs.trivy_scan }}
-        with:
-          image-ref: ${{ env.OPEA_IMAGE_REPO }}opea/${{ matrix.image }}:${{ inputs.tag }}
-          output: ${{ matrix.image }}-trivy-scan.txt
-          format: 'table'
-          exit-code: '1'
-          ignore-unfixed: true
-          vuln-type: 'os,library'
-          severity: 'CRITICAL,HIGH'
 
       - name: Cleanup
         if: always()
@@ -94,8 +95,8 @@ jobs:
           mv ${{ matrix.image }}-*-scan.txt /tmp/scan-${{ inputs.tag }}-${{ github.run_number }}
 
   upload-artifacts:
-    needs: scan-docker
-    runs-on: "docker-build-${{ inputs.node }}"
+    needs: [BoM-scan-docker, trivy-scan-docker]
+    runs-on: trivy #ubuntu-latest   #"docker-build-${{ inputs.node }}"
     if: always()
     steps:
       - uses: actions/upload-artifact@v4.3.4
