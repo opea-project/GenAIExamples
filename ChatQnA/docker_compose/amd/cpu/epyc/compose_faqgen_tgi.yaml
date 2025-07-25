@@ -1,0 +1,206 @@
+# Copyright (C) 2025 Advanced Micro Devices, Inc.
+# Copyright (C) 2025 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  redis-vector-db:
+    image: redis/redis-stack:7.2.0-v9
+    container_name: redis-vector-db
+    ports:
+      - "${CHATQNA_REDIS_VECTOR_PORT:-6379}:6379"
+      - "${CHATQNA_REDIS_VECTOR_INSIGHT_PORT:-8001}:8001"
+  dataprep-redis-service:
+    image: ${REGISTRY:-opea}/dataprep:${TAG:-latest}
+    container_name: dataprep-redis-server
+    depends_on:
+      - redis-vector-db
+      - tei-embedding-service
+    ports:
+      - "6007:5000"
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      REDIS_URL: redis://redis-vector-db:6379
+      REDIS_HOST: redis-vector-db
+      INDEX_NAME: ${INDEX_NAME}
+      TEI_ENDPOINT: http://tei-embedding-service:80
+      HF_TOKEN: ${HF_TOKEN}
+    healthcheck:
+      test:
+        ["CMD-SHELL", "curl -f http://localhost:5000/v1/health_check || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 50
+    restart: unless-stopped
+  tei-embedding-service:
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.7
+    container_name: tei-embedding-server
+    ports:
+      - "6006:80"
+    volumes:
+      - "${MODEL_CACHE:-./data}:/data"
+    shm_size: 1g
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+    command: --model-id ${EMBEDDING_MODEL_ID} --auto-truncate
+  retriever:
+    image: ${REGISTRY:-opea}/retriever:${TAG:-latest}
+    container_name: retriever-redis-server
+    depends_on:
+      - redis-vector-db
+    ports:
+      - "7000:7000"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      REDIS_URL: redis://redis-vector-db:6379
+      REDIS_HOST: redis-vector-db
+      INDEX_NAME: ${INDEX_NAME}
+      TEI_EMBEDDING_ENDPOINT: http://tei-embedding-service:80
+      HF_TOKEN: ${HF_TOKEN}
+      LOGFLAG: ${LOGFLAG}
+      RETRIEVER_COMPONENT_NAME: "OPEA_RETRIEVER_REDIS"
+    restart: unless-stopped
+  tei-reranking-service:
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.7
+    container_name: tei-reranking-server
+    ports:
+      - "8808:80"
+    volumes:
+      - "${MODEL_CACHE:-./data}:/data"
+    shm_size: 1g
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      HF_TOKEN: ${HF_TOKEN}
+      HF_HUB_DISABLE_PROGRESS_BARS: 1
+      HF_HUB_ENABLE_HF_TRANSFER: 0
+    command: --model-id ${RERANK_MODEL_ID} --auto-truncate
+  tgi-service:
+    image: ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu
+    container_name: tgi-server
+    ports:
+      - ${LLM_ENDPOINT_PORT:-9009}:80
+    volumes:
+      - "${MODEL_CACHE:-./data}:/data"
+    shm_size: 1g
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      HF_TOKEN: ${HF_TOKEN}
+      host_ip: ${host_ip}
+      LLM_ENDPOINT_PORT: ${LLM_ENDPOINT_PORT}
+      HF_HUB_DISABLE_PROGRESS_BARS: 1
+      HF_HUB_ENABLE_HF_TRANSFER: 0
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl -f http://${host_ip}:${LLM_ENDPOINT_PORT}/health || exit 1",
+        ]
+      interval: 10s
+      timeout: 10s
+      retries: 100
+    command: --model-id ${LLM_MODEL_ID} --cuda-graphs 0
+  llm-faqgen:
+    image: ${REGISTRY:-opea}/llm-faqgen:${TAG:-latest}
+    container_name: llm-faqgen-server
+    depends_on:
+      tgi-service:
+        condition: service_healthy
+    ports:
+      - ${LLM_SERVER_PORT:-9000}:9000
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      LLM_ENDPOINT: ${LLM_ENDPOINT}
+      LLM_MODEL_ID: ${LLM_MODEL_ID}
+      HF_TOKEN: ${HF_TOKEN}
+      FAQGen_COMPONENT_NAME: ${FAQGen_COMPONENT_NAME:-OpeaFaqGenTgi}
+      LOGFLAG: ${LOGFLAG:-False}
+    restart: unless-stopped
+  chatqna-epyc-backend-server:
+    image: ${REGISTRY:-opea}/chatqna:${TAG:-latest}
+    container_name: chatqna-epyc-backend-server
+    depends_on:
+      redis-vector-db:
+        condition: service_started
+      tei-embedding-service:
+        condition: service_started
+      retriever:
+        condition: service_started
+      tei-reranking-service:
+        condition: service_started
+      tgi-service:
+        condition: service_started
+      llm-faqgen:
+        condition: service_started
+      dataprep-redis-service:
+        condition: service_healthy
+    ports:
+      - ${CHATQNA_BACKEND_PORT:-8888}:8888
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - MEGA_SERVICE_HOST_IP=chatqna-epyc-backend-server
+      - EMBEDDING_SERVER_HOST_IP=tei-embedding-service
+      - EMBEDDING_SERVER_PORT=80
+      - RETRIEVER_SERVICE_HOST_IP=retriever
+      - RETRIEVER_SERVICE_PORT=7000
+      - RERANK_SERVER_HOST_IP=tei-reranking-service
+      - RERANK_SERVER_PORT=80
+      - LLM_SERVER_HOST_IP=llm-faqgen
+      - LLM_SERVER_PORT=9000
+      - LLM_MODEL=${LLM_MODEL_ID}
+      - LOGFLAG=${LOGFLAG}
+      - CHATQNA_TYPE=${CHATQNA_TYPE:-CHATQNA_FAQGEN}
+    ipc: host
+    restart: always
+  chatqna-epyc-ui-server:
+    image: ${REGISTRY:-opea}/chatqna-ui:${TAG:-latest}
+    container_name: chatqna-epyc-ui-server
+    depends_on:
+      - chatqna-epyc-backend-server
+    ports:
+      - ${CHATQNA_FRONTEND_SERVICE_PORT:-5173}:5173
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+    ipc: host
+    restart: always
+  chatqna-epyc-nginx-server:
+    image: ${REGISTRY:-opea}/nginx:${TAG:-latest}
+    container_name: chatqna-epyc-nginx-server
+    depends_on:
+      - chatqna-epyc-backend-server
+      - chatqna-epyc-ui-server
+    ports:
+      - "${NGINX_PORT:-80}:80"
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - FRONTEND_SERVICE_IP=chatqna-epyc-ui-server
+      - FRONTEND_SERVICE_PORT=5173
+      - BACKEND_SERVICE_NAME=chatqna
+      - BACKEND_SERVICE_IP=chatqna-epyc-backend-server
+      - BACKEND_SERVICE_PORT=8888
+      - DATAPREP_SERVICE_IP=dataprep-redis-service
+      - DATAPREP_SERVICE_PORT=5000
+    ipc: host
+    restart: always
+
+networks:
+  default:
+    driver: bridge
