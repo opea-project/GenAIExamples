@@ -108,7 +108,7 @@ jobs:
 
   upload-artifacts:
     needs: [BoM-scan-docker, trivy-scan-docker]
-    runs-on: ubuntu-latest   #"docker-build-${{ inputs.node }}"
+    runs-on: trivy #ubuntu-latest   #"docker-build-${{ inputs.node }}"
     steps:
       - uses: actions/upload-artifact@v4.3.4
         with:
