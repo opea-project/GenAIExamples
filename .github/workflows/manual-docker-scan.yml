@@ -11,12 +11,12 @@ on:
         required: true
         type: string
       examples:
-        default: "CodeGen,CodeTrans"
+        default: "CodeGen"
         description: 'List of examples to publish "AgentQnA,AudioQnA,ChatQnA,CodeGen,CodeTrans,DocIndexRetriever,DocSum,InstructionTuning,MultimodalQnA,ProductivitySuite,RerankFinetuning,SearchQnA,Translation,VideoQnA,VisualQnA"'
         required: false
         type: string
       images:
-        default: "image2image-gaudi,lvm-llava"
+        default: ""
         description: 'List of images to publish "gmcmanager,gmcrouter"'
         required: false
         type: string
@@ -108,6 +108,7 @@ jobs:
 
   upload-artifacts:
     needs: [BoM-scan-docker, trivy-scan-docker]
+    if: always()
     runs-on: trivy #ubuntu-latest   #"docker-build-${{ inputs.node }}"
     steps:
       - uses: actions/upload-artifact@v4.3.4

@@ -40,12 +40,18 @@ jobs:
           docker system prune -f
       - name: Checkout out Repo
         uses: actions/checkout@v4
-      - name: Checkout GenAIComps Repository
-        uses: actions/checkout@v4
-        with:
-          repository: opea-project/GenAIComps
-          path: GenAIComps
-
+      - name: Clone Required Repo
+        run: |
+          sudo yum install -y jq
+          source ${{ github.workspace }}/.github/env/_build_image.sh
+          if [[ "${{ inputs.image }}" == "vllm" ]]; then
+              git clone -b ${VLLM_VER} --single-branch https://github.com/vllm-project/vllm.git
+          fi
+          if [[ "${{ inputs.image }}" == "vllm-gaudi" ]]; then
+              git clone -b ${VLLM_FORK_VER} --single-branch https://github.com/HabanaAI/vllm-fork.git
+          fi
+          git clone --depth 1 https://github.com/opea-project/GenAIComps.git
+          cd GenAIComps && git rev-parse HEAD && cd ../
       - name: Pull Image
         run: |
           docker pull ${OPEA_IMAGE_REPO}opea/${{ inputs.image }}:${{ inputs.tag }}
@@ -72,25 +78,25 @@ jobs:
           echo "base_image=$base_image"
           echo "base_image=$base_image" >> $GITHUB_OUTPUT
 
-      - name: Trivy Scan base image
-        id: trivy_base_scan
-        shell: bash
-        run: |
-          cd ${{ github.workspace }}
-          base_image="${{ steps.find_base_image.outputs.base_image }}"
-          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock     aquasec/trivy:latest image --format json --severity CRITICAL,HIGH --ignore-unfixed --pkg-types os,library "$base_image" > trivy_base_scan.json
+      # - name: Trivy Scan base image
+      #   id: trivy_base_scan
+      #   shell: bash
+      #   run: |
+      #     cd ${{ github.workspace }}
+      #     base_image="${{ steps.find_base_image.outputs.base_image }}"
+      #     docker run --rm -v /var/run/docker.sock:/var/run/docker.sock     aquasec/trivy:latest image --format json --severity CRITICAL,HIGH --ignore-unfixed --pkg-types os,library "$base_image" > trivy_base_scan.json
 
-          cve_list=$(jq '[.Results[] | select((.Type=="python-pkg") or (.Target | test("requirements.txt|setup.py|Pipfile|pyproject.toml|\\.whl$|\\.egg$"))) | .Vulnerabilities[]? | select(.VulnerabilityID != null) | .VulnerabilityID] ' trivy_base_scan.json | jq -s 'add | unique')
+      #     cve_list=$(jq '[.Results[] | select((.Type=="python-pkg") or (.Target | test("requirements.txt|setup.py|Pipfile|pyproject.toml|\\.whl$|\\.egg$"))) | .Vulnerabilities[]? | select(.VulnerabilityID != null) | .VulnerabilityID] ' trivy_base_scan.json | jq -s 'add | unique')
 
-          jq -n --arg image "$base_image" --argjson cves "$cve_list" '{image: $image, cves: $cves}' > single_base_cve.json
-          cat base_image_CVE.json
-          if [ -f base_image_CVE.json ]; then
-            jq -s '.[0] + [.[1]] | unique_by(.image)' base_image_CVE.json single_base_cve.json > tmp && mv tmp base_image_CVE.json
-          else
-            jq -s '.' single_base_cve.json > base_image_CVE.json
-          fi
-          rm -rf trivy_base_scan.json single_base_cve.json
-          cat base_image_CVE.json
+      #     jq -n --arg image "$base_image" --argjson cves "$cve_list" '{image: $image, cves: $cves}' > single_base_cve.json
+      #     cat base_image_CVE.json
+      #     if [ -f base_image_CVE.json ]; then
+      #       jq -s '.[0] + [.[1]] | unique_by(.image)' base_image_CVE.json single_base_cve.json > tmp && mv tmp base_image_CVE.json
+      #     else
+      #       jq -s '.' single_base_cve.json > base_image_CVE.json
+      #     fi
+      #     rm -rf trivy_base_scan.json single_base_cve.json
+      #     cat base_image_CVE.json
 
       - name: Generate ignorefile
         env:
