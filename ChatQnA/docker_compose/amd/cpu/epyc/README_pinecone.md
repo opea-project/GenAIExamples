@@ -188,6 +188,7 @@ For users in China who are unable to download models directly from Huggingface, 
    ```
 
 2. Offline
+
    - Search your model name in ModelScope. For example, check [this page](https://modelscope.cn/models/LLM-Research/Meta-Llama-3-8B-Instruct/files) for model `Meta-Llama-3-8B-Instruct`.
 
    - Click on `Download this model` button, and choose one way to download the model to your local path `/path/to/model`.
