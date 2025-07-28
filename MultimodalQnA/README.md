@@ -104,6 +104,6 @@ The table below lists currently available deployment options. They outline in de
 
 | **Deploy Method** | **LLM Engine** | **LLM Model**                     | **Database**  | **Hardware** |
 | ----------------- | -------------- | --------------------------------- | ------------- | ------------ |
-| Docker Compose    | LLAVA          | llava-hf/llava-v1.6-vicuna-13b-hf | Milvus, Redis | Intel Xeon   |
+| Docker Compose    | LLAVA          | llava-hf/llava-1.5-7b-hf          | Milvus, Redis | Intel Xeon   |
 | Docker Compose    | LLAVA          | llava-hf/llava-v1.6-vicuna-13b-hf | Redis         | Intel Gaudi  |
 | Docker Compose    | TGI, vLLM      | Xkev/Llama-3.2V-11B-cot           | Redis         | AMD ROCm     |

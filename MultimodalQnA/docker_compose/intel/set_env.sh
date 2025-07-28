@@ -45,6 +45,8 @@ export REDIS_RETRIEVER_PORT=7000
 export LVM_PORT=9399
 export LLAVA_SERVER_PORT=8399
 export TGI_GAUDI_PORT="${LLAVA_SERVER_PORT}:80"
+
+# For Xeon, use llava-hf/llava-1.5-7b-hf
 export LVM_MODEL_ID="llava-hf/llava-v1.6-vicuna-13b-hf"
 
 export LVM_ENDPOINT="http://${host_ip}:${LLAVA_SERVER_PORT}"
