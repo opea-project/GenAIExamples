@@ -20,7 +20,7 @@ on:
         description: "Image List"
         value: ${{ jobs.get-image-list.outputs.matrix }}
       run_matrix:
-        description: "Run Matrix"
+        description: "Trivy Matrix composed of image name and Dockerfile path"
         value: ${{ jobs.get-image-list.outputs.run_matrix }}
 
 jobs:
