@@ -180,7 +180,8 @@ function validate_frontend() {
 
 	sed -i "s/localhost/$ip_address/g" playwright.config.ts
 
-	npm install && npm ci && npx playwright install --with-deps
+	# npm install && npm ci && npx playwright install --with-deps
+	npm install && npm ci && npx playwright install
 	node -v && npm -v && pip list
 
 	exit_status=0
