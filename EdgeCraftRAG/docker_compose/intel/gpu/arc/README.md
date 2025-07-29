@@ -68,7 +68,6 @@ docker compose up -d
 
 The EdgeCraftRAG docker images should automatically be downloaded from the `OPEA registry` and deployed on the Intel® Arc® Platform
 
-
 ### Check the Deployment Status
 
 After running docker compose, check if all the containers launched via docker compose have started:
@@ -78,7 +77,6 @@ docker ps -a
 ```
 
 For the default deployment, the following 5 containers should be running:
-
 
 ### Test the Pipeline
 
@@ -107,24 +105,24 @@ All the EdgeCraftRAG containers will be stopped and then removed on completion o
 
 The compose.yaml is default compose file using tgi as serving framework
 
-| Service Name                    | Image Name                                                    |
-| ------------------------------- | ------------------------------------------------------------- |
-| etcd                            | quay.io/coreos/etcd:v3.5.5                                    |
-| minio                           | minio/minio:RELEASE.2023-03-20T20-16-18Z                      |
-| milvus-standalone               | milvusdb/milvus:v2.4.6                                        |
-| edgecraftrag-server             | opea/edgecraftrag-server:latest                               |
-| edgecraftrag-ui                 | opea/edgecraftrag-ui:latest                                   |
-| ecrag                           | opea/edgecraftrag:latest                                      |
+| Service Name        | Image Name                               |
+| ------------------- | ---------------------------------------- |
+| etcd                | quay.io/coreos/etcd:v3.5.5               |
+| minio               | minio/minio:RELEASE.2023-03-20T20-16-18Z |
+| milvus-standalone   | milvusdb/milvus:v2.4.6                   |
+| edgecraftrag-server | opea/edgecraftrag-server:latest          |
+| edgecraftrag-ui     | opea/edgecraftrag-ui:latest              |
+| ecrag               | opea/edgecraftrag:latest                 |
 
 ## EdgeCraftRAG Service Configuration
 
 The table provides a comprehensive overview of the EdgeCraftRAG service utilized across various deployments as illustrated in the example Docker Compose files. Each row in the table represents a distinct service, detailing its possible images used to enable it and a concise description of its function within the deployment architecture.
 
-| Service Name                    | Possible Image Names                                          | Optional | Description                                                                                     |
-| ------------------------------- | ------------------------------------------------------------- | -------- | ----------------------------------------------------------------------------------------------- |
-| etcd                            | quay.io/coreos/etcd:v3.5.5                                    | No       | Provides distributed key-value storage for service discovery and configuration management.       |
-| minio                           | minio/minio:RELEASE.2023-03-20T20-16-18Z                      | No       | Provides object storage services for storing documents and model files.                          |
-| milvus-standalone               | milvusdb/milvus:v2.4.6                                        | No       | Provides vector database capabilities for managing embeddings and similarity search.             |
-| edgecraftrag-server             | opea/edgecraftrag-server:latest                               | No       | Serves as the backend for the EdgeCraftRAG service, with variations depending on the deployment. |
-| edgecraftrag-ui                 | opea/edgecraftrag-ui:latest                                   | No       | Provides the user interface for the EdgeCraftRAG service.                                        |
-| ecrag                           | opea/edgecraftrag:latest                                      | No       | Acts as a reverse proxy, managing traffic between the UI and backend services.                        |
+| Service Name        | Possible Image Names                     | Optional | Description                                                                                      |
+| ------------------- | ---------------------------------------- | -------- | ------------------------------------------------------------------------------------------------ |
+| etcd                | quay.io/coreos/etcd:v3.5.5               | No       | Provides distributed key-value storage for service discovery and configuration management.       |
+| minio               | minio/minio:RELEASE.2023-03-20T20-16-18Z | No       | Provides object storage services for storing documents and model files.                          |
+| milvus-standalone   | milvusdb/milvus:v2.4.6                   | No       | Provides vector database capabilities for managing embeddings and similarity search.             |
+| edgecraftrag-server | opea/edgecraftrag-server:latest          | No       | Serves as the backend for the EdgeCraftRAG service, with variations depending on the deployment. |
+| edgecraftrag-ui     | opea/edgecraftrag-ui:latest              | No       | Provides the user interface for the EdgeCraftRAG service.                                        |
+| ecrag               | opea/edgecraftrag:latest                 | No       | Acts as a reverse proxy, managing traffic between the UI and backend services.                   |

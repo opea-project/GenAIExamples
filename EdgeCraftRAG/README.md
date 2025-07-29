@@ -85,9 +85,9 @@ flowchart TD
 
 The table below lists the available deployment options and their implementation details for different hardware platforms.
 
-| Platform     | Deployment Method | Link                                                              |
-| ------------ | ----------------- | ----------------------------------------------------------------- |
-| Intel Arc    | Docker compose    | [Deployment on Arc](./docker_compose/intel/cpu/arc/README.md)     |
+| Platform  | Deployment Method | Link                                                          |
+| --------- | ----------------- | ------------------------------------------------------------- |
+| Intel Arc | Docker compose    | [Deployment on Arc](./docker_compose/intel/cpu/arc/README.md) |
 
 ## Validated Configurations
 
