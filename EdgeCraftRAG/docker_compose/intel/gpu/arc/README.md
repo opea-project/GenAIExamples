@@ -26,7 +26,7 @@ Hardware: Intel Arc A770
 OS: Ubuntu Server 22.04.1 or newer (at least 6.2 LTS kernel)  
 Driver & libraries: please to [Installing Client GPUs](https://dgpu-docs.intel.com/driver/client/overview.html) for detailed driver & libraries setup
 
-Below steps are based on **vLLM** as inference engine, if you want to choose **OpenVINO**, please refer to [OpenVINO Local Inference](docs/Advanced_Setup.md#openvino-local-inference)
+Below steps are based on **vLLM** as inference engine, if you want to choose **OpenVINO**, please refer to [OpenVINO Local Inference](../../../../docs/Advanced_Setup.md#openvino-local-inference)
 
 ### Access the Code
 
@@ -49,14 +49,14 @@ Some HuggingFace resources, such as some models, are only accessible if you have
 
 ### Configure the Deployment Environment
 
-Below steps are for single Intel Arc GPU inference, if you want to setup multi Intel Arc GPUs inference, please refer to [Multi-ARC Setup](docs/Advanced_Setup.md#multi-arc-setup)
+Below steps are for single Intel Arc GPU inference, if you want to setup multi Intel Arc GPUs inference, please refer to [Multi-ARC Setup](../../../../docs/Advanced_Setup.md#multi-arc-setup)
 To set up environment variables for deploying EdgeCraftRAG service, source the set_env.sh script in this directory:
 
 ```
 source set_env.sh
 ```
 
-For more advanced env variables and configurations, please refer to [Prepare env variables for vLLM deployment](docs/Advanced_Setup.md#prepare-env-variables-for-vllm-deployment)
+For more advanced env variables and configurations, please refer to [Prepare env variables for vLLM deployment](../../../../docs/Advanced_Setup.md#prepare-env-variables-for-vllm-deployment)
 
 ### Deploy the Service Using Docker Compose
 
@@ -89,7 +89,7 @@ curl http://${host_ip}:16011/v1/chatqna -H 'Content-Type: application/json' -d '
      "messages":"What is the test id?","max_tokens":5 }'
 ```
 
-For detailed operations on UI and EC-RAG settings, please refer to [Explore_Edge_Craft_RAG](docs/Explore_Edge_Craft_RAG.md)
+For detailed operations on UI and EC-RAG settings, please refer to [Explore_Edge_Craft_RAG](../../../../docs/Explore_Edge_Craft_RAG.md)
 
 **Note** The value of _host_ip_ was set using the _set_env.sh_ script and can be found in the _.env_ file.
 
