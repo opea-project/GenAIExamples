@@ -33,7 +33,7 @@ cd GenAIExamples/ProductivitySuite/docker_compose/amd/cpu/epyc/
 Some HuggingFace resources, such as some models, are only accessible if you have an access token. If you do not already have a HuggingFace access token, you can create one by first creating an account by following the steps provided at [HuggingFace](https://huggingface.co/) and then generating a [user access token](https://huggingface.co/docs/transformers.js/en/guides/private#step-1-generating-a-user-access-token).
 
     # Replace with your Hugging Face Hub API token
-    export HUGGINGFACEHUB_API_TOKEN="your_huggingface_token"
+    export HF_TOKEN="your_huggingface_token"
 
 ### Configure the Deployment Environment
 

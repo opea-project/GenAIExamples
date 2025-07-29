@@ -17,7 +17,7 @@ This section describes how to quickly deploy and test the AudioQnA service manua
 
 1. [Access the Code](#access-the-code)
 2. [Install Docker](#install-docker)
-3. [Determine your host's external IP address](#determine-your-host-external-IP-address)
+3. [Determine your host's external IP address](#determine-your-host-external-ip-address)
 4. [Configure the Deployment Environment](#configure-the-deployment-environment)
 5. [Deploy the Services Using Docker Compose](#deploy-the-services-using-docker-compose)
 6. [Check the Deployment Status](#check-the-deployment-status)
@@ -74,15 +74,13 @@ export model_cache=/home/documentation/data_audioqna/data # Path to save cache m
 To set up environment variables for deploying AudioQnA services, set up some parameters specific to the deployment environment and source the `set_env.sh` script in this directory:
 
 ```bash
-export HUGGINGFACEHUB_API_TOKEN="Your_HuggingFace_API_Token"
+export HF_TOKEN="Your_HuggingFace_API_Token"
 export http_proxy="Your_HTTP_Proxy"           # http proxy if any
 export https_proxy="Your_HTTPs_Proxy"         # https proxy if any
 export no_proxy=localhost,127.0.0.1,$host_ip,whisper-service,speecht5-service,vllm-service,tgi-service,audioqna-epyc-backend-server,audioqna-epyc-ui-server  # additional no proxies if needed
 export NGINX_PORT=${your_nginx_port}          # your usable port for nginx, 80 for example
 source ./set_env.sh
 ```
-
-Consult the section on [AudioQnA Service configuration](#audioqna-configuration) for information on how service specific configuration parameters affect deployments.
 
 ### Deploy the Services Using Docker Compose
 
@@ -162,13 +160,12 @@ docker compose -f compose.yaml down
 
 ## AudioQnA Docker Compose Files
 
-When deploying an AudioQnA pipeline on an AMD EPYC™ platform, users can select from various large language model serving frameworks or opt for either single-language English TTS or multi-language TTS components. The table below highlights the available configurations included in the application. These configurations serve as templates and can be extended to incorporate additional components from [GenAIComps](https://github.com/opea-project/GenAIComps.git).
+When deploying an AudioQnA pipeline on an AMD EPYC™ platform, users can select from various large language model serving frameworks or opt for either single-language English TTS. The table below highlights the available configurations included in the application. These configurations serve as templates and can be extended to incorporate additional components from [GenAIComps](https://github.com/opea-project/GenAIComps.git).
 
-| File                                               | Description                                                                               |
-| -------------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| [compose.yaml](./compose.yaml)                     | Default compose file using vllm as serving framework and redis as vector database         |
-| [compose_tgi.yaml](./compose_tgi.yaml)             | The LLM serving framework is TGI. All other configurations remain the same as the default |
-| [compose_multilang.yaml](./compose_multilang.yaml) | The TTS component is GPT-SoVITS. All other configurations remain the same as the default  |
+| File                                   | Description                                                                               |
+| -------------------------------------- | ----------------------------------------------------------------------------------------- |
+| [compose.yaml](./compose.yaml)         | Default compose file using vllm as serving framework and redis as vector database         |
+| [compose_tgi.yaml](./compose_tgi.yaml) | The LLM serving framework is TGI. All other configurations remain the same as the default |
 
 ## Validate MicroServices
 

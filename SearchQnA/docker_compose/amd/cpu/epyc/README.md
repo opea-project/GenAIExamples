@@ -15,7 +15,7 @@ This section describes how to quickly deploy and test the SearchQnA service manu
 
 1. [Access the Code](#access-the-code)
 2. [Install Docker](#install-docker)
-3. [Determine your host's external IP address](#determine-your-host-external-IP-address)
+3. [Determine your host's external IP address](#determine-your-host-external-ip-address)
 4. [Generate a HuggingFace Access Token](#generate-a-huggingface-access-token)
 5. [Configure the Deployment Environment](#configure-the-deployment-environment)
 6. [Deploy the Services Using Docker Compose](#deploy-the-services-using-docker-compose)
@@ -65,7 +65,7 @@ In this example, the (`host_ip`) would be (`10.101.16.119`).
 Some HuggingFace resources, such as some models, are only accessible if you have an access token. If you do not already have a HuggingFace access token, you can create one by first creating an account by following the steps provided at [HuggingFace](https://huggingface.co/) and then generating a [user access token](https://huggingface.co/docs/transformers.js/en/guides/private#step-1-generating-a-user-access-token).
 
 ```bash
-export HUGGINGFACEHUB_API_TOKEN="your_huggingface_token"
+export HF_TOKEN="your_huggingface_token"
 ```
 
 ### Configure the Deployment Environment
@@ -86,7 +86,7 @@ The environment variables `GOOGLE_CSE_ID` and `GOOGLE_API_KEY` must be set. To c
 
 To enable the Custom Search API:
 
-1. To enable the Custom Search API on a Google account follow (here)[(https://programmablesearchengine.google.com/controlpanel/create]
+1. To enable the Custom Search API on a Google account follow [here](https://programmablesearchengine.google.com/controlpanel/create)
 
 ```bash
 export GOOGLE_API_KEY="your google api key"
@@ -105,8 +105,6 @@ Finally set the other environment variables
 ```bash
 source ./set_env.sh
 ```
-
-Consult the section on [SearchQnA Service configuration](#SearchQnA-configuration) for information on how service specific configuration parameters affect deployments.
 
 ### Deploy the Services Using Docker Compose
 

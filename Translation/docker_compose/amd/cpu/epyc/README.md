@@ -12,7 +12,7 @@ This section describes how to quickly deploy and test the Translation service ma
 
 1. [Access the Code](#access-the-code)
 2. [Install Docker](#install-docker)
-3. [Determine your host's external IP address](#determine-your-host-external-IP-address)
+3. [Determine your host's external IP address](#determine-your-host-external-ip-address)
 4. [Generate a HuggingFace Access Token](#generate-a-huggingface-access-token)
 5. [Configure the Deployment Environment](#configure-the-deployment-environment)
 6. [Deploy the Service Using Docker Compose](#deploy-the-service-using-docker-compose)
@@ -62,7 +62,7 @@ In this example, the (`host_ip`) would be (`10.101.16.119`).
 Some HuggingFace resources, such as some models, are only accessible if you have an access token. If you do not already have a HuggingFace access token, you can create one by first creating an account by following the steps provided at [HuggingFace](https://huggingface.co/) and then generating a [user access token](https://huggingface.co/docs/transformers.js/en/guides/private#step-1-generating-a-user-access-token).
 
 ```bash
-export HUGGINGFACEHUB_API_TOKEN="Your_HuggingFace_API_Token"
+export HF_TOKEN="Your_HuggingFace_API_Token"
 ```
 
 ### Configure the Deployment Environment

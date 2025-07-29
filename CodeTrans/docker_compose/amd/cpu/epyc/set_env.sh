@@ -1,8 +1,12 @@
+#!/bin/bash
+
 # Copyright (C) 2025 Advanced Micro Devices, Inc.
 # Copyright (C) 2025 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-export host_ip=$(hostname -I | awk '{print $1}')
+host_ip=$(hostname -I | awk '{print $1}')
+export host_ip
+
 export LLM_MODEL_ID="mistralai/Mistral-7B-Instruct-v0.3"
 export LLM_ENDPOINT="http://${host_ip}:8008"
 export LLM_COMPONENT_NAME="OpeaTextGenService"

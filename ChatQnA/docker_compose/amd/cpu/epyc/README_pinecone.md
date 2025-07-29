@@ -25,12 +25,12 @@ To set up environment variables for deploying ChatQnA services, follow these ste
    ```bash
    # Example: host_ip="192.168.1.1"
    export host_ip="External_Public_IP"
-   export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
+   export HF_TOKEN="Your_Huggingface_API_Token"
    ```
 
 2. Set the required Pinecone environment variables:
 
-Please refer to ['Getting started with Pinecone'](#https://docs.pinecone.io/guides/get-started/quickstart) to get the below details.
+Please refer to [Getting started with Pinecone](https://docs.pinecone.io/guides/get-started/quickstart) to get the below details.
 
 ```bash
 export PINECONE_API_KEY="Pinecone_API_Key"
@@ -188,7 +188,6 @@ For users in China who are unable to download models directly from Huggingface, 
    ```
 
 2. Offline
-
    - Search your model name in ModelScope. For example, check [this page](https://modelscope.cn/models/LLM-Research/Meta-Llama-3-8B-Instruct/files) for model `Meta-Llama-3-8B-Instruct`.
 
    - Click on `Download this model` button, and choose one way to download the model to your local path `/path/to/model`.
@@ -208,7 +207,7 @@ For users in China who are unable to download models directly from Huggingface, 
    ```bash
    # Example: host_ip="192.168.1.1"
    export host_ip="External_Public_IP"
-   export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
+   export HF_TOKEN="Your_Huggingface_API_Token"
    # Example: NGINX_PORT=80
    export NGINX_PORT=${your_nginx_port}
    export PINECONE_API_KEY="Pinecone_API_Key"
@@ -250,7 +249,6 @@ docker compose -f compose_pinecone.yaml up -d
 
 Note, when verify the microservices by curl or API from remote client, please make sure the **ports** of the microservices are opened in the firewall of the cloud node.
 Follow the instructions to validate MicroServices.
-For details on how to verify the correctness of the response, refer to [how-to-validate_service](../../hpu/gaudi/how_to_validate_service.md).
 
 1. TEI Embedding Service
 

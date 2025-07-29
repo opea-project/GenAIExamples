@@ -20,6 +20,14 @@ export host_ip="External_Public_IP"
 export no_proxy=${no_proxy},${host_ip}
 ```
 
+**Generate a HuggingFace Access Token**
+
+> Some HuggingFace resources, such as some models, are only accessible if you have an access token. If you do not already have a HuggingFace access token, you can create one by first creating an account by following the steps provided at [HuggingFace](https://huggingface.co/) and then generating a [user access token](https://huggingface.co/docs/transformers.js/en/guides/private#step-1-generating-a-user-access-token).
+
+```bash
+export HF_TOKEN="your_huggingface_token"
+```
+
 ```bash
 export MM_EMBEDDING_SERVICE_HOST_IP=${host_ip}
 export MM_RETRIEVER_SERVICE_HOST_IP=${host_ip}

@@ -65,7 +65,7 @@ cd docker_compose/amd/cpu/epyc
      Some HuggingFace resources, such as some models, are only accessible if you have an access token. If you do not already have a HuggingFace access token, you can create one by first creating an account by following the steps provided at [HuggingFace](https://huggingface.co/) and then generating a [user access token](https://huggingface.co/docs/transformers.js/en/guides/private#step-1-generating-a-user-access-token).
 
         # Replace with your Hugging Face Hub API token
-        export HUGGINGFACEHUB_API_TOKEN="your_huggingface_token"
+        export HF_TOKEN="your_huggingface_token"
 
     **_iii) Set environment variables:_**
     The model_cache directory, by default, stores models in the ./data directory. To change this, use the following command:
@@ -85,8 +85,6 @@ cd docker_compose/amd/cpu/epyc
     To set other environment variables:
 
          source set_env.sh
-
-    Consult the section on [CodeTrans Service configuration](#codetrans-configuration) for information on how service specific configuration parameters affect deployments.
 
 ### Deploy the Services Using Docker Compose
 
@@ -159,7 +157,7 @@ Key parameters are configured via environment variables set before running `dock
 | Environment Variable                    | Description                                                                                                           | Default (Set Externally)              |
 | :-------------------------------------- | :-------------------------------------------------------------------------------------------------------------------- | :------------------------------------ |
 | `HOST_IP`                               | External IP address of the host machine. **Required.**                                                                | `your_external_ip_address`            |
-| `HUGGINGFACEHUB_API_TOKEN`              | Your Hugging Face Hub token for model access. **Required.**                                                           | `your_huggingface_token`              |
+| `HF_TOKEN`                              | Your Hugging Face Hub token for model access. **Required.**                                                           | `your_huggingface_token`              |
 | `LLM_MODEL_ID`                          | Hugging Face model ID for the CodeTrans LLM (used by TGI/vLLM service). Configured within `compose.yaml` environment. | `mistralai/Mistral-7B-Instruct-v0.3`  |
 | `LLM_ENDPOINT`                          | Internal URL for the LLM serving endpoint (used by `codetrans-epyc-llm-server`). Configured in `compose.yaml`.        | `http://${HOST_IP}:8008`              |
 | `LLM_COMPONENT_NAME`                    | LLM component name for the LLM Microservice.                                                                          | `OpeaTextGenService`                  |

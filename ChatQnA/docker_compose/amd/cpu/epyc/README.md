@@ -4,7 +4,7 @@ This document outlines the single node deployment process for a ChatQnA applicat
 
 ## Table of contents
 
-1. [ChatQnA Quick Start Deployment](#chatqna-quick-start-Deployment)
+1. [ChatQnA Quick Start Deployment](#chatqna-quick-start-deployment)
 2. [ChatQnA Docker Compose file Options](#chatqna-docker-compose-files)
 3. [ChatQnA with Conversational UI](#chatqna-with-conversational-ui-optional)
 
@@ -45,15 +45,13 @@ To set up environment variables for deploying ChatQnA services, set up some para
 
 ```
 export host_ip="External_Public_IP"           #ip address of the node
-export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
+export HF_TOKEN="Your_Huggingface_API_Token"
 export http_proxy="Your_HTTP_Proxy"           #http proxy if any
 export https_proxy="Your_HTTPs_Proxy"         #https proxy if any
 export no_proxy=localhost,127.0.0.1,$host_ip  #additional no proxies if needed
 export no_proxy=$no_proxy,chatqna-epyc-ui-server,chatqna-epyc-backend-server,dataprep-redis-service,tei-embedding-service,retriever,tei-reranking-service,tgi-service,vllm-service,llm-faqgen
 source ./set_env.sh
 ```
-
-Consult the section on [ChatQnA Service configuration](#chatqna-configuration) for information on how service specific configuration parameters affect deployments.
 
 ### Deploy the Services Using Docker Compose
 
@@ -144,18 +142,15 @@ docker compose -f compose.yaml down
 
 In the context of deploying a ChatQnA pipeline on an AMD EPYC platform, we can pick and choose different vector databases, large language model serving frameworks, and remove pieces of the pipeline such as the reranker. The table below outlines the various configurations that are available as part of the application. These configurations can be used as templates and can be extended to different components available in [GenAIComps](https://github.com/opea-project/GenAIComps.git).
 
-| File                                                         | Description                                                                                                                                                           |
-| ------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [compose.yaml](./compose.yaml)                               | Default compose file using vllm as serving framework and redis as vector database                                                                                     |
-| [compose_milvus.yaml](./compose_milvus.yaml)                 | Uses Milvus as the vector database. All other configurations remain the same as the default                                                                           |
-| [compose_pinecone.yaml](./compose_pinecone.yaml)             | Uses Pinecone as the vector database. All other configurations remain the same as the default. For more details, refer to [README_pinecone.md](./README_pinecone.md). |
-| [compose_qdrant.yaml](./compose_qdrant.yaml)                 | Uses Qdrant as the vector database. All other configurations remain the same as the default. For more details, refer to [README_qdrant.md](./README_qdrant.md).       |
-| [compose_tgi.yaml](./compose_tgi.yaml)                       | Uses TGI as the LLM serving framework. All other configurations remain the same as the default                                                                        |
-| [compose_without_rerank.yaml](./compose_without_rerank.yaml) | Default configuration without the reranker                                                                                                                            |
-| [compose_faqgen.yaml](./compose_faqgen.yaml)                 | Enables FAQ generation using vLLM as the LLM serving framework. For more details, refer to [README_faqgen.md](./README_faqgen.md).                                    |
-| [compose_faqgen_tgi.yaml](./compose_faqgen_tgi.yaml)         | Enables FAQ generation using TGI as the LLM serving framework. For more details, refer to [README_faqgen.md](./README_faqgen.md).                                     |
-| [compose.telemetry.yaml](./compose.telemetry.yaml)           | Helper file for telemetry features for vllm. Can be used along with any compose files that serves vllm                                                                |
-| [compose_tgi.telemetry.yaml](./compose_tgi.telemetry.yaml)   | Helper file for telemetry features for tgi. Can be used along with any compose files that serves tgi                                                                  |
+| File                                                       | Description                                                                                                                                                           |
+| ---------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [compose.yaml](./compose.yaml)                             | Default compose file using vllm as serving framework and redis as vector database                                                                                     |
+| [compose_pinecone.yaml](./compose_pinecone.yaml)           | Uses Pinecone as the vector database. All other configurations remain the same as the default. For more details, refer to [README_pinecone.md](./README_pinecone.md). |
+| [compose_tgi.yaml](./compose_tgi.yaml)                     | Uses TGI as the LLM serving framework. All other configurations remain the same as the default                                                                        |
+| [compose_faqgen.yaml](./compose_faqgen.yaml)               | Enables FAQ generation using vLLM as the LLM serving framework. For more details, refer to [README_faqgen.md](./README_faqgen.md).                                    |
+| [compose_faqgen_tgi.yaml](./compose_faqgen_tgi.yaml)       | Enables FAQ generation using TGI as the LLM serving framework. For more details, refer to [README_faqgen.md](./README_faqgen.md).                                     |
+| [compose.telemetry.yaml](./compose.telemetry.yaml)         | Helper file for telemetry features for vllm. Can be used along with any compose files that serves vllm                                                                |
+| [compose_tgi.telemetry.yaml](./compose_tgi.telemetry.yaml) | Helper file for telemetry features for tgi. Can be used along with any compose files that serves tgi                                                                  |
 
 ## ChatQnA with Conversational UI (Optional)
 
@@ -198,7 +193,6 @@ Here is an example of running ChatQnA with Conversational UI (React):
 
 Note, when verifying the microservices by curl or API from remote client, please make sure the **ports** of the microservices are opened in the firewall of the cloud node.  
 Follow the instructions to validate MicroServices.
-For details on how to verify the correctness of the response, refer to [how-to-validate_service](../../hpu/gaudi/how_to_validate_service.md).
 
 1. **TEI Embedding Service**
    Send a test request to the TEI Embedding Service to ensure it is running correctly:

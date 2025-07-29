@@ -4,7 +4,6 @@
 
 ```bash
 export HF_TOKEN="Your_Huggingface_API_Token"
-export HUGGINGFACEHUB_API_TOKEN=${HF_TOKEN}
 export GOOGLE_API_KEY="your google api key"
 export GOOGLE_CSE_ID="your cse id"
 ```

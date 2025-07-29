@@ -4,7 +4,6 @@
 
 ```bash
 export HF_TOKEN="Your_Huggingface_API_Token"
-export HUGGINGFACEHUB_API_TOKEN=${HF_TOKEN}
 ```
 
 ## Run test
@@ -24,7 +23,7 @@ bash test_compose_on_gaudi.sh
 On AMD EPYC with TGI:
 
 ```bash
-bash test_compose_on_epyc_tgi.sh
+bash test_compose_tgi_on_epyc.sh
 ```
 
 On AMD EPYC with VLLM:

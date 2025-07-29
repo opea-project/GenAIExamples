@@ -4,14 +4,17 @@
 # Copyright (C) 2025 Advanced Micro Devices, Inc.
 # SPDX-License-Identifier: Apache-2.0
 
-export host_ip=$(hostname -I | awk '{print $1}')
+host_ip=$(hostname -I | awk '{print $1}')
+export host_ip
+
 export DB_NAME="opea"
 export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
 export RERANK_MODEL_ID="BAAI/bge-reranker-base"
 export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
 export LLM_MODEL_ID_CODEGEN="Intel/neural-chat-7b-v3-3"
 export INDEX_NAME="rag-redis"
-export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+export HF_TOKEN=${HF_TOKEN}
+
 export BACKEND_SERVICE_ENDPOINT_CHATQNA="http://${host_ip}:8888/v1/chatqna"
 export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/delete"
 export BACKEND_SERVICE_ENDPOINT_CODEGEN="http://${host_ip}:7778/v1/codegen"
@@ -28,5 +31,5 @@ export KEYCLOAK_SERVICE_ENDPOINT="http://${host_ip}:8080"
 export DocSum_COMPONENT_NAME="OpeaDocSumTgi"
 export MEGA_SERVICE_HOST_IP=${host_ip}
 
-#Set no proxy
+# Set no proxy
 export no_proxy="$no_proxy,tgi_service_codegen,llm_codegen,tei-embedding-service,tei-reranking-service,chatqna-epyc-backend-server,retriever,tgi-service,redis-vector-db,whisper,llm-docsum-tgi,docsum-epyc-backend-server,mongo,codegen"

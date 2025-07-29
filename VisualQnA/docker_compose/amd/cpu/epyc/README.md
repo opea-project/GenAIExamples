@@ -62,7 +62,7 @@ Since the `compose.yaml` will consume some environment variables, you need to se
 source set_env.sh
 ```
 
-Note: Please replace with `host_ip` with you external IP address, do not use localhost.
+Note: Please replace with `host_ip` with you external IP address, do not use localhost. Also set the `HF_TOKEN`.
 
 ### Start all the services Docker Containers
 

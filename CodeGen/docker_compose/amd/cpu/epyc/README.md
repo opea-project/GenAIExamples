@@ -66,7 +66,7 @@ This guide focuses on running the pre-configured CodeGen service using Docker Co
      Some HuggingFace resources, such as some models, are only accessible if you have an access token. If you do not already have a HuggingFace access token, you can create one by first creating an account by following the steps provided at [HuggingFace](https://huggingface.co/) and then generating a [user access token](https://huggingface.co/docs/transformers.js/en/guides/private#step-1-generating-a-user-access-token).
 
         # Replace with your Hugging Face Hub API token
-        export HUGGINGFACEHUB_API_TOKEN="your_huggingface_token"
+        export HF_TOKEN="your_huggingface_token"
 
     **_iii) Set environment variables:_**  
      The model_cache directory, by default, stores models in the ./data directory. To change this, use the following command:
@@ -113,7 +113,7 @@ The `compose.yaml` file uses Docker Compose profiles to select the LLM serving b
 - **Services Deployed:** `codegen-vllm-server`, `codegen-llm-server`, `codegen-tei-embedding-server`, `codegen-retriever-server`, `redis-vector-db`, `codegen-dataprep-server`, `codegen-backend-server`, `codegen-gradio-ui-server`.
 - **To Run:**
   ```bash
-  # Ensure environment variables (host_ip, HUGGINGFACEHUB_API_TOKEN) are set
+  # Ensure environment variables (host_ip, HF_TOKEN) are set
   docker compose --profile codegen-epyc-vllm up -d
   ```
 
@@ -124,7 +124,7 @@ The `compose.yaml` file uses Docker Compose profiles to select the LLM serving b
 - **Services Deployed:** `codegen-tgi-server`, `codegen-llm-server`, `codegen-tei-embedding-server`, `codegen-retriever-server`, `redis-vector-db`, `codegen-dataprep-server`, `codegen-backend-server`, `codegen-gradio-ui-server`.
 - **To Run:**
   ```bash
-  # Ensure environment variables (host_ip, HUGGINGFACEHUB_API_TOKEN) are set
+  # Ensure environment variables (host_ip, HF_TOKEN) are set
   docker compose --profile codegen-epyc-tgi up -d
   ```
 
@@ -227,7 +227,7 @@ Users can interact with the backend service using the `Neural Copilot` VS Code e
 
 ## Troubleshooting
 
-- **Model Download Issues:** Check `HUGGINGFACEHUB_API_TOKEN`. Ensure internet connectivity or correct proxy settings. Check logs of `tgi-service`/`vllm-service` and `tei-embedding-server`. Gated models need prior Hugging Face access.
+- **Model Download Issues:** Check `HF_TOKEN`. Ensure internet connectivity or correct proxy settings. Check logs of `tgi-service`/`vllm-service` and `tei-embedding-server`. Gated models need prior Hugging Face access.
 - **Connection Errors:** Verify `host_ip` is correct and accessible. Check `docker ps` for port mappings. Ensure `no_proxy` includes `host_ip` if using a proxy. Check logs of the service failing to connect (e.g., `codegen-backend-server` logs if it can't reach `codegen-llm-server`).
 - **"Container name is in use"**: Stop existing containers (`docker compose down`) or change `container_name` in `compose.yaml`.
 - **Resource Issues:** CodeGen models can be memory-intensive. Monitor host RAM usage. Increase Docker resources if needed.

@@ -5,17 +5,19 @@
 # SPDX-License-Identifier: Apache-2.0
 
 # export host_ip=<your External Public IP>
-export host_ip=$(hostname -I | awk '{print $1}')
-export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
-if [ -z "${HUGGINGFACEHUB_API_TOKEN}" ]; then
-    echo "Error: HUGGINGFACEHUB_API_TOKEN is not set. Please set HUGGINGFACEHUB_API_TOKEN"
+host_ip=$(hostname -I | awk '{print $1}')
+export host_ip
+
+export HF_TOKEN=${HF_TOKEN}
+if [ -z "${HF_TOKEN}" ]; then
+    echo "Error: HF_TOKEN is not set. Please set HF_TOKEN"
 fi
 
 if [ -z "${host_ip}" ]; then
     echo "Error: host_ip is not set. Please set host_ip first."
 fi
 
-export no_proxy=${no_proxy},${host_ip}
+export no_proxy="${no_proxy},${host_ip}"
 export http_proxy=${http_proxy}
 export https_proxy=${https_proxy}
 

@@ -15,7 +15,7 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HF_TOKEN: ${HF_TOKEN}
       LLM_MODEL_ID: ${LLM_MODEL_ID}
       MODEL_CACHE: ${MODEL_CACHE}
       VLLM_CPU_KVCACHE_SPACE: 40
@@ -42,7 +42,7 @@ services:
       LLM_ENDPOINT: ${LLM_ENDPOINT}
       LLM_MODEL_ID: ${LLM_MODEL_ID}
       LLM_COMPONENT_NAME: ${LLM_COMPONENT_NAME}
-      HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HF_TOKEN: ${HF_TOKEN}
       MODEL_CACHE: ${MODEL_CACHE}
     restart: unless-stopped
   codetrans-epyc-backend-server:
