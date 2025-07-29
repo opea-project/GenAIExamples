@@ -8,7 +8,7 @@
 
 ## Overview
 
-This document outlines the deployment process for a rerank model finetuning service utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice on Intel Xeon server. The steps include Docker image creation, container deployment. We will publish the Docker images to Docker Hub, it will simplify the deployment process for this service.
+This document outlines the deployment process for a rerank model finetuning service utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice on Intel Gaudi. The steps include Docker image creation, container deployment. We will publish the Docker images to Docker Hub, it will simplify the deployment process for this service.
 
 ## Build Docker Image
 
