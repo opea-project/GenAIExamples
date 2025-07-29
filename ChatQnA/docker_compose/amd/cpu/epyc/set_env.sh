@@ -38,7 +38,5 @@ export NGINX_PORT=80
 export FAQGen_COMPONENT_NAME="OpeaFaqGenvLLM"
 export LLM_ENDPOINT="http://${host_ip}:${LLM_ENDPOINT_PORT}"
 
-pushd "grafana/dashboards" >/dev/null || exit
-# shellcheck source=grafana/dashboards/download_opea_dashboard.sh
-source download_opea_dashboard.sh
-popd >/dev/null || exit
+# shellcheck source=./ChatQnA/docker_compose/amd/cpu/epyc/grafana/dashboards/download_opea_dashboard.sh
+source "grafana/dashboards/download_opea_dashboard.sh"

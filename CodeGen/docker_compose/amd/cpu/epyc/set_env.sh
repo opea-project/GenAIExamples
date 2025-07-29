@@ -10,11 +10,11 @@ export host_ip
 
 export HF_TOKEN=${HF_TOKEN}
 if [ -z "${HF_TOKEN}" ]; then
-    echo "Error: HF_TOKEN is not set. Please set HF_TOKEN"
+	echo "Error: HF_TOKEN is not set. Please set HF_TOKEN"
 fi
 
 if [ -z "${host_ip}" ]; then
-    echo "Error: host_ip is not set. Please set host_ip first."
+	echo "Error: host_ip is not set. Please set host_ip first."
 fi
 
 export no_proxy="${no_proxy},${host_ip}"
