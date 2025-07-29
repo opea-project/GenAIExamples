@@ -87,7 +87,7 @@ The table below lists the available deployment options and their implementation 
 
 | Platform  | Deployment Method | Link                                                          |
 | --------- | ----------------- | ------------------------------------------------------------- |
-| Intel Arc | Docker compose    | [Deployment on Arc](./docker_compose/intel/cpu/arc/README.md) |
+| Intel Arc | Docker compose    | [Deployment on Arc](./docker_compose/intel/gpu/arc/README.md) |
 
 ## Validated Configurations
 
