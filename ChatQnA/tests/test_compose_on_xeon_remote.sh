@@ -23,7 +23,7 @@ function build_docker_images() {
     echo "GenAIComps test commit is $(git rev-parse HEAD)"
     docker build --no-cache -t ${REGISTRY}/comps-base:${TAG} --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
     popd && sleep 1s
-    
+
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
     service_list="chatqna chatqna-ui dataprep retriever nginx"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
@@ -38,7 +38,7 @@ function start_services() {
     #export REMOTE_ENDPOINT=
     #export API_KEY=
     #export LLM_MODEL_ID=
-    
+
     # Start Docker Containers
     docker compose -f compose_remote.yaml -f compose.telemetry.yaml up -d --quiet-pull > ${LOG_PATH}/start_services_with_compose_remote.log
 }
@@ -181,5 +181,3 @@ function main() {
 }
 
 main
-
-

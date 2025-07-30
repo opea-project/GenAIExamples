@@ -45,7 +45,7 @@ function start_services() {
     cd $WORKPATH/docker_compose/intel/cpu/xeon/
     #export REMOTE_ENDPOINT=
     #export API_KEY=
-    #export LLM_MODEL_ID= 
+    #export LLM_MODEL_ID=
     # Start Docker Containers
     docker compose -f compose_remote.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
 
@@ -178,7 +178,7 @@ function validate_gradio() {
 }
 
 function stop_docker() {
- 
+
     cd $WORKPATH/docker_compose/intel/cpu/xeon/
     docker compose -f compose_remote.yaml down
 }
