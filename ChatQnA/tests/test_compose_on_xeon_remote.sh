@@ -100,6 +100,7 @@ function validate_microservices() {
         "tei-reranking-server" \
         '{"query":"What is Deep Learning?", "texts": ["Deep Learning is not...", "Deep learning is..."]}'
 
+}
 
 function validate_megaservice() {
     # Curl the Mega Service
