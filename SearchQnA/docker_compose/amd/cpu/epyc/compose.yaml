@@ -1,0 +1,199 @@
+# Copyright (C) 2025 Advanced Micro Devices, Inc.
+# Copyright (C) 2025 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  tei-embedding-service:
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.6
+    entrypoint: /bin/sh -c "apt-get update && apt-get install -y curl && text-embeddings-router --json-output --model-id ${EMBEDDING_MODEL_ID} --auto-truncate"
+    container_name: tei-embedding-server
+    ports:
+      - "3001:80"
+    volumes:
+      - "${MODEL_CACHE:-./data}:/data"
+    shm_size: 1g
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      host_ip: ${host_ip}
+      MODEL_CACHE: ${MODEL_CACHE}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://$host_ip:3001/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 60
+  embedding:
+    image: ${REGISTRY:-opea}/embedding:${TAG:-latest}
+    container_name: embedding-server
+    depends_on:
+      tei-embedding-service:
+        condition: service_healthy
+    ports:
+      - "3002:6000"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      TEI_EMBEDDING_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
+      HF_TOKEN: ${HF_TOKEN}
+      LOGFLAG: ${LOGFLAG}
+    restart: unless-stopped
+  web-retriever:
+    image: ${REGISTRY:-opea}/web-retriever:${TAG:-latest}
+    container_name: web-retriever-server
+    ports:
+      - "3003:7077"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      TEI_EMBEDDING_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
+      GOOGLE_API_KEY: ${GOOGLE_API_KEY}
+      GOOGLE_CSE_ID: ${GOOGLE_CSE_ID}
+      LOGFLAG: ${LOGFLAG}
+    restart: unless-stopped
+  tei-reranking-service:
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.6
+    entrypoint: /bin/sh -c "apt-get update && apt-get install -y curl && text-embeddings-router --json-output --model-id ${RERANK_MODEL_ID} --auto-truncate"
+    container_name: tei-reranking-server
+    ports:
+      - "3004:80"
+    volumes:
+      - "${MODEL_CACHE:-./data}:/data"
+    shm_size: 1g
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      host_ip: ${host_ip}
+      MODEL_CACHE: ${MODEL_CACHE}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://$host_ip:3004/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 60
+  reranking:
+    image: ${REGISTRY:-opea}/reranking:${TAG:-latest}
+    container_name: reranking-tei-epyc-server
+    depends_on:
+      tei-reranking-service:
+        condition: service_healthy
+    ports:
+      - "3005:8000"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      RERANK_TYPE: ${RERANK_TYPE}
+      TEI_RERANKING_ENDPOINT: ${TEI_RERANKING_ENDPOINT}
+      HF_TOKEN: ${HF_TOKEN}
+      LOGFLAG: ${LOGFLAG}
+    restart: unless-stopped
+  tgi-service:
+    image: ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu
+    container_name: tgi-service
+    ports:
+      - "3006:80"
+    volumes:
+      - "${MODEL_CACHE:-./data}:/data"
+    shm_size: 1g
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      HF_TOKEN: ${HF_TOKEN}
+      host_ip: ${host_ip}
+      MODEL_CACHE: ${MODEL_CACHE}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://$host_ip:3006/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 100
+    command: --model-id ${LLM_MODEL_ID} --cuda-graphs 0
+  llm:
+    image: ${REGISTRY:-opea}/llm-textgen:${TAG:-latest}
+    container_name: llm-textgen-server
+    depends_on:
+      tgi-service:
+        condition: service_healthy
+    ports:
+      - "3007:9000"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      LLM_ENDPOINT: ${TGI_LLM_ENDPOINT}
+      LLM_MODEL_ID: ${LLM_MODEL_ID}
+      HF_TOKEN: ${HF_TOKEN}
+      LOGFLAG: ${LOGFLAG}
+    restart: unless-stopped
+  searchqna-epyc-backend-server:
+    image: ${REGISTRY:-opea}/searchqna:${TAG:-latest}
+    container_name: searchqna-epyc-backend-server
+    depends_on:
+      - tei-embedding-service
+      - embedding
+      - web-retriever
+      - tei-reranking-service
+      - reranking
+      - tgi-service
+      - llm
+    ports:
+      - "3008:8888"
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - MEGA_SERVICE_HOST_IP=${MEGA_SERVICE_HOST_IP}
+      - EMBEDDING_SERVICE_HOST_IP=${EMBEDDING_SERVICE_HOST_IP}
+      - WEB_RETRIEVER_SERVICE_HOST_IP=${WEB_RETRIEVER_SERVICE_HOST_IP}
+      - RERANK_SERVICE_HOST_IP=${RERANK_SERVICE_HOST_IP}
+      - LLM_SERVICE_HOST_IP=${LLM_SERVICE_HOST_IP}
+      - EMBEDDING_SERVICE_PORT=${EMBEDDING_SERVICE_PORT}
+      - WEB_RETRIEVER_SERVICE_PORT=${WEB_RETRIEVER_SERVICE_PORT}
+      - RERANK_SERVICE_PORT=${RERANK_SERVICE_PORT}
+      - LLM_SERVICE_PORT=${LLM_SERVICE_PORT}
+      - LOGFLAG=${LOGFLAG}
+    ipc: host
+    restart: always
+  searchqna-epyc-ui-server:
+    image: ${REGISTRY:-opea}/searchqna-ui:${TAG:-latest}
+    container_name: searchqna-epyc-ui-server
+    depends_on:
+      - searchqna-epyc-backend-server
+    ports:
+      - "5173:5173"
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+    ipc: host
+    restart: always
+  searchqna-epyc-nginx-server:
+    image: ${REGISTRY:-opea}/nginx:${TAG:-latest}
+    container_name: searchqna-epyc-nginx-server
+    depends_on:
+      - searchqna-epyc-backend-server
+      - searchqna-epyc-ui-server
+    ports:
+      - "${NGINX_PORT:-80}:80"
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - FRONTEND_SERVICE_IP=searchqna-epyc-ui-server
+      - FRONTEND_SERVICE_PORT=5173
+      - BACKEND_SERVICE_NAME=searchqna
+      - BACKEND_SERVICE_IP=searchqna-epyc-backend-server
+      - BACKEND_SERVICE_PORT=8888
+    ipc: host
+    restart: always
+
+networks:
+  default:
+    driver: bridge
