@@ -1,0 +1,231 @@
+# Copyright (C) 2025 Advanced Micro Devices, Inc.
+
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  whisper-service:
+    image: ${REGISTRY:-opea}/whisper:${TAG:-latest}
+    container_name: whisper-service
+    ports:
+      - "${WHISPER_PORT}:7066"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+    restart: unless-stopped
+  speecht5-service:
+    image: ${REGISTRY:-opea}/speecht5:${TAG:-latest}
+    container_name: speecht5-service
+    ports:
+      - "${TTS_PORT}:7055"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      TTS_PORT: ${TTS_PORT}
+      TTS_ENDPOINT: ${TTS_ENDPOINT}
+    restart: unless-stopped
+  redis-vector-db:
+    image: redis/redis-stack:7.2.0-v9
+    container_name: redis-vector-db
+    ports:
+      - "${REDIS_DB_PORT}:${REDIS_DB_PORT}"
+      - "${REDIS_INSIGHTS_PORT}:${REDIS_INSIGHTS_PORT}"
+  dataprep-multimodal-redis:
+    image: ${REGISTRY:-opea}/dataprep:${TAG:-latest}
+    container_name: dataprep-multimodal-redis
+    depends_on:
+      - redis-vector-db
+      - lvm-llava
+    ports:
+      - "${DATAPREP_MMR_PORT:-6007}:5000"
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      REDIS_URL: ${REDIS_URL}
+      REDIS_HOST: ${REDIS_HOST}
+      DATAPREP_MMR_PORT: ${DATAPREP_MMR_PORT}
+      INDEX_NAME: ${INDEX_NAME}
+      LVM_ENDPOINT: "http://${LVM_SERVICE_HOST_IP}:${LVM_PORT}/v1/lvm"
+      HF_TOKEN: ${HF_TOKEN}
+      MULTIMODAL_DATAPREP: true
+      DATAPREP_COMPONENT_NAME: "OPEA_DATAPREP_MULTIMODALREDIS"
+    healthcheck:
+      test:
+        ["CMD-SHELL", "curl -f http://localhost:5000/v1/health_check || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+  embedding-multimodal-bridgetower:
+    image: ${REGISTRY:-opea}/embedding-multimodal-bridgetower:${TAG:-latest}
+    container_name: embedding-multimodal-bridgetower
+    ports:
+      - ${EMM_BRIDGETOWER_PORT}:${EMM_BRIDGETOWER_PORT}
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      EMM_BRIDGETOWER_PORT: ${EMM_BRIDGETOWER_PORT}
+      PORT: ${EMM_BRIDGETOWER_PORT}
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "http_proxy='' curl -f http://localhost:${EMM_BRIDGETOWER_PORT}/v1/health_check",
+        ]
+      interval: 10s
+      timeout: 6s
+      retries: 18
+      start_period: 30s
+    entrypoint:
+      [
+        "python",
+        "bridgetower_server.py",
+        "--device",
+        "cpu",
+        "--model_name_or_path",
+        "$EMBEDDING_MODEL_ID",
+      ]
+    restart: unless-stopped
+  embedding:
+    image: ${REGISTRY:-opea}/embedding:${TAG:-latest}
+    container_name: embedding
+    depends_on:
+      embedding-multimodal-bridgetower:
+        condition: service_healthy
+    ports:
+      - ${MM_EMBEDDING_PORT_MICROSERVICE}:${MM_EMBEDDING_PORT_MICROSERVICE}
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      MMEI_EMBEDDING_ENDPOINT: ${MMEI_EMBEDDING_ENDPOINT}
+      MM_EMBEDDING_PORT_MICROSERVICE: ${MM_EMBEDDING_PORT_MICROSERVICE}
+      MULTIMODAL_EMBEDDING: true
+    restart: unless-stopped
+  retriever-redis:
+    image: ${REGISTRY:-opea}/retriever:${TAG:-latest}
+    container_name: retriever-redis
+    depends_on:
+      - redis-vector-db
+    ports:
+      - "${REDIS_RETRIEVER_PORT}:${REDIS_RETRIEVER_PORT}"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      REDIS_URL: ${REDIS_URL}
+      REDIS_DB_PORT: ${REDIS_DB_PORT}
+      REDIS_INSIGHTS_PORT: ${REDIS_INSIGHTS_PORT}
+      REDIS_RETRIEVER_PORT: ${REDIS_RETRIEVER_PORT}
+      INDEX_NAME: ${INDEX_NAME}
+      BRIDGE_TOWER_EMBEDDING: ${BRIDGE_TOWER_EMBEDDING}
+      LOGFLAG: ${LOGFLAG}
+      RETRIEVER_COMPONENT_NAME: "OPEA_RETRIEVER_REDIS"
+    restart: unless-stopped
+  lvm-llava:
+    image: ${REGISTRY:-opea}/lvm-llava:${TAG:-latest}
+    container_name: lvm-llava
+    ports:
+      - "${LLAVA_SERVER_PORT}:${LLAVA_SERVER_PORT}"
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      LLAVA_SERVER_PORT: ${LLAVA_SERVER_PORT}
+      LVM_PORT: ${LVM_PORT}
+    entrypoint:
+      [
+        "python",
+        "llava_server.py",
+        "--device",
+        "cpu",
+        "--model_name_or_path",
+        $LVM_MODEL_ID,
+      ]
+    restart: unless-stopped
+  lvm:
+    image: ${REGISTRY:-opea}/lvm:${TAG:-latest}
+    container_name: lvm
+    depends_on:
+      - lvm-llava
+    ports:
+      - "${LVM_PORT}:${LVM_PORT}"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      LVM_COMPONENT_NAME: "OPEA_LLAVA_LVM"
+      LVM_ENDPOINT: ${LVM_ENDPOINT}
+      LLAVA_SERVER_PORT: ${LLAVA_SERVER_PORT}
+      LVM_PORT: ${LVM_PORT}
+      MAX_IMAGES: ${MAX_IMAGES:-1}
+    restart: unless-stopped
+  multimodalqna:
+    image: ${REGISTRY:-opea}/multimodalqna:${TAG:-latest}
+    container_name: multimodalqna-backend-server
+    depends_on:
+      redis-vector-db:
+        condition: service_started
+      dataprep-multimodal-redis:
+        condition: service_healthy
+      embedding:
+        condition: service_started
+      retriever-redis:
+        condition: service_started
+      lvm:
+        condition: service_started
+    ports:
+      - "${MEGA_SERVICE_PORT}:${MEGA_SERVICE_PORT}"
+    environment:
+      no_proxy: ${no_proxy}
+      https_proxy: ${https_proxy}
+      http_proxy: ${http_proxy}
+      MEGA_SERVICE_HOST_IP: ${MEGA_SERVICE_HOST_IP}
+      MEGA_SERVICE_PORT: ${MEGA_SERVICE_PORT}
+      MM_EMBEDDING_SERVICE_HOST_IP: ${MM_EMBEDDING_SERVICE_HOST_IP}
+      MM_EMBEDDING_PORT_MICROSERVICE: ${MM_EMBEDDING_PORT_MICROSERVICE}
+      MM_RETRIEVER_SERVICE_HOST_IP: ${MM_RETRIEVER_SERVICE_HOST_IP}
+      LVM_SERVICE_HOST_IP: ${LVM_SERVICE_HOST_IP}
+      LVM_MODEL_ID: ${LVM_MODEL_ID}
+      WHISPER_PORT: ${WHISPER_PORT}
+      WHISPER_SERVER_ENDPOINT: ${WHISPER_SERVER_ENDPOINT}
+      TTS_PORT: ${TTS_PORT}
+      TTS_ENDPOINT: ${TTS_ENDPOINT}
+    ipc: host
+    restart: always
+  multimodalqna-ui:
+    image: ${REGISTRY:-opea}/multimodalqna-ui:${TAG:-latest}
+    container_name: multimodalqna-gradio-ui-server
+    depends_on:
+      - multimodalqna
+    ports:
+      - "${UI_PORT}:${UI_PORT}"
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - BACKEND_SERVICE_ENDPOINT=${BACKEND_SERVICE_ENDPOINT}
+      - DATAPREP_INGEST_SERVICE_ENDPOINT=${DATAPREP_INGEST_SERVICE_ENDPOINT}
+      - DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT=${DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT}
+      - DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT=${DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT}
+      - DATAPREP_GET_FILE_ENDPOINT=${DATAPREP_GET_FILE_ENDPOINT}
+      - DATAPREP_DELETE_FILE_ENDPOINT=${DATAPREP_DELETE_FILE_ENDPOINT}
+      - MEGA_SERVICE_PORT:=${MEGA_SERVICE_PORT}
+      - UI_PORT=${UI_PORT}
+      - UI_TIMEOUT=${UI_TIMEOUT}
+      - DATAPREP_MMR_PORT=${DATAPREP_MMR_PORT}
+    ipc: host
+    restart: always
+
+networks:
+  default:
+    driver: bridge
