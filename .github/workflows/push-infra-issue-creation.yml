@@ -42,7 +42,7 @@ jobs:
           echo "EOF" >> $GITHUB_ENV
 
       - name: Create Issue
-        uses: daisy-ycguo/create-issue-action@stable
+        uses: dacbd/create-issue-action@main
         with:
           token: ${{ secrets.ACTION_TOKEN }}
           owner: opea-project
