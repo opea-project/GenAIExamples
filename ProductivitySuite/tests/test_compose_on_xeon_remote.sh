@@ -35,18 +35,18 @@ function start_services() {
     export host_ip=${ip_address}
     export LOGFLAG=True
     export no_proxy="$no_proxy,tgi_service_codegen,llm_codegen,tei-embedding-service,tei-reranking-service,chatqna-xeon-backend-server,retriever,tgi-service,redis-vector-db,whisper,llm-docsum-tgi,docsum-xeon-backend-server,mongo,codegen"
-    
+
     source set_env.sh
-    
+
     #export REMOTE_ENDPOINT=
     #export API_KEY=
     #export LLM_MODEL_ID=
     #export LLM_MODEL_ID_CODEGEN=
-    
+
     # Start Docker Containers
     docker compose -f compose_remote.yaml up -d > ${LOG_PATH}/start_services_with_compose_remote.log
     sleep 30s
-    
+
 }
 
 function validate_service() {
