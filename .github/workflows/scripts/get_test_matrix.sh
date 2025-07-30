@@ -25,8 +25,9 @@ for example in ${examples}; do
     fi
     echo -e "Test supported hardware list: \n${hardware_list}"
 
+    set -x
     run_hardware=""
-    if [[ $(printf '%s\n' "${changed_files[@]}" | grep ${example} | cut -d'/' -f2 | grep -E '\.py|Dockerfile*|ui|docker_image_build|requirements|package\.json' ) ]]; then
+    if [[ $(printf '%s\n' "${changed_files[@]}" | grep ${example} | cut -d'/' -f2 | grep -E '\.py|Dockerfile*|ui|docker_image_build|requirements' ) ]]; then
         echo "run test on all hardware if megaservice or ui code change..."
         run_hardware=$hardware_list
     elif [[ $(printf '%s\n' "${changed_files[@]}" | grep ${example} | grep 'tests'| cut -d'/' -f3 | grep -vE '^test_|^_test' ) ]]; then
@@ -39,6 +40,7 @@ for example in ${examples}; do
             fi
         done
     fi
+    set +x
     for hw in ${run_hardware}; do
         # TODO: remove this condition when ROCm hardware is available
         if [[ "${hw}" == "rocm" ]]; then
