@@ -38,10 +38,10 @@ function start_services() {
 
     source set_env.sh
 
-    #export REMOTE_ENDPOINT=
-    #export API_KEY=
-    #export LLM_MODEL_ID=
-    #export LLM_MODEL_ID_CODEGEN=
+    export REMOTE_ENDPOINT=http://localhost:80
+    export API_KEY=$TEST_KEY
+    export LLM_MODEL_ID=TinyLlama/TinyLlama-1.1B-Chat-v1.0
+    export LLM_MODEL_ID_CODEGEN=TinyLlama/TinyLlama-1.1B-Chat-v1.0
 
     # Start Docker Containers
     docker compose -f compose_remote.yaml up -d > ${LOG_PATH}/start_services_with_compose_remote.log

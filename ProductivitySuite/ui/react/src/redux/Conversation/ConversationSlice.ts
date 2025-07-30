@@ -400,7 +400,7 @@ export const deleteMultipleInDataSource = createAsyncThunkWrapper(
     const promises = files.map((file) =>
       axios
         .post(DATA_PREP_DELETE_URL, {
-          file_path: file.split("_")[1],
+          file_path: file,
         })
         .then((response) => {
           return response.data;
