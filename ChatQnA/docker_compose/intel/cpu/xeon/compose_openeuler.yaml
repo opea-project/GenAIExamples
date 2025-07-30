@@ -14,7 +14,7 @@ services:
       timeout: 3s
       retries: 10
   dataprep-redis-service:
-    image: ${REGISTRY:-opea}/dataprep:${TAG:-latest}
+    image: ${REGISTRY:-opea}/dataprep:${TAG:-latest}-openeuler
     container_name: dataprep-redis-server
     depends_on:
       redis-vector-db:
@@ -52,7 +52,7 @@ services:
       https_proxy: ${https_proxy}
     command: --model-id ${EMBEDDING_MODEL_ID} --auto-truncate
   retriever:
-    image: ${REGISTRY:-opea}/retriever:${TAG:-latest}
+    image: ${REGISTRY:-opea}/retriever:${TAG:-latest}-openeuler
     container_name: retriever-redis-server
     depends_on:
       - redis-vector-db
@@ -111,7 +111,7 @@ services:
       retries: 100
     command: --model $LLM_MODEL_ID --host 0.0.0.0 --port 80
   chatqna-xeon-backend-server:
-    image: ${REGISTRY:-opea}/chatqna:${TAG:-latest}
+    image: ${REGISTRY:-opea}/chatqna:${TAG:-latest}-openeuler
     container_name: chatqna-xeon-backend-server
     depends_on:
       redis-vector-db:
@@ -145,7 +145,7 @@ services:
     ipc: host
     restart: always
   chatqna-xeon-ui-server:
-    image: ${REGISTRY:-opea}/chatqna-ui:${TAG:-latest}
+    image: ${REGISTRY:-opea}/chatqna-ui:${TAG:-latest}-openeuler
     container_name: chatqna-xeon-ui-server
     depends_on:
       - chatqna-xeon-backend-server
@@ -158,7 +158,7 @@ services:
     ipc: host
     restart: always
   chatqna-xeon-nginx-server:
-    image: ${REGISTRY:-opea}/nginx:${TAG:-latest}
+    image: ${REGISTRY:-opea}/nginx:${TAG:-latest}-openeuler
     container_name: chatqna-xeon-nginx-server
     depends_on:
       - chatqna-xeon-backend-server
