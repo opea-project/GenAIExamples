@@ -24,7 +24,7 @@ This section describes how to quickly deploy and test the EdgeCraftRAG service m
 EC-RAG supports vLLM deployment(default method) and local OpenVINO deployment for Intel Arc GPU. Prerequisites are shown as below:  
 Hardware: Intel Arc A770  
 OS: Ubuntu Server 22.04.1 or newer (at least 6.2 LTS kernel)  
-Driver & libraries: please to [Installing Client GPUs](https://dgpu-docs.intel.com/driver/client/overview.html) for detailed driver & libraries setup
+Driver & libraries: please refer to [Installing Client GPUs](https://dgpu-docs.intel.com/driver/client/overview.html) for detailed driver & libraries setup
 
 Below steps are based on **vLLM** as inference engine, if you want to choose **OpenVINO**, please refer to [OpenVINO Local Inference](../../../../docs/Advanced_Setup.md#openvino-local-inference)
 
