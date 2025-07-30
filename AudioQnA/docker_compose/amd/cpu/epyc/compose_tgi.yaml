@@ -1,0 +1,93 @@
+# Copyright (C) 2025 Advanced Micro Devices, Inc.
+# Copyright (C) 2025 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  whisper-service:
+    image: ${REGISTRY:-opea}/whisper:${TAG:-latest}
+    container_name: whisper-service
+    ports:
+      - ${WHISPER_SERVER_PORT:-7066}:7066
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+    restart: unless-stopped
+  speecht5-service:
+    image: ${REGISTRY:-opea}/speecht5:${TAG:-latest}
+    container_name: speecht5-service
+    ports:
+      - ${SPEECHT5_SERVER_PORT:-7055}:7055
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+    restart: unless-stopped
+  tgi-service:
+    image: ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu
+    container_name: tgi-service
+    ports:
+      - ${LLM_SERVER_PORT:-3006}:80
+    volumes:
+      - "${MODEL_CACHE:-./data}:/data"
+    shm_size: 1g
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      HF_TOKEN: ${HF_TOKEN}
+      MODEL_CACHE: ${MODEL_CACHE}
+      LLM_SERVER_PORT: ${LLM_SERVER_PORT}
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl -f http://$host_ip:${LLM_SERVER_PORT}/health || exit 1",
+        ]
+      interval: 10s
+      timeout: 10s
+      retries: 100
+    command: --model-id ${LLM_MODEL_ID} --cuda-graphs 0
+  audioqna-epyc-backend-server:
+    image: ${REGISTRY:-opea}/audioqna:${TAG:-latest}
+    container_name: audioqna-epyc-backend-server
+    depends_on:
+      - whisper-service
+      - tgi-service
+      - speecht5-service
+    ports:
+      - "3008:8888"
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - MEGA_SERVICE_HOST_IP=${MEGA_SERVICE_HOST_IP}
+      - WHISPER_SERVER_HOST_IP=${WHISPER_SERVER_HOST_IP}
+      - WHISPER_SERVER_PORT=${WHISPER_SERVER_PORT}
+      - LLM_SERVER_HOST_IP=${LLM_SERVER_HOST_IP}
+      - LLM_SERVER_PORT=${LLM_SERVER_PORT}
+      - LLM_MODEL_ID=${LLM_MODEL_ID}
+      - SPEECHT5_SERVER_HOST_IP=${SPEECHT5_SERVER_HOST_IP}
+      - SPEECHT5_SERVER_PORT=${SPEECHT5_SERVER_PORT}
+    ipc: host
+    restart: always
+  audioqna-epyc-ui-server:
+    image: ${REGISTRY:-opea}/audioqna-ui:${TAG:-latest}
+    container_name: audioqna-epyc-ui-server
+    depends_on:
+      - audioqna-epyc-backend-server
+    ports:
+      - "5173:5173"
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - CHAT_URL=${BACKEND_SERVICE_ENDPOINT}
+    ipc: host
+    restart: always
+
+networks:
+  default:
+    driver: bridge
