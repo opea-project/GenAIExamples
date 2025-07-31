@@ -134,7 +134,7 @@ const { postprocessor = [] } = props.formData.postprocessor || [];
 const defaultConfig = [
   {
     processor_type: "reranker",
-    top_n: 5,
+    top_n: 25,
     reranker_model: {
       model_id: "BAAI/bge-reranker-large",
       model_path: "./models/BAAI/bge-reranker-large",

@@ -32,6 +32,18 @@ On Intel Gaudi with TGI:
 bash test_compose_tgi_on_gaudi.sh
 ```
 
+On AMD EPYC with vLLM:
+
+```bash
+bash test_compose_on_epyc.sh
+```
+
+On AMD EPYC with Milvus:
+
+```bash
+bash test_compose_milvus_on_epyc.sh
+```
+
 On AMD ROCm with TGI:
 
 ```bash

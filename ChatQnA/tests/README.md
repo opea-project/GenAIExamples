@@ -74,6 +74,14 @@ On Intel Gaudi without Rerank:
 bash test_compose_without_rerank_on_gaudi.sh
 ```
 
+On AMD EPYC with Pinecone:
+
+```bash
+export PINECONE_KEY_LANGCHAIN_TEST="Pinecone_API_Key"
+
+bash test_compose_pinecone_on_epyc.sh
+```
+
 On AMD ROCm with TGI:
 
 ```bash
