@@ -1,6 +1,6 @@
 # Text-to-Image Microservice
 
-Text-to-Image is a task that generate image conditioning on the provided text. This microservice supports text-to-image task by using Stable Diffusion (SD) model.
+Text-to-Image is a task that generates image conditioning on the provided text. This microservice supports text-to-image task by using Stable Diffusion (SD) model.
 
 ## Deployment Options
 
