@@ -85,8 +85,8 @@ jobs:
           base_image: ${{ steps.find_base_image.outputs.base_image }}
         run: |
           cd ${{ github.workspace }}
-          if [ -f base_image_CVE.json ]; then
-            jq -r --arg image "$base_image" '.[] | select(.image == $image) | .cves[]' base_image_CVE.json > .trivyignore
+          if [ -f .github/workflows/docker/base_image_CVE.json ]; then
+            jq -r --arg image "$base_image" '.[] | select(.image == $image) | .cves[]' .github/workflows/docker/base_image_CVE.json > .trivyignore
           fi
         shell: bash
 
