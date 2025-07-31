@@ -204,7 +204,7 @@ services:
       no_proxy: ${no_proxy}
       https_proxy: ${https_proxy}
       http_proxy: ${http_proxy}
-      MEGA_SERVICE_HOST_IP: ${host_ip}
+      MEGA_SERVICE_HOST_IP: ${MEGA_SERVICE_HOST_IP}
       LLM_SERVICE_HOST_IP: llm_codegen
       LLM_SERVICE_PORT: ${LLM_SERVICE_HOST_PORT_CODEGEN:-9000}
       LOGFLAG: ${LOGFLAG}
@@ -291,6 +291,9 @@ services:
   llm-docsum-tgi:
     image: ${REGISTRY:-opea}/llm-docsum:${TAG:-latest}
     container_name: docsum-xeon-llm-server
+    depends_on:
+      tgi-service:
+        condition: service_healthy
     ports:
       - ${LLM_PORT_DOCSUM:-9003}:9000
     ipc: host
@@ -298,10 +301,8 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      LLM_ENDPOINT: ${REMOTE_ENDPOINT}
+      LLM_ENDPOINT: http://tgi-service:80
       LLM_MODEL_ID: ${LLM_MODEL_ID}
-      OPENAI_API_KEY: ${API_KEY}
-      HUGGINGFACEHUB_API_TOKEN: ${HF_TOKEN}
       HF_TOKEN: ${HF_TOKEN}
       MAX_INPUT_TOKENS: ${MAX_INPUT_TOKENS:-1024}
       MAX_TOTAL_TOKENS: ${MAX_TOTAL_TOKENS:-2048}
@@ -312,6 +313,7 @@ services:
     image: ${REGISTRY:-opea}/docsum:${TAG:-latest}
     container_name: docsum-xeon-backend-server
     depends_on:
+      - tgi-service
       - llm-docsum-tgi
     ports:
       - "${BACKEND_SERVICE_PORT_DOCSUM:-8890}:8888"
@@ -319,7 +321,7 @@ services:
       - no_proxy=${no_proxy}
       - https_proxy=${https_proxy}
       - http_proxy=${http_proxy}
-      - MEGA_SERVICE_HOST_IP=${host_ip}
+      - MEGA_SERVICE_HOST_IP=${MEGA_SERVICE_HOST_IP}
       - LLM_SERVICE_HOST_IP=llm-docsum-tgi
       - LLM_SERVICE_PORT=9000
       - ASR_SERVICE_HOST_IP=whisper
