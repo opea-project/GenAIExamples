@@ -1,0 +1,66 @@
+[
+  {
+    "image": "langchain/langchain:latest",
+    "cves": ["CVE-2024-23334", "CVE-2024-30251", "CVE-2024-5998", "CVE-2024-6345", "CVE-2025-2828", "CVE-2025-47273"]
+  },
+  {
+    "image": "nginx:alpine",
+    "cves": []
+  },
+  {
+    "image": "nginx:stable-alpine",
+    "cves": []
+  },
+  {
+    "image": "node:20.11.1",
+    "cves": ["CVE-2024-21538", "CVE-2024-29415"]
+  },
+  {
+    "image": "node:20.18.1",
+    "cves": ["CVE-2024-21538"]
+  },
+  {
+    "image": "node:22-alpine3.20",
+    "cves": []
+  },
+  {
+    "image": "pathwaycom/pathway:0.13.2-slim",
+    "cves": ["CVE-2024-52804", "CVE-2024-6345", "CVE-2025-4565", "CVE-2025-47273", "CVE-2025-47287"]
+  },
+  {
+    "image": "python:3.10-slim",
+    "cves": ["CVE-2024-6345", "CVE-2025-47273"]
+  },
+  {
+    "image": "openeuler/python:3.11.13-oe2403lts",
+    "cves": ["CVE-2022-40897", "CVE-2024-6345", "CVE-2025-47273"]
+  },
+  {
+    "image": "python:3.10.14",
+    "cves": ["CVE-2024-6345", "CVE-2025-47273"]
+  },
+  {
+    "image": "python:3.11-slim",
+    "cves": ["CVE-2024-6345", "CVE-2025-47273"]
+  },
+  {
+    "image": "python:3.11-slim-bookworm",
+    "cves": ["CVE-2024-6345", "CVE-2025-47273"]
+  },
+  {
+    "image": "python:3.9-slim",
+    "cves": ["CVE-2022-40897", "CVE-2024-6345", "CVE-2025-47273"]
+  },
+  {
+    "image": "rocm/vllm:rocm6.3.1_instinct_vllm0.8.3_20250410",
+    "cves": ["CVE-2025-43859", "CVE-2025-4565", "CVE-2025-32444", "CVE-2025-47277", "CVE-2025-30165", "CVE-2025-30202"]
+  },
+  {
+    "image": "ubuntu:22.04",
+    "cves": []
+  },
+  {
+    "image": "vault.habana.ai/gaudi-docker/1.20.1/ubuntu22.04/habanalabs/pytorch-installer-2.6.0:latest",
+    "cves": ["CVE-2025-4565", "CVE-2025-47273"]
+  }
+]
