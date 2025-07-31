@@ -138,3 +138,9 @@ services:
       dockerfile: comps/third_parties/nginx/src/Dockerfile
     extends: chatqna
     image: ${REGISTRY:-opea}/nginx:${TAG:-latest}
+  nginx-openeuler:
+    build:
+      context: GenAIComps
+      dockerfile: comps/third_parties/nginx/src/Dockerfile.openEuler
+    extends: chatqna
+    image: ${REGISTRY:-opea}/nginx:${TAG:-latest}-openeuler
