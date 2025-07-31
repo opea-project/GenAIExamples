@@ -240,6 +240,7 @@ Set the following environment variables.
 - `LLM_MODEL_ID` is the model card which may need to be overwritten depending on what it is set to `set_env.sh`.
 
 ```bash
+export DocSum_COMPONENT_NAME="OpeaDocSumvLLM"
 export REMOTE_ENDPOINT=<https-endpoint-of-remote-server>
 export API_KEY=<your-api-key>
 export LLM_MODEL_ID=<model-card>
