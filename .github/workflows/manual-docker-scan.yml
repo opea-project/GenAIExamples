@@ -54,7 +54,7 @@ jobs:
     secrets: inherit
 
   upload-artifacts:
-    needs: [BoM-scan-docker, trivy-scan-docker]
+    needs: [trivy-scan-docker]
     runs-on: "docker-build-${{ inputs.node }}"
     if: always()
     steps:
