@@ -91,7 +91,6 @@ function validate_services() {
 }
 
 function validate_microservices() {
-    local llm_container_name="$1"
 
     # Data ingest microservice
     validate_services \
@@ -100,7 +99,6 @@ function validate_microservices() {
         "ingest" \
         "dataprep-redis-server" \
         'link_list=["https://modin.readthedocs.io/en/latest/index.html"]'
-
 }
 
 function validate_megaservice() {
