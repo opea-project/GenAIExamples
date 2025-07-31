@@ -49,7 +49,7 @@ jobs:
           repo: GenAIInfra
           title: |
             [ci-auto] GenAIExample ${{ env.examples }} compose.yaml got changed.
-          assignees: lianhao
+          assignees: poussa
           labels: helm
           body: |
             ## GenAIExample ${{ env.examples }} compose.yaml got changed
