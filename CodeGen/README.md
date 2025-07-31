@@ -110,6 +110,7 @@ This CodeGen example can be deployed manually on various hardware platforms usin
 | :-------------- | :------------------- | :----------------------------------------------------------------------- |
 | Intel Xeon CPU  | Single Node (Docker) | [Xeon Docker Compose Guide](./docker_compose/intel/cpu/xeon/README.md)   |
 | Intel Gaudi HPU | Single Node (Docker) | [Gaudi Docker Compose Guide](./docker_compose/intel/hpu/gaudi/README.md) |
+| AMD EPYC CPU    | Single Node (Docker) | [EPYC Docker Compose Guide](./docker_compose/amd/cpu/epyc/README.md)     |
 | AMD ROCm GPU    | Single Node (Docker) | [ROCm Docker Compose Guide](./docker_compose/amd/gpu/rocm/README.md)     |
 | Intel Xeon CPU  | Kubernetes (Helm)    | [Kubernetes Helm Guide](./kubernetes/helm/README.md)                     |
 | Intel Gaudi HPU | Kubernetes (Helm)    | [Kubernetes Helm Guide](./kubernetes/helm/README.md)                     |
@@ -137,17 +138,6 @@ Intel® Optimized Cloud Modules for Terraform provide an automated way to deploy
 | GCP                  | 4th/5th Gen Intel Xeon            | [GCP Deployment](https://github.com/intel/terraform-intel-gcp-vm/tree/main/examples/gen-ai-xeon-opea-codegen) | Available   |
 | Azure                | 4th/5th Gen Intel Xeon            | Work-in-progress                                                                                              | Coming Soon |
 | Intel Tiber AI Cloud | 5th Gen Intel Xeon with Intel AMX | Work-in-progress                                                                                              | Coming Soon |
-
-## Validated Configurations
-
-| **Deploy Method** | **LLM Engine** | **LLM Model**                  | **Hardware** |
-| ----------------- | -------------- | ------------------------------ | ------------ |
-| Docker Compose    | vLLM, TGI      | Qwen/Qwen2.5-Coder-7B-Instruct | Intel Gaudi  |
-| Docker Compose    | vLLM, TGI      | Qwen/Qwen2.5-Coder-7B-Instruct | Intel Xeon   |
-| Docker Compose    | vLLM, TGI      | Qwen/Qwen2.5-Coder-7B-Instruct | AMD ROCm     |
-| Helm Charts       | vLLM, TGI      | Qwen/Qwen2.5-Coder-7B-Instruct | Intel Gaudi  |
-| Helm Charts       | vLLM, TGI      | Qwen/Qwen2.5-Coder-7B-Instruct | Intel Xeon   |
-| Helm Charts       | vLLM, TGI      | Qwen/Qwen2.5-Coder-7B-Instruct | AMD ROCm     |
 
 ## Contribution
 
