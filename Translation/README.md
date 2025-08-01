@@ -65,7 +65,7 @@ flowchart LR
 
 ```
 
-This Translation use case performs Language Translation Inference across multiple platforms. Currently, we provide the example for [Intel Gaudi2](https://www.intel.com/content/www/us/en/products/details/processors/ai-accelerators/gaudi-overview.html) and [Intel Xeon Scalable Processors](https://www.intel.com/content/www/us/en/products/details/processors/xeon.html), and we invite contributions from other hardware vendors to expand OPEA ecosystem.
+This Translation use case performs Language Translation Inference across multiple platforms. Currently, we provide the example for [Intel Gaudi2](https://www.intel.com/content/www/us/en/products/details/processors/ai-accelerators/gaudi-overview.html), [Intel Xeon Scalable Processors](https://www.intel.com/content/www/us/en/products/details/processors/xeon.html) and [AMD EPYC™ Processors](https://www.amd.com/en/products/processors/server/epyc.html), and we invite contributions from other hardware vendors to expand OPEA ecosystem.
 
 ## Deployment Options
 
@@ -75,14 +75,5 @@ The table below lists the available deployment options and their implementation 
 | ------------ | ----------------- | ----------------------------------------------------------------- |
 | Intel Xeon   | Docker compose    | [Deployment on Xeon](./docker_compose/intel/cpu/xeon/README.md)   |
 | Intel Gaudi2 | Docker compose    | [Deployment on Gaudi](./docker_compose/intel/hpu/gaudi/README.md) |
+| AMD EPYC     | Docker compose    | [Deployment on AMD EPYC](./docker_compose/amd/cpu/epyc/README.md) |
 | AMD ROCm     | Docker compose    | [Deployment on AMD Rocm](./docker_compose/amd/gpu/rocm/README.md) |
-
-## Validated Configurations
-
-| **Deploy Method** | **LLM Engine** | **LLM Model**     | **Hardware** |
-| ----------------- | -------------- | ----------------- | ------------ |
-| Docker Compose    | vLLM, TGI      | haoranxu/ALMA-13B | Intel Gaudi  |
-| Docker Compose    | vLLM, TGI      | haoranxu/ALMA-13B | Intel Xeon   |
-| Docker Compose    | vLLM, TGI      | haoranxu/ALMA-13B | AMD ROCm     |
-| Helm Charts       | vLLM, TGI      | haoranxu/ALMA-13B | Intel Gaudi  |
-| Helm Charts       | vLLM, TGI      | haoranxu/ALMA-13B | Intel Xeon   |

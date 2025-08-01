@@ -74,6 +74,7 @@ The table below lists currently available deployment options. They outline in de
 | ---------------------- | ----------------- | ---------------------------------------------------------------- |
 | On-premise Deployments | Docker compose    | [AudioQnA deployment on Xeon](./docker_compose/intel/cpu/xeon)   |
 |                        |                   | [AudioQnA deployment on Gaudi](./docker_compose/intel/hpu/gaudi) |
+|                        |                   | [AudioQnA deployment on AMD EPYC](./docker_compose/amd/cpu/epyc) |
 |                        |                   | [AudioQnA deployment on AMD ROCm](./docker_compose/amd/gpu/rocm) |
 |                        | Kubernetes        | [Helm Charts](./kubernetes/helm)                                 |
 
@@ -83,6 +84,7 @@ The table below lists currently available deployment options. They outline in de
 | ----------------- | --------------------- | ----------------------------------- | ------------ |
 | Docker Compose    | vLLM, TGI             | meta-llama/Meta-Llama-3-8B-Instruct | Intel Gaudi  |
 | Docker Compose    | vLLM, TGI, GPT-SoVITS | meta-llama/Meta-Llama-3-8B-Instruct | Intel Xeon   |
+| Docker Compose    | vLLM, TGI             | meta-llama/Meta-Llama-3-8B-Instruct | AMD EPYC     |
 | Docker Compose    | vLLM, TGI             | Intel/neural-chat-7b-v3-3           | AMD ROCm     |
 | Helm Charts       | vLLM, TGI             | meta-llama/Meta-Llama-3-8B-Instruct | Intel Gaudi  |
 | Helm Charts       | vLLM, TGI             | meta-llama/Meta-Llama-3-8B-Instruct | Intel Xeon   |

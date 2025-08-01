@@ -12,6 +12,10 @@ Refer to the [Xeon Guide](./docker_compose/intel/cpu/xeon/README.md) for detail.
 
 Refer to the [Gaudi Guide](./docker_compose/intel/hpu/gaudi/README.md) for detail.
 
+### Deploy Text-to-Image Service on AMD EPYC
+
+Refer to the [AMD EPYC Guide](./docker_compose/amd/cpu/epyc/README.md) for detail.
+
 ## Consume Text-to-Image Service
 
 Use below command to generate image.
@@ -26,5 +30,6 @@ http_proxy="" curl http://localhost:9379/v1/text2image -XPOST -d '{"prompt":"An 
 | ----------------- | ------------ |
 | Docker Compose    | Intel Xeon   |
 | Docker Compose    | Intel Gaudi  |
+| Docker Compose    | AMD EPYC     |
 | Helm Charts       | Intel Gaudi  |
 | Helm Charts       | Intel Xeon   |
