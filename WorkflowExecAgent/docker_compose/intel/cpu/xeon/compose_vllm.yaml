@@ -17,6 +17,7 @@ services:
       recursion_limit: ${recursion_limit}
       llm_engine: ${llm_engine}
       llm_endpoint_url: ${llm_endpoint_url}
+      api_key: ${API_KEY}
       model: ${model}
       temperature: ${temperature}
       max_new_tokens: ${max_new_tokens}
