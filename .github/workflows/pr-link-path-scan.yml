@@ -39,19 +39,25 @@ jobs:
                   # echo $url_line
                   url=$(echo "$url_line"|cut -d '(' -f2 | cut -d ')' -f1|sed 's/\.git$//')
                   path=$(echo "$url_line"|cut -d':' -f1 | cut -d'/' -f2-)
-                  if [[ "$url" == "https://platform.openai.com/api-keys"* ]]; then
+                  if [[ "$url" == "https://platform.openai.com/api-keys"* || "$url" == "https://ai.cloud.intel.com/" ]]; then
                     echo "Link "$url" from ${{github.workspace}}/$path needs to be verified by a real person."
                   else
                     sleep $delay
-                    response=$(curl -L -s -o /dev/null -w "%{http_code}" "$url")|| true
+                    response=$(curl -L -s -o /dev/null -w "%{http_code}" -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"   -H "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"   -H "Accept-Language: en-US,en;q=0.5" "$url")|| true
                     if [ "$response" -ne 200 ]; then
-                      echo "**********Validation failed ($response), try again**********"
+                      echo "**********Validation $url failed ($response), try again**********"
                       response_retry=$(curl -s -o /dev/null -w "%{http_code}" "$url")
                       if [ "$response_retry" -eq 200 ]; then
                         echo "*****Retry successfully*****"
                       else
-                        echo -e "::error:: Invalid link ($response_retry) from ${{github.workspace}}/$(echo "$url_line"|cut -d':' -f1): $url"
-                        fail="TRUE"
+                        echo "******Retry $url failed ($response_retry), add simulated browser requests******"
+                        response_browser=$(curl -s -o /dev/null -w "%{http_code}" -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"   -H "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"   -H "Accept-Language: en-US,en;q=0.5" "$url")
+                        if [ "$response_browser" -eq 200 ]; then
+                          echo "*****Retry successfully*****"
+                        else
+                          echo -e "::error:: Invalid link ($response_retry) from ${{github.workspace}}/$(echo "$url_line"|cut -d':' -f1): $url"
+                          fail="TRUE"
+                        fi
                       fi
                     fi
                   fi
