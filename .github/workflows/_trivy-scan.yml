@@ -1,0 +1,119 @@
+# Copyright (C) 2025 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+name: Trivy scan for Docker Images
+permissions:
+  contents: read
+
+on:
+  workflow_call:
+    inputs:
+      registry:
+        default: "opea"
+        description: "Docker registry to use"
+        required: true
+        type: string
+      tag:
+        default: "latest"
+        description: "Tag for images to scan"
+        required: true
+        type: string
+      image:
+        default: ""
+        description: "Image to scan"
+        required: true
+        type: string
+      dockerfile:
+        default: ""
+        description: "Path to Dockerfile"
+        required: true
+        type: string
+
+jobs:
+  trivy-scan:
+    runs-on: "docker-build-${{ inputs.node }}"
+    continue-on-error: true
+    steps:
+      - name: Clean up Working Directory
+        run: |
+          sudo rm -rf ${{github.workspace}}/* || true
+          docker system prune -f
+      - name: Checkout out Repo
+        uses: actions/checkout@v4
+      - name: Clone Required Repo
+        run: |
+          sudo yum install -y jq
+          source ${{ github.workspace }}/.github/env/_build_image.sh
+          if [[ "${{ inputs.image }}" == "vllm" ]]; then
+              git clone -b ${VLLM_VER} --single-branch https://github.com/vllm-project/vllm.git
+          fi
+          if [[ "${{ inputs.image }}" == "vllm-gaudi" ]]; then
+              git clone -b ${VLLM_FORK_VER} --single-branch https://github.com/HabanaAI/vllm-fork.git
+          fi
+          git clone --depth 1 https://github.com/opea-project/GenAIComps.git
+          cd GenAIComps && git rev-parse HEAD && cd ../
+      - name: Pull Image
+        run: |
+          docker pull ${OPEA_IMAGE_REPO}opea/${{ inputs.image }}:${{ inputs.tag }}
+          echo "OPEA_IMAGE_REPO=${OPEA_IMAGE_REPO}" >> $GITHUB_ENV
+
+      - name: find base image
+        if: ${{ inputs.dockerfile != '' }}
+        id: find_base_image
+        run: |
+          cd ${{ github.workspace }}
+          set -x
+          echo "dockerfile: ${{ inputs.dockerfile }}"
+          base_image=$(cat ${{ inputs.dockerfile }}| grep "^FROM " | head -1 | awk '{print $2}' | tr -d "\n")
+          if echo "$base_image" | grep -q '\$'; then
+            env_var_list=$(echo "$base_image" | grep -o '\$[a-zA-Z_][a-zA-Z0-9_]*')
+            for env_var in $env_var_list;do
+              echo $env_var
+              e_old=${env_var#*$}
+              echo $e_old
+              e_new=$(grep $e_old ${{ inputs.dockerfile }} | head -1 | awk -F "=" '{print $2}')
+              echo $e_new
+              base_image=$(echo $base_image | sed "s|$env_var|$e_new|")
+            done
+          fi
+          echo "base_image=$base_image"
+          echo "base_image=$base_image" >> $GITHUB_OUTPUT
+
+      - name: Generate ignorefile
+        if: ${{ inputs.dockerfile != '' }}
+        env:
+          base_image: ${{ steps.find_base_image.outputs.base_image }}
+        run: |
+          cd ${{ github.workspace }}
+          if [ -f .github/workflows/docker/base_image_CVE.json ]; then
+            jq -r --arg image "$base_image" '.[] | select(.image == $image) | .cves[]' .github/workflows/docker/base_image_CVE.json > .trivyignore
+          fi
+        shell: bash
+
+      - name: Security Scan Container
+        uses: aquasecurity/trivy-action@0.24.0
+        if: ${{ inputs.trivy_scan }}
+        with:
+          image-ref: ${{ env.OPEA_IMAGE_REPO }}opea/${{ inputs.image }}:${{ inputs.tag }}
+          output: ${{ inputs.image }}-trivy-scan.txt
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
+          trivyignores: .trivyignore
+          timeout: 30m
+
+      - name: Cleanup
+        if: always()
+        env:
+          base_image: ${{ steps.find_base_image.outputs.base_image }}
+        run: |
+          docker rmi -f ${OPEA_IMAGE_REPO}opea/${{ inputs.image }}:${{ inputs.tag }} || true
+          docker rmi -f ${base_image} || true
+
+      - name: Collect Logs
+        if: always()
+        run: |
+          mkdir -p /tmp/scan-${{ inputs.tag }}-${{ github.run_number }}
+          mv ${{ inputs.image }}-trivy-scan.txt /tmp/scan-${{ inputs.tag }}-${{ github.run_number }}
