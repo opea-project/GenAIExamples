@@ -43,6 +43,7 @@ Some HuggingFace resources, such as some models, are only accessible if you have
 To set up environment variables for deploying Productivity Suite service, source the set_env.sh script in this directory:
 
 ```
+export host_ip=<ip-address-of-the-machine>
 source set_env.sh
 ```
 
