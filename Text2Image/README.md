@@ -1,16 +1,17 @@
 # Text-to-Image Microservice
 
-Text-to-Image is a task that generate image conditioning on the provided text. This microservice supports text-to-image task by using Stable Diffusion (SD) model.
+Text-to-Image is a task that generates image conditioning on the provided text. This microservice supports text-to-image task by using Stable Diffusion (SD) model.
 
-## Deploy Text-to-Image Service
+## Deployment Options
 
-### Deploy Text-to-Image Service on Xeon
+The table below lists currently available deployment options. They outline in detail the implementation of this example on selected hardware.
 
-Refer to the [Xeon Guide](./docker_compose/intel/cpu/xeon/README.md) for detail.
-
-### Deploy Text-to-Image Service on Gaudi
-
-Refer to the [Gaudi Guide](./docker_compose/intel/hpu/gaudi/README.md) for detail.
+| Hardware                       | Deployment Approach | Deployment Guide                                         |
+| ------------------------------ | ------------------- | -------------------------------------------------------- |
+| Single-Node Intel Xeon System  | Docker Compose      | [View Guide](./docker_compose/intel/cpu/xeon/README.md)  |
+| Single-Node Intel Gaudi System | Docker Compose      | [View Guide](./docker_compose/intel/hpu/gaudi/README.md) |
+| Intel Xeon Cluster             | Helm                | [View Guide](./kubernetes/helm/README.md)                |
+| Intel Gaudi Cluster            | Helm                | [View Guide](./kubernetes/helm/README.md)                |
 
 ## Consume Text-to-Image Service
 
