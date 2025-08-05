@@ -88,15 +88,15 @@
     } else {
       loading.set(true);
       if ($kb_id !== "") {
-        dispatch("generateSummary", { 
-          mode: "file", 
+        dispatch("generateSummary", {
+          mode: "file",
           value: $kb_id,
           languageOption,
           summaryType
         });
       } else if (message !== "") {
-        dispatch("generateSummary", { 
-          mode: "text", 
+        dispatch("generateSummary", {
+          mode: "text",
           value: message,
           languageOption,
           summaryType
@@ -177,7 +177,7 @@
       </div>
     </div>
   {/each}
-  
+
   {#if $loading}
     <button
       type="submit"

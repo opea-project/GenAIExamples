@@ -40,7 +40,7 @@
   ) => {
 
     console.log('callTextStream', languageOption, summaryType);
-    
+
     // Fetch the stream
     const eventStream = await fetchTextStream(
       query,
@@ -69,19 +69,19 @@
 
   async function handleGenerateSummary(e) {
     console.log('handleGenerateSummary', e);
-    
+
     if (e.detail.mode === "file") {
       await callTextStream(
-        e.detail.value, 
-        "/file_summarize", 
+        e.detail.value,
+        "/file_summarize",
         "doc_id",
         e.detail.languageOption,
         e.detail.summaryType
       );
     } else if (e.detail.mode === "text") {
       await callTextStream(
-        e.detail.value, 
-        "/text_summarize", 
+        e.detail.value,
+        "/text_summarize",
         "text",
         e.detail.languageOption,
         e.detail.summaryType

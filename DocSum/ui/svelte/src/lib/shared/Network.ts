@@ -17,12 +17,12 @@ import { env } from "$env/dynamic/public";
 const DOC_BASE_URL = env.DOC_BASE_URL;
 
 export async function fetchTextStream(
-  query: string | Blob, 
-  params: string, 
-  file: Blob, 
+  query: string | Blob,
+  params: string,
+  file: Blob,
   fileName: string | undefined,
   languageOption: string = "auto",
-  summaryType: string = "auto"
+  summaryType: string = "auto",
 ) {
   const url = `${DOC_BASE_URL}`; // Ensure the URL is constructed correctly
   const formData = new FormData();
