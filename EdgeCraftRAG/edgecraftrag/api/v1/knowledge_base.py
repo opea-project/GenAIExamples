@@ -89,7 +89,7 @@ async def update_knowledge_base(knowledge: KnowledgeBaseCreateIn):
                 file_paths = kb.get_file_paths()
                 await update_knowledge_base_handler(file_paths, knowledge.name)
             elif not knowledge.active and kb.description != knowledge.description:
-                pass                
+                pass
             elif not knowledge.active:
                 raise HTTPException(
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Must have an active knowledge base"
@@ -286,6 +286,8 @@ async def save_knowledge_to_file():
 
 all_pipeline_milvus_maps = {}
 current_pipeline_kb_map = {}
+
+
 async def refresh_milvus_map(milvus_name):
     current_pipeline_kb_map.clear()
     knowledge_bases_list = await get_all_knowledge_bases()
@@ -345,5 +347,4 @@ async def Synchronizing_vector_data(old_active_pl, new_active_pl):
                 if old_active_pl.indexer.comp_subtype == "milvus_vector":
                     await refresh_milvus_map(milvus_name)
     except Exception as e:
-            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, 
-                                detail=e)
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=e)

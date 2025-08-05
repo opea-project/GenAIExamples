@@ -46,7 +46,7 @@ class DocxParagraphPicturePartitioner:
 
 def get_prompt_template(model_id, prompt_content=None, template_path=None):
     if prompt_content is not None:
-        template = prompt_content 
+        template = prompt_content
     elif template_path is not None:
         template = Path(template_path).read_text(encoding=None)
     else:

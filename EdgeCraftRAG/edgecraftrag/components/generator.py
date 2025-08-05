@@ -137,8 +137,8 @@ class QnAGenerator(BaseComponent):
         # using the prompt template enhancement strategy(only tested on Qwen2-7B-Instruction) if template_enhance_on is true
         self.template_enhance_on = True if "Qwen2" in self.model_id else False
         if prompt_content:
-           self.set_prompt(prompt_content)
-           self.prompt = get_prompt_template(self.model_id, self.prompt)
+            self.set_prompt(prompt_content)
+            self.prompt = get_prompt_template(self.model_id, self.prompt)
         elif prompt_template_file is None:
             print("There is no template file, using the default template.")
             prompt_template = get_prompt_template(self.model_id)
@@ -209,7 +209,7 @@ class QnAGenerator(BaseComponent):
             final_query = f"{query}\n\n### Sub-questions ###\nThe following list is how you should consider the answer, you MUST follow these steps when responding:\n\n{sub_questions}"
         else:
             final_query = query
-        prompt_str = self.prompt.format(input=final_query, chat_history= chat_history, context=text_gen_context)
+        prompt_str = self.prompt.format(input=final_query, chat_history=chat_history, context=text_gen_context)
         return text_gen_context, prompt_str
 
     def run(self, chat_request, retrieved_nodes, node_parser_type, **kwargs):
