@@ -13,6 +13,10 @@ The table below lists currently available deployment options. They outline in de
 | Intel Xeon Cluster             | Helm                | [View Guide](./kubernetes/helm/README.md)                |
 | Intel Gaudi Cluster            | Helm                | [View Guide](./kubernetes/helm/README.md)                |
 
+### Deploy Text-to-Image Service on AMD EPYC
+
+Refer to the [AMD EPYC Guide](./docker_compose/amd/cpu/epyc/README.md) for detail.
+
 ## Consume Text-to-Image Service
 
 Use below command to generate image.
@@ -27,5 +31,6 @@ http_proxy="" curl http://localhost:9379/v1/text2image -XPOST -d '{"prompt":"An 
 | ----------------- | ------------ |
 | Docker Compose    | Intel Xeon   |
 | Docker Compose    | Intel Gaudi  |
+| Docker Compose    | AMD EPYC     |
 | Helm Charts       | Intel Gaudi  |
 | Helm Charts       | Intel Xeon   |

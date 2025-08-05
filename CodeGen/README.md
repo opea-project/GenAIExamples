@@ -110,6 +110,7 @@ This CodeGen example can be deployed manually on various hardware platforms usin
 | :-------------- | :------------------- | :----------------------------------------------------------------------- |
 | Intel Xeon CPU  | Single Node (Docker) | [Xeon Docker Compose Guide](./docker_compose/intel/cpu/xeon/README.md)   |
 | Intel Gaudi HPU | Single Node (Docker) | [Gaudi Docker Compose Guide](./docker_compose/intel/hpu/gaudi/README.md) |
+| AMD EPYC CPU    | Single Node (Docker) | [EPYC Docker Compose Guide](./docker_compose/amd/cpu/epyc/README.md)     |
 | AMD ROCm GPU    | Single Node (Docker) | [ROCm Docker Compose Guide](./docker_compose/amd/gpu/rocm/README.md)     |
 | Intel Xeon CPU  | Kubernetes (Helm)    | [Kubernetes Helm Guide](./kubernetes/helm/README.md)                     |
 | Intel Gaudi HPU | Kubernetes (Helm)    | [Kubernetes Helm Guide](./kubernetes/helm/README.md)                     |
@@ -144,6 +145,7 @@ Intel® Optimized Cloud Modules for Terraform provide an automated way to deploy
 | ----------------- | -------------- | ------------------------------ | ------------ |
 | Docker Compose    | vLLM, TGI      | Qwen/Qwen2.5-Coder-7B-Instruct | Intel Gaudi  |
 | Docker Compose    | vLLM, TGI      | Qwen/Qwen2.5-Coder-7B-Instruct | Intel Xeon   |
+| Docker Compose    | vLLM, TGI      | Qwen/Qwen2.5-Coder-7B-Instruct | AMD EPYC     |
 | Docker Compose    | vLLM, TGI      | Qwen/Qwen2.5-Coder-7B-Instruct | AMD ROCm     |
 | Helm Charts       | vLLM, TGI      | Qwen/Qwen2.5-Coder-7B-Instruct | Intel Gaudi  |
 | Helm Charts       | vLLM, TGI      | Qwen/Qwen2.5-Coder-7B-Instruct | Intel Xeon   |
