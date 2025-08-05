@@ -1,18 +1,13 @@
 # Deploy Finance Agent on Intel® Gaudi® AI Accelerator with Docker Compose
 
-This README provides instructions for deploying the Finance Agent application using Docker Compose on systems equipped with Intel® Gaudi® AI Accelerators.
+This README provides instructions for deploying the Finance Agent application using Docker Compose on systems equipped with Intel® Gaudi® AI Accelerators. It leverages containers optimized for Gaudi for the LLM serving component, along with CPU-based containers for other microservices like embedding, retrieval, data preparation and the UI.
 
 ## Table of Contents
 
-- [Overview](#overview)
 - [Prerequisites](#prerequisites)
-- [Start Deployment](#start-deployment)
+- [Finance Agent Quick Start Deployment](#finance-agent-quick-start-deployment)
 - [Validate Services](#validate-services)
 - [Accessing the User Interface (UI)](#accessing-the-user-interface-ui)
-
-## Overview
-
-This guide focuses on running the pre-configured Finance Agent service using Docker Compose on Intel® Gaudi® AI Accelerators. It leverages containers optimized for Gaudi for the LLM serving component, along with CPU-based containers for other microservices like embedding, retrieval, data preparation and the UI.
 
 ## Prerequisites
 
@@ -34,7 +29,7 @@ git clone https://github.com/opea-project/GenAIExamples.git
 cd GenAIExamples/FinanceAgent/docker_compose/intel/hpu/gaudi
 ```
 
-## Start Deployment
+## Finance Agent Quick Start Deployment
 
 This uses the default vLLM-based deployment profile (vllm-gaudi-server).
 

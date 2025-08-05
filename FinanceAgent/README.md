@@ -65,3 +65,9 @@ _Note: Building custom microservice images can be done using the resources in [G
 ## Contribution
 
 We welcome contributions to the OPEA project. Please refer to the [contribution guidelines](https://github.com/opea-project/docs/blob/main/community/CONTRIBUTING.md) for more information.
+
+## Validated Configurations
+
+| **Deploy Method** | **LLM Engine** | **LLM Model**                     | **Hardware** |
+| ----------------- | -------------- | --------------------------------- | ------------ |
+| Docker Compose    | vLLM           | meta-llama/Llama-3.3-70B-Instruct | Intel Gaudi  |

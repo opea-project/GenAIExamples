@@ -9,7 +9,7 @@ RUN useradd -m -s /bin/bash user && \
 COPY ./ui/vue /home/user/ui
  
 RUN mkdir -p /home/user/ui
-ENV UI_TMPFILE_PATH=/home/user/ui
+ENV TMPFILE_PATH=/home/user/ui
  
 WORKDIR /home/user/ui
  
