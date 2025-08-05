@@ -175,25 +175,23 @@ def align_generator(self, gen, **kwargs):
     # b'data:{"id":"","object":"text_completion","created":1725530204,"model":"meta-llama/Meta-Llama-3-8B-Instruct","system_fingerprint":"2.0.1-native","choices":[{"index":0,"delta":{"role":"assistant","content":"?"},"logprobs":null,"finish_reason":null}]}\n\n'
     for line in gen:
         line = line.decode("utf-8")
-        start = line.find("{")
-        end = line.rfind("}") + 1
-
-        json_str = line[start:end]
-        try:
-            # sometimes yield empty chunk, do a fallback here
-            json_data = json.loads(json_str)
-            if "ops" in json_data and "op" in json_data["ops"][0]:
-                if "value" in json_data["ops"][0] and isinstance(json_data["ops"][0]["value"], str):
-                    yield f"data: {repr(json_data['ops'][0]['value'].encode('utf-8'))}\n\n"
-                else:
-                    pass
-            elif (
-                json_data["choices"][0]["finish_reason"] != "eos_token"
-                and "content" in json_data["choices"][0]["delta"]
-            ):
-                yield f"data: {repr(json_data['choices'][0]['delta']['content'].encode('utf-8'))}\n\n"
-        except Exception as e:
-            yield f"data: {repr(json_str.encode('utf-8'))}\n\n"
+        chunks = [chunk.strip() for chunk in line.split("\n\n") if chunk.strip()]
+        for line in chunks:
+            start = line.find("{")
+            end = line.rfind("}") + 1
+            json_str = line[start:end]
+            try:
+                # sometimes yield empty chunk, do a fallback here
+                json_data = json.loads(json_str)
+                if "ops" in json_data and "op" in json_data["ops"][0]:
+                    if "value" in json_data["ops"][0] and isinstance(json_data["ops"][0]["value"], str):
+                        yield f"data: {repr(json_data['ops'][0]['value'].encode('utf-8'))}\n\n"
+                    else:
+                        pass
+                elif "content" in json_data["choices"][0]["delta"]:
+                    yield f"data: {repr(json_data['choices'][0]['delta']['content'].encode('utf-8'))}\n\n"
+            except Exception as e:
+                yield f"data: {repr(json_str.encode('utf-8'))}\n\n"
     yield "data: [DONE]\n\n"
 
 

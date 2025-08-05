@@ -160,6 +160,7 @@ const PrimaryInput: React.FC<PrimaryInputProps> = ({
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                 updatePromptText(e.target.value)
               }
+	      disabled={isSummary || isFaq}
               onKeyDown={handleKeyDown}
               sx={{
                 resize: "none",
