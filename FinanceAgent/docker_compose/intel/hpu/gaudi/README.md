@@ -16,7 +16,7 @@ This README provides instructions for deploying the Finance Agent application us
 - Git installed (for cloning repository).
 - Hugging Face Hub API Token (for downloading models).
 - Access to the internet (or a private model cache).
-- Finnhub API Key. Go to https://docs.financialdatasets.ai/ to get your free api key.
+- Finnhub API Key. Go to https://finnhub.io/ to get your free api key.
 - Financial Datasets API Key. Go to https://docs.financialdatasets.ai/ to get your free api key.
 
 Clone the GenAIExamples repository:

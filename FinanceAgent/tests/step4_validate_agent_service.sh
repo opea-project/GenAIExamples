@@ -50,8 +50,8 @@ function validate_agent_service() {
     echo $EXIT_CODE
     local EXIT_CODE="${EXIT_CODE:0-1}"
     if [ "$EXIT_CODE" == "1" ]; then
-	docker logs research-agent-endpoint
-	exit 1
+	    docker logs research-agent-endpoint
+	    exit 1
     fi
 
     # test supervisor react agent

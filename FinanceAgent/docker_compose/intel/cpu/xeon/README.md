@@ -22,7 +22,7 @@ This guide focuses on running the pre-configured Finance Agent service using Doc
 - Git installed (for cloning repository).
 - Hugging Face Hub API Token (for downloading models).
 - Access to the internet (or a private model cache).
-- Finnhub API Key. Go to https://docs.financialdatasets.ai/ to get your free api key.
+- Finnhub API Key. Go to https://finnhub.io/ to get your free api key.
 - Financial Datasets API Key. Go to https://docs.financialdatasets.ai/ to get your free api key.
 
 Clone the GenAIExamples repository:
@@ -74,7 +74,7 @@ When models are deployed on a remote server, a base URL and an API key are requi
 
 Set the following environment variables.
 
-- `REMOTE_ENDPOINT` is the HTTPS endpoint of the remote server with the model of choice (i.e. https://api.inference.denvrdata.com). **Note:** If not using LiteLLM, the second part of the model card needs to be appended to the URL i.e. `/Llama-3.3-70B-Instruct` from `meta-llama/Llama-3.3-70B-Instruct`.
+- `REMOTE_ENDPOINT` is the HTTPS endpoint of the remote server with the model of choice (i.e. https://api.example.com). **Note:** If the API for the models does not use LiteLLM, the second part of the model card needs to be appended to the URL. For example, set `REMOTE_ENDPOINT` to https://api.example.com/Llama-3.3-70B-Instruct if the model card is `meta-llama/Llama-3.3-70B-Instruct`.
 - `OPENAI_LLM_MODEL_ID` is the model card which may need to be overwritten depending on what it is set to `set_env.sh`.
 
 ```bash
