@@ -15,46 +15,9 @@ WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
 
-export HOST_IP=${ip_address}
-export HOST_IP_EXTERNAL=${ip_address}
+source $WORKPATH/docker_compose/amd/gpu/rocm/set_env_faqgen.sh
 
-export CHATQNA_EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
-export CHATQNA_HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
-export CHATQNA_LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
-export CHATQNA_RERANK_MODEL_ID="BAAI/bge-reranker-base"
-
-export CHATQNA_BACKEND_SERVICE_PORT=8888
-export CHATQNA_FRONTEND_SERVICE_PORT=5173
-export CHATQNA_LLM_FAQGEN_PORT=18011
-export CHATQNA_NGINX_PORT=80
-export CHATQNA_REDIS_DATAPREP_PORT=18103
-export CHATQNA_REDIS_RETRIEVER_PORT=7000
-export CHATQNA_REDIS_VECTOR_INSIGHT_PORT=8001
-export CHATQNA_REDIS_VECTOR_PORT=6379
-export CHATQNA_TEI_EMBEDDING_PORT=18090
-export CHATQNA_TEI_RERANKING_PORT=18808
-export CHATQNA_TGI_SERVICE_PORT=18008
-
-export CHATQNA_BACKEND_SERVICE_ENDPOINT="http://${HOST_IP_EXTERNAL}:${CHATQNA_BACKEND_SERVICE_PORT}/v1/chatqna"
-export CHATQNA_BACKEND_SERVICE_IP=${HOST_IP}
-export CHATQNA_DATAPREP_DELETE_FILE_ENDPOINT="http://${HOST_IP_EXTERNAL}:${CHATQNA_REDIS_DATAPREP_PORT}/v1/dataprep/delete"
-export CHATQNA_DATAPREP_GET_FILE_ENDPOINT="http://${HOST_IP_EXTERNAL}:${CHATQNA_REDIS_DATAPREP_PORT}/v1/dataprep/get"
-export CHATQNA_DATAPREP_SERVICE_ENDPOINT="http://${HOST_IP_EXTERNAL}:${CHATQNA_REDIS_DATAPREP_PORT}/v1/dataprep/ingest"
-export CHATQNA_EMBEDDING_SERVICE_HOST_IP=${HOST_IP}
-export CHATQNA_FRONTEND_SERVICE_IP=${HOST_IP}
-export CHATQNA_LLM_SERVICE_HOST_IP=${HOST_IP}
-export CHATQNA_LLM_ENDPOINT="http://${HOST_IP}:${CHATQNA_TGI_SERVICE_PORT}"
-export CHATQNA_MEGA_SERVICE_HOST_IP=${HOST_IP}
-export CHATQNA_REDIS_URL="redis://${HOST_IP}:${CHATQNA_REDIS_VECTOR_PORT}"
-export CHATQNA_RERANK_SERVICE_HOST_IP=${HOST_IP}
-export CHATQNA_RETRIEVER_SERVICE_HOST_IP=${HOST_IP}
-export CHATQNA_TEI_EMBEDDING_ENDPOINT="http://${HOST_IP}:${CHATQNA_TEI_EMBEDDING_PORT}"
-
-export CHATQNA_BACKEND_SERVICE_NAME=chatqna
-export CHATQNA_INDEX_NAME="rag-redis"
-export FAQGen_COMPONENT_NAME="OpeaFaqGenTgi"
-
-export PATH="~/miniconda3/bin:$PATH"
+export PATH="$HOME/miniconda3/bin:$PATH"
 
 function build_docker_images() {
     opea_branch=${opea_branch:-"main"}
@@ -76,11 +39,11 @@ function start_services() {
     cd "$WORKPATH"/docker_compose/amd/gpu/rocm
 
     # Start Docker Containers
-    docker compose -f compose_faqgen.yaml up -d > "${LOG_PATH}"/start_services_with_compose.log
+    docker compose -f compose_faqgen.yaml up -d --quiet-pull > "${LOG_PATH}"/start_services_with_compose.log
 
     n=0
     until [[ "$n" -ge 160 ]]; do
-        docker logs chatqna-tgi-service > "${LOG_PATH}"/tgi_service_start.log
+        docker logs chatqna-tgi-service > "${LOG_PATH}"/tgi_service_start.log 2>&1
         if grep -q Connected "${LOG_PATH}"/tgi_service_start.log; then
             break
         fi

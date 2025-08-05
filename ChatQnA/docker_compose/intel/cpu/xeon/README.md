@@ -29,10 +29,10 @@ git clone https://github.com/opea-project/GenAIExamples.git
 cd GenAIExamples/ChatQnA/docker_compose/intel/cpu/xeon/
 ```
 
-Checkout a released version, such as v1.2:
+Checkout a released version, such as v1.3:
 
 ```
-git checkout v1.2
+git checkout v1.3
 ```
 
 ### Generate a HuggingFace Access Token
@@ -45,7 +45,7 @@ To set up environment variables for deploying ChatQnA services, set up some para
 
 ```
 export host_ip="External_Public_IP"           #ip address of the node
-export HUGGINGFACEHUB_API_TOKEN="Your_Huggingface_API_Token"
+export HF_TOKEN="Your_Huggingface_API_Token"
 export http_proxy="Your_HTTP_Proxy"           #http proxy if any
 export https_proxy="Your_HTTPs_Proxy"         #https proxy if any
 export no_proxy=localhost,127.0.0.1,$host_ip  #additional no proxies if needed
@@ -147,6 +147,7 @@ In the context of deploying a ChatQnA pipeline on an Intel® Xeon® platform, we
 | File                                                         | Description                                                                                                                                                           |
 | ------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [compose.yaml](./compose.yaml)                               | Default compose file using vllm as serving framework and redis as vector database                                                                                     |
+| [compose_remote.yaml](./compose_remote.yaml)                 | Default compose file using remote inference endpoints and redis as vector database                                                                                    |
 | [compose_milvus.yaml](./compose_milvus.yaml)                 | Uses Milvus as the vector database. All other configurations remain the same as the default                                                                           |
 | [compose_pinecone.yaml](./compose_pinecone.yaml)             | Uses Pinecone as the vector database. All other configurations remain the same as the default. For more details, refer to [README_pinecone.md](./README_pinecone.md). |
 | [compose_qdrant.yaml](./compose_qdrant.yaml)                 | Uses Qdrant as the vector database. All other configurations remain the same as the default. For more details, refer to [README_qdrant.md](./README_qdrant.md).       |
@@ -156,6 +157,29 @@ In the context of deploying a ChatQnA pipeline on an Intel® Xeon® platform, we
 | [compose_faqgen_tgi.yaml](./compose_faqgen_tgi.yaml)         | Enables FAQ generation using TGI as the LLM serving framework. For more details, refer to [README_faqgen.md](./README_faqgen.md).                                     |
 | [compose.telemetry.yaml](./compose.telemetry.yaml)           | Helper file for telemetry features for vllm. Can be used along with any compose files that serves vllm                                                                |
 | [compose_tgi.telemetry.yaml](./compose_tgi.telemetry.yaml)   | Helper file for telemetry features for tgi. Can be used along with any compose files that serves tgi                                                                  |
+| [compose_mariadb.yaml](./compose_mariadb.yaml)               | Uses MariaDB Server as the vector database. All other configurations remain the same as the default                                                                   |
+
+### Running LLM models with remote endpoints
+
+When models are deployed on a remote server, a base URL and an API key are required to access them. To set up a remote server and acquire the base URL and API key, refer to [Intel® AI for Enterprise Inference](https://www.intel.com/content/www/us/en/developer/topic-technology/artificial-intelligence/enterprise-inference.html) offerings.
+
+Set the following environment variables.
+
+- `REMOTE_ENDPOINT` is the HTTPS endpoint of the remote server with the model of choice (i.e. https://api.example.com). **Note:** If the API for the models does not use LiteLLM, the second part of the model card needs to be appended to the URL. For example, set `REMOTE_ENDPOINT` to https://api.example.com/Llama-3.3-70B-Instruct if the model card is `meta-llama/Llama-3.3-70B-Instruct`.
+- `API_KEY` is the access token or key to access the model(s) on the server.
+- `LLM_MODEL_ID` is the model card which may need to be overwritten depending on what it is set to `set_env.sh`.
+
+```bash
+export REMOTE_ENDPOINT=<https-endpoint-of-remote-server>
+export API_KEY=<your-api-key>
+export LLM_MODEL_ID=<model-card>
+```
+
+After setting these environment variables, run `docker compose` with `compose_remote.yaml`:
+
+```bash
+docker compose -f compose_remote.yaml up -d
+```
 
 ## ChatQnA with Conversational UI (Optional)
 
@@ -297,12 +321,12 @@ For details on how to verify the correctness of the response, refer to [how-to-v
 
    If you want to update the default knowledge base, you can use the following commands:
 
-   Update Knowledge Base via Local File [nke-10k-2023.pdf](https://github.com/opea-project/GenAIComps/blob/v1.1/comps/retrievers/redis/data/nke-10k-2023.pdf). Or
-   click [here](https://raw.githubusercontent.com/opea-project/GenAIComps/v1.1/comps/retrievers/redis/data/nke-10k-2023.pdf) to download the file via any web browser.
+   Update Knowledge Base via Local File [nke-10k-2023.pdf](https://raw.githubusercontent.com/opea-project/GenAIComps/v1.3/comps/third_parties/pathway/src/data/nke-10k-2023.pdf). Or
+   click [here](https://raw.githubusercontent.com/opea-project/GenAIComps/v1.3/comps/third_parties/pathway/src/data/nke-10k-2023.pdf) to download the file via any web browser.
    Or run this command to get the file on a terminal.
 
    ```bash
-   wget https://raw.githubusercontent.com/opea-project/GenAIComps/v1.1/comps/retrievers/redis/data/nke-10k-2023.pdf
+   wget https://raw.githubusercontent.com/opea-project/GenAIComps/v1.3/comps/third_parties/pathway/src/data/nke-10k-2023.pdf
    ```
 
    Upload:

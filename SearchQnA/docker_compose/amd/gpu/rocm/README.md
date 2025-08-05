@@ -30,10 +30,10 @@ git clone https://github.com/opea-project/GenAIExamples.git
 cd GenAIExamples/SearchQnA/docker_compose/amd/gpu/rocm
 ```
 
-Checkout a released version, such as v1.2:
+Checkout a released version, such as v1.3:
 
 ```bash
-git checkout v1.2
+git checkout v1.3
 ```
 
 ### Generate a HuggingFace Access Token
@@ -50,7 +50,7 @@ To set up environment variables for deploying SearchQnA services, set up some pa
 export host_ip="External_Public_IP"           # ip address of the node
 export GOOGLE_CSE_ID="your cse id"
 export GOOGLE_API_KEY="your google api key"
-export HUGGINGFACEHUB_API_TOKEN="Your_HuggingFace_API_Token"
+export HF_TOKEN="Your_HuggingFace_API_Token"
 export http_proxy="Your_HTTP_Proxy"           # http proxy if any
 export https_proxy="Your_HTTPs_Proxy"         # https proxy if any
 export no_proxy=localhost,127.0.0.1,$host_ip  # additional no proxies if needed
@@ -64,7 +64,7 @@ source ./set_env_vllm.sh
 export host_ip="External_Public_IP"           # ip address of the node
 export GOOGLE_CSE_ID="your cse id"
 export GOOGLE_API_KEY="your google api key"
-export HUGGINGFACEHUB_API_TOKEN="Your_HuggingFace_API_Token"
+export HF_TOKEN="Your_HuggingFace_API_Token"
 export http_proxy="Your_HTTP_Proxy"           # http proxy if any
 export https_proxy="Your_HTTPs_Proxy"         # https proxy if any
 export no_proxy=localhost,127.0.0.1,$host_ip  # additional no proxies if needed
@@ -131,8 +131,8 @@ bb46cdaf1794   opea/reranking:latest                                   "python o
 d89ab0ef3f41   opea/embedding:latest                                   "sh -c 'python $( [ …"   About a minute ago   Up About a minute   0.0.0.0:3002->6000/tcp, [::]:3002->6000/tcp     search-embedding-server
 b248e55dd20f   opea/vllm-rocm:latest                                   "python3 /workspace/…"   About a minute ago   Up About a minute   0.0.0.0:3080->8011/tcp, [::]:3080->8011/tcp     search-vllm-service
 c3800753fac5   opea/web-retriever:latest                               "python opea_web_ret…"   About a minute ago   Up About a minute   0.0.0.0:3003->7077/tcp, [::]:3003->7077/tcp     search-web-retriever-server
-0db8af486bd0   ghcr.io/huggingface/text-embeddings-inference:cpu-1.5   "text-embeddings-rou…"   About a minute ago   Up About a minute   0.0.0.0:3001->80/tcp, [::]:3001->80/tcp         search-tei-embedding-server
-3125915447ef   ghcr.io/huggingface/text-embeddings-inference:cpu-1.5   "text-embeddings-rou…"   About a minute ago   Up About a minute   0.0.0.0:3004->80/tcp, [::]:3004->80/tcp         search-tei-reranking-server
+0db8af486bd0   ghcr.io/huggingface/text-embeddings-inference:cpu-1.7   "text-embeddings-rou…"   About a minute ago   Up About a minute   0.0.0.0:3001->80/tcp, [::]:3001->80/tcp         search-tei-embedding-server
+3125915447ef   ghcr.io/huggingface/text-embeddings-inference:cpu-1.7   "text-embeddings-rou…"   About a minute ago   Up About a minute   0.0.0.0:3004->80/tcp, [::]:3004->80/tcp         search-tei-reranking-server
 ```
 
 #### For TGI inference type deployment

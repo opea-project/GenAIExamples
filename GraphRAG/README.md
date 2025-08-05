@@ -18,7 +18,7 @@ Quick Start Deployment Steps:
 2. Run Docker Compose.
 3. Consume the GraphRAG Service.
 
-Note: If you do not have docker installed you can run this script to install docker : `bash docker_compose/install_docker.sh`
+Note: If you do not have Docker installed you can [install Docker](https://docs.docker.com/engine/install/) first
 
 ### Quick Start: 1.Setup Environment Variable
 
@@ -33,7 +33,7 @@ To set up environment variables for deploying GraphRAG services, follow these st
    export NEO4J_PASSWORD=${your_neo4j_password}
    export PYTHONPATH=${path_to_comps}
    export OPENAI_KEY=${your_openai_api_key} #optional, when not provided will use smaller models TGI/TEI
-   export HUGGINGFACEHUB_API_TOKEN=${your_hf_token} #needed for TGI/TEI models
+   export HF_TOKEN=${your_hf_token} #needed for TGI/TEI models
    ```
 
 2. If you are in a proxy environment, also set the proxy-related environment variables:
@@ -70,7 +70,7 @@ Here is an example of `Nike 2023` pdf.
 
 ```bash
 # download pdf file
-wget https://raw.githubusercontent.com/opea-project/GenAIComps/v1.1/comps/retrievers/redis/data/nke-10k-2023.pdf
+wget https://raw.githubusercontent.com/opea-project/GenAIComps/v1.3/comps/third_parties/pathway/src/data/nke-10k-2023.pdf
 # upload pdf file with dataprep
 curl -X POST "http://${host_ip}:11103/v1/dataprep/ingest" \
     -H "Content-Type: multipart/form-data" \
@@ -204,7 +204,7 @@ Here is an example of `Nike 2023` pdf.
 
 ```bash
 # download pdf file
-wget https://raw.githubusercontent.com/opea-project/GenAIComps/v1.1/comps/retrievers/redis/data/nke-10k-2023.pdf
+wget https://raw.githubusercontent.com/opea-project/GenAIComps/v1.3/comps/third_parties/pathway/src/data/nke-10k-2023.pdf
 # upload pdf file with dataprep
 curl -X POST "http://${host_ip}:6007/v1/dataprep/ingest" \
     -H "Content-Type: multipart/form-data" \
@@ -251,3 +251,9 @@ OPEA microservice deployment can easily be monitored through Grafana dashboards 
 
 ![chatqna dashboards](../ChatQnA/assets/img/chatqna_dashboards.png)
 ![tgi dashboard](../ChatQnA//assets/img/tgi_dashboard.png)
+
+## Validated Configurations
+
+| **Deploy Method** | **LLM Engine** | **LLM Model**                         | **Hardware** |
+| ----------------- | -------------- | ------------------------------------- | ------------ |
+| Docker Compose    | TGI            | meta-llama/Meta-Llama-3.1-8B-Instruct | Intel Gaudi  |

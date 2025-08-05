@@ -1,13 +1,12 @@
-#!/usr/bin/env bash                                                                                                           set_env.sh
-
+#!/usr/bin/env bash
 # Copyright (C) 2024 Advanced Micro Devices, Inc.
 # SPDX-License-Identifier: Apache-2.0
 
 
 # export host_ip=<your External Public IP>    # export host_ip=$(hostname -I | awk '{print $1}')
 
-export host_ip="192.165.1.21"
-export HUGGINGFACEHUB_API_TOKEN=${YOUR_HUGGINGFACEHUB_API_TOKEN}
+export host_ip=${ip_address}
+export HF_TOKEN=${HF_TOKEN}
 # <token>
 
 export LLM_MODEL_ID=Intel/neural-chat-7b-v3-3

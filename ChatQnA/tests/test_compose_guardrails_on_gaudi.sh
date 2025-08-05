@@ -2,7 +2,7 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-set -e
+set -xe
 IMAGE_REPO=${IMAGE_REPO:-"opea"}
 IMAGE_TAG=${IMAGE_TAG:-"latest"}
 echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
@@ -24,8 +24,8 @@ function build_docker_images() {
     docker build --no-cache -t ${REGISTRY}/comps-base:${TAG} --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
     popd && sleep 1s
     git clone https://github.com/HabanaAI/vllm-fork.git && cd vllm-fork
-    VLLM_VER=v0.6.6.post1+Gaudi-1.20.0
-    git checkout ${VLLM_VER} &> /dev/null && cd ../
+    VLLM_FORK_VER=v0.6.6.post1+Gaudi-1.20.0
+    git checkout ${VLLM_FORK_VER} &> /dev/null && cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
     service_list="chatqna chatqna-ui dataprep retriever vllm-gaudi guardrails nginx"
@@ -36,21 +36,15 @@ function build_docker_images() {
 
 function start_services() {
     cd $WORKPATH/docker_compose/intel/hpu/gaudi
-    export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
-    export RERANK_MODEL_ID="BAAI/bge-reranker-base"
-    export LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
-    export NUM_CARDS=1
-    export INDEX_NAME="rag-redis"
-    export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
-    export host_ip=${ip_address}
     export GURADRAILS_MODEL_ID="meta-llama/Meta-Llama-Guard-2-8B"
+    source set_env_faqgen.sh
 
     # Start Docker Containers
-    docker compose -f compose_guardrails.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
+    docker compose -f compose_guardrails.yaml up -d --quiet-pull > ${LOG_PATH}/start_services_with_compose.log
     n=0
     until [[ "$n" -ge 200 ]]; do
         echo "n=$n"
-        docker logs vllm-gaudi-server > vllm_service_start.log
+        docker logs vllm-gaudi-server > vllm_service_start.log 2>&1
         if grep -q "Warmup finished" vllm_service_start.log; then
             break
         fi

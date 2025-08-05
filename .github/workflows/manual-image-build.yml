@@ -2,6 +2,22 @@
 # SPDX-License-Identifier: Apache-2.0
 
 name: Build specific images on manual event
+permissions:
+  actions: read
+  contents: read
+  checks: read
+  deployments: read
+  discussions: read
+  issues: read
+  packages: read
+  pages: read
+  pull-requests: read
+  repository-projects: read
+  statuses: read
+  security-events: read
+  id-token: write
+  attestations: read
+  models: read
 on:
   workflow_dispatch:
     inputs:
@@ -50,6 +66,22 @@ jobs:
           echo "nodes=$nodes_json" >> $GITHUB_OUTPUT
 
   image-build:
+    permissions:
+      actions: read
+      attestations: read
+      discussions: read
+      models: read
+      repository-projects: read
+      id-token: write
+      contents: read
+      checks: write
+      deployments: write
+      issues: write
+      packages: write
+      pages: write
+      pull-requests: write
+      statuses: write
+      security-events: read
     needs: get-test-matrix
     if: ${{ needs.get-test-matrix.outputs.nodes != '' }}
     strategy:

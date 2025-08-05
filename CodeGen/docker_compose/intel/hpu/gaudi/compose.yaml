@@ -2,41 +2,9 @@
 # SPDX-License-Identifier: Apache-2.0
 
 services:
-  tgi-service:
-    image: ghcr.io/huggingface/tgi-gaudi:2.3.1
-    container_name: tgi-gaudi-server
-    profiles:
-      - codegen-gaudi-tgi
-    ports:
-      - "8028:80"
-    volumes:
-      - "${MODEL_CACHE:-./data}:/data"
-    environment:
-      no_proxy: ${no_proxy}
-      http_proxy: ${http_proxy}
-      https_proxy: ${https_proxy}
-      HABANA_VISIBLE_DEVICES: all
-      OMPI_MCA_btl_vader_single_copy_mechanism: none
-      HUGGING_FACE_HUB_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
-      ENABLE_HPU_GRAPH: true
-      LIMIT_HPU_GRAPH: true
-      USE_FLASH_ATTENTION: true
-      FLASH_ATTENTION_RECOMPUTE: true
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:80/health || exit 1"]
-      interval: 10s
-      timeout: 10s
-      retries: 100
-    runtime: habana
-    cap_add:
-      - SYS_NICE
-    ipc: host
-    command: --model-id ${LLM_MODEL_ID} --max-input-length 1024 --max-total-tokens 2048
   vllm-service:
     image: ${REGISTRY:-opea}/vllm-gaudi:${TAG:-latest}
     container_name: vllm-gaudi-server
-    profiles:
-      - codegen-gaudi-vllm
     ports:
       - "8028:80"
     volumes:
@@ -46,7 +14,7 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HF_TOKEN: ${HF_TOKEN}
       HABANA_VISIBLE_DEVICES: all
       OMPI_MCA_btl_vader_single_copy_mechanism: none
       VLLM_SKIP_WARMUP: ${VLLM_SKIP_WARMUP:-false}
@@ -71,24 +39,11 @@ services:
       https_proxy: ${https_proxy}
       LLM_ENDPOINT: ${LLM_ENDPOINT}
       LLM_MODEL_ID: ${LLM_MODEL_ID}
-      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HF_TOKEN: ${HF_TOKEN}
     restart: unless-stopped
-  llm-tgi-service:
-    extends: llm-base
-    container_name: llm-codegen-tgi-gaudi-server
-    profiles:
-      - codegen-gaudi-tgi
-    ports:
-      - "9000:9000"
-    ipc: host
-    depends_on:
-      tgi-service:
-        condition: service_healthy
   llm-vllm-service:
     extends: llm-base
     container_name: llm-codegen-gaudi-vllm-server
-    profiles:
-      - codegen-gaudi-vllm
     ports:
       - "9000:9000"
     ipc: host
@@ -140,8 +95,8 @@ services:
     image: redis/redis-stack:7.2.0-v9
     container_name: redis-vector-db
     ports:
-      - "${REDIS_DB_PORT}:${REDIS_DB_PORT}"
-      - "${REDIS_INSIGHTS_PORT}:${REDIS_INSIGHTS_PORT}"
+      - "${REDIS_DB_PORT:-6379}:${REDIS_DB_PORT:-6379}"
+      - "${REDIS_INSIGHTS_PORT:-8001}:${REDIS_INSIGHTS_PORT:-8001}"
   dataprep-redis-server:
     image: ${REGISTRY:-opea}/dataprep:${TAG:-latest}
     container_name: dataprep-redis-server
@@ -156,7 +111,7 @@ services:
       REDIS_URL: ${REDIS_URL}
       REDIS_HOST: ${host_ip}
       INDEX_NAME: ${INDEX_NAME}
-      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HF_TOKEN: ${HF_TOKEN}
       LOGFLAG: true
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:5000/v1/health_check || exit 1"]
@@ -165,7 +120,7 @@ services:
       retries: 10
     restart: unless-stopped
   tei-embedding-serving:
-    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.7
     container_name: tei-embedding-serving
     entrypoint: /bin/sh -c "apt-get update && apt-get install -y curl && text-embeddings-router --json-output --model-id ${EMBEDDING_MODEL_ID} --auto-truncate"
     ports:
@@ -178,7 +133,7 @@ services:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       host_ip: ${host_ip}
-      HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HF_TOKEN: ${HF_TOKEN}
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:80/health"]
       interval: 10s
@@ -206,7 +161,7 @@ services:
     depends_on:
       - redis-vector-db
     ports:
-      - "${REDIS_RETRIEVER_PORT}:${REDIS_RETRIEVER_PORT}"
+      - "${REDIS_RETRIEVER_PORT:-7000}:${REDIS_RETRIEVER_PORT:-7000}"
     ipc: host
     environment:
       no_proxy: ${no_proxy}
@@ -218,7 +173,7 @@ services:
       REDIS_RETRIEVER_PORT: ${REDIS_RETRIEVER_PORT}
       INDEX_NAME: ${INDEX_NAME}
       TEI_EMBEDDING_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
-      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HF_TOKEN: ${HF_TOKEN}
       LOGFLAG: ${LOGFLAG}
       RETRIEVER_COMPONENT_NAME: ${RETRIEVER_COMPONENT_NAME:-OPEA_RETRIEVER_REDIS}
     restart: unless-stopped

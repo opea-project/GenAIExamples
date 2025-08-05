@@ -21,40 +21,36 @@ This section describes how to quickly deploy and test the DocSum service manuall
 6. [Test the Pipeline](#test-the-pipeline)
 7. [Cleanup the Deployment](#cleanup-the-deployment)
 
-### Access the Code
+### Access the Code and Set Up Environment
 
 Clone the GenAIExample repository and access the ChatQnA Intel Xeon platform Docker Compose files and supporting scripts:
 
-```
+```bash
 git clone https://github.com/opea-project/GenAIExamples.git
-cd GenAIExamples/DocSum/docker_compose/intel/cpu/xeon/
+cd GenAIExamples/DocSum/docker_compose
+source intel/set_env.sh
 ```
 
-Checkout a released version, such as v1.2:
+> NOTE: by default vLLM does "warmup" at start, to optimize its performance for the specified model and the underlying platform, which can take long time. For development (and e.g. autoscaling) it can be skipped with `export VLLM_SKIP_WARMUP=true`.
 
-```
-git checkout v1.2
+> NOTE: If any port on your local machine is occupied (like `9000/8008/8888`, etc.), modify it in `set_env.sh`, then run `source set_env.sh` again.
+
+Checkout a released version, such as v1.3:
+
+```bash
+git checkout v1.3
 ```
 
 ### Generate a HuggingFace Access Token
 
 Some HuggingFace resources, such as some models, are only accessible if you have an access token. If you do not already have a HuggingFace access token, you can create one by first creating an account by following the steps provided at [HuggingFace](https://huggingface.co/) and then generating a [user access token](https://huggingface.co/docs/transformers.js/en/guides/private#step-1-generating-a-user-access-token).
 
-### Configure the Deployment Environment
-
-To set up environment variables for deploying DocSum services, source the _set_env.sh_ script in this directory:
-
-```
-source ./set_env.sh
-```
-
-The _set_env.sh_ script will prompt for required and optional environment variables used to configure the DocSum services. If a value is not entered, the script will use a default value for the same. It will also generate a _.env_ file defining the desired configuration. Consult the section on [DocSum Service configuration](#docsum-service-configuration) for information on how service specific configuration parameters affect deployments.
-
 ### Deploy the Services Using Docker Compose
 
 To deploy the DocSum services, execute the `docker compose up` command with the appropriate arguments. For a default deployment, execute:
 
 ```bash
+cd intel/cpu/xeon/
 docker compose up -d
 ```
 
@@ -78,13 +74,13 @@ Please refer to the table below to build different microservices from source:
 
 After running docker compose, check if all the containers launched via docker compose have started:
 
-```
+```bash
 docker ps -a
 ```
 
 For the default deployment, the following 5 containers should have started:
 
-```
+```bash
 CONTAINER ID   IMAGE                                 COMMAND                  CREATED         STATUS                   PORTS                                       NAMES
 748f577b3c78   opea/whisper:latest                   "python whisper_s…"      5 minutes ago   Up About a minute        0.0.0.0:7066->7066/tcp, :::7066->7066/tcp   docsum-xeon-whisper-server
 4eq8b7034fd9   opea/docsum-gradio-ui:latest          "docker-entrypoint.s…"   5 minutes ago   Up About a minute        0.0.0.0:5173->5173/tcp, :::5173->5173/tcp   docsum-xeon-ui-server
@@ -109,7 +105,7 @@ curl -X POST http://${host_ip}:8888/v1/docsum \
 
 To stop the containers associated with the deployment, execute the following command:
 
-```
+```bash
 docker compose -f compose.yaml down
 ```
 
@@ -119,10 +115,33 @@ All the DocSum containers will be stopped and then removed on completion of the 
 
 In the context of deploying a DocSum pipeline on an Intel® Xeon® platform, we can pick and choose different large language model serving frameworks. The table below outlines the various configurations that are available as part of the application.
 
-| File                                   | Description                                                                               |
-| -------------------------------------- | ----------------------------------------------------------------------------------------- |
-| [compose.yaml](./compose.yaml)         | Default compose file using vllm as serving framework                                      |
-| [compose_tgi.yaml](./compose_tgi.yaml) | The LLM serving framework is TGI. All other configurations remain the same as the default |
+| File                                         | Description                                                                            |
+| -------------------------------------------- | -------------------------------------------------------------------------------------- |
+| [compose.yaml](./compose.yaml)               | Default compose file using vllm as serving framework                                   |
+| [compose_tgi.yaml](./compose_tgi.yaml)       | The LLM serving framework is TGI. All other configurations remain the same as default  |
+| [compose_remote.yaml](./compose_remote.yaml) | Uses remote inference endpoints for LLMs. All other configurations are same as default |
+
+### Running LLM models with remote endpoints
+
+When models are deployed on a remote server, a base URL and an API key are required to access them. To set up a remote server and acquire the base URL and API key, refer to [Intel® AI for Enterprise Inference](https://www.intel.com/content/www/us/en/developer/topic-technology/artificial-intelligence/enterprise-inference.html) offerings.
+
+Set the following environment variables.
+
+- `REMOTE_ENDPOINT` is the HTTPS endpoint of the remote server with the model of choice (i.e. https://api.example.com). **Note:** If the API for the models does not use LiteLLM, the second part of the model card needs to be appended to the URL. For example, set `REMOTE_ENDPOINT` to https://api.example.com/Llama-3.3-70B-Instruct if the model card is `meta-llama/Llama-3.3-70B-Instruct`.
+- `API_KEY` is the access token or key to access the model(s) on the server.
+- `LLM_MODEL_ID` is the model card which may need to be overwritten depending on what it is set to `set_env.sh`.
+
+```bash
+export REMOTE_ENDPOINT=<https-endpoint-of-remote-server>
+export API_KEY=<your-api-key>
+export LLM_MODEL_ID=<model-card>
+```
+
+After setting these environment variables, run `docker compose` with `compose_remote.yaml`:
+
+```bash
+docker compose -f compose_remote.yaml up -d
+```
 
 ## DocSum Detailed Usage
 
@@ -156,16 +175,19 @@ curl http://${host_ip}:8888/v1/docsum \
    -F "messages=" \
    -F "files=@/path to your file (.txt, .docx, .pdf)" \
    -F "max_tokens=32" \
-   -F "language=en" \
+   -F "language=en"
 ```
+
+Note that the `-F "messages="` flag is required, even for file uploads. Multiple files can be uploaded in a single call with multiple `-F "files=@/path"` inputs.
 
 ### Query with audio and video
 
-> Audio and Video file uploads are not supported in docsum with curl request, please use the Gradio-UI.
+> Audio and video can be passed as base64 strings or uploaded by providing a local file path.
 
 Audio:
 
 ```bash
+# Send base64 string
 curl -X POST http://${host_ip}:8888/v1/docsum \
    -H "Content-Type: application/json" \
    -d '{"type": "audio", "messages": "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA"}'
@@ -177,11 +199,21 @@ curl http://${host_ip}:8888/v1/docsum \
    -F "max_tokens=32" \
    -F "language=en" \
    -F "stream=True"
+
+# Upload file
+curl http://${host_ip}:8888/v1/docsum \
+   -H "Content-Type: multipart/form-data" \
+   -F "type=audio" \
+   -F "messages=" \
+   -F "files=@/path to your file (.mp3, .wav)" \
+   -F "max_tokens=32" \
+   -F "language=en"
 ```
 
 Video:
 
 ```bash
+# Send base64 string
 curl -X POST http://${host_ip}:8888/v1/docsum \
    -H "Content-Type: application/json" \
    -d '{"type": "video", "messages": "convert your video to base64 data type"}'
@@ -193,6 +225,15 @@ curl http://${host_ip}:8888/v1/docsum \
    -F "max_tokens=32" \
    -F "language=en" \
    -F "stream=True"
+
+# Upload file
+curl http://${host_ip}:8888/v1/docsum \
+   -H "Content-Type: multipart/form-data" \
+   -F "type=video" \
+   -F "messages=" \
+   -F "files=@/path to your file (.mp4)" \
+   -F "max_tokens=32" \
+   -F "language=en"
 ```
 
 ### Query with long context

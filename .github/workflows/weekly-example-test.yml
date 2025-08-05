@@ -3,6 +3,10 @@
 
 name: Weekly test all examples on multiple HWs
 
+permissions:
+  contents: read
+  id-token: write
+
 on:
   schedule:
     - cron: "30 2 * * 6" # UTC time
@@ -10,7 +14,7 @@ on:
 
 env:
   EXAMPLES: ${{ vars.NIGHTLY_RELEASE_EXAMPLES }}
-  NODES: "gaudi,xeon,rocm,arc"
+  NODES: "gaudi,xeon,arc"
 
 jobs:
   get-test-matrix:
@@ -31,6 +35,10 @@ jobs:
 
   build-comps-base:
     needs: [get-test-matrix]
+    permissions:
+      attestations: read
+      models: read
+      security-events: read
     strategy:
       matrix:
         node: ${{ fromJson(needs.get-test-matrix.outputs.nodes) }}
@@ -39,6 +47,22 @@ jobs:
       node: ${{ matrix.node }}
 
   run-examples:
+    permissions:
+      contents: read
+      id-token: write
+      actions: read
+      attestations: read
+      checks: write
+      deployments: write
+      discussions: read
+      issues: write
+      models: read
+      packages: write
+      pages: write
+      pull-requests: write
+      repository-projects: read
+      statuses: write
+      security-events: read
     needs: [get-test-matrix, build-comps-base]
     strategy:
       matrix:

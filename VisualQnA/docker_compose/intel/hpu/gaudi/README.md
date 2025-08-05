@@ -1,59 +1,33 @@
-# Build MegaService of VisualQnA on Gaudi
+# Deploying VisualQnA on Intel® Gaudi® Processors
 
 This document outlines the deployment process for a VisualQnA application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on Intel Gaudi server. The steps include Docker image creation, container deployment via Docker Compose, and service execution to integrate microservices such as llm. We will publish the Docker images to Docker Hub, it will simplify the deployment process for this service.
 
-## 🚀 Build Docker Images
+## Table of Contents
+
+1. [VisualQnA Quick Start Deployment](#visualqna-quick-start-deployment)
+2. [Validate Microservices](#validate-microservices)
+3. [Launch the UI](#launch-the-UI)
+
+## VisualQnA Quick Start Deployment
+
+This section describes how to quickly deploy and test the VisualQnA service manually on an Intel® Xeon® processor. The basic steps are:
+
+1. [Build Docker Images](#build-docker-images)
+2. [Setup Environment Variables](#setup-environment-variables)
+3. [Deploy the Services Using Docker Compose](#deploy-the-services-using-docker-compose)
+
+### Build Docker Images
 
 First of all, you need to build Docker Images locally. This step can be ignored after the Docker images published to Docker hub.
 
-### 1. Build LVM and NGINX Docker Images
+Please refer the table below to build different microservices from source:
 
-```bash
-git clone https://github.com/opea-project/GenAIComps.git
-cd GenAIComps
-docker build --no-cache -t opea/lvm:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/lvms/src/Dockerfile .
-docker build --no-cache -t opea/nginx:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/third_parties/nginx/src/Dockerfile .
-```
-
-### 2. Build vLLM/Pull TGI Gaudi Image
-
-```bash
-# vLLM
-
-# currently you have to build the opea/vllm-gaudi with the habana_main branch and the specific commit locally
-# we will update it to stable release tag in the future
-git clone https://github.com/HabanaAI/vllm-fork.git
-cd ./vllm-fork/
-docker build -f Dockerfile.hpu -t opea/vllm-gaudi:latest --shm-size=128g . --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy
-cd ..
-rm -rf vllm-fork
-```
-
-```bash
-# TGI (Optional)
-
-docker pull ghcr.io/huggingface/tgi-gaudi:2.3.1
-```
-
-### 3. Build MegaService Docker Image
-
-To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `visualqna.py` Python script. Build the MegaService Docker image using the command below:
-
-```bash
-git clone https://github.com/opea-project/GenAIExamples.git
-cd GenAIExamples/VisualQnA
-docker build --no-cache -t opea/visualqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
-cd ../..
-```
-
-### 4. Build UI Docker Image
-
-Build frontend Docker image via below command:
-
-```bash
-cd GenAIExamples/VisualQnA/ui
-docker build --no-cache -t opea/visualqna-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f ./docker/Dockerfile .
-```
+| Microservice  | Deployment Guide                                                                                             |
+| ------------- | ------------------------------------------------------------------------------------------------------------ |
+| MegaService   | [Build MegaService Docker Image](../../../../README_miscellaneous.md#build-megaservice-docker-image)         |
+| LVM and NGINX | [Build LVM and NGINX Docker Images](../../../../README_miscellaneous.md#build-lvm-and-nginx-docker-images)   |
+| vLLM or TGI   | [Build vLLM or Pull TGI Gaudi Image](../../../../README_miscellaneous.md#build-vllm-or-pull-tgi-gaudi-image) |
+| UI            | [Basic UI build guide](../../../../README_miscellaneous.md#build-ui-docker-image)                            |
 
 Then run the command `docker images`, you will have the following 5 Docker Images:
 
@@ -63,8 +37,6 @@ Then run the command `docker images`, you will have the following 5 Docker Image
 4. `opea/visualqna:latest`
 5. `opea/visualqna-ui:latest`
 6. `opea/nginx`
-
-## 🚀 Start MicroServices and MegaService
 
 ### Setup Environment Variables
 
@@ -76,7 +48,7 @@ source set_env.sh
 
 Note: Please replace with `host_ip` with you external IP address, do not use localhost.
 
-### Start all the services Docker Containers
+### Deploy the Services Using Docker Compose
 
 ```bash
 cd GenAIExamples/VisualQnA/docker_compose/intel/hpu/gaudi/
@@ -90,7 +62,9 @@ docker compose -f compose_tgi.yaml up -d
 
 > **_NOTE:_** Users need at least one Gaudi cards to run the VisualQnA successfully.
 
-### Validate MicroServices and MegaService
+After running docker compose, check if all the containers launched via docker compose have started.
+
+## Validate MicroServices
 
 Follow the instructions to validate MicroServices.
 
@@ -127,7 +101,7 @@ curl http://${host_ip}:8888/v1/visualqna -H "Content-Type: application/json" -d 
     }'
 ```
 
-## 🚀 Launch the UI
+## Launch the UI
 
 To access the frontend, open the following URL in your browser: http://{host_ip}:5173. By default, the UI runs on port 5173 internally. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `compose.yaml` file as shown below:
 

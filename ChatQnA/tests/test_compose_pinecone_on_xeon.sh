@@ -2,7 +2,7 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-set -e
+set -xe
 IMAGE_REPO=${IMAGE_REPO:-"opea"}
 IMAGE_TAG=${IMAGE_TAG:-"latest"}
 echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
@@ -25,7 +25,7 @@ function build_docker_images() {
     docker build --no-cache -t ${REGISTRY}/comps-base:${TAG} --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
     popd && sleep 1s
     git clone https://github.com/vllm-project/vllm.git && cd vllm
-    VLLM_VER="v0.8.3"
+    VLLM_VER=v0.9.0.1
     echo "Check out vLLM tag ${VLLM_VER}"
     git checkout ${VLLM_VER} &> /dev/null
     # Not change the pwd
@@ -41,17 +41,14 @@ function build_docker_images() {
 function start_services() {
     cd $WORKPATH/docker_compose/intel/cpu/xeon/
     export no_proxy=${no_proxy},${ip_address}
-    export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
-    export RERANK_MODEL_ID="BAAI/bge-reranker-base"
-    export LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
     export PINECONE_API_KEY=${PINECONE_KEY_LANGCHAIN_TEST}
     export PINECONE_INDEX_NAME="langchain-test"
     export INDEX_NAME="langchain-test"
-    export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
     export LOGFLAG=true
+    source set_env.sh
 
     # Start Docker Containers
-    docker compose -f compose_pinecone.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
+    docker compose -f compose_pinecone.yaml up -d --quiet-pull > ${LOG_PATH}/start_services_with_compose.log
 
     n=0
     until [[ "$n" -ge 100 ]]; do

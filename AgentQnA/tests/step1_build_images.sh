@@ -13,6 +13,10 @@ function get_genai_comps() {
     if [ ! -d "GenAIComps" ] ; then
         git clone --depth 1 --branch ${opea_branch:-"main"} https://github.com/opea-project/GenAIComps.git
     fi
+    pushd GenAIComps
+    echo "GenAIComps test commit is $(git rev-parse HEAD)"
+    docker build --no-cache -t ${REGISTRY}/comps-base:${TAG} --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
+    popd && sleep 1s
 }
 
 function build_docker_images_for_retrieval_tool(){
@@ -37,8 +41,8 @@ function build_agent_docker_image_gaudi_vllm() {
     get_genai_comps
 
     git clone https://github.com/HabanaAI/vllm-fork.git && cd vllm-fork
-    VLLM_VER=v0.6.6.post1+Gaudi-1.20.0
-    git checkout ${VLLM_VER} &> /dev/null && cd ../
+    VLLM_FORK_VER=v0.6.6.post1+Gaudi-1.20.0
+    git checkout ${VLLM_FORK_VER} &> /dev/null && cd ../
 
     echo "Build agent image with --no-cache..."
     service_list="agent agent-ui vllm-gaudi"

@@ -8,7 +8,7 @@
           :style="{ color: 'var(--color-big-icon)' }"
           inherit
         />
-        <div>Chatbot</div>
+        <div>{{ $t("common.chatbot") }}</div>
       </div></a-affix
     >
     <!-- system status -->
@@ -22,8 +22,6 @@
       @import="handleImport"
       @search="handleSearch"
     />
-    <!-- configuration -->
-    <!-- <Configuration :json-data="jsonData" /> -->
     <!-- createDialog -->
     <CreateDialog
       v-if="createDialog.visible"
@@ -49,8 +47,6 @@
       @close="importDialog.visible = false"
       @search="handleSearch"
     />
-    <!-- QuickStart -->
-    <QuickStart @create="handleCreate" />
   </div>
 </template>
 
@@ -61,16 +57,16 @@ import { pipelineAppStore } from "@/store/pipeline";
 import { useNotification } from "@/utils/common";
 import { onMounted, reactive, ref } from "vue";
 import {
-  Configuration,
   CreateDialog,
   DetailDrawer,
   EditDialog,
   ImportDialog,
-  QuickStart,
   System,
   Table,
 } from "./components";
+import { useI18n } from "vue-i18n";
 
+const { t } = useI18n();
 const { antNotification } = useNotification();
 const pipelineStore = pipelineAppStore();
 const createDialog = reactive<DialogType>({
@@ -89,7 +85,6 @@ const importDialog = reactive<DialogType>({
 });
 
 const tableData = ref<EmptyArrayType>([]);
-const jsonData = ref<string>("");
 
 const queryPipelineList = async () => {
   const data: any = await getPipelineList();
@@ -126,12 +121,12 @@ const handleImport = () => {
 //Jump Chatbot
 const jumpChatbot = () => {
   if (pipelineStore.activatedPipeline) {
-    router.push("/chatbot");
+    router.push({ name: "Chatbot" });
   } else {
     antNotification(
       "warning",
-      "Prompt",
-      "There is no available pipeline. Please create or activate it first."
+      t("common.prompt"),
+      t("pipeline.notActivatedTip")
     );
   }
 };
@@ -143,8 +138,12 @@ onMounted(() => {
 <style scoped lang="less">
 .setting-container {
   position: relative;
+  display: block !important;
+  padding: 24px;
+  width: 100%;
 
   .chatbot-wrap {
+    display: none;
     padding: 12px 8px;
     position: absolute;
     transform: translateY(-50%);
@@ -154,7 +153,7 @@ onMounted(() => {
     background-color: var(--bg-content-color);
     box-shadow: 0px 2px 4px 0px var(--bg-box-shadow);
     border-radius: 6px;
-    display: flex;
+    // display: flex;
     flex-direction: column;
     align-items: center;
     cursor: pointer;

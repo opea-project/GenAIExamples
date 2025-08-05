@@ -1,107 +1,93 @@
 <template>
-  <div class="pipeline-container">
-    <a-affix :offset-top="450">
-      <div class="setting-icon" @click="jumpPipeline">
-        <SvgIcon
-          name="icon-setting"
-          :size="32"
-          :style="{ color: 'var(--color-big-icon)' }"
-          inherit
+  <div class="chat-container">
+    <a-layout class="content-container">
+      <a-layout-sider :width="currentMenu === 'knowledge' ? 240 : 0">
+        <KnowledgeBase
+          @view="handleViewKBDetial"
+          v-if="currentMenu === 'knowledge'"
         />
-        <div>Pipeline</div>
-      </div></a-affix
-    >
-    <!-- system status -->
-    <Header @config="handleConfig" />
-    <!-- chatbot-->
-    <Chatbot :configuration="chatbotConfiguration" />
-    <!-- upload file-->
-    <UploadFile />
-    <!-- config chatbot -->
-    <ConfigDrawer
-      v-if="configDrawer.visible"
-      :drawer-data="configDrawer.data"
-      @close="configDrawer.visible = false"
-      @update="handleUpdateConfiguration"
-    />
+      </a-layout-sider>
+      <a-layout-content>
+        <keep-alive>
+          <component
+            :is="currentComponent"
+            class="body-wrap"
+            :kb-name="kbName"
+            @back="handleBack"
+          />
+        </keep-alive>
+      </a-layout-content>
+    </a-layout>
   </div>
 </template>
 
 <script lang="ts" setup name="Chatbot">
-import router from "@/router";
-import { chatbotAppStore } from "@/store/chatbot";
-import { onMounted, reactive } from "vue";
-import { Chatbot, ConfigDrawer, Header, UploadFile } from "./components";
-import { ConfigType } from "./type";
+import { onMounted, computed } from "vue";
+import { Chatbot, KnowledgeDetial, KnowledgeBase } from "./components";
 
-const chatbotStore = chatbotAppStore();
+const route = useRoute();
 
-let chatbotConfiguration = reactive<ConfigType>({
-  top_n: 5,
-  temperature: 0.1,
-  top_p: 1,
-  top_k: 50,
-  repetition_penalty: 1.1,
-  max_tokens: 512,
-  stream: true,
-});
-const configDrawer = reactive<DialogType>({
-  visible: false,
-  data: {},
+const currentMenu = ref<string>("chat");
+const currentPage = ref<string>("chat");
+const kbName = ref<string>("");
+
+const componentList = ref<EmptyArrayType>([
+  {
+    label: "chat.title",
+    id: "chat",
+    icon: "icon-chat",
+    component: markRaw(Chatbot),
+  },
+  {
+    label: "knowledge.title",
+    id: "knowledge",
+    icon: "icon-knowledge",
+    component: markRaw(KnowledgeDetial),
+  },
+]);
+
+const currentComponent = computed(() => {
+  return componentList.value.find((item) => item.id === currentPage.value)
+    ?.component;
 });
 
-const handleConfig = () => {
-  configDrawer.visible = true;
-  configDrawer.data = chatbotConfiguration;
+const handleViewKBDetial = (name: string) => {
+  kbName.value = name;
+  if (kbName.value) currentPage.value = "knowledge";
+  else currentPage.value = "chat";
 };
-//Jump Pipeline
-const jumpPipeline = () => {
-  router.push("/pipeline");
+const handleBack = () => {
+  currentPage.value = "chat";
 };
-const handleUpdateConfiguration = (configuration: ConfigType) => {
-  chatbotConfiguration = {
-    ...chatbotConfiguration,
-    ...configuration,
-  };
-  chatbotStore.setChatbotConfiguration(configuration);
-};
-onMounted(() => {
-  if (chatbotStore?.configuration)
-    chatbotConfiguration = {
-      ...chatbotConfiguration,
-      ...chatbotStore.configuration,
-    };
-});
+watch(
+  () => route,
+  (route) => {
+    if (route.query?.type === "kb") {
+      currentMenu.value = "knowledge";
+    } else {
+      currentMenu.value = "chat";
+      currentPage.value = "chat";
+    }
+  },
+  { immediate: true, deep: true }
+);
+onMounted(() => {});
 </script>
 
 <style scoped lang="less">
-.pipeline-container {
+.chat-container {
   position: relative;
-
-  .setting-icon {
-    padding: 12px 8px;
-    position: absolute;
-    transform: translateY(-50%);
-    top: 40%;
-    left: -80px;
-    z-index: 99;
-    background-color: var(--bg-content-color);
-    box-shadow: 0px 2px 4px 0px var(--bg-box-shadow);
-    border-radius: 6px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--font-main-color);
-    &:hover {
-      color: var(--color-primary);
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  .intel-layout.intel-layout-has-sider {
+    height: 100%;
+    background-color: transparent;
+    .intel-layout-content {
+      overflow: auto;
     }
-  }
-  @media (max-width: 1100px) {
-    .setting-icon {
-      left: 0;
+    .intel-layout-sider {
+      background-color: transparent;
     }
   }
 }

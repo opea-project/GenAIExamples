@@ -12,12 +12,15 @@
   }
   code,
   tt {
-    background-color: var(--color-primaryBg);
+    background-color: var(--message-bg);
     border-radius: 6px;
     font-size: 85%;
     margin: 0;
     padding: 0.2em 0.4em;
     white-space: break-spaces;
+  }
+  pre {
+    margin-bottom: 0;
   }
   h1,
   h2,
@@ -68,5 +71,80 @@
 
   img[align="left"] {
     padding-right: 20px;
+  }
+  table {
+    width: 100%;
+    margin-top: 16px;
+    border: 1px solid var(--border-main-color);
+    border-collapse: collapse;
+    color: var(--font-main-color);
+  }
+  table th {
+    background-color: var(--table-th-bg);
+    font-weight: 600;
+    text-align: left;
+  }
+
+  table td,
+  table th {
+    border: 1px solid var(--border-main-color);
+    padding: 6px 13px;
+    margin: 0;
+  }
+  table td {
+    background-color: var(--table-td-bg);
+  }
+  table td > :last-child {
+    margin-bottom: 0;
+  }
+
+  table tr {
+    font-size: 14px;
+    border-top: 1px solid var(--border-main-color);
+  }
+
+  blockquote {
+    color: var(--blockquote-color);
+    border-left: 3px solid var(--color-scrollbar);
+    margin: 8px 0px;
+    padding: 0px 10px;
+  }
+  .intel-highlighter {
+    width: 100%;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-top: 16px;
+    margin-bottom: 12px;
+    .header-wrap {
+      align-items: center;
+      background-color: var(--code-header-bg);
+      color: var(--code-header-font);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 14px;
+      height: 32px;
+      padding: 0 14px;
+      .copy-icon {
+        display: block;
+        color: var(--font-main-color);
+        cursor: pointer;
+        &:hover {
+          color: var(--color-primary);
+        }
+      }
+      .success-icon {
+        display: none;
+        color: var(--color-success);
+      }
+    }
+    .content-wrap {
+      overflow-x: auto;
+      background: var(--code-content-bg);
+      padding: 16px;
+      font-size: 13px;
+      margin-top: 0;
+      color: var(--font-main-color);
+    }
   }
 }

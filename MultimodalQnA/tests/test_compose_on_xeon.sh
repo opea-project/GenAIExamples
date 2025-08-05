@@ -45,19 +45,13 @@ function check_service_ready() {
 
 function build_docker_images() {
     opea_branch=${opea_branch:-"main"}
-    # If the opea_branch isn't main, replace the git clone branch in Dockerfile.
-    if [[ "${opea_branch}" != "main" ]]; then
-        cd $WORKPATH
-        OLD_STRING="RUN git clone --depth 1 https://github.com/opea-project/GenAIComps.git"
-        NEW_STRING="RUN git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git"
-        find . -type f -name "Dockerfile*" | while read -r file; do
-            echo "Processing file: $file"
-            sed -i "s|$OLD_STRING|$NEW_STRING|g" "$file"
-        done
-    fi
 
     cd $WORKPATH/docker_image_build
     git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
+    pushd GenAIComps
+    echo "GenAIComps test commit is $(git rev-parse HEAD)"
+    docker build --no-cache -t ${REGISTRY}/comps-base:${TAG} --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
+    popd && sleep 1s
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
     service_list="multimodalqna multimodalqna-ui embedding-multimodal-bridgetower embedding retriever speecht5 lvm-llava lvm dataprep whisper"
@@ -67,40 +61,9 @@ function build_docker_images() {
 
 function setup_env() {
     export host_ip=${ip_address}
-    export MM_EMBEDDING_SERVICE_HOST_IP=${host_ip}
-    export MM_RETRIEVER_SERVICE_HOST_IP=${host_ip}
-    export LVM_SERVICE_HOST_IP=${host_ip}
-    export MEGA_SERVICE_HOST_IP=${host_ip}
-    export WHISPER_PORT=7066
-    export MAX_IMAGES=1
-    export WHISPER_MODEL="base"
-    export WHISPER_SERVER_ENDPOINT="http://${host_ip}:${WHISPER_PORT}/v1/asr"
-    export TTS_PORT=7055
-    export TTS_ENDPOINT="http://${host_ip}:${TTS_PORT}/v1/tts"
-    export REDIS_DB_PORT=6379
-    export REDIS_INSIGHTS_PORT=8001
-    export REDIS_URL="redis://${host_ip}:${REDIS_DB_PORT}"
-    export REDIS_HOST=${host_ip}
-    export INDEX_NAME="mm-rag-redis"
-    export DATAPREP_MMR_PORT=6007
-    export DATAPREP_INGEST_SERVICE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/dataprep/ingest"
-    export DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/dataprep/generate_transcripts"
-    export DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/dataprep/generate_captions"
-    export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/dataprep/get"
-    export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/dataprep/delete"
-    export EMM_BRIDGETOWER_PORT=6006
-    export BRIDGE_TOWER_EMBEDDING=true
-    export EMBEDDING_MODEL_ID="BridgeTower/bridgetower-large-itm-mlm-itc"
-    export MMEI_EMBEDDING_ENDPOINT="http://${host_ip}:$EMM_BRIDGETOWER_PORT"
-    export MM_EMBEDDING_PORT_MICROSERVICE=6000
-    export REDIS_RETRIEVER_PORT=7000
-    export LVM_PORT=9399
-    export LLAVA_SERVER_PORT=8399
+    cd $WORKPATH/docker_compose/intel
+    source set_env.sh
     export LVM_MODEL_ID="llava-hf/llava-1.5-7b-hf"
-    export LVM_ENDPOINT="http://${host_ip}:$LLAVA_SERVER_PORT"
-    export MEGA_SERVICE_PORT=8888
-    export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:$MEGA_SERVICE_PORT/v1/multimodalqna"
-    export UI_PORT=5173
 }
 
 
@@ -118,7 +81,7 @@ function prepare_data() {
     wget https://github.com/docarray/docarray/blob/main/tests/toydata/image-data/apple.png?raw=true -O ${image_fn}
     wget https://github.com/intel/intel-extension-for-transformers/raw/refs/tags/v1.5/intel_extension_for_transformers/neural_chat/ui/customized/talkingbot/src/lib/components/talkbot/assets/mid-age-man.mp3 -O ${audio_fn}
     wget http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4 -O ${video_fn}
-    wget https://raw.githubusercontent.com/opea-project/GenAIComps/v1.1/comps/retrievers/redis/data/nke-10k-2023.pdf -O ${pdf_fn}
+    wget https://raw.githubusercontent.com/opea-project/GenAIComps/v1.3/comps/third_parties/pathway/src/data/nke-10k-2023.pdf -O ${pdf_fn}
     echo "Writing caption file"
     echo "This is an apple."  > ${caption_fn}
     sleep 1m
@@ -398,26 +361,44 @@ function stop_docker() {
 function main() {
 
     setup_env
+
+    echo "::group::stop_docker"
     stop_docker
+    echo "::endgroup::"
+
+    echo "::group::build_docker_images"
     if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
-    start_time=$(date +%s)
+    echo "::endgroup::"
+
+    echo "::group::start_services"
     start_services
-    end_time=$(date +%s)
-    duration=$((end_time-start_time))
-    echo "Mega service start duration is $duration s" && sleep 1s
+    echo "::endgroup::"
+
+    echo "::group::prepare_data"
     prepare_data
+    echo "::endgroup::"
 
+    echo "::group::validate_microservices"
     validate_microservices
-    echo "==== microservices validated ===="
+    echo "::endgroup::"
+
+    echo "::group::validate_megaservice"
     validate_megaservice
-    echo "==== megaservice validated ===="
+    echo "::endgroup::"
+
+    echo "::group::validate_delete"
     validate_delete
-    echo "==== delete validated ===="
+    echo "::endgroup::"
 
+    echo "::group::delete_data"
     delete_data
-    stop_docker
-    echo y | docker system prune
+    echo "::endgroup::"
 
+    echo "::group::stop_docker"
+    stop_docker
+    echo "::endgroup::"
+
+    docker system prune -f
 }
 
 main

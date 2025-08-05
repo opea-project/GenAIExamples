@@ -14,21 +14,13 @@ services:
     image: ${REGISTRY:-opea}/edgecraftrag:${TAG:-latest}
   edgecraftrag-server:
     build:
+      context: ../
       dockerfile: ./Dockerfile.server
     extends: edgecraftrag
     image: ${REGISTRY:-opea}/edgecraftrag-server:${TAG:-latest}
   edgecraftrag-ui:
     build:
+      context: ../
       dockerfile: ./ui/docker/Dockerfile.ui
     extends: edgecraftrag
     image: ${REGISTRY:-opea}/edgecraftrag-ui:${TAG:-latest}
-  edgecraftrag-ui-gradio:
-    build:
-      dockerfile: ./ui/docker/Dockerfile.gradio
-    extends: edgecraftrag
-    image: ${REGISTRY:-opea}/edgecraftrag-ui-gradio:${TAG:-latest}
-  vllm-arc:
-    build:
-      context: GenAIComps
-      dockerfile: comps/third_parties/vllm/src/Dockerfile.intel_gpu
-    image: ${REGISTRY:-opea}/vllm-arc:${TAG:-latest}

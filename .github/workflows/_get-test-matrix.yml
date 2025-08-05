@@ -3,14 +3,24 @@
 
 # Support push and pull_request events
 name: Get Test Matrix
-permissions: read-all
+permissions:
+  actions: read
+  contents: read
+  checks: read
+  deployments: read
+  issues: read
+  packages: read
+  pages: read
+  pull-requests: read
+  statuses: read
+  security-events: read
 on:
   workflow_call:
     inputs:
       diff_excluded_files:
         required: false
         type: string
-        default: '.github|README.md|*.txt'
+        default: '.github|README.md'
       test_mode:
         required: false
         type: string

@@ -27,10 +27,10 @@ git clone https://github.com/opea-project/GenAIExamples.git
 cd GenAIExamples/Translation/docker_compose/amd/gpu/rocm/
 ```
 
-Checkout a released version, such as v1.2:
+Checkout a released version, such as v1.3:
 
 ```
-git checkout v1.2
+git checkout v1.3
 ```
 
 ### Generate a HuggingFace Access Token

@@ -21,19 +21,14 @@ export caption_fn="apple.txt"
 
 function build_docker_images() {
     opea_branch=${opea_branch:-"main"}
-    # If the opea_branch isn't main, replace the git clone branch in Dockerfile.
-    if [[ "${opea_branch}" != "main" ]]; then
-        cd $WORKPATH
-        OLD_STRING="RUN git clone --depth 1 https://github.com/opea-project/GenAIComps.git"
-        NEW_STRING="RUN git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git"
-        find . -type f -name "Dockerfile*" | while read -r file; do
-            echo "Processing file: $file"
-            sed -i "s|$OLD_STRING|$NEW_STRING|g" "$file"
-        done
-    fi
 
     cd $WORKPATH/docker_image_build
-    git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
+    git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
+    pushd GenAIComps
+    echo "GenAIComps test commit is $(git rev-parse HEAD)"
+    docker build --no-cache -t ${REGISTRY}/comps-base:${TAG} --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
+    popd && sleep 1s
+
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
     service_list="multimodalqna multimodalqna-ui embedding-multimodal-bridgetower embedding retriever lvm dataprep whisper"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
@@ -42,38 +37,10 @@ function build_docker_images() {
 }
 
 function setup_env() {
-    export HOST_IP=${ip_address}
     export host_ip=${ip_address}
-    export MULTIMODAL_HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
-    export MULTIMODAL_TGI_SERVICE_PORT="8399"
-    export no_proxy=${your_no_proxy}
-    export http_proxy=${your_http_proxy}
-    export https_proxy=${your_http_proxy}
-    export BRIDGE_TOWER_EMBEDDING=true
-    export EMBEDDER_PORT=6006
-    export MMEI_EMBEDDING_ENDPOINT="http://${HOST_IP}:$EMBEDDER_PORT"
-    export MM_EMBEDDING_PORT_MICROSERVICE=6000
-    export WHISPER_SERVER_PORT=7066
-    export WHISPER_SERVER_ENDPOINT="http://${HOST_IP}:${WHISPER_SERVER_PORT}/v1/asr"
-    export REDIS_URL="redis://${HOST_IP}:6379"
-    export REDIS_HOST=${HOST_IP}
-    export INDEX_NAME="mm-rag-redis"
-    export LLAVA_SERVER_PORT=8399
-    export LVM_ENDPOINT="http://${HOST_IP}:8399"
-    export EMBEDDING_MODEL_ID="BridgeTower/bridgetower-large-itm-mlm-itc"
-    export LVM_MODEL_ID="Xkev/Llama-3.2V-11B-cot"
-    export WHISPER_MODEL="base"
-    export MM_EMBEDDING_SERVICE_HOST_IP=${HOST_IP}
-    export MM_RETRIEVER_SERVICE_HOST_IP=${HOST_IP}
-    export LVM_SERVICE_HOST_IP=${HOST_IP}
-    export MEGA_SERVICE_HOST_IP=${HOST_IP}
-    export BACKEND_SERVICE_ENDPOINT="http://${HOST_IP}:8888/v1/multimodalqna"
-    export DATAPREP_INGEST_SERVICE_ENDPOINT="http://${HOST_IP}:6007/v1/dataprep/ingest"
-    export DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT="http://${HOST_IP}:6007/v1/dataprep/generate_transcripts"
-    export DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT="http://${HOST_IP}:6007/v1/dataprep/generate_captions"
-    export DATAPREP_GET_FILE_ENDPOINT="http://${HOST_IP}:6007/v1/dataprep/get"
-    export DATAPREP_DELETE_FILE_ENDPOINT="http://${HOST_IP}:6007/v1/dataprep/delete"
     export MODEL_CACHE=${model_cache:-"/var/opea/multimodalqna-service/data"}
+    cd $WORKPATH/docker_compose/amd/gpu/rocm
+    source set_env.sh
 }
 
 function start_services() {
@@ -317,25 +284,44 @@ function stop_docker() {
 function main() {
 
     setup_env
+
+    echo "::group::stop_docker"
     stop_docker
+    echo "::endgroup::"
+
+    echo "::group::build_docker_images"
     if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
-    start_time=$(date +%s)
+    echo "::endgroup::"
+
+    echo "::group::start_services"
     start_services
-    end_time=$(date +%s)
-    duration=$((end_time-start_time))
-    echo "Mega service start duration is $duration s" && sleep 1s
+    echo "::endgroup::"
+
+    echo "::group::prepare_data"
     prepare_data
+    echo "::endgroup::"
 
+    echo "::group::validate_microservices"
     validate_microservices
-    echo "==== microservices validated ===="
-    validate_megaservice
-    echo "==== megaservice validated ===="
-    validate_delete
-    echo "==== delete validated ===="
+    echo "::endgroup::"
 
+    echo "::group::validate_megaservice"
+    validate_megaservice
+    echo "::endgroup::"
+
+    echo "::group::validate_delete"
+    validate_delete
+    echo "::endgroup::"
+
+    echo "::group::delete_data"
     delete_data
+    echo "::endgroup::"
+
+    echo "::group::stop_docker"
     stop_docker
-    echo y | docker system prune
+    echo "::endgroup::"
+
+    docker system prune -f
 
 }
 

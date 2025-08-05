@@ -24,8 +24,8 @@ function build_docker_images() {
     docker build --no-cache -t ${REGISTRY}/comps-base:${TAG} --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
     popd && sleep 1s
     git clone https://github.com/HabanaAI/vllm-fork.git && cd vllm-fork
-    VLLM_VER=v0.6.6.post1+Gaudi-1.20.0
-    git checkout ${VLLM_VER} &> /dev/null && cd ../
+    VLLM_FORK_VER=v0.6.6.post1+Gaudi-1.20.0
+    git checkout ${VLLM_FORK_VER} &> /dev/null && cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
     service_list="chatqna chatqna-ui dataprep retriever llm-faqgen vllm-gaudi nginx"
@@ -36,30 +36,10 @@ function build_docker_images() {
 
 function start_services() {
     cd $WORKPATH/docker_compose/intel/hpu/gaudi
-    export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
-    export RERANK_MODEL_ID="BAAI/bge-reranker-base"
-    export LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
-    export NUM_CARDS=1
-    export INDEX_NAME="rag-redis"
-    export host_ip=${ip_address}
-    export LLM_ENDPOINT_PORT=8010
-    export LLM_SERVER_PORT=9001
-    export CHATQNA_BACKEND_PORT=8888
-    export CHATQNA_REDIS_VECTOR_PORT=6377
-    export CHATQNA_REDIS_VECTOR_INSIGHT_PORT=8006
-    export CHATQNA_FRONTEND_SERVICE_PORT=5175
-    export NGINX_PORT=80
-    export FAQGen_COMPONENT_NAME="OpeaFaqGenvLLM"
-    export LLM_ENDPOINT="http://${host_ip}:${LLM_ENDPOINT_PORT}"
-    export HF_TOKEN=${HF_TOKEN}
-    export VLLM_SKIP_WARMUP=true
-    export LOGFLAG=True
-    export http_proxy=${http_proxy}
-    export https_proxy=${https_proxy}
-    export no_proxy="${ip_address},redis-vector-db,dataprep-redis-service,tei-embedding-service,retriever,tei-reranking-service,tgi-service,vllm-service,guardrails,llm-faqgen,chatqna-gaudi-backend-server,chatqna-gaudi-ui-server,chatqna-gaudi-nginx-server"
+    source set_env_faqgen.sh
 
     # Start Docker Containers
-    docker compose -f compose_faqgen.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
+    docker compose -f compose_faqgen.yaml up -d --quiet-pull > ${LOG_PATH}/start_services_with_compose.log
 
     sleep 30s
 }

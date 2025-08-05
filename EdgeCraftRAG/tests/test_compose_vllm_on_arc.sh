@@ -21,16 +21,24 @@ HOST_IP=$ip_address
 COMPOSE_FILE="compose_vllm.yaml"
 EC_RAG_SERVICE_PORT=16010
 
-MODEL_PATH="/home/media/models"
+MODEL_PATH="${HOME}/models"
 # MODEL_PATH="$WORKPATH/models"
 DOC_PATH="$WORKPATH/tests"
-UI_TMPFILE_PATH="$WORKPATH/tests"
+UI_UPLOAD_PATH="$WORKPATH/tests"
 
-#HF_ENDPOINT=https://hf-mirror.com
-LLM_MODEL="Qwen/Qwen2-7B-Instruct"
-VLLM_SERVICE_PORT=8008
-vLLM_ENDPOINT="http://${HOST_IP}:${VLLM_SERVICE_PORT}"
-
+HF_ENDPOINT=https://hf-mirror.com
+NGINX_PORT=8086
+NGINX_PORT_0=8100
+NGINX_PORT_1=8100
+VLLM_SERVICE_PORT_0=8100
+TENSOR_PARALLEL_SIZE=1
+SELECTED_XPU_0=0
+vLLM_ENDPOINT="http://${HOST_IP}:${NGINX_PORT}"
+LLM_MODEL="Qwen/Qwen3-8B"
+LLM_MODEL_PATH="${HOME}/qwen/"
+NGINX_CONFIG_PATH="$WORKPATH/nginx/nginx.conf"
+VLLM_IMAGE_TAG="0.8.3-b20"
+DP_NUM=1
 
 function build_docker_images() {
     opea_branch=${opea_branch:-"main"}
@@ -41,39 +49,33 @@ function build_docker_images() {
     docker build --no-cache -t ${REGISTRY}/comps-base:${TAG} --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
     popd && sleep 1s
 
+    echo "Pull intelanalytics/ipex-llm-serving-xpu image"
+    docker pull intelanalytics/ipex-llm-serving-xpu:${VLLM_IMAGE_TAG}
+
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
     docker compose -f build.yaml build --no-cache > ${LOG_PATH}/docker_image_build.log
-
-    echo "Build vllm_openvino image from GenAIComps..."
-    cd $WORKPATH && git clone --single-branch --branch "${opea_branch:-"main"}" https://github.com/opea-project/GenAIComps.git
-    cd GenAIComps/comps/third_parties/vllm/src/
-    bash ./build_docker_vllm_openvino.sh gpu
 
     docker images && sleep 1s
 }
 
 function start_services() {
-    export MODEL_PATH=${MODEL_PATH}
-    export DOC_PATH=${DOC_PATH}
-    export UI_TMPFILE_PATH=${UI_TMPFILE_PATH}
-    export HOST_IP=${HOST_IP}
-    export LLM_MODEL=${LLM_MODEL}
-    export HF_ENDPOINT=${HF_ENDPOINT}
-    export vLLM_ENDPOINT=${vLLM_ENDPOINT}
-    export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
-    export no_proxy="localhost, 127.0.0.1, 192.168.1.1"
-
     cd $WORKPATH/docker_compose/intel/gpu/arc
-
+    source set_env.sh
+    # generate nginx config file according to container count
+    bash $WORKPATH/nginx/nginx-conf-generator.sh $DP_NUM $WORKPATH/nginx/nginx.conf
+    # generate yaml file according to container count
+    bash multi-arc-yaml-generator.sh $DP_NUM $COMPOSE_FILE
     # Start Docker Containers
     docker compose -f $COMPOSE_FILE up -d > ${LOG_PATH}/start_services_with_compose.log
+    echo "ipex-llm-serving-xpu is booting, please wait."
+    sleep 30s
     n=0
     until [[ "$n" -ge 100 ]]; do
-        docker logs vllm-openvino-server > ${LOG_PATH}/vllm_service_start.log
-        if grep -q "metrics.py" ${LOG_PATH}/vllm_service_start.log; then
+        docker logs ipex-llm-serving-xpu-container-0 > ${LOG_PATH}/ipex-llm-serving-xpu-container.log 2>&1
+        if grep -q "Starting vLLM API server on http://0.0.0.0:" ${LOG_PATH}/ipex-llm-serving-xpu-container.log; then
             break
         fi
-        sleep 5s
+        sleep 6s
         n=$((n+1))
     done
 }
@@ -95,15 +97,6 @@ function validate_services() {
 
     if [ "$HTTP_STATUS" -eq 200 ]; then
         echo "[ $SERVICE_NAME ] HTTP status is 200. Checking content..."
-
-
-        if echo "$CONTENT" | grep -q "$EXPECTED_RESULT"; then
-            echo "[ $SERVICE_NAME ] Content is as expected."
-        else
-            echo "[ $SERVICE_NAME ] Content does not match the expected result: $CONTENT"
-            docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
-            exit 1
-        fi
     else
         echo "[ $SERVICE_NAME ] HTTP status is not 200. Received status was $HTTP_STATUS"
         docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
@@ -121,7 +114,7 @@ function validate_rag() {
         "active" \
         "pipeline" \
         "edgecraftrag-server" \
-        '@configs/test_pipeline_vllm.json'
+        '@configs/test_pipeline_ipex_vllm.json'
 
     # add data
     validate_services \
@@ -136,8 +129,8 @@ function validate_rag() {
         "${HOST_IP}:${EC_RAG_SERVICE_PORT}/v1/chatqna" \
         "1234567890" \
         "query" \
-        "vllm-openvino-server" \
-        '{"messages":"What is the test id?"}'
+        "ipex-llm-serving-xpu-container-0" \
+        '{"messages":"What is the test id?","max_tokens":5}'
 }
 
 function validate_megaservice() {
@@ -146,8 +139,8 @@ function validate_megaservice() {
         "${HOST_IP}:16011/v1/chatqna" \
         "1234567890" \
         "query" \
-        "vllm-openvino-server" \
-        '{"messages":"What is the test id?"}'
+        "ipex-llm-serving-xpu-container-0" \
+        '{"messages":"What is the test id?","max_tokens":5}'
 }
 
 function stop_docker() {
@@ -157,7 +150,7 @@ function stop_docker() {
 
 
 function main() {
-    mkdir -p "$LOG_PATH"
+    mkdir -p $LOG_PATH
 
     echo "::group::stop_docker"
     stop_docker

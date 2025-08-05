@@ -27,7 +27,7 @@ function build_docker_images() {
 
     git clone https://github.com/vllm-project/vllm.git
     cd ./vllm/
-    VLLM_VER="v0.8.3"
+    VLLM_VER=v0.9.0.1
     echo "Check out vLLM tag ${VLLM_VER}"
     git checkout ${VLLM_VER} &> /dev/null && cd ../
 
@@ -40,21 +40,8 @@ function build_docker_images() {
 
 function start_services() {
     cd $WORKPATH/docker_compose/intel/cpu/xeon/
-    export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
-    export LLM_MODEL_ID=meta-llama/Meta-Llama-3-8B-Instruct
-
-    export MEGA_SERVICE_HOST_IP=${ip_address}
-    export WHISPER_SERVER_HOST_IP=${ip_address}
-    export GPT_SOVITS_SERVER_HOST_IP=${ip_address}
-    export LLM_SERVER_HOST_IP=${ip_address}
-
-    export WHISPER_SERVER_PORT=7066
-    export GPT_SOVITS_SERVER_PORT=9880
-    export LLM_SERVER_PORT=3006
-
-    export BACKEND_SERVICE_ENDPOINT=http://${ip_address}:3008/v1/audioqna
     export host_ip=${ip_address}
-
+    source set_env.sh
     # sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
     # Start Docker Containers
