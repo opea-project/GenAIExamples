@@ -45,6 +45,7 @@ Deployment is based on released docker images by default - check [docker image l
 
 - For Docker Compose-based deployment, you should have docker compose installed. Refer to [docker compose install](https://docs.docker.com/compose/install/) for more information.
 - For Kubernetes-based deployment, you can use [Helm](https://helm.sh) or [GMC](https://github.com/opea-project/GenAIInfra/tree/main/microservices-connector/README.md)-based deployment.
+
   - You should have a kubernetes cluster ready for use. If not, you can refer to [k8s install](https://github.com/opea-project/docs/tree/main/guide/installation/k8s_install/README.md) to deploy one.
   - (Optional) You should have Helm (version >= 3.15) installed if you want to deploy with Helm Charts. Refer to the [Helm Installation Guide](https://helm.sh/docs/intro/install/) for more information.
   - (Optional) You should have GMC installed to your kubernetes cluster if you want to try with GMC. Refer to [GMC install](https://github.com/opea-project/docs/blob/main/guide/installation/gmc_install/gmc_install.md) for more information.
