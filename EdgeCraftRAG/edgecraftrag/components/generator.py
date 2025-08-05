@@ -115,7 +115,7 @@ async def stream_generator(llm, prompt_str, unstructured_str):
 
 class QnAGenerator(BaseComponent):
 
-    def __init__(self, llm_model, prompt_template_file, inference_type, vllm_endpoint, **kwargs):
+    def __init__(self, llm_model, prompt_template_file, inference_type, vllm_endpoint, prompt_content, **kwargs):
         BaseComponent.__init__(
             self,
             comp_type=CompType.GENERATOR,
@@ -136,7 +136,10 @@ class QnAGenerator(BaseComponent):
             self.lock = asyncio.Lock()
         # using the prompt template enhancement strategy(only tested on Qwen2-7B-Instruction) if template_enhance_on is true
         self.template_enhance_on = True if "Qwen2" in self.model_id else False
-        if prompt_template_file is None:
+        if prompt_content:
+           self.set_prompt(prompt_content)
+           self.prompt = get_prompt_template(self.model_id, self.prompt)
+        elif prompt_template_file is None:
             print("There is no template file, using the default template.")
             prompt_template = get_prompt_template(self.model_id)
             self.prompt = (
@@ -154,7 +157,7 @@ class QnAGenerator(BaseComponent):
             if self.template_enhance_on:
                 self.prompt = DocumentedContextRagPromptTemplate.from_file(template_path)
             else:
-                self.prompt = get_prompt_template(self.model_id, template_path)
+                self.prompt = get_prompt_template(self.model_id, prompt_content, template_path)
 
         self.llm = llm_model
         if isinstance(llm_model, str):
@@ -172,8 +175,8 @@ class QnAGenerator(BaseComponent):
     def set_prompt(self, prompt):
         if "{context}" not in prompt:
             prompt += "\n<|im_start|>{context}<|im_end|>"
-        if "{input}" not in prompt:
-            prompt += "\n<|im_start|>{input}"
+        if "{chat_history}" not in prompt:
+            prompt += "\n<|im_start|>{chat_history}"
         self.prompt = prompt
 
     def reset_prompt(self):
@@ -201,11 +204,12 @@ class QnAGenerator(BaseComponent):
             origin_text = n.node.get_text()
             text_gen_context += self.clean_string(origin_text.strip())
         query = chat_request.messages
+        chat_history = concat_history(chat_request.messages)
         if sub_questions:
             final_query = f"{query}\n\n### Sub-questions ###\nThe following list is how you should consider the answer, you MUST follow these steps when responding:\n\n{sub_questions}"
         else:
             final_query = query
-        prompt_str = self.prompt.format(input=final_query, context=text_gen_context)
+        prompt_str = self.prompt.format(input=final_query, chat_history= chat_history, context=text_gen_context)
         return text_gen_context, prompt_str
 
     def run(self, chat_request, retrieved_nodes, node_parser_type, **kwargs):
@@ -213,7 +217,6 @@ class QnAGenerator(BaseComponent):
             # This could happen when User delete all LLMs through RESTful API
             raise ValueError("No LLM available, please load LLM")
         # query transformation
-        chat_request.messages = concat_history(chat_request.messages)
         sub_questions = kwargs.get("sub_questions", None)
         text_gen_context, prompt_str = self.query_transform(chat_request, retrieved_nodes, sub_questions=sub_questions)
         generate_kwargs = dict(
@@ -241,7 +244,6 @@ class QnAGenerator(BaseComponent):
 
     def run_vllm(self, chat_request, retrieved_nodes, node_parser_type, **kwargs):
         # query transformation
-        chat_request.messages = concat_history(chat_request.messages)
         sub_questions = kwargs.get("sub_questions", None)
         text_gen_context, prompt_str = self.query_transform(chat_request, retrieved_nodes, sub_questions=sub_questions)
         llm = OpenAILike(

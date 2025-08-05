@@ -210,6 +210,7 @@ const handleImageVisible = (value: boolean = false) => {
   imgVisible.value = value;
 };
 const handleNewChat = () => {
+  inputKeywords.value = "";
   messagesList.value = [];
   Local.remove("chat_session_id");
 };

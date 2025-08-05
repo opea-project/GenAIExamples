@@ -1,6 +1,7 @@
 # Copyright (C) 2025 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+import copy
 import json
 import os
 import re
@@ -87,6 +88,8 @@ async def update_knowledge_base(knowledge: KnowledgeBaseCreateIn):
             if knowledge.active and knowledge.active != kb.active:
                 file_paths = kb.get_file_paths()
                 await update_knowledge_base_handler(file_paths, knowledge.name)
+            elif not knowledge.active and kb.description != knowledge.description:
+                pass                
             elif not knowledge.active:
                 raise HTTPException(
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Must have an active knowledge base"
@@ -95,6 +98,8 @@ async def update_knowledge_base(knowledge: KnowledgeBaseCreateIn):
             if knowledge.active and knowledge.active != kb.active:
                 active_pl.indexer.reinitialize_indexer(knowledge.name)
                 active_pl.update_indexer_to_retriever()
+            elif not knowledge.active and kb.description != knowledge.description:
+                pass
             elif not knowledge.active:
                 raise HTTPException(
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Must have an active knowledge base"
@@ -234,7 +239,7 @@ async def load_knowledge_from_file():
     KNOWLEDGEBASE_FILE = os.path.join(CONFIG_DIR, "knowledgebase.json")
     active_pl = ctx.get_pipeline_mgr().get_active_pipeline()
     if os.path.exists(KNOWLEDGEBASE_FILE):
-        with open(KNOWLEDGEBASE_FILE, "r") as f:
+        with open(KNOWLEDGEBASE_FILE, "r", encoding="utf-8") as f:
             all_Knowledgebases = f.read()
         try:
             all_data = json.loads(all_Knowledgebases)
@@ -272,21 +277,25 @@ async def save_knowledge_to_file():
         for kb in kb_base:
             kb_json = {"name": kb.name, "description": kb.description, "active": kb.active, "file_map": kb.file_map}
             knowledgebases_data.append(kb_json)
-        json_str = json.dumps(knowledgebases_data, indent=2)
-        with open(KNOWLEDGEBASE_FILE, "w") as f:
+        json_str = json.dumps(knowledgebases_data, indent=2, ensure_ascii=False)
+        with open(KNOWLEDGEBASE_FILE, "w", encoding="utf-8") as f:
             f.write(json_str)
     except Exception as e:
         print(f"Error saving Knowledge base: {e}")
 
 
-old_milvus_map = {}
+all_pipeline_milvus_maps = {}
+current_pipeline_kb_map = {}
+async def refresh_milvus_map(milvus_name):
+    current_pipeline_kb_map.clear()
+    knowledge_bases_list = await get_all_knowledge_bases()
+    for kb in knowledge_bases_list:
+        current_pipeline_kb_map[kb.name] = kb.file_map
+    all_pipeline_milvus_maps[milvus_name] = copy.deepcopy(current_pipeline_kb_map)
 
 
-async def refresh_milvus_map():
-    old_milvus_map.clear()
-    kb_list = await get_all_knowledge_bases()
-    for kb in kb_list:
-        old_milvus_map[kb.name] = kb.file_map
+def clear_milvus_map(milvus_name):
+    all_pipeline_milvus_maps[milvus_name] = {}
 
 
 async def Synchronizing_vector_data(old_active_pl, new_active_pl):
@@ -295,12 +304,14 @@ async def Synchronizing_vector_data(old_active_pl, new_active_pl):
         active_pl = ctx.get_pipeline_mgr().get_active_pipeline()
         if not active_kb or not active_pl:
             return True
+
         if new_active_pl.indexer.comp_subtype == "milvus_vector":
+            milvus_name = new_active_pl.name
             new_milvus_map = {}
             kb_list = await get_all_knowledge_bases()
             for kb in kb_list:
                 new_milvus_map[kb.name] = kb.file_map
-            added_files, deleted_files = compare_mappings(new_milvus_map, old_milvus_map)
+            added_files, deleted_files = compare_mappings(new_milvus_map, all_pipeline_milvus_maps.get(milvus_name, {}))
             # Synchronization of deleted files
             for kb_name, file_paths in deleted_files.items():
                 if file_paths:
@@ -308,7 +319,8 @@ async def Synchronizing_vector_data(old_active_pl, new_active_pl):
                     if kb_name not in new_milvus_map.keys():
                         continue
                     kb = await get_knowledge_base(kb_name)
-                    new_active_pl.indexer.reinitialize_indexer(kb)
+                    new_active_pl.indexer.reinitialize_indexer(kb_name)
+                    file_paths = kb.get_file_paths()
                     if file_paths:
                         for file in file_paths:
                             await add_data(DataIn(local_path=file))
@@ -321,13 +333,17 @@ async def Synchronizing_vector_data(old_active_pl, new_active_pl):
 
             new_active_pl.indexer.reinitialize_indexer(active_kb.name)
             new_active_pl.update_indexer_to_retriever()
+            await refresh_milvus_map(milvus_name)
         else:
+            milvus_name = old_active_pl.name if old_active_pl else "default_kb"
             new_active_pl.indexer.reinitialize_indexer()
             new_active_pl.update_indexer_to_retriever()
             add_list = active_kb.get_file_paths()
             for file in add_list:
                 await add_data(DataIn(local_path=file))
-            if old_active_pl.indexer.comp_subtype == "milvus_vector":
-                await refresh_milvus_map()
+            if old_active_pl:
+                if old_active_pl.indexer.comp_subtype == "milvus_vector":
+                    await refresh_milvus_map(milvus_name)
     except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Synchronization error")
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, 
+                                detail=e)
