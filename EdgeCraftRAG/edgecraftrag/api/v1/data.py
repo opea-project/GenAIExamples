@@ -102,7 +102,7 @@ async def upload_file(file_name: str, file: UploadFile = File(...)):
         )
     try:
         # DIR for server to save files uploaded by UI
-        UI_DIRECTORY = os.getenv("UI_TMPFILE_PATH", "/home/user/ui_cache")
+        UI_DIRECTORY = os.getenv("TMPFILE_PATH", "/home/user/ui_cache")
         UPLOAD_DIRECTORY = os.path.join(UI_DIRECTORY, file_name)
         os.makedirs(UPLOAD_DIRECTORY, exist_ok=True)
         file_path = os.path.join(UPLOAD_DIRECTORY, file.filename)
