@@ -51,16 +51,15 @@ Deployment is based on released docker images by default - check [docker image l
 
 - Recommended Hardware Reference
 
-  Based on different deployment model sizes and performance requirements, you may choose different hardware platforms or cloud instances. Here are some of the reference platforms: 
-  
-| Use Case     | Deployment model                    | Reference Configuration                                                 | Hardware access/instances                                                                  |
-| ------------ | ----------------------------------- | ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| Xeon         | Intel/neural-chat-7b-v3-3           | 64 vCPUs, 365 GB disk, 100 GB RAM, and Ubuntu 24.04                     | [Intel Tiber Developer Cloud](https://console.cloud.intel.com/)                            |
-| Gaudi        | Intel/neural-chat-7b-v3-3           | 1 or 2 Gaudi Cards, 16 vCPUs, 365 GB disk, 100 GB RAM, and Ubuntu 24.04 | [Intel Tiber Developer Cloud](https://console.cloud.intel.com/)                            |
-| Xeon (AWS)   | Intel/neural-chat-7b-v3-3           | 64 vCPUs, 100 GB disk, 64 GB RAM, and Ubuntu 24.04                      | AWS Cloud (e.g., `c7i.16xlarge`)                                                            |
-| AMD EPYC     | meta-llama/Meta-Llama-3-8B-Instruct | 64 vCPUs, 100 GB disk, 256 GB RAM, and Ubuntu 24.04                     | [Google Cloud Platform](https://www.amd.com/en/ecosystem/csp/google-cloud.html)<br>[Microsoft Azure](https://www.amd.com/en/ecosystem/csp/microsoft-azure.html)<br>[AWS](https://aws.amazon.com/ec2/amd/#topic-0) |
-| AMD Instinct | meta-llama/Llama-3.1-405B           | GPU: 8× MI300X, 1536 GB vRAM, and Ubuntu 24.04                          | [AMD Developer Cloud](https://amd.digitalocean.com/login)<br>[Oracle Cloud Infrastructure](https://www.amd.com/de/products/accelerators/instinct/eval-request/oracle-cloud-infrastructure.html)<br>[Microsoft Azure](https://learn.microsoft.com/en-us/azure/virtual-machines/sizes/gpu-accelerated/ndmi300xv5-series?tabs=sizebasic) |
+  Based on different deployment model sizes and performance requirements, you may choose different hardware platforms or cloud instances. Here are some of the reference platforms:
 
+| Use Case     | Deployment model                    | Reference Configuration                                                 | Hardware access/instances                                                                                                                                                                                                                                                                                                             |
+| ------------ | ----------------------------------- | ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Xeon         | Intel/neural-chat-7b-v3-3           | 64 vCPUs, 365 GB disk, 100 GB RAM, and Ubuntu 24.04                     | [Intel Tiber Developer Cloud](https://console.cloud.intel.com/)                                                                                                                                                                                                                                                                       |
+| Gaudi        | Intel/neural-chat-7b-v3-3           | 1 or 2 Gaudi Cards, 16 vCPUs, 365 GB disk, 100 GB RAM, and Ubuntu 24.04 | [Intel Tiber Developer Cloud](https://console.cloud.intel.com/)                                                                                                                                                                                                                                                                       |
+| Xeon (AWS)   | Intel/neural-chat-7b-v3-3           | 64 vCPUs, 100 GB disk, 64 GB RAM, and Ubuntu 24.04                      | AWS Cloud (e.g., `c7i.16xlarge`)                                                                                                                                                                                                                                                                                                      |
+| AMD EPYC     | meta-llama/Meta-Llama-3-8B-Instruct | 64 vCPUs, 100 GB disk, 256 GB RAM, and Ubuntu 24.04                     | [Google Cloud Platform](https://www.amd.com/en/ecosystem/csp/google-cloud.html)<br>[Microsoft Azure](https://www.amd.com/en/ecosystem/csp/microsoft-azure.html)<br>[AWS](https://aws.amazon.com/ec2/amd/#topic-0)                                                                                                                     |
+| AMD Instinct | meta-llama/Llama-3.1-405B           | GPU: 8× MI300X, 1536 GB vRAM, and Ubuntu 24.04                          | [AMD Developer Cloud](https://amd.digitalocean.com/login)<br>[Oracle Cloud Infrastructure](https://www.amd.com/de/products/accelerators/instinct/eval-request/oracle-cloud-infrastructure.html)<br>[Microsoft Azure](https://learn.microsoft.com/en-us/azure/virtual-machines/sizes/gpu-accelerated/ndmi300xv5-series?tabs=sizebasic) |
 
 #### Deploy Examples
 
@@ -83,6 +82,10 @@ Deployment is based on released docker images by default - check [docker image l
 ## Supported Examples
 
 Check [here](./supported_examples.md) for detailed information of supported examples, models, hardwares, etc.
+
+## Validated Configurations
+
+Check [here](./validated_configurations.md) for the validated configurations of GenAIExamples, including hardware and software versions that have been tested for each release.
 
 ## Contributing to OPEA
 

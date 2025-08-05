@@ -156,8 +156,6 @@ The table below lists the available deployment options and their implementation 
 | Intel Xeon | Docker compose    | [Deployment on Xeon](./docker_compose/intel/cpu/xeon/README.md) |
 | AMD EPYC   | Docker compose    | [Deployment on EPYC](./docker_compose/amd/cpu/epyc/README.md)   |
 
-|
-
 ## Validated Configurations
 
 | **Deploy Method** | **LLM Engine** | **LLM Model**             | **Hardware** |
