@@ -64,7 +64,7 @@ flowchart LR
     style MegaService margin-top:20px,margin-bottom:20px
 ```
 
-This SearchQnA use case performs Search-augmented Question Answering across multiple platforms. Currently, we provide the example for Intel® Gaudi® 2 and Intel® Xeon® Scalable Processors, and we invite contributions from other hardware vendors to expand OPEA ecosystem.
+This SearchQnA use case performs Search-augmented Question Answering across multiple platforms. Currently, we provide the example for Intel® Gaudi® 2, Intel® Xeon® Scalable Processors and AMD EPYC™ Processors, and we invite contributions from other hardware vendors to expand OPEA ecosystem.
 
 ## Deployment Options
 
@@ -74,6 +74,7 @@ The table below lists the available deployment options and their implementation 
 | ---------------------- | ---------------------- | --------------------------------------------------------------------------- |
 | On-premise Deployments | Docker Compose (Xeon)  | [SearchQnA deployment on Xeon](./docker_compose/intel/cpu/xeon/README.md)   |
 |                        | Docker Compose (Gaudi) | [SearchQnA deployment on Gaudi](./docker_compose/intel/hpu/gaudi/README.md) |
+|                        | Docker Compose (EPYC)  | [SearchQnA deployment on AMD EPYC](./docker_compose/amd/cpu/epyc/README.md) |
 |                        | Docker Compose (ROCm)  | [SearchQnA deployment on AMD ROCm](./docker_compose/amd/gpu/rocm/README.md) |
 
 ## Validated Configurations
@@ -82,6 +83,7 @@ The table below lists the available deployment options and their implementation 
 | ----------------- | -------------- | ------------------------- | ------------ |
 | Docker Compose    | vLLM, TGI      | Intel/neural-chat-7b-v3-3 | Intel Gaudi  |
 | Docker Compose    | vLLM, TGI      | Intel/neural-chat-7b-v3-3 | Intel Xeon   |
+| Docker Compose    | vLLM, TGI      | Intel/neural-chat-7b-v3-3 | AMD EPYC     |
 | Docker Compose    | vLLM, TGI      | Intel/neural-chat-7b-v3-3 | AMD ROCm     |
 | Helm Charts       | vLLM, TGI      | Intel/neural-chat-7b-v3-3 | Intel Gaudi  |
 | Helm Charts       | vLLM, TGI      | Intel/neural-chat-7b-v3-3 | Intel Xeon   |
