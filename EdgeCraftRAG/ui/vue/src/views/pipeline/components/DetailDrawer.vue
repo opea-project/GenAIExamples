@@ -99,6 +99,17 @@
                 formData.indexer.embedding_model.device
               }}</span>
             </li>
+            <li
+              class="item-wrap"
+              v-if="formData.indexer.indexer_type === 'milvus_vector'"
+            >
+              <span class="label-wrap">{{
+                $t("pipeline.config.vector_uri")
+              }}</span>
+              <span class="content-wrap">{{
+                formData.indexer.vector_uri
+              }}</span>
+            </li>
           </ul>
         </a-collapse-panel>
       </a-collapse>
@@ -184,15 +195,15 @@
                 formData.generator.inference_type
               }}</span>
             </li>
+            <li class="item-wrap">
+              <span class="label-wrap">{{
+                $t("pipeline.config.language")
+              }}</span>
+              <span class="content-wrap">{{
+                formData.generator.model.model_id
+              }}</span>
+            </li>
             <template v-if="formData.generator.inference_type === 'local'">
-              <li class="item-wrap">
-                <span class="label-wrap">{{
-                  $t("pipeline.config.language")
-                }}</span>
-                <span class="content-wrap">{{
-                  formData.generator.model.model_id
-                }}</span>
-              </li>
               <li class="item-wrap">
                 <span class="label-wrap">{{
                   $t("pipeline.config.llmDevice")
@@ -210,6 +221,14 @@
                 }}</span>
               </li></template
             >
+            <li class="item-wrap" v-else>
+              <span class="label-wrap">{{
+                $t("pipeline.config.vllm_url")
+              }}</span>
+              <span class="content-wrap">{{
+                formData.generator.vllm_endpoint
+              }}</span>
+            </li>
           </ul>
         </a-collapse-panel>
       </a-collapse>

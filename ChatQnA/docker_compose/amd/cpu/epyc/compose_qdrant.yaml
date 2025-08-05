@@ -1,0 +1,173 @@
+# Copyright (C) 2025 Advanced Micro Devices, Inc.
+# Copyright (C) 2025 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  qdrant-vector-db:
+    image: qdrant/qdrant
+    container_name: qdrant-vector-db
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+  dataprep-qdrant-service:
+    image: ${REGISTRY:-opea}/dataprep:${TAG:-latest}
+    container_name: dataprep-qdrant-server
+    depends_on:
+      - qdrant-vector-db
+      - tei-embedding-service
+    ports:
+      - "6043:5000"
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      QDRANT_HOST: qdrant-vector-db
+      QDRANT_PORT: 6333
+      QDRANT_INDEX_NAME: ${INDEX_NAME}
+      TEI_EMBEDDING_ENDPOINT: http://tei-embedding-service:80
+      HF_TOKEN: ${HF_TOKEN}
+      DATAPREP_COMPONENT_NAME: "OPEA_DATAPREP_QDRANT"
+    healthcheck:
+      test:
+        ["CMD-SHELL", "curl -f http://localhost:5000/v1/health_check || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 50
+    restart: unless-stopped
+  tei-embedding-service:
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.7
+    container_name: tei-embedding-server
+    ports:
+      - "6040:80"
+    volumes:
+      - "${MODEL_CACHE:-./data}:/data"
+    shm_size: 1g
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+    command: --model-id ${EMBEDDING_MODEL_ID} --auto-truncate
+  retriever:
+    image: ${REGISTRY:-opea}/retriever:${TAG:-latest}
+    container_name: retriever-qdrant-server
+    depends_on:
+      - qdrant-vector-db
+    ports:
+      - "6045:7000"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      QDRANT_HOST: qdrant-vector-db
+      QDRANT_PORT: 6333
+      INDEX_NAME: ${INDEX_NAME}
+      TEI_EMBEDDING_ENDPOINT: http://tei-embedding-service:80
+      LOGFLAG: ${LOGFLAG}
+      RETRIEVER_COMPONENT_NAME: "OPEA_RETRIEVER_QDRANT"
+    restart: unless-stopped
+  tei-reranking-service:
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.7
+    container_name: tei-reranking-server
+    ports:
+      - "6041:80"
+    volumes:
+      - "${MODEL_CACHE:-./data}:/data"
+    shm_size: 1g
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      HF_TOKEN: ${HF_TOKEN}
+      HF_HUB_DISABLE_PROGRESS_BARS: 1
+      HF_HUB_ENABLE_HF_TRANSFER: 0
+    command: --model-id ${RERANK_MODEL_ID} --auto-truncate
+  vllm-service:
+    image: ${REGISTRY:-opea}/vllm:${TAG:-latest}
+    container_name: vllm-service
+    ports:
+      - "6042:80"
+    volumes:
+      - "${MODEL_CACHE:-./data}:/root/.cache/huggingface/hub"
+    shm_size: 128g
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      HF_TOKEN: ${HF_TOKEN}
+      LLM_MODEL_ID: ${LLM_MODEL_ID}
+      VLLM_TORCH_PROFILER_DIR: "/mnt"
+    command: --model $LLM_MODEL_ID --host 0.0.0.0 --port 80
+  chatqna-epyc-backend-server:
+    image: ${REGISTRY:-opea}/chatqna:${TAG:-latest}
+    container_name: chatqna-epyc-backend-server
+    depends_on:
+      qdrant-vector-db:
+        condition: service_started
+      dataprep-qdrant-service:
+        condition: service_healthy
+      tei-embedding-service:
+        condition: service_started
+      retriever:
+        condition: service_started
+      tei-reranking-service:
+        condition: service_started
+      vllm-service:
+        condition: service_started
+    ports:
+      - "8912:8888"
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - MEGA_SERVICE_HOST_IP=chatqna-epyc-backend-server
+      - EMBEDDING_SERVER_HOST_IP=tei-embedding-service
+      - EMBEDDING_SERVER_PORT=${EMBEDDING_SERVER_PORT:-80}
+      - RETRIEVER_SERVICE_HOST_IP=retriever
+      - RETRIEVER_SERVICE_PORT=${RETRIEVER_SERVICE_PORT:-7000}
+      - RERANK_SERVER_HOST_IP=tei-reranking-service
+      - RERANK_SERVER_PORT=${RERANK_SERVER_PORT:-80}
+      - LLM_SERVER_HOST_IP=vllm-service
+      - LLM_SERVER_PORT=80
+      - LLM_MODEL=${LLM_MODEL_ID}
+      - LOGFLAG=${LOGFLAG}
+    ipc: host
+    restart: always
+  chatqna-epyc-ui-server:
+    image: ${REGISTRY:-opea}/chatqna-ui:${TAG:-latest}
+    container_name: chatqna-epyc-ui-server
+    depends_on:
+      - chatqna-epyc-backend-server
+    ports:
+      - "5173:5173"
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+    ipc: host
+    restart: always
+  chatqna-epyc-nginx-server:
+    image: ${REGISTRY:-opea}/nginx:${TAG:-latest}
+    container_name: chatqna-epyc-nginx-server
+    depends_on:
+      - chatqna-epyc-backend-server
+      - chatqna-epyc-ui-server
+    ports:
+      - "${NGINX_PORT:-80}:80"
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - FRONTEND_SERVICE_IP=chatqna-epyc-ui-server
+      - FRONTEND_SERVICE_PORT=5173
+      - BACKEND_SERVICE_NAME=chatqna
+      - BACKEND_SERVICE_IP=chatqna-epyc-backend-server
+      - BACKEND_SERVICE_PORT=8888
+      - DATAPREP_SERVICE_IP=dataprep-qdrant-service
+      - DATAPREP_SERVICE_PORT=5000
+    ipc: host
+    restart: always
+
+networks:
+  default:
+    driver: bridge

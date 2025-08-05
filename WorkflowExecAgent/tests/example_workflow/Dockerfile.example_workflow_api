@@ -1,0 +1,14 @@
+# Copyright (C) 2025 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+FROM ubuntu:22.04
+
+RUN apt-get -qq update
+
+WORKDIR /home/ubuntu
+
+COPY launch_workflow_service.sh requirements.txt main.py workflow.py ./
+
+RUN chmod +x ./launch_workflow_service.sh
+
+CMD ["./launch_workflow_service.sh"]
