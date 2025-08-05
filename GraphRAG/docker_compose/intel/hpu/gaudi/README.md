@@ -114,28 +114,28 @@ All the GraphRAG containers will be stopped and then removed on completion of th
 
 The compose.yaml is default compose file using tgi as serving framework
 
-| Service Name                     | Image Name                                            |
-| -------------------------------- | ----------------------------------------------------- |
-| neo4j-apoc                       | neo4j:latest                                          |
-| tei-embedding-serving            | ghcr.io/huggingface/text-embeddings-inference:cpu-1.6 |
-| tgi-gaudi-server                 | ghcr.io/huggingface/tgi-gaudi:2.3.1                   |
-| dataprep-neo4j-llamaindex        | opea/dataprep:latest                                  |
-| retriever-neo4j                  | opea/retriever:latest                                 |
-| graphrag-gaudi-backend-server    | opea/graphrag:latest                                  |
-| graphrag-ui-server               | opea/graphrag-ui:latest                               |
-| chatqna-gaudi-nginx-server       | opea/nginx:latest                                     |
+| Service Name                  | Image Name                                            |
+| ----------------------------- | ----------------------------------------------------- |
+| neo4j-apoc                    | neo4j:latest                                          |
+| tei-embedding-serving         | ghcr.io/huggingface/text-embeddings-inference:cpu-1.6 |
+| tgi-gaudi-server              | ghcr.io/huggingface/tgi-gaudi:2.3.1                   |
+| dataprep-neo4j-llamaindex     | opea/dataprep:latest                                  |
+| retriever-neo4j               | opea/retriever:latest                                 |
+| graphrag-gaudi-backend-server | opea/graphrag:latest                                  |
+| graphrag-ui-server            | opea/graphrag-ui:latest                               |
+| chatqna-gaudi-nginx-server    | opea/nginx:latest                                     |
 
 ## GraphRAG Service Configuration
 
 The table provides a comprehensive overview of the GraphRAG service utilized across various deployments as illustrated in the example Docker Compose files. Each row in the table represents a distinct service, detailing its possible images used to enable it and a concise description of its function within the deployment architecture.
 
-| Service Name                     | Possible Image Names                                  | Optional | Description                                                                                     |
-| -------------------------------- | ----------------------------------------------------- | -------- | ----------------------------------------------------------------------------------------------- |
-| neo4j-apoc                       | neo4j:latest                                          | No       | Provides the Neo4j graph database with APOC (Awesome Procedures on Cypher) extensions for advanced graph operations. |
-| tei-embedding-serving            | ghcr.io/huggingface/text-embeddings-inference:cpu-1.6 | No       | Serves text embedding models for converting text into vector representations used in retrieval. |
-| tgi-gaudi-server                 | ghcr.io/huggingface/tgi-gaudi:2.3.1                   | No       | Hosts the Text Generation Inference (TGI) server optimized for Intel® Gaudi® to serve LLMs.    |
-| dataprep-neo4j-llamaindex        | opea/dataprep:latest                                  | No       | Prepares and ingests data into Neo4j and builds indexes for efficient retrieval.                |
-| retriever-neo4j                  | opea/retriever:latest                                 | No       | Handles retrieval of relevant documents or nodes from Neo4j based on user queries.              |
-| graphrag-gaudi-backend-server    | opea/graphrag:latest                                  | No       | Implements the core GraphRAG functionality, processing requests and managing data flow.         |
-| graphrag-ui-server               | opea/graphrag-ui:latest                               | No       | Provides the user interface for the GraphRAG service.                                        |
-| chatqna-gaudi-nginx-server       | opea/nginx:latest                                     | No       | Acts as a reverse proxy, managing traffic between the UI and backend services.                  |
+| Service Name                  | Possible Image Names                                  | Optional | Description                                                                                                          |
+| ----------------------------- | ----------------------------------------------------- | -------- | -------------------------------------------------------------------------------------------------------------------- |
+| neo4j-apoc                    | neo4j:latest                                          | No       | Provides the Neo4j graph database with APOC (Awesome Procedures on Cypher) extensions for advanced graph operations. |
+| tei-embedding-serving         | ghcr.io/huggingface/text-embeddings-inference:cpu-1.6 | No       | Serves text embedding models for converting text into vector representations used in retrieval.                      |
+| tgi-gaudi-server              | ghcr.io/huggingface/tgi-gaudi:2.3.1                   | No       | Hosts the Text Generation Inference (TGI) server optimized for Intel® Gaudi® to serve LLMs.                        |
+| dataprep-neo4j-llamaindex     | opea/dataprep:latest                                  | No       | Prepares and ingests data into Neo4j and builds indexes for efficient retrieval.                                     |
+| retriever-neo4j               | opea/retriever:latest                                 | No       | Handles retrieval of relevant documents or nodes from Neo4j based on user queries.                                   |
+| graphrag-gaudi-backend-server | opea/graphrag:latest                                  | No       | Implements the core GraphRAG functionality, processing requests and managing data flow.                              |
+| graphrag-ui-server            | opea/graphrag-ui:latest                               | No       | Provides the user interface for the GraphRAG service.                                                                |
+| chatqna-gaudi-nginx-server    | opea/nginx:latest                                     | No       | Acts as a reverse proxy, managing traffic between the UI and backend services.                                       |
