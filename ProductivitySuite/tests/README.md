@@ -13,3 +13,9 @@ On Intel Xeon with TGI:
 ```bash
 bash test_compose_on_xeon.sh
 ```
+
+On AMD EPYC with TGI:
+
+```bash
+bash test_compose_on_epyc.sh
+```

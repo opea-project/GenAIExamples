@@ -77,6 +77,7 @@ The table below lists currently available deployment options. They outline in de
 | ---------------------- | ---------------------- | -------------------------------------------------------------- |
 | On-premise Deployments | Docker Compose (Xeon)  | [DocSum deployment on Xeon](./docker_compose/intel/cpu/xeon)   |
 |                        | Docker Compose (Gaudi) | [DocSum deployment on Gaudi](./docker_compose/intel/hpu/gaudi) |
+|                        | Docker Compose (EPYC)  | [DocSum deployment on AMD EPYC](./docker_compose/amd/cpu/epyc) |
 |                        | Docker Compose (ROCm)  | [DocSum deployment on AMD ROCm](./docker_compose/amd/gpu/rocm) |
 
 ## Validated Configurations
@@ -85,6 +86,7 @@ The table below lists currently available deployment options. They outline in de
 | ----------------- | -------------- | ----------------------------------- | ------------ |
 | Docker Compose    | vLLM, TGI      | meta-llama/Meta-Llama-3-8B-Instruct | Intel Gaudi  |
 | Docker Compose    | vLLM, TGI      | meta-llama/Meta-Llama-3-8B-Instruct | Intel Xeon   |
+| Docker Compose    | vLLM, TGI      | Intel/neural-chat-7b-v3-3           | AMD EPYC     |
 | Docker Compose    | vLLM, TGI      | Intel/neural-chat-7b-v3-3           | AMD ROCm     |
 | Helm Charts       | vLLM, TGI      | Intel/neural-chat-7b-v3-3           | Intel Gaudi  |
 | Helm Charts       | vLLM, TGI      | Intel/neural-chat-7b-v3-3           | Intel Xeon   |
