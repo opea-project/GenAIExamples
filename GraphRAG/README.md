@@ -94,6 +94,9 @@ flowchart LR
 ## Deployment Options
 
 The table below lists the available deployment options and implementation details.
+
+| Platform     | Deployment Method | Link                                                              |
+| ------------ | ----------------- | ----------------------------------------------------------------- |
 | Intel Gaudi2 | Docker compose    | [Deployment on Gaudi](./docker_compose/intel/hpu/gaudi/README.md) |
 
 ## Validated Configurations

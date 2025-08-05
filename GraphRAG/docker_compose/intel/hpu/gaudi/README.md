@@ -1,6 +1,6 @@
 # Example GraphRAG Deployment on Intel® Gaudi® Platform
 
-This document outlines the deployment process for a Translation service utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on Intel Gaudi server. This example includes the following sections:
+This document outlines the deployment process for a Graphrag service utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on Intel Gaudi server. This example includes the following sections:
 
 - [GraphRAG Quick Start Deployment](#graphrag-quick-start-deployment): Demonstrates how to quickly deploy a GraphRAG service/pipeline on Intel® Gaudi® platform.
 - [GraphRAG Docker Compose Files](#graphrag-docker-compose-files): Describes some example deployments and their docker compose files.
@@ -76,9 +76,7 @@ Once the GraphRAG service are running, test the pipeline using the following com
 ```bash
 curl http://${host_ip}:8888/v1/graphrag \
     -H "Content-Type: application/json"  \
-    -d '{
-        "model": "gpt-4o-mini","messages": [{"role": "user","content": "Who is John Brady and has he had any confrontations?
-    "}]}'
+    -d '{"model": "gpt-4o-mini", "messages": [{"role": "user", "content": "Who is John Brady and has he had any confrontations?"}]}'
 ```
 
 **Note** The value of _host_ip_ was set using the _set_env.sh_ script and can be found in the _.env_ file.
@@ -87,9 +85,9 @@ curl http://${host_ip}:8888/v1/graphrag \
 
 1. If you get errors like "Access Denied", [validate micro service](https://github.com/opea-project/GenAIExamples/blob/main/ChatQnA/docker_compose/intel/cpu/xeon/README.md#validate-microservices) first. A simple example:
 
-   ```bash
-   http_proxy="" curl ${host_ip}:6006/embed -X POST  -d '{"inputs":"What is Deep Learning?"}' -H 'Content-Type: application/json'
-   ```
+```bash
+http_proxy="" curl ${host_ip}:6006/embed -X POST  -d '{"inputs":"What is Deep Learning?"}' -H 'Content-Type: application/json'
+```
 
 2. (Docker only) If all microservices work well, check the port ${host_ip}:8888, the port may be allocated by other users, you can modify the `compose.yaml`.
 
@@ -99,8 +97,8 @@ curl http://${host_ip}:8888/v1/graphrag \
 
 OPEA microservice deployment can easily be monitored through Grafana dashboards in conjunction with Prometheus data collection. Follow the [README](https://github.com/opea-project/GenAIEval/blob/main/evals/benchmark/grafana/README.md) to setup Prometheus and Grafana servers and import dashboards to monitor the OPEA service.
 
-![chatqna dashboards](../ChatQnA/assets/img/chatqna_dashboards.png)
-![tgi dashboard](../ChatQnA//assets/img/tgi_dashboard.png)
+![chatqna dashboards](../../../../assets/img/chatqna_dashboards.png)
+![tgi dashboard](../../../../assets/img/tgi_dashboard.png)
 
 ### Cleanup the Deployment
 
