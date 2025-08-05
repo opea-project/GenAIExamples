@@ -16,7 +16,14 @@ import { env } from "$env/dynamic/public";
 
 const DOC_BASE_URL = env.DOC_BASE_URL;
 
-export async function fetchTextStream(query: string | Blob, params: string, file: Blob, fileName: string | undefined) {
+export async function fetchTextStream(
+  query: string | Blob, 
+  params: string, 
+  file: Blob, 
+  fileName: string | undefined,
+  languageOption: string = "auto",
+  summaryType: string = "auto"
+) {
   const url = `${DOC_BASE_URL}`; // Ensure the URL is constructed correctly
   const formData = new FormData();
 
@@ -29,10 +36,14 @@ export async function fetchTextStream(query: string | Blob, params: string, file
     formData.append("files", file, fileName);
     formData.append("messages", query);
     formData.append("type", "text");
+    formData.append("language_option", languageOption);
+    formData.append("summary_type", summaryType);
   } else if (params === "text") {
     formData.append("files", file, fileName);
     formData.append("messages", query);
     formData.append("type", "text");
+    formData.append("language_option", languageOption);
+    formData.append("summary_type", summaryType);
   }
 
   // Initiate the POST request to upload the file

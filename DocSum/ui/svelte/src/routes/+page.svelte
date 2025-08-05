@@ -34,14 +34,21 @@
   const callTextStream = async (
     query: string,
     urlSuffix: string,
-    params: string
+    params: string,
+    languageOption: string = "auto",
+    summaryType: string = "auto"
   ) => {
+
+    console.log('callTextStream', languageOption, summaryType);
+    
     // Fetch the stream
     const eventStream = await fetchTextStream(
       query,
       params,
       $uploadFile,
-      $uploadFilesName
+      $uploadFilesName,
+      languageOption,
+      summaryType
     );
 
     // Process the stream as an async iterator
@@ -61,10 +68,24 @@
   };
 
   async function handleGenerateSummary(e) {
+    console.log('handleGenerateSummary', e);
+    
     if (e.detail.mode === "file") {
-      await callTextStream(e.detail.value, "/file_summarize", "doc_id");
+      await callTextStream(
+        e.detail.value, 
+        "/file_summarize", 
+        "doc_id",
+        e.detail.languageOption,
+        e.detail.summaryType
+      );
     } else if (e.detail.mode === "text") {
-      await callTextStream(e.detail.value, "/text_summarize", "text");
+      await callTextStream(
+        e.detail.value, 
+        "/text_summarize", 
+        "text",
+        e.detail.languageOption,
+        e.detail.summaryType
+      );
     }
   }
 

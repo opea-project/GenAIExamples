@@ -20,7 +20,7 @@
   import DropFile from "./dropFile.svelte";
   import SpinLoading from "./assets/spinLoading.svelte";
   import { kb_id, loading } from "./shared/Store.js";
-  import { Textarea } from "flowbite-svelte";
+  import { Textarea, Select } from "flowbite-svelte";
   import { createEventDispatcher } from "svelte";
   import { getNotificationsContext } from "svelte-notifications";
 
@@ -31,6 +31,22 @@
   let message = "";
   let formModal = false;
   let currentIdx = 1;
+  let languageOption = "auto";
+  let summaryType = "auto";
+
+  const languageOptions = [
+    { value: "auto", name: "Auto" },
+    { value: "en", name: "English" },
+    { value: "zh", name: "Chinese" }
+  ];
+
+  const summaryTypeOptions = [
+    { value: "auto", name: "Auto" },
+    { value: "stuff", name: "Stuff" },
+    { value: "truncate", name: "Truncate" },
+    { value: "map_reduce", name: "Map Reduce" },
+    { value: "refine", name: "Refine" }
+  ];
 
   function togglePanel(index: number) {
     if (activePanel === index) {
@@ -72,15 +88,37 @@
     } else {
       loading.set(true);
       if ($kb_id !== "") {
-        dispatch("generateSummary", { mode: "file", value: $kb_id });
+        dispatch("generateSummary", { 
+          mode: "file", 
+          value: $kb_id,
+          languageOption,
+          summaryType
+        });
       } else if (message !== "") {
-        dispatch("generateSummary", { mode: "text", value: message });
+        dispatch("generateSummary", { 
+          mode: "text", 
+          value: message,
+          languageOption,
+          summaryType
+        });
       }
     }
   }
 </script>
 
 <div class="w-full h-full relative">
+  <!-- Language and Summary Type Options at the top -->
+  <div class="mb-6 grid grid-cols-2 gap-4">
+    <div>
+      <Label for="language-select" class="mb-2 text-sm font-medium text-gray-700">Language Option</Label>
+      <Select id="language-select" bind:value={languageOption} items={languageOptions} />
+    </div>
+    <div>
+      <Label for="summary-type-select" class="mb-2 text-sm font-medium text-gray-700">Summary Type</Label>
+      <Select id="summary-type-select" bind:value={summaryType} items={summaryTypeOptions} />
+    </div>
+  </div>
+
   {#each [1, 2] as panelIndex}
     <div id="accordion-open" data-accordion="open">
       <h2 id={`accordion-open-heading-${panelIndex}`}>
@@ -139,6 +177,7 @@
       </div>
     </div>
   {/each}
+  
   {#if $loading}
     <button
       type="submit"
