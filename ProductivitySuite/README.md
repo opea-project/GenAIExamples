@@ -154,9 +154,11 @@ The table below lists the available deployment options and their implementation 
 | Platform   | Deployment Method | Link                                                            |
 | ---------- | ----------------- | --------------------------------------------------------------- |
 | Intel Xeon | Docker compose    | [Deployment on Xeon](./docker_compose/intel/cpu/xeon/README.md) |
+| AMD EPYC   | Docker compose    | [Deployment on EPYC](./docker_compose/amd/cpu/epyc/README.md)   |
 
 ## Validated Configurations
 
 | **Deploy Method** | **LLM Engine** | **LLM Model**             | **Hardware** |
 | ----------------- | -------------- | ------------------------- | ------------ |
 | Docker Compose    | vLLM           | Intel/neural-chat-7b-v3-3 | Intel Xeon   |
+| Docker Compose    | vLLM           | Intel/neural-chat-7b-v3-3 | AMD EPYC     |
