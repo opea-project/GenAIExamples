@@ -138,7 +138,7 @@ class Deployer:
         if not compose_files:
             return None
         cmd = self.compose_command.split()
-        cmd.extend(["-p", self.project_name])
+        cmd.extend(["--project-name", self.project_name])
         for f in compose_files:
             cmd.extend(["-f", str(f.resolve())])
         return cmd
