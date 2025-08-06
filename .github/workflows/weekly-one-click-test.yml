@@ -1,7 +1,7 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-name: Weekly test all examples on multiple HWs
+name: Weekly oneclick test all examples on multiple HWs
 
 permissions:
   contents: read
