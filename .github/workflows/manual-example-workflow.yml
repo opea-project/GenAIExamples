@@ -88,12 +88,9 @@ jobs:
 
   build-comps-base:
     needs: [get-test-matrix]
-    strategy:
-      matrix:
-        node: ${{ fromJson(needs.get-test-matrix.outputs.nodes) }}
     uses: ./.github/workflows/_build_comps_base_image.yml
     with:
-      node: ${{ matrix.node }}
+      node: gaudi
       build: ${{ fromJSON(inputs.build) }}
       tag: ${{ inputs.tag }}
       opea_branch: ${{ inputs.opea_branch }}
