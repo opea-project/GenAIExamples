@@ -58,7 +58,6 @@ jobs:
         if: ${{ inputs.deploy_method == 'docker' }}
         uses: actions/checkout@v4
         with:
-          ref: ${{ needs.get-test-case.outputs.CHECKOUT_REF }}
           fetch-depth: 0
 
       - name: Clean up container before test
@@ -87,14 +86,12 @@ jobs:
       - name: Clean Up Working Directory
         if: ${{ inputs.deploy_method == 'k8s' }}
         run: |
-          echo "value_file=${{ matrix.value_file }}"
           sudo rm -rf ${{github.workspace}}/*
 
       - name: Checkout out Repo
         if: ${{ inputs.deploy_method == 'k8s' }}
         uses: actions/checkout@v4
         with:
-          ref: ${{ needs.get-test-case.outputs.CHECKOUT_REF }}
           fetch-depth: 0
 
       - name: get-default-params-from-config
