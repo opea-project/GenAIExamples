@@ -68,6 +68,9 @@ jobs:
         deploy_methods=($(echo ${{ inputs.deploy_methods }} | tr ',' ' '))
         deploy_methods_json=$(printf '%s\n' "${deploy_methods[@]}" | sort -u | jq -R '.' | jq -sc '.')
         echo "deploy_methods=$deploy_methods_json" >> $GITHUB_OUTPUT
+        echo "examples=$examples_json"
+        echo "nodes=$nodes_json"
+        echo "deploy_methods=$deploy_methods_json"
 
   run-examples:
     # permissions:
