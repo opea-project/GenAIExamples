@@ -28,7 +28,11 @@ on:
         description: "Path to Dockerfile"
         required: true
         type: string
-
+      node:
+        default: "gaudi"
+        description: "Hardware to run scan"
+        required: true
+        type: string
 jobs:
   trivy-scan:
     runs-on: "docker-build-${{ inputs.node }}"
@@ -40,9 +44,12 @@ jobs:
           docker system prune -f
       - name: Checkout out Repo
         uses: actions/checkout@v4
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq
       - name: Clone Required Repo
         run: |
-          sudo yum install -y jq
           source ${{ github.workspace }}/.github/env/_build_image.sh
           if [[ "${{ inputs.image }}" == "vllm" ]]; then
               git clone -b ${VLLM_VER} --single-branch https://github.com/vllm-project/vllm.git

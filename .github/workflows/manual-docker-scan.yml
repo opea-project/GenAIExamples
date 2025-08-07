@@ -51,6 +51,7 @@ jobs:
       tag: ${{ inputs.tag }}
       image: ${{ matrix.image }}
       dockerfile: ${{ matrix.dockerfile }}
+      node: ${{ inputs.node }}
     secrets: inherit
 
   upload-artifacts:
