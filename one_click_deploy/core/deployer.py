@@ -694,6 +694,9 @@ cd "{compose_dir.resolve()}"
                     f.write(script_content)
                     temp_script_path = f.name
                 os.chmod(temp_script_path, stat.S_IRWXU)
+                # Output the temp_script_path content for debugging
+                with open(temp_script_path, "r") as debug_f:
+                    log_message("INFO", f"Deployment script content:\n{debug_f.read()}")
                 run_command(["/bin/bash", temp_script_path], check=True, stream_output=True)
                 return True
             except subprocess.CalledProcessError:
