@@ -43,7 +43,7 @@ jobs:
     if: ${{ !github.event.pull_request.draft }}
     uses: ./.github/workflows/_get-test-matrix.yml
     with:
-      diff_excluded_files: '\.github|\.md|\.txt|kubernetes|gmc|assets|benchmark'
+      diff_excluded_files: '\.github|\.md|kubernetes|gmc|assets|benchmark'
 
   example-test:
     permissions:
@@ -69,5 +69,5 @@ jobs:
       example: ${{ matrix.example }}
       hardware: ${{ matrix.hardware }}
       use_model_cache: true
-      diff_excluded_files: '\.github|\.md|\.txt|kubernetes|gmc|assets|benchmark'
+      diff_excluded_files: '\.github|\.md|kubernetes|gmc|assets|benchmark'
     secrets: inherit

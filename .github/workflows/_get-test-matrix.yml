@@ -20,7 +20,7 @@ on:
       diff_excluded_files:
         required: false
         type: string
-        default: '.github|README.md|*.txt'
+        default: '.github|README.md'
       test_mode:
         required: false
         type: string
