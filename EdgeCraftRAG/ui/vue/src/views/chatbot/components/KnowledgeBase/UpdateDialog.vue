@@ -7,7 +7,7 @@
     :title="dialogTitle"
     :keyboard="false"
     :maskClosable="false"
-    @cancel="handleCancle"
+    @cancel="handleCancel"
   >
     <a-form
       :model="form"
@@ -41,7 +41,7 @@
       </a-form-item>
     </a-form>
     <template #footer>
-      <a-button type="primary" ghost @click="handleCancle">{{
+      <a-button type="primary" ghost @click="handleCancel">{{
         $t("common.cancel")
       }}</a-button>
       <a-button
@@ -150,7 +150,7 @@ const handleSubmit = () => {
     apiUrl(form)
       .then(() => {
         emit("switch", name);
-        handleCancle();
+        handleCancel();
       })
       .catch((error: any) => {
         console.error(error);
@@ -162,7 +162,7 @@ const handleSubmit = () => {
 };
 
 //close
-const handleCancle = () => {
+const handleCancel = () => {
   emit("close");
 };
 </script>

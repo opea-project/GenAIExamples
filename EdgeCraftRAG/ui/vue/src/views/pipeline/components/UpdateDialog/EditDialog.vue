@@ -38,7 +38,7 @@
           />
         </keep-alive>
         <div class="footer-wrap">
-          <a-button type="primary" ghost @click="handleCancle">{{
+          <a-button type="primary" ghost @click="handleCancel">{{
             $t("common.cancel")
           }}</a-button>
           <a-button
@@ -137,7 +137,7 @@ const currentTitle = computed(() => {
   return stepList.value.find((item) => item.index === currentStep.value)?.label;
 });
 //last
-const handleCancle = () => {
+const handleCancel = () => {
   emit("close");
 };
 
@@ -162,7 +162,7 @@ const handleSubmit = async () => {
   requestPipelineUpdate(name, formData)
     .then(() => {
       emit("search");
-      handleCancle();
+      handleCancel();
     })
     .catch((error) => {
       console.error(error);

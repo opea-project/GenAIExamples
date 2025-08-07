@@ -51,7 +51,7 @@
 </template>
 
 <script lang="ts" setup name="xxx">
-import { getPipelineDetialByName, getPipelineList } from "@/api/pipeline";
+import { getPipelineDetailByName, getPipelineList } from "@/api/pipeline";
 import router from "@/router";
 import { pipelineAppStore } from "@/store/pipeline";
 import { useNotification } from "@/utils/common";
@@ -98,14 +98,14 @@ const handleCreate = () => {
 };
 //edit
 const handleUpdate = async (row: EmptyObjectType) => {
-  const data: any = await getPipelineDetialByName(row.name);
+  const data: any = await getPipelineDetailByName(row.name);
 
   editDialog.data = JSON.parse(data);
   editDialog.visible = true;
 };
 //detail
 const handleView = async (row: EmptyObjectType) => {
-  const data: any = await getPipelineDetialByName(row.name);
+  const data: any = await getPipelineDetailByName(row.name);
 
   detailDrawer.data = JSON.parse(data);
   detailDrawer.visible = true;

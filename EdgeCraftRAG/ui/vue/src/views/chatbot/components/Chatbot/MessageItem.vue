@@ -16,7 +16,7 @@
             <span class="drop"></span>
           </div>
 
-          <div class="think-container" v-if="isThinkMode || isThinkEnd">
+          <div class="think-container" v-if="getThinkMode().value?.length > 8">
             <div
               :class="{
                 'think-title': true,
@@ -31,7 +31,7 @@
               >
                 <span>
                   {{
-                    isThinkEnd ? $t("chat.thinkStart") : $t("chat.thinkEnd")
+                    isThinkEnd ? $t("chat.thinkEnd") : $t("chat.thinkStart")
                   }}</span
                 >
                 <UpOutlined
@@ -136,12 +136,15 @@ const isThinkEnd = computed(() => props.message.content.includes("</think>"));
 const getThinkMode = () => {
   const { content } = props.message;
   const endIndex = content.indexOf("</think>");
+
   return computed(() => {
-    return isThinkMode.value
-      ? content
-      : isThinkEnd.value
-      ? content.substring(0, endIndex)
-      : "";
+    if (isThinkEnd.value) {
+      return content.substring(0, endIndex);
+    } else if (isThinkMode.value) {
+      return content;
+    } else {
+      return "";
+    }
   });
 };
 
@@ -292,6 +295,7 @@ watch(
   .message-wrap {
     background-color: var(--message-bg);
     width: auto;
+    text-align: left;
   }
 }
 .benchmark-wrap {
