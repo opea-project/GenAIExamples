@@ -39,7 +39,7 @@ services:
       retries: 50
     restart: unless-stopped
   tei-embedding-service:
-    image: openeuler/text-embeddings-inference-cpu:1.5.0-oe2403lts
+    image: openeuler/text-embeddings-inference-cpu:1.7.0-oe2403lts
     container_name: tei-embedding-server
     ports:
       - "6006:80"
@@ -72,7 +72,7 @@ services:
       RETRIEVER_COMPONENT_NAME: "OPEA_RETRIEVER_REDIS"
     restart: unless-stopped
   tei-reranking-service:
-    image: openeuler/text-embeddings-inference-cpu:1.5.0-oe2403lts
+    image: openeuler/text-embeddings-inference-cpu:1.7.0-oe2403lts
     container_name: tei-reranking-server
     ports:
       - "8808:80"
