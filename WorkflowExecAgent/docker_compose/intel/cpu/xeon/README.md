@@ -109,11 +109,13 @@ Also, ensure the manually launched `uvicorn` workflow server and your external L
 Once the services are running, test the pipeline using the following command. The agent microservice logs can be viewed to see the full execution trace.
 
 View logs with:
+
 ```bash
 docker logs workflowexec-agent-endpoint
 ```
 
 Send a request to the agent:
+
 ```bash
 # Set your workflow_id, which for the example is '12345'
 export workflow_id=12345
@@ -140,16 +142,16 @@ Remember to also stop the manually launched `uvicorn` server (Ctrl+C in its term
 
 Key parameters are configured via environment variables in the `.env` file before running `docker compose up`.
 
-| Environment Variable   | Description                                                                                                   | Default (Set in `.env`)                  |
-| :--------------------- | :------------------------------------------------------------------------------------------------------------ | :--------------------------------------- |
-| `SDK_BASE_URL`         | **Required.** The URL to your platform's workflow serving API.                                                | `http://<your-ip>:<wf_api_port>/`        |
-| `SERVING_TOKEN`        | Authentication bearer token used for the SDK to authenticate with the workflow serving API. Can be empty for the example. | `""`                                     |
-| `HF_TOKEN`             | Your Hugging Face Hub token for model access (if needed by the LLM service).                                  | `your_huggingface_token`                 |
-| `llm_endpoint_url`     | **Required.** The full URL of the running LLM inference service endpoint.                                     | `your_llm_endpoint`                      |
-| `wf_api_port`          | The port to use for the example workflow serving API.                                                         | `5000`                                   |
-| `ip_address`           | The host IP address, used to construct default URLs.                                                          | `$(hostname -I | awk '{print $1}')`      |
-| `model`                | The name of the LLM model to be used for agent reasoning.                                                     | `mistralai/Mistral-7B-Instruct-v0.3`     |
-| `http_proxy`/`https_proxy` | Network proxy settings (if required).                                                                         | `""`                                     |
+| Environment Variable       | Description                                                                                                               | Default (Set in `.env`)              |
+| :------------------------- | :------------------------------------------------------------------------------------------------------------------------ | :----------------------------------- | ------------------ |
+| `SDK_BASE_URL`             | **Required.** The URL to your platform's workflow serving API.                                                            | `http://<your-ip>:<wf_api_port>/`    |
+| `SERVING_TOKEN`            | Authentication bearer token used for the SDK to authenticate with the workflow serving API. Can be empty for the example. | `""`                                 |
+| `HF_TOKEN`                 | Your Hugging Face Hub token for model access (if needed by the LLM service).                                              | `your_huggingface_token`             |
+| `llm_endpoint_url`         | **Required.** The full URL of the running LLM inference service endpoint.                                                 | `your_llm_endpoint`                  |
+| `wf_api_port`              | The port to use for the example workflow serving API.                                                                     | `5000`                               |
+| `ip_address`               | The host IP address, used to construct default URLs.                                                                      | `$(hostname -I                       | awk '{print $1}')` |
+| `model`                    | The name of the LLM model to be used for agent reasoning.                                                                 | `mistralai/Mistral-7B-Instruct-v0.3` |
+| `http_proxy`/`https_proxy` | Network proxy settings (if required).                                                                                     | `""`                                 |
 
 ## Validate Microservices
 
@@ -160,6 +162,7 @@ Key parameters are configured via environment variables in the `.env` file befor
     ```bash
     docker logs workflowexec-agent-endpoint
     ```
+
     You should be able to see "HTTP server setup successful" upon a successful startup. Then, validate with a `curl` command as shown in the [Validate the Pipeline](#validate-the-pipeline) section.
 
 2.  **Example Workflow API Service**

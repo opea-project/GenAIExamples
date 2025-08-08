@@ -14,10 +14,10 @@ GenAI Workflow Executor Example showcases the capability to handle data/AI workf
 
 Before we begin, here are the definitions for some terms for clarity:
 
--   **Servable/Serving Workflow**: A workflow made ready to be executed through an API. It should be able to accept parameter injection for workflow scheduling and have a way to retrieve the final output data. It should also have a unique workflow ID for referencing.
--   **SDK Class**: Performs requests to interface with a 3rd-party API to perform workflow operations on the servable workflow. Found in `tools/sdk.py`.
--   **Workflow ID**: A unique ID for the servable workflow.
--   **Workflow Instance**: An instance created from the servable workflow. It is represented as a `Workflow` class created using `DataInsightAutomationSDK.create_workflow()` under `tools/sdk.py`. It contains methods to `start`, `get_status`, and `get_results` from the workflow.
+- **Servable/Serving Workflow**: A workflow made ready to be executed through an API. It should be able to accept parameter injection for workflow scheduling and have a way to retrieve the final output data. It should also have a unique workflow ID for referencing.
+- **SDK Class**: Performs requests to interface with a 3rd-party API to perform workflow operations on the servable workflow. Found in `tools/sdk.py`.
+- **Workflow ID**: A unique ID for the servable workflow.
+- **Workflow Instance**: An instance created from the servable workflow. It is represented as a `Workflow` class created using `DataInsightAutomationSDK.create_workflow()` under `tools/sdk.py`. It contains methods to `start`, `get_status`, and `get_results` from the workflow.
 
 ### Workflow Executor Strategy
 
@@ -67,16 +67,15 @@ When the workflow is configured as desired, transform this into a servable workf
 
 > [!NOTE]
 > Remember to create a unique workflow ID along with the servable workflow.
+
 ## Deployment Options
 
 The table below lists currently available deployment options. They outline in detail the implementation of this example on selected hardware.
 
-| Category               | Deployment Option    | Description                                                                                 |
-| ---------------------- | -------------------- | ------------------------------------------------------------------------------------------- |
-| On-premise Deployments | Docker compose       | [WorkflowExecAgent deployment on Xeon](./docker_compose/intel/cpu/xeon/README.md)           |
-|                        | Kubernetes           | Work-in-progress                                                                            |
-
-
+| Category               | Deployment Option | Description                                                                       |
+| ---------------------- | ----------------- | --------------------------------------------------------------------------------- |
+| On-premise Deployments | Docker compose    | [WorkflowExecAgent deployment on Xeon](./docker_compose/intel/cpu/xeon/README.md) |
+|                        | Kubernetes        | Work-in-progress                                                                  |
 
 ## Validated Configurations
 
