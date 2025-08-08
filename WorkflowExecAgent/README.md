@@ -5,7 +5,6 @@
 1. [Overview](#overview)
 2. [Deployment Options](#deployment-options)
 3. [Roadmap](#roadmap)
-4. [Monitoring and Tracing](./README_miscellaneous.md)
 
 ## Overview
 
