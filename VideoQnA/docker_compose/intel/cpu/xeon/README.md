@@ -15,17 +15,17 @@ VideoQnA is a pipeline that retrieves video based on provided user prompt. It us
 
 ## Port used for the microservices
 
-| Service                     | Port    |
-|-----------------------------|---------|
-| dataprep                    | 6007    |
-| vdms-vector-db              | 8001    |
-| embedding                   | 6990    |
-| retriever                   | 7000    |
-| reranking                   | 8000    |
-| lvm video-llama             | 9009    |
-| lvm                         | 9399    |
-| videoqna-xeon-backend-server| 8888    |
-| videoqna-xeon-ui-server     | 5173    |
+| Service                      | Port |
+| ---------------------------- | ---- |
+| dataprep                     | 6007 |
+| vdms-vector-db               | 8001 |
+| embedding                    | 6990 |
+| retriever                    | 7000 |
+| reranking                    | 8000 |
+| lvm video-llama              | 9009 |
+| lvm                          | 9399 |
+| videoqna-xeon-backend-server | 8888 |
+| videoqna-xeon-ui-server      | 5173 |
 
 ## Build Docker Images
 
