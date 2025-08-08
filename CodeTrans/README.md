@@ -16,7 +16,7 @@ The CodeTrans application is an end-to-end workflow that leverages the capabilit
 
 The CodeTrans example is implemented using the component-level microservices defined in [GenAIComps](https://github.com/opea-project/GenAIComps).
 
-This Code Translation use case demonstrates Text Generation Inference across multiple platforms. Currently, we provide examples for [Intel Gaudi2](https://www.intel.com/content/www/us/en/products/details/processors/ai-accelerators/gaudi-overview.html) and [Intel Xeon Scalable Processors](https://www.intel.com/content/www/us/en/products/details/processors/xeon.html), and we invite contributions from other hardware vendors to expand OPEA ecosystem.
+This Code Translation use case demonstrates Text Generation Inference across multiple platforms. Currently, we provide examples for [Intel Gaudi2](https://www.intel.com/content/www/us/en/products/details/processors/ai-accelerators/gaudi.html), [Intel Xeon Scalable Processors](https://www.intel.com/content/www/us/en/products/details/processors/xeon.html) and [AMD EPYC™ Processors](https://www.amd.com/en/products/processors/server/epyc.html), and we invite contributions from other hardware vendors to expand OPEA ecosystem.
 
 ## Deployment Options
 
@@ -26,6 +26,7 @@ The table below lists currently available deployment options. They outline in de
 | ---------------------- | -------------------- | --------------------------------------------------------------------------- |
 | On-premise Deployments | Docker compose       | [CodeTrans deployment on Xeon](./docker_compose/intel/cpu/xeon/README.md)   |
 |                        |                      | [CodeTrans deployment on Gaudi](./docker_compose/intel/hpu/gaudi/README.md) |
+|                        |                      | [CodeTrans deployment on AMD EPYC](./docker_compose/amd/cpu/epyc/README.md) |
 |                        |                      | [CodeTrans deployment on AMD ROCm](./docker_compose/amd/gpu/rocm/README.md) |
 |                        | Kubernetes           | [Helm Charts](./kubernetes/helm/README.md)                                  |
 |                        | Azure                | Work-in-progress                                                            |
@@ -37,6 +38,7 @@ The table below lists currently available deployment options. They outline in de
 | ----------------- | -------------- | ---------------------------------- | ------------ |
 | Docker Compose    | vLLM, TGI      | mistralai/Mistral-7B-Instruct-v0.3 | Intel Gaudi  |
 | Docker Compose    | vLLM, TGI      | mistralai/Mistral-7B-Instruct-v0.3 | Intel Xeon   |
+| Docker Compose    | vLLM, TGI      | Qwen/Qwen2.5-Coder-7B-Instruct     | AMD EPYC     |
 | Docker Compose    | vLLM, TGI      | Qwen/Qwen2.5-Coder-7B-Instruct     | AMD ROCm     |
 | Helm Charts       | vLLM, TGI      | mistralai/Mistral-7B-Instruct-v0.3 | Intel Gaudi  |
 | Helm Charts       | vLLM, TGI      | mistralai/Mistral-7B-Instruct-v0.3 | Intel Xeon   |

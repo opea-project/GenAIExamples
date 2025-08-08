@@ -1,4 +1,4 @@
-gradio>5.22.0
+gradio>5.22.0,<=5.34.0   # Upper bound (<=5.34.0) set due to compatibility issues with later versions causing the UI to not load
 gradio_pdf==0.0.20
 moviepy==1.0.3
 numpy==1.26.4
