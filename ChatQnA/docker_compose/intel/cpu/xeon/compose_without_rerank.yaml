@@ -79,6 +79,11 @@ services:
       HF_TOKEN: ${HF_TOKEN}
       LLM_MODEL_ID: ${LLM_MODEL_ID}
       VLLM_TORCH_PROFILER_DIR: "/mnt"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://$host_ip:9009/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 100
     command: --model $LLM_MODEL_ID --host 0.0.0.0 --port 80
   chatqna-xeon-backend-server:
     image: ${REGISTRY:-opea}/chatqna:${TAG:-latest}

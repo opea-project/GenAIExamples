@@ -63,6 +63,6 @@ jobs:
       fail-fast: false
     uses: ./.github/workflows/_example-workflow.yml
     with:
-      node: ${{ matrix.hardware }}
+      node: gaudi
       example: ${{ matrix.example }}
     secrets: inherit
