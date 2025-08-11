@@ -4,15 +4,15 @@
 services:
   worker-rag-agent:
     environment:
-      llm_endpoint_url: ${LLM_ENDPOINT_URL}
+      llm_endpoint_url: ${REMOTE_ENDPOINT}
       api_key: ${OPENAI_API_KEY}
 
   worker-sql-agent:
     environment:
-      llm_endpoint_url: ${LLM_ENDPOINT_URL}
+      llm_endpoint_url: ${REMOTE_ENDPOINT}
       api_key: ${OPENAI_API_KEY}
 
   supervisor-react-agent:
     environment:
-      llm_endpoint_url: ${LLM_ENDPOINT_URL}
+      llm_endpoint_url: ${REMOTE_ENDPOINT}
       api_key: ${OPENAI_API_KEY}
