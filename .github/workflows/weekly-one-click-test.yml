@@ -1,7 +1,7 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-name: Weekly test all examples on multiple HWs
+name: Weekly oneclick test all examples on multiple HWs
 
 permissions:
   contents: read
@@ -15,6 +15,7 @@ on:
 env:
   # EXAMPLES: ${{ vars.NIGHTLY_RELEASE_EXAMPLES }}
   NODES: "gaudi,xeon"
+  DEPLOY_METHODS: "docker,k8s" # Not used in this workflow, but can be added if needed
 
 jobs:
   get-test-matrix:
@@ -22,6 +23,7 @@ jobs:
     outputs:
       examples: ${{ steps.get-matrix.outputs.examples }}
       nodes: ${{ steps.get-matrix.outputs.nodes }}
+      deploy_methods: ${{ steps.get-matrix.outputs.deploy_methods }}
     steps:
       - name: Create Matrix
         id: get-matrix
@@ -32,6 +34,9 @@ jobs:
           nodes=($(echo ${NODES} | tr ',' ' '))
           nodes_json=$(printf '%s\n' "${nodes[@]}" | sort -u | jq -R '.' | jq -sc '.')
           echo "nodes=$nodes_json" >> $GITHUB_OUTPUT
+          deploy_methods=($(echo ${DEPLOY_METHODS} | tr ',' ' '))
+          deploy_methods_json=$(printf '%s\n' "${deploy_methods[@]}" | sort -u | jq -R '.' | jq -sc '.')
+          echo "deploy_methods=$deploy_methods_json" >> $GITHUB_OUTPUT
 
   run-examples:
     permissions:
@@ -55,12 +60,12 @@ jobs:
       matrix:
         example: ${{ fromJson(needs.get-test-matrix.outputs.examples) }}
         node: ${{ fromJson(needs.get-test-matrix.outputs.nodes) }}
+        deploy_method: ${{ fromJson(needs.get-test-matrix.outputs.deploy_methods) }}
       fail-fast: false
     uses: ./.github/workflows/_run-one-click.yml
     with:
       hardware: ${{ matrix.node }}
       example: ${{ matrix.example }}
-      test_compose: true
-      test_helmchart: true
+      deploy_method: ${{ matrix.deploy_method }}
       registry: "opea"
     secrets: inherit

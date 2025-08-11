@@ -19,32 +19,74 @@ on:
       matrix:
         description: "Image List"
         value: ${{ jobs.get-image-list.outputs.matrix }}
+      run_matrix:
+        description: "Trivy Matrix composed of image name and Dockerfile path"
+        value: ${{ jobs.get-image-list.outputs.run_matrix }}
 
 jobs:
   get-image-list:
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.get-matrix.outputs.matrix }}
+      run_matrix: ${{ steps.get-matrix.outputs.run_matrix }}
     steps:
       - name: Checkout out Repo
         uses: actions/checkout@v4
+
+      - name: Checkout GenAIComps Repository
+        uses: actions/checkout@v4
+        with:
+          repository: opea-project/GenAIComps
+          path: GenAIComps
 
       - name: Set Matrix
         id: get-matrix
         run: |
           image_list=[]
+          run_matrix="{\"include\":["
           if [[ ! -z "${{ inputs.examples }}" ]]; then
               pip install yq
               examples=($(echo ${{ inputs.examples }} | tr ',' ' '))
               for example in ${examples[@]}
               do
                   images=$(cat ${{ github.workspace }}/${example}/docker_image_build/build.yaml | yq -r '.[]' | jq 'keys' | jq -c '.')
+                  dockerfiles=$(cat ${{ github.workspace }}/${example}/docker_image_build/build.yaml | yq -r '.[]' | jq -c --arg example "$example" 'to_entries[] | { image: .key, dockerfile: ( if (.value.build.context | test("\\.\\.")) then $example + "/docker_image_build/" + .value.build.context + "/" + .value.build.dockerfile else .value.build.context + "/" + .value.build.dockerfile end ) }')
+                  dockerfiles=$(echo ${dockerfiles} | tr ' ' ',')
+                  run_matrix="${run_matrix}${dockerfiles},"
                   image_list=$(echo ${image_list} | jq -s '.[0] + .[1] | unique' - <(echo ${images}))
               done
           fi
 
           if [[ ! -z "${{ inputs.images }}" ]]; then
               images=($(echo ${{ inputs.images }} | tr ',' ' '))
+              found=False
+              for image in ${images[@]}
+              do
+                for compose_file in $(ls ${{ github.workspace }}/GenAIComps/.github/workflows/docker/compose/*-compose.yaml); do
+                  if grep -q "$image" "$compose_file"; then
+                    found=True
+                    docker_file="$compose_file"
+                  fi
+                done
+
+                if [[ "${found}" == "False" ]]; then
+                  for build_file in $(ls ${{ github.workspace }}/*/docker_image_build/build.yaml); do
+                    if grep -q "$image" "$build_file"; then
+                      found=True
+                      docker_file="$build_file"
+                    fi
+                  done
+                fi
+
+                if [[ "${found}" == "False" ]]; then
+                  echo "::error:: Image ${image} not found in any compose or build file."
+                  exit 1
+                fi
+
+                dockerfiles=$(yq -r ".services[\"$image\"] | {image: \"$image\", dockerfile: ( ( .build.context // \"\" ) + ( if .build.context and .build.dockerfile then \"/\" else \"\" end ) + ( .build.dockerfile // \"\" ) )}" "$docker_file" | jq -c . | tr -d ' ')
+                run_matrix="${run_matrix}${dockerfiles},"
+              done
+
               input_image_list=$(printf '%s\n' "${images[@]}" | sort -u | jq -R '.' | jq -sc '.')
               image_list=$(echo ${image_list} | jq -s '.[0] + .[1] | unique' - <(echo ${input_image_list}))
           fi
@@ -53,3 +95,8 @@ jobs:
           echo "$image_list" | jq . | jq -r '.[]'
           echo "end of image list..."
           echo "matrix=$(echo ${image_list} | jq -c '.')" >> $GITHUB_OUTPUT
+          run_matrix="${run_matrix%,}"
+          run_matrix="${run_matrix}]}"
+
+          echo "run_matrix=$(echo "${run_matrix}" | jq -c '{include: (.include | unique_by(.image))}')"
+          echo "run_matrix=$(echo "${run_matrix}" | jq -c '{include: (.include | unique_by(.image))}')" >> $GITHUB_OUTPUT
