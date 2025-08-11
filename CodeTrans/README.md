@@ -34,12 +34,12 @@ The table below lists currently available deployment options. They outline in de
 
 ## Validated Configurations
 
-| **Deploy Method** | **LLM Engine** | **LLM Model**                      | **Hardware** |
-| ----------------- | -------------- | ---------------------------------- | ------------ |
+| **Deploy Method** | **LLM Engine** | **LLM Model**                  | **Hardware** |
+| ----------------- | -------------- | ------------------------------ | ------------ |
 | Docker Compose    | vLLM, TGI      | Qwen/Qwen2.5-Coder-7B-Instruct | Intel Gaudi  |
 | Docker Compose    | vLLM, TGI      | Qwen/Qwen2.5-Coder-7B-Instruct | Intel Xeon   |
-| Docker Compose    | vLLM, TGI      | Qwen/Qwen2.5-Coder-7B-Instruct     | AMD EPYC     |
-| Docker Compose    | vLLM, TGI      | Qwen/Qwen2.5-Coder-7B-Instruct     | AMD ROCm     |
+| Docker Compose    | vLLM, TGI      | Qwen/Qwen2.5-Coder-7B-Instruct | AMD EPYC     |
+| Docker Compose    | vLLM, TGI      | Qwen/Qwen2.5-Coder-7B-Instruct | AMD ROCm     |
 | Helm Charts       | vLLM, TGI      | Qwen/Qwen2.5-Coder-7B-Instruct | Intel Gaudi  |
 | Helm Charts       | vLLM, TGI      | Qwen/Qwen2.5-Coder-7B-Instruct | Intel Xeon   |
 | Helm Charts       | vLLM, TGI      | Qwen/Qwen2.5-Coder-7B-Instruct | AMD ROCm     |
