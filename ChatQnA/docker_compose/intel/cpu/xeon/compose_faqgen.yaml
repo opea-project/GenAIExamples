@@ -83,6 +83,7 @@ services:
   vllm-service:
     image: ${REGISTRY:-opea}/vllm:${TAG:-latest}
     container_name: vllm-server
+    privileged: true
     ports:
       - ${LLM_ENDPOINT_PORT:-9009}:80
     volumes:
