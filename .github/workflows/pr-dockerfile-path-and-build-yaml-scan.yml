@@ -94,7 +94,7 @@ jobs:
           consistency="TRUE"
           build_yamls=$(find . -name 'build.yaml')
           for build_yaml in $build_yamls; do
-            message=$(python3 .github/workflows/scripts/check-name-agreement.py "$build_yaml")
+            message=$(python3 .github/workflows/scripts/check_name_agreement.py "$build_yaml")
             if [[ "$message" != *"consistent"* ]]; then
               consistency="FALSE"
               echo "Inconsistent service name and image name found in file $build_yaml."
