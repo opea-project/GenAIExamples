@@ -156,21 +156,32 @@
             :class="['form-wrap', index ? 'bt-border' : '']"
           >
             <li class="item-wrap">
-              {{ `${$t("pipeline.config.postProcessorType")}${index + 1}:` }}
+              <span class="label-wrap">
+                {{ $t("pipeline.config.postProcessorType") }}
+                <template v-if="formData.postprocessor?.length > 1">
+                  {{ index + 1 }}
+                </template></span
+              >
               <span class="content-wrap">{{ item.processor_type }}</span>
             </li>
-            <li class="item-wrap" v-if="item.reranker_model?.model_id">
-              <span class="label-wrap">{{ $t("pipeline.config.rerank") }}</span>
-              <span class="content-wrap">{{
-                item.reranker_model.model_id
-              }}</span>
-            </li>
-            <li class="item-wrap" v-if="item.reranker_model?.device">
-              <span class="label-wrap">{{
-                $t("pipeline.config.rerankDevice")
-              }}</span>
-              <span class="content-wrap">{{ item.reranker_model.device }}</span>
-            </li>
+            <template v-if="item.processor_type === 'reranker'">
+              <li class="item-wrap">
+                <span class="label-wrap">{{
+                  $t("pipeline.config.rerank")
+                }}</span>
+                <span class="content-wrap">{{
+                  item.reranker_model.model_id
+                }}</span>
+              </li>
+              <li class="item-wrap">
+                <span class="label-wrap">{{
+                  $t("pipeline.config.rerankDevice")
+                }}</span>
+                <span class="content-wrap">{{
+                  item.reranker_model.device
+                }}</span>
+              </li></template
+            >
           </ul>
         </a-collapse-panel>
       </a-collapse>

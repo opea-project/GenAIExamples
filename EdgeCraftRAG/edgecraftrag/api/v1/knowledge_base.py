@@ -293,25 +293,20 @@ async def refresh_milvus_map(milvus_name):
         current_pipeline_kb_map[kb.name] = kb.file_map
     all_pipeline_milvus_maps[milvus_name] = copy.deepcopy(current_pipeline_kb_map)
 
-
-def clear_milvus_map(milvus_name):
-    all_pipeline_milvus_maps[milvus_name] = {}
-
-
 async def Synchronizing_vector_data(old_active_pl, new_active_pl):
     try:
         active_kb = ctx.knowledgemgr.get_active_knowledge_base()
         active_pl = ctx.get_pipeline_mgr().get_active_pipeline()
         if not active_kb or not active_pl:
             return True
+        milvus_name = old_active_pl.name + str(old_active_pl.indexer.model_extra['d'])  if old_active_pl else "default_kb"
 
         if new_active_pl.indexer.comp_subtype == "milvus_vector":
-            milvus_name = new_active_pl.name
             new_milvus_map = {}
             kb_list = await get_all_knowledge_bases()
             for kb in kb_list:
                 new_milvus_map[kb.name] = kb.file_map
-            added_files, deleted_files = compare_mappings(new_milvus_map, all_pipeline_milvus_maps.get(milvus_name, {}))
+            added_files, deleted_files = compare_mappings(new_milvus_map, all_pipeline_milvus_maps.get(new_active_pl.name + str(new_active_pl.indexer.model_extra['d']), {}))
             # Synchronization of deleted files
             for kb_name, file_paths in deleted_files.items():
                 if file_paths:
@@ -335,7 +330,6 @@ async def Synchronizing_vector_data(old_active_pl, new_active_pl):
             new_active_pl.update_indexer_to_retriever()
             await refresh_milvus_map(milvus_name)
         else:
-            milvus_name = old_active_pl.name if old_active_pl else "default_kb"
             new_active_pl.indexer.reinitialize_indexer()
             new_active_pl.update_indexer_to_retriever()
             add_list = active_kb.get_file_paths()

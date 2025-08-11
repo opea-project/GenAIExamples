@@ -14,6 +14,7 @@ export default {
     confirm: "确认",
     save: "保存",
     back: "返回",
+    prev: "上一步",
     next: "下一步",
     submit: "提交",
     prompt: "提示",
@@ -23,6 +24,8 @@ export default {
     success: "成功",
     error: "错误",
     clear: "清除",
+    all: "全选",
+    reset: "重置",
     uploadTip: "点击或将文件拖到此区域进行上传",
   },
   system: {
@@ -46,7 +49,8 @@ export default {
     step1: "创建 Pipeline",
     step1Tip: "定制您的 RAG 流程，释放 AI 信息处理的最大能力。",
     step2: "前往对话",
-    step2Tip: "开始与智能聊天机器人互动，它支持文件上传和信息检索，帮助您更高效地完成任务。",
+    step2Tip:
+      "开始与智能聊天机器人互动，它支持文件上传和信息检索，帮助您更高效地完成任务。",
     create: "去创建",
   },
   pipeline: {
@@ -123,7 +127,7 @@ export default {
       llmDevice: "请选择大语言模型运行设备",
       weights: "请选择模型权重",
       vector_uri: "IP : 端口，(例如 192.168.1.1:19530)",
-      vllm_url: "IP : 端口，(例如 192.168.1.1:8080)",
+      vllm_url: "IP : 端口，(例如 192.168.1.1:8086)",
       urlValid1: "URL 不能为空",
       urlValid2: "请输入正确的URL",
       urlValid3: "URL无法访问",
@@ -133,7 +137,8 @@ export default {
     },
     desc: {
       name: "Pipeline的名称标识，用于区分不同工作流",
-      nodeParserType: "RAG 处理时的文本拆分策略，支持简单句子、层次结构等解析方式",
+      nodeParserType:
+        "RAG 处理时的文本拆分策略，支持简单句子、层次结构等解析方式",
       chunkSize: "文本处理时的单块数据大小",
       chunkOverlap: "相邻数据块的重叠部分大小，确保跨块语义连续性",
       windowSize: "每个节点捕获的上下文句子窗口大小，用于增强语义完整性",
@@ -158,7 +163,8 @@ export default {
       vector: "矢量存储索引",
       simple: "解析文本，优先选择完整的句子。",
       hierarchical: "使用借点解析将文档分割成递归层次节点",
-      sentencewindow: "将文档分割成节点，每个节点代表一个句子。每个节点包含一个来自元数据中周围句子的窗口",
+      sentencewindow:
+        "将文档分割成节点，每个节点代表一个句子。每个节点包含一个来自元数据中周围句子的窗口",
       unstructured: "一个处理非结构化数据的组件",
       milvusVector: "嵌入存储在Milvus索引中",
       vector_uri: "测试Milvus地址是否可用",
@@ -181,7 +187,8 @@ export default {
     desc: {
       top_n: "重排后结果的数量",
       temperature: "数值越高，输出越多样化",
-      top_p: "从累积概率超过 top_p 的最小标记集中采样,设为1则禁用并从所有标记取样。",
+      top_p:
+        "从累积概率超过 top_p 的最小标记集中采样,设为1则禁用并从所有标记取样。",
       top_k: "从概率前k的 Token 中采样",
       penalty: "抑制重复的系数,设为1.0表示禁用",
       maxToken: "生成回答的最大Token数量",
@@ -198,8 +205,10 @@ export default {
     rag: "EC RAG",
     setting: "Pipeline 配置",
     clear: "清除消息",
-    thinkStart: "执行推理搜索中",
-    thinkEnd: "推理搜索已完成",
+    think: "思考",
+    reason: "思考",
+    thinkStart: "思考中...",
+    thinkEnd: "思考过程",
   },
   knowledge: {
     title: "知识库",
@@ -209,7 +218,8 @@ export default {
     edit: "编辑知识库",
     deleteTip: "您确定要删除此知识库吗？此操作不可恢复。",
     activeTip: "您确定要激活此知识库吗？",
-    uploadTip: "支持 PDF、Word、TXT、Doc、HTML、PPT 格式，单个文件大小不超过 200M。",
+    uploadTip:
+      "支持 PDF、Word、TXT、Doc、HTML、PPT 格式，单个文件大小不超过 200M。",
     notFileTip: "您还没有上传任何文件，点击“上传”按钮开始添加内容吧～",
     name: "名称",
     des: "描述",

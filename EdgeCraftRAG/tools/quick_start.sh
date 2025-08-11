@@ -58,6 +58,8 @@ function start_vllm_services() {
     # vllm ENV
     export NGINX_PORT=8086
     export vLLM_ENDPOINT="http://${HOST_IP}:${NGINX_PORT}"
+    TENSOR_PARALLEL_SIZE=$(get_user_input "your tp size" 1)
+    SELECTED_XPU_0=$(get_user_input "selected GPU " "0")
     DP_NUM=$(get_user_input "DP number(how many containers to run vLLM)" 1)
     for (( x=0; x<DP_NUM; x++ ))
     do
@@ -75,6 +77,8 @@ function start_vllm_services() {
     export no_proxy="localhost, 127.0.0.1, 192.168.1.1, ${HOST_IP}"
     export MILVUS_ENABLED=${MILVUS_ENABLED}
     export CHAT_HISTORY_ROUND=${CHAT_HISTORY_ROUND}
+    export SELECTED_XPU_0=${SELECTED_XPU_0}
+    export TENSOR_PARALLEL_SIZE=${TENSOR_PARALLEL_SIZE}
 
     bash $WORKPATH/nginx/nginx-conf-generator.sh $DP_NUM $WORKPATH/nginx/nginx.conf
     export NGINX_CONFIG_PATH="${WORKPATH}/nginx/nginx.conf"

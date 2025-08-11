@@ -11,12 +11,12 @@
         </div>
         <div class="message-wrap">
           <div v-if="!props.message?.content" class="dot-loader">
-            <span class="drop"></span>
-            <span class="drop"></span>
-            <span class="drop"></span>
+            <span class="drop" v-for="(drop, index) in 3" :key="index"></span>
           </div>
-
-          <div class="think-container" v-if="getThinkMode().value?.length > 8">
+          <div
+            class="think-container"
+            v-if="thinkMode && message.content?.length"
+          >
             <div
               :class="{
                 'think-title': true,
@@ -112,6 +112,10 @@ const props = defineProps({
     type: Boolean,
     required: true,
   },
+  think: {
+    type: Boolean,
+    required: true,
+  },
 });
 
 const emit = defineEmits(["preview", "stop"]);
@@ -121,6 +125,7 @@ const benchmarkData = computed<Benchmark>(() => {
 });
 const isExpanded = ref<boolean>(false);
 const isCollapsed = ref(true);
+const thinkMode = ref(props.think);
 
 marked.setOptions({
   pedantic: false,
@@ -129,9 +134,7 @@ marked.setOptions({
   renderer: CustomRenderer,
 });
 const thinkTagRegexSpecial = /^[\s\S]*?<\/think>/;
-const thinkTagRegex = /<think>([\s\S]*?)<\/think>/;
 
-const isThinkMode = computed(() => props.message.content.includes("<think>"));
 const isThinkEnd = computed(() => props.message.content.includes("</think>"));
 const getThinkMode = () => {
   const { content } = props.message;
@@ -140,7 +143,7 @@ const getThinkMode = () => {
   return computed(() => {
     if (isThinkEnd.value) {
       return content.substring(0, endIndex);
-    } else if (isThinkMode.value) {
+    } else if (thinkMode.value) {
       return content;
     } else {
       return "";
@@ -154,18 +157,19 @@ const thinkMarkdown = computed(() => {
 
 const renderedMarkdown = computed(() => {
   const content = props.message?.content || "";
+
   if (!content) return "";
-  if (isThinkMode.value && !isThinkEnd.value) {
-    return "";
-  }
-  if (isThinkEnd.value) {
-    const cleanedContent = isThinkMode.value
-      ? content.replace(thinkTagRegex, "")
-      : content.replace(thinkTagRegexSpecial, "");
-    return marked(cleanedContent);
+
+  if (!thinkMode.value) {
+    return marked(content);
   }
 
-  return marked(content);
+  if (!isThinkEnd.value) {
+    return "";
+  }
+
+  const cleanedContent = content.replace(thinkTagRegexSpecial, "");
+  return marked(cleanedContent);
 });
 const toggleTabs = () => {
   isExpanded.value = !isExpanded.value;
@@ -301,7 +305,6 @@ watch(
 .benchmark-wrap {
   .flex-left;
   margin-bottom: 20px;
-  padding-left: 40px;
   gap: 12px;
   position: relative;
   top: -8px;
@@ -430,6 +433,7 @@ watch(
         justify-content: center;
         flex-shrink: 0;
         margin-bottom: 8px;
+        margin-top: 2px;
         &::before {
           content: "";
           position: absolute;

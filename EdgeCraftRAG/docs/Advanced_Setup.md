@@ -1,6 +1,6 @@
 # Edge Craft Retrieval-Augmented Generation Advanced Setup
 
-## Query Search (Experience Injection)
+## Query Search
 
 Query Search features allow EC-RAG to do query pre-process before retrieval and reranking. To enable query search, vllm inference is required. Chinese version is available in [Query Search Zh](Query_Search_Zh.md)
 
@@ -114,6 +114,9 @@ export MILVUS_ENABLED=0
 # EC-RAG support chat history round setting, by default chat history is disabled, you can set CHAT_HISTORY_ROUND to control it
 # export CHAT_HISTORY_ROUND= # change to your preference
 
+# EC-RAG support pipeline performance benchmark, use ENABLE_BENCHMARK=true/false to turn on/off benchmark
+# export ENABLE_BENCHMARK= # change to your preference
+
 # Launch EC-RAG service with compose
 docker compose -f docker_compose/intel/gpu/arc/compose.yaml up -d
 ```
@@ -122,7 +125,7 @@ docker compose -f docker_compose/intel/gpu/arc/compose.yaml up -d
 
 EC-RAG support run inference with multi-ARC in multiple isolated containers
 Docker Images preparation is the same as local inference section, please refer to [Build Docker Images](#1-optional-build-docker-images-for-mega-service-server-and-ui-by-your-own)
-Model preparation is the same as vLLM inference section, please refer to [Prepare models](../README.md#2-prepare-models)
+Model preparation is the same as vLLM inference section, please refer to [Prepare models](../docker_compose/intel/gpu/arc/README.md#2-prepare-models)
 After docker images preparation and model preparation, please follow below steps to run multi-ARC Setup(Below steps show 2 vLLM container(2 DP) with multi Intel Arc GPUs):
 
 ### 1. Prepare env variables and configurations
@@ -192,4 +195,4 @@ bash docker_compose/intel/gpu/arc/multi-arc-yaml-generator.sh $DP_NUM docker_com
 
 ### 3. Start Edge Craft RAG Services with Docker Compose
 
-This section is the same as default vLLM inference section, please refer to [Start Edge Craft RAG Services with Docker Compose](../README.md#4-start-edge-craft-rag-services-with-docker-compose)
+This section is the same as default vLLM inference section, please refer to [Start Edge Craft RAG Services with Docker Compose](../docker_compose/intel/gpu/arc/README.md#4-start-edge-craft-rag-services-with-docker-compose)

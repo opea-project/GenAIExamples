@@ -7,7 +7,7 @@ import os
 import weakref
 from concurrent.futures import ThreadPoolExecutor
 
-from edgecraftrag.api.v1.knowledge_base import Synchronizing_vector_data, clear_milvus_map
+from edgecraftrag.api.v1.knowledge_base import Synchronizing_vector_data
 from edgecraftrag.api_schema import MilvusConnectRequest, PipelineCreateIn
 from edgecraftrag.base import IndexerType, InferenceType, ModelType, NodeParserType, PostProcessorType, RetrieverType
 from edgecraftrag.components.benchmark import Benchmark
@@ -186,11 +186,6 @@ def update_pipeline_handler(pl, req):
             pl._index_to_retriever_updated = False
             # As indexer changed, nodes are cleared in indexer's db
             pl._node_changed = True
-
-    # If embedding_model is modified, clear the vector in milvus and reload it.
-    if pl.indexer.comp_subtype == "milvus_vector":
-        if pl.indexer.model.model_id != req.indexer.embedding_model.model_id: 
-            clear_milvus_map(pl.name)
 
     if req.retriever is not None:
         retr = req.retriever

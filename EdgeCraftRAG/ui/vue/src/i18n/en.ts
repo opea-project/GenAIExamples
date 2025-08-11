@@ -13,6 +13,7 @@ export default {
     cancel: "Cancel",
     confirm: "Confirm",
     save: "Save",
+    prev: "Prev",
     back: "Back",
     next: "Next",
     submit: "Submit",
@@ -23,6 +24,8 @@ export default {
     success: "Success",
     error: "Error",
     clear: "Clear",
+    all: "All",
+    reset: "Reset",
     uploadTip: "Click or drag file to this area to upload",
   },
   system: {
@@ -60,7 +63,8 @@ export default {
     activated: "Activated",
     inactive: "Inactive",
     isActive: "Activated",
-    pipelineFormatTip: "Supports JSON format, with file size not exceeding 10M.",
+    pipelineFormatTip:
+      "Supports JSON format, with file size not exceeding 10M.",
     importSuccTip: "Files upload successful!",
     importErrTip: "Files upload failed!",
     name: "Name",
@@ -70,7 +74,8 @@ export default {
     deactivateTip: "Are you sure deactivate this pipeline?",
     activeTip: "Are you sure activate this pipeline?",
     deleteTip: "Are you sure delete this pipeline?",
-    notActivatedTip: "There is no available pipeline. Please create or activate it first.",
+    notActivatedTip:
+      "There is no available pipeline. Please create or activate it first.",
     validErr: "Form validation failed !",
     config: {
       basic: "Basic",
@@ -107,9 +112,11 @@ export default {
       nameValid2: "Name should be between 2 and 30 characters",
       nodeParserType: "Please select Node Parser Type",
       chunkSizeValid1: "Please select Chunk Size",
-      chunkSizeValid2: "The value of Chunk Size cannot be less than Chunk Overlap",
+      chunkSizeValid2:
+        "The value of Chunk Size cannot be less than Chunk Overlap",
       chunkOverlapValid1: "Please select Chunk Overlap",
-      chunkOverlapValid2: "The value of Chunk Overlap cannot be greater than Chunk Size",
+      chunkOverlapValid2:
+        "The value of Chunk Overlap cannot be greater than Chunk Size",
       windowSize: "Please select Chunk Window Size",
       indexerType: "Please select Indexer Type",
       embedding: "Please select Embedding Model",
@@ -124,7 +131,7 @@ export default {
       llmDevice: "Please select LLM run device",
       weights: "Please select Weights",
       vector_uri: "IP : Port, (e.g. 192.168.1.1:19530)",
-      vllm_url: "IP : Port, (e.g. 192.168.1.1:8080)",
+      vllm_url: "IP : Port, (e.g. 192.168.1.1:8086)",
       urlValid1: "Please enter url",
       urlValid2: "Please enter the correct url",
       urlValid3: "URL cannot be accessed",
@@ -137,14 +144,17 @@ export default {
       nodeParserType: "Node parsing type when you use RAG",
       chunkSize: "Size of each chunk for processing",
       chunkOverlap: "Overlap size between chunks",
-      windowSize: "The number of sentences on each side of a sentence to capture",
-      indexerType: "The type of index structure responsible for building based on the parsed nodes",
+      windowSize:
+        "The number of sentences on each side of a sentence to capture",
+      indexerType:
+        "The type of index structure responsible for building based on the parsed nodes",
       embedding: "Embed the text data to represent it and build a vector index",
       embeddingDevice: "The device used by the Embedding Model",
       retrieverType:
         "The retrieval type used when retrieving relevant nodes from the index according to the user's query",
       topk: "The number of top k results to return",
-      postProcessorType: "Select postprocessors for post-processing of the context",
+      postProcessorType:
+        "Select postprocessors for post-processing of the context",
       rerank: "Rerank Model",
       rerankDevice: "Rerank run device",
       generatorType: "Local inference generator or vllm generator",
@@ -152,17 +162,21 @@ export default {
       llmDevice: "The device used by the  LLM",
       weights: "Model weight",
       reranker: "The model for reranking.",
-      metadataReplace: "Used to replace the node content with a field from the node metadata.",
+      metadataReplace:
+        "Used to replace the node content with a field from the node metadata.",
       vectorsimilarity: "retrieval according to vector similarity",
-      autoMerge: "This retriever will try to merge context into parent context.",
+      autoMerge:
+        "This retriever will try to merge context into parent context.",
       bm25: "A BM25 retriever that uses the BM25 algorithm to retrieve nodes.",
       faissVector: "Embeddings are stored within a Faiss index.",
       vector: "Vector Store Index.",
       simple: "Parse text with a preference for complete sentences.",
-      hierarchical: "Splits a document into a recursive hierarchy Nodes using a NodeParser.",
+      hierarchical:
+        "Splits a document into a recursive hierarchy Nodes using a NodeParser.",
       sentencewindow:
         "Sentence window node parser. Splits a document into Nodes, with each node being a sentence. Each node contains a window from the surrounding sentences in the metadata.",
-      unstructured: "UnstructedNodeParser is a component that processes unstructured data.",
+      unstructured:
+        "UnstructedNodeParser is a component that processes unstructured data.",
       milvusVector: "Embedding vectors stored in milvus",
       vector_uri: "Connecting milvus uri",
       test: "Test",
@@ -202,8 +216,10 @@ export default {
     rag: "EC RAG",
     setting: "Pipeline Setting",
     clear: "Clear Message",
-    thinkStart: "Performing reasoning search",
-    thinkEnd: "Reasoning search has been completed",
+    think: "Think",
+    reason: "Think",
+    thinkStart: "Thinking...",
+    thinkEnd: "Thoughts",
   },
   knowledge: {
     title: "Knowledge Base",
@@ -213,7 +229,8 @@ export default {
     edit: "Edit Knowledge Base",
     deleteTip: "Are you sure delete this knowledge base?",
     activeTip: "Are you sure activate this knowledge base?",
-    uploadTip: "Supports PDF, Word, TXT,Doc,Html,PPT formats, with a single file size not exceeding 200M",
+    uploadTip:
+      "Supports PDF, Word, TXT,Doc,Html,PPT formats, with a single file size not exceeding 200M",
     notFileTip: "The knowledge base is empty. Go upload your files.",
     name: "Name",
     des: "Description",
