@@ -72,10 +72,10 @@ flowchart LR
 
 The table below lists currently available deployment options. They outline in detail the implementation of this example on selected hardware.
 
-| Category               | Deployment Option | Guide                                                                     |
-| ---------------------- | ----------------- | ------------------------------------------------------------------------- |
-| On-premise Deployments    | Docker compose               | [DocIndexRetriever deployment on Xeon](./docker_compose/intel/cpu/xeon/README.md)  |
-|                           |                              | [DocIndexRetriever deployment on Gaudi](./docker_compose/intel/hpu/gaudi/README.md)|  
+| Category               | Deployment Option | Guide                                                                               |
+| ---------------------- | ----------------- | ----------------------------------------------------------------------------------- |
+| On-premise Deployments | Docker compose    | [DocIndexRetriever deployment on Xeon](./docker_compose/intel/cpu/xeon/README.md)   |
+|                        |                   | [DocIndexRetriever deployment on Gaudi](./docker_compose/intel/hpu/gaudi/README.md) |
 
 ## Validated Configurations
 
