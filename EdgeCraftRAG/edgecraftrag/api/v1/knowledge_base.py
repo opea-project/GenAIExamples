@@ -5,6 +5,15 @@ import json
 import os
 import re
 
+
+# Define the root directory for knowledge base files
+DATA_ROOT = "/path/to/knowledge_base_data"
+
+def is_safe_path(base_path, user_path):
+    # Normalize the joined path
+    full_path = os.path.normpath(os.path.join(base_path, user_path))
+    # Ensure the normalized path starts with the base path
+    return full_path.startswith(os.path.abspath(base_path))
 from edgecraftrag.api.v1.data import add_data
 from edgecraftrag.api_schema import DataIn, KnowledgeBaseCreateIn
 from edgecraftrag.base import IndexerType
@@ -112,16 +121,20 @@ async def add_file_to_knowledge_base(knowledge_name, file_path: DataIn):
     try:
         active_pl = ctx.get_pipeline_mgr().get_active_pipeline()
         kb = ctx.knowledgemgr.get_knowledge_base_by_name_or_id(knowledge_name)
-        if os.path.isdir(file_path.local_path):
-            for root, _, files in os.walk(file_path.local_path):
+        # Validate the user-provided path
+        if not is_safe_path(DATA_ROOT, file_path.local_path):
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid file path")
+        abs_local_path = os.path.normpath(os.path.join(DATA_ROOT, file_path.local_path))
+        if os.path.isdir(abs_local_path):
+            for root, _, files in os.walk(abs_local_path):
                 for file in files:
                     file_full_path = os.path.join(root, file)
                     if file_full_path not in kb.get_file_paths():
                         kb.add_file_path(file_full_path)
                     else:
                         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="File upload failed")
-        elif os.path.isfile(file_path.local_path) and file_path.local_path not in kb.get_file_paths():
-            kb.add_file_path(file_path.local_path)
+        elif os.path.isfile(abs_local_path) and abs_local_path not in kb.get_file_paths():
+            kb.add_file_path(abs_local_path)
         else:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="File upload failed")
 
