@@ -29,6 +29,6 @@ spec:
         internalService:
           serviceName: tgi-gaudi-svc
           config:
-            MODEL_ID: mistralai/Mistral-7B-Instruct-v0.3
+            MODEL_ID: Qwen/Qwen2.5-Coder-7B-Instruct
             endpoint: /generate
           isDownstreamService: true

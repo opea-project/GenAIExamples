@@ -92,7 +92,7 @@ flowchart LR
 
 ```
 
-This MultimodalQnA use case performs Multimodal-RAG using LangChain, Redis VectorDB and Text Generation Inference on [Intel Gaudi2](https://www.intel.com/content/www/us/en/products/details/processors/ai-accelerators/gaudi-overview.html) and [Intel Xeon Scalable Processors](https://www.intel.com/content/www/us/en/products/details/processors/xeon.html), and we invite contributions from other hardware vendors to expand the example.
+This MultimodalQnA use case performs Multimodal-RAG using LangChain, Redis VectorDB and Text Generation Inference on [Intel Gaudi2](https://www.intel.com/content/www/us/en/products/details/processors/ai-accelerators/gaudi.html), [Intel Xeon Scalable Processors](https://www.intel.com/content/www/us/en/products/details/processors/xeon.html) and [AMD EPYC™ Processors](https://www.amd.com/en/products/processors/server/epyc.html), and we invite contributions from other hardware vendors to expand the example.
 
 ## Deployment Options
 
@@ -106,4 +106,14 @@ The table below lists currently available deployment options. They outline in de
 | ----------------- | -------------- | --------------------------------- | ------------- | ------------ |
 | Docker Compose    | LLAVA          | llava-hf/llava-1.5-7b-hf          | Milvus, Redis | Intel Xeon   |
 | Docker Compose    | LLAVA          | llava-hf/llava-v1.6-vicuna-13b-hf | Redis         | Intel Gaudi  |
+| Docker Compose    | LLAVA          | llava-hf/llava-1.5-7b-hf          | Milvus, Redis | AMD EPYC     |
+| Docker Compose    | TGI, vLLM      | Xkev/Llama-3.2V-11B-cot           | Redis         | AMD ROCm     |
+
+## Validated Configurations
+
+| **Deploy Method** | **LLM Engine** | **LLM Model**                     | **Database**  | **Hardware** |
+| ----------------- | -------------- | --------------------------------- | ------------- | ------------ |
+| Docker Compose    | LLAVA          | llava-hf/llava-1.5-7b-hf          | Milvus, Redis | Intel Xeon   |
+| Docker Compose    | LLAVA          | llava-hf/llava-v1.6-vicuna-13b-hf | Redis         | Intel Gaudi  |
+| Docker Compose    | LLAVA          | llava-hf/llava-1.5-7b-hf          | Milvus, Redis | AMD EPYC     |
 | Docker Compose    | TGI, vLLM      | Xkev/Llama-3.2V-11B-cot           | Redis         | AMD ROCm     |
