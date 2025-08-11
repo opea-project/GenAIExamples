@@ -74,8 +74,8 @@ The table below lists currently available deployment options. They outline in de
 
 | Category               | Deployment Option | Guide                                                                     |
 | ---------------------- | ----------------- | ------------------------------------------------------------------------- |
-| On-premise Deployments | Docker compose    | [ChatQnA deployment on Xeon](./docker_compose/intel/cpu/xeon/README.md)   |
-|                        |                   | [ChatQnA deployment on Gaudi](./docker_compose/intel/hpu/gaudi/README.md) |
+| On-premise Deployments    | Docker compose               | [DocIndexRetriever deployment on Xeon](./docker_compose/intel/cpu/xeon/README.md)  |
+|                           |                              | [DocIndexRetriever deployment on Gaudi](./docker_compose/intel/hpu/gaudi/README.md)|  
 
 ## Validated Configurations
 
