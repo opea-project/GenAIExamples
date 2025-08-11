@@ -251,9 +251,7 @@ class Deployer:
                     env_vars = parse_shell_env_file(local_env_file)
                     conflicting_ports = get_conflicting_ports_from_compose(self._get_docker_compose_files(), env_vars)
                     if conflicting_ports:
-                        raise DeploymentError(
-                            f"Ports are in use by other applications: {sorted(conflicting_ports)}"
-                        )
+                        raise DeploymentError(f"Ports are in use by other applications: {sorted(conflicting_ports)}")
             except Exception as e:
                 raise DeploymentError(f"Failed during pre-deployment check: {e}") from e
 
