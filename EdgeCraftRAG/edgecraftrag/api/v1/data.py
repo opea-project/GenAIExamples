@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import os
+from werkzeug.utils import secure_filename
 
 from edgecraftrag.api_schema import DataIn, FilesIn
 from edgecraftrag.context import ctx
@@ -103,9 +104,23 @@ async def upload_file(file_name: str, file: UploadFile = File(...)):
     try:
         # DIR for server to save files uploaded by UI
         UI_DIRECTORY = os.getenv("TMPFILE_PATH", "/home/user/ui_cache")
-        UPLOAD_DIRECTORY = os.path.join(UI_DIRECTORY, file_name)
+        # Sanitize file_name to prevent path traversal
+        safe_file_name = secure_filename(file_name)
+        UPLOAD_DIRECTORY = os.path.normpath(os.path.join(UI_DIRECTORY, safe_file_name))
+        # Ensure UPLOAD_DIRECTORY is within UI_DIRECTORY
+        if not UPLOAD_DIRECTORY.startswith(os.path.abspath(UI_DIRECTORY)):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid file name or path"
+            )
         os.makedirs(UPLOAD_DIRECTORY, exist_ok=True)
-        file_path = os.path.join(UPLOAD_DIRECTORY, file.filename)
+        # Sanitize the uploaded file's name
+        safe_filename = secure_filename(file.filename)
+        file_path = os.path.normpath(os.path.join(UPLOAD_DIRECTORY, safe_filename))
+        # Ensure file_path is within UPLOAD_DIRECTORY
+        if not file_path.startswith(os.path.abspath(UPLOAD_DIRECTORY)):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid uploaded file name"
+            )
         with open(file_path, "wb") as buffer:
             buffer.write(await file.read())
         return file_path
