@@ -1,21 +1,25 @@
-# Edge Craft Retrieval-Augmented Generation
+# Example Edge Craft Retrieval-Augmented Generation Deployment on Intel® Arc® Platform
 
-Edge Craft RAG (EC-RAG) is a customizable, tunable and production-ready
-Retrieval-Augmented Generation system for edge solutions. It is designed to
-curate the RAG pipeline to meet hardware requirements at edge with guaranteed
-quality and performance.
+This document outlines the deployment process for Edge Craft Retrieval-Augmented Generation service on Intel Arc server. This example includes the following sections:
 
-## What's New in this release?
+- [EdgeCraftRAG Quick Start Deployment](#edgecraftrag-quick-start-deployment): Demonstrates how to quickly deploy a Edge Craft Retrieval-Augmented Generation service/pipeline on Intel® Arc® platform.
+- [EdgeCraftRAG Docker Compose Files](#edgecraftrag-docker-compose-files): Describes some example deployments and their docker compose files.
+- [EdgeCraftRAG Service Configuration](#edgecraftrag-service-configuration): Describes the service and possible configuration changes.
 
-- Add MilvusDB to support persistent storage
-- Support EC-RAG service recovery after restart
-- Add query search in EC-RAG pipeline to improve RAG quality
-- Support Qwen3-8B as the default LLM for EC-RAG
-- Enable chat history round setting for Users
+## EdgeCraftRAG Quick Start Deployment
 
-## Quick Start Guide
+This section describes how to quickly deploy and test the EdgeCraftRAG service manually on Intel® Arc® platform. The basic steps are:
 
-### 1. Prerequisites
+1. [Prerequisites](#prerequisites)
+2. [Access the Code](#access-the-code)
+2. [Prepare models](#prepare-models)
+3. [Prepare env variables and configurations](#prepare-env-variables-and-configurations)
+4. [Configure the Deployment Environment](#configure-the-deployment-environment)
+5. [Deploy the Service Using Docker Compose](#deploy-the-service-using-docker-compose)
+6. [Access UI](#access-ui)
+7. [Cleanup the Deployment](#cleanup-the-deployment)
+
+### Prerequisites
 
 EC-RAG supports vLLM deployment(default method) and local OpenVINO deployment for Intel Arc GPU. Prerequisites are shown as below:  
 Hardware: Intel Arc A770  
@@ -24,11 +28,24 @@ Driver & libraries: please to [Installing GPUs Drivers](https://dgpu-docs.intel.
 
 Below steps are based on **vLLM** as inference engine, if you want to choose **OpenVINO**, please refer to [OpenVINO Local Inference](../../../../docs/Advanced_Setup.md#openvino-local-inference)
 
-### 2. Prepare models
+### Access the Code
 
-```bash
+Clone the GenAIExample repository and access the EdgeCraftRAG Intel® Arc® platform Docker Compose files and supporting scripts:
+
+```
 git clone https://github.com/opea-project/GenAIExamples.git
 cd GenAIExamples/EdgeCraftRAG
+```
+
+Checkout a released version, such as v1.3:
+
+```
+git checkout v1.3
+```
+
+### Prepare models
+
+```bash
 # Prepare models for embedding, reranking:
 export MODEL_PATH="${PWD}/models" # Your model path for embedding, reranking and LLM models
 mkdir -p $MODEL_PATH
@@ -45,7 +62,7 @@ modelscope download --model $LLM_MODEL --local_dir "${MODEL_PATH}/${LLM_MODEL}"
 # huggingface-cli download $LLM_MODEL --local-dir "${MODEL_PATH}/${LLM_MODEL}"
 ```
 
-### 3. Prepare env variables and configurations
+### Prepare env variables and configurations
 
 Below steps are for single Intel Arc GPU inference, if you want to setup multi Intel Arc GPUs inference, please refer to [Multi-ARC Setup](../../../../docs/Advanced_Setup.md#multi-arc-setup)
 
@@ -85,7 +102,7 @@ bash nginx/nginx-conf-generator.sh 1 nginx/nginx.conf
 export NGINX_CONFIG_PATH="${PWD}/nginx/nginx.conf"
 ```
 
-### 4. Start Edge Craft RAG Services with Docker Compose
+### Deploy the Service Using Docker Compose
 
 ```bash
 # EC-RAG support Milvus as persistent database, by default milvus is disabled, you can choose to set MILVUS_ENABLED=1 to enable it
@@ -100,7 +117,7 @@ export MILVUS_ENABLED=0
 docker compose -f docker_compose/intel/gpu/arc/compose_vllm.yaml up -d
 ```
 
-### 5. Access UI
+### Access UI
 
 Open your browser, access http://${HOST_IP}:8082
 
@@ -108,3 +125,39 @@ Open your browser, access http://${HOST_IP}:8082
 
 Below is the UI front page, for detailed operations on UI and EC-RAG settings, please refer to [Explore_Edge_Craft_RAG](../../../../docs/Explore_Edge_Craft_RAG.md)
 ![front_page](../../../../assets/img/front_page.png)
+
+### Cleanup the Deployment
+
+To stop the containers associated with the deployment, execute the following command:
+
+```
+docker compose -f docker_compose/intel/gpu/arc/compose_vllm.yaml down
+```
+
+All the EdgeCraftRAG containers will be stopped and then removed on completion of the "down" command.
+
+## EdgeCraftRAG Docker Compose Files
+
+The compose.yaml is default compose file using tgi as serving framework
+
+| Service Name        | Image Name                               |
+| ------------------- | ---------------------------------------- |
+| etcd                | quay.io/coreos/etcd:v3.5.5               |
+| minio               | minio/minio:RELEASE.2023-03-20T20-16-18Z |
+| milvus-standalone   | milvusdb/milvus:v2.4.6                   |
+| edgecraftrag-server | opea/edgecraftrag-server:latest          |
+| edgecraftrag-ui     | opea/edgecraftrag-ui:latest              |
+| ecrag               | opea/edgecraftrag:latest                 |
+
+## EdgeCraftRAG Service Configuration
+
+The table provides a comprehensive overview of the EdgeCraftRAG service utilized across various deployments as illustrated in the example Docker Compose files. Each row in the table represents a distinct service, detailing its possible images used to enable it and a concise description of its function within the deployment architecture.
+
+| Service Name        | Possible Image Names                     | Optional | Description                                                                                      |
+| ------------------- | ---------------------------------------- | -------- | ------------------------------------------------------------------------------------------------ |
+| etcd                | quay.io/coreos/etcd:v3.5.5               | No       | Provides distributed key-value storage for service discovery and configuration management.       |
+| minio               | minio/minio:RELEASE.2023-03-20T20-16-18Z | No       | Provides object storage services for storing documents and model files.                          |
+| milvus-standalone   | milvusdb/milvus:v2.4.6                   | No       | Provides vector database capabilities for managing embeddings and similarity search.             |
+| edgecraftrag-server | opea/edgecraftrag-server:latest          | No       | Serves as the backend for the EdgeCraftRAG service, with variations depending on the deployment. |
+| edgecraftrag-ui     | opea/edgecraftrag-ui:latest              | No       | Provides the user interface for the EdgeCraftRAG service.                                        |
+| ecrag               | opea/edgecraftrag:latest                 | No       | Acts as a reverse proxy, managing traffic between the UI and backend services.                   |

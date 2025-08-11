@@ -195,4 +195,4 @@ bash docker_compose/intel/gpu/arc/multi-arc-yaml-generator.sh $DP_NUM docker_com
 
 ### 3. Start Edge Craft RAG Services with Docker Compose
 
-This section is the same as default vLLM inference section, please refer to [Start Edge Craft RAG Services with Docker Compose](../docker_compose/intel/gpu/arc/README.md#4-start-edge-craft-rag-services-with-docker-compose)
+This section is the same as default vLLM inference section, please refer to [Start Edge Craft RAG Services with Docker Compose](../docker_compose/intel/gpu/arc/README.md#deploy-the-service-using-docker-compose)
