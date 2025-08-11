@@ -39,12 +39,9 @@ jobs:
       attestations: read
       models: read
       security-events: read
-    strategy:
-      matrix:
-        node: ${{ fromJson(needs.get-test-matrix.outputs.nodes) }}
     uses: ./.github/workflows/_build_comps_base_image.yml
     with:
-      node: ${{ matrix.node }}
+      node: gaudi
 
   run-examples:
     permissions:
