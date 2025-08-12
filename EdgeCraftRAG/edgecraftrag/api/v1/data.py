@@ -2,11 +2,11 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import os
-from werkzeug.utils import secure_filename
 
 from edgecraftrag.api_schema import DataIn, FilesIn
 from edgecraftrag.context import ctx
 from fastapi import FastAPI, File, HTTPException, UploadFile, status
+from werkzeug.utils import secure_filename
 
 data_app = FastAPI()
 
@@ -107,8 +107,7 @@ async def upload_file(file_name: str, file: UploadFile = File(...)):
         UPLOAD_DIRECTORY = os.path.normpath(os.path.join(UI_DIRECTORY, file_name))
         if not UPLOAD_DIRECTORY.startswith(os.path.abspath(UI_DIRECTORY) + os.sep):
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Invalid file_name: directory traversal detected"
+                status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid file_name: directory traversal detected"
             )
         os.makedirs(UPLOAD_DIRECTORY, exist_ok=True)
         safe_filename = secure_filename(file.filename)
@@ -117,9 +116,7 @@ async def upload_file(file_name: str, file: UploadFile = File(...)):
         file_path = os.path.normpath(os.path.join(UPLOAD_DIRECTORY, safe_filename))
         # Ensure file_path is within UPLOAD_DIRECTORY
         if not file_path.startswith(os.path.abspath(UPLOAD_DIRECTORY)):
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid uploaded file name"
-            )
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid uploaded file name")
         with open(file_path, "wb") as buffer:
             buffer.write(await file.read())
         return file_path

@@ -218,7 +218,7 @@ async def query_search(user_input, search_config_path, search_dir, pl):
     match_scores.sort(key=lambda x: x[1], reverse=True)
 
     # Maximum less than 0.6, we don't use query search.
-    if  match_scores[0][1] < 0.6:
+    if match_scores[0][1] < 0.6:
         return top1_issue, sub_questionss_result
     top1_issue = match_scores[0][0]
     for key, value in maintenance_data.items():

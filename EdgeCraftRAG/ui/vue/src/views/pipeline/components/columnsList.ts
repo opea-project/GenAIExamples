@@ -1,3 +1,6 @@
+// Copyright (C) 2025 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
+
 const getTableColumns = (t: (key: string) => string): TableColumns[] => [
   {
     title: t("pipeline.name"),

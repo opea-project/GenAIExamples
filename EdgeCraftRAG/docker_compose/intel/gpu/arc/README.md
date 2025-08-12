@@ -12,12 +12,12 @@ This section describes how to quickly deploy and test the EdgeCraftRAG service m
 
 1. [Prerequisites](#prerequisites)
 2. [Access the Code](#access-the-code)
-2. [Prepare models](#prepare-models)
-3. [Prepare env variables and configurations](#prepare-env-variables-and-configurations)
-4. [Configure the Deployment Environment](#configure-the-deployment-environment)
-5. [Deploy the Service Using Docker Compose](#deploy-the-service-using-docker-compose)
-6. [Access UI](#access-ui)
-7. [Cleanup the Deployment](#cleanup-the-deployment)
+3. [Prepare models](#prepare-models)
+4. [Prepare env variables and configurations](#prepare-env-variables-and-configurations)
+5. [Configure the Deployment Environment](#configure-the-deployment-environment)
+6. [Deploy the Service Using Docker Compose](#deploy-the-service-using-docker-compose)
+7. [Access UI](#access-ui)
+8. [Cleanup the Deployment](#cleanup-the-deployment)
 
 ### Prerequisites
 

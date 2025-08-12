@@ -19,6 +19,7 @@ kb_app = FastAPI()
 # Define the root directory for knowledge base files
 KNOWLEDGE_BASE_ROOT = "/home/user/ui_cache"
 
+
 # Get all knowledge bases
 @kb_app.get(path="/v1/knowledge")
 async def get_all_knowledge_bases():
@@ -91,7 +92,7 @@ async def update_knowledge_base(knowledge: KnowledgeBaseCreateIn):
                 file_paths = kb.get_file_paths()
                 await update_knowledge_base_handler(file_paths, knowledge.name)
             elif not knowledge.active and kb.description != knowledge.description:
-                pass                
+                pass
             elif not knowledge.active:
                 raise HTTPException(
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Must have an active knowledge base"
@@ -292,6 +293,8 @@ async def save_knowledge_to_file():
 
 all_pipeline_milvus_maps = {}
 current_pipeline_kb_map = {}
+
+
 async def refresh_milvus_map(milvus_name):
     current_pipeline_kb_map.clear()
     knowledge_bases_list = await get_all_knowledge_bases()
@@ -299,17 +302,20 @@ async def refresh_milvus_map(milvus_name):
         current_pipeline_kb_map[kb.name] = kb.file_map
     all_pipeline_milvus_maps[milvus_name] = copy.deepcopy(current_pipeline_kb_map)
 
+
 async def Synchronizing_vector_data(old_active_pl, new_active_pl):
     try:
         active_kb = ctx.knowledgemgr.get_active_knowledge_base()
         active_pl = ctx.get_pipeline_mgr().get_active_pipeline()
-        milvus_name = old_active_pl.name + str(old_active_pl.indexer.model_extra['d'])  if old_active_pl else "default_kb"
+        milvus_name = (
+            old_active_pl.name + str(old_active_pl.indexer.model_extra["d"]) if old_active_pl else "default_kb"
+        )
         if not active_kb:
             return True
         if not active_pl:
             if old_active_pl:
-                    if old_active_pl.indexer.comp_subtype == "milvus_vector":
-                        await refresh_milvus_map(milvus_name)
+                if old_active_pl.indexer.comp_subtype == "milvus_vector":
+                    await refresh_milvus_map(milvus_name)
             return True
 
         if new_active_pl.indexer.comp_subtype == "milvus_vector":
@@ -317,7 +323,10 @@ async def Synchronizing_vector_data(old_active_pl, new_active_pl):
             kb_list = await get_all_knowledge_bases()
             for kb in kb_list:
                 new_milvus_map[kb.name] = kb.file_map
-            added_files, deleted_files = compare_mappings(new_milvus_map, all_pipeline_milvus_maps.get(new_active_pl.name + str(new_active_pl.indexer.model_extra['d']), {}))
+            added_files, deleted_files = compare_mappings(
+                new_milvus_map,
+                all_pipeline_milvus_maps.get(new_active_pl.name + str(new_active_pl.indexer.model_extra["d"]), {}),
+            )
             # Synchronization of deleted files
             for kb_name, file_paths in deleted_files.items():
                 if file_paths:
@@ -350,5 +359,4 @@ async def Synchronizing_vector_data(old_active_pl, new_active_pl):
                 if old_active_pl.indexer.comp_subtype == "milvus_vector":
                     await refresh_milvus_map(milvus_name)
     except Exception as e:
-            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, 
-                                detail=e)
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=e)

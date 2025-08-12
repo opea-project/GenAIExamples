@@ -5,11 +5,12 @@ from typing import Any
 
 import faiss
 from edgecraftrag.base import BaseComponent, CompType, IndexerType
+from edgecraftrag.context import ctx
 from llama_index.core import StorageContext, VectorStoreIndex
 from llama_index.vector_stores.faiss import FaissVectorStore
 from llama_index.vector_stores.milvus import MilvusVectorStore
 from pydantic import model_serializer
-from edgecraftrag.context import ctx
+
 
 class VectorIndexer(BaseComponent, VectorStoreIndex):
 
@@ -31,7 +32,7 @@ class VectorIndexer(BaseComponent, VectorStoreIndex):
     def _initialize_indexer(self, embed_model, vector_type, milvus_uri, kb_name):
         # get active name
         pl = ctx.get_pipeline_mgr().get_active_pipeline()
-        plname =pl.name if pl else ""
+        plname = pl.name if pl else ""
         if embed_model:
             self.d = embed_model._model.request.outputs[0].get_partial_shape()[2].get_length()
         else:
@@ -47,7 +48,7 @@ class VectorIndexer(BaseComponent, VectorStoreIndex):
                 milvus_vector_store = MilvusVectorStore(
                     uri=milvus_uri,
                     dim=self.d,
-                    collection_name= kb_name + plname + str(self.d),
+                    collection_name=kb_name + plname + str(self.d),
                     overwrite=False,
                 )
                 milvus_store = StorageContext.from_defaults(vector_store=milvus_vector_store)
@@ -59,10 +60,10 @@ class VectorIndexer(BaseComponent, VectorStoreIndex):
     def clear_milvus_collection(self, kb_name="default_kb"):
         # get active name
         pl = ctx.get_pipeline_mgr().get_active_pipeline()
-        plname =pl.name if pl else ""
+        plname = pl.name if pl else ""
         milvus_vector_store = MilvusVectorStore(
             uri=self.milvus_uri,
-            collection_name= kb_name + plname + str(self.d),
+            collection_name=kb_name + plname + str(self.d),
             overwrite=False,
         )
         milvus_vector_store.clear()

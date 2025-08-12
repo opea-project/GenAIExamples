@@ -252,7 +252,9 @@ def update_pipeline_handler(pl, req):
                 ctx.get_model_mgr().add(model)
             # Use weakref to achieve model deletion and memory release
             model_ref = weakref.ref(model)
-            pl.generator = QnAGenerator(model_ref, gen.prompt_path, gen.inference_type, gen.vllm_endpoint, gen.prompt_content)
+            pl.generator = QnAGenerator(
+                model_ref, gen.prompt_path, gen.inference_type, gen.vllm_endpoint, gen.prompt_content
+            )
             if pl.enable_benchmark:
                 if "tokenizer" not in locals() or tokenizer is None:
                     _, tokenizer, bench_hook = ctx.get_model_mgr().load_model_ben(gen.model)
@@ -272,11 +274,10 @@ def update_pipeline_handler(pl, req):
         try:
             loop.run_until_complete(Synchronizing_vector_data(active_pipeline, pl))
         except Exception as e:
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Synchronization error: {e}"
-            )
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Synchronization error: {e}")
         finally:
             loop.close()
+
     with ThreadPoolExecutor(max_workers=1) as executor:
         future = executor.submit(run_async_task)
         future.result()
