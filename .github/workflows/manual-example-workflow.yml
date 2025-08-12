@@ -25,12 +25,12 @@ on:
     inputs:
       nodes:
         default: "gaudi,xeon"
-        description: "Hardware to run test gaudi,xeon,rocm,arc,gaudi3,xeon-gnr"
+        description: "Hardware to run test gaudi,xeon,rocm,epyc,arc,gaudi3,xeon-gnr"
         required: true
         type: string
       examples:
         default: "ChatQnA"
-        description: 'List of examples to test [AgentQnA,AudioQnA,ChatQnA,CodeGen,CodeTrans,DocIndexRetriever,DocSum,InstructionTuning,MultimodalQnA,ProductivitySuite,RerankFinetuning,SearchQnA,Translation,VideoQnA,VisualQnA,AvatarChatbot,Text2Image,WorkflowExecAgent,DBQnA,EdgeCraftRAG,GraphRAG]'
+        description: 'List of examples to test [AgentQnA,AudioQnA,AvatarChatbot,ChatQnA,CodeGen,CodeTrans,DBQnA,DeepResearchAgent,DocIndexRetriever,DocSum,EdgeCraftRAG,FinanceAgent,GraphRAG,HybridRAG,InstructionTuning,MultimodalQnA,ProductivitySuite,RerankFinetuning,SearchQnA,Text2Image,Translation,VideoQnA,VisualQnA,WorkflowExecAgent]'
         required: true
         type: string
       tag:
