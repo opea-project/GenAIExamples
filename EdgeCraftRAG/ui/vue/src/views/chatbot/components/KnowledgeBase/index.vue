@@ -95,6 +95,7 @@ import {
   EditFilled,
   CheckCircleFilled,
   CloseCircleFilled,
+  FileDoneOutlined,
 } from "@ant-design/icons-vue";
 import { useI18n } from "vue-i18n";
 import { Modal } from "ant-design-vue";
@@ -207,13 +208,13 @@ onUnmounted(() => {
   .menu-container {
     width: 100%;
     height: 100%;
-    padding: 16px 0;
     border-right: 1px solid var(--border-main-color);
     .flex-column;
     gap: 12px;
     .header-menu {
       .vertical-center;
-      padding: 0 16px 12px 16px;
+      padding: 0 12px;
+      height: 60px;
       border-bottom: 1px solid var(--border-main-color);
       .intel-btn {
         width: 100%;
@@ -306,6 +307,10 @@ onUnmounted(() => {
   }
 }
 .intel-empty {
-  margin: 200px auto;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 </style>

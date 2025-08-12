@@ -12,6 +12,8 @@ declare module 'vue' {
   export interface GlobalComponents {
     AAffix: typeof import('ant-design-vue/es')['Affix']
     AButton: typeof import('ant-design-vue/es')['Button']
+    ACheckbox: typeof import('ant-design-vue/es')['Checkbox']
+    ACheckboxGroup: typeof import('ant-design-vue/es')['CheckboxGroup']
     ACol: typeof import('ant-design-vue/es')['Col']
     ACollapse: typeof import('ant-design-vue/es')['Collapse']
     ACollapsePanel: typeof import('ant-design-vue/es')['CollapsePanel']
@@ -53,5 +55,6 @@ declare module 'vue' {
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SvgIcon: typeof import('./src/components/SvgIcon.vue')['default']
+    TableColumns: typeof import('./src/components/TableColumns.vue')['default']
   }
 }

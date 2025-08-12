@@ -16,4 +16,7 @@ When responding and thinking, please keep the following points in mind:
 - If the response is lengthy, structure it well and summarize it in paragraphs
 - Choose an appropriate and visually appealing format for your response based on the user's requirements and the content of the answer, ensuring strong readability
 
-### The user's message is: ###
+### history content ###
+{chat_history}
+
+### Below is the main question(If the main question is in English, your answer MUST be in English, If the main question is in Chinese, your answer MUST be in Chinese) ###
