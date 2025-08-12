@@ -17,7 +17,7 @@ from pymilvus.exceptions import MilvusException
 kb_app = FastAPI()
 
 # Define the root directory for knowledge base files
-KNOWLEDGE_BASE_ROOT = os.getenv("TMPFILE_PATH", "/home/user/ui_cache")
+KNOWLEDGE_BASE_ROOT = "/home/user/ui_cache"
 
 # Get all knowledge bases
 @kb_app.get(path="/v1/knowledge")
@@ -119,7 +119,6 @@ async def add_file_to_knowledge_base(knowledge_name, file_path: DataIn):
     try:
         active_pl = ctx.get_pipeline_mgr().get_active_pipeline()
         kb = ctx.knowledgemgr.get_knowledge_base_by_name_or_id(knowledge_name)
-        # Validate and normalize the user-provided path
         user_path = file_path.local_path
         normalized_path = os.path.normpath(os.path.join(KNOWLEDGE_BASE_ROOT, user_path))
         if not normalized_path.startswith(KNOWLEDGE_BASE_ROOT):
@@ -304,9 +303,14 @@ async def Synchronizing_vector_data(old_active_pl, new_active_pl):
     try:
         active_kb = ctx.knowledgemgr.get_active_knowledge_base()
         active_pl = ctx.get_pipeline_mgr().get_active_pipeline()
-        if not active_kb or not active_pl:
-            return True
         milvus_name = old_active_pl.name + str(old_active_pl.indexer.model_extra['d'])  if old_active_pl else "default_kb"
+        if not active_kb:
+            return True
+        if not active_pl:
+            if old_active_pl:
+                    if old_active_pl.indexer.comp_subtype == "milvus_vector":
+                        await refresh_milvus_map(milvus_name)
+            return True
 
         if new_active_pl.indexer.comp_subtype == "milvus_vector":
             new_milvus_map = {}

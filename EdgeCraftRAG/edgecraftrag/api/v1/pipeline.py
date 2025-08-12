@@ -186,6 +186,8 @@ def update_pipeline_handler(pl, req):
             pl._index_to_retriever_updated = False
             # As indexer changed, nodes are cleared in indexer's db
             pl._node_changed = True
+            if req.indexer.indexer_type == "milvus_vector":
+                pl.reset_node_status()
 
     if req.retriever is not None:
         retr = req.retriever
