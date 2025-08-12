@@ -49,12 +49,14 @@ jobs:
       id-token: write
       actions: read
       attestations: read
+      checks: read
       discussions: read
       issues: write
       models: read
       pages: write
       pull-requests: write
       repository-projects: read
+      security-events: read
     needs: [get-test-matrix, build-comps-base]
     strategy:
       matrix:

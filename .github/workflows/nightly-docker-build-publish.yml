@@ -94,6 +94,7 @@ jobs:
       attestations: read
       discussions: read
       models: read
+      checks: read
       repository-projects: read
       id-token: write
       contents: read
