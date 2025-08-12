@@ -101,11 +101,18 @@ services:
       - "8080:8000"
     ipc: host
   agent-ui:
-    image: opea/agent-ui
+    image: ghcr.io/open-webui/open-webui:main
     container_name: agent-ui
     ports:
       - "5173:8080"
     ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      OPENAI_API_KEYS: "empty"
+      OPENAI_API_BASE_URLS: ${SUPERVISOR_AGENT_ENDPOINT}
+      ENABLE_OLLAMA_API: False
 
 networks:
   default:
