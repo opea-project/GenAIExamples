@@ -6,6 +6,90 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "44419262",
+      "name": "deep-think",
+      "font_class": "deep-think",
+      "unicode": "e772",
+      "unicode_decimal": 59250
+    },
+    {
+      "icon_id": "17523064",
+      "name": "配置-分区配置",
+      "font_class": "collocation",
+      "unicode": "e61c",
+      "unicode_decimal": 58908
+    },
+    {
+      "icon_id": "929936",
+      "name": "upload",
+      "font_class": "upload1",
+      "unicode": "e87b",
+      "unicode_decimal": 59515
+    },
+    {
+      "icon_id": "1420883",
+      "name": "edit",
+      "font_class": "edit",
+      "unicode": "e633",
+      "unicode_decimal": 58931
+    },
+    {
+      "icon_id": "11753455",
+      "name": "skip",
+      "font_class": "skip",
+      "unicode": "e6d7",
+      "unicode_decimal": 59095
+    },
+    {
+      "icon_id": "36657468",
+      "name": "prompt",
+      "font_class": "prompt",
+      "unicode": "e641",
+      "unicode_decimal": 58945
+    },
+    {
+      "icon_id": "22325372",
+      "name": "sync",
+      "font_class": "sync",
+      "unicode": "e611",
+      "unicode_decimal": 58897
+    },
+    {
+      "icon_id": "8855141",
+      "name": "process-node",
+      "font_class": "process-node",
+      "unicode": "e986",
+      "unicode_decimal": 59782
+    },
+    {
+      "icon_id": "14772879",
+      "name": "process",
+      "font_class": "process",
+      "unicode": "e64a",
+      "unicode_decimal": 58954
+    },
+    {
+      "icon_id": "29808383",
+      "name": "sigh",
+      "font_class": "sigh",
+      "unicode": "e8d6",
+      "unicode_decimal": 59606
+    },
+    {
+      "icon_id": "10273624",
+      "name": "loading",
+      "font_class": "loading1",
+      "unicode": "e891",
+      "unicode_decimal": 59537
+    },
+    {
+      "icon_id": "136387",
+      "name": "download",
+      "font_class": "download",
+      "unicode": "e600",
+      "unicode_decimal": 58880
+    },
+    {
       "icon_id": "43508860",
       "name": "newChat",
       "font_class": "newChat",

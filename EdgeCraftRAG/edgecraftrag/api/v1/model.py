@@ -18,7 +18,12 @@ CONTAINER_MODEL_PATH = "/home/user/models/"
 @model_app.get(path="/v1/settings/weight/{model_id:path}")
 async def get_model_weight(model_id):
     try:
-        return get_available_weights(CONTAINER_MODEL_PATH + model_id)
+        # Normalize and validate the path
+        base_path = os.path.normpath(CONTAINER_MODEL_PATH)
+        requested_path = os.path.normpath(os.path.join(CONTAINER_MODEL_PATH, model_id))
+        if not requested_path.startswith(base_path):
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid model path")
+        return get_available_weights(requested_path)
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=" GET model weight failed")
 

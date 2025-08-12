@@ -8,7 +8,8 @@
               :message="msg"
               ref="messageRef"
               :inResponse
-              @preview="hadleImagePreview"
+              :think="isThink"
+              @preview="handleImagePreview"
               @stop="isUserScrolling = true"
             />
           </div>
@@ -35,9 +36,16 @@
         :auto-size="{ minRows: 2, maxRows: 5 }"
       />
       <div class="button-wrap">
+        <span
+          :class="{ 'think-btn': true, 'is-deep': isThink }"
+          @click="handleThinkChange"
+        >
+          <SvgIcon name="icon-deep-think" :size="16" inherit />
+          {{ $t(`chat.${isThink ? "reason" : "think"}`) }}
+        </span>
         <div class="send-btn">
           <a-tooltip placement="top" :title="$t('chat.new')">
-            <span class="connon-btn">
+            <span class="common-btn">
               <SvgIcon
                 name="icon-newChat"
                 :size="36"
@@ -47,7 +55,7 @@
             </span>
           </a-tooltip>
           <a-tooltip placement="top" :title="$t('generation.title')">
-            <span class="connon-btn">
+            <span class="common-btn">
               <SvgIcon
                 name="icon-setting1"
                 :size="36"
@@ -90,7 +98,9 @@ import { pipelineAppStore } from "@/store/pipeline";
 import { Local } from "@/utils/storage";
 import { ArrowDownOutlined } from "@ant-design/icons-vue";
 import { throttle } from "lodash";
+import { chatbotAppStore } from "@/store/chatbot";
 
+const chatbotStore = chatbotAppStore();
 const emit = defineEmits(["config"]);
 const ENV_URL = import.meta.env;
 const pipelineStore = pipelineAppStore();
@@ -112,6 +122,7 @@ const imageSrc = ref<string>("");
 const isUserScrolling = ref(false);
 const showScrollToBottomBtn = ref(false);
 const resizeObserverRef = ref<ResizeObserver | null>(null);
+const isThink = ref<boolean>(true);
 
 const inputRef = ref();
 const handleEnvUrl = () => {
@@ -202,7 +213,7 @@ const queryBenchmark = async () => {
     }
   }
 };
-const hadleImagePreview = (url: string) => {
+const handleImagePreview = (url: string) => {
   imageSrc.value = url;
   handleImageVisible(true);
 };
@@ -210,8 +221,16 @@ const handleImageVisible = (value: boolean = false) => {
   imgVisible.value = value;
 };
 const handleNewChat = () => {
+  inputKeywords.value = "";
   messagesList.value = [];
   Local.remove("chat_session_id");
+};
+const handleThinkChange = () => {
+  isThink.value = !isThink.value;
+
+  chatbotStore.setChatbotConfiguration({
+    chat_template_kwargs: { enable_thinking: isThink.value },
+  });
 };
 const handleConfig = () => {
   emit("config");
@@ -273,8 +292,8 @@ const initResizeObserver = () => {
 
 watch(
   () => messageComponent.value,
-  (domo) => {
-    if (domo) {
+  (value) => {
+    if (value) {
       nextTick(() => {
         initResizeObserver();
       });
@@ -282,7 +301,10 @@ watch(
   },
   { immediate: true }
 );
-
+onMounted(() => {
+  isThink.value =
+    chatbotStore.configuration?.chat_template_kwargs.enable_thinking;
+});
 onBeforeUnmount(() => {
   if (resizeObserver && messageComponent.value) {
     resizeObserver.unobserve(messageComponent.value);
@@ -397,13 +419,35 @@ onBeforeUnmount(() => {
     .button-wrap {
       display: flex;
       align-items: center;
-      justify-content: flex-end;
+      justify-content: space-between;
       padding: 6px 12px;
-
+      .think-btn {
+        height: 24px;
+        line-height: 24px;
+        padding: 0 8px;
+        border: 1px solid var(--border-main-color);
+        color: var(--font-text-color);
+        cursor: pointer;
+        border-radius: 12px;
+        font-size: 12px;
+        .mt-12;
+        .vertical-center;
+        gap: 4px;
+        &:hover {
+          border: 1px solid var(--color-primary-second);
+          color: var(--color-primary-second);
+          background-color: var(--color-primaryBg);
+        }
+        &.is-deep {
+          border: 1px solid var(--color-primary-second);
+          color: var(--color-primary-second);
+          background-color: var(--color-primaryBg);
+        }
+      }
       .send-btn {
         display: flex;
 
-        .connon-btn {
+        .common-btn {
           width: 36px;
           height: 36px;
           margin-left: 8px;

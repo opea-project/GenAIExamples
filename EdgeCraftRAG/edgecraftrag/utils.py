@@ -3,6 +3,7 @@
 
 import io
 import os
+from pathlib import Path
 from typing import Iterator, List, Optional
 
 from docx.text.paragraph import Paragraph
@@ -43,10 +44,10 @@ class DocxParagraphPicturePartitioner:
             yield Image(text="IMAGE", metadata=element_metadata)
 
 
-def get_prompt_template(model_id, template_path=None):
-    if template_path:
-        from pathlib import Path
-
+def get_prompt_template(model_id, prompt_content=None, template_path=None, enable_think=False):
+    if prompt_content is not None:
+        template = prompt_content
+    elif template_path is not None:
         template = Path(template_path).read_text(encoding=None)
     else:
         template = DEFAULT_TEMPLATE
@@ -57,7 +58,7 @@ def get_prompt_template(model_id, template_path=None):
         messages,
         tokenize=False,
         add_generation_prompt=True,
-        enable_thinking=True,  # Switches between thinking and non-thinking modes. Default is True.
+        enable_thinking=enable_think,  # Switches between thinking and non-thinking modes. Default is True.
     )
     return prompt_template
 
@@ -130,11 +131,9 @@ def concat_history(message: str) -> str:
             max_token = vllm_max_len - 1024
 
     history_id = get_current_session()
-    _history_map.setdefault(history_id, []).append(f"user: {message}")
     history_id_list = _history_map.get(history_id, [])
     str_message = get_recent_chat_rounds(history_id_list)
-    if not str_message:
-        str_message = message
+    _history_map.setdefault(history_id, []).append(f"user: {message}")
     return str_message[-max_token:] if len(str_message) > max_token else str_message
 
 

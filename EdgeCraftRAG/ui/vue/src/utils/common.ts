@@ -43,5 +43,14 @@ export const getChatSessionId = (): string => {
 };
 
 const generateFallbackId = (): string => {
-  return `${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+  if (typeof self !== "undefined" && self.crypto && self.crypto.getRandomValues) {
+    const array = new Uint32Array(2);
+    self.crypto.getRandomValues(array);
+    const randomPart = Array.from(array)
+      .map((num) => num.toString(36))
+      .join("");
+    return `${Date.now()}_${randomPart}`;
+  } else {
+    throw new Error("No secure random number generator available for session ID generation.");
+  }
 };

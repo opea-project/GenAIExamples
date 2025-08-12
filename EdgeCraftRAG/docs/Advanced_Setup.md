@@ -94,7 +94,7 @@ export RENDERGROUPID=$(getent group render | cut -d: -f3)
 
 # By default, the ports of the containers are set, uncomment if you want to change
 # export MEGA_SERVICE_PORT=16011
-# export PIPELINE_SERVICE_PORT=16011
+# export PIPELINE_SERVICE_PORT=16010
 # export UI_SERVICE_PORT="8082"
 
 # Make sure all 3 folders have 1000:1000 permission, otherwise
@@ -111,6 +111,12 @@ export MILVUS_ENABLED=0
 # If you enable Milvus, the default storage path is PWD, uncomment if you want to change:
 # export DOCKER_VOLUME_DIRECTORY= # change to your preference
 
+# EC-RAG support chat history round setting, by default chat history is disabled, you can set CHAT_HISTORY_ROUND to control it
+# export CHAT_HISTORY_ROUND= # change to your preference
+
+# EC-RAG support pipeline performance benchmark, use ENABLE_BENCHMARK=true/false to turn on/off benchmark
+# export ENABLE_BENCHMARK= # change to your preference
+
 # Launch EC-RAG service with compose
 docker compose -f docker_compose/intel/gpu/arc/compose.yaml up -d
 ```
@@ -119,7 +125,7 @@ docker compose -f docker_compose/intel/gpu/arc/compose.yaml up -d
 
 EC-RAG support run inference with multi-ARC in multiple isolated containers
 Docker Images preparation is the same as local inference section, please refer to [Build Docker Images](#1-optional-build-docker-images-for-mega-service-server-and-ui-by-your-own)
-Model preparation is the same as vLLM inference section, please refer to [Prepare models](../README.md#2-prepare-models)
+Model preparation is the same as vLLM inference section, please refer to [Prepare models](../docker_compose/intel/gpu/arc/README.md#2-prepare-models)
 After docker images preparation and model preparation, please follow below steps to run multi-ARC Setup(Below steps show 2 vLLM container(2 DP) with multi Intel Arc GPUs):
 
 ### 1. Prepare env variables and configurations
@@ -148,7 +154,7 @@ export RENDERGROUPID=$(getent group render | cut -d: -f3)
 
 # By default, the ports of the containers are set, uncomment if you want to change
 # export MEGA_SERVICE_PORT=16011
-# export PIPELINE_SERVICE_PORT=16011
+# export PIPELINE_SERVICE_PORT=16010
 # export UI_SERVICE_PORT="8082"
 
 # Make sure all 3 folders have 1000:1000 permission, otherwise
@@ -167,8 +173,8 @@ export SELECTED_XPU_1=1 # Which GPU to select to run for container 1
 
 # Below are the extra env you can set for vllm
 export MAX_NUM_SEQS=64 # MAX_NUM_SEQS value
-export MAX_NUM_BATCHED_TOKENS=4000 # MAX_NUM_BATCHED_TOKENS value
-export MAX_MODEL_LEN=3000 # MAX_MODEL_LEN value
+export MAX_NUM_BATCHED_TOKENS=5000 # MAX_NUM_BATCHED_TOKENS value
+export MAX_MODEL_LEN=5000 # MAX_MODEL_LEN value
 export LOAD_IN_LOW_BIT=fp8 # the weight type value, expected: sym_int4, asym_int4, sym_int5, asym_int5 or sym_int8
 export CCL_DG2_USM="" # Need to set to 1 on Core to enable USM (Shared Memory GPUDirect). Xeon supports P2P and doesn't need this.
 ```
@@ -189,4 +195,4 @@ bash docker_compose/intel/gpu/arc/multi-arc-yaml-generator.sh $DP_NUM docker_com
 
 ### 3. Start Edge Craft RAG Services with Docker Compose
 
-This section is the same as default vLLM inference section, please refer to [Start Edge Craft RAG Services with Docker Compose](../README.md#4-start-edge-craft-rag-services-with-docker-compose)
+This section is the same as default vLLM inference section, please refer to [Start Edge Craft RAG Services with Docker Compose](../docker_compose/intel/gpu/arc/README.md#deploy-the-service-using-docker-compose)

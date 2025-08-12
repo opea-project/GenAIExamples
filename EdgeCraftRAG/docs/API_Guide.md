@@ -97,6 +97,50 @@ curl -X GET http://${HOST_IP}:16010/v1/settings/models/BAAI/bge-reranker-large -
 curl -X DELETE http://${HOST_IP}:16010/v1/settings/models/BAAI/bge-reranker-large -H "Content-Type: application/json" | jq '.'
 ```
 
+## Knowledge Base Management
+
+### Create a knowledge base
+
+```bash
+curl -X POST http://${HOST_IP}:16010/v1/knowledge -H "Content-Type: application/json" -d '{"name": "default_kb","description": "Your knowledge base Description","active":true}' | jq '.'
+```
+
+### Update a knowledge base
+
+```bash
+curl -X PATCH http://${HOST_IP}:16010/v1/knowledge/patch -H "Content-Type: application/json" -d '{"name": "default_kb","active":"True","description": "Your knowledge base Description","active":"True"}' | jq '.'
+```
+
+### Check all knowledge base
+
+```bash
+curl -X GET http://${HOST_IP}:16010/v1/knowledge -H "Content-Type: application/json" | jq '.'
+```
+
+### Activate knowledge base
+
+```bash
+curl -X PATCH http://${HOST_IP}:16010/v1/knowledge/patch -H "Content-Type: application/json" -d '{"name": "default_kb","active":true}' | jq '.'
+```
+
+### Remove a knowledge base
+
+```bash
+curl -X DELETE http://${HOST_IP}:16010/v1/knowledge/default_kb -H "Content-Type: application/json" | jq '.'
+```
+
+### Add file to knowledge base
+
+```bash
+curl -X POST http://${HOST_IP}:16010/v1/knowledge/default_kb/files -H "Content-Type: application/json" -d '{"local_path": "docs/#REPLACE WITH YOUR DIR WITHIN MOUNTED DOC PATH#"}' | jq '.'
+```
+
+### Delete file to knowledge base
+
+```bash
+curl -X DELETE http://${HOST_IP}:16010/v1/knowledge/default_kb/files -H "Content-Type: application/json" -d '{"local_path": "docs/#REPLACE WITH YOUR DIR WITHIN MOUNTED DOC PATH#"}' | jq '.'
+```
+
 ## File Management
 
 ### Add a text

@@ -5,6 +5,7 @@ from typing import Any
 
 import faiss
 from edgecraftrag.base import BaseComponent, CompType, IndexerType
+from edgecraftrag.context import ctx
 from llama_index.core import StorageContext, VectorStoreIndex
 from llama_index.vector_stores.faiss import FaissVectorStore
 from llama_index.vector_stores.milvus import MilvusVectorStore
@@ -29,22 +30,25 @@ class VectorIndexer(BaseComponent, VectorStoreIndex):
         self._initialize_indexer(embed_model, vector_type, milvus_uri, kb_name)
 
     def _initialize_indexer(self, embed_model, vector_type, milvus_uri, kb_name):
+        # get active name
+        pl = ctx.get_pipeline_mgr().get_active_pipeline()
+        plname = pl.name if pl else ""
         if embed_model:
-            d = embed_model._model.request.outputs[0].get_partial_shape()[2].get_length()
+            self.d = embed_model._model.request.outputs[0].get_partial_shape()[2].get_length()
         else:
-            d = 128
+            self.d = 128
         match vector_type:
             case IndexerType.DEFAULT_VECTOR:
                 VectorStoreIndex.__init__(self, embed_model=embed_model, nodes=[])
             case IndexerType.FAISS_VECTOR:
-                faiss_index = faiss.IndexFlatL2(d)
+                faiss_index = faiss.IndexFlatL2(self.d)
                 faiss_store = StorageContext.from_defaults(vector_store=FaissVectorStore(faiss_index=faiss_index))
                 VectorStoreIndex.__init__(self, embed_model=embed_model, nodes=[], storage_context=faiss_store)
             case IndexerType.MILVUS_VECTOR:
                 milvus_vector_store = MilvusVectorStore(
                     uri=milvus_uri,
-                    dim=d,
-                    collection_name=kb_name,
+                    dim=self.d,
+                    collection_name=kb_name + plname + str(self.d),
                     overwrite=False,
                 )
                 milvus_store = StorageContext.from_defaults(vector_store=milvus_vector_store)
@@ -54,9 +58,12 @@ class VectorIndexer(BaseComponent, VectorStoreIndex):
         self._initialize_indexer(self.model, self.comp_subtype, self.milvus_uri, kb_name)
 
     def clear_milvus_collection(self, kb_name="default_kb"):
+        # get active name
+        pl = ctx.get_pipeline_mgr().get_active_pipeline()
+        plname = pl.name if pl else ""
         milvus_vector_store = MilvusVectorStore(
             uri=self.milvus_uri,
-            collection_name=kb_name,
+            collection_name=kb_name + plname + str(self.d),
             overwrite=False,
         )
         milvus_vector_store.clear()

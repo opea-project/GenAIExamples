@@ -11,6 +11,9 @@ export interface IMessage {
   content: string;
   benchmark?: Benchmark | undefined;
 }
+export interface ThinkType {
+  enable_thinking?: boolean;
+}
 export interface ConfigType {
   top_n: number;
   temperature: number;
@@ -19,4 +22,5 @@ export interface ConfigType {
   repetition_penalty: number;
   max_tokens: number;
   stream: boolean;
+  chat_template_kwargs?: ThinkType;
 }

@@ -12,11 +12,11 @@ This section describes how to quickly deploy and test the EdgeCraftRAG service m
 
 1. [Prerequisites](#prerequisites)
 2. [Access the Code](#access-the-code)
-3. [Generate a HuggingFace Access Token](#generate-a-huggingface-access-token)
-4. [Configure the Deployment Environment](#configure-the-deployment-environment)
-5. [Deploy the Service Using Docker Compose](#deploy-the-service-using-docker-compose)
-6. [Check the Deployment Status](#check-the-deployment-status)
-7. [Test the Pipeline](#test-the-pipeline)
+3. [Prepare models](#prepare-models)
+4. [Prepare env variables and configurations](#prepare-env-variables-and-configurations)
+5. [Configure the Deployment Environment](#configure-the-deployment-environment)
+6. [Deploy the Service Using Docker Compose](#deploy-the-service-using-docker-compose)
+7. [Access UI](#access-ui)
 8. [Cleanup the Deployment](#cleanup-the-deployment)
 
 ### Prerequisites
@@ -24,7 +24,7 @@ This section describes how to quickly deploy and test the EdgeCraftRAG service m
 EC-RAG supports vLLM deployment(default method) and local OpenVINO deployment for Intel Arc GPU. Prerequisites are shown as below:  
 Hardware: Intel Arc A770  
 OS: Ubuntu Server 22.04.1 or newer (at least 6.2 LTS kernel)  
-Driver & libraries: please refer to [Installing Client GPUs](https://dgpu-docs.intel.com/driver/client/overview.html) for detailed driver & libraries setup
+Driver & libraries: please to [Installing GPUs Drivers](https://dgpu-docs.intel.com/driver/installation-rolling.html#installing-gpu-drivers) for detailed driver & libraries setup
 
 Below steps are based on **vLLM** as inference engine, if you want to choose **OpenVINO**, please refer to [OpenVINO Local Inference](../../../../docs/Advanced_Setup.md#openvino-local-inference)
 
@@ -34,7 +34,7 @@ Clone the GenAIExample repository and access the EdgeCraftRAG Intel® Arc® plat
 
 ```
 git clone https://github.com/opea-project/GenAIExamples.git
-cd GenAIExamples/EdgeCraftRAG/docker_compose/intel/gpu/arc/
+cd GenAIExamples/EdgeCraftRAG
 ```
 
 Checkout a released version, such as v1.3:
@@ -43,60 +43,95 @@ Checkout a released version, such as v1.3:
 git checkout v1.3
 ```
 
-### Generate a HuggingFace Access Token
+### Prepare models
 
-Some HuggingFace resources, such as some models, are only accessible if you have an access token. If you do not already have a HuggingFace access token, you can create one by first creating an account by following the steps provided at [HuggingFace](https://huggingface.co/) and then generating a [user access token](https://huggingface.co/docs/transformers.js/en/guides/private#step-1-generating-a-user-access-token).
+```bash
+# Prepare models for embedding, reranking:
+export MODEL_PATH="${PWD}/models" # Your model path for embedding, reranking and LLM models
+mkdir -p $MODEL_PATH
+pip install --upgrade --upgrade-strategy eager "optimum[openvino]"
+optimum-cli export openvino -m BAAI/bge-small-en-v1.5 ${MODEL_PATH}/BAAI/bge-small-en-v1.5 --task sentence-similarity
+optimum-cli export openvino -m BAAI/bge-reranker-large ${MODEL_PATH}/BAAI/bge-reranker-large --task text-classification
 
-### Configure the Deployment Environment
+# Prepare LLM model
+export LLM_MODEL="Qwen/Qwen3-8B" # Your model id
+pip install modelscope
+modelscope download --model $LLM_MODEL --local_dir "${MODEL_PATH}/${LLM_MODEL}"
+# Optionally, you can also download models with huggingface:
+# pip install -U huggingface_hub
+# huggingface-cli download $LLM_MODEL --local-dir "${MODEL_PATH}/${LLM_MODEL}"
+```
+
+### Prepare env variables and configurations
 
 Below steps are for single Intel Arc GPU inference, if you want to setup multi Intel Arc GPUs inference, please refer to [Multi-ARC Setup](../../../../docs/Advanced_Setup.md#multi-arc-setup)
-To set up environment variables for deploying EdgeCraftRAG service, source the set_env.sh script in this directory:
 
-```
-source set_env.sh
+#### Prepare env variables for vLLM deployment
+
+```bash
+ip_address=$(hostname -I | awk '{print $1}')
+# Use `ip a` to check your active ip
+export HOST_IP=$ip_address # Your host ip
+
+# Check group id of video and render
+export VIDEOGROUPID=$(getent group video | cut -d: -f3)
+export RENDERGROUPID=$(getent group render | cut -d: -f3)
+
+# If you have a proxy configured, uncomment below line
+# export no_proxy=${no_proxy},${HOST_IP},edgecraftrag,edgecraftrag-server
+# export NO_PROXY=${NO_PROXY},${HOST_IP},edgecraftrag,edgecraftrag-server
+# If you have a HF mirror configured, it will be imported to the container
+# export HF_ENDPOINT=https://hf-mirror.com # your HF mirror endpoint"
+
+# Make sure all 3 folders have 1000:1000 permission, otherwise
+# chown 1000:1000 ${MODEL_PATH} ${PWD} # the default value of DOC_PATH and TMPFILE_PATH is PWD ,so here we give permission to ${PWD}
+# In addition, also make sure the .cache folder has 1000:1000 permission, otherwise
+# chown 1000:1000 -R $HOME/.cache
 ```
 
 For more advanced env variables and configurations, please refer to [Prepare env variables for vLLM deployment](../../../../docs/Advanced_Setup.md#prepare-env-variables-for-vllm-deployment)
 
+#### Generate nginx config file
+
+```bash
+export VLLM_SERVICE_PORT_0=8100 # You can set your own port for vllm service
+# Generate your nginx config file
+# nginx-conf-generator.sh requires 2 parameters: DP_NUM and output filepath
+bash nginx/nginx-conf-generator.sh 1 nginx/nginx.conf
+# set NGINX_CONFIG_PATH
+export NGINX_CONFIG_PATH="${PWD}/nginx/nginx.conf"
+```
+
 ### Deploy the Service Using Docker Compose
 
-To deploy the EdgeCraftRAG service, execute the `docker compose up` command with the appropriate arguments. For a default deployment, execute:
-
 ```bash
-docker compose up -d
+# EC-RAG support Milvus as persistent database, by default milvus is disabled, you can choose to set MILVUS_ENABLED=1 to enable it
+export MILVUS_ENABLED=0
+# If you enable Milvus, the default storage path is PWD, uncomment if you want to change:
+# export DOCKER_VOLUME_DIRECTORY= # change to your preference
+
+# EC-RAG support chat history round setting, by default chat history is disabled, you can set CHAT_HISTORY_ROUND to control it
+# export CHAT_HISTORY_ROUND= # change to your preference
+
+# Launch EC-RAG service with compose
+docker compose -f docker_compose/intel/gpu/arc/compose_vllm.yaml up -d
 ```
 
-The EdgeCraftRAG docker images should automatically be downloaded from the `OPEA registry` and deployed on the Intel® Arc® Platform
+### Access UI
 
-### Check the Deployment Status
+Open your browser, access http://${HOST_IP}:8082
 
-After running docker compose, check if all the containers launched via docker compose have started:
+> Your browser should be running on the same host of your console, otherwise you will need to access UI with your host domain name instead of ${HOST_IP}.
 
-```
-docker ps -a
-```
-
-For the default deployment, the following 5 containers should be running:
-
-### Test the Pipeline
-
-Once the EdgeCraftRAG service are running, test the pipeline using the following command:
-
-```bash
-curl http://${host_ip}:16011/v1/chatqna -H 'Content-Type: application/json' -d '{
-     "messages":"What is the test id?","max_tokens":5 }'
-```
-
-For detailed operations on UI and EC-RAG settings, please refer to [Explore_Edge_Craft_RAG](../../../../docs/Explore_Edge_Craft_RAG.md)
-
-**Note** The value of _host_ip_ was set using the _set_env.sh_ script and can be found in the _.env_ file.
+Below is the UI front page, for detailed operations on UI and EC-RAG settings, please refer to [Explore_Edge_Craft_RAG](../../../../docs/Explore_Edge_Craft_RAG.md)
+![front_page](../../../../assets/img/front_page.png)
 
 ### Cleanup the Deployment
 
 To stop the containers associated with the deployment, execute the following command:
 
 ```
-docker compose -f compose.yaml down
+docker compose -f docker_compose/intel/gpu/arc/compose_vllm.yaml down
 ```
 
 All the EdgeCraftRAG containers will be stopped and then removed on completion of the "down" command.

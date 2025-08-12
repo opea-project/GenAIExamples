@@ -6,6 +6,7 @@ import os
 from edgecraftrag.api_schema import DataIn, FilesIn
 from edgecraftrag.context import ctx
 from fastapi import FastAPI, File, HTTPException, UploadFile, status
+from werkzeug.utils import secure_filename
 
 data_app = FastAPI()
 
@@ -103,9 +104,19 @@ async def upload_file(file_name: str, file: UploadFile = File(...)):
     try:
         # DIR for server to save files uploaded by UI
         UI_DIRECTORY = os.getenv("TMPFILE_PATH", "/home/user/ui_cache")
-        UPLOAD_DIRECTORY = os.path.join(UI_DIRECTORY, file_name)
+        UPLOAD_DIRECTORY = os.path.normpath(os.path.join(UI_DIRECTORY, file_name))
+        if not UPLOAD_DIRECTORY.startswith(os.path.abspath(UI_DIRECTORY) + os.sep):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid file_name: directory traversal detected"
+            )
         os.makedirs(UPLOAD_DIRECTORY, exist_ok=True)
-        file_path = os.path.join(UPLOAD_DIRECTORY, file.filename)
+        safe_filename = secure_filename(file.filename)
+        # Sanitize the uploaded file's name
+        safe_filename = secure_filename(file.filename)
+        file_path = os.path.normpath(os.path.join(UPLOAD_DIRECTORY, safe_filename))
+        # Ensure file_path is within UPLOAD_DIRECTORY
+        if not file_path.startswith(os.path.abspath(UPLOAD_DIRECTORY)):
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid uploaded file name")
         with open(file_path, "wb") as buffer:
             buffer.write(await file.read())
         return file_path

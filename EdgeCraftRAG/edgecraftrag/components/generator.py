@@ -115,7 +115,7 @@ async def stream_generator(llm, prompt_str, unstructured_str):
 
 class QnAGenerator(BaseComponent):
 
-    def __init__(self, llm_model, prompt_template_file, inference_type, vllm_endpoint, **kwargs):
+    def __init__(self, llm_model, prompt_template_file, inference_type, vllm_endpoint, prompt_content, **kwargs):
         BaseComponent.__init__(
             self,
             comp_type=CompType.GENERATOR,
@@ -126,7 +126,7 @@ class QnAGenerator(BaseComponent):
             ("\n\n", "\n"),
             ("\t\n", "\n"),
         )
-
+        self.enable_think = False
         self.llm = llm_model
         if isinstance(llm_model, str):
             self.model_id = llm_model
@@ -134,27 +134,9 @@ class QnAGenerator(BaseComponent):
             self.model_id = llm_model().model_id
         if self.inference_type == InferenceType.LOCAL:
             self.lock = asyncio.Lock()
-        # using the prompt template enhancement strategy(only tested on Qwen2-7B-Instruction) if template_enhance_on is true
-        self.template_enhance_on = True if "Qwen2" in self.model_id else False
-        if prompt_template_file is None:
-            print("There is no template file, using the default template.")
-            prompt_template = get_prompt_template(self.model_id)
-            self.prompt = (
-                DocumentedContextRagPromptTemplate.from_template(prompt_template)
-                if self.template_enhance_on
-                else prompt_template
-            )
-        else:
-            safe_root = "/templates"
-            template_path = os.path.normpath(os.path.join(safe_root, prompt_template_file))
-            if not template_path.startswith(safe_root):
-                raise ValueError("Invalid template path")
-            if not os.path.exists(template_path):
-                raise ValueError("Template file not exists")
-            if self.template_enhance_on:
-                self.prompt = DocumentedContextRagPromptTemplate.from_file(template_path)
-            else:
-                self.prompt = get_prompt_template(self.model_id, template_path)
+        self.prompt_content = prompt_content
+        self.prompt_template_file = prompt_template_file
+        self.prompt = self.init_prompt(self.model_id, self.prompt_content, self.prompt_template_file)
 
         self.llm = llm_model
         if isinstance(llm_model, str):
@@ -169,11 +151,37 @@ class QnAGenerator(BaseComponent):
                 vllm_endpoint = os.getenv("vLLM_ENDPOINT", "http://localhost:8086")
         self.vllm_endpoint = vllm_endpoint
 
+    def init_prompt(self, model_id, prompt_content=None, prompt_template_file=None, enable_think=False):
+        # using the prompt template enhancement strategy(only tested on Qwen2-7B-Instruction) if template_enhance_on is true
+        template_enhance_on = True if "Qwen2" in self.model_id else False
+        if prompt_content:
+            self.set_prompt(prompt_content)
+            return get_prompt_template(model_id, prompt_content, prompt_template_file, enable_think)
+        elif prompt_template_file is None:
+            print("There is no template file, using the default template.")
+            prompt_template = get_prompt_template(model_id, prompt_content, prompt_template_file, enable_think)
+            return (
+                DocumentedContextRagPromptTemplate.from_template(prompt_template)
+                if template_enhance_on
+                else prompt_template
+            )
+        else:
+            safe_root = "/templates"
+            prompt_template_file = os.path.normpath(os.path.join(safe_root, prompt_template_file))
+            if not prompt_template_file.startswith(safe_root):
+                raise ValueError("Invalid template path")
+            if not os.path.exists(prompt_template_file):
+                raise ValueError("Template file not exists")
+            if template_enhance_on:
+                return DocumentedContextRagPromptTemplate.from_file(prompt_template_file)
+            else:
+                return get_prompt_template(model_id, prompt_content, prompt_template_file, enable_think)
+
     def set_prompt(self, prompt):
         if "{context}" not in prompt:
             prompt += "\n<|im_start|>{context}<|im_end|>"
-        if "{input}" not in prompt:
-            prompt += "\n<|im_start|>{input}"
+        if "{chat_history}" not in prompt:
+            prompt += "\n<|im_start|>{chat_history}"
         self.prompt = prompt
 
     def reset_prompt(self):
@@ -201,11 +209,22 @@ class QnAGenerator(BaseComponent):
             origin_text = n.node.get_text()
             text_gen_context += self.clean_string(origin_text.strip())
         query = chat_request.messages
+        chat_history = concat_history(chat_request.messages)
+        # Modify model think status
+        if chat_request.chat_template_kwargs:
+            if self.enable_think != chat_request.chat_template_kwargs["enable_thinking"]:
+                self.prompt = self.init_prompt(
+                    self.model_id,
+                    self.prompt_content,
+                    self.prompt_template_file,
+                    chat_request.chat_template_kwargs["enable_thinking"],
+                )
+                self.enable_think = chat_request.chat_template_kwargs["enable_thinking"]
         if sub_questions:
             final_query = f"{query}\n\n### Sub-questions ###\nThe following list is how you should consider the answer, you MUST follow these steps when responding:\n\n{sub_questions}"
         else:
             final_query = query
-        prompt_str = self.prompt.format(input=final_query, context=text_gen_context)
+        prompt_str = self.prompt.format(input=final_query, chat_history=chat_history, context=text_gen_context)
         return text_gen_context, prompt_str
 
     def run(self, chat_request, retrieved_nodes, node_parser_type, **kwargs):
@@ -213,7 +232,6 @@ class QnAGenerator(BaseComponent):
             # This could happen when User delete all LLMs through RESTful API
             raise ValueError("No LLM available, please load LLM")
         # query transformation
-        chat_request.messages = concat_history(chat_request.messages)
         sub_questions = kwargs.get("sub_questions", None)
         text_gen_context, prompt_str = self.query_transform(chat_request, retrieved_nodes, sub_questions=sub_questions)
         generate_kwargs = dict(
@@ -241,7 +259,6 @@ class QnAGenerator(BaseComponent):
 
     def run_vllm(self, chat_request, retrieved_nodes, node_parser_type, **kwargs):
         # query transformation
-        chat_request.messages = concat_history(chat_request.messages)
         sub_questions = kwargs.get("sub_questions", None)
         text_gen_context, prompt_str = self.query_transform(chat_request, retrieved_nodes, sub_questions=sub_questions)
         llm = OpenAILike(

@@ -17,18 +17,34 @@
           </template>
           {{ $t("pipeline.create") }}</a-button
         >
+        <TableColumns :columns="allColumns" @change="handleColumnChange" />
       </div>
     </div>
     <a-table
       :columns="tableColumns"
       :data-source="tableList"
       :pagination="false"
+      :scroll="{ x: 'max-content' }"
     >
       <template #bodyCell="{ column, record }">
         <template v-if="column.dataIndex === 'name'">
           <span @click="handleView(record)" class="click-link">{{
             record.name
           }}</span>
+        </template>
+        <template v-if="column.dataIndex === 'postProcessor'">
+          {{
+            record.postprocessor
+              .map((item: any) => item?.processor_type)
+              .join(", ")
+          }}
+        </template>
+        <template v-if="column.dataIndex === 'rerank'">
+          {{
+            record.postprocessor
+              .map((item: any) => item?.model?.model_id)
+              .join(", ") || "--"
+          }}
         </template>
         <template v-if="column.dataIndex === 'status'">
           <span>
@@ -100,7 +116,7 @@
 
 <script lang="ts" setup name="Table">
 import {
-  getPipelineDetialByName,
+  getPipelineDetailByName,
   requestPipelineDelete,
   requestPipelineSwitchState,
 } from "@/api/pipeline";
@@ -116,6 +132,8 @@ import {
 import { Modal } from "ant-design-vue";
 import { createVNode, h, ref } from "vue";
 import { useI18n } from "vue-i18n";
+import TableColumns from "@/components/TableColumns.vue";
+import getTableColumns from "./columnsList";
 
 const { t } = useI18n();
 const pipelineStore = pipelineAppStore();
@@ -133,30 +151,8 @@ const paginationData = reactive<paginationType>({
   pageNum: 1,
   pageSize: 10,
 });
-const tableColumns = ref<TableColumns[]>([
-  {
-    title: t("pipeline.name"),
-    dataIndex: "name",
-    width: "25%",
-  },
-  {
-    title: t("pipeline.id"),
-    dataIndex: "idx",
-    width: "25%",
-    ellipsis: true,
-  },
-  {
-    title: t("pipeline.status"),
-    dataIndex: "status",
-    width: "20%",
-  },
-  {
-    title: t("pipeline.operation"),
-    dataIndex: "operation",
-    width: "30%",
-    fixed: "right",
-  },
-]);
+const tableColumns = ref<TableColumns[]>([]);
+const allColumns = computed(() => getTableColumns(t));
 const tableList = computed(() => {
   const { pageNum, pageSize } = paginationData;
   const start = (pageNum - 1) * pageSize;
@@ -176,29 +172,23 @@ const handleUpdate = (row: EmptyObjectType) => {
 const handleView = (row: EmptyObjectType) => {
   emit("view", row);
 };
-//activate/deactivate
 const handleSwitchState = (row: EmptyObjectType) => {
-  const { name } = row;
   const { active } = row?.status;
+  const { name } = row;
 
   const text = active ? t("pipeline.deactivateTip") : t("pipeline.activeTip");
-
   Modal.confirm({
     title: t("common.prompt"),
     content: text,
     okText: t("common.confirm"),
     async onOk() {
-      const data: any = await getPipelineDetialByName(name);
-      const form = {
-        ...JSON.parse(data),
-        active: !active,
-      };
-      await requestPipelineSwitchState(name, form);
+      await requestPipelineSwitchState(name, { active: !active });
       pipelineStore.setPipelineActivate(active ? "" : name);
       emit("search");
     },
   });
 };
+
 //delete
 const handleDelete = (row: EmptyObjectType) => {
   Modal.confirm({
@@ -214,7 +204,9 @@ const handleDelete = (row: EmptyObjectType) => {
     },
   });
 };
-
+const handleColumnChange = (checkedColumns: TableColumns[]) => {
+  tableColumns.value = [...checkedColumns];
+};
 //import
 const handleImport = () => {
   emit("import");
