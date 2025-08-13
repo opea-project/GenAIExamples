@@ -3,5 +3,7 @@
 
 services:
   vllm-service:
-    image: public.ecr.aws/q9t5s3a7/vllm-cpu-release-repo:v0.9.2
-    command: --model $LLM_MODEL_ID --host 0.0.0.0 --port 80 --dtype bfloat16 --distributed-executor-backend mp --block-size 128 --enforce-eager --tensor-parallel-size 2
+    image: public.ecr.aws/q9t5s3a7/vllm-cpu-release-repo:v0.10.0
+    environment:
+      VLLM_CPU_SGL_KERNEL: 1
+    command: --model $LLM_MODEL_ID --host 0.0.0.0 --port 80 --dtype bfloat16 --distributed-executor-backend mp --block-size 128 --enforce-eager --tensor-parallel-size $TP_NUM --pipeline-parallel-size $PP_NUM --max-num-batched-tokens $MAX_BATCHED_TOKENS --max-num-seqs $MAX_SEQS
