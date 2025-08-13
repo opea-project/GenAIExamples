@@ -25,7 +25,7 @@ on:
   workflow_dispatch:
 
 env:
-  EXAMPLES: ${{ vars.NIGHTLY_RELEASE_EXAMPLES }}
+  EXAMPLES: #${{ vars.NIGHTLY_RELEASE_EXAMPLES }}
   TAG: "latest"
   PUBLISH_TAGS: "latest"
 
@@ -94,16 +94,14 @@ jobs:
       attestations: read
       discussions: read
       models: read
+      checks: read
       repository-projects: read
       id-token: write
       contents: read
-      checks: write
-      deployments: write
       issues: write
       packages: write
       pages: write
       pull-requests: write
-      statuses: write
       security-events: read
     if: ${{ needs.get-build-matrix.outputs.examples_json != '' }}
     strategy:

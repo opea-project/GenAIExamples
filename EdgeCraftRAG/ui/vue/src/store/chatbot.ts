@@ -12,6 +12,9 @@ const configuration = {
     repetition_penalty: 1.03,
     max_tokens: 1024,
     stream: true,
+    chat_template_kwargs: {
+      enable_thinking: true,
+    },
   },
 };
 export const chatbotAppStore = defineStore("chatbot", {

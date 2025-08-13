@@ -123,16 +123,9 @@ def load_pipeline(request):
 
 
 def update_pipeline_handler(pl, req):
-    indexer_type_changed = False
-    pl_status = req.active
     active_kb = ctx.knowledgemgr.get_active_knowledge_base()
     active_pipeline = ctx.get_pipeline_mgr().get_active_pipeline()
     kb_name = active_kb.name if active_kb else "default_kb"
-
-    if active_pipeline:
-        if active_pipeline.status.active and pl_status and req.indexer:
-            if active_pipeline.indexer.comp_subtype != req.indexer.indexer_type:
-                indexer_type_changed = True
 
     if req.node_parser is not None:
         np = req.node_parser
@@ -171,7 +164,7 @@ def update_pipeline_handler(pl, req):
     if req.indexer is not None:
         ind = req.indexer
         found_indexer = ctx.get_indexer_mgr().search_indexer(ind)
-        if found_indexer is not None and not indexer_type_changed:
+        if found_indexer is not None:
             pl.indexer = found_indexer
         else:
             embed_model = None
@@ -185,7 +178,7 @@ def update_pipeline_handler(pl, req):
                 case IndexerType.DEFAULT_VECTOR | IndexerType.FAISS_VECTOR | IndexerType.MILVUS_VECTOR:
                     # TODO: **RISK** if considering 2 pipelines with different
                     # nodes, but same indexer, what will happen?
-                    pl.indexer = VectorIndexer(embed_model, ind.indexer_type, ind.vector_uri, pl.name)
+                    pl.indexer = VectorIndexer(embed_model, ind.indexer_type, ind.vector_uri, kb_name)
                 case _:
                     pass
             ctx.get_indexer_mgr().add(pl.indexer)
@@ -193,6 +186,8 @@ def update_pipeline_handler(pl, req):
             pl._index_to_retriever_updated = False
             # As indexer changed, nodes are cleared in indexer's db
             pl._node_changed = True
+            if req.indexer.indexer_type == "milvus_vector":
+                pl.reset_node_status()
 
     if req.retriever is not None:
         retr = req.retriever
@@ -257,7 +252,9 @@ def update_pipeline_handler(pl, req):
                 ctx.get_model_mgr().add(model)
             # Use weakref to achieve model deletion and memory release
             model_ref = weakref.ref(model)
-            pl.generator = QnAGenerator(model_ref, gen.prompt_path, gen.inference_type, gen.vllm_endpoint)
+            pl.generator = QnAGenerator(
+                model_ref, gen.prompt_path, gen.inference_type, gen.vllm_endpoint, gen.prompt_content
+            )
             if pl.enable_benchmark:
                 if "tokenizer" not in locals() or tokenizer is None:
                     _, tokenizer, bench_hook = ctx.get_model_mgr().load_model_ben(gen.model)
@@ -271,23 +268,19 @@ def update_pipeline_handler(pl, req):
         ctx.get_pipeline_mgr().activate_pipeline(pl.name, req.active, ctx.get_node_mgr(), kb_name)
 
     # Create and set up a separate event loop to run asynchronous tasks in threads
-    if indexer_type_changed:
+    def run_async_task():
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        try:
+            loop.run_until_complete(Synchronizing_vector_data(active_pipeline, pl))
+        except Exception as e:
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Synchronization error: {e}")
+        finally:
+            loop.close()
 
-        def run_async_task():
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-            try:
-                loop.run_until_complete(Synchronizing_vector_data(active_pipeline, pl))
-            except Exception as e:
-                raise HTTPException(
-                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Synchronization error: {e}"
-                )
-            finally:
-                loop.close()
-
-        with ThreadPoolExecutor(max_workers=1) as executor:
-            future = executor.submit(run_async_task)
-            future.result()
+    with ThreadPoolExecutor(max_workers=1) as executor:
+        future = executor.submit(run_async_task)
+        future.result()
     return pl
 
 
@@ -296,7 +289,7 @@ def load_pipeline_from_file():
     CONFIG_DIR = "/home/user/ui_cache/configs"
     PIPELINE_FILE = os.path.join(CONFIG_DIR, "pipeline.json")
     if os.path.exists(PIPELINE_FILE):
-        with open(PIPELINE_FILE, "r") as f:
+        with open(PIPELINE_FILE, "r", encoding="utf-8") as f:
             all_pipelines = f.read()
         try:
             all_da = json.loads(all_pipelines)
@@ -320,8 +313,8 @@ def save_pipeline_to_file():
         all_pipeline_json = []
         for pipeline in pipelines_data:
             all_pipeline_json.append(pipeline.get_pipeline_json)
-        json_str = json.dumps(all_pipeline_json, indent=2)
-        with open(PIPELINE_FILE, "w") as f:
+        json_str = json.dumps(all_pipeline_json, indent=2, ensure_ascii=False)
+        with open(PIPELINE_FILE, "w", encoding="utf-8") as f:
             f.write(json_str)
     except Exception as e:
         print(f"Error saving pipelines: {e}")

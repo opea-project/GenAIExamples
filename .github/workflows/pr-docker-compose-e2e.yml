@@ -49,13 +49,9 @@ jobs:
     permissions:
       actions: read
       contents: read
-      checks: write
-      deployments: write
       issues: write
-      packages: write
       pages: write
       pull-requests: write
-      statuses: write
       security-events: read
     needs: [get-test-matrix]
     if: ${{ needs.get-test-matrix.outputs.run_matrix != '' }}
