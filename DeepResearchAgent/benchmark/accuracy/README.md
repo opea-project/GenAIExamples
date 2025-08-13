@@ -23,14 +23,7 @@ The default values for arguments are:
 
 We randomly select 30 samples from the dataset [togethercomputer/together-search-bench](https://huggingface.co/datasets/togethercomputer/together-search-bench) randomly and compare the results of base model and deep research agent. The results show deep research agent can improve the generation quality and accuracy.
 
-
-| model       | accuracy           |                   |
-| -------------- | ----------------- |
-| [meta-llama/Llama-3.3-70B-Instruct](https://huggingface.co/meta-llama/Llama-3.3-70B-Instruct) | 0.433333 |
-| deep research agent with [meta-llama/Llama-3.3-70B-Instruct](https://huggingface.co/meta-llama/Llama-3.3-70B-Instruct) | 0.8 |
-
-
-
-
-
-
+| model                                                                                                                  | accuracy |     |
+| ---------------------------------------------------------------------------------------------------------------------- | -------- | --- |
+| [meta-llama/Llama-3.3-70B-Instruct](https://huggingface.co/meta-llama/Llama-3.3-70B-Instruct)                          | 0.433333 |
+| deep research agent with [meta-llama/Llama-3.3-70B-Instruct](https://huggingface.co/meta-llama/Llama-3.3-70B-Instruct) | 0.8      |
