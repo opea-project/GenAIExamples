@@ -44,6 +44,7 @@ services:
       LLM_MODEL_ID: ${LLM_MODEL_ID}
       VLLM_TORCH_PROFILER_DIR: "/mnt"
       LLM_SERVER_PORT: ${LLM_SERVER_PORT}
+      VLLM_CPU_OMP_THREADS_BIND: all
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://$host_ip:${LLM_SERVER_PORT}/health || exit 1"]
       interval: 10s

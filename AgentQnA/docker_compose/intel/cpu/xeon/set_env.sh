@@ -28,9 +28,11 @@ export OPENAI_API_KEY=${OPENAI_API_KEY}
 export WORKER_AGENT_URL="http://${ip_address}:9095/v1/chat/completions"
 export SQL_AGENT_URL="http://${ip_address}:9096/v1/chat/completions"
 export RETRIEVAL_TOOL_URL="http://${ip_address}:8889/v1/retrievaltool"
-export CRAG_SERVER=http://${ip_address}:8080
+export LLM_ENDPOINT_URL="http://${ip_address}:9009"
+export CRAG_SERVER="http://${ip_address}:8080"
 export db_name=Chinook
 export db_path="sqlite:////home/user/chinook-db/Chinook_Sqlite.sqlite"
+export SUPERVISOR_AGENT_ENDPOINT="http://${ip_address}:9090/v1"
 
 if [ ! -f $WORKDIR/GenAIExamples/AgentQnA/tests/Chinook_Sqlite.sqlite ]; then
     echo "Download Chinook_Sqlite!"
@@ -61,4 +63,4 @@ export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:6008/v1/dataprep/get"
 export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:6009/v1/dataprep/delete"
 
 
-export no_proxy="$no_proxy,rag-agent-endpoint,sql-agent-endpoint,react-agent-endpoint,agent-ui"
+export no_proxy="$no_proxy,$host_ip,rag-agent-endpoint,sql-agent-endpoint,react-agent-endpoint,agent-ui,vllm-service"
