@@ -34,7 +34,7 @@ on:
 
 jobs:
   one-click-test:
-    runs-on: ${{ inputs.deploy_method }}-${{ inputs.hardware }}
+    runs-on: ubuntu-latest    #${{ inputs.deploy_method }}-${{ inputs.hardware }}
     continue-on-error: true
     steps:
       - name: Clean up Working Directory
