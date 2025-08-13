@@ -144,7 +144,7 @@ class LogitsEstimatorJSON(LogitsEstimator):
                 input_text += "user\n" + msg["content"] + "\n"
             elif msg["role"] == "assistant":
                 input_text += "assistant\n" + msg["content"] + "\n"
-        input_text += "assistant\n<think>\n</think>\n"
+        input_text += "assistant\n<think>\n</think>\nanswer:\n"
         outputs = await self.invoke_vllm([input_text])
         score = self._calculate_token_score_vllm(outputs)
 
@@ -217,6 +217,9 @@ async def query_search(user_input, search_config_path, search_dir, pl):
     match_scores = list(zip(issues, scores))
     match_scores.sort(key=lambda x: x[1], reverse=True)
 
+    # Maximum less than 0.6, we don't use query search.
+    if match_scores[0][1] < 0.6:
+        return top1_issue, sub_questionss_result
     top1_issue = match_scores[0][0]
     for key, value in maintenance_data.items():
         if key == top1_issue:

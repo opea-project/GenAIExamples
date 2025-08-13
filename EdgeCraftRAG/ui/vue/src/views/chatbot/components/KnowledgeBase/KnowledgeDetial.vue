@@ -53,9 +53,11 @@
         >
           <div class="file-item">
             <div class="left-wrap">
-              <SvgIcon
-                name="icon-uploaded"
-                :style="{ color: 'var(--color-primary-second)' }"
+              <FileDoneOutlined
+                :style="{
+                  color: 'var(--color-success)',
+                  fontSize: '20px',
+                }"
               />
               <a-tooltip placement="topLeft" :title="key">
                 <div class="file-name">{{ key }}</div>
@@ -89,6 +91,7 @@ import {
   CloseCircleFilled,
   DeleteFilled,
   RollbackOutlined,
+  FileDoneOutlined,
 } from "@ant-design/icons-vue";
 import { message, Modal, UploadFile, UploadProps } from "ant-design-vue";
 import { useI18n } from "vue-i18n";
@@ -206,7 +209,7 @@ watch(
   display: block !important;
   .flex-column;
   .header-wrap {
-    padding: 12px 16px;
+    padding: 0 16px;
     height: 60px;
     border-bottom: 1px solid var(--border-main-color);
     .flex-between;
@@ -289,7 +292,11 @@ watch(
     }
   }
   .intel-empty {
-    margin: 200px auto;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
   }
 }
 </style>

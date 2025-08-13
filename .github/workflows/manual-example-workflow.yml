@@ -6,15 +6,11 @@ name: Examples CD workflow on manual event
 permissions:
   actions: read
   contents: read
-  checks: read
-  deployments: read
   discussions: read
   issues: read
-  packages: read
   pages: read
   pull-requests: read
   repository-projects: read
-  statuses: read
   security-events: read
   id-token: write
   attestations: read
@@ -25,12 +21,12 @@ on:
     inputs:
       nodes:
         default: "gaudi,xeon"
-        description: "Hardware to run test gaudi,xeon,rocm,arc,gaudi3,xeon-gnr"
+        description: "Hardware to run test gaudi,xeon,rocm,epyc,arc,gaudi3,xeon-gnr"
         required: true
         type: string
       examples:
         default: "ChatQnA"
-        description: 'List of examples to test [AgentQnA,AudioQnA,ChatQnA,CodeGen,CodeTrans,DocIndexRetriever,DocSum,FaqGen,InstructionTuning,MultimodalQnA,ProductivitySuite,RerankFinetuning,SearchQnA,Translation,VideoQnA,VisualQnA,AvatarChatbot,Text2Image,WorkflowExecAgent,DBQnA,EdgeCraftRAG,GraphRAG]'
+        description: 'List of examples to test [AgentQnA,AudioQnA,AvatarChatbot,ChatQnA,CodeGen,CodeTrans,DBQnA,DeepResearchAgent,DocIndexRetriever,DocSum,EdgeCraftRAG,FinanceAgent,GraphRAG,HybridRAG,InstructionTuning,MultimodalQnA,ProductivitySuite,RerankFinetuning,SearchQnA,Text2Image,Translation,VideoQnA,VisualQnA,WorkflowExecAgent]'
         required: true
         type: string
       tag:
@@ -88,12 +84,9 @@ jobs:
 
   build-comps-base:
     needs: [get-test-matrix]
-    strategy:
-      matrix:
-        node: ${{ fromJson(needs.get-test-matrix.outputs.nodes) }}
     uses: ./.github/workflows/_build_comps_base_image.yml
     with:
-      node: ${{ matrix.node }}
+      node: gaudi
       build: ${{ fromJSON(inputs.build) }}
       tag: ${{ inputs.tag }}
       opea_branch: ${{ inputs.opea_branch }}
