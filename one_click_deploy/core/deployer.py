@@ -21,6 +21,7 @@ from .config import (
 )
 from .tester import ConnectionTesterFactory
 from .utils import (
+    DeploymentError,
     get_conflicting_ports_from_compose,
     get_host_ip,
     get_huggingface_token_from_file,
@@ -219,14 +220,11 @@ class Deployer:
             return
 
         if self.args.do_check_env and not self.check_environment():
-            log_message("ERROR", "Environment check failed. Aborting deployment.")
-            return
+            raise DeploymentError("Environment check failed. Aborting deployment.")
         if self.args.do_update_images and not self.update_images():
-            log_message("ERROR", "Image update failed. Aborting deployment.")
-            return
+            raise DeploymentError("Image update failed. Aborting deployment.")
         if not self.configure_services():
-            log_message("ERROR", "Service configuration failed. Aborting deployment.")
-            return
+            raise DeploymentError("Service configuration failed. Aborting deployment.")
 
         if self.args.deploy_mode == "docker":
             self.project_name = f"{self.example_name.lower().replace(' ', '')}-{self.args.device}"
@@ -253,14 +251,9 @@ class Deployer:
                     env_vars = parse_shell_env_file(local_env_file)
                     conflicting_ports = get_conflicting_ports_from_compose(self._get_docker_compose_files(), env_vars)
                     if conflicting_ports:
-                        log_message(
-                            "ERROR",
-                            f"Deployment aborted. Ports are in use by other applications: {sorted(conflicting_ports)}",
-                        )
-                        return
+                        raise DeploymentError(f"Ports are in use by other applications: {sorted(conflicting_ports)}")
             except Exception as e:
-                log_message("ERROR", f"Failed during pre-deployment check: {e}")
-                return
+                raise DeploymentError(f"Failed during pre-deployment check: {e}") from e
 
         try:
             log_message("INFO", "Starting deployment...")
@@ -290,7 +283,7 @@ class Deployer:
                 elif self.args.deploy_mode == "k8s":
                     ns = self.config["kubernetes"]["namespace"]
                     log_message("INFO", f"Inspect pods with 'kubectl get pods -n {ns}'.")
-            return
+            raise DeploymentError("Deployment command failed.") from e
 
         if self.args.do_test_connection:
             log_message("INFO", f"Waiting for {POST_DEPLOY_WAIT_S} seconds for services to stabilize before testing...")
@@ -311,6 +304,7 @@ class Deployer:
                 elif self.args.deploy_mode == "k8s":
                     ns = self.config["kubernetes"]["namespace"]
                     log_message("INFO", f"Please inspect pod status with 'kubectl get pods -n {ns}'.")
+                raise DeploymentError("Connection tests failed after deployment.")
             else:
                 log_message("OK", "All connection tests passed.")
 
@@ -413,10 +407,12 @@ class Deployer:
             return
 
         try:
-            self.clear_deployment()
+            if not self.clear_deployment():
+                raise DeploymentError("Cleanup process failed. Please check logs.")
             log_message("OK", "Cleanup process completed successfully.")
         except Exception as e:
             log_message("ERROR", f"An unexpected error occurred during cleanup: {e}")
+            raise  # Re-raise the exception to be caught by the main CLI
 
     def _interactive_setup_for_clear(self):
         section_header(f"{self.example_name} Interactive Clear Setup")
@@ -450,10 +446,12 @@ class Deployer:
             return
 
         try:
-            self.test_connection()
-            log_message("OK", "Testing process completed.")
+            if not self.test_connection():
+                raise DeploymentError("Connection tests failed.")
+            log_message("OK", "Testing process completed successfully.")
         except Exception as e:
             log_message("ERROR", f"An unexpected error occurred during testing: {e}")
+            raise  # Re-raise
 
     def _interactive_setup_for_test(self):
         """Gathers necessary information for testing and updates self.args."""
@@ -755,6 +753,7 @@ cd "{compose_dir.resolve()}"
                         log_message("ERROR", f"  STDOUT: {result.stdout.strip()}")
                     if result.stderr:
                         log_message("ERROR", f"  STDERR: {result.stderr.strip()}")
+                    raise DeploymentError("Docker Compose down command failed.")
                 else:
                     log_message("OK", "Docker Compose services stopped and removed.")
                 if clear_local_config:
@@ -762,18 +761,20 @@ cd "{compose_dir.resolve()}"
                     if local_env_file and local_env_file.exists():
                         local_env_file.unlink()
                         log_message("INFO", f"Removed generated config file: {local_env_file.name}")
-                return result.returncode == 0
+                return True
             except Exception as e:
                 log_message("ERROR", f"Failed to clear Docker Compose deployment: {e}")
-                return False
+                raise DeploymentError("Failed to clear Docker Compose deployment.") from e
 
         elif self.args.deploy_mode == "k8s":
             cfg = self.config["kubernetes"]
+            all_ok = True
             try:
                 run_command(["helm", "uninstall", cfg["release_name"], "--namespace", cfg["namespace"]], check=False)
                 log_message("OK", f"Helm release '{cfg['release_name']}' uninstalled.")
             except Exception as e:
                 log_message("WARN", f"Helm uninstall may have failed: {e}")
+                all_ok = False
             local_values_file = self._get_local_helm_values_file_path()
             if local_values_file and local_values_file.exists():
                 try:
@@ -790,7 +791,10 @@ cd "{compose_dir.resolve()}"
                     log_message("OK", f"Namespace '{cfg['namespace']}' deleted.")
                 except Exception as e:
                     log_message("ERROR", f"Failed to delete namespace: {e}")
-                    return False
+                    all_ok = False
+
+            if not all_ok:
+                raise DeploymentError("Kubernetes cleanup failed. Some resources may remain.")
             return True
         return False
 

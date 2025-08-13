@@ -36,6 +36,12 @@ COLOR_INFO_HEADER = "\033[1;34m"
 COLOR_DEBUG_ICON = "\033[0;36m"
 
 
+class DeploymentError(Exception):
+    """Custom exception for deployment script failures."""
+
+    pass
+
+
 class LogMessagePrintFilter(logging.Filter):
     def filter(self, record):
         return not getattr(record, "skip_console_handler", False)
