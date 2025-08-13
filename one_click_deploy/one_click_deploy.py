@@ -10,7 +10,7 @@ from core.config import EXAMPLE_CONFIGS
 from core.deployer import Deployer
 from core.utils import log_message, setup_logging, stop_all_kubectl_port_forwards
 
-
+####test
 @click.command()
 @click.option("--verbose", "-v", is_flag=True, help="Enable verbose (DEBUG) logging.")
 def cli(verbose):
