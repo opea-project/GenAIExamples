@@ -5,15 +5,11 @@ name: Example jobs
 permissions:
   actions: read
   contents: read
-  checks: read
-  deployments: read
   discussions: read
   issues: read
-  packages: read
   pages: read
   pull-requests: read
   repository-projects: read
-  statuses: read
   security-events: read
   id-token: write
   attestations: read
@@ -73,14 +69,11 @@ jobs:
       actions: read
       contents: read
       checks: read
-      deployments: read
       discussions: read
       issues: read
-      packages: read
       pages: read
       pull-requests: read
       repository-projects: read
-      statuses: read
       security-events: read
       id-token: write
       attestations: read
@@ -102,13 +95,9 @@ jobs:
     permissions:
       actions: read
       contents: read
-      checks: write
-      deployments: write
       issues: write
-      packages: write
       pages: write
       pull-requests: write
-      statuses: write
       security-events: read
     needs: [build-images]
     if: ${{ inputs.test_compose }}

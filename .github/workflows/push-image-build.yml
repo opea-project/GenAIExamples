@@ -48,13 +48,9 @@ jobs:
       repository-projects: read
       id-token: write
       contents: read
-      checks: write
-      deployments: write
       issues: write
-      packages: write
       pages: write
       pull-requests: write
-      statuses: write
       security-events: read
     needs: job1
     if: ${{ needs.job1.outputs.run_matrix != '{"include":[]}' }}

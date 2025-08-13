@@ -71,13 +71,9 @@ jobs:
       repository-projects: read
       id-token: write
       contents: read
-      checks: write
-      deployments: write
       issues: write
-      packages: write
       pages: write
       pull-requests: write
-      statuses: write
       security-events: read
     needs: [get-build-matrix, clean-up]
     if: ${{ needs.get-image-list.outputs.matrix != '' }}

@@ -41,7 +41,6 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
-      actions: write
     if: needs.get-check-list.outputs.files != ''
     strategy:
       matrix:

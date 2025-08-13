@@ -5,13 +5,9 @@ name: Image Build
 permissions:
   actions: read
   contents: read
-  checks: write
-  deployments: write
   issues: write
-  packages: write
   pages: write
   pull-requests: write
-  statuses: write
   security-events: read
 on:
   workflow_call:
