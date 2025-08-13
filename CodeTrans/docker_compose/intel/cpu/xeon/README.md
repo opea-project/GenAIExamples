@@ -151,7 +151,7 @@ Set the following environment variables.
 
 - `REMOTE_ENDPOINT` is the HTTPS endpoint of the remote server with the model of choice (i.e. https://api.example.com). **Note:** If the API for the models does not use LiteLLM, the second part of the model card needs to be appended to the URL. For example, set `REMOTE_ENDPOINT` to https://api.example.com/Llama-3.3-70B-Instruct if the model card is `meta-llama/Llama-3.3-70B-Instruct`.
 - `API_KEY` is the access token or key to access the model(s) on the server.
-- `LLM_MODEL_ID` is the model card which may need to be overwritten depending on what it is set to `set_env.sh`.
+- `LLM_MODEL_ID` is the model card which may need to be overwritten depending on what it is set to in `set_env.sh`.
 
 ```bash
 export REMOTE_ENDPOINT=<https-endpoint-of-remote-server>
