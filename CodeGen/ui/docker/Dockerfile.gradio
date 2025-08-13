@@ -10,7 +10,6 @@ ARG ARCH="cpu"
 RUN apt-get update -y && apt-get install -y --no-install-recommends --fix-missing \
     build-essential \
     default-jre \
-    libgl1-mesa-glx \
     libjemalloc-dev \
     ffmpeg \
     wget
