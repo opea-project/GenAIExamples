@@ -64,7 +64,7 @@ function start_vllm_services() {
     export NGINX_PORT=8086
     export vLLM_ENDPOINT="http://${HOST_IP}:${NGINX_PORT}"
     TENSOR_PARALLEL_SIZE=$(get_user_input "your tp size" 1)
-    read -p "selected GPU [$(seq -s, 0 $((TENSOR_PARALLEL_SIZE - 1)))] " SELECTED_XPU_0; SELECTED_XPU_0=${SELECTED_XPU_0:-$(seq -s, 0 $((TENSOR_PARALLEL_SIZE - 1)))} 
+    read -p "selected GPU [$(seq -s, 0 $((TENSOR_PARALLEL_SIZE - 1)))] " SELECTED_XPU_0; SELECTED_XPU_0=${SELECTED_XPU_0:-$(seq -s, 0 $((TENSOR_PARALLEL_SIZE - 1)))}
     DP_NUM=$(get_user_input "DP number(how many containers to run vLLM)" 1)
     for (( x=0; x<DP_NUM; x++ ))
     do
