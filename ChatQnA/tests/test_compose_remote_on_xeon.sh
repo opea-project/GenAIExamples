@@ -38,7 +38,7 @@ function start_services() {
     export REMOTE_ENDPOINT=http://localhost:8000
     export API_KEY=$TEST_KEY
     export LLM_MODEL_ID=TinyLlama/TinyLlama-1.1B-Chat-v1.0
-    
+
     # Start Docker Containers
     docker compose -f compose_remote.yaml -f compose.telemetry.yaml up -d --quiet-pull > ${LOG_PATH}/start_services_with_compose_remote.log
 }
