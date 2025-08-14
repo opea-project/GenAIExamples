@@ -94,6 +94,11 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y python3-pip
+
       - name: get-default-params-from-config
         id: get-default-params
         if: ${{ inputs.deploy_method == 'k8s' }}
@@ -131,9 +136,6 @@ jobs:
           Mount_dir: ${{ env.Mount_dir }}
           LVM_model: ${{ env.LVM_model }}
         run: |
-          sudo apt update
-          sudo apt install -y python3-pip
-
           cd ${{ github.workspace }}/one_click_deploy
           python3 -m pip install -r requirements.txt
 
