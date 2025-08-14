@@ -487,11 +487,9 @@ class Deployer:
             self._deploy_from_offline_package()
 
     def _get_all_docker_images_for_example(self):
-        """
-        Parses all compose files for an example, substitutes common environment variables,
-        and extracts unique image names.
-        """
-        from .utils import find_all_values_for_key, YAML_HANDLER, _substitute_env_vars
+        """Parses all compose files for an example, substitutes common environment variables,
+        and extracts unique image names."""
+        from .utils import YAML_HANDLER, _substitute_env_vars, find_all_values_for_key
 
         log_message("INFO", "Discovering all required Docker images for all device types...")
         if not YAML_HANDLER:
@@ -539,8 +537,9 @@ class Deployer:
             except Exception as e:
                 log_message("ERROR", f"Failed to parse {compose_path}: {e}")
 
-        final_images = {img for img in unique_images if
-                        ":" in img or "/" in img}  # A basic sanity check for image names
+        final_images = {
+            img for img in unique_images if ":" in img or "/" in img
+        }  # A basic sanity check for image names
 
         if not final_images:
             log_message("WARN", "Could not discover any valid image names.")
@@ -549,8 +548,8 @@ class Deployer:
         return sorted(list(final_images))
 
     def _create_offline_package(self):
-        """
-        Pulls all necessary images, saves them to a tarball, and packages everything.
+        """Pulls all necessary images, saves them to a tarball, and packages everything.
+
         Includes a user confirmation step before pulling. Fails on first error.
         """
         section_header("Creating Offline Deployment Package")
