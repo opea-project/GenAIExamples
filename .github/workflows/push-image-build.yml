@@ -21,7 +21,7 @@ permissions:
   models: read
 
 on:
-  push:
+  pull_request:
     branches: [ 'main', 'ze-fix/push-build' ]
     paths:
       - "**.py"
