@@ -48,9 +48,17 @@ def cli(verbose):
             deployment_type_prompt_text, type=click.IntRange(1, len(deployment_types)), default=1, show_default=True
         )
         deployment_type_choice = deployment_types[deployment_type_choice_num - 1]
-        # ## END MODIFIED SECTION ##
 
         log_message("INFO", f"Deployment type selected: '{deployment_type_choice}'")
+
+        if deployment_type_choice == "Offline Deployment Management":
+            # Check config to see if offline mode is supported for the selected example
+            supported_offline_modes = EXAMPLE_CONFIGS[example_name].get("offline_support", [])
+            if not supported_offline_modes:
+                log_message("ERROR", f"Offline mode is not currently supported for the '{example_name}' example.")
+                sys.exit(1)
+            # Pass the supported modes to the deployer for later use
+            app_args.supported_offline_modes = supported_offline_modes
 
         deployer = Deployer(app_args)
 

@@ -316,7 +316,15 @@ class Deployer:
 
     def _interactive_setup_for_deploy(self):
         section_header(f"{self.example_name} Interactive Deployment Setup")
-        self.args.deploy_mode = click.prompt("Deployment Mode", type=click.Choice(["docker", "k8s"]), default="docker")
+
+        # If this is an offline deployment, the mode is already set and should not be prompted.
+        if getattr(self.args, "is_offline_deployment", False):
+            log_message("INFO", f"Offline Deployment Mode: {self.args.deploy_mode} (pre-selected)")
+        else:
+            self.args.deploy_mode = click.prompt(
+                "Deployment Mode", type=click.Choice(["docker", "k8s"]), default="docker"
+            )
+
         self.args.device = click.prompt(
             "Target Device",
             type=click.Choice(self.config.get("supported_devices")),
@@ -475,7 +483,6 @@ class Deployer:
         if offline_action == "Create Offline Package":
             if not self._create_offline_package():
                 log_message("ERROR", "Offline package creation failed. Please check the logs.")
-                # No need to sys.exit, the main loop will catch the return and finish.
         elif offline_action == "Deploy from Offline Package":
             self._deploy_from_offline_package()
 
@@ -501,7 +508,6 @@ class Deployer:
         if not all_compose_paths:
             log_message("ERROR", f"No Docker Compose files found for example '{self.example_name}'.")
             return []
-
 
         default_env_for_parsing = {
             "REGISTRY": "opea",  # Default value for ${REGISTRY}
@@ -554,7 +560,6 @@ class Deployer:
             log_message("ERROR", "No images found to package. Aborting.")
             return False
 
-        # --- ADDED: User confirmation step ---
         section_header("Discovered Images for Offline Package")
         log_message("INFO", "The following Docker images will be pulled and packaged:")
         for image in images:
@@ -608,14 +613,7 @@ class Deployer:
                 final_package_path = output_path / package_name
 
                 log_message("INFO", f"Creating final compressed package: {final_package_path}")
-                tar_cmd = [
-                    "tar",
-                    "-czvf",
-                    str(final_package_path),
-                    "-C",
-                    str(temp_path),
-                    ".",
-                ]
+                tar_cmd = ["tar", "-czvf", str(final_package_path), "-C", str(temp_path), "."]
                 run_command(tar_cmd, check=True)
 
                 log_message("OK", "Offline package created successfully!")
@@ -624,7 +622,6 @@ class Deployer:
         except Exception as e:
             log_message("ERROR", f"An error occurred during packaging: {e}")
             return False
-
 
     def _deploy_from_offline_package(self):
         """Loads images from an offline package and then starts the normal deployment flow."""
@@ -659,8 +656,22 @@ class Deployer:
             log_message("ERROR", f"Failed to process the offline package: {e}")
             return False
 
-        log_message("INFO", "Image loading complete. Now proceeding to the standard interactive deployment setup...")
+        # Determine deployment mode from config
+        supported_modes = getattr(self.args, "supported_offline_modes", [])
+
+        if len(supported_modes) == 1:
+            self.args.deploy_mode = supported_modes[0]
+            log_message("INFO", f"Automatically selecting the only supported offline mode: '{self.args.deploy_mode}'")
+        else:  # Future-proofing for when k8s etc. is supported
+            self.args.deploy_mode = click.prompt(
+                "Please choose the offline deployment mode",
+                type=click.Choice(supported_modes),
+                default=supported_modes[0],
+            )
+
+        log_message("INFO", "Now proceeding to the standard interactive deployment setup...")
         self.args.action = "Deploy"
+        self.args.is_offline_deployment = True
         self.run_interactive_deployment()
 
     def _interactive_setup_for_test(self):
@@ -887,15 +898,23 @@ class Deployer:
             compose_dir = self._get_docker_compose_files()[0].parent
             local_env_dir = local_env_file.parent
 
-            script_content = f"""#!/bin/bash
-set -e
-trap 'echo "ERROR: A command failed at line $LINENO. Exiting." >&2' ERR
-cd "{local_env_dir.resolve()}"
-export NON_INTERACTIVE=true
-source "{local_env_file.resolve()}"
-cd "{compose_dir.resolve()}"
-{compose_up_cmd}
-"""
+            script_lines = [
+                "#!/bin/bash",
+                "set -e",
+                "trap 'echo \"ERROR: A command failed at line $LINENO. Exiting.\" >&2' ERR",
+                f'cd "{local_env_dir.resolve()}"',
+                "export NON_INTERACTIVE=true",
+                f'source "{local_env_file.resolve()}"',
+            ]
+
+            # If offline deployment, set HF_HUB_OFFLINE to prevent downloads.
+            if getattr(self.args, "is_offline_deployment", False):
+                log_message("INFO", "Offline mode detected, setting HF_HUB_OFFLINE=1 for deployment.")
+                script_lines.append("export HF_HUB_OFFLINE=1")
+
+            script_lines.extend([f'cd "{compose_dir.resolve()}"', compose_up_cmd])
+            script_content = "\n".join(script_lines) + "\n"
+
             temp_script_path = None
             try:
                 with tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".sh", dir=".") as f:
