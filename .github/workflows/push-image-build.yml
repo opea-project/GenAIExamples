@@ -21,8 +21,8 @@ permissions:
   models: read
 
 on:
-  pull_request:
-    branches: [ 'main', 'ze-fix/push-build' ]
+  push:
+    branches: [ 'main' ]
     paths:
       - "**.py"
       - "**Dockerfile*"
