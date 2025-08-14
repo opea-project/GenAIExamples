@@ -160,6 +160,7 @@ python3 $WORKDIR/GenAIExamples/FinanceAgent/tests/test.py --agent_role "supervis
 Supervisor Agent multi turn:
 
 ```bash
+export agent_port="9090"
 python3 $WORKDIR/GenAIExamples/FinanceAgent/tests/test.py --agent_role "supervisor" --ext_port $agent_port --multi-turn --stream
 ```
 

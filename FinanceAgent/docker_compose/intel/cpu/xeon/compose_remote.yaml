@@ -1,18 +1,20 @@
 # Copyright (C) 2025 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+x-common-environment:
+  &common-env
+  llm_endpoint_url: ${REMOTE_ENDPOINT}
+  api_key: ${OPENAI_API_KEY}
+
 services:
   worker-finqa-agent:
     environment:
-      llm_endpoint_url: ${REMOTE_ENDPOINT}
-      api_key: ${OPENAI_API_KEY}
+      <<: *common-env
 
   worker-research-agent:
     environment:
-      llm_endpoint_url: ${REMOTE_ENDPOINT}
-      api_key: ${OPENAI_API_KEY}
+      <<: *common-env
 
   supervisor-react-agent:
     environment:
-      llm_endpoint_url: ${REMOTE_ENDPOINT}
-      api_key: ${OPENAI_API_KEY}
+      <<: *common-env
