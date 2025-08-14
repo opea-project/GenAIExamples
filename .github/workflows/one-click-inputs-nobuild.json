@@ -5,6 +5,7 @@
         "deploy": [
           "1",
           "1",
+          "1",
           "docker",
           "$hardware",
           "$HF_TOKEN",
@@ -28,6 +29,7 @@
         "deploy": [
           "2",
           "1",
+          "1",
           "docker",
           "$hardware",
           "$HF_TOKEN",
@@ -47,6 +49,7 @@
       "inputs": {
         "deploy": [
           "3",
+          "1",
           "1",
           "docker",
           "$hardware",
@@ -68,6 +71,7 @@
         "deploy": [
           "4",
           "1",
+          "1",
           "docker",
           "$hardware",
           "$HF_TOKEN",
@@ -87,6 +91,7 @@
       "inputs": {
         "deploy": [
           "5",
+          "1",
           "1",
           "docker",
           "$hardware",
@@ -108,6 +113,7 @@
         "deploy": [
           "6",
           "1",
+          "1",
           "docker",
           "$hardware",
           "$HF_TOKEN",
@@ -128,6 +134,7 @@
         "deploy": [
           "7",
           "1",
+          "1",
           "docker",
           "$hardware",
           "$HF_TOKEN",
@@ -147,6 +154,7 @@
       "inputs": {
         "deploy": [
           "8",
+          "1",
           "1",
           "docker",
           "$hardware",
@@ -169,6 +177,7 @@
     "ChatQnA": {
       "inputs": {
         "deploy": [
+          "1",
           "1",
           "1",
           "k8s",
@@ -194,6 +203,7 @@
         "deploy": [
           "2",
           "1",
+          "1",
           "k8s",
           "$hardware",
           "$HF_TOKEN",
@@ -214,6 +224,7 @@
       "inputs": {
         "deploy": [
           "3",
+          "1",
           "1",
           "k8s",
           "$hardware",
@@ -236,6 +247,7 @@
         "deploy": [
           "4",
           "1",
+          "1",
           "k8s",
           "$hardware",
           "$HF_TOKEN",
@@ -256,6 +268,7 @@
       "inputs": {
         "deploy": [
           "5",
+          "1",
           "1",
           "k8s",
           "$hardware",
@@ -278,6 +291,7 @@
         "deploy": [
           "6",
           "1",
+          "1",
           "k8s",
           "$hardware",
           "$HF_TOKEN",
@@ -299,6 +313,7 @@
         "deploy": [
           "7",
           "1",
+          "1",
           "k8s",
           "$hardware",
           "$HF_TOKEN",
@@ -319,6 +334,7 @@
       "inputs": {
         "deploy": [
           "8",
+          "1",
           "1",
           "k8s",
           "$hardware",
