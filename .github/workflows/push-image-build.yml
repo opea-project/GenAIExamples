@@ -22,7 +22,7 @@ permissions:
 
 on:
   push:
-    branches: [ 'main' ]
+    branches: [ 'main', 'ze-fix/push-build' ]
     paths:
       - "**.py"
       - "**Dockerfile*"
