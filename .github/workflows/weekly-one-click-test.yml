@@ -25,6 +25,11 @@ jobs:
       nodes: ${{ steps.get-matrix.outputs.nodes }}
       deploy_methods: ${{ steps.get-matrix.outputs.deploy_methods }}
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
       - name: Create Matrix
         id: get-matrix
         run: |
