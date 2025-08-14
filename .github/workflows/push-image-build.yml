@@ -43,6 +43,7 @@ jobs:
     permissions:
       actions: read
       attestations: read
+      checks: read
       discussions: read
       models: read
       repository-projects: read
