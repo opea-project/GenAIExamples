@@ -3,6 +3,10 @@
 
 name: Daily update vLLM & vLLM-fork version
 
+permissions:
+  contents: write
+  pull-requests: write
+
 on:
   schedule:
     - cron: "30 22 * * *"
@@ -26,9 +30,6 @@ jobs:
             repo_name: HabanaAI/vllm-fork
             ver_name: VLLM_FORK_VER
       fail-fast: false
-    permissions:
-      contents: write
-      pull-requests: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
