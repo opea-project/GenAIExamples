@@ -13,7 +13,7 @@ export HF_TOKEN=${HF_TOKEN}
 export host_ip=${ip_address}
 export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
 export RERANK_MODEL_ID="BAAI/bge-reranker-base"
-export LLM_MODEL_ID="meta-llama/Meta-Llama-3-8B-Instruct"
+export LLM_MODEL_ID="meta-llama/Meta-Llama-3.1-8B-Instruct"
 export INDEX_NAME="rag-redis"
 # Set it as a non-null string, such as true, if you want to enable logging facility,
 # otherwise, keep it as "" to disable it.
