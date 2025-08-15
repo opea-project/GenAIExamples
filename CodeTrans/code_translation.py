@@ -17,6 +17,7 @@ from fastapi.responses import StreamingResponse
 MEGA_SERVICE_PORT = int(os.getenv("MEGA_SERVICE_PORT", 7777))
 LLM_SERVICE_HOST_IP = os.getenv("LLM_SERVICE_HOST_IP", "0.0.0.0")
 LLM_SERVICE_PORT = int(os.getenv("LLM_SERVICE_PORT", 9000))
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", None)
 
 
 class CodeTransService:
@@ -31,8 +32,10 @@ class CodeTransService:
             name="llm",
             host=LLM_SERVICE_HOST_IP,
             port=LLM_SERVICE_PORT,
+            api_key=OPENAI_API_KEY,
             endpoint="/v1/chat/completions",
             use_remote_service=True,
+            service_type=ServiceType.LLM,
         )
         self.megaservice.add(llm)
 
