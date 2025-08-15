@@ -43,7 +43,7 @@ function start_services() {
     source set_env.sh
 
     # Start Docker Containers
-    docker compose -f compose.yaml -f compose.telemetry.yaml -f compose.perf.yaml up -d --quiet-pull > ${LOG_PATH}/start_services_with_compose.log
+    docker compose -f compose.yaml -f compose.telemetry.yaml up -d --quiet-pull > ${LOG_PATH}/start_services_with_compose.log
     n=0
     until [[ "$n" -ge 100 ]]; do
         docker logs vllm-service > ${LOG_PATH}/vllm_service_start.log 2>&1
@@ -163,7 +163,7 @@ function validate_frontend() {
 
 function stop_docker() {
     cd $WORKPATH/docker_compose/intel/cpu/xeon
-    docker compose -f compose.yaml -f compose.telemetry.yaml -f compose.perf.yaml down
+    docker compose -f compose.yaml -f compose.telemetry.yaml down
 }
 
 function main() {
