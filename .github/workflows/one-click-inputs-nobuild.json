@@ -29,6 +29,7 @@
         "deploy": [
           "1",
           "1",
+          "1",
           "docker",
           "$hardware",
           "$HF_TOKEN",
@@ -44,7 +45,7 @@
           "y",
           "Y"
         ],
-        "clear": ["1", "2", "docker", "$hardware", "Y"]
+        "clear": ["1", "1", "2", "docker", "$hardware", "Y"]
       }
     },
     "CodeTrans": {
@@ -226,6 +227,7 @@
         "deploy": [
           "1",
           "1",
+          "1",
           "k8s",
           "$hardware",
           "$HF_TOKEN",
@@ -241,7 +243,7 @@
           "8080",
           "Y"
         ],
-        "clear": ["1", "2", "k8s", "y", "Y"]
+        "clear": ["1", "1", "2", "k8s", "y", "Y"]
       }
     },
     "CodeTrans": {
