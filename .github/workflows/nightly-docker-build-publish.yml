@@ -25,8 +25,7 @@ on:
   workflow_dispatch:
 
 env:
-  EXAMPLES: "CodeGen,CodeTrans"
-  # ${{ vars.NIGHTLY_RELEASE_EXAMPLES }}
+  EXAMPLES: ${{ vars.NIGHTLY_RELEASE_EXAMPLES }}
   TAG: "latest"
   PUBLISH_TAGS: "latest"
 

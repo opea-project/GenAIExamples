@@ -11,7 +11,6 @@ permissions:
 on:
   schedule:
     - cron: "30 22 * * *"
-  workflow_dispatch:
 
 jobs:
   close-issues:
