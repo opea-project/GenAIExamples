@@ -1,7 +1,9 @@
 # Code Generation Example (CodeGen)
 
 ## Table of Contents
+
 ##
+
 - [Overview](#overview)
 - [Problem Motivation](#problem-motivation)
 - [Architecture](#architecture)
