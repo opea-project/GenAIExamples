@@ -31,6 +31,7 @@ services:
       REDIS_HOST: redis-vector-db
       INDEX_NAME: ${INDEX_NAME}
       TEI_ENDPOINT: http://tei-embedding-service:80
+      TEI_EMBEDDING_ENDPOINT: http://tei-embedding-service:80
       HF_TOKEN: ${HF_TOKEN}
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:5000/v1/health_check || exit 1"]
@@ -102,6 +103,7 @@ services:
       HF_TOKEN: ${HF_TOKEN}
       LLM_MODEL_ID: ${LLM_MODEL_ID}
       VLLM_TORCH_PROFILER_DIR: "/mnt"
+      HF_HUB_OFFLINE: ${HF_HUB_OFFLINE:-0}
       VLLM_CPU_KVCACHE_SPACE: 40
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://$host_ip:9009/health || exit 1"]

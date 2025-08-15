@@ -12,6 +12,9 @@ on:
     types: [opened, reopened, synchronize] # added `ready_for_review` since draft is skipped
     paths:
       - "**/one_click_deploy/**"
+      - "**/workflows/one-click-inputs-nobuild.json"
+      - "**/workflows/pr-one-click.yml"
+      - "**/workflows/_run-one-click.yml"
 
 # If there is a new commit, the previous jobs will be canceled
 concurrency:

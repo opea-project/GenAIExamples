@@ -310,7 +310,15 @@ class Deployer:
 
     def _interactive_setup_for_deploy(self):
         section_header(f"{self.example_name} Interactive Deployment Setup")
-        self.args.deploy_mode = click.prompt("Deployment Mode", type=click.Choice(["docker", "k8s"]), default="docker")
+
+        # If this is an offline deployment, the mode is already set and should not be prompted.
+        if getattr(self.args, "is_offline_deployment", False):
+            log_message("INFO", f"Offline Deployment Mode: {self.args.deploy_mode} (pre-selected)")
+        else:
+            self.args.deploy_mode = click.prompt(
+                "Deployment Mode", type=click.Choice(["docker", "k8s"]), default="docker"
+            )
+
         self.args.device = click.prompt(
             "Target Device",
             type=click.Choice(self.config.get("supported_devices")),
@@ -452,6 +460,216 @@ class Deployer:
         except Exception as e:
             log_message("ERROR", f"An unexpected error occurred during testing: {e}")
             raise  # Re-raise
+
+    def manage_offline_deployment(self):
+        """Orchestrates the offline deployment management flow using numbered options."""
+        section_header(f"Offline Deployment Management for {self.example_name}")
+
+        offline_actions = ["Create Offline Package", "Deploy from Offline Package"]
+        offline_action_prompt_lines = ["Please choose an offline action:"]
+        for i, name in enumerate(offline_actions, 1):
+            offline_action_prompt_lines.append(f"  [{i}] {name}")
+        offline_action_prompt_text = "\n".join(offline_action_prompt_lines)
+
+        offline_action_choice_num = click.prompt(
+            offline_action_prompt_text, type=click.IntRange(1, len(offline_actions)), default=1, show_default=True
+        )
+        offline_action = offline_actions[offline_action_choice_num - 1]
+
+        log_message("INFO", f"Offline action selected: '{offline_action}'")
+
+        if offline_action == "Create Offline Package":
+            if not self._create_offline_package():
+                log_message("ERROR", "Offline package creation failed. Please check the logs.")
+        elif offline_action == "Deploy from Offline Package":
+            self._deploy_from_offline_package()
+
+    def _get_all_docker_images_for_example(self):
+        """Parses all compose files for an example, substitutes common environment variables,
+        and extracts unique image names."""
+        from .utils import YAML_HANDLER, _substitute_env_vars, find_all_values_for_key
+
+        log_message("INFO", "Discovering all required Docker images for all device types...")
+        if not YAML_HANDLER:
+            log_message("ERROR", "YAML library (ruamel.yaml or pyyaml) is not installed. Cannot parse compose files.")
+            return []
+
+        all_compose_paths = []
+        compose_paths_map = self.config.get("docker_compose", {}).get("paths", {})
+        for device in compose_paths_map:
+            paths = self._get_path_from_config(["docker_compose", "paths"], device)
+            if paths:
+                all_compose_paths.extend(paths)
+
+        if not all_compose_paths:
+            log_message("ERROR", f"No Docker Compose files found for example '{self.example_name}'.")
+            return []
+
+        default_env_for_parsing = {
+            "REGISTRY": "opea",  # Default value for ${REGISTRY}
+            "TAG": "latest",  # Default value for ${TAG}
+            # Add other common variables from your set_env.sh scripts here if needed
+            "LLM_MODEL_ID": "meta-llama/Meta-Llama-3-8B-Instruct",  # Example default
+        }
+        log_message("DEBUG", f"Using default env for parsing: {default_env_for_parsing}")
+
+        unique_images = set()
+        for compose_path in set(all_compose_paths):
+            if not compose_path.exists():
+                log_message("WARN", f"Compose file not found, skipping: {compose_path}")
+                continue
+
+            log_message("INFO", f"Parsing {compose_path.name} for image names...")
+            try:
+                raw_content = compose_path.read_text()
+
+                substituted_content = _substitute_env_vars(raw_content, default_env_for_parsing)
+
+                data = YAML_HANDLER.load(substituted_content)
+
+                images_in_file = find_all_values_for_key(data, "image")
+
+                valid_images = {img.strip() for img in images_in_file if img and not img.isspace()}
+                unique_images.update(valid_images)
+
+            except Exception as e:
+                log_message("ERROR", f"Failed to parse {compose_path}: {e}")
+
+        final_images = {
+            img for img in unique_images if ":" in img or "/" in img
+        }  # A basic sanity check for image names
+
+        if not final_images:
+            log_message("WARN", "Could not discover any valid image names.")
+            return []
+
+        return sorted(list(final_images))
+
+    def _create_offline_package(self):
+        """Pulls all necessary images, saves them to a tarball, and packages everything.
+
+        Includes a user confirmation step before pulling. Fails on first error.
+        """
+        section_header("Creating Offline Deployment Package")
+
+        images = self._get_all_docker_images_for_example()
+        if not images:
+            log_message("ERROR", "No images found to package. Aborting.")
+            return False
+
+        section_header("Discovered Images for Offline Package")
+        log_message("INFO", "The following Docker images will be pulled and packaged:")
+        for image in images:
+            log_message("INFO", f"  - {image}")
+
+        if not click.confirm("\nDo you want to proceed with pulling these images?", default=True):
+            log_message("INFO", "Operation aborted by user.")
+            return False
+
+        # 1. Pull all images. If any pull fails, abort immediately.
+        log_message("INFO", "Pulling all required images. This may take a long time...")
+        for i, image in enumerate(images):
+            log_message("INFO", f"[{i + 1}/{len(images)}] Pulling {image}...")
+            try:
+                # Add a check for obviously invalid image names before trying to pull
+                if not image or ":" not in image:
+                    log_message("ERROR", f"Skipping invalid image name: '{image}'. Aborting package creation.")
+                    return False
+                run_command(["docker", "pull", image], check=True, stream_output=True)
+            except Exception as e:
+                log_message("ERROR", f"Failed to pull image '{image}'. Aborting package creation.")
+                log_message("DEBUG", f"Underlying error: {e}")
+                return False
+
+        log_message("OK", "All required images have been successfully pulled.")
+
+        # 2. Save images to a tar file in a temporary directory
+        try:
+            with tempfile.TemporaryDirectory() as temp_dir:
+                temp_path = pathlib.Path(temp_dir)
+                images_tar_path = temp_path / "images.tar"
+
+                log_message("INFO", f"Saving images to a single tarball: {images_tar_path}")
+                valid_images = [img for img in images if img]
+                if not valid_images:
+                    log_message("ERROR", "No valid image names to save.")
+                    return False
+
+                save_cmd = ["docker", "save", "--output", str(images_tar_path)] + valid_images
+                run_command(save_cmd, check=True, stream_output=True)
+                log_message("OK", "Images successfully saved to tarball.")
+
+                # 3. Create the final .tar.gz package
+                output_dir = click.prompt(
+                    "Enter the directory to save the final package", default=str(pathlib.Path.cwd())
+                )
+                output_path = pathlib.Path(output_dir)
+                output_path.mkdir(parents=True, exist_ok=True)
+
+                package_name = f"offline_package_{self.example_name.lower()}_{time.strftime('%Y%m%d')}.tar.gz"
+                final_package_path = output_path / package_name
+
+                log_message("INFO", f"Creating final compressed package: {final_package_path}")
+                tar_cmd = ["tar", "-czvf", str(final_package_path), "-C", str(temp_path), "."]
+                run_command(tar_cmd, check=True)
+
+                log_message("OK", "Offline package created successfully!")
+                log_message("INFO", f"Package location: {final_package_path}")
+                return True
+        except Exception as e:
+            log_message("ERROR", f"An error occurred during packaging: {e}")
+            return False
+
+    def _deploy_from_offline_package(self):
+        """Loads images from an offline package and then starts the normal deployment flow."""
+        section_header("Deploying from Offline Package")
+
+        package_path_str = click.prompt("Please enter the full path to the offline .tar.gz package")
+        package_path = pathlib.Path(package_path_str).expanduser()
+
+        if not package_path.is_file():
+            log_message("ERROR", f"File not found: {package_path}")
+            return False
+
+        try:
+            with tempfile.TemporaryDirectory() as temp_dir:
+                temp_path = pathlib.Path(temp_dir)
+                log_message("INFO", f"Extracting package '{package_path.name}' to a temporary directory...")
+
+                extract_cmd = ["tar", "-xzvf", str(package_path), "-C", str(temp_path)]
+                run_command(extract_cmd, check=True)
+
+                images_tar_path = temp_path / "images.tar"
+                if not images_tar_path.exists():
+                    log_message("ERROR", "The package is invalid. 'images.tar' not found after extraction.")
+                    return False
+
+                log_message("INFO", "Loading Docker images from the package. This may take a few minutes...")
+                load_cmd = ["docker", "load", "--input", str(images_tar_path)]
+                run_command(load_cmd, check=True, stream_output=True)
+                log_message("OK", "All images have been loaded into Docker.")
+
+        except Exception as e:
+            log_message("ERROR", f"Failed to process the offline package: {e}")
+            return False
+
+        # Determine deployment mode from config
+        supported_modes = getattr(self.args, "supported_offline_modes", [])
+
+        if len(supported_modes) == 1:
+            self.args.deploy_mode = supported_modes[0]
+            log_message("INFO", f"Automatically selecting the only supported offline mode: '{self.args.deploy_mode}'")
+        else:  # Future-proofing for when k8s etc. is supported
+            self.args.deploy_mode = click.prompt(
+                "Please choose the offline deployment mode",
+                type=click.Choice(supported_modes),
+                default=supported_modes[0],
+            )
+
+        log_message("INFO", "Now proceeding to the standard interactive deployment setup...")
+        self.args.action = "Deploy"
+        self.args.is_offline_deployment = True
+        self.run_interactive_deployment()
 
     def _interactive_setup_for_test(self):
         """Gathers necessary information for testing and updates self.args."""
@@ -677,15 +895,23 @@ class Deployer:
             compose_dir = self._get_docker_compose_files()[0].parent
             local_env_dir = local_env_file.parent
 
-            script_content = f"""#!/bin/bash
-set -e
-trap 'echo "ERROR: A command failed at line $LINENO. Exiting." >&2' ERR
-cd "{local_env_dir.resolve()}"
-export NON_INTERACTIVE=true
-source "{local_env_file.resolve()}"
-cd "{compose_dir.resolve()}"
-{compose_up_cmd}
-"""
+            script_lines = [
+                "#!/bin/bash",
+                "set -e",
+                "trap 'echo \"ERROR: A command failed at line $LINENO. Exiting.\" >&2' ERR",
+                f'cd "{local_env_dir.resolve()}"',
+                "export NON_INTERACTIVE=true",
+                f'source "{local_env_file.resolve()}"',
+            ]
+
+            # If offline deployment, set HF_HUB_OFFLINE to prevent downloads.
+            if getattr(self.args, "is_offline_deployment", False):
+                log_message("INFO", "Offline mode detected, setting HF_HUB_OFFLINE=1 for deployment.")
+                script_lines.append("export HF_HUB_OFFLINE=1")
+
+            script_lines.extend([f'cd "{compose_dir.resolve()}"', compose_up_cmd])
+            script_content = "\n".join(script_lines) + "\n"
+
             temp_script_path = None
             try:
                 with tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".sh", dir=".") as f:
