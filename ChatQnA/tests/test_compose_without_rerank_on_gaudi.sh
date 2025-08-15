@@ -182,7 +182,7 @@ function validate_frontend() {
     conda install -c conda-forge nodejs=22.6.0 -y
     npm install && npm ci && npx playwright install --with-deps
     node -v && npm -v && pip list
-    
+
     export no_proxy="localhost,127.0.0.1,$ip_address"
 
     exit_status=0
