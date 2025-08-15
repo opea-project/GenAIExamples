@@ -33,12 +33,15 @@ jobs:
       - name: Create Matrix
         id: get-matrix
         run: |
-          examples=$(grep -oP '^\s{4}"\K[^"]+(?=":)' ${{ github.workspace }}/one_click_deploy/core/config.py)
+          # Get examples from one-click-inputs-nobuild.json (both ChatQnA and ChatQnA-Qwen will be included)
+          examples=$(jq -r '.docker | keys[]' ${{ github.workspace }}/.github/workflows/one-click-inputs-nobuild.json)
           examples_json=$(printf '%s\n' "${examples[@]}" | sort -u | jq -R '.' | jq -sc '.')
           echo "examples=$examples_json" >> $GITHUB_OUTPUT
+
           nodes=($(echo ${NODES} | tr ',' ' '))
           nodes_json=$(printf '%s\n' "${nodes[@]}" | sort -u | jq -R '.' | jq -sc '.')
           echo "nodes=$nodes_json" >> $GITHUB_OUTPUT
+
           deploy_methods=($(echo ${DEPLOY_METHODS} | tr ',' ' '))
           deploy_methods_json=$(printf '%s\n' "${deploy_methods[@]}" | sort -u | jq -R '.' | jq -sc '.')
           echo "deploy_methods=$deploy_methods_json" >> $GITHUB_OUTPUT
@@ -46,20 +49,6 @@ jobs:
   run-examples:
     permissions:
       contents: read
-      # id-token: write
-      # actions: read
-      # attestations: read
-      # checks: write
-      # deployments: write
-      # discussions: read
-      # issues: write
-      # models: read
-      # packages: write
-      # pages: write
-      # pull-requests: write
-      # repository-projects: read
-      # statuses: write
-      # security-events: read
     needs: [get-test-matrix]
     strategy:
       matrix:
