@@ -3,7 +3,6 @@ FROM python:3.11-slim
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 RUN apt-get update -y && apt-get install -y --no-install-recommends --fix-missing \
-    libgl1-mesa-glx \
     libjemalloc-dev \
     libmagic1 \
     libglib2.0-0 \
@@ -16,7 +15,8 @@ RUN wget -qO - https://repositories.intel.com/gpu/intel-graphics.key | \
 RUN echo "deb [arch=amd64,i386 signed-by=/usr/share/keyrings/intel-graphics.gpg] https://repositories.intel.com/gpu/ubuntu jammy client" | \
     tee /etc/apt/sources.list.d/intel-gpu-jammy.list
 RUN apt-get update && apt-get install -y \
-    intel-opencl-icd intel-level-zero-gpu level-zero intel-level-zero-gpu-raytracing \
+    intel-opencl-icd intel-level-zero-gpu \
+    intel-level-zero-gpu-raytracing \
     intel-media-va-driver-non-free libmfx1 libmfxgen1 libvpl2 \
     libegl-mesa0 libegl1-mesa libegl1-mesa-dev libgbm1 libgl1-mesa-dev libgl1-mesa-dri \
     libglapi-mesa libgles2-mesa-dev libglx-mesa0 libigdgmm12 libxatracker2 mesa-va-drivers \
