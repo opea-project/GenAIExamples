@@ -96,8 +96,9 @@ jobs:
 
       - name: Install dependencies
         run: |
-          sudo apt update
-          sudo apt install -y python3-pip
+          # Use flock to prevent apt conflicts when multiple instances run
+          sudo flock /var/lib/dpkg/lock-frontend apt update
+          sudo flock /var/lib/dpkg/lock-frontend apt install -y python3-pip
 
       - name: get-default-params-from-config
         id: get-default-params
