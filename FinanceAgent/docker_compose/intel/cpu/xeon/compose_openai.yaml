@@ -1,0 +1,188 @@
+# Copyright (C) 2025 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+
+x-common-environment:
+  &common-env
+  no_proxy: ${NO_PROXY}
+  http_proxy: ${HTTP_PROXY}
+  https_proxy: ${HTTPS_PROXY}
+
+x-common-agent-environment:
+  &common-agent-env
+  <<: *common-env
+  llm_engine: openai
+  model: ${OPENAI_LLM_MODEL_ID}
+  OPENAI_API_KEY: ${OPENAI_API_KEY}
+  REDIS_URL_VECTOR: ${REDIS_URL_VECTOR}
+  REDIS_URL_KV: ${REDIS_URL_KV}
+  TEI_EMBEDDING_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
+  ip_address: ${HOST_IP}
+  strategy: react_llama
+  require_human_feedback: false
+
+services:
+
+  tei-embedding-serving:
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+    container_name: tei-embedding-serving
+    entrypoint: /bin/sh -c "apt-get update && apt-get install -y curl && text-embeddings-router --json-output --model-id ${EMBEDDING_MODEL_ID} --auto-truncate"
+    ports:
+      - "${TEI_EMBEDDER_PORT:-10221}:80"
+    volumes:
+      - ${HF_CACHE_DIR:-./data}:/data
+    shm_size: 1g
+    environment:
+      <<: *common-env
+      HF_TOKEN: ${HF_TOKEN}
+      host_ip: ${HOST_IP}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://${HOST_IP}:${TEI_EMBEDDER_PORT}/health"]
+      interval: 10s
+      timeout: 6s
+      retries: 48
+
+  redis-vector-db:
+    image: redis/redis-stack:7.2.0-v9
+    container_name: redis-vector-db
+    ports:
+      - "${REDIS_PORT1:-6379}:6379"
+      - "${REDIS_PORT2:-8001}:8001"
+    environment:
+      <<: *common-env
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  redis-kv-store:
+    image: redis/redis-stack:7.2.0-v9
+    container_name: redis-kv-store
+    ports:
+      - "${REDIS_PORT3:-6380}:6379"
+      - "${REDIS_PORT4:-8002}:8001"
+    environment:
+      <<: *common-env
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  dataprep-redis-finance:
+    image: ${REGISTRY:-opea}/dataprep:${TAG:-latest}
+    container_name: dataprep-redis-server-finance
+    depends_on:
+      redis-vector-db:
+        condition: service_healthy
+      redis-kv-store:
+        condition: service_healthy
+      tei-embedding-serving:
+        condition: service_healthy
+    ports:
+      - "${DATAPREP_PORT:-6007}:5000"
+    environment:
+      <<: *common-env
+      DATAPREP_COMPONENT_NAME: ${DATAPREP_COMPONENT_NAME}
+      REDIS_URL_VECTOR: ${REDIS_URL_VECTOR}
+      REDIS_URL_KV: ${REDIS_URL_KV}
+      TEI_EMBEDDING_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
+      LLM_ENDPOINT: ${LLM_ENDPOINT}
+      LLM_MODEL: ${LLM_MODEL_ID}
+      HUGGINGFACEHUB_API_TOKEN: ${HF_TOKEN}
+      HF_TOKEN: ${HF_TOKEN}
+      LOGFLAG: true
+
+  worker-finqa-agent:
+    image: opea/agent:latest
+    container_name: finqa-agent-endpoint
+    volumes:
+      - ${TOOLSET_PATH}:/home/user/tools/
+      - ${PROMPT_PATH}:/home/user/prompts/
+    ipc: host
+    ports:
+      - "9095:9095"
+    environment:
+      <<: *common-agent-env
+      with_memory: false
+      recursion_limit: ${RECURSION_LIMIT_WORKER}
+      temperature: ${TEMPERATURE}
+      max_new_tokens: ${MAX_TOKENS}
+      stream: false
+      tools: /home/user/tools/finqa_agent_tools.yaml
+      custom_prompt: /home/user/prompts/finqa_prompt.py
+      port: 9095
+
+  worker-research-agent:
+    image: opea/agent:latest
+    container_name: research-agent-endpoint
+    volumes:
+      - ${TOOLSET_PATH}:/home/user/tools/
+      - ${PROMPT_PATH}:/home/user/prompts/
+    ipc: host
+    ports:
+      - "9096:9096"
+    environment:
+      <<: *common-agent-env
+      with_memory: false
+      recursion_limit: ${RECURSION_LIMIT_WORKER}
+      stream: false
+      tools: /home/user/tools/research_agent_tools.yaml
+      custom_prompt: /home/user/prompts/research_prompt.py
+      FINNHUB_API_KEY: ${FINNHUB_API_KEY}
+      FINANCIAL_DATASETS_API_KEY: ${FINANCIAL_DATASETS_API_KEY}
+      port: 9096
+
+  docsum-vllm-xeon:
+    image: opea/llm-docsum:latest
+    container_name: docsum-vllm-xeon
+    ports:
+      - ${DOCSUM_PORT:-9000}:9000
+    ipc: host
+    environment:
+      <<: *common-env
+      LLM_ENDPOINT: ${LLM_ENDPOINT}
+      LLM_MODEL_ID: ${LLM_MODEL_ID}
+      HF_TOKEN: ${HF_TOKEN}
+      LOGFLAG: ${LOGFLAG:-False}
+      MAX_INPUT_TOKENS: ${MAX_INPUT_TOKENS}
+      MAX_TOTAL_TOKENS: ${MAX_TOTAL_TOKENS}
+      DocSum_COMPONENT_NAME: ${DOCSUM_COMPONENT_NAME:-OpeaDocSumvLLM}
+    restart: unless-stopped
+
+  supervisor-react-agent:
+    image: opea/agent:latest
+    container_name: supervisor-agent-endpoint
+    volumes:
+      - ${TOOLSET_PATH}:/home/user/tools/
+      - ${PROMPT_PATH}:/home/user/prompts/
+    ipc: host
+    depends_on:
+      - worker-finqa-agent
+      - worker-research-agent
+    ports:
+      - "9090:9090"
+    environment:
+      <<: *common-agent-env
+      with_memory: "true"
+      recursion_limit: ${RECURSION_LIMIT_SUPERVISOR}
+      temperature: ${TEMPERATURE}
+      max_new_tokens: ${MAX_TOKENS}
+      stream: "true"
+      tools: /home/user/tools/supervisor_agent_tools.yaml
+      custom_prompt: /home/user/prompts/supervisor_prompt.py
+      WORKER_FINQA_AGENT_URL: ${WORKER_FINQA_AGENT_URL}
+      WORKER_RESEARCH_AGENT_URL: ${WORKER_RESEARCH_AGENT_URL}
+      DOCSUM_ENDPOINT: ${DOCSUM_ENDPOINT}
+      port: 9090
+
+  agent-ui:
+    image: opea/agent-ui:latest
+    container_name: agent-ui
+    environment:
+      <<: *common-env
+      host_ip: ${HOST_IP}
+    ports:
+      - "5175:8080"
+    ipc: host
