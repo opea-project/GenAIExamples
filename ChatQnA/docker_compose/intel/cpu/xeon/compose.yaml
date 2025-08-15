@@ -106,7 +106,7 @@ services:
       HF_HUB_OFFLINE: ${HF_HUB_OFFLINE:-0}
       VLLM_CPU_KVCACHE_SPACE: 40
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://vllm-service:80/health || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://$host_ip:9009/health || exit 1"]
       interval: 10s
       timeout: 10s
       retries: 100
