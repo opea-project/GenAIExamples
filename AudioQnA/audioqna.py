@@ -43,10 +43,7 @@ def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **k
 def align_outputs(self, data, cur_node, inputs, runtime_graph, llm_parameters_dict, **kwargs):
     next_data = {}
     if self.services[cur_node].service_type == ServiceType.LLM and not llm_parameters_dict["stream"]:
-        if "faqgen" in self.services[cur_node].endpoint:
-            next_data = data
-        else:
-            next_data["text"] = data["choices"][0]["message"]["content"]
+        next_data["text"] = data["choices"][0]["message"]["content"]
     else:
         next_data = data
 
