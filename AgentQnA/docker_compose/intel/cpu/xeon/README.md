@@ -33,7 +33,7 @@ git clone https://github.com/opea-project/GenAIExamples.git
 cd GenAIExamples/AgentQnA
 ```
 
-Then checkout a released version, such as v1.4:
+To checkout a released version, such as v1.4:
 
 ```bash
 git checkout v1.4
@@ -49,7 +49,6 @@ export HF_TOKEN="Your_HuggingFace_API_Token"  # the huggingface API token you ap
 export http_proxy="Your_HTTP_Proxy"           # http proxy if any
 export https_proxy="Your_HTTPs_Proxy"         # https proxy if any
 export no_proxy=localhost,127.0.0.1,$host_ip  # additional no proxies if needed
-export NGINX_PORT=${your_nginx_port}          # your usable port for nginx, 80 for example
 ```
 
 #### [Optional] OPENAI_API_KEY to use OpenAI models or LLM models with remote endpoints
@@ -67,7 +66,8 @@ export OPENAI_API_KEY=<your-openai-key>
 #### Then, set up environment variables for the selected hardware using the corresponding `set_env.sh`
 
 ```bash
-source $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/cpu/xeon/set_env.sh
+cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/cpu/xeon
+source ./set_env.sh
 ```
 
 ### Deploy the Services Using Docker Compose
@@ -115,8 +115,8 @@ docker compose -f $WORKDIR/GenAIExamples/DocIndexRetriever/docker_compose/intel/
 Please refer to the table below to build different microservices from source:
 
 | Microservice | Deployment Guide                                                                                                                                 |
-| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------ | --- |
-| Agent        | [Agent build guide](https://github.com/opea-project/GenAIComps/blob/main/comps/agent/src/README.md#21-build-docker-image-for-agent-microservice) |     |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Agent        | [Agent build guide](https://github.com/opea-project/GenAIComps/blob/main/comps/agent/src/README.md#21-build-docker-image-for-agent-microservice) |
 | UI           | [Basic UI build guide](../../../../README_miscellaneous.md#build-ui-docker-image)                                                                |
 
 ### Ingest Data into the Vector Database

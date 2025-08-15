@@ -117,11 +117,12 @@ declare interface paginationType<T = any> {
 // Table Columns
 declare type TableColumns<T = any> = {
   title: string;
-  key?: string;
+  key: string;
   dataIndex: string | string[];
-  width?: string;
+  width?: number | string;
   align?: string;
-  ellipsis?: booleanstring;
+  ellipsis?: boolean;
+  visible?: boolean;
   fixed?: boolean | string;
   [key: string]: T;
 };

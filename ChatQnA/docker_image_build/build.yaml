@@ -109,12 +109,6 @@ services:
       dockerfile: comps/guardrails/src/guardrails/Dockerfile
     extends: chatqna
     image: ${REGISTRY:-opea}/guardrails:${TAG:-latest}
-  guardrails-openeuler:
-    build:
-      context: GenAIComps
-      dockerfile: comps/guardrails/src/guardrails/Dockerfile.openEuler
-    extends: chatqna
-    image: ${REGISTRY:-opea}/guardrails:${TAG:-latest}-openeuler
   vllm-rocm:
     build:
       context: GenAIComps
