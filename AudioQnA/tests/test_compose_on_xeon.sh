@@ -27,7 +27,7 @@ function build_docker_images() {
 
     git clone https://github.com/vllm-project/vllm.git
     cd ./vllm/
-    VLLM_VER=v0.9.0.1
+    VLLM_VER=v0.10.0
     echo "Check out vLLM tag ${VLLM_VER}"
     git checkout ${VLLM_VER} &> /dev/null && cd ../
 
@@ -55,6 +55,7 @@ function start_services() {
        sleep 5s
        n=$((n+1))
     done
+    sleep 1m
 }
 
 

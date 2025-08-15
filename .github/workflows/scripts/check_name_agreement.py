@@ -19,8 +19,10 @@ def check_service_image_consistency(data):
         image_name = service_details.get("image", "")
         # Extract the image name part after the last '/'
         image_name_part = image_name.split("/")[-1].split(":")[0]
+        # Remove '-openeuler' suffix if it exists
+        fixed_service_name = service_name.rsplit("-openeuler", 1)[0]
         # Check if the service name is a substring of the image name part
-        if service_name not in image_name_part:
+        if fixed_service_name not in image_name_part:
             # Get the line number of the service name
             line_number = service_details.lc.line + 1
             inconsistencies.append((service_name, image_name, line_number))
