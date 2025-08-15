@@ -231,10 +231,11 @@ const formatFormParam = () => {
     window_size: isSentencewindow.value ? window_size : undefined,
     chunk_size:
       !isHierarchical.value && !isSentencewindow.value ? chunk_size : undefined,
-    chunk_overlap:
-      !isHierarchical.value && !isSentencewindow.value
-        ? chunk_overlap
-        : undefined,
+    chunk_overlap: isHierarchical.value
+      ? 20
+      : !isSentencewindow.value
+      ? chunk_overlap
+      : undefined,
   };
 };
 // Validate the form, throw results form

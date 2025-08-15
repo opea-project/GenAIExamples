@@ -39,31 +39,54 @@ def cli(verbose):
         log_message("INFO", f"Example selected: '{example_name}'")
         app_args.example = example_name
 
-        # 2. Choose an action
-        actions = ["Deploy", "Clear", "Test Connection"]
-
-        action_prompt_lines = ["Please choose an action:"]
-        for i, desc in enumerate(actions, 1):
-            action_prompt_lines.append(f"  [{i}] {desc}")
-        action_prompt_text = "\n".join(action_prompt_lines)
-
-        action_choice_num = click.prompt(
-            action_prompt_text, type=click.IntRange(1, len(actions)), default=1, show_default=True
+        deployment_types = ["Online Deployment", "Offline Deployment Management"]
+        deployment_type_prompt_lines = ["Please choose the deployment type:"]
+        for i, name in enumerate(deployment_types, 1):
+            deployment_type_prompt_lines.append(f"  [{i}] {name}")
+        deployment_type_prompt_text = "\n".join(deployment_type_prompt_lines)
+        deployment_type_choice_num = click.prompt(
+            deployment_type_prompt_text, type=click.IntRange(1, len(deployment_types)), default=1, show_default=True
         )
+        deployment_type_choice = deployment_types[deployment_type_choice_num - 1]
 
-        action = actions[action_choice_num - 1]
-        log_message("INFO", f"Action selected: '{action}'")
-        app_args.action = action
+        log_message("INFO", f"Deployment type selected: '{deployment_type_choice}'")
 
-        # 3. Execute
+        if deployment_type_choice == "Offline Deployment Management":
+            # Check config to see if offline mode is supported for the selected example
+            supported_offline_modes = EXAMPLE_CONFIGS[example_name].get("offline_support", [])
+            if not supported_offline_modes:
+                log_message("ERROR", f"Offline mode is not currently supported for the '{example_name}' example.")
+                sys.exit(1)
+            # Pass the supported modes to the deployer for later use
+            app_args.supported_offline_modes = supported_offline_modes
+
         deployer = Deployer(app_args)
 
-        if action == "Deploy":
-            deployer.run_interactive_deployment()
-        elif action == "Clear":
-            deployer.run_interactive_clear()
-        elif action == "Test Connection":
-            deployer.run_interactive_test()
+        if deployment_type_choice == "Online Deployment":
+            # 2. Choose an action (original flow)
+            actions = ["Deploy", "Clear", "Test Connection"]
+            action_prompt_lines = ["Please choose an action:"]
+            for i, desc in enumerate(actions, 1):
+                action_prompt_lines.append(f"  [{i}] {desc}")
+            action_prompt_text = "\n".join(action_prompt_lines)
+            action_choice_num = click.prompt(
+                action_prompt_text, type=click.IntRange(1, len(actions)), default=1, show_default=True
+            )
+            action = actions[action_choice_num - 1]
+            log_message("INFO", f"Action selected: '{action}'")
+            app_args.action = action
+
+            # 3. Execute
+            if action == "Deploy":
+                deployer.run_interactive_deployment()
+            elif action == "Clear":
+                deployer.run_interactive_clear()
+            elif action == "Test Connection":
+                deployer.run_interactive_test()
+
+        elif deployment_type_choice == "Offline Deployment Management":
+            # New flow for offline management
+            deployer.manage_offline_deployment()
 
     except (ValueError, click.exceptions.Abort) as e:
         log_message("WARN", f"Operation aborted by user or invalid input: {e}")
