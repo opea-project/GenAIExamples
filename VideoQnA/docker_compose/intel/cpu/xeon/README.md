@@ -4,47 +4,30 @@ This document outlines the deployment process for a videoqna application utilizi
 
 VideoQnA is a pipeline that retrieves video based on provided user prompt. It uses only the video embeddings to perform vector similarity search in Intel's VDMS vector database and performs all operations on Intel Xeon CPU. The pipeline supports long form videos and time-based search.
 
-## 🚀 Port used for the microservices
+## Table of Contents
 
-```
-dataprep
-========
-Port 6007 - Open to 0.0.0.0/0
+- [Port used for the microservices](#port-used-for-the-microservices)
+- [Build Docker Images](#build-docker-images)
+- [Start Microservices](#start-microservices)
+- [Validate Microservices](#validate-microservices)
+- [Launch the UI](#launch-the-ui)
+- [Clean Microservices](#clean-microservices)
 
-vdms-vector-db
-===============
-Port 8001 - Open to 0.0.0.0/0
+## Port used for the microservices
 
-embedding
-=========
-Port 6990 - Open to 0.0.0.0/0
+| Service                      | Port |
+| ---------------------------- | ---- |
+| dataprep                     | 6007 |
+| vdms-vector-db               | 8001 |
+| embedding                    | 6990 |
+| retriever                    | 7000 |
+| reranking                    | 8000 |
+| lvm video-llama              | 9009 |
+| lvm                          | 9399 |
+| videoqna-xeon-backend-server | 8888 |
+| videoqna-xeon-ui-server      | 5173 |
 
-retriever
-=========
-Port 7000 - Open to 0.0.0.0/0
-
-reranking
-=========
-Port 8000 - Open to 0.0.0.0/0
-
-lvm video-llama
-===============
-Port 9009 - Open to 0.0.0.0/0
-
-lvm
-===
-Port 9399 - Open to 0.0.0.0/0
-
-videoqna-xeon-backend-server
-==========================
-Port 8888 - Open to 0.0.0.0/0
-
-videoqna-xeon-ui-server
-=====================
-Port 5173 - Open to 0.0.0.0/0
-```
-
-## 🚀 Build Docker Images
+## Build Docker Images
 
 First of all, you need to build Docker Images locally and install the python package of it.
 
@@ -115,7 +98,7 @@ Then run the command `docker images`, you will have the following 8 Docker Image
 1. `opea/videoqna:latest`
 1. `opea/videoqna-ui:latest`
 
-## 🚀 Start Microservices
+## Start Microservices
 
 ### Setup Environment Variables
 
@@ -125,7 +108,7 @@ Since the `compose.yaml` will consume some environment variables, you need to se
 
 > Change the `External_Public_IP` below with the actual IPV4 value
 
-```
+```bash
 export host_ip="External_Public_IP"
 ```
 
@@ -133,69 +116,17 @@ export host_ip="External_Public_IP"
 
 > Change the `Your_Huggingface_API_Token` below with your actual Huggingface API Token value
 
-```
+```bash
 export HF_TOKEN="Your_Huggingface_API_Token"
 ```
 
 **Append the value of the public IP address to the no_proxy list**
 
-```
+```bash
 export no_proxy="${your_no_proxy},${host_ip}"
 ```
 
-Then you can run below commands or `source set_env.sh` to set all the variables
-
-```bash
-export no_proxy=${your_no_proxy}
-export http_proxy=${your_http_proxy}
-export https_proxy=${your_http_proxy}
-
-export HF_TOKEN=${HF_TOKEN}
-export HF_TOKEN=${HF_TOKEN}
-
-export INDEX_NAME="mega-videoqna"
-export LLM_DOWNLOAD="True" # Set to "False" before redeploy LVM server to avoid model download
-export RERANK_COMPONENT_NAME="OPEA_VIDEO_RERANKING"
-export LVM_COMPONENT_NAME="OPEA_VIDEO_LLAMA_LVM"
-export EMBEDDING_COMPONENT_NAME="OPEA_CLIP_EMBEDDING"
-export USECLIP=1
-export LOGFLAG=True
-
-export EMBEDDING_SERVICE_HOST_IP=${host_ip}
-export LVM_SERVICE_HOST_IP=${host_ip}
-export MEGA_SERVICE_HOST_IP=${host_ip}
-export RERANK_SERVICE_HOST_IP=${host_ip}
-export RETRIEVER_SERVICE_HOST_IP=${host_ip}
-export VDMS_HOST=${host_ip}
-
-export BACKEND_PORT=8888
-export DATAPREP_PORT=6007
-export EMBEDDER_PORT=6990
-export MULTIMODAL_CLIP_EMBEDDER_PORT=6991
-export LVM_PORT=9399
-export RERANKING_PORT=8000
-export RETRIEVER_PORT=7000
-export UI_PORT=5173
-export VDMS_PORT=8001
-export VIDEO_LLAMA_PORT=9009
-
-export BACKEND_HEALTH_CHECK_ENDPOINT="http://${host_ip}:${BACKEND_PORT}/v1/health_check"
-export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:${BACKEND_PORT}/v1/videoqna"
-export CLIP_EMBEDDING_ENDPOINT="http://${host_ip}:${MULTIMODAL_CLIP_EMBEDDER_PORT}"
-export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:${DATAPREP_PORT}/v1/dataprep/get"
-export DATAPREP_GET_VIDEO_LIST_ENDPOINT="http://${host_ip}:${DATAPREP_PORT}/v1/dataprep/get_videos"
-export DATAPREP_INGEST_SERVICE_ENDPOINT="http://${host_ip}:${DATAPREP_PORT}/v1/dataprep/ingest"
-export EMBEDDING_ENDPOINT="http://${host_ip}:${EMBEDDER_PORT}/v1/embeddings"
-export FRONTEND_ENDPOINT="http://${host_ip}:${UI_PORT}/_stcore/health"
-export LVM_ENDPOINT="http://${host_ip}:${VIDEO_LLAMA_PORT}"
-export LVM_VIDEO_ENDPOINT="http://${host_ip}:${VIDEO_LLAMA_PORT}/generate"
-export RERANKING_ENDPOINT="http://${host_ip}:${RERANKING_PORT}/v1/reranking"
-export RETRIEVER_ENDPOINT="http://${host_ip}:${RETRIEVER_PORT}/v1/retrieval"
-export TEI_RERANKING_ENDPOINT="http://${host_ip}:${TEI_RERANKING_PORT}"
-export UI_ENDPOINT="http://${host_ip}:${UI_PORT}/_stcore/health"
-
-export no_proxy="${NO_PROXY},${host_ip},vdms-vector-db,dataprep-vdms-server,clip-embedding-server,reranking-tei-server,retriever-vdms-server,lvm-video-llama,lvm,videoqna-xeon-backend-server,videoqna-xeon-ui-server"
-```
+Then you can run `source set_env.sh` to set all the variables
 
 Note: Replace with `host_ip` with you external IP address, do not use localhost.
 
@@ -228,7 +159,7 @@ docker compose up -d
 # wait until all the services is up. The LVM server will download models, so it take ~1.5hr to get ready.
 ```
 
-### Validate Microservices
+## Validate Microservices
 
 1. Dataprep Microservice
 
@@ -339,7 +270,7 @@ docker compose up -d
 
    > Note that the megaservice support only stream output.
 
-## 🚀 Launch the UI
+## Launch the UI
 
 To access the frontend, open the following URL in your browser: http://{host_ip}:5173. By default, the UI runs on port 5173 internally. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `compose.yaml` file as shown below:
 

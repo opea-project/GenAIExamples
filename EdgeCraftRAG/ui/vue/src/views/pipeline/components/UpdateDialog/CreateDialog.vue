@@ -29,27 +29,32 @@
       </keep-alive>
     </div>
     <template #footer>
-      <a-button
-        type="primary"
-        ghost
-        @click="handleLast"
-        v-if="currentStep > 1 && currentStep <= 7"
-        >{{ $t("common.back") }}</a-button
-      >
-      <a-button
-        type="primary"
-        @click="handleNext"
-        v-if="currentStep >= 1 && currentStep < 7"
-        >{{ $t("common.next") }}</a-button
-      >
-      <a-button
-        key="submit"
-        type="primary"
-        :loading="submitLoading"
-        @click="handleSubmit"
-        v-if="currentStep === 7"
-        >{{ $t("common.submit") }}</a-button
-      >
+      <div class="flex-between">
+        <a-button
+          type="primary"
+          ghost
+          @click="handleLast"
+          v-if="currentStep > 1 && currentStep <= 7"
+          >{{ $t("common.prev") }}</a-button
+        >
+        <span v-else></span>
+        <div>
+          <a-button
+            type="primary"
+            @click="handleNext"
+            v-if="currentStep >= 1 && currentStep < 7"
+            >{{ $t("common.next") }}</a-button
+          >
+          <a-button
+            key="submit"
+            type="primary"
+            :loading="submitLoading"
+            @click="handleSubmit"
+            v-else-if="currentStep === 7"
+            >{{ $t("common.submit") }}</a-button
+          >
+        </div>
+      </div>
     </template>
   </a-modal>
 </template>
