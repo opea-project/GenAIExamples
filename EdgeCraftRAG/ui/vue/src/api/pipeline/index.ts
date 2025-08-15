@@ -18,7 +18,7 @@ export const getPipelineList = () => {
   });
 };
 
-export const getPipelineDetialByName = (name: String) => {
+export const getPipelineDetailByName = (name: String) => {
   return request({
     url: `/v1/settings/pipelines/${name}/json`,
     method: "get",

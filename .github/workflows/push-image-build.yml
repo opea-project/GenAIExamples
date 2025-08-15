@@ -43,18 +43,15 @@ jobs:
     permissions:
       actions: read
       attestations: read
+      checks: read
       discussions: read
       models: read
       repository-projects: read
       id-token: write
       contents: read
-      checks: write
-      deployments: write
       issues: write
-      packages: write
       pages: write
       pull-requests: write
-      statuses: write
       security-events: read
     needs: job1
     if: ${{ needs.job1.outputs.run_matrix != '{"include":[]}' }}
@@ -63,6 +60,6 @@ jobs:
       fail-fast: false
     uses: ./.github/workflows/_example-workflow.yml
     with:
-      node: ${{ matrix.hardware }}
+      node: gaudi
       example: ${{ matrix.example }}
     secrets: inherit
