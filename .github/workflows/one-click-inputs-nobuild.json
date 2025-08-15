@@ -5,6 +5,7 @@
         "deploy": [
           "1",
           "1",
+          "1",
           "docker",
           "$hardware",
           "$HF_TOKEN",
@@ -20,7 +21,7 @@
           "y",
           "Y"
         ],
-        "clear": ["1", "2", "docker", "$hardware", "Y"]
+        "clear": ["1", "1", "2", "docker", "$hardware", "Y"]
       }
     },
     "ChatQnA-Qwen": {
@@ -51,6 +52,7 @@
         "deploy": [
           "2",
           "1",
+          "1",
           "docker",
           "$hardware",
           "$HF_TOKEN",
@@ -63,13 +65,14 @@
           "y",
           "Y"
         ],
-        "clear": ["2", "2", "docker", "$hardware", "Y"]
+        "clear": ["2", "1", "2", "docker", "$hardware", "Y"]
       }
     },
     "DocSum": {
       "inputs": {
         "deploy": [
           "3",
+          "1",
           "1",
           "docker",
           "$hardware",
@@ -83,13 +86,14 @@
           "y",
           "Y"
         ],
-        "clear": ["3", "2", "docker", "$hardware", "Y"]
+        "clear": ["3", "1", "2", "docker", "$hardware", "Y"]
       }
     },
     "CodeGen": {
       "inputs": {
         "deploy": [
           "4",
+          "1",
           "1",
           "docker",
           "$hardware",
@@ -103,13 +107,14 @@
           "y",
           "Y"
         ],
-        "clear": ["4", "2", "docker", "$hardware", "Y"]
+        "clear": ["4", "1", "2", "docker", "$hardware", "Y"]
       }
     },
     "AudioQnA": {
       "inputs": {
         "deploy": [
           "5",
+          "1",
           "1",
           "docker",
           "$hardware",
@@ -123,13 +128,14 @@
           "y",
           "Y"
         ],
-        "clear": ["5", "2", "docker", "$hardware", "Y"]
+        "clear": ["5", "1", "2", "docker", "$hardware", "Y"]
       }
     },
     "VisualQnA": {
       "inputs": {
         "deploy": [
           "6",
+          "1",
           "1",
           "docker",
           "$hardware",
@@ -143,13 +149,14 @@
           "y",
           "Y"
         ],
-        "clear": ["6", "2", "docker", "$hardware", "Y"]
+        "clear": ["6", "1", "2", "docker", "$hardware", "Y"]
       }
     },
     "FaqGen": {
       "inputs": {
         "deploy": [
           "7",
+          "1",
           "1",
           "docker",
           "$hardware",
@@ -163,13 +170,14 @@
           "y",
           "Y"
         ],
-        "clear": ["7", "2", "docker", "$hardware", "Y"]
+        "clear": ["7", "1", "2", "docker", "$hardware", "Y"]
       }
     },
     "AgentQnA": {
       "inputs": {
         "deploy": [
           "8",
+          "1",
           "1",
           "docker",
           "$hardware",
@@ -184,7 +192,7 @@
           "y",
           "Y"
         ],
-        "clear": ["8", "2", "docker", "$hardware", "Y"]
+        "clear": ["8", "1", "2", "docker", "$hardware", "Y"]
       }
     }
   },
@@ -192,6 +200,7 @@
     "ChatQnA": {
       "inputs": {
         "deploy": [
+          "1",
           "1",
           "1",
           "k8s",
@@ -209,7 +218,7 @@
           "8080",
           "Y"
         ],
-        "clear": ["1", "2", "k8s", "y", "Y"]
+        "clear": ["1", "1", "2", "k8s", "y", "Y"]
       }
     },
     "ChatQnA-Qwen": {
@@ -240,6 +249,7 @@
         "deploy": [
           "2",
           "1",
+          "1",
           "k8s",
           "$hardware",
           "$HF_TOKEN",
@@ -253,13 +263,14 @@
           "8080",
           "Y"
         ],
-        "clear": ["2", "2", "k8s", "y", "Y"]
+        "clear": ["2", "1", "2", "k8s", "y", "Y"]
       }
     },
     "DocSum": {
       "inputs": {
         "deploy": [
           "3",
+          "1",
           "1",
           "k8s",
           "$hardware",
@@ -274,13 +285,14 @@
           "8080",
           "Y"
         ],
-        "clear": ["3", "2", "k8s", "y", "Y"]
+        "clear": ["3", "1", "2", "k8s", "y", "Y"]
       }
     },
     "CodeGen": {
       "inputs": {
         "deploy": [
           "4",
+          "1",
           "1",
           "k8s",
           "$hardware",
@@ -295,13 +307,14 @@
           "8080",
           "Y"
         ],
-        "clear": ["4", "2", "k8s", "y", "Y"]
+        "clear": ["4", "1", "2", "k8s", "y", "Y"]
       }
     },
     "AudioQnA": {
       "inputs": {
         "deploy": [
           "5",
+          "1",
           "1",
           "k8s",
           "$hardware",
@@ -316,13 +329,14 @@
           "8080",
           "Y"
         ],
-        "clear": ["5", "2", "k8s", "y", "Y"]
+        "clear": ["5", "1", "2", "k8s", "y", "Y"]
       }
     },
     "VisualQnA": {
       "inputs": {
         "deploy": [
           "6",
+          "1",
           "1",
           "k8s",
           "$hardware",
@@ -337,13 +351,14 @@
           "8080",
           "Y"
         ],
-        "clear": ["6", "2", "k8s", "y", "Y"]
+        "clear": ["6", "1", "2", "k8s", "y", "Y"]
       }
     },
     "FaqGen": {
       "inputs": {
         "deploy": [
           "7",
+          "1",
           "1",
           "k8s",
           "$hardware",
@@ -358,13 +373,14 @@
           "8080",
           "Y"
         ],
-        "clear": ["7", "2", "k8s", "y", "Y"]
+        "clear": ["7", "1", "2", "k8s", "y", "Y"]
       }
     },
     "AgentQnA": {
       "inputs": {
         "deploy": [
           "8",
+          "1",
           "1",
           "k8s",
           "$hardware",
@@ -380,7 +396,7 @@
           "8080",
           "Y"
         ],
-        "clear": ["8", "2", "k8s", "y", "Y"]
+        "clear": ["8", "1", "2", "k8s", "y", "Y"]
       }
     }
   }
