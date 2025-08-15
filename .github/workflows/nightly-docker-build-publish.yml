@@ -99,7 +99,6 @@ jobs:
       id-token: write
       contents: read
       issues: write
-      packages: write
       pages: write
       pull-requests: write
       security-events: read
