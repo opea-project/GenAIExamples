@@ -552,3 +552,19 @@ def get_conflicting_ports_from_compose(compose_files: list[pathlib.Path], env_va
             conflicting_ports.append(port)
 
     return conflicting_ports
+
+
+def find_all_values_for_key(data_structure, key_to_find):
+    """Recursively finds all values for a specific key in a nested data structure."""
+    found_values = []
+    if isinstance(data_structure, dict):
+        for key, value in data_structure.items():
+            if key == key_to_find:
+                if isinstance(value, str):
+                    found_values.append(value)
+            else:
+                found_values.extend(find_all_values_for_key(value, key_to_find))
+    elif isinstance(data_structure, list):
+        for item in data_structure:
+            found_values.extend(find_all_values_for_key(item, key_to_find))
+    return found_values
