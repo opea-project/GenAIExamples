@@ -97,20 +97,20 @@
         document.body.appendChild(textArea);
         textArea.focus();
         textArea.select();
-        
+
         if (document.execCommand('copy')) {
           copyText = "copied!";
         } else {
           copyText = "copy failed";
         }
-        
+
         document.body.removeChild(textArea);
       }
     } catch (err) {
       console.error('Copy failed:', err);
       copyText = "copy failed";
     }
-    
+
     setTimeout(() => {
       copyText = "copy";
     }, 2000);
