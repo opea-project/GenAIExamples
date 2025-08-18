@@ -1,0 +1,27 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  vllm-service:
+    image: public.ecr.aws/q9t5s3a7/vllm-cpu-release-repo:v0.10.0
+    environment:
+      VLLM_CPU_SGL_KERNEL: 1
+    entrypoint: ["python3", "-m", "vllm.entrypoints.openai.api_server"]
+    command: --model $LLM_MODEL_ID --host 0.0.0.0 --port 80 --dtype bfloat16 --distributed-executor-backend mp --block-size 128 --enforce-eager --tensor-parallel-size $TP_NUM --pipeline-parallel-size $PP_NUM --max-num-batched-tokens $MAX_BATCHED_TOKENS --max-num-seqs $MAX_SEQS
+  vllm-ci-test:
+    image: public.ecr.aws/q9t5s3a7/vllm-ci-test-repo:a5dd03c1ebc5e4f56f3c9d3dc0436e9c582c978f-cpu
+    container_name: vllm-ci-test
+    volumes:
+      - "${MODEL_CACHE:-./data}:/root/.cache/huggingface/hub"
+    shm_size: 128g
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      HF_TOKEN: ${HF_TOKEN}
+      LLM_MODEL_ID: ${LLM_MODEL_ID}
+      VLLM_CPU_KVCACHE_SPACE: 40
+      ON_CPU: 1
+      REMOTE_HOST: vllm-service
+      REMOTE_PORT: 80
+    entrypoint: tail -f /dev/null

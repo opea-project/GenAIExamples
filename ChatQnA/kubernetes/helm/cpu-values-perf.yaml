@@ -1,0 +1,26 @@
+# Copyright (C) 2025 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+vllm:
+  image:
+    repository: public.ecr.aws/q9t5s3a7/vllm-cpu-release-repo
+    tag: "v0.10.0"
+  resources: {}
+  LLM_MODEL_ID: meta-llama/Meta-Llama-3-8B-Instruct
+  # Uncomment the following model specific settings for DeepSeek models
+  VLLM_CPU_KVCACHE_SPACE: 40
+  VLLM_CPU_SGK_KERNEL: 1
+
+  extraCmdArgs: [
+    "--tensor-parallel-size", "1",
+    "--pipeline-parallel-size", "1",
+    "--block-size", "128",
+    "--dtype", "bfloat16",
+    "--max-model-len", "5196",
+    "--distributed_executor_backend", "mp",
+    "--max-num-batched-tokens", "2048",
+    "--max-num-seqs", "256",
+    "--enforce-eager"]
+  #resources:
+  #  requests:
+  #    memory: 60Gi # 40G for KV cache, and 20G for DeepSeek-R1-Distill-Qwen-7B, need to adjust it for other models
