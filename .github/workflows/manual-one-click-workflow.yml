@@ -26,7 +26,7 @@ on:
         type: string
       deploy_methods:
         default: "docker,k8s"
-        description: 'Test examples with docker compose or k8s charts'
+        description: 'Test examples with docker compose or k8s charts(exclude AgentQnA k8s on Xeon)'
         type: choice
         required: true
         options:
