@@ -69,7 +69,7 @@ jobs:
             export test_case=test_compose_faqgen_on_xeon.sh
             cd ${{ github.workspace }}/ChatQnA
           else
-            cd ${{ github.workspace }}/${{ inputs.example }}
+            cd ${{ github.workspace }}/$(echo "${{ inputs.example }}" | cut -d'-' -f1)
           fi
           export hardware=${{ inputs.hardware }}
           bash ${{ github.workspace }}/.github/workflows/scripts/docker_compose_clean_up.sh "containers"
@@ -114,24 +114,26 @@ jobs:
 
       - name: Install dependencies
         run: |
-          sudo apt update
-          sudo apt install -y python3-pip
+          # Use flock to prevent apt conflicts when multiple instances run
+          sudo flock /var/lib/dpkg/lock-frontend apt update
+          sudo flock /var/lib/dpkg/lock-frontend apt install -y python3-pip
 
       - name: get-default-params-from-config
         id: get-default-params
         if: ${{ inputs.deploy_method == 'k8s' }}
         run: |
           cd ${{ github.workspace }}
-          PARAMS_JSON=$(python3 .github/workflows/scripts/get-params.py ${{ inputs.example }})
+          example=$(echo "${{ inputs.example }}" | cut -d'-' -f1)
+          PARAMS_JSON=$(python3 .github/workflows/scripts/get-params.py $example)
           echo "LLM_model=$(echo "$PARAMS_JSON" | jq -r '.llm_model')" >> $GITHUB_ENV
-          if [ "${{ inputs.example }}" = "ChatQnA" ]; then
+          if [ "$example" = "ChatQnA" ]; then
             echo "LLM_model=$(echo "$PARAMS_JSON" | jq -r '.llm_model')" >> $GITHUB_ENV
             echo "Embedding_model=$(echo "$PARAMS_JSON" | jq -r '.embed_model')" >> $GITHUB_ENV
             echo "Reranking_model=$(echo "$PARAMS_JSON" | jq -r '.rerank_model')" >> $GITHUB_ENV
             echo "Mount_dir=$(echo "$PARAMS_JSON" | jq -r '.mount_dir')" >> $GITHUB_ENV
-          elif [ "${{ inputs.example }}" = "VisualQnA" ]; then
+          elif [ "$example" = "VisualQnA" ]; then
             echo "LVM_model=$(echo "$PARAMS_JSON" | jq -r '.lvm_model')" >> $GITHUB_ENV
-          elif [ "${{ inputs.example }}" = "AgentQnA" ]; then
+          elif [ "$example" = "AgentQnA" ]; then
             echo "LLM_model=$(echo "$PARAMS_JSON" | jq -r '.gaudi.llm_model')" >> $GITHUB_ENV
           fi
 
@@ -165,7 +167,7 @@ jobs:
           INPUT_DATA=$(
             jq -r --arg type "${{ inputs.deploy_method }}" --arg id "${{ inputs.example }}" \
               '.[$type][$id].inputs.deploy[]' ${{ github.workspace }}/.github/workflows/one-click-inputs-nobuild.json | \
-            sed "s|\$hardware|$hardware|g; \
+            sed "s|\$hardware|${{ inputs.hardware }}|g; \
                  s|\$HF_TOKEN|$HF_TOKEN|g; \
                  s|\$LLM_model|$LLM_model|g; \
                  s|\$Embedding_model|$Embedding_model|g; \
