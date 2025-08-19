@@ -19,30 +19,22 @@ export no_proxy="${no_proxy},${HOST_IP}"
 export http_proxy="${http_proxy}"
 export https_proxy="${https_proxy}"
 
-# VLLM configuration
-MODEL=meta-llama/Llama-3.3-70B-Instruct
-export VLLM_PORT="${VLLM_PORT:-8086}"
-
-# export HF_CACHE_DIR="${HF_CACHE_DIR:-"./data"}"
-export HF_CACHE_DIR=${model_cache:-"./data2/huggingface"}
-export VLLM_VOLUME="${HF_CACHE_DIR:-"./data2/huggingface"}"
-export VLLM_IMAGE="${VLLM_IMAGE:-opea/vllm-gaudi:latest}"
-export LLM_MODEL_ID="${LLM_MODEL_ID:-meta-llama/Llama-3.3-70B-Instruct}"
-export LLM_MODEL=$LLM_MODEL_ID
-export LLM_ENDPOINT="http://${IP_ADDRESS}:${VLLM_PORT}"
-export MAX_LEN="${MAX_LEN:-16384}"
-export NUM_CARDS="${NUM_CARDS:-4}"
-
-# Recursion limits
+# OPENAI and agent configuration
+export OPENAI_API_KEY="${OPENAI_API_KEY}"
+export OPENAI_LLM_MODEL_ID="${OPENAI_LLM_MODEL_ID:-gpt-4o-mini-2024-07-18}"
 export RECURSION_LIMIT_WORKER="${RECURSION_LIMIT_WORKER:-12}"
 export RECURSION_LIMIT_SUPERVISOR="${RECURSION_LIMIT_SUPERVISOR:-10}"
-
-# Hugging Face API token
-export HF_TOKEN="${HF_TOKEN}"
-
-# LLM configuration
 export TEMPERATURE="${TEMPERATURE:-0.5}"
 export MAX_TOKENS="${MAX_TOKENS:-4096}"
+
+# Hugging Face API token
+export HUGGINGFACEHUB_API_TOKEN="${HF_TOKEN}"
+
+# Dataprep and Docsum LLM configuration
+export HF_CACHE_DIR="${HF_CACHE_DIR:-"./data"}"
+export LLM_PORT="${LLLM_PORT:-8086}"
+export LLM_ENDPOINT="http://${IP_ADDRESS}:${LLM_PORT}"
+export LLM_MODEL_ID="${LLM_MODEL_ID:-meta-llama/Llama-3.1-8B-Instruct}"
 export MAX_INPUT_TOKENS="${MAX_INPUT_TOKENS:-2048}"
 export MAX_TOTAL_TOKENS="${MAX_TOTAL_TOKENS:-4096}"
 
@@ -69,12 +61,6 @@ export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
 export TEI_EMBEDDING_ENDPOINT="http://${IP_ADDRESS}:${TEI_EMBEDDER_PORT}"
 #######################################
 
-function stop_llm() {
-    cid=$(docker ps -aq --filter "name=vllm-gaudi-server")
-    echo "Stopping container $cid"
-    if [[ ! -z "$cid" ]]; then docker rm $cid -f && sleep 1s; fi
-}
-
 function stop_dataprep() {
     echo "Stopping databases"
     cid=$(docker ps -aq --filter "name=dataprep-redis-server*" --filter "name=redis-*" --filter "name=tei-embedding-*")
@@ -82,8 +68,8 @@ function stop_dataprep() {
 }
 
 function stop_agent_docker() {
-    cd $WORKPATH/docker_compose/intel/hpu/gaudi/
-    container_list=$(cat compose.yaml | grep container_name | cut -d':' -f2)
+    cd $WORKPATH/docker_compose/intel/cpu/xeon/
+    container_list=$(cat compose_openai.yaml | grep container_name | cut -d':' -f2)
     for container_name in $container_list; do
         cid=$(docker ps -aq --filter "name=$container_name")
         echo "Stopping container $container_name"
@@ -93,18 +79,17 @@ function stop_agent_docker() {
 
 echo "workpath: $WORKPATH"
 echo "=================== Stop containers ===================="
-stop_llm
 stop_agent_docker
 stop_dataprep
 
 cd $WORKPATH/tests
 
 echo "=================== #1 Building docker images ===================="
-bash step1_build_images.sh gaudi_vllm
+bash step1_build_images.sh xeon
 echo "=================== #1 Building docker images completed ===================="
 
 echo "=================== #2 Start services ===================="
-bash step2_start_services.sh gaudi_vllm
+bash step2_start_services.sh xeon
 echo "=================== #2 Endpoints for services started ===================="
 
 echo "=================== #3 Validate ingest_validate_dataprep ===================="
@@ -118,8 +103,7 @@ echo "=================== #4 Agent test passed ===================="
 echo "=================== #5 Stop microservices ===================="
 stop_agent_docker
 stop_dataprep
-stop_llm
-echo "=================== #5 Microservices stopped ===================="
+echo "=================== #5 Microservices stopped ==================="
 
 echo y | docker system prune
 
