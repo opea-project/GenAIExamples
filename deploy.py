@@ -177,6 +177,8 @@ def configure_models(values, deploy_config):
             values[service_name]["EMBEDDING_MODEL_ID"] = model_id
         elif service_name == "teirerank":
             values[service_name]["RERANK_MODEL_ID"] = model_id
+        elif service_name == "llm-uservice":
+            values[service_name]["LLM_MODEL_ID"] = model_id
 
     return values
 
@@ -190,7 +192,7 @@ def configure_rerank(values, with_rerank, deploy_config, example_type, node_sele
             values["teirerank"]["nodeSelector"] = {key: value for key, value in node_selector.items()}
     else:
         if example_type == "chatqna":
-            values["image"] = {"repository": "opea/chatqna-without-rerank"}
+            values["CHATQNA_TYPE"] = "CHATQNA_NO_RERANK"
         if "teirerank" not in values:
             values["teirerank"] = {"enabled": False}
         elif "enabled" not in values["teirerank"]:
@@ -218,10 +220,11 @@ def generate_helm_values(example_type, deploy_config, chart_dir, action_type, no
     # Initialize base values
     values = {
         "global": {
-            "HUGGINGFACEHUB_API_TOKEN": deploy_config.get("HUGGINGFACEHUB_API_TOKEN", ""),
+            "HUGGINGFACEHUB_API_TOKEN": deploy_config.get("HF_TOKEN", ""),
             "modelUseHostPath": deploy_config.get("modelUseHostPath", ""),
         }
     }
+    os.environ["HF_TOKEN"] = deploy_config.get("HF_TOKEN", "")
 
     # Configure components
     values = configure_node_selectors(values, node_selector or {}, deploy_config)
@@ -336,17 +339,15 @@ def get_hw_values_file(deploy_config, chart_dir):
     version = deploy_config.get("version", "1.1.0")
 
     if os.path.isdir(chart_dir):
-        # Determine which values file to use based on version
-        if version in ["1.0.0", "1.1.0"]:
-            hw_values_file = os.path.join(chart_dir, f"{device_type}-values.yaml")
-        else:
-            hw_values_file = os.path.join(chart_dir, f"{device_type}-{llm_engine}-values.yaml")
-
+        hw_values_file = os.path.join(chart_dir, f"{device_type}-{llm_engine}-values.yaml")
         if not os.path.exists(hw_values_file):
             print(f"Warning: {hw_values_file} not found")
-            hw_values_file = None
-        else:
-            print(f"Device-specific values file found: {hw_values_file}")
+            hw_values_file = os.path.join(chart_dir, f"{device_type}-values.yaml")
+            if not os.path.exists(hw_values_file):
+                print(f"Warning: {hw_values_file} not found")
+                print(f"Error: Can not found a correct values file for {device_type} with {llm_engine}")
+                sys.exit(1)
+        print(f"Device-specific values file found: {hw_values_file}")
     else:
         print(f"Error: Could not find directory for {chart_dir}")
         hw_values_file = None

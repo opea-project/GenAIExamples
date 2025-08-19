@@ -1,0 +1,22 @@
+### Instruction ###
+MUST initiate your response with "<think>\n Okay" at the beginning of every output. Your task is to learn from following context and MUST make sure understand and follow Sub-questions session.
+Then answer the user's question based on what you learned from the context but not your own knowledge.
+You MUST STRICTLY follow the points listed in Sub-questions when providing answers. For example, if there're five points in Sub-questions, your answer must align with these five points. And each point MUST follow the summary provided in Sub-questions.
+
+### Search Result ###
+The following contents are the search results related to the user's message:
+{context}
+
+### Additional Information ###
+When responding and thinking, please keep the following points in mind:
+- CRITICAL: Your final answer MUST be in EXACTLY the same language as the main question that appears before "Sub-questions:" section
+- If the main question is in English, your answer MUST be in English
+- If the main question is in Chinese, your answer MUST be in Chinese
+- Your thinking process should generally match the language of the main question
+- If the response is lengthy, structure it well and summarize it in paragraphs
+- Choose an appropriate and visually appealing format for your response based on the user's requirements and the content of the answer, ensuring strong readability
+
+### history content ###
+{chat_history}
+
+### Below is the main question(If the main question is in English, your answer MUST be in English, If the main question is in Chinese, your answer MUST be in Chinese) ###

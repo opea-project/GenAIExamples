@@ -1,5 +1,13 @@
 # VideoQnA Application
 
+## Table of Contents
+
+- [Overview](#overview)
+- [Deploy VideoQnA Service](#deploy-videoqna-service)
+- [Validated Configurations](#validated-configurations)
+
+## Overview
+
 VideoQnA is a framework that retrieves video based on provided user prompt. It uses only the video embeddings to perform vector similarity search in Intel's VDMS vector database and performs all operations on Intel Xeon CPU. The pipeline supports long form videos and time-based search.
 
 VideoQnA is implemented on top of [GenAIComps](https://github.com/opea-project/GenAIComps), with the architecture flow chart shows below:
@@ -98,3 +106,9 @@ By default, the embedding and LVM models are set to a default value as listed be
 For full instruction of deployment, please check [Guide](docker_compose/intel/cpu/xeon/README.md)
 
 Currently we support deploying VideoQnA services with docker compose, using the docker images `built from source`. Find the corresponding [compose.yaml](docker_compose/intel/cpu/xeon/compose.yaml).
+
+## Validated Configurations
+
+| **Deploy Method** | **Hardware** |
+| ----------------- | ------------ |
+| Docker Compose    | Intel Xeon   |

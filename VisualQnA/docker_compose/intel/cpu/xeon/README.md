@@ -1,8 +1,23 @@
-# Build Mega Service of VisualQnA on Xeon
+# Deploying VisualQnA on Intel® Xeon® Processors
 
 This document outlines the deployment process for a VisualQnA application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on Intel Xeon server. The steps include Docker image creation, container deployment via Docker Compose, and service execution to integrate microservices such as `llm`. We will publish the Docker images to Docker Hub soon, it will simplify the deployment process for this service.
 
-## 🚀 Apply Xeon Server on AWS
+## Table of Contents
+
+1. [VisualQnA Quick Start Deployment](#visualqna-quick-start-deployment)
+2. [Validate Microservices](#validate-microservices)
+3. [Launch the UI](#launch-the-UI)
+
+## VisualQnA Quick Start Deployment
+
+This section describes how to quickly deploy and test the VisualQnA service manually on an Intel® Xeon® processor. The basic steps are:
+
+1. [Apply Xeon Server on AWS](#apply-xeon-server-on-aws)
+2. [Build Docker Images](#build-docker-images)
+3. [Setup Environment Variables](#setup-environment-variables)
+4. [Deploy the Services Using Docker Compose](#deploy-the-services-using-docker-compose)
+
+### Apply Xeon Server on AWS
 
 To apply a Xeon server on AWS, start by creating an AWS account if you don't have one already. Then, head to the [EC2 Console](https://console.aws.amazon.com/ec2/v2/home) to begin the process. Within the EC2 service, select the Amazon EC2 M7i or M7i-flex instance type to leverage 4th Generation Intel Xeon Scalable processors. These instances are optimized for high-performance computing and demanding workloads.
 
@@ -10,109 +25,39 @@ For detailed information about these instance types, you can refer to this [link
 
 After launching your instance, you can connect to it using SSH (for Linux instances) or Remote Desktop Protocol (RDP) (for Windows instances). From there, you'll have full access to your Xeon server, allowing you to install, configure, and manage your applications as needed.
 
-**Certain ports in the EC2 instance need to opened up in the security group, for the microservices to work with the curl commands**
-
-> See one example below. Please open up these ports in the EC2 instance based on the IP addresses you want to allow
-
-```
-llava-tgi-service
-===========
-Port 8399 - Open to 0.0.0.0/0
-
-llm
-===
-Port 9399 - Open to 0.0.0.0/0
-
-visualqna-xeon-backend-server
-==========================
-Port 8888 - Open to 0.0.0.0/0
-
-visualqna-xeon-ui-server
-=====================
-Port 5173 - Open to 0.0.0.0/0
-```
-
-## 🚀 Build Docker Images
+### Build Docker Images
 
 First of all, you need to build Docker Images locally and install the python package of it.
 
-### 1. Build LVM and NGINX Docker Images
+Please refer to the table below to build different microservices from source:
 
-```bash
-git clone https://github.com/opea-project/GenAIComps.git
-cd GenAIComps
-docker build --no-cache -t opea/lvm:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/lvms/src/Dockerfile .
-docker build --no-cache -t opea/nginx:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/third_parties/nginx/src/Dockerfile .
-```
+| Microservice  | Deployment Guide                                                                              |
+| ------------- | --------------------------------------------------------------------------------------------- |
+| MegaService   | [MegaService build guide](../../../../README_miscellaneous.md#build-megaservice-docker-image) |
+| LVM and NGINX | [vLLM build guide](../../../../README_miscellaneous.md#build-lvm-and-nginx-docker-images)     |
+| vLLM or TGI   | [Pull vLLM/TGI Xeon Image](../../../../README_miscellaneous.md#pull-vLLM/TGI-xeon-image)      |
+| UI            | [Basic UI build guide](../../../../README_miscellaneous.md#build-ui-docker-image)             |
 
-### 2. Build MegaService Docker Image
+Then run the command `docker images`, you will have the following Docker Images:
 
-To construct the Mega Service, we utilize the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline within the `visualqna.py` Python script. Build MegaService Docker image via below command:
-
-```bash
-git clone https://github.com/opea-project/GenAIExamples.git
-cd GenAIExamples/VisualQnA
-docker build --no-cache -t opea/visualqna:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
-```
-
-### 3. Build UI Docker Image
-
-Build frontend Docker image via below command:
-
-```bash
-cd GenAIExamples/VisualQnA/ui
-docker build --no-cache -t opea/visualqna-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
-```
-
-### 4. Pull TGI Xeon Image
-
-```bash
-docker pull ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu
-```
-
-Then run the command `docker images`, you will have the following 5 Docker Images:
-
-1. `ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu`
-2. `opea/lvm:latest`
-3. `opea/visualqna:latest`
-4. `opea/visualqna-ui:latest`
-5. `opea/nginx`
-
-## 🚀 Start Microservices
+1. `opea/vllm:latest`
+2. `ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu` (Optional)
+3. `opea/lvm:latest`
+4. `opea/visualqna:latest`
+5. `opea/visualqna-ui:latest`
+6. `opea/nginx`
 
 ### Setup Environment Variables
 
 Since the `compose.yaml` will consume some environment variables, you need to setup them in advance as below.
 
-**Export the value of the public IP address of your Xeon server to the `host_ip` environment variable**
-
-> Change the External_Public_IP below with the actual IPV4 value
-
-```
-export host_ip="External_Public_IP"
-```
-
-**Append the value of the public IP address to the no_proxy list**
-
-```
-export your_no_proxy="${your_no_proxy},${host_ip}"
-```
-
 ```bash
-export no_proxy=${your_no_proxy}
-export http_proxy=${your_http_proxy}
-export https_proxy=${your_http_proxy}
-export LVM_MODEL_ID="llava-hf/llava-v1.6-mistral-7b-hf"
-export LVM_ENDPOINT="http://${host_ip}:8399"
-export LVM_SERVICE_PORT=9399
-export MEGA_SERVICE_HOST_IP=${host_ip}
-export LVM_SERVICE_HOST_IP=${host_ip}
-export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/visualqna"
+source set_env.sh
 ```
 
 Note: Please replace with `host_ip` with you external IP address, do not use localhost.
 
-### Start all the services Docker Containers
+### Deploy the Services Using Docker Compose
 
 > Before running the docker compose command, you need to be in the folder that has the docker compose yaml file
 
@@ -122,9 +67,13 @@ cd GenAIExamples/VisualQnA/docker_compose/intel/cpu/xeon
 
 ```bash
 docker compose -f compose.yaml up -d
+# if use TGI as the LLM serving backend
+docker compose -f compose_tgi.yaml up -d
 ```
 
-### Validate Microservices
+After running docker compose, check if all the containers launched via docker compose have started.
+
+## Validate Microservices
 
 Follow the instructions to validate MicroServices.
 
@@ -161,7 +110,7 @@ curl http://${host_ip}:8888/v1/visualqna -H "Content-Type: application/json" -d 
     }'
 ```
 
-## 🚀 Launch the UI
+## Launch the UI
 
 To access the frontend, open the following URL in your browser: http://{host_ip}:5173. By default, the UI runs on port 5173 internally. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `compose.yaml` file as shown below:
 

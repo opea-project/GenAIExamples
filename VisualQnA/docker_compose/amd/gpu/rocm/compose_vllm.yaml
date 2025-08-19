@@ -1,0 +1,104 @@
+# Copyright (C) 2024 Advanced Micro Devices, Inc.
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  visualqna-vllm-service:
+    image: ${REGISTRY:-opea}/vllm-rocm:${TAG:-latest}
+    container_name: visualqna-vllm-service
+    ports:
+      - "${VISUALQNA_VLLM_SERVICE_PORT:-8081}:8011"
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      HF_TOKEN: ${VISUALQNA_HUGGINGFACEHUB_API_TOKEN}
+      HF_HUB_DISABLE_PROGRESS_BARS: 1
+      HF_HUB_ENABLE_HF_TRANSFER: 0
+      WILM_USE_TRITON_FLASH_ATTENTION: 0
+      PYTORCH_JIT: 0
+    volumes:
+      - "${MODEL_CACHE:-./data}:/data"
+    shm_size: 20G
+    devices:
+      - /dev/kfd:/dev/kfd
+      - /dev/dri/:/dev/dri/
+    cap_add:
+      - SYS_PTRACE
+    group_add:
+      - video
+    security_opt:
+      - seccomp:unconfined
+      - apparmor=unconfined
+    command: "--model ${VISUALQNA_LVM_MODEL_ID} --swap-space 16 --disable-log-requests --dtype float16 --tensor-parallel-size 1 --host 0.0.0.0 --port 8011 --num-scheduler-steps 1 --distributed-executor-backend \"mp\""
+    ipc: host
+  lvm:
+    image: ${REGISTRY:-opea}/lvm:${TAG:-latest}
+    container_name: lvm-server
+    depends_on:
+      - visualqna-vllm-service
+    ports:
+      - "9399:9399"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      LVM_COMPONENT_NAME: "OPEA_VLLM_LVM"
+      LVM_ENDPOINT: ${LVM_ENDPOINT}
+      LLM_MODEL_ID: ${VISUALQNA_LVM_MODEL_ID}
+      HF_HUB_DISABLE_PROGRESS_BARS: 1
+      HF_HUB_ENABLE_HF_TRANSFER: 0
+    restart: unless-stopped
+  visualqna-rocm-backend-server:
+    image: ${REGISTRY:-opea}/visualqna:${TAG:-latest}
+    container_name: visualqna-rocm-backend-server
+    depends_on:
+      - visualqna-vllm-service
+      - lvm
+    ports:
+      - "${BACKEND_SERVICE_PORT:-8888}:8888"
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - MEGA_SERVICE_HOST_IP=${MEGA_SERVICE_HOST_IP}
+      - LVM_SERVICE_HOST_IP=${LVM_SERVICE_HOST_IP}
+    ipc: host
+    restart: always
+  visualqna-rocm-ui-server:
+    image: ${REGISTRY:-opea}/visualqna-ui:${TAG:-latest}
+    container_name: visualqna-rocm-ui-server
+    depends_on:
+      - visualqna-rocm-backend-server
+    ports:
+      - "${FRONTEND_SERVICE_PORT:-5173}:5173"
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - BACKEND_BASE_URL=${BACKEND_SERVICE_ENDPOINT}
+    ipc: host
+    restart: always
+  visualqna-nginx-server:
+    image: ${REGISTRY:-opea}/nginx:${TAG:-latest}
+    container_name: visualqna-rocm-nginx-server
+    depends_on:
+      - visualqna-rocm-backend-server
+      - visualqna-rocm-ui-server
+    ports:
+      - "${NGINX_PORT:-80}:80"
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - FRONTEND_SERVICE_IP=${HOST_IP}
+      - FRONTEND_SERVICE_PORT=${FRONTEND_SERVICE_PORT}
+      - BACKEND_SERVICE_NAME=${BACKEND_SERVICE_NAME}
+      - BACKEND_SERVICE_IP=${HOST_IP}
+      - BACKEND_SERVICE_PORT=${BACKEND_SERVICE_PORT}
+    ipc: host
+    restart: always
+
+networks:
+  default:
+    driver: bridge

@@ -5,6 +5,8 @@ services:
   searchqna:
     build:
       args:
+        IMAGE_REPO: ${REGISTRY:-opea}
+        BASE_TAG: ${TAG:-latest}
         http_proxy: ${http_proxy}
         https_proxy: ${https_proxy}
         no_proxy: ${no_proxy}
@@ -41,3 +43,14 @@ services:
       dockerfile: comps/llms/src/text-generation/Dockerfile
     extends: searchqna
     image: ${REGISTRY:-opea}/llm-textgen:${TAG:-latest}
+  vllm-rocm:
+    build:
+      context: GenAIComps
+      dockerfile: comps/third_parties/vllm/src/Dockerfile.amd_gpu
+    image: ${REGISTRY:-opea}/vllm-rocm:${TAG:-latest}
+  nginx:
+    build:
+      context: GenAIComps
+      dockerfile: comps/third_parties/nginx/src/Dockerfile
+    extends: searchqna
+    image: ${REGISTRY:-opea}/nginx:${TAG:-latest}

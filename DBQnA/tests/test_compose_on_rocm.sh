@@ -4,24 +4,21 @@
 
 set -xe
 
+IMAGE_REPO=${IMAGE_REPO:-"opea"}
+IMAGE_TAG=${IMAGE_TAG:-"latest"}
+echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
+echo "TAG=IMAGE_TAG=${IMAGE_TAG}"
+export REGISTRY=${IMAGE_REPO}
+export TAG=${IMAGE_TAG}
+
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
-tgi_port=8008
-tgi_volume=$WORKPATH/data
 
 export host_ip=${ip_address}
-export DBQNA_HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
-export DBQNA_TGI_SERVICE_PORT=8008
-export DBQNA_TGI_LLM_ENDPOINT="http://${host_ip}:${DBQNA_TGI_SERVICE_PORT}"
-export DBQNA_LLM_MODEL_ID="mistralai/Mistral-7B-Instruct-v0.3"
-export MODEL_ID=${DBQNA_LLM_MODEL_ID}
-export POSTGRES_USER="postgres"
-export POSTGRES_PASSWORD="testpwd"
-export POSTGRES_DB="chinook"
-export DBQNA_TEXT_TO_SQL_PORT=9090
-export DBQNA_UI_PORT=5174
-export build_texttosql_url="${ip_address}:${DBQNA_TEXT_TO_SQL_PORT}/v1"
+source $WORKPATH/docker_compose/amd/gpu/rocm/set_env.sh
+
+export MODEL_CACHE=${model_cache:-"/var/lib/GenAI/data"}
 
 function build_docker_images() {
     cd "$WORKPATH"/docker_image_build
@@ -31,11 +28,11 @@ function build_docker_images() {
     service_list="text2sql text2sql-react-ui"
 
     docker compose -f build.yaml build ${service_list} --no-cache > "${LOG_PATH}"/docker_image_build.log
-    docker pull ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
+    docker pull ghcr.io/huggingface/text-generation-inference:2.4.1-rocm
     docker images && sleep 1s
 }
 
-function start_service() {
+function start_services() {
     cd "$WORKPATH"/docker_compose/amd/gpu/rocm
     # Start Docker Containers
     docker compose up -d > "${LOG_PATH}"/start_services_with_compose.log
@@ -56,7 +53,8 @@ function validate_microservice() {
         -d '{"input_text": "Find the total number of Albums.","conn_str": {"user": "'${POSTGRES_USER}'","password": "'${POSTGRES_PASSWORD}'","host": "'${ip_address}'", "port": "5442", "database": "'${POSTGRES_DB}'" }}' \
         -H 'Content-Type: application/json')
 
-    if [[ $result == *"output"* ]]; then
+    if echo "$result" | jq -e '.result.output' > /dev/null 2>&1; then
+    # if [[ $result == *"output"* ]]; then
         echo $result
         echo "Result correct."
     else
@@ -104,16 +102,31 @@ function stop_docker() {
 
 function main() {
 
+    echo "::group::stop_docker"
     stop_docker
+    echo "::endgroup::"
 
-    build_docker_images
-    start_service
-    sleep 10s
+    echo "::group::build_docker_images"
+    if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
+    echo "::endgroup::"
+
+    echo "::group::start_services"
+    start_services
+    echo "::endgroup::"
+
+    echo "::group::validate_microservice"
     validate_microservice
-    validate_frontend
+    echo "::endgroup::"
 
+    echo "::group::validate_frontend"
+    validate_frontend
+    echo "::endgroup::"
+
+    echo "::group::stop_docker"
     stop_docker
-    echo y | docker system prune
+    echo "::endgroup::"
+
+    docker system prune -f
 
 }
 

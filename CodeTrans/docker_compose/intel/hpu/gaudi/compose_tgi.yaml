@@ -1,0 +1,99 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  tgi-service:
+    image: ghcr.io/huggingface/tgi-gaudi:2.0.6
+    container_name: codetrans-gaudi-tgi-service
+    ports:
+      - "8008:80"
+    volumes:
+      - "${MODEL_CACHE}:/data"
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      HF_TOKEN: ${HF_TOKEN}
+      HF_HUB_DISABLE_PROGRESS_BARS: 1
+      HF_HUB_ENABLE_HF_TRANSFER: 0
+      HABANA_VISIBLE_DEVICES: all
+      OMPI_MCA_btl_vader_single_copy_mechanism: none
+      ENABLE_HPU_GRAPH: true
+      LIMIT_HPU_GRAPH: true
+      USE_FLASH_ATTENTION: true
+      FLASH_ATTENTION_RECOMPUTE: true
+    runtime: habana
+    cap_add:
+      - SYS_NICE
+    ipc: host
+    command: --model-id ${LLM_MODEL_ID} --max-input-length 2048 --max-total-tokens 4096
+  llm:
+    image: ${REGISTRY:-opea}/llm-textgen:${TAG:-latest}
+    container_name: codetrans-gaudi-llm-server
+    depends_on:
+      - tgi-service
+    ports:
+      - "9000:9000"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      LLM_ENDPOINT: ${LLM_ENDPOINT}
+      LLM_MODEL_ID: ${LLM_MODEL_ID}
+      LLM_COMPONENT_NAME: ${LLM_COMPONENT_NAME}
+      HF_TOKEN: ${HF_TOKEN}
+    restart: unless-stopped
+  codetrans-gaudi-backend-server:
+    image: ${REGISTRY:-opea}/codetrans:${TAG:-latest}
+    container_name: codetrans-gaudi-backend-server
+    depends_on:
+      - tgi-service
+      - llm
+    ports:
+      - "${BACKEND_SERVICE_PORT:-7777}:7777"
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - MEGA_SERVICE_HOST_IP=${MEGA_SERVICE_HOST_IP}
+      - LLM_SERVICE_HOST_IP=${LLM_SERVICE_HOST_IP}
+    ipc: host
+    restart: always
+  codetrans-gaudi-ui-server:
+    image: ${REGISTRY:-opea}/codetrans-ui:${TAG:-latest}
+    container_name: codetrans-gaudi-ui-server
+    depends_on:
+      - codetrans-gaudi-backend-server
+    ports:
+      - "${FRONTEND_SERVICE_PORT:-5173}:5173"
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - BASE_URL=${BACKEND_SERVICE_ENDPOINT}
+    ipc: host
+    restart: always
+  codetrans-gaudi-nginx-server:
+    image: ${REGISTRY:-opea}/nginx:${TAG:-latest}
+    container_name: codetrans-gaudi-nginx-server
+    depends_on:
+      - codetrans-gaudi-backend-server
+      - codetrans-gaudi-ui-server
+    ports:
+      - "${NGINX_PORT:-80}:80"
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - FRONTEND_SERVICE_IP=${FRONTEND_SERVICE_IP}
+      - FRONTEND_SERVICE_PORT=${FRONTEND_SERVICE_PORT}
+      - BACKEND_SERVICE_NAME=${BACKEND_SERVICE_NAME}
+      - BACKEND_SERVICE_IP=${BACKEND_SERVICE_IP}
+      - BACKEND_SERVICE_PORT=${BACKEND_SERVICE_PORT}
+    ipc: host
+    restart: always
+
+networks:
+  default:
+    driver: bridge

@@ -1,0 +1,73 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+name: Weekly test all examples on multiple HWs
+
+permissions:
+  contents: read
+  id-token: write
+
+on:
+  schedule:
+    - cron: "30 2 * * 6" # UTC time
+  workflow_dispatch:
+
+env:
+  EXAMPLES: ${{ vars.NIGHTLY_RELEASE_EXAMPLES }}
+  NODES: "gaudi,xeon,arc"
+
+jobs:
+  get-test-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      examples: ${{ steps.get-matrix.outputs.examples }}
+      nodes: ${{ steps.get-matrix.outputs.nodes }}
+    steps:
+      - name: Create Matrix
+        id: get-matrix
+        run: |
+          examples=($(echo ${EXAMPLES} | tr ',' ' '))
+          examples_json=$(printf '%s\n' "${examples[@]}" | sort -u | jq -R '.' | jq -sc '.')
+          echo "examples=$examples_json" >> $GITHUB_OUTPUT
+          nodes=($(echo ${NODES} | tr ',' ' '))
+          nodes_json=$(printf '%s\n' "${nodes[@]}" | sort -u | jq -R '.' | jq -sc '.')
+          echo "nodes=$nodes_json" >> $GITHUB_OUTPUT
+
+  build-comps-base:
+    needs: [get-test-matrix]
+    permissions:
+      attestations: read
+      models: read
+      security-events: read
+    uses: ./.github/workflows/_build_comps_base_image.yml
+    with:
+      node: gaudi
+
+  run-examples:
+    permissions:
+      contents: read
+      id-token: write
+      actions: read
+      attestations: read
+      checks: read
+      discussions: read
+      issues: write
+      models: read
+      pages: write
+      pull-requests: write
+      repository-projects: read
+      security-events: read
+    needs: [get-test-matrix, build-comps-base]
+    strategy:
+      matrix:
+        example: ${{ fromJson(needs.get-test-matrix.outputs.examples) }}
+        node: ${{ fromJson(needs.get-test-matrix.outputs.nodes) }}
+      fail-fast: false
+    uses: ./.github/workflows/_example-workflow.yml
+    with:
+      node: ${{ matrix.node }}
+      example: ${{ matrix.example }}
+      build: true
+      test_compose: true
+      test_helmchart: true
+    secrets: inherit

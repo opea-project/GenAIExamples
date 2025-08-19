@@ -5,24 +5,14 @@ services:
   chatqna:
     build:
       args:
+        IMAGE_REPO: ${REGISTRY}
+        BASE_TAG: ${TAG}
         http_proxy: ${http_proxy}
         https_proxy: ${https_proxy}
         no_proxy: ${no_proxy}
       context: ../
       dockerfile: ./Dockerfile
     image: ${REGISTRY:-opea}/chatqna:${TAG:-latest}
-  chatqna-guardrails:
-    build:
-      context: ../
-      dockerfile: ./Dockerfile.guardrails
-    extends: chatqna
-    image: ${REGISTRY:-opea}/chatqna-guardrails:${TAG:-latest}
-  chatqna-without-rerank:
-    build:
-      context: ../
-      dockerfile: ./Dockerfile.without_rerank
-    extends: chatqna
-    image: ${REGISTRY:-opea}/chatqna-without-rerank:${TAG:-latest}
   chatqna-ui:
     build:
       context: ../ui
@@ -35,46 +25,99 @@ services:
       dockerfile: ./docker/Dockerfile.react
     extends: chatqna
     image: ${REGISTRY:-opea}/chatqna-conversation-ui:${TAG:-latest}
+  chatqna-openeuler:
+    build:
+      context: ../
+      dockerfile: ./Dockerfile.openEuler
+    extends: chatqna
+    image: ${REGISTRY:-opea}/chatqna:${TAG:-latest}-openeuler
+  chatqna-ui-openeuler:
+    build:
+      context: ../ui
+      dockerfile: ./docker/Dockerfile.openEuler
+    extends: chatqna-ui
+    image: ${REGISTRY:-opea}/chatqna-ui:${TAG:-latest}-openeuler
+  chatqna-conversation-ui-openeuler:
+    build:
+      context: ../ui
+      dockerfile: ./docker/Dockerfile.react.openEuler
+    extends: chatqna-conversation-ui
+    image: ${REGISTRY:-opea}/chatqna-conversation-ui:${TAG:-latest}-openeuler
   embedding:
     build:
       context: GenAIComps
       dockerfile: comps/embeddings/src/Dockerfile
     extends: chatqna
     image: ${REGISTRY:-opea}/embedding:${TAG:-latest}
+  embedding-openeuler:
+    build:
+      context: GenAIComps
+      dockerfile: comps/embeddings/src/Dockerfile.openEuler
+    extends: chatqna
+    image: ${REGISTRY:-opea}/embedding:${TAG:-latest}-openeuler
   retriever:
     build:
       context: GenAIComps
       dockerfile: comps/retrievers/src/Dockerfile
     extends: chatqna
     image: ${REGISTRY:-opea}/retriever:${TAG:-latest}
+  retriever-openeuler:
+    build:
+      context: GenAIComps
+      dockerfile: comps/retrievers/src/Dockerfile.openEuler
+    extends: chatqna
+    image: ${REGISTRY:-opea}/retriever:${TAG:-latest}-openeuler
   reranking:
     build:
       context: GenAIComps
       dockerfile: comps/rerankings/src/Dockerfile
     extends: chatqna
     image: ${REGISTRY:-opea}/reranking:${TAG:-latest}
+  reranking-openeuler:
+    build:
+      context: GenAIComps
+      dockerfile: comps/rerankings/src/Dockerfile.openEuler
+    extends: chatqna
+    image: ${REGISTRY:-opea}/reranking:${TAG:-latest}-openeuler
   llm-textgen:
     build:
       context: GenAIComps
       dockerfile: comps/llms/src/text-generation/Dockerfile
     extends: chatqna
     image: ${REGISTRY:-opea}/llm-textgen:${TAG:-latest}
+  llm-faqgen:
+    build:
+      context: GenAIComps
+      dockerfile: comps/llms/src/faq-generation/Dockerfile
+    extends: chatqna
+    image: ${REGISTRY:-opea}/llm-faqgen:${TAG:-latest}
   dataprep:
     build:
       context: GenAIComps
       dockerfile: comps/dataprep/src/Dockerfile
     extends: chatqna
     image: ${REGISTRY:-opea}/dataprep:${TAG:-latest}
+  dataprep-openeuler:
+    build:
+      context: GenAIComps
+      dockerfile: comps/dataprep/src/Dockerfile.openEuler
+    extends: chatqna
+    image: ${REGISTRY:-opea}/dataprep:${TAG:-latest}-openeuler
   guardrails:
     build:
       context: GenAIComps
       dockerfile: comps/guardrails/src/guardrails/Dockerfile
     extends: chatqna
     image: ${REGISTRY:-opea}/guardrails:${TAG:-latest}
+  vllm-rocm:
+    build:
+      context: GenAIComps
+      dockerfile: comps/third_parties/vllm/src/Dockerfile.amd_gpu
+    image: ${REGISTRY:-opea}/vllm-rocm:${TAG:-latest}
   vllm:
     build:
       context: vllm
-      dockerfile: Dockerfile.cpu
+      dockerfile: docker/Dockerfile.cpu
     extends: chatqna
     image: ${REGISTRY:-opea}/vllm:${TAG:-latest}
   vllm-gaudi:
@@ -89,3 +132,9 @@ services:
       dockerfile: comps/third_parties/nginx/src/Dockerfile
     extends: chatqna
     image: ${REGISTRY:-opea}/nginx:${TAG:-latest}
+  nginx-openeuler:
+    build:
+      context: GenAIComps
+      dockerfile: comps/third_parties/nginx/src/Dockerfile.openEuler
+    extends: chatqna
+    image: ${REGISTRY:-opea}/nginx:${TAG:-latest}-openeuler

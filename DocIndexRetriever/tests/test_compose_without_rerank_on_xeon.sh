@@ -21,10 +21,15 @@ function build_docker_images() {
     if [ ! -d "GenAIComps" ] ; then
         git clone --single-branch --branch "${opea_branch:-"main"}" https://github.com/opea-project/GenAIComps.git
     fi
+    pushd GenAIComps
+    echo "GenAIComps test commit is $(git rev-parse HEAD)"
+    docker build --no-cache -t ${REGISTRY}/comps-base:${TAG} --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
+    popd && sleep 1s
+
     service_list="dataprep embedding retriever doc-index-retriever"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
-    docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+    docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.6
     docker pull redis/redis-stack:7.2.0-v9
     docker images && sleep 1s
 
@@ -34,16 +39,7 @@ function build_docker_images() {
 function start_services() {
     echo "Starting Docker Services...."
     cd $WORKPATH/docker_compose/intel/cpu/xeon
-    export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
-    export TEI_EMBEDDING_ENDPOINT="http://${ip_address}:6006"
-    export REDIS_URL="redis://${ip_address}:6379"
-    export INDEX_NAME="rag-redis"
-    export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
-    export MEGA_SERVICE_HOST_IP=${ip_address}
-    export EMBEDDING_SERVICE_HOST_IP=${ip_address}
-    export RETRIEVER_SERVICE_HOST_IP=${ip_address}
-    export host_ip=${ip_address}
-    export LOGFLAG=true
+    source ./set_env.sh
 
     # Start Docker Containers
     docker compose -f compose_without_rerank.yaml up -d
@@ -80,10 +76,10 @@ function validate_megaservice() {
     fi
 
     # Curl the Mega Service
-    echo "================Testing retriever service: Text Request ================"
+    echo "================Testing retriever service ================"
     cd $WORKPATH/tests
     local CONTENT=$(http_proxy="" curl http://${ip_address}:8889/v1/retrievaltool -X POST -H "Content-Type: application/json" -d '{
-     "text": "Explain the OPEA project?"
+     "messages": "Explain the OPEA project?"
     }')
 
     local EXIT_CODE=$(validate "$CONTENT" "OPEA" "doc-index-retriever-service-xeon")
@@ -114,19 +110,27 @@ function stop_docker() {
 
 function main() {
 
+    echo "::group::stop_docker"
     stop_docker
-    if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
-    echo "Dump current docker ps"
-    docker ps
-    start_time=$(date +%s)
-    start_services
-    end_time=$(date +%s)
-    duration=$((end_time-start_time))
-    echo "Mega service start duration is $duration s"
-    validate_megaservice
+    echo "::endgroup::"
 
+    echo "::group::build_docker_images"
+    if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
+    echo "::endgroup::"
+
+    echo "::group::start_services"
+    start_services
+    echo "::endgroup::"
+
+    echo "::group::validate_megaservice"
+    validate_megaservice
+    echo "::endgroup::"
+
+    echo "::group::stop_docker"
     stop_docker
-    echo y | docker system prune
+    echo "::endgroup::"
+
+    docker system prune -f
 
 }
 

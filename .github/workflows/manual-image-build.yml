@@ -2,6 +2,18 @@
 # SPDX-License-Identifier: Apache-2.0
 
 name: Build specific images on manual event
+permissions:
+  actions: read
+  contents: read
+  discussions: read
+  issues: read
+  pages: read
+  pull-requests: read
+  repository-projects: read
+  security-events: read
+  id-token: write
+  attestations: read
+  models: read
 on:
   workflow_dispatch:
     inputs:
@@ -32,9 +44,9 @@ on:
         type: string
       inject_commit:
         default: false
-        description: "inject commit to docker images true or false"
+        description: "inject commit to docker images"
         required: false
-        type: string
+        type: boolean
 
 jobs:
   get-test-matrix:
@@ -50,6 +62,19 @@ jobs:
           echo "nodes=$nodes_json" >> $GITHUB_OUTPUT
 
   image-build:
+    permissions:
+      actions: read
+      attestations: read
+      checks: read
+      discussions: read
+      models: read
+      repository-projects: read
+      id-token: write
+      contents: read
+      issues: write
+      pages: write
+      pull-requests: write
+      security-events: read
     needs: get-test-matrix
     if: ${{ needs.get-test-matrix.outputs.nodes != '' }}
     strategy:

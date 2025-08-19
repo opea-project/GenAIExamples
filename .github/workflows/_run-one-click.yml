@@ -1,0 +1,213 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+name: One Click test on call
+
+permissions:
+  contents: read
+
+on:
+  workflow_call:
+    inputs:
+      registry:
+        description: Container Registry URL
+        required: false
+        default: ""
+        type: string
+      tag:
+        description: Container Tag
+        required: false
+        default: "latest"
+        type: string
+      example:
+        description: Example to test
+        required: true
+        type: string
+      deploy_method:
+        description: 'Test examples with docker compose or k8s charts'
+        required: true
+        type: string
+      hardware:
+        description: Hardware to run the test on
+        required: true
+        type: string
+
+jobs:
+  one-click-test:
+    runs-on: ${{ inputs.deploy_method }}-${{ inputs.hardware }}
+    continue-on-error: true
+    steps:
+      - name: Clean up Working Directory
+        if: ${{ inputs.deploy_method == 'docker' }}
+        run: |
+          sudo rm -rf ${{github.workspace}}/* || true
+
+          echo "Cleaning up containers using ports..."
+          cid=$(docker ps --format '{{.Names}} : {{.Ports}}' | grep -v ' : $' | grep -v 0.0.0.0:5000 | awk -F' : ' '{print $1}')
+          if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid && sleep 1s; fi
+          docker system prune -f
+
+          echo "Cleaning up images ..."
+          docker images --filter reference="*/*/*:latest" -q | xargs -r docker rmi && sleep 1s
+          docker images --filter reference="*/*:ci" -q | xargs -r docker rmi && sleep 1s
+          docker images --filter reference="*:5000/*/*" -q | xargs -r docker rmi && sleep 1s
+          docker images --filter reference="opea/comps-base" -q | xargs -r docker rmi && sleep 1s
+          docker images
+
+      - name: Checkout out Repo
+        if: ${{ inputs.deploy_method == 'docker' }}
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Clean up container before test
+        if: ${{ inputs.deploy_method == 'docker' }}
+        shell: bash
+        run: |
+          docker ps
+          if [ "${{ inputs.example }}" = "FaqGen" ]; then
+            export test_case=test_compose_faqgen_on_xeon.sh
+            cd ${{ github.workspace }}/ChatQnA
+          else
+            cd ${{ github.workspace }}/$(echo "${{ inputs.example }}" | cut -d'-' -f1)
+          fi
+          export hardware=${{ inputs.hardware }}
+          bash ${{ github.workspace }}/.github/workflows/scripts/docker_compose_clean_up.sh "containers"
+          bash ${{ github.workspace }}/.github/workflows/scripts/docker_compose_clean_up.sh "ports"
+          docker ps
+
+      - name: Log in DockerHub
+        if: ${{ inputs.deploy_method == 'docker' }}
+        uses: docker/login-action@v3.2.0
+        with:
+          username: ${{ secrets.DOCKERHUB_USER }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Clean Up Working Directory
+        if: ${{ inputs.deploy_method == 'k8s' }}
+        run: |
+          sudo rm -rf ${{github.workspace}}/*
+
+      - name: Checkout out Repo
+        if: ${{ inputs.deploy_method == 'k8s' }}
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Clean up deployment before test
+        if: ${{ inputs.deploy_method == 'k8s' }}
+        shell: bash
+        run: |
+          cd ${{ github.workspace }}/one_click_deploy
+
+          INPUT_DATA=$(
+            jq -r --arg type "${{ inputs.deploy_method }}" --arg id "${{ inputs.example }}" \
+              '.[$type][$id].inputs.clear[]' ${{ github.workspace }}/.github/workflows/one-click-inputs-nobuild.json | \
+            sed "s/\$hardware/${{ inputs.hardware }}/g"
+          )
+          echo "Generated input:"
+          echo "$INPUT_DATA"
+
+          python3 one_click_deploy.py << INPUTS
+          $INPUT_DATA
+          INPUTS
+
+      - name: Install dependencies
+        run: |
+          # Use flock to prevent apt conflicts when multiple instances run
+          sudo flock /var/lib/dpkg/lock-frontend apt update
+          sudo flock /var/lib/dpkg/lock-frontend apt install -y python3-pip
+
+      - name: get-default-params-from-config
+        id: get-default-params
+        if: ${{ inputs.deploy_method == 'k8s' }}
+        run: |
+          cd ${{ github.workspace }}
+          example=$(echo "${{ inputs.example }}" | cut -d'-' -f1)
+          PARAMS_JSON=$(python3 .github/workflows/scripts/get-params.py $example)
+          echo "LLM_model=$(echo "$PARAMS_JSON" | jq -r '.llm_model')" >> $GITHUB_ENV
+          if [ "$example" = "ChatQnA" ]; then
+            echo "LLM_model=$(echo "$PARAMS_JSON" | jq -r '.llm_model')" >> $GITHUB_ENV
+            echo "Embedding_model=$(echo "$PARAMS_JSON" | jq -r '.embed_model')" >> $GITHUB_ENV
+            echo "Reranking_model=$(echo "$PARAMS_JSON" | jq -r '.rerank_model')" >> $GITHUB_ENV
+            echo "Mount_dir=$(echo "$PARAMS_JSON" | jq -r '.mount_dir')" >> $GITHUB_ENV
+          elif [ "$example" = "VisualQnA" ]; then
+            echo "LVM_model=$(echo "$PARAMS_JSON" | jq -r '.lvm_model')" >> $GITHUB_ENV
+          elif [ "$example" = "AgentQnA" ]; then
+            echo "LLM_model=$(echo "$PARAMS_JSON" | jq -r '.gaudi.llm_model')" >> $GITHUB_ENV
+          fi
+
+      - name: deploy and test
+        shell: bash
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          GOOGLE_CSE_ID: ${{ secrets.GOOGLE_CSE_ID }}
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          PINECONE_KEY: ${{ secrets.PINECONE_KEY }}
+          PINECONE_KEY_LANGCHAIN_TEST: ${{ secrets.PINECONE_KEY_LANGCHAIN_TEST }}
+          SDK_BASE_URL: ${{ secrets.SDK_BASE_URL }}
+          SERVING_TOKEN: ${{ secrets.SERVING_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
+          FINANCIAL_DATASETS_API_KEY: ${{ secrets.FINANCIAL_DATASETS_API_KEY }}
+          LLM_model: ${{ env.LLM_model }}
+          Embedding_model: ${{ env.Embedding_model }}
+          Reranking_model: ${{ env.Reranking_model }}
+          Mount_dir: ${{ env.Mount_dir }}
+          LVM_model: ${{ env.LVM_model }}
+        run: |
+          cd ${{ github.workspace }}/one_click_deploy
+          python3 -m pip install -r requirements.txt
+
+          if [ "${{ inputs.deploy_method }}" = "k8s" ]; then
+            export OPEA_K8S_VLLM_SKIP_WARMUP=TRUE
+          fi
+          export TEST_RETRY_ATTEMPTS=6
+
+          INPUT_DATA=$(
+            jq -r --arg type "${{ inputs.deploy_method }}" --arg id "${{ inputs.example }}" \
+              '.[$type][$id].inputs.deploy[]' ${{ github.workspace }}/.github/workflows/one-click-inputs-nobuild.json | \
+            sed "s|\$hardware|${{ inputs.hardware }}|g; \
+                 s|\$HF_TOKEN|$HF_TOKEN|g; \
+                 s|\$LLM_model|$LLM_model|g; \
+                 s|\$Embedding_model|$Embedding_model|g; \
+                 s|\$Reranking_model|$Reranking_model|g; \
+                 s|\$CodeTrans_model|$LLM_model|g; \
+                 s|\$DocSum_model|$LLM_model|g; \
+                 s|\$CodeGen_model|$LLM_model|g; \
+                 s|\$AudioQnA_model|$LLM_model|g; \
+                 s|\$VisualQnA_model|$LLM_model|g; \
+                 s|\$FaqGen_model|$LLM_model|g; \
+                 s|\$AgentQnA_model|$LLM_model|g; \
+                 s|\$Mount_dir|$Mount_dir|g"
+          )
+
+          echo "Generated input:"
+          echo "$INPUT_DATA"
+
+          python3 one_click_deploy.py << INPUTS
+          $INPUT_DATA
+          INPUTS
+
+      - name: Clean up deployment
+        run: |
+          cd ${{ github.workspace }}/one_click_deploy
+
+          INPUT_DATA=$(
+            jq -r --arg type "${{ inputs.deploy_method }}" --arg id "${{ inputs.example }}" \
+              '.[$type][$id].inputs.clear[]' ${{ github.workspace }}/.github/workflows/one-click-inputs-nobuild.json | \
+            sed "s/\$hardware/${{ inputs.hardware }}/g"
+          )
+          echo "Generated input:"
+          echo "$INPUT_DATA"
+
+          python3 one_click_deploy.py << INPUTS
+          $INPUT_DATA
+          INPUTS
+
+      - name: Publish pipeline artifact
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.deploy_method }}
+          path: ${{ github.workspace }}/${{ inputs.deploy_method }}-tests/test-results.log

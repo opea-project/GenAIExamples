@@ -8,6 +8,10 @@ on:
       - "**/docker_compose/**/compose*.yaml"
 
 name: Create an issue to GenAIInfra on push
+
+permissions:
+  contents: read
+
 jobs:
   job1:
     name: Create issue
@@ -38,14 +42,14 @@ jobs:
           echo "EOF" >> $GITHUB_ENV
 
       - name: Create Issue
-        uses: daisy-ycguo/create-issue-action@stable
+        uses: dacbd/create-issue-action@main
         with:
           token: ${{ secrets.ACTION_TOKEN }}
           owner: opea-project
           repo: GenAIInfra
           title: |
             [ci-auto] GenAIExample ${{ env.examples }} compose.yaml got changed.
-          assignees: lianhao
+          assignees: poussa
           labels: helm
           body: |
             ## GenAIExample ${{ env.examples }} compose.yaml got changed

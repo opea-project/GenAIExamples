@@ -68,21 +68,19 @@ flowchart LR
 
 ```
 
-## We provided DocRetriever with different deployment infra
+## Deployment Options
 
-- [docker xeon version](docker_compose/intel/cpu/xeon/README.md) => minimum endpoints, easy to setup
-- [docker gaudi version](docker_compose/intel/hpu/gaudi/README.md) => with extra tei_gaudi endpoint, faster
+The table below lists currently available deployment options. They outline in detail the implementation of this example on selected hardware.
 
-## We allow users to set retriever/reranker hyperparams via requests
+| Category               | Deployment Option | Guide                                                                               |
+| ---------------------- | ----------------- | ----------------------------------------------------------------------------------- |
+| On-premise Deployments | Docker compose    | [DocIndexRetriever deployment on Xeon](./docker_compose/intel/cpu/xeon/README.md)   |
+|                        |                   | [DocIndexRetriever deployment on Gaudi](./docker_compose/intel/hpu/gaudi/README.md) |
 
-Example usage:
+## Validated Configurations
 
-```python
-url = "http://{host_ip}:{port}/v1/retrievaltool".format(host_ip=host_ip, port=port)
-payload = {
-    "messages": query,
-    "k": 5,  # retriever top k
-    "top_n": 2,  # reranker top n
-}
-response = requests.post(url, json=payload)
-```
+| **Deploy Method** | **Database**  | **Reranking** | **Hardware** |
+| ----------------- | ------------- | ------------- | ------------ |
+| Docker Compose    | Milvus, Redis | w/            | Intel Xeon   |
+| Docker Compose    | Redis         | w/o           | Intel Xeon   |
+| Docker Compose    | Milvus, Redis | w/            | Intel Gaudi  |

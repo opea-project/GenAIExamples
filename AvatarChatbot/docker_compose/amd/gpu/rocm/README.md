@@ -14,7 +14,7 @@ cd GenAIComps
 ### 2. Build ASR Image
 
 ```bash
-docker build -t opea/whisper:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/asr/src/integrations/dependency/whisper/Dockerfile .
+docker build -t opea/whisper:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/third_parties/whisper/src/Dockerfile .
 
 
 docker build -t opea/asr:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/asr/src/Dockerfile .
@@ -29,7 +29,7 @@ docker build --no-cache -t opea/llm-textgen:latest --build-arg https_proxy=$http
 ### 4. Build TTS Image
 
 ```bash
-docker build -t opea/speecht5:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/tts/src/integrations/dependency/speecht5/Dockerfile .
+docker build -t opea/speecht5:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/third_parties/speecht5/src/Dockerfile .
 
 docker build -t opea/tts:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/tts/src/Dockerfile .
 ```
@@ -68,7 +68,7 @@ Then run the command `docker images`, you will have following images ready:
 Before starting the services with `docker compose`, you have to recheck the following environment variables.
 
 ```bash
-export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+export HF_TOKEN=${HF_TOKEN}
 export host_ip=$(hostname -I | awk '{print $1}')
 
 export TGI_SERVICE_PORT=3006
@@ -194,7 +194,7 @@ python3 ui/gradio/app_gradio_demo_avatarchatbot.py
 
 The UI can be viewed at http://${host_ip}:7861  
 <img src="../../../../assets/img/UI.png" alt="UI Example" width="60%">  
-In the current version v1.0, you need to set the avatar figure image/video and the DL model choice in the environment variables before starting AvatarChatbot backend service and running the UI. Please just customize the audio question in the UI.  
+In the current version v1.3, you need to set the avatar figure image/video and the DL model choice in the environment variables before starting AvatarChatbot backend service and running the UI. Please just customize the audio question in the UI.
 \*\* We will enable change of avatar figure between runs in v2.0
 
 ## Troubleshooting
@@ -203,7 +203,7 @@ In the current version v1.0, you need to set the avatar figure image/video and t
 cd GenAIExamples/AvatarChatbot/tests
 export IMAGE_REPO="opea"
 export IMAGE_TAG="latest"
-export HUGGINGFACEHUB_API_TOKEN=<your_hf_token>
+export HF_TOKEN=<your_hf_token>
 
 test_avatarchatbot_on_xeon.sh
 ```

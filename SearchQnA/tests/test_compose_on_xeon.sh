@@ -9,6 +9,7 @@ echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
 echo "TAG=IMAGE_TAG=${IMAGE_TAG}"
 export REGISTRY=${IMAGE_REPO}
 export TAG=${IMAGE_TAG}
+export MODEL_CACHE=${model_cache:-"./data"}
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
@@ -16,58 +17,28 @@ ip_address=$(hostname -I | awk '{print $1}')
 
 function build_docker_images() {
     opea_branch=${opea_branch:-"main"}
-    # If the opea_branch isn't main, replace the git clone branch in Dockerfile.
-    if [[ "${opea_branch}" != "main" ]]; then
-        cd $WORKPATH
-        OLD_STRING="RUN git clone --depth 1 https://github.com/opea-project/GenAIComps.git"
-        NEW_STRING="RUN git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git"
-        find . -type f -name "Dockerfile*" | while read -r file; do
-            echo "Processing file: $file"
-            sed -i "s|$OLD_STRING|$NEW_STRING|g" "$file"
-        done
-    fi
-
     cd $WORKPATH/docker_image_build
     git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
+    pushd GenAIComps
+    echo "GenAIComps test commit is $(git rev-parse HEAD)"
+    docker build --no-cache -t ${REGISTRY}/comps-base:${TAG} --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
+    popd && sleep 1s
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="searchqna searchqna-ui embedding web-retriever reranking llm-textgen"
+    service_list="searchqna searchqna-ui embedding web-retriever reranking llm-textgen nginx"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
-    docker pull ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
-    docker pull ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu
     docker images && sleep 1s
 }
 
 function start_services() {
-    cd $WORKPATH/docker_compose/intel/cpu/xeon/
-    export GOOGLE_CSE_ID=$GOOGLE_CSE_ID
-    export GOOGLE_API_KEY=$GOOGLE_API_KEY
-    export HUGGINGFACEHUB_API_TOKEN=$HUGGINGFACEHUB_API_TOKEN
-
-    export EMBEDDING_MODEL_ID=BAAI/bge-base-en-v1.5
-    export TEI_EMBEDDING_ENDPOINT=http://$ip_address:3001
-    export RERANK_MODEL_ID=BAAI/bge-reranker-base
+    cd $WORKPATH/docker_compose/intel/
     export RERANK_TYPE="tei"
-    export TEI_RERANKING_ENDPOINT=http://$ip_address:3004
-
-    export TGI_LLM_ENDPOINT=http://$ip_address:3006
-    export LLM_MODEL_ID=Intel/neural-chat-7b-v3-3
-
-    export MEGA_SERVICE_HOST_IP=${ip_address}
-    export EMBEDDING_SERVICE_HOST_IP=${ip_address}
-    export WEB_RETRIEVER_SERVICE_HOST_IP=${ip_address}
-    export RERANK_SERVICE_HOST_IP=${ip_address}
-    export LLM_SERVICE_HOST_IP=${ip_address}
-
-    export EMBEDDING_SERVICE_PORT=3002
-    export WEB_RETRIEVER_SERVICE_PORT=3003
-    export RERANK_SERVICE_PORT=3005
-    export LLM_SERVICE_PORT=3007
     export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:3008/v1/searchqna"
     export host_ip=${ip_address}
     export LOGFLAG=true
-
+    source ./set_env.sh
+    cd cpu/xeon
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
@@ -129,15 +100,31 @@ function stop_docker() {
 
 function main() {
 
+    echo "::group::stop_docker"
     stop_docker
+    echo "::endgroup::"
+
+    echo "::group::build_docker_images"
     if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
+    echo "::endgroup::"
+
+    echo "::group::start_services"
     start_services
+    echo "::endgroup::"
 
+    echo "::group::validate_megaservice"
     validate_megaservice
-    validate_frontend
+    echo "::endgroup::"
 
+    echo "::group::validate_frontend"
+    validate_frontend
+    echo "::endgroup::"
+
+    echo "::group::stop_docker"
     stop_docker
-    echo y | docker system prune
+    echo "::endgroup::"
+
+    docker system prune -f
 
 }
 

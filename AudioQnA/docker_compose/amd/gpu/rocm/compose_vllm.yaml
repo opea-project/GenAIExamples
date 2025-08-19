@@ -1,0 +1,100 @@
+# Copyright (C) 2024 Advanced Micro Devices, Inc.
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  whisper-service:
+    image: ${REGISTRY:-opea}/whisper:${TAG:-latest}
+    container_name: whisper-service
+    ports:
+      - "${WHISPER_SERVER_PORT:-7066}:7066"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+    restart: unless-stopped
+
+  speecht5-service:
+    image: ${REGISTRY:-opea}/speecht5:${TAG:-latest}
+    container_name: speecht5-service
+    ports:
+      - "${SPEECHT5_SERVER_PORT:-7055}:7055"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+    restart: unless-stopped
+
+  audioqna-vllm-service:
+    image: ${REGISTRY:-opea}/vllm-rocm:${TAG:-latest}
+    container_name: audioqna-vllm-service
+    ports:
+      - "${VLLM_SERVICE_PORT:-8081}:8011"
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      HF_TOKEN: ${HF_TOKEN}
+      HF_HUB_DISABLE_PROGRESS_BARS: 1
+      HF_HUB_ENABLE_HF_TRANSFER: 0
+      WILM_USE_TRITON_FLASH_ATTENTION: 0
+      PYTORCH_JIT: 0
+    volumes:
+      - "${HF_CACHE_DIR:-./data}:/data"
+    shm_size: 20G
+    devices:
+      - /dev/kfd:/dev/kfd
+      - /dev/dri/:/dev/dri/
+    cap_add:
+      - SYS_PTRACE
+    group_add:
+      - video
+    security_opt:
+      - seccomp:unconfined
+      - apparmor=unconfined
+    command: "--model ${LLM_MODEL_ID} --swap-space 16 --disable-log-requests --dtype float16 --tensor-parallel-size 1 --host 0.0.0.0 --port 8011 --num-scheduler-steps 1 --distributed-executor-backend \"mp\""
+    ipc: host
+
+  audioqna-backend-server:
+    image: ${REGISTRY:-opea}/audioqna:${TAG:-latest}
+    container_name: audioqna-backend-server
+    depends_on:
+      - whisper-service
+      - audioqna-vllm-service
+      - speecht5-service
+    ports:
+      - "${BACKEND_SERVICE_PORT:-3008}:8888"
+    environment:
+      no_proxy: ${no_proxy}
+      https_proxy: ${https_proxy}
+      http_proxy: ${http_proxy}
+      MEGA_SERVICE_HOST_IP: ${MEGA_SERVICE_HOST_IP}
+      WHISPER_SERVER_HOST_IP: ${WHISPER_SERVER_HOST_IP}
+      WHISPER_SERVER_PORT: ${WHISPER_SERVER_PORT}
+      LLM_SERVER_HOST_IP: ${LLM_SERVER_HOST_IP}
+      LLM_SERVER_PORT: ${LLM_SERVER_PORT}
+      LLM_MODEL_ID: ${LLM_MODEL_ID}
+      SPEECHT5_SERVER_HOST_IP: ${SPEECHT5_SERVER_HOST_IP}
+      SPEECHT5_SERVER_PORT: ${SPEECHT5_SERVER_PORT}
+    ipc: host
+    restart: always
+
+  audioqna-ui-server:
+    image: ${REGISTRY:-opea}/audioqna-ui:${TAG:-latest}
+    container_name: audioqna-ui-server
+    depends_on:
+      - audioqna-backend-server
+    ports:
+      - "${FRONTEND_SERVICE_PORT:-5173}:5173"
+    environment:
+      no_proxy: ${no_proxy}
+      https_proxy: ${https_proxy}
+      http_proxy: ${http_proxy}
+      CHAT_URL: ${BACKEND_SERVICE_ENDPOINT}
+    ipc: host
+    restart: always
+
+networks:
+  default:
+    driver: bridge

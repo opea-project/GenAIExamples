@@ -1,0 +1,92 @@
+# Copyright (C) 2024 Intel Corporation
+# Copyright (c) 2024 Advanced Micro Devices, Inc.
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  codegen-vllm-service:
+    image: ${REGISTRY:-opea}/vllm-rocm:${TAG:-latest}
+    container_name: codegen-vllm-service
+    ports:
+      - "${CODEGEN_VLLM_SERVICE_PORT:-8081}:8011"
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      HF_TOKEN: ${CODEGEN_HUGGINGFACEHUB_API_TOKEN}
+      HF_HUB_DISABLE_PROGRESS_BARS: 1
+      HF_HUB_ENABLE_HF_TRANSFER: 0
+      WILM_USE_TRITON_FLASH_ATTENTION: 0
+      PYTORCH_JIT: 0
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://${HOST_IP}:${CODEGEN_VLLM_SERVICE_PORT:-8028}/health || exit 1" ]
+      interval: 10s
+      timeout: 10s
+      retries: 100
+    volumes:
+      - "./data:/data"
+    shm_size: 20G
+    devices:
+      - /dev/kfd:/dev/kfd
+      - /dev/dri/:/dev/dri/
+    cap_add:
+      - SYS_PTRACE
+    group_add:
+      - video
+    security_opt:
+      - seccomp:unconfined
+      - apparmor=unconfined
+    command: "--model ${CODEGEN_LLM_MODEL_ID} --swap-space 16 --disable-log-requests --dtype float16 --tensor-parallel-size 4 --host 0.0.0.0 --port 8011 --num-scheduler-steps 1 --distributed-executor-backend \"mp\""
+    ipc: host
+  codegen-llm-server:
+    image: ${REGISTRY:-opea}/llm-textgen:${TAG:-latest}
+    container_name: codegen-llm-server
+    depends_on:
+      codegen-vllm-service:
+        condition: service_healthy
+    ports:
+      - "${CODEGEN_LLM_SERVICE_PORT:-9000}:9000"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      LLM_ENDPOINT: ${CODEGEN_VLLM_ENDPOINT}
+      LLM_MODEL_ID: ${CODEGEN_LLM_MODEL_ID}
+      HF_TOKEN: ${CODEGEN_HUGGINGFACEHUB_API_TOKEN}
+      LLM_COMPONENT_NAME: "OpeaTextGenService"
+    restart: unless-stopped
+  codegen-backend-server:
+    image: ${REGISTRY:-opea}/codegen:${TAG:-latest}
+    container_name: codegen-backend-server
+    depends_on:
+      - codegen-llm-server
+    ports:
+      - "${CODEGEN_BACKEND_SERVICE_PORT:-7778}:7778"
+    environment:
+      no_proxy: ${no_proxy}
+      https_proxy: ${https_proxy}
+      http_proxy: ${http_proxy}
+      MEGA_SERVICE_HOST_IP: ${CODEGEN_MEGA_SERVICE_HOST_IP}
+      LLM_SERVICE_HOST_IP: ${HOST_IP}
+      LLM_SERVICE_PORT: ${CODEGEN_LLM_SERVICE_PORT}
+    ipc: host
+    restart: always
+  codegen-ui-server:
+    image: ${REGISTRY:-opea}/codegen-ui:${TAG:-latest}
+    container_name: codegen-ui-server
+    depends_on:
+      - codegen-backend-server
+    ports:
+      - "${CODEGEN_UI_SERVICE_PORT:-5173}:5173"
+    environment:
+      no_proxy: ${no_proxy}
+      https_proxy: ${https_proxy}
+      http_proxy: ${http_proxy}
+      BASIC_URL: ${CODEGEN_BACKEND_SERVICE_URL}
+      BACKEND_SERVICE_ENDPOINT: ${CODEGEN_BACKEND_SERVICE_URL}
+    ipc: host
+    restart: always
+
+networks:
+  default:
+    driver: bridge

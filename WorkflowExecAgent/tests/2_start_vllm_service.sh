@@ -10,7 +10,7 @@ vllm_port=${vllm_port}
 [[ -z "$vllm_port" ]] && vllm_port=8084
 model=mistralai/Mistral-7B-Instruct-v0.3
 export WORKDIR=$WORKPATH/../../
-export HF_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+export HF_TOKEN=${HF_TOKEN}
 
 function build_vllm_docker_image() {
     echo "Building the vllm docker images"
@@ -19,14 +19,14 @@ function build_vllm_docker_image() {
     if [ ! -d "./vllm" ]; then
         git clone https://github.com/vllm-project/vllm.git
         cd vllm
-        VLLM_VER="$(git describe --tags "$(git rev-list --tags --max-count=1)" )"
+        VLLM_VER=v0.10.0
         echo "Check out vLLM tag ${VLLM_VER}"
         git checkout ${VLLM_VER} &> /dev/null
         git rev-parse HEAD
     else
         cd ./vllm
     fi
-    docker build -f Dockerfile.cpu -t vllm-cpu-env --shm-size=100g .
+    docker build -f docker/Dockerfile.cpu -t vllm-cpu-env --shm-size=100g .
     if [ $? -ne 0 ]; then
         echo "opea/vllm:cpu failed"
         exit 1
@@ -37,15 +37,20 @@ function build_vllm_docker_image() {
 
 function start_vllm_service() {
     echo "start vllm service"
-    docker run -d -p ${vllm_port}:${vllm_port} --rm --network=host --name test-comps-vllm-service -v ~/.cache/huggingface:/root/.cache/huggingface -v ${WORKPATH}/tests/tool_chat_template_mistral_custom.jinja:/root/tool_chat_template_mistral_custom.jinja -e HF_TOKEN=$HF_TOKEN -e http_proxy=$http_proxy -e https_proxy=$https_proxy -it vllm-cpu-env --model ${model} --port ${vllm_port} --chat-template /root/tool_chat_template_mistral_custom.jinja --enable-auto-tool-choice --tool-call-parser mistral
+    export VLLM_SKIP_WARMUP=true
+    docker run -d -p ${vllm_port}:${vllm_port} --rm --network=host --name test-comps-vllm-service -v ~/.cache/huggingface:/root/.cache/huggingface -v ${WORKPATH}/tests/tool_chat_template_mistral_custom.jinja:/root/tool_chat_template_mistral_custom.jinja -e HF_TOKEN=$HF_TOKEN -e http_proxy=$http_proxy -e https_proxy=$https_proxy -it public.ecr.aws/q9t5s3a7/vllm-cpu-release-repo:v0.10.0 --model ${model} --port ${vllm_port} --chat-template /root/tool_chat_template_mistral_custom.jinja --enable-auto-tool-choice --tool-call-parser mistral
     echo ${LOG_PATH}/vllm-service.log
-    sleep 5s
+    sleep 10s
     echo "Waiting vllm ready"
     n=0
     until [[ "$n" -ge 100 ]] || [[ $ready == true ]]; do
+        docker logs test-comps-vllm-service
+        if docker logs test-comps-vllm-service| grep "Error response from daemon: No such container:"; then
+            exit 1
+        fi
         docker logs test-comps-vllm-service &> ${LOG_PATH}/vllm-service.log
         n=$((n+1))
-        if grep -q "Uvicorn running on" ${LOG_PATH}/vllm-service.log; then
+        if grep -q "Application startup complete." ${LOG_PATH}/vllm-service.log; then
             break
         fi
         if grep -q "No such container" ${LOG_PATH}/vllm-service.log; then
@@ -59,9 +64,9 @@ function start_vllm_service() {
 }
 
 function main() {
-    echo "==================== Build vllm docker image ===================="
-    build_vllm_docker_image
-    echo "==================== Build vllm docker image completed ===================="
+    # echo "==================== Build vllm docker image ===================="
+    # build_vllm_docker_image
+    # echo "==================== Build vllm docker image completed ===================="
 
     echo "==================== Start vllm docker service ===================="
     start_vllm_service

@@ -9,7 +9,7 @@ services:
       - ${WORKDIR}/GenAIComps/comps/agent/src/:/home/user/comps/agent/src/
       - ${TOOLSET_PATH}:/home/user/tools/
     ports:
-      - "9090:9090"
+      - "9091:9090"
     ipc: host
     environment:
       ip_address: ${ip_address}
@@ -17,6 +17,7 @@ services:
       recursion_limit: ${recursion_limit}
       llm_engine: ${llm_engine}
       llm_endpoint_url: ${llm_endpoint_url}
+      api_key: ${llm_endpoint_api_key}
       model: ${model}
       temperature: ${temperature}
       max_new_tokens: ${max_new_tokens}

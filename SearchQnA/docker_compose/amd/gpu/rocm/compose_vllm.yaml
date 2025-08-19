@@ -1,0 +1,196 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  search-tei-embedding-service:
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.7
+    container_name: search-tei-embedding-server
+    ports:
+      - "${SEARCH_TEI_EMBEDDING_PORT:-3001}:80"
+    volumes:
+      - "${MODEL_CACHE:-./data}:/data"
+    shm_size: 1g
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      HF_TOKEN: ${SEARCH_HUGGINGFACEHUB_API_TOKEN}
+    command: --model-id ${SEARCH_EMBEDDING_MODEL_ID} --auto-truncate
+
+  search-embedding:
+    image: ${REGISTRY:-opea}/embedding:${TAG:-latest}
+    container_name: search-embedding-server
+    depends_on:
+      - search-tei-embedding-service
+    ports:
+      - "${SEARCH_EMBEDDING_SERVICE_PORT:-3002}:6000"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      TEI_EMBEDDING_HOST_IP: ${SEARCH_HOST_IP}
+      TEI_EMBEDDING_PORT: ${SEARCH_TEI_EMBEDDING_PORT}
+      TEI_EMBEDDING_ENDPOINT: ${SEARCH_TEI_EMBEDDING_ENDPOINT}
+      HF_TOKEN: ${SEARCH_HUGGINGFACEHUB_API_TOKEN}
+    restart: unless-stopped
+
+  search-web-retriever:
+    image: ${REGISTRY:-opea}/web-retriever:${TAG:-latest}
+    container_name: search-web-retriever-server
+    ports:
+      - "${SEARCH_WEB_RETRIEVER_SERVICE_PORT:-3003}:7077"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      TEI_EMBEDDING_ENDPOINT: ${SEARCH_TEI_EMBEDDING_ENDPOINT}
+      GOOGLE_API_KEY: ${SEARCH_GOOGLE_API_KEY}
+      GOOGLE_CSE_ID: ${SEARCH_GOOGLE_CSE_ID}
+    restart: unless-stopped
+
+  search-tei-reranking-service:
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.7
+    container_name: search-tei-reranking-server
+    ports:
+      - "${SEARCH_TEI_RERANKING_PORT:-3004}:80"
+    volumes:
+      - "${MODEL_CACHE:-./data}:/data"
+    shm_size: 1g
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+    command: --model-id ${SEARCH_RERANK_MODEL_ID} --auto-truncate
+
+  search-reranking:
+    image: ${REGISTRY:-opea}/reranking:${TAG:-latest}
+    container_name: search-reranking-server
+    depends_on:
+      - search-tei-reranking-service
+    ports:
+      - "${SEARCH_RERANK_SERVICE_PORT:-3005}:8000"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      TEI_RERANKING_ENDPOINT: ${SEARCH_TEI_RERANKING_ENDPOINT}
+      HF_TOKEN: ${SEARCH_HUGGINGFACEHUB_API_TOKEN}
+    restart: unless-stopped
+
+  search-vllm-service:
+    image: ${REGISTRY:-opea}/vllm-rocm:${TAG:-latest}
+    container_name: search-vllm-service
+    ports:
+      - "${SEARCH_VLLM_SERVICE_PORT:-8081}:8011"
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      HF_TOKEN: ${SEARCH_HUGGINGFACEHUB_API_TOKEN}
+      HF_HUB_DISABLE_PROGRESS_BARS: 1
+      HF_HUB_ENABLE_HF_TRANSFER: 0
+      WILM_USE_TRITON_FLASH_ATTENTION: 0
+      PYTORCH_JIT: 0
+    volumes:
+      - "${MODEL_CACHE:-./data}:/data"
+    shm_size: 20G
+    devices:
+      - /dev/kfd:/dev/kfd
+      - /dev/dri/:/dev/dri/
+    cap_add:
+      - SYS_PTRACE
+    group_add:
+      - video
+    security_opt:
+      - seccomp:unconfined
+      - apparmor=unconfined
+    command: "--model ${SEARCH_LLM_MODEL_ID} --swap-space 16 --disable-log-requests --dtype float16 --tensor-parallel-size 4 --host 0.0.0.0 --port 8011 --num-scheduler-steps 1 --distributed-executor-backend \"mp\""
+    ipc: host
+
+  search-llm:
+    image: ${REGISTRY:-opea}/llm-textgen:${TAG:-latest}
+    container_name: search-llm-server
+    depends_on:
+      - search-vllm-service
+    ports:
+      - "${SEARCH_LLM_SERVICE_PORT:-3007}:9000"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      LLM_ENDPOINT: ${SEARCH_LLM_ENDPOINT}
+      LLM_MODEL_ID: ${SEARCH_LLM_MODEL_ID}
+      HF_TOKEN: ${SEARCH_HUGGINGFACEHUB_API_TOKEN}
+      LLM_COMPONENT_NAME: "OpeaTextGenService"
+    restart: unless-stopped
+
+  search-backend-server:
+    image: ${REGISTRY:-opea}/searchqna:${TAG:-latest}
+    container_name: search-backend-server
+    depends_on:
+      - search-tei-embedding-service
+      - search-embedding
+      - search-web-retriever
+      - search-tei-reranking-service
+      - search-reranking
+      - search-vllm-service
+      - search-llm
+    ports:
+      - "${SEARCH_BACKEND_SERVICE_PORT:-3008}:8888"
+    environment:
+      no_proxy: ${no_proxy}
+      https_proxy: ${https_proxy}
+      http_proxy: ${http_proxy}
+      MEGA_SERVICE_HOST_IP: ${SEARCH_MEGA_SERVICE_HOST_IP}
+      EMBEDDING_SERVICE_HOST_IP: ${SEARCH_EMBEDDING_SERVICE_HOST_IP}
+      EMBEDDING_SERVICE_PORT: ${SEARCH_EMBEDDING_SERVICE_PORT}
+      WEB_RETRIEVER_SERVICE_HOST_IP: ${SEARCH_WEB_RETRIEVER_SERVICE_HOST_IP}
+      WEB_RETRIEVER_SERVICE_PORT: ${SEARCH_WEB_RETRIEVER_SERVICE_PORT}
+      RERANK_SERVICE_HOST_IP: ${SEARCH_RERANK_SERVICE_HOST_IP}
+      RERANK_SERVICE_PORT: ${SEARCH_RERANK_SERVICE_PORT}
+      LLM_SERVICE_HOST_IP: ${SEARCH_LLM_SERVICE_HOST_IP}
+      LLM_SERVICE_PORT: ${SEARCH_LLM_SERVICE_PORT}
+    ipc: host
+    restart: always
+
+  search-ui-server:
+    image: ${REGISTRY:-opea}/searchqna-ui:${TAG:-latest}
+    container_name: search-ui-server
+    depends_on:
+      - search-backend-server
+    ports:
+      - "${SEARCH_FRONTEND_SERVICE_PORT:-5173}:5173"
+    environment:
+      no_proxy: ${no_proxy}
+      https_proxy: ${https_proxy}
+      http_proxy: ${http_proxy}
+    ipc: host
+    restart: always
+  search-nginx-server:
+    image: ${REGISTRY:-opea}/nginx:${TAG:-latest}
+    container_name: search-nginx-server
+    depends_on:
+      - search-backend-server
+      - search-ui-server
+    ports:
+      - "${NGINX_PORT:-80}:80"
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - FRONTEND_SERVICE_IP=search-ui-server
+      - FRONTEND_SERVICE_PORT=5173
+      - BACKEND_SERVICE_NAME=search
+      - BACKEND_SERVICE_IP=search-backend-server
+      - BACKEND_SERVICE_PORT=8888
+    ipc: host
+    restart: always
+networks:
+  default:
+    driver: bridge

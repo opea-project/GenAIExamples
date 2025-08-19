@@ -1,0 +1,235 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+version: "3.8"
+
+services:
+  milvus-etcd:
+    container_name: milvus-etcd
+    image: quay.io/coreos/etcd:v3.5.5
+    environment:
+      - ETCD_AUTO_COMPACTION_MODE=revision
+      - ETCD_AUTO_COMPACTION_RETENTION=1000
+      - ETCD_QUOTA_BACKEND_BYTES=4294967296
+      - ETCD_SNAPSHOT_COUNT=50000
+    volumes:
+      - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/etcd:/etcd
+    command: etcd -advertise-client-urls=http://127.0.0.1:2379 -listen-client-urls http://0.0.0.0:2379 --data-dir /etcd
+    healthcheck:
+      test: ["CMD", "etcdctl", "endpoint", "health"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+  milvus-minio:
+    container_name: milvus-minio
+    image: minio/minio:RELEASE.2023-03-20T20-16-18Z
+    environment:
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin
+    ports:
+      - "${MINIO_PORT1:-5044}:9001"
+      - "${MINIO_PORT2:-5043}:9000"
+    volumes:
+      - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/minio:/minio_data
+    command: minio server /minio_data --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+  milvus-standalone:
+    container_name: milvus-standalone
+    image: milvusdb/milvus:v2.4.6
+    command: ["milvus", "run", "standalone"]
+    security_opt:
+      - seccomp:unconfined
+    environment:
+      ETCD_ENDPOINTS: milvus-etcd:2379
+      MINIO_ADDRESS: milvus-minio:9000
+    volumes:
+      - ${DOCKER_VOLUME_DIRECTORY:-.}/config/milvus.yaml:/milvus/configs/milvus.yaml
+      - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/milvus:/var/lib/milvus
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9091/healthz"]
+      interval: 30s
+      start_period: 90s
+      timeout: 20s
+      retries: 3
+    ports:
+      - "19530:19530"
+      - "${MILVUS_STANDALONE_PORT:-9091}:9091"
+    depends_on:
+      - "milvus-etcd"
+      - "milvus-minio"
+
+  dataprep-milvus:
+    image: ${REGISTRY:-opea}/dataprep:${TAG:-latest}
+    container_name: dataprep-milvus-server
+    ports:
+      - "${DATAPREP_PORT:-6007}:5000"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      DATAPREP_COMPONENT_NAME: "OPEA_DATAPREP_MILVUS"
+      MILVUS_HOST: ${MILVUS_HOST}
+      TEI_EMBEDDING_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
+      HF_TOKEN: ${HF_TOKEN}
+      LOGFLAG: ${LOGFLAG}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:5000/v1/health_check || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+    depends_on:
+      tei-embedding-service:
+        condition: service_healthy
+      milvus-standalone:
+        condition: service_healthy
+      milvus-etcd:
+        condition: service_healthy
+      milvus-minio:
+        condition: service_healthy
+
+  tei-embedding-service:
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.7
+    entrypoint: /bin/sh -c "apt-get update && apt-get install -y curl && text-embeddings-router --json-output --model-id ${EMBEDDING_MODEL_ID} --auto-truncate"
+    container_name: tei-embedding-server
+    ports:
+      - "6006:80"
+    volumes:
+      - "${MODEL_CACHE:-./data}:/data"
+    shm_size: 1g
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      HF_TOKEN: ${HF_TOKEN}
+      host_ip: ${host_ip}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:80/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 60
+
+  embedding:
+    image: ${REGISTRY:-opea}/embedding:${TAG:-latest}
+    container_name: embedding-server
+    # volumes:
+    #   - $WORKDIR/GenAIExamples/DocIndexRetriever/docker_image_build/GenAIComps/comps:/home/comps
+    ports:
+      - "6000:6000"
+    ipc: host
+    depends_on:
+      tei-embedding-service:
+        condition: service_healthy
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      HF_TOKEN: ${HF_TOKEN}
+      TEI_EMBEDDING_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
+      LOGFLAG: ${LOGFLAG}
+    restart: unless-stopped
+
+  retriever:
+    image: ${REGISTRY:-opea}/retriever:${TAG:-latest}
+    container_name: retriever-milvus-server
+    depends_on:
+      - milvus-standalone
+    ports:
+      - "7000:7000"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      MILVUS_HOST: ${host_ip}
+      HF_TOKEN: ${HF_TOKEN}
+      TEI_EMBEDDING_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
+      LOGFLAG: ${LOGFLAG}
+      RETRIEVER_COMPONENT_NAME: "OPEA_RETRIEVER_MILVUS"
+    restart: unless-stopped
+
+  tei-reranking-service:
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.7
+    entrypoint: /bin/sh -c "apt-get update && apt-get install -y curl && text-embeddings-router --json-output --model-id ${RERANK_MODEL_ID} --auto-truncate"
+    container_name: tei-reranking-server
+    ports:
+      - "8808:80"
+    volumes:
+      - "${MODEL_CACHE:-./data}:/data"
+    shm_size: 1g
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      HF_TOKEN: ${HF_TOKEN}
+      HF_HUB_DISABLE_PROGRESS_BARS: 1
+      HF_HUB_ENABLE_HF_TRANSFER: 0
+      host_ip: ${host_ip}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:80/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 60
+
+  reranking:
+    image: ${REGISTRY:-opea}/reranking:${TAG:-latest}
+    container_name: reranking-tei-xeon-server
+    # volumes:
+    #   - $WORKDIR/GenAIExamples/DocIndexRetriever/docker_image_build/GenAIComps/comps:/home/user/comps
+    depends_on:
+      tei-reranking-service:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      RERANK_TYPE: ${RERANK_TYPE}
+      TEI_RERANKING_ENDPOINT: ${TEI_RERANKING_ENDPOINT}
+      HF_TOKEN: ${HF_TOKEN}
+      HF_HUB_DISABLE_PROGRESS_BARS: 1
+      HF_HUB_ENABLE_HF_TRANSFER: 0
+      LOGFLAG: ${LOGFLAG}
+    restart: unless-stopped
+
+  doc-index-retriever-server:
+    image: ${REGISTRY:-opea}/doc-index-retriever:${TAG:-latest}
+    container_name: doc-index-retriever-server
+    depends_on:
+      milvus-standalone:
+        condition: service_healthy
+      tei-embedding-service:
+        condition: service_healthy
+      embedding:
+        condition: service_started
+      dataprep-milvus:
+        condition: service_healthy
+      retriever:
+        condition: service_started
+      reranking:
+        condition: service_started
+    ports:
+      - "8889:8889"
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - MEGA_SERVICE_HOST_IP=${MEGA_SERVICE_HOST_IP}
+      - EMBEDDING_SERVICE_HOST_IP=${EMBEDDING_SERVICE_HOST_IP}
+      - RETRIEVER_SERVICE_HOST_IP=${RETRIEVER_SERVICE_HOST_IP}
+      - RERANK_SERVICE_HOST_IP=${RERANK_SERVICE_HOST_IP}
+      - LLM_SERVICE_HOST_IP=${LLM_SERVICE_HOST_IP}
+    ipc: host
+    restart: always
+
+networks:
+  default:
+    driver: bridge

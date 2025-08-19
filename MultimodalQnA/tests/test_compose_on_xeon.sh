@@ -14,9 +14,10 @@ WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
 
-export image_fn="apple.png"
+export image_fn="sample.png"
 export video_fn="WeAreGoingOnBullrun.mp4"
-export caption_fn="apple.txt"
+export audio_fn="sample.mp3"  # audio_fn and caption_fn are used as captions for image_fn, so they all need the same base name
+export caption_fn="sample.txt"
 export pdf_fn="nke-10k-2023.pdf"
 
 function check_service_ready() {
@@ -44,60 +45,25 @@ function check_service_ready() {
 
 function build_docker_images() {
     opea_branch=${opea_branch:-"main"}
-    # If the opea_branch isn't main, replace the git clone branch in Dockerfile.
-    if [[ "${opea_branch}" != "main" ]]; then
-        cd $WORKPATH
-        OLD_STRING="RUN git clone --depth 1 https://github.com/opea-project/GenAIComps.git"
-        NEW_STRING="RUN git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git"
-        find . -type f -name "Dockerfile*" | while read -r file; do
-            echo "Processing file: $file"
-            sed -i "s|$OLD_STRING|$NEW_STRING|g" "$file"
-        done
-    fi
 
     cd $WORKPATH/docker_image_build
     git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
+    pushd GenAIComps
+    echo "GenAIComps test commit is $(git rev-parse HEAD)"
+    docker build --no-cache -t ${REGISTRY}/comps-base:${TAG} --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
+    popd && sleep 1s
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="multimodalqna multimodalqna-ui embedding-multimodal-bridgetower embedding retriever lvm-llava lvm dataprep whisper"
+    service_list="multimodalqna multimodalqna-ui embedding-multimodal-bridgetower embedding retriever speecht5 lvm-llava lvm dataprep whisper"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
     docker images && sleep 1s
 }
 
 function setup_env() {
     export host_ip=${ip_address}
-    export MM_EMBEDDING_SERVICE_HOST_IP=${host_ip}
-    export MM_RETRIEVER_SERVICE_HOST_IP=${host_ip}
-    export LVM_SERVICE_HOST_IP=${host_ip}
-    export MEGA_SERVICE_HOST_IP=${host_ip}
-    export WHISPER_PORT=7066
-    export MAX_IMAGES=1
-    export WHISPER_MODEL="base"
-    export WHISPER_SERVER_ENDPOINT="http://${host_ip}:${WHISPER_PORT}/v1/asr"
-    export REDIS_DB_PORT=6379
-    export REDIS_INSIGHTS_PORT=8001
-    export REDIS_URL="redis://${host_ip}:${REDIS_DB_PORT}"
-    export REDIS_HOST=${host_ip}
-    export INDEX_NAME="mm-rag-redis"
-    export DATAPREP_MMR_PORT=6007
-    export DATAPREP_INGEST_SERVICE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/dataprep/ingest"
-    export DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/dataprep/generate_transcripts"
-    export DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/dataprep/generate_captions"
-    export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/dataprep/get"
-    export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/dataprep/delete"
-    export EMM_BRIDGETOWER_PORT=6006
-    export BRIDGE_TOWER_EMBEDDING=true
-    export EMBEDDING_MODEL_ID="BridgeTower/bridgetower-large-itm-mlm-itc"
-    export MMEI_EMBEDDING_ENDPOINT="http://${host_ip}:$EMM_BRIDGETOWER_PORT"
-    export MM_EMBEDDING_PORT_MICROSERVICE=6000
-    export REDIS_RETRIEVER_PORT=7000
-    export LVM_PORT=9399
-    export LLAVA_SERVER_PORT=8399
+    cd $WORKPATH/docker_compose/intel
+    source set_env.sh
     export LVM_MODEL_ID="llava-hf/llava-1.5-7b-hf"
-    export LVM_ENDPOINT="http://${host_ip}:$LLAVA_SERVER_PORT"
-    export MEGA_SERVICE_PORT=8888
-    export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:$MEGA_SERVICE_PORT/v1/multimodalqna"
-    export UI_PORT=5173
 }
 
 
@@ -113,8 +79,9 @@ function prepare_data() {
     cd $LOG_PATH
     echo "Downloading image and video"
     wget https://github.com/docarray/docarray/blob/main/tests/toydata/image-data/apple.png?raw=true -O ${image_fn}
+    wget https://github.com/intel/intel-extension-for-transformers/raw/refs/tags/v1.5/intel_extension_for_transformers/neural_chat/ui/customized/talkingbot/src/lib/components/talkbot/assets/mid-age-man.mp3 -O ${audio_fn}
     wget http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4 -O ${video_fn}
-    wget https://raw.githubusercontent.com/opea-project/GenAIComps/v1.1/comps/retrievers/redis/data/nke-10k-2023.pdf -O ${pdf_fn}
+    wget https://raw.githubusercontent.com/opea-project/GenAIComps/v1.3/comps/third_parties/pathway/src/data/nke-10k-2023.pdf -O ${pdf_fn}
     echo "Writing caption file"
     echo "This is an apple."  > ${caption_fn}
     sleep 1m
@@ -130,20 +97,23 @@ function validate_service() {
 
     if [[ $SERVICE_NAME == *"dataprep-multimodal-redis-transcript"* ]]; then
         cd $LOG_PATH
-        HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -F "files=@./${video_fn}" -H 'Content-Type: multipart/form-data' "$URL")
+        HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -F "files=@./${video_fn}" -F "files=@./${audio_fn}" -H 'Content-Type: multipart/form-data' "$URL")
     elif [[ $SERVICE_NAME == *"dataprep-multimodal-redis-caption"* ]]; then
         cd $LOG_PATH
         HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -F "files=@./${image_fn}" -H 'Content-Type: multipart/form-data' "$URL")
+    elif [[ $SERVICE_NAME == *"dataprep-multimodal-redis-ingest-image-audio"* ]]; then
+        cd $LOG_PATH
+        HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -F "files=@./${image_fn}" -F "files=@./${audio_fn}" -H 'Content-Type: multipart/form-data' "$URL")
     elif [[ $SERVICE_NAME == *"dataprep-multimodal-redis-ingest"* ]]; then
         cd $LOG_PATH
-        HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -F "files=@./${image_fn}" -F "files=@./apple.txt" -H 'Content-Type: multipart/form-data' "$URL")
+        HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -F "files=@./${image_fn}" -F "files=@./${caption_fn}" -H 'Content-Type: multipart/form-data' "$URL")
     elif [[ $SERVICE_NAME == *"dataprep-multimodal-redis-pdf"* ]]; then
         cd $LOG_PATH
         HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -F "files=@./${pdf_fn}" -H 'Content-Type: multipart/form-data' "$URL")
     elif [[ $SERVICE_NAME == *"dataprep_get"* ]]; then
         HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -H 'Content-Type: application/json' "$URL")
     elif [[ $SERVICE_NAME == *"dataprep_del"* ]]; then
-        HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -d '{"file_path": "apple.txt"}' -H 'Content-Type: application/json' "$URL")
+        HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -d '{"file_path": "${caption_fn}"}' -H 'Content-Type: application/json' "$URL")
     else
         HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL")
     fi
@@ -215,11 +185,18 @@ function validate_microservices() {
         "dataprep-multimodal-redis-transcript" \
         "dataprep-multimodal-redis"
 
-    echo "Validating Data Prep with Image & Caption Ingestion"
+    echo "Validating Data Prep with Image & Text Caption Ingestion"
     validate_service \
         "${DATAPREP_INGEST_SERVICE_ENDPOINT}" \
         "Data preparation succeeded" \
         "dataprep-multimodal-redis-ingest" \
+        "dataprep-multimodal-redis"
+
+    echo "Validating Data Prep with Image & Audio Caption Ingestion"
+    validate_service \
+        "${DATAPREP_INGEST_SERVICE_ENDPOINT}" \
+        "Data preparation succeeded" \
+        "dataprep-multimodal-redis-ingest-image-audio" \
         "dataprep-multimodal-redis"
 
     echo "Validating Data Prep with PDF"
@@ -292,6 +269,15 @@ function validate_microservices() {
         "dataprep-multimodal-redis-caption" \
         "dataprep-multimodal-redis"
 
+    echo "Validating Text to speech service"
+    validate_service \
+        "${TTS_ENDPOINT}" \
+        '"tts_result":' \
+        "speecht5-service" \
+        "speecht5-service" \
+        '{"text": "Who are you?"}'
+
+
     sleep 3m
 }
 
@@ -300,10 +286,18 @@ function validate_megaservice() {
     echo "Validating megaservice with first query"
     validate_service \
         "http://${host_ip}:${MEGA_SERVICE_PORT}/v1/multimodalqna" \
-        '"time_of_frame_ms":' \
+        'red' \
         "multimodalqna" \
         "multimodalqna-backend-server" \
-        '{"messages": "What is the revenue of Nike in 2023?"}'
+        '{"messages": "Find an apple. What color is it?"}'
+
+    echo "Validating megaservice with audio response"
+    validate_service \
+        "http://${host_ip}:${MEGA_SERVICE_PORT}/v1/multimodalqna" \
+        '"audio":{"data"' \
+        "multimodalqna" \
+        "multimodalqna-backend-server" \
+        '{"messages": "Find an apple. What color is it?", "modalities": ["text", "audio"]}'
 
     echo "Validating megaservice with first audio query"
     validate_service \
@@ -319,8 +313,7 @@ function validate_megaservice() {
         '"time_of_frame_ms":' \
         "multimodalqna" \
         "multimodalqna-backend-server" \
-        '{"messages": [{"role": "user", "content": [{"type": "text", "text": "Find a similar image"}, {"type": "image_url", "image_url": {"url": "https://www.ilankelman.org/stopsigns/australia.jpg"}}]}]}'
-
+        '{"messages": [{"role": "user", "content": [{"type": "text", "text": "hello, "}, {"type": "image_url", "image_url": {"url": "https://www.ilankelman.org/stopsigns/australia.jpg"}}]}], "max_tokens": 10, "modalities": ["text", "audio"]}'
     echo "Validating megaservice with follow-up query"
     validate_service \
         "http://${host_ip}:${MEGA_SERVICE_PORT}/v1/multimodalqna" \
@@ -340,7 +333,7 @@ function validate_megaservice() {
 
 function validate_delete {
     echo "Validating data prep delete files"
-    export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/delete"
+    export DATAPREP_DELETE_FILE_ENDPOINT="http://${host_ip}:${DATAPREP_MMR_PORT}/v1/dataprep/delete"
     validate_service \
         "${DATAPREP_DELETE_FILE_ENDPOINT}" \
         '{"status":true}' \
@@ -353,6 +346,7 @@ function delete_data() {
     echo "Deleting image, video, and caption"
     rm -rf ${image_fn}
     rm -rf ${video_fn}
+    rm -rf ${audio_fn}
     rm -rf ${pdf_fn}
     rm -rf ${caption_fn}
 }
@@ -367,26 +361,44 @@ function stop_docker() {
 function main() {
 
     setup_env
+
+    echo "::group::stop_docker"
     stop_docker
+    echo "::endgroup::"
+
+    echo "::group::build_docker_images"
     if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
-    start_time=$(date +%s)
+    echo "::endgroup::"
+
+    echo "::group::start_services"
     start_services
-    end_time=$(date +%s)
-    duration=$((end_time-start_time))
-    echo "Mega service start duration is $duration s" && sleep 1s
+    echo "::endgroup::"
+
+    echo "::group::prepare_data"
     prepare_data
+    echo "::endgroup::"
 
+    echo "::group::validate_microservices"
     validate_microservices
-    echo "==== microservices validated ===="
+    echo "::endgroup::"
+
+    echo "::group::validate_megaservice"
     validate_megaservice
-    echo "==== megaservice validated ===="
+    echo "::endgroup::"
+
+    echo "::group::validate_delete"
     validate_delete
-    echo "==== delete validated ===="
+    echo "::endgroup::"
 
+    echo "::group::delete_data"
     delete_data
-    stop_docker
-    echo y | docker system prune
+    echo "::endgroup::"
 
+    echo "::group::stop_docker"
+    stop_docker
+    echo "::endgroup::"
+
+    docker system prune -f
 }
 
 main

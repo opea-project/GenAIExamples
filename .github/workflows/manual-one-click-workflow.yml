@@ -1,0 +1,92 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+name: One Click workflow on manual event
+
+permissions:
+  contents: read
+
+on:
+  workflow_dispatch:
+    inputs:
+      nodes:
+        default: "gaudi,xeon"
+        description: "Hardware to run test gaudi,xeon,rocm,arc,gaudi3,xeon-gnr"
+        required: true
+        type: string
+      examples:
+        default: "ChatQnA,ChatQnA-Qwen"
+        description: 'List of examples to test [ChatQnA,ChatQnA-Qwen,CodeTrans,DocSum,CodeGen,AudioQnA,VisualQnA,FaqGen,AgentQnA]'
+        required: true
+        type: string
+      tag:
+        default: "latest"
+        description: "Tag to apply to images"
+        required: true
+        type: string
+      deploy_methods:
+        default: "docker,k8s"
+        description: 'Test examples with docker compose or k8s charts(exclude AgentQnA k8s on Xeon)'
+        type: choice
+        required: true
+        options:
+          - docker
+          - k8s
+          - docker,k8s
+
+jobs:
+  get-test-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      examples: ${{ steps.get-matrix.outputs.examples }}
+      nodes: ${{ steps.get-matrix.outputs.nodes }}
+      deploy_methods: ${{ steps.get-matrix.outputs.deploy_methods }}
+    steps:
+    - name: Create Matrix
+      id: get-matrix
+      run: |
+        examples=($(echo ${{ inputs.examples }} | tr ',' ' '))
+        examples_json=$(printf '%s\n' "${examples[@]}" | sort -u | jq -R '.' | jq -sc '.')
+        echo "examples=$examples_json" >> $GITHUB_OUTPUT
+        nodes=($(echo ${{ inputs.nodes }} | tr ',' ' '))
+        nodes_json=$(printf '%s\n' "${nodes[@]}" | sort -u | jq -R '.' | jq -sc '.')
+        echo "nodes=$nodes_json" >> $GITHUB_OUTPUT
+        deploy_methods=($(echo ${{ inputs.deploy_methods }} | tr ',' ' '))
+        deploy_methods_json=$(printf '%s\n' "${deploy_methods[@]}" | sort -u | jq -R '.' | jq -sc '.')
+        echo "deploy_methods=$deploy_methods_json" >> $GITHUB_OUTPUT
+        echo "examples=$examples_json"
+        echo "nodes=$nodes_json"
+        echo "deploy_methods=$deploy_methods_json"
+
+  run-examples:
+    # permissions:
+    #   actions: read
+    #   attestations: read
+    #   discussions: read
+    #   models: read
+    #   repository-projects: read
+    #   id-token: write
+    #   contents: read
+    #   checks: write
+    #   deployments: write
+    #   issues: write
+    #   packages: write
+    #   pages: write
+    #   pull-requests: write
+    #   statuses: write
+    #   security-events: read
+    needs: [get-test-matrix]
+    strategy:
+      matrix:
+        example: ${{ fromJson(needs.get-test-matrix.outputs.examples) }}
+        hardware: ${{ fromJson(needs.get-test-matrix.outputs.nodes) }}
+        deploy_method: ${{ fromJson(needs.get-test-matrix.outputs.deploy_methods) }}
+      fail-fast: false
+    uses: ./.github/workflows/_run-one-click.yml
+    with:
+      hardware: ${{ matrix.hardware }}
+      example: ${{ matrix.example }}
+      deploy_method: ${{ matrix.deploy_method }}
+      tag: ${{ inputs.tag }}
+      registry: "opea"
+    secrets: inherit

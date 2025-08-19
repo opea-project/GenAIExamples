@@ -21,35 +21,35 @@ HOST_IP=$ip_address
 COMPOSE_FILE="compose.yaml"
 EC_RAG_SERVICE_PORT=16010
 
-MODEL_PATH="/home/media/models"
+MODEL_PATH="${HOME}/models"
 # MODEL_PATH="$WORKPATH/models"
 DOC_PATH="$WORKPATH/tests"
-GRADIO_PATH="$WORKPATH/tests"
+UI_UPLOAD_PATH="$WORKPATH/tests"
 
 HF_ENDPOINT=https://hf-mirror.com
 
 
 function build_docker_images() {
+    opea_branch=${opea_branch:-"main"}
     cd $WORKPATH/docker_image_build
+    git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
+    pushd GenAIComps
+    echo "GenAIComps test commit is $(git rev-parse HEAD)"
+    docker build --no-cache -t ${REGISTRY}/comps-base:${TAG} --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
+    popd && sleep 1s
+
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
+    service_list="edgecraftrag edgecraftrag-server edgecraftrag-ui"
     docker compose -f build.yaml build --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker images && sleep 1s
 }
 
 function start_services() {
-    export MODEL_PATH=${MODEL_PATH}
-    export DOC_PATH=${DOC_PATH}
-    export GRADIO_PATH=${GRADIO_PATH}
-    export HOST_IP=${HOST_IP}
-    export LLM_MODEL=${LLM_MODEL}
-    export HF_ENDPOINT=${HF_ENDPOINT}
-    export vLLM_ENDPOINT=${vLLM_ENDPOINT}
-    export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
-    export no_proxy="localhost, 127.0.0.1, 192.168.1.1"
+    export UI_UPLOAD_PATH=${UI_UPLOAD_PATH}
 
     cd $WORKPATH/docker_compose/intel/gpu/arc
-
+    source set_env.sh
     # Start Docker Containers
     docker compose -f $COMPOSE_FILE up -d > ${LOG_PATH}/start_services_with_compose.log
     sleep 20
@@ -102,16 +102,30 @@ function stop_docker() {
 function main() {
     mkdir -p $LOG_PATH
 
+    echo "::group::stop_docker"
     stop_docker
+    echo "::endgroup::"
+
+    echo "::group::build_docker_images"
     if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
+    echo "::endgroup::"
+
+    echo "::group::start_services"
     start_services
-    echo "EC_RAG service started" && sleep 1s
+    echo "::endgroup::"
 
+    echo "::group::validate_rag"
     validate_rag
-    validate_megaservice
+    echo "::endgroup::"
 
+    echo "::group::validate_megaservice"
+    validate_megaservice
+    echo "::endgroup::"
+
+    echo "::group::stop_docker"
     stop_docker
     echo y | docker system prune
+    echo "::endgroup::"
 
 }
 

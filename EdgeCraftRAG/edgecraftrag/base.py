@@ -50,6 +50,7 @@ class IndexerType(str, Enum):
 
     FAISS_VECTOR = "faiss_vector"
     DEFAULT_VECTOR = "vector"
+    MILVUS_VECTOR = "milvus_vector"
 
 
 class RetrieverType(str, Enum):
@@ -79,7 +80,6 @@ class InferenceType(str, Enum):
 class CallbackType(str, Enum):
 
     DATAPREP = "dataprep"
-    DATAUPDATE = "dataupdate"
     RETRIEVE = "retrieve"
     PIPELINE = "pipeline"
 

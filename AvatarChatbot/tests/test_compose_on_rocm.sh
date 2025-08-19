@@ -2,13 +2,14 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-set -e
+set -xe
 IMAGE_REPO=${IMAGE_REPO:-"opea"}
 IMAGE_TAG=${IMAGE_TAG:-"latest"}
 echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
 echo "TAG=IMAGE_TAG=${IMAGE_TAG}"
 export REGISTRY=${IMAGE_REPO}
 export TAG=${IMAGE_TAG}
+export MODEL_CACHE=${model_cache:-"/var/lib/GenAI/data"}
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
@@ -24,9 +25,13 @@ ip_address=$(hostname -I | awk '{print $1}')
 function build_docker_images() {
     cd $WORKPATH/docker_image_build
     git clone https://github.com/opea-project/GenAIComps.git && cd GenAIComps && git checkout "${opea_branch:-"main"}" && cd ../
+    pushd GenAIComps
+    echo "GenAIComps test commit is $(git rev-parse HEAD)"
+    docker build --no-cache -t ${REGISTRY}/comps-base:${TAG} --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
+    popd && sleep 1s
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="avatarchatbot whisper asr llm-textgen speecht5 tts wav2lip animation"
+    service_list="avatarchatbot whisper asr speecht5 tts wav2lip animation"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker pull ghcr.io/huggingface/text-generation-inference:2.3.1-rocm
@@ -37,48 +42,8 @@ function build_docker_images() {
 
 function start_services() {
     cd $WORKPATH/docker_compose/amd/gpu/rocm
-
-    export HUGGINGFACEHUB_API_TOKEN=$HUGGINGFACEHUB_API_TOKEN
     export OPENAI_API_KEY=$OPENAI_API_KEY
-    export host_ip=${ip_address}
-
-    export TGI_SERVICE_PORT=3006
-    export TGI_LLM_ENDPOINT=http://${host_ip}:${TGI_SERVICE_PORT}
-    export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
-
-    export ASR_ENDPOINT=http://${host_ip}:7066
-    export TTS_ENDPOINT=http://${host_ip}:7055
-    export WAV2LIP_ENDPOINT=http://${host_ip}:7860
-
-    export MEGA_SERVICE_HOST_IP=${host_ip}
-    export ASR_SERVICE_HOST_IP=${host_ip}
-    export TTS_SERVICE_HOST_IP=${host_ip}
-    export LLM_SERVICE_HOST_IP=${host_ip}
-    export ANIMATION_SERVICE_HOST_IP=${host_ip}
-    export WHISPER_SERVER_HOST_IP=${host_ip}
-    export WHISPER_SERVER_PORT=7066
-
-    export SPEECHT5_SERVER_HOST_IP=${host_ip}
-    export SPEECHT5_SERVER_PORT=7055
-
-    export MEGA_SERVICE_PORT=8888
-    export ASR_SERVICE_PORT=3001
-    export TTS_SERVICE_PORT=3002
-    export LLM_SERVICE_PORT=3007
-    export ANIMATION_SERVICE_PORT=3008
-
-    export DEVICE="cpu"
-    export WAV2LIP_PORT=7860
-    export INFERENCE_MODE='wav2lip+gfpgan'
-    export CHECKPOINT_PATH='/usr/local/lib/python3.11/site-packages/Wav2Lip/checkpoints/wav2lip_gan.pth'
-    export FACE="/home/user/comps/animation/src/assets/img/avatar5.png"
-    # export AUDIO='assets/audio/eg3_ref.wav' # audio file path is optional, will use base64str in the post request as input if is 'None'
-    export AUDIO='None'
-    export FACESIZE=96
-    export OUTFILE="./outputs/result.mp4"
-    export GFPGAN_MODEL_VERSION=1.4 # latest version, can roll back to v1.3 if needed
-    export UPSCALE_FACTOR=1
-    export FPS=5
+    source set_env.sh
 
     # Start Docker Containers
     docker compose up -d --force-recreate
@@ -137,11 +102,6 @@ function validate_megaservice() {
 }
 
 
-#function validate_frontend() {
-
-#}
-
-
 function stop_docker() {
     cd $WORKPATH/docker_compose/amd/gpu/rocm
     docker compose down && docker compose rm -f
@@ -150,19 +110,27 @@ function stop_docker() {
 
 function main() {
 
-    echo $OPENAI_API_KEY
-    echo $OPENAI_KEY
-
+    echo "::group::stop_docker"
     stop_docker
+    echo "::endgroup::"
+
+    echo "::group::build_docker_images"
     if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
-    start_services
-    # validate_microservices
-    sleep 30
-    validate_megaservice
-    # validate_frontend
-    stop_docker
+    echo "::endgroup::"
 
-    echo y | docker system prune
+    echo "::group::start_services"
+    start_services
+    echo "::endgroup::"
+
+    echo "::group::validate_megaservice"
+    validate_megaservice
+    echo "::endgroup::"
+
+    echo "::group::stop_docker"
+    stop_docker
+    echo "::endgroup::"
+
+    docker system prune -f
 
 }
 

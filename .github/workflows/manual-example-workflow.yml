@@ -2,17 +2,31 @@
 # SPDX-License-Identifier: Apache-2.0
 
 name: Examples CD workflow on manual event
+
+permissions:
+  actions: read
+  contents: read
+  discussions: read
+  issues: read
+  pages: read
+  pull-requests: read
+  repository-projects: read
+  security-events: read
+  id-token: write
+  attestations: read
+  models: read
+
 on:
   workflow_dispatch:
     inputs:
       nodes:
         default: "gaudi,xeon"
-        description: "Hardware to run test"
+        description: "Hardware to run test gaudi,xeon,rocm,epyc,arc,gaudi3,xeon-gnr"
         required: true
         type: string
       examples:
         default: "ChatQnA"
-        description: 'List of examples to test [AgentQnA,AudioQnA,ChatQnA,CodeGen,CodeTrans,DocIndexRetriever,DocSum,FaqGen,InstructionTuning,MultimodalQnA,ProductivitySuite,RerankFinetuning,SearchQnA,Translation,VideoQnA,VisualQnA,AvatarChatbot,Text2Image,WorkflowExecAgent,DBQnA,EdgeCraftRAG,GraphRAG]'
+        description: 'List of examples to test [AgentQnA,AudioQnA,AvatarChatbot,ChatQnA,CodeGen,CodeTrans,DBQnA,DeepResearchAgent,DocIndexRetriever,DocSum,EdgeCraftRAG,FinanceAgent,GraphRAG,HybridRAG,InstructionTuning,MultimodalQnA,ProductivitySuite,RerankFinetuning,SearchQnA,Text2Image,Translation,VideoQnA,VisualQnA,WorkflowExecAgent]'
         required: true
         type: string
       tag:
@@ -20,11 +34,6 @@ on:
         description: "Tag to apply to images"
         required: true
         type: string
-      # deploy_gmc:
-      #   default: false
-      #   description: 'Whether to deploy gmc'
-      #   required: true
-      #   type: boolean
       build:
         default: true
         description: 'Build test required images for Examples'
@@ -40,11 +49,6 @@ on:
         description: 'Test examples with helm charts'
         required: false
         type: boolean
-      # test_gmc:
-      #   default: false
-      #   description: 'Test examples with gmc'
-      #   required: false
-      #   type: boolean
       opea_branch:
         default: "main"
         description: 'OPEA branch for image build'
@@ -52,16 +56,15 @@ on:
         type: string
       inject_commit:
         default: false
-        description: "inject commit to docker images true or false"
+        description: "inject commit to docker images"
         required: false
         type: boolean
       use_model_cache:
         default: false
-        description: "use model cache true or false"
+        description: "use model cache"
         required: false
         type: boolean
 
-permissions: read-all
 jobs:
   get-test-matrix:
     runs-on: ubuntu-latest
@@ -79,24 +82,30 @@ jobs:
         nodes_json=$(printf '%s\n' "${nodes[@]}" | sort -u | jq -R '.' | jq -sc '.')
         echo "nodes=$nodes_json" >> $GITHUB_OUTPUT
 
-  build-deploy-gmc:
+  build-comps-base:
     needs: [get-test-matrix]
-    if: false
-    #${{ fromJSON(inputs.deploy_gmc) }}
-    strategy:
-      matrix:
-        node: ${{ fromJson(needs.get-test-matrix.outputs.nodes) }}
-      fail-fast: false
-    uses: ./.github/workflows/_gmc-workflow.yml
+    uses: ./.github/workflows/_build_comps_base_image.yml
     with:
-      node: ${{ matrix.node }}
+      node: gaudi
+      build: ${{ fromJSON(inputs.build) }}
       tag: ${{ inputs.tag }}
       opea_branch: ${{ inputs.opea_branch }}
-    secrets: inherit
 
   run-examples:
-    needs: [get-test-matrix]   #[get-test-matrix, build-deploy-gmc]
-    if: always()
+    permissions:
+      actions: read
+      attestations: read
+      checks: read
+      discussions: read
+      models: read
+      repository-projects: read
+      id-token: write
+      contents: read
+      issues: write
+      pages: write
+      pull-requests: write
+      security-events: read
+    needs: [get-test-matrix, build-comps-base]
     strategy:
       matrix:
         example: ${{ fromJson(needs.get-test-matrix.outputs.examples) }}
@@ -110,7 +119,6 @@ jobs:
       build: ${{ fromJSON(inputs.build) }}
       test_compose: ${{ fromJSON(inputs.test_compose) }}
       test_helmchart: ${{ fromJSON(inputs.test_helmchart) }}
-      # test_gmc: ${{ fromJSON(inputs.test_gmc) }}
       opea_branch: ${{ inputs.opea_branch }}
       inject_commit: ${{ inputs.inject_commit }}
       use_model_cache: ${{ inputs.use_model_cache }}

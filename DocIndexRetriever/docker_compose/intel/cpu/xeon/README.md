@@ -2,7 +2,11 @@
 
 DocRetriever are the most widely adopted use case for leveraging the different methodologies to match user query against a set of free-text records. DocRetriever is essential to RAG system, which bridges the knowledge gap by dynamically fetching relevant information from external sources, ensuring that responses generated remain factual and current. The core of this architecture are vector databases, which are instrumental in enabling efficient and semantic retrieval of information. These databases store data as vectors, allowing RAG to swiftly access the most pertinent documents or data points based on semantic similarity.
 
-## 1. Build Images for necessary microservices. (Optional after docker image release)
+\_Note:
+
+As the related docker images were published to Docker Hub, you can ignore the below step 1 and 2， quick start from step 3.
+
+## 1. Build Images for necessary microservices. (Optional)
 
 - Embedding TEI Image
 
@@ -30,7 +34,7 @@ DocRetriever are the most widely adopted use case for leveraging the different m
   docker build -t opea/dataprep:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/dataprep/src/Dockerfile .
   ```
 
-## 2. Build Images for MegaService
+## 2. Build Images for MegaService (Optional)
 
 ```bash
 cd ..
@@ -43,22 +47,32 @@ docker build --no-cache -t opea/doc-index-retriever:latest --build-arg https_pro
 
 ```bash
 export host_ip="YOUR IP ADDR"
-export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
+export HF_TOKEN=${your_hf_api_token}
+```
+
+Set environment variables by
+
+```
+cd GenAIExamples/DocIndexRetriever/docker_compose/intel/cpu/xeon
+source set_env.sh
+```
+
+Note: set_env.sh will help to set all required variables. Please ensure all required variables like ports (LLM_SERVICE_PORT, MEGA_SERVICE_PORT, etc.) are set if not using defaults from the compose file.
+or Set environment variables manually
+
+```
 export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
 export RERANK_MODEL_ID="BAAI/bge-reranker-base"
 export TEI_EMBEDDING_ENDPOINT="http://${host_ip}:6006"
 export TEI_RERANKING_ENDPOINT="http://${host_ip}:8808"
-export TGI_LLM_ENDPOINT="http://${host_ip}:8008"
 export REDIS_URL="redis://${host_ip}:6379"
 export INDEX_NAME="rag-redis"
-export MEGA_SERVICE_HOST_IP=${host_ip}
 export EMBEDDING_SERVICE_HOST_IP=${host_ip}
 export RETRIEVER_SERVICE_HOST_IP=${host_ip}
 export RERANK_SERVICE_HOST_IP=${host_ip}
-export LLM_SERVICE_HOST_IP=${host_ip}
 export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8000/v1/retrievaltool"
 export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/ingest"
-cd GenAIExamples/DocIndexRetriever/intel/cpu/xoen/
+cd GenAIExamples/DocIndexRetriever/docker_compose/intel/cpu/xeon
 docker compose up -d
 ```
 
@@ -67,10 +81,18 @@ In that case, start Docker Containers with compose_without_rerank.yaml
 
 ```bash
 export host_ip="YOUR IP ADDR"
-export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
+export HF_TOKEN=${your_hf_api_token}
 export EMBEDDING_MODEL_ID="BAAI/bge-base-en-v1.5"
-cd GenAIExamples/DocIndexRetriever/intel/cpu/xoen/
+cd GenAIExamples/DocIndexRetriever/docker_compose/intel/cpu/xeon
 docker compose -f compose_without_rerank.yaml up -d
+```
+
+To run the DocRetriever with Rerank pipeline using the Milvus vector database, use the compose_milvus.yaml configuration file and set the MILVUS_HOST environment variable.
+
+```bash
+export MILVUS_HOST=${host_ip}
+cd GenAIExamples/DocIndexRetriever/docker_compose/intel/cpu/xeon
+docker compose -f compose_milvus.yaml up -d
 ```
 
 ## 4. Validation
@@ -92,9 +114,6 @@ Retrieval from KnowledgeBase
 curl http://${host_ip}:8889/v1/retrievaltool -X POST -H "Content-Type: application/json" -d '{
      "messages": "Explain the OPEA project?"
      }'
-
-# expected output
-{"id":"354e62c703caac8c547b3061433ec5e8","reranked_docs":[{"id":"06d5a5cefc06cf9a9e0b5fa74a9f233c","text":"Close SearchsearchMenu WikiNewsCommunity Daysx-twitter linkedin github searchStreamlining implementation of enterprise-grade Generative AIEfficiently integrate secure, performant, and cost-effective Generative AI workflows into business value.TODAYOPEA..."}],"initial_query":"Explain the OPEA project?"}
 ```
 
 **Note**: `messages` is the required field. You can also pass in parameters for the retriever and reranker in the request. The parameters that can changed are listed below.
@@ -123,7 +142,7 @@ curl http://${host_ip}:8889/v1/retrievaltool -X POST -H "Content-Type: applicati
    # embedding microservice
    curl http://${host_ip}:6000/v1/embeddings \
      -X POST \
-     -d '{"text":"Explain the OPEA project"}' \
+     -d '{"messages":"Explain the OPEA project"}' \
      -H 'Content-Type: application/json' > query
    docker container logs embedding-server
 

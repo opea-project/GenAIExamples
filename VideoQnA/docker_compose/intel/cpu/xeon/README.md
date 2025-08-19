@@ -4,47 +4,30 @@ This document outlines the deployment process for a videoqna application utilizi
 
 VideoQnA is a pipeline that retrieves video based on provided user prompt. It uses only the video embeddings to perform vector similarity search in Intel's VDMS vector database and performs all operations on Intel Xeon CPU. The pipeline supports long form videos and time-based search.
 
-## 🚀 Port used for the microservices
+## Table of Contents
 
-```
-dataprep
-========
-Port 6007 - Open to 0.0.0.0/0
+- [Port used for the microservices](#port-used-for-the-microservices)
+- [Build Docker Images](#build-docker-images)
+- [Start Microservices](#start-microservices)
+- [Validate Microservices](#validate-microservices)
+- [Launch the UI](#launch-the-ui)
+- [Clean Microservices](#clean-microservices)
 
-vdms-vector-db
-===============
-Port 8001 - Open to 0.0.0.0/0
+## Port used for the microservices
 
-embedding
-=========
-Port 6000 - Open to 0.0.0.0/0
+| Service                      | Port |
+| ---------------------------- | ---- |
+| dataprep                     | 6007 |
+| vdms-vector-db               | 8001 |
+| embedding                    | 6990 |
+| retriever                    | 7000 |
+| reranking                    | 8000 |
+| lvm video-llama              | 9009 |
+| lvm                          | 9399 |
+| videoqna-xeon-backend-server | 8888 |
+| videoqna-xeon-ui-server      | 5173 |
 
-retriever
-=========
-Port 7000 - Open to 0.0.0.0/0
-
-reranking
-=========
-Port 8000 - Open to 0.0.0.0/0
-
-lvm video-llama
-===============
-Port 9009 - Open to 0.0.0.0/0
-
-lvm
-===
-Port 9000 - Open to 0.0.0.0/0
-
-chaqna-xeon-backend-server
-==========================
-Port 8888 - Open to 0.0.0.0/0
-
-chaqna-xeon-ui-server
-=====================
-Port 5173 - Open to 0.0.0.0/0
-```
-
-## 🚀 Build Docker Images
+## Build Docker Images
 
 First of all, you need to build Docker Images locally and install the python package of it.
 
@@ -71,7 +54,7 @@ docker build -t opea/reranking:latest --build-arg https_proxy=$https_proxy --bui
 ### 4. Build LVM Image (Xeon)
 
 ```bash
-docker build -t opea/lvm-video-llama:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/lvms/src/integrations/dependency/video-llama/Dockerfile .
+docker build -t opea/lvm-video-llama:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/third_parties/video-llama/src/Dockerfile .
 
 # LVM Service Image
 docker build -t opea/lvm:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/lvms/src/Dockerfile .
@@ -106,19 +89,16 @@ docker build -t opea/videoqna-ui:latest --build-arg https_proxy=$https_proxy --b
 
 Then run the command `docker images`, you will have the following 8 Docker Images:
 
+1. `opea/embedding-multimodal-clip:latest`
+1. `opea/retriever:latest`
+1. `opea/reranking:latest`
+1. `opea/lvm-video-llama:latest`
+1. `opea/lvm:latest`
 1. `opea/dataprep:latest`
-2. `opea/embedding-multimodal-clip:latest`
-3. `opea/retriever:latest`
-4. `opea/reranking:latest`
-5. `opea/video-llama-lvm-server:latest`
-6. # `opea/lvm-video-llama:latest`
-7. `opea/reranking-tei:latest`
-8. `opea/lvm-video-llama:latest`
-9. `opea/lvm:latest`
-10. `opea/videoqna:latest`
-11. `opea/videoqna-ui:latest`
+1. `opea/videoqna:latest`
+1. `opea/videoqna-ui:latest`
 
-## 🚀 Start Microservices
+## Start Microservices
 
 ### Setup Environment Variables
 
@@ -128,51 +108,25 @@ Since the `compose.yaml` will consume some environment variables, you need to se
 
 > Change the `External_Public_IP` below with the actual IPV4 value
 
-```
+```bash
 export host_ip="External_Public_IP"
 ```
 
-**Export the value of your Huggingface API token to the `your_hf_api_token` environment variable**
+**Export the value of your Huggingface API token to the `HF_TOKEN` environment variable**
 
 > Change the `Your_Huggingface_API_Token` below with your actual Huggingface API Token value
 
-```
-export your_hf_api_token="Your_Huggingface_API_Token"
+```bash
+export HF_TOKEN="Your_Huggingface_API_Token"
 ```
 
 **Append the value of the public IP address to the no_proxy list**
 
-```
-export your_no_proxy="${your_no_proxy},${host_ip}"
-```
-
-Then you can run below commands or `source set_env.sh` to set all the variables
-
 ```bash
-export no_proxy=${your_no_proxy}
-export http_proxy=${your_http_proxy}
-export https_proxy=${your_http_proxy}
-export MEGA_SERVICE_HOST_IP=${host_ip}
-export EMBEDDING_SERVICE_HOST_IP=${host_ip}
-export RETRIEVER_SERVICE_HOST_IP=${host_ip}
-export RERANK_SERVICE_HOST_IP=${host_ip}
-export LVM_SERVICE_HOST_IP=${host_ip}
-
-export LVM_ENDPOINT="http://${host_ip}:9009"
-export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:8888/v1/videoqna"
-export BACKEND_HEALTH_CHECK_ENDPOINT="http://${host_ip}:8888/v1/health_check"
-export DATAPREP_SERVICE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/ingest"
-export DATAPREP_GET_FILE_ENDPOINT="http://${host_ip}:6007/v1/dataprep/get"
-export DATAPREP_GET_VIDEO_LIST_ENDPOINT="http://${host_ip}:6007/v1/dataprep/get_videos"
-
-export VDMS_HOST=${host_ip}
-export VDMS_PORT=8001
-export INDEX_NAME="mega-videoqna"
-export LLM_DOWNLOAD="True"
-export USECLIP=1
-
-export HUGGINGFACEHUB_API_TOKEN=${your_hf_api_token}
+export no_proxy="${your_no_proxy},${host_ip}"
 ```
+
+Then you can run `source set_env.sh` to set all the variables
 
 Note: Replace with `host_ip` with you external IP address, do not use localhost.
 
@@ -190,12 +144,13 @@ In the deploy steps, you need to start the VDMS DB and dataprep firstly, then in
 ```bash
 cd GenAIExamples/VideoQnA/docker_compose/intel/cpu/xeon/
 
-docker volume create video-llama-model
+docker volume create video-llama-
+docker volume create videoqna-cache
 docker compose up vdms-vector-db dataprep -d
-sleep 1m # wait for the services ready
+sleep 30s
 
 # Insert some sample data to the DB
-curl -X POST http://${host_ip}:6007/v1/dataprep/ingest \
+curl -X POST ${DATAPREP_INGEST_SERVICE_ENDPOINT} \
       -H "Content-Type: multipart/form-data" \
       -F "files=@./data/op_1_0320241830.mp4"
 
@@ -204,7 +159,7 @@ docker compose up -d
 # wait until all the services is up. The LVM server will download models, so it take ~1.5hr to get ready.
 ```
 
-### Validate Microservices
+## Validate Microservices
 
 1. Dataprep Microservice
 
@@ -212,11 +167,12 @@ docker compose up -d
 
    ```bash
    # Single file upload
-   curl -X POST ${DATAPREP_SERVICE_ENDPOINT} \
+   curl -X POST ${DATAPREP_INGEST_SERVICE_ENDPOINT} \
        -H "Content-Type: multipart/form-data" \
        -F "files=@./file1.mp4"
+
    # Multiple file upload
-   curl -X POST ${DATAPREP_SERVICE_ENDPOINT} \
+   curl -X POST ${DATAPREP_INGEST_SERVICE_ENDPOINT} \
        -H "Content-Type: multipart/form-data" \
        -F "files=@./file1.mp4" \
        -F "files=@./file2.mp4" \
@@ -228,6 +184,7 @@ docker compose up -d
    ```bash
    # List available videos
    curl -X 'GET' ${DATAPREP_GET_VIDEO_LIST_ENDPOINT} -H 'accept: application/json'
+
    # Download available video
    curl -X 'GET' ${DATAPREP_GET_FILE_ENDPOINT}/video_name.mp4 -H 'accept: application/json'
    ```
@@ -235,9 +192,9 @@ docker compose up -d
 2. Embedding Microservice
 
    ```bash
-   curl http://${host_ip}:6000/v1/embeddings \
+   curl ${EMBEDDING_ENDPOINT} \
        -X POST \
-       -d '{"text":"Sample text"}' \
+       -d '{"input":"What is the man doing?"}' \
        -H 'Content-Type: application/json'
    ```
 
@@ -251,16 +208,16 @@ docker compose up -d
 
    ```bash
    export your_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(512)]; print(embedding)")
-   curl http://${host_ip}:7000/v1/retrieval \
+   curl ${RETRIEVER_ENDPOINT} \
      -X POST \
-     -d "{\"text\":\"test\",\"embedding\":${your_embedding}}" \
+     -d "{\"text\":\"What is the man doing?\",\"embedding\":${your_embedding},\"search_type\":\"mmr\", \"k\":4}" \
      -H 'Content-Type: application/json'
    ```
 
 4. Reranking Microservice
 
    ```bash
-   curl http://${host_ip}:8000/v1/reranking \
+   curl ${RERANKING_ENDPOINT} \
      -X 'POST' \
      -H 'accept: application/json' \
      -H 'Content-Type: application/json' \
@@ -282,7 +239,7 @@ docker compose up -d
 
    ```bash
    curl -X POST \
-     "http://${host_ip}:9009/generate?video_url=silence_girl.mp4&start=0.0&duration=9&prompt=What%20is%20the%20person%20doing%3F&max_new_tokens=150" \
+     "${LVM_VIDEO_ENDPOINT}?video_url=silence_girl.mp4&start=0.0&duration=9&prompt=What%20is%20the%20person%20doing%3F&max_new_tokens=150" \
      -H "accept: */*" \
      -d ''
    ```
@@ -294,9 +251,9 @@ docker compose up -d
    This service depends on above LLM backend service startup. It will be ready after long time, to wait for them being ready in first startup.
 
    ```bash
-   curl http://${host_ip}:9000/v1/lvm\
+   curl http://${host_ip}:${LVM_PORT}/v1/lvm \
      -X POST \
-     -d '{"video_url":"https://github.com/DAMO-NLP-SG/Video-LLaMA/raw/main/examples/silence_girl.mp4","chunk_start": 0,"chunk_duration": 7,"prompt":"What is the person doing?","max_new_tokens": 50}' \
+     -d '{"video_url":"https://github.com/DAMO-NLP-SG/Video-LLaMA/raw/main/examples/silence_girl.mp4","chunk_start": 0,"chunk_duration": 7,"prompt":"What is the man doing?","max_new_tokens": 50}' \
      -H 'Content-Type: application/json'
    ```
 
@@ -305,7 +262,7 @@ docker compose up -d
 7. MegaService
 
    ```bash
-   curl http://${host_ip}:8888/v1/videoqna -H "Content-Type: application/json" -d '{
+   curl ${BACKEND_SERVICE_ENDPOINT} -H "Content-Type: application/json" -d '{
          "messages": "What is the man doing?",
          "stream": "True"
          }'
@@ -313,7 +270,7 @@ docker compose up -d
 
    > Note that the megaservice support only stream output.
 
-## 🚀 Launch the UI
+## Launch the UI
 
 To access the frontend, open the following URL in your browser: http://{host_ip}:5173. By default, the UI runs on port 5173 internally. If you prefer to use a different host port to access the frontend, you can modify the port mapping in the `compose.yaml` file as shown below:
 
@@ -343,4 +300,5 @@ To clean the volume:
 
 ```bash
 docker volume rm video-llama-model
+docker volume rm videoqna-cache
 ```

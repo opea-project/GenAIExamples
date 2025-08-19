@@ -1,0 +1,70 @@
+# Copyright (C) 2025 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+name: Build Comps Base Image
+
+permissions:
+  attestations: read
+  models: read
+  security-events: read
+
+on:
+  workflow_call:
+    inputs:
+      node:
+        required: true
+        type: string
+      build:
+        default: true
+        required: false
+        type: boolean
+      tag:
+        default: "latest"
+        required: false
+        type: string
+      opea_branch:
+        default: "main"
+        required: false
+        type: string
+      inject_commit:
+        default: false
+        required: false
+        type: boolean
+
+jobs:
+  pre-build-image-check:
+    runs-on: ubuntu-latest
+    outputs:
+      should_skip: ${{ steps.check-skip.outputs.should_skip }}
+    steps:
+      - name: Check if job should be skipped
+        id: check-skip
+        run: |
+          should_skip=true
+          if [[ "${{ inputs.node }}" == "gaudi" || "${{ inputs.node }}" == "xeon" ]]; then
+            should_skip=false
+          fi
+          echo "should_skip=$should_skip"
+          echo "should_skip=$should_skip" >> $GITHUB_OUTPUT
+
+  build-images:
+    needs: [ pre-build-image-check ]
+    if: ${{ needs.pre-build-image-check.outputs.should_skip == 'false' && fromJSON(inputs.build) }}
+    runs-on: "docker-build-${{ inputs.node }}"
+    steps:
+      - name: Clean Up Working Directory
+        run: sudo rm -rf ${{github.workspace}}/*
+
+      - name: Clone Required Repo
+        run: |
+          git clone --depth 1 --branch ${{ inputs.opea_branch }} https://github.com/opea-project/GenAIComps.git
+          cd GenAIComps && git rev-parse HEAD && cd ../ && ls -l
+
+      - name: Build Image
+        uses: opea-project/validation/actions/image-build@main
+        with:
+          work_dir: ${{ github.workspace }}/GenAIComps
+          docker_compose_path: ${{ github.workspace }}/GenAIComps/.github/workflows/docker/compose/base-compose.yaml
+          registry: ${OPEA_IMAGE_REPO}opea
+          inject_commit: ${{ inputs.inject_commit }}
+          tag: ${{ inputs.tag }}

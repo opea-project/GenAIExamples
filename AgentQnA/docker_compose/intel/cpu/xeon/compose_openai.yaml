@@ -6,7 +6,7 @@ services:
     image: opea/agent:latest
     container_name: rag-agent-endpoint
     volumes:
-      - ${TOOLSET_PATH}:/home/user/tools/
+      - ${TOOLSET_PATH:-../../../../tools}:/home/user/tools/
     ports:
       - "9095:9095"
     ipc: host
@@ -67,7 +67,7 @@ services:
       - worker-rag-agent
       - worker-sql-agent
     volumes:
-      - ${TOOLSET_PATH}:/home/user/tools/
+      - ${TOOLSET_PATH:-../../../../tools}:/home/user/tools/
     ports:
       - "9090:9090"
     ipc: host
@@ -92,4 +92,28 @@ services:
       LANGCHAIN_PROJECT: "opea-supervisor-agent-service"
       CRAG_SERVER: $CRAG_SERVER
       WORKER_AGENT_URL: $WORKER_AGENT_URL
+      SQL_AGENT_URL: $SQL_AGENT_URL
       port: 9090
+  mock-api:
+    image: docker.io/aicrowd/kdd-cup-24-crag-mock-api:v0
+    container_name: mock-api
+    ports:
+      - "8080:8000"
+    ipc: host
+  agent-ui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: agent-ui
+    ports:
+      - "5173:8080"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      OPENAI_API_KEYS: "empty"
+      OPENAI_API_BASE_URLS: ${SUPERVISOR_AGENT_ENDPOINT}
+      ENABLE_OLLAMA_API: False
+
+networks:
+  default:
+    driver: bridge

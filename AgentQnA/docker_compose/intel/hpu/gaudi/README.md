@@ -1,147 +1,221 @@
-# Single node on-prem deployment AgentQnA on Gaudi
+# Deploying AgentQnA on Intel® Gaudi® Processors
 
-This example showcases a hierarchical multi-agent system for question-answering applications. We deploy the example on Gaudi using open-source LLMs.
-For more details, please refer to the deployment guide [here](../../../../README.md).
+This document outlines the single node deployment process for a AgentQnA application utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservices on Intel Gaudi® server. The steps include pulling Docker images, container deployment via Docker Compose, and service execution using microservices `agent`.
 
-## Deployment with docker
+## Table of Contents
 
-1. First, clone this repo.
-   ```
-   export WORKDIR=<your-work-directory>
-   cd $WORKDIR
-   git clone https://github.com/opea-project/GenAIExamples.git
-   ```
-2. Set up environment for this example </br>
+1. [AgentQnA Quick Start Deployment](#agentqna-quick-start-deployment)
+2. [Configuration Parameters](#configuration-parameters)
+3. [AgentQnA Docker Compose Files](#agentqna-docker-compose-files)
+4. [Validate Services](#validate-services)
+5. [Interact with the agent system with UI](#interact-with-the-agent-system-with-ui)
+6. [Register other tools with the AI agent](#register-other-tools-with-the-ai-agent)
+7. [Conclusion](#conclusion)
 
-   ```
-   # Example: host_ip="192.168.1.1" or export host_ip="External_Public_IP"
-   export host_ip=$(hostname -I | awk '{print $1}')
-   # if you are in a proxy environment, also set the proxy-related environment variables
-   export http_proxy="Your_HTTP_Proxy"
-   export https_proxy="Your_HTTPs_Proxy"
-   # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
-   export no_proxy="Your_No_Proxy"
+## AgentQnA Quick Start Deployment
 
-   export TOOLSET_PATH=$WORKDIR/GenAIExamples/AgentQnA/tools/
-   # for using open-source llms
-   export HUGGINGFACEHUB_API_TOKEN=<your-HF-token>
-   # Example export HF_CACHE_DIR=$WORKDIR so that no need to redownload every time
-   export HF_CACHE_DIR=<directory-where-llms-are-downloaded>
+This section describes how to quickly deploy and test the AgentQnA service manually on an Intel® Gaudi® processor. The basic steps are:
 
-   ```
+1. [Access the Code](#access-the-code)
+2. [Configure the Deployment Environment](#configure-the-deployment-environment)
+3. [Deploy the Services Using Docker Compose](#deploy-the-services-using-docker-compose)
+4. [Ingest Data into the Vector Database](#ingest-data-into-the-vector-database)
+5. [Cleanup the Deployment](#cleanup-the-deployment)
 
-3. Deploy the retrieval tool (i.e., DocIndexRetriever mega-service)
+### Access the Code
 
-   First, launch the mega-service.
+Clone the GenAIExample repository and access the AgentQnA Intel® Gaudi® platform Docker Compose files and supporting scripts:
 
-   ```
-   cd $WORKDIR/GenAIExamples/AgentQnA/retrieval_tool
-   bash launch_retrieval_tool.sh
-   ```
-
-   Then, ingest data into the vector database. Here we provide an example. You can ingest your own data.
-
-   ```
-   bash run_ingest_data.sh
-   ```
-
-4. Prepare SQL database
-   In this example, we will use the Chinook SQLite database. Run the commands below.
-
-   ```
-   # Download data
-   cd $WORKDIR
-   git clone https://github.com/lerocha/chinook-database.git
-   cp chinook-database/ChinookDatabase/DataSources/Chinook_Sqlite.sqlite $WORKDIR/GenAIExamples/AgentQnA/tests/
-   ```
-
-5. Launch Tool service
-   In this example, we will use some of the mock APIs provided in the Meta CRAG KDD Challenge to demonstrate the benefits of gaining additional context from mock knowledge graphs.
-   ```
-   docker run -d -p=8080:8000 docker.io/aicrowd/kdd-cup-24-crag-mock-api:v0
-   ```
-6. Launch multi-agent system
-
-   On Gaudi2 we will serve `meta-llama/Meta-Llama-3.1-70B-Instruct` using vllm.
-
-   First build vllm-gaudi docker image.
-
-   ```bash
-   cd $WORKDIR
-   git clone https://github.com/vllm-project/vllm.git
-   cd ./vllm
-   git checkout v0.6.6
-   docker build --no-cache -f Dockerfile.hpu -t opea/vllm-gaudi:latest --shm-size=128g . --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy
-   ```
-
-   Then launch vllm on Gaudi2 with the command below.
-
-   ```bash
-   vllm_port=8086
-   model="meta-llama/Meta-Llama-3.1-70B-Instruct"
-   docker run -d --runtime=habana --rm --name "vllm-gaudi-server" -e HABANA_VISIBLE_DEVICES=0,1,2,3 -p $vllm_port:8000 -v $vllm_volume:/data -e HF_TOKEN=$HF_TOKEN -e HUGGING_FACE_HUB_TOKEN=$HF_TOKEN -e HF_HOME=/data -e OMPI_MCA_btl_vader_single_copy_mechanism=none -e PT_HPU_ENABLE_LAZY_COLLECTIVES=true -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e no_proxy=$no_proxy -e VLLM_SKIP_WARMUP=true --cap-add=sys_nice --ipc=host opea/vllm-gaudi:latest --model ${model} --max-seq-len-to-capture 16384 --tensor-parallel-size 4
-   ```
-
-   Then launch Agent microservices.
-
-   ```bash
-   cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/hpu/gaudi/
-   bash launch_agent_service_gaudi.sh
-   ```
-
-7. [Optional] Build `Agent` docker image if pulling images failed.
-
-   If docker image pulling failed in Step 6 above, build the agent docker image with the commands below. After image build, try Step 6 again.
-
-   ```
-   git clone https://github.com/opea-project/GenAIComps.git
-   cd GenAIComps
-   docker build -t opea/agent:latest -f comps/agent/src/Dockerfile .
-   ```
-
-## Validate services
-
-First look at logs of the agent docker containers:
-
+```bash
+export WORKDIR=<your-work-directory>
+cd $WORKDIR
+git clone https://github.com/opea-project/GenAIExamples.git
+cd GenAIExamples/AgentQnA
 ```
+
+To checkout a released version, such as v1.4:
+
+```bash
+git checkout v1.4
+```
+
+### Configure the Deployment Environment
+
+To set up environment variables for deploying AgentQnA services, set up some parameters specific to the deployment environment and source the `set_env.sh` script in this directory:
+
+```bash
+export host_ip="External_Public_IP"           # ip address of the node
+export HF_TOKEN="Your_HuggingFace_API_Token"  # the huggingface API token you applied
+export http_proxy="Your_HTTP_Proxy"           # http proxy if any
+export https_proxy="Your_HTTPs_Proxy"         # https proxy if any
+export no_proxy=localhost,127.0.0.1,$host_ip  # additional no proxies if needed
+```
+
+#### [Optional] OPENAI_API_KEY to use OpenAI models or Intel® AI for Enterprise Inference
+
+To use OpenAI models, generate a key following these [instructions](https://platform.openai.com/api-keys).
+
+To use a remote server running Intel® AI for Enterprise Inference, contact the cloud service provider or owner of the on-prem machine for a key to access the desired model on the server.
+
+Then set the environment variable `OPENAI_API_KEY` with the key contents:
+
+```bash
+export OPENAI_API_KEY=<your-openai-key>
+```
+
+#### Then, set up environment variables for the selected hardware using the corresponding `set_env.sh`
+
+```bash
+source $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/hpu/gaudi/set_env.sh
+```
+
+### Deploy the Services Using Docker Compose
+
+We make it convenient to launch the whole system with docker compose, which includes microservices for LLM, agents, UI, retrieval tool, vector database, dataprep, and telemetry. There are 3 docker compose files, which make it easy for users to pick and choose. Users can choose a different retrieval tool other than the `DocIndexRetriever` example provided in our GenAIExamples repo. Users can choose not to launch the telemetry containers.
+
+On Gaudi, `meta-llama/Meta-Llama-3.3-70B-Instruct` will be served using vllm. The command below will launch the multi-agent system with the `DocIndexRetriever` as the retrieval tool for the Worker RAG agent.
+
+```bash
+cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/hpu/gaudi/
+docker compose -f $WORKDIR/GenAIExamples/DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml -f compose.yaml up -d
+```
+
+> **Note**: To enable the web search tool, skip this step and proceed to the "[Optional] Web Search Tool Support" section.
+
+To enable Open Telemetry Tracing, compose.telemetry.yaml file need to be merged along with default compose.yaml file.
+Gaudi example with Open Telemetry feature:
+
+```bash
+cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/hpu/gaudi/
+docker compose -f $WORKDIR/GenAIExamples/DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml -f compose.yaml -f compose.telemetry.yaml up -d
+```
+
+#### [Optional] Web Search Tool Support
+
+<details>
+<summary> Instructions </summary>
+A web search tool is supported in this example and can be enabled by running docker compose with the `compose.webtool.yaml` file.
+The Google Search API is used. Follow the [instructions](https://python.langchain.com/docs/integrations/tools/google_search) to create an API key and enable the Custom Search API on a Google account. The environment variables `GOOGLE_CSE_ID` and `GOOGLE_API_KEY` need to be set.
+
+```bash
+cd $WORKDIR/GenAIExamples/AgentQnA/docker_compose/intel/hpu/gaudi/
+export GOOGLE_CSE_ID="YOUR_ID"
+export GOOGLE_API_KEY="YOUR_API_KEY"
+docker compose -f $WORKDIR/GenAIExamples/DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml -f compose.yaml -f compose.webtool.yaml up -d
+```
+
+</details>
+
+#### Build image from source
+
+Please refer to the table below to build different microservices from source:
+
+| Microservice | Deployment Guide                                                                                                                                 |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Agent        | [Agent build guide](https://github.com/opea-project/GenAIComps/blob/main/comps/agent/src/README.md#21-build-docker-image-for-agent-microservice) |
+| UI           | [Basic UI build guide](../../../../README_miscellaneous.md#build-ui-docker-image)                                                                |
+
+### Ingest Data into the Vector Database
+
+The `run_ingest_data.sh` script will use an example jsonl file to ingest example documents into a vector database. Other ways to ingest data and other types of documents supported can be found in the OPEA dataprep microservice located in the opea-project/GenAIComps repo.
+
+```bash
+cd  $WORKDIR/GenAIExamples/AgentQnA/retrieval_tool/
+bash run_ingest_data.sh
+```
+
+> **Note**: This is a one-time operation.
+
+### Cleanup the Deployment
+
+To stop the containers associated with the deployment, execute the following command:
+
+```bash
+# for OpenAI Models
+docker compose -f compose_openai.yaml down
+# for Models on Remote Server
+docker compose -f compose_remote.yaml down
+```
+
+## Configuration Parameters
+
+Key parameters are configured via environment variables set before running `docker compose up`.
+
+| Environment Variable                    | Description                                                                               | Default (Set Externally)                        |
+| :-------------------------------------- | :---------------------------------------------------------------------------------------- | :---------------------------------------------- |
+| `ip_address`                            | External IP address of the host machine. **Required.**                                    | `your_external_ip_address`                      |
+| `OPENAI_API_KEY`                        | Your OpenAI API key for model access. **Required.**                                       | `your_openai_api_key`                           |
+| `model`                                 | Hugging Face model ID for the AgentQnA LLM. Configured within `compose.yaml` environment. | `gpt-4o-mini-2024-07-18`                        |
+| `TOOLSET_PATH`                          | Local path to the tool Yaml file. Configured in `compose.yaml`.                           | `$WORKDIR/GenAIExamples/AgentQnA/tools/`        |
+| `CRAG_SERVER`                           | CRAG server URL. Derived from `ip_address` and port `8080`.                               | `http://${ip_address}:8080`                     |
+| `WORKER_AGENT_URL`                      | Worker agent URL. Derived from `ip_address` and port `9095`.                              | `http://${ip_address}:9095/v1/chat/completions` |
+| `SQL_AGENT_URL`                         | SQL agent URL. Derived from `ip_address` and port `9096`.                                 | `http://${ip_address}:9096/v1/chat/completions` |
+| `http_proxy` / `https_proxy`/`no_proxy` | Network proxy settings (if required).                                                     | `""`                                            |
+
+## AgentQnA Docker Compose Files
+
+In the context of deploying a AgentQnA pipeline on an Intel® Gaudi® platform, we can pick and choose different large language model serving frameworks. The table below outlines the various configurations that are available as part of the application. These configurations can be used as templates and can be extended to different components available in [GenAIComps](https://github.com/opea-project/GenAIComps.git).
+
+| File                                               | Description                                                         |
+| -------------------------------------------------- | ------------------------------------------------------------------- |
+| [compose.yaml](./compose.yaml)                     | Default compose file using vLLM as the serving framework            |
+| [compose.webtool.yaml](./compose.webtool.yaml)     | This compose file is used to start a supervisor agent with webtools |
+| [compose.telemetry.yaml](./compose.telemetry.yaml) | This compose file is used to enable telemetry related services      |
+
+## Validate Services
+
+1. First look at logs for each of the agent docker containers:
+
+```bash
 # worker RAG agent
 docker logs rag-agent-endpoint
 
 # worker SQL agent
 docker logs sql-agent-endpoint
-```
 
-```
 # supervisor agent
 docker logs react-agent-endpoint
 ```
 
-You should see something like "HTTP server setup successful" if the docker containers are started successfully.</p>
+Look for the message "HTTP server setup successful" to confirm the agent docker container has started successfully.</p>
 
-Second, validate worker RAG agent:
+2. Use python to validate each agent is working properly:
 
-```
-curl http://${host_ip}:9095/v1/chat/completions -X POST -H "Content-Type: application/json" -d '{
-     "messages": "Michael Jackson song Thriller"
-    }'
-```
+```bash
+# RAG worker agent
+python $WORKDIR/GenAIExamples/AgentQnA/tests/test.py --prompt "Tell me about Michael Jackson song Thriller" --agent_role "worker" --ext_port 9095
 
-Third, validate worker SQL agent:
+# SQL agent
+python $WORKDIR/GenAIExamples/AgentQnA/tests/test.py --prompt "How many employees in company" --agent_role "worker" --ext_port 9096
 
-```
-curl http://${host_ip}:9095/v1/chat/completions -X POST -H "Content-Type: application/json" -d '{
-     "messages": "How many employees are in the company?"
-    }'
+# supervisor agent: this will test a two-turn conversation
+python $WORKDIR/GenAIExamples/AgentQnA/tests/test.py --agent_role "supervisor" --ext_port 9090
 ```
 
-Finally, validate supervisor agent:
+## Interact with the agent system with UI
 
-```
-curl http://${host_ip}:9090/v1/chat/completions -X POST -H "Content-Type: application/json" -d '{
-     "messages": "How many albums does Iron Maiden have?"
-    }'
-```
+The UI microservice is launched in the previous step with the other microservices.
+To see the UI, open a web browser to `http://${ip_address}:5173` to access the UI. Note the `ip_address` here is the host IP of the UI microservice.
 
-## How to register your own tools with agent
+1. Click on the arrow above `Get started`. Create an admin account with a name, email, and password.
+2. Add an OpenAI-compatible API endpoint. In the upper right, click on the circle button with the user's initial, go to `Admin Settings`->`Connections`. Under `Manage OpenAI API Connections`, click on the `+` to add a connection. Fill in these fields:
 
-You can take a look at the tools yaml and python files in this example. For more details, please refer to the "Provide your own tools" section in the instructions [here](https://github.com/opea-project/GenAIComps/tree/main/comps/agent/src/README.md).
+- **URL**: `http://${ip_address}:9090/v1`, do not forget the `v1`
+- **Key**: any value
+- **Model IDs**: any name i.e. `opea-agent`, then press `+` to add it
+
+Click "Save".
+
+![opea-agent-setting](../../../../assets/img/opea-agent-setting.png)
+
+3. Test OPEA agent with UI. Return to `New Chat` and ensure the model (i.e. `opea-agent`) is selected near the upper left. Enter in any prompt to interact with the agent.
+
+![opea-agent-test](../../../../assets/img/opea-agent-test.png)
+
+## Register other tools with the AI agent
+
+The [tools](../../../../tools) folder contains YAML and Python files for additional tools for the supervisor and worker agents. Refer to the "Provide your own tools" section in the instructions [here](https://github.com/opea-project/GenAIComps/tree/main/comps/agent/src/README.md) to add tools and customize the AI agents.
+
+## Conclusion
+
+This guide provides a comprehensive workflow for deploying, configuring, and validating the AgentQnA system on Intel® Gaudi® processors, enabling flexible integration with both OpenAI-compatible and remote LLM services.

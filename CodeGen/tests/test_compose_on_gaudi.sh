@@ -1,4 +1,4 @@
-
+#!/bin/bashs
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
@@ -14,50 +14,43 @@ export MODEL_CACHE=${model_cache:-"./data"}
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
-
+source $WORKPATH/docker_compose/intel/set_env.sh
 function build_docker_images() {
     opea_branch=${opea_branch:-"main"}
-    # If the opea_branch isn't main, replace the git clone branch in Dockerfile.
-    if [[ "${opea_branch}" != "main" ]]; then
-        cd $WORKPATH
-        OLD_STRING="RUN git clone --depth 1 https://github.com/opea-project/GenAIComps.git"
-        NEW_STRING="RUN git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git"
-        find . -type f -name "Dockerfile*" | while read -r file; do
-            echo "Processing file: $file"
-            sed -i "s|$OLD_STRING|$NEW_STRING|g" "$file"
-        done
-    fi
 
     cd $WORKPATH/docker_image_build
     git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
+    pushd GenAIComps
+    echo "GenAIComps test commit is $(git rev-parse HEAD)"
+    docker build --no-cache -t ${REGISTRY}/comps-base:${TAG} --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
+    popd && sleep 1s
+
+    # Download Gaudi vllm of latest tag
+    git clone https://github.com/HabanaAI/vllm-fork.git && cd vllm-fork
+    VLLM_FORK_VER=v0.6.6.post1+Gaudi-1.20.0
+    echo "Check out vLLM tag ${VLLM_FORK_VER}"
+    git checkout ${VLLM_FORK_VER} &> /dev/null && cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="codegen codegen-ui llm-textgen"
+    service_list="codegen codegen-gradio-ui llm-textgen vllm-gaudi dataprep retriever embedding"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
-    docker pull ghcr.io/huggingface/tgi-gaudi:2.0.6
     docker images && sleep 1s
 }
 
 function start_services() {
-    cd $WORKPATH/docker_compose/intel/hpu/gaudi
-    export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
-    export TGI_LLM_ENDPOINT="http://${ip_address}:8028"
-    export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
-    export MEGA_SERVICE_HOST_IP=${ip_address}
-    export LLM_SERVICE_HOST_IP=${ip_address}
-    export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:7778/v1/codegen"
-    export host_ip=${ip_address}
+    local compose_file="$1"
+    local llm_container_name="$2"
 
-    sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
+    cd $WORKPATH/docker_compose/intel/hpu/gaudi
 
     # Start Docker Containers
-    docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
+    docker compose -f ${compose_file} up -d | tee ${LOG_PATH}/start_services_with_compose.log
 
     n=0
     until [[ "$n" -ge 100 ]]; do
-        docker logs tgi-gaudi-server > ${LOG_PATH}/tgi_service_start.log
-        if grep -q Connected ${LOG_PATH}/tgi_service_start.log; then
+        docker logs ${llm_container_name} > ${LOG_PATH}/llm_service_start.log 2>&1
+        if grep -E "Connected|complete" ${LOG_PATH}/llm_service_start.log; then
             break
         fi
         sleep 5s
@@ -72,35 +65,48 @@ function validate_services() {
     local DOCKER_NAME="$4"
     local INPUT_DATA="$5"
 
-    local HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL")
-    if [ "$HTTP_STATUS" -eq 200 ]; then
-        echo "[ $SERVICE_NAME ] HTTP status is 200. Checking content..."
+    if [[ "$SERVICE_NAME" == "ingest" ]]; then
+        local HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST -F "$INPUT_DATA" -F index_name=test_redis -H 'Content-Type: multipart/form-data' "$URL")
 
-        local CONTENT=$(curl -s -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL" | tee ${LOG_PATH}/${SERVICE_NAME}.log)
-
-        if echo "$CONTENT" | grep -q "$EXPECTED_RESULT"; then
-            echo "[ $SERVICE_NAME ] Content is as expected."
+        if [ "$HTTP_STATUS" -eq 200 ]; then
+            echo "[ $SERVICE_NAME ] HTTP status is 200. Data preparation succeeded..."
         else
-            echo "[ $SERVICE_NAME ] Content does not match the expected result: $CONTENT"
+            echo "[ $SERVICE_NAME ] Data preparation failed..."
+        fi
+
+    else
+        local HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL")
+        if [ "$HTTP_STATUS" -eq 200 ]; then
+            echo "[ $SERVICE_NAME ] HTTP status is 200. Checking content..."
+
+            local CONTENT=$(curl -s -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL" | tee ${LOG_PATH}/${SERVICE_NAME}.log)
+
+            if echo "$CONTENT" | grep -q "$EXPECTED_RESULT"; then
+                echo "[ $SERVICE_NAME ] Content is as expected."
+            else
+                echo "[ $SERVICE_NAME ] Content does not match the expected result: $CONTENT"
+                docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
+                exit 1
+            fi
+        else
+            echo "[ $SERVICE_NAME ] HTTP status is not 200. Received status was $HTTP_STATUS"
             docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
             exit 1
         fi
-    else
-        echo "[ $SERVICE_NAME ] HTTP status is not 200. Received status was $HTTP_STATUS"
-        docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
-        exit 1
     fi
     sleep 5s
 }
 
 function validate_microservices() {
+    local llm_container_name="$1"
+
     # tgi for llm service
     validate_services \
-        "${ip_address}:8028/generate" \
-        "generated_text" \
-        "tgi-llm" \
-        "tgi-gaudi-server" \
-        '{"inputs":"def print_hello_world():","parameters":{"max_new_tokens":256, "do_sample": true}}'
+        "${ip_address}:8028/v1/chat/completions" \
+        "completion_tokens" \
+        "llm-service" \
+        "${llm_container_name}" \
+        '{"model": "Qwen/Qwen2.5-Coder-7B-Instruct", "messages": [{"role": "user", "content": "def print_hello_world():"}], "max_tokens": 256}'
 
     # llm microservice
     validate_services \
@@ -109,6 +115,14 @@ function validate_microservices() {
         "llm" \
         "llm-textgen-gaudi-server" \
         '{"query":"def print_hello_world():"}'
+
+    # Data ingest microservice
+    validate_services \
+        "${ip_address}:6007/v1/dataprep/ingest" \
+        "Data preparation succeeded" \
+        "ingest" \
+        "dataprep-redis-server" \
+        'link_list=["https://modin.readthedocs.io/en/latest/index.html"]'
 
 }
 
@@ -120,6 +134,21 @@ function validate_megaservice() {
         "mega-codegen" \
         "codegen-gaudi-backend-server" \
         '{"messages": "def print_hello_world():"}'
+
+    # Curl the Mega Service with index_name and agents_flag
+    validate_services \
+        "${ip_address}:7778/v1/codegen" \
+        "" \
+        "mega-codegen" \
+        "codegen-gaudi-backend-server" \
+        '{ "index_name": "test_redis", "agents_flag": "True", "messages": "def print_hello_world():", "max_tokens": 256}'
+
+    validate_services \
+        "${ip_address}:7778/v1/codegen" \
+        "class" \
+        "mega-codegen" \
+        "codegen-xeon-backend-server" \
+        '{"model": "Qwen/Qwen2.5-Coder-7B-Instruct", "messages": [{"role": "user", "content": "Implement a basic Python class"}], "max_tokens":32}'
 
 }
 
@@ -151,25 +180,75 @@ function validate_frontend() {
     fi
 }
 
+function validate_gradio() {
+    local URL="http://${ip_address}:5173/health"
+    local HTTP_STATUS=$(curl "$URL")
+    local SERVICE_NAME="Gradio"
+
+    if [ "$HTTP_STATUS" = '{"status":"ok"}' ]; then
+        echo "[ $SERVICE_NAME ] HTTP status is 200. UI server is running successfully..."
+    else
+        echo "[ $SERVICE_NAME ] UI server has failed..."
+    fi
+}
+
 function stop_docker() {
+    local compose_file="$1"
+
     cd $WORKPATH/docker_compose/intel/hpu/gaudi
-    docker compose stop && docker compose rm -f
+    docker compose -f ${compose_file} down
 }
 
 function main() {
+    # all docker docker compose compose files for XEON Platform
+    docker_compose_files=("compose.yaml" "compose_tgi.yaml")
+    docker_llm_container_names=("vllm-gaudi-server" "tgi-gaudi-server")
 
-    stop_docker
+    # get number of compose files and container
+    len_compose_files=${#docker_compose_files[@]}
+    len_containers=${#docker_llm_container_names[@]}
 
+    # number of compose files and docker container names must be matched
+    if [ ${len_compose_files} -ne ${len_containers} ]; then
+        echo "Error: number of docker compose files ${len_compose_files} and container names ${len_containers} mismatched"
+        exit 1
+    fi
+
+    # stop_docker, stop all compose files
+    for ((i = 0; i < len_compose_files; i++)); do
+        stop_docker "${docker_compose_files[${i}]}"
+    done
+
+    echo "::group::build_docker_images"
     if [[ "$IMAGE_REPO" == "opea" ]]; then build_docker_images; fi
-    start_services
+    echo "::endgroup::"
 
-    validate_microservices
-    validate_megaservice
-    validate_frontend
+    # loop all compose files
+    for ((i = 0; i < len_compose_files; i++)); do
+        echo "Process [${i}]: ${docker_compose_files[$i]}, ${docker_llm_container_names[${i}]}"
 
-    stop_docker
-    echo y | docker system prune
+        echo "::group::start_services"
+        start_services "${docker_compose_files[${i}]}" "${docker_llm_container_names[${i}]}"
+        echo "::endgroup::"
+        docker ps -a
 
+        echo "::group::validate_microservices"
+        validate_microservices "${docker_llm_container_names[${i}]}"
+        echo "::endgroup::"
+
+        echo "::group::validate_megaservice"
+        validate_megaservice
+        echo "::endgroup::"
+
+        echo "::group::validate_gradio"
+        validate_gradio
+        echo "::endgroup::"
+
+        stop_docker "${docker_compose_files[${i}]}"
+        sleep 5s
+    done
+
+    docker system prune -f
 }
 
 main

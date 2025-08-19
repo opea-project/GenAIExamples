@@ -1,0 +1,50 @@
+.modal {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  max-width: 400px;
+  width: 100%;
+  padding: 0;
+  min-width: 300px;
+  z-index: 9999;
+
+  :global {
+    #modal-modal-title {
+      padding: 0.75rem 1rem;
+      font-weight: 600;
+      font-size: 0.8rem;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    #modal-modal-description {
+      padding: 1.5rem 1rem 1rem;
+      margin-top: -1rem;
+
+      .MuiFormControlLabel-label,
+      .MuiTypography-root {
+        font-weight: 300;
+        font-size: 0.8rem;
+        margin-top: 0.5rem;
+      }
+
+      .MuiBox-root {
+        align-items: flex-start;
+      }
+
+      .MuiButton-root {
+        padding: 5px 10px;
+
+        + .MuiButton-root {
+          margin-left: 0.5rem;
+        }
+      }
+    }
+    button {
+      padding: 0;
+    }
+  }
+}

@@ -1,0 +1,94 @@
+* {
+  box-sizing: border-box;
+  outline: none !important;
+}
+
+html,
+body,
+#app {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  font-family: var(--body-font-family);
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  background-color: var(--bg-main-color);
+  font-size: 14px;
+  color: var(--font-text-color);
+  overflow: hidden;
+  position: relative;
+}
+
+h1,
+p {
+  margin: 0;
+  padding: 0;
+}
+div[aria-hidden="true"] {
+  display: none !important;
+}
+.layout-container {
+  width: 100%;
+  height: 100%;
+
+  .layout-header {
+    position: relative;
+    z-index: 10;
+    background-color: var(--bg-content-color);
+    box-shadow: 0px 1px 2px 0px var(--bg-box-shadow);
+  }
+
+  .layout-main {
+    overflow: hidden;
+    width: 100%;
+
+    .layout-view {
+      margin: 0 auto;
+    }
+  }
+}
+
+.w100 {
+  width: 100% !important;
+}
+
+.h100 {
+  height: 100% !important;
+}
+
+.vh100 {
+  height: 100vh !important;
+}
+
+.max100vh {
+  max-height: 100vh !important;
+}
+
+.min100vh {
+  min-height: 100vh !important;
+}
+
+// 滚动条凹槽的颜色，还可以设置边框属性
+&::-webkit-scrollbar-track-piece {
+  background-color: var(--bg-scrollbar);
+}
+
+// 滚动条的宽度
+&::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+// 滚动条的设置
+&::-webkit-scrollbar-thumb {
+  background-color: var(--color-scrollbar);
+  background-clip: padding-box;
+  min-height: 28px;
+  border-radius: 3px;
+}
+
+&::-webkit-scrollbar-thumb:hover {
+  background-color: var(--bg-scrollbar-hover);
+}

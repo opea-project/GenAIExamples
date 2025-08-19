@@ -1,42 +1,150 @@
-# Build and deploy Translation Application on AMD GPU (ROCm)
+# Example Translation Deployment on AMD GPU (ROCm)
 
-## Build images
+This document outlines the deployment process for a Translation service utilizing the [GenAIComps](https://github.com/opea-project/GenAIComps.git) microservice pipeline on AMD GPU (ROCm). This example includes the following sections:
 
-### Build the LLM Docker Image
+- [Translation Quick Start Deployment](#translation-quick-start-deployment): Demonstrates how to quickly deploy a Translation service/pipeline on AMD GPU (ROCm).
+- [Translation Docker Compose Files](#translation-docker-compose-files): Describes some example deployments and their docker compose files.
+- [Translation Service Configuration](#translation-service-configuration): Describes the service and possible configuration changes.
 
-```bash
-### Cloning repo
-git clone https://github.com/opea-project/GenAIComps.git
-cd GenAIComps
+## Translation Quick Start Deployment
 
-### Build Docker image
-docker build -t opea/llm-textgen:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f comps/llms/src/text-generation/Dockerfile .
+This section describes how to quickly deploy and test the Translation service manually on AMD GPU (ROCm). The basic steps are:
+
+1. [Access the Code](#access-the-code)
+2. [Generate a HuggingFace Access Token](#generate-a-huggingface-access-token)
+3. [Configure the Deployment Environment](#configure-the-deployment-environment)
+4. [Deploy the Service Using Docker Compose](#deploy-the-service-using-docker-compose)
+5. [Check the Deployment Status](#check-the-deployment-status)
+6. [Test the Pipeline](#test-the-pipeline)
+7. [Cleanup the Deployment](#cleanup-the-deployment)
+
+### Access the Code
+
+Clone the GenAIExample repository and access the Translation AMD GPU (ROCm) Docker Compose files and supporting scripts:
+
+```
+git clone https://github.com/opea-project/GenAIExamples.git
+cd GenAIExamples/Translation/docker_compose/amd/gpu/rocm/
 ```
 
-### Build the MegaService Docker Image
+Checkout a released version, such as v1.3:
 
-```bash
-### Cloning repo
-git clone https://github.com/opea-project/GenAIExamples
-cd GenAIExamples/Translation/
-
-### Build Docker image
-docker build -t opea/translation:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
+```
+git checkout v1.3
 ```
 
-### Build the UI Docker Image
+### Generate a HuggingFace Access Token
 
-```bash
-cd GenAIExamples/Translation/ui
-### Build UI Docker image
-docker build -t opea/translation-ui:latest --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f docker/Dockerfile .
+Some HuggingFace resources, such as some models, are only accessible if you have an access token. If you do not already have a HuggingFace access token, you can create one by first creating an account by following the steps provided at [HuggingFace](https://huggingface.co/) and then generating a [user access token](https://huggingface.co/docs/transformers.js/en/guides/private#step-1-generating-a-user-access-token).
+
+### Configure the Deployment Environment
+
+To set up environment variables for deploying Translation service, source the _set_env.sh_ or _set_env_vllm.sh_ script in this directory:
+
+```
+//with TGI:
+source ./set_env.sh
 ```
 
-## Deploy Translation Application
+```
+//with VLLM:
+source ./set_env_vllm.sh
+```
 
-### Features of Docker compose for AMD GPUs
+The _set_env.sh_ script will prompt for required and optional environment variables used to configure the Translation service based on TGI. The _set_env_vllm.sh_ script will prompt for required and optional environment variables used to configure the Translation service based on VLLM. If a value is not entered, the script will use a default value for the same. It will also generate a _.env_ file defining the desired configuration. Consult the section on [Translation Service configuration](#translation-service-configuration) for information on how service specific configuration parameters affect deployments.
 
-1. Added forwarding of GPU devices to the container TGI service with instructions:
+### Deploy the Service Using Docker Compose
+
+To deploy the Translation service, execute the `docker compose up` command with the appropriate arguments. For a default deployment, execute:
+
+```bash
+//with TGI:
+docker compose -f compose.yaml up -d
+```
+
+```bash
+//with VLLM:
+docker compose -f compose_vllm.yaml up -d
+```
+
+The Translation docker images should automatically be downloaded from the `OPEA registry` and deployed on the AMD GPU (ROCm)
+
+### Check the Deployment Status
+
+After running docker compose, check if all the containers launched via docker compose have started:
+
+```
+docker ps -a
+```
+
+For the default deployment, the following 5 containers should be running.
+
+### Test the Pipeline
+
+Once the Translation service are running, test the pipeline using the following command:
+
+```bash
+DATA='{"language_from": "Chinese","language_to": "English","source_language": "我爱机器翻译。"}'
+
+curl http://${HOST_IP}:${TRANSLATION_LLM_SERVICE_PORT}/v1/translation  \
+  -d "$DATA" \
+  -H 'Content-Type: application/json'
+```
+
+Checking the response from the service. The response should be similar to JSON:
+
+```textmate
+data: {"id":"","choices":[{"finish_reason":"","index":0,"logprobs":null,"text":" I"}],"created":1743062099,"model":"haoranxu/ALMA-13B","object":"text_completion","system_fingerprint":"2.3.1-sha-a094729-rocm","usage":null}
+
+data: {"id":"","choices":[{"finish_reason":"","index":0,"logprobs":null,"text":" love"}],"created":1743062099,"model":"haoranxu/ALMA-13B","object":"text_completion","system_fingerprint":"2.3.1-sha-a094729-rocm","usage":null}
+
+data: {"id":"","choices":[{"finish_reason":"","index":0,"logprobs":null,"text":" machine"}],"created":1743062099,"model":"haoranxu/ALMA-13B","object":"text_completion","system_fingerprint":"2.3.1-sha-a094729-rocm","usage":null}
+
+data: {"id":"","choices":[{"finish_reason":"","index":0,"logprobs":null,"text":" translation"}],"created":1743062099,"model":"haoranxu/ALMA-13B","object":"text_completion","system_fingerprint":"2.3.1-sha-a094729-rocm","usage":null}
+
+data: {"id":"","choices":[{"finish_reason":"","index":0,"logprobs":null,"text":"."}],"created":1743062099,"model":"haoranxu/ALMA-13B","object":"text_completion","system_fingerprint":"2.3.1-sha-a094729-rocm","usage":null}
+
+data: {"id":"","choices":[{"finish_reason":"eos_token","index":0,"logprobs":null,"text":"</s>"}],"created":1743062099,"model":"haoranxu/ALMA-13B","object":"text_completion","system_fingerprint":"2.3.1-sha-a094729-rocm","usage":{"completion_tokens":6,"prompt_tokens":3071,"total_tokens":3077,"completion_tokens_details":null,"prompt_tokens_details":null}}
+
+data: [DONE]
+```
+
+**Note** The value of _host_ip_ was set using the _set_env.sh_ script and can be found in the _.env_ file.
+
+### Cleanup the Deployment
+
+To stop the containers associated with the deployment, execute the following command:
+
+```
+//with TGI:
+docker compose -f compose.yaml down
+```
+
+```bash
+//with VLLM:
+docker compose -f compose_vllm.yaml up -d
+```
+
+All the Translation containers will be stopped and then removed on completion of the "down" command.
+
+## Translation Docker Compose Files
+
+The compose.yaml is default compose file using tgi as serving framework
+
+| Service Name               | Image Name                                               |
+| -------------------------- | -------------------------------------------------------- |
+| translation-tgi-service    | ghcr.io/huggingface/text-generation-inference:2.4.1-rocm |
+| translation-llm            | opea/llm-textgen:latest                                  |
+| translation-backend-server | opea/translation:latest                                  |
+| translation-ui-server      | opea/translation-ui:latest                               |
+| translation-nginx-server   | opea/nginx:latest                                        |
+
+## Translation Service Configuration for AMD GPUs
+
+To enable GPU support for AMD GPUs, the following configuration is added to the Docker Compose file:
+
+- compose_vllm.yaml - for vLLM-based service
+- compose.yaml - for TGI-based
 
 ```yaml
 shm_size: 1g
@@ -51,16 +159,14 @@ security_opt:
   - seccomp:unconfined
 ```
 
-In this case, all GPUs are thrown. To reset a specific GPU, you need to use specific device names cardN and renderN.
-
-For example:
+This configuration forwards all available GPUs to the container. To use a specific GPU, specify its `cardN` and `renderN` device IDs. For example:
 
 ```yaml
 shm_size: 1g
 devices:
   - /dev/kfd:/dev/kfd
   - /dev/dri/card0:/dev/dri/card0
-  - /dev/dri/render128:/dev/dri/render128
+  - /dev/dri/renderD128:/dev/dri/renderD128
 cap_add:
   - SYS_PTRACE
 group_add:
@@ -69,60 +175,16 @@ security_opt:
   - seccomp:unconfined
 ```
 
-To find out which GPU device IDs cardN and renderN correspond to the same GPU, use the GPU driver utility
+The table provides a comprehensive overview of the Translation service utilized across various deployments as illustrated in the example Docker Compose files. Each row in the table represents a distinct service, detailing its possible images used to enable it and a concise description of its function within the deployment architecture.
 
-### Go to the directory with the Docker compose file
+| Service Name               | Possible Image Names                                     | Optional | Description                                                                                         |
+| -------------------------- | -------------------------------------------------------- | -------- | --------------------------------------------------------------------------------------------------- |
+| translation-tgi-service    | ghcr.io/huggingface/text-generation-inference:2.4.1-rocm | No       | Specific to the TGI deployment, focuses on text generation inference using AMD GPU (ROCm) hardware. |
+| translation-vllm-service   | opea/vllm-rocm:latest                                    | No       | Handles large language model (LLM) tasks, utilizing AMD GPU (ROCm) hardware.                        |
+| translation-llm            | opea/llm-textgen:latest                                  | No       | Handles large language model (LLM) tasks                                                            |
+| translation-backend-server | opea/translation:latest                                  | No       | Serves as the backend for the Translation service, with variations depending on the deployment.     |
+| translation-ui-server      | opea/translation-ui:latest                               | No       | Provides the user interface for the Translation service.                                            |
+| translation-nginx-server   | opea/nginx:latest                                        | No       | A cts as a reverse proxy, managing traffic between the UI and backend services.                     |
 
-```bash
-cd GenAIExamples/Translation/docker_compose/amd/gpu/rocm
-```
-
-### Set environments
-
-In the file "GenAIExamples/Translation/docker_compose/amd/gpu/rocm/set_env.sh " it is necessary to set the required values. Parameter assignments are specified in the comments for each variable setting command
-
-```bash
-chmod +x set_env.sh
-. set_env.sh
-```
-
-### Run services
-
-```
-docker compose up -d
-```
-
-# Validate the MicroServices and MegaService
-
-## Validate TGI service
-
-```bash
-curl http://${TRANSLATION_HOST_IP}:${TRANSLATIONS_TGI_SERVICE_PORT}/generate \
-  -X POST \
-  -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}' \
-  -H 'Content-Type: application/json'
-```
-
-## Validate LLM service
-
-```bash
-curl http://${TRANSLATION_HOST_IP}:9000/v1/chat/completions \
-  -X POST \
-  -d '{"query":"Translate this from Chinese to English:\nChinese: 我爱机器翻译。\nEnglish:"}' \
-  -H 'Content-Type: application/json'
-```
-
-## Validate MegaService
-
-```bash
-curl http://${TRANSLATION_HOST_IP}:${TRANSLATION_BACKEND_SERVICE_PORT}/v1/translation -H "Content-Type: application/json" -d '{
-     "language_from": "Chinese","language_to": "English","source_language": "我爱机器翻译。"}'
-```
-
-## Validate Nginx service
-
-```bash
-curl http://${TRANSLATION_HOST_IP}:${TRANSLATION_NGINX_PORT}/v1/translation \
-    -H "Content-Type: application/json" \
-    -d '{"language_from": "Chinese","language_to": "English","source_language": "我爱机器翻译。"}'
-```
+**How to Identify GPU Device IDs:**
+Use AMD GPU driver utilities to determine the correct `cardN` and `renderN` IDs for your GPU.

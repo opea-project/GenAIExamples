@@ -2,7 +2,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 name: E2E Test with Helm Charts
-
+permissions:
+  contents: read
 on:
   pull_request_target:
     branches: [main]
@@ -19,6 +20,9 @@ concurrency:
 jobs:
   job1:
     name: Get-Test-Matrix
+    permissions:
+      contents: read
+      pull-requests: read
     runs-on: ubuntu-latest
     outputs:
       run_matrix: ${{ steps.get-test-matrix.outputs.run_matrix }}
@@ -46,6 +50,8 @@ jobs:
               example=$(echo "$values_file" | cut -d'/' -f1) # CodeGen
               if [[ "$valuefile" == *"gaudi"* ]]; then
                 hardware="gaudi"
+              elif [[ "$valuefile" == *"rocm"* ]]; then
+                hardware="rocm"
               elif [[ "$valuefile" == *"nv"* ]]; then
                 continue
               else

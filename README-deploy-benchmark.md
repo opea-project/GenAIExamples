@@ -1,4 +1,4 @@
-# ChatQnA Benchmarking
+# Deploy and Benchmark
 
 ## Purpose
 
@@ -7,6 +7,11 @@ We aim to run these benchmarks and share them with the OPEA community for three 
 - To offer insights on inference throughput in real-world scenarios, helping you choose the best service or deployment for your needs.
 - To establish a baseline for validating optimization solutions across different implementations, providing clear guidance on which methods are most effective for your use case.
 - To inspire the community to build upon our benchmarks, allowing us to better quantify new solutions in conjunction with current leading LLMs, serving frameworks etc.
+
+### Support Example List
+
+- ChatQnA
+- DocSum
 
 ## Table of Contents
 
@@ -25,7 +30,7 @@ Before running the benchmarks, ensure you have:
    - (Optional) [Kubernetes set up guide on Intel Gaudi product](https://github.com/opea-project/GenAIInfra/blob/main/README.md#setup-kubernetes-cluster)
 
 2. **Configuration YAML**  
-   The configuration file (e.g., `./ChatQnA/benchmark_chatqna.yaml`) consists of two main sections: deployment and benchmarking. Required fields with `# mandatory` comment must be filled with valid values, such as `HUGGINGFACEHUB_API_TOKEN`. For all other fields, you can either customize them according to our needs or leave them empty ("") to use the default values from the [helm charts](https://github.com/opea-project/GenAIInfra/tree/main/helm-charts).
+   The configuration file (e.g., `./ChatQnA/benchmark_chatqna.yaml`) consists of two main sections: deployment and benchmarking. Required fields with `# mandatory` comment must be filled with valid values, such as `HF_TOKEN`. For all other fields, you can either customize them according to our needs or leave them empty ("") to use the default values from the [helm charts](https://github.com/opea-project/GenAIInfra/tree/main/helm-charts).
 
    **Default Models**:
 
@@ -68,6 +73,7 @@ Before running the benchmarks, ensure you have:
    ```bash
    pip install -r requirements.txt
    ```
+   notes: the benchmark need `opea-eval>=1.3`, if v1.3 is not released, please build the `opea-eval` from [source](https://github.com/opea-project/GenAIEval).
 
 ## Data Preparation
 
@@ -186,3 +192,7 @@ Choose "oob" mode when you want to selectively enable optimizations, or "tune" m
 - After cleaning up the directory, try running the deployment again
 
 Note: Always ensure there are no leftover Helm chart directories from previous failed runs before starting a new deployment.
+
+## ChatQnA Release Data
+
+The ChatQnA benchmark results are available in the [ChatQnA/benchmark_results.md](./ChatQnA/benchmark_results.md).

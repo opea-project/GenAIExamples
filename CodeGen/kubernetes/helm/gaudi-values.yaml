@@ -2,32 +2,26 @@
 # SPDX-License-Identifier: Apache-2.0
 
 tgi:
+  enabled: false
+
+vllm:
+  enabled: true
   accelDevice: "gaudi"
-  LLM_MODEL_ID: Qwen/Qwen2.5-Coder-7B-Instruct
   image:
-    repository: ghcr.io/huggingface/tgi-gaudi
-    tag: "2.3.1"
+    repository: opea/vllm-gaudi
+  PT_HPU_ENABLE_LAZY_COLLECTIVES: "true"
+  OMPI_MCA_btl_vader_single_copy_mechanism: "none"
+  startupProbe:
+    failureThreshold: 360
   resources:
     limits:
       habana.ai/gaudi: 1
-  MAX_INPUT_LENGTH: "1024"
-  MAX_TOTAL_TOKENS: "2048"
-  CUDA_GRAPHS: ""
-  OMPI_MCA_btl_vader_single_copy_mechanism: "none"
-  ENABLE_HPU_GRAPH: "true"
-  LIMIT_HPU_GRAPH: "true"
-  USE_FLASH_ATTENTION: "true"
-  FLASH_ATTENTION_RECOMPUTE: "true"
-  livenessProbe:
-    initialDelaySeconds: 5
-    periodSeconds: 5
-    timeoutSeconds: 1
-  readinessProbe:
-    initialDelaySeconds: 5
-    periodSeconds: 5
-    timeoutSeconds: 1
-  startupProbe:
-    initialDelaySeconds: 5
-    periodSeconds: 5
-    timeoutSeconds: 1
-    failureThreshold: 120
+  extraCmdArgs: [
+    "--tensor-parallel-size", "1",
+    "--block-size", "128",
+    "--max-num-seqs", "256",
+  ]
+
+llm-uservice:
+  TEXTGEN_BACKEND: vLLM
+  retryTimeoutSeconds: 720

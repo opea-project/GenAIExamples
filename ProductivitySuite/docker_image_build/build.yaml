@@ -5,6 +5,8 @@ services:
   chatqna:
     build:
       args:
+        IMAGE_REPO: ${REGISTRY}
+        BASE_TAG: ${TAG}
         http_proxy: ${http_proxy}
         https_proxy: ${https_proxy}
         no_proxy: ${no_proxy}
@@ -68,18 +70,36 @@ services:
       context: ../../CodeGen/
       dockerfile: ./Dockerfile
     image: ${REGISTRY:-opea}/codegen:${TAG:-latest}
-  faqgen:
+  llm-faqgen:
     build:
       args:
         http_proxy: ${http_proxy}
         https_proxy: ${https_proxy}
         no_proxy: ${no_proxy}
-      context: ../../FaqGen/
-      dockerfile: ./Dockerfile
-    image: ${REGISTRY:-opea}/faqgen:${TAG:-latest}
-  llm-faqgen:
-    build:
       context: GenAIComps
       dockerfile: comps/llms/src/faq-generation/Dockerfile
-    extends: faqgen
     image: ${REGISTRY:-opea}/llm-faqgen:${TAG:-latest}
+  docsum:
+    build:
+      args:
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
+        no_proxy: ${no_proxy}
+      context: ../../DocSum/
+      dockerfile: ./Dockerfile
+    image: ${REGISTRY:-opea}/docsum:${TAG:-latest}
+  llm-docsum:
+    build:
+      context: GenAIComps
+      dockerfile: comps/llms/src/doc-summarization/Dockerfile
+    extends: docsum
+    image: ${REGISTRY:-opea}/llm-docsum:${TAG:-latest}
+  whisper:
+    build:
+      args:
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
+      context: GenAIComps
+      dockerfile: comps/third_parties/whisper/src/Dockerfile
+    extends: docsum
+    image: ${REGISTRY:-opea}/whisper:${TAG:-latest}

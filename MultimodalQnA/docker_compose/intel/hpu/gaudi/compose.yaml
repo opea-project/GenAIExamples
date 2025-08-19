@@ -21,6 +21,19 @@ services:
       WHISPER_PORT: ${WHISPER_PORT}
       WHISPER_SERVER_ENDPOINT: ${WHISPER_SERVER_ENDPOINT}
     restart: unless-stopped
+  speecht5-service:
+    image: ${REGISTRY:-opea}/speecht5:${TAG:-latest}
+    container_name: speecht5-service
+    ports:
+      - "${TTS_PORT}:7055"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      TTS_PORT: ${TTS_PORT}
+      TTS_ENDPOINT: ${TTS_ENDPOINT}
+    restart: unless-stopped
   dataprep-multimodal-redis:
     image: ${REGISTRY:-opea}/dataprep:${TAG:-latest}
     container_name: dataprep-multimodal-redis
@@ -28,7 +41,7 @@ services:
       - redis-vector-db
       - lvm
     ports:
-      - "${DATAPREP_MMR_PORT}:5000"
+      - "${DATAPREP_MMR_PORT:-6007}:5000"
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
@@ -38,9 +51,14 @@ services:
       DATAPREP_MMR_PORT: ${DATAPREP_MMR_PORT}
       INDEX_NAME: ${INDEX_NAME}
       LVM_ENDPOINT: "http://${LVM_SERVICE_HOST_IP}:${LVM_PORT}/v1/lvm"
-      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HF_TOKEN: ${HF_TOKEN}
       MULTIMODAL_DATAPREP: true
       DATAPREP_COMPONENT_NAME: "OPEA_DATAPREP_MULTIMODALREDIS"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:5000/v1/health_check || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
     restart: unless-stopped
   embedding-multimodal-bridgetower-gaudi:
     image: ${REGISTRY:-opea}/embedding-multimodal-bridgetower-gaudi:${TAG:-latest}
@@ -162,11 +180,16 @@ services:
     image: ${REGISTRY:-opea}/multimodalqna:${TAG:-latest}
     container_name: multimodalqna-backend-server
     depends_on:
-      - redis-vector-db
-      - dataprep-multimodal-redis
-      - embedding
-      - retriever-redis
-      - lvm
+      redis-vector-db:
+        condition: service_started
+      dataprep-multimodal-redis:
+        condition: service_healthy
+      embedding:
+        condition: service_started
+      retriever-redis:
+        condition: service_started
+      lvm:
+        condition: service_started
     ports:
       - "${MEGA_SERVICE_PORT}:${MEGA_SERVICE_PORT}"
     environment:
@@ -182,6 +205,8 @@ services:
       LVM_MODEL_ID: ${LVM_MODEL_ID}
       WHISPER_PORT: ${WHISPER_PORT}
       WHISPER_SERVER_ENDPOINT: ${WHISPER_SERVER_ENDPOINT}
+      TTS_PORT: ${TTS_PORT}
+      TTS_ENDPOINT: ${TTS_ENDPOINT}
     ipc: host
     restart: always
   multimodalqna-ui:
@@ -199,8 +224,11 @@ services:
       - DATAPREP_INGEST_SERVICE_ENDPOINT=${DATAPREP_INGEST_SERVICE_ENDPOINT}
       - DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT=${DATAPREP_GEN_TRANSCRIPT_SERVICE_ENDPOINT}
       - DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT=${DATAPREP_GEN_CAPTION_SERVICE_ENDPOINT}
+      - DATAPREP_GET_FILE_ENDPOINT=${DATAPREP_GET_FILE_ENDPOINT}
+      - DATAPREP_DELETE_FILE_ENDPOINT=${DATAPREP_DELETE_FILE_ENDPOINT}
       - MEGA_SERVICE_PORT:=${MEGA_SERVICE_PORT}
       - UI_PORT=${UI_PORT}
+      - UI_TIMEOUT=${UI_TIMEOUT}
       - DATAPREP_MMR_PORT=${DATAPREP_MMR_PORT}
     ipc: host
     restart: always

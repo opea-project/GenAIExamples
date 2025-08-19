@@ -3,6 +3,7 @@
 
 import asyncio
 import base64
+import json
 import os
 import subprocess
 import uuid
@@ -61,6 +62,20 @@ def read_pdf(file):
     loader = PyPDFLoader(file)
     docs = loader.load_and_split()
     return docs
+
+
+def encode_file_to_base64(file_path):
+    """Encode the content of a file to a base64 string.
+
+    Args:
+        file_path (str): The path to the file to be encoded.
+
+    Returns:
+        str: The base64 encoded string of the file content.
+    """
+    with open(file_path, "rb") as f:
+        base64_str = base64.b64encode(f.read()).decode("utf-8")
+    return base64_str
 
 
 def video2audio(
@@ -128,11 +143,49 @@ def read_text_from_file(file, save_file_name):
     return file_content
 
 
+def align_generator(self, gen, **kwargs):
+    # OpenAI response format
+    # b'data:{"id":"","object":"text_completion","created":1725530204,"model":"meta-llama/Meta-Llama-3-8B-Instruct","system_fingerprint":"2.0.1-native","choices":[{"index":0,"delta":{"role":"assistant","content":"?"},"logprobs":null,"finish_reason":null}]}\n\n'
+    for line in gen:
+        line = line.decode("utf-8")
+        start = -1
+        end = -1
+        try:
+            start = line.find("{")
+            end = line.rfind("}") + 1
+            if start == -1 or end <= start:
+                # Handle cases where '{' or '}' are not found or are in the wrong order
+                json_str = ""
+            else:
+                json_str = line[start:end]
+        except Exception as e:
+            print(f"Error finding JSON boundaries: {e}")
+            json_str = ""
+
+        try:
+            # sometimes yield empty chunk, do a fallback here
+            json_data = json.loads(json_str)
+            if "ops" in json_data and "op" in json_data["ops"][0]:
+                if "value" in json_data["ops"][0] and isinstance(json_data["ops"][0]["value"], str):
+                    yield f"data: {repr(json_data['ops'][0]['value'].encode('utf-8'))}\n\n"
+                else:
+                    pass
+            elif (
+                json_data["choices"][0]["finish_reason"] != "eos_token"
+                and "content" in json_data["choices"][0]["delta"]
+            ):
+                yield f"data: {repr(json_data['choices'][0]['delta']['content'].encode('utf-8'))}\n\n"
+        except Exception as e:
+            yield f"data: {repr(json_str.encode('utf-8'))}\n\n"
+    yield "data: [DONE]\n\n"
+
+
 class DocSumService:
     def __init__(self, host="0.0.0.0", port=8000):
         self.host = host
         self.port = port
         ServiceOrchestrator.align_inputs = align_inputs
+        ServiceOrchestrator.align_generator = align_generator
         self.megaservice = ServiceOrchestrator()
         self.megaservice_text_only = ServiceOrchestrator()
         self.endpoint = str(MegaServiceEndpoint.DOC_SUMMARY)
@@ -163,7 +216,6 @@ class DocSumService:
 
     async def handle_request(self, request: Request, files: List[UploadFile] = File(default=None)):
         """Accept pure text, or files .txt/.pdf.docx, audio/video base64 string."""
-
         if "application/json" in request.headers.get("content-type"):
             data = await request.json()
             stream_opt = data.get("stream", True)
@@ -193,25 +245,24 @@ class DocSumService:
                     uid = str(uuid.uuid4())
                     file_path = f"/tmp/{uid}"
 
-                    if data_type is not None and data_type in ["audio", "video"]:
-                        raise ValueError(
-                            "Audio and Video file uploads are not supported in docsum with curl request, \
-                                please use the UI or pass base64 string of the content directly."
-                        )
+                    import aiofiles
 
-                    else:
-                        import aiofiles
+                    async with aiofiles.open(file_path, "wb") as f:
+                        await f.write(await file.read())
 
-                        async with aiofiles.open(file_path, "wb") as f:
-                            await f.write(await file.read())
-
+                    if data_type == "text":
                         docs = read_text_from_file(file, file_path)
-                        os.remove(file_path)
+                    elif data_type in ["audio", "video"]:
+                        docs = encode_file_to_base64(file_path)
+                    else:
+                        raise ValueError(f"Data type not recognized: {data_type}")
 
-                        if isinstance(docs, list):
-                            file_summaries.extend(docs)
-                        else:
-                            file_summaries.append(docs)
+                    os.remove(file_path)
+
+                    if isinstance(docs, list):
+                        file_summaries.extend(docs)
+                    else:
+                        file_summaries.append(docs)
 
             if file_summaries:
                 prompt = handle_message(chat_request.messages) + "\n".join(file_summaries)

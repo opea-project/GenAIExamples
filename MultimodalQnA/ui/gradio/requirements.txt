@@ -1,6 +1,7 @@
-gradio==5.11.0
-gradio_pdf==0.0.19
+gradio>5.22.0,<=5.34.0   # Upper bound (<=5.34.0) set due to compatibility issues with later versions causing the UI to not load
+gradio_pdf==0.0.20
 moviepy==1.0.3
 numpy==1.26.4
 opencv-python==4.10.0.82
 Pillow==10.3.0
+pydantic==2.10.6

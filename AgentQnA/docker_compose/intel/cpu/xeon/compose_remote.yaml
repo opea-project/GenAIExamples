@@ -1,0 +1,50 @@
+# Copyright (C) 2025 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  agent-vllm-service:
+    image: ${REGISTRY:-opea}/vllm:${TAG:-latest}
+    container_name: vllm-service
+    ports:
+      - "9009:80"
+    volumes:
+      - "${MODEL_CACHE:-./data}:/root/.cache/huggingface/hub"
+    shm_size: 128g
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      HF_TOKEN: ${HF_TOKEN}
+      LLM_MODEL_ID: ${model}
+      VLLM_TORCH_PROFILER_DIR: "/mnt"
+      VLLM_CPU_KVCACHE_SPACE: 40
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:80/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 100
+    command: --model $model --host 0.0.0.0 --port 80
+
+  worker-rag-agent:
+    depends_on:
+      agent-vllm-service:
+        condition: service_healthy
+    environment:
+      llm_engine: vllm
+      llm_endpoint_url: ${LLM_ENDPOINT_URL}
+
+  worker-sql-agent:
+    depends_on:
+      agent-vllm-service:
+        condition: service_healthy
+    environment:
+      llm_engine: vllm
+      llm_endpoint_url: ${LLM_ENDPOINT_URL}
+
+  supervisor-react-agent:
+    depends_on:
+      agent-vllm-service:
+        condition: service_healthy
+    environment:
+      llm_engine: vllm
+      llm_endpoint_url: ${LLM_ENDPOINT_URL}
