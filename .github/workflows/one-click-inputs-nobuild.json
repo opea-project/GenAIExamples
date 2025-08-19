@@ -24,6 +24,30 @@
         "clear": ["1", "1", "2", "docker", "$hardware", "Y"]
       }
     },
+    "ChatQnA-Qwen": {
+      "inputs": {
+        "deploy": [
+          "1",
+          "1",
+          "1",
+          "docker",
+          "$hardware",
+          "$HF_TOKEN",
+          "$http_proxy",
+          "$https_proxy",
+          "$no_proxy",
+          "Qwen/Qwen2.5-7B-Instruct",
+          "BAAI/bge-base-en-v1.5",
+          "BAAI/bge-reranker-base",
+          "./data",
+          "N",
+          "N",
+          "y",
+          "Y"
+        ],
+        "clear": ["1", "1", "2", "docker", "$hardware", "Y"]
+      }
+    },
     "CodeTrans": {
       "inputs": {
         "deploy": [
@@ -187,6 +211,30 @@
           "$https_proxy",
           "$no_proxy",
           "$LLM_model",
+          "$Embedding_model",
+          "$Reranking_model",
+          "N",
+          "N",
+          "y",
+          "8080",
+          "Y"
+        ],
+        "clear": ["1", "1", "2", "k8s", "y", "Y"]
+      }
+    },
+    "ChatQnA-Qwen": {
+      "inputs": {
+        "deploy": [
+          "1",
+          "1",
+          "1",
+          "k8s",
+          "$hardware",
+          "$HF_TOKEN",
+          "$http_proxy",
+          "$https_proxy",
+          "$no_proxy",
+          "Qwen/Qwen2.5-7B-Instruct",
           "$Embedding_model",
           "$Reranking_model",
           "N",
