@@ -59,7 +59,7 @@ jobs:
           latest_vllm_ver=$(curl -s "https://api.github.com/repos/${{ matrix.repo_name }}/tags" | jq '.[0].name' -)
           latest_vllm_ver=$(echo "$latest_vllm_ver" | sed 's/"//g')
           echo "latest_vllm_ver=${latest_vllm_ver}" >> "$GITHUB_ENV"
-          find . -type f -name "*.sh" -exec sed -i "s/${{ matrix.ver_name }}=.*/${{ matrix.ver_name }}=${latest_vllm_ver}/" {} \;
+          find . -type f \( -name "*.sh" -o -name "*.md" \) -exec sed -i "s/${{ matrix.ver_name }}=.*/${{ matrix.ver_name }}=${latest_vllm_ver}/" {} \;
 
       - name: Commit changes
         run: |
