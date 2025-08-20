@@ -73,7 +73,7 @@ def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **k
     elif self.services[cur_node].service_type == ServiceType.LLM:
         # convert TGI/vLLM to unified OpenAI /v1/chat/completions format
         next_inputs = {}
-        next_inputs["model"] = LLM_MODEL
+        next_inputs["model"] = inputs["model"]
         next_inputs["messages"] = [{"role": "user", "content": inputs["inputs"]}]
         next_inputs["max_tokens"] = llm_parameters_dict["max_tokens"]
         next_inputs["top_p"] = llm_parameters_dict["top_p"]
