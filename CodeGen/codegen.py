@@ -195,7 +195,7 @@ class CodeGenService:
             repetition_penalty=chat_request.repetition_penalty if chat_request.repetition_penalty else 1.03,
             stream=stream_opt,
             index_name=chat_request.index_name,
-            model=chat_request.model if chat_request.model else LLM_MODEL_ID
+            model=chat_request.model if chat_request.model else LLM_MODEL_ID,
         )
 
         # Initialize the initial inputs with the generated prompt
