@@ -396,7 +396,7 @@ class ChatQnAService:
             repetition_penalty=chat_request.repetition_penalty if chat_request.repetition_penalty else 1.03,
             stream=stream_opt,
             chat_template=chat_request.chat_template if chat_request.chat_template else None,
-            model=chat_request.model if chat_request.model else None,
+            model=chat_request.model if chat_request.model else LLM_MODEL,
         )
         retriever_parameters = RetrieverParms(
             search_type=chat_request.search_type if chat_request.search_type else "similarity",
