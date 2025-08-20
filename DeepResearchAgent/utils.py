@@ -23,7 +23,10 @@ def create_agent(config: str) -> Any:
 
         from langgraph.checkpoint.memory import MemorySaver
         from langgraph.types import Command
-        from open_deep_research.graph import builder
+
+        # from open_deep_research.graph import builder
+        # TODO
+        from legacy.graph import builder
     except ImportError as e:
         raise ImportError(
             f"Failed to import required modules for langchain deep researcher: {e}. Make sure langgraph and open_deep_research are installed. Also make sure that the benchmark directory is in your path. Also, you might need to install the with-open-deep-research extra dependencies (see README.md)."

@@ -11,6 +11,8 @@ In this application, we leverage the deep research agent implementation of [lang
 ## Setup Deployment Environment
 
 ```
+# Configure deep_researcher.yaml with your llm model served by the vllm
+
 # get your TAVILY_API_KEY from https://app.tavily.com/
 export TAVILY_API_KEY=""
 # get your HuggingFace Access Token from https://huggingface.co/docs/transformers.js/en/guides/private#step-1-generating-a-user-access-token
@@ -21,7 +23,7 @@ export http_proxy=""
 export https_proxy=""
 export no_proxy=""
 
-
+# the shell script will initialize the OPENAI_BASE_URL and OPENAI_API_KEY for the openai compatible vllm service
 source ./set_env.sh
 ```
 
