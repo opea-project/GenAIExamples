@@ -33,7 +33,7 @@ async def run(request: SimpleRequest):
 
     result = await agent(question)
 
-    return result
+    return {"answer": result}
 
 
 if __name__ == "__main__":

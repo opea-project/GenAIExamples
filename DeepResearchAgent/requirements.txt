@@ -1,1 +1,1 @@
-open_deep_research # https://github.com/langchain-ai/open_deep_research
+open-deep-research==0.0.16
