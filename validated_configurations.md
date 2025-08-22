@@ -25,7 +25,7 @@ Example specific test matrix can be found in examples' README.md files, for exam
 ## v1.4 Release Test Config Overview
 
 | **HW/SW Stake**        | **Description**                                                                        |
-| ---------------------- |----------------------------------------------------------------------------------------|
+| ---------------------- | -------------------------------------------------------------------------------------- |
 | **Validated Hardware** | Intel Gaudi AI Accelerators (2nd)                                                      |
 |                        | Intel Xeon Scalable processor (3rd)                                                    |
 |                        | Intel Arc Graphics GPU (A770)                                                          |
