@@ -1,9 +1,9 @@
 @font-face {
   font-family: "iconfont"; /* Project id 4784207 */
   src:
-    url("iconfont.woff2?t=1748479964596") format("woff2"),
-    url("iconfont.woff?t=1748479964596") format("woff"),
-    url("iconfont.ttf?t=1748479964596") format("truetype");
+    url("iconfont.woff2?t=1754038546130") format("woff2"),
+    url("iconfont.woff?t=1754038546130") format("woff"),
+    url("iconfont.ttf?t=1754038546130") format("truetype");
 }
 
 .iconfont {
@@ -12,6 +12,54 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-deep-think:before {
+  content: "\e772";
+}
+
+.icon-collocation:before {
+  content: "\e61c";
+}
+
+.icon-upload1:before {
+  content: "\e87b";
+}
+
+.icon-edit:before {
+  content: "\e633";
+}
+
+.icon-skip:before {
+  content: "\e6d7";
+}
+
+.icon-prompt:before {
+  content: "\e641";
+}
+
+.icon-sync:before {
+  content: "\e611";
+}
+
+.icon-process-node:before {
+  content: "\e986";
+}
+
+.icon-process:before {
+  content: "\e64a";
+}
+
+.icon-sigh:before {
+  content: "\e8d6";
+}
+
+.icon-loading1:before {
+  content: "\e891";
+}
+
+.icon-download:before {
+  content: "\e600";
 }
 
 .icon-newChat:before {

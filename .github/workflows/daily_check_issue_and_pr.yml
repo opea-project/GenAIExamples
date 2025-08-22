@@ -3,6 +3,11 @@
 
 name: Check stale issue and pr
 
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
 on:
   schedule:
     - cron: "30 22 * * *"
@@ -10,9 +15,6 @@ on:
 jobs:
   close-issues:
     runs-on: ubuntu-latest
-    permissions:
-      issues: write
-      pull-requests: write
     steps:
       - uses: actions/stale@v9
         with:
