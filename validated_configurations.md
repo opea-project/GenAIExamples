@@ -21,3 +21,21 @@ Example specific test matrix can be found in examples' README.md files, for exam
 |                        | vLLM v0.8.3 (Xeon, ROCm)                                                                                     |
 |                        | TGI v2.4.0 (Xeon), v2.3.1 (Gaudi), v2.4.1 (ROCm)                                                             |
 |                        | TEI v1.6                                                                                                     |
+
+## v1.4 Release Test Config Overview
+
+| **HW/SW Stake**        | **Description**                                                                        |
+| ---------------------- | -------------------------------------------------------------------------------------- |
+| **Validated Hardware** | Intel Gaudi AI Accelerators (2nd)                                                      |
+|                        | Intel Xeon Scalable processor (3rd)                                                    |
+|                        | Intel Arc Graphics GPU (A770)                                                          |
+|                        | AMD EPYC processors (4th, 5th)                                                         |
+| **Validated Software** | Ubuntu 22.04                                                                           |
+|                        | Habana v1.21 ([link](https://docs.habana.ai/en/v1.21.2/Installation_Guide/index.html)) |
+|                        | Docker version 28.3.3                                                                  |
+|                        | Docker Compose version v2.39.1                                                         |
+|                        | Kubernetes v1.32.7                                                                     |
+|                        | HabanaAI vLLM v0.6.6.post1+Gaudi-1.20.0                                                |
+|                        | vLLM v1.10.0                                                                           |
+|                        | TGI v2.4.0 (Xeon), v2.3.1 (Gaudi), v2.4.1 (ROCm)                                       |
+|                        | TEI v1.7                                                                               |
