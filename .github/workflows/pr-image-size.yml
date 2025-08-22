@@ -46,8 +46,8 @@ jobs:
       matrix:
         dockerfile: ${{ fromJson(needs.get-check-list.outputs.files) }}
       fail-fast: false
-    # outputs:
-    #   comments: ${{ steps.build-check.outputs.comment_message }}
+    outputs:
+      skip: ${{ steps.build-check.outputs.skip }}
     steps:
       - name: Checkout PR branch
         uses: actions/checkout@v4
@@ -92,7 +92,11 @@ jobs:
           echo "Building base image for $dockerfile"
           git checkout ${{ github.event.pull_request.base.sha }}
           echo "::group::Build image_base"
-          docker build -f $file -t "$image_base" --no-cache . || true
+          if ! docker build -f "$file" -t "$image_base" --no-cache .; then
+            echo "skip=true" >> $GITHUB_ENV
+            echo "skip=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
           echo "::endgroup::"
           size_base=$(docker image inspect "$image_base" | jq '.[0].Size / (1024 * 1024) | round')
 
@@ -123,6 +127,7 @@ jobs:
           echo "summary_path=${{github.workspace}}/build-$image_name.md" >> $GITHUB_ENV
 
       - name: Download origin artifact log
+        if: env.skip != 'true'
         uses: actions/download-artifact@v4
         with:
           name: build-comments
@@ -130,12 +135,14 @@ jobs:
         continue-on-error: true
 
       - name: Merge logs
+        if: env.skip != 'true'
         run: |
           mkdir -p merged-files
           ls merged-files/
           cp ${{ env.summary_path }} merged-files/
 
       - name: Save Summary as Artifact
+        if: env.skip != 'true'
         uses: actions/upload-artifact@v4
         with:
           name: build-comments
@@ -146,7 +153,7 @@ jobs:
     needs: build-and-check
     permissions:
       actions: read
-    if: always()
+    if: always() && needs.build-and-check.outputs.skip != 'true'
     runs-on: ubuntu-latest
     outputs:
       all_comments: ${{ steps.summary.outputs.all_comments }}
