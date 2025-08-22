@@ -23,6 +23,8 @@ export MODEL_CACHE=${model_cache:-"./data"}
 export MAX_INPUT_TOKENS=2048
 export MAX_TOTAL_TOKENS=4096
 
+export DocSum_COMPONENT_NAME="OpeaDocSumvLLM"
+
 # Get the root folder of the current script
 ROOT_FOLDER=$(dirname "$(readlink -f "$0")")
 
@@ -204,8 +206,6 @@ function validate_megaservice_text() {
 }
 
 function validate_megaservice_multimedia() {
-    sleep 10s
-
     echo ">>> Checking audio data in json format"
     validate_service \
         "${host_ip}:${BACKEND_SERVICE_PORT}/v1/docsum" \
@@ -215,6 +215,7 @@ function validate_megaservice_multimedia() {
         "json" \
         "{\"type\": \"audio\",  \"messages\": \"$(input_data_for_test "audio")\", \"stream\": \"False\"}"
 
+    sleep 10s
     echo ">>> Checking audio data in form format"
     validate_service \
         "${host_ip}:${BACKEND_SERVICE_PORT}/v1/docsum" \
@@ -228,6 +229,7 @@ function validate_megaservice_multimedia() {
         "language=en" \
         "stream=False"
 
+    sleep 10s
     echo ">>> Checking audio data in form format, upload file"
     validate_service \
         "${host_ip}:${BACKEND_SERVICE_PORT}/v1/docsum" \
@@ -242,6 +244,7 @@ function validate_megaservice_multimedia() {
         "language=en" \
         "stream=False"
 
+    sleep 10s
     echo ">>> Checking video data in json format"
     validate_service \
         "${host_ip}:${BACKEND_SERVICE_PORT}/v1/docsum" \
@@ -251,6 +254,7 @@ function validate_megaservice_multimedia() {
         "json" \
         "{\"type\": \"video\",  \"messages\": \"$(input_data_for_test "video")\", \"stream\": \"False\"}"
 
+    sleep 10s
     echo ">>> Checking video data in form format"
     validate_service \
         "${host_ip}:${BACKEND_SERVICE_PORT}/v1/docsum" \
@@ -264,6 +268,7 @@ function validate_megaservice_multimedia() {
         "language=en" \
         "stream=False"
 
+    sleep 20s
     echo ">>> Checking video data in form format, upload file"
     validate_service \
         "${host_ip}:${BACKEND_SERVICE_PORT}/v1/docsum" \
@@ -280,8 +285,7 @@ function validate_megaservice_multimedia() {
 }
 
 function validate_megaservice_long_text() {
-    sleep 10s
-
+    sleep 20s
     echo ">>> Checking long text data in form format, set summary_type=auto"
     validate_service \
         "${host_ip}:${BACKEND_SERVICE_PORT}/v1/docsum" \
@@ -296,6 +300,7 @@ function validate_megaservice_long_text() {
         "summary_type=auto" \
         "stream=False"
 
+    sleep 20s
     echo ">>> Checking long text data in form format, set summary_type=stuff"
     validate_service \
         "${host_ip}:${BACKEND_SERVICE_PORT}/v1/docsum" \
@@ -310,6 +315,7 @@ function validate_megaservice_long_text() {
         "summary_type=stuff" \
         "stream=False"
 
+    sleep 20s
     echo ">>> Checking long text data in form format, set summary_type=truncate"
     validate_service \
         "${host_ip}:${BACKEND_SERVICE_PORT}/v1/docsum" \
@@ -324,6 +330,7 @@ function validate_megaservice_long_text() {
         "summary_type=truncate" \
         "stream=False"
 
+    sleep 20s
     echo ">>> Checking long text data in form format, set summary_type=map_reduce"
     validate_service \
         "${host_ip}:${BACKEND_SERVICE_PORT}/v1/docsum" \
@@ -338,6 +345,7 @@ function validate_megaservice_long_text() {
         "summary_type=map_reduce" \
         "stream=False"
 
+    sleep 20s
     echo ">>> Checking long text data in form format, set summary_type=refine"
     validate_service \
         "${host_ip}:${BACKEND_SERVICE_PORT}/v1/docsum" \
