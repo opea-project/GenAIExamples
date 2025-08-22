@@ -242,7 +242,7 @@ function validate_megaservice_multimedia() {
         "language=en" \
         "stream=False"
 
-    echo ">>> Checking video data in json formatn"
+    echo ">>> Checking video data in json format"
     validate_service \
         "${host_ip}:${BACKEND_SERVICE_PORT}/v1/docsum" \
         "bye" \
@@ -281,7 +281,7 @@ function validate_megaservice_multimedia() {
 
 function validate_megaservice_long_text() {
     sleep 10s
-    
+
     echo ">>> Checking long text data in form format, set summary_type=auto"
     validate_service \
         "${host_ip}:${BACKEND_SERVICE_PORT}/v1/docsum" \
