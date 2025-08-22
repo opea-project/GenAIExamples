@@ -93,6 +93,10 @@ jobs:
           git checkout ${{ github.event.pull_request.base.sha }}
           echo "::group::Build image_base"
           docker build -f $file -t "$image_base" --no-cache . || true
+          if [ $? -ne 0 ]; then
+            echo "Failed to build base image for $dockerfile"
+            exit 1
+          fi
           echo "::endgroup::"
           size_base=$(docker image inspect "$image_base" | jq '.[0].Size / (1024 * 1024) | round')
 
