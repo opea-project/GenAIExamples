@@ -19,7 +19,7 @@ case "$1" in
         containers=$(cat $yaml_file | grep container_name | cut -d':' -f2)
         for container_name in $containers; do
             cid=$(docker ps -aq --filter "name=$container_name")
-            if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid && sleep 1s; fi
+            if [[ -n "$cid" ]]; then docker stop "$cid" && docker rm "$cid" && sleep 1s; fi
         done
         ;;
     ports)
@@ -32,11 +32,9 @@ case "$1" in
           if [[ $port =~ [a-zA-Z_-] ]]; then
             echo "Search port value $port from the test case..."
             port_fix=$(grep -E "export $port=" tests/$test_case | cut -d'=' -f2)
-            if [[ "$port_fix" == "" ]]; then
-              echo "Can't find the port value from the test case, use the default value in yaml..."
-              port_fix=$(yq '.services[].ports[]' $yaml_file | grep $port | cut -d':' -f2 |  grep -o '[0-9a-zA-Z]\+')
+            if [[ "$port_fix"  ]]; then
+               port=$port_fix
             fi
-            port=$port_fix
           fi
           if [[ $port =~ [0-9] ]]; then
             if [[ $port == 5000 ]]; then
@@ -45,7 +43,7 @@ case "$1" in
             fi
             echo "Check port $port..."
             cid=$(docker ps --filter "publish=${port}" --format "{{.ID}}")
-            if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid && echo "release $port"; fi
+            if [[ -n "$cid" ]]; then docker stop "$cid" && docker rm "$cid" && echo "release $port"; fi
           fi
         done
         ;;
