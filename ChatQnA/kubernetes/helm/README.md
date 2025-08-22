@@ -14,7 +14,7 @@ helm install chatqna oci://ghcr.io/opea-project/charts/chatqna  --set global.HUG
 
 ```
 export HFTOKEN="insert-your-huggingface-token-here"
-helm install chatqna oci://ghcr.io/opea-project/charts/chatqna  --set global.HUGGINGFACEHUB_API_TOKEN=${HFTOKEN} -f gaudi-vllm-values.yaml
+helm install chatqna oci://ghcr.io/opea-project/charts/chatqna  --set global.HUGGINGFACEHUB_API_TOKEN=${HFTOKEN} -f gaudi-values.yaml
 ```
 
 ## Deploy variants of ChatQnA
