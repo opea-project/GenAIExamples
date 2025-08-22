@@ -281,7 +281,7 @@ function validate_megaservice_multimedia() {
 
 function validate_megaservice_long_text() {
     sleep 10s
-    
+
     echo ">>> Checking long text data in form format, set summary_type=auto"
     validate_service \
         "${host_ip}:${BACKEND_SERVICE_PORT}/v1/docsum" \
