@@ -9,6 +9,7 @@ IMAGE_TAG=${IMAGE_TAG:-"latest"}
 export http_proxy=$http_proxy
 export https_proxy=$https_proxy
 export host_ip=$(hostname -I | awk '{print $1}')
+export no_proxy=$no_proxy,$host_ip
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
