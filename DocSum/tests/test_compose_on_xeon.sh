@@ -254,7 +254,7 @@ function validate_megaservice_multimedia() {
         "json" \
         "{\"type\": \"video\",  \"messages\": \"$(input_data_for_test "video")\", \"stream\": \"False\"}"
 
-    sleep 10s
+    sleep 20s
     echo ">>> Checking video data in form format"
     validate_service \
         "${host_ip}:${BACKEND_SERVICE_PORT}/v1/docsum" \
