@@ -9,7 +9,6 @@ IMAGE_TAG=${IMAGE_TAG:-"latest"}
 export http_proxy=$http_proxy
 export https_proxy=$https_proxy
 export host_ip=$(hostname -I | awk '{print $1}')
-export no_proxy=$no_proxy,$host_ip
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
@@ -241,7 +240,7 @@ function validate_megaservice_multimedia() {
         "language=en" \
         "stream=False"
 
-    echo ">>> Checking video data in json format"
+    echo ">>> Checking video data in json format, set language=en"
     validate_service \
         "${host_ip}:${BACKEND_SERVICE_PORT}/v1/docsum" \
         "bye" \
