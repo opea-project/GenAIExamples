@@ -51,15 +51,20 @@ function start_vllm_services() {
         pip install -U huggingface_hub
         huggingface-cli download $LLM_MODEL --local-dir "${MODEL_PATH}/${LLM_MODEL}"
     fi
+    HF_CACHE="${HOME}/.cache"
+    if [ ! -d "${HF_CACHE}" ]; then
+        mkdir -p "${HF_CACHE}"
+        echo "Created directory: ${HF_CACHE}"
+    fi
     echo "give permission to related path..."
     sudo chown 1000:1000 ${MODEL_PATH} ${DOC_PATH} ${TMPFILE_PATH}
-    sudo chown -R 1000:1000 ${HOME}/.cache/huggingface
+    sudo chown -R 1000:1000 ${HF_CACHE}
     HF_ENDPOINT=https://hf-mirror.com
     # vllm ENV
     export NGINX_PORT=8086
     export vLLM_ENDPOINT="http://${HOST_IP}:${NGINX_PORT}"
     TENSOR_PARALLEL_SIZE=$(get_user_input "your tp size" 1)
-    SELECTED_XPU_0=$(get_user_input "selected GPU " "0")
+    read -p "selected GPU [$(seq -s, 0 $((TENSOR_PARALLEL_SIZE - 1)))] " SELECTED_XPU_0; SELECTED_XPU_0=${SELECTED_XPU_0:-$(seq -s, 0 $((TENSOR_PARALLEL_SIZE - 1)))}
     DP_NUM=$(get_user_input "DP number(how many containers to run vLLM)" 1)
     for (( x=0; x<DP_NUM; x++ ))
     do
@@ -138,9 +143,14 @@ function start_services() {
             exit 0
         fi
     fi
+    HF_CACHE="${HOME}/.cache"
+    if [ ! -d "${HF_CACHE}" ]; then
+        mkdir -p "${HF_CACHE}"
+        echo "Created directory: ${HF_CACHE}"
+    fi
     echo "give permission to related path..."
     sudo chown 1000:1000 ${MODEL_PATH} ${DOC_PATH} ${TMPFILE_PATH}
-    sudo chown -R 1000:1000 ${HOME}/.cache/huggingface
+    sudo chown -R 1000:1000 ${HF_CACHE}
     HF_ENDPOINT=https://hf-mirror.com
 
     # export ENV

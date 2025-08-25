@@ -150,6 +150,8 @@ function validate_frontend() {
     npm install && npm ci && npx playwright install --with-deps
     node -v && npm -v && pip list
 
+    export no_proxy="localhost,127.0.0.1,$ip_address"
+
     exit_status=0
     npx playwright test || exit_status=$?
 

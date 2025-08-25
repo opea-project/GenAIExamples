@@ -49,6 +49,7 @@ EXAMPLE_CONFIGS = {
         },
         "supported_devices": ["xeon", "gaudi"],
         "default_device": "xeon",
+        "offline_support": ["docker"],
         "ports": {
             "docker": {
                 "backend": "8888",
@@ -152,6 +153,7 @@ EXAMPLE_CONFIGS = {
         },
         "supported_devices": ["xeon", "gaudi"],
         "default_device": "xeon",
+        "offline_support": [],
         "ports": {
             "docker": {"backend": "7777", "llm": "9000"},
             "k8s_services": {"backend": "codetrans", "llm": "codetrans-llm-svc"},
@@ -223,6 +225,7 @@ EXAMPLE_CONFIGS = {
         },
         "supported_devices": ["xeon", "gaudi"],
         "default_device": "xeon",
+        "offline_support": [],
         "ports": {
             "docker": {"backend": "8888", "llm": "8008"},
             "k8s_services": {"backend": "docsum", "llm": "llm-docsum-svc"},
@@ -293,6 +296,7 @@ EXAMPLE_CONFIGS = {
         },
         "supported_devices": ["xeon", "gaudi"],
         "default_device": "xeon",
+        "offline_support": [],
         "ports": {
             "docker": {"backend": "7778", "llm": "8028"},
             "k8s_services": {"backend": "codegen", "llm": "codegen-llm-uservice"},
@@ -364,6 +368,7 @@ EXAMPLE_CONFIGS = {
         },
         "supported_devices": ["xeon", "gaudi"],
         "default_device": "xeon",
+        "offline_support": [],
         "ports": {
             "docker": {"backend": "3008", "llm": "3006"},
             "k8s_services": {"backend": "audioqna", "llm": "audioqna-vllm"},
@@ -436,6 +441,7 @@ EXAMPLE_CONFIGS = {
         },
         "supported_devices": ["xeon", "gaudi"],
         "default_device": "xeon",
+        "offline_support": [],
         "ports": {
             "docker": {"backend": "8888", "lvm": "9399", "nginx": "81"},
             "k8s_services": {"backend": "visualqna", "lvm": "visualqna-lvm-uservice"},
@@ -518,6 +524,7 @@ EXAMPLE_CONFIGS = {
         },
         "supported_devices": ["xeon", "gaudi"],
         "default_device": "xeon",
+        "offline_support": [],
         "ports": {
             "docker": {
                 "backend": "8888",
@@ -618,6 +625,7 @@ EXAMPLE_CONFIGS = {
         },
         "supported_devices": ["xeon", "gaudi"],
         "default_device": "xeon",
+        "offline_support": [],
         "ports": {
             "docker": {"rag": "9095"},
             "k8s_services": {"rag": "agentqna-ragagent"},

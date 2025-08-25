@@ -16,8 +16,8 @@ This README provides instructions for deploying the Finance Agent application us
 - Git installed (for cloning repository).
 - Hugging Face Hub API Token (for downloading models).
 - Access to the internet (or a private model cache).
-- Finnhub API Key. Go to https://docs.financialdatasets.ai/ to get your free api key
-- Financial Datgasets API Key. Go to https://docs.financialdatasets.ai/ to get your free api key
+- Finnhub API Key. Go to https://finnhub.io/ to get your free api key.
+- Financial Datasets API Key. Go to https://docs.financialdatasets.ai/ to get your free api key.
 
 Clone the GenAIExamples repository:
 
@@ -43,21 +43,21 @@ export HF_CACHE_DIR="./data"
 # Some models from Hugging Face require approval beforehand. Ensure you have the necessary permissions to access them.
 export HF_TOKEN="your_huggingface_token"
 export FINNHUB_API_KEY="your-finnhub-api-key"
-export FINANCIAL_DATASETS_API_KEY="your-financial-datgasets-api-key"
+export FINANCIAL_DATASETS_API_KEY="your-financial-datasets-api-key"
 
-# Optional: Configure HOST_IP if needed
+# Configure HOST_IP
 # Replace with your host's external IP address (do not use localhost or 127.0.0.1).
-# export HOST_IP=$(hostname -I | awk '{print $1}')
+export HOST_IP=$(hostname -I | awk '{print $1}')
 
 # Optional: Configure proxy if needed
 # export HTTP_PROXY="${http_proxy}"
 # export HTTPS_PROXY="${https_proxy}"
 # export NO_PROXY="${NO_PROXY},${HOST_IP}"
 
-source ../../set_env.sh
+source set_env.sh
 ```
 
-Note: The compose file might read additional variables from set_env.sh. Ensure all required variables like ports (LLM_SERVICE_PORT, TEI_EMBEDDER_PORT, etc.) are set if not using defaults from the compose file. For instance, edit the set_env.sh to change the LLM model:
+Note: The compose file might read additional variables from `set_env.sh`. Ensure all required variables like ports (LLM_SERVICE_PORT, TEI_EMBEDDER_PORT, etc.) are set if not using defaults from the compose file. For instance, edit the `set_env.sh` or overwrite LLM_MODEL_ID to change the LLM model.
 
 ### Start Services
 
@@ -65,7 +65,6 @@ Note: The compose file might read additional variables from set_env.sh. Ensure a
 
 Below is the command to launch services
 
-- vllm-gaudi-server
 - tei-embedding-serving
 - redis-vector-db
 - redis-kv-store
@@ -99,7 +98,7 @@ cd $WORKDIR
 git clone https://github.com/HabanaAI/vllm-fork.git
 # get the latest release tag of vllm gaudi
 cd vllm-fork
-VLLM_VER=$(git describe --tags "$(git rev-list --tags --max-count=1)")
+VLLM_VER=v0.10.0
 echo "Check out vLLM tag ${VLLM_VER}"
 git checkout ${VLLM_VER}
 docker build --no-cache -f docker/Dockerfile.hpu -t opea/vllm-gaudi:latest --shm-size=128g . --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy
@@ -161,6 +160,7 @@ python3 $WORKDIR/GenAIExamples/FinanceAgent/tests/test.py --agent_role "supervis
 Supervisor Agent multi turn:
 
 ```bash
+export agent_port="9090"
 python3 $WORKDIR/GenAIExamples/FinanceAgent/tests/test.py --agent_role "supervisor" --ext_port $agent_port --multi-turn --stream
 ```
 
