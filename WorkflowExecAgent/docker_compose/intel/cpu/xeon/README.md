@@ -60,6 +60,24 @@ export temperature=0
 export max_new_tokens=1000
 ```
 
+<details>
+<summary> Using Remote LLM Endpoints </summary>
+When models are deployed on a remote server, a base URL and an API key are required to access them. To set up a remote server and acquire the base URL and API key, refer to <a href="https://www.intel.com/content/www/us/en/developer/topic-technology/artificial-intelligence/enterprise-inference.html"> Intel® AI for Enterprise Inference </a> offerings.
+
+Set the following environment variables.
+
+- `llm_endpoint_url` is the HTTPS endpoint of the remote server with the model of choice (i.e. https://api.inference.denvrdata.com). **Note:** If not using LiteLLM, the second part of the model card needs to be appended to the URL i.e. `/Llama-3.3-70B-Instruct` from `meta-llama/Llama-3.3-70B-Instruct`.
+- `llm_endpoint_api_key` is the access token or key to access the model(s) on the server.
+- `LLM_MODEL_ID` is the model card which may need to be overwritten depending on what it is set to `set_env.sh`.
+
+```bash
+export llm_endpoint_url=<https-endpoint-of-remote-server>
+export llm_endpoint_api_key=<your-api-key>
+export LLM_MODEL_ID=<model-card>
+```
+
+</details>
+
 ### Deploy the Services Using Docker Compose
 
 For an out-of-the-box experience, this guide uses an example workflow serving API service. There are 3 services needed for the setup: the agent microservice, an LLM inference service, and the workflow serving API.

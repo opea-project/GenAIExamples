@@ -18,7 +18,7 @@ import { SSE } from "sse.js";
 const CHAT_BASE_URL = env.CHAT_BASE_URL;
 const MODEL_ID = env.MODEL_ID;
 
-export async function fetchTextStream(query: string) {
+export async function fetchTextStream(query: object) {
 	let payload = {};
 	let url = "";
 	let modelId = "meta-llama/Meta-Llama-3-8B-Instruct";
