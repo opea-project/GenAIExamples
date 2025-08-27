@@ -6,8 +6,8 @@ langchain-core==0.3.60
 llama-index==0.12.41
 llama-index-core==0.12.41
 llama-index-embeddings-openvino==0.5.2
-llama-index-llms-openai==0.3.44
-llama-index-llms-openai-like==0.3.4
+llama-index-llms-openai==0.4.0
+llama-index-llms-openai-like==0.4.0
 llama-index-llms-openvino==0.4.0
 llama-index-postprocessor-openvino-rerank==0.4.1
 llama-index-readers-file==0.4.7

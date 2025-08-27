@@ -36,7 +36,7 @@ function build_docker_images() {
     cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="hybridrag hybridrag-ui dataprep retriever text2cypher vllm nginx"
+    service_list="hybridrag hybridrag-ui dataprep retriever text2cypher-gaudi vllm nginx"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log 2>&1
 
     docker images && sleep 1s
