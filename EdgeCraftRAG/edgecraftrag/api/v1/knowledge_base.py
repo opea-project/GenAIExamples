@@ -6,8 +6,9 @@ import json
 import os
 import re
 
+from typing import List, Dict, Union
 from edgecraftrag.api.v1.data import add_data
-from edgecraftrag.api_schema import DataIn, KnowledgeBaseCreateIn
+from edgecraftrag.api_schema import DataIn, KnowledgeBaseCreateIn, ExperienceIn
 from edgecraftrag.base import IndexerType
 from edgecraftrag.context import ctx
 from edgecraftrag.utils import compare_mappings
@@ -41,13 +42,15 @@ async def get_knowledge_base(knowledge_name: str):
 async def create_knowledge_base(knowledge: KnowledgeBaseCreateIn):
     try:
         active_pl = ctx.get_pipeline_mgr().get_active_pipeline()
+        if not active_pl:
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Please activate pipeline")
         if not re.match(r"^[a-zA-Z_][a-zA-Z0-9_]*$", knowledge.name):
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Knowledge base names must begin with a letter or underscore",
             )
         kb = ctx.knowledgemgr.create_knowledge_base(knowledge)
-        if kb.active:
+        if kb.active and kb.comp_type =="knowledge":
             active_pl.indexer.reinitialize_indexer(kb.name)
             active_pl.update_indexer_to_retriever()
         await save_knowledge_to_file()
@@ -63,17 +66,23 @@ async def delete_knowledge_base(knowledge_name: str):
         rm_kb = ctx.knowledgemgr.get_knowledge_base_by_name_or_id(knowledge_name)
         active_kb = ctx.knowledgemgr.get_active_knowledge_base()
         active_pl = ctx.get_pipeline_mgr().get_active_pipeline()
-        if active_kb.name == knowledge_name or active_kb.idx == knowledge_name:
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Cannot delete a running knowledge base."
-            )
-        kb_file_path = rm_kb.get_file_paths()
-        if kb_file_path:
-            if active_pl.indexer.comp_subtype == "milvus_vector":
-                await remove_file_handler([], knowledge_name)
-            if active_kb:
-                active_pl.indexer.reinitialize_indexer(active_kb.name)
-                active_pl.update_indexer_to_retriever()
+        if rm_kb.comp_type == "knowledge":
+            if not active_kb:
+                raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Please activate a knowledge base before proceeding.")
+            if active_kb.name == knowledge_name or active_kb.idx == knowledge_name:
+                raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Cannot delete a running knowledge base.")
+            kb_file_path = rm_kb.get_file_paths()
+            if kb_file_path:
+                if active_pl.indexer.comp_subtype == "milvus_vector":
+                    await remove_file_handler([], knowledge_name)
+                if active_kb:
+                    active_pl.indexer.reinitialize_indexer(active_kb.name)
+                    active_pl.update_indexer_to_retriever()
+        if rm_kb.comp_type == "experience":
+            if rm_kb.experience_active:
+                raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Cannot delete a running experience knowledge base.")
+            else:
+                rm_kb.clear_experiences()
         result = ctx.knowledgemgr.delete_knowledge_base(knowledge_name)
         await save_knowledge_to_file()
         return result
@@ -87,26 +96,27 @@ async def update_knowledge_base(knowledge: KnowledgeBaseCreateIn):
     try:
         kb = ctx.knowledgemgr.get_knowledge_base_by_name_or_id(knowledge.name)
         active_pl = ctx.get_pipeline_mgr().get_active_pipeline()
-        if active_pl.indexer.comp_subtype != "milvus_vector":
-            if knowledge.active and knowledge.active != kb.active:
-                file_paths = kb.get_file_paths()
-                await update_knowledge_base_handler(file_paths, knowledge.name)
-            elif not knowledge.active and kb.description != knowledge.description:
-                pass
-            elif not knowledge.active:
-                raise HTTPException(
-                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Must have an active knowledge base"
-                )
-        else:
-            if knowledge.active and knowledge.active != kb.active:
-                active_pl.indexer.reinitialize_indexer(knowledge.name)
-                active_pl.update_indexer_to_retriever()
-            elif not knowledge.active and kb.description != knowledge.description:
-                pass
-            elif not knowledge.active:
-                raise HTTPException(
-                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Must have an active knowledge base"
-                )
+        if kb.comp_type == "knowledge":
+            if active_pl.indexer.comp_subtype != "milvus_vector":
+                if knowledge.active and knowledge.active != kb.active:
+                    file_paths = kb.get_file_paths()
+                    await update_knowledge_base_handler(file_paths, knowledge.name)
+                elif not knowledge.active and kb.description != knowledge.description:
+                    pass
+                elif not knowledge.active:
+                    raise HTTPException(
+                        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Must have an active knowledge base"
+                    )
+            else:
+                if knowledge.active and knowledge.active != kb.active:
+                    active_pl.indexer.reinitialize_indexer(knowledge.name)
+                    active_pl.update_indexer_to_retriever()
+                elif not knowledge.active and kb.description != knowledge.description:
+                    pass
+                elif not knowledge.active:
+                    raise HTTPException(
+                        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Must have an active knowledge base"
+                    )
         result = ctx.knowledgemgr.update_knowledge_base(knowledge)
         await save_knowledge_to_file()
         return result
@@ -120,6 +130,9 @@ async def add_file_to_knowledge_base(knowledge_name, file_path: DataIn):
     try:
         active_pl = ctx.get_pipeline_mgr().get_active_pipeline()
         kb = ctx.knowledgemgr.get_knowledge_base_by_name_or_id(knowledge_name)
+        if kb.comp_type =="experience":
+             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="The experience type cannot perform file operations.")
+        # Validate and normalize the user-provided path
         user_path = file_path.local_path
         normalized_path = os.path.normpath(os.path.join(KNOWLEDGE_BASE_ROOT, user_path))
         if not normalized_path.startswith(KNOWLEDGE_BASE_ROOT):
@@ -170,6 +183,8 @@ async def remove_file_from_knowledge_base(knowledge_name, file_path: DataIn):
     try:
         active_pl = ctx.get_pipeline_mgr().get_active_pipeline()
         kb = ctx.knowledgemgr.get_knowledge_base_by_name_or_id(knowledge_name)
+        if kb.comp_type =="experience":
+             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="The experience type cannot perform file operations.")
         active_kb = ctx.knowledgemgr.get_active_knowledge_base()
         if file_path.local_path in kb.get_file_paths():
             kb.remove_file_path(file_path.local_path)
@@ -197,6 +212,72 @@ async def remove_file_from_knowledge_base(knowledge_name, file_path: DataIn):
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
 
+@kb_app.post("/v1/experience")
+def get_experience_by_question(req: ExperienceIn):
+    kb = ctx.knowledgemgr.get_experience_kb()   
+    result = kb.get_experience_by_question(req.question)
+    if not result:
+        raise HTTPException(404, detail="Experience not found")
+    return result
+
+@kb_app.get("/v1/experiences")
+def get_all_experience():
+    kb = ctx.knowledgemgr.get_experience_kb()
+    if kb:
+        return kb.get_all_experience()
+    else:
+        return kb
+
+@kb_app.patch("/v1/experiences")
+def update_experience(experience: ExperienceIn):
+    kb = ctx.knowledgemgr.get_experience_kb()
+    result = kb.update_experience(experience.question, experience.content)
+    if not result:
+        raise HTTPException(404, detail=f"Question not found")
+    return result
+
+@kb_app.delete("/v1/experiences")
+def delete_experience(req :ExperienceIn):
+    kb = ctx.knowledgemgr.get_experience_kb()
+    success = kb.delete_experience(req.question)
+    if not success:
+        raise HTTPException(404, detail=f"Question {req.question} not found")
+    return {"message": f"Question deleted"}
+
+@kb_app.post("/v1/multiple_experiences/check")
+def check_duplicate_multiple_experiences(experiences: List[Dict[str, Union[str, List[str]]]]):
+    kb = ctx.knowledgemgr.get_experience_kb()
+    if not kb:
+       raise HTTPException(404, detail=f"No active experience type knowledge base")
+    all_existing = kb.get_all_experience()
+    existing_questions = {item["question"] for item in all_existing}
+    new_questions = [exp["question"] for exp in experiences if "question" in exp]
+    duplicate_questions = [q for q in new_questions if q in existing_questions]
+    if duplicate_questions:
+        return {"code": 2001, "detail": "Duplicate experiences are appended OR overwritten!"}
+    else:
+        kb.add_multiple_experiences(experiences=experiences, flag=True)  
+        return {"status": "success","detail": "No duplicate experiences, added successfully"}
+
+@kb_app.post("/v1/multiple_experiences/confirm")
+def confirm_multiple_experiences(experiences: List[Dict[str, Union[str, List[str]]]],flag: bool):
+    kb = ctx.knowledgemgr.get_experience_kb()
+    try:
+        if not kb:
+            raise HTTPException(404, detail=f"No active experience type knowledge base")
+        kb.add_multiple_experiences(experiences=experiences, flag=flag)
+        return {"status": "success", "detail": "Experiences added successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Add Failure：{str(e)}")
+
+@kb_app.post("/v1/experiences/files")
+def add_experiences_from_file(req: DataIn):
+    kb = ctx.knowledgemgr.get_experience_kb()
+    try:
+        kb.add_experiences_from_file(req.local_path)
+        return {"status": "success"}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 # Update knowledge base data
 async def update_knowledge_base_handler(file_path=None, knowledge_name: str = "default_kb", add_file: bool = False):
@@ -253,21 +334,22 @@ async def load_knowledge_from_file():
             for Knowledgebase_data in all_data:
                 pipeline_req = KnowledgeBaseCreateIn(**Knowledgebase_data)
                 kb = ctx.knowledgemgr.create_knowledge_base(pipeline_req)
-                if Knowledgebase_data["file_map"]:
-                    if active_pl.indexer.comp_subtype != "milvus_vector" and Knowledgebase_data["active"]:
-                        for file_path in Knowledgebase_data["file_map"].values():
-                            await update_knowledge_base_handler(
-                                DataIn(local_path=file_path), Knowledgebase_data["name"], add_file=True
-                            )
-                            kb.add_file_path(file_path)
-                    elif Knowledgebase_data["active"]:
-                        active_pl.indexer.reinitialize_indexer(Knowledgebase_data["name"])
-                        active_pl.update_indexer_to_retriever()
-                        for file_path in Knowledgebase_data["file_map"].values():
-                            kb.add_file_path(file_path)
-                    else:
-                        for file_path in Knowledgebase_data["file_map"].values():
-                            kb.add_file_path(file_path)
+                if  kb.comp_type =="knowledge":
+                    if Knowledgebase_data["file_map"]:
+                        if active_pl.indexer.comp_subtype != "milvus_vector" and Knowledgebase_data["active"]:
+                            for file_path in Knowledgebase_data["file_map"].values():
+                                await update_knowledge_base_handler(
+                                    DataIn(local_path=file_path), Knowledgebase_data["name"], add_file=True
+                                )
+                                kb.add_file_path(file_path)
+                        elif Knowledgebase_data["active"]:
+                            active_pl.indexer.reinitialize_indexer(Knowledgebase_data["name"])
+                            active_pl.update_indexer_to_retriever()
+                            for file_path in Knowledgebase_data["file_map"].values():
+                                kb.add_file_path(file_path)
+                        else:
+                            for file_path in Knowledgebase_data["file_map"].values():
+                                kb.add_file_path(file_path)
         except Exception as e:
             print(f"Error load Knowledge base: {e}")
 
@@ -282,7 +364,7 @@ async def save_knowledge_to_file():
         kb_base = ctx.knowledgemgr.get_all_knowledge_bases()
         knowledgebases_data = []
         for kb in kb_base:
-            kb_json = {"name": kb.name, "description": kb.description, "active": kb.active, "file_map": kb.file_map}
+            kb_json = {"name": kb.name, "description": kb.description, "active": kb.active, "file_map": kb.file_map, "comp_type": kb.comp_type, "experience_active": kb.experience_active}
             knowledgebases_data.append(kb_json)
         json_str = json.dumps(knowledgebases_data, indent=2, ensure_ascii=False)
         with open(KNOWLEDGEBASE_FILE, "w", encoding="utf-8") as f:
@@ -293,15 +375,14 @@ async def save_knowledge_to_file():
 
 all_pipeline_milvus_maps = {}
 current_pipeline_kb_map = {}
-
-
 async def refresh_milvus_map(milvus_name):
     current_pipeline_kb_map.clear()
     knowledge_bases_list = await get_all_knowledge_bases()
     for kb in knowledge_bases_list:
+        if kb.comp_type == "experience":
+                    continue
         current_pipeline_kb_map[kb.name] = kb.file_map
     all_pipeline_milvus_maps[milvus_name] = copy.deepcopy(current_pipeline_kb_map)
-
 
 async def Synchronizing_vector_data(old_active_pl, new_active_pl):
     try:
@@ -322,6 +403,8 @@ async def Synchronizing_vector_data(old_active_pl, new_active_pl):
             new_milvus_map = {}
             kb_list = await get_all_knowledge_bases()
             for kb in kb_list:
+                if kb.comp_type == "experience":
+                    continue
                 new_milvus_map[kb.name] = kb.file_map
             added_files, deleted_files = compare_mappings(
                 new_milvus_map,

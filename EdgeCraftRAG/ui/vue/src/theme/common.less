@@ -111,6 +111,10 @@
     background: var(--color-primary-hover) !important;
     transition-duration: 0s;
   }
+  &.is-disabled {
+    color: var(--bg-scrollbar-hover) !important;
+    background: var(--color-scrollbar) !important;
+  }
 }
 .form-wrap {
   .intel-form-item-control-input-content {
@@ -191,9 +195,9 @@
     padding: 16px 24px 0 !important;
   }
 }
-.centered-model {
+.model-centered-footer {
   .ant-modal-confirm-btns {
-    text-align: center;
+    .vertical-center;
   }
 }
 .option-introduction {
@@ -213,6 +217,13 @@
     top: 5px;
   }
 }
+.experience-dialog {
+  .intel-modal-body {
+    max-height: 500px;
+    overflow-y: auto;
+  }
+}
+
 .loopStyle(@counter) when (@counter > 0) {
   .p-@{counter} {
     padding: (1px * @counter);

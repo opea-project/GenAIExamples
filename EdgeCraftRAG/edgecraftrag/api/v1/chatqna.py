@@ -32,6 +32,9 @@ async def chatqna(request: ChatCompletionRequest):
     try:
         sessionid = request.user
         set_current_session(sessionid)
+        kb = ctx.knowledgemgr.get_active_experience()
+        if kb:
+            request.tool_choice = 'auto' if kb.experience_active else 'none'
         generator = ctx.get_pipeline_mgr().get_active_pipeline().generator
         if generator:
             request.model = generator.model_id

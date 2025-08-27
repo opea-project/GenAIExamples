@@ -21,7 +21,7 @@
         <a-input
           v-model:value.trim="form.name"
           :maxlength="30"
-          :disabled="isEdit"
+          :disabled="isEdit || isExperience"
           :placeholder="$t('knowledge.nameValid1')"
         />
       </a-form-item>
@@ -74,10 +74,15 @@ const props = defineProps({
     type: String,
     default: "create",
   },
+  dialogFlag: {
+    type: String,
+    default: "knowledge",
+  },
 });
 interface FormType {
   name: string;
   description: string;
+  comp_type: string;
   active: boolean;
 }
 
@@ -89,7 +94,6 @@ const validateName = async (rule: any, value: string) => {
   if (len < 2 || len > 30) {
     return Promise.reject(t("knowledge.nameValid2"));
   }
-  console.log(isValidName(value));
   if (!isValidName(value)) {
     return Promise.reject(t("knowledge.nameValid3"));
   }
@@ -98,9 +102,11 @@ const validateName = async (rule: any, value: string) => {
 
 const { t } = useI18n();
 const emit = defineEmits(["close", "switch"]);
+const { dialogFlag } = props;
+
 const typeMap = {
-  create: t("knowledge.create"),
-  edit: t("knowledge.edit"),
+  create: t(`${dialogFlag}.create`),
+  edit: t(`${dialogFlag}.edit`),
 } as const;
 const dialogTitle = computed(() => {
   return typeMap[props.dialogType as keyof typeof typeMap];
@@ -108,17 +114,26 @@ const dialogTitle = computed(() => {
 const isEdit = computed(() => {
   return props.dialogType === "edit";
 });
+const isExperience = computed(() => {
+  return props.dialogFlag === "experience";
+});
 const isActivated = computed(() => {
   return props.dialogData?.active;
 });
 const modelVisible = ref<boolean>(true);
 const submitLoading = ref<boolean>(false);
 const formRef = ref<FormInstance>();
-const { name = "", description = "", active = false } = props.dialogData;
+const {
+  name = "",
+  description = "",
+  active = false,
+  experience_active = false,
+} = props.dialogData;
 const form = reactive<FormType>({
-  name,
+  name: isExperience.value ? "Experience" : name,
   description,
-  active,
+  comp_type: dialogFlag,
+  active: isExperience.value ? experience_active : active,
 });
 
 const rules = reactive({
@@ -137,17 +152,28 @@ const rules = reactive({
     },
   ],
 });
+// Format parameter
+const formatFormParam = () => {
+  const { name, description, comp_type, active } = form;
+  return {
+    name,
+    description,
+    comp_type,
+    active: !isExperience.value ? active : undefined,
+    experience_active: isExperience.value ? active : undefined,
+  };
+};
 // Submit
 const handleSubmit = () => {
   formRef.value?.validate().then(() => {
     submitLoading.value = true;
     const { name } = form;
-    const apiUrl =
-      props.dialogType === "edit"
-        ? requestKnowledgeBaseUpdate
-        : requestKnowledgeBaseCreate;
 
-    apiUrl(form)
+    const apiUrl = isEdit.value
+      ? requestKnowledgeBaseUpdate
+      : requestKnowledgeBaseCreate;
+
+    apiUrl(formatFormParam())
       .then(() => {
         emit("switch", name);
         handleCancel();

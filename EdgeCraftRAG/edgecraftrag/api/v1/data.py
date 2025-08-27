@@ -110,9 +110,7 @@ async def upload_file(file_name: str, file: UploadFile = File(...)):
                 status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid file_name: directory traversal detected"
             )
         os.makedirs(UPLOAD_DIRECTORY, exist_ok=True)
-        safe_filename = secure_filename(file.filename)
-        # Sanitize the uploaded file's name
-        safe_filename = secure_filename(file.filename)
+        safe_filename = file.filename
         file_path = os.path.normpath(os.path.join(UPLOAD_DIRECTORY, safe_filename))
         # Ensure file_path is within UPLOAD_DIRECTORY
         if not file_path.startswith(os.path.abspath(UPLOAD_DIRECTORY)):

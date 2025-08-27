@@ -123,7 +123,10 @@ def get_available_weights(model_path):
 
 def get_available_models(model_type):
     avail_models = []
-    if model_type == "LLM":
+    if model_type == "vLLM":
+        LLM_MODEL = os.getenv("LLM_MODEL", "Qwen/Qwen3-8B")
+        avail_models.append(LLM_MODEL)
+    elif model_type == "LLM":
         items = os.listdir(CONTAINER_MODEL_PATH)
         for item in items:
             if item == "BAAI":

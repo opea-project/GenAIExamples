@@ -66,7 +66,10 @@ const viteConfig = defineConfig((mode: ConfigEnv) => {
       preprocessorOptions: {
         less: {
           javascriptEnabled: true,
-          additionalData: `@import "${path.resolve(__dirname, "src/theme/index.less")}";`,
+          additionalData: `@import "${path.resolve(
+            __dirname,
+            "src/theme/index.less"
+          )}";`,
         },
       },
     },

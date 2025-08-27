@@ -80,7 +80,12 @@ class KnowledgeBaseCreateIn(BaseModel):
     name: str
     description: Optional[str] = None
     active: Optional[bool] = None
+    comp_type: Optional[str] = "knowledge"
+    experience_active:  Optional[bool] = None
 
+class ExperienceIn(BaseModel):
+    question: str
+    content: list[str] = None
 
 class MilvusConnectRequest(BaseModel):
     vector_uri: str

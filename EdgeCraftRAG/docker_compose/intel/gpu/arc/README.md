@@ -102,7 +102,7 @@ bash nginx/nginx-conf-generator.sh 1 nginx/nginx.conf
 export NGINX_CONFIG_PATH="${PWD}/nginx/nginx.conf"
 ```
 
-### Deploy the Service Using Docker Compose
+### Deploy the Service on Arc A770 Using Docker Compose
 
 ```bash
 # EC-RAG support Milvus as persistent database, by default milvus is disabled, you can choose to set MILVUS_ENABLED=1 to enable it
@@ -115,6 +115,35 @@ export MILVUS_ENABLED=0
 
 # Launch EC-RAG service with compose
 docker compose -f docker_compose/intel/gpu/arc/compose_vllm.yaml up -d
+```
+
+### Deploy the Service on Arc B60 Using Docker Compose
+
+```bash
+# EC-RAG support Milvus as persistent database, by default milvus is disabled, you can choose to set MILVUS_ENABLED=1 to enable it
+export MILVUS_ENABLED=0
+# If you enable Milvus, the default storage path is PWD, uncomment if you want to change:
+# export DOCKER_VOLUME_DIRECTORY= # change to your preference
+
+# EC-RAG support chat history round setting, by default chat history is disabled, you can set CHAT_HISTORY_ROUND to control it
+# export CHAT_HISTORY_ROUND= # change to your preference
+
+# Launch EC-RAG service with compose
+# Below enviroments are exposed for vLLM config, you can change them to your preference:
+# export VLLM_SERVICE_PORT_0=8100
+# export DTYPE=float16
+# export ZE_AFFINITY_MASK=0
+# export ENFORCE_EAGER=1
+# export TRUST_REMOTE_CODE=1
+# export DISABLE_SLIDING_WINDOW=1
+# export GPU_MEMORY_UTIL=0.8
+# export NO_ENABLE_PREFIX_CACHING=1
+# export MAX_NUM_BATCHED_TOKENS=8192
+# export DISABLE_LOG_REQUESTS=1
+# export MAX_MODEL_LEN=49152
+# export BLOCK_SIZE=64
+# export QUANTIZATION=fp8
+docker compose -f docker_compose/intel/gpu/arc/compose_vllm_b60.yaml up -d
 ```
 
 ### Access UI

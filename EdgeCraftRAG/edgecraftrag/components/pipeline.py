@@ -230,10 +230,12 @@ def run_generator_ben(pl: Pipeline, chat_request: ChatCompletionRequest) -> Any:
     contexts = {}
     start = time.perf_counter()
     query = chat_request.messages
-    if pl.generator.inference_type == InferenceType.VLLM:
-        UI_DIRECTORY = os.getenv("TMPFILE_PATH", "/home/user/ui_cache")
+    sub_questionss_result = None
+    experience_status = True if chat_request.tool_choice == 'auto' else False
+    if pl.generator.inference_type == InferenceType.VLLM and experience_status:
+        UI_DIRECTORY ="/home/user/ui_cache"
         search_config_path = os.path.join(UI_DIRECTORY, "configs/search_config.yaml")
-        search_dir = os.path.join(UI_DIRECTORY, "configs/search_dir")
+        search_dir = os.path.join(UI_DIRECTORY, "configs/experience_dir/experience.json")
 
         def run_async_query_search():
             loop = asyncio.new_event_loop()
@@ -294,10 +296,12 @@ def run_generator_ben(pl: Pipeline, chat_request: ChatCompletionRequest) -> Any:
 def run_generator(pl: Pipeline, chat_request: ChatCompletionRequest) -> Any:
     query = chat_request.messages
     contexts = {}
-    if pl.generator.inference_type == InferenceType.VLLM:
-        UI_DIRECTORY = os.getenv("TMPFILE_PATH", "/home/user/ui_cache")
+    sub_questionss_result = None
+    experience_status = True if chat_request.tool_choice == 'auto' else False
+    if pl.generator.inference_type == InferenceType.VLLM and experience_status:
+        UI_DIRECTORY ="/home/user/ui_cache"
         search_config_path = os.path.join(UI_DIRECTORY, "configs/search_config.yaml")
-        search_dir = os.path.join(UI_DIRECTORY, "configs/search_dir")
+        search_dir = os.path.join(UI_DIRECTORY, "configs/experience_dir/experience.json")
 
         def run_async_query_search():
             loop = asyncio.new_event_loop()

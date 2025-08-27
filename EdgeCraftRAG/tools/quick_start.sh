@@ -5,6 +5,8 @@
 set -e
 
 WORKPATH=$(dirname "$(pwd)")
+ip_address=$(hostname -I | awk '{print $1}')
+HOST_IP=$ip_address
 
 get_user_input() {
     local var_name=$1
@@ -32,7 +34,7 @@ function start_vllm_services() {
     MILVUS_ENABLED=$(get_enable_function "MILVUS DB(Enter 1 for enable)" "0")
     CHAT_HISTORY_ROUND=$(get_user_input "chat history round" "0")
     LLM_MODEL=$(get_user_input "your LLM model" "Qwen/Qwen3-8B")
-    MODEL_PATH=$(get_user_input "your model path" "${HOME}/models")
+    MODEL_PATH=$(get_user_input "your model path" "${PWD}/models")
     read -p "Have you prepare models in ${MODEL_PATH}:(yes/no) [yes]" user_input
     user_input=${user_input:-"yes"}
 
@@ -63,14 +65,20 @@ function start_vllm_services() {
     # vllm ENV
     export NGINX_PORT=8086
     export vLLM_ENDPOINT="http://${HOST_IP}:${NGINX_PORT}"
-    TENSOR_PARALLEL_SIZE=$(get_user_input "your tp size" 1)
-    read -p "selected GPU [$(seq -s, 0 $((TENSOR_PARALLEL_SIZE - 1)))] " SELECTED_XPU_0; SELECTED_XPU_0=${SELECTED_XPU_0:-$(seq -s, 0 $((TENSOR_PARALLEL_SIZE - 1)))}
-    DP_NUM=$(get_user_input "DP number(how many containers to run vLLM)" 1)
-    for (( x=0; x<DP_NUM; x++ ))
-    do
+    read -p "DP number(how many containers to run vLLM) [1] , press Enter to confirm, or type a new value:" DP_NUM; DP_NUM=${DP_NUM:-1}
+    read -p "Tensor parallel size(your tp size [1]), press Enter to confirm, or type a new value:" TENSOR_PARALLEL_SIZE; TENSOR_PARALLEL_SIZE=${TENSOR_PARALLEL_SIZE:-1}
+
+    for (( x=0; x<DP_NUM; x++ )); do
+        start_gpu=$(( x * TENSOR_PARALLEL_SIZE ))
+        default_gpu_list=$(seq -s, $start_gpu $(( start_gpu + TENSOR_PARALLEL_SIZE - 1 )))
+        
+        read -p "seleted XPU(your selected_XPU_${x} [${default_gpu_list}]) , press Enter to confirm, or type a new value:" input_gpu_list
+        selected_gpu_list=${input_gpu_list:-$default_gpu_list}
+        
+        export SELECTED_XPU_${x}="$selected_gpu_list"
         export VLLM_SERVICE_PORT_${x}="8$((x+1))00"
-        export SELECTED_XPU_${x}=$x
     done
+    CCL_DG2_USM=$(get_user_input "Set USM (Core=1, Xeon=0, default=0)" 0)
     export HOST_IP=${HOST_IP}
     export VLLM_SERVICE_PORT_0=8100
     # export ENV
@@ -84,6 +92,7 @@ function start_vllm_services() {
     export CHAT_HISTORY_ROUND=${CHAT_HISTORY_ROUND}
     export SELECTED_XPU_0=${SELECTED_XPU_0}
     export TENSOR_PARALLEL_SIZE=${TENSOR_PARALLEL_SIZE}
+    export CCL_DG2_USM=${CCL_DG2_USM}
 
     bash $WORKPATH/nginx/nginx-conf-generator.sh $DP_NUM $WORKPATH/nginx/nginx.conf
     export NGINX_CONFIG_PATH="${WORKPATH}/nginx/nginx.conf"
@@ -118,7 +127,7 @@ function start_services() {
     MILVUS_ENABLED=$(get_enable_function "MILVUS DB(Enter 1 for enable)" "0")
     CHAT_HISTORY_ROUND=$(get_user_input "chat history round" "0")
     LLM_MODEL=$(get_user_input "your LLM model" "Qwen/Qwen3-8B")
-    MODEL_PATH=$(get_user_input "your model path" "${HOME}/models")
+    MODEL_PATH=$(get_user_input "your model path" "${PWD}/models")
     read -p "Have you prepare models in ${MODEL_PATH}:(yes/no) [yes]" user_input
     user_input=${user_input:-"yes"}
 
@@ -170,14 +179,125 @@ function start_services() {
     docker compose -f $WORKPATH/docker_compose/intel/gpu/arc/$COMPOSE_FILE up -d
 }
 
-function main {
-    read -p "Do you want to start vLLM or local OpenVINO services? (vLLM/ov) [vLLM]: " user_input
-    user_input=${user_input:-"vLLM"}
 
-    if [ "$user_input" == "vLLM" ]; then
-        start_vllm_services
+function check_baai_folder() {
+    local baai_path="${MODEL_PATH}/BAAI"
+    
+    if [ -d "${baai_path}" ]; then
+        return 0
     else
-        start_services
+        echo "Error: BAAI folder not found in ${MODEL_PATH}!"
+        echo "Please prepare the models first, then run quick_start_ov_services again."
+        exit 1 
+    fi
+}
+
+
+function quick_start_vllm_services() {
+    WORKPATH=$(dirname "$PWD")
+    COMPOSE_FILE="compose_vllm.yaml"
+    EC_RAG_SERVICE_PORT=16010
+    docker compose -f $WORKPATH/docker_compose/intel/gpu/arc/$COMPOSE_FILE down
+
+    export HOST_IP=${HOST_IP:-"${ip_address}"}
+    export MODEL_PATH=${MODEL_PATH:-"${PWD}/models"}
+    export DOC_PATH=${DOC_PATH:-"$WORKPATH/tests"}
+    export TMPFILE_PATH=${TMPFILE_PATH:-"$WORKPATH/tests"}
+    export DP_NUM=${DP_NUM:-1}
+    export MILVUS_ENABLED=${MILVUS_ENABLED:-1}
+    export CHAT_HISTORY_ROUND=${CHAT_HISTORY_ROUND:-2}
+    export HF_ENDPOINT=${HF_ENDPOINT:-https://hf-mirror.com}
+    export NGINX_PORT=${NGINX_PORT:-8086}
+    export NGINX_PORT_0=${NGINX_PORT_0:-8100}
+    export VLLM_SERVICE_PORT_0=${VLLM_SERVICE_PORT_0:-8100}
+    export TENSOR_PARALLEL_SIZE=${TENSOR_PARALLEL_SIZE:-1}
+    export SELECTED_XPU_0=${SELECTED_XPU_0:-0}
+    export MAX_NUM_SEQS=${MAX_NUM_SEQS:-64}
+    export MAX_NUM_BATCHED_TOKENS=${MAX_NUM_BATCHED_TOKENS:-4000}
+    export MAX_MODEL_LEN=${MAX_MODEL_LEN:-3000}
+    export LOAD_IN_LOW_BIT=${LOAD_IN_LOW_BIT:-fp8}
+    export CCL_DG2_USM=${CCL_DG2_USM:-0}
+    export vLLM_ENDPOINT=${vLLM_ENDPOINT:-"http://${HOST_IP}:${NGINX_PORT}"}
+    export LLM_MODEL=${LLM_MODEL:-Qwen/Qwen3-8B}
+    export LLM_MODEL_PATH=${LLM_MODEL_PATH:-"${MODEL_PATH}/Qwen/Qwen3-8B"}
+  
+    check_baai_folder
+    export HF_CACHE=${HF_CACHE:-"${HOME}/.cache"}
+    export no_proxy="localhost, 127.0.0.1, 192.168.1.1, ${HOST_IP}"
+    if [ ! -d "${HF_CACHE}" ]; then
+        mkdir -p "${HF_CACHE}"
+        echo "Created directory: ${HF_CACHE}"
+    fi
+    sudo chown -R 1000:1000 ${MODEL_PATH} ${DOC_PATH} ${TMPFILE_PATH}
+    sudo chown -R 1000:1000 ${HF_CACHE}
+    cd $WORKPATH/docker_compose/intel/gpu/arc
+    bash $WORKPATH/nginx/nginx-conf-generator.sh $DP_NUM $WORKPATH/nginx/nginx.conf
+    export NGINX_CONFIG_PATH=${NGINX_CONFIG_PATH:-"$WORKPATH/nginx/nginx.conf"}
+   
+    bash $WORKPATH/docker_compose/intel/gpu/arc/multi-arc-yaml-generator.sh $DP_NUM $WORKPATH/docker_compose/intel/gpu/arc/$COMPOSE_FILE
+    docker compose -f $WORKPATH/docker_compose/intel/gpu/arc/$COMPOSE_FILE up -d
+    echo "ipex-llm-serving-xpu is booting, please wait..."
+    n=0
+    until [[ "$n" -ge 100 ]]; do
+        docker logs ipex-llm-serving-xpu-container-0 > ipex-llm-serving-xpu-container.log 2>&1
+        if grep -q "Starting vLLM API server on http://0.0.0.0:" ipex-llm-serving-xpu-container.log; then
+            break
+        fi
+        sleep 6s
+        n=$((n+1))
+    done
+    rm -rf ipex-llm-serving-xpu-container.log
+    echo "service launched, please visit UI at ${HOST_IP}:8082"
+}
+
+
+function quick_start_ov_services() {
+    COMPOSE_FILE="compose.yaml"
+    echo "stop former service..."
+    docker compose -f $WORKPATH/docker_compose/intel/gpu/arc/$COMPOSE_FILE down
+
+    ip_address=$(hostname -I | awk '{print $1}')
+    export HOST_IP=${HOST_IP:-"${ip_address}"}
+    export DOC_PATH=${DOC_PATH:-"$WORKPATH/tests"}
+    export TMPFILE_PATH=${TMPFILE_PATH:-"$WORKPATH/tests"}
+    export MILVUS_ENABLED=${MILVUS_ENABLED:-1}
+    export CHAT_HISTORY_ROUND=${CHAT_HISTORY_ROUND:-"0"}
+    export LLM_MODEL=${LLM_MODEL:-"Qwen/Qwen3-8B"}
+    export MODEL_PATH=${MODEL_PATH:-"${HOME}/models"}
+
+    check_baai_folder
+    export HF_CACHE=${HF_CACHE:-"${HOME}/.cache"}
+    if [ ! -d "${HF_CACHE}" ]; then
+        mkdir -p "${HF_CACHE}"
+        echo "Created directory: ${HF_CACHE}"
+    fi
+
+    sudo chown 1000:1000 "${MODEL_PATH}" "${DOC_PATH}" "${TMPFILE_PATH}"
+    sudo chown -R 1000:1000 "${HF_CACHE}"
+    export HF_ENDPOINT=${HF_ENDPOINT:-"https://hf-mirror.com"}
+    export no_proxy="localhost, 127.0.0.1, 192.168.1.1, ${HOST_IP}"
+    export CCL_DG2_USM=${CCL_DG2_USM:-0}
+
+    echo "Starting service..."
+    docker compose -f "$WORKPATH/docker_compose/intel/gpu/arc/$COMPOSE_FILE" up -d
+}
+
+function main {
+    if [[ $- == *i* ]]; then
+        read -p "Do you want to start vLLM or local OpenVINO services? (vLLM/ov) [vLLM]: " user_input
+        user_input=${user_input:-"vLLM"}
+        if [ "$user_input" == "vLLM" ]; then
+            start_vllm_services
+        else
+            start_services
+        fi
+    else
+        export SERVICE_TYPE=${SERVICE_TYPE:-"vLLM"}
+        if [ "$SERVICE_TYPE" == "vLLM" ]; then
+            quick_start_vllm_services
+        else
+            quick_start_ov_services
+        fi
     fi
 }
 
