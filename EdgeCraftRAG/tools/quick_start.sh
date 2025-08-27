@@ -72,7 +72,7 @@ function start_vllm_services() {
         start_gpu=$(( x * TENSOR_PARALLEL_SIZE ))
         default_gpu_list=$(seq -s, $start_gpu $(( start_gpu + TENSOR_PARALLEL_SIZE - 1 )))
         
-        read -p "seleted XPU(your selected_XPU_${x} [${default_gpu_list}]) , press Enter to confirm, or type a new value:" input_gpu_list
+        read -p "selected XPU(your selected_XPU_${x} [${default_gpu_list}]) , press Enter to confirm, or type a new value:" input_gpu_list
         selected_gpu_list=${input_gpu_list:-$default_gpu_list}
         
         export SELECTED_XPU_${x}="$selected_gpu_list"
