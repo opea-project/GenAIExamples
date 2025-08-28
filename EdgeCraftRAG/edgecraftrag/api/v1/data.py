@@ -6,7 +6,6 @@ import os
 from edgecraftrag.api_schema import DataIn, FilesIn
 from edgecraftrag.context import ctx
 from fastapi import FastAPI, File, HTTPException, UploadFile, status
-from werkzeug.utils import secure_filename
 
 data_app = FastAPI()
 
