@@ -175,8 +175,8 @@ class LogitsEstimatorJSON(LogitsEstimator):
 def read_json_files(file_path: str) -> dict:
     result = {}
     if os.path.isfile(file_path):
-        with open(file_path, 'r', encoding='utf-8') as f:
-            result =  json.load(f)
+        with open(file_path, "r", encoding="utf-8") as f:
+            result = json.load(f)
     return result
 
 
@@ -213,10 +213,10 @@ async def query_search(user_input, search_config_path, search_dir, pl):
     match_scores.sort(key=lambda x: x[1], reverse=True)
 
     # Maximum less than 0.6, we don't use query search.
-    if  match_scores[0][1] < 0.6:
+    if match_scores[0][1] < 0.6:
         return top1_issue, sub_questions_result
     top1_issue = match_scores[0][0]
     for i in range(len(maintenance_data)):
-        if maintenance_data[i]['question'] == top1_issue:
+        if maintenance_data[i]["question"] == top1_issue:
             sub_questions_result = "\n".join(maintenance_data[i]["content"])
     return top1_issue, sub_questions_result

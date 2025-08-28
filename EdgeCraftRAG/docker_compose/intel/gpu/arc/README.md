@@ -129,7 +129,7 @@ export MILVUS_ENABLED=0
 # export CHAT_HISTORY_ROUND= # change to your preference
 
 # Launch EC-RAG service with compose
-# Below enviroments are exposed for vLLM config, you can change them to your preference:
+# Below environments are exposed for vLLM config, you can change them to your preference:
 # export VLLM_SERVICE_PORT_0=8100
 # export DTYPE=float16
 # export ZE_AFFINITY_MASK=0

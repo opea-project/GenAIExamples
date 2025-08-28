@@ -231,9 +231,9 @@ def run_generator_ben(pl: Pipeline, chat_request: ChatCompletionRequest) -> Any:
     start = time.perf_counter()
     query = chat_request.messages
     sub_questionss_result = None
-    experience_status = True if chat_request.tool_choice == 'auto' else False
+    experience_status = True if chat_request.tool_choice == "auto" else False
     if pl.generator.inference_type == InferenceType.VLLM and experience_status:
-        UI_DIRECTORY ="/home/user/ui_cache"
+        UI_DIRECTORY = "/home/user/ui_cache"
         search_config_path = os.path.join(UI_DIRECTORY, "configs/search_config.yaml")
         search_dir = os.path.join(UI_DIRECTORY, "configs/experience_dir/experience.json")
 
@@ -297,9 +297,9 @@ def run_generator(pl: Pipeline, chat_request: ChatCompletionRequest) -> Any:
     query = chat_request.messages
     contexts = {}
     sub_questionss_result = None
-    experience_status = True if chat_request.tool_choice == 'auto' else False
+    experience_status = True if chat_request.tool_choice == "auto" else False
     if pl.generator.inference_type == InferenceType.VLLM and experience_status:
-        UI_DIRECTORY ="/home/user/ui_cache"
+        UI_DIRECTORY = "/home/user/ui_cache"
         search_config_path = os.path.join(UI_DIRECTORY, "configs/search_config.yaml")
         search_dir = os.path.join(UI_DIRECTORY, "configs/experience_dir/experience.json")
 
