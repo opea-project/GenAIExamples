@@ -31,7 +31,7 @@ git clone https://github.com/opea-project/GenAIComps.git
 
 # vllm-service
 cd vllm/
-VLLM_VER=v0.10.1.1
+VLLM_VER=v0.10.2rc1
 git checkout "${VLLM_VER}"
 docker build --no-cache -f docker/Dockerfile.cpu -t opea/vllm-cpu:"${TAG:-latest}" --shm-size=128g .
 
