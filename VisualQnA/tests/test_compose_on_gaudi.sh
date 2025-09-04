@@ -27,7 +27,7 @@ function build_docker_images() {
     popd && sleep 1s
 
     git clone https://github.com/HabanaAI/vllm-fork.git && cd vllm-fork
-    VLLM_FORK_VER=v0.9.0.1+Gaudi-1.22.0
+    VLLM_FORK_VER=v1.22.0-740
     git checkout ${VLLM_FORK_VER} &> /dev/null && cd ../
 
     service_list="visualqna visualqna-ui lvm nginx vllm-gaudi"

@@ -27,7 +27,7 @@ function build_docker_images() {
 
     # Download Gaudi vllm of latest tag
     git clone https://github.com/HabanaAI/vllm-fork.git && cd vllm-fork
-    VLLM_FORK_VER=v0.9.0.1+Gaudi-1.22.0
+    VLLM_FORK_VER=v1.22.0-740
     echo "Check out vLLM tag ${VLLM_FORK_VER}"
     git checkout ${VLLM_FORK_VER} &> /dev/null && cd ../
 
