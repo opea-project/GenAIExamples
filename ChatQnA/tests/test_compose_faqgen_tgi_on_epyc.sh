@@ -25,16 +25,6 @@ function build_docker_images() {
 	echo "GenAIComps test commit is $(git rev-parse HEAD)"
 	docker build --no-cache -t ${REGISTRY}/comps-base:${TAG} --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
 	popd && sleep 1s
-	git clone https://github.com/vllm-project/vllm.git && cd vllm
-	VLLM_VER=v0.10.0
-	echo "Check out vLLM tag ${VLLM_VER}"
-	git checkout ${VLLM_VER} &>/dev/null
-	VLLM_REQ_FILE="requirements/cpu.txt"
-	if ! grep -q "^transformers" "$VLLM_REQ_FILE"; then
-		echo "Adding transformers<4.54.0 to $VLLM_REQ_FILE"
-		echo "transformers<4.54.0" >>"$VLLM_REQ_FILE"
-	fi
-	cd ../
 
 	echo "Build all the images with --no-cache, check docker_image_build.log for details..."
 	service_list="chatqna chatqna-ui dataprep retriever llm-faqgen nginx"
