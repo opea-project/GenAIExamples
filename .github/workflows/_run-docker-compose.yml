@@ -105,7 +105,7 @@ jobs:
                   run_test_cases="$run_test_cases $test_case"
               fi
           done
-          
+
           if [ -z "$run_test_cases" ] && [[ $(printf '%s\n' "${changed_files[@]}" | grep ${{ inputs.example }} | grep /tests/) ]]; then
               run_test_cases=$other_test_cases
           fi
