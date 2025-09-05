@@ -35,7 +35,7 @@ services:
       - SYS_NICE
     restart: unless-stopped
   vllm-service:
-    image: ${REGISTRY:-opea}/vllm-gaudi:${TAG:-latest}
+    image: vault.habana.ai/gaudi-docker/1.22.0/ubuntu22.04/habanalabs/vllm-installer-2.7.1:1.22.0-740
     container_name: vllm-gaudi-service
     ports:
       - ${LLM_SERVER_PORT:-3006}:80
