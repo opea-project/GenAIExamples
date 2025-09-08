@@ -29,7 +29,7 @@ services:
     #  - ./pretrained_models/:/home/user/GPT-SoVITS/GPT_SoVITS/pretrained_models/
     restart: unless-stopped
   vllm-service:
-    image: ${REGISTRY:-opea}/vllm:${TAG:-latest}
+    image: public.ecr.aws/q9t5s3a7/vllm-cpu-release-repo:v0.10.1
     container_name: vllm-service
     ports:
       - ${LLM_SERVER_PORT:-3006}:80

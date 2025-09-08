@@ -144,7 +144,7 @@ services:
     command: --model-id ${RERANK_MODEL_ID} --auto-truncate
 
   vllm-service:
-    image: ${REGISTRY:-opea}/vllm:${TAG:-latest}
+    image: public.ecr.aws/q9t5s3a7/vllm-cpu-release-repo:v0.10.1
     container_name: vllm-service
     ports:
       - "9009:80"

@@ -65,7 +65,7 @@ services:
       RETRIEVER_COMPONENT_NAME: "OPEA_RETRIEVER_REDIS"
     restart: unless-stopped
   vllm-service:
-    image: ${REGISTRY:-opea}/vllm:${TAG:-latest}
+    image: public.ecr.aws/q9t5s3a7/vllm-cpu-release-repo:v0.10.1
     container_name: vllm-service
     ports:
       - "9009:80"

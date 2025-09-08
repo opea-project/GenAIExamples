@@ -114,12 +114,6 @@ services:
       context: GenAIComps
       dockerfile: comps/third_parties/vllm/src/Dockerfile.amd_gpu
     image: ${REGISTRY:-opea}/vllm-rocm:${TAG:-latest}
-  vllm:
-    build:
-      context: vllm
-      dockerfile: docker/Dockerfile.cpu
-    extends: chatqna
-    image: ${REGISTRY:-opea}/vllm:${TAG:-latest}
   vllm-gaudi:
     build:
       context: vllm-fork
