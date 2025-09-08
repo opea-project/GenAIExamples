@@ -73,12 +73,6 @@ services:
       dockerfile: comps/third_parties/gpt-sovits/src/Dockerfile
     extends: audioqna
     image: ${REGISTRY:-opea}/gpt-sovits:${TAG:-latest}
-  vllm:
-    build:
-      context: vllm
-      dockerfile: docker/Dockerfile.cpu
-    extends: audioqna
-    image: ${REGISTRY:-opea}/vllm:${TAG:-latest}
   vllm-gaudi:
     build:
       context: vllm-fork
