@@ -41,7 +41,7 @@ function build_agent_docker_image_gaudi_vllm() {
     get_genai_comps
 
     git clone https://github.com/HabanaAI/vllm-fork.git && cd vllm-fork
-    VLLM_FORK_VER=v1.22.0-740
+    VLLM_FORK_VER=v0.9.0.1+Gaudi-1.22.0
     git checkout ${VLLM_FORK_VER} &> /dev/null && cd ../
 
     echo "Build agent image with --no-cache..."

@@ -123,7 +123,7 @@ get_service_list() {
 # Defines the configurations for cloning prerequisite repositories.
 # A generic build function will use these settings.
 
-VLLM_FORK_VER=v1.22.0-740
+VLLM_FORK_VER=v0.9.0.1+Gaudi-1.22.0
 
 # Config for examples using vLLM v0.8.3
 declare -A VLLM_8_3_CONFIG=(
