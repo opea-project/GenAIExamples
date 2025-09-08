@@ -32,7 +32,7 @@ services:
       retries: 50
     restart: unless-stopped
   vllm-guardrails-service:
-    image: vault.habana.ai/gaudi-docker/1.22.0/ubuntu22.04/habanalabs/vllm-installer-2.7.1:1.22.0-740
+    image: ${REGISTRY:-opea}/vllm-gaudi:${TAG:-latest}
     container_name: vllm-guardrails-server
     ports:
       - "8088:80"
