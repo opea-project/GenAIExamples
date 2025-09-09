@@ -34,23 +34,43 @@
 		const eventSource = await fetchTextStream(query);
 
 		eventSource.addEventListener("message", (e: any) => {
-			let res = e.data;
+			const raw = String(e.data);
+			const payloads = raw
+				.split(/\r?\n/)
+				.map((l) => l.replace(/^data:\s*/, "").trim())
+				.filter((l) => l.length > 0);
 
-			if (res === "[DONE]") {
-				deleteFlag = false;
-				loading = false;
-				query = '';
-			} else {
-				let Msg = JSON.parse(res).choices[0].text;
-				if (Msg.includes("'''")) {
-					deleteFlag = true;
-				} else if (deleteFlag && Msg.includes("\\n")) {
+			for (const part of payloads) {
+				if (part === "[DONE]") {
 					deleteFlag = false;
-				} else if (Msg !== "</s>" && !deleteFlag) {
-					code_output += Msg.replace(/\\n/g, "\n");
+					loading = false;
+					return;
+				}
+				try {
+					const json = JSON.parse(part);
+					const msg =
+						json.choices?.[0]?.delta?.content ?? json.choices?.[0]?.text ?? ""; 
+
+					if (!msg) continue;
+
+					if (msg.includes("```")) {
+						deleteFlag = !deleteFlag; 
+						continue;
+					}
+
+					if (!deleteFlag && msg !== "</s>") {
+						code_output += msg; 
+					}
+				} catch (err) {
+					console.error("JSON chunk parse error:", err, part);
 				}
 			}
 		});
+
+		eventSource.addEventListener("error", () => {
+			loading = false;
+		});
+
 		eventSource.stream();
 	};
 
