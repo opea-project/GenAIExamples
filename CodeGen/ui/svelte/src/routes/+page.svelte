@@ -49,17 +49,17 @@
 				try {
 					const json = JSON.parse(part);
 					const msg =
-						json.choices?.[0]?.delta?.content ?? json.choices?.[0]?.text ?? ""; 
+						json.choices?.[0]?.delta?.content ?? json.choices?.[0]?.text ?? "";
 
 					if (!msg) continue;
 
 					if (msg.includes("```")) {
-						deleteFlag = !deleteFlag; 
+						deleteFlag = !deleteFlag;
 						continue;
 					}
 
 					if (!deleteFlag && msg !== "</s>") {
-						code_output += msg; 
+						code_output += msg;
 					}
 				} catch (err) {
 					console.error("JSON chunk parse error:", err, part);
