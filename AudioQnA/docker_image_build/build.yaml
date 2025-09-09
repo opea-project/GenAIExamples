@@ -13,12 +13,29 @@ services:
       context: ../
       dockerfile: ./Dockerfile
     image: ${REGISTRY:-opea}/audioqna:${TAG:-latest}
+  audioqna-openeuler:
+    build:
+      args:
+        IMAGE_REPO: ${REGISTRY}
+        BASE_TAG: ${TAG}
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
+        no_proxy: ${no_proxy}
+      context: ../
+      dockerfile: ./Dockerfile.openEuler
+    image: ${REGISTRY:-opea}/audioqna:${TAG:-latest}-openeuler
   audioqna-ui:
     build:
       context: ../ui
       dockerfile: ./docker/Dockerfile
     extends: audioqna
     image: ${REGISTRY:-opea}/audioqna-ui:${TAG:-latest}
+  audioqna-ui-openeuler:
+    build:
+      context: ../ui
+      dockerfile: ./docker/Dockerfile.openEuler
+    extends: audioqna
+    image: ${REGISTRY:-opea}/audioqna-ui:${TAG:-latest}-openeuler
   audioqna-multilang:
     build:
       context: ../
@@ -37,6 +54,12 @@ services:
       dockerfile: comps/third_parties/whisper/src/Dockerfile
     extends: audioqna
     image: ${REGISTRY:-opea}/whisper:${TAG:-latest}
+  whisper-openeuler:
+    build:
+      context: GenAIComps
+      dockerfile: comps/third_parties/whisper/src/Dockerfile.openEuler
+    extends: audioqna
+    image: ${REGISTRY:-opea}/whisper:${TAG:-latest}-openeuler
   asr:
     build:
       context: GenAIComps
@@ -61,6 +84,12 @@ services:
       dockerfile: comps/third_parties/speecht5/src/Dockerfile
     extends: audioqna
     image: ${REGISTRY:-opea}/speecht5:${TAG:-latest}
+  speecht5-openeuler:
+    build:
+      context: GenAIComps
+      dockerfile: comps/third_parties/speecht5/src/Dockerfile.openEuler
+    extends: audioqna
+    image: ${REGISTRY:-opea}/speecht5:${TAG:-latest}-openeuler
   tts:
     build:
       context: GenAIComps
