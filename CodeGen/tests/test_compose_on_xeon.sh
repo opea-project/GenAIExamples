@@ -33,7 +33,7 @@ function build_docker_images() {
     cd ../
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="codegen codegen-gradio-ui llm-textgen vllm dataprep retriever embedding"
+    service_list="codegen codegen-ui llm-textgen vllm dataprep retriever embedding"
 
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
@@ -250,8 +250,12 @@ function main() {
         validate_megaservice
         echo "::endgroup::"
 
-        echo "::group::validate_gradio"
-        validate_gradio
+        # echo "::group::validate_gradio"
+        # validate_gradio
+        # echo "::endgroup::"
+
+        echo "::group::validate_ui"
+        validate_frontend
         echo "::endgroup::"
 
         stop_docker "${docker_compose_files[${i}]}"
