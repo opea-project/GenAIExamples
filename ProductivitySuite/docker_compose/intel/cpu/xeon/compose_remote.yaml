@@ -163,7 +163,7 @@ services:
     command: mongod --quiet --logpath /dev/null
 
   chathistory-mongo:
-    image: ${REGISTRY:-opea}/chathistory-mongo:${TAG:-latest}
+    image: ${REGISTRY:-opea}/chathistory:${TAG:-latest}
     container_name: chathistory-mongo-server
     ports:
       - "6012:6012"
@@ -172,6 +172,7 @@ services:
       http_proxy: ${http_proxy}
       no_proxy: ${no_proxy}
       https_proxy: ${https_proxy}
+      OPEA_STORE_NAME: "mongodb"
       MONGO_HOST: ${MONGO_HOST:-mongo}
       MONGO_PORT: ${MONGO_PORT:-27017}
       COLLECTION_NAME: ${COLLECTION_NAME:-Conversations}
@@ -179,7 +180,7 @@ services:
     restart: unless-stopped
 
   promptregistry-mongo:
-    image: ${REGISTRY:-opea}/promptregistry-mongo:${TAG:-latest}
+    image: ${REGISTRY:-opea}/promptregistry:${TAG:-latest}
     container_name: promptregistry-mongo-server
     ports:
       - "6018:6018"
@@ -188,6 +189,7 @@ services:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       no_proxy: ${no_proxy}
+      OPEA_STORE_NAME: "mongodb"
       MONGO_HOST: ${MONGO_HOST:-mongo}
       MONGO_PORT: ${MONGO_PORT:-27017}
       COLLECTION_NAME: ${PROMPT_COLLECTION_NAME:-prompt}
