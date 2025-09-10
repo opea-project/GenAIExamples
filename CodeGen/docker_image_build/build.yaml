@@ -31,12 +31,47 @@ services:
       dockerfile: ./docker/Dockerfile.gradio
     extends: codegen
     image: ${REGISTRY:-opea}/codegen-gradio-ui:${TAG:-latest}
+  codegen-openeuler:
+    build:
+      args:
+        IMAGE_REPO: ${REGISTRY}
+        BASE_TAG: ${TAG}
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
+        no_proxy: ${no_proxy}
+      context: ../
+      dockerfile: ./Dockerfile.openEuler
+    image: ${REGISTRY:-opea}/codegen:${TAG:-latest}-openeuler
+  codegen-ui-openeuler:
+    build:
+      context: ../ui
+      dockerfile: ./docker/Dockerfile.openEuler
+    extends: codegen
+    image: ${REGISTRY:-opea}/codegen-ui:${TAG:-latest}-openeuler
+  codegen-react-ui-openeuler:
+    build:
+      context: ../ui
+      dockerfile: ./docker/Dockerfile.react.openEuler
+    extends: codegen
+    image: ${REGISTRY:-opea}/codegen-react-ui:${TAG:-latest}-openeuler
+  codegen-gradio-ui-openeuler:
+    build:
+      context: ../ui
+      dockerfile: ./docker/Dockerfile.gradio.openEuler
+    extends: codegen
+    image: ${REGISTRY:-opea}/codegen-gradio-ui:${TAG:-latest}-openeuler
   llm-textgen:
     build:
       context: GenAIComps
       dockerfile: comps/llms/src/text-generation/Dockerfile
     extends: codegen
     image: ${REGISTRY:-opea}/llm-textgen:${TAG:-latest}
+  llm-textgen-openeuler:
+    build:
+      context: GenAIComps
+      dockerfile: comps/llms/src/text-generation/Dockerfile.openEuler
+    extends: codegen
+    image: ${REGISTRY:-opea}/llm-textgen:${TAG:-latest}-openeuler
   vllm-rocm:
     build:
       context: GenAIComps
@@ -61,15 +96,33 @@ services:
       dockerfile: comps/dataprep/src/Dockerfile
     extends: codegen
     image: ${REGISTRY:-opea}/dataprep:${TAG:-latest}
+  dataprep-openeuler:
+    build:
+      context: GenAIComps
+      dockerfile: comps/dataprep/src/Dockerfile.openEuler
+    extends: codegen
+    image: ${REGISTRY:-opea}/dataprep:${TAG:-latest}-openeuler
   retriever:
     build:
       context: GenAIComps
       dockerfile: comps/retrievers/src/Dockerfile
     extends: codegen
     image: ${REGISTRY:-opea}/retriever:${TAG:-latest}
+  retriever-openeuler:
+    build:
+      context: GenAIComps
+      dockerfile: comps/retrievers/src/Dockerfile.openEuler
+    extends: codegen
+    image: ${REGISTRY:-opea}/retriever:${TAG:-latest}-openeuler
   embedding:
     build:
       context: GenAIComps
       dockerfile: comps/embeddings/src/Dockerfile
     extends: codegen
     image: ${REGISTRY:-opea}/embedding:${TAG:-latest}
+  embedding-openeuler:
+    build:
+      context: GenAIComps
+      dockerfile: comps/embeddings/src/Dockerfile.openEuler
+    extends: codegen
+    image: ${REGISTRY:-opea}/embedding:${TAG:-latest}-openeuler

@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright (C) 2025 Intel Corporation
+# Copyright (C) 2025 Huawei Technologies Co., Ltd.
 # SPDX-License-Identifier: Apache-2.0
 
 set -e
@@ -22,11 +22,11 @@ function build_docker_images() {
     git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
     pushd GenAIComps
     echo "GenAIComps test commit is $(git rev-parse HEAD)"
-    docker build --no-cache -t ${REGISTRY}/comps-base:${TAG} --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
+    docker build --no-cache -t ${REGISTRY}/comps-base:${TAG}-openeuler --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile.openEuler .
     popd && sleep 1s
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="audioqna-multilang audioqna-ui whisper gpt-sovits"
+    service_list="audioqna-openeuler audioqna-ui-openeuler whisper-openeuler speecht5-openeuler"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker images && sleep 1s
@@ -39,7 +39,7 @@ function start_services() {
     # sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
     # Start Docker Containers
-    docker compose -f compose_multilang.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
+    docker compose -f compose_openeuler.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
     n=0
     until [[ "$n" -ge 200 ]]; do
        docker logs vllm-service > $LOG_PATH/vllm_service_start.log 2>&1
@@ -49,7 +49,6 @@ function start_services() {
        sleep 5s
        n=$((n+1))
     done
-    sleep 1m
 }
 
 
@@ -57,7 +56,7 @@ function validate_megaservice() {
     response=$(http_proxy="" curl http://${ip_address}:3008/v1/audioqna -XPOST -d '{"audio": "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA", "max_tokens":64}' -H 'Content-Type: application/json')
     # always print the log
     docker logs whisper-service > $LOG_PATH/whisper-service.log
-    docker logs gpt-sovits-service > $LOG_PATH/tts-service.log
+    docker logs speecht5-service > $LOG_PATH/tts-service.log
     docker logs vllm-service > $LOG_PATH/vllm-service.log
     docker logs audioqna-xeon-backend-server > $LOG_PATH/audioqna-xeon-backend-server.log
     echo "$response" | sed 's/^"//;s/"$//' | base64 -d > speech.mp3
@@ -71,10 +70,9 @@ function validate_megaservice() {
 
 }
 
-
 function stop_docker() {
     cd $WORKPATH/docker_compose/intel/cpu/xeon/
-    docker compose -f compose_multilang.yaml stop && docker compose rm -f
+    docker compose -f compose_openeuler.yaml stop && docker compose rm -f
 }
 
 function main() {

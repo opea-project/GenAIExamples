@@ -1,0 +1,10 @@
+# Copyright (C) 2025 Huawei Technologies Co., Ltd.
+# SPDX-License-Identifier: Apache-2.0
+
+ARG IMAGE_REPO=opea
+ARG BASE_TAG=latest
+FROM $IMAGE_REPO/comps-base:$BASE_TAG-openeuler
+
+COPY ./codegen.py $HOME/codegen.py
+
+ENTRYPOINT ["python", "codegen.py"]
