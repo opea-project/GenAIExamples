@@ -25,11 +25,11 @@
 
 	let query: string = "";
 	let loading: boolean = false;
-	let inFence = false;       
-	let tickRun = 0;           
-	let skipLangLine = false;  
-	let langBuf = "";          
-	let currentLang = "";      
+	let inFence = false;
+	let tickRun = 0;
+	let skipLangLine = false;
+	let langBuf = "";
+	let currentLang = "";
 
 	type Segment = {
 		id: number;
@@ -86,7 +86,7 @@
 		const s = (raw ?? "").toString().trim();
 		if (!s) return null;
 		const lower = s.toLowerCase();
-		return languageAliases[lower] ?? s; 
+		return languageAliases[lower] ?? s;
 	}
 
 	function appendText(s: string) {
@@ -188,7 +188,7 @@
 
 		for (const part of payloads) {
 			if (part === "[DONE]") {
-			settleTicks(); 
+			settleTicks();
 			loading = false;
 			return;
 			}
