@@ -753,7 +753,16 @@ class Deployer:
             log_message("WARN", f"Image update script '{script_path}' not found. Skipping this step.")
             return True
 
-        cmd = ["bash", str(script_path), "--example", self.example_name, "--device", self.args.device, "--os", self.args.os]
+        cmd = [
+            "bash",
+            str(script_path),
+            "--example",
+            self.example_name,
+            "--device",
+            self.args.device,
+            "--os",
+            self.args.os,
+        ]
 
         if getattr(self.args, "setup_local_registry", False):
             cmd.append("--setup-registry")
