@@ -33,7 +33,7 @@ log() {
 
 section_header() {
     local title="$1"
-    local width=56
+    local width=96
     local border_top="┌"
     local border_side="│"
     local border_bot="└"
