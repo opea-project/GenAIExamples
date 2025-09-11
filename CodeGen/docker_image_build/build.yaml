@@ -78,12 +78,6 @@ services:
       dockerfile: comps/third_parties/vllm/src/Dockerfile.amd_gpu
     extends: codegen
     image: ${REGISTRY:-opea}/vllm-rocm:${TAG:-latest}
-  vllm:
-    build:
-      context: vllm
-      dockerfile: docker/Dockerfile.cpu
-    extends: codegen
-    image: ${REGISTRY:-opea}/vllm:${TAG:-latest}
   vllm-gaudi:
     build:
       context: vllm-fork

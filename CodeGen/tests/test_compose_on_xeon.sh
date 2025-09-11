@@ -26,14 +26,8 @@ function build_docker_images() {
     docker build --no-cache -t ${REGISTRY}/comps-base:${TAG} --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
     popd && sleep 1s
 
-    git clone https://github.com/vllm-project/vllm.git && cd vllm
-    VLLM_VER=v0.10.0
-    echo "Check out vLLM tag ${VLLM_VER}"
-    git checkout ${VLLM_VER} &> /dev/null
-    cd ../
-
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="codegen codegen-gradio-ui llm-textgen vllm dataprep retriever embedding"
+    service_list="codegen codegen-gradio-ui llm-textgen dataprep retriever embedding"
 
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 

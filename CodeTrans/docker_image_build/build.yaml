@@ -25,12 +25,6 @@ services:
       dockerfile: comps/llms/src/text-generation/Dockerfile
     extends: codetrans
     image: ${REGISTRY:-opea}/llm-textgen:${TAG:-latest}
-  vllm:
-    build:
-      context: vllm
-      dockerfile: docker/Dockerfile.cpu
-    extends: codetrans
-    image: ${REGISTRY:-opea}/vllm:${TAG:-latest}
   vllm-gaudi:
     build:
       context: vllm-fork
