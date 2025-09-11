@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright (C) 2024 Intel Corporation
+# Copyright (C) 2025 Huawei Technologies Co., Ltd.
 # SPDX-License-Identifier: Apache-2.0
 
 set -xe
@@ -23,15 +23,15 @@ function build_docker_images() {
     git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
     pushd GenAIComps
     echo "GenAIComps test commit is $(git rev-parse HEAD)"
-    docker build --no-cache -t ${REGISTRY}/comps-base:${TAG} --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
+    docker build --no-cache -t ${REGISTRY}/comps-base:${TAG}-openeuler --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile.openEuler .
     popd && sleep 1s
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="codegen codegen-ui llm-textgen vllm dataprep retriever embedding"
+    service_list="codegen-openeuler codegen-gradio-ui-openeuler llm-textgen-openeuler dataprep-openeuler retriever-openeuler embedding-openeuler"
 
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
-    docker pull ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu
+    docker pull openeuler/text-generation-inference-cpu:2.4.0-oe2403lts
     docker images && sleep 1s
 }
 
@@ -159,25 +159,24 @@ function validate_megaservice() {
 
 function validate_frontend() {
     cd $WORKPATH/ui/svelte
-    local conda_env_name="OPEA_e2e"
-    export PATH=${HOME}/miniforge3/bin/:$PATH
-    if conda info --envs | grep -q "$conda_env_name"; then
-        echo "$conda_env_name exist!"
-    else
-        conda create -n ${conda_env_name} python=3.12 -y
-    fi
-    source activate ${conda_env_name}
+    echo "[TEST INFO]: Preparing frontend test using Docker..."
 
     sed -i "s/localhost/$ip_address/g" playwright.config.ts
 
-    conda install -c conda-forge nodejs=22.6.0 -y
-    npm install && npm ci && npx playwright install --with-deps
-    node -v && npm -v && pip list
-
-    export no_proxy="localhost,127.0.0.1,$ip_address"
-    
+    echo "[TEST INFO]: Running frontend tests in Docker..."
     exit_status=0
-    npx playwright test || exit_status=$?
+
+    docker run --rm \
+        --network="host" \
+        -v $PWD:/work \
+        -w /work \
+        mcr.microsoft.com/playwright:v1.40.0-focal \
+        /bin/bash -c "
+            npm install &&
+            npm ci &&
+            npx playwright install &&
+            npx playwright test
+        " || exit_status=$?
 
     if [ $exit_status -ne 0 ]; then
         echo "[TEST INFO]: ---------frontend test failed---------"
@@ -199,7 +198,7 @@ function validate_gradio() {
     fi
 }
 
-function stop_docker() {
+function stop_service() {
     local compose_file="$1"
 
     cd $WORKPATH/docker_compose/intel/cpu/xeon/
@@ -208,8 +207,8 @@ function stop_docker() {
 
 function main() {
     # all docker docker compose files for Xeon Platform
-    docker_compose_files=("compose_tgi.yaml" "compose.yaml")
-    docker_llm_container_names=("tgi-server" "vllm-server")
+    docker_compose_files=("compose_openeuler.yaml")
+    docker_llm_container_names=( "vllm-server")
 
     # get number of compose files and LLM docker container names
     len_compose_files=${#docker_compose_files[@]}
@@ -221,9 +220,9 @@ function main() {
         exit 1
     fi
 
-    # stop_docker, stop all compose files
+    # stop_service, stop all compose files
     for ((i = 0; i < len_compose_files; i++)); do
-        stop_docker "${docker_compose_files[${i}]}"
+        stop_service "${docker_compose_files[${i}]}"
     done
 
     # build docker images
@@ -246,15 +245,11 @@ function main() {
         validate_megaservice
         echo "::endgroup::"
 
-        # echo "::group::validate_gradio"
-        # validate_gradio
-        # echo "::endgroup::"
-
-        echo "::group::validate_ui"
-        validate_frontend
+        echo "::group::validate_gradio"
+        validate_gradio
         echo "::endgroup::"
 
-        stop_docker "${docker_compose_files[${i}]}"
+        stop_service "${docker_compose_files[${i}]}"
         sleep 5s
     done
 

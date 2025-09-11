@@ -1,15 +1,15 @@
-# Copyright (C) 2025 Advanced Micro Devices, Inc.
-# Copyright (C) 2025 Intel Corporation
+# Copyright (C) 2025 Huawei Technologies Co., Ltd.
 # SPDX-License-Identifier: Apache-2.0
 
 services:
-  vllm-service:
-    image: public.ecr.aws/q9t5s3a7/vllm-cpu-release-repo:v0.10.1
-    container_name: vllm-server
+
+  tgi-service:
+    image: openeuler/text-generation-inference-cpu:2.4.0-oe2403lts
+    container_name: tgi-server
     ports:
       - "8028:80"
     volumes:
-      - "${MODEL_CACHE:-./data}:/root/.cache/huggingface/hub"
+      - "${MODEL_CACHE:-./data}:/data"
     shm_size: 1g
     environment:
       no_proxy: ${no_proxy}
@@ -22,9 +22,9 @@ services:
       interval: 10s
       timeout: 10s
       retries: 100
-    command: --model ${LLM_MODEL_ID} --host 0.0.0.0 --port 80
+    command: --model-id ${LLM_MODEL_ID} --cuda-graphs 0
   llm-base:
-    image: ${REGISTRY:-opea}/llm-textgen:${TAG:-latest}
+    image: ${REGISTRY:-opea}/llm-textgen:${TAG:-latest}-openeuler
     container_name: llm-textgen-server
     environment:
       no_proxy: ${no_proxy}
@@ -34,18 +34,18 @@ services:
       LLM_MODEL_ID: ${LLM_MODEL_ID}
       HF_TOKEN: ${HF_TOKEN}
     restart: unless-stopped
-  llm-vllm-service:
+  llm-tgi-service:
     extends: llm-base
-    container_name: llm-codegen-vllm-server
+    container_name: llm-codegen-tgi-server
     ports:
       - "9000:9000"
     ipc: host
     depends_on:
-      vllm-service:
+      tgi-service:
         condition: service_healthy
-  codegen-epyc-backend-server:
-    image: ${REGISTRY:-opea}/codegen:${TAG:-latest}
-    container_name: codegen-epyc-backend-server
+  codegen-xeon-backend-server:
+    image: ${REGISTRY:-opea}/codegen:${TAG:-latest}-openeuler
+    container_name: codegen-xeon-backend-server
     depends_on:
       llm-base:
         condition: service_started
@@ -65,11 +65,11 @@ services:
       - EMBEDDER_PORT=${EMBEDDER_PORT}
     ipc: host
     restart: always
-  codegen-epyc-ui-server:
-    image: ${REGISTRY:-opea}/codegen-gradio-ui:${TAG:-latest}
-    container_name: codegen-epyc-ui-server
+  codegen-xeon-ui-server:
+    image: ${REGISTRY:-opea}/codegen-gradio-ui:${TAG:-latest}-openeuler
+    container_name: codegen-xeon-ui-server
     depends_on:
-      - codegen-epyc-backend-server
+      - codegen-xeon-backend-server
     ports:
       - "5173:5173"
     environment:
@@ -87,10 +87,10 @@ services:
     image: redis/redis-stack:7.2.0-v9
     container_name: redis-vector-db
     ports:
-      - "${REDIS_DB_PORT:-6379}:${REDIS_DB_PORT:-6379}"
-      - "${REDIS_INSIGHTS_PORT:-8001}:${REDIS_INSIGHTS_PORT:-8001}"
+      - "${REDIS_DB_PORT}:${REDIS_DB_PORT}"
+      - "${REDIS_INSIGHTS_PORT}:${REDIS_INSIGHTS_PORT}"
   dataprep-redis-server:
-    image: ${REGISTRY:-opea}/dataprep:${TAG:-latest}
+    image: ${REGISTRY:-opea}/dataprep:${TAG:-latest}-openeuler
     container_name: dataprep-redis-server
     depends_on:
       - redis-vector-db
@@ -106,16 +106,15 @@ services:
       HF_TOKEN: ${HF_TOKEN}
       LOGFLAG: true
     healthcheck:
-      test:
-        ["CMD-SHELL", "curl -f http://localhost:5000/v1/health_check || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://localhost:5000/v1/health_check || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 10
     restart: unless-stopped
   tei-embedding-serving:
-    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.7
+    image: openeuler/text-embeddings-inference-cpu:1.7.0-oe2403lts
     container_name: tei-embedding-serving
-    entrypoint: /bin/sh -c "apt-get update && apt-get install -y curl && text-embeddings-router --json-output --model-id ${EMBEDDING_MODEL_ID} --auto-truncate"
+    entrypoint: /bin/sh -c "yum update -y && yum install -y curl && text-embeddings-router --json-output --model-id ${EMBEDDING_MODEL_ID} --auto-truncate"
     ports:
       - "${TEI_EMBEDDER_PORT:-12000}:80"
     volumes:
@@ -133,7 +132,7 @@ services:
       timeout: 6s
       retries: 48
   tei-embedding-server:
-    image: ${REGISTRY:-opea}/embedding:${TAG:-latest}
+    image: ${REGISTRY:-opea}/embedding:${TAG:-latest}-openeuler
     container_name: tei-embedding-server
     ports:
       - "${EMBEDDER_PORT:-10201}:6000"
@@ -149,12 +148,12 @@ services:
         condition: service_healthy
     restart: unless-stopped
   retriever-redis:
-    image: ${REGISTRY:-opea}/retriever:${TAG:-latest}
+    image: ${REGISTRY:-opea}/retriever:${TAG:-latest}-openeuler
     container_name: retriever-redis
     depends_on:
       - redis-vector-db
     ports:
-      - "${REDIS_RETRIEVER_PORT:-7000}:${REDIS_RETRIEVER_PORT:-7000}"
+      - "${REDIS_RETRIEVER_PORT}:${REDIS_RETRIEVER_PORT}"
     ipc: host
     environment:
       no_proxy: ${no_proxy}
