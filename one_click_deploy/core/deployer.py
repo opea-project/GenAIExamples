@@ -182,7 +182,7 @@ class Deployer:
 
     def _get_docker_compose_files(self):
         """Returns a list of Docker Compose file paths."""
-        return self._get_path_from_config(["docker_compose", "paths"], self.args.device)
+        return self._get_path_from_config(["docker_compose", "paths", self.args.os], self.args.device)
 
     def _get_docker_set_env_script(self):
         """Returns the path to the set_env script."""
@@ -318,10 +318,14 @@ class Deployer:
             self.args.deploy_mode = click.prompt(
                 "Deployment Mode", type=click.Choice(["docker", "k8s"]), default="docker"
             )
-
+        self.args.os = click.prompt(
+            "Target OS",
+            type=click.Choice(self.config.get("supported_os")),
+            default=self.config.get("default_os"),
+        )
         self.args.device = click.prompt(
             "Target Device",
-            type=click.Choice(self.config.get("supported_devices")),
+            type=click.Choice(self.config.get("supported_devices").get(self.args.os)),
             default=self.config.get("default_device"),
         )
         cached_token = get_huggingface_token_from_file()
@@ -429,9 +433,14 @@ class Deployer:
         )
 
         if self.args.deploy_mode == "docker":
+            self.args.os = click.prompt(
+                "On which target OS was it deployed?",
+                type=click.Choice(self.config.get("supported_os")),
+                default=self.config.get("default_os"),
+            )
             self.args.device = click.prompt(
                 "On which target device was it deployed?",
-                type=click.Choice(self.config.get("supported_devices")),
+                type=click.Choice(self.config.get("supported_devices").get(self.args.os)),
                 default=self.config.get("default_device"),
             )
             # Set project name for clearing
@@ -678,9 +687,14 @@ class Deployer:
         self.args.deploy_mode = click.prompt(
             "How is the service deployed?", type=click.Choice(["docker", "k8s"]), default="docker"
         )
+        self.args.os = click.prompt(
+            "On which target OS is it deployed?",
+            type=click.Choice(self.config.get("supported_os")),
+            default=self.config.get("default_os"),
+        )
         self.args.device = click.prompt(
             "On which target device is it running?",
-            type=click.Choice(self.config.get("supported_devices")),
+            type=click.Choice(self.config.get("supported_devices").get(self.args.os)),
             default=self.config.get("default_device"),
         )
         if self.args.deploy_mode == "docker":
@@ -739,7 +753,16 @@ class Deployer:
             log_message("WARN", f"Image update script '{script_path}' not found. Skipping this step.")
             return True
 
-        cmd = ["bash", str(script_path), "--example", self.example_name, "--device", self.args.device]
+        cmd = [
+            "bash",
+            str(script_path),
+            "--example",
+            self.example_name,
+            "--device",
+            self.args.device,
+            "--os",
+            self.args.os,
+        ]
 
         if getattr(self.args, "setup_local_registry", False):
             cmd.append("--setup-registry")
