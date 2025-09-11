@@ -3,7 +3,7 @@
 
 services:
   vllm-service:
-    image: ${REGISTRY:-opea}/vllm:${TAG:-latest}
+    image: public.ecr.aws/q9t5s3a7/vllm-cpu-release-repo:v0.10.1
     container_name: docsum-xeon-vllm-service
     ports:
       - ${LLM_ENDPOINT_PORT:-8008}:80
