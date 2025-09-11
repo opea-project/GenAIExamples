@@ -115,6 +115,7 @@ jobs:
       - name: Install dependencies
         run: |
           # Use flock to prevent apt conflicts when multiple instances run
+          sudo rm -f /etc/apt/sources.list.d/helm-stable-debian.list || true
           sudo flock /var/lib/dpkg/lock-frontend apt update
           sudo flock /var/lib/dpkg/lock-frontend apt install -y python3-pip
 
