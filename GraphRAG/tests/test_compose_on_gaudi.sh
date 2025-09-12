@@ -35,7 +35,7 @@ function start_services() {
     cd $WORKPATH/docker_compose/intel/hpu/gaudi
     source set_env.sh
     unset OPENAI_API_KEY
-
+    export no_proxy="localhost,127.0.0.1,$ip_address"
     # Start Docker Containers
     docker compose -f compose.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
 
