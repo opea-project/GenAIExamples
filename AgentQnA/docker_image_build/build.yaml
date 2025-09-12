@@ -17,12 +17,6 @@ services:
       dockerfile: ./docker/Dockerfile
     extends: agent
     image: ${REGISTRY:-opea}/agent-ui:${TAG:-latest}
-  vllm-gaudi:
-    build:
-      context: vllm-fork
-      dockerfile: Dockerfile.hpu
-    extends: agent
-    image: ${REGISTRY:-opea}/vllm-gaudi:${TAG:-latest}
   vllm-rocm:
     build:
       context: GenAIComps

@@ -35,6 +35,7 @@ function build_docker_images() {
 
 function start_services() {
     cd $WORKPATH/docker_compose/amd/gpu/rocm/
+    export no_proxy="localhost,127.0.0.1,$ip_address"
     source set_env.sh
     # Start Docker Containers
     docker compose up -d > ${LOG_PATH}/start_services_with_compose.log

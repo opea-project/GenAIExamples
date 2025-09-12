@@ -33,7 +33,7 @@ function build_docker_images() {
 
 function start_services() {
     cd $WORKPATH/docker_compose/intel/cpu/xeon
-
+    export no_proxy="localhost,127.0.0.1,$ip_address"
     export INDEX_NAME="rag-qdrant"
     source set_env.sh
 
