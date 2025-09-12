@@ -33,6 +33,7 @@ function build_docker_images() {
 
 function start_services() {
     cd $WORKPATH/docker_compose/amd/gpu/rocm/
+    export no_proxy="localhost,127.0.0.1,$ip_address"
     source set_env_vllm.sh
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
