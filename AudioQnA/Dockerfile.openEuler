@@ -6,6 +6,7 @@ ARG BASE_TAG=latest
 FROM $IMAGE_REPO/comps-base:$BASE_TAG-openeuler
 
 
+
 COPY ./audioqna.py $HOME/audioqna.py
 
 ENTRYPOINT ["python", "audioqna.py"]
