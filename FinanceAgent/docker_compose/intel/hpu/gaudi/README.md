@@ -98,7 +98,7 @@ cd $WORKDIR
 git clone https://github.com/HabanaAI/vllm-fork.git
 # get the latest release tag of vllm gaudi
 cd vllm-fork
-VLLM_VER=v0.10.2rc1
+VLLM_VER=v0.10.2rc2
 echo "Check out vLLM tag ${VLLM_VER}"
 git checkout ${VLLM_VER}
 docker build --no-cache -f Dockerfile.hpu -t opea/vllm-gaudi:latest --shm-size=128g . --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy
