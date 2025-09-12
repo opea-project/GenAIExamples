@@ -88,14 +88,13 @@ services:
       HF_HUB_ENABLE_HF_TRANSFER: 0
     command: --model-id ${RERANK_MODEL_ID} --auto-truncate
   vllm-service:
-    image: openeuler/vllm-cpu:0.9.1-oe2403lts
+    image: openeuler/vllm-cpu:0.10.1-oe2403lts
     container_name: vllm-service
     ports:
       - "9009:80"
     volumes:
       - "${MODEL_CACHE:-./data}:/root/.cache/huggingface/hub"
     shm_size: 128g
-    privileged: true
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
