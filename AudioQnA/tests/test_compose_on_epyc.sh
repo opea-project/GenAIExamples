@@ -29,7 +29,7 @@ function build_docker_images() {
 
 	git clone https://github.com/vllm-project/vllm.git
 	cd ./vllm/
-	VLLM_VER=v0.10.2rc2
+	VLLM_VER=v0.10.2
 	echo "Check out vLLM tag ${VLLM_VER}"
 	git checkout ${VLLM_VER} &>/dev/null
 	VLLM_REQ_FILE="requirements/cpu.txt"

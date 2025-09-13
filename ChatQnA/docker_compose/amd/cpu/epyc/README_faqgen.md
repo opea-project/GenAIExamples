@@ -65,7 +65,7 @@ First of all, you need to build Docker Images locally. This step can be ignored 
 ```bash
 git clone https://github.com/vllm-project/vllm.git
 cd ./vllm/
-VLLM_VER=v0.10.2rc2
+VLLM_VER=v0.10.2
 git checkout ${VLLM_VER}
 docker build --no-cache --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile.cpu -t opea/vllm:latest --shm-size=128g .
 ```
