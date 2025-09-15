@@ -26,7 +26,11 @@ function build_docker_images() {
     docker build --no-cache -t ${REGISTRY}/comps-base:${TAG} --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
     popd && sleep 1s
 
-    service_list="visualqna visualqna-ui lvm nginx"
+    git clone https://github.com/HabanaAI/vllm-fork.git && cd vllm-fork
+    VLLM_FORK_VER=v0.6.6.post1+Gaudi-1.20.0
+    git checkout ${VLLM_FORK_VER} &> /dev/null && cd ../
+
+    service_list="visualqna visualqna-ui lvm nginx vllm-gaudi"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
     docker images && sleep 1s
 }
