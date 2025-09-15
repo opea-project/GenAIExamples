@@ -2,7 +2,7 @@
   <div class="knowledge-base">
     <div class="menu-container">
       <div class="header-menu">
-        <a-button type="primary" @click="handleCreate">
+        <a-button type="primary" block @click="handleCreateSelect">
           <template #icon>
             <PlusOutlined />
           </template>
@@ -16,19 +16,40 @@
           :key="item.idx"
           @click="handleView(item)"
         >
-          <span class="active-icon" v-if="item.active"
+          <span
+            :class="{
+              'active-icon': true,
+              'is-experience': item.comp_type === 'experience',
+            }"
+            v-if="item.active || item.experience_active"
             ><CheckOutlined :style="{ fontSize: '12px' }"
           /></span>
           <div class="left-wrap">
             <SvgIcon
-              name="icon-knowledge"
+              :name="
+                item.comp_type === 'experience'
+                  ? 'icon-experience'
+                  : 'icon-knowledge'
+              "
               :style="{ color: 'var(--color-primary-second)' }"
             />
             <div class="des-wrap">
-              <div class="name-wrap">{{ item.name }}</div>
+              <div class="name-wrap">
+                {{ item.name }}
+
+                <template v-if="item.comp_type === 'experience'">
+                  <span class="tag-wrap"> {{ $t("experience.unique") }}</span>
+                </template>
+              </div>
               <div class="total-wrap">
-                {{ $t("knowledge.total") }}
-                {{ Object.keys(item.file_map).length || 0 }}
+                <template v-if="item.comp_type === 'experience'">
+                  {{ $t("experience.total") }}
+                  {{ item.total }}
+                </template>
+                <template v-else>
+                  {{ $t("knowledge.total") }}
+                  {{ item.total }}</template
+                >
               </div>
             </div>
           </div>
@@ -37,16 +58,37 @@
               <a @click.prevent class="expand-wrap"> ... </a>
               <template #overlay>
                 <a-menu>
-                  <a-menu-item
-                    key="activate"
-                    :disabled="item.active"
-                    @click="handleSwitchState(item)"
-                  >
-                    <CheckCircleFilled
-                      :style="{ color: 'var(--color-success)' }"
-                    />
-                    {{ $t("common.active") }}</a-menu-item
-                  >
+                  <template v-if="item.comp_type === 'knowledge'">
+                    <a-menu-item
+                      key="activate"
+                      :disabled="item.active"
+                      @click="handleSwitchState(item)"
+                    >
+                      <CheckCircleFilled
+                        :style="{ color: 'var(--color-success)' }"
+                      />
+                      {{ $t("common.active") }}</a-menu-item
+                    >
+                  </template>
+                  <template v-else>
+                    <a-menu-item
+                      key="experience_active"
+                      @click="handleSwitchExperienceState(item)"
+                    >
+                      <template v-if="!item.experience_active">
+                        <CheckCircleFilled
+                          :style="{ color: 'var(--color-success)' }"
+                        />
+                        {{ $t("common.active") }}</template
+                      >
+                      <template v-else>
+                        <PauseCircleFilled
+                          :style="{ color: 'var(--color-error)' }"
+                        />
+                        {{ $t("common.deactivate") }}
+                      </template>
+                    </a-menu-item>
+                  </template>
                   <a-menu-item key="update" @click="handleUpdate(item)">
                     <EditFilled
                       :style="{ color: 'var(--color-primary-second)' }"
@@ -56,7 +98,7 @@
                   <a-menu-item
                     key="delete"
                     @click="handleDelete(item)"
-                    :disabled="item.active"
+                    :disabled="item.active || item.experience_active"
                   >
                     <DeleteFilled :style="{ color: 'var(--color-error)' }" />
                     {{ $t("common.delete") }}</a-menu-item
@@ -73,18 +115,25 @@
       v-if="updateDialog.visible"
       :dialog-data="updateDialog.data"
       :dialog-type="updateDialog.type"
+      :dialog-flag="updateDialog.flag"
       @switch="handleSwitch"
       @close="updateDialog.visible = false"
+    />
+    <SelectTypeDialog
+      v-if="selectTypeDialog.visible"
+      :created="isCreated"
+      @close="selectTypeDialog.visible = false"
+      @createKB="handleCreate"
     />
   </div>
 </template>
 
 <script lang="ts" setup name="KnowledgeBase">
 import { onMounted, reactive, createVNode } from "vue";
-import { UpdateDialog } from "./index";
+import { UpdateDialog, SelectTypeDialog } from "./index";
 import {
   getKnowledgeBaseList,
-  getKnowledgeBaseDetialByName,
+  getKnowledgeBaseDetailByName,
   requestKnowledgeBaseUpdate,
   requestKnowledgeBaseDelete,
 } from "@/api/knowledgeBase";
@@ -95,7 +144,7 @@ import {
   EditFilled,
   CheckCircleFilled,
   CloseCircleFilled,
-  FileDoneOutlined,
+  PauseCircleFilled,
 } from "@ant-design/icons-vue";
 import { useI18n } from "vue-i18n";
 import { Modal } from "ant-design-vue";
@@ -108,35 +157,47 @@ const selectedKB = ref<string>("");
 const updateDialog = reactive<DialogType>({
   visible: false,
   type: "create",
+  flag: "knowledge",
   data: {},
+});
+const selectTypeDialog = reactive<DialogType>({
+  visible: false,
 });
 
 const kbList = ref<EmptyArrayType>([]);
-
+const isCreated = computed(() =>
+  kbList.value.some((item) => item.comp_type === "experience")
+);
 const queryKnowledgeBaseList = async () => {
   const data: any = await getKnowledgeBaseList();
 
   kbList.value = [].concat(data);
 };
+const handleCreateSelect = () => {
+  selectTypeDialog.visible = true;
+};
 //create
-const handleCreate = () => {
+const handleCreate = (flag = "create") => {
   updateDialog.type = "create";
+  updateDialog.flag = flag;
   updateDialog.data = {};
   updateDialog.visible = true;
 };
 //edit
 const handleUpdate = async (row: EmptyObjectType) => {
-  const data: any = await getKnowledgeBaseDetialByName(row.name);
+  const data: any = await getKnowledgeBaseDetailByName(row.name);
 
   updateDialog.data = data;
   updateDialog.type = "edit";
+  updateDialog.flag = row.comp_type;
   updateDialog.visible = true;
 };
 //detail
 const handleView = async (row: EmptyObjectType) => {
-  const { idx, name } = row;
+  const { idx } = row;
+
   selectedKB.value = idx;
-  emit("view", name);
+  emit("view", row);
 };
 //delete
 const handleDelete = (row: EmptyObjectType) => {
@@ -153,7 +214,7 @@ const handleDelete = (row: EmptyObjectType) => {
 
       if (selectedKB.value === idx) {
         selectedKB.value = "";
-        emit("view", "");
+        emit("view", { name: "" });
       }
     },
   });
@@ -168,6 +229,25 @@ const handleSwitchState = (row: EmptyObjectType) => {
     okText: t("common.confirm"),
     async onOk() {
       await requestKnowledgeBaseUpdate({ name, active: true });
+      handleSearch();
+    },
+  });
+};
+const handleSwitchExperienceState = (row: EmptyObjectType) => {
+  const { name, experience_active } = row;
+
+  const text = experience_active
+    ? t("experience.deactivateTip")
+    : t("experience.activeTip");
+  Modal.confirm({
+    title: t("common.prompt"),
+    content: text,
+    okText: t("common.confirm"),
+    async onOk() {
+      await requestKnowledgeBaseUpdate({
+        name,
+        experience_active: !experience_active,
+      });
       handleSearch();
     },
   });
@@ -216,9 +296,6 @@ onUnmounted(() => {
       padding: 0 12px;
       height: 60px;
       border-bottom: 1px solid var(--border-main-color);
-      .intel-btn {
-        width: 100%;
-      }
     }
     .list-container {
       flex: 1;
@@ -257,6 +334,19 @@ onUnmounted(() => {
               line-height: 16px;
               text-align: left;
               .single-ellipsis;
+              .tag-wrap {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                height: 16px;
+                line-height: 1;
+                padding: 0 6px;
+                border-radius: 10px;
+                font-size: 10px;
+                margin-left: 4px;
+                color: var(--color-primary-tip);
+                background-color: var(--color-second-primaryBg);
+              }
             }
             .total-wrap {
               color: var(--font-info-color);
@@ -289,6 +379,9 @@ onUnmounted(() => {
           background-color: var(--color-success);
           color: var(--color-white);
           .vertical-center;
+          &.is-experience {
+            background-color: var(--color-purple);
+          }
         }
       }
     }

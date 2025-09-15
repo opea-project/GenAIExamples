@@ -60,5 +60,5 @@ class MetadataReplaceProcessor(BaseComponent, MetadataReplacementPostProcessor):
 
     @model_serializer
     def ser_model(self):
-        set = {"idx": self.idx, "processor_type": self.comp_subtype, "model": None, "top_n": None}
+        set = {"idx": self.idx, "processor_type": self.comp_subtype, "top_n": None}
         return set

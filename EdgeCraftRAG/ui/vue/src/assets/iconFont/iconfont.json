@@ -6,6 +6,13 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "5299955",
+      "name": "experience",
+      "font_class": "experience",
+      "unicode": "e68e",
+      "unicode_decimal": 59022
+    },
+    {
       "icon_id": "44419262",
       "name": "deep-think",
       "font_class": "deep-think",

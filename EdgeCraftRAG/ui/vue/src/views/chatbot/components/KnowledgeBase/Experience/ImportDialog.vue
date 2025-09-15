@@ -4,7 +4,7 @@
     width="500px"
     centered
     destroyOnClose
-    :title="$t('pipeline.import')"
+    :title="$t('experience.import')"
     :keyboard="false"
     :maskClosable="false"
     :footer="null"
@@ -14,7 +14,7 @@
     <a-upload-dragger
       v-model:fileList="fileList"
       name="file"
-      :action="importUrl"
+      :action="uploadFileApi"
       accept=".json"
       :showUploadList="false"
       :before-upload="handleBeforeUpload"
@@ -27,7 +27,7 @@
       />
       <p class="intel-upload-text">{{ $t("common.uploadTip") }}</p>
       <p class="intel-upload-hint">
-        {{ $t("pipeline.pipelineFormatTip") }}
+        {{ $t("experience.fileFormatTip") }}
       </p>
       <a-button type="primary" class="mt-12">{{
         $t("common.import")
@@ -37,8 +37,8 @@
 </template>
 
 <script lang="ts" setup name="ImportDialog">
-import { importUrl } from "@/api/pipeline";
-import { ref } from "vue";
+import { requestExperienceRelation, uploadFileUrl } from "@/api/knowledgeBase";
+import { ref, inject } from "vue";
 import { useNotification } from "@/utils/common";
 import { NextLoading } from "@/utils/loading";
 import { useI18n } from "vue-i18n";
@@ -47,38 +47,44 @@ import { message, UploadProps } from "ant-design-vue";
 const { t } = useI18n();
 const { antNotification } = useNotification();
 
+interface KbType {
+  name: string;
+}
 const emit = defineEmits(["search", "close"]);
+const kbInfo = inject<KbType>("kbInfo");
 const modelVisible = ref<boolean>(true);
 const fileList = ref([]);
-
+const uploadFileApi = computed(() => {
+  return uploadFileUrl + kbInfo?.name;
+});
 const handleBeforeUpload = (file: UploadProps["fileList"][number]) => {
-  const isFileSize = file.size / 1024 / 1024 < 10;
+  const isFileSize = file.size / 1024 / 1024 < 100;
 
   if (!isFileSize) {
-    message.error(t("pipeline.pipelineFormatTip"));
+    message.error(t("experience.uploadValid"));
     return;
   }
 
   return isFileSize;
 };
-const handleChange = (info: any) => {
+const handleChange = async (info: any) => {
   const el = <HTMLElement>document.querySelector(".loading-next");
   if (!el) NextLoading.start();
   try {
-    const status = info.file.status;
+    const { response, status } = info.file;
 
     if (status === "done") {
+      const { name = "" } = kbInfo;
+      await requestExperienceRelation({
+        name,
+        local_path: response,
+      });
       emit("search");
       handleClose();
       NextLoading.done();
-      antNotification(
-        "success",
-        t("common.success"),
-        t("pipeline.importSuccTip")
-      );
     } else if (status === "error") {
       NextLoading.done();
-      antNotification("error", t("common.error"), t("pipeline.importErrTip"));
+      antNotification("error", t("common.error"), t("experience.importErrTip"));
     }
   } catch (error) {
     console.error(error);
