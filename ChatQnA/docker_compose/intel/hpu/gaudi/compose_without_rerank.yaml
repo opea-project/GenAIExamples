@@ -65,7 +65,7 @@ services:
       RETRIEVER_COMPONENT_NAME: "OPEA_RETRIEVER_REDIS"
     restart: unless-stopped
   vllm-service:
-    image: ${REGISTRY:-opea}/vllm-gaudi:${TAG:-latest}
+    image: opea/vllm-gaudi:1.22.0
     container_name: vllm-gaudi-server
     ports:
       - "8007:80"
