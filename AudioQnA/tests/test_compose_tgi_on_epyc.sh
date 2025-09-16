@@ -38,6 +38,7 @@ function build_docker_images() {
 function start_services() {
     echo $WORKPATH
     cd $WORKPATH/docker_compose/amd/cpu/epyc/
+    export no_proxy="localhost,127.0.0.1,$ip_address"
     source set_env.sh
     # Start Docker Containers
     docker compose -f compose_tgi.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
