@@ -87,7 +87,6 @@ jobs:
         run: |
           cd ${{ github.workspace }}/${{ inputs.example }}/docker_image_build
           docker_compose_path=${{ github.workspace }}/${{ inputs.example }}/docker_image_build/build.yaml
-          source ${{ github.workspace }}/.github/env/_build_image.sh
           git clone --depth 1 --branch ${{ inputs.opea_branch }} https://github.com/opea-project/GenAIComps.git
           cd GenAIComps && git rev-parse HEAD && cd ../
 

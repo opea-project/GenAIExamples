@@ -50,7 +50,6 @@ jobs:
           sudo apt-get install -y jq
       - name: Clone Required Repo
         run: |
-          source ${{ github.workspace }}/.github/env/_build_image.sh
           git clone --depth 1 https://github.com/opea-project/GenAIComps.git
           cd GenAIComps && git rev-parse HEAD && cd ../
       - name: Pull Image
