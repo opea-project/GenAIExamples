@@ -26,7 +26,7 @@ tei:
 data-prep:
   image:
     tag: latest-openeuler
-  
+
 retriever-usvc:
   image:
     tag: latest-openeuler
@@ -34,7 +34,7 @@ retriever-usvc:
 embedding-usvc:
   image:
     tag: latest-openeuler
-  
+
 codegen-ui:
   image:
     tag: latest-openeuler
