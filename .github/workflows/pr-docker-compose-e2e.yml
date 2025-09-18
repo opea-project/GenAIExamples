@@ -58,7 +58,7 @@ jobs:
     strategy:
       matrix: ${{ fromJSON(needs.get-test-matrix.outputs.run_matrix) }}
       fail-fast: false
-    uses: ./.github/workflows/_run-docker-compose.yml
+    uses: opea-project/GenAIExamples/.github/workflows/_run-docker-compose.yml@ze-opt/ui
     with:
       registry: "opea"
       tag: "ci"
