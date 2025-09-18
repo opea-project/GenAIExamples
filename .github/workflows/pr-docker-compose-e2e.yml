@@ -8,7 +8,7 @@ permissions:
 
 on:
   pull_request: #_target:
-    branches: ["main", "*rc"]
+    branches: ["main", "*rc", "ze-opt/ui-test"]
     types: [opened, reopened, ready_for_review, synchronize] # added `ready_for_review` since draft is skipped
     paths:
       - "**/Dockerfile**"
