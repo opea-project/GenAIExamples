@@ -40,7 +40,7 @@ function build_docker_images() {
 function start_services() {
 	local compose_file="$1"
 	local llm_container_name="$2"
-
+	export no_proxy="localhost,127.0.0.1,$ip_address"
 	cd $WORKPATH/docker_compose/amd/cpu/epyc/
 
 	# Start Docker Containers

@@ -19,12 +19,6 @@ services:
       dockerfile:  comps/text2cypher/src/Dockerfile.intel_hpu
     extends: hybridrag
     image: ${REGISTRY:-opea}/text2cypher-gaudi:${TAG:-latest}
-  vllm:
-    build:
-      context: vllm
-      dockerfile: docker/Dockerfile.cpu
-    extends: hybridrag
-    image: ${REGISTRY:-opea}/vllm:${TAG:-latest}
   dataprep:
     build:
       context: GenAIComps

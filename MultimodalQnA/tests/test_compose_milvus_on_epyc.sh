@@ -73,6 +73,7 @@ function setup_env() {
 function start_services() {
     echo "Starting services..."
     cd $WORKPATH/docker_compose/amd/cpu/epyc
+    export no_proxy="localhost,127.0.0.1,$ip_address"
     docker compose -f compose_milvus.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
     sleep 2m
     echo "Services started."

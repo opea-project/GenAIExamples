@@ -38,6 +38,7 @@ function start_services() {
     export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:3008/v1/searchqna"
     export host_ip=${ip_address}
     export LOGFLAG=true
+    export no_proxy="localhost,127.0.0.1,$ip_address"
     source ./set_env.sh
     cd hpu/gaudi
 

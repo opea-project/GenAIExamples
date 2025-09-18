@@ -87,13 +87,6 @@ jobs:
         run: |
           cd ${{ github.workspace }}/${{ inputs.example }}/docker_image_build
           docker_compose_path=${{ github.workspace }}/${{ inputs.example }}/docker_image_build/build.yaml
-          source ${{ github.workspace }}/.github/env/_build_image.sh
-          if [[ $(grep -c "vllm:" ${docker_compose_path}) != 0 ]]; then
-              git clone -b ${VLLM_VER} --single-branch https://github.com/vllm-project/vllm.git
-          fi
-          if [[ $(grep -c "vllm-gaudi:" ${docker_compose_path}) != 0 ]]; then
-              git clone -b ${VLLM_FORK_VER} --single-branch https://github.com/HabanaAI/vllm-fork.git
-          fi
           git clone --depth 1 --branch ${{ inputs.opea_branch }} https://github.com/opea-project/GenAIComps.git
           cd GenAIComps && git rev-parse HEAD && cd ../
 
