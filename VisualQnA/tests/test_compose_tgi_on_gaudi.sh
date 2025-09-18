@@ -37,6 +37,7 @@ function start_services() {
     export HF_TOKEN=${HF_TOKEN}
     export NGINX_PORT=80
     export host_ip=${ip_address}
+    export no_proxy="localhost,127.0.0.1,$ip_address"
     source ./set_env.sh
     export LVM_MODEL_ID="llava-hf/llava-v1.6-mistral-7b-hf"
 
