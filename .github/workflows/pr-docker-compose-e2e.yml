@@ -7,8 +7,8 @@ permissions:
   contents: read
 
 on:
-  pull_request: #_target:
-    branches: ["main", "*rc", "ze-opt/ui-test"]
+  pull_request_target:
+    branches: ["main", "*rc"]
     types: [opened, reopened, ready_for_review, synchronize] # added `ready_for_review` since draft is skipped
     paths:
       - "**/Dockerfile**"
@@ -58,7 +58,7 @@ jobs:
     strategy:
       matrix: ${{ fromJSON(needs.get-test-matrix.outputs.run_matrix) }}
       fail-fast: false
-    uses: opea-project/GenAIExamples/.github/workflows/_run-docker-compose.yml@ze-opt/ui
+    uses: ./.github/workflows/_run-docker-compose.yml
     with:
       registry: "opea"
       tag: "ci"
