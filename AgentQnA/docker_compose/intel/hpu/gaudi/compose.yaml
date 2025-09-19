@@ -128,7 +128,7 @@ services:
       OPENAI_API_BASE_URLS: ${SUPERVISOR_AGENT_ENDPOINT}
       ENABLE_OLLAMA_API: False
   vllm-service:
-    image: ${REGISTRY:-opea}/vllm-gaudi:${TAG:-latest}
+    image: opea/vllm-gaudi:1.4
     container_name: vllm-gaudi-server
     ports:
       - "8086:8000"

@@ -3,7 +3,7 @@
 
 services:
   vllm-service:
-    image: ${REGISTRY:-opea}/vllm-gaudi:${TAG:-latest}
+    image: opea/vllm-gaudi:1.4
     container_name: codetrans-gaudi-vllm-service
     ports:
       - "8008:80"
