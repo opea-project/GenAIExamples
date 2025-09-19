@@ -20,7 +20,7 @@ x-common-agent-environment:
 services:
 
   vllm-service:
-    image: ${REGISTRY:-opea}/vllm-gaudi:${TAG:-latest}
+    image: opea/vllm-gaudi:1.22.0
     container_name: vllm-gaudi-server
     ports:
       - "8000:8000"

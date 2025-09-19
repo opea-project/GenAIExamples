@@ -3,7 +3,7 @@
 
 services:
   vllm-gaudi-service:
-    image: ${REGISTRY:-opea}/vllm-gaudi:${TAG:-latest}
+    image: opea/vllm-gaudi:1.4
     container_name: vllm-gaudi-service
     ports:
       - ${VLLM_PORT:-8399}:80

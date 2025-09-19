@@ -42,7 +42,7 @@ function start_services() {
     echo "Starting services..."
     cd $WORKPATH/docker_compose/intel/cpu/xeon/
     source ./set_env.sh
-
+    export no_proxy="localhost,127.0.0.1,$ip_address"
     docker volume create video-llama-model
     docker volume create videoqna-cache
     docker compose up vdms-vector-db dataprep -d
