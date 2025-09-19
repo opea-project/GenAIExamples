@@ -37,9 +37,3 @@ services:
       dockerfile: comps/third_parties/vllm/src/Dockerfile.amd_gpu
     extends: visualqna
     image: ${REGISTRY:-opea}/vllm-rocm:${TAG:-latest}
-  vllm-gaudi:
-    build:
-      context: vllm-fork
-      dockerfile: Dockerfile.hpu
-    extends: visualqna
-    image: ${REGISTRY:-opea}/vllm-gaudi:${TAG:-latest}
