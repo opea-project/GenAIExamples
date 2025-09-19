@@ -35,6 +35,7 @@ function start_services() {
     export NON_INTERACTIVE=true
     export host_ip=${ip_address}
     export telemetry=yes
+    export no_proxy="localhost,127.0.0.1,$ip_address"
     source set_env.sh
 
     # Start Docker Containers
