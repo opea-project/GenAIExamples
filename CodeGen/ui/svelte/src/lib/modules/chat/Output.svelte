@@ -36,7 +36,6 @@
 	import lua from "svelte-highlight/languages/lua";
 	import bash from "svelte-highlight/languages/bash";
 	import sql from "svelte-highlight/languages/sql";
-	import SvelteMarkdown from "svelte-markdown";
 	import { marked } from "marked";
 	import { afterUpdate, onMount } from "svelte";
 
@@ -252,12 +251,7 @@
 						</Highlight>
 					</div>
 				{:else}
-					<div>
-						<SvelteMarkdown
-							source={seg.content}
-							options={{ gfm: true, breaks: true }}
-						/>
-					</div>
+					<div>{@html marked(seg.content)}</div>
 				{/if}
 			{/each}
 		{:else}
