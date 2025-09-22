@@ -1,0 +1,58 @@
+# Copyright (C) 2025 Huawei Technologies Co., Ltd.
+# SPDX-License-Identifier: Apache-2.0
+
+# This file is based on cpu-values.yaml and overrides image tags to 'latest-openeuler'
+# for all enabled services to run on openEuler.
+
+# Overrides for the main chart image
+image:
+  tag: latest-openeuler
+
+# Overrides from cpu-values.yaml
+vllm:
+  image:
+    repository: openeuler/vllm-cpu
+    tag: 0.10.1-oe2403lts
+  LLM_MODEL_ID: meta-llama/Meta-Llama-3-8B-Instruct
+
+  # Uncomment the following model specific settings for DeepSeek models
+  #VLLM_CPU_KVCACHE_SPACE: 40
+  #resources:
+  #  requests:
+  #    memory: 60Gi # 40G for KV cache, and 20G for DeepSeek-R1-Distill-Qwen-7B, need to adjust it for other models
+
+# Overrides for subchart images
+# Based on the default values in opea-project/GenAIInfra/helm-charts/chatqna/values.yaml,
+# the following services are enabled by default.
+
+# data-prep service
+data-prep:
+  image:
+    tag: latest-openeuler
+
+# retriever-usvc service
+retriever-usvc:
+  image:
+    tag: latest-openeuler
+
+# tei-rerank service
+teirerank:
+  image:
+    repository: openeuler/text-embeddings-inference-cpu
+    tag: 1.7.0-oe2403lts
+
+# tei service
+tei:
+  image:
+    repository: openeuler/text-embeddings-inference-cpu
+    tag: 1.7.0-oe2403lts
+
+# nginx service
+nginx:
+  image:
+    tag: latest-openeuler
+
+# chatqna-ui service
+chatqna-ui:
+  image:
+    tag: latest-openeuler

@@ -36,7 +36,7 @@ function build_docker_images() {
 function start_services() {
     cd $WORKPATH/docker_compose/intel
     export HF_TOKEN=${HF_TOKEN}
-
+    export no_proxy="localhost,127.0.0.1,$ip_address"
     export NGINX_PORT=80
     source set_env.sh
     cd hpu/gaudi/
