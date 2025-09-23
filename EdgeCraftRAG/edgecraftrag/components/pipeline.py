@@ -97,12 +97,10 @@ class Pipeline(BaseComponent):
     # TODO: update doc changes
     # TODO: more operations needed, add, del, modify
     def update_nodes(self, nodes):
-        print(f"Updating {len(nodes)} nodes ...")
         if self.indexer is not None:
             self.indexer.insert_nodes(nodes)
 
     def update_indexer_to_retriever(self):
-        print("Updating indexer to retriever ...")
         if self.indexer is not None and self.retriever is not None:
             old_retriever = self.retriever
             retriever_type = old_retriever.comp_subtype
@@ -122,7 +120,6 @@ class Pipeline(BaseComponent):
     # Implement abstract run function
     # callback dispatcher
     def run(self, **kwargs) -> Any:
-        print(kwargs)
         if "cbtype" in kwargs:
             if kwargs["cbtype"] == CallbackType.DATAPREP:
                 if "docs" in kwargs:
@@ -183,9 +180,18 @@ class Pipeline(BaseComponent):
 
 # Test callback to retrieve nodes from query
 def run_retrieve(pl: Pipeline, chat_request: ChatCompletionRequest) -> Any:
+    benchmark_data = {}
     query = chat_request.messages
+    top_k = None if chat_request.k == ChatCompletionRequest.model_fields["k"].default else chat_request.k
     contexts = {}
-    retri_res = pl.retriever.run(query=query)
+    start = 0
+    if pl.enable_benchmark:
+        _, benchmark_data = pl.benchmark.init_benchmark_data()
+        start = time.perf_counter()
+    retri_res = pl.retriever.run(query=query, top_k=top_k)
+    if pl.enable_benchmark:
+        benchmark_data[CompType.RETRIEVER] = time.perf_counter() - start
+        pl.benchmark.insert_benchmark_data(benchmark_data)
     contexts[CompType.RETRIEVER] = retri_res
     query_bundle = QueryBundle(query)
     if pl.postprocessor:
@@ -201,10 +207,18 @@ def run_retrieve(pl: Pipeline, chat_request: ChatCompletionRequest) -> Any:
 
 
 def run_simple_doc(pl: Pipeline, docs: List[Document]) -> Any:
+    start = 0
+    benchmark_data = {}
+    if pl.enable_benchmark:
+        _, benchmark_data = pl.benchmark.init_benchmark_data()
+        start = time.perf_counter()
     n = pl.node_parser.run(docs=docs)
     if pl.indexer is not None:
         pl.indexer.insert_nodes(n)
-    print(pl.indexer._index_struct)
+    if pl.enable_benchmark:
+        benchmark_data[CompType.NODEPARSER] += (time.perf_counter() - start)
+        benchmark_data[CompType.CHUNK_NUM] += len(n)
+        pl.benchmark.insert_benchmark_data(benchmark_data)
     return n
 
 
@@ -228,43 +242,57 @@ def benchmark_response(ret, benchmark, benchmark_index, benchmark_data, input_to
 def run_generator_ben(pl: Pipeline, chat_request: ChatCompletionRequest) -> Any:
     benchmark_index, benchmark_data = pl.benchmark.init_benchmark_data()
     contexts = {}
-    start = time.perf_counter()
+    retri_res = []
+    active_kb = chat_request.user if chat_request.user  else None
+    enable_rag_retrieval = chat_request.chat_template_kwargs.get("enable_rag_retrieval", True) if chat_request.chat_template_kwargs else True
+    if not active_kb:
+        enable_rag_retrieval = False
+    elif pl.retriever.comp_subtype == "kbadmin_retriever" and active_kb.comp_subtype == "origin_kb":
+        enable_rag_retrieval = False
+    elif pl.retriever.comp_subtype != "kbadmin_retriever" and  active_kb.comp_subtype == "kbadmin_kb":
+        enable_rag_retrieval = False
     query = chat_request.messages
-    if pl.generator.inference_type == InferenceType.VLLM:
-        UI_DIRECTORY = os.getenv("TMPFILE_PATH", "/home/user/ui_cache")
-        search_config_path = os.path.join(UI_DIRECTORY, "configs/search_config.yaml")
-        search_dir = os.path.join(UI_DIRECTORY, "configs/search_dir")
+    sub_questionss_result = None
+    experience_status = True if chat_request.tool_choice == 'auto' else False
+    if enable_rag_retrieval:
+        start = time.perf_counter()
+        if pl.generator.inference_type == InferenceType.VLLM and experience_status:
+            UI_DIRECTORY ="/home/user/ui_cache"
+            search_config_path = os.path.join(UI_DIRECTORY, "configs/search_config.yaml")
+            search_dir = os.path.join(UI_DIRECTORY, "configs/experience_dir/experience.json")
 
-        def run_async_query_search():
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-            try:
-                return loop.run_until_complete(query_search(query, search_config_path, search_dir, pl))
-            finally:
-                loop.close()
+            def run_async_query_search():
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+                try:
+                    return loop.run_until_complete(query_search(query, search_config_path, search_dir, pl))
+                finally:
+                    loop.close()
 
-        with ThreadPoolExecutor(max_workers=1) as executor:
-            future = executor.submit(run_async_query_search)
-            top1_issue, sub_questionss_result = future.result()
-        if sub_questionss_result:
-            query = query + sub_questionss_result
+            with ThreadPoolExecutor(max_workers=1) as executor:
+                future = executor.submit(run_async_query_search)
+                top1_issue, sub_questionss_result = future.result()
+            if sub_questionss_result:
+                query = query + sub_questionss_result
+        benchmark_data[CompType.QUERYSEARCH] = time.perf_counter() - start
+        start = time.perf_counter()
+        top_k = None if chat_request.k == ChatCompletionRequest.model_fields["k"].default else chat_request.k
+        retri_res = pl.retriever.run(query=query, top_k=top_k)
+        query_bundle = QueryBundle(query)
+        benchmark_data[CompType.RETRIEVER] = time.perf_counter() - start
+        contexts[CompType.RETRIEVER] = retri_res
 
-    retri_res = pl.retriever.run(query=query)
-    query_bundle = QueryBundle(query)
-    benchmark_data[CompType.RETRIEVER] = time.perf_counter() - start
-    contexts[CompType.RETRIEVER] = retri_res
-
-    start = time.perf_counter()
-    if pl.postprocessor:
-        for processor in pl.postprocessor:
-            if (
-                isinstance(processor, RerankProcessor)
-                and chat_request.top_n != ChatCompletionRequest.model_fields["top_n"].default
-            ):
-                processor.top_n = chat_request.top_n
-            retri_res = processor.run(retri_res=retri_res, query_bundle=query_bundle)
-            contexts[CompType.POSTPROCESSOR] = retri_res
-    benchmark_data[CompType.POSTPROCESSOR] = time.perf_counter() - start
+        start = time.perf_counter()
+        if pl.postprocessor:
+            for processor in pl.postprocessor:
+                if (
+                    isinstance(processor, RerankProcessor)
+                    and chat_request.top_n != ChatCompletionRequest.model_fields["top_n"].default
+                ):
+                    processor.top_n = chat_request.top_n
+                retri_res = processor.run(retri_res=retri_res, query_bundle=query_bundle)
+                contexts[CompType.POSTPROCESSOR] = retri_res
+        benchmark_data[CompType.POSTPROCESSOR] = time.perf_counter() - start
 
     if pl.generator is None:
         raise ValueError("No Generator Specified")
@@ -294,37 +322,51 @@ def run_generator_ben(pl: Pipeline, chat_request: ChatCompletionRequest) -> Any:
 def run_generator(pl: Pipeline, chat_request: ChatCompletionRequest) -> Any:
     query = chat_request.messages
     contexts = {}
-    if pl.generator.inference_type == InferenceType.VLLM:
-        UI_DIRECTORY = os.getenv("TMPFILE_PATH", "/home/user/ui_cache")
-        search_config_path = os.path.join(UI_DIRECTORY, "configs/search_config.yaml")
-        search_dir = os.path.join(UI_DIRECTORY, "configs/search_dir")
+    retri_res = []
+    active_kb = chat_request.user if chat_request.user  else None
+    enable_rag_retrieval = chat_request.chat_template_kwargs.get("enable_rag_retrieval", True) if chat_request.chat_template_kwargs else True
+    if not active_kb:
+        enable_rag_retrieval = False
+    elif pl.retriever.comp_subtype == "kbadmin_retriever" and active_kb.comp_subtype == "origin_kb":
+        enable_rag_retrieval = False
+    elif pl.retriever.comp_subtype != "kbadmin_retriever" and  active_kb.comp_subtype == "kbadmin_kb":
+        enable_rag_retrieval = False
+    query = chat_request.messages
+    sub_questionss_result = None
+    experience_status = True if chat_request.tool_choice == 'auto' else False
+    if enable_rag_retrieval:
+        if pl.generator.inference_type == InferenceType.VLLM and experience_status:
+            UI_DIRECTORY ="/home/user/ui_cache"
+            search_config_path = os.path.join(UI_DIRECTORY, "configs/search_config.yaml")
+            search_dir = os.path.join(UI_DIRECTORY, "configs/experience_dir/experience.json")
 
-        def run_async_query_search():
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-            try:
-                return loop.run_until_complete(query_search(query, search_config_path, search_dir, pl))
-            finally:
-                loop.close()
+            def run_async_query_search():
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+                try:
+                    return loop.run_until_complete(query_search(query, search_config_path, search_dir, pl))
+                finally:
+                    loop.close()
 
-        with ThreadPoolExecutor(max_workers=1) as executor:
-            future = executor.submit(run_async_query_search)
-            top1_issue, sub_questionss_result = future.result()
-        if sub_questionss_result:
-            query = query + sub_questionss_result
-    retri_res = pl.retriever.run(query=query)
-    contexts[CompType.RETRIEVER] = retri_res
-    query_bundle = QueryBundle(query)
+            with ThreadPoolExecutor(max_workers=1) as executor:
+                future = executor.submit(run_async_query_search)
+                top1_issue, sub_questionss_result = future.result()
+            if sub_questionss_result:
+                query = query + sub_questionss_result
+        top_k = None if chat_request.k == ChatCompletionRequest.model_fields["k"].default else chat_request.k
+        retri_res = pl.retriever.run(query=query, top_k=top_k)
+        contexts[CompType.RETRIEVER] = retri_res
+        query_bundle = QueryBundle(query)
 
-    if pl.postprocessor:
-        for processor in pl.postprocessor:
-            if (
-                isinstance(processor, RerankProcessor)
-                and chat_request.top_n != ChatCompletionRequest.model_fields["top_n"].default
-            ):
-                processor.top_n = chat_request.top_n
-            retri_res = processor.run(retri_res=retri_res, query_bundle=query_bundle)
-            contexts[CompType.POSTPROCESSOR] = retri_res
+        if pl.postprocessor:
+            for processor in pl.postprocessor:
+                if (
+                    isinstance(processor, RerankProcessor)
+                    and chat_request.top_n != ChatCompletionRequest.model_fields["top_n"].default
+                ):
+                    processor.top_n = chat_request.top_n
+                retri_res = processor.run(retri_res=retri_res, query_bundle=query_bundle)
+                contexts[CompType.POSTPROCESSOR] = retri_res
 
     if pl.generator is None:
         raise ValueError("No Generator Specified")

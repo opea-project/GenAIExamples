@@ -3,7 +3,7 @@
     <div class="message-box" ref="scrollContainer" v-if="messagesLength">
       <div class="intel-markdown">
         <div ref="messageComponent">
-          <div v-for="(msg, index) in messagesList" :key="index" :inResponse>
+          <div v-for="(msg, index) in messagesList" :key="index">
             <MessageItem
               :message="msg"
               ref="messageRef"
@@ -12,6 +12,19 @@
               @preview="handleImagePreview"
               @stop="isUserScrolling = true"
             />
+          </div>
+          <div class="error-tip" v-if="messageError.visible">
+            <div>
+              <SvgIcon
+                name="icon-chatbot1"
+                :size="20"
+                :style="{
+                  color: 'var(--color-second-warning)',
+                }"
+              />
+              <span class="ml-10"> {{ messageError.msg }}</span>
+            </div>
+            <CloseOutlined class="close-btn" @click="handleCloseMsg" />
           </div>
         </div>
       </div>
@@ -36,13 +49,23 @@
         :auto-size="{ minRows: 2, maxRows: 5 }"
       />
       <div class="button-wrap">
-        <span
-          :class="{ 'think-btn': true, 'is-deep': isThink }"
-          @click="handleThinkChange"
-        >
-          <SvgIcon name="icon-deep-think" :size="16" inherit />
-          {{ $t(`chat.${isThink ? "reason" : "think"}`) }}
-        </span>
+        <div class="flex-left">
+          <span
+            :class="{ 'think-btn': true, 'is-deep': isThink }"
+            @click="handleThinkChange"
+          >
+            <SvgIcon name="icon-deep-think" :size="16" inherit />
+            {{ $t(`chat.${isThink ? "reason" : "think"}`) }}
+          </span>
+          <span
+            :class="{ 'think-btn': true, 'is-deep': enableKB }"
+            @click="handleKBChange"
+          >
+            <SvgIcon name="icon-kb" :size="16" inherit />
+            {{ $t("knowledge.title") }}
+          </span>
+        </div>
+
         <div class="send-btn">
           <a-tooltip placement="top" :title="$t('chat.new')">
             <span class="common-btn">
@@ -96,10 +119,14 @@ import MessageItem from "./MessageItem.vue";
 import { handleMessageSend } from "./SseService";
 import { pipelineAppStore } from "@/store/pipeline";
 import { Local } from "@/utils/storage";
-import { ArrowDownOutlined } from "@ant-design/icons-vue";
+import { ArrowDownOutlined, CloseOutlined } from "@ant-design/icons-vue";
 import { throttle } from "lodash";
 import { chatbotAppStore } from "@/store/chatbot";
 
+const STATUS = {
+  SUCCESS: "200",
+  ERROR: "500",
+};
 const chatbotStore = chatbotAppStore();
 const emit = defineEmits(["config"]);
 const ENV_URL = import.meta.env;
@@ -123,6 +150,11 @@ const isUserScrolling = ref(false);
 const showScrollToBottomBtn = ref(false);
 const resizeObserverRef = ref<ResizeObserver | null>(null);
 const isThink = ref<boolean>(true);
+const enableKB = ref<boolean>(true);
+let messageError = reactive<EmptyObjectType>({
+  visible: false,
+  msg: "",
+});
 
 const inputRef = ref();
 const handleEnvUrl = () => {
@@ -134,6 +166,16 @@ const handleEnvUrl = () => {
 const handleMessageDisplay = (data: any) => {
   if (inResponse.value) {
     isUserScrolling.value = false;
+    const regex = /code:0000(.*)/s;
+    const match = data.match(regex);
+    if (match) {
+      Object.assign(messageError, { visible: true, msg: match[1].trim() });
+      messagesList.value.pop();
+      setTimeout(() => {
+        Object.assign(messageError, { visible: false, msg: "" });
+      }, 10 * 1000);
+      return;
+    }
     messagesList.value[messagesList.value?.length - 1].content = data;
   }
 };
@@ -158,6 +200,9 @@ const toggleConnection = () => {
   }
 };
 
+const handleCloseMsg = () => {
+  Object.assign(messageError, { visible: false, msg: "" });
+};
 // Format parameter
 const formatFormParam = () => {
   const { configuration = {} } = Local.get("chatbotConfiguration") || {};
@@ -196,8 +241,7 @@ const handleStopDisplay = () => {
 };
 
 const queryBenchmark = async () => {
-  const { activatedPipeline } = pipelineStore;
-  const data = (await getBenchmark(activatedPipeline)) || {};
+  const data = (await getBenchmark()) || {};
 
   if (data["Benchmark enabled"]) {
     const benchmarkData = data.last_benchmark_data || {};
@@ -205,7 +249,7 @@ const queryBenchmark = async () => {
       const processedBenchmarkData = Object.fromEntries(
         Object.entries(benchmarkData).map(([key, value]: any) => [
           key,
-          parseFloat(value.toFixed(4)),
+          value ? parseFloat(value.toFixed(4)) : 0,
         ])
       );
       messagesList.value[messagesList.value.length - 1].benchmark =
@@ -227,9 +271,27 @@ const handleNewChat = () => {
 };
 const handleThinkChange = () => {
   isThink.value = !isThink.value;
+  const { chat_template_kwargs } = chatbotStore.configuration;
+
+  const chat_template = {
+    ...chat_template_kwargs,
+    enable_thinking: isThink.value,
+  };
+  chatbotStore.setChatbotConfiguration({
+    chat_template_kwargs: chat_template,
+  });
+};
+const handleKBChange = () => {
+  enableKB.value = !enableKB.value;
+  const { chat_template_kwargs } = chatbotStore.configuration;
+
+  const chat_template = {
+    ...chat_template_kwargs,
+    enable_rag_retrieval: enableKB.value,
+  };
 
   chatbotStore.setChatbotConfiguration({
-    chat_template_kwargs: { enable_thinking: isThink.value },
+    chat_template_kwargs: chat_template,
   });
 };
 const handleConfig = () => {
@@ -302,8 +364,10 @@ watch(
   { immediate: true }
 );
 onMounted(() => {
-  isThink.value =
-    chatbotStore.configuration?.chat_template_kwargs.enable_thinking;
+  const { enable_thinking = true, enable_rag_retrieval = false } =
+    chatbotStore.configuration?.chat_template_kwargs;
+  isThink.value = enable_thinking;
+  enableKB.value = enable_rag_retrieval;
 });
 onBeforeUnmount(() => {
   if (resizeObserver && messageComponent.value) {
@@ -421,6 +485,9 @@ onBeforeUnmount(() => {
       align-items: center;
       justify-content: space-between;
       padding: 6px 12px;
+      .flex-left {
+        gap: 8px;
+      }
       .think-btn {
         height: 24px;
         line-height: 24px;
@@ -492,6 +559,25 @@ onBeforeUnmount(() => {
         .icon-intel {
           color: var(--color-white) !important;
         }
+      }
+    }
+  }
+  .error-tip {
+    border: 1px solid var(--border-warning);
+    background-color: var(--color-warningBg);
+    color: var(--color-second-warning);
+    padding: 8px 12px;
+    border-radius: 0 4px 4px 0;
+    margin-bottom: 12px;
+    font-size: 12px;
+    &:hover {
+      .card-shadow;
+    }
+    .flex-left;
+    .close-btn {
+      cursor: pointer;
+      &:hover {
+        color: var(--color-error);
       }
     }
   }

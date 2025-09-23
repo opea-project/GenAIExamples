@@ -6,6 +6,7 @@ import os
 from edgecraftrag.api_schema import DataIn, FilesIn
 from edgecraftrag.context import ctx
 from fastapi import FastAPI, File, HTTPException, UploadFile, status
+from werkzeug.utils import secure_filename
 
 data_app = FastAPI()
 
@@ -13,6 +14,7 @@ data_app = FastAPI()
 # Upload a text or files
 @data_app.post(path="/v1/data")
 async def add_data(request: DataIn):
+    pl = ctx.get_pipeline_mgr().get_active_pipeline()
     docs = []
     if request.text is not None:
         docs.extend(ctx.get_file_mgr().add_text(text=request.text))
@@ -20,9 +22,9 @@ async def add_data(request: DataIn):
         docs.extend(ctx.get_file_mgr().add_files(docs=request.local_path))
 
     nodelist = ctx.get_pipeline_mgr().run_data_prepare(docs=docs)
-    if nodelist is None or len(nodelist) == 0:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="File not found")
-    pl = ctx.get_pipeline_mgr().get_active_pipeline()
+    if pl.indexer.comp_subtype != "kbadmin_indexer":
+        if nodelist is None or len(nodelist) == 0:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="File not found")
     ctx.get_node_mgr().add_nodes(pl.node_parser.idx, nodelist)
     return "Done"
 
@@ -109,8 +111,6 @@ async def upload_file(file_name: str, file: UploadFile = File(...)):
                 status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid file_name: directory traversal detected"
             )
         os.makedirs(UPLOAD_DIRECTORY, exist_ok=True)
-        safe_filename = file.filename
-        # Sanitize the uploaded file's name
         safe_filename = file.filename
         file_path = os.path.normpath(os.path.join(UPLOAD_DIRECTORY, safe_filename))
         # Ensure file_path is within UPLOAD_DIRECTORY

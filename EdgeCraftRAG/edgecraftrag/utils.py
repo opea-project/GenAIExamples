@@ -44,15 +44,14 @@ class DocxParagraphPicturePartitioner:
             yield Image(text="IMAGE", metadata=element_metadata)
 
 
-def get_prompt_template(model_id, prompt_content=None, template_path=None, enable_think=False):
+def get_prompt_template(model_path, prompt_content=None, template_path=None, enable_think=False):
     if prompt_content is not None:
         template = prompt_content
     elif template_path is not None:
         template = Path(template_path).read_text(encoding=None)
     else:
         template = DEFAULT_TEMPLATE
-    tokenizer = AutoTokenizer.from_pretrained(model_id)
-    model_id = model_id.split("/")[-1]
+    tokenizer = AutoTokenizer.from_pretrained(model_path)
     messages = [{"role": "system", "content": template}, {"role": "user", "content": "\n{input}\n"}]
     prompt_template = tokenizer.apply_chat_template(
         messages,
@@ -126,7 +125,7 @@ def concat_history(message: str) -> str:
     max_token = 6000
     active_pl = ctx.get_pipeline_mgr().get_active_pipeline()
     if active_pl.generator.inference_type == InferenceType.VLLM:
-        vllm_max_len = int(os.getenv("MAX_MODEL_LEN", "5000"))
+        vllm_max_len = int(os.getenv("MAX_MODEL_LEN", "10240"))
         if vllm_max_len > 5000:
             max_token = vllm_max_len - 1024
 

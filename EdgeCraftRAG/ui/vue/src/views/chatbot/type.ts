@@ -13,6 +13,7 @@ export interface IMessage {
 }
 export interface ThinkType {
   enable_thinking?: boolean;
+  enable_rag_retrieval?: boolean;
 }
 export interface ConfigType {
   top_n: number;

@@ -10,8 +10,8 @@
           />
         </div>
         <div class="message-wrap">
-          <div v-if="!props.message?.content" class="dot-loader">
-            <span class="drop" v-for="(drop, index) in 3" :key="index"></span>
+          <div v-if="inResponse && !props.message?.content" class="dot-loader">
+            <span class="drop" v-for="index in 3" :key="index"></span>
           </div>
           <div
             class="think-container"

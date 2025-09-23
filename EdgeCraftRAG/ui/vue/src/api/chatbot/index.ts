@@ -21,9 +21,9 @@ export const requestChatbotConfig = (data: Object) => {
   });
 };
 
-export const getBenchmark = (name: String) => {
+export const getBenchmark = () => {
   return request({
-    url: `/v1/settings/pipelines/${name}/benchmark`,
+    url: `/v1/settings/pipeline/benchmark`,
     method: "get",
   });
 };
