@@ -115,6 +115,8 @@ jobs:
           if [[ "$hardware" == "xeon"* ]]; then
             if [ -f "${{ github.workspace }}/${{ inputs.example }}/tests/test_ui_on_xeon.sh" ]; then
               run_test_cases="$run_test_cases test_ui_on_xeon.sh";
+            elid [ -f "${{ github.workspace }}/${{ inputs.example }}/tests/test_ui_on_gaudi.sh" ]; then
+              run_test_cases="$run_test_cases test_ui_on_gaudi.sh";
             fi
           fi
           test_cases=$(echo $run_test_cases | tr ' ' '\n' | sort -u | jq -R '.' | jq -sc '.')
