@@ -76,7 +76,7 @@ jobs:
           cd ${{ github.workspace }}/${{ inputs.example }}/tests
           run_test_cases=""
 
-          if [[ "$HARDWARE}" == "gaudi"* ]]; then
+          if [[ "$HARDWARE" == "gaudi"* ]]; then
             hardware="gaudi"
           elif [[ "$HARDWARE" == "xeon"* ]]; then
             hardware="xeon"
@@ -108,14 +108,14 @@ jobs:
               fi
           done
 
-          # if [ -z "$run_test_cases" ] && [[ $(printf '%s\n' "${changed_files[@]}" | grep ${{ inputs.example }} | grep /tests/) ]]; then
-          #     run_test_cases=$other_test_cases
-          # fi
+          if [ -z "$run_test_cases" ] && [[ $(printf '%s\n' "${changed_files[@]}" | grep ${{ inputs.example }} | grep /tests/) ]]; then
+              run_test_cases=$other_test_cases
+          fi
 
           if [[ "$hardware" == "xeon"* ]]; then
             if [ -f "${{ github.workspace }}/${{ inputs.example }}/tests/test_ui_on_xeon.sh" ]; then
               run_test_cases="$run_test_cases test_ui_on_xeon.sh";
-            elid [ -f "${{ github.workspace }}/${{ inputs.example }}/tests/test_ui_on_gaudi.sh" ]; then
+            elif [ -f "${{ github.workspace }}/${{ inputs.example }}/tests/test_ui_on_gaudi.sh" ]; then
               run_test_cases="$run_test_cases test_ui_on_gaudi.sh";
             fi
           fi
