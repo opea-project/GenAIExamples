@@ -96,6 +96,10 @@ function main() {
     start_services
     echo "::endgroup::"
 
+    echo "::group::validate_frontend"
+    validate_frontend
+    echo "::endgroup::"
+
     echo "::group::stop_docker"
     stop_docker
     echo "::endgroup::"
