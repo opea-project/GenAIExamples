@@ -69,17 +69,19 @@ jobs:
       - name: Get test matrix
         shell: bash
         id: test-case-matrix
+        env:
+          HARDWARE: ${{ inputs.hardware }}
         run: |
           example_l=$(echo ${{ inputs.example }} | tr '[:upper:]' '[:lower:]')
           cd ${{ github.workspace }}/${{ inputs.example }}/tests
           run_test_cases=""
 
-          if [[ "${{ inputs.hardware }}" == "gaudi"* ]]; then
+          if [[ "$HARDWARE" == "gaudi"* ]]; then
             hardware="gaudi"
-          elif [[ "${{ inputs.hardware }}" == "xeon"* ]]; then
+          elif [[ "$HARDWARE" == "xeon"* ]]; then
             hardware="xeon"
           else
-            hardware="${{ inputs.hardware }}"
+            hardware="$HARDWARE"
           fi
           default_test_case=$(find . -type f -name "test_compose_on_$hardware.sh" | cut -d/ -f2)
           if [ "$default_test_case" ]; then run_test_cases="$default_test_case"; fi
@@ -110,9 +112,11 @@ jobs:
               run_test_cases=$other_test_cases
           fi
 
-          if [[ "${{ hardware }}" == "xeon"* ]]; then
+          if [[ "$hardware" == "xeon"* ]]; then
             if [ -f "${{ github.workspace }}/${{ inputs.example }}/tests/test_ui_on_xeon.sh" ]; then
               run_test_cases="$run_test_cases test_ui_on_xeon.sh";
+            elif [ -f "${{ github.workspace }}/${{ inputs.example }}/tests/test_ui_on_gaudi.sh" ]; then
+              run_test_cases="$run_test_cases test_ui_on_gaudi.sh";
             fi
           fi
           test_cases=$(echo $run_test_cases | tr ' ' '\n' | sort -u | jq -R '.' | jq -sc '.')
