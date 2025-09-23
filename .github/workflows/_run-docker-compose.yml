@@ -70,177 +70,176 @@ jobs:
         shell: bash
         id: test-case-matrix
         run: |
-          echo "${{ inputs.hardware }}"
-  #         example_l=$(echo ${{ inputs.example }} | tr '[:upper:]' '[:lower:]')
-  #         cd ${{ github.workspace }}/${{ inputs.example }}/tests
-  #         run_test_cases=""
+          example_l=$(echo ${{ inputs.example }} | tr '[:upper:]' '[:lower:]')
+          cd ${{ github.workspace }}/${{ inputs.example }}/tests
+          run_test_cases=""
 
-  #         if [[ "${{ inputs.hardware }}" == "gaudi"* ]]; then
-  #           hardware="gaudi"
-  #         elif [[ "${{ inputs.hardware }}" == "xeon"* ]]; then
-  #           hardware="xeon"
-  #         else
-  #           hardware="${{ inputs.hardware }}"
-  #         fi
-  #         default_test_case=$(find . -type f -name "test_compose_on_$hardware.sh" | cut -d/ -f2)
-  #         if [ "$default_test_case" ]; then run_test_cases="$default_test_case"; fi
-  #         other_test_cases=$(find . -type f -name "test_compose_*_on_$hardware.sh" | cut -d/ -f2)
-  #         echo "default_test_case=$default_test_case"
-  #         echo "other_test_cases=$other_test_cases"
+          if [[ "${{ inputs.hardware }}" == "gaudi"* ]]; then
+            hardware="gaudi"
+          elif [[ "${{ inputs.hardware }}" == "xeon"* ]]; then
+            hardware="xeon"
+          else
+            hardware="${{ inputs.hardware }}"
+          fi
+          default_test_case=$(find . -type f -name "test_compose_on_$hardware.sh" | cut -d/ -f2)
+          if [ "$default_test_case" ]; then run_test_cases="$default_test_case"; fi
+          other_test_cases=$(find . -type f -name "test_compose_*_on_$hardware.sh" | cut -d/ -f2)
+          echo "default_test_case=$default_test_case"
+          echo "other_test_cases=$other_test_cases"
 
-  #         if [ "${{ inputs.tag }}" == "ci" ]; then
-  #             base_commit=$(curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-  #             "https://api.github.com/repos/opea-project/GenAIExamples/commits?sha=${{ github.event.pull_request.base.ref }}" | jq -r '.[0].sha')
-  #             merged_commit=$(git log -1 --format='%H')
-  #             changed_files="$(git diff --name-only ${base_commit} ${merged_commit} | grep -vE '${{ inputs.diff_excluded_files }}')" || true
-  #         fi
+          if [ "${{ inputs.tag }}" == "ci" ]; then
+              base_commit=$(curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+              "https://api.github.com/repos/opea-project/GenAIExamples/commits?sha=${{ github.event.pull_request.base.ref }}" | jq -r '.[0].sha')
+              merged_commit=$(git log -1 --format='%H')
+              changed_files="$(git diff --name-only ${base_commit} ${merged_commit} | grep -vE '${{ inputs.diff_excluded_files }}')" || true
+          fi
 
-  #         for test_case in $other_test_cases; do
-  #             if [ "${{ inputs.tag }}" == "ci" ]; then
-  #                 flag=${test_case%_on_*}
-  #                 flag=${flag#test_compose_}
-  #                 if [[ $(printf '%s\n' "${changed_files[@]}" | grep ${{ inputs.example }} | grep ${flag}) ]]; then
-  #                     run_test_cases="$run_test_cases $test_case"
-  #                 fi
-  #             else
-  #                 run_test_cases="$run_test_cases $test_case"
-  #             fi
-  #         done
+          for test_case in $other_test_cases; do
+              if [ "${{ inputs.tag }}" == "ci" ]; then
+                  flag=${test_case%_on_*}
+                  flag=${flag#test_compose_}
+                  if [[ $(printf '%s\n' "${changed_files[@]}" | grep ${{ inputs.example }} | grep ${flag}) ]]; then
+                      run_test_cases="$run_test_cases $test_case"
+                  fi
+              else
+                  run_test_cases="$run_test_cases $test_case"
+              fi
+          done
 
-  #         if [ -z "$run_test_cases" ] && [[ $(printf '%s\n' "${changed_files[@]}" | grep ${{ inputs.example }} | grep /tests/) ]]; then
-  #             run_test_cases=$other_test_cases
-  #         fi
+          if [ -z "$run_test_cases" ] && [[ $(printf '%s\n' "${changed_files[@]}" | grep ${{ inputs.example }} | grep /tests/) ]]; then
+              run_test_cases=$other_test_cases
+          fi
 
-  #         if [[ "${{ hardware }}" == "xeon"* ]]; then
-  #           if [ -f "${{ github.workspace }}/${{ inputs.example }}/tests/test_ui_on_xeon.sh" ]; then
-  #             run_test_cases="$run_test_cases test_ui_on_xeon.sh";
-  #           fi
-  #         fi
-  #         test_cases=$(echo $run_test_cases | tr ' ' '\n' | sort -u | jq -R '.' | jq -sc '.')
-  #         echo "test_cases=$test_cases"
-  #         echo "test_cases=$test_cases" >> $GITHUB_OUTPUT
+          if [[ "${{ hardware }}" == "xeon"* ]]; then
+            if [ -f "${{ github.workspace }}/${{ inputs.example }}/tests/test_ui_on_xeon.sh" ]; then
+              run_test_cases="$run_test_cases test_ui_on_xeon.sh";
+            fi
+          fi
+          test_cases=$(echo $run_test_cases | tr ' ' '\n' | sort -u | jq -R '.' | jq -sc '.')
+          echo "test_cases=$test_cases"
+          echo "test_cases=$test_cases" >> $GITHUB_OUTPUT
 
-  # compose-test:
-  #   needs: [get-test-case]
-  #   if: ${{ needs.get-test-case.outputs.test_cases != '[""]' }}
-  #   strategy:
-  #     matrix:
-  #       test_case: ${{ fromJSON(needs.get-test-case.outputs.test_cases) }}
-  #     fail-fast: false
-  #   runs-on: ${{ inputs.hardware }}
-  #   continue-on-error: true
-  #   steps:
-  #     - name: Clean up Working Directory
-  #       run: |
-  #         sudo rm -rf ${{github.workspace}}/* || true
+  compose-test:
+    needs: [get-test-case]
+    if: ${{ needs.get-test-case.outputs.test_cases != '[""]' }}
+    strategy:
+      matrix:
+        test_case: ${{ fromJSON(needs.get-test-case.outputs.test_cases) }}
+      fail-fast: false
+    runs-on: ${{ inputs.hardware }}
+    continue-on-error: true
+    steps:
+      - name: Clean up Working Directory
+        run: |
+          sudo rm -rf ${{github.workspace}}/* || true
 
-  #         echo "Cleaning up containers using ports..."
-  #         cid=$(docker ps --format '{{.Names}} : {{.Ports}}' | grep -v ' : $' | grep -v 0.0.0.0:5000 | awk -F' : ' '{print $1}')
-  #         if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid && sleep 1s; fi
-  #         docker system prune -f
+          echo "Cleaning up containers using ports..."
+          cid=$(docker ps --format '{{.Names}} : {{.Ports}}' | grep -v ' : $' | grep -v 0.0.0.0:5000 | awk -F' : ' '{print $1}')
+          if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid && sleep 1s; fi
+          docker system prune -f
 
-  #         echo "Cleaning up images ..."
-  #         docker images --filter reference="*/*/*:latest" -q | xargs -r docker rmi && sleep 1s
-  #         docker images --filter reference="*/*:ci" -q | xargs -r docker rmi && sleep 1s
-  #         docker images --filter reference="*:5000/*/*" -q | xargs -r docker rmi && sleep 1s
-  #         docker images --filter reference="opea/comps-base" -q | xargs -r docker rmi && sleep 1s
-  #         docker images
+          echo "Cleaning up images ..."
+          docker images --filter reference="*/*/*:latest" -q | xargs -r docker rmi && sleep 1s
+          docker images --filter reference="*/*:ci" -q | xargs -r docker rmi && sleep 1s
+          docker images --filter reference="*:5000/*/*" -q | xargs -r docker rmi && sleep 1s
+          docker images --filter reference="opea/comps-base" -q | xargs -r docker rmi && sleep 1s
+          docker images
 
-  #     - name: Checkout out Repo
-  #       uses: actions/checkout@v4
-  #       with:
-  #         ref: ${{ needs.get-test-case.outputs.CHECKOUT_REF }}
-  #         fetch-depth: 0
+      - name: Checkout out Repo
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.get-test-case.outputs.CHECKOUT_REF }}
+          fetch-depth: 0
 
-  #     - name: Clean up container before test
-  #       shell: bash
-  #       run: |
-  #         docker ps
-  #         cd ${{ github.workspace }}/${{ inputs.example }}
-  #         export test_case=${{ matrix.test_case }}
-  #         export hardware=${{ inputs.hardware }}
-  #         bash ${{ github.workspace }}/.github/workflows/scripts/docker_compose_clean_up.sh "containers"
-  #         bash ${{ github.workspace }}/.github/workflows/scripts/docker_compose_clean_up.sh "ports"
-  #         docker ps
+      - name: Clean up container before test
+        shell: bash
+        run: |
+          docker ps
+          cd ${{ github.workspace }}/${{ inputs.example }}
+          export test_case=${{ matrix.test_case }}
+          export hardware=${{ inputs.hardware }}
+          bash ${{ github.workspace }}/.github/workflows/scripts/docker_compose_clean_up.sh "containers"
+          bash ${{ github.workspace }}/.github/workflows/scripts/docker_compose_clean_up.sh "ports"
+          docker ps
 
-  #     - name: Log in DockerHub
-  #       uses: docker/login-action@v3.2.0
-  #       with:
-  #         username: ${{ secrets.DOCKERHUB_USER }}
-  #         password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Log in DockerHub
+        uses: docker/login-action@v3.2.0
+        with:
+          username: ${{ secrets.DOCKERHUB_USER }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-  #     - name: Run test
-  #       shell: bash
-  #       env:
-  #         HUGGINGFACEHUB_API_TOKEN: ${{ secrets.HF_TOKEN }}
-  #         HF_TOKEN: ${{ secrets.HF_TOKEN }}
-  #         GOOGLE_CSE_ID: ${{ secrets.GOOGLE_CSE_ID }}
-  #         GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
-  #         PINECONE_KEY: ${{ secrets.PINECONE_KEY }}
-  #         PINECONE_KEY_LANGCHAIN_TEST: ${{ secrets.PINECONE_KEY_LANGCHAIN_TEST }}
-  #         SDK_BASE_URL: ${{ secrets.SDK_BASE_URL }}
-  #         SERVING_TOKEN: ${{ secrets.SERVING_TOKEN }}
-  #         OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-  #         FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
-  #         FINANCIAL_DATASETS_API_KEY: ${{ secrets.FINANCIAL_DATASETS_API_KEY }}
-  #         TAVILY_API_KEY: ${{ secrets.TAVILY_API_KEY }}
-  #         IMAGE_REPO: ${{ inputs.registry }}
-  #         IMAGE_TAG: ${{ inputs.tag }}
-  #         opea_branch: ${{ inputs.opea_branch }}
-  #         example: ${{ inputs.example }}
-  #         hardware: ${{ inputs.hardware }}
-  #         test_case: ${{ matrix.test_case }}
-  #         use_model_cache: ${{ inputs.use_model_cache }}
-  #       run: |
-  #         cd ${{ github.workspace }}/$example/tests
-  #         if [[ "$IMAGE_REPO" == "" ]]; then export IMAGE_REPO="${OPEA_IMAGE_REPO}opea"; fi
-  #         if [[ "$use_model_cache" == "true" ]]; then
-  #           if [ -d "/data2/hf_model" ]; then
-  #             export model_cache="/data2/hf_model"
-  #           else
-  #             echo "Model cache directory /data2/hf_model does not exist"
-  #             export model_cache="$HOME/.cache/huggingface/hub"
-  #           fi
-  #           if [[ "$test_case" == *"rocm"* ]]; then
-  #             export model_cache="/var/lib/GenAI/data"
-  #           fi
-  #         fi
-  #         if [ -f "${test_case}" ]; then timeout 60m bash "${test_case}"; else echo "Test script {${test_case}} not found, skip test!"; fi
+      - name: Run test
+        shell: bash
+        env:
+          HUGGINGFACEHUB_API_TOKEN: ${{ secrets.HF_TOKEN }}
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          GOOGLE_CSE_ID: ${{ secrets.GOOGLE_CSE_ID }}
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          PINECONE_KEY: ${{ secrets.PINECONE_KEY }}
+          PINECONE_KEY_LANGCHAIN_TEST: ${{ secrets.PINECONE_KEY_LANGCHAIN_TEST }}
+          SDK_BASE_URL: ${{ secrets.SDK_BASE_URL }}
+          SERVING_TOKEN: ${{ secrets.SERVING_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
+          FINANCIAL_DATASETS_API_KEY: ${{ secrets.FINANCIAL_DATASETS_API_KEY }}
+          TAVILY_API_KEY: ${{ secrets.TAVILY_API_KEY }}
+          IMAGE_REPO: ${{ inputs.registry }}
+          IMAGE_TAG: ${{ inputs.tag }}
+          opea_branch: ${{ inputs.opea_branch }}
+          example: ${{ inputs.example }}
+          hardware: ${{ inputs.hardware }}
+          test_case: ${{ matrix.test_case }}
+          use_model_cache: ${{ inputs.use_model_cache }}
+        run: |
+          cd ${{ github.workspace }}/$example/tests
+          if [[ "$IMAGE_REPO" == "" ]]; then export IMAGE_REPO="${OPEA_IMAGE_REPO}opea"; fi
+          if [[ "$use_model_cache" == "true" ]]; then
+            if [ -d "/data2/hf_model" ]; then
+              export model_cache="/data2/hf_model"
+            else
+              echo "Model cache directory /data2/hf_model does not exist"
+              export model_cache="$HOME/.cache/huggingface/hub"
+            fi
+            if [[ "$test_case" == *"rocm"* ]]; then
+              export model_cache="/var/lib/GenAI/data"
+            fi
+          fi
+          if [ -f "${test_case}" ]; then timeout 60m bash "${test_case}"; else echo "Test script {${test_case}} not found, skip test!"; fi
 
-  #     - name: Clean up container after test
-  #       if: always()
-  #       run: |
-  #         set -x
+      - name: Clean up container after test
+        if: always()
+        run: |
+          set -x
 
-  #         echo "Cleaning up containers using ports..."
-  #         cid=$(docker ps --format '{{.Names}} : {{.Ports}}' | grep -v ' : $' | grep -v 0.0.0.0:5000 | awk -F' : ' '{print $1}')
-  #         if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid && sleep 1s; fi
+          echo "Cleaning up containers using ports..."
+          cid=$(docker ps --format '{{.Names}} : {{.Ports}}' | grep -v ' : $' | grep -v 0.0.0.0:5000 | awk -F' : ' '{print $1}')
+          if [[ ! -z "$cid" ]]; then docker stop $cid && docker rm $cid && sleep 1s; fi
 
-  #         echo "Cleaning up images ..."
-  #         df -h
-  #         sleep 1
-  #         docker system df
-  #         sleep 1
-  #         if [[ "${{ inputs.hardware }}" == "xeon"* ]]; then
-  #             docker system prune -a -f
-  #         else
-  #             docker images --filter reference="*/*/*:latest" -q | xargs -r docker rmi && sleep 1s
-  #             docker images --filter reference="*/*:ci" -q | xargs -r docker rmi && sleep 1s
-  #             docker images --filter reference="*:5000/*/*" -q | xargs -r docker rmi && sleep 1s
-  #             docker images --filter reference="opea/comps-base" -q | xargs -r docker rmi && sleep 1s
-  #             docker system prune -f
-  #         fi
-  #         sleep 5
-  #         docker images
-  #         sleep 1
-  #         df -h
-  #         sleep 1
-  #         docker system df
-  #         sleep 1
+          echo "Cleaning up images ..."
+          df -h
+          sleep 1
+          docker system df
+          sleep 1
+          if [[ "${{ inputs.hardware }}" == "xeon"* ]]; then
+              docker system prune -a -f
+          else
+              docker images --filter reference="*/*/*:latest" -q | xargs -r docker rmi && sleep 1s
+              docker images --filter reference="*/*:ci" -q | xargs -r docker rmi && sleep 1s
+              docker images --filter reference="*:5000/*/*" -q | xargs -r docker rmi && sleep 1s
+              docker images --filter reference="opea/comps-base" -q | xargs -r docker rmi && sleep 1s
+              docker system prune -f
+          fi
+          sleep 5
+          docker images
+          sleep 1
+          df -h
+          sleep 1
+          docker system df
+          sleep 1
 
-  #     - name: Publish pipeline artifact
-  #       if: ${{ !cancelled() }}
-  #       uses: actions/upload-artifact@v4
-  #       with:
-  #         name: ${{ inputs.hardware }}_${{ inputs.example }}_${{ matrix.test_case }}
-  #         path: ${{ github.workspace }}/${{ inputs.example }}/tests/*.log
+      - name: Publish pipeline artifact
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.hardware }}_${{ inputs.example }}_${{ matrix.test_case }}
+          path: ${{ github.workspace }}/${{ inputs.example }}/tests/*.log
