@@ -95,7 +95,8 @@ For more advanced env variables and configurations, please refer to [Prepare env
 
 ### 5. Deploy the Service on Intel GPU Using Docker Compose
 
-set Milvus DB and chat history round for inference: 
+set Milvus DB and chat history round for inference:
+
 ```bash
 # EC-RAG support Milvus as persistent database, by default milvus is disabled, you can choose to set MILVUS_ENABLED=1 to enable it
 export MILVUS_ENABLED=0
@@ -123,7 +124,7 @@ docker compose -f docker_compose/intel/gpu/arc/compose_vllm.yaml up -d
 #### option b. Deploy the Service on Arc B60 Using Docker Compose
 
 ```bash
-# Besides MILVUS_ENABLED and CHAT_HISTORY_ROUND, below enviroments are exposed for vLLM config, you can change them to your preference:
+# Besides MILVUS_ENABLED and CHAT_HISTORY_ROUND, below environments are exposed for vLLM config, you can change them to your preference:
 # export VLLM_SERVICE_PORT_B60=8086
 # export DTYPE=float16
 # export TP=1 # for multi GPU, you can change TP value

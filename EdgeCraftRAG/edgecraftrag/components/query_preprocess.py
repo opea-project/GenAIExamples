@@ -175,8 +175,8 @@ class LogitsEstimatorJSON(LogitsEstimator):
 def read_json_files(file_path: str) -> dict:
     result = {}
     if os.path.isfile(file_path):
-        with open(file_path, 'r', encoding='utf-8') as f:
-            result =  json.load(f)
+        with open(file_path, "r", encoding="utf-8") as f:
+            result = json.load(f)
     return result
 
 
@@ -196,14 +196,14 @@ async def query_search(user_input, search_config_path, search_dir, pl):
 
     cfg = {}
     if not os.path.exists(search_config_path):
-        cfg["query_matcher"] =  {
-                "instructions": "You're an expert in TCB Bonder, your task is to decide the semantic similarity of two queries.\n If they are expressing similar idea, mark as High.\n If they are totally different, mark as Low.\n If some parts of them are similar, some are not, mark as Medium.\n",
-                "input_template": "<query> {} </query>\n<query> {} </query>\n",
-                "output_template": "output from {json_levels}.\n",
-                "json_key": "similarity",
-                "json_levels": ["Low", "Medium", "High"],
-                "temperature": 1
-            }
+        cfg["query_matcher"] = {
+            "instructions": "You're an expert in TCB Bonder, your task is to decide the semantic similarity of two queries.\n If they are expressing similar idea, mark as High.\n If they are totally different, mark as Low.\n If some parts of them are similar, some are not, mark as Medium.\n",
+            "input_template": "<query> {} </query>\n<query> {} </query>\n",
+            "output_template": "output from {json_levels}.\n",
+            "json_key": "similarity",
+            "json_levels": ["Low", "Medium", "High"],
+            "temperature": 1,
+        }
     else:
         cfg = OmegaConf.load(search_config_path)
     cfg["query_matcher"]["model_id"] = model_id
@@ -221,10 +221,10 @@ async def query_search(user_input, search_config_path, search_dir, pl):
     match_scores.sort(key=lambda x: x[1], reverse=True)
 
     # Maximum less than 0.6, we don't use query search.
-    if  match_scores[0][1] < 0.6:
+    if match_scores[0][1] < 0.6:
         return top1_issue, sub_questions_result
     top1_issue = match_scores[0][0]
     for i in range(len(maintenance_data)):
-        if maintenance_data[i]['question'] == top1_issue:
+        if maintenance_data[i]["question"] == top1_issue:
             sub_questions_result = "\n".join(maintenance_data[i]["content"])
     return top1_issue, sub_questions_result
