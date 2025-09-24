@@ -901,7 +901,7 @@ class Deployer:
                 log_message("ERROR", f"Local environment script '{local_env_file}' not found. Cannot deploy.")
                 return False
 
-            compose_up_cmd = " ".join(compose_base_cmd + ["up", "-d", "--remove-orphans"])
+            compose_up_cmd = " ".join(compose_base_cmd + ["up", "-d", "--remove-orphans", "--quiet-pull"])
             if self.example_name == "ChatQnA" and self.args.device == "gaudi":
                 compose_up_cmd = "source .env&&" + compose_up_cmd
             compose_dir = self._get_docker_compose_files()[0].parent
