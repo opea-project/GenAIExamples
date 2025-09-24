@@ -371,14 +371,13 @@ class Deployer:
             if help_text:
                 prompt_text = f"{prompt_text} ({help_text})"
 
-
-            user_input = click.prompt(prompt_text, default=final_default , type=param.get("type", str))
+            user_input = click.prompt(prompt_text, default=final_default, type=param.get("type", str))
 
             value_to_set = user_input if user_input else final_default
 
             is_required = param.get("required", False)
 
-            while is_required and  not value_to_set:
+            while is_required and not value_to_set:
                 log_message("WARN", f"A valid '{param['prompt']}' is required. Please provide a real value.")
                 user_input = click.prompt(prompt_text, type=param.get("type", str), default=None)
                 value_to_set = user_input if user_input else None
