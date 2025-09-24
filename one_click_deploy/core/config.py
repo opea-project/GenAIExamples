@@ -118,6 +118,7 @@ EXAMPLE_CONFIGS = {
                 "name": "mount_dir",
                 "prompt": "Data Mount Directory (for Docker)",
                 "type": str,
+                "default": "./data",
                 "modes": ["docker"],
             },
         ],

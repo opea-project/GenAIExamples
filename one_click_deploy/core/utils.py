@@ -393,8 +393,11 @@ def get_var_from_shell_script(script_path: pathlib.Path, var_name: str) -> str |
         log_message("DEBUG", f"Source script for variable extraction not found: {script_path}")
         return None
 
-    command_string = f'NON_INTERACTIVE=true; source "{script_path.resolve()}"; echo "${var_name}"'
-
+    command_string = (
+        f'NON_INTERACTIVE=true; '
+        f'source "{script_path.resolve()}" > /dev/null; '
+        f'echo "${var_name}"'
+    )
     try:
         result = run_command(
             ["bash", "-c", command_string],

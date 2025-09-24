@@ -353,8 +353,9 @@ class Deployer:
                 setattr(self.args, param["name"], None)
                 continue
 
-            default_value = param.get("default")
+            static_default = param.get("default")
 
+            dynamic_default = None
             env_var_name = docker_param_map.get(param["name"])
             if env_var_name and source_env_script:
                 dynamic_default = get_var_from_shell_script(source_env_script, env_var_name)
@@ -363,22 +364,26 @@ class Deployer:
                         "DEBUG",
                         f"Found default for '{param['name']}' from script '{source_env_script.name}': {dynamic_default}",
                     )
-                    default_value = dynamic_default
 
+            final_default = dynamic_default if dynamic_default is not None else static_default
             prompt_text = param["prompt"]
             help_text = param.get("help")
             if help_text:
                 prompt_text = f"{prompt_text} ({help_text})"
 
+
+            user_input = click.prompt(prompt_text, default=final_default , type=param.get("type", str))
+
+            value_to_set = user_input if user_input else final_default
+
             is_required = param.get("required", False)
 
-            user_input = click.prompt(prompt_text, default=default_value, type=param.get("type", str))
-
-            while is_required and (not user_input or user_input == default_value):
+            while is_required and  not value_to_set:
                 log_message("WARN", f"A valid '{param['prompt']}' is required. Please provide a real value.")
                 user_input = click.prompt(prompt_text, type=param.get("type", str), default=None)
+                value_to_set = user_input if user_input else None
 
-            setattr(self.args, param["name"], user_input)
+            setattr(self.args, param["name"], value_to_set)
 
         self.args.do_check_env = click.confirm("Run environment check?", default=False, show_default=True)
 
