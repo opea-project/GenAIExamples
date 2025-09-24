@@ -802,7 +802,7 @@ class Deployer:
         updates = {
             env_var: getattr(self.args, arg_name)
             for arg_name, env_var in params_to_env_map.items()
-            if hasattr(self.args, arg_name) and getattr(self.args, arg_name) is not None
+            if hasattr(self.args, arg_name) and getattr(self.args, arg_name)
         }
 
         user_proxies = {p.strip() for p in self.args.no_proxy.split(",") if p.strip()}
@@ -846,7 +846,7 @@ class Deployer:
         for name, path_or_paths in params_to_values.items():
             if hasattr(self.args, name):
                 value = getattr(self.args, name)
-                if value is None:
+                if not value:
                     continue
 
                 if isinstance(path_or_paths, list) and len(path_or_paths) > 0 and isinstance(path_or_paths[0], list):
