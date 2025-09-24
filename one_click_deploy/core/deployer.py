@@ -345,17 +345,29 @@ class Deployer:
 
         interactive_params = self._get_device_specific_or_common_config(["interactive_params"]) or []
 
+        docker_param_map = self._get_device_specific_or_common_config(["docker_compose", "params_to_set_env"]) or {}
+        source_env_script = self._get_docker_set_env_script()
+
         for param in interactive_params:
             if "modes" in param and self.args.deploy_mode not in param["modes"]:
                 setattr(self.args, param["name"], None)
                 continue
+
+            default_value = param.get("default")
+
+            env_var_name = docker_param_map.get(param["name"])
+            if env_var_name and source_env_script:
+                dynamic_default = get_var_from_shell_script(source_env_script, env_var_name)
+                if dynamic_default:
+                    log_message("DEBUG",
+                                f"Found default for '{param['name']}' from script '{source_env_script.name}': {dynamic_default}")
+                    default_value = dynamic_default
 
             prompt_text = param["prompt"]
             help_text = param.get("help")
             if help_text:
                 prompt_text = f"{prompt_text} ({help_text})"
 
-            default_value = param.get("default")
             is_required = param.get("required", False)
 
             user_input = click.prompt(prompt_text, default=default_value, type=param.get("type", str))
