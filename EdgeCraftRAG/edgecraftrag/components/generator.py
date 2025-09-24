@@ -237,14 +237,15 @@ class QnAGenerator(BaseComponent):
         chat_history = concat_history(chat_request.messages)
         # Modify model think status
         if chat_request.chat_template_kwargs:
-            if self.enable_think != chat_request.chat_template_kwargs["enable_thinking"]:
-                self.prompt = self.init_prompt(
-                    self.model_path,
-                    self.prompt_content,
-                    self.prompt_template_file,
-                    chat_request.chat_template_kwargs["enable_thinking"],
-                )
-                self.enable_think = chat_request.chat_template_kwargs["enable_thinking"]
+            if 'enable_thinking' in chat_request.chat_template_kwargs:
+                if self.enable_think != chat_request.chat_template_kwargs["enable_thinking"]:
+                    self.prompt = self.init_prompt(
+                        self.model_path,
+                        self.prompt_content,
+                        self.prompt_template_file,
+                        chat_request.chat_template_kwargs["enable_thinking"],
+                    )
+                    self.enable_think = chat_request.chat_template_kwargs["enable_thinking"]
         if sub_questions:
             final_query = f"{query}\n\n### Sub-questions ###\nThe following list is how you should consider the answer, you MUST follow these steps when responding:\n\n{sub_questions}"
         else:

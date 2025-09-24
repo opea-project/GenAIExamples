@@ -315,8 +315,8 @@ def load_pipeline_from_file():
         with open(PIPELINE_FILE, "r", encoding="utf-8") as f:
             all_pipelines = f.read()
         try:
-            all_da = json.loads(all_pipelines)
-            for pipeline_data in all_da:
+            all_data = json.loads(all_pipelines)
+            for pipeline_data in all_data:
                 one_pipelinejson = json.loads(pipeline_data)
                 pipeline_req = PipelineCreateIn(**one_pipelinejson)
                 load_pipeline(pipeline_req)

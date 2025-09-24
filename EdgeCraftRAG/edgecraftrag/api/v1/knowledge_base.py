@@ -55,7 +55,7 @@ async def create_knowledge_base(knowledge: KnowledgeBaseCreateIn):
         if knowledge.active and knowledge.comp_type =="knowledge" and knowledge.comp_subtype == "origin_kb":
             active_pl.indexer.reinitialize_indexer(knowledge.name)
             active_pl.update_indexer_to_retriever()
-        elif knowledge.comp_subtype == "kbadmin_kb":
+        elif  knowledge.active and knowledge.comp_subtype == "kbadmin_kb":
             active_pl.retriever.config_kbadmin_milvus(knowledge.name)
         kb = ctx.knowledgemgr.create_knowledge_base(knowledge)
         await save_knowledge_to_file()
@@ -372,7 +372,7 @@ async def load_knowledge_from_file():
             for Knowledgebase_data in all_data:
                 pipeline_req = KnowledgeBaseCreateIn(**Knowledgebase_data)
                 kb = ctx.knowledgemgr.create_knowledge_base(pipeline_req)
-                if  kb.comp_type =="knowledge":
+                if  kb.comp_type =="knowledge" and kb.comp_subtype =="origin_kb":
                     if Knowledgebase_data["file_map"]:
                         if active_pl.indexer.comp_subtype != "milvus_vector" and Knowledgebase_data["active"]:
                             for file_path in Knowledgebase_data["file_map"].values():
@@ -388,6 +388,9 @@ async def load_knowledge_from_file():
                         else:
                             for file_path in Knowledgebase_data["file_map"].values():
                                 kb.add_file_path(file_path)
+                elif kb.comp_subtype =="kbadmin_kb":
+                    if Knowledgebase_data["active"]:
+                        active_pl.retriever.config_kbadmin_milvus(kb.name)
         except Exception as e:
             print(f"Error load Knowledge base: {e}")
 
