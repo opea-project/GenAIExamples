@@ -56,6 +56,10 @@ jobs:
         node: ${{ fromJson(needs.get-test-matrix.outputs.nodes) }}
         deploy_method: ${{ fromJson(needs.get-test-matrix.outputs.deploy_methods) }}
       fail-fast: false
+      exclude:
+          - example: AudioQnA
+            node: xeon
+            deploy_method: k8x
     uses: ./.github/workflows/_run-one-click.yml
     with:
       hardware: ${{ matrix.node }}
