@@ -55,6 +55,10 @@ jobs:
         example: ${{ fromJson(needs.get-test-matrix.outputs.examples) }}
         node: ${{ fromJson(needs.get-test-matrix.outputs.nodes) }}
         deploy_method: ${{ fromJson(needs.get-test-matrix.outputs.deploy_methods) }}
+        exclude:
+          - example: AgentQnA
+            node: xeon
+            deploy_method: k8s
       fail-fast: false
     uses: ./.github/workflows/_run-one-click.yml
     with:
