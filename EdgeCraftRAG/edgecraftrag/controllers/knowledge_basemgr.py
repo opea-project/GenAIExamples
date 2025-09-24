@@ -50,26 +50,34 @@ class KnowledgeManager(BaseMgr):
         if kb.comp_type != "experience":
             raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Knowledge type  cannot be active")
         self.active_experience_idx = kb.idx if knowledge.experience_active else None
-        if  kb.experience_active != knowledge.experience_active:
+        if kb.experience_active != knowledge.experience_active:
             for idx, comp in self.components.items():
                 if isinstance(comp, Knowledge):
                     comp.experience_active = idx == self.active_experience_idx
         return kb
 
-    
     def create_knowledge_base(self, knowledge: KnowledgeBaseCreateIn) -> Knowledge:
         for _, kb in self.components.items():
             if kb.name == knowledge.name:
                 raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="The knowledge base already exists.")
-            if  knowledge.comp_type == "experience":
+            if knowledge.comp_type == "experience":
                 for idx, kb in self.components.items():
-                    if kb.comp_type =='experience':
-                        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Only one experience class can be created.")
+                    if kb.comp_type == "experience":
+                        raise HTTPException(
+                            status_code=status.HTTP_409_CONFLICT, detail="Only one experience class can be created."
+                        )
         if knowledge.comp_type == "experience":
             knowledge.active = False
         if knowledge.active is None:
             knowledge.active = False
-        kb = Knowledge(name=knowledge.name, description=knowledge.description, active=knowledge.active, comp_type=knowledge.comp_type, comp_subtype=knowledge.comp_subtype, experience_active=knowledge.experience_active)
+        kb = Knowledge(
+            name=knowledge.name,
+            description=knowledge.description,
+            active=knowledge.active,
+            comp_type=knowledge.comp_type,
+            comp_subtype=knowledge.comp_subtype,
+            experience_active=knowledge.experience_active,
+        )
         self.add(kb)
         if knowledge.active:
             self.active_knowledge(knowledge)
@@ -89,11 +97,11 @@ class KnowledgeManager(BaseMgr):
                 kb.description = knowledge.description
             if knowledge.active is not None and kb.active != knowledge.active:
                 kb = self.active_knowledge(knowledge)
-        if  kb.comp_type == "experience":
-                if knowledge.description is not None:
-                    kb.description = knowledge.description
-                if knowledge.experience_active is not None and kb.experience_active != knowledge.experience_active:
-                    kb = self.active_experience(knowledge)
+        if kb.comp_type == "experience":
+            if knowledge.description is not None:
+                kb.description = knowledge.description
+            if knowledge.experience_active is not None and kb.experience_active != knowledge.experience_active:
+                kb = self.active_experience(knowledge)
         return "Knowledge base update successfully"
 
     def get_all_knowledge_bases(self) -> List[Dict[str, Any]]:
@@ -104,6 +112,5 @@ class KnowledgeManager(BaseMgr):
 
     def get_experience_kb(self):
         for idx, kb in self.components.items():
-            if kb.comp_type =='experience':
+            if kb.comp_type == "experience":
                 return kb
-            
