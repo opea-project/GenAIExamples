@@ -44,7 +44,7 @@ class Pipeline(BaseComponent):
         if self.name == "" or self.name is None:
             self.name = self.idx
         self.enable_benchmark = os.getenv("ENABLE_BENCHMARK", "False").lower() == "true"
-        self.run_pipeline_cb = run_generator_ben if self.enable_benchmark else run_generator
+        self.run_pipeline_cb = run_generator
         self.run_retriever_cb = run_retrieve
         self.run_data_prepare_cb = run_simple_doc
 
@@ -239,88 +239,9 @@ def benchmark_response(ret, benchmark, benchmark_index, benchmark_data, input_to
         return ret
 
 
-def run_generator_ben(pl: Pipeline, chat_request: ChatCompletionRequest) -> Any:
-    benchmark_index, benchmark_data = pl.benchmark.init_benchmark_data()
-    contexts = {}
-    retri_res = []
-    active_kb = chat_request.user if chat_request.user  else None
-    enable_rag_retrieval = chat_request.chat_template_kwargs.get("enable_rag_retrieval", True) if chat_request.chat_template_kwargs else True
-    if not active_kb:
-        enable_rag_retrieval = False
-    elif pl.retriever.comp_subtype == "kbadmin_retriever" and active_kb.comp_subtype == "origin_kb":
-        enable_rag_retrieval = False
-    elif pl.retriever.comp_subtype != "kbadmin_retriever" and  active_kb.comp_subtype == "kbadmin_kb":
-        enable_rag_retrieval = False
-    query = chat_request.messages
-    sub_questionss_result = None
-    experience_status = True if chat_request.tool_choice == 'auto' else False
-    if enable_rag_retrieval:
-        start = time.perf_counter()
-        if pl.generator.inference_type == InferenceType.VLLM and experience_status:
-            UI_DIRECTORY ="/home/user/ui_cache"
-            search_config_path = os.path.join(UI_DIRECTORY, "configs/search_config.yaml")
-            search_dir = os.path.join(UI_DIRECTORY, "configs/experience_dir/experience.json")
-
-            def run_async_query_search():
-                loop = asyncio.new_event_loop()
-                asyncio.set_event_loop(loop)
-                try:
-                    return loop.run_until_complete(query_search(query, search_config_path, search_dir, pl))
-                finally:
-                    loop.close()
-
-            with ThreadPoolExecutor(max_workers=1) as executor:
-                future = executor.submit(run_async_query_search)
-                top1_issue, sub_questionss_result = future.result()
-            if sub_questionss_result:
-                query = query + sub_questionss_result
-        benchmark_data[CompType.QUERYSEARCH] = time.perf_counter() - start
-        start = time.perf_counter()
-        top_k = None if chat_request.k == ChatCompletionRequest.model_fields["k"].default else chat_request.k
-        retri_res = pl.retriever.run(query=query, top_k=top_k)
-        query_bundle = QueryBundle(query)
-        benchmark_data[CompType.RETRIEVER] = time.perf_counter() - start
-        contexts[CompType.RETRIEVER] = retri_res
-
-        start = time.perf_counter()
-        if pl.postprocessor:
-            for processor in pl.postprocessor:
-                if (
-                    isinstance(processor, RerankProcessor)
-                    and chat_request.top_n != ChatCompletionRequest.model_fields["top_n"].default
-                ):
-                    processor.top_n = chat_request.top_n
-                retri_res = processor.run(retri_res=retri_res, query_bundle=query_bundle)
-                contexts[CompType.POSTPROCESSOR] = retri_res
-        benchmark_data[CompType.POSTPROCESSOR] = time.perf_counter() - start
-
-    if pl.generator is None:
-        raise ValueError("No Generator Specified")
-
-    text_gen_context, prompt_str = pl.generator.query_transform(chat_request, retri_res)
-    input_token_size = pl.benchmark.cal_input_token_size(prompt_str)
-
-    np_type = pl.node_parser.comp_subtype
-    start = time.perf_counter()
-    if pl.generator.inference_type == InferenceType.LOCAL:
-        ret = pl.generator.run(chat_request, retri_res, np_type)
-    elif pl.generator.inference_type == InferenceType.VLLM:
-        ret = pl.generator.run_vllm(chat_request, retri_res, np_type, sub_questions=sub_questionss_result)
-    else:
-        raise ValueError("LLM inference_type not supported")
-    end = time.perf_counter()
-
-    if isinstance(ret, StreamingResponse):
-        ret = benchmark_response(ret, pl.benchmark, benchmark_index, benchmark_data, input_token_size, start)
-    else:
-        benchmark_data[CompType.GENERATOR] = end - start
-        pl.benchmark.insert_llm_data(benchmark_index, input_token_size)
-        pl.benchmark.insert_benchmark_data(benchmark_data)
-    return ret, contexts
-
-
 def run_generator(pl: Pipeline, chat_request: ChatCompletionRequest) -> Any:
-    query = chat_request.messages
+    if pl.enable_benchmark:
+        benchmark_index, benchmark_data = pl.benchmark.init_benchmark_data()
     contexts = {}
     retri_res = []
     active_kb = chat_request.user if chat_request.user  else None
@@ -335,6 +256,9 @@ def run_generator(pl: Pipeline, chat_request: ChatCompletionRequest) -> Any:
     sub_questionss_result = None
     experience_status = True if chat_request.tool_choice == 'auto' else False
     if enable_rag_retrieval:
+        start = 0
+        if pl.enable_benchmark:
+            start = time.perf_counter()
         if pl.generator.inference_type == InferenceType.VLLM and experience_status:
             UI_DIRECTORY ="/home/user/ui_cache"
             search_config_path = os.path.join(UI_DIRECTORY, "configs/search_config.yaml")
@@ -353,11 +277,17 @@ def run_generator(pl: Pipeline, chat_request: ChatCompletionRequest) -> Any:
                 top1_issue, sub_questionss_result = future.result()
             if sub_questionss_result:
                 query = query + sub_questionss_result
+        if pl.enable_benchmark:
+            benchmark_data[CompType.QUERYSEARCH] = time.perf_counter() - start
+            start = time.perf_counter()
         top_k = None if chat_request.k == ChatCompletionRequest.model_fields["k"].default else chat_request.k
         retri_res = pl.retriever.run(query=query, top_k=top_k)
+        if pl.enable_benchmark:
+            benchmark_data[CompType.RETRIEVER] = time.perf_counter() - start
         contexts[CompType.RETRIEVER] = retri_res
         query_bundle = QueryBundle(query)
-
+        if pl.enable_benchmark:
+            start = time.perf_counter()
         if pl.postprocessor:
             for processor in pl.postprocessor:
                 if (
@@ -367,14 +297,31 @@ def run_generator(pl: Pipeline, chat_request: ChatCompletionRequest) -> Any:
                     processor.top_n = chat_request.top_n
                 retri_res = processor.run(retri_res=retri_res, query_bundle=query_bundle)
                 contexts[CompType.POSTPROCESSOR] = retri_res
+        if pl.enable_benchmark:
+            benchmark_data[CompType.POSTPROCESSOR] = time.perf_counter() - start
 
     if pl.generator is None:
         raise ValueError("No Generator Specified")
+
+    if pl.enable_benchmark:
+        _, prompt_str = pl.generator.query_transform(chat_request, retri_res)
+        input_token_size = pl.benchmark.cal_input_token_size(prompt_str)
+
     np_type = pl.node_parser.comp_subtype
+    if pl.enable_benchmark:
+        start = time.perf_counter()
     if pl.generator.inference_type == InferenceType.LOCAL:
         ret = pl.generator.run(chat_request, retri_res, np_type)
     elif pl.generator.inference_type == InferenceType.VLLM:
         ret = pl.generator.run_vllm(chat_request, retri_res, np_type, sub_questions=sub_questionss_result)
     else:
         raise ValueError("LLM inference_type not supported")
+    if pl.enable_benchmark:
+        end = time.perf_counter()
+        if isinstance(ret, StreamingResponse):
+            ret = benchmark_response(ret, pl.benchmark, benchmark_index, benchmark_data, input_token_size, start)
+        else:
+            benchmark_data[CompType.GENERATOR] = end - start
+            pl.benchmark.insert_llm_data(benchmark_index, input_token_size)
+            pl.benchmark.insert_benchmark_data(benchmark_data)
     return ret, contexts

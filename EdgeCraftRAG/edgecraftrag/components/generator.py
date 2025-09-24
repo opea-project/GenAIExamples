@@ -6,9 +6,7 @@ import dataclasses
 import json
 import os
 import urllib.request
-import requests
 from urllib.parse import urlparse
-from fastapi import HTTPException, status
 
 from edgecraftrag.base import BaseComponent, CompType, GeneratorType, InferenceType, NodeParserType
 from edgecraftrag.utils import concat_history, get_prompt_template, save_history

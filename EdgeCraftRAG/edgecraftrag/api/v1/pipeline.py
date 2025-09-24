@@ -61,7 +61,7 @@ async def get_pipeline_benchmark():
 
 # GET Pipeline benchmark
 @pipeline_app.get(path="/v1/settings/pipelines/{name}/benchmarks")
-async def get_pipeline_benchmark(name):
+async def get_pipeline_benchmarks(name):
     pl = ctx.get_pipeline_mgr().get_pipeline_by_name_or_id(name)
     if pl and pl.benchmark:
         return pl.benchmark.benchmark_data_list
