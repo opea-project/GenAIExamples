@@ -377,8 +377,7 @@ def stop_all_kubectl_port_forwards():
 
 
 def get_var_from_shell_script(script_path: pathlib.Path, var_name: str) -> str | None:
-    """
-    Gets the value of an environment variable by executing a shell script.
+    """Gets the value of an environment variable by executing a shell script.
 
     This method is robust as it handles scripts with functions, sourcing other files,
     and conditional logic. It executes the script in a non-interactive mode.
@@ -393,7 +392,6 @@ def get_var_from_shell_script(script_path: pathlib.Path, var_name: str) -> str |
     if not script_path or not script_path.exists():
         log_message("DEBUG", f"Source script for variable extraction not found: {script_path}")
         return None
-
 
     command_string = f'NON_INTERACTIVE=true; source "{script_path.resolve()}"; echo "${var_name}"'
 
@@ -423,7 +421,9 @@ def get_var_from_shell_script(script_path: pathlib.Path, var_name: str) -> str |
             return None
 
     except Exception as e:
-        log_message("WARN", f"An unexpected error occurred while executing {script_path.name} to get var '{var_name}': {e}")
+        log_message(
+            "WARN", f"An unexpected error occurred while executing {script_path.name} to get var '{var_name}': {e}"
+        )
         return None
 
 
