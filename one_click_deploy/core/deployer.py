@@ -359,8 +359,10 @@ class Deployer:
             if env_var_name and source_env_script:
                 dynamic_default = get_var_from_shell_script(source_env_script, env_var_name)
                 if dynamic_default:
-                    log_message("DEBUG",
-                                f"Found default for '{param['name']}' from script '{source_env_script.name}': {dynamic_default}")
+                    log_message(
+                        "DEBUG",
+                        f"Found default for '{param['name']}' from script '{source_env_script.name}': {dynamic_default}",
+                    )
                     default_value = dynamic_default
 
             prompt_text = param["prompt"]
