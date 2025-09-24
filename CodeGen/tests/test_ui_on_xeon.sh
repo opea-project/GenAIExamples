@@ -140,6 +140,10 @@ function main() {
         validate_frontend
         echo "::endgroup::"
 
+        echo "::group::validate_gradio"
+        validate_gradio
+        echo "::endgroup::"
+
         stop_docker "${docker_compose_files[${i}]}"
         sleep 5s
     done
