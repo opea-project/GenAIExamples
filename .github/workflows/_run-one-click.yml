@@ -123,20 +123,11 @@ jobs:
         id: get-default-params
         if: ${{ inputs.deploy_method == 'k8s' }}
         run: |
-          cd ${{ github.workspace }}
-          example=$(echo "${{ inputs.example }}" | cut -d'-' -f1)
-          PARAMS_JSON=$(python3 .github/workflows/scripts/get-params.py $example)
-          echo "LLM_model=$(echo "$PARAMS_JSON" | jq -r '.llm_model')" >> $GITHUB_ENV
-          if [ "$example" = "ChatQnA" ]; then
-            echo "LLM_model=$(echo "$PARAMS_JSON" | jq -r '.llm_model')" >> $GITHUB_ENV
-            echo "Embedding_model=$(echo "$PARAMS_JSON" | jq -r '.embed_model')" >> $GITHUB_ENV
-            echo "Reranking_model=$(echo "$PARAMS_JSON" | jq -r '.rerank_model')" >> $GITHUB_ENV
-            echo "Mount_dir=$(echo "$PARAMS_JSON" | jq -r '.mount_dir')" >> $GITHUB_ENV
-          elif [ "$example" = "VisualQnA" ]; then
-            echo "LVM_model=$(echo "$PARAMS_JSON" | jq -r '.lvm_model')" >> $GITHUB_ENV
-          elif [ "$example" = "AgentQnA" ]; then
-            echo "LLM_model=$(echo "$PARAMS_JSON" | jq -r '.gaudi.llm_model')" >> $GITHUB_ENV
-          fi
+          echo "LLM_model=" >> $GITHUB_ENV
+          echo "Embedding_model=" >> $GITHUB_ENV
+          echo "Reranking_model=" >> $GITHUB_ENV
+          echo "Mount_dir=" >> $GITHUB_ENV
+          echo "LVM_model=" >> $GITHUB_ENV
 
       - name: deploy and test
         shell: bash

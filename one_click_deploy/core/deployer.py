@@ -345,26 +345,44 @@ class Deployer:
 
         interactive_params = self._get_device_specific_or_common_config(["interactive_params"]) or []
 
+        docker_param_map = self._get_device_specific_or_common_config(["docker_compose", "params_to_set_env"]) or {}
+        source_env_script = self._get_docker_set_env_script()
+
         for param in interactive_params:
             if "modes" in param and self.args.deploy_mode not in param["modes"]:
                 setattr(self.args, param["name"], None)
                 continue
 
+            static_default = param.get("default")
+
+            dynamic_default = None
+            env_var_name = docker_param_map.get(param["name"])
+            if env_var_name and source_env_script:
+                dynamic_default = get_var_from_shell_script(source_env_script, env_var_name)
+                if dynamic_default:
+                    log_message(
+                        "DEBUG",
+                        f"Found default for '{param['name']}' from script '{source_env_script.name}': {dynamic_default}",
+                    )
+
+            final_default = dynamic_default if dynamic_default is not None else static_default
             prompt_text = param["prompt"]
             help_text = param.get("help")
             if help_text:
                 prompt_text = f"{prompt_text} ({help_text})"
 
-            default_value = param.get("default")
+            user_input = click.prompt(prompt_text, default=final_default, type=param.get("type", str))
+
+            value_to_set = user_input if user_input else final_default
+
             is_required = param.get("required", False)
 
-            user_input = click.prompt(prompt_text, default=default_value, type=param.get("type", str))
-
-            while is_required and (not user_input or user_input == default_value):
+            while is_required and not value_to_set:
                 log_message("WARN", f"A valid '{param['prompt']}' is required. Please provide a real value.")
                 user_input = click.prompt(prompt_text, type=param.get("type", str), default=None)
+                value_to_set = user_input if user_input else None
 
-            setattr(self.args, param["name"], user_input)
+            setattr(self.args, param["name"], value_to_set)
 
         self.args.do_check_env = click.confirm("Run environment check?", default=False, show_default=True)
 
@@ -790,7 +808,7 @@ class Deployer:
         updates = {
             env_var: getattr(self.args, arg_name)
             for arg_name, env_var in params_to_env_map.items()
-            if hasattr(self.args, arg_name) and getattr(self.args, arg_name) is not None
+            if hasattr(self.args, arg_name) and getattr(self.args, arg_name)
         }
 
         user_proxies = {p.strip() for p in self.args.no_proxy.split(",") if p.strip()}
@@ -834,7 +852,7 @@ class Deployer:
         for name, path_or_paths in params_to_values.items():
             if hasattr(self.args, name):
                 value = getattr(self.args, name)
-                if value is None:
+                if not value:
                     continue
 
                 if isinstance(path_or_paths, list) and len(path_or_paths) > 0 and isinstance(path_or_paths[0], list):
@@ -889,7 +907,7 @@ class Deployer:
                 log_message("ERROR", f"Local environment script '{local_env_file}' not found. Cannot deploy.")
                 return False
 
-            compose_up_cmd = " ".join(compose_base_cmd + ["up", "-d", "--remove-orphans"])
+            compose_up_cmd = " ".join(compose_base_cmd + ["up", "-d", "--remove-orphans", "--quiet-pull"])
             if self.example_name == "ChatQnA" and self.args.device == "gaudi":
                 compose_up_cmd = "source .env&&" + compose_up_cmd
             compose_dir = self._get_docker_compose_files()[0].parent
