@@ -142,10 +142,9 @@ function validate_frontend() {
         -w /work \
         mcr.microsoft.com/playwright:v1.40.0-focal \
         /bin/bash -c "
-            npm install &&
             npm ci &&
-            npx playwright install &&
-            npx playwright test
+            npx playwright@1.44.0 install --with-deps &&
+            npx playwright@1.44.0 test
         " || exit_status=$?
 
     if [ $exit_status -ne 0 ]; then
