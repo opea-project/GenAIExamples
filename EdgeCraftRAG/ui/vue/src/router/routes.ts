@@ -8,27 +8,19 @@ export const routeList = [
     path: "/",
     name: "Main",
     component: Layout,
-    redirect: "/rag",
+    redirect: "/chatbot",
     children: [
       {
-        path: "/rag",
-        name: "Rag",
-        component: () => import("@/views/main/index.vue"),
-        redirect: "/rag/chatbot",
-        children: [
-          {
-            path: "/rag/pipeline",
-            name: "Pipeline",
-            component: () => import("@/views/pipeline/index.vue"),
-            meta: { title: "Pipeline" },
-          },
-          {
-            path: "/rag/chatbot",
-            name: "Chatbot",
-            component: () => import("@/views/chatbot/index.vue"),
-            meta: { title: "Chatbot" },
-          },
-        ],
+        path: "/pipeline",
+        name: "Pipeline",
+        component: () => import("@/views/pipeline/index.vue"),
+        meta: { title: "Pipeline" },
+      },
+      {
+        path: "/chatbot",
+        name: "Chatbot",
+        component: () => import("@/views/chatbot/index.vue"),
+        meta: { title: "Chatbot" },
       },
     ],
   },

@@ -68,17 +68,17 @@ let systemData = reactive<EmptyObjectType>({});
 const componentList = ref<EmptyArrayType>([
   {
     label: "chat.title",
-    path: "/rag/chatbot",
+    path: "/chatbot",
     icon: "icon-chat",
   },
   {
     label: "knowledge.title",
-    path: "/rag/chatbot?type=kb",
+    path: "/chatbot?type=kb",
     icon: "icon-knowledge",
   },
   {
     label: "chat.setting",
-    path: "/rag/pipeline",
+    path: "/pipeline",
     icon: "icon-setting",
   },
 ]);

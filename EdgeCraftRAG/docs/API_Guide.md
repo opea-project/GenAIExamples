@@ -205,3 +205,18 @@ curl -X POST http://${HOST_IP}:16010/v1/chatqna/prompt/reset -H "Content-Type: a
 ```bash
 curl -X POST http://${HOST_IP}:16010/v1/chatqna/prompt-file -H "Content-Type: multipart/form-data" -F "file=@your_prompt_file.txt"
 ```
+
+## ChatQnA
+
+### Retrieval API
+
+```bash
+curl -X POST http://${HOST_IP}:16010/v1/retrieval -H "Content-Type: application/json" -d '{"messages":"#Please enter the question you need to retrieve here#", "top_n":5, "max_tokens":512}' | jq '.'
+
+```
+
+### ChatQnA API
+
+```bash
+curl -X POST http://${HOST_IP}:16011/v1/chatqna -H "Content-Type: application/json" -d '{"messages":"#REPLACE WITH YOUR QUESTION HERE#", "top_n":5, "max_tokens":512}' | jq '.'
+```

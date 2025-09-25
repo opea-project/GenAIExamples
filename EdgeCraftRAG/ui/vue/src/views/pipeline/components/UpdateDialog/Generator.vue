@@ -177,10 +177,10 @@ interface FormType {
 }
 const validateUnique = async (rule: any, value: string) => {
   if (!value) {
-    return Promise.reject(t("pipeline.valid.urlValid1"));
+    return Promise.reject(t("pipeline.valid.vllmUrlValid1"));
   }
   if (!validateIpPort(value)) {
-    return Promise.reject(t("pipeline.valid.urlValid2"));
+    return Promise.reject(t("pipeline.valid.vllmUrlValid2"));
   }
 
   isPass.value = true;
@@ -360,14 +360,18 @@ const handleTestUrl = async () => {
     model_name: modelName,
   });
   if (status !== "200") {
-    antNotification("error", t("common.error"), t("pipeline.valid.urlValid3"));
+    antNotification(
+      "error",
+      t("common.error"),
+      t("pipeline.valid.vllmUrlValid3")
+    );
     return;
   }
   validatePass.value = true;
   antNotification(
     "success",
     t("common.success"),
-    t("pipeline.valid.urlValid4")
+    t("pipeline.valid.vllmUrlValid4")
   );
 };
 // Validate the form, throw results form
@@ -380,7 +384,7 @@ const handleValidate = (): Promise<object> => {
           antNotification(
             "warning",
             t("common.prompt"),
-            t("pipeline.valid.urlValid5")
+            t("pipeline.valid.vllmUrlValid5")
           );
           return;
         }
