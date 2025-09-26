@@ -21,21 +21,17 @@ const getHostIP = () => {
 test('testing api with dynamic host', async () => {
   // Get the dynamic host IP
   const host = await getHostIP();
-  const endpointUrl = `http://${host}:9090/v1/text2sql`;
-
-  const formData = {
-    user: 'postgres',
-    database: 'chinook',
-    host: host,
-    password: 'testpwd',
-    port: '5442',
-  };
-
+  const endpointUrl = `http://${host}:9090/v1/text2query`;
+  const connUrl = `postgresql://postgres:testpwd@${host}:5442/chinook`;
   const question = "Find the total number of invoices.";
 
   const payload = {
-    input_text: question,
-    conn_str: formData,
+    query: question,
+    conn_type: "sql",
+    conn_url: connUrl,
+    conn_user: "postgres",
+    conn_password: "testpwd",
+    conn_dialect: "postgresql",
   };
 
   const response = await axios.post(endpointUrl, payload);
@@ -47,6 +43,6 @@ test('testing api with dynamic host', async () => {
   expect(result.hasOwnProperty('sql')).toBe(true);
   expect(result.hasOwnProperty('output')).toBe(true);
   expect(result.hasOwnProperty('input')).toBe(true);
-  expect(result.input.input_text).toBe(question);
+  expect(result.input.query).toBe(question);
 
 }, apiTimeOutInSeconds * 1000);
