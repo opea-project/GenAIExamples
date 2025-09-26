@@ -27,6 +27,10 @@ on:
         description: 'Test examples with docker compose or k8s charts'
         required: true
         type: string
+      os:
+        description: OS to run the test on
+        required: true
+        type: string
       hardware:
         description: Hardware to run the test on
         required: true
@@ -103,7 +107,8 @@ jobs:
           INPUT_DATA=$(
             jq -r --arg type "${{ inputs.deploy_method }}" --arg id "${{ inputs.example }}" \
               '.[$type][$id].inputs.clear[]' ${{ github.workspace }}/.github/workflows/one-click-inputs-nobuild.json | \
-            sed "s/\$hardware/${{ inputs.hardware }}/g"
+            sed "s|\$hardware|${{ inputs.hardware }}|g; \
+                 s|\$os|${{ inputs.os }}|g"
           )
           echo "Generated input:"
           echo "$INPUT_DATA"
@@ -115,7 +120,6 @@ jobs:
       - name: Install dependencies
         run: |
           # Use flock to prevent apt conflicts when multiple instances run
-          sudo rm -f /etc/apt/sources.list.d/helm-stable-debian.list || true
           sudo flock /var/lib/dpkg/lock-frontend apt update
           sudo flock /var/lib/dpkg/lock-frontend apt install -y python3-pip
 
@@ -160,6 +164,7 @@ jobs:
             jq -r --arg type "${{ inputs.deploy_method }}" --arg id "${{ inputs.example }}" \
               '.[$type][$id].inputs.deploy[]' ${{ github.workspace }}/.github/workflows/one-click-inputs-nobuild.json | \
             sed "s|\$hardware|${{ inputs.hardware }}|g; \
+                 s|\$os|${{ inputs.os }}|g; \
                  s|\$HF_TOKEN|$HF_TOKEN|g; \
                  s|\$LLM_model|$LLM_model|g; \
                  s|\$Embedding_model|$Embedding_model|g; \
@@ -188,7 +193,8 @@ jobs:
           INPUT_DATA=$(
             jq -r --arg type "${{ inputs.deploy_method }}" --arg id "${{ inputs.example }}" \
               '.[$type][$id].inputs.clear[]' ${{ github.workspace }}/.github/workflows/one-click-inputs-nobuild.json | \
-            sed "s/\$hardware/${{ inputs.hardware }}/g"
+            sed "s|\$hardware|${{ inputs.hardware }}|g; \
+                 s|\$os|${{ inputs.os }}|g"
           )
           echo "Generated input:"
           echo "$INPUT_DATA"
