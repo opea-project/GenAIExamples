@@ -3,18 +3,18 @@ FROM python:3.11-slim
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 RUN apt-get update && apt-get install -y gnupg2 wget git
 RUN apt-get remove -y libze-intel-gpu1 libigc1 libigdfcl1 libze-dev || true; \
-    apt-get update; \
-    apt-get install -y curl
+    apt-get update; \
+    apt-get install -y curl
 RUN curl -sL 'https://keyserver.ubuntu.com/pks/lookup?fingerprint=on&op=get&search=0x0C0E6AF955CE463C03FC51574D098D70AFBE5E1F' | tee /etc/apt/trusted.gpg.d/driver.asc
 RUN echo -e "Types: deb\nURIs: https://ppa.launchpadcontent.net/kobuk-team/intel-graphics/ubuntu/\nSuites: plucky\nComponents: main\nSigned-By: /etc/apt/trusted.gpg.d/driver.asc" > /etc/apt/sources.list.d/driver.sources
 RUN apt update && apt-get install -y libze-intel-gpu1 libze1 intel-metrics-discovery intel-opencl-icd clinfo intel-gsc && apt-get install -y libze-intel-gpu1 libze1 intel-metrics-discovery intel-opencl-icd clinfo intel-gsc && apt-get install -y libze-dev intel-ocloc libze-intel-gpu-raytracing
 
 RUN useradd -m -s /bin/bash user && \
-    mkdir -p /home/user && \
-    chown -R user /home/user/
+    mkdir -p /home/user && \
+    chown -R user /home/user/
 
 RUN mkdir /templates && \
-    chown -R user /templates
+    chown -R user /templates
 COPY ./edgecraftrag/prompt_template/default_prompt.txt /templates/
 RUN chown -R user /templates/default_prompt.txt
 
@@ -27,7 +27,7 @@ USER user
 
 WORKDIR /home/user/edgecraftrag
 RUN pip3 install --no-cache-dir --upgrade setuptools==70.0.0 --break-system-packages && \
-    pip3 install --no-cache-dir --extra-index-url https://download.pytorch.org/whl/cpu -r requirements.txt --break-system-packages
+    pip3 install --no-cache-dir --extra-index-url https://download.pytorch.org/whl/cpu -r requirements.txt --break-system-packages
 
 RUN pip3 install --no-cache-dir docarray==0.40.0 --break-system-packages
 
