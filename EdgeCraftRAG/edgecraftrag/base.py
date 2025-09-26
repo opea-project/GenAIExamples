@@ -19,7 +19,9 @@ class CompType(str, Enum):
     RETRIEVER = "retriever"
     POSTPROCESSOR = "postprocessor"
     GENERATOR = "generator"
+    QUERYSEARCH = "querysearch"
     FILE = "file"
+    CHUNK_NUM = "chunk_num"
 
 
 class ModelType(str, Enum):
@@ -44,6 +46,7 @@ class NodeParserType(str, Enum):
     HIERARCHY = "hierarchical"
     SENTENCEWINDOW = "sentencewindow"
     UNSTRUCTURED = "unstructured"
+    KBADMINPARSER = "kbadmin_parser"
 
 
 class IndexerType(str, Enum):
@@ -51,6 +54,7 @@ class IndexerType(str, Enum):
     FAISS_VECTOR = "faiss_vector"
     DEFAULT_VECTOR = "vector"
     MILVUS_VECTOR = "milvus_vector"
+    KBADMIN_INDEXER = "kbadmin_indexer"
 
 
 class RetrieverType(str, Enum):
@@ -58,6 +62,7 @@ class RetrieverType(str, Enum):
     VECTORSIMILARITY = "vectorsimilarity"
     AUTOMERGE = "auto_merge"
     BM25 = "bm25"
+    KBADMIN_RETRIEVER = "kbadmin_retriever"
 
 
 class PostProcessorType(str, Enum):
@@ -113,8 +118,18 @@ class BaseMgr:
     def __init__(self):
         self.components = {}
 
-    def add(self, comp: BaseComponent):
+    def add(self, comp: BaseComponent, name: str = None):
+        if name:
+            self.components[name] = comp
+            return True
         self.components[comp.idx] = comp
+
+    def append(self, comp: BaseComponent, name: str = None):
+        key = name if name else comp.idx
+        if key not in self.components:
+            self.components[key] = []
+        self.components[key].append(comp)
+        return True
 
     def get(self, idx: str) -> BaseComponent:
         if idx in self.components:

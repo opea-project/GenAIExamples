@@ -17,6 +17,8 @@ chatqna_app = FastAPI()
 @chatqna_app.post(path="/v1/retrieval")
 async def retrieval(request: ChatCompletionRequest):
     try:
+        active_kb = ctx.knowledgemgr.get_active_knowledge_base()
+        request.user = active_kb if active_kb else None
         contexts = ctx.get_pipeline_mgr().run_retrieve(chat_request=request)
         serialized_contexts = serialize_contexts(contexts)
 
@@ -32,6 +34,11 @@ async def chatqna(request: ChatCompletionRequest):
     try:
         sessionid = request.user
         set_current_session(sessionid)
+        experience_kb = ctx.knowledgemgr.get_active_experience()
+        active_kb = ctx.knowledgemgr.get_active_knowledge_base()
+        request.user = active_kb if active_kb else None
+        if experience_kb:
+            request.tool_choice = "auto" if experience_kb.experience_active else "none"
         generator = ctx.get_pipeline_mgr().get_active_pipeline().generator
         if generator:
             request.model = generator.model_id
@@ -49,6 +56,16 @@ async def chatqna(request: ChatCompletionRequest):
 @chatqna_app.post(path="/v1/ragqna")
 async def ragqna(request: ChatCompletionRequest):
     try:
+        sessionid = request.user
+        set_current_session(sessionid)
+        experience_kb = ctx.knowledgemgr.get_active_experience()
+        active_kb = ctx.knowledgemgr.get_active_knowledge_base()
+        request.user = active_kb if active_kb else None
+        if experience_kb:
+            request.tool_choice = "auto" if experience_kb.experience_active else "none"
+        generator = ctx.get_pipeline_mgr().get_active_pipeline().generator
+        if generator:
+            request.model = generator.model_id
         res, contexts = ctx.get_pipeline_mgr().run_pipeline(chat_request=request)
         if isinstance(res, GeneratedDoc):
             res = res.text

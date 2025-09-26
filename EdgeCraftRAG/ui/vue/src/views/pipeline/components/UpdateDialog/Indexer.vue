@@ -8,24 +8,34 @@
     autocomplete="off"
     class="form-wrap"
   >
-    <a-form-item :label="$t('pipeline.config.indexerType')" name="indexer_type">
-      <a-select
-        showSearch
-        v-model:value="form.indexer_type"
-        :placeholder="$t('pipeline.valid.indexerType')"
+    <div class="column-wrap">
+      <a-form-item
+        :label="$t('pipeline.config.indexerType')"
+        class="row-item"
+        name="indexer_type"
       >
-        <a-select-option
-          v-for="item in indexerList"
-          :key="item.value"
-          :value="item.value"
-          >{{ item.name }}</a-select-option
-        >
-      </a-select>
-      <FormTooltip :title="$t('pipeline.desc.indexerType')" />
-    </a-form-item>
-    <div class="option-introduction">
-      <InfoCircleOutlined />
-      {{ $t(optionIntroduction!) }}
+        <div class="flex-left">
+          <a-select
+            showSearch
+            v-model:value="form.indexer_type"
+            :placeholder="$t('pipeline.valid.indexerType')"
+            @change="handleTypeChange"
+          >
+            <a-select-option
+              v-for="item in indexerList"
+              :key="item.value"
+              :value="item.value"
+              >{{ item.name }}</a-select-option
+            >
+          </a-select>
+          <FormTooltip :title="$t('pipeline.desc.indexerType')" />
+        </div>
+
+        <div class="option-introduction">
+          <InfoCircleOutlined />
+          {{ $t(optionIntroduction!) }}
+        </div>
+      </a-form-item>
     </div>
     <a-form-item
       :label="$t('pipeline.config.embedding')"
@@ -46,6 +56,26 @@
       <FormTooltip :title="$t('pipeline.desc.embedding')" />
     </a-form-item>
     <a-form-item
+      :label="$t('pipeline.config.embeddingUrl')"
+      name="embedding_url"
+      :rules="rules.embedding_url"
+      v-if="isKbadmin"
+    >
+      <a-input
+        v-model:value="form.embedding_url"
+        :placeholder="$t('pipeline.valid.embeddingUrl')"
+      >
+        <template #addonBefore>
+          <a-select v-model:value="modelProtocol">
+            <a-select-option value="http://">Http://</a-select-option>
+            <a-select-option value="https://">Https://</a-select-option>
+          </a-select>
+        </template>
+      </a-input>
+      <FormTooltip :title="$t('pipeline.desc.embeddingUrl')" />
+    </a-form-item>
+    <a-form-item
+      v-if="!isKbadmin"
       :label="$t('pipeline.config.embeddingDevice')"
       :name="['embedding_model', 'device']"
       :rules="rules.device"
@@ -63,18 +93,23 @@
       <FormTooltip :title="$t('pipeline.desc.embeddingDevice')" />
     </a-form-item>
     <a-form-item
-      :label="$t('pipeline.config.vector_uri')"
-      name="vector_uri"
-      :rules="rules.vector_uri"
-      v-if="form.indexer_type === 'milvus_vector'"
+      :label="$t('pipeline.config.vector_url')"
+      name="vector_url"
+      :rules="rules.vector_url"
+      v-if="isMilvus || isKbadmin"
     >
       <a-input
-        v-model:value="form.vector_uri"
-        :addon-before="protocol"
-        :placeholder="$t('pipeline.valid.vector_uri')"
+        v-model:value="form.vector_url"
+        :placeholder="$t(`${TIP_MESSAGES[form.indexer_type]}`)"
         @change="handleUriChange"
       >
-        <template #addonAfter>
+        <template #addonBefore>
+          <a-select v-model:value="protocol">
+            <a-select-option value="http://">Http://</a-select-option>
+            <a-select-option value="https://">Https://</a-select-option>
+          </a-select>
+        </template>
+        <template #addonAfter v-if="isMilvus">
           <a-button
             type="primary"
             class="text-btn"
@@ -89,7 +124,7 @@
           </a-button>
         </template>
       </a-input>
-      <FormTooltip :title="$t('pipeline.desc.vector_uri')" />
+      <FormTooltip :title="$t('pipeline.desc.vector_url')" />
     </a-form-item>
   </a-form>
 </template>
@@ -104,6 +139,8 @@ import { InfoCircleOutlined, CheckCircleFilled } from "@ant-design/icons-vue";
 import { useI18n } from "vue-i18n";
 import { validateIpPort } from "@/utils/validate.ts";
 import { useNotification } from "@/utils/common";
+import { SelectValue } from "ant-design-vue/es/select/index";
+import { RuleObject } from "ant-design-vue/es/form/interface";
 
 const { t } = useI18n();
 const { antNotification } = useNotification();
@@ -119,26 +156,15 @@ const props = defineProps({
 });
 interface FormType {
   indexer_type: string;
-  vector_uri?: string;
+  vector_url?: string;
+  embedding_url?: string;
   embedding_model: ModelType;
 }
-const validateUnique = async (rule: any, value: string) => {
-  if (!value) {
-    return Promise.reject(t("pipeline.valid.urlValid1"));
-  }
-  if (!validateIpPort(value)) {
-    return Promise.reject(t("pipeline.valid.urlValid2"));
-  }
-  isPass.value = true;
-  return Promise.resolve();
-};
-const handleUrlFormat = (url: string) => {
-  if (!url) return "";
-  return url.replace(/http:\/\//g, "");
-};
+
 const {
   indexer_type = "faiss_vector",
-  vector_uri = "",
+  vector_url = "",
+  embedding_url = "",
   embedding_model = {
     model_id: "BAAI/bge-small-en-v1.5",
     model_path: "./models/BAAI/bge-small-en-v1.5",
@@ -146,21 +172,74 @@ const {
     weight: "INT4",
   },
 } = props.formData?.indexer || {};
+const { parser_type = "" } = props.formData?.node_parser || {};
+const TIP_MESSAGES = {
+  kbadmin_indexer: "pipeline.valid.kb_vector_url",
+  milvus_vector: "pipeline.valid.vector_url",
+} as const;
+const VALIDATION_MESSAGES = {
+  vector: {
+    required: "pipeline.valid.urlValid1",
+    format: "pipeline.valid.urlValid2",
+  },
+  model: {
+    required: "pipeline.valid.modelRequired",
+    format: "pipeline.valid.modelFormat",
+  },
+} as const;
+const validateUnique = (type: "vector" | "model") => {
+  return async (rule: RuleObject, value: string) => {
+    const messages = VALIDATION_MESSAGES[type];
+    if (!value) {
+      return Promise.reject(new Error(t(messages.required)));
+    }
+    if (!validateIpPort(value)) {
+      return Promise.reject(new Error(t(messages.format)));
+    }
+    isPass.value = true;
+    return Promise.resolve();
+  };
+};
+
+const validateIndeserType = async (rule: any, value: string) => {
+  if (!value) {
+    return Promise.reject(t("pipeline.valid.indexerType"));
+  }
+  if (parser_type === "kbadmin_parser" && value !== "kbadmin_indexer") {
+    return Promise.reject(t("pipeline.valid.indexerTypeValid1"));
+  }
+  return Promise.resolve();
+};
+
+const handleUrlFormat = (url: string) => {
+  if (!url) return "";
+  return url.replace(/https?:\/\//g, "");
+};
 
 const isPass = ref<boolean>(false);
 const validatePass = ref<boolean>(false);
 const protocol = ref<string>("http://");
+const modelProtocol = ref<string>("http://");
 const formRef = ref<FormInstance>();
 const form = reactive<FormType>({
   indexer_type,
-  vector_uri: handleUrlFormat(vector_uri),
-  embedding_model,
+  vector_url: handleUrlFormat(vector_url),
+  embedding_url: handleUrlFormat(embedding_url),
+  embedding_model: {
+    ...embedding_model,
+    model_id:
+      props.formType === "update"
+        ? embedding_model.model_id
+        : indexer_type === "kbadmin_indexer"
+        ? undefined
+        : embedding_model.model_id,
+  },
 });
-const rules = reactive({
+const rules: FormRules = reactive({
   indexer_type: [
     {
       required: true,
-      message: t("pipeline.valid.indexerType"),
+      validator: validateIndeserType,
       trigger: "change",
     },
   ],
@@ -178,24 +257,58 @@ const rules = reactive({
       trigger: "change",
     },
   ],
-  vector_uri: [
+  vector_url: [
     {
       required: true,
-      validator: validateUnique,
+      validator: validateUnique("vector"),
       trigger: "blur",
     },
   ],
+
+  embedding_url: [
+    {
+      required: true,
+      validator: validateUnique("model"),
+      trigger: "change",
+    },
+  ],
 });
-const indexerList = Indexer;
+
 const deviceList = ref<EmptyArrayType>([]);
 const modelList = ref<EmptyArrayType>([]);
-
+const isCreate = computed(() => {
+  return props.formType === "create";
+});
+const isKbadmin = computed(() => {
+  return form.indexer_type === "kbadmin_indexer";
+});
+const isMilvus = computed(() => {
+  return form.indexer_type === "milvus_vector";
+});
+const indexerList = computed(() => {
+  if (isCreate.value) {
+    return Indexer;
+  }
+  return isKbadmin.value
+    ? Indexer.filter((item) => item.value === "kbadmin_indexer")
+    : Indexer.filter((item) => item.value !== "kbadmin_indexer");
+});
 const optionIntroduction = computed(() => {
   const { indexer_type } = form;
 
-  return indexerList.find((item) => item.value === indexer_type)?.describe;
+  return Indexer.find((item) => item.value === indexer_type)?.describe;
 });
 
+const handleTypeChange = (value: SelectValue) => {
+  if (value === "kbadmin_indexer")
+    antNotification(
+      "warning",
+      t("common.prompt"),
+      t("pipeline.valid.indexerTypeTip")
+    );
+  form.embedding_model.model_id = undefined;
+  form.embedding_model.model_path = "";
+};
 // Handling Device Folding Events
 const handleDeviceVisible = async (visible: boolean) => {
   if (visible) {
@@ -211,7 +324,10 @@ const handleDeviceVisible = async (visible: boolean) => {
 const handleModelVisible = async (visible: boolean) => {
   if (visible) {
     try {
-      const data: any = await getModelList("embedding");
+      const modelType = isKbadmin.value
+        ? "kbadmin_embedding_model"
+        : "embedding";
+      const data: any = await getModelList(modelType);
       modelList.value = [].concat(data);
     } catch (err) {
       console.error(err);
@@ -219,12 +335,12 @@ const handleModelVisible = async (visible: boolean) => {
   }
 };
 //Complete model_cath
-const handleModelChange = (value: string) => {
+const handleModelChange = (value: SelectValue) => {
   form.embedding_model.model_path = `./models/${value}`;
 };
 const handleTestUrl = async () => {
-  const vector_uri = protocol.value + form.vector_uri;
-  const { status = "" } = await requestUrlVerify({ vector_uri });
+  const vector_url = protocol.value + form.vector_url;
+  const { status = "" } = (await requestUrlVerify({ vector_url })) as any;
 
   if (status !== "200") {
     antNotification("error", t("common.error"), t("pipeline.valid.urlValid3"));
@@ -243,16 +359,33 @@ const handleUriChange = () => {
 };
 // Format parameter
 const formatFormParam = () => {
-  const { indexer_type, vector_uri, embedding_model } = form;
+  const { indexer_type, vector_url, embedding_url, embedding_model } = form;
 
   return {
     indexer_type,
-    embedding_model,
-    vector_uri:
-      indexer_type === "milvus_vector"
-        ? protocol.value + vector_uri
+    embedding_model: embedding_model,
+    vector_url:
+      isMilvus.value || isKbadmin.value
+        ? protocol.value + vector_url
         : undefined,
+    embedding_url: isKbadmin.value
+      ? modelProtocol.value + embedding_url
+      : undefined,
   };
+};
+const generateFormData = () => {
+  const baseData = { indexer: formatFormParam() };
+  const { retriever } = props.formData;
+
+  if (isKbadmin.value && parser_type !== "kbadmin_parser") {
+    return {
+      ...baseData,
+      node_parser: { parser_type: "kbadmin_parser" },
+      retriever: { ...retriever, retriever_type: "kbadmin_retriever" },
+    };
+  }
+
+  return baseData;
 };
 // Validate the form, throw results form
 const handleValidate = (): Promise<object> => {
@@ -260,7 +393,7 @@ const handleValidate = (): Promise<object> => {
     formRef.value
       ?.validate()
       .then(() => {
-        if (form.indexer_type === "milvus_vector" && !validatePass.value) {
+        if (isMilvus.value && !validatePass.value) {
           antNotification(
             "warning",
             t("common.prompt"),
@@ -270,7 +403,7 @@ const handleValidate = (): Promise<object> => {
         }
         resolve({
           result: true,
-          data: { indexer: formatFormParam() },
+          data: generateFormData(),
         });
       })
       .catch(() => {
@@ -283,7 +416,7 @@ defineExpose({
 });
 
 onMounted(() => {
-  if (props.formType === "update") {
+  if (props.formType === "update" && isMilvus.value) {
     isPass.value = true;
     validatePass.value = true;
   }
@@ -294,6 +427,9 @@ onMounted(() => {
 :deep(.intel-input-group) {
   .intel-input-group-addon {
     overflow: hidden;
+    .intel-select-selector {
+      border: 1px solid transparent !important;
+    }
   }
 }
 .text-btn {

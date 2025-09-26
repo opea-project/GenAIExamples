@@ -41,6 +41,8 @@ async def get_prompt():
     try:
         generator = ctx.get_pipeline_mgr().get_active_pipeline().generator
         if generator:
+            if generator.prompt_content is not None:
+                return generator.prompt_content
             return generator.prompt
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))

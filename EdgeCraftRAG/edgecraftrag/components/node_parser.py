@@ -168,3 +168,25 @@ class UnstructedNodeParser(BaseComponent, UnstructuredReader):
             "chunk_overlap": self.chunk_overlap,
         }
         return set
+
+
+class KBADMINParser(BaseComponent):
+    # Handled in the kbadmin project
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.comp_type = CompType.NODEPARSER
+        self.comp_subtype = NodeParserType.KBADMINPARSER
+
+    def run(self, **kwargs) -> Any:
+        return None
+
+    def insert_nodes(self):
+        return None
+
+    @model_serializer
+    def ser_model(self):
+        set = {
+            "idx": self.idx,
+            "parser_type": self.comp_subtype,
+        }
+        return set

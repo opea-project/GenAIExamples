@@ -4,6 +4,7 @@
 import asyncio
 import json
 import os
+import re
 import weakref
 from concurrent.futures import ThreadPoolExecutor
 
@@ -12,15 +13,21 @@ from edgecraftrag.api_schema import MilvusConnectRequest, PipelineCreateIn
 from edgecraftrag.base import IndexerType, InferenceType, ModelType, NodeParserType, PostProcessorType, RetrieverType
 from edgecraftrag.components.benchmark import Benchmark
 from edgecraftrag.components.generator import QnAGenerator
-from edgecraftrag.components.indexer import VectorIndexer
+from edgecraftrag.components.indexer import KBADMINIndexer, VectorIndexer
 from edgecraftrag.components.node_parser import (
     HierarchyNodeParser,
+    KBADMINParser,
     SimpleNodeParser,
     SWindowNodeParser,
     UnstructedNodeParser,
 )
 from edgecraftrag.components.postprocessor import MetadataReplaceProcessor, RerankProcessor
-from edgecraftrag.components.retriever import AutoMergeRetriever, SimpleBM25Retriever, VectorSimRetriever
+from edgecraftrag.components.retriever import (
+    AutoMergeRetriever,
+    KBadminRetriever,
+    SimpleBM25Retriever,
+    VectorSimRetriever,
+)
 from edgecraftrag.context import ctx
 from fastapi import FastAPI, File, HTTPException, UploadFile, status
 from pymilvus import connections
@@ -51,16 +58,30 @@ async def get_pipeline_json(name):
 
 
 # GET Pipeline benchmark
-@pipeline_app.get(path="/v1/settings/pipelines/{name}/benchmark")
-async def get_pipeline_benchmark(name):
-    pl = ctx.get_pipeline_mgr().get_pipeline_by_name_or_id(name)
+@pipeline_app.get(path="/v1/settings/pipeline/benchmark")
+async def get_pipeline_benchmark():
+    pl = ctx.get_pipeline_mgr().get_active_pipeline()
     if pl and pl.benchmark:
         return pl.benchmark
+
+
+# GET Pipeline benchmark
+@pipeline_app.get(path="/v1/settings/pipelines/{name}/benchmarks")
+async def get_pipeline_benchmarks(name):
+    pl = ctx.get_pipeline_mgr().get_pipeline_by_name_or_id(name)
+    if pl and pl.benchmark:
+        return pl.benchmark.benchmark_data_list
 
 
 # POST Pipeline
 @pipeline_app.post(path="/v1/settings/pipelines")
 async def add_pipeline(request: PipelineCreateIn):
+    pattern = re.compile(r"^[a-zA-Z0-9_]+$")
+    if not pattern.fullmatch(request.name):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Pipeline name must consist of letters, numbers, and underscores.",
+        )
     return load_pipeline(request)
 
 
@@ -126,9 +147,11 @@ def update_pipeline_handler(pl, req):
     active_kb = ctx.knowledgemgr.get_active_knowledge_base()
     active_pipeline = ctx.get_pipeline_mgr().get_active_pipeline()
     kb_name = active_kb.name if active_kb else "default_kb"
+    pl_change = False
 
     if req.node_parser is not None:
         np = req.node_parser
+        pl_change = ctx.get_node_parser_mgr().search_parser_change(pl, req)
         found_parser = ctx.get_node_parser_mgr().search_parser(np)
         if found_parser is not None:
             pl.node_parser = found_parser
@@ -153,12 +176,10 @@ def update_pipeline_handler(pl, req):
                     pl.node_parser = SWindowNodeParser.from_defaults(window_size=np.window_size)
                 case NodeParserType.UNSTRUCTURED:
                     pl.node_parser = UnstructedNodeParser(chunk_size=np.chunk_size, chunk_overlap=np.chunk_overlap)
+                case NodeParserType.KBADMINPARSER:
+                    pl.node_parser = KBADMINParser()
             ctx.get_node_parser_mgr().add(pl.node_parser)
 
-            all_docs = ctx.get_file_mgr().get_all_docs()
-            nodelist = pl.node_parser.run(docs=all_docs)
-            if nodelist is not None and len(nodelist) > 0:
-                ctx.get_node_mgr().add_nodes(pl.node_parser.idx, nodelist)
             pl._node_changed = True
 
     if req.indexer is not None:
@@ -168,17 +189,24 @@ def update_pipeline_handler(pl, req):
             pl.indexer = found_indexer
         else:
             embed_model = None
-            if ind.embedding_model:
-                embed_model = ctx.get_model_mgr().search_model(ind.embedding_model)
-                if embed_model is None:
-                    ind.embedding_model.model_type = ModelType.EMBEDDING
-                    embed_model = ctx.get_model_mgr().load_model(ind.embedding_model)
-                    ctx.get_model_mgr().add(embed_model)
             match ind.indexer_type:
                 case IndexerType.DEFAULT_VECTOR | IndexerType.FAISS_VECTOR | IndexerType.MILVUS_VECTOR:
+                    if ind.embedding_model:
+                        embed_model = ctx.get_model_mgr().search_model(ind.embedding_model)
+                        if embed_model is None:
+                            ind.embedding_model.model_type = ModelType.EMBEDDING
+                            embed_model = ctx.get_model_mgr().load_model(ind.embedding_model)
+                            ctx.get_model_mgr().add(embed_model)
                     # TODO: **RISK** if considering 2 pipelines with different
                     # nodes, but same indexer, what will happen?
-                    pl.indexer = VectorIndexer(embed_model, ind.indexer_type, ind.vector_uri, kb_name)
+                    pl.indexer = VectorIndexer(embed_model, ind.indexer_type, ind.vector_url, kb_name)
+                case IndexerType.KBADMIN_INDEXER:
+                    kbadmin_embedding_url = ind.embedding_url
+                    KBADMIN_VECTOR_URL = ind.vector_url
+                    embed_model = ind.embedding_model.model_id
+                    pl.indexer = KBADMINIndexer(
+                        embed_model, ind.indexer_type, kbadmin_embedding_url, KBADMIN_VECTOR_URL
+                    )
                 case _:
                     pass
             ctx.get_indexer_mgr().add(pl.indexer)
@@ -208,6 +236,8 @@ def update_pipeline_handler(pl, req):
                     pl.retriever = SimpleBM25Retriever(pl.indexer, similarity_top_k=retr.retrieve_topk)
                 else:
                     return Exception("No indexer")
+            case RetrieverType.KBADMIN_RETRIEVER:
+                pl.retriever = KBadminRetriever(pl.indexer, similarity_top_k=retr.retrieve_topk)
             case _:
                 pass
         # Index is updated to retriever
@@ -272,7 +302,7 @@ def update_pipeline_handler(pl, req):
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
         try:
-            loop.run_until_complete(Synchronizing_vector_data(active_pipeline, pl))
+            loop.run_until_complete(Synchronizing_vector_data(active_pipeline, pl, pl_change))
         except Exception as e:
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Synchronization error: {e}")
         finally:
@@ -292,8 +322,8 @@ def load_pipeline_from_file():
         with open(PIPELINE_FILE, "r", encoding="utf-8") as f:
             all_pipelines = f.read()
         try:
-            all_da = json.loads(all_pipelines)
-            for pipeline_data in all_da:
+            all_data = json.loads(all_pipelines)
+            for pipeline_data in all_data:
                 one_pipelinejson = json.loads(pipeline_data)
                 pipeline_req = PipelineCreateIn(**one_pipelinejson)
                 load_pipeline(pipeline_req)
@@ -323,18 +353,18 @@ def save_pipeline_to_file():
 # Detecting if milvus is connected
 @pipeline_app.post(path="/v1/check/milvus")
 async def check_milvus(request: MilvusConnectRequest):
-    vector_uri = request.vector_uri
+    vector_url = request.vector_url
     try:
-        if vector_uri.startswith("http://"):
-            host_port = vector_uri.replace("http://", "")
-        elif vector_uri.startswith("https://"):
-            host_port = vector_uri.replace("https://", "")
+        if vector_url.startswith("http://"):
+            host_port = vector_url.replace("http://", "")
+        elif vector_url.startswith("https://"):
+            host_port = vector_url.replace("https://", "")
         else:
-            host_port = vector_uri
+            host_port = vector_url
         host, port = host_port.split(":", 1)
-        connections.connect(alias="default", host=host, port=port)
+        connections.connect(alias="knowledge_default", host=host, port=port)
 
-        if connections.has_connection("default"):
+        if connections.has_connection("knowledge_default"):
             return {"status": "200", "message": "Milvus connection successful."}
         else:
             return {"status": "404", "message": "Milvus connection failed."}

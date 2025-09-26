@@ -9,10 +9,13 @@ export interface Benchmark {
 export interface IMessage {
   role: string;
   content: string;
+  query?: string;
+  errorMessage?: string;
   benchmark?: Benchmark | undefined;
 }
 export interface ThinkType {
   enable_thinking?: boolean;
+  enable_rag_retrieval?: boolean;
 }
 export interface ConfigType {
   top_n: number;

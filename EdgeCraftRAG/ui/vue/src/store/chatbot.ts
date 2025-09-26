@@ -14,6 +14,7 @@ const configuration = {
     stream: true,
     chat_template_kwargs: {
       enable_thinking: true,
+      enable_rag_retrieval: true,
     },
   },
 };

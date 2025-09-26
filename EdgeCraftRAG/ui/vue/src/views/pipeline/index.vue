@@ -15,6 +15,7 @@
     <System />
     <!-- pipelines list -->
     <Table
+      :loading
       :table-data="tableData"
       @create="handleCreate"
       @update="handleUpdate"
@@ -69,6 +70,7 @@ import { useI18n } from "vue-i18n";
 const { t } = useI18n();
 const { antNotification } = useNotification();
 const pipelineStore = pipelineAppStore();
+const loading = ref<boolean>(true);
 const createDialog = reactive<DialogType>({
   visible: false,
 });
@@ -87,9 +89,15 @@ const importDialog = reactive<DialogType>({
 const tableData = ref<EmptyArrayType>([]);
 
 const queryPipelineList = async () => {
-  const data: any = await getPipelineList();
-
-  tableData.value = [].concat(data);
+  try {
+    loading.value = true;
+    const data: any = await getPipelineList();
+    tableData.value = [].concat(data);
+  } catch (error) {
+    console.log(error);
+  } finally {
+    loading.value = false;
+  }
 };
 
 //create

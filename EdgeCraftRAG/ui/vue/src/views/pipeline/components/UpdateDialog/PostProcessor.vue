@@ -22,6 +22,7 @@
           showSearch
           v-model:value="processor.processor_type"
           :placeholder="$t('pipeline.valid.postProcessorType')"
+          @change="(value) => handleTypeChange(value, processor)"
         >
           <a-select-option
             v-for="item in postProcessorList"
@@ -48,7 +49,7 @@
             v-model:value="processor.reranker_model.model_id"
             :placeholder="$t('pipeline.valid.rerank')"
             @dropdownVisibleChange="handleModelVisible"
-            @change="(value:string) => handleModelChange(processor.reranker_model, value)"
+            @change="(value:SelectValue) => handleModelChange(processor.reranker_model, value)"
           >
             <a-select-option
               v-for="item in modelList"
@@ -112,6 +113,7 @@ import { PostProcessor } from "../../enum.ts";
 import { ModelType } from "../../type.ts";
 import { InfoCircleOutlined } from "@ant-design/icons-vue";
 import { useI18n } from "vue-i18n";
+import { SelectValue } from "ant-design-vue/es/select/index";
 
 const { t } = useI18n();
 const props = defineProps({
@@ -129,7 +131,7 @@ interface ProcessorType {
 interface FormType {
   postprocessor: ProcessorType[];
 }
-const { postprocessor = [] } = props.formData.postprocessor || [];
+const { postprocessor = [] } = props.formData || [];
 
 const defaultConfig = [
   {
@@ -147,7 +149,7 @@ const formRef = ref<FormInstance>();
 const form = reactive<FormType>({
   postprocessor: postprocessor.length ? postprocessor : defaultConfig,
 });
-const rules = reactive({
+const rules: FormRules = reactive({
   processor_type: [
     {
       required: true,
@@ -180,6 +182,19 @@ const getDisable = (value: string) => {
 const getOptionIntroduction = (value: string) => {
   return postProcessorList.find((item) => item.value === value)?.describe;
 };
+const handleTypeChange = (value: SelectValue, row: EmptyObjectType) => {
+  if (value === "reranker") {
+    Object.assign(row, {
+      top_n: 25,
+      reranker_model: {
+        model_id: "BAAI/bge-reranker-large",
+        model_path: "./models/BAAI/bge-reranker-large",
+        device: "AUTO",
+        weight: "INT4",
+      },
+    });
+  }
+};
 // Handling Model Folding Events
 const handleModelVisible = async (visible: boolean) => {
   if (visible) {
@@ -198,6 +213,7 @@ const handleModelChange = (item: EmptyObjectType, value: string) => {
 const handleAdd = () => {
   form.postprocessor.push({
     processor_type: "",
+    top_n: 25,
     reranker_model: {
       model_id: "",
       model_path: "",
@@ -220,6 +236,19 @@ const handleDeviceVisible = async (visible: boolean) => {
     }
   }
 };
+// Format parameter
+const formatFormParam = () => {
+  const { postprocessor } = form;
+  return postprocessor.map((item) => {
+    if (item.processor_type === "metadata_replace") {
+      return {
+        processor_type: item.processor_type,
+      };
+    } else {
+      return item;
+    }
+  });
+};
 // Validate the form, throw results form
 const handleValidate = (): Promise<object> => {
   return new Promise((resolve) => {
@@ -228,7 +257,7 @@ const handleValidate = (): Promise<object> => {
       .then(() => {
         resolve({
           result: true,
-          data: form,
+          data: { postprocessor: formatFormParam() },
         });
       })
       .catch(() => {

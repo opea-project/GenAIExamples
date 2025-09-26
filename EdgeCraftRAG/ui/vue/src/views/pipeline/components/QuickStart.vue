@@ -50,7 +50,7 @@
   </a-modal>
 </template>
 
-<script lang="ts" setup name="EditDialog">
+<script lang="ts" setup name="QuickStart">
 import { userAppStore } from "@/store/user";
 import { PlusOutlined } from "@ant-design/icons-vue";
 import { computed, h } from "vue";

@@ -2,7 +2,7 @@
   <div class="header-wrap">
     <img :height="36" :src="headerLog" />
     <div class="setting-wrap">
-      <a-dropdown arrow>
+      <a-dropdown>
         <div @click.prevent>
           <div class="lang-icon">
             <SvgIcon

@@ -27,7 +27,7 @@
           <a-slider
             v-model:value="form.top_n"
             :min="1"
-            :max="30"
+            :max="50"
             :marks="sliderMarks.top_n"
           />
           <div class="tips-wrap">
@@ -164,7 +164,7 @@ const form = reactive<ConfigType>({
   max_tokens,
   stream,
 });
-const rules = reactive({
+const rules: FormRules = reactive({
   top_n: [{ required: true, trigger: "blur" }],
   temperature: [{ required: true, trigger: "blur" }],
   top_p: [{ required: true, trigger: "blur" }],
@@ -175,7 +175,7 @@ const rules = reactive({
 const sliderMarks = reactive<EmptyObjectType>({
   top_n: {
     1: "1",
-    30: "30",
+    50: "50",
   },
   temperature: {
     0: "0",

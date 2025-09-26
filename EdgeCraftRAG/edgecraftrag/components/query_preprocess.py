@@ -85,6 +85,7 @@ class LogitsEstimatorJSON(LogitsEstimator):
         output_template="",
         json_key="relevance",
         json_levels=["Low", "High"],
+        scores_weight=None,
         temperature=1.0,
         API_BASE=None,
         **kwargs,
@@ -106,6 +107,19 @@ class LogitsEstimatorJSON(LogitsEstimator):
         self.json_key = json_key
         self.json_levels = json_levels
         self.API_BASE = API_BASE
+
+        # dynamically set scores_weight, use default if not provided
+        if scores_weight is None:
+            # generate default weights based on json_levels count
+            if len(json_levels) == 2:
+                self.scores_weight = [0.0, 1.0]  # Low, High
+            elif len(json_levels) == 3:
+                self.scores_weight = [0.0, 0.5, 1.0]  # Low, Medium, High
+            else:
+                # for other counts, generate evenly spaced weights
+                self.scores_weight = [i / (len(json_levels) - 1) for i in range(len(json_levels))]
+        else:
+            self.scores_weight = scores_weight
 
     async def invoke_vllm(self, input_texts):
         headers = {"Content-Type": "application/json"}
@@ -152,18 +166,22 @@ class LogitsEstimatorJSON(LogitsEstimator):
 
     def _calculate_token_score_vllm(self, outputs, output_index=1, transform="exp"):
         generated_scores = outputs[output_index]
-        three_scores = [
-            generated_scores.get("Low", -9999.0),
-            generated_scores.get("Medium", -9999.0),
-            generated_scores.get("High", -9999.0),
-        ]
-        level_scores = [score / self.temperature for score in three_scores]
+
+        # dynamically get scores for all levels
+        level_scores = []
+        for level in self.json_levels:
+            level_scores.append(generated_scores.get(level, -9999.0))
+
+        # apply temperature scaling
+        level_scores = [score / self.temperature for score in level_scores]
 
         level_scores_np = numpy.array(level_scores)
         level_scores_np = numpy.where(level_scores_np < -1000, -1000, level_scores_np)
         level_scores_np_exp = numpy.exp(level_scores_np - numpy.max(level_scores_np))
         scores_probs = level_scores_np_exp / level_scores_np_exp.sum()
-        scores_weight = numpy.array([0.0, 0.5, 1.0])  # Low=0, Medium=0.5, High=1
+
+        # using dynamic scores_weight
+        scores_weight = numpy.array(self.scores_weight)
         final_score = numpy.dot(scores_probs, scores_weight)
 
         return final_score
@@ -172,40 +190,43 @@ class LogitsEstimatorJSON(LogitsEstimator):
         return await self._calculate_logits_score(*input_pair)
 
 
-def read_json_files(directory: str) -> dict:
+def read_json_files(file_path: str) -> dict:
     result = {}
-    for filename in os.listdir(directory):
-        if filename.endswith(".json"):
-            file_path = os.path.join(directory, filename)
-            if os.path.isfile(file_path):
-                try:
-                    with open(file_path, "r", encoding="utf-8") as file:
-                        data = json.load(file)
-                        result.update(data)
-                except Exception:
-                    continue
+    if os.path.isfile(file_path):
+        with open(file_path, "r", encoding="utf-8") as f:
+            result = json.load(f)
     return result
 
 
 async def query_search(user_input, search_config_path, search_dir, pl):
-
     top1_issue = None
-    sub_questionss_result = None
-    if not os.path.exists(search_dir):
-        return top1_issue, sub_questionss_result
+    sub_questions_result = None
 
     model_id = pl.generator.model_id
     vllm_endpoint = pl.generator.vllm_endpoint
 
-    cfg = OmegaConf.load(search_config_path)
-    cfg.query_matcher.model_id = model_id
-    cfg.query_matcher.API_BASE = os.path.join(vllm_endpoint, "v1/completions")
-    query_matcher = LogitsEstimatorJSON(**cfg.query_matcher)
     maintenance_data = read_json_files(search_dir)
-    issues = list(maintenance_data.keys())
+    issues = []
+    for i in range(len(maintenance_data)):
+        issues.append(maintenance_data[i]["question"])
     if not issues:
-        return top1_issue, sub_questionss_result
+        return top1_issue, sub_questions_result
 
+    cfg = {}
+    if not os.path.exists(search_config_path):
+        cfg["query_matcher"] = {
+            "instructions": "You're a knowledgeable assistant. Your task is to judge if two queries ask for the same information about the same primary subject. Output only 'Yes' or 'No'. Yes = same subject entity AND same information need, with only wording or stylistic differences. No = different subject entity, different spec or numeric constraint, different attribute/metric, or scope changed by adding/removing a restricting condition. Entity changes MUST lead to No.",
+            "input_template": "Query 1: {}\nQuery 2: {}\n",
+            "output_template": "\nAre these queries equivalent? Answer 'Yes' or 'No':",
+            "json_key": "similarity",
+            "json_levels": ["No", "Yes"],
+            "temperature": 0.1,
+        }
+    else:
+        cfg = OmegaConf.load(search_config_path)
+    cfg["query_matcher"]["model_id"] = model_id
+    cfg["query_matcher"]["API_BASE"] = os.path.join(vllm_endpoint, "v1/completions")
+    query_matcher = LogitsEstimatorJSON(**cfg["query_matcher"])
     semaphore = asyncio.Semaphore(200)
 
     async def limited_compute_score(query_matcher, user_input, issue):
@@ -219,9 +240,9 @@ async def query_search(user_input, search_config_path, search_dir, pl):
 
     # Maximum less than 0.6, we don't use query search.
     if match_scores[0][1] < 0.6:
-        return top1_issue, sub_questionss_result
+        return top1_issue, sub_questions_result
     top1_issue = match_scores[0][0]
-    for key, value in maintenance_data.items():
-        if key == top1_issue:
-            sub_questionss_result = value
-    return top1_issue, sub_questionss_result
+    for i in range(len(maintenance_data)):
+        if maintenance_data[i]["question"] == top1_issue:
+            sub_questions_result = "\n".join(maintenance_data[i]["content"])
+    return top1_issue, sub_questions_result

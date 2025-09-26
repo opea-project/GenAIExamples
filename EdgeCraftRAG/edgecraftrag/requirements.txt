@@ -3,11 +3,13 @@ EbookLib>=0.18
 faiss-cpu>=1.8.0.post1
 html2text>=2025.4.15
 langchain-core==0.3.60
-llama-index==0.12.41
-llama-index-core==0.12.41
+langchain-milvus
+langchain-openai
+llama-index==0.12.36
+llama-index-core==0.12.37
 llama-index-embeddings-openvino==0.5.2
-llama-index-llms-openai==0.4.0
-llama-index-llms-openai-like==0.4.0
+llama-index-llms-openai==0.3.44
+llama-index-llms-openai-like==0.3.4
 llama-index-llms-openvino==0.4.0
 llama-index-postprocessor-openvino-rerank==0.4.1
 llama-index-readers-file==0.4.7
@@ -20,6 +22,6 @@ pillow>=10.4.0
 py-cpuinfo>=9.0.0
 pymilvus==2.5.10
 python-docx==1.1.2
-unstructured==0.16.11
+unstructured
 unstructured[pdf]
 werkzeug==3.1.3

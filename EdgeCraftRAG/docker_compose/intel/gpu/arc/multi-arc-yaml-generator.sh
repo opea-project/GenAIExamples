@@ -87,17 +87,15 @@ services:
       no_proxy: \${no_proxy}
       http_proxy: \${http_proxy}
       https_proxy: \${https_proxy}
-      HF_ENDPOINT: \${HF_ENDPOINT}
       vLLM_ENDPOINT: \${vLLM_ENDPOINT:-http://\${HOST_IP}:\${NGINX_PORT:-8086}}
       LLM_MODEL: \${LLM_MODEL}
       ENABLE_BENCHMARK: \${ENABLE_BENCHMARK:-false}
-      MAX_MODEL_LEN: \${MAX_MODEL_LEN:-5000}
+      MAX_MODEL_LEN: \${MAX_MODEL_LEN:-10240}
       CHAT_HISTORY_ROUND: \${CHAT_HISTORY_ROUND:-0}
     volumes:
       - \${MODEL_PATH:-\${PWD}}:/home/user/models
       - \${DOC_PATH:-\${PWD}}:/home/user/docs
       - \${TMPFILE_PATH:-\${PWD}}:/home/user/ui_cache
-      - \${HF_CACHE:-\${HOME}/.cache}:/home/user/.cache
       - \${PROMPT_PATH:-\${PWD}}:/templates/custom
     restart: always
     ports:
@@ -176,7 +174,6 @@ for ((i = 0; i < PORT_NUM; i++)); do
       no_proxy: \${no_proxy}
       http_proxy: \${http_proxy}
       https_proxy: \${https_proxy}
-      HF_ENDPOINT: \${HF_ENDPOINT}
       MODEL_PATH: "/llm/models"
       SERVED_MODEL_NAME: \${LLM_MODEL}
       TENSOR_PARALLEL_SIZE: \${TENSOR_PARALLEL_SIZE:-1}

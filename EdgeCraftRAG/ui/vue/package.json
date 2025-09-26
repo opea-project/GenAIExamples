@@ -9,7 +9,6 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@vueuse/i18n": "^4.0.0-beta.12",
     "ant-design-vue": "^4.0.0-rc.6",
     "axios": "^1.7.9",
     "clipboard": "^2.0.11",

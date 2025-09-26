@@ -25,7 +25,12 @@ export const validateIpPort = (ipPortStr: string) => {
   return true;
 };
 
-export const isValidName = (name: string) => {
-  const pattern = /^[^0-9]/;
+export const isValidName = (name: string): boolean => {
+  const pattern = /^[a-zA-Z_][a-zA-Z0-9_]*$/;
   return pattern.test(name);
+};
+
+export const isValidPipelineName = (name: string): boolean => {
+  const validPattern = /^[a-zA-Z0-9_]+$/;
+  return validPattern.test(name);
 };
