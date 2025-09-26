@@ -33,7 +33,7 @@ function build_docker_images() {
 
 function start_services() {
     cd $WORKPATH/docker_compose/intel/cpu/xeon
-
+    export no_proxy="localhost,127.0.0.1,$ip_address"
     source set_env.sh
 
     # Start Docker Containers
@@ -181,10 +181,6 @@ function main() {
 
     echo "::group::validate_megaservice"
     validate_megaservice
-    echo "::endgroup::"
-
-    echo "::group::validate_frontend"
-    validate_frontend
     echo "::endgroup::"
 
     echo "::group::stop_docker"

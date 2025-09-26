@@ -28,19 +28,8 @@ function build_docker_images() {
 	docker build --no-cache -t ${REGISTRY}/comps-base:${TAG} --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
 	popd && sleep 1s
 
-	git clone https://github.com/vllm-project/vllm.git && cd vllm
-	VLLM_VER=v0.10.0
-	echo "Check out vLLM tag ${VLLM_VER}"
-	git checkout ${VLLM_VER} &>/dev/null
-	VLLM_REQ_FILE="requirements/cpu.txt"
-	if ! grep -q "^transformers" "$VLLM_REQ_FILE"; then
-		echo "Adding transformers<4.54.0 to $VLLM_REQ_FILE"
-		echo "transformers<4.54.0" >>"$VLLM_REQ_FILE"
-	fi
-	cd ../
-
 	echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-	service_list="codegen codegen-gradio-ui llm-textgen vllm dataprep retriever embedding"
+	service_list="codegen codegen-gradio-ui llm-textgen dataprep retriever embedding"
 
 	docker compose -f build.yaml build ${service_list} --no-cache >${LOG_PATH}/docker_image_build.log
 
@@ -51,7 +40,7 @@ function build_docker_images() {
 function start_services() {
 	local compose_file="$1"
 	local llm_container_name="$2"
-
+	export no_proxy="localhost,127.0.0.1,$ip_address"
 	cd $WORKPATH/docker_compose/amd/cpu/epyc/
 
 	# Start Docker Containers

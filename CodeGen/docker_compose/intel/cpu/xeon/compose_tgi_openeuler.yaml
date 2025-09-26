@@ -1,0 +1,174 @@
+# Copyright (C) 2025 Huawei Technologies Co., Ltd.
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+
+  tgi-service:
+    image: openeuler/text-generation-inference-cpu:2.4.0-oe2403lts
+    container_name: tgi-server
+    ports:
+      - "8028:80"
+    volumes:
+      - "${MODEL_CACHE:-./data}:/data"
+    shm_size: 1g
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      HF_TOKEN: ${HF_TOKEN}
+      host_ip: ${host_ip}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:80/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 100
+    command: --model-id ${LLM_MODEL_ID} --cuda-graphs 0
+  llm-base:
+    image: ${REGISTRY:-opea}/llm-textgen:${TAG:-latest}-openeuler
+    container_name: llm-textgen-server
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      LLM_ENDPOINT: ${LLM_ENDPOINT}
+      LLM_MODEL_ID: ${LLM_MODEL_ID}
+      HF_TOKEN: ${HF_TOKEN}
+    restart: unless-stopped
+  llm-tgi-service:
+    extends: llm-base
+    container_name: llm-codegen-tgi-server
+    ports:
+      - "9000:9000"
+    ipc: host
+    depends_on:
+      tgi-service:
+        condition: service_healthy
+  codegen-xeon-backend-server:
+    image: ${REGISTRY:-opea}/codegen:${TAG:-latest}-openeuler
+    container_name: codegen-xeon-backend-server
+    depends_on:
+      llm-base:
+        condition: service_started
+      dataprep-redis-server:
+        condition: service_healthy
+    ports:
+      - "7778:7778"
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - MEGA_SERVICE_HOST_IP=${MEGA_SERVICE_HOST_IP}
+      - LLM_SERVICE_HOST_IP=${LLM_SERVICE_HOST_IP}
+      - RETRIEVAL_SERVICE_HOST_IP=${RETRIEVAL_SERVICE_HOST_IP}
+      - REDIS_RETRIEVER_PORT=${REDIS_RETRIEVER_PORT}
+      - TEI_EMBEDDING_HOST_IP=${TEI_EMBEDDING_HOST_IP}
+      - EMBEDDER_PORT=${EMBEDDER_PORT}
+    ipc: host
+    restart: always
+  codegen-xeon-ui-server:
+    image: ${REGISTRY:-opea}/codegen-gradio-ui:${TAG:-latest}-openeuler
+    container_name: codegen-xeon-ui-server
+    depends_on:
+      - codegen-xeon-backend-server
+    ports:
+      - "5173:5173"
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - BASIC_URL=${BACKEND_SERVICE_ENDPOINT}
+      - MEGA_SERVICE_PORT=${MEGA_SERVICE_PORT}
+      - host_ip=${host_ip}
+      - DATAPREP_ENDPOINT=${DATAPREP_ENDPOINT}
+      - DATAPREP_REDIS_PORT=${DATAPREP_REDIS_PORT}
+    ipc: host
+    restart: always
+  redis-vector-db:
+    image: redis/redis-stack:7.2.0-v9
+    container_name: redis-vector-db
+    ports:
+      - "${REDIS_DB_PORT}:${REDIS_DB_PORT}"
+      - "${REDIS_INSIGHTS_PORT}:${REDIS_INSIGHTS_PORT}"
+  dataprep-redis-server:
+    image: ${REGISTRY:-opea}/dataprep:${TAG:-latest}-openeuler
+    container_name: dataprep-redis-server
+    depends_on:
+      - redis-vector-db
+    ports:
+      - "${DATAPREP_REDIS_PORT}:5000"
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      REDIS_URL: ${REDIS_URL}
+      REDIS_HOST: ${host_ip}
+      INDEX_NAME: ${INDEX_NAME}
+      HF_TOKEN: ${HF_TOKEN}
+      LOGFLAG: true
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:5000/v1/health_check || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+  tei-embedding-serving:
+    image: openeuler/text-embeddings-inference-cpu:1.7.0-oe2403lts
+    container_name: tei-embedding-serving
+    entrypoint: /bin/sh -c "yum update -y && yum install -y curl && text-embeddings-router --json-output --model-id ${EMBEDDING_MODEL_ID} --auto-truncate"
+    ports:
+      - "${TEI_EMBEDDER_PORT:-12000}:80"
+    volumes:
+      - "./data:/data"
+    shm_size: 1g
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      host_ip: ${host_ip}
+      HF_TOKEN: ${HF_TOKEN}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
+      interval: 10s
+      timeout: 6s
+      retries: 48
+  tei-embedding-server:
+    image: ${REGISTRY:-opea}/embedding:${TAG:-latest}-openeuler
+    container_name: tei-embedding-server
+    ports:
+      - "${EMBEDDER_PORT:-10201}:6000"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      TEI_EMBEDDING_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
+      EMBEDDING_COMPONENT_NAME: "OPEA_TEI_EMBEDDING"
+    depends_on:
+      tei-embedding-serving:
+        condition: service_healthy
+    restart: unless-stopped
+  retriever-redis:
+    image: ${REGISTRY:-opea}/retriever:${TAG:-latest}-openeuler
+    container_name: retriever-redis
+    depends_on:
+      - redis-vector-db
+    ports:
+      - "${REDIS_RETRIEVER_PORT}:${REDIS_RETRIEVER_PORT}"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      REDIS_URL: ${REDIS_URL}
+      REDIS_DB_PORT: ${REDIS_DB_PORT}
+      REDIS_INSIGHTS_PORT: ${REDIS_INSIGHTS_PORT}
+      REDIS_RETRIEVER_PORT: ${REDIS_RETRIEVER_PORT}
+      INDEX_NAME: ${INDEX_NAME}
+      TEI_EMBEDDING_ENDPOINT: ${TEI_EMBEDDING_ENDPOINT}
+      HF_TOKEN: ${HF_TOKEN}
+      LOGFLAG: ${LOGFLAG}
+      RETRIEVER_COMPONENT_NAME: ${RETRIEVER_COMPONENT_NAME:-OPEA_RETRIEVER_REDIS}
+    restart: unless-stopped
+networks:
+  default:
+    driver: bridge
