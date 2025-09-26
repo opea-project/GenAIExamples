@@ -177,18 +177,12 @@ class QnAGenerator(BaseComponent):
         self.vllm_endpoint = vllm_endpoint
 
     def init_prompt(self, model_path, prompt_content=None, prompt_template_file=None, enable_think=False):
-        # using the prompt template enhancement strategy(only tested on Qwen2-7B-Instruction) if template_enhance_on is true
-        template_enhance_on = True if "Qwen2" in self.model_id else False
         if prompt_content:
             return get_prompt_template(model_path, prompt_content, prompt_template_file, enable_think)
         elif prompt_template_file is None:
             print("There is no template file, using the default template.")
             prompt_template = get_prompt_template(model_path, prompt_content, prompt_template_file, enable_think)
-            return (
-                DocumentedContextRagPromptTemplate.from_template(prompt_template)
-                if template_enhance_on
-                else prompt_template
-            )
+            return prompt_template
         else:
             safe_root = "/templates"
             prompt_template_file = os.path.normpath(os.path.join(safe_root, prompt_template_file))
@@ -196,10 +190,7 @@ class QnAGenerator(BaseComponent):
                 raise ValueError("Invalid template path")
             if not os.path.exists(prompt_template_file):
                 raise ValueError("Template file not exists")
-            if template_enhance_on:
-                return DocumentedContextRagPromptTemplate.from_file(prompt_template_file)
-            else:
-                return get_prompt_template(model_path, prompt_content, prompt_template_file, enable_think)
+            return get_prompt_template(model_path, prompt_content, prompt_template_file, enable_think)
 
     def set_prompt(self, prompt):
         if "{context}" not in prompt:
