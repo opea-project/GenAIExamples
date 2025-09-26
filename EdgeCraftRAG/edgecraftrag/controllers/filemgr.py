@@ -20,7 +20,7 @@ class FilelMgr(BaseMgr):
         self.add(file)
         return file.documents
 
-    def add_files(self, docs: Any, docs_name:str = "default"):
+    def add_files(self, docs: Any, docs_name: str = "default"):
         if not isinstance(docs, list):
             docs = [docs]
 
@@ -45,7 +45,7 @@ class FilelMgr(BaseMgr):
                 input_docs.extend(file.documents)
         return input_docs
 
-    def get_file_by_name(self, docs_name:str = "default", file_path: str = None):
+    def get_file_by_name(self, docs_name: str = "default", file_path: str = None):
         for name, files in self.components.items():
             if docs_name == name:
                 for file in files:
@@ -53,7 +53,7 @@ class FilelMgr(BaseMgr):
                         return file.documents
         return None
 
-    def get_kb_files_by_name(self, docs_name:str = "default"):
+    def get_kb_files_by_name(self, docs_name: str = "default"):
         file_docs = []
         for name, files in self.components.items():
             if name == docs_name:
@@ -75,12 +75,12 @@ class FilelMgr(BaseMgr):
         else:
             return False
 
-    def del_kb_file(self, docs_name:str = "default"):
+    def del_kb_file(self, docs_name: str = "default"):
         files = self.get_kb_files_by_name(docs_name)
         if files:
             self.remove(docs_name)
 
-    def del_file(self, docs_name:str = "default", file_path: str= None ):
+    def del_file(self, docs_name: str = "default", file_path: str = None):
         files = self.get_file_by_name(docs_name, file_path)
         docs_list = []
         for docs_file in files:

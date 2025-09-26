@@ -27,7 +27,7 @@ service.interceptors.request.use(
   },
   (error) => {
     return Promise.reject(error);
-  }
+  },
 );
 
 // response interceptor
@@ -40,11 +40,7 @@ service.interceptors.response.use(
       const antNotification = serviceManager.getService("antNotification");
 
       if (antNotification)
-        antNotification(
-          "success",
-          i18n.global.t("common.success"),
-          i18n.global.t(config.successMsg)
-        );
+        antNotification("success", i18n.global.t("common.success"), i18n.global.t(config.successMsg));
     }
     return Promise.resolve(res);
   },
@@ -60,11 +56,10 @@ service.interceptors.response.use(
       errorMessage = error.message;
     }
     const antNotification = serviceManager.getService("antNotification");
-    if (antNotification)
-      antNotification("error", i18n.global.t("common.error"), errorMessage);
+    if (antNotification) antNotification("error", i18n.global.t("common.error"), errorMessage);
 
     return Promise.reject(error);
-  }
+  },
 );
 
 export default service;

@@ -49,7 +49,14 @@ class Benchmark(BaseComponent):
         return input_token_size
 
     def init_benchmark_data(self):
-        pipeline_comp = [CompType.NODEPARSER, CompType.CHUNK_NUM, CompType.RETRIEVER, CompType.POSTPROCESSOR, CompType.QUERYSEARCH, CompType.GENERATOR]
+        pipeline_comp = [
+            CompType.NODEPARSER,
+            CompType.CHUNK_NUM,
+            CompType.RETRIEVER,
+            CompType.POSTPROCESSOR,
+            CompType.QUERYSEARCH,
+            CompType.GENERATOR,
+        ]
         if self.is_enabled():
             with self._idx_lock:
                 self.last_idx += 1

@@ -71,10 +71,10 @@ function start_vllm_services() {
     for (( x=0; x<DP_NUM; x++ )); do
         start_gpu=$(( x * TENSOR_PARALLEL_SIZE ))
         default_gpu_list=$(seq -s, $start_gpu $(( start_gpu + TENSOR_PARALLEL_SIZE - 1 )))
-        
+
         read -p "selected XPU(your selected_XPU_${x} [${default_gpu_list}]) , press Enter to confirm, or type a new value:" input_gpu_list
         selected_gpu_list=${input_gpu_list:-$default_gpu_list}
-        
+
         export SELECTED_XPU_${x}="$selected_gpu_list"
         export VLLM_SERVICE_PORT_${x}="8$((x+1))00"
     done
@@ -186,13 +186,13 @@ function start_services() {
 
 function check_baai_folder() {
     local baai_path="${MODEL_PATH}/BAAI"
-    
+
     if [ -d "${baai_path}" ]; then
         return 0
     else
         echo "Error: BAAI folder not found in ${MODEL_PATH}!"
         echo "Please prepare the models first, then run quick_start_ov_services again."
-        exit 1 
+        exit 1
     fi
 }
 
@@ -239,7 +239,7 @@ function quick_start_vllm_services() {
     cd $WORKPATH/docker_compose/intel/gpu/arc
     bash $WORKPATH/nginx/nginx-conf-generator.sh $DP_NUM $WORKPATH/nginx/nginx.conf
     export NGINX_CONFIG_PATH=${NGINX_CONFIG_PATH:-"$WORKPATH/nginx/nginx.conf"}
-   
+
     bash $WORKPATH/docker_compose/intel/gpu/arc/multi-arc-yaml-generator.sh $DP_NUM $WORKPATH/docker_compose/intel/gpu/arc/$COMPOSE_FILE
     docker compose -f $WORKPATH/docker_compose/intel/gpu/arc/$COMPOSE_FILE up -d
     echo "ipex-llm-serving-xpu is booting, please wait..."

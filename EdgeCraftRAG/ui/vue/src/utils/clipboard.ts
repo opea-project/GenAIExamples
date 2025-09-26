@@ -1,3 +1,6 @@
+// Copyright (C) 2025 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
+
 import { ref, Ref } from "vue";
 import { message } from "ant-design-vue";
 import type { MessageType } from "ant-design-vue/es/message";
@@ -16,9 +19,7 @@ interface UseClipboardReturn {
   reset: () => void;
 }
 
-export const useClipboard = (
-  options: UseClipboardOptions = {}
-): UseClipboardReturn => {
+export const useClipboard = (options: UseClipboardOptions = {}): UseClipboardReturn => {
   const { timeout = 2000 } = options;
 
   const copied = ref(false);

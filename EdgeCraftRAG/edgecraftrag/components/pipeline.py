@@ -216,7 +216,7 @@ def run_simple_doc(pl: Pipeline, docs: List[Document]) -> Any:
     if pl.indexer is not None:
         pl.indexer.insert_nodes(n)
     if pl.enable_benchmark:
-        benchmark_data[CompType.NODEPARSER] += (time.perf_counter() - start)
+        benchmark_data[CompType.NODEPARSER] += time.perf_counter() - start
         benchmark_data[CompType.CHUNK_NUM] += len(n)
         pl.benchmark.insert_benchmark_data(benchmark_data)
     return n
@@ -244,23 +244,27 @@ def run_generator(pl: Pipeline, chat_request: ChatCompletionRequest) -> Any:
         benchmark_index, benchmark_data = pl.benchmark.init_benchmark_data()
     contexts = {}
     retri_res = []
-    active_kb = chat_request.user if chat_request.user  else None
-    enable_rag_retrieval = chat_request.chat_template_kwargs.get("enable_rag_retrieval", True) if chat_request.chat_template_kwargs else True
+    active_kb = chat_request.user if chat_request.user else None
+    enable_rag_retrieval = (
+        chat_request.chat_template_kwargs.get("enable_rag_retrieval", True)
+        if chat_request.chat_template_kwargs
+        else True
+    )
     if not active_kb:
         enable_rag_retrieval = False
     elif pl.retriever.comp_subtype == "kbadmin_retriever" and active_kb.comp_subtype == "origin_kb":
         enable_rag_retrieval = False
-    elif pl.retriever.comp_subtype != "kbadmin_retriever" and  active_kb.comp_subtype == "kbadmin_kb":
+    elif pl.retriever.comp_subtype != "kbadmin_retriever" and active_kb.comp_subtype == "kbadmin_kb":
         enable_rag_retrieval = False
     query = chat_request.messages
     sub_questionss_result = None
-    experience_status = True if chat_request.tool_choice == 'auto' else False
+    experience_status = True if chat_request.tool_choice == "auto" else False
     if enable_rag_retrieval:
         start = 0
         if pl.enable_benchmark:
             start = time.perf_counter()
         if pl.generator.inference_type == InferenceType.VLLM and experience_status:
-            UI_DIRECTORY ="/home/user/ui_cache"
+            UI_DIRECTORY = "/home/user/ui_cache"
             search_config_path = os.path.join(UI_DIRECTORY, "configs/search_config.yaml")
             search_dir = os.path.join(UI_DIRECTORY, "configs/experience_dir/experience.json")
 

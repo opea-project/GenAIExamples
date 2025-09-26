@@ -35,7 +35,7 @@ async def redindex_data():
     pl = ctx.get_pipeline_mgr().get_active_pipeline()
     kb = ctx.get_knowledge_mgr().get_active_knowledge_base()
     if kb:
-        kb_name  = kb.name
+        kb_name = kb.name
         docs_name = kb_name + pl.name + str(pl.indexer.d)
     else:
         kb_name = None
@@ -45,7 +45,7 @@ async def redindex_data():
     pl.update_indexer_to_retriever()
 
     all_docs = []
-    docs_list =ctx.get_file_mgr().get_kb_files_by_name(docs_name)
+    docs_list = ctx.get_file_mgr().get_kb_files_by_name(docs_name)
     for docs_file in docs_list:
         all_docs.extend(docs_file.documents)
     nodelist = ctx.get_pipeline_mgr().run_data_prepare(docs=all_docs)
@@ -99,9 +99,10 @@ async def delete_file(kb_name, file_path):
         if nodelist is not None and len(nodelist) > 0:
             ctx.get_node_mgr().add_nodes(pl.node_parser.idx, nodelist)
 
-        return f"File is deleted"
+        return "File is deleted"
     else:
-        return f"File not found"
+        return "File not found"
+
 
 # DELETE a file
 @data_app.delete(path="/v1/data/all_files/{name}")
@@ -117,6 +118,7 @@ async def delete_all_file(name):
         return f"File {name} is deleted"
     else:
         return f"File {name} not found"
+
 
 # Upload & save a file from UI
 @data_app.post(path="/v1/data/file/{file_name}")
