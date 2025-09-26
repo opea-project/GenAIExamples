@@ -43,7 +43,11 @@ jobs:
           sudo rm -rf ${{github.workspace}}/* || true
           docker system prune -f
       - name: Checkout out Repo
+<<<<<<< HEAD
         uses: actions/checkout@1e31de5234b9f8995739874a8ce0492dc87873e2
+=======
+        uses: actions/checkout@sha256:1e31de5234b9f8995739874a8ce0492dc87873e2
+>>>>>>> c7043a46317d46c39a90b9ad3efb18a91ac7f376
       - name: Install Dependencies
         run: |
           sudo apt-get update
@@ -91,7 +95,11 @@ jobs:
         shell: bash
 
       - name: Security Scan Container
+<<<<<<< HEAD
         uses: aquasecurity/trivy-action@6e7b7d1fd3e4fef0c5fa8cce1229c54b2c9bd0d8
+=======
+        uses: aquasecurity/trivy-action@sha256:6e7b7d1fd3e4fef0c5fa8cce1229c54b2c9bd0d8
+>>>>>>> c7043a46317d46c39a90b9ad3efb18a91ac7f376
         if: ${{ inputs.trivy_scan }}
         with:
           image-ref: ${{ env.OPEA_IMAGE_REPO }}opea/${{ inputs.image }}:${{ inputs.tag }}

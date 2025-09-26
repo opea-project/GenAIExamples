@@ -19,7 +19,11 @@ jobs:
         run: sudo rm -rf ${{github.workspace}}/*
 
       - name: Checkout Repo GenAIExamples
+<<<<<<< HEAD
         uses: actions/checkout@1e31de5234b9f8995739874a8ce0492dc87873e2
+=======
+        uses: actions/checkout@sha256:1e31de5234b9f8995739874a8ce0492dc87873e2
+>>>>>>> c7043a46317d46c39a90b9ad3efb18a91ac7f376
         with:
           fetch-depth: 0
 
@@ -84,7 +88,11 @@ jobs:
         run: sudo rm -rf ${{github.workspace}}/*
 
       - name: Checkout Repo GenAIExamples
+<<<<<<< HEAD
         uses: actions/checkout@1e31de5234b9f8995739874a8ce0492dc87873e2
+=======
+        uses: actions/checkout@sha256:1e31de5234b9f8995739874a8ce0492dc87873e2
+>>>>>>> c7043a46317d46c39a90b9ad3efb18a91ac7f376
         with:
           fetch-depth: 0
 
