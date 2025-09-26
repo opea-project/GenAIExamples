@@ -7,7 +7,7 @@ RUN apt-get remove -y libze-intel-gpu1 libigc1 libigdfcl1 libze-dev || true; \
     apt-get install -y curl
 RUN curl -sL 'https://keyserver.ubuntu.com/pks/lookup?fingerprint=on&op=get&search=0x0C0E6AF955CE463C03FC51574D098D70AFBE5E1F' | tee /etc/apt/trusted.gpg.d/driver.asc
 RUN echo -e "Types: deb\nURIs: https://ppa.launchpadcontent.net/kobuk-team/intel-graphics/ubuntu/\nSuites: plucky\nComponents: main\nSigned-By: /etc/apt/trusted.gpg.d/driver.asc" > /etc/apt/sources.list.d/driver.sources
-RUN apt update && apt-get install -y libze-intel-gpu1 libze1 intel-metrics-discovery intel-opencl-icd clinfo intel-gsc && apt-get install -y libze-intel-gpu1 libze1 intel-metrics-discovery intel-opencl-icd clinfo intel-gsc && apt-get install -y libze-dev intel-ocloc libze-intel-gpu-raytracing
+RUN apt-get update && apt-get install -y libze-intel-gpu1 libze1 intel-metrics-discovery intel-opencl-icd clinfo intel-gsc && apt-get install -y libze-intel-gpu1 libze1 intel-metrics-discovery intel-opencl-icd clinfo intel-gsc && apt-get install -y libze-dev intel-ocloc libze-intel-gpu-raytracing
 
 RUN useradd -m -s /bin/bash user && \
     mkdir -p /home/user && \
