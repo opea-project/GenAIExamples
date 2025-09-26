@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="detail-wrap">
     <div class="upload-wrap">
       <a-upload-dragger
         v-model:file-list="uploadFileList"
@@ -34,41 +34,51 @@
           v-model:value="uploadedCount"
           :min="0"
           :max="totalFiles"
-        /><span>{{ uploadedCount }}/{{ totalFiles }}</span>
+        /><span
+          >{{ uploadedCount }}/{{ totalFiles }}
+          <span class="pl-8">
+            {{ $t("knowledge.successfully") }}:
+            <span class="is-success">{{ successCount }}</span>
+            {{ $t("knowledge.failed") }}:
+            <span class="is-failed">{{ failCount }}</span></span
+          >
+        </span>
       </div>
     </div>
-    <a-empty v-if="notFile" :description="$t('knowledge.notFileTip')" />
-    <div class="files-container" v-else>
-      <a-row type="flex" wrap :gutter="[20, 20]">
-        <a-col
-          :span="8"
-          v-for="[key, value] in Object.entries(knowledgeData.file_map)"
-          :key="key"
-        >
-          <div class="file-item">
-            <div class="left-wrap">
-              <FileDoneOutlined
-                :style="{
-                  color: 'var(--color-success)',
-                  fontSize: '20px',
-                }"
-              />
-              <a-tooltip placement="topLeft" :title="key">
-                <div class="file-name">{{ key }}</div>
-              </a-tooltip>
-            </div>
-            <div class="right-wrap">
-              <a-tooltip placement="top" :title="$t('common.delete')">
-                <DeleteFilled
-                  class="delete-icon"
-                  @click="handleFileDelete(value as string)"
+    <PartialLoading :visible="loading" />
+    <template v-if="!loading">
+      <a-empty v-if="notFile" :description="$t('knowledge.notFileTip')" />
+      <div class="files-container" v-else>
+        <a-row type="flex" wrap :gutter="[20, 20]">
+          <a-col
+            :span="8"
+            v-for="[key, value] in Object.entries(knowledgeData.file_map)"
+            :key="key"
+          >
+            <div class="file-item">
+              <div class="left-wrap">
+                <FileDoneOutlined
+                  :style="{
+                    color: 'var(--color-success)',
+                    fontSize: '20px',
+                  }"
                 />
-              </a-tooltip>
+                <a-tooltip placement="topLeft" :title="key">
+                  <div class="file-name">{{ key }}</div>
+                </a-tooltip>
+              </div>
+              <div class="right-wrap">
+                <a-tooltip placement="top" :title="$t('common.delete')">
+                  <DeleteFilled
+                    class="delete-icon"
+                    @click="handleFileDelete(value as string)"
+                  />
+                </a-tooltip>
+              </div>
             </div>
-          </div>
-        </a-col>
-      </a-row>
-    </div>
+          </a-col>
+        </a-row></div
+    ></template>
   </div>
 </template>
 
@@ -80,7 +90,6 @@ import {
   requestFileDelete,
   requestUploadFileUrl,
 } from "@/api/knowledgeBase";
-import { useNotification } from "@/utils/common";
 import {
   CloseCircleFilled,
   DeleteFilled,
@@ -97,14 +106,16 @@ interface KbType {
 }
 const { t } = useI18n();
 const kbInfo = inject<KbType>("kbInfo");
-const { antNotification } = useNotification();
 const uploadFileList = ref([]);
 const knowledgeData = reactive<EmptyObjectType>({});
-const pendingFiles: UploadRequestOption[] = [];
+const pendingFiles = ref<UploadRequestOption[]>([]);
 let isUploading = ref<boolean>(false);
 const totalFiles = ref<number>(0);
 const uploadedCount = ref<number>(0);
+const successCount = ref<number>(0);
+const failCount = ref<number>(0);
 const startUpload = ref<boolean>(false);
+const loading = ref<boolean>(false);
 
 const notFile = computed(() => {
   const { file_map = {} } = knowledgeData;
@@ -112,8 +123,16 @@ const notFile = computed(() => {
 });
 
 const queryKnowledgeBaseDetail = async () => {
-  const data: any = await getKnowledgeBaseDetailByName(kbInfo?.name!);
-  Object.assign(knowledgeData, data);
+  getKnowledgeBaseDetailByName(kbInfo?.name!)
+    .then((data: any) => {
+      Object.assign(knowledgeData, data);
+    })
+    .catch((error: any) => {
+      console.error(error);
+    })
+    .finally(() => {
+      loading.value = false;
+    });
 };
 const handleBeforeUpload = (file: UploadProps["fileList"][number]) => {
   const isFileSize = file.size / 1024 / 1024 < 200;
@@ -127,7 +146,7 @@ const handleBeforeUpload = (file: UploadProps["fileList"][number]) => {
 };
 
 const customRequest = (options: UploadRequestOption) => {
-  pendingFiles.push(options);
+  pendingFiles.value.push(options);
   totalFiles.value += 1;
   startUpload.value = true;
   if (!isUploading.value) {
@@ -137,11 +156,11 @@ const customRequest = (options: UploadRequestOption) => {
 };
 
 const uploadInBatches = async () => {
-  while (pendingFiles.length > 0) {
-    const batch = pendingFiles.splice(0, 5);
+  while (pendingFiles.value.length > 0) {
+    const batch = pendingFiles.value.splice(0, 20);
 
     await Promise.all(
-      batch.map(async (options) => {
+      batch.map(async (options: any) => {
         const { file, onSuccess, onError } = options;
         const uploadFile = file as UploadFile;
 
@@ -152,14 +171,16 @@ const uploadInBatches = async () => {
 
           onSuccess?.(res, uploadFile as any);
           handleSuccess(uploadFile);
-          uploadedCount.value += 1;
-          queryKnowledgeBaseDetail();
+          successCount.value += 1;
         } catch (err: any) {
           onError?.(err);
+          failCount.value += 1;
+        } finally {
           uploadedCount.value += 1;
         }
       })
     );
+    queryKnowledgeBaseDetail();
   }
   handleRefresh();
   isUploading.value = false;
@@ -167,7 +188,9 @@ const uploadInBatches = async () => {
     startUpload.value = false;
     totalFiles.value = 0;
     uploadedCount.value = 0;
-  }, 3000);
+    successCount.value = 0;
+    failCount.value = 0;
+  }, 5000);
 };
 
 const handleSuccess = (file: UploadFile) => {
@@ -196,11 +219,16 @@ const handleRefresh = () => {
 };
 
 onMounted(() => {
+  loading.value = true;
   queryKnowledgeBaseDetail();
 });
 </script>
 
 <style lang="less" scoped>
+.detail-wrap {
+  height: 100%;
+  .flex-column;
+}
 .upload-wrap {
   padding: 16px;
   :deep(.intel-upload-drag) {
@@ -262,7 +290,7 @@ onMounted(() => {
   border-left: 3px solid var(--color-second-warning);
   background-color: var(--color-warningBg);
   color: var(--color-second-warning);
-  padding: 0 12px;
+  padding: 8px 12px 0 12px;
   border-radius: 0 4px 4px 0;
   margin-bottom: 12px;
   font-size: 12px;
@@ -273,7 +301,7 @@ onMounted(() => {
     align-items: center;
   }
   .rated-wrap {
-    width: 300px;
+    width: 400px;
     display: flex;
     gap: 4px;
     align-items: center;
@@ -293,6 +321,13 @@ onMounted(() => {
         top: 1px;
       }
     }
+  }
+  .is-success {
+    .pr-6;
+    color: var(--color-success);
+  }
+  .is-failed {
+    color: var(--color-error);
   }
 }
 </style>

@@ -27,3 +27,10 @@ export const getBenchmark = () => {
     method: "get",
   });
 };
+
+export const requestStopChat = () => {
+  return request({
+    url: `/v1/chatqna/stop`,
+    method: "post",
+  });
+};

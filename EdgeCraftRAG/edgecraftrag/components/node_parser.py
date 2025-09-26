@@ -169,7 +169,6 @@ class UnstructedNodeParser(BaseComponent, UnstructuredReader):
         }
         return set
 
-
 class KBADMINParser(BaseComponent):
     # Handled in the kbadmin project
     def __init__(self, **kwargs):
@@ -182,7 +181,6 @@ class KBADMINParser(BaseComponent):
 
     def insert_nodes(self):
         return None
-
     @model_serializer
     def ser_model(self):
         set = {

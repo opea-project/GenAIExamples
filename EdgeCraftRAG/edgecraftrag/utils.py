@@ -89,10 +89,6 @@ def compare_mappings(new_dict, old_dict):
         deleted = {name: old_files[name] for name in set(old_files) - set(new_files)}
         if deleted:
             deleted_files[key] = deleted
-
-    for key in list(added_files.keys()):
-        if key in deleted_files:
-            del added_files[key]
     return added_files, deleted_files
 
 

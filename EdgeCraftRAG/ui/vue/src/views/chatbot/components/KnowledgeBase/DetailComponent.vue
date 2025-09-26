@@ -56,6 +56,7 @@ const handleBack = () => {
 <style lang="less" scoped>
 .kb-detail-container {
   display: block !important;
+  height: 100%;
   .flex-column;
   .header-wrap {
     padding: 12px 16px;

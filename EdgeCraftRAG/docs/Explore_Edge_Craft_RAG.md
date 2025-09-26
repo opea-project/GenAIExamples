@@ -34,7 +34,7 @@ After knowledge base creation, you can upload the documents for retrieval.
 Then, you can submit messages in the chat box in `Chat` page.
 ![chat_with_rag](../assets/img/chatqna.png)
 
-## ChatQnA with Kbadmin in UI
+## ChatQnA with Kbadmin in UI 
 
 ### Kbadmin Pipeline
 

@@ -48,6 +48,7 @@ const props = defineProps({
 <style lang="less" scoped>
 .loading-container {
   width: 100%;
+  height: 100%;
   flex: 1;
   .vertical-center;
   .loading-wrap {

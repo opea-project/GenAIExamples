@@ -83,13 +83,11 @@ class KnowledgeBaseCreateIn(BaseModel):
     active: Optional[bool] = None
     comp_type: Optional[str] = "knowledge"
     comp_subtype: Optional[str] = "origin_kb"
-    experience_active: Optional[bool] = None
-
+    experience_active:  Optional[bool] = None
 
 class ExperienceIn(BaseModel):
     question: str
     content: list[str] = None
-
 
 class MilvusConnectRequest(BaseModel):
     vector_url: str

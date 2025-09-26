@@ -80,10 +80,10 @@ class KBADMINIndexer(BaseComponent):
     # Handled in the kbadmin project
     def __init__(self, embed_model, vector_type, kbadmin_embedding_url, vector_url="http://localhost:29530"):
         BaseComponent.__init__(
-            self,
-            comp_type=CompType.INDEXER,
-            comp_subtype=IndexerType.KBADMIN_INDEXER,
-        )
+                self,
+                comp_type=CompType.INDEXER,
+                comp_subtype=IndexerType.KBADMIN_INDEXER,
+            )
         self.embed_model = embed_model
         self.kbadmin_embedding_url = kbadmin_embedding_url
         self.vector_url = vector_url
@@ -91,7 +91,7 @@ class KBADMINIndexer(BaseComponent):
     def insert_nodes(self, nodes):
         return None
 
-    def _index_struct(self, nodes):
+    def _index_struct(self, nodes):  
         return None
 
     def run(self, **kwargs) -> Any:
@@ -105,11 +105,5 @@ class KBADMINIndexer(BaseComponent):
 
     @model_serializer
     def ser_model(self):
-        set = {
-            "idx": self.idx,
-            "indexer_type": self.comp_subtype,
-            "model": {"model_id": self.embed_model},
-            "kbadmin_embedding_url": self.kbadmin_embedding_url,
-            "vector_url": self.vector_url,
-        }
+        set = {"idx": self.idx, "indexer_type": self.comp_subtype, "model": {"model_id": self.embed_model}, "kbadmin_embedding_url": self.kbadmin_embedding_url, "vector_url":self.vector_url}
         return set

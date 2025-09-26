@@ -85,7 +85,10 @@ export const requestExperienceCreate = (data: EmptyArrayType) => {
     showLoading: true,
   });
 };
-export const requestExperienceConfirm = (flag: Boolean, data: EmptyArrayType) => {
+export const requestExperienceConfirm = (
+  flag: Boolean,
+  data: EmptyArrayType
+) => {
   return request({
     url: `/v1/multiple_experiences/confirm?flag=${flag}`,
     method: "post",

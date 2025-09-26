@@ -1,19 +1,23 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-import warnings
-from typing import Any, List, Optional, cast
+from typing import Any, List, cast
 
-import requests
+import requests, warnings
 from edgecraftrag.base import BaseComponent, CompType, RetrieverType
-from langchain_milvus import Milvus
-from langchain_openai import OpenAIEmbeddings
 from llama_index.core.indices.vector_store.retrievers import VectorIndexRetriever
 from llama_index.core.retrievers import AutoMergingRetriever
-from llama_index.core.schema import BaseNode, Document, NodeWithScore
+from llama_index.core.schema import BaseNode
 from llama_index.retrievers.bm25 import BM25Retriever
 from pydantic import model_serializer
-from pymilvus import Collection, MilvusException, connections, utility
+from llama_index.core.schema import NodeWithScore
+
+from langchain_openai import OpenAIEmbeddings
+from langchain_milvus import Milvus
+from llama_index.core.schema import Document
+from typing import List, Optional
+from pymilvus import MilvusException
+from pymilvus import connections, utility, Collection
 
 
 class VectorSimRetriever(BaseComponent, VectorIndexRetriever):
@@ -45,7 +49,7 @@ class VectorSimRetriever(BaseComponent, VectorIndexRetriever):
         for k, v in kwargs.items():
             if k == "query":
                 top_k = kwargs["top_k"] if kwargs["top_k"] else self.topk
-                self.similarity_top_k = top_k
+                self.similarity_top_k=top_k
                 return self.retrieve(v)
 
         return None
@@ -145,44 +149,41 @@ class KBadminRetriever(BaseComponent):
         self.collection_name = None
         self.topk = kwargs.get("similarity_top_k", 30)
         self.KBADMIN_MILVUS_URL = indexer.vector_url
-        self.CONNECTION_ARGS = {"uri": indexer.vector_url}
+        self.CONNECTION_ARGS =  {"uri": indexer.vector_url}
         self.vector_field = "q_1024_vec"
         self.text_field = "content_with_weight"
         self.embedding_model_name = indexer.embed_model
         self.embedding_url = indexer.kbadmin_embedding_url + "/v3"
-        self.embedding = OpenAIEmbeddings(
-            model=self.embedding_model_name,
-            api_key="unused",
-            base_url=self.embedding_url,
-            tiktoken_enabled=False,
-            embedding_ctx_length=510,
-        )
+        self.embedding = OpenAIEmbeddings(model=self.embedding_model_name, api_key="unused", base_url=self.embedding_url, tiktoken_enabled=False, embedding_ctx_length=510)
 
     def config_kbadmin_milvus(self, knowledge_name):
         collection_name = knowledge_name
         if not kbs_rev_maps:
-            get_kbs_info(self.CONNECTION_ARGS)
+            get_kbs_info( self.CONNECTION_ARGS)
         collection_name = kbs_rev_maps[collection_name]
         self.vector_db = Milvus(
             self.embedding,
-            connection_args=self.CONNECTION_ARGS,
-            collection_name=collection_name,
-            vector_field=self.vector_field,
-            text_field=self.text_field,
+            connection_args = self.CONNECTION_ARGS,
+            collection_name = collection_name,
+
+            vector_field = self.vector_field,
+            text_field = self.text_field,
             enable_dynamic_field=True,
-            index_params={"index_type": "FLAT", "metric_type": "IP", "params": {}},
+            index_params = {"index_type": "FLAT", "metric_type": "IP", "params": {}}
         )
+
 
     def similarity_search_with_embedding(self, query: str, k) -> list[tuple[Document, float]]:
         url = self.embedding_url + "/embeddings"
-        embedding_info = {"model": self.embedding_model_name, "input": query}
+        embedding_info = {"model": self.embedding_model_name,"input": query}
         # Get embedding result from embedding service
-        response = requests.post(url, headers={"Content-Type": "application/json"}, json=embedding_info)
+        response = requests.post(url, headers={'Content-Type': 'application/json'}, json=embedding_info)
         embedding_json = response.json()
-        embedding = embedding_json["data"][0]["embedding"]
+        embedding = embedding_json['data'][0]['embedding']
         docs_and_scores = self.vector_db.similarity_search_with_score_by_vector(embedding=embedding, k=k)
         relevance_score_fn = self.vector_db._select_relevance_score_fn()
         return [(doc, relevance_score_fn(score)) for doc, score in docs_and_scores]
+
 
     def run(self, **kwargs) -> Any:
         query = kwargs["query"]
@@ -201,15 +202,17 @@ class KBadminRetriever(BaseComponent):
 
     @model_serializer
     def ser_model(self):
-        set = {"idx": self.idx, "retriever_type": self.comp_subtype, "CONNECTION_ARGS": self.CONNECTION_ARGS}
+        set = {
+            "idx": self.idx,
+            "retriever_type": self.comp_subtype,
+            "CONNECTION_ARGS": self.CONNECTION_ARGS
+        }
         return set
 
 
 # global kbs maps.
 global kbs_rev_maps
 kbs_rev_maps = {}
-
-
 def get_kbs_info(CONNECTION_ARGS):
     alias = "default"
     try:
@@ -218,52 +221,52 @@ def get_kbs_info(CONNECTION_ARGS):
         all_kb_infos = {}
         new_infos = {}
         for kb in collections:
-            collection = Collection(kb)
-            collection.load()
-            try:
-                if any(field.name == "kb_id" for field in collection.schema.fields):
-                    docs = collection.query(
-                        expr="pk != 0",
-                        output_fields=["kb_name", "kb_id", "docnm_kwd"],
-                        timeout=10,
-                    )
-                else:
-                    docs = collection.query(
-                        expr="pk != 0",
-                        output_fields=["filename"],
-                        timeout=10,
-                    )
-                collection.release()
-            except MilvusException as e:
-                continue
-            this_kbinfo = {}
-            for doc in docs:
+                collection = Collection(kb)
+                collection.load()
                 try:
-                    if "kb_name" in doc:
-                        if not this_kbinfo:
-                            this_kbinfo["name"] = doc["kb_name"]
-                            this_kbinfo["uuid"] = doc["kb_id"]
-                            this_kbinfo["files"] = set([doc["docnm_kwd"]])
-                        else:
-                            this_kbinfo["files"].add(doc["docnm_kwd"])
+                    if any(field.name == 'kb_id' for field in collection.schema.fields):
+                        docs = collection.query(
+                            expr="pk != 0",
+                            output_fields=["kb_name", "kb_id", "docnm_kwd"],
+                            timeout=10,
+                        )
                     else:
-                        if not this_kbinfo:
-                            this_kbinfo["name"] = kb
-                            this_kbinfo["uuid"] = ""
-                            this_kbinfo["files"] = set([doc["filename"]])
+                        docs = collection.query(
+                            expr="pk != 0",
+                            output_fields=["filename"],
+                            timeout=10,
+                        )
+                    collection.release()
+                except MilvusException as e:
+                    continue
+                this_kbinfo = {}
+                for doc in docs:
+                    try:
+                        if 'kb_name' in doc:
+                            if not this_kbinfo:
+                                this_kbinfo['name'] = doc['kb_name']
+                                this_kbinfo['uuid'] = doc['kb_id']
+                                this_kbinfo['files'] = set([doc['docnm_kwd']])
+                            else:
+                                this_kbinfo['files'].add(doc['docnm_kwd'])
                         else:
-                            this_kbinfo["files"].add(doc["filename"])
-                except KeyError:
-                    this_kbinfo = None
-                    break
-            if this_kbinfo:
-                unique_files = list(this_kbinfo["files"])
-                this_kbinfo["files"] = unique_files
-                new_infos[kb] = this_kbinfo
+                            if not this_kbinfo:
+                                this_kbinfo['name'] = kb
+                                this_kbinfo['uuid'] = ""
+                                this_kbinfo['files'] = set([doc['filename']])
+                            else:
+                                this_kbinfo['files'].add(doc['filename'])
+                    except KeyError:
+                        this_kbinfo = None
+                        break
+                if this_kbinfo:
+                    unique_files = list(this_kbinfo['files'])
+                    this_kbinfo['files'] = unique_files
+                    new_infos[kb] = this_kbinfo
         all_kb_infos.update(new_infos)
         kbs_rev_maps.clear()
         for kb_id in all_kb_infos:
-            kbs_rev_maps[all_kb_infos[kb_id]["name"]] = kb_id
+            kbs_rev_maps[all_kb_infos[kb_id]['name']] = kb_id
         return kbs_rev_maps
     finally:
         if connections.has_connection(alias):

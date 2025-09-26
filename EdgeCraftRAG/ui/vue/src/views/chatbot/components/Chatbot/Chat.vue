@@ -9,22 +9,14 @@
               ref="messageRef"
               :inResponse
               :think="isThink"
+              :message-Index="index"
+              :last-query="isLastQuery(index)"
+              :last-response="isLastResponse(index)"
               @preview="handleImagePreview"
               @stop="isUserScrolling = true"
+              @regenerate="handleRegenerate"
+              @resend="handleDelete"
             />
-          </div>
-          <div class="error-tip" v-if="messageError.visible">
-            <div>
-              <SvgIcon
-                name="icon-chatbot1"
-                :size="20"
-                :style="{
-                  color: 'var(--color-second-warning)',
-                }"
-              />
-              <span class="ml-10"> {{ messageError.msg }}</span>
-            </div>
-            <CloseOutlined class="close-btn" @click="handleCloseMsg" />
           </div>
         </div>
       </div>
@@ -110,27 +102,21 @@
 </template>
 
 <script lang="ts" setup name="Chatbot">
-import { getBenchmark } from "@/api/chatbot";
+import { getBenchmark, requestStopChat } from "@/api/chatbot";
 import lightBulb from "@/assets/svgs/lightBulb.svg";
 import _ from "lodash";
 import { reactive, ref, computed, nextTick } from "vue";
 import { Benchmark, IMessage } from "../../type";
 import MessageItem from "./MessageItem.vue";
 import { handleMessageSend } from "./SseService";
-import { pipelineAppStore } from "@/store/pipeline";
 import { Local } from "@/utils/storage";
 import { ArrowDownOutlined, CloseOutlined } from "@ant-design/icons-vue";
 import { throttle } from "lodash";
 import { chatbotAppStore } from "@/store/chatbot";
 
-const STATUS = {
-  SUCCESS: "200",
-  ERROR: "500",
-};
 const chatbotStore = chatbotAppStore();
 const emit = defineEmits(["config"]);
 const ENV_URL = import.meta.env;
-const pipelineStore = pipelineAppStore();
 const defaultBenchmark = reactive<Benchmark>({
   generator: "",
   postprocessor: "",
@@ -151,10 +137,6 @@ const showScrollToBottomBtn = ref(false);
 const resizeObserverRef = ref<ResizeObserver | null>(null);
 const isThink = ref<boolean>(true);
 const enableKB = ref<boolean>(true);
-let messageError = reactive<EmptyObjectType>({
-  visible: false,
-  msg: "",
-});
 
 const inputRef = ref();
 const handleEnvUrl = () => {
@@ -169,13 +151,12 @@ const handleMessageDisplay = (data: any) => {
     const regex = /code:0000(.*)/s;
     const match = data.match(regex);
     if (match) {
-      Object.assign(messageError, { visible: true, msg: match[1].trim() });
       messagesList.value.pop();
-      setTimeout(() => {
-        Object.assign(messageError, { visible: false, msg: "" });
-      }, 10 * 1000);
+      messagesList.value[messagesList.value?.length - 1].errorMessage =
+        match[1].trim();
       return;
     }
+
     messagesList.value[messagesList.value?.length - 1].content = data;
   }
 };
@@ -185,6 +166,26 @@ const notInput = computed(() => {
 const messagesLength = computed(() => {
   return messagesList.value?.length;
 });
+const lastQueryIndex = computed(() => {
+  for (let i = messagesList.value.length - 1; i >= 0; i--) {
+    if (messagesList.value[i].role === "user") {
+      return i;
+    }
+  }
+  return -1;
+});
+
+const lastResponseIndex = computed(() => {
+  for (let i = messagesList.value.length - 1; i >= 0; i--) {
+    if (messagesList.value[i].role === "assistant") {
+      return i;
+    }
+  }
+  return -1;
+});
+const isLastQuery = (index: number) => index === lastQueryIndex.value;
+const isLastResponse = (index: number) => index === lastResponseIndex.value;
+
 const handleStreamEnd = () => {
   handleStopDisplay();
   queryBenchmark();
@@ -200,9 +201,6 @@ const toggleConnection = () => {
   }
 };
 
-const handleCloseMsg = () => {
-  Object.assign(messageError, { visible: false, msg: "" });
-};
 // Format parameter
 const formatFormParam = () => {
   const { configuration = {} } = Local.get("chatbotConfiguration") || {};
@@ -228,6 +226,7 @@ const handleSendMessage = async () => {
     {
       role: "assistant",
       content: "",
+      query: inputKeywords.value,
       benchmark: _.cloneDeep(defaultBenchmark),
     }
   );
@@ -296,6 +295,17 @@ const handleKBChange = () => {
 };
 const handleConfig = () => {
   emit("config");
+};
+const handleRegenerate = (query: string) => {
+  inputKeywords.value = query;
+
+  handleSendMessage();
+};
+const handleDelete = ({ index, query }: { index: number; query: string }) => {
+  messagesList.value.splice(index);
+  inputKeywords.value = query;
+
+  handleSendMessage();
 };
 
 const scrollToBottom = () => {
@@ -570,12 +580,16 @@ onBeforeUnmount(() => {
     border-radius: 0 4px 4px 0;
     margin-bottom: 12px;
     font-size: 12px;
+    .flex-between;
     &:hover {
       .card-shadow;
     }
-    .flex-left;
+    .message-wrap {
+      flex: 1;
+    }
     .close-btn {
       cursor: pointer;
+      text-align: end;
       &:hover {
         color: var(--color-error);
       }

@@ -3,8 +3,7 @@
 
 import asyncio
 import json
-import os
-import re
+import os, re
 import weakref
 from concurrent.futures import ThreadPoolExecutor
 
@@ -13,21 +12,16 @@ from edgecraftrag.api_schema import MilvusConnectRequest, PipelineCreateIn
 from edgecraftrag.base import IndexerType, InferenceType, ModelType, NodeParserType, PostProcessorType, RetrieverType
 from edgecraftrag.components.benchmark import Benchmark
 from edgecraftrag.components.generator import QnAGenerator
-from edgecraftrag.components.indexer import KBADMINIndexer, VectorIndexer
+from edgecraftrag.components.indexer import VectorIndexer, KBADMINIndexer
 from edgecraftrag.components.node_parser import (
     HierarchyNodeParser,
-    KBADMINParser,
     SimpleNodeParser,
     SWindowNodeParser,
     UnstructedNodeParser,
+    KBADMINParser
 )
 from edgecraftrag.components.postprocessor import MetadataReplaceProcessor, RerankProcessor
-from edgecraftrag.components.retriever import (
-    AutoMergeRetriever,
-    KBadminRetriever,
-    SimpleBM25Retriever,
-    VectorSimRetriever,
-)
+from edgecraftrag.components.retriever import AutoMergeRetriever, SimpleBM25Retriever, VectorSimRetriever, KBadminRetriever
 from edgecraftrag.context import ctx
 from fastapi import FastAPI, File, HTTPException, UploadFile, status
 from pymilvus import connections
@@ -78,10 +72,7 @@ async def get_pipeline_benchmarks(name):
 async def add_pipeline(request: PipelineCreateIn):
     pattern = re.compile(r"^[a-zA-Z0-9_]+$")
     if not pattern.fullmatch(request.name):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Pipeline name must consist of letters, numbers, and underscores.",
-        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Pipeline name must consist of letters, numbers, and underscores.")
     return load_pipeline(request)
 
 
@@ -180,10 +171,6 @@ def update_pipeline_handler(pl, req):
                     pl.node_parser = KBADMINParser()
             ctx.get_node_parser_mgr().add(pl.node_parser)
 
-            all_docs = ctx.get_file_mgr().get_all_docs()
-            nodelist = pl.node_parser.run(docs=all_docs)
-            if nodelist is not None and len(nodelist) > 0:
-                ctx.get_node_mgr().add_nodes(pl.node_parser.idx, nodelist)
             pl._node_changed = True
 
     if req.indexer is not None:
@@ -208,9 +195,7 @@ def update_pipeline_handler(pl, req):
                     kbadmin_embedding_url = ind.embedding_url
                     KBADMIN_VECTOR_URL = ind.vector_url
                     embed_model = ind.embedding_model.model_id
-                    pl.indexer = KBADMINIndexer(
-                        embed_model, ind.indexer_type, kbadmin_embedding_url, KBADMIN_VECTOR_URL
-                    )
+                    pl.indexer =  KBADMINIndexer(embed_model, ind.indexer_type, kbadmin_embedding_url, KBADMIN_VECTOR_URL)
                 case _:
                     pass
             ctx.get_indexer_mgr().add(pl.indexer)
@@ -241,7 +226,7 @@ def update_pipeline_handler(pl, req):
                 else:
                     return Exception("No indexer")
             case RetrieverType.KBADMIN_RETRIEVER:
-                pl.retriever = KBadminRetriever(pl.indexer, similarity_top_k=retr.retrieve_topk)
+                    pl.retriever = KBadminRetriever(pl.indexer, similarity_top_k=retr.retrieve_topk)
             case _:
                 pass
         # Index is updated to retriever
@@ -374,3 +359,4 @@ async def check_milvus(request: MilvusConnectRequest):
             return {"status": "404", "message": "Milvus connection failed."}
     except Exception as e:
         return {"status": "404", "message": f"connection failed: {str(e)}"}
+

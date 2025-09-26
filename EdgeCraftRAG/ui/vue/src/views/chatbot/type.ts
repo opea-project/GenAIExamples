@@ -9,6 +9,8 @@ export interface Benchmark {
 export interface IMessage {
   role: string;
   content: string;
+  query?: string;
+  errorMessage?: string;
   benchmark?: Benchmark | undefined;
 }
 export interface ThinkType {

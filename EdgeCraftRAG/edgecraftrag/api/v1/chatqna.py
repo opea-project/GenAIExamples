@@ -38,7 +38,7 @@ async def chatqna(request: ChatCompletionRequest):
         active_kb = ctx.knowledgemgr.get_active_knowledge_base()
         request.user = active_kb if active_kb else None
         if experience_kb:
-            request.tool_choice = "auto" if experience_kb.experience_active else "none"
+            request.tool_choice = 'auto' if experience_kb.experience_active else 'none'
         generator = ctx.get_pipeline_mgr().get_active_pipeline().generator
         if generator:
             request.model = generator.model_id
@@ -62,7 +62,7 @@ async def ragqna(request: ChatCompletionRequest):
         active_kb = ctx.knowledgemgr.get_active_knowledge_base()
         request.user = active_kb if active_kb else None
         if experience_kb:
-            request.tool_choice = "auto" if experience_kb.experience_active else "none"
+            request.tool_choice = 'auto' if experience_kb.experience_active else 'none'
         generator = ctx.get_pipeline_mgr().get_active_pipeline().generator
         if generator:
             request.model = generator.model_id
