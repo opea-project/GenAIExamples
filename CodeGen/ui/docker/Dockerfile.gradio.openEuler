@@ -1,7 +1,7 @@
 # Copyright (C) 2025 Huawei Technologies Co., Ltd.
 # SPDX-License-Identifier: Apache-2.0
 
-FROM openeuler/python:3.11.13-oe2403lts
+openeuler/python:3.11.13-oe2403lts@sha256:472759fb1852f35c9c0be20ff931aba6fbac1487175a0e46d6a73b6f6c33dd3c
 
 ENV LANG=C.UTF-8
 
@@ -24,7 +24,7 @@ RUN mkdir -p /home/user
 COPY gradio /home/user/gradio
 
 RUN pip install --no-cache-dir --upgrade pip setuptools && \
-pip install --no-cache-dir -r /home/user/gradio/requirements.txt
+    pip install --no-cache-dir --require-hashes -r /home/user/gradio/requirements.txt
 
 WORKDIR /home/user/gradio
 ENTRYPOINT ["python", "codegen_ui_gradio.py"]
