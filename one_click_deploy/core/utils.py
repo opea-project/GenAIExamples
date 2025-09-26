@@ -377,28 +377,52 @@ def stop_all_kubectl_port_forwards():
 
 
 def get_var_from_shell_script(script_path: pathlib.Path, var_name: str) -> str | None:
+    """Gets the value of an environment variable by executing a shell script.
+
+    This method is robust as it handles scripts with functions, sourcing other files,
+    and conditional logic. It executes the script in a non-interactive mode.
+
+    Args:
+        script_path: The absolute path to the shell script.
+        var_name: The name of the environment variable to retrieve.
+
+    Returns:
+        The value of the variable as a string, or None if not found or on error.
+    """
     if not script_path or not script_path.exists():
         log_message("DEBUG", f"Source script for variable extraction not found: {script_path}")
         return None
-    assignment_pattern = re.compile(rf"^\s*(?:export\s+)?{re.escape(var_name)}\s*=\s*(.*)")
-    self_ref_pattern = re.compile(r"^\s*(\$\{?" + re.escape(var_name) + r"\}?\,?)")
+
+    command_string = f"NON_INTERACTIVE=true; " f'source "{script_path.resolve()}" > /dev/null; ' f'echo "${var_name}"'
     try:
-        lines = script_path.read_text().splitlines()
-        for line in reversed(lines):
-            match = assignment_pattern.match(line)
-            if match:
-                value = match.group(1).strip()
-                value = value.split("#", 1)[0].strip()
-                if (value.startswith('"') and value.endswith('"')) or (value.startswith("'") and value.endswith("'")):
-                    value = value[1:-1]
-                value = self_ref_pattern.sub("", value).strip()
-                value = value.lstrip(",")
-                log_message("DEBUG", f"Extracted and cleaned value for '{var_name}': {value}")
-                return value
-        log_message("DEBUG", f"Variable '{var_name}' not found in {script_path}.")
-        return None
+        result = run_command(
+            ["bash", "-c", command_string],
+            cwd=script_path.parent,
+            capture_output=True,
+            check=False,
+            display_cmd=False,
+        )
+
+        if result.returncode != 0:
+            log_message(
+                "WARN",
+                f"Execution of '{script_path.name}' failed when trying to get var '{var_name}'. Stderr: {result.stderr.strip()}",
+            )
+            return None
+
+        value = result.stdout.strip()
+
+        if value:
+            log_message("DEBUG", f"Extracted value for '{var_name}' from '{script_path.name}': {value}")
+            return value
+        else:
+            log_message("DEBUG", f"Variable '{var_name}' was not set or is empty in '{script_path.name}'.")
+            return None
+
     except Exception as e:
-        log_message("WARN", f"Failed to parse variable '{var_name}' from {script_path}: {e}")
+        log_message(
+            "WARN", f"An unexpected error occurred while executing {script_path.name} to get var '{var_name}': {e}"
+        )
         return None
 
 
