@@ -31,17 +31,10 @@ jobs:
       run_matrix: ${{ steps.get-matrix.outputs.run_matrix }}
     steps:
       - name: Checkout out Repo
-<<<<<<< HEAD
         uses: actions/checkout@1e31de5234b9f8995739874a8ce0492dc87873e2
 
       - name: Checkout GenAIComps Repository
         uses: actions/checkout@1e31de5234b9f8995739874a8ce0492dc87873e2
-=======
-        uses: actions/checkout@sha256:1e31de5234b9f8995739874a8ce0492dc87873e2
-
-      - name: Checkout GenAIComps Repository
-        uses: actions/checkout@sha256:1e31de5234b9f8995739874a8ce0492dc87873e2
->>>>>>> c7043a46317d46c39a90b9ad3efb18a91ac7f376
         with:
           repository: opea-project/GenAIComps
           path: GenAIComps
@@ -52,7 +45,7 @@ jobs:
           image_list=[]
           run_matrix="{\"include\":["
           if [[ ! -z "${{ inputs.examples }}" ]]; then
-              pip install yq
+              pip install yq==3.4.3
               examples=($(echo ${{ inputs.examples }} | tr ',' ' '))
               for example in ${examples[@]}
               do

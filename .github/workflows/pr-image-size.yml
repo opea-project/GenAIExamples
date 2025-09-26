@@ -23,7 +23,7 @@ jobs:
       files: ${{ steps.changed-dockerfiles.outputs.files }}
     steps:
       - name: Checkout PR branch
-        uses: actions/checkout@v4
+        uses: actions/checkout@1e31de5234b9f8995739874a8ce0492dc87873e2
         with:
           fetch-depth: 0
 
@@ -50,12 +50,12 @@ jobs:
       skip: ${{ steps.build-check.outputs.skip }}
     steps:
       - name: Checkout PR branch
-        uses: actions/checkout@v4
+        uses: actions/checkout@1e31de5234b9f8995739874a8ce0492dc87873e2
         with:
           fetch-depth: 0
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@d70bba72b1f3fd22344832f00baa16ece964efeb
 
       - name: Build and check image sizes
         id: build-check
@@ -159,7 +159,7 @@ jobs:
       all_comments: ${{ steps.summary.outputs.all_comments }}
     steps:
       - name: Download Summary
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@7a1cd3216ca9260cd8022db641d960b1db4d1be4
         with:
           name: build-comments
           path: downloaded-files
