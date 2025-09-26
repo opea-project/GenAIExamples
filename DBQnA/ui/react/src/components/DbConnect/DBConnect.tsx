@@ -42,8 +42,15 @@ const DBConnect: React.FC = () => {
     e.preventDefault();
     try {
       let api_response: Record<string, any>;
-      let unifiedConnData = {"conn_str":formData};
-      api_response = await axios.post(`${TEXT_TO_SQL_URL}/postgres/health`, unifiedConnData);
+      let connUrl = `postgresql://${formData.user}:${formData.password}@${formData.host}:${formData.port}/${formData.database}`;
+      let unifiedConnData = {
+        conn_type: "sql",
+        conn_url: connUrl,
+        conn_user: formData.user,
+        conn_password: formData.password,
+        conn_dialect: "postgresql",
+      };
+      api_response = await axios.post(`${TEXT_TO_SQL_URL}/db/health`, unifiedConnData);
 
       setSqlStatus(null);
       setSqlError(null);
@@ -74,13 +81,18 @@ const DBConnect: React.FC = () => {
     e.preventDefault();
     setIsLoading(true);
     try {
+      const connUrl = `postgresql://${formData.user}:${formData.password}@${formData.host}:${formData.port}/${formData.database}`;
       const payload = {
-        input_text: question,
-        conn_str: formData,
+        query: question,
+        conn_type: "sql",
+        conn_url: connUrl,
+        conn_user: formData.user,
+        conn_password: formData.password,
+        conn_dialect: "postgresql",
       };
 
       let api_response: Record<string, any>;
-      api_response = await axios.post(`${TEXT_TO_SQL_URL}/text2sql`, payload);
+      api_response = await axios.post(`${TEXT_TO_SQL_URL}/text2query`, payload);
 
       setSqlQuery(api_response.data.result.sql); // Assuming the API returns an SQL query
       setQueryOutput(api_response.data.result.output);
