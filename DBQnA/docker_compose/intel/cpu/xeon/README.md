@@ -9,13 +9,17 @@ This document outlines the deployment process for DBQnA application which helps 
 
 This section describes how to quickly deploy and test the DBQnA service manually on Intel® Xeon® platform. The basic steps are:
 
-1. [Access the Code](#access-the-code)
-2. [Generate a HuggingFace Access Token](#generate-a-huggingface-access-token)
-3. [Configure the Deployment Environment](#configure-the-deployment-environment)
-4. [Deploy the Service Using Docker Compose](#deploy-the-service-using-docker-compose)
-5. [Check the Deployment Status](#check-the-deployment-status)
-6. [Test the Pipeline](#test-the-pipeline)
-7. [Cleanup the Deployment](#cleanup-the-deployment)
+- [Example DBQnA Deployment on Intel® Xeon® Platform](#example-dbqna-deployment-on-intel-xeon-platform)
+  - [DBQnA Quick Start Deployment](#dbqna-quick-start-deployment)
+    - [Access the Code](#access-the-code)
+    - [Generate a HuggingFace Access Token](#generate-a-huggingface-access-token)
+    - [Configure the Deployment Environment](#configure-the-deployment-environment)
+    - [Deploy the Service Using Docker Compose](#deploy-the-service-using-docker-compose)
+    - [Check the Deployment Status](#check-the-deployment-status)
+    - [Test the Pipeline](#test-the-pipeline)
+    - [Cleanup the Deployment](#cleanup-the-deployment)
+  - [DBQnA Docker Compose Files](#dbqna-docker-compose-files)
+  - [DBQnA Service Configuration](#dbqna-service-configuration)
 
 ### Access the Code
 
@@ -80,7 +84,7 @@ CONTAINER ID   IMAGE                                                            
 2728db31368b   opea/text2sql-react-ui:latest                                                               "nginx -g 'daemon of…"   9 minutes ago   Up 9 minutes   0.0.0.0:5174->80/tcp, :::5174->80/tcp       dbqna-xeon-react-ui-server
 0ab75b92c300   postgres:latest                                                                             "docker-entrypoint.s…"   9 minutes ago   Up 9 minutes   0.0.0.0:5442->5432/tcp, :::5442->5432/tcp   postgres-container
 2662a69b515b   ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu                               "text-generation-lau…"   9 minutes ago   Up 9 minutes   0.0.0.0:8008->80/tcp, :::8008->80/tcp       tgi-service
-bb44512be80e   opea/text2sql:latest                                                                        "python opea_text2sq…"   9 minutes ago   Up 9 minutes   0.0.0.0:9090->8080/tcp, :::9090->8080/tcp   text2sql-service
+bb44512be80e   opea/text2query-sql:latest                                                                  "python opea_text2sq…"   9 minutes ago   Up 9 minutes   0.0.0.0:9090->8080/tcp, :::9090->8080/tcp   text2sql-service
 ```
 
 ### Test the Pipeline
@@ -88,10 +92,11 @@ bb44512be80e   opea/text2sql:latest                                             
 Once the DBQnA service are running, test the pipeline using the following command:
 
 ```bash
-curl http://${host_ip}:9090/v1/text2sql\
+url="postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${host_ip}:5442/${POSTGRES_DB}"
+curl --connect-timeout 5 --max-time 120000 http://${host_ip}:9090/v1/text2query\
     -X POST \
-    -d '{"input_text": "Find the total number of Albums.","conn_str": {"user": "'${POSTGRES_USER}'","password": "'${POSTGRES_PASSWORD}'","host": "'${host_ip}'", "port": "5442", "database": "'${POSTGRES_DB}'"}}' \
-    -H 'Content-Type: application/json'
+    -d '{"query": "Find the total number of Albums.","conn_type": "sql", "conn_url": "'${url}'", "conn_user": "'${POSTGRES_USER}'","conn_password": "'${POSTGRES_PASSWORD}'","conn_dialect": "postgresql" }' \
+    -H 'Content-Type: application/json')
 ```
 
 ### Cleanup the Deployment
@@ -121,7 +126,7 @@ The compose.yaml is default compose file using tgi as serving framework
 | -------------------------- | ------------------------------------------------------------- |
 | tgi-service                | ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu |
 | postgres                   | postgres:latest                                               |
-| text2sql                   | opea/text2sql:latest                                          |
+| text2sql                   | opea/text2query-sql:latest                                    |
 | dbqna-xeon-react-ui-server | opea/text2sql-react-ui:latest                                 |
 
 ## DBQnA Service Configuration
@@ -132,5 +137,5 @@ The table provides a comprehensive overview of the DBQnA service utilized across
 | -------------------------- | ------------------------------------------------------------- | -------- | --------------------------------------------------------------------------------------------------- |
 | tgi-service                | ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu | No       | Specific to the TGI deployment, focuses on text generation inference using AMD GPU (ROCm) hardware. |
 | postgres                   | postgres:latest                                               | No       | Provides the relational database backend for storing and querying data used by the DBQnA pipeline.  |
-| text2sql                   | opea/text2sql:latest                                          | No       | Handles text-to-SQL conversion tasks.                                                               |
+| text2sql                   | opea/text2query-sql:latest                                    | No       | Handles text-to-SQL conversion tasks.                                                               |
 | dbqna-xeon-react-ui-server | opea/text2sql-react-ui:latest                                 | No       | Provides the user interface for the DBQnA service.                                                  |

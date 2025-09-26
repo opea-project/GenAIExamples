@@ -31,12 +31,16 @@ services:
       - ./chinook.sql:/docker-entrypoint-initdb.d/chinook.sql
 
   text2sql-service:
-    image: ${REGISTRY:-opea}/text2sql:${TAG:-latest}
+    image: ${REGISTRY:-opea}/text2query-sql:${TAG:-latest}
     container_name: text2sql-service
     ports:
-      - "${TEXT2SQL_PORT}:8080"
+      - "${TEXT2SQL_PORT}:9097"
     environment:
       - TGI_LLM_ENDPOINT=${TGI_LLM_ENDPOINT}
+      - TEXT2QUERY_COMPONENT_NAME=OPEA_TEXT2QUERY_SQL
+    depends_on:
+      - tgi-service
+      - postgres
 
   dbqna-xeon-react-ui-server:
     image: ${REGISTRY:-opea}/text2sql-react-ui:${TAG:-latest}

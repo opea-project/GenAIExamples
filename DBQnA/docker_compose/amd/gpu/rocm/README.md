@@ -9,13 +9,17 @@ This document outlines the deployment process for DBQnA application which helps 
 
 This section describes how to quickly deploy and test the DBQnA service manually on AMD GPU (ROCm). The basic steps are:
 
-1. [Access the Code](#access-the-code)
-2. [Generate a HuggingFace Access Token](#generate-a-huggingface-access-token)
-3. [Configure the Deployment Environment](#configure-the-deployment-environment)
-4. [Deploy the Service Using Docker Compose](#deploy-the-service-using-docker-compose)
-5. [Check the Deployment Status](#check-the-deployment-status)
-6. [Test the Pipeline](#test-the-pipeline)
-7. [Cleanup the Deployment](#cleanup-the-deployment)
+- [Example DBQnA Deployment on AMD GPU (ROCm)](#example-dbqna-deployment-on-amd-gpu-rocm)
+  - [DBQnA Quick Start Deployment](#dbqna-quick-start-deployment)
+    - [Access the Code](#access-the-code)
+    - [Generate a HuggingFace Access Token](#generate-a-huggingface-access-token)
+    - [Configure the Deployment Environment](#configure-the-deployment-environment)
+    - [Deploy the Service Using Docker Compose](#deploy-the-service-using-docker-compose)
+    - [Check the Deployment Status](#check-the-deployment-status)
+    - [Test the Pipeline](#test-the-pipeline)
+    - [Cleanup the Deployment](#cleanup-the-deployment)
+  - [DBQnA Docker Compose Files](#dbqna-docker-compose-files)
+  - [DBQnA Service Configuration for AMD GPUs](#dbqna-service-configuration-for-amd-gpus)
 
 ### Access the Code
 
@@ -73,10 +77,11 @@ For the default deployment, the following 4 containers should be running.
 Once the DBQnA service are running, test the pipeline using the following command:
 
 ```bash
-curl http://${host_ip}:${DBQNA_TEXT_TO_SQL_PORT}/v1/texttosql \
+url="postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${host_ip}:5442/${POSTGRES_DB}"
+curl --connect-timeout 5 --max-time 120000 http://${host_ip}:9090/v1/text2query\
     -X POST \
-    -d '{"input_text": "Find the total number of Albums.","conn_str": {"user": "'${POSTGRES_USER}'","password": "'${POSTGRES_PASSWORD}'","host": "'${host_ip}'", "port": "5442", "database": "'${POSTGRES_DB}'"}}' \
-    -H 'Content-Type: application/json'
+    -d '{"query": "Find the total number of Albums.","conn_type": "sql", "conn_url": "'${url}'", "conn_user": "'${POSTGRES_USER}'","conn_password": "'${POSTGRES_PASSWORD}'","conn_dialect": "postgresql" }' \
+    -H 'Content-Type: application/json')
 ```
 
 ### Cleanup the Deployment
@@ -97,7 +102,7 @@ The compose.yaml is default compose file using tgi as serving framework
 | ----------------- | -------------------------------------------------------- |
 | dbqna-tgi-service | ghcr.io/huggingface/text-generation-inference:2.4.1-rocm |
 | postgres          | postgres:latest                                          |
-| text2sql          | opea/text2sql:latest                                     |
+| text2sql          | opea/text2query-sql:latest                               |
 | text2sql-react-ui | opea/text2sql-react-ui:latest                            |
 
 ## DBQnA Service Configuration for AMD GPUs
@@ -108,5 +113,5 @@ The table provides a comprehensive overview of the DBQnA service utilized across
 | ----------------- | -------------------------------------------------------- | -------- | --------------------------------------------------------------------------------------------------- |
 | dbqna-tgi-service | ghcr.io/huggingface/text-generation-inference:2.4.1-rocm | No       | Specific to the TGI deployment, focuses on text generation inference using AMD GPU (ROCm) hardware. |
 | postgres          | postgres:latest                                          | No       | Provides the relational database backend for storing and querying data used by the DBQnA pipeline.  |
-| text2sql          | opea/text2sql:latest                                     | No       | Handles text-to-SQL conversion tasks.                                                               |
+| text2sql          | opea/text2query-sql:latest                               | No       | Handles text-to-SQL conversion tasks.                                                               |
 | text2sql-react-ui | opea/text2sql-react-ui:latest                            | No       | Provides the user interface for the DBQnA service.                                                  |
