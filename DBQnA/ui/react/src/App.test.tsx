@@ -43,6 +43,6 @@ test('testing api with dynamic host', async () => {
   expect(result.hasOwnProperty('sql')).toBe(true);
   expect(result.hasOwnProperty('output')).toBe(true);
   expect(result.hasOwnProperty('input')).toBe(true);
-  expect(result.input.input_text).toBe(question);
+  expect(result.input.query).toBe(question);
 
 }, apiTimeOutInSeconds * 1000);
