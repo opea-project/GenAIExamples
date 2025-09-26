@@ -42,7 +42,7 @@ jobs:
           echo "EOF" >> $GITHUB_ENV
 
       - name: Create Issue
-        uses: dacbd/create-issue-action@sha256:fec641442c0897e734fad173cfe83ae21a2284a3
+        uses: dacbd/create-issue-action@fec641442c0897e734fad173cfe83ae21a2284a3
         with:
           token: ${{ secrets.ACTION_TOKEN }}
           owner: opea-project

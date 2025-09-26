@@ -56,7 +56,7 @@ jobs:
 
       - name: Checkout out Repo
         if: ${{ inputs.deploy_method == 'docker' }}
-        uses: actions/checkout@sha256:1e31de5234b9f8995739874a8ce0492dc87873e2
+        uses: actions/checkout@1e31de5234b9f8995739874a8ce0492dc87873e2
         with:
           fetch-depth: 0
 
@@ -90,7 +90,7 @@ jobs:
 
       - name: Checkout out Repo
         if: ${{ inputs.deploy_method == 'k8s' }}
-        uses: actions/checkout@sha256:1e31de5234b9f8995739874a8ce0492dc87873e2
+        uses: actions/checkout@1e31de5234b9f8995739874a8ce0492dc87873e2
         with:
           fetch-depth: 0
 
@@ -208,7 +208,7 @@ jobs:
 
       - name: Publish pipeline artifact
         if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@sha256:c7d193f32edcb7bfad88892161225aeda64e9392
+        uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392
         with:
           name: ${{ inputs.deploy_method }}
           path: ${{ github.workspace }}/${{ inputs.deploy_method }}-tests/test-results.log
