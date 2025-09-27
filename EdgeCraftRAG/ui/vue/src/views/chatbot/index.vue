@@ -3,7 +3,7 @@
     <a-layout class="content-container">
       <a-layout-sider :width="currentMenu === 'knowledge' ? 240 : 0">
         <KnowledgeBase
-          @view="handleViewKBDetial"
+          @view="handleViewKBDetail"
           v-if="currentMenu === 'knowledge'"
         />
       </a-layout-sider>
@@ -12,7 +12,7 @@
           <component
             :is="currentComponent"
             class="body-wrap"
-            :kb-name="kbName"
+            :kb-info="kbInfo"
             @back="handleBack"
           />
         </keep-alive>
@@ -23,13 +23,13 @@
 
 <script lang="ts" setup name="Chatbot">
 import { onMounted, computed } from "vue";
-import { Chatbot, KnowledgeDetial, KnowledgeBase } from "./components";
+import { Chatbot, DetailComponent, KnowledgeBase } from "./components";
 
 const route = useRoute();
 
 const currentMenu = ref<string>("chat");
 const currentPage = ref<string>("chat");
-const kbName = ref<string>("");
+let kbInfo = reactive<EmptyObjectType>({});
 
 const componentList = ref<EmptyArrayType>([
   {
@@ -42,7 +42,7 @@ const componentList = ref<EmptyArrayType>([
     label: "knowledge.title",
     id: "knowledge",
     icon: "icon-knowledge",
-    component: markRaw(KnowledgeDetial),
+    component: markRaw(DetailComponent),
   },
 ]);
 
@@ -51,9 +51,10 @@ const currentComponent = computed(() => {
     ?.component;
 });
 
-const handleViewKBDetial = (name: string) => {
-  kbName.value = name;
-  if (kbName.value) currentPage.value = "knowledge";
+const handleViewKBDetail = (row: EmptyObjectType) => {
+  Object.assign(kbInfo, row);
+
+  if (kbInfo.name) currentPage.value = "knowledge";
   else currentPage.value = "chat";
 };
 const handleBack = () => {
@@ -71,7 +72,6 @@ watch(
   },
   { immediate: true, deep: true }
 );
-onMounted(() => {});
 </script>
 
 <style scoped lang="less">

@@ -1,28 +1,10 @@
 <template>
-  <div class="kb-detial-container">
-    <div class="header-wrap">
-      <div class="info-wrap">
-        <div class="name-wrap">{{ knowledgeData.name }}</div>
-        <div class="des-wrap" v-if="knowledgeData.description">
-          {{ knowledgeData.description }}
-        </div>
-      </div>
-      <div class="button-wrap">
-        <a-button
-          type="primary"
-          ghost
-          :icon="h(RollbackOutlined)"
-          @click="handleBack"
-          >{{ $t("common.back") }}</a-button
-        >
-      </div>
-    </div>
+  <div>
     <div class="upload-wrap">
       <a-upload-dragger
         v-model:file-list="uploadFileList"
         name="file"
         multiple
-        :max-count="20"
         :showUploadList="false"
         :action="uploadFileApi"
         accept=".csv,.doc,.docx,.enex,.epub,.html,.md,.odt,.pdf,.ppt,.pptx,.txt,"
@@ -42,7 +24,6 @@
         </div>
       </a-upload-dragger>
     </div>
-
     <a-empty v-if="notFile" :description="$t('knowledge.notFileTip')" />
     <div class="files-container" v-else>
       <a-row type="flex" wrap :gutter="[20, 20]">
@@ -78,11 +59,11 @@
   </div>
 </template>
 
-<script setup lang="ts" name="KnowledgeBaseDetial">
-import { ref, reactive, createVNode, h } from "vue";
+<script setup lang="ts" name="KnowledgeBaseDetail">
+import { ref, reactive, createVNode, inject, onMounted } from "vue";
 import {
   requestKnowledgeBaseRelation,
-  getKnowledgeBaseDetialByName,
+  getKnowledgeBaseDetailByName,
   requestFileDelete,
   uploadFileUrl,
 } from "@/api/knowledgeBase";
@@ -90,7 +71,6 @@ import { useNotification } from "@/utils/common";
 import {
   CloseCircleFilled,
   DeleteFilled,
-  RollbackOutlined,
   FileDoneOutlined,
 } from "@ant-design/icons-vue";
 import { message, Modal, UploadFile, UploadProps } from "ant-design-vue";
@@ -98,15 +78,11 @@ import { useI18n } from "vue-i18n";
 import { NextLoading } from "@/utils/loading";
 import eventBus from "@/utils/mitt";
 
-const props = defineProps({
-  kbName: {
-    type: String,
-    default: "",
-  },
-});
-
+interface KbType {
+  name: string;
+}
 const { t } = useI18n();
-const emit = defineEmits(["back"]);
+const kbInfo = inject<KbType>("kbInfo");
 const { antNotification } = useNotification();
 const uploadFileList = ref([]);
 const knowledgeData = reactive<EmptyObjectType>({});
@@ -118,8 +94,8 @@ const uploadFileApi = computed(() => {
   return uploadFileUrl + knowledgeData.name;
 });
 
-const queryKnowledgeBaseDetial = async () => {
-  const data: any = await getKnowledgeBaseDetialByName(props.kbName);
+const queryKnowledgeBaseDetail = async () => {
+  const data: any = await getKnowledgeBaseDetailByName(kbInfo?.name!);
   Object.assign(knowledgeData, data);
 };
 const handleBeforeUpload = (file: UploadProps["fileList"][number]) => {
@@ -127,11 +103,12 @@ const handleBeforeUpload = (file: UploadProps["fileList"][number]) => {
 
   if (!isFileSize) {
     message.error(t("knowledge.uploadValid"));
+    return;
   }
 
   return isFileSize;
 };
-const handleChange = ({
+const handleChange = async ({
   fileList,
   file,
 }: {
@@ -144,7 +121,7 @@ const handleChange = ({
   const { name } = knowledgeData;
   try {
     if (status === "done") {
-      requestKnowledgeBaseRelation(name, {
+      await requestKnowledgeBaseRelation(name, {
         local_path: response,
       });
       handleSuccess(file);
@@ -157,7 +134,7 @@ const handleChange = ({
     if (isAllEnd) {
       NextLoading.done();
       setTimeout(() => {
-        queryKnowledgeBaseDetial();
+        queryKnowledgeBaseDetail();
         handleRefresh();
       }, 100);
     }
@@ -181,122 +158,75 @@ const handleFileDelete = (local_path: string) => {
     async onOk() {
       const { name } = knowledgeData;
       await requestFileDelete(name, { local_path });
-      queryKnowledgeBaseDetial();
+      queryKnowledgeBaseDetail();
       handleRefresh();
     },
   });
 };
 
-const handleBack = () => {
-  emit("back");
-  eventBus.emit("reset");
-};
 const handleRefresh = () => {
   eventBus.emit("refresh");
 };
 
-watch(
-  () => props.kbName,
-  (kbName) => {
-    if (kbName) queryKnowledgeBaseDetial();
-  },
-  { immediate: true, deep: true }
-);
+onMounted(() => {
+  queryKnowledgeBaseDetail();
+});
 </script>
 
 <style lang="less" scoped>
-.kb-detial-container {
-  display: block !important;
-  .flex-column;
-  .header-wrap {
-    padding: 0 16px;
-    height: 60px;
-    border-bottom: 1px solid var(--border-main-color);
+.upload-wrap {
+  padding: 16px;
+  :deep(.intel-upload-drag) {
+    background-color: var(--bg-content-color);
+  }
+  .upload-text {
+    color: var(--font-text-color);
+    margin: 8px 0;
+    font-weight: 500;
+    font-size: 16px;
+  }
+  .upload-tip {
+    color: var(--font-tip-color);
+    font-size: 12px;
+    line-height: 1.4;
+    margin-top: 12px;
+  }
+}
+.files-container {
+  flex: 1;
+  width: 100%;
+  padding: 12px 16px;
+  .file-item {
+    padding: 12px;
+    background-color: var(--bg-content-color);
+    border: 1px solid var(--border-main-color);
+    border-radius: 6px;
     .flex-between;
-    gap: 16px;
-    min-width: 0;
-    .info-wrap {
+    &:hover {
+      .card-shadow;
+    }
+    .left-wrap {
       flex: 1;
-      .flex-column;
-      gap: 4px;
       min-width: 0;
-      .name-wrap {
-        font-size: 16px;
-        font-weight: 600;
+      .flex-left;
+      gap: 6px;
+      .file-name {
         flex: 1;
-        min-width: 0;
-        line-height: 16px;
-        .single-ellipsis;
-      }
-      .des-wrap {
-        color: var(--font-info-color);
-        font-size: 12px;
+        color: var(--font-main-color);
         .single-ellipsis;
       }
     }
-    .button-wrap {
-      .vertical-center;
-      gap: 4px;
-    }
-  }
-  .upload-wrap {
-    padding: 16px;
-    :deep(.intel-upload-drag) {
-      background-color: var(--bg-content-color);
-    }
-    .upload-text {
-      color: var(--font-text-color);
-      margin: 8px 0;
-      font-weight: 500;
-      font-size: 16px;
-    }
-    .upload-tip {
-      color: var(--font-tip-color);
-      font-size: 12px;
-      line-height: 1.4;
-      margin-top: 12px;
-    }
-  }
-  .files-container {
-    flex: 1;
-    width: 100%;
-    padding: 12px 16px;
-    .file-item {
-      padding: 12px;
-      background-color: var(--bg-content-color);
-      border: 1px solid var(--border-main-color);
-      border-radius: 6px;
-      .flex-between;
-      &:hover {
-        .card-shadow;
-      }
-      .left-wrap {
-        flex: 1;
-        min-width: 0;
-        .flex-left;
-        gap: 6px;
-        .file-name {
-          flex: 1;
-          color: var(--font-main-color);
-          .single-ellipsis;
-        }
-      }
-      .right-wrap {
-        .delete-icon {
-          color: var(--font-tip-color);
-          &:hover {
-            color: var(--color-error);
-          }
+    .right-wrap {
+      .delete-icon {
+        color: var(--font-tip-color);
+        &:hover {
+          color: var(--color-error);
         }
       }
     }
   }
-  .intel-empty {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-  }
+}
+.intel-empty {
+  margin: 200px auto;
 }
 </style>

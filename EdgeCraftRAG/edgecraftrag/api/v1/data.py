@@ -110,8 +110,6 @@ async def upload_file(file_name: str, file: UploadFile = File(...)):
             )
         os.makedirs(UPLOAD_DIRECTORY, exist_ok=True)
         safe_filename = file.filename
-        # Sanitize the uploaded file's name
-        safe_filename = file.filename
         file_path = os.path.normpath(os.path.join(UPLOAD_DIRECTORY, safe_filename))
         # Ensure file_path is within UPLOAD_DIRECTORY
         if not file_path.startswith(os.path.abspath(UPLOAD_DIRECTORY)):

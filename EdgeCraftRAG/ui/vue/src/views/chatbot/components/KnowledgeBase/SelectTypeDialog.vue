@@ -12,21 +12,17 @@
     class="import-dialog"
   >
     <div class="guide-wrap">
-      <div class="guide-title">{{ $t("quickStart.title") }}</div>
-      <div class="steps-wrap">
-        <a-steps
-          :current="0"
-          :items="steps"
-          labelPlacement="vertical"
-        ></a-steps>
-      </div>
+      <div class="guide-title">{{ $t("knowledge.selectTitle") }}</div>
+      <div class="guide-text">{{ $t("knowledge.selectDes") }}</div>
       <div class="card-wrap">
         <div class="item-wrap">
-          <div class="left-wrap">1</div>
+          <div class="left-wrap">
+            <SvgIcon name="icon-knowledge" inherit :size="32" />
+          </div>
           <div class="right-wrap">
-            <div class="title">{{ $t("quickStart.step1") }}</div>
+            <div class="title">{{ $t("knowledge.title") }}</div>
             <div class="des">
-              {{ $t("quickStart.step1Tip") }}
+              {{ $t("knowledge.kbDes") }}
             </div>
             <a-button
               class="special-button-primary"
@@ -37,12 +33,24 @@
           </div>
         </div>
         <div class="item-wrap">
-          <div class="left-wrap">2</div>
+          <div class="left-wrap">
+            <SvgIcon name="icon-experience" inherit :size="32" />
+          </div>
           <div class="right-wrap">
-            <div class="title">{{ $t("quickStart.step2") }}</div>
+            <div class="title">{{ $t("knowledge.experience") }}</div>
             <div class="des">
-              {{ $t("quickStart.step2Tip") }}
+              {{ $t("knowledge.experienceDes") }}
             </div>
+            <a-button
+              :class="{
+                'special-button-primary': true,
+                'is-disabled': created,
+              }"
+              :icon="h(PlusOutlined)"
+              :disabled="created"
+              @click="handleCreateExperience"
+              >{{ $t("quickStart.create") }}</a-button
+            >
           </div>
         </div>
       </div>
@@ -50,34 +58,29 @@
   </a-modal>
 </template>
 
-<script lang="ts" setup name="QuickStart">
-import { userAppStore } from "@/store/user";
+<script lang="ts" setup name="SelectTypeDialog">
 import { PlusOutlined } from "@ant-design/icons-vue";
-import { computed, h } from "vue";
-import { useI18n } from "vue-i18n";
+import { h } from "vue";
 
-const { t } = useI18n();
-const userGuideStore = userAppStore();
-
-const emit = defineEmits(["create"]);
-const modelVisible = computed(() => {
-  return !userGuideStore.userGuide;
+const props = defineProps({
+  created: {
+    type: Boolean,
+    default: false,
+  },
 });
 
-const steps = ref<EmptyArrayType>([
-  {
-    title: t("quickStart.first"),
-  },
-  {
-    title: t("quickStart.second"),
-  },
-]);
+const emit = defineEmits(["createKB", "close"]);
+const modelVisible = ref<boolean>(true);
 const handleCreate = () => {
-  userGuideStore.setUserGuideState(true);
-  emit("create");
+  emit("createKB", "knowledge");
+  handleClose();
+};
+const handleCreateExperience = async () => {
+  emit("createKB", "experience");
+  handleClose();
 };
 const handleClose = () => {
-  userGuideStore.setUserGuideState(true);
+  emit("close");
 };
 </script>
 
@@ -90,27 +93,9 @@ const handleClose = () => {
     color: var(--font-main-color);
     text-align: center;
   }
-  .steps-wrap {
-    width: 600px;
-    margin: 0 auto;
-    :deep(.intel-steps) {
-      padding-top: 30px;
-      .intel-steps-item-title {
-        position: absolute;
-        top: -35px;
-        left: 35px;
-        font-weight: 500;
-      }
-      .intel-steps-item-active {
-        .intel-steps-item-title {
-          color: var(--color-primary);
-        }
-      }
-      .intel-steps-item-tail::after {
-        height: 3px;
-        background-color: var(--color-primary);
-      }
-    }
+  .guide-text {
+    text-align: center;
+    color: var(--font-tip-color);
   }
   .card-wrap {
     display: flex;
@@ -120,15 +105,12 @@ const handleClose = () => {
       flex: 1;
       padding: 20px;
       border-radius: 6px;
-      height: 200px;
       box-shadow: var(--bg-gradient-shadow);
       display: flex;
       gap: 12px;
       .left-wrap {
-        width: 30px;
-        color: var(--border-main-color);
-        font-size: 42px;
-        line-height: 42px;
+        .pt-6;
+        color: var(--color-second-primaryBg);
       }
       .right-wrap {
         flex: 1;
