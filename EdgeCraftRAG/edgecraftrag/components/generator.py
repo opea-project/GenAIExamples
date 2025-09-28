@@ -109,8 +109,9 @@ async def local_stream_generator(lock, llm, prompt_str, unstructured_str):
             save_history(res)
         except Exception as e:
             start_idx = str(e).find("message") + len("message")
-            result_error =  str(e)[start_idx:]
+            result_error = str(e)[start_idx:]
             yield f"code:0000{result_error}"
+
 
 async def stream_generator(llm, prompt_str, unstructured_str):
     response = llm.stream_complete(prompt_str)
@@ -126,9 +127,9 @@ async def stream_generator(llm, prompt_str, unstructured_str):
         res = "".join(collected_data)
         save_history(res)
     except Exception as e:
-            start_idx = str(e).find("message") + len("message")
-            result_error =  str(e)[start_idx:]
-            yield f"code:0000{result_error}"
+        start_idx = str(e).find("message") + len("message")
+        result_error = str(e)[start_idx:]
+        yield f"code:0000{result_error}"
 
 
 class QnAGenerator(BaseComponent):
@@ -153,7 +154,7 @@ class QnAGenerator(BaseComponent):
             llm_instance = llm_model()
             if llm_instance.model_path is None or llm_instance.model_path == "":
                 self.model_id = llm_instance.model_id
-                self.model_path = os.path.join("/home/user/models/",os.getenv("LLM_MODEL", "Qwen/Qwen3-8B"))
+                self.model_path = os.path.join("/home/user/models/", os.getenv("LLM_MODEL", "Qwen/Qwen3-8B"))
             else:
                 self.model_id = llm_instance.model_id
                 self.model_path = llm_instance.model_path
@@ -224,7 +225,7 @@ class QnAGenerator(BaseComponent):
         chat_history = concat_history(chat_request.messages)
         # Modify model think status
         if chat_request.chat_template_kwargs:
-            if 'enable_thinking' in chat_request.chat_template_kwargs:
+            if "enable_thinking" in chat_request.chat_template_kwargs:
                 if self.enable_think != chat_request.chat_template_kwargs["enable_thinking"]:
                     self.prompt = self.init_prompt(
                         self.model_path,

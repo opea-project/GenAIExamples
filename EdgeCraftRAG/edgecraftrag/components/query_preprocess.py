@@ -179,7 +179,7 @@ class LogitsEstimatorJSON(LogitsEstimator):
         level_scores_np = numpy.where(level_scores_np < -1000, -1000, level_scores_np)
         level_scores_np_exp = numpy.exp(level_scores_np - numpy.max(level_scores_np))
         scores_probs = level_scores_np_exp / level_scores_np_exp.sum()
-        
+
         # using dynamic scores_weight
         scores_weight = numpy.array(self.scores_weight)
         final_score = numpy.dot(scores_probs, scores_weight)
@@ -193,8 +193,8 @@ class LogitsEstimatorJSON(LogitsEstimator):
 def read_json_files(file_path: str) -> dict:
     result = {}
     if os.path.isfile(file_path):
-        with open(file_path, 'r', encoding='utf-8') as f:
-            result =  json.load(f)
+        with open(file_path, "r", encoding="utf-8") as f:
+            result = json.load(f)
     return result
 
 
@@ -214,14 +214,14 @@ async def query_search(user_input, search_config_path, search_dir, pl):
 
     cfg = {}
     if not os.path.exists(search_config_path):
-        cfg["query_matcher"] =  {
-                "instructions": "You're a knowledgeable assistant. Your task is to judge if two queries ask for the same information about the same primary subject. Output only 'Yes' or 'No'. Yes = same subject entity AND same information need, with only wording or stylistic differences. No = different subject entity, different spec or numeric constraint, different attribute/metric, or scope changed by adding/removing a restricting condition. Entity changes MUST lead to No.",
-                "input_template": "Query 1: {}\nQuery 2: {}\n",
-                "output_template": "\nAre these queries equivalent? Answer 'Yes' or 'No':",
-                "json_key": "similarity",
-                "json_levels": ["No", "Yes"],
-                "temperature": 0.1
-            }
+        cfg["query_matcher"] = {
+            "instructions": "You're a knowledgeable assistant. Your task is to judge if two queries ask for the same information about the same primary subject. Output only 'Yes' or 'No'. Yes = same subject entity AND same information need, with only wording or stylistic differences. No = different subject entity, different spec or numeric constraint, different attribute/metric, or scope changed by adding/removing a restricting condition. Entity changes MUST lead to No.",
+            "input_template": "Query 1: {}\nQuery 2: {}\n",
+            "output_template": "\nAre these queries equivalent? Answer 'Yes' or 'No':",
+            "json_key": "similarity",
+            "json_levels": ["No", "Yes"],
+            "temperature": 0.1,
+        }
     else:
         cfg = OmegaConf.load(search_config_path)
     cfg["query_matcher"]["model_id"] = model_id
@@ -239,10 +239,10 @@ async def query_search(user_input, search_config_path, search_dir, pl):
     match_scores.sort(key=lambda x: x[1], reverse=True)
 
     # Maximum less than 0.6, we don't use query search.
-    if  match_scores[0][1] < 0.6:
+    if match_scores[0][1] < 0.6:
         return top1_issue, sub_questions_result
     top1_issue = match_scores[0][0]
     for i in range(len(maintenance_data)):
-        if maintenance_data[i]['question'] == top1_issue:
+        if maintenance_data[i]["question"] == top1_issue:
             sub_questions_result = "\n".join(maintenance_data[i]["content"])
     return top1_issue, sub_questions_result

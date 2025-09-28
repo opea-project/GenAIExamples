@@ -48,12 +48,14 @@ class NodeParserType(str, Enum):
     UNSTRUCTURED = "unstructured"
     KBADMINPARSER = "kbadmin_parser"
 
+
 class IndexerType(str, Enum):
 
     FAISS_VECTOR = "faiss_vector"
     DEFAULT_VECTOR = "vector"
     MILVUS_VECTOR = "milvus_vector"
     KBADMIN_INDEXER = "kbadmin_indexer"
+
 
 class RetrieverType(str, Enum):
 
@@ -116,13 +118,13 @@ class BaseMgr:
     def __init__(self):
         self.components = {}
 
-    def add(self, comp: BaseComponent, name: str=None):
+    def add(self, comp: BaseComponent, name: str = None):
         if name:
             self.components[name] = comp
             return True
         self.components[comp.idx] = comp
 
-    def append(self, comp: BaseComponent, name: str=None):
+    def append(self, comp: BaseComponent, name: str = None):
         key = name if name else comp.idx
         if key not in self.components:
             self.components[key] = []

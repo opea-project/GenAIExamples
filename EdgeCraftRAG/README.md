@@ -8,7 +8,7 @@ quality and performance.
 ## What's New
 
 1. Support Intel Arc B60 for model inference
-2. support KBadmin for knowledge base management 
+2. support KBadmin for knowledge base management
 3. support Experience Injection module in UI
 
 ## Table of contents

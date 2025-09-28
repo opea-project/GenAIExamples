@@ -208,6 +208,6 @@ Model preparation is the same as vLLM inference section, please refer to [Prepar
 
 This section is the same as default vLLM inference section, please refer to [Prepare env variables and configurations](../docker_compose/intel/gpu/arc/README.md#prepare-env-variables-and-configurations) and [Start Edge Craft RAG Services with Docker Compose](../docker_compose/intel/gpu/arc/README.md#deploy-the-service-on-arc-a770-using-docker-compose)
 
-### 2. Access Kbadmin UI 
+### 2. Access Kbadmin UI
 
 please refer to [ChatQnA with Kbadmin in UI](./Explore_Edge_Craft_RAG.md#chatqna-with-kbadmin-in-ui)
