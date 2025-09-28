@@ -57,7 +57,7 @@
           <div v-html="renderedMarkdown"></div>
           <div v-if="!inResponse" class="footer-btn">
             <a-tooltip placement="top" :title="$t('common.copy')">
-              <span class="icon-style" @click="handleCopy()">
+              <span class="icon-style" @click="handleCopyResponses()">
                 <CopyOutlined /></span
             ></a-tooltip>
             <a-tooltip
@@ -111,7 +111,12 @@
             <a-button shape="round" @click="handleCancel">
               {{ $t("common.cancel") }}
             </a-button>
-            <a-button type="primary" shape="round" @click="handleSend">
+            <a-button
+              type="primary"
+              shape="round"
+              @click="handleSend"
+              :disabled="!queryInput"
+            >
               {{ $t("common.send") }}
             </a-button>
           </div>
@@ -142,7 +147,7 @@
           {{ message.content }}
           <div class="footer-btn">
             <a-tooltip placement="top" :title="$t('common.copy')">
-              <span class="icon-style" @click="handleCopy()">
+              <span class="icon-style" @click="handleCopyQuery()">
                 <CopyOutlined /></span
             ></a-tooltip>
             <a-tooltip
@@ -292,16 +297,21 @@ const handleRegenerate = () => {
   if (!query) return;
   emit("regenerate", query);
 };
-const handleCopy = async () => {
+const handleCopyQuery = async () => {
+  await copy(queryInput.value);
+};
+const handleCopyResponses = async () => {
   await copy(readResponse.value);
 };
 const handleEdit = () => {
+  queryInput.value = props.message.content;
   editState.value = true;
 };
 const handleCancel = () => {
   editState.value = false;
 };
 const handleSend = () => {
+  if (!queryInput.value) return;
   emit("resend", { index: props.messageIndex, query: queryInput.value });
   handleCancel();
 };
@@ -422,7 +432,7 @@ watch(
       z-index: 20;
       opacity: 0;
       visibility: hidden;
-      transition: opacity 0.3s ease, visibility 0s linear 2s; /* 关键：延迟 visibility 变化 */
+      transition: opacity 0.3s ease, visibility 0s linear 2s;
       gap: 8px;
       .anticon {
         cursor: pointer;

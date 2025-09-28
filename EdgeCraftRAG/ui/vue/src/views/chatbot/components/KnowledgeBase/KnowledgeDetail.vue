@@ -34,6 +34,7 @@
           v-model:value="uploadedCount"
           :min="0"
           :max="totalFiles"
+          disabled
         /><span
           >{{ uploadedCount }}/{{ totalFiles }}
           <span class="pl-8">
@@ -315,10 +316,12 @@ onMounted(() => {
       .intel-slider-track {
         height: 8px;
         border-radius: 4px;
-        background-color: var(--color-primary-tip);
+        background-color: var(--color-primary-tip) !important;
       }
       .intel-slider-handle::after {
         top: 1px;
+        background-color: var(--color-primary-tip) !important;
+        box-shadow: 0 0 0 2px var(--color-primary-second) !important;
       }
     }
   }
