@@ -451,10 +451,10 @@ class Deployer:
         )
 
         self.args.os = click.prompt(
-                "On which target OS was it deployed?",
-                type=click.Choice(self.config.get("supported_os")),
-                default=self.config.get("default_os"),
-            )
+            "On which target OS was it deployed?",
+            type=click.Choice(self.config.get("supported_os")),
+            default=self.config.get("default_os"),
+        )
         if self.args.deploy_mode == "docker":
             self.args.device = click.prompt(
                 "On which target device was it deployed?",
@@ -464,7 +464,7 @@ class Deployer:
             # Set project name for clearing
             self.project_name = f"{self.example_name.lower().replace(' ', '')}-{self.args.device}"
         else:
-            
+
             self.args.device = self.config.get("default_device")
 
         if self.args.deploy_mode == "k8s":
