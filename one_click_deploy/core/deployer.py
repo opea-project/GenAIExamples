@@ -203,7 +203,7 @@ class Deployer:
 
     def _get_helm_values_file(self):
         """Gets the original Helm values file path."""
-        paths = self._get_path_from_config(["kubernetes", "helm", "values_files"], self.args.device)
+        paths = self._get_path_from_config(["kubernetes", "helm", "values_files", self.args.os], self.args.device)
         return paths[0] if paths else None
 
     def _get_local_helm_values_file_path(self):
@@ -432,12 +432,12 @@ class Deployer:
             "Which deployment mode to clear?", type=click.Choice(["docker", "k8s"]), default="docker"
         )
 
-        if self.args.deploy_mode == "docker":
-            self.args.os = click.prompt(
+        self.args.os = click.prompt(
                 "On which target OS was it deployed?",
                 type=click.Choice(self.config.get("supported_os")),
                 default=self.config.get("default_os"),
             )
+        if self.args.deploy_mode == "docker":
             self.args.device = click.prompt(
                 "On which target device was it deployed?",
                 type=click.Choice(self.config.get("supported_devices").get(self.args.os)),
@@ -446,6 +446,7 @@ class Deployer:
             # Set project name for clearing
             self.project_name = f"{self.example_name.lower().replace(' ', '')}-{self.args.device}"
         else:
+            
             self.args.device = self.config.get("default_device")
 
         if self.args.deploy_mode == "k8s":
