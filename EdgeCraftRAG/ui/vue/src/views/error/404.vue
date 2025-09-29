@@ -2,12 +2,11 @@
   <div class="not-found">
     <img :src="notFound" alt="" class="not-found-icon" />
     <p>{{ $t("error.notFoundTip") }}</p>
-    <a-button
-      type="primary"
-      size="large"
-      :icon="h(HomeFilled)"
-      @click="handleGoHome"
-      >{{ $t("error.back") }}
+    <a-button type="primary" size="large" @click="handleGoHome">
+      <template #icon>
+        <HomeFilled />
+      </template>
+      {{ $t("error.back") }}
     </a-button>
   </div>
 </template>

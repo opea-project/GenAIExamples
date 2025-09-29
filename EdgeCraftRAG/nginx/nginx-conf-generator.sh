@@ -25,7 +25,7 @@ EOL
 # Generate the server lines
 for ((i=0; i<PORT_NUM; i++)); do
     PORT_VAR="VLLM_SERVICE_PORT_$i"
-    echo "        server ${HOST_IP}:${!PORT_VAR};" >> $2
+    echo "        server ${HOST_IP}:${!PORT_VAR:-8$((i+1))00};" >> $2
 done
 
 # Close the upstream block and the http block

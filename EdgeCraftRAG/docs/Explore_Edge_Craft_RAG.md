@@ -33,3 +33,23 @@ After knowledge base creation, you can upload the documents for retrieval.
 
 Then, you can submit messages in the chat box in `Chat` page.
 ![chat_with_rag](../assets/img/chatqna.png)
+
+## ChatQnA with Kbadmin in UI
+
+### Kbadmin Pipeline
+
+In the `Node Parser` page, select 'kbadmin' as node parser.
+![kbadmin_node_parser](../assets/img/kbadmin_type.png)
+
+In the `Indexer` page, input embedding and vector DB information, please note the embedding service port is 13020; the vector DB port is 29530.
+![kbadmin_indexer](../assets/img/kbadmin_index.png)
+
+### Upload files & ChatQnA
+
+After the pipeline creation, you can go to `Knowledge Base` page and click `Create Knowledge Base` button to create your knowledge base.  
+Please select 'kbadmin' in `Type`and select kb name from the kbs you created in kbadmin UI page.
+
+![upload_data](../assets/img/kbadmin_kb.png)
+
+Then, you can submit messages in the chat box in `Chat` page.
+![chat_with_rag](../assets/img/chatqna.png)

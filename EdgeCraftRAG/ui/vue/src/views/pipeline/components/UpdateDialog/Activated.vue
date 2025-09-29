@@ -39,7 +39,7 @@ const formRef = ref<FormInstance>();
 const form = reactive<FormType>({
   active,
 });
-const rules = reactive({
+const rules: FormRules = reactive({
   active: [{ required: true, trigger: "change" }],
 });
 // Validate the form, throw results form

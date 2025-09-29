@@ -123,7 +123,10 @@ def get_available_weights(model_path):
 
 def get_available_models(model_type):
     avail_models = []
-    if model_type == "LLM":
+    if model_type == "vLLM":
+        LLM_MODEL = os.getenv("LLM_MODEL", "Qwen/Qwen3-8B")
+        avail_models.append(LLM_MODEL)
+    elif model_type == "LLM":
         items = os.listdir(CONTAINER_MODEL_PATH)
         for item in items:
             if item == "BAAI":
@@ -134,6 +137,8 @@ def get_available_models(model_type):
                     avail_models.append(item + "/" + sub_path)
             else:
                 avail_models.append(item)
+    elif model_type == "kbadmin_embedding_model":
+        return ["BAAI/bge-large-zh-v1.5"]
     else:
         for item in os.listdir(CONTAINER_MODEL_PATH + "BAAI"):
             if (model_type == "reranker" and "rerank" in item) or (model_type == "embedding" and "rerank" not in item):

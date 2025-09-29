@@ -24,6 +24,7 @@
       :columns="tableColumns"
       :data-source="tableList"
       :pagination="false"
+      :loading="loading"
       :scroll="{ x: 'max-content' }"
     >
       <template #bodyCell="{ column, record }">
@@ -36,14 +37,14 @@
           {{
             record.postprocessor
               .map((item: any) => item?.processor_type)
-              .join(", ")
+              .join(",")
           }}
         </template>
         <template v-if="column.dataIndex === 'rerank'">
           {{
             record.postprocessor
               .map((item: any) => item?.model?.model_id)
-              .join(", ") || "--"
+              .join(" ") || "--"
           }}
         </template>
         <template v-if="column.dataIndex === 'status'">
@@ -116,7 +117,6 @@
 
 <script lang="ts" setup name="Table">
 import {
-  getPipelineDetailByName,
   requestPipelineDelete,
   requestPipelineSwitchState,
 } from "@/api/pipeline";
@@ -143,6 +143,10 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
+  loading: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const emit = defineEmits(["update", "create", "view", "import", "search"]);
@@ -153,6 +157,7 @@ const paginationData = reactive<paginationType>({
 });
 const tableColumns = ref<TableColumns[]>([]);
 const allColumns = computed(() => getTableColumns(t));
+
 const tableList = computed(() => {
   const { pageNum, pageSize } = paginationData;
   const start = (pageNum - 1) * pageSize;

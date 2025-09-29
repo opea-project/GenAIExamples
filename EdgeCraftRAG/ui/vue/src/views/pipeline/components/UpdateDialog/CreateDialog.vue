@@ -20,13 +20,11 @@
       </div>
     </div>
     <div class="body-container">
-      <keep-alive>
-        <component
-          :is="currentComponent"
-          :form-data="formData"
-          ref="pipelineRef"
-        />
-      </keep-alive>
+      <component
+        :is="currentComponent"
+        :form-data="formData"
+        ref="pipelineRef"
+      />
     </div>
     <template #footer>
       <div class="flex-between">
@@ -140,12 +138,17 @@ const handleLast = () => {
 //next，update form
 const handleNext = async () => {
   if (pipelineRef.value) {
-    const { result = false, data = {} } = await pipelineRef.value?.validate();
+    const {
+      result = false,
+      data = {},
+      dest = null,
+    } = await pipelineRef.value?.validate();
 
     if (result) {
       Object.assign(formData, data);
+
       if (currentStep.value < 7) {
-        currentStep.value++;
+        currentStep.value = dest ? dest : currentStep.value + 1;
       }
     } else {
       console.log(t("pipeline.validErr"));

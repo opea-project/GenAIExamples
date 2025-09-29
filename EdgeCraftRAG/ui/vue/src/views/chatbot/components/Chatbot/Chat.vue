@@ -3,14 +3,19 @@
     <div class="message-box" ref="scrollContainer" v-if="messagesLength">
       <div class="intel-markdown">
         <div ref="messageComponent">
-          <div v-for="(msg, index) in messagesList" :key="index" :inResponse>
+          <div v-for="(msg, index) in messagesList" :key="index">
             <MessageItem
               :message="msg"
               ref="messageRef"
               :inResponse
               :think="isThink"
+              :message-Index="index"
+              :last-query="isLastQuery(index)"
+              :last-response="isLastResponse(index)"
               @preview="handleImagePreview"
               @stop="isUserScrolling = true"
+              @regenerate="handleRegenerate"
+              @resend="handleDelete"
             />
           </div>
         </div>
@@ -36,13 +41,23 @@
         :auto-size="{ minRows: 2, maxRows: 5 }"
       />
       <div class="button-wrap">
-        <span
-          :class="{ 'think-btn': true, 'is-deep': isThink }"
-          @click="handleThinkChange"
-        >
-          <SvgIcon name="icon-deep-think" :size="16" inherit />
-          {{ $t(`chat.${isThink ? "reason" : "think"}`) }}
-        </span>
+        <div class="flex-left">
+          <span
+            :class="{ 'think-btn': true, 'is-deep': isThink }"
+            @click="handleThinkChange"
+          >
+            <SvgIcon name="icon-deep-think" :size="16" inherit />
+            {{ $t(`chat.${isThink ? "reason" : "think"}`) }}
+          </span>
+          <span
+            :class="{ 'think-btn': true, 'is-deep': enableKB }"
+            @click="handleKBChange"
+          >
+            <SvgIcon name="icon-kb" :size="16" inherit />
+            {{ $t("knowledge.title") }}
+          </span>
+        </div>
+
         <div class="send-btn">
           <a-tooltip placement="top" :title="$t('chat.new')">
             <span class="common-btn">
@@ -87,23 +102,21 @@
 </template>
 
 <script lang="ts" setup name="Chatbot">
-import { getBenchmark } from "@/api/chatbot";
+import { getBenchmark, requestStopChat } from "@/api/chatbot";
 import lightBulb from "@/assets/svgs/lightBulb.svg";
 import _ from "lodash";
 import { reactive, ref, computed, nextTick } from "vue";
 import { Benchmark, IMessage } from "../../type";
 import MessageItem from "./MessageItem.vue";
 import { handleMessageSend } from "./SseService";
-import { pipelineAppStore } from "@/store/pipeline";
 import { Local } from "@/utils/storage";
-import { ArrowDownOutlined } from "@ant-design/icons-vue";
+import { ArrowDownOutlined, CloseOutlined } from "@ant-design/icons-vue";
 import { throttle } from "lodash";
 import { chatbotAppStore } from "@/store/chatbot";
 
 const chatbotStore = chatbotAppStore();
 const emit = defineEmits(["config"]);
 const ENV_URL = import.meta.env;
-const pipelineStore = pipelineAppStore();
 const defaultBenchmark = reactive<Benchmark>({
   generator: "",
   postprocessor: "",
@@ -123,6 +136,7 @@ const isUserScrolling = ref(false);
 const showScrollToBottomBtn = ref(false);
 const resizeObserverRef = ref<ResizeObserver | null>(null);
 const isThink = ref<boolean>(true);
+const enableKB = ref<boolean>(true);
 
 const inputRef = ref();
 const handleEnvUrl = () => {
@@ -134,6 +148,15 @@ const handleEnvUrl = () => {
 const handleMessageDisplay = (data: any) => {
   if (inResponse.value) {
     isUserScrolling.value = false;
+    const regex = /code:0000(.*)/s;
+    const match = data.match(regex);
+    if (match) {
+      messagesList.value.pop();
+      messagesList.value[messagesList.value?.length - 1].errorMessage =
+        match[1].trim();
+      return;
+    }
+
     messagesList.value[messagesList.value?.length - 1].content = data;
   }
 };
@@ -143,6 +166,26 @@ const notInput = computed(() => {
 const messagesLength = computed(() => {
   return messagesList.value?.length;
 });
+const lastQueryIndex = computed(() => {
+  for (let i = messagesList.value.length - 1; i >= 0; i--) {
+    if (messagesList.value[i].role === "user") {
+      return i;
+    }
+  }
+  return -1;
+});
+
+const lastResponseIndex = computed(() => {
+  for (let i = messagesList.value.length - 1; i >= 0; i--) {
+    if (messagesList.value[i].role === "assistant") {
+      return i;
+    }
+  }
+  return -1;
+});
+const isLastQuery = (index: number) => index === lastQueryIndex.value;
+const isLastResponse = (index: number) => index === lastResponseIndex.value;
+
 const handleStreamEnd = () => {
   handleStopDisplay();
   queryBenchmark();
@@ -183,6 +226,7 @@ const handleSendMessage = async () => {
     {
       role: "assistant",
       content: "",
+      query: inputKeywords.value,
       benchmark: _.cloneDeep(defaultBenchmark),
     }
   );
@@ -196,8 +240,7 @@ const handleStopDisplay = () => {
 };
 
 const queryBenchmark = async () => {
-  const { activatedPipeline } = pipelineStore;
-  const data = (await getBenchmark(activatedPipeline)) || {};
+  const data = (await getBenchmark()) || {};
 
   if (data["Benchmark enabled"]) {
     const benchmarkData = data.last_benchmark_data || {};
@@ -205,7 +248,7 @@ const queryBenchmark = async () => {
       const processedBenchmarkData = Object.fromEntries(
         Object.entries(benchmarkData).map(([key, value]: any) => [
           key,
-          parseFloat(value.toFixed(4)),
+          value ? parseFloat(value.toFixed(4)) : 0,
         ])
       );
       messagesList.value[messagesList.value.length - 1].benchmark =
@@ -227,13 +270,42 @@ const handleNewChat = () => {
 };
 const handleThinkChange = () => {
   isThink.value = !isThink.value;
+  const { chat_template_kwargs } = chatbotStore.configuration;
+
+  const chat_template = {
+    ...chat_template_kwargs,
+    enable_thinking: isThink.value,
+  };
+  chatbotStore.setChatbotConfiguration({
+    chat_template_kwargs: chat_template,
+  });
+};
+const handleKBChange = () => {
+  enableKB.value = !enableKB.value;
+  const { chat_template_kwargs } = chatbotStore.configuration;
+
+  const chat_template = {
+    ...chat_template_kwargs,
+    enable_rag_retrieval: enableKB.value,
+  };
 
   chatbotStore.setChatbotConfiguration({
-    chat_template_kwargs: { enable_thinking: isThink.value },
+    chat_template_kwargs: chat_template,
   });
 };
 const handleConfig = () => {
   emit("config");
+};
+const handleRegenerate = (query: string) => {
+  inputKeywords.value = query;
+
+  handleSendMessage();
+};
+const handleDelete = ({ index, query }: { index: number; query: string }) => {
+  messagesList.value.splice(index);
+  inputKeywords.value = query;
+
+  handleSendMessage();
 };
 
 const scrollToBottom = () => {
@@ -302,8 +374,10 @@ watch(
   { immediate: true }
 );
 onMounted(() => {
-  isThink.value =
-    chatbotStore.configuration?.chat_template_kwargs.enable_thinking;
+  const { enable_thinking = true, enable_rag_retrieval = false } =
+    chatbotStore.configuration?.chat_template_kwargs;
+  isThink.value = enable_thinking;
+  enableKB.value = enable_rag_retrieval;
 });
 onBeforeUnmount(() => {
   if (resizeObserver && messageComponent.value) {
@@ -421,6 +495,9 @@ onBeforeUnmount(() => {
       align-items: center;
       justify-content: space-between;
       padding: 6px 12px;
+      .flex-left {
+        gap: 8px;
+      }
       .think-btn {
         height: 24px;
         line-height: 24px;
@@ -492,6 +569,29 @@ onBeforeUnmount(() => {
         .icon-intel {
           color: var(--color-white) !important;
         }
+      }
+    }
+  }
+  .error-tip {
+    border: 1px solid var(--border-warning);
+    background-color: var(--color-warningBg);
+    color: var(--color-second-warning);
+    padding: 8px 12px;
+    border-radius: 0 4px 4px 0;
+    margin-bottom: 12px;
+    font-size: 12px;
+    .flex-between;
+    &:hover {
+      .card-shadow;
+    }
+    .message-wrap {
+      flex: 1;
+    }
+    .close-btn {
+      cursor: pointer;
+      text-align: end;
+      &:hover {
+        color: var(--color-error);
       }
     }
   }

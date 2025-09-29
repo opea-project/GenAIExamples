@@ -55,9 +55,9 @@ EC-RAG support using local OpenVINO models to do inference, please follow below 
 ```bash
 git clone https://github.com/opea-project/GenAIExamples.git
 cd GenAIExamples/EdgeCraftRAG
-docker build --build-arg http_proxy=$http_proxy --build-arg https_proxy=$https_proxy --build-arg no_proxy="$no_proxy" -t opea/edgecraftrag:latest -f Dockerfile .
-docker build --build-arg http_proxy=$http_proxy --build-arg https_proxy=$https_proxy --build-arg no_proxy="$no_proxy" -t opea/edgecraftrag-server:latest -f Dockerfile.server .
-docker build --build-arg http_proxy=$http_proxy --build-arg https_proxy=$https_proxy --build-arg no_proxy="$no_proxy" -t opea/edgecraftrag-ui:latest -f ui/docker/Dockerfile.ui .
+docker build --no-cache --pull --build-arg http_proxy=$http_proxy --build-arg https_proxy=$https_proxy --build-arg no_proxy="$no_proxy" -t opea/edgecraftrag:latest -f Dockerfile .
+docker build --no-cache --pull --build-arg http_proxy=$http_proxy --build-arg https_proxy=$https_proxy --build-arg no_proxy="$no_proxy" -t opea/edgecraftrag-server:latest -f Dockerfile.server .
+docker build --no-cache --pull --build-arg http_proxy=$http_proxy --build-arg https_proxy=$https_proxy --build-arg no_proxy="$no_proxy" -t opea/edgecraftrag-ui:latest -f ui/docker/Dockerfile.ui .
 ```
 
 ### 2. Prepare models
@@ -196,3 +196,18 @@ bash docker_compose/intel/gpu/arc/multi-arc-yaml-generator.sh $DP_NUM docker_com
 ### 3. Start Edge Craft RAG Services with Docker Compose
 
 This section is the same as default vLLM inference section, please refer to [Start Edge Craft RAG Services with Docker Compose](../docker_compose/intel/gpu/arc/README.md#deploy-the-service-using-docker-compose)
+
+## EC-RAG with Kbadmin
+
+EC-RAG support kbadmin as a knowledge base manager  
+Please make sure all the kbadmin services have been launched
+EC-RAG Docker Images preparation is the same as local inference section, please refer to [Build Docker Images](#1-optional-build-docker-images-for-mega-service-server-and-ui-by-your-own)
+Model preparation is the same as vLLM inference section, please refer to [Prepare models](../docker_compose/intel/gpu/arc/README.md#2-prepare-models)
+
+### 1. Start Edge Craft RAG Services with Docker Compose
+
+This section is the same as default vLLM inference section, please refer to [Prepare env variables and configurations](../docker_compose/intel/gpu/arc/README.md#prepare-env-variables-and-configurations) and [Start Edge Craft RAG Services with Docker Compose](../docker_compose/intel/gpu/arc/README.md#deploy-the-service-on-arc-a770-using-docker-compose)
+
+### 2. Access Kbadmin UI
+
+please refer to [ChatQnA with Kbadmin in UI](./Explore_Edge_Craft_RAG.md#chatqna-with-kbadmin-in-ui)

@@ -148,14 +148,18 @@ const handleSelect = async (value?: number) => {
     if (result) {
       await Object.assign(formData, data);
       if (value) currentStep.value = value;
+      return true;
     } else {
       console.log(t("pipeline.validErr"));
+      return false;
     }
   }
+  return false;
 };
 // Submit
 const handleSubmit = async () => {
-  await handleSelect();
+  const isValid = await handleSelect();
+  if (!isValid) return;
   submitLoading.value = true;
   const { name } = props.dialogData;
 

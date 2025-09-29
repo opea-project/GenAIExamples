@@ -20,6 +20,7 @@
 </template>
 
 <script lang="ts" setup name="Basic">
+import { isValidPipelineName } from "@/utils/validate";
 import type { FormInstance } from "ant-design-vue";
 import { reactive, ref, computed } from "vue";
 import { useI18n } from "vue-i18n";
@@ -36,6 +37,19 @@ const props = defineProps({
     default: "create",
   },
 });
+const validateName = async (rule: any, value: string) => {
+  if (!value) {
+    return Promise.reject(t("pipeline.valid.nameValid1"));
+  }
+  const len = value.length;
+  if (len < 2 || len > 30) {
+    return Promise.reject(t("pipeline.valid.nameValid2"));
+  }
+  if (!isValidPipelineName(value)) {
+    return Promise.reject(t("pipeline.valid.nameValid3"));
+  }
+  return Promise.resolve();
+};
 const disabledName = computed(() => {
   const { formType } = props;
   return formType === "update";
@@ -49,18 +63,12 @@ const formRef = ref<FormInstance>();
 const form = reactive<FormType>({
   name,
 });
-const rules = reactive({
+const rules: FormRules = reactive({
   name: [
     {
       required: true,
-      message: t("pipeline.valid.nameValid1"),
-      trigger: "blur",
-    },
-    {
-      min: 2,
-      max: 30,
-      message: t("pipeline.valid.nameValid2"),
-      trigger: "blur",
+      validator: validateName,
+      trigger: ["blur", "change"],
     },
   ],
 });

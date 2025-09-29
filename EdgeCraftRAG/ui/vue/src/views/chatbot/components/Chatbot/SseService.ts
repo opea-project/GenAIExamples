@@ -1,6 +1,7 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 import { getChatSessionId } from "@/utils/common";
+import { message } from "ant-design-vue";
 
 export const handleMessageSend = async (
   url: string,
@@ -8,6 +9,8 @@ export const handleMessageSend = async (
   onDisplay: (data: any) => void,
   onEnd?: () => void,
 ): Promise<void> => {
+  let reader: ReadableStreamDefaultReader | undefined;
+
   try {
     const response = await fetch(url, {
       method: "POST",
@@ -20,30 +23,48 @@ export const handleMessageSend = async (
     });
 
     if (!response.ok) {
-      throw new Error(`Network response was not ok: ${response.statusText}`);
+      let errorMessage = "";
+      try {
+        const errorText = await response.text();
+        if (errorText) {
+          errorMessage = errorText;
+        }
+      } catch (parseError) {
+        console.warn("Failed to read error response:", parseError);
+      }
+      message.error(errorMessage);
+      throw new Error(errorMessage);
     }
 
-    const reader = response.body?.getReader();
+    reader = response.body?.getReader();
+    if (!reader) {
+      throw new Error("Readable stream is not available");
+    }
+
     const decoder = new TextDecoder("utf-8");
     let buffer = "";
 
-    try {
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) {
-          onEnd?.();
-          break;
-        }
-        buffer += decoder.decode(value, { stream: true });
-
-        onDisplay(buffer);
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) {
+        onEnd?.();
+        break;
       }
-    } catch (error) {
-      console.error(error);
-      onEnd?.();
+
+      buffer += decoder.decode(value, { stream: true });
+
+      onDisplay(buffer);
     }
-  } catch (error) {
-    console.error(error);
+  } catch (error: any) {
+    console.error("Request or stream error:", error);
     onEnd?.();
+  } finally {
+    if (reader) {
+      try {
+        await reader.cancel();
+      } catch (cancelError) {
+        console.warn("Failed to cancel reader:", cancelError);
+      }
+    }
   }
 };

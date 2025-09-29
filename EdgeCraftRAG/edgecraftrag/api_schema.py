@@ -25,7 +25,8 @@ class NodeParserIn(BaseModel):
 class IndexerIn(BaseModel):
     indexer_type: str
     embedding_model: Optional[ModelIn] = None
-    vector_uri: Optional[str] = None
+    embedding_url: Optional[str] = None
+    vector_url: Optional[str] = None
 
 
 class RetrieverIn(BaseModel):
@@ -80,7 +81,15 @@ class KnowledgeBaseCreateIn(BaseModel):
     name: str
     description: Optional[str] = None
     active: Optional[bool] = None
+    comp_type: Optional[str] = "knowledge"
+    comp_subtype: Optional[str] = "origin_kb"
+    experience_active: Optional[bool] = None
+
+
+class ExperienceIn(BaseModel):
+    question: str
+    content: list[str] = None
 
 
 class MilvusConnectRequest(BaseModel):
-    vector_uri: str
+    vector_url: str

@@ -6,6 +6,20 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "687788",
+      "name": "知识库",
+      "font_class": "kb",
+      "unicode": "e639",
+      "unicode_decimal": 58937
+    },
+    {
+      "icon_id": "5299955",
+      "name": "experience",
+      "font_class": "experience",
+      "unicode": "e68e",
+      "unicode_decimal": 59022
+    },
+    {
       "icon_id": "44419262",
       "name": "deep-think",
       "font_class": "deep-think",

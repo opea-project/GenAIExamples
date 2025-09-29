@@ -14,7 +14,6 @@ export const getPipelineList = () => {
   return request({
     url: "/v1/settings/pipelines",
     method: "get",
-    showLoading: true,
   });
 };
 
