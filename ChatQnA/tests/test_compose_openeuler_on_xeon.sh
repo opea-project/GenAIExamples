@@ -126,36 +126,6 @@ function validate_megaservice() {
 
 }
 
-function validate_frontend() {
-    cd $WORKPATH/ui/svelte
-
-    echo "[TEST INFO]: Preparing frontend test using Docker..."
-
-    sed -i "s/localhost/$ip_address/g" playwright.config.ts
-
-    echo "[TEST INFO]: Running frontend tests in Docker..."
-    exit_status=0
-
-    docker run --rm \
-        --network="host" \
-        -v $PWD:/work \
-        -w /work \
-        mcr.microsoft.com/playwright:v1.40.0-focal \
-        /bin/bash -c "
-            npm install &&
-            npm ci &&
-            npx playwright install &&
-            npx playwright test
-        " || exit_status=$?
-
-    if [ $exit_status -ne 0 ]; then
-        echo "[TEST INFO]: ---------frontend test failed---------"
-        exit $exit_status
-    else
-        echo "[TEST INFO]: ---------frontend test passed---------"
-    fi
-}
-
 function stop_docker() {
     cd $WORKPATH/docker_compose/intel/cpu/xeon
     docker compose -f compose_openeuler.yaml -f compose.telemetry.yaml down

@@ -9,7 +9,7 @@ echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
 echo "TAG=IMAGE_TAG=${IMAGE_TAG}"
 export REGISTRY=${IMAGE_REPO}
 export TAG=${IMAGE_TAG}
-export MODEL_PATH=${model_cache:-"./data"}
+export MODEL_CACHE=${model_cache:-"./data"}
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
@@ -32,45 +32,53 @@ function build_docker_images() {
 }
 
 function start_services() {
-    cd $WORKPATH/docker_compose/amd/gpu/rocm/
+    cd $WORKPATH/docker_compose/intel/
+    export RERANK_TYPE="tei"
+    export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:3008/v1/searchqna"
+    export host_ip=${ip_address}
+    export LOGFLAG=true
+    export no_proxy="localhost,127.0.0.1,$ip_address"
     source ./set_env.sh
+    cd cpu/xeon
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
     # Start Docker Containers
     docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
-    n=0
-    until [[ "$n" -ge 100 ]]; do
-        docker logs search-tgi-service > $LOG_PATH/search-tgi-service_start.log 2>&1
-        if grep -q Connected $LOG_PATH/search-tgi-service_start.log; then
-            break
-        fi
-        sleep 5s
-        n=$((n+1))
-    done
-    sleep 20
+
+    sleep 10s
 }
 
-
-function validate_megaservice() {
-    result=$(http_proxy="" curl http://${ip_address}:3008/v1/searchqna -XPOST -d '{"messages": "What is black myth wukong?", "stream": "False"}' -H 'Content-Type: application/json')
-    echo $result
-
-    if [[ $result == *"the"* ]]; then
-        docker logs search-web-retriever-server
-        docker logs search-backend-server
-        echo "Result correct."
+function validate_frontend() {
+    cd $WORKPATH/ui/svelte
+    local conda_env_name="OPEA_e2e"
+    export PATH=${HOME}/miniforge3/bin/:$PATH
+    if conda info --envs | grep -q "$conda_env_name"; then
+        echo "$conda_env_name exist!"
     else
-        docker logs search-web-retriever-server
-        docker logs search-backend-server
-        echo "Result wrong."
-        exit 1
+        conda create -n ${conda_env_name} python=3.12 -y
     fi
+    source activate ${conda_env_name}
 
+    sed -i "s/localhost/$ip_address/g" playwright.config.ts
+
+    conda install -c conda-forge nodejs=22.6.0 -y
+    npm install && npm ci && npx playwright install --with-deps
+    node -v && npm -v && pip list
+
+    exit_status=0
+    npx playwright test || exit_status=$?
+
+    if [ $exit_status -ne 0 ]; then
+       echo "[TEST INFO]: ---------frontend test failed---------"
+       exit $exit_status
+    else
+       echo "[TEST INFO]: ---------frontend test passed---------"
+    fi
 }
 
 function stop_docker() {
-    cd $WORKPATH/docker_compose/amd/gpu/rocm/
+    cd $WORKPATH/docker_compose/intel/cpu/xeon/
     docker compose stop && docker compose rm -f
 }
 
@@ -88,8 +96,8 @@ function main() {
     start_services
     echo "::endgroup::"
 
-    echo "::group::validate_megaservice"
-    validate_megaservice
+    echo "::group::validate_frontend"
+    validate_frontend
     echo "::endgroup::"
 
     echo "::group::stop_docker"

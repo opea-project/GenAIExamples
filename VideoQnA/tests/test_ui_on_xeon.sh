@@ -124,123 +124,28 @@ function start_services() {
 
 }
 
-function validate_services() {
-    local URL="$1"
-    local EXPECTED_RESULT="$2"
-    local SERVICE_NAME="$3"
-    local DOCKER_NAME="$4"
-    local INPUT_DATA="$5"
+function validate_frontend() {
+    echo "Validating frontend ..."
 
-    HTTP_RESPONSE=$(curl -s -w "HTTPSTATUS:%{http_code}" -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL")
-    HTTP_STATUS=$(echo $HTTP_RESPONSE | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
-    RESPONSE_BODY=$(echo $HTTP_RESPONSE | sed -e 's/HTTPSTATUS\:.*//g')
-
-    docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
-
-    # check response status
-    if [ "$HTTP_STATUS" -ne "200" ]; then
-        echo "[ $SERVICE_NAME ] HTTP status is not 200. Received status was $HTTP_STATUS"
-        exit 1
-    else
-        echo "[ $SERVICE_NAME ] HTTP status is 200. Checking content..."
-    fi
-
-    # check response body
-    if [[ "${RESPONSE_BODY}" != *"${EXPECTED_RESULT}"* ]]; then
-        echo "[ $SERVICE_NAME ] Content does not match the expected result: $RESPONSE_BODY"
-        exit 1
-    else
-        echo "[ $SERVICE_NAME ] Content is as expected."
-    fi
-    sleep 1s
-}
-
-function validate_microservices() {
-    # Check if the microservices are running correctly.
-    cd $WORKPATH/docker_compose/intel/cpu/xeon/data
-
-    # dataprep microservice
-    echo "Validating Dataprep microservice ..."
-    HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST "${DATAPREP_INGEST_SERVICE_ENDPOINT}" \
-    -H "Content-Type: multipart/form-data" \
-    -F "files=@./op_1_0320241830.mp4")
+    HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X GET ${FRONTEND_ENDPOINT})
 
     if [ "$HTTP_STATUS" -eq 200 ]; then
-        echo "Dataprep microservice is running correctly."
+        echo "Frontend is running correctly."
+        local CONTENT=$(curl -s -X GET ${FRONTEND_ENDPOINT})
+        if echo "$CONTENT" | grep -q "ok"; then
+            echo "Frontend Content is as expected."
+        else
+            echo "Frontend Content does not match the expected result: $CONTENT"
+            docker logs videoqna-xeon-ui-server >> ${LOG_PATH}/ui.log
+            exit 1
+        fi
     else
-        echo "Dataprep microservice is not running correctly. Received status was $HTTP_STATUS"
-        docker logs dataprep-vdms-server >> ${LOG_PATH}/dataprep.log
+        echo "Frontend is not running correctly. Received status was $HTTP_STATUS"
+        docker logs videoqna-xeon-ui-server >> ${LOG_PATH}/ui.log
         exit 1
     fi
 
-    # Embedding Microservice
-    validate_services \
-        ${EMBEDDING_ENDPOINT} \
-        '"embedding":[' \
-        "embedding" \
-        "clip-embedding-server" \
-        '{"input":"What is the man doing?"}'
-
-    # Retriever Microservice
-    export your_embedding=$(python3 -c "import random; embedding = [random.uniform(-1, 1) for _ in range(512)]; print(embedding)")
-    validate_services \
-        ${RETRIEVER_ENDPOINT} \
-        "retrieved_docs" \
-        "retriever" \
-        "retriever-vdms-server" \
-        "{\"text\":\"What is the man doing?\",\"embedding\":${your_embedding},\"search_type\":\"mmr\", \"k\":4}"
-
-    # Reranking Microservice
-    validate_services \
-        ${RERANKING_ENDPOINT} \
-        "video_url" \
-        "reranking" \
-        "reranking-tei-server" \
-        '{
-            "retrieved_docs": [{"doc": [{"text": "retrieved text"}]}],
-            "initial_query": "query",
-            "top_n": 1,
-            "metadata": [
-                {"other_key": "value", "video":"top_video_name", "timestamp":"20"}
-            ]
-        }'
-
-    # Video Llama LVM Backend Service
-    result=$(http_proxy="" curl -X POST \
-        "${LVM_VIDEO_ENDPOINT}?video_url=https%3A%2F%2Fgithub.com%2FDAMO-NLP-SG%2FVideo-LLaMA%2Fraw%2Fmain%2Fexamples%2Fsilence_girl.mp4&start=0.0&duration=9&prompt=What%20is%20the%20person%20doing%3F&max_new_tokens=150" \
-        -H "accept: */*" -d '')
-
-    if [[ $result == *"silence"* ]]; then
-        echo "LVM microservice is running correctly."
-    else
-        echo "LVM microservice is not running correctly. Received status was $HTTP_STATUS"
-        docker logs lvm-video-llama >> ${LOG_PATH}/lvm-video-llama.log
-        exit 1
-    fi
-
-    # LVM Microservice
-    validate_services \
-        "http://${host_ip}:${LVM_PORT}/v1/lvm" \
-        "silence" \
-        "lvm" \
-        "lvm" \
-        '{"video_url":"https://github.com/DAMO-NLP-SG/Video-LLaMA/raw/main/examples/silence_girl.mp4","chunk_start": 0,"chunk_duration": 7,"prompt":"What is the man doing?","max_new_tokens": 50}'
-
-    echo "==== microservices validated ===="
-    sleep 1s
-}
-
-function validate_megaservice() {
-    echo "Validating videoqna-xeon-backend-server ..."
-
-    validate_services \
-    ${BACKEND_SERVICE_ENDPOINT} \
-    "man" \
-    "videoqna-xeon-backend-server" \
-    "videoqna-xeon-backend-server" \
-    '{"messages":"What is the man doing?","stream":"True"}'
-
-    echo "==== megaservice validated ===="
+    echo "==== frontend validated ===="
 }
 
 function stop_docker() {
@@ -266,12 +171,8 @@ function main() {
     start_services
     echo "::endgroup::"
 
-    echo "::group::validate_microservices"
-    validate_microservices
-    echo "::endgroup::"
-
-    echo "::group::validate_megaservice"
-    validate_megaservice
+    echo "::group::validate_frontend"
+    validate_frontend
     echo "::endgroup::"
 
     echo "::group::stop_docker"
