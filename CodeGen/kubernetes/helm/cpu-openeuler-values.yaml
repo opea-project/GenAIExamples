@@ -1,0 +1,40 @@
+# Copyright (C) 2025 Huawei Technologies Co., Ltd.
+# SPDX-License-Identifier: Apache-2.0
+
+# This file is based on cpu-values.yaml and overrides image tags to 'latest-openeuler'
+# for all enabled services to run on openEuler.
+image:
+  tag: latest-openeuler
+
+tgi:
+  enabled: false
+vllm:
+  image:
+    repository: openeuler/vllm-cpu
+    tag: 0.10.1-oe2403lts
+  enabled: true
+llm-uservice:
+  image:
+    tag: latest-openeuler
+  TEXTGEN_BACKEND: vLLM
+
+tei:
+  image:
+    repository: openeuler/text-embeddings-inference-cpu
+    tag: 1.7.0-oe2403lts
+
+data-prep:
+  image:
+    tag: latest-openeuler
+
+retriever-usvc:
+  image:
+    tag: latest-openeuler
+
+embedding-usvc:
+  image:
+    tag: latest-openeuler
+
+codegen-ui:
+  image:
+    tag: latest-openeuler
