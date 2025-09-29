@@ -363,6 +363,7 @@ function main() {
 
 	echo "::group::start_services"
 	start_services
+    docker ps
 	echo "::endgroup::"
 
 	echo "::group:: Validating microservices"
