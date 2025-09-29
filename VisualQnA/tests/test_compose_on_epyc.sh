@@ -35,6 +35,7 @@ function build_docker_images() {
 function start_services() {
 	cd $WORKPATH/docker_compose/amd/cpu/epyc/
 	source ./set_env.sh
+	export no_proxy="localhost,127.0.0.1,$ip_address"
 	sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 	# Start Docker Containers
 	docker compose up -d >${LOG_PATH}/start_services_with_compose.log
@@ -145,37 +146,6 @@ function validate_megaservice() {
         ],
         "max_tokens": 300
     }'
-}
-
-function validate_frontend() {
-	cd $WORKPATH/ui/svelte
-	local conda_env_name="OPEA_e2e"
-	export PATH=${HOME}/miniforge3/bin/:$PATH
-	if conda info --envs | grep -q "$conda_env_name"; then
-		echo "$conda_env_name exist!"
-	else
-		conda create -n ${conda_env_name} python=3.12 -y
-	fi
-	CONDA_ROOT=$(conda info --base)
-	source "${CONDA_ROOT}/etc/profile.d/conda.sh"
-	conda activate ${conda_env_name}
-
-	sed -i "s/localhost/$ip_address/g" playwright.config.ts
-
-	conda install -c conda-forge nodejs=22.6.0 -y
-	# npm install && npm ci && npx playwright install --with-deps
-	npm install && npm ci && npx playwright install
-	node -v && npm -v && pip list
-
-	exit_status=0
-	npx playwright test || exit_status=$?
-
-	if [ $exit_status -ne 0 ]; then
-		echo "[TEST INFO]: ---------frontend test failed---------"
-		exit $exit_status
-	else
-		echo "[TEST INFO]: ---------frontend test passed---------"
-	fi
 }
 
 function stop_docker() {

@@ -1,30 +1,17 @@
 FROM python:3.11-slim
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
-
-RUN apt-get update -y && apt-get install -y --no-install-recommends --fix-missing \
-    libjemalloc-dev \
-    libmagic1 \
-    libglib2.0-0 \
-    poppler-utils \
-    tesseract-ocr
-
-RUN apt-get update && apt-get install -y gnupg wget git
-RUN wget -qO - https://repositories.intel.com/gpu/intel-graphics.key | \
-    gpg --yes --dearmor --output /usr/share/keyrings/intel-graphics.gpg
-RUN echo "deb [arch=amd64,i386 signed-by=/usr/share/keyrings/intel-graphics.gpg] https://repositories.intel.com/gpu/ubuntu jammy client" | \
-    tee /etc/apt/sources.list.d/intel-gpu-jammy.list
-RUN apt-get update && apt-get install -y \
-    intel-opencl-icd intel-level-zero-gpu \
-    intel-level-zero-gpu-raytracing \
-    intel-media-va-driver-non-free libmfx1 libmfxgen1 libvpl2 \
-    libegl-mesa0 libegl1-mesa libegl1-mesa-dev libgbm1 libgl1-mesa-dev libgl1-mesa-dri \
-    libglapi-mesa libgles2-mesa-dev libglx-mesa0 libigdgmm12 libxatracker2 mesa-va-drivers \
-    mesa-vdpau-drivers mesa-vulkan-drivers va-driver-all vainfo hwinfo clinfo 
+RUN apt-get update && apt-get install -y gnupg2 wget git
+RUN apt-get remove -y libze-intel-gpu1 libigc1 libigdfcl1 libze-dev || true; \
+    apt-get update; \
+    apt-get install -y curl
+RUN curl -sL 'https://keyserver.ubuntu.com/pks/lookup?fingerprint=on&op=get&search=0x0C0E6AF955CE463C03FC51574D098D70AFBE5E1F' | tee /etc/apt/trusted.gpg.d/driver.asc
+RUN echo -e "Types: deb\nURIs: https://ppa.launchpadcontent.net/kobuk-team/intel-graphics/ubuntu/\nSuites: plucky\nComponents: main\nSigned-By: /etc/apt/trusted.gpg.d/driver.asc" > /etc/apt/sources.list.d/driver.sources
+RUN apt-get update && apt-get install -y libze-intel-gpu1 libze1 intel-metrics-discovery intel-opencl-icd clinfo intel-gsc && apt-get install -y libze-intel-gpu1 libze1 intel-metrics-discovery intel-opencl-icd clinfo intel-gsc && apt-get install -y libze-dev intel-ocloc libze-intel-gpu-raytracing
 
 RUN useradd -m -s /bin/bash user && \
     mkdir -p /home/user && \
-    chown -R user /home/user/ 
+    chown -R user /home/user/
 
 RUN mkdir /templates && \
     chown -R user /templates
@@ -33,17 +20,19 @@ RUN chown -R user /templates/default_prompt.txt
 
 COPY ./edgecraftrag /home/user/edgecraftrag
 
-RUN mkdir -p /home/user/ui_cache 
+RUN mkdir -p /home/user/ui_cache
 ENV UI_UPLOAD_PATH=/home/user/ui_cache
 
 USER user
 
 WORKDIR /home/user/edgecraftrag
-RUN pip install --no-cache-dir --upgrade pip setuptools==70.0.0 && \
-    pip install --no-cache-dir --extra-index-url https://download.pytorch.org/whl/cpu -r requirements.txt
+RUN pip3 install --no-cache-dir --upgrade setuptools==70.0.0 --break-system-packages && \
+    pip3 install --no-cache-dir --extra-index-url https://download.pytorch.org/whl/cpu -r requirements.txt --break-system-packages
+
+RUN pip3 install --no-cache-dir docarray==0.40.0 --break-system-packages
 
 WORKDIR /home/user/
 RUN git clone https://github.com/openvinotoolkit/openvino.genai.git genai
 ENV PYTHONPATH="$PYTHONPATH:/home/user/genai/tools/llm_bench"
 
-ENTRYPOINT ["python", "-m", "edgecraftrag.server"]
+ENTRYPOINT ["python3", "-m", "edgecraftrag.server"]

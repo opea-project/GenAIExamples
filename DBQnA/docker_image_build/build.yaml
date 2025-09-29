@@ -2,22 +2,22 @@
 # SPDX-License-Identifier: Apache-2.0
 
 services:
-  text2sql:
+  text2query-sql:
     build:
       context: GenAIComps
-      dockerfile: comps/text2sql/src/Dockerfile
+      dockerfile: comps/text2query/src/Dockerfile
       args:
         IMAGE_REPO: ${REGISTRY:-opea}
         BASE_TAG: ${TAG:-latest}
         http_proxy: ${http_proxy}
         https_proxy: ${https_proxy}
         no_proxy: ${no_proxy}
-    image: ${REGISTRY:-opea}/text2sql:${TAG:-latest}
+    image: ${REGISTRY:-opea}/text2query-sql:${TAG:-latest}
   text2sql-react-ui:
     build:
       context: ../ui
       dockerfile: ./docker/Dockerfile.react
       args:
         texttosql_url: ${build_texttosql_url}
-    extends: text2sql
+    extends: text2query-sql
     image: ${REGISTRY:-opea}/text2sql-react-ui:${TAG:-latest}

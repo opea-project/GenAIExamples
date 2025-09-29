@@ -25,14 +25,8 @@ function build_docker_images() {
     docker build --no-cache -t ${REGISTRY}/comps-base:${TAG} --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
     popd && sleep 1s
 
-    git clone https://github.com/HabanaAI/vllm-fork.git
-    cd vllm-fork/
-    VLLM_FORK_VER=v0.6.6.post1+Gaudi-1.20.0
-    echo "Check out vLLM tag ${VLLM_FORK_VER}"
-    git checkout ${VLLM_FORK_VER} &> /dev/null && cd ../
-
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="audioqna audioqna-ui whisper-gaudi speecht5-gaudi vllm-gaudi"
+    service_list="audioqna audioqna-ui whisper-gaudi speecht5-gaudi"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker images && sleep 1s
@@ -41,6 +35,7 @@ function build_docker_images() {
 function start_services() {
     cd $WORKPATH/docker_compose/intel/hpu/gaudi
     export host_ip=${ip_address}
+    export no_proxy="localhost,127.0.0.1,$ip_address"
     source set_env.sh
     # sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
