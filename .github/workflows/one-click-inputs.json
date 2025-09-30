@@ -6,6 +6,7 @@
           "1",
           "1",
           "docker",
+          "$os",
           "$hardware",
           "$HF_TOKEN",
           "$http_proxy",
@@ -22,7 +23,7 @@
           "y",
           "Y"
         ],
-        "clear": ["1", "2", "docker", "$hardware", "Y"]
+        "clear": ["1", "2", "docker", "$os", "$hardware", "Y"]
       }
     },
     "CodeTrans": {
@@ -31,6 +32,7 @@
           "2",
           "1",
           "docker",
+          "$os",
           "$hardware",
           "$HF_TOKEN",
           "$http_proxy",
@@ -44,7 +46,7 @@
           "y",
           "Y"
         ],
-        "clear": ["2", "2", "docker", "$hardware", "Y"]
+        "clear": ["2", "2", "docker", "$os", "$hardware", "Y"]
       }
     },
     "DocSum": {
@@ -53,6 +55,7 @@
           "3",
           "1",
           "docker",
+          "$os",
           "$hardware",
           "$HF_TOKEN",
           "$http_proxy",
@@ -66,7 +69,7 @@
           "y",
           "Y"
         ],
-        "clear": ["3", "2", "docker", "$hardware", "Y"]
+        "clear": ["3", "2", "docker", "$os", "$hardware", "Y"]
       }
     },
     "CodeGen": {
@@ -75,6 +78,7 @@
           "4",
           "1",
           "docker",
+          "$os",
           "$hardware",
           "$HF_TOKEN",
           "$http_proxy",
@@ -88,7 +92,7 @@
           "y",
           "Y"
         ],
-        "clear": ["4", "2", "docker", "$hardware", "Y"]
+        "clear": ["4", "2", "docker", "$os", "$hardware", "Y"]
       }
     },
     "AudioQnA": {
@@ -97,6 +101,7 @@
           "5",
           "1",
           "docker",
+          "$os",
           "$hardware",
           "$HF_TOKEN",
           "$http_proxy",
@@ -110,7 +115,7 @@
           "y",
           "Y"
         ],
-        "clear": ["5", "2", "docker", "$hardware", "Y"]
+        "clear": ["5", "2", "docker", "$os", "$hardware", "Y"]
       }
     },
     "VisualQnA": {
@@ -119,6 +124,7 @@
           "6",
           "1",
           "docker",
+          "$os",
           "$hardware",
           "$HF_TOKEN",
           "$http_proxy",
@@ -132,7 +138,7 @@
           "y",
           "Y"
         ],
-        "clear": ["6", "2", "docker", "$hardware", "Y"]
+        "clear": ["6", "2", "docker", "$os", "$hardware", "Y"]
       }
     },
     "FaqGen": {
@@ -141,6 +147,7 @@
           "7",
           "1",
           "docker",
+          "$os",
           "$hardware",
           "$HF_TOKEN",
           "$http_proxy",
@@ -154,7 +161,7 @@
           "y",
           "Y"
         ],
-        "clear": ["7", "2", "docker", "$hardware", "Y"]
+        "clear": ["7", "2", "docker", "$os", "$hardware", "Y"]
       }
     },
     "AgentQnA": {
@@ -163,6 +170,7 @@
           "8",
           "1",
           "docker",
+          "$os",
           "$hardware",
           "$HF_TOKEN",
           "$http_proxy",
@@ -177,7 +185,7 @@
           "y",
           "Y"
         ],
-        "clear": ["8", "2", "docker", "$hardware", "Y"]
+        "clear": ["8", "2", "docker", "$os", "$hardware", "Y"]
       }
     }
   },
@@ -188,6 +196,7 @@
           "1",
           "1",
           "k8s",
+          "$os",
           "$hardware",
           "$HF_TOKEN",
           "$http_proxy",
@@ -204,7 +213,7 @@
           "8080",
           "Y"
         ],
-        "clear": ["1", "2", "k8s", "y", "Y"]
+        "clear": ["1", "2", "k8s", "$os", "y", "Y"]
       }
     },
     "CodeTrans": {
@@ -213,6 +222,7 @@
           "2",
           "1",
           "k8s",
+          "$os",
           "$hardware",
           "$HF_TOKEN",
           "$http_proxy",
@@ -227,7 +237,7 @@
           "8080",
           "Y"
         ],
-        "clear": ["2", "2", "k8s", "y", "Y"]
+        "clear": ["2", "2", "k8s", "$os", "y", "Y"]
       }
     },
     "DocSum": {
@@ -236,6 +246,7 @@
           "3",
           "1",
           "k8s",
+          "$os",
           "$hardware",
           "$HF_TOKEN",
           "$http_proxy",
@@ -250,7 +261,7 @@
           "8080",
           "Y"
         ],
-        "clear": ["3", "2", "k8s", "y", "Y"]
+        "clear": ["3", "2", "k8s", "$os", "y", "Y"]
       }
     },
     "CodeGen": {
@@ -259,6 +270,7 @@
           "4",
           "1",
           "k8s",
+          "$os",
           "$hardware",
           "$HF_TOKEN",
           "$http_proxy",
@@ -273,7 +285,7 @@
           "8080",
           "Y"
         ],
-        "clear": ["4", "2", "k8s", "y", "Y"]
+        "clear": ["4", "2", "k8s", "$os", "y", "Y"]
       }
     },
     "AudioQnA": {
@@ -282,6 +294,7 @@
           "5",
           "1",
           "k8s",
+          "$os",
           "$hardware",
           "$HF_TOKEN",
           "$http_proxy",
@@ -296,7 +309,7 @@
           "8080",
           "Y"
         ],
-        "clear": ["5", "2", "k8s", "y", "Y"]
+        "clear": ["5", "2", "k8s", "$os", "y", "Y"]
       }
     },
     "VisualQnA": {
@@ -305,6 +318,7 @@
           "6",
           "1",
           "k8s",
+          "$os",
           "$hardware",
           "$HF_TOKEN",
           "$http_proxy",
@@ -319,7 +333,7 @@
           "8080",
           "Y"
         ],
-        "clear": ["6", "2", "k8s", "y", "Y"]
+        "clear": ["6", "2", "k8s", "$os", "y", "Y"]
       }
     },
     "FaqGen": {
@@ -328,6 +342,7 @@
           "7",
           "1",
           "k8s",
+          "$os",
           "$hardware",
           "$HF_TOKEN",
           "$http_proxy",
@@ -342,7 +357,7 @@
           "8080",
           "Y"
         ],
-        "clear": ["7", "2", "k8s", "y", "Y"]
+        "clear": ["7", "2", "k8s", "$os", "y", "Y"]
       }
     },
     "AgentQnA": {
@@ -351,6 +366,7 @@
           "8",
           "1",
           "k8s",
+          "$os",
           "$hardware",
           "$HF_TOKEN",
           "$http_proxy",
@@ -366,7 +382,7 @@
           "8080",
           "Y"
         ],
-        "clear": ["8", "2", "k8s", "y", "Y"]
+        "clear": ["8", "2", "k8s", "$os", "y", "Y"]
       }
     }
   }

@@ -26,12 +26,14 @@ jobs:
     strategy:
       matrix:
         deploy_method: ["docker", "k8s"]
+        os: ["debian", "openeuler"]
       fail-fast: false
     uses: ./.github/workflows/_run-one-click.yml
     with:
       registry: "opea"
       tag: "ci"
       example: ChatQnA
-      hardware: gaudi
+      os: ${{ matrix.os }}
+      hardware: xeon
       deploy_method: ${{ matrix.deploy_method }}
     secrets: inherit
