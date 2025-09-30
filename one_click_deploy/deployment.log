@@ -1,0 +1,36 @@
+2025-09-29 16:20:16,829 [INFO] 📘 Example selected: 'ChatQnA'
+2025-09-29 16:20:19,567 [INFO] 📘 Deployment type selected: 'Offline Deployment Management'
+2025-09-29 16:20:19,567 [INFO] 
+======================================================================
+== OFFLINE DEPLOYMENT MANAGEMENT FOR CHATQNA ==
+======================================================================
+2025-09-29 16:20:29,583 [WARNING] ⚠️ Operation aborted by user or invalid input: 
+2025-09-29 16:20:29,583 [INFO] 📘 Script finished.
+2025-09-29 16:20:31,740 [INFO] 📘 Example selected: 'ChatQnA'
+2025-09-29 16:20:32,979 [INFO] 📘 Deployment type selected: 'Online Deployment'
+2025-09-29 16:20:34,637 [INFO] 📘 Action selected: 'Clear'
+2025-09-29 16:20:34,637 [INFO] 
+======================================================================
+== CHATQNA INTERACTIVE CLEAR SETUP ==
+======================================================================
+2025-09-29 16:20:43,516 [INFO] 📘 Will attempt to clear 'ChatQnA' deployed via k8s.
+2025-09-29 16:22:18,009 [WARNING] ⚠️ Operation aborted by user or invalid input: 
+2025-09-29 16:22:18,009 [INFO] 📘 Script finished.
+2025-09-29 16:22:20,508 [INFO] 📘 Example selected: 'ChatQnA'
+2025-09-29 16:22:21,885 [INFO] 📘 Deployment type selected: 'Online Deployment'
+2025-09-29 16:22:23,438 [INFO] 📘 Action selected: 'Clear'
+2025-09-29 16:22:23,438 [INFO] 
+======================================================================
+== CHATQNA INTERACTIVE CLEAR SETUP ==
+======================================================================
+2025-09-29 16:24:44,933 [WARNING] ⚠️ Operation aborted by user or invalid input: 
+2025-09-29 16:24:44,934 [INFO] 📘 Script finished.
+2025-09-29 16:24:48,076 [INFO] 📘 Example selected: 'ChatQnA'
+2025-09-29 16:24:49,293 [INFO] 📘 Deployment type selected: 'Online Deployment'
+2025-09-29 16:24:50,882 [INFO] 📘 Action selected: 'Clear'
+2025-09-29 16:24:50,883 [INFO] 
+======================================================================
+== CHATQNA INTERACTIVE CLEAR SETUP ==
+======================================================================
+2025-09-29 16:24:57,948 [WARNING] ⚠️ Operation aborted by user or invalid input: 
+2025-09-29 16:24:57,949 [INFO] 📘 Script finished.

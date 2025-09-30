@@ -14,6 +14,7 @@ LOG_FILE="${PROJECT_ROOT}/deploy.log"
 # --- Configuration ---
 EXAMPLE="ChatQnA"
 DEVICE="xeon"
+OS="debian"
 REGISTRY="opea"
 TAG="latest"
 BUILD_ACTION=false
@@ -37,6 +38,8 @@ usage() {
     echo "                              (default: ${EXAMPLE})"
     echo "  --device <DEVICE>:          Specify the target device (e.g., xeon, gaudi)."
     echo "                              (default: ${DEVICE})"
+    echo "  --os <OS>:                  Specify the target operating system (e.g., debian, openeuler)."
+    echo "                              (default: ${OS})"
     echo "  --build:                    Build all images for the specified example."
     echo "  --push:                     Push all built images for the specified example to the registry."
     echo "  --setup-registry:           Set up a local Docker registry (localhost:5000) for this run."
@@ -59,6 +62,7 @@ usage() {
 get_service_list() {
     local example_name=$1
     local device_name=$2
+    local os_name=$3
     case "$example_name" in
         "DocSum")
             if [[ "$device_name" == "gaudi" ]]; then
@@ -68,20 +72,32 @@ get_service_list() {
             fi
             ;;
         "ChatQnA")
-            echo "chatqna chatqna-ui dataprep retriever vllm nginx"
+            if [[ "$os_name" == "openeuler" ]]; then
+                echo "chatqna-openeuler chatqna-ui-openeuler dataprep-openeuler retriever-openeuler nginx-openeuler"
+            else
+                echo "chatqna chatqna-ui dataprep retriever vllm nginx"
+            fi
             ;;
         "CodeGen")
-            if [[ "$device_name" == "gaudi" ]]; then
-                echo "codegen codegen-gradio-ui dataprep embedding retriever llm-textgen vllm-gaudi"
+            if [[ "$os_name" == "openeuler" ]]; then
+                echo "codegen-openeuler codegen-gradio-ui-openeuler dataprep-openeuler embedding-openeuler retriever-openeuler llm-textgen-openeuler"
             else
-                echo "codegen codegen-gradio-ui dataprep embedding retriever llm-textgen vllm"
+                if [[ "$device_name" == "gaudi" ]]; then
+                    echo "codegen codegen-gradio-ui dataprep embedding retriever llm-textgen vllm-gaudi"
+                else
+                    echo "codegen codegen-gradio-ui dataprep embedding retriever llm-textgen vllm"
+                fi
             fi
             ;;
         "AudioQnA")
-            if [[ "$device_name" == "gaudi" ]]; then
-                echo "audioqna audioqna-ui whisper-gaudi speecht5-gaudi vllm-gaudi"
+            if [[ "$os_name" == "openeuler" ]]; then
+                echo "audioqna-openeuler audioqna-ui-openeuler whisper-openeuler speecht5-openeuler"
             else
-                echo "audioqna audioqna-ui whisper speecht5 vllm"
+                if [[ "$device_name" == "gaudi" ]]; then
+                    echo "audioqna audioqna-ui whisper-gaudi speecht5-gaudi vllm-gaudi"
+                else
+                    echo "audioqna audioqna-ui whisper speecht5 vllm"
+                fi
             fi
             ;;
         "FaqGen")
@@ -197,10 +213,17 @@ execute_build() {
 
     log "INFO" "Building base image: comps-base (build-time only)"
     pushd GenAIComps
-    docker build --no-cache -t "${REGISTRY}/comps-base:${TAG}" \
-        --build-arg https_proxy="$https_proxy" \
-        --build-arg http_proxy="$http_proxy" \
-        -f Dockerfile .
+    if [[ "$OS" == "openeuler" ]]; then
+        docker build --no-cache -t "${REGISTRY}/comps-base:${TAG}-openeuler" \
+            --build-arg https_proxy="$https_proxy" \
+            --build-arg http_proxy="$http_proxy" \
+            -f Dockerfile.openEuler .
+    else
+        docker build --no-cache -t "${REGISTRY}/comps-base:${TAG}" \
+            --build-arg https_proxy="$https_proxy" \
+            --build-arg http_proxy="$http_proxy" \
+            -f Dockerfile .
+    fi
     popd
 
     log "INFO" "Starting build for specified ${example_name} services..."
@@ -215,9 +238,10 @@ dispatch_build() {
     local example_name=$1
     local example_path=$2
     local device_name=$3
+    local os_name=$4
     local config_name # This will hold the name of the config array
 
-    section_header "Building Docker Images for ${example_name} on ${device_name}"
+    section_header "Building Docker Images for ${example_name} on ${device_name} with OS ${os_name}"
 
     export REGISTRY
     export TAG
@@ -225,7 +249,7 @@ dispatch_build() {
     export https_proxy=${https_proxy:-}
     export no_proxy=${no_proxy:-}
 
-    local service_list=$(get_service_list "$example_name" "$device_name")
+    local service_list=$(get_service_list "$example_name" "$device_name" "$os_name")
 
     case "$example_name" in
         "DocSum"|"ChatQnA"|"CodeTrans"|"FaqGen"|"VisualQnA")
@@ -268,6 +292,7 @@ push_images() {
     local example_name=$1
     local example_path=$2
     local device_name=$3
+    local os_name=$4
     section_header "Pushing Docker Images for ${example_name}"
 
     cd "${example_path}/docker_image_build"
@@ -277,7 +302,7 @@ push_images() {
     export REGISTRY
     export TAG
 
-    local service_list=$(get_service_list "$example_name" "$device_name")
+    local service_list=$(get_service_list "$example_name" "$device_name" "$os_name" )
 
     if [ -z "$service_list" ]; then
         log "INFO" "Pushing all services defined in build.yaml for ${example_name}..."
@@ -340,6 +365,10 @@ while [[ $# -gt 0 ]]; do
             DEVICE="$2"
             shift 2
             ;;
+        --os)
+            OS="$2"
+            shift 2
+            ;;
         --build)
             BUILD_ACTION=true
             shift
@@ -377,6 +406,7 @@ EXAMPLE_PATH=$(get_example_path "$EXAMPLE")
 log "INFO" "Project Root: ${PROJECT_ROOT}"
 log "INFO" "Selected Example: ${EXAMPLE} (Path: ${EXAMPLE_PATH})"
 log "INFO" "Target Device: ${DEVICE}"
+log "INFO" "Target OS: ${OS}"
 log "INFO" "Image Registry: ${REGISTRY:-'Not set'}"
 log "INFO" "Image Tag: ${TAG}"
 
@@ -385,14 +415,14 @@ if [ "$SETUP_REGISTRY_ACTION" = true ]; then
 fi
 
 if [ "$BUILD_ACTION" = true ]; then
-    dispatch_build "$EXAMPLE" "$EXAMPLE_PATH" "$DEVICE"
+    dispatch_build "$EXAMPLE" "$EXAMPLE_PATH" "$DEVICE" "$OS"
 fi
 
 if [ "$PUSH_ACTION" = true ]; then
     if [ "$REGISTRY" == "opea" ] && [ "$SETUP_REGISTRY_ACTION" = false ]; then
         log "INFO" "Warning: Pushing to default 'opea' registry. Use --registry to specify user/org, e.g., --registry docker.io/opea."
     fi
-    push_images "$EXAMPLE" "$EXAMPLE_PATH" "$DEVICE"
+    push_images "$EXAMPLE" "$EXAMPLE_PATH" "$DEVICE" "$OS"
 fi
 
 if [ "$BUILD_ACTION" = false ] && [ "$PUSH_ACTION" = false ] && [ "$SETUP_REGISTRY_ACTION" = false ]; then

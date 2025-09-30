@@ -14,8 +14,13 @@ EXAMPLE_CONFIGS = {
         "base_dir": "ChatQnA",
         "docker_compose": {
             "paths": {
-                "xeon": "docker_compose/intel/cpu/xeon/compose.yaml",
-                "gaudi": "docker_compose/intel/hpu/gaudi/compose.yaml",
+                "debian": {
+                    "xeon": "docker_compose/intel/cpu/xeon/compose.yaml",
+                    "gaudi": "docker_compose/intel/hpu/gaudi/compose.yaml",
+                },
+                "openeuler": {
+                    "xeon": "docker_compose/intel/cpu/xeon/compose_openeuler.yaml",
+                },
             },
             "set_env_scripts": {
                 "xeon": "docker_compose/intel/cpu/xeon/set_env.sh",
@@ -33,8 +38,13 @@ EXAMPLE_CONFIGS = {
             "helm": {
                 "chart_oci": "oci://ghcr.io/opea-project/charts/chatqna",
                 "values_files": {
-                    "xeon": "kubernetes/helm/cpu-values.yaml",
-                    "gaudi": "kubernetes/helm/gaudi-values.yaml",
+                    "debian": {
+                        "xeon": "kubernetes/helm/cpu-values.yaml",
+                        "gaudi": "kubernetes/helm/gaudi-values.yaml",
+                    },
+                    "openeuler": {
+                        "xeon": "kubernetes/helm/cpu-openeuler-values.yaml",
+                    },
                 },
                 "params_to_values": {
                     "hf_token": ["global", "HUGGINGFACEHUB_API_TOKEN"],
@@ -47,7 +57,12 @@ EXAMPLE_CONFIGS = {
             "release_name": "chatqna",
             "ui_namespace": "rag-ui",
         },
-        "supported_devices": ["xeon", "gaudi"],
+        "supported_os": ["debian", "openeuler"],
+        "default_os": "debian",
+        "supported_devices": {
+            "debian": ["xeon", "gaudi"],
+            "openeuler": ["xeon"],
+        },
         "default_device": "xeon",
         "offline_support": ["docker"],
         "ports": {
@@ -127,8 +142,10 @@ EXAMPLE_CONFIGS = {
         "base_dir": "CodeTrans",
         "docker_compose": {
             "paths": {
-                "xeon": "docker_compose/intel/cpu/xeon/compose.yaml",
-                "gaudi": "docker_compose/intel/hpu/gaudi/compose.yaml",
+                "debian": {
+                    "xeon": "docker_compose/intel/cpu/xeon/compose.yaml",
+                    "gaudi": "docker_compose/intel/hpu/gaudi/compose.yaml",
+                },
             },
             "set_env_scripts": {"xeon": "docker_compose/intel/set_env.sh", "gaudi": "docker_compose/intel/set_env.sh"},
             "params_to_set_env": {"llm_model": "LLM_MODEL_ID", "hf_token": "HF_TOKEN"},
@@ -137,8 +154,10 @@ EXAMPLE_CONFIGS = {
             "helm": {
                 "chart_oci": "oci://ghcr.io/opea-project/charts/codetrans",
                 "values_files": {
-                    "xeon": "kubernetes/helm/cpu-values.yaml",
-                    "gaudi": "kubernetes/helm/gaudi-values.yaml",
+                    "debian": {
+                        "xeon": "kubernetes/helm/cpu-values.yaml",
+                        "gaudi": "kubernetes/helm/gaudi-values.yaml",
+                    },
                 },
                 "params_to_values": {
                     "hf_token": ["global", "HUGGINGFACEHUB_API_TOKEN"],
@@ -148,7 +167,11 @@ EXAMPLE_CONFIGS = {
             "namespace": "codetrans",
             "release_name": "codetrans",
         },
-        "supported_devices": ["xeon", "gaudi"],
+        "supported_os": ["debian"],
+        "default_os": "debian",
+        "supported_devices": {
+            "debian": ["xeon", "gaudi"],
+        },
         "default_device": "xeon",
         "offline_support": [],
         "ports": {
@@ -198,8 +221,10 @@ EXAMPLE_CONFIGS = {
         "base_dir": "DocSum",
         "docker_compose": {
             "paths": {
-                "xeon": "docker_compose/intel/cpu/xeon/compose.yaml",
-                "gaudi": "docker_compose/intel/hpu/gaudi/compose.yaml",
+                "debian": {
+                    "xeon": "docker_compose/intel/cpu/xeon/compose.yaml",
+                    "gaudi": "docker_compose/intel/hpu/gaudi/compose.yaml",
+                },
             },
             "set_env_scripts": {"xeon": "docker_compose/intel/set_env.sh", "gaudi": "docker_compose/intel/set_env.sh"},
             "params_to_set_env": {"llm_model": "LLM_MODEL_ID", "hf_token": "HF_TOKEN"},
@@ -208,8 +233,10 @@ EXAMPLE_CONFIGS = {
             "helm": {
                 "chart_oci": "oci://ghcr.io/opea-project/charts/docsum",
                 "values_files": {
-                    "xeon": "kubernetes/helm/cpu-values.yaml",
-                    "gaudi": "kubernetes/helm/gaudi-values.yaml",
+                    "debian": {
+                        "xeon": "kubernetes/helm/cpu-values.yaml",
+                        "gaudi": "kubernetes/helm/gaudi-values.yaml",
+                    },
                 },
                 "params_to_values": {
                     "hf_token": ["global", "HUGGINGFACEHUB_API_TOKEN"],
@@ -219,7 +246,11 @@ EXAMPLE_CONFIGS = {
             "namespace": "docsum",
             "release_name": "docsum",
         },
-        "supported_devices": ["xeon", "gaudi"],
+        "supported_os": ["debian"],
+        "default_os": "debian",
+        "supported_devices": {
+            "debian": ["xeon", "gaudi"],
+        },
         "default_device": "xeon",
         "offline_support": [],
         "ports": {
@@ -268,8 +299,13 @@ EXAMPLE_CONFIGS = {
         "base_dir": "CodeGen",
         "docker_compose": {
             "paths": {
-                "xeon": "docker_compose/intel/cpu/xeon/compose.yaml",
-                "gaudi": "docker_compose/intel/hpu/gaudi/compose.yaml",
+                "debian": {
+                    "xeon": "docker_compose/intel/cpu/xeon/compose.yaml",
+                    "gaudi": "docker_compose/intel/hpu/gaudi/compose.yaml",
+                },
+                "openeuler": {
+                    "xeon": "docker_compose/intel/cpu/xeon/compose_openeuler.yaml",
+                },
             },
             "set_env_scripts": {"xeon": "docker_compose/intel/set_env.sh", "gaudi": "docker_compose/intel/set_env.sh"},
             "params_to_set_env": {"llm_model": "LLM_MODEL_ID", "hf_token": "HF_TOKEN"},
@@ -278,8 +314,13 @@ EXAMPLE_CONFIGS = {
             "helm": {
                 "chart_oci": "oci://ghcr.io/opea-project/charts/codegen",
                 "values_files": {
-                    "xeon": "kubernetes/helm/cpu-values.yaml",
-                    "gaudi": "kubernetes/helm/gaudi-values.yaml",
+                    "debian": {
+                        "xeon": "kubernetes/helm/cpu-values.yaml",
+                        "gaudi": "kubernetes/helm/gaudi-values.yaml",
+                    },
+                    "openeuler": {
+                        "xeon": "kubernetes/helm/cpu-openeuler-values.yaml",
+                    },
                 },
                 "params_to_values": {
                     "hf_token": ["global", "HUGGINGFACEHUB_API_TOKEN"],
@@ -289,7 +330,12 @@ EXAMPLE_CONFIGS = {
             "namespace": "codegen",
             "release_name": "codegen",
         },
-        "supported_devices": ["xeon", "gaudi"],
+        "supported_os": ["debian", "openeuler"],
+        "default_os": "debian",
+        "supported_devices": {
+            "debian": ["xeon", "gaudi"],
+            "openeuler": ["xeon"],
+        },
         "default_device": "xeon",
         "offline_support": [],
         "ports": {
@@ -336,8 +382,13 @@ EXAMPLE_CONFIGS = {
         "base_dir": "AudioQnA",
         "docker_compose": {
             "paths": {
-                "xeon": "docker_compose/intel/cpu/xeon/compose.yaml",
-                "gaudi": "docker_compose/intel/hpu/gaudi/compose.yaml",
+                "debian": {
+                    "xeon": "docker_compose/intel/cpu/xeon/compose.yaml",
+                    "gaudi": "docker_compose/intel/hpu/gaudi/compose.yaml",
+                },
+                "openeuler": {
+                    "xeon": "docker_compose/intel/cpu/xeon/compose_openeuler.yaml",
+                },
             },
             "set_env_scripts": {
                 "xeon": "docker_compose/intel/cpu/xeon/set_env.sh",
@@ -349,8 +400,13 @@ EXAMPLE_CONFIGS = {
             "helm": {
                 "chart_oci": "oci://ghcr.io/opea-project/charts/audioqna",
                 "values_files": {
-                    "xeon": "kubernetes/helm/cpu-values.yaml",
-                    "gaudi": "kubernetes/helm/gaudi-values.yaml",
+                    "debian": {
+                        "xeon": "kubernetes/helm/cpu-values.yaml",
+                        "gaudi": "kubernetes/helm/gaudi-values.yaml",
+                    },
+                    "openeuler": {
+                        "xeon": "kubernetes/helm/cpu-openeuler-values.yaml",
+                    },
                 },
                 "params_to_values": {
                     "hf_token": ["global", "HUGGINGFACEHUB_API_TOKEN"],
@@ -360,7 +416,12 @@ EXAMPLE_CONFIGS = {
             "namespace": "audioqna",
             "release_name": "audioqna",
         },
-        "supported_devices": ["xeon", "gaudi"],
+        "supported_os": ["debian", "openeuler"],
+        "default_os": "debian",
+        "supported_devices": {
+            "debian": ["xeon", "gaudi"],
+            "openeuler": ["xeon"],
+        },
         "default_device": "xeon",
         "offline_support": [],
         "ports": {
@@ -411,8 +472,10 @@ EXAMPLE_CONFIGS = {
         "base_dir": "VisualQnA",
         "docker_compose": {
             "paths": {
-                "xeon": "docker_compose/intel/cpu/xeon/compose.yaml",
-                "gaudi": "docker_compose/intel/hpu/gaudi/compose.yaml",
+                "debian": {
+                    "xeon": "docker_compose/intel/cpu/xeon/compose.yaml",
+                    "gaudi": "docker_compose/intel/hpu/gaudi/compose.yaml",
+                },
             },
             "set_env_scripts": {
                 "xeon": "docker_compose/intel/cpu/xeon/set_env.sh",
@@ -432,7 +495,11 @@ EXAMPLE_CONFIGS = {
             "namespace": "visualqna",
             "release_name": "visualqna",
         },
-        "supported_devices": ["xeon", "gaudi"],
+        "supported_os": ["debian"],
+        "default_os": "debian",
+        "supported_devices": {
+            "debian": ["xeon", "gaudi"],
+        },
         "default_device": "xeon",
         "offline_support": [],
         "ports": {
@@ -487,8 +554,10 @@ EXAMPLE_CONFIGS = {
         "base_dir": "ChatQnA",
         "docker_compose": {
             "paths": {
-                "xeon": "docker_compose/intel/cpu/xeon/compose_faqgen.yaml",
-                "gaudi": "docker_compose/intel/hpu/gaudi/compose_faqgen.yaml",
+                "debian": {
+                    "xeon": "docker_compose/intel/cpu/xeon/compose_faqgen.yaml",
+                    "gaudi": "docker_compose/intel/hpu/gaudi/compose_faqgen.yaml",
+                },
             },
             "set_env_scripts": {
                 "xeon": "docker_compose/intel/cpu/xeon/set_env.sh",
@@ -514,7 +583,11 @@ EXAMPLE_CONFIGS = {
             "namespace": "faqgen",
             "release_name": "faqgen",
         },
-        "supported_devices": ["xeon", "gaudi"],
+        "supported_os": ["debian"],
+        "default_os": "debian",
+        "supported_devices": {
+            "debian": ["xeon", "gaudi"],
+        },
         "default_device": "xeon",
         "offline_support": [],
         "ports": {
@@ -568,14 +641,16 @@ EXAMPLE_CONFIGS = {
         "base_dir": "AgentQnA",
         "docker_compose": {
             "paths": {
-                "xeon": [
-                    "docker_compose/intel/cpu/xeon/compose_openai.yaml",
-                    f"{EXAMPLES_ROOT_DIR}/DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml",
-                ],
-                "gaudi": [
-                    "docker_compose/intel/hpu/gaudi/compose.yaml",
-                    f"{EXAMPLES_ROOT_DIR}/DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml",
-                ],
+                "debian": {
+                    "xeon": [
+                        "docker_compose/intel/cpu/xeon/compose_openai.yaml",
+                        f"{EXAMPLES_ROOT_DIR}/DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml",
+                    ],
+                    "gaudi": [
+                        "docker_compose/intel/hpu/gaudi/compose.yaml",
+                        f"{EXAMPLES_ROOT_DIR}/DocIndexRetriever/docker_compose/intel/cpu/xeon/compose.yaml",
+                    ],
+                }
             },
             "set_env_scripts": {
                 "xeon": "docker_compose/intel/cpu/xeon/set_env.sh",
@@ -614,7 +689,11 @@ EXAMPLE_CONFIGS = {
             "release_name": "agentqna",
             "ui_namespace": "agentqna-ui",
         },
-        "supported_devices": ["xeon", "gaudi"],
+        "supported_os": ["debian"],
+        "default_os": "debian",
+        "supported_devices": {
+            "debian": ["xeon", "gaudi"],
+        },
         "default_device": "xeon",
         "offline_support": [],
         "ports": {
