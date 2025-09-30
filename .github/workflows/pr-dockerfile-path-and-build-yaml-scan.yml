@@ -17,7 +17,7 @@ jobs:
         run: sudo rm -rf ${{github.workspace}}/*
 
       - name: Checkout Repo GenAIExamples
-        uses: actions/checkout@v4
+        uses: actions/checkout@1e31de5234b9f8995739874a8ce0492dc87873e2
 
       - name: Clone Repo GenAIComps
         run: |
@@ -50,7 +50,7 @@ jobs:
         run: sudo rm -rf ${{github.workspace}}/*
 
       - name: Checkout Repo GenAIExamples
-        uses: actions/checkout@v4
+        uses: actions/checkout@1e31de5234b9f8995739874a8ce0492dc87873e2
         with:
           fetch-depth: 0
 
@@ -85,11 +85,11 @@ jobs:
         run: sudo rm -rf ${{github.workspace}}/*
 
       - name: Checkout Repo GenAIExamples
-        uses: actions/checkout@v4
+        uses: actions/checkout@1e31de5234b9f8995739874a8ce0492dc87873e2
 
       - name: Check name agreement in build.yaml
         run: |
-          pip install ruamel.yaml
+          pip install ruamel.yaml==0.18.6
           cd ${{github.workspace}}
           consistency="TRUE"
           build_yamls=$(find . -name 'build.yaml')
