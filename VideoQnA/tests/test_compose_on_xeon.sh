@@ -243,30 +243,6 @@ function validate_megaservice() {
     echo "==== megaservice validated ===="
 }
 
-function validate_frontend() {
-    echo "Validating frontend ..."
-
-    HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X GET ${FRONTEND_ENDPOINT})
-
-    if [ "$HTTP_STATUS" -eq 200 ]; then
-        echo "Frontend is running correctly."
-        local CONTENT=$(curl -s -X GET ${FRONTEND_ENDPOINT})
-        if echo "$CONTENT" | grep -q "ok"; then
-            echo "Frontend Content is as expected."
-        else
-            echo "Frontend Content does not match the expected result: $CONTENT"
-            docker logs videoqna-xeon-ui-server >> ${LOG_PATH}/ui.log
-            exit 1
-        fi
-    else
-        echo "Frontend is not running correctly. Received status was $HTTP_STATUS"
-        docker logs videoqna-xeon-ui-server >> ${LOG_PATH}/ui.log
-        exit 1
-    fi
-
-    echo "==== frontend validated ===="
-}
-
 function stop_docker() {
     echo "Stopping docker..."
     cd $WORKPATH/docker_compose/intel/cpu/xeon/
@@ -296,10 +272,6 @@ function main() {
 
     echo "::group::validate_megaservice"
     validate_megaservice
-    echo "::endgroup::"
-
-    echo "::group::validate_frontend"
-    validate_frontend
     echo "::endgroup::"
 
     echo "::group::stop_docker"

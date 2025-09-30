@@ -17,6 +17,7 @@
       :action="importUrl"
       accept=".json"
       :showUploadList="false"
+      :before-upload="handleBeforeUpload"
       @change="handleChange"
     >
       <SvgIcon
@@ -41,6 +42,7 @@ import { ref } from "vue";
 import { useNotification } from "@/utils/common";
 import { NextLoading } from "@/utils/loading";
 import { useI18n } from "vue-i18n";
+import { message, UploadProps } from "ant-design-vue";
 
 const { t } = useI18n();
 const { antNotification } = useNotification();
@@ -49,6 +51,16 @@ const emit = defineEmits(["search", "close"]);
 const modelVisible = ref<boolean>(true);
 const fileList = ref([]);
 
+const handleBeforeUpload = (file: UploadProps["fileList"][number]) => {
+  const isFileSize = file.size / 1024 / 1024 < 10;
+
+  if (!isFileSize) {
+    message.error(t("pipeline.pipelineFormatTip"));
+    return;
+  }
+
+  return isFileSize;
+};
 const handleChange = (info: any) => {
   const el = <HTMLElement>document.querySelector(".loading-next");
   if (!el) NextLoading.start();

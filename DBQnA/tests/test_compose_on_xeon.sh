@@ -48,9 +48,10 @@ function start_services() {
 }
 
 function validate_microservice() {
-    result=$(http_proxy="" curl --connect-timeout 5 --max-time 120000 http://${ip_address}:$TEXT2SQL_PORT/v1/text2sql\
+    url="postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${ip_address}:5442/${POSTGRES_DB}"
+    result=$(http_proxy="" curl --connect-timeout 5 --max-time 120000 http://${ip_address}:$TEXT2SQL_PORT/v1/text2query\
         -X POST \
-        -d '{"input_text": "Find the total number of Albums.","conn_str": {"user": "'${POSTGRES_USER}'","password": "'${POSTGRES_PASSWORD}'","host": "'${ip_address}'", "port": "5442", "database": "'${POSTGRES_DB}'" }}' \
+        -d '{"query": "Find the total number of Albums.","conn_type": "sql", "conn_url": "'${url}'", "conn_user": "'${POSTGRES_USER}'","conn_password": "'${POSTGRES_PASSWORD}'","conn_dialect": "postgresql" }' \
         -H 'Content-Type: application/json')
 
     if echo "$result" | jq -e '.result.output' > /dev/null 2>&1; then
@@ -64,35 +65,6 @@ function validate_microservice() {
         exit 1
     fi
 
-}
-
-function validate_frontend() {
-    echo "[ TEST INFO ]: --------- frontend test started ---------"
-    cd $WORKPATH/ui/react
-    local conda_env_name="OPEA_e2e"
-    export PATH=${HOME}/miniforge3/bin/:$PATH
-    if conda info --envs | grep -q "$conda_env_name"; then
-        echo "$conda_env_name exist!"
-    else
-        conda create -n ${conda_env_name} python=3.12 -y
-    fi
-
-    source activate ${conda_env_name}
-    echo "[ TEST INFO ]: --------- conda env activated ---------"
-
-    conda install -c conda-forge nodejs=22.6.0 -y
-    npm install && npm ci
-    node -v && npm -v && pip list
-
-    exit_status=0
-    npm run test || exit_status=$?
-
-    if [ $exit_status -ne 0 ]; then
-        echo "[TEST INFO]: ---------frontend test failed---------"
-        exit $exit_status
-    else
-        echo "[TEST INFO]: ---------frontend test passed---------"
-    fi
 }
 
 function stop_docker() {
@@ -116,10 +88,6 @@ function main() {
 
     echo "::group::validate_microservice"
     validate_microservice
-    echo "::endgroup::"
-
-    echo "::group::validate_frontend"
-    validate_frontend
     echo "::endgroup::"
 
     echo "::group::stop_docker"

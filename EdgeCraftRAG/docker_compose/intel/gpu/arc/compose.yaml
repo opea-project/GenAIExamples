@@ -71,7 +71,6 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      HF_ENDPOINT: ${HF_ENDPOINT}
       vLLM_ENDPOINT: ${vLLM_ENDPOINT:-http://${HOST_IP}:${NGINX_PORT:-8086}}
       ENABLE_BENCHMARK: ${ENABLE_BENCHMARK:-false}
       MAX_MODEL_LEN: ${MAX_MODEL_LEN:-5000}
@@ -80,7 +79,6 @@ services:
       - ${MODEL_PATH:-${PWD}}:/home/user/models
       - ${DOC_PATH:-${PWD}}:/home/user/docs
       - ${TMPFILE_PATH:-${PWD}}:/home/user/ui_cache
-      - ${HF_CACHE:-${HOME}/.cache}:/home/user/.cache
       - ${PROMPT_PATH:-${PWD}}:/templates/custom
     restart: always
     ports:

@@ -66,8 +66,8 @@ class PipelineMgr(BaseMgr):
             return
 
         nodelist = None
-        if pl.node_changed:
-            nodelist = nm.get_nodes(pl.node_parser.idx)
+        # if pl.node_changed:
+        #     nodelist = nm.get_nodes(pl.node_parser.idx)
         pl.check_active(nodelist, kb_name)
         prevactive = self._active_pipeline
         if prevactive:

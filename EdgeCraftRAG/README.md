@@ -5,6 +5,12 @@ Retrieval-Augmented Generation system for edge solutions. It is designed to
 curate the RAG pipeline to meet hardware requirements at edge with guaranteed
 quality and performance.
 
+## What's New
+
+1. Support Intel Arc B60 for model inference
+2. support KBadmin for knowledge base management
+3. support Experience Injection module in UI
+
 ## Table of contents
 
 1. [Architecture](#architecture)

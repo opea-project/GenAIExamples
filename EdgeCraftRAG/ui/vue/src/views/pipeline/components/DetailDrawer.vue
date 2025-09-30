@@ -83,6 +83,17 @@
                 formData.indexer.indexer_type
               }}</span>
             </li>
+            <li
+              class="item-wrap"
+              v-if="formData.indexer.indexer_type === 'kbadmin_indexer'"
+            >
+              <span class="label-wrap">{{
+                $t("pipeline.config.embeddingUrl")
+              }}</span>
+              <span class="content-wrap">{{
+                formData.indexer?.embedding_url
+              }}</span>
+            </li>
             <li class="item-wrap">
               <span class="label-wrap">{{
                 $t("pipeline.config.embedding")
@@ -101,13 +112,17 @@
             </li>
             <li
               class="item-wrap"
-              v-if="formData.indexer.indexer_type === 'milvus_vector'"
+              v-if="
+                ['kbadmin_indexer', 'milvus_vector'].includes(
+                  formData.indexer.indexer_type
+                )
+              "
             >
               <span class="label-wrap">{{
-                $t("pipeline.config.vector_uri")
+                $t("pipeline.config.vector_url")
               }}</span>
               <span class="content-wrap">{{
-                formData.indexer.vector_uri
+                formData.indexer?.vector_url
               }}</span>
             </li>
           </ul>
@@ -165,6 +180,10 @@
               <span class="content-wrap">{{ item.processor_type }}</span>
             </li>
             <template v-if="item.processor_type === 'reranker'">
+              <li class="item-wrap">
+                <span class="label-wrap">{{ $t("pipeline.config.topn") }}</span>
+                <span class="content-wrap">{{ item.top_n }}</span>
+              </li>
               <li class="item-wrap">
                 <span class="label-wrap">{{
                   $t("pipeline.config.rerank")
@@ -266,11 +285,15 @@ const postProcessorActive = ref<string>("postProcessor");
 const generatorActive = ref<string>("generator");
 
 const isHierarchical = computed(() => {
-  return formData.node_parser.parser_type === "hierarchical";
+  return (
+    formData.node_parser.parser_type === "hierarchical" ||
+    formData.node_parser.parser_type === "kbadmin_parser"
+  );
 });
 const isSentencewindow = computed(() => {
   return formData.node_parser.parser_type === "sentencewindow";
 });
+
 const handleClose = () => {
   emit("close");
 };
