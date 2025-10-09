@@ -22,23 +22,23 @@ echo "Script directory: $SCRIPT_DIR"
 echo "Working directory: $WORKPATH"
 
 function build_docker_images() {
-    echo "Building PolyLingua Docker images..."
-    cd $WORKPATH
+    opea_branch=${opea_branch:-"main"}
+    cd $WORKPATH/docker_image_build
 
-    # Build polylingua backend
-    echo "Building polylingua backend service..."
-    docker build --no-cache -t ${REGISTRY}/polylingua:${TAG} -f Dockerfile . > ${LOG_PATH}/docker_image_build.log 2>&1
+    # Clone GenAIComps
+    git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
+    pushd GenAIComps
+    echo "GenAIComps test commit is $(git rev-parse HEAD)"
+    docker build --no-cache -t ${REGISTRY}/comps-base:${TAG} --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
+    popd && sleep 1s
 
-    # Build polylingua UI
-    echo "Building polylingua UI service..."
-    export BACKEND_SERVICE_ENDPOINT="http://${ip_address}:8888"
-    docker build --no-cache \
-      --build-arg BACKEND_SERVICE_ENDPOINT=${BACKEND_SERVICE_ENDPOINT} \
-      -t ${REGISTRY}/polylingua-ui:${TAG} \
-      -f ui/Dockerfile ./ui >> ${LOG_PATH}/docker_image_build.log 2>&1
+    # Build all images using build.yaml
+    echo "Building PolyLingua images with --no-cache, check docker_image_build.log for details..."
+    service_list="polylingua polylingua-ui llm-textgen"
+    docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log 2>&1
 
     echo "Image build completed"
-    docker images | grep polylingua
+    docker images | grep -E "polylingua|llm-textgen"
     sleep 1s
 }
 
