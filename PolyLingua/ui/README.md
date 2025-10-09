@@ -29,11 +29,13 @@ A modern, single-page translation interface built with Next.js 14, React, and sh
 ### Installation
 
 1. Navigate to the ui directory:
+
 ```bash
 cd ui
 ```
 
 2. Install dependencies:
+
 ```bash
 npm install
 # or
@@ -43,6 +45,7 @@ pnpm install
 ```
 
 3. Run the development server:
+
 ```bash
 npm run dev
 # or
@@ -96,10 +99,10 @@ const handleTranslate = async () => {
   setIsLoading(true);
 
   try {
-    const response = await fetch('/api/translate', {
-      method: 'POST',
+    const response = await fetch("/api/translate", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         text: sourceText,
