@@ -1,40 +1,12 @@
-# PloyLingua
+# PolyLingua
 
 A production-ready translation service built with **OPEA (Open Platform for Enterprise AI)** components, featuring a modern Next.js UI and microservices architecture.
 
-## 🏗️ Architecture
-
-This service implements a **5-layer microservices architecture**:
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    Nginx Reverse Proxy                       │
-│                        (Port 80)                             │
-└────────────────┬────────────────────────────────────────────┘
-                 │
-        ┌────────┴─────────┐
-        │                  │
-┌───────▼────────┐  ┌──────▼──────────────────┐
-│   Next.js UI   │  │  Translation Megaservice │
-│   (Port 5173)  │  │     (Port 8888)          │
-└────────────────┘  └──────┬──────────────────┘
-                           │
-                  ┌────────▼────────────┐
-                  │  LLM Microservice   │
-                  │    (Port 9000)      │
-                  └────────┬────────────┘
-                           │
-                  ┌────────▼────────────┐
-                  │   TGI Model Server  │
-                  │    (Port 8008)      │
-                  └─────────────────────┘
-```
-
 ### Components
 
-1. **TGI Service** - HuggingFace Text Generation Inference for model serving
+1. **vLLM Service** - High-performance LLM inference engine for model serving
 2. **LLM Microservice** - OPEA wrapper providing standardized API
-3. **Translation Megaservice** - Orchestrator that formats prompts and routes requests
+3. **PolyLingua Megaservice** - Orchestrator that formats prompts and routes requests
 4. **UI Service** - Next.js 14 frontend with React and TypeScript
 5. **Nginx** - Reverse proxy for unified access
 
@@ -59,7 +31,7 @@ cd PolyLingua
 
 You'll be prompted for:
 - **HuggingFace API Token** - Get from https://huggingface.co/settings/tokens
-- **Model ID** - Default: `haoranxu/ALMA-13B` (translation-optimized model)
+- **Model ID** - Default: `swiss-ai/Apertus-8B-Instruct-2509` (translation-optimized model)
 - **Host IP** - Your server's IP address
 - **Ports and proxy settings**
 
@@ -113,7 +85,7 @@ Key variables in `.env`:
 | Variable | Description | Default |
 |----------|-------------|---------|
 | `HF_TOKEN` | HuggingFace API token | Required |
-| `LLM_MODEL_ID` | Model to use for translation | `haoranxu/ALMA-13B` |
+| `LLM_MODEL_ID` | Model to use for translation | `swiss-ai/Apertus-8B-Instruct-2509` |
 | `MODEL_CACHE` | Directory for model storage | `./data` |
 | `host_ip` | Server IP address | `localhost` |
 | `NGINX_PORT` | External port for web access | `80` |
@@ -133,24 +105,24 @@ The service works with any HuggingFace text generation model. Recommended models
 ### Project Structure
 
 ```
-opea-translation/
-├── translation.py          # Backend translation service
-├── requirements.txt        # Python dependencies
-├── Dockerfile             # Backend container definition
-├── docker-compose.yaml    # Multi-service orchestration
-├── set_env.sh            # Environment setup script
-├── .env.example          # Environment template
-├── ui/                   # Next.js frontend
-│   ├── app/             # Next.js app directory
-│   ├── components/      # React components
-│   ├── Dockerfile       # UI container definition
-│   └── package.json     # Node dependencies
-└── deploy/              # Deployment scripts
-    ├── nginx.conf       # Nginx configuration
-    ├── build.sh         # Image build script
-    ├── start.sh         # Service startup script
-    ├── stop.sh          # Service shutdown script
-    └── test.sh          # API testing script
+PolyLingua/
+├── polylingua.py          # Backend polylingua service
+├── requirements.txt       # Python dependencies
+├── Dockerfile            # Backend container definition
+├── docker-compose.yaml   # Multi-service orchestration
+├── set_env.sh           # Environment setup script
+├── .env.example         # Environment template
+├── ui/                  # Next.js frontend
+│   ├── app/            # Next.js app directory
+│   ├── components/     # React components
+│   ├── Dockerfile      # UI container definition
+│   └── package.json    # Node dependencies
+└── deploy/             # Deployment scripts
+    ├── nginx.conf      # Nginx configuration
+    ├── build.sh        # Image build script
+    ├── start.sh        # Service startup script
+    ├── stop.sh         # Service shutdown script
+    └── test.sh         # API testing script
 ```
 
 ### Running Locally (Development)
@@ -166,7 +138,7 @@ export LLM_SERVICE_PORT=9000
 export MEGA_SERVICE_PORT=8888
 
 # Run service
-python translation.py
+python polylingua.py
 ```
 
 **Frontend:**
@@ -194,7 +166,7 @@ Translate text between languages.
 **Response:**
 ```json
 {
-  "model": "translation",
+  "model": "polylingua",
   "choices": [{
     "index": 0,
     "message": {
@@ -216,8 +188,8 @@ Translate text between languages.
 docker compose logs -f
 
 # Specific service
-docker compose logs -f translation-backend-server
-docker compose logs -f translation-ui-server
+docker compose logs -f polylingua-backend-server
+docker compose logs -f polylingua-ui-server
 ```
 
 ### Stop Services
@@ -253,7 +225,7 @@ docker compose down -v
 
 1. Check if ports are available:
    ```bash
-   sudo lsof -i :80,8888,9000,8008,5173
+   sudo lsof -i :80,8888,9000,8028,5173
    ```
 
 2. Verify environment variables:
@@ -276,9 +248,9 @@ docker compose down -v
 
 ### Translation errors
 
-- Wait for TGI service to fully initialize (check logs)
+- Wait for vLLM service to fully initialize (check logs)
 - Verify LLM service is healthy: `curl http://localhost:9000/v1/health`
-- Check TGI service: `curl http://localhost:8008/health`
+- Check vLLM service: `curl http://localhost:8028/health`
 
 ### UI can't connect to backend
 
@@ -293,7 +265,7 @@ docker compose down -v
 - [OPEA Project](https://github.com/opea-project)
 - [GenAIComps](https://github.com/opea-project/GenAIComps)
 - [GenAIExamples](https://github.com/opea-project/GenAIExamples)
-- [HuggingFace Text Generation Inference](https://github.com/huggingface/text-generation-inference)
+- [vLLM](https://github.com/vllm-project/vllm)
 
 ## 📧 Support
 

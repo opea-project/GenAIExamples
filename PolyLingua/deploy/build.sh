@@ -5,7 +5,7 @@
 set -e
 
 echo "======================================"
-echo "Building OPEA Translation Service Images"
+echo "Building OPEA PolyLingua Service Images"
 echo "======================================"
 
 # Source environment variables
@@ -17,17 +17,17 @@ else
     echo "Run './set_env.sh' to configure environment variables."
 fi
 
-# Build translation backend
+# Build polylingua backend
 echo ""
-echo "Building translation backend service..."
-docker build --no-cache -t ${REGISTRY:-opea}/translation:${TAG:-latest} -f Dockerfile .
+echo "Building polylingua backend service..."
+docker build --no-cache -t ${REGISTRY:-opea}/polylingua:${TAG:-latest} -f Dockerfile .
 
-# Build translation UI
+# Build polylingua UI
 echo ""
-echo "Building translation UI service..."
+echo "Building polylingua UI service..."
 docker build --no-cache \
   --build-arg BACKEND_SERVICE_ENDPOINT=${BACKEND_SERVICE_ENDPOINT} \
-  -t ${REGISTRY:-opea}/translation-ui:${TAG:-latest} \
+  -t ${REGISTRY:-opea}/polylingua-ui:${TAG:-latest} \
   -f ui/Dockerfile ./ui
 
 echo ""
@@ -36,8 +36,8 @@ echo "Build completed successfully!"
 echo "======================================"
 echo ""
 echo "Images built:"
-echo "  - ${REGISTRY:-opea}/translation:${TAG:-latest}"
-echo "  - ${REGISTRY:-opea}/translation-ui:${TAG:-latest}"
+echo "  - ${REGISTRY:-opea}/polylingua:${TAG:-latest}"
+echo "  - ${REGISTRY:-opea}/polylingua-ui:${TAG:-latest}"
 echo ""
 echo "To start the services, run:"
 echo "  ./deploy/start.sh"

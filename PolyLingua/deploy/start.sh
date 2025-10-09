@@ -5,7 +5,7 @@
 set -e
 
 echo "======================================"
-echo "Starting OPEA Translation Service"
+echo "Starting OPEA PolyLingua Service"
 echo "======================================"
 
 # Source environment variables

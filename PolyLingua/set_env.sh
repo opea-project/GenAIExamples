@@ -2,10 +2,10 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-# Environment Setup Script for OPEA Translation Service
+# Environment Setup Script for OPEA PolyLingua Service
 
 echo "======================================"
-echo "OPEA Translation Service Setup"
+echo "OPEA PolyLingua Service Setup"
 echo "======================================"
 echo ""
 
@@ -51,8 +51,8 @@ prompt_with_default "Enter Host IP" "$host_ip" "host_ip"
 # Service Endpoints
 echo ""
 echo "--- Service Endpoints ---"
-export TGI_LLM_ENDPOINT="http://${host_ip}:8008"
-echo "export TGI_LLM_ENDPOINT=\"http://${host_ip}:8008\"" >> .env
+export VLLM_ENDPOINT="http://${host_ip}:8028"
+echo "export VLLM_ENDPOINT=\"http://${host_ip}:8028\"" >> .env
 
 export LLM_SERVICE_HOST_IP="${host_ip}"
 echo "export LLM_SERVICE_HOST_IP=\"${host_ip}\"" >> .env
@@ -72,8 +72,8 @@ echo "export FRONTEND_SERVICE_IP=\"${host_ip}\"" >> .env
 export FRONTEND_SERVICE_PORT="5173"
 echo "export FRONTEND_SERVICE_PORT=\"5173\"" >> .env
 
-export BACKEND_SERVICE_NAME="translation"
-echo "export BACKEND_SERVICE_NAME=\"translation\"" >> .env
+export BACKEND_SERVICE_NAME="polylingua"
+echo "export BACKEND_SERVICE_NAME=\"polylingua\"" >> .env
 
 export BACKEND_SERVICE_IP="${host_ip}"
 echo "export BACKEND_SERVICE_IP=\"${host_ip}\"" >> .env

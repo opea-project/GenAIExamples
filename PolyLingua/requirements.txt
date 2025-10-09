@@ -12,3 +12,6 @@ asyncio>=3.4.3
 
 # Language Detection
 langdetect>=1.0.9
+
+# Document Processing
+docling>=2.0.0

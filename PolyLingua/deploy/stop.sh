@@ -5,7 +5,7 @@
 set -e
 
 echo "======================================"
-echo "Stopping OPEA Translation Service"
+echo "Stopping OPEA PolyLingua Service"
 echo "======================================"
 
 echo ""
