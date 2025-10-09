@@ -1,17 +1,17 @@
-# OPEA GenAIComps Framework
-opea-comps>=1.3.0
-
-# Core Dependencies
-fastapi>=0.109.0
-uvicorn[standard]>=0.27.0
-python-multipart>=0.0.9
 
 # Async Support
 aiohttp>=3.9.0
 asyncio>=3.4.3
 
-# Language Detection
-langdetect>=1.0.9
-
 # Document Processing
 docling>=2.0.0
+
+# Core Dependencies
+fastapi>=0.109.0
+
+# Language Detection
+langdetect>=1.0.9
+# OPEA GenAIComps Framework
+opea-comps>=1.3.0
+python-multipart>=0.0.9
+uvicorn[standard]>=0.27.0
