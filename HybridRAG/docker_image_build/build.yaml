@@ -13,12 +13,12 @@ services:
       context: ../
       dockerfile: ./Dockerfile
     image: ${REGISTRY:-opea}/hybridrag:${TAG:-latest}
-  text2cypher-gaudi:
+  text2query-cypher:
     build:
       context: GenAIComps
-      dockerfile:  comps/text2cypher/src/Dockerfile.intel_hpu
+      dockerfile:  comps/text2query/src/Dockerfile.cypher.intel_hpu
     extends: hybridrag
-    image: ${REGISTRY:-opea}/text2cypher-gaudi:${TAG:-latest}
+    image: ${REGISTRY:-opea}/text2query-cypher:${TAG:-latest}
   dataprep:
     build:
       context: GenAIComps

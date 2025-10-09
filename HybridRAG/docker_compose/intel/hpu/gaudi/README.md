@@ -47,15 +47,15 @@ The HybridRAG docker images should automatically be downloaded from the `OPEA re
 
 ```
 [+] Running 9/9
- ✔ Container redis-vector-db                Healthy                                                                           6.4s
- ✔ Container vllm-service                   Started                                                                           0.4s
- ✔ Container tei-embedding-server           Started                                                                           0.9s
- ✔ Container neo4j-apoc                     Healthy                                                                          11.4s
- ✔ Container tei-reranking-server           Started                                                                           0.8s
- ✔ Container retriever-redis-server         Started                                                                           1.0s
- ✔ Container dataprep-redis-server          Started                                                                           6.5s
- ✔ Container text2cypher-gaudi-container    Started                                                                          12.2s
- ✔ Container hybridrag-xeon-backend-server  Started                                                                          12.4s
+ ✔ Container redis-vector-db                      Healthy                                                                           6.4s
+ ✔ Container vllm-service                         Started                                                                           0.4s
+ ✔ Container tei-embedding-server                 Started                                                                           0.9s
+ ✔ Container neo4j-apoc                           Healthy                                                                          11.4s
+ ✔ Container tei-reranking-server                 Started                                                                           0.8s
+ ✔ Container retriever-redis-server               Started                                                                           1.0s
+ ✔ Container dataprep-redis-server                Started                                                                           6.5s
+ ✔ Container text2query-cypher-gaudi-container    Started                                                                          12.2s
+ ✔ Container hybridrag-xeon-backend-server        Started                                                                          12.4s
 ```
 
 To rebuild the docker image for the hybridrag-xeon-backend-server container:
@@ -78,7 +78,7 @@ For the default deployment, the following 10 containers should have started:
 ```
 CONTAINER ID   IMAGE                                                                                       COMMAND                  CREATED        STATUS                  PORTS                                                                                            NAMES
 a9286abd0015   opea/hybridrag:latest                                                                       "python hybridrag.py"    15 hours ago   Up 15 hours             0.0.0.0:8888->8888/tcp, :::8888->8888/tcp                                                        hybridrag-xeon-backend-server
-8477b154dc72   opea/text2cypher-gaudi:latest                                                               "/bin/sh -c 'bash ru…"   15 hours ago   Up 15 hours             0.0.0.0:11801->9097/tcp, [::]:11801->9097/tcp                                                    text2cypher-gaudi-container
+8477b154dc72   opea/text2query-cypher:latest                                                               "/bin/sh -c 'bash ru…"   15 hours ago   Up 15 hours             0.0.0.0:11801->9097/tcp, [::]:11801->9097/tcp                                                    text2query-cypher-gaudi-container
 688e01a431fa   opea/dataprep:latest                                                                        "sh -c 'python $( [ …"   15 hours ago   Up 15 hours             0.0.0.0:6007->5000/tcp, [::]:6007->5000/tcp                                                      dataprep-redis-server
 54f574fe54bb   opea/retriever:latest                                                                       "python opea_retriev…"   15 hours ago   Up 15 hours             0.0.0.0:7000->7000/tcp, :::7000->7000/tcp                                                        retriever-redis-server
 5028eb66617c   ghcr.io/huggingface/text-embeddings-inference:cpu-1.6                                       "text-embeddings-rou…"   15 hours ago   Up 15 hours             0.0.0.0:8808->80/tcp, [::]:8808->80/tcp                                                          tei-reranking-server

@@ -255,14 +255,14 @@ class HybridRAGService:
         self.endpoint = str(MegaServiceEndpoint.HYBRID_RAG)
 
     async def exec_text2cypher(self, prompt):
-        url = f"http://{TEXT2CYPHER_SERVER_HOST_IP}:{TEXT2CYPHER_SERVER_PORT}/v1/text2cypher"
+        url = f"http://{TEXT2CYPHER_SERVER_HOST_IP}:{TEXT2CYPHER_SERVER_PORT}/v1/text2query"
         headers = {"Content-Type": "application/json"}
         if refresh_db == "False":
-            data = {"input_text": prompt, "seeding": {"refresh_db": "False"}}
+            data = {"query": prompt, "options": {"refresh_db": "False"}}
         elif cypher_insert is not None:
-            data = {"input_text": prompt, "seeding": {"cypher_insert": "'${cypher_insert}'", "refresh_db": "True"}}
+            data = {"query": prompt, "options": {"cypher_insert": "'${cypher_insert}'", "refresh_db": "True"}}
         else:
-            data = {"input_text": prompt}
+            data = {"query": prompt}
         response = requests.post(url, json=data)
         data = response.json()
         data_str = str(data)
@@ -295,12 +295,12 @@ class HybridRAGService:
         )
 
         text2cypher = MicroService(
-            name="text2cypher",
+            name="text2query",
             host=TEXT2CYPHER_SERVER_HOST_IP,
             port=TEXT2CYPHER_SERVER_PORT,
-            endpoint="/text2cypher",
+            endpoint="/text2query",
             use_remote_service=True,
-            service_type=ServiceType.TEXT2CYPHER,
+            service_type=ServiceType.TEXT2QUERY,
         )
 
         retriever = MicroService(
