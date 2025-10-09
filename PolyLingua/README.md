@@ -30,6 +30,7 @@ cd PolyLingua
 ```
 
 You'll be prompted for:
+
 - **HuggingFace API Token** - Get from https://huggingface.co/settings/tokens
 - **Model ID** - Default: `swiss-ai/Apertus-8B-Instruct-2509` (translation-optimized model)
 - **Host IP** - Your server's IP address
@@ -42,6 +43,7 @@ You'll be prompted for:
 ```
 
 This builds:
+
 - Translation backend service
 - Next.js UI service
 
@@ -82,13 +84,13 @@ curl -X POST http://localhost:8888/v1/translation \
 
 Key variables in `.env`:
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `HF_TOKEN` | HuggingFace API token | Required |
+| Variable       | Description                  | Default                             |
+| -------------- | ---------------------------- | ----------------------------------- |
+| `HF_TOKEN`     | HuggingFace API token        | Required                            |
 | `LLM_MODEL_ID` | Model to use for translation | `swiss-ai/Apertus-8B-Instruct-2509` |
-| `MODEL_CACHE` | Directory for model storage | `./data` |
-| `host_ip` | Server IP address | `localhost` |
-| `NGINX_PORT` | External port for web access | `80` |
+| `MODEL_CACHE`  | Directory for model storage  | `./data`                            |
+| `host_ip`      | Server IP address            | `localhost`                         |
+| `NGINX_PORT`   | External port for web access | `80`                                |
 
 See `.env.example` for full configuration options.
 
@@ -98,7 +100,6 @@ The service works with any HuggingFace text generation model. Recommended models
 
 - **swiss-ai/Apertus-8B-Instruct-2509** - Multilingual translation (default)
 - **haoranxu/ALMA-7B** - Specialized translation model
-
 
 ## 🛠️ Development
 
@@ -128,6 +129,7 @@ PolyLingua/
 ### Running Locally (Development)
 
 **Backend:**
+
 ```bash
 # Install dependencies
 pip install -r requirements.txt
@@ -142,6 +144,7 @@ python polylingua.py
 ```
 
 **Frontend:**
+
 ```bash
 cd ui
 npm install
@@ -155,6 +158,7 @@ npm run dev
 Translate text between languages.
 
 **Request:**
+
 ```json
 {
   "language_from": "English",
@@ -164,17 +168,20 @@ Translate text between languages.
 ```
 
 **Response:**
+
 ```json
 {
   "model": "polylingua",
-  "choices": [{
-    "index": 0,
-    "message": {
-      "role": "assistant",
-      "content": "Translated text here"
-    },
-    "finish_reason": "stop"
-  }],
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "Translated text here"
+      },
+      "finish_reason": "stop"
+    }
+  ],
   "usage": {}
 }
 ```
@@ -224,11 +231,13 @@ docker compose down -v
 ### Service won't start
 
 1. Check if ports are available:
+
    ```bash
    sudo lsof -i :80,8888,9000,8028,5173
    ```
 
 2. Verify environment variables:
+
    ```bash
    cat .env
    ```
@@ -258,8 +267,6 @@ docker compose down -v
 - Check if backend is running: `docker compose ps`
 - Test API directly: `curl http://localhost:8888/v1/translation`
 
-
-
 ## 🔗 Resources
 
 - [OPEA Project](https://github.com/opea-project)
@@ -270,6 +277,7 @@ docker compose down -v
 ## 📧 Support
 
 For issues and questions:
+
 - Open an issue on GitHub
 - Check existing issues for solutions
 - Review OPEA documentation

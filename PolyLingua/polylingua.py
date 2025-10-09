@@ -17,9 +17,6 @@ import json
 import os
 import tempfile
 from pathlib import Path
-from langdetect import detect, LangDetectException
-from docling.document_converter import DocumentConverter
-from docling.datamodel.base_models import InputFormat
 
 from comps import MegaServiceEndpoint, MicroService, ServiceOrchestrator, ServiceRoleType, ServiceType
 from comps.cores.proto.api_protocol import (
@@ -29,8 +26,11 @@ from comps.cores.proto.api_protocol import (
     ChatMessage,
     UsageInfo,
 )
-from fastapi import Request, UploadFile, File, Form, HTTPException
+from docling.datamodel.base_models import InputFormat
+from docling.document_converter import DocumentConverter
+from fastapi import File, Form, HTTPException, Request, UploadFile
 from fastapi.responses import StreamingResponse
+from langdetect import LangDetectException, detect
 
 MEGA_SERVICE_PORT = int(os.getenv("MEGA_SERVICE_PORT", 8888))
 LLM_SERVICE_HOST_IP = os.getenv("LLM_SERVICE_HOST_IP", "0.0.0.0")
@@ -79,8 +79,7 @@ class DocumentProcessor:
         self.converter = DocumentConverter()
 
     async def process_file(self, file: UploadFile) -> list[str]:
-        """
-        Process an uploaded file and extract text content in chunks.
+        """Process an uploaded file and extract text content in chunks.
 
         Args:
             file: The uploaded file
@@ -100,8 +99,7 @@ class DocumentProcessor:
         file_ext = Path(file.filename).suffix.lower()
         if file_ext not in SUPPORTED_EXTENSIONS:
             raise ValueError(
-                f"Unsupported file type: {file_ext}. "
-                f"Supported types: {', '.join(sorted(SUPPORTED_EXTENSIONS))}"
+                f"Unsupported file type: {file_ext}. " f"Supported types: {', '.join(sorted(SUPPORTED_EXTENSIONS))}"
             )
 
         page_texts = []
@@ -112,11 +110,11 @@ class DocumentProcessor:
             print(f"Reading text file {file.filename}...")
             try:
                 # Try UTF-8 first
-                text_content = contents.decode('utf-8')
+                text_content = contents.decode("utf-8")
             except UnicodeDecodeError:
                 # Fallback to latin-1 for other encodings
                 print("UTF-8 decode failed, trying latin-1...")
-                text_content = contents.decode('latin-1')
+                text_content = contents.decode("latin-1")
 
             print(f"Read {len(text_content)} characters from text file")
 
@@ -124,7 +122,7 @@ class DocumentProcessor:
             if len(text_content) > CHUNK_SIZE:
                 print(f"Splitting into chunks of {CHUNK_SIZE} chars")
                 for i in range(0, len(text_content), CHUNK_SIZE):
-                    chunk = text_content[i:i + CHUNK_SIZE]
+                    chunk = text_content[i : i + CHUNK_SIZE]
                     page_texts.append(chunk)
                     print(f"Chunk {len(page_texts)}: {len(chunk)} chars")
             else:
@@ -145,7 +143,7 @@ class DocumentProcessor:
                 # Convert document using docling
                 print(f"Converting document {file.filename}...")
                 result = self.converter.convert(tmp_path)
-                print(f"Conversion completed")
+                print("Conversion completed")
 
                 # Export entire document to markdown
                 full_markdown = result.document.export_to_markdown()
@@ -156,7 +154,7 @@ class DocumentProcessor:
                     print(f"Splitting into chunks of {CHUNK_SIZE} chars")
                     # Split into manageable chunks
                     for i in range(0, len(full_markdown), CHUNK_SIZE):
-                        chunk = full_markdown[i:i + CHUNK_SIZE]
+                        chunk = full_markdown[i : i + CHUNK_SIZE]
                         page_texts.append(chunk)
                         print(f"Chunk {len(page_texts)}: {len(chunk)} chars")
                 else:
@@ -209,16 +207,14 @@ class PolyLinguaService:
             {source_language}
 
         """
-        prompt = prompt_template.format(
-            language_from=language_from, language_to=language_to, source_language=page_text
-        )
+        prompt = prompt_template.format(language_from=language_from, language_to=language_to, source_language=page_text)
 
         # Create chat completion request with streaming
         chat_request_dict = {
             "model": LLM_MODEL_ID,
             "messages": [{"role": "user", "content": prompt}],
             "max_tokens": 4096,
-            "stream": True
+            "stream": True,
         }
 
         result_dict, runtime_graph = await self.megaservice.schedule(initial_inputs=chat_request_dict)
@@ -235,21 +231,21 @@ class PolyLinguaService:
 
                 # Get the response body iterator
                 async for chunk in response.body_iterator:
-                    chunk_str = chunk.decode('utf-8') if isinstance(chunk, bytes) else chunk
+                    chunk_str = chunk.decode("utf-8") if isinstance(chunk, bytes) else chunk
 
                     # Parse SSE format
-                    lines = chunk_str.split('\n')
+                    lines = chunk_str.split("\n")
                     for line in lines:
-                        if line.startswith('data: '):
+                        if line.startswith("data: "):
                             data = line[6:]  # Remove "data: " prefix
 
-                            if data == '[DONE]':
+                            if data == "[DONE]":
                                 continue
 
                             try:
                                 parsed = json.loads(data)
                                 # Extract content from chat completion format
-                                text = parsed.get('choices', [{}])[0].get('delta', {}).get('content', '')
+                                text = parsed.get("choices", [{}])[0].get("delta", {}).get("content", "")
                                 if text:
                                     accumulated_text += text
                             except:
@@ -274,7 +270,7 @@ class PolyLinguaService:
             language_to = form_data.get("language_to")
             file = form_data.get("file")
 
-            if not file or not hasattr(file, 'filename'):
+            if not file or not hasattr(file, "filename"):
                 raise HTTPException(status_code=400, detail="No file uploaded")
 
             if not language_to:
@@ -368,7 +364,7 @@ class PolyLinguaService:
             chat_request_dict = {
                 "model": LLM_MODEL_ID,
                 "messages": [{"role": "user", "content": prompt}],
-                "stream": True
+                "stream": True,
             }
 
             result_dict, runtime_graph = await self.megaservice.schedule(initial_inputs=chat_request_dict)
