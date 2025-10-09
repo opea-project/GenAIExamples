@@ -3,8 +3,8 @@
 
 services:
   text2cypher-gaudi:
-    image: ${REGISTRY:-opea}/text2cypher-gaudi:${TAG:-latest}
-    container_name: text2cypher-gaudi-container
+    image: ${REGISTRY:-opea}/text2query-cypher:${TAG:-latest}
+    container_name: text2query-cypher-gaudi-container
     ports:
       - "11801:9097"
     depends_on:
@@ -26,6 +26,7 @@ services:
       NEO4J_USERNAME: ${NEO4J_USERNAME}
       NEO4J_PASSWORD: ${NEO4J_PASSWORD}
       host_ip: ${host_ip}
+      TEXT2QUERY_COMPONENT_NAME: "OPEA_TEXT2QUERY_CYPHER"
     runtime: habana
     cap_add:
       - SYS_NICE
