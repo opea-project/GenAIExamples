@@ -5,7 +5,7 @@
 set -e
 
 echo "======================================"
-echo "Testing OPEA Translation Service"
+echo "Testing OPEA PolyLingua Service"
 echo "======================================"
 
 # Source environment variables
@@ -36,12 +36,12 @@ echo "HTTP Status: $http_code"
 echo ""
 
 if [ "$http_code" -eq 200 ]; then
-    echo "✓ Translation service is working!"
+    echo "✓ PolyLingua service is working!"
     echo ""
     echo "Response:"
     echo "$body" | jq '.' 2>/dev/null || echo "$body"
 else
-    echo "✗ Translation service returned an error!"
+    echo "✗ PolyLingua service returned an error!"
     echo ""
     echo "Response:"
     echo "$body"

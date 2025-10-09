@@ -15,11 +15,11 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
-# Copy translation service
-COPY translation.py .
+# Copy polylingua service
+COPY polylingua.py .
 
 # Expose service port
 EXPOSE 8888
 
-# Run the translation service
-ENTRYPOINT ["python", "translation.py"]
+# Run the polylingua service
+ENTRYPOINT ["python", "polylingua.py"]

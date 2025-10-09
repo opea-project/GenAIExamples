@@ -1,4 +1,4 @@
-# Translation UI
+# PolyLingua UI
 
 A modern, single-page translation interface built with Next.js 14, React, and shadcn/ui components.
 
@@ -68,7 +68,7 @@ ui/
 │   │   ├── label.tsx
 │   │   ├── select.tsx
 │   │   └── textarea.tsx
-│   └── translation-form.tsx  # Main translation form component
+│   └── polylingua-form.tsx   # Main translation form component
 ├── lib/
 │   └── utils.ts              # Utility functions
 ├── package.json
@@ -87,7 +87,7 @@ ui/
 
 Currently, the app uses a mock translation function. To connect to a real translation backend:
 
-1. Update the `handleTranslate` function in `components/translation-form.tsx`:
+1. Update the `handleTranslate` function in `components/polylingua-form.tsx`:
 
 ```typescript
 const handleTranslate = async () => {
@@ -131,7 +131,7 @@ npm start
 
 ### Adding More Languages
 
-Edit the `languages` array in `components/translation-form.tsx`:
+Edit the `languages` array in `components/polylingua-form.tsx`:
 
 ```typescript
 const languages = [
