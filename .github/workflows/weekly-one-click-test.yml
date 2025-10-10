@@ -65,5 +65,6 @@ jobs:
       hardware: ${{ matrix.node }}
       example: ${{ matrix.example }}
       deploy_method: ${{ matrix.deploy_method }}
+      os: "debian"
       registry: "opea"
     secrets: inherit
