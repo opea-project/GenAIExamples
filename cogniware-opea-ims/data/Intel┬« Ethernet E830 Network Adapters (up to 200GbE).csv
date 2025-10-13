@@ -1,0 +1,6 @@
+Product ID,Product Name,Cabling Type,MaxTDP,Port Configuration,Data Rate Per Port,System Interface Type
+243946,Intel® Ethernet Network Adapter E830-XXVDA8F for OCP 3.0,"SFP28 ports - DAC, Optics, and AOCs",,8-Port,25/10Gb,PCIe 4.0 (16 GT/s)
+239775,Intel® Ethernet Network Adapter E830-CQDA2,"QSFP28 ports - DAC, Optics, and AOC's",,Dual,200/100/50/25/10GbE,"PCIe 5.0, PCIe 4.0"
+239778,Intel® Ethernet Network Adapter E830-CQDA2 for OCP 3.0,"QSFP28 ports - DAC, Optics, and AOC's",,Dual,200/100/50/25/10GbE,"PCIe 5.0, PCIe 4.0"
+241942,Intel® Ethernet Network Adapter E830-XXVDA2,"SFP28 ports - DAC, Optics, and AOC's",,Dual,25/10/1GbE,PCIe 4.0 (16 GT/s)
+239779,Intel® Ethernet Network Adapter E830-XXVDA2 for OCP 3.0,"SFP28 ports - DAC, Optics, and AOC's",,Dual,25/10/1GbE,PCIe 4.0 (16 GT/s)

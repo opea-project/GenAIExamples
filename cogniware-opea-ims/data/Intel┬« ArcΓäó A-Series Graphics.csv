@@ -1,0 +1,20 @@
+Product ID,Product Name,Xe-cores,Ray Tracing Units,Memory Size,Graphics Memory Bandwidth,GPU Peak TOPS (Int8),# of Displays Supported‡
+240446,Intel® Arc ™ A580E Graphics,24,24,16 GB,560 GB/s,197,4
+240447,Intel® Arc ™ A750E Graphics,28,28,16 GB,560 GB/s,229,4
+237552,Intel® Arc ™ A310E Graphics,6,6,4 GB,124 GB/s,52,4
+237551,Intel® Arc ™ A350E Graphics,6,6,4 GB,112 GB/s,44,4
+237550,Intel® Arc ™ A370E Graphics,8,8,4 GB,112 GB/s,56,4
+237549,Intel® Arc ™ A380E Graphics,8,8,6 GB,186 GB/s,66,4
+227961,Intel® Arc™ A580 Graphics,24,24,8 GB,512 GB/s,197,4
+232776,Intel® Arc™ A530M Graphics,12,12,,224 GB/s,96,4
+232777,Intel® Arc™ A570M Graphics,16,16,8 GB,256 GB/s,128,4
+227958,Intel® Arc™ A310 Graphics,6,6,4 GB,124 GB/s,52,4
+227954,Intel® Arc™ A750 Graphics,28,28,8 GB,512 GB/s,229,4
+229151,Intel® Arc™ A770 Graphics,32,32,16 GB,560 GB/s,262,4
+227955,Intel® Arc™ A770 Graphics,32,32,8 GB,512 GB/s,262,4
+227959,Intel® Arc™ A380 Graphics,8,8,6 GB,186 GB/s,66,4
+228341,Intel® Arc™ A770M Graphics,32,32,16 GB,512 GB/s,223,4
+228340,Intel® Arc™ A730M Graphics,24,24,12 GB,336 GB/s,167,4
+228343,Intel® Arc™ A550M Graphics,16,16,8 GB,224 GB/s,111,4
+228342,Intel® Arc™ A370M Graphics,8,8,4 GB,112 GB/s,56,4
+228338,Intel® Arc™ A350M Graphics,6,6,4 GB,112 GB/s,44,4

@@ -1,0 +1,8 @@
+Section,Key,Value
+Essentials,Product Collection,Heat-Sink Options
+Essentials,Code Name,Products formerly North Pass
+Essentials,Marketing Status,Discontinued
+Essentials,Launch Date,Q1'22
+Essentials,Expected Discontinuance,2025
+Essentials,Included Items,(1)  8x2.5” Backplane(1)  75 mm I2C cable – 5-pin to 5-pin communication cable installed between two backplanes
+Supplemental Information,Description,"2U backplane with support for up to eight 2.5” drives. Each drive connector is hot swap capable and supports SATA, SAS, or NVMe drive interfaces.Kit is offered as a required accessory when looking to upgrade the front drive bay to 16 drives."

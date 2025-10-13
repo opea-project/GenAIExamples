@@ -1,0 +1,12 @@
+Product ID,Product Name,Launch Date,Logic Elements (LE),Ordering Part Number
+235251,Intel Agilex® 7 FPGA M-Series Development Kit - HBM2e Edition  (ES1 3x F-Tile & 1x R-Tile),Q3'23,3851520,DK-DEV-AGM039FES
+235249,Intel Agilex® 7 FPGA I-Series Transceiver Development Kit  (ES1 6x F-Tile),Q4'22,4047400,DK-SI-AGI040FES
+235244,Intel Agilex® 7 FPGA I-Series Development Kit  (ES2 2x R-Tile & 1x F-Tile),Q2'20,2692760,DK-DEV-AGI027RBES
+235246,Intel Agilex® 7 FPGA I-Series Transceiver-SoC Development Kit  (Production 1 4x F-Tile),Q2'20,2692760,DK-SI-AGI027FA
+235245,Intel Agilex® 7 FPGA F-Series Transceiver-SoC Development Kit  (Production 2 P-Tile & E-Tile),Q2'20,1437240,DK-SI-AGF014EB
+235240,Intel Agilex® 7 FPGA F-Series Development Kit  (ES1 2x F-Tile),Q2'20,2692760,DK-DEV-AGF027F1ES
+235241,Intel Agilex® 7 FPGA F-Series Development Kit  (Production 1 2x F-Tile),Q2'22,2308080,DK-DEV-AGF023FA
+235239,Intel Agilex® 7 FPGA F-Series Development Kit  (Production 1 P-Tile & E-Tile),Q2'20,1437240,DK-DEV-AGF014EA
+235243,Intel Agilex® 7 FPGA F-Series Transceiver-SoC Development Kit  (Production 1 P-Tile & E-Tile),Q2'20,1437240,DK-SI-AGF014EA
+235248,Intel Agilex® 7 FPGA I-Series Development Kit  (ES1 2x R-Tile & 1x F-Tile),Q2'20,2692760,DK-DEV-AGI027R1BES
+235247,Intel Agilex® 7 FPGA I-Series Transceiver-SoC Development Kit  (ES1 4x F-Tile),Q2'20,2692760,DK-SI-AGI027FB

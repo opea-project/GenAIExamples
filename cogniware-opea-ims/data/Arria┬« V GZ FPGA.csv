@@ -1,0 +1,5 @@
+Product ID,Product Name,Launch Date,Logic Elements (LE),Digital Signal Processing (DSP) Blocks,Maximum Embedded Memory,Maximum User I/O Count†,Package Options
+210406,Arria® V 5AGZE1 FPGA,2012,220000,800,14.924 Mb,414,"H780, F1152"
+210407,Arria® V 5AGZE3 FPGA,2012,360000,1044,23.385 Mb,414,"H780, F1152"
+210408,Arria® V 5AGZE5 FPGA,2012,400000,1092,33.518 Mb,674,"F1152, F1517"
+210405,Arria® V 5AGZE7 FPGA,2012,450000,1139,39.306 Mb,674,"F1152, F1517"

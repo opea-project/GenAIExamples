@@ -1,0 +1,5 @@
+Product ID,Product Name,Launch Date,Logic Elements (LE),Digital Signal Processing (DSP) Blocks,Maximum Embedded Memory,Maximum User I/O Count†,Package Options
+210430,Intel® Cyclone® 10 10CX085 FPGA,2017,85000,84,6.473 Mb,216,"U484, F672"
+210429,Intel® Cyclone® 10 10CX105 FPGA,2017,104000,125,8.439 Mb,284,"U484, F672, F780"
+210431,Intel® Cyclone® 10 10CX150 FPGA,2017,150000,156,10.652 Mb,284,"U484, F672, F780"
+210432,Intel® Cyclone® 10 10CX220 FPGA,2017,220000,192,13.43 Mb,284,"U484, F672, F780"

@@ -1,0 +1,21 @@
+Section,Key,Value
+Ordering and Spec Information,,
+"Intel® Wi-Fi 6 AX201 (Gig+),  2230, 2x2 AX+BT, vPro®",Ordering Code,AX201.NGWG
+"Intel® Wi-Fi 6 AX201 (Gig+),  2230, 2x2 AX+BT, vPro®",MDDS Content IDs,706241
+"Intel® Wi-Fi 6 AX201 (Gig+),  2230, 2x2 AX+BT, vPro®",PCN Content IDs,"799860,799031,806387,799882,807135,810315,835573"
+"Intel® Wi-Fi 6 AX201 (Gig+),  2230, 2x2 AX+BT, No vPro®",Ordering Code,AX201.NGWG.NV
+"Intel® Wi-Fi 6 AX201 (Gig+),  2230, 2x2 AX+BT, No vPro®",MDDS Content IDs,"706241,785496"
+"Intel® Wi-Fi 6 AX201 (Gig+),  2230, 2x2 AX+BT, No vPro®",PCN Content IDs,"799882,799031,806387,799860,807135,810315,835573"
+"Intel® Wi-Fi 6 AX201 (Gig+),  1216, 2x2 AX+BT, vPro®",Ordering Code,AX201.D2WG
+"Intel® Wi-Fi 6 AX201 (Gig+),  1216, 2x2 AX+BT, vPro®",MDDS Content IDs,"708922,708975"
+"Intel® Wi-Fi 6 AX201 (Gig+),  1216, 2x2 AX+BT, vPro®",PCN Content IDs,"800921,796296,810303,797103,806355,807543,808542,833704"
+"Intel® Wi-Fi 6 AX201 (Gig+),  1216, 2x2 AX+BT, No vPro®",Ordering Code,AX201.D2WG.NV
+"Intel® Wi-Fi 6 AX201 (Gig+),  1216, 2x2 AX+BT, No vPro®",MDDS Content IDs,"708922,708975"
+"Intel® Wi-Fi 6 AX201 (Gig+),  1216, 2x2 AX+BT, No vPro®",PCN Content IDs,"800921,796296,807543,797103,810303,806355,833704,808542"
+Retired and discontinued,,
+"Intel® Wi-Fi 6 AX201 (Gig+),  1216, 2x2 AX+BT, No vPro®, LTE Coex",Ordering Code,AX201.D2WG.LNVW
+"Intel® Wi-Fi 6 AX201 (Gig+),  1216, 2x2 AX+BT, No vPro®, LTE Coex",MDDS Content IDs,708975
+"Intel® Wi-Fi 6 AX201 (Gig+),  1216, 2x2 AX+BT, No vPro®, LTE Coex",PCN Content IDs,"800921,797103,806355,808542,810303"
+Trade Compliance Information,ECCN,5A991
+Trade Compliance Information,CCATS,NA
+Trade Compliance Information,US HTS,8517620090

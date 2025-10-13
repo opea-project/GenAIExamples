@@ -1,0 +1,9 @@
+Product ID,Product Name,Cabling Type,MaxTDP,Port Configuration,Data Rate Per Port,System Interface Type
+204835,Intel® Ethernet Network Adapter X710-T4L for OCP 3.0,"RJ45 Category 6, Category 6A, Category 5e up to 100m",,Quad,10GbE/5GbE/2.5GbE/1GbE/100Mb,PCIe 3.0 (8.0 GT/s)
+189770,Intel® Ethernet Network Adapter X710-T2L for OCP 3.0,"RJ45 Category 6, Category 6A, Category 5e up to 100m",,Dual,10GbE/5Gbe/2.5GbE/1GbE/100Mb,RJ 45
+189464,Intel® Ethernet Network Adapter X710-T4L,"RJ45 Category 6, Category 6A, Category 5e up to 100m",,Quad,10GbE/5GbE/2.5GbE/1GbE/100Mb,PCIe 3.0 (8.0 GT/s)
+184821,Intel® Ethernet Network Adapter X710-DA2 for OCP 3.0,SFP+ Direct Attach Copper 10GBASE-SR and 10GBASE-LR Physical Media,,Dual,10/1GbE,PCIe 3.0 (8.0 GT/s)
+184822,Intel® Ethernet Network Adapter X710-DA4 for OCP 3.0,SFP+ Direct Attach Copper   10GBASE-SR and 10GBASE-LR Physical Media,,Quad,10/1GbE,PCIe 3.0 (8.0 GT/s)
+189463,Intel® Ethernet Network Adapter X710-T2L,"RJ45 Category 6, Category 6A, Category 5e up to 100m",,Dual,10GbE/5GbE/2.5GbE/1GbE/100Mb,PCIe 3.0 (8.0 GT/s)
+83964,Intel® Ethernet Converged Network Adapter X710-DA2,SFP+ Direct Attached Twinaxial Cabling up to 10m,,Dual,10/1GbE,PCIe 3.0 (8.0 GT/s)
+83965,Intel® Ethernet Converged Network Adapter X710-DA4,SFP+ Direct Attached Twin Axial Cabling up to 10m,,Quad,10/1GbE,PCIe 3.0 (8.0 GT/s)

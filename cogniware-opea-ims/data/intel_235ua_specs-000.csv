@@ -1,0 +1,777 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® Core™ Ultra Processors (Series 2)
+Essentials,Vertical Segment,Mobile
+Essentials,Processor Number,235UA
+Essentials,Lithography,Intel 3
+Essentials,Total Cores,10
+Essentials,# of Performance-cores,2
+Essentials,# of Efficient-cores,8
+Essentials,# of Low Power Efficient-cores,2
+Essentials,Total Threads,14
+Essentials,Max Turbo Frequency,4.9 GHz
+Essentials,Performance-core Max Turbo Frequency,4.9 GHz
+Essentials,Efficient-core Max Turbo Frequency,4.1 GHz
+Essentials,Low Power Efficient-core Max Turbo Frequency,2.4 GHz
+Essentials,Performance-core Base Frequency,2.0 GHz
+Essentials,Efficient-core Base Frequency,1.6 GHz
+Essentials,Low Power Efficient-core Base Frequency,700 MHz
+Essentials,Cache,12 MB
+Essentials,Bus Speed,0.000 GT/s
+Essentials,Processor Base Power,15 W
+Essentials,Maximum Turbo Power,57 W
+Essentials,Minimum Assured Power,12 W
+Essentials,Intel® Deep Learning Boost (Intel® DL Boost) on CPU,Yes
+Essentials,AI Software Frameworks Supported by CPU,"OpenVINO™, WindowsML, ONNX RT"
+Essentials,Marketing Status,Launched
+Essentials,Launch Date,Q3'25
+Essentials,Embedded Options Available,No
+Essentials,Max Memory Size (dependent on memory type),128 GB
+Essentials,Memory Types,Up to LPDDR5/x 8400 MT/sUp to DDR5 6400 MT/s
+Essentials,Max # of Memory Channels,2
+Essentials,ECC Memory Supported‡,No
+Essentials,GPU Name‡,Intel® Graphics
+Essentials,Graphics Max Dynamic Frequency,2.05 GHz
+Essentials,Graphics Output,"DP2.1 UHBR20, HDMI 2.1, eDP1.4b"
+Essentials,Xe-cores,4
+Essentials,Ray Tracing,Yes
+Essentials,Max Resolution (HDMI)‡,4096 x 2304 @ 60Hz (HDMI 2.1 TMDS)7680 x 4320 @ 60Hz (HDMI2.1 FRL)
+Essentials,Max Resolution (DP)‡,7680 x 4320 @ 60Hz
+Essentials,Max Resolution (eDP - Integrated Flat Panel)‡,3840 x 2400 @ 120Hz
+Essentials,DirectX* Support,12.2
+Essentials,OpenGL* Support,4.6
+Essentials,OpenCL* Support,3.0
+Essentials,Multi-Format Codec Engines,2
+Essentials,H.264 Hardware Encode/Decode,Yes
+Essentials,H.265 (HEVC) Hardware Encode/Decode,Yes
+Essentials,AV1 Encode/Decode,Yes
+Essentials,VP9 Bitstream & Decoding,Yes
+Essentials,Intel® Quick Sync Video,Yes
+Essentials,# of Displays Supported‡,4
+Essentials,Device ID,0x7D41
+Essentials,Intel® Deep Learning Boost (Intel® DL Boost) on GPU,Yes
+Essentials,AI Software Frameworks Supported by GPU,"OpenVINO™, WindowsML, DirectML, ONNX RT, WebGPU"
+Essentials,NPU Name‡,Intel® AI Boost
+Essentials,NPU Peak TOPS (Int8),12
+Essentials,Sparsity Support,Yes
+Essentials,Windows Studio Effects Support,Yes
+Essentials,AI Software Frameworks Supported by NPU,"OpenVINO™, WindowsML, DirectML, ONNX RT"
+Essentials,Intel® Thunderbolt™ 4,Yes
+Essentials,PCI Support,4.0
+Essentials,PCI Express Configurations‡,"3 (x4) Gen4 + 8 (x1,x2,x4) Gen4"
+Essentials,Max # of PCI Express Lanes,20
+Essentials,Max CPU Configuration,1
+Essentials,Max Operating Temperature,110 °C
+Essentials,Package Size,50mm x 25mm
+Essentials,Intel® Gaussian & Neural Accelerator,3.5
+Essentials,Intel® Thread Director,Yes
+Essentials,Intel® Image Processing Unit,6.0
+Essentials,Intel® Smart Sound Technology,Yes
+Essentials,Intel® Wake on Voice,Yes
+Essentials,Intel® High Definition Audio,Yes
+Essentials,Intel® Adaptix™ Technology,Yes
+Essentials,Intel® Speed Shift Technology,Yes
+Essentials,Intel® Turbo Boost Max Technology 3.0‡,No
+Essentials,Intel® Hyper-Threading Technology‡,Yes
+Essentials,Instruction Set,64-bit
+Essentials,Instruction Set Extensions,"Intel® SSE4.1, Intel® SSE4.2, Intel® AVX2"
+Essentials,Thermal Monitoring Technologies,Yes
+Essentials,Intel® Volume Management Device (VMD),Yes
+Essentials,Intel vPro® Eligibility‡,Intel vPro® Enterprise
+Essentials,Intel® Threat Detection Technology (TDT),Yes
+Essentials,Intel® Active Management Technology (AMT)‡,Yes
+Essentials,Intel® Standard Manageability (ISM)‡,Yes
+Essentials,Intel® Remote Platform Erase (RPE)‡,Yes
+Essentials,Intel® One-Click Recovery‡,Yes
+Essentials,Intel® Secure Key,Yes
+Essentials,Intel® Control-Flow Enforcement Technology,Yes
+Essentials,Intel® Total Memory Encryption - Multi Key,Yes
+Essentials,Intel® AES New Instructions,Yes
+Essentials,Intel® Trusted Execution Technology‡,Yes
+Essentials,Execute Disable Bit‡,Yes
+Essentials,Intel® OS Guard,Yes
+Essentials,Intel® Boot Guard,Yes
+Essentials,Mode-based Execute Control (MBEC),Yes
+Essentials,Intel® Stable IT Platform Program (SIPP),Yes
+Essentials,Intel® Virtualization Technology with Redirect Protection (VT-rp)‡,Yes
+Essentials,Intel® Virtualization Technology (VT-x)‡,Yes
+Essentials,Intel® Virtualization Technology for Directed I/O (VT-d)‡,Yes
+Essentials,Intel® VT-x with Extended Page Tables (EPT)‡,Yes
+CPU Specifications,Product Collection,Intel® Core™ Ultra Processors (Series 2)
+CPU Specifications,Vertical Segment,Mobile
+CPU Specifications,Processor Number,235UA
+CPU Specifications,Lithography,Intel 3
+CPU Specifications,Total Cores,10
+CPU Specifications,# of Performance-cores,2
+CPU Specifications,# of Efficient-cores,8
+CPU Specifications,# of Low Power Efficient-cores,2
+CPU Specifications,Total Threads,14
+CPU Specifications,Max Turbo Frequency,4.9 GHz
+CPU Specifications,Performance-core Max Turbo Frequency,4.9 GHz
+CPU Specifications,Efficient-core Max Turbo Frequency,4.1 GHz
+CPU Specifications,Low Power Efficient-core Max Turbo Frequency,2.4 GHz
+CPU Specifications,Performance-core Base Frequency,2.0 GHz
+CPU Specifications,Efficient-core Base Frequency,1.6 GHz
+CPU Specifications,Low Power Efficient-core Base Frequency,700 MHz
+CPU Specifications,Cache,12 MB
+CPU Specifications,Bus Speed,0.000 GT/s
+CPU Specifications,Processor Base Power,15 W
+CPU Specifications,Maximum Turbo Power,57 W
+CPU Specifications,Minimum Assured Power,12 W
+CPU Specifications,Intel® Deep Learning Boost (Intel® DL Boost) on CPU,Yes
+CPU Specifications,AI Software Frameworks Supported by CPU,"OpenVINO™, WindowsML, ONNX RT"
+CPU Specifications,Marketing Status,Launched
+CPU Specifications,Launch Date,Q3'25
+CPU Specifications,Embedded Options Available,No
+CPU Specifications,Max Memory Size (dependent on memory type),128 GB
+CPU Specifications,Memory Types,Up to LPDDR5/x 8400 MT/sUp to DDR5 6400 MT/s
+CPU Specifications,Max # of Memory Channels,2
+CPU Specifications,ECC Memory Supported‡,No
+CPU Specifications,GPU Name‡,Intel® Graphics
+CPU Specifications,Graphics Max Dynamic Frequency,2.05 GHz
+CPU Specifications,Graphics Output,"DP2.1 UHBR20, HDMI 2.1, eDP1.4b"
+CPU Specifications,Xe-cores,4
+CPU Specifications,Ray Tracing,Yes
+CPU Specifications,Max Resolution (HDMI)‡,4096 x 2304 @ 60Hz (HDMI 2.1 TMDS)7680 x 4320 @ 60Hz (HDMI2.1 FRL)
+CPU Specifications,Max Resolution (DP)‡,7680 x 4320 @ 60Hz
+CPU Specifications,Max Resolution (eDP - Integrated Flat Panel)‡,3840 x 2400 @ 120Hz
+CPU Specifications,DirectX* Support,12.2
+CPU Specifications,OpenGL* Support,4.6
+CPU Specifications,OpenCL* Support,3.0
+CPU Specifications,Multi-Format Codec Engines,2
+CPU Specifications,H.264 Hardware Encode/Decode,Yes
+CPU Specifications,H.265 (HEVC) Hardware Encode/Decode,Yes
+CPU Specifications,AV1 Encode/Decode,Yes
+CPU Specifications,VP9 Bitstream & Decoding,Yes
+CPU Specifications,Intel® Quick Sync Video,Yes
+CPU Specifications,# of Displays Supported‡,4
+CPU Specifications,Device ID,0x7D41
+CPU Specifications,Intel® Deep Learning Boost (Intel® DL Boost) on GPU,Yes
+CPU Specifications,AI Software Frameworks Supported by GPU,"OpenVINO™, WindowsML, DirectML, ONNX RT, WebGPU"
+CPU Specifications,NPU Name‡,Intel® AI Boost
+CPU Specifications,NPU Peak TOPS (Int8),12
+CPU Specifications,Sparsity Support,Yes
+CPU Specifications,Windows Studio Effects Support,Yes
+CPU Specifications,AI Software Frameworks Supported by NPU,"OpenVINO™, WindowsML, DirectML, ONNX RT"
+CPU Specifications,Intel® Thunderbolt™ 4,Yes
+CPU Specifications,PCI Support,4.0
+CPU Specifications,PCI Express Configurations‡,"3 (x4) Gen4 + 8 (x1,x2,x4) Gen4"
+CPU Specifications,Max # of PCI Express Lanes,20
+CPU Specifications,Max CPU Configuration,1
+CPU Specifications,Max Operating Temperature,110 °C
+CPU Specifications,Package Size,50mm x 25mm
+CPU Specifications,Intel® Gaussian & Neural Accelerator,3.5
+CPU Specifications,Intel® Thread Director,Yes
+CPU Specifications,Intel® Image Processing Unit,6.0
+CPU Specifications,Intel® Smart Sound Technology,Yes
+CPU Specifications,Intel® Wake on Voice,Yes
+CPU Specifications,Intel® High Definition Audio,Yes
+CPU Specifications,Intel® Adaptix™ Technology,Yes
+CPU Specifications,Intel® Speed Shift Technology,Yes
+CPU Specifications,Intel® Turbo Boost Max Technology 3.0‡,No
+CPU Specifications,Intel® Hyper-Threading Technology‡,Yes
+CPU Specifications,Instruction Set,64-bit
+CPU Specifications,Instruction Set Extensions,"Intel® SSE4.1, Intel® SSE4.2, Intel® AVX2"
+CPU Specifications,Thermal Monitoring Technologies,Yes
+CPU Specifications,Intel® Volume Management Device (VMD),Yes
+CPU Specifications,Intel vPro® Eligibility‡,Intel vPro® Enterprise
+CPU Specifications,Intel® Threat Detection Technology (TDT),Yes
+CPU Specifications,Intel® Active Management Technology (AMT)‡,Yes
+CPU Specifications,Intel® Standard Manageability (ISM)‡,Yes
+CPU Specifications,Intel® Remote Platform Erase (RPE)‡,Yes
+CPU Specifications,Intel® One-Click Recovery‡,Yes
+CPU Specifications,Intel® Secure Key,Yes
+CPU Specifications,Intel® Control-Flow Enforcement Technology,Yes
+CPU Specifications,Intel® Total Memory Encryption - Multi Key,Yes
+CPU Specifications,Intel® AES New Instructions,Yes
+CPU Specifications,Intel® Trusted Execution Technology‡,Yes
+CPU Specifications,Execute Disable Bit‡,Yes
+CPU Specifications,Intel® OS Guard,Yes
+CPU Specifications,Intel® Boot Guard,Yes
+CPU Specifications,Mode-based Execute Control (MBEC),Yes
+CPU Specifications,Intel® Stable IT Platform Program (SIPP),Yes
+CPU Specifications,Intel® Virtualization Technology with Redirect Protection (VT-rp)‡,Yes
+CPU Specifications,Intel® Virtualization Technology (VT-x)‡,Yes
+CPU Specifications,Intel® Virtualization Technology for Directed I/O (VT-d)‡,Yes
+CPU Specifications,Intel® VT-x with Extended Page Tables (EPT)‡,Yes
+Supplemental Information,Product Collection,Intel® Core™ Ultra Processors (Series 2)
+Supplemental Information,Vertical Segment,Mobile
+Supplemental Information,Processor Number,235UA
+Supplemental Information,Lithography,Intel 3
+Supplemental Information,Total Cores,10
+Supplemental Information,# of Performance-cores,2
+Supplemental Information,# of Efficient-cores,8
+Supplemental Information,# of Low Power Efficient-cores,2
+Supplemental Information,Total Threads,14
+Supplemental Information,Max Turbo Frequency,4.9 GHz
+Supplemental Information,Performance-core Max Turbo Frequency,4.9 GHz
+Supplemental Information,Efficient-core Max Turbo Frequency,4.1 GHz
+Supplemental Information,Low Power Efficient-core Max Turbo Frequency,2.4 GHz
+Supplemental Information,Performance-core Base Frequency,2.0 GHz
+Supplemental Information,Efficient-core Base Frequency,1.6 GHz
+Supplemental Information,Low Power Efficient-core Base Frequency,700 MHz
+Supplemental Information,Cache,12 MB
+Supplemental Information,Bus Speed,0.000 GT/s
+Supplemental Information,Processor Base Power,15 W
+Supplemental Information,Maximum Turbo Power,57 W
+Supplemental Information,Minimum Assured Power,12 W
+Supplemental Information,Intel® Deep Learning Boost (Intel® DL Boost) on CPU,Yes
+Supplemental Information,AI Software Frameworks Supported by CPU,"OpenVINO™, WindowsML, ONNX RT"
+Supplemental Information,Marketing Status,Launched
+Supplemental Information,Launch Date,Q3'25
+Supplemental Information,Embedded Options Available,No
+Supplemental Information,Max Memory Size (dependent on memory type),128 GB
+Supplemental Information,Memory Types,Up to LPDDR5/x 8400 MT/sUp to DDR5 6400 MT/s
+Supplemental Information,Max # of Memory Channels,2
+Supplemental Information,ECC Memory Supported‡,No
+Supplemental Information,GPU Name‡,Intel® Graphics
+Supplemental Information,Graphics Max Dynamic Frequency,2.05 GHz
+Supplemental Information,Graphics Output,"DP2.1 UHBR20, HDMI 2.1, eDP1.4b"
+Supplemental Information,Xe-cores,4
+Supplemental Information,Ray Tracing,Yes
+Supplemental Information,Max Resolution (HDMI)‡,4096 x 2304 @ 60Hz (HDMI 2.1 TMDS)7680 x 4320 @ 60Hz (HDMI2.1 FRL)
+Supplemental Information,Max Resolution (DP)‡,7680 x 4320 @ 60Hz
+Supplemental Information,Max Resolution (eDP - Integrated Flat Panel)‡,3840 x 2400 @ 120Hz
+Supplemental Information,DirectX* Support,12.2
+Supplemental Information,OpenGL* Support,4.6
+Supplemental Information,OpenCL* Support,3.0
+Supplemental Information,Multi-Format Codec Engines,2
+Supplemental Information,H.264 Hardware Encode/Decode,Yes
+Supplemental Information,H.265 (HEVC) Hardware Encode/Decode,Yes
+Supplemental Information,AV1 Encode/Decode,Yes
+Supplemental Information,VP9 Bitstream & Decoding,Yes
+Supplemental Information,Intel® Quick Sync Video,Yes
+Supplemental Information,# of Displays Supported‡,4
+Supplemental Information,Device ID,0x7D41
+Supplemental Information,Intel® Deep Learning Boost (Intel® DL Boost) on GPU,Yes
+Supplemental Information,AI Software Frameworks Supported by GPU,"OpenVINO™, WindowsML, DirectML, ONNX RT, WebGPU"
+Supplemental Information,NPU Name‡,Intel® AI Boost
+Supplemental Information,NPU Peak TOPS (Int8),12
+Supplemental Information,Sparsity Support,Yes
+Supplemental Information,Windows Studio Effects Support,Yes
+Supplemental Information,AI Software Frameworks Supported by NPU,"OpenVINO™, WindowsML, DirectML, ONNX RT"
+Supplemental Information,Intel® Thunderbolt™ 4,Yes
+Supplemental Information,PCI Support,4.0
+Supplemental Information,PCI Express Configurations‡,"3 (x4) Gen4 + 8 (x1,x2,x4) Gen4"
+Supplemental Information,Max # of PCI Express Lanes,20
+Supplemental Information,Max CPU Configuration,1
+Supplemental Information,Max Operating Temperature,110 °C
+Supplemental Information,Package Size,50mm x 25mm
+Supplemental Information,Intel® Gaussian & Neural Accelerator,3.5
+Supplemental Information,Intel® Thread Director,Yes
+Supplemental Information,Intel® Image Processing Unit,6.0
+Supplemental Information,Intel® Smart Sound Technology,Yes
+Supplemental Information,Intel® Wake on Voice,Yes
+Supplemental Information,Intel® High Definition Audio,Yes
+Supplemental Information,Intel® Adaptix™ Technology,Yes
+Supplemental Information,Intel® Speed Shift Technology,Yes
+Supplemental Information,Intel® Turbo Boost Max Technology 3.0‡,No
+Supplemental Information,Intel® Hyper-Threading Technology‡,Yes
+Supplemental Information,Instruction Set,64-bit
+Supplemental Information,Instruction Set Extensions,"Intel® SSE4.1, Intel® SSE4.2, Intel® AVX2"
+Supplemental Information,Thermal Monitoring Technologies,Yes
+Supplemental Information,Intel® Volume Management Device (VMD),Yes
+Supplemental Information,Intel vPro® Eligibility‡,Intel vPro® Enterprise
+Supplemental Information,Intel® Threat Detection Technology (TDT),Yes
+Supplemental Information,Intel® Active Management Technology (AMT)‡,Yes
+Supplemental Information,Intel® Standard Manageability (ISM)‡,Yes
+Supplemental Information,Intel® Remote Platform Erase (RPE)‡,Yes
+Supplemental Information,Intel® One-Click Recovery‡,Yes
+Supplemental Information,Intel® Secure Key,Yes
+Supplemental Information,Intel® Control-Flow Enforcement Technology,Yes
+Supplemental Information,Intel® Total Memory Encryption - Multi Key,Yes
+Supplemental Information,Intel® AES New Instructions,Yes
+Supplemental Information,Intel® Trusted Execution Technology‡,Yes
+Supplemental Information,Execute Disable Bit‡,Yes
+Supplemental Information,Intel® OS Guard,Yes
+Supplemental Information,Intel® Boot Guard,Yes
+Supplemental Information,Mode-based Execute Control (MBEC),Yes
+Supplemental Information,Intel® Stable IT Platform Program (SIPP),Yes
+Supplemental Information,Intel® Virtualization Technology with Redirect Protection (VT-rp)‡,Yes
+Supplemental Information,Intel® Virtualization Technology (VT-x)‡,Yes
+Supplemental Information,Intel® Virtualization Technology for Directed I/O (VT-d)‡,Yes
+Supplemental Information,Intel® VT-x with Extended Page Tables (EPT)‡,Yes
+NPU Specifications,Product Collection,Intel® Core™ Ultra Processors (Series 2)
+NPU Specifications,Vertical Segment,Mobile
+NPU Specifications,Processor Number,235UA
+NPU Specifications,Lithography,Intel 3
+NPU Specifications,Total Cores,10
+NPU Specifications,# of Performance-cores,2
+NPU Specifications,# of Efficient-cores,8
+NPU Specifications,# of Low Power Efficient-cores,2
+NPU Specifications,Total Threads,14
+NPU Specifications,Max Turbo Frequency,4.9 GHz
+NPU Specifications,Performance-core Max Turbo Frequency,4.9 GHz
+NPU Specifications,Efficient-core Max Turbo Frequency,4.1 GHz
+NPU Specifications,Low Power Efficient-core Max Turbo Frequency,2.4 GHz
+NPU Specifications,Performance-core Base Frequency,2.0 GHz
+NPU Specifications,Efficient-core Base Frequency,1.6 GHz
+NPU Specifications,Low Power Efficient-core Base Frequency,700 MHz
+NPU Specifications,Cache,12 MB
+NPU Specifications,Bus Speed,0.000 GT/s
+NPU Specifications,Processor Base Power,15 W
+NPU Specifications,Maximum Turbo Power,57 W
+NPU Specifications,Minimum Assured Power,12 W
+NPU Specifications,Intel® Deep Learning Boost (Intel® DL Boost) on CPU,Yes
+NPU Specifications,AI Software Frameworks Supported by CPU,"OpenVINO™, WindowsML, ONNX RT"
+NPU Specifications,Marketing Status,Launched
+NPU Specifications,Launch Date,Q3'25
+NPU Specifications,Embedded Options Available,No
+NPU Specifications,Max Memory Size (dependent on memory type),128 GB
+NPU Specifications,Memory Types,Up to LPDDR5/x 8400 MT/sUp to DDR5 6400 MT/s
+NPU Specifications,Max # of Memory Channels,2
+NPU Specifications,ECC Memory Supported‡,No
+NPU Specifications,GPU Name‡,Intel® Graphics
+NPU Specifications,Graphics Max Dynamic Frequency,2.05 GHz
+NPU Specifications,Graphics Output,"DP2.1 UHBR20, HDMI 2.1, eDP1.4b"
+NPU Specifications,Xe-cores,4
+NPU Specifications,Ray Tracing,Yes
+NPU Specifications,Max Resolution (HDMI)‡,4096 x 2304 @ 60Hz (HDMI 2.1 TMDS)7680 x 4320 @ 60Hz (HDMI2.1 FRL)
+NPU Specifications,Max Resolution (DP)‡,7680 x 4320 @ 60Hz
+NPU Specifications,Max Resolution (eDP - Integrated Flat Panel)‡,3840 x 2400 @ 120Hz
+NPU Specifications,DirectX* Support,12.2
+NPU Specifications,OpenGL* Support,4.6
+NPU Specifications,OpenCL* Support,3.0
+NPU Specifications,Multi-Format Codec Engines,2
+NPU Specifications,H.264 Hardware Encode/Decode,Yes
+NPU Specifications,H.265 (HEVC) Hardware Encode/Decode,Yes
+NPU Specifications,AV1 Encode/Decode,Yes
+NPU Specifications,VP9 Bitstream & Decoding,Yes
+NPU Specifications,Intel® Quick Sync Video,Yes
+NPU Specifications,# of Displays Supported‡,4
+NPU Specifications,Device ID,0x7D41
+NPU Specifications,Intel® Deep Learning Boost (Intel® DL Boost) on GPU,Yes
+NPU Specifications,AI Software Frameworks Supported by GPU,"OpenVINO™, WindowsML, DirectML, ONNX RT, WebGPU"
+NPU Specifications,NPU Name‡,Intel® AI Boost
+NPU Specifications,NPU Peak TOPS (Int8),12
+NPU Specifications,Sparsity Support,Yes
+NPU Specifications,Windows Studio Effects Support,Yes
+NPU Specifications,AI Software Frameworks Supported by NPU,"OpenVINO™, WindowsML, DirectML, ONNX RT"
+NPU Specifications,Intel® Thunderbolt™ 4,Yes
+NPU Specifications,PCI Support,4.0
+NPU Specifications,PCI Express Configurations‡,"3 (x4) Gen4 + 8 (x1,x2,x4) Gen4"
+NPU Specifications,Max # of PCI Express Lanes,20
+NPU Specifications,Max CPU Configuration,1
+NPU Specifications,Max Operating Temperature,110 °C
+NPU Specifications,Package Size,50mm x 25mm
+NPU Specifications,Intel® Gaussian & Neural Accelerator,3.5
+NPU Specifications,Intel® Thread Director,Yes
+NPU Specifications,Intel® Image Processing Unit,6.0
+NPU Specifications,Intel® Smart Sound Technology,Yes
+NPU Specifications,Intel® Wake on Voice,Yes
+NPU Specifications,Intel® High Definition Audio,Yes
+NPU Specifications,Intel® Adaptix™ Technology,Yes
+NPU Specifications,Intel® Speed Shift Technology,Yes
+NPU Specifications,Intel® Turbo Boost Max Technology 3.0‡,No
+NPU Specifications,Intel® Hyper-Threading Technology‡,Yes
+NPU Specifications,Instruction Set,64-bit
+NPU Specifications,Instruction Set Extensions,"Intel® SSE4.1, Intel® SSE4.2, Intel® AVX2"
+NPU Specifications,Thermal Monitoring Technologies,Yes
+NPU Specifications,Intel® Volume Management Device (VMD),Yes
+NPU Specifications,Intel vPro® Eligibility‡,Intel vPro® Enterprise
+NPU Specifications,Intel® Threat Detection Technology (TDT),Yes
+NPU Specifications,Intel® Active Management Technology (AMT)‡,Yes
+NPU Specifications,Intel® Standard Manageability (ISM)‡,Yes
+NPU Specifications,Intel® Remote Platform Erase (RPE)‡,Yes
+NPU Specifications,Intel® One-Click Recovery‡,Yes
+NPU Specifications,Intel® Secure Key,Yes
+NPU Specifications,Intel® Control-Flow Enforcement Technology,Yes
+NPU Specifications,Intel® Total Memory Encryption - Multi Key,Yes
+NPU Specifications,Intel® AES New Instructions,Yes
+NPU Specifications,Intel® Trusted Execution Technology‡,Yes
+NPU Specifications,Execute Disable Bit‡,Yes
+NPU Specifications,Intel® OS Guard,Yes
+NPU Specifications,Intel® Boot Guard,Yes
+NPU Specifications,Mode-based Execute Control (MBEC),Yes
+NPU Specifications,Intel® Stable IT Platform Program (SIPP),Yes
+NPU Specifications,Intel® Virtualization Technology with Redirect Protection (VT-rp)‡,Yes
+NPU Specifications,Intel® Virtualization Technology (VT-x)‡,Yes
+NPU Specifications,Intel® Virtualization Technology for Directed I/O (VT-d)‡,Yes
+NPU Specifications,Intel® VT-x with Extended Page Tables (EPT)‡,Yes
+Expansion Options,Product Collection,Intel® Core™ Ultra Processors (Series 2)
+Expansion Options,Vertical Segment,Mobile
+Expansion Options,Processor Number,235UA
+Expansion Options,Lithography,Intel 3
+Expansion Options,Total Cores,10
+Expansion Options,# of Performance-cores,2
+Expansion Options,# of Efficient-cores,8
+Expansion Options,# of Low Power Efficient-cores,2
+Expansion Options,Total Threads,14
+Expansion Options,Max Turbo Frequency,4.9 GHz
+Expansion Options,Performance-core Max Turbo Frequency,4.9 GHz
+Expansion Options,Efficient-core Max Turbo Frequency,4.1 GHz
+Expansion Options,Low Power Efficient-core Max Turbo Frequency,2.4 GHz
+Expansion Options,Performance-core Base Frequency,2.0 GHz
+Expansion Options,Efficient-core Base Frequency,1.6 GHz
+Expansion Options,Low Power Efficient-core Base Frequency,700 MHz
+Expansion Options,Cache,12 MB
+Expansion Options,Bus Speed,0.000 GT/s
+Expansion Options,Processor Base Power,15 W
+Expansion Options,Maximum Turbo Power,57 W
+Expansion Options,Minimum Assured Power,12 W
+Expansion Options,Intel® Deep Learning Boost (Intel® DL Boost) on CPU,Yes
+Expansion Options,AI Software Frameworks Supported by CPU,"OpenVINO™, WindowsML, ONNX RT"
+Expansion Options,Marketing Status,Launched
+Expansion Options,Launch Date,Q3'25
+Expansion Options,Embedded Options Available,No
+Expansion Options,Max Memory Size (dependent on memory type),128 GB
+Expansion Options,Memory Types,Up to LPDDR5/x 8400 MT/sUp to DDR5 6400 MT/s
+Expansion Options,Max # of Memory Channels,2
+Expansion Options,ECC Memory Supported‡,No
+Expansion Options,GPU Name‡,Intel® Graphics
+Expansion Options,Graphics Max Dynamic Frequency,2.05 GHz
+Expansion Options,Graphics Output,"DP2.1 UHBR20, HDMI 2.1, eDP1.4b"
+Expansion Options,Xe-cores,4
+Expansion Options,Ray Tracing,Yes
+Expansion Options,Max Resolution (HDMI)‡,4096 x 2304 @ 60Hz (HDMI 2.1 TMDS)7680 x 4320 @ 60Hz (HDMI2.1 FRL)
+Expansion Options,Max Resolution (DP)‡,7680 x 4320 @ 60Hz
+Expansion Options,Max Resolution (eDP - Integrated Flat Panel)‡,3840 x 2400 @ 120Hz
+Expansion Options,DirectX* Support,12.2
+Expansion Options,OpenGL* Support,4.6
+Expansion Options,OpenCL* Support,3.0
+Expansion Options,Multi-Format Codec Engines,2
+Expansion Options,H.264 Hardware Encode/Decode,Yes
+Expansion Options,H.265 (HEVC) Hardware Encode/Decode,Yes
+Expansion Options,AV1 Encode/Decode,Yes
+Expansion Options,VP9 Bitstream & Decoding,Yes
+Expansion Options,Intel® Quick Sync Video,Yes
+Expansion Options,# of Displays Supported‡,4
+Expansion Options,Device ID,0x7D41
+Expansion Options,Intel® Deep Learning Boost (Intel® DL Boost) on GPU,Yes
+Expansion Options,AI Software Frameworks Supported by GPU,"OpenVINO™, WindowsML, DirectML, ONNX RT, WebGPU"
+Expansion Options,NPU Name‡,Intel® AI Boost
+Expansion Options,NPU Peak TOPS (Int8),12
+Expansion Options,Sparsity Support,Yes
+Expansion Options,Windows Studio Effects Support,Yes
+Expansion Options,AI Software Frameworks Supported by NPU,"OpenVINO™, WindowsML, DirectML, ONNX RT"
+Expansion Options,Intel® Thunderbolt™ 4,Yes
+Expansion Options,PCI Support,4.0
+Expansion Options,PCI Express Configurations‡,"3 (x4) Gen4 + 8 (x1,x2,x4) Gen4"
+Expansion Options,Max # of PCI Express Lanes,20
+Expansion Options,Max CPU Configuration,1
+Expansion Options,Max Operating Temperature,110 °C
+Expansion Options,Package Size,50mm x 25mm
+Expansion Options,Intel® Gaussian & Neural Accelerator,3.5
+Expansion Options,Intel® Thread Director,Yes
+Expansion Options,Intel® Image Processing Unit,6.0
+Expansion Options,Intel® Smart Sound Technology,Yes
+Expansion Options,Intel® Wake on Voice,Yes
+Expansion Options,Intel® High Definition Audio,Yes
+Expansion Options,Intel® Adaptix™ Technology,Yes
+Expansion Options,Intel® Speed Shift Technology,Yes
+Expansion Options,Intel® Turbo Boost Max Technology 3.0‡,No
+Expansion Options,Intel® Hyper-Threading Technology‡,Yes
+Expansion Options,Instruction Set,64-bit
+Expansion Options,Instruction Set Extensions,"Intel® SSE4.1, Intel® SSE4.2, Intel® AVX2"
+Expansion Options,Thermal Monitoring Technologies,Yes
+Expansion Options,Intel® Volume Management Device (VMD),Yes
+Expansion Options,Intel vPro® Eligibility‡,Intel vPro® Enterprise
+Expansion Options,Intel® Threat Detection Technology (TDT),Yes
+Expansion Options,Intel® Active Management Technology (AMT)‡,Yes
+Expansion Options,Intel® Standard Manageability (ISM)‡,Yes
+Expansion Options,Intel® Remote Platform Erase (RPE)‡,Yes
+Expansion Options,Intel® One-Click Recovery‡,Yes
+Expansion Options,Intel® Secure Key,Yes
+Expansion Options,Intel® Control-Flow Enforcement Technology,Yes
+Expansion Options,Intel® Total Memory Encryption - Multi Key,Yes
+Expansion Options,Intel® AES New Instructions,Yes
+Expansion Options,Intel® Trusted Execution Technology‡,Yes
+Expansion Options,Execute Disable Bit‡,Yes
+Expansion Options,Intel® OS Guard,Yes
+Expansion Options,Intel® Boot Guard,Yes
+Expansion Options,Mode-based Execute Control (MBEC),Yes
+Expansion Options,Intel® Stable IT Platform Program (SIPP),Yes
+Expansion Options,Intel® Virtualization Technology with Redirect Protection (VT-rp)‡,Yes
+Expansion Options,Intel® Virtualization Technology (VT-x)‡,Yes
+Expansion Options,Intel® Virtualization Technology for Directed I/O (VT-d)‡,Yes
+Expansion Options,Intel® VT-x with Extended Page Tables (EPT)‡,Yes
+Package Specifications,Product Collection,Intel® Core™ Ultra Processors (Series 2)
+Package Specifications,Vertical Segment,Mobile
+Package Specifications,Processor Number,235UA
+Package Specifications,Lithography,Intel 3
+Package Specifications,Total Cores,10
+Package Specifications,# of Performance-cores,2
+Package Specifications,# of Efficient-cores,8
+Package Specifications,# of Low Power Efficient-cores,2
+Package Specifications,Total Threads,14
+Package Specifications,Max Turbo Frequency,4.9 GHz
+Package Specifications,Performance-core Max Turbo Frequency,4.9 GHz
+Package Specifications,Efficient-core Max Turbo Frequency,4.1 GHz
+Package Specifications,Low Power Efficient-core Max Turbo Frequency,2.4 GHz
+Package Specifications,Performance-core Base Frequency,2.0 GHz
+Package Specifications,Efficient-core Base Frequency,1.6 GHz
+Package Specifications,Low Power Efficient-core Base Frequency,700 MHz
+Package Specifications,Cache,12 MB
+Package Specifications,Bus Speed,0.000 GT/s
+Package Specifications,Processor Base Power,15 W
+Package Specifications,Maximum Turbo Power,57 W
+Package Specifications,Minimum Assured Power,12 W
+Package Specifications,Intel® Deep Learning Boost (Intel® DL Boost) on CPU,Yes
+Package Specifications,AI Software Frameworks Supported by CPU,"OpenVINO™, WindowsML, ONNX RT"
+Package Specifications,Marketing Status,Launched
+Package Specifications,Launch Date,Q3'25
+Package Specifications,Embedded Options Available,No
+Package Specifications,Max Memory Size (dependent on memory type),128 GB
+Package Specifications,Memory Types,Up to LPDDR5/x 8400 MT/sUp to DDR5 6400 MT/s
+Package Specifications,Max # of Memory Channels,2
+Package Specifications,ECC Memory Supported‡,No
+Package Specifications,GPU Name‡,Intel® Graphics
+Package Specifications,Graphics Max Dynamic Frequency,2.05 GHz
+Package Specifications,Graphics Output,"DP2.1 UHBR20, HDMI 2.1, eDP1.4b"
+Package Specifications,Xe-cores,4
+Package Specifications,Ray Tracing,Yes
+Package Specifications,Max Resolution (HDMI)‡,4096 x 2304 @ 60Hz (HDMI 2.1 TMDS)7680 x 4320 @ 60Hz (HDMI2.1 FRL)
+Package Specifications,Max Resolution (DP)‡,7680 x 4320 @ 60Hz
+Package Specifications,Max Resolution (eDP - Integrated Flat Panel)‡,3840 x 2400 @ 120Hz
+Package Specifications,DirectX* Support,12.2
+Package Specifications,OpenGL* Support,4.6
+Package Specifications,OpenCL* Support,3.0
+Package Specifications,Multi-Format Codec Engines,2
+Package Specifications,H.264 Hardware Encode/Decode,Yes
+Package Specifications,H.265 (HEVC) Hardware Encode/Decode,Yes
+Package Specifications,AV1 Encode/Decode,Yes
+Package Specifications,VP9 Bitstream & Decoding,Yes
+Package Specifications,Intel® Quick Sync Video,Yes
+Package Specifications,# of Displays Supported‡,4
+Package Specifications,Device ID,0x7D41
+Package Specifications,Intel® Deep Learning Boost (Intel® DL Boost) on GPU,Yes
+Package Specifications,AI Software Frameworks Supported by GPU,"OpenVINO™, WindowsML, DirectML, ONNX RT, WebGPU"
+Package Specifications,NPU Name‡,Intel® AI Boost
+Package Specifications,NPU Peak TOPS (Int8),12
+Package Specifications,Sparsity Support,Yes
+Package Specifications,Windows Studio Effects Support,Yes
+Package Specifications,AI Software Frameworks Supported by NPU,"OpenVINO™, WindowsML, DirectML, ONNX RT"
+Package Specifications,Intel® Thunderbolt™ 4,Yes
+Package Specifications,PCI Support,4.0
+Package Specifications,PCI Express Configurations‡,"3 (x4) Gen4 + 8 (x1,x2,x4) Gen4"
+Package Specifications,Max # of PCI Express Lanes,20
+Package Specifications,Max CPU Configuration,1
+Package Specifications,Max Operating Temperature,110 °C
+Package Specifications,Package Size,50mm x 25mm
+Package Specifications,Intel® Gaussian & Neural Accelerator,3.5
+Package Specifications,Intel® Thread Director,Yes
+Package Specifications,Intel® Image Processing Unit,6.0
+Package Specifications,Intel® Smart Sound Technology,Yes
+Package Specifications,Intel® Wake on Voice,Yes
+Package Specifications,Intel® High Definition Audio,Yes
+Package Specifications,Intel® Adaptix™ Technology,Yes
+Package Specifications,Intel® Speed Shift Technology,Yes
+Package Specifications,Intel® Turbo Boost Max Technology 3.0‡,No
+Package Specifications,Intel® Hyper-Threading Technology‡,Yes
+Package Specifications,Instruction Set,64-bit
+Package Specifications,Instruction Set Extensions,"Intel® SSE4.1, Intel® SSE4.2, Intel® AVX2"
+Package Specifications,Thermal Monitoring Technologies,Yes
+Package Specifications,Intel® Volume Management Device (VMD),Yes
+Package Specifications,Intel vPro® Eligibility‡,Intel vPro® Enterprise
+Package Specifications,Intel® Threat Detection Technology (TDT),Yes
+Package Specifications,Intel® Active Management Technology (AMT)‡,Yes
+Package Specifications,Intel® Standard Manageability (ISM)‡,Yes
+Package Specifications,Intel® Remote Platform Erase (RPE)‡,Yes
+Package Specifications,Intel® One-Click Recovery‡,Yes
+Package Specifications,Intel® Secure Key,Yes
+Package Specifications,Intel® Control-Flow Enforcement Technology,Yes
+Package Specifications,Intel® Total Memory Encryption - Multi Key,Yes
+Package Specifications,Intel® AES New Instructions,Yes
+Package Specifications,Intel® Trusted Execution Technology‡,Yes
+Package Specifications,Execute Disable Bit‡,Yes
+Package Specifications,Intel® OS Guard,Yes
+Package Specifications,Intel® Boot Guard,Yes
+Package Specifications,Mode-based Execute Control (MBEC),Yes
+Package Specifications,Intel® Stable IT Platform Program (SIPP),Yes
+Package Specifications,Intel® Virtualization Technology with Redirect Protection (VT-rp)‡,Yes
+Package Specifications,Intel® Virtualization Technology (VT-x)‡,Yes
+Package Specifications,Intel® Virtualization Technology for Directed I/O (VT-d)‡,Yes
+Package Specifications,Intel® VT-x with Extended Page Tables (EPT)‡,Yes
+Advanced Technologies,Product Collection,Intel® Core™ Ultra Processors (Series 2)
+Advanced Technologies,Vertical Segment,Mobile
+Advanced Technologies,Processor Number,235UA
+Advanced Technologies,Lithography,Intel 3
+Advanced Technologies,Total Cores,10
+Advanced Technologies,# of Performance-cores,2
+Advanced Technologies,# of Efficient-cores,8
+Advanced Technologies,# of Low Power Efficient-cores,2
+Advanced Technologies,Total Threads,14
+Advanced Technologies,Max Turbo Frequency,4.9 GHz
+Advanced Technologies,Performance-core Max Turbo Frequency,4.9 GHz
+Advanced Technologies,Efficient-core Max Turbo Frequency,4.1 GHz
+Advanced Technologies,Low Power Efficient-core Max Turbo Frequency,2.4 GHz
+Advanced Technologies,Performance-core Base Frequency,2.0 GHz
+Advanced Technologies,Efficient-core Base Frequency,1.6 GHz
+Advanced Technologies,Low Power Efficient-core Base Frequency,700 MHz
+Advanced Technologies,Cache,12 MB
+Advanced Technologies,Bus Speed,0.000 GT/s
+Advanced Technologies,Processor Base Power,15 W
+Advanced Technologies,Maximum Turbo Power,57 W
+Advanced Technologies,Minimum Assured Power,12 W
+Advanced Technologies,Intel® Deep Learning Boost (Intel® DL Boost) on CPU,Yes
+Advanced Technologies,AI Software Frameworks Supported by CPU,"OpenVINO™, WindowsML, ONNX RT"
+Advanced Technologies,Marketing Status,Launched
+Advanced Technologies,Launch Date,Q3'25
+Advanced Technologies,Embedded Options Available,No
+Advanced Technologies,Max Memory Size (dependent on memory type),128 GB
+Advanced Technologies,Memory Types,Up to LPDDR5/x 8400 MT/sUp to DDR5 6400 MT/s
+Advanced Technologies,Max # of Memory Channels,2
+Advanced Technologies,ECC Memory Supported‡,No
+Advanced Technologies,GPU Name‡,Intel® Graphics
+Advanced Technologies,Graphics Max Dynamic Frequency,2.05 GHz
+Advanced Technologies,Graphics Output,"DP2.1 UHBR20, HDMI 2.1, eDP1.4b"
+Advanced Technologies,Xe-cores,4
+Advanced Technologies,Ray Tracing,Yes
+Advanced Technologies,Max Resolution (HDMI)‡,4096 x 2304 @ 60Hz (HDMI 2.1 TMDS)7680 x 4320 @ 60Hz (HDMI2.1 FRL)
+Advanced Technologies,Max Resolution (DP)‡,7680 x 4320 @ 60Hz
+Advanced Technologies,Max Resolution (eDP - Integrated Flat Panel)‡,3840 x 2400 @ 120Hz
+Advanced Technologies,DirectX* Support,12.2
+Advanced Technologies,OpenGL* Support,4.6
+Advanced Technologies,OpenCL* Support,3.0
+Advanced Technologies,Multi-Format Codec Engines,2
+Advanced Technologies,H.264 Hardware Encode/Decode,Yes
+Advanced Technologies,H.265 (HEVC) Hardware Encode/Decode,Yes
+Advanced Technologies,AV1 Encode/Decode,Yes
+Advanced Technologies,VP9 Bitstream & Decoding,Yes
+Advanced Technologies,Intel® Quick Sync Video,Yes
+Advanced Technologies,# of Displays Supported‡,4
+Advanced Technologies,Device ID,0x7D41
+Advanced Technologies,Intel® Deep Learning Boost (Intel® DL Boost) on GPU,Yes
+Advanced Technologies,AI Software Frameworks Supported by GPU,"OpenVINO™, WindowsML, DirectML, ONNX RT, WebGPU"
+Advanced Technologies,NPU Name‡,Intel® AI Boost
+Advanced Technologies,NPU Peak TOPS (Int8),12
+Advanced Technologies,Sparsity Support,Yes
+Advanced Technologies,Windows Studio Effects Support,Yes
+Advanced Technologies,AI Software Frameworks Supported by NPU,"OpenVINO™, WindowsML, DirectML, ONNX RT"
+Advanced Technologies,Intel® Thunderbolt™ 4,Yes
+Advanced Technologies,PCI Support,4.0
+Advanced Technologies,PCI Express Configurations‡,"3 (x4) Gen4 + 8 (x1,x2,x4) Gen4"
+Advanced Technologies,Max # of PCI Express Lanes,20
+Advanced Technologies,Max CPU Configuration,1
+Advanced Technologies,Max Operating Temperature,110 °C
+Advanced Technologies,Package Size,50mm x 25mm
+Advanced Technologies,Intel® Gaussian & Neural Accelerator,3.5
+Advanced Technologies,Intel® Thread Director,Yes
+Advanced Technologies,Intel® Image Processing Unit,6.0
+Advanced Technologies,Intel® Smart Sound Technology,Yes
+Advanced Technologies,Intel® Wake on Voice,Yes
+Advanced Technologies,Intel® High Definition Audio,Yes
+Advanced Technologies,Intel® Adaptix™ Technology,Yes
+Advanced Technologies,Intel® Speed Shift Technology,Yes
+Advanced Technologies,Intel® Turbo Boost Max Technology 3.0‡,No
+Advanced Technologies,Intel® Hyper-Threading Technology‡,Yes
+Advanced Technologies,Instruction Set,64-bit
+Advanced Technologies,Instruction Set Extensions,"Intel® SSE4.1, Intel® SSE4.2, Intel® AVX2"
+Advanced Technologies,Thermal Monitoring Technologies,Yes
+Advanced Technologies,Intel® Volume Management Device (VMD),Yes
+Advanced Technologies,Intel vPro® Eligibility‡,Intel vPro® Enterprise
+Advanced Technologies,Intel® Threat Detection Technology (TDT),Yes
+Advanced Technologies,Intel® Active Management Technology (AMT)‡,Yes
+Advanced Technologies,Intel® Standard Manageability (ISM)‡,Yes
+Advanced Technologies,Intel® Remote Platform Erase (RPE)‡,Yes
+Advanced Technologies,Intel® One-Click Recovery‡,Yes
+Advanced Technologies,Intel® Secure Key,Yes
+Advanced Technologies,Intel® Control-Flow Enforcement Technology,Yes
+Advanced Technologies,Intel® Total Memory Encryption - Multi Key,Yes
+Advanced Technologies,Intel® AES New Instructions,Yes
+Advanced Technologies,Intel® Trusted Execution Technology‡,Yes
+Advanced Technologies,Execute Disable Bit‡,Yes
+Advanced Technologies,Intel® OS Guard,Yes
+Advanced Technologies,Intel® Boot Guard,Yes
+Advanced Technologies,Mode-based Execute Control (MBEC),Yes
+Advanced Technologies,Intel® Stable IT Platform Program (SIPP),Yes
+Advanced Technologies,Intel® Virtualization Technology with Redirect Protection (VT-rp)‡,Yes
+Advanced Technologies,Intel® Virtualization Technology (VT-x)‡,Yes
+Advanced Technologies,Intel® Virtualization Technology for Directed I/O (VT-d)‡,Yes
+Advanced Technologies,Intel® VT-x with Extended Page Tables (EPT)‡,Yes
+Security & Reliability,Product Collection,Intel® Core™ Ultra Processors (Series 2)
+Security & Reliability,Vertical Segment,Mobile
+Security & Reliability,Processor Number,235UA
+Security & Reliability,Lithography,Intel 3
+Security & Reliability,Total Cores,10
+Security & Reliability,# of Performance-cores,2
+Security & Reliability,# of Efficient-cores,8
+Security & Reliability,# of Low Power Efficient-cores,2
+Security & Reliability,Total Threads,14
+Security & Reliability,Max Turbo Frequency,4.9 GHz
+Security & Reliability,Performance-core Max Turbo Frequency,4.9 GHz
+Security & Reliability,Efficient-core Max Turbo Frequency,4.1 GHz
+Security & Reliability,Low Power Efficient-core Max Turbo Frequency,2.4 GHz
+Security & Reliability,Performance-core Base Frequency,2.0 GHz
+Security & Reliability,Efficient-core Base Frequency,1.6 GHz
+Security & Reliability,Low Power Efficient-core Base Frequency,700 MHz
+Security & Reliability,Cache,12 MB
+Security & Reliability,Bus Speed,0.000 GT/s
+Security & Reliability,Processor Base Power,15 W
+Security & Reliability,Maximum Turbo Power,57 W
+Security & Reliability,Minimum Assured Power,12 W
+Security & Reliability,Intel® Deep Learning Boost (Intel® DL Boost) on CPU,Yes
+Security & Reliability,AI Software Frameworks Supported by CPU,"OpenVINO™, WindowsML, ONNX RT"
+Security & Reliability,Marketing Status,Launched
+Security & Reliability,Launch Date,Q3'25
+Security & Reliability,Embedded Options Available,No
+Security & Reliability,Max Memory Size (dependent on memory type),128 GB
+Security & Reliability,Memory Types,Up to LPDDR5/x 8400 MT/sUp to DDR5 6400 MT/s
+Security & Reliability,Max # of Memory Channels,2
+Security & Reliability,ECC Memory Supported‡,No
+Security & Reliability,GPU Name‡,Intel® Graphics
+Security & Reliability,Graphics Max Dynamic Frequency,2.05 GHz
+Security & Reliability,Graphics Output,"DP2.1 UHBR20, HDMI 2.1, eDP1.4b"
+Security & Reliability,Xe-cores,4
+Security & Reliability,Ray Tracing,Yes
+Security & Reliability,Max Resolution (HDMI)‡,4096 x 2304 @ 60Hz (HDMI 2.1 TMDS)7680 x 4320 @ 60Hz (HDMI2.1 FRL)
+Security & Reliability,Max Resolution (DP)‡,7680 x 4320 @ 60Hz
+Security & Reliability,Max Resolution (eDP - Integrated Flat Panel)‡,3840 x 2400 @ 120Hz
+Security & Reliability,DirectX* Support,12.2
+Security & Reliability,OpenGL* Support,4.6
+Security & Reliability,OpenCL* Support,3.0
+Security & Reliability,Multi-Format Codec Engines,2
+Security & Reliability,H.264 Hardware Encode/Decode,Yes
+Security & Reliability,H.265 (HEVC) Hardware Encode/Decode,Yes
+Security & Reliability,AV1 Encode/Decode,Yes
+Security & Reliability,VP9 Bitstream & Decoding,Yes
+Security & Reliability,Intel® Quick Sync Video,Yes
+Security & Reliability,# of Displays Supported‡,4
+Security & Reliability,Device ID,0x7D41
+Security & Reliability,Intel® Deep Learning Boost (Intel® DL Boost) on GPU,Yes
+Security & Reliability,AI Software Frameworks Supported by GPU,"OpenVINO™, WindowsML, DirectML, ONNX RT, WebGPU"
+Security & Reliability,NPU Name‡,Intel® AI Boost
+Security & Reliability,NPU Peak TOPS (Int8),12
+Security & Reliability,Sparsity Support,Yes
+Security & Reliability,Windows Studio Effects Support,Yes
+Security & Reliability,AI Software Frameworks Supported by NPU,"OpenVINO™, WindowsML, DirectML, ONNX RT"
+Security & Reliability,Intel® Thunderbolt™ 4,Yes
+Security & Reliability,PCI Support,4.0
+Security & Reliability,PCI Express Configurations‡,"3 (x4) Gen4 + 8 (x1,x2,x4) Gen4"
+Security & Reliability,Max # of PCI Express Lanes,20
+Security & Reliability,Max CPU Configuration,1
+Security & Reliability,Max Operating Temperature,110 °C
+Security & Reliability,Package Size,50mm x 25mm
+Security & Reliability,Intel® Gaussian & Neural Accelerator,3.5
+Security & Reliability,Intel® Thread Director,Yes
+Security & Reliability,Intel® Image Processing Unit,6.0
+Security & Reliability,Intel® Smart Sound Technology,Yes
+Security & Reliability,Intel® Wake on Voice,Yes
+Security & Reliability,Intel® High Definition Audio,Yes
+Security & Reliability,Intel® Adaptix™ Technology,Yes
+Security & Reliability,Intel® Speed Shift Technology,Yes
+Security & Reliability,Intel® Turbo Boost Max Technology 3.0‡,No
+Security & Reliability,Intel® Hyper-Threading Technology‡,Yes
+Security & Reliability,Instruction Set,64-bit
+Security & Reliability,Instruction Set Extensions,"Intel® SSE4.1, Intel® SSE4.2, Intel® AVX2"
+Security & Reliability,Thermal Monitoring Technologies,Yes
+Security & Reliability,Intel® Volume Management Device (VMD),Yes
+Security & Reliability,Intel vPro® Eligibility‡,Intel vPro® Enterprise
+Security & Reliability,Intel® Threat Detection Technology (TDT),Yes
+Security & Reliability,Intel® Active Management Technology (AMT)‡,Yes
+Security & Reliability,Intel® Standard Manageability (ISM)‡,Yes
+Security & Reliability,Intel® Remote Platform Erase (RPE)‡,Yes
+Security & Reliability,Intel® One-Click Recovery‡,Yes
+Security & Reliability,Intel® Secure Key,Yes
+Security & Reliability,Intel® Control-Flow Enforcement Technology,Yes
+Security & Reliability,Intel® Total Memory Encryption - Multi Key,Yes
+Security & Reliability,Intel® AES New Instructions,Yes
+Security & Reliability,Intel® Trusted Execution Technology‡,Yes
+Security & Reliability,Execute Disable Bit‡,Yes
+Security & Reliability,Intel® OS Guard,Yes
+Security & Reliability,Intel® Boot Guard,Yes
+Security & Reliability,Mode-based Execute Control (MBEC),Yes
+Security & Reliability,Intel® Stable IT Platform Program (SIPP),Yes
+Security & Reliability,Intel® Virtualization Technology with Redirect Protection (VT-rp)‡,Yes
+Security & Reliability,Intel® Virtualization Technology (VT-x)‡,Yes
+Security & Reliability,Intel® Virtualization Technology for Directed I/O (VT-d)‡,Yes
+Security & Reliability,Intel® VT-x with Extended Page Tables (EPT)‡,Yes

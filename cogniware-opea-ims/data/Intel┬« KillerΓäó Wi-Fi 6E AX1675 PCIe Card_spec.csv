@@ -1,0 +1,20 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® Killer™ Wi-Fi Series
+Essentials,Code Name,Products formerly Typhoon Peak
+Essentials,Marketing Status,Launched
+Essentials,Launch Date,Q3'22
+Essentials,Weight (in grams),251
+Essentials,Operating Temperature Range,0°C to 80°C
+Essentials,Max Operating Temperature,80 °C
+Essentials,Minimum Operating Temperature,0 °C
+Essentials,Supported Operating Systems,"Windows 11, 64-bit*, Windows 10, 64-bit*, Linux*"
+Essentials,Antenna,2x2
+Networking Specifications,TX/RX Streams,2x2
+Networking Specifications,Bands,"2.4, 5, 6 GHz (160MHz)"
+Networking Specifications,Max Speed,2.4 Gbps
+Networking Specifications,Wi-Fi CERTIFIED*,Wi-Fi 6E (802.11ax)
+Networking Specifications,Integrated Bluetooth,Yes
+Networking Specifications,Bluetooth Version,5.3
+Package Specifications,System Interface Type,"Wi-Fi(PCIe), BT(USB)"
+Advanced Technologies,MU-MIMO,Yes
+Advanced Technologies,Orthogonal Frequency-Division Multiple Access (OFDMA),Yes

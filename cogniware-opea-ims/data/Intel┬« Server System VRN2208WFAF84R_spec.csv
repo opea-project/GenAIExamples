@@ -1,0 +1,17 @@
+Section,Key,Value
+Essentials,Product Collection,"Intel® Data Center Systems for HCI, certified for VMware vSAN"
+Essentials,Code Name,Products formerly Wolf Pass
+Essentials,Launch Date,Q2'21
+Essentials,Marketing Status,Discontinued
+Essentials,Expected Discontinuance,2023
+Essentials,ISV Certification,Designed for VMware* Virtual SAN (VSAN)
+Essentials,Rack Rails Included,No
+Essentials,Compatible Product Series,2nd Generation Intel® Xeon® Scalable Processors
+Essentials,TDP,125 W
+Essentials,System Board,Intel® Server System R2208WF0ZSR
+Essentials,Target Market,Cloud/Datacenter
+Essentials,Included Items,"(1) Intel® Server System R2208WF0ZSR(2) Intel® Xeon® Gold 6230 Processors (20c, 2.1G, 125W)  CD8069504193701(1) Intel® SSD D3-S4510 Series (480GB, M.2 80mm SATA 6Gb/s) SSDSCKKB480G801(4) Intel® Optane™ SSD DC P4800X Series (375GB, 2.5in PCIe x4, 3D XPoint™)  SSDPE21K375GA01(12) Intel® SSD DC P4510 Series (2.0TB, 2.5in) SSDPE2KX020T801(1) Remote Management Module 4 Lite 2 AXXRMM4LITE2(1) 2U Hot-swap 8x2.5inch SAS/NVMe Combo Drive Bay Kit A2U8X25S3PHS(2) 8-Port PCIe Gen3 x8 Switch AIC AXXP3SWX08080(2) Cable Kit OCuLink* 2U 8 Port Switch #2 A2U8PSWCXCXK2(1) Oculink Cable Kit AXXCBL530CVCR(1) Oculink Cable Kit AXXCBL470CVCR(2) Oculink Cable Kit AXXCBL700CVCR(1) 1300W AC CRPS 80+ Titanium PSU AXX1300TCRPS(1) Intel® Ethernet Network Connection OCP X527-DA4 X527DA40CPG1P5(8) Intel® Optane™ Persistent Memory 128GB Module (1.0) NMA1XXD128GPSU4(12) RDIMM 32GB - DDR4, 288-pin, 2666MHz(1) Trusted Platform Module 2.0 AXXTPMENC8"
+Supplemental Information,Description,"Intel® Data Center Blocks for Cloud designed for VMware* Virtual SAN (vSAN) includes Server Board, Chassis, Processor, Solid State Drives and third-party memory."
+Memory & Storage,Storage Profile,All-Flash Storage Profile
+Memory & Storage,Included Memory,"1TB Raw Memory (384GB DDR4 RAM, 1TB DCPMM)"
+Memory & Storage,Included Storage,"24TB Raw Storage(0.48TB boot device, 1.5TB Cache Tier, 24TB Capacity Tier)"

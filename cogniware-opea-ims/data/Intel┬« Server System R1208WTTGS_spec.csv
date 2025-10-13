@@ -1,0 +1,76 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® Server System R1000WT Family
+Essentials,Code Name,Products formerly Wildcat Pass
+Essentials,Launch Date,Q4'14
+Essentials,Marketing Status,Discontinued
+Essentials,Expected Discontinuance,Q1'16
+Essentials,EOL Announce,"Friday, November 13, 2015"
+Essentials,Last Order,"Friday, January 29, 2016"
+Essentials,Last Receipt Attributes,"Friday, February 26, 2016"
+Essentials,Limited 3-year Warranty,Yes
+Essentials,Extended Warranty Available for Purchase (Select Countries),Yes
+Essentials,Additional Extended Warranty Details,Dual Processor System Extended Warranty
+Essentials,Chassis Form Factor,1U Rack
+Essentials,Chassis Dimensions,"16.93"" x 27.95"" x 1.72"""
+Essentials,Board Form Factor,"Custom 16.7"" x 17"""
+Essentials,Rack Rails Included,No
+Essentials,Compatible Product Series,Intel® Xeon® Processor E5-2600 v3 Family
+Essentials,Socket,Socket R3
+Essentials,TDP,145 W
+Essentials,Heat Sink,2
+Essentials,Heat Sink Included,Yes
+Essentials,System Board,Intel® Server Board S2600WTT
+Essentials,Target Market,Cloud/Datacenter
+Essentials,Rack-Friendly Board,Yes
+Essentials,Power Supply,750 W
+Essentials,Power Supply Type,AC
+Essentials,# of Power Supply Included,1
+Essentials,Redundant Fans,Yes
+Essentials,Redundant Power Supported,"Supported, requires additional power supply"
+Essentials,Backplanes,Included
+Essentials,Included Items,"(1) Intel® Server Board S2600WTT in a 1U chassis, (1) standard control panel board FXXFPANEL, (1) I/O Panel with front 1x VGA and 2x USB (ODD bay if removed), (8) 2.5 inch hot-swap drive carriers FXX25HSCAR, (1) backplane F1U8X25S3HSBP, (1) AXXCBL730HRHD cable, (1) AXXCBL900HRHD cable, (2) processor heatsink FXXCA84X106HS, (2) risers with 1x16 PCIe* 3.0 FHHL slot on each F1UL16RISER, and (1) 750W AC power supply FXX750PCRPS"
+Supplemental Information,Description,"Integrated 1U system featuring Intel® Server Board S2600WTT supporting eight 2.5 inch hot-swap drives, dual 10-GbE LAN, 24 DIMMs, one 750W redundant-capable power supply, enterprise class I/O, with built in discrete management network interface."
+Memory & Storage,Memory Types,DDR4-1600/1866/2133
+Memory & Storage,# of Memory Slots,24
+Memory & Storage,Max Memory Size (dependent on memory type),1.5 TB
+Memory & Storage,# of Front Drives Supported,8
+Memory & Storage,Front Drive Form Factor,"Hot-swap 2.5"""
+GPU Specifications,Integrated Graphics‡,Yes
+Expansion Options,PCI Express Revision,3.0
+Expansion Options,PCIe x4 Gen 3,1
+Expansion Options,PCIe x8 Gen 3,1
+Expansion Options,PCIe x16 Gen 3,2
+Expansion Options,Connector for Intel® I/O Expansion Module x8 Gen 3,1
+Expansion Options,Connector for Intel® Integrated RAID Module,1
+I/O Specifications,# of USB Ports,8
+I/O Specifications,Total # of SATA Ports,10
+I/O Specifications,RAID Configuration,"SW RAID 0, 1, 10, optional 5"
+I/O Specifications,# of Serial Ports,2
+I/O Specifications,Integrated LAN,2x 10-GbE
+I/O Specifications,# of LAN Ports,2
+I/O Specifications,Optical Drive Support,Yes
+I/O Specifications,Firewire,No
+I/O Specifications,Integrated SAS Ports,0
+I/O Specifications,Embedded USB (eUSB) Solid State Drive Option,Yes
+I/O Specifications,Integrated InfiniBand*,No
+Package Specifications,Max CPU Configuration,2
+Advanced Technologies,Intel® Remote Management Module Support,Yes
+Advanced Technologies,Integrated BMC with IPMI,IPMI 2.0 with OEM extensions
+Advanced Technologies,Intel® Node Manager,Yes
+Advanced Technologies,Intel® On-Demand Redundant Power,Yes
+Advanced Technologies,Intel® Advanced Management Technology,Yes
+Advanced Technologies,Intel® Server Customization Technology,Yes
+Advanced Technologies,Intel® Build Assurance Technology,Yes
+Advanced Technologies,Intel® Efficient Power Technology,Yes
+Advanced Technologies,Intel® Quiet Thermal Technology,Yes
+Advanced Technologies,Intel® Virtualization Technology for Directed I/O (VT-d)‡,Yes
+Advanced Technologies,Intel® Matrix Storage Technology,No
+Advanced Technologies,Intel® Rapid Storage Technology,No
+Advanced Technologies,Intel® Rapid Storage Technology enterprise,Yes
+Advanced Technologies,Intel® Quiet System Technology,Yes
+Advanced Technologies,Intel® Fast Memory Access,Yes
+Advanced Technologies,Intel® Flex Memory Access,Yes
+Advanced Technologies,Intel® I/O Acceleration Technology,Yes
+Advanced Technologies,TPM Version,1.2
+Security & Reliability,Intel® AES New Instructions,Yes
+Security & Reliability,Intel® Trusted Execution Technology‡,Yes

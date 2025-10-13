@@ -1,0 +1,21 @@
+Section,Key,Value
+Ordering and Spec Information,,
+"Intel® Wi-Fi 6E AX211 (Gig+), 2230, 2x2 AX R2 (6GHz)+BT, vPro®",Ordering Code,AX211.NGWG
+"Intel® Wi-Fi 6E AX211 (Gig+), 2230, 2x2 AX R2 (6GHz)+BT, vPro®",MDDS Content IDs,"708816,785485"
+"Intel® Wi-Fi 6E AX211 (Gig+), 2230, 2x2 AX R2 (6GHz)+BT, vPro®",PCN Content IDs,"795968,811492,797171,801175,835554"
+"Intel® Wi-Fi 6E AX211 (Gig+), 2230, 2x2 AX R2 (6GHz)+BT, vPro®",Recommended Customer Price,$16.00
+"Intel® Wi-Fi 6E AX211 (Gig+), 2230, 2x2 AX R2 (6GHz)+BT, No vPro®",Ordering Code,AX211.NGWG.NV
+"Intel® Wi-Fi 6E AX211 (Gig+), 2230, 2x2 AX R2 (6GHz)+BT, No vPro®",MDDS Content IDs,"707749,785490"
+"Intel® Wi-Fi 6E AX211 (Gig+), 2230, 2x2 AX R2 (6GHz)+BT, No vPro®",PCN Content IDs,"795968,835554,797171,801175,811492"
+"Intel® Wi-Fi 6E AX211 (Gig+), 2230, 2x2 AX R2 (6GHz)+BT, No vPro®",Recommended Customer Price,$10.00
+"Intel® Wi-Fi 6E AX211 (Gig+), 1216, 2x2 AX R2 (6GHz)+BT, vPro®",Ordering Code,AX211.D2WG
+"Intel® Wi-Fi 6E AX211 (Gig+), 1216, 2x2 AX R2 (6GHz)+BT, vPro®",MDDS Content IDs,"709187,785495"
+"Intel® Wi-Fi 6E AX211 (Gig+), 1216, 2x2 AX R2 (6GHz)+BT, vPro®",PCN Content IDs,"805256,797962,839761,800412,803016"
+"Intel® Wi-Fi 6E AX211 (Gig+), 1216, 2x2 AX R2 (6GHz)+BT, vPro®",Recommended Customer Price,$16.00
+"Intel® Wi-Fi 6E AX211 (Gig+), 1216, 2x2 AX R2 (6GHz)+BT, No vPro®",Ordering Code,AX211.D2WG.NV
+"Intel® Wi-Fi 6E AX211 (Gig+), 1216, 2x2 AX R2 (6GHz)+BT, No vPro®",MDDS Content IDs,708996
+"Intel® Wi-Fi 6E AX211 (Gig+), 1216, 2x2 AX R2 (6GHz)+BT, No vPro®",PCN Content IDs,"797962,800412,803016,805256,839761"
+"Intel® Wi-Fi 6E AX211 (Gig+), 1216, 2x2 AX R2 (6GHz)+BT, No vPro®",Recommended Customer Price,$10.00
+Trade Compliance Information,ECCN,5A991
+Trade Compliance Information,CCATS,NA
+Trade Compliance Information,US HTS,8517620090

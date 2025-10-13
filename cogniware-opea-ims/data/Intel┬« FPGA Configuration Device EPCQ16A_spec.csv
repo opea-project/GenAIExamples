@@ -1,0 +1,15 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® FPGA Configuration Device EPCQ-A
+Essentials,Marketing Status,Launched
+Essentials,Launch Date,Q3'17
+Essentials,Lithography,58 nm
+Resources,Memory Size,16777216 bits
+Resources,On-Chip Decompression Support,No
+Resources,In-System Programming Support,Yes
+Resources,Cascading Support,No
+Resources,Reprogrammable,Yes
+Resources,Recommended Operating Voltage,3.3 V
+Package Specifications,Package Options,8-pin SOIC
+Package Specifications,Package Size,4.9mm x 6.0mm
+Supplemental Information,Datasheet,View now
+Supplemental Information,Additional Information,View now

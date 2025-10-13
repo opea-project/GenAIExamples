@@ -1,0 +1,7 @@
+Section,Key,Value
+Essentials,Product Collection,Drive Bay Options
+Essentials,Marketing Status,Discontinued
+Essentials,Launch Date,Q1'06
+Essentials,Expected Discontinuance,2012
+Essentials,Included Items,"Backplane board, 6 drive carriers, 2 data cables, 6-drive bay, IPMB cable, installation guide, SATA/SAS configuration label"
+Supplemental Information,Description,Expander-based 6-drive bay that supports SAS/SATA drives. Requires a SAS module or SAS RAID card with two free ports.

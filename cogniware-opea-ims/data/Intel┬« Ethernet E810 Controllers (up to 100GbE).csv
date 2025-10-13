@@ -1,0 +1,4 @@
+Product ID,Product Name,CablingDescription,MaxTDP,Port Configuration,Data Rate Per Port,System Interface Type
+186127,Intel® Ethernet Controller E810-XXVAM2,,,Dual,25Gb/s,PCIe 4.0/3.0
+187409,Intel® Ethernet Controller E810-CAM1,,,Single,"1x100, 2x50, 4x25, or 4x10 Gbps",PCIe 4.0/3.0
+187410,Intel® Ethernet Controller E810-CAM2,,,Dual,100Gb/s,PCIe 4.0/3.0

@@ -1,0 +1,25 @@
+Section,Key,Value
+Essentials,Product Collection,IoT & Edge Intel® Wi-Fi Series
+Essentials,Code Name,Products formerly Thunder Peak
+Essentials,Marketing Status,Launched
+Essentials,Launch Date,Q4'20
+Essentials,Weight (in grams),143.5
+Essentials,Operating Temperature Range,-40 °C to 50 °C
+Essentials,Max Operating Temperature,50 °C
+Essentials,Minimum Operating Temperature,-40 °C
+Essentials,Supported Operating Systems,OS Independent
+Essentials,Warranty Period,3  yrs
+Essentials,Antenna,2x2
+Essentials,Use Conditions,Industrial Extended Temp
+Networking Specifications,TX/RX Streams,2x2
+Networking Specifications,Bands,"2.4, 5 GHz (160 MHz)"
+Networking Specifications,Max Speed,1.73 Gbps
+Networking Specifications,Wi-Fi CERTIFIED*,Wi-Fi 5 (802.11ac)
+Networking Specifications,Compliance,Yes
+Networking Specifications,Integrated Bluetooth,Yes
+Networking Specifications,Bluetooth Version,5.1
+Package Specifications,Board Form Factor,M.2 2230
+Package Specifications,System Interface Type,"Wi-Fi(PCIe),BT(USB)"
+Advanced Technologies,MU-MIMO,Yes
+Advanced Technologies,Orthogonal Frequency-Division Multiple Access (OFDMA),Yes
+Advanced Technologies,Supported Under Intel vPro® Technology,No

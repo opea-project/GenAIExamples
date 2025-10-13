@@ -1,0 +1,4 @@
+Product ID,Product Name,Cabling Type,TDP,Port Configuration,Data Rate Per Port,System Interface Type
+184824,Intel® Ethernet Network Adapter I350-T4 for OCP 3.0,Cat 5 up to 100m,,Quad,1GbE,PCIe v2.1 (5.0 GT/s)
+84804,Intel® Ethernet Server Adapter I350-T2V2,Cat 5 up to 100m,,Dual,1GbE,PCIe v2.1 (5.0 GT/s)
+84805,Intel® Ethernet Server Adapter I350-T4V2,Cat 5 up to 100m,5 W,Quad,,PCIe v2.1 (5.0 GT/s)

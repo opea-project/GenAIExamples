@@ -1,0 +1,3 @@
+Product ID,Product Name,CablingDescription,TDP,Port Configuration,Data Rate Per Port,InterfaceType
+128970,Intel® Ethernet Connection C827-IM1,,2.6 W,Single,"1x100GbE, 1x40GbE, 4x25GbE or 4x10GbE",
+128969,Intel® Ethernet Connection C827-AM1,,2.6 W,Single,"1x100GbE, 1x40GbE, 4x25GbE or 4x10GbE",

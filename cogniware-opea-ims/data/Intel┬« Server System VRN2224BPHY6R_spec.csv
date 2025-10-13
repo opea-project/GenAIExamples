@@ -1,0 +1,16 @@
+Section,Key,Value
+Essentials,Product Collection,"Intel® Data Center Systems for HCI, certified for VMware vSAN"
+Essentials,Code Name,Products formerly Buchanan Pass
+Essentials,Launch Date,Q2'19
+Essentials,Marketing Status,Discontinued
+Essentials,Expected Discontinuance,2023
+Essentials,ISV Certification,Designed for VMware* Virtual SAN (VSAN)
+Essentials,Rack Rails Included,Yes
+Essentials,Compatible Product Series,2nd Generation Intel® Xeon® Scalable Processors
+Essentials,TDP,85 W
+Essentials,System Board,Intel® Compute Module HNS2600BPS24R
+Essentials,Target Market,Cloud/Datacenter
+Supplemental Information,Description,"Intel® Data Center Blocks for Cloud designed for VMware* Virtual SAN (vSAN) includes Server Board, Chassis, Processor, Solid State Drives and third-party memory."
+Memory & Storage,Storage Profile,Hybrid Storage Profile
+Memory & Storage,Included Memory,1.02TB DDR4 RAM Raw Memory
+Memory & Storage,Included Storage,4x 0.25TB  boot device7.68TB Cache TierCapacity Tier HDDs are customer supplied and NOT INCLUDED in the configuration. This model was certified with 16 x 2TB Seagate ST2000NX0433 drives

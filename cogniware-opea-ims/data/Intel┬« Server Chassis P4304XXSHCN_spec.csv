@@ -1,0 +1,22 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® Server Chassis P4000S Family
+Essentials,Launch Date,Q1'11
+Essentials,Marketing Status,Discontinued
+Essentials,Expected Discontinuance,Q1'18
+Essentials,EOL Announce,"Tuesday, March 27, 2018"
+Essentials,Last Order,"Sunday, July 1, 2018"
+Essentials,Last Receipt Attributes,"Monday, October 1, 2018"
+Essentials,Limited 3-year Warranty,Yes
+Essentials,Extended Warranty Available for Purchase (Select Countries),Yes
+Essentials,Chassis Form Factor,4U Pedestal
+Essentials,Chassis Dimensions,"17.24"" x 21.5"" x 6.81"""
+Essentials,Target Market,Small and Medium Business
+Essentials,Power Supply,365 W
+Essentials,Power Supply Type,AC
+Essentials,# of Power Supply Included,1
+Essentials,Redundant Fans,No
+Essentials,Redundant Power Supported,No
+Essentials,Backplanes,Included
+Essentials,Included Items,"(1) System fan assembly, (1) Front Panel assembly with cables, (1) 365W Fixed Mount Power Supply, (1) System fan assembly, (4) 3.5 inch Hot swap drive carriers, (2) ODD Slide Rail Assemblies, (1) 450mm SATA data cable, (1) 600mm I2C data cable, (1) 450mm SGPIO data cable, (1) 200mm chassis intrusion switch cable"
+Memory & Storage,# of Front Drives Supported,4
+Memory & Storage,Front Drive Form Factor,"Hot-swap 3.5"" HDD or 2.5"" SSD"

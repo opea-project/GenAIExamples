@@ -1,0 +1,17 @@
+Product ID,Product Name,Launch Date,Total Cores,Max Turbo Frequency,Processor Base Frequency,Cache,TDP
+214758,Intel® Celeron® Processor J6412,Q1'21,4,,2.00 GHz,4 MB L3 Cache,10 W
+207909,Intel® Celeron® Processor J6413,Q1'21,4,,1.80 GHz,1.5 MB L2 Cache,10 W
+197307,Intel® Celeron® Processor J4025,Q4'19,2,,2.00 GHz,4 MB,10 W
+197305,Intel® Celeron® Processor J4125,Q4'19,4,,2.00 GHz,4 MB,10 W
+195256,Intel® Celeron® Processor J3355E,Q3'19,2,2.50 GHz,2.00 GHz,2 MB,10 W
+195255,Intel® Celeron® Processor J3455E,Q3'19,4,2.30 GHz,1.50 GHz,2 MB,10 W
+128992,Intel® Celeron® J4005 Processor,Q4'17,2,,2.00 GHz,4 MB,10 W
+128989,Intel® Celeron® J4105 Processor,Q4'17,4,,1.50 GHz,4 MB,10 W
+95597,Intel® Celeron® Processor J3355,Q3'16,2,,2.00 GHz,2 MB,10 W
+95594,Intel® Celeron® Processor J3455,Q3'16,4,,1.50 GHz,2 MB,10 W
+91534,Intel® Celeron® Processor J3060,Q1'16,2,,1.60 GHz,2 MB L2 Cache,6 W
+91533,Intel® Celeron® Processor J3160,Q1'16,4,,1.60 GHz,2 MB L2 Cache,6 W
+78866,Intel® Celeron® Processor J1800,Q4'13,2,,2.41 GHz,1 MB L2 Cache,10 W
+78867,Intel® Celeron® Processor J1900,Q4'13,4,,2.00 GHz,2 MB L2 Cache,10 W
+76531,Intel® Celeron® Processor J1750,Q3'13,2,,2.41 GHz,1 MB L2 Cache,10 W
+76530,Intel® Celeron® Processor J1850,Q3'13,4,,2.00 GHz,2 MB L2 Cache,10 W

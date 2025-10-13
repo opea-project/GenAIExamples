@@ -1,0 +1,33 @@
+Section,Key,Value
+Essentials,Product Collection,Intel Atom® Processor N Series
+Essentials,Code Name,Products formerly Cedarview
+Essentials,Vertical Segment,Mobile
+Essentials,Processor Number,N2800
+Essentials,Lithography,32 nm
+CPU Specifications,Total Cores,2
+CPU Specifications,Total Threads,4
+CPU Specifications,Processor Base Frequency,1.86 GHz
+CPU Specifications,Cache,1 MB L2 Cache
+CPU Specifications,Bus Speed,2.5 GT/s
+CPU Specifications,TDP,6.5 W
+Supplemental Information,Marketing Status,Discontinued
+Supplemental Information,Launch Date,Q4'11
+Supplemental Information,Embedded Options Available,Yes
+Supplemental Information,Use Conditions,PC/Client/Tablet
+Memory Specifications,Max Memory Size (dependent on memory type),4.88 GB
+Memory Specifications,Memory Types,DDR3
+Memory Specifications,Max # of Memory Channels,1
+GPU Specifications,Graphics Base Frequency,640 MHz
+Package Specifications,Sockets Supported,FCBGA559
+Advanced Technologies,Intel® Turbo Boost Technology‡,No
+Advanced Technologies,Intel® Hyper-Threading Technology‡,Yes
+Advanced Technologies,Intel® 64‡,Yes
+Advanced Technologies,Instruction Set,64-bit
+Advanced Technologies,Instruction Set Extensions,"Intel® SSE2, Intel® SSE3, Intel® SSSE3"
+Advanced Technologies,Enhanced Intel SpeedStep® Technology,Yes
+Advanced Technologies,Intel® Demand Based Switching,No
+Advanced Technologies,Thermal Monitoring Technologies,Yes
+Security & Reliability,Intel® Trusted Execution Technology‡,No
+Security & Reliability,Execute Disable Bit‡,Yes
+Security & Reliability,Intel® Virtualization Technology (VT-x)‡,No
+Security & Reliability,Intel® Virtualization Technology for Directed I/O (VT-d)‡,No

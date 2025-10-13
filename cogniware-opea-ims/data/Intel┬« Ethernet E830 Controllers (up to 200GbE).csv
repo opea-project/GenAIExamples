@@ -1,0 +1,3 @@
+Product ID,Product Name,CablingDescription,MaxTDP,Port Configuration,Data Rate Per Port,System Interface Type
+238871,Intel® Ethernet Controller E830-CCAM1,,,Single,"1x200, 2x100, 4x50, or 8x25 Gbps",PCIe
+238870,Intel® Ethernet Controller E830-XXVAM2,,,Dual,25 Gbps,PCIe

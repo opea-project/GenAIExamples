@@ -1,0 +1,12 @@
+Product ID,Product Name,Cabling Type,MaxTDP,Port Configuration,Data Rate Per Port,System Interface Type
+218110,Intel® Ethernet Network Adapter E810-CQDA2T,"QSFP28 port - DAC, Optics, AOC's. SiPh",,Dual,100/50/25/10GbE,PCIe 4.0 (16 GT/s)
+211608,Intel® Ethernet Network Adapter E810-XXVDA4T,"SFP28 ports - DAC, Optics, and AOCs",,Quad,25/10/1GbE,PCIe 4.0 (16 GT/s)
+184820,Intel® Ethernet Network Adapter E810-XXVDA4 for OCP 3.0,"SFP28 ports - DAC, Optics, And AOC's",,Quad,25/10/1GbE,PCIe 4.0 (16 GT/s)
+210969,Intel® Ethernet Network Adapter E810-2CQDA2,"QSFP28 - DAC, Optics, and AOC's",,Dual,100/50/25/10GbE (200GbE when ports bifurcated),PCIe 4.0 (16GT/s)
+192561,Intel® Ethernet Network Adapter E810-CQDA1,"QSFP28 port - DAC, Optics, and AOC's",,Single,100/50/25/10GbE,PCIe 4.0 (16 GT/s)
+184816,Intel® Ethernet Network Adapter E810-CQDA1 for OCP 3.0,"QSFP28 port - DAC, Optics, AOC's",,Single,100/50/25/10GbE,PCIe 4.0 (16 GT/s)
+192558,Intel® Ethernet Network Adapter E810-CQDA2,"QSFP28 ports - DAC, Optics, and AOC's",,Dual,100/50/25/10GbE,PCIe 4.0
+184817,Intel® Ethernet Network Adapter E810-CQDA2 for OCP 3.0,"QSFP28 ports - DAC, Optics, AOC's",,Dual,100/50/25/10GbE,PCIe 4.0 (16 GT/s)
+189760,Intel® Ethernet Network Adapter E810-XXVDA2,"SFP28 ports - DAC, Optics, and AOC's",,Dual,25/10/1GbE,PCIe 4.0 (16 GT/s)
+184815,Intel® Ethernet Network Adapter E810-XXVDA2 for OCP 3.0,"SFP28 ports - DAC, Optics, And AOC's",,Dual,25/10/1GbE,PCIe 4.0 (16 GT/s)
+192560,Intel® Ethernet Network Adapter E810-XXVDA4,"SFP28 ports - DAC, Optics, and AOC's",,Quad,25/10/1GbE,PCIe 4.0 (16 GT/s)

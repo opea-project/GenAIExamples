@@ -1,0 +1,29 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® C620 Series Chipsets
+Essentials,Code Name,Products formerly Lewisburg
+Essentials,Vertical Segment,Server
+Essentials,Marketing Status,Launched
+Essentials,Launch Date,Q3'17
+Essentials,TDP,21 W
+Essentials,Recommended Customer Price,$156.00
+Supplemental Information,Embedded Options Available,Yes
+Expansion Options,PCI Express Revision,Gen 3
+Expansion Options,PCI Express Configurations‡,"1x4,2x2,4x1,1x2+2x1"
+Expansion Options,Max # of PCI Express Lanes,20
+I/O Specifications,# of USB Ports,14
+I/O Specifications,USB Revision,3
+I/O Specifications,USB 3.0,10
+I/O Specifications,USB 2.0,14
+I/O Specifications,Total # of SATA Ports,14
+I/O Specifications,Max # of SATA 6.0 Gb/s Ports,14
+I/O Specifications,Integrated LAN,5
+I/O Specifications,PCIe* Uplink,x16
+Advanced Technologies,Intel® Virtualization Technology for Directed I/O (VT-d)‡,Yes
+Advanced Technologies,Intel® HD Audio Technology,Yes
+Advanced Technologies,Intel® Rapid Storage Technology enterprise,Yes
+Advanced Technologies,Integrated Intel® QuickAssist Technology,Yes
+Advanced Technologies,Intel® Node Manager,Yes
+Advanced Technologies,Intel® Standard Manageability,Yes
+Advanced Technologies,Intel® Rapid Start Technology,No
+Advanced Technologies,Intel® Platform Trust Technology (Intel® PTT),Yes
+Security & Reliability,Intel® Trusted Execution Technology‡,Yes

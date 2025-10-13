@@ -1,0 +1,31 @@
+Product ID,Product Name,Launch Date,Total Cores,Max Turbo Frequency,Cache,GPU Name‡
+230901,Intel® Core™ i5-1235UL Processor,Q3'22,10,4.40 GHz,12 MB Intel® Smart Cache,Intel® Iris® Xe Graphics eligible
+230900,Intel® Core™ i5-1245UL Processor,Q3'22,10,4.40 GHz,12 MB Intel® Smart Cache,Intel® Iris® Xe Graphics eligible
+229976,Intel® Core™ i5-12500HL Processor,Q3'22,12,4.50 GHz,18 MB Intel® Smart Cache,Intel® Iris® Xe Graphics eligible
+229975,Intel® Core™ i5-12600HL Processor,Q3'22,12,4.50 GHz,18 MB Intel® Smart Cache,Intel® Iris® Xe Graphics eligible
+228794,Intel® Core™ i5-12450HX Processor,Q2'22,8,4.40 GHz,12 MB Intel® Smart Cache,Intel® UHD Graphics for 12th Gen Intel® Processors
+228438,Intel® Core™ i5-12600HX Processor,Q2'22,12,4.60 GHz,18 MB Intel® Smart Cache,Intel® UHD Graphics for 12th Gen Intel® Processors
+227854,Intel® Core™ i5-1245UE Processor,Q1'22,10,,12 MB Intel® Smart Cache,Intel® Iris® Xe Graphics eligible
+227850,Intel® Core™ i5-1250PE Processor,Q1'22,12,,12 MB Intel® Smart Cache,Intel® Iris® Xe Graphics eligible
+226453,Intel® Core™ i5-1230U Processor,Q1'22,10,4.40 GHz,12 MB Intel® Smart Cache,Intel® Iris® Xe Graphics eligible
+226261,Intel® Core™ i5-1235U Processor,Q1'22,10,4.40 GHz,12 MB Intel® Smart Cache,Intel® Iris® Xe Graphics eligible
+226266,Intel® Core™ i5-1235U Processor,Q1'22,10,4.40 GHz,12 MB Intel® Smart Cache,Intel® Iris® Xe Graphics eligible
+132221,Intel® Core™ i5-1240P Processor,Q1'22,12,4.40 GHz,12 MB Intel® Smart Cache,Intel® Iris® Xe Graphics eligible
+226452,Intel® Core™ i5-1240U Processor,Q1'22,10,4.40 GHz,12 MB Intel® Smart Cache,Intel® Iris® Xe Graphics eligible
+226260,Intel® Core™ i5-1245U Processor,Q1'22,10,4.40 GHz,12 MB Intel® Smart Cache,Intel® Iris® Xe Graphics eligible
+226256,Intel® Core™ i5-1250P Processor,Q1'22,12,4.40 GHz,12 MB Intel® Smart Cache,Intel® Iris® Xe Graphics eligible
+134586,Intel® Core™ i5-12400 Processor,Q1'22,6,4.40 GHz,18 MB Intel® Smart Cache,Intel® UHD Graphics 730
+134587,Intel® Core™ i5-12400F Processor,Q1'22,6,4.40 GHz,18 MB Intel® Smart Cache,
+223094,Intel® Core™ i5-12400T Processor,Q1'22,6,4.20 GHz,18 MB Intel® Smart Cache,Intel® UHD Graphics 730
+132222,Intel® Core™ i5-12450H Processor,Q1'22,8,4.40 GHz,12 MB Intel® Smart Cache,Intel® UHD Graphics for 12th Gen Intel® Processors
+96144,Intel® Core™ i5-12500 Processor,Q1'22,6,4.60 GHz,18 MB Intel® Smart Cache,Intel® UHD Graphics 770
+96143,Intel® Core™ i5-12500E Processor,Q1'22,6,4.50 GHz,18 MB Intel® Smart Cache,Intel® UHD Graphics 770
+96141,Intel® Core™ i5-12500H Processor,Q1'22,12,4.50 GHz,18 MB Intel® Smart Cache,Intel® Iris® Xe Graphics eligible
+96140,Intel® Core™ i5-12500T Processor,Q1'22,6,4.40 GHz,18 MB Intel® Smart Cache,Intel® UHD Graphics 770
+96142,Intel® Core™ i5-12500TE Processor,Q1'22,6,4.30 GHz,18 MB Intel® Smart Cache,Intel® UHD Graphics 770
+96149,Intel® Core™ i5-12600 Processor,Q1'22,6,4.80 GHz,18 MB Intel® Smart Cache,Intel® UHD Graphics 770
+96156,Intel® Core™ i5-12600H Processor,Q1'22,12,4.50 GHz,18 MB Intel® Smart Cache,Intel® Iris® Xe Graphics eligible
+96158,Intel® Core™ i5-12600HE Processor,Q1'22,12,,18 MB Intel® Smart Cache,Intel® Iris® Xe Graphics eligible
+96150,Intel® Core™ i5-12600T Processor,Q1'22,6,4.60 GHz,18 MB Intel® Smart Cache,Intel® UHD Graphics 770
+134589,Intel® Core™ i5-12600K Processor,Q4'21,10,4.90 GHz,20 MB Intel® Smart Cache,Intel® UHD Graphics 770
+134590,Intel® Core™ i5-12600KF Processor,Q4'21,10,4.90 GHz,20 MB Intel® Smart Cache,

@@ -1,0 +1,22 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® Communications Chipsets
+Essentials,Code Name,Products formerly Cave Creek
+Essentials,Vertical Segment,Embedded
+Essentials,Marketing Status,Discontinued
+Essentials,Launch Date,Q4'12
+Essentials,TDP,12 W
+Essentials,Use Conditions,Communications Commercial Temp
+Supplemental Information,Embedded Options Available,Yes
+Supplemental Information,Datasheet,View now
+Supplemental Information,Additional Information,View now
+Expansion Options,PCI Express Revision,Gen 1
+Expansion Options,Max # of PCI Express Lanes,4
+I/O Specifications,# of USB Ports,6
+I/O Specifications,USB Revision,2.0
+I/O Specifications,USB 2.0,6
+I/O Specifications,Total # of SATA Ports,2
+I/O Specifications,Integrated LAN,4
+I/O Specifications,PCIe* Uplink,x16 PCIe Gen2
+Package Specifications,Max CPU Configuration,2
+Package Specifications,Package Size,27mm x 27mm
+Advanced Technologies,Integrated Intel® QuickAssist Technology,Yes

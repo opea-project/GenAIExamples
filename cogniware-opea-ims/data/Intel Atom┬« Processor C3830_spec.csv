@@ -1,0 +1,51 @@
+Section,Key,Value
+Essentials,Product Collection,Intel Atom® Processor C Series
+Essentials,Code Name,Products formerly Denverton
+Essentials,Vertical Segment,Server
+Essentials,Processor Number,C3830
+Essentials,Lithography,14 nm
+CPU Specifications,Total Cores,12
+CPU Specifications,Total Threads,12
+CPU Specifications,Max Turbo Frequency,2.30 GHz
+CPU Specifications,Intel® Turbo Boost Technology 2.0 Frequency‡,2.30 GHz
+CPU Specifications,Processor Base Frequency,1.90 GHz
+CPU Specifications,Cache,12 MB
+CPU Specifications,Max # of UPI Links,0
+CPU Specifications,# of QPI Links,0
+CPU Specifications,TDP,21.5 W
+Supplemental Information,Marketing Status,Launched
+Supplemental Information,Launch Date,Q3'17
+Supplemental Information,Servicing Status,ESU Notification Issued
+Supplemental Information,End of Servicing Updates Date,"Monday, June 30, 2025"
+Supplemental Information,Embedded Options Available,No
+Memory Specifications,Max Memory Size (dependent on memory type),256 GB
+Memory Specifications,Memory Types,DDR4: 2133
+Memory Specifications,Max # of Memory Channels,2
+Memory Specifications,ECC Memory Supported‡,Yes
+Expansion Options,PCI Express Revision,3
+Expansion Options,PCI Express Configurations‡,"x2,x4,x8"
+Expansion Options,Max # of PCI Express Lanes,12
+I/O Specifications,# of USB Ports,8
+I/O Specifications,USB Revision,3
+I/O Specifications,Total # of SATA Ports,12
+I/O Specifications,Integrated LAN,2x10/2.5/1 GbE
+I/O Specifications,Max # of SATA 6.0 Gb/s Ports,12
+Package Specifications,Sockets Supported,FCBGA1310
+Package Specifications,Max CPU Configuration,1
+Package Specifications,TCASE,85°C
+Package Specifications,Minimum Operating Temperature,0 °C
+Package Specifications,Package Size,34 mm x 28 mm
+Advanced Technologies,Intel® Turbo Boost Technology‡,2.0
+Advanced Technologies,Secure Boot,Yes
+Advanced Technologies,Intel® Hyper-Threading Technology‡,No
+Advanced Technologies,Instruction Set,64-bit
+Advanced Technologies,Integrated Intel® QuickAssist Technology,No
+Security & Reliability,Intel® Secure Key,Yes
+Security & Reliability,Intel® AES New Instructions,Yes
+Security & Reliability,Intel® Software Guard Extensions (Intel® SGX),No
+Security & Reliability,Execute Disable Bit‡,Yes
+Security & Reliability,Intel® OS Guard,Yes
+Security & Reliability,Intel® Boot Guard,No
+Security & Reliability,Intel® Virtualization Technology (VT-x)‡,Yes
+Security & Reliability,Intel® Virtualization Technology for Directed I/O (VT-d)‡,Yes
+Security & Reliability,Intel® VT-x with Extended Page Tables (EPT)‡,Yes

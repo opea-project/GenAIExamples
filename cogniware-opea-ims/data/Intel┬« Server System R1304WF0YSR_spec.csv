@@ -1,0 +1,63 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® Server System R1000WFR Family
+Essentials,Code Name,Products formerly Wolf Pass
+Essentials,Launch Date,Q2'19
+Essentials,Marketing Status,Discontinued
+Essentials,Expected Discontinuance,2023
+Essentials,EOL Announce,"Friday, May 5, 2023"
+Essentials,Last Order,"Friday, June 30, 2023"
+Essentials,Limited 3-year Warranty,Yes
+Essentials,Extended Warranty Available for Purchase (Select Countries),Yes
+Essentials,Additional Extended Warranty Details,Dual Processor System Extended Warranty
+Essentials,Supported Operating Systems,"VMware*, Windows Server 2019*, Windows Server 2016*, Red Hat Enterprise Linux 7.6*, Red Hat Enterprise Linux 7.5*, SUSE Linux Enterprise Server 15*, SUSE Linux Enterprise Server 12 SP4*, Ubuntu*"
+Essentials,Chassis Form Factor,"1U, Spread Core Rack"
+Essentials,Chassis Dimensions,"16.93"" x 27.95"" x 1.72"""
+Essentials,Board Form Factor,"Custom 16.7"" x 17"""
+Essentials,Compatible Product Series,2nd Generation Intel® Xeon® Scalable Processors
+Essentials,Socket,Socket P
+Essentials,TDP,165 W
+Essentials,Heat Sink,(2) 1U Standard Heat Sink FXXCA78X108HS
+Essentials,Heat Sink Included,Yes
+Essentials,System Board,Intel® Server Board S2600WF0R
+Essentials,Board Chipset,Intel® C624 Chipset
+Essentials,Target Market,Mainstream
+Essentials,Rack-Friendly Board,Yes
+Essentials,Power Supply,1100 W
+Essentials,Power Supply Type,AC
+Essentials,# of Power Supply Included,1
+Essentials,Redundant Power Supported,"Supported, requires additional power supply"
+Essentials,Backplanes,Included
+Supplemental Information,Description,"Integrated 1U system featuring an Intel® Server Board S2600WF0R,  supporting two 2nd Generation Intel® Xeon® Scalable processors, (4) 3.5 inch hot-swap drives, 24 DIMMs, (1)1100W redundant-capable power supply, Intel® OCP Module."
+Memory & Storage,Memory Types,DDR4 ECC RDIMM/LRDIMM 2133/2400/2666/2933 & Intel® Optane™ DC Persistent Memory Supported
+Memory & Storage,# of Memory Slots,24
+Memory & Storage,Max Memory Size (dependent on memory type),7.5 TB
+Memory & Storage,# of Front Drives Supported,4
+Memory & Storage,Front Drive Form Factor,"Hot-swap 3.5"" HDD or 2.5"" SSD"
+Memory & Storage,# of Internal Drives Supported,2
+Memory & Storage,Internal Drive Form Factor,M.2 SSD
+Memory & Storage,Intel® Optane™ Persistent Memory Supported,Yes
+GPU Specifications,Integrated Graphics‡,Yes
+Expansion Options,PCIe x24 Riser Super slot,1
+Expansion Options,PCIe x16 Gen 3,2
+Expansion Options,PCIe OCuLink Connectors (NVMe support),4
+Expansion Options,Connector for Intel® Integrated RAID Module,1
+Expansion Options,Riser Slot 1: Total # of Lanes,24
+Expansion Options,Riser Slot 1: Included Slot Configuration(s),1x PCIe Gen3 x16
+Expansion Options,Riser Slot 2: Total # of Lanes,24
+Expansion Options,Riser Slot 2: Included Slot Configuration(s),1x PCIe Gen3 x16
+I/O Specifications,# of USB Ports,5
+I/O Specifications,Total # of SATA Ports,10
+I/O Specifications,Max # of UPI Links,2
+I/O Specifications,RAID Configuration,"SW RAID 0, 1, 10, optional 5"
+I/O Specifications,# of Serial Ports,2
+I/O Specifications,Integrated LAN,1GbE (mgmt port)
+I/O Specifications,# of LAN Ports,1
+Package Specifications,Max CPU Configuration,2
+Advanced Technologies,Intel® Optane™ Memory Supported‡,No
+Advanced Technologies,Intel® Remote Management Module Support,Yes
+Advanced Technologies,Integrated BMC with IPMI,IPMI 2.0 & Redfish
+Advanced Technologies,Intel® Node Manager,Yes
+Advanced Technologies,Intel® Virtualization Technology for Directed I/O (VT-d)‡,Yes
+Advanced Technologies,Intel® Rapid Storage Technology enterprise,Yes
+Advanced Technologies,TPM Version,2.0
+Intel® Transparent Supply Chain,Includes Statement of Conformance and Platform Certificate,Yes

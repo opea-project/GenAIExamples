@@ -1,0 +1,22 @@
+Section,Key,Value
+Essentials,Product Collection,Cyclone® IV GX FPGA
+Essentials,Marketing Status,Launched
+Essentials,Launch Date,2009
+Essentials,Lithography,60 nm
+Resources,Logic Elements (LE),21000
+Resources,Fabric and I/O Phase-Locked Loops (PLLs),4
+Resources,Maximum Embedded Memory,756 Kb
+Resources,Digital Signal Processing (DSP) Blocks,40
+Resources,Digital Signal Processing (DSP) Format,Multiply
+Resources,Hard Memory Controllers,No
+Resources,External Memory Interfaces (EMIF),"DDR, DDR2, SDR"
+I/O Specifications,Maximum User I/O Count†,150
+I/O Specifications,I/O Standards Support,"3.0 V to 3.3 V LVTTL, 1.2 V to 3.3 V LVCMOS, PCI, PCI-X, SSTL, HSTL, Differential SSTL, Differential HSTL, LVDS, Mini-LVDS, RSDS, LVPECL, BLVDS, PPDS"
+I/O Specifications,Maximum LVDS Pairs,28
+I/O Specifications,Maximum Non-Return to Zero (NRZ) Transceivers†,4
+I/O Specifications,Maximum Non-Return to Zero (NRZ) Data Rate†,2.5 Gbps
+I/O Specifications,Transceiver Protocol Hard IP,PCIe Gen1
+Advanced Technologies,FPGA Bitstream Security,No
+Advanced Technologies,Analog-to-Digital Converter,No
+Package Specifications,Package Options,"F169, F324"
+Supplemental Information,Additional Information,Product Table (Family Comparison)Cyclone IV Featured DocumentationAll FPGA Documentation

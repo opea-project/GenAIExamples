@@ -1,0 +1,16 @@
+Section,Key,Value
+Essentials,Product Collection,"Intel® Data Center Systems for HCI, certified for Microsoft Azure Stack HCI"
+Essentials,Code Name,Products formerly Wolf Pass
+Essentials,Launch Date,Q2'19
+Essentials,Marketing Status,Discontinued
+Essentials,Expected Discontinuance,2023
+Essentials,ISV Certification,Microsoft Windows Server 2019* Software-Defined Data Center (SDDC) Premium
+Essentials,Rack Rails Included,No
+Essentials,Compatible Product Series,2nd Generation Intel® Xeon® Scalable Processors
+Essentials,TDP,125 W
+Essentials,System Board,Intel® Server System R2208WF0ZSR
+Essentials,Target Market,Cloud/Datacenter
+Supplemental Information,Description,"Intel® Data Center Blocks for Microsoft* Azure* Stack HCI- includes Server Board, Chassis, Processor, Solid State Drives and third-party memory, optimized for Storage Spaces Direct and built with Microsoft* Windows* Server 2019 certified ingredients"
+Memory & Storage,Storage Profile,All-Flash Storage Profile
+Memory & Storage,Included Memory,768GB DDR4 RAM Raw Memory
+Memory & Storage,Included Storage,"24TB Raw Storage(0.48TB boot device, 1.5TB Cache Tier, 24TB Capacity Tier)"

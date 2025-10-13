@@ -1,0 +1,25 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® Server Chassis H2000G Family
+Essentials,Code Name,Products formerly Bobcat Peak
+Essentials,Launch Date,Q2'16
+Essentials,Marketing Status,Discontinued
+Essentials,Expected Discontinuance,Q3'20
+Essentials,EOL Announce,"Friday, July 19, 2019"
+Essentials,Last Order,"Sunday, July 5, 2020"
+Essentials,Last Receipt Attributes,"Monday, October 5, 2020"
+Essentials,Limited 3-year Warranty,Yes
+Essentials,Extended Warranty Available for Purchase (Select Countries),Yes
+Essentials,Chassis Form Factor,"2U, 4 node Rack Chassis"
+Essentials,Chassis Dimensions,"17.24"" x 28.86"" x 3.42"""
+Essentials,Target Market,High Performance Computing
+Essentials,Power Supply,2130 W
+Essentials,Power Supply Type,AC
+Essentials,# of Power Supply Included,2
+Essentials,Redundant Fans,No
+Essentials,Redundant Power Supported,Yes
+Essentials,Backplanes,Included
+Essentials,Included Items,(1) standard control panel (FH2000FPANEL2); (1) 12Gb SAS backplane (FHW16X25HS12G); (16) 2.5 inch hot-swap drive carriers (FXX25HSCAR); (2) 2130W common redundant power supply (Platinum Efficiency) (FXX2130PCRPS); (2) power distribution board (FXXCRPSPDB2); (4) node fillers; (1) Enhanced Value RAIL (AXXELVRAIL)
+Supplemental Information,Description,"2U rack chassis supporting up to four hot-pluggable Intel® Compute Module HNS7200AP/HNS2600TPR/HNS2600KPR product family, up to 16 2.5 inch hot-swap drives and two 2130W common redundant power supplies"
+Memory & Storage,# of Front Drives Supported,16
+Memory & Storage,Front Drive Form Factor,"Hot-swap 2.5"""
+Package Specifications,Max CPU Configuration,8

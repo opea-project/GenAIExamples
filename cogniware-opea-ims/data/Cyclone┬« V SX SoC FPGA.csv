@@ -1,0 +1,5 @@
+Product ID,Product Name,Launch Date,Logic Elements (LE),Digital Signal Processing (DSP) Blocks,Maximum Embedded Memory,Maximum User I/O Count†,Package Options
+210463,Cyclone® V 5CSXC2 FPGA,2012,25000,36,1.538 Mb,145,U672
+210455,Cyclone® V 5CSXC4 FPGA,2012,40000,84,2.931 Mb,145,U672
+210454,Cyclone® V 5CSXC5 FPGA,2012,85000,87,4.45 Mb,288,"U672, F896"
+210462,Cyclone® V 5CSXC6 FPGA,2012,110000,112,6.191 Mb,288,"U672, F896"

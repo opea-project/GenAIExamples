@@ -1,0 +1,58 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® Server System R1000SPO Family
+Essentials,Code Name,Products formerly Silver Pass
+Essentials,Launch Date,Q2'16
+Essentials,Marketing Status,Discontinued
+Essentials,Expected Discontinuance,Q4'16
+Essentials,EOL Announce,"Tuesday, November 15, 2016"
+Essentials,Last Order,"Monday, January 30, 2017"
+Essentials,Last Receipt Attributes,"Monday, March 13, 2017"
+Essentials,Limited 3-year Warranty,Yes
+Essentials,Extended Warranty Available for Purchase (Select Countries),Yes
+Essentials,Additional Extended Warranty Details,Single Processor System Extended Warranty
+Essentials,Chassis Form Factor,1U Rack
+Essentials,Chassis Dimensions,"17.26""x23.84""x1.7"" (WxDxH)"
+Essentials,Board Form Factor,uATX
+Essentials,Rack Rails Included,No
+Essentials,Compatible Product Series,Intel® Xeon® Processor E3-1200 v5 Family
+Essentials,Socket,LGA 1151 Socket H4
+Essentials,Heat Sink,F1UE3PASSHS
+Essentials,Heat Sink Included,Yes
+Essentials,System Board,Intel® Server Board S1200SPO
+Essentials,Board Chipset,Intel® C236 Chipset
+Essentials,Target Market,Entry
+Essentials,Rack-Friendly Board,Yes
+Essentials,Power Supply Type,AC
+Essentials,# of Power Supply Included,2
+Essentials,Redundant Fans,No
+Essentials,Redundant Power Supported,Yes
+Essentials,Backplanes,Included
+Essentials,Included Items,"(1) Intel® Server Board S1200SPO(1) Riser card assembly (AXX1UPCIEX16R2)(2) 450W redundant power supply(1) Power Distribution Boar(8) 2.5 inch Hot-swap drive bays with(8) 2.5 inch Hot-swap drive trays (FXX25HSCAR2)(1) 12Gb SAS Backplane (F1U8X25S3HSBP)(1) SATA data cable(1) Backplane 12C cable(1) SATA ODD data cable(1) SAS Data cable(3) System fans,(1) Standard control panel assembly(1) Front I/O Panel assembly (1 x VGA & 2 x USB)(1) SATA Optical drive bay with filler panel(2) Chassis handles -installed"
+Supplemental Information,Description,"Intel® Server System R1208SPOSHOR, 1u rack system with S1200SPO board and 8 x 2.5 hot-swapable HDD Drive cage, 2 x 450W redundant power supplies"
+Memory & Storage,Memory Types,DDR4 ECC UDIMM
+Memory & Storage,# of Memory Slots,4
+Memory & Storage,Max Memory Size (dependent on memory type),64 GB
+Memory & Storage,DIMM Type,UDIMM
+Memory & Storage,# of Front Drives Supported,8
+Memory & Storage,Front Drive Form Factor,"Hot-swap 2.5"""
+Memory & Storage,# of Internal Drives Supported,1
+Memory & Storage,Internal Drive Form Factor,M.2 SSD
+GPU Specifications,Integrated Graphics‡,No
+Expansion Options,Connector for Intel® I/O Expansion Module x8 Gen 3,1
+Expansion Options,Connector for Intel® Integrated RAID Module,1
+Expansion Options,Riser Slot 1: Total # of Lanes,8
+Expansion Options,Riser Slot 1: Included Slot Configuration(s),1x PCIe Gen3 x8
+I/O Specifications,# of USB Ports,9
+I/O Specifications,Total # of SATA Ports,8
+I/O Specifications,RAID Configuration,"Software RAID RSTe (0,1,10,5) and ESRT2 (0,1,10)"
+I/O Specifications,# of Serial Ports,1
+I/O Specifications,Integrated LAN,i210
+I/O Specifications,# of LAN Ports,2
+I/O Specifications,Optical Drive Support,Yes
+Package Specifications,Max CPU Configuration,1
+Advanced Technologies,Intel® Remote Management Module Support,Yes
+Advanced Technologies,Integrated BMC with IPMI,IPMI 2.0
+Advanced Technologies,Intel® Node Manager,Yes
+Advanced Technologies,Intel® Rapid Storage Technology enterprise,Yes
+Advanced Technologies,Intel® I/O Acceleration Technology,Yes
+Advanced Technologies,TPM Version,1.2

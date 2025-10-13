@@ -1,0 +1,11 @@
+Section,Key,Value
+Essentials,Product Collection,Rail Options
+Essentials,Code Name,Products formerly Union Peak
+Essentials,Marketing Status,Discontinued
+Essentials,Launch Date,Q1'13
+Essentials,Expected Discontinuance,Q4'15
+Essentials,EOL Announce,"Tuesday, October 20, 2015"
+Essentials,Last Order,"Wednesday, April 20, 2016"
+Essentials,Last Receipt Attributes,"Wednesday, July 20, 2016"
+Essentials,Included Items,"1 bracket, 4 GPGPU power cables,  4 Intel® Xeon® Phi™ Coprocessor PCI Express* Card extension brackets,  screws."
+Supplemental Information,Description,Bracket for securing full length double width Xeon Phi cards to fan bulkhead.  For use in P4000L/P4000L-WS chasses

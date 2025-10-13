@@ -1,0 +1,31 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® Optane™ DC SSD Series
+Essentials,Code Name,Products formerly Alder Stream
+Essentials,Capacity,800 GB
+Essentials,Marketing Status,Discontinued
+Essentials,Launch Date,Q4'20
+Performance Specifications,Sequential Bandwidth - 100% Read (up to),7200  MB/s
+Performance Specifications,Sequential Bandwidth - 100% Write (up to),6100  MB/s
+Performance Specifications,Random Read (100% Span),1500000 IOPS (4K Blocks)
+Performance Specifications,Random Write (100% Span),1350000 IOPS (4K Blocks)
+Performance Specifications,Power - Active,18W
+Performance Specifications,Power - Idle,4.2W
+Reliability,Vibration - Operating,"2.17 Grms, (5-700 Hz), random"
+Reliability,Vibration - Non-Operating,"3.13 Grms (5-800 Hz), random"
+Reliability,Shock (Operating and Non-Operating),"1,000 G, 0.5 ms, half sine"
+Reliability,Operating Temperature Range,0°C to 70°C
+Reliability,Max Operating Temperature,70 °C
+Reliability,Minimum Operating Temperature,0 °C
+Reliability,Endurance Rating (Lifetime Writes),100 DWPD
+Reliability,Mean Time Between Failures (MTBF),2 Million Hours
+Reliability,Uncorrectable Bit Error Rate (UBER),< 1 sector per 10^17 bits read
+Reliability,Warranty Period,5  yrs
+Package Specifications,Components,Intel(R) Optane(TM) Memory Media
+Package Specifications,Weight,140g
+Package Specifications,Form Factor,"2.5"" 15mm"
+Package Specifications,Interface,"PCIe 4.0 x4, NVMe"
+Advanced Technologies,Enhanced Power Loss Data Protection,Yes
+Advanced Technologies,Hardware Encryption,AES 256 bit
+Advanced Technologies,High Endurance Technology (HET),Yes
+Advanced Technologies,Temperature Monitoring and Logging,Yes
+Advanced Technologies,End-to-End Data Protection,Yes

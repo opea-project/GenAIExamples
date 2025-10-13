@@ -1,0 +1,19 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® Programmable Acceleration Cards (PAC)
+Essentials,Marketing Status,Discontinued
+Essentials,Launch Date,Q4'19
+Essentials,FPGA,Intel® Stratix® 10 GX FPGA
+Essentials,Logic Elements (LE),2800000
+Essentials,On-chip Memory,244 Mb
+Essentials,DSP Blocks,11520
+Memory Specifications,External Onboard DDR4,32 GB (8GB x 4 banks)
+I/O Specifications,PCI Express Revision,3
+I/O Specifications,PCI Express Configurations‡,Gen3 x16
+I/O Specifications,QSFP Interface,x2
+I/O Specifications,USB Configuration,USB 2.0
+I/O Specifications,Network Interface,"10 Gbps, 25 Gbps, 40 Gbps, 100 Gbps"
+Supplemental Information,Board Form Factor,"¾ length, full height, dual slot"
+Supplemental Information,Thermal Solution Specification,Passively Cooled
+Supplemental Information,TDP,215 W
+Package Specifications,Tools Supported,"Intel® Acceleration Stack for Intel® Xeon® CPU with FPGAs, Intel® Quartus® Prime Software, Open Programmable Acceleration Engine (OPAE)"
+Package Specifications,Description,"Intel FPGA PAC D5005, previously known as Intel PAC with Intel Stratix® 10 SX FPGA, offers inline high-speed interfaces up to 100 Gbps."

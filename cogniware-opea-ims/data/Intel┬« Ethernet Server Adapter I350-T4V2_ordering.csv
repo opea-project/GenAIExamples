@@ -1,0 +1,17 @@
+Section,Key,Value
+Ordering and Spec Information,,
+"Intel® Ethernet Server Adapter I350-T4V2, OEM Gen",Ordering Code,I350T4G2P20
+"Intel® Ethernet Server Adapter I350-T4V2, OEM Gen",MDDS Content IDs,708790
+"Intel® Ethernet Server Adapter I350-T4V2, OEM Gen",PCN Content IDs,"802715,802260,809950,808438,810645,808616,811504,809474,811787,810326,848179,859226"
+"Intel® Ethernet Server Adapter I350-T4V2, OEM Gen",Recommended Customer Price,$138.00
+"Intel® Ethernet Server Adapter I350-T4V2, retail unit",Ordering Code,I350T4V2
+"Intel® Ethernet Server Adapter I350-T4V2, retail unit",MDDS Content IDs,706913
+"Intel® Ethernet Server Adapter I350-T4V2, retail unit",PCN Content IDs,"802260,796112,802715,810326,808616,811504,809474,848179,810645,859226,811787"
+"Intel® Ethernet Server Adapter I350-T4V2, retail unit",Recommended Customer Price,$143.00
+"Intel® Ethernet Server Adapter I350-T4V2, retail bulk",Ordering Code,I350T4V2BLK
+"Intel® Ethernet Server Adapter I350-T4V2, retail bulk",MDDS Content IDs,707219
+"Intel® Ethernet Server Adapter I350-T4V2, retail bulk",PCN Content IDs,"796112,802260,808226,802715,808687,808616,810326,809474,811504,810645,848179,859226"
+"Intel® Ethernet Server Adapter I350-T4V2, retail bulk",Recommended Customer Price,$138.00
+Trade Compliance Information,ECCN,5A991
+Trade Compliance Information,CCATS,NA
+Trade Compliance Information,US HTS,8517620090

@@ -1,0 +1,57 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® Server M50FCP Family
+Essentials,Code Name,Products formerly Fox Creek Pass
+Essentials,Launch Date,Q1'23
+Essentials,Marketing Status,Discontinued
+Essentials,Expected Discontinuance,2023
+Essentials,EOL Announce,"Friday, May 5, 2023"
+Essentials,Last Order,"Friday, June 30, 2023"
+Essentials,Limited 3-year Warranty,Yes
+Essentials,Extended Warranty Available for Purchase (Select Countries),Yes
+Essentials,Chassis Form Factor,2U Rack
+Essentials,Chassis Dimensions,770 x 438 x 87 mm
+Essentials,Board Form Factor,18.79” x 16.84”
+Essentials,Rack Rails Included,No
+Essentials,Compatible Product Series,"4th Gen Intel® Xeon® Scalable Processors, 5th Gen Intel® Xeon® Scalable Processors"
+Essentials,Socket,Socket-E LGA4677
+Essentials,TDP,350 W
+Essentials,Heat Sink Included,No
+Essentials,System Board,Intel® Server Board M50FCP2SBSTD
+Essentials,Board Chipset,Intel® C741 Chipset
+Essentials,Rack-Friendly Board,Yes
+Essentials,Power Supply,2100 W
+Essentials,Power Supply Type,AC
+Essentials,# of Power Supply Included,0
+Essentials,Redundant Fans,Yes
+Essentials,Redundant Power Supported,Yes
+Essentials,Backplanes,Included
+Essentials,Included Items,"(1) – 2U 2.5"" Chassis – iPN M36826-xxx(1) – Server board – iPC M50FCP2SBSTD(1) 8 x 2.5"" combo HSBP – iPC CYPHSBP2208(8) 2.5"" SSD mounting rails with lever – iPN K71493-xxx(8) 2.5"" drive blanks – iPN K71491-xxx(1) power cable, for 3x HSBPs – iPN K62572-xxx(1) I2C cable, server board to HSBP– iPN K63232-xxx(2) – Riser card assembly brackets(1) – Front panel (left) with two USB ports – iPN K48177-xxx(1) – Front Panel (left) USB cable – iPN K67061-xxx(1) – Front panel (right) with control panel – iPN K48178-xxx(1) – Front panel (right) cable pin – iPN K67059-xxx(6) – Single-rotor system fans – iPC CYPFAN2UKIT(16) – DIMM blanks – iPN M45676-xxx(1) – Standard 2U air duct (for 2U-Tall HS) – iPC FCPDUCTSTD(2) – Intel® RAID Maintenance Free Backup Unit (RMFBU) bracket(2) – E1A (XCC) processor clips – iPN AXXSPRXCCCC(2) - E1B (MCC) processor clips - iPN AXXSPRMCCCCNOTE: NO PSU included"
+Supplemental Information,Description,"Integrated 2U system featuring an Intel® Server Board M50FCP2SBSTD,supporting two 4th Generation Intel® Xeon® Scalable processors,up to (24) 2.5"" SSD with air cooling.NOTE: NO PSU included"
+Memory & Storage,Memory Types,• DDR5 (RDIMM)• 3DS-RDIMM• 9x4 RDIMM• Intel® Optane™ PMem 300 series
+Memory & Storage,# of Memory Slots,32
+Memory & Storage,Max Memory Size (dependent on memory type),12 TB
+Memory & Storage,# of Front Drives Supported,24
+Memory & Storage,Intel® Optane™ Persistent Memory Supported,Yes
+GPU Specifications,Integrated Graphics‡,Yes
+Expansion Options,PCI Express Revision,5.0
+Expansion Options,Riser Slot 1: Total # of Lanes,32
+Expansion Options,Riser Slot 2: Total # of Lanes,32
+Expansion Options,Riser Slot 3: Total # of Lanes,16
+I/O Specifications,Open Compute Port (OCP) Support,1 x 3.0
+I/O Specifications,# of USB Ports,5
+I/O Specifications,Total # of SATA Ports,10
+I/O Specifications,USB Configuration,• One USB 3.0 port at back panel• Two USB 2.0 ports at back panel• One USB 3.0 port front panel• One USB 2.0 port front panel
+I/O Specifications,Max # of UPI Links,3
+I/O Specifications,RAID Configuration,0/1/5/10
+I/O Specifications,# of Serial Ports,1
+Package Specifications,Max CPU Configuration,2
+Advanced Technologies,Advanced System Management key,Yes
+Advanced Technologies,Intel® Optane™ Memory Supported‡,Yes
+Advanced Technologies,Intel® Remote Management Module Support,Yes
+Advanced Technologies,Integrated BMC with IPMI,IPMI 2.0 & Redfish
+Advanced Technologies,Intel® Node Manager,Yes
+Advanced Technologies,Intel® Advanced Management Technology,Yes
+Advanced Technologies,Intel® Virtualization Technology for Directed I/O (VT-d)‡,Yes
+Advanced Technologies,TPM Version,2.0
+Security & Reliability,Intel® Total Memory Encryption,Yes
+Security & Reliability,Intel® Trusted Execution Technology‡,Yes

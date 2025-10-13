@@ -1,0 +1,6 @@
+Product ID,Product Name,Xe-cores,Ray Tracing Units,Memory Size,Graphics Memory Bandwidth,GPU Peak TOPS (Int8),# of Displays Supported‡
+235979,Intel® Arc™ Pro A60 Graphics,16,16,12 GB,384 GB/s,151,4
+232778,Intel® Arc™ Pro A60M Graphics,16,16,8 GB,256 GB/s,128,4
+216962,Intel® Arc™ Pro A30M Graphics,8,8,4 GB,112 GB/s,56,4
+230317,Intel® Arc™ Pro A40 Graphics,8,8,6 GB,192 GB/s,69,4
+230316,Intel® Arc™ Pro A50 Graphics,8,8,6 GB,192 GB/s,69,4

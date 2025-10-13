@@ -1,0 +1,45 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® Core™ X-series Processors
+Essentials,Code Name,Products formerly Skylake
+Essentials,Vertical Segment,Desktop
+Essentials,Processor Number,i9-7960X
+CPU Specifications,Total Cores,16
+CPU Specifications,Total Threads,32
+CPU Specifications,Max Turbo Frequency,4.20 GHz
+CPU Specifications,Intel® Turbo Boost Max Technology 3.0 Frequency‡,4.40 GHz
+CPU Specifications,Processor Base Frequency,2.80 GHz
+CPU Specifications,Cache,22 MB
+CPU Specifications,Bus Speed,8 GT/s
+CPU Specifications,# of QPI Links,0
+CPU Specifications,TDP,165 W
+Supplemental Information,Marketing Status,Discontinued
+Supplemental Information,Launch Date,Q3'17
+Supplemental Information,Servicing Status,End of Servicing Updates
+Supplemental Information,End of Servicing Updates Date,"Sunday, December 31, 2023"
+Supplemental Information,Embedded Options Available,No
+Supplemental Information,Included Items,Please note: The boxed product does not include a fan or heat sink
+Supplemental Information,Datasheet,View now
+Memory Specifications,Max Memory Size (dependent on memory type),128 GB
+Memory Specifications,Memory Types,DDR4-2666
+Memory Specifications,Max # of Memory Channels,4
+Memory Specifications,Max Memory Bandwidth,85 GB/s
+Memory Specifications,ECC Memory Supported‡,No
+Expansion Options,Scalability,1S Only
+Expansion Options,PCI Express Revision,3.0
+Expansion Options,Max # of PCI Express Lanes,44
+Package Specifications,Sockets Supported,FCLGA2066
+Package Specifications,Max CPU Configuration,1
+Package Specifications,Thermal Solution Specification,PCG 2017X
+Package Specifications,TJUNCTION,98°C
+Advanced Technologies,Intel® Optane™ Memory Supported‡,Yes
+Advanced Technologies,Intel® Turbo Boost Max Technology 3.0‡,Yes
+Advanced Technologies,Intel® Turbo Boost Technology‡,2.0
+Advanced Technologies,Intel® Hyper-Threading Technology‡,Yes
+Advanced Technologies,Intel® 64‡,Yes
+Advanced Technologies,Instruction Set Extensions,"Intel® SSE4.1, Intel® SSE4.2, Intel® AVX2, Intel® AVX-512"
+Advanced Technologies,# of AVX-512 FMA Units,2
+Advanced Technologies,Enhanced Intel SpeedStep® Technology,Yes
+Security & Reliability,Intel® AES New Instructions,Yes
+Security & Reliability,Execute Disable Bit‡,Yes
+Security & Reliability,Intel® Virtualization Technology (VT-x)‡,Yes
+Security & Reliability,Intel® Virtualization Technology for Directed I/O (VT-d)‡,Yes

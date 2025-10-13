@@ -1,0 +1,3 @@
+Product ID,Product Name,Launch Date,Logic Elements (LE),Digital Signal Processing (DSP) Blocks,Maximum Embedded Memory,Maximum User I/O Count†,Package Options
+210376,Intel® Arria® 10 GT 1150 FPGA,2013,1150000,1518,65.7 Mb,624,F1932
+210375,Intel® Arria® 10 GT 900 FPGA,2013,900000,1518,56.2 Mb,624,F1932

@@ -1,0 +1,22 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® Wireless 7200 Series
+Essentials,Marketing Status,Discontinued
+Essentials,Launch Date,Q2'13
+Essentials,Weight (in grams),40.68
+Essentials,Operating Temperature Range,0°C to 80°C
+Essentials,Max Operating Temperature,80 °C
+Essentials,Minimum Operating Temperature,0 °C
+Essentials,Supported Operating Systems,"Windows 8*, Windows 7*, Linux*"
+Essentials,Antenna,2x2
+Networking Specifications,TX/RX Streams,2x2
+Networking Specifications,Bands,"2.4Ghz, 5Ghz"
+Networking Specifications,Max Speed,867 Mbps
+Networking Specifications,Wi-Fi CERTIFIED*,802.11ac
+Networking Specifications,Compliance,"PCI, CISP, FIPS, FISMA"
+Networking Specifications,Integrated Bluetooth,Yes
+Networking Specifications,Bluetooth Version,4.0
+Package Specifications,Package Size,See Product Brief
+Package Specifications,System Interface Type,PCle x1
+Advanced Technologies,MU-MIMO,No
+Advanced Technologies,Intel® Smart Connect Technology,Yes
+Advanced Technologies,Supported Under Intel vPro® Technology,Yes

@@ -1,0 +1,98 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® Core™ Ultra Processors (Series 2)
+Essentials,Code Name,Products formerly Arrow Lake
+Essentials,Vertical Segment,Desktop
+Essentials,Processor Number,285
+Essentials,Overall Peak TOPS (Int8),36
+Essentials,Recommended Customer Price,$549.00-$579.00
+CPU Specifications,Total Cores,24
+CPU Specifications,# of Performance-cores,8
+CPU Specifications,# of Efficient-cores,16
+CPU Specifications,Total Threads,24
+CPU Specifications,Max Turbo Frequency,5.6 GHz
+CPU Specifications,Intel® Thermal Velocity Boost Frequency,5.6 GHz
+CPU Specifications,Intel® Turbo Boost Max Technology 3.0 Frequency‡,5.5 GHz
+CPU Specifications,Performance-core Max Turbo Frequency,5.4 GHz
+CPU Specifications,Efficient-core Max Turbo Frequency,4.6 GHz
+CPU Specifications,Performance-core Base Frequency,2.5 GHz
+CPU Specifications,Efficient-core Base Frequency,1.9 GHz
+CPU Specifications,Cache,36 MB Intel® Smart Cache
+CPU Specifications,Total L2 Cache,40 MB
+CPU Specifications,Processor Base Power,65 W
+CPU Specifications,Maximum Turbo Power,182 W
+CPU Specifications,Intel® Deep Learning Boost (Intel® DL Boost) on CPU,Yes
+CPU Specifications,AI Software Frameworks Supported by CPU,"OpenVINO™, WindowsML, DirectML, ONNX RT, WebNN"
+CPU Specifications,CPU Lithography,TSMC N3B
+Supplemental Information,Marketing Status,Launched
+Supplemental Information,Launch Date,Q1'25
+Supplemental Information,Embedded Options Available,Yes
+Supplemental Information,Use Conditions,"PC/Client/Tablet, Workstation"
+Supplemental Information,Datasheet,View now
+Memory Specifications,Max Memory Size (dependent on memory type),256 GB
+Memory Specifications,Memory Types,Up to DDR5 6400 MT/s
+Memory Specifications,Max # of Memory Channels,2
+Memory Specifications,ECC Memory Supported‡,Yes
+GPU Specifications,GPU Name‡,Intel® Graphics
+GPU Specifications,Graphics Base Frequency,300 MHz
+GPU Specifications,Graphics Max Dynamic Frequency,2 GHz
+GPU Specifications,GPU Peak TOPS (Int8),8
+GPU Specifications,Graphics Output,"DP2.1 UHBR20, HDM2.1 FRL 12GHz, eDP1.4b"
+GPU Specifications,Xe-cores,4
+GPU Specifications,Max Resolution (HDMI)‡,4K @ 60Hz (HDMI 2.1 TMDS) 8K @ 60Hz (HDMI2.1 FRL)
+GPU Specifications,Max Resolution (DP)‡,8K @ 60Hz
+GPU Specifications,Max Resolution (eDP - Integrated Flat Panel)‡,4K @ 60Hz
+GPU Specifications,DirectX* Support,12
+GPU Specifications,OpenGL* Support,4.5
+GPU Specifications,OpenCL* Support,3
+GPU Specifications,Intel® Quick Sync Video,Yes
+GPU Specifications,# of Displays Supported‡,4
+GPU Specifications,Device ID,0x7D67
+GPU Specifications,Intel® Deep Learning Boost (Intel® DL Boost) on GPU,Yes
+NPU Specifications,NPU Name‡,Intel® AI Boost
+NPU Specifications,NPU Peak TOPS (Int8),13
+NPU Specifications,Sparsity Support,Yes
+NPU Specifications,Windows Studio Effects Support,Yes
+NPU Specifications,AI Software Frameworks Supported by NPU,"OpenVINO™, WindowsML, DirectML, ONNX RT, WebNN"
+Expansion Options,Direct Media Interface (DMI) Revision,4
+Expansion Options,Max # of DMI Lanes,8
+Expansion Options,Intel® Thunderbolt™ 4,Yes
+Expansion Options,Scalability,1S Only
+Expansion Options,PCI Express Revision,5.0 and 4.0
+Expansion Options,PCI Express Configurations‡,"Up to 1x16+2x4, 2x8+2x4,1x8+4x4"
+Expansion Options,Max # of PCI Express Lanes,24
+Package Specifications,Sockets Supported,FCLGA1851
+Package Specifications,Thermal Solution Specification,PCG 2022C
+Package Specifications,Max Operating Temperature,105 °C
+Advanced Technologies,Intel® Gaussian & Neural Accelerator,3.5
+Advanced Technologies,Intel® Thread Director,Yes
+Advanced Technologies,Intel® Speed Shift Technology,Yes
+Advanced Technologies,Intel® Thermal Velocity Boost,Yes
+Advanced Technologies,Intel® Turbo Boost Max Technology 3.0‡,Yes
+Advanced Technologies,Intel® Turbo Boost Technology‡,2.0
+Advanced Technologies,Intel® 64‡,Yes
+Advanced Technologies,Instruction Set,64-bit
+Advanced Technologies,Instruction Set Extensions,"Intel® SSE4.1, Intel® SSE4.2, Intel® AVX2"
+Advanced Technologies,Idle States,Yes
+Advanced Technologies,Enhanced Intel SpeedStep® Technology,Yes
+Advanced Technologies,Thermal Monitoring Technologies,Yes
+Advanced Technologies,Intel® Volume Management Device (VMD),Yes
+Security & Reliability,Intel vPro® Eligibility‡,Intel vPro® Enterprise
+Security & Reliability,Intel® Threat Detection Technology (TDT),Yes
+Security & Reliability,Intel® Active Management Technology (AMT)‡,Yes
+Security & Reliability,Intel® Standard Manageability (ISM)‡,Yes
+Security & Reliability,Intel® Remote Platform Erase (RPE)‡,Yes
+Security & Reliability,Intel® One-Click Recovery‡,Yes
+Security & Reliability,Intel® Secure Key,Yes
+Security & Reliability,Intel® Control-Flow Enforcement Technology,Yes
+Security & Reliability,Intel® Total Memory Encryption - Multi Key,Yes
+Security & Reliability,Intel® AES New Instructions,Yes
+Security & Reliability,Intel® Trusted Execution Technology‡,Yes
+Security & Reliability,Execute Disable Bit‡,Yes
+Security & Reliability,Intel® OS Guard,Yes
+Security & Reliability,Intel® Boot Guard,Yes
+Security & Reliability,Mode-based Execute Control (MBEC),Yes
+Security & Reliability,Intel® Stable IT Platform Program (SIPP),Yes
+Security & Reliability,Intel® Virtualization Technology with Redirect Protection (VT-rp)‡,Yes
+Security & Reliability,Intel® Virtualization Technology (VT-x)‡,Yes
+Security & Reliability,Intel® Virtualization Technology for Directed I/O (VT-d)‡,Yes
+Security & Reliability,Intel® VT-x with Extended Page Tables (EPT)‡,Yes

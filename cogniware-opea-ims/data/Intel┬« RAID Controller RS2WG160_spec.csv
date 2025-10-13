@@ -1,0 +1,29 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® RAID Controllers
+Essentials,Code Name,Products formerly Walnut Grove
+Essentials,Marketing Status,Discontinued
+Essentials,Launch Date,Q2'10
+Essentials,Expected Discontinuance,1H'15
+Essentials,EOL Announce,"Friday, October 31, 2014"
+Essentials,Last Order,"Thursday, April 30, 2015"
+Essentials,Last Receipt Attributes,"Monday, August 31, 2015"
+Essentials,Target Market,Scalable Performance
+Essentials,Board Form Factor,Full Height 1/2 Length PCIe Card
+Essentials,Data Transfer Rate,6 Gb/s
+Essentials,Supported Devices,SAS/SATA
+Essentials,Supported Operating Systems,"Windows, Linux, Solaris, VMware"
+Essentials,Compatible Cache Backup Options,AXXRSBBU7 or AXXRSBBU8
+Essentials,RAID Level Supported,"0, 1, 10, 5, 50, 6, 60"
+Essentials,JBOD Mode,No
+Essentials,# of Ports Internal,16
+Essentials,# of Ports External,0
+Essentials,# of Devices Supported,240
+Essentials,Cache Memory,512MB
+Essentials,PCIe Host Interface,PCIe x8 Gen2
+Essentials,IO Processor Model,LSI2108
+Essentials,Keying,PCIe x8 Connector
+Essentials,Connector Orientation,"4 Side, 1 External"
+Essentials,Extended Warranty Available for Purchase (Select Countries),Yes
+Essentials,Additional Features,Support for Premium Feature Options
+Essentials,Included Items,"Raid Controller, Quick Start User Guide, 1 standard & 1 Low Profile bracket. Four MiniSAS Cables are included."
+Supplemental Information,Description,Scalable Performance 6G SAS RAID controller with 16 internal SAS/SATA ports. Retail SKU includes cables.

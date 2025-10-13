@@ -1,0 +1,56 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® Xeon® D Processor
+Essentials,Code Name,Products formerly Skylake
+Essentials,Vertical Segment,Server
+Essentials,Processor Number,D-2161I
+Essentials,Lithography,14 nm
+Essentials,Recommended Customer Price,$1103.00
+CPU Specifications,Total Cores,12
+CPU Specifications,Total Threads,24
+CPU Specifications,Max Turbo Frequency,3.00 GHz
+CPU Specifications,Processor Base Frequency,2.20 GHz
+CPU Specifications,Cache,16.5 MB L2 Cache
+CPU Specifications,Max # of UPI Links,0
+CPU Specifications,TDP,90 W
+Supplemental Information,Marketing Status,Launched
+Supplemental Information,Launch Date,Q1'18
+Supplemental Information,Servicing Status,End of Servicing Updates
+Supplemental Information,End of Servicing Updates Date,"Sunday, December 31, 2023"
+Supplemental Information,Embedded Options Available,No
+Supplemental Information,Product Brief,View now
+Memory Specifications,Max Memory Size (dependent on memory type),512 GB
+Memory Specifications,Memory Types,DDR4
+Memory Specifications,Maximum Memory Speed,2133 MHz
+Memory Specifications,Max # of Memory Channels,4
+Memory Specifications,ECC Memory Supported‡,Yes
+Expansion Options,Scalability,1S Only
+Expansion Options,PCI Express Revision,3.0
+Expansion Options,PCI Express Configurations‡,>
+Expansion Options,Max # of PCI Express Lanes,32
+Package Specifications,Sockets Supported,FCBGA2518
+Package Specifications,Max CPU Configuration,1
+Advanced Technologies,Intel® Optane™ Memory Supported‡,No
+Advanced Technologies,Intel® Turbo Boost Max Technology 3.0‡,No
+Advanced Technologies,Intel® Turbo Boost Technology‡,2.0
+Advanced Technologies,Intel® Hyper-Threading Technology‡,Yes
+Advanced Technologies,Intel® Transactional Synchronization Extensions,Yes
+Advanced Technologies,Intel® 64‡,Yes
+Advanced Technologies,Instruction Set,64-bit
+Advanced Technologies,Instruction Set Extensions,"Intel® AVX2, Intel® AVX-512"
+Advanced Technologies,# of AVX-512 FMA Units,1
+Advanced Technologies,Idle States,Yes
+Advanced Technologies,Enhanced Intel SpeedStep® Technology,Yes
+Advanced Technologies,Thermal Monitoring Technologies,Yes
+Advanced Technologies,Integrated Intel® QuickAssist Technology,No
+Advanced Technologies,Intel® Volume Management Device (VMD),Yes
+Security & Reliability,Intel® Secure Key,Yes
+Security & Reliability,Intel® AES New Instructions,Yes
+Security & Reliability,Intel® Software Guard Extensions (Intel® SGX),No
+Security & Reliability,Intel® Memory Protection Extensions (Intel® MPX),Yes
+Security & Reliability,Intel® Trusted Execution Technology‡,Yes
+Security & Reliability,Execute Disable Bit‡,Yes
+Security & Reliability,Intel® OS Guard,Yes
+Security & Reliability,Intel® Boot Guard,Yes
+Security & Reliability,Intel® Virtualization Technology (VT-x)‡,Yes
+Security & Reliability,Intel® Virtualization Technology for Directed I/O (VT-d)‡,Yes
+Security & Reliability,Intel® VT-x with Extended Page Tables (EPT)‡,Yes

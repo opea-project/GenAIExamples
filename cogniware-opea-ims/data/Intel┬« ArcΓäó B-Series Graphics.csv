@@ -1,0 +1,3 @@
+Product ID,Product Name,Xe-cores,Ray Tracing Units,DiscreteGraphicsDedicatedMemoryGB,Graphics Memory Bandwidth,GPU Peak TOPS (Int8),# of Displays Supported‡
+241676,Intel® Arc™ B570 Graphics,18,18,,380 GB/s,203,4
+241598,Intel® Arc™ B580 Graphics,20,20,,456 GB/s,233,4

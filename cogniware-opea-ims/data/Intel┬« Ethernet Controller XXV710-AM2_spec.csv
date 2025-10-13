@@ -1,0 +1,33 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® Ethernet Controller XXV710
+Essentials,Code Name,Products formerly Fortville
+Essentials,Marketing Status,Launched
+Essentials,Launch Date,Q3'17
+Essentials,Expected Discontinuance,1H'26
+Essentials,Lithography,28 nm
+Essentials,Recommended Customer Price,$165.00
+Essentials,Supported Operating Systems,View now
+Essentials,Operating Temperature Range,0°C to 50°C
+Essentials,Max Operating Temperature,50 °C
+Essentials,Minimum Operating Temperature,0 °C
+Supplemental Information,Datasheet,View now
+Supplemental Information,Description,"Ethernet Controller, 50GbE bandwidth. Configurable as 2x25GbE, or 2x10GbE connections."
+Supplemental Information,Product Brief,View now
+Networking Specifications,Port Configuration,Dual
+Networking Specifications,Data Rate Per Port,2x25 or 2x10 Gbps
+Networking Specifications,System Interface Type,PCIe v3.0 (8.0 GT/s)
+Networking Specifications,NC Sideband Interface,Yes
+Networking Specifications,Jumbo Frames Supported,Yes
+Networking Specifications,Controller,FTXXV710-AM2
+Networking Specifications,Interfaces Supported,"SFI, KR, KR4, XAUI, KX, KX4, SGMII"
+Package Specifications,Package Size,25mm X 25mm
+Intel® Virtualization Technology for Connectivity,On-chip QoS and Traffic Management,Yes
+Intel® Virtualization Technology for Connectivity,Flexible Port Partitioning,Yes
+Intel® Virtualization Technology for Connectivity,Virtual Machine Device Queues (VMDq),Yes
+Intel® Virtualization Technology for Connectivity,PCI-SIG* SR-IOV Capable,Yes
+Advanced Technologies,Fiber Channel over Ethernet,No
+Advanced Technologies,IEEE 1588,Yes
+Advanced Technologies,Intel® Ethernet Power Management,Yes
+Advanced Technologies,Intel® Data Direct I/O Technology,Yes
+Advanced Technologies,Intelligent Offloads,Yes
+Advanced Technologies,Storage Over Ethernet,"iSCSI, NFS"

@@ -1,0 +1,24 @@
+Section,Key,Value
+Ordering and Spec Information,,
+"Intel® Core™ i7-9700KF Processor (12M Cache, up to 4.90 GHz) FC-LGA14A, Tray",Ordering Code,CM8068403874220
+"Intel® Core™ i7-9700KF Processor (12M Cache, up to 4.90 GHz) FC-LGA14A, Tray",Spec Code,SRG16
+"Intel® Core™ i7-9700KF Processor (12M Cache, up to 4.90 GHz) FC-LGA14A, Tray",Shipping Media,TRAY
+"Intel® Core™ i7-9700KF Processor (12M Cache, up to 4.90 GHz) FC-LGA14A, Tray",Stepping,R0
+"Intel® Core™ i7-9700KF Processor (12M Cache, up to 4.90 GHz) FC-LGA14A, Tray",MDDS Content IDs,"707950,708845"
+"Intel® Core™ i7-9700KF Processor (12M Cache, up to 4.90 GHz) FC-LGA14A, Tray",PCN Content IDs,"804099,799495,809472,813820,809679"
+Retired and discontinued,,
+"Boxed Intel® Core™ i7-9700KF Processor (12M Cache, up to 4.90 GHz) FC-LGA14A",Ordering Code,BX80684I79700KF
+"Boxed Intel® Core™ i7-9700KF Processor (12M Cache, up to 4.90 GHz) FC-LGA14A",Spec Code,SRFAC
+"Boxed Intel® Core™ i7-9700KF Processor (12M Cache, up to 4.90 GHz) FC-LGA14A",Shipping Media,BOX
+"Boxed Intel® Core™ i7-9700KF Processor (12M Cache, up to 4.90 GHz) FC-LGA14A",Stepping,P0
+"Boxed Intel® Core™ i7-9700KF Processor (12M Cache, up to 4.90 GHz) FC-LGA14A",MDDS Content IDs,707172
+"Boxed Intel® Core™ i7-9700KF Processor (12M Cache, up to 4.90 GHz) FC-LGA14A",PCN Content IDs,"798513,799495,804577"
+"Boxed Intel® Core™ i7-9700KF Processor (12M Cache, up to 4.90 GHz) FC-LGA14A, for China",Ordering Code,BXC80684I7970KF
+"Boxed Intel® Core™ i7-9700KF Processor (12M Cache, up to 4.90 GHz) FC-LGA14A, for China",Spec Code,SRFAC
+"Boxed Intel® Core™ i7-9700KF Processor (12M Cache, up to 4.90 GHz) FC-LGA14A, for China",Shipping Media,BOX
+"Boxed Intel® Core™ i7-9700KF Processor (12M Cache, up to 4.90 GHz) FC-LGA14A, for China",Stepping,P0
+"Boxed Intel® Core™ i7-9700KF Processor (12M Cache, up to 4.90 GHz) FC-LGA14A, for China",MDDS Content IDs,707172
+"Boxed Intel® Core™ i7-9700KF Processor (12M Cache, up to 4.90 GHz) FC-LGA14A, for China",PCN Content IDs,"799495,804577"
+Trade Compliance Information,ECCN,5A992.C
+Trade Compliance Information,CCATS,G077159
+Trade Compliance Information,US HTS,8542310050

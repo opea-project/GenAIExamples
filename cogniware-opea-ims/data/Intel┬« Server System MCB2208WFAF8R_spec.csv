@@ -1,0 +1,17 @@
+Section,Key,Value
+Essentials,Product Collection,"Intel® Data Center Systems for HCI, certified for Microsoft Azure Stack HCI"
+Essentials,Code Name,Products formerly Wolf Pass
+Essentials,Launch Date,Q2'19
+Essentials,Marketing Status,Discontinued
+Essentials,Expected Discontinuance,2023
+Essentials,ISV Certification,Microsoft Windows Server 2019* Software-Defined Data Center (SDDC) Premium
+Essentials,Rack Rails Included,No
+Essentials,Compatible Product Series,2nd Generation Intel® Xeon® Scalable Processors
+Essentials,TDP,125 W
+Essentials,System Board,Intel® Server System R2208WF0ZSR
+Essentials,Target Market,Cloud/Datacenter
+Essentials,Included Items,"(1) Intel Server System w/S2600WF0R, 2U1N, 8x2.5"", R2208WF0ZSR(2) Intel®  Xeon Gold 5218R processor (20 Cores, 2.1Ghz, 125W ) CD8069504446300(1) Intel® Solid State Drive (SSD) D3 S4510 480GB (M.2, 80mm) SSDSCKKB480G801(2) Intel® Optane™ Solid State Drive (SSD) DC P4800X 375GB (2.5” U.2 NVMe) SSDPE21K375GA01(4) Intel® Solid State Drive (SSD) DC P4510 4.0TB (2.5"" U.2 NVMe) SSDPE2KX040T801(1) Intel® PCIe Switch AIC (8 ports) AXXP3SWX08080(1) OCuLink Cable – 725mm  Cable Kit A2U8PSWCXCXK1(1) OCuLink Cable – 530mm  AXXCBL530CVCR(1) OCuLink Cable - 470mm AXXCBL470CVCR(1) Remote Management Module Lite 2 AXXRMM4LITE2(1) 1300W AC Common Redundant Power Supply AXX1300TCRPS(1) Ethernet OCP Quad SFP+   X527DA4OCPG1P5(12) 16GB Micron* DDR4 RDIMM, 288-pin, 2666MHz(1) Intel® Optane™ DC 128GB Persistent Memory Module (1.0) 4 Pack NMA1XXD128GPSU4(1) Trusted Platform Module (TPM) 2.0  AXXTPMENC8(2) Power cable FPWRCABLENA (Only for systems shipped to USA & Canada)"
+Supplemental Information,Description,"Intel® Data Center Blocks for Microsoft* Azure* Stack HCI - includes Server Board, Chassis, Processor, Solid State Drives and third-party memory, optimized for Storage Spaces Direct and built with Microsoft* Windows* Server 2019 certified ingredients"
+Memory & Storage,Storage Profile,All-Flash Storage Profile
+Memory & Storage,Included Memory,"512GB Raw Memory (192GB DDR4 RAM, 512GB DCPMM)"
+Memory & Storage,Included Storage,"16TB Raw Storage(0.48TB boot device, 0.75TB Cache Tier, 16TB Capacity Tier)"

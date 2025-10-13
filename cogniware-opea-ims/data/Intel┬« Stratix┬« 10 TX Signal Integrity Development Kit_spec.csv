@@ -1,0 +1,18 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® Stratix® Development Kits
+Essentials,Marketing Status,Launched
+Essentials,Launch Date,2018
+Essentials,Featured FPGA,Intel® Stratix® 10 TX FPGA 1ST280EY2F55E1VG
+Essentials,Logic Elements (LE),2753000
+Essentials,On-chip Memory,244 Mb
+Essentials,DSP Blocks,5760
+Essentials,FPGA Package,F55
+Essentials,Board Type,Signal Integrity
+Essentials,Ordering Part Number,DK-SI-1STX-E-A
+Essentials,Distributor Availability,ArrowDigiKeyMouser
+Board Specifications,Interfaces,"SGMII, SMA, MXP, QSFP-DD, MXP, JTAG, USB, Ethernet"
+Board Specifications,Expansion,FMC+
+Board Specifications,Memory,DDR4
+Board Specifications,Versions,Production E-Tile
+Supplemental Information,Description,Intel® Stratix® 10 TX Signal Integrity (SI) Development Kit offers a complete design environment that includes both hardware and software for developing Intel® Stratix® 10 TX FPGA designs.
+Supplemental Information,User Guide,View now

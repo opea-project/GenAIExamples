@@ -1,0 +1,23 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® Wireless 7200 Series
+Essentials,Code Name,Products formerly Wilkins Peak
+Essentials,Marketing Status,Discontinued
+Essentials,Launch Date,Q2'13
+Essentials,Weight (in grams),3.4
+Essentials,Operating Temperature Range,0°C to 80°C
+Essentials,Max Operating Temperature,80 °C
+Essentials,Minimum Operating Temperature,0 °C
+Essentials,Supported Operating Systems,"Windows 10, 32-bit*, Windows 10, 64-bit*, Windows 8.1, 32-bit*, Windows 8.1, 64-bit*, Windows 8, 32-bit*, Windows 8, 64-bit*, Windows 7, 32-bit*, Windows 7, 64-bit*, Linux*"
+Essentials,Antenna,2x2
+Networking Specifications,TX/RX Streams,2x2
+Networking Specifications,Bands,"2.4 GHz, 5 GHz"
+Networking Specifications,Max Speed,300 Mbps
+Networking Specifications,Wi-Fi CERTIFIED*,802.11agn
+Networking Specifications,Compliance,"PCI, CISP, FIPS, FISMA"
+Networking Specifications,Integrated Bluetooth,Yes
+Networking Specifications,Bluetooth Version,4.0
+Package Specifications,Board Form Factor,PCIe Half Mini Card/ M.2 (NGFF)
+Package Specifications,Package Size,See Product Brief
+Package Specifications,System Interface Type,"PCIe, USB"
+Advanced Technologies,MU-MIMO,No
+Advanced Technologies,Supported Under Intel vPro® Technology,Yes

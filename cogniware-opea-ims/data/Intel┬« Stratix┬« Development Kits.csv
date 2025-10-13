@@ -1,0 +1,14 @@
+Product ID,Product Name,Launch Date,Logic Elements (LE),Ordering Part Number
+235255,Intel® Stratix® 10 DX FPGA Development Kit  (Production),2019,2753000,DK-DEV-1SDX-P-A
+235254,Intel® Stratix® 10 GX FPGA Development Kit  (Production H-Tile),2013,2753000,DK-DEV-1SGX-H-A
+235250,Intel® Stratix® 10 GX FPGA Development Kit  (Production L-Tile),2013,2753000,DK-DEV-1SGX-L-A
+235227,Intel® Stratix® 10 GX Signal Integrity Development Kit  (Production H-tile),2013,2753000,DK-SI-1SGX-H-A
+235226,Intel® Stratix® 10 GX Signal Integrity Development Kit  (Production L-Tile),2013,2753000,DK-SI-1SGX-L-A
+235234,Intel® Stratix® 10 MX FPGA Development Kit  (Production H-Tile 16 GB HBM2),2017,2073000,DK-DEV-1SMC-H-A
+235232,Intel® Stratix® 10 MX FPGA Development Kit  (Production H-Tile 8 GB HBM2),2017,2073000,DK-DEV-1SMX-H-A
+235231,Intel® Stratix® 10 SX SoC Development Kit  (Production H-Tile),2013,2753000,DK-SOC-1SSX-H-D
+235230,Intel® Stratix® 10 TX Signal Integrity Development Kit  (Production E-Tile),2018,2753000,DK-SI-1STX-E-A
+235236,Stratix® V GS FPGA Development Kit  (Production DSP),2010,457000,DK-DEV-5SGSMD5N
+235228,Stratix® V GX FPGA Development Kit  (Production 100G),2010,622000,DK-100G-5SGXEA7N
+235233,Stratix® V GX FPGA Development Kit  (Production PCIe),2010,622000,DK-DEV-5SGXEA7N
+235229,Stratix® V GX Signal Integrity Development Kit  (Production SI),2010,622000,DK-SI-5SGXEA7N

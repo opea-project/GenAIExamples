@@ -1,0 +1,3 @@
+Product ID,Product Name,CablingDescription,TDP,Port Configuration,Data Rate Per Port,System Interface Type
+82185,Intel® Ethernet Connection I219-LM,,0.5 W,Single,1GbE,Proprietary
+82186,Intel® Ethernet Connection I219-V,,0.5 W,Single,1GbE,Proprietary

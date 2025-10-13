@@ -1,0 +1,10 @@
+Section,Key,Value
+Essentials,Product Collection,Rail Options
+Essentials,Code Name,Products formerly Fox Creek Pass
+Essentials,Marketing Status,Discontinued
+Essentials,Launch Date,Q1'23
+Essentials,Expected Discontinuance,2023
+Essentials,EOL Announce,"Friday, May 5, 2023"
+Essentials,Last Order,"Friday, June 30, 2023"
+Essentials,Included Items,(1) GPGPU air duct(1) GPGPU air duct bracket(2) 200/250 mm GPGPU power cable(2) 235 mm ATS300W power cable(2) Intel RAID Maintenance Free Backup Unit (RMFBU) bracketNote: Systems configured with any type of GPGPU card must have the shipping bracket installed before the system is exposed to any level of shock or vibration or is shipped to the end user location. Failure to install the shipping bracket has the potential to cause serious damage to various components within the system.
+Supplemental Information,Description,2U GPGPU Air Duct (when installing GPGPU accelerator add-in cards).Note: The Intel® Server System M50FCP1UR family does not support GPGPU accelerator cards with active heat sinks.

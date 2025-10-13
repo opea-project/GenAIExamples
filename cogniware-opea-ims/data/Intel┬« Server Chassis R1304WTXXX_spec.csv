@@ -1,0 +1,22 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® Server Chassis R1000WT Family
+Essentials,Code Name,Products formerly Buffalo Peak
+Essentials,Launch Date,Q3'14
+Essentials,Marketing Status,Discontinued
+Essentials,Expected Discontinuance,Q3'20
+Essentials,EOL Announce,"Friday, July 19, 2019"
+Essentials,Last Order,"Sunday, July 5, 2020"
+Essentials,Last Receipt Attributes,"Monday, October 5, 2020"
+Essentials,Limited 3-year Warranty,Yes
+Essentials,Extended Warranty Available for Purchase (Select Countries),No
+Essentials,Chassis Form Factor,"1U, Spread Core Rack"
+Essentials,Chassis Dimensions,"16.93"" x 27.95"" x 1.72"""
+Essentials,Target Market,Cloud/Datacenter
+Essentials,Redundant Fans,Yes
+Essentials,Redundant Power Supported,"Supported, requires additional power supply"
+Essentials,Backplanes,Included
+Essentials,Included Items,(1) Airduct; (1) standard control panel board (FXXFPANEL); (1) SATA Optical drive bay with filler panel (Include: optical drive mounting latch kit  and 3550mm optical drive power cable); (4) 3.5 inch hot-swap drive carriers (FXX35HSCAR); (1) 12Gb SAS backplane (FR1304S3HSBP); (1) Server board to backplane power cable; (2) processor heatsinks (FXXCA84X106HS); (2) riser card mounting brackets (riser cards sold separately); (1) power supply blank insert (power supply sold separately); (6) Dual rotor system fans (FR1UFAN10PW)
+Supplemental Information,Description,"1U server chassis designed for the Intel® Server Board S2600WT family, supporting four 3.5 inch hot-swap drives. Power supply, risers, and SAS cables sold separately"
+Memory & Storage,# of Front Drives Supported,4
+Memory & Storage,Front Drive Form Factor,"Hot-swap 2.5"" or 3.5"""
+Package Specifications,Max CPU Configuration,2

@@ -1,0 +1,56 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® Server M50CYP Family
+Essentials,Code Name,Products formerly Coyote Pass
+Essentials,Launch Date,Q2'21
+Essentials,Marketing Status,Discontinued
+Essentials,Expected Discontinuance,2023
+Essentials,EOL Announce,"Friday, May 5, 2023"
+Essentials,Last Order,"Friday, June 30, 2023"
+Essentials,Limited 3-year Warranty,Yes
+Essentials,Extended Warranty Available for Purchase (Select Countries),Yes
+Essentials,Additional Extended Warranty Details,Dual Processor Board Extended Warranty
+Essentials,Chassis Form Factor,2U Rack
+Essentials,Chassis Dimensions,712 x 439 x 89 mm
+Essentials,Board Form Factor,18.79” x 16.84”
+Essentials,Rack Rails Included,No
+Essentials,Compatible Product Series,3rd Generation Intel® Xeon® Scalable Processors
+Essentials,Socket,Socket-P4
+Essentials,TDP,270 W
+Essentials,Heat Sink Included,No
+Essentials,System Board,Intel® Server Board M50CYP2SBSTD
+Essentials,Board Chipset,Intel® C621A Chipset
+Essentials,Target Market,Mainstream
+Essentials,Rack-Friendly Board,Yes
+Essentials,Power Supply,2100 W
+Essentials,Power Supply Type,AC
+Essentials,# of Power Supply Included,0
+Essentials,Redundant Fans,Yes
+Essentials,Redundant Power Supported,"Supported, requires additional power supply"
+Essentials,Backplanes,Included
+Memory & Storage,Memory Types,-DDR4 (RDIMM)-3DS-RDIMM-Load Reduced DDR4 (LRDIMM)-3DS-LRDIMM-Intel® Optane™ persistent memory 200 series
+Memory & Storage,# of Memory Slots,32
+Memory & Storage,Max Memory Size (dependent on memory type),12 TB
+Memory & Storage,# of Front Drives Supported,12
+Memory & Storage,Front Drive Form Factor,"Hot Swap 3.5"""
+Memory & Storage,Intel® Optane™ Persistent Memory Supported,Yes
+GPU Specifications,Integrated Graphics‡,Yes
+Expansion Options,Riser Slot 1: Total # of Lanes,32
+Expansion Options,Riser Slot 2: Total # of Lanes,32
+Expansion Options,Riser Slot 3: Total # of Lanes,16
+I/O Specifications,Open Compute Port (OCP) Support,1 x 3.0
+I/O Specifications,# of USB Ports,6
+I/O Specifications,Total # of SATA Ports,10
+I/O Specifications,USB Configuration,•Three USB 3.0 on the back panel•One USB 3.0 + one USB 2.0on the front panel•One USB 2.0 internal Type-A
+I/O Specifications,Max # of UPI Links,3
+I/O Specifications,# of Serial Ports,2
+I/O Specifications,Integrated SAS Ports,8
+Package Specifications,Max CPU Configuration,2
+Advanced Technologies,Advanced System Management key,Yes
+Advanced Technologies,Intel® Optane™ Memory Supported‡,Yes
+Advanced Technologies,Intel® Remote Management Module Support,Yes
+Advanced Technologies,Integrated BMC with IPMI,IPMI 2.0 & Redfish
+Advanced Technologies,Intel® Node Manager,Yes
+Advanced Technologies,Intel® Advanced Management Technology,Yes
+Advanced Technologies,Intel® Virtualization Technology for Directed I/O (VT-d)‡,Yes
+Advanced Technologies,TPM Version,2.0
+Security & Reliability,Intel® Trusted Execution Technology‡,Yes

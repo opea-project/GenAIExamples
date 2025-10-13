@@ -1,0 +1,28 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® RAID Controllers
+Essentials,Code Name,Products formerly Whale Cove
+Essentials,Marketing Status,Discontinued
+Essentials,Launch Date,Q2'10
+Essentials,Expected Discontinuance,2H'14
+Essentials,EOL Announce,"Friday, October 31, 2014"
+Essentials,Last Order,"Thursday, April 30, 2015"
+Essentials,Last Receipt Attributes,"Monday, August 31, 2015"
+Essentials,Target Market,Entry
+Essentials,Board Form Factor,Low Profile MD2 Card
+Essentials,Data Transfer Rate,6 Gb/s
+Essentials,Supported Devices,SAS/SATA
+Essentials,Supported Operating Systems,"Windows, Linux, Solaris, VMware"
+Essentials,RAID Level Supported,"0, 1, 10, 5, 50"
+Essentials,JBOD Mode,No
+Essentials,# of Ports Internal,8
+Essentials,# of Ports External,0
+Essentials,# of Devices Supported,16
+Essentials,Cache Memory,None
+Essentials,PCIe Host Interface,PCIe x8 Gen2
+Essentials,IO Processor Model,LSI2008
+Essentials,Keying,PCIe x8 Connector
+Essentials,Connector Orientation,Top
+Essentials,Extended Warranty Available for Purchase (Select Countries),Yes
+Essentials,Additional Features,None
+Essentials,Included Items,"Raid Controller, Quick Start User Guide, 1 standard & 1 Low Profile bracket. Two MiniSAS Cables are included."
+Supplemental Information,Description,Entry-level 6G SAS RAID controller with 8 internal ports for SAS/SATA drives. Retail SKU includes cables.

@@ -1,0 +1,22 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® Ethernet Controller I210 Series
+Essentials,Code Name,Products formerly Springville
+Essentials,Marketing Status,Launched
+Essentials,Launch Date,Q4'12
+Essentials,Expected Discontinuance,1H'35
+Essentials,Recommended Customer Price,$4.27
+Essentials,Supported Operating Systems,View now
+Essentials,Operating Temperature Range,0°C to 70°C
+Essentials,Max Operating Temperature,70 °C
+Essentials,Minimum Operating Temperature,0 °C
+Supplemental Information,Datasheet,View now
+Supplemental Information,Product Brief,View now
+Networking Specifications,Port Configuration,Single
+Networking Specifications,Data Rate Per Port,1GbE
+Networking Specifications,System Interface Type,PCIe v2.1 (2.5 GT/s)
+Networking Specifications,NC Sideband Interface,Yes
+Networking Specifications,Jumbo Frames Supported,Yes
+Networking Specifications,Interfaces Supported,1000Base-T
+Package Specifications,Package Size,9mm x 9mm
+Advanced Technologies,MACsec IEEE 802.1 AE,No
+Advanced Technologies,IEEE 1588,Yes

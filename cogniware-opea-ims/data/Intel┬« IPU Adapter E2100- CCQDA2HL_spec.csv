@@ -1,0 +1,26 @@
+Section,Key,Value
+Essentials,Product Collection,200GbE Intel® Infrastructure Processing Unit E2100
+Essentials,Marketing Status,Launched
+Essentials,Launch Date,Q4'24
+Essentials,Vertical Segment,Server
+Essentials,Cable Medium,"Copper, Optics"
+Essentials,Cabling Type,"QSFP56 ports - DAC, Optics, and AOC's"
+Essentials,Bracket Height,full height
+Essentials,TDP,75 W
+Essentials,Ethernet Controller,200GbE Intel® Infrastructure Processing Unit E2100
+Essentials,Supported Operating Systems,Linux*
+Essentials,Use Conditions,Server/Enterprise
+Supplemental Information,Product Brief,View now
+Networking Specifications,Port Configuration,Dual
+Networking Specifications,Data Rate Per Port,200/100/50/25/10GbE
+Networking Specifications,Intel® Virtualization Technology for Connectivity (VT-c),No
+Package Specifications,System Interface Type,PCIe 4.0 (16GT/s)
+Package Specifications,Board Form Factor,"½ length, full height, single slot"
+Intel® Virtualization Technology for Connectivity,On-chip QoS and Traffic Management,No
+Intel® Virtualization Technology for Connectivity,Virtual Machine Device Queues (VMDq),Yes
+Intel® Virtualization Technology for Connectivity,PCI-SIG* SR-IOV Capable,Yes
+Advanced Technologies,iWARP/RDMA,No
+Advanced Technologies,RoCEv2/RDMA,Yes
+Advanced Technologies,Intel® Data Direct I/O Technology,No
+Advanced Technologies,Intelligent Offloads,Yes
+Advanced Technologies,Storage Over Ethernet,Yes

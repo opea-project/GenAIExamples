@@ -1,0 +1,2 @@
+Product ID,Product Name,CablingDescription,TDP,Port Configuration,Data Rate Per Port,System Interface Type
+202627,Intel® Ethernet Controller V710-AT2,,9.5 W,Dual,"5/2.5/1GbE, 100Mb",PCIe 3.0 (8.0 GT/s)

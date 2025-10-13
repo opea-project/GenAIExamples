@@ -1,0 +1,10 @@
+Product ID,Product Name,Supports Overclocking,PCI Express Revision,USB Revision
+201836,Intel® Q470 Chipset,,3.0,"3.2, 2.0"
+203700,Intel® Q470E Chipset,,3.0,"3.2, 2.0"
+201910,Intel® W480 Chipset,Memory,3.0,"3.2, 2.0"
+203696,Intel® W480E Chipset,Memory,3.0,"3.2, 2.0"
+201841,Intel® B460 Chipset,,3.0,"3.2, 2.0"
+201842,Intel® H410 Chipset,,2.0,"3.2, 2.0"
+203695,Intel® H420E Chipset,,3.0,"3.2, 2.0"
+201835,Intel® H470 Chipset,,3.0,"3.2, 2.0"
+201834,Intel® Z490 Chipset,"IA, BCLK, Memory",3.0,"3.2, 2.0"

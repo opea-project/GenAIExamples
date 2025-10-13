@@ -1,0 +1,7 @@
+Product ID,Product Name,Launch Date,Logic Elements (LE),Digital Signal Processing (DSP) Blocks,Maximum Embedded Memory,Maximum User I/O Count†,Package Options
+242539,Intel Agilex® 7 FPGA M-Series 032  (R31B),Q1'22,3245000,9375,344 Mb,720,R31B
+241584,Intel Agilex® 7 FPGA M-Series 032  (R47A),Q1'22,3245000,9375,344 Mb,768,R47A
+242613,Intel Agilex® 7 FPGA M-Series 032  (R47B),Q1'22,3245000,9375,344 Mb,768,R47B
+242538,Intel Agilex® 7 FPGA M-Series 039  (R31B),Q1'22,3851520,12300,410 Mb,720,R31B
+242614,Intel Agilex® 7 FPGA M-Series 039  (R47B),Q1'22,3851520,12300,410 Mb,768,R47B
+232772,Intel Agilex® 7 FPGA M-Series 039  (R47A),Q1'22,3851520,12300,410 Mb,768,R47A

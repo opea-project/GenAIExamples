@@ -1,0 +1,89 @@
+Section,Key,Value
+Essentials,Product Collection,12th Generation Intel® Core™ i7 Processors
+Essentials,Code Name,Products formerly Alder Lake
+Essentials,Vertical Segment,Mobile
+Essentials,Processor Number,i7-12800H
+Essentials,Lithography,Intel 7
+CPU Specifications,Total Cores,14
+CPU Specifications,# of Performance-cores,6
+CPU Specifications,# of Efficient-cores,8
+CPU Specifications,Total Threads,20
+CPU Specifications,Max Turbo Frequency,4.80 GHz
+CPU Specifications,Intel® Turbo Boost Max Technology 3.0 Frequency‡,4.80 GHz
+CPU Specifications,Performance-core Max Turbo Frequency,4.80 GHz
+CPU Specifications,Efficient-core Max Turbo Frequency,3.70 GHz
+CPU Specifications,Cache,24 MB Intel® Smart Cache
+CPU Specifications,Processor Base Power,45 W
+CPU Specifications,Maximum Turbo Power,115 W
+CPU Specifications,Minimum Assured Power,35 W
+Supplemental Information,Marketing Status,Launched
+Supplemental Information,Launch Date,Q1'22
+Supplemental Information,Embedded Options Available,No
+Supplemental Information,Datasheet,View now
+Memory Specifications,Max Memory Size (dependent on memory type),64 GB
+Memory Specifications,Memory Types,Up to DDR5 4800 MT/sUp to DDR4 3200 MT/sUp to LPDDR5  5200 MT/sUp to LPDDR4x 4267 MT/s
+Memory Specifications,Max # of Memory Channels,2
+Memory Specifications,ECC Memory Supported‡,No
+GPU Specifications,GPU Name‡,Intel® Iris® Xe Graphics eligible
+GPU Specifications,Graphics Max Dynamic Frequency,1.40 GHz
+GPU Specifications,Graphics Output,"eDP 1.4b, DP 1.4a, HDMI 2.1"
+GPU Specifications,Execution Units,96
+GPU Specifications,Max Resolution (HDMI)‡,4096 x 2304 @ 60Hz
+GPU Specifications,Max Resolution (DP)‡,7680 x 4320 @ 60Hz
+GPU Specifications,Max Resolution (eDP - Integrated Flat Panel)‡,4096 x 2304 @ 120Hz
+GPU Specifications,DirectX* Support,12.1
+GPU Specifications,OpenGL* Support,4.6
+GPU Specifications,OpenCL* Support,3.0
+GPU Specifications,Multi-Format Codec Engines,2
+GPU Specifications,Intel® Quick Sync Video,Yes
+GPU Specifications,# of Displays Supported‡,4
+GPU Specifications,Device ID,0x46A6
+Expansion Options,Intel® Thunderbolt™ 4,Yes
+Expansion Options,Microprocessor PCIe Revision,Gen 4
+Expansion Options,Chipset / PCH PCIe Revision,Gen 3
+Expansion Options,Max # of PCI Express Lanes,28
+Package Specifications,Sockets Supported,FCBGA1744
+Package Specifications,Max CPU Configuration,1
+Package Specifications,TJUNCTION,100°C
+Package Specifications,Package Size,50 x 25
+Package Specifications,Max Operating Temperature,100 °C
+Advanced Technologies,Intel® Gaussian & Neural Accelerator,3.0
+Advanced Technologies,Intel® Thread Director,Yes
+Advanced Technologies,Intel® Image Processing Unit,6.0
+Advanced Technologies,Intel® Smart Sound Technology,Yes
+Advanced Technologies,Intel® Wake on Voice,Yes
+Advanced Technologies,Intel® High Definition Audio,Yes
+Advanced Technologies,MIPI SoundWire*,1.2
+Advanced Technologies,Intel® Deep Learning Boost (Intel® DL Boost) on CPU,Yes
+Advanced Technologies,Intel® Adaptix™ Technology,Yes
+Advanced Technologies,Intel® Speed Shift Technology,Yes
+Advanced Technologies,Intel® Turbo Boost Max Technology 3.0‡,Yes
+Advanced Technologies,Intel® Hyper-Threading Technology‡,Yes
+Advanced Technologies,Instruction Set,64-bit
+Advanced Technologies,Instruction Set Extensions,"Intel® SSE4.1, Intel® SSE4.2, Intel® AVX2"
+Advanced Technologies,Thermal Monitoring Technologies,Yes
+Advanced Technologies,Intel® Flex Memory Access,Yes
+Advanced Technologies,Intel® Volume Management Device (VMD),Yes
+Security & Reliability,Intel vPro® Eligibility‡,Intel vPro® Enterprise
+Security & Reliability,Intel® Threat Detection Technology (TDT),Yes
+Security & Reliability,Intel® Active Management Technology (AMT)‡,Yes
+Security & Reliability,Intel® Standard Manageability (ISM)‡,Yes
+Security & Reliability,Intel® Remote Platform Erase (RPE)‡,Yes
+Security & Reliability,Intel® One-Click Recovery‡,Yes
+Security & Reliability,Intel® Hardware Shield Eligibility‡,Yes
+Security & Reliability,Intel® Secure Key,Yes
+Security & Reliability,Intel® QuickAssist Software Acceleration,Yes
+Security & Reliability,Intel® Control-Flow Enforcement Technology,Yes
+Security & Reliability,Intel® Total Memory Encryption - Multi Key,Yes
+Security & Reliability,Intel® Total Memory Encryption,Yes
+Security & Reliability,Intel® AES New Instructions,Yes
+Security & Reliability,Intel® OS Guard,Yes
+Security & Reliability,Intel® Trusted Execution Technology‡,Yes
+Security & Reliability,Execute Disable Bit‡,Yes
+Security & Reliability,Intel® Boot Guard,Yes
+Security & Reliability,Mode-based Execute Control (MBEC),Yes
+Security & Reliability,Intel® Stable IT Platform Program (SIPP),Yes
+Security & Reliability,Intel® Virtualization Technology with Redirect Protection (VT-rp)‡,Yes
+Security & Reliability,Intel® Virtualization Technology (VT-x)‡,Yes
+Security & Reliability,Intel® Virtualization Technology for Directed I/O (VT-d)‡,Yes
+Security & Reliability,Intel® VT-x with Extended Page Tables (EPT)‡,Yes

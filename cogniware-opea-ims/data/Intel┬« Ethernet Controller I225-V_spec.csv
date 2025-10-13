@@ -1,0 +1,22 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® Ethernet Controller I225 Series
+Essentials,Code Name,Products formerly Foxville
+Essentials,Marketing Status,Launched
+Essentials,Launch Date,Q4'19
+Essentials,Expected Discontinuance,1H'27
+Essentials,TDP,1.95 W
+Essentials,Recommended Customer Price,$2.87
+Essentials,Supported Operating Systems,View now
+Essentials,Operating Temperature Range,0°C to 70°C
+Essentials,Max Operating Temperature,70 °C
+Essentials,Minimum Operating Temperature,0 °C
+Essentials,Use Conditions,PC/Client/Tablet
+Supplemental Information,Embedded Options Available,No
+Supplemental Information,Product Brief,View now
+Networking Specifications,Port Configuration,Single
+Networking Specifications,Data Rate Per Port,2.5GbE
+Networking Specifications,System Interface Type,PCIe
+Networking Specifications,NC Sideband Interface,No
+Networking Specifications,Jumbo Frames Supported,Yes
+Networking Specifications,Speed & Slot Width,"x1, G2"
+Networking Specifications,Interfaces Supported,NBASE-T

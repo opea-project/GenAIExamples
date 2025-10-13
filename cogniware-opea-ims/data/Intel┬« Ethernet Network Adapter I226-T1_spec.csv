@@ -1,0 +1,15 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® Ethernet Network Adapter I226 Series
+Essentials,Marketing Status,Launched
+Essentials,Launch Date,Q3'23
+Essentials,Vertical Segment,Desktop
+Essentials,Cable Medium,Copper
+Essentials,Cabling Type,"CAT5e, CAT6, CAT6A"
+Essentials,Bracket Height,Low profile and full height
+Essentials,Recommended Customer Price,$62.00-$64.00
+Supplemental Information,Product Brief,View now
+Networking Specifications,Port Configuration,Single
+Networking Specifications,Data Rate Per Port,10/100/1000/2.5GBASE-T(TX)
+Networking Specifications,Speed & Slot Width,"5 GT/s, x1 Lane"
+Networking Specifications,Controller,Intel(R) Ethernet Controller I226
+Package Specifications,System Interface Type,PCIe 3.1 (5 GT/s)

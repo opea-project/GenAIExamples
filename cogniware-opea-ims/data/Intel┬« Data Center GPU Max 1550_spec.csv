@@ -1,0 +1,29 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® Data Center GPU Max Series
+Essentials,Microarchitecture,Xe-HPC
+Essentials,Code Name,Products formerly Ponte Vecchio
+Essentials,Marketing Status,Launched
+Essentials,Launch Date,Q1'23
+Essentials,Expected Discontinuance,Jan 2026
+Essentials,Warranty Period,3  yrs
+Essentials,Embedded Options Available,No
+Essentials,Use Conditions,Server/Enterprise
+Essentials,Usecase,"Artificial Intelligence, High Performance Computing"
+GPU Specifications,Xe-cores,128
+GPU Specifications,Ray Tracing Units,128
+GPU Specifications,Intel® XeMatrix Extensions (Intel® XMX) Engines,1024
+GPU Specifications,XeVector Engines,1024
+GPU Specifications,Graphics Max Dynamic Clock,1600 MHz
+GPU Specifications,Graphics Base Clock,900 MHz
+GPU Specifications,Intel® XeLink Maximum Frequency,53 Gbps
+GPU Specifications,TDP,600 W
+GPU Specifications,PCI Express Configurations‡,Gen 5 x16
+GPU Specifications,Device ID,0x0BD5
+Memory Specifications,Memory Size,128 GB
+Memory Specifications,Memory Type,HBM2e
+Memory Specifications,Graphics Memory Interface,1024 bit
+Memory Specifications,Graphics Memory Bandwidth,3276.8 GB/s
+I/O Specifications,# of Displays Supported‡,0
+Features,H.264 Hardware Encode/Decode,No
+Supported Technologies,Ray Tracing,Yes
+Supported Technologies,oneAPI Support,Yes

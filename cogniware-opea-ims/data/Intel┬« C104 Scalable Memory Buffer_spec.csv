@@ -1,0 +1,15 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® Scalable Memory Buffers
+Essentials,Code Name,Products formerly Jordan Creek
+Essentials,Marketing Status,Discontinued
+Essentials,Launch Date,Q1'14
+Essentials,Lithography,32 nm
+Essentials,TDP,9 W
+Supplemental Information,Embedded Options Available,No
+Memory Specifications,Max Memory Size (dependent on memory type),384 GB
+Memory Specifications,Memory Types,"DDR3 1066/1333/1600, RDIMM/LRDIMM/LVDIMM"
+Memory Specifications,Max # of Memory Channels,2
+Memory Specifications,Max Memory Bandwidth,21 GB/s
+Memory Specifications,ECC Memory Supported‡,Yes
+Memory Specifications,# of DIMMs per channel,3
+Package Specifications,Package Size,31mm x 19.5mm

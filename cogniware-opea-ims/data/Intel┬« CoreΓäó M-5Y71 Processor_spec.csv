@@ -1,0 +1,74 @@
+Section,Key,Value
+Essentials,Product Collection,5th Generation Intel® Core™ M Processors
+Essentials,Code Name,Products formerly Broadwell
+Essentials,Vertical Segment,Mobile
+Essentials,Processor Number,5Y71
+Essentials,Lithography,14 nm
+CPU Specifications,Total Cores,2
+CPU Specifications,Total Threads,4
+CPU Specifications,Max Turbo Frequency,2.90 GHz
+CPU Specifications,Intel® Turbo Boost Technology 2.0 Frequency‡,2.90 GHz
+CPU Specifications,Processor Base Frequency,1.20 GHz
+CPU Specifications,Cache,4 MB
+CPU Specifications,Scenario Design Power (SDP),3.5 W
+CPU Specifications,TDP,4.5 W
+CPU Specifications,Configurable TDP-up Base Frequency,1.40 GHz
+CPU Specifications,Configurable TDP-up,6 W
+CPU Specifications,Configurable TDP-down Base Frequency,600 MHz
+CPU Specifications,Configurable TDP-down,3.5 W
+Supplemental Information,Marketing Status,Discontinued
+Supplemental Information,Launch Date,Q4'14
+Supplemental Information,Servicing Status,End of Servicing Lifetime
+Supplemental Information,End of Servicing Updates Date,"Wednesday, June 30, 2021"
+Supplemental Information,Embedded Options Available,No
+Supplemental Information,Datasheet,View now
+Memory Specifications,Max Memory Size (dependent on memory type),16 GB
+Memory Specifications,Memory Types,LPDDR3 1333/1600; DDR3L/DDR3L-RS 1600
+Memory Specifications,Max # of Memory Channels,2
+Memory Specifications,Max Memory Bandwidth,25.6 GB/s
+Memory Specifications,ECC Memory Supported‡,No
+GPU Specifications,GPU Name‡,Intel® HD Graphics 5300
+GPU Specifications,Graphics Base Frequency,300 MHz
+GPU Specifications,Graphics Max Dynamic Frequency,900 MHz
+GPU Specifications,Graphics Video Max Memory,16 GB
+GPU Specifications,Graphics Output,eDP/DP/HDMI
+GPU Specifications,Max Resolution (HDMI)‡,2560x1600@60Hz
+GPU Specifications,Max Resolution (DP)‡,2560x1600@60Hz
+GPU Specifications,DirectX* Support,11.2/12
+GPU Specifications,OpenGL* Support,4.3
+GPU Specifications,Intel® Quick Sync Video,Yes
+GPU Specifications,Intel® InTru™ 3D Technology,Yes
+GPU Specifications,Intel® Flexible Display Interface (Intel® FDI),Yes
+GPU Specifications,Intel® Clear Video HD Technology,Yes
+GPU Specifications,# of Displays Supported‡,3
+GPU Specifications,Device ID,0x161E
+Expansion Options,PCI Express Revision,2.0
+Expansion Options,PCI Express Configurations‡,"x1 (6), x2 (4), x4 (3)"
+Expansion Options,Max # of PCI Express Lanes,12
+Package Specifications,Sockets Supported,FCBGA1234
+Package Specifications,Max CPU Configuration,1
+Package Specifications,TJUNCTION,95 C
+Package Specifications,Package Size,30mm x 16.5mm
+Advanced Technologies,Intel® Turbo Boost Technology‡,2.0
+Advanced Technologies,Intel® Hyper-Threading Technology‡,Yes
+Advanced Technologies,Intel® Transactional Synchronization Extensions,Yes
+Advanced Technologies,Intel® 64‡,Yes
+Advanced Technologies,Instruction Set,64-bit
+Advanced Technologies,Instruction Set Extensions,"Intel® SSE4.1, Intel® SSE4.2, Intel® AVX2"
+Advanced Technologies,Idle States,Yes
+Advanced Technologies,Enhanced Intel SpeedStep® Technology,Yes
+Advanced Technologies,Thermal Monitoring Technologies,Yes
+Advanced Technologies,Intel® Fast Memory Access,Yes
+Advanced Technologies,Intel® Flex Memory Access,Yes
+Advanced Technologies,Intel® Identity Protection Technology‡,Yes
+Advanced Technologies,Intel® Smart Response Technology,Yes
+Security & Reliability,Intel vPro® Eligibility‡,Intel vPro® Platform
+Security & Reliability,Intel® Secure Key,Yes
+Security & Reliability,Intel® AES New Instructions,Yes
+Security & Reliability,Intel® Trusted Execution Technology‡,Yes
+Security & Reliability,Execute Disable Bit‡,Yes
+Security & Reliability,Intel® OS Guard,Yes
+Security & Reliability,Intel® Stable IT Platform Program (SIPP),Yes
+Security & Reliability,Intel® Virtualization Technology (VT-x)‡,Yes
+Security & Reliability,Intel® Virtualization Technology for Directed I/O (VT-d)‡,Yes
+Security & Reliability,Intel® VT-x with Extended Page Tables (EPT)‡,Yes

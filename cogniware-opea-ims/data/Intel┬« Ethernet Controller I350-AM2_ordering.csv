@@ -1,0 +1,19 @@
+Section,Key,Value
+Ordering and Spec Information,,
+"Intel® Ethernet Controller I350-AM2, Tray",Ordering Code,NHI350AM2
+"Intel® Ethernet Controller I350-AM2, Tray",Spec Code,SLJ3S
+"Intel® Ethernet Controller I350-AM2, Tray",Shipping Media,TRAY
+"Intel® Ethernet Controller I350-AM2, Tray",Stepping,A1
+"Intel® Ethernet Controller I350-AM2, Tray",MDDS Content IDs,707124
+"Intel® Ethernet Controller I350-AM2, Tray",PCN Content IDs,"799822,795943,802395,798798,803212,799686,804690,804340,805021,809472,810640,811242,812098,813833,813819,813824"
+"Intel® Ethernet Controller I350-AM2, Tray",Recommended Customer Price,$20.30
+"Intel® Ethernet Controller I350-AM2, Tape",Ordering Code,NHI350AM2
+"Intel® Ethernet Controller I350-AM2, Tape",Spec Code,SLJ3R
+"Intel® Ethernet Controller I350-AM2, Tape",Shipping Media,T&R
+"Intel® Ethernet Controller I350-AM2, Tape",Stepping,A1
+"Intel® Ethernet Controller I350-AM2, Tape",MDDS Content IDs,707124
+"Intel® Ethernet Controller I350-AM2, Tape",PCN Content IDs,"798798,795943,803212,799686,804340,809472,804690,811242,812043,813824,819816"
+"Intel® Ethernet Controller I350-AM2, Tape",Recommended Customer Price,$20.30
+Trade Compliance Information,ECCN,5A991
+Trade Compliance Information,CCATS,NA
+Trade Compliance Information,US HTS,8542310030

@@ -1,0 +1,24 @@
+Section,Key,Value
+Essentials,Product Collection,Arria® V GX FPGA
+Essentials,Marketing Status,Launched
+Essentials,Launch Date,2011
+Essentials,Lithography,28 nm
+Resources,Logic Elements (LE),75000
+Resources,Adaptive Logic Modules (ALM),28302
+Resources,Adaptive Logic Module (ALM) Registers,113208
+Resources,Fabric and I/O Phase-Locked Loops (PLLs),10
+Resources,Maximum Embedded Memory,8.463 Mb
+Resources,Digital Signal Processing (DSP) Blocks,240
+Resources,Digital Signal Processing (DSP) Format,Variable Precision
+Resources,Hard Memory Controllers,Yes
+Resources,External Memory Interfaces (EMIF),"DDR II+, DDR2, DDR3, LPDDR, LPDDR2, QDR II, QDR II+, RLDRAM II, RLDRAM 3"
+I/O Specifications,Maximum User I/O Count†,416
+I/O Specifications,I/O Standards Support,"3.0 V to 3.3 V LVTTL, 1.2 V to 3.3 V LVCMOS, PCI, PCI-X, SSTL, HSTL, HSUL, Differential SSTL, Differential HSTL, Differential HSUL, LVDS, Mini-LVDS, RSDS, LVPECL"
+I/O Specifications,Maximum LVDS Pairs,147
+I/O Specifications,Maximum Non-Return to Zero (NRZ) Transceivers†,9
+I/O Specifications,Maximum Non-Return to Zero (NRZ) Data Rate†,6.5536 Gbps
+I/O Specifications,Transceiver Protocol Hard IP,PCIe Gen2
+Advanced Technologies,FPGA Bitstream Security,Yes
+Advanced Technologies,Analog-to-Digital Converter,No
+Package Specifications,Package Options,"F672, F896"
+Supplemental Information,Additional Information,Product Table (Family Comparison)DatasheetAll FPGA Documentation

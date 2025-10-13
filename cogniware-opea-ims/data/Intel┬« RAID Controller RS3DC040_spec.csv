@@ -1,0 +1,27 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® RAID Controllers
+Essentials,Code Name,Products formerly Dark Canyon
+Essentials,Marketing Status,Discontinued
+Essentials,Launch Date,Q3'13
+Essentials,Expected Discontinuance,Q2'22
+Essentials,EOL Announce,"Tuesday, April 6, 2021"
+Essentials,Last Order,"Wednesday, April 6, 2022"
+Essentials,Last Receipt Attributes,"Friday, July 22, 2022"
+Essentials,Target Market,Mainstream
+Essentials,Board Form Factor,Low Profile MD2 Card
+Essentials,Data Transfer Rate,12 Gb/s
+Essentials,Supported Devices,SAS/SATA
+Essentials,Supported Operating Systems,"Windows, Linux, VMWare"
+Essentials,Compatible Cache Backup Options,AXXRMFBU4
+Essentials,RAID Level Supported,"0, 1, 10, 5, 50, 6, 60"
+Essentials,JBOD Mode,Yes
+Essentials,# of Ports Internal,4
+Essentials,# of Ports External,0
+Essentials,# of Devices Supported,128
+Essentials,Cache Memory,1GB
+Essentials,PCIe Host Interface,PCIe x8 Gen3
+Essentials,IO Processor Model,LSI3108
+Essentials,Connector Orientation,Side
+Essentials,Additional Extended Warranty Details,Intel® RAID Extended Warranty
+Essentials,Included Items,"Raid Controller, Quick Start User Guide, 1 standard & 1 Low Profile bracket."
+Supplemental Information,Description,"12Gb/s SAS, 6Gb/s SATA, LSI3108 ROC Mainstream Intelligent RAID 0,1,5,10,50,60 add-in card with x8 PCIe 3.0, 4 internal ports, MD2 Low Profile form factor."

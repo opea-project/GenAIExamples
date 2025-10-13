@@ -1,0 +1,18 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® Cyclone® Development Kits
+Essentials,Marketing Status,Launched
+Essentials,Launch Date,2017
+Essentials,Featured FPGA,Intel® Cyclone® 10 LP FPGA 10CL025YU256I7G
+Essentials,Logic Elements (LE),24624
+Essentials,On-chip Memory,594 Kb
+Essentials,DSP Blocks,66
+Essentials,FPGA Package,U256
+Essentials,Board Type,General Purpose
+Essentials,Ordering Part Number,EK-10CL025U256
+Essentials,Distributor Availability,ArrowDigiKeyMouser
+Board Specifications,Interfaces,"RGMII, MDC/MDIO, RJ45"
+Board Specifications,Expansion,"Arduino UNO R3, PMOD"
+Board Specifications,Memory,HyperRAM
+Board Specifications,Versions,Production
+Supplemental Information,Description,Provides an easy-to-use platform for evaluating Intel Cyclone 10 LP FPGA technology.
+Supplemental Information,User Guide,View now

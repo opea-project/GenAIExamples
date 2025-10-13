@@ -1,0 +1,58 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® Server System M20MYP Family
+Essentials,Code Name,Products formerly Mystic Pass
+Essentials,Launch Date,Q2'20
+Essentials,Marketing Status,Discontinued
+Essentials,Expected Discontinuance,2023
+Essentials,EOL Announce,"Thursday, April 7, 2022"
+Essentials,Last Order,"Friday, July 1, 2022"
+Essentials,Last Receipt Attributes,"Wednesday, August 31, 2022"
+Essentials,Limited 3-year Warranty,Yes
+Essentials,Extended Warranty Available for Purchase (Select Countries),Yes
+Essentials,Chassis Form Factor,1U Rack
+Essentials,Chassis Dimensions,660 x 438.5 x 43.2 mm (26” x 17.2” x 1.7”)
+Essentials,Board Form Factor,SSI EEB (12 x 13 in)
+Essentials,Compatible Product Series,2nd Generation Intel® Xeon® Scalable Processors
+Essentials,Socket,Socket P
+Essentials,TDP,150 W
+Essentials,Heat Sink,(2) AXXSTPHMKIT1U
+Essentials,Heat Sink Included,Yes
+Essentials,System Board,Intel® Server Board MYP1USVB
+Essentials,Board Chipset,Intel® C624 Chipset
+Essentials,Target Market,Cloud/Datacenter
+Essentials,Rack-Friendly Board,Yes
+Essentials,Power Supply,750 W
+Essentials,Power Supply Type,AC
+Essentials,# of Power Supply Included,1
+Essentials,Backplanes,Included
+Essentials,Included Items,"(1) Intel® Server Chassis M20MYP(1) Intel® Server Board MYP1USVB(2) 1U PCIe x16  Riser Card  MYP1URISER(1) 12 Gb SAS backplane  FR1304S3HSBP(4) 3.5” hot swap drive tool less carriers   FXX35HSCAR2(1) Pre-installed control panel(1) 350 mm backplane I2C cable J20956 -xxx(1) Mini SAS HD cable AXXCBL650HDHD(1) Backplane power cable(1)  1U Server airduct MYP1UADUCT(6) 40 x 28 mm managed system fans(1) 750W power supply module FXX750PCRPS(2)  CPU passive heat sinks, 51 fins AXXSTPHMKIT1U(2) CPU heat sink “No CPU” label inserts(2)  Standard CPU Carriers H72853 -xxx"
+Essentials,Use Conditions,Server/Enterprise
+Supplemental Information,Description,"Integrated 1U system featuring an Intel® Server Board MYP1USVB, supporting two 2nd Generation Intel® Xeon® Scalable processors.Dual CPU support up to 150W TDP.Up to 165W for specific single CPU configurations."
+Memory & Storage,Storage Profile,Hybrid Storage Profile
+Memory & Storage,Memory Types,"DDR4 RDIMM/LRDIMM, Up to 2933 MT/s, 1.2 V"
+Memory & Storage,# of Memory Slots,16
+Memory & Storage,Max Memory Size (dependent on memory type),512 GB
+Memory & Storage,# of Front Drives Supported,4
+Memory & Storage,Front Drive Form Factor,"Hot-swap 2.5"" or 3.5"""
+Memory & Storage,# of Internal Drives Supported,2
+Memory & Storage,Internal Drive Form Factor,M.2 SSD
+Expansion Options,PCIe x16 Gen 3,2
+Expansion Options,Riser Slot 1: Total # of Lanes,16
+Expansion Options,Riser Slot 1: Included Slot Configuration(s),1x PCIe Gen3 x16
+Expansion Options,Riser Slot 2: Total # of Lanes,16
+Expansion Options,Riser Slot 2: Included Slot Configuration(s),1x PCIe Gen3 x16
+I/O Specifications,# of USB Ports,7
+I/O Specifications,Total # of SATA Ports,6
+I/O Specifications,USB Configuration,Two USB 2.0 ports on back panelTwo USB 3.0 ports on back panelOne internal USB 3.0 type-A connectorTwo USB 3.0 ports on front panel
+I/O Specifications,Max # of UPI Links,2
+I/O Specifications,RAID Configuration,"0,1,5,10"
+I/O Specifications,# of Serial Ports,1
+I/O Specifications,Integrated LAN,Yes
+I/O Specifications,# of LAN Ports,2
+Package Specifications,Max CPU Configuration,2
+Advanced Technologies,Intel® Remote Management Module Support,Yes
+Advanced Technologies,Integrated BMC with IPMI,IPMI 2.0
+Advanced Technologies,Intel® Node Manager,Yes
+Advanced Technologies,Intel® Virtualization Technology for Directed I/O (VT-d)‡,Yes
+Advanced Technologies,Intel® Rapid Storage Technology enterprise,Yes
+Advanced Technologies,TPM Version,2.0

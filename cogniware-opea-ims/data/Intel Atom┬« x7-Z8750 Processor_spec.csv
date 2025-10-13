@@ -1,0 +1,45 @@
+Section,Key,Value
+Essentials,Product Collection,Intel Atom® Processor X Series
+Essentials,Code Name,Products formerly Cherry Trail
+Essentials,Vertical Segment,Mobile
+Essentials,Processor Number,x7-Z8750
+Essentials,Lithography,14 nm
+Essentials,Recommended Customer Price,$45.00
+CPU Specifications,Total Cores,4
+CPU Specifications,Burst Frequency,2.56 GHz
+CPU Specifications,Processor Base Frequency,1.60 GHz
+CPU Specifications,Cache,2 MB
+CPU Specifications,Scenario Design Power (SDP),2 W
+Supplemental Information,Marketing Status,Discontinued
+Supplemental Information,Launch Date,Q1'16
+Supplemental Information,Servicing Status,End of Servicing Lifetime
+Supplemental Information,End of Servicing Updates Date,"Thursday, June 30, 2022"
+Supplemental Information,Embedded Options Available,No
+Memory Specifications,Max Memory Size (dependent on memory type),8 GB
+Memory Specifications,Memory Types,LPDDR3 1600
+Memory Specifications,Max # of Memory Channels,2
+Memory Specifications,Max Memory Bandwidth,25.6 GB/s
+GPU Specifications,Graphics Base Frequency,200 MHz
+GPU Specifications,Graphics Burst Frequency,600 MHz
+GPU Specifications,Graphics Max Dynamic Frequency,600 MHz
+GPU Specifications,Graphics Video Max Memory,8 GB
+GPU Specifications,Execution Units,16
+GPU Specifications,Max Resolution (HDMI)‡,3840x2160
+GPU Specifications,Max Resolution (eDP - Integrated Flat Panel)‡,2560x1600
+GPU Specifications,# of Displays Supported‡,3
+Expansion Options,PCI Express Revision,2.0
+Expansion Options,PCI Express Configurations‡,"2x1, 1x2"
+Expansion Options,Max # of PCI Express Lanes,2
+I/O Specifications,# of USB Ports,3
+I/O Specifications,USB Revision,3.0
+Package Specifications,Sockets Supported,UTFCBGA1380
+Package Specifications,TJUNCTION,90°C
+Package Specifications,Package Size,17mm x 17mm
+Advanced Technologies,Intel® Turbo Boost Max Technology 3.0‡,No
+Advanced Technologies,Secure Boot,Yes
+Advanced Technologies,Intel® 64‡,Yes
+Advanced Technologies,Instruction Set,64-bit
+Advanced Technologies,Intel® Identity Protection Technology‡,Yes
+Security & Reliability,Intel® AES New Instructions,Yes
+Security & Reliability,Intel® Stable IT Platform Program (SIPP),No
+Security & Reliability,Intel® Virtualization Technology (VT-x)‡,Yes

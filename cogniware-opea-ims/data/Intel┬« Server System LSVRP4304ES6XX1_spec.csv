@@ -1,0 +1,45 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® Server System P4000SP Family
+Essentials,Code Name,Products formerly Silver Pass
+Essentials,Launch Date,Q2'16
+Essentials,Marketing Status,Discontinued
+Essentials,Expected Discontinuance,Q4'16
+Essentials,EOL Announce,"Tuesday, November 15, 2016"
+Essentials,Last Order,"Monday, January 30, 2017"
+Essentials,Last Receipt Attributes,"Thursday, April 13, 2017"
+Essentials,Limited 3-year Warranty,Yes
+Essentials,Extended Warranty Available for Purchase (Select Countries),Yes
+Essentials,Chassis Form Factor,4U Pedestal
+Essentials,Board Form Factor,uATX
+Essentials,Compatible Product Series,Intel® Xeon® Processor E3-1200 v5 Family
+Essentials,Heat Sink Included,Yes
+Essentials,System Board,Intel® Server Board S1200SPL
+Essentials,Board Chipset,Intel® C236 Chipset
+Essentials,Target Market,Small Business/1st Server
+Essentials,Power Supply,365 W
+Essentials,Power Supply Type,AC
+Essentials,# of Power Supply Included,1
+Essentials,Redundant Fans,No
+Essentials,Redundant Power Supported,No
+Essentials,Included Items,"This product has transitioned to LSVRP4304ES6XXR.PLEASE NOTE: LSVRP4304ES6XXR does not include a hard drive and contains some additional configuration changes.Configured system includes:Intel® Server Chassis P4304XXSFCN with(1) 365W Fixed Power Supply(1) Intel® Server Board S1200SPL(1) Intel® Xeon® Processor E3-1230 v5 (8M Cache, 3.40 GHz)(1) Intel® Remote Management Module AXXRMM4LITE2(1) 16GB, 2133MHZ, DDR4, UDIMM memory module(1) Intel® SSD DC S3510 Series (120GB, 2.5in SATA 6Gb/s, 16nm, MLC)"
+Supplemental Information,Description,"SMB Server Blocks feature the Intel Xeon processor E3 family that delivers high memory, I/O and storage capacity, fast application loading and performance, and the capacity to support multiple users."
+Memory & Storage,# of Front Drives Supported,4
+Memory & Storage,Front Drive Form Factor,"Fixed 3.5"" HDD or 2.5"" SSD"
+GPU Specifications,Integrated Graphics‡,Yes
+Expansion Options,PCIe x4 Gen 3,1
+Expansion Options,PCIe x8 Gen 3,1
+Expansion Options,PCIe x16 Gen 3,1
+Expansion Options,Connector for Intel® I/O Expansion Module x8 Gen 3,1
+Expansion Options,Connector for Intel® Integrated RAID Module,1
+I/O Specifications,# of USB Ports,9
+I/O Specifications,Total # of SATA Ports,8
+I/O Specifications,RAID Configuration,"Software RAID RST (0,1,10,5) and ESRT2 (0,1,10)"
+I/O Specifications,# of Serial Ports,1
+I/O Specifications,Integrated LAN,2x 1GbE
+I/O Specifications,# of LAN Ports,2
+Advanced Technologies,Intel® Remote Management Module Support,Yes
+Advanced Technologies,Intel® Node Manager,Yes
+Advanced Technologies,Intel® Virtualization Technology for Directed I/O (VT-d)‡,Yes
+Advanced Technologies,Intel® Rapid Storage Technology enterprise,Yes
+Advanced Technologies,Intel® I/O Acceleration Technology,Yes
+Advanced Technologies,TPM Version,1.2

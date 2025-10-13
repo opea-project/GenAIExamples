@@ -1,0 +1,24 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® Ethernet Server Adapter I210 Series
+Essentials,Marketing Status,Launched
+Essentials,Launch Date,Q1'13
+Essentials,Vertical Segment,Server
+Essentials,Cable Medium,Copper
+Essentials,Cabling Type,"RJ45 Category 5, up to 100 m"
+Essentials,Bracket Height,Low Profile and Full Height
+Essentials,TDP,1 W
+Essentials,Recommended Customer Price,$43.00-$44.00
+Supplemental Information,Product Brief,View now
+Networking Specifications,Port Configuration,Single
+Networking Specifications,Data Rate Per Port,10/100/1000 Mbps
+Networking Specifications,Speed & Slot Width,"2.5 GT/s, x1 Lane"
+Networking Specifications,Controller,Intel I210
+Package Specifications,System Interface Type,PCIe v2.1 (2.5 GT/s)
+Intel® Virtualization Technology for Connectivity,On-chip QoS and Traffic Management,No
+Intel® Virtualization Technology for Connectivity,Flexible Port Partitioning,No
+Intel® Virtualization Technology for Connectivity,Virtual Machine Device Queues (VMDq),No
+Intel® Virtualization Technology for Connectivity,PCI-SIG* SR-IOV Capable,No
+Advanced Technologies,iWARP/RDMA,No
+Advanced Technologies,Intel® Ethernet Power Management,Yes
+Advanced Technologies,Intel® Data Direct I/O Technology,No
+Advanced Technologies,Intelligent Offloads,Yes

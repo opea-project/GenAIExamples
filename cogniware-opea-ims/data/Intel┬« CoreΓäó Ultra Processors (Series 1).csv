@@ -1,0 +1,21 @@
+Product ID,Product Name,Launch Date,Total Cores,Max Turbo Frequency,Cache,GPU Name‡
+239781,Intel® Core™ Ultra 3 Processor 105UL,Q2'24,8,4.2 GHz,10 MB,Intel® Graphics
+239782,Intel® Core™ Ultra 5 Processor 125HL,Q2'24,14,4.5 GHz,18 MB,Intel® Arc™ graphics
+239783,Intel® Core™ Ultra 5 Processor 125UL,Q2'24,12,4.3 GHz,12 MB,Intel® Graphics
+239784,Intel® Core™ Ultra 5 Processor 135HL,Q2'24,14,4.6 GHz,18 MB,Intel® Arc™ graphics
+239785,Intel® Core™ Ultra 5 Processor 135UL,Q2'24,12,4.4 GHz,12 MB,Intel® Graphics
+239786,Intel® Core™ Ultra 7 Processor 155HL,Q2'24,16,4.8 GHz,24 MB,Intel® Arc™ graphics
+239787,Intel® Core™ Ultra 7 Processor 155UL,Q2'24,12,4.8 GHz,12 MB,Intel® Graphics
+239788,Intel® Core™ Ultra 7 Processor 165HL,Q2'24,16,5 GHz,24 MB,Intel® Arc™ graphics
+239802,Intel® Core™ Ultra 7 Processor 165UL,Q2'24,12,4.9 GHz,12 MB,Intel® Graphics
+236848,Intel® Core™ Ultra 5 Processor 125H,Q4'23,14,4.5 GHz,18 MB Intel® Smart Cache,Intel® Arc™ graphics
+237330,Intel® Core™ Ultra 5 Processor 125U,Q4'23,12,4.3 GHz,12 MB Intel® Smart Cache,Intel® Graphics
+237507,Intel® Core™ Ultra 5 Processor 134U,Q4'23,12,4.4 GHz,12 MB Intel® Smart Cache,Intel® Graphics
+236850,Intel® Core™ Ultra 5 Processor 135H,Q4'23,14,4.6 GHz,18 MB Intel® Smart Cache,Intel® Arc™ graphics
+237328,Intel® Core™ Ultra 5 Processor 135U,Q4'23,12,4.4 GHz,12 MB Intel® Smart Cache,Intel® Graphics
+236847,Intel® Core™ Ultra 7 Processor 155H,Q4'23,16,4.8 GHz,24 MB Intel® Smart Cache,Intel® Arc™ graphics
+237327,Intel® Core™ Ultra 7 Processor 155U,Q4'23,12,4.8 GHz,12 MB Intel® Smart Cache,Intel® Graphics
+237508,Intel® Core™ Ultra 7 Processor 164U,Q4'23,12,4.8 GHz,12 MB Intel® Smart Cache,Intel® Graphics
+236851,Intel® Core™ Ultra 7 Processor 165H,Q4'23,16,5 GHz,24 MB Intel® Smart Cache,Intel® Arc™ graphics
+237329,Intel® Core™ Ultra 7 Processor 165U,Q4'23,12,4.9 GHz,12 MB Intel® Smart Cache,Intel® Graphics
+236849,Intel® Core™ Ultra 9 Processor 185H,Q4'23,16,5.1 GHz,24 MB Intel® Smart Cache,Intel® Arc™ graphics
