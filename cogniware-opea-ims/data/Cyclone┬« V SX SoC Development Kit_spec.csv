@@ -1,0 +1,18 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® Cyclone® Development Kits
+Essentials,Marketing Status,Launched
+Essentials,Launch Date,2012
+Essentials,Featured FPGA,Cyclone® V SX SoC 5CSXFC6D6F31C6N
+Essentials,Logic Elements (LE),110000
+Essentials,On-chip Memory,5.44 Mb
+Essentials,DSP Blocks,112
+Essentials,FPGA Package,F31
+Essentials,Board Type,General Purpose
+Essentials,Ordering Part Number,DK-DEV-5CSXC6N
+Essentials,Distributor Availability,ArrowDigiKeyMouser
+Board Specifications,Interfaces,"SMA, PCIe, HSMC, SDI, USB"
+Board Specifications,Memory,"DDR3,SPI"
+Board Specifications,Special Feature,LCD
+Board Specifications,Versions,Production
+Supplemental Information,Description,"Offers a quick and simple approach to develop custom ARM* processor-based SoC designs accompanied by Intel's low-power, low-cost Cyclone V FPGA fabric."
+Supplemental Information,User Guide,View now

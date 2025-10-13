@@ -1,0 +1,51 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® Celeron® Processor J Series
+Essentials,Code Name,Products formerly Bay Trail
+Essentials,Vertical Segment,Desktop
+Essentials,Processor Number,J1800
+Essentials,Lithography,22 nm
+Essentials,Recommended Customer Price,$22.00
+CPU Specifications,Total Cores,2
+CPU Specifications,Total Threads,2
+CPU Specifications,Burst Frequency,2.58 GHz
+CPU Specifications,Processor Base Frequency,2.41 GHz
+CPU Specifications,Cache,1 MB L2 Cache
+CPU Specifications,TDP,10 W
+Supplemental Information,Marketing Status,Discontinued
+Supplemental Information,Launch Date,Q4'13
+Supplemental Information,Servicing Status,End of Servicing Lifetime
+Supplemental Information,Embedded Options Available,No
+Supplemental Information,Use Conditions,PC/Client/Tablet
+Memory Specifications,Max Memory Size (dependent on memory type),8 GB
+Memory Specifications,Memory Types,DDR3L 1333
+Memory Specifications,Max # of Memory Channels,2
+Memory Specifications,Physical Address Extensions,36-bit
+Memory Specifications,ECC Memory Supported‡,No
+GPU Specifications,GPU Name‡,Intel® HD Graphics for Intel Atom® Processor Z3700 Series
+GPU Specifications,Graphics Base Frequency,688 MHz
+GPU Specifications,Graphics Max Dynamic Frequency,792 MHz
+GPU Specifications,Intel® Quick Sync Video,Yes
+GPU Specifications,Intel® InTru™ 3D Technology,No
+GPU Specifications,Intel® Flexible Display Interface (Intel® FDI),No
+GPU Specifications,# of Displays Supported‡,2
+Expansion Options,PCI Express Revision,2.0
+Expansion Options,PCI Express Configurations‡,"X4, X2, X1"
+Expansion Options,Max # of PCI Express Lanes,4
+Package Specifications,Sockets Supported,FCBGA1170
+Package Specifications,Max CPU Configuration,1
+Package Specifications,TJUNCTION,105°C
+Package Specifications,Package Size,25mm X 27mm
+Advanced Technologies,Intel® Optane™ Memory Supported‡,No
+Advanced Technologies,Intel® Turbo Boost Technology‡,No
+Advanced Technologies,Intel® Hyper-Threading Technology‡,No
+Advanced Technologies,Intel® 64‡,Yes
+Advanced Technologies,Instruction Set,64-bit
+Advanced Technologies,Enhanced Intel SpeedStep® Technology,Yes
+Advanced Technologies,Intel® Identity Protection Technology‡,No
+Advanced Technologies,Intel® Rapid Storage Technology,No
+Security & Reliability,Intel® AES New Instructions,No
+Security & Reliability,Execute Disable Bit‡,Yes
+Security & Reliability,Anti-Theft Technology,No
+Security & Reliability,Intel® Stable IT Platform Program (SIPP),No
+Security & Reliability,Intel® Virtualization Technology (VT-x)‡,Yes
+Security & Reliability,Intel® Virtualization Technology for Directed I/O (VT-d)‡,No

@@ -1,0 +1,17 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® Integrated RAID (Modules/System Boards)
+Essentials,Marketing Status,Discontinued
+Essentials,Launch Date,Q3'11
+Essentials,Expected Discontinuance,Q4'15
+Essentials,EOL Announce,"Wednesday, March 23, 2016"
+Essentials,Last Order,"Wednesday, September 28, 2016"
+Essentials,Last Receipt Attributes,"Friday, January 27, 2017"
+Essentials,Board Form Factor,Storage Connector Module
+Essentials,Supported Devices,SAS/SATA
+Essentials,RAID Level Supported,"0, 1, 10, 5, 50, 6, 60"
+Essentials,JBOD Mode,No
+Essentials,# of Devices Supported,120
+Essentials,PCIe Host Interface,PCIe x4 Gen1
+Essentials,IO Processor Model,LSI1064
+Essentials,Included Items,"SAS Controller module, Quick Start User Guide, Mounting standoffs. Note: Cables sold separately"
+Supplemental Information,Description,4-port Entry 3Gb SAS I/O expansion module. Optional RAID 5 with AXXRAKSW5.

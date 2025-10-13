@@ -1,0 +1,24 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® Stratix® 10 GX FPGA
+Essentials,Marketing Status,Launched
+Essentials,Launch Date,2013
+Essentials,Lithography,14 nm
+Resources,Logic Elements (LE),1325000
+Resources,Adaptive Logic Modules (ALM),449280
+Resources,Adaptive Logic Module (ALM) Registers,1797120
+Resources,Fabric and I/O Phase-Locked Loops (PLLs),16
+Resources,Maximum Embedded Memory,114 Mb
+Resources,Digital Signal Processing (DSP) Blocks,2592
+Resources,Digital Signal Processing (DSP) Format,"Multiply and Accumulate, Variable Precision, Fixed Point (hard IP), Floating Point (hard IP)"
+Resources,Hard Memory Controllers,Yes
+Resources,External Memory Interfaces (EMIF),"DDR, DDR2, DDR3, DDR4, HMC, MoSys, QDR II, QDR II+, RLDRAM II, RLDRAM 3"
+I/O Specifications,Maximum User I/O Count†,688
+I/O Specifications,I/O Standards Support,"3.0 V to 3.3 V LVTTL, 1.2 V to 3.3V LVCMOS,  SSTL, POD, HSTL, HSUL, Differential SSTL, Differential POD, Differential HSTL, Differential HSUL, LVDS, Mini-LVDS, RSDS, LVPECL"
+I/O Specifications,Maximum LVDS Pairs,336
+I/O Specifications,Maximum Non-Return to Zero (NRZ) Transceivers†,48
+I/O Specifications,Maximum Non-Return to Zero (NRZ) Data Rate†,28.3 Gbps
+I/O Specifications,Transceiver Protocol Hard IP,"PCIe Gen3, 100G Ethernet"
+Advanced Technologies,Hyper-Registers,Yes
+Advanced Technologies,FPGA Bitstream Security,Yes
+Package Specifications,Package Options,F1760
+Supplemental Information,Additional Information,Product Table (Family Comparison)DatasheetAll FPGA Documentation

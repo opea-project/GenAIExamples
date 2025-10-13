@@ -1,0 +1,74 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® Server Board S2600CW Family
+Essentials,Code Name,Products formerly Cottonwood Pass
+Essentials,Marketing Status,Discontinued
+Essentials,Launch Date,Q1'15
+Essentials,Expected Discontinuance,Q1'16
+Essentials,EOL Announce,"Friday, November 13, 2015"
+Essentials,Last Order,"Friday, January 29, 2016"
+Essentials,Last Receipt Attributes,"Friday, February 26, 2016"
+Essentials,Limited 3-year Warranty,Yes
+Essentials,Extended Warranty Available for Purchase (Select Countries),Yes
+Essentials,Additional Extended Warranty Details,Dual Processor Board Extended Warranty
+Essentials,# of QPI Links,2
+Essentials,Compatible Product Series,Intel® Xeon® processor E5-2600 v3 product family
+Essentials,Board Form Factor,"SSI EEB 12"" x 13"""
+Essentials,Chassis Form Factor,Rack or Pedestal
+Essentials,Socket,Socket R3
+Essentials,Integrated Systems Available,No
+Essentials,Integrated BMC with IPMI,IPMI 2.0 with OEM extensions
+Essentials,Rack-Friendly Board,Yes
+Essentials,TDP,145 W
+Essentials,Included Items,"(1) Intel® Server Board S2600CW2S, (1) I/O shield, (2) SATA cables, Quick Start User’s Guide, Attention document, and configuration labels. Note: the OEM 10 Pack does not ship with included items."
+Essentials,Board Chipset,Intel® C612 Chipset
+Essentials,Target Market,Embedded
+Supplemental Information,Embedded Options Available,No
+Supplemental Information,Datasheet,View now
+Supplemental Information,Description,"A general purpose server board supporting two Intel® Xeon® processor E5-2600 V3 family up to 145W, 16 DIMMs, two 1-Gb ethernet ports, and an eight port LSI* 3008 SAS controller"
+Memory Specifications,Max Memory Size (dependent on memory type),1 TB
+Memory Specifications,Memory Types,"DDR4 ECC RDIMM 1600/1866/2133, DDR4 ECC LRDIMM 1600/1866/2133"
+Memory Specifications,Max # of Memory Channels,8
+Memory Specifications,Max Memory Bandwidth,136 GB/s
+Memory Specifications,Physical Address Extensions,46-bit
+Memory Specifications,# of Memory Slots,16
+Memory Specifications,ECC Memory Supported‡,Yes
+GPU Specifications,Integrated Graphics‡,Yes
+GPU Specifications,Graphics Output,VGA
+GPU Specifications,Discrete Graphics,Supported
+Expansion Options,PCI Express Revision,3.0
+Expansion Options,Max # of PCI Express Lanes,84
+Expansion Options,PCIe x8 Gen 3,2
+Expansion Options,PCIe x16 Gen 3,3
+Expansion Options,PCIe x4 Gen 2.x,1
+I/O Specifications,# of USB Ports,7
+I/O Specifications,USB Revision,2.0 & 3.0
+I/O Specifications,Total # of SATA Ports,10
+I/O Specifications,RAID Configuration,"PCH SATA 6G, ESRT2 RAID 0,1,10"
+I/O Specifications,# of Serial Ports,1
+I/O Specifications,# of LAN Ports,2
+I/O Specifications,Integrated LAN,2x 1-GbE
+I/O Specifications,Firewire,No
+I/O Specifications,Embedded USB (eUSB) Solid State Drive Option,Yes
+I/O Specifications,Integrated SAS Ports,8
+I/O Specifications,Integrated InfiniBand*,No
+Package Specifications,Max CPU Configuration,2
+Advanced Technologies,Intel® Virtualization Technology for Directed I/O (VT-d)‡,Yes
+Advanced Technologies,Intel® Remote Management Module Support,Yes
+Advanced Technologies,Intel® Node Manager,Yes
+Advanced Technologies,Intel® Quick Resume Technology,No
+Advanced Technologies,Intel® Quiet System Technology,No
+Advanced Technologies,Intel® HD Audio Technology,No
+Advanced Technologies,Intel® Matrix Storage Technology,No
+Advanced Technologies,Intel® Rapid Storage Technology,No
+Advanced Technologies,Intel® Rapid Storage Technology enterprise,Yes
+Advanced Technologies,Intel® Fast Memory Access,Yes
+Advanced Technologies,Intel® Flex Memory Access,Yes
+Advanced Technologies,Intel® I/O Acceleration Technology,Yes
+Advanced Technologies,Intel® Advanced Management Technology,Yes
+Advanced Technologies,Intel® Server Customization Technology,Yes
+Advanced Technologies,Intel® Build Assurance Technology,Yes
+Advanced Technologies,Intel® Efficient Power Technology,Yes
+Advanced Technologies,Intel® Quiet Thermal Technology,Yes
+Advanced Technologies,TPM Version,1.2
+Security & Reliability,Intel® AES New Instructions,Yes
+Security & Reliability,Intel® Trusted Execution Technology‡,Yes

@@ -1,0 +1,21 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® Server Chassis FC2000 Family
+Essentials,Code Name,Products formerly Optimus Beach
+Essentials,Launch Date,Q1'23
+Essentials,Marketing Status,Discontinued
+Essentials,Expected Discontinuance,2023
+Essentials,EOL Announce,"Friday, May 5, 2023"
+Essentials,Last Order,"Friday, June 30, 2023"
+Essentials,Limited 3-year Warranty,Yes
+Essentials,Extended Warranty Available for Purchase (Select Countries),Yes
+Essentials,Chassis Form Factor,"2U Front IO, 4 node Rack"
+Essentials,Chassis Dimensions,865 x 441.8 x 86.8 mm (L x W x H)
+Essentials,Target Market,"High Performance Computing, Scalable Performance"
+Essentials,Power Supply,3000 W
+Essentials,Power Supply Type,AC
+Essentials,# of Power Supply Included,0
+Essentials,Redundant Fans,Yes
+Essentials,Redundant Power Supported,Yes
+Essentials,TDP,350 W
+Essentials,Included Items,(1) – 2U chassis FC2000(2) – Liquid-cooled fan assembly with integrated dual rotor 40mm fan – iPC FCXX40MMLCFAN(1) – Chassis plumbing assembly kit – iPC FCXXLCMDMFD(1) – Power distribution board assembly – iPC FCXXPDBASSMBL2(1) – Tool less rack rail mount kit – iPC FCXXRAILKIT(4) – Internal rail kit – iPC FCXX1USPPRT(1) – EMP module filler
+Supplemental Information,Description,Intel® Server Chassis FC2000 v2 supporting four 1U half-width liquid-cooled compute modules. No PSUs included

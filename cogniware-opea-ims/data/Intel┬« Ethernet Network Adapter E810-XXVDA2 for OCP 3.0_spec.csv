@@ -1,0 +1,27 @@
+Section,Key,Value
+Essentials,Product Collection,800 Series Network Adapters (up to 200GbE)
+Essentials,Marketing Status,Launched
+Essentials,Launch Date,Q3'20
+Essentials,Vertical Segment,Server
+Essentials,Cable Medium,"Copper, Fiber"
+Essentials,Cabling Type,"SFP28 ports - DAC, Optics, And AOC's"
+Essentials,Bracket Height,OCP 3.0
+Essentials,Recommended Customer Price,$209.00-$216.00
+Essentials,Supported Operating Systems,View now
+Supplemental Information,Datasheet,View now
+Supplemental Information,Product Brief,View now
+Networking Specifications,Port Configuration,Dual
+Networking Specifications,Data Rate Per Port,25/10/1GbE
+Networking Specifications,Intel® Virtualization Technology for Connectivity (VT-c),Yes
+Networking Specifications,Speed & Slot Width,16 GT/s x8 lanes
+Networking Specifications,Controller,Intel Ethernet Controller E810
+Package Specifications,System Interface Type,PCIe 4.0 (16 GT/s)
+Intel® Virtualization Technology for Connectivity,On-chip QoS and Traffic Management,Yes
+Intel® Virtualization Technology for Connectivity,Flexible Port Partitioning,Yes
+Intel® Virtualization Technology for Connectivity,Virtual Machine Device Queues (VMDq),Yes
+Intel® Virtualization Technology for Connectivity,PCI-SIG* SR-IOV Capable,Yes
+Advanced Technologies,iWARP/RDMA,Yes
+Advanced Technologies,RoCEv2/RDMA,Yes
+Advanced Technologies,Intel® Data Direct I/O Technology,Yes
+Advanced Technologies,Intelligent Offloads,Yes
+Advanced Technologies,Storage Over Ethernet,"iSCSI, NFS"

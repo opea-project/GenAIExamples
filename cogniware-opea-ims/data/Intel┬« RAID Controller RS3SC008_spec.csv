@@ -1,0 +1,26 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® RAID Controllers
+Essentials,Code Name,Products formerly Sunset Canyon
+Essentials,Marketing Status,Discontinued
+Essentials,Launch Date,Q3'14
+Essentials,Expected Discontinuance,Q2'22
+Essentials,EOL Announce,"Tuesday, April 6, 2021"
+Essentials,Last Order,"Wednesday, April 6, 2022"
+Essentials,Last Receipt Attributes,"Friday, July 22, 2022"
+Essentials,Target Market,Scalable Performance
+Essentials,Board Form Factor,MD2 low profile
+Essentials,Data Transfer Rate,12 Gb/s
+Essentials,Supported Devices,SAS/SATA
+Essentials,Supported Operating Systems,"Windows, Linux, VMWare"
+Essentials,RAID Level Supported,"0, 1, 10, 5, 50, 6, 60"
+Essentials,JBOD Mode,Yes
+Essentials,# of Ports Internal,0
+Essentials,# of Ports External,8
+Essentials,# of Devices Supported,240
+Essentials,Cache Memory,1GB
+Essentials,PCIe Host Interface,PCIe x8 Gen3
+Essentials,IO Processor Model,LSI3108
+Essentials,Connector Orientation,External
+Essentials,Extended Warranty Available for Purchase (Select Countries),Yes
+Essentials,Additional Extended Warranty Details,Intel® RAID Extended Warranty
+Supplemental Information,Description,"12Gb/s SAS12Gb/s SAS, 6Gb/s SATA, LSI3108 ROC Scalable Performance Intelligent RAID 0,1,5,10,50,60 add-in card with x8 PCIe 3.0, 8 external ports, MD2 Low Profile form factor."

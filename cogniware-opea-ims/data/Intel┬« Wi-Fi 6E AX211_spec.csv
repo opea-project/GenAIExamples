@@ -1,0 +1,25 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® Wi-Fi 6E (Gig+) Series
+Essentials,Code Name,Products formerly Garfield Peak
+Essentials,Marketing Status,Launched
+Essentials,Launch Date,Q3'21
+Essentials,Weight (in grams),2.83
+Essentials,Operating Temperature Range,0 °C to 50 °C
+Essentials,Max Operating Temperature,50 °C
+Essentials,Minimum Operating Temperature,0 °C
+Essentials,Supported Operating Systems,"Windows 11, 64-bit*, Windows 10, 64-bit*, Linux*, Chrome OS*"
+Essentials,Antenna,2x2
+Supplemental Information,Product Brief,View now
+Networking Specifications,TX/RX Streams,2x2
+Networking Specifications,Bands,"2.4, 5, 6 GHz (160MHz)"
+Networking Specifications,Max Speed,2.4 Gbps
+Networking Specifications,Wi-Fi CERTIFIED*,Wi-Fi 6E (802.11ax)
+Networking Specifications,Compliance,"FIPS, FISMA"
+Networking Specifications,Integrated Bluetooth,Yes
+Networking Specifications,Bluetooth Version,5.3
+Package Specifications,Board Form Factor,"M.2 2230, M.2 1216"
+Package Specifications,Package Size,"22mm x 30mm x 2.4mm, 12mm x 16mm x 1.65mm"
+Package Specifications,System Interface Type,M.2: CNVio2
+Advanced Technologies,MU-MIMO,Yes
+Advanced Technologies,Orthogonal Frequency-Division Multiple Access (OFDMA),Yes
+Advanced Technologies,Supported Under Intel vPro® Technology,Yes

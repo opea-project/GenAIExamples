@@ -1,0 +1,43 @@
+Section,Key,Value
+Essentials,Product Collection,Intel Atom® Processor C Series
+Essentials,Code Name,Products formerly Avoton
+Essentials,Vertical Segment,Server
+Essentials,Processor Number,C2530
+Essentials,Lithography,22 nm
+Essentials,Recommended Customer Price,$70.00
+CPU Specifications,Total Cores,4
+CPU Specifications,Total Threads,4
+CPU Specifications,Max Turbo Frequency,2.40 GHz
+CPU Specifications,Intel® Turbo Boost Technology 2.0 Frequency‡,2.40 GHz
+CPU Specifications,Processor Base Frequency,1.70 GHz
+CPU Specifications,Cache,2 MB
+CPU Specifications,TDP,9 W
+Supplemental Information,Marketing Status,Discontinued
+Supplemental Information,Launch Date,Q3'13
+Supplemental Information,Servicing Status,End of Servicing Lifetime
+Supplemental Information,End of Servicing Updates Date,"Wednesday, June 30, 2021"
+Supplemental Information,Embedded Options Available,No
+Memory Specifications,Max Memory Size (dependent on memory type),32 GB
+Memory Specifications,Memory Types,DDR3/DDR3L 1333
+Memory Specifications,Max # of Memory Channels,2
+Memory Specifications,Max Memory Bandwidth,21.3 GB/s
+Memory Specifications,Physical Address Extensions,36-bit
+Memory Specifications,ECC Memory Supported‡,Yes
+Expansion Options,PCI Express Revision,2
+Expansion Options,PCI Express Configurations‡,"x1,x2,x4,x8"
+Expansion Options,Max # of PCI Express Lanes,8
+I/O Specifications,# of USB Ports,4
+I/O Specifications,USB Revision,2
+I/O Specifications,Total # of SATA Ports,2
+I/O Specifications,Integrated LAN,2x1 or 2x2.5 GbE
+I/O Specifications,UART,2
+I/O Specifications,Max # of SATA 6.0 Gb/s Ports,2
+Package Specifications,Sockets Supported,FCBGA1283
+Package Specifications,TCASE,97°C
+Package Specifications,Package Size,34 mm x 28 mm
+Advanced Technologies,Intel® Turbo Boost Technology‡,2.0
+Advanced Technologies,Intel® Hyper-Threading Technology‡,No
+Advanced Technologies,Instruction Set,64-bit
+Security & Reliability,Intel® AES New Instructions,Yes
+Security & Reliability,Intel® Virtualization Technology (VT-x)‡,Yes
+Security & Reliability,Intel® VT-x with Extended Page Tables (EPT)‡,Yes

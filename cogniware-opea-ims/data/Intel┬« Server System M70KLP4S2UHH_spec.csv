@@ -1,0 +1,63 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® Server System M70KLP Family
+Essentials,Code Name,Products formerly Kelton Pass
+Essentials,Launch Date,Q1'21
+Essentials,Marketing Status,Discontinued
+Essentials,Expected Discontinuance,2022
+Essentials,EOL Announce,"Monday, March 7, 2022"
+Essentials,Last Order,"Friday, May 6, 2022"
+Essentials,Last Receipt Attributes,"Tuesday, July 5, 2022"
+Essentials,Limited 3-year Warranty,Yes
+Essentials,Chassis Form Factor,2U Rack
+Essentials,Chassis Dimensions,841 mm x 435 mm x 87 mm
+Essentials,Board Form Factor,"610mm x 424mm, Thickness 2.34mm"
+Essentials,Rack Rails Included,Yes
+Essentials,Compatible Product Series,3rd Generation Intel® Xeon® Scalable Processors
+Essentials,Socket,P+
+Essentials,TDP,250 W
+Essentials,Heat Sink,(2) 2U Front CPU Heatsink(2) 2U Rear CPU Heatsink
+Essentials,Heat Sink Included,Yes
+Essentials,System Board,Intel® Server Board M70KLP2SB
+Essentials,Board Chipset,Intel® C621 Chipset
+Essentials,Target Market,Mainstream
+Essentials,Rack-Friendly Board,Yes
+Essentials,Power Supply,2000 W
+Essentials,Power Supply Type,AC
+Essentials,# of Power Supply Included,2
+Essentials,Redundant Fans,Yes
+Essentials,Redundant Power Supported,Yes
+Essentials,Backplanes,Included
+Essentials,Included Items,"(1) Intel® Server Chassis M70KLP2UCHHH(1) Intel® Server Board M70KLP2SB(1) 2U PCIe Riser M.2 Connector KLP2UM2RISER(1) SlimSAS M.2 Cable KLPCBLSSM2(1) 2U 8x2.5"" SAS/NVME Hot-Swap Backplane KLP08HSBP(1) DC Power Cable Mid-HSBP KLPCBLDCPM - 230mm(1) Comm Cable HSBP-Mid KLPCBLCOM224M - 820mm(6) 2U Fan Kit KLP2UFAN(1) Fan Bracket(8) 2.5"" Hot-Swap Drive Carrier KLP25HSCAR(2) 2000W AC Common Redundant Power Supply KLP2000CRPS(1) 2U Rail Kit (Full Extension) KLPRAILK(1) Front I/O Panel assembly (VGA+1x USB 3.0+1x USB 2.0) installed(1) 2U Server airduct(48) Blank DIMM slots(4) CPU heat sink + CPU Clips(2) Front Panel 8 Drive Filler Plate(1) PDB(1) PDB CableNote: Risers supporting additional PCIe 3.0 cards, drive carriers and backplanes (for (16) or (24) 2.5” drive support) sold separately."
+Supplemental Information,Description,Integrated 2U server system supporting(4) 3rd Generation Intel® Xeon® Processors.(8) 2.5” drives(2) x16 Half Height Half Length PCIe 3.0 cards(4) x8 Half Height Half Length PCIe 3.0 cards.
+Memory & Storage,Storage Profile,Hybrid Storage Profile
+Memory & Storage,Memory Types,"DDR4, RDIMMs, LDRIMMs and Intel® Optane™Persistent Memory.15 TB with Intel® Optane™ Persistent Memory"
+Memory & Storage,# of Memory Slots,48
+Memory & Storage,Max Memory Size (dependent on memory type),6 TB
+Memory & Storage,Max Storage Capacity,192 TB
+Memory & Storage,# of Front Drives Supported,24
+Memory & Storage,Front Drive Form Factor,"Hot-swap 2.5"""
+Memory & Storage,# of Internal Drives Supported,2
+Memory & Storage,Internal Drive Form Factor,M.2 SSD
+Memory & Storage,Intel® Optane™ Persistent Memory Supported,Yes
+Expansion Options,PCIe x8 Gen 3,4
+Expansion Options,PCIe x16 Gen 3,2
+Expansion Options,PCIe Slimline Connectors,8x8
+Expansion Options,Connector for Intel® Integrated RAID Module,1
+Expansion Options,Riser Slot 1: Total # of Lanes,40
+Expansion Options,Riser Slot 1: Included Slot Configuration(s),2x PCIe Gen3 x16 + 1x PCIe Gen3 x8
+Expansion Options,Riser Slot 2: Total # of Lanes,24
+Expansion Options,Riser Slot 2: Included Slot Configuration(s),3x PCIe Gen3 x8
+I/O Specifications,Open Compute Port (OCP) Support,1x 3.0 slot
+I/O Specifications,# of USB Ports,5
+I/O Specifications,Total # of SATA Ports,1
+I/O Specifications,USB Configuration,One USB 2.0 port on front panelOne USB 3.0 port on front panelTwo USB 3.0 port on rear panelOne USB 2.0 port on board
+I/O Specifications,Max # of UPI Links,6
+I/O Specifications,RAID Configuration,"1, 5, 6, and 10"
+I/O Specifications,# of Serial Ports,2
+Package Specifications,Max CPU Configuration,4
+Advanced Technologies,Advanced System Management key,Yes
+Advanced Technologies,Intel® Optane™ Memory Supported‡,Yes
+Advanced Technologies,Integrated BMC with IPMI,IPMI 2.0 & Redfish
+Advanced Technologies,Intel® On-Demand Redundant Power,Yes
+Advanced Technologies,Intel® Virtualization Technology for Directed I/O (VT-d)‡,Yes
+Advanced Technologies,TPM Version,2.0

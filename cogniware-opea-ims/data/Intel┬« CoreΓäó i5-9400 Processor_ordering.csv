@@ -1,0 +1,32 @@
+Section,Key,Value
+Ordering and Spec Information,,
+"Intel® Core™ i5-9400 Processor (9M Cache, up to 4.10 GHz) FC-LGA14A, Tray",Ordering Code,CM8068403875505
+"Intel® Core™ i5-9400 Processor (9M Cache, up to 4.10 GHz) FC-LGA14A, Tray",Spec Code,SRG0Y
+"Intel® Core™ i5-9400 Processor (9M Cache, up to 4.10 GHz) FC-LGA14A, Tray",Shipping Media,TRAY
+"Intel® Core™ i5-9400 Processor (9M Cache, up to 4.10 GHz) FC-LGA14A, Tray",Stepping,R0
+"Intel® Core™ i5-9400 Processor (9M Cache, up to 4.10 GHz) FC-LGA14A, Tray",MDDS Content IDs,"708148,708845"
+"Intel® Core™ i5-9400 Processor (9M Cache, up to 4.10 GHz) FC-LGA14A, Tray",PCN Content IDs,"813820,799495,804099,809472,809679"
+"Intel® Core™ i5-9400 Processor (9M Cache, up to 4.10 GHz) FC-LGA14A, Tray",Recommended Customer Price,$182.00
+Retired and discontinued,,
+"Intel® Core™ i5-9400 Processor (9M Cache, up to 4.10 GHz) FC-LGA14C, Tray",Ordering Code,CM8068403358816
+"Intel® Core™ i5-9400 Processor (9M Cache, up to 4.10 GHz) FC-LGA14C, Tray",Spec Code,SR3X5
+"Intel® Core™ i5-9400 Processor (9M Cache, up to 4.10 GHz) FC-LGA14C, Tray",Shipping Media,TRAY
+"Intel® Core™ i5-9400 Processor (9M Cache, up to 4.10 GHz) FC-LGA14C, Tray",Stepping,U0
+"Intel® Core™ i5-9400 Processor (9M Cache, up to 4.10 GHz) FC-LGA14C, Tray",MDDS Content IDs,708214
+"Intel® Core™ i5-9400 Processor (9M Cache, up to 4.10 GHz) FC-LGA14C, Tray",PCN Content IDs,"812098,799495,813820,799685,809472,813833"
+"Intel® Core™ i5-9400 Processor (9M Cache, up to 4.10 GHz) FC-LGA14C, Tray",Recommended Customer Price,$182.00
+"Boxed Intel® Core™ i5-9400 Processor (9M Cache, up to 4.10 GHz) FC-LGA14A",Ordering Code,BX80684I59400
+"Boxed Intel® Core™ i5-9400 Processor (9M Cache, up to 4.10 GHz) FC-LGA14A",Spec Code,SRELV
+"Boxed Intel® Core™ i5-9400 Processor (9M Cache, up to 4.10 GHz) FC-LGA14A",Shipping Media,BOX
+"Boxed Intel® Core™ i5-9400 Processor (9M Cache, up to 4.10 GHz) FC-LGA14A",Stepping,P0
+"Boxed Intel® Core™ i5-9400 Processor (9M Cache, up to 4.10 GHz) FC-LGA14A",MDDS Content IDs,706611
+"Boxed Intel® Core™ i5-9400 Processor (9M Cache, up to 4.10 GHz) FC-LGA14A",PCN Content IDs,"798513,804577,799495"
+"Boxed Intel® Core™ i5-9400 Processor (9M Cache, up to 4.10 GHz) FC-LGA14A, for China",Ordering Code,BXC80684I59400
+"Boxed Intel® Core™ i5-9400 Processor (9M Cache, up to 4.10 GHz) FC-LGA14A, for China",Spec Code,SRELV
+"Boxed Intel® Core™ i5-9400 Processor (9M Cache, up to 4.10 GHz) FC-LGA14A, for China",Shipping Media,BOX
+"Boxed Intel® Core™ i5-9400 Processor (9M Cache, up to 4.10 GHz) FC-LGA14A, for China",Stepping,P0
+"Boxed Intel® Core™ i5-9400 Processor (9M Cache, up to 4.10 GHz) FC-LGA14A, for China",MDDS Content IDs,706820
+"Boxed Intel® Core™ i5-9400 Processor (9M Cache, up to 4.10 GHz) FC-LGA14A, for China",PCN Content IDs,"799495,804577"
+Trade Compliance Information,ECCN,5A992.C
+Trade Compliance Information,CCATS,G077159
+Trade Compliance Information,US HTS,8542310050

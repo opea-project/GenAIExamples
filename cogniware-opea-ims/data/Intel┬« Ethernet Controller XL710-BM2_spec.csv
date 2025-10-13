@@ -1,0 +1,33 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® Ethernet Controller XL710
+Essentials,Code Name,Products formerly Fortville
+Essentials,Marketing Status,Launched
+Essentials,Launch Date,Q4'15
+Essentials,Expected Discontinuance,1H'31
+Essentials,Lithography,28 nm
+Essentials,TDP,7 W
+Essentials,Recommended Customer Price,$117.70
+Essentials,Supported Operating Systems,View now
+Essentials,Operating Temperature Range,0°C to 55°C
+Essentials,Max Operating Temperature,55 °C
+Essentials,Minimum Operating Temperature,0 °C
+Supplemental Information,Datasheet,View now
+Supplemental Information,Description,Dual Port 40GbE or 4x10GbE Ethernet Controller
+Supplemental Information,Product Brief,View now
+Networking Specifications,Port Configuration,Dual
+Networking Specifications,Data Rate Per Port,40/10/1GbE
+Networking Specifications,System Interface Type,PCIe v3.0 (8.0 GT/s)
+Networking Specifications,NC Sideband Interface,Yes
+Networking Specifications,Jumbo Frames Supported,Yes
+Networking Specifications,Interfaces Supported,"SFI, KR, KR4, XAUI, KX, KX4, SGMII"
+Package Specifications,Package Size,25mm x 25mm
+Intel® Virtualization Technology for Connectivity,On-chip QoS and Traffic Management,Yes
+Intel® Virtualization Technology for Connectivity,Flexible Port Partitioning,Yes
+Intel® Virtualization Technology for Connectivity,Virtual Machine Device Queues (VMDq),Yes
+Intel® Virtualization Technology for Connectivity,PCI-SIG* SR-IOV Capable,Yes
+Advanced Technologies,Fiber Channel over Ethernet,No
+Advanced Technologies,IEEE 1588,Yes
+Advanced Technologies,Intel® Ethernet Power Management,Yes
+Advanced Technologies,Intel® Data Direct I/O Technology,Yes
+Advanced Technologies,Intelligent Offloads,Yes
+Advanced Technologies,Storage Over Ethernet,"iSCSI, NFS"

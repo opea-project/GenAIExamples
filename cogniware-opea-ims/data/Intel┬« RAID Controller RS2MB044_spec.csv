@@ -1,0 +1,29 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® RAID Controllers
+Essentials,Code Name,Products formerly Mobile Bay
+Essentials,Marketing Status,Discontinued
+Essentials,Launch Date,Q2'10
+Essentials,Expected Discontinuance,Q4'14
+Essentials,EOL Announce,"Friday, October 31, 2014"
+Essentials,Last Order,"Thursday, April 30, 2015"
+Essentials,Last Receipt Attributes,"Monday, August 31, 2015"
+Essentials,Target Market,Mainstream
+Essentials,Board Form Factor,Low Profile MD2 Card
+Essentials,Data Transfer Rate,6 Gb/s
+Essentials,Supported Devices,SAS/SATA
+Essentials,Supported Operating Systems,"Windows, Linux, Solaris, VMware"
+Essentials,Compatible Cache Backup Options,AXXRSBBU7 or AXXRSBBU8
+Essentials,RAID Level Supported,"0, 1, 10, 5, 50, 6, 60"
+Essentials,JBOD Mode,No
+Essentials,# of Ports Internal,4
+Essentials,# of Ports External,4
+Essentials,# of Devices Supported,240
+Essentials,Cache Memory,512MB
+Essentials,PCIe Host Interface,PCIe x8 Gen2
+Essentials,IO Processor Model,LSI2108
+Essentials,Keying,PCIe x8 Connector
+Essentials,Connector Orientation,"1 Top, 1 External 8088"
+Essentials,Extended Warranty Available for Purchase (Select Countries),Yes
+Essentials,Additional Features,Support for Premium Feature Options
+Essentials,Included Items,"Raid Controller, Quick Start User Guide, 1 standard & 1 Low Profile bracket. No SAS Cables are included."
+Supplemental Information,Description,Mainstream 6G SAS RAID controller with 4 internal and 4 external ports for SAS/SATA drives.Retail SKU includes cables.

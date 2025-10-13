@@ -1,0 +1,57 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® Server D50DNP Family
+Essentials,Code Name,Products formerly Denali Pass
+Essentials,Launch Date,Q1'23
+Essentials,Marketing Status,Discontinued
+Essentials,Expected Discontinuance,2023
+Essentials,EOL Announce,"Friday, May 5, 2023"
+Essentials,Last Order,"Friday, June 30, 2023"
+Essentials,Limited 3-year Warranty,Yes
+Essentials,Extended Warranty Available for Purchase (Select Countries),Yes
+Essentials,Supported Operating Systems,"VMware ESXi* 7.0, Windows Server 2022*, Windows Server 2019*, Red Hat Linux*, SUSE Linux*, Ubuntu*, CentOS*"
+Essentials,Chassis Form Factor,"2U Front IO, 4 node Rack"
+Essentials,Chassis Dimensions,591.4 x 216 x 40.6 mm (L x W x H)
+Essentials,Board Form Factor,8.33” x 21.5”
+Essentials,Rack Rails Included,Yes
+Essentials,Compatible Product Series,"4th Gen Intel® Xeon® Scalable Processors, 5th Gen Intel® Xeon® Scalable Processors"
+Essentials,Socket,Socket- E LGA4677
+Essentials,TDP,250 W
+Essentials,Heat Sink,(1) – 1U air-cooled heat sink front – iPC DNP1UHSF(1) – 1U air-cooled heat sink back – iPC DNP1UHSB
+Essentials,Heat Sink Included,Yes
+Essentials,System Board,Intel® Server Board D50DNP1SB
+Essentials,Board Chipset,Intel® C741 Chipset
+Essentials,Target Market,"High Performance Computing, Scalable Performance"
+Essentials,Rack-Friendly Board,Yes
+Essentials,Included Items,(1) – Intel® Server Board D50DNP1SB – iPC D50DNP1SB(1) – 1U half-width module tray – iPN M44835-xxx(1) – 1U compute module air duct – iPN M44897-xxx(2) – 1U riser bracket to support riser cards DNP1URISER and DNP1UMRISER – iPN M44890-xxx(1) – 1U low-profile PCIe standard riser card – iPC DNP1URISER(1) – 1U low-profile PCIe MCIO riser card – iPC DNP1UMRISER(1) – MCIO cable for 1U left riser – iPN M40563-xxx(1) – 1U air-cooled heat sink front – iPC DNP1UHSF(1) – 1U air-cooled heat sink back – iPC DNP1UHSB
+Essentials,Riser Card Included,1U PCIe Riser DNP1URISER
+Supplemental Information,Description,Density-optimized 1U compute module designed for HPC and AI applications.Supports two 4th Gen Intel® Xeon® Scalable or Intel® Xeon® CPU Max Series processors and up to 16 DDR5 DIMMs.
+Memory & Storage,Memory Types,• DDR5 RDIMM• DDR5 3DS-RDIMM• DDR5 9x4 RDIMM
+Memory & Storage,# of Memory Slots,16
+Memory & Storage,Max Memory Size (dependent on memory type),2 TB
+Memory & Storage,# of Internal Drives Supported,2
+Memory & Storage,Internal Drive Form Factor,M.2 SSD
+Memory & Storage,Intel® Optane™ Persistent Memory Supported,No
+GPU Specifications,Integrated Graphics‡,Yes
+Expansion Options,PCI Express Revision,5.0
+Expansion Options,Riser Slot 1: Total # of Lanes,24
+Expansion Options,Riser Slot 2: Total # of Lanes,24
+I/O Specifications,# of USB Ports,3
+I/O Specifications,Total # of SATA Ports,2
+I/O Specifications,USB Configuration,• One USB 3.0 port on the front panel• Two USB 3.0 ports via breakout cable
+I/O Specifications,Max # of UPI Links,3
+I/O Specifications,# of Serial Ports,1
+I/O Specifications,Integrated LAN,10Gb Ethernet (RJ45) and 1Gb Ethernet (RJ45)
+I/O Specifications,# of LAN Ports,2
+Package Specifications,Max CPU Configuration,2
+Advanced Technologies,Advanced System Management key,Yes
+Advanced Technologies,Intel® Optane™ Memory Supported‡,No
+Advanced Technologies,Intel® Remote Management Module Support,Yes
+Advanced Technologies,Integrated BMC with IPMI,IPMI 2.0 and Redfish compliant
+Advanced Technologies,Intel® Node Manager,Yes
+Advanced Technologies,Intel® Virtualization Technology for Directed I/O (VT-d)‡,Yes
+Advanced Technologies,Intel® Rapid Storage Technology enterprise,Yes
+Advanced Technologies,TPM Version,2.0
+Security & Reliability,Intel® Total Memory Encryption,Yes
+Security & Reliability,Intel® Software Guard Extensions (Intel® SGX),Yes with Intel® SPS
+Security & Reliability,Intel® AES New Instructions,Yes
+Security & Reliability,Intel® Trusted Execution Technology‡,Yes

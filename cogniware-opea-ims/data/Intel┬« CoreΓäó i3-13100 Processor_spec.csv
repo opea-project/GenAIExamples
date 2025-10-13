@@ -1,0 +1,79 @@
+Section,Key,Value
+Essentials,Product Collection,13th Generation Intel® Core™ i3 Processors
+Essentials,Code Name,Products formerly Raptor Lake
+Essentials,Vertical Segment,Desktop
+Essentials,Processor Number,i3-13100
+Essentials,Lithography,Intel 7
+Essentials,Recommended Customer Price,$134.00-$144.00
+CPU Specifications,Total Cores,4
+CPU Specifications,# of Performance-cores,4
+CPU Specifications,# of Efficient-cores,0
+CPU Specifications,Total Threads,8
+CPU Specifications,Max Turbo Frequency,4.50 GHz
+CPU Specifications,Performance-core Max Turbo Frequency,4.50 GHz
+CPU Specifications,Performance-core Base Frequency,3.40 GHz
+CPU Specifications,Cache,12 MB Intel® Smart Cache
+CPU Specifications,Total L2 Cache,5 MB
+CPU Specifications,Processor Base Power,60 W
+CPU Specifications,Maximum Turbo Power,110 W
+Supplemental Information,Marketing Status,Launched
+Supplemental Information,Launch Date,Q1'23
+Supplemental Information,Embedded Options Available,Yes
+Supplemental Information,Use Conditions,PC/Client/Tablet
+Supplemental Information,Datasheet,View now
+Memory Specifications,Max Memory Size (dependent on memory type),192 GB
+Memory Specifications,Memory Types,Up to DDR5 4800 MT/sUp to DDR4 3200 MT/s
+Memory Specifications,Max # of Memory Channels,2
+Memory Specifications,Max Memory Bandwidth,76.8 GB/s
+GPU Specifications,GPU Name‡,Intel® UHD Graphics 730
+GPU Specifications,Graphics Base Frequency,300 MHz
+GPU Specifications,Graphics Max Dynamic Frequency,1.5 GHz
+GPU Specifications,Graphics Output,"eDP 1.4b, DP 1.4a, HDMI 2.1"
+GPU Specifications,Execution Units,24
+GPU Specifications,Max Resolution (HDMI)‡,4096 x 2160 @ 60Hz
+GPU Specifications,Max Resolution (DP)‡,7680 x 4320 @ 60Hz
+GPU Specifications,Max Resolution (eDP - Integrated Flat Panel)‡,5120 x 3200 @ 120Hz
+GPU Specifications,DirectX* Support,12
+GPU Specifications,OpenGL* Support,4.5
+GPU Specifications,OpenCL* Support,3.0
+GPU Specifications,Multi-Format Codec Engines,1
+GPU Specifications,Intel® Quick Sync Video,Yes
+GPU Specifications,Intel® Clear Video HD Technology,Yes
+GPU Specifications,# of Displays Supported‡,4
+GPU Specifications,Device ID,0x4692
+Expansion Options,Direct Media Interface (DMI) Revision,4.0
+Expansion Options,Max # of DMI Lanes,8
+Expansion Options,Scalability,1S Only
+Expansion Options,PCI Express Revision,5.0 and 4.0
+Expansion Options,PCI Express Configurations‡,"Up to 1x16+4, 2x8+4"
+Expansion Options,Max # of PCI Express Lanes,20
+Package Specifications,Sockets Supported,FCLGA1700
+Package Specifications,Max CPU Configuration,1
+Package Specifications,Thermal Solution Specification,PCG 2020C
+Package Specifications,TJUNCTION,100°C
+Package Specifications,Package Size,45.0 mm x 37.5 mm
+Package Specifications,Max Operating Temperature,100 °C
+Advanced Technologies,Intel® Gaussian & Neural Accelerator,3.0
+Advanced Technologies,Intel® Deep Learning Boost (Intel® DL Boost) on CPU,Yes
+Advanced Technologies,Intel® Speed Shift Technology,Yes
+Advanced Technologies,Intel® Turbo Boost Max Technology 3.0‡,No
+Advanced Technologies,Intel® Turbo Boost Technology‡,2.0
+Advanced Technologies,Intel® Hyper-Threading Technology‡,Yes
+Advanced Technologies,Intel® 64‡,Yes
+Advanced Technologies,Instruction Set,64-bit
+Advanced Technologies,Instruction Set Extensions,"Intel® SSE4.1, Intel® SSE4.2, Intel® AVX2"
+Advanced Technologies,Idle States,Yes
+Advanced Technologies,Enhanced Intel SpeedStep® Technology,Yes
+Advanced Technologies,Thermal Monitoring Technologies,Yes
+Advanced Technologies,Intel® Volume Management Device (VMD),Yes
+Security & Reliability,Intel® Standard Manageability (ISM)‡,Yes
+Security & Reliability,Intel® Secure Key,Yes
+Security & Reliability,Intel® Control-Flow Enforcement Technology,Yes
+Security & Reliability,Intel® AES New Instructions,Yes
+Security & Reliability,Intel® OS Guard,Yes
+Security & Reliability,Execute Disable Bit‡,Yes
+Security & Reliability,Intel® Boot Guard,Yes
+Security & Reliability,Mode-based Execute Control (MBEC),Yes
+Security & Reliability,Intel® Virtualization Technology (VT-x)‡,Yes
+Security & Reliability,Intel® Virtualization Technology for Directed I/O (VT-d)‡,Yes
+Security & Reliability,Intel® VT-x with Extended Page Tables (EPT)‡,Yes

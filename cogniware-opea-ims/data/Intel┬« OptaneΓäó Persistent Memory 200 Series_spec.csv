@@ -1,0 +1,14 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® Optane™ Persistent Memory 200 Series
+Essentials,Capacity,512 GB
+Essentials,Code Name,Products formerly Barlow Pass
+Essentials,Marketing Status,Discontinued
+Essentials,Launch Date,Q2'20
+Reliability,Operating Temperature Range,0°C to 85°C
+Reliability,Max Operating Temperature,85 °C
+Reliability,Minimum Operating Temperature,0 °C
+Reliability,Warranty Period,5  yrs
+Package Specifications,Weight,1.9 oz
+Package Specifications,Form Factor,Persistent Memory Module (PMem)
+Package Specifications,Interface,DDR-T
+Advanced Technologies,Hardware Encryption,AES 256 bit

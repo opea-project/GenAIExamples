@@ -1,0 +1,2 @@
+Product ID,Product Name,Cabling Type,MaxTDP,Port Configuration,Data Rate Per Port,System Interface Type
+225771,Intel® Ethernet Network Adapter I226-T1,"CAT5e, CAT6, CAT6A",,Single,10/100/1000/2.5GBASE-T(TX),PCIe 3.1 (5 GT/s)

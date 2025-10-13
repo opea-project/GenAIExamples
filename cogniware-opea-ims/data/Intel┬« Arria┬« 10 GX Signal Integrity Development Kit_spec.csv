@@ -1,0 +1,18 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® Arria® Development Kits
+Essentials,Marketing Status,Launched
+Essentials,Launch Date,2013
+Essentials,Featured FPGA,Intel® Arria® 10 GX FPGA 10AX115S2F45I1SG
+Essentials,Logic Elements (LE),1150000
+Essentials,On-chip Memory,65.7 Mb
+Essentials,DSP Blocks,1518
+Essentials,FPGA Package,SF45
+Essentials,Board Type,Signal Integrity
+Essentials,Ordering Part Number,DK-SI-10AX115S-A
+Essentials,Distributor Availability,ArrowDigiKeyMouser
+Board Specifications,Interfaces,"CFP2, QSFP+, SFP+, USB, JTAG, SMA"
+Board Specifications,Memory,DDR4
+Board Specifications,Special Feature,LCD
+Board Specifications,Versions,Production
+Supplemental Information,Description,Intel® Arria® 10 GX Transceiver Signal Integrity Development Kit delivers a complete design environment that includes all hardware and software you need to start taking advantage of the performance and capabilities available in Intel® Arria® 10 GX FPGAs.
+Supplemental Information,User Guide,View now

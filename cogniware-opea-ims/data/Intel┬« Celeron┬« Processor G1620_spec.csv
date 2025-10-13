@@ -1,0 +1,56 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® Celeron® Processor G Series
+Essentials,Code Name,Products formerly Ivy Bridge
+Essentials,Vertical Segment,Desktop
+Essentials,Processor Number,G1620
+Essentials,Lithography,22 nm
+CPU Specifications,Total Cores,2
+CPU Specifications,Total Threads,2
+CPU Specifications,Processor Base Frequency,2.70 GHz
+CPU Specifications,Cache,2 MB Intel® Smart Cache
+CPU Specifications,Bus Speed,5 GT/s
+CPU Specifications,TDP,55 W
+Supplemental Information,Marketing Status,Discontinued
+Supplemental Information,Launch Date,Q1'13
+Supplemental Information,Servicing Status,End of Servicing Lifetime
+Supplemental Information,End of Servicing Updates Date,"Tuesday, December 31, 2019"
+Supplemental Information,Embedded Options Available,Yes
+Supplemental Information,Use Conditions,PC/Client/Tablet
+Supplemental Information,Datasheet,View now
+Memory Specifications,Max Memory Size (dependent on memory type),32 GB
+Memory Specifications,Memory Types,DDR3 1333
+Memory Specifications,Max # of Memory Channels,2
+Memory Specifications,Max Memory Bandwidth,21 GB/s
+Memory Specifications,ECC Memory Supported‡,Yes
+GPU Specifications,GPU Name‡,Intel® HD Graphics for 3rd Generation Intel® Processors
+GPU Specifications,Graphics Base Frequency,650 MHz
+GPU Specifications,Graphics Max Dynamic Frequency,1.05 GHz
+GPU Specifications,Intel® Quick Sync Video,No
+GPU Specifications,Intel® InTru™ 3D Technology,No
+GPU Specifications,Intel® Clear Video HD Technology,No
+GPU Specifications,# of Displays Supported‡,3
+Expansion Options,Scalability,1S Only
+Expansion Options,PCI Express Revision,2.0
+Expansion Options,PCI Express Configurations‡,"up to 1x16, 2x8, 1x8 & 2x4"
+Package Specifications,Sockets Supported,FCLGA1155
+Package Specifications,Max CPU Configuration,1
+Package Specifications,Thermal Solution Specification,2011C
+Package Specifications,Package Size,37.5mm x 37.5mm
+Advanced Technologies,Intel® Optane™ Memory Supported‡,No
+Advanced Technologies,Intel® Turbo Boost Technology‡,No
+Advanced Technologies,Intel® Hyper-Threading Technology‡,No
+Advanced Technologies,Intel® 64‡,Yes
+Advanced Technologies,Instruction Set,64-bit
+Advanced Technologies,Instruction Set Extensions,"Intel® SSE4.1, Intel® SSE4.2"
+Advanced Technologies,Intel® My WiFi Technology,No
+Advanced Technologies,Idle States,Yes
+Advanced Technologies,Enhanced Intel SpeedStep® Technology,Yes
+Advanced Technologies,Thermal Monitoring Technologies,Yes
+Security & Reliability,Intel® Secure Key,No
+Security & Reliability,Intel® AES New Instructions,No
+Security & Reliability,Intel® Trusted Execution Technology‡,No
+Security & Reliability,Execute Disable Bit‡,Yes
+Security & Reliability,Anti-Theft Technology,No
+Security & Reliability,Intel® Virtualization Technology (VT-x)‡,Yes
+Security & Reliability,Intel® Virtualization Technology for Directed I/O (VT-d)‡,No
+Security & Reliability,Intel® VT-x with Extended Page Tables (EPT)‡,Yes

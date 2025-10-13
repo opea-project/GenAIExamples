@@ -1,0 +1,41 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® Server Board M10JNP
+Essentials,Code Name,Products formerly Juniper Pass
+Essentials,Marketing Status,Discontinued
+Essentials,Launch Date,Q4'19
+Essentials,EOL Announce,"Friday, July 1, 2022"
+Essentials,Last Order,"Monday, October 31, 2022"
+Essentials,Last Receipt Attributes,"Saturday, December 31, 2022"
+Essentials,Limited 3-year Warranty,Yes
+Essentials,Compatible Product Series,Intel® Xeon® E Processor
+Essentials,Board Form Factor,uATX
+Essentials,Socket,"Socket H4, FCLGA 1151"
+Essentials,Integrated BMC with IPMI,IPMI and Redfish
+Essentials,TDP,95 W
+Essentials,Included Items,Intel® Server Board M10JNP2SBI/O shield
+Essentials,Board Chipset,Intel® C246 Chipset
+Essentials,Target Market,Small and Medium Business
+Supplemental Information,Embedded Options Available,Yes
+Supplemental Information,Datasheet,View now
+Supplemental Information,Description,"Single socket solution for entry level servers in SMB, web hosting, content delivery, storage enterprise and embedded applications. Optimized for use with Intel® Xeon® E processor family. Flexible uATX form factor fitting into rack and pedestal  chassis."
+Memory Specifications,Max Memory Size (dependent on memory type),128 GB
+Memory Specifications,Memory Types,"DDR4 UDIMM ECC, 2666 MT/s, 1.2V"
+Memory Specifications,Max # of Memory Channels,2
+Memory Specifications,# of Memory Slots,4
+Memory Specifications,ECC Memory Supported‡,Yes
+GPU Specifications,Integrated Graphics‡,Yes
+GPU Specifications,Graphics Output,DDI ports
+Expansion Options,PCI Express Revision,"PCIe* 3.0 (3 ports,  2 x8, 1 x4)"
+Expansion Options,Max # of PCI Express Lanes,8
+Expansion Options,PCIe x4 Gen 3,1
+Expansion Options,PCIe x8 Gen 3,2
+I/O Specifications,# of USB Ports,4
+I/O Specifications,USB Configuration,4 x External USB 3.1 Gen2 ports2 x USB 3.1 Gen1 ports (via 2x10 pin connector)
+I/O Specifications,USB Revision,3.1
+I/O Specifications,Total # of SATA Ports,8
+I/O Specifications,RAID Configuration,RAID 0/1/10/5 (Intel RSTe)
+I/O Specifications,# of Serial Ports,2
+I/O Specifications,# of LAN Ports,4
+I/O Specifications,Integrated LAN,4 x 1Gbps LAN ports + 1 x 1Gbps management port
+Package Specifications,Max CPU Configuration,1
+Advanced Technologies,TPM Version,2.0 support

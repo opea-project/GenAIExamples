@@ -1,0 +1,23 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® Server Chassis P4000S Family
+Essentials,Code Name,Products formerly Union Peak
+Essentials,Launch Date,Q4'15
+Essentials,Marketing Status,Discontinued
+Essentials,Expected Discontinuance,Q3'20
+Essentials,EOL Announce,"Friday, July 19, 2019"
+Essentials,Last Order,"Sunday, July 5, 2020"
+Essentials,Last Receipt Attributes,"Monday, October 5, 2020"
+Essentials,Limited 3-year Warranty,Yes
+Essentials,Chassis Form Factor,4U Pedestal
+Essentials,Chassis Dimensions,"17.24"" x 21.5"" x 6.81"""
+Essentials,Target Market,Small Business/1st Server
+Essentials,Power Supply,460 W
+Essentials,Power Supply Type,AC
+Essentials,# of Power Supply Included,2
+Essentials,Redundant Fans,No
+Essentials,Redundant Power Supported,Yes
+Essentials,Backplanes,Sold Separately
+Essentials,Included Items,"(1) Front Panel assembly with cables, (2) 460W Power Supply Modules, (1) System rear fan assembly, (1) System PCIe zone fan assembly, (4) fixed mount drive trays, (2) ODD Slide Rail Assemblies, (1) 200mm chassis intrusion switch cable, (2) 150mm dual SATA Drive power cable, (1) SATA cable for onboard M.2 connector (42mm), (1) USB 3.0 cable"
+Supplemental Information,Description,"Supporting S1200SP board family, with 3.5 inch fixed drives,  redundant power supplies, optimized for thermal and acoustic performance.Note: FUPSESK kit is required to enable front panel USB ports when using with S1200SPS or S1200SPSR boards"
+Memory & Storage,# of Front Drives Supported,4
+Memory & Storage,Front Drive Form Factor,"Fixed 3.5"" HDD or 2.5"" SSD"

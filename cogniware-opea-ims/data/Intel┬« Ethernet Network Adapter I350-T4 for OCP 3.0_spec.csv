@@ -1,0 +1,24 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® Ethernet Server Adapter I350 Series
+Essentials,Marketing Status,Launched
+Essentials,Launch Date,Q4'19
+Essentials,Vertical Segment,Server
+Essentials,Cable Medium,Copper
+Essentials,Cabling Type,Cat 5 up to 100m
+Essentials,Bracket Height,OCP 3.0
+Essentials,Supported Operating Systems,intel.com/support/Ethernet
+Supplemental Information,Product Brief,View now
+Networking Specifications,Port Configuration,Quad
+Networking Specifications,Data Rate Per Port,1GbE
+Networking Specifications,Intel® Virtualization Technology for Connectivity (VT-c),Yes
+Networking Specifications,Speed & Slot Width,5 GT/s x4 Lane
+Networking Specifications,Controller,Intel® Ethernet Controller i350
+Package Specifications,System Interface Type,PCIe v2.1 (5.0 GT/s)
+Intel® Virtualization Technology for Connectivity,On-chip QoS and Traffic Management,Yes
+Intel® Virtualization Technology for Connectivity,Flexible Port Partitioning,Yes
+Intel® Virtualization Technology for Connectivity,Virtual Machine Device Queues (VMDq),Yes
+Intel® Virtualization Technology for Connectivity,PCI-SIG* SR-IOV Capable,Yes
+Advanced Technologies,iWARP/RDMA,No
+Advanced Technologies,Intel® Ethernet Power Management,Yes
+Advanced Technologies,Intelligent Offloads,Yes
+Advanced Technologies,Storage Over Ethernet,"iSCSI, NFS"

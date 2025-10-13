@@ -1,0 +1,53 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® Server System H2000G Family
+Essentials,Code Name,Products formerly Taylor Pass
+Essentials,Launch Date,Q2'17
+Essentials,Marketing Status,Discontinued
+Essentials,Expected Discontinuance,Q3'20
+Essentials,Limited 3-year Warranty,Yes
+Essentials,Extended Warranty Available for Purchase (Select Countries),Yes
+Essentials,Chassis Form Factor,2U Rack
+Essentials,Chassis Dimensions,"17.24"" x 28.86"" x 3.42"""
+Essentials,Board Form Factor,"Custom 6.8"" x 18.9"""
+Essentials,Socket,Socket R3
+Essentials,Heat Sink,8 (4x2)
+Essentials,Heat Sink Included,Yes
+Essentials,Target Market,Cloud/Datacenter
+Essentials,Rack-Friendly Board,Yes
+Essentials,Power Supply,1600 W
+Essentials,Power Supply Type,AC
+Essentials,# of Power Supply Included,1
+Essentials,Redundant Fans,No
+Essentials,Redundant Power Supported,Yes
+Essentials,Backplanes,Included
+Essentials,Included Items,"Intel® Server Chassis H2224XXXKR2 with four Hypervisor Nodes.  Each Hypervisor Node includes an Intel® Compute Module HNS2600TP24SR, Intel® Xeon® Processor E5-2650 v4 (x2), 16GB DDR 2400 (x8),  Intel® SSD DC P3700 2.5” 400GB (x1) and a Remote Management Module 4 Lite 2 (AXXRMM4LITE2)."
+Supplemental Information,Description,"Cloud Block for OnApp Scale System - Includes four Hypervisor Nodes with Intel Server Board, Chassis, Xeon E5 Processor, Intel Solid State Drives and memory, designed for OnApp and configured to add to a Starter System deployment for additional scaling."
+Memory & Storage,Memory Types,DDR4 ECC RDIMM 1600/1866/2133 DDR4 ECC LRDIMM 1600/1866/2133
+Memory & Storage,# of Memory Slots,16
+Memory & Storage,Max Memory Size (dependent on memory type),1 TB
+Memory & Storage,# of Front Drives Supported,24
+Memory & Storage,Front Drive Form Factor,"Hot-swap 2.5"""
+GPU Specifications,Integrated Graphics‡,No
+Expansion Options,PCIe x8 Gen 3,1
+Expansion Options,PCIe x16 Gen 3,1
+I/O Specifications,# of USB Ports,16
+I/O Specifications,Total # of SATA Ports,24
+I/O Specifications,# of Serial Ports,4
+I/O Specifications,Integrated LAN,4x (2x 1GbE + 2x 10GbE SFP+)
+I/O Specifications,# of LAN Ports,16
+Package Specifications,Max CPU Configuration,8
+Advanced Technologies,Intel® Remote Management Module Support,Yes
+Advanced Technologies,Integrated BMC with IPMI,IPMI 2.0
+Advanced Technologies,Intel® Node Manager,Yes
+Advanced Technologies,Intel® Advanced Management Technology,Yes
+Advanced Technologies,Intel® Server Customization Technology,Yes
+Advanced Technologies,Intel® Build Assurance Technology,Yes
+Advanced Technologies,Intel® Efficient Power Technology,Yes
+Advanced Technologies,Intel® Quiet Thermal Technology,Yes
+Advanced Technologies,Intel® Virtualization Technology for Directed I/O (VT-d)‡,Yes
+Advanced Technologies,Intel® Matrix Storage Technology,No
+Advanced Technologies,Intel® Quiet System Technology,Yes
+Advanced Technologies,Intel® Fast Memory Access,Yes
+Advanced Technologies,Intel® Flex Memory Access,Yes
+Advanced Technologies,Intel® I/O Acceleration Technology,Yes
+Advanced Technologies,TPM Version,2.0

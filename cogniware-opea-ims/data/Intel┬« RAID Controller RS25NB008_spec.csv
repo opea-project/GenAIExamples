@@ -1,0 +1,30 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® RAID Controllers
+Essentials,Marketing Status,Discontinued
+Essentials,Launch Date,Q3'11
+Essentials,Expected Discontinuance,1H'16
+Essentials,EOL Announce,"Wednesday, March 23, 2016"
+Essentials,Last Order,"Wednesday, September 28, 2016"
+Essentials,Last Receipt Attributes,"Friday, January 27, 2017"
+Essentials,Long Life,No
+Essentials,Target Market,Scalable Performance
+Essentials,Board Form Factor,Low Profile MD2 Card
+Essentials,Data Transfer Rate,6 Gb/s
+Essentials,Supported Devices,SAS/SATA
+Essentials,Supported Operating Systems,"Windows, Linux, Solaris, VMware"
+Essentials,Compatible Cache Backup Options,AXXRSBBU9
+Essentials,RAID Level Supported,"0, 1, 10, 5, 50, 6, 60"
+Essentials,JBOD Mode,No
+Essentials,# of Ports Internal,0
+Essentials,# of Ports External,8
+Essentials,# of Devices Supported,128
+Essentials,Cache Memory,1GB
+Essentials,PCIe Host Interface,PCIe x8 Gen2
+Essentials,IO Processor Model,LSI2208
+Essentials,Keying,PCIe x8 Connector
+Essentials,Connector Orientation,External 8088
+Essentials,Extended Warranty Available for Purchase (Select Countries),Yes
+Essentials,Additional Extended Warranty Details,Intel® RAID Extended Warranty
+Essentials,Additional Features,Support for Premium Feature Options
+Essentials,Included Items,"Raid Controller, Quick Start User Guide, 1 standard & 1 Low Profile bracket. No SAS Cables are included."
+Supplemental Information,Description,6G SAS RAID Controller with 8 external ports and dual core ROC. No cables included.  Optional Battery Backup Unit AXXRSBBU9.

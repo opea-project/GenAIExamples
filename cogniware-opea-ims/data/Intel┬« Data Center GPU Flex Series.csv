@@ -1,0 +1,4 @@
+Product ID,Product Name,Xe-cores,Ray Tracing Units,Memory Size,Graphics Memory Bandwidth,GpuMaxInt8Tops,# of Displays Supported‡
+240233,Intel® Data Center GPU Flex 170V,32,32,16 GB,576 GB/s,,0
+230020,Intel® Data Center GPU Flex 140,16,16,12 GB,336 GB/s,,0
+230019,Intel® Data Center GPU Flex 170,32,32,16 GB,576 GB/s,,0

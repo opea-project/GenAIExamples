@@ -1,0 +1,22 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® Communications Chipsets
+Essentials,Code Name,Products formerly Coleto Creek
+Essentials,Vertical Segment,Embedded
+Essentials,Marketing Status,Discontinued
+Essentials,Launch Date,Q4'13
+Essentials,TDP,20 W
+Essentials,Use Conditions,Communications Commercial Temp
+Supplemental Information,Embedded Options Available,Yes
+GPU Specifications,Integrated Graphics‡,No
+Expansion Options,PCI Support,Gen 1
+Expansion Options,PCI Express Revision,Gen 2 Endpoint
+Expansion Options,PCI Express Configurations‡,Endpoint x16
+I/O Specifications,# of USB Ports,6
+I/O Specifications,USB Revision,2.0
+I/O Specifications,USB 2.0,Yes
+I/O Specifications,Total # of SATA Ports,2
+I/O Specifications,Integrated LAN,No
+Package Specifications,Max CPU Configuration,2
+Package Specifications,Package Size,27mm x 27mm
+Advanced Technologies,Intel® Virtualization Technology for Directed I/O (VT-d)‡,Yes
+Advanced Technologies,Integrated Intel® QuickAssist Technology,Yes

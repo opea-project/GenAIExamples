@@ -1,0 +1,24 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® Server Chassis P4000S Family
+Essentials,Code Name,Products formerly Union Peak
+Essentials,Launch Date,Q1'12
+Essentials,Marketing Status,Discontinued
+Essentials,Expected Discontinuance,Q1'13
+Essentials,EOL Announce,"Sunday, March 31, 2013"
+Essentials,Last Order,"Monday, September 30, 2013"
+Essentials,Last Receipt Attributes,"Friday, January 31, 2014"
+Essentials,Limited 3-year Warranty,Yes
+Essentials,Extended Warranty Available for Purchase (Select Countries),Yes
+Essentials,Chassis Form Factor,4U Pedestal
+Essentials,Chassis Dimensions,"17.24"" x 21.5"" x 6.81"""
+Essentials,Target Market,Small and Medium Business
+Essentials,Power Supply,460 W
+Essentials,Power Supply Type,AC
+Essentials,# of Power Supply Included,2
+Essentials,Redundant Fans,Not Supported
+Essentials,Redundant Power Supported,"Supported, requires additional power supply"
+Essentials,Included Items,"(1) Intel® Server Chassis P4304XXSFDR- Pedestal form factor (6.81"" x 17.24"" x 21.5"")  (4) 3.5"" Fixed Drive Carriers, (2) 460W Common Redundant Power Supply (Gold Efficiency), (2)  92mm fixed fans. Airduct sold separately."
+Supplemental Information,Description,"A general purpose pedestal chassis supporting 3.5"" fixed HDDs, with redundant power supplies, optimized for thermal and acoustic performance."
+Memory & Storage,# of Front Drives Supported,4
+Memory & Storage,Front Drive Form Factor,"Fixed 2.5"" or 3.5"""
+Package Specifications,Max CPU Configuration,2

@@ -1,0 +1,20 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® MAX® 10 FPGA
+Essentials,Marketing Status,Launched
+Essentials,Launch Date,2014
+Essentials,Lithography,55 nm
+Resources,Logic Elements (LE),4000
+Resources,Fabric and I/O Phase-Locked Loops (PLLs),2
+Resources,Maximum Embedded Memory,189 Kb
+Resources,Digital Signal Processing (DSP) Format,Multiply
+Resources,Hard Memory Controllers,No
+Resources,External Memory Interfaces (EMIF),SRAM
+Resources,User-Flashable Memory,Yes
+Resources,Internal Configuration Storage,Yes
+I/O Specifications,Maximum User I/O Count†,246
+I/O Specifications,I/O Standards Support,"3.0 V to 3.3 V LVTTL, 1.0 V to 3.3 V LVCMOS, PCI, SSTL, HSTL, HSUL, Differential SSTL, Differential HSTL, Differential HSUL, LVDS, Mini-LVDS, RSDS, LVPECL, PPDS, BLVDS, TMDS, Sub-LVDS, SLVS, HiSpi"
+I/O Specifications,Maximum LVDS Pairs,15
+Advanced Technologies,FPGA Bitstream Security,Yes
+Advanced Technologies,Analog-to-Digital Converter,Yes
+Package Specifications,Package Options,"F256, U324, E144, M153, U169, U324"
+Supplemental Information,Additional Information,Product Table (Family Comparison)DatasheetAll FPGA Documentation

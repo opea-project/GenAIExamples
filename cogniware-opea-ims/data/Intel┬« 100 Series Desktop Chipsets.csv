@@ -1,0 +1,7 @@
+Product ID,Product Name,Supports Overclocking,PCI Express Revision,USB Revision
+90592,Intel® B150 Chipset,,3.0,"3.0, 2.0"
+90590,Intel® H110 Chipset,,2.0,"3.0, 2.0"
+90595,Intel® H170 Chipset,,3.0,"3.0, 2.0"
+90588,Intel® Q150 Chipset,,3.0,"3.0, 2.0"
+90587,Intel® Q170 Chipset,,3.0,"3.0, 2.0"
+90591,Intel® Z170 Chipset,"IA, BCLK, Memory",3.0,"3.0, 2.0"

@@ -1,0 +1,67 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® Server Board S2600TP Family
+Essentials,Code Name,Products formerly Taylor Pass
+Essentials,Marketing Status,Discontinued
+Essentials,Launch Date,Q1'17
+Essentials,Expected Discontinuance,Q3'20
+Essentials,EOL Announce,"Friday, July 19, 2019"
+Essentials,Last Order,"Sunday, July 5, 2020"
+Essentials,Last Receipt Attributes,"Monday, October 5, 2020"
+Essentials,Limited 3-year Warranty,Yes
+Essentials,Extended Warranty Available for Purchase (Select Countries),Yes
+Essentials,Additional Extended Warranty Details,Dual Processor Board Extended Warranty
+Essentials,# of QPI Links,2
+Essentials,Compatible Product Series,Intel® Xeon® Processor E5-2600 v4 Family
+Essentials,Board Form Factor,"Custom 6.8"" x 18.9"""
+Essentials,Chassis Form Factor,2U Rack
+Essentials,Socket,Socket R3
+Essentials,Integrated Systems Available,No
+Essentials,Integrated BMC with IPMI,IPMI 2.0
+Essentials,Rack-Friendly Board,Yes
+Essentials,TDP,160 W
+Essentials,Included Items,OEM 10 pack includes (10) Intel® Server Board S2600TPNR
+Essentials,Target Market,High Performance Computing
+Supplemental Information,Embedded Options Available,No
+Supplemental Information,Description,A high density server board supporting two Intel® Xeon® processor E5-2600 V3/V4 family and 16 DIMMs with two DIMMs per Channel designed for higher memory capability and I/O capability; an ideal option for high-performance computing and big data.
+Memory Specifications,Max Memory Size (dependent on memory type),1 TB
+Memory Specifications,Memory Types,DDR4-1600/1866/2133/2400
+Memory Specifications,Max # of Memory Channels,8
+Memory Specifications,Max Memory Bandwidth,153.6 GB/s
+Memory Specifications,Physical Address Extensions,46-bit
+Memory Specifications,# of Memory Slots,16
+Memory Specifications,ECC Memory Supported‡,Yes
+GPU Specifications,Integrated Graphics‡,Yes
+GPU Specifications,Graphics Output,VGA
+GPU Specifications,Discrete Graphics,Supported
+Expansion Options,PCI Express Revision,3.0
+Expansion Options,Max # of PCI Express Lanes,80
+Expansion Options,PCIe x16 Gen 3,2
+Expansion Options,Riser Slot 1: Total # of Lanes,16
+Expansion Options,Riser Slot 2: Total # of Lanes,24
+Expansion Options,Riser Slot 3: Total # of Lanes,24
+Expansion Options,Riser Slot 4: Total # of Lanes,16
+I/O Specifications,# of USB Ports,4
+I/O Specifications,USB Revision,2.0
+I/O Specifications,Total # of SATA Ports,5
+I/O Specifications,RAID Configuration,Up to SW Raid 5 (LSI RSTE)
+I/O Specifications,# of Serial Ports,1
+I/O Specifications,# of LAN Ports,2
+I/O Specifications,Integrated LAN,2x 1-GbE
+I/O Specifications,Firewire,No
+I/O Specifications,Embedded USB (eUSB) Solid State Drive Option,No
+I/O Specifications,Integrated SAS Ports,0
+I/O Specifications,Integrated InfiniBand*,No
+Package Specifications,Max CPU Configuration,2
+Advanced Technologies,Intel® Virtualization Technology for Directed I/O (VT-d)‡,Yes
+Advanced Technologies,Intel® Remote Management Module Support,Yes
+Advanced Technologies,Intel® Node Manager,Yes
+Advanced Technologies,Intel® Fast Memory Access,Yes
+Advanced Technologies,Intel® Flex Memory Access,Yes
+Advanced Technologies,Intel® I/O Acceleration Technology,Yes
+Advanced Technologies,Intel® Advanced Management Technology,Yes
+Advanced Technologies,Intel® Server Customization Technology,Yes
+Advanced Technologies,Intel® Build Assurance Technology,Yes
+Advanced Technologies,Intel® Efficient Power Technology,Yes
+Advanced Technologies,Intel® Quiet Thermal Technology,Yes
+Security & Reliability,Intel® AES New Instructions,Yes
+Security & Reliability,Intel® Trusted Execution Technology‡,No

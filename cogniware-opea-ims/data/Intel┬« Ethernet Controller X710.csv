@@ -1,0 +1,5 @@
+Product ID,Product Name,CablingDescription,TDP,Port Configuration,Data Rate Per Port,System Interface Type
+189534,Intel® Ethernet Controller X710-AT2,,9.5 W,Dual,"10/5/2.5/1GbE, 100Mb",PCIe 3.0 (8.0 GT/s)
+148601,Intel® Ethernet Controller X710-TM4,,9.8 W,Quad,"10/5/2.5/1GbE, 100Mb",PCIe 3.0 (8.0 GT/s)
+82944,Intel® Ethernet Controller X710-AM2,,7 W,Dual,10GbE/1GbE,PCIe v3.0 (8.0 GT/s)
+93098,Intel® Ethernet Controller X710-BM2,,7 W,Dual,10/1GbE,PCIe v3.0 (8.0 GT/s)

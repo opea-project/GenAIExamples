@@ -1,0 +1,23 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® Ethernet Controller I226 Series
+Essentials,Code Name,Products formerly Foxville
+Essentials,Marketing Status,Launched
+Essentials,Launch Date,Q2'22
+Essentials,Expected Discontinuance,1H'33
+Essentials,Lithography,28 nm
+Essentials,TDP,1.3 W
+Essentials,Recommended Customer Price,$2.87
+Essentials,Operating Temperature Range,0°C to 70°C
+Essentials,Max Operating Temperature,70 °C
+Essentials,Minimum Operating Temperature,0 °C
+Essentials,Use Conditions,PC/Client/Tablet
+Supplemental Information,Embedded Options Available,No
+Networking Specifications,Port Configuration,Single
+Networking Specifications,Data Rate Per Port,2.5G
+Networking Specifications,System Interface Type,PCIe 3.1
+Networking Specifications,NC Sideband Interface,No
+Networking Specifications,Jumbo Frames Supported,Yes
+Networking Specifications,Speed & Slot Width,"5G, x1"
+Networking Specifications,Interfaces Supported,NBASE-T
+Package Specifications,Package Size,7x7mm
+Advanced Technologies,IEEE 1588,Yes

@@ -1,0 +1,23 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® Wireless 9000 Series
+Essentials,Code Name,Products formerly Jefferson Peak
+Essentials,Marketing Status,Launched
+Essentials,Launch Date,Q4'17
+Essentials,Weight (in grams),2.7
+Essentials,Operating Temperature Range,0 °C to 50 °C
+Essentials,Max Operating Temperature,50 °C
+Essentials,Minimum Operating Temperature,0 °C
+Essentials,Supported Operating Systems,"Windows 11, 64-bit*, Windows 10, 64-bit*, Linux*"
+Essentials,Antenna,1x1
+Networking Specifications,TX/RX Streams,1x1 (Diversity)
+Networking Specifications,Bands,"2.4, 5 GHz"
+Networking Specifications,Max Speed,433 Mbps
+Networking Specifications,Wi-Fi CERTIFIED*,Wi-Fi 5 (802.11ac)
+Networking Specifications,Compliance,"FIPS, FISMA"
+Networking Specifications,Integrated Bluetooth,Yes
+Networking Specifications,Bluetooth Version,5.1
+Package Specifications,Board Form Factor,"M.2 2230, M.2 1216"
+Package Specifications,Package Size,"22mm x 30mm x 2.4mm, 12mm x 16mm x 1.57mm"
+Package Specifications,System Interface Type,M.2: CNVio
+Advanced Technologies,MU-MIMO,Yes
+Advanced Technologies,Supported Under Intel vPro® Technology,No

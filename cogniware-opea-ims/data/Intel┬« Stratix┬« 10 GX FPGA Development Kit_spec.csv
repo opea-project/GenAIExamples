@@ -1,0 +1,17 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® Stratix® Development Kits
+Essentials,Marketing Status,Discontinued
+Essentials,Launch Date,2013
+Essentials,Featured FPGA,Intel® Stratix® 10 GX FPGA 1SG280LU2F50E2VG
+Essentials,Logic Elements (LE),2753000
+Essentials,On-chip Memory,244 Mb
+Essentials,DSP Blocks,5760
+Essentials,FPGA Package,F50
+Essentials,Board Type,PCIe
+Essentials,Ordering Part Number,DK-DEV-1SGX-L-A
+Board Specifications,Interfaces,"PCIe EP, JTAG, USB"
+Board Specifications,Expansion,"FMC, HiLo"
+Board Specifications,Memory,DDR4
+Board Specifications,Versions,Production L-Tile
+Supplemental Information,Description,Intel® Stratix® 10 GX FPGA Development Kit delivers a complete design environment that includes all hardware and software you need to start taking advantage of the performance and capabilities available in Intel Stratix 10 GX FPGAs for your design needs.
+Supplemental Information,User Guide,View now

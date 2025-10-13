@@ -1,0 +1,50 @@
+Product ID,Product Name,Launch Date,Total Cores,Max Turbo Frequency,Cache,GPU Name‡
+78934,Intel® Core™ i7-4720HQ Processor,Q1'15,4,3.60 GHz,6 MB,Intel® HD Graphics 4600
+78935,Intel® Core™ i7-4722HQ Processor,Q1'15,4,3.40 GHz,6 MB,Intel® HD Graphics 4600
+83506,Intel® Core™ i7-4578U Processor,Q3'14,2,3.50 GHz,4 MB,Intel® Iris® Graphics 5100
+83505,Intel® Core™ i7-4770HQ Processor,Q3'14,4,3.40 GHz,6 MB,Intel® Iris® Pro Graphics 5200
+83504,Intel® Core™ i7-4870HQ Processor,Q3'14,4,3.70 GHz,6 MB,Intel® Iris® Pro Graphics 5200
+83503,Intel® Core™ i7-4980HQ Processor,Q3'14,4,4.00 GHz,6 MB,Intel® Iris® Pro Graphics 5200
+80807,Intel® Core™ i7-4790K Processor,Q2'14,4,4.40 GHz,8 MB Intel® Smart Cache,Intel® HD Graphics 4600
+80814,Intel® Core™ i7-4785T Processor,Q2'14,4,3.20 GHz,8 MB Intel® Smart Cache,Intel® HD Graphics 4600
+80806,Intel® Core™ i7-4790 Processor,Q2'14,4,4.00 GHz,8 MB Intel® Smart Cache,Intel® HD Graphics 4600
+80808,Intel® Core™ i7-4790S Processor,Q2'14,4,4.00 GHz,8 MB Intel® Smart Cache,Intel® HD Graphics 4600
+80809,Intel® Core™ i7-4790T Processor,Q2'14,4,3.90 GHz,8 MB Intel® Smart Cache,Intel® HD Graphics 4600
+81015,Intel® Core™ i7-4510U Processor,Q2'14,2,3.10 GHz,4 MB Intel® Smart Cache,Intel® HD Graphics 4400
+78930,Intel® Core™ i7-4710HQ Processor,Q2'14,4,3.50 GHz,6 MB Intel® Smart Cache,Intel® HD Graphics 4600
+78931,Intel® Core™ i7-4710MQ Processor,Q2'14,4,3.50 GHz,6 MB Intel® Smart Cache,Intel® HD Graphics 4600
+78932,Intel® Core™ i7-4712HQ Processor,Q2'14,4,3.30 GHz,6 MB Intel® Smart Cache,Intel® HD Graphics 4600
+78933,Intel® Core™ i7-4712MQ Processor,Q2'14,4,3.30 GHz,6 MB Intel® Smart Cache,Intel® HD Graphics 4600
+76090,Intel® Core™ i7-4760HQ Processor,Q2'14,4,3.30 GHz,6 MB Intel® Smart Cache,Intel® Iris® Pro Graphics 5200
+75555,Intel® Core™ i7-4700EC Processor,Q1'14,4,,8 MB Intel® Smart Cache,
+75556,Intel® Core™ i7-4702EC Processor,Q1'14,4,,8 MB Intel® Smart Cache,
+80345,Intel® Core™ i7-4610M Processor,Q1'14,2,3.70 GHz,4 MB Intel® Smart Cache,Intel® HD Graphics 4600
+78937,Intel® Core™ i7-4810MQ Processor,Q1'14,4,3.80 GHz,6 MB Intel® Smart Cache,Intel® HD Graphics 4600
+76089,Intel® Core™ i7-4860HQ Processor,Q1'14,4,3.60 GHz,6 MB Intel® Smart Cache,Intel® Iris® Pro Graphics 5200
+78939,Intel® Core™ i7-4910MQ Processor,Q1'14,4,3.90 GHz,8 MB Intel® Smart Cache,Intel® HD Graphics 4600
+76349,Intel® Core™ i7-4600M Processor,Q4'13,2,3.60 GHz,4 MB Intel® Smart Cache,Intel® HD Graphics 4600
+76616,Intel® Core™ i7-4600U Processor,Q3'13,2,3.30 GHz,4 MB Intel® Smart Cache,Intel® HD Graphics 4400
+76618,Intel® Core™ i7-4610Y Processor,Q3'13,2,2.90 GHz,4 MB Intel® Smart Cache,Intel® HD Graphics 4200
+77656,Intel® Core™ i7-4771 Processor,Q3'13,4,3.90 GHz,8 MB Intel® Smart Cache,Intel® HD Graphics 4600
+76088,Intel® Core™ i7-4960HQ Processor,Q4'13,4,3.80 GHz,6 MB Intel® Smart Cache,Intel® Iris® Pro Graphics 5200
+76087,Intel® Core™ i7-4750HQ Processor,Q3'13,4,3.20 GHz,6 MB Intel® Smart Cache,Intel® Iris® Pro Graphics 5200
+76086,Intel® Core™ i7-4850HQ Processor,Q3'13,4,3.50 GHz,6 MB Intel® Smart Cache,Intel® Iris® Pro Graphics 5200
+76085,Intel® Core™ i7-4950HQ Processor,Q3'13,4,3.60 GHz,6 MB Intel® Smart Cache,Intel® Iris® Pro Graphics 5200
+75460,Intel® Core™ i7-4500U Processor,Q3'13,2,3.00 GHz,4 MB Intel® Smart Cache,Intel® HD Graphics 4400
+75112,Intel® Core™ i7-4550U Processor,Q3'13,2,3.00 GHz,4 MB Intel® Smart Cache,Intel® HD Graphics 5000
+75992,Intel® Core™ i7-4558U Processor,Q3'13,2,3.30 GHz,4 MB Intel® Smart Cache,Intel® Iris® Graphics 5100
+75114,Intel® Core™ i7-4650U Processor,Q3'13,2,3.30 GHz,4 MB Intel® Smart Cache,Intel® HD Graphics 5000
+76642,Intel® Core™ i7-4770R Processor,Q2'13,4,3.90 GHz,6 MB Intel® Smart Cache,Intel® Iris® Pro Graphics 5200
+75469,Intel® Core™ i7-4700EQ Processor,Q2'13,4,3.40 GHz,6 MB Intel® Smart Cache,Intel® HD Graphics 4600
+75116,Intel® Core™ i7-4700HQ Processor,Q2'13,4,3.40 GHz,6 MB Intel® Smart Cache,Intel® HD Graphics 4600
+75117,Intel® Core™ i7-4700MQ Processor,Q2'13,4,3.40 GHz,6 MB Intel® Smart Cache,Intel® HD Graphics 4600
+75118,Intel® Core™ i7-4702HQ Processor,Q2'13,4,3.20 GHz,6 MB Intel® Smart Cache,Intel® HD Graphics 4600
+75119,Intel® Core™ i7-4702MQ Processor,Q2'13,4,3.20 GHz,6 MB Intel® Smart Cache,Intel® HD Graphics 4600
+75121,Intel® Core™ i7-4765T Processor,Q2'13,4,3.00 GHz,8 MB Intel® Smart Cache,Intel® HD Graphics 4600
+75122,Intel® Core™ i7-4770 Processor,Q2'13,4,3.90 GHz,8 MB Intel® Smart Cache,Intel® HD Graphics 4600
+75123,Intel® Core™ i7-4770K Processor,Q2'13,4,3.90 GHz,8 MB Intel® Smart Cache,Intel® HD Graphics 4600
+75124,Intel® Core™ i7-4770S Processor,Q2'13,4,3.90 GHz,8 MB Intel® Smart Cache,Intel® HD Graphics 4600
+75125,Intel® Core™ i7-4770T Processor,Q2'13,4,3.70 GHz,8 MB Intel® Smart Cache,Intel® HD Graphics 4600
+75610,Intel® Core™ i7-4770TE Processor,Q2'13,4,3.30 GHz,8 MB Intel® Smart Cache,Intel® HD Graphics 4600
+75128,Intel® Core™ i7-4800MQ Processor,Q2'13,4,3.70 GHz,6 MB Intel® Smart Cache,Intel® HD Graphics 4600
+75131,Intel® Core™ i7-4900MQ Processor,Q2'13,4,3.80 GHz,8 MB Intel® Smart Cache,Intel® HD Graphics 4600

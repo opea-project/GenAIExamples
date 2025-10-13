@@ -1,0 +1,2 @@
+Product ID,Product Name,Cabling Type,TDP,Port Configuration,Data Rate Per Port,System Interface Type
+68668,Intel® Ethernet Server Adapter I210-T1,"RJ45 Category 5, up to 100 m",1 W,Single,10/100/1000 Mbps,PCIe v2.1 (2.5 GT/s)

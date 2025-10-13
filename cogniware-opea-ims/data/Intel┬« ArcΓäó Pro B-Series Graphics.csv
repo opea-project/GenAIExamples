@@ -1,0 +1,3 @@
+Product ID,Product Name,Xe-cores,Ray Tracing Units,DiscreteGraphicsDedicatedMemoryGB,Graphics Memory Bandwidth,GPU Peak TOPS (Int8),# of Displays Supported‡
+242615,Intel® Arc™ Pro B50 Graphics,16,16,,224 GB/s,170,4
+243916,Intel® Arc™ Pro B60 Graphics,20,20,,456 GB/s,197,4

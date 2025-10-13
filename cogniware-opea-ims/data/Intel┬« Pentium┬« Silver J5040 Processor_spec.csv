@@ -1,0 +1,73 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® Pentium® Silver Processor Series
+Essentials,Code Name,Products formerly Gemini Lake Refresh
+Essentials,Vertical Segment,Mobile
+Essentials,Processor Number,J5040
+Essentials,Lithography,14 nm
+CPU Specifications,Total Cores,4
+CPU Specifications,Total Threads,4
+CPU Specifications,Burst Frequency,3.20 GHz
+CPU Specifications,Processor Base Frequency,2.00 GHz
+CPU Specifications,Cache,4 MB
+CPU Specifications,TDP,10 W
+Supplemental Information,Marketing Status,Discontinued
+Supplemental Information,Launch Date,Q4'19
+Supplemental Information,Embedded Options Available,No
+Supplemental Information,Use Conditions,PC/Client/Tablet
+Memory Specifications,Max Memory Size (dependent on memory type),8 GB
+Memory Specifications,Memory Types,DDR4/LPDDR4 upto 2400 MT/s
+Memory Specifications,Max # of Memory Channels,2
+Memory Specifications,ECC Memory Supported‡,No
+GPU Specifications,GPU Name‡,Intel® UHD Graphics 605
+GPU Specifications,Graphics Base Frequency,250 MHz
+GPU Specifications,Graphics Burst Frequency,800 MHz
+GPU Specifications,Graphics Video Max Memory,8 GB
+GPU Specifications,Graphics Output,eDP/DP/HDMI/MIPI-DSI
+GPU Specifications,Execution Units,18
+GPU Specifications,4K Support,"Yes, at 60Hz"
+GPU Specifications,Max Resolution (HDMI)‡,4096x2160@30Hz
+GPU Specifications,Max Resolution (DP)‡,4096x2160@60Hz
+GPU Specifications,Max Resolution (eDP - Integrated Flat Panel)‡,4096x2160@60Hz
+GPU Specifications,DirectX* Support,12
+GPU Specifications,OpenGL* Support,4.4
+GPU Specifications,Intel® Quick Sync Video,Yes
+GPU Specifications,# of Displays Supported‡,3
+GPU Specifications,Device ID,0x3184
+Expansion Options,PCI Express Revision,2.0
+Expansion Options,PCI Express Configurations‡,1x4 + 1x2 or 4x1 or 2x1+1x2 + 1x2
+Expansion Options,Max # of PCI Express Lanes,6
+I/O Specifications,# of USB Ports,8
+I/O Specifications,USB Revision,2.0/3.0
+I/O Specifications,Total # of SATA Ports,2
+I/O Specifications,Integrated LAN,No
+I/O Specifications,Integrated Wireless‡,Intel® Wireless-AC MAC
+I/O Specifications,General Purpose IO,Yes
+I/O Specifications,UART,Yes
+I/O Specifications,Max # of SATA 6.0 Gb/s Ports,2
+Package Specifications,Sockets Supported,FCBGA1090
+Package Specifications,Max CPU Configuration,1
+Package Specifications,TJUNCTION,105°C
+Package Specifications,Package Size,25mm x 24mm
+Advanced Technologies,Intel® Optane™ Memory Supported‡,No
+Advanced Technologies,Intel® Speed Shift Technology,No
+Advanced Technologies,Intel® Turbo Boost Max Technology 3.0‡,No
+Advanced Technologies,Intel® Turbo Boost Technology‡,No
+Advanced Technologies,Intel® Hyper-Threading Technology‡,No
+Advanced Technologies,Intel® 64‡,Yes
+Advanced Technologies,Instruction Set,64-bit
+Advanced Technologies,Instruction Set Extensions,Intel® SSE4.2
+Advanced Technologies,Idle States,Yes
+Advanced Technologies,Enhanced Intel SpeedStep® Technology,Yes
+Advanced Technologies,Thermal Monitoring Technologies,Yes
+Advanced Technologies,Intel® Identity Protection Technology‡,Yes
+Advanced Technologies,Intel® Smart Response Technology,No
+Security & Reliability,Intel® Secure Key,Yes
+Security & Reliability,Intel® AES New Instructions,Yes
+Security & Reliability,Intel® Software Guard Extensions (Intel® SGX),Yes with Intel® ME
+Security & Reliability,Intel® Memory Protection Extensions (Intel® MPX),Yes
+Security & Reliability,Execute Disable Bit‡,Yes
+Security & Reliability,Anti-Theft Technology,No
+Security & Reliability,Intel® OS Guard,Yes
+Security & Reliability,Intel® Virtualization Technology (VT-x)‡,Yes
+Security & Reliability,Intel® Virtualization Technology for Directed I/O (VT-d)‡,Yes
+Security & Reliability,Intel® VT-x with Extended Page Tables (EPT)‡,Yes

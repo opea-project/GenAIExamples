@@ -1,0 +1,4 @@
+Product ID,Product Name,CablingDescription,TDP,Port Configuration,Data Rate Per Port,System Interface Type
+184681,Intel® Ethernet Controller I225-IT,,2 W,Single,2.5GbE,PCIe 3.1
+184675,Intel® Ethernet Controller I225-LM,,2 W,Single,2.5GbE,PCIe
+184676,Intel® Ethernet Controller I225-V,,1.95 W,Single,2.5GbE,PCIe

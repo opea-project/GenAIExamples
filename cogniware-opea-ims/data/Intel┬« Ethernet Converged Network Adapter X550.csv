@@ -1,0 +1,2 @@
+Product ID,Product Name,Cabling Type,MaxTDP,Port Configuration,Data Rate Per Port,System Interface Type
+88209,Intel® Ethernet Converged Network Adapter X550-T2,RJ45 Category 6 up to 55m; Category 6A up to 100m,,Dual,10GbE/5GbE/2.5GbE/1GbE/100Mb,PCIe v3.0 (8.0 GT/s)

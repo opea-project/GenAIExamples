@@ -1,0 +1,28 @@
+Section,Key,Value
+Essentials,Product Collection,Intel Agilex® 7 FPGAs and SoC FPGAs F-Series
+Essentials,Marketing Status,Launched
+Essentials,Launch Date,Q2'19
+Essentials,Lithography,10 nm
+Resources,Logic Elements (LE),2208075
+Resources,Adaptive Logic Modules (ALM),748500
+Resources,Adaptive Logic Module (ALM) Registers,2994000
+Resources,Fabric and I/O Phase-Locked Loops (PLLs),28
+Resources,Maximum Embedded Memory,235 Mb
+Resources,Digital Signal Processing (DSP) Blocks,6250
+Resources,Digital Signal Processing (DSP) Format,"Fixed Point (hard IP), Floating Point (hard IP), Multiply, Multiply and Accumulate, Variable Precision"
+Resources,Hard Processor System (HPS),Quad-core 64 bit Arm* Cortex*-A53
+Resources,Hard Crypto Blocks,0
+Resources,Hard Memory Controllers,Yes
+Resources,External Memory Interfaces (EMIF),"DDR4, QDR IV"
+I/O Specifications,Maximum User I/O Count†,624
+I/O Specifications,I/O Standards Support,"1.2 V LVCMOS, 1.8 V LVCMOS, SSTL, POD, HSTL, HSUL, Differential SSTL, Differential POD, Differential HSTL, Differential HSUL, True Differential Signaling"
+I/O Specifications,Maximum LVDS Pairs,312
+I/O Specifications,Maximum Non-Return to Zero (NRZ) Transceivers†,24
+I/O Specifications,Maximum Non-Return to Zero (NRZ) Data Rate†,28.9 Gbps
+I/O Specifications,Maximum Pulse-Amplitude Modulation (PAM4) Transceivers†,12
+I/O Specifications,Maximum Pulse-Amplitude Modulation (PAM4) Data Rate†,57.8 Gbps
+I/O Specifications,Transceiver Protocol Hard IP,"PCIe Gen4, 10/25/100G Ethernet"
+Advanced Technologies,Hyper-Registers,Yes
+Advanced Technologies,FPGA Bitstream Security,Yes
+Package Specifications,Package Options,R2581A
+Supplemental Information,Additional Information,Product Table (Family Comparison)DatasheetAll FPGA Documentation

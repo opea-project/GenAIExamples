@@ -1,0 +1,57 @@
+Section,Key,Value
+Essentials,Product Collection,Intel Atom® Processor X Series
+Essentials,Code Name,Products formerly Alder Lake-N
+Essentials,Vertical Segment,Embedded
+Essentials,Processor Number,X7213E
+Essentials,Lithography,Intel 7
+Essentials,Recommended Customer Price,$47.00
+CPU Specifications,Total Cores,2
+CPU Specifications,Max Turbo Frequency,3.20 GHz
+CPU Specifications,Cache,6 MB
+CPU Specifications,TDP,10 W
+Supplemental Information,Marketing Status,Launched
+Supplemental Information,Launch Date,Q1'23
+Supplemental Information,Embedded Options Available,Yes
+Supplemental Information,Use Conditions,Embedded Broad Market Commercial Temp
+Memory Specifications,Max Memory Size (dependent on memory type),32 GB
+Memory Specifications,Memory Types,DDR4 3200 MT/sDDR5 4800 MT/sLPDDR5 4800 MT/s
+Memory Specifications,Maximum Memory Speed,4800 MHz
+Memory Specifications,Max # of Memory Channels,1
+GPU Specifications,GPU Name‡,Intel® UHD Graphics
+GPU Specifications,Graphics Max Dynamic Frequency,1.00 GHz
+GPU Specifications,Graphics Output,"eDP 1.4b, DP 1.4, HDMI 2.1, MIPI-DSI 1.3"
+GPU Specifications,Execution Units,16
+GPU Specifications,4K Support,"Yes, at 60Hz"
+GPU Specifications,Max Resolution (HDMI)‡,4096 x 2160@60Hz
+GPU Specifications,Max Resolution (DP)‡,4096 x 2160@60Hz
+GPU Specifications,DirectX* Support,12.1
+GPU Specifications,OpenGL* Support,4.6
+GPU Specifications,OpenCL* Support,3.0
+GPU Specifications,Intel® Quick Sync Video,Yes
+GPU Specifications,# of Displays Supported‡,3
+Expansion Options,Chipset / PCH PCIe Revision,Gen 3
+Expansion Options,Max # of PCI Express Lanes,9
+I/O Specifications,USB Revision,2.0/3.2
+I/O Specifications,General Purpose IO,Yes
+Package Specifications,Sockets Supported,FCBGA1264
+Package Specifications,Max CPU Configuration,1
+Package Specifications,TJUNCTION,105°C
+Package Specifications,Max Operating Temperature,105 °C
+Package Specifications,Package Size,35mm x 24mm
+Advanced Technologies,Intel® Gaussian & Neural Accelerator,3.0
+Advanced Technologies,Intel® Smart Sound Technology,Yes
+Advanced Technologies,Intel® Wake on Voice,Yes
+Advanced Technologies,Intel® High Definition Audio,Yes
+Advanced Technologies,MIPI SoundWire*,1.2
+Advanced Technologies,Intel® Speed Shift Technology,Yes
+Advanced Technologies,Intel® Hyper-Threading Technology‡,No
+Advanced Technologies,Instruction Set,64-bit
+Advanced Technologies,Instruction Set Extensions,"Intel® SSE4.1, Intel® SSE4.2, Intel® AVX2"
+Advanced Technologies,Enhanced Intel SpeedStep® Technology,Yes
+Advanced Technologies,Thermal Monitoring Technologies,Yes
+Security & Reliability,Intel® AES New Instructions,Yes
+Security & Reliability,Intel® OS Guard,Yes
+Security & Reliability,Intel® Boot Guard,Yes
+Security & Reliability,Intel® Virtualization Technology (VT-x)‡,Yes
+Security & Reliability,Intel® Virtualization Technology for Directed I/O (VT-d)‡,Yes
+Security & Reliability,Intel® VT-x with Extended Page Tables (EPT)‡,Yes

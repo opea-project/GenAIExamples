@@ -1,0 +1,11 @@
+Product ID,Product Name,Launch Date,Total Cores,ClockSpeedMax,Processor Base Frequency,Cache,TDP
+189270,Intel® Celeron® Processor 3867U,Q1'19,2,,1.80 GHz,2 MB Intel® Smart Cache,15 W
+122698,Intel® Celeron® Processor 3965Y,Q2'17,2,,1.50 GHz,2 MB Intel® Smart Cache,6 W
+96507,Intel® Celeron® Processor 3865U,Q1'17,2,,1.80 GHz,2 MB Intel® Smart Cache,15 W
+96506,Intel® Celeron® Processor 3965U,Q1'17,2,,2.20 GHz,2 MB Intel® Smart Cache,15 W
+92211,Intel® Celeron® Processor 3855U,Q4'15,2,,1.60 GHz,2 MB Intel® Smart Cache,15 W
+92213,Intel® Celeron® Processor 3955U,Q4'15,2,,2.00 GHz,2 MB Intel® Smart Cache,15 W
+84810,Intel® Celeron® Processor 3215U,Q2'15,2,,1.70 GHz,2 MB,15 W
+84812,Intel® Celeron® Processor 3765U,Q2'15,2,,1.90 GHz,2 MB,15 W
+84809,Intel® Celeron® Processor 3205U,Q1'15,2,,1.50 GHz,2 MB,15 W
+84811,Intel® Celeron® Processor 3755U,Q1'15,2,,1.70 GHz,2 MB,15 W

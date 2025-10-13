@@ -1,0 +1,17 @@
+Section,Key,Value
+Ordering and Spec Information,,
+"Intel® Ethernet Controller I226-IT, T&R",Ordering Code,KTI226IT
+"Intel® Ethernet Controller I226-IT, T&R",Spec Code,SRKTW
+"Intel® Ethernet Controller I226-IT, T&R",Shipping Media,T&R
+"Intel® Ethernet Controller I226-IT, T&R",Stepping,C0
+"Intel® Ethernet Controller I226-IT, T&R",MDDS Content IDs,758771
+"Intel® Ethernet Controller I226-IT, T&R",Recommended Customer Price,$7.02
+"Intel® Ethernet Controller I226-IT, Tray",Ordering Code,KTI226IT
+"Intel® Ethernet Controller I226-IT, Tray",Spec Code,SRKTX
+"Intel® Ethernet Controller I226-IT, Tray",Shipping Media,TRAY
+"Intel® Ethernet Controller I226-IT, Tray",Stepping,C0
+"Intel® Ethernet Controller I226-IT, Tray",MDDS Content IDs,758771
+"Intel® Ethernet Controller I226-IT, Tray",Recommended Customer Price,$7.02
+Trade Compliance Information,ECCN,5A991.B.4.A
+Trade Compliance Information,CCATS,NA
+Trade Compliance Information,US HTS,8542310030

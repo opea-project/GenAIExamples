@@ -1,0 +1,21 @@
+Section,Key,Value
+Essentials,Product Collection,Cyclone® V E FPGA
+Essentials,Marketing Status,Launched
+Essentials,Launch Date,2011
+Essentials,Lithography,28 nm
+Resources,Logic Elements (LE),25000
+Resources,Adaptive Logic Modules (ALM),9434
+Resources,Adaptive Logic Module (ALM) Registers,37736
+Resources,Fabric and I/O Phase-Locked Loops (PLLs),4
+Resources,Maximum Embedded Memory,1.956 Mb
+Resources,Digital Signal Processing (DSP) Blocks,25
+Resources,Digital Signal Processing (DSP) Format,Variable Precision
+Resources,Hard Memory Controllers,Yes
+Resources,External Memory Interfaces (EMIF),"DDR2, DDR3, LPDDR2"
+I/O Specifications,Maximum User I/O Count†,224
+I/O Specifications,I/O Standards Support,"3.0 V to 3.3 V LVTTL, 1.2 V to 3.3 V LVCMOS, PCI, PCI-X, SSTL, HSTL, HSUL, Differential SSTL, Differential HSTL, Differential HSUL, LVDS, Mini-LVDS, RSDS, LVPECL, HiSpi, SLVS, Sub-LVDS"
+I/O Specifications,Maximum LVDS Pairs,112
+Advanced Technologies,FPGA Bitstream Security,Yes
+Advanced Technologies,Analog-to-Digital Converter,No
+Package Specifications,Package Options,"M383, U324, U484, F256, F484"
+Supplemental Information,Additional Information,Product Table (Family Comparison)DatasheetAll FPGA Documentation

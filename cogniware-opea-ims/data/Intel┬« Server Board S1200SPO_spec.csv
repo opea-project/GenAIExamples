@@ -1,0 +1,57 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® Server Board S1200SP Family
+Essentials,Code Name,Products formerly Silver Pass
+Essentials,Marketing Status,Discontinued
+Essentials,Launch Date,Q4'15
+Essentials,Expected Discontinuance,Q1'16
+Essentials,EOL Announce,"Tuesday, November 15, 2016"
+Essentials,Last Order,"Monday, January 30, 2017"
+Essentials,Last Receipt Attributes,"Monday, March 13, 2017"
+Essentials,Limited 3-year Warranty,Yes
+Essentials,Extended Warranty Available for Purchase (Select Countries),Yes
+Essentials,Additional Extended Warranty Details,Single Processor Board Extended Warranty
+Essentials,# of QPI Links,0
+Essentials,Compatible Product Series,Intel® Xeon® Processor E3-1200 v5 Family
+Essentials,Board Form Factor,uATX
+Essentials,Chassis Form Factor,Rack
+Essentials,Socket,LGA 1151 Socket H4
+Essentials,Integrated Systems Available,Yes
+Essentials,Integrated BMC with IPMI,IPMI2.0
+Essentials,TDP,80 W
+Essentials,Included Items,(1)Server Board. (4)SATA Data Cable. (1)Attention Documentation. (1)Quick Start User's Guide. (1)Quick Configuration Label
+Essentials,Board Chipset,Intel® C236 Chipset
+Essentials,Target Market,Small and Medium Business
+Supplemental Information,Embedded Options Available,No
+Supplemental Information,Description,"An entry-level board with Intel® C236 chipset supporting one Intel® Xeon® Processor E3-1200 v5 family, 4 UDIMMs, Dual integrated 1GBaseT Ethernet. Supports eight SATA3 ports, M.2 SATA SSD (42mm), Intel® Integrated RAID Module and Intel® IO Module."
+Memory Specifications,Max Memory Size (dependent on memory type),64 GB
+Memory Specifications,Memory Types,DDR4 ECC UDIMM
+Memory Specifications,Max # of Memory Channels,2
+Memory Specifications,Max Memory Bandwidth,68.256 GB/s
+Memory Specifications,Physical Address Extensions,40-bit
+Memory Specifications,# of Memory Slots,4
+Memory Specifications,ECC Memory Supported‡,Yes
+Memory Specifications,DIMM Type,UDIMM
+GPU Specifications,Integrated Graphics‡,No
+GPU Specifications,Graphics Output,VGA
+Expansion Options,PCI Express Revision,3.0
+Expansion Options,Max # of PCI Express Lanes,20
+Expansion Options,PCIe x8 Gen 3,1
+Expansion Options,Connector for Intel® I/O Expansion Module x8 Gen 3,1
+Expansion Options,Connector for Intel® Integrated RAID Module,1
+I/O Specifications,# of USB Ports,9
+I/O Specifications,USB Revision,2.0 & 3.0
+I/O Specifications,Total # of SATA Ports,8
+I/O Specifications,RAID Configuration,"Software RAID RSTe (0,1,10,5) and ESRT2 (0,1,10)"
+I/O Specifications,# of Serial Ports,1
+I/O Specifications,# of LAN Ports,2
+I/O Specifications,Integrated LAN,2x 1GbE
+I/O Specifications,Embedded USB (eUSB) Solid State Drive Option,No
+I/O Specifications,Integrated InfiniBand*,No
+Package Specifications,Max CPU Configuration,1
+Advanced Technologies,Intel® Virtualization Technology for Directed I/O (VT-d)‡,Yes
+Advanced Technologies,Intel® Remote Management Module Support,Yes
+Advanced Technologies,Intel® Node Manager,Yes
+Advanced Technologies,Intel® Rapid Storage Technology enterprise,Yes
+Advanced Technologies,Intel® I/O Acceleration Technology,Yes
+Advanced Technologies,TPM Version,1.2
+Security & Reliability,Intel® Trusted Execution Technology‡,Yes

@@ -1,0 +1,27 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® RAID Controllers
+Essentials,Code Name,Products formerly Hidden Dunes
+Essentials,Marketing Status,Discontinued
+Essentials,Launch Date,Q3'17
+Essentials,Expected Discontinuance,2023
+Essentials,EOL Announce,"Friday, May 5, 2023"
+Essentials,Last Order,"Friday, June 30, 2023"
+Essentials,Last Receipt Attributes,"Friday, April 28, 2023"
+Essentials,Target Market,Entry
+Essentials,Board Form Factor,Mezzanine Module
+Essentials,Supported Devices,PCIe/SAS/SATA
+Essentials,Supported Operating Systems,"Windows, Linux, VMWare"
+Essentials,RAID Level Supported,"0, 1, 10, 5, 50"
+Essentials,JBOD Mode,Yes
+Essentials,# of Ports Internal,8
+Essentials,# of Ports External,0
+Essentials,# of Devices Supported,63
+Essentials,PCIe Host Interface,PCIe x8 Gen3
+Essentials,IO Processor Model,SAS3408
+Essentials,Keying,SIOM Connector
+Essentials,Connector Orientation,Vertical
+Essentials,Extended Warranty Available for Purchase (Select Countries),Yes
+Essentials,Additional Extended Warranty Details,Intel® RAID Extended Warranty
+Essentials,Included Items,"(1) Intel® RAID Module, (4) standoffs, and (4) standoff locking pins"
+Supplemental Information,Description,Tri-mode PCIe Entry-Level RAID Mezzanine Module with 8 SAS/SATA or 2 NVMe internal ports
+Supplemental Information,Datasheet,View now

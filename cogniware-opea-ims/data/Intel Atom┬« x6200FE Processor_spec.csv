@@ -1,0 +1,65 @@
+Section,Key,Value
+Essentials,Product Collection,Intel Atom® Processor X Series
+Essentials,Code Name,Products formerly Elkhart Lake
+Essentials,Vertical Segment,Embedded
+Essentials,Processor Number,6200FE
+Essentials,Lithography,10 nm
+Essentials,Recommended Customer Price,$45.00
+CPU Specifications,Total Cores,2
+CPU Specifications,Total Threads,2
+CPU Specifications,Processor Base Frequency,1.00 GHz
+CPU Specifications,Cache,1.5 MB
+CPU Specifications,TDP,4.5 W
+Supplemental Information,Marketing Status,Launched
+Supplemental Information,Launch Date,Q1'21
+Supplemental Information,Embedded Options Available,Yes
+Supplemental Information,Use Conditions,Industrial Extended Temp
+Supplemental Information,Functional Safety (FuSa) Documentation Available,Yes
+Memory Specifications,Max Memory Size (dependent on memory type),32 GB
+Memory Specifications,Memory Types,4x32 LPDDR4/x 2400MT/s Max16GB / 2x64 DDR4 2400MT/s Max 32GBLPDDR4/x & DDR4 with In Band ECC
+Memory Specifications,Max # of Memory Channels,4
+Memory Specifications,Max Memory Bandwidth,38.4 GB/s
+Memory Specifications,ECC Memory Supported‡,Yes
+GPU Specifications,Graphics Output,N/A
+GPU Specifications,Execution Units,0
+GPU Specifications,4K Support,No
+GPU Specifications,DirectX* Support,No
+GPU Specifications,OpenGL* Support,No
+GPU Specifications,OpenCL* Support,No
+GPU Specifications,Intel® Quick Sync Video,No
+GPU Specifications,# of Displays Supported‡,0
+Expansion Options,PCI Support,Yes
+Expansion Options,PCI Express Revision,3.0
+Expansion Options,PCI Express Configurations‡,"PCIe 0: 1 x4/2 x2/1 x2 + 2 x1/4 x1, PCIe 1-3: 1 x2/1 x1"
+Expansion Options,Max # of PCI Express Lanes,8
+I/O Specifications,# of USB Ports,4
+I/O Specifications,USB Revision,2.0/3.0/3.1
+I/O Specifications,Total # of SATA Ports,2
+I/O Specifications,Integrated LAN,3x 2.5GbE
+I/O Specifications,Integrated Wireless‡,No
+I/O Specifications,General Purpose IO,Yes
+I/O Specifications,UART,Yes
+Package Specifications,Sockets Supported,FCBGA1493
+Package Specifications,Max CPU Configuration,1
+Package Specifications,TJUNCTION,110°C
+Package Specifications,Max Operating Temperature,85 °C
+Package Specifications,Minimum Operating Temperature,-40 °C
+Package Specifications,Package Size,35mm x 24mm
+Advanced Technologies,Intel® Time Coordinated Computing (Intel® TCC)‡,Yes
+Advanced Technologies,Intel® Gaussian & Neural Accelerator,1.0
+Advanced Technologies,Intel® Speed Shift Technology,No
+Advanced Technologies,Secure Boot,Yes
+Advanced Technologies,Intel® Hyper-Threading Technology‡,No
+Advanced Technologies,Intel® 64‡,Yes
+Advanced Technologies,Instruction Set,64-bit
+Advanced Technologies,Idle States,Yes
+Advanced Technologies,Intel® HD Audio Technology,Yes
+Security & Reliability,Intel® Secure Key,Yes
+Security & Reliability,Intel® AES New Instructions,Yes
+Security & Reliability,Intel® Trusted Execution Technology‡,No
+Security & Reliability,Execute Disable Bit‡,Yes
+Security & Reliability,Intel® OS Guard,Yes
+Security & Reliability,Intel® Boot Guard,Yes
+Security & Reliability,Intel® Virtualization Technology (VT-x)‡,Yes
+Security & Reliability,Intel® Virtualization Technology for Directed I/O (VT-d)‡,Yes
+Security & Reliability,Intel® VT-x with Extended Page Tables (EPT)‡,Yes

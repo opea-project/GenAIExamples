@@ -1,0 +1,5 @@
+Product ID,Product Name,Supports Overclocking,PCI Express Revision,USB Revision
+218824,Intel® W790 Chipset,"IA, Memory","3.0, 4.0","3.2, 2.0"
+229719,Intel® B760 Chipset,Memory,"3.0, 4.0","3.2, 2.0"
+229720,Intel® H770 Chipset,Memory,"3.0, 4.0","3.2, 2.0"
+229721,Intel® Z790 Chipset,"IA, BCLK, Memory","3.0, 4.0","3.2, 2.0"

@@ -1,0 +1,3 @@
+Product ID,Product Name,Xe-cores,Ray Tracing Units,Memory Size,Graphics Memory Bandwidth,GpuMaxInt8Tops,# of Displays Supported‡
+232876,Intel® Data Center GPU Max 1100,56,56,48 GB,1228.8 GB/s,,0
+232873,Intel® Data Center GPU Max 1550,128,128,128 GB,3276.8 GB/s,,0

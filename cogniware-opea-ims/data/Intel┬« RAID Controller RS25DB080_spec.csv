@@ -1,0 +1,30 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® RAID Controllers
+Essentials,Marketing Status,Discontinued
+Essentials,Launch Date,Q1'11
+Essentials,Expected Discontinuance,Q4'19
+Essentials,EOL Announce,"Monday, December 31, 2018"
+Essentials,Last Order,"Monday, July 1, 2019"
+Essentials,Last Receipt Attributes,"Tuesday, October 1, 2019"
+Essentials,Long Life,No
+Essentials,Target Market,Scalable Performance
+Essentials,Board Form Factor,Low Profile MD2 Card
+Essentials,Data Transfer Rate,6 Gb/s
+Essentials,Supported Devices,SAS/SATA
+Essentials,Supported Operating Systems,"Windows, Linux, Solaris, VMware"
+Essentials,Compatible Cache Backup Options,AXXRSBBU9
+Essentials,RAID Level Supported,"0, 1, 10, 5, 50, 6, 60"
+Essentials,JBOD Mode,No
+Essentials,# of Ports Internal,8
+Essentials,# of Ports External,0
+Essentials,# of Devices Supported,128
+Essentials,Cache Memory,1GB
+Essentials,PCIe Host Interface,PCIe x8 Gen3
+Essentials,IO Processor Model,LSI2208
+Essentials,Keying,PCIe x8 Connector
+Essentials,Connector Orientation,Top
+Essentials,Extended Warranty Available for Purchase (Select Countries),Yes
+Essentials,Additional Extended Warranty Details,Intel® RAID Extended Warranty
+Essentials,Additional Features,Support for Premium Feature Options
+Essentials,Included Items,"Raid Controller, Quick Start User Guide, 1 standard & 1 Low Profile bracket. No SAS Cables are included."
+Supplemental Information,Description,"6G SAS RAID Controller with 8 internal ports. PCIe Gen 3 capable, and dual core ROC. No cables included."

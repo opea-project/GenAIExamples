@@ -1,0 +1,3 @@
+Product ID,Product Name,Cabling Type,TDP,Port Configuration,Data Rate Per Port,System Interface Type
+242097,Intel® IPU Adapter E2100- CCQDA2HL,"QSFP56 ports - DAC, Optics, and AOC's",75 W,Dual,200/100/50/25/10GbE,PCIe 4.0 (16GT/s)
+235724,Intel® IPU Adapter E2100-CCQDA2,"QSFP56 ports - DAC, Optics, and AOC's",150 W,Dual,200/100/50/25/10GbE,PCIe 4.0 (16GT/s)

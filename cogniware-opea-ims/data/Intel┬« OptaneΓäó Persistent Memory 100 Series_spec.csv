@@ -1,0 +1,13 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® Optane™ Persistent Memory 100 Series
+Essentials,Capacity,512 GB
+Essentials,Code Name,Products formerly Apache Pass
+Essentials,Marketing Status,Discontinued
+Essentials,Launch Date,Q2'19
+Essentials,Use Conditions,Automotive
+Reliability,Max Operating Temperature,85 °C
+Reliability,Mean Time Between Failures (MTBF),2 million hours
+Reliability,Warranty Period,5  yrs
+Package Specifications,Form Factor,Persistent Memory Module (PMem)
+Package Specifications,Interface,DDR-T
+Advanced Technologies,Hardware Encryption,AES 256 bit

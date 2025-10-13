@@ -1,0 +1,37 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® C200 Series Chipsets
+Essentials,Code Name,Products formerly Cougar Point
+Essentials,Vertical Segment,Server
+Essentials,Marketing Status,Discontinued
+Essentials,Launch Date,Q2'11
+Essentials,Use Conditions,Server/Enterprise
+Supplemental Information,Embedded Options Available,Yes
+Supplemental Information,Datasheet,View now
+GPU Specifications,Integrated Graphics‡,Yes
+GPU Specifications,Graphics Output,Yes
+GPU Specifications,Intel® Clear Video Technology,Yes
+GPU Specifications,# of Displays Supported‡,2
+Expansion Options,PCI Support,Yes
+Expansion Options,PCI Express Revision,2.0
+Expansion Options,PCI Express Configurations‡,"2x4, 4x2, 8x1"
+Expansion Options,Max # of PCI Express Lanes,8
+I/O Specifications,# of USB Ports,14
+I/O Specifications,USB Revision,2.0
+I/O Specifications,USB 2.0,14
+I/O Specifications,Total # of SATA Ports,6
+I/O Specifications,Max # of SATA 6.0 Gb/s Ports,2
+I/O Specifications,Integrated LAN,Yes
+I/O Specifications,Integrated IDE,Yes
+Package Specifications,Max CPU Configuration,1
+Advanced Technologies,Intel® Virtualization Technology for Directed I/O (VT-d)‡,Yes
+Advanced Technologies,Intel® ME Firmware Version,8.1
+Advanced Technologies,Intel® Remote PC Assist Technology,No
+Advanced Technologies,Intel® Quick Resume Technology,Yes
+Advanced Technologies,Intel® Quiet System Technology,No
+Advanced Technologies,Intel® HD Audio Technology,Yes
+Advanced Technologies,Intel® AC97 Technology,Yes
+Advanced Technologies,Intel® Matrix Storage Technology,Yes
+Advanced Technologies,Intel® Rapid Storage Technology,Yes
+Advanced Technologies,Intel® I/O Acceleration Technology,Yes
+Security & Reliability,Intel® Trusted Execution Technology‡,Yes
+Security & Reliability,Anti-Theft Technology,Yes

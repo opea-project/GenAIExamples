@@ -1,0 +1,64 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® Server System R1000WFR Family
+Essentials,Code Name,Products formerly Wolf Pass
+Essentials,Launch Date,Q1'22
+Essentials,Marketing Status,Discontinued
+Essentials,Expected Discontinuance,2023
+Essentials,EOL Announce,"Friday, May 5, 2023"
+Essentials,Last Order,"Friday, June 30, 2023"
+Essentials,Limited 3-year Warranty,Yes
+Essentials,Extended Warranty Available for Purchase (Select Countries),Yes
+Essentials,Additional Extended Warranty Details,Dual Processor System Extended Warranty
+Essentials,Supported Operating Systems,"VMware*, Windows Server 2019*, Red Hat Enterprise Linux 7.6*, Red Hat Enterprise Linux 7.5*, SUSE Linux Enterprise Server 15*, SUSE Linux Enterprise Server 12 SP4*, Ubuntu*"
+Essentials,Chassis Form Factor,"1U, Spread Core Rack"
+Essentials,Chassis Dimensions,"16.93"" x 27.95"" x 1.72"""
+Essentials,Board Form Factor,"Custom 16.7"" x 17"""
+Essentials,Compatible Product Series,2nd Generation Intel® Xeon® Scalable Processors
+Essentials,Socket,Socket P
+Essentials,TDP,165 W
+Essentials,Heat Sink,(2) 1U Standard Heat Sink FXXCA78X108HS
+Essentials,Heat Sink Included,Yes
+Essentials,System Board,Intel® Server Board S2600WFQR
+Essentials,Board Chipset,Intel® C628 Chipset
+Essentials,Target Market,Mainstream
+Essentials,Rack-Friendly Board,Yes
+Essentials,Power Supply,1300 W
+Essentials,Power Supply Type,AC
+Essentials,# of Power Supply Included,1
+Essentials,Redundant Power Supported,"Supported, requires additional power supply"
+Essentials,Backplanes,Included
+Essentials,Included Items,(1) 1U chassis with Quick Reference Label(1) Intel® Server Board S2600WFQR(2) Riser card assembly with 1 slot PCIe* x16 riser card F1UL16RISER3(8) 2.5” hot-swap drive bays with drive carriers and drive blanks(1) Preinstalled standard control panel assembly(board only FXXFPANEL2)(1) Preinstalled front I/O panel assembly (1x VGA and 2x USB)(1) 200mm backplane I2C cable H91170-xxx(1) 400mm backplane power cable H82099-xxx(1) 290 mm Intel® QAT cable J61138-xxx(1) Air duct H90054-xxx(6) Dual rotor system fans FR1UFAN10PW(1) 1300W power supply module AXX1300TCRPS(2) CPU heat sinks J39509-xxx(2) CPU heat sink label inserts J16115-xxx(2) Standard CPU carriers H72851-xxx(8) DIMM slot blanks G75158-xxx(1) Chassis Stiffener Bar J16623-xxx(1) Power supply bay blank insert(2) AC power cord retention strap assembly H23961-00x
+Supplemental Information,Description,"Integrated 1U system featuring an Intel® Server Board S2600WFQR, supporting two 2nd Generation Intel® Xeon® Scalable processors, (8) 2.5 inch hot-swap drives, 24 DIMMs, (1)1300W redundant-capable power supply, Intel® OCP Module."
+Memory & Storage,Memory Types,DDR4 ECC RDIMM/LRDIMM 2133/2400/2666/2933 & Intel® Optane™ DC Persistent Memory Supported
+Memory & Storage,# of Memory Slots,24
+Memory & Storage,Max Memory Size (dependent on memory type),6 TB
+Memory & Storage,# of Front Drives Supported,8
+Memory & Storage,Front Drive Form Factor,"Hot-swap 2.5"""
+Memory & Storage,# of Internal Drives Supported,2
+Memory & Storage,Internal Drive Form Factor,M.2 SSD
+Memory & Storage,Intel® Optane™ Persistent Memory Supported,Yes
+GPU Specifications,Integrated Graphics‡,Yes
+Expansion Options,PCI Express Revision,3.0
+Expansion Options,PCIe x24 Riser Super slot,1
+Expansion Options,PCIe x16 Gen 3,2
+Expansion Options,PCIe OCuLink Connectors (NVMe support),2
+Expansion Options,Connector for Intel® Integrated RAID Module,1
+Expansion Options,Riser Slot 1: Total # of Lanes,24
+Expansion Options,Riser Slot 1: Included Slot Configuration(s),1x PCIe Gen3 x16
+Expansion Options,Riser Slot 2: Total # of Lanes,24
+Expansion Options,Riser Slot 2: Included Slot Configuration(s),1x PCIe Gen3 x16
+I/O Specifications,# of USB Ports,5
+I/O Specifications,Total # of SATA Ports,2
+I/O Specifications,Max # of UPI Links,3
+I/O Specifications,RAID Configuration,SW RAID 0/1
+I/O Specifications,# of Serial Ports,2
+I/O Specifications,Integrated LAN,1GbE (mgmt port)
+I/O Specifications,# of LAN Ports,1
+Package Specifications,Max CPU Configuration,2
+Advanced Technologies,Intel® Remote Management Module Support,Yes
+Advanced Technologies,Integrated BMC with IPMI,IPMI 2.0 & Redfish
+Advanced Technologies,Intel® Node Manager,Yes
+Advanced Technologies,Intel® Virtualization Technology for Directed I/O (VT-d)‡,Yes
+Advanced Technologies,Intel® Rapid Storage Technology,Yes
+Advanced Technologies,TPM Version,2.0
+Intel® Transparent Supply Chain,Includes Statement of Conformance and Platform Certificate,Yes

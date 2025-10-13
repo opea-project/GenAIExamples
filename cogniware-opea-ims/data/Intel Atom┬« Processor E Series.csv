@@ -1,0 +1,7 @@
+Product ID,Product Name,Launch Date,Total Cores,ClockSpeedMax,Processor Base Frequency,Cache,TDP
+84311,Intel Atom® Processor E3805,Q4'14,2,,1.33 GHz,1 MB L2 Cache,3 W
+78476,Intel Atom® Processor E3815,Q4'13,1,,1.46 GHz,512 KB L2 Cache,5 W
+78474,Intel Atom® Processor E3825,Q4'13,2,,1.33 GHz,1 MB L2 Cache,6 W
+78477,Intel Atom® Processor E3826,Q4'13,2,,1.46 GHz,1 MB L2 Cache,7 W
+78478,Intel Atom® Processor E3827,Q4'13,2,,1.75 GHz,1 MB L2 Cache,8 W
+78475,Intel Atom® Processor E3845,Q4'13,4,,1.91 GHz,2 MB L2 Cache,10 W

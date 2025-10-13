@@ -1,0 +1,19 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® Integrated RAID (Modules/System Boards)
+Essentials,Marketing Status,Discontinued
+Essentials,Launch Date,Q1'11
+Essentials,Expected Discontinuance,Q2'16
+Essentials,EOL Announce,"Thursday, June 30, 2016"
+Essentials,Last Order,"Tuesday, December 27, 2016"
+Essentials,Last Receipt Attributes,"Thursday, April 27, 2017"
+Essentials,Target Market,Entry
+Essentials,Board Form Factor,Storage Connector Module
+Essentials,Data Transfer Rate,6 Gb/s
+Essentials,Supported Devices,SAS/SATA
+Essentials,RAID Level Supported,"0, 1, 10, 5, 50"
+Essentials,JBOD Mode,No
+Essentials,# of Ports Internal,4
+Essentials,# of Devices Supported,32
+Essentials,IO Processor Model,LSI2008
+Essentials,Included Items,"RAID module, Quick Start User Guide, Mounting standoffs. Note: Cables sold separately"
+Supplemental Information,Description,Entry 6Gb SAS/SATA RAID Module with 4  ports.  Firmware-based RAID.  RAID 5 uses system resources for parity calculations.

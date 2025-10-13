@@ -1,0 +1,36 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® C600 Series Chipsets
+Essentials,Code Name,Products formerly Patsburg
+Essentials,Vertical Segment,Server
+Essentials,Marketing Status,Discontinued
+Essentials,Launch Date,Q1'12
+Essentials,Lithography,65 nm
+Essentials,TDP,8 W
+Essentials,Use Conditions,Server/Enterprise
+Supplemental Information,Embedded Options Available,Yes
+GPU Specifications,Integrated Graphics‡,No
+GPU Specifications,Graphics Output,No
+GPU Specifications,Intel® Clear Video Technology,No
+GPU Specifications,Macrovision* License Required,No
+Expansion Options,PCI Support,Yes
+Expansion Options,PCI Express Revision,2.0
+Expansion Options,PCI Express Configurations‡,"2x4, 4x2, 8x1"
+Expansion Options,Max # of PCI Express Lanes,8
+I/O Specifications,# of USB Ports,14
+I/O Specifications,USB Revision,2.0
+I/O Specifications,USB 2.0,14
+I/O Specifications,Total # of SATA Ports,10
+I/O Specifications,Max # of SATA 6.0 Gb/s Ports,2
+I/O Specifications,Integrated LAN,Yes
+Package Specifications,Package Size,27 mm x 27 mm
+Advanced Technologies,Intel® Virtualization Technology for Directed I/O (VT-d)‡,Yes
+Advanced Technologies,Intel® ME Firmware Version,7.1.20
+Advanced Technologies,Intel® Remote PC Assist Technology,No
+Advanced Technologies,Intel® Quiet System Technology,No
+Advanced Technologies,Intel® HD Audio Technology,Yes
+Advanced Technologies,Intel® Matrix Storage Technology,No
+Advanced Technologies,Intel® Rapid Storage Technology,No
+Advanced Technologies,Intel® Rapid Storage Technology enterprise,Yes
+Security & Reliability,Intel vPro® Eligibility‡,Intel vPro® Platform
+Security & Reliability,Intel® Trusted Execution Technology‡,Yes
+Security & Reliability,Anti-Theft Technology,No

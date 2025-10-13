@@ -1,0 +1,20 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® Programmable Acceleration Cards (PAC)
+Essentials,Marketing Status,Discontinued
+Essentials,Launch Date,Q4'19
+Essentials,FPGA,Intel® Arria® 10 GT FPGA
+Essentials,Logic Elements (LE),1150000
+Essentials,On-chip Memory,65.7 Mb
+Essentials,DSP Blocks,3036
+Memory Specifications,External Onboard DDR4,9 GB
+Memory Specifications,External Onboard SRAM,144 Mb QDR IV
+I/O Specifications,PCI Express Revision,3
+I/O Specifications,PCI Express Configurations‡,Gen3 x16
+I/O Specifications,QSFP Interface,x2
+I/O Specifications,Network Interface,"10 Gbps, 25 Gbps (up to 100 GbE) with  Dual Intel Ethernet Converged Network Adapter XL710"
+Supplemental Information,Board Form Factor,"½ length, full height, single slot"
+Supplemental Information,Thermal Solution Specification,Passively Cooled
+Supplemental Information,TDP,100 W
+Package Specifications,Tools Supported,"Intel® Acceleration Stack for Intel® Xeon® CPU with FPGAs, Intel® Quartus® Prime Software, Open Programmable Acceleration Engine (OPAE), Data Plane Developer Kit (DPDK)"
+Package Specifications,Datasheet,View now
+Package Specifications,Description,"Intel FPGA PAC N3000 accelerates network traffic for up to 100 Gbps to support low-latency, high-bandwidth 5G applications."

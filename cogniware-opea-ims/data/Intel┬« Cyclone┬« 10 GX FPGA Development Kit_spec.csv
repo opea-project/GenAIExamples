@@ -1,0 +1,18 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® Cyclone® Development Kits
+Essentials,Marketing Status,Launched
+Essentials,Launch Date,2017
+Essentials,Featured FPGA,Intel® Cyclone® 10 GX FPGA 10CX220YF780E5G
+Essentials,Logic Elements (LE),220000
+Essentials,On-chip Memory,11.46 Mb
+Essentials,DSP Blocks,192
+Essentials,FPGA Package,F780
+Essentials,Board Type,PCIe
+Essentials,Ordering Part Number,DK-DEV-10CX220-A
+Essentials,Distributor Availability,ArrowDigiKeyMouser
+Board Specifications,Interfaces,"PCIe, LVDS, USB, SFP+"
+Board Specifications,Expansion,FMC
+Board Specifications,Memory,"SDRAM, DDR3"
+Board Specifications,Versions,Production
+Supplemental Information,Description,"The Intel Cyclone 10 GX FPGA Development Kit is an ideal starting point for applications, such as embedded vision, factory automation, or video connectivity evaluation or concept proving."
+Supplemental Information,User Guide,View now

@@ -1,0 +1,25 @@
+Section,Key,Value
+Essentials,Product Collection,10GbE Intel® Ethernet Network Adapter E610
+Essentials,Marketing Status,Launched
+Essentials,Launch Date,Q2'25
+Essentials,Vertical Segment,Server
+Essentials,Cable Medium,Copper
+Essentials,Cabling Type,"RJ45 Category 6, Category 6A, Category 5e up to 100m"
+Essentials,Bracket Height,Low Profile and Full Height
+Essentials,Recommended Customer Price,$428.00-$446.00
+Essentials,Supported Operating Systems,View now
+Supplemental Information,Product Brief,View now
+Networking Specifications,Port Configuration,Quad
+Networking Specifications,Data Rate Per Port,10GbE/5GbE/2.5GbE/1GbE
+Networking Specifications,Intel® Virtualization Technology for Connectivity (VT-c),Yes
+Networking Specifications,Speed & Slot Width,PCIe 4.0 x8 via x4 x4 PCIe link subdivision (bifurcation)
+Networking Specifications,Controller,Intel(R) Ethernet Controller E610-XAT2
+Package Specifications,System Interface Type,RJ45
+Intel® Virtualization Technology for Connectivity,On-chip QoS and Traffic Management,Yes
+Intel® Virtualization Technology for Connectivity,Flexible Port Partitioning,Yes
+Intel® Virtualization Technology for Connectivity,Virtual Machine Device Queues (VMDq),Yes
+Intel® Virtualization Technology for Connectivity,PCI-SIG* SR-IOV Capable,Yes
+Advanced Technologies,iWARP/RDMA,No
+Advanced Technologies,Intel® Data Direct I/O Technology,Yes
+Advanced Technologies,Intelligent Offloads,Yes
+Advanced Technologies,Storage Over Ethernet,"iSCSI, NFS"

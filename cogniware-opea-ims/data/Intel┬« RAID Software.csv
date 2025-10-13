@@ -1,0 +1,8 @@
+Product ID,Product Name,Marketing Status,FormFactor,RAID Level Supported,# of Ports Internal,# of Ports External,EmbeddedMemorySize
+60293,Intel® RAID C600 Upgrade Key RKSAS4,Discontinued,,"0, 1, 10",4,0,
+60294,Intel® RAID C600 Upgrade Key RKSAS4R5,Discontinued,,0 1 10 5,4,0,
+60295,Intel® RAID C600 Upgrade Key RKSAS8,Discontinued,,"0, 1, 10",8,0,
+60296,Intel® RAID C600 Upgrade Key RKSAS8R5,Discontinued,,0 1 10 5,8,0,
+60290,Intel® RAID C600 Upgrade Key RKSATA4R5,Discontinued,,"0, 1, 10, 5",4,0,
+60291,Intel® RAID C600 Upgrade Key RKSATA8,Discontinued,,"0, 1, 10",8,0,
+60292,Intel® RAID C600 Upgrade Key RKSATA8R5,Discontinued,,"0, 1, 10, 5",8,0,

@@ -1,0 +1,19 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® Storage Expanders
+Essentials,Marketing Status,Discontinued
+Essentials,Launch Date,Q1'12
+Essentials,Expected Discontinuance,1H'17
+Essentials,EOL Announce,"Tuesday, January 10, 2017"
+Essentials,Last Order,"Monday, June 26, 2017"
+Essentials,Last Receipt Attributes,"Thursday, October 26, 2017"
+Essentials,Target Market,Scalable Performance
+Essentials,Data Transfer Rate,6 Gb/s
+Essentials,Supported Devices,SAS/SATA
+Essentials,Supported Operating Systems,N/A
+Essentials,RAID Level Supported,Dependent on paired RAID card
+Essentials,# of Ports Internal,24
+Essentials,# of Ports External,0
+Essentials,IO Processor Model,LSI 6Gb SAS2x24 expander
+Essentials,Additional Extended Warranty Details,Intel® RAID Extended Warranty
+Essentials,Included Items,(1) RAID Expander
+Supplemental Information,Description,24 Port SAS 6Gb expander card with ports configurable for input or output. Retail SKU includes cables. Requires system mounting location.

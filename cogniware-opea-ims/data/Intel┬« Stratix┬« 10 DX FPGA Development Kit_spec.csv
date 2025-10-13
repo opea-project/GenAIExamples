@@ -1,0 +1,17 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® Stratix® Development Kits
+Essentials,Marketing Status,Discontinued
+Essentials,Launch Date,2019
+Essentials,Featured FPGA,Intel® Stratix® 10 DX FPGA 1SD280PT2F55E1VG
+Essentials,Logic Elements (LE),2753000
+Essentials,On-chip Memory,244 Mb
+Essentials,DSP Blocks,5760
+Essentials,FPGA Package,F55
+Essentials,Board Type,PCIe
+Essentials,Ordering Part Number,DK-DEV-1SDX-P-A
+Board Specifications,Interfaces,"PCIe, UPI, JTAG, USB"
+Board Specifications,Expansion,"DIMM, SlimSAS"
+Board Specifications,Memory,"DDR4, DDR-T"
+Board Specifications,Versions,Production
+Supplemental Information,Description,Intel® Stratix® 10 DX FPGA Development Kit delivers a complete design environment that includes all the hardware and software within a PCI Express* (PCIe) form factor.
+Supplemental Information,User Guide,View now

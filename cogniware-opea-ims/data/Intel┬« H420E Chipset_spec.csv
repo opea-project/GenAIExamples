@@ -1,0 +1,39 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® 400 Series Desktop Chipsets
+Essentials,Code Name,Products formerly Comet Lake
+Essentials,Vertical Segment,Embedded
+Essentials,Marketing Status,Launched
+Essentials,Launch Date,Q2'20
+Essentials,TDP,6 W
+Essentials,Recommended Customer Price,$30.00
+Essentials,Supports Memory Overclocking,No
+Essentials,Use Conditions,Embedded Broad Market Commercial Temp
+Supplemental Information,Embedded Options Available,Yes
+Memory Specifications,# of DIMMs per channel,1
+Memory Specifications,ECC Memory Supported‡,No
+GPU Specifications,# of Displays Supported‡,2
+Expansion Options,Direct Media Interface (DMI) Revision,3.0
+Expansion Options,Max # of DMI Lanes,4
+Expansion Options,PCI Express Revision,3.0
+Expansion Options,PCI Express Configurations‡,"x1, x2, x4"
+Expansion Options,Max # of PCI Express Lanes,6
+I/O Specifications,# of USB Ports,10
+I/O Specifications,USB Configuration,6 USB 3.2 Ports- Up to 0 USB 3.2 Gen 1x1 (5Gb/s) Ports- Up to 6 USB 3.2 Gen 1x1 (5Gb/s) Ports10 USB 2.0 Ports
+I/O Specifications,USB Revision,"3.2, 2.0"
+I/O Specifications,Max # of SATA 6.0 Gb/s Ports,4
+I/O Specifications,RAID Configuration,N/A
+I/O Specifications,Integrated LAN,Integrated MAC
+I/O Specifications,Integrated Wireless‡,No
+I/O Specifications,Supported Processor PCI Express Port Configurations,1x16
+Package Specifications,Package Size,25mm x 24mm
+Advanced Technologies,Intel® Virtualization Technology for Directed I/O (VT-d)‡,Yes
+Advanced Technologies,Intel® ME Firmware Version,14
+Advanced Technologies,Intel® HD Audio Technology,Yes
+Advanced Technologies,Intel® Rapid Storage Technology,Yes
+Advanced Technologies,Intel® Rapid Storage Technology enterprise,No
+Advanced Technologies,Intel® Standard Manageability,No
+Advanced Technologies,Intel® Stable IT Platform Program (SIPP),No
+Advanced Technologies,Intel® Smart Sound Technology,No
+Advanced Technologies,Intel® Platform Trust Technology (Intel® PTT),Yes
+Security & Reliability,Intel® Trusted Execution Technology‡,No
+Security & Reliability,Intel® Boot Guard,Yes

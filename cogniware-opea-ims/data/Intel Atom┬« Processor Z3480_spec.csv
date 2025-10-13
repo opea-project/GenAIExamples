@@ -1,0 +1,41 @@
+Section,Key,Value
+Essentials,Product Collection,Intel Atom® Processor Z Series
+Essentials,Code Name,Products formerly Merrifield
+Essentials,Vertical Segment,Mobile
+Essentials,Processor Number,Z3480
+Essentials,Lithography,22 nm
+CPU Specifications,Total Cores,2
+CPU Specifications,Burst Frequency,2.13 GHz
+CPU Specifications,Cache,1 MB Intel® Smart Cache
+Supplemental Information,Marketing Status,Discontinued
+Supplemental Information,Launch Date,Q1'14
+Supplemental Information,Servicing Status,End of Servicing Lifetime
+Supplemental Information,Embedded Options Available,No
+Memory Specifications,Max Memory Size (dependent on memory type),4 GB
+Memory Specifications,Memory Types,LPDDR3 1066
+Memory Specifications,Max # of Memory Channels,2
+Memory Specifications,Max Memory Bandwidth,8.5 GB/s
+Memory Specifications,Physical Address Extensions,32-bit
+GPU Specifications,Graphics Base Frequency,457 MHz
+GPU Specifications,Graphics Burst Frequency,533 MHz
+GPU Specifications,Graphics Output,MIPI-DSI
+GPU Specifications,# of Displays Supported‡,2
+I/O Specifications,# of USB Ports,2
+I/O Specifications,USB Revision,2.0/3.0
+I/O Specifications,General Purpose IO,175
+I/O Specifications,UART,3
+Package Specifications,Sockets Supported,FC-MB5796
+Package Specifications,Max CPU Configuration,1
+Package Specifications,TJUNCTION,90°C
+Package Specifications,Package Size,12mm x 12mm
+Advanced Technologies,Intel® 64‡,Yes
+Advanced Technologies,Instruction Set,64-bit
+Advanced Technologies,Instruction Set Extensions,"Intel® SSE2, Intel® SSE3, Intel® SSSE3, Intel® SSE4.1, Intel® SSE4.2"
+Advanced Technologies,Idle States,Yes
+Advanced Technologies,Enhanced Intel SpeedStep® Technology,Yes
+Advanced Technologies,Thermal Monitoring Technologies,Yes
+Advanced Technologies,Intel® Smart Idle Technology,Yes
+Security & Reliability,Intel® Secure Key,Yes
+Security & Reliability,Intel® AES New Instructions,Yes
+Security & Reliability,Execute Disable Bit‡,Yes
+Security & Reliability,Intel® Virtualization Technology (VT-x)‡,Yes

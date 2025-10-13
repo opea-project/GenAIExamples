@@ -1,0 +1,22 @@
+Section,Key,Value
+Essentials,Product Collection,Intel Agilex® 5 FPGAs and SoC FPGAs E-Series
+Essentials,Marketing Status,Launched
+Essentials,Launch Date,Q3'22
+Essentials,Lithography,Intel 7
+Resources,Logic Elements (LE),50445
+Resources,Adaptive Logic Modules (ALM),17100
+Resources,Adaptive Logic Module (ALM) Registers,68400
+Resources,Fabric and I/O Phase-Locked Loops (PLLs),7
+Resources,Maximum Embedded Memory,3.06 Mb
+Resources,Digital Signal Processing (DSP) Blocks,65
+Resources,Digital Signal Processing (DSP) Format,"Fixed Point (hard IP), Floating Point (hard IP), Multiply and Accumulate, Multiply, Variable Precision"
+Resources,Peak INT8 (TOPS),1.7
+Resources,Hard Memory Controllers,Yes
+Resources,External Memory Interfaces (EMIF),"DDR4, LPDDR4, LPDDR5"
+I/O Specifications,Maximum User I/O Count†,256
+I/O Specifications,I/O Standards Support,"1.2 V LVCMOS, 1.8 V LVCMOS, SSTL, POD, HSTL, HSUL, Differential SSTL, Differential POD, Differential HSTL, Differential HSUL, True Differential Signaling"
+I/O Specifications,Maximum LVDS Pairs,48
+Advanced Technologies,Hyper-Registers,Yes
+Advanced Technologies,FPGA Bitstream Security,Yes
+Package Specifications,Package Options,B23B
+Supplemental Information,Additional Information,Product Table (Family Comparison)DatasheetAll FPGA Documentation

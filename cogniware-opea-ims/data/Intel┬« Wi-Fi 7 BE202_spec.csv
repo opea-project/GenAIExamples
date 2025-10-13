@@ -1,0 +1,23 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® Wi-Fi 7 Series
+Essentials,Marketing Status,Launched
+Essentials,Launch Date,Q3'23
+Essentials,Weight (in grams),"2230: 3.07+/-0.15g ,  1216: 0.75+/-0.04g"
+Essentials,Operating Temperature Range,0 °C to 50 °C
+Essentials,Max Operating Temperature,50 °C
+Essentials,Minimum Operating Temperature,0 °C
+Essentials,Supported Operating Systems,"Windows 11*, Windows 10*, Linux*"
+Essentials,Antenna,2x2
+Supplemental Information,Product Brief,View now
+Networking Specifications,TX/RX Streams,"2x2, 160 MHz, 1024 QAM"
+Networking Specifications,Bands,"2.4GHz, 5GHz and 6GHz"
+Networking Specifications,Max Speed,2.4 Gbps
+Networking Specifications,Wi-Fi CERTIFIED*,Wi-Fi 7
+Networking Specifications,Compliance,FIPS
+Networking Specifications,Bluetooth Version,5.4
+Package Specifications,Board Form Factor,"M.2 2230, M.2 1216"
+Package Specifications,Package Size,"22mm x 30mm x 2.4mm, 12mm x 16mm x 1.7(+/-0.1)mm"
+Package Specifications,System Interface Type,"M.2: PCIe*, USB"
+Advanced Technologies,MU-MIMO,Yes
+Advanced Technologies,Orthogonal Frequency-Division Multiple Access (OFDMA),Yes
+Advanced Technologies,Supported Under Intel vPro® Technology,No

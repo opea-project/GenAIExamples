@@ -1,0 +1,15 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® Integrated RAID (Modules/System Boards)
+Essentials,Marketing Status,Discontinued
+Essentials,Launch Date,Q1'10
+Essentials,Expected Discontinuance,1H '14
+Essentials,Target Market,Entry
+Essentials,Board Form Factor,Storage Connector Module
+Essentials,Data Transfer Rate,3 Gb/s
+Essentials,Supported Devices,SAS/SATA
+Essentials,Compatible Cache Backup Options,AXXRSBBU3
+Essentials,RAID Level Supported,"0, 1, 10, 5, 50, 6, 60"
+Essentials,JBOD Mode,No
+Essentials,# of Ports Internal,4
+Essentials,IO Processor Model,LSI1078
+Supplemental Information,Description,3Gb Integrated RAID I/O Expansion Module

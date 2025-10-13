@@ -1,0 +1,79 @@
+Section,Key,Value
+Essentials,Product Collection,7th Generation Intel® Core™ i7 Processors
+Essentials,Code Name,Products formerly Kaby Lake
+Essentials,Vertical Segment,Mobile
+Essentials,Processor Number,i7-7Y75
+Essentials,Lithography,14 nm
+CPU Specifications,Total Cores,2
+CPU Specifications,Total Threads,4
+CPU Specifications,Max Turbo Frequency,3.60 GHz
+CPU Specifications,Intel® Turbo Boost Technology 2.0 Frequency‡,3.60 GHz
+CPU Specifications,Processor Base Frequency,1.30 GHz
+CPU Specifications,Cache,4 MB Intel® Smart Cache
+CPU Specifications,Bus Speed,4 GT/s
+CPU Specifications,TDP,4.5 W
+CPU Specifications,Configurable TDP-up Base Frequency,1.60 GHz
+CPU Specifications,Configurable TDP-up,7 W
+CPU Specifications,Configurable TDP-down Base Frequency,600 MHz
+CPU Specifications,Configurable TDP-down,3.5 W
+Supplemental Information,Marketing Status,Discontinued
+Supplemental Information,Launch Date,Q3'16
+Supplemental Information,Servicing Status,End of Servicing Lifetime
+Supplemental Information,End of Servicing Updates Date,"Tuesday, December 31, 2024"
+Supplemental Information,Embedded Options Available,No
+Supplemental Information,Datasheet,View now
+Memory Specifications,Max Memory Size (dependent on memory type),16 GB
+Memory Specifications,Memory Types,"LPDDR3-1866, DDR3L-1600"
+Memory Specifications,Max # of Memory Channels,2
+Memory Specifications,Max Memory Bandwidth,29.8 GB/s
+Memory Specifications,ECC Memory Supported‡,No
+GPU Specifications,GPU Name‡,Intel® HD Graphics 615
+GPU Specifications,Graphics Base Frequency,300 MHz
+GPU Specifications,Graphics Max Dynamic Frequency,1.05 GHz
+GPU Specifications,Graphics Video Max Memory,16 GB
+GPU Specifications,Graphics Output,eDP/DP/HDMI/DVI
+GPU Specifications,4K Support,"Yes, at 60Hz"
+GPU Specifications,Max Resolution (HDMI)‡,4096x2304@24Hz
+GPU Specifications,Max Resolution (DP)‡,3840x2160@60Hz
+GPU Specifications,Max Resolution (eDP - Integrated Flat Panel)‡,3840x2160@60Hz
+GPU Specifications,DirectX* Support,12
+GPU Specifications,OpenGL* Support,4.5
+GPU Specifications,Intel® Quick Sync Video,Yes
+GPU Specifications,Intel® Clear Video HD Technology,Yes
+GPU Specifications,Intel® Clear Video Technology,Yes
+GPU Specifications,# of Displays Supported‡,3
+GPU Specifications,Device ID,0x591E
+Expansion Options,PCI Express Revision,3.0
+Expansion Options,PCI Express Configurations‡,"1x4, 2x2, 1x2+2x1 and 4x1"
+Expansion Options,Max # of PCI Express Lanes,10
+Package Specifications,Sockets Supported,FCBGA1515
+Package Specifications,Max CPU Configuration,1
+Package Specifications,TJUNCTION,100°C
+Package Specifications,Package Size,20.5mm X 16.5mm
+Advanced Technologies,Intel® Speed Shift Technology,Yes
+Advanced Technologies,Intel® Turbo Boost Technology‡,2.0
+Advanced Technologies,Intel® Hyper-Threading Technology‡,Yes
+Advanced Technologies,Intel® Transactional Synchronization Extensions,Yes
+Advanced Technologies,Intel® 64‡,Yes
+Advanced Technologies,Instruction Set,64-bit
+Advanced Technologies,Instruction Set Extensions,"Intel® SSE4.1, Intel® SSE4.2, Intel® AVX2"
+Advanced Technologies,Idle States,Yes
+Advanced Technologies,Enhanced Intel SpeedStep® Technology,Yes
+Advanced Technologies,Thermal Monitoring Technologies,Yes
+Advanced Technologies,Intel® Flex Memory Access,Yes
+Advanced Technologies,Intel® Identity Protection Technology‡,Yes
+Advanced Technologies,Intel® Smart Response Technology,Yes
+Advanced Technologies,Intel® My WiFi Technology,Yes
+Security & Reliability,Intel vPro® Eligibility‡,Intel vPro® Platform
+Security & Reliability,Intel® Secure Key,Yes
+Security & Reliability,Intel® AES New Instructions,Yes
+Security & Reliability,Intel® Software Guard Extensions (Intel® SGX),Yes with Intel® ME
+Security & Reliability,Intel® Memory Protection Extensions (Intel® MPX),Yes
+Security & Reliability,Intel® Trusted Execution Technology‡,Yes
+Security & Reliability,Execute Disable Bit‡,Yes
+Security & Reliability,Intel® OS Guard,Yes
+Security & Reliability,Intel® Boot Guard,Yes
+Security & Reliability,Intel® Stable IT Platform Program (SIPP),Yes
+Security & Reliability,Intel® Virtualization Technology (VT-x)‡,Yes
+Security & Reliability,Intel® Virtualization Technology for Directed I/O (VT-d)‡,Yes
+Security & Reliability,Intel® VT-x with Extended Page Tables (EPT)‡,Yes

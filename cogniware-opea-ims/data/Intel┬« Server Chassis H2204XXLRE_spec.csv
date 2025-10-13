@@ -1,0 +1,23 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® Server Chassis H2000P Family
+Essentials,Code Name,Products formerly Buchanan Pass
+Essentials,Launch Date,Q3'17
+Essentials,Marketing Status,Discontinued
+Essentials,Expected Discontinuance,2023
+Essentials,EOL Announce,"Friday, May 5, 2023"
+Essentials,Last Order,"Friday, June 30, 2023"
+Essentials,Limited 3-year Warranty,Yes
+Essentials,Extended Warranty Available for Purchase (Select Countries),Yes
+Essentials,Chassis Form Factor,"2U, 4 node Rack Chassis"
+Essentials,Target Market,High Performance Computing
+Essentials,Power Supply,2130 W
+Essentials,Power Supply Type,AC
+Essentials,# of Power Supply Included,2
+Essentials,Redundant Fans,No
+Essentials,Redundant Power Supported,Yes
+Essentials,Backplanes,Included
+Essentials,Included Items,"1) 2U H2000G Chassis, includes:(1) Front panel - iPC FH2000FPANEL2(1) Power Distribution Board - iPC FXXCRPSPDB2(2) 2130W 80 Plus Platinum PSUs – iPC FXX2130PCRPS(1) 12 x 3.5’’ Hot-swap HDDs cage, includes:- (4) Tool less carriers, iPC -  FXX35HSCAR2- (1) Backplane, iPC - FHW04X35HSBP(4) - Blank Compute Module Slot Fillers(1) - Basic rack rail (AXXELVRAIL)"
+Supplemental Information,Description,"2U rack chassis supporting up to four hot-pluggable compute modules Intel(r) Compute Module HNS2600BP product family, up to 4 hot-swap drives, and two 2130W common redundant power supplies"
+Memory & Storage,# of Front Drives Supported,4
+Memory & Storage,Front Drive Form Factor,"Hot-swap 2.5"""
+Memory & Storage,# of Rear Drives Supported,0

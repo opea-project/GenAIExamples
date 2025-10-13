@@ -1,0 +1,11 @@
+Section,Key,Value
+Ordering and Spec Information,,
+"Intel® Ethernet SFP+ SR Optics, retail unit",Ordering Code,E10GSFPSR
+"Intel® Ethernet SFP+ SR Optics, retail unit",MDDS Content IDs,706851
+"Intel® Ethernet SFP+ SR Optics, retail unit",PCN Content IDs,"796792,798141,800788,802260,803733,807440,804013,810296,804062,810400,806472,835315,806994,859226,809838,810139"
+"Intel® Ethernet SFP+ SR Optics, OEM Gen",Ordering Code,E10GSFPSRG1P5
+"Intel® Ethernet SFP+ SR Optics, OEM Gen",MDDS Content IDs,706851
+"Intel® Ethernet SFP+ SR Optics, OEM Gen",PCN Content IDs,"795888,798141,800788,800111,801188,802260,803733,810296,804062,810400,806472,810879,806994,859226,807440,835315"
+Trade Compliance Information,ECCN,5A991
+Trade Compliance Information,CCATS,NA
+Trade Compliance Information,US HTS,8517620090

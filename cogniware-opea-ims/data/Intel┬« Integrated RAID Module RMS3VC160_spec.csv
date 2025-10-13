@@ -1,0 +1,29 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® Integrated RAID (Modules/System Boards)
+Essentials,Code Name,Products formerly Volcano Canyon
+Essentials,Marketing Status,Discontinued
+Essentials,Launch Date,Q2'16
+Essentials,Expected Discontinuance,Q2'20
+Essentials,EOL Announce,"Tuesday, July 16, 2019"
+Essentials,Last Order,"Wednesday, July 1, 2020"
+Essentials,Last Receipt Attributes,"Thursday, October 1, 2020"
+Essentials,Target Market,Entry
+Essentials,Board Form Factor,Storage Connector Module
+Essentials,Data Transfer Rate,12 Gb/s
+Essentials,Supported Devices,SAS/SATA
+Essentials,Supported Operating Systems,"Windows, Linux, VMware"
+Essentials,RAID Level Supported,None
+Essentials,JBOD Mode,Yes
+Essentials,# of Ports Internal,16
+Essentials,# of Ports External,0
+Essentials,# of Devices Supported,1024
+Essentials,Cache Memory,None
+Essentials,PCIe Host Interface,PCIe x8 Gen3
+Essentials,IO Processor Model,Avago 3216
+Essentials,Keying,SIOM Connector
+Essentials,Connector Orientation,Vertical
+Essentials,Extended Warranty Available for Purchase (Select Countries),Yes
+Essentials,Additional Extended Warranty Details,Intel® RAID Extended Warranty
+Essentials,Included Items,"(1) Intel® Integrated RAID Module RMS3VC160, (4) standoffs, and (4) standoff locking pins"
+Supplemental Information,Description,12Gb/s (SAS 3.0) 16 internal port SAS/SATA mezzanine card built with PCIe 3.0 dual core I/O Controller (IOC).
+Supplemental Information,Datasheet,View now

@@ -1,0 +1,49 @@
+Section,Key,Value
+Essentials,Product Collection,Intel Atom® Processor E Series
+Essentials,Code Name,Products formerly Bay Trail
+Essentials,Vertical Segment,Embedded
+Essentials,Processor Number,E3815
+Essentials,Lithography,22 nm
+Essentials,Recommended Customer Price,$25.00
+CPU Specifications,Total Cores,1
+CPU Specifications,Total Threads,1
+CPU Specifications,Processor Base Frequency,1.46 GHz
+CPU Specifications,Cache,512 KB L2 Cache
+CPU Specifications,TDP,5 W
+Supplemental Information,Marketing Status,Launched
+Supplemental Information,Launch Date,Q4'13
+Supplemental Information,Servicing Status,End of Servicing Lifetime
+Supplemental Information,Embedded Options Available,Yes
+Supplemental Information,Use Conditions,"Automotive, Industrial Commercial Temp, Industrial Extended Temp, Embedded Broad Market Commercial Temp"
+Supplemental Information,Datasheet,View now
+Memory Specifications,Max Memory Size (dependent on memory type),8 GB
+Memory Specifications,Memory Types,DDR3L 1067
+Memory Specifications,Max # of Memory Channels,1
+Memory Specifications,ECC Memory Supported‡,Yes
+GPU Specifications,GPU Name‡,Intel® HD Graphics for Intel Atom® Processor Z3700 Series
+GPU Specifications,Graphics Base Frequency,400 MHz
+GPU Specifications,Graphics Burst Frequency,400 MHz
+GPU Specifications,Intel® Quick Sync Video,Yes
+GPU Specifications,# of Displays Supported‡,2
+Expansion Options,PCI Express Revision,2.0
+Expansion Options,PCI Express Configurations‡,"x4, x2, x1"
+Expansion Options,Max # of PCI Express Lanes,4
+I/O Specifications,USB Revision,"2.0, 3.0"
+I/O Specifications,Total # of SATA Ports,2
+I/O Specifications,Integrated LAN,No
+I/O Specifications,Integrated IDE,No
+I/O Specifications,UART,Yes
+Package Specifications,Sockets Supported,FCBGA1170
+Package Specifications,TJUNCTION,-40°C to 110°C
+Package Specifications,Package Size,25mm x 27mm
+Advanced Technologies,Intel® Hyper-Threading Technology‡,No
+Advanced Technologies,Intel® 64‡,Yes
+Advanced Technologies,Instruction Set,64-bit
+Advanced Technologies,Enhanced Intel SpeedStep® Technology,Yes
+Advanced Technologies,Intel® HD Audio Technology,Yes
+Security & Reliability,Intel® AES New Instructions,Yes
+Security & Reliability,Intel® Trusted Execution Technology‡,No
+Security & Reliability,Execute Disable Bit‡,Yes
+Security & Reliability,Intel® Virtualization Technology (VT-x)‡,Yes
+Security & Reliability,Intel® Virtualization Technology for Directed I/O (VT-d)‡,No
+Security & Reliability,Intel® VT-x with Extended Page Tables (EPT)‡,Yes

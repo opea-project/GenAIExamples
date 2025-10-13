@@ -1,0 +1,72 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® Server System R1000WFR Family
+Essentials,Code Name,Products formerly Wolf Pass
+Essentials,Launch Date,Q3'17
+Essentials,Marketing Status,Discontinued
+Essentials,Expected Discontinuance,Q3'19
+Essentials,EOL Announce,"Monday, April 22, 2019"
+Essentials,Last Order,"Thursday, August 22, 2019"
+Essentials,Last Receipt Attributes,"Sunday, December 22, 2019"
+Essentials,Limited 3-year Warranty,Yes
+Essentials,Extended Warranty Available for Purchase (Select Countries),Yes
+Essentials,Additional Extended Warranty Details,Dual Processor System Extended Warranty
+Essentials,Chassis Form Factor,"1U, Spread Core Rack"
+Essentials,Chassis Dimensions,"16.93"" x 27.95"" x 1.72"""
+Essentials,Board Form Factor,"Custom 16.7"" x 17"""
+Essentials,Rack Rails Included,No
+Essentials,Compatible Product Series,Intel® Xeon® Scalable Processors
+Essentials,Socket,Socket P
+Essentials,TDP,165 W
+Essentials,Heat Sink,(2) 1U Standard Heat Sink FXXCA78X108HS
+Essentials,Heat Sink Included,Yes
+Essentials,System Board,Intel® Server Board S2600WFT
+Essentials,Board Chipset,Intel® C624 Chipset
+Essentials,Target Market,Full-featured
+Essentials,Rack-Friendly Board,Yes
+Essentials,Power Supply,1100 W
+Essentials,Power Supply Type,AC
+Essentials,# of Power Supply Included,1
+Essentials,Redundant Fans,No
+Essentials,Redundant Power Supported,"Supported, requires additional power supply"
+Essentials,Backplanes,Included
+Essentials,Included Items,"(1) Intel® Server Board S2600WFT (Dual 10GbE LAN) S2600WFT, (2) Riser card assembly with 1 slot PCIe x16 riser card F1UL16RISER3, (4) 3.5” Hot-swap drive bays with drive carriers and drive blanks: Includes (1) 12 Gb SAS backplane FR1304S3HSBP, (4) 3.5” hot swap drive tool less carriers FXX35HSCAR2, (1) Standard control panel assembly FXXFPANEL2, (1) Front I/O Panel assembly (VGA and 2 x USB), (1) 150mm Backplane I2C cable, (1) 850mm MiniSAS HD Cable AXXCBL850HDHRT, (1) 350mm Backplane power cable, (1) Air duct, (6) Dual rotor system fans FR1UFAN10PW, (8) DIMM slot blanks, (1) Chassis Stiffener Bar, (1) 1100W power supply module AXX1100PCRPS, (2) CPU heat sinks FXXCA78X108HS, (2) CPU heat sink “No CPU” Label inserts, (2) Standard CPU Carrier, (1) Power supply bay blank insert, (2) Chassis handle (1 set) installed A2UHANDLKIT3, (2) AC Power Cord retention strap assembly"
+Supplemental Information,Description,"Integrated 1U system featuring an Intel® Server Board S2600WFT with Dual 10GbE LAN, four 3.5 inch hot-swap drives, 24 DIMMs, one 1100W redundant-capable power supply, Intel® OCP Module for adding additional features without losing a PCIe add-in slot"
+Memory & Storage,Memory Types,Registered/Load Reduced DDR4-2133/2400/2666 MHz
+Memory & Storage,# of Memory Slots,24
+Memory & Storage,Max Memory Size (dependent on memory type),1.5 TB
+Memory & Storage,# of Front Drives Supported,4
+Memory & Storage,Front Drive Form Factor,"Hot-swap 3.5"" HDD or 2.5"" SSD"
+Memory & Storage,# of Internal Drives Supported,2
+Memory & Storage,Internal Drive Form Factor,M.2 SSD
+Expansion Options,PCIe x24 Riser Super slot,2
+Expansion Options,Connector for Intel® I/O Expansion Module x8 Gen 3,1
+Expansion Options,Connector for Intel® Integrated RAID Module,1
+Expansion Options,Riser Slot 1: Total # of Lanes,24
+Expansion Options,Riser Slot 1: Included Slot Configuration(s),1x PCIe Gen3 x16
+Expansion Options,Riser Slot 2: Total # of Lanes,24
+Expansion Options,Riser Slot 2: Included Slot Configuration(s),1x PCIe Gen3 x16
+I/O Specifications,# of USB Ports,5
+I/O Specifications,Total # of SATA Ports,10
+I/O Specifications,RAID Configuration,"SW RAID 0, 1, 10, optional 5"
+I/O Specifications,# of Serial Ports,2
+I/O Specifications,Integrated LAN,2x 10GbE
+I/O Specifications,# of LAN Ports,2
+I/O Specifications,Optical Drive Support,Yes
+Package Specifications,Max CPU Configuration,2
+Advanced Technologies,Intel® Optane™ Memory Supported‡,Yes
+Advanced Technologies,Intel® Remote Management Module Support,Yes
+Advanced Technologies,Integrated BMC with IPMI,IPMI 2.0 & Redfish
+Advanced Technologies,Intel® Node Manager,Yes
+Advanced Technologies,Intel® On-Demand Redundant Power,Yes
+Advanced Technologies,Intel® Advanced Management Technology,Yes
+Advanced Technologies,Intel® Server Customization Technology,Yes
+Advanced Technologies,Intel® Build Assurance Technology,Yes
+Advanced Technologies,Intel® Efficient Power Technology,Yes
+Advanced Technologies,Intel® Quiet Thermal Technology,Yes
+Advanced Technologies,Intel® Virtualization Technology for Directed I/O (VT-d)‡,Yes
+Advanced Technologies,Intel® Rapid Storage Technology enterprise,Yes
+Advanced Technologies,Intel® Quiet System Technology,Yes
+Advanced Technologies,Intel® Fast Memory Access,Yes
+Advanced Technologies,Intel® Flex Memory Access,Yes
+Advanced Technologies,TPM Version,2.0 (optional module)
+Intel® Transparent Supply Chain,Includes Statement of Conformance and Platform Certificate,Yes

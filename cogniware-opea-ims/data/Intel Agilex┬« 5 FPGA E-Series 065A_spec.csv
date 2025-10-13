@@ -1,0 +1,26 @@
+Section,Key,Value
+Essentials,Product Collection,Intel Agilex® 5 FPGAs and SoC FPGAs E-Series
+Essentials,Marketing Status,Launched
+Essentials,Launch Date,Q3'22
+Essentials,Lithography,Intel 7
+Resources,Logic Elements (LE),656080
+Resources,Adaptive Logic Modules (ALM),222400
+Resources,Adaptive Logic Module (ALM) Registers,889600
+Resources,Fabric and I/O Phase-Locked Loops (PLLs),21
+Resources,Maximum Embedded Memory,38.25 Mb
+Resources,Digital Signal Processing (DSP) Blocks,846
+Resources,Digital Signal Processing (DSP) Format,"Multiply, Multiply and Accumulate, Variable Precision, Fixed Point (hard IP), Floating Point (hard IP)"
+Resources,Peak INT8 (TOPS),25.99
+Resources,Hard Processor System (HPS),"Dual core Arm* Cortex* -A76, Dual core Arm* Cortex* -A55"
+Resources,Hard Memory Controllers,Yes
+Resources,External Memory Interfaces (EMIF),"DDR4, DDR5, LPDDR4, LPDDR5"
+I/O Specifications,Maximum User I/O Count†,504
+I/O Specifications,I/O Standards Support,"1.2 V LVCMOS, 1.8 V LVCMOS, SSTL, POD, HSTL, HSUL, Differential SSTL, Differential POD, Differential HSTL, Differential HSUL, True Differential Signaling"
+I/O Specifications,Maximum LVDS Pairs,192
+I/O Specifications,Maximum Non-Return to Zero (NRZ) Transceivers†,24
+I/O Specifications,Maximum Non-Return to Zero (NRZ) Data Rate†,28.1 Gbps
+I/O Specifications,Transceiver Protocol Hard IP,PCIe Gen4
+Advanced Technologies,Hyper-Registers,Yes
+Advanced Technologies,FPGA Bitstream Security,Yes
+Package Specifications,Package Options,B32A
+Supplemental Information,Additional Information,Product Table (Family Comparison)DatasheetAll FPGA Documentation

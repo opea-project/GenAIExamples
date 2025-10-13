@@ -1,0 +1,36 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® Ethernet E810 Controllers (up to 100GbE)
+Essentials,Code Name,Products formerly Columbiaville
+Essentials,Marketing Status,Launched
+Essentials,Launch Date,Q3'20
+Essentials,Expected Discontinuance,1H'31
+Essentials,Lithography,16 nm
+Essentials,Recommended Customer Price,$330.00
+Essentials,Supported Operating Systems,View now
+Essentials,Operating Temperature Range,0 °C to 85 °C
+Essentials,Max Operating Temperature,85 °C
+Essentials,Minimum Operating Temperature,0 °C
+Supplemental Information,Embedded Options Available,No
+Supplemental Information,Datasheet,View now
+Supplemental Information,Description,"Ethernet Controller, 100GbE bandwidth. Configurable as 1x100GbE, 2x50GbE, 4x25GbE, or 4x10GbE connections."
+Supplemental Information,Product Brief,View now
+Networking Specifications,Port Configuration,Single
+Networking Specifications,Data Rate Per Port,"1x100, 2x50, 4x25, or 4x10 Gbps"
+Networking Specifications,System Interface Type,PCIe 4.0/3.0
+Networking Specifications,NC Sideband Interface,Yes
+Networking Specifications,Jumbo Frames Supported,Yes
+Networking Specifications,Speed & Slot Width,PCIe 3.0/4.0 x16
+Package Specifications,Package Size,25x25mm
+Intel® Virtualization Technology for Connectivity,On-chip QoS and Traffic Management,Yes
+Intel® Virtualization Technology for Connectivity,Flexible Port Partitioning,Yes
+Intel® Virtualization Technology for Connectivity,Virtual Machine Device Queues (VMDq),Yes
+Intel® Virtualization Technology for Connectivity,PCI-SIG* SR-IOV Capable,Yes
+Advanced Technologies,Fiber Channel over Ethernet,No
+Advanced Technologies,MACsec IEEE 802.1 AE,No
+Advanced Technologies,IEEE 1588,Yes
+Advanced Technologies,Supported Under Intel vPro® Technology,No
+Advanced Technologies,iWARP/RDMA,Yes
+Advanced Technologies,RoCEv2/RDMA,Yes
+Advanced Technologies,Intel® Data Direct I/O Technology,Yes
+Advanced Technologies,Intelligent Offloads,Yes
+Advanced Technologies,Storage Over Ethernet,SMB Direct

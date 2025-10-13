@@ -1,0 +1,45 @@
+Product ID,Product Name,Launch Date,Total Cores,Max Turbo Frequency,Processor Base Frequency,Cache,TDP
+134803,Intel Atom® Processor C5115,Q2'22,4,,2.80 GHz,9 MB,43 W
+134802,Intel Atom® Processor C5125,Q2'22,8,,2.80 GHz,9 MB,50 W
+134801,Intel Atom® Processor C5310,Q2'22,4,,1.60 GHz,9 MB,32 W
+134800,Intel Atom® Processor C5315,Q2'22,4,,2.40 GHz,9 MB,38 W
+134799,Intel Atom® Processor C5320,Q2'22,8,,2.40 GHz,9 MB,41 W
+134798,Intel Atom® Processor C5325,Q2'22,8,,2.40 GHz,9 MB,41 W
+241454,Intel Atom® Processor C5335C1,Q2'22,12,,2.4 GHz,13.5 MB,50 W
+204839,Intel Atom® Processor C3338R,Q2'20,2,2.20 GHz,1.80 GHz,4 MB,10.5 W
+204842,Intel Atom® Processor C3436L,Q2'20,4,,1.30 GHz,8 MB,10.75 W
+204841,Intel Atom® Processor C3558R,Q2'20,4,,2.40 GHz,8 MB,17 W
+204840,Intel Atom® Processor C3758R,Q2'20,8,,2.40 GHz,16 MB,26 W
+184994,Intel Atom® Processor C3336,Q3'18,2,,1.50 GHz,4 MB,11 W
+97935,Intel Atom® Processor C3308,Q3'17,2,2.10 GHz,1.60 GHz,4 MB,9.5 W
+97930,Intel Atom® Processor C3508,Q3'17,4,1.60 GHz,1.60 GHz,8 MB,11.5 W
+97929,Intel Atom® Processor C3538,Q3'17,4,2.10 GHz,2.10 GHz,8 MB,15 W
+97937,Intel Atom® Processor C3558,Q3'17,4,2.20 GHz,2.20 GHz,8 MB,16 W
+97934,Intel Atom® Processor C3708,Q3'17,8,1.70 GHz,1.70 GHz,16 MB,17 W
+97938,Intel Atom® Processor C3750,Q3'17,8,2.40 GHz,2.20 GHz,16 MB,21 W
+97926,Intel Atom® Processor C3758,Q3'17,8,2.20 GHz,2.20 GHz,16 MB,25 W
+97939,Intel Atom® Processor C3808,Q3'17,12,2.00 GHz,2.00 GHz,12 MB,25 W
+97931,Intel Atom® Processor C3830,Q3'17,12,2.30 GHz,1.90 GHz,12 MB,21.5 W
+97932,Intel Atom® Processor C3850,Q3'17,12,2.40 GHz,2.10 GHz,12 MB,25 W
+97936,Intel Atom® Processor C3858,Q3'17,12,2.00 GHz,2.00 GHz,12 MB,25 W
+97940,Intel Atom® Processor C3950,Q3'17,16,2.20 GHz,1.70 GHz,16 MB,24 W
+97933,Intel Atom® Processor C3955,Q3'17,16,2.40 GHz,2.10 GHz,16 MB,32 W
+97927,Intel Atom® Processor C3958,Q3'17,16,2.00 GHz,2.00 GHz,16 MB,31 W
+123003,Intel Atom® Processor C2316,Q3'17,2,,1.50 GHz,1 MB,7 W
+123004,Intel Atom® Processor C2516,Q3'17,4,,1.40 GHz,2 MB,10 W
+97928,Intel Atom® Processor C3338,Q1'17,2,2.20 GHz,1.50 GHz,4 MB,8.5 W
+81328,Intel Atom® Processor C2308,Q2'14,2,,1.25 GHz,1 MB,6 W
+81270,Intel Atom® Processor C2508,Q2'14,4,,1.25 GHz,2 MB,9.5 W
+77976,Intel Atom® Processor C2338,Q3'13,2,2.00 GHz,1.70 GHz,1 MB,7 W
+77977,Intel Atom® Processor C2350,Q3'13,2,2.00 GHz,1.70 GHz,1 MB,6 W
+77978,Intel Atom® Processor C2358,Q3'13,2,2.00 GHz,1.70 GHz,1 MB,7 W
+77979,Intel Atom® Processor C2518,Q3'13,4,,1.70 GHz,2 MB,13 W
+77980,Intel Atom® Processor C2530,Q3'13,4,2.40 GHz,1.70 GHz,2 MB,9 W
+77981,Intel Atom® Processor C2538,Q3'13,4,,2.40 GHz,2 MB,15 W
+77982,Intel Atom® Processor C2550,Q3'13,4,2.60 GHz,2.40 GHz,2 MB,14 W
+77983,Intel Atom® Processor C2558,Q3'13,4,,2.40 GHz,2 MB,15 W
+77984,Intel Atom® Processor C2718,Q3'13,8,,2.00 GHz,4 MB,18 W
+77985,Intel Atom® Processor C2730,Q3'13,8,2.40 GHz,1.70 GHz,4 MB,12 W
+77986,Intel Atom® Processor C2738,Q3'13,8,,2.40 GHz,4 MB,20 W
+77987,Intel Atom® Processor C2750,Q3'13,8,2.60 GHz,2.40 GHz,4 MB,20 W
+77988,Intel Atom® Processor C2758,Q3'13,8,,2.40 GHz,4 MB,20 W

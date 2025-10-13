@@ -1,0 +1,19 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® Server Chassis FC2000 Family
+Essentials,Code Name,Products formerly Optimus Beach
+Essentials,Launch Date,Q1'20
+Essentials,Marketing Status,Discontinued
+Essentials,Expected Discontinuance,2023
+Essentials,EOL Announce,"Friday, May 5, 2023"
+Essentials,Last Order,"Friday, June 30, 2023"
+Essentials,Extended Warranty Available for Purchase (Select Countries),Yes
+Essentials,Chassis Form Factor,"2U Front IO, 4 node Rack"
+Essentials,Chassis Dimensions,"16.93"" x 36.61"" x 3.44"""
+Essentials,Target Market,High Performance Computing
+Essentials,Power Supply,2100 W
+Essentials,Power Supply Type,AC
+Essentials,# of Power Supply Included,3
+Essentials,Redundant Fans,Yes
+Essentials,Redundant Power Supported,Yes
+Supplemental Information,Description,"Air Cooled 2U flexible multi node chassis with front IO, capable of supporting either two, three, or four independent warm-swap compute nodes and 3x hot-swap CRPS 2100W (Platinum)  PSUs."
+Package Specifications,Max CPU Configuration,8

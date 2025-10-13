@@ -1,0 +1,37 @@
+Section,Key,Value
+Essentials,Product Collection,Intel Atom® Processor Z Series
+Essentials,Code Name,Products formerly Cloverview
+Essentials,Vertical Segment,Mobile
+Essentials,Processor Number,Z2580
+Essentials,Lithography,32 nm
+CPU Specifications,Total Cores,2
+CPU Specifications,Total Threads,4
+CPU Specifications,Burst Frequency,2.00 GHz
+CPU Specifications,Cache,1 MB Intel® Smart Cache
+Supplemental Information,Marketing Status,Discontinued
+Supplemental Information,Launch Date,Q2'13
+Supplemental Information,Embedded Options Available,No
+Memory Specifications,Max Memory Size (dependent on memory type),2 GB
+Memory Specifications,Memory Types,LPDDR2 1066
+Memory Specifications,Max # of Memory Channels,2
+Memory Specifications,Max Memory Bandwidth,8.5 GB/s
+Memory Specifications,Physical Address Extensions,32-bit
+GPU Specifications,Graphics Base Frequency,400 MHz
+GPU Specifications,Graphics Burst Frequency,533 MHz
+GPU Specifications,# of Displays Supported‡,2
+I/O Specifications,# of USB Ports,2
+I/O Specifications,USB Revision,"2.0 OTG, USB-SPH 2.0"
+I/O Specifications,UART,3
+Package Specifications,Sockets Supported,FC-MB4760
+Package Specifications,Max CPU Configuration,1
+Package Specifications,TJUNCTION,90°C
+Package Specifications,Package Size,14mm x 14mm
+Advanced Technologies,Intel® Hyper-Threading Technology‡,Yes
+Advanced Technologies,Instruction Set,32-bit
+Advanced Technologies,Instruction Set Extensions,"Intel® SSE2, Intel® SSE3, Intel® SSSE3"
+Advanced Technologies,Idle States,Yes
+Advanced Technologies,Enhanced Intel SpeedStep® Technology,Yes
+Advanced Technologies,Thermal Monitoring Technologies,Yes
+Advanced Technologies,Intel® Smart Idle Technology,Yes
+Security & Reliability,Intel® AES New Instructions,No
+Security & Reliability,Intel® Virtualization Technology (VT-x)‡,Yes

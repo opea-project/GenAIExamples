@@ -1,0 +1,21 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® Ethernet Connection X557
+Essentials,Code Name,Products formerly Coppervale
+Essentials,Marketing Status,Launched
+Essentials,Launch Date,Q2'15
+Essentials,Expected Discontinuance,1H'32
+Essentials,Lithography,28 nm
+Essentials,TDP,13.6 W
+Essentials,Recommended Customer Price,$158.13
+Essentials,Supported Operating Systems,View now
+Essentials,Operating Temperature Range,0°C to 55°C
+Essentials,Max Operating Temperature,55 °C
+Essentials,Minimum Operating Temperature,0 °C
+Supplemental Information,Datasheet,View now
+Supplemental Information,Description,Intel(r) Ethernet Connection X557 Family.  See the Product Brief for supported devices.
+Supplemental Information,Product Brief,View now
+Networking Specifications,Port Configuration,Quad
+Networking Specifications,Data Rate Per Port,10GbE
+Networking Specifications,Jumbo Frames Supported,Yes
+Networking Specifications,Interfaces Supported,"KR, KX, SGMII"
+Package Specifications,Package Size,25mm x 25mm

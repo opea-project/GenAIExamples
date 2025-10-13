@@ -1,0 +1,56 @@
+Product ID,Product Name,Launch Date,Total Cores,Max Turbo Frequency,Cache,GPU Name‡
+78929,Intel® Core™ i5-4210H Processor,Q3'14,2,3.50 GHz,3 MB Intel® Smart Cache,Intel® HD Graphics 4600
+83508,Intel® Core™ i5-4278U Processor,Q3'14,2,3.10 GHz,3 MB,Intel® Iris® Graphics 5100
+83507,Intel® Core™ i5-4308U Processor,Q3'14,2,3.30 GHz,3 MB,Intel® Iris® Graphics 5100
+80811,Intel® Core™ i5-4690K Processor,Q2'14,4,3.90 GHz,6 MB Intel® Smart Cache,Intel® HD Graphics 4600
+80817,Intel® Core™ i5-4460 Processor,Q2'14,4,3.40 GHz,6 MB Intel® Smart Cache,Intel® HD Graphics 4600
+80818,Intel® Core™ i5-4460S Processor,Q2'14,4,3.40 GHz,6 MB Intel® Smart Cache,Intel® HD Graphics 4600
+78927,Intel® Core™ i5-4460T Processor,Q2'14,4,2.70 GHz,6 MB Intel® Smart Cache,Intel® HD Graphics 4600
+80815,Intel® Core™ i5-4590 Processor,Q2'14,4,3.70 GHz,6 MB Intel® Smart Cache,Intel® HD Graphics 4600
+80816,Intel® Core™ i5-4590S Processor,Q2'14,4,3.70 GHz,6 MB Intel® Smart Cache,Intel® HD Graphics 4600
+78928,Intel® Core™ i5-4590T Processor,Q2'14,4,3.00 GHz,6 MB Intel® Smart Cache,Intel® HD Graphics 4600
+80810,Intel® Core™ i5-4690 Processor,Q2'14,4,3.90 GHz,6 MB Intel® Smart Cache,Intel® HD Graphics 4600
+80812,Intel® Core™ i5-4690S Processor,Q2'14,4,3.90 GHz,6 MB Intel® Smart Cache,Intel® HD Graphics 4600
+80813,Intel® Core™ i5-4690T Processor,Q2'14,4,3.50 GHz,6 MB Intel® Smart Cache,Intel® HD Graphics 4600
+81012,Intel® Core™ i5-4210M Processor,Q2'14,2,3.20 GHz,3 MB Intel® Smart Cache,Intel® HD Graphics 4600
+81016,Intel® Core™ i5-4210U Processor,Q2'14,2,2.70 GHz,3 MB Intel® Smart Cache,Intel® HD Graphics 4400
+81020,Intel® Core™ i5-4220Y Processor,Q2'14,2,2.00 GHz,3 MB,Intel® HD Graphics 4200
+75030,Intel® Core™ i5-4260U Processor,Q2'14,2,2.70 GHz,3 MB Intel® Smart Cache,Intel® HD Graphics 5000
+79199,Intel® Core™ i5-4410E Processor,Q2'14,2,,3 MB Intel® Smart Cache,Intel® HD Graphics 4600
+79201,Intel® Core™ i5-4422E Processor,Q2'14,2,2.90 GHz,3 MB Intel® Smart Cache,Intel® HD Graphics 4600
+75554,Intel® Core™ i5-4402EC Processor,Q1'14,2,,4 MB Intel® Smart Cache,
+80373,Intel® Core™ i5-4310M Processor,Q1'14,2,3.40 GHz,3 MB Intel® Smart Cache,Intel® HD Graphics 4600
+80343,Intel® Core™ i5-4310U Processor,Q1'14,2,3.00 GHz,3 MB Intel® Smart Cache,Intel® HD Graphics 4400
+80344,Intel® Core™ i5-4340M Processor,Q1'14,2,3.60 GHz,3 MB Intel® Smart Cache,Intel® HD Graphics 4600
+75034,Intel® Core™ i5-4360U Processor,Q1'14,2,3.00 GHz,3 MB Intel® Smart Cache,Intel® HD Graphics 5000
+75027,Intel® Core™ i5-4200H Processor,Q4'13,2,3.40 GHz,3 MB Intel® Smart Cache,Intel® HD Graphics 4600
+76348,Intel® Core™ i5-4200M Processor,Q4'13,2,3.10 GHz,3 MB Intel® Smart Cache,Intel® HD Graphics 4600
+76610,Intel® Core™ i5-4202Y Processor,Q3'13,2,2.00 GHz,3 MB Intel® Smart Cache,Intel® HD Graphics 4200
+76611,Intel® Core™ i5-4210Y Processor,Q3'13,2,1.90 GHz,3 MB Intel® Smart Cache,Intel® HD Graphics 4200
+76347,Intel® Core™ i5-4300M Processor,Q4'13,2,3.30 GHz,3 MB Intel® Smart Cache,Intel® HD Graphics 4600
+76308,Intel® Core™ i5-4300U Processor,Q3'13,2,2.90 GHz,3 MB Intel® Smart Cache,Intel® HD Graphics 4400
+76612,Intel® Core™ i5-4300Y Processor,Q3'13,2,2.30 GHz,3 MB Intel® Smart Cache,Intel® HD Graphics 4200
+76613,Intel® Core™ i5-4302Y Processor,Q3'13,2,2.30 GHz,3 MB Intel® Smart Cache,Intel® HD Graphics 4200
+76750,Intel® Core™ i5-4330M Processor,Q4'13,2,3.50 GHz,3 MB Intel® Smart Cache,Intel® HD Graphics 4600
+76292,Intel® Core™ i5-4400E Processor,Q3'13,2,3.30 GHz,3 MB Intel® Smart Cache,Intel® HD Graphics 4600
+76307,Intel® Core™ i5-4402E Processor,Q3'13,2,2.70 GHz,3 MB Intel® Smart Cache,Intel® HD Graphics 4600
+75038,Intel® Core™ i5-4440 Processor,Q3'13,4,3.30 GHz,6 MB Intel® Smart Cache,Intel® HD Graphics 4600
+75040,Intel® Core™ i5-4440S Processor,Q3'13,4,3.30 GHz,6 MB Intel® Smart Cache,Intel® HD Graphics 4600
+75459,Intel® Core™ i5-4200U Processor,Q3'13,2,2.60 GHz,3 MB Intel® Smart Cache,Intel® HD Graphics 4400
+75802,Intel® Core™ i5-4200Y Processor,Q3'13,2,1.90 GHz,3 MB Intel® Smart Cache,Intel® HD Graphics 4200
+75028,Intel® Core™ i5-4250U Processor,Q3'13,2,2.60 GHz,3 MB Intel® Smart Cache,Intel® HD Graphics 5000
+75990,Intel® Core™ i5-4258U Processor,Q3'13,2,2.90 GHz,3 MB Intel® Smart Cache,Intel® Iris® Graphics 5100
+75991,Intel® Core™ i5-4288U Processor,Q3'13,2,3.10 GHz,3 MB Intel® Smart Cache,Intel® Iris® Graphics 5100
+75033,Intel® Core™ i5-4350U Processor,Q3'13,2,2.90 GHz,3 MB Intel® Smart Cache,Intel® HD Graphics 5000
+76640,Intel® Core™ i5-4570R Processor,Q2'13,4,3.20 GHz,4 MB Intel® Smart Cache,Intel® Iris® Pro Graphics 5200
+76641,Intel® Core™ i5-4670R Processor,Q2'13,4,3.70 GHz,4 MB Intel® Smart Cache,Intel® Iris® Pro Graphics 5200
+75036,Intel® Core™ i5-4430 Processor,Q2'13,4,3.20 GHz,6 MB Intel® Smart Cache,Intel® HD Graphics 4600
+75037,Intel® Core™ i5-4430S Processor,Q2'13,4,3.20 GHz,6 MB Intel® Smart Cache,Intel® HD Graphics 4600
+75043,Intel® Core™ i5-4570 Processor,Q2'13,4,3.60 GHz,6 MB Intel® Smart Cache,Intel® HD Graphics 4600
+75044,Intel® Core™ i5-4570S Processor,Q2'13,4,3.60 GHz,6 MB Intel® Smart Cache,Intel® HD Graphics 4600
+75045,Intel® Core™ i5-4570T Processor,Q2'13,2,3.60 GHz,4 MB Intel® Smart Cache,Intel® HD Graphics 4600
+75468,Intel® Core™ i5-4570TE Processor,Q2'13,2,3.30 GHz,4 MB Intel® Smart Cache,Intel® HD Graphics 4600
+75047,Intel® Core™ i5-4670 Processor,Q2'13,4,3.80 GHz,6 MB Intel® Smart Cache,Intel® HD Graphics 4600
+75048,Intel® Core™ i5-4670K Processor,Q2'13,4,3.80 GHz,6 MB Intel® Smart Cache,Intel® HD Graphics 4600
+75049,Intel® Core™ i5-4670S Processor,Q2'13,4,3.80 GHz,6 MB Intel® Smart Cache,Intel® HD Graphics 4600
+75050,Intel® Core™ i5-4670T Processor,Q2'13,4,3.30 GHz,6 MB Intel® Smart Cache,Intel® HD Graphics 4600

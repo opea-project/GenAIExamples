@@ -1,0 +1,17 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® MAX® Development Kits
+Essentials,Marketing Status,Launched
+Essentials,Launch Date,2014
+Essentials,Featured FPGA,Intel® MAX® 10 FPGA
+Essentials,Logic Elements (LE),50000
+Essentials,On-chip Memory,1.6 Mb
+Essentials,FPGA Package,E144
+Essentials,Board Type,General Purpose
+Essentials,Ordering Part Number,DK-DEV-10M50-A
+Essentials,Distributor Availability,ArrowDigiKeyMouser
+Board Specifications,Interfaces,"GbE, USB, HMDI, GUI, SMA, JTAG, Ethernet"
+Board Specifications,Expansion,"HSMC, PMOD"
+Board Specifications,Memory,QSPI
+Board Specifications,Versions,Production
+Supplemental Information,Description,"Provides a full featured design platform built around a 50K logic elements Intel MAX 10 FPGA, optimized for system level integration with on-die analog-to-digital converter (ADC), dual-configuration flash, and DDR3 memory interface support."
+Supplemental Information,User Guide,View now
