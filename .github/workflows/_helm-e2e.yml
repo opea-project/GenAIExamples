@@ -74,6 +74,9 @@ jobs:
             echo $values_files
           elif [ "${{ inputs.mode }}" = "CD" ]; then
             values_files=$(ls ${{ inputs.example }}/kubernetes/helm/*values.yaml || true)
+            if [ "${{ inputs.example }}" = "FaqGen" ]; then
+              values_files=$(ls ChatQnA/kubernetes/helm/*values.yaml | grep "faqgen" || true)
+            fi
           fi
           value_files="["
           for file in ${values_files}; do
