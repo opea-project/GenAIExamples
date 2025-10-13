@@ -1,0 +1,19 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® Stratix® Development Kits
+Essentials,Marketing Status,Launched
+Essentials,Launch Date,2010
+Essentials,Featured FPGA,Stratix® V GX FPGA 5SGXEA7K2F40C2N
+Essentials,Logic Elements (LE),622000
+Essentials,On-chip Memory,57.16 Mb
+Essentials,DSP Blocks,256
+Essentials,FPGA Package,F40
+Essentials,Board Type,PCIe
+Essentials,Ordering Part Number,DK-DEV-5SGXEA7N
+Essentials,Distributor Availability,ArrowDigiKeyMouser
+Board Specifications,Interfaces,"PCIe, SDI, QSFP, SGMII, SMA, USB, JTAG"
+Board Specifications,Expansion,HSMC
+Board Specifications,Memory,"DDR3, QDRII+, RLDRAMII"
+Board Specifications,Special Feature,LCD
+Board Specifications,Versions,Production PCIe
+Supplemental Information,Description,The Stratix® V GX FPGA Development Kit provides a complete design environment that includes all the hardware and software you need to begin developing FPGA designs immediately.
+Supplemental Information,User Guide,View now

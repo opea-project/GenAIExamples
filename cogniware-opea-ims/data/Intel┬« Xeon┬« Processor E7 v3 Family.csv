@@ -1,0 +1,13 @@
+Product ID,Product Name,Launch Date,Total Cores,Max Turbo Frequency,Processor Base Frequency,Cache,TDP
+84676,Intel® Xeon® Processor E7-4809 v3,Q2'15,8,,2.00 GHz,20 MB Last Level Cache,115 W
+84677,Intel® Xeon® Processor E7-4820 v3,Q2'15,10,,1.90 GHz,25 MB Last Level Cache,115 W
+84678,Intel® Xeon® Processor E7-4830 v3,Q2'15,12,2.70 GHz,2.10 GHz,30 MB Last Level Cache,115 W
+84679,Intel® Xeon® Processor E7-4850 v3,Q2'15,14,2.80 GHz,2.20 GHz,35 MB Last Level Cache,115 W
+84680,Intel® Xeon® Processor E7-8860 v3,Q2'15,16,3.20 GHz,2.20 GHz,40 MB Last Level Cache,140 W
+84681,Intel® Xeon® Processor E7-8867 v3,Q2'15,16,3.30 GHz,2.50 GHz,45 MB,165 W
+84682,Intel® Xeon® Processor E7-8870 v3,Q2'15,18,2.90 GHz,2.10 GHz,45 MB Last Level Cache,140 W
+84683,Intel® Xeon® Processor E7-8880 v3,Q2'15,18,3.10 GHz,2.30 GHz,45 MB Last Level Cache,150 W
+84684,Intel® Xeon® Processor E7-8880L v3,Q2'15,18,2.80 GHz,2.00 GHz,45 MB Last Level Cache,115 W
+84685,Intel® Xeon® Processor E7-8890 v3,Q2'15,18,3.30 GHz,2.50 GHz,45 MB Last Level Cache,165 W
+84686,Intel® Xeon® Processor E7-8891 v3,Q2'15,10,3.50 GHz,2.80 GHz,45 MB Last Level Cache,165 W
+84688,Intel® Xeon® Processor E7-8893 v3,Q2'15,4,3.50 GHz,3.20 GHz,45 MB Last Level Cache,140 W

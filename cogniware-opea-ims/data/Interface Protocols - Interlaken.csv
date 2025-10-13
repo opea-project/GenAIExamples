@@ -1,0 +1,9 @@
+Product ID,Product Name,LatestVersion,LatestReleaseDate,Category,Ordering Part Number
+237701,Interlaken - 100G for 28nm and 20nm devices,,,Interface Protocols,"IP-ILKN/100G, IPR-ILKN/100G"
+237678,Interlaken - 200G for 28nm and 20nm devices,,,Interface Protocols,"IP-ILKN/200G, IPR-ILKN/200G"
+237702,Interlaken - 400G for 14nm devices,,,Interface Protocols,"IP-ILKN/400G, IPR-ILKN/400G"
+237697,Interlaken - 50G for 28nm and 20nm devices,,,Interface Protocols,"IP-ILKN/50G, IPR-ILKN/50G"
+237680,Interlaken Look-Aside - 100G for 28nm devices and 20nm devices,,,Interface Protocols,"IP-ILA/100G, IPR-ILA/100G"
+237698,Interlaken Look-Aside - 200G for 28nm devices and 20nm devices,,,Interface Protocols,"IP-ILA/200G, IPR-ILA/200G"
+237690,Interlaken Look-Aside - 400G for 14nm devices,,,Interface Protocols,"IP-ILA/400G, IPR-ILA/400G"
+237683,Interlaken Look-Aside - 50G for 28nm devices and 20nm devices,,,Interface Protocols,"IP-ILA/50G, IPR-ILA/50G"

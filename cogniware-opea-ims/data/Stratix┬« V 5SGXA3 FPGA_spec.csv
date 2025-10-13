@@ -1,0 +1,22 @@
+Section,Key,Value
+Essentials,Product Collection,Stratix® V GX FPGA
+Essentials,Marketing Status,Launched
+Essentials,Launch Date,2010
+Essentials,Lithography,28 nm
+Resources,Logic Elements (LE),340000
+Resources,Adaptive Logic Modules (ALM),128300
+Resources,Adaptive Logic Module (ALM) Registers,513200
+Resources,Fabric and I/O Phase-Locked Loops (PLLs),24
+Resources,Maximum Embedded Memory,22.92 Mb
+Resources,Digital Signal Processing (DSP) Blocks,256
+Resources,Digital Signal Processing (DSP) Format,"Multiply and Accumulate, Variable Precision, Fixed Point (hard IP)"
+Resources,Hard Memory Controllers,No
+Resources,External Memory Interfaces (EMIF),"DDR3, DDR2, DDR, QDR II, QDR II+, RLDRAM II, RLDRAM 3"
+I/O Specifications,Maximum User I/O Count†,696
+I/O Specifications,I/O Standards Support,"3.0 V LVTTL, 1.2 V to 3.0 V LVCMOS, SSTL, HSTL, HSUL, Differential SSTL, Differential HSTL, Differential HSUL, LVDS, Mini-LVDS, RSDS, LVPECL, BLVDS"
+I/O Specifications,Maximum LVDS Pairs,348
+I/O Specifications,Maximum Non-Return to Zero (NRZ) Transceivers†,36
+I/O Specifications,Maximum Non-Return to Zero (NRZ) Data Rate†,14.1 Gbps
+I/O Specifications,Transceiver Protocol Hard IP,PCIe Gen3
+Package Specifications,Package Options,"F780, F1152, F1517"
+Supplemental Information,Additional Information,Product Table (Family Comparison)DatasheetAll FPGA Documentation

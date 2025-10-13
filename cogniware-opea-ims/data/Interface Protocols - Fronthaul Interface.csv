@@ -1,0 +1,4 @@
+Product ID,Product Name,LatestVersion,LatestReleaseDate,Category,Ordering Part Number
+237772,FPGA IP example design for O-RAN fronthaul multiplexer,,,Interface Protocols,IP-ED-FHM
+237771,FPGA IP for O-RAN fronthaul compression and decompression,,,Interface Protocols,IP-FH-COMP
+237750,ORAN Fronthaul Interface,,,Interface Protocols,IP-ORAN-FH

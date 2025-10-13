@@ -1,0 +1,6 @@
+Product ID,Product Name,Launch Date,Total Cores,Max Turbo Frequency,Processor Base Frequency,Cache,TDP
+88096,Intel® Xeon® Processor E3-1258L v4,Q2'15,4,3.20 GHz,1.80 GHz,6 MB Intel® Smart Cache,47 W
+88041,Intel® Xeon® Processor E3-1265L v4,Q2'15,4,3.30 GHz,2.30 GHz,6 MB,35 W
+88097,Intel® Xeon® Processor E3-1278L v4,Q2'15,4,3.30 GHz,2.00 GHz,6 MB Intel® Smart Cache,47 W
+88046,Intel® Xeon® Processor E3-1285 v4,Q2'15,4,3.80 GHz,3.50 GHz,6 MB,95 W
+88043,Intel® Xeon® Processor E3-1285L v4,Q2'15,4,3.80 GHz,3.40 GHz,6 MB,65 W

@@ -1,0 +1,71 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® Xeon® Processor E3 v5 Family
+Essentials,Code Name,Products formerly Skylake
+Essentials,Vertical Segment,Server
+Essentials,Processor Number,E3-1275V5
+Essentials,Lithography,14 nm
+CPU Specifications,Total Cores,4
+CPU Specifications,Total Threads,8
+CPU Specifications,Max Turbo Frequency,4.00 GHz
+CPU Specifications,Intel® Turbo Boost Technology 2.0 Frequency‡,4.00 GHz
+CPU Specifications,Processor Base Frequency,3.60 GHz
+CPU Specifications,Cache,8 MB Intel® Smart Cache
+CPU Specifications,Bus Speed,8 GT/s
+CPU Specifications,TDP,80 W
+Supplemental Information,Marketing Status,Launched
+Supplemental Information,Launch Date,Q4'15
+Supplemental Information,Servicing Status,End of Servicing Lifetime
+Supplemental Information,End of Servicing Updates Date,"Friday, September 30, 2022"
+Supplemental Information,Embedded Options Available,Yes
+Supplemental Information,Use Conditions,PC/Client/Tablet
+Memory Specifications,Max Memory Size (dependent on memory type),64 GB
+Memory Specifications,Memory Types,"DDR4-1866/2133, DDR3L-1333/1600 @ 1.35V"
+Memory Specifications,Max # of Memory Channels,2
+Memory Specifications,Max Memory Bandwidth,34.1 GB/s
+Memory Specifications,ECC Memory Supported‡,Yes
+GPU Specifications,GPU Name‡,Intel® HD Graphics P530
+GPU Specifications,Graphics Base Frequency,400 MHz
+GPU Specifications,Graphics Max Dynamic Frequency,1.15 GHz
+GPU Specifications,Graphics Video Max Memory,64 GB
+GPU Specifications,Graphics Output,eDP/DP/HDMI/DVI
+GPU Specifications,4K Support,"Yes, at 60Hz"
+GPU Specifications,Max Resolution (HDMI)‡,4096x2304@24Hz
+GPU Specifications,Max Resolution (DP)‡,4096x2304@60Hz
+GPU Specifications,Max Resolution (eDP - Integrated Flat Panel)‡,4096x2304@60Hz
+GPU Specifications,Max Resolution (VGA)‡,N/A
+GPU Specifications,DirectX* Support,12
+GPU Specifications,OpenGL* Support,4.4
+GPU Specifications,Intel® Quick Sync Video,Yes
+GPU Specifications,Intel® InTru™ 3D Technology,Yes
+GPU Specifications,Intel® Clear Video HD Technology,Yes
+GPU Specifications,Intel® Clear Video Technology,Yes
+GPU Specifications,# of Displays Supported‡,3
+GPU Specifications,Device ID,0x191D
+Expansion Options,Scalability,1S Only
+Expansion Options,PCI Express Revision,3.0
+Expansion Options,PCI Express Configurations‡,"1x16, 2x8, 1x8+2x4"
+Expansion Options,Max # of PCI Express Lanes,16
+Package Specifications,Sockets Supported,FCLGA1151
+Package Specifications,Max CPU Configuration,1
+Package Specifications,Package Size,37.5mm x 37.5mm
+Advanced Technologies,Intel® Turbo Boost Technology‡,2.0
+Advanced Technologies,Intel® Hyper-Threading Technology‡,Yes
+Advanced Technologies,Intel® Transactional Synchronization Extensions,Yes
+Advanced Technologies,Intel® 64‡,Yes
+Advanced Technologies,Instruction Set,64-bit
+Advanced Technologies,Instruction Set Extensions,"Intel® SSE4.1, Intel® SSE4.2, Intel® AVX2"
+Advanced Technologies,Idle States,Yes
+Advanced Technologies,Enhanced Intel SpeedStep® Technology,Yes
+Advanced Technologies,Thermal Monitoring Technologies,Yes
+Security & Reliability,Intel vPro® Eligibility‡,Intel vPro® Platform
+Security & Reliability,Intel® Secure Key,Yes
+Security & Reliability,Intel® AES New Instructions,Yes
+Security & Reliability,Intel® Software Guard Extensions (Intel® SGX),Yes with Intel® ME
+Security & Reliability,Intel® Memory Protection Extensions (Intel® MPX),Yes
+Security & Reliability,Intel® OS Guard,Yes
+Security & Reliability,Intel® Trusted Execution Technology‡,Yes
+Security & Reliability,Execute Disable Bit‡,Yes
+Security & Reliability,Intel® Boot Guard,Yes
+Security & Reliability,Intel® Virtualization Technology (VT-x)‡,Yes
+Security & Reliability,Intel® Virtualization Technology for Directed I/O (VT-d)‡,Yes
+Security & Reliability,Intel® VT-x with Extended Page Tables (EPT)‡,Yes

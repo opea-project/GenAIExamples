@@ -1,0 +1,77 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® Xeon® E Processor
+Essentials,Code Name,Products formerly Coffee Lake
+Essentials,Vertical Segment,Embedded
+Essentials,Processor Number,E-2276ME
+Essentials,Lithography,14 nm
+Essentials,Recommended Customer Price,$450.00
+CPU Specifications,Total Cores,6
+CPU Specifications,Total Threads,12
+CPU Specifications,Max Turbo Frequency,4.50 GHz
+CPU Specifications,Intel® Turbo Boost Technology 2.0 Frequency‡,4.50 GHz
+CPU Specifications,Processor Base Frequency,2.80 GHz
+CPU Specifications,Cache,12 MB
+CPU Specifications,Bus Speed,8 GT/s
+CPU Specifications,TDP,45 W
+CPU Specifications,Configurable TDP-down,35 W
+Supplemental Information,Marketing Status,Launched
+Supplemental Information,Launch Date,Q2'19
+Supplemental Information,Servicing Status,Baseline Servicing
+Supplemental Information,Embedded Options Available,Yes
+Supplemental Information,Use Conditions,Embedded Broad Market Commercial Temp
+Memory Specifications,Max Memory Size (dependent on memory type),64 GB
+Memory Specifications,Memory Types,DDR4-2666
+Memory Specifications,Max # of Memory Channels,2
+Memory Specifications,ECC Memory Supported‡,Yes
+GPU Specifications,GPU Name‡,Intel® UHD Graphics P630
+GPU Specifications,Graphics Base Frequency,350 MHz
+GPU Specifications,Graphics Max Dynamic Frequency,1.15 GHz
+GPU Specifications,Graphics Video Max Memory,64 GB
+GPU Specifications,Graphics Output,eDP/DP/HDMI/DVI
+GPU Specifications,4K Support,"Yes, at 60Hz"
+GPU Specifications,Max Resolution (HDMI)‡,4096x2160@30Hz
+GPU Specifications,Max Resolution (DP)‡,4096x2304@30Hz
+GPU Specifications,Max Resolution (eDP - Integrated Flat Panel)‡,4096x2304@30Hz
+GPU Specifications,Max Resolution (VGA)‡,N/A
+GPU Specifications,DirectX* Support,12
+GPU Specifications,OpenGL* Support,4.5
+GPU Specifications,Intel® Quick Sync Video,Yes
+GPU Specifications,Intel® InTru™ 3D Technology,Yes
+GPU Specifications,Intel® Clear Video HD Technology,Yes
+GPU Specifications,Intel® Clear Video Technology,Yes
+GPU Specifications,# of Displays Supported‡,3
+GPU Specifications,Device ID,0x3E94
+Expansion Options,PCI Express Revision,3.0
+Expansion Options,PCI Express Configurations‡,"Up to 1x16, 2x8, 1x8+2x4"
+Expansion Options,Max # of PCI Express Lanes,16
+Package Specifications,Sockets Supported,FCBGA1440
+Package Specifications,Max CPU Configuration,1
+Package Specifications,TJUNCTION,100
+Package Specifications,Package Size,42mm x 28mm
+Advanced Technologies,Intel® Optane™ Memory Supported‡,Yes
+Advanced Technologies,Intel® Speed Shift Technology,Yes
+Advanced Technologies,Intel® Turbo Boost Technology‡,2.0
+Advanced Technologies,Intel® Hyper-Threading Technology‡,Yes
+Advanced Technologies,Intel® Transactional Synchronization Extensions,Yes
+Advanced Technologies,Intel® 64‡,Yes
+Advanced Technologies,Instruction Set,64-bit
+Advanced Technologies,Instruction Set Extensions,"Intel® SSE4.1, Intel® SSE4.2, Intel® AVX2"
+Advanced Technologies,Intel® My WiFi Technology,Yes
+Advanced Technologies,Idle States,Yes
+Advanced Technologies,Enhanced Intel SpeedStep® Technology,Yes
+Advanced Technologies,Thermal Monitoring Technologies,Yes
+Advanced Technologies,Intel® Flex Memory Access,Yes
+Advanced Technologies,Intel® Identity Protection Technology‡,Yes
+Security & Reliability,Intel vPro® Eligibility‡,Intel vPro® Platform
+Security & Reliability,Intel® Secure Key,Yes
+Security & Reliability,Intel® AES New Instructions,Yes
+Security & Reliability,Intel® Software Guard Extensions (Intel® SGX),Yes with Intel® ME
+Security & Reliability,Intel® Memory Protection Extensions (Intel® MPX),Yes
+Security & Reliability,Intel® OS Guard,Yes
+Security & Reliability,Intel® Trusted Execution Technology‡,Yes
+Security & Reliability,Execute Disable Bit‡,Yes
+Security & Reliability,Intel® Boot Guard,Yes
+Security & Reliability,Intel® Stable IT Platform Program (SIPP),Yes
+Security & Reliability,Intel® Virtualization Technology (VT-x)‡,Yes
+Security & Reliability,Intel® Virtualization Technology for Directed I/O (VT-d)‡,Yes
+Security & Reliability,Intel® VT-x with Extended Page Tables (EPT)‡,Yes

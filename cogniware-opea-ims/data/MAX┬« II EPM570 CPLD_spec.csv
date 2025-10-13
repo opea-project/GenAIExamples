@@ -1,0 +1,27 @@
+Section,Key,Value
+Essentials,Product Collection,MAX® II CPLD
+Essentials,Marketing Status,Launched
+Essentials,Launch Date,Q1'14
+Essentials,Lithography,180 nm
+Resources,Equivalent Macrocells,440
+Resources,Pin-to-pin Delay,9 ns
+Resources,User Flash Memory,8 Kb
+Features,Boundary-scan JTAG,Yes
+Features,JTAG ISP,Yes
+Features,Fast Input Registers,Yes
+Features,Programmable Register Power-up,Yes
+Features,JTAG Translator,Yes
+Features,Real-time ISP,Yes
+Features,MultiVolt I/Os†,"1.5, 1.8, 2.5, 3.3"
+Features,I/O Power Banks,2
+Features,Maximum Output Enables,160
+Features,LVTTL/LVCMOS,Yes
+Features,Schmitt Triggers,Yes
+Features,Programmable Slew Rate,Yes
+Features,Programmable Pull-up Resistors,Yes
+Features,Programmable GND Pins,Yes
+Features,Open-drain Outputs,Yes
+Features,Bus Hold,Yes
+Package Specifications,Package Options,"M100, F100, M256, T100, F256, T144"
+Package Specifications,Package Size,"6mmx6mm,11mmx11mm,11mmx11mm,16mmx16mm,17mmx17mm,22mmx22mm"
+Supplemental Information,Additional Information,View now
