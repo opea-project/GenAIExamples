@@ -18,9 +18,8 @@ async function enterMessageToChat(page: Page, message: string) {
 	await page.getByTestId("chat-input").click();
 	await page.getByTestId("chat-input").fill(message);
 	await page.getByTestId("chat-input").press("Enter");
-	
-	await expect(page.getByTestId("display-answer")).toBeVisible({ timeout: 5 * 60 * 1000 });
 
+	await expect(page.getByTestId("display-answer")).toBeVisible({ timeout: 5 * 60 * 1000 });
 }
 
 // Test description: New Chat
