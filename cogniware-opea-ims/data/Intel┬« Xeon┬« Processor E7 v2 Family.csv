@@ -1,0 +1,21 @@
+Product ID,Product Name,Launch Date,Total Cores,Max Turbo Frequency,Processor Base Frequency,Cache,TDP
+75239,Intel® Xeon® Processor E7-2850 v2,Q1'14,12,2.80 GHz,2.30 GHz,24 MB,105 W
+75240,Intel® Xeon® Processor E7-2870 v2,Q1'14,15,2.90 GHz,2.30 GHz,30 MB,130 W
+75241,Intel® Xeon® Processor E7-2880 v2,Q1'14,15,3.10 GHz,2.50 GHz,37.5 MB,130 W
+75242,Intel® Xeon® Processor E7-2890 v2,Q1'14,15,3.40 GHz,2.80 GHz,37.5 MB,155 W
+75245,Intel® Xeon® Processor E7-4809 v2,Q1'14,6,,1.90 GHz,12 MB,105 W
+75246,Intel® Xeon® Processor E7-4820 v2,Q1'14,8,2.50 GHz,2.00 GHz,16 MB,105 W
+75247,Intel® Xeon® Processor E7-4830 v2,Q1'14,10,2.70 GHz,2.20 GHz,20 MB,105 W
+75248,Intel® Xeon® Processor E7-4850 v2,Q1'14,12,2.80 GHz,2.30 GHz,24 MB,105 W
+75249,Intel® Xeon® Processor E7-4860 v2,Q1'14,12,3.20 GHz,2.60 GHz,30 MB,130 W
+75250,Intel® Xeon® Processor E7-4870 v2,Q1'14,15,2.90 GHz,2.30 GHz,30 MB,130 W
+75773,Intel® Xeon® Processor E7-4880 v2,Q1'14,15,3.10 GHz,2.50 GHz,37.5 MB,130 W
+75251,Intel® Xeon® Processor E7-4890 v2,Q1'14,15,3.40 GHz,2.80 GHz,37.5 MB,155 W
+75253,Intel® Xeon® Processor E7-8850 v2,Q1'14,12,2.80 GHz,2.30 GHz,24 MB,105 W
+75254,Intel® Xeon® Processor E7-8857 v2,Q1'14,12,3.60 GHz,3.00 GHz,30 MB,130 W
+75255,Intel® Xeon® Processor E7-8870 v2,Q1'14,15,2.90 GHz,2.30 GHz,30 MB,130 W
+75257,Intel® Xeon® Processor E7-8880 v2,Q1'14,15,3.10 GHz,2.50 GHz,37.5 MB,130 W
+75256,Intel® Xeon® Processor E7-8880L v2,Q1'14,15,2.80 GHz,2.20 GHz,37.5 MB,105 W
+75258,Intel® Xeon® Processor E7-8890 v2,Q1'14,15,3.40 GHz,2.80 GHz,37.5 MB,155 W
+75259,Intel® Xeon® Processor E7-8891 v2,Q1'14,10,3.70 GHz,3.20 GHz,37.5 MB,155 W
+75260,Intel® Xeon® Processor E7-8893 v2,Q1'14,6,3.70 GHz,3.40 GHz,37.5 MB,155 W

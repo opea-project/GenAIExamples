@@ -1,0 +1,11 @@
+Section,Key,Value
+Essentials,Product Collection,I/O Options
+Essentials,Code Name,Products formerly Wolf Pass
+Essentials,Marketing Status,Discontinued
+Essentials,Launch Date,Q4'17
+Essentials,Expected Discontinuance,Q4'20
+Essentials,EOL Announce,"Tuesday, August 25, 2020"
+Essentials,Last Order,"Sunday, November 1, 2020"
+Essentials,Last Receipt Attributes,"Friday, January 1, 2021"
+Essentials,Included Items,"Kit includes:(1) IFT Carrier PCIe Add-in Board(1) 235mm cable, 1 port, PCIe add-in card to Fabric Processor #1(1) 430mm 2x12 HFI Sideband Y Cable, Single Omni-Path Sideband IFT Carrier to dual Omni-Path CPU connectors (PCIe add-in card to server board CPU HFI Sideband connectors)(1) Fabric Processor ClipDual Fabric Processor Support:Dual Fabric processor configurations require the following additional accessory kits to be ordered separately:Cable kit AXXCBL235IFPR1 – 235mm cable for PCIe Add-in card to Fabric Processor #2Fabric Processor Clip Kit FXXCPUCLIPF – Used to attach fabric enabled processor to processor heat sink"
+Supplemental Information,Description,Accessory IFT Fab Carrier PCIe kit to support Xeon Fabric processor. Includes 1 sideband cable and 1 IFP cable.

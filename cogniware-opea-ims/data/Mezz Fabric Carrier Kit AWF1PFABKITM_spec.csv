@@ -1,0 +1,11 @@
+Section,Key,Value
+Essentials,Product Collection,I/O Options
+Essentials,Code Name,Products formerly Wolf Pass
+Essentials,Marketing Status,Discontinued
+Essentials,Launch Date,Q3'17
+Essentials,Expected Discontinuance,Q4'20
+Essentials,EOL Announce,"Tuesday, August 25, 2020"
+Essentials,Last Order,"Sunday, November 1, 2020"
+Essentials,Last Receipt Attributes,"Friday, January 1, 2021"
+Essentials,Included Items,"Allows external access to the Host Fabric Interface (HFI) on supported processors.  The connection to the external access is done through two QSFP+28 style connections.The fabric carrier is designed to be mounted at the OCP Mezz location found on the baseboard/chassis.  There is no connection to the motherboard OCP connector.  All required signals/power for the board are passed through the sideband cable.Kit includes:(1) IFT Carrier Board Mezz(1) 235mm, 1 port, straight IFP28 connector to LEC54B right angle – right exit connector  (Mezzanine card to Fabric Processor #1)(1) 430mm, 2x12 HFI Sideband Y Cable, Single Omni-Path Sideband IFT Carrier to dual Omni-Path CPU connectors (Mezzanine card to server board CPU HFI Sideband connectors)(2) Fabric Processor Clips(4) Mounting ScrewsAdditional Required Accessory:Dual processor configurations requires the addition of cable kit AXXCBL370IFPS1 (Mezzanine card to Fabric Processor #2)"
+Supplemental Information,Description,Accessory IFT Fab Carrier Mezzanine kit to support Xeon Fabric processor. Includes 1 sideband cable and 1 IFP cable.

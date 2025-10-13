@@ -1,0 +1,44 @@
+Product ID,Product Name,Launch Date,Total Cores,Max Turbo Frequency,Processor Base Frequency,Cache,TDP
+66662,Intel® Xeon® Processor E5-1428L,Q2'12,6,,1.80 GHz,15 MB L3 Cache,60 W
+64615,Intel® Xeon® Processor E5-2403,Q2'12,4,,1.80 GHz,10 MB Intel® Smart Cache,80 W
+64614,Intel® Xeon® Processor E5-2407,Q2'12,4,,2.20 GHz,10 MB Intel® Smart Cache,80 W
+67026,Intel® Xeon® Processor E5-2418L,Q2'12,4,2.10 GHz,2.00 GHz,10 MB Intel® Smart Cache,50 W
+64617,Intel® Xeon® Processor E5-2420,Q2'12,6,2.40 GHz,1.90 GHz,15 MB Intel® Smart Cache,95 W
+67025,Intel® Xeon® Processor E5-2428L,Q2'12,6,2.00 GHz,1.80 GHz,15 MB Intel® Smart Cache,60 W
+64616,Intel® Xeon® Processor E5-2430,Q2'12,6,2.70 GHz,2.20 GHz,15 MB Intel® Smart Cache,95 W
+64613,Intel® Xeon® Processor E5-2430L,Q2'12,6,2.50 GHz,2.00 GHz,15 MB Intel® Smart Cache,60 W
+64612,Intel® Xeon® Processor E5-2440,Q2'12,6,2.90 GHz,2.40 GHz,15 MB Intel® Smart Cache,95 W
+67024,Intel® Xeon® Processor E5-2448L,Q2'12,8,2.10 GHz,1.80 GHz,20 MB Intel® Smart Cache,70 W
+64611,Intel® Xeon® Processor E5-2450,Q2'12,8,2.90 GHz,2.10 GHz,20 MB Intel® Smart Cache,95 W
+64610,Intel® Xeon® Processor E5-2450L,Q2'12,8,2.30 GHz,1.80 GHz,20 MB Intel® Smart Cache,70 W
+64623,Intel® Xeon® Processor E5-2470,Q2'12,8,3.10 GHz,2.30 GHz,20 MB Intel® Smart Cache,95 W
+64609,Intel® Xeon® Processor E5-4603,Q2'12,4,,2.00 GHz,10 MB Intel® Smart Cache,95 W
+64604,Intel® Xeon® Processor E5-4607,Q2'12,6,,2.20 GHz,12 MB Intel® Smart Cache,95 W
+64602,Intel® Xeon® Processor E5-4610,Q2'12,6,2.90 GHz,2.40 GHz,15 MB Intel® Smart Cache,95 W
+64608,Intel® Xeon® Processor E5-4617,Q2'12,6,3.40 GHz,2.90 GHz,15 MB Intel® Smart Cache,130 W
+64607,Intel® Xeon® Processor E5-4620,Q2'12,8,2.60 GHz,2.20 GHz,16 MB Intel® Smart Cache,95 W
+64603,Intel® Xeon® Processor E5-4640,Q2'12,8,2.80 GHz,2.40 GHz,20 MB Intel® Smart Cache,95 W
+64622,Intel® Xeon® Processor E5-4650,Q2'12,8,3.30 GHz,2.70 GHz,20 MB Intel® Smart Cache,130 W
+64606,Intel® Xeon® Processor E5-4650L,Q2'12,8,3.10 GHz,2.60 GHz,20 MB Intel® Smart Cache,115 W
+64621,Intel® Xeon® Processor E5-1620,Q1'12,4,3.80 GHz,3.60 GHz,10 MB Intel® Smart Cache,130 W
+64601,Intel® Xeon® Processor E5-1650,Q1'12,6,3.80 GHz,3.20 GHz,12 MB Intel® Smart Cache,130 W
+64620,Intel® Xeon® Processor E5-1660,Q1'12,6,3.90 GHz,3.30 GHz,15 MB Intel® Smart Cache,130 W
+64592,Intel® Xeon® Processor E5-2603,Q1'12,4,,1.80 GHz,10 MB Intel® Smart Cache,80 W
+64588,Intel® Xeon® Processor E5-2609,Q1'12,4,,2.40 GHz,10 MB Intel® Smart Cache,80 W
+64594,Intel® Xeon® Processor E5-2620,Q1'12,6,2.50 GHz,2.00 GHz,15 MB Intel® Smart Cache,95 W
+64593,Intel® Xeon® Processor E5-2630,Q1'12,6,2.80 GHz,2.30 GHz,15 MB Intel® Smart Cache,95 W
+64586,Intel® Xeon® Processor E5-2630L,Q1'12,6,2.50 GHz,2.00 GHz,15 MB Intel® Smart Cache,60 W
+64598,Intel® Xeon® Processor E5-2637,Q1'12,2,3.50 GHz,3.00 GHz,5 MB Intel® Smart Cache,80 W
+64591,Intel® Xeon® Processor E5-2640,Q1'12,6,3.00 GHz,2.50 GHz,15 MB Intel® Smart Cache,95 W
+64587,Intel® Xeon® Processor E5-2643,Q1'12,4,3.50 GHz,3.30 GHz,10 MB Intel® Smart Cache,130 W
+61426,Intel® Xeon® Processor E5-2648L,Q1'12,8,2.10 GHz,1.80 GHz,20 MB Intel® Smart Cache,70 W
+64590,Intel® Xeon® Processor E5-2650,Q1'12,8,2.80 GHz,2.00 GHz,20 MB Intel® Smart Cache,95 W
+64585,Intel® Xeon® Processor E5-2650L,Q1'12,8,2.30 GHz,1.80 GHz,20 MB Intel® Smart Cache,70 W
+61428,Intel® Xeon® Processor E5-2658,Q1'12,8,2.40 GHz,2.10 GHz,20 MB Intel® Smart Cache,95 W
+64584,Intel® Xeon® Processor E5-2660,Q1'12,8,3.00 GHz,2.20 GHz,20 MB Intel® Smart Cache,95 W
+64597,Intel® Xeon® Processor E5-2665,Q1'12,8,3.10 GHz,2.40 GHz,20 MB Intel® Smart Cache,115 W
+64589,Intel® Xeon® Processor E5-2667,Q1'12,6,3.50 GHz,2.90 GHz,15 MB Intel® Smart Cache,130 W
+64595,Intel® Xeon® Processor E5-2670,Q1'12,8,3.30 GHz,2.60 GHz,20 MB Intel® Smart Cache,115 W
+64583,Intel® Xeon® Processor E5-2680,Q1'12,8,3.50 GHz,2.70 GHz,20 MB Intel® Smart Cache,130 W
+64582,Intel® Xeon® Processor E5-2687W,Q1'12,8,3.80 GHz,3.10 GHz,20 MB Intel® Smart Cache,150 W
+64596,Intel® Xeon® Processor E5-2690,Q1'12,8,3.80 GHz,2.90 GHz,20 MB Intel® Smart Cache,135 W

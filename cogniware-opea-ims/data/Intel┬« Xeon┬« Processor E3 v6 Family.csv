@@ -1,0 +1,15 @@
+Product ID,Product Name,Launch Date,Total Cores,Max Turbo Frequency,Processor Base Frequency,Cache,TDP
+99978,Intel® Xeon® Processor E3-1285 v6,Q3'17,4,4.50 GHz,4.10 GHz,8 MB Intel® Smart Cache,79 W
+97470,Intel® Xeon® Processor E3-1220 v6,Q1'17,4,3.50 GHz,3.00 GHz,8 MB Intel® Smart Cache,72 W
+97476,Intel® Xeon® Processor E3-1225 v6,Q1'17,4,3.70 GHz,3.30 GHz,8 MB Intel® Smart Cache,73 W
+97474,Intel® Xeon® Processor E3-1230 v6,Q1'17,4,3.90 GHz,3.50 GHz,8 MB Intel® Smart Cache,72 W
+97469,Intel® Xeon® Processor E3-1240 v6,Q1'17,4,4.10 GHz,3.70 GHz,8 MB Intel® Smart Cache,72 W
+97473,Intel® Xeon® Processor E3-1245 v6,Q1'17,4,4.10 GHz,3.70 GHz,8 MB Intel® Smart Cache,73 W
+97479,Intel® Xeon® Processor E3-1270 v6,Q1'17,4,4.20 GHz,3.80 GHz,8 MB Intel® Smart Cache,72 W
+97478,Intel® Xeon® Processor E3-1275 v6,Q1'17,4,4.20 GHz,3.80 GHz,8 MB Intel® Smart Cache,73 W
+97475,Intel® Xeon® Processor E3-1280 v6,Q1'17,4,4.20 GHz,3.90 GHz,8 MB Intel® Smart Cache,72 W
+98858,Intel® Xeon® Processor E3-1505L v6,Q1'17,4,3.00 GHz,2.20 GHz,8 MB,25 W
+97463,Intel® Xeon® Processor E3-1505M v6,Q1'17,4,4.00 GHz,3.00 GHz,8 MB,45 W
+97468,Intel® Xeon® Processor E3-1535M v6,Q1'17,4,4.20 GHz,3.10 GHz,8 MB,45 W
+122823,Intel® Xeon® Processor E3-1501L v6,Q3'16,4,2.90 GHz,2.10 GHz,6 MB,25 W
+122822,Intel® Xeon® Processor E3-1501M v6,Q3'16,4,3.60 GHz,2.90 GHz,6 MB,45 W

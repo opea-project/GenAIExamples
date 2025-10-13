@@ -1,0 +1,13 @@
+Product ID,Product Name,Launch Date,Total Cores,Max Turbo Frequency,Processor Base Frequency,Cache,TDP
+96900,Intel® Xeon® Processor E7-8894 v4,Q1'17,24,3.40 GHz,2.40 GHz,60 MB,165 W
+93794,Intel® Xeon® Processor E7-4809 v4,Q2'16,8,,2.10 GHz,20 MB,115 W
+93814,Intel® Xeon® Processor E7-4820 v4,Q2'16,10,,2.00 GHz,25 MB,115 W
+93811,Intel® Xeon® Processor E7-4830 v4,Q2'16,14,2.80 GHz,2.00 GHz,35 MB,115 W
+93806,Intel® Xeon® Processor E7-4850 v4,Q2'16,16,2.80 GHz,2.10 GHz,40 MB,115 W
+93793,Intel® Xeon® Processor E7-8860 v4,Q2'16,18,3.20 GHz,2.20 GHz,45 MB,140 W
+93804,Intel® Xeon® Processor E7-8867 v4,Q2'16,18,3.30 GHz,2.40 GHz,45 MB,165 W
+93801,Intel® Xeon® Processor E7-8870 v4,Q2'16,20,3.00 GHz,2.10 GHz,50 MB,140 W
+93792,Intel® Xeon® Processor E7-8880 v4,Q2'16,22,3.30 GHz,2.20 GHz,55 MB,150 W
+93790,Intel® Xeon® Processor E7-8890 v4,Q2'16,24,3.40 GHz,2.20 GHz,60 MB,165 W
+93795,Intel® Xeon® Processor E7-8891 v4,Q2'16,10,3.50 GHz,2.80 GHz,60 MB,165 W
+93791,Intel® Xeon® Processor E7-8893 v4,Q2'16,4,3.50 GHz,3.20 GHz,60 MB,140 W

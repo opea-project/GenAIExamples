@@ -1,0 +1,32 @@
+Section,Key,Value
+Essentials,Product Collection,MAX® V CPLD
+Essentials,Marketing Status,Launched
+Essentials,Launch Date,2010
+Essentials,Lithography,180 nm
+Resources,Logic Elements (LE),80
+Resources,Equivalent Macrocells,64
+Resources,Pin-to-pin Delay,7.5 ns
+Resources,User Flash Memory,8 Kb
+Resources,Logic Convertible To Memory,Yes
+Features,Internal Oscillator,Yes
+Features,Fast Power-on Reset,Yes
+Features,Boundary-scan JTAG,Yes
+Features,JTAG ISP,Yes
+Features,Fast Input Registers,Yes
+Features,Programmable Register Power-up,Yes
+Features,JTAG Translator,Yes
+Features,Real-time ISP,Yes
+Features,MultiVolt I/Os†,"1.2 V, 1.5 V, 1.8 V, 2.5 V, 3.3 V"
+Features,I/O Power Banks,2
+Features,Maximum Output Enables,54
+Features,LVTTL/LVCMOS,Yes
+Features,Emulated LVDS Outputs,Yes
+Features,Schmitt Triggers,Yes
+Features,Programmable Slew Rate,Yes
+Features,Programmable Pull-up Resistors,Yes
+Features,Programmable GND Pins,Yes
+Features,Open-drain Outputs,Yes
+Features,Bus Hold,Yes
+Package Specifications,Package Options,"M64, M68, E64, T100"
+Package Specifications,Package Size,"4.5mm, x 4.5mm, 5mm x 5mm,  9mm x 9mm, 16mm x 16mm"
+Supplemental Information,Additional Information,Product Table (Family Comparison)DatasheetAll FPGA Documentation

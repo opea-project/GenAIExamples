@@ -1,0 +1,57 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® Xeon® E Processor
+Essentials,Code Name,Products formerly Coffee Lake
+Essentials,Vertical Segment,Server
+Essentials,Processor Number,E-2134
+Essentials,Lithography,14 nm
+Essentials,Recommended Customer Price,$281.00-$288.00
+CPU Specifications,Total Cores,4
+CPU Specifications,Total Threads,8
+CPU Specifications,Max Turbo Frequency,4.50 GHz
+CPU Specifications,Intel® Turbo Boost Technology 2.0 Frequency‡,4.50 GHz
+CPU Specifications,Processor Base Frequency,3.50 GHz
+CPU Specifications,Cache,8 MB Intel® Smart Cache
+CPU Specifications,Bus Speed,8 GT/s
+CPU Specifications,TDP,71 W
+Supplemental Information,Marketing Status,Discontinued
+Supplemental Information,Launch Date,Q3'18
+Supplemental Information,Servicing Status,ESU Notification Issued
+Supplemental Information,End of Servicing Updates Date,"Monday, June 30, 2025"
+Supplemental Information,Embedded Options Available,No
+Supplemental Information,Description,Support for up to 128GB system memory capacity will be available in 2019 and requires both a BIOS update and hardware platform support. Please contact your hardware provider regarding availability for your system.
+Supplemental Information,Included Items,"This product is available in tray and box. For boxed product, a thermal solution is included"
+Memory Specifications,Max Memory Size (dependent on memory type),128 GB
+Memory Specifications,Memory Types,DDR4-2666
+Memory Specifications,Max # of Memory Channels,2
+Memory Specifications,Max Memory Bandwidth,41.6 GB/s
+Memory Specifications,ECC Memory Supported‡,Yes
+Expansion Options,Scalability,1S Only
+Expansion Options,PCI Express Revision,3.0
+Expansion Options,PCI Express Configurations‡,"1x16,2x8,1x8+2x4"
+Expansion Options,Max # of PCI Express Lanes,16
+Package Specifications,Sockets Supported,FCLGA1151
+Package Specifications,Max CPU Configuration,1
+Package Specifications,TJUNCTION,100°C
+Package Specifications,Package Size,37.5mm x 37.5mm
+Advanced Technologies,Intel® Optane™ Memory Supported‡,Yes
+Advanced Technologies,Intel® Turbo Boost Technology‡,2.0
+Advanced Technologies,Intel® Hyper-Threading Technology‡,Yes
+Advanced Technologies,Intel® Transactional Synchronization Extensions,Yes
+Advanced Technologies,Intel® 64‡,Yes
+Advanced Technologies,Instruction Set,64-bit
+Advanced Technologies,Instruction Set Extensions,"Intel® SSE4.1, Intel® SSE4.2, Intel® AVX2"
+Advanced Technologies,Idle States,Yes
+Advanced Technologies,Enhanced Intel SpeedStep® Technology,Yes
+Advanced Technologies,Thermal Monitoring Technologies,Yes
+Security & Reliability,Intel vPro® Eligibility‡,Intel vPro® Platform
+Security & Reliability,Intel® Secure Key,Yes
+Security & Reliability,Intel® AES New Instructions,Yes
+Security & Reliability,Intel® Software Guard Extensions (Intel® SGX),Yes with Intel® ME
+Security & Reliability,Intel® Memory Protection Extensions (Intel® MPX),Yes
+Security & Reliability,Intel® OS Guard,Yes
+Security & Reliability,Intel® Trusted Execution Technology‡,Yes
+Security & Reliability,Execute Disable Bit‡,Yes
+Security & Reliability,Intel® Boot Guard,Yes
+Security & Reliability,Intel® Virtualization Technology (VT-x)‡,Yes
+Security & Reliability,Intel® Virtualization Technology for Directed I/O (VT-d)‡,Yes
+Security & Reliability,Intel® VT-x with Extended Page Tables (EPT)‡,Yes

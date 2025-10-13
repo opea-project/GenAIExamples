@@ -1,0 +1,17 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® MAX® Development Kits
+Essentials,Marketing Status,Launched
+Essentials,Launch Date,2010
+Essentials,Featured FPGA,MAX® V CPLD
+Essentials,Logic Elements (LE),570
+Essentials,On-chip Memory,8 Kb
+Essentials,FPGA Package,"T100, T144, M100, F256"
+Essentials,Board Type,General Purpose
+Essentials,Ordering Part Number,DK-DEV-5M570ZN
+Essentials,Distributor Availability,ArrowDigiKeyMouser
+Board Specifications,Interfaces,"JTAG, USB"
+Board Specifications,Expansion,"GPIO, Motor Control Header"
+Board Specifications,Memory,EEPROM
+Board Specifications,Versions,Production
+Supplemental Information,Description,"Provides a comprehensive, low-cost hardware platform to quickly begin developing low-cost, low-power CPLD designs."
+Supplemental Information,User Guide,View now

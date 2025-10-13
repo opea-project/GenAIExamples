@@ -1,0 +1,10 @@
+Section,Key,Value
+Essentials,Product Collection,Drive Bay Options
+Essentials,Marketing Status,Discontinued
+Essentials,Launch Date,Q1'12
+Essentials,Expected Discontinuance,Q4'15
+Essentials,EOL Announce,"Tuesday, October 20, 2015"
+Essentials,Last Order,"Wednesday, April 20, 2016"
+Essentials,Last Receipt Attributes,"Wednesday, July 20, 2016"
+Essentials,Included Items,"Carrier board kit for HNS2600JF and HNS2400LP compute module family including (1) PCI Express x16 (164 pin) rIOM riser, (1) rIOM carrier board"
+Supplemental Information,Description,PCI Express x16 (164 pin) rIOM riser and rIOM carrier board kit for providing dedicated RMM4 NIC port and containing Intel® I/O module for HNS2600JF and HNS2400LP compute module family

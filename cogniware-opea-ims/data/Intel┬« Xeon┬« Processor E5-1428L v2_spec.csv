@@ -1,0 +1,52 @@
+Section,Key,Value
+Essentials,Product Collection,Intel® Xeon® Processor E5 v2 Family
+Essentials,Code Name,Products formerly Ivy Bridge EN
+Essentials,Vertical Segment,Embedded
+Essentials,Processor Number,E5-1428LV2
+Essentials,Lithography,22 nm
+Essentials,Recommended Customer Price,$494.00
+CPU Specifications,Total Cores,6
+CPU Specifications,Total Threads,12
+CPU Specifications,Max Turbo Frequency,2.70 GHz
+CPU Specifications,Intel® Turbo Boost Technology 2.0 Frequency‡,2.70 GHz
+CPU Specifications,Processor Base Frequency,2.20 GHz
+CPU Specifications,Cache,15 MB Intel® Smart Cache
+CPU Specifications,Bus Speed,0 GT/s
+CPU Specifications,TDP,60 W
+Supplemental Information,Marketing Status,Discontinued
+Supplemental Information,Launch Date,Q1'14
+Supplemental Information,Servicing Status,End of Servicing Lifetime
+Supplemental Information,End of Servicing Updates Date,"Tuesday, June 30, 2020"
+Supplemental Information,Embedded Options Available,Yes
+Memory Specifications,Max Memory Size (dependent on memory type),384 GB
+Memory Specifications,Memory Types,DDR3 800/1066/1333/1600
+Memory Specifications,Max # of Memory Channels,3
+Memory Specifications,Max Memory Bandwidth,38.4 GB/s
+Memory Specifications,Physical Address Extensions,46-bit
+Memory Specifications,ECC Memory Supported‡,Yes
+Expansion Options,Scalability,1S Only
+Expansion Options,PCI Express Revision,3.0
+Expansion Options,PCI Express Configurations‡,"x4, x8, x16"
+Expansion Options,Max # of PCI Express Lanes,24
+Package Specifications,Sockets Supported,FCLGA1356
+Package Specifications,TCASE,80°C
+Package Specifications,Package Size,45mm x 42.5mm
+Advanced Technologies,Intel® Turbo Boost Technology‡,2.0
+Advanced Technologies,Intel® Hyper-Threading Technology‡,Yes
+Advanced Technologies,Intel® Transactional Synchronization Extensions,No
+Advanced Technologies,Intel® 64‡,Yes
+Advanced Technologies,Instruction Set,64-bit
+Advanced Technologies,Instruction Set Extensions,Intel® AVX
+Advanced Technologies,Idle States,Yes
+Advanced Technologies,Enhanced Intel SpeedStep® Technology,Yes
+Advanced Technologies,Thermal Monitoring Technologies,Yes
+Advanced Technologies,Intel® Flex Memory Access,No
+Advanced Technologies,Intel® Identity Protection Technology‡,No
+Security & Reliability,Intel® Secure Key,Yes
+Security & Reliability,Intel® AES New Instructions,Yes
+Security & Reliability,Intel® OS Guard,Yes
+Security & Reliability,Intel® Trusted Execution Technology‡,Yes
+Security & Reliability,Execute Disable Bit‡,Yes
+Security & Reliability,Intel® Virtualization Technology (VT-x)‡,Yes
+Security & Reliability,Intel® Virtualization Technology for Directed I/O (VT-d)‡,Yes
+Security & Reliability,Intel® VT-x with Extended Page Tables (EPT)‡,Yes

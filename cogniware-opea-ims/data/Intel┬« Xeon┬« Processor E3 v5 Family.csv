@@ -1,0 +1,24 @@
+Product ID,Product Name,Launch Date,Total Cores,Max Turbo Frequency,Processor Base Frequency,Cache,TDP
+93847,Intel® Xeon® Processor E3-1558L v5,Q2'16,4,3.30 GHz,1.90 GHz,8 MB,45 W
+93740,Intel® Xeon® Processor E3-1565L v5,Q2'16,4,3.50 GHz,2.50 GHz,8 MB,35 W
+93848,Intel® Xeon® Processor E3-1578L v5,Q2'16,4,3.40 GHz,2.00 GHz,8 MB,45 W
+93742,Intel® Xeon® Processor E3-1585 v5,Q2'16,4,3.90 GHz,3.50 GHz,8 MB,65 W
+93741,Intel® Xeon® Processor E3-1585L v5,Q2'16,4,3.70 GHz,3.00 GHz,8 MB,45 W
+93358,Intel® Xeon® Processor E3-1515M v5,Q1'16,4,3.70 GHz,2.80 GHz,8 MB Intel® Smart Cache,45 W
+93359,Intel® Xeon® Processor E3-1545M v5,Q1'16,4,3.80 GHz,2.90 GHz,8 MB Intel® Smart Cache,45 W
+93354,Intel® Xeon® Processor E3-1575M v5,Q1'16,4,3.90 GHz,3.00 GHz,8 MB Intel® Smart Cache,45 W
+88172,Intel® Xeon® Processor E3-1220 v5,Q4'15,4,3.50 GHz,3.00 GHz,8 MB Intel® Smart Cache,80 W
+88168,Intel® Xeon® Processor E3-1225 v5,Q4'15,4,3.70 GHz,3.30 GHz,8 MB Intel® Smart Cache,80 W
+88182,Intel® Xeon® Processor E3-1230 v5,Q4'15,4,3.80 GHz,3.40 GHz,8 MB Intel® Smart Cache,80 W
+88170,Intel® Xeon® Processor E3-1235L v5,Q4'15,4,3.00 GHz,2.00 GHz,8 MB Intel® Smart Cache,25 W
+88176,Intel® Xeon® Processor E3-1240 v5,Q4'15,4,3.90 GHz,3.50 GHz,8 MB Intel® Smart Cache,80 W
+88169,Intel® Xeon® Processor E3-1240L v5,Q4'15,4,3.20 GHz,2.10 GHz,8 MB Intel® Smart Cache,25 W
+88173,Intel® Xeon® Processor E3-1245 v5,Q4'15,4,3.90 GHz,3.50 GHz,8 MB Intel® Smart Cache,80 W
+88175,Intel® Xeon® Processor E3-1260L v5,Q4'15,4,3.90 GHz,2.90 GHz,8 MB Intel® Smart Cache,45 W
+88178,Intel® Xeon® Processor E3-1268L v5,Q4'15,4,3.40 GHz,2.40 GHz,8 MB Intel® Smart Cache,35 W
+88174,Intel® Xeon® Processor E3-1270 v5,Q4'15,4,4.00 GHz,3.60 GHz,8 MB Intel® Smart Cache,80 W
+88177,Intel® Xeon® Processor E3-1275 v5,Q4'15,4,4.00 GHz,3.60 GHz,8 MB Intel® Smart Cache,80 W
+88171,Intel® Xeon® Processor E3-1280 v5,Q4'15,4,4.00 GHz,3.70 GHz,8 MB Intel® Smart Cache,80 W
+90618,Intel® Xeon® Processor E3-1505L v5,Q4'15,4,2.80 GHz,2.00 GHz,8 MB Intel® Smart Cache,25 W
+89608,Intel® Xeon® Processor E3-1505M v5,Q3'15,4,3.70 GHz,2.80 GHz,8 MB Intel® Smart Cache,45 W
+89610,Intel® Xeon® Processor E3-1535M v5,Q3'15,4,3.80 GHz,2.90 GHz,8 MB Intel® Smart Cache,45 W
