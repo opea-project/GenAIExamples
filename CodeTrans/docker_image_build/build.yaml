@@ -13,24 +13,53 @@ services:
       context: ../
       dockerfile: ./Dockerfile
     image: ${REGISTRY:-opea}/codetrans:${TAG:-latest}
+  codetrans-openeuler:
+    build:
+      args:
+        IMAGE_REPO: ${REGISTRY:-opea}
+        BASE_TAG: ${TAG:-latest}
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
+        no_proxy: ${no_proxy}
+      context: ../
+      dockerfile: ./Dockerfile.openEuler
+    image: ${REGISTRY:-opea}/codetrans:${TAG:-latest}-openeuler
   codetrans-ui:
     build:
       context: ../ui
       dockerfile: ./docker/Dockerfile
     extends: codetrans
     image: ${REGISTRY:-opea}/codetrans-ui:${TAG:-latest}
+  codetrans-ui-openeuler:
+    build:
+      context: ../ui
+      dockerfile: ./docker/Dockerfile.openEuler
+    extends: codetrans
+    image: ${REGISTRY:-opea}/codetrans-ui:${TAG:-latest}-openeuler
   llm-textgen:
     build:
       context: GenAIComps
       dockerfile: comps/llms/src/text-generation/Dockerfile
     extends: codetrans
     image: ${REGISTRY:-opea}/llm-textgen:${TAG:-latest}
+  llm-textgen-openeuler:
+    build:
+      context: GenAIComps
+      dockerfile: comps/llms/src/text-generation/Dockerfile.openEuler
+    extends: codetrans
+    image: ${REGISTRY:-opea}/llm-textgen:${TAG:-latest}-openeuler
   nginx:
     build:
       context: GenAIComps
       dockerfile: comps/third_parties/nginx/src/Dockerfile
     extends: codetrans
     image: ${REGISTRY:-opea}/nginx:${TAG:-latest}
+  nginx-openeuler:
+    build:
+      context: GenAIComps
+      dockerfile: comps/third_parties/nginx/src/Dockerfile.openEuler
+    extends: codetrans
+    image: ${REGISTRY:-opea}/nginx:${TAG:-latest}-openeuler
   vllm-rocm:
     build:
       context: GenAIComps
