@@ -1,11 +1,15 @@
-# Copyright (C) 2024 Intel Corporation
+# Copyright (C) 2025 Huawei Technologies Co., Ltd.
 # SPDX-License-Identifier: Apache-2.0
 
 # Use node 20.11.1 as the base image
-FROM node:20.11.1
+FROM openeuler/node:20.11.1-oe2403lts
 
 # Update package manager and install Git
-RUN apt-get update -y && apt-get install -y git
+RUN yum update -y && \
+    yum install -y \
+        git && \
+    yum clean all && \
+    rm -rf /var/cache/yum
 
 # Copy the front-end code repository
 COPY svelte /home/user/svelte
