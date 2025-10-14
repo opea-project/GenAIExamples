@@ -106,7 +106,7 @@ function validate_megaservice() {
         "codetrans-xeon-backend-server" \
         '{"language_from": "Golang","language_to": "Python","source_code": "package main\n\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World!\");\n}"}'
 
-    # test the megeservice via nginx
+    # test the megaservice via nginx
     validate_services \
         "${ip_address}:${NGINX_PORT}/v1/codetrans" \
         "print" \
