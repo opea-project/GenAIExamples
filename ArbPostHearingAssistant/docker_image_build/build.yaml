@@ -1,0 +1,41 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  arbPostHearingAssistant:
+    build:
+      args:
+        IMAGE_REPO: ${REGISTRY}
+        BASE_TAG: ${TAG}
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
+        no_proxy: ${no_proxy}
+      context: ../
+      dockerfile: ./Dockerfile
+    image: ${REGISTRY:-opea}/arbPostHearingAssistant:${TAG:-latest}
+  arbPostHearingAssistant-gradio-ui:
+    build:
+      args:
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
+      context: ../ui
+      dockerfile: ./docker/Dockerfile.gradio
+    extends: arbPostHearingAssistant
+    image: ${REGISTRY:-opea}/arbPostHearingAssistant-gradio-ui:${TAG:-latest}
+  arbPostHearingAssistant-ui:
+    build:
+      context: ../ui
+      dockerfile: ./docker/Dockerfile
+    extends: arbPostHearingAssistant
+    image: ${REGISTRY:-opea}/arbPostHearingAssistant-ui:${TAG:-latest}
+  llm-arbPostHearingAssistant:
+    build:
+      context: GenAIComps
+      dockerfile: comps/arb_post_hearing_assistant/src/Dockerfile
+    extends: arbPostHearingAssistant
+    image: ${REGISTRY:-opea}/llm-arb-post-hearing-assistant:${TAG:-latest}
+  vllm-rocm:
+    build:
+      context: GenAIComps
+      dockerfile: comps/third_parties/vllm/src/Dockerfile.amd_gpu
+    image: ${REGISTRY:-opea}/vllm-rocm:${TAG:-latest}
