@@ -73,10 +73,11 @@ jobs:
             sort -u)
             echo $values_files
           elif [ "${{ inputs.mode }}" = "CD" ]; then
-            values_files=$(ls ${{ inputs.example }}/kubernetes/helm/*values.yaml || true)
+            example_dir=${{ inputs.example }}
             if [ "${{ inputs.example }}" = "FaqGen" ]; then
-              values_files=$(ls ChatQnA/kubernetes/helm/*values.yaml | grep "faqgen" || true)
+              example_dir="ChatQnA"
             fi
+            values_files=$(ls ${example_dir}/kubernetes/helm/*values.yaml | grep "faqgen" || true)
           fi
           value_files="["
           for file in ${values_files}; do
