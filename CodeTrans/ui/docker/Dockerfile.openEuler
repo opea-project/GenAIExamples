@@ -2,8 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 # Use node 20.11.1 as the base image
-
-FROM openeuler/node:20.11.1-oe2403lts@sha256:25c790f93c2243b361919620c069812319f614fd697e32e433402ae706a19ffd
+FROM openeuler/node:20.11.1-oe2403lts
 
 # Update package manager and install Git
 RUN yum update -y && \
@@ -19,8 +18,7 @@ COPY svelte /home/user/svelte
 WORKDIR /home/user/svelte
 
 # Install front-end dependencies
-RUN npm install --package-lock-only
-RUN npm ci
+RUN npm install
 
 # Build the front-end application
 RUN npm run build

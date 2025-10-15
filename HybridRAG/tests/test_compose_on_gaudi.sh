@@ -28,7 +28,7 @@ function build_docker_images() {
     popd && sleep 1s
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="hybridrag hybridrag-ui dataprep retriever text2cypher-gaudi nginx"
+    service_list="hybridrag hybridrag-ui dataprep retriever text2query-cypher nginx"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log 2>&1
 
     docker images && sleep 1s
@@ -72,9 +72,9 @@ function validate_service() {
 
     local HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL")
 
-    if [ "$DOCKER_NAME" = "text2cypher-gaudi-container" ]; then
+    if [ "$DOCKER_NAME" = "text2query-cypher-gaudi-container" ]; then
         docker ps
-        docker logs text2cypher-gaudi-container
+        docker logs text2query-cypher-gaudi-container
     fi
 
     if [ "$HTTP_STATUS" -eq 200 ]; then
@@ -89,7 +89,7 @@ function validate_service() {
             docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
             if [ "$DOCKER_NAME" = "hybridrag-xeon-backend-server" ]; then
                 docker ps
-                docker logs text2cypher-gaudi-container
+                docker logs text2query-cypher-gaudi-container
             fi
             exit 1
         fi
@@ -98,7 +98,7 @@ function validate_service() {
         docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
         if [ "$DOCKER_NAME" = "hybridrag-xeon-backend-server" ]; then
             docker ps
-            docker logs text2cypher-gaudi-container
+            docker logs text2query-cypher-gaudi-container
         fi
         exit 1
     fi
@@ -156,13 +156,13 @@ function validate_megaservice() {
 }
 
 function validate_text2cypher() {
-    # text2cypher service
+    # text2query-cypher service
     validate_service \
-        "${ip_address}:11801/v1/text2cypher" \
+        "${ip_address}:11801/v1/text2query" \
         "\[" \
         "text2cypher-gaudi" \
-        "text2cypher-gaudi-container" \
-        '{"input_text": "what are the symptoms for Diabetes?"}'
+        "text2query-cypher-gaudi-container" \
+        '{"query": "what are the symptoms for Diabetes?"}'
 }
 
 function stop_docker() {
