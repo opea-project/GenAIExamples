@@ -19,7 +19,7 @@ from comps.cores.proto.api_protocol import (
     ArbPostHearingAssistantChatCompletionRequest,
     UsageInfo,
 )
-from fastapi import File, Request, UploadFile
+from fastapi import Request
 from fastapi.responses import StreamingResponse
 
 MEGA_SERVICE_PORT = int(os.getenv("MEGA_SERVICE_PORT", 8888))
@@ -28,8 +28,8 @@ LLM_SERVICE_HOST_IP = os.getenv("LLM_SERVICE_HOST_IP", "0.0.0.0")
 LLM_SERVICE_PORT = int(os.getenv("LLM_SERVICE_PORT", 9000))
 
 
-def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **kwargs):
-    if self.services[cur_node].service_type == ServiceType.LLM:
+def align_inputs(self, inputs, cur_node, **kwargs):
+    if self.services[cur_node].service_type == ServiceType.ARB_POST_HEARING_ASSISTANT:
         for key_to_replace in ["text", "asr_result"]:
             if key_to_replace in inputs:
                 inputs["messages"] = inputs[key_to_replace]
@@ -48,54 +48,6 @@ def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **k
             del inputs["input"]
     return inputs
 
-
-def read_pdf(file):
-    from langchain.document_loaders import PyPDFLoader
-
-    loader = PyPDFLoader(file)
-    docs = loader.load_and_split()
-    return docs
-
-
-def encode_file_to_base64(file_path):
-    """Encode the content of a file to a base64 string.
-
-    Args:
-        file_path (str): The path to the file to be encoded.
-
-    Returns:
-        str: The base64 encoded string of the file content.
-    """
-    with open(file_path, "rb") as f:
-        base64_str = base64.b64encode(f.read()).decode("utf-8")
-    return base64_str
-
-
-def read_text_from_file(file, save_file_name):
-    import docx2txt
-    from langchain.text_splitter import CharacterTextSplitter
-
-    # read text file
-    if file.headers["content-type"] == "text/plain":
-        file.file.seek(0)
-        content = file.file.read().decode("utf-8")
-        # Split text
-        text_splitter = CharacterTextSplitter()
-        texts = text_splitter.split_text(content)
-        # Create multiple documents
-        file_content = texts
-    # read pdf file
-    elif file.headers["content-type"] == "application/pdf":
-        documents = read_pdf(save_file_name)
-        file_content = [doc.page_content for doc in documents]
-    # read docx file
-    elif (
-        file.headers["content-type"] == "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-        or file.headers["content-type"] == "application/octet-stream"
-    ):
-        file_content = docx2txt.process(save_file_name)
-
-    return file_content
 
 
 def align_generator(self, gen, **kwargs):
@@ -142,11 +94,11 @@ class OpeaArbPostHearingAssistantService:
         ServiceOrchestrator.align_inputs = align_inputs
         ServiceOrchestrator.align_generator = align_generator
         self.megaservice = ServiceOrchestrator()
-        self.endpoint = str(getattr(MegaServiceEndpoint, "ARB_POST_HEARING_ASSISTANT", "/v1/arb-post-hearing"))
+        self.endpoint = str(MegaServiceEndpoint.ARB_POST_HEARING_ASSISTANT)
 
     def add_remote_service(self):
 
-        llm = MicroService(
+        arb_post_hearing_assistant = MicroService(
             name="opea_service@arb_post_hearing_assistant",
             host=LLM_SERVICE_HOST_IP,
             port=LLM_SERVICE_PORT,
@@ -154,69 +106,22 @@ class OpeaArbPostHearingAssistantService:
             use_remote_service=True,
             service_type=ServiceType.ARB_POST_HEARING_ASSISTANT,
         )
-        self.megaservice.add(llm)
+        self.megaservice.add(arb_post_hearing_assistant)
 
-    async def handle_request(self, request: Request, files: List[UploadFile] = File(default=None)):
-        """Accept pure text, or files .txt/.pdf.docx"""
+    async def handle_request(self, request: Request):
+        """Accept pure text"""
         if "application/json" in request.headers.get("content-type"):
             data = await request.json()
             chunk_size = data.get("chunk_size", -1)
             chunk_overlap = data.get("chunk_overlap", -1)
-            chat_request = ChatCompletionRequest.model_validate(data)
+            chat_request = ArbPostHearingAssistantChatCompletionRequest.model_validate(data)
             prompt = handle_message(chat_request.messages)
-
             initial_inputs_data = {data["type"]: prompt}
-
-        elif "multipart/form-data" in request.headers.get("content-type"):
-            data = await request.form()
-            chunk_size = data.get("chunk_size", -1)
-            chunk_overlap = data.get("chunk_overlap", -1)
-            chat_request = ChatCompletionRequest.model_validate(data)
-
-            data_type = data.get("type")
-
-            file_summaries = []
-            if files:
-                for file in files:
-                    # Fix concurrency issue with the same file name
-                    # https://github.com/opea-project/GenAIExamples/issues/1279
-                    uid = str(uuid.uuid4())
-                    file_path = f"/tmp/{uid}"
-
-                    import aiofiles
-
-                    async with aiofiles.open(file_path, "wb") as f:
-                        await f.write(await file.read())
-
-                    if data_type == "text":
-                        docs = read_text_from_file(file, file_path)
-                    else:
-                        raise ValueError(f"Data type not recognized: {data_type}")
-
-                    os.remove(file_path)
-
-                    if isinstance(docs, list):
-                        file_summaries.extend(docs)
-                    else:
-                        file_summaries.append(docs)
-
-            if file_summaries:
-                prompt = handle_message(chat_request.messages) + "\n".join(file_summaries)
-            else:
-                prompt = handle_message(chat_request.messages)
-
-            data_type = data.get("type")
-            if data_type is not None:
-                initial_inputs_data = {}
-                initial_inputs_data[data_type] = prompt
-            else:
-                initial_inputs_data = {"messages": prompt}
-
         else:
             raise ValueError(f"Unknown request type: {request.headers.get('content-type')}")
 
         arbPostHearingAssistant_parameters = ArbPostHearingAssistantChatCompletionRequest(
-            messages="",
+            messages=chat_request.messages,
             max_tokens=chat_request.max_tokens if chat_request.max_tokens else 1024,
             top_k=chat_request.top_k if chat_request.top_k else 10,
             top_p=chat_request.top_p if chat_request.top_p else 0.95,
@@ -224,7 +129,6 @@ class OpeaArbPostHearingAssistantService:
             frequency_penalty=chat_request.frequency_penalty if chat_request.frequency_penalty else 0.0,
             presence_penalty=chat_request.presence_penalty if chat_request.presence_penalty else 0.0,
             repetition_penalty=chat_request.repetition_penalty if chat_request.repetition_penalty else 1.03,
-            stream=stream_opt,
             model=chat_request.model if chat_request.model else None,
             language=chat_request.language if chat_request.language else "en",
             chunk_overlap=chunk_overlap,
@@ -264,7 +168,7 @@ class OpeaArbPostHearingAssistantService:
             host=self.host,
             port=self.port,
             endpoint=self.endpoint,
-            input_datatype=ChatCompletionRequest,
+            input_datatype=ArbPostHearingAssistantChatCompletionRequest,
             output_datatype=ChatCompletionResponse,
         )
         self.service.add_route(self.endpoint, self.handle_request, methods=["POST"])

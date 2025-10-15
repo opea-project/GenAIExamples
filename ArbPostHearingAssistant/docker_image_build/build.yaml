@@ -22,12 +22,6 @@ services:
       dockerfile: ./docker/Dockerfile.gradio
     extends: arbPostHearingAssistant
     image: ${REGISTRY:-opea}/arbPostHearingAssistant-gradio-ui:${TAG:-latest}
-  arbPostHearingAssistant-ui:
-    build:
-      context: ../ui
-      dockerfile: ./docker/Dockerfile
-    extends: arbPostHearingAssistant
-    image: ${REGISTRY:-opea}/arbPostHearingAssistant-ui:${TAG:-latest}
   llm-arbPostHearingAssistant:
     build:
       context: GenAIComps
