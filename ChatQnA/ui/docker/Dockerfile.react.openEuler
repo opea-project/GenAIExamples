@@ -7,7 +7,7 @@ FROM openeuler/node:20.11.1-oe2403lts@sha256:25c790f93c2243b361919620c069812319f
 COPY react /usr/app/react
 WORKDIR /usr/app/react
 
-
+RUN ["npm", "install", "--package-lock-only"]
 RUN ["npm", "ci"]
 RUN ["npm", "run", "build"]
 
