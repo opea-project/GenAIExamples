@@ -24,7 +24,7 @@ RUN mkdir -p /home/user
 COPY gradio /home/user/gradio
 
 RUN pip install --no-cache-dir --upgrade pip setuptools && \
-    pip install --no-cache-dir --require-hashes -r /home/user/gradio/requirements.txt
+pip install --no-cache-dir -r /home/user/gradio/requirements.txt
 
 WORKDIR /home/user/gradio
 ENTRYPOINT ["python", "codegen_ui_gradio.py"]
