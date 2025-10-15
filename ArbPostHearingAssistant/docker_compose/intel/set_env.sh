@@ -25,19 +25,16 @@ export MAX_TOTAL_TOKENS=2048
 
 export LLM_PORT=9000
 export LLM_ENDPOINT="http://${host_ip}:${LLM_ENDPOINT_PORT}"
-export ASR_SERVICE_PORT=7066
 export OPEA_ARB_POSTHEARING_ASSISTANT_COMPONENT_NAME="OpeaArbPostHearingAssistantTgi" # OpeaArbPostHearingAssistantVllm
 export FRONTEND_SERVICE_PORT=5173
-export MEGA_SERVICE_HOST_IP=${host_ip}
-export LLM_SERVICE_HOST_IP=${host_ip}
-export VLLM_SKIP_WARMUP=true
+
+export MEGA_SERVICE_HOST_IP=${host_ip} #Example: MEGA_SERVICE_HOST_IP="localhost"
+export LLM_SERVICE_HOST_IP=${host_ip}  #Example: LLM_SERVICE_HOST_IP="localhost"
+
+# uncomment below during development
+# export VLLM_SKIP_WARMUP=true  
 
 export BACKEND_SERVICE_PORT=8888
-export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:${BACKEND_SERVICE_PORT}/v1/docsum"
+export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:${BACKEND_SERVICE_PORT}/v1/arb-post-hearing"
 
 export LOGFLAG=True
-
-export NUM_CARDS=1
-export BLOCK_SIZE=128
-export MAX_NUM_SEQS=256
-export MAX_SEQ_LEN_TO_CAPTURE=2048
