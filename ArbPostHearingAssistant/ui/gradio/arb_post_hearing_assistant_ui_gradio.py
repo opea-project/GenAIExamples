@@ -21,7 +21,7 @@ class ArbPostHearingAssistantUI:
         """Initialize class with headers and backend endpoint."""
         self.HEADERS = {"Content-Type": "application/json"}
         self.BACKEND_SERVICE_ENDPOINT = os.getenv(
-            "BACKEND_SERVICE_ENDPOINT", "http://localhost:8888/v1/docsum"
+            "BACKEND_SERVICE_ENDPOINT", "http://localhost:8888/v1/arb-post-hearing"
         )
 
     def extract_json(self, text: str):
@@ -39,7 +39,7 @@ class ArbPostHearingAssistantUI:
         """Generate a summary for the given document content."""
         logger.info(">>> BACKEND_SERVICE_ENDPOINT - %s", self.BACKEND_SERVICE_ENDPOINT)
 
-        data = {"max_tokens": 2000, "messages": transcript}
+        data = {"messages": transcript,"type": "text","language": "en"}
 
         try:
             response = requests.post(
@@ -54,7 +54,7 @@ class ArbPostHearingAssistantUI:
 
             if response.status_code == 200:
                 result = response.json()
-                raw_text = result.get("text", "")
+                raw_text = result["choices"][0]["message"]["content"]
                 extracted_json = self.extract_json(raw_text)
 
                 # Return pretty JSON if available
@@ -119,3 +119,4 @@ if __name__ == "__main__":
     logger.info(">>> Starting server at %s:%d", args.host, args.port)
 
     uvicorn.run("arb_post_hearing_assistant_ui_gradio:app", host=args.host, port=args.port)
+

@@ -12,7 +12,7 @@ services:
         no_proxy: ${no_proxy}
       context: ../
       dockerfile: ./Dockerfile
-    image: ${REGISTRY:-opea}/arbPostHearingAssistant:${TAG:-latest}
+    image: ${REGISTRY:-opea}/arb-post-hearing-assistant:${TAG:-latest}
   arbPostHearingAssistant-gradio-ui:
     build:
       args:
@@ -21,15 +21,15 @@ services:
       context: ../ui
       dockerfile: ./docker/Dockerfile.gradio
     extends: arbPostHearingAssistant
-    image: ${REGISTRY:-opea}/arbPostHearingAssistant-gradio-ui:${TAG:-latest}
+    image: ${REGISTRY:-opea}/arb-post-hearing-assistant-gradio-ui:${TAG:-latest}
   llm-arbPostHearingAssistant:
     build:
-      context: GenAIComps
+      context: ../../../GenAIComps
       dockerfile: comps/arb_post_hearing_assistant/src/Dockerfile
     extends: arbPostHearingAssistant
     image: ${REGISTRY:-opea}/llm-arb-post-hearing-assistant:${TAG:-latest}
   vllm-rocm:
     build:
-      context: GenAIComps
+      context: ../../../GenAIComps
       dockerfile: comps/third_parties/vllm/src/Dockerfile.amd_gpu
     image: ${REGISTRY:-opea}/vllm-rocm:${TAG:-latest}

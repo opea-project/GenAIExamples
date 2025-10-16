@@ -28,7 +28,7 @@ LLM_SERVICE_HOST_IP = os.getenv("LLM_SERVICE_HOST_IP", "0.0.0.0")
 LLM_SERVICE_PORT = int(os.getenv("LLM_SERVICE_PORT", 9000))
 
 
-def align_inputs(self, inputs, cur_node, **kwargs):
+def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **kwargs):
     if self.services[cur_node].service_type == ServiceType.ARB_POST_HEARING_ASSISTANT:
         for key_to_replace in ["text", "asr_result"]:
             if key_to_replace in inputs:
@@ -48,54 +48,17 @@ def align_inputs(self, inputs, cur_node, **kwargs):
             del inputs["input"]
     return inputs
 
-
-
-def align_generator(self, gen, **kwargs):
-    # OpenAI response format
-    # b'data:{"id":"","object":"text_completion","created":1725530204,"model":"meta-llama/Meta-Llama-3-8B-Instruct","system_fingerprint":"2.0.1-native","choices":[{"index":0,"delta":{"role":"assistant","content":"?"},"logprobs":null,"finish_reason":null}]}\n\n'
-    for line in gen:
-        line = line.decode("utf-8")
-        start = -1
-        end = -1
-        try:
-            start = line.find("{")
-            end = line.rfind("}") + 1
-            if start == -1 or end <= start:
-                # Handle cases where '{' or '}' are not found or are in the wrong order
-                json_str = ""
-            else:
-                json_str = line[start:end]
-        except Exception as e:
-            print(f"Error finding JSON boundaries: {e}")
-            json_str = ""
-
-        try:
-            # sometimes yield empty chunk, do a fallback here
-            json_data = json.loads(json_str)
-            if "ops" in json_data and "op" in json_data["ops"][0]:
-                if "value" in json_data["ops"][0] and isinstance(json_data["ops"][0]["value"], str):
-                    yield f"data: {repr(json_data['ops'][0]['value'].encode('utf-8'))}\n\n"
-                else:
-                    pass
-            elif (
-                json_data["choices"][0]["finish_reason"] != "eos_token"
-                and "content" in json_data["choices"][0]["delta"]
-            ):
-                yield f"data: {repr(json_data['choices'][0]['delta']['content'].encode('utf-8'))}\n\n"
-        except Exception as e:
-            yield f"data: {repr(json_str.encode('utf-8'))}\n\n"
-    yield "data: [DONE]\n\n"
-
+def align_outputs(self, data, *args, **kwargs):
+    return data
 
 class OpeaArbPostHearingAssistantService:
     def __init__(self, host="0.0.0.0", port=8000):
         self.host = host
         self.port = port
         ServiceOrchestrator.align_inputs = align_inputs
-        ServiceOrchestrator.align_generator = align_generator
+        ServiceOrchestrator.align_outputs = align_outputs
         self.megaservice = ServiceOrchestrator()
-        self.endpoint = str(MegaServiceEndpoint.ARB_POST_HEARING_ASSISTANT)
-
+        self.endpoint = "/v1/arb-post-hearing"
     def add_remote_service(self):
 
         arb_post_hearing_assistant = MicroService(
@@ -161,7 +124,6 @@ class OpeaArbPostHearingAssistantService:
         return ChatCompletionResponse(model="arbPostHearingAssistant", choices=choices, usage=usage)
 
     def start(self):
-
         self.service = MicroService(
             self.__class__.__name__,
             service_role=ServiceRoleType.MEGASERVICE,
@@ -179,3 +141,4 @@ if __name__ == "__main__":
     arbPostHearingAssistant = OpeaArbPostHearingAssistantService(port=MEGA_SERVICE_PORT)
     arbPostHearingAssistant.add_remote_service()
     arbPostHearingAssistant.start()
+

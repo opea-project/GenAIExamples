@@ -4,7 +4,7 @@
 services:
   tgi-server:
     image: ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu
-    container_name: arbPostHearingAssistant-xeon-tgi-server
+    container_name: arb-post-hearing-assistant-xeon-tgi-server
     ports:
       - ${LLM_ENDPOINT_PORT:-8008}:80
     volumes:
@@ -25,8 +25,8 @@ services:
     command: --model-id ${LLM_MODEL_ID} --cuda-graphs 0  --max-input-length ${MAX_INPUT_TOKENS} --max-total-tokens ${MAX_TOTAL_TOKENS}
 
   llm-arbPostHearingAssistant-tgi:
-    image: ${REGISTRY:-opea}/llm-arbPostHearingAssistant:${TAG:-latest}
-    container_name: arbPostHearingAssistant-xeon-llm-server
+    image: ${REGISTRY:-opea}/llm-arb-post-hearing-assistant:${TAG:-latest}
+    container_name: arb-post-hearing-assistant-xeon-llm-server
     depends_on:
       tgi-server:
         condition: service_healthy
@@ -47,8 +47,8 @@ services:
     restart: unless-stopped
 
   arbPostHearingAssistant-xeon-backend-server:
-    image: ${REGISTRY:-opea}/arbPostHearingAssistant:${TAG:-latest}
-    container_name: arbPostHearingAssistant-xeon-backend-server
+    image: ${REGISTRY:-opea}/arb-post-hearing-assistant:${TAG:-latest}
+    container_name: arb-post-hearing-assistant-xeon-backend-server
     depends_on:
       - tgi-server
       - llm-arbPostHearingAssistant-tgi
@@ -65,8 +65,8 @@ services:
     restart: always
 
   arbPostHearingAssistant-gradio-ui:
-    image: ${REGISTRY:-opea}/arbPostHearingAssistant-gradio-ui:${TAG:-latest}
-    container_name: arbPostHearingAssistant-xeon-ui-server
+    image: ${REGISTRY:-opea}/arb-post-hearing-assistant-gradio-ui:${TAG:-latest}
+    container_name: arb-post-hearing-assistant-xeon-ui-server
     depends_on:
       - arbPostHearingAssistant-xeon-backend-server
     ports:

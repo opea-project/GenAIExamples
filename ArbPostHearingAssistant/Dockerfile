@@ -3,7 +3,7 @@
 
 ARG IMAGE_REPO=opea
 ARG BASE_TAG=latest
-FROM $IMAGE_REPO/comps-base:$BASE_TAG
+FROM opea/comps-base:latest
 
 USER root
 # FFmpeg needed for media processing
