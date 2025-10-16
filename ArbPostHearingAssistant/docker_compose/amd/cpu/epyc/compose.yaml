@@ -4,7 +4,7 @@
 services:
   vllm-service:
     image: public.ecr.aws/q9t5s3a7/vllm-cpu-release-repo:v0.10.1
-    container_name: arbPostHearingAssistant-epyc-vllm-service
+    container_name: arb-post-hearing-assistant-epyc-vllm-service
     ports:
       - "8008:80"
     volumes:
@@ -27,8 +27,8 @@ services:
     command: --model $LLM_MODEL_ID --host 0.0.0.0 --port 80
 
   llm-arbPostHearingAssistant-vllm:
-    image: ${REGISTRY:-opea}/llm-arbPostHearingAssistant:${TAG:-latest}
-    container_name: arbPostHearingAssistant-epyc-llm-server
+    image: ${REGISTRY:-opea}/llm-arb-post-hearing-assistant:${TAG:-latest}
+    container_name: arb-post-hearing-assistant-epyc-llm-server
     depends_on:
       vllm-service:
         condition: service_healthy
@@ -50,8 +50,8 @@ services:
     restart: unless-stopped
 
   arbPostHearingAssistant-epyc-backend-server:
-    image: ${REGISTRY:-opea}/arbPostHearingAssistant:${TAG:-latest}
-    container_name: arbPostHearingAssistant-epyc-backend-server
+    image: ${REGISTRY:-opea}/arb-post-hearing-assistant:${TAG:-latest}
+    container_name: arb-post-hearing-assistant-epyc-backend-server
     depends_on:
       - vllm-service
       - llm-arbPostHearingAssistant-vllm
@@ -67,8 +67,8 @@ services:
     restart: always
 
   arbPostHearingAssistant-gradio-ui:
-    image: ${REGISTRY:-opea}/arbPostHearingAssistant-gradio-ui:${TAG:-latest}
-    container_name: arbPostHearingAssistant-epyc-ui-server
+    image: ${REGISTRY:-opea}/arb-post-hearing-assistant-gradio-ui:${TAG:-latest}
+    container_name: arb-post-hearing-assistant-epyc-ui-server
     depends_on:
       - arbPostHearingAssistant-epyc-backend-server
     ports:

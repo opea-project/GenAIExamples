@@ -4,7 +4,7 @@
 services:
   arbPostHearingAssistant-vllm-service:
     image: ${REGISTRY:-opea}/vllm-rocm:${TAG:-latest}
-    container_name: arbPostHearingAssistant-vllm-service
+    container_name: arb-post-hearing-assistant-vllm-service
     ports:
       - "${ARB_POSTHEARING_ASSISTANT_VLLM_SERVICE_PORT:-8081}:8011"
     environment:
@@ -38,8 +38,8 @@ services:
     ipc: host
 
   arbPostHearingAssistant-llm-server:
-    image: ${REGISTRY:-opea}/llm-arbPostHearingAssistant:${TAG:-latest}
-    container_name: arbPostHearingAssistant-llm-server
+    image: ${REGISTRY:-opea}/llm-arb-post-hearing-assistant:${TAG:-latest}
+    container_name: arb-post-hearing-assistant-llm-server
     depends_on:
       arbPostHearingAssistant-vllm-service:
         condition: service_healthy
@@ -60,8 +60,8 @@ services:
     restart: unless-stopped
 
   arbPostHearingAssistant-backend-server:
-    image: ${REGISTRY:-opea}/arbPostHearingAssistant:${TAG:-latest}
-    container_name: arbPostHearingAssistant-backend-server
+    image: ${REGISTRY:-opea}/arb-post-hearing-assistant:${TAG:-latest}
+    container_name: arb-post-hearing-assistant-backend-server
     depends_on:
       - arbPostHearingAssistant-vllm-service
       - arbPostHearingAssistant-llm-server
@@ -77,8 +77,8 @@ services:
     restart: always
 
   arbPostHearingAssistant-gradio-ui:
-    image: ${REGISTRY:-opea}/arbPostHearingAssistant-gradio-ui:${TAG:-latest}
-    container_name: arbPostHearingAssistant-ui-server
+    image: ${REGISTRY:-opea}/arb-post-hearing-assistant-gradio-ui:${TAG:-latest}
+    container_name: arb-post-hearing-assistant-ui-server
     depends_on:
       - arbPostHearingAssistant-backend-server
     ports:

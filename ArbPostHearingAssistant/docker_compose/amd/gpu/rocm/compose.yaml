@@ -4,7 +4,7 @@
 services:
   arbPostHearingAssistant-tgi-service:
     image: ghcr.io/huggingface/text-generation-inference:2.4.1-rocm
-    container_name: arbPostHearingAssistant-tgi-service
+    container_name: arb-post-hearing-assistant-tgi-service
     ports:
       - "${ARB_POSTHEARING_ASSISTANT_TGI_SERVICE_PORT:-8008}:80"
     environment:
@@ -36,8 +36,8 @@ services:
     command: --model-id ${ARB_POSTHEARING_ASSISTANT_LLM_MODEL_ID} --max-input-length ${ARB_POSTHEARING_ASSISTANT_MAX_INPUT_TOKENS} --max-total-tokens ${ARB_POSTHEARING_ASSISTANT_MAX_TOTAL_TOKENS}
 
   arbPostHearingAssistant-llm-server:
-    image: ${REGISTRY:-opea}/llm-arbPostHearingAssistant:${TAG:-latest}
-    container_name: arbPostHearingAssistant-llm-server
+    image: ${REGISTRY:-opea}/llm-arb-post-hearing-assistant:${TAG:-latest}
+    container_name: arb-post-hearing-assistant-llm-server
     depends_on:
       arbPostHearingAssistant-tgi-service:
         condition: service_healthy
@@ -58,8 +58,8 @@ services:
     restart: unless-stopped
 
   arbPostHearingAssistant-backend-server:
-    image: ${REGISTRY:-opea}/arbPostHearingAssistant:${TAG:-latest}
-    container_name: arbPostHearingAssistant-backend-server
+    image: ${REGISTRY:-opea}/arb-post-hearing-assistant:${TAG:-latest}
+    container_name: arb-post-hearing-assistant-backend-server
     depends_on:
       - arbPostHearingAssistant-tgi-service
       - arbPostHearingAssistant-llm-server
@@ -76,8 +76,8 @@ services:
     restart: always
 
   arbPostHearingAssistant-gradio-ui:
-    image: ${REGISTRY:-opea}/arbPostHearingAssistant-gradio-ui:${TAG:-latest}
-    container_name: arbPostHearingAssistant-ui-server
+    image: ${REGISTRY:-opea}/arb-post-hearing-assistant-gradio-ui:${TAG:-latest}
+    container_name: arb-post-hearing-assistant-ui-server
     depends_on:
       - arbPostHearingAssistant-backend-server
     ports:

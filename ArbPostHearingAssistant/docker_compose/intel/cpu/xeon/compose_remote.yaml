@@ -3,8 +3,8 @@
 
 services:
   llm-arbPostHearingAssistant-vllm:
-    image: ${REGISTRY:-opea}/llm-arbPostHearingAssistant:${TAG:-latest}
-    container_name: arbPostHearingAssistant-xeon-llm-server
+    image: ${REGISTRY:-opea}/llm-arb-post-hearing-assistant:${TAG:-latest}
+    container_name: arb-post-hearing-assistant-xeon-llm-server
     ports:
       - ${LLM_PORT:-9000}:9000
     ipc: host
@@ -25,8 +25,8 @@ services:
     restart: unless-stopped
 
   arbPostHearingAssistant-xeon-backend-server:
-    image: ${REGISTRY:-opea}/arbPostHearingAssistant:${TAG:-latest}
-    container_name: arbPostHearingAssistant-xeon-backend-server
+    image: ${REGISTRY:-opea}/arb-post-hearing-assistant:${TAG:-latest}
+    container_name: arb-post-hearing-assistant-xeon-backend-server
     depends_on:
       - llm-arbPostHearingAssistant-vllm
     ports:
@@ -41,8 +41,8 @@ services:
     restart: always
 
   arbPostHearingAssistant-gradio-ui:
-    image: ${REGISTRY:-opea}/arbPostHearingAssistant-gradio-ui:${TAG:-latest}
-    container_name: arbPostHearingAssistant-xeon-ui-server
+    image: ${REGISTRY:-opea}/arb-post-hearing-assistant-gradio-ui:${TAG:-latest}
+    container_name: arb-post-hearing-assistant-xeon-ui-server
     depends_on:
       - arbPostHearingAssistant-xeon-backend-server
     ports:
