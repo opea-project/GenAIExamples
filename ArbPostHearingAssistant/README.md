@@ -10,11 +10,11 @@ The Arbitration Post-Hearing Assistant is a GenAI-based module designed to proce
 
 ## Architecture
 
-The architecture of the Document Summarization Application is illustrated below:
+The architecture of the ArbPostHearingAssistant Application is illustrated below:
 
 ![Architecture](./assets/img/arbitration_architecture.png)
 
-The DocSum example is implemented using the component-level microservices defined in [GenAIComps](https://github.com/opea-project/GenAIComps).
+The ArbPostHearingAssistant example is implemented using the component-level microservices defined in [GenAIComps](https://github.com/opea-project/GenAIComps).
 
 ## Deployment Options
 
@@ -22,8 +22,8 @@ The table below lists currently available deployment options. They outline in de
 
 | Category               | Deployment Option      | Description                                                    |
 | ---------------------- | ---------------------- | -------------------------------------------------------------- |
-| On-premise Deployments | Docker Compose (Xeon)  | [DocSum deployment on Xeon](./docker_compose/intel/cpu/xeon)   |
-|                        | Docker Compose (Gaudi) | [DocSum deployment on Gaudi](./docker_compose/intel/hpu/gaudi) |
+| On-premise Deployments | Docker Compose (Xeon)  | [ArbPostHearingAssistant deployment on Xeon](./docker_compose/intel/cpu/xeon)   |
+|                        | Docker Compose (Gaudi) | [ArbPostHearingAssistant deployment on Gaudi](./docker_compose/intel/hpu/gaudi) |
 
 
 ## Validated Configurations
