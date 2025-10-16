@@ -20,11 +20,11 @@ services:
         https_proxy: ${https_proxy}
       context: ../ui
       dockerfile: ./docker/Dockerfile.gradio
-    extends: arbPostHearingAssistant
+    extends: arb-post-hearing-assistant
     image: ${REGISTRY:-opea}/arb-post-hearing-assistant-gradio-ui:${TAG:-latest}
   llm-arb-post-hearing-assistant:
     build:
       context: ../../../GenAIComps
       dockerfile: comps/arb_post_hearing_assistant/src/Dockerfile
-    extends: arbPostHearingAssistant
+    extends: arb-post-hearing-assistant
     image: ${REGISTRY:-opea}/llm-arb-post-hearing-assistant:${TAG:-latest}
