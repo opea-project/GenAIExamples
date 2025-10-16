@@ -32,7 +32,7 @@ export MEGA_SERVICE_HOST_IP=${host_ip} #Example: MEGA_SERVICE_HOST_IP="localhost
 export LLM_SERVICE_HOST_IP=${host_ip}  #Example: LLM_SERVICE_HOST_IP="localhost"
 
 # uncomment below during development
-# export VLLM_SKIP_WARMUP=true  
+# export VLLM_SKIP_WARMUP=true
 
 export BACKEND_SERVICE_PORT=8888
 export BACKEND_SERVICE_ENDPOINT="http://${host_ip}:${BACKEND_SERVICE_PORT}/v1/arb-post-hearing"

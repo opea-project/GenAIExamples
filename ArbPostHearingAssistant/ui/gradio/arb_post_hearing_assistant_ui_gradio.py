@@ -39,7 +39,7 @@ class ArbPostHearingAssistantUI:
         """Generate a summary for the given document content."""
         logger.info(">>> BACKEND_SERVICE_ENDPOINT - %s", self.BACKEND_SERVICE_ENDPOINT)
 
-        data = {"messages": transcript,"type": "text","language": "en"}
+        data = {"messages": transcript, "type": "text", "language": "en"}
 
         try:
             response = requests.post(
@@ -62,13 +62,13 @@ class ArbPostHearingAssistantUI:
                     return json.dumps(extracted_json, indent=4)
 
                 # Fallback if no JSON found
-                return json.dumps({"message":"something went wrong, please try again"},indent=4)
+                return json.dumps({"message": "something went wrong, please try again"}, indent=4)
 
         except requests.exceptions.RequestException as e:
             logger.error("Request exception: %s", e)
-            return json.dumps({"message":"something went wrong, please try again"},indent=4)
+            return json.dumps({"message": "something went wrong, please try again"}, indent=4)
 
-        return json.dumps({"message":"something went wrong, please try again"},indent=4)
+        return json.dumps({"message": "something went wrong, please try again"}, indent=4)
 
     def render(self):
         """Render the Gradio UI."""
@@ -80,20 +80,19 @@ class ArbPostHearingAssistantUI:
                     input_text = gr.TextArea(
                         label="Enter your arbitration transcript to process:",
                         placeholder="Please enter arbitration transcript before submitting",
-                        lines = 20
+                        lines=20,
                     )
                     submit_btn = gr.Button("Generate")
                 with gr.Column():
                     # ✅ Use Textbox to show formatted JSON properly
-                    generated_text = gr.JSON(
-                        label="Generated arbitration Summary",height=462,max_height=500
-                    )
+                    generated_text = gr.JSON(label="Generated arbitration Summary", height=462, max_height=500)
             submit_btn.click(fn=self.summarize_arbitration_transcript, inputs=[input_text], outputs=[generated_text])
 
         with gr.Blocks() as self.demo:
-            gr.Markdown("<h1 style='text-align:center;'>⚖️ Arbitration Post Hearing Assistant</h1>",
-                            elem_classes=["centered-title"]
-    )
+            gr.Markdown(
+                "<h1 style='text-align:center;'>⚖️ Arbitration Post Hearing Assistant</h1>",
+                elem_classes=["centered-title"],
+            )
             with gr.Tabs():
                 with gr.TabItem("Paste Arbitration Transcript"):
                     text_ui.render()
@@ -119,4 +118,3 @@ if __name__ == "__main__":
     logger.info(">>> Starting server at %s:%d", args.host, args.port)
 
     uvicorn.run("arb_post_hearing_assistant_ui_gradio:app", host=args.host, port=args.port)
-

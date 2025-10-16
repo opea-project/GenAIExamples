@@ -122,13 +122,13 @@ Use AMD GPU driver utilities to determine the correct `cardN` and `renderN` IDs 
 
 Please refer to the table below to build different microservices from source:
 
-| Microservice | Deployment Guide                                                                                                                      |
-| ------------ | ------------------------------------------------------------------------------------------------------------------------------------- |
-| TGI          | [TGI project](https://github.com/huggingface/text-generation-inference.git)                                                           |
-| vLLM         | [vLLM build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/third_parties/vllm#build-docker)                        |
-| llm-arb-post-hearing-assistant   | [LLM-ArbPostHearingAssistant build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/arb_post_hearing_assistant/src/#12-build-docker-image) |
-| MegaService  | [MegaService build guide](../../../../README_miscellaneous.md#build-megaservice-docker-image)                                         |
-| UI           | [Basic UI build guide](../../../../README_miscellaneous.md#build-ui-docker-image)                                                     |
+| Microservice                   | Deployment Guide                                                                                                                                            |
+| ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| TGI                            | [TGI project](https://github.com/huggingface/text-generation-inference.git)                                                                                 |
+| vLLM                           | [vLLM build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/third_parties/vllm#build-docker)                                              |
+| llm-arb-post-hearing-assistant | [LLM-ArbPostHearingAssistant build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/arb_post_hearing_assistant/src/#12-build-docker-image) |
+| MegaService                    | [MegaService build guide](../../../../README_miscellaneous.md#build-megaservice-docker-image)                                                               |
+| UI                             | [Basic UI build guide](../../../../README_miscellaneous.md#build-ui-docker-image)                                                                           |
 
 ### Check the Deployment Status
 
@@ -149,6 +149,7 @@ CONTAINER ID   IMAGE                                                           C
 32afc12de996   opea/llm-arb-post-hearing-assistant:latest                      "python comps/arb_po…"   2 hours ago   Up 2 hours             0.0.0.0:9000->9000/tcp, [::]:9000->9000/tcp   arb-post-hearing-assistant-xeon-llm-server
 c8e539360aff   ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu   "text-generation-lau…"   2 hours ago   Up 2 hours (healthy)   0.0.0.0:8008->80/tcp, [::]:8008->80/tcp       arb-post-hearing-assistant-xeon-tgi-server
 ```
+
 ### Test the Pipeline
 
 Once the Arbitration Post-Hearing Assistant services are running, test the pipeline using the following command:
@@ -213,3 +214,4 @@ Users could follow previous section to testing vLLM microservice or Arbitration 
 ## Conclusion
 
 This guide should enable developer to deploy the default configuration or any of the other compose yaml files for different configurations. It also highlights the configurable parameters that can be set before deployment.
+```

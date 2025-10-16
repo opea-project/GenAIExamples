@@ -12,11 +12,11 @@ from typing import List
 from comps import MegaServiceEndpoint, MicroService, ServiceOrchestrator, ServiceRoleType, ServiceType
 from comps.cores.mega.utils import handle_message
 from comps.cores.proto.api_protocol import (
+    ArbPostHearingAssistantChatCompletionRequest,
     ChatCompletionRequest,
     ChatCompletionResponse,
     ChatCompletionResponseChoice,
     ChatMessage,
-    ArbPostHearingAssistantChatCompletionRequest,
     UsageInfo,
 )
 from fastapi import Request
@@ -48,8 +48,10 @@ def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **k
             del inputs["input"]
     return inputs
 
+
 def align_outputs(self, data, *args, **kwargs):
     return data
+
 
 class OpeaArbPostHearingAssistantService:
     def __init__(self, host="0.0.0.0", port=8000):
@@ -73,7 +75,7 @@ class OpeaArbPostHearingAssistantService:
         self.megaservice.add(arb_post_hearing_assistant)
 
     async def handle_request(self, request: Request):
-        """Accept pure text"""
+        """Accept pure text."""
         if "application/json" in request.headers.get("content-type"):
             data = await request.json()
             chunk_size = data.get("chunk_size", -1)
@@ -144,4 +146,3 @@ if __name__ == "__main__":
     arbPostHearingAssistant = OpeaArbPostHearingAssistantService(port=MEGA_SERVICE_PORT)
     arbPostHearingAssistant.add_remote_service()
     arbPostHearingAssistant.start()
-

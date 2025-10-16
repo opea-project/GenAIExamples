@@ -1,4 +1,3 @@
-
 # Arbitration Post-Hearing Assistant
 
 The Arbitration Post-Hearing Assistant is a GenAI-based module designed to process and summarize post-hearing transcripts or arbitration-related documents. It intelligently extracts key entities and insights to assist arbitrators, legal teams, and case managers in managing case follow-ups efficiently.
@@ -14,7 +13,7 @@ Identifies and extracts essential details such as:
 - Hearing date and time
 - Next hearing schedule and purpose
 - Hearing outcomes and reasons
-  
+
 ## Docker
 
 ### Build UI Docker Image
@@ -57,7 +56,6 @@ python arb_post_hearing_assistant_ui_gradio.py
 
 This command starts the frontend application using Python.
 
-
 ## 📸 Project Screenshots
 
 ![project-screenshot](../../assets/img/arbritation_post_hearing_ui_gradio_text.png)
@@ -68,16 +66,15 @@ Here are some of the project's features:
 
 ## Features
 
-- **Automated Case Extraction:** Extracts key arbitration details including case number, claimant/respondent, arbitrator, hearing dates, next hearing schedule, and outcome.  
-- **Hearing Summarization:** Generates concise summaries of post-hearing proceedings.  
-- **LLM-Powered Processing:** Integrates with vLLM or TGI backends for natural language understanding.  
-- **Structured Output:** Returns all extracted information in JSON format for easy storage, display, or integration with case management systems.  
+- **Automated Case Extraction:** Extracts key arbitration details including case number, claimant/respondent, arbitrator, hearing dates, next hearing schedule, and outcome.
+- **Hearing Summarization:** Generates concise summaries of post-hearing proceedings.
+- **LLM-Powered Processing:** Integrates with vLLM or TGI backends for natural language understanding.
+- **Structured Output:** Returns all extracted information in JSON format for easy storage, display, or integration with case management systems.
 - **Easy Deployment:** Containerized microservice, lightweight and reusable across legal workflows.
-- **Typical Flow:**  
-  1. Upload or stream post-hearing transcript.  
-  2. LLM backend analyzes text and extracts entities.  
+- **Typical Flow:**
+  1. Upload or stream post-hearing transcript.
+  2. LLM backend analyzes text and extracts entities.
   3. Returns structured JSON with case details and summary.
-
 
 ## Additional Information
 
