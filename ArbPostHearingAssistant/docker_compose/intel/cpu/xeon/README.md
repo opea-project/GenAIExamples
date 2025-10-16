@@ -13,13 +13,18 @@ This example includes the following sections:
 
 This section describes how to quickly deploy and test the Arbitration Post-Hearing Assistant service manually on an Intel Xeon platform. The basic steps are:
 
-1. [Access the Code](#access-the-code)
-2. [Generate a HuggingFace Access Token](#generate-a-huggingface-access-token)
-3. [Configure the Deployment Environment](#configure-the-deployment-environment)
-4. [Deploy the Services Using Docker Compose](#deploy-the-services-using-docker-compose)
-5. [Check the Deployment Status](#check-the-deployment-status)
-6. [Test the Pipeline](#test-the-pipeline)
-7. [Cleanup the Deployment](#cleanup-the-deployment)
+- [Example Arbitration Post-Hearing Assistant deployments on Intel Xeon Processor](#example-arbitration-post-hearing-assistant-deployments-on-intel-xeon-processor)
+  - [arb-post-hearing-assistant Quick Start Deployment](#arb-post-hearing-assistant-quick-start-deployment)
+    - [Access the Code and Set Up Environment](#access-the-code-and-set-up-environment)
+    - [Generate a HuggingFace Access Token](#generate-a-huggingface-access-token)
+    - [Deploy the Services Using Docker Compose](#deploy-the-services-using-docker-compose)
+    - [Check the Deployment Status](#check-the-deployment-status)
+    - [Test the Pipeline](#test-the-pipeline)
+    - [Cleanup the Deployment](#cleanup-the-deployment)
+  - [arb-post-hearing-assistant Docker Compose Files](#arb-post-hearing-assistant-docker-compose-files)
+    - [Running LLM models with remote endpoints](#running-llm-models-with-remote-endpoints)
+  - [arb-post-hearing-assistant Detailed Usage](#arb-post-hearing-assistant-detailed-usage)
+    - [Query with text](#query-with-text)
 
 ### Access the Code and Set Up Environment
 
@@ -60,8 +65,8 @@ Please refer to the table below to build different microservices from source:
 | ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | vLLM                           | [vLLM build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/third_parties/vllm#build-docker)                                              |
 | llm-arb-post-hearing-assistant | [LLM-ArbPostHearingAssistant build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/arb_post_hearing_assistant/src/#12-build-docker-image) |
-| MegaService                    | [MegaService build guide](../../../../README_miscellaneous.md#build-megaservice-docker-image)                                                               |
-| UI                             | [Basic UI build guide](../../../../README_miscellaneous.md#build-ui-docker-image)                                                                           |
+| MegaService                    | [MegaService build guide](../../../README_miscellaneous.md#build-megaservice-docker-image)                                                               |
+| UI                             | [Basic UI build guide](../../../README_miscellaneous.md#build-ui-docker-image)                                                                           |
 
 ### Check the Deployment Status
 

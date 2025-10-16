@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 services:
-  arbPostHearingAssistant:
+  arb-post-hearing-assistant:
     build:
       args:
         IMAGE_REPO: ${REGISTRY}
@@ -13,7 +13,7 @@ services:
       context: ../
       dockerfile: ./Dockerfile
     image: ${REGISTRY:-opea}/arb-post-hearing-assistant:${TAG:-latest}
-  arbPostHearingAssistant-gradio-ui:
+  arb-post-hearing-assistant-gradio-ui:
     build:
       args:
         http_proxy: ${http_proxy}
@@ -22,14 +22,9 @@ services:
       dockerfile: ./docker/Dockerfile.gradio
     extends: arbPostHearingAssistant
     image: ${REGISTRY:-opea}/arb-post-hearing-assistant-gradio-ui:${TAG:-latest}
-  llm-arbPostHearingAssistant:
+  llm-arb-post-hearing-assistant:
     build:
       context: ../../../GenAIComps
       dockerfile: comps/arb_post_hearing_assistant/src/Dockerfile
     extends: arbPostHearingAssistant
     image: ${REGISTRY:-opea}/llm-arb-post-hearing-assistant:${TAG:-latest}
-  vllm-rocm:
-    build:
-      context: ../../../GenAIComps
-      dockerfile: comps/third_parties/vllm/src/Dockerfile.amd_gpu
-    image: ${REGISTRY:-opea}/vllm-rocm:${TAG:-latest}
