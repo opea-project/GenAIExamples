@@ -106,7 +106,7 @@ function validate_frontend() {
     echo "Starting Playwright tests..."
     exit_status=0
     npx playwright test --reporter=list > ${LOG_PATH}/frontend_test.log 2>&1 || exit_status=$?
-    
+
     if [ $exit_status -ne 0 ]; then
         echo "[TEST INFO]: ---------frontend test failed---------"
         echo "Test logs:"

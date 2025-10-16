@@ -18,10 +18,10 @@ async function enterMessageToChat(page: Page, message: string) {
 	await page.getByTestId("code-input").click();
 	await page.getByTestId("code-input").fill(message);
 	await page.getByTestId("code-input").press("Enter");
-	
+
 	// Wait for the output container to appear first
 	await expect(page.getByTestId("code-output")).toBeVisible({ timeout: 30000 });
-	
+
 	// Wait for content to be loaded and copy button to appear
 	await expect(page.getByTestId("code-output")).toContainText("copy", { timeout: 30000 });
 }
