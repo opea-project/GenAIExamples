@@ -8,7 +8,7 @@
 
 ## Build MegaService Docker Image
 
-To construct the Megaservice of DocSum, the [GenAIExamples](https://github.com/opea-project/GenAIExamples.git) repository is utilized. Build MegaService Docker image via command below:
+To construct the Megaservice of ArbPostHearingAssistant, the [GenAIExamples](https://github.com/opea-project/GenAIExamples.git) repository is utilized. Build MegaService Docker image via command below:
 
 ```bash
 git clone https://github.com/opea-project/GenAIExamples.git
@@ -31,7 +31,7 @@ Some HuggingFace resources, such as certain models, are only accessible if the d
 
 ## Troubleshooting
 
-1. If you get errors like "Access Denied", [validate micro service](https://github.com/opea-project/GenAIExamples/tree/main/DocSum/docker_compose/intel/cpu/xeon/README.md#validate-microservices) first. A simple example:
+1. If you get errors like "Access Denied", [validate micro service](https://github.com/opea-project/GenAIExamples/tree/main/ArbPostHearingAssistant/docker_compose/intel/cpu/xeon/README.md#validate-microservices) first. A simple example:
 
    ```bash
    http_proxy=""
