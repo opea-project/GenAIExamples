@@ -3,7 +3,7 @@
 
 ARG IMAGE_REPO=opea
 ARG BASE_TAG=latest
-FROM $IMAGE_REPO/comps-base:$BASE_TAG
+FROM opea/comps-base:$BASE_TAG
 
 COPY ./deep_researcher.yaml $HOME/deep_researcher.yaml
 COPY ./utils.py $HOME/utils.py

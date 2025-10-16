@@ -1,4 +1,4 @@
-# Copyright (C) 2024 Intel Corporation
+# Copyright (C) 2025 Zensar Technologies Private Ltd.
 # SPDX-License-Identifier: Apache-2.0
 
 import asyncio
@@ -59,6 +59,7 @@ class OpeaArbPostHearingAssistantService:
         ServiceOrchestrator.align_outputs = align_outputs
         self.megaservice = ServiceOrchestrator()
         self.endpoint = "/v1/arb-post-hearing"
+
     def add_remote_service(self):
 
         arb_post_hearing_assistant = MicroService(
@@ -79,6 +80,8 @@ class OpeaArbPostHearingAssistantService:
             chunk_overlap = data.get("chunk_overlap", -1)
             chat_request = ArbPostHearingAssistantChatCompletionRequest.model_validate(data)
             prompt = handle_message(chat_request.messages)
+            print(f"messages:{chat_request.messages}")
+            print(f"prompt: {prompt}")
             initial_inputs_data = {data["type"]: prompt}
         else:
             raise ValueError(f"Unknown request type: {request.headers.get('content-type')}")

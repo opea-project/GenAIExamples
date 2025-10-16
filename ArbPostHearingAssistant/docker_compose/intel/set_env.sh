@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Copyright (C) 2024 Intel Corporation
+# Copyright (C) 2025 Zensar Technologies Private Ltd.
 # SPDX-License-Identifier: Apache-2.0
 SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 pushd "${SCRIPT_DIR}/../../.." > /dev/null
