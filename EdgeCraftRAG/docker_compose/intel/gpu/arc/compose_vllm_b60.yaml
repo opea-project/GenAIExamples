@@ -129,7 +129,7 @@ services:
       - ecrag
   llm-serving-xpu:
     container_name: ipex-serving-xpu-container
-    image: intel/llm-scaler-vllm:1.0
+    image: intel/llm-scaler-vllm:1.1-preview
     privileged: true
     restart: always
     ports:
