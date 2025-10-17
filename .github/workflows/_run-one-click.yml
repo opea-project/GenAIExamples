@@ -60,7 +60,7 @@ jobs:
 
       - name: Checkout out Repo
         if: ${{ inputs.deploy_method == 'docker' }}
-        uses: actions/checkout@v4
+        uses: actions/checkout@1e31de5234b9f8995739874a8ce0492dc87873e2
         with:
           fetch-depth: 0
 
@@ -94,7 +94,7 @@ jobs:
 
       - name: Checkout out Repo
         if: ${{ inputs.deploy_method == 'k8s' }}
-        uses: actions/checkout@v4
+        uses: actions/checkout@1e31de5234b9f8995739874a8ce0492dc87873e2
         with:
           fetch-depth: 0
 
@@ -153,7 +153,7 @@ jobs:
           LVM_model: ${{ env.LVM_model }}
         run: |
           cd ${{ github.workspace }}/one_click_deploy
-          python3 -m pip install -r requirements.txt
+          python3 -m pip install --require-hashes -r requirements.txt
 
           if [ "${{ inputs.deploy_method }}" = "k8s" ]; then
             export OPEA_K8S_VLLM_SKIP_WARMUP=TRUE
@@ -205,7 +205,7 @@ jobs:
 
       - name: Publish pipeline artifact
         if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392
         with:
           name: ${{ inputs.deploy_method }}
           path: ${{ github.workspace }}/${{ inputs.deploy_method }}-tests/test-results.log

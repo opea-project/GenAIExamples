@@ -27,11 +27,11 @@ jobs:
         run: sudo rm -rf ${{github.workspace}}/*
 
       - name: Checkout Repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@1e31de5234b9f8995739874a8ce0492dc87873e2
 
       - name: Check all the docker image build files
         run: |
-          pip install PyYAML
+          pip install PyYAML==6.0.3
           cd ${{github.workspace}}
           build_files=""
           for f in `find . -path "*/docker_image_build/build.yaml"`; do
