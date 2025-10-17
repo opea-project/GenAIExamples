@@ -35,7 +35,7 @@ function build_docker_images() {
     if [ ! -d "$GENAICOMPS_PATH" ]; then
         git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git "$GENAICOMPS_PATH"
     fi
-    pushd GenAIComps
+    pushd "$GENAICOMPS_PATH"
     echo "GenAIComps test commit is $(git rev-parse HEAD)"
     docker build --no-cache -t ${REGISTRY}/comps-base:${TAG} --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
     popd && sleep 1s
