@@ -24,7 +24,7 @@ services:
     image: ${REGISTRY:-opea}/arb-post-hearing-assistant-gradio-ui:${TAG:-latest}
   llm-arb-post-hearing-assistant:
     build:
-      context: ../../../GenAIComps
+      context: GenAIComps
       dockerfile: comps/arb_post_hearing_assistant/src/Dockerfile
     extends: arb-post-hearing-assistant
     image: ${REGISTRY:-opea}/llm-arb-post-hearing-assistant:${TAG:-latest}
