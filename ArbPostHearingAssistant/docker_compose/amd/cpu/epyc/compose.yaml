@@ -1,0 +1,87 @@
+# Copyright (C) 2025 Zensar Technologies Private Ltd.
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  vllm-service:
+    image: public.ecr.aws/q9t5s3a7/vllm-cpu-release-repo:v0.10.1
+    container_name: arb-post-hearing-assistant-epyc-vllm-service
+    ports:
+      - "8008:80"
+    volumes:
+      - "${MODEL_CACHE:-./data}:/root/.cache/huggingface/hub"
+    shm_size: 1g
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      HF_TOKEN: ${HF_TOKEN}
+      MODEL_CACHE: ${MODEL_CACHE}
+      LLM_MODEL_ID: ${LLM_MODEL_ID}
+      VLLM_CPU_KVCACHE_SPACE: 40
+      VLLM_TORCH_PROFILER_DIR: "/mnt"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:80/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 100
+    command: --model $LLM_MODEL_ID --host 0.0.0.0 --port 80
+
+  llm-arbPostHearingAssistant-vllm:
+    image: ${REGISTRY:-opea}/llm-arb-post-hearing-assistant:${TAG:-latest}
+    container_name: arb-post-hearing-assistant-epyc-llm-server
+    depends_on:
+      vllm-service:
+        condition: service_healthy
+    ports:
+      - ${LLM_PORT:-9000}:9000
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      LLM_ENDPOINT: ${LLM_ENDPOINT}
+      LLM_MODEL_ID: ${LLM_MODEL_ID}
+      HF_TOKEN: ${HF_TOKEN}
+      MODEL_CACHE: ${MODEL_CACHE}
+      MAX_INPUT_TOKENS: ${MAX_INPUT_TOKENS}
+      MAX_TOTAL_TOKENS: ${MAX_TOTAL_TOKENS}
+      OPEA_ARB_POSTHEARING_ASSISTANT_COMPONENT_NAME: ${OPEA_ARB_POSTHEARING_ASSISTANT_COMPONENT_NAME}
+      LOGFLAG: ${LOGFLAG:-False}
+    restart: unless-stopped
+
+  arbPostHearingAssistant-epyc-backend-server:
+    image: ${REGISTRY:-opea}/arb-post-hearing-assistant:${TAG:-latest}
+    container_name: arb-post-hearing-assistant-epyc-backend-server
+    depends_on:
+      - vllm-service
+      - llm-arbPostHearingAssistant-vllm
+    ports:
+      - "${BACKEND_SERVICE_PORT:-8888}:8888"
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - MEGA_SERVICE_HOST_IP=${MEGA_SERVICE_HOST_IP}
+      - LLM_SERVICE_HOST_IP=${LLM_SERVICE_HOST_IP}
+    ipc: host
+    restart: always
+
+  arbPostHearingAssistant-gradio-ui:
+    image: ${REGISTRY:-opea}/arb-post-hearing-assistant-gradio-ui:${TAG:-latest}
+    container_name: arb-post-hearing-assistant-epyc-ui-server
+    depends_on:
+      - arbPostHearingAssistant-epyc-backend-server
+    ports:
+      - "${FRONTEND_SERVICE_PORT:-5173}:5173"
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - BACKEND_SERVICE_ENDPOINT=${BACKEND_SERVICE_ENDPOINT}
+      - DOC_BASE_URL=${BACKEND_SERVICE_ENDPOINT}
+    ipc: host
+    restart: always
+
+networks:
+  default:
+    driver: bridge

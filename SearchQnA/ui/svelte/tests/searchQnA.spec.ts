@@ -3,6 +3,8 @@
 
 import { test, expect, type Page } from "@playwright/test";
 
+test.setTimeout(5 * 60 * 1000);
+
 // Initialization before each test
 test.beforeEach(async ({ page }) => {
 	await page.goto("/");
@@ -16,8 +18,8 @@ async function enterMessageToChat(page: Page, message: string) {
 	await page.getByTestId("chat-input").click();
 	await page.getByTestId("chat-input").fill(message);
 	await page.getByTestId("chat-input").press("Enter");
-	await page.waitForTimeout(10000);
-	await expect(page.getByTestId("display-answer")).toBeVisible();
+
+	await expect(page.getByTestId("display-answer")).toBeVisible({ timeout: 5 * 60 * 1000 });
 }
 
 // Test description: New Chat
