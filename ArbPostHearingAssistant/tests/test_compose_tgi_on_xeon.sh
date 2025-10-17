@@ -96,7 +96,7 @@ function validate_microservices() {
         "${host_ip}:${LLM_ENDPOINT_PORT}/generate" \
         "generated_text" \
         "tgi-server" \
-        "arb-post-hearing-assistant-xeon-tgi-server" \ 
+        "arb-post-hearing-assistant-xeon-tgi-server" \
         "json" \
         '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":17, "do_sample": true}}'
 
