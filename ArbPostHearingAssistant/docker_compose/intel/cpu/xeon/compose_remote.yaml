@@ -1,0 +1,61 @@
+# Copyright (C) 2025 Zensar Technologies Private Ltd.
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  llm-arbPostHearingAssistant-vllm:
+    image: ${REGISTRY:-opea}/llm-arb-post-hearing-assistant:${TAG:-latest}
+    container_name: arb-post-hearing-assistant-xeon-llm-server
+    ports:
+      - ${LLM_PORT:-9000}:9000
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      LLM_ENDPOINT: ${REMOTE_ENDPOINT}
+      LLM_MODEL_ID: ${LLM_MODEL_ID}
+      OPENAI_API_KEY: ${API_KEY}
+      HUGGINGFACEHUB_API_TOKEN: ${HF_TOKEN}
+      HF_TOKEN: ${HF_TOKEN}
+      MAX_INPUT_TOKENS: ${MAX_INPUT_TOKENS}
+      MAX_TOTAL_TOKENS: ${MAX_TOTAL_TOKENS}
+      OPEA_ARB_POSTHEARING_ASSISTANT_COMPONENT_NAME: ${OPEA_ARB_POSTHEARING_ASSISTANT_COMPONENT_NAME}
+
+      LOGFLAG: ${LOGFLAG:-False}
+    restart: unless-stopped
+
+  arbPostHearingAssistant-xeon-backend-server:
+    image: ${REGISTRY:-opea}/arb-post-hearing-assistant:${TAG:-latest}
+    container_name: arb-post-hearing-assistant-xeon-backend-server
+    depends_on:
+      - llm-arbPostHearingAssistant-vllm
+    ports:
+      - "${BACKEND_SERVICE_PORT:-8888}:8888"
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - MEGA_SERVICE_HOST_IP=${MEGA_SERVICE_HOST_IP}
+      - LLM_SERVICE_HOST_IP=${LLM_SERVICE_HOST_IP}
+    ipc: host
+    restart: always
+
+  arbPostHearingAssistant-gradio-ui:
+    image: ${REGISTRY:-opea}/arb-post-hearing-assistant-gradio-ui:${TAG:-latest}
+    container_name: arb-post-hearing-assistant-xeon-ui-server
+    depends_on:
+      - arbPostHearingAssistant-xeon-backend-server
+    ports:
+      - "${FRONTEND_SERVICE_PORT:-5173}:5173"
+    environment:
+      - no_proxy=${no_proxy}
+      - https_proxy=${https_proxy}
+      - http_proxy=${http_proxy}
+      - BACKEND_SERVICE_ENDPOINT=${BACKEND_SERVICE_ENDPOINT}
+      - DOC_BASE_URL=${BACKEND_SERVICE_ENDPOINT}
+    ipc: host
+    restart: always
+
+networks:
+  default:
+    driver: bridge
