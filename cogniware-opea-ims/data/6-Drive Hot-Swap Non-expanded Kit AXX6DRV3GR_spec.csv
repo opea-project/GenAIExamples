@@ -1,7 +1,0 @@
-Section,Key,Value
-Essentials,Product Collection,Drive Bay Options
-Essentials,Marketing Status,Discontinued
-Essentials,Launch Date,Q1'06
-Essentials,Expected Discontinuance,2012
-Essentials,Included Items,"Backplane board, 6 drive carriers, 6 data cables, 6-drive bay, IPMB cable, SES cable, SGPIO cable, installation guide, SATA/SAS configuration label"
-Supplemental Information,Description,6-drive bay that supports SAS/SATA drives. Requires six free SAS or SATA ports.SAS hard drive support requires SAS connectors from a SAS module or SAS RAID Card. Support 6Gb SAS Hard Drives with compatible 6Gb SAS adapters

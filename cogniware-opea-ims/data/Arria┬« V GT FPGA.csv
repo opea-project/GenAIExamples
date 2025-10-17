@@ -1,5 +1,0 @@
-Product ID,Product Name,Launch Date,Logic Elements (LE),Digital Signal Processing (DSP) Blocks,Maximum Embedded Memory,Maximum User I/O Count†,Package Options
-210396,Arria® V 5AGTC3 FPGA,2011,156000,396,11.471 Mb,416,"F672, F896"
-210393,Arria® V 5AGTC7 FPGA,2011,242000,800,15.108 Mb,544,"F896, F1152"
-210395,Arria® V 5AGTD3 FPGA,2011,362000,1045,19.358 Mb,704,"F896, F1152, F1517"
-210394,Arria® V 5AGTD7 FPGA,2011,504000,1156,27.046 Mb,704,"F1152, F1517"

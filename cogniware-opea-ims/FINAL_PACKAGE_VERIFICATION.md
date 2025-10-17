@@ -421,3 +421,4 @@ docker-compose exec backend python app/init_knowledge_base.py
 
 *Built with ❤️ using OPEA GenAI Components on Intel Xeon Processors*
 
+

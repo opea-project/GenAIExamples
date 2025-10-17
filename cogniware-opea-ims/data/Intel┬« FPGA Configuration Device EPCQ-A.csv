@@ -1,6 +1,0 @@
-Product ID,Product Name,Launch Date,LogicElements,DigitalSignalProcessingBlocks,EmbeddedMemoryMax,UserIOMax,Package Options
-216139,Intel® FPGA Configuration Device EPCQ128A,Q3'17,,,,,16-pin SOIC
-216141,Intel® FPGA Configuration Device EPCQ16A,Q3'17,,,,,8-pin SOIC
-216144,Intel® FPGA Configuration Device EPCQ32A,Q3'17,,,,,8-pin SOIC
-216143,Intel® FPGA Configuration Device EPCQ4A,Q3'17,,,,,8-pin SOIC
-216145,Intel® FPGA Configuration Device EPCQ64A,Q3'17,,,,,16-pin SOIC

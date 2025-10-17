@@ -1,5 +1,0 @@
-Product ID,Product Name,Cabling Type,MaxTDP,Port Configuration,Data Rate Per Port,System Interface Type
-237052,Intel® Ethernet Network Adapter E610-XT2,"RJ45 Category 6, Category 6A, Category 5e up to 100m",,Dual,10GbE/5GbE/2.5GbE/1GbE,RJ45
-237053,Intel® Ethernet Network Adapter E610-XT4,"RJ45 Category 6, Category 6A, Category 5e up to 100m",,Quad,10GbE/5GbE/2.5GbE/1GbE,RJ45
-237355,Intel® Ethernet Network Adapter E610-XT2 for OCP 3.0,"RJ45 Category 6, Category 6A, Category 5e up to 100m",,Dual,10GbE/5GbE/2.5GbE/1Gb,RJ 45
-237354,Intel® Ethernet Network Adapter E610-XT4 for OCP 3.0,"RJ45 Category 6, Category 6A, Category 5e up to 100m",,Quad,10GbE/5GbE/2.5GbE/1Gb,RJ 45

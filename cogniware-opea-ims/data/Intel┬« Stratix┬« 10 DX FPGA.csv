@@ -1,4 +1,0 @@
-Product ID,Product Name,Launch Date,Logic Elements (LE),Digital Signal Processing (DSP) Blocks,Maximum Embedded Memory,Maximum User I/O Count†,Package Options
-210311,Intel® Stratix® 10 DX 1100 FPGA,Q3'19,1325000,2592,114 Mb,528,F1760
-210310,Intel® Stratix® 10 DX 2100 FPGA,Q3'19,2073000,3960,239.5 Mb,612,F2597
-210309,Intel® Stratix® 10 DX 2800 FPGA,Q3'19,2753000,5760,244 Mb,816,F2912

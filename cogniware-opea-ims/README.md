@@ -70,7 +70,25 @@
 - 50GB free disk space (SSD recommended)
 - **Optimized for Intel Xeon processors** - leverages Intel optimizations for AI workloads
 
-### One-Command Deployment
+### Step 1: Download Sample Data
+
+> **⚠️ Important**: The sample data files (7,479 CSV files, ~32MB) are **not included** in the Git repository per OPEA guidelines. They must be downloaded separately before first use.
+
+**Automated download (recommended)**:
+```bash
+# Download sample inventory data
+./scripts/download-data.sh
+```
+
+**Manual download**:
+See [DATA_SETUP.md](DATA_SETUP.md) for detailed instructions and alternative download options.
+
+**What's included**:
+- 7,479 CSV files with Intel product specifications
+- Product categories: Xeon processors, Core CPUs, FPGAs, server components, storage, networking
+- Total size: ~32 MB compressed, ~45 MB extracted
+
+### Step 2: One-Command Deployment
 
 ```bash
 # Clone or download this package
@@ -84,10 +102,10 @@ cd cogniware-opea-ims
 # Backend API: http://localhost:8000/docs
 ```
 
-### Initialize Knowledge Base
+### Step 3: Initialize Knowledge Base
 
 ```bash
-# In a new terminal, initialize with CSV data (15k+ documents)
+# In a new terminal, initialize with CSV data (7,479+ documents)
 docker-compose exec backend python app/init_knowledge_base.py
 
 # Verify initialization
@@ -441,11 +459,13 @@ Upload new product catalogs, system automatically learns and adapts
 
 ## 📚 Documentation
 
+- **[Data Setup Guide](DATA_SETUP.md)** - ⚠️ **Required**: Download sample data files
 - [Complete Setup Guide](docs/SETUP_GUIDE.md)
 - [OPEA Integration Details](docs/OPEA_INTEGRATION.md)
 - [API Documentation](docs/API_DOCS.md)
 - [Deployment Guide](docs/DEPLOYMENT.md)
 - [Security Guidelines](docs/SECURITY.md)
+- [Security Updates](SECURITY_UPDATES.md) - Recent CVE fixes
 - [Troubleshooting](docs/TROUBLESHOOTING.md)
 
 ## 🤝 Contributing

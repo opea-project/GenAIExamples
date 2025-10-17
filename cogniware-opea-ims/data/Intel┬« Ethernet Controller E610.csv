@@ -1,4 +1,0 @@
-Product ID,Product Name,CablingDescription,MaxTDP,Port Configuration,Data Rate Per Port,System Interface Type
-231836,Intel® Ethernet Controller E610-IAT2,,,Dual,2.5Gb,PCIe
-242256,Intel® Ethernet Controller E610-XAT,,,Single,10/5/2.5/1GbE,PCIe
-236437,Intel® Ethernet Controller E610-XAT2,,,Dual,10/5/2.5/1GbE,PCIe

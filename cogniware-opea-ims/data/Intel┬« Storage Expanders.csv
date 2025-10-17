@@ -1,7 +1,0 @@
-Product ID,Product Name,Marketing Status,Board Form Factor,RAID Level Supported,# of Ports Internal,# of Ports External,EmbeddedMemorySize
-81277,Intel® Storage Expander RES3FV288,Discontinued,Low Profile MD2 Card,Dependent on paired RAID card,28,8,
-81278,Intel® Storage Expander RES3TV360,Discontinued,Midplane Board,Dependent on paired RAID card,36,,
-60297,Intel® RAID Expander RES2SV240NC,Discontinued,Low Profile MD2 Card,,24,,
-60273,Intel® RAID Expander RES2CV240,Discontinued,,Dependent on paired RAID card,24,0,
-64080,Intel® RAID Expander RES2CV360,Discontinued,,Dependent on paired RAID card,36,0,
-49596,Intel® RAID Expander RES2SV240,Discontinued,Low Profile MD2 Card,Dependent on paired RAID card,24,0,

@@ -69,6 +69,11 @@ uploads/
 temp/
 tmp/
 
+# Data files - Download separately (see DATA_SETUP.md)
+data/
+!data/.gitkeep
+!data/README.md
+
 # Secrets
 *.pem
 *.key
