@@ -30,12 +30,8 @@ ROOT_FOLDER=$(dirname "$(readlink -f "$0")")
 function build_docker_images() {
     opea_branch=${opea_branch:-"main"}
     cd $WORKPATH/docker_image_build
-    # Ensure GenAIComps is cloned to the correct relative path expected by build.yaml
-    GENAICOMPS_PATH="$WORKPATH/GenAIComps"
-    if [ ! -d "$GENAICOMPS_PATH" ]; then
-        git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git "$GENAICOMPS_PATH"
-    fi
-    pushd "$GENAICOMPS_PATH"
+    git clone --depth 1 --branch ${opea_branch} https://github.com/opea-project/GenAIComps.git
+    pushd GenAIComps
     echo "GenAIComps test commit is $(git rev-parse HEAD)"
     docker build --no-cache -t ${REGISTRY}/comps-base:${TAG} --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
     popd && sleep 1s
