@@ -1,0 +1,30 @@
+# Copyright (C) 2025 Zensar Technologies Private Ltd.
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  arb-post-hearing-assistant:
+    build:
+      args:
+        IMAGE_REPO: ${REGISTRY}
+        BASE_TAG: ${TAG}
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
+        no_proxy: ${no_proxy}
+      context: ../
+      dockerfile: ./Dockerfile
+    image: ${REGISTRY:-opea}/arb-post-hearing-assistant:${TAG:-latest}
+  arb-post-hearing-assistant-gradio-ui:
+    build:
+      args:
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
+      context: ../ui
+      dockerfile: ./docker/Dockerfile.gradio
+    extends: arb-post-hearing-assistant
+    image: ${REGISTRY:-opea}/arb-post-hearing-assistant-gradio-ui:${TAG:-latest}
+  llm-arb-post-hearing-assistant:
+    build:
+      context: GenAIComps
+      dockerfile: comps/arb_post_hearing_assistant/src/Dockerfile
+    extends: arb-post-hearing-assistant
+    image: ${REGISTRY:-opea}/llm-arb-post-hearing-assistant:${TAG:-latest}
