@@ -1,8 +1,0 @@
-Product ID,Product Name,Launch Date,Logic Elements (LE),Digital Signal Processing (DSP) Blocks,Maximum Embedded Memory,Maximum User I/O Count†,Package Options
-244392,Agilex™ 3 FPGA C-Series 025  (B18A),Q3'24,25075,34,1.54 Mb,208,B18A
-244390,Agilex™ 3 FPGA C-Series 050  (B18A),Q3'24,47200,65,2.89 Mb,208,B18A
-244391,Agilex™ 3 FPGA C-Series 065  (B18A),Q3'24,65490,88,3.94 Mb,208,B18A
-242850,Agilex™ 3 FPGA C-Series 100  (B18A),Q3'24,100300,138,6.34 Mb,208,B18A
-242849,Agilex™ 3 FPGA C-Series 100  (M16A),Q3'24,100300,138,3.94 Mb,232,M16A
-242852,Agilex™ 3 FPGA C-Series 135  (B18A),Q3'24,135100,184,8.29 Mb,208,B18A
-242851,Agilex™ 3 FPGA C-Series 135  (M16A),Q3'24,135100,184,8.29 Mb,232,M16A

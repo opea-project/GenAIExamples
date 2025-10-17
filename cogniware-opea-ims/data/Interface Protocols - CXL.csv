@@ -1,5 +1,0 @@
-Product ID,Product Name,LatestVersion,LatestReleaseDate,Category,Ordering Part Number
-237770,Base CXL Hard IP with spec-defined subprotocol interfaces,,,Interface Protocols,"IP-CXLBASEHIP, IPR-CXLBASEHIP"
-237766,CXL IP for Device Type1 with optional built-in cache,,,Interface Protocols,"IP-CXLTYP1, IPR-CXLTYP1"
-237767,CXL IP for Device Type2 with Device coherency  (DCOH) support logic,,,Interface Protocols,"IP-CXLTYP2, IPR-CXLTYP2"
-237768,CXL IP for Device Type3 with DDR4 based MemBuffer,,,Interface Protocols,"IP-CXLTYP3DDR, IPR-CXLTYP3DDR"

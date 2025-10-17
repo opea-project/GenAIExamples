@@ -1,8 +1,0 @@
-Section,Key,Value
-Essentials,Product Collection,Management Module Options
-Essentials,Code Name,Products formerly Wolf Pass
-Essentials,Marketing Status,Discontinued
-Essentials,Launch Date,Q3'17
-Essentials,Expected Discontinuance,2023
-Essentials,Included Items,"Intel® Trusted Platform Module (TPM) 2.0A TPM is a hardware-based security device that addresses the growing concern on boot process integrity and offers better data protection. TPM protects the system start-up process by ensuring it is tamper-free before releasing system control to the operating system. A TPM device provides secured storage to store data, such as security keys and passwords. In addition, a TPM device has encryption and hash functions.AXXTPMENC8 implements TPM as per TPM PC Client specifications revision 2.0 by the Trusted Computing Group (TCG)"
-Supplemental Information,Description,Accessory TPM 2.0 Module for Rest of World except China.

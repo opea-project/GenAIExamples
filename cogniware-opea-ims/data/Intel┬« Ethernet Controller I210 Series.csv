@@ -1,6 +1,0 @@
-Product ID,Product Name,CablingDescription,MaxTDP,Port Configuration,Data Rate Per Port,System Interface Type
-141110,Intel® Ethernet Controller I210-CL,,,Single,1GbE,PCIe v2.1 (2.5 GT/s)
-88741,Intel® Ethernet Controller I210-CS,,,Single,1GbE SerDes/SGMII,PCIe v2.1 (2.5 GT/s)
-64400,Intel® Ethernet Controller I210-AT,,,Single,1GbE,PCIe v2.1 (2.5 GT/s)
-64401,Intel® Ethernet Controller I210-IS,,,Single,1GbE SerDes/SGMII,PCIe v2.1 (2.5 GT/s)
-64402,Intel® Ethernet Controller I210-IT,,,Single,1GbE,PCIe v2.1 (2.5 GT/s)

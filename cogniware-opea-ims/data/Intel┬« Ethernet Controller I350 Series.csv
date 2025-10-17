@@ -1,3 +1,0 @@
-Product ID,Product Name,CablingDescription,TDP,Port Configuration,Data Rate Per Port,System Interface Type
-52968,Intel® Ethernet Controller I350-AM2,,2.8 W,Dual,1GbE,PCIe v2.0 (5.0 GT/s)
-52966,Intel® Ethernet Controller I350-AM4,,4 W,Quad,1GbE,PCIe v2.0 (5.0 GT/s)

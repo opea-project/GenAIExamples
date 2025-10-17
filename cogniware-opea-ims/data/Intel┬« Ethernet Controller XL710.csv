@@ -1,5 +1,0 @@
-Product ID,Product Name,CablingDescription,TDP,Port Configuration,Data Rate Per Port,System Interface Type
-82945,Intel® Ethernet Controller XL710-AM1,,7 W,Single,1GbE/10GbE/40GbE,PCIe v3.0 (8.0 GT/s)
-82946,Intel® Ethernet Controller XL710-AM2,,7 W,Dual,1GbE/10GbE/40GbE,PCIe v3.0 (8.0 GT/s)
-93104,Intel® Ethernet Controller XL710-BM1,,7 W,Single,"1x400, 4x10, or 2x10 Gbps",PCIe v3.0 (8.0 GT/s)
-93099,Intel® Ethernet Controller XL710-BM2,,7 W,Dual,"2x40, 1x40, 4x10, or 2x10 Gbps",PCIe v3.0 (8.0 GT/s)

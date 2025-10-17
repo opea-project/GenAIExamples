@@ -1,9 +1,0 @@
-Product ID,Product Name,Launch Date,Total Cores,ClockSpeedMax,Processor Base Frequency,Cache,TDP
-86348,Intel® Pentium® Processor 3825U,Q1'15,2,,1.90 GHz,2 MB,15 W
-84813,Intel® Pentium® Processor 3805U,Q1'15,2,,1.90 GHz,2 MB,15 W
-81013,Intel® Pentium® Processor 3560M,Q2'14,2,,2.40 GHz,2 MB,37 W
-78945,Intel® Pentium® Processor 3558U,Q4'13,2,,1.70 GHz,2 MB Intel® Smart Cache,15 W
-78946,Intel® Pentium® Processor 3561Y,Q4'13,2,,1.20 GHz,2 MB Intel® Smart Cache,11.5 W
-77404,Intel® Pentium® Processor 3550M,Q4'13,2,,2.30 GHz,2 MB Intel® Smart Cache,37 W
-76621,Intel® Pentium® Processor 3556U,Q3'13,2,,1.70 GHz,2 MB Intel® Smart Cache,15 W
-76622,Intel® Pentium® Processor 3560Y,Q3'13,2,,1.20 GHz,2 MB Intel® Smart Cache,11.5 W
