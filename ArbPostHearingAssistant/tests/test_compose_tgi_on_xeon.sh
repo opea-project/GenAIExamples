@@ -115,7 +115,7 @@ function validate_megaservice_text() {
     echo ">>> Checking text data in json format"
     validate_service \
         "${host_ip}:${BACKEND_SERVICE_PORT}/v1/arb-post-hearing" \
-        "[DONE]" \
+        "summary" \
         "arbPostHearingAssistant-xeon-backend-server" \
         "arb-post-hearing-assistant-xeon-backend-server" \
         "json" \
