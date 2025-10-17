@@ -103,7 +103,7 @@ function validate_microservices() {
     # llm microservice
     validate_service \
         "${host_ip}:${LLM_PORT}/v1/arb-post-hearing" \
-        "text" \
+        "case_number" \
         "llm-arbPostHearingAssistant-tgi" \
         "arb-post-hearing-assistant-xeon-llm-server" \
         "json" \
