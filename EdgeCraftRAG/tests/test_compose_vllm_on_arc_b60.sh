@@ -33,6 +33,7 @@ vLLM_ENDPOINT="http://${HOST_IP}:${VLLM_SERVICE_PORT_B60}"
 LLM_MODEL="Qwen/Qwen3-8B"
 VLLM_IMAGE_TAG="1.0"
 DP=1
+ZE_AFFINITY_MASK=1
 
 function build_docker_images() {
     opea_branch=${opea_branch:-"main"}
