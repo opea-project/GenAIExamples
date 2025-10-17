@@ -38,6 +38,7 @@ LLM_MODEL="Qwen/Qwen3-8B"
 LLM_MODEL_PATH="${MODEL_PATH}/${LLM_MODEL}"
 NGINX_CONFIG_PATH="$WORKPATH/nginx/nginx.conf"
 VLLM_IMAGE_TAG="0.8.3-b20"
+MAX_MODEL_LEN=8192
 DP_NUM=1
 
 function build_docker_images() {
@@ -178,5 +179,6 @@ function main() {
     echo "::endgroup::"
 
 }
+
 
 main
