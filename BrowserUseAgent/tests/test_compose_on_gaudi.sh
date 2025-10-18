@@ -107,7 +107,7 @@ function validate_megaservice() {
         "\"is_success\":true" \
         "browser-use-agent" \
         "browser-use-agent-server" \
-        '{"task_prompt": "Nagivate to http://10.7.4.57:8084/admin and login with the credentials: username: admin, password: admin1234. Then, find out What are the top-3 best-selling product in 2022?"}'
+        '{"task_prompt": "Navigate to http://'${ip_address}':8084/admin and login with the credentials: username: admin, password: admin1234. Then, find out What are the top-3 best-selling product in 2022?"}'
 }
 
 function stop_docker() {

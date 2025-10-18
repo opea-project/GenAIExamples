@@ -7,8 +7,6 @@ FROM $IMAGE_REPO/comps-base:$BASE_TAG
 
 USER root
 
-RUN apt update && apt install vim curl -y
-
 COPY ./requirements.txt $HOME/requirements.txt
 COPY ./browser_use_agent.py $HOME/browser_use_agent.py
 

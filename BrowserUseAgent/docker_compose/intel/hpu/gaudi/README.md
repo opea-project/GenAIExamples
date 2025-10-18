@@ -47,7 +47,7 @@ To set up environment variables for deploying BrowserUseAgent services, source t
 source ./set_env.sh
 ```
 
-The _set_env.sh_ script will prompt for required and optional environment variables used to configure the ChatQnA services. If a value is not entered, the script will use a default value for the same. Users need to check if the values fit your deployment environment. 
+The _set_env.sh_ script will prompt for required and optional environment variables used to configure the BrowserUseAgent services. If a value is not entered, the script will use a default value for the same. Users need to check if the values fit your deployment environment. 
 
 
 ### Deploy the Services Using Docker Compose

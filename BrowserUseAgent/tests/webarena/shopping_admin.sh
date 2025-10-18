@@ -11,7 +11,7 @@ source ${BASE_DIR}/set_env.sh
 
 assert() {
   if ! "$@"; then
-    echo "Assertion failed: $@" >&2
+    echo "Assertion failed: $*" >&2
     exit 1
   fi
 }
