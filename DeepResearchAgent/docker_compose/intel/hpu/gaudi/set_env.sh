@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 # Navigate to the parent directory and source the environment
-SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)"
 
 pushd "$SCRIPT_DIR/../../../../../" > /dev/null
 source .set_env.sh
