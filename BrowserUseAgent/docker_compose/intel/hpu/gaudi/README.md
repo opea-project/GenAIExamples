@@ -4,7 +4,6 @@ This example covers the single-node on-premises deployment of the BrowserUseAgen
 
 **Note** This example requires access to a properly installed Intel® Gaudi® platform with a functional Docker service configured to use the habanalabs-container-runtime. Please consult the [Intel® Gaudi® software Installation Guide](https://docs.habana.ai/en/v1.20.1/Installation_Guide/Driver_Installation.html) for more information.
 
-
 ## Quick Start Deployment
 
 This section describes how to quickly deploy and test the BrowserUseAgent service manually on an Intel® Gaudi® platform. The basic steps are:
@@ -16,7 +15,6 @@ This section describes how to quickly deploy and test the BrowserUseAgent servic
 5. [Check the Deployment Status](#check-the-deployment-status)
 6. [Test the Pipeline](#test-the-pipeline)
 7. [Cleanup the Deployment](#cleanup-the-deployment)
-
 
 ### Access the Code
 
@@ -33,11 +31,9 @@ Checkout a released version, such as v1.5:
 git checkout v1.5
 ```
 
-
 ### Generate a HuggingFace Access Token
 
 Some HuggingFace resources, such as some models, are only accessible if you have an access token. If you do not already have a HuggingFace access token, you can create one by first creating an account by following the steps provided at [HuggingFace](https://huggingface.co/) and then generating a [user access token](https://huggingface.co/docs/transformers.js/en/guides/private#step-1-generating-a-user-access-token).
-
 
 ### Configure the Deployment Environment
 
@@ -47,8 +43,7 @@ To set up environment variables for deploying BrowserUseAgent services, source t
 source ./set_env.sh
 ```
 
-The _set_env.sh_ script will prompt for required and optional environment variables used to configure the BrowserUseAgent services. If a value is not entered, the script will use a default value for the same. Users need to check if the values fit your deployment environment. 
-
+The _set_env.sh_ script will prompt for required and optional environment variables used to configure the ChatQnA services. If a value is not entered, the script will use a default value for the same. Users need to check if the values fit your deployment environment.
 
 ### Deploy the Services Using Docker Compose
 
@@ -59,7 +54,6 @@ docker compose up -d
 ```
 
 The BrowserUseAgent docker images should automatically be downloaded from the `OPEA registry` and deployed on the Intel® Gaudi® Platform.
-
 
 ### Check the Deployment Status
 
@@ -86,11 +80,10 @@ Once the BrowserUseAgent services are running, test the pipeline using the follo
 ```bash
 curl -X POST http://${host_ip}:${BROWSER_USE_AGENT_PORT}/v1/browser_use_agent \
     -H "Content-Type: application/json" \
-    -d '{"task_prompt": "Nagivate to http://10.7.4.57:8083/admin and login with the credentials: username: admin, password: admin1234. Then, find out What are the top-2 best-selling product in 2022?"}'
+    -d '{"task_prompt": "Navigate to http://10.7.4.57:8083/admin and login with the credentials: username: admin, password: admin1234. Then, find out What are the top-2 best-selling product in 2022?"}'
 ```
 
-* Note that Update the `task_prompt` to match the evaluation question relevant to your configured website.
-
+- Note that Update the `task_prompt` to match the evaluation question relevant to your configured website.
 
 ### Cleanup the Deployment
 
