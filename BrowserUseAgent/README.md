@@ -14,4 +14,5 @@ The table below lists currently available deployment options. They outline in de
 
 | **Deploy Method** | **LLM Engine** | **LLM Model**                          | **Hardware** |
 | ----------------- | -------------- | -------------------------------------- | ------------ |
-| Docker Compose    | vLLM           | meta-llama/Meta-Llama-3.3-70B-Instruct | Intel Gaudi  |
+| Docker Compose    | vLLM           | Qwen/Qwen2.5-VL-32B-Instruct           | Intel Gaudi  |
+| Docker Compose    | vLLM           | Qwen/Qwen2.5-VL-72B-Instruct           | Intel Gaudi  |
