@@ -5,21 +5,19 @@ ARG IMAGE_REPO=opea
 ARG BASE_TAG=latest
 FROM $IMAGE_REPO/comps-base:$BASE_TAG
 
-RUN apt update && apt install -y software-properties-common && \
-    add-apt-repository -y ppa:deadsnakes/ppa && \
-    apt install python3.12 python3.12-venv python3.12-distutils -y python3.12 --version && \
-    playwright install chromium --with-deps --no-shell && \
-    apt clean && rm -rf /var/lib/apt/lists/*
+USER root
+
+RUN apt update && apt install vim curl -y
 
 COPY ./requirements.txt $HOME/requirements.txt
 COPY ./browser_use_agent.py $HOME/browser_use_agent.py
 
-USER root
 ARG uvpip='uv pip install --system --no-cache-dir'
-RUN pip install --no-cache-dir --upgrade pip setuptools uv && \
+RUN uv pip install --system --upgrade pip setuptools uv && \
+    $uvpip pytest-playwright && \
+    playwright install chromium --with-deps --no-shell && \
     $uvpip -r requirements.txt && \
-    chown -R user:user $HOME
+    $uvpip posthog==5.4.0
 
 USER user
-
 ENTRYPOINT ["python", "browser_use_agent.py"]
