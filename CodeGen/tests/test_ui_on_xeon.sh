@@ -45,11 +45,13 @@ function start_services() {
     docker compose -f ${compose_file} up -d > ${LOG_PATH}/start_services_with_compose.log
 
     n=0
-    until [[ "$n" -ge 100 ]]; do
+    until [[ "$n" -ge 200 ]]; do
         docker logs ${llm_container_name} > ${LOG_PATH}/llm_service_start.log 2>&1
-        if grep -E "Connected|complete" ${LOG_PATH}/llm_service_start.log; then
+        if grep -E "Connected|complete|healthy" ${LOG_PATH}/llm_service_start.log; then
+            echo "LLM service is ready"
             break
         fi
+        echo "Waiting for LLM service... (attempt $n/200)"
         sleep 5s
         n=$((n+1))
     done
@@ -74,8 +76,63 @@ function validate_frontend() {
 
     export no_proxy="localhost,127.0.0.1,$ip_address"
 
+    # Wait for backend service to be ready
+    echo "Waiting for backend service to be ready..."
+    n=0
+    until [[ "$n" -ge 120 ]]; do
+        HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "http://${ip_address}:7778/v1/chatcompletions")
+        if [ "$HTTP_STATUS" = "200" ] || [ "$HTTP_STATUS" = "500" ]; then  # 500 might be expected if model is loading
+            echo "Backend service is ready"
+            break
+        fi
+        echo "Waiting for backend service... (attempt $n/120), HTTP status: $HTTP_STATUS"
+        sleep 5s
+        n=$((n+1))
+    done
+
+    # Test backend service with actual codegen endpoint
+    echo "Testing backend codegen endpoint..."
+    n=0
+    until [[ "$n" -ge 60 ]]; do
+        TEST_RESPONSE=$(curl -s -X POST "http://${ip_address}:7778/v1/codegen" \
+            -H "Content-Type: application/json" \
+            -d '{"messages": "test"}' 2>/dev/null)
+        if [ $? -eq 0 ] && [ -n "$TEST_RESPONSE" ]; then
+            echo "Backend codegen endpoint is responding"
+            break
+        fi
+        echo "Waiting for backend codegen endpoint... (attempt $n/60)"
+        sleep 5s
+        n=$((n+1))
+    done
+
+    # Wait for UI service to be ready
+    echo "Waiting for UI service to be ready..."
+    n=0
+    until [[ "$n" -ge 120 ]]; do
+        HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "http://${ip_address}:5173/health")
+        if [ "$HTTP_STATUS" = "200" ]; then
+            echo "UI service is ready"
+            break
+        fi
+        echo "Waiting for UI service... (attempt $n/120), HTTP status: $HTTP_STATUS"
+        sleep 5s
+        n=$((n+1))
+    done
+
+    # Run tests with better logging
+    echo "Starting Playwright tests..."
     exit_status=0
-    npx playwright test || exit_status=$?
+    npx playwright test --reporter=list > ${LOG_PATH}/frontend_test.log 2>&1 || exit_status=$?
+
+    if [ $exit_status -ne 0 ]; then
+        echo "[TEST INFO]: ---------frontend test failed---------"
+        echo "Test logs:"
+        cat ${LOG_PATH}/frontend_test.log
+        exit $exit_status
+    else
+        echo "[TEST INFO]: ---------frontend test passed---------"
+    fi
 
     if [ $exit_status -ne 0 ]; then
         echo "[TEST INFO]: ---------frontend test failed---------"
