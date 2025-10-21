@@ -71,7 +71,7 @@ case "$1" in
         ;;
     restart)
         echo "Restarting shopping_admin server..."
-        $stop
+        stop
         sleep 2
         start
         echo "shopping_admin server restarted."
