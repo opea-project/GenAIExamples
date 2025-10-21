@@ -16,30 +16,28 @@ const CHAT_ITEMS = [
 // Helper function: Enter message to chat
 async function enterMessageToChat(page: Page, message: string) {
 	console.log("Starting to enter message:", message);
-	
+
 	// Take screenshot before starting
 	await page.screenshot({ path: "test-start.png" });
-	
+
 	await page.getByTestId("code-input").click();
 	await page.getByTestId("code-input").fill(message);
 	console.log("Message filled, pressing Enter...");
 
 	await page.getByTestId("code-input").press("Enter");
 	console.log("Enter pressed, waiting for response...");
-	
+
 	// Wait for network response to complete
 	console.log("Waiting for network response...");
-	await page.waitForResponse(response =>
-		response.url().includes('/v1/codegen') &&
-		response.status() !== 0,
-		{ timeout: 60000 }
-	);
+	await page.waitForResponse((response) => response.url().includes("/v1/codegen") && response.status() !== 0, {
+		timeout: 60000,
+	});
 	console.log("Network response received");
-	
+
 	// Wait for UI to update
 	console.log("Waiting for UI to update...");
 	await page.waitForTimeout(15000);
-	
+
 	console.log("Checking for code-output element...");
 
 	// First check if the output container exists
@@ -50,13 +48,13 @@ async function enterMessageToChat(page: Page, message: string) {
 	if (!isVisible) {
 		console.log("code-output container not found, taking screenshot...");
 		await page.screenshot({ path: "no-output-container.png" });
-		
+
 		// Check if there are any error messages
 		const errorMessages = await page.locator('.error, .alert, [role="alert"]').allTextContents();
 		if (errorMessages.length > 0) {
 			console.log("Error messages found:", errorMessages);
 		}
-		
+
 		throw new Error("code-output container not found");
 	}
 
@@ -71,13 +69,13 @@ async function enterMessageToChat(page: Page, message: string) {
 		// Get the content of the output container for debugging
 		const outputContent = await outputContainer.textContent();
 		console.log("Output container content:", outputContent);
-		
+
 		// Check if there are any loading indicators
 		const loadingIndicators = await page.locator('.loading, .spinner, [role="progressbar"]').allTextContents();
 		if (loadingIndicators.length > 0) {
 			console.log("Loading indicators found:", loadingIndicators);
 		}
-		
+
 		throw new Error("Copy button not found in code-output container");
 	}
 
