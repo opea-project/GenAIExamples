@@ -28,7 +28,6 @@ UI_UPLOAD_PATH="$WORKPATH/tests"
 
 HF_ENDPOINT=https://hf-mirror.com
 
-
 function build_docker_images() {
     opea_branch=${opea_branch:-"main"}
     cd $WORKPATH/docker_image_build
