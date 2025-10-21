@@ -131,11 +131,11 @@ function validate_services() {
 
     if [[ "$CONTENT_TYPE" == "multipart/form-data" ]]; then
         # Handle file upload
-        local HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST $INPUT_DATA "$URL")
+        local HTTP_STATUS=$(eval curl -s -o /dev/null -w "%{http_code}" -X POST $INPUT_DATA "$URL")
 
         if [ "$HTTP_STATUS" -eq 200 ]; then
             echo "[ $SERVICE_NAME ] HTTP status is 200. Checking content..."
-            local CONTENT=$(curl -s -X POST $INPUT_DATA "$URL" | tee ${LOG_PATH}/${SERVICE_NAME}.log)
+            local CONTENT=$(eval curl -s -X POST $INPUT_DATA "$URL" | tee ${LOG_PATH}/${SERVICE_NAME}.log)
 
             if echo "$CONTENT" | grep -q "$EXPECTED_RESULT"; then
                 echo "[ $SERVICE_NAME ] ✓ Content is as expected."
