@@ -2,7 +2,7 @@
 
 A production-ready translation service built with **OPEA (Open Platform for Enterprise AI)** components, featuring a modern Next.js UI and microservices architecture.
 
-### Components
+## Components
 
 1. **vLLM Service** - High-performance LLM inference engine for model serving
 2. **LLM Microservice** - OPEA wrapper providing standardized API

@@ -3,7 +3,7 @@
 
 services:
   vllm-service:
-    image: budstudio/vllm-cpu:0.1.0
+    image: budstudio/vllm-cpu:0.11.0
     container_name: vllm-service
     ports:
       - "8028:8000"
@@ -23,7 +23,7 @@ services:
     volumes:
       - "${MODEL_CACHE:-./data}:/root/.cache/huggingface/hub"
     shm_size: 1g
-    command: --model ${LLM_MODEL_ID} --host 0.0.0.0 --port 8000
+    command: --model ${LLM_MODEL_ID} --host 0.0.0.0 --port 8000 --max-model-len 8192
 
   llm:
     image: ${REGISTRY:-opea}/llm-textgen:${TAG:-latest}
