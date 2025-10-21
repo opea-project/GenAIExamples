@@ -13,6 +13,17 @@ services:
       context: ../
       dockerfile: ./Dockerfile
     image: ${REGISTRY:-opea}/docsum:${TAG:-latest}
+  docsum-openeuler:
+    build:
+      args:
+        IMAGE_REPO: ${REGISTRY}
+        BASE_TAG: ${TAG}
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
+        no_proxy: ${no_proxy}
+      context: ../
+      dockerfile: ./Dockerfile.openEuler
+    image: ${REGISTRY:-opea}/docsum:${TAG:-latest}-openeuler
   docsum-gradio-ui:
     build:
       args:
@@ -22,18 +33,39 @@ services:
       dockerfile: ./docker/Dockerfile.gradio
     extends: docsum
     image: ${REGISTRY:-opea}/docsum-gradio-ui:${TAG:-latest}
+  docsum-gradio-ui-openeuler:
+    build:
+      args:
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
+      context: ../ui
+      dockerfile: ./docker/Dockerfile.gradio.openEuler
+    extends: docsum
+    image: ${REGISTRY:-opea}/docsum-gradio-ui:${TAG:-latest}-openeuler
   docsum-ui:
     build:
       context: ../ui
       dockerfile: ./docker/Dockerfile
     extends: docsum
     image: ${REGISTRY:-opea}/docsum-ui:${TAG:-latest}
+  docsum-ui-openeuler:
+    build:
+      context: ../ui
+      dockerfile: ./docker/Dockerfile.openEuler
+    extends: docsum
+    image: ${REGISTRY:-opea}/docsum-ui:${TAG:-latest}-openeuler
   docsum-react-ui:
     build:
       context: ../ui
       dockerfile: ./docker/Dockerfile.react
     extends: docsum
     image: ${REGISTRY:-opea}/docsum-react-ui:${TAG:-latest}
+  docsum-react-ui-openeuler:
+    build:
+      context: ../ui
+      dockerfile: ./docker/Dockerfile.react.openEuler
+    extends: docsum
+    image: ${REGISTRY:-opea}/docsum-react-ui:${TAG:-latest}-openeuler
   whisper:
     build:
       args:
@@ -43,12 +75,27 @@ services:
       dockerfile: comps/third_parties/whisper/src/Dockerfile
     extends: docsum
     image: ${REGISTRY:-opea}/whisper:${TAG:-latest}
+  whisper-openeuler:
+    build:
+      args:
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
+      context: GenAIComps
+      dockerfile: comps/third_parties/whisper/src/Dockerfile.openEuler
+    extends: docsum
+    image: ${REGISTRY:-opea}/whisper:${TAG:-latest}-openeuler
   llm-docsum:
     build:
       context: GenAIComps
       dockerfile: comps/llms/src/doc-summarization/Dockerfile
     extends: docsum
     image: ${REGISTRY:-opea}/llm-docsum:${TAG:-latest}
+  llm-docsum:
+    build:
+      context: GenAIComps
+      dockerfile: comps/llms/src/doc-summarization/Dockerfile.openEuler
+    extends: docsum
+    image: ${REGISTRY:-opea}/llm-docsum:${TAG:-latest}-openeuler
   vllm-rocm:
     build:
       context: GenAIComps
