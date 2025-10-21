@@ -1,0 +1,1378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CogniDream IDE - AI-Powered Code Generation</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Monaco Editor -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/editor/editor.main.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #1e1e1e;
+            color: #cccccc;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            background: #252526;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            border-bottom: 1px solid #3e3e42;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-weight: 700;
+            font-size: 1.1em;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .top-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9em;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #3e3e42;
+        }
+
+        .btn-secondary:hover {
+            background: #4e4e52;
+        }
+
+        /* Main Layout */
+        .main-layout {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* Sidebar - File Explorer */
+        .sidebar {
+            width: 250px;
+            background: #252526;
+            border-right: 1px solid #3e3e42;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .sidebar-header {
+            padding: 15px;
+            border-bottom: 1px solid #3e3e42;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .sidebar-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .icon-btn {
+            background: none;
+            border: none;
+            color: #cccccc;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 1.1em;
+        }
+
+        .icon-btn:hover {
+            background: #3e3e42;
+        }
+
+        .file-tree {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .tree-item {
+            padding: 6px 10px;
+            cursor: pointer;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            user-select: none;
+        }
+
+        .tree-item:hover {
+            background: #2a2d2e;
+        }
+
+        .tree-item.selected {
+            background: #37373d;
+        }
+
+        .tree-item.folder {
+            font-weight: 500;
+        }
+
+        .tree-item .icon {
+            font-size: 0.9em;
+        }
+
+        .tree-children {
+            margin-left: 20px;
+        }
+
+        /* Editor Area */
+        .editor-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .tabs-bar {
+            background: #252526;
+            height: 40px;
+            display: flex;
+            border-bottom: 1px solid #3e3e42;
+            overflow-x: auto;
+        }
+
+        .tab {
+            padding: 0 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #2d2d30;
+            border-right: 1px solid #3e3e42;
+            cursor: pointer;
+            font-size: 0.9em;
+            min-width: 120px;
+        }
+
+        .tab.active {
+            background: #1e1e1e;
+        }
+
+        .tab-close {
+            margin-left: auto;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+
+        .tab-close:hover {
+            background: #3e3e42;
+        }
+
+        #editor {
+            flex: 1;
+            width: 100%;
+        }
+
+        /* AI Chat Panel */
+        .ai-panel {
+            width: 350px;
+            background: #252526;
+            border-left: 1px solid #3e3e42;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .ai-header {
+            padding: 15px;
+            border-bottom: 1px solid #3e3e42;
+            font-weight: 600;
+            background: linear-gradient(135deg, #667eea20 0%, #764ba220 100%);
+        }
+
+        .ai-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .ai-message {
+            padding: 12px;
+            border-radius: 8px;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .ai-message.user {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            margin-left: auto;
+            max-width: 85%;
+        }
+
+        .ai-message.assistant {
+            background: #2d2d30;
+            max-width: 90%;
+        }
+
+        .ai-message code {
+            background: #1e1e1e;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .ai-input-container {
+            padding: 15px;
+            border-top: 1px solid #3e3e42;
+        }
+
+        .ai-input {
+            width: 100%;
+            padding: 12px;
+            background: #3e3e42;
+            border: none;
+            border-radius: 6px;
+            color: #cccccc;
+            font-family: inherit;
+            resize: none;
+            min-height: 60px;
+        }
+
+        .ai-input:focus {
+            outline: 2px solid #667eea;
+        }
+
+        .ai-send-btn {
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        /* Terminal */
+        .terminal-panel {
+            height: 200px;
+            background: #1e1e1e;
+            border-top: 1px solid #3e3e42;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .terminal-header {
+            padding: 8px 15px;
+            background: #252526;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #3e3e42;
+        }
+
+        .terminal-content {
+            flex: 1;
+            padding: 10px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+        }
+
+        .terminal-line {
+            margin-bottom: 4px;
+        }
+
+        .terminal-prompt {
+            color: #4ec9b0;
+        }
+
+        /* Project Dialog */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: #252526;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal h2 {
+            margin-bottom: 20px;
+            color: #ffffff;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            background: #3e3e42;
+            border: 1px solid #4e4e52;
+            border-radius: 6px;
+            color: #cccccc;
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 25px;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #1e1e1e;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #3e3e42;
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4e4e52;
+        }
+
+        /* File Icons */
+        .file-icon-js::before { content: "📄"; color: #f0db4f; }
+        .file-icon-py::before { content: "🐍"; color: #4b8bbe; }
+        .file-icon-html::before { content: "🌐"; color: #e34c26; }
+        .file-icon-css::before { content: "🎨"; color: #264de4; }
+        .file-icon-json::before { content: "📋"; color: #000000; }
+        .file-icon-md::before { content: "📝"; color: #ffffff; }
+        .file-icon-folder::before { content: "📁"; color: #8b8b8b; }
+        .file-icon-default::before { content: "📄"; color: #cccccc; }
+
+        .loading {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border: 2px solid #ffffff30;
+            border-top-color: #667eea;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Login Modal */
+        .login-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+        
+        .login-container {
+            background: #252526;
+            border: 1px solid #3e3e42;
+            border-radius: 12px;
+            padding: 40px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+        
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .login-header h2 {
+            font-size: 1.8em;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+        
+        .login-header p {
+            color: #999;
+            font-size: 0.9em;
+        }
+        
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #ccc;
+            font-weight: 500;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            background: #1e1e1e;
+            border: 1px solid #3e3e42;
+            border-radius: 6px;
+            color: #fff;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .login-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 6px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .login-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .login-alert {
+            background: #cc3333;
+            color: white;
+            padding: 12px;
+            border-radius: 6px;
+            display: none;
+            margin-bottom: 15px;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Modal -->
+    <div id="loginModal" class="login-modal" style="display: none;">
+        <div class="login-container">
+            <div class="login-header">
+                <h2>🚀 CogniDream IDE</h2>
+                <p>Login to start building with AI</p>
+            </div>
+            <div class="login-alert" id="loginAlert"></div>
+            <form class="login-form" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label for="loginUsername">Username</label>
+                    <input 
+                        type="text" 
+                        id="loginUsername" 
+                        placeholder="Enter username" 
+                        required
+                    >
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <input 
+                        type="password" 
+                        id="loginPassword" 
+                        placeholder="Enter password" 
+                        required
+                    >
+                </div>
+                <button type="submit" class="login-button">Login to IDE</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <a href="index.html" class="logo" style="text-decoration: none; color: inherit; cursor: pointer;">
+            <span>🚀</span>
+            <span>CogniDream IDE</span>
+        </a>
+        <div class="top-actions">
+            <select id="projectSelector" class="btn-secondary btn" onchange="openExistingProject()" style="cursor: pointer; min-width: 200px;">
+                <option value="">Open Project...</option>
+            </select>
+            <button class="btn-secondary btn" onclick="showNewProjectDialog()">
+                + New Project
+            </button>
+            <button class="btn" onclick="generateWithAI()">
+                ✨ Generate with AI
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Layout -->
+    <div class="main-layout">
+        <!-- Sidebar - File Explorer -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <span>EXPLORER</span>
+                <div class="sidebar-actions">
+                    <button class="icon-btn" onclick="refreshFileTree()" title="Refresh">
+                        🔄
+                    </button>
+                    <button class="icon-btn" onclick="showNewFileDialog()" title="New File">
+                        📄+
+                    </button>
+                </div>
+            </div>
+            <div class="file-tree" id="fileTree">
+                <div style="padding: 20px; text-align: center; color: #888;">
+                    No project opened<br><br>
+                    <button class="btn" onclick="showNewProjectDialog()">Create Project</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Editor Area -->
+        <div class="editor-container">
+            <div class="tabs-bar" id="tabsBar">
+                <!-- Tabs will be added dynamically -->
+            </div>
+            <div id="editor"></div>
+        </div>
+
+        <!-- AI Chat Panel -->
+        <div class="ai-panel">
+            <div class="ai-header">
+                🤖 AI Assistant (MCP-Enhanced)
+            </div>
+            <div class="ai-messages" id="aiMessages">
+                <div class="ai-message assistant">
+                    Hello! I'm your AI assistant powered by the Model Context Protocol (MCP). I can help you:
+                    <br><br>
+                    • Generate complete projects
+                    <br>• Create files and folders
+                    <br>• Write code with full project context
+                    <br>• Explain and refactor code
+                    <br><br>
+                    Create a new project to get started!
+                </div>
+            </div>
+            <div class="ai-input-container">
+                <textarea class="ai-input" id="aiInput" 
+                    placeholder="Ask me to generate code, create files, or help with your project..."
+                    onkeydown="if(event.key==='Enter'&&event.ctrlKey) sendAIMessage()"></textarea>
+                <button class="btn ai-send-btn" onclick="sendAIMessage()">
+                    ✨ Send (Ctrl+Enter)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Terminal Panel -->
+    <div class="terminal-panel" style="display:flex;" id="terminalPanel">
+        <div class="terminal-header">
+            <span>🔧 TERMINAL</span>
+            <button class="icon-btn" onclick="toggleTerminal()">✕</button>
+        </div>
+        <div class="terminal-content" id="terminalContent">
+            <div class="terminal-line">
+                <span class="terminal-prompt">$</span> Terminal ready
+            </div>
+        </div>
+    </div>
+
+    <!-- New Project Modal -->
+    <div class="modal-overlay" id="newProjectModal">
+        <div class="modal">
+            <h2>Create New Project</h2>
+            <div class="form-group">
+                <label>Project Name *</label>
+                <input type="text" id="projectName" placeholder="my-awesome-project">
+            </div>
+            <div class="form-group">
+                <label>Template</label>
+                <select id="projectTemplate">
+                    <option value="blank">Blank Project</option>
+                    <option value="fastapi">FastAPI (Python)</option>
+                    <option value="flask">Flask (Python)</option>
+                    <option value="django">Django (Python)</option>
+                    <option value="react">React (JavaScript)</option>
+                    <option value="express">Express.js (Node)</option>
+                    <option value="python-cli">Python CLI Tool</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Description</label>
+                <textarea id="projectDescription" rows="3" placeholder="Brief description of your project..."></textarea>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-secondary btn" onclick="closeNewProjectDialog()">Cancel</button>
+                <button class="btn" onclick="createProject()">Create Project</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Monaco Editor -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/loader.min.js"></script>
+    
+    <script>
+        // Global state
+        let editor;
+        let currentProject = null;
+        let currentFile = null;
+        let openTabs = new Map();
+        let fileTree = {};
+        let currentToken = localStorage.getItem('cogniware_token') || '';
+        
+        // API URL Detection
+        function getAPIBaseURL() {
+            const hostname = window.location.hostname;
+            if (hostname === 'localhost' || hostname === '127.0.0.1') {
+                return 'http://localhost';
+            } else {
+                return '';  // Use relative URLs for production (Nginx proxies)
+            }
+        }
+        
+        const API_BASE_URL = getAPIBaseURL();
+        const API_PORT = API_BASE_URL ? ':8090' : '';  // Port only for localhost
+        const MCP_PORT = API_BASE_URL ? ':8091' : '/mcp';  // MCP endpoint
+
+        // Authentication check on page load
+        function checkAuthentication() {
+            const token = localStorage.getItem('cogniware_token');
+            if (!token) {
+                showLoginModal();
+                return false;
+            }
+            currentToken = token;
+            return true;
+        }
+        
+        function showLoginModal() {
+            document.getElementById('loginModal').style.display = 'flex';
+        }
+        
+        function hideLoginModal() {
+            document.getElementById('loginModal').style.display = 'none';
+        }
+        
+        async function handleLogin(event) {
+            event.preventDefault();
+            
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+            const alertDiv = document.getElementById('loginAlert');
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}${API_PORT}/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    currentToken = result.token;
+                    localStorage.setItem('cogniware_token', currentToken);
+                    localStorage.setItem('cogniware_user', JSON.stringify(result.user));
+                    
+                    hideLoginModal();
+                    addAIMessage('assistant', `✅ Welcome ${result.user.username}! You're now logged in to CogniDream IDE.`);
+                    
+                    // Load existing projects after login
+                    await loadExistingProjects();
+                } else {
+                    alertDiv.textContent = result.error || 'Login failed';
+                    alertDiv.style.display = 'block';
+                }
+            } catch (error) {
+                alertDiv.textContent = 'Connection error. Please ensure the server is running.';
+                alertDiv.style.display = 'block';
+            }
+        }
+
+        // Monaco Editor Setup
+        require.config({ paths: { vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs' } });
+        
+        require(['vs/editor/editor.main'], function() {
+            editor = monaco.editor.create(document.getElementById('editor'), {
+                value: '// Welcome to CogniDream IDE\n// Create a new project or open an existing one to start coding!\n',
+                language: 'javascript',
+                theme: 'vs-dark',
+                automaticLayout: true,
+                fontSize: 14,
+                minimap: { enabled: true },
+                scrollBeyondLastLine: false,
+            });
+
+            // Auto-save on content change
+            editor.onDidChangeModelContent(() => {
+                if (currentFile && currentProject) {
+                    // Debounced auto-save
+                    clearTimeout(window.autoSaveTimeout);
+                    window.autoSaveTimeout = setTimeout(() => {
+                        saveCurrentFile();
+                    }, 1000);
+                }
+            });
+        });
+
+        // Project Management
+        async function createProject() {
+            const name = document.getElementById('projectName').value.trim();
+            const template = document.getElementById('projectTemplate').value;
+            const description = document.getElementById('projectDescription').value.trim();
+
+            if (!name) {
+                alert('Please enter a project name');
+                return;
+            }
+
+            try {
+                addAIMessage('assistant', `Creating project "${name}" with ${template} template...`);
+                
+                const response = await fetch(`${API_BASE_URL}${MCP_PORT}/projects`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, template, description })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    addAIMessage('assistant', `✅ Project "${name}" created successfully! ${result.files_created} files generated.`);
+                    currentProject = name;
+                    closeNewProjectDialog();
+                    
+                    // Reload project list to show new project
+                    await loadExistingProjects();
+                    
+                    // Load the new project
+                    await loadProject(name);
+                    
+                    // Update selector to show current project
+                    document.getElementById('projectSelector').value = name;
+                } else {
+                    addAIMessage('assistant', `❌ Failed to create project: ${result.error}`);
+                }
+            } catch (error) {
+                addAIMessage('assistant', `❌ Error: ${error.message}`);
+            }
+        }
+
+        async function loadProject(projectName) {
+            try {
+                const response = await fetch(`${API_BASE_URL}${MCP_PORT}/projects/${projectName}/context`);
+                const result = await response.json();
+
+                if (result.success) {
+                    currentProject = projectName;
+                    buildFileTree(result.files);
+                    addAIMessage('assistant', `📂 Loaded project "${projectName}" (${result.file_count} files)`);
+                    
+                    // Update selector to show current project
+                    const selector = document.getElementById('projectSelector');
+                    if (selector) {
+                        selector.value = projectName;
+                    }
+                    
+                    // Show terminal for better visibility of operations
+                    const terminal = document.getElementById('terminalPanel');
+                    if (terminal.style.display === 'none') {
+                        terminal.style.display = 'flex';
+                    }
+                    
+                    logTerminal(`Project "${projectName}" loaded with ${result.file_count} files`);
+                }
+            } catch (error) {
+                console.error('Failed to load project:', error);
+                addAIMessage('assistant', `❌ Failed to load project: ${error.message}`);
+            }
+        }
+
+        function buildFileTree(files) {
+            const tree = {};
+            
+            files.forEach(file => {
+                const parts = file.split('/');
+                let current = tree;
+                
+                parts.forEach((part, index) => {
+                    if (index === parts.length - 1) {
+                        // File
+                        if (!current._files) current._files = [];
+                        current._files.push({ name: part, path: file });
+                    } else {
+                        // Folder
+                        if (!current[part]) current[part] = {};
+                        current = current[part];
+                    }
+                });
+            });
+
+            renderFileTree(tree);
+        }
+
+        function renderFileTree(tree, parentElement = null, level = 0) {
+            const container = parentElement || document.getElementById('fileTree');
+            if (!parentElement) container.innerHTML = '';
+
+            // Render folders
+            Object.keys(tree).forEach(key => {
+                if (key === '_files') return;
+
+                const folderDiv = document.createElement('div');
+                folderDiv.className = 'tree-item folder';
+                folderDiv.style.paddingLeft = `${level * 15 + 10}px`;
+                folderDiv.innerHTML = `<span class="icon file-icon-folder"></span><span>${key}</span>`;
+                
+                const childContainer = document.createElement('div');
+                childContainer.className = 'tree-children';
+                
+                folderDiv.onclick = (e) => {
+                    e.stopPropagation();
+                    childContainer.style.display = childContainer.style.display === 'none' ? 'block' : 'none';
+                };
+
+                container.appendChild(folderDiv);
+                container.appendChild(childContainer);
+                
+                renderFileTree(tree[key], childContainer, level + 1);
+            });
+
+            // Render files
+            if (tree._files) {
+                tree._files.forEach(file => {
+                    const fileDiv = document.createElement('div');
+                    fileDiv.className = 'tree-item';
+                    fileDiv.style.paddingLeft = `${level * 15 + 10}px`;
+                    
+                    const ext = file.name.split('.').pop();
+                    const iconClass = `file-icon-${ext}` || 'file-icon-default';
+                    
+                    fileDiv.innerHTML = `<span class="icon ${iconClass}"></span><span>${file.name}</span>`;
+                    fileDiv.onclick = (e) => {
+                        e.stopPropagation();
+                        openFile(file.path);
+                    };
+                    
+                    container.appendChild(fileDiv);
+                });
+            }
+        }
+
+        async function openFile(filePath) {
+            if (!currentProject) return;
+
+            try {
+                const response = await fetch(`${API_BASE_URL}${MCP_PORT}/projects/${currentProject}/files/${filePath}`);
+                const result = await response.json();
+
+                if (result.success) {
+                    currentFile = filePath;
+                    editor.setValue(result.content);
+                    
+                    // Detect language
+                    const ext = filePath.split('.').pop();
+                    const languageMap = {
+                        'js': 'javascript',
+                        'py': 'python',
+                        'html': 'html',
+                        'css': 'css',
+                        'json': 'json',
+                        'md': 'markdown',
+                        'txt': 'plaintext'
+                    };
+                    const language = languageMap[ext] || 'plaintext';
+                    monaco.editor.setModelLanguage(editor.getModel(), language);
+
+                    // Add tab
+                    addTab(filePath);
+                }
+            } catch (error) {
+                console.error('Failed to open file:', error);
+            }
+        }
+
+        function addTab(filePath) {
+            const tabsBar = document.getElementById('tabsBar');
+            
+            // Check if tab already exists
+            if (openTabs.has(filePath)) {
+                selectTab(filePath);
+                return;
+            }
+
+            const tab = document.createElement('div');
+            tab.className = 'tab active';
+            tab.dataset.path = filePath;
+            tab.innerHTML = `
+                <span>${filePath.split('/').pop()}</span>
+                <span class="tab-close" onclick="event.stopPropagation(); closeTab('${filePath}')">✕</span>
+            `;
+            tab.onclick = () => selectTab(filePath);
+
+            // Deactivate other tabs
+            tabsBar.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            
+            tabsBar.appendChild(tab);
+            openTabs.set(filePath, tab);
+        }
+
+        function selectTab(filePath) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            const tab = openTabs.get(filePath);
+            if (tab) {
+                tab.classList.add('active');
+                openFile(filePath);
+            }
+        }
+
+        function closeTab(filePath) {
+            const tab = openTabs.get(filePath);
+            if (tab) {
+                tab.remove();
+                openTabs.delete(filePath);
+            }
+
+            if (openTabs.size > 0) {
+                const firstTab = Array.from(openTabs.keys())[0];
+                selectTab(firstTab);
+            } else {
+                currentFile = null;
+                editor.setValue('// No file open');
+            }
+        }
+
+        async function saveCurrentFile() {
+            if (!currentFile || !currentProject) return;
+
+            try {
+                const content = editor.getValue();
+                await fetch(`${API_BASE_URL}${MCP_PORT}/projects/${currentProject}/files`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        file_path: currentFile,
+                        content: content
+                    })
+                });
+                
+                logTerminal(`Saved ${currentFile}`);
+            } catch (error) {
+                console.error('Save failed:', error);
+            }
+        }
+
+        // AI Assistant
+        function sendAIMessage() {
+            const input = document.getElementById('aiInput');
+            const message = input.value.trim();
+
+            if (!message) return;
+
+            addAIMessage('user', message);
+            input.value = '';
+
+            // Process AI request
+            processAIRequest(message);
+        }
+
+        async function processAIRequest(message) {
+            if (!currentProject) {
+                addAIMessage('assistant', 'Please create or open a project first.');
+                return;
+            }
+
+            try {
+                // Show planning message
+                const planMsgId = addAIMessage('assistant', '<div class="loading"></div> 🤔 Analyzing request and planning files to create...');
+
+                // Use auto-generate endpoint to create files automatically
+                const autoGenResponse = await fetch(`${API_BASE_URL}${MCP_PORT}/projects/${currentProject}/auto-generate`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt: message })
+                });
+
+                const autoGenResult = await autoGenResponse.json();
+
+                removeLastMessage();
+
+                if (!autoGenResult.success) {
+                    addAIMessage('assistant', `❌ ${autoGenResult.error}`);
+                    return;
+                }
+
+                // Show the plan
+                const plan = autoGenResult.plan;
+                let planHTML = `<div style="background:#2d2d30;padding:15px;border-radius:8px;border-left:4px solid #4ec9b0;margin:10px 0;">`;
+                planHTML += `<strong style="font-size:1.1em;">📋 Generation Plan</strong><br>`;
+                planHTML += `<div style="color:#888;font-size:0.9em;margin:5px 0;">${plan.description}</div><br>`;
+                planHTML += '<div style="background:#1e1e1e;padding:10px;border-radius:4px;">';
+                
+                plan.items.forEach((item, index) => {
+                    planHTML += `<div style="margin:5px 0;font-family:monospace;">`;
+                    planHTML += `<span style="color:#888;">${String(index + 1).padStart(2, '0')}.</span> `;
+                    planHTML += `<span style="color:#4ec9b0;">${item.file_path}</span>`;
+                    planHTML += `<div style="color:#999;margin-left:25px;font-size:0.85em;">${item.description}</div>`;
+                    planHTML += `</div>`;
+                });
+                
+                planHTML += '</div></div>';
+                addAIMessage('assistant', planHTML);
+
+                // Iteratively show file creation progress
+                const filesCreated = autoGenResult.files_created || [];
+                
+                for (let i = 0; i < filesCreated.length; i++) {
+                    const file = filesCreated[i];
+                    
+                    // Show progress message
+                    const progressMsg = addAIMessage('assistant', 
+                        `<div class="loading"></div> Creating <span style="color:#4ec9b0;font-family:monospace;">${file.path}</span>...`
+                    );
+                    
+                    // Simulate slight delay for visual effect
+                    await new Promise(resolve => setTimeout(resolve, 300));
+                    
+                    removeLastMessage();
+                    
+                    // Show file created with details
+                    let fileHTML = `<div style="background:#1e3a1e;padding:12px;border-radius:6px;margin:8px 0;border-left:3px solid #4ec9b0;">`;
+                    fileHTML += `<div style="display:flex;align-items:center;gap:10px;">`;
+                    fileHTML += `<span style="font-size:1.2em;">✓</span>`;
+                    fileHTML += `<div style="flex:1;">`;
+                    fileHTML += `<span style="color:#4ec9b0;font-family:monospace;font-weight:600;">${file.path}</span>`;
+                    fileHTML += `<div style="color:#888;font-size:0.85em;margin-top:3px;">${file.description} • ${file.size} bytes</div>`;
+                    fileHTML += `</div>`;
+                    fileHTML += `</div></div>`;
+                    
+                    addAIMessage('assistant', fileHTML);
+                    
+                    // Log to terminal
+                    logTerminal(`✓ Created ${file.path} (${file.size} bytes)`);
+                }
+
+                // Get comprehensive build summary
+                const summaryResponse = await fetch(`${API_BASE_URL}${MCP_PORT}/projects/${currentProject}/build-summary`);
+                const summaryResult = await summaryResponse.json();
+
+                // Show comprehensive summary (like Cursor/VS Code)
+                let summaryHTML = `<div style="background:#1e1e1e;padding:20px;border-radius:12px;margin:15px 0;border:2px solid #4ec9b0;">`;
+                summaryHTML += `<div style="font-size:1.3em;font-weight:700;color:#4ec9b0;margin-bottom:15px;">📊 Project Build Summary</div>`;
+                
+                if (summaryResult.success) {
+                    const summary = summaryResult.summary;
+                    
+                    summaryHTML += `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:15px;margin:15px 0;">`;
+                    
+                    summaryHTML += `<div style="background:#2d2d30;padding:15px;border-radius:8px;text-align:center;">`;
+                    summaryHTML += `<div style="font-size:2em;font-weight:700;color:#4ec9b0;">${summary.total_files}</div>`;
+                    summaryHTML += `<div style="color:#888;font-size:0.85em;">Files</div>`;
+                    summaryHTML += `</div>`;
+                    
+                    summaryHTML += `<div style="background:#2d2d30;padding:15px;border-radius:8px;text-align:center;">`;
+                    summaryHTML += `<div style="font-size:2em;font-weight:700;color:#f0db4f;">${summary.total_lines.toLocaleString()}</div>`;
+                    summaryHTML += `<div style="color:#888;font-size:0.85em;">Lines of Code</div>`;
+                    summaryHTML += `</div>`;
+                    
+                    summaryHTML += `<div style="background:#2d2d30;padding:15px;border-radius:8px;text-align:center;">`;
+                    summaryHTML += `<div style="font-size:2em;font-weight:700;color:#e34c26;">${summary.total_folders}</div>`;
+                    summaryHTML += `<div style="color:#888;font-size:0.85em;">Folders</div>`;
+                    summaryHTML += `</div>`;
+                    
+                    summaryHTML += `<div style="background:#2d2d30;padding:15px;border-radius:8px;text-align:center;">`;
+                    summaryHTML += `<div style="font-size:2em;font-weight:700;color:#764ba2;">${filesCreated.length}</div>`;
+                    summaryHTML += `<div style="color:#888;font-size:0.85em;">Just Added</div>`;
+                    summaryHTML += `</div>`;
+                    
+                    summaryHTML += `</div>`;
+                    
+                    // File types breakdown
+                    summaryHTML += `<div style="margin:15px 0;">`;
+                    summaryHTML += `<div style="color:#888;font-size:0.9em;margin-bottom:8px;">File Types:</div>`;
+                    summaryHTML += `<div style="display:flex;gap:10px;flex-wrap:wrap;">`;
+                    
+                    for (const [ext, count] of Object.entries(summary.file_types)) {
+                        const colors = {
+                            'py': '#4b8bbe', 'js': '#f0db4f', 'html': '#e34c26',
+                            'css': '#264de4', 'json': '#000', 'md': '#fff',
+                            'txt': '#888'
+                        };
+                        const color = colors[ext] || '#888';
+                        summaryHTML += `<span style="background:#2d2d30;padding:6px 12px;border-radius:15px;font-size:0.85em;">`;
+                        summaryHTML += `<span style="color:${color};">●</span> .${ext} (${count})`;
+                        summaryHTML += `</span>`;
+                    }
+                    
+                    summaryHTML += `</div></div>`;
+                    
+                    // Project structure
+                    summaryHTML += `<div style="margin:15px 0;">`;
+                    summaryHTML += `<div style="color:#888;font-size:0.9em;margin-bottom:8px;">Project Structure:</div>`;
+                    summaryHTML += `<div style="background:#2d2d30;padding:12px;border-radius:6px;font-family:monospace;font-size:0.85em;max-height:200px;overflow-y:auto;">`;
+                    
+                    summary.folders.slice(0, 10).forEach(folder => {
+                        summaryHTML += `📁 ${folder}<br>`;
+                    });
+                    
+                    if (summary.folders.length > 10) {
+                        summaryHTML += `<span style="color:#888;">... and ${summary.folders.length - 10} more folders</span>`;
+                    }
+                    
+                    summaryHTML += `</div></div>`;
+                }
+                
+                // Next steps
+                summaryHTML += `<div style="margin-top:15px;padding:12px;background:#2d2d30;border-radius:6px;">`;
+                summaryHTML += `<div style="color:#888;font-size:0.9em;margin-bottom:8px;">💡 Next Steps:</div>`;
+                summaryHTML += `<div style="font-size:0.9em;">`;
+                summaryHTML += `• Review generated files in the editor<br>`;
+                summaryHTML += `• Customize code as needed<br>`;
+                summaryHTML += `• Add more features by asking AI<br>`;
+                summaryHTML += `• Run and test your application`;
+                summaryHTML += `</div></div>`;
+                
+                summaryHTML += `</div>`;
+                
+                addAIMessage('assistant', summaryHTML);
+
+                // Auto-refresh file tree to show new files
+                await loadProject(currentProject);
+                
+                // If files were created, open the first one
+                if (filesCreated.length > 0) {
+                    setTimeout(() => {
+                        openFile(filesCreated[0].path);
+                        logTerminal(`📄 Opened ${filesCreated[0].path} for editing`);
+                    }, 500);
+                }
+
+            } catch (error) {
+                removeLastMessage();
+                addAIMessage('assistant', `❌ Error: ${error.message}`);
+            }
+        }
+
+        window.generatedCode = '';
+
+        function insertGeneratedCode() {
+            if (window.generatedCode) {
+                editor.setValue(window.generatedCode);
+                saveCurrentFile();
+                addAIMessage('assistant', '✅ Code inserted and saved!');
+            }
+        }
+
+        function addAIMessage(type, content) {
+            const messagesContainer = document.getElementById('aiMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `ai-message ${type}`;
+            messageDiv.innerHTML = content;
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+            // Store generated code for insertion
+            if (type === 'assistant' && content.includes('<pre')) {
+                const pre = messageDiv.querySelector('pre');
+                if (pre) {
+                    window.generatedCode = pre.textContent;
+                }
+            }
+        }
+
+        function removeLastMessage() {
+            const messagesContainer = document.getElementById('aiMessages');
+            const lastMessage = messagesContainer.lastElementChild;
+            if (lastMessage) lastMessage.remove();
+        }
+
+        // Terminal
+        function toggleTerminal() {
+            const terminal = document.getElementById('terminalPanel');
+            terminal.style.display = terminal.style.display === 'none' ? 'flex' : 'none';
+        }
+
+        function logTerminal(message) {
+            const terminal = document.getElementById('terminalContent');
+            const line = document.createElement('div');
+            line.className = 'terminal-line';
+            line.innerHTML = `<span class="terminal-prompt">$</span> ${message}`;
+            terminal.appendChild(line);
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+
+        // Modal Management
+        function showNewProjectDialog() {
+            document.getElementById('newProjectModal').classList.add('active');
+        }
+
+        function closeNewProjectDialog() {
+            document.getElementById('newProjectModal').classList.remove('active');
+        }
+
+        function refreshFileTree() {
+            if (currentProject) {
+                loadProject(currentProject);
+            }
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Quick actions
+        function generateWithAI() {
+            const input = document.getElementById('aiInput');
+            input.focus();
+            if (!currentProject) {
+                addAIMessage('assistant', '💡 Create a project first, then I can help you generate code!');
+            }
+        }
+
+        // Load projects on startup
+        window.addEventListener('load', async () => {
+            // Check authentication first
+            if (!checkAuthentication()) {
+                return;  // Login modal will be shown
+            }
+            
+            // If authenticated, load projects
+            await loadExistingProjects();
+        });
+        
+        async function loadExistingProjects() {
+            try {
+                const response = await fetch(`${API_BASE_URL}${MCP_PORT}/projects`);
+                const result = await response.json();
+                
+                if (result.success && result.projects.length > 0) {
+                    // Populate project selector
+                    const selector = document.getElementById('projectSelector');
+                    selector.innerHTML = '<option value="">Open Project...</option>';
+                    
+                    result.projects.forEach(project => {
+                        const option = document.createElement('option');
+                        option.value = project.name;
+                        option.textContent = `${project.name} (${project.files} files)`;
+                        selector.appendChild(option);
+                    });
+                    
+                    addAIMessage('assistant', `Found ${result.projects.length} existing project(s). Select from dropdown to reopen.`);
+                }
+            } catch (error) {
+                console.error('Failed to load projects:', error);
+            }
+        }
+        
+        function openExistingProject() {
+            const selector = document.getElementById('projectSelector');
+            const projectName = selector.value;
+            
+            if (projectName) {
+                loadProject(projectName);
+            }
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            // Ctrl+S - Save
+            if (e.ctrlKey && e.key === 's') {
+                e.preventDefault();
+                saveCurrentFile();
+            }
+            
+            // Ctrl+` - Toggle terminal
+            if (e.ctrlKey && e.key === '`') {
+                e.preventDefault();
+                toggleTerminal();
+            }
+        });
+    </script>
+</body>
+</html>
+

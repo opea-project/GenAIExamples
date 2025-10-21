@@ -1,0 +1,680 @@
+{
+  "info": {
+    "name": "Cogniware Core - Business Use Cases API",
+    "description": "Complete API collection for Business Use Cases - Database Q&A, Code Generation, Document Processing, Data Integration, Workflow Automation",
+    "version": "2.0.0",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8095",
+      "type": "string"
+    },
+    {
+      "key": "prod_url",
+      "value": "http://localhost:8090",
+      "type": "string"
+    },
+    {
+      "key": "demo_url",
+      "value": "http://localhost:8080",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "00. Server Info",
+      "item": [
+        {
+          "name": "Root - Business API",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/",
+              "host": ["{{base_url}}"],
+              "path": [""]
+            },
+            "description": "Get business API information and available use cases"
+          }
+        },
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/health",
+              "host": ["{{base_url}}"],
+              "path": ["health"]
+            }
+          }
+        },
+        {
+          "name": "System Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/status",
+              "host": ["{{base_url}}"],
+              "path": ["status"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "01. Database Q&A",
+      "description": "Natural language database queries and management",
+      "item": [
+        {
+          "name": "Create Database - Sales",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"sales_db\",\n  \"schema\": {\n    \"customers\": [\n      {\"name\": \"id\", \"type\": \"INTEGER PRIMARY KEY\"},\n      {\"name\": \"name\", \"type\": \"TEXT\"},\n      {\"name\": \"email\", \"type\": \"TEXT\"},\n      {\"name\": \"created_at\", \"type\": \"TEXT\"}\n    ],\n    \"orders\": [\n      {\"name\": \"id\", \"type\": \"INTEGER PRIMARY KEY\"},\n      {\"name\": \"customer_id\", \"type\": \"INTEGER\"},\n      {\"name\": \"product\", \"type\": \"TEXT\"},\n      {\"name\": \"amount\", \"type\": \"REAL\"},\n      {\"name\": \"status\", \"type\": \"TEXT\"}\n    ]\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/database/create",
+              "host": ["{{base_url}}"],
+              "path": ["api", "database", "create"]
+            },
+            "description": "Create a sales database with customers and orders tables"
+          }
+        },
+        {
+          "name": "Create Database - HR",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"hr_db\",\n  \"schema\": {\n    \"employees\": [\n      {\"name\": \"id\", \"type\": \"INTEGER PRIMARY KEY\"},\n      {\"name\": \"name\", \"type\": \"TEXT\"},\n      {\"name\": \"department\", \"type\": \"TEXT\"},\n      {\"name\": \"salary\", \"type\": \"REAL\"},\n      {\"name\": \"hire_date\", \"type\": \"TEXT\"}\n    ]\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/database/create",
+              "host": ["{{base_url}}"],
+              "path": ["api", "database", "create"]
+            }
+          }
+        },
+        {
+          "name": "Insert Data - Customers",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"database\": \"sales_db\",\n  \"table\": \"customers\",\n  \"data\": [\n    {\"name\": \"John Doe\", \"email\": \"john@example.com\", \"created_at\": \"2025-01-01\"},\n    {\"name\": \"Jane Smith\", \"email\": \"jane@example.com\", \"created_at\": \"2025-01-02\"},\n    {\"name\": \"Bob Johnson\", \"email\": \"bob@example.com\", \"created_at\": \"2025-01-03\"}\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/database/insert",
+              "host": ["{{base_url}}"],
+              "path": ["api", "database", "insert"]
+            }
+          }
+        },
+        {
+          "name": "Insert Data - Orders",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"database\": \"sales_db\",\n  \"table\": \"orders\",\n  \"data\": [\n    {\"customer_id\": 1, \"product\": \"Laptop\", \"amount\": 1200.00, \"status\": \"completed\"},\n    {\"customer_id\": 1, \"product\": \"Mouse\", \"amount\": 25.00, \"status\": \"completed\"},\n    {\"customer_id\": 2, \"product\": \"Keyboard\", \"amount\": 75.00, \"status\": \"pending\"},\n    {\"customer_id\": 3, \"product\": \"Monitor\", \"amount\": 350.00, \"status\": \"completed\"}\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/database/insert",
+              "host": ["{{base_url}}"],
+              "path": ["api", "database", "insert"]
+            }
+          }
+        },
+        {
+          "name": "Query - Show All Customers",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"database\": \"sales_db\",\n  \"question\": \"Show me all customers\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/database/query",
+              "host": ["{{base_url}}"],
+              "path": ["api", "database", "query"]
+            },
+            "description": "Natural language query: Show all customers"
+          }
+        },
+        {
+          "name": "Query - Count Records",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"database\": \"sales_db\",\n  \"question\": \"How many customers do we have?\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/database/query",
+              "host": ["{{base_url}}"],
+              "path": ["api", "database", "query"]
+            },
+            "description": "Natural language query: Count customers"
+          }
+        },
+        {
+          "name": "Analyze Database",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/database/analyze/sales_db",
+              "host": ["{{base_url}}"],
+              "path": ["api", "database", "analyze", "sales_db"]
+            },
+            "description": "Get database structure and statistics"
+          }
+        }
+      ]
+    },
+    {
+      "name": "02. Code Generation",
+      "description": "Generate code, projects, and files",
+      "item": [
+        {
+          "name": "Create Web API Project",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"my_web_api\",\n  \"type\": \"api\",\n  \"language\": \"python\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/code/project/create",
+              "host": ["{{base_url}}"],
+              "path": ["api", "code", "project", "create"]
+            },
+            "description": "Create a complete REST API project structure"
+          }
+        },
+        {
+          "name": "Create Web App Project",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"my_web_app\",\n  \"type\": \"web\",\n  \"language\": \"python\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/code/project/create",
+              "host": ["{{base_url}}"],
+              "path": ["api", "code", "project", "create"]
+            }
+          }
+        },
+        {
+          "name": "Create CLI Tool Project",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"my_cli_tool\",\n  \"type\": \"cli\",\n  \"language\": \"python\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/code/project/create",
+              "host": ["{{base_url}}"],
+              "path": ["api", "code", "project", "create"]
+            }
+          }
+        },
+        {
+          "name": "Generate Function - Python",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"calculate_discount\",\n  \"description\": \"Calculate discount based on customer loyalty level and purchase amount\",\n  \"language\": \"python\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/code/function/generate",
+              "host": ["{{base_url}}"],
+              "path": ["api", "code", "function", "generate"]
+            }
+          }
+        },
+        {
+          "name": "Generate Function - JavaScript",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"validateEmail\",\n  \"description\": \"Validate email address format\",\n  \"language\": \"javascript\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/code/function/generate",
+              "host": ["{{base_url}}"],
+              "path": ["api", "code", "function", "generate"]
+            }
+          }
+        },
+        {
+          "name": "Add File to Project",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"path\": \"utils/helpers.py\",\n  \"content\": \"def format_currency(amount):\\n    return f'${amount:,.2f}'\\n\\ndef get_timestamp():\\n    from datetime import datetime\\n    return datetime.now().isoformat()\\n\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/code/project/my_web_api/file",
+              "host": ["{{base_url}}"],
+              "path": ["api", "code", "project", "my_web_api", "file"]
+            }
+          }
+        },
+        {
+          "name": "List All Projects",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/code/projects",
+              "host": ["{{base_url}}"],
+              "path": ["api", "code", "projects"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "03. Document Processing",
+      "description": "Create, analyze, and search documents",
+      "item": [
+        {
+          "name": "Create Document - Meeting Notes",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"meeting_notes_2025\",\n  \"content\": \"# Team Meeting - January 2025\\n\\n## Attendees\\n- John Doe\\n- Jane Smith\\n- Bob Johnson\\n\\n## Agenda\\n1. Q1 Goals\\n2. New Product Launch\\n3. Budget Review\\n\\n## Action Items\\n- [ ] Finalize Q1 OKRs\\n- [ ] Schedule product demo\\n- [ ] Review budget proposals\\n\",\n  \"type\": \"md\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/documents/create",
+              "host": ["{{base_url}}"],
+              "path": ["api", "documents", "create"]
+            }
+          }
+        },
+        {
+          "name": "Create Document - Report",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"quarterly_report\",\n  \"content\": \"Quarterly Report Q1 2025\\n\\nRevenue: $1.2M\\nExpenses: $800K\\nProfit: $400K\\n\\nKey Achievements:\\n- Launched new product\\n- Expanded to 3 new markets\\n- Hired 10 new employees\\n\\nChallenges:\\n- Supply chain delays\\n- Competition increased\\n\",\n  \"type\": \"txt\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/documents/create",
+              "host": ["{{base_url}}"],
+              "path": ["api", "documents", "create"]
+            }
+          }
+        },
+        {
+          "name": "Analyze Document",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/documents/analyze/meeting_notes_2025",
+              "host": ["{{base_url}}"],
+              "path": ["api", "documents", "analyze", "meeting_notes_2025"]
+            },
+            "description": "Get document statistics and preview"
+          }
+        },
+        {
+          "name": "Search Documents - Budget",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"budget\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/documents/search",
+              "host": ["{{base_url}}"],
+              "path": ["api", "documents", "search"]
+            },
+            "description": "Search for 'budget' across all documents"
+          }
+        },
+        {
+          "name": "Search Documents - Product",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"product\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/documents/search",
+              "host": ["{{base_url}}"],
+              "path": ["api", "documents", "search"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "04. Data Integration & ETL",
+      "description": "Import, export, and transform data",
+      "item": [
+        {
+          "name": "Import from API - GitHub Users",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"api_url\": \"https://api.github.com/users/github\",\n  \"database\": \"external_data\",\n  \"table\": \"github_users\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/integration/import",
+              "host": ["{{base_url}}"],
+              "path": ["api", "integration", "import"]
+            },
+            "description": "Import data from GitHub API into database"
+          }
+        },
+        {
+          "name": "Export to JSON",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"database\": \"sales_db\",\n  \"table\": \"customers\",\n  \"output_file\": \"customers_export.json\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/integration/export",
+              "host": ["{{base_url}}"],
+              "path": ["api", "integration", "export"]
+            },
+            "description": "Export database table to JSON file"
+          }
+        },
+        {
+          "name": "Transform Data - Uppercase",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"data\": [\n    {\"name\": \"john doe\", \"city\": \"new york\", \"status\": \"active\"},\n    {\"name\": \"jane smith\", \"city\": \"los angeles\", \"status\": \"active\"},\n    {\"name\": \"bob johnson\", \"city\": \"chicago\", \"status\": \"inactive\"}\n  ],\n  \"transformations\": [\n    {\"operation\": \"uppercase\", \"field\": \"name\"},\n    {\"operation\": \"uppercase\", \"field\": \"city\"}\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/integration/transform",
+              "host": ["{{base_url}}"],
+              "path": ["api", "integration", "transform"]
+            }
+          }
+        },
+        {
+          "name": "Transform Data - Filter",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"data\": [\n    {\"product\": \"Laptop\", \"price\": 1200, \"category\": \"electronics\"},\n    {\"product\": \"Desk\", \"price\": 300, \"category\": \"furniture\"},\n    {\"product\": \"Mouse\", \"price\": 25, \"category\": \"electronics\"},\n    {\"product\": \"Chair\", \"price\": 150, \"category\": \"furniture\"}\n  ],\n  \"transformations\": [\n    {\"operation\": \"filter\", \"field\": \"category\", \"value\": \"electronics\"}\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/integration/transform",
+              "host": ["{{base_url}}"],
+              "path": ["api", "integration", "transform"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "05. Workflow Automation",
+      "description": "Execute multi-step workflows",
+      "item": [
+        {
+          "name": "Execute Workflow - Data Pipeline",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"data_pipeline\",\n  \"steps\": [\n    {\n      \"name\": \"fetch_external_data\",\n      \"type\": \"http_request\",\n      \"url\": \"https://api.github.com\"\n    },\n    {\n      \"name\": \"create_report_file\",\n      \"type\": \"create_file\",\n      \"path\": \"pipeline_report.txt\",\n      \"content\": \"Data pipeline executed successfully\"\n    },\n    {\n      \"name\": \"log_execution\",\n      \"type\": \"database_query\",\n      \"database\": \"logs\",\n      \"query\": \"INSERT INTO executions VALUES (datetime('now'))\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/workflow/execute",
+              "host": ["{{base_url}}"],
+              "path": ["api", "workflow", "execute"]
+            }
+          }
+        },
+        {
+          "name": "Execute Workflow - Report Generation",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"generate_reports\",\n  \"steps\": [\n    {\n      \"name\": \"create_sales_report\",\n      \"type\": \"create_file\",\n      \"path\": \"reports/sales_summary.txt\",\n      \"content\": \"Sales Report Generated\"\n    },\n    {\n      \"name\": \"create_inventory_report\",\n      \"type\": \"create_file\",\n      \"path\": \"reports/inventory_summary.txt\",\n      \"content\": \"Inventory Report Generated\"\n    },\n    {\n      \"name\": \"check_api_status\",\n      \"type\": \"http_request\",\n      \"url\": \"https://api.github.com\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/workflow/execute",
+              "host": ["{{base_url}}"],
+              "path": ["api", "workflow", "execute"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "99. Production Server (Real Ops)",
+      "description": "Real operations server endpoints",
+      "item": [
+        {
+          "name": "Real GPU Info",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{prod_url}}/system/gpu",
+              "host": ["{{prod_url}}"],
+              "path": ["system", "gpu"]
+            },
+            "description": "Get REAL GPU information (RTX 4050)"
+          }
+        },
+        {
+          "name": "Real System Info",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{prod_url}}/system/info",
+              "host": ["{{prod_url}}"],
+              "path": ["system", "info"]
+            }
+          }
+        },
+        {
+          "name": "Real File Write (MCP)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tool\": \"fs_write_file\",\n  \"parameters\": {\n    \"path\": \"data/test_from_postman.txt\",\n    \"content\": \"This file was created from Postman via Cogniware MCP!\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{prod_url}}/mcp/tools/execute",
+              "host": ["{{prod_url}}"],
+              "path": ["mcp", "tools", "execute"]
+            }
+          }
+        },
+        {
+          "name": "Real HTTP Request (MCP)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tool\": \"http_get\",\n  \"parameters\": {\n    \"url\": \"https://api.github.com\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{prod_url}}/mcp/tools/execute",
+              "host": ["{{prod_url}}"],
+              "path": ["mcp", "tools", "execute"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
+

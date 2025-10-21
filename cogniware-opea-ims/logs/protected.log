@@ -1,0 +1,179 @@
+======================================================================
+🚀 Cogniware Core - Protected Business API Server
+======================================================================
+Features:
+  ✅ License validation on all endpoints
+  ✅ Feature-based access control
+  ✅ Role-based permissions
+  ✅ API usage tracking
+  ✅ Online/offline license validation
+  ✅ Browser Automation & RPA (NEW!)
+  ✅ Chrome automation & screen capture
+
+Available Modules:
+  • Database Q&A
+  • Code Generation
+  • Document Processing
+  • Data Integration & ETL
+  • Workflow Automation
+  • Browser Automation & RPA
+
+Authentication Methods:
+  • API Key: X-API-Key: cw_xxxxx
+  • JWT Token: Authorization: Bearer <token>
+
+Starting server on http://0.0.0.0:8096
+======================================================================
+ * Serving Flask app 'api_server_business_protected'
+ * Debug mode: on
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8096
+ * Running on http://192.168.1.37:8096
+[33mPress CTRL+C to quit[0m
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 132-935-511
+127.0.0.1 - - [18/Oct/2025 01:48:32] "GET /health HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2025 01:49:10] "GET /health HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2025 01:50:05] "GET /health HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2025 01:51:52] "OPTIONS /api/code/project/create HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2025 01:51:52] "[31m[1mPOST /api/code/project/create HTTP/1.1[0m" 401 -
+127.0.0.1 - - [18/Oct/2025 01:52:22] "OPTIONS /api/code/function/generate HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2025 01:52:22] "[31m[1mPOST /api/code/function/generate HTTP/1.1[0m" 401 -
+127.0.0.1 - - [18/Oct/2025 01:52:27] "OPTIONS /api/code/project/create HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2025 01:52:27] "[31m[1mPOST /api/code/project/create HTTP/1.1[0m" 401 -
+127.0.0.1 - - [18/Oct/2025 01:52:59] "OPTIONS /api/browser/navigate HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2025 01:52:59] "[31m[1mPOST /api/browser/navigate HTTP/1.1[0m" 401 -
+127.0.0.1 - - [18/Oct/2025 01:55:09] "OPTIONS /api/browser/navigate HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2025 01:55:18] "POST /api/browser/navigate HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2025 01:55:18] "OPTIONS /api/browser/screenshot HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2025 01:55:18] "POST /api/browser/screenshot HTTP/1.1" 200 -
+ * Detected change in '/home/deadbrainviv/Documents/GitHub/cogniware-core/python/mcp_browser_automation.py', reloading
+======================================================================
+🚀 Cogniware Core - Protected Business API Server
+======================================================================
+Features:
+  ✅ License validation on all endpoints
+  ✅ Feature-based access control
+  ✅ Role-based permissions
+  ✅ API usage tracking
+  ✅ Online/offline license validation
+  ✅ Browser Automation & RPA (NEW!)
+  ✅ Chrome automation & screen capture
+
+Available Modules:
+  • Database Q&A
+  • Code Generation
+  • Document Processing
+  • Data Integration & ETL
+  • Workflow Automation
+  • Browser Automation & RPA
+
+Authentication Methods:
+  • API Key: X-API-Key: cw_xxxxx
+  • JWT Token: Authorization: Bearer <token>
+
+Starting server on http://0.0.0.0:8096
+======================================================================
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 132-935-511
+127.0.0.1 - - [18/Oct/2025 01:57:51] "OPTIONS /api/documents/create HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2025 01:57:51] "POST /api/documents/create HTTP/1.1" 200 -
+ * Detected change in '/home/deadbrainviv/Documents/GitHub/cogniware-core/python/mcp_browser_automation.py', reloading
+======================================================================
+🚀 Cogniware Core - Protected Business API Server
+======================================================================
+Features:
+  ✅ License validation on all endpoints
+  ✅ Feature-based access control
+  ✅ Role-based permissions
+  ✅ API usage tracking
+  ✅ Online/offline license validation
+  ✅ Browser Automation & RPA (NEW!)
+  ✅ Chrome automation & screen capture
+
+Available Modules:
+  • Database Q&A
+  • Code Generation
+  • Document Processing
+  • Data Integration & ETL
+  • Workflow Automation
+  • Browser Automation & RPA
+
+Authentication Methods:
+  • API Key: X-API-Key: cw_xxxxx
+  • JWT Token: Authorization: Bearer <token>
+
+Starting server on http://0.0.0.0:8096
+======================================================================
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 132-935-511
+127.0.0.1 - - [18/Oct/2025 01:58:32] "OPTIONS /api/browser/navigate HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2025 01:58:39] "POST /api/browser/navigate HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2025 01:58:57] "OPTIONS /api/browser/navigate HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2025 01:59:30] "POST /api/browser/navigate HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2025 01:59:30] "OPTIONS /api/browser/screenshot HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2025 01:59:31] "POST /api/browser/screenshot HTTP/1.1" 200 -
+ * Detected change in '/home/deadbrainviv/Documents/GitHub/cogniware-core/python/api_server_business_protected.py', reloading
+======================================================================
+🚀 Cogniware Core - Protected Business API Server
+======================================================================
+Features:
+  ✅ License validation on all endpoints
+  ✅ Feature-based access control
+  ✅ Role-based permissions
+  ✅ API usage tracking
+  ✅ Online/offline license validation
+  ✅ Browser Automation & RPA (NEW!)
+  ✅ Chrome automation & screen capture
+
+Available Modules:
+  • Database Q&A
+  • Code Generation
+  • Document Processing
+  • Data Integration & ETL
+  • Workflow Automation
+  • Browser Automation & RPA
+
+Authentication Methods:
+  • API Key: X-API-Key: cw_xxxxx
+  • JWT Token: Authorization: Bearer <token>
+
+Starting server on http://0.0.0.0:8096
+======================================================================
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 132-935-511
+ * Detected change in '/home/deadbrainviv/Documents/GitHub/cogniware-core/python/api_server_business_protected.py', reloading
+======================================================================
+🚀 Cogniware Core - Protected Business API Server
+======================================================================
+Features:
+  ✅ License validation on all endpoints
+  ✅ Feature-based access control
+  ✅ Role-based permissions
+  ✅ API usage tracking
+  ✅ Online/offline license validation
+  ✅ Browser Automation & RPA (NEW!)
+  ✅ Chrome automation & screen capture
+
+Available Modules:
+  • Database Q&A
+  • Code Generation
+  • Document Processing
+  • Data Integration & ETL
+  • Workflow Automation
+  • Browser Automation & RPA
+
+Authentication Methods:
+  • API Key: X-API-Key: cw_xxxxx
+  • JWT Token: Authorization: Bearer <token>
+
+Starting server on http://0.0.0.0:8096
+======================================================================
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 132-935-511

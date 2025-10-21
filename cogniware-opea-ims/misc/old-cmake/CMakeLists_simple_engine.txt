@@ -1,0 +1,64 @@
+cmake_minimum_required(VERSION 3.15)
+
+# Set C++ standard
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# Project name and version
+project(simple_engine VERSION 1.0.0)
+
+# Find required packages
+find_package(Threads REQUIRED)
+find_package(nlohmann_json REQUIRED)
+
+# Add source files
+set(SIMPLE_ENGINE_SOURCES
+    src/simple_engine/simple_engine.cpp
+    src/simple_engine/simple_api.cpp
+)
+
+set(SIMPLE_ENGINE_HEADERS
+    src/simple_engine/simple_engine.h
+    src/simple_engine/simple_api.h
+)
+
+# Create shared library
+add_library(simple_engine SHARED ${SIMPLE_ENGINE_SOURCES} ${SIMPLE_ENGINE_HEADERS})
+
+# Set include directories
+target_include_directories(simple_engine
+    PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/simple_engine
+    PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
+)
+
+# Link libraries
+target_link_libraries(simple_engine
+    Threads::Threads
+    nlohmann_json::nlohmann_json
+)
+
+# Set properties
+set_target_properties(simple_engine PROPERTIES
+    CXX_STANDARD 17
+    CXX_STANDARD_REQUIRED ON
+    POSITION_INDEPENDENT_CODE ON
+    VERSION ${PROJECT_VERSION}
+    SOVERSION 1
+)
+
+# Create executable for testing
+add_executable(simple_engine_test src/simple_engine/test_simple_engine.cpp)
+target_link_libraries(simple_engine_test simple_engine)
+
+# Install targets
+install(TARGETS simple_engine
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib
+    RUNTIME DESTINATION bin
+)
+
+install(FILES ${SIMPLE_ENGINE_HEADERS}
+    DESTINATION include/simple_engine
+)

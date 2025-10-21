@@ -1,0 +1,399 @@
+Multiple LLM execution capability
+Parallel Computing to run multiple LLM by Customizing Kernel, Driver and computing
+engines.
+Documentation of the inventionField of the Invention: The present invention relates to the field of graphics
+processing units (GPUs) and, more specifically, to a system and method for creating
+customized kernels and drivers (for parallelizing computational tasks at a tensor core
+level) for GPGPUs (General Purpose Graphical Processing Units) on a Linux
+environment (Debian based Ubuntu). This invention will enable the said system (virtual
+or physical) to perform multiple Large Language models (Training and Inference
+generation) by interacting with the hardware in parallel improving the efficiency and
+effectiveness of these AI/ML technologies. Using optimized and custom designed
+algorithm for utilizing dormant tensor cores more effectively that the opensource
+version of the driver, the invention enables a never before ability to run large language
+models in parallel on a single hardware.
+Background: With the advent of AI and ML, Generative AI and its variants have been
+in the works for more than a decade. The progress and the visibility of the GenAI
+nowadays, owe its gratitude to the hundreds if not thousands of computing power
+that was used to train and generate the datasets that power the solutions like ChatGPT
+and the likes. The ML computing hardware manufacturers (Qualcomm, Intel and Apple)
+always chose to build ARM based FPGAs and ASICs for most of the handheld and
+portable device and their needs, but the heavy lifting training and dataset creation,
+always needed GPUs, especially General-Purpose programmable GPUs. Even though
+these GPGPUs could compute much faster on a wide set of models, the efficiency of
+these could be improved using the same ASIC and FPGA integrated with the compute
+capability of GPGPUs. Thus Nvidia A100 and H100 architectures were born. AMD, Intel
+and Apple as well as many other manufacturers have build similar solutions, but we
+are using the Nvidia as the basis of our invention as it has been widely adopted and
+cloud providers depend on these for their AI/ ML tasks. We are also implementing the
+same with AMD GPGPUs with tensor cores as well in the next phase. The GPGPUs are
+only one part of the problem statement, the operating system still depends on the
+CPU and the RAM as well as the hard disks. We need to identify and create a specific
+set of hardware configuration to get the desired performance to run Large Language
+Models, their training and inference generation. Before we get into the details of that,
+let us dissect LLMs, LLMs are just another advent of ML and AI working in synergy to
+generate a specific output by using large data sets of information that is mapped,
+tagged and weighted. This enables standard algorithms to be executed and arithmetic
+calculations can be performed to obtain inferences from a set of words (from speech
+or natural language prompts). The LLM then generates the output in the format the
+AI/ML platform is engineered to and provides the response in the specific format. This
+is called GenAI as it generates a response based on a limited set of data mostly in
+natural language. There are so many areas where GenAI can impact, a lot of developers,
+architects and data scientists are building on the available platforms and systems to
+create solutions in a wide variety of domains. The biggest limitation is that no solutionexists, as of the day of writing this document, where one can run multiple LLMS on a
+single hardware (physical or virtual). Even using a very high-power computer cannot
+solve the problem, as the name suggests, large language models have billions of
+unique data points and they need to be applied to train the underlying models
+effectively. Hence running multiple LLMs have never been possible with the available
+architectures that are used in today’s computing environments.
+Summary of the Invention: The invention that is outlined below emphasizes on the
+ability to use the opensource architecture of the Nvidia A/H 100 and other tensor core-
+based compute GPUs, to be able to provide dynamic allocation of resources on the
+compute unit based on the demand from each of the LLMs that are residing on the
+hardware (virtual or physical). This enables these LLMs to work faster as there are no
+computations that needs to be transmitted over the network and the data is accessible
+within the system bus. Leveraging the asynchronous barriers in memory sharing and
+the CUDA streams, the system is able to leverage the available bus pipes of AMD based
+CPUs on which we are adding these computing GPUs. The invention focuses on using
+the advancements in compute graphical processing units and building modules as
+described in Diagram D1, our AI/ML compute engines can bifurcate the available
+graphical compute cores across the available resources and effectively utilize all the
+cores, memory, CPU, bus, CUDA, OpenCV and other modules as and when needed by
+the application layer modules, in this case, the LLMS. As shown in Diagram D2,
+understanding and exploring the versatility of Nvidia GPU architecture, we have
+developed a layer to directly enable interaction of the LLM engine directly with the
+compute nodes. The approach uses the middleware of C++ to create memory spaces
+and computation task identification at a compute node level, create the set of requests
+that are in queue and assigned weightage by the LLM, and thereby allocate necessary
+resources from the compute nodes to process the queues with highest weightages in
+a FIFO sequence. As shown in Diagram D3, the traditional AI engines are replaced by
+LLM entries and this is possible as we are able to interact with the application layer
+from the hardware layer by modifying the kernel and driver of the GPGPU. As we can
+see in the Diagram D4, memory partitioning has been implemented in the A/H 100
+GPGPUs in C++, and the opensource code was modified to allow DMA from the
+application layer. Using python modules to read and access C++ pointers, we are able
+to identify the resources that are being used and that are unused, based on the load,
+the system creates virtual compute nodes and frees them up as soon as the
+computational workload is finished. Each of these delegative tasks are effectively
+managed using AMD CPUS that has be maximum virtual cores and DMA channels.
+Therefore the synergy of the perfect combination of the CPU, GPU and memory
+enables us to create this invention. Using the architectural advantages of compute
+driven GPU design, we are able to customize the specific address spaces and locations
+within a single GPU device and virtually create compute nodes across multiple
+hardware to create virtual dedicated computation nodes for each of the LLMs. The
+architecture of Nvidia also provides a lot of leverage in implementing thesecustomizations, like the NVLink Network interconnect enables GPU-to-GPU
+communication among up to 256 GPUs across multiple compute nodes. Secure MIG
+partitions the GPU into isolated, right-size instances to maximize quality of service
+(QoS) for smaller workloads. NVIDIA H100 is the first truly asynchronous GPU. H100
+extends A100’s global-to-shared asynchronous transfers across all address spaces and
+adds support for tensor memory access patterns. It enables applications to build end-
+to-end asynchronous pipelines that move data into and off the chip, completely
+overlapping and hiding data movement with computation. Orchestrating the growing
+number of on-chip accelerators and diverse groups of general-purpose threads
+requires synchronization. For example, threads and accelerators that consume outputs
+must wait on threads and accelerators that produce them. These hardware systems are
+capable of up to 500 teraflops of computations. As showing in Diagram D5, every
+single area that Nvidia A/H 100 GPGPUs are best suited due to the inherent dynamic
+partitioning capabilities, our customized solution can run multiple large language
+models in each of those domains and effectively provide a never before performance
+and effectiveness.
+Work is underway to add more details, will be shared by this weekend
+Detailed Description: Offer a detailed explanation of your invention, including:
+1. Customized Kernel:
+• Describe the architecture and components of your customized kernel.
+• Highlight any novel algorithms, processes, or techniques employed in
+the kernel.
+2. Customized Driver:
+• Explain the functionality and features of your customized GPU driver.
+• Specify how the driver interacts with the customized kernel.
+3. Integration with Existing GPU Architecture:
+• Explain how your customized kernel and driver integrate with standard
+GPU architecture.
+• Highlight any compatibility features.
+4. Advantages:
+• Enumerate the advantages of your invention over existing solutions.
+• Emphasize improved performance, energy efficiency, or any other
+relevant benefits.
+Claims: This invention claims that the modules that are created enabling LLMs to
+directly interact with the GPGPU compute nodes and allocate availability according
+to the demand from the LLM is unique and therefore needs protection from
+infringement.
+Drawings:D1 – High level architecture diagram.
+D2. Current Nvidia A/H100 Architecture
+D3. Proposed Architecture Nvidia A/H100 ArchitectureDirect LLM Access to the cores and compute
+instance within each GPU
+LLM 1
+D4. Memory Partitioning support in A/H 100 GPGPUs
+LLM 2
+LLM 3D5. Applicable areas of this capability of multiple LLMS
+Abstract: Summarize your invention in a brief abstract, highlighting its key features
+and benefits.
+Conclusion: Conclude your patent documentation by reiterating the significance of
+your invention, its advantages, and potential applications.1. Taking an example use case (e.g., a task requiring two or more LLMs), please
+describe how this use case can be implemented using current techniques (e.g.,
+different VMs, LangChain, etc.)
+a. Please provide a diagram explaining how this use case would be
+implemented using an existing hardware platform (e.g., for NVIDIA)
+along with an explanation of the various modules within and
+communications between the modules or any other implementation
+details that will help to highlight the difference between the existing
+architecture and your implementation.
+b. Here when describing the use case, please specify the prompt
+provided, how the prompt is operated upon by the existing hardware
+platform, how the output is generated and what the output is. Please
+provide specific implementation details for each of the steps involved
+in task execution.
+Ans:
+Use case – Document summarization model implemented using
+GPT 3.
+LLMS involved
+Interface LLM – Chat based variant of GPT 3 trained on natural
+language promptsKnowledge LLM 1 – Technical document model and dataset
+downloaded as pretrained with REST JSON API prompting
+Knowledge LLM 2 – Pre trained text summarization model with
+REST JSON API prompting
+Knowledge LLM 3 – Thesaurus LLM Model – GPT3 REST JSON API
+prompting
+Knowledge LLM 4 – English Oxford dictionary and grammar
+reference books – 6 TB dataset with GPT 3 REST JSON API
+prompting
+Hardware Assumption: Here we have 4 Nvidia H 100 GPU with 32 GB
+RAM each connected using NVLink, on a AMD Thread ripper 128 Core
+CPU and 512 GB RAM, with 10 TB storage.
+Software Assumption: The system is running Ubuntu and it has the
+customized kernel for Nvidia H100 GPU as well as patches for the driver
+installed.
+Prompting and response Table:
+Interface LLM
+Summarize
+a8ached pdf to a 2
+page summary by
+topic
+KNW LLM 1
+Converts PDF to
+text stream and
+prepare the data
+into page wise
+data sets
+KNW LLM 2
+Parses the enHre
+data sets and
+prepare summary,
+Cycle 1
+Perform second
+level with target as
+2 page and use
+default 12 px, arial
+as the font size to
+idenHfy page
+limits
+Perform third level
+with target as 2
+page and use
+default 12 px, arial
+as the font size to
+idenHfy page
+limits
+KNW LLM 3
+Check for
+alternaHve words
+and compress,
+send to KWLLM4
+to check
+KNW LLM 4
+Checks and
+corrects, send to
+cycle 2
+Performs same
+step as aboveChecks and
+corrects, send to
+cycle 3
+Performs same
+step as aboveChecks and
+corrects, send to
+cycle 4
+NANANANANANANANAChecks and
+corrects, send to
+cycle 5
+Display the
+content and
+provide download
+linkFormats the
+document in the
+format and
+generates PDFNANANA2. Explain in detail the drawbacks of these existing techniques, such as latency,
+compute power, etc. For example, what modules, communications, or lack
+thereof in the existing architecture lead to the drawbacks.
+Current techniques forces the systems to consume the entire available
+resources to train and run inferences, the application level limitations are
+not handled at hardware and firmware level. Our solution solves that
+problem at a hardware level and supports granular task creation and
+weightage assignment to available cores.
+3. As inventors when you recognized these drawbacks, how did you change
+NVIDIA’s hardware platform (e.g., changes made in the way the OS kernel
+works to avoid using multiple VMs) . Please provide details on changes made,
+e.g., modules added/changed/removed, new/modified communications
+between the modules etc. Please provide a diagram showing your new
+architecture along with an explanation of the changes and how your
+implementation is now different from existing techniques.
+By understanding the Nvidia hardware platform and code in detail, we re
+engineered the code to allow us direct access into the firmware calls and
+memory management. We created a middleware that can manage the
+virtual compute node creation and thereby enable us to effectively use
+the capability of these hardware to the fullest. Please refer diagrams D2
+and D3.
+4. Please provide an explanation of why these changes overcome the drawbacks
+of existing techniques. For the list of drawbacks you note in 2), please explain
+how your new implementation overcomes them, for example, which modules,
+communications, interfaces etc. were specifically designed to address the
+problems with existing techniques and how they address these.
+NVIDIA H100 Tensor Core GPU Architecture Overview
+NVIDIA H100 Tensor Core GPU Datasheet
+5. Why do you think someone else didn’t come up with your solution before?
+The main reason is that it has not become a necessity for anyone yet, we
+are in the pre dawn days of gen AI. We have been working on ASICs and
+FPGAs since the advent of crypto mining and there were parallels we
+could identify and generate the tangent. Hence we were able to come up
+with this solution before someone else.
+6. Going back to example use case you used in 1), please now describe how your
+new architecture performs the same task.
+a. For the same prompt example in 1), how is the prompt operated upon
+by your new architecture, how the output is generated and what the
+output is.b. Also provide specific implementation details for each of the steps
+involved in task execution.
+Please advice if the above table defines it, we can export the actual JSON
+inputs and outputs as well as computation breakup of the cores as well as
+memory in detail.
+PS: we are working on the entire documentation down to the code level.
+We will work on this and deliver the next release by this weekend. We will
+also setup a demo session to show exactly the system works.
+To create a standalone multiple large language model execution platform, we
+created a customized driver for the Nvidia ubuntu version the opensource GCC code
+that was released in GitHub. Using the module for accessing the compute cores and
+its associate storage and memory modules, we created a module that can bypass
+drivers for python libraries for TensorFlow and pyTorch. This module has 4 different
+sub modules, the first module captures the incoming requests and calculates the
+number of cores that are needed to execute the tasks in parallel. In this module, we
+leverage the capability of NV Link that enables multiple GPGPUs to work as one. A
+Nvidia H100 GPGPU has 400 Teraflops of tensor calculation capability with 100
+tensor cores per device. The architecture that is designed contains 4 of these graphic
+devices, therefore in effect, we have a total 1600 teraflops of computation power and
+400 tensor cores. This architecture leverages the dynamicity of Nvidia memory
+bifurcation as well as virtual compute node creation over single/multiple devices.
+Hence, once the request is received by the compute estimation module, a new virtual
+compute node is created with its own swap space, compute cores and memory. Once
+these as allocated, the second module takes over the request cycle. This module
+processes each of the compute task to the corresponding cores and stores it in a
+specific memory space accessible only for that core. This core can read and write to
+that highspeed memory. Each of these tasks are executed in parallel. The third
+module is created to capture the computed values and prepare it for submission to
+the LLM from where the request is originating. The fourth module is providing the
+response to LLM and captures the next set of actions from it to repeat the cycle
+again till the required computation for training/inference generation of the LLM is
+completed.
+The standard systems and drivers with Nvidia H 100 or similar compute cores are
+that any LLM or AI/ML system converts the request set into the underlying
+technology like TensorFlow or pyTorch or OpenCV and then this calls the Nvidia
+driver from the kernel, then sends the request into the reserved memory and CPU
+cycle. The CPU then allocates the task to the GPGPU for computation. This causes
+delay in execution of the task and the memory that is reserved cannot be re
+allocated. Said that, the Nvidia still utilizes the virtual compute node creationcapability, but its effectiveness is nullified by the inherent problem of request
+processing and the way the queue management cycle uses the CPU. The
+computation of a 100 GB training a model task with 100 cycles using 1 CPU, I Nvidia
+H100 GPGPU will take about 30 minutes to execute due to the bottle neck in the
+design aspect of the kernel and its execution cycles.
+Using our modified operating system kernel and the customized drivers for Nvidia
+H100 tensor compute GPGPUs enables us to perform these tasks in parallel with
+ability to run the same task of 100 GB training a model task with 100 cycles in less
+than 2 minutes. The effectiveness is because there are resources that are not being
+used in the first model as it is using the specific underlying technology adapters
+which has predefined virtual compute nodes and memory allocation. We, with this
+modified driver can decide on the size of the compute node on the fly and there by
+providing more computation in lesser time frame.
+The below flowcharts (FC 1 and FC2) explains both the processes and its differences
+in a simple fashion.
+Assumption – System Configuration
+1. OS – Linux
+2. GPU – Nvidia H100 with 32 GB on device RAM x 1
+3. CPU – AMD Threadripper 128 Core 3 Ghz
+4. RAM – 512 GB
+5. HDD – 1 x 512 nvma ssd, 1 x 2 td HDD
+6. GPU connected on PCI 16x slotFC1 – How task is executed on traditional systems.
+Task Initiation
+by the User
+User selects a 100GB dataset to train a model using tensorflow
+in python. User imports necessary modules and begins
+execution of the training.
+The OS invokes the corresponding kernel module and triggers
+the GPU and its set of resources to perform the compute
+cycle.
+The GPU
+compute Cycle
+The OS allocates a % of system memory and 100% of GPU
+memory for the task as directed by the application. This
+triggers allocation of memory, system bus, disk space, swap
+space etc.
+The compute nodes are created by the corresponding module
+that is triggered within the driver, in this case as it is a tensor
+flow module 40% of available GPU is utilized and tasks are
+being executed
+Task execution
+on GPGPU
+The GPGPU now uses 40% of available resource as the
+compute node, even though it is using only 40% of the
+compute cores, the system utilization will be 100% as other
+resources are not bifurcated.
+The allocation of tasks are done using the inherent logic of the
+tensorflow engine and related python modules. Each of these
+modules are executed inside their own virtual compute nodes.
+and corresponding memory is allocated.
+Task
+handover
+and
+termination
+of cycle
+The computation tasks are performed and the handover is
+completed once the 100 cycles of training is completed within
+the python code where the training is being done.
+The memory and other system resources are released from
+lock once the handover is complete. In total from initiation to
+releasing the lock on the address spaces will take
+appoximately 30 to 40 minutes.FC2 – How task is executed with our customized kernel and driver
+Task Initiation
+by the User
+User selects a 100GB dataset to train a model using tensorflow in python.
+User imports necessary modules and begins execution of the training.
+The OS invokes the corresponding kernel module and triggers the
+interpreter module of the driver which provides response to the OS with
+required system resources.
+The GPU
+compute Cycle
+System now allocates the resources as requested from the interpreter
+module and GPU is partitioned into multiple modules to compute each
+arithematic calculations in parallel.
+The compute nodes are created by the corresponding module that is
+triggered within the driver and the sub modules create their own virtual
+compute nodes, in this case it will consume 100% of available GPU and
+tasks are being executed in parallel across multiple compute nodes that
+are generated in the memory by the custom driver.
+Task execution
+on GPGPU
+The GPGPU now uses 100% of available resource as the compute node,
+the system memory and the CPU usage will remain very low as the tasks
+are computed and response handling is the only activity that the CPU and
+the OS has to handle. The higer level tasks and computation is completed
+within the GPU as the driver is now content aware and .
+The allocation of tasks are done using the python modules directly from
+within the LLM. Each of these modules are executed inside one virtual
+compute nodes. and direct memory access is provided
+Task
+handover
+and
+termination
+of cycle
+The computation tasks are performed and the handover is completed
+once the 100 cycles of training is completed within the python code
+where the training is being done.
+The memory and other system resources are released from lock once the
+handover is complete. In total from initiation to releasing the lock on the
+address spaces will take appoximately 1 to 2 minutes.

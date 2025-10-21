@@ -1,0 +1,1 @@
+-I"/home/deadbrainviv/Documents/GitHub/cogniware-core/include" -I"/home/deadbrainviv/Documents/GitHub/cogniware-core/src" -I"/home/deadbrainviv/Documents/GitHub/cogniware-core/src/llm_inference_core" -isystem /usr/include/python3.12

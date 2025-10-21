@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cogniware Core - Admin Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f7fa;
+        }
+
+        .topbar {
+            background: white;
+            padding: 15px 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .topbar .logo {
+            font-size: 1.5em;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .topbar .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+
+        .page-title {
+            margin-bottom: 30px;
+        }
+
+        .page-title h1 {
+            color: #333;
+            font-size: 2em;
+            margin-bottom: 5px;
+        }
+
+        .page-title p {
+            color: #999;
+        }
+
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .stat-card .icon {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .value {
+            font-size: 2.5em;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .stat-card .label {
+            color: #999;
+            font-size: 0.9em;
+        }
+
+        .section {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+
+        .section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        th {
+            background: #f9f9f9;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 500;
+        }
+
+        .badge.success {
+            background: #e6f9e6;
+            color: #2d862d;
+        }
+
+        .badge.warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .badge.primary {
+            background: #e6f3ff;
+            color: #2d5c86;
+        }
+
+        .login-screen {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .login-box {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            width: 400px;
+        }
+
+        .login-box h2 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .usage-chart {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .progress-bar {
+            background: #e0e0e0;
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div class="login-screen" id="loginScreen">
+        <div class="login-box">
+            <h2>Admin Login</h2>
+            <div id="loginError" style="display: none; color: #c33; margin-bottom: 15px; text-align: center;"></div>
+            <form id="loginForm">
+                <div class="input-group">
+                    <label>Username</label>
+                    <input type="text" id="username" required>
+                </div>
+                <div class="input-group">
+                    <label>Password</label>
+                    <input type="password" id="password" required>
+                </div>
+                <button type="submit" class="btn" style="width: 100%;">Login</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Admin Dashboard -->
+    <div id="adminDashboard" style="display: none;">
+        <div class="topbar">
+            <div class="logo">🚀 Cogniware Core</div>
+            <div class="user-menu">
+                <span id="orgName" style="color: #999;"></span>
+                <span id="userName" style="font-weight: 600;"></span>
+                <button class="btn" onclick="logout()">Logout</button>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="page-title">
+                <h1>Organization Dashboard</h1>
+                <p>Manage your organization's users, licenses, and usage</p>
+            </div>
+
+            <!-- Statistics -->
+            <div class="stats-row">
+                <div class="stat-card">
+                    <div class="icon">👥</div>
+                    <div class="value" id="statUsers">0</div>
+                    <div class="label">Total Users</div>
+                </div>
+                <div class="stat-card">
+                    <div class="icon">📜</div>
+                    <div class="value" id="statLicenses">0</div>
+                    <div class="label">Active Licenses</div>
+                </div>
+                <div class="stat-card">
+                    <div class="icon">📊</div>
+                    <div class="value" id="statAPICalls">0</div>
+                    <div class="label">API Calls (30 days)</div>
+                </div>
+                <div class="stat-card">
+                    <div class="icon">⚡</div>
+                    <div class="value" id="statAvgResponse">0ms</div>
+                    <div class="label">Avg Response Time</div>
+                </div>
+            </div>
+
+            <!-- License Information -->
+            <div class="section">
+                <h2>📜 Your License</h2>
+                <div id="licenseInfo">Loading...</div>
+            </div>
+
+            <!-- Users Management -->
+            <div class="section">
+                <h2>👥 Users in Your Organization</h2>
+                <button class="btn" onclick="showCreateUserForm()">+ Create User</button>
+                
+                <div id="createUserForm" style="display: none; margin: 20px 0; padding: 20px; background: #f9f9f9; border-radius: 8px;">
+                    <h3>Create New User</h3>
+                    <div class="input-group">
+                        <label>Username</label>
+                        <input type="text" id="newUsername">
+                    </div>
+                    <div class="input-group">
+                        <label>Email</label>
+                        <input type="email" id="newUserEmail">
+                    </div>
+                    <div class="input-group">
+                        <label>Full Name</label>
+                        <input type="text" id="newUserFullName">
+                    </div>
+                    <div class="input-group">
+                        <label>Password</label>
+                        <input type="password" id="newUserPassword">
+                    </div>
+                    <div class="input-group">
+                        <label>Role</label>
+                        <select id="newUserRole">
+                            <option value="user">User</option>
+                            <option value="admin">Admin</option>
+                        </select>
+                    </div>
+                    <button class="btn" onclick="createUser()">Create User</button>
+                    <button class="btn btn-outline" onclick="hideCreateUserForm()">Cancel</button>
+                </div>
+                
+                <div id="usersList">Loading users...</div>
+            </div>
+
+            <!-- Usage Statistics -->
+            <div class="section">
+                <h2>📊 API Usage Statistics</h2>
+                <div id="usageStats">Loading...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_ADMIN = 'http://localhost:8099';
+        let currentToken = null;
+        let currentUser = null;
+
+        // Login
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const response = await fetch(`${API_ADMIN}/auth/login`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({username, password})
+                });
+
+                const data = await response.json();
+
+                if (data.success && (data.user.role === 'admin' || data.user.role === 'super_admin')) {
+                    currentToken = data.token;
+                    currentUser = data.user;
+                    
+                    document.getElementById('loginScreen').style.display = 'none';
+                    document.getElementById('adminDashboard').style.display = 'block';
+                    
+                    document.getElementById('userName').textContent = currentUser.full_name;
+                    
+                    loadDashboard();
+                } else {
+                    document.getElementById('loginError').textContent = 'Admin access required';
+                    document.getElementById('loginError').style.display = 'block';
+                }
+            } catch (error) {
+                document.getElementById('loginError').textContent = 'Connection error';
+                document.getElementById('loginError').style.display = 'block';
+            }
+        });
+
+        function logout() {
+            document.getElementById('adminDashboard').style.display = 'none';
+            document.getElementById('loginScreen').style.display = 'flex';
+            document.getElementById('password').value = '';
+        }
+
+        async function apiCall(endpoint, method = 'GET', body = null) {
+            const options = {
+                method,
+                headers: {
+                    'Authorization': `Bearer ${currentToken}`,
+                    'Content-Type': 'application/json'
+                }
+            };
+
+            if (body) {
+                options.body = JSON.stringify(body);
+            }
+
+            const response = await fetch(`${API_ADMIN}${endpoint}`, options);
+            return await response.json();
+        }
+
+        async function loadDashboard() {
+            loadOrganizationInfo();
+            loadUsers();
+            loadLicenseInfo();
+            loadUsageStats();
+        }
+
+        async function loadOrganizationInfo() {
+            try {
+                const org = await apiCall(`/admin/organizations/${currentUser.org_id}`);
+                if (org.organization) {
+                    document.getElementById('orgName').textContent = org.organization.org_name;
+                }
+            } catch (error) {
+                console.error('Error loading org:', error);
+            }
+        }
+
+        async function loadUsers() {
+            try {
+                const data = await apiCall(`/admin/users?org_id=${currentUser.org_id}`);
+                document.getElementById('statUsers').textContent = data.count || 0;
+                
+                const container = document.getElementById('usersList');
+                if (data.users && data.users.length > 0) {
+                    let html = '<table><thead><tr><th>Username</th><th>Email</th><th>Full Name</th><th>Role</th><th>Status</th></tr></thead><tbody>';
+                    data.users.forEach(user => {
+                        html += `<tr>
+                            <td><strong>${user.username}</strong></td>
+                            <td>${user.email}</td>
+                            <td>${user.full_name}</td>
+                            <td><span class="badge primary">${user.role}</span></td>
+                            <td><span class="badge success">${user.status}</span></td>
+                        </tr>`;
+                    });
+                    html += '</tbody></table>';
+                    container.innerHTML = html;
+                } else {
+                    container.innerHTML = '<p style="color: #999; margin-top: 15px;">No users found</p>';
+                }
+            } catch (error) {
+                document.getElementById('usersList').innerHTML = '<p style="color: #c33;">Error loading users</p>';
+            }
+        }
+
+        async function loadLicenseInfo() {
+            try {
+                const licenses = await apiCall(`/admin/licenses?org_id=${currentUser.org_id}`);
+                document.getElementById('statLicenses').textContent = licenses.count || 0;
+                
+                const container = document.getElementById('licenseInfo');
+                if (licenses.licenses && licenses.licenses.length > 0) {
+                    const license = licenses.licenses[0];
+                    const licenseDetails = await apiCall(`/admin/licenses/${license.license_key}`);
+                    
+                    if (licenseDetails.success) {
+                        const lic = licenseDetails.license;
+                        const daysRemaining = licenseDetails.license.validation ? licenseDetails.license.validation.days_remaining : 0;
+                        
+                        container.innerHTML = `
+                            <div class="usage-chart">
+                                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+                                    <div>
+                                        <strong>License Type:</strong><br>
+                                        <span class="badge success" style="margin-top: 5px; display: inline-block;">${lic.license_type}</span>
+                                    </div>
+                                    <div>
+                                        <strong>Status:</strong><br>
+                                        <span class="badge success" style="margin-top: 5px; display: inline-block;">${lic.status}</span>
+                                    </div>
+                                    <div>
+                                        <strong>Expires:</strong><br>
+                                        ${new Date(lic.expiry_date).toLocaleDateString()}
+                                        <span style="color: ${daysRemaining < 30 ? '#c33' : '#2d862d'};">(${daysRemaining} days)</span>
+                                    </div>
+                                    <div>
+                                        <strong>Max Users:</strong><br>
+                                        ${lic.max_users}
+                                    </div>
+                                </div>
+                                <div style="margin-top: 20px;">
+                                    <strong>Enabled Features:</strong><br>
+                                    ${lic.features.map(f => `<span class="badge primary" style="margin: 5px 5px 0 0;">${f}</span>`).join('')}
+                                </div>
+                            </div>
+                        `;
+                    }
+                } else {
+                    container.innerHTML = '<p style="color: #c33;">No active license found. Contact super admin.</p>';
+                }
+            } catch (error) {
+                document.getElementById('licenseInfo').innerHTML = '<p style="color: #c33;">Error loading license info</p>';
+            }
+        }
+
+        async function loadUsageStats() {
+            try {
+                const stats = await apiCall(`/admin/usage/${currentUser.org_id}?days=30`);
+                
+                if (stats.stats) {
+                    document.getElementById('statAPICalls').textContent = stats.stats.total_api_calls.toLocaleString();
+                    document.getElementById('statAvgResponse').textContent = stats.stats.average_response_time_ms.toFixed(1) + 'ms';
+                    
+                    const container = document.getElementById('usageStats');
+                    let html = '<div class="usage-chart">';
+                    html += `<p><strong>Last 30 Days:</strong> ${stats.stats.total_api_calls.toLocaleString()} API calls</p>`;
+                    html += '<h4 style="margin-top: 20px; margin-bottom: 10px;">Top Endpoints:</h4>';
+                    
+                    if (stats.stats.top_endpoints && stats.stats.top_endpoints.length > 0) {
+                        html += '<table><thead><tr><th>Endpoint</th><th>Calls</th><th>Usage</th></tr></thead><tbody>';
+                        const total = stats.stats.total_api_calls;
+                        stats.stats.top_endpoints.forEach(ep => {
+                            const percent = ((ep.count / total) * 100).toFixed(1);
+                            html += `<tr>
+                                <td>${ep.endpoint}</td>
+                                <td>${ep.count.toLocaleString()}</td>
+                                <td>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: ${percent}%"></div>
+                                    </div>
+                                    ${percent}%
+                                </td>
+                            </tr>`;
+                        });
+                        html += '</tbody></table>';
+                    }
+                    html += '</div>';
+                    container.innerHTML = html;
+                }
+            } catch (error) {
+                console.error('Error loading usage:', error);
+            }
+        }
+
+        function showCreateUserForm() {
+            document.getElementById('createUserForm').style.display = 'block';
+        }
+
+        function hideCreateUserForm() {
+            document.getElementById('createUserForm').style.display = 'none';
+        }
+
+        async function createUser() {
+            const data = {
+                org_id: currentUser.org_id,
+                username: document.getElementById('newUsername').value,
+                email: document.getElementById('newUserEmail').value,
+                full_name: document.getElementById('newUserFullName').value,
+                password: document.getElementById('newUserPassword').value,
+                role: document.getElementById('newUserRole').value
+            };
+
+            const result = await apiCall('/admin/users', 'POST', data);
+            if (result.success) {
+                alert('✅ User created successfully!\n\nUsername: ' + result.username);
+                hideCreateUserForm();
+                loadUsers();
+            } else {
+                alert('❌ Error: ' + (result.error || JSON.stringify(result)));
+            }
+        }
+    </script>
+</body>
+</html>
+

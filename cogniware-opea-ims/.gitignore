@@ -1,105 +1,32 @@
-# Environment variables
-.env
-.env.local
-.env.*.local
+# Prerequisites
+*.d
 
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
-*.pyc
-venv/
-env/
-ENV/
-
-# Node.js
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-.pnpm-debug.log*
-.next/
-out/
-.npm
-.yarn
-.cache
-
-# IDEs
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-.DS_Store
-
-# Docker
-docker-compose.override.yml
-
-# Logs
-logs/
-*.log
-log/
-
-# Database
-*.sql
-*.db
-*.sqlite
-*.sqlite3
-
-# Uploads
-uploads/
-temp/
-tmp/
-
-# Data files - Download separately (see DATA_SETUP.md)
-data/
-!data/.gitkeep
-!data/README.md
-
-# Secrets
-*.pem
-*.key
-*.crt
-secrets/
-
-# OS
-Thumbs.db
-.DS_Store
-
-# Testing
-.coverage
-.pytest_cache/
-htmlcov/
-.tox/
-
-# Backups
-*.bak
-backup/
-backups/
-
-# Compiled files
-*.com
-*.class
-*.dll
-*.exe
+# Compiled Object files
+*.slo
+*.lo
 *.o
-*.so
+*.obj
 
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app

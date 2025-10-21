@@ -1,0 +1,43 @@
+FROM nvidia/cuda:12.2.0-devel-ubuntu22.04
+
+# Set environment variables
+ENV DEBIAN_FRONTEND=noninteractive
+ENV CUDA_HOME=/usr/local/cuda
+ENV PATH=${CUDA_HOME}/bin:${PATH}
+ENV LD_LIBRARY_PATH=${CUDA_HOME}/lib64:${LD_LIBRARY_PATH}
+
+# Install dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    cmake \
+    ninja-build \
+    git \
+    wget \
+    libspdlog-dev \
+    libfmt-dev \
+    libgtest-dev \
+    python3 \
+    python3-pip \
+    python3-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Python dependencies
+RUN pip3 install numpy pybind11
+
+# Create app directory
+WORKDIR /app
+
+# Copy source code
+COPY . /app/
+
+# Build
+RUN mkdir -p build && cd build && \
+    cmake .. -GNinja && \
+    ninja -j$(nproc)
+
+# Expose API port
+EXPOSE 8080
+
+# Run server
+CMD ["./build/cogniware_server", "--port", "8080"]
+

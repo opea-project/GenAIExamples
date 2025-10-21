@@ -1,0 +1,78 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: cogniware
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cogniware-core
+  namespace: cogniware
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: cogniware-core
+  template:
+    metadata:
+      labels:
+        app: cogniware-core
+    spec:
+      containers:
+      - name: cogniware
+        image: cogniware/core:latest
+        ports:
+        - containerPort: 8080
+        resources:
+          limits:
+            nvidia.com/gpu: 4
+            memory: 512Gi
+            cpu: 96
+          requests:
+            nvidia.com/gpu: 4
+            memory: 256Gi
+            cpu: 48
+        env:
+        - name: CUDA_VISIBLE_DEVICES
+          value: "0,1,2,3"
+        volumeMounts:
+        - name: model-storage
+          mountPath: /models
+      volumes:
+      - name: model-storage
+        persistentVolumeClaim:
+          claimName: model-pvc
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: cogniware-service
+  namespace: cogniware
+spec:
+  selector:
+    app: cogniware-core
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8080
+  type: LoadBalancer
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: model-pvc
+  namespace: cogniware
+spec:
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 10Ti
+  storageClassName: fast-nvme
+

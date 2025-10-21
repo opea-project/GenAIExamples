@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cogniware Core - Enterprise Login</title>
+    <link rel="stylesheet" href="corporate-design-system.css">
+    <style>
+        body {
+            background: var(--gradient-primary);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--space-4);
+        }
+
+        .login-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            max-width: 1200px;
+            width: 100%;
+            background: var(--neutral-white);
+            border-radius: var(--radius-2xl);
+            box-shadow: var(--shadow-2xl);
+            overflow: hidden;
+        }
+
+        .login-brand {
+            background: var(--gradient-primary);
+            padding: var(--space-16) var(--space-12);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            color: var(--neutral-white);
+        }
+
+        .brand-logo {
+            font-size: 4rem;
+            margin-bottom: var(--space-4);
+        }
+
+        .brand-title {
+            font-size: var(--text-4xl);
+            font-weight: var(--font-bold);
+            margin-bottom: var(--space-3);
+            color: var(--neutral-white);
+        }
+
+        .brand-subtitle {
+            font-size: var(--text-xl);
+            margin-bottom: var(--space-8);
+            opacity: 0.95;
+        }
+
+        .brand-features {
+            list-style: none;
+        }
+
+        .brand-features li {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            margin-bottom: var(--space-4);
+            font-size: var(--text-lg);
+        }
+
+        .brand-features li::before {
+            content: '✓';
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            font-weight: bold;
+        }
+
+        .login-form-container {
+            padding: var(--space-16) var(--space-12);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .login-header {
+            margin-bottom: var(--space-8);
+        }
+
+        .login-header h1 {
+            font-size: var(--text-3xl);
+            margin-bottom: var(--space-2);
+            color: var(--neutral-900);
+        }
+
+        .login-header p {
+            color: var(--neutral-600);
+            font-size: var(--text-base);
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: var(--space-4);
+            margin: var(--space-6) 0;
+            color: var(--neutral-500);
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--neutral-300);
+        }
+
+        .quick-login {
+            background: var(--neutral-50);
+            padding: var(--space-4);
+            border-radius: var(--radius-lg);
+            margin-top: var(--space-6);
+            border: 1px solid var(--neutral-200);
+        }
+
+        .quick-login-title {
+            font-size: var(--text-sm);
+            font-weight: var(--font-semibold);
+            color: var(--neutral-700);
+            margin-bottom: var(--space-3);
+        }
+
+        .quick-login-item {
+            display: flex;
+            justify-content: space-between;
+            padding: var(--space-2) 0;
+            font-size: var(--text-sm);
+        }
+
+        .quick-login-label {
+            color: var(--neutral-600);
+        }
+
+        .quick-login-value {
+            font-family: var(--font-family-mono);
+            color: var(--neutral-900);
+            background: var(--neutral-100);
+            padding: var(--space-1) var(--space-2);
+            border-radius: var(--radius-sm);
+        }
+
+        .footer {
+            text-align: center;
+            padding: var(--space-6);
+            color: rgba(255, 255, 255, 0.9);
+            font-size: var(--text-sm);
+        }
+
+        .footer a {
+            color: var(--neutral-white);
+            text-decoration: underline;
+        }
+
+        @media (max-width: 1024px) {
+            .login-wrapper {
+                grid-template-columns: 1fr;
+            }
+
+            .login-brand {
+                padding: var(--space-10) var(--space-6);
+            }
+
+            .brand-features {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: var(--space-4);
+            }
+
+            .brand-features li {
+                margin-bottom: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .login-form-container {
+                padding: var(--space-8) var(--space-6);
+            }
+
+            .brand-features {
+                grid-template-columns: 1fr;
+            }
+
+            .login-brand {
+                display: none;
+            }
+        }
+
+        .password-toggle {
+            position: relative;
+        }
+
+        .password-toggle-btn {
+            position: absolute;
+            right: var(--space-3);
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--neutral-600);
+            cursor: pointer;
+            padding: var(--space-2);
+            font-size: var(--text-lg);
+        }
+
+        .password-toggle-btn:hover {
+            color: var(--neutral-900);
+        }
+    </style>
+</head>
+<body>
+    <div class="login-wrapper">
+        <!-- Brand Section -->
+        <div class="login-brand">
+            <div class="brand-logo">🚀</div>
+            <h1 class="brand-title">Cogniware Core</h1>
+            <p class="brand-subtitle">Enterprise AI Platform</p>
+            
+            <ul class="brand-features">
+                <li>Advanced AI Capabilities</li>
+                <li>Multi-Tenant Architecture</li>
+                <li>Enterprise-Grade Security</li>
+                <li>Real-Time Analytics</li>
+                <li>Scalable Infrastructure</li>
+                <li>24/7 Support Available</li>
+            </ul>
+        </div>
+
+        <!-- Login Form Section -->
+        <div class="login-form-container">
+            <div class="login-header">
+                <h1>Welcome Back</h1>
+                <p>Sign in to access your Cogniware dashboard</p>
+            </div>
+
+            <div class="alert alert-error" id="loginAlert" style="display: none;">
+                <div class="alert-icon">⚠️</div>
+                <div class="alert-content">
+                    <div class="alert-title">Login Failed</div>
+                    <div id="loginAlertMessage"></div>
+                </div>
+            </div>
+
+            <form id="loginForm">
+                <div class="form-group">
+                    <label class="form-label required">Username</label>
+                    <input 
+                        type="text" 
+                        id="username" 
+                        class="form-input" 
+                        placeholder="Enter your username" 
+                        required
+                        autocomplete="username"
+                        autofocus
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label required">Password</label>
+                    <div class="password-toggle">
+                        <input 
+                            type="password" 
+                            id="password" 
+                            class="form-input" 
+                            placeholder="Enter your password" 
+                            required
+                            autocomplete="current-password"
+                        >
+                        <button type="button" class="password-toggle-btn" id="passwordToggle">
+                            👁️
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: var(--space-6);">
+                    <label class="form-inline">
+                        <input type="checkbox" class="form-checkbox" id="rememberMe">
+                        <span style="font-size: var(--text-sm); color: var(--neutral-700);">Remember me</span>
+                    </label>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-full btn-lg" id="loginButton">
+                    <span>Sign In</span>
+                </button>
+            </form>
+
+            <div class="divider">
+                <span>Quick Access Credentials</span>
+            </div>
+
+            <div class="quick-login">
+                <div class="quick-login-title">🔐 Default Administrator</div>
+                <div class="quick-login-item">
+                    <span class="quick-login-label">Username:</span>
+                    <code class="quick-login-value">superadmin</code>
+                </div>
+                <div class="quick-login-item">
+                    <span class="quick-login-label">Password:</span>
+                    <code class="quick-login-value">Cogniware@2025</code>
+                </div>
+                <div style="margin-top: var(--space-3); padding: var(--space-2); background: var(--warning-50); border-radius: var(--radius-sm); font-size: var(--text-xs); color: var(--warning-700);">
+                    ⚠️ Change default password immediately after first login
+                </div>
+            </div>
+
+            <div style="margin-top: var(--space-6); text-align: center;">
+                <a href="#" class="btn-link" style="font-size: var(--text-sm);">Forgot Password?</a>
+                <span style="color: var(--neutral-400); margin: 0 var(--space-2);">•</span>
+                <a href="#" class="btn-link" style="font-size: var(--text-sm);">Contact Support</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        © 2025 Cogniware Incorporated. All Rights Reserved. 
+        <a href="#">Privacy Policy</a> • 
+        <a href="#">Terms of Service</a>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8099';
+        let isLoading = false;
+
+        // Password toggle functionality
+        document.getElementById('passwordToggle').addEventListener('click', function() {
+            const passwordInput = document.getElementById('password');
+            const type = passwordInput.type === 'password' ? 'text' : 'password';
+            passwordInput.type = type;
+            this.textContent = type === 'password' ? '👁️' : '🙈';
+        });
+
+        // Form submission
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (isLoading) return;
+
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const rememberMe = document.getElementById('rememberMe').checked;
+
+            if (!username || !password) {
+                showError('Please enter both username and password');
+                return;
+            }
+
+            isLoading = true;
+            const loginButton = document.getElementById('loginButton');
+            const originalText = loginButton.innerHTML;
+            loginButton.innerHTML = '<div class="spinner spinner-sm" style="border-top-color: white;"></div> <span>Signing In...</span>';
+            loginButton.disabled = true;
+
+            try {
+                const response = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await response.json();
+
+                if (data.success && data.token) {
+                    // Store authentication data
+                    const storage = rememberMe ? localStorage : sessionStorage;
+                    storage.setItem('cogniware_token', data.token);
+                    storage.setItem('cogniware_user', JSON.stringify(data.user));
+                    storage.setItem('cogniware_login_time', new Date().toISOString());
+
+                    // Show success message
+                    hideError();
+                    loginButton.innerHTML = '✓ Success! Redirecting...';
+                    loginButton.classList.remove('btn-primary');
+                    loginButton.classList.add('btn-success');
+
+                    // Redirect based on role
+                    setTimeout(() => {
+                        redirectToPortal(data.user.role);
+                    }, 800);
+                } else {
+                    showError(data.message || 'Invalid username or password. Please try again.');
+                    resetButton(loginButton, originalText);
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                showError('Unable to connect to server. Please ensure all services are running.');
+                resetButton(loginButton, originalText);
+            } finally {
+                isLoading = false;
+            }
+        });
+
+        function redirectToPortal(role) {
+            // Always redirect to main landing page after login
+            // Users can choose their module from there
+            window.location.href = 'index.html';
+        }
+
+        function showError(message) {
+            const alert = document.getElementById('loginAlert');
+            const messageEl = document.getElementById('loginAlertMessage');
+            messageEl.textContent = message;
+            alert.style.display = 'flex';
+            alert.classList.add('animate-fade-in');
+        }
+
+        function hideError() {
+            const alert = document.getElementById('loginAlert');
+            alert.style.display = 'none';
+        }
+
+        function resetButton(button, originalText) {
+            button.innerHTML = originalText;
+            button.disabled = false;
+        }
+
+        // Check if already logged in
+        window.addEventListener('load', function() {
+            const token = localStorage.getItem('cogniware_token') || sessionStorage.getItem('cogniware_token');
+            const userStr = localStorage.getItem('cogniware_user') || sessionStorage.getItem('cogniware_user');
+            
+            if (token && userStr) {
+                try {
+                    const user = JSON.parse(userStr);
+                    // Verify token is still valid
+                    fetch(`${API_BASE}/auth/verify`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    }).then(response => response.json())
+                      .then(data => {
+                          if (data.valid) {
+                              redirectToPortal(user.role);
+                          }
+                      }).catch(() => {
+                          // Token invalid, stay on login page
+                      });
+                } catch (e) {
+                    // Invalid stored data, stay on login page
+                }
+            }
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Alt+S for super admin quick login (development only)
+            if (e.altKey && e.key === 's') {
+                document.getElementById('username').value = 'superadmin';
+                document.getElementById('password').value = 'Cogniware@2025';
+                e.preventDefault();
+            }
+        });
+    </script>
+</body>
+</html>
+
