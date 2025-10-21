@@ -70,6 +70,9 @@ function validate_frontend() {
 
     sed -i "s/localhost/$ip_address/g" playwright.config.ts
 
+    # Update the .env file with the correct backend address
+    sed -i "s/backend_address/$ip_address/g" .env
+
     conda install -c conda-forge nodejs=22.6.0 -y
     npm install && npm ci && npx playwright install --with-deps
     node -v && npm -v && pip list
@@ -129,13 +132,6 @@ function validate_frontend() {
         echo "[TEST INFO]: ---------frontend test failed---------"
         echo "Test logs:"
         cat ${LOG_PATH}/frontend_test.log
-        exit $exit_status
-    else
-        echo "[TEST INFO]: ---------frontend test passed---------"
-    fi
-
-    if [ $exit_status -ne 0 ]; then
-        echo "[TEST INFO]: ---------frontend test failed---------"
         exit $exit_status
     else
         echo "[TEST INFO]: ---------frontend test passed---------"
