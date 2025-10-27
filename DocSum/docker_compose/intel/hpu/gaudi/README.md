@@ -15,13 +15,23 @@ This example includes the following sections:
 
 This section describes how to quickly deploy and test the DocSum service manually on an Intel® Gaudi® platform. The basic steps are:
 
-1. [Access the Code](#access-the-code)
-2. [Generate a HuggingFace Access Token](#generate-a-huggingface-access-token)
-3. [Configure the Deployment Environment](#configure-the-deployment-environment)
-4. [Deploy the Services Using Docker Compose](#deploy-the-services-using-docker-compose)
-5. [Check the Deployment Status](#check-the-deployment-status)
-6. [Test the Pipeline](#test-the-pipeline)
-7. [Cleanup the Deployment](#cleanup-the-deployment)
+- [Example DocSum deployments on Intel® Gaudi® Platform](#example-docsum-deployments-on-intel-gaudi-platform)
+  - [DocSum Quick Start Deployment](#docsum-quick-start-deployment)
+    - [Access the Code and Set Up Environment](#access-the-code-and-set-up-environment)
+    - [Generate a HuggingFace Access Token](#generate-a-huggingface-access-token)
+    - [Deploy the Services Using Docker Compose](#deploy-the-services-using-docker-compose)
+    - [Check the Deployment Status](#check-the-deployment-status)
+    - [Test the Pipeline](#test-the-pipeline)
+    - [Cleanup the Deployment](#cleanup-the-deployment)
+  - [DocSum Docker Compose Files](#docsum-docker-compose-files)
+  - [DocSum Detailed Usage](#docsum-detailed-usage)
+    - [Query with text](#query-with-text)
+    - [Query with audio and video](#query-with-audio-and-video)
+    - [Query with long context](#query-with-long-context)
+  - [Launch the UI](#launch-the-ui)
+    - [Gradio UI](#gradio-ui)
+    - [Launch the Svelte UI](#launch-the-svelte-ui)
+    - [Launch the React UI (Optional)](#launch-the-react-ui-optional)
 
 ### Access the Code and Set Up Environment
 
@@ -30,7 +40,7 @@ Clone the GenAIExample repository and access the DocSum Intel® Gaudi® platform
 ```bash
 git clone https://github.com/opea-project/GenAIExamples.git
 cd GenAIExamples/DocSum/docker_compose
-source intel/set_env.sh
+source intel/hpu/gaudi/set_env.sh
 ```
 
 > NOTE: by default vLLM does "warmup" at start, to optimize its performance for the specified model and the underlying platform, which can take long time. For development (and e.g. autoscaling) it can be skipped with `export VLLM_SKIP_WARMUP=true`.

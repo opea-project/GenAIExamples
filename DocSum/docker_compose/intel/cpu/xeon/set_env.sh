@@ -8,9 +8,6 @@ source .set_env.sh
 popd > /dev/null
 
 export host_ip=$(hostname -I | awk '{print $1}') # Example: host_ip="192.168.1.1"
-export no_proxy="${no_proxy},${host_ip}" # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
-export http_proxy=$http_proxy
-export https_proxy=$https_proxy
 export HF_TOKEN=${HF_TOKEN}
 
 export LLM_ENDPOINT_PORT=8008
@@ -41,3 +38,13 @@ export NUM_CARDS=1
 export BLOCK_SIZE=128
 export MAX_NUM_SEQS=256
 export MAX_SEQ_LEN_TO_CAPTURE=2048
+
+# Download Grafana configurations
+pushd "grafana/dashboards" > /dev/null
+source download_opea_dashboard.sh
+popd > /dev/null
+
+# Set network proxy settings
+export no_proxy="${no_proxy},${host_ip},docsum-xeon-vllm-service,docsum-xeon-tgi-server,docsum-xeon-backend-server,opea_prometheus,grafana,node-exporter,$JAEGER_IP" # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
+export http_proxy=$http_proxy
+export https_proxy=$https_proxy
