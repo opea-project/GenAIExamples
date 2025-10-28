@@ -18,8 +18,8 @@ This section describes how to quickly deploy and test the DocSum service manuall
     - [Access the Code and Set Up Environment](#access-the-code-and-set-up-environment)
     - [Generate a HuggingFace Access Token](#generate-a-huggingface-access-token)
     - [Deploy the Services Using Docker Compose](#deploy-the-services-using-docker-compose)
-      - [Option #1:](#option-1)
-      - [Option #2:](#option-2)
+      - [Option #1](#option-1)
+      - [Option #2](#option-2)
     - [Check the Deployment Status](#check-the-deployment-status)
     - [Test the Pipeline](#test-the-pipeline)
     - [Cleanup the Deployment](#cleanup-the-deployment)
@@ -60,7 +60,7 @@ Some HuggingFace resources, such as some models, are only accessible if you have
 
 ### Deploy the Services Using Docker Compose
 
-#### Option #1: 
+#### Option #1
 
 To deploy the DocSum services, execute the `docker compose up` command with the appropriate arguments. For a default deployment, execute:
 
@@ -69,14 +69,14 @@ cd intel/cpu/xeon/
 docker compose up -d
 ```
 
-#### Option #2:
-> NOTE : To enable mornitoring, `compose.telemetry.yaml` file need to be merged along with default `compose.yaml` file.  
+#### Option #2
+> NOTE : To enable mornitoring, `compose.monitoring.yaml` file need to be merged along with default `compose.yaml` file.  
 
 To deploy with mornitoring:
 
 ```bash
 cd intel/cpu/xeon/
-docker compose -f compose.yaml -f compose.telemetry.yaml up -d
+docker compose -f compose.yaml -f compose.monitoring.yaml up -d
 ``` 
 
 **Note**: developers should build docker image from source when:
@@ -138,7 +138,7 @@ If mornitoring is enabled, execute the following command:
 
 ```bash
 cd intel/cpu/xeon/
-docker compose -f compose.yaml -f compose.telemetry.yaml down
+docker compose -f compose.yaml -f compose.monitoring.yaml down
 ``` 
 
 
@@ -153,8 +153,7 @@ In the context of deploying a DocSum pipeline on an Intel® Xeon® platform, we 
 | [compose.yaml](./compose.yaml)                               | Default compose file using vllm as serving framework                                                   |
 | [compose_tgi.yaml](./compose_tgi.yaml)                       | The LLM serving framework is TGI. All other configurations remain the same as default                  |
 | [compose_remote.yaml](./compose_remote.yaml)                 | Uses remote inference endpoints for LLMs. All other configurations are same as default                 |
-| [compose.telemetry.yaml](./compose.telemetry.yaml)           | Helper file for telemetry features for vllm. Can be used along with any compose files that serves vllm |
-| [compose_tgi.telemetry.yaml](./compose_tgi.telemetry.yaml)   | Helper file for telemetry features for tgi. Can be used along with any compose files that serves tgi   |
+| [compose.monitoring.yaml](./compose.monitoring.yaml)         | Helper file for monitoring features. Can be used along with any compose files                          |
 
 ### Running LLM models with remote endpoints
 
