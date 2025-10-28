@@ -37,12 +37,24 @@
 	import bash from "svelte-highlight/languages/bash";
 	import sql from "svelte-highlight/languages/sql";
 	import { marked } from "marked";
-	export let label = "";
-	export let output = "";
-	export let languages = "Python";
-	export let isCode = false;
+	import { afterUpdate, onMount } from "svelte";
 
+	export let output = "";
+	export let lang = "Python";
+	export let isCode = false;
+	export let md_output = "";
+	export let segments: Segment[] = [];
+
+	let outputEl: HTMLDivElement;
 	let copyText = "copy";
+	let shouldAutoscroll = true;
+
+	type Segment = {
+		id: number;
+		type: "text" | "code";
+		content: string;
+		lang?: string;
+	};
 
 	const languagesTag = {
 		Typescript: typescript,
@@ -65,53 +77,194 @@
 		Lua: lua,
 		Bash: bash,
 		Sql: sql,
-	} as { [key: string]: any };
+	} as const;
 
-	function copyToClipboard(text) {
-		const textArea = document.createElement("textarea");
-		textArea.value = text;
-		document.body.appendChild(textArea);
-		textArea.select();
-		document.execCommand("copy");
-		document.body.removeChild(textArea);
+	type LangKey = keyof typeof languagesTag;
+
+	const aliasMap: Record<string, LangKey> = {
+		javascript: "Javascript",
+		js: "Javascript",
+		jsx: "Javascript",
+		typescript: "Typescript",
+		ts: "Typescript",
+		tsx: "Typescript",
+
+		python: "Python",
+		py: "Python",
+
+		c: "C",
+		"c++": "Cpp",
+		cpp: "Cpp",
+		cxx: "Cpp",
+		csharp: "Csharp",
+		"c#": "Csharp",
+
+		go: "Go",
+		golang: "Go",
+		java: "Java",
+		swift: "Swift",
+		ruby: "Ruby",
+		rust: "Rust",
+		php: "Php",
+		kotlin: "Kotlin",
+		objectivec: "Objectivec",
+		objc: "Objectivec",
+		"objective-c": "Objectivec",
+		perl: "Perl",
+		matlab: "Matlab",
+		r: "R",
+		lua: "Lua",
+
+		bash: "Bash",
+		sh: "Bash",
+		shell: "Bash",
+		zsh: "Bash",
+
+		sql: "Sql",
+	};
+
+	$: normalizedLangKey = (() => {
+		const raw = (lang ?? "").toString().trim();
+		if (!raw) return null;
+		const lower = raw.toLowerCase();
+
+		if (lower in aliasMap) return aliasMap[lower];
+
+		const hit = (Object.keys(languagesTag) as LangKey[]).find(
+			(k) => k.toLowerCase() === lower
+		);
+		return hit ?? null;
+	})();
+
+	$: fullText = buildFullText();
+
+	function atBottom(el: HTMLElement, threshold = 8) {
+		return el.scrollHeight - el.scrollTop - el.clientHeight <= threshold;
 	}
 
-	function handelCopy() {
-		copyToClipboard(output);
+	function handleScroll() {
+		if (!outputEl) return;
+		shouldAutoscroll = atBottom(outputEl);
+	}
+
+	function scrollToBottom() {
+		if (!outputEl) return;
+		requestAnimationFrame(() =>
+			requestAnimationFrame(() => {
+				if (outputEl.scrollHeight) {
+					outputEl.scrollTop = outputEl.scrollHeight;
+				}
+			})
+		);
+	}
+
+	onMount(() => {
+		scrollToBottom();
+	});
+
+	afterUpdate(() => {
+		if (shouldAutoscroll) scrollToBottom();
+	});
+	async function copyAllFromDiv() {
+		await navigator.clipboard.writeText(outputEl.innerText);
 		copyText = "copied!";
-		setTimeout(() => {
-			copyText = "copy";
-		}, 1000);
+		setTimeout(() => (copyText = "copy"), 1000);
+	}
+
+	function copyToClipboard(text: string) {
+		if (navigator?.clipboard?.writeText) {
+			navigator.clipboard.writeText(text);
+		} else {
+			const textArea = document.createElement("textarea");
+			textArea.value = text;
+			document.body.appendChild(textArea);
+			textArea.select();
+			document.execCommand("copy");
+			document.body.removeChild(textArea);
+		}
+	}
+
+	function normalizeToKey(raw?: string | null) {
+		const s = (raw ?? "").trim().toLowerCase();
+		if (!s) return null;
+		if (s in aliasMap) return aliasMap[s as keyof typeof aliasMap];
+		const hit = (
+			Object.keys(languagesTag) as (keyof typeof languagesTag)[]
+		).find((k) => k.toLowerCase() === s);
+		return hit ?? null;
+	}
+
+	function buildFullText(): string {
+		if (segments && segments.length > 0) {
+			return segments
+				.map((seg) => {
+					if (seg.type === "code") {
+						const key = normalizeToKey(seg.lang) ?? "text";
+						return ["```" + key.toLowerCase(), seg.content, "```"].join("\n");
+					}
+					return seg.content;
+				})
+				.join("\n\n");
+		}
+
+		const parts: string[] = [];
+		if (isCode && output) {
+			const key = (normalizedLangKey ?? "text").toLowerCase();
+			parts.push(["```" + key, output, "```"].join("\n"));
+		}
+		if (md_output) {
+			parts.push(md_output);
+		}
+		return parts.join("\n\n");
 	}
 </script>
 
 <div class="flex w-full flex-col" data-testid="code-output">
-	<span
-		class=" mb-2 flex h-[3rem] w-full items-center justify-center bg-[#5856D6] px-8 py-2 text-center text-[0.89rem] uppercase leading-tight opacity-80"
-		>{label}</span
-	>
-
 	<div
 		class="flex justify-end border-2 border-none border-b-gray-800 bg-[#1C1C1C] px-3 text-white"
 	>
 		<button
 			class="rounded border border-none py-1 text-[0.8rem] text-[#abb2bf]"
-			on:click={() => {
-				handelCopy();
-			}}>{copyText}</button
+			on:click={copyAllFromDiv}>{copyText}</button
 		>
 	</div>
+
 	<div
-		class="code-format-style hiddenScroll h-[22rem] divide-y overflow-auto bg-[#011627]"
+		class="
+    hiddenScroll h-[22rem] overflow-auto
+    bg-[#011627] p-5 text-[13px]
+    leading-5
+  "
+		bind:this={outputEl}
+		on:scroll={handleScroll}
 	>
-		{#if isCode}
-			<Highlight language={python} code={output} let:highlighted>
-				<LineNumbers {highlighted} wrapLines hideBorder />
-			</Highlight>
+		{#if segments && segments.length > 0}
+			{#each segments as seg (seg.id)}
+				{#if seg.type === "code"}
+					<div class="relative border-t border-[#0c2233]">
+						<Highlight
+							language={languagesTag[normalizeToKey(seg.lang) ?? "Python"]}
+							code={seg.content}
+							let:highlighted
+						>
+							<LineNumbers {highlighted} wrapLines hideBorder />
+						</Highlight>
+					</div>
+				{:else}
+					<div>{@html marked(seg.content)}</div>
+				{/if}
+			{/each}
 		{:else}
-			<div class="bg-[#282c34] text-[#abb2bf]">
-				{@html marked(output)}
-			</div>
+			{#if isCode && output}
+				<Highlight language={python} code={output} let:highlighted>
+					<LineNumbers {highlighted} wrapLines hideBorder />
+				</Highlight>
+			{/if}
+			{#if md_output}
+				<div class="bg-[#282c34] py-2 text-[#abb2bf]">
+					{@html marked(md_output)}
+				</div>
+			{/if}
 		{/if}
 	</div>
 </div>
@@ -120,17 +273,8 @@
 	.hiddenScroll::-webkit-scrollbar {
 		display: none;
 	}
-
 	.hiddenScroll {
 		-ms-overflow-style: none; /* IE and Edge */
 		scrollbar-width: none; /* Firefox */
-	}
-
-	.code-format-style {
-		resize: none;
-		font-size: 16px;
-		border: solid rgba(128, 0, 128, 0) 4px;
-		box-shadow: 0 0 8px rgba(0, 0, 0, 0.19);
-		transition: 0.1s linear;
 	}
 </style>

@@ -10,14 +10,18 @@ This document details the deployment process for the OPEA Productivity Suite usi
 
 This section describes how to quickly deploy and test the Productivity Suite service manually on AMD EPYC™ platform. The basic steps are:
 
-1. [Access the Code](#access-the-code)
-2. [Generate a HuggingFace Access Token](#generate-a-huggingface-access-token)
-3. [Configure the Deployment Environment](#configure-the-deployment-environment)
-4. [Deploy the Service Using Docker Compose](#deploy-the-service-using-docker-compose)
-5. [Check the Deployment Status](#check-the-deployment-status)
-6. [Setup Keycloak](#setup-keycloak)
-7. [Test the Pipeline](#test-the-pipeline)
-8. [Cleanup the Deployment](#cleanup-the-deployment)
+- [Build Mega Service of Productivity Suite on AMD EPYC™ Processors](#build-mega-service-of-productivity-suite-on-amd-epyc-processors)
+  - [Productivity Suite Quick Start Deployment](#productivity-suite-quick-start-deployment)
+    - [Access the Code](#access-the-code)
+    - [Generate a HuggingFace Access Token](#generate-a-huggingface-access-token)
+    - [Configure the Deployment Environment](#configure-the-deployment-environment)
+    - [Deploy the Service Using Docker Compose](#deploy-the-service-using-docker-compose)
+    - [Check the Deployment Status](#check-the-deployment-status)
+    - [Setup Keycloak](#setup-keycloak)
+    - [Test the Pipeline](#test-the-pipeline)
+    - [Cleanup the Deployment](#cleanup-the-deployment)
+  - [Productivity Suite Docker Compose Files](#productivity-suite-docker-compose-files)
+  - [Productivity Suite Service Configuration](#productivity-suite-service-configuration)
 
 ### Access the Code
 
@@ -126,8 +130,8 @@ ea7444faa8b2   ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu    
 9fb471c452ec   quay.io/keycloak/keycloak:25.0.2                                                            "/opt/keycloak/bin/k…"   8 minutes ago   Up 8 minutes             8443/tcp, 0.0.0.0:8080->8080/tcp, :::8080->8080/tcp, 9000/tcp                          keycloak-server
 a00ac544abb7   ghcr.io/huggingface/text-embeddings-inference:cpu-1.6                                       "/bin/sh -c 'apt-get…"   8 minutes ago   Up 8 minutes (healthy)   0.0.0.0:6006->80/tcp, :::6006->80/tcp                                                  tei-embedding-server
 87c2996111d5   redis/redis-stack:7.2.0-v9                                                                  "/entrypoint.sh"         8 minutes ago   Up 8 minutes             0.0.0.0:6379->6379/tcp, :::6379->6379/tcp, 0.0.0.0:8001->8001/tcp, :::8001->8001/tcp   redis-vector-db
-536b71e4ec67   opea/chathistory-mongo:latest                                                               "python opea_chathis…"   8 minutes ago   Up 8 minutes             0.0.0.0:6012->6012/tcp, :::6012->6012/tcp                                              chathistory-mongo-server
-8d56c2b03431   opea/promptregistry-mongo:latest                                                            "python opea_prompt_…"   8 minutes ago   Up 8 minutes             0.0.0.0:6018->6018/tcp, :::6018->6018/tcp                                              promptregistry-mongo-server
+536b71e4ec67   opea/chathistory:latest                                                                     "python opea_chathis…"   8 minutes ago   Up 8 minutes             0.0.0.0:6012->6012/tcp, :::6012->6012/tcp                                              chathistory-mongo-server
+8d56c2b03431   opea/promptregistry:latest                                                                  "python opea_prompt_…"   8 minutes ago   Up 8 minutes             0.0.0.0:6018->6018/tcp, :::6018->6018/tcp                                              promptregistry-mongo-server
 c48921438848   ghcr.io/huggingface/text-embeddings-inference:cpu-1.6                                       "/bin/sh -c 'apt-get…"   8 minutes ago   Up 8 minutes (healthy)   0.0.0.0:8808->80/tcp, :::8808->80/tcp                                                  tei-reranking-server
 ```
 
@@ -203,7 +207,7 @@ The compose.yaml is default compose file using tgi as serving framework
 
 | Service Name                            | Image Name                                                    |
 | --------------------------------------- | ------------------------------------------------------------- |
-| chathistory-mongo-server                | opea/chathistory-mongo:latest                                 |
+| chathistory-mongo-server                | opea/chathistory:latest                                       |
 | chatqna-epyc-backend-server             | opea/chatqna:latest                                           |
 | codegen-epyc-backend-server             | opea/codegen:latest                                           |
 | dataprep-redis-server                   | opea/dataprep:latest                                          |
@@ -213,7 +217,7 @@ The compose.yaml is default compose file using tgi as serving framework
 | llm-textgen-server-codegen              | opea/llm-textgen:latest                                       |
 | mongodb                                 | mongo:7.0.11                                                  |
 | productivity-suite-epyc-react-ui-server | opea/productivity-suite-react-ui-server:latest                |
-| promptregistry-mongo-server             | opea/promptregistry-mongo:latest                              |
+| promptregistry-mongo-server             | opea/promptregistry:latest                                    |
 | redis-vector-db                         | redis/redis-stack:7.2.0-v9                                    |
 | retriever-redis-server                  | opea/retriever:latest                                         |
 | tei-embedding-server                    | ghcr.io/huggingface/text-embeddings-inference:cpu-1.6         |
@@ -228,7 +232,7 @@ The table provides a comprehensive overview of the Productivity Suite service ut
 
 | Service Name                            | Possible Image Names                                          | Optional | Description                                                                                                      |
 | --------------------------------------- | ------------------------------------------------------------- | -------- | ---------------------------------------------------------------------------------------------------------------- |
-| chathistory-mongo-server                | opea/chathistory-mongo:latest                                 | No       | Handles chat history storage and retrieval using MongoDB.                                                        |
+| chathistory-mongo-server                | opea/chathistory:latest                                       | No       | Handles chat history storage and retrieval using MongoDB.                                                        |
 | chatqna-epyc-backend-server             | opea/chatqna:latest                                           | No       | Handles question answering and chat interactions.                                                                |
 | codegen-epyc-backend-server             | opea/codegen:latest                                           | No       | Handles code generation tasks.                                                                                   |
 | dataprep-redis-server                   | opea/dataprep:latest                                          | No       | Handles data preparation and preprocessing tasks for downstream services.                                        |
@@ -238,7 +242,7 @@ The table provides a comprehensive overview of the Productivity Suite service ut
 | llm-textgen-server-codegen              | opea/llm-textgen:latest                                       | No       | Handles large language model (LLM) text generation tasks, providing inference APIs for code and text completion. |
 | mongodb                                 | mongo:7.0.11                                                  | No       | Provides persistent storage for application data using MongoDB.                                                  |
 | productivity-suite-epyc-react-ui-server | opea/productivity-suite-react-ui-server:latest                | No       | Hosts the web-based user interface for interacting with the Productivity Suite services.                         |
-| promptregistry-mongo-server             | opea/promptregistry-mongo:latest                              | No       | Manages storage and retrieval of prompt templates and related metadata.                                          |
+| promptregistry-mongo-server             | opea/promptregistry:latest                                    | No       | Manages storage and retrieval of prompt templates and related metadata.                                          |
 | redis-vector-db                         | redis/redis-stack:7.2.0-v9                                    | No       | Offers in-memory data storage and vector database capabilities for fast retrieval and caching.                   |
 | retriever-redis-server                  | opea/retriever:latest                                         | No       | Handles retrieval-augmented generation tasks, enabling efficient document and context retrieval.                 |
 | tei-embedding-server                    | ghcr.io/huggingface/text-embeddings-inference:cpu-1.6         | No       | Provides text embedding and sequence classification services for downstream NLP tasks.                           |

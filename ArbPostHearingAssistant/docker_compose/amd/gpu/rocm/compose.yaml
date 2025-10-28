@@ -1,0 +1,96 @@
+# Copyright (C) 2025 Zensar Technologies Private Ltd.
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  arbPostHearingAssistant-tgi-service:
+    image: ghcr.io/huggingface/text-generation-inference:2.4.1-rocm
+    container_name: arb-post-hearing-assistant-tgi-service
+    ports:
+      - "${ARB_POSTHEARING_ASSISTANT_TGI_SERVICE_PORT:-8008}:80"
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      TGI_LLM_ENDPOINT: "http://${HOST_IP}:${ARB_POSTHEARING_ASSISTANT_TGI_SERVICE_PORT}"
+      HF_TOKEN: ${ARB_POSTHEARING_ASSISTANT_HUGGINGFACEHUB_API_TOKEN}
+      host_ip: ${host_ip}
+      ARB_POSTHEARING_ASSISTANT_TGI_SERVICE_PORT: ${ARB_POSTHEARING_ASSISTANT_TGI_SERVICE_PORT}
+    volumes:
+      - "${MODEL_CACHE:-./data}:/data"
+    shm_size: 20g
+    devices:
+      - /dev/kfd:/dev/kfd
+      - /dev/dri/:/dev/dri/
+    cap_add:
+      - SYS_PTRACE
+    group_add:
+      - video
+    security_opt:
+      - seccomp:unconfined
+    ipc: host
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://${host_ip}:${ARB_POSTHEARING_ASSISTANT_TGI_SERVICE_PORT}/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 100
+    command: --model-id ${ARB_POSTHEARING_ASSISTANT_LLM_MODEL_ID} --max-input-length ${ARB_POSTHEARING_ASSISTANT_MAX_INPUT_TOKENS} --max-total-tokens ${ARB_POSTHEARING_ASSISTANT_MAX_TOTAL_TOKENS}
+
+  arbPostHearingAssistant-llm-server:
+    image: ${REGISTRY:-opea}/llm-arb-post-hearing-assistant:${TAG:-latest}
+    container_name: arb-post-hearing-assistant-llm-server
+    depends_on:
+      arbPostHearingAssistant-tgi-service:
+        condition: service_healthy
+    ports:
+      - "${ARB_POSTHEARING_ASSISTANT_LLM_SERVER_PORT}:9000"
+    ipc: host
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      LLM_ENDPOINT: ${ARB_POSTHEARING_ASSISTANT_TGI_LLM_ENDPOINT}
+      HF_TOKEN: ${ARB_POSTHEARING_ASSISTANT_HUGGINGFACEHUB_API_TOKEN}
+      MAX_INPUT_TOKENS: ${ARB_POSTHEARING_ASSISTANT_MAX_INPUT_TOKENS}
+      MAX_TOTAL_TOKENS: ${ARB_POSTHEARING_ASSISTANT_MAX_TOTAL_TOKENS}
+      LLM_MODEL_ID: ${ARB_POSTHEARING_ASSISTANT_LLM_MODEL_ID}
+      OPEA_ARB_POSTHEARING_ASSISTANT_COMPONENT_NAME: "OpeaArbPostHearingAssistantTgi"
+      LOGFLAG: ${LOGFLAG:-False}
+    restart: unless-stopped
+
+  arbPostHearingAssistant-backend-server:
+    image: ${REGISTRY:-opea}/arb-post-hearing-assistant:${TAG:-latest}
+    container_name: arb-post-hearing-assistant-backend-server
+    depends_on:
+      - arbPostHearingAssistant-tgi-service
+      - arbPostHearingAssistant-llm-server
+    ports:
+      - "${ARB_POSTHEARING_ASSISTANT_BACKEND_SERVER_PORT}:8888"
+    environment:
+      no_proxy: ${no_proxy}
+      https_proxy: ${https_proxy}
+      http_proxy: ${http_proxy}
+      MEGA_SERVICE_HOST_IP: ${HOST_IP}
+      LLM_SERVICE_HOST_IP: ${HOST_IP}
+      LLM_SERVICE_PORT: ${ARB_POSTHEARING_ASSISTANT_LLM_SERVER_PORT}
+    ipc: host
+    restart: always
+
+  arbPostHearingAssistant-gradio-ui:
+    image: ${REGISTRY:-opea}/arb-post-hearing-assistant-gradio-ui:${TAG:-latest}
+    container_name: arb-post-hearing-assistant-ui-server
+    depends_on:
+      - arbPostHearingAssistant-backend-server
+    ports:
+      - "5173:5173"
+    environment:
+      no_proxy: ${no_proxy}
+      https_proxy: ${https_proxy}
+      http_proxy: ${http_proxy}
+      BACKEND_SERVICE_ENDPOINT: ${BACKEND_SERVICE_ENDPOINT}
+      DOC_BASE_URL: ${BACKEND_SERVICE_ENDPOINT}
+    ipc: host
+    restart: always
+
+networks:
+  default:
+    driver: bridge

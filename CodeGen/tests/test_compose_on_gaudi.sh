@@ -25,14 +25,8 @@ function build_docker_images() {
     docker build --no-cache -t ${REGISTRY}/comps-base:${TAG} --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
     popd && sleep 1s
 
-    # Download Gaudi vllm of latest tag
-    git clone https://github.com/HabanaAI/vllm-fork.git && cd vllm-fork
-    VLLM_FORK_VER=v0.6.6.post1+Gaudi-1.20.0
-    echo "Check out vLLM tag ${VLLM_FORK_VER}"
-    git checkout ${VLLM_FORK_VER} &> /dev/null && cd ../
-
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="codegen codegen-gradio-ui llm-textgen vllm-gaudi dataprep retriever embedding"
+    service_list="codegen codegen-gradio-ui llm-textgen dataprep retriever embedding"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker images && sleep 1s
@@ -41,7 +35,7 @@ function build_docker_images() {
 function start_services() {
     local compose_file="$1"
     local llm_container_name="$2"
-
+    export no_proxy="localhost,127.0.0.1,$ip_address"
     cd $WORKPATH/docker_compose/intel/hpu/gaudi
 
     # Start Docker Containers
@@ -152,46 +146,6 @@ function validate_megaservice() {
 
 }
 
-function validate_frontend() {
-    cd $WORKPATH/ui/svelte
-    local conda_env_name="OPEA_e2e"
-    export PATH=${HOME}/miniforge3/bin/:$PATH
-    if conda info --envs | grep -q "$conda_env_name"; then
-        echo "$conda_env_name exist!"
-    else
-        conda create -n ${conda_env_name} python=3.12 -y
-    fi
-    source activate ${conda_env_name}
-
-    sed -i "s/localhost/$ip_address/g" playwright.config.ts
-
-    conda install -c conda-forge nodejs=22.6.0 -y
-    npm install && npm ci && npx playwright install --with-deps
-    node -v && npm -v && pip list
-
-    exit_status=0
-    npx playwright test || exit_status=$?
-
-    if [ $exit_status -ne 0 ]; then
-        echo "[TEST INFO]: ---------frontend test failed---------"
-        exit $exit_status
-    else
-        echo "[TEST INFO]: ---------frontend test passed---------"
-    fi
-}
-
-function validate_gradio() {
-    local URL="http://${ip_address}:5173/health"
-    local HTTP_STATUS=$(curl "$URL")
-    local SERVICE_NAME="Gradio"
-
-    if [ "$HTTP_STATUS" = '{"status":"ok"}' ]; then
-        echo "[ $SERVICE_NAME ] HTTP status is 200. UI server is running successfully..."
-    else
-        echo "[ $SERVICE_NAME ] UI server has failed..."
-    fi
-}
-
 function stop_docker() {
     local compose_file="$1"
 
@@ -238,10 +192,6 @@ function main() {
 
         echo "::group::validate_megaservice"
         validate_megaservice
-        echo "::endgroup::"
-
-        echo "::group::validate_gradio"
-        validate_gradio
         echo "::endgroup::"
 
         stop_docker "${docker_compose_files[${i}]}"

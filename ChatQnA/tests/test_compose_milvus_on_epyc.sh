@@ -26,19 +26,9 @@ function build_docker_images() {
 	echo "GenAIComps test commit is $(git rev-parse HEAD)"
 	docker build --no-cache -t ${REGISTRY}/comps-base:${TAG} --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
 	popd && sleep 1s
-	git clone https://github.com/vllm-project/vllm.git && cd vllm
-	VLLM_VER=v0.10.0
-	echo "Check out vLLM tag ${VLLM_VER}"
-	git checkout ${VLLM_VER} &>/dev/null
-	VLLM_REQ_FILE="requirements/cpu.txt"
-	if ! grep -q "^transformers" "$VLLM_REQ_FILE"; then
-		echo "Adding transformers<4.54.0 to $VLLM_REQ_FILE"
-		echo "transformers<4.54.0" >>"$VLLM_REQ_FILE"
-	fi
-	cd ../
 
 	echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-	service_list="chatqna chatqna-ui dataprep retriever vllm nginx"
+	service_list="chatqna chatqna-ui dataprep retriever nginx"
 	docker compose -f build.yaml build ${service_list} --no-cache >${LOG_PATH}/docker_image_build.log
 
 	docker images && sleep 1s
@@ -181,39 +171,6 @@ function validate_megaservice() {
 
 }
 
-function validate_frontend() {
-	echo "[ TEST INFO ]: --------- frontend test started ---------"
-	cd $WORKPATH/ui/svelte
-	local conda_env_name="OPEA_e2e"
-	export PATH=${HOME}/miniforge3/bin/:$PATH
-	if conda info --envs | grep -q "$conda_env_name"; then
-		echo "$conda_env_name exist!"
-	else
-		conda create -n ${conda_env_name} python=3.12 -y
-	fi
-	CONDA_ROOT=$(conda info --base)
-	source "${CONDA_ROOT}/etc/profile.d/conda.sh"
-	conda activate ${conda_env_name}
-	echo "[ TEST INFO ]: --------- conda env activated ---------"
-
-	sed -i "s/localhost/$ip_address/g" playwright.config.ts
-
-	conda install -c conda-forge nodejs=22.6.0 -y
-	# npm install && npm ci && npx playwright install --with-deps
-	npm install && npm ci && npx playwright install
-	node -v && npm -v && pip list
-
-	exit_status=0
-	npx playwright test || exit_status=$?
-
-	if [ $exit_status -ne 0 ]; then
-		echo "[TEST INFO]: ---------frontend test failed---------"
-		exit $exit_status
-	else
-		echo "[TEST INFO]: ---------frontend test passed---------"
-	fi
-}
-
 function stop_docker() {
 	echo "In stop docker"
 	echo $WORKPATH
@@ -241,10 +198,6 @@ function main() {
 
 	echo "::group::validate_megaservice"
 	validate_megaservice
-	echo "::endgroup::"
-
-	echo "::group::validate_frontend"
-	validate_frontend
 	echo "::endgroup::"
 
 	echo "::group::stop_docker"

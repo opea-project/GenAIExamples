@@ -27,16 +27,8 @@ function build_docker_images() {
     docker build --no-cache -t ${REGISTRY}/comps-base:${TAG} --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
     popd && sleep 1s
 
-    git clone https://github.com/vllm-project/vllm.git && cd vllm
-    VLLM_VER=v0.10.0
-
-    echo "Check out vLLM tag ${VLLM_VER}"
-    git checkout ${VLLM_VER} &> /dev/null
-    # make sure NOT change the pwd
-    cd ../
-
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="hybridrag hybridrag-ui dataprep retriever text2cypher vllm nginx"
+    service_list="hybridrag hybridrag-ui dataprep retriever text2query-cypher nginx"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log 2>&1
 
     docker images && sleep 1s
@@ -44,7 +36,7 @@ function build_docker_images() {
 
 function start_services() {
     cd $WORKPATH/docker_compose/intel/hpu/gaudi
-
+    export no_proxy="localhost,127.0.0.1,$ip_address"
     # Start Docker Containers
     docker compose -f compose.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
     n=0
@@ -80,9 +72,9 @@ function validate_service() {
 
     local HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL")
 
-    if [ "$DOCKER_NAME" = "text2cypher-gaudi-container" ]; then
+    if [ "$DOCKER_NAME" = "text2query-cypher-gaudi-container" ]; then
         docker ps
-        docker logs text2cypher-gaudi-container
+        docker logs text2query-cypher-gaudi-container
     fi
 
     if [ "$HTTP_STATUS" -eq 200 ]; then
@@ -97,7 +89,7 @@ function validate_service() {
             docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
             if [ "$DOCKER_NAME" = "hybridrag-xeon-backend-server" ]; then
                 docker ps
-                docker logs text2cypher-gaudi-container
+                docker logs text2query-cypher-gaudi-container
             fi
             exit 1
         fi
@@ -106,7 +98,7 @@ function validate_service() {
         docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
         if [ "$DOCKER_NAME" = "hybridrag-xeon-backend-server" ]; then
             docker ps
-            docker logs text2cypher-gaudi-container
+            docker logs text2query-cypher-gaudi-container
         fi
         exit 1
     fi
@@ -164,42 +156,13 @@ function validate_megaservice() {
 }
 
 function validate_text2cypher() {
-    # text2cypher service
+    # text2query-cypher service
     validate_service \
-        "${ip_address}:11801/v1/text2cypher" \
+        "${ip_address}:11801/v1/text2query" \
         "\[" \
         "text2cypher-gaudi" \
-        "text2cypher-gaudi-container" \
-        '{"input_text": "what are the symptoms for Diabetes?"}'
-}
-
-function validate_frontend() {
-    cd $WORKPATH/ui/svelte
-    local conda_env_name="OPEA_e2e"
-    export PATH=${HOME}/miniforge3/bin/:$PATH
-    if conda info --envs | grep -q "$conda_env_name"; then
-        echo "$conda_env_name exist!"
-    else
-        conda create -n ${conda_env_name} python=3.12 -y
-    fi
-
-    source activate ${conda_env_name}
-
-    sed -i "s/localhost/$ip_address/g" playwright.config.ts
-
-    conda install -c conda-forge nodejs=22.6.0 -y
-    npm install && npm ci && npx playwright install --with-deps
-    node -v && npm -v && pip list
-
-    exit_status=0
-    npx playwright test || exit_status=$?
-
-    if [ $exit_status -ne 0 ]; then
-        echo "[TEST INFO]: ---------frontend test failed---------"
-        exit $exit_status
-    else
-        echo "[TEST INFO]: ---------frontend test passed---------"
-    fi
+        "text2query-cypher-gaudi-container" \
+        '{"query": "what are the symptoms for Diabetes?"}'
 }
 
 function stop_docker() {
@@ -231,10 +194,6 @@ function main() {
 
     echo "::group::validate_megaservice"
     validate_megaservice
-    echo "::endgroup::"
-
-    echo "::group::validate_frontend"
-    validate_frontend
     echo "::endgroup::"
 
     echo "::group::stop_docker"

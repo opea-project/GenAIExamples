@@ -182,7 +182,7 @@ class Deployer:
 
     def _get_docker_compose_files(self):
         """Returns a list of Docker Compose file paths."""
-        return self._get_path_from_config(["docker_compose", "paths"], self.args.device)
+        return self._get_path_from_config(["docker_compose", "paths", self.args.os], self.args.device)
 
     def _get_docker_set_env_script(self):
         """Returns the path to the set_env script."""
@@ -203,7 +203,7 @@ class Deployer:
 
     def _get_helm_values_file(self):
         """Gets the original Helm values file path."""
-        paths = self._get_path_from_config(["kubernetes", "helm", "values_files"], self.args.device)
+        paths = self._get_path_from_config(["kubernetes", "helm", "values_files", self.args.os], self.args.device)
         return paths[0] if paths else None
 
     def _get_local_helm_values_file_path(self):
@@ -318,10 +318,14 @@ class Deployer:
             self.args.deploy_mode = click.prompt(
                 "Deployment Mode", type=click.Choice(["docker", "k8s"]), default="docker"
             )
-
+        self.args.os = click.prompt(
+            "Target OS",
+            type=click.Choice(self.config.get("supported_os")),
+            default=self.config.get("default_os"),
+        )
         self.args.device = click.prompt(
             "Target Device",
-            type=click.Choice(self.config.get("supported_devices")),
+            type=click.Choice(self.config.get("supported_devices").get(self.args.os)),
             default=self.config.get("default_device"),
         )
         cached_token = get_huggingface_token_from_file()
@@ -345,26 +349,44 @@ class Deployer:
 
         interactive_params = self._get_device_specific_or_common_config(["interactive_params"]) or []
 
+        docker_param_map = self._get_device_specific_or_common_config(["docker_compose", "params_to_set_env"]) or {}
+        source_env_script = self._get_docker_set_env_script()
+
         for param in interactive_params:
             if "modes" in param and self.args.deploy_mode not in param["modes"]:
                 setattr(self.args, param["name"], None)
                 continue
 
+            static_default = param.get("default")
+
+            dynamic_default = None
+            env_var_name = docker_param_map.get(param["name"])
+            if env_var_name and source_env_script:
+                dynamic_default = get_var_from_shell_script(source_env_script, env_var_name)
+                if dynamic_default:
+                    log_message(
+                        "DEBUG",
+                        f"Found default for '{param['name']}' from script '{source_env_script.name}': {dynamic_default}",
+                    )
+
+            final_default = dynamic_default if dynamic_default is not None else static_default
             prompt_text = param["prompt"]
             help_text = param.get("help")
             if help_text:
                 prompt_text = f"{prompt_text} ({help_text})"
 
-            default_value = param.get("default")
+            user_input = click.prompt(prompt_text, default=final_default, type=param.get("type", str))
+
+            value_to_set = user_input if user_input else final_default
+
             is_required = param.get("required", False)
 
-            user_input = click.prompt(prompt_text, default=default_value, type=param.get("type", str))
-
-            while is_required and (not user_input or user_input == default_value):
+            while is_required and not value_to_set:
                 log_message("WARN", f"A valid '{param['prompt']}' is required. Please provide a real value.")
                 user_input = click.prompt(prompt_text, type=param.get("type", str), default=None)
+                value_to_set = user_input if user_input else None
 
-            setattr(self.args, param["name"], user_input)
+            setattr(self.args, param["name"], value_to_set)
 
         self.args.do_check_env = click.confirm("Run environment check?", default=False, show_default=True)
 
@@ -428,15 +450,21 @@ class Deployer:
             "Which deployment mode to clear?", type=click.Choice(["docker", "k8s"]), default="docker"
         )
 
+        self.args.os = click.prompt(
+            "On which target OS was it deployed?",
+            type=click.Choice(self.config.get("supported_os")),
+            default=self.config.get("default_os"),
+        )
         if self.args.deploy_mode == "docker":
             self.args.device = click.prompt(
                 "On which target device was it deployed?",
-                type=click.Choice(self.config.get("supported_devices")),
+                type=click.Choice(self.config.get("supported_devices").get(self.args.os)),
                 default=self.config.get("default_device"),
             )
             # Set project name for clearing
             self.project_name = f"{self.example_name.lower().replace(' ', '')}-{self.args.device}"
         else:
+
             self.args.device = self.config.get("default_device")
 
         if self.args.deploy_mode == "k8s":
@@ -678,9 +706,14 @@ class Deployer:
         self.args.deploy_mode = click.prompt(
             "How is the service deployed?", type=click.Choice(["docker", "k8s"]), default="docker"
         )
+        self.args.os = click.prompt(
+            "On which target OS is it deployed?",
+            type=click.Choice(self.config.get("supported_os")),
+            default=self.config.get("default_os"),
+        )
         self.args.device = click.prompt(
             "On which target device is it running?",
-            type=click.Choice(self.config.get("supported_devices")),
+            type=click.Choice(self.config.get("supported_devices").get(self.args.os)),
             default=self.config.get("default_device"),
         )
         if self.args.deploy_mode == "docker":
@@ -739,7 +772,16 @@ class Deployer:
             log_message("WARN", f"Image update script '{script_path}' not found. Skipping this step.")
             return True
 
-        cmd = ["bash", str(script_path), "--example", self.example_name, "--device", self.args.device]
+        cmd = [
+            "bash",
+            str(script_path),
+            "--example",
+            self.example_name,
+            "--device",
+            self.args.device,
+            "--os",
+            self.args.os,
+        ]
 
         if getattr(self.args, "setup_local_registry", False):
             cmd.append("--setup-registry")
@@ -790,7 +832,7 @@ class Deployer:
         updates = {
             env_var: getattr(self.args, arg_name)
             for arg_name, env_var in params_to_env_map.items()
-            if hasattr(self.args, arg_name) and getattr(self.args, arg_name) is not None
+            if hasattr(self.args, arg_name) and getattr(self.args, arg_name)
         }
 
         user_proxies = {p.strip() for p in self.args.no_proxy.split(",") if p.strip()}
@@ -834,7 +876,7 @@ class Deployer:
         for name, path_or_paths in params_to_values.items():
             if hasattr(self.args, name):
                 value = getattr(self.args, name)
-                if value is None:
+                if not value:
                     continue
 
                 if isinstance(path_or_paths, list) and len(path_or_paths) > 0 and isinstance(path_or_paths[0], list):
@@ -889,7 +931,7 @@ class Deployer:
                 log_message("ERROR", f"Local environment script '{local_env_file}' not found. Cannot deploy.")
                 return False
 
-            compose_up_cmd = " ".join(compose_base_cmd + ["up", "-d", "--remove-orphans"])
+            compose_up_cmd = " ".join(compose_base_cmd + ["up", "-d", "--remove-orphans", "--quiet-pull"])
             if self.example_name == "ChatQnA" and self.args.device == "gaudi":
                 compose_up_cmd = "source .env&&" + compose_up_cmd
             compose_dir = self._get_docker_compose_files()[0].parent

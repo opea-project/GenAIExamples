@@ -27,6 +27,10 @@ on:
         description: 'Test examples with docker compose or k8s charts'
         required: true
         type: string
+      os:
+        description: OS to run the test on
+        required: true
+        type: string
       hardware:
         description: Hardware to run the test on
         required: true
@@ -103,7 +107,8 @@ jobs:
           INPUT_DATA=$(
             jq -r --arg type "${{ inputs.deploy_method }}" --arg id "${{ inputs.example }}" \
               '.[$type][$id].inputs.clear[]' ${{ github.workspace }}/.github/workflows/one-click-inputs-nobuild.json | \
-            sed "s/\$hardware/${{ inputs.hardware }}/g"
+            sed "s|\$hardware|${{ inputs.hardware }}|g; \
+                 s|\$os|${{ inputs.os }}|g"
           )
           echo "Generated input:"
           echo "$INPUT_DATA"
@@ -122,20 +127,11 @@ jobs:
         id: get-default-params
         if: ${{ inputs.deploy_method == 'k8s' }}
         run: |
-          cd ${{ github.workspace }}
-          example=$(echo "${{ inputs.example }}" | cut -d'-' -f1)
-          PARAMS_JSON=$(python3 .github/workflows/scripts/get-params.py $example)
-          echo "LLM_model=$(echo "$PARAMS_JSON" | jq -r '.llm_model')" >> $GITHUB_ENV
-          if [ "$example" = "ChatQnA" ]; then
-            echo "LLM_model=$(echo "$PARAMS_JSON" | jq -r '.llm_model')" >> $GITHUB_ENV
-            echo "Embedding_model=$(echo "$PARAMS_JSON" | jq -r '.embed_model')" >> $GITHUB_ENV
-            echo "Reranking_model=$(echo "$PARAMS_JSON" | jq -r '.rerank_model')" >> $GITHUB_ENV
-            echo "Mount_dir=$(echo "$PARAMS_JSON" | jq -r '.mount_dir')" >> $GITHUB_ENV
-          elif [ "$example" = "VisualQnA" ]; then
-            echo "LVM_model=$(echo "$PARAMS_JSON" | jq -r '.lvm_model')" >> $GITHUB_ENV
-          elif [ "$example" = "AgentQnA" ]; then
-            echo "LLM_model=$(echo "$PARAMS_JSON" | jq -r '.gaudi.llm_model')" >> $GITHUB_ENV
-          fi
+          echo "LLM_model=" >> $GITHUB_ENV
+          echo "Embedding_model=" >> $GITHUB_ENV
+          echo "Reranking_model=" >> $GITHUB_ENV
+          echo "Mount_dir=" >> $GITHUB_ENV
+          echo "LVM_model=" >> $GITHUB_ENV
 
       - name: deploy and test
         shell: bash
@@ -168,6 +164,7 @@ jobs:
             jq -r --arg type "${{ inputs.deploy_method }}" --arg id "${{ inputs.example }}" \
               '.[$type][$id].inputs.deploy[]' ${{ github.workspace }}/.github/workflows/one-click-inputs-nobuild.json | \
             sed "s|\$hardware|${{ inputs.hardware }}|g; \
+                 s|\$os|${{ inputs.os }}|g; \
                  s|\$HF_TOKEN|$HF_TOKEN|g; \
                  s|\$LLM_model|$LLM_model|g; \
                  s|\$Embedding_model|$Embedding_model|g; \
@@ -196,7 +193,8 @@ jobs:
           INPUT_DATA=$(
             jq -r --arg type "${{ inputs.deploy_method }}" --arg id "${{ inputs.example }}" \
               '.[$type][$id].inputs.clear[]' ${{ github.workspace }}/.github/workflows/one-click-inputs-nobuild.json | \
-            sed "s/\$hardware/${{ inputs.hardware }}/g"
+            sed "s|\$hardware|${{ inputs.hardware }}|g; \
+                 s|\$os|${{ inputs.os }}|g"
           )
           echo "Generated input:"
           echo "$INPUT_DATA"

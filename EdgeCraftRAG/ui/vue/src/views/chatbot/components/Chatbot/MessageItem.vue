@@ -10,8 +10,8 @@
           />
         </div>
         <div class="message-wrap">
-          <div v-if="!props.message?.content" class="dot-loader">
-            <span class="drop" v-for="(drop, index) in 3" :key="index"></span>
+          <div v-if="inResponse && !props.message?.content" class="dot-loader">
+            <span class="drop" v-for="index in 3" :key="index"></span>
           </div>
           <div
             class="think-container"
@@ -55,6 +55,20 @@
             </div>
           </div>
           <div v-html="renderedMarkdown"></div>
+          <div v-if="!inResponse" class="footer-btn">
+            <a-tooltip placement="top" :title="$t('common.copy')">
+              <span class="icon-style" @click="handleCopyResponses()">
+                <CopyOutlined /></span
+            ></a-tooltip>
+            <a-tooltip
+              v-if="lastResponse"
+              placement="top"
+              :title="$t('common.regenerate')"
+            >
+              <span class="icon-style" @click="handleRegenerate()">
+                <SyncOutlined /></span
+            ></a-tooltip>
+          </div>
         </div>
       </div>
       <div
@@ -86,7 +100,67 @@
       </div>
     </template>
     <div v-else class="user-session">
-      <div class="message-wrap">{{ message.content }}</div>
+      <template v-if="editState">
+        <div class="input-wrap">
+          <a-textarea
+            v-model:value.trim="queryInput"
+            :bordered="false"
+            :auto-size="{ minRows: 1, maxRows: 2 }"
+          />
+          <div class="button-wrap">
+            <a-button shape="round" @click="handleCancel">
+              {{ $t("common.cancel") }}
+            </a-button>
+            <a-button
+              type="primary"
+              shape="round"
+              @click="handleSend"
+              :disabled="!queryInput"
+            >
+              {{ $t("common.send") }}
+            </a-button>
+          </div>
+        </div>
+      </template>
+      <template v-else>
+        <a-tooltip
+          v-if="message.errorMessage"
+          placement="left"
+          color="var(--bg-card-color)"
+          :overlayInnerStyle="{
+            color: 'var(--font-text-color)',
+            border: '1px solid var(--color-error)',
+          }"
+        >
+          <template #title>
+            <SvgIcon
+              name="icon-chatbot1"
+              :size="20"
+              :style="{
+                color: 'var(--color-error)',
+              }"
+            />{{ message.errorMessage }}</template
+          >
+          <ExclamationCircleFilled class="error-icon"
+        /></a-tooltip>
+        <div class="message-wrap">
+          {{ message.content }}
+          <div class="footer-btn">
+            <a-tooltip placement="top" :title="$t('common.copy')">
+              <span class="icon-style" @click="handleCopyQuery()">
+                <CopyOutlined /></span
+            ></a-tooltip>
+            <a-tooltip
+              v-if="!inResponse && lastQuery"
+              placement="top"
+              :title="$t('common.edit')"
+            >
+              <span class="icon-style" @click="handleEdit()">
+                <EditOutlined /></span
+            ></a-tooltip>
+          </div>
+        </div>
+      </template>
       <div class="user-wrap">
         <SvgIcon name="icon-user" inherit :size="22" />
       </div>
@@ -97,10 +171,20 @@
 <script lang="ts" setup name="MessageItem">
 import { marked } from "marked";
 import { PropType, ref } from "vue";
-import { CheckCircleFilled, UpOutlined } from "@ant-design/icons-vue";
+import {
+  CheckCircleFilled,
+  UpOutlined,
+  CopyOutlined,
+  SyncOutlined,
+  EditOutlined,
+  ExclamationCircleFilled,
+} from "@ant-design/icons-vue";
 import { IMessage, Benchmark } from "../../type";
 import CustomRenderer from "@/utils/customRenderer";
+import { useClipboard } from "@/utils/clipboard";
 import "highlight.js/styles/atom-one-dark.css";
+
+const { copy } = useClipboard();
 
 const props = defineProps({
   message: {
@@ -116,9 +200,20 @@ const props = defineProps({
     type: Boolean,
     required: true,
   },
+  messageIndex: {
+    type: Number,
+  },
+  lastQuery: {
+    type: Boolean,
+    default: false,
+  },
+  lastResponse: {
+    type: Boolean,
+    default: false,
+  },
 });
 
-const emit = defineEmits(["preview", "stop"]);
+const emit = defineEmits(["preview", "stop", "regenerate", "resend"]);
 
 const benchmarkData = computed<Benchmark>(() => {
   return (props.message?.benchmark || {}) as Benchmark;
@@ -126,6 +221,8 @@ const benchmarkData = computed<Benchmark>(() => {
 const isExpanded = ref<boolean>(false);
 const isCollapsed = ref(true);
 const thinkMode = ref(props.think);
+const editState = ref<boolean>(false);
+const queryInput = ref<string>(props.message.content);
 
 marked.setOptions({
   pedantic: false,
@@ -155,13 +252,13 @@ const thinkMarkdown = computed(() => {
   return marked(getThinkMode().value);
 });
 
-const renderedMarkdown = computed(() => {
+const readResponse = computed(() => {
   const content = props.message?.content || "";
 
   if (!content) return "";
 
   if (!thinkMode.value) {
-    return marked(content);
+    return content;
   }
 
   if (!isThinkEnd.value) {
@@ -169,7 +266,10 @@ const renderedMarkdown = computed(() => {
   }
 
   const cleanedContent = content.replace(thinkTagRegexSpecial, "");
-  return marked(cleanedContent);
+  return cleanedContent;
+});
+const renderedMarkdown = computed(() => {
+  return marked(readResponse.value);
 });
 const toggleTabs = () => {
   isExpanded.value = !isExpanded.value;
@@ -191,6 +291,29 @@ const addClickListeners = () => {
       }
     });
   });
+};
+const handleRegenerate = () => {
+  const { query = "" } = props.message;
+  if (!query) return;
+  emit("regenerate", query);
+};
+const handleCopyQuery = async () => {
+  await copy(queryInput.value);
+};
+const handleCopyResponses = async () => {
+  await copy(readResponse.value);
+};
+const handleEdit = () => {
+  queryInput.value = props.message.content;
+  editState.value = true;
+};
+const handleCancel = () => {
+  editState.value = false;
+};
+const handleSend = () => {
+  if (!queryInput.value) return;
+  emit("resend", { index: props.messageIndex, query: queryInput.value });
+  handleCancel();
 };
 
 watch(
@@ -290,8 +413,9 @@ watch(
   width: 100%;
 }
 .user-session {
-  margin-bottom: 20px;
+  margin-bottom: 30px;
   display: flex;
+  align-items: center;
   justify-content: flex-end;
   font-size: 16px;
   text-align: end;
@@ -300,6 +424,33 @@ watch(
     background-color: var(--message-bg);
     width: auto;
     text-align: left;
+    position: relative;
+    .footer-btn {
+      position: absolute;
+      bottom: -24px;
+      right: 0;
+      z-index: 20;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0s linear 2s;
+      gap: 8px;
+      .anticon {
+        cursor: pointer;
+        &:hover {
+          color: var(--color-primary-hover);
+        }
+      }
+    }
+    &:hover .footer-btn {
+      opacity: 1;
+      visibility: visible;
+      transition: opacity 0.3s ease;
+    }
+  }
+  .error-icon {
+    font-size: 18px;
+    color: var(--color-error);
+    .mr-8;
   }
 }
 .benchmark-wrap {
@@ -491,6 +642,46 @@ watch(
     &:nth-child(3) {
       animation-delay: 0.4s;
     }
+  }
+}
+.footer-btn {
+  .flex-end;
+  .mt-8;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--font-tip-color);
+  .anticon {
+    cursor: pointer;
+    &:hover {
+      color: var(--color-primary-hover);
+    }
+  }
+}
+.input-wrap {
+  padding: 4px;
+  border: 1px solid var(--color-primary);
+  border-radius: 20px;
+  background-color: var(--input-bg);
+  max-width: 960px;
+  min-width: 500px;
+  transition: all 0.2s;
+  width: 100%;
+  display: flow-root;
+  position: relative;
+  left: -2px;
+  text-align: center;
+
+  &:hover {
+    box-shadow: 0 4px 12px var(--bg-primary-shadow);
+    border: 1px solid var(--color-primary-hover);
+  }
+  textarea {
+    resize: none;
+  }
+
+  .button-wrap {
+    .flex-end;
+    padding: 6px 12px;
   }
 }
 </style>
