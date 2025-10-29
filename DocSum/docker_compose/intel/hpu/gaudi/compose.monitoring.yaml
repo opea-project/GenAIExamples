@@ -46,7 +46,9 @@ services:
       - /:/rootfs:ro
     command:
       - '--path.procfs=/host/proc'
+      - '--path.rootfs=/rootfs'
       - '--path.sysfs=/host/sys'
+      - '--path.udev.data=/rootfs/run/udev/data'
       - --collector.filesystem.ignored-mount-points
       - "^/(sys|proc|dev|host|etc|rootfs/var/lib/docker/containers|rootfs/var/lib/docker/overlay2|rootfs/run/docker/netns|rootfs/var/lib/docker/aufs)($$|/)"
     environment:
@@ -56,4 +58,19 @@ services:
     restart: always
     deploy:
       mode: global
+
+  gaudi-metrics-exporter:
+    image: vault.habana.ai/gaudi-metric-exporter/metric-exporter:latest
+    privileged: true
+    container_name: gaudi-metrics-exporter
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+      - /dev:/dev
+    deploy:
+      mode: global
+    ports:
+      - 41611:41611
+    restart: unless-stopped
 

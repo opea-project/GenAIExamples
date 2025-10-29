@@ -53,6 +53,7 @@ services:
       no_proxy: ${no_proxy}
     ports:
       - 9100:9100
+    ipc: host
     restart: always
     deploy:
       mode: global
