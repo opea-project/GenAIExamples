@@ -57,4 +57,3 @@ services:
     restart: always
     deploy:
       mode: global
-

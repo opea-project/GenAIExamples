@@ -70,14 +70,15 @@ docker compose up -d
 ```
 
 #### Option #2
-> NOTE : To enable mornitoring, `compose.monitoring.yaml` file need to be merged along with default `compose.yaml` file.  
+
+> NOTE : To enable mornitoring, `compose.monitoring.yaml` file need to be merged along with default `compose.yaml` file.
 
 To deploy with mornitoring:
 
 ```bash
 cd intel/cpu/xeon/
 docker compose -f compose.yaml -f compose.monitoring.yaml up -d
-``` 
+```
 
 **Note**: developers should build docker image from source when:
 
@@ -139,8 +140,7 @@ If mornitoring is enabled, execute the following command:
 ```bash
 cd intel/cpu/xeon/
 docker compose -f compose.yaml -f compose.monitoring.yaml down
-``` 
-
+```
 
 All the DocSum containers will be stopped and then removed on completion of the "down" command.
 
@@ -148,12 +148,12 @@ All the DocSum containers will be stopped and then removed on completion of the 
 
 In the context of deploying a DocSum pipeline on an Intel® Xeon® platform, we can pick and choose different large language model serving frameworks. The table below outlines the various configurations that are available as part of the application.
 
-| File                                                         | Description                                                                                            |
-| ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------ |
-| [compose.yaml](./compose.yaml)                               | Default compose file using vllm as serving framework                                                   |
-| [compose_tgi.yaml](./compose_tgi.yaml)                       | The LLM serving framework is TGI. All other configurations remain the same as default                  |
-| [compose_remote.yaml](./compose_remote.yaml)                 | Uses remote inference endpoints for LLMs. All other configurations are same as default                 |
-| [compose.monitoring.yaml](./compose.monitoring.yaml)         | Helper file for monitoring features. Can be used along with any compose files                          |
+| File                                                 | Description                                                                            |
+| ---------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| [compose.yaml](./compose.yaml)                       | Default compose file using vllm as serving framework                                   |
+| [compose_tgi.yaml](./compose_tgi.yaml)               | The LLM serving framework is TGI. All other configurations remain the same as default  |
+| [compose_remote.yaml](./compose_remote.yaml)         | Uses remote inference endpoints for LLMs. All other configurations are same as default |
+| [compose.monitoring.yaml](./compose.monitoring.yaml) | Helper file for monitoring features. Can be used along with any compose files          |
 
 ### Running LLM models with remote endpoints
 

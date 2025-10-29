@@ -71,14 +71,15 @@ docker compose up -d
 ```
 
 #### Option #2
-> NOTE : To enable mornitoring, `compose.monitoring.yaml` file need to be merged along with default `compose.yaml` file.  
+
+> NOTE : To enable mornitoring, `compose.monitoring.yaml` file need to be merged along with default `compose.yaml` file.
 
 To deploy with mornitoring:
 
 ```bash
 cd intel/cpu/xeon/
 docker compose -f compose.yaml -f compose.monitoring.yaml up -d
-``` 
+```
 
 **Note**: developers should build docker image from source when:
 
@@ -141,11 +142,11 @@ All the DocSum containers will be stopped and then removed on completion of the 
 
 In the context of deploying a DocSum pipeline on an Intel® Gaudi® platform, the allocation and utilization of Gaudi devices across different services are important considerations for optimizing performance and resource efficiency. Each of the example deployments, defined by the example Docker compose yaml files, demonstrates a unique approach to leveraging Gaudi hardware, reflecting different priorities and operational strategies.
 
-| File                                   | Description                                                                               |
-| -------------------------------------- | ----------------------------------------------------------------------------------------- |
-| [compose.yaml](./compose.yaml)         | Default compose file using vllm as serving framework                                      |
-| [compose_tgi.yaml](./compose_tgi.yaml) | The LLM serving framework is TGI. All other configurations remain the same as the default |
-| [compose.monitoring.yaml](./compose.monitoring.yaml)         | Helper file for monitoring features. Can be used along with any compose files   
+| File                                                 | Description                                                                               |
+| ---------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| [compose.yaml](./compose.yaml)                       | Default compose file using vllm as serving framework                                      |
+| [compose_tgi.yaml](./compose_tgi.yaml)               | The LLM serving framework is TGI. All other configurations remain the same as the default |
+| [compose.monitoring.yaml](./compose.monitoring.yaml) | Helper file for monitoring features. Can be used along with any compose files             |
 
 ## DocSum Detailed Usage
 
