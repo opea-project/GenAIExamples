@@ -75,7 +75,6 @@ docker compose up -d
 > NOTE : To enable monitoring, `compose.monitoring.yaml` file need to be merged along with default `compose.yaml` file.
 
 To deploy with monitoring:
-To deploy with mornitoring:
 
 ```bash
 cd intel/cpu/xeon/
