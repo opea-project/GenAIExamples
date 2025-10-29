@@ -346,7 +346,7 @@ function validate_megaservice_long_text() {
 
 function stop_docker() {
     cd $WORKPATH/docker_compose/intel/cpu/xeon/
-    docker compose -f compose.yaml -f compose.monitoring.yaml down && docker compose -f compose.yaml -f compose.monitoring.yaml rm -f
+    docker compose -f compose.yaml -f compose.monitoring.yaml down
 }
 
 function main() {
