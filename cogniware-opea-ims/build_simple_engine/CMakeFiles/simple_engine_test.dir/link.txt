@@ -1,1 +1,0 @@
-/usr/bin/c++ -O3 -DNDEBUG CMakeFiles/simple_engine_test.dir/src/simple_engine/test_simple_engine.cpp.o -o simple_engine_test  -Wl,-rpath,/home/deadbrainviv/Documents/GitHub/CogniSynapseEngine/cogniware_og_engine_cpp/build_simple_engine libsimple_engine.so.1.0.0 

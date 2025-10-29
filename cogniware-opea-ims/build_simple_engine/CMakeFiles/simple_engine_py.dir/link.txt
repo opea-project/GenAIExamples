@@ -1,1 +1,0 @@
-/usr/bin/c++ -fPIC -O3 -DNDEBUG -flto=auto -shared  -o simple_engine_py.cpython-312-x86_64-linux-gnu.so CMakeFiles/simple_engine_py.dir/src/simple_engine/python_bindings.cpp.o  -Wl,-rpath,/home/deadbrainviv/Documents/GitHub/CogniSynapseEngine/cogniware_og_engine_cpp/build_simple_engine libsimple_engine.so.1.0.0 

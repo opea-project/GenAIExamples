@@ -1,8 +1,0 @@
-/home/deadbrainviv/Documents/GitHub/CogniSynapseEngine/cogniware_og_engine_cpp/build_simple/CMakeFiles/msmartcompute_engine.dir
-/home/deadbrainviv/Documents/GitHub/CogniSynapseEngine/cogniware_og_engine_cpp/build_simple/CMakeFiles/test.dir
-/home/deadbrainviv/Documents/GitHub/CogniSynapseEngine/cogniware_og_engine_cpp/build_simple/CMakeFiles/edit_cache.dir
-/home/deadbrainviv/Documents/GitHub/CogniSynapseEngine/cogniware_og_engine_cpp/build_simple/CMakeFiles/rebuild_cache.dir
-/home/deadbrainviv/Documents/GitHub/CogniSynapseEngine/cogniware_og_engine_cpp/build_simple/CMakeFiles/list_install_components.dir
-/home/deadbrainviv/Documents/GitHub/CogniSynapseEngine/cogniware_og_engine_cpp/build_simple/CMakeFiles/install.dir
-/home/deadbrainviv/Documents/GitHub/CogniSynapseEngine/cogniware_og_engine_cpp/build_simple/CMakeFiles/install/local.dir
-/home/deadbrainviv/Documents/GitHub/CogniSynapseEngine/cogniware_og_engine_cpp/build_simple/CMakeFiles/install/strip.dir

@@ -1,1 +1,0 @@
-/usr/bin/c++ -fPIC -O3 -DNDEBUG -shared -Wl,-soname,libsimple_engine.so.1 -o libsimple_engine.so.1.0.0 CMakeFiles/simple_engine.dir/src/simple_engine/simple_engine.cpp.o CMakeFiles/simple_engine.dir/src/simple_engine/simple_api.cpp.o 

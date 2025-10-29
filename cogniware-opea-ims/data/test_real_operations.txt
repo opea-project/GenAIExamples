@@ -1,4 +1,0 @@
-This is a REAL file written by Cogniware Core MCP
-GPU: NVIDIA RTX 4050
-CPU: 14 cores
-Memory: 16GB
