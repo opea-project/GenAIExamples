@@ -40,10 +40,10 @@ function start_services() {
     # sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
     # Start Docker Containers
-    docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
+    docker compose -f compose.yaml -f compose.monitoring.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
     n=0
     until [[ "$n" -ge 200 ]]; do
-       docker logs vllm-gaudi-service > $LOG_PATH/vllm_service_start.log 2>&1
+       docker logs vllm-gaudi-service 2>&1| tee $LOG_PATH/vllm_service_start.log
        if grep -q complete $LOG_PATH/vllm_service_start.log; then
            break
        fi
@@ -53,8 +53,8 @@ function start_services() {
 
     n=0
     until [[ "$n" -ge 100 ]]; do
-       docker logs whisper-service > $LOG_PATH/whisper_service_start.log
-       if grep -q "Uvicorn server setup on port" $LOG_PATH/whisper_service_start.log; then
+       docker logs whisper-service 2>&1| tee $LOG_PATH/whisper_service_start.log
+       if grep -q "Uvicorn running on" $LOG_PATH/whisper_service_start.log; then
            break
        fi
        sleep 5s
@@ -65,16 +65,15 @@ function start_services() {
 
 function validate_megaservice() {
     response=$(http_proxy="" curl http://${ip_address}:3008/v1/audioqna -XPOST -d '{"audio": "UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA", "max_tokens":64}' -H 'Content-Type: application/json')
-    # always print the log
-    docker logs whisper-service > $LOG_PATH/whisper-service.log
-    docker logs speecht5-service > $LOG_PATH/tts-service.log
-    docker logs vllm-gaudi-service > $LOG_PATH/vllm-gaudi-service.log
-    docker logs audioqna-gaudi-backend-server > $LOG_PATH/audioqna-gaudi-backend-server.log
     echo "$response" | sed 's/^"//;s/"$//' | base64 -d > speech.mp3
 
     if [[ $(file speech.mp3) == *"RIFF"* ]]; then
         echo "Result correct."
     else
+        docker logs whisper-service > $LOG_PATH/whisper-service.log
+        docker logs speecht5-service > $LOG_PATH/tts-service.log
+        docker logs vllm-gaudi-service > $LOG_PATH/vllm-gaudi-service.log
+        docker logs audioqna-gaudi-backend-server > $LOG_PATH/audioqna-gaudi-backend-server.log
         echo "Result wrong."
         exit 1
     fi
@@ -82,7 +81,7 @@ function validate_megaservice() {
 
 function stop_docker() {
     cd $WORKPATH/docker_compose/intel/hpu/gaudi
-    docker compose -f compose.yaml stop && docker compose rm -f
+    docker compose -f compose.yaml -f compose.monitoring.yaml down
 }
 
 function main() {
