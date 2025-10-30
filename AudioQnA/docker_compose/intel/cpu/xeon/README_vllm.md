@@ -74,7 +74,7 @@ export HF_TOKEN='your_huggingfacehub_token'
 ### Setting variables in the file set_env_vllm.sh
 
 ```bash
-cd cd cd ~/searchqna-test/GenAIExamples/SearchQnA/docker_compose/amd/gpu/rocm
+cd ~/searchqna-test/GenAIExamples/SearchQnA/docker_compose/amd/gpu/rocm
 ### The example uses the Nano text editor. You can use any convenient text editor
 nano set_env_vllm.sh
 ```
@@ -107,7 +107,7 @@ export https_proxy="Your_HTTPs_Proxy"
 
 ```bash
 cd cd ~/audioqna-test/GenAIExamples/AudioQnA/docker_compose/amd/gpu/rocm/
-docker compose -f compose_vllm up -d
+docker compose up -d
 ```
 
 After starting the containers, you need to view their status with the command:
@@ -125,6 +125,12 @@ The following containers should be running:
 - audioqna-ui-server
 
 Containers should not restart.
+
+(Optional) Enabling monitoring using the commmand:
+```bash
+docker compose -f compose.yaml -f compose.monitoring.yaml up -d
+```
+
 
 #### 3.1.1. Configuring GPU forwarding
 
