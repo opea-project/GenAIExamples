@@ -88,7 +88,7 @@ Please refer to the table below to build different microservices from source:
 (Optional) Enabling monitoring using the command:
 
 ```bash
-cd docker_compose/intel/cpu/xeon
+cd docker_compose/intel/hpu/gaudi
 docker compose -f compose.yaml -f compose.monitoring.yaml up -d
 ```
 

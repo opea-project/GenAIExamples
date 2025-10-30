@@ -23,7 +23,7 @@ git clone https://github.com/opea-project/GenAIExamples.git
 If you are using the main branch, then you do not need to make the transition, the main branch is used by default
 
 ```bash
-cd ~/searchqna-test/GenAIExamples/SearchQnA/docker_image_build
+cd GenAIExamples/AudioQnA/docker_image_build
 git clone https://github.com/opea-project/GenAIComps.git
 ```
 
@@ -31,7 +31,7 @@ If you are using a specific branch or tag, then we perform git checkout to the d
 
 ```bash
 ### Replace "v1.3" with the code version you need (branch or tag)
-cd cd ~/searchqna-test/GenAIExamples/SearchQnA/docker_image_build && git checkout v1.3
+cd GenAIExamples/AudioQnA/docker_image_build && git checkout v1.3
 git clone https://github.com/opea-project/GenAIComps.git
 ```
 
@@ -106,7 +106,7 @@ export https_proxy="Your_HTTPs_Proxy"
 ### 3.1. Deploying applications using Docker Compose
 
 ```bash
-cd cd ~/audioqna-test/GenAIExamples/AudioQnA/docker_compose/amd/gpu/rocm/
+cd GenAIExamples/AudioQnA/docker_compose/intel/cpu/xeon/
 docker compose up -d
 ```
 
