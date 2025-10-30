@@ -126,11 +126,11 @@ The following containers should be running:
 
 Containers should not restart.
 
-(Optional) Enabling monitoring using the commmand:
+(Optional) Enabling monitoring using the command:
+
 ```bash
 docker compose -f compose.yaml -f compose.monitoring.yaml up -d
 ```
-
 
 #### 3.1.1. Configuring GPU forwarding
 
