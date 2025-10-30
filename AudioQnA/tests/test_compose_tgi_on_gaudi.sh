@@ -52,7 +52,7 @@ function start_services() {
     n=0
     until [[ "$n" -ge 100 ]]; do
        docker logs whisper-service > $LOG_PATH/whisper_service_start.log
-       if grep -q "Uvicorn server setup on port" $LOG_PATH/whisper_service_start.log; then
+       if grep -q "Uvicorn running on" $LOG_PATH/whisper_service_start.log; then
            break
        fi
        sleep 5s

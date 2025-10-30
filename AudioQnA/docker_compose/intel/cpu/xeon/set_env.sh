@@ -27,3 +27,5 @@ export BACKEND_SERVICE_ENDPOINT=http://${host_ip}:3008/v1/audioqna
 pushd "${SCRIPT_DIR}/grafana/dashboards" > /dev/null
 source download_opea_dashboard.sh
 popd > /dev/null
+
+export no_proxy="${no_proxy},localhost,127.0.0.1,${host_ip},node-exporter,opea_prometheus,grafana"
