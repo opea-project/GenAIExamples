@@ -24,7 +24,7 @@ case "$1" in
         ;;
     ports)
         echo "Release all ports used by the services in $yaml_file ..."
-        pip install jq yq
+        pip install jq==1.10.0 yq==3.4.3
         ports=$(yq '.services[].ports[] | split(":")[0]' $yaml_file | grep -o '[0-9a-zA-Z_-]\+')
         echo "All ports list..."
         echo "$ports"

@@ -34,7 +34,7 @@ jobs:
       fail-fast: false
     steps:
       - name: Checkout out Repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@1e31de5234b9f8995739874a8ce0492dc87873e2
 
       - name: Check Dangerous Command Injection
         uses: opea-project/validation/actions/check-cmd@main
@@ -62,7 +62,7 @@ jobs:
 
       - name: Publish pipeline artifact
         if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392
         with:
           name: ${{ matrix.job_name }}
           path: ${{ github.workspace }}/.github/workflows/scripts/codeScan/${{ matrix.job_name }}.*
@@ -74,7 +74,7 @@ jobs:
       contents: read
     steps:
       - name: Repository checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@1e31de5234b9f8995739874a8ce0492dc87873e2
         with:
           fetch-depth: 0
 
@@ -98,7 +98,7 @@ jobs:
       - name: ShellCheck
         # if: ${{ env.changed_files != '' }}
         if: steps.get-changed-files.outputs.changed_files_exist == 'true'
-        uses: ludeeus/action-shellcheck@2.0.0
+        uses: ludeeus/action-shellcheck@00cae500b08a931fb5698e11e79bfbd38e612a38
         env:
           SHELLCHECK_OPTS: -e SC2164 -e SC2154 -e SC2034 -e SC2155 -e SC1090 -e SC2153 -e SC2046
         with:
