@@ -28,7 +28,7 @@ jobs:
       run_matrix: ${{ steps.get-test-matrix.outputs.run_matrix }}
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@1e31de5234b9f8995739874a8ce0492dc87873e2
         with:
           ref: "refs/pull/${{ github.event.number }}/merge"
           fetch-depth: 0
