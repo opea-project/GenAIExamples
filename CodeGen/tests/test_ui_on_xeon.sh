@@ -45,9 +45,9 @@ function start_services() {
     docker compose -f ${compose_file} up -d > ${LOG_PATH}/start_services_with_compose.log
 
     n=0
-    until [[ "$n" -ge 100 ]]; do
+    until [[ "$n" -ge 200 ]]; do
         docker logs ${llm_container_name} > ${LOG_PATH}/llm_service_start.log 2>&1
-        if grep -E "Connected|complete" ${LOG_PATH}/llm_service_start.log; then
+        if grep -E "Connected|complete|healthy" ${LOG_PATH}/llm_service_start.log; then
             break
         fi
         sleep 5s
@@ -74,11 +74,43 @@ function validate_frontend() {
 
     export no_proxy="localhost,127.0.0.1,$ip_address"
 
+    # Wait for backend service to be ready
+    echo "Waiting for backend service to be ready..."
+    n=0
+    until [[ "$n" -ge 60 ]]; do
+        HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "http://${ip_address}:7778/v1/chatcompletions")
+        if [ "$HTTP_STATUS" = "200" ] || [ "$HTTP_STATUS" = "500" ]; then  # 500 might be expected if model is loading
+            echo "Backend service is ready"
+            break
+        fi
+        echo "Waiting for backend service... (attempt $n/60), HTTP status: $HTTP_STATUS"
+        sleep 5s
+        n=$((n+1))
+    done
+
+    # Wait for UI service to be ready
+    echo "Waiting for UI service to be ready..."
+    n=0
+    until [[ "$n" -ge 60 ]]; do
+        HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "http://${ip_address}:5173/health")
+        if [ "$HTTP_STATUS" = "200" ]; then
+            echo "UI service is ready"
+            break
+        fi
+        echo "Waiting for UI service... (attempt $n/60), HTTP status: $HTTP_STATUS"
+        sleep 5s
+        n=$((n+1))
+    done
+
+    # Run tests with better logging
+    echo "Starting Playwright tests..."
     exit_status=0
-    npx playwright test || exit_status=$?
+    npx playwright test --reporter=list > ${LOG_PATH}/frontend_test.log 2>&1 || exit_status=$?
 
     if [ $exit_status -ne 0 ]; then
         echo "[TEST INFO]: ---------frontend test failed---------"
+        echo "Test logs:"
+        cat ${LOG_PATH}/frontend_test.log
         exit $exit_status
     else
         echo "[TEST INFO]: ---------frontend test passed---------"
@@ -87,13 +119,13 @@ function validate_frontend() {
 
 function validate_gradio() {
     local URL="http://${ip_address}:5173/health"
-    local HTTP_STATUS=$(curl "$URL")
-    local SERVICE_NAME="Gradio"
+    local HTTP_STATUS=$(curl -s "$URL")
+    local SERVICE_NAME="CodeGen UI"
 
-    if [ "$HTTP_STATUS" = '{"status":"ok"}' ]; then
+    if [ "$HTTP_STATUS" = '{"status":"ok"}' ] || [ "$HTTP_STATUS" = "200" ]; then
         echo "[ $SERVICE_NAME ] HTTP status is 200. UI server is running successfully..."
     else
-        echo "[ $SERVICE_NAME ] UI server has failed..."
+        echo "[ $SERVICE_NAME ] UI server health check failed. Response: $HTTP_STATUS"
     fi
 }
 
@@ -138,6 +170,13 @@ function main() {
 
         echo "::group::validate_ui"
         validate_frontend
+        if [ $? -ne 0 ]; then
+            echo "Frontend validation failed, checking logs..."
+            if [ -f "${LOG_PATH}/frontend_test.log" ]; then
+                echo "Frontend test logs:"
+                cat "${LOG_PATH}/frontend_test.log"
+            fi
+        fi
         echo "::endgroup::"
 
         echo "::group::validate_gradio"

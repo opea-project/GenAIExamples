@@ -1,7 +1,7 @@
 # Copyright (C) 2025 Huawei Technologies Co., Ltd.
 # SPDX-License-Identifier: Apache-2.0
 
-FROM openeuler/python:3.11.13-oe2403lts
+FROM openeuler/python:3.11.13-oe2403lts@sha256:472759fb1852f35c9c0be20ff931aba6fbac1487175a0e46d6a73b6f6c33dd3c
 
 ENV LANG=C.UTF-8
 

@@ -19,7 +19,7 @@ jobs:
         run: sudo rm -rf ${{github.workspace}}/*
 
       - name: Checkout repo GenAIExamples
-        uses: actions/checkout@v4
+        uses: actions/checkout@1e31de5234b9f8995739874a8ce0492dc87873e2
 
       - name: Check the validity of links
         run: |
