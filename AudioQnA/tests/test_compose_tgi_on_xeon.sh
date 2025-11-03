@@ -38,7 +38,7 @@ function start_services() {
     export no_proxy="localhost,127.0.0.1,$ip_address"
     source set_env.sh
     # Start Docker Containers
-    docker compose -f compose_tgi.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
+    docker compose -f compose_tgi.yaml -f compose.monitoring.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
     n=0
     until [[ "$n" -ge 200 ]]; do
        docker logs tgi-service > $LOG_PATH/tgi_service_start.log
@@ -72,7 +72,7 @@ function validate_megaservice() {
 
 function stop_docker() {
     cd $WORKPATH/docker_compose/intel/cpu/xeon/
-    docker compose -f compose_tgi.yaml stop && docker compose rm -f
+    docker compose -f compose_tgi.yaml -f compose.monitoring.yaml down
 }
 
 function main() {
