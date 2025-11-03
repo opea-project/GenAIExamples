@@ -14,7 +14,7 @@ export MODEL_CACHE=${model_cache:-"./data"}
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
-source $WORKPATH/docker_compose/intel/set_env.sh
+source $WORKPATH/docker_compose/intel/hpu/gaudi/set_env.sh
 function build_docker_images() {
     opea_branch=${opea_branch:-"main"}
 
@@ -39,7 +39,7 @@ function start_services() {
     cd $WORKPATH/docker_compose/intel/hpu/gaudi
 
     # Start Docker Containers
-    docker compose -f ${compose_file} up -d | tee ${LOG_PATH}/start_services_with_compose.log
+    docker compose -f ${compose_file} -f compose.monitoring.yaml up -d | tee ${LOG_PATH}/start_services_with_compose.log
 
     n=0
     until [[ "$n" -ge 100 ]]; do
@@ -150,7 +150,7 @@ function stop_docker() {
     local compose_file="$1"
 
     cd $WORKPATH/docker_compose/intel/hpu/gaudi
-    docker compose -f ${compose_file} down
+    docker compose -f ${compose_file} -f compose.monitoring.yaml down
 }
 
 function main() {

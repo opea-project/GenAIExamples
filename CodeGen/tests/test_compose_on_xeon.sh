@@ -42,7 +42,7 @@ function start_services() {
     cd $WORKPATH/docker_compose/intel/cpu/xeon/
 
     # Start Docker Containers
-    docker compose -f ${compose_file} up -d > ${LOG_PATH}/start_services_with_compose.log
+    docker compose -f ${compose_file} -f compose.monitoring.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
 
     n=0
     until [[ "$n" -ge 100 ]]; do
@@ -161,7 +161,7 @@ function stop_docker() {
     local compose_file="$1"
 
     cd $WORKPATH/docker_compose/intel/cpu/xeon/
-    docker compose -f ${compose_file} down
+    docker compose -f ${compose_file} -f compose.monitoring.yaml down
 }
 
 function main() {
