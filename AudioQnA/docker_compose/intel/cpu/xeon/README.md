@@ -15,12 +15,19 @@ Note: The default LLM is `meta-llama/Meta-Llama-3-8B-Instruct`. Before deploying
 
 This section describes how to quickly deploy and test the AudioQnA service manually on an Intel® Xeon® processor. The basic steps are:
 
-1. [Access the Code](#access-the-code)
-2. [Configure the Deployment Environment](#configure-the-deployment-environment)
-3. [Deploy the Services Using Docker Compose](#deploy-the-services-using-docker-compose)
-4. [Check the Deployment Status](#check-the-deployment-status)
-5. [Validate the Pipeline](#validate-the-pipeline)
-6. [Cleanup the Deployment](#cleanup-the-deployment)
+- [Deploying AudioQnA on Intel® Xeon® Processors](#deploying-audioqna-on-intel-xeon-processors)
+  - [Table of Contents](#table-of-contents)
+  - [AudioQnA Quick Start Deployment](#audioqna-quick-start-deployment)
+    - [Access the Code](#access-the-code)
+    - [Configure the Deployment Environment](#configure-the-deployment-environment)
+    - [Deploy the Services Using Docker Compose](#deploy-the-services-using-docker-compose)
+    - [Check the Deployment Status](#check-the-deployment-status)
+    - [Validate the Pipeline](#validate-the-pipeline)
+    - [Cleanup the Deployment](#cleanup-the-deployment)
+  - [AudioQnA Docker Compose Files](#audioqna-docker-compose-files)
+    - [Running LLM models with remote endpoints](#running-llm-models-with-remote-endpoints)
+  - [Validate MicroServices](#validate-microservices)
+  - [Conclusion](#conclusion)
 
 ### Access the Code
 
@@ -59,7 +66,7 @@ To deploy the AudioQnA services, execute the `docker compose up` command with th
 
 ```bash
 cd docker_compose/intel/cpu/xeon
-docker compose -f compose.yaml up -d
+docker compose -f compose_tgi.yaml up -d
 ```
 
 > **Note**: developers should build docker image from source when:
@@ -79,6 +86,13 @@ Please refer to the table below to build different microservices from source:
 | GPT-SOVITS   | [GPT-SOVITS build guide](https://github.com/opea-project/GenAIComps/tree/main/comps/third_parties/gpt-sovits/src#build-the-image) |
 | MegaService  | [MegaService build guide](../../../../README_miscellaneous.md#build-megaservice-docker-image)                                     |
 | UI           | [Basic UI build guide](../../../../README_miscellaneous.md#build-ui-docker-image)                                                 |
+
+(Optional) Enabling monitoring using the command:
+
+```bash
+cd docker_compose/intel/cpu/xeon
+docker compose -f compose_tgi.yaml -f compose.monitoring.yaml up -d
+```
 
 ### Check the Deployment Status
 
@@ -127,19 +141,26 @@ curl http://${host_ip}:3008/v1/audioqna \
 To stop the containers associated with the deployment, execute the following command:
 
 ```bash
-docker compose -f compose.yaml down
+docker compose -f compose_tgi.yaml down
+```
+
+If monitoring is enabled, stop the containers using the following command:
+
+```bash
+docker compose -f compose_tgi.yaml -f compose.monitoring.yaml down
 ```
 
 ## AudioQnA Docker Compose Files
 
 In the context of deploying an AudioQnA pipeline on an Intel® Xeon® platform, we can pick and choose different large language model serving frameworks, or single English TTS/multi-language TTS component. The table below outlines the various configurations that are available as part of the application. These configurations can be used as templates and can be extended to different components available in [GenAIComps](https://github.com/opea-project/GenAIComps.git).
 
-| File                                               | Description                                                                                                                                                                                                                  |
-| -------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [compose.yaml](./compose.yaml)                     | Default compose file using vllm as serving framework and redis as vector database                                                                                                                                            |
-| [compose_tgi.yaml](./compose_tgi.yaml)             | The LLM serving framework is TGI. All other configurations remain the same as the default                                                                                                                                    |
-| [compose_multilang.yaml](./compose_multilang.yaml) | The TTS component is GPT-SoVITS. All other configurations remain the same as the default                                                                                                                                     |
-| [compose_remote.yaml](./compose_remote.yaml)       | The LLM used is hosted on a remote server and an endpoint is used to access this model. Additional environment variables need to be set before running. See [instructions](#running-llm-models-with-remote-endpoints) below. |
+| File                                                 | Description                                                                                                                                                                                                                  |
+| ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [compose.yaml](./compose.yaml)                       | Default compose file using vllm as serving framework and redis as vector database                                                                                                                                            |
+| [compose_tgi.yaml](./compose_tgi.yaml)               | The LLM serving framework is TGI. All other configurations remain the same as the default                                                                                                                                    |
+| [compose_multilang.yaml](./compose_multilang.yaml)   | The TTS component is GPT-SoVITS. All other configurations remain the same as the default                                                                                                                                     |
+| [compose_remote.yaml](./compose_remote.yaml)         | The LLM used is hosted on a remote server and an endpoint is used to access this model. Additional environment variables need to be set before running. See [instructions](#running-llm-models-with-remote-endpoints) below. |
+| [compose.monitoring.yaml](./compose.monitoring.yaml) | Helper file for monitoring features. Can be used along with any compose files                                                                                                                                                |
 
 ### Running LLM models with remote endpoints
 

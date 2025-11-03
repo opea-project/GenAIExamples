@@ -15,12 +15,18 @@ Note: The default LLM is `meta-llama/Meta-Llama-3-8B-Instruct`. Before deploying
 
 This section describes how to quickly deploy and test the AudioQnA service manually on an Intel® Gaudi® processor. The basic steps are:
 
-1. [Access the Code](#access-the-code)
-2. [Configure the Deployment Environment](#configure-the-deployment-environment)
-3. [Deploy the Services Using Docker Compose](#deploy-the-services-using-docker-compose)
-4. [Check the Deployment Status](#check-the-deployment-status)
-5. [Validate the Pipeline](#validate-the-pipeline)
-6. [Cleanup the Deployment](#cleanup-the-deployment)
+- [Deploying AudioQnA on Intel® Gaudi® Processors](#deploying-audioqna-on-intel-gaudi-processors)
+  - [Table of Contents](#table-of-contents)
+  - [AudioQnA Quick Start Deployment](#audioqna-quick-start-deployment)
+    - [Access the Code](#access-the-code)
+    - [Configure the Deployment Environment](#configure-the-deployment-environment)
+    - [Deploy the Services Using Docker Compose](#deploy-the-services-using-docker-compose)
+    - [Check the Deployment Status](#check-the-deployment-status)
+    - [Validate the Pipeline](#validate-the-pipeline)
+    - [Cleanup the Deployment](#cleanup-the-deployment)
+  - [AudioQnA Docker Compose Files](#audioqna-docker-compose-files)
+  - [Validate MicroServices](#validate-microservices)
+  - [Conclusion](#conclusion)
 
 ### Access the Code
 
@@ -79,6 +85,13 @@ Please refer to the table below to build different microservices from source:
 | MegaService  | [MegaService build guide](../../../../README_miscellaneous.md#build-megaservice-docker-image)                        |
 | UI           | [Basic UI build guide](../../../../README_miscellaneous.md#build-ui-docker-image)                                    |
 
+(Optional) Enabling monitoring using the command:
+
+```bash
+cd docker_compose/intel/hpu/gaudi
+docker compose -f compose.yaml -f compose.monitoring.yaml up -d
+```
+
 ### Check the Deployment Status
 
 After running docker compose, check if all the containers launched via docker compose have started:
@@ -126,6 +139,12 @@ To stop the containers associated with the deployment, execute the following com
 
 ```bash
 docker compose -f compose.yaml down
+```
+
+If monitoring is enabled, stop the containers using the following command:
+
+```bash
+docker compose -f compose.yaml -f compose.monitoring.yaml down
 ```
 
 ## AudioQnA Docker Compose Files

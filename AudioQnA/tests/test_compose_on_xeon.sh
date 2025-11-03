@@ -40,7 +40,7 @@ function start_services() {
     # sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
     # Start Docker Containers
-    docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
+    docker compose -f compose.yaml -f compose.monitoring.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
     n=0
     until [[ "$n" -ge 200 ]]; do
        docker logs vllm-service > $LOG_PATH/vllm_service_start.log 2>&1
@@ -74,7 +74,7 @@ function validate_megaservice() {
 
 function stop_docker() {
     cd $WORKPATH/docker_compose/intel/cpu/xeon/
-    docker compose -f compose.yaml stop && docker compose rm -f
+    docker compose -f compose.yaml -f compose.monitoring.yaml down
 }
 
 function main() {
