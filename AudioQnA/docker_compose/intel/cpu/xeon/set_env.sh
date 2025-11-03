@@ -3,6 +3,8 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
+
 # export host_ip=<your External Public IP>
 export host_ip=$(hostname -I | awk '{print $1}')
 export HF_TOKEN=${HF_TOKEN}
@@ -21,3 +23,9 @@ export SPEECHT5_SERVER_PORT=7055
 export LLM_SERVER_PORT=3006
 
 export BACKEND_SERVICE_ENDPOINT=http://${host_ip}:3008/v1/audioqna
+
+pushd "${SCRIPT_DIR}/grafana/dashboards" > /dev/null
+source download_opea_dashboard.sh
+popd > /dev/null
+
+export no_proxy="${no_proxy},localhost,127.0.0.1,${host_ip},node-exporter,opea_prometheus,grafana"
