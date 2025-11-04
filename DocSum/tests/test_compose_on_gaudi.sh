@@ -16,7 +16,7 @@ echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
 echo "TAG=IMAGE_TAG=${IMAGE_TAG}"
 export REGISTRY=${IMAGE_REPO}
 export TAG=${IMAGE_TAG}
-source $WORKPATH/docker_compose/intel/set_env.sh
+source $WORKPATH/docker_compose/intel/hpu/gaudi/set_env.sh
 
 export MODEL_CACHE=${model_cache:-"./data"}
 
@@ -26,12 +26,6 @@ export MAX_NUM_SEQS=256
 export MAX_SEQ_LEN_TO_CAPTURE=2048
 export MAX_INPUT_TOKENS=2048
 export MAX_TOTAL_TOKENS=4096
-
-# set service host and no_proxy
-export LLM_ENDPOINT="http://vllm-service:80"
-export LLM_SERVICE_HOST_IP="llm-docsum-vllm"
-export ASR_SERVICE_HOST_IP="whisper"
-export no_proxy=$no_proxy,$LLM_SERVICE_HOST_IP,$ASR_SERVICE_HOST_IP,"vllm-service"
 
 # Get the root folder of the current script
 ROOT_FOLDER=$(dirname "$(readlink -f "$0")")
@@ -55,8 +49,7 @@ function build_docker_images() {
 
 function start_services() {
     cd $WORKPATH/docker_compose/intel/hpu/gaudi
-    export no_proxy="localhost,127.0.0.1,$ip_address"
-    docker compose -f compose.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
+    docker compose -f compose.yaml -f compose.monitoring.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
     sleep 2m
 }
 
@@ -356,7 +349,7 @@ function validate_megaservice_long_text() {
 
 function stop_docker() {
     cd $WORKPATH/docker_compose/intel/hpu/gaudi
-    docker compose -f compose.yaml stop && docker compose rm -f
+    docker compose -f compose.yaml -f compose.monitoring.yaml stop && docker compose -f compose.yaml -f compose.monitoring.yaml rm -f
 }
 
 function main() {
