@@ -208,11 +208,11 @@ Multiple UI options can be configured via the compose files.
 
 ### Svelte UI (Default)
 
-Access the default Gradio UI by navigating to:
+Access the default Svelte UI by navigating to:
 `http://{HOST_IP}:5173`
 _(Port `5173` is the default host mapping for `codegen-ui-server`)_
 
-![Svelte UI - Code Generation](../../../../assets/img/codegen_gradio_ui_main.png)
+![Svelte UI - Code Generation](../../../../assets/img/codeGen_ui_init.jpg)
 
 ### Gradio UI (Optional)
 
