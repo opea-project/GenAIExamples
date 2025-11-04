@@ -257,7 +257,7 @@ Users can interact with the backend service using the `Neural Copilot` VS Code e
 
 To enable monitoring for the CodeGen application, you can use the monitoring Docker Compose file along with the main deployment.
 
-#### Option #1: Default Deployment (without monitoring)
+### Option #1: Default Deployment (without monitoring)
 
 To deploy the CodeGen services without monitoring, execute:
 
@@ -265,7 +265,7 @@ To deploy the CodeGen services without monitoring, execute:
 docker compose up -d
 ```
 
-#### Option #2: Deployment with Monitoring
+### Option #2: Deployment with Monitoring
 
 > NOTE: To enable monitoring, `compose.monitoring.yaml` file need to be merged along with default `compose.yaml` file.
 
