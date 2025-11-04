@@ -40,9 +40,6 @@ function start_services() {
     source set_env.sh
     cd cpu/xeon/
 
-    # download grafana dashboard
-    bash grafana/dashboards/download_opea_dashboard.sh
-
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
     # Start Docker Containers

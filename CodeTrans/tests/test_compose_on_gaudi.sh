@@ -42,9 +42,6 @@ function start_services() {
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
-    # download grafana dashboard
-    bash grafana/dashboards/download_opea_dashboard.sh
-
     # Start Docker Containers
     docker compose up  -f compose.yaml -f compose.monitoring.yaml -d > ${LOG_PATH}/start_services_with_compose.log
 

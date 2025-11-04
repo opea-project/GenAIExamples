@@ -70,8 +70,6 @@ To deploy with monitoring:
 
 ```bash
 cd hpu/gaudi/
-# download grafana dashboard
-bash grafana/dashboards/download_opea_dashboard.sh
 docker compose -f compose.yaml -f compose.monitoring.yaml up -d
 ```
 
@@ -135,8 +133,6 @@ If monitoring is enabled, execute the following command:
 
 ```bash
 cd hpu/gaudi/
-# download grafana dashboard
-bash grafana/dashboards/download_opea_dashboard.sh
 docker compose -f compose.yaml -f compose.monitoring.yaml down
 ```
 
