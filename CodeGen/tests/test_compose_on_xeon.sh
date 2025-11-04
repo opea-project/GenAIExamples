@@ -41,6 +41,9 @@ function start_services() {
     export no_proxy="localhost,127.0.0.1,$ip_address"
     cd $WORKPATH/docker_compose/intel/cpu/xeon/
 
+    # download grafana dashboard
+    bash grafana/dashboards/download_opea_dashboard.sh
+
     # Start Docker Containers
     docker compose -f ${compose_file} -f compose.monitoring.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
 
