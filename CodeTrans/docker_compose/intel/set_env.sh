@@ -31,6 +31,3 @@ export no_proxy="${no_proxy},${HOST_IP},vllm-server,codetrans-xeon-backend-serve
 export http_proxy=$http_proxy
 export https_proxy=$https_proxy
 
-pushd "${SCRIPT_DIR}/grafana/dashboards" > /dev/null
-source download_opea_dashboard.sh
-popd > /dev/null

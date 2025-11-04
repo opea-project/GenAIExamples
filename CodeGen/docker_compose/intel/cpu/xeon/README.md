@@ -49,7 +49,8 @@ This uses the default vLLM-based deployment using `compose.yaml`.
     # export https_proxy="your_https_proxy"
     # export no_proxy="localhost,127.0.0.1,${HOST_IP}" # Add other hosts if necessary
     source intel/set_env.sh
-    cd /intel/cpu/xeon
+    cd intel/cpu/xeon
+    bash grafana/dashboards/download_opea_dashboard.sh
     ```
 
     _Note: The compose file might read additional variables from set_env.sh. Ensure all required variables like ports (`LLM_SERVICE_PORT`, `MEGA_SERVICE_PORT`, etc.) are set if not using defaults from the compose file._
@@ -146,7 +147,7 @@ Key parameters are configured via environment variables set before running `dock
 Most of these parameters are in `set_env.sh`, you can either modify this file or overwrite the env variables by setting them.
 
 ```shell
-source CodeGen/docker_compose/set_env.sh
+source CodeGen/docker_compose/intel/set_env.sh
 ```
 
 #### Compose Files
@@ -271,6 +272,7 @@ docker compose up -d
 To deploy with monitoring:
 
 ```bash
+bash grafana/dashboards/download_opea_dashboard.sh
 docker compose -f compose.yaml -f compose.monitoring.yaml up -d
 ```
 

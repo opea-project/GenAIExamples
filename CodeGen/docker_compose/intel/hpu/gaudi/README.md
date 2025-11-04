@@ -49,7 +49,10 @@ This uses the default vLLM-based deployment using `compose.yaml`.
     # export https_proxy="your_https_proxy"
     # export no_proxy="localhost,127.0.0.1,${HOST_IP}" # Add other hosts if necessary
     source intel/set_env.sh
-    cd /intel/hpu/gaudi
+    cd intel/hpu/gaudi
+    cd grafana/dashboards
+    bash download_opea_dashboard.sh
+    cd ../..
     ```
 
     _Note: The compose file might read additional variables from set_env.sh. Ensure all required variables like ports (`LLM_SERVICE_PORT`, `MEGA_SERVICE_PORT`, etc.) are set if not using defaults from the compose file._
