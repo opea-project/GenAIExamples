@@ -46,7 +46,7 @@ function start_services() {
     bash grafana/dashboards/download_opea_dashboard.sh
 
     # Start Docker Containers
-    docker compose up  -f compose.yaml -f compose.monitoring.yaml -d > ${LOG_PATH}/start_services_with_compose.log
+    docker compose -f compose.yaml -f compose.monitoring.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
 
     n=0
     until [[ "$n" -ge 100 ]]; do
