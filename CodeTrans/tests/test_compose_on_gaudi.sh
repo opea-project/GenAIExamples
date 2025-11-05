@@ -42,8 +42,11 @@ function start_services() {
 
     sed -i "s/backend_address/$ip_address/g" $WORKPATH/ui/svelte/.env
 
+    # download grafana dashboard
+    bash grafana/dashboards/download_opea_dashboard.sh
+
     # Start Docker Containers
-    docker compose up -d > ${LOG_PATH}/start_services_with_compose.log
+    docker compose -f compose.yaml -f compose.monitoring.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
 
     n=0
     until [[ "$n" -ge 100 ]]; do
@@ -117,7 +120,7 @@ function validate_megaservice() {
 
 function stop_docker() {
     cd $WORKPATH/docker_compose/intel/hpu/gaudi
-    docker compose -f compose.yaml stop && docker compose rm -f
+    docker compose  -f compose.yaml -f compose.monitoring.yaml  stop && docker compose rm -f
 }
 
 function main() {
