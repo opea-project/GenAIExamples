@@ -43,7 +43,7 @@ function build_docker_images() {
 }
 
 function start_services() {
-    cd $WORKPATH
+    cd $WORKPATH/docker_compose/intel/cpu/xeon/
     export host_ip=${ip_address}
     export no_proxy="localhost,127.0.0.1,$ip_address"
 
@@ -89,7 +89,7 @@ EOF
 
     # Start Docker Containers
     echo "Starting services with docker compose..."
-    docker compose up -d > ${LOG_PATH}/start_services_with_compose.log 2>&1
+    docker compose -f compose.yaml up -d > ${LOG_PATH}/start_services_with_compose.log 2>&1
 
     # Wait for vLLM service to be ready
     echo "Waiting for vLLM service to initialize (this may take several minutes)..."
@@ -295,9 +295,9 @@ function validate_ui() {
 }
 
 function stop_docker() {
-    cd $WORKPATH
+    cd $WORKPATH/docker_compose/intel/cpu/xeon/
     echo "Stopping services..."
-    docker compose down
+    docker compose -f compose.yaml down
     echo "Services stopped"
 }
 
