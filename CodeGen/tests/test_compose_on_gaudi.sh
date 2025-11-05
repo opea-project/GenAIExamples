@@ -26,7 +26,7 @@ function build_docker_images() {
     popd && sleep 1s
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="codegen codegen-gradio-ui llm-textgen dataprep retriever embedding"
+    service_list="codegen codegen-ui llm-textgen dataprep retriever embedding"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker images && sleep 1s

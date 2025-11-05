@@ -86,7 +86,7 @@ There are two separate Docker Compose files to select the LLM serving backend ac
 - **Compose File:** `compose.yaml`
 - **Description:** Uses vLLM optimized for Intel Gaudi HPUs as the LLM serving engine. This is the default deployment used in the Quick Start.
 - **Gaudi Service:** `codegen-vllm-gaudi-server`
-- **Other Services:** `codegen-llm-server`, `codegen-tei-embedding-server` (CPU), `codegen-retriever-server` (CPU), `redis-vector-db` (CPU), `codegen-dataprep-server` (CPU), `codegen-backend-server` (CPU), `codegen-gradio-ui-server` (CPU).
+- **Other Services:** `codegen-llm-server`, `codegen-tei-embedding-server` (CPU), `codegen-retriever-server` (CPU), `redis-vector-db` (CPU), `codegen-dataprep-server` (CPU), `codegen-backend-server` (CPU), `codegen-ui-server` (CPU).
 
 ### TGI-based Deployment (`compose_tgi.yaml`)
 
@@ -197,23 +197,23 @@ Use `curl` commands targeting the main service endpoints. Ensure `HOST_IP` is co
 
 UI options are similar to the Xeon deployment.
 
-### Gradio UI (Default)
+### Svelte UI (Default)
 
-Access the default Gradio UI:
+Access the default Svelte UI:
 `http://{HOST_IP}:5173`
 _(Port `5173` is the default host mapping)_
 
-![Gradio UI](../../../../assets/img/codegen_gradio_ui_main.png)
+![Svelte UI](../../../../assets/img/codeGen_ui_init.jpg)
 
-### Svelte UI (Optional)
+### Gradio UI (Optional)
 
-1.  Modify the compose file (either `compose.yaml` or `compose_tgi.yaml`): Swap Gradio service for Svelte (`codegen-gaudi-ui-server`), check port map (e.g., `5173:5173`).
+1.  Modify the compose file (either `compose.yaml` or `compose_tgi.yaml`): Swap Svelte service for Gradio (`codegen-gradio-ui-server`), check port map (e.g., `5173:5173`).
 2.  Restart: `docker compose up -d` or `docker compose -f compose_tgi.yaml up -d`
 3.  Access: `http://{HOST_IP}:5173`
 
 ### React UI (Optional)
 
-1.  Modify the compose file (either `compose.yaml` or `compose_tgi.yaml`): Swap Gradio service for React (`codegen-gaudi-react-ui-server`), check port map (e.g., `5174:80`).
+1.  Modify the compose file (either `compose.yaml` or `compose_tgi.yaml`): Swap Svelte service for React (`codegen-gaudi-react-ui-server`), check port map (e.g., `5174:80`).
 2.  Restart: `docker compose up -d` or `docker compose -f compose_tgi.yaml up -d`
 3.  Access: `http://{HOST_IP}:5174`
 

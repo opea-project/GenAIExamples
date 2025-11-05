@@ -74,7 +74,7 @@ services:
     ipc: host
     restart: always
   codegen-gaudi-ui-server:
-    image: ${REGISTRY:-opea}/codegen-gradio-ui:${TAG:-latest}
+    image: ${REGISTRY:-opea}/codegen-ui:${TAG:-latest}
     container_name: codegen-gaudi-ui-server
     depends_on:
       - codegen-gaudi-backend-server
