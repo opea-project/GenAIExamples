@@ -49,7 +49,10 @@ This uses the default vLLM-based deployment using `compose.yaml`.
     # export https_proxy="your_https_proxy"
     # export no_proxy="localhost,127.0.0.1,${HOST_IP}" # Add other hosts if necessary
     source intel/set_env.sh
-    cd /intel/hpu/gaudi
+    cd intel/hpu/gaudi
+    cd grafana/dashboards
+    bash download_opea_dashboard.sh
+    cd ../..
     ```
 
     _Note: The compose file might read additional variables from set_env.sh. Ensure all required variables like ports (`LLM_SERVICE_PORT`, `MEGA_SERVICE_PORT`, etc.) are set if not using defaults from the compose file._
@@ -228,7 +231,62 @@ Use the `Neural Copilot` extension configured with the CodeGen backend URL: `htt
 - **Model Download Issues:** Check `HF_TOKEN`, internet access, proxy settings. Check LLM service logs.
 - **Connection Errors:** Verify `HOST_IP`, ports, and proxy settings. Use `docker ps` and check service logs.
 
-## Stopping the Application
+## Monitoring Deployment
+
+To enable monitoring for the CodeGen application on Gaudi, you can use the monitoring Docker Compose file along with the main deployment.
+
+### Option #1: Default Deployment (without monitoring)
+
+To deploy the CodeGen services without monitoring, execute:
+
+```bash
+docker compose up -d
+```
+
+### Option #2: Deployment with Monitoring
+
+> NOTE: To enable monitoring, `compose.monitoring.yaml` file need to be merged along with default `compose.yaml` file.
+
+To deploy with monitoring:
+
+```bash
+docker compose -f compose.yaml -f compose.monitoring.yaml up -d
+```
+
+### Accessing Monitoring Services
+
+Once deployed with monitoring, you can access:
+
+- **Prometheus**: `http://${HOST_IP}:9090`
+- **Grafana**: `http://${HOST_IP}:3000` (username: `admin`, password: `admin`)
+- **Node Exporter**: `http://${HOST_IP}:9100`
+
+### Monitoring Components
+
+The monitoring stack includes:
+
+- **Prometheus**: For metrics collection and querying
+- **Grafana**: For visualization and dashboards
+- **Node Exporter**: For system metrics collection
+
+### Monitoring Dashboards
+
+The following dashboards are automatically downloaded and configured:
+
+- vLLM Dashboard
+- TGI Dashboard
+- CodeGen MegaService Dashboard
+- Node Exporter Dashboard
+
+### Stopping the Application
+
+If monitoring is enabled, execute the following command:
+
+```bash
+docker compose -f compose.yaml -f compose.monitoring.yaml down
+```
+
+If monitoring is not enabled, execute:
 
 ```bash
 docker compose down  # for vLLM (compose.yaml)
