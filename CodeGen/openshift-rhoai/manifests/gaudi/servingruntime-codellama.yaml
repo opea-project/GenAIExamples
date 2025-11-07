@@ -1,0 +1,70 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+---
+apiVersion: template.openshift.io/v1
+kind: Template
+metadata:
+  annotations:
+    opendatahub.io/apiProtocol: REST
+    opendatahub.io/modelServingSupport: '["single"]'
+  labels:
+    opendatahub.io/dashboard: "true"
+  name: tgi-codellama-7b-hf-gaudi
+  namespace: redhat-ods-applications
+objects:
+- apiVersion: serving.kserve.io/v1alpha1
+  kind: ServingRuntime
+  labels:
+    opendatahub.io/dashboard: "true"
+  metadata:
+    annotations:
+      openshift.io/display-name: Text Generation Inference CodeLlama-7b-hf on Gaudi
+      opendatahub.io/recommended-accelerators: '["habana.ai/gaudi"]'
+    name: tgi-codellama-7b-hf-gaudi
+  spec:
+    containers:
+      - args:
+          - --model-id
+          - /mnt/models/--meta-llama--CodeLlama-7b-hf/snapshots/b462c3c99b077d341db691ec780a33156f3c1472
+          - --port=8080
+          - --json-output
+          - --max-input-length
+          - "1024"
+          - --max-total-tokens
+          - "2048"
+        env:
+          - name: NUMBA_CACHE_DIR
+            value: /tmp/hf_home
+          - name: HF_HOME
+            value: /tmp/hf_home
+          - name: HF_HUB_CACHE
+            value: /mnt/models
+          - name: HUGGING_FACE_HUB_TOKEN
+            value: "insert-your-huggingface-token-here"
+        image: ghcr.io/huggingface/tgi-gaudi:2.0.4
+        name: kserve-container
+        ports:
+          - containerPort: 8080
+            protocol: TCP
+        resources:
+          limits:
+            habana.ai/gaudi: 1
+          requests:
+            habana.ai/gaudi: 1
+        volumeMounts:
+          - mountPath: /data
+            name: model-volume
+          - mountPath: /var/log/habana_logs
+            name: logs-volume
+    multiModel: false
+    supportedModelFormats:
+      - autoSelect: true
+        name: llm
+    volumes:
+      - emptyDir:
+          sizeLimit: 300Gi
+        name: model-volume
+      - emptyDir:
+          sizeLimit: 500Mi
+        name: logs-volume

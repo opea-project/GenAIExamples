@@ -1,0 +1,79 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    io.kompose.service: ui-server
+  name: ui-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: ui-server
+  template:
+    metadata:
+      labels:
+        io.kompose.service: ui-server
+    spec:
+      initContainers:
+        - name: copy-ui-to-workdir
+          image: "insert-your-image-codegen-ui"
+          command:
+            - /bin/bash
+            - -c
+          args:
+            - |
+              cp -v -r /home/user/* /tmp/temp-data/
+          volumeMounts:
+            - name: temp-data
+              mountPath: /tmp/temp-data
+      containers:
+        - env:
+            - name: HOME
+              value: /tmp/temp-data
+            - name: BASIC_URL
+              value: http://insert-your-codegen-route/v1/codegen
+          image: "insert-your-image-codegen-ui"
+          name: ui-server
+          ports:
+            - containerPort: 5173
+              protocol: TCP
+          workingDir: /tmp/temp-data/svelte
+          volumeMounts:
+            - name: temp-data
+              mountPath: /tmp/temp-data
+      restartPolicy: Always
+      volumes:
+        - name: temp-data
+          emptyDir: {}
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  labels:
+    io.kompose.service: ui-server
+  name: ui-server
+spec:
+  port:
+    targetPort: 5173
+  to:
+    kind: Service
+    name: ui-server
+    weight: 100
+  wildcardPolicy: None
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    io.kompose.service: ui-server
+  name: ui-server
+spec:
+  ports:
+    - name: "5173"
+      port: 5173
+      targetPort: 5173
+  selector:
+    io.kompose.service: ui-server
