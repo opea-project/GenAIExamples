@@ -81,6 +81,7 @@ jobs:
         nodes=($(echo ${{ inputs.nodes }} | tr ',' ' '))
         nodes_json=$(printf '%s\n' "${nodes[@]}" | sort -u | jq -R '.' | jq -sc '.')
         echo "nodes=$nodes_json" >> $GITHUB_OUTPUT
+        echo "OPEA_IMAGE_REPO is ${OPEA_IMAGE_REPO}"
 
   build-comps-base:
     needs: [get-test-matrix]
