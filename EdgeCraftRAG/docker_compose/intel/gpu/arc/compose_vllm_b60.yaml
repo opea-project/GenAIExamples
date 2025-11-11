@@ -157,7 +157,7 @@ services:
       DP: ${DP:-1}
     entrypoint:
       /bin/bash -c "
-      cd  /workspace/vllm/models &&
+      cd  /workspace/vllm/models && source /opt/intel/oneapi/setvars.sh --force &&
       VLLM_OFFLOAD_WEIGHTS_BEFORE_QUANT=1 \
       TORCH_LLM_ALLREDUCE=1 \
       VLLM_USE_V1=1 \
@@ -178,7 +178,6 @@ services:
       --max-model-len $${MAX_MODEL_LEN} \
       --block-size $${BLOCK_SIZE} \
       --quantization $${QUANTIZATION} \
-      --distributed-executor-backend mp \
       -tp=$${TP} \
       -dp=$${DP}"
 networks:
