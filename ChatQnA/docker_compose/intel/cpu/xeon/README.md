@@ -190,7 +190,7 @@ docker compose -f compose_remote.yaml up -d
 
 ## ChatQnA with Conversational UI (Optional)
 
-To access the Conversational UI (react based) frontend, modify the UI service in the `compose` file used to deploy. Replace `chaqna-xeon-ui-server` service with the `chatqna-xeon-conversation-ui-server` service as per the config below:
+To access the Conversational UI (react based) frontend, modify the UI service in the `compose` file used to deploy. Replace `chatqna-xeon-ui-server` service with the `chatqna-xeon-conversation-ui-server` service as per the config below:
 
 ```yaml
 chatqna-xeon-conversation-ui-server:
@@ -202,7 +202,7 @@ chatqna-xeon-conversation-ui-server:
   ports:
     - "5174:80"
   depends_on:
-    - chaqna-xeon-backend-server
+    - chatqna-xeon-backend-server
   ipc: host
   restart: always
 ```
@@ -210,7 +210,7 @@ chatqna-xeon-conversation-ui-server:
 Once the services are up, open the following URL in the browser: http://{host_ip}:5174. By default, the UI runs on port 80 internally. If the developer prefers to use a different host port to access the frontend, it can be modified by port mapping in the `compose.yaml` file as shown below:
 
 ```yaml
-  chaqna-gaudi-conversation-ui-server:
+  chatqna-gaudi-conversation-ui-server:
     image: opea/chatqna-conversation-ui:latest
     ...
     ports:
