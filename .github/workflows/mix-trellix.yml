@@ -17,7 +17,7 @@ jobs:
         run: sudo rm -rf ${{github.workspace}}/*
 
       - name: Checkout out Repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@1e31de5234b9f8995739874a8ce0492dc87873e2
 
       - name: Run Trellix Scanner
         env:
@@ -26,6 +26,6 @@ jobs:
 
       - name: Publish pipeline artifact
         if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392
         with:
           path: ${{ github.workspace }}/.github/workflows/scripts/codeScan/report.html

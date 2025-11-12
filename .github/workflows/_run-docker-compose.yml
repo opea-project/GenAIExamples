@@ -61,7 +61,7 @@ jobs:
           echo "checkout ref ${CHECKOUT_REF}"
 
       - name: Checkout out Repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@1e31de5234b9f8995739874a8ce0492dc87873e2
         with:
           ref: ${{ steps.get-checkout-ref.outputs.CHECKOUT_REF }}
           fetch-depth: 0
@@ -150,7 +150,7 @@ jobs:
           docker images
 
       - name: Checkout out Repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@1e31de5234b9f8995739874a8ce0492dc87873e2
         with:
           ref: ${{ needs.get-test-case.outputs.CHECKOUT_REF }}
           fetch-depth: 0
@@ -243,7 +243,7 @@ jobs:
 
       - name: Publish pipeline artifact
         if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392
         with:
           name: ${{ inputs.hardware }}_${{ inputs.example }}_${{ matrix.test_case }}
           path: ${{ github.workspace }}/${{ inputs.example }}/tests/*.log

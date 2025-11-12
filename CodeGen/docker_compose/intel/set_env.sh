@@ -51,3 +51,9 @@ export DATAPREP_ENDPOINT="http://${HOST_IP}:${DATAPREP_REDIS_PORT}/v1/dataprep"
 export LOGFLAG=false
 export MODEL_CACHE=${model_cache:-"./data"}
 export NUM_CARDS=1
+
+
+# Set network proxy settings
+export no_proxy="${no_proxy},${HOST_IP},vllm-server,codegen-xeon-backend-server,codegen-xeon-ui-server,redis-vector-db,dataprep-redis-server,tei-embedding-serving,tei-embedding-server,retriever-redis,opea_prometheus,grafana,node-exporter,$JAEGER_IP" # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
+export http_proxy=$http_proxy
+export https_proxy=$https_proxy

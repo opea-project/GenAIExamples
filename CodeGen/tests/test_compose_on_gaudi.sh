@@ -26,7 +26,7 @@ function build_docker_images() {
     popd && sleep 1s
 
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
-    service_list="codegen codegen-gradio-ui llm-textgen dataprep retriever embedding"
+    service_list="codegen codegen-ui llm-textgen dataprep retriever embedding"
     docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log
 
     docker images && sleep 1s
@@ -38,8 +38,10 @@ function start_services() {
     export no_proxy="localhost,127.0.0.1,$ip_address"
     cd $WORKPATH/docker_compose/intel/hpu/gaudi
 
+    # download grafana dashboard
+    bash grafana/dashboards/download_opea_dashboard.sh
     # Start Docker Containers
-    docker compose -f ${compose_file} up -d | tee ${LOG_PATH}/start_services_with_compose.log
+    docker compose -f ${compose_file} -f compose.monitoring.yaml up -d | tee ${LOG_PATH}/start_services_with_compose.log
 
     n=0
     until [[ "$n" -ge 100 ]]; do
@@ -150,7 +152,7 @@ function stop_docker() {
     local compose_file="$1"
 
     cd $WORKPATH/docker_compose/intel/hpu/gaudi
-    docker compose -f ${compose_file} down
+    docker compose -f ${compose_file} -f compose.monitoring.yaml down
 }
 
 function main() {
