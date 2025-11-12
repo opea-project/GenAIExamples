@@ -2,7 +2,7 @@
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![OPEA](https://img.shields.io/badge/OPEA-GenAI%20Example-green)](https://github.com/opea-project)
-[![Intel](https://img.shields.io/badge/Intel-Xeon%20Optimized-0071C5?logo=intel)](https://www.intel.com/xeon)
+[![Intel](https://img.shields.io/badge/Intel-Xeon%20Optimized-0071C5?logo=intel)](https://www.intel.com/content/www/us/en/products/details/processors/xeon.html)
 
 An OPEA-compliant GenAI example demonstrating an AI-powered inventory management system with advanced features including RAG, DBQnA, document summarization, and continuous learning. Built with **CogniDREAM Code Generation Platform**, a Cogniware AI engine for creating production-ready agentic platforms.
 
@@ -83,21 +83,24 @@ This example demonstrates how to build a full-stack AI application using OPEA's 
 ### Service Flow
 
 **RAG Pipeline**:
+
 ```
 Query → Embedding → Retriever → Rerank → LLM → Response
 ```
 
 **Continuous Learning**:
+
 ```
 Upload → Parse → Embed → Index → Immediately Searchable
 ```
 
 **DBQnA Pipeline**:
+
 ```
 Natural Language → LLM (generate SQL) → PostgreSQL → Format → Response
 ```
 
-For detailed architecture diagrams, see [assets/README.md](assets/README.md).
+For detailed architecture diagrams, see [assets/README.md](../assets/README.md).
 
 ## Features
 
@@ -126,6 +129,7 @@ For detailed architecture diagrams, see [assets/README.md](assets/README.md).
 ### Prerequisites
 
 #### For Docker Compose Deployment
+
 - **Intel Xeon Server** (3rd Gen or newer recommended)
 - Docker 24.0+ and Docker Compose 2.0+
 - 16GB+ RAM (32GB recommended)
@@ -133,6 +137,7 @@ For detailed architecture diagrams, see [assets/README.md](assets/README.md).
 - HuggingFace API token
 
 #### For Kubernetes Deployment
+
 - Kubernetes cluster 1.24+
 - kubectl configured
 - Helm 3.0+ (for Helm deployment)
@@ -141,12 +146,14 @@ For detailed architecture diagrams, see [assets/README.md](assets/README.md).
 ### Quick Start
 
 1. **Clone the repository**:
+
 ```bash
 git clone https://github.com/opea-project/GenAIExamples.git
 cd GenAIExamples/CogniwareIMS
 ```
 
 2. **Download sample data** (Required):
+
 ```bash
 ./scripts/download-data.sh
 ```
@@ -154,18 +161,21 @@ cd GenAIExamples/CogniwareIMS
 This downloads 7,479 CSV files (~32MB) with Intel product specifications.
 
 3. **Set environment**:
+
 ```bash
 export HUGGINGFACEHUB_API_TOKEN="your-token-here"
 export LLM_MODEL_ID="Intel/neural-chat-7b-v3-3"
 ```
 
 4. **Build Docker images**:
+
 ```bash
 cd docker_build_image
 docker compose -f build.yaml build
 ```
 
 5. **Deploy with Docker Compose**:
+
 ```bash
 cd ../docker_compose/intel/xeon
 source ./set_env.sh
@@ -173,12 +183,14 @@ docker compose up -d
 ```
 
 6. **Access the application**:
+
 - Frontend UI: http://localhost:3000
 - Backend API: http://localhost:8000
 - API Docs: http://localhost:8000/docs
 - RedisInsight: http://localhost:8001
 
 7. **Initialize knowledge base**:
+
 ```bash
 docker exec -it cogniwareims-backend python app/init_knowledge_base.py
 ```
@@ -196,6 +208,7 @@ docker compose up -d
 ```
 
 **Verify deployment**:
+
 ```bash
 # Check all services
 docker compose ps
@@ -228,7 +241,7 @@ kubectl get svc -n opea
 kubectl port-forward -n opea svc/cogniwareims-ui 3000:3000
 ```
 
-For detailed Kubernetes instructions, see [kubernetes/README.md](kubernetes/README.md).
+For detailed Kubernetes instructions, see [kubernetes/README.md](../kubernetes/README.md).
 
 ### Kubernetes Deployment with GMC
 
@@ -315,11 +328,13 @@ curl http://localhost:8000/api/graphs/performance-metrics
 ### Run E2E Tests
 
 **Docker Compose Test**:
+
 ```bash
 ./tests/test_compose_on_xeon.sh
 ```
 
 **Kubernetes GMC Test**:
+
 ```bash
 ./tests/test_gmc_on_xeon.sh
 ```
@@ -336,7 +351,7 @@ curl http://localhost:6000/v1/health  # Embedding
 curl http://localhost:9000/v1/health  # LLM
 ```
 
-For detailed testing instructions, see [tests/README.md](tests/README.md).
+For detailed testing instructions, see [tests/README.md](../tests/README.md).
 
 ## Contributing
 
@@ -362,20 +377,21 @@ git commit -s -m "Your commit message"
 ### Documentation
 
 - [OPEA Documentation](https://opea-project.github.io)
-- [Architecture Guide](assets/README.md)
-- [Deployment Guide](kubernetes/README.md)
-- [Testing Guide](tests/README.md)
+- [Architecture Guide](../assets/README.md)
+- [Deployment Guide](../kubernetes/README.md)
+- [Testing Guide](../tests/README.md)
 - [Data Setup Guide](DATA_SETUP.md)
 
 ### Getting Help
 
 - **GitHub Issues**: [Report bugs or request features](https://github.com/opea-project/GenAIExamples/issues)
 - **Email**: info@opea.dev
-- **Community**: [OPEA Discussions](https://github.com/orgs/opea-project/discussions)
+- **Community**: [OPEA Discussions](https://github.com/opea-project/discussions)
 
 ### Troubleshooting
 
 **Services not starting**:
+
 ```bash
 # Check logs
 docker compose logs <service-name>
@@ -388,6 +404,7 @@ netstat -tulpn | grep -E '3000|6000|8000'
 ```
 
 **Performance issues**:
+
 - Ensure 16GB+ RAM available
 - Use SSD storage for better I/O
 - Verify Intel Xeon optimizations are enabled
@@ -395,7 +412,7 @@ netstat -tulpn | grep -E '3000|6000|8000'
 
 ## License
 
-This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the Apache License 2.0 - see the [LICENSE](../LICENSE) file for details.
 
 ## Acknowledgments
 
@@ -418,7 +435,6 @@ This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENS
 
 **Built with ❤️ using OPEA GenAI Components and CogniDREAM Platform**
 
-*Production-ready • Scalable • Secure • AI-Powered • Intel Optimized*
+_Production-ready • Scalable • Secure • AI-Powered • Intel Optimized_
 
 For more examples and use cases, visit [OPEA GenAI Examples](https://github.com/opea-project/GenAIExamples).
-

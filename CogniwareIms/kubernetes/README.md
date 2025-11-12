@@ -6,7 +6,10 @@ This directory contains Kubernetes deployment configurations for the OPEA Cogniw
 
 ### Option 1: Helm Chart Deployment
 
+> **Note:** Publish the chart to GHCR before running CI. See `helm/PUBLISH_CHART.md` for instructions.
+
 #### Prerequisites
+
 - Kubernetes cluster (v1.24+)
 - Helm 3.0+
 - kubectl configured
@@ -56,6 +59,7 @@ helm uninstall cogniwareims --namespace opea
 ### Option 2: GMC (GenAI Microservices Connector) Deployment
 
 #### Prerequisites
+
 - Kubernetes cluster with GMC installed
 - kubectl configured
 
@@ -151,4 +155,3 @@ kubectl exec -it <pod-name> -n opea -- curl http://service-name:port/health
 - [OPEA Documentation](https://opea-project.github.io)
 - [Helm Documentation](https://helm.sh/docs/)
 - [GMC Documentation](https://github.com/opea-project/GenAIInfra)
-

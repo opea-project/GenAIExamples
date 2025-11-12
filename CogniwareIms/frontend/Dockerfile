@@ -7,14 +7,14 @@ RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
 # Install dependencies
-COPY frontend/package.json frontend/package-lock.json* ./
+COPY package.json package-lock.json* ./
 RUN npm ci --only=production
 
 # Rebuild the source code only when needed
 FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
-COPY frontend/ .
+COPY . .
 
 # Set environment variables
 ENV NEXT_TELEMETRY_DISABLED 1

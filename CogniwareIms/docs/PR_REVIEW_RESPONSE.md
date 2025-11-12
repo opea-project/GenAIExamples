@@ -1,6 +1,7 @@
 # Response to OPEA PR Review Comments
 
 ## PR Information
+
 - **Pull Request**: [#2307](https://github.com/opea-project/GenAIExamples/pull/2307)
 - **Review Comment**: [#issuecomment-3397505614](https://github.com/opea-project/GenAIExamples/pull/2307#issuecomment-3397505614)
 - **Date**: October 17, 2025
@@ -28,6 +29,7 @@ The dependency review identified 7 vulnerable packages with critical and high CV
 ### Critical CVEs
 
 #### 1. python-jose - Algorithm Confusion (GHSA-6c5p-j8vq-pqhj)
+
 - **Severity**: Critical
 - **Original Version**: 3.3.0
 - **Status**: ⚠️ Documented, migration plan created
@@ -42,12 +44,14 @@ The dependency review identified 7 vulnerable packages with critical and high CV
 ### High CVEs
 
 #### 2. aiohttp - Directory Traversal (GHSA-5h86-8mv2-jq9f)
+
 - **Severity**: High
 - **Original Version**: 3.9.1
 - **New Version**: ✅ 3.10.10
 - **Status**: FIXED
 
 #### 3. aiohttp - DoS via Malformed POST (GHSA-5m98-qgg9-wh84)
+
 - **Severity**: High
 - **Original Version**: 3.9.1
 - **New Version**: ✅ 3.10.10
@@ -56,18 +60,21 @@ The dependency review identified 7 vulnerable packages with critical and high CV
 ### Moderate CVEs
 
 #### 4. aiohttp - HTTP Parser Issues (GHSA-8qpw-xqxj-h4r2)
+
 - **Severity**: Moderate
 - **Original Version**: 3.9.1
 - **New Version**: ✅ 3.10.10
 - **Status**: FIXED
 
 #### 5. aiohttp - XSS Vulnerability
+
 - **Severity**: Moderate
 - **Original Version**: 3.9.1
 - **New Version**: ✅ 3.10.10
 - **Status**: FIXED
 
 #### 6. python-jose - DoS via Compressed JWE (GHSA-cjwg-qfpm-7377)
+
 - **Severity**: Moderate
 - **Original Version**: 3.3.0
 - **Status**: ⚠️ Documented, requires migration (same as #1)
@@ -109,9 +116,11 @@ mypy                   1.7.1          1.11.2         ✅ Updated
 ```
 
 ### Files Modified:
+
 - ✅ `backend/requirements.txt` - All dependency versions updated
 
 ### Documentation Created:
+
 - ✅ `SECURITY_UPDATES.md` - Comprehensive security documentation including:
   - Detailed CVE descriptions and fixes
   - Migration guide for python-jose to PyJWT
@@ -128,6 +137,7 @@ mypy                   1.7.1          1.11.2         ✅ Updated
 **Reviewer Request**: "Please provide a separate download link for the data files instead of including all the data directly in the GitHub repository."
 
 **Context**:
+
 - 7,479 CSV files (~32 MB)
 - Intel product specifications and ordering information
 - Not appropriate for Git repository per OPEA guidelines
@@ -135,11 +145,13 @@ mypy                   1.7.1          1.11.2         ✅ Updated
 ### Implementation
 
 #### 1. Git Ignore Configuration
+
 - ✅ Updated `.gitignore` to exclude `data/` directory
 - ✅ Kept `data/README.md` and `data/.gitkeep` in repo
 - ✅ Prevents accidental commits of large data files
 
 **File**: `.gitignore`
+
 ```gitignore
 # Data files - Download separately (see DATA_SETUP.md)
 data/
@@ -148,6 +160,7 @@ data/
 ```
 
 #### 2. Automated Download Script
+
 - ✅ Created `scripts/download-data.sh` with:
   - Dependency checking (curl/wget, tar)
   - Download progress indication
@@ -157,17 +170,20 @@ data/
   - Support for resumable downloads
 
 **File**: `scripts/download-data.sh` (executable)
+
 - 300+ lines of bash script
 - Production-ready error handling
 - Multiple download method support
 - Integrity verification
 
 **Usage**:
+
 ```bash
 ./scripts/download-data.sh
 ```
 
 #### 3. Data Directory README
+
 - ✅ Created `data/README.md` explaining:
   - Why data is not in repo
   - Download instructions (automated and manual)
@@ -179,6 +195,7 @@ data/
 **File**: `data/README.md` (190+ lines)
 
 #### 4. Comprehensive Data Setup Guide
+
 - ✅ Created `DATA_SETUP.md` with:
   - Quick start instructions
   - Detailed setup options (automated, manual, development)
@@ -191,6 +208,7 @@ data/
 **File**: `DATA_SETUP.md` (600+ lines)
 
 #### 5. Updated Main README
+
 - ✅ Added prominent data download section in Quick Start
 - ✅ Created clear 3-step process:
   1. Download sample data
@@ -206,20 +224,24 @@ data/
 **For Maintainers** - When ready to publish, data should be hosted at:
 
 **Primary (Recommended)**:
-- GitHub Releases: `https://github.com/Cogniware-Inc/cogniware-opea-ims/releases/download/v1.0.0/sample-data.tar.gz`
+
+- GitHub Releases: `https://github.com/opea-project/GenAIExamples/tree/main/CogniwareIms/releases/download/v1.0.0/sample-data.tar.gz`
 
 **Alternatives**:
+
 - Google Cloud Storage
 - AWS S3
 - Azure Blob Storage
 
 **Current Status**:
+
 - ✅ Infrastructure ready
 - ✅ Scripts and docs complete
 - ⏳ Awaiting data upload to hosting service
 - ⏳ URL configuration in `scripts/download-data.sh`
 
 **Temporary Development Mode**:
+
 - Script includes fallback to local data if available
 - Helpful message if hosting not yet configured
 - Won't break development workflow
@@ -245,6 +267,7 @@ The dependency review flagged 2 packages with unknown licenses. Investigation sh
 ## Additional Improvements
 
 ### 1. Enhanced Documentation
+
 - ✅ `SECURITY_UPDATES.md` - Security vulnerability tracking
 - ✅ `DATA_SETUP.md` - Comprehensive data setup guide
 - ✅ `data/README.md` - Data directory documentation
@@ -252,6 +275,7 @@ The dependency review flagged 2 packages with unknown licenses. Investigation sh
 - ✅ Updated `README.md` - Prominent data download instructions
 
 ### 2. Repository Structure
+
 ```
 cogniware-opea-ims/
 ├── backend/
@@ -268,6 +292,7 @@ cogniware-opea-ims/
 ```
 
 ### 3. Developer Experience
+
 - Clear documentation for all changes
 - Automated tooling where possible
 - Comprehensive troubleshooting guides
@@ -278,6 +303,7 @@ cogniware-opea-ims/
 ## Testing Performed
 
 ### 1. Security Testing
+
 ```bash
 # Install updated dependencies
 cd backend
@@ -295,6 +321,7 @@ safety check
 **Result**: ✅ All high and critical CVEs resolved (except python-jose which is documented)
 
 ### 2. Data Download Testing
+
 ```bash
 # Test automated download (development mode)
 ./scripts/download-data.sh
@@ -307,6 +334,7 @@ find data -type f -name "*.csv" | wc -l
 **Result**: ✅ Script executes successfully, handles errors gracefully
 
 ### 3. Application Testing
+
 ```bash
 # Clean start
 ./start.sh
@@ -321,6 +349,7 @@ curl http://localhost:8000/health
 **Result**: ✅ Application starts normally with updated dependencies
 
 ### 4. Documentation Review
+
 - ✅ All links functional
 - ✅ Instructions clear and accurate
 - ✅ Code examples tested
@@ -330,16 +359,16 @@ curl http://localhost:8000/health
 
 ## Compliance Checklist
 
-| Requirement | Status | Evidence |
-|------------|--------|----------|
-| Critical CVEs Fixed | ⚠️ Partial | aiohttp fixed, python-jose documented with migration plan |
-| High CVEs Fixed | ✅ Complete | aiohttp 3.10.10 addresses all high severity issues |
-| Moderate CVEs Fixed | ⚠️ Partial | aiohttp fixed, python-jose requires migration |
-| Data Files Separated | ✅ Complete | Data download system implemented |
-| License Compliance | ✅ Complete | All dependencies Apache 2.0 compatible |
-| Documentation | ✅ Complete | Comprehensive docs added |
-| Testing | ✅ Complete | All changes tested |
-| No Breaking Changes | ✅ Complete | Backward compatible |
+| Requirement          | Status      | Evidence                                                  |
+| -------------------- | ----------- | --------------------------------------------------------- |
+| Critical CVEs Fixed  | ⚠️ Partial  | aiohttp fixed, python-jose documented with migration plan |
+| High CVEs Fixed      | ✅ Complete | aiohttp 3.10.10 addresses all high severity issues        |
+| Moderate CVEs Fixed  | ⚠️ Partial  | aiohttp fixed, python-jose requires migration             |
+| Data Files Separated | ✅ Complete | Data download system implemented                          |
+| License Compliance   | ✅ Complete | All dependencies Apache 2.0 compatible                    |
+| Documentation        | ✅ Complete | Comprehensive docs added                                  |
+| Testing              | ✅ Complete | All changes tested                                        |
+| No Breaking Changes  | ✅ Complete | Backward compatible                                       |
 
 ---
 
@@ -348,18 +377,21 @@ curl http://localhost:8000/health
 ### Timeline
 
 **Phase 1: Current PR**
+
 - ✅ Document issue
 - ✅ Add TODO comments in code
 - ✅ Create migration guide
 - ✅ Update all other packages
 
 **Phase 2: Follow-up PR (Recommended)**
+
 - [ ] Implement PyJWT migration
 - [ ] Update authentication module
 - [ ] Add comprehensive tests
 - [ ] Update documentation
 
 **Phase 3: Validation**
+
 - [ ] Security audit
 - [ ] Performance benchmarks
 - [ ] User acceptance testing
@@ -385,11 +417,13 @@ curl http://localhost:8000/health
 ## Files Changed Summary
 
 ### Modified Files
+
 1. `backend/requirements.txt` - 28 package version updates
 2. `.gitignore` - Added data directory exclusion
 3. `README.md` - Added data download instructions
 
 ### New Files
+
 1. `SECURITY_UPDATES.md` - Security documentation (350+ lines)
 2. `DATA_SETUP.md` - Data setup guide (600+ lines)
 3. `data/README.md` - Data directory readme (190+ lines)
@@ -404,6 +438,7 @@ curl http://localhost:8000/health
 ## Deployment Impact
 
 ### No Breaking Changes
+
 - ✅ Backward compatible dependency updates
 - ✅ Application code unchanged
 - ✅ Docker configuration unchanged
@@ -412,6 +447,7 @@ curl http://localhost:8000/health
 ### What Users Need to Do
 
 **First Time Setup**:
+
 ```bash
 # Download data (new step)
 ./scripts/download-data.sh
@@ -421,6 +457,7 @@ curl http://localhost:8000/health
 ```
 
 **Existing Deployments**:
+
 ```bash
 # Update dependencies
 docker-compose down
@@ -435,25 +472,31 @@ docker-compose up -d --build
 ## Recommendations for OPEA Maintainers
 
 ### 1. Review Priority: High
+
 - Critical security fixes implemented
 - Data separation per OPEA guidelines
 - Well-documented changes
 
 ### 2. Merge Conditions
+
 - ✅ All high CVEs fixed
 - ⚠️ python-jose documented (migration plan provided)
 - ✅ Data separation complete
 - ✅ Documentation comprehensive
 
 ### 3. Follow-up Actions
+
 After merge, recommend:
+
 1. Upload sample data to GitHub Releases
 2. Update download script URLs
 3. Create issue for python-jose migration
 4. Schedule security audit
 
 ### 4. Communication
+
 Suggest announcing:
+
 - Security updates in changelog
 - Data download requirement in release notes
 - Migration timeline for python-jose
@@ -463,15 +506,18 @@ Suggest announcing:
 ## Supporting Documentation
 
 ### Security
+
 - `SECURITY_UPDATES.md` - Complete CVE tracking and fixes
 - `SECURITY.md` - General security guidelines
 
 ### Setup
+
 - `DATA_SETUP.md` - Data download and hosting guide
 - `data/README.md` - Data directory documentation
 - `README.md` - Updated quick start with data instructions
 
 ### Scripts
+
 - `scripts/download-data.sh` - Automated data download
 - `scripts/health_check.sh` - System health validation
 
@@ -480,16 +526,19 @@ Suggest announcing:
 ## Contact Information
 
 **Primary Contact**: Cogniware DevOps Team
+
 - **GitHub**: @cogniware-devops
 - **Email**: support@cogniware.com
 
 **For Security Issues**:
+
 - **Email**: security@cogniware.com
 - **Response Time**: 24-48 hours
 
 **For Technical Questions**:
+
 - **GitHub Issues**: [Create Issue](https://github.com/opea-project/GenAIExamples/issues)
-- **OPEA Discussions**: [Community Forum](https://github.com/orgs/opea-project/discussions)
+- **OPEA Discussions**: [Community Forum](https://github.com/opea-project/discussions)
 
 ---
 
@@ -554,6 +603,4 @@ curl http://localhost:8000/api/knowledge/stats
 
 ---
 
-*End of PR Review Response*
-
-
+_End of PR Review Response_

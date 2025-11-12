@@ -1,7 +1,7 @@
 # Cogniware OPEA IMS - AI-Powered Inventory Management System
 
 [![OPEA](https://img.shields.io/badge/OPEA-GenAI%20Components-blue)](https://github.com/opea-project/GenAIComps)
-[![Intel](https://img.shields.io/badge/Intel-Xeon%20Optimized-0071C5?logo=intel)](https://www.intel.com/xeon)
+[![Intel](https://img.shields.io/badge/Intel-Xeon%20Optimized-0071C5?logo=intel)](https://www.intel.com/content/www/us/en/products/details/processors/xeon.html)
 [![License](https://img.shields.io/badge/License-Apache%202.0-green.svg)](LICENSE)
 [![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker)](https://www.docker.com/)
 [![Production](https://img.shields.io/badge/Status-Production%20Ready-success)](https://github.com/opea-project)
@@ -11,6 +11,7 @@
 **Cogniware OPEA IMS** is a production-ready, AI-powered Inventory Management System built on the [OPEA (Open Platform for Enterprise AI)](https://github.com/opea-project) framework, **specifically optimized for Intel Xeon processors**. It demonstrates enterprise-grade integration of multiple GenAI microservices for intelligent inventory operations, leveraging Intel's AI acceleration capabilities for superior performance. This platform is built with CogniDREAM Code Generation Platform, a Cogniware AI engine that can create end-to-end production ready agentic platforms with natural language inputs.
 
 > **🚀 Intel Xeon Powered**: This system is engineered to leverage Intel Xeon processor capabilities including:
+>
 > - Intel Deep Learning Boost (Intel DL Boost) for faster AI inference
 > - Intel Advanced Vector Extensions (AVX-512) for optimized computations
 > - Intel Math Kernel Library (MKL) integration for superior performance
@@ -75,15 +76,17 @@
 > **⚠️ Important**: The sample data files (7,479 CSV files, ~32MB) are **not included** in the Git repository per OPEA guidelines. They must be downloaded separately before first use.
 
 **Automated download (recommended)**:
+
 ```bash
 # Download sample inventory data
 ./scripts/download-data.sh
 ```
 
 **Manual download**:
-See [DATA_SETUP.md](DATA_SETUP.md) for detailed instructions and alternative download options.
+See [Data Setup Guide](docs/DATA_SETUP.md) for detailed instructions and alternative download options.
 
 **What's included**:
+
 - 7,479 CSV files with Intel product specifications
 - Product categories: Xeon processors, Core CPUs, FPGAs, server components, storage, networking
 - Total size: ~32 MB compressed, ~45 MB extracted
@@ -172,6 +175,7 @@ cp .env.example .env
 ```
 
 Key variables:
+
 - `OPEA_EMBEDDING_URL`: Embedding service endpoint
 - `OPEA_LLM_URL`: LLM service endpoint
 - `DATABASE_URL`: PostgreSQL connection string
@@ -191,6 +195,7 @@ curl -X POST http://localhost:8000/api/auth/login \
 ```
 
 **Default Users:**
+
 - `consumer@company.com` - Consumer role
 - `inventory@company.com` - Inventory Manager role
 - `admin@company.com` - Super Admin role
@@ -270,6 +275,7 @@ This system integrates the following OPEA components:
 ### Data Flow
 
 **Query Processing:**
+
 ```
 User Query → Frontend
     ↓
@@ -285,6 +291,7 @@ Formatted response → Frontend → User
 ```
 
 **Knowledge Ingestion:**
+
 ```
 CSV/Text Input → Backend
     ↓
@@ -399,6 +406,7 @@ docker-compose logs > logs.txt
 ### Metrics
 
 Access metrics at:
+
 - Prometheus: http://localhost:9090 (if enabled)
 - Grafana: http://localhost:3001 (if enabled)
 
@@ -443,34 +451,42 @@ docker-compose up -d --scale backend=3
 ## 🌟 Use Cases
 
 ### 1. Intelligent Inventory Search
+
 "Show me all GPUs with more than 40GB memory in stock at Portland warehouse"
 
 ### 2. Automated Reporting
+
 "Generate a summary of this month's inventory movements"
 
 ### 3. Predictive Analytics
+
 "Forecast demand for Xeon processors for next 30 days"
 
 ### 4. Natural Language Database Queries
+
 "Which products are below reorder threshold?"
 
 ### 5. Continuous Learning
+
 Upload new product catalogs, system automatically learns and adapts
 
 ## 📚 Documentation
 
-- **[Data Setup Guide](DATA_SETUP.md)** - ⚠️ **Required**: Download sample data files
-- [Complete Setup Guide](docs/SETUP_GUIDE.md)
-- [OPEA Integration Details](docs/OPEA_INTEGRATION.md)
-- [API Documentation](docs/API_DOCS.md)
-- [Deployment Guide](docs/DEPLOYMENT.md)
+- **[Data Setup Guide](docs/DATA_SETUP.md)** - ⚠️ **Required**: Download sample data files
+- [Data Source Updates](docs/DATA_SOURCE_UPDATE.md)
+- [Deployment Guide](docs/DEPLOYMENT_GUIDE.md)
+- [Submission Checklist](docs/SUBMISSION_CHECKLIST.md)
+- [Final Submission Checklist](docs/FINAL_SUBMISSION_CHECKLIST.md)
+- [Ready for Submission Guide](docs/READY_FOR_SUBMISSION.md)
 - [Security Guidelines](docs/SECURITY.md)
-- [Security Updates](SECURITY_UPDATES.md) - Recent CVE fixes
-- [Troubleshooting](docs/TROUBLESHOOTING.md)
+- [Security Updates](docs/SECURITY_UPDATES.md) - Recent CVE fixes
+- [Changelog](docs/CHANGELOG.md)
+- [Compliance Summary](docs/OPEA_COMPLIANCE_SUMMARY.md)
+- [How to Submit](docs/HOW_TO_SUBMIT_TO_OPEA.md)
 
 ## 🤝 Contributing
 
-This project follows OPEA contribution guidelines. See [CONTRIBUTING.md](CONTRIBUTING.md).
+This project follows OPEA contribution guidelines. See [CONTRIBUTING.md](docs/CONTRIBUTING.md).
 
 ### Development Setup
 
@@ -507,7 +523,7 @@ This project is licensed under the Apache License 2.0 - see [LICENSE](LICENSE) f
 
 - Documentation: [docs/](docs/)
 - Issues: GitHub Issues
-- OPEA Community: [opea-project discussions](https://github.com/orgs/opea-project/discussions)
+- OPEA Community: [opea-project discussions](https://github.com/opea-project/discussions)
 
 ## 🎯 Roadmap
 
@@ -522,5 +538,4 @@ This project is licensed under the Apache License 2.0 - see [LICENSE](LICENSE) f
 
 **Built with ❤️ using OPEA GenAI Components**
 
-*Production-ready • Scalable • Secure • AI-Powered*
-
+_Production-ready • Scalable • Secure • AI-Powered_

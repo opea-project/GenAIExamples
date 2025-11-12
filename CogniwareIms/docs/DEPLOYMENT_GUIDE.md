@@ -103,6 +103,7 @@ docker-compose exec backend python app/init_knowledge_base.py
 - **RedisInsight**: http://localhost:8001
 
 **Default Login:**
+
 - Email: `inventory@company.com`
 - Password: `password123`
 
@@ -582,7 +583,7 @@ free -h
 services:
   llm-service:
     healthcheck:
-      start_period: 300s  # Increase from 120s
+      start_period: 300s # Increase from 120s
 ```
 
 #### Issue: Out of memory
@@ -595,7 +596,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 32G  # Increase from 16G
+          memory: 32G # Increase from 16G
 ```
 
 ---
@@ -624,4 +625,3 @@ After deployment:
 ---
 
 **Your OPEA IMS system is production-ready! 🚀**
-

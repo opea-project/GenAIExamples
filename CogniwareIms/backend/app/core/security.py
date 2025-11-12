@@ -1,18 +1,21 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
 """
 Security utilities - JWT, password hashing, authentication
 Industry-standard security implementation
 """
 
-from datetime import datetime, timedelta
-from typing import Optional, Dict, Any
-from passlib.context import CryptContext
-from jose import JWTError, jwt
-from fastapi import HTTPException, Security, Depends
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-import os
-import secrets
 import hashlib
 import logging
+import os
+import secrets
+from datetime import datetime, timedelta
+from typing import Any, Dict, Optional
+
+from fastapi import Depends, HTTPException, Security
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from jose import JWTError, jwt
+from passlib.context import CryptContext
 
 logger = logging.getLogger(__name__)
 
@@ -27,12 +30,13 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 # HTTP Bearer token scheme
 security = HTTPBearer()
 
+
 class SecurityManager:
-    """Manages authentication and authorization"""
+    """Manages authentication and authorization."""
 
     @staticmethod
     def verify_password(plain_password: str, hashed_password: str) -> bool:
-        """Verify a password against its hash"""
+        """Verify a password against its hash."""
         try:
             return pwd_context.verify(plain_password, hashed_password)
         except Exception as e:
@@ -41,16 +45,14 @@ class SecurityManager:
 
     @staticmethod
     def get_password_hash(password: str) -> str:
-        """Hash a password"""
+        """Hash a password."""
         return pwd_context.hash(password)
 
     @staticmethod
     def create_access_token(
-        data: Dict[str, Any],
-        expires_delta: Optional[timedelta] = None
+        data: Dict[str, Any], expires_delta: Optional[timedelta] = None
     ) -> str:
-        """
-        Create a JWT access token
+        """Create a JWT access token.
 
         Args:
             data: Payload data to encode in token
@@ -66,19 +68,20 @@ class SecurityManager:
         else:
             expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
 
-        to_encode.update({
-            "exp": expire,
-            "iat": datetime.utcnow(),
-            "jti": secrets.token_hex(16)  # Unique token ID
-        })
+        to_encode.update(
+            {
+                "exp": expire,
+                "iat": datetime.utcnow(),
+                "jti": secrets.token_hex(16),  # Unique token ID
+            }
+        )
 
         encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
         return encoded_jwt
 
     @staticmethod
     def verify_token(token: str) -> Dict[str, Any]:
-        """
-        Verify and decode a JWT token
+        """Verify and decode a JWT token.
 
         Args:
             token: JWT token string
@@ -102,25 +105,24 @@ class SecurityManager:
 
     @staticmethod
     def create_api_key() -> str:
-        """Generate a secure API key"""
+        """Generate a secure API key."""
         return secrets.token_urlsafe(32)
 
     @staticmethod
     def hash_api_key(api_key: str) -> str:
-        """Hash an API key for storage"""
+        """Hash an API key for storage."""
         return hashlib.sha256(api_key.encode()).hexdigest()
 
     @staticmethod
     def verify_api_key(api_key: str, hashed_key: str) -> bool:
-        """Verify an API key against its hash"""
+        """Verify an API key against its hash."""
         return hashlib.sha256(api_key.encode()).hexdigest() == hashed_key
 
 
 def get_current_user(
-    credentials: HTTPAuthorizationCredentials = Security(security)
+    credentials: HTTPAuthorizationCredentials = Security(security),
 ) -> Dict[str, Any]:
-    """
-    Dependency to get current authenticated user from JWT token
+    """Dependency to get current authenticated user from JWT token.
 
     Usage:
         @app.get("/protected")
@@ -133,26 +135,27 @@ def get_current_user(
     # Extract user info from payload
     email = payload.get("sub")
     if email is None:
-        raise HTTPException(status_code=401, detail="Invalid authentication credentials")
+        raise HTTPException(
+            status_code=401, detail="Invalid authentication credentials"
+        )
 
     return payload
 
 
 def require_role(required_role: str):
-    """
-    Dependency factory for role-based access control
+    """Dependency factory for role-based access control.
 
     Usage:
         @app.get("/admin")
         def admin_route(user: Dict = Depends(require_role("Super Admin"))):
             return {"message": "Admin access granted"}
     """
+
     def role_checker(current_user: Dict = Depends(get_current_user)):
         user_role = current_user.get("role")
         if user_role != required_role:
             raise HTTPException(
-                status_code=403,
-                detail=f"Access denied. Required role: {required_role}"
+                status_code=403, detail=f"Access denied. Required role: {required_role}"
             )
         return current_user
 
@@ -161,8 +164,7 @@ def require_role(required_role: str):
 
 # Password strength validation
 def validate_password_strength(password: str) -> tuple[bool, str]:
-    """
-    Validate password meets security requirements
+    """Validate password meets security requirements.
 
     Returns:
         (is_valid, error_message)
@@ -188,7 +190,7 @@ def validate_password_strength(password: str) -> tuple[bool, str]:
 
 # Security headers middleware
 def get_security_headers() -> Dict[str, str]:
-    """Get recommended security headers"""
+    """Get recommended security headers."""
     return {
         "X-Content-Type-Options": "nosniff",
         "X-Frame-Options": "DENY",
@@ -196,14 +198,13 @@ def get_security_headers() -> Dict[str, str]:
         "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
         "Content-Security-Policy": "default-src 'self'",
         "Referrer-Policy": "strict-origin-when-cross-origin",
-        "Permissions-Policy": "geolocation=(), microphone=(), camera=()"
+        "Permissions-Policy": "geolocation=(), microphone=(), camera=()",
     }
 
 
 # Input sanitization
 def sanitize_input(text: str, max_length: int = 1000) -> str:
-    """
-    Sanitize user input to prevent injection attacks
+    """Sanitize user input to prevent injection attacks.
 
     Args:
         text: Input text
@@ -220,28 +221,24 @@ def sanitize_input(text: str, max_length: int = 1000) -> str:
 
     # Remove potentially dangerous characters
     # (This is basic; consider using bleach or similar for HTML)
-    dangerous_chars = ['<', '>', '"', "'", '&', '`']
+    dangerous_chars = ["<", ">", '"', "'", "&", "`"]
     for char in dangerous_chars:
-        text = text.replace(char, '')
+        text = text.replace(char, "")
 
     return text.strip()
 
 
 # Rate limiting helper
 class RateLimiter:
-    """Simple in-memory rate limiter"""
+    """Simple in-memory rate limiter."""
 
     def __init__(self):
         self.requests = {}
 
     def is_allowed(
-        self,
-        identifier: str,
-        max_requests: int = 60,
-        window_seconds: int = 60
+        self, identifier: str, max_requests: int = 60, window_seconds: int = 60
     ) -> bool:
-        """
-        Check if request is allowed under rate limit
+        """Check if request is allowed under rate limit.
 
         Args:
             identifier: Unique identifier (IP, user ID, etc.)
@@ -259,8 +256,7 @@ class RateLimiter:
         # Clean old requests
         cutoff = now - timedelta(seconds=window_seconds)
         self.requests[identifier] = [
-            req_time for req_time in self.requests[identifier]
-            if req_time > cutoff
+            req_time for req_time in self.requests[identifier] if req_time > cutoff
         ]
 
         # Check limit
@@ -275,14 +271,14 @@ class RateLimiter:
 # Global rate limiter instance
 rate_limiter = RateLimiter()
 
+
 # Audit logging
 def log_security_event(
     event_type: str,
     user_id: Optional[str] = None,
-    details: Optional[Dict[str, Any]] = None
+    details: Optional[Dict[str, Any]] = None,
 ):
-    """
-    Log security-related events for audit trail
+    """Log security-related events for audit trail.
 
     Args:
         event_type: Type of event (login, logout, failed_auth, etc.)
@@ -293,7 +289,7 @@ def log_security_event(
         "timestamp": datetime.utcnow().isoformat(),
         "event_type": event_type,
         "user_id": user_id,
-        "details": details or {}
+        "details": details or {},
     }
 
     # In production, this should write to a secure audit log
@@ -302,11 +298,10 @@ def log_security_event(
 
 # CSRF token generation (for forms)
 def generate_csrf_token() -> str:
-    """Generate a CSRF token"""
+    """Generate a CSRF token."""
     return secrets.token_urlsafe(32)
 
 
 def verify_csrf_token(token: str, stored_token: str) -> bool:
-    """Verify CSRF token"""
+    """Verify CSRF token."""
     return secrets.compare_digest(token, stored_token)
-

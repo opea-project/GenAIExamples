@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Security
 
 #### Fixed
+
 - **aiohttp updated to 3.10.10** - Resolves multiple high and critical vulnerabilities:
   - Directory traversal vulnerability (GHSA-5h86-8mv2-jq9f) - High
   - DoS via malformed POST requests (GHSA-5m98-qgg9-wh84) - High
@@ -19,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - XSS on static file index pages - Moderate
 
 #### Updated Security Dependencies
+
 - `fastapi`: 0.104.1 → 0.115.0
 - `uvicorn[standard]`: 0.24.0 → 0.31.0
 - `python-multipart`: 0.0.6 → 0.0.12
@@ -27,6 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `httpx`: 0.25.2 → 0.27.2
 
 #### Documented
+
 - **python-jose 3.3.0** - Critical vulnerabilities documented with migration plan to PyJWT
   - Algorithm confusion (GHSA-6c5p-j8vq-pqhj) - Critical
   - DoS via compressed JWE (GHSA-cjwg-qfpm-7377) - Moderate
@@ -36,6 +39,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 #### Data Handling
+
 - **BREAKING**: Sample data files (7,479 CSV, ~32MB) now **excluded from Git repository**
   - Per OPEA guidelines to maintain manageable repository size
   - Data must be downloaded separately before first use
@@ -44,38 +48,46 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 #### Updated Dependencies
 
 **Database**:
+
 - `sqlalchemy`: 2.0.23 → 2.0.35
 - `psycopg2-binary`: 2.9.9 → 2.9.10
 - `alembic`: 1.12.1 → 1.13.3
 
 **Caching**:
+
 - `redis`: 5.0.1 → 5.2.0
 - `hiredis`: 2.2.3 → 3.0.0
 
 **Data Processing**:
+
 - `pandas`: 2.1.3 → 2.2.3
 - `numpy`: 1.26.2 → 2.1.2
 - `openpyxl`: 3.1.2 → 3.1.5
 - `python-docx`: 1.1.0 → 1.1.2
 
 **Validation**:
+
 - `pydantic`: 2.5.2 → 2.9.2
 - `pydantic-settings`: 2.1.0 → 2.5.2
 - `email-validator`: 2.1.0 → 2.2.0
 
 **Utilities**:
+
 - `python-dotenv`: 1.0.0 → 1.0.1
 - `PyYAML`: 6.0.1 → 6.0.2
 
 **AI/ML**:
+
 - `scikit-learn`: 1.3.2 → 1.5.2
 
 **Testing**:
+
 - `pytest`: 7.4.3 → 8.3.3
 - `pytest-asyncio`: 0.21.1 → 0.24.0
 - `pytest-cov`: 4.1.0 → 6.0.0
 
 **Code Quality**:
+
 - `black`: 23.11.0 → 24.10.0
 - `flake8`: 6.1.0 → 7.1.1
 - `mypy`: 1.7.1 → 1.11.2
@@ -83,6 +95,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 #### Documentation
+
 - **`SECURITY_UPDATES.md`** - Comprehensive security vulnerability tracking
   - Complete CVE descriptions and fixes
   - Migration guide: python-jose → PyJWT
@@ -112,6 +125,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **`CHANGELOG.md`** - This file
 
 #### Scripts
+
 - **`scripts/download-data.sh`** - Automated data download script
   - Dependency checking (curl/wget, tar)
   - Download with progress indication
@@ -121,12 +135,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Support for multiple hosting services
 
 #### Configuration
+
 - **`data/.gitkeep`** - Ensures data directory tracked in Git
 
 ### Modified
 
 #### Configuration Files
+
 - **`.gitignore`** - Added data directory exclusion
+
   ```gitignore
   # Data files - Download separately (see DATA_SETUP.md)
   data/
@@ -137,6 +154,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **`backend/requirements.txt`** - All 28 dependencies updated to latest stable versions
 
 #### Documentation Updates
+
 - **`README.md`** - Enhanced Quick Start section
   - Added Step 1: Download Sample Data
   - Prominent warning about data requirement
@@ -185,6 +203,7 @@ sha256sum sample-data.tar.gz > sample-data.sha256
 ## [1.0.0] - 2025-10-13 (Initial Release)
 
 ### Added
+
 - Complete AI-powered inventory management system
 - OPEA GenAI microservices integration
 - Intel Xeon processor optimizations
@@ -200,12 +219,14 @@ sha256sum sample-data.tar.gz > sample-data.sha256
 - Comprehensive documentation
 
 ### OPEA Components Used
+
 - Embedding Service (BAAI/bge-base-en-v1.5)
 - Retrieval Service (Redis vector store)
 - LLM Service (Intel/neural-chat-7b-v3-3)
 - ChatQnA Gateway
 
 ### Technology Stack
+
 - **Backend**: FastAPI, Python 3.11
 - **Frontend**: Next.js 14, React 18, TypeScript
 - **Database**: PostgreSQL 15
@@ -214,6 +235,7 @@ sha256sum sample-data.tar.gz > sample-data.sha256
 - **Platform**: Intel Xeon (CPU-only, no GPU required)
 
 ### Sample Data
+
 - 7,479 CSV files with Intel product specifications
 - Categories: Processors, FPGAs, server components, storage, networking
 - Total size: ~32 MB
@@ -236,7 +258,7 @@ sha256sum sample-data.tar.gz > sample-data.sha256
 
 ### Links
 
-- **GitHub**: [Cogniware OPEA IMS](https://github.com/Cogniware-Inc/cogniware-opea-ims)
+- **GitHub**: [Cogniware OPEA IMS](https://github.com/opea-project/GenAIExamples/tree/main/CogniwareIms)
 - **OPEA Project**: [opea-project/GenAIExamples](https://github.com/opea-project/GenAIExamples)
 - **Documentation**: See `docs/` directory
 - **Issues**: GitHub Issues
@@ -244,7 +266,5 @@ sha256sum sample-data.tar.gz > sample-data.sha256
 
 ---
 
-*Changelog follows [Keep a Changelog](https://keepachangelog.com/) format*
-*Last Updated: October 17, 2025*
-
-
+_Changelog follows [Keep a Changelog](https://keepachangelog.com/) format_
+_Last Updated: October 17, 2025_

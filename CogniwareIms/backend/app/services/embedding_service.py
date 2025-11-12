@@ -1,19 +1,20 @@
-"""
-OPEA Embedding Service Integration
-Handles text vectorization and embedding generation
-"""
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+"""OPEA Embedding Service Integration Handles text vectorization and embedding generation."""
+
+import logging
+import os
+from functools import lru_cache
+from typing import Any, Dict, List
 
 import httpx
-import os
-import logging
-from typing import List, Dict, Any
 import numpy as np
-from functools import lru_cache
 
 logger = logging.getLogger(__name__)
 
+
 class EmbeddingService:
-    """Integration with OPEA Embedding microservice"""
+    """Integration with OPEA Embedding microservice."""
 
     def __init__(self):
         self.base_url = os.getenv("OPEA_EMBEDDING_URL", "http://embedding-service:6000")
@@ -22,10 +23,7 @@ class EmbeddingService:
         self.cache = {}
 
     async def embed_text(self, text: str) -> List[float]:
-        """
-        Generate embedding for a single text
-        Uses OPEA embedding microservice
-        """
+        """Generate embedding for a single text Uses OPEA embedding microservice."""
         # Check cache first
         if text in self.cache:
             logger.debug(f"Cache hit for text: {text[:50]}...")
@@ -35,10 +33,7 @@ class EmbeddingService:
             async with httpx.AsyncClient(timeout=self.timeout) as client:
                 response = await client.post(
                     f"{self.base_url}/v1/embeddings",
-                    json={
-                        "input": text,
-                        "model": self.model_id
-                    }
+                    json={"input": text, "model": self.model_id},
                 )
                 response.raise_for_status()
                 result = response.json()
@@ -64,31 +59,29 @@ class EmbeddingService:
             logger.error(f"Error generating embedding: {e}")
             raise
 
-    async def embed_batch(self, texts: List[str], batch_size: int = 32) -> List[List[float]]:
-        """
-        Generate embeddings for multiple texts in batches
-        More efficient for large datasets
-        """
+    async def embed_batch(
+        self, texts: List[str], batch_size: int = 32
+    ) -> List[List[float]]:
+        """Generate embeddings for multiple texts in batches More efficient for large datasets."""
         embeddings = []
 
         for i in range(0, len(texts), batch_size):
-            batch = texts[i:i + batch_size]
+            batch = texts[i : i + batch_size]
 
             try:
                 async with httpx.AsyncClient(timeout=self.timeout) as client:
                     response = await client.post(
                         f"{self.base_url}/v1/embeddings",
-                        json={
-                            "input": batch,
-                            "model": self.model_id
-                        }
+                        json={"input": batch, "model": self.model_id},
                     )
                     response.raise_for_status()
                     result = response.json()
 
                     # Extract embeddings
                     if "data" in result:
-                        batch_embeddings = [item["embedding"] for item in result["data"]]
+                        batch_embeddings = [
+                            item["embedding"] for item in result["data"]
+                        ]
                     else:
                         # Fallback: generate one by one
                         batch_embeddings = []
@@ -111,11 +104,10 @@ class EmbeddingService:
 
         return embeddings
 
-    async def embed_documents(self, documents: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-        """
-        Embed a list of documents with metadata
-        Returns documents with added embedding field
-        """
+    async def embed_documents(
+        self, documents: List[Dict[str, Any]]
+    ) -> List[Dict[str, Any]]:
+        """Embed a list of documents with metadata Returns documents with added embedding field."""
         texts = [doc.get("text", "") for doc in documents]
         embeddings = await self.embed_batch(texts)
 
@@ -131,7 +123,7 @@ class EmbeddingService:
 
     @lru_cache(maxsize=1000)
     def cosine_similarity(self, vec1_tuple: tuple, vec2_tuple: tuple) -> float:
-        """Calculate cosine similarity between two vectors"""
+        """Calculate cosine similarity between two vectors."""
         vec1 = np.array(vec1_tuple)
         vec2 = np.array(vec2_tuple)
 
@@ -144,10 +136,10 @@ class EmbeddingService:
 
         return float(dot_product / (norm1 * norm2))
 
-    async def find_similar(self, query_text: str, candidate_texts: List[str], top_k: int = 5) -> List[Dict[str, Any]]:
-        """
-        Find most similar texts to query using cosine similarity
-        """
+    async def find_similar(
+        self, query_text: str, candidate_texts: List[str], top_k: int = 5
+    ) -> List[Dict[str, Any]]:
+        """Find most similar texts to query using cosine similarity."""
         # Generate query embedding
         query_embedding = await self.embed_text(query_text)
 
@@ -156,23 +148,20 @@ class EmbeddingService:
 
         # Calculate similarities
         similarities = []
-        for idx, (text, embedding) in enumerate(zip(candidate_texts, candidate_embeddings)):
+        for idx, (text, embedding) in enumerate(
+            zip(candidate_texts, candidate_embeddings)
+        ):
             similarity = self.cosine_similarity(
-                tuple(query_embedding),
-                tuple(embedding)
+                tuple(query_embedding), tuple(embedding)
             )
-            similarities.append({
-                "text": text,
-                "index": idx,
-                "similarity": similarity
-            })
+            similarities.append({"text": text, "index": idx, "similarity": similarity})
 
         # Sort by similarity and return top k
         similarities.sort(key=lambda x: x["similarity"], reverse=True)
         return similarities[:top_k]
 
     async def health_check(self) -> bool:
-        """Check if embedding service is available"""
+        """Check if embedding service is available."""
         try:
             async with httpx.AsyncClient(timeout=httpx.Timeout(5.0)) as client:
                 response = await client.get(f"{self.base_url}/v1/health_check")
@@ -180,6 +169,6 @@ class EmbeddingService:
         except:
             return False
 
+
 # Global instance
 embedding_service = EmbeddingService()
-

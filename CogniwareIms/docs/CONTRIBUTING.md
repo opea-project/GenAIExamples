@@ -30,6 +30,7 @@ By participating in this project, you agree to maintain a respectful and inclusi
 
 1. **Fork the repository**
 2. **Create a feature branch**
+
    ```bash
    git checkout -b feature/your-feature-name
    ```
@@ -40,9 +41,11 @@ By participating in this project, you agree to maintain a respectful and inclusi
    - Update documentation
 
 4. **Commit your changes**
+
    ```bash
    git commit -m "feat: Add amazing feature"
    ```
+
    Use conventional commits format:
    - `feat:` New feature
    - `fix:` Bug fix
@@ -53,6 +56,7 @@ By participating in this project, you agree to maintain a respectful and inclusi
    - `chore:` Maintenance
 
 5. **Push to your fork**
+
    ```bash
    git push origin feature/your-feature-name
    ```
@@ -75,6 +79,7 @@ By participating in this project, you agree to maintain a respectful and inclusi
 ### Local Development
 
 **Backend:**
+
 ```bash
 cd backend
 
@@ -94,6 +99,7 @@ uvicorn app.main:app --reload
 ```
 
 **Frontend:**
+
 ```bash
 cd frontend
 
@@ -134,6 +140,7 @@ def example_function(param: str) -> Dict[str, Any]:
 ```
 
 **Formatting:**
+
 ```bash
 # Format code
 black backend/
@@ -164,6 +171,7 @@ export function ExampleComponent({ data, onUpdate }: ExampleProps) {
 ```
 
 **Formatting:**
+
 ```bash
 # Format code
 npm run lint
@@ -238,6 +246,7 @@ Follow [Conventional Commits](https://www.conventionalcommits.org/):
 ```
 
 **Examples:**
+
 ```
 feat(backend): Add knowledge base search endpoint
 
@@ -311,6 +320,7 @@ Maintainers will handle releases:
 ## Recognition
 
 Contributors will be:
+
 - Listed in CONTRIBUTORS.md
 - Mentioned in release notes
 - Credited in documentation
@@ -329,4 +339,3 @@ By contributing, you agree that your contributions will be licensed under the Ap
 ---
 
 Thank you for contributing to Cogniware OPEA IMS! 🎉
-

@@ -1,26 +1,26 @@
-"""
-Knowledge Base Manager
-Handles continuous learning and knowledge base updates
-Allows users to add new knowledge and retrain on combined old+new data
-"""
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+"""Knowledge Base Manager Handles continuous learning and knowledge base updates Allows users to add new knowledge and
+retrain on combined old+new data."""
 
-import logging
-from typing import List, Dict, Any, Optional
-from datetime import datetime
 import json
-from pathlib import Path
-import pandas as pd
+import logging
 import os
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List, Optional
+
+import pandas as pd
+
 from .embedding_service import embedding_service
 from .retrieval_service import retrieval_service
 
 logger = logging.getLogger(__name__)
 
+
 class KnowledgeManager:
-    """
-    Manages knowledge base with continuous learning capabilities
-    Users can add new documents/data and system retrains automatically
-    """
+    """Manages knowledge base with continuous learning capabilities Users can add new documents/data and system retrains
+    automatically."""
 
     def __init__(self, data_dir: str = "../data"):
         self.data_dir = Path(data_dir)
@@ -31,20 +31,20 @@ class KnowledgeManager:
         self.load_history()
 
     def load_history(self):
-        """Load training history"""
+        """Load training history."""
         if self.history_file.exists():
-            with open(self.history_file, 'r') as f:
+            with open(self.history_file, "r") as f:
                 self.history = json.load(f)
         else:
             self.history = {
                 "training_runs": [],
                 "total_documents": 0,
-                "last_update": None
+                "last_update": None,
             }
 
     def save_history(self):
-        """Save training history"""
-        with open(self.history_file, 'w') as f:
+        """Save training history."""
+        with open(self.history_file, "w") as f:
             json.dump(self.history, f, indent=2)
 
     async def add_knowledge_from_text(
@@ -52,10 +52,9 @@ class KnowledgeManager:
         text: str,
         source: str,
         metadata: Optional[Dict[str, Any]] = None,
-        auto_train: bool = True
+        auto_train: bool = True,
     ) -> Dict[str, Any]:
-        """
-        Add new knowledge from text input
+        """Add new knowledge from text input.
 
         Args:
             text: The knowledge text to add
@@ -75,7 +74,7 @@ class KnowledgeManager:
                 "source": source,
                 "added_at": datetime.now().isoformat(),
                 "added_by": metadata.get("user", "system") if metadata else "system",
-                **(metadata or {})
+                **(metadata or {}),
             }
 
             # Generate embedding
@@ -83,10 +82,7 @@ class KnowledgeManager:
 
             # Index in vector store
             success = await retrieval_service.index_document(
-                doc_id=doc_id,
-                text=text,
-                embedding=embedding,
-                metadata=full_metadata
+                doc_id=doc_id, text=text, embedding=embedding, metadata=full_metadata
             )
 
             if success:
@@ -101,34 +97,28 @@ class KnowledgeManager:
                     "success": True,
                     "doc_id": doc_id,
                     "message": "Knowledge added successfully",
-                    "total_documents": self.history["total_documents"]
+                    "total_documents": self.history["total_documents"],
                 }
             else:
                 raise Exception("Failed to index document")
 
         except Exception as e:
             logger.error(f"Error adding knowledge: {e}")
-            return {
-                "success": False,
-                "error": str(e)
-            }
+            return {"success": False, "error": str(e)}
 
     async def add_knowledge_from_csv(
-        self,
-        csv_file: Path,
-        auto_train: bool = True
+        self, csv_file: Path, auto_train: bool = True
     ) -> Dict[str, Any]:
-        """
-        Add knowledge from CSV file
-        Each row becomes a document in the knowledge base
-        """
+        """Add knowledge from CSV file Each row becomes a document in the knowledge base."""
         try:
             df = pd.read_csv(csv_file)
             added_count = 0
 
             for idx, row in df.iterrows():
                 # Create text representation
-                text_parts = [f"{col}: {row[col]}" for col in df.columns if pd.notna(row[col])]
+                text_parts = [
+                    f"{col}: {row[col]}" for col in df.columns if pd.notna(row[col])
+                ]
                 text = " | ".join(text_parts)
 
                 # Add to knowledge base
@@ -138,21 +128,23 @@ class KnowledgeManager:
                     metadata={
                         "file": csv_file.name,
                         "row_index": idx,
-                        "raw_data": row.to_dict()
+                        "raw_data": row.to_dict(),
                     },
-                    auto_train=False  # Batch training at end
+                    auto_train=False,  # Batch training at end
                 )
 
                 if result["success"]:
                     added_count += 1
 
             # Record training run
-            self.history["training_runs"].append({
-                "timestamp": datetime.now().isoformat(),
-                "source": f"csv_{csv_file.name}",
-                "documents_added": added_count,
-                "total_documents": self.history["total_documents"]
-            })
+            self.history["training_runs"].append(
+                {
+                    "timestamp": datetime.now().isoformat(),
+                    "source": f"csv_{csv_file.name}",
+                    "documents_added": added_count,
+                    "total_documents": self.history["total_documents"],
+                }
+            )
             self.save_history()
 
             logger.info(f"Added {added_count} documents from CSV: {csv_file.name}")
@@ -161,23 +153,17 @@ class KnowledgeManager:
                 "success": True,
                 "documents_added": added_count,
                 "total_documents": self.history["total_documents"],
-                "file": csv_file.name
+                "file": csv_file.name,
             }
 
         except Exception as e:
             logger.error(f"Error processing CSV: {e}")
-            return {
-                "success": False,
-                "error": str(e)
-            }
+            return {"success": False, "error": str(e)}
 
     async def add_knowledge_batch(
-        self,
-        documents: List[Dict[str, str]],
-        source: str = "batch_import"
+        self, documents: List[Dict[str, str]], source: str = "batch_import"
     ) -> Dict[str, Any]:
-        """
-        Add multiple documents at once
+        """Add multiple documents at once.
 
         Args:
             documents: List of {"text": "...", "metadata": {...}}
@@ -201,8 +187,8 @@ class KnowledgeManager:
                 metadata={
                     "source": source,
                     "added_at": datetime.now().isoformat(),
-                    **doc.get("metadata", {})
-                }
+                    **doc.get("metadata", {}),
+                },
             )
 
             if success:
@@ -213,13 +199,15 @@ class KnowledgeManager:
         # Update history
         self.history["total_documents"] += added_count
         self.history["last_update"] = datetime.now().isoformat()
-        self.history["training_runs"].append({
-            "timestamp": datetime.now().isoformat(),
-            "source": source,
-            "documents_added": added_count,
-            "documents_failed": failed_count,
-            "total_documents": self.history["total_documents"]
-        })
+        self.history["training_runs"].append(
+            {
+                "timestamp": datetime.now().isoformat(),
+                "source": source,
+                "documents_added": added_count,
+                "documents_failed": failed_count,
+                "total_documents": self.history["total_documents"],
+            }
+        )
         self.save_history()
 
         logger.info(f"Batch import: {added_count} added, {failed_count} failed")
@@ -228,19 +216,13 @@ class KnowledgeManager:
             "success": True,
             "added": added_count,
             "failed": failed_count,
-            "total_documents": self.history["total_documents"]
+            "total_documents": self.history["total_documents"],
         }
 
     async def update_knowledge(
-        self,
-        doc_id: str,
-        new_text: str,
-        new_metadata: Optional[Dict[str, Any]] = None
+        self, doc_id: str, new_text: str, new_metadata: Optional[Dict[str, Any]] = None
     ) -> Dict[str, Any]:
-        """
-        Update existing knowledge document
-        Regenerates embedding and updates index
-        """
+        """Update existing knowledge document Regenerates embedding and updates index."""
         try:
             # Get existing document
             existing = await retrieval_service.get_document(doc_id)
@@ -258,10 +240,7 @@ class KnowledgeManager:
 
             # Update in vector store
             success = await retrieval_service.update_document(
-                doc_id=doc_id,
-                text=new_text,
-                embedding=embedding,
-                metadata=metadata
+                doc_id=doc_id, text=new_text, embedding=embedding, metadata=metadata
             )
 
             if success:
@@ -269,7 +248,7 @@ class KnowledgeManager:
                 return {
                     "success": True,
                     "doc_id": doc_id,
-                    "message": "Knowledge updated successfully"
+                    "message": "Knowledge updated successfully",
                 }
             else:
                 raise Exception("Failed to update document")
@@ -279,7 +258,7 @@ class KnowledgeManager:
             return {"success": False, "error": str(e)}
 
     async def delete_knowledge(self, doc_id: str) -> Dict[str, Any]:
-        """Delete a knowledge document"""
+        """Delete a knowledge document."""
         try:
             success = await retrieval_service.delete_document(doc_id)
 
@@ -287,10 +266,7 @@ class KnowledgeManager:
                 self.history["total_documents"] -= 1
                 self.save_history()
 
-                return {
-                    "success": True,
-                    "message": "Knowledge deleted successfully"
-                }
+                return {"success": True, "message": "Knowledge deleted successfully"}
             else:
                 raise Exception("Failed to delete document")
 
@@ -299,23 +275,16 @@ class KnowledgeManager:
             return {"success": False, "error": str(e)}
 
     async def search_knowledge(
-        self,
-        query: str,
-        top_k: int = 5,
-        filters: Optional[Dict] = None
+        self, query: str, top_k: int = 5, filters: Optional[Dict] = None
     ) -> List[Dict[str, Any]]:
-        """
-        Search knowledge base using semantic search
-        """
+        """Search knowledge base using semantic search."""
         try:
             # Generate query embedding
             query_embedding = await embedding_service.embed_text(query)
 
             # Search vector store
             results = await retrieval_service.search(
-                query_embedding=query_embedding,
-                top_k=top_k,
-                filters=filters
+                query_embedding=query_embedding, top_k=top_k, filters=filters
             )
 
             return results
@@ -325,10 +294,7 @@ class KnowledgeManager:
             return []
 
     async def retrain_all(self) -> Dict[str, Any]:
-        """
-        Retrain entire knowledge base
-        Useful after bulk updates or schema changes
-        """
+        """Retrain entire knowledge base Useful after bulk updates or schema changes."""
         try:
             logger.info("Starting full knowledge base retraining...")
 
@@ -336,10 +302,7 @@ class KnowledgeManager:
             documents = await retrieval_service.get_all_documents(limit=10000)
 
             if not documents:
-                return {
-                    "success": False,
-                    "error": "No documents to retrain"
-                }
+                return {"success": False, "error": "No documents to retrain"}
 
             # Re-embed all documents
             texts = [doc["text"] for doc in documents]
@@ -352,26 +315,30 @@ class KnowledgeManager:
                     doc_id=doc["id"],
                     text=doc["text"],
                     embedding=new_embedding,
-                    metadata=doc.get("metadata", {})
+                    metadata=doc.get("metadata", {}),
                 )
                 if success:
                     success_count += 1
 
             # Record retraining
-            self.history["training_runs"].append({
-                "timestamp": datetime.now().isoformat(),
-                "type": "full_retrain",
-                "documents_processed": success_count,
-                "total_documents": self.history["total_documents"]
-            })
+            self.history["training_runs"].append(
+                {
+                    "timestamp": datetime.now().isoformat(),
+                    "type": "full_retrain",
+                    "documents_processed": success_count,
+                    "total_documents": self.history["total_documents"],
+                }
+            )
             self.save_history()
 
-            logger.info(f"Retraining complete: {success_count}/{len(documents)} documents")
+            logger.info(
+                f"Retraining complete: {success_count}/{len(documents)} documents"
+            )
 
             return {
                 "success": True,
                 "documents_retrained": success_count,
-                "total_documents": len(documents)
+                "total_documents": len(documents),
             }
 
         except Exception as e:
@@ -379,7 +346,7 @@ class KnowledgeManager:
             return {"success": False, "error": str(e)}
 
     async def get_knowledge_stats(self) -> Dict[str, Any]:
-        """Get knowledge base statistics"""
+        """Get knowledge base statistics."""
         try:
             total_docs = await retrieval_service.count_documents()
 
@@ -387,18 +354,17 @@ class KnowledgeManager:
                 "total_documents": total_docs,
                 "last_update": self.history.get("last_update"),
                 "training_runs": len(self.history.get("training_runs", [])),
-                "recent_runs": self.history.get("training_runs", [])[-5:],  # Last 5 runs
-                "storage": {
-                    "vector_store": "Redis",
-                    "indexed": total_docs
-                }
+                "recent_runs": self.history.get("training_runs", [])[
+                    -5:
+                ],  # Last 5 runs
+                "storage": {"vector_store": "Redis", "indexed": total_docs},
             }
         except Exception as e:
             logger.error(f"Error getting stats: {e}")
             return {"error": str(e)}
 
     async def export_knowledge_base(self, output_file: Optional[Path] = None) -> Path:
-        """Export entire knowledge base to JSON file"""
+        """Export entire knowledge base to JSON file."""
         try:
             documents = await retrieval_service.get_all_documents(limit=100000)
 
@@ -406,13 +372,16 @@ class KnowledgeManager:
                 "exported_at": datetime.now().isoformat(),
                 "total_documents": len(documents),
                 "documents": documents,
-                "history": self.history
+                "history": self.history,
             }
 
             if not output_file:
-                output_file = self.knowledge_dir / f"export_{datetime.now().strftime('%Y%m%d%H%M%S')}.json"
+                output_file = (
+                    self.knowledge_dir
+                    / f"export_{datetime.now().strftime('%Y%m%d%H%M%S')}.json"
+                )
 
-            with open(output_file, 'w') as f:
+            with open(output_file, "w") as f:
                 json.dump(export_data, f, indent=2)
 
             logger.info(f"Exported knowledge base to: {output_file}")
@@ -423,9 +392,9 @@ class KnowledgeManager:
             raise
 
     async def import_knowledge_base(self, import_file: Path) -> Dict[str, Any]:
-        """Import knowledge base from JSON file"""
+        """Import knowledge base from JSON file."""
         try:
-            with open(import_file, 'r') as f:
+            with open(import_file, "r") as f:
                 import_data = json.load(f)
 
             documents = import_data.get("documents", [])
@@ -433,13 +402,10 @@ class KnowledgeManager:
             # Add all documents
             result = await self.add_knowledge_batch(
                 documents=[
-                    {
-                        "text": doc["text"],
-                        "metadata": doc.get("metadata", {})
-                    }
+                    {"text": doc["text"], "metadata": doc.get("metadata", {})}
                     for doc in documents
                 ],
-                source=f"import_{import_file.stem}"
+                source=f"import_{import_file.stem}",
             )
 
             logger.info(f"Imported {result['added']} documents from: {import_file}")
@@ -449,8 +415,6 @@ class KnowledgeManager:
             logger.error(f"Import error: {e}")
             return {"success": False, "error": str(e)}
 
-# Global instance
-knowledge_manager = KnowledgeManager(
-    data_dir=os.getenv("CSV_DATA_DIR", "../data")
-)
 
+# Global instance
+knowledge_manager = KnowledgeManager(data_dir=os.getenv("CSV_DATA_DIR", "../data"))

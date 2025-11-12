@@ -2,13 +2,10 @@
 # -*- coding: utf-8 -*-
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
+"""OPEA Cogniware IMS Megaservice Application.
 
-"""
-OPEA Cogniware IMS Megaservice Application
-
-This application provides an AI-powered inventory management system for Intel products
-with advanced features including RAG, DBQnA, document summarization, and continuous learning.
-Built with CogniDREAM Code Generation Platform.
+This application provides an AI-powered inventory management system for Intel products with advanced features including
+RAG, DBQnA, document summarization, and continuous learning. Built with CogniDREAM Code Generation Platform.
 """
 
 import os
@@ -21,10 +18,8 @@ from fastapi.responses import StreamingResponse
 
 
 class CogniwareIMSService:
-    """
-    Cogniware Inventory Management System Megaservice
-    Orchestrates multiple AI microservices for intelligent inventory operations
-    """
+    """Cogniware Inventory Management System Megaservice Orchestrates multiple AI microservices for intelligent
+    inventory operations."""
 
     def __init__(self, host: str = "0.0.0.0", port: int = 8888):
         self.host = host
@@ -86,7 +81,9 @@ class CogniwareIMSService:
         )
 
         # Add services to megaservice
-        self.megaservice.add(embedding_service).add(retriever_service).add(rerank_service).add(llm_service)
+        self.megaservice.add(embedding_service).add(retriever_service).add(
+            rerank_service
+        ).add(llm_service)
         self.megaservice.add(dataprep_service)
 
         # Define service flow for RAG pipeline
@@ -96,9 +93,10 @@ class CogniwareIMSService:
         self.megaservice.flow_to(rerank_service, llm_service)
 
 
-def align_inputs(self, inputs: dict, cur_node: MicroService, runtime_graph: dict) -> dict:
-    """
-    Align input format for different microservices.
+def align_inputs(
+    self, inputs: dict, cur_node: MicroService, runtime_graph: dict
+) -> dict:
+    """Align input format for different microservices.
 
     Args:
         inputs: Input data dictionary
@@ -145,8 +143,8 @@ async def health_check():
 
 @app.post("/v1/cogniwareims")
 async def cogniwareims_endpoint(request: Request):
-    """
-    Main endpoint for Cogniware IMS.
+    """Main endpoint for Cogniware IMS.
+
     Handles chat completions with RAG pipeline.
     """
     data = await request.json()
@@ -170,8 +168,8 @@ async def chat_completions(request: Request):
 
 @app.post("/v1/cogniwareims/query")
 async def inventory_query(request: Request):
-    """
-    Inventory query endpoint with RAG support.
+    """Inventory query endpoint with RAG support.
+
     Natural language inventory search and analytics.
     """
     data = await request.json()
@@ -210,14 +208,14 @@ async def get_stats():
             "Continuous Learning",
             "Multi-format Upload",
             "Interactive Agent",
-            "Real-time Analytics"
+            "Real-time Analytics",
         ],
         "optimization": "Intel Xeon Processors",
         "models": {
             "llm": "Intel/neural-chat-7b-v3-3",
             "embedding": "BAAI/bge-base-en-v1.5",
-            "reranking": "BAAI/bge-reranker-base"
-        }
+            "reranking": "BAAI/bge-reranker-base",
+        },
     }
 
 
@@ -234,4 +232,3 @@ if __name__ == "__main__":
         port=cogniwareims_service.port,
         log_level="info",
     )
-

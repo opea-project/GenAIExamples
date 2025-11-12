@@ -3,6 +3,7 @@
 ## Pre-Submission Verification
 
 ### ✅ Code Quality
+
 - [x] All backend services tested and working
 - [x] All frontend components rendering correctly
 - [x] No linting errors in Python code
@@ -12,6 +13,7 @@
 - [x] Environment variables properly configured
 
 ### ✅ Documentation
+
 - [x] README.md comprehensive and clear
 - [x] Architecture diagram showing OPEA components
 - [x] Quick start guide (< 5 minutes)
@@ -23,6 +25,7 @@
 - [x] Intel Xeon optimizations documented
 
 ### ✅ Testing
+
 - [x] Application tested locally
 - [x] Docker deployment verified (`./start.sh`)
 - [x] Knowledge base initialization successful
@@ -33,6 +36,7 @@
 - [x] API endpoints tested
 
 ### ✅ OPEA Integration
+
 - [x] Embedding Service integrated
 - [x] Retrieval Service integrated
 - [x] LLM Service integrated
@@ -43,6 +47,7 @@
 - [x] Integration patterns documented
 
 ### ✅ Security
+
 - [x] No credentials in code
 - [x] `.env.example` provided
 - [x] `.env` in .gitignore
@@ -54,6 +59,7 @@
 - [x] Secure headers implemented
 
 ### ✅ Intel Xeon Optimizations
+
 - [x] OMP_NUM_THREADS configured
 - [x] KMP_AFFINITY optimized
 - [x] KMP_BLOCKTIME set
@@ -64,6 +70,7 @@
 - [x] Intel Xeon badge in README
 
 ### ✅ Data & Dependencies
+
 - [x] 7,479 CSV files included
 - [x] Sample data appropriate size
 - [x] All Python dependencies in requirements.txt
@@ -72,6 +79,7 @@
 - [x] Docker images versions specified
 
 ### ✅ File Structure
+
 ```
 cogniware-opea-ims/
 ├── README.md ✅
@@ -137,6 +145,7 @@ cogniware-opea-ims/
 ## Submission Steps
 
 ### Step 1: Final Local Test ✅
+
 ```bash
 cd /Users/deadbrain/cogniware-opea-ims
 ./start.sh
@@ -145,6 +154,7 @@ docker-compose exec backend python app/init_knowledge_base.py
 ```
 
 ### Step 2: Clean Repository ⏳
+
 ```bash
 # Remove generated files
 rm -rf frontend/.next
@@ -156,11 +166,13 @@ cat .gitignore
 ```
 
 ### Step 3: Fork OPEA Repository ⏳
+
 - [ ] Go to https://github.com/opea-project/GenAIExamples
 - [ ] Click "Fork" button
 - [ ] Wait for fork to complete
 
 ### Step 4: Clone and Setup ⏳
+
 ```bash
 cd /Users/deadbrain
 git clone https://github.com/YOUR_USERNAME/GenAIExamples.git
@@ -169,11 +181,13 @@ git remote add upstream https://github.com/opea-project/GenAIExamples.git
 ```
 
 ### Step 5: Create Branch ⏳
+
 ```bash
 git checkout -b feature/cogniware-opea-ims
 ```
 
 ### Step 6: Copy Files ⏳
+
 ```bash
 # Create category directory
 mkdir -p InventoryManagement
@@ -189,7 +203,7 @@ OPEA-based inventory management applications optimized for enterprise use.
 
 ## Examples
 
-- **[cogniware-opea-ims](./cogniware-opea-ims/)** - Complete AI-powered inventory management system optimized for Intel Xeon processors with multi-format file upload, continuous learning, and comprehensive OPEA integration.
+- **cogniware-opea-ims** - Complete AI-powered inventory management system optimized for Intel Xeon processors with multi-format file upload, continuous learning, and comprehensive OPEA integration.
 
 ## Features
 
@@ -205,6 +219,7 @@ EOF
 ```
 
 ### Step 7: Commit Changes ⏳
+
 ```bash
 git add .
 git commit -m "Add Cogniware OPEA IMS - Intel Xeon optimized inventory management
@@ -221,17 +236,20 @@ git commit -m "Add Cogniware OPEA IMS - Intel Xeon optimized inventory managemen
 ```
 
 ### Step 8: Push to Fork ⏳
+
 ```bash
 git push origin feature/cogniware-opea-ims
 ```
 
 ### Step 9: Create Pull Request ⏳
+
 - [ ] Go to your fork on GitHub
 - [ ] Click "Compare & pull request"
 - [ ] Fill in PR template (see HOW_TO_SUBMIT_TO_OPEA.md)
 - [ ] Submit PR
 
 ### Step 10: Monitor and Respond ⏳
+
 - [ ] Watch for CI/CD build results
 - [ ] Respond to reviewer comments
 - [ ] Make requested changes
@@ -242,12 +260,14 @@ git push origin feature/cogniware-opea-ims
 ## PR Template (Copy This)
 
 **Title:**
+
 ```
 Add Cogniware OPEA IMS - Intel Xeon Optimized Inventory Management System
 ```
 
 **Description:**
-```markdown
+
+````markdown
 ## Overview
 
 Complete, production-ready AI-powered Inventory Management System built with OPEA GenAI components and optimized for Intel Xeon processors.
@@ -255,6 +275,7 @@ Complete, production-ready AI-powered Inventory Management System built with OPE
 ## What's Included
 
 ### Key Features
+
 - 🤖 Natural language inventory queries using RAG
 - 📊 DBQnA agent for SQL generation from natural language
 - 📝 Document summarization and analysis
@@ -265,17 +286,20 @@ Complete, production-ready AI-powered Inventory Management System built with OPE
 - 🔐 Enterprise-grade security (JWT, bcrypt, RBAC)
 
 ### OPEA Components
+
 - **Embedding Service**: BAAI/bge-base-en-v1.5 for text vectorization
 - **Retrieval Service**: Redis vector store for semantic search
 - **LLM Service**: Intel/neural-chat-7b-v3-3 for text generation
 - **ChatQnA Gateway**: Service orchestration
 
 ### Platform
+
 - **CPU-Only**: Optimized for Intel Xeon processors
 - **No GPU Required**: Runs on CPU infrastructure
 - **Intel Optimizations**: OMP, KMP, AVX-512, Intel MKL
 
 ### Technical Stack
+
 - **Backend**: FastAPI (11 service modules)
 - **Frontend**: Next.js 14 + React 18 + TypeScript
 - **Database**: PostgreSQL + Redis
@@ -283,6 +307,7 @@ Complete, production-ready AI-powered Inventory Management System built with OPE
 - **Data**: 7,479 sample CSV files
 
 ### Documentation
+
 ✅ Complete README with quick start
 ✅ Deployment guide
 ✅ Security best practices
@@ -307,8 +332,10 @@ Complete, production-ready AI-powered Inventory Management System built with OPE
 docker-compose exec backend python app/init_knowledge_base.py
 # Access: http://localhost:3000
 ```
+````
 
 ## Testing Done
+
 - [x] Local deployment verified
 - [x] All 8 Docker containers healthy
 - [x] Knowledge base initialization successful
@@ -319,6 +346,7 @@ docker-compose exec backend python app/init_knowledge_base.py
 - [x] Intel Xeon optimizations verified
 
 ## Checklist
+
 - [x] Code follows OPEA guidelines
 - [x] Documentation complete
 - [x] Docker deployment working
@@ -328,10 +356,13 @@ docker-compose exec backend python app/init_knowledge_base.py
 - [x] Production ready
 
 ## Built With
+
 CogniDREAM - Cogniware's AI platform for generating production-ready OPEA applications
 
 ## Screenshots
+
 (Add screenshots of application)
+
 ```
 
 ---
@@ -384,7 +415,7 @@ Your submission is successful when:
 ## Contact & Support
 
 **For Submission Questions:**
-- OPEA Discussions: https://github.com/orgs/opea-project/discussions
+- OPEA Discussions: https://github.com/opea-project/discussions
 - GitHub Issues: https://github.com/opea-project/GenAIExamples/issues
 
 **For Package Questions:**
@@ -422,3 +453,4 @@ See **HOW_TO_SUBMIT_TO_OPEA.md** for detailed instructions.
 *Checklist created for Cogniware OPEA IMS submission to opea-project/GenAIExamples*
 
 
+```

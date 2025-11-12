@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   # ==========================================
@@ -21,7 +21,15 @@ services:
       - opea-network
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000"]
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://localhost:3000",
+        ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -63,7 +71,7 @@ services:
       - RATE_LIMIT_ENABLED=true
       - RATE_LIMIT_PER_MINUTE=60
     volumes:
-      - ./data:/app/data:ro
+      - ./assets/data:/app/data:ro
       - ./backend/logs:/app/logs
     depends_on:
       postgres:
@@ -86,10 +94,10 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '2'
+          cpus: "2"
           memory: 4G
         reservations:
-          cpus: '1'
+          cpus: "1"
           memory: 2G
 
   # ==========================================
@@ -118,10 +126,10 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '4'
+          cpus: "4"
           memory: 8G
         reservations:
-          cpus: '2'
+          cpus: "2"
           memory: 4G
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:6000/health"]
@@ -180,10 +188,10 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '8'
+          cpus: "8"
           memory: 16G
         reservations:
-          cpus: '4'
+          cpus: "4"
           memory: 8G
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/health"]
@@ -248,10 +256,10 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '2'
+          cpus: "2"
           memory: 2G
         reservations:
-          cpus: '0.5'
+          cpus: "0.5"
           memory: 512M
 
   # Redis (Vector Store & Cache)
@@ -260,7 +268,7 @@ services:
     container_name: opea-redis
     ports:
       - "6379:6379"
-      - "8001:8001"  # RedisInsight
+      - "8001:8001" # RedisInsight
     environment:
       - REDIS_ARGS=--maxmemory 4gb --maxmemory-policy allkeys-lru
     volumes:
@@ -276,10 +284,10 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '2'
+          cpus: "2"
           memory: 4G
         reservations:
-          cpus: '0.5'
+          cpus: "0.5"
           memory: 1G
 
   # ==========================================
@@ -296,8 +304,8 @@ services:
       - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - prometheus_data:/prometheus
     command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
     networks:
       - opea-network
     restart: unless-stopped
@@ -362,4 +370,3 @@ networks:
     ipam:
       config:
         - subnet: 172.28.0.0/16
-

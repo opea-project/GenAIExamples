@@ -49,6 +49,7 @@ ls -la
 ```
 
 **Verify:**
+
 - [ ] No `.env` file committed
 - [ ] No hardcoded passwords
 - [ ] No API keys or tokens
@@ -169,7 +170,7 @@ OPEA-based inventory management applications.
 
 ## Examples
 
-- **[cogniware-opea-ims](./cogniware-opea-ims/)** - Full-featured AI-powered inventory management system optimized for Intel Xeon processors
+- **cogniware-opea-ims** - Full-featured AI-powered inventory management system optimized for Intel Xeon processors
 EOF
 ```
 
@@ -206,37 +207,46 @@ Ensure your README includes:
 ```markdown
 # Cogniware OPEA IMS
 
-[![OPEA](badge-link)](link)
-[![Intel Xeon](badge-link)](link)
+OPEA badge (optional)
+Intel Xeon badge (optional)
 
 ## Overview
+
 Brief description with OPEA focus
 
 ## Architecture
+
 Diagram showing OPEA components
 
 ## Quick Start
+
 Simple deployment steps
 
 ## OPEA Components Used
+
 - Embedding Service
 - Retrieval Service
 - LLM Service
 - etc.
 
 ## Prerequisites
+
 Hardware and software requirements
 
 ## Deployment
+
 Step-by-step instructions
 
 ## API Documentation
+
 Link to API docs
 
 ## Contributing
+
 How to contribute
 
 ## License
+
 Apache 2.0
 ```
 
@@ -290,6 +300,7 @@ git push origin feature/cogniware-opea-ims
 #### 8.2 Fill Out Pull Request Template
 
 **Title:**
+
 ```
 Add Cogniware OPEA IMS - Intel Xeon Optimized Inventory Management System
 ```
@@ -304,6 +315,7 @@ This PR adds a complete, production-ready AI-powered Inventory Management System
 ## What's Included
 
 ### Application Features
+
 - 🤖 Natural language inventory queries using RAG
 - 📊 DBQnA agent for NL-to-SQL conversion
 - 📝 Document summarization and analysis
@@ -314,12 +326,14 @@ This PR adds a complete, production-ready AI-powered Inventory Management System
 - 🔐 Enterprise-grade security
 
 ### OPEA Components Used
+
 - Embedding Service (BAAI/bge-base-en-v1.5)
 - Retrieval Service (Redis vector store)
 - LLM Service (Intel/neural-chat-7b-v3-3)
 - ChatQnA Gateway
 
 ### Technical Details
+
 - **Platform**: Intel Xeon processors (CPU-only, no GPU required)
 - **Backend**: FastAPI with 11 service modules
 - **Frontend**: Next.js 14 with React 18
@@ -328,12 +342,14 @@ This PR adds a complete, production-ready AI-powered Inventory Management System
 - **Data**: 7,479 sample CSV files included
 
 ### Intel Xeon Optimizations
+
 - OMP and KMP threading optimizations
 - Intel MKL integration
 - AVX-512 vectorization support
 - Intel Deep Learning Boost utilization
 
 ### Documentation
+
 - ✅ Complete README with quick start
 - ✅ Deployment guide for production
 - ✅ Security best practices guide
@@ -342,6 +358,7 @@ This PR adds a complete, production-ready AI-powered Inventory Management System
 - ✅ Apache 2.0 License
 
 ### Testing
+
 - ✅ Tested on Intel Xeon platforms
 - ✅ Docker deployment verified
 - ✅ All microservices functional
@@ -426,21 +443,25 @@ The PR will automatically update.
 #### 9.2 Common Review Requests
 
 **Documentation:**
+
 - Add more details to README
 - Include architecture diagrams
 - Clarify setup instructions
 
 **Code:**
+
 - Remove unused dependencies
 - Add comments for complex logic
 - Improve error handling
 
 **Testing:**
+
 - Add test cases
 - Verify on different platforms
 - Document test results
 
 **OPEA Compliance:**
+
 - Follow naming conventions
 - Use standard OPEA patterns
 - Update to latest component versions
@@ -517,14 +538,17 @@ Once approved:
 ### 1. Clear Value Proposition
 
 **Good:**
+
 > "Complete inventory management system optimized for Intel Xeon with multi-format file upload"
 
 **Bad:**
+
 > "Another inventory app"
 
 ### 2. Comprehensive Documentation
 
 Include:
+
 - Quick start (< 5 minutes to deploy)
 - Architecture overview
 - Detailed setup guide
@@ -542,6 +566,7 @@ Include:
 ### 4. OPEA Component Integration
 
 Clearly show:
+
 - Which components are used
 - How they're configured
 - Integration patterns
@@ -550,6 +575,7 @@ Clearly show:
 ### 5. Real-World Applicability
 
 Demonstrate:
+
 - Actual use case
 - Sample data
 - Production deployment
@@ -562,6 +588,7 @@ Demonstrate:
 ### Issue: PR Build Fails
 
 **Solution:**
+
 ```bash
 # Check CI logs
 # Fix issues locally
@@ -572,6 +599,7 @@ Demonstrate:
 ### Issue: Review Takes Long Time
 
 **Solution:**
+
 - Be patient (reviewers are volunteers)
 - Respond promptly to feedback
 - Keep PR updated with main branch
@@ -580,6 +608,7 @@ Demonstrate:
 ### Issue: Merge Conflicts
 
 **Solution:**
+
 ```bash
 # Update your branch
 git checkout feature/cogniware-opea-ims
@@ -599,7 +628,7 @@ git push origin feature/cogniware-opea-ims
 
 ### OPEA Community Resources
 
-- **GitHub Discussions**: https://github.com/orgs/opea-project/discussions
+- **GitHub Discussions**: https://github.com/opea-project/discussions
 - **Issues**: https://github.com/opea-project/GenAIExamples/issues
 - **Documentation**: https://opea-project.github.io/
 
@@ -613,6 +642,7 @@ git push origin feature/cogniware-opea-ims
 ### Asking for Help
 
 Provide:
+
 - Clear description of issue
 - Steps to reproduce
 - Error messages/logs
@@ -654,6 +684,7 @@ cat docker-compose.yml
 ### After Merge
 
 1. **Update Your Fork**
+
    ```bash
    git checkout main
    git pull upstream main
@@ -661,6 +692,7 @@ cat docker-compose.yml
    ```
 
 2. **Close Your Feature Branch**
+
    ```bash
    git branch -d feature/cogniware-opea-ims
    git push origin --delete feature/cogniware-opea-ims
@@ -696,7 +728,7 @@ Your submission is successful when:
 
 Copy this template for your PR:
 
-```markdown
+````markdown
 ## Description
 
 Brief overview of what this example does and why it's valuable.
@@ -729,6 +761,7 @@ Brief overview of what this example does and why it's valuable.
 ```bash
 ./start.sh
 ```
+````
 
 ## Screenshots
 
@@ -746,7 +779,8 @@ Brief overview of what this example does and why it's valuable.
 - [x] Tests passing
 - [x] No sensitive data
 - [x] Apache 2.0 licensed
-```
+
+````
 
 ---
 
@@ -773,12 +807,12 @@ git commit -m "Add [Example Name]"
 git push origin feature/your-example
 
 # Create PR on GitHub
-```
+````
 
 ### Important URLs
 
 - **Main Repo**: https://github.com/opea-project/GenAIExamples
-- **Discussions**: https://github.com/orgs/opea-project/discussions
+- **Discussions**: https://github.com/opea-project/discussions
 - **Issues**: https://github.com/opea-project/GenAIExamples/issues
 - **Documentation**: https://opea-project.github.io/
 
@@ -830,5 +864,4 @@ For questions: GitHub Discussions or Issues
 
 ---
 
-*Guide created for Cogniware OPEA IMS submission to opea-project/GenAIExamples*
-
+_Guide created for Cogniware OPEA IMS submission to opea-project/GenAIExamples_

@@ -1,18 +1,19 @@
-"""
-OPEA LLM Service Integration
-Handles text generation, chat, and intelligent responses
-"""
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+"""OPEA LLM Service Integration Handles text generation, chat, and intelligent responses."""
+
+import json
+import logging
+import os
+from typing import Any, AsyncGenerator, Dict, List, Optional
 
 import httpx
-import os
-import logging
-from typing import List, Dict, Any, Optional, AsyncGenerator
-import json
 
 logger = logging.getLogger(__name__)
 
+
 class LLMService:
-    """Integration with OPEA LLM microservice for text generation"""
+    """Integration with OPEA LLM microservice for text generation."""
 
     def __init__(self):
         self.base_url = os.getenv("OPEA_LLM_URL", "http://llm-service:9000")
@@ -24,10 +25,9 @@ class LLMService:
         self,
         messages: List[Dict[str, str]],
         temperature: float = 0.7,
-        max_tokens: Optional[int] = None
+        max_tokens: Optional[int] = None,
     ) -> str:
-        """
-        Generate chat completion using OPEA LLM service
+        """Generate chat completion using OPEA LLM service.
 
         Args:
             messages: List of chat messages [{"role": "user", "content": "..."}]
@@ -40,12 +40,11 @@ class LLMService:
                     "model": self.model_id,
                     "messages": messages,
                     "temperature": temperature,
-                    "max_tokens": max_tokens or self.max_tokens
+                    "max_tokens": max_tokens or self.max_tokens,
                 }
 
                 response = await client.post(
-                    f"{self.base_url}/v1/chat/completions",
-                    json=payload
+                    f"{self.base_url}/v1/chat/completions", json=payload
                 )
                 response.raise_for_status()
                 result = response.json()
@@ -63,13 +62,14 @@ class LLMService:
             raise
 
     async def generate_text(self, prompt: str, temperature: float = 0.7) -> str:
-        """Simple text generation from prompt"""
+        """Simple text generation from prompt."""
         messages = [{"role": "user", "content": prompt}]
         return await self.chat_completion(messages, temperature)
 
-    async def query_with_context(self, question: str, context: str, system_prompt: Optional[str] = None) -> str:
-        """
-        Query LLM with context (RAG pattern)
+    async def query_with_context(
+        self, question: str, context: str, system_prompt: Optional[str] = None
+    ) -> str:
+        """Query LLM with context (RAG pattern)
 
         Args:
             question: User's question
@@ -91,11 +91,14 @@ Based on the context above, provide a detailed and accurate answer:"""
 
         messages.append({"role": "user", "content": prompt})
 
-        return await self.chat_completion(messages, temperature=0.3)  # Lower temp for factual responses
+        return await self.chat_completion(
+            messages, temperature=0.3
+        )  # Lower temp for factual responses
 
-    async def generate_sql_query(self, natural_language_query: str, schema: Dict[str, Any]) -> str:
-        """
-        Generate SQL query from natural language (for DBQnA)
+    async def generate_sql_query(
+        self, natural_language_query: str, schema: Dict[str, Any]
+    ) -> str:
+        """Generate SQL query from natural language (for DBQnA)
 
         Args:
             natural_language_query: User's question in natural language
@@ -117,7 +120,7 @@ Rules:
 
         messages = [
             {"role": "system", "content": system_prompt},
-            {"role": "user", "content": f"Generate SQL for: {natural_language_query}"}
+            {"role": "user", "content": f"Generate SQL for: {natural_language_query}"},
         ]
 
         sql = await self.chat_completion(messages, temperature=0.1)
@@ -132,9 +135,7 @@ Rules:
         return sql
 
     async def summarize_text(self, text: str, max_length: int = 150) -> str:
-        """
-        Summarize long text using OPEA DocSummarization pattern
-        """
+        """Summarize long text using OPEA DocSummarization pattern."""
         prompt = f"""Summarize the following text in {max_length} words or less. Focus on key points and important details:
 
 Text:
@@ -145,10 +146,7 @@ Summary:"""
         return await self.generate_text(prompt, temperature=0.3)
 
     async def extract_entities(self, text: str) -> List[Dict[str, str]]:
-        """
-        Extract named entities from text
-        Useful for inventory data extraction
-        """
+        """Extract named entities from text Useful for inventory data extraction."""
         prompt = f"""Extract all product names, SKUs, quantities, and locations from the following text. Return as JSON list.
 
 Text: {text}
@@ -174,9 +172,7 @@ Extract and return JSON format:
             return []
 
     async def generate_inventory_insights(self, data: Dict[str, Any]) -> str:
-        """
-        Generate insights from inventory data
-        """
+        """Generate insights from inventory data."""
         data_summary = json.dumps(data, indent=2)
 
         prompt = f"""Analyze the following inventory data and provide actionable insights:
@@ -195,13 +191,9 @@ Insights:"""
         return await self.generate_text(prompt, temperature=0.5)
 
     async def answer_inventory_question(
-        self,
-        question: str,
-        inventory_context: List[Dict[str, Any]]
+        self, question: str, inventory_context: List[Dict[str, Any]]
     ) -> str:
-        """
-        Answer inventory-related questions with context
-        """
+        """Answer inventory-related questions with context."""
         # Format inventory context
         context_parts = []
         for item in inventory_context:
@@ -218,13 +210,9 @@ Insights:"""
         return await self.query_with_context(question, context, system_prompt)
 
     async def stream_chat(
-        self,
-        messages: List[Dict[str, str]],
-        temperature: float = 0.7
+        self, messages: List[Dict[str, str]], temperature: float = 0.7
     ) -> AsyncGenerator[str, None]:
-        """
-        Stream chat responses (for real-time UI updates)
-        """
+        """Stream chat responses (for real-time UI updates)"""
         try:
             async with httpx.AsyncClient(timeout=self.timeout) as client:
                 async with client.stream(
@@ -234,8 +222,8 @@ Insights:"""
                         "model": self.model_id,
                         "messages": messages,
                         "temperature": temperature,
-                        "stream": True
-                    }
+                        "stream": True,
+                    },
                 ) as response:
                     async for line in response.aiter_lines():
                         if line.startswith("data: "):
@@ -254,7 +242,7 @@ Insights:"""
             yield f"Error: {str(e)}"
 
     async def health_check(self) -> bool:
-        """Check if LLM service is available"""
+        """Check if LLM service is available."""
         try:
             async with httpx.AsyncClient(timeout=httpx.Timeout(5.0)) as client:
                 response = await client.get(f"{self.base_url}/v1/health_check")
@@ -262,6 +250,6 @@ Insights:"""
         except:
             return False
 
+
 # Global instance
 llm_service = LLMService()
-

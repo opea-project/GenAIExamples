@@ -1,18 +1,36 @@
-'use client';
+// Copyright (C) 2024 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
 
-import React, { useState, useEffect } from 'react';
-import { ArrowRight, ArrowLeft, RotateCcw, Check, ChevronDown, MessageSquare, LogOut, User, Building, Package, FileText, BarChart3, Truck, Archive } from 'lucide-react';
+"use client";
+
+import React, { useState, useEffect } from "react";
+import {
+  ArrowRight,
+  ArrowLeft,
+  RotateCcw,
+  Check,
+  ChevronDown,
+  MessageSquare,
+  LogOut,
+  User,
+  Building,
+  Package,
+  FileText,
+  BarChart3,
+  Truck,
+  Archive,
+} from "lucide-react";
 
 // Custom hook for typing effect
 const useTypingEffect = (text: string, speed: number = 50) => {
-  const [displayText, setDisplayText] = useState('');
+  const [displayText, setDisplayText] = useState("");
   const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
     if (currentIndex < text.length) {
       const timeout = setTimeout(() => {
-        setDisplayText(prev => prev + text[currentIndex]);
-        setCurrentIndex(prev => prev + 1);
+        setDisplayText((prev) => prev + text[currentIndex]);
+        setCurrentIndex((prev) => prev + 1);
       }, speed);
       return () => clearTimeout(timeout);
     }
@@ -22,11 +40,11 @@ const useTypingEffect = (text: string, speed: number = 50) => {
 };
 
 // Logo Component - Using actual logo image with even larger sizes
-const Logo = ({ size = 'medium' }: { size?: 'small' | 'medium' | 'large' }) => {
+const Logo = ({ size = "medium" }: { size?: "small" | "medium" | "large" }) => {
   const sizes = {
-    small: 'w-32 h-32',
-    medium: 'w-48 h-48',
-    large: 'w-64 h-64'
+    small: "w-32 h-32",
+    medium: "w-48 h-48",
+    large: "w-64 h-64",
   };
 
   return (
@@ -42,19 +60,21 @@ const Logo = ({ size = 'medium' }: { size?: 'small' | 'medium' | 'large' }) => {
 
 // Button with click effect
 const variants = {
-  primary: 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700',
-  secondary: 'bg-blue-600 hover:bg-blue-700',
-  danger: 'bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700',
-  outline: 'bg-white/5 border border-white/20 hover:bg-white/10',
-  menu: 'bg-white hover:bg-gray-50 border border-gray-200 text-black hover:text-black'
+  primary:
+    "bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700",
+  secondary: "bg-blue-600 hover:bg-blue-700",
+  danger:
+    "bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700",
+  outline: "bg-white/5 border border-white/20 hover:bg-white/10",
+  menu: "bg-white hover:bg-gray-50 border border-gray-200 text-black hover:text-black",
 };
 
 const AnimatedButton = ({
   children,
   onClick,
   disabled = false,
-  variant = 'primary',
-  className = '',
+  variant = "primary",
+  className = "",
   ...props
 }: {
   children: React.ReactNode;
@@ -64,7 +84,9 @@ const AnimatedButton = ({
   className?: string;
   [key: string]: any;
 }) => {
-  const [ripples, setRipples] = useState<Array<{ x: number; y: number; id: number }>>([]);
+  const [ripples, setRipples] = useState<
+    Array<{ x: number; y: number; id: number }>
+  >([]);
 
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     const button = e.currentTarget;
@@ -76,7 +98,7 @@ const AnimatedButton = ({
     setRipples([...ripples, newRipple]);
 
     setTimeout(() => {
-      setRipples(prev => prev.filter(r => r.id !== newRipple.id));
+      setRipples((prev) => prev.filter((r) => r.id !== newRipple.id));
     }, 600);
 
     if (onClick && !disabled) {
@@ -88,19 +110,19 @@ const AnimatedButton = ({
     <button
       onClick={handleClick}
       disabled={disabled}
-      className={`relative overflow-hidden ${variants[variant]} ${className} transition-all duration-200 active:scale-95 ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+      className={`relative overflow-hidden ${variants[variant]} ${className} transition-all duration-200 active:scale-95 ${disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
       {...props}
     >
-      {ripples.map(ripple => (
+      {ripples.map((ripple) => (
         <span
           key={ripple.id}
           className="absolute bg-white/30 rounded-full animate-ripple"
           style={{
             left: ripple.x,
             top: ripple.y,
-            width: '100px',
-            height: '100px',
-            transform: 'translate(-50%, -50%)'
+            width: "100px",
+            height: "100px",
+            transform: "translate(-50%, -50%)",
           }}
         />
       ))}
@@ -113,25 +135,31 @@ const AnimatedButton = ({
 const Sidebar = ({ currentUser }: { currentUser: string | null }) => {
   // Build an Agent section
   const buildAgentMenuItems = [
-    { id: 'features', label: 'Platform Features', icon: MessageSquare },
-    { id: 'describe', label: 'Describe Agent', icon: FileText },
-    { id: 'configure', label: 'Configure Components', icon: Package },
-    { id: 'deploy', label: 'Deploy Agent', icon: Truck },
+    { id: "features", label: "Platform Features", icon: MessageSquare },
+    { id: "describe", label: "Describe Agent", icon: FileText },
+    { id: "configure", label: "Configure Components", icon: Package },
+    { id: "deploy", label: "Deploy Agent", icon: Truck },
   ];
 
   // Inventory Management section
   const inventoryMenuItems = [
-    { id: 'query', label: 'Query Inventory', icon: MessageSquare },
-    { id: 'stock', label: 'Stock Management', icon: Package },
-    { id: 'filter', label: 'Product Filter', icon: FileText },
-    { id: 'allocations', label: 'Allocations', icon: BarChart3 },
-    { id: 'warehouse', label: 'Warehouse', icon: Building },
-    { id: 'assets', label: 'Assets', icon: Archive },
-    { id: 'reports', label: 'Reports', icon: Truck },
+    { id: "query", label: "Query Inventory", icon: MessageSquare },
+    { id: "stock", label: "Stock Management", icon: Package },
+    { id: "filter", label: "Product Filter", icon: FileText },
+    { id: "allocations", label: "Allocations", icon: BarChart3 },
+    { id: "warehouse", label: "Warehouse", icon: Building },
+    { id: "assets", label: "Assets", icon: Archive },
+    { id: "reports", label: "Reports", icon: Truck },
   ];
 
-  const menuItems = currentUser === 'Inventory Manager' ? inventoryMenuItems : buildAgentMenuItems;
-  const sectionTitle = currentUser === 'Inventory Manager' ? 'Inventory Management' : 'Build an Agent';
+  const menuItems =
+    currentUser === "Inventory Manager"
+      ? inventoryMenuItems
+      : buildAgentMenuItems;
+  const sectionTitle =
+    currentUser === "Inventory Manager"
+      ? "Inventory Management"
+      : "Build an Agent";
 
   return (
     <div className="fixed left-0 top-0 h-full w-64 bg-white border-r border-gray-200 shadow-lg z-40 overflow-y-auto">
@@ -157,7 +185,9 @@ const Sidebar = ({ currentUser }: { currentUser: string | null }) => {
         <div className="p-4 bg-blue-50 border-b border-gray-200">
           <div className="flex items-center gap-2">
             <User size={16} className="text-blue-600" />
-            <span className="text-sm font-medium text-black">{currentUser}</span>
+            <span className="text-sm font-medium text-black">
+              {currentUser}
+            </span>
           </div>
         </div>
       )}
@@ -173,8 +203,13 @@ const Sidebar = ({ currentUser }: { currentUser: string | null }) => {
               key={item.id}
               className="flex items-center gap-3 p-3 rounded-lg hover:bg-blue-50 transition-colors cursor-pointer text-black group"
             >
-              <item.icon size={20} className="text-gray-600 group-hover:text-blue-600" />
-              <span className="text-sm font-medium group-hover:text-blue-600">{item.label}</span>
+              <item.icon
+                size={20}
+                className="text-gray-600 group-hover:text-blue-600"
+              />
+              <span className="text-sm font-medium group-hover:text-blue-600">
+                {item.label}
+              </span>
             </div>
           ))}
         </div>
@@ -190,7 +225,8 @@ const Sidebar = ({ currentUser }: { currentUser: string | null }) => {
             <strong>Environment:</strong> Production
           </div>
           <div className="text-xs text-black">
-            <strong>Status:</strong> <span className="text-green-600">● Active</span>
+            <strong>Status:</strong>{" "}
+            <span className="text-green-600">● Active</span>
           </div>
         </div>
       </div>
@@ -199,28 +235,36 @@ const Sidebar = ({ currentUser }: { currentUser: string | null }) => {
 };
 
 // Admin Menu Component (kept for inventory pages)
-const AdminMenu = ({ currentPage, onPageChange }: { currentPage: string, onPageChange: (page: string) => void }) => {
+const AdminMenu = ({
+  currentPage,
+  onPageChange,
+}: {
+  currentPage: string;
+  onPageChange: (page: string) => void;
+}) => {
   const menuItems = [
-    { id: 'query', label: 'Query Inventory', icon: MessageSquare },
-    { id: 'stock', label: 'Stock Management', icon: Package },
-    { id: 'filter', label: 'Product Filter', icon: FileText },
-    { id: 'allocations', label: 'Allocations', icon: BarChart3 },
-    { id: 'warehouse', label: 'Warehouse', icon: Building },
-    { id: 'assets', label: 'Assets', icon: Archive },
-    { id: 'reports', label: 'Reports', icon: Truck },
+    { id: "query", label: "Query Inventory", icon: MessageSquare },
+    { id: "stock", label: "Stock Management", icon: Package },
+    { id: "filter", label: "Product Filter", icon: FileText },
+    { id: "allocations", label: "Allocations", icon: BarChart3 },
+    { id: "warehouse", label: "Warehouse", icon: Building },
+    { id: "assets", label: "Assets", icon: Archive },
+    { id: "reports", label: "Reports", icon: Truck },
   ];
 
   return (
     <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-lg mb-6">
-      <h3 className="text-lg font-semibold text-black mb-4">Inventory Management</h3>
+      <h3 className="text-lg font-semibold text-black mb-4">
+        Inventory Management
+      </h3>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {menuItems.map((item) => (
           <AnimatedButton
             key={item.id}
             onClick={() => onPageChange(item.id)}
-            variant={currentPage === item.id ? 'secondary' : 'menu'}
+            variant={currentPage === item.id ? "secondary" : "menu"}
             className={`p-3 rounded-lg flex flex-col items-center gap-2 text-sm font-medium ${
-              currentPage === item.id ? 'text-black' : 'text-black'
+              currentPage === item.id ? "text-black" : "text-black"
             }`}
           >
             <item.icon size={20} />
@@ -237,31 +281,31 @@ export default function OpeaAiAgentDemo() {
   const [currentUser, setCurrentUser] = useState<string | null>(null);
 
   const steps = [
-    { id: 0, title: 'Welcome Screen' },
-    { id: 1, title: 'Platform Features' },
-    { id: 2, title: 'Consumer Role Login' },
-    { id: 3, title: 'Consumer Capabilities' },
-    { id: 4, title: 'Build AI Agent' },
-    { id: 5, title: 'Agent Configuration' },
-    { id: 6, title: 'Deployment Workflow' },
-    { id: 7, title: 'Logout Consumer' },
-    { id: 8, title: 'Inventory Manager Login' },
-    { id: 9, title: 'Query Inventory' },
-    { id: 10, title: 'Stock Management' },
-    { id: 11, title: 'Product Category Filter' },
-    { id: 12, title: 'Allocations Screen' },
-    { id: 13, title: 'Warehouse Management' },
-    { id: 14, title: 'Assets Management' },
-    { id: 15, title: 'Reports Dashboard' },
-    { id: 16, title: 'Final Screen' },
+    { id: 0, title: "Welcome Screen" },
+    { id: 1, title: "Platform Features" },
+    { id: 2, title: "Consumer Role Login" },
+    { id: 3, title: "Consumer Capabilities" },
+    { id: 4, title: "Build AI Agent" },
+    { id: 5, title: "Agent Configuration" },
+    { id: 6, title: "Deployment Workflow" },
+    { id: 7, title: "Logout Consumer" },
+    { id: 8, title: "Inventory Manager Login" },
+    { id: 9, title: "Query Inventory" },
+    { id: 10, title: "Stock Management" },
+    { id: 11, title: "Product Category Filter" },
+    { id: 12, title: "Allocations Screen" },
+    { id: 13, title: "Warehouse Management" },
+    { id: 14, title: "Assets Management" },
+    { id: 15, title: "Reports Dashboard" },
+    { id: 16, title: "Final Screen" },
   ];
 
   const handleNext = () => {
     if (currentStep < steps.length - 1) {
       // Add transition effect
       setTimeout(() => {
-        setCurrentStep(prev => prev + 1);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        setCurrentStep((prev) => prev + 1);
+        window.scrollTo({ top: 0, behavior: "smooth" });
       }, 150);
     }
   };
@@ -270,8 +314,8 @@ export default function OpeaAiAgentDemo() {
     if (currentStep > 0) {
       // Add transition effect
       setTimeout(() => {
-        setCurrentStep(prev => prev - 1);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        setCurrentStep((prev) => prev - 1);
+        window.scrollTo({ top: 0, behavior: "smooth" });
       }, 150);
     }
   };
@@ -279,17 +323,23 @@ export default function OpeaAiAgentDemo() {
   const handleReset = () => {
     setCurrentStep(0);
     setCurrentUser(null);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const renderStep = () => {
-    switch(currentStep) {
+    switch (currentStep) {
       case 0:
         return <WelcomeScreen onNext={handleNext} />;
       case 1:
         return <PlatformFeatures onNext={handleNext} />;
       case 2:
-        return <LoginScreen role="Consumer" onLogin={() => setCurrentUser('Consumer')} onNext={handleNext} />;
+        return (
+          <LoginScreen
+            role="Consumer"
+            onLogin={() => setCurrentUser("Consumer")}
+            onNext={handleNext}
+          />
+        );
       case 3:
         return <ConsumerCapabilities onNext={handleNext} />;
       case 4:
@@ -299,9 +349,20 @@ export default function OpeaAiAgentDemo() {
       case 6:
         return <DeploymentWorkflow onNext={handleNext} />;
       case 7:
-        return <LogoutScreen onLogout={() => setCurrentUser(null)} onNext={handleNext} />;
+        return (
+          <LogoutScreen
+            onLogout={() => setCurrentUser(null)}
+            onNext={handleNext}
+          />
+        );
       case 8:
-        return <LoginScreen role="Inventory Manager" onLogin={() => setCurrentUser('Inventory Manager')} onNext={handleNext} />;
+        return (
+          <LoginScreen
+            role="Inventory Manager"
+            onLogin={() => setCurrentUser("Inventory Manager")}
+            onNext={handleNext}
+          />
+        );
       case 9:
         return <QueryInventory onNext={handleNext} />;
       case 10:
@@ -333,7 +394,7 @@ export default function OpeaAiAgentDemo() {
       {showSidebar && <Sidebar currentUser={currentUser} />}
 
       {/* Main Content */}
-      <div className={`py-12 px-6 ${showSidebar ? 'ml-64' : ''}`}>
+      <div className={`py-12 px-6 ${showSidebar ? "ml-64" : ""}`}>
         {renderStep()}
       </div>
     </div>
@@ -355,7 +416,8 @@ function WelcomeScreen({ onNext }: { onNext: () => void }) {
         </h1>
 
         <p className="text-xl text-black max-w-3xl mx-auto">
-          AI-powered inventory management system with specialized agents for every role
+          AI-powered inventory management system with specialized agents for
+          every role
         </p>
 
         <p className="text-lg text-black max-w-2xl mx-auto">
@@ -389,7 +451,9 @@ function WelcomeScreen({ onNext }: { onNext: () => void }) {
 
         {/* Role Selection */}
         <div className="pt-12">
-          <h2 className="text-3xl font-bold text-black mb-8">Select Your Role</h2>
+          <h2 className="text-3xl font-bold text-black mb-8">
+            Select Your Role
+          </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
             {/* Consumer Role */}
@@ -421,7 +485,11 @@ function WelcomeScreen({ onNext }: { onNext: () => void }) {
                   Product Comparison
                 </li>
               </ul>
-              <AnimatedButton onClick={onNext} variant="primary" className="w-full py-3 text-black rounded-lg">
+              <AnimatedButton
+                onClick={onNext}
+                variant="primary"
+                className="w-full py-3 text-black rounded-lg"
+              >
                 Access Consumer →
               </AnimatedButton>
             </div>
@@ -432,10 +500,13 @@ function WelcomeScreen({ onNext }: { onNext: () => void }) {
                 <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
                   <Building className="text-black" size={24} />
                 </div>
-                <h3 className="text-xl font-bold text-black">Inventory Manager</h3>
+                <h3 className="text-xl font-bold text-black">
+                  Inventory Manager
+                </h3>
               </div>
               <p className="text-black mb-4">
-                Manage warehouse operations and track inventory with AI assistance.
+                Manage warehouse operations and track inventory with AI
+                assistance.
               </p>
               <ul className="space-y-2 mb-6">
                 <li className="flex items-center gap-2 text-sm text-black">
@@ -455,7 +526,10 @@ function WelcomeScreen({ onNext }: { onNext: () => void }) {
                   Reports
                 </li>
               </ul>
-              <AnimatedButton className="w-full py-3 bg-green-600 text-black" disabled>
+              <AnimatedButton
+                className="w-full py-3 bg-green-600 text-black"
+                disabled
+              >
                 Coming Soon
               </AnimatedButton>
             </div>
@@ -489,7 +563,10 @@ function WelcomeScreen({ onNext }: { onNext: () => void }) {
                   Configuration
                 </li>
               </ul>
-              <AnimatedButton className="w-full py-3 bg-purple-600 text-black" disabled>
+              <AnimatedButton
+                className="w-full py-3 bg-purple-600 text-black"
+                disabled
+              >
                 Coming Soon
               </AnimatedButton>
             </div>
@@ -513,24 +590,48 @@ function WelcomeScreen({ onNext }: { onNext: () => void }) {
 
 function PlatformFeatures({ onNext }: { onNext: () => void }) {
   const features = [
-    { icon: MessageSquare, title: 'Interactive Agents', desc: 'Build conversational AI agents' },
-    { icon: FileText, title: 'Document Processing', desc: 'DocSummarization & DBQnA' },
-    { icon: BarChart3, title: 'Analytics & Insights', desc: 'Real-time data analysis' },
-    { icon: Truck, title: 'Inventory Management', desc: 'Complete warehouse solutions' },
-    { icon: Archive, title: 'Asset Tracking', desc: 'Track and manage assets' },
-    { icon: Building, title: 'Multi-tenant', desc: 'Role-based access control' },
+    {
+      icon: MessageSquare,
+      title: "Interactive Agents",
+      desc: "Build conversational AI agents",
+    },
+    {
+      icon: FileText,
+      title: "Document Processing",
+      desc: "DocSummarization & DBQnA",
+    },
+    {
+      icon: BarChart3,
+      title: "Analytics & Insights",
+      desc: "Real-time data analysis",
+    },
+    {
+      icon: Truck,
+      title: "Inventory Management",
+      desc: "Complete warehouse solutions",
+    },
+    { icon: Archive, title: "Asset Tracking", desc: "Track and manage assets" },
+    {
+      icon: Building,
+      title: "Multi-tenant",
+      desc: "Role-based access control",
+    },
   ];
 
   const handleClick = () => {
-    console.log('Login as Consumer button clicked!');
+    console.log("Login as Consumer button clicked!");
     onNext();
   };
 
   return (
     <div className="max-w-7xl mx-auto px-6">
       <div className="text-center mb-12">
-        <h2 className="text-5xl font-bold text-black mb-4">Platform Features</h2>
-        <p className="text-xl text-black">Everything you need to build enterprise-grade AI applications</p>
+        <h2 className="text-5xl font-bold text-black mb-4">
+          Platform Features
+        </h2>
+        <p className="text-xl text-black">
+          Everything you need to build enterprise-grade AI applications
+        </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
@@ -543,7 +644,9 @@ function PlatformFeatures({ onNext }: { onNext: () => void }) {
             <div className="p-3 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg w-fit mb-4">
               <feature.icon size={32} className="text-white" />
             </div>
-            <h3 className="text-xl font-bold text-black mb-2">{feature.title}</h3>
+            <h3 className="text-xl font-bold text-black mb-2">
+              {feature.title}
+            </h3>
             <p className="text-black">{feature.desc}</p>
           </div>
         ))}
@@ -562,12 +665,21 @@ function PlatformFeatures({ onNext }: { onNext: () => void }) {
   );
 }
 
-function LoginScreen({ role, onLogin, onNext }: { role: string, onLogin: () => void, onNext: () => void }) {
+function LoginScreen({
+  role,
+  onLogin,
+  onNext,
+}: {
+  role: string;
+  onLogin: () => void;
+  onNext: () => void;
+}) {
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [showTyping, setShowTyping] = useState(false);
 
-  const fullEmail = role === 'Consumer' ? 'consumer@company.com' : 'inventory@company.com';
-  const fullPassword = 'password123';
+  const fullEmail =
+    role === "Consumer" ? "consumer@company.com" : "inventory@company.com";
+  const fullPassword = "password123";
 
   const typedEmail = useTypingEffect(fullEmail, 100);
   const typedPassword = useTypingEffect(fullPassword, 100);
@@ -595,17 +707,21 @@ function LoginScreen({ role, onLogin, onNext }: { role: string, onLogin: () => v
           <div className="flex justify-center mb-4">
             <Logo size="large" />
           </div>
-          <h2 className="text-3xl font-bold text-black mb-2">Login as {role}</h2>
+          <h2 className="text-3xl font-bold text-black mb-2">
+            Login as {role}
+          </h2>
           <p className="text-black">Secure authentication with OPEA Platform</p>
         </div>
 
         <div className="space-y-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Email
+            </label>
             <div className="relative">
               <input
                 type="email"
-                value={showTyping ? typedEmail : ''}
+                value={showTyping ? typedEmail : ""}
                 readOnly
                 className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-black font-mono"
                 placeholder="Typing..."
@@ -619,20 +735,28 @@ function LoginScreen({ role, onLogin, onNext }: { role: string, onLogin: () => v
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Password
+            </label>
             <div className="relative">
               <input
                 type="password"
-                value={showTyping && typedEmail.length === fullEmail.length ? typedPassword : ''}
+                value={
+                  showTyping && typedEmail.length === fullEmail.length
+                    ? typedPassword
+                    : ""
+                }
                 readOnly
                 className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-black font-mono"
                 placeholder="Typing..."
               />
-              {showTyping && typedEmail.length === fullEmail.length && typedPassword.length < fullPassword.length && (
-                <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                  <div className="w-0.5 h-5 bg-blue-500 animate-pulse" />
-                </div>
-              )}
+              {showTyping &&
+                typedEmail.length === fullEmail.length &&
+                typedPassword.length < fullPassword.length && (
+                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                    <div className="w-0.5 h-5 bg-blue-500 animate-pulse" />
+                  </div>
+                )}
             </div>
           </div>
 
@@ -657,7 +781,8 @@ function LoginScreen({ role, onLogin, onNext }: { role: string, onLogin: () => v
 
         <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
           <p className="text-black text-sm text-center">
-            <strong>Secure Access:</strong> Enterprise-grade authentication powered by OPEA
+            <strong>Secure Access:</strong> Enterprise-grade authentication
+            powered by OPEA
           </p>
         </div>
       </div>
@@ -667,18 +792,20 @@ function LoginScreen({ role, onLogin, onNext }: { role: string, onLogin: () => v
 
 function ConsumerCapabilities({ onNext }: { onNext: () => void }) {
   const capabilities = [
-    'Browse product catalog and compare specifications',
-    'Build custom PC configurations with AI assistance',
-    'Get real-time pricing and availability',
-    'Access technical documentation and guides',
-    'Create and deploy custom AI agents',
-    'Integrate with existing workflows'
+    "Browse product catalog and compare specifications",
+    "Build custom PC configurations with AI assistance",
+    "Get real-time pricing and availability",
+    "Access technical documentation and guides",
+    "Create and deploy custom AI agents",
+    "Integrate with existing workflows",
   ];
 
   return (
     <div className="max-w-5xl mx-auto px-6">
       <div className="bg-white rounded-2xl border border-gray-200 p-8 shadow-lg">
-        <h2 className="text-4xl font-bold text-black mb-6">Consumer Role Capabilities</h2>
+        <h2 className="text-4xl font-bold text-black mb-6">
+          Consumer Role Capabilities
+        </h2>
 
         <div className="space-y-4">
           {capabilities.map((cap, idx) => (
@@ -729,10 +856,12 @@ function BuildAIAgent({ onNext }: { onNext: () => void }) {
 
         <div className="space-y-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Describe your AI Agent</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Describe your AI Agent
+            </label>
             <div className="relative">
               <textarea
-                value={showTyping ? typedText : ''}
+                value={showTyping ? typedText : ""}
                 readOnly
                 className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-black h-32 resize-none font-mono"
                 placeholder="Typing..."
@@ -743,18 +872,23 @@ function BuildAIAgent({ onNext }: { onNext: () => void }) {
                 </div>
               )}
             </div>
-            <p className="text-black text-sm mt-2">AI-powered agent creation with natural language processing</p>
+            <p className="text-black text-sm mt-2">
+              AI-powered agent creation with natural language processing
+            </p>
           </div>
 
           <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
             <p className="text-black">
-              <span className="font-semibold">✨ AI Analysis:</span> Based on your description, we recommend an Interactive Agent with Document Processing capabilities.
+              <span className="font-semibold">✨ AI Analysis:</span> Based on
+              your description, we recommend an Interactive Agent with Document
+              Processing capabilities.
             </p>
           </div>
 
           <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
             <p className="text-black text-sm">
-              <span className="font-semibold">Ready!</span> Your agent configuration is ready for deployment.
+              <span className="font-semibold">Ready!</span> Your agent
+              configuration is ready for deployment.
             </p>
           </div>
 
@@ -776,19 +910,23 @@ function BuildAIAgent({ onNext }: { onNext: () => void }) {
 
 function AgentConfiguration({ onNext }: { onNext: () => void }) {
   const agents = [
-    { name: 'Interactive Agent', selected: true, required: true },
-    { name: 'DBQnA Agent', selected: true, required: false },
-    { name: 'DocSummarization Agent', selected: true, required: false },
-    { name: 'RAG Agent', selected: false, required: false },
-    { name: 'Audio Agent', selected: false, required: false },
+    { name: "Interactive Agent", selected: true, required: true },
+    { name: "DBQnA Agent", selected: true, required: false },
+    { name: "DocSummarization Agent", selected: true, required: false },
+    { name: "RAG Agent", selected: false, required: false },
+    { name: "Audio Agent", selected: false, required: false },
   ];
 
   return (
     <div className="max-w-4xl mx-auto px-6">
       <div className="bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 p-8">
-        <h2 className="text-4xl font-bold text-black mb-6">Agent Configuration</h2>
+        <h2 className="text-4xl font-bold text-black mb-6">
+          Agent Configuration
+        </h2>
 
-        <p className="text-black mb-6">Components auto-selected for your Inventory Management Agent:</p>
+        <p className="text-black mb-6">
+          Components auto-selected for your Inventory Management Agent:
+        </p>
 
         <div className="space-y-3 mb-8">
           {agents.map((agent, idx) => (
@@ -796,8 +934,8 @@ function AgentConfiguration({ onNext }: { onNext: () => void }) {
               key={idx}
               className={`flex items-center justify-between p-4 rounded-lg border transition-all ${
                 agent.selected
-                  ? 'bg-green-500/20 border-green-500/50'
-                  : 'bg-white/5 border-white/20'
+                  ? "bg-green-500/20 border-green-500/50"
+                  : "bg-white/5 border-white/20"
               }`}
             >
               <div className="flex items-center gap-3">
@@ -819,16 +957,16 @@ function AgentConfiguration({ onNext }: { onNext: () => void }) {
                   </span>
                 )}
               </div>
-              {agent.selected && (
-                <Check size={20} className="text-black" />
-              )}
+              {agent.selected && <Check size={20} className="text-black" />}
             </div>
           ))}
         </div>
 
         <div className="p-4 bg-green-500/10 border border-green-500/30 rounded-lg mb-6">
           <p className="text-black text-sm">
-            <span className="font-semibold">Configuration Ready!</span> DBQnA and DocSummarization agents have been automatically selected based on your requirements.
+            <span className="font-semibold">Configuration Ready!</span> DBQnA
+            and DocSummarization agents have been automatically selected based
+            on your requirements.
           </p>
         </div>
 
@@ -853,17 +991,17 @@ function DeploymentWorkflow({ onNext }: { onNext: () => void }) {
   const [showSuccess, setShowSuccess] = useState(false);
 
   const deploySteps = [
-    { title: 'Generating Code', duration: 2300, time: '2.3s' },
-    { title: 'Creating GitHub Repository', duration: 1800, time: '1.8s' },
-    { title: 'Building Container', duration: 4000, time: '45.2s' },
-    { title: 'Deploying to Cloud', duration: 3000, time: '12.7s' },
+    { title: "Generating Code", duration: 2300, time: "2.3s" },
+    { title: "Creating GitHub Repository", duration: 1800, time: "1.8s" },
+    { title: "Building Container", duration: 4000, time: "45.2s" },
+    { title: "Deploying to Cloud", duration: 3000, time: "12.7s" },
   ];
 
   useEffect(() => {
     if (currentStep < deploySteps.length) {
       const timer = setTimeout(() => {
-        setCompletedSteps(prev => [...prev, currentStep]);
-        setCurrentStep(prev => prev + 1);
+        setCompletedSteps((prev) => [...prev, currentStep]);
+        setCurrentStep((prev) => prev + 1);
       }, deploySteps[currentStep].duration);
 
       return () => clearTimeout(timer);
@@ -877,7 +1015,9 @@ function DeploymentWorkflow({ onNext }: { onNext: () => void }) {
   return (
     <div className="max-w-5xl mx-auto px-6">
       <div className="bg-white rounded-2xl border border-gray-200 p-8 shadow-lg">
-        <h2 className="text-4xl font-bold text-black mb-6">Deployment Workflow</h2>
+        <h2 className="text-4xl font-bold text-black mb-6">
+          Deployment Workflow
+        </h2>
 
         <div className="space-y-4 mb-8">
           {deploySteps.map((step, idx) => {
@@ -890,20 +1030,22 @@ function DeploymentWorkflow({ onNext }: { onNext: () => void }) {
                 key={idx}
                 className={`p-4 rounded-lg border-2 transition-all duration-300 ${
                   isCompleted
-                    ? 'bg-green-50 border-green-500'
+                    ? "bg-green-50 border-green-500"
                     : isActive
-                    ? 'bg-blue-50 border-blue-500'
-                    : 'bg-gray-50 border-gray-200'
+                      ? "bg-blue-50 border-blue-500"
+                      : "bg-gray-50 border-gray-200"
                 }`}
               >
                 <div className="flex items-center gap-4 mb-2">
-                  <div className={`p-2 rounded-full transition-all duration-300 ${
-                    isCompleted
-                      ? 'bg-green-500'
-                      : isActive
-                      ? 'bg-blue-500 animate-pulse'
-                      : 'bg-gray-300'
-                  }`}>
+                  <div
+                    className={`p-2 rounded-full transition-all duration-300 ${
+                      isCompleted
+                        ? "bg-green-500"
+                        : isActive
+                          ? "bg-blue-500 animate-pulse"
+                          : "bg-gray-300"
+                    }`}
+                  >
                     {isCompleted ? (
                       <Check size={20} className="text-white" />
                     ) : (
@@ -922,7 +1064,9 @@ function DeploymentWorkflow({ onNext }: { onNext: () => void }) {
                       )}
                     </div>
                   </div>
-                  <div className="text-sm text-black font-mono">{step.time}</div>
+                  <div className="text-sm text-black font-mono">
+                    {step.time}
+                  </div>
                 </div>
 
                 {/* Progress Bar */}
@@ -932,7 +1076,7 @@ function DeploymentWorkflow({ onNext }: { onNext: () => void }) {
                       className="h-full bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-300 ease-linear"
                       style={{
                         width: `${progress}%`,
-                        animation: `loadProgress ${deploySteps[idx].duration}ms linear forwards`
+                        animation: `loadProgress ${deploySteps[idx].duration}ms linear forwards`,
                       }}
                     />
                   </div>
@@ -975,7 +1119,9 @@ function DeploymentWorkflow({ onNext }: { onNext: () => void }) {
           <>
             <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg mb-6">
               <p className="text-black text-sm">
-                <span className="font-semibold">Next Step:</span> Logout from Consumer role and proceed to test the deployed agent as an Inventory Manager.
+                <span className="font-semibold">Next Step:</span> Logout from
+                Consumer role and proceed to test the deployed agent as an
+                Inventory Manager.
               </p>
             </div>
 
@@ -995,15 +1141,25 @@ function DeploymentWorkflow({ onNext }: { onNext: () => void }) {
 
       <style jsx>{`
         @keyframes loadProgress {
-          from { width: 0%; }
-          to { width: 100%; }
+          from {
+            width: 0%;
+          }
+          to {
+            width: 100%;
+          }
         }
       `}</style>
     </div>
   );
 }
 
-function LogoutScreen({ onLogout, onNext }: { onLogout: () => void, onNext: () => void }) {
+function LogoutScreen({
+  onLogout,
+  onNext,
+}: {
+  onLogout: () => void;
+  onNext: () => void;
+}) {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const handleLogout = () => {
@@ -1024,7 +1180,9 @@ function LogoutScreen({ onLogout, onNext }: { onLogout: () => void, onNext: () =
           </div>
         </div>
         <h2 className="text-3xl font-bold text-black mb-4">Logout</h2>
-        <p className="text-black mb-8">Sign out of your current session securely</p>
+        <p className="text-black mb-8">
+          Sign out of your current session securely
+        </p>
 
         <AnimatedButton
           onClick={handleLogout}
@@ -1052,8 +1210,9 @@ function LogoutScreen({ onLogout, onNext }: { onLogout: () => void, onNext: () =
 function QueryInventory({ onNext }: { onNext: () => void }) {
   const [showTyping, setShowTyping] = useState(false);
   const [showResults, setShowResults] = useState(false);
-  const [currentMenuPage, setCurrentMenuPage] = useState('query');
-  const fullQuery = "Show inventory details for Xeon 6 processor at San Jose warehouse";
+  const [currentMenuPage, setCurrentMenuPage] = useState("query");
+  const fullQuery =
+    "Show inventory details for Xeon 6 processor at San Jose warehouse";
   const typedQuery = useTypingEffect(fullQuery, 50);
 
   useEffect(() => {
@@ -1075,17 +1234,24 @@ function QueryInventory({ onNext }: { onNext: () => void }) {
 
   return (
     <div className="max-w-6xl mx-auto px-6">
-      <AdminMenu currentPage={currentMenuPage} onPageChange={setCurrentMenuPage} />
+      <AdminMenu
+        currentPage={currentMenuPage}
+        onPageChange={setCurrentMenuPage}
+      />
 
       <div className="bg-white rounded-2xl border border-gray-200 p-8 shadow-lg">
-        <h2 className="text-4xl font-bold text-black mb-6">Inventory Query Agent</h2>
+        <h2 className="text-4xl font-bold text-black mb-6">
+          Inventory Query Agent
+        </h2>
 
         <div className="space-y-6">
           <div className="p-4 bg-blue-50 border-l-4 border-blue-500 rounded-lg">
-            <div className="text-sm text-black mb-2 font-medium">User Query</div>
+            <div className="text-sm text-black mb-2 font-medium">
+              User Query
+            </div>
             <div className="relative">
               <div className="text-black font-mono text-lg min-h-[2rem]">
-                {showTyping ? typedQuery : ''}
+                {showTyping ? typedQuery : ""}
                 {showTyping && typedQuery.length < fullQuery.length && (
                   <span className="w-0.5 h-5 bg-blue-500 animate-pulse inline-block ml-1" />
                 )}
@@ -1095,12 +1261,16 @@ function QueryInventory({ onNext }: { onNext: () => void }) {
 
           {showResults && (
             <div className="p-6 bg-gray-50 rounded-lg border border-gray-200 animate-slideUp">
-              <div className="text-sm text-black mb-4 font-medium">Agent Response</div>
+              <div className="text-sm text-black mb-4 font-medium">
+                Agent Response
+              </div>
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="p-4 bg-white rounded-lg border border-gray-200 shadow-sm">
                     <div className="text-black text-sm mb-1">Product</div>
-                    <div className="text-black font-semibold">Intel Xeon 6 Processor</div>
+                    <div className="text-black font-semibold">
+                      Intel Xeon 6 Processor
+                    </div>
                   </div>
                   <div className="p-4 bg-white rounded-lg border border-gray-200 shadow-sm">
                     <div className="text-black text-sm mb-1">SKU</div>
@@ -1108,10 +1278,14 @@ function QueryInventory({ onNext }: { onNext: () => void }) {
                   </div>
                   <div className="p-4 bg-white rounded-lg border border-gray-200 shadow-sm">
                     <div className="text-black text-sm mb-1">Location</div>
-                    <div className="text-black font-semibold">San Jose Warehouse</div>
+                    <div className="text-black font-semibold">
+                      San Jose Warehouse
+                    </div>
                   </div>
                   <div className="p-4 bg-white rounded-lg border border-gray-200 shadow-sm">
-                    <div className="text-black text-sm mb-1">Available Stock</div>
+                    <div className="text-black text-sm mb-1">
+                      Available Stock
+                    </div>
                     <div className="text-black font-semibold">247 units</div>
                   </div>
                   <div className="p-4 bg-white rounded-lg border border-gray-200 shadow-sm">
@@ -1146,17 +1320,44 @@ function QueryInventory({ onNext }: { onNext: () => void }) {
 }
 
 function StockManagement({ onNext }: { onNext: () => void }) {
-  const [currentMenuPage, setCurrentMenuPage] = useState('stock');
+  const [currentMenuPage, setCurrentMenuPage] = useState("stock");
   const stockData = [
-    { product: 'Intel Xeon 6', sku: 'CPU-XN6-2024', stock: 247, status: 'In Stock', trend: '+12%' },
-    { product: 'AMD EPYC 9004', sku: 'CPU-EP9-2024', stock: 189, status: 'In Stock', trend: '+8%' },
-    { product: 'NVIDIA H100', sku: 'GPU-H100-2024', stock: 45, status: 'Low Stock', trend: '-15%' },
-    { product: 'Samsung DDR5 64GB', sku: 'RAM-DD5-64', stock: 523, status: 'In Stock', trend: '+23%' },
+    {
+      product: "Intel Xeon 6",
+      sku: "CPU-XN6-2024",
+      stock: 247,
+      status: "In Stock",
+      trend: "+12%",
+    },
+    {
+      product: "AMD EPYC 9004",
+      sku: "CPU-EP9-2024",
+      stock: 189,
+      status: "In Stock",
+      trend: "+8%",
+    },
+    {
+      product: "NVIDIA H100",
+      sku: "GPU-H100-2024",
+      stock: 45,
+      status: "Low Stock",
+      trend: "-15%",
+    },
+    {
+      product: "Samsung DDR5 64GB",
+      sku: "RAM-DD5-64",
+      stock: 523,
+      status: "In Stock",
+      trend: "+23%",
+    },
   ];
 
   return (
     <div className="max-w-6xl mx-auto px-6">
-      <AdminMenu currentPage={currentMenuPage} onPageChange={setCurrentMenuPage} />
+      <AdminMenu
+        currentPage={currentMenuPage}
+        onPageChange={setCurrentMenuPage}
+      />
 
       <div className="bg-white rounded-2xl border border-gray-200 p-8 shadow-lg">
         <h2 className="text-4xl font-bold text-black mb-6">Stock Management</h2>
@@ -1165,31 +1366,54 @@ function StockManagement({ onNext }: { onNext: () => void }) {
           <table className="w-full">
             <thead>
               <tr className="border-b border-gray-200">
-                <th className="text-left py-3 px-4 text-black font-semibold">Product</th>
-                <th className="text-left py-3 px-4 text-black font-semibold">SKU</th>
-                <th className="text-left py-3 px-4 text-black font-semibold">Stock</th>
-                <th className="text-left py-3 px-4 text-black font-semibold">Status</th>
-                <th className="text-left py-3 px-4 text-black font-semibold">Trend</th>
+                <th className="text-left py-3 px-4 text-black font-semibold">
+                  Product
+                </th>
+                <th className="text-left py-3 px-4 text-black font-semibold">
+                  SKU
+                </th>
+                <th className="text-left py-3 px-4 text-black font-semibold">
+                  Stock
+                </th>
+                <th className="text-left py-3 px-4 text-black font-semibold">
+                  Status
+                </th>
+                <th className="text-left py-3 px-4 text-black font-semibold">
+                  Trend
+                </th>
               </tr>
             </thead>
             <tbody>
               {stockData.map((item, idx) => (
-                <tr key={idx} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
-                  <td className="py-4 px-4 text-black font-medium">{item.product}</td>
-                  <td className="py-4 px-4 text-black font-mono text-sm">{item.sku}</td>
-                  <td className="py-4 px-4 text-black font-semibold">{item.stock}</td>
+                <tr
+                  key={idx}
+                  className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
+                >
+                  <td className="py-4 px-4 text-black font-medium">
+                    {item.product}
+                  </td>
+                  <td className="py-4 px-4 text-black font-mono text-sm">
+                    {item.sku}
+                  </td>
+                  <td className="py-4 px-4 text-black font-semibold">
+                    {item.stock}
+                  </td>
                   <td className="py-4 px-4">
-                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                      item.status === 'In Stock'
-                        ? 'bg-green-100 text-black'
-                        : 'bg-yellow-100 text-black'
-                    }`}>
+                    <span
+                      className={`px-3 py-1 rounded-full text-sm font-medium ${
+                        item.status === "In Stock"
+                          ? "bg-green-100 text-black"
+                          : "bg-yellow-100 text-black"
+                      }`}
+                    >
                       {item.status}
                     </span>
                   </td>
-                  <td className={`py-4 px-4 font-semibold ${
-                    item.trend.startsWith('+') ? 'text-black' : 'text-black'
-                  }`}>
+                  <td
+                    className={`py-4 px-4 font-semibold ${
+                      item.trend.startsWith("+") ? "text-black" : "text-black"
+                    }`}
+                  >
                     {item.trend}
                   </td>
                 </tr>
@@ -1214,26 +1438,48 @@ function StockManagement({ onNext }: { onNext: () => void }) {
 }
 
 function ProductCategoryFilter({ onNext }: { onNext: () => void }) {
-  const [selectedCategory] = useState('Processors');
-  const [selectedWarehouse] = useState('San Jose');
-  const [currentMenuPage, setCurrentMenuPage] = useState('filter');
+  const [selectedCategory] = useState("Processors");
+  const [selectedWarehouse] = useState("San Jose");
+  const [currentMenuPage, setCurrentMenuPage] = useState("filter");
 
   const products = [
-    { name: 'Intel Xeon 6 5th Gen', warehouse: 'San Jose', qty: 247, value: '$124,753' },
-    { name: 'Intel Xeon 6 6th Gen', warehouse: 'San Jose', qty: 156, value: '$93,600' },
-    { name: 'AMD EPYC 9004 Series', warehouse: 'San Jose', qty: 189, value: '$113,400' },
+    {
+      name: "Intel Xeon 6 5th Gen",
+      warehouse: "San Jose",
+      qty: 247,
+      value: "$124,753",
+    },
+    {
+      name: "Intel Xeon 6 6th Gen",
+      warehouse: "San Jose",
+      qty: 156,
+      value: "$93,600",
+    },
+    {
+      name: "AMD EPYC 9004 Series",
+      warehouse: "San Jose",
+      qty: 189,
+      value: "$113,400",
+    },
   ];
 
   return (
     <div className="max-w-6xl mx-auto px-6">
-      <AdminMenu currentPage={currentMenuPage} onPageChange={setCurrentMenuPage} />
+      <AdminMenu
+        currentPage={currentMenuPage}
+        onPageChange={setCurrentMenuPage}
+      />
 
       <div className="bg-white rounded-2xl border border-gray-200 p-8 shadow-lg">
-        <h2 className="text-4xl font-bold text-black mb-6">Product Category Filter</h2>
+        <h2 className="text-4xl font-bold text-black mb-6">
+          Product Category Filter
+        </h2>
 
         <div className="flex gap-4 mb-6">
           <div className="flex-1">
-            <label className="block text-sm text-black mb-2 font-medium">Category</label>
+            <label className="block text-sm text-black mb-2 font-medium">
+              Category
+            </label>
             <select className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-black">
               <option>Processors</option>
               <option>Graphics Cards</option>
@@ -1243,7 +1489,9 @@ function ProductCategoryFilter({ onNext }: { onNext: () => void }) {
           </div>
 
           <div className="flex-1">
-            <label className="block text-sm text-black mb-2 font-medium">Warehouse</label>
+            <label className="block text-sm text-black mb-2 font-medium">
+              Warehouse
+            </label>
             <select className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-black">
               <option>San Jose</option>
               <option>Austin</option>
@@ -1255,13 +1503,20 @@ function ProductCategoryFilter({ onNext }: { onNext: () => void }) {
 
         <div className="space-y-3">
           {products.map((product, idx) => (
-            <div key={idx} className="p-4 bg-gray-50 rounded-lg border border-gray-200 flex justify-between items-center hover:shadow-sm transition-shadow">
+            <div
+              key={idx}
+              className="p-4 bg-gray-50 rounded-lg border border-gray-200 flex justify-between items-center hover:shadow-sm transition-shadow"
+            >
               <div>
                 <div className="text-black font-semibold">{product.name}</div>
-                <div className="text-black text-sm">{product.warehouse} Warehouse</div>
+                <div className="text-black text-sm">
+                  {product.warehouse} Warehouse
+                </div>
               </div>
               <div className="text-right">
-                <div className="text-black font-semibold">{product.qty} units</div>
+                <div className="text-black font-semibold">
+                  {product.qty} units
+                </div>
                 <div className="text-black text-sm">{product.value}</div>
               </div>
             </div>
@@ -1284,33 +1539,66 @@ function ProductCategoryFilter({ onNext }: { onNext: () => void }) {
 }
 
 function AllocationsScreen({ onNext }: { onNext: () => void }) {
-  const [currentMenuPage, setCurrentMenuPage] = useState('allocations');
+  const [currentMenuPage, setCurrentMenuPage] = useState("allocations");
   const allocations = [
-    { id: 'AL-2024-001', product: 'Intel Xeon 6', customer: 'Tech Corp', qty: 50, status: 'Pending', date: '2024-10-10' },
-    { id: 'AL-2024-002', product: 'NVIDIA H100', customer: 'AI Solutions', qty: 20, status: 'Confirmed', date: '2024-10-09' },
-    { id: 'AL-2024-003', product: 'AMD EPYC 9004', customer: 'Cloud Dynamics', qty: 35, status: 'Shipped', date: '2024-10-08' },
+    {
+      id: "AL-2024-001",
+      product: "Intel Xeon 6",
+      customer: "Tech Corp",
+      qty: 50,
+      status: "Pending",
+      date: "2024-10-10",
+    },
+    {
+      id: "AL-2024-002",
+      product: "NVIDIA H100",
+      customer: "AI Solutions",
+      qty: 20,
+      status: "Confirmed",
+      date: "2024-10-09",
+    },
+    {
+      id: "AL-2024-003",
+      product: "AMD EPYC 9004",
+      customer: "Cloud Dynamics",
+      qty: 35,
+      status: "Shipped",
+      date: "2024-10-08",
+    },
   ];
 
   return (
     <div className="max-w-6xl mx-auto px-6">
-      <AdminMenu currentPage={currentMenuPage} onPageChange={setCurrentMenuPage} />
+      <AdminMenu
+        currentPage={currentMenuPage}
+        onPageChange={setCurrentMenuPage}
+      />
 
       <div className="bg-white rounded-2xl border border-gray-200 p-8 shadow-lg">
         <h2 className="text-4xl font-bold text-black mb-6">Allocations</h2>
 
         <div className="space-y-4">
           {allocations.map((alloc, idx) => (
-            <div key={idx} className="p-5 bg-gray-50 rounded-lg border border-gray-200 hover:shadow-sm transition-shadow">
+            <div
+              key={idx}
+              className="p-5 bg-gray-50 rounded-lg border border-gray-200 hover:shadow-sm transition-shadow"
+            >
               <div className="flex justify-between items-start mb-3">
                 <div>
                   <div className="text-black font-mono text-sm">{alloc.id}</div>
-                  <div className="text-black font-semibold text-lg">{alloc.product}</div>
+                  <div className="text-black font-semibold text-lg">
+                    {alloc.product}
+                  </div>
                 </div>
-                <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                  alloc.status === 'Confirmed' ? 'bg-green-100 text-black' :
-                  alloc.status === 'Shipped' ? 'bg-blue-100 text-black' :
-                  'bg-yellow-100 text-black'
-                }`}>
+                <span
+                  className={`px-3 py-1 rounded-full text-sm font-medium ${
+                    alloc.status === "Confirmed"
+                      ? "bg-green-100 text-black"
+                      : alloc.status === "Shipped"
+                        ? "bg-blue-100 text-black"
+                        : "bg-yellow-100 text-black"
+                  }`}
+                >
                   {alloc.status}
                 </span>
               </div>
@@ -1321,7 +1609,9 @@ function AllocationsScreen({ onNext }: { onNext: () => void }) {
                 </div>
                 <div>
                   <div className="text-black">Quantity</div>
-                  <div className="text-black font-medium">{alloc.qty} units</div>
+                  <div className="text-black font-medium">
+                    {alloc.qty} units
+                  </div>
                 </div>
                 <div>
                   <div className="text-black">Date</div>
@@ -1348,34 +1638,64 @@ function AllocationsScreen({ onNext }: { onNext: () => void }) {
 }
 
 function WarehouseManagement({ onNext }: { onNext: () => void }) {
-  const [currentMenuPage, setCurrentMenuPage] = useState('warehouse');
+  const [currentMenuPage, setCurrentMenuPage] = useState("warehouse");
   const warehouses = [
-    { name: 'San Jose', capacity: '15,000 sq ft', utilization: '78%', items: 2847, temp: '68°F' },
-    { name: 'Austin', capacity: '12,000 sq ft', utilization: '65%', items: 1923, temp: '70°F' },
-    { name: 'Portland', capacity: '18,000 sq ft', utilization: '82%', items: 3456, temp: '66°F' },
+    {
+      name: "San Jose",
+      capacity: "15,000 sq ft",
+      utilization: "78%",
+      items: 2847,
+      temp: "68°F",
+    },
+    {
+      name: "Austin",
+      capacity: "12,000 sq ft",
+      utilization: "65%",
+      items: 1923,
+      temp: "70°F",
+    },
+    {
+      name: "Portland",
+      capacity: "18,000 sq ft",
+      utilization: "82%",
+      items: 3456,
+      temp: "66°F",
+    },
   ];
 
   return (
     <div className="max-w-6xl mx-auto px-6">
-      <AdminMenu currentPage={currentMenuPage} onPageChange={setCurrentMenuPage} />
+      <AdminMenu
+        currentPage={currentMenuPage}
+        onPageChange={setCurrentMenuPage}
+      />
 
       <div className="bg-white rounded-2xl border border-gray-200 p-8 shadow-lg">
-        <h2 className="text-4xl font-bold text-black mb-6">Warehouse Management</h2>
+        <h2 className="text-4xl font-bold text-black mb-6">
+          Warehouse Management
+        </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {warehouses.map((warehouse, idx) => (
-            <div key={idx} className="p-6 bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl border border-gray-200 hover:shadow-md transition-shadow">
+            <div
+              key={idx}
+              className="p-6 bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl border border-gray-200 hover:shadow-md transition-shadow"
+            >
               <div className="flex items-center gap-3 mb-4">
                 <div className="p-2 bg-blue-100 rounded-lg">
                   <Building size={24} className="text-black" />
                 </div>
-                <h3 className="text-xl font-bold text-black">{warehouse.name}</h3>
+                <h3 className="text-xl font-bold text-black">
+                  {warehouse.name}
+                </h3>
               </div>
 
               <div className="space-y-3">
                 <div>
                   <div className="text-black text-sm">Capacity</div>
-                  <div className="text-black font-semibold">{warehouse.capacity}</div>
+                  <div className="text-black font-semibold">
+                    {warehouse.capacity}
+                  </div>
                 </div>
                 <div>
                   <div className="text-black text-sm">Utilization</div>
@@ -1386,17 +1706,23 @@ function WarehouseManagement({ onNext }: { onNext: () => void }) {
                         style={{ width: warehouse.utilization }}
                       />
                     </div>
-                    <span className="text-black font-semibold">{warehouse.utilization}</span>
+                    <span className="text-black font-semibold">
+                      {warehouse.utilization}
+                    </span>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <div className="text-black text-sm">Items</div>
-                    <div className="text-black font-semibold">{warehouse.items}</div>
+                    <div className="text-black font-semibold">
+                      {warehouse.items}
+                    </div>
                   </div>
                   <div>
                     <div className="text-black text-sm">Temperature</div>
-                    <div className="text-black font-semibold">{warehouse.temp}</div>
+                    <div className="text-black font-semibold">
+                      {warehouse.temp}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1420,45 +1746,85 @@ function WarehouseManagement({ onNext }: { onNext: () => void }) {
 }
 
 function AssetsManagement({ onNext }: { onNext: () => void }) {
-  const [currentMenuPage, setCurrentMenuPage] = useState('assets');
+  const [currentMenuPage, setCurrentMenuPage] = useState("assets");
   const assets = [
-    { id: 'AST-2024-145', type: 'Server Rack', location: 'San Jose - A3', status: 'Active', value: '$45,000' },
-    { id: 'AST-2024-146', type: 'Forklift', location: 'Austin - B2', status: 'Active', value: '$32,000' },
-    { id: 'AST-2024-147', type: 'Cooling System', location: 'Portland - C1', status: 'Maintenance', value: '$28,500' },
-    { id: 'AST-2024-148', type: 'Security System', location: 'San Jose - Main', status: 'Active', value: '$18,900' },
+    {
+      id: "AST-2024-145",
+      type: "Server Rack",
+      location: "San Jose - A3",
+      status: "Active",
+      value: "$45,000",
+    },
+    {
+      id: "AST-2024-146",
+      type: "Forklift",
+      location: "Austin - B2",
+      status: "Active",
+      value: "$32,000",
+    },
+    {
+      id: "AST-2024-147",
+      type: "Cooling System",
+      location: "Portland - C1",
+      status: "Maintenance",
+      value: "$28,500",
+    },
+    {
+      id: "AST-2024-148",
+      type: "Security System",
+      location: "San Jose - Main",
+      status: "Active",
+      value: "$18,900",
+    },
   ];
 
   return (
     <div className="max-w-6xl mx-auto px-6">
-      <AdminMenu currentPage={currentMenuPage} onPageChange={setCurrentMenuPage} />
+      <AdminMenu
+        currentPage={currentMenuPage}
+        onPageChange={setCurrentMenuPage}
+      />
 
       <div className="bg-white rounded-2xl border border-gray-200 p-8 shadow-lg">
-        <h2 className="text-4xl font-bold text-black mb-6">Assets Management</h2>
+        <h2 className="text-4xl font-bold text-black mb-6">
+          Assets Management
+        </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {assets.map((asset, idx) => (
-            <div key={idx} className="p-5 bg-gray-50 rounded-lg border border-gray-200 hover:shadow-sm transition-shadow">
+            <div
+              key={idx}
+              className="p-5 bg-gray-50 rounded-lg border border-gray-200 hover:shadow-sm transition-shadow"
+            >
               <div className="flex justify-between items-start mb-3">
                 <div>
                   <div className="text-black font-mono text-sm">{asset.id}</div>
-                  <div className="text-black font-semibold text-lg">{asset.type}</div>
+                  <div className="text-black font-semibold text-lg">
+                    {asset.type}
+                  </div>
                 </div>
-                <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                  asset.status === 'Active'
-                    ? 'bg-green-100 text-black'
-                    : 'bg-yellow-100 text-black'
-                }`}>
+                <span
+                  className={`px-3 py-1 rounded-full text-sm font-medium ${
+                    asset.status === "Active"
+                      ? "bg-green-100 text-black"
+                      : "bg-yellow-100 text-black"
+                  }`}
+                >
                   {asset.status}
                 </span>
               </div>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span className="text-black">Location:</span>
-                  <span className="text-black font-medium">{asset.location}</span>
+                  <span className="text-black font-medium">
+                    {asset.location}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-black">Value:</span>
-                  <span className="text-black font-semibold">{asset.value}</span>
+                  <span className="text-black font-semibold">
+                    {asset.value}
+                  </span>
                 </div>
               </div>
             </div>
@@ -1481,14 +1847,19 @@ function AssetsManagement({ onNext }: { onNext: () => void }) {
 }
 
 function ReportsDashboard({ onNext }: { onNext: () => void }) {
-  const [currentMenuPage, setCurrentMenuPage] = useState('reports');
+  const [currentMenuPage, setCurrentMenuPage] = useState("reports");
 
   return (
     <div className="max-w-6xl mx-auto px-6">
-      <AdminMenu currentPage={currentMenuPage} onPageChange={setCurrentMenuPage} />
+      <AdminMenu
+        currentPage={currentMenuPage}
+        onPageChange={setCurrentMenuPage}
+      />
 
       <div className="bg-white rounded-2xl border border-gray-200 p-8 shadow-lg">
-        <h2 className="text-4xl font-bold text-black mb-6">Reports Dashboard</h2>
+        <h2 className="text-4xl font-bold text-black mb-6">
+          Reports Dashboard
+        </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="p-6 bg-gradient-to-br from-green-50 to-blue-50 rounded-xl border border-gray-200 hover:shadow-md transition-shadow">
@@ -1496,7 +1867,9 @@ function ReportsDashboard({ onNext }: { onNext: () => void }) {
               <div className="p-2 bg-green-100 rounded-lg">
                 <BarChart3 size={24} className="text-black" />
               </div>
-              <h3 className="text-xl font-bold text-black">Inventory Turnover</h3>
+              <h3 className="text-xl font-bold text-black">
+                Inventory Turnover
+              </h3>
             </div>
             <div className="text-4xl font-bold text-black mb-2">4.2x</div>
             <div className="text-black text-sm">+12% vs last month</div>
@@ -1507,7 +1880,9 @@ function ReportsDashboard({ onNext }: { onNext: () => void }) {
               <div className="p-2 bg-purple-100 rounded-lg">
                 <FileText size={24} className="text-black" />
               </div>
-              <h3 className="text-xl font-bold text-black">Order Fulfillment</h3>
+              <h3 className="text-xl font-bold text-black">
+                Order Fulfillment
+              </h3>
             </div>
             <div className="text-4xl font-bold text-black mb-2">96.8%</div>
             <div className="text-black text-sm">+3.2% vs last month</div>
@@ -1518,7 +1893,9 @@ function ReportsDashboard({ onNext }: { onNext: () => void }) {
               <div className="p-2 bg-blue-100 rounded-lg">
                 <Truck size={24} className="text-black" />
               </div>
-              <h3 className="text-xl font-bold text-black">Average Delivery Time</h3>
+              <h3 className="text-xl font-bold text-black">
+                Average Delivery Time
+              </h3>
             </div>
             <div className="text-4xl font-bold text-black mb-2">2.4 days</div>
             <div className="text-black text-sm">-0.3 days vs last month</div>
@@ -1557,8 +1934,12 @@ function FinalScreen({ onReset }: { onReset: () => void }) {
       <div className="space-y-6">
         {/* Header */}
         <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-lg">
-          <h1 className="text-4xl font-bold text-black mb-2">📊 Inventory Dashboard Overview</h1>
-          <p className="text-black">Real-time inventory metrics and analytics powered by OPEA AI</p>
+          <h1 className="text-4xl font-bold text-black mb-2">
+            📊 Inventory Dashboard Overview
+          </h1>
+          <p className="text-black">
+            Real-time inventory metrics and analytics powered by OPEA AI
+          </p>
         </div>
 
         {/* Key Metrics */}
@@ -1575,7 +1956,9 @@ function FinalScreen({ onReset }: { onReset: () => void }) {
           <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between mb-4">
               <Building size={32} className="text-green-600" />
-              <span className="text-green-600 text-sm font-semibold">3 Active</span>
+              <span className="text-green-600 text-sm font-semibold">
+                3 Active
+              </span>
             </div>
             <div className="text-3xl font-bold text-black mb-1">3</div>
             <div className="text-sm text-black">Warehouses</div>
@@ -1593,7 +1976,9 @@ function FinalScreen({ onReset }: { onReset: () => void }) {
           <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between mb-4">
               <BarChart3 size={32} className="text-orange-600" />
-              <span className="text-green-600 text-sm font-semibold">99.2%</span>
+              <span className="text-green-600 text-sm font-semibold">
+                99.2%
+              </span>
             </div>
             <div className="text-3xl font-bold text-black mb-1">$2.4M</div>
             <div className="text-sm text-black">Inventory Value</div>
@@ -1604,25 +1989,37 @@ function FinalScreen({ onReset }: { onReset: () => void }) {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Stock Levels Chart */}
           <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-            <h3 className="text-xl font-bold text-black mb-4">Stock Levels by Category</h3>
+            <h3 className="text-xl font-bold text-black mb-4">
+              Stock Levels by Category
+            </h3>
             <div className="space-y-4">
               <div>
                 <div className="flex justify-between text-sm mb-2">
-                  <span className="text-black font-medium">Processors (Xeon, EPYC)</span>
+                  <span className="text-black font-medium">
+                    Processors (Xeon, EPYC)
+                  </span>
                   <span className="text-black">436 units</span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-3">
-                  <div className="bg-gradient-to-r from-blue-500 to-blue-600 h-3 rounded-full" style={{width: '78%'}}></div>
+                  <div
+                    className="bg-gradient-to-r from-blue-500 to-blue-600 h-3 rounded-full"
+                    style={{ width: "78%" }}
+                  ></div>
                 </div>
               </div>
 
               <div>
                 <div className="flex justify-between text-sm mb-2">
-                  <span className="text-black font-medium">GPUs (H100, A100)</span>
+                  <span className="text-black font-medium">
+                    GPUs (H100, A100)
+                  </span>
                   <span className="text-black">45 units</span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-3">
-                  <div className="bg-gradient-to-r from-purple-500 to-purple-600 h-3 rounded-full" style={{width: '25%'}}></div>
+                  <div
+                    className="bg-gradient-to-r from-purple-500 to-purple-600 h-3 rounded-full"
+                    style={{ width: "25%" }}
+                  ></div>
                 </div>
               </div>
 
@@ -1632,7 +2029,10 @@ function FinalScreen({ onReset }: { onReset: () => void }) {
                   <span className="text-black">523 units</span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-3">
-                  <div className="bg-gradient-to-r from-green-500 to-green-600 h-3 rounded-full" style={{width: '92%'}}></div>
+                  <div
+                    className="bg-gradient-to-r from-green-500 to-green-600 h-3 rounded-full"
+                    style={{ width: "92%" }}
+                  ></div>
                 </div>
               </div>
 
@@ -1642,7 +2042,10 @@ function FinalScreen({ onReset }: { onReset: () => void }) {
                   <span className="text-black">312 units</span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-3">
-                  <div className="bg-gradient-to-r from-orange-500 to-orange-600 h-3 rounded-full" style={{width: '65%'}}></div>
+                  <div
+                    className="bg-gradient-to-r from-orange-500 to-orange-600 h-3 rounded-full"
+                    style={{ width: "65%" }}
+                  ></div>
                 </div>
               </div>
             </div>
@@ -1650,7 +2053,9 @@ function FinalScreen({ onReset }: { onReset: () => void }) {
 
           {/* Warehouse Utilization */}
           <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-            <h3 className="text-xl font-bold text-black mb-4">Warehouse Utilization</h3>
+            <h3 className="text-xl font-bold text-black mb-4">
+              Warehouse Utilization
+            </h3>
             <div className="space-y-6">
               <div>
                 <div className="flex justify-between mb-2">
@@ -1658,11 +2063,16 @@ function FinalScreen({ onReset }: { onReset: () => void }) {
                   <span className="text-black font-semibold">78%</span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-4">
-                  <div className="bg-gradient-to-r from-blue-500 to-cyan-500 h-4 rounded-full flex items-center justify-end pr-2" style={{width: '78%'}}>
+                  <div
+                    className="bg-gradient-to-r from-blue-500 to-cyan-500 h-4 rounded-full flex items-center justify-end pr-2"
+                    style={{ width: "78%" }}
+                  >
                     <span className="text-white text-xs font-bold">78%</span>
                   </div>
                 </div>
-                <div className="text-xs text-black mt-1">2,847 items • 15,000 sq ft</div>
+                <div className="text-xs text-black mt-1">
+                  2,847 items • 15,000 sq ft
+                </div>
               </div>
 
               <div>
@@ -1671,11 +2081,16 @@ function FinalScreen({ onReset }: { onReset: () => void }) {
                   <span className="text-black font-semibold">65%</span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-4">
-                  <div className="bg-gradient-to-r from-green-500 to-emerald-500 h-4 rounded-full flex items-center justify-end pr-2" style={{width: '65%'}}>
+                  <div
+                    className="bg-gradient-to-r from-green-500 to-emerald-500 h-4 rounded-full flex items-center justify-end pr-2"
+                    style={{ width: "65%" }}
+                  >
                     <span className="text-white text-xs font-bold">65%</span>
                   </div>
                 </div>
-                <div className="text-xs text-black mt-1">1,923 items • 12,000 sq ft</div>
+                <div className="text-xs text-black mt-1">
+                  1,923 items • 12,000 sq ft
+                </div>
               </div>
 
               <div>
@@ -1684,11 +2099,16 @@ function FinalScreen({ onReset }: { onReset: () => void }) {
                   <span className="text-black font-semibold">82%</span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-4">
-                  <div className="bg-gradient-to-r from-orange-500 to-red-500 h-4 rounded-full flex items-center justify-end pr-2" style={{width: '82%'}}>
+                  <div
+                    className="bg-gradient-to-r from-orange-500 to-red-500 h-4 rounded-full flex items-center justify-end pr-2"
+                    style={{ width: "82%" }}
+                  >
                     <span className="text-white text-xs font-bold">82%</span>
                   </div>
                 </div>
-                <div className="text-xs text-black mt-1">3,456 items • 18,000 sq ft</div>
+                <div className="text-xs text-black mt-1">
+                  3,456 items • 18,000 sq ft
+                </div>
               </div>
             </div>
           </div>
@@ -1696,14 +2116,20 @@ function FinalScreen({ onReset }: { onReset: () => void }) {
 
         {/* Recent Activity */}
         <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-          <h3 className="text-xl font-bold text-black mb-4">Recent Inventory Activity</h3>
+          <h3 className="text-xl font-bold text-black mb-4">
+            Recent Inventory Activity
+          </h3>
           <div className="space-y-3">
             <div className="flex items-center gap-4 p-3 bg-blue-50 rounded-lg border border-blue-100">
               <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
               <Package size={20} className="text-blue-600" />
               <div className="flex-1">
-                <div className="text-sm font-semibold text-black">Stock Updated: Intel Xeon 6</div>
-                <div className="text-xs text-black">San Jose Warehouse • +50 units</div>
+                <div className="text-sm font-semibold text-black">
+                  Stock Updated: Intel Xeon 6
+                </div>
+                <div className="text-xs text-black">
+                  San Jose Warehouse • +50 units
+                </div>
               </div>
               <div className="text-xs text-black">2 mins ago</div>
             </div>
@@ -1712,8 +2138,12 @@ function FinalScreen({ onReset }: { onReset: () => void }) {
               <div className="w-2 h-2 bg-green-600 rounded-full"></div>
               <Truck size={20} className="text-green-600" />
               <div className="flex-1">
-                <div className="text-sm font-semibold text-black">Allocation Completed: AL-2024-003</div>
-                <div className="text-xs text-black">Cloud Dynamics • 35 units shipped</div>
+                <div className="text-sm font-semibold text-black">
+                  Allocation Completed: AL-2024-003
+                </div>
+                <div className="text-xs text-black">
+                  Cloud Dynamics • 35 units shipped
+                </div>
               </div>
               <div className="text-xs text-black">15 mins ago</div>
             </div>
@@ -1722,8 +2152,12 @@ function FinalScreen({ onReset }: { onReset: () => void }) {
               <div className="w-2 h-2 bg-purple-600 rounded-full"></div>
               <Building size={20} className="text-purple-600" />
               <div className="flex-1">
-                <div className="text-sm font-semibold text-black">Warehouse Alert: Portland at 82%</div>
-                <div className="text-xs text-black">Consider redistribution to optimize space</div>
+                <div className="text-sm font-semibold text-black">
+                  Warehouse Alert: Portland at 82%
+                </div>
+                <div className="text-xs text-black">
+                  Consider redistribution to optimize space
+                </div>
               </div>
               <div className="text-xs text-black">1 hour ago</div>
             </div>
@@ -1734,8 +2168,12 @@ function FinalScreen({ onReset }: { onReset: () => void }) {
         <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div>
-              <h3 className="text-lg font-bold text-black">Need to explore more?</h3>
-              <p className="text-sm text-black">Restart the journey to experience different workflows</p>
+              <h3 className="text-lg font-bold text-black">
+                Need to explore more?
+              </h3>
+              <p className="text-sm text-black">
+                Restart the journey to experience different workflows
+              </p>
             </div>
             <AnimatedButton
               onClick={onReset}
@@ -1751,4 +2189,3 @@ function FinalScreen({ onReset }: { onReset: () => void }) {
     </div>
   );
 }
-

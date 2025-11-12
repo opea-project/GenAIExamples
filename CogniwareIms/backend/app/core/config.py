@@ -1,15 +1,16 @@
-"""
-Application configuration
-Centralized settings management following 12-factor app principles
-"""
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+"""Application configuration Centralized settings management following 12-factor app principles."""
 
-from pydantic_settings import BaseSettings
-from typing import List, Optional
 import os
 from functools import lru_cache
+from typing import List, Optional
+
+from pydantic_settings import BaseSettings
+
 
 class Settings(BaseSettings):
-    """Application settings from environment variables"""
+    """Application settings from environment variables."""
 
     # Application
     APP_NAME: str = "OPEA IMS - Cogniware"
@@ -21,14 +22,12 @@ class Settings(BaseSettings):
     # API Configuration
     API_V1_PREFIX: str = "/api"
     ALLOWED_ORIGINS: List[str] = os.getenv(
-        "ALLOWED_ORIGINS",
-        "http://localhost:3000,http://frontend:3000"
+        "ALLOWED_ORIGINS", "http://localhost:3000,http://frontend:3000"
     ).split(",")
 
     # Security
     JWT_SECRET_KEY: str = os.getenv(
-        "JWT_SECRET_KEY",
-        "CHANGE_THIS_IN_PRODUCTION_USE_openssl_rand_hex_32"
+        "JWT_SECRET_KEY", "CHANGE_THIS_IN_PRODUCTION_USE_openssl_rand_hex_32"
     )
     JWT_ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
@@ -40,8 +39,7 @@ class Settings(BaseSettings):
 
     # Database
     DATABASE_URL: str = os.getenv(
-        "DATABASE_URL",
-        "postgresql://postgres:postgres@postgres:5432/opea_ims"
+        "DATABASE_URL", "postgresql://postgres:postgres@postgres:5432/opea_ims"
     )
     DB_POOL_SIZE: int = 10
     DB_MAX_OVERFLOW: int = 20
@@ -51,9 +49,13 @@ class Settings(BaseSettings):
     REDIS_MAX_CONNECTIONS: int = 50
 
     # OPEA Services
-    OPEA_EMBEDDING_URL: str = os.getenv("OPEA_EMBEDDING_URL", "http://embedding-service:6000")
+    OPEA_EMBEDDING_URL: str = os.getenv(
+        "OPEA_EMBEDDING_URL", "http://embedding-service:6000"
+    )
     OPEA_LLM_URL: str = os.getenv("OPEA_LLM_URL", "http://llm-service:9000")
-    OPEA_RETRIEVAL_URL: str = os.getenv("OPEA_RETRIEVAL_URL", "http://retrieval-service:7000")
+    OPEA_RETRIEVAL_URL: str = os.getenv(
+        "OPEA_RETRIEVAL_URL", "http://retrieval-service:7000"
+    )
     OPEA_GATEWAY_URL: str = os.getenv("OPEA_GATEWAY_URL", "http://opea-gateway:8888")
 
     # Models
@@ -89,16 +91,16 @@ class Settings(BaseSettings):
 
     @property
     def is_production(self) -> bool:
-        """Check if running in production"""
+        """Check if running in production."""
         return self.ENVIRONMENT.lower() == "production"
 
     @property
     def is_development(self) -> bool:
-        """Check if running in development"""
+        """Check if running in development."""
         return self.ENVIRONMENT.lower() == "development"
 
     def get_cors_origins(self) -> List[str]:
-        """Get CORS origins as list"""
+        """Get CORS origins as list."""
         if isinstance(self.ALLOWED_ORIGINS, str):
             return [origin.strip() for origin in self.ALLOWED_ORIGINS.split(",")]
         return self.ALLOWED_ORIGINS
@@ -106,10 +108,9 @@ class Settings(BaseSettings):
 
 @lru_cache()
 def get_settings() -> Settings:
-    """Get cached settings instance"""
+    """Get cached settings instance."""
     return Settings()
 
 
 # Global settings instance
 settings = get_settings()
-

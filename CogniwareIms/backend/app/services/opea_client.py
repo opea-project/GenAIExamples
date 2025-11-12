@@ -1,17 +1,18 @@
-"""
-OPEA Microservices Client
-Handles communication with OPEA GenAIComps microservices
-"""
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+"""OPEA Microservices Client Handles communication with OPEA GenAIComps microservices."""
+
+import logging
+import os
+from typing import Any, Dict, List, Optional
 
 import httpx
-import os
-from typing import Dict, List, Any, Optional
-import logging
 
 logger = logging.getLogger(__name__)
 
+
 class OPEAClient:
-    """Client for OPEA GenAIComps microservices"""
+    """Client for OPEA GenAIComps microservices."""
 
     def __init__(self):
         self.embedding_url = os.getenv("OPEA_EMBEDDING_URL", "http://localhost:6000")
@@ -21,31 +22,30 @@ class OPEAClient:
         self.timeout = httpx.Timeout(60.0, connect=10.0)
 
     async def generate_embedding(self, text: str) -> List[float]:
-        """Generate embeddings using OPEA embedding service"""
+        """Generate embeddings using OPEA embedding service."""
         try:
             async with httpx.AsyncClient(timeout=self.timeout) as client:
                 response = await client.post(
-                    f"{self.embedding_url}/v1/embeddings",
-                    json={"text": text}
+                    f"{self.embedding_url}/v1/embeddings", json={"text": text}
                 )
                 response.raise_for_status()
                 result = response.json()
                 return result.get("embedding", [])
         except Exception as e:
             logger.error(f"Embedding generation failed: {e}")
-            raise HTTPException(status_code=500, detail=f"Embedding service error: {str(e)}")
+            raise HTTPException(
+                status_code=500, detail=f"Embedding service error: {str(e)}"
+            )
 
-    async def query_with_rag(self, query: str, context: Optional[str] = None) -> Dict[str, Any]:
-        """Query using Retrieval-Augmented Generation"""
+    async def query_with_rag(
+        self, query: str, context: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """Query using Retrieval-Augmented Generation."""
         try:
             async with httpx.AsyncClient(timeout=self.timeout) as client:
-                payload = {
-                    "question": query,
-                    "context": context or ""
-                }
+                payload = {"question": query, "context": context or ""}
                 response = await client.post(
-                    f"{self.llm_url}/v1/chat/completions",
-                    json=payload
+                    f"{self.llm_url}/v1/chat/completions", json=payload
                 )
                 response.raise_for_status()
                 return response.json()
@@ -53,18 +53,14 @@ class OPEAClient:
             logger.error(f"RAG query failed: {e}")
             raise HTTPException(status_code=500, detail=f"LLM service error: {str(e)}")
 
-    async def query_database(self, question: str, database_schema: Optional[Dict] = None) -> Dict[str, Any]:
-        """Query database using OPEA DBQnA agent"""
+    async def query_database(
+        self, question: str, database_schema: Optional[Dict] = None
+    ) -> Dict[str, Any]:
+        """Query database using OPEA DBQnA agent."""
         try:
             async with httpx.AsyncClient(timeout=self.timeout) as client:
-                payload = {
-                    "question": question,
-                    "schema": database_schema or {}
-                }
-                response = await client.post(
-                    f"{self.dbqna_url}/v1/query",
-                    json=payload
-                )
+                payload = {"question": question, "schema": database_schema or {}}
+                response = await client.post(f"{self.dbqna_url}/v1/query", json=payload)
                 response.raise_for_status()
                 return response.json()
         except Exception as e:
@@ -73,12 +69,12 @@ class OPEAClient:
             return self._get_mock_query_result(question)
 
     async def semantic_search(self, query: str, top_k: int = 5) -> List[Dict[str, Any]]:
-        """Perform semantic search using OPEA retrieval service"""
+        """Perform semantic search using OPEA retrieval service."""
         try:
             async with httpx.AsyncClient(timeout=self.timeout) as client:
                 response = await client.post(
                     f"{self.retrieval_url}/v1/search",
-                    json={"query": query, "top_k": top_k}
+                    json={"query": query, "top_k": top_k},
                 )
                 response.raise_for_status()
                 return response.json().get("results", [])
@@ -87,12 +83,11 @@ class OPEAClient:
             return []
 
     async def summarize_document(self, text: str) -> str:
-        """Summarize document using OPEA DocSummarization agent"""
+        """Summarize document using OPEA DocSummarization agent."""
         try:
             async with httpx.AsyncClient(timeout=self.timeout) as client:
                 response = await client.post(
-                    f"{self.llm_url}/v1/summarize",
-                    json={"text": text}
+                    f"{self.llm_url}/v1/summarize", json={"text": text}
                 )
                 response.raise_for_status()
                 result = response.json()
@@ -102,7 +97,7 @@ class OPEAClient:
             return text[:200] + "..."  # Fallback to truncation
 
     def _get_mock_query_result(self, question: str) -> Dict[str, Any]:
-        """Get mock query result when OPEA services are unavailable"""
+        """Get mock query result when OPEA services are unavailable."""
         if "xeon 6" in question.lower():
             return {
                 "result": {
@@ -111,13 +106,13 @@ class OPEAClient:
                     "location": "San Jose Warehouse",
                     "available": 247,
                     "reserved": 32,
-                    "in_transit": 15
+                    "in_transit": 15,
                 }
             }
         return {"result": {"message": "No results found"}}
 
     async def health_check_all(self) -> Dict[str, str]:
-        """Check health of all OPEA microservices"""
+        """Check health of all OPEA microservices."""
         services = {
             "embedding": self.embedding_url,
             "retrieval": self.retrieval_url,
@@ -131,6 +126,6 @@ class OPEAClient:
 
         return status
 
+
 # Global OPEA client instance
 opea_client = OPEAClient()
-

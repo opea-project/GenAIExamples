@@ -1,34 +1,32 @@
-"""
-OPEA DocSummarization Service
-Handles document summarization and analysis
-"""
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+"""OPEA DocSummarization Service Handles document summarization and analysis."""
 
-import logging
-from typing import Dict, Any, List, Optional
-import httpx
-import os
 import json
+import logging
+import os
 from datetime import datetime
-from .llm_service import llm_service
+from typing import Any, Dict, List, Optional
+
+import httpx
 import pandas as pd
+
+from .llm_service import llm_service
 
 logger = logging.getLogger(__name__)
 
+
 class DocSummarizationService:
-    """Document summarization using OPEA LLM service"""
+    """Document summarization using OPEA LLM service."""
 
     def __init__(self):
         self.base_url = os.getenv("OPEA_LLM_URL", "http://llm-service:9000")
         self.timeout = httpx.Timeout(60.0, connect=10.0)
 
     async def summarize_document(
-        self,
-        text: str,
-        summary_type: str = "concise",
-        max_length: int = 200
+        self, text: str, summary_type: str = "concise", max_length: int = 200
     ) -> Dict[str, Any]:
-        """
-        Summarize a document
+        """Summarize a document.
 
         Args:
             text: Document text to summarize
@@ -70,25 +68,20 @@ Summary:"""
                 "original_length": len(text.split()),
                 "summary": summary.strip(),
                 "summary_length": len(summary.split()),
-                "compression_ratio": round(len(summary.split()) / max(len(text.split()), 1), 2),
-                "type": summary_type
+                "compression_ratio": round(
+                    len(summary.split()) / max(len(text.split()), 1), 2
+                ),
+                "type": summary_type,
             }
 
         except Exception as e:
             logger.error(f"Summarization error: {e}")
-            return {
-                "success": False,
-                "error": str(e)
-            }
+            return {"success": False, "error": str(e)}
 
     async def summarize_inventory_report(
-        self,
-        report_data: Dict[str, Any]
+        self, report_data: Dict[str, Any]
     ) -> Dict[str, Any]:
-        """
-        Summarize inventory report data
-        Specialized for inventory metrics
-        """
+        """Summarize inventory report data Specialized for inventory metrics."""
         try:
             # Convert report data to narrative text
             report_text = self._format_report_for_summarization(report_data)
@@ -110,7 +103,7 @@ Analysis:"""
                 "success": True,
                 "report_summary": analysis,
                 "data": report_data,
-                "generated_at": datetime.now().isoformat()
+                "generated_at": datetime.now().isoformat(),
             }
 
         except Exception as e:
@@ -118,7 +111,7 @@ Analysis:"""
             return {"success": False, "error": str(e)}
 
     def _format_report_for_summarization(self, report_data: Dict[str, Any]) -> str:
-        """Format report data into readable text"""
+        """Format report data into readable text."""
         parts = []
 
         if "total_items" in report_data:
@@ -130,7 +123,9 @@ Analysis:"""
         if "stock_by_category" in report_data:
             parts.append("\nStock by Category:")
             for cat in report_data["stock_by_category"]:
-                parts.append(f"  - {cat['category']}: {cat['count']} units ({cat['percentage']}%)")
+                parts.append(
+                    f"  - {cat['category']}: {cat['count']} units ({cat['percentage']}%)"
+                )
 
         if "recent_activity" in report_data:
             parts.append("\nRecent Activity:")
@@ -140,10 +135,7 @@ Analysis:"""
         return "\n".join(parts)
 
     async def extract_key_information(self, text: str) -> Dict[str, Any]:
-        """
-        Extract structured information from unstructured text
-        Useful for processing uploaded documents
-        """
+        """Extract structured information from unstructured text Useful for processing uploaded documents."""
         prompt = f"""Extract key information from the following text and return as JSON:
 
 Text:
@@ -180,26 +172,16 @@ JSON:"""
 
             extracted = json.loads(json_str)
 
-            return {
-                "success": True,
-                "extracted_info": extracted
-            }
+            return {"success": True, "extracted_info": extracted}
 
         except Exception as e:
             logger.error(f"Information extraction error: {e}")
-            return {
-                "success": False,
-                "error": str(e)
-            }
+            return {"success": False, "error": str(e)}
 
     async def summarize_csv_data(
-        self,
-        csv_path: str,
-        sample_size: int = 100
+        self, csv_path: str, sample_size: int = 100
     ) -> Dict[str, Any]:
-        """
-        Summarize CSV file contents
-        """
+        """Summarize CSV file contents."""
         try:
             df = pd.read_csv(csv_path)
 
@@ -208,7 +190,7 @@ JSON:"""
                 "rows": len(df),
                 "columns": list(df.columns),
                 "numeric_summary": df.describe().to_dict() if len(df) > 0 else {},
-                "sample": df.head(5).to_dict('records') if len(df) > 0 else []
+                "sample": df.head(5).to_dict("records") if len(df) > 0 else [],
             }
 
             # Generate natural language summary
@@ -217,14 +199,16 @@ JSON:"""
             summary = await self.summarize_document(
                 text=f"CSV File Analysis:\n{stats_text}",
                 summary_type="bullet_points",
-                max_length=150
+                max_length=150,
             )
 
             return {
                 "success": True,
                 "file": csv_path,
                 "statistics": stats,
-                "summary": summary["summary"] if summary["success"] else "Summary unavailable"
+                "summary": (
+                    summary["summary"] if summary["success"] else "Summary unavailable"
+                ),
             }
 
         except Exception as e:
@@ -232,17 +216,15 @@ JSON:"""
             return {"success": False, "error": str(e)}
 
     async def generate_report_narrative(
-        self,
-        title: str,
-        data_points: List[Dict[str, Any]]
+        self, title: str, data_points: List[Dict[str, Any]]
     ) -> str:
-        """
-        Generate narrative report from data points
-        """
-        data_text = "\n".join([
-            f"- {dp.get('label', 'Item')}: {dp.get('value', 'N/A')}"
-            for dp in data_points
-        ])
+        """Generate narrative report from data points."""
+        data_text = "\n".join(
+            [
+                f"- {dp.get('label', 'Item')}: {dp.get('value', 'N/A')}"
+                for dp in data_points
+            ]
+        )
 
         prompt = f"""Generate a professional narrative report titled "{title}" based on the following data:
 
@@ -253,6 +235,6 @@ Write a clear, professional report that explains the data, identifies trends, an
         narrative = await llm_service.generate_text(prompt, temperature=0.5)
         return narrative
 
+
 # Global instance
 doc_summarization = DocSummarizationService()
-

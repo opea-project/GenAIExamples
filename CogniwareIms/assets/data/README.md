@@ -23,6 +23,7 @@ Run the download script from the project root:
 ```
 
 This script will:
+
 - Check for required dependencies
 - Download the data files from the hosting service
 - Verify data integrity (checksum)
@@ -37,16 +38,18 @@ This script will:
    - Alternative: Contact Cogniware for data access
 
 2. **Extract to this directory**:
+
    ```bash
    cd /path/to/cogniware-opea-ims
    unzip main.zip
-   cp -r Cogniware-OPEA-IMS-Data-main/data/* data/
+   mkdir -p assets/data
+   cp -r Cogniware-OPEA-IMS-Data-main/data/* assets/data/
    rm -rf Cogniware-OPEA-IMS-Data-main main.zip
    ```
 
 3. **Verify file count**:
    ```bash
-   find data/ -type f -name "*.csv" | wc -l
+   find assets/data/ -type f -name "*.csv" | wc -l
    # Should show: 7479
    ```
 
@@ -55,11 +58,13 @@ This script will:
 The CSV files contain Intel product information:
 
 ### File Naming Convention
+
 ```
 [Product Name]_[Type].csv
 ```
 
 **Examples**:
+
 - `Intel® Xeon® Processor E5-4660 v3_spec.csv` - Specifications
 - `Intel® Core™ i7-13700K Processor_ordering.csv` - Ordering info
 
@@ -75,6 +80,7 @@ The CSV files contain Intel product information:
 ### CSV Structure
 
 Each CSV typically contains:
+
 - Product name and model number
 - Technical specifications
 - Performance metrics
@@ -95,6 +101,7 @@ The data is used for:
 ### Example Queries
 
 Once data is loaded, try:
+
 - "What are the specs for Xeon E5 processors?"
 - "Show me all FPGAs in the database"
 - "Compare Intel Core i7 13th and 14th generation"
@@ -103,6 +110,7 @@ Once data is loaded, try:
 ## Data Updates
 
 ### Current Version
+
 - **Version**: 1.0.0
 - **Date**: October 2025
 - **Files**: 7,479 CSV files
@@ -111,6 +119,7 @@ Once data is loaded, try:
 ### Future Updates
 
 Data updates will be released as:
+
 - New product additions
 - Specification updates
 - Additional product categories
@@ -120,6 +129,7 @@ Check the [Cogniware website](https://cogniware.com) for updates.
 ## Data License
 
 The sample data includes:
+
 - Intel® product specifications (public information)
 - Product ordering information (public information)
 
@@ -130,6 +140,7 @@ The sample data includes:
 ### Data Download Issues
 
 **Problem**: Download script fails
+
 ```bash
 # Check internet connection
 ping -c 3 google.com
@@ -142,16 +153,18 @@ curl -L -O [DATA_URL]
 ```
 
 **Problem**: Wrong number of files
+
 ```bash
 # Expected: 7,479 files
-find data/ -type f -name "*.csv" | wc -l
+find assets/data/ -type f -name "*.csv" | wc -l
 
 # If incorrect, re-download
-rm -rf data/
+rm -rf assets/data/
 ./scripts/download-data.sh
 ```
 
 **Problem**: Data not loading in application
+
 ```bash
 # Check Docker logs
 docker-compose logs backend
@@ -163,6 +176,7 @@ docker-compose exec backend python app/init_knowledge_base.py
 ### Data Integrity
 
 Verify data integrity with checksums:
+
 ```bash
 # If checksum file is available
 sha256sum -c data-checksums.txt
@@ -179,10 +193,11 @@ When developing with this data:
    - Only commit this README.md
 
 2. **Testing with subset**
+
    ```bash
    # Use first 100 files for quick tests
    mkdir -p data-test
-   ls data/*.csv | head -100 | xargs -I {} cp {} data-test/
+   ls assets/data/*.csv | head -100 | xargs -I {} cp {} data-test/
    ```
 
 3. **Local development**
@@ -195,11 +210,13 @@ When developing with this data:
 For maintainers hosting the data:
 
 1. **Create archive**:
+
    ```bash
-   tar -czf sample-data.tar.gz data/
+   tar -czf sample-data.tar.gz assets/data/
    ```
 
 2. **Generate checksum**:
+
    ```bash
    sha256sum sample-data.tar.gz > sample-data.sha256
    ```
@@ -239,8 +256,9 @@ See `backend/app/core/config.py` for database connection settings.
 ## Support
 
 For data-related questions:
-- **Issues**: [GitHub Issues](https://github.com/Cogniware-Inc/cogniware-opea-ims/issues)
-- **Discussions**: [OPEA Discussions](https://github.com/orgs/opea-project/discussions)
+
+- **Issues**: [GitHub Issues](https://github.com/opea-project/GenAIExamples/issues)
+- **Discussions**: [OPEA Discussions](https://github.com/opea-project/discussions)
 - **Email**: support@cogniware.com
 
 ## File Structure
@@ -262,5 +280,5 @@ data/
 
 ---
 
-*Last Updated: October 17, 2025*
-*For Cogniware OPEA IMS v1.0.0*
+_Last Updated: October 17, 2025_
+_For Cogniware OPEA IMS v1.0.0_

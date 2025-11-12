@@ -1,7 +1,18 @@
-'use client';
+// Copyright (C) 2024 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
 
-import React, { useState, useRef } from 'react';
-import { Upload, FileText, File, FileSpreadsheet, CheckCircle, XCircle, Loader } from 'lucide-react';
+"use client";
+
+import React, { useState, useRef } from "react";
+import {
+  Upload,
+  FileText,
+  File,
+  FileSpreadsheet,
+  CheckCircle,
+  XCircle,
+  Loader,
+} from "lucide-react";
 
 interface UploadResult {
   success: boolean;
@@ -22,10 +33,22 @@ export default function FileUpload() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const supportedTypes = {
-    'text/csv': { icon: FileSpreadsheet, label: 'CSV', color: 'text-green-600' },
-    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': { icon: FileSpreadsheet, label: 'XLSX', color: 'text-blue-600' },
-    'application/pdf': { icon: FileText, label: 'PDF', color: 'text-red-600' },
-    'application/vnd.openxmlformats-officedocument.wordprocessingml.document': { icon: File, label: 'DOCX', color: 'text-indigo-600' }
+    "text/csv": {
+      icon: FileSpreadsheet,
+      label: "CSV",
+      color: "text-green-600",
+    },
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+      icon: FileSpreadsheet,
+      label: "XLSX",
+      color: "text-blue-600",
+    },
+    "application/pdf": { icon: FileText, label: "PDF", color: "text-red-600" },
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document": {
+      icon: File,
+      label: "DOCX",
+      color: "text-indigo-600",
+    },
   };
 
   const handleDrag = (e: React.DragEvent) => {
@@ -64,10 +87,10 @@ export default function FileUpload() {
 
     try {
       const formData = new FormData();
-      formData.append('file', selectedFile);
+      formData.append("file", selectedFile);
 
-      const response = await fetch('/api/knowledge/upload-file', {
-        method: 'POST',
+      const response = await fetch("/api/knowledge/upload-file", {
+        method: "POST",
         body: formData,
       });
 
@@ -77,13 +100,13 @@ export default function FileUpload() {
       if (data.success) {
         setSelectedFile(null);
         if (fileInputRef.current) {
-          fileInputRef.current.value = '';
+          fileInputRef.current.value = "";
         }
       }
     } catch (error) {
       setResult({
         success: false,
-        error: error instanceof Error ? error.message : 'Upload failed'
+        error: error instanceof Error ? error.message : "Upload failed",
       });
     } finally {
       setUploading(false);
@@ -109,28 +132,39 @@ export default function FileUpload() {
     if (result.chunks_processed) {
       return `${result.chunks_processed} chunks processed`;
     }
-    return 'Processed successfully';
+    return "Processed successfully";
   };
 
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-6">
       {/* Header */}
       <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-        <h2 className="text-2xl font-bold text-black mb-2">Upload Knowledge Files</h2>
+        <h2 className="text-2xl font-bold text-black mb-2">
+          Upload Knowledge Files
+        </h2>
         <p className="text-black">
           Upload CSV, XLSX, PDF, or DOCX files to add to the knowledge base.
-          Powered by <span className="font-semibold text-blue-600">Intel Xeon processors</span> for fast processing.
+          Powered by{" "}
+          <span className="font-semibold text-blue-600">
+            Intel Xeon processors
+          </span>{" "}
+          for fast processing.
         </p>
       </div>
 
       {/* Supported Formats */}
       <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-        <h3 className="text-lg font-semibold text-black mb-4">Supported File Types</h3>
+        <h3 className="text-lg font-semibold text-black mb-4">
+          Supported File Types
+        </h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {Object.entries(supportedTypes).map(([type, info]) => {
             const Icon = info.icon;
             return (
-              <div key={type} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
+              <div
+                key={type}
+                className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200"
+              >
                 <Icon size={24} className={info.color} />
                 <span className="font-medium text-black">{info.label}</span>
               </div>
@@ -144,8 +178,8 @@ export default function FileUpload() {
         <div
           className={`border-2 border-dashed rounded-lg p-8 text-center transition-all ${
             dragActive
-              ? 'border-blue-500 bg-blue-50'
-              : 'border-gray-300 hover:border-blue-400'
+              ? "border-blue-500 bg-blue-50"
+              : "border-gray-300 hover:border-blue-400"
           }`}
           onDragEnter={handleDrag}
           onDragLeave={handleDrag}
@@ -158,7 +192,9 @@ export default function FileUpload() {
                 {getFileIcon(selectedFile.type)}
               </div>
               <div>
-                <p className="text-lg font-semibold text-black">{selectedFile.name}</p>
+                <p className="text-lg font-semibold text-black">
+                  {selectedFile.name}
+                </p>
                 <p className="text-sm text-black">
                   {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
                 </p>
@@ -196,9 +232,7 @@ export default function FileUpload() {
               <p className="text-lg font-semibold text-black mb-2">
                 Drag and drop your file here
               </p>
-              <p className="text-sm text-black mb-4">
-                or click to browse
-              </p>
+              <p className="text-sm text-black mb-4">or click to browse</p>
               <input
                 ref={fileInputRef}
                 type="file"
@@ -223,33 +257,42 @@ export default function FileUpload() {
 
       {/* Upload Result */}
       {result && (
-        <div className={`p-6 rounded-lg border-2 ${
-          result.success
-            ? 'bg-green-50 border-green-200'
-            : 'bg-red-50 border-red-200'
-        }`}>
+        <div
+          className={`p-6 rounded-lg border-2 ${
+            result.success
+              ? "bg-green-50 border-green-200"
+              : "bg-red-50 border-red-200"
+          }`}
+        >
           <div className="flex items-start gap-3">
             {result.success ? (
-              <CheckCircle size={24} className="text-green-600 flex-shrink-0 mt-1" />
+              <CheckCircle
+                size={24}
+                className="text-green-600 flex-shrink-0 mt-1"
+              />
             ) : (
               <XCircle size={24} className="text-red-600 flex-shrink-0 mt-1" />
             )}
             <div className="flex-1">
-              <h3 className={`text-lg font-semibold ${
-                result.success ? 'text-green-800' : 'text-red-800'
-              }`}>
-                {result.success ? 'Upload Successful!' : 'Upload Failed'}
+              <h3
+                className={`text-lg font-semibold ${
+                  result.success ? "text-green-800" : "text-red-800"
+                }`}
+              >
+                {result.success ? "Upload Successful!" : "Upload Failed"}
               </h3>
               {result.success ? (
                 <div className="mt-2 space-y-1">
                   <p className="text-green-800">
-                    <span className="font-semibold">{result.filename}</span> has been processed
+                    <span className="font-semibold">{result.filename}</span> has
+                    been processed
                   </p>
+                  <p className="text-green-800">{getProcessingStats(result)}</p>
                   <p className="text-green-800">
-                    {getProcessingStats(result)}
-                  </p>
-                  <p className="text-green-800">
-                    <span className="font-semibold">{result.documents_added}</span> documents added to knowledge base
+                    <span className="font-semibold">
+                      {result.documents_added}
+                    </span>{" "}
+                    documents added to knowledge base
                   </p>
                   <p className="text-sm text-green-700 mt-2">
                     ⚡ Processed using Intel Xeon acceleration
@@ -257,7 +300,7 @@ export default function FileUpload() {
                 </div>
               ) : (
                 <p className="text-red-800 mt-2">
-                  {result.error || 'An error occurred during upload'}
+                  {result.error || "An error occurred during upload"}
                 </p>
               )}
             </div>
@@ -267,27 +310,40 @@ export default function FileUpload() {
 
       {/* Processing Info */}
       <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl border border-blue-200 p-6">
-        <h3 className="text-lg font-semibold text-black mb-3">🚀 Processing Features</h3>
+        <h3 className="text-lg font-semibold text-black mb-3">
+          🚀 Processing Features
+        </h3>
         <ul className="space-y-2 text-black">
           <li className="flex items-start gap-2">
             <span className="text-blue-600 font-bold">✓</span>
-            <span><strong>Automatic Embedding:</strong> Files are automatically vectorized using OPEA embedding service</span>
+            <span>
+              <strong>Automatic Embedding:</strong> Files are automatically
+              vectorized using OPEA embedding service
+            </span>
           </li>
           <li className="flex items-start gap-2">
             <span className="text-blue-600 font-bold">✓</span>
-            <span><strong>Semantic Search:</strong> Uploaded content becomes instantly searchable</span>
+            <span>
+              <strong>Semantic Search:</strong> Uploaded content becomes
+              instantly searchable
+            </span>
           </li>
           <li className="flex items-start gap-2">
             <span className="text-blue-600 font-bold">✓</span>
-            <span><strong>Intel Xeon Optimized:</strong> Leverages Intel performance libraries for fast processing</span>
+            <span>
+              <strong>Intel Xeon Optimized:</strong> Leverages Intel performance
+              libraries for fast processing
+            </span>
           </li>
           <li className="flex items-start gap-2">
             <span className="text-blue-600 font-bold">✓</span>
-            <span><strong>Multiple Formats:</strong> Handles CSV, Excel, PDF, and Word documents</span>
+            <span>
+              <strong>Multiple Formats:</strong> Handles CSV, Excel, PDF, and
+              Word documents
+            </span>
           </li>
         </ul>
       </div>
     </div>
   );
 }
-

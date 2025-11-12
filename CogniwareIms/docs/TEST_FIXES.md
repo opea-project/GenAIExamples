@@ -5,16 +5,19 @@
 ### 1. Kubectl Namespace Error
 
 **Error Message**:
+
 ```
 Error: flag needs an argument: --namespace
 Error: Process completed with exit code 1.
 ```
 
 **Root Cause**:
+
 - Missing or empty namespace variable in kubectl commands
 - Incomplete error handling in cleanup functions
 
 **Fix Applied**:
+
 - Added `NAMESPACE="${NAMESPACE:-opea}"` with default value
 - Added proper error suppression with `2>/dev/null`
 - Added fallback handling for missing resources
@@ -25,6 +28,7 @@ Error: Process completed with exit code 1.
 **Changes Made**:
 
 #### test_compose_on_xeon.sh
+
 ```bash
 # Before
 docker compose down -v
@@ -37,6 +41,7 @@ docker compose down -v 2>/dev/null || {
 ```
 
 #### test_gmc_on_xeon.sh
+
 ```bash
 # Added namespace variable
 NAMESPACE="${NAMESPACE:-opea}"
@@ -126,6 +131,7 @@ bash -c "source test_gmc_on_xeon.sh; cleanup"
 ## Key Improvements
 
 ### Before
+
 - ❌ Hardcoded namespace
 - ❌ No error suppression
 - ❌ Failures caused script to abort
@@ -133,6 +139,7 @@ bash -c "source test_gmc_on_xeon.sh; cleanup"
 - ❌ Missing resource caused errors
 
 ### After
+
 - ✅ Configurable namespace with default
 - ✅ Proper error suppression (`2>/dev/null`)
 - ✅ Graceful handling of failures
@@ -145,30 +152,35 @@ bash -c "source test_gmc_on_xeon.sh; cleanup"
 ### If tests still fail:
 
 1. **Check Kubernetes access**:
+
 ```bash
 kubectl cluster-info
 kubectl get nodes
 ```
 
 2. **Verify namespace permissions**:
+
 ```bash
 kubectl auth can-i create namespace
 kubectl auth can-i delete namespace
 ```
 
 3. **Check existing resources**:
+
 ```bash
 kubectl get all -n opea
 helm list -n opea
 ```
 
 4. **Manual cleanup**:
+
 ```bash
 helm uninstall cogniwareims -n opea
 kubectl delete namespace opea --force --grace-period=0
 ```
 
 5. **Check Docker**:
+
 ```bash
 docker ps -a
 docker compose ps
@@ -194,4 +206,3 @@ docker system df
 
 **Last Updated**: October 21, 2025
 **Status**: ✅ All fixes applied and tested
-

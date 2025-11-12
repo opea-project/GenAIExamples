@@ -321,7 +321,7 @@ Documentation: See all .md files in root directory
 Deployment: ./start.sh
 Health Check: ./scripts/health_check.sh
 OPEA Examples: https://github.com/opea-project/GenAIExamples
-OPEA Discussions: https://github.com/orgs/opea-project/discussions
+OPEA Discussions: https://github.com/opea-project/discussions
 
 ================================================================================
 LICENSE

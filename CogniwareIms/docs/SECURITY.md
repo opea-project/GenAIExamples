@@ -9,7 +9,7 @@ Security is a top priority for the Cogniware OPEA IMS project. This document out
 If you discover a security vulnerability, please report it responsibly:
 
 1. **Do NOT** create a public GitHub issue
-2. Email security concerns to: [security@cogniware.com](mailto:security@cogniware.com)
+2. Email security concerns to: `security@cogniware.com`
 3. Include detailed information about the vulnerability
 4. Allow us reasonable time to respond and fix the issue
 
@@ -56,9 +56,11 @@ If you discover a security vulnerability, please report it responsibly:
   - Grafana admin password
 
 - [ ] **Generate strong JWT secret**
+
   ```bash
   openssl rand -hex 32
   ```
+
   Update `JWT_SECRET_KEY` in `.env`
 
 - [ ] **Enable HTTPS/TLS**
@@ -114,6 +116,7 @@ If you discover a security vulnerability, please report it responsibly:
 **Never commit `.env` files to version control!**
 
 Add to `.gitignore`:
+
 ```
 .env
 .env.*
@@ -123,6 +126,7 @@ Add to `.gitignore`:
 ### Minimum Password Requirements
 
 Enforced by the system:
+
 - Minimum 8 characters
 - At least one uppercase letter
 - At least one lowercase letter
@@ -152,6 +156,7 @@ DATABASE_URL=postgresql://postgres:<password>@postgres:5432/opea_ims
 ### Docker Network Isolation
 
 Services are isolated in `opea-network`:
+
 - Frontend/Backend can communicate
 - OPEA services communicate internally
 - Databases not exposed externally
@@ -160,8 +165,8 @@ Services are isolated in `opea-network`:
 
 ```yaml
 # External (via nginx)
-80:   HTTP (redirect to HTTPS)
-443:  HTTPS
+80: HTTP (redirect to HTTPS)
+443: HTTPS
 
 # Internal only (block external access)
 5432: PostgreSQL
@@ -177,6 +182,7 @@ Services are isolated in `opea-network`:
 ### Security Monitoring
 
 Monitor logs for:
+
 - Failed login attempts
 - Unusual API usage patterns
 - SQL injection attempts
@@ -257,6 +263,7 @@ Specific compliance requirements may need additional configuration.
 ### Recommended Tools
 
 **Vulnerability Scanning:**
+
 ```bash
 # Python dependencies
 pip-audit
@@ -269,6 +276,7 @@ npm audit
 ```
 
 **Secret Detection:**
+
 ```bash
 # Scan for committed secrets
 git-secrets --scan
@@ -276,6 +284,7 @@ trufflehog
 ```
 
 **SAST (Static Analysis):**
+
 ```bash
 # Python
 bandit -r backend/
@@ -285,6 +294,7 @@ eslint frontend/ --ext .ts,.tsx
 ```
 
 **DAST (Dynamic Analysis):**
+
 ```bash
 # OWASP ZAP
 zap-baseline.py -t http://localhost:3000
@@ -343,10 +353,10 @@ docker-compose up -d --no-deps --build <service>
 ## Contact
 
 For security questions or concerns:
+
 - Email: security@cogniware.com
 - Documentation: See `docs/security/` directory
 
 ---
 
 **Remember**: Security is an ongoing process, not a one-time setup. Regularly review and update security measures.
-

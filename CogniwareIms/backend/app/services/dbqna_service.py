@@ -1,75 +1,77 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
 """
 OPEA DBQnA Service - Database Query & Answer
 Converts natural language to SQL and executes against inventory database
 """
 
 import logging
-from typing import Dict, Any, List, Optional
+import os
+from typing import Any, Dict, List, Optional
+
 import sqlalchemy
 from sqlalchemy import create_engine, text
-import os
+
 from .llm_service import llm_service
 
 logger = logging.getLogger(__name__)
 
+
 class DBQnAService:
-    """
-    Database Query & Answer service using OPEA LLM for SQL generation
-    """
+    """Database Query & Answer service using OPEA LLM for SQL generation."""
 
     def __init__(self):
-        self.database_url = os.getenv("DATABASE_URL", "postgresql://postgres:postgres@postgres:5432/opea_ims")
+        self.database_url = os.getenv(
+            "DATABASE_URL", "postgresql://postgres:postgres@postgres:5432/opea_ims"
+        )
         self.engine = None
         self.schema_cache = None
 
     def get_engine(self):
-        """Get or create database engine"""
+        """Get or create database engine."""
         if self.engine is None:
             self.engine = create_engine(self.database_url, pool_pre_ping=True)
         return self.engine
 
     async def get_schema(self) -> Dict[str, Any]:
-        """
-        Get database schema for SQL generation context
-        """
+        """Get database schema for SQL generation context."""
         if self.schema_cache:
             return self.schema_cache
 
         try:
             engine = self.get_engine()
 
-            schema = {
-                "tables": {},
-                "relationships": []
-            }
+            schema = {"tables": {}, "relationships": []}
 
             # Get table information
             with engine.connect() as conn:
                 # Get all tables
-                tables_query = text("""
+                tables_query = text(
+                    """
                     SELECT table_name
                     FROM information_schema.tables
                     WHERE table_schema = 'public'
-                """)
+                """
+                )
                 tables = conn.execute(tables_query).fetchall()
 
                 for (table_name,) in tables:
                     # Get columns for each table
-                    columns_query = text("""
+                    columns_query = text(
+                        """
                         SELECT column_name, data_type
                         FROM information_schema.columns
                         WHERE table_name = :table_name
                         ORDER BY ordinal_position
-                    """)
+                    """
+                    )
                     columns = conn.execute(
-                        columns_query,
-                        {"table_name": table_name}
+                        columns_query, {"table_name": table_name}
                     ).fetchall()
 
                     schema["tables"][table_name] = {
                         "columns": [
-                            {"name": col, "type": dtype}
-                            for col, dtype in columns
+                            {"name": col, "type": dtype} for col, dtype in columns
                         ]
                     }
 
@@ -81,12 +83,9 @@ class DBQnAService:
             return {"tables": {}, "relationships": []}
 
     async def natural_language_query(
-        self,
-        question: str,
-        include_explanation: bool = True
+        self, question: str, include_explanation: bool = True
     ) -> Dict[str, Any]:
-        """
-        Convert natural language question to SQL and execute
+        """Convert natural language question to SQL and execute.
 
         Args:
             question: Natural language question about inventory
@@ -113,8 +112,7 @@ class DBQnAService:
 
                 # Convert to dict format
                 data = [
-                    {col: value for col, value in zip(columns, row)}
-                    for row in rows
+                    {col: value for col, value in zip(columns, row)} for row in rows
                 ]
 
             response = {
@@ -122,7 +120,7 @@ class DBQnAService:
                 "question": question,
                 "sql_query": sql_query,
                 "data": data,
-                "row_count": len(data)
+                "row_count": len(data),
             }
 
             # Generate natural language explanation
@@ -140,17 +138,10 @@ Provide a natural language summary of the results."""
 
         except Exception as e:
             logger.error(f"DBQnA error: {e}")
-            return {
-                "success": False,
-                "question": question,
-                "error": str(e)
-            }
+            return {"success": False, "question": question, "error": str(e)}
 
     async def query_inventory(self, question: str) -> Dict[str, Any]:
-        """
-        Query inventory database with natural language
-        Optimized for common inventory questions
-        """
+        """Query inventory database with natural language Optimized for common inventory questions."""
         # Map common questions to predefined queries for better accuracy
         question_lower = question.lower()
 
@@ -166,7 +157,8 @@ Provide a natural language summary of the results."""
         try:
             engine = self.get_engine()
             with engine.connect() as conn:
-                query = text("""
+                query = text(
+                    """
                     SELECT
                         p.name as product,
                         p.sku,
@@ -178,7 +170,8 @@ Provide a natural language summary of the results."""
                     JOIN products p ON i.product_id = p.id
                     JOIN warehouses w ON i.warehouse_id = w.id
                     WHERE p.sku = :sku AND w.name = :warehouse
-                """)
+                """
+                )
 
                 result = conn.execute(query, {"sku": sku, "warehouse": warehouse})
                 row = result.fetchone()
@@ -192,8 +185,8 @@ Provide a natural language summary of the results."""
                             "location": row[2],
                             "available": row[3] or 247,  # Default values
                             "reserved": row[4] or 32,
-                            "in_transit": row[5] or 15
-                        }
+                            "in_transit": row[5] or 15,
+                        },
                     }
                 else:
                     # Return mock data if not found
@@ -205,8 +198,8 @@ Provide a natural language summary of the results."""
                             "location": warehouse,
                             "available": 247,
                             "reserved": 32,
-                            "in_transit": 15
-                        }
+                            "in_transit": 15,
+                        },
                     }
         except Exception as e:
             logger.error(f"Query error: {e}")
@@ -219,12 +212,12 @@ Provide a natural language summary of the results."""
                     "location": warehouse,
                     "available": 247,
                     "reserved": 32,
-                    "in_transit": 15
-                }
+                    "in_transit": 15,
+                },
             }
 
     async def health_check(self) -> bool:
-        """Check database connection"""
+        """Check database connection."""
         try:
             engine = self.get_engine()
             with engine.connect() as conn:
@@ -233,6 +226,6 @@ Provide a natural language summary of the results."""
         except:
             return False
 
+
 # Global instance
 dbqna_service = DBQnAService()
-

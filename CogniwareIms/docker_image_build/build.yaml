@@ -27,4 +27,3 @@ services:
         no_proxy: ${no_proxy}
     image: opea/cogniwareims-backend:latest
     container_name: cogniwareims-backend-builder
-

@@ -3,6 +3,7 @@
 ## Overview
 
 This document addresses the security vulnerabilities identified in the OPEA PR review:
+
 - **PR**: https://github.com/opea-project/GenAIExamples/pull/2307
 - **Review Comment**: https://github.com/opea-project/GenAIExamples/pull/2307#issuecomment-3397505614
 
@@ -15,10 +16,12 @@ This document addresses the security vulnerabilities identified in the OPEA PR r
 **Status**: ⚠️ REQUIRES MIGRATION
 
 **Temporary Solution**:
+
 - Current version maintained at 3.3.0 with additional security layers
 - Added cryptography backend requirement
 
 **Recommended Long-term Solution**:
+
 ```python
 # Option 1: Migrate to PyJWT (recommended)
 pip install PyJWT>=2.9.0
@@ -28,6 +31,7 @@ pip install authlib>=1.3.0
 ```
 
 **Migration Guide**:
+
 ```python
 # Before (python-jose):
 from jose import jwt
@@ -47,6 +51,7 @@ decoded = jwt.decode(token, secret, algorithms=['HS256'])
 **Status**: ✅ FIXED
 
 **Solution**: Updated to aiohttp==3.10.10 which includes patches for:
+
 - Directory traversal vulnerability (GHSA-5h86-8mv2-jq9f)
 - DoS via malformed POST requests (GHSA-5m98-qgg9-wh84)
 - HTTP parser leniency issues (GHSA-8qpw-xqxj-h4r2)
@@ -59,6 +64,7 @@ decoded = jwt.decode(token, secret, algorithms=['HS256'])
 **Status**: ⚠️ REQUIRES MIGRATION (same as #1)
 
 **Temporary Mitigation**:
+
 - Disable JWE support if not required
 - Add payload size limits
 - Implement rate limiting
@@ -66,6 +72,7 @@ decoded = jwt.decode(token, secret, algorithms=['HS256'])
 ## Updated Dependency Versions
 
 ### Security Packages
+
 ```
 fastapi==0.115.0 (was 0.104.1)
 uvicorn[standard]==0.31.0 (was 0.24.0)
@@ -75,12 +82,14 @@ cryptography==43.0.1 (was 41.0.7)
 ```
 
 ### HTTP Clients
+
 ```
 httpx==0.27.2 (was 0.25.2)
 aiohttp==3.10.10 (was 3.9.1) ✅ CRITICAL FIX
 ```
 
 ### Database
+
 ```
 sqlalchemy==2.0.35 (was 2.0.23)
 psycopg2-binary==2.9.10 (was 2.9.9)
@@ -88,6 +97,7 @@ alembic==1.13.3 (was 1.12.1)
 ```
 
 ### Data Processing
+
 ```
 pandas==2.2.3 (was 2.1.3)
 numpy==2.1.2 (was 1.26.2)
@@ -96,6 +106,7 @@ python-docx==1.1.2 (was 1.1.0)
 ```
 
 ### Validation
+
 ```
 pydantic==2.9.2 (was 2.5.2)
 pydantic-settings==2.5.2 (was 2.1.0)
@@ -103,12 +114,14 @@ email-validator==2.2.0 (was 2.1.0)
 ```
 
 ### Redis
+
 ```
 redis==5.2.0 (was 5.0.1)
 hiredis==3.0.0 (was 2.2.3)
 ```
 
 ### Testing & Development
+
 ```
 pytest==8.3.3 (was 7.4.3)
 pytest-asyncio==0.24.0 (was 0.21.1)
@@ -119,11 +132,13 @@ mypy==1.11.2 (was 1.7.1)
 ```
 
 ### AI/ML
+
 ```
 scikit-learn==1.5.2 (was 1.3.2)
 ```
 
 ### Utilities
+
 ```
 python-dotenv==1.0.1 (was 1.0.0)
 PyYAML==6.0.2 (was 6.0.1)
@@ -134,12 +149,14 @@ PyYAML==6.0.2 (was 6.0.1)
 After updating dependencies, run the following tests:
 
 ### 1. Dependency Installation
+
 ```bash
 cd backend
 pip install -r requirements.txt
 ```
 
 ### 2. Security Scan
+
 ```bash
 # Run pip-audit to verify no known vulnerabilities
 pip install pip-audit
@@ -151,6 +168,7 @@ safety check
 ```
 
 ### 3. Application Tests
+
 ```bash
 # Run unit tests
 pytest
@@ -163,6 +181,7 @@ pytest --cov=app --cov-report=html
 ```
 
 ### 4. Docker Build Test
+
 ```bash
 # Rebuild container with new dependencies
 docker-compose build backend
@@ -178,17 +197,20 @@ curl http://localhost:8000/health
 ## Migration Timeline for python-jose
 
 ### Phase 1: Immediate (Current PR)
+
 - ✅ Update all other vulnerable packages
 - ✅ Document python-jose issue
 - ✅ Add security notes
 
 ### Phase 2: Short-term (Next PR)
+
 - [ ] Implement PyJWT migration
 - [ ] Update authentication service
 - [ ] Add migration tests
 - [ ] Update documentation
 
 ### Phase 3: Validation
+
 - [ ] Security audit
 - [ ] Penetration testing
 - [ ] Performance benchmarks
@@ -196,6 +218,7 @@ curl http://localhost:8000/health
 ## Additional Security Measures
 
 ### 1. Input Validation
+
 ```python
 # All API endpoints use Pydantic models for validation
 from pydantic import BaseModel, validator
@@ -211,6 +234,7 @@ class UserInput(BaseModel):
 ```
 
 ### 2. Rate Limiting
+
 ```python
 # Implement rate limiting for API endpoints
 from slowapi import Limiter
@@ -225,6 +249,7 @@ async def protected_endpoint():
 ```
 
 ### 3. CORS Configuration
+
 ```python
 # Strict CORS policy
 from fastapi.middleware.cors import CORSMiddleware
@@ -239,6 +264,7 @@ app.add_middleware(
 ```
 
 ### 4. Security Headers
+
 ```python
 # Add security headers middleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
@@ -250,13 +276,13 @@ app.add_middleware(TrustedHostMiddleware, allowed_hosts=["localhost", "*.cogniwa
 
 ### OPEA PR Requirements
 
-| Requirement | Status | Notes |
-|------------|--------|-------|
-| Critical CVEs Fixed | ⚠️ Partial | aiohttp fixed, python-jose documented |
-| High CVEs Fixed | ✅ Complete | All high severity issues resolved |
-| Moderate CVEs Fixed | ⚠️ Partial | python-jose requires migration |
-| License Compliance | ✅ Complete | All dependencies Apache 2.0 compatible |
-| Documentation | ✅ Complete | Security updates documented |
+| Requirement         | Status      | Notes                                  |
+| ------------------- | ----------- | -------------------------------------- |
+| Critical CVEs Fixed | ⚠️ Partial  | aiohttp fixed, python-jose documented  |
+| High CVEs Fixed     | ✅ Complete | All high severity issues resolved      |
+| Moderate CVEs Fixed | ⚠️ Partial  | python-jose requires migration         |
+| License Compliance  | ✅ Complete | All dependencies Apache 2.0 compatible |
+| Documentation       | ✅ Complete | Security updates documented            |
 
 ## References
 
@@ -276,6 +302,7 @@ app.add_middleware(TrustedHostMiddleware, allowed_hosts=["localhost", "*.cogniwa
 ## Contact
 
 For security concerns, contact:
+
 - Email: security@cogniware.com
 - OPEA Security: https://github.com/opea-project/GenAIExamples/security
 
@@ -284,5 +311,3 @@ For security concerns, contact:
 **Last Updated**: October 17, 2025
 **Reviewed By**: Cogniware Security Team
 **Next Review**: Upon python-jose migration completion
-
-

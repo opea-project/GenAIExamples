@@ -2,6 +2,12 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+Copyright (C) 2024 Intel Corporation
+SPDX-License-Identifier: Apache-2.0
+
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 # Script to fix all pre-commit hook issues
 
 set -e
@@ -13,7 +19,7 @@ echo "1. Fixing end-of-file issues..."
 find . -type f \( -name "*.py" -o -name "*.js" -o -name "*.json" -o -name "*.yaml" -o -name "*.yml" -o -name "*.md" -o -name "*.sh" -o -name "*.ts" -o -name "*.tsx" \) \
   ! -path "./node_modules/*" \
   ! -path "./.git/*" \
-  ! -path "./data/*" \
+  ! -path "./assets/data/*" \
   ! -path "./.next/*" \
   -exec sh -c 'tail -c1 "$1" | read -r _ || echo >> "$1"' _ {} \;
 
@@ -22,7 +28,7 @@ echo "2. Fixing trailing whitespace..."
 find . -type f \( -name "*.py" -o -name "*.js" -o -name "*.json" -o -name "*.yaml" -o -name "*.yml" -o -name "*.md" -o -name "*.sh" -o -name "*.ts" -o -name "*.tsx" \) \
   ! -path "./node_modules/*" \
   ! -path "./.git/*" \
-  ! -path "./data/*" \
+  ! -path "./assets/data/*" \
   ! -path "./.next/*" \
   -exec sed -i '' 's/[[:space:]]*$//' {} \;
 

@@ -13,6 +13,7 @@ The data download system has been updated to use the official GitHub data reposi
 ### 1. Download Script Updated (`scripts/download-data.sh`)
 
 #### Configuration Changes:
+
 ```bash
 # Old (placeholder):
 DATA_URL="https://storage.googleapis.com/cogniware-opea-ims/data/sample-data.tar.gz"
@@ -32,6 +33,7 @@ TEMP_FILE="/tmp/cogniware-opea-ims-data.zip"
 5. **Source Attribution**: Added clear GitHub source URL
 
 #### New Extract Function:
+
 ```bash
 extract_data() {
     # Supports both tar.gz and zip formats
@@ -46,6 +48,7 @@ extract_data() {
 ### 2. Documentation Updated
 
 #### DATA_SETUP.md:
+
 - ✅ Updated download URLs to GitHub repository
 - ✅ Changed extraction instructions for ZIP format
 - ✅ Updated hosting guide to reflect GitHub as primary source
@@ -53,6 +56,7 @@ extract_data() {
 - ✅ Added repository link and access methods
 
 #### data/README.md:
+
 - ✅ Updated manual download instructions
 - ✅ Changed extraction commands for ZIP format
 - ✅ Added GitHub repository link
@@ -91,12 +95,14 @@ Cogniware-OPEA-IMS-Data/
 ### For Users
 
 **Automated Download** (Recommended):
+
 ```bash
 cd cogniware-opea-ims
 ./scripts/download-data.sh
 ```
 
 **Manual Download**:
+
 ```bash
 # Download ZIP archive
 wget https://github.com/Cogniware-Inc/Cogniware-OPEA-IMS-Data/archive/refs/heads/main.zip
@@ -105,19 +111,22 @@ wget https://github.com/Cogniware-Inc/Cogniware-OPEA-IMS-Data/archive/refs/heads
 unzip main.zip
 
 # Copy data files
-cp -r Cogniware-OPEA-IMS-Data-main/data/* cogniware-opea-ims/data/
+mkdir -p cogniware-opea-ims/assets/data/
+cp -r Cogniware-OPEA-IMS-Data-main/data/* cogniware-opea-ims/assets/data/
 
 # Cleanup
 rm -rf main.zip Cogniware-OPEA-IMS-Data-main
 ```
 
 **Using Git Clone**:
+
 ```bash
 # Clone data repository
 git clone https://github.com/Cogniware-Inc/Cogniware-OPEA-IMS-Data.git
 
 # Copy data files
-cp -r Cogniware-OPEA-IMS-Data/data/* cogniware-opea-ims/data/
+mkdir -p cogniware-opea-ims/assets/data/
+cp -r Cogniware-OPEA-IMS-Data/data/* cogniware-opea-ims/assets/data/
 
 # Cleanup (optional)
 rm -rf Cogniware-OPEA-IMS-Data
@@ -156,14 +165,14 @@ rm -rf Cogniware-OPEA-IMS-Data
 
 ### Comparison with Alternatives
 
-| Feature | GitHub Repo | GitHub Releases | Cloud Storage |
-|---------|-------------|-----------------|---------------|
-| Cost | Free | Free | ~$0.50/month |
-| Version Control | ✅ Git | ⚠️ Manual | ❌ No |
-| Easy Updates | ✅ Yes | ⚠️ Manual | ⚠️ Manual |
-| URL Stability | ✅ Stable | ✅ Stable | ✅ Stable |
-| Bandwidth | ✅ Unlimited | ✅ Unlimited | 💰 Charged |
-| Setup Complexity | ✅ Simple | ⚠️ Moderate | ⚠️ Moderate |
+| Feature          | GitHub Repo  | GitHub Releases | Cloud Storage |
+| ---------------- | ------------ | --------------- | ------------- |
+| Cost             | Free         | Free            | ~$0.50/month  |
+| Version Control  | ✅ Git       | ⚠️ Manual       | ❌ No         |
+| Easy Updates     | ✅ Yes       | ⚠️ Manual       | ⚠️ Manual     |
+| URL Stability    | ✅ Stable    | ✅ Stable       | ✅ Stable     |
+| Bandwidth        | ✅ Unlimited | ✅ Unlimited    | 💰 Charged    |
+| Setup Complexity | ✅ Simple    | ⚠️ Moderate     | ⚠️ Moderate   |
 
 ---
 
@@ -300,11 +309,13 @@ git push origin v1.0.1
 ### Changes from Previous System
 
 **Before** (Placeholder):
+
 - Undefined cloud storage location
 - Manual setup required
 - No working URL
 
 **After** (GitHub):
+
 - Public GitHub repository
 - Automated download working
 - Stable, reliable URL
@@ -312,6 +323,7 @@ git push origin v1.0.1
 ### No Breaking Changes
 
 The update maintains backward compatibility:
+
 - Same script filename (`download-data.sh`)
 - Same data directory location (`data/`)
 - Same file structure (7,479 CSV files)
@@ -324,6 +336,7 @@ The update maintains backward compatibility:
 ### Issue: "unzip command not found"
 
 **Solution**:
+
 ```bash
 # Ubuntu/Debian
 sudo apt-get install unzip
@@ -338,6 +351,7 @@ sudo yum install unzip
 ### Issue: "Extraction failed"
 
 **Solution**:
+
 ```bash
 # Check available disk space
 df -h .
@@ -353,6 +367,7 @@ cp -r Cogniware-OPEA-IMS-Data-main/data/* data/
 **Expected**: 7,479 CSV files
 
 **Troubleshooting**:
+
 ```bash
 # Check what was extracted
 ls -la data/
@@ -431,6 +446,7 @@ No additional steps required. The system is fully functional with the GitHub dat
 ### Future Enhancements
 
 **Optional improvements**:
+
 1. Add data versioning via Git tags
 2. Create GitHub Releases for stable snapshots
 3. Add automated data validation tests
@@ -445,6 +461,7 @@ No additional steps required. The system is fully functional with the GitHub dat
 The data download system is now fully integrated with the GitHub data repository. All scripts and documentation have been updated to use [Cogniware-OPEA-IMS-Data](https://github.com/Cogniware-Inc/Cogniware-OPEA-IMS-Data) as the authoritative data source.
 
 **Benefits**:
+
 - ✅ Free, reliable hosting
 - ✅ Version control for data
 - ✅ Easy updates and maintenance
@@ -459,5 +476,3 @@ The data download system is now fully integrated with the GitHub data repository
 **Repository**: https://github.com/Cogniware-Inc/Cogniware-OPEA-IMS-Data
 **Download Script**: `scripts/download-data.sh`
 **Status**: Production Ready ✅
-
-

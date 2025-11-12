@@ -10,37 +10,37 @@ The cogniware-opea-ims folder is now **fully prepared** for submission to the OP
 
 ### Critical Files - All Present
 
-| File | Status | Purpose |
-|------|--------|---------|
-| `README.md` | ✅ | Main project documentation |
-| `LICENSE` | ✅ | Apache 2.0 license |
-| `CONTRIBUTING.md` | ✅ | Contribution guidelines |
-| `SECURITY.md` | ✅ | Security policy |
-| `docker-compose.yml` | ✅ | Service orchestration |
-| `env.example` | ✅ | Environment template |
-| `start.sh` | ✅ | Quick start script (executable) |
+| File                 | Status | Purpose                         |
+| -------------------- | ------ | ------------------------------- |
+| `README.md`          | ✅     | Main project documentation      |
+| `LICENSE`            | ✅     | Apache 2.0 license              |
+| `CONTRIBUTING.md`    | ✅     | Contribution guidelines         |
+| `SECURITY.md`        | ✅     | Security policy                 |
+| `docker-compose.yml` | ✅     | Service orchestration           |
+| `env.example`        | ✅     | Environment template            |
+| `start.sh`           | ✅     | Quick start script (executable) |
 
 ### New Files for PR Review - All Created
 
-| File | Lines | Status | Purpose |
-|------|-------|--------|---------|
-| `SECURITY_UPDATES.md` | 287 | ✅ | CVE tracking & fixes |
-| `DATA_SETUP.md` | 656 | ✅ | Data download guide |
-| `data/README.md` | 219 | ✅ | Data documentation |
-| `scripts/download-data.sh` | 255 | ✅ | Automated download (executable) |
-| `PR_REVIEW_RESPONSE.md` | 558 | ✅ | Detailed PR response |
-| `PR_COMMENT_RESPONSE.md` | 220 | ✅ | GitHub comment |
-| `CHANGELOG.md` | 249 | ✅ | Version history |
-| `CHANGES_SUMMARY.md` | 350 | ✅ | Change summary |
-| `data/.gitkeep` | 1 | ✅ | Git directory tracking |
+| File                       | Lines | Status | Purpose                         |
+| -------------------------- | ----- | ------ | ------------------------------- |
+| `SECURITY_UPDATES.md`      | 287   | ✅     | CVE tracking & fixes            |
+| `DATA_SETUP.md`            | 656   | ✅     | Data download guide             |
+| `data/README.md`           | 219   | ✅     | Data documentation              |
+| `scripts/download-data.sh` | 255   | ✅     | Automated download (executable) |
+| `PR_REVIEW_RESPONSE.md`    | 558   | ✅     | Detailed PR response            |
+| `PR_COMMENT_RESPONSE.md`   | 220   | ✅     | GitHub comment                  |
+| `CHANGELOG.md`             | 249   | ✅     | Version history                 |
+| `CHANGES_SUMMARY.md`       | 350   | ✅     | Change summary                  |
+| `data/.gitkeep`            | 1     | ✅     | Git directory tracking          |
 
 ### Updated Files
 
-| File | Status | Changes |
-|------|--------|---------|
-| `backend/requirements.txt` | ✅ | 28 packages updated |
-| `.gitignore` | ✅ | Data directory excluded |
-| `README.md` | ✅ | Data download section added |
+| File                       | Status | Changes                     |
+| -------------------------- | ------ | --------------------------- |
+| `backend/requirements.txt` | ✅     | 28 packages updated         |
+| `.gitignore`               | ✅     | Data directory excluded     |
+| `README.md`                | ✅     | Data download section added |
 
 ### Directory Structure
 
@@ -87,14 +87,14 @@ cogniware-opea-ims/
 
 ### Vulnerabilities Addressed
 
-| Package | Old Version | New Version | CVE Status |
-|---------|-------------|-------------|------------|
-| aiohttp | 3.9.1 | 3.10.10 | ✅ 4 CVEs FIXED |
-| fastapi | 0.104.1 | 0.115.0 | ✅ Updated |
-| uvicorn | 0.24.0 | 0.31.0 | ✅ Updated |
-| httpx | 0.25.2 | 0.27.2 | ✅ Updated |
-| cryptography | 41.0.7 | 43.0.1 | ✅ Updated |
-| python-jose | 3.3.0 | 3.3.0 | ⚠️ Documented with migration plan |
+| Package      | Old Version | New Version | CVE Status                        |
+| ------------ | ----------- | ----------- | --------------------------------- |
+| aiohttp      | 3.9.1       | 3.10.10     | ✅ 4 CVEs FIXED                   |
+| fastapi      | 0.104.1     | 0.115.0     | ✅ Updated                        |
+| uvicorn      | 0.24.0      | 0.31.0      | ✅ Updated                        |
+| httpx        | 0.25.2      | 0.27.2      | ✅ Updated                        |
+| cryptography | 41.0.7      | 43.0.1      | ✅ Updated                        |
+| python-jose  | 3.3.0       | 3.3.0       | ⚠️ Documented with migration plan |
 
 **Total Packages Updated**: 28
 **Critical/High CVEs Fixed**: 6 of 7
@@ -270,6 +270,7 @@ git push origin [your-branch-name]
 1. **Go to your PR**: https://github.com/opea-project/GenAIExamples/pull/2307
 
 2. **Post a Comment** using content from `PR_COMMENT_RESPONSE.md`:
+
    ```bash
    cat PR_COMMENT_RESPONSE.md
    # Copy the content and paste as PR comment
@@ -282,6 +283,7 @@ git push origin [your-branch-name]
 #### Step 5: Reference Detailed Documentation
 
 In your PR comment, reference:
+
 - `PR_REVIEW_RESPONSE.md` - For detailed technical response
 - `SECURITY_UPDATES.md` - For complete CVE tracking
 - `DATA_SETUP.md` - For data download system details
@@ -292,6 +294,7 @@ In your PR comment, reference:
 ## 📋 Final Checklist
 
 ### Code & Configuration
+
 - [x] `backend/requirements.txt` - All packages updated
 - [x] `.gitignore` - Data directory excluded
 - [x] `docker-compose.yml` - Present and unchanged
@@ -299,6 +302,7 @@ In your PR comment, reference:
 - [x] All scripts executable
 
 ### Security
+
 - [x] 6 of 7 critical/high CVEs fixed
 - [x] python-jose documented with migration plan
 - [x] Security updates documented
@@ -306,6 +310,7 @@ In your PR comment, reference:
 - [x] Environment variables used
 
 ### Data Separation
+
 - [x] Data excluded from Git
 - [x] Download script created
 - [x] Setup guide comprehensive
@@ -313,6 +318,7 @@ In your PR comment, reference:
 - [x] README updated
 
 ### Documentation
+
 - [x] README.md updated
 - [x] SECURITY_UPDATES.md created
 - [x] DATA_SETUP.md created
@@ -321,12 +327,14 @@ In your PR comment, reference:
 - [x] All documentation clear and complete
 
 ### Testing
+
 - [x] Dependencies installable
 - [x] Scripts executable
 - [x] Documentation reviewed
 - [x] File structure verified
 
 ### OPEA Compliance
+
 - [x] Apache 2.0 licensed
 - [x] No large binaries in repo
 - [x] Follows OPEA patterns
@@ -347,6 +355,7 @@ After following the submission steps:
 ### Success Criteria
 
 Your PR will be ready for approval when:
+
 - ✅ All review comments addressed
 - ✅ Security vulnerabilities fixed/documented
 - ✅ Data separation implemented
@@ -361,16 +370,19 @@ Your PR will be ready for approval when:
 ### For Questions
 
 **Before Submitting**:
+
 - Review `PR_REVIEW_RESPONSE.md` for detailed responses
 - Check `DATA_SETUP.md` for data system details
 - See `SECURITY_UPDATES.md` for CVE information
 
 **After Submitting**:
+
 - Respond to reviewer comments promptly
 - Reference detailed documentation as needed
 - Be open to additional feedback
 
 **Contact**:
+
 - **GitHub**: @cogniware-devops
 - **Email**: support@cogniware.com
 - **Security**: security@cogniware.com
@@ -382,6 +394,7 @@ Your PR will be ready for approval when:
 **Status**: ✅ **READY FOR SUBMISSION**
 
 **Changes Made**:
+
 - 🔒 Security: 6 CVEs fixed, 1 documented
 - 📦 Data: Complete separation system
 - 📚 Documentation: 2,200+ lines added
@@ -389,6 +402,7 @@ Your PR will be ready for approval when:
 - 🚀 Deployment: Backward compatible
 
 **Next Steps**:
+
 1. Review changes
 2. Commit to Git
 3. Push to fork
@@ -406,6 +420,4 @@ Your PR will be ready for approval when:
 
 ---
 
-*All systems go! Ready to merge with OPEA Examples repository.* ✨
-
-
+_All systems go! Ready to merge with OPEA Examples repository._ ✨

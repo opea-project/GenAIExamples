@@ -1,5 +1,5 @@
 {
-  "name": "cogniware-opea-ims-frontend",
+  "name": "cogniware-opea-ims-ui",
   "version": "1.0.0",
   "description": "AI-Powered Inventory Management System - Frontend",
   "private": true,
@@ -36,4 +36,3 @@
     "url": "https://github.com/opea-project/GenAIExamples"
   }
 }
-

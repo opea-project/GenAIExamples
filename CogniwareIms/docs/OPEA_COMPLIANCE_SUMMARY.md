@@ -9,30 +9,36 @@ This document summarizes the changes made to make the CogniwareIMS repository co
 All required files and directories following OPEA standards:
 
 #### Application Definition
+
 - ✅ `cogniwareims.py` - Megaservice definition using OPEA patterns
 - ✅ `backend/` - Existing backend with full application logic
 - ✅ `frontend/` - Existing Next.js UI
 
 #### Docker Support
+
 - ✅ `docker_build_image/build.yaml` - Image build configuration
 - ✅ `backend/Dockerfile` - Backend container (existing)
-- ✅ `frontend/Dockerfile` - Frontend container (existing)
+- ✅ `frontend/docker/Dockerfile` - Frontend container (existing)
 
 #### Docker Compose Deployments
+
 - ✅ `docker_compose/intel/xeon/compose.yaml` - Xeon deployment (OPEA-compliant)
 - ✅ `docker_compose/intel/xeon/set_env.sh` - Environment setup
 - ✅ Original `docker-compose.yml` retained for compatibility
 
 #### Kubernetes Deployments
+
 - ✅ `kubernetes/helm/Chart.yaml` - Helm chart metadata
 - ✅ `kubernetes/helm/values.yaml` - Configuration values
 - ✅ `kubernetes/README.md` - K8s deployment guide
 
 #### Tests
+
 - ✅ `tests/test_compose_on_xeon.sh` - Docker Compose E2E test
 - ✅ `tests/README.md` - Testing documentation
 
 #### Documentation
+
 - ✅ `README_OPEA.md` - OPEA-compliant README
 - ✅ `OPEA_COMPLIANCE_SUMMARY.md` - This file
 - ✅ `assets/README.md` - Architecture documentation
@@ -91,6 +97,7 @@ The system orchestrates these OPEA microservices:
 ### Application Layer
 
 Additional services in backend:
+
 - **Interactive Agent**: Orchestrates RAG + DBQnA
 - **Knowledge Manager**: Continuous learning
 - **DBQnA Service**: Natural language to SQL
@@ -113,9 +120,11 @@ All images follow OPEA naming conventions (lowercase):
 Following OPEA patterns:
 
 **Docker Compose Tests**:
+
 - `test_compose_on_xeon.sh` - Intel Xeon platform
 
 **Future Tests** (if Gaudi/GPU support added):
+
 - `test_compose_on_gaudi.sh`
 - `test_gmc_on_xeon.sh`
 - `test_gmc_on_gaudi.sh`
@@ -123,6 +132,7 @@ Following OPEA patterns:
 ### Test Coverage
 
 Each test includes:
+
 1. Docker image building
 2. Service deployment
 3. Microservice health checks
@@ -179,12 +189,12 @@ cogniware-opea-ims/
 
 ## Deployment Matrix
 
-| Platform | Deployment Type | Status | Test Coverage |
-|----------|----------------|--------|---------------|
-| Intel Xeon | Docker Compose (OPEA) | ✅ Complete | ✅ E2E Test |
-| Intel Xeon | Docker Compose (Original) | ✅ Complete | Manual |
-| Kubernetes | Helm | ✅ Complete | Manual |
-| Kubernetes | GMC | ✅ Config Ready | Needs Testing |
+| Platform   | Deployment Type           | Status          | Test Coverage |
+| ---------- | ------------------------- | --------------- | ------------- |
+| Intel Xeon | Docker Compose (OPEA)     | ✅ Complete     | ✅ E2E Test   |
+| Intel Xeon | Docker Compose (Original) | ✅ Complete     | Manual        |
+| Kubernetes | Helm                      | ✅ Complete     | Manual        |
+| Kubernetes | GMC                       | ✅ Config Ready | Needs Testing |
 
 ## Key Differences from Standard OPEA Examples
 
@@ -199,12 +209,14 @@ This example is unique as it combines:
 ### Dual Docker Compose
 
 Two deployment options:
+
 - **Original**: `docker-compose.yml` (existing users)
 - **OPEA-Compliant**: `docker_compose/intel/xeon/compose.yaml` (OPEA structure)
 
 ### Extended Features
 
 Beyond basic RAG:
+
 - DBQnA (Natural Language to SQL)
 - Document summarization
 - Continuous learning
@@ -226,6 +238,7 @@ environment:
 ```
 
 Features used:
+
 - Intel DL Boost for AI inference
 - AVX-512 vector instructions
 - Intel MKL math libraries
@@ -244,6 +257,7 @@ Features used:
 ## Production Readiness
 
 ### Security
+
 - ✅ JWT authentication
 - ✅ HTTPS/TLS support
 - ✅ Input validation
@@ -252,6 +266,7 @@ Features used:
 - ✅ Environment-based secrets
 
 ### Observability
+
 - ✅ Health check endpoints
 - ✅ Structured logging
 - ✅ Docker health checks
@@ -259,6 +274,7 @@ Features used:
 - ✅ Prometheus metrics (optional)
 
 ### Scalability
+
 - ✅ Horizontal pod autoscaling (K8s)
 - ✅ Load balancing support
 - ✅ Stateless backend design
@@ -270,12 +286,14 @@ Features used:
 For users of the existing system:
 
 ### Keep Using Original
+
 ```bash
 # Continue using
 docker-compose up -d
 ```
 
 ### Migrate to OPEA Structure
+
 ```bash
 # Use new OPEA-compliant deployment
 cd docker_compose/intel/xeon
@@ -332,6 +350,7 @@ This repository is now **fully compliant** with OPEA contribution guidelines whi
 **Compliance Score: 100%** ✅
 
 Key achievements:
+
 - ✅ OPEA megaservice pattern implemented
 - ✅ Proper directory structure
 - ✅ Docker Compose with vendor/device structure
@@ -344,7 +363,6 @@ Key achievements:
 
 ---
 
-*Last Updated: October 21, 2025*
-*OPEA Version: 1.0+*
-*CogniwareIMS Version: 1.0.0*
-
+_Last Updated: October 21, 2025_
+_OPEA Version: 1.0+_
+_CogniwareIMS Version: 1.0.0_

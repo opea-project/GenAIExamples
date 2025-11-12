@@ -8,10 +8,10 @@ repos:
       - id: end-of-file-fixer
       - id: trailing-whitespace
       - id: check-yaml
-        args: ['--unsafe']
+        args: ["--unsafe"]
       - id: check-json
       - id: check-added-large-files
-        args: ['--maxkb=1000']
+        args: ["--maxkb=1000"]
       - id: check-merge-conflict
       - id: debug-statements
       - id: mixed-line-ending
@@ -27,21 +27,21 @@ repos:
           - --license-filepath
           - LICENSE_HEADER_PYTHON.txt
           - --comment-style
-          - '#'
+          - "#"
       - id: insert-license
         files: \.sh$
         args:
           - --license-filepath
           - LICENSE_HEADER_SHELL.txt
           - --comment-style
-          - '#'
+          - "#"
       - id: insert-license
         files: \.(js|ts|tsx)$
         args:
           - --license-filepath
           - LICENSE_HEADER_JS.txt
           - --comment-style
-          - '//'
+          - "//"
 
   - repo: https://github.com/pycqa/isort
     rev: 5.13.2
@@ -67,6 +67,5 @@ repos:
     rev: 7.0.0
     hooks:
       - id: flake8
-        args: ['--max-line-length=120', '--ignore=E203,W503']
+        args: ["--max-line-length=120", "--ignore=E203,W503"]
         files: \.py$
-

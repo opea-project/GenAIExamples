@@ -5,18 +5,21 @@ This directory contains end-to-end (E2E) tests for the OPEA Cogniware Inventory 
 ## Test Coverage
 
 ### Docker Compose Tests
+
 - `test_compose_on_xeon.sh` - Tests Docker Compose deployment on Intel Xeon processors
 - `test_gmc_on_xeon.sh` - Tests GMC deployment on Kubernetes with Xeon
 
 ## Prerequisites
 
 ### For Docker Compose Tests
+
 - Docker and Docker Compose installed
 - 16GB+ RAM (32GB recommended)
 - HuggingFace API token
 - Intel Xeon processor (recommended)
 
 ### For Kubernetes Tests
+
 - Kubernetes cluster (v1.24+)
 - kubectl configured
 - Helm 3.0+ or GMC installed
@@ -63,6 +66,7 @@ Each test follows this workflow:
 ## Test Validation Points
 
 ### Microservices
+
 - ✅ Redis vector database connectivity
 - ✅ PostgreSQL database ready
 - ✅ TGI service health
@@ -73,6 +77,7 @@ Each test follows this workflow:
 - ✅ Data preparation microservice
 
 ### Application
+
 - ✅ Backend health check
 - ✅ Chat completion endpoint
 - ✅ Inventory query endpoint
@@ -82,9 +87,11 @@ Each test follows this workflow:
 ## Environment Variables
 
 ### Required
+
 - `HUGGINGFACEHUB_API_TOKEN` - Your HuggingFace API token
 
 ### Optional
+
 - `LLM_MODEL_ID` - LLM model (default: Intel/neural-chat-7b-v3-3)
 - `EMBEDDING_MODEL_ID` - Embedding model (default: BAAI/bge-base-en-v1.5)
 - `RERANK_MODEL_ID` - Reranking model (default: BAAI/bge-reranker-base)
@@ -163,6 +170,7 @@ jobs:
 ## Contributing
 
 When adding new tests:
+
 1. Follow naming convention: `test_<type>_on_<hardware>.sh`
 2. Include proper error handling with `set -e`
 3. Add cleanup functions
@@ -172,7 +180,7 @@ When adding new tests:
 ## Support
 
 For issues:
+
 - Check logs: `docker compose logs -f`
 - Review README files in parent directories
 - Open an issue on GitHub
-

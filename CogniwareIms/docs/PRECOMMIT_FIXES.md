@@ -5,35 +5,43 @@
 The pre-commit hooks detected several code quality issues that have been automatically fixed:
 
 ### 1. End-of-File Fixer ✅
-**Issue**: Files must end with a single newline character  
+
+**Issue**: Files must end with a single newline character
 **Fixed**: Added newline to end of all source files
 
 ### 2. Trailing Whitespace ✅
-**Issue**: Lines had trailing spaces/tabs  
+
+**Issue**: Lines had trailing spaces/tabs
 **Fixed**: Removed all trailing whitespace from files
 
 ### 3. Requirements.txt Sorting ✅
-**Issue**: Python dependencies not alphabetically sorted  
+
+**Issue**: Python dependencies not alphabetically sorted
 **Fixed**: Sorted `backend/requirements.txt` alphabetically
 
 ### 4. Shell Script Permissions ✅
-**Issue**: Shell scripts not executable  
+
+**Issue**: Shell scripts not executable
 **Fixed**: Set executable permission on all `.sh` files
 
 ### 5. License Headers
-**Issue**: Some files missing Apache 2.0 license headers  
+
+**Issue**: Some files missing Apache 2.0 license headers
 **Status**: Files were auto-updated by pre-commit hook
 
 ### 6. Import Sorting (isort)
-**Issue**: Python imports not properly organized  
+
+**Issue**: Python imports not properly organized
 **Status**: Files were auto-updated by pre-commit hook
 
 ### 7. Docstring Formatting (docformatter)
-**Issue**: Python docstrings not properly formatted  
+
+**Issue**: Python docstrings not properly formatted
 **Status**: Files were auto-updated by pre-commit hook
 
 ### 8. Code Formatting (prettier)
-**Issue**: JavaScript/TypeScript/YAML files formatting  
+
+**Issue**: JavaScript/TypeScript/YAML files formatting
 **Status**: Files were auto-updated by pre-commit hook
 
 ## Files Modified
@@ -41,12 +49,14 @@ The pre-commit hooks detected several code quality issues that have been automat
 The following files were automatically fixed:
 
 ### Python Files
+
 - `backend/app/*.py`
 - `backend/app/core/*.py`
 - `backend/app/services/*.py`
 - `cogniwareims.py`
 
 ### Configuration Files
+
 - `backend/requirements.txt`
 - `docker-compose.yml`
 - `docker_compose/intel/xeon/compose.yaml`
@@ -55,7 +65,8 @@ The following files were automatically fixed:
 - `kubernetes/helm/values.yaml`
 
 ### Frontend Files
-- `frontend/Dockerfile`
+
+- `frontend/docker/Dockerfile`
 - `frontend/next.config.js`
 - `frontend/postcss.config.js`
 - `frontend/tailwind.config.js`
@@ -63,12 +74,14 @@ The following files were automatically fixed:
 - `frontend/package.json`
 
 ### Shell Scripts
+
 - `start.sh`
 - `scripts/*.sh`
 - `tests/*.sh`
 - `docker_compose/intel/xeon/set_env.sh`
 
 ### Documentation
+
 - All `.md` files
 
 ## What Was Done
@@ -101,6 +114,7 @@ All source files now include:
 ```
 
 Or for scripts:
+
 ```bash
 #!/bin/bash
 # Copyright (C) 2024 Intel Corporation
@@ -108,6 +122,7 @@ Or for scripts:
 ```
 
 Or for JavaScript/TypeScript:
+
 ```javascript
 // Copyright (C) 2024 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
@@ -202,32 +217,39 @@ All issues must be fixed before PR can be merged.
 ## Common Issues and Solutions
 
 ### Issue: "Some sources were modified by the hook"
+
 **Solution**: The hook auto-fixed files. Just `git add .` and commit again.
 
 ### Issue: "isort failed"
+
 **Solution**: Python imports were reordered. Review changes and commit.
 
 ### Issue: "prettier failed"
+
 **Solution**: JS/TS files were reformatted. Review changes and commit.
 
 ### Issue: "Fixing <file>"
+
 **Solution**: File was auto-fixed. This is normal, just add and commit.
 
 ## Manual Fixes (If Needed)
 
 ### Sort Python imports:
+
 ```bash
 pip install isort
 isort backend/app/**/*.py
 ```
 
 ### Format Python docstrings:
+
 ```bash
 pip install docformatter
 docformatter --in-place backend/app/**/*.py
 ```
 
 ### Format JavaScript/TypeScript:
+
 ```bash
 cd frontend
 npm install prettier
@@ -235,6 +257,7 @@ npx prettier --write "**/*.{js,ts,tsx,json,yaml,yml,md}"
 ```
 
 ### Check requirements.txt:
+
 ```bash
 sort -u backend/requirements.txt -o backend/requirements.txt
 ```
@@ -268,6 +291,7 @@ git push
 ## Summary
 
 ✅ All pre-commit hook issues have been fixed:
+
 - End-of-file newlines added
 - Trailing whitespace removed
 - Requirements.txt sorted
@@ -281,6 +305,5 @@ The repository is now compliant with OPEA code quality standards!
 
 ---
 
-**Last Updated**: October 21, 2025  
+**Last Updated**: October 21, 2025
 **Status**: ✅ All pre-commit issues resolved
-

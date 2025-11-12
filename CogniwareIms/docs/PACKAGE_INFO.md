@@ -5,8 +5,11 @@
 This is a **production-ready, fully functional AI-powered Inventory Management System** built on the OPEA (Open Platform for Enterprise AI) framework, **specifically optimized for Intel Xeon processors**.
 
 ### Version: 1.0.0
+
 ### License: Apache 2.0
+
 ### Author: Cogniware
+
 ### Platform: **Intel Xeon Optimized**
 
 ---
@@ -16,6 +19,7 @@ This is a **production-ready, fully functional AI-powered Inventory Management S
 ### 1. Complete Source Code
 
 #### Backend (Python/FastAPI)
+
 - `backend/app/main.py` - Main FastAPI application with all endpoints
 - `backend/app/core/` - Security, configuration, and core utilities
 - `backend/app/services/` - All OPEA microservice integrations:
@@ -32,6 +36,7 @@ This is a **production-ready, fully functional AI-powered Inventory Management S
 - `backend/app/init_knowledge_base.py` - Knowledge base setup script
 
 #### Frontend (Next.js/React/TypeScript)
+
 - `frontend/app/page.tsx` - Main demo/application interface
 - `frontend/app/layout.tsx` - Root layout with metadata
 - `frontend/app/globals.css` - Global styles and animations
@@ -48,6 +53,7 @@ This is a **production-ready, fully functional AI-powered Inventory Management S
 ### 3. Infrastructure
 
 #### Docker Configuration
+
 - `docker-compose.yml` - Complete orchestration of 8 services
   - Frontend (Next.js)
   - Backend (FastAPI)
@@ -57,8 +63,9 @@ This is a **production-ready, fully functional AI-powered Inventory Management S
   - Optional monitoring stack (Prometheus, Grafana)
 
 #### Dockerfiles
+
 - `backend/Dockerfile` - Multi-stage production-optimized build
-- `frontend/Dockerfile` - Next.js standalone production build
+- `frontend/docker/Dockerfile` - Next.js standalone production build
 
 ### 4. Deployment Tools
 
@@ -170,6 +177,7 @@ User → Frontend (Next.js) → Backend (FastAPI) → OPEA Services → Data Sto
 ### Security Checklist
 
 All security best practices implemented:
+
 - ✅ Authentication & authorization
 - ✅ Data encryption (in transit)
 - ✅ Input validation & sanitization
@@ -234,11 +242,13 @@ All security best practices implemented:
 ### Resource Requirements
 
 **Minimum:**
+
 - 4 CPU cores
 - 16GB RAM
 - 50GB disk
 
 **Recommended:**
+
 - 8+ CPU cores
 - 32GB+ RAM
 - 100GB SSD
@@ -328,6 +338,7 @@ All security best practices implemented:
 ### Contributing
 
 See `CONTRIBUTING.md` for guidelines on:
+
 - Reporting bugs
 - Suggesting features
 - Submitting pull requests
@@ -390,6 +401,7 @@ See `CONTRIBUTING.md` for guidelines on:
 ## 🔄 Version History
 
 ### Version 1.0.0 (Current)
+
 - Initial production release
 - Full OPEA integration
 - 8 microservices
@@ -402,6 +414,7 @@ See `CONTRIBUTING.md` for guidelines on:
 ## 📞 Contact
 
 **Cogniware**
+
 - Website: https://cogniware.com
 - Email: info@cogniware.com
 - Security: security@cogniware.com
@@ -443,6 +456,7 @@ This package is ready for submission to the OPEA examples repository:
 ### System Requirements
 
 Verified on:
+
 - Ubuntu 20.04/22.04 LTS
 - macOS 12+ (Intel and Apple Silicon)
 - Windows 11 with WSL2
@@ -453,5 +467,4 @@ Verified on:
 
 ---
 
-*Built with ❤️ using OPEA - Open Platform for Enterprise AI*
-
+_Built with ❤️ using OPEA - Open Platform for Enterprise AI_

@@ -1,36 +1,34 @@
-"""
-Knowledge Base Initialization Script
-Processes all CSV files and creates initial embeddings
-Run this after first deployment to populate the knowledge base
-"""
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+"""Knowledge Base Initialization Script Processes all CSV files and creates initial embeddings Run this after first
+deployment to populate the knowledge base."""
 
 import asyncio
 import logging
 import sys
 from pathlib import Path
+
 import pandas as pd
 
 # Add parent directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from app.services.embedding_service import embedding_service
-from app.services.retrieval_service import retrieval_service
-from app.services.knowledge_manager import knowledge_manager
 from app.services.csv_processor import csv_processor
+from app.services.embedding_service import embedding_service
+from app.services.knowledge_manager import knowledge_manager
+from app.services.retrieval_service import retrieval_service
 
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
+
 async def initialize_knowledge_base():
-    """
-    Initialize complete knowledge base from CSV data
-    """
-    logger.info("="*60)
+    """Initialize complete knowledge base from CSV data."""
+    logger.info("=" * 60)
     logger.info("🚀 Starting Knowledge Base Initialization")
-    logger.info("="*60)
+    logger.info("=" * 60)
 
     try:
         # Step 1: Load all CSV files
@@ -49,14 +47,18 @@ async def initialize_knowledge_base():
         total_indexed = 0
 
         for i in range(0, len(documents), batch_size):
-            batch = documents[i:i+batch_size]
-            logger.info(f"   Processing batch {i//batch_size + 1}/{(len(documents)-1)//batch_size + 1}...")
+            batch = documents[i : i + batch_size]
+            logger.info(
+                f"   Processing batch {i//batch_size + 1}/{(len(documents)-1)//batch_size + 1}..."
+            )
 
             # Extract texts
             texts = [doc["text"] for doc in batch]
 
             # Generate embeddings in batch
-            embeddings = await embedding_service.embed_batch(texts, batch_size=batch_size)
+            embeddings = await embedding_service.embed_batch(
+                texts, batch_size=batch_size
+            )
 
             # Index each document
             for doc, embedding in zip(batch, embeddings):
@@ -64,7 +66,7 @@ async def initialize_knowledge_base():
                     doc_id=doc["id"],
                     text=doc["text"],
                     embedding=embedding,
-                    metadata=doc.get("metadata", {})
+                    metadata=doc.get("metadata", {}),
                 )
 
                 if success:
@@ -76,12 +78,14 @@ async def initialize_knowledge_base():
         logger.info("\n📊 Step 4: Updating knowledge base statistics...")
         knowledge_manager.history["total_documents"] = total_indexed
         knowledge_manager.history["last_update"] = pd.Timestamp.now().isoformat()
-        knowledge_manager.history["training_runs"].append({
-            "timestamp": pd.Timestamp.now().isoformat(),
-            "type": "initial_setup",
-            "documents_added": total_indexed,
-            "source": "csv_bulk_import"
-        })
+        knowledge_manager.history["training_runs"].append(
+            {
+                "timestamp": pd.Timestamp.now().isoformat(),
+                "type": "initial_setup",
+                "documents_added": total_indexed,
+                "source": "csv_bulk_import",
+            }
+        )
         knowledge_manager.save_history()
 
         # Step 5: Verify
@@ -89,9 +93,9 @@ async def initialize_knowledge_base():
         doc_count = await retrieval_service.count_documents()
         logger.info(f"   Vector store contains {doc_count} documents")
 
-        logger.info("\n" + "="*60)
+        logger.info("\n" + "=" * 60)
         logger.info("🎉 Knowledge Base Initialization Complete!")
-        logger.info("="*60)
+        logger.info("=" * 60)
         logger.info(f"\n📊 Summary:")
         logger.info(f"   CSV Files Processed: {len(dataframes)}")
         logger.info(f"   Documents Indexed: {total_indexed}")
@@ -102,22 +106,19 @@ async def initialize_knowledge_base():
             "success": True,
             "csv_files": len(dataframes),
             "documents_indexed": total_indexed,
-            "vector_store_count": doc_count
+            "vector_store_count": doc_count,
         }
 
     except Exception as e:
         logger.error(f"\n❌ Initialization failed: {e}")
         import traceback
+
         traceback.print_exc()
-        return {
-            "success": False,
-            "error": str(e)
-        }
+        return {"success": False, "error": str(e)}
+
 
 async def quick_test():
-    """
-    Quick test of knowledge base functionality
-    """
+    """Quick test of knowledge base functionality."""
     logger.info("\n🧪 Running Quick Test...")
 
     try:
@@ -132,12 +133,15 @@ async def quick_test():
 
         # Test knowledge manager
         stats = await knowledge_manager.get_knowledge_stats()
-        logger.info(f"✅ Knowledge manager: OK ({stats.get('total_documents', 0)} documents)")
+        logger.info(
+            f"✅ Knowledge manager: OK ({stats.get('total_documents', 0)} documents)"
+        )
 
         logger.info("\n🎉 All systems operational!")
 
     except Exception as e:
         logger.error(f"\n❌ Test failed: {e}")
+
 
 if __name__ == "__main__":
     # Check if test mode
@@ -154,4 +158,3 @@ if __name__ == "__main__":
             sys.exit(0)
         else:
             sys.exit(1)
-

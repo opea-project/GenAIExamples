@@ -40,13 +40,15 @@ cd /path/to/cogniware-opea-ims
 ```
 
 **What the script does**:
+
 1. ✅ Checks for required dependencies (curl/wget, tar)
 2. ✅ Downloads data archive from hosting service
 3. ✅ Verifies data integrity (SHA-256 checksum)
-4. ✅ Extracts 7,479 CSV files to `data/` directory
+4. ✅ Extracts 7,479 CSV files to `assets/data/` directory
 5. ✅ Displays summary and next steps
 
 **Requirements**:
+
 - Internet connection
 - ~40MB free disk space
 - `curl` or `wget`
@@ -59,6 +61,7 @@ If the automated script doesn't work, download manually:
 #### Step 1: Download Data Archive
 
 **Primary Download Location**:
+
 ```bash
 # GitHub Repository Archive
 wget https://github.com/Cogniware-Inc/Cogniware-OPEA-IMS-Data/archive/refs/heads/main.zip
@@ -70,6 +73,7 @@ curl -L -O https://github.com/Cogniware-Inc/Cogniware-OPEA-IMS-Data/archive/refs
 **Data Repository**: [Cogniware-OPEA-IMS-Data](https://github.com/Cogniware-Inc/Cogniware-OPEA-IMS-Data)
 
 **Alternative Locations**:
+
 - Direct from Cogniware: support@cogniware.com
 
 #### Step 2: Verify Download (Optional)
@@ -83,10 +87,11 @@ curl -L -O https://github.com/Cogniware-Inc/Cogniware-OPEA-IMS-Data/archive/refs
 unzip main.zip
 
 # Move data files to correct location
-cp -r Cogniware-OPEA-IMS-Data-main/data/* data/
+mkdir -p assets/data
+cp -r Cogniware-OPEA-IMS-Data-main/data/* assets/data/
 
 # Verify file count
-find data -type f -name "*.csv" | wc -l
+find assets/data -type f -name "*.csv" | wc -l
 # Expected: 7479
 ```
 
@@ -104,10 +109,10 @@ If you already have the data from another source:
 
 ```bash
 # Copy existing data
-cp -r /path/to/existing/data/* cogniware-opea-ims/data/
+cp -r /path/to/existing/data/* cogniware-opea-ims/assets/data/
 
 # Or create symbolic link
-ln -s /path/to/existing/data cogniware-opea-ims/data
+ln -s /path/to/existing/data cogniware-opea-ims/assets/data
 ```
 
 ---
@@ -117,11 +122,13 @@ ln -s /path/to/existing/data cogniware-opea-ims/data
 ### What's Included
 
 **File Statistics**:
+
 - **Total Files**: 7,479 CSV files
 - **Total Size**: ~32 MB compressed, ~45 MB extracted
 - **File Types**: Product specifications and ordering information
 
 **Product Categories**:
+
 - Intel® Xeon® Processors (various generations)
 - Intel® Core™ Processors (Consumer & Mobile)
 - Intel® FPGAs (Stratix®, Arria®, Cyclone®, MAX®, Agilex®)
@@ -133,7 +140,7 @@ ln -s /path/to/existing/data cogniware-opea-ims/data
 ### File Structure
 
 ```
-data/
+assets/data/
 ├── README.md
 ├── .gitkeep
 └── [7,479 CSV files]
@@ -146,6 +153,7 @@ data/
 ### CSV Format
 
 Each CSV file contains product information with columns such as:
+
 - Product Name
 - Model Number
 - Specifications
@@ -154,6 +162,7 @@ Each CSV file contains product information with columns such as:
 - Package Details
 
 **Example** (`Intel® Xeon® Processor E5-4660 v3_spec.csv`):
+
 ```csv
 Field,Value
 Product Name,Intel® Xeon® Processor E5-4660 v3
@@ -181,15 +190,15 @@ If you're a maintainer preparing the data for distribution:
 cd cogniware-opea-ims
 
 # Verify data directory structure
-ls -la data/
-find data -type f -name "*.csv" | wc -l  # Should be 7479
+ls -la assets/data/
+find assets/data -type f -name "*.csv" | wc -l  # Should be 7479
 ```
 
 #### Step 2: Create Compressed Archive
 
 ```bash
 # Create tarball with optimal compression
-tar -czf sample-data.tar.gz data/ \
+tar -czf sample-data.tar.gz assets/data/ \
     --exclude='.DS_Store' \
     --exclude='._*' \
     --exclude='.gitkeep'
@@ -232,6 +241,7 @@ rm -rf /tmp/test-data
 **Repository**: [Cogniware-OPEA-IMS-Data](https://github.com/Cogniware-Inc/Cogniware-OPEA-IMS-Data)
 
 1. **Repository Structure**:
+
    ```
    Cogniware-OPEA-IMS-Data/
    └── data/
@@ -248,6 +258,7 @@ rm -rf /tmp/test-data
    - No URL changes needed
 
 **Advantages**:
+
 - ✅ Free for public repositories
 - ✅ Reliable GitHub infrastructure
 - ✅ Version control via Git
@@ -343,6 +354,7 @@ If you want to use your own inventory data instead of the sample data:
 #### Minimum Required Fields
 
 For best results with the AI agents, include:
+
 - Product name/identifier
 - Category/type
 - Key specifications
@@ -362,11 +374,13 @@ product_id,product_name,category,specification,value,unit
 ### Setup Custom Data
 
 1. **Place CSV files in data/ directory**:
+
    ```bash
-   cp /path/to/your/csvs/*.csv cogniware-opea-ims/data/
+   cp /path/to/your/csvs/*.csv cogniware-opea-ims/assets/data/
    ```
 
 2. **Reinitialize knowledge base**:
+
    ```bash
    docker-compose up -d
    docker-compose exec backend python app/init_knowledge_base.py
@@ -386,11 +400,13 @@ product_id,product_name,category,specification,value,unit
 #### Issue: "Download script fails"
 
 **Symptoms**:
+
 ```
 ✗ Download failed
 ```
 
 **Solutions**:
+
 ```bash
 # 1. Check internet connection
 ping -c 3 google.com
@@ -409,12 +425,14 @@ export https_proxy=http://proxy:port
 #### Issue: "Wrong number of files extracted"
 
 **Symptoms**:
+
 ```bash
 find data -name "*.csv" | wc -l
 # Shows number other than 7479
 ```
 
 **Solutions**:
+
 ```bash
 # 1. Remove incomplete data
 rm -rf data/
@@ -429,11 +447,13 @@ sha256sum sample-data.tar.gz
 #### Issue: "Data not loading in application"
 
 **Symptoms**:
+
 - Application starts but no inventory data
 - Queries return "no results"
 - Knowledge base initialization errors
 
 **Solutions**:
+
 ```bash
 # 1. Check data files exist
 ls -l data/*.csv | head
@@ -454,11 +474,13 @@ docker-compose restart
 #### Issue: "Permission denied extracting files"
 
 **Symptoms**:
+
 ```
 tar: Cannot open: Permission denied
 ```
 
 **Solutions**:
+
 ```bash
 # 1. Check directory permissions
 ls -ld data/
@@ -476,11 +498,13 @@ tar -xzf sample-data.tar.gz
 #### Issue: "Checksum verification failed"
 
 **Symptoms**:
+
 ```
 sample-data.tar.gz: FAILED
 ```
 
 **Solutions**:
+
 ```bash
 # 1. Re-download the archive (may be corrupted)
 rm sample-data.tar.gz
@@ -564,6 +588,7 @@ docker-compose exec backend python app/init_knowledge_base.py
 ### Q: Can I use this in production?
 
 **A**: The sample data is for demonstration only. For production use:
+
 - Verify data accuracy with official sources
 - Use your own real inventory data
 - Implement proper data governance
@@ -575,6 +600,7 @@ docker-compose exec backend python app/init_knowledge_base.py
 ### Q: What if I don't want to download 7,479 files?
 
 **A**: You can use a subset for testing:
+
 ```bash
 # Download full set
 ./scripts/download-data.sh
@@ -589,6 +615,7 @@ ls data/*.csv | head -100 | xargs -I {} cp {} data-test/
 ### Q: Can I contribute additional data?
 
 **A**: Yes! If you have product data to contribute:
+
 1. Ensure it's publicly available information
 2. Format as CSV with clear headers
 3. Submit PR with data files
@@ -605,15 +632,18 @@ ls data/*.csv | head -100 | xargs -I {} cp {} data-test/
 ### Getting Help
 
 **Documentation**:
+
 - README.md - Main project documentation
 - DEPLOYMENT_GUIDE.md - Deployment instructions
 - SECURITY.md - Security guidelines
 
 **Community**:
+
 - GitHub Issues: https://github.com/opea-project/GenAIExamples/issues
-- OPEA Discussions: https://github.com/orgs/opea-project/discussions
+- OPEA Discussions: https://github.com/opea-project/discussions
 
 **Commercial Support**:
+
 - Email: support@cogniware.com
 - Website: https://cogniware.com
 
@@ -622,6 +652,7 @@ ls data/*.csv | head -100 | xargs -I {} cp {} data-test/
 ## Summary
 
 **Quick Setup**:
+
 ```bash
 git clone [repository]
 cd cogniware-opea-ims
@@ -634,6 +665,7 @@ cd cogniware-opea-ims
 **Files**: 7,479 CSV files with Intel product data
 
 **Next Steps**:
+
 1. ✅ Download data
 2. ✅ Start application with `./start.sh`
 3. ✅ Access UI at http://localhost:3000
@@ -641,7 +673,6 @@ cd cogniware-opea-ims
 
 ---
 
-*Last Updated: October 17, 2025*
-*Version: 1.0.0*
-*For: Cogniware OPEA IMS*
-
+_Last Updated: October 17, 2025_
+_Version: 1.0.0_
+_For: Cogniware OPEA IMS_

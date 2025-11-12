@@ -4,7 +4,7 @@
 # OPEA Cogniware IMS - Docker Compose for Intel Xeon
 # Full-stack AI-powered inventory management system
 
-version: '3.8'
+version: "3.8"
 
 services:
   # Redis Vector Database & Cache
@@ -13,7 +13,7 @@ services:
     container_name: redis-vector-db
     ports:
       - "6379:6379"
-      - "8001:8001"  # RedisInsight
+      - "8001:8001" # RedisInsight
     environment:
       - REDIS_ARGS=--maxmemory 4gb --maxmemory-policy allkeys-lru
     volumes:
@@ -291,7 +291,15 @@ services:
       NEXT_PUBLIC_API_URL: http://cogniwareims-backend:8000
       NODE_ENV: production
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000"]
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://localhost:3000",
+        ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -303,4 +311,3 @@ volumes:
 networks:
   default:
     driver: bridge
-

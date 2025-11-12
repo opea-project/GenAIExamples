@@ -1,26 +1,27 @@
-"""
-CSV Data Processor
-Ingests CSV files and prepares them for OPEA knowledge base
-"""
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+"""CSV Data Processor Ingests CSV files and prepares them for OPEA knowledge base."""
+
+import json
+import logging
+import os
+from pathlib import Path
+from typing import Any, Dict, List
 
 import pandas as pd
-import os
-import json
-from pathlib import Path
-from typing import List, Dict, Any
-import logging
 
 logger = logging.getLogger(__name__)
 
+
 class CSVProcessor:
-    """Process CSV files for inventory data"""
+    """Process CSV files for inventory data."""
 
     def __init__(self, data_dir: str = "/data"):
         self.data_dir = Path(data_dir)
         self.processed_data = {}
 
     def load_all_csv_files(self) -> Dict[str, pd.DataFrame]:
-        """Load all CSV files from the data directory"""
+        """Load all CSV files from the data directory."""
         csv_files = list(self.data_dir.glob("*.csv"))
         logger.info(f"Found {len(csv_files)} CSV files")
 
@@ -35,8 +36,10 @@ class CSVProcessor:
 
         return dataframes
 
-    def prepare_for_embedding(self, dataframes: Dict[str, pd.DataFrame]) -> List[Dict[str, Any]]:
-        """Prepare data for OPEA embedding service"""
+    def prepare_for_embedding(
+        self, dataframes: Dict[str, pd.DataFrame]
+    ) -> List[Dict[str, Any]]:
+        """Prepare data for OPEA embedding service."""
         documents = []
 
         for name, df in dataframes.items():
@@ -50,39 +53,40 @@ class CSVProcessor:
 
                 doc_text = " | ".join(text_parts)
 
-                documents.append({
-                    "id": f"{name}_{idx}",
-                    "source": name,
-                    "text": doc_text,
-                    "metadata": row.to_dict()
-                })
+                documents.append(
+                    {
+                        "id": f"{name}_{idx}",
+                        "source": name,
+                        "text": doc_text,
+                        "metadata": row.to_dict(),
+                    }
+                )
 
         logger.info(f"Prepared {len(documents)} documents for embedding")
         return documents
 
-    def extract_inventory_data(self, dataframes: Dict[str, pd.DataFrame]) -> Dict[str, Any]:
-        """Extract structured inventory data"""
+    def extract_inventory_data(
+        self, dataframes: Dict[str, pd.DataFrame]
+    ) -> Dict[str, Any]:
+        """Extract structured inventory data."""
         inventory_data = {
             "products": [],
             "categories": set(),
             "warehouses": set(),
-            "total_items": 0
+            "total_items": 0,
         }
 
         for name, df in dataframes.items():
             # Try to identify inventory-related columns
-            if any(col in df.columns for col in ['product', 'Product', 'item', 'Item']):
+            if any(col in df.columns for col in ["product", "Product", "item", "Item"]):
                 for _, row in df.iterrows():
-                    product_info = {
-                        "source": name,
-                        "data": row.to_dict()
-                    }
+                    product_info = {"source": name, "data": row.to_dict()}
                     inventory_data["products"].append(product_info)
                     inventory_data["total_items"] += 1
 
                     # Extract categories if available
-                    if 'category' in df.columns or 'Category' in df.columns:
-                        cat_col = 'category' if 'category' in df.columns else 'Category'
+                    if "category" in df.columns or "Category" in df.columns:
+                        cat_col = "category" if "category" in df.columns else "Category"
                         if pd.notna(row[cat_col]):
                             inventory_data["categories"].add(str(row[cat_col]))
 
@@ -92,7 +96,7 @@ class CSVProcessor:
         return inventory_data
 
     def create_knowledge_base(self) -> Dict[str, Any]:
-        """Create a complete knowledge base from CSV data"""
+        """Create a complete knowledge base from CSV data."""
         dataframes = self.load_all_csv_files()
 
         knowledge_base = {
@@ -101,8 +105,8 @@ class CSVProcessor:
             "metadata": {
                 "total_files": len(dataframes),
                 "total_documents": sum(len(df) for df in dataframes.values()),
-                "files": [name for name in dataframes.keys()]
-            }
+                "files": [name for name in dataframes.keys()],
+            },
         }
 
         # Save processed data
@@ -112,32 +116,29 @@ class CSVProcessor:
         with open(output_dir / "knowledge_base.json", "w") as f:
             json.dump(knowledge_base, f, indent=2, default=str)
 
-        logger.info(f"Knowledge base created with {len(knowledge_base['documents'])} documents")
+        logger.info(
+            f"Knowledge base created with {len(knowledge_base['documents'])} documents"
+        )
 
         return knowledge_base
 
     def get_product_summary(self) -> Dict[str, Any]:
-        """Get a summary of products for quick access"""
+        """Get a summary of products for quick access."""
         dataframes = self.load_all_csv_files()
 
-        summary = {
-            "total_files": len(dataframes),
-            "file_details": []
-        }
+        summary = {"total_files": len(dataframes), "file_details": []}
 
         for name, df in dataframes.items():
             file_info = {
                 "name": name,
                 "rows": len(df),
                 "columns": list(df.columns),
-                "sample": df.head(3).to_dict('records') if len(df) > 0 else []
+                "sample": df.head(3).to_dict("records") if len(df) > 0 else [],
             }
             summary["file_details"].append(file_info)
 
         return summary
 
-# Global CSV processor instance
-csv_processor = CSVProcessor(
-    data_dir=os.getenv("CSV_DATA_DIR", "../data")
-)
 
+# Global CSV processor instance
+csv_processor = CSVProcessor(data_dir=os.getenv("CSV_DATA_DIR", "../data"))

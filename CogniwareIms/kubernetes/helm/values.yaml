@@ -152,4 +152,3 @@ dataprep-redis:
   service:
     type: ClusterIP
     port: 6007
-

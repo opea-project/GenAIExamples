@@ -1,4 +1,9 @@
 #!/bin/bash
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+Copyright (C) 2024 Intel Corporation
+SPDX-License-Identifier: Apache-2.0
 
 ##############################################################################
 # Data Download Script for Cogniware OPEA IMS
@@ -21,7 +26,7 @@ NC='\033[0m' # No Color
 
 # Configuration
 DATA_URL="https://github.com/Cogniware-Inc/Cogniware-OPEA-IMS-Data/archive/refs/heads/main.zip"
-DATA_DIR="$(dirname "$0")/../data"
+DATA_DIR="$(dirname "$0")/../assets/data"
 TEMP_FILE="/tmp/cogniware-opea-ims-data.zip"
 CHECKSUM_URL=""  # Checksum not available for GitHub archive
 

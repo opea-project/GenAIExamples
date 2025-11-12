@@ -1,20 +1,21 @@
-"""
-OPEA Retrieval Service Integration
-Handles semantic search and document retrieval using Redis vector store
-"""
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+"""OPEA Retrieval Service Integration Handles semantic search and document retrieval using Redis vector store."""
+
+import json
+import logging
+import os
+from typing import Any, Dict, List, Optional
 
 import httpx
-import os
-import logging
-from typing import List, Dict, Any, Optional
-import redis.asyncio as redis
-import json
 import numpy as np
+import redis.asyncio as redis
 
 logger = logging.getLogger(__name__)
 
+
 class RetrievalService:
-    """Integration with OPEA Retrieval microservice and Redis vector store"""
+    """Integration with OPEA Retrieval microservice and Redis vector store."""
 
     def __init__(self):
         self.base_url = os.getenv("OPEA_RETRIEVAL_URL", "http://retrieval-service:7000")
@@ -23,19 +24,17 @@ class RetrievalService:
         self.redis_client = None
 
     async def get_redis_client(self):
-        """Get or create Redis client"""
+        """Get or create Redis client."""
         if self.redis_client is None:
             self.redis_client = await redis.from_url(
-                self.redis_url,
-                encoding="utf-8",
-                decode_responses=False
+                self.redis_url, encoding="utf-8", decode_responses=False
             )
         return self.redis_client
 
-    async def index_document(self, doc_id: str, text: str, embedding: List[float], metadata: Dict[str, Any]) -> bool:
-        """
-        Index a document in the vector store
-        """
+    async def index_document(
+        self, doc_id: str, text: str, embedding: List[float], metadata: Dict[str, Any]
+    ) -> bool:
+        """Index a document in the vector store."""
         try:
             # Store in Redis
             client = await self.get_redis_client()
@@ -44,21 +43,15 @@ class RetrievalService:
                 "id": doc_id,
                 "text": text,
                 "embedding": embedding,
-                "metadata": metadata
+                "metadata": metadata,
             }
 
             # Store document
-            await client.set(
-                f"doc:{doc_id}",
-                json.dumps(doc_data)
-            )
+            await client.set(f"doc:{doc_id}", json.dumps(doc_data))
 
             # Store embedding separately for vector search
             embedding_key = f"embedding:{doc_id}"
-            await client.set(
-                embedding_key,
-                json.dumps(embedding)
-            )
+            await client.set(embedding_key, json.dumps(embedding))
 
             # Add to index
             await client.sadd("document_ids", doc_id)
@@ -70,10 +63,13 @@ class RetrievalService:
             logger.error(f"Error indexing document {doc_id}: {e}")
             return False
 
-    async def search(self, query_embedding: List[float], top_k: int = 5, filters: Optional[Dict] = None) -> List[Dict[str, Any]]:
-        """
-        Semantic search using query embedding
-        """
+    async def search(
+        self,
+        query_embedding: List[float],
+        top_k: int = 5,
+        filters: Optional[Dict] = None,
+    ) -> List[Dict[str, Any]]:
+        """Semantic search using query embedding."""
         try:
             # Try OPEA retrieval service first
             async with httpx.AsyncClient(timeout=self.timeout) as client:
@@ -82,8 +78,8 @@ class RetrievalService:
                     json={
                         "embedding": query_embedding,
                         "top_k": top_k,
-                        "filters": filters or {}
-                    }
+                        "filters": filters or {},
+                    },
                 )
 
                 if response.status_code == 200:
@@ -91,15 +87,17 @@ class RetrievalService:
                     return result.get("results", [])
 
         except Exception as e:
-            logger.warning(f"OPEA retrieval service unavailable, using direct Redis: {e}")
+            logger.warning(
+                f"OPEA retrieval service unavailable, using direct Redis: {e}"
+            )
 
         # Fallback to direct Redis search
         return await self._redis_search(query_embedding, top_k, filters)
 
-    async def _redis_search(self, query_embedding: List[float], top_k: int, filters: Optional[Dict]) -> List[Dict[str, Any]]:
-        """
-        Direct Redis vector similarity search
-        """
+    async def _redis_search(
+        self, query_embedding: List[float], top_k: int, filters: Optional[Dict]
+    ) -> List[Dict[str, Any]]:
+        """Direct Redis vector similarity search."""
         try:
             client = await self.get_redis_client()
 
@@ -112,7 +110,9 @@ class RetrievalService:
 
             for doc_id in doc_ids:
                 # Get document
-                doc_json = await client.get(f"doc:{doc_id.decode() if isinstance(doc_id, bytes) else doc_id}")
+                doc_json = await client.get(
+                    f"doc:{doc_id.decode() if isinstance(doc_id, bytes) else doc_id}"
+                )
                 if doc_json:
                     doc = json.loads(doc_json)
                     doc_embedding = np.array(doc.get("embedding", []))
@@ -127,19 +127,23 @@ class RetrievalService:
                         if filters:
                             metadata = doc.get("metadata", {})
                             if all(metadata.get(k) == v for k, v in filters.items()):
-                                similarities.append({
+                                similarities.append(
+                                    {
+                                        "doc_id": doc["id"],
+                                        "text": doc["text"],
+                                        "metadata": metadata,
+                                        "score": float(similarity),
+                                    }
+                                )
+                        else:
+                            similarities.append(
+                                {
                                     "doc_id": doc["id"],
                                     "text": doc["text"],
-                                    "metadata": metadata,
-                                    "score": float(similarity)
-                                })
-                        else:
-                            similarities.append({
-                                "doc_id": doc["id"],
-                                "text": doc["text"],
-                                "metadata": doc.get("metadata", {}),
-                                "score": float(similarity)
-                            })
+                                    "metadata": doc.get("metadata", {}),
+                                    "score": float(similarity),
+                                }
+                            )
 
             # Sort by similarity and return top k
             similarities.sort(key=lambda x: x["score"], reverse=True)
@@ -150,7 +154,7 @@ class RetrievalService:
             return []
 
     async def delete_document(self, doc_id: str) -> bool:
-        """Delete a document from the vector store"""
+        """Delete a document from the vector store."""
         try:
             client = await self.get_redis_client()
 
@@ -165,8 +169,10 @@ class RetrievalService:
             logger.error(f"Error deleting document {doc_id}: {e}")
             return False
 
-    async def update_document(self, doc_id: str, text: str, embedding: List[float], metadata: Dict[str, Any]) -> bool:
-        """Update an existing document"""
+    async def update_document(
+        self, doc_id: str, text: str, embedding: List[float], metadata: Dict[str, Any]
+    ) -> bool:
+        """Update an existing document."""
         # Delete old version
         await self.delete_document(doc_id)
 
@@ -174,7 +180,7 @@ class RetrievalService:
         return await self.index_document(doc_id, text, embedding, metadata)
 
     async def get_document(self, doc_id: str) -> Optional[Dict[str, Any]]:
-        """Retrieve a specific document by ID"""
+        """Retrieve a specific document by ID."""
         try:
             client = await self.get_redis_client()
             doc_json = await client.get(f"doc:{doc_id}")
@@ -187,14 +193,16 @@ class RetrievalService:
             logger.error(f"Error retrieving document {doc_id}: {e}")
             return None
 
-    async def get_all_documents(self, limit: int = 100, offset: int = 0) -> List[Dict[str, Any]]:
-        """Get all indexed documents"""
+    async def get_all_documents(
+        self, limit: int = 100, offset: int = 0
+    ) -> List[Dict[str, Any]]:
+        """Get all indexed documents."""
         try:
             client = await self.get_redis_client()
             doc_ids = await client.smembers("document_ids")
 
             documents = []
-            for i, doc_id in enumerate(list(doc_ids)[offset:offset+limit]):
+            for i, doc_id in enumerate(list(doc_ids)[offset : offset + limit]):
                 doc = await self.get_document(
                     doc_id.decode() if isinstance(doc_id, bytes) else doc_id
                 )
@@ -208,7 +216,7 @@ class RetrievalService:
             return []
 
     async def count_documents(self) -> int:
-        """Get total number of indexed documents"""
+        """Get total number of indexed documents."""
         try:
             client = await self.get_redis_client()
             count = await client.scard("document_ids")
@@ -236,12 +244,8 @@ class RetrievalService:
             return False
 
     async def health_check(self) -> Dict[str, Any]:
-        """Check health of retrieval service and Redis"""
-        status = {
-            "opea_service": False,
-            "redis": False,
-            "document_count": 0
-        }
+        """Check health of retrieval service and Redis."""
+        status = {"opea_service": False, "redis": False, "document_count": 0}
 
         # Check OPEA service
         try:
@@ -262,6 +266,6 @@ class RetrievalService:
 
         return status
 
+
 # Global instance
 retrieval_service = RetrievalService()
-
