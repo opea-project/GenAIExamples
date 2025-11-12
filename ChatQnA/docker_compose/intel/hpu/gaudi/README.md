@@ -294,6 +294,43 @@ The `tgi-guardrails-service` uses the `GUARDRAILS_MODEL_ID` parameter to select 
 
 The `vllm-guardrails-service` uses the `GUARDRAILS_MODEL_ID` parameter to select a [supported model](https://docs.vllm.ai/en/latest/models/supported_models.html) for the associated `opea/vllm-gaudi:latest` image. It uses the `NUM_CARDS` parameter.
 
+## ChatQnA with Conversational UI (Optional)
+
+To access the Conversational UI (react based) frontend, modify the UI service in the `compose` file used to deploy. Replace `chatqna-xeon-ui-server` service with the `chatqna-xeon-conversation-ui-server` service as per the config below:
+
+```yaml
+chatqna-xeon-conversation-ui-server:
+  image: opea/chatqna-conversation-ui:latest
+  container_name: chatqna-xeon-conversation-ui-server
+  environment:
+    - APP_BACKEND_SERVICE_ENDPOINT=${BACKEND_SERVICE_ENDPOINT}
+    - APP_DATA_PREP_SERVICE_URL=${DATAPREP_SERVICE_ENDPOINT}
+  ports:
+    - "5174:80"
+  depends_on:
+    - chatqna-xeon-backend-server
+  ipc: host
+  restart: always
+```
+
+Once the services are up, open the following URL in the browser: http://{host_ip}:5174. By default, the UI runs on port 80 internally. If the developer prefers to use a different host port to access the frontend, it can be modified by port mapping in the `compose.yaml` file as shown below:
+
+```yaml
+  chatqna-gaudi-conversation-ui-server:
+    image: opea/chatqna-conversation-ui:latest
+    ...
+    ports:
+      - "80:80"
+```
+
+Here is an example of running ChatQnA (default UI):
+
+![project-screenshot](../../../../assets/img/chat_ui_response.png)
+
+Here is an example of running ChatQnA with Conversational UI (React):
+
+![project-screenshot](../../../../assets/img/conversation_ui_response.png)
+
 ## Conclusion
 
 In examining the various services and configurations across different deployments, developers should gain a comprehensive understanding of how each component contributes to the overall functionality and performance of a ChatQnA pipeline on an Intel® Gaudi® platform. Key services such as the `vllm-service`, `tei-embedding-service`, `tei-reranking-service`, `tgi-guardrails-service`and `vllm-guardrails-service` each consume Gaudi accelerators, leveraging specific models and hardware resources to optimize their respective tasks. The `LLM_MODEL_ID`, `EMBEDDING_MODEL_ID`, `RERANK_MODEL_ID`, and `GUARDRAILS_MODEL_ID` parameters specify the models used, directly impacting the quality and effectiveness of language processing, embedding, reranking, and safety operations.
