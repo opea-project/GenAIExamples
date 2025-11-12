@@ -5,7 +5,7 @@ html2text>=2025.4.15
 langchain-core==0.3.60
 langchain-milvus
 langchain-openai
-llama-index==0.12.36
+llama-index==0.13.0
 llama-index-core==0.12.37
 llama-index-embeddings-openvino==0.5.2
 llama-index-llms-openai==0.3.44
