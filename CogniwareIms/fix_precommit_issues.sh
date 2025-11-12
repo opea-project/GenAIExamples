@@ -2,12 +2,6 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-Copyright (C) 2024 Intel Corporation
-SPDX-License-Identifier: Apache-2.0
-
-# Copyright (C) 2024 Intel Corporation
-# SPDX-License-Identifier: Apache-2.0
-
 # Script to fix all pre-commit hook issues
 
 set -e
