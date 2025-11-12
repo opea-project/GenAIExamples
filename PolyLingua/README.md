@@ -2,6 +2,17 @@
 
 A production-ready translation service built with **OPEA (Open Platform for Enterprise AI)** components, featuring a modern Next.js UI and microservices architecture.
 
+## Table of Contents
+
+1. [Components](#components)
+2. [Quick Start](#quick-start)
+3. [Configuration](#configuration)
+4. [Development](#development)
+5. [Operations](#operations)
+6. [Troubleshooting](#troubleshooting)
+7. [Resources](#resources)
+8. [Support](#support)
+
 ## Components
 
 1. **vLLM Service** - High-performance LLM inference engine for model serving
@@ -195,7 +206,7 @@ Translate text between languages.
 docker compose logs -f
 
 # Specific service
-docker compose logs -f polylingua-backend-server
+docker compose logs -f polylingua-xeon-backend-server
 docker compose logs -f polylingua-ui-server
 ```
 
