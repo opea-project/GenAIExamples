@@ -206,7 +206,12 @@ Verification is performed in two ways:
         "prompt_logprobs": null
       }
     ],
-    "usage": { "prompt_tokens": 7, "total_tokens": 37, "completion_tokens": 30, "prompt_tokens_details": null }
+    "usage": {
+      "prompt_tokens": 7,
+      "total_tokens": 37,
+      "completion_tokens": 30,
+      "prompt_tokens_details": null
+    }
   }
   ```
   The value of "choice.text" must contain a response from the service that makes sense.

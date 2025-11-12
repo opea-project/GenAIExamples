@@ -9,13 +9,14 @@ from concurrent.futures import ThreadPoolExecutor
 from typing import Any, Callable, List, Optional
 
 from comps.cores.proto.api_protocol import ChatCompletionRequest
+from fastapi.responses import StreamingResponse
+from llama_index.core.schema import Document, QueryBundle
+from pydantic import BaseModel, Field, model_serializer
+
 from edgecraftrag.base import BaseComponent, CallbackType, CompType, InferenceType, RetrieverType
 from edgecraftrag.components.postprocessor import RerankProcessor
 from edgecraftrag.components.query_preprocess import query_search
 from edgecraftrag.components.retriever import AutoMergeRetriever, SimpleBM25Retriever, VectorSimRetriever
-from fastapi.responses import StreamingResponse
-from llama_index.core.schema import Document, QueryBundle
-from pydantic import BaseModel, Field, model_serializer
 
 
 class PipelineStatus(BaseModel):
@@ -23,7 +24,6 @@ class PipelineStatus(BaseModel):
 
 
 class Pipeline(BaseComponent):
-
     node_parser: Optional[BaseComponent] = Field(default=None)
     indexer: Optional[BaseComponent] = Field(default=None)
     retriever: Optional[BaseComponent] = Field(default=None)

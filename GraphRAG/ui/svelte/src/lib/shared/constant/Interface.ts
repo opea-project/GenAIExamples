@@ -1,3 +1,6 @@
+// Copyright (C) 2024 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
+
 //  Copyright (C) 2024 Intel Corporation
 //  SPDX-License-Identifier: Apache-2.0
 
@@ -18,10 +21,10 @@ export enum MessageType {
 type Map<T> = T extends MessageType.Text | MessageType.SingleAudio
 	? string
 	: T extends MessageType.AudioList
-		? string[]
-		: T extends MessageType.SingleImage
-			? { imgSrc: string; imgId: string }
-			: { imgSrc: string; imgId: string }[];
+	  ? string[]
+	  : T extends MessageType.SingleImage
+	    ? { imgSrc: string; imgId: string }
+	    : { imgSrc: string; imgId: string }[];
 
 export interface Message {
 	role: MessageRole;

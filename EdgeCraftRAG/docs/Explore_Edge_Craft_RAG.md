@@ -7,13 +7,13 @@
 To create a default pipeline, you need to click the `Create Pipeline` button in the `Pipeline Setting` page.
 ![create_pipeline](../assets/img/create_pipeline.png)
 
-Then follow the pipeline create guide in UI to set your pipeline, please note that in `Indexer Type` you can set MilvusVector as indexer(Please make sure Milvus is enabled before set MilvusVector as indexer, you can refer to [Enable Milvus](../docker_compose/intel/gpu/arc/README.md#deploy-the-service-using-docker-compose)).  
+Then follow the pipeline create guide in UI to set your pipeline, please note that in `Indexer Type` you can set MilvusVector as indexer(Please make sure Milvus is enabled before set MilvusVector as indexer, you can refer to [Enable Milvus](../docker_compose/intel/gpu/arc/README.md#deploy-the-service-using-docker-compose)).
 if choosing MilvusVector, you need to verify vector uri first, please input 'Your_IP:milvus_port' then click `Test` button. Note that milvus_port is 19530
 ![milvus](../assets/img/milvus.png)
 
-Then, In ` Generator` config page, choose LLM Inference Type to `Vllm`.  
-In `Large Language Model` field, input your LLM_MODEL name, e.g. 'Qwen/Qwen3-8B'.  
-In `Vllm Url` field, you need to input 'IP:vllm_port' then click `Test` button. Note that defaultly vllm_port is '8086'  
+Then, In ` Generator` config page, choose LLM Inference Type to `Vllm`.
+In `Large Language Model` field, input your LLM_MODEL name, e.g. 'Qwen/Qwen3-8B'.
+In `Vllm Url` field, you need to input 'IP:vllm_port' then click `Test` button. Note that defaultly vllm_port is '8086'
 (Note if the test fails, it might be because vLLM service not ready yet, you can wait for 30s and try again)
 ![generator](../assets/img/generator.png)
 
@@ -46,7 +46,7 @@ In the `Indexer` page, input embedding and vector DB information, please note th
 
 ### Upload files & ChatQnA
 
-After the pipeline creation, you can go to `Knowledge Base` page and click `Create Knowledge Base` button to create your knowledge base.  
+After the pipeline creation, you can go to `Knowledge Base` page and click `Create Knowledge Base` button to create your knowledge base.
 Please select 'kbadmin' in `Type`and select kb name from the kbs you created in kbadmin UI page.
 
 ![upload_data](../assets/img/kbadmin_kb.png)

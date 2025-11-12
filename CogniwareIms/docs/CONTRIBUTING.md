@@ -36,6 +36,7 @@ By participating in this project, you agree to maintain a respectful and inclusi
    ```
 
 3. **Make your changes**
+
    - Follow coding standards (see below)
    - Add tests for new features
    - Update documentation
@@ -47,6 +48,7 @@ By participating in this project, you agree to maintain a respectful and inclusi
    ```
 
    Use conventional commits format:
+
    - `feat:` New feature
    - `fix:` Bug fix
    - `docs:` Documentation
@@ -287,11 +289,13 @@ Fixes #456
 When working with OPEA components:
 
 1. **Follow OPEA API specifications**
+
    - Use standard endpoints
    - Respect rate limits
    - Handle errors gracefully
 
 2. **Microservice Communication**
+
    - Use async/await for API calls
    - Implement retry logic
    - Add timeouts

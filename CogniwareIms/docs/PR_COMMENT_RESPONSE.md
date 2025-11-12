@@ -100,23 +100,27 @@ pytest:            7.4.3    → 8.3.3
 ### New Files Created:
 
 1. **`SECURITY_UPDATES.md`** (350+ lines)
+
    - Complete CVE tracking and fixes
    - Migration guide for python-jose → PyJWT
    - Testing requirements
    - Compliance status
 
 2. **`DATA_SETUP.md`** (600+ lines)
+
    - Automated and manual download instructions
    - Data hosting guide for maintainers
    - Comprehensive troubleshooting
    - FAQ section
 
 3. **`data/README.md`** (190+ lines)
+
    - Data structure and contents
    - Usage instructions
    - Alternative data sources
 
 4. **`scripts/download-data.sh`** (300+ lines)
+
    - Production-ready download script
    - Checksum verification
    - Error handling

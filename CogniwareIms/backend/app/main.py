@@ -24,15 +24,7 @@ from app.services.interactive_agent import interactive_agent
 from app.services.knowledge_manager import knowledge_manager
 from app.services.llm_service import llm_service
 from app.services.retrieval_service import retrieval_service
-from fastapi import (
-    Depends,
-    FastAPI,
-    File,
-    HTTPException,
-    UploadFile,
-    WebSocket,
-    WebSocketDisconnect,
-)
+from fastapi import Depends, FastAPI, File, HTTPException, UploadFile, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
@@ -159,9 +151,7 @@ async def health_check():
     db_health = await dbqna_service.health_check()
 
     return {
-        "status": (
-            "healthy" if all([embedding_health, llm_health, db_health]) else "degraded"
-        ),
+        "status": ("healthy" if all([embedding_health, llm_health, db_health]) else "degraded"),
         "timestamp": datetime.now().isoformat(),
         "services": {
             "api": "up",
@@ -324,9 +314,7 @@ async def upload_csv_knowledge(file: UploadFile = File(...)):
         content = await file.read()
 
         # Process using file upload service
-        result = await file_upload_service.upload_and_process(
-            filename=file.filename, content=content
-        )
+        result = await file_upload_service.upload_and_process(filename=file.filename, content=content)
 
         return result
 
@@ -344,9 +332,7 @@ async def upload_knowledge_file(file: UploadFile = File(...)):
         content = await file.read()
 
         # Process using file upload service
-        result = await file_upload_service.upload_and_process(
-            filename=file.filename, content=content
-        )
+        result = await file_upload_service.upload_and_process(filename=file.filename, content=content)
 
         return result
 
@@ -657,9 +643,7 @@ async def startup_event():
 
     # Load knowledge base stats
     stats = await knowledge_manager.get_knowledge_stats()
-    logger.info(
-        f"  Knowledge Base: {stats.get('total_documents', 0)} documents indexed"
-    )
+    logger.info(f"  Knowledge Base: {stats.get('total_documents', 0)} documents indexed")
 
     logger.info("✅ OPEA IMS Platform started successfully!")
 

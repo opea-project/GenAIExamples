@@ -12,8 +12,8 @@
    Summary of Changes:
     - Changed integer PKs to serial (auto-incrementing) Pks
     - Added Transactions table to excercie Biggie code against a bigserial type
-    - Imported "Actors", "Cities", "Countries" and "Films" tables from pg dvdrentals Db to exercise 
-      Biggie code against Full-Text Search table. 
+    - Imported "Actors", "Cities", "Countries" and "Films" tables from pg dvdrentals Db to exercise
+      Biggie code against Full-Text Search table.
 ********************************************************************************/
 
 
@@ -23853,4 +23853,3 @@ EXECUTE PROCEDURE "last_updated"();
 -- Primary Key structure for table film_actor
 -- ----------------------------
 ALTER TABLE "film_actor" ADD PRIMARY KEY ("actor_id", "film_id");
-

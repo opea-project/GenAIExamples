@@ -4,11 +4,12 @@
 import requests
 from comps import GeneratedDoc
 from comps.cores.proto.api_protocol import ChatCompletionRequest
+from fastapi import Body, FastAPI, File, HTTPException, UploadFile, status
+from fastapi.responses import StreamingResponse
+
 from edgecraftrag.api_schema import RagOut
 from edgecraftrag.context import ctx
 from edgecraftrag.utils import serialize_contexts, set_current_session
-from fastapi import Body, FastAPI, File, HTTPException, UploadFile, status
-from fastapi.responses import StreamingResponse
 
 chatqna_app = FastAPI()
 

@@ -68,11 +68,11 @@ jobs:
         image: ${{ fromJSON(needs.get-images-matrix.outputs.examples_json) }}
       fail-fast: false
     steps:
-    - name: Check dockerhub description
-      run: |
-        echo "dockerhub description for ${{ matrix.image.repository }}"
-        echo "short-description: ${{ matrix.image.short-description }}"
-        echo "readme-filepath: ${{ matrix.image.readme-filepath }}"
+      - name: Check dockerhub description
+        run: |
+          echo "dockerhub description for ${{ matrix.image.repository }}"
+          echo "short-description: ${{ matrix.image.short-description }}"
+          echo "readme-filepath: ${{ matrix.image.readme-filepath }}"
 
   dockerHubDescription:
     runs-on: ubuntu-latest
@@ -83,37 +83,37 @@ jobs:
         image: ${{ fromJSON(needs.get-images-matrix.outputs.examples_json) }}
       fail-fast: false
     steps:
-    - name: Checkout GenAIExamples
-      uses: actions/checkout@v4
-      with:
-        repository: opea-project/GenAIExamples
-        path: GenAIExamples
+      - name: Checkout GenAIExamples
+        uses: actions/checkout@v4
+        with:
+          repository: opea-project/GenAIExamples
+          path: GenAIExamples
 
-    - name: Checkout GenAIComps
-      uses: actions/checkout@v4
-      with:
-        repository: opea-project/GenAIComps
-        path: GenAIComps
+      - name: Checkout GenAIComps
+        uses: actions/checkout@v4
+        with:
+          repository: opea-project/GenAIComps
+          path: GenAIComps
 
-    - name: Checkout vllm-openvino
-      uses: actions/checkout@v4
-      with:
-        repository: vllm-project/vllm
-        path: vllm
+      - name: Checkout vllm-openvino
+        uses: actions/checkout@v4
+        with:
+          repository: vllm-project/vllm
+          path: vllm
 
-    - name: Checkout vllm-gaudi
-      uses: actions/checkout@v4
-      with:
-        repository: HabanaAI/vllm-fork
-        ref: habana_main
-        path: vllm-fork
+      - name: Checkout vllm-gaudi
+        uses: actions/checkout@v4
+        with:
+          repository: HabanaAI/vllm-fork
+          ref: habana_main
+          path: vllm-fork
 
-    - name: add dockerhub description
-      uses: peter-evans/dockerhub-description@v4
-      with:
-        username: ${{ secrets.DOCKERHUB_USER }}
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
-        repository: ${{ matrix.image.repository }}
-        short-description: ${{ matrix.image.short-description }}
-        readme-filepath: ${{ matrix.image.readme-filepath }}
-        enable-url-completion: false
+      - name: add dockerhub description
+        uses: peter-evans/dockerhub-description@v4
+        with:
+          username: ${{ secrets.DOCKERHUB_USER }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          repository: ${{ matrix.image.repository }}
+          short-description: ${{ matrix.image.short-description }}
+          readme-filepath: ${{ matrix.image.readme-filepath }}
+          enable-url-completion: false

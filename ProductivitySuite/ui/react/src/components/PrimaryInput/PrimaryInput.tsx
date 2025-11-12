@@ -1,3 +1,6 @@
+// Copyright (C) 2024 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
+
 import { useEffect, useRef, useState } from "react";
 import { Box, Button, styled, TextareaAutosize } from "@mui/material";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
@@ -152,7 +155,9 @@ const PrimaryInput: React.FC<PrimaryInputProps> = ({
             className={`${styles.primaryInput} ${promptText ? "active" : ""}`}
           >
             <TextInput
-              className={`${styles.textAreaAuto} ${(isSummary || isFaq) && home ? styles.summaryInput : ""}`}
+              className={`${styles.textAreaAuto} ${
+                (isSummary || isFaq) && home ? styles.summaryInput : ""
+              }`}
               minRows={1}
               maxRows={8}
               placeholder={placeHolderCopy()}
@@ -160,7 +165,7 @@ const PrimaryInput: React.FC<PrimaryInputProps> = ({
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                 updatePromptText(e.target.value)
               }
-	      disabled={isSummary || isFaq}
+              disabled={isSummary || isFaq}
               onKeyDown={handleKeyDown}
               sx={{
                 resize: "none",

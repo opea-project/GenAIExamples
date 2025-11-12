@@ -21,7 +21,7 @@ on:
         default: "main"
         required: false
         type: string
-        description: 'OPEA branch for image build'
+        description: "OPEA branch for image build"
   workflow_call:
     inputs:
       tag:
@@ -38,12 +38,12 @@ on:
         default: "main"
         required: false
         type: string
-        description: 'OPEA branch for image build'
+        description: "OPEA branch for image build"
 
 jobs:
-####################################################################################################
-# Image Build and Scan
-####################################################################################################
+  ####################################################################################################
+  # Image Build and Scan
+  ####################################################################################################
   image-build:
     runs-on: "docker-build-${{ inputs.node }}"
     steps:
@@ -77,11 +77,11 @@ jobs:
       - name: Clean up GenAIInfra source codes
         if: always()
         run: |
-           rm -rf ${{github.workspace}}/GenAIInfra
+          rm -rf ${{github.workspace}}/GenAIInfra
 
-####################################################################################################
-# GMC Install
-####################################################################################################
+  ####################################################################################################
+  # GMC Install
+  ####################################################################################################
   gmc-install:
     needs: image-build
     runs-on: "k8s-${{ inputs.node }}"
@@ -114,4 +114,4 @@ jobs:
       - name: Clean up GenAIInfra source codes
         if: always()
         run: |
-           rm -rf ${{github.workspace}}/GenAIInfra
+          rm -rf ${{github.workspace}}/GenAIInfra

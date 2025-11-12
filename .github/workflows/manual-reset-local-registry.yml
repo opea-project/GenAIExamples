@@ -37,15 +37,15 @@ jobs:
       examples: ${{ steps.get-matrix.outputs.examples }}
       nodes: ${{ steps.get-matrix.outputs.nodes }}
     steps:
-    - name: Create Matrix
-      id: get-matrix
-      run: |
-        examples=($(echo ${EXAMPLES} | tr ',' ' '))
-        examples_json=$(printf '%s\n' "${examples[@]}" | sort -u | jq -R '.' | jq -sc '.')
-        echo "examples=$examples_json" >> $GITHUB_OUTPUT
-        nodes=($(echo ${{ inputs.nodes }} | tr ',' ' '))
-        nodes_json=$(printf '%s\n' "${nodes[@]}" | sort -u | jq -R '.' | jq -sc '.')
-        echo "nodes=$nodes_json" >> $GITHUB_OUTPUT
+      - name: Create Matrix
+        id: get-matrix
+        run: |
+          examples=($(echo ${EXAMPLES} | tr ',' ' '))
+          examples_json=$(printf '%s\n' "${examples[@]}" | sort -u | jq -R '.' | jq -sc '.')
+          echo "examples=$examples_json" >> $GITHUB_OUTPUT
+          nodes=($(echo ${{ inputs.nodes }} | tr ',' ' '))
+          nodes_json=$(printf '%s\n' "${nodes[@]}" | sort -u | jq -R '.' | jq -sc '.')
+          echo "nodes=$nodes_json" >> $GITHUB_OUTPUT
 
   clean-up:
     needs: get-build-matrix

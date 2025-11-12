@@ -369,16 +369,19 @@ See `CONTRIBUTING.md` for guidelines on:
 ### Primary Use Cases
 
 1. **Intelligent Inventory Search**
+
    - Natural language queries
    - Semantic search across all data
    - Multi-warehouse support
 
 2. **Automated Reporting**
+
    - AI-generated summaries
    - Trend analysis
    - Anomaly detection
 
 3. **Conversational AI**
+
    - Interactive chat interface
    - Context-aware responses
    - Multi-turn conversations

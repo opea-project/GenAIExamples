@@ -110,7 +110,11 @@ const AnimatedButton = ({
     <button
       onClick={handleClick}
       disabled={disabled}
-      className={`relative overflow-hidden ${variants[variant]} ${className} transition-all duration-200 active:scale-95 ${disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
+      className={`relative overflow-hidden ${
+        variants[variant]
+      } ${className} transition-all duration-200 active:scale-95 ${
+        disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"
+      }`}
       {...props}
     >
       {ripples.map((ripple) => (

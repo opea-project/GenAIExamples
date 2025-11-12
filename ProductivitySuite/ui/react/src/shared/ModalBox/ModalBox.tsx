@@ -1,3 +1,6 @@
+// Copyright (C) 2024 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
+
 import { Modal, styled } from "@mui/material";
 
 import styles from "./Modal.module.scss";

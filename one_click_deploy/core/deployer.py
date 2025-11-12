@@ -1,3 +1,6 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 # Copyright (C) 2025 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
@@ -464,7 +467,6 @@ class Deployer:
             # Set project name for clearing
             self.project_name = f"{self.example_name.lower().replace(' ', '')}-{self.args.device}"
         else:
-
             self.args.device = self.config.get("default_device")
 
         if self.args.deploy_mode == "k8s":

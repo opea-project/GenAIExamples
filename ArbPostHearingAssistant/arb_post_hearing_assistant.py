@@ -1,3 +1,6 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 # Copyright (C) 2025 Zensar Technologies Private Ltd.
 # SPDX-License-Identifier: Apache-2.0
 
@@ -63,7 +66,6 @@ class OpeaArbPostHearingAssistantService:
         self.endpoint = "/v1/arb-post-hearing"
 
     def add_remote_service(self):
-
         arb_post_hearing_assistant = MicroService(
             name="opea_service@arb_post_hearing_assistant",
             host=LLM_SERVICE_HOST_IP,

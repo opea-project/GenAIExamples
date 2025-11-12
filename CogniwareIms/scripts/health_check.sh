@@ -211,4 +211,3 @@ echo "View details:        docker-compose ps"
 echo ""
 
 exit $exit_code
-

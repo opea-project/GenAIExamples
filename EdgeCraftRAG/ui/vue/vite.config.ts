@@ -1,3 +1,6 @@
+// Copyright (C) 2024 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
+
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
@@ -66,7 +69,10 @@ const viteConfig = defineConfig((mode: ConfigEnv) => {
       preprocessorOptions: {
         less: {
           javascriptEnabled: true,
-          additionalData: `@import "${path.resolve(__dirname, "src/theme/index.less")}";`,
+          additionalData: `@import "${path.resolve(
+            __dirname,
+            "src/theme/index.less",
+          )}";`,
         },
       },
     },

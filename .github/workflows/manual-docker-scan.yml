@@ -27,7 +27,7 @@ on:
         type: string
       trivy_scan:
         default: true
-        description: 'Scan images for CVE'
+        description: "Scan images for CVE"
         required: false
         type: boolean
 

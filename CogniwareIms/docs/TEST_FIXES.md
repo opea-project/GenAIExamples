@@ -62,6 +62,7 @@ trap cleanup EXIT
 ## Updated Files
 
 1. **tests/test_compose_on_xeon.sh**
+
    - ✅ Enhanced error handling in stop_services()
    - ✅ Added fallback for container cleanup
 

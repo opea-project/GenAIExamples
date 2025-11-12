@@ -1,3 +1,6 @@
+// Copyright (C) 2024 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
+
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
@@ -25,7 +28,8 @@ const setDayjsLocale = (locale: string) => {
 
 const body = document.documentElement as HTMLElement;
 
-if (Local.get("themeInfo")?.theme === "dark") body.setAttribute("data-theme", "dark");
+if (Local.get("themeInfo")?.theme === "dark")
+  body.setAttribute("data-theme", "dark");
 else body.setAttribute("data-theme", "");
 
 // watch i18n update dayjs language

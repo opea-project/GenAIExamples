@@ -120,18 +120,21 @@ curl http://localhost:8000/api/knowledge/stats
 ### Core Services
 
 1. **Frontend Application** (Next.js 14)
+
    - Modern, responsive UI with Tailwind CSS
    - Real-time chat interface
    - Interactive dashboards and analytics
    - Knowledge management interface
 
 2. **Backend API** (FastAPI)
+
    - RESTful API endpoints
    - WebSocket support for real-time updates
    - Comprehensive error handling
    - API documentation (OpenAPI/Swagger)
 
 3. **OPEA Microservices**
+
    - **Embedding Service**: Text vectorization (BAAI/bge-base-en-v1.5)
    - **Retrieval Service**: Semantic search with Redis
    - **LLM Service**: Text generation (Intel/neural-chat-7b-v3-3)
@@ -255,16 +258,19 @@ curl -X POST http://localhost:8000/api/documents/summarize \
 This system integrates the following OPEA components:
 
 1. **Embeddings** (`comps/embeddings`)
+
    - Model: BAAI/bge-base-en-v1.5
    - Dimension: 768
    - Use: Text vectorization for semantic search
 
 2. **Retrievers** (`comps/retrievers`)
+
    - Backend: Redis vector store
    - Algorithm: Cosine similarity
    - Use: Find relevant documents
 
 3. **LLMs** (`comps/llms`)
+
    - Model: Intel/neural-chat-7b-v3-3
    - Use: Text generation, chat, SQL generation
 

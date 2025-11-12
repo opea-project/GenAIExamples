@@ -1,3 +1,6 @@
+// Copyright (C) 2024 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
+
 import { Link } from "react-router-dom";
 import { useTheme } from "@mui/material/styles";
 import { SvgIconProps } from "@mui/material/SvgIcon";
@@ -218,7 +221,9 @@ const SideBar: React.FC<SideBarProps> = ({
 const SideBarSpacer: React.FC<SideBarProps> = ({ asideOpen }) => {
   return (
     <div
-      className={`${styles.asideSpacer} ${asideOpen ? styles.asideSpacerOpen : ""}`}
+      className={`${styles.asideSpacer} ${
+        asideOpen ? styles.asideSpacerOpen : ""
+      }`}
     ></div>
   );
 };

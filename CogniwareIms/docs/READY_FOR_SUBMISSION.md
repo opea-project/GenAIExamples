@@ -141,16 +141,19 @@ cogniware-opea-ims/
 ### Documentation Files
 
 1. **Setup & Deployment**
+
    - `README.md` - Main documentation (updated)
    - `DATA_SETUP.md` - Data download guide (656 lines)
    - `DEPLOYMENT_GUIDE.md` - Deployment instructions
    - `SUBMISSION_CHECKLIST.md` - OPEA submission guide
 
 2. **Security**
+
    - `SECURITY.md` - Security policy
    - `SECURITY_UPDATES.md` - CVE tracking (287 lines)
 
 3. **Development**
+
    - `CONTRIBUTING.md` - Contribution guidelines
    - `CHANGELOG.md` - Version history (249 lines)
    - `CHANGES_SUMMARY.md` - Change summary (350 lines)
@@ -166,16 +169,19 @@ cogniware-opea-ims/
 ### Tests Performed
 
 1. ✅ **Security Validation**
+
    - Dependencies installable
    - No critical errors
    - CVEs resolved (except documented)
 
 2. ✅ **Script Validation**
+
    - Download script executable
    - Start script executable
    - Health check script executable
 
 3. ✅ **Documentation Review**
+
    - All links valid
    - Instructions clear
    - Code examples correct

@@ -1,55 +1,64 @@
 // Copyright (C) 2024 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { useState } from "react"
-import { Tooltip, UnstyledButton, Stack, rem } from "@mantine/core"
-import { IconHome2, IconLogout } from "@tabler/icons-react"
-import classes from "./sidebar.module.scss"
-import OpeaLogo from "../../assets/opea-icon-black.svg"
-import { useAppDispatch } from "../../redux/store"
-import { removeUser } from "../../redux/User/userSlice"
-import { logout } from "../../redux/Conversation/ConversationSlice"
+import { useState } from "react";
+import { Tooltip, UnstyledButton, Stack, rem } from "@mantine/core";
+import { IconHome2, IconLogout } from "@tabler/icons-react";
+import classes from "./sidebar.module.scss";
+import OpeaLogo from "../../assets/opea-icon-black.svg";
+import { useAppDispatch } from "../../redux/store";
+import { removeUser } from "../../redux/User/userSlice";
+import { logout } from "../../redux/Conversation/ConversationSlice";
 
 interface NavbarLinkProps {
-  icon: typeof IconHome2
-  label: string
-  active?: boolean
-  onClick?(): void
+  icon: typeof IconHome2;
+  label: string;
+  active?: boolean;
+  onClick?(): void;
 }
 
 function NavbarLink({ icon: Icon, label, active, onClick }: NavbarLinkProps) {
   return (
     <Tooltip label={label} position="right" transitionProps={{ duration: 0 }}>
-      <UnstyledButton onClick={onClick} className={classes.link} data-active={active || undefined}>
+      <UnstyledButton
+        onClick={onClick}
+        className={classes.link}
+        data-active={active || undefined}
+      >
         <Icon style={{ width: rem(20), height: rem(20) }} stroke={1.5} />
       </UnstyledButton>
     </Tooltip>
-  )
+  );
 }
 
 export interface SidebarNavItem {
-  icon: typeof IconHome2
-  label: string
+  icon: typeof IconHome2;
+  label: string;
 }
 
-export type SidebarNavList = SidebarNavItem[]
+export type SidebarNavList = SidebarNavItem[];
 
 export interface SideNavbarProps {
-  navList: SidebarNavList
+  navList: SidebarNavList;
 }
 
 export function SideNavbar({ navList }: SideNavbarProps) {
-  const dispatch =useAppDispatch()
-  const [active, setActive] = useState(0)
+  const dispatch = useAppDispatch();
+  const [active, setActive] = useState(0);
 
   const handleLogout = () => {
-    dispatch(logout())
-    dispatch(removeUser())
-  }
+    dispatch(logout());
+    dispatch(removeUser());
+  };
 
   const links = navList.map((link, index) => (
-    <NavbarLink {...link} key={link.label} active={index === active} onClick={() => setActive(index)} />
-  ))
+    <NavbarLink
+      {...link}
+      key={link.label}
+      active={index === active}
+      onClick={() => setActive(index)}
+    />
+  ));
 
   return (
     <nav className={classes.navbar}>
@@ -66,5 +75,5 @@ export function SideNavbar({ navList }: SideNavbarProps) {
         <NavbarLink icon={IconLogout} label="Logout" onClick={handleLogout} />
       </Stack>
     </nav>
-  )
+  );
 }

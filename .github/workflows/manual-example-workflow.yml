@@ -26,7 +26,7 @@ on:
         type: string
       examples:
         default: "ChatQnA"
-        description: 'List of examples to test [AgentQnA,AudioQnA,AvatarChatbot,ChatQnA,CodeGen,CodeTrans,DBQnA,DeepResearchAgent,DocIndexRetriever,DocSum,EdgeCraftRAG,FinanceAgent,GraphRAG,HybridRAG,InstructionTuning,MultimodalQnA,ProductivitySuite,RerankFinetuning,SearchQnA,Text2Image,Translation,VideoQnA,VisualQnA,WorkflowExecAgent]'
+        description: "List of examples to test [AgentQnA,AudioQnA,AvatarChatbot,ChatQnA,CodeGen,CodeTrans,DBQnA,DeepResearchAgent,DocIndexRetriever,DocSum,EdgeCraftRAG,FinanceAgent,GraphRAG,HybridRAG,InstructionTuning,MultimodalQnA,ProductivitySuite,RerankFinetuning,SearchQnA,Text2Image,Translation,VideoQnA,VisualQnA,WorkflowExecAgent]"
         required: true
         type: string
       tag:
@@ -36,22 +36,22 @@ on:
         type: string
       build:
         default: true
-        description: 'Build test required images for Examples'
+        description: "Build test required images for Examples"
         required: false
         type: boolean
       test_compose:
         default: true
-        description: 'Test examples with docker compose'
+        description: "Test examples with docker compose"
         required: false
         type: boolean
       test_helmchart:
         default: true
-        description: 'Test examples with helm charts'
+        description: "Test examples with helm charts"
         required: false
         type: boolean
       opea_branch:
         default: "main"
-        description: 'OPEA branch for image build'
+        description: "OPEA branch for image build"
         required: false
         type: string
       inject_commit:
@@ -72,15 +72,15 @@ jobs:
       examples: ${{ steps.get-matrix.outputs.examples }}
       nodes: ${{ steps.get-matrix.outputs.nodes }}
     steps:
-    - name: Create Matrix
-      id: get-matrix
-      run: |
-        examples=($(echo ${{ inputs.examples }} | tr ',' ' '))
-        examples_json=$(printf '%s\n' "${examples[@]}" | sort -u | jq -R '.' | jq -sc '.')
-        echo "examples=$examples_json" >> $GITHUB_OUTPUT
-        nodes=($(echo ${{ inputs.nodes }} | tr ',' ' '))
-        nodes_json=$(printf '%s\n' "${nodes[@]}" | sort -u | jq -R '.' | jq -sc '.')
-        echo "nodes=$nodes_json" >> $GITHUB_OUTPUT
+      - name: Create Matrix
+        id: get-matrix
+        run: |
+          examples=($(echo ${{ inputs.examples }} | tr ',' ' '))
+          examples_json=$(printf '%s\n' "${examples[@]}" | sort -u | jq -R '.' | jq -sc '.')
+          echo "examples=$examples_json" >> $GITHUB_OUTPUT
+          nodes=($(echo ${{ inputs.nodes }} | tr ',' ' '))
+          nodes_json=$(printf '%s\n' "${nodes[@]}" | sort -u | jq -R '.' | jq -sc '.')
+          echo "nodes=$nodes_json" >> $GITHUB_OUTPUT
 
   build-comps-base:
     needs: [get-test-matrix]

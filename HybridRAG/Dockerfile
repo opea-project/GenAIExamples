@@ -8,4 +8,3 @@ FROM $IMAGE_REPO/comps-base:$BASE_TAG
 COPY ./hybridrag.py $HOME/hybridrag.py
 
 ENTRYPOINT ["python", "hybridrag.py"]
-

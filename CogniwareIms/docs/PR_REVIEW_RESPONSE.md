@@ -255,6 +255,7 @@ data/
 The dependency review flagged 2 packages with unknown licenses. Investigation shows:
 
 1. **All packages use Apache 2.0 compatible licenses**:
+
    - Most: MIT, BSD, Apache 2.0
    - All: Compatible with OPEA Apache 2.0 requirements
 

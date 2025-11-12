@@ -24,7 +24,7 @@ on:
         required: true
         type: string
       deploy_method:
-        description: 'Test examples with docker compose or k8s charts'
+        description: "Test examples with docker compose or k8s charts"
         required: true
         type: string
       os:

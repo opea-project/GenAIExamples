@@ -3,16 +3,16 @@
 
 from typing import Any
 
-from edgecraftrag.base import BaseComponent, CompType, NodeParserType
-from edgecraftrag.utils import IMG_OUTPUT_DIR, DocxParagraphPicturePartitioner
 from llama_index.core.node_parser import HierarchicalNodeParser, SentenceSplitter, SentenceWindowNodeParser
 from llama_index.readers.file import UnstructuredReader
 from pydantic import model_serializer
 from unstructured.partition.docx import register_picture_partitioner
 
+from edgecraftrag.base import BaseComponent, CompType, NodeParserType
+from edgecraftrag.utils import IMG_OUTPUT_DIR, DocxParagraphPicturePartitioner
+
 
 class SimpleNodeParser(BaseComponent, SentenceSplitter):
-
     # Use super for SentenceSplitter since it's __init__ will cleanup
     # BaseComponent fields
     def __init__(self, **kwargs):
@@ -39,7 +39,6 @@ class SimpleNodeParser(BaseComponent, SentenceSplitter):
 
 
 class HierarchyNodeParser(BaseComponent, HierarchicalNodeParser):
-
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.comp_type = CompType.NODEPARSER
@@ -64,7 +63,6 @@ class HierarchyNodeParser(BaseComponent, HierarchicalNodeParser):
 
 
 class SWindowNodeParser(BaseComponent, SentenceWindowNodeParser):
-
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.comp_type = CompType.NODEPARSER

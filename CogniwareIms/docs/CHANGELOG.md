@@ -97,12 +97,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 #### Documentation
 
 - **`SECURITY_UPDATES.md`** - Comprehensive security vulnerability tracking
+
   - Complete CVE descriptions and fixes
   - Migration guide: python-jose → PyJWT
   - Testing requirements and compliance status
   - Additional security best practices
 
 - **`DATA_SETUP.md`** - Complete data download and setup guide
+
   - Quick start and detailed instructions
   - Automated and manual download options
   - Data hosting guide for maintainers
@@ -110,12 +112,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Comprehensive troubleshooting and FAQ
 
 - **`data/README.md`** - Data directory documentation
+
   - Data structure and file listing
   - Download instructions
   - Usage in application
   - Troubleshooting tips
 
 - **`PR_REVIEW_RESPONSE.md`** - Detailed response to OPEA PR review
+
   - Issue tracking and resolution
   - Testing performed
   - Migration timeline

@@ -36,9 +36,7 @@ class CSVProcessor:
 
         return dataframes
 
-    def prepare_for_embedding(
-        self, dataframes: Dict[str, pd.DataFrame]
-    ) -> List[Dict[str, Any]]:
+    def prepare_for_embedding(self, dataframes: Dict[str, pd.DataFrame]) -> List[Dict[str, Any]]:
         """Prepare data for OPEA embedding service."""
         documents = []
 
@@ -65,9 +63,7 @@ class CSVProcessor:
         logger.info(f"Prepared {len(documents)} documents for embedding")
         return documents
 
-    def extract_inventory_data(
-        self, dataframes: Dict[str, pd.DataFrame]
-    ) -> Dict[str, Any]:
+    def extract_inventory_data(self, dataframes: Dict[str, pd.DataFrame]) -> Dict[str, Any]:
         """Extract structured inventory data."""
         inventory_data = {
             "products": [],
@@ -116,9 +112,7 @@ class CSVProcessor:
         with open(output_dir / "knowledge_base.json", "w") as f:
             json.dump(knowledge_base, f, indent=2, default=str)
 
-        logger.info(
-            f"Knowledge base created with {len(knowledge_base['documents'])} documents"
-        )
+        logger.info(f"Knowledge base created with {len(knowledge_base['documents'])} documents")
 
         return knowledge_base
 

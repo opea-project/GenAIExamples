@@ -1,3 +1,6 @@
+// Copyright (C) 2024 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
+
 import {
   Box,
   Checkbox,
@@ -152,8 +155,8 @@ const DataSourceManagement = () => {
 
   const handleSearch = (value: string) => {
     const filteredList = dataList;
-    const searchResults = filteredList.filter((file: file) =>
-      file.name?.toLowerCase().includes(value.toLowerCase()),
+    const searchResults = filteredList.filter(
+      (file: file) => file.name?.toLowerCase().includes(value.toLowerCase()),
     );
     setDataList(value ? searchResults : sortFiles());
   };

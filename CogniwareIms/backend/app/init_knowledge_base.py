@@ -18,9 +18,7 @@ from app.services.embedding_service import embedding_service
 from app.services.knowledge_manager import knowledge_manager
 from app.services.retrieval_service import retrieval_service
 
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 
@@ -48,17 +46,13 @@ async def initialize_knowledge_base():
 
         for i in range(0, len(documents), batch_size):
             batch = documents[i : i + batch_size]
-            logger.info(
-                f"   Processing batch {i//batch_size + 1}/{(len(documents)-1)//batch_size + 1}..."
-            )
+            logger.info(f"   Processing batch {i//batch_size + 1}/{(len(documents)-1)//batch_size + 1}...")
 
             # Extract texts
             texts = [doc["text"] for doc in batch]
 
             # Generate embeddings in batch
-            embeddings = await embedding_service.embed_batch(
-                texts, batch_size=batch_size
-            )
+            embeddings = await embedding_service.embed_batch(texts, batch_size=batch_size)
 
             # Index each document
             for doc, embedding in zip(batch, embeddings):
@@ -133,9 +127,7 @@ async def quick_test():
 
         # Test knowledge manager
         stats = await knowledge_manager.get_knowledge_stats()
-        logger.info(
-            f"✅ Knowledge manager: OK ({stats.get('total_documents', 0)} documents)"
-        )
+        logger.info(f"✅ Knowledge manager: OK ({stats.get('total_documents', 0)} documents)")
 
         logger.info("\n🎉 All systems operational!")
 

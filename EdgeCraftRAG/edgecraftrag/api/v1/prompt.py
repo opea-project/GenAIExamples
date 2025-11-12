@@ -1,9 +1,13 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 # Copyright (C) 2025 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+from fastapi import FastAPI, File, HTTPException, UploadFile, status
+
 from edgecraftrag.api_schema import PromptIn
 from edgecraftrag.context import ctx
-from fastapi import FastAPI, File, HTTPException, UploadFile, status
 
 prompt_app = FastAPI()
 

@@ -7,12 +7,13 @@ from pathlib import Path
 from typing import Iterator, List, Optional
 
 from docx.text.paragraph import Paragraph
-from edgecraftrag.base import InferenceType
-from edgecraftrag.context import ctx
 from PIL import Image as Img
 from transformers import AutoTokenizer
 from unstructured.documents.elements import ElementMetadata, Image
 from unstructured.partition.docx import DocxPartitionerOptions
+
+from edgecraftrag.base import InferenceType
+from edgecraftrag.context import ctx
 
 UI_DIRECTORY = os.getenv("TMPFILE_PATH", "/home/user/ui_cache")
 IMG_OUTPUT_DIR = os.path.join(UI_DIRECTORY, "pic")

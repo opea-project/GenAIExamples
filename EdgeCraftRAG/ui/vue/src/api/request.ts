@@ -1,3 +1,6 @@
+// Copyright (C) 2024 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
+
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
@@ -40,7 +43,11 @@ service.interceptors.response.use(
       const antNotification = serviceManager.getService("antNotification");
 
       if (antNotification)
-        antNotification("success", i18n.global.t("common.success"), i18n.global.t(config.successMsg));
+        antNotification(
+          "success",
+          i18n.global.t("common.success"),
+          i18n.global.t(config.successMsg),
+        );
     }
     return Promise.resolve(res);
   },
@@ -56,7 +63,8 @@ service.interceptors.response.use(
       errorMessage = error.message;
     }
     const antNotification = serviceManager.getService("antNotification");
-    if (antNotification) antNotification("error", i18n.global.t("common.error"), errorMessage);
+    if (antNotification)
+      antNotification("error", i18n.global.t("common.error"), errorMessage);
 
     return Promise.reject(error);
   },

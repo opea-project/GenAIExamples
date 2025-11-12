@@ -6,7 +6,6 @@ from edgecraftrag.base import BaseComponent, BaseMgr, CallbackType, ModelType, N
 
 
 class NodeParserMgr(BaseMgr):
-
     def __init__(self):
         super().__init__()
 
@@ -56,7 +55,6 @@ class NodeParserMgr(BaseMgr):
 
 
 class IndexerMgr(BaseMgr):
-
     def __init__(self):
         super().__init__()
 
@@ -78,18 +76,15 @@ class IndexerMgr(BaseMgr):
 
 
 class RetrieverMgr(BaseMgr):
-
     def __init__(self):
         super().__init__()
 
 
 class PostProcessorMgr(BaseMgr):
-
     def __init__(self):
         super().__init__()
 
 
 class GeneratorMgr(BaseMgr):
-
     def __init__(self):
         super().__init__()

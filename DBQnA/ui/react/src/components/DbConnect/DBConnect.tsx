@@ -1,24 +1,34 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-import { Button, Text, TextInput, Title, Textarea, Loader } from '@mantine/core';
-import { TEXT_TO_SQL_URL } from '../../config';
+// Copyright (C) 2024 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
+
+import React, { useState } from "react";
+import axios from "axios";
+import {
+  Button,
+  Text,
+  TextInput,
+  Title,
+  Textarea,
+  Loader,
+} from "@mantine/core";
+import { TEXT_TO_SQL_URL } from "../../config";
 // import { notifications } from '@mantine/notifications';
-import styleClasses from './dbconnect.module.scss'; // Importing the SCSS file
+import styleClasses from "./dbconnect.module.scss"; // Importing the SCSS file
 
 const DBConnect: React.FC = () => {
   const [formData, setFormData] = useState({
-    user: 'postgres',
-    database: 'chinook',
-    host: '127.0.0.1',
-    password: 'testpwd',
-    port: '5442',
+    user: "postgres",
+    database: "chinook",
+    host: "127.0.0.1",
+    password: "testpwd",
+    port: "5442",
   });
 
   const [dbStatus, setDbStatus] = useState<string | null>(null);
   const [sqlStatus, setSqlStatus] = useState<string | null>(null);
   const [dberror, setDbError] = useState<string | null>(null);
   const [sqlerror, setSqlError] = useState<string | null>(null);
-  const [question, setQuestion] = useState<string>('');
+  const [question, setQuestion] = useState<string>("");
   const [sqlQuery, setSqlQuery] = useState<string | null>(null);
   const [queryOutput, setQueryOutput] = useState<string | null>(null);
   const [isConnected, setIsConnected] = useState<boolean>(false);
@@ -50,16 +60,22 @@ const DBConnect: React.FC = () => {
         conn_password: formData.password,
         conn_dialect: "postgresql",
       };
-      api_response = await axios.post(`${TEXT_TO_SQL_URL}/db/health`, unifiedConnData);
+      api_response = await axios.post(
+        `${TEXT_TO_SQL_URL}/db/health`,
+        unifiedConnData,
+      );
 
       setSqlStatus(null);
       setSqlError(null);
 
-      if (api_response.data.status && api_response.data.status.toLowerCase().includes('success')) {
+      if (
+        api_response.data.status &&
+        api_response.data.status.toLowerCase().includes("success")
+      ) {
         setDbStatus(api_response.data.message);
         setDbError(null);
         setIsConnected(true);
-        setQuestion('');
+        setQuestion("");
         setSqlQuery(null);
         setQueryOutput(null);
       } else {
@@ -69,13 +85,13 @@ const DBConnect: React.FC = () => {
         setSqlStatus(null);
       }
     } catch (err) {
-      setDbError('Failed to connect to the database.');
+      setDbError("Failed to connect to the database.");
       setIsConnected(false);
       setDbStatus(null);
       setSqlStatus(null);
     }
   };
-  
+
   // Handle generating SQL query
   const handleGenerateSQL = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -96,10 +112,10 @@ const DBConnect: React.FC = () => {
 
       setSqlQuery(api_response.data.result.sql); // Assuming the API returns an SQL query
       setQueryOutput(api_response.data.result.output);
-      setSqlError(null)
-      setSqlStatus('SQL query output generated successfully')
+      setSqlError(null);
+      setSqlStatus("SQL query output generated successfully");
     } catch (err) {
-      setSqlError('Failed to generate SQL query output.');
+      setSqlError("Failed to generate SQL query output.");
     } finally {
       setIsLoading(false); // Stop loading
     }
@@ -171,8 +187,12 @@ const DBConnect: React.FC = () => {
           </Button>
         </form>
 
-        {dbStatus && <Text className={styleClasses.status}>Status: {dbStatus}</Text>}
-        {dberror && <Text className={styleClasses.error}>Error: {dberror}</Text>}
+        {dbStatus && (
+          <Text className={styleClasses.status}>Status: {dbStatus}</Text>
+        )}
+        {dberror && (
+          <Text className={styleClasses.error}>Error: {dberror}</Text>
+        )}
       </div>
 
       {/* DBQnA Section */}
@@ -192,8 +212,19 @@ const DBConnect: React.FC = () => {
               </div>
             </div>
 
-            <Button type="submit" className={styleClasses.submitButton} fullWidth disabled={isLoading}>
-            {isLoading ? <div className="loader-container"><Loader size="sm" /></div> : 'Generate SQL Query Output'}
+            <Button
+              type="submit"
+              className={styleClasses.submitButton}
+              fullWidth
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <div className="loader-container">
+                  <Loader size="sm" />
+                </div>
+              ) : (
+                "Generate SQL Query Output"
+              )}
             </Button>
           </form>
         )}
@@ -204,18 +235,21 @@ const DBConnect: React.FC = () => {
             <form className={styleClasses.form}>
               <div className={styleClasses.inputField}>
                 <label>Generated SQL Query:</label>
-                <Textarea value={sqlQuery.replace('\n', '')} readOnly />
+                <Textarea value={sqlQuery.replace("\n", "")} readOnly />
                 <label>Generated SQL Query Output:</label>
-                <Textarea value={queryOutput.replace('</s>', '')} readOnly />
+                <Textarea value={queryOutput.replace("</s>", "")} readOnly />
               </div>
             </form>
           </div>
         )}
 
         {/* Display SQL generation status, error if any */}
-        {sqlStatus && !isLoading && <Text className={styleClasses.status}>Status: {sqlStatus}</Text>}
-        {sqlerror && !isLoading && <Text className={styleClasses.error}>Error: {sqlerror}</Text>}
-
+        {sqlStatus && !isLoading && (
+          <Text className={styleClasses.status}>Status: {sqlStatus}</Text>
+        )}
+        {sqlerror && !isLoading && (
+          <Text className={styleClasses.error}>Error: {sqlerror}</Text>
+        )}
       </div>
     </div>
   );

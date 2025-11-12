@@ -49,9 +49,7 @@ class SecurityManager:
         return pwd_context.hash(password)
 
     @staticmethod
-    def create_access_token(
-        data: Dict[str, Any], expires_delta: Optional[timedelta] = None
-    ) -> str:
+    def create_access_token(data: Dict[str, Any], expires_delta: Optional[timedelta] = None) -> str:
         """Create a JWT access token.
 
         Args:
@@ -135,9 +133,7 @@ def get_current_user(
     # Extract user info from payload
     email = payload.get("sub")
     if email is None:
-        raise HTTPException(
-            status_code=401, detail="Invalid authentication credentials"
-        )
+        raise HTTPException(status_code=401, detail="Invalid authentication credentials")
 
     return payload
 
@@ -154,9 +150,7 @@ def require_role(required_role: str):
     def role_checker(current_user: Dict = Depends(get_current_user)):
         user_role = current_user.get("role")
         if user_role != required_role:
-            raise HTTPException(
-                status_code=403, detail=f"Access denied. Required role: {required_role}"
-            )
+            raise HTTPException(status_code=403, detail=f"Access denied. Required role: {required_role}")
         return current_user
 
     return role_checker
@@ -235,9 +229,7 @@ class RateLimiter:
     def __init__(self):
         self.requests = {}
 
-    def is_allowed(
-        self, identifier: str, max_requests: int = 60, window_seconds: int = 60
-    ) -> bool:
+    def is_allowed(self, identifier: str, max_requests: int = 60, window_seconds: int = 60) -> bool:
         """Check if request is allowed under rate limit.
 
         Args:
@@ -255,9 +247,7 @@ class RateLimiter:
 
         # Clean old requests
         cutoff = now - timedelta(seconds=window_seconds)
-        self.requests[identifier] = [
-            req_time for req_time in self.requests[identifier] if req_time > cutoff
-        ]
+        self.requests[identifier] = [req_time for req_time in self.requests[identifier] if req_time > cutoff]
 
         # Check limit
         if len(self.requests[identifier]) >= max_requests:

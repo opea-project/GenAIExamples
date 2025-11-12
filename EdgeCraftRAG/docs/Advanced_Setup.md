@@ -199,7 +199,7 @@ This section is the same as default vLLM inference section, please refer to [Sta
 
 ## EC-RAG with Kbadmin
 
-EC-RAG support kbadmin as a knowledge base manager  
+EC-RAG support kbadmin as a knowledge base manager
 Please make sure all the kbadmin services have been launched
 EC-RAG Docker Images preparation is the same as local inference section, please refer to [Build Docker Images](#1-optional-build-docker-images-for-mega-service-server-and-ui-by-your-own)
 Model preparation is the same as vLLM inference section, please refer to [Prepare models](../docker_compose/intel/gpu/arc/README.md#2-prepare-models)

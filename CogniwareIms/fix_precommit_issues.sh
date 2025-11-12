@@ -41,4 +41,3 @@ echo ""
 echo "Next steps:"
 echo "  git add ."
 echo "  git commit -m 'Fix pre-commit issues'"
-

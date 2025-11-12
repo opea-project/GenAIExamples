@@ -1,8 +1,7 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-x-common-environment:
-  &common-env
+x-common-environment: &common-env
   no_proxy: ${no_proxy}
   http_proxy: ${http_proxy}
   https_proxy: ${https_proxy}

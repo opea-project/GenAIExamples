@@ -1,3 +1,6 @@
+// Copyright (C) 2024 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
+
 import { FileDownloadOutlined } from "@mui/icons-material";
 import { IconButton, Tooltip } from "@mui/material";
 import { conversationSelector } from "@redux/Conversation/ConversationSlice";
@@ -35,7 +38,9 @@ const DownloadChat = () => {
       type,
     };
 
-    const newUrl = `data:application/json;charset=utf-8;base64,${safeBtoa(JSON.stringify(conversationObject))}`;
+    const newUrl = `data:application/json;charset=utf-8;base64,${safeBtoa(
+      JSON.stringify(conversationObject),
+    )}`;
 
     if (
       selectedConversationHistory &&

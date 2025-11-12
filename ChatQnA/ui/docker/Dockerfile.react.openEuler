@@ -3,7 +3,7 @@
 
 # Use node 20.11.1 as the base image
 FROM openeuler/node:20.11.1-oe2403lts as vite-app
- 
+
 COPY react /usr/app/react
 WORKDIR /usr/app/react
 

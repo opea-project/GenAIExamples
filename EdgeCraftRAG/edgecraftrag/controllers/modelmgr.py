@@ -14,7 +14,6 @@ from edgecraftrag.components.model import (
 
 
 class ModelMgr(BaseMgr):
-
     def __init__(self):
         self._lock = asyncio.Lock()
         super().__init__()

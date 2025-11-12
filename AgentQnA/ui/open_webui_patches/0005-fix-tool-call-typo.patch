@@ -13,13 +13,12 @@ index 9e44ed91a..82aed5346 100644
 +++ b/backend/open_webui/utils/middleware.py
 @@ -1142,7 +1142,7 @@ async def process_chat_response(
                                  result_display_content = f"{result_display_content}\n> {tool_name}: {result.get('content', '')}"
- 
+
                              if not raw:
 -                                content = f'{content}\n<details type="tool_calls" done="true" content="{html.escape(json.dumps(block_content))}" results="{html.escape(json.dumps(results))}">\n<summary> Tool: {tool_call.get('function', {}).get('name', '')} Executed</summary>\n{result_display_content}\n</details>\n'
 +                                content = f'{content}\n<details type="tool_calls" done="true" content="{html.escape(json.dumps(block_content))}" results="{html.escape(json.dumps(results))}">\n<summary> Tool: {tool_call.get("function", {}).get("name", "")} Executed</summary>\n{result_display_content}\n</details>\n'
                          else:
                              tool_calls_display_content = ""
- 
--- 
-2.34.1
 
+--
+2.34.1

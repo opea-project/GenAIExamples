@@ -51,6 +51,7 @@ If you discover a security vulnerability, please report it responsibly:
 ### Critical (Before Going Live)
 
 - [ ] **Change all default passwords**
+
   - PostgreSQL admin password
   - Default user passwords
   - Grafana admin password
@@ -64,12 +65,14 @@ If you discover a security vulnerability, please report it responsibly:
   Update `JWT_SECRET_KEY` in `.env`
 
 - [ ] **Enable HTTPS/TLS**
+
   - Obtain SSL certificates (Let's Encrypt recommended)
   - Configure nginx with HTTPS
   - Force HTTPS redirects
   - Enable HSTS header
 
 - [ ] **Configure CORS properly**
+
   - Set specific allowed origins (not `*`)
   - Update `ALLOWED_ORIGINS` in `.env`
 
@@ -80,26 +83,31 @@ If you discover a security vulnerability, please report it responsibly:
 ### Recommended
 
 - [ ] **Enable rate limiting**
+
   - Configure `RATE_LIMIT_PER_MINUTE` appropriately
   - Monitor for abuse patterns
 
 - [ ] **Set up firewall rules**
+
   - Only expose necessary ports (80, 443)
   - Restrict database ports (5432, 6379) to internal network
   - Block direct access to OPEA services from internet
 
 - [ ] **Enable audit logging**
+
   - Configure centralized logging
   - Set up log rotation and retention
   - Monitor for suspicious activities
 
 - [ ] **Regular backups**
+
   - Database backups (PostgreSQL)
   - Redis snapshots
   - Knowledge base exports
   - Disaster recovery plan
 
 - [ ] **Security updates**
+
   - Regularly update Docker images
   - Monitor CVE databases
   - Update dependencies (`pip-audit`, `npm audit`)
@@ -203,16 +211,19 @@ docker-compose logs nginx | grep "403\|404\|500"
 If security breach detected:
 
 1. **Immediate**
+
    - Isolate affected systems
    - Change all credentials
    - Review logs for compromise extent
 
 2. **Investigation**
+
    - Identify attack vector
    - Assess data exposure
    - Document timeline
 
 3. **Remediation**
+
    - Patch vulnerabilities
    - Update security policies
    - Notify affected users if required

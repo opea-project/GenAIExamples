@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: Apache-2.0
 
 services:
-
   tgi-service:
     image: ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu
     container_name: tgi-server
@@ -106,7 +105,8 @@ services:
       HF_TOKEN: ${HF_TOKEN}
       LOGFLAG: true
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:5000/v1/health_check || exit 1"]
+      test:
+        ["CMD-SHELL", "curl -f http://localhost:5000/v1/health_check || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 10

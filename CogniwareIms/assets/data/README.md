@@ -33,6 +33,7 @@ This script will:
 ### Option 2: Manual Download
 
 1. **Download the data archive**:
+
    - Repository: [Cogniware-OPEA-IMS-Data](https://github.com/Cogniware-Inc/Cogniware-OPEA-IMS-Data)
    - Direct Download: `https://github.com/Cogniware-Inc/Cogniware-OPEA-IMS-Data/archive/refs/heads/main.zip`
    - Alternative: Contact Cogniware for data access
@@ -189,6 +190,7 @@ sha256sum -c data-checksums.txt
 When developing with this data:
 
 1. **Never commit data files to Git**
+
    - .gitignore excludes data/ directory
    - Only commit this README.md
 
@@ -222,6 +224,7 @@ For maintainers hosting the data:
    ```
 
 3. **Upload to hosting**:
+
    - GitHub Releases (recommended)
    - Cloud storage (GCS, S3, Azure)
    - CDN for faster distribution
@@ -238,6 +241,7 @@ For maintainers hosting the data:
 Replace sample data with your own CSV files:
 
 1. **Format requirements**:
+
    - UTF-8 encoding
    - Header row with column names
    - Consistent structure

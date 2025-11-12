@@ -5,8 +5,9 @@ import json
 import os
 from typing import Any, Dict, List, Optional, Union
 
-from edgecraftrag.base import BaseComponent
 from pydantic import model_serializer
+
+from edgecraftrag.base import BaseComponent
 
 
 class Knowledge(BaseComponent):

@@ -115,7 +115,7 @@ The table below lists currently available deployment options. They outline in de
 
 ## Monitor and Tracing
 
-Follow [OpenTelemetry OPEA Guide](https://opea-project.github.io/latest/tutorial/OpenTelemetry/OpenTelemetry_OPEA_Guide.html) to understand how to use OpenTelemetry tracing and metrics in OPEA.  
+Follow [OpenTelemetry OPEA Guide](https://opea-project.github.io/latest/tutorial/OpenTelemetry/OpenTelemetry_OPEA_Guide.html) to understand how to use OpenTelemetry tracing and metrics in OPEA.
 For ChatQnA specific tracing and metrics monitoring, follow [OpenTelemetry on ChatQnA](https://opea-project.github.io/latest/tutorial/OpenTelemetry/deploy/ChatQnA.html) section.
 
 ## FAQ Generation Application

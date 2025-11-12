@@ -4,7 +4,12 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { RootState, store } from "../store";
 import { fetchEventSource } from "@microsoft/fetch-event-source";
-import { Message, MessageRole, ConversationReducer, ConversationRequest } from "./Conversation";
+import {
+  Message,
+  MessageRole,
+  ConversationReducer,
+  ConversationRequest,
+} from "./Conversation";
 import { getCurrentTimeStamp, uuidv4 } from "../../common/util";
 import { createAsyncThunkWrapper } from "../thunkUtil";
 import client from "../../common/client";
@@ -30,13 +35,18 @@ export const ConversationSlice = createSlice({
       state.onGoingResult = action.payload;
     },
     addMessageToMessages: (state, action: PayloadAction<Message>) => {
-      const selectedConversation = state.conversations.find((x) => x.conversationId === state.selectedConversationId);
+      const selectedConversation = state.conversations.find(
+        (x) => x.conversationId === state.selectedConversationId,
+      );
       selectedConversation?.Messages?.push(action.payload);
     },
     newConversation: (state) => {
       (state.selectedConversationId = ""), (state.onGoingResult = "");
     },
-    createNewConversation: (state, action: PayloadAction<{ title: string; id: string; message: Message }>) => {
+    createNewConversation: (
+      state,
+      action: PayloadAction<{ title: string; id: string; message: Message }>,
+    ) => {
       state.conversations.push({
         title: action.payload.title,
         conversationId: action.payload.id,
@@ -87,18 +97,21 @@ export const submitDataSourceURL = createAsyncThunkWrapper(
     return response.data;
   },
 );
-export const uploadFile = createAsyncThunkWrapper("conversation/uploadFile", async ({ file }: { file: File }, {}) => {
-  const body = new FormData();
-  body.append("files", file);
+export const uploadFile = createAsyncThunkWrapper(
+  "conversation/uploadFile",
+  async ({ file }: { file: File }, {}) => {
+    const body = new FormData();
+    body.append("files", file);
 
-  notifications.show({
-    id: "upload-file",
-    message: "uploading File",
-    loading: true,
-  });
-  const response = await client.post(DATA_PREP_URL, body);
-  return response.data;
-});
+    notifications.show({
+      id: "upload-file",
+      message: "uploading File",
+      loading: true,
+    });
+    const response = await client.post(DATA_PREP_URL, body);
+    return response.data;
+  },
+);
 export const {
   logout,
   setOnGoingResult,
@@ -107,7 +120,8 @@ export const {
   setSelectedConversationId,
   createNewConversation,
 } = ConversationSlice.actions;
-export const conversationSelector = (state: RootState) => state.conversationReducer;
+export const conversationSelector = (state: RootState) =>
+  state.conversationReducer;
 export default ConversationSlice.reducer;
 
 export const doConversation = (conversationRequest: ConversationRequest) => {
@@ -148,7 +162,11 @@ export const doConversation = (conversationRequest: ConversationRequest) => {
       async onopen(response) {
         if (response.ok) {
           return;
-        } else if (response.status >= 400 && response.status < 500 && response.status !== 429) {
+        } else if (
+          response.status >= 400 &&
+          response.status < 500 &&
+          response.status !== 429
+        ) {
           const e = await response.json();
           console.log(e);
           throw Error(e.error.message);

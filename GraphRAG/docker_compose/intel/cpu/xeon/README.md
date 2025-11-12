@@ -280,7 +280,7 @@ Xeon default configuration:
 | MicroService | Open Source Project | HW | Default Port | Endpoint |
 | ------------ | ------------------- | --- | ------------ | -------- |
 | Dataprep | Neo4j, LlamaIndex | OpenAI-like Endpoint | 6004 | /v1/dataprep/ingest |
-| Embedding | Llama-index, TEI | Xeon or CPU | 6006 | /v1/embeddings |  
+| Embedding | Llama-index, TEI | Xeon or CPU | 6006 | /v1/embeddings |
 | Retriever | Llama-index, Neo4j | OpenAI-like Endpoint | 7000 | /v1/retrieval |
 | Final LLM | vLLM | Xeon or CPU | 9009 | /v1/chat/completions |
 

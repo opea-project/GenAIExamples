@@ -155,8 +155,7 @@ services:
       LLM_MODEL: ${LLM_MODEL}
       TP: ${TP:-1}
       DP: ${DP:-1}
-    entrypoint:
-      /bin/bash -c "
+    entrypoint: /bin/bash -c "
       cd  /workspace/vllm/models &&
       VLLM_OFFLOAD_WEIGHTS_BEFORE_QUANT=1 \
       TORCH_LLM_ALLREDUCE=1 \

@@ -1,15 +1,12 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-
-x-common-environment:
-  &common-env
+x-common-environment: &common-env
   no_proxy: ${no_proxy}
   http_proxy: ${http_proxy}
   https_proxy: ${https_proxy}
 
-x-common-agent-environment:
-  &common-agent-env
+x-common-agent-environment: &common-agent-env
   <<: *common-env
   HF_TOKEN: ${HF_TOKEN}
   model: ${LLM_MODEL_ID}
@@ -18,7 +15,6 @@ x-common-agent-environment:
   OPENAI_BASE_URL: ${OPENAI_BASE_URL}
 
 services:
-
   vllm-service:
     image: opea/vllm-gaudi:1.22.0
     container_name: vllm-gaudi-server

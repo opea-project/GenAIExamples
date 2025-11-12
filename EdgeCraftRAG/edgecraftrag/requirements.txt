@@ -27,4 +27,3 @@ torchvision==0.23.0+cpu
 unstructured
 unstructured[pdf]
 werkzeug==3.1.3
-

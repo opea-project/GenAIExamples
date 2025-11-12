@@ -139,21 +139,25 @@ rm -rf Cogniware-OPEA-IMS-Data
 ### GitHub Repository Advantages
 
 1. **✅ Version Control**
+
    - Full Git history for data changes
    - Easy to track updates and modifications
    - Rollback capability if needed
 
 2. **✅ Free Hosting**
+
    - No cloud storage costs
    - Reliable GitHub infrastructure
    - Automatic CDN distribution
 
 3. **✅ Easy Updates**
+
    - Push new CSV files to repository
    - Users download latest automatically
    - No URL changes needed
 
 4. **✅ Transparency**
+
    - Public repository
    - Community can view data
    - Open source compliance
@@ -181,20 +185,24 @@ rm -rf Cogniware-OPEA-IMS-Data
 ### Download Script Behavior
 
 1. **Check Existing Data**:
+
    - Prompts user if data already exists
    - Option to skip or re-download
 
 2. **Dependency Validation**:
+
    - Checks for `curl` or `wget`
    - Checks for `unzip`
    - Warns if optional tools missing
 
 3. **Download Process**:
+
    - Downloads ZIP archive from GitHub
    - Shows progress bar
    - Handles download failures gracefully
 
 4. **Extraction Process**:
+
    - Extracts to temporary directory
    - Identifies data subdirectory automatically
    - Copies only CSV files to destination
@@ -387,12 +395,14 @@ rm -rf data/* main.zip
 ### Updated Files:
 
 1. **`scripts/download-data.sh`**
+
    - Changed DATA_URL to GitHub
    - Updated extraction logic for ZIP
    - Added unzip dependency check
    - Improved error handling
 
 2. **`DATA_SETUP.md`**
+
    - Updated download instructions
    - Changed to ZIP format examples
    - Added GitHub repository information

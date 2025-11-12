@@ -168,4 +168,3 @@ fi
 echo ""
 echo "🎉 System is ready! Open http://localhost:3000 in your browser."
 echo ""
-

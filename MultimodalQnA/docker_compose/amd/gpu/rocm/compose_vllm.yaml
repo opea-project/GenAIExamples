@@ -39,7 +39,8 @@ services:
       MULTIMODAL_DATAPREP: true
       DATAPREP_COMPONENT_NAME: "OPEA_DATAPREP_MULTIMODALREDIS"
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:5000/v1/health_check || exit 1"]
+      test:
+        ["CMD-SHELL", "curl -f http://localhost:5000/v1/health_check || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 10
@@ -55,12 +56,24 @@ services:
       https_proxy: ${https_proxy}
       PORT: ${EMBEDDER_PORT}
     healthcheck:
-      test: ["CMD-SHELL", "http_proxy='' curl -f http://localhost:${EMBEDDER_PORT}/v1/health_check"]
+      test:
+        [
+          "CMD-SHELL",
+          "http_proxy='' curl -f http://localhost:${EMBEDDER_PORT}/v1/health_check",
+        ]
       interval: 10s
       timeout: 6s
       retries: 18
       start_period: 30s
-    entrypoint: ["python", "bridgetower_server.py", "--device", "cpu", "--model_name_or_path", $EMBEDDING_MODEL_ID]
+    entrypoint:
+      [
+        "python",
+        "bridgetower_server.py",
+        "--device",
+        "cpu",
+        "--model_name_or_path",
+        $EMBEDDING_MODEL_ID,
+      ]
     restart: unless-stopped
   embedding:
     image: ${REGISTRY:-opea}/embedding:${TAG:-latest}
@@ -124,7 +137,7 @@ services:
     security_opt:
       - seccomp:unconfined
       - apparmor=unconfined
-    command: "--model ${MULTIMODAL_LLM_MODEL_ID} --swap-space 16 --disable-log-requests --dtype float16 --tensor-parallel-size 1 --host 0.0.0.0 --port 8011 --num-scheduler-steps 1 --distributed-executor-backend \"mp\""
+    command: '--model ${MULTIMODAL_LLM_MODEL_ID} --swap-space 16 --disable-log-requests --dtype float16 --tensor-parallel-size 1 --host 0.0.0.0 --port 8011 --num-scheduler-steps 1 --distributed-executor-backend "mp"'
     ipc: host
   lvm:
     image: ${REGISTRY:-opea}/lvm:${TAG:-latest}

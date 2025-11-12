@@ -1,3 +1,6 @@
+// Copyright (C) 2024 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
+
 // Copyright (c) 2024 Intel Corporation
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,7 +19,11 @@ import { SSE } from "sse.js";
 
 const BASE_URL = env.BASE_URL;
 
-export async function fetchLanguageResponse(input: string, transform: string, transTo: string) {
+export async function fetchLanguageResponse(
+  input: string,
+  transform: string,
+  transTo: string,
+) {
   let payload = {};
   let url = "";
 

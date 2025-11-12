@@ -21,7 +21,7 @@ index c5fad1323..32be528a7 100644
 --- a/src/lib/apis/knowledge/index.ts
 +++ b/src/lib/apis/knowledge/index.ts
 @@ -345,3 +345,63 @@ export const deleteKnowledgeById = async (token: string, id: string) => {
- 
+
  	return res;
  };
 +
@@ -91,7 +91,7 @@ index 2fcfadaec..3237744d5 100644
 @@ -47,6 +47,9 @@
  	let showAddOpenAIConnectionModal = false;
  	let showAddOllamaConnectionModal = false;
- 
+
 +	let ENABLE_ICLOUD_API: null | boolean = (localStorage.getItem('ENABLE_ICLOUD_API') === "enable");
 +	let ICLOUD_BASE_URL = localStorage.getItem('ICLOUD_BASE_URL') || '';
 +
@@ -101,7 +101,7 @@ index 2fcfadaec..3237744d5 100644
 @@ -193,10 +196,22 @@
  		}
  	});
- 
+
 +	const updateIcloudHandler = async () => {
 +		if (ENABLE_ICLOUD_API) {
 +			localStorage.setItem('ICLOUD_BASE_URL', ICLOUD_BASE_URL);
@@ -118,22 +118,22 @@ index 2fcfadaec..3237744d5 100644
  		updateOllamaHandler();
  		updateDirectConnectionsHandler();
 +		updateIcloudHandler();
- 
+
  		dispatch('save');
  	};
 @@ -301,7 +316,7 @@
  				</div>
- 
+
  				{#if ENABLE_OLLAMA_API}
 -					<hr class=" border-gray-100 dark:border-gray-850 my-2" />
 +					<hr class=" border-gray-100 dark:border-gray-850" />
- 
+
  					<div class="">
  						<div class="flex justify-between items-center">
 @@ -358,6 +373,39 @@
  				{/if}
  			</div>
- 
+
 +			<hr class=" border-gray-50 dark:border-gray-850" />
 +
 +			<div class="pr-1.5 my-2">
@@ -141,8 +141,8 @@ index 2fcfadaec..3237744d5 100644
 +					<div class="font-medium">{$i18n.t('Icloud File API')}</div>
 +
 +					<div class="mt-1">
-+						<Switch 
-+							bind:state={ENABLE_ICLOUD_API} 
++						<Switch
++							bind:state={ENABLE_ICLOUD_API}
 +							on:change={async () => {
 +								updateIcloudHandler();
 +							}}
@@ -168,7 +168,7 @@ index 2fcfadaec..3237744d5 100644
 +			</div>
 +
  			<hr class=" border-gray-100 dark:border-gray-850" />
- 
+
  			<div class="pr-1.5 my-2">
 diff --git a/src/lib/components/icons/UploadCloudIcon.svelte b/src/lib/components/icons/UploadCloudIcon.svelte
 new file mode 100644
@@ -206,7 +206,7 @@ index 57d45312d..43a1f305e 100644
 +		getKnowledgeBaseList,
 +		getIcloudFiles
  	} from '$lib/apis/knowledge';
- 
+
  	import { goto } from '$app/navigation';
 @@ -26,6 +27,11 @@
  	import Spinner from '../common/Spinner.svelte';
@@ -217,12 +217,12 @@ index 57d45312d..43a1f305e 100644
 +
 +	let showAddTextContentModal = false;
 +	let IcloudFile = [];
- 
+
  	let loaded = false;
- 
+
 @@ -65,9 +71,26 @@
  	};
- 
+
  	onMount(async () => {
 +		await updateIcloudFiles();
 +
@@ -233,7 +233,7 @@ index 57d45312d..43a1f305e 100644
 +	async function updateIcloudFiles() {
 +		let ICLOUD_BASE_URL = localStorage.getItem('ICLOUD_BASE_URL') || '';
 +		console.log('ICLOUD_BASE_URL', ICLOUD_BASE_URL);
-+		
++
 +		if (ICLOUD_BASE_URL !== '') {
 +			const res = await getIcloudFiles(ICLOUD_BASE_URL).catch((e) => {
 +				toast.error(`${e}`);
@@ -245,12 +245,12 @@ index 57d45312d..43a1f305e 100644
 +		}
 +	}
  </script>
- 
+
  <svelte:head>
 @@ -187,11 +210,39 @@
  		{/each}
  	</div>
- 
+
 -	<div class=" text-gray-500 text-xs mt-1 mb-2">
 -		ⓘ {$i18n.t("Use '#' in the prompt input to load and include your knowledge.")}
 +	<div class="flex justify-between items-center">
@@ -526,6 +526,5 @@ index ebb53a1b5..d6b72e04d 100644
 +	"Upload Succeed": "上传文件成功",
 +	"Icloud API settings updated": "云端存储API设置已更新"
  }
--- 
+--
 2.34.1
-

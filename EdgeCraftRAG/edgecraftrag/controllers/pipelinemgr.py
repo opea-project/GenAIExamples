@@ -6,14 +6,14 @@ import gc
 from typing import Any, List
 
 from comps.cores.proto.api_protocol import ChatCompletionRequest
+from llama_index.core.schema import Document
+
 from edgecraftrag.base import BaseMgr, CallbackType
 from edgecraftrag.components.pipeline import Pipeline
 from edgecraftrag.controllers.nodemgr import NodeMgr
-from llama_index.core.schema import Document
 
 
 class PipelineMgr(BaseMgr):
-
     def __init__(self):
         self._active_pipeline = None
         self._lock = asyncio.Lock()

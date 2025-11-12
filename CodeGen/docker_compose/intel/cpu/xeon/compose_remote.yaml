@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: Apache-2.0
 
 services:
-
   codegen-xeon-backend-server:
     image: ${REGISTRY:-opea}/codegen:${TAG:-latest}
     container_name: codegen-xeon-backend-server
@@ -66,7 +65,8 @@ services:
       HF_TOKEN: ${HF_TOKEN}
       LOGFLAG: true
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:5000/v1/health_check || exit 1"]
+      test:
+        ["CMD-SHELL", "curl -f http://localhost:5000/v1/health_check || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 10
@@ -87,7 +87,8 @@ services:
       host_ip: ${host_ip}
       HF_TOKEN: ${HF_TOKEN}
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://${host_ip}:${TEI_EMBEDDER_PORT}/health"]
+      test:
+        ["CMD", "curl", "-f", "http://${host_ip}:${TEI_EMBEDDER_PORT}/health"]
       interval: 10s
       timeout: 6s
       retries: 48

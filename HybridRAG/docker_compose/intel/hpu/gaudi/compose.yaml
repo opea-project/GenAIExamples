@@ -38,10 +38,10 @@ services:
       - "${NEO4J_PORT1:-7474}:7474"
       - "${NEO4J_PORT2:-7687}:7687"
     volumes:
-        - ./data/neo4j/logs:/logs
-        - ./data/neo4j/config:/config
-        - ./data/neo4j/data:/data
-        - ./data/neo4j/plugins:/plugins
+      - ./data/neo4j/logs:/logs
+      - ./data/neo4j/config:/config
+      - ./data/neo4j/data:/data
+      - ./data/neo4j/plugins:/plugins
     ipc: host
     environment:
       - no_proxy=${no_proxy}

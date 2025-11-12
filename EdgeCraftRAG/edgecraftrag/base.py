@@ -10,7 +10,6 @@ from pydantic import BaseModel, ConfigDict, Field, model_serializer
 
 
 class CompType(str, Enum):
-
     DEFAULT = "default"
     MODEL = "model"
     PIPELINE = "pipeline"
@@ -25,7 +24,6 @@ class CompType(str, Enum):
 
 
 class ModelType(str, Enum):
-
     EMBEDDING = "embedding"
     RERANKER = "reranker"
     LLM = "llm"
@@ -41,7 +39,6 @@ class FileType(str, Enum):
 
 
 class NodeParserType(str, Enum):
-
     SIMPLE = "simple"
     HIERARCHY = "hierarchical"
     SENTENCEWINDOW = "sentencewindow"
@@ -50,7 +47,6 @@ class NodeParserType(str, Enum):
 
 
 class IndexerType(str, Enum):
-
     FAISS_VECTOR = "faiss_vector"
     DEFAULT_VECTOR = "vector"
     MILVUS_VECTOR = "milvus_vector"
@@ -58,7 +54,6 @@ class IndexerType(str, Enum):
 
 
 class RetrieverType(str, Enum):
-
     VECTORSIMILARITY = "vectorsimilarity"
     AUTOMERGE = "auto_merge"
     BM25 = "bm25"
@@ -66,31 +61,26 @@ class RetrieverType(str, Enum):
 
 
 class PostProcessorType(str, Enum):
-
     RERANKER = "reranker"
     METADATAREPLACE = "metadata_replace"
 
 
 class GeneratorType(str, Enum):
-
     CHATQNA = "chatqna"
 
 
 class InferenceType(str, Enum):
-
     LOCAL = "local"
     VLLM = "vllm"
 
 
 class CallbackType(str, Enum):
-
     DATAPREP = "dataprep"
     RETRIEVE = "retrieve"
     PIPELINE = "pipeline"
 
 
 class BaseComponent(BaseModel):
-
     model_config = ConfigDict(extra="allow", arbitrary_types_allowed=True)
 
     idx: str = Field(default_factory=lambda: str(uuid.uuid4()))
@@ -114,7 +104,6 @@ class BaseComponent(BaseModel):
 
 
 class BaseMgr:
-
     def __init__(self):
         self.components = {}
 

@@ -4,6 +4,11 @@
 import os
 
 import uvicorn
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from llama_index.core.settings import Settings
+
 from edgecraftrag.api.v1.chatqna import chatqna_app
 from edgecraftrag.api.v1.data import data_app
 from edgecraftrag.api.v1.knowledge_base import kb_app, load_knowledge_from_file
@@ -12,10 +17,6 @@ from edgecraftrag.api.v1.pipeline import load_pipeline_from_file, pipeline_app
 from edgecraftrag.api.v1.prompt import prompt_app
 from edgecraftrag.api.v1.system import system_app
 from edgecraftrag.utils import UI_DIRECTORY
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
-from llama_index.core.settings import Settings
 
 
 async def lifespan(app: FastAPI):

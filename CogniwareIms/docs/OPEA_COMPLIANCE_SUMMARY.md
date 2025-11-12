@@ -76,18 +76,22 @@ class CogniwareIMSService:
 The system orchestrates these OPEA microservices:
 
 1. **LLM Microservice** (Port 9000)
+
    - Model: Intel/neural-chat-7b-v3-3
    - Service Type: `ServiceType.LLM`
 
 2. **Embedding Microservice** (Port 6000)
+
    - Model: BAAI/bge-base-en-v1.5
    - Service Type: `ServiceType.EMBEDDING`
 
 3. **Retriever Microservice** (Port 7000)
+
    - Backend: Redis Vector Database
    - Service Type: `ServiceType.RETRIEVER`
 
 4. **Reranking Microservice** (Port 8000)
+
    - Model: BAAI/bge-reranker-base
    - Service Type: `ServiceType.RERANK`
 
