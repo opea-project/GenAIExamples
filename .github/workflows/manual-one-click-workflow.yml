@@ -27,8 +27,11 @@ on:
       os:
         default: "debian"
         description: "OS to run the test on debian or openeuler"
+        type: choice
         required: true
-        type: string
+        options:
+          - debian
+          - openeuler
       deploy_methods:
         default: "docker,k8s"
         description: 'Test examples with docker compose or k8s charts(exclude AgentQnA k8s on Xeon)'
@@ -46,6 +49,7 @@ jobs:
       examples: ${{ steps.get-matrix.outputs.examples }}
       nodes: ${{ steps.get-matrix.outputs.nodes }}
       deploy_methods: ${{ steps.get-matrix.outputs.deploy_methods }}
+      OSs: ${{ steps.get-matrix.outputs.OSs }}
     steps:
     - name: Create Matrix
       id: get-matrix
