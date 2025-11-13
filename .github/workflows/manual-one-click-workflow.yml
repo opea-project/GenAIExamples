@@ -24,6 +24,14 @@ on:
         description: "Tag to apply to images"
         required: true
         type: string
+      os:
+        default: "debian"
+        description: "OS to run the test on debian or openeuler"
+        type: choice
+        required: true
+        options:
+          - debian
+          - openeuler
       deploy_methods:
         default: "docker,k8s"
         description: 'Test examples with docker compose or k8s charts(exclude AgentQnA k8s on Xeon)'
@@ -41,6 +49,7 @@ jobs:
       examples: ${{ steps.get-matrix.outputs.examples }}
       nodes: ${{ steps.get-matrix.outputs.nodes }}
       deploy_methods: ${{ steps.get-matrix.outputs.deploy_methods }}
+      OSs: ${{ steps.get-matrix.outputs.OSs }}
     steps:
     - name: Create Matrix
       id: get-matrix
@@ -54,9 +63,13 @@ jobs:
         deploy_methods=($(echo ${{ inputs.deploy_methods }} | tr ',' ' '))
         deploy_methods_json=$(printf '%s\n' "${deploy_methods[@]}" | sort -u | jq -R '.' | jq -sc '.')
         echo "deploy_methods=$deploy_methods_json" >> $GITHUB_OUTPUT
+        OSs=($(echo ${{ inputs.os }} | tr ',' ' '))
+        OSs_json=$(printf '%s\n' "${OSs[@]}" | sort -u | jq -R '.' | jq -sc '.')
+        echo "OSs=$OSs_json" >> $GITHUB_OUTPUT
         echo "examples=$examples_json"
         echo "nodes=$nodes_json"
         echo "deploy_methods=$deploy_methods_json"
+        echo "OSs=$OSs_json"
 
   run-examples:
     # permissions:
@@ -81,12 +94,14 @@ jobs:
         example: ${{ fromJson(needs.get-test-matrix.outputs.examples) }}
         hardware: ${{ fromJson(needs.get-test-matrix.outputs.nodes) }}
         deploy_method: ${{ fromJson(needs.get-test-matrix.outputs.deploy_methods) }}
+        os: ${{ fromJson(needs.get-test-matrix.outputs.OSs) }}
       fail-fast: false
     uses: ./.github/workflows/_run-one-click.yml
     with:
       hardware: ${{ matrix.hardware }}
       example: ${{ matrix.example }}
       deploy_method: ${{ matrix.deploy_method }}
+      os: ${{ matrix.os }}
       tag: ${{ inputs.tag }}
       registry: "opea"
     secrets: inherit
