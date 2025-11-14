@@ -8,8 +8,14 @@ pushd "$SCRIPT_DIR/../../../../../" > /dev/null
 source .set_env.sh
 popd > /dev/null
 
+# Download Grafana configurations
+pushd "${SCRIPT_DIR}/grafana/dashboards" > /dev/null
+source download_opea_dashboard.sh
+popd > /dev/null
+
 export host_ip=$(hostname -I | awk '{print $1}')
-export no_proxy=$host_ip,$no_proxy
+# Set network proxy settings
+export no_proxy="${no_proxy},${host_ip},vllm-service,tgi-llava-xeon-server,visualqna-xeon-backend-server,opea_prometheus,grafana,node-exporter,$JAEGER_IP" # Example: no_proxy="localhost, 127.0.0.1, 192.168.1.1"
 export LVM_MODEL_ID="llava-hf/llava-v1.6-mistral-7b-hf"
 export LVM_ENDPOINT="http://${host_ip}:8399"
 export LVM_SERVICE_PORT=9399

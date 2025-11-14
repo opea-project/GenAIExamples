@@ -17,7 +17,7 @@ echo "TAG=IMAGE_TAG=${IMAGE_TAG}"
 export REGISTRY=${IMAGE_REPO}
 export TAG=${IMAGE_TAG}
 
-source $WORKPATH/docker_compose/intel/set_env.sh
+source $WORKPATH/docker_compose/intel/cpu/xeon/set_env.sh
 export MODEL_CACHE=${model_cache:-"./data"}
 
 export MAX_INPUT_TOKENS=2048
@@ -46,7 +46,7 @@ function build_docker_images() {
 function start_services() {
     cd $WORKPATH/docker_compose/intel/cpu/xeon/
     export no_proxy="localhost,127.0.0.1,$ip_address"
-    docker compose -f compose.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
+    docker compose -f compose.yaml -f compose.monitoring.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
     sleep 1m
 }
 
@@ -346,7 +346,7 @@ function validate_megaservice_long_text() {
 
 function stop_docker() {
     cd $WORKPATH/docker_compose/intel/cpu/xeon/
-    docker compose stop && docker compose rm -f
+    docker compose -f compose.yaml -f compose.monitoring.yaml down
 }
 
 function main() {

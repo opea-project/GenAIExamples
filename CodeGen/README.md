@@ -106,18 +106,57 @@ flowchart LR
 
 This CodeGen example can be deployed manually on various hardware platforms using Docker Compose or Kubernetes. Select the appropriate guide based on your target environment:
 
-| Hardware        | Deployment Mode      | Guide Link                                                               |
-| :-------------- | :------------------- | :----------------------------------------------------------------------- |
-| Intel Xeon CPU  | Single Node (Docker) | [Xeon Docker Compose Guide](./docker_compose/intel/cpu/xeon/README.md)   |
-| Intel Gaudi HPU | Single Node (Docker) | [Gaudi Docker Compose Guide](./docker_compose/intel/hpu/gaudi/README.md) |
-| AMD EPYC CPU    | Single Node (Docker) | [EPYC Docker Compose Guide](./docker_compose/amd/cpu/epyc/README.md)     |
-| AMD ROCm GPU    | Single Node (Docker) | [ROCm Docker Compose Guide](./docker_compose/amd/gpu/rocm/README.md)     |
-| Intel Xeon CPU  | Kubernetes (Helm)    | [Kubernetes Helm Guide](./kubernetes/helm/README.md)                     |
-| Intel Gaudi HPU | Kubernetes (Helm)    | [Kubernetes Helm Guide](./kubernetes/helm/README.md)                     |
-| Intel Xeon CPU  | Kubernetes (GMC)     | [Kubernetes GMC Guide](./kubernetes/gmc/README.md)                       |
-| Intel Gaudi HPU | Kubernetes (GMC)     | [Kubernetes GMC Guide](./kubernetes/gmc/README.md)                       |
+| Hardware        | Deployment Mode                      | Guide Link                                                                               |
+| :-------------- | :----------------------------------- | :--------------------------------------------------------------------------------------- |
+| Intel Xeon CPU  | Single Node (Docker)                 | [Xeon Docker Compose Guide](./docker_compose/intel/cpu/xeon/README.md)                   |
+| Intel Xeon CPU  | Single Node (Docker) with Monitoring | [Xeon Docker Compose with Monitoring Guide](./docker_compose/intel/cpu/xeon/README.md)   |
+| Intel Gaudi HPU | Single Node (Docker)                 | [Gaudi Docker Compose Guide](./docker_compose/intel/hpu/gaudi/README.md)                 |
+| Intel Gaudi HPU | Single Node (Docker) with Monitoring | [Gaudi Docker Compose with Monitoring Guide](./docker_compose/intel/hpu/gaudi/README.md) |
+| AMD EPYC CPU    | Single Node (Docker)                 | [EPYC Docker Compose Guide](./docker_compose/amd/cpu/epyc/README.md)                     |
+| AMD ROCm GPU    | Single Node (Docker)                 | [ROCm Docker Compose Guide](./docker_compose/amd/gpu/rocm/README.md)                     |
+| Intel Xeon CPU  | Kubernetes (Helm)                    | [Kubernetes Helm Guide](./kubernetes/helm/README.md)                                     |
+| Intel Gaudi HPU | Kubernetes (Helm)                    | [Kubernetes Helm Guide](./kubernetes/helm/README.md)                                     |
+| Intel Xeon CPU  | Kubernetes (GMC)                     | [Kubernetes GMC Guide](./kubernetes/gmc/README.md)                                       |
+| Intel Gaudi HPU | Kubernetes (GMC)                     | [Kubernetes GMC Guide](./kubernetes/gmc/README.md)                                       |
 
 _Note: Building custom microservice images can be done using the resources in [GenAIComps](https://github.com/opea-project/GenAIComps)._
+
+## Monitoring
+
+The CodeGen example supports monitoring capabilities for Intel Xeon and Intel Gaudi platforms. Monitoring includes:
+
+- **Prometheus**: For metrics collection and querying
+- **Grafana**: For visualization and dashboards
+- **Node Exporter**: For system metrics collection
+
+### Monitoring Features
+
+- Real-time metrics collection from all CodeGen microservices
+- Pre-configured dashboards for:
+  - vLLM/TGI performance metrics
+  - CodeGen MegaService metrics
+  - System resource utilization
+  - Node-level metrics
+
+### Enabling Monitoring
+
+Monitoring can be enabled by using the `compose.monitoring.yaml` file along with the main compose file:
+
+```bash
+# For Intel Xeon
+docker compose -f compose.yaml -f compose.monitoring.yaml up -d
+
+# For Intel Gaudi
+docker compose -f compose.yaml -f compose.monitoring.yaml up -d
+```
+
+### Accessing Monitoring Services
+
+Once deployed with monitoring, you can access:
+
+- **Prometheus**: `http://${HOST_IP}:9090`
+- **Grafana**: `http://${HOST_IP}:3000` (username: `admin`, password: `admin`)
+- **Node Exporter**: `http://${HOST_IP}:9100`
 
 ## Benchmarking
 

@@ -38,7 +38,7 @@ function start_services() {
     export no_proxy="localhost,127.0.0.1,$ip_address"
     source set_env.sh
     # Start Docker Containers
-    docker compose -f compose_tgi.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
+    docker compose -f compose_tgi.yaml -f compose.monitoring.yaml up -d > ${LOG_PATH}/start_services_with_compose.log
     n=0
     until [[ "$n" -ge 200 ]]; do
        docker logs tgi-gaudi-service > $LOG_PATH/tgi_service_start.log
@@ -52,7 +52,7 @@ function start_services() {
     n=0
     until [[ "$n" -ge 100 ]]; do
        docker logs whisper-service > $LOG_PATH/whisper_service_start.log
-       if grep -q "Uvicorn server setup on port" $LOG_PATH/whisper_service_start.log; then
+       if grep -q "Uvicorn running on" $LOG_PATH/whisper_service_start.log; then
            break
        fi
        sleep 5s
@@ -81,7 +81,7 @@ function validate_megaservice() {
 
 function stop_docker() {
     cd $WORKPATH/docker_compose/intel/hpu/gaudi
-    docker compose -f compose_tgi.yaml stop && docker compose rm -f
+    docker compose -f compose_tgi.yaml -f compose.monitoring.yaml down
 }
 
 function main() {

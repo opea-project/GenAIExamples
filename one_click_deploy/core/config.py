@@ -490,8 +490,10 @@ EXAMPLE_CONFIGS = {
             "helm": {
                 "chart_oci": "oci://ghcr.io/opea-project/charts/visualqna",
                 "values_files": {
-                    "xeon": "kubernetes/helm/cpu-values.yaml",
-                    "gaudi": "kubernetes/helm/gaudi-values.yaml",
+                    "debian": {
+                        "xeon": "kubernetes/helm/cpu-values.yaml",
+                        "gaudi": "kubernetes/helm/gaudi-values.yaml",
+                    },
                 },
                 "params_to_values": {"hf_token": ["global", "HUGGINGFACEHUB_API_TOKEN"]},
             },
@@ -575,8 +577,10 @@ EXAMPLE_CONFIGS = {
             "helm": {
                 "chart_oci": "oci://ghcr.io/opea-project/charts/chatqna",
                 "values_files": {
-                    "xeon": "kubernetes/helm/faqgen-cpu-values.yaml",
-                    "gaudi": "kubernetes/helm/faqgen-gaudi-values.yaml",
+                    "debian": {
+                        "xeon": "kubernetes/helm/faqgen-cpu-values.yaml",
+                        "gaudi": "kubernetes/helm/faqgen-gaudi-values.yaml",
+                    },
                 },
                 "params_to_values": {
                     "hf_token": ["global", "HUGGINGFACEHUB_API_TOKEN"],
@@ -675,7 +679,9 @@ EXAMPLE_CONFIGS = {
             "helm": {
                 "chart_oci": "oci://ghcr.io/opea-project/charts/agentqna",
                 "values_files": {
-                    "gaudi": "kubernetes/helm/gaudi-values.yaml",
+                    "debian": {
+                        "gaudi": "kubernetes/helm/gaudi-values.yaml",
+                    },
                 },
                 "params_to_values": {
                     "llm_model": [

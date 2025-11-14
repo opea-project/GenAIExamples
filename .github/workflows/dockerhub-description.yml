@@ -83,30 +83,30 @@ jobs:
         image: ${{ fromJSON(needs.get-images-matrix.outputs.examples_json) }}
       fail-fast: false
     steps:
-      - name: Checkout GenAIExamples
-        uses: actions/checkout@v4
-        with:
-          repository: opea-project/GenAIExamples
-          path: GenAIExamples
+    - name: Checkout GenAIExamples
+      uses: actions/checkout@1e31de5234b9f8995739874a8ce0492dc87873e2
+      with:
+        repository: opea-project/GenAIExamples
+        path: GenAIExamples
 
-      - name: Checkout GenAIComps
-        uses: actions/checkout@v4
-        with:
-          repository: opea-project/GenAIComps
-          path: GenAIComps
+    - name: Checkout GenAIComps
+      uses: actions/checkout@1e31de5234b9f8995739874a8ce0492dc87873e2
+      with:
+        repository: opea-project/GenAIComps
+        path: GenAIComps
 
-      - name: Checkout vllm-openvino
-        uses: actions/checkout@v4
-        with:
-          repository: vllm-project/vllm
-          path: vllm
+    - name: Checkout vllm-openvino
+      uses: actions/checkout@1e31de5234b9f8995739874a8ce0492dc87873e2
+      with:
+        repository: vllm-project/vllm
+        path: vllm
 
-      - name: Checkout vllm-gaudi
-        uses: actions/checkout@v4
-        with:
-          repository: HabanaAI/vllm-fork
-          ref: habana_main
-          path: vllm-fork
+    - name: Checkout vllm-gaudi
+      uses: actions/checkout@1e31de5234b9f8995739874a8ce0492dc87873e2
+      with:
+        repository: HabanaAI/vllm-fork
+        ref: habana_main
+        path: vllm-fork
 
       - name: add dockerhub description
         uses: peter-evans/dockerhub-description@v4

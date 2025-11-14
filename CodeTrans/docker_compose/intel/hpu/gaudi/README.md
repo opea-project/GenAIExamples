@@ -54,11 +54,26 @@ Consult the section on [CodeTrans Service configuration](#codetrans-configuratio
 
 ### Deploy the Services Using Docker Compose
 
+#### Option #1
+
 To deploy the CodeTrans services, execute the `docker compose up` command with the appropriate arguments. For a default deployment, execute the command below. It uses the 'compose.yaml' file.
 
 ```bash
 cd hpu/gaudi
 docker compose -f compose.yaml up -d
+```
+
+#### Option #2
+
+> NOTE : To enable monitoring, `compose.monitoring.yaml` file need to be merged along with default `compose.yaml` file.
+
+To deploy with monitoring:
+
+```bash
+cd hpu/gaudi/
+# download grafana dashboard
+bash grafana/dashboards/download_opea_dashboard.sh
+docker compose -f compose.yaml -f compose.monitoring.yaml up -d
 ```
 
 > **Note**: developers should build docker image from source when:
@@ -115,6 +130,15 @@ To stop the containers associated with the deployment, execute the following com
 
 ```bash
 docker compose -f compose.yaml down
+```
+
+If monitoring is enabled, execute the following command:
+
+```bash
+cd hpu/gaudi/
+# download grafana dashboard
+bash grafana/dashboards/download_opea_dashboard.sh
+docker compose -f compose.yaml -f compose.monitoring.yaml down
 ```
 
 ## Configuration Parameters

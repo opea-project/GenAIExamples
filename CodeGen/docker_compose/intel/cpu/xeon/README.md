@@ -49,7 +49,8 @@ This uses the default vLLM-based deployment using `compose.yaml`.
     # export https_proxy="your_https_proxy"
     # export no_proxy="localhost,127.0.0.1,${HOST_IP}" # Add other hosts if necessary
     source intel/set_env.sh
-    cd /intel/cpu/xeon
+    cd intel/cpu/xeon
+    bash grafana/dashboards/download_opea_dashboard.sh
     ```
 
     _Note: The compose file might read additional variables from set_env.sh. Ensure all required variables like ports (`LLM_SERVICE_PORT`, `MEGA_SERVICE_PORT`, etc.) are set if not using defaults from the compose file._
@@ -83,13 +84,13 @@ Different Docker Compose files are available to select the LLM serving backend.
 
 - **Compose File:** `compose.yaml`
 - **Description:** Uses vLLM optimized for Intel CPUs as the LLM serving engine. This is the default deployment option used in the Quick Start.
-- **Services Deployed:** `codegen-vllm-server`, `codegen-llm-server`, `codegen-tei-embedding-server`, `codegen-retriever-server`, `redis-vector-db`, `codegen-dataprep-server`, `codegen-backend-server`, `codegen-gradio-ui-server`.
+- **Services Deployed:** `codegen-vllm-server`, `codegen-llm-server`, `codegen-tei-embedding-server`, `codegen-retriever-server`, `redis-vector-db`, `codegen-dataprep-server`, `codegen-backend-server`, `codegen-ui-server`.
 
 #### TGI-based Deployment (`compose_tgi.yaml`)
 
 - **Compose File:** `compose_tgi.yaml`
 - **Description:** Uses Hugging Face Text Generation Inference (TGI) optimized for Intel CPUs as the LLM serving engine.
-- **Services Deployed:** `codegen-tgi-server`, `codegen-llm-server`, `codegen-tei-embedding-server`, `codegen-retriever-server`, `redis-vector-db`, `codegen-dataprep-server`, `codegen-backend-server`, `codegen-gradio-ui-server`.
+- **Services Deployed:** `codegen-tgi-server`, `codegen-llm-server`, `codegen-tei-embedding-server`, `codegen-retriever-server`, `redis-vector-db`, `codegen-dataprep-server`, `codegen-backend-server`, `codegen-ui-server`.
 - **To Run:**
 
   ```bash
@@ -101,7 +102,7 @@ Different Docker Compose files are available to select the LLM serving backend.
 
 - **Compose File:** `compose_remote.yaml`
 - **Description:** Uses remote endpoints to access the served LLM's. This is the default configurations except for the LLM serving engine.
-- **Services Deployed:** `codegen-tei-embedding-server`, `codegen-retriever-server`, `redis-vector-db`, `codegen-dataprep-server`, `codegen-backend-server`, `codegen-gradio-ui-server`.
+- **Services Deployed:** `codegen-tei-embedding-server`, `codegen-retriever-server`, `redis-vector-db`, `codegen-dataprep-server`, `codegen-backend-server`, `codegen-ui-server`.
 - **To Run:**
 
 When models are deployed on a remote server, a base URL and an API key are required to access them. To set up a remote server and acquire the base URL and API key, refer to [Intel® AI for Enterprise Inference](https://www.intel.com/content/www/us/en/developer/topic-technology/artificial-intelligence/enterprise-inference.html) offerings.
@@ -146,7 +147,7 @@ Key parameters are configured via environment variables set before running `dock
 Most of these parameters are in `set_env.sh`, you can either modify this file or overwrite the env variables by setting them.
 
 ```shell
-source CodeGen/docker_compose/set_env.sh
+source CodeGen/docker_compose/intel/set_env.sh
 ```
 
 #### Compose Files
@@ -158,7 +159,7 @@ Different Docker Compose files (`compose.yaml`, `compose_tgi.yaml`) control whic
 If you need to modify the microservices:
 
 1.  Clone the [OPEA GenAIComps](https://github.com/opea-project/GenAIComps) repository.
-2.  Follow build instructions in the respective component directories (e.g., `comps/llms/text-generation`, `comps/codegen`, `comps/ui/gradio`, etc.). Use the provided Dockerfiles (e.g., `CodeGen/Dockerfile`, `CodeGen/ui/docker/Dockerfile.gradio`).
+2.  Follow build instructions in the respective component directories (e.g., `comps/llms/text-generation`, `comps/codegen`, etc.). Use the provided Dockerfiles (e.g., `CodeGen/Dockerfile`, `CodeGen/ui/docker/Dockerfile`).
 3.  Tag your custom images appropriately (e.g., `my-custom-codegen:latest`).
 4.  Update the `image:` fields in the compose files (`compose.yaml` or `compose_tgi.yaml`) to use your custom image tags.
 
@@ -206,18 +207,17 @@ Use `curl` commands to test the main service endpoints. Ensure `HOST_IP` is corr
 
 Multiple UI options can be configured via the compose files.
 
-### Gradio UI (Default)
+### Svelte UI (Default)
 
-Access the default Gradio UI by navigating to:
+Access the default Svelte UI by navigating to:
 `http://{HOST_IP}:5173`
-_(Port `5173` is the default host mapping for `codegen-gradio-ui-server`)_
+_(Port `5173` is the default host mapping for `codegen-ui-server`)_
 
-![Gradio UI - Code Generation](../../../../assets/img/codegen_gradio_ui_main.png)
-![Gradio UI - Resource Management](../../../../assets/img/codegen_gradio_ui_dataprep.png)
+![Svelte UI - Code Generation](../../../../assets/img/codeGen_ui_init.jpg)
 
-### Svelte UI (Optional)
+### Gradio UI (Optional)
 
-1.  Modify the compose file (either `compose.yaml` or `compose_tgi.yaml`): Comment out the `codegen-gradio-ui-server` service and uncomment/add the `codegen-xeon-ui-server` (Svelte) service definition, ensuring the port mapping is correct (e.g., `"- 5173:5173"`).
+1.  Modify the compose file (either `compose.yaml` or `compose_tgi.yaml`): Comment out the `codegen-xeon-ui-server` (Svelte) service and uncomment/add the `codegen-gradio-ui-server` service definition, ensuring the port mapping is correct (e.g., `"- 5173:5173"`).
 2.  Restart Docker Compose: `docker compose up -d` or `docker compose -f compose_tgi.yaml up -d`
 3.  Access: `http://{HOST_IP}:5173` (or the host port you mapped).
 
@@ -252,7 +252,63 @@ Users can interact with the backend service using the `Neural Copilot` VS Code e
 - **"Container name is in use"**: Stop existing containers (`docker compose down`) or change `container_name` in the compose file.
 - **Resource Issues:** CodeGen models can be memory-intensive. Monitor host RAM usage. Increase Docker resources if needed.
 
-## Stopping the Application
+## Monitoring Deployment
+
+To enable monitoring for the CodeGen application, you can use the monitoring Docker Compose file along with the main deployment.
+
+### Option #1: Default Deployment (without monitoring)
+
+To deploy the CodeGen services without monitoring, execute:
+
+```bash
+docker compose up -d
+```
+
+### Option #2: Deployment with Monitoring
+
+> NOTE: To enable monitoring, `compose.monitoring.yaml` file need to be merged along with default `compose.yaml` file.
+
+To deploy with monitoring:
+
+```bash
+bash grafana/dashboards/download_opea_dashboard.sh
+docker compose -f compose.yaml -f compose.monitoring.yaml up -d
+```
+
+### Accessing Monitoring Services
+
+Once deployed with monitoring, you can access:
+
+- **Prometheus**: `http://${HOST_IP}:9090`
+- **Grafana**: `http://${HOST_IP}:3000` (username: `admin`, password: `admin`)
+- **Node Exporter**: `http://${HOST_IP}:9100`
+
+### Monitoring Components
+
+The monitoring stack includes:
+
+- **Prometheus**: For metrics collection and querying
+- **Grafana**: For visualization and dashboards
+- **Node Exporter**: For system metrics collection
+
+### Monitoring Dashboards
+
+The following dashboards are automatically downloaded and configured:
+
+- vLLM Dashboard
+- TGI Dashboard
+- CodeGen MegaService Dashboard
+- Node Exporter Dashboard
+
+### Stopping the Application
+
+If monitoring is enabled, execute the following command:
+
+```bash
+docker compose -f compose.yaml -f compose.monitoring.yaml down
+```
+
+If monitoring is not enabled, execute:
 
 ```bash
 docker compose down  # for vLLM (compose.yaml)
