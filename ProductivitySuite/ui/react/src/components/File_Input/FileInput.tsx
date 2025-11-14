@@ -1,3 +1,6 @@
+// Copyright (C) 2024 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
+
 import React, { useEffect, useReducer, useRef, useState } from "react";
 import {
   Box,
@@ -132,7 +135,9 @@ const FileInput: React.FC<FileInputProps> = ({
   const validateFiles = (newFiles: File[]) => {
     if (newFiles.length + filesToUpload.length > maxFileCount) {
       notify(
-        `You can only upload a maximum of ${maxFileCount} file${maxFileCount > 1 ? "s" : ""}.`,
+        `You can only upload a maximum of ${maxFileCount} file${
+          maxFileCount > 1 ? "s" : ""
+        }.`,
         NotificationSeverity.ERROR,
       );
       return;
@@ -168,7 +173,9 @@ const FileInput: React.FC<FileInputProps> = ({
 
       if (!isWithinSizeLimit) {
         notify(
-          `File "${file.name}" exceeds the maximum size limit of ${imageInput ? "3MB" : "200MB"}.`,
+          `File "${file.name}" exceeds the maximum size limit of ${
+            imageInput ? "3MB" : "200MB"
+          }.`,
           NotificationSeverity.ERROR,
         );
         return false;
@@ -341,7 +348,9 @@ const FileInput: React.FC<FileInputProps> = ({
         )}
 
         <div
-          className={`${styles.details} ${details ? styles.detailsOpen : styles.detailGap}`}
+          className={`${styles.details} ${
+            details ? styles.detailsOpen : styles.detailGap
+          }`}
         >
           <Typography variant="body2" color="textSecondary" sx={{ mt: 2 }}>
             Limit {imageInput ? "3MB" : "200MB"} per file.

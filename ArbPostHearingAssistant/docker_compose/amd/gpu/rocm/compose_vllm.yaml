@@ -17,7 +17,11 @@ services:
       VLLM_USE_TRITON_FLASH_ATTENTION: 0
       PYTORCH_JIT: 0
     healthcheck:
-      test: [ "CMD-SHELL", "curl -f http://${HOST_IP}:${ARB_POSTHEARING_ASSISTANT_VLLM_SERVICE_PORT:-8081}/health || exit 1" ]
+      test:
+        [
+          "CMD-SHELL",
+          "curl -f http://${HOST_IP}:${ARB_POSTHEARING_ASSISTANT_VLLM_SERVICE_PORT:-8081}/health || exit 1",
+        ]
       interval: 10s
       timeout: 10s
       retries: 100
@@ -34,7 +38,7 @@ services:
     security_opt:
       - seccomp:unconfined
       - apparmor=unconfined
-    command: "--model ${ARB_POSTHEARING_ASSISTANT_LLM_MODEL_ID} --swap-space 16 --disable-log-requests --dtype float16 --tensor-parallel-size 4 --host 0.0.0.0 --port 8011 --num-scheduler-steps 1 --distributed-executor-backend \"mp\""
+    command: '--model ${ARB_POSTHEARING_ASSISTANT_LLM_MODEL_ID} --swap-space 16 --disable-log-requests --dtype float16 --tensor-parallel-size 4 --host 0.0.0.0 --port 8011 --num-scheduler-steps 1 --distributed-executor-backend "mp"'
     ipc: host
 
   arbPostHearingAssistant-llm-server:

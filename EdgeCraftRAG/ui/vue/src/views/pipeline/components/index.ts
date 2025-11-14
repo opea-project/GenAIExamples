@@ -1,3 +1,6 @@
+// Copyright (C) 2024 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
+
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
@@ -10,4 +13,13 @@ import Table from "./Table.vue";
 import CreateDialog from "./UpdateDialog/CreateDialog.vue";
 import EditDialog from "./UpdateDialog/EditDialog.vue";
 
-export { CreateDialog, DetailDrawer, EditDialog, ImportDialog, QuickStart, System, SystemChart, Table };
+export {
+  CreateDialog,
+  DetailDrawer,
+  EditDialog,
+  ImportDialog,
+  QuickStart,
+  System,
+  SystemChart,
+  Table,
+};

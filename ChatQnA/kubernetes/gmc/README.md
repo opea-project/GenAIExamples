@@ -28,11 +28,11 @@ tei-embedding-service: ghcr.io/huggingface/text-embeddings-inference:hpu-1.7
 tgi-service: gghcr.io/huggingface/tgi-gaudi:2.3.1
 
 
-> [NOTE]  
+> [NOTE]
 > Please refer to [Xeon README](https://github.com/opea-project/GenAIExamples/blob/main/ChatQnA/docker_compose/intel/cpu/xeon/README.md) or [Gaudi README](https://github.com/opea-project/GenAIExamples/blob/main/ChatQnA/docker_compose/intel/hpu/gaudi/README.md) to build the OPEA images. These too will be available on Docker Hub soon to simplify use.
 
 ## Deploy ChatQnA pipeline
-This involves deploying the ChatQnA custom resource. You can use chatQnA_xeon.yaml or if you have a Gaudi cluster, you could use chatQnA_gaudi.yaml. 
+This involves deploying the ChatQnA custom resource. You can use chatQnA_xeon.yaml or if you have a Gaudi cluster, you could use chatQnA_gaudi.yaml.
 
 1. Create namespace and deploy application
    ```sh

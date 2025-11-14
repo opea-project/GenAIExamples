@@ -8,6 +8,9 @@ import re
 import weakref
 from concurrent.futures import ThreadPoolExecutor
 
+from fastapi import FastAPI, File, HTTPException, UploadFile, status
+from pymilvus import connections
+
 from edgecraftrag.api.v1.knowledge_base import Synchronizing_vector_data
 from edgecraftrag.api_schema import MilvusConnectRequest, PipelineCreateIn
 from edgecraftrag.base import IndexerType, InferenceType, ModelType, NodeParserType, PostProcessorType, RetrieverType
@@ -29,8 +32,6 @@ from edgecraftrag.components.retriever import (
     VectorSimRetriever,
 )
 from edgecraftrag.context import ctx
-from fastapi import FastAPI, File, HTTPException, UploadFile, status
-from pymilvus import connections
 
 pipeline_app = FastAPI()
 

@@ -61,7 +61,7 @@ To deploy the ChatQnA services, execute the `docker compose up` command with the
 docker compose up -d
 ```
 
-To enable Open Telemetry Tracing, compose.telemetry.yaml file need to be merged along with default compose.yaml file.  
+To enable Open Telemetry Tracing, compose.telemetry.yaml file need to be merged along with default compose.yaml file.
 CPU example with Open Telemetry feature:
 
 > NOTE : To get supported Grafana Dashboard, please run download_opea_dashboard.sh following below commands.
@@ -194,7 +194,7 @@ Here is an example of running ChatQnA with Conversational UI (React):
 
 ### Validate Microservices
 
-Note, when verifying the microservices by curl or API from remote client, please make sure the **ports** of the microservices are opened in the firewall of the cloud node.  
+Note, when verifying the microservices by curl or API from remote client, please make sure the **ports** of the microservices are opened in the firewall of the cloud node.
 Follow the instructions to validate MicroServices.
 
 1. **TEI Embedding Service**
@@ -375,8 +375,8 @@ To further analyze MicroService Performance, users could follow the instructions
 
 #### 1. vLLM backend Service
 
-Users could follow previous section to testing vLLM microservice or ChatQnA MegaService.  
- By default, vLLM profiling is not enabled. Users could start and stop profiling by following commands.
+Users could follow previous section to testing vLLM microservice or ChatQnA MegaService.
+By default, vLLM profiling is not enabled. Users could start and stop profiling by following commands.
 
 ##### Start vLLM profiling
 
@@ -394,13 +394,13 @@ INFO api_server.py:363] Profiler started.
 INFO:     x.x.x.x:35940 - "POST /start_profile HTTP/1.1" 200 OK
 ```
 
-After vLLM profiling is started, users could start asking questions and get responses from vLLM MicroService  
- or ChatQnA MicroService.
+After vLLM profiling is started, users could start asking questions and get responses from vLLM MicroService
+or ChatQnA MicroService.
 
 ##### Stop vLLM profiling
 
-By following command, users could stop vLLM profiling and generate a \*.pt.trace.json.gz file as profiling result  
- under /mnt folder in vllm-service docker instance.
+By following command, users could stop vLLM profiling and generate a \*.pt.trace.json.gz file as profiling result
+under /mnt folder in vllm-service docker instance.
 
 ```bash
 # vLLM Service
@@ -425,8 +425,8 @@ docker cp  vllm-service:/mnt/ .
 
 ##### Check profiling result
 
-Open a web browser and type "chrome://tracing" or "ui.perfetto.dev", and then load the json.gz file, you should be able  
- to see the vLLM profiling result as below diagram.
+Open a web browser and type "chrome://tracing" or "ui.perfetto.dev", and then load the json.gz file, you should be able
+to see the vLLM profiling result as below diagram.
 ![image](https://github.com/user-attachments/assets/55c7097e-5574-41dc-97a7-5e87c31bc286)
 
 ## Conclusion

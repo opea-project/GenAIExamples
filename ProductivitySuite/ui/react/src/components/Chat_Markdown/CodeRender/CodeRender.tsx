@@ -1,3 +1,6 @@
+// Copyright (C) 2024 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
+
 import styles from "./codeRender.module.scss";
 import { Light as SyntaxHighlighter } from "react-syntax-highlighter";
 import {

@@ -4,9 +4,10 @@
 import gc
 import os
 
+from fastapi import FastAPI, HTTPException, status
+
 from edgecraftrag.api_schema import ModelIn
 from edgecraftrag.context import ctx
-from fastapi import FastAPI, HTTPException, status
 
 model_app = FastAPI()
 

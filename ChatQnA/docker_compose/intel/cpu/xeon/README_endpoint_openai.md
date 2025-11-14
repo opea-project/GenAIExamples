@@ -80,7 +80,7 @@ NGINX_PORT=8080 docker compose -f compose_endpoint_openai.yaml up -d
 
 Usage of NGINX_PORT=8080 allows you to access the chat console on localhost:8080 since webbrowser may use port 80.
 
-To enable Open Telemetry Tracing, compose.telemetry.yaml file need to be merged along with default compose.yaml file.  
+To enable Open Telemetry Tracing, compose.telemetry.yaml file need to be merged along with default compose.yaml file.
 CPU example with Open Telemetry feature:
 
 > NOTE : To get supported Grafana Dashboard, please run download_opea_dashboard.sh following below commands.
@@ -213,7 +213,7 @@ Here is an example of running ChatQnA with Conversational UI (React):
 
 ### Validate Microservices
 
-Note, when verifying the microservices by curl or API from remote client, please make sure the **ports** of the microservices are opened in the firewall of the cloud node.  
+Note, when verifying the microservices by curl or API from remote client, please make sure the **ports** of the microservices are opened in the firewall of the cloud node.
 Follow the instructions to validate MicroServices.
 For details on how to verify the correctness of the response, refer to [how-to-validate_service](../../hpu/gaudi/how_to_validate_service.md).
 

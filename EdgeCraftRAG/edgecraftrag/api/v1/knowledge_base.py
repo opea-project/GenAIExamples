@@ -1,3 +1,6 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 # Copyright (C) 2025 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
@@ -7,6 +10,9 @@ import os
 import re
 from typing import Dict, List, Union
 
+from fastapi import FastAPI, HTTPException, status
+from pymilvus.exceptions import MilvusException
+
 from edgecraftrag.api.v1.data import add_data
 from edgecraftrag.api_schema import DataIn, ExperienceIn, KnowledgeBaseCreateIn
 from edgecraftrag.base import IndexerType
@@ -14,8 +20,6 @@ from edgecraftrag.components.query_preprocess import query_search
 from edgecraftrag.components.retriever import get_kbs_info
 from edgecraftrag.context import ctx
 from edgecraftrag.utils import compare_mappings
-from fastapi import FastAPI, HTTPException, status
-from pymilvus.exceptions import MilvusException
 
 kb_app = FastAPI()
 

@@ -19,4 +19,3 @@ When responding and thinking, please keep the following points in mind:
 {chat_history}
 
 ### Below is the main question ###
-

@@ -3,13 +3,13 @@
 
 from typing import Any
 
-from edgecraftrag.base import BaseComponent, CompType, PostProcessorType
 from llama_index.core.postprocessor import MetadataReplacementPostProcessor
 from pydantic import model_serializer
 
+from edgecraftrag.base import BaseComponent, CompType, PostProcessorType
+
 
 class RerankProcessor(BaseComponent):
-
     def __init__(self, rerank_model, top_n):
         BaseComponent.__init__(
             self,
@@ -38,7 +38,6 @@ class RerankProcessor(BaseComponent):
 
 
 class MetadataReplaceProcessor(BaseComponent, MetadataReplacementPostProcessor):
-
     def __init__(self, target_metadata_key="window"):
         BaseComponent.__init__(
             self,

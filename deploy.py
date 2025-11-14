@@ -512,7 +512,6 @@ def check_deployment_ready(release_name, namespace, timeout=1000, interval=5, lo
 
         # Loop through each deployment to check its readiness
         for deployment_name in deployments:
-
             if "-" not in deployment_name or "ui" in deployment_name or "nginx" in deployment_name:
                 continue
 

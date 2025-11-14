@@ -1,3 +1,6 @@
+// Copyright (C) 2024 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
+
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
@@ -106,4 +109,6 @@ export const requestUrlVllm = (data: Object) => {
   });
 };
 
-export const importUrl = `${import.meta.env.VITE_API_URL}v1/settings/pipelines/import`;
+export const importUrl = `${
+  import.meta.env.VITE_API_URL
+}v1/settings/pipelines/import`;

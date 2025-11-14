@@ -1,3 +1,6 @@
+// Copyright (C) 2024 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
+
 import { useEffect, useRef, JSX } from "react";
 import styles from "./ChatView.module.scss";
 import { useLocation, useNavigate, useParams } from "react-router-dom";

@@ -1,3 +1,6 @@
+// Copyright (C) 2024 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
+
 import { IconButton, styled, Tooltip } from "@mui/material";
 import React from "react";
 import styles from "./ChatUser.module.scss";

@@ -35,8 +35,8 @@ cd GenAIExamples/ChatQnA/docker_compose/intel/cpu/aipc
 
 3. Set up other environment variables
 
-   By default, llama3.2 is used for LLM serving, the default model can be changed to other LLM models. Please pick a [validated llm models](https://github.com/opea-project/GenAIComps/tree/main/comps/llms/src/text-generation#validated-llm-models) from the table.  
-   To change the default model defined in set_env.sh, overwrite it by exporting OLLAMA_MODEL to the new model or by modifying set_env.sh.  
+   By default, llama3.2 is used for LLM serving, the default model can be changed to other LLM models. Please pick a [validated llm models](https://github.com/opea-project/GenAIComps/tree/main/comps/llms/src/text-generation#validated-llm-models) from the table.
+   To change the default model defined in set_env.sh, overwrite it by exporting OLLAMA_MODEL to the new model or by modifying set_env.sh.
    For example, change to using the following model.
 
    ```bash
@@ -224,7 +224,7 @@ For details on how to verify the correctness of the response, refer to [how-to-v
        -H 'Content-Type: application/json'
    ```
 
-2. Retriever Microservice  
+2. Retriever Microservice
    To validate the retriever microservice, you need to generate a mock embedding vector of length 768 in Python script:
 
    ```bash

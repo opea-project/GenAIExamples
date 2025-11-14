@@ -96,11 +96,11 @@ jobs:
         with:
           image-ref: ${{ env.OPEA_IMAGE_REPO }}opea/${{ inputs.image }}:${{ inputs.tag }}
           output: ${{ inputs.image }}-trivy-scan.txt
-          format: 'table'
-          exit-code: '1'
+          format: "table"
+          exit-code: "1"
           ignore-unfixed: true
-          vuln-type: 'os,library'
-          severity: 'CRITICAL,HIGH'
+          vuln-type: "os,library"
+          severity: "CRITICAL,HIGH"
           trivyignores: .trivyignore
           timeout: 30m
 

@@ -5,7 +5,6 @@ import warnings
 from typing import Any, List, Optional, cast
 
 import requests
-from edgecraftrag.base import BaseComponent, CompType, RetrieverType
 from langchain_milvus import Milvus
 from langchain_openai import OpenAIEmbeddings
 from llama_index.core.indices.vector_store.retrievers import VectorIndexRetriever
@@ -15,9 +14,10 @@ from llama_index.retrievers.bm25 import BM25Retriever
 from pydantic import model_serializer
 from pymilvus import Collection, MilvusException, connections, utility
 
+from edgecraftrag.base import BaseComponent, CompType, RetrieverType
+
 
 class VectorSimRetriever(BaseComponent, VectorIndexRetriever):
-
     def __init__(self, indexer, **kwargs):
         BaseComponent.__init__(
             self,
@@ -61,7 +61,6 @@ class VectorSimRetriever(BaseComponent, VectorIndexRetriever):
 
 
 class AutoMergeRetriever(BaseComponent, AutoMergingRetriever):
-
     def __init__(self, indexer, **kwargs):
         BaseComponent.__init__(
             self,

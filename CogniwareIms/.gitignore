@@ -1,0 +1,50 @@
+# === Build outputs / compiled artifacts ===
+build_simple/
+build_simple_engine/
+misc/
+models/
+documents/
+logs/
+
+# === CMake and build systems ===
+CMakeFiles/
+CMakeCache.txt
+cmake-build-*/
+Makefile
+compile_commands.json
+
+# === Python ===
+venv/
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+
+# === Node (if present) ===
+node_modules/
+
+# === OS / IDE / editor cruft ===
+.DS_Store
+*.log
+*.swp
+*.swo
+*.tmp
+*.bak
+Thumbs.db
+.idea/
+.vscode/
+*.code-workspace
+
+# === Compiled binaries and objects ===
+*.so
+*.dylib
+*.dll
+*.exe
+*.o
+*.a
+*.out
+# Postman exports
+*.postman_collection.json
+*.postman_environment.json

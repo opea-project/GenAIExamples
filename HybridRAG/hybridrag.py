@@ -1,3 +1,6 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 # Copyright (C) 2025 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
@@ -115,7 +118,6 @@ def align_outputs(self, data, cur_node, inputs, runtime_graph, llm_parameters_di
         assert isinstance(data, list)
         next_data = {"text": inputs["inputs"], "embedding": data[0]}
     elif self.services[cur_node].service_type == ServiceType.RETRIEVER:
-
         docs = [doc["text"] for doc in data["retrieved_docs"]]
 
         with_rerank = runtime_graph.downstream(cur_node)[0].startswith("rerank")
@@ -284,7 +286,6 @@ class HybridRAGService:
         return structured
 
     def add_remote_service(self):
-
         embedding = MicroService(
             name="embedding",
             host=EMBEDDING_SERVER_HOST_IP,
@@ -442,7 +443,6 @@ class HybridRAGService:
         return ChatCompletionResponse(model="hybridrag", choices=choices, usage=usage)
 
     def start(self):
-
         self.service = MicroService(
             self.__class__.__name__,
             service_role=ServiceRoleType.MEGASERVICE,

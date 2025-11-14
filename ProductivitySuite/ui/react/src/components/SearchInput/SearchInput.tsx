@@ -1,3 +1,6 @@
+// Copyright (C) 2024 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
+
 import { InputAdornment, styled, TextField } from "@mui/material";
 import styles from "./SearchInput.module.scss";
 import { Close, Search } from "@mui/icons-material";

@@ -1,3 +1,6 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 # Copyright (C) 2025 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
@@ -12,7 +15,6 @@ def load_config(config_path: str):
 
 
 def create_agent(config: str) -> Any:
-
     config_dict = load_config(config)
 
     agent_config = config_dict.get("agent")

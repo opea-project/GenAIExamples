@@ -3,13 +3,13 @@
 
 from typing import List
 
+from llama_index.core.schema import BaseNode
+
 from edgecraftrag.api_schema import IndexerIn, ModelIn, NodeParserIn
 from edgecraftrag.base import BaseComponent, BaseMgr, CallbackType, ModelType
-from llama_index.core.schema import BaseNode
 
 
 class NodeMgr:
-
     def __init__(self):
         self.nodes = {}
 

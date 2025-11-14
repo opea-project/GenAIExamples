@@ -4,11 +4,12 @@
 from pathlib import Path
 from typing import Any, Optional
 
-from edgecraftrag.base import BaseComponent, CompType, ModelType
 from llama_index.embeddings.huggingface_openvino import OpenVINOEmbedding
 from llama_index.llms.openvino import OpenVINOLLM
 from llama_index.postprocessor.openvino_rerank import OpenVINORerank
 from pydantic import Field, model_serializer
+
+from edgecraftrag.base import BaseComponent, CompType, ModelType
 
 
 def model_exist(model_path):
@@ -21,7 +22,6 @@ def model_exist(model_path):
 
 
 class BaseModelComponent(BaseComponent):
-
     model_id: Optional[str] = Field(default="")
     model_path: Optional[str] = Field(default="")
     weight: Optional[str] = Field(default="")
@@ -44,7 +44,6 @@ class BaseModelComponent(BaseComponent):
 
 
 class OpenVINOEmbeddingModel(BaseModelComponent, OpenVINOEmbedding):
-
     def __init__(self, model_id, model_path, device, weight):
         if not model_exist(model_path):
             OpenVINOEmbedding.create_and_save_openvino_model(model_id, model_path)
@@ -58,7 +57,6 @@ class OpenVINOEmbeddingModel(BaseModelComponent, OpenVINOEmbedding):
 
 
 class OpenVINORerankModel(BaseModelComponent, OpenVINORerank):
-
     def __init__(self, model_id, model_path, device, weight):
         if not model_exist(model_path):
             OpenVINORerank.create_and_save_openvino_model(model_id, model_path)
@@ -76,7 +74,6 @@ class OpenVINORerankModel(BaseModelComponent, OpenVINORerank):
 
 
 class OpenVINOLLMModel(BaseModelComponent, OpenVINOLLM):
-
     def __init__(self, model_id, model_path, device, weight, model=None):
         OpenVINOLLM.__init__(
             self,

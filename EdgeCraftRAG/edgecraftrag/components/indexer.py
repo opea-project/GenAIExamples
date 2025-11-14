@@ -4,12 +4,13 @@
 from typing import Any
 
 import faiss
-from edgecraftrag.base import BaseComponent, CompType, IndexerType
-from edgecraftrag.context import ctx
 from llama_index.core import StorageContext, VectorStoreIndex
 from llama_index.vector_stores.faiss import FaissVectorStore
 from llama_index.vector_stores.milvus import MilvusVectorStore
 from pydantic import model_serializer
+
+from edgecraftrag.base import BaseComponent, CompType, IndexerType
+from edgecraftrag.context import ctx
 
 
 class VectorIndexer(BaseComponent, VectorStoreIndex):

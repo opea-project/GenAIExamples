@@ -1,3 +1,6 @@
+// Copyright (C) 2024 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
+
 import {
   Box,
   Button,
@@ -77,7 +80,9 @@ const PromptSelector: React.FC<PromptSelectorProps> = ({ setSearchText }) => {
         </Tooltip>
 
         <PromptListWrapper
-          className={`${styles.promptsListWrapper} ${showPrompts ? styles.open : ""}`}
+          className={`${styles.promptsListWrapper} ${
+            showPrompts ? styles.open : ""
+          }`}
         >
           <List className={styles.promptsList}>
             {prompts?.map((prompt, promptIndex) => {

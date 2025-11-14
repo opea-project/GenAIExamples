@@ -8,13 +8,14 @@ import os
 import urllib.request
 from urllib.parse import urlparse
 
-from edgecraftrag.base import BaseComponent, CompType, GeneratorType, InferenceType, NodeParserType
-from edgecraftrag.utils import concat_history, get_prompt_template, save_history
 from fastapi.responses import StreamingResponse
 from langchain_core.prompts import PromptTemplate
 from llama_index.llms.openai_like import OpenAILike
 from pydantic import model_serializer
 from unstructured.staging.base import elements_from_base64_gzipped_json
+
+from edgecraftrag.base import BaseComponent, CompType, GeneratorType, InferenceType, NodeParserType
+from edgecraftrag.utils import concat_history, get_prompt_template, save_history
 
 
 def extract_urls(text):
@@ -133,7 +134,6 @@ async def stream_generator(llm, prompt_str, unstructured_str):
 
 
 class QnAGenerator(BaseComponent):
-
     def __init__(self, llm_model, prompt_template_file, inference_type, vllm_endpoint, prompt_content, **kwargs):
         BaseComponent.__init__(
             self,
@@ -362,7 +362,6 @@ def preprocess_question(question):
 
 
 class DocumentedContextRagPromptTemplate(PromptTemplate):
-
     def format(self, **kwargs) -> str:
         # context = '\n'.join([clean_string(f"{_.page_content}".strip()) for i, _ in enumerate(kwargs["context"])])
         context = kwargs["context"]

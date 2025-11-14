@@ -43,7 +43,11 @@ services:
       VLLM_CPU_OMP_THREADS_BIND: all
       VLLM_CPU_KVCACHE_SPACE: 30
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://$host_ip:${LLM_SERVER_PORT}/health || exit 1"]
+      test:
+        [
+          "CMD-SHELL",
+          "curl -f http://$host_ip:${LLM_SERVER_PORT}/health || exit 1",
+        ]
       interval: 10s
       timeout: 10s
       retries: 100

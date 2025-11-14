@@ -33,7 +33,8 @@ services:
       TEI_ENDPOINT: http://tei-embedding-service:80
       HUGGINGFACEHUB_API_TOKEN: ${HF_TOKEN}
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:5000/v1/health_check || exit 1"]
+      test:
+        ["CMD-SHELL", "curl -f http://localhost:5000/v1/health_check || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 50
@@ -85,19 +86,19 @@ services:
       https_proxy: ${https_proxy}
     command: --model-id ${RERANK_MODEL_ID} --auto-truncate
   # Substitute vllm with OpeaTextGenService
-  textgen-service-endpoint-openai:  # Used instead of vllm
+  textgen-service-endpoint-openai: # Used instead of vllm
     image: opea/llm-textgen:${TAG:-latest} # Changed image
-    container_name: textgen-service-endpoint-openai  # Updated container name
+    container_name: textgen-service-endpoint-openai # Updated container name
     ipc: host
     ports:
-      - "9000:9000"  # Changed port mapping
+      - "9000:9000" # Changed port mapping
     environment:
       LLM_COMPONENT_NAME: OpeaTextGenService
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      LLM_MODEL_ID: ${LLM_MODEL_ID}  # Set to model ID
-      LLM_ENDPOINT: ${LLM_ENDPOINT}  # An openai compatible endpoint, e.g. Hugging Face, OpenRouter, OpenAI
+      LLM_MODEL_ID: ${LLM_MODEL_ID} # Set to model ID
+      LLM_ENDPOINT: ${LLM_ENDPOINT} # An openai compatible endpoint, e.g. Hugging Face, OpenRouter, OpenAI
       OPENAI_API_KEY: ${OPENAI_API_KEY} # Add OpenRouter API Key
   chatqna-xeon-backend-server:
     image: ${REGISTRY:-opea}/chatqna:${TAG:-latest}
@@ -127,7 +128,7 @@ services:
       - RETRIEVER_SERVICE_HOST_IP=retriever
       - RERANK_SERVER_HOST_IP=tei-reranking-service
       - RERANK_SERVER_PORT=${RERANK_SERVER_PORT:-80}
-      - LLM_SERVER_HOST_IP=textgen-service-endpoint-openai  # Updated host IP
+      - LLM_SERVER_HOST_IP=textgen-service-endpoint-openai # Updated host IP
       - LLM_SERVER_PORT=${LLM_SERVER_PORT:-9000}
       - LLM_MODEL=${LLM_MODEL_ID}
       - LOGFLAG=${LOGFLAG}

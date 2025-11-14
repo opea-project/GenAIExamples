@@ -191,7 +191,6 @@ class DocSumService:
         self.endpoint = str(MegaServiceEndpoint.DOC_SUMMARY)
 
     def add_remote_service(self):
-
         asr = MicroService(
             name="asr",
             host=ASR_SERVICE_HOST_IP,
@@ -337,7 +336,6 @@ class DocSumService:
         return ChatCompletionResponse(model="docsum", choices=choices, usage=usage)
 
     def start(self):
-
         self.service = MicroService(
             self.__class__.__name__,
             service_role=ServiceRoleType.MEGASERVICE,

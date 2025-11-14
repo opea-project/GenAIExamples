@@ -1,3 +1,6 @@
+// Copyright (C) 2024 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
+
 import { createTheme } from "@mui/material/styles";
 import moonIcon from "@assets/icons/moon.svg";
 import sunIcon from "@assets/icons/sun.svg";
@@ -120,7 +123,9 @@ export const themeCreator = (mode: "light" | "dark") => {
         // secondary: mode === 'dark' ? '#141415' : '#141415',
       },
       gradientShadow: {
-        border: `1px solid ${mode === "dark" ? "#ffffff20" : deepPurple + "10"}`,
+        border: `1px solid ${
+          mode === "dark" ? "#ffffff20" : deepPurple + "10"
+        }`,
         boxShadow:
           mode === "dark"
             ? "0px 0px 10px rgba(0, 0, 0, 0.7)"
@@ -152,12 +157,16 @@ export const themeCreator = (mode: "light" | "dark") => {
         },
         sourceWrap: {
           background: mode === "dark" ? "#1a1b27" : "#ffffff70",
-          border: `1px solid ${mode === "dark" ? "rgba(230, 232, 253, 0.30)" : lightPurple}`,
+          border: `1px solid ${
+            mode === "dark" ? "rgba(230, 232, 253, 0.30)" : lightPurple
+          }`,
           color: mode === "dark" ? "#fff" : deepPurple,
         },
         sourceChip: {
           background: mode === "dark" ? "#1a1b27" : "#ffffff",
-          border: `1px solid ${mode === "dark" ? "#c398fa" : "rgba(73, 83, 213, 0.40)"}`,
+          border: `1px solid ${
+            mode === "dark" ? "#c398fa" : "rgba(73, 83, 213, 0.40)"
+          }`,
           color: mode === "dark" ? "#fff" : "#444",
         },
       },
@@ -230,13 +239,17 @@ export const themeCreator = (mode: "light" | "dark") => {
       primaryInput: {
         inputWrapper: {
           backgroundColor: mode === "dark" ? lightGrey : lightPurple,
-          border: `1px solid ${mode === "dark" ? "#ffffff20" : deepPurple + "10"}`,
+          border: `1px solid ${
+            mode === "dark" ? "#ffffff20" : deepPurple + "10"
+          }`,
           boxShadow:
             mode === "dark"
               ? "0px 0px 10px rgba(0, 0, 0, 0.3)"
               : "0px 0px 10px rgba(0, 0, 0, 0.1)",
           "&:hover, &.active, &:focus": {
-            border: `1px solid ${mode === "dark" ? "#ffffff20" : deepPurple + "60"}`,
+            border: `1px solid ${
+              mode === "dark" ? "#ffffff20" : deepPurple + "60"
+            }`,
           },
         },
         textInput: {
@@ -289,7 +302,9 @@ export const themeCreator = (mode: "light" | "dark") => {
         ".Mui-focused": {
           color: mode === "dark" ? "#ffffff" : deepPurple,
           ".MuiOutlinedInput-notchedOutline": {
-            border: `1px solid ${mode === "dark" ? white60 : `${deepPurple}22`}`,
+            border: `1px solid ${
+              mode === "dark" ? white60 : `${deepPurple}22`
+            }`,
           },
         },
       },

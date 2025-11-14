@@ -1,3 +1,6 @@
+// Copyright (C) 2024 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
+
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
@@ -6,7 +9,8 @@ import { customNotification } from "./notification";
 import { Local } from "./storage";
 
 export const useNotification = () => {
-  const customNotificationInjected = inject<typeof customNotification>("customNotification");
+  const customNotificationInjected =
+    inject<typeof customNotification>("customNotification");
 
   if (!customNotificationInjected) {
     throw new Error("Notification service not provided");
@@ -21,7 +25,11 @@ export const formatDecimals = (num: number, decimalPlaces: number = 2) => {
   return Math.round(num * factor) / factor;
 };
 
-export const formatCapitalize = (string: string, start: number = 0, length: number = 1) => {
+export const formatCapitalize = (
+  string: string,
+  start: number = 0,
+  length: number = 1,
+) => {
   const end = start + length;
   const part1 = string.slice(0, start);
   const part2 = string.slice(start, end).toUpperCase();
@@ -43,7 +51,11 @@ export const getChatSessionId = (): string => {
 };
 
 const generateFallbackId = (): string => {
-  if (typeof self !== "undefined" && self.crypto && self.crypto.getRandomValues) {
+  if (
+    typeof self !== "undefined" &&
+    self.crypto &&
+    self.crypto.getRandomValues
+  ) {
     const array = new Uint32Array(2);
     self.crypto.getRandomValues(array);
     const randomPart = Array.from(array)
@@ -51,6 +63,8 @@ const generateFallbackId = (): string => {
       .join("");
     return `${Date.now()}_${randomPart}`;
   } else {
-    throw new Error("No secure random number generator available for session ID generation.");
+    throw new Error(
+      "No secure random number generator available for session ID generation.",
+    );
   }
 };
