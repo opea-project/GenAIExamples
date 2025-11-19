@@ -4,17 +4,15 @@ Deep Research Agents are a new class of autonomous AI systems designed to perfor
 
 ## Overview
 
-In this application, we leverage the deep research agent implementation of [langchain-ai/open_deep_research](https://github.com/langchain-ai/open_deep_research), and deploy it on the Intel platform with opea microserice.
+In this application, we leverage the deep research agent implementation of [langchain-ai/deepagents](https://github.com/langchain-ai/deepagents), and deploy it on the Intel platform with opea microserice.
 
-![Architecture Overview](assets/img/opea-deep-research-agent.png)
 
 ## Setup Deployment Environment
 
-```
-# Configure deep_researcher.yaml with your llm model served by the vllm
-
+```shell
 # get your TAVILY_API_KEY from https://app.tavily.com/
 export TAVILY_API_KEY=""
+
 # get your HuggingFace Access Token from https://huggingface.co/docs/transformers.js/en/guides/private#step-1-generating-a-user-access-token
 export HF_TOKEN=""
 
@@ -31,9 +29,8 @@ source ./set_env.sh
 
 To deploy the Deep Research Agent services, execute the docker compose up command with the appropriate arguments. For a default deployment, execute:
 
-```
+```shell
 docker compose -f docker_compose/intel/hpu/gaudi/compose.yaml up -d
-
 ```
 
 ## Validate Microservice
