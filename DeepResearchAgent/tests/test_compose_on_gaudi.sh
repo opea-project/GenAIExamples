@@ -84,7 +84,7 @@ function validate_microservices() {
 
     validate_service \
         "${ip_address}:8022/v1/deep_research_agent" \
-	    "deep" \
+	"deep" \
         "deep-research-agent" \
         "deep-research-agent-server" \
         '{"question": "what is the deep learning?"}'
