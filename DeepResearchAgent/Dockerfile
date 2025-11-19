@@ -5,9 +5,9 @@ ARG IMAGE_REPO=opea
 ARG BASE_TAG=latest
 FROM opea/comps-base:$BASE_TAG
 
-COPY ./deep_researcher.yaml $HOME/deep_researcher.yaml
-COPY ./utils.py $HOME/utils.py
+COPY ./research_agents $HOME/research_agents
 COPY ./requirements.txt $HOME/requirements.txt
+COPY ./agent_factory.py $HOME/agent_factory.py
 COPY ./research_agent.py $HOME/research_agent.py
 
 USER root
