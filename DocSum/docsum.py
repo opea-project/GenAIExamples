@@ -1,7 +1,6 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-import asyncio
 import base64
 import json
 import os
@@ -56,7 +55,7 @@ def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **k
     return inputs
 
 
-def read_pdf(file):
+def read_pdf(file: str):
     from langchain.document_loaders import PyPDFLoader
 
     loader = PyPDFLoader(file)
@@ -64,7 +63,7 @@ def read_pdf(file):
     return docs
 
 
-def encode_file_to_base64(file_path):
+async def encode_file_to_base64(f: UploadFile):
     """Encode the content of a file to a base64 string.
 
     Args:
@@ -73,8 +72,7 @@ def encode_file_to_base64(file_path):
     Returns:
         str: The base64 encoded string of the file content.
     """
-    with open(file_path, "rb") as f:
-        base64_str = base64.b64encode(f.read()).decode("utf-8")
+    base64_str = await base64.b64encode(f.read()).decode("utf-8")
     return base64_str
 
 
@@ -91,6 +89,7 @@ def video2audio(
     """
     video_data = base64.b64decode(video_base64)
 
+    # TODO: why this processing is not async?
     uid = str(uuid.uuid4())
     temp_video_path = f"{uid}.mp4"
     temp_audio_path = f"{uid}.mp3"
@@ -116,29 +115,50 @@ def video2audio(
     return audio_base64
 
 
-def read_text_from_file(file, save_file_name):
+async def read_text_from_file(file: UploadFile):
+    ctype = file.headers["content-type"]
+    valid = (
+        "text/plain",
+        "application/pdf",
+        "application/octet-stream",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    )
+
+    file_content = None
+    if ctype not in valid:
+        return file_content
+
+    import aiofiles
     import docx2txt
     from langchain.text_splitter import CharacterTextSplitter
 
     # read text file
-    if file.headers["content-type"] == "text/plain":
+    if ctype == "text/plain":
         file.file.seek(0)
         content = file.file.read().decode("utf-8")
-        # Split text
+        # Split text to multiple documents
         text_splitter = CharacterTextSplitter()
-        texts = text_splitter.split_text(content)
-        # Create multiple documents
-        file_content = texts
-    # read pdf file
-    elif file.headers["content-type"] == "application/pdf":
-        documents = read_pdf(save_file_name)
-        file_content = [doc.page_content for doc in documents]
-    # read docx file
-    elif (
-        file.headers["content-type"] == "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-        or file.headers["content-type"] == "application/octet-stream"
-    ):
-        file_content = docx2txt.process(save_file_name)
+        return text_splitter.split_text(content)
+
+    # need a tmp file for rest
+    async with aiofiles.tempfile.NamedTemporaryFile() as tmp:
+        await tmp.write(await file.read())
+        await tmp.flush()
+
+        # read pdf file
+        if ctype == "application/pdf":
+            documents = read_pdf(tmp.name)
+            file_content = [doc.page_content for doc in documents]
+
+        # read docx file
+        if ctype in (
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            "application/octet-stream",
+        ):
+            file_content = docx2txt.process(tmp.name)
+
+        # remove temp file
+        await tmp.close()
 
     return file_content
 
@@ -240,24 +260,13 @@ class DocSumService:
             file_summaries = []
             if files:
                 for file in files:
-                    # Fix concurrency issue with the same file name
-                    # https://github.com/opea-project/GenAIExamples/issues/1279
-                    uid = str(uuid.uuid4())
-                    file_path = f"/tmp/{uid}"
-
-                    import aiofiles
-
-                    async with aiofiles.open(file_path, "wb") as f:
-                        await f.write(await file.read())
 
                     if data_type == "text":
-                        docs = read_text_from_file(file, file_path)
+                        docs = await read_text_from_file(file)
                     elif data_type in ["audio", "video"]:
-                        docs = encode_file_to_base64(file_path)
+                        docs = await encode_file_to_base64(file)
                     else:
                         raise ValueError(f"Data type not recognized: {data_type}")
-
-                    os.remove(file_path)
 
                     if isinstance(docs, list):
                         file_summaries.extend(docs)
