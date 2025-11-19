@@ -45,7 +45,7 @@ services:
     cap_add:
       - SYS_NICE
     ipc: host
-    command: --model ${LLM_MODEL_ID} --tensor-parallel-size ${NUM_CARDS} --host 0.0.0.0 --port 8000 --max-seq-len-to-capture $MAX_LEN
+    command: --model ${LLM_MODEL_ID} --tensor-parallel-size ${NUM_CARDS} --enable-auto-tool-choice --tool-call-parser llama3_json --host 0.0.0.0 --port 8000 --max-seq-len-to-capture $MAX_LEN
 
   deep-research-agent-server:
     image: ${REGISTRY:-opea}/deep-research-agent:${TAG:-latest}

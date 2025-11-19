@@ -109,6 +109,7 @@ services:
       NUM_CARDS: ${NUM_CARDS}
       HF_HUB_OFFLINE: ${HF_HUB_OFFLINE:-0}
       VLLM_TORCH_PROFILER_DIR: "/mnt"
+      VLLM_SKIP_WARMUP: true
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:80/health || exit 1"]
       interval: 10s
