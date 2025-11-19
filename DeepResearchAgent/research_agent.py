@@ -1,14 +1,14 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-import os
 import logging
+import os
 from typing import List, Union
-from comps import opea_microservices, register_microservice, CustomLogger
-from comps.cores.telemetry.opea_telemetry import opea_telemetry
-from pydantic import BaseModel
 
 from agent_factory import create_agent
+from comps import CustomLogger, opea_microservices, register_microservice
+from comps.cores.telemetry.opea_telemetry import opea_telemetry
+from pydantic import BaseModel
 from research_agents.deepagents.utils import format_message
 
 logger = CustomLogger(__name__)
@@ -30,10 +30,10 @@ class SimpleRequest(BaseModel):
 async def run(request: SimpleRequest):
 
     logger.debug(f"Received question: {request.question}")
-    
+
     logger.debug("Creating DeepAgents research agent...")
     agent = create_agent(impl="DeepAgents")
-    
+
     logger.debug("Invoking agent with the provided question...")
     result = agent.invoke(
         {
@@ -43,12 +43,12 @@ async def run(request: SimpleRequest):
                     "content": f"Question: {request.question}",
                 }
             ],
-        }, 
+        },
     )
     logger.debug("Agent invocation completed.")
     if os.getenv("LOGFLAG", "").lower() == "true":
         format_message(result["messages"])
-        
+
     return {"answer": result["messages"][-1].content}
 
 

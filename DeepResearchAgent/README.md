@@ -6,7 +6,6 @@ Deep Research Agents are a new class of autonomous AI systems designed to perfor
 
 In this application, we leverage the deep research agent implementation of [langchain-ai/deepagents](https://github.com/langchain-ai/deepagents), and deploy it on the Intel platform with opea microserice.
 
-
 ## Setup Deployment Environment
 
 ```shell

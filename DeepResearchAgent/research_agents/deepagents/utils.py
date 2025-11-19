@@ -1,3 +1,5 @@
+# Copyright (C) 2025 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
 """Utility functions for displaying messages and prompts in Jupyter notebooks."""
 
 import json
@@ -31,11 +33,7 @@ def format_message_content(message):
         parts.append(str(message.content))
 
     # Handle tool calls attached to the message (OpenAI format) - only if not already processed
-    if (
-        not tool_calls_processed
-        and hasattr(message, "tool_calls")
-        and message.tool_calls
-    ):
+    if not tool_calls_processed and hasattr(message, "tool_calls") and message.tool_calls:
         for tool_call in message.tool_calls:
             parts.append(f"\n🔧 Tool Call: {tool_call['name']}")
             parts.append(f"   Args: {json.dumps(tool_call['args'], indent=2)}")
@@ -76,12 +74,8 @@ def show_prompt(prompt_text: str, title: str = "Prompt", border_style: str = "bl
     # Create a formatted display of the prompt
     formatted_text = Text(prompt_text)
     formatted_text.highlight_regex(r"<[^>]+>", style="bold blue")  # Highlight XML tags
-    formatted_text.highlight_regex(
-        r"##[^#\n]+", style="bold magenta"
-    )  # Highlight headers
-    formatted_text.highlight_regex(
-        r"###[^#\n]+", style="bold cyan"
-    )  # Highlight sub-headers
+    formatted_text.highlight_regex(r"##[^#\n]+", style="bold magenta")  # Highlight headers
+    formatted_text.highlight_regex(r"###[^#\n]+", style="bold cyan")  # Highlight sub-headers
 
     # Display in a panel for better presentation
     console.print(

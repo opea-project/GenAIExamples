@@ -1,14 +1,18 @@
+# Copyright (C) 2025 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 import os
 from datetime import datetime
 from typing import Any
+
 from langchain_openai import ChatOpenAI
 
 
 def create_deepagents_research_agent() -> Any:
     from deepagents import create_deep_agent
     from research_agents.deepagents.prompts import (
-        RESEARCHER_INSTRUCTIONS,
         RESEARCH_WORKFLOW_INSTRUCTIONS,
+        RESEARCHER_INSTRUCTIONS,
         SUBAGENT_DELEGATION_INSTRUCTIONS,
     )
     from research_agents.deepagents.tools import tavily_search, think_tool
@@ -18,9 +22,11 @@ def create_deepagents_research_agent() -> Any:
     max_researcher_iterations = os.environ.get("MAX_RESEARCHER_ITERATIONS", 3)
 
     # Custom instructions (if any)
-    instructions_researcher=os.environ.get("RESEARCHER_INSTRUCTIONS", RESEARCHER_INSTRUCTIONS)
-    instructions_research_workflow=os.environ.get("RESEARCH_WORKFLOW_INSTRUCTIONS", RESEARCH_WORKFLOW_INSTRUCTIONS)
-    instructions_subagent_delegation=os.environ.get("SUBAGENT_DELEGATION_INSTRUCTIONS", SUBAGENT_DELEGATION_INSTRUCTIONS)
+    instructions_researcher = os.environ.get("RESEARCHER_INSTRUCTIONS", RESEARCHER_INSTRUCTIONS)
+    instructions_research_workflow = os.environ.get("RESEARCH_WORKFLOW_INSTRUCTIONS", RESEARCH_WORKFLOW_INSTRUCTIONS)
+    instructions_subagent_delegation = os.environ.get(
+        "SUBAGENT_DELEGATION_INSTRUCTIONS", SUBAGENT_DELEGATION_INSTRUCTIONS
+    )
 
     # Combine orchestrator instructions (RESEARCHER_INSTRUCTIONS only for sub-agents)
     INSTRUCTIONS = (
@@ -33,7 +39,7 @@ def create_deepagents_research_agent() -> Any:
             max_researcher_iterations=max_researcher_iterations,
         )
     )
-    
+
     # Get current date
     current_date = datetime.now().strftime("%Y-%m-%d")
 
@@ -50,9 +56,9 @@ def create_deepagents_research_agent() -> Any:
         openai_api_base=os.environ.get("OPENAI_BASE_URL", "http://0.0.0.0:8000/v1/"),
         openai_api_key=os.environ.get("OPENAI_API_KEY", "empty-api-key"),
         model_name=os.environ.get("LLM_MODEL_ID", "meta-llama/Llama-3.3-70B-Instruct"),
-        temperature=0.0
+        temperature=0.0,
     )
-    
+
     # Create the agent
     return create_deep_agent(
         model=model,
@@ -60,7 +66,8 @@ def create_deepagents_research_agent() -> Any:
         system_prompt=INSTRUCTIONS,
         subagents=[research_sub_agent],
     )
-    
+
+
 def create_agent(impl="DeepAgents") -> Any:
     if impl == "DeepAgents":
         return create_deepagents_research_agent()
