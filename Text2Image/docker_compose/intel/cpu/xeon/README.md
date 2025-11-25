@@ -23,8 +23,6 @@ Select Stable Diffusion (SD) model and assign its name to a environment variable
 ```bash
 # SD1.5
 export MODEL=stable-diffusion-v1-5/stable-diffusion-v1-5
-# SD2.1
-export MODEL=stabilityai/stable-diffusion-2-1
 # SDXL
 export MODEL=stabilityai/stable-diffusion-xl-base-1.0
 # SD3
