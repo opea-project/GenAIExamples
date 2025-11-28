@@ -1,9 +1,9 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-from typing import Any, Optional
-
+from typing import Any, Optional, Dict
 from pydantic import BaseModel
+from edgecraftrag import base
 
 
 class ModelIn(BaseModel):
@@ -12,6 +12,7 @@ class ModelIn(BaseModel):
     model_path: Optional[str] = "./"
     weight: Optional[str] = "INT4"
     device: Optional[str] = "cpu"
+    api_base: Optional[str] = None
 
 
 class NodeParserIn(BaseModel):
@@ -41,6 +42,7 @@ class PostProcessorIn(BaseModel):
 
 
 class GeneratorIn(BaseModel):
+    generator_type: str
     prompt_path: Optional[str] = None
     prompt_content: Optional[str] = None
     model: Optional[ModelIn] = None
@@ -49,6 +51,7 @@ class GeneratorIn(BaseModel):
 
 
 class PipelineCreateIn(BaseModel):
+    idx: Optional[str] = None
     name: Optional[str] = None
     node_parser: Optional[NodeParserIn] = None
     indexer: Optional[IndexerIn] = None
@@ -56,6 +59,7 @@ class PipelineCreateIn(BaseModel):
     postprocessor: Optional[list[PostProcessorIn]] = None
     generator: Optional[GeneratorIn] = None
     active: Optional[bool] = False
+    documents_cache: Optional[Dict] = None
 
 
 class DataIn(BaseModel):
@@ -78,18 +82,35 @@ class PromptIn(BaseModel):
 
 
 class KnowledgeBaseCreateIn(BaseModel):
+    idx: Optional[str] = None
     name: str
     description: Optional[str] = None
     active: Optional[bool] = None
     comp_type: Optional[str] = "knowledge"
     comp_subtype: Optional[str] = "origin_kb"
     experience_active: Optional[bool] = None
+    all_document_maps: Optional[Dict] = None
+    file_paths: Optional[list] = None
 
 
 class ExperienceIn(BaseModel):
-    question: str
+    idx: Optional[str] = None
+    question: Optional[str] = None
     content: list[str] = None
 
 
 class MilvusConnectRequest(BaseModel):
     vector_url: str
+
+
+class AgentCreateIn(BaseModel):
+    idx: Optional[str] = None
+    name: Optional[str] = ""
+    type: Optional[base.AgentType] = None
+    pipeline_idx: Optional[str] = None
+    configs: Optional[dict] = None
+    active: Optional[bool] = False
+
+
+class SessionIn(BaseModel):
+    idx: Optional[str] = None

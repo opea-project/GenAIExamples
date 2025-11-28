@@ -269,7 +269,7 @@ function quick_start_ov_services() {
     export MILVUS_ENABLED=${MILVUS_ENABLED:-1}
     export CHAT_HISTORY_ROUND=${CHAT_HISTORY_ROUND:-"0"}
     export LLM_MODEL=${LLM_MODEL:-"Qwen/Qwen3-8B"}
-    export MODEL_PATH=${MODEL_PATH:-"${HOME}/models"}
+    export MODEL_PATH=${MODEL_PATH:-"${PWD}/models"}
     export VIDEOGROUPID=$(getent group video | cut -d: -f3)
     export RENDERGROUPID=$(getent group render | cut -d: -f3)
 
@@ -294,6 +294,7 @@ function quick_start_ov_services() {
 function start_vLLM_B60_services() {
     COMPOSE_FILE="compose_vllm_b60.yaml"
     echo "stop former service..."
+    export MODEL_PATH=${MODEL_PATH:-"${PWD}/models"}
     docker compose -f $WORKPATH/docker_compose/intel/gpu/arc/$COMPOSE_FILE down
 
     ip_address=$(hostname -I | awk '{print $1}')
@@ -302,7 +303,7 @@ function start_vLLM_B60_services() {
     TMPFILE_PATH=$(get_user_input "TMPFILE_PATH" "$WORKPATH/tests")
     MILVUS_ENABLED=$(get_enable_function "MILVUS DB(Enter 1 for enable)" "0")
     CHAT_HISTORY_ROUND=$(get_user_input "chat history round" "0")
-    LLM_MODEL=$(get_user_input "your LLM model" "Qwen/Qwen3-72B")
+    LLM_MODEL=$(get_user_input "your LLM model" "Qwen/Qwen3-8B")
     MODEL_PATH=$(get_user_input "your model path" "${PWD}/models")
     read -p "Have you prepare models in ${MODEL_PATH}:(yes/no) [yes]" user_input
     user_input=${user_input:-"yes"}
@@ -342,6 +343,7 @@ function start_vLLM_B60_services() {
     BLOCK_SIZE=$(get_user_input "BLOCK_SIZE (vLLM block size)" "64")
     QUANTIZATION=$(get_user_input "QUANTIZATION (model quantization method, e.g. fp8/int4)" "fp8")
     # export ENV
+    export HOST_IP=${HOST_IP:-"${ip_address}"}
     export MODEL_PATH=${MODEL_PATH}
     export DOC_PATH=${DOC_PATH}
     export TMPFILE_PATH=${TMPFILE_PATH}
@@ -397,7 +399,7 @@ function quick_start_vllm_B60_services() {
     export TMPFILE_PATH=${TMPFILE_PATH:-"$WORKPATH/tests"}
     export MILVUS_ENABLED=${MILVUS_ENABLED:-1}
     export CHAT_HISTORY_ROUND=${CHAT_HISTORY_ROUND:-2}
-    export LLM_MODEL=${LLM_MODEL:-Qwen/Qwen3-72B}
+    export LLM_MODEL=${LLM_MODEL:-Qwen/Qwen3-8B}
     export VIDEOGROUPID=$(getent group video | cut -d: -f3)
     export RENDERGROUPID=$(getent group render | cut -d: -f3)
     # export vllm ENV

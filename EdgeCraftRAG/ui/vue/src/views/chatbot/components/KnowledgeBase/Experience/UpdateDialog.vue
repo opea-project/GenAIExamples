@@ -25,10 +25,9 @@
           v-for="(item, index) in form.experience"
           :key="index"
         >
+          <div v-if="!isEdit" class="query-index">{{ index + 1 }}</div>
           <a-form-item
-            :label="`${$t('experience.label.experience')} ${
-              isEdit ? '' : `${index + 1}`
-            }`"
+            :label="$t('experience.label.experience')"
             :name="['experience', index, 'question']"
             :rules="rules.experience"
           >
@@ -36,7 +35,6 @@
               v-model:value="item.question"
               :placeholder="$t('experience.placeholder.experience')"
               :auto-size="{ minRows: 1, maxRows: 2 }"
-              :disabled="isEdit"
             />
           </a-form-item>
           <a-form-item
@@ -298,11 +296,25 @@ const handleRefresh = () => {
   }
   .form-wrap {
     .item-wrap {
-      padding: 16px 32px 16px 16px;
+      padding: 16px;
       border: 1px solid var(--border-main-color);
       position: relative;
       margin-bottom: 16px;
       border-radius: 6px;
+      .query-index {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 20px;
+        height: 20px;
+        line-height: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        text-align: center;
+        border-radius: 6px 0;
+        color: var(--color-primary-tip);
+        background-color: var(--border-primary);
+      }
       .gt-wrap {
         margin-bottom: 0;
         :deep(.intel-form-item-control-input-content) {
@@ -351,7 +363,7 @@ const handleRefresh = () => {
         cursor: pointer;
         display: inline-flex;
         gap: 8px;
-        width: 42px;
+        width: 20px;
         .anticon {
           font-size: 16px;
           &:hover {

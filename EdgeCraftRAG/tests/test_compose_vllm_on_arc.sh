@@ -18,7 +18,7 @@ LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
 HOST_IP=$ip_address
 
-COMPOSE_FILE="compose_vllm.yaml"
+COMPOSE_FILE="compose.yaml"
 EC_RAG_SERVICE_PORT=16010
 
 MODEL_PATH="${HOME}/models"
@@ -27,19 +27,13 @@ DOC_PATH="$WORKPATH/tests"
 UI_UPLOAD_PATH="$WORKPATH/tests"
 
 HF_ENDPOINT=https://hf-mirror.com
-NGINX_PORT=8086
-NGINX_PORT_0=8100
-NGINX_PORT_1=8100
-VLLM_SERVICE_PORT_0=8100
+VLLM_SERVICE_PORT_A770=8086
 TENSOR_PARALLEL_SIZE=1
 SELECTED_XPU_0=0
-vLLM_ENDPOINT="http://${HOST_IP}:${NGINX_PORT}"
+vLLM_ENDPOINT="http://${HOST_IP}:${VLLM_SERVICE_PORT_A770}"
 LLM_MODEL="Qwen/Qwen3-8B"
 LLM_MODEL_PATH="${MODEL_PATH}/${LLM_MODEL}"
-NGINX_CONFIG_PATH="$WORKPATH/nginx/nginx.conf"
 VLLM_IMAGE_TAG="0.8.3-b20"
-MAX_MODEL_LEN=8192
-DP_NUM=1
 
 function build_docker_images() {
     opea_branch=${opea_branch:-"main"}
@@ -62,12 +56,8 @@ function build_docker_images() {
 function start_services() {
     cd $WORKPATH/docker_compose/intel/gpu/arc
     source set_env.sh
-    # generate nginx config file according to container count
-    bash $WORKPATH/nginx/nginx-conf-generator.sh $DP_NUM $WORKPATH/nginx/nginx.conf
-    # generate yaml file according to container count
-    bash multi-arc-yaml-generator.sh $DP_NUM $COMPOSE_FILE
     # Start Docker Containers
-    docker compose -f $COMPOSE_FILE up -d > ${LOG_PATH}/start_services_with_compose.log
+    docker --profile a770 compose -f $COMPOSE_FILE up -d > ${LOG_PATH}/start_services_with_compose.log
     echo "ipex-llm-serving-xpu is booting, please wait."
     sleep 30s
     n=0
@@ -179,6 +169,5 @@ function main() {
     echo "::endgroup::"
 
 }
-
 
 main

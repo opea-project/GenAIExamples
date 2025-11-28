@@ -4,8 +4,15 @@
 import { defineStore } from "pinia";
 
 const configuration = {
+  agent: {
+    name: "",
+    type: "",
+    index: 0,
+  },
+  sessionId: "",
   configuration: {
-    top_n: 25,
+    top_n: 0,
+    k: 0,
     temperature: 0.01,
     top_p: 0.95,
     top_k: 10,
@@ -30,6 +37,15 @@ export const chatbotAppStore = defineStore("chatbot", {
         ...this.configuration,
         ...configuration,
       };
+    },
+    setAgent(agent: EmptyObjectType) {
+      this.agent = {
+        ...this.agent,
+        ...agent,
+      };
+    },
+    setSessionId(id: string) {
+      this.sessionId = id;
     },
   },
 });

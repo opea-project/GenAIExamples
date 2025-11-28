@@ -25,8 +25,10 @@ MODEL_PATH="${HOME}/models"
 # MODEL_PATH="$WORKPATH/models"
 DOC_PATH="$WORKPATH/tests"
 UI_UPLOAD_PATH="$WORKPATH/tests"
+MAX_MODEL_LEN=5000
 
 HF_ENDPOINT=https://hf-mirror.com
+
 
 function build_docker_images() {
     opea_branch=${opea_branch:-"main"}

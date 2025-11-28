@@ -26,34 +26,6 @@ class NodeParserMgr(BaseMgr):
                     return v
         return None
 
-    def search_parser_change(self, pl, req):
-        pl_change = False
-        try:
-            if pl.node_parser.comp_subtype != req.node_parser.parser_type:
-                return True
-            if pl.node_parser.comp_subtype == req.node_parser.parser_type:
-                if pl.node_parser.comp_subtype == NodeParserType.SIMPLE:
-                    if (
-                        pl.node_parser.chunk_size != req.node_parser.chunk_size
-                        or pl.node_parser.chunk_overlap != req.node_parser.chunk_overlap
-                    ):
-                        pl_change = True
-                elif pl.node_parser.comp_subtype == NodeParserType.SENTENCEWINDOW:
-                    if pl.node_parser.window_size != req.node_parser.window_size:
-                        pl_change = True
-                elif pl.node_parser.comp_subtype == NodeParserType.HIERARCHY:
-                    if pl.node_parser.chunk_sizes != req.node_parser.chunk_sizes:
-                        pl_change = True
-                elif pl.node_parser.comp_subtype == NodeParserType.UNSTRUCTURED:
-                    if (
-                        pl.node_parser.chunk_size != req.node_parser.chunk_size
-                        or pl.node_parser.chunk_overlap != req.node_parser.chunk_overlap
-                    ):
-                        pl_change = True
-        except:
-            return False
-        return pl_change
-
 
 class IndexerMgr(BaseMgr):
 

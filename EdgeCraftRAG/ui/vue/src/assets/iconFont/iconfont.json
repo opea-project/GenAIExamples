@@ -6,6 +6,83 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "13542590",
+      "name": "simple-robot",
+      "font_class": "simple-robot",
+      "unicode": "e604",
+      "unicode_decimal": 58884
+    },
+    {
+      "icon_id": "14551080",
+      "name": "deep_search",
+      "font_class": "deep_search",
+      "unicode": "e620",
+      "unicode_decimal": 58912
+    },
+    {
+      "icon_id": "38847045",
+      "name": "机器人-05",
+      "font_class": "jiqiren-05",
+      "unicode": "ec1e",
+      "unicode_decimal": 60446
+    },
+    {
+      "icon_id": "46000445",
+      "name": "recursive",
+      "font_class": "recursive",
+      "unicode": "e61e",
+      "unicode_decimal": 58910
+    },
+    {
+      "icon_id": "46000444",
+      "name": "simple",
+      "font_class": "simple",
+      "unicode": "e61f",
+      "unicode_decimal": 58911
+    },
+    {
+      "icon_id": "45982435",
+      "name": "路径",
+      "font_class": "lujing",
+      "unicode": "e61d",
+      "unicode_decimal": 58909
+    },
+    {
+      "icon_id": "3638339",
+      "name": "agent",
+      "font_class": "agent",
+      "unicode": "e62c",
+      "unicode_decimal": 58924
+    },
+    {
+      "icon_id": "4772844",
+      "name": "Pipeline",
+      "font_class": "pipeline",
+      "unicode": "e650",
+      "unicode_decimal": 58960
+    },
+    {
+      "icon_id": "15838538",
+      "name": "skip",
+      "font_class": "skip1",
+      "unicode": "e67f",
+      "unicode_decimal": 59007
+    },
+    {
+      "icon_id": "12753474",
+      "name": "annotation",
+      "font_class": "annotation",
+      "unicode": "e62e",
+      "unicode_decimal": 58926
+    },
+    {
+      "icon_id": "33279726",
+      "name": "groundtruth",
+      "font_class": "groundtruth",
+      "unicode": "e9b7",
+      "unicode_decimal": 59831
+    },
+    {
       "icon_id": "687788",
       "name": "知识库",
       "font_class": "kb",

@@ -28,9 +28,26 @@ export const getBenchmark = () => {
   });
 };
 
-export const requestStopChat = () => {
+export const getHistorySessionList = () => {
   return request({
-    url: `/v1/chatqna/stop`,
-    method: "post",
+    url: "/v1/sessions",
+    method: "get",
+  });
+};
+
+export const getSessionDetailById = (SessionId: String) => {
+  return request({
+    url: `v1/session/${SessionId}`,
+    method: "get",
+  });
+};
+
+export const requestSessionDelete = (SessionId: String) => {
+  return request({
+    url: `/v1/session/${SessionId}`,
+    method: "delete",
+    showLoading: true,
+    showSuccessMsg: true,
+    successMsg: "request.knowledge.deleteSucc",
   });
 };

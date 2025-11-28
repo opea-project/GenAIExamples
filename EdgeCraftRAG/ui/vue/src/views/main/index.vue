@@ -58,7 +58,8 @@
 <script lang="ts" setup name="Chatbot">
 import router from "@/router";
 import { onMounted, reactive } from "vue";
-import { QuickStart, SystemChart } from "../pipeline/components/index";
+import SystemChart from "@/views/settings/components/System/SystemChart.vue";
+import QuickStart from "./QuickStart.vue";
 import { getSystemStatus } from "@/api/pipeline";
 
 const route = useRoute();
@@ -78,7 +79,7 @@ const componentList = ref<EmptyArrayType>([
   },
   {
     label: "chat.setting",
-    path: "/pipeline",
+    path: "/settings",
     icon: "icon-setting",
   },
 ]);
@@ -89,7 +90,7 @@ const handleMenuChange = (path: string) => {
 };
 //create
 const handleCreate = () => {
-  router.push({ name: "Pipeline" });
+  router.push({ name: "Setting" });
 };
 const querySystemStatus = async () => {
   const data = await getSystemStatus();

@@ -74,10 +74,11 @@ export const getRunDevice = () => {
   });
 };
 
-export const getModelList = (type: string) => {
+export const getModelList = (type: string, params?: Object) => {
   return request({
     url: `/v1/settings/avail-models/${type}`,
     method: "get",
+    params,
   });
 };
 
@@ -106,4 +107,6 @@ export const requestUrlVllm = (data: Object) => {
   });
 };
 
-export const importUrl = `${import.meta.env.VITE_API_URL}v1/settings/pipelines/import`;
+export const importUrl = `${
+  import.meta.env.VITE_API_URL
+}v1/settings/pipelines/import`;
