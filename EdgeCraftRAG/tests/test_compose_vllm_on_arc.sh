@@ -136,6 +136,7 @@ function validate_megaservice() {
 
 function stop_docker() {
     cd $WORKPATH/docker_compose/intel/gpu/arc
+    export MODEL_PATH="${HOME}/models"
     docker compose -f $COMPOSE_FILE down
 }
 
