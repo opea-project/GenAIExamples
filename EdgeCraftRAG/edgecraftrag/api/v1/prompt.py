@@ -5,7 +5,7 @@ from edgecraftrag.api_schema import PromptIn
 from edgecraftrag.context import ctx
 from edgecraftrag.api.v1.pipeline import save_pipeline_configurations
 from fastapi import FastAPI, File, HTTPException, UploadFile, status
-
+from edgecraftrag.utils import DEFAULT_TEMPLATE
 prompt_app = FastAPI()
 
 
@@ -61,6 +61,9 @@ async def get_tagged_prompt():
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
+@prompt_app.get(path="/v1/chatqna/prompt/default")
+async def get_default_prompt():
+    return DEFAULT_TEMPLATE
 
 # Reset prompt for LLM ChatQnA
 @prompt_app.post(path="/v1/chatqna/prompt/reset")
