@@ -57,7 +57,7 @@ function start_services() {
     cd $WORKPATH/docker_compose/intel/gpu/arc
     source set_env.sh
     # Start Docker Containers
-    docker --profile a770 compose -f $COMPOSE_FILE up -d > ${LOG_PATH}/start_services_with_compose.log
+    docker compose --profile a770 -f $COMPOSE_FILE up -d > ${LOG_PATH}/start_services_with_compose.log
     echo "ipex-llm-serving-xpu is booting, please wait."
     sleep 30s
     n=0
