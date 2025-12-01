@@ -33,6 +33,7 @@ vLLM_ENDPOINT="http://${HOST_IP}:${VLLM_SERVICE_PORT_B60}"
 LLM_MODEL="Qwen/Qwen3-8B"
 VLLM_IMAGE_TAG="1.1-preview"
 DP=1
+ZE_AFFINITY_MASK=1
 
 function build_docker_images() {
     opea_branch=${opea_branch:-"main"}
@@ -62,7 +63,7 @@ function start_services() {
     n=0
     until [[ "$n" -ge 100 ]]; do
         docker logs ipex-serving-xpu-container > ${LOG_PATH}/ipex-serving-xpu-container.log 2>&1
-        if grep -q "Starting vLLM API server on http://0.0.0.0:" ${LOG_PATH}/ipex-serving-xpu-container.log; then
+        if grep -q "Starting vLLM API server" ${LOG_PATH}/ipex-serving-xpu-container.log; then
             break
         fi
         sleep 6s
