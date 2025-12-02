@@ -61,7 +61,7 @@ function start_services() {
     sleep 30s
     n=0
     until [[ "$n" -ge 100 ]]; do
-        docker logs ipex-llm-serving-xpu-container-0 > ${LOG_PATH}/ipex-llm-serving-xpu-container.log 2>&1
+        docker logs ipex-llm-serving-xpu-770 > ${LOG_PATH}/ipex-llm-serving-xpu-container.log 2>&1
         if grep -q "Starting vLLM API server on http://0.0.0.0:" ${LOG_PATH}/ipex-llm-serving-xpu-container.log; then
             break
         fi
@@ -119,7 +119,7 @@ function validate_rag() {
         "${HOST_IP}:${EC_RAG_SERVICE_PORT}/v1/chatqna" \
         "1234567890" \
         "query" \
-        "ipex-llm-serving-xpu-container-0" \
+        "ipex-llm-serving-xpu-770" \
         '{"messages":"What is the test id?","max_tokens":5}'
 }
 
@@ -129,7 +129,7 @@ function validate_megaservice() {
         "${HOST_IP}:16011/v1/chatqna" \
         "1234567890" \
         "query" \
-        "ipex-llm-serving-xpu-container-0" \
+        "ipex-llm-serving-xpu-770" \
         '{"messages":"What is the test id?","max_tokens":5}'
 }
 

@@ -123,6 +123,9 @@ async def update_pipeline(name, request: PipelineCreateIn):
 async def remove_pipeline(name):
     try:
         pl = ctx.get_pipeline_mgr().get_pipeline_by_name_or_id(name)
+        for _, agent in ctx.agentmgr.get_agents().items():
+            if pl.idx == agent.pipeline_idx:
+                raise Exception(f"Please cancel the {agent.name}'s agent associated with the current pipeline first")
         res = ctx.get_pipeline_mgr().remove_pipeline_by_name_or_id(name)
         await save_pipeline_configurations("delete", pl)
         return res
