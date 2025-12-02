@@ -37,6 +37,7 @@
       "device": "auto",
       "weight": "INT4"
     },
+    "generator_type": "chatqna",
     "prompt_path": "./default_prompt.txt",
     "inference_type": "local"
   },

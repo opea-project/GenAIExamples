@@ -23,7 +23,7 @@ get_enable_function() {
 }
 
 function start_vllm_services() {
-    COMPOSE_FILE="compose_vllm.yaml"
+    COMPOSE_FILE="compose.yaml"
     echo "stop former service..."
     docker compose -f $WORKPATH/docker_compose/intel/gpu/arc/$COMPOSE_FILE down
 
@@ -63,24 +63,11 @@ function start_vllm_services() {
     sudo chown -R 1000:1000 ${HF_CACHE}
     HF_ENDPOINT=https://hf-mirror.com
     # vllm ENV
-    export NGINX_PORT=8086
-    export vLLM_ENDPOINT="http://${HOST_IP}:${NGINX_PORT}"
-    read -p "DP number(how many containers to run vLLM) [1] , press Enter to confirm, or type a new value:" DP_NUM; DP_NUM=${DP_NUM:-1}
+    export VLLM_SERVICE_PORT_A770=8086
+
     read -p "Tensor parallel size(your tp size [1]), press Enter to confirm, or type a new value:" TENSOR_PARALLEL_SIZE; TENSOR_PARALLEL_SIZE=${TENSOR_PARALLEL_SIZE:-1}
-
-    for (( x=0; x<DP_NUM; x++ )); do
-        start_gpu=$(( x * TENSOR_PARALLEL_SIZE ))
-        default_gpu_list=$(seq -s, $start_gpu $(( start_gpu + TENSOR_PARALLEL_SIZE - 1 )))
-
-        read -p "selected XPU(your selected_XPU_${x} [${default_gpu_list}]) , press Enter to confirm, or type a new value:" input_gpu_list
-        selected_gpu_list=${input_gpu_list:-$default_gpu_list}
-
-        export SELECTED_XPU_${x}="$selected_gpu_list"
-        export VLLM_SERVICE_PORT_${x}="8$((x+1))00"
-    done
     CCL_DG2_USM=$(get_user_input "Set USM (Core=1, Xeon=0, default=0)" 0)
     export HOST_IP=${HOST_IP}
-    export VLLM_SERVICE_PORT_0=8100
     # export ENV
     export MODEL_PATH=${MODEL_PATH}
     export DOC_PATH=${DOC_PATH}
@@ -90,18 +77,14 @@ function start_vllm_services() {
     export no_proxy="localhost, 127.0.0.1, 192.168.1.1, ${HOST_IP}"
     export MILVUS_ENABLED=${MILVUS_ENABLED}
     export CHAT_HISTORY_ROUND=${CHAT_HISTORY_ROUND}
-    export SELECTED_XPU_0=${SELECTED_XPU_0}
     export TENSOR_PARALLEL_SIZE=${TENSOR_PARALLEL_SIZE}
     export CCL_DG2_USM=${CCL_DG2_USM}
     export VIDEOGROUPID=$(getent group video | cut -d: -f3)
     export RENDERGROUPID=$(getent group render | cut -d: -f3)
 
-    bash $WORKPATH/nginx/nginx-conf-generator.sh $DP_NUM $WORKPATH/nginx/nginx.conf
-    export NGINX_CONFIG_PATH="${WORKPATH}/nginx/nginx.conf"
 
     # Start Docker Containers
-    bash $WORKPATH/docker_compose/intel/gpu/arc/multi-arc-yaml-generator.sh $DP_NUM $WORKPATH/docker_compose/intel/gpu/arc/$COMPOSE_FILE
-    docker compose -f $WORKPATH/docker_compose/intel/gpu/arc/$COMPOSE_FILE up -d
+    docker compose --profile a770 -f $WORKPATH/docker_compose/intel/gpu/arc/$COMPOSE_FILE up -d
     echo "ipex-llm-serving-xpu is booting, please wait..."
     n=0
     until [[ "$n" -ge 100 ]]; do
@@ -176,6 +159,7 @@ function start_services() {
     export CHAT_HISTORY_ROUND=${CHAT_HISTORY_ROUND}
     export VIDEOGROUPID=$(getent group video | cut -d: -f3)
     export RENDERGROUPID=$(getent group render | cut -d: -f3)
+    export MAX_MODEL_LEN=5000
 
     # Start Docker Containers
     COMPOSE_FILE="compose.yaml"
@@ -199,10 +183,11 @@ function check_baai_folder() {
 
 function quick_start_vllm_services() {
     WORKPATH=$(dirname "$PWD")
-    COMPOSE_FILE="compose_vllm.yaml"
+    COMPOSE_FILE="compose.yaml"
     EC_RAG_SERVICE_PORT=16010
     docker compose -f $WORKPATH/docker_compose/intel/gpu/arc/$COMPOSE_FILE down
 
+    ip_address=$(hostname -I | awk '{print $1}')
     export HOST_IP=${HOST_IP:-"${ip_address}"}
     export MODEL_PATH=${MODEL_PATH:-"${PWD}/models"}
     export DOC_PATH=${DOC_PATH:-"$WORKPATH/tests"}
@@ -211,21 +196,17 @@ function quick_start_vllm_services() {
     export MILVUS_ENABLED=${MILVUS_ENABLED:-1}
     export CHAT_HISTORY_ROUND=${CHAT_HISTORY_ROUND:-2}
     export HF_ENDPOINT=${HF_ENDPOINT:-https://hf-mirror.com}
-    export NGINX_PORT=${NGINX_PORT:-8086}
-    export NGINX_PORT_0=${NGINX_PORT_0:-8100}
-    export VLLM_SERVICE_PORT_0=${VLLM_SERVICE_PORT_0:-8100}
     export TENSOR_PARALLEL_SIZE=${TENSOR_PARALLEL_SIZE:-1}
-    export SELECTED_XPU_0=${SELECTED_XPU_0:-0}
     export MAX_NUM_SEQS=${MAX_NUM_SEQS:-64}
-    export MAX_NUM_BATCHED_TOKENS=${MAX_NUM_BATCHED_TOKENS:-4000}
-    export MAX_MODEL_LEN=${MAX_MODEL_LEN:-3000}
+    export MAX_MODEL_LEN=${MAX_MODEL_LEN:-10240}
+    export MAX_NUM_BATCHED_TOKENS=${MAX_NUM_BATCHED_TOKENS:-10240}
     export LOAD_IN_LOW_BIT=${LOAD_IN_LOW_BIT:-fp8}
     export CCL_DG2_USM=${CCL_DG2_USM:-0}
-    export vLLM_ENDPOINT=${vLLM_ENDPOINT:-"http://${HOST_IP}:${NGINX_PORT}"}
     export LLM_MODEL=${LLM_MODEL:-Qwen/Qwen3-8B}
     export LLM_MODEL_PATH=${LLM_MODEL_PATH:-"${MODEL_PATH}/Qwen/Qwen3-8B"}
     export VIDEOGROUPID=$(getent group video | cut -d: -f3)
     export RENDERGROUPID=$(getent group render | cut -d: -f3)
+    export VLLM_SERVICE_PORT_A770=8086
 
     check_baai_folder
     export HF_CACHE=${HF_CACHE:-"${HOME}/.cache"}
@@ -237,11 +218,8 @@ function quick_start_vllm_services() {
     sudo chown -R 1000:1000 ${MODEL_PATH} ${DOC_PATH} ${TMPFILE_PATH}
     sudo chown -R 1000:1000 ${HF_CACHE}
     cd $WORKPATH/docker_compose/intel/gpu/arc
-    bash $WORKPATH/nginx/nginx-conf-generator.sh $DP_NUM $WORKPATH/nginx/nginx.conf
-    export NGINX_CONFIG_PATH=${NGINX_CONFIG_PATH:-"$WORKPATH/nginx/nginx.conf"}
 
-    bash $WORKPATH/docker_compose/intel/gpu/arc/multi-arc-yaml-generator.sh $DP_NUM $WORKPATH/docker_compose/intel/gpu/arc/$COMPOSE_FILE
-    docker compose -f $WORKPATH/docker_compose/intel/gpu/arc/$COMPOSE_FILE up -d
+    docker compose --profile a770 -f $WORKPATH/docker_compose/intel/gpu/arc/$COMPOSE_FILE up -d
     echo "ipex-llm-serving-xpu is booting, please wait..."
     n=0
     until [[ "$n" -ge 100 ]]; do
@@ -269,9 +247,10 @@ function quick_start_ov_services() {
     export MILVUS_ENABLED=${MILVUS_ENABLED:-1}
     export CHAT_HISTORY_ROUND=${CHAT_HISTORY_ROUND:-"0"}
     export LLM_MODEL=${LLM_MODEL:-"Qwen/Qwen3-8B"}
-    export MODEL_PATH=${MODEL_PATH:-"${HOME}/models"}
+    export MODEL_PATH=${MODEL_PATH:-"${PWD}/models"}
     export VIDEOGROUPID=$(getent group video | cut -d: -f3)
     export RENDERGROUPID=$(getent group render | cut -d: -f3)
+    export MAX_MODEL_LEN=5000
 
     check_baai_folder
     export HF_CACHE=${HF_CACHE:-"${HOME}/.cache"}
@@ -292,8 +271,9 @@ function quick_start_ov_services() {
 
 
 function start_vLLM_B60_services() {
-    COMPOSE_FILE="compose_vllm_b60.yaml"
+    COMPOSE_FILE="compose.yaml"
     echo "stop former service..."
+    export MODEL_PATH=${MODEL_PATH:-"${PWD}/models"}
     docker compose -f $WORKPATH/docker_compose/intel/gpu/arc/$COMPOSE_FILE down
 
     ip_address=$(hostname -I | awk '{print $1}')
@@ -302,7 +282,7 @@ function start_vLLM_B60_services() {
     TMPFILE_PATH=$(get_user_input "TMPFILE_PATH" "$WORKPATH/tests")
     MILVUS_ENABLED=$(get_enable_function "MILVUS DB(Enter 1 for enable)" "0")
     CHAT_HISTORY_ROUND=$(get_user_input "chat history round" "0")
-    LLM_MODEL=$(get_user_input "your LLM model" "Qwen/Qwen3-72B")
+    LLM_MODEL=$(get_user_input "your LLM model" "Qwen/Qwen3-8B")
     MODEL_PATH=$(get_user_input "your model path" "${PWD}/models")
     read -p "Have you prepare models in ${MODEL_PATH}:(yes/no) [yes]" user_input
     user_input=${user_input:-"yes"}
@@ -338,10 +318,11 @@ function start_vLLM_B60_services() {
     NO_ENABLE_PREFIX_CACHING=$(get_user_input "NO_ENABLE_PREFIX_CACHING (disable prefix caching, 1=disable/0=enable)" "1")
     MAX_NUM_BATCHED_TOKENS=$(get_user_input "MAX_NUM_BATCHED_TOKENS (max number of batched tokens)" "8192")
     DISABLE_LOG_REQUESTS=$(get_user_input "DISABLE_LOG_REQUESTS (disable request logs, 1=disable/0=enable)" "1")
-    MAX_MODEL_LEN=$(get_user_input "MAX_MODEL_LEN (max model context length, e.g. 49152/10240)" "49152")
+    MAX_MODEL_LEN=$(get_user_input "MAX_MODEL_LEN (max model context length, e.g. 40000/10240)" "40000")
     BLOCK_SIZE=$(get_user_input "BLOCK_SIZE (vLLM block size)" "64")
     QUANTIZATION=$(get_user_input "QUANTIZATION (model quantization method, e.g. fp8/int4)" "fp8")
     # export ENV
+    export HOST_IP=${HOST_IP:-"${ip_address}"}
     export MODEL_PATH=${MODEL_PATH}
     export DOC_PATH=${DOC_PATH}
     export TMPFILE_PATH=${TMPFILE_PATH}
@@ -369,7 +350,7 @@ function start_vLLM_B60_services() {
     export QUANTIZATION=${QUANTIZATION}
 
     # Start Docker Containers
-    docker compose -f $WORKPATH/docker_compose/intel/gpu/arc/$COMPOSE_FILE up -d
+    docker compose --profile b60 -f $WORKPATH/docker_compose/intel/gpu/arc/$COMPOSE_FILE up -d
     echo "ipex-llm-serving-xpu is booting, please wait..."
     n=0
     until [[ "$n" -ge 100 ]]; do
@@ -387,24 +368,25 @@ function start_vLLM_B60_services() {
 
 function quick_start_vllm_B60_services() {
     WORKPATH=$(dirname "$PWD")
-    COMPOSE_FILE="compose_vllm_b60.yaml"
+    COMPOSE_FILE="compose.yaml"
     EC_RAG_SERVICE_PORT=16010
     docker compose -f $WORKPATH/docker_compose/intel/gpu/arc/$COMPOSE_FILE down
 
+    ip_address=$(hostname -I | awk '{print $1}')
     export HOST_IP=${HOST_IP:-"${ip_address}"}
     export MODEL_PATH=${MODEL_PATH:-"${PWD}/models"}
     export DOC_PATH=${DOC_PATH:-"$WORKPATH/tests"}
     export TMPFILE_PATH=${TMPFILE_PATH:-"$WORKPATH/tests"}
     export MILVUS_ENABLED=${MILVUS_ENABLED:-1}
     export CHAT_HISTORY_ROUND=${CHAT_HISTORY_ROUND:-2}
-    export LLM_MODEL=${LLM_MODEL:-Qwen/Qwen3-72B}
+    export LLM_MODEL=${LLM_MODEL:-Qwen/Qwen3-8B}
     export VIDEOGROUPID=$(getent group video | cut -d: -f3)
     export RENDERGROUPID=$(getent group render | cut -d: -f3)
     # export vllm ENV
-    export DP=${DP:-4}
+    export DP=${DP:-1}
     export TP=${TP:-1}
     export DTYPE=${DTYPE:-float16}
-    export ZE_AFFINITY_MASK=${ZE_AFFINITY_MASK:-0,1,2,3}
+    export ZE_AFFINITY_MASK=${ZE_AFFINITY_MASK:-0}
     export ENFORCE_EAGER=${ENFORCE_EAGER:-1}
     export TRUST_REMOTE_CODE=${TRUST_REMOTE_CODE:-1}
     export DISABLE_SLIDING_WINDOW=${DISABLE_SLIDING_WINDOW:-1}
@@ -412,7 +394,7 @@ function quick_start_vllm_B60_services() {
     export NO_ENABLE_PREFIX_CACHING=${NO_ENABLE_PREFIX_CACHING:-1}
     export MAX_NUM_BATCHED_TOKENS=${MAX_NUM_BATCHED_TOKENS:-8192}
     export DISABLE_LOG_REQUESTS=${disable_LOG_REQUESTS:-1}
-    export MAX_MODEL_LEN=${MAX_MODEL_LEN:-49152}
+    export MAX_MODEL_LEN=${MAX_MODEL_LEN:-40000}
     export BLOCK_SIZE=${BLOCK_SIZE:-64}
     export QUANTIZATION=${QUANTIZATION:-fp8}
 
@@ -420,7 +402,7 @@ function quick_start_vllm_B60_services() {
     check_baai_folder
     export no_proxy="localhost, 127.0.0.1, 192.168.1.1, ${HOST_IP}"
     sudo chown -R 1000:1000 ${MODEL_PATH} ${DOC_PATH} ${TMPFILE_PATH}
-    docker compose -f $WORKPATH/docker_compose/intel/gpu/arc/$COMPOSE_FILE up -d
+    docker compose --profile b60 -f $WORKPATH/docker_compose/intel/gpu/arc/$COMPOSE_FILE up -d
     echo "ipex-llm-serving-xpu is booting, please wait..."
     n=0
     until [[ "$n" -ge 100 ]]; do
@@ -448,10 +430,10 @@ function main {
             start_services
         fi
     else
-        export SERVICE_TYPE=${SERVICE_TYPE:-"vLLM_A770"}
-        if [[ "$SERVICE_TYPE" == "vLLM_A770" || "$SERVICE_TYPE" == "vLLM" ]]; then
+        export COMPOSE_PROFILES=${COMPOSE_PROFILES:-""}
+        if [[ "$COMPOSE_PROFILES" == "vLLM_A770" || "$COMPOSE_PROFILES" == "vLLM"  || "$COMPOSE_PROFILES" == "vllm_on_a770" ]]; then
             quick_start_vllm_services
-        elif [[ "$SERVICE_TYPE" == "vLLM_B60" || "$SERVICE_TYPE" == "vLLM_b60" ]]; then
+        elif [[ "$COMPOSE_PROFILES" == "vLLM_B60" || "$COMPOSE_PROFILES" == "vLLM_b60" || "$COMPOSE_PROFILES" == "vllm_on_b60" ]]; then
             quick_start_vllm_B60_services
         else
             quick_start_ov_services

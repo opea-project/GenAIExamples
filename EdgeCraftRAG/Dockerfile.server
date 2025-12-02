@@ -35,4 +35,6 @@ WORKDIR /home/user/
 RUN git clone https://github.com/openvinotoolkit/openvino.genai.git genai
 ENV PYTHONPATH="$PYTHONPATH:/home/user/genai/tools/llm_bench"
 
+RUN python3 -m nltk.downloader -d /home/user/nltk_data punkt_tab averaged_perceptron_tagger_eng
+
 ENTRYPOINT ["python3", "-m", "edgecraftrag.server"]

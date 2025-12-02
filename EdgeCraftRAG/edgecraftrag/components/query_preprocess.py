@@ -8,6 +8,7 @@ from abc import ABC
 
 import aiohttp
 import numpy
+from edgecraftrag.config_repository import MilvusConfigRepository
 from omegaconf import OmegaConf
 
 
@@ -190,22 +191,30 @@ class LogitsEstimatorJSON(LogitsEstimator):
         return await self._calculate_logits_score(*input_pair)
 
 
+experience_repo = MilvusConfigRepository.create_connection("experience_data", 1)
+
+
 def read_json_files(file_path: str) -> dict:
-    result = {}
-    if os.path.isfile(file_path):
-        with open(file_path, "r", encoding="utf-8") as f:
-            result = json.load(f)
-    return result
+    experience_lists = []
+    if experience_repo:
+        experience_lists = []
+        for experience in experience_repo.get_configs():
+            experience_lists.append(experience["config_json"])
+    else:
+        if os.path.isfile(file_path):
+            with open(file_path, "r", encoding="utf-8") as f:
+                experience_lists = json.load(f)
+    return experience_lists
 
 
-async def query_search(user_input, search_config_path, search_dir, pl):
+async def query_search(user_input, SEARCH_CONFIG_PATH, SEARCH_DIR, pl):
     top1_issue = None
     sub_questions_result = None
 
     model_id = pl.generator.model_id
     vllm_endpoint = pl.generator.vllm_endpoint
 
-    maintenance_data = read_json_files(search_dir)
+    maintenance_data = read_json_files(SEARCH_DIR)
     issues = []
     for i in range(len(maintenance_data)):
         issues.append(maintenance_data[i]["question"])
@@ -213,7 +222,7 @@ async def query_search(user_input, search_config_path, search_dir, pl):
         return top1_issue, sub_questions_result
 
     cfg = {}
-    if not os.path.exists(search_config_path):
+    if not os.path.exists(SEARCH_CONFIG_PATH):
         cfg["query_matcher"] = {
             "instructions": "You're a knowledgeable assistant. Your task is to judge if two queries ask for the same information about the same primary subject. Output only 'Yes' or 'No'. Yes = same subject entity AND same information need, with only wording or stylistic differences. No = different subject entity, different spec or numeric constraint, different attribute/metric, or scope changed by adding/removing a restricting condition. Entity changes MUST lead to No.",
             "input_template": "Query 1: {}\nQuery 2: {}\n",
@@ -223,7 +232,7 @@ async def query_search(user_input, search_config_path, search_dir, pl):
             "temperature": 0.1,
         }
     else:
-        cfg = OmegaConf.load(search_config_path)
+        cfg = OmegaConf.load(SEARCH_CONFIG_PATH)
     cfg["query_matcher"]["model_id"] = model_id
     cfg["query_matcher"]["API_BASE"] = os.path.join(vllm_endpoint, "v1/completions")
     query_matcher = LogitsEstimatorJSON(**cfg["query_matcher"])

@@ -3,98 +3,83 @@
 
 import { ref, Ref } from "vue";
 import { message } from "ant-design-vue";
-import type { MessageType } from "ant-design-vue/es/message";
 import i18n from "@/i18n";
-
-interface UseClipboardOptions {
-  timeout?: number;
-}
 
 interface UseClipboardReturn {
   copied: Ref<boolean>;
-  clipboardText: Ref<string>;
-  isSupported: Ref<boolean>;
   copy: (text: string) => Promise<boolean>;
-  read: () => Promise<string | null>;
-  reset: () => void;
 }
 
-export const useClipboard = (options: UseClipboardOptions = {}): UseClipboardReturn => {
-  const { timeout = 2000 } = options;
+export const copyText = async (text: string, showMessage: boolean = true): Promise<boolean> => {
+  if (!text) {
+    if (showMessage) {
+      message.error(i18n.global.t("common.copyError"));
+    }
+    return false;
+  }
 
-  const copied = ref(false);
-  const clipboardText = ref("");
-  const isSupported = ref(!!navigator.clipboard);
-  let timeoutId: number | null = null;
-  let messageInstance: MessageType | null = null;
+  const copyWithExecCommand = (text: string): boolean => {
+    try {
+      const textArea = document.createElement("textarea");
+      textArea.value = text;
+      textArea.style.cssText = "position:fixed;top:0;left:0;opacity:0;pointer-events:none;z-index:-1;";
+      document.body.appendChild(textArea);
+      textArea.select();
+      textArea.setSelectionRange(0, 99999);
+      const successful = document.execCommand("copy");
+      document.body.removeChild(textArea);
+      return successful;
+    } catch (err) {
+      return false;
+    }
+  };
 
-  const setCopiedState = (): void => {
-    copied.value = true;
-
-    if (timeoutId) {
-      clearTimeout(timeoutId);
+  try {
+    if (navigator.clipboard) {
+      await navigator.clipboard.writeText(text);
+    } else {
+      const success = copyWithExecCommand(text);
+      if (!success) throw new Error("Copy failed");
     }
 
-    timeoutId = window.setTimeout(() => {
-      copied.value = false;
-    }, timeout);
-  };
+    if (showMessage) message.success(i18n.global.t("common.copySucc"));
+    return true;
+  } catch (error) {
+    try {
+      const success = copyWithExecCommand(text);
+      if (success) {
+        if (showMessage) message.success(i18n.global.t("common.copySucc"));
+        return true;
+      }
+    } catch (fallbackError) {
+      console.error("Fallback also failed:", fallbackError);
+    }
+
+    if (showMessage) message.error(i18n.global.t("common.copyError"));
+    return false;
+  }
+};
+
+export const useClipboard = (timeout: number = 2000): UseClipboardReturn => {
+  const copied = ref(false);
+  let timeoutId: number | null = null;
 
   const copy = async (text: string): Promise<boolean> => {
-    if (!text) {
-      message.error(i18n.global.t("common.copyError"));
-      return false;
+    const success = await copyText(text, true);
+
+    if (success) {
+      copied.value = true;
+      if (timeoutId) clearTimeout(timeoutId);
+      timeoutId = window.setTimeout(() => {
+        copied.value = false;
+      }, timeout);
     }
 
-    try {
-      if (navigator.clipboard) {
-        await navigator.clipboard.writeText(text);
-      }
-      clipboardText.value = text;
-      setCopiedState();
-      message.success(i18n.global.t("common.copySucc"));
-      return true;
-    } catch (error) {
-      message.error(i18n.global.t("common.copyError"));
-      return false;
-    }
-  };
-
-  const read = async (): Promise<string | null> => {
-    try {
-      if (navigator.clipboard && navigator.clipboard.readText) {
-        const text = await navigator.clipboard.readText();
-        clipboardText.value = text;
-        return text;
-      } else {
-        return null;
-      }
-    } catch (error) {
-      console.error(error);
-
-      return null;
-    }
-  };
-
-  const reset = (): void => {
-    copied.value = false;
-    clipboardText.value = "";
-    if (timeoutId) {
-      clearTimeout(timeoutId);
-      timeoutId = null;
-    }
-    if (messageInstance) {
-      messageInstance();
-      messageInstance = null;
-    }
+    return success;
   };
 
   return {
     copied,
-    clipboardText,
-    isSupported,
     copy,
-    read,
-    reset,
   };
 };

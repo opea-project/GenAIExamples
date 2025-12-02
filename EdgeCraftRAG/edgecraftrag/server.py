@@ -4,14 +4,16 @@
 import os
 
 import uvicorn
+from edgecraftrag.api.v1.agent import agent_app, restore_agent_configurations
 from edgecraftrag.api.v1.chatqna import chatqna_app
 from edgecraftrag.api.v1.data import data_app
-from edgecraftrag.api.v1.knowledge_base import kb_app, load_knowledge_from_file
+from edgecraftrag.api.v1.knowledge_base import kb_app, restore_knowledge_configurations
 from edgecraftrag.api.v1.model import model_app
-from edgecraftrag.api.v1.pipeline import load_pipeline_from_file, pipeline_app
+from edgecraftrag.api.v1.pipeline import pipeline_app, restore_pipeline_configurations
 from edgecraftrag.api.v1.prompt import prompt_app
+from edgecraftrag.api.v1.session import session_app
 from edgecraftrag.api.v1.system import system_app
-from edgecraftrag.utils import UI_DIRECTORY
+from edgecraftrag.env import UI_DIRECTORY
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -19,10 +21,14 @@ from llama_index.core.settings import Settings
 
 
 async def lifespan(app: FastAPI):
-    print("Restore pipeline configuration and knowledge base configuration...")
-    load_pipeline_from_file()
-    await load_knowledge_from_file()
-    yield
+    try:
+        print("Restore pipeline configuration and knowledge base configuration...")
+        await restore_pipeline_configurations()
+        await restore_knowledge_configurations()
+        await restore_agent_configurations()
+        yield
+    except Exception as e:
+        raise
 
 
 app = FastAPI(lifespan=lifespan)
@@ -36,7 +42,17 @@ app.add_middleware(
 )
 
 
-sub_apps = [data_app, model_app, pipeline_app, chatqna_app, system_app, prompt_app, kb_app]
+sub_apps = [
+    data_app,
+    model_app,
+    pipeline_app,
+    chatqna_app,
+    system_app,
+    prompt_app,
+    kb_app,
+    agent_app,
+    session_app,
+]
 for sub_app in sub_apps:
     for route in sub_app.routes:
         app.router.routes.append(route)

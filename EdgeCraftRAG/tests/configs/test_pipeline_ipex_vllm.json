@@ -38,6 +38,7 @@
       "device": "",
       "weight": ""
     },
+    "generator_type": "chatqna",
     "prompt_path": "./default_prompt.txt",
     "vllm_endpoint": ""
   },

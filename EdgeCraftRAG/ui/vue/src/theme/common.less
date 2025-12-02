@@ -236,7 +236,11 @@
     overflow-y: auto;
   }
 }
-
+.eg-wrap {
+  font-size: 12px;
+  color: var(--font-tip-color);
+  .ml-12;
+}
 .loopStyle(@counter) when (@counter > 0) {
   .p-@{counter} {
     padding: (1px * @counter);
@@ -288,4 +292,12 @@
 .loopStyle(100);
 .intel-dropdown {
   z-index: 9999;
+}
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
