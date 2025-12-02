@@ -1,15 +1,15 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+import json
 import os
 from typing import List
 
 from edgecraftrag.api_schema import DataIn, FilesIn
-from edgecraftrag.context import ctx
-from fastapi import FastAPI, File, HTTPException, UploadFile, status
-import json
 from edgecraftrag.config_repository import MilvusConfigRepository
+from edgecraftrag.context import ctx
 from edgecraftrag.env import UI_DIRECTORY
+from fastapi import FastAPI, File, HTTPException, UploadFile, status
 
 data_app = FastAPI()
 
@@ -52,22 +52,22 @@ async def redindex_data():
 # Gets the current nodelist
 @data_app.get(path="/v1/data/nodes")
 async def get_nodes_with_kb(kb_name=None):
-    node_lists  = {}
+    node_lists = {}
     active_pl = ctx.get_pipeline_mgr().get_active_pipeline()
     if kb_name:
         kb = ctx.get_knowledge_mgr().get_knowledge_base_by_name_or_id(kb_name)
     else:
         kb = ctx.get_knowledge_mgr().get_active_knowledge_base()
     if active_pl.indexer.comp_subtype == "faiss_vector":
-        return  active_pl.indexer.docstore.docs
+        return active_pl.indexer.docstore.docs
     elif active_pl.indexer.comp_subtype == "milvus_vector":
         collection_name = kb.name + active_pl.name
-        Milvus_node_list = MilvusConfigRepository.create_connection(collection_name,1, active_pl.indexer.vector_url)
+        Milvus_node_list = MilvusConfigRepository.create_connection(collection_name, 1, active_pl.indexer.vector_url)
         results = Milvus_node_list.get_configs(output_fields=["text", "_node_content", "doc_id"])
         for node_list in results:
             text = node_list.get("text")
-            node_content =  json.loads(node_list.get("_node_content"))
-            node_content["doc_id"]=node_list.get("doc_id")
+            node_content = json.loads(node_list.get("_node_content"))
+            node_content["doc_id"] = node_list.get("doc_id")
             node_content["text"] = text
             node_lists[node_content.get("id_")] = node_content
         return node_lists
@@ -81,12 +81,10 @@ async def get_nodes_by_document_name(document_name: str):
     all_nodes = await get_nodes_with_kb()
     matching_nodes = []
     for node in all_nodes.values() if isinstance(all_nodes, dict) else all_nodes:
-        metadata = node.get('metadata', {}) if isinstance(node, dict) else getattr(node, 'metadata', {})
-        node_file_name = metadata.get('file_name', '')
-        node_file_path = metadata.get('file_path', '')
-        if (node_file_name == document_name or
-            document_name in node_file_name or
-            document_name in node_file_path):
+        metadata = node.get("metadata", {}) if isinstance(node, dict) else getattr(node, "metadata", {})
+        node_file_name = metadata.get("file_name", "")
+        node_file_path = metadata.get("file_path", "")
+        if node_file_name == document_name or document_name in node_file_name or document_name in node_file_path:
             matching_nodes.append(node)
     return matching_nodes
 
@@ -100,23 +98,20 @@ async def get_document_names():
 
     documents = {}
     for node in all_nodes.values() if isinstance(all_nodes, dict) else all_nodes:
-        metadata = node.get('metadata', {}) if isinstance(node, dict) else getattr(node, 'metadata', {})
-        file_name = metadata.get('file_name')
-        file_path = metadata.get('file_path')
+        metadata = node.get("metadata", {}) if isinstance(node, dict) else getattr(node, "metadata", {})
+        file_name = metadata.get("file_name")
+        file_path = metadata.get("file_path")
         if file_name and file_name not in documents:
             documents[file_name] = {
                 "file_name": file_name,
                 "file_path": file_path,
-                "file_type": metadata.get('file_type', 'unknown'),
-                "chunk_count": 0
+                "file_type": metadata.get("file_type", "unknown"),
+                "chunk_count": 0,
             }
         if file_name:
             documents[file_name]["chunk_count"] += 1
 
-    return {
-        "total_documents": len(documents),
-        "documents": list(documents.values())
-    }
+    return {"total_documents": len(documents), "documents": list(documents.values())}
 
 
 # Upload files by a list of file_path

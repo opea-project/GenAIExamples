@@ -8,8 +8,9 @@ from abc import ABC
 
 import aiohttp
 import numpy
-from omegaconf import OmegaConf
 from edgecraftrag.config_repository import MilvusConfigRepository
+from omegaconf import OmegaConf
+
 
 class _BaseEstimator(ABC):
     """Base class for LLM-based estimators.
@@ -189,7 +190,10 @@ class LogitsEstimatorJSON(LogitsEstimator):
     async def compute_score(self, input_pair):
         return await self._calculate_logits_score(*input_pair)
 
+
 experience_repo = MilvusConfigRepository.create_connection("experience_data", 1)
+
+
 def read_json_files(file_path: str) -> dict:
     experience_lists = []
     if experience_repo:

@@ -1,15 +1,17 @@
 # Copyright (C) 2025 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
-import os
+import asyncio
+import importlib.util
 import json
 import logging
-import sys
+import os
 import re
+import sys
+from typing import Any, Dict, List, Optional, Tuple, Union
+
 import numpy
-import importlib.util
-from typing import Dict, Any, Tuple, List, Optional, Union
 from pydantic import BaseModel
-import asyncio
+
 # from wrapped_atomic_apis import call_logits_next_token
 
 # Configure logging
@@ -21,8 +23,8 @@ if not logger.handlers:
     console_handler = logging.StreamHandler()
     console_handler.setLevel(logging.INFO)
     # Format: [YYYY-MM-DD HH:MM:SS] Message with emoji
-    formatter = logging.Formatter('[%(asctime)s] %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
-    formatter = logging.Formatter('[%(asctime)s] %(message)s', datefmt='%H:%M:%S')
+    formatter = logging.Formatter("[%(asctime)s] %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
+    formatter = logging.Formatter("[%(asctime)s] %(message)s", datefmt="%H:%M:%S")
     console_handler.setFormatter(formatter)
     logger.addHandler(console_handler)
 
@@ -41,7 +43,7 @@ def log_status(emoji: str, message: str, indent: int = 0) -> None:
 
 class Config(BaseModel):
     system_instruction: str
-    plan_instruction: str = ''
+    plan_instruction: str = ""
     query_instruction: str
     answer_instruction: str
     domain_knowledge: str
@@ -52,9 +54,9 @@ class Config(BaseModel):
     embedding_endpoint: str
     reranker_endpoint: str
     llm_endpoint: str
-    query_search_endpoint: str = ''
+    query_search_endpoint: str = ""
     generation_config: Dict[str, Any] = {}
-    postproc: str = 'defaults.py'
+    postproc: str = "defaults.py"
 
 
 def import_module_from_path(file_path: str):
@@ -104,11 +106,11 @@ def load_config(config_path: str) -> Config:
     Returns:
         Config object with loaded configuration
     """
-    with open(config_path, 'r') as f:
+    with open(config_path, "r") as f:
         config_dict = json.load(f)
     cfg = Config(**config_dict)
     if os.path.isfile(cfg.domain_knowledge):
-        with open(cfg.domain_knowledge, 'r') as f:
+        with open(cfg.domain_knowledge, "r") as f:
             cfg.domain_knowledge = f.read()
     return cfg
 
@@ -119,14 +121,13 @@ class ROLE:
     USER = "user"
 
 
-def remove_tagged(text, tag='think'):
+def remove_tagged(text, tag="think"):
     pattern = f"<{tag}>.*?</{tag}>"
     return re.sub(pattern, "", text, flags=re.DOTALL).strip()
 
 
 def _extract_pattern_and_text(line: str) -> Optional[Tuple[str, int, str, str]]:
-    """
-    Checks if a line matches the pattern [prefix][digit][suffix][text].
+    """Checks if a line matches the pattern [prefix][digit][suffix][text].
 
     Args:
         line: The line to check.
@@ -143,7 +144,7 @@ def _extract_pattern_and_text(line: str) -> Optional[Tuple[str, int, str, str]]:
     # and the rest of the line as text.
     # The suffix (\D+) is followed by (.*) which will grab the text.
     # This structure correctly separates the separator from the text.
-    match = re.match(r'^(.*?)(\d+)(.*)', line)
+    match = re.match(r"^(.*?)(\d+)(.*)", line)
     if match:
         prefix, digit_str, text = match.groups()
         # We require actual text for it to be a valid step
@@ -153,8 +154,7 @@ def _extract_pattern_and_text(line: str) -> Optional[Tuple[str, int, str, str]]:
 
 
 def parse_plan_from_text(text_content: str) -> List[str]:
-    """
-    Parses a block of text to extract a list of plan steps by finding a
+    """Parses a block of text to extract a list of plan steps by finding a
     consecutive sequence of numbered lines.
 
     Args:
@@ -171,9 +171,9 @@ def parse_plan_from_text(text_content: str) -> List[str]:
 
         # 1. Pre-process the line
         processed_line = start_line.strip()
-        if processed_line.lower().startswith('step'):
+        if processed_line.lower().startswith("step"):
             # Remove "step" and any space/punctuation immediately after
-            processed_line = re.sub(r'^step\s*[:\-\s#]*', '', processed_line, flags=re.IGNORECASE)
+            processed_line = re.sub(r"^step\s*[:\-\s#]*", "", processed_line, flags=re.IGNORECASE)
 
         # 2. Check if it matches the generic pattern and starts with 0 or 1
         pattern_info = _extract_pattern_and_text(processed_line)
@@ -186,19 +186,16 @@ def parse_plan_from_text(text_content: str) -> List[str]:
                 expected_digit = digit + 1
 
                 # 3. If it's a valid start, check subsequent lines for the same pattern
-                for next_line in lines[i + 1:]:
+                for next_line in lines[i + 1 :]:
 
                     # Pre-process the next line similarly
                     processed_next_line = next_line.strip()
-                    if processed_next_line.lower().startswith('step'):
-                        processed_next_line = re.sub(r'^step\s*[:\-\s#]*', '', processed_next_line, flags=re.IGNORECASE)
+                    if processed_next_line.lower().startswith("step"):
+                        processed_next_line = re.sub(r"^step\s*[:\-\s#]*", "", processed_next_line, flags=re.IGNORECASE)
 
                     # Check if the next line matches the *exact* pattern with the next number
                     # We escape prefix/suffix in case they contain special regex characters
-                    expected_pattern = re.match(
-                        f'^{re.escape(prefix)}{expected_digit}(.*)',
-                        processed_next_line
-                    )
+                    expected_pattern = re.match(f"^{re.escape(prefix)}{expected_digit}(.*)", processed_next_line)
 
                     if expected_pattern:
                         next_text = expected_pattern.group(1).strip()
@@ -218,9 +215,8 @@ def parse_plan_from_text(text_content: str) -> List[str]:
     return longest_plan
 
 
-def format_terminal_str(text: str, color: str = '', bold: bool = False, italic: bool = False) -> str:
-    """
-    Format a string with ANSI escape codes for color, bold, and italic.
+def format_terminal_str(text: str, color: str = "", bold: bool = False, italic: bool = False) -> str:
+    """Format a string with ANSI escape codes for color, bold, and italic.
 
     Args:
         text: The text to format.
@@ -292,8 +288,7 @@ def format_terminal_str(text: str, color: str = '', bold: bool = False, italic: 
 _DEFAULT_TEMPLATE_MESSAGES = [
     {
         "role": "system",
-        "content":
-"""You are an impartial quality rater for TCB Bonder troubleshooting answers. Your task is to rate if the answer by user well covers the steps in the reference answer.
+        "content": """You are an impartial quality rater for TCB Bonder troubleshooting answers. Your task is to rate if the answer by user well covers the steps in the reference answer.
 
 Task instructions:
 - Parse the reference answer into its essential checkpoints (split on punctuation such as "?", ";", or line breaks) and understand what each step expects the technician to do or verify. The order of the checkpoints has low importance.
@@ -329,33 +324,28 @@ PHS: Pre/Post heat station
 PR: Pattern recognition
 SC: Station controller
 BLPCS: Bond line process control system
-"""
+""",
     },
     {
         "role": "user",
-        "content":
-"""User's answer:
+        "content": """User's answer:
 {llm_answer}
 
 Reference answer:
 {ref_answer}
 """,
-        "template_message": True
+        "template_message": True,
     },
     {
         "role": "system",
-        "content":
-"""Does the user's answer well cover the steps in the reference answer? Yes or No.
+        "content": """Does the user's answer well cover the steps in the reference answer? Yes or No.
 
 Scoring rubric:
 - Answer "Yes" only when every checkpoint from the reference is fully covered and nothing in the user's answer conflicts with the reference guidance.
 - Answer "No" if any checkpoint is missing, incorrectly addressed, or contradicted by the user's answer.
-"""
+""",
     },
-    {
-        "role": "assistant",
-        "content": "{\"label\": \""
-    }
+    {"role": "assistant", "content": '{"label": "'},
 ]
 DEFAULT_TARGET_TOKENS = ["No", "Yes"]
 DEFAULT_TRANSFORM_PARAMS = (5, -1, 10)  # a, b, T
@@ -363,7 +353,7 @@ DEFAULT_TRANSFORM_PARAMS = (5, -1, 10)  # a, b, T
 
 def batch_cal_score(x, a=1.0, b=0.0, T=1.0, s=10):
     _, d = x.shape
-    levels = numpy.arange(d)[None, ] / (d - 1)
+    levels = numpy.arange(d)[None,] / (d - 1)
     transformed = numpy.exp(x / T)
     probs = transformed / transformed.sum(axis=1, keepdims=True)
     expected_levels = (probs * levels).sum(axis=1)
@@ -372,22 +362,24 @@ def batch_cal_score(x, a=1.0, b=0.0, T=1.0, s=10):
 
 
 def llm_evaluate(
-        ref_answer,
-        llm_answer,
-        eval_endpoint,
-        template_messages=_DEFAULT_TEMPLATE_MESSAGES,
-        target_tokens=DEFAULT_TARGET_TOKENS,
-        transform_params=DEFAULT_TRANSFORM_PARAMS,
-        return_logits=False
-    ) -> Union[float, List[float]]:
+    ref_answer,
+    llm_answer,
+    eval_endpoint,
+    template_messages=_DEFAULT_TEMPLATE_MESSAGES,
+    target_tokens=DEFAULT_TARGET_TOKENS,
+    transform_params=DEFAULT_TRANSFORM_PARAMS,
+    return_logits=False,
+) -> Union[float, List[float]]:
     messages = [
-        message if not message.get("template_message") else {
-            "role": message["role"],
-            "content": message["content"].format(
-                ref_answer=ref_answer,
-                llm_answer=llm_answer
-            )
-        } for message in template_messages
+        (
+            message
+            if not message.get("template_message")
+            else {
+                "role": message["role"],
+                "content": message["content"].format(ref_answer=ref_answer, llm_answer=llm_answer),
+            }
+        )
+        for message in template_messages
     ]
     # result_json = call_logits_next_token(
     #     endpoint=eval_endpoint,
@@ -400,7 +392,7 @@ def llm_evaluate(
     if return_logits:
         return raw_logits
     else:
-        score = batch_cal_score(numpy.array(raw_logits)[None, ], *transform_params)[0]
+        score = batch_cal_score(numpy.array(raw_logits)[None,], *transform_params)[0]
         return score
 
 

@@ -3,23 +3,18 @@
 
 import os
 from abc import abstractmethod
-from pydantic import model_serializer
-from edgecraftrag.base import BaseComponent, CallbackType, CompType
+
 from comps.cores.proto.api_protocol import ChatCompletionRequest
+from edgecraftrag.base import BaseComponent, CallbackType, CompType
 from edgecraftrag.components.agents.utils import remove_think_tags
 from edgecraftrag.utils import stream_generator
 from langgraph.config import get_stream_writer
+from pydantic import model_serializer
 
 
 class Agent(BaseComponent):
 
-    def __init__(
-        self,
-        name,
-        agent_type,
-        pipeline_idx,
-        configs
-    ):
+    def __init__(self, name, agent_type, pipeline_idx, configs):
         super().__init__(name=name, comp_type=CompType.AGENT, comp_subtype=agent_type)
         if self.name == "" or self.name is None:
             self.name = self.idx
@@ -108,7 +103,7 @@ class Agent(BaseComponent):
             "type": self.comp_subtype,
             "pipeline_idx": self.pipeline_idx,
             "configs": self.configs,
-            "active": isactive
+            "active": isactive,
         }
         return set
 

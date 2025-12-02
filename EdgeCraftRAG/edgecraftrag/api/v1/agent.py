@@ -4,11 +4,12 @@
 import json
 import os
 import time
+
 from edgecraftrag.api_schema import AgentCreateIn
 from edgecraftrag.base import AgentType
+from edgecraftrag.config_repository import MilvusConfigRepository, save_agent_configurations
 from edgecraftrag.context import ctx
 from edgecraftrag.env import AGENT_FILE
-from edgecraftrag.config_repository import MilvusConfigRepository, save_agent_configurations
 from fastapi import FastAPI, HTTPException, status
 
 agent_app = FastAPI()
@@ -21,14 +22,16 @@ async def get_all_agents():
     agents = ctx.get_agent_mgr().get_agents()
     active_id = ctx.get_agent_mgr().get_active_agent_id()
     for k, agent in agents.items():
-        out.append(AgentCreateIn(
-            idx=agent.idx,
-            name=agent.name,
-            type=agent.comp_subtype,
-            pipeline_idx=agent.pipeline_idx,
-            configs=agent.configs,
-            active=True if agent.idx == active_id else False
-        ))
+        out.append(
+            AgentCreateIn(
+                idx=agent.idx,
+                name=agent.name,
+                type=agent.comp_subtype,
+                pipeline_idx=agent.pipeline_idx,
+                configs=agent.configs,
+                active=True if agent.idx == active_id else False,
+            )
+        )
     return out
 
 
@@ -44,7 +47,7 @@ async def get_agent(name):
             type=agent.comp_subtype,
             pipeline_idx=agent.pipeline_idx,
             configs=agent.configs,
-            active=isactive
+            active=isactive,
         )
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
@@ -95,7 +98,7 @@ async def delete_agent(name):
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 
-# GET Agent Type defualt configs
+# GET Agent Type default configs
 @agent_app.get(path="/v1/settings/agents/configs/{agent_type}")
 async def get_agent_default_configs(agent_type):
     try:

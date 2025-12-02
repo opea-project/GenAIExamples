@@ -1,3 +1,5 @@
+# Copyright (C) 2025 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
 """Default post-processing logic for Mini Deep Search."""
 
 from __future__ import annotations
@@ -22,7 +24,7 @@ def _merge_plan_steps(plan: List[str], max_steps: int) -> List[str]:
     for i in range(max_steps):
         group_size = steps_per_group + 1 if i < extra_steps else steps_per_group
         if index < len(plan):
-            merged_plan.append(" ".join(plan[index:index + group_size]))
+            merged_plan.append(" ".join(plan[index : index + group_size]))
             index += group_size
     log_status(
         "✨",
@@ -60,12 +62,10 @@ def parse_plan_from_text(text_content: str) -> List[str]:
             continue
         current_plan = [text]
         expected_digit = digit + 1
-        for next_line in lines[i + 1:]:
+        for next_line in lines[i + 1 :]:
             processed_next_line = next_line.strip()
             if processed_next_line.lower().startswith("step"):
-                processed_next_line = re.sub(
-                    r"^step\s*[:\-\s#]*", "", processed_next_line, flags=re.IGNORECASE
-                )
+                processed_next_line = re.sub(r"^step\s*[:\-\s#]*", "", processed_next_line, flags=re.IGNORECASE)
             expected_pattern = re.match(f"^{re.escape(prefix)}{expected_digit}(.*)", processed_next_line)
             if not expected_pattern:
                 break

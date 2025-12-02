@@ -1,9 +1,10 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-from typing import Any, Optional, Dict
-from pydantic import BaseModel
+from typing import Any, Dict, Optional
+
 from edgecraftrag import base
+from pydantic import BaseModel
 
 
 class ModelIn(BaseModel):

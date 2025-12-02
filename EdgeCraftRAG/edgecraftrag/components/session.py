@@ -2,7 +2,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from datetime import datetime
-from typing import List, Dict, Optional, Any
+from typing import Any, Dict, List, Optional
+
 from edgecraftrag.base import BaseComponent, CompType
 from pydantic import model_serializer
 
@@ -53,9 +54,7 @@ class Session(BaseComponent):
         session = cls(session_id)
         session.idx = data.get("idx", session.idx)
         created_at_str = data.get("created_at")
-        session.created_at = (
-            datetime.fromisoformat(created_at_str) if created_at_str else datetime.now()
-        )
+        session.created_at = datetime.fromisoformat(created_at_str) if created_at_str else datetime.now()
         for item in data.get("messages", []):
             if isinstance(item, dict) and "role" in item and "content" in item:
                 role = item["role"]

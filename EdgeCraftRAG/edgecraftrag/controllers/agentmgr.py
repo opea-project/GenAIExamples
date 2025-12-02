@@ -3,13 +3,12 @@
 
 from typing import Any, Dict, Optional
 
-from edgecraftrag.base import CallbackType, AgentType
-from edgecraftrag.api_schema import AgentCreateIn
-from edgecraftrag.base import BaseMgr
-from edgecraftrag.components.agent import Agent
-from edgecraftrag.components.agents.simple import SimpleRAGAgent
-from edgecraftrag.components.agents.deep_search.deep_search import DeepSearchAgent
 from comps.cores.proto.api_protocol import ChatCompletionRequest
+from edgecraftrag.api_schema import AgentCreateIn
+from edgecraftrag.base import AgentType, BaseMgr, CallbackType
+from edgecraftrag.components.agent import Agent
+from edgecraftrag.components.agents.deep_search.deep_search import DeepSearchAgent
+from edgecraftrag.components.agents.simple import SimpleRAGAgent
 
 
 class AgentManager(BaseMgr):
@@ -115,6 +114,4 @@ class AgentManager(BaseMgr):
     async def run_agent(self, chat_request: ChatCompletionRequest) -> Any:
         active_agent = self.get_active_agent()
         if active_agent is not None:
-            return await active_agent.run(
-                cbtype=CallbackType.RUNAGENT, chat_request=chat_request
-            )
+            return await active_agent.run(cbtype=CallbackType.RUNAGENT, chat_request=chat_request)

@@ -10,7 +10,7 @@ from llama_index.core import StorageContext, VectorStoreIndex
 from llama_index.vector_stores.faiss import FaissVectorStore
 from llama_index.vector_stores.milvus import MilvusVectorStore
 from pydantic import model_serializer
-from pymilvus import connections, Collection
+from pymilvus import Collection, connections
 
 
 class VectorIndexer(BaseComponent, VectorStoreIndex):

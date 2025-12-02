@@ -9,14 +9,15 @@ from concurrent.futures import ThreadPoolExecutor
 from typing import Any, Callable, List, Optional
 
 from comps.cores.proto.api_protocol import ChatCompletionRequest
-from edgecraftrag.base import BaseComponent, CallbackType, CompType, InferenceType, RetrieverType, NodeParserType
+from edgecraftrag.base import BaseComponent, CallbackType, CompType, InferenceType, NodeParserType, RetrieverType
 from edgecraftrag.components.postprocessor import RerankProcessor
 from edgecraftrag.components.query_preprocess import query_search
 from edgecraftrag.components.retriever import AutoMergeRetriever, SimpleBM25Retriever, VectorSimRetriever
+from edgecraftrag.env import SEARCH_CONFIG_PATH, SEARCH_DIR
 from fastapi.responses import StreamingResponse
 from llama_index.core.schema import Document, QueryBundle
 from pydantic import BaseModel, Field, model_serializer
-from edgecraftrag.env import SEARCH_CONFIG_PATH, SEARCH_DIR
+
 
 class PipelineStatus(BaseModel):
     active: bool = False
@@ -147,7 +148,9 @@ class Pipeline(BaseComponent):
                     return await self.run_retriever_cb(self, chat_request=kwargs["chat_request"])
             if kwargs["cbtype"] == CallbackType.POSTPROCESS:
                 if "chat_request" in kwargs and "contexts" in kwargs:
-                    return await self.run_postprocessor_cb(self, chat_request=kwargs["chat_request"], contexts=kwargs["contexts"])
+                    return await self.run_postprocessor_cb(
+                        self, chat_request=kwargs["chat_request"], contexts=kwargs["contexts"]
+                    )
             if kwargs["cbtype"] == CallbackType.GENERATE:
                 if "chat_request" in kwargs:
                     return await self.run_generator_cb(self, chat_request=kwargs["chat_request"])
@@ -175,10 +178,7 @@ class Pipeline(BaseComponent):
             return None
         target_config = self.connect_target_config()
         if kb_name not in self.documents_cache:
-            self.documents_cache[kb_name] = {
-                "files": [],
-                "config": target_config
-            }
+            self.documents_cache[kb_name] = {"files": [], "config": target_config}
         if isinstance(file_paths, str):
             file_paths = [file_paths]
         self.documents_cache[kb_name]["files"].extend(file_paths)
@@ -202,10 +202,7 @@ class Pipeline(BaseComponent):
         if self.documents_cache[kb_name]["config"] == target_config:
             diff = self.compare_mappings(self.documents_cache[kb_name]["files"], current_files)
         else:
-            self.documents_cache[kb_name] = {
-                "files": [],
-                "config": self.connect_target_config()
-            }
+            self.documents_cache[kb_name] = {"files": [], "config": self.connect_target_config()}
             diff = {"add_docs": current_files}
         return diff
 
@@ -217,13 +214,23 @@ class Pipeline(BaseComponent):
     def connect_target_config(self):
         target_config = ""
         if self.node_parser.comp_subtype == NodeParserType.SIMPLE:
-            target_config = "simple" + str(self.node_parser.chunk_size) + str(self.node_parser.chunk_overlap) + self.indexer.model.model_id
+            target_config = (
+                "simple"
+                + str(self.node_parser.chunk_size)
+                + str(self.node_parser.chunk_overlap)
+                + self.indexer.model.model_id
+            )
         elif self.node_parser.comp_subtype == NodeParserType.SENTENCEWINDOW:
             target_config = "sentencewindow" + str(self.node_parser.window_size) + self.indexer.model.model_id
         elif self.node_parser.comp_subtype == NodeParserType.HIERARCHY:
             target_config = "hierarchical" + self.indexer.model.model_id
         elif self.node_parser.comp_subtype == NodeParserType.UNSTRUCTURED:
-            target_config = "target_config" + str(self.node_parser.chunk_size) + str(self.node_parser.chunk_overlap) + self.indexer.model.model_id
+            target_config = (
+                "target_config"
+                + str(self.node_parser.chunk_size)
+                + str(self.node_parser.chunk_overlap)
+                + self.indexer.model.model_id
+            )
         return target_config
 
     def nodes_to_document(self, node_dict: dict):
@@ -362,6 +369,7 @@ async def run_simple_doc(pl: Pipeline, docs: List[Document]) -> Any:
 
 async def run_query_search(pl: Pipeline, chat_request: ChatCompletionRequest) -> Any:
     query = chat_request.messages
+
     def run_async_query_search():
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
@@ -424,7 +432,11 @@ async def run_pipeline(pl: Pipeline, chat_request: ChatCompletionRequest) -> Any
         if pl.enable_benchmark:
             benchmark_data[CompType.QUERYSEARCH] = time.perf_counter() - start
             start = time.perf_counter()
-        top_k = None if chat_request.k == pl.retriever.topk or chat_request.k != 0 or chat_request.k is None else chat_request.k
+        top_k = (
+            None
+            if chat_request.k == pl.retriever.topk or chat_request.k != 0 or chat_request.k is None
+            else chat_request.k
+        )
         retri_res = pl.retriever.run(query=query, top_k=top_k)
         if pl.enable_benchmark:
             benchmark_data[CompType.RETRIEVER] = time.perf_counter() - start

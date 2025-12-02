@@ -9,12 +9,19 @@ import time
 import weakref
 from concurrent.futures import ThreadPoolExecutor
 
-from edgecraftrag.config_repository import MilvusConfigRepository, save_pipeline_configurations
 from edgecraftrag.api.v1.knowledge_base import Synchronizing_vector_data
 from edgecraftrag.api_schema import MilvusConnectRequest, PipelineCreateIn
-from edgecraftrag.base import IndexerType, InferenceType, ModelType, NodeParserType, PostProcessorType, RetrieverType, GeneratorType
+from edgecraftrag.base import (
+    GeneratorType,
+    IndexerType,
+    InferenceType,
+    ModelType,
+    NodeParserType,
+    PostProcessorType,
+    RetrieverType,
+)
 from edgecraftrag.components.benchmark import Benchmark
-from edgecraftrag.components.generator import QnAGenerator, FreeChatGenerator
+from edgecraftrag.components.generator import FreeChatGenerator, QnAGenerator
 from edgecraftrag.components.indexer import KBADMINIndexer, VectorIndexer
 from edgecraftrag.components.node_parser import (
     HierarchyNodeParser,
@@ -30,6 +37,7 @@ from edgecraftrag.components.retriever import (
     SimpleBM25Retriever,
     VectorSimRetriever,
 )
+from edgecraftrag.config_repository import MilvusConfigRepository, save_pipeline_configurations
 from edgecraftrag.context import ctx
 from edgecraftrag.env import PIPELINE_FILE
 from fastapi import FastAPI, File, HTTPException, UploadFile, status
@@ -95,9 +103,7 @@ async def add_pipeline(request: PipelineCreateIn):
 async def update_pipeline(name, request: PipelineCreateIn):
     pl = ctx.get_pipeline_mgr().get_pipeline_by_name_or_id(name)
     if pl is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Pipeline not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Pipeline not found")
     active_pl = ctx.get_pipeline_mgr().get_active_pipeline()
     if pl == active_pl:
         if request.active:
@@ -111,9 +117,7 @@ async def update_pipeline(name, request: PipelineCreateIn):
             pipeline_dict = request.dict()
             pl.update_pipeline_json(pipeline_dict)
         except (ValueError, Exception) as e:
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)
-            )
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
     await save_pipeline_configurations("update", pl)
     return pl
 
@@ -130,9 +134,7 @@ async def remove_pipeline(name):
         await save_pipeline_configurations("delete", pl)
         return res
     except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)
-        )
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 
 # IMPORT pipeline json from a file
@@ -164,9 +166,7 @@ async def load_pipeline(request):
         await update_pipeline_handler(pl, request)
     except (ValueError, Exception) as e:
         ctx.get_pipeline_mgr().remove_pipeline_by_name_or_id(request.name)
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)
-        )
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
     return pl
 
 
@@ -312,9 +312,7 @@ async def update_pipeline_handler(pl, req):
                     model_ref, gen.prompt_path, gen.inference_type, gen.vllm_endpoint, gen.prompt_content
                 )
             elif gen.generator_type == GeneratorType.FREECHAT:
-                pl.generator = FreeChatGenerator(
-                    model_ref, gen.inference_type, gen.vllm_endpoint
-                )
+                pl.generator = FreeChatGenerator(model_ref, gen.inference_type, gen.vllm_endpoint)
             if pl.enable_benchmark:
                 if "tokenizer" not in locals() or tokenizer is None:
                     _, tokenizer, bench_hook = ctx.get_model_mgr().load_model_ben(gen.model)

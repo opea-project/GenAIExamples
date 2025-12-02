@@ -1,14 +1,15 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-import os
 import json
-from typing import Dict, Optional, List, Any
-from edgecraftrag.base import InferenceType, BaseMgr
-from edgecraftrag.env import SESSION_FILE
-from edgecraftrag.components.session import Session
+import os
+from typing import Any, Dict, List, Optional
+
 from edgecraftrag.api_schema import SessionIn
+from edgecraftrag.base import BaseMgr, InferenceType
+from edgecraftrag.components.session import Session
 from edgecraftrag.config_repository import MilvusConfigRepository
+from edgecraftrag.env import SESSION_FILE
 
 
 class SessionManager(BaseMgr):
@@ -17,9 +18,7 @@ class SessionManager(BaseMgr):
         self._current_session_id: Optional[str] = None
         self.session_file = SESSION_FILE
 
-        self.milvus_repo = MilvusConfigRepository.create_connection(
-            Repo_config_name="session_storage", max_retries=1
-        )
+        self.milvus_repo = MilvusConfigRepository.create_connection(Repo_config_name="session_storage", max_retries=1)
         self.components: Dict[str, Session] = {}
 
         if self.milvus_repo and self.milvus_repo.connected:
@@ -28,11 +27,7 @@ class SessionManager(BaseMgr):
             self.load_from_file()
 
     def set_current_session(self, session_id: str) -> None:
-        self._current_session_id = (
-            session_id
-            if session_id and session_id not in ("None", "")
-            else "default_session"
-        )
+        self._current_session_id = session_id if session_id and session_id not in ("None", "") else "default_session"
         if self._current_session_id not in self.components:
             new_session = Session(self._current_session_id)
             self.add(new_session, name=self._current_session_id)
@@ -92,9 +87,7 @@ class SessionManager(BaseMgr):
         except ValueError as e:
             return f"Failed to update message: {str(e)}"
 
-    def concat_history(
-        self, sessionid: str, inference_type: str, user_message: str
-    ) -> str:
+    def concat_history(self, sessionid: str, inference_type: str, user_message: str) -> str:
         max_token = 6000
         if inference_type == InferenceType.VLLM:
             vllm_max_len = int(os.getenv("MAX_MODEL_LEN", "10240"))
@@ -144,11 +137,7 @@ class SessionManager(BaseMgr):
     def save_to_file(self) -> Dict[str, str]:
         try:
             os.makedirs(os.path.dirname(self.session_file), exist_ok=True)
-            data = {
-                sid: session.to_dict()
-                for sid, session in self.components.items()
-                if isinstance(session, Session)
-            }
+            data = {sid: session.to_dict() for sid, session in self.components.items() if isinstance(session, Session)}
             with open(self.session_file, "w", encoding="utf-8") as f:
                 json.dump(data, f, indent=2, ensure_ascii=False)
             return {"status": "success", "message": f"Saved to {self.session_file}"}
@@ -176,14 +165,14 @@ class SessionManager(BaseMgr):
             return {"status": "error", "message": f"Load failed: {str(e)}"}
 
     def _load_from_milvus(self):
-            try:
-                milvus_sessions = self.milvus_repo.get_configs()
-                for item in milvus_sessions:
-                    session_id = item.get("idx")
-                    config_json = item.get("config_json", {})
-                    if session_id and isinstance(config_json, dict):
-                        session = Session.from_dict(config_json)
-                        self.components[session_id] = session
-                print(f"Loaded {len(self.components)} sessions from Milvus.")
-            except Exception as e:
-                print(f"Error loading sessions from Milvus: {str(e)}")
+        try:
+            milvus_sessions = self.milvus_repo.get_configs()
+            for item in milvus_sessions:
+                session_id = item.get("idx")
+                config_json = item.get("config_json", {})
+                if session_id and isinstance(config_json, dict):
+                    session = Session.from_dict(config_json)
+                    self.components[session_id] = session
+            print(f"Loaded {len(self.components)} sessions from Milvus.")
+        except Exception as e:
+            print(f"Error loading sessions from Milvus: {str(e)}")

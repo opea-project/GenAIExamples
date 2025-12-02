@@ -2,19 +2,19 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import asyncio
-from concurrent.futures import ThreadPoolExecutor
 import json
 import os
 import urllib.request
+from concurrent.futures import ThreadPoolExecutor
 from urllib.parse import urlparse
 
+from comps.cores.proto.api_protocol import ChatCompletionRequest
 from edgecraftrag.base import BaseComponent, CompType, GeneratorType, InferenceType, NodeParserType
 from edgecraftrag.utils import get_prompt_template
 from fastapi.responses import StreamingResponse
 from llama_index.llms.openai_like import OpenAILike
 from pydantic import model_serializer
 from unstructured.staging.base import elements_from_base64_gzipped_json
-from comps.cores.proto.api_protocol import ChatCompletionRequest
 
 
 def extract_urls(text):
@@ -145,7 +145,9 @@ class QnAGenerator(BaseComponent):
             else:
                 self.model_id = llm_instance.model_id
                 self.model_path = llm_instance.model_path
-        self.original_template, self.prompt = self.prompt_handler(self.model_path, self.prompt_content, self.prompt_template_file)
+        self.original_template, self.prompt = self.prompt_handler(
+            self.model_path, self.prompt_content, self.prompt_template_file
+        )
 
         self.llm = llm_model
         if self.inference_type == InferenceType.LOCAL:
@@ -156,7 +158,9 @@ class QnAGenerator(BaseComponent):
                 vllm_endpoint = os.getenv("vLLM_ENDPOINT", "http://localhost:8086")
         self.vllm_endpoint = vllm_endpoint
 
-    def prompt_handler(self, model_path, prompt_content=None, prompt_template_file=None, enable_think=False, enable_rag_retrieval=True):
+    def prompt_handler(
+        self, model_path, prompt_content=None, prompt_template_file=None, enable_think=False, enable_rag_retrieval=True
+    ):
         if prompt_content:
             return get_prompt_template(model_path, prompt_content, prompt_template_file, enable_think)
         elif prompt_template_file is None:
@@ -183,11 +187,15 @@ class QnAGenerator(BaseComponent):
         if "{chat_history}" not in prompt:
             prompt += "\n<|im_start|>{chat_history}"
         self.prompt_content = prompt
-        self.original_template, self.prompt = self.prompt_handler(self.model_path, self.prompt_content, self.prompt_template_file)
+        self.original_template, self.prompt = self.prompt_handler(
+            self.model_path, self.prompt_content, self.prompt_template_file
+        )
 
     def reset_prompt(self):
         self.prompt_content = None
-        self.original_template, self.prompt = self.prompt_handler(self.model_path, self.prompt_content, self.prompt_template_file)
+        self.original_template, self.prompt = self.prompt_handler(
+            self.model_path, self.prompt_content, self.prompt_template_file
+        )
 
     def clean_string(self, string):
         ret = string
@@ -224,7 +232,7 @@ class QnAGenerator(BaseComponent):
                     self.prompt_content,
                     self.prompt_template_file,
                     self.enable_think,
-                    self.enable_rag_retrieval
+                    self.enable_rag_retrieval,
                 )
 
         if sub_questions:
@@ -260,6 +268,7 @@ class QnAGenerator(BaseComponent):
                 async for chunk in local_stream_generator(self.lock, self.llm(), prompt_str, unstructured_str):
                     yield chunk or ""
                     await asyncio.sleep(0)
+
             return generator()
         else:
             result = self.llm().complete(prompt_str)
@@ -290,6 +299,7 @@ class QnAGenerator(BaseComponent):
                 async for chunk in stream_generator(llm, prompt_str, unstructured_str):
                     yield chunk or ""
                     await asyncio.sleep(0)
+
             return generator()
         else:
             result = await llm.acomplete(prompt_str)
@@ -367,6 +377,7 @@ class FreeChatGenerator(BaseComponent):
                 async for chunk in gen:
                     yield chunk.delta or ""
                     await asyncio.sleep(0)
+
             return generator()
         else:
             result = await llm.acomplete(prompt_str)
@@ -385,9 +396,7 @@ class FreeChatGenerator(BaseComponent):
 
 
 def chatcompletion_to_chatml(request: ChatCompletionRequest) -> str:
-    """
-    Convert a ChatCompletionRequest dict to a ChatML-formatted string
-    """
+    """Convert a ChatCompletionRequest dict to a ChatML-formatted string."""
     chatml = ""
     for msg in request.messages:
         chatml += f"<|im_start|>{msg.get('role', '')}\n{msg.get('content', '')}<|im_end|>\n"

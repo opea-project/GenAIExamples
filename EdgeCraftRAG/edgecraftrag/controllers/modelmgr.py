@@ -94,10 +94,7 @@ class ModelMgr(BaseMgr):
                     weight=model_para.weight,
                 )
             case ModelType.VLLM_EMBEDDING:
-                model = OpenAIEmbeddingModel(
-                    model_id=model_para.model_id,
-                    api_base=model_para.api_base
-                )
+                model = OpenAIEmbeddingModel(model_id=model_para.model_id, api_base=model_para.api_base)
             case ModelType.LLM:
                 model = OpenVINOLLMModel(
                     model_id=model_para.model_id,

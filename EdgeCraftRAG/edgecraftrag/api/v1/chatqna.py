@@ -1,15 +1,16 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-import requests
-import json
 import asyncio
-from typing import List
+import json
 from concurrent.futures import ThreadPoolExecutor
+from typing import List
+
+import requests
 from comps.cores.proto.api_protocol import ChatCompletionRequest
 from edgecraftrag.api_schema import RagOut
 from edgecraftrag.context import ctx
-from edgecraftrag.utils import serialize_contexts, stream_generator, chain_async_generators
+from edgecraftrag.utils import chain_async_generators, serialize_contexts, stream_generator
 from fastapi import Body, FastAPI, HTTPException, status
 from fastapi.responses import StreamingResponse
 
@@ -25,7 +26,10 @@ async def retrieval(request: ChatCompletionRequest):
         if active_kb:
             request.user = active_kb
         else:
-            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Retrieval needs to have an active knowledgebase")
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Retrieval needs to have an active knowledgebase",
+            )
         contexts = await ctx.get_pipeline_mgr().run_retrieve_postprocess(chat_request=request)
         serialized_contexts = serialize_contexts(contexts)
 
@@ -63,16 +67,10 @@ async def chatqna(request: ChatCompletionRequest):
                 request.model = generator.model_id
 
         if request.stream:
-            run_pipeline_gen, contexts = await ctx.get_pipeline_mgr().run_pipeline(
-                chat_request=request
-            )
-            return StreamingResponse(
-                save_session(sessionid, run_pipeline_gen), media_type="text/plain"
-            )
+            run_pipeline_gen, contexts = await ctx.get_pipeline_mgr().run_pipeline(chat_request=request)
+            return StreamingResponse(save_session(sessionid, run_pipeline_gen), media_type="text/plain")
         else:
-            ret, contexts = await ctx.get_pipeline_mgr().run_pipeline(
-                chat_request=request
-            )
+            ret, contexts = await ctx.get_pipeline_mgr().run_pipeline(chat_request=request)
             ctx.get_session_mgr().save_current_message(sessionid, "assistant", str(ret))
             return str(ret)
 
@@ -105,11 +103,11 @@ async def ragqna(request: ChatCompletionRequest):
                     yield token.replace("\n", "\\n")
 
             # Reconstruct RagOut in stream response
-            query_gen = stream_generator("{\"query\":\"" + request.messages + "\",")
+            query_gen = stream_generator('{"query":"' + request.messages + '",')
 
             s_contexts = json.dumps(serialize_contexts(contexts))
-            context_gen = stream_generator("\"contexts\":" + s_contexts + ",\"response\":\"")
-            final_gen = stream_generator("\"}")
+            context_gen = stream_generator('"contexts":' + s_contexts + ',"response":"')
+            final_gen = stream_generator('"}')
             output_gen = chain_async_generators([query_gen, context_gen, res_gen_json(), final_gen])
 
             return StreamingResponse(output_gen, media_type="text/plain")

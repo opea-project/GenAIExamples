@@ -1,6 +1,7 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+from edgecraftrag.controllers.agentmgr import AgentManager
 from edgecraftrag.controllers.compmgr import (
     GeneratorMgr,
     IndexerMgr,
@@ -13,7 +14,6 @@ from edgecraftrag.controllers.knowledge_basemgr import KnowledgeManager
 from edgecraftrag.controllers.modelmgr import ModelMgr
 from edgecraftrag.controllers.nodemgr import NodeMgr
 from edgecraftrag.controllers.pipelinemgr import PipelineMgr
-from edgecraftrag.controllers.agentmgr import AgentManager
 from edgecraftrag.controllers.sessionmgr import SessionManager
 
 

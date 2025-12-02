@@ -10,10 +10,7 @@ interface UseClipboardReturn {
   copy: (text: string) => Promise<boolean>;
 }
 
-export const copyText = async (
-  text: string,
-  showMessage: boolean = true
-): Promise<boolean> => {
+export const copyText = async (text: string, showMessage: boolean = true): Promise<boolean> => {
   if (!text) {
     if (showMessage) {
       message.error(i18n.global.t("common.copyError"));
@@ -25,8 +22,7 @@ export const copyText = async (
     try {
       const textArea = document.createElement("textarea");
       textArea.value = text;
-      textArea.style.cssText =
-        "position:fixed;top:0;left:0;opacity:0;pointer-events:none;z-index:-1;";
+      textArea.style.cssText = "position:fixed;top:0;left:0;opacity:0;pointer-events:none;z-index:-1;";
       document.body.appendChild(textArea);
       textArea.select();
       textArea.setSelectionRange(0, 99999);

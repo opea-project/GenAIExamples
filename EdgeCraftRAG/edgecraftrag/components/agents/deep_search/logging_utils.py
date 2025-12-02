@@ -1,9 +1,10 @@
+# Copyright (C) 2025 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
 """Logging helpers for Mini Deep Search."""
 
 import logging
 import os
 from typing import List
-
 
 _LOGGER_NAME = "deep_search"
 

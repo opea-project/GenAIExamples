@@ -1,19 +1,20 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+import json
 import os
 import time
-import json
-from typing import List, Optional, Dict
+from typing import Dict, List, Optional
+
+from edgecraftrag.env import AGENT_FILE, KNOWLEDGEBASE_FILE, PIPELINE_FILE
 from pymilvus import (
-    connections,
-    FieldSchema,
+    Collection,
     CollectionSchema,
     DataType,
-    Collection,
+    FieldSchema,
+    connections,
     utility,
 )
-from edgecraftrag.env import PIPELINE_FILE, KNOWLEDGEBASE_FILE, AGENT_FILE
 
 
 class MilvusConfigRepository:
@@ -52,13 +53,9 @@ class MilvusConfigRepository:
                 FieldSchema(name="config_json", dtype=DataType.JSON),
                 FieldSchema(name="dummy_vector", dtype=DataType.FLOAT_VECTOR, dim=2),
             ]
-            schema = CollectionSchema(
-                fields, description="Config storage (idx as primary key)"
-            )
+            schema = CollectionSchema(fields, description="Config storage (idx as primary key)")
             collection = Collection(self.collection_name, schema, using=self.alias)
-            collection.create_index(
-                "dummy_vector", {"index_type": "FLAT", "metric_type": "L2"}
-            )
+            collection.create_index("dummy_vector", {"index_type": "FLAT", "metric_type": "L2"})
             return collection
         return Collection(self.collection_name, using=self.alias)
 
@@ -106,9 +103,7 @@ class MilvusConfigRepository:
         else:
             print("No data to insert")
 
-    def get_configs(
-        self, idx: Optional[str] = None, output_fields: Optional[list] = None
-    ) -> List[Dict]:
+    def get_configs(self, idx: Optional[str] = None, output_fields: Optional[list] = None) -> List[Dict]:
         try:
             self.collection.load()
             output_fields = output_fields or ["idx", "config_json"]
@@ -181,9 +176,7 @@ class MilvusDocumentRecordRepository:
         self.host, self.port = None, None
         if self.vector_url:
             if self.vector_url.startswith(("http://", "https://")):
-                host_port = self.vector_url.replace("http://", "").replace(
-                    "https://", ""
-                )
+                host_port = self.vector_url.replace("http://", "").replace("https://", "")
             else:
                 host_port = self.vector_url
             if ":" in host_port:
@@ -210,16 +203,10 @@ class MilvusDocumentRecordRepository:
                 FieldSchema(name="metadata", dtype=DataType.JSON),
                 FieldSchema(name="dummy_vector", dtype=DataType.FLOAT_VECTOR, dim=2),
             ]
-            schema = CollectionSchema(
-                fields, description="File-Document association records (with metadata)"
-            )
-            collection = Collection(
-                name=self.collection_name, schema=schema, using=self.alias
-            )
+            schema = CollectionSchema(fields, description="File-Document association records (with metadata)")
+            collection = Collection(name=self.collection_name, schema=schema, using=self.alias)
             index_params = {"index_type": "FLAT", "metric_type": "L2"}
-            collection.create_index(
-                field_name="dummy_vector", index_params=index_params
-            )
+            collection.create_index(field_name="dummy_vector", index_params=index_params)
             return collection
         else:
             return Collection(self.collection_name, using=self.alias)
@@ -246,9 +233,7 @@ class MilvusDocumentRecordRepository:
                     if retry < max_retries - 1:
                         print(f"Retrying in {retry_interval}s...")
                         time.sleep(retry_interval)
-            raise ConnectionError(
-                f"Max retries ({max_retries}) reached. Failed to connect to Milvus"
-            )
+            raise ConnectionError(f"Max retries ({max_retries}) reached. Failed to connect to Milvus")
         else:
             return None
 
@@ -294,23 +279,17 @@ async def save_pipeline_configurations(operation: str = None, pipeline=None):
         target_data["idx"] = pipeline.idx
         target_idx = target_data.get("idx")
         if "generator" in target_data and operation != "delete":
-            target_data["generator"][
-                "prompt_content"
-            ] = pipeline.generator.prompt_content
+            target_data["generator"]["prompt_content"] = pipeline.generator.prompt_content
             target_data["documents_cache"] = pipeline.documents_cache
             target_data["active"] = pipeline.status.active
 
         if pipeline_milvus_repo:
             if operation == "add":
-                success = pipeline_milvus_repo.add_config_by_idx(
-                    target_idx, target_data
-                )
+                success = pipeline_milvus_repo.add_config_by_idx(target_idx, target_data)
             elif operation == "delete":
                 success = pipeline_milvus_repo.delete_config_by_idx(target_idx)
             elif operation == "update":
-                success = pipeline_milvus_repo.update_config_by_idx(
-                    target_idx, target_data
-                )
+                success = pipeline_milvus_repo.update_config_by_idx(target_idx, target_data)
             if not success:
                 return False
             return True
@@ -324,12 +303,10 @@ async def save_pipeline_configurations(operation: str = None, pipeline=None):
 
             if operation == "add":
                 if any(p.get("idx") == target_idx for p in existing_pipelines):
-                    return {"message": f"Pipeline already exists"}
+                    return {"message": "Pipeline already exists"}
                 existing_pipelines.append(target_data)
             elif operation == "delete":
-                existing_pipelines = [
-                    p for p in existing_pipelines if p.get("idx") != target_idx
-                ]
+                existing_pipelines = [p for p in existing_pipelines if p.get("idx") != target_idx]
             elif operation == "update":
                 for i in range(len(existing_pipelines)):
                     if existing_pipelines[i].get("idx") == target_idx:
@@ -344,9 +321,7 @@ async def save_pipeline_configurations(operation: str = None, pipeline=None):
 
 
 # Configuration of knowledge base for persistence
-knowledgebase_config_repo = MilvusConfigRepository.create_connection(
-    "knowledgebase_config", 1
-)
+knowledgebase_config_repo = MilvusConfigRepository.create_connection("knowledgebase_config", 1)
 
 
 async def save_knowledge_configurations(operation: str = None, kb=None):
@@ -370,15 +345,11 @@ async def save_knowledge_configurations(operation: str = None, kb=None):
 
         if knowledgebase_config_repo:
             if operation == "add":
-                success = knowledgebase_config_repo.add_config_by_idx(
-                    target_idx, target_kb
-                )
+                success = knowledgebase_config_repo.add_config_by_idx(target_idx, target_kb)
             elif operation == "delete":
                 success = knowledgebase_config_repo.delete_config_by_idx(target_idx)
             elif operation == "update":
-                success = knowledgebase_config_repo.update_config_by_idx(
-                    target_idx, target_kb
-                )
+                success = knowledgebase_config_repo.update_config_by_idx(target_idx, target_kb)
             else:
                 return {"message": f"Invalid operation: {operation}"}
             return success
@@ -392,9 +363,7 @@ async def save_knowledge_configurations(operation: str = None, kb=None):
             if operation == "add":
                 existing_kbs.append(target_kb)
             elif operation == "delete":
-                existing_kbs = [
-                    item for item in existing_kbs if item.get("idx") != target_idx
-                ]
+                existing_kbs = [item for item in existing_kbs if item.get("idx") != target_idx]
             elif operation == "update":
                 for i in range(len(existing_kbs)):
                     if existing_kbs[i].get("idx") == target_idx:
@@ -430,14 +399,10 @@ async def save_agent_configurations(operation: str = None, agents=None):
                     return {"message": "Missing 'idx' in data"}
 
                 if operation == "add":
-                    success = agent_milvus_repo.add_config_by_idx(
-                        target_idx, target_data
-                    )
+                    success = agent_milvus_repo.add_config_by_idx(target_idx, target_data)
 
                 elif operation == "update":
-                    success = agent_milvus_repo.update_config_by_idx(
-                        target_idx, target_data
-                    )
+                    success = agent_milvus_repo.update_config_by_idx(target_idx, target_data)
 
                 if not success:
                     return False

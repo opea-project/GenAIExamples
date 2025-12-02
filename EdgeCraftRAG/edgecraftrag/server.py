@@ -9,10 +9,10 @@ from edgecraftrag.api.v1.chatqna import chatqna_app
 from edgecraftrag.api.v1.data import data_app
 from edgecraftrag.api.v1.knowledge_base import kb_app, restore_knowledge_configurations
 from edgecraftrag.api.v1.model import model_app
-from edgecraftrag.api.v1.pipeline import restore_pipeline_configurations, pipeline_app
+from edgecraftrag.api.v1.pipeline import pipeline_app, restore_pipeline_configurations
 from edgecraftrag.api.v1.prompt import prompt_app
-from edgecraftrag.api.v1.system import system_app
 from edgecraftrag.api.v1.session import session_app
+from edgecraftrag.api.v1.system import system_app
 from edgecraftrag.env import UI_DIRECTORY
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -29,6 +29,7 @@ async def lifespan(app: FastAPI):
         yield
     except Exception as e:
         raise
+
 
 app = FastAPI(lifespan=lifespan)
 app.mount(UI_DIRECTORY, StaticFiles(directory=UI_DIRECTORY), name=UI_DIRECTORY)

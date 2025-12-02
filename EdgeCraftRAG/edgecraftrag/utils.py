@@ -1,21 +1,19 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+import asyncio
 import io
 import os
 from pathlib import Path
 from typing import Iterator, List, Optional
-import asyncio
 
 from docx.text.paragraph import Paragraph
 from edgecraftrag.base import InferenceType
+from edgecraftrag.env import IMG_OUTPUT_DIR
 from PIL import Image as Img
 from transformers import AutoTokenizer
 from unstructured.documents.elements import ElementMetadata, Image
 from unstructured.partition.docx import DocxPartitionerOptions
-from edgecraftrag.env import IMG_OUTPUT_DIR
-
-
 
 DEFAULT_TEMPLATE = """You are an AI assistant. Your task is to learn from the following context. Then answer the user's question based on what you learned from the context but not your own knowledge.
 

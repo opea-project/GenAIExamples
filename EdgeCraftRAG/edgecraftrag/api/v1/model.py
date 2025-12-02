@@ -3,12 +3,12 @@
 
 import gc
 import os
-import requests
 from typing import Optional
 
+import requests
 from edgecraftrag.api_schema import ModelIn
 from edgecraftrag.context import ctx
-from fastapi import FastAPI, HTTPException, status, Query
+from fastapi import FastAPI, HTTPException, Query, status
 
 model_app = FastAPI()
 
@@ -34,9 +34,7 @@ async def get_model_weight(model_id):
 @model_app.get(path="/v1/settings/avail-models/{model_type}")
 async def get_model_id(
     model_type: str,
-    server_address: Optional[str] = Query(
-        default=None, description="vLLM server address (optional)"
-    ),
+    server_address: Optional[str] = Query(default=None, description="vLLM server address (optional)"),
 ):
     try:
         if model_type == "vLLM":
@@ -50,6 +48,7 @@ async def get_model_id(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=" GET model failed",
         )
+
 
 # GET Models
 @model_app.get(path="/v1/settings/models")
@@ -174,10 +173,6 @@ def get_available_vllm_models(server_address: str):
         return models
 
     except requests.exceptions.RequestException as e:
-        raise HTTPException(
-            status_code=500, detail=f"Failed to connect to vLLM server: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=f"Failed to connect to vLLM server: {str(e)}")
     except Exception as e:
-        raise HTTPException(
-            status_code=500, detail=f"Error processing request: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=f"Error processing request: {str(e)}")

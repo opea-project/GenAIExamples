@@ -1,9 +1,9 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-from fastapi import FastAPI
-from edgecraftrag.context import ctx
 from edgecraftrag.api_schema import SessionIn
+from edgecraftrag.context import ctx
+from fastapi import FastAPI
 
 session_app = FastAPI()
 

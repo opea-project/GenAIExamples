@@ -1,11 +1,16 @@
+# Copyright (C) 2025 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
 """Core DeepSearch implementation."""
 
 from __future__ import annotations
 
-import os
 import asyncio
+import os
 from typing import Any, List, Tuple
 
+from comps.cores.proto.api_protocol import ChatCompletionRequest
+from edgecraftrag.base import AgentType, CallbackType, CompType
+from edgecraftrag.components.agent import Agent, stream_writer
 from langgraph.graph import END, START, StateGraph
 from pydantic import BaseModel, Field
 
@@ -15,10 +20,6 @@ from .postprocessing import postproc_answer as default_postproc_answer
 from .postprocessing import postproc_plan as default_postproc_plan
 from .postprocessing import postproc_query as default_postproc_query
 from .utils import Role, import_module_from_path
-from edgecraftrag.components.agent import Agent, stream_writer
-from edgecraftrag.base import CallbackType, AgentType, CompType
-from comps.cores.proto.api_protocol import ChatCompletionRequest
-
 
 DEFAULT_CONFIG = "./edgecraftrag/components/agents/deep_search/cfgs/default.json"
 
@@ -47,13 +48,8 @@ class DeepSearchState(BaseModel):
 
 class DeepSearchAgent(Agent):
     """Driver class orchestrating the deep search workflow."""
-    def __init__(
-        self,
-        idx,
-        name,
-        pipeline_idx,
-        cfg
-    ):
+
+    def __init__(self, idx, name, pipeline_idx, cfg):
         super().__init__(name=name, agent_type=AgentType.DEEPSEARCH, pipeline_idx=pipeline_idx, configs=cfg)
 
         # Load the configuration
@@ -83,7 +79,9 @@ class DeepSearchAgent(Agent):
             except ImportError as exc:
                 log_status(
                     "⚠️",
-                    format_terminal_str(f"Failed to import postproc module '{self.cfg.postproc}': {exc}", color="yellow"),
+                    format_terminal_str(
+                        f"Failed to import postproc module '{self.cfg.postproc}': {exc}", color="yellow"
+                    ),
                 )
         postproc_module = postproc_module or None
         self.postproc_query = getattr(postproc_module, "postproc_query", default_postproc_query)
@@ -98,7 +96,7 @@ class DeepSearchAgent(Agent):
             "rerank_top_k": cfg.rerank_top_k,
             "mece_retrieval": cfg.mece_retrieval,
             "max_retrievals": cfg.max_retrievals,
-            "max_plan_steps": cfg.max_plan_steps
+            "max_plan_steps": cfg.max_plan_steps,
         }
 
     def update(self, cfg):
@@ -171,9 +169,7 @@ class DeepSearchAgent(Agent):
                         "📚",
                         f"Retrieved {format_terminal_str(str(num_retrieved), color='cyan', bold=True)} similar questions from experience database.\n",
                     )
-                experiences_block = self.cfg.prompt_templates.experiences.format(
-                    experiences="\n\n".join(examples)
-                )
+                experiences_block = self.cfg.prompt_templates.experiences.format(experiences="\n\n".join(examples))
         return [
             {
                 "role": Role.SYSTEM.value,
@@ -200,7 +196,7 @@ class DeepSearchAgent(Agent):
         if mece_retrieve:
             new_retrieved = [node for node in retrieved if node.node_id not in state.context_chunk_ids]
             # TODO: Using top_k from request, need to change?
-            new_retrieved = new_retrieved[:request.k]
+            new_retrieved = new_retrieved[: request.k]
         else:
             new_retrieved = retrieved
 
@@ -238,10 +234,7 @@ class DeepSearchAgent(Agent):
         await stream_writer("\n\n🤔 **Evaluating if more information is needed**\n\n")
         contexts = self.cfg.prompt_templates.contexts.format(
             contexts="\n".join(
-                [
-                    self.cfg.prompt_templates.context.format(context=doc.text)
-                    for doc in state.retrievals[-1].reranked
-                ]
+                [self.cfg.prompt_templates.context.format(context=doc.text) for doc in state.retrievals[-1].reranked]
             )
         )
         messages = [
@@ -318,7 +311,7 @@ class DeepSearchAgent(Agent):
         )
         log_status("🚀", f"{title_str} {format_terminal_str(step, italic=True)}")
         log_status("💡", format_terminal_str("Generating the initial query ...", color="green"))
-        await stream_writer(f"<agent title=\"Executing Step {state.step + 1}/{len(state.plan)}: {step}\">")
+        await stream_writer(f'<agent title="Executing Step {state.step + 1}/{len(state.plan)}: {step}">')
         message = {
             "role": Role.SYSTEM.value,
             "content": f"Start to execute the step: {step}\n",
@@ -333,13 +326,13 @@ class DeepSearchAgent(Agent):
     async def check_execution(self, state: DeepSearchState) -> str:
         if state.step >= len(state.plan):
             log_status("🏁", format_terminal_str("All planned steps completed", color="cyan", bold=True))
-            await stream_writer("<agent title=\"All planned steps completed\" tag=\"nofold\"></agent>")
+            await stream_writer('<agent title="All planned steps completed" tag="nofold"></agent>')
             return "stop"
         return "continue"
 
     async def make_plan(self, state: DeepSearchState) -> dict:
         log_status("📋", format_terminal_str("Making a plan ...", color="cyan", bold=True))
-        await stream_writer("<agent title=\"Making a plan\">")
+        await stream_writer('<agent title="Making a plan">')
         messages = [
             {
                 "role": Role.USER.value,
@@ -347,9 +340,7 @@ class DeepSearchAgent(Agent):
             },
             {
                 "role": Role.SYSTEM.value,
-                "content": self.cfg.prompt_templates.make_plan.format(
-                    plan_instruction=self.cfg.plan_instruction
-                ),
+                "content": self.cfg.prompt_templates.make_plan.format(plan_instruction=self.cfg.plan_instruction),
             },
         ]
         self._messages.extend(messages)
@@ -368,10 +359,7 @@ class DeepSearchAgent(Agent):
         await stream_writer("</agent>")
         plan_prompt = self.cfg.prompt_templates.plan.format(
             plan_steps="\n".join(
-                [
-                    self.cfg.prompt_templates.plan_step.format(num=i + 1, step=step)
-                    for i, step in enumerate(plan)
-                ]
+                [self.cfg.prompt_templates.plan_step.format(num=i + 1, step=step) for i, step in enumerate(plan)]
             )
         )
         message = {
@@ -409,8 +397,7 @@ class DeepSearchAgent(Agent):
         self._messages.append(
             {
                 "role": Role.ASSISTANT.value,
-                "content": "The following is the summarized information from previous search steps:\n"
-                + response,
+                "content": "The following is the summarized information from previous search steps:\n" + response,
             }
         )
         log_status("✅", format_terminal_str("Search process summarized\n", color="cyan", bold=True))
@@ -419,7 +406,7 @@ class DeepSearchAgent(Agent):
 
     async def generate_answer(self, state: DeepSearchState) -> dict:
         log_status("📝", format_terminal_str("Generating the final answer ...", color="cyan", bold=True))
-        await stream_writer("<agent title=\"Generating the final answer ...\" tag=\"nofold\"></agent>")
+        await stream_writer('<agent title="Generating the final answer ..." tag="nofold"></agent>')
 
         if self.cfg.use_summarized_context and state.search_summaries:
             plan_with_information = "Plan with Summarized Information:\n"
@@ -431,9 +418,9 @@ class DeepSearchAgent(Agent):
                     plan_with_information += "- Summary: N/A\n\n"
         else:
             if not self.cfg.mece_retrieval:
-                plan_with_information = "Plan:\n" + "\n".join(
-                    [f"{i+1}. {step}" for i, step in enumerate(state.plan)]
-                ) + "\n\n"
+                plan_with_information = (
+                    "Plan:\n" + "\n".join([f"{i+1}. {step}" for i, step in enumerate(state.plan)]) + "\n\n"
+                )
                 plan_with_information += "Retrieved Information:\n"
                 presented_ids = []
                 for retrieval in state.retrievals:
@@ -585,7 +572,7 @@ class DeepSearchAgent(Agent):
             step_index = i + 1
             step_desc = retrieval.step
             report.append(f"### Retrieval {step_index}: {step_desc}")
-            report.append(f"**Query:** \"{retrieval.query}\"")
+            report.append(f'**Query:** "{retrieval.query}"')
             report.append("#### Retrieved Documents Summary")
             for j, doc in enumerate(retrieval.reranked[:3]):
                 doc_content = doc.text
@@ -626,7 +613,7 @@ class DeepSearchAgent(Agent):
                     answer="",
                     plan=[],
                     retrievals=[],
-                    request=request
+                    request=request,
                 )
                 self._messages = await self._build_init_messages(request)
 
@@ -634,6 +621,7 @@ class DeepSearchAgent(Agent):
                     async for event, chunk in self.graph.astream(state, subgraphs=True, stream_mode="custom"):
                         yield chunk
                         await asyncio.sleep(0)
+
                 # log_status("✅", format_terminal_str("DeepSearch process completed", color="cyan", bold=True))
                 # result["conversation"] = [*self.conversation_history]
                 # result["graph_mermaid"] = self.graph.get_graph(xray=True).draw_mermaid()

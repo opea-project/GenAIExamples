@@ -54,9 +54,7 @@ class OpenAIEmbeddingModel(BaseModelComponent, OpenAIEmbedding):
             api_key="unused",
             **kwargs,
         )
-        OpenAIEmbedding.__init__(
-            self, model=model_id, api_base=api_base, api_key="unused"
-        )
+        OpenAIEmbedding.__init__(self, model=model_id, api_base=api_base, api_key="unused")
         self.comp_type = CompType.MODEL
         self.comp_subtype = ModelType.VLLM_EMBEDDING
 

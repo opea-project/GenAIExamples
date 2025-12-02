@@ -68,9 +68,7 @@ const createCustomRenderer = () => {
   const renderer = new marked.Renderer();
 
   renderer.link = ({ href, title, text }) => {
-    return `<a href="${href}" target="_blank" rel="noopener noreferrer" ${
-      title ? `title="${title}"` : ""
-    }>${text}</a>`;
+    return `<a href="${href}" target="_blank" rel="noopener noreferrer" ${title ? `title="${title}"` : ""}>${text}</a>`;
   };
 
   renderer.code = ({ text, lang }: CodeRenderParams) => {
@@ -79,9 +77,7 @@ const createCustomRenderer = () => {
     const codeHtml = hljs.highlight(text, {
       language: language || "plaintext",
     }).value;
-    const uniqueId = `code-${Date.now()}-${Math.random()
-      .toString(16)
-      .slice(2)}`;
+    const uniqueId = `code-${Date.now()}-${Math.random().toString(16).slice(2)}`;
 
     return `
       <div class="intel-highlighter">

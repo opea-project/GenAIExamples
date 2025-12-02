@@ -12,7 +12,7 @@ export const handleMessageSend = (
   url: string,
   postData: any,
   onDisplay: (data: string) => void,
-  onEnd?: () => void
+  onEnd?: () => void,
 ): StreamController => {
   let reader: ReadableStreamDefaultReader | undefined;
   const controller = new AbortController();

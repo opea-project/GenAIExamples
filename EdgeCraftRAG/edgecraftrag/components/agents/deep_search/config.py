@@ -1,3 +1,5 @@
+# Copyright (C) 2025 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
 """Configuration models and helpers for Mini Deep Search."""
 
 from __future__ import annotations

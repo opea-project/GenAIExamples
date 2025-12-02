@@ -7,13 +7,13 @@ import uuid
 from typing import Any, Dict, List, Optional, Union
 
 from edgecraftrag.base import BaseComponent, CompType
-from pydantic import model_serializer
-from llama_index.core.schema import Document
 from edgecraftrag.config_repository import (
     MilvusConfigRepository,
     MilvusDocumentRecordRepository,
 )
-from edgecraftrag.env import EXPERIENCE_FILE, DOCUMENT_DATA_FILE
+from edgecraftrag.env import DOCUMENT_DATA_FILE, EXPERIENCE_FILE
+from llama_index.core.schema import Document
+from pydantic import model_serializer
 
 
 class Knowledge(BaseComponent):
@@ -53,17 +53,11 @@ class Knowledge(BaseComponent):
             self.file_paths: List[str] = []
             self.file_map: Dict[str, str] = {}
 
-        self.experience_repo = MilvusConfigRepository.create_connection(
-            "experience_data", 1
-        )
-        self.document_record_repo = MilvusDocumentRecordRepository.create_connection(
-            "document_records", 1
-        )
+        self.experience_repo = MilvusConfigRepository.create_connection("experience_data", 1)
+        self.document_record_repo = MilvusDocumentRecordRepository.create_connection("document_records", 1)
 
     def _update_file_names(self) -> None:
-        self.file_map = {
-            os.path.basename(path): path for path in self.file_paths if path is not None
-        }
+        self.file_map = {os.path.basename(path): path for path in self.file_paths if path is not None}
 
     def add_file_path(
         self,
@@ -97,10 +91,7 @@ class Knowledge(BaseComponent):
 
     def remove_file_path(self, file_path: str, pl_name: str) -> List[str]:
         removed_doc_ids = []
-        if (
-            pl_name in self.all_document_maps
-            and file_path in self.all_document_maps[pl_name]
-        ):
+        if pl_name in self.all_document_maps and file_path in self.all_document_maps[pl_name]:
             file_id = self.all_document_maps[pl_name][file_path]
             removed_doc_ids = self._remove_document_records_by_file_id(file_id)
 
@@ -158,9 +149,7 @@ class Knowledge(BaseComponent):
                 existing = self.experience_repo.get_configs(idx=exp_idx)
                 if not existing:
                     all_exps = self.get_all_experience()
-                    existing = [
-                        item for item in all_exps if item.get("question") == question
-                    ]
+                    existing = [item for item in all_exps if item.get("question") == question]
                 else:
                     existing = [item["config_json"] for item in existing]
 
@@ -168,15 +157,11 @@ class Knowledge(BaseComponent):
                     existing_item = existing[0]
                     exp_idx = existing_item.get("idx")
                     if flag:
-                        existing_item["content"].extend(
-                            [c for c in content if c not in existing_item["content"]]
-                        )
+                        existing_item["content"].extend([c for c in content if c not in existing_item["content"]])
                     else:
                         existing_item["content"] = content
                     existing_item["question"] = question
-                    success = self.experience_repo.update_config_by_idx(
-                        exp_idx, existing_item
-                    )
+                    success = self.experience_repo.update_config_by_idx(exp_idx, existing_item)
                     if success:
                         result.append(existing_item)
                 else:
@@ -212,9 +197,7 @@ class Knowledge(BaseComponent):
                             break
                 if existing_idx is not None:
                     if flag:
-                        existing_item["content"].extend(
-                            [c for c in content if c not in existing_item["content"]]
-                        )
+                        existing_item["content"].extend([c for c in content if c not in existing_item["content"]])
                         existing_item["question"] = question
                     else:
                         existing_item["content"] = content
@@ -255,9 +238,7 @@ class Knowledge(BaseComponent):
             self._write_experience_file([])
             return True
 
-    def update_experience(
-        self, exp_idx: str, new_question: str, new_content: List[str]
-    ) -> Optional[Dict]:
+    def update_experience(self, exp_idx: str, new_question: str, new_content: List[str]) -> Optional[Dict]:
         updated_item = {
             "idx": exp_idx,
             "question": new_question,
@@ -275,9 +256,7 @@ class Knowledge(BaseComponent):
                     return updated_item
             return None
 
-    def add_experiences_from_file(
-        self, file_path: str, flag: bool = False
-    ) -> List[Dict]:
+    def add_experiences_from_file(self, file_path: str, flag: bool = False) -> List[Dict]:
         if not file_path.endswith(".json"):
             raise ValueError("File must be a JSON file")
         try:
@@ -319,19 +298,13 @@ class Knowledge(BaseComponent):
     def _remove_document_records_by_file_id(self, file_id: str) -> List[Dict[str, str]]:
         deleted_records = []
         if self.document_record_repo:
-            deleted_records = self.document_record_repo.delete_records_by_file_id(
-                file_id
-            )
+            deleted_records = self.document_record_repo.delete_records_by_file_id(file_id)
         else:
             if os.path.exists(DOCUMENT_DATA_FILE):
                 with open(DOCUMENT_DATA_FILE, "r", encoding="utf-8") as f:
                     all_document_data = json.load(f)
-                deleted_records = [
-                    item.get("doc_id") for item in all_document_data if item.get("file_id") == file_id
-                ]
-                result_documents = [
-                    item for item in all_document_data if item.get("file_id") != file_id
-                ]
+                deleted_records = [item.get("doc_id") for item in all_document_data if item.get("file_id") == file_id]
+                result_documents = [item for item in all_document_data if item.get("file_id") != file_id]
                 if len(deleted_records) > 0:
                     with open(DOCUMENT_DATA_FILE, "w", encoding="utf-8") as f:
                         json.dump(result_documents, f, ensure_ascii=False, indent=4)
@@ -344,13 +317,10 @@ class Knowledge(BaseComponent):
         file_id = self.all_document_maps[pl_name].get(file_path)
         if not file_id:
             return doc_info_list
-        
+
         if self.document_record_repo:
             records = self.document_record_repo.get_records_by_file_id(file_id)
-            doc_info_list = [
-                {"doc_id": rec["doc_id"], "metadata": rec.get("metadata", {})}
-                for rec in records
-            ]
+            doc_info_list = [{"doc_id": rec["doc_id"], "metadata": rec.get("metadata", {})} for rec in records]
         else:
             if os.path.exists(DOCUMENT_DATA_FILE):
                 with open(DOCUMENT_DATA_FILE, "r", encoding="utf-8") as f:

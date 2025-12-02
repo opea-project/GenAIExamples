@@ -6,22 +6,22 @@ import os
 import re
 from typing import Dict, List, Union
 
-from edgecraftrag.config_repository import (
-    MilvusConfigRepository,
-    save_pipeline_configurations,
-    save_knowledge_configurations,
-)
+from edgecraftrag.api.v1.data import get_nodes_with_kb
 from edgecraftrag.api_schema import DataIn, ExperienceIn, KnowledgeBaseCreateIn
 from edgecraftrag.components.query_preprocess import query_search
 from edgecraftrag.components.retriever import get_kbs_info
+from edgecraftrag.config_repository import (
+    MilvusConfigRepository,
+    save_knowledge_configurations,
+    save_pipeline_configurations,
+)
 from edgecraftrag.context import ctx
 from edgecraftrag.env import (
-    UI_DIRECTORY,
     KNOWLEDGEBASE_FILE,
     SEARCH_CONFIG_PATH,
     SEARCH_DIR,
+    UI_DIRECTORY,
 )
-from edgecraftrag.api.v1.data import get_nodes_with_kb
 from fastapi import FastAPI, HTTPException, status
 from llama_index.core.schema import Document
 
@@ -60,11 +60,7 @@ async def create_knowledge_base(knowledge: KnowledgeBaseCreateIn):
                 detail="Knowledge base names must begin with a letter or underscore",
             )
 
-        if (
-            knowledge.active
-            and knowledge.comp_type == "knowledge"
-            and knowledge.comp_subtype == "origin_kb"
-        ):
+        if knowledge.active and knowledge.comp_type == "knowledge" and knowledge.comp_subtype == "origin_kb":
             active_pl.indexer.reinitialize_indexer(knowledge.name)
             active_pl.update_indexer_to_retriever()
         elif knowledge.active and knowledge.comp_subtype == "kbadmin_kb":
@@ -121,18 +117,12 @@ async def update_knowledge_base(knowledge: KnowledgeBaseCreateIn):
     try:
         kb = ctx.knowledgemgr.get_knowledge_base_by_name_or_id(knowledge.name)
         active_pl = ctx.get_pipeline_mgr().get_active_pipeline()
-        if (
-            active_pl.indexer.comp_subtype == "kbadmin_indexer"
-            and kb.comp_subtype != "kbadmin_kb"
-        ):
+        if active_pl.indexer.comp_subtype == "kbadmin_indexer" and kb.comp_subtype != "kbadmin_kb":
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="The kbadmin pipeline must correspond to the kbadmin type kb.",
             )
-        if (
-            active_pl.indexer.comp_subtype != "kbadmin_indexer"
-            and kb.comp_subtype == "kbadmin_kb"
-        ):
+        if active_pl.indexer.comp_subtype != "kbadmin_indexer" and kb.comp_subtype == "kbadmin_kb":
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Not kbadmin pipeline cannot active kbadmin type kb.",
@@ -155,9 +145,7 @@ async def update_knowledge_base(knowledge: KnowledgeBaseCreateIn):
                         active_pl.indexer.reinitialize_indexer(kb.name)
                         if need_delete_document_path:
                             for file_path in need_delete_document_path:
-                                await remove_file_from_knowledge_base(
-                                    kb.name, DataIn(local_path=file_path)
-                                )
+                                await remove_file_from_knowledge_base(kb.name, DataIn(local_path=file_path))
                         if need_add_document_path:
                             for file_path in need_add_document_path:
                                 add_document = await add_file_to_knowledge_base(
@@ -181,9 +169,7 @@ async def update_knowledge_base(knowledge: KnowledgeBaseCreateIn):
 
 # Add a files to the knowledge base
 @kb_app.post(path="/v1/knowledge/{knowledge_name}/files")
-async def add_file_to_knowledge_base(
-    knowledge_name, file_path: DataIn, only_add_file: bool = True
-):
+async def add_file_to_knowledge_base(knowledge_name, file_path: DataIn, only_add_file: bool = True):
     try:
         active_pl = ctx.get_pipeline_mgr().get_active_pipeline()
         kb = ctx.knowledgemgr.get_knowledge_base_by_name_or_id(knowledge_name)
@@ -192,10 +178,7 @@ async def add_file_to_knowledge_base(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="The experience type cannot perform file operations.",
             )
-        if (
-            kb.comp_subtype == "kbadmin_kb"
-            or active_pl.indexer.comp_subtype == "kbadmin_indexer"
-        ):
+        if kb.comp_subtype == "kbadmin_kb" or active_pl.indexer.comp_subtype == "kbadmin_indexer":
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Please proceed to the kbadmin interface to perform the operation.",
@@ -205,47 +188,33 @@ async def add_file_to_knowledge_base(
         add_document = ctx.get_file_mgr().add_files(docs=user_path)
         normalized_path = os.path.normpath(os.path.join(UI_DIRECTORY, user_path))
         if not normalized_path.startswith(UI_DIRECTORY):
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid file path"
-            )
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid file path")
         if os.path.isdir(normalized_path):
             for root, _, files in os.walk(normalized_path):
                 for file in files:
                     file_full_path = os.path.join(root, file)
                     if file_full_path not in kb.get_file_paths():
-                        kb.add_file_path(
-                            file_full_path, add_document, active_pl.name, only_add_file
-                        )
+                        kb.add_file_path(file_full_path, add_document, active_pl.name, only_add_file)
                         active_pl.add_docs_to_list(knowledge_name, file_full_path)
                     else:
                         raise HTTPException(
                             status_code=status.HTTP_409_CONFLICT,
                             detail=f"File already exists {file_full_path}",
                         )
-        elif (
-            os.path.isfile(normalized_path)
-            and normalized_path in kb.get_file_paths()
-            and only_add_file
-        ):
+        elif os.path.isfile(normalized_path) and normalized_path in kb.get_file_paths() and only_add_file:
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
                 detail=f"File already exists {normalized_path}",
             )
         elif os.path.isfile(normalized_path) and only_add_file:
-            kb.add_file_path(
-                normalized_path, add_document, active_pl.name, only_add_file
-            )
+            kb.add_file_path(normalized_path, add_document, active_pl.name, only_add_file)
             active_pl.add_docs_to_list(knowledge_name, user_path)
         elif os.path.isfile(normalized_path):
-            kb.add_file_path(
-                normalized_path, add_document, active_pl.name, only_add_file
-            )
+            kb.add_file_path(normalized_path, add_document, active_pl.name, only_add_file)
             active_pl.add_docs_to_list(knowledge_name, user_path)
             return add_document
         else:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Error uploading file."
-            )
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Error uploading file.")
 
         active_kb = ctx.knowledgemgr.get_active_knowledge_base()
         if active_pl.indexer.comp_subtype == "milvus_vector":
@@ -278,10 +247,7 @@ async def remove_file_from_knowledge_base(knowledge_name, file_path: DataIn):
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="The experience type cannot perform file operations.",
             )
-        if (
-            kb.comp_subtype == "kbadmin_kb"
-            or active_pl.indexer.comp_subtype == "kbadmin_indexer"
-        ):
+        if kb.comp_subtype == "kbadmin_kb" or active_pl.indexer.comp_subtype == "kbadmin_indexer":
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Please proceed to the kbadmin interface to perform the operation.",
@@ -322,9 +288,7 @@ def get_all_experience():
 @kb_app.patch("/v1/experiences")
 def update_experience(experience: ExperienceIn):
     kb = ctx.knowledgemgr.get_experience_kb()
-    result = kb.update_experience(
-        experience.idx, experience.question, experience.content
-    )
+    result = kb.update_experience(experience.idx, experience.question, experience.content)
     if not result:
         raise HTTPException(404, detail="Question_idx or question not found")
     return result
@@ -347,12 +311,8 @@ def check_duplicate_multiple_experiences(
     if not kb:
         raise HTTPException(404, detail="No active experience type knowledge base")
     all_existing = kb.get_all_experience()
-    existing_questions = {
-        item["question"] for item in all_existing if "question" in item
-    }
-    new_questions = [
-        exp["question"] for exp in experiences if "question" in exp and exp["question"]
-    ]
+    existing_questions = {item["question"] for item in all_existing if "question" in item}
+    new_questions = [exp["question"] for exp in experiences if "question" in exp and exp["question"]]
     duplicate_questions = [q for q in new_questions if q in existing_questions]
     if duplicate_questions:
         return {
@@ -368,9 +328,7 @@ def check_duplicate_multiple_experiences(
 
 
 @kb_app.post("/v1/multiple_experiences/confirm")
-def confirm_multiple_experiences(
-    experiences: List[Dict[str, Union[str, List[str]]]], flag: bool
-):
+def confirm_multiple_experiences(experiences: List[Dict[str, Union[str, List[str]]]], flag: bool):
     kb = ctx.knowledgemgr.get_experience_kb()
     try:
         if not kb:
@@ -430,17 +388,13 @@ async def add_document_handler(all_document=None):
         nodelist = await ctx.get_pipeline_mgr().run_data_prepare(docs=all_document)
         if active_pl.indexer.comp_subtype != "kbadmin_indexer":
             if nodelist is None or len(nodelist) == 0:
-                raise HTTPException(
-                    status_code=status.HTTP_404_NOT_FOUND, detail="File not found"
-                )
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="File not found")
         ctx.get_node_mgr().add_nodes(active_pl.node_parser.idx, nodelist)
         return "success update file"
 
 
 # Update knowledge base data
-async def remove_document_handler(
-    document_list=None, knowledge_name: str = "default_kb"
-):
+async def remove_document_handler(document_list=None, knowledge_name: str = "default_kb"):
     if ctx.get_pipeline_mgr().get_active_pipeline() is None:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -462,9 +416,7 @@ async def remove_document_handler(
 
 # Restore knowledge base configuration
 async def restore_knowledge_configurations():
-    knowledgebase_config_repo = MilvusConfigRepository.create_connection(
-        "knowledgebase_config", 1
-    )
+    knowledgebase_config_repo = MilvusConfigRepository.create_connection("knowledgebase_config", 1)
     all_datas = []
     active_pl = ctx.get_pipeline_mgr().get_active_pipeline()
     if knowledgebase_config_repo:
@@ -485,15 +437,10 @@ async def restore_knowledge_configurations():
             kb = ctx.knowledgemgr.create_knowledge_base(Knoweldge_req)
             if kb.comp_type == "knowledge" and kb.comp_subtype == "origin_kb":
                 if Knowledgebase_data["file_paths"]:
-                    if (
-                        active_pl.indexer.comp_subtype != "milvus_vector"
-                        and Knowledgebase_data["active"]
-                    ):
+                    if active_pl.indexer.comp_subtype != "milvus_vector" and Knowledgebase_data["active"]:
                         await handle_reload_data(kb, active_pl)
                     elif Knowledgebase_data["active"]:
-                        active_pl.indexer.reinitialize_indexer(
-                            Knowledgebase_data["name"]
-                        )
+                        active_pl.indexer.reinitialize_indexer(Knowledgebase_data["name"])
                         active_pl.update_indexer_to_retriever()
                     else:
                         pass
@@ -540,9 +487,7 @@ async def Synchronizing_vector_data(old_active_pl, new_active_pl):
                 active_pl.indexer.reinitialize_indexer(active_kb.name)
                 if need_delete_document_path:
                     for file_path in need_delete_document_path:
-                        await remove_file_from_knowledge_base(
-                            active_kb.name, DataIn(local_path=file_path)
-                        )
+                        await remove_file_from_knowledge_base(active_kb.name, DataIn(local_path=file_path))
                 if need_add_document_path:
                     for file_path in need_add_document_path:
                         add_document = await add_file_to_knowledge_base(
@@ -571,26 +516,38 @@ async def handle_pipeline_change(kb, pl, file_paths):
         pl.indexer.reinitialize_indexer(kb.name)
         for file_path in need_add_document_path:
             if exist_file:
-                add_document = await add_file_to_knowledge_base(
-                    kb.name, DataIn(local_path=file_path), False
-                )
+                add_document = await add_file_to_knowledge_base(kb.name, DataIn(local_path=file_path), False)
                 await add_document_handler(add_document)
             else:
                 add_document = []
-                docuement = {}
+                document = {}
                 documents_list = kb.get_all_document(file_path, pl.name)
-                for docuement in documents_list:
+                for document in documents_list:
                     need_add_node_list = {}
                     for node in node_lists.values():
-                        if docuement.get("doc_id") == node.get("doc_id"):
+                        if document.get("doc_id") == node.get("doc_id"):
                             need_add_node_list[node["id_"]] = node
                     docuement_text = pl.nodes_to_document(need_add_node_list)
-                    docuement["id_"] = docuement.get("doc_id")
-                    docuement["text"] = docuement_text
-                    docuement["excluded_embed_metadata_keys"] = ['file_name', 'file_type', 'file_size', 'creation_date', 'last_modified_date', 'last_accessed_date']
-                    docuement["excluded_llm_metadata_keys"] = ['file_name', 'file_type', 'file_size', 'creation_date', 'last_modified_date', 'last_accessed_date']
-                    docuement["metadata"] = docuement.get("metadata")
-                    result_document = Document.from_dict(data=docuement)
+                    document["id_"] = document.get("doc_id")
+                    document["text"] = docuement_text
+                    document["excluded_embed_metadata_keys"] = [
+                        "file_name",
+                        "file_type",
+                        "file_size",
+                        "creation_date",
+                        "last_modified_date",
+                        "last_accessed_date",
+                    ]
+                    document["excluded_llm_metadata_keys"] = [
+                        "file_name",
+                        "file_type",
+                        "file_size",
+                        "creation_date",
+                        "last_modified_date",
+                        "last_accessed_date",
+                    ]
+                    document["metadata"] = document.get("metadata")
+                    result_document = Document.from_dict(data=document)
                     add_document.append(result_document)
                 pl.add_docs_to_list(kb.name, file_path)
                 await add_document_handler(add_document)
@@ -605,7 +562,5 @@ async def handle_reload_data(kb, pl):
     kb.clear_documents(pl.name)
     if need_add_document_path:
         for file_path in need_add_document_path:
-            add_document = await add_file_to_knowledge_base(
-                kb.name, DataIn(local_path=file_path), False
-            )
+            add_document = await add_file_to_knowledge_base(kb.name, DataIn(local_path=file_path), False)
             await add_document_handler(add_document)
