@@ -3,7 +3,7 @@ EbookLib>=0.18
 faiss-cpu>=1.8.0.post1
 html2text>=2025.4.15
 json-repair==0.52.0
-langchain-core==0.3.79
+langchain-core==0.3.80
 langchain-milvus
 langchain-openai
 langgraph==0.6.10
