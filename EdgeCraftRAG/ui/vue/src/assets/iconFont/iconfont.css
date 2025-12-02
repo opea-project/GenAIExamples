@@ -1,9 +1,9 @@
 @font-face {
   font-family: "iconfont"; /* Project id 4784207 */
   src:
-    url("iconfont.woff2?t=1757469597873") format("woff2"),
-    url("iconfont.woff?t=1757469597873") format("woff"),
-    url("iconfont.ttf?t=1757469597873") format("truetype");
+    url("iconfont.woff2?t=1762502048420") format("woff2"),
+    url("iconfont.woff?t=1762502048420") format("woff"),
+    url("iconfont.ttf?t=1762502048420") format("truetype");
 }
 
 .iconfont {
@@ -12,6 +12,50 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-simple-robot:before {
+  content: "\e604";
+}
+
+.icon-deep_search:before {
+  content: "\e620";
+}
+
+.icon-jiqiren-05:before {
+  content: "\ec1e";
+}
+
+.icon-recursive:before {
+  content: "\e61e";
+}
+
+.icon-simple:before {
+  content: "\e61f";
+}
+
+.icon-lujing:before {
+  content: "\e61d";
+}
+
+.icon-agent:before {
+  content: "\e62c";
+}
+
+.icon-pipeline:before {
+  content: "\e650";
+}
+
+.icon-skip1:before {
+  content: "\e67f";
+}
+
+.icon-annotation:before {
+  content: "\e62e";
+}
+
+.icon-groundtruth:before {
+  content: "\e9b7";
 }
 
 .icon-kb:before {

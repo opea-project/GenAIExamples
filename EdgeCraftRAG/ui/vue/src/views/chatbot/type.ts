@@ -19,6 +19,7 @@ export interface ThinkType {
 }
 export interface ConfigType {
   top_n: number;
+  k: number;
   temperature: number;
   top_p: number;
   top_k: number;

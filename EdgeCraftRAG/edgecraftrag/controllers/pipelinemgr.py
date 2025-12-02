@@ -19,8 +19,15 @@ class PipelineMgr(BaseMgr):
         self._lock = asyncio.Lock()
         super().__init__()
 
-    def create_pipeline(self, name: str, origin_json: str):
-        pl = Pipeline(name, origin_json)
+    def create_pipeline(self, request, origin_json: str):
+        if isinstance(request, str):
+            name = request
+            idx, documents_cache = None, None
+        else:
+            name = request.name
+            idx = request.idx
+            documents_cache = request.documents_cache
+        pl = Pipeline(name, origin_json, idx, documents_cache)
         self.add(pl)
         return pl
 
@@ -83,24 +90,38 @@ class PipelineMgr(BaseMgr):
         for _, pl in self.components.items():
             pl.set_node_change()
 
-    def run_pipeline(self, chat_request: ChatCompletionRequest) -> Any:
+    async def run_pipeline(self, chat_request: ChatCompletionRequest) -> Any:
+        ap = self.get_active_pipeline()
+        if ap is not None:
+            return await ap.run(cbtype=CallbackType.PIPELINE, chat_request=chat_request)
+        return -1
+
+    async def run_retrieve_postprocess(self, chat_request: ChatCompletionRequest) -> Any:
         ap = self.get_active_pipeline()
         out = None
         if ap is not None:
-            out = ap.run(cbtype=CallbackType.PIPELINE, chat_request=chat_request)
+            out = await ap.run(cbtype=CallbackType.RETRIEVE_POSTPROCESS, chat_request=chat_request)
             return out
         return -1
 
-    def run_retrieve(self, chat_request: ChatCompletionRequest) -> Any:
+    async def run_retrieve(self, chat_request: ChatCompletionRequest) -> Any:
         ap = self.get_active_pipeline()
         out = None
         if ap is not None:
-            out = ap.run(cbtype=CallbackType.RETRIEVE, chat_request=chat_request)
+            out = await ap.run(cbtype=CallbackType.RETRIEVE, chat_request=chat_request)
             return out
         return -1
 
-    def run_data_prepare(self, docs: List[Document]) -> Any:
+    async def run_postprocess(self, chat_request: ChatCompletionRequest, contexts) -> Any:
+        ap = self.get_active_pipeline()
+        out = None
+        if ap is not None:
+            out = await ap.run(cbtype=CallbackType.POSTPROCESS, chat_request=chat_request, contexts=contexts)
+            return out
+        return -1
+
+    async def run_data_prepare(self, docs: List[Document]) -> Any:
         ap = self.get_active_pipeline()
         if ap is not None:
-            return ap.run(cbtype=CallbackType.DATAPREP, docs=docs)
+            return await ap.run(cbtype=CallbackType.DATAPREP, docs=docs)
         return -1

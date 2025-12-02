@@ -10,6 +10,7 @@ from llama_index.core import StorageContext, VectorStoreIndex
 from llama_index.vector_stores.faiss import FaissVectorStore
 from llama_index.vector_stores.milvus import MilvusVectorStore
 from pydantic import model_serializer
+from pymilvus import Collection, connections
 
 
 class VectorIndexer(BaseComponent, VectorStoreIndex):
@@ -31,9 +32,13 @@ class VectorIndexer(BaseComponent, VectorStoreIndex):
     def _initialize_indexer(self, embed_model, vector_type, vector_url, kb_name):
         # get active name
         pl = ctx.get_pipeline_mgr().get_active_pipeline()
-        plname = pl.name if pl else ""
+        collection_name = kb_name + pl.name if pl else "default"
         if embed_model:
-            self.d = embed_model._model.request.outputs[0].get_partial_shape()[2].get_length()
+            try:
+                self.d = len(embed_model.get_text_embedding("test"))
+            except Exception:
+                # Fallback for OpenVINO models if the above fails
+                self.d = embed_model._model.request.outputs[0].get_partial_shape()[2].get_length()
         else:
             self.d = 128
         match vector_type:
@@ -47,7 +52,7 @@ class VectorIndexer(BaseComponent, VectorStoreIndex):
                 milvus_vector_store = MilvusVectorStore(
                     uri=vector_url,
                     dim=self.d,
-                    collection_name=kb_name + plname + str(self.d),
+                    collection_name=collection_name,
                     overwrite=False,
                 )
                 milvus_store = StorageContext.from_defaults(vector_store=milvus_vector_store)
@@ -62,7 +67,7 @@ class VectorIndexer(BaseComponent, VectorStoreIndex):
         plname = pl.name if pl else ""
         milvus_vector_store = MilvusVectorStore(
             uri=self.vector_url,
-            collection_name=kb_name + plname + str(self.d),
+            collection_name=kb_name + plname,
             overwrite=False,
         )
         milvus_vector_store.clear()

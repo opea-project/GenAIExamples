@@ -22,7 +22,8 @@ import { Local } from "@/utils/storage";
 const chatbotStore = chatbotAppStore();
 
 let chatbotConfiguration = reactive<ConfigType>({
-  top_n: 25,
+  top_n: 0,
+  k: 0,
   temperature: 0.01,
   top_p: 0.95,
   top_k: 10,

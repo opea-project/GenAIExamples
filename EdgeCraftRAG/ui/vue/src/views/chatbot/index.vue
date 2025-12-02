@@ -1,11 +1,16 @@
 <template>
   <div class="chat-container">
     <a-layout class="content-container">
-      <a-layout-sider :width="currentMenu === 'knowledge' ? 240 : 0">
+      <a-layout-sider :width="expandMenu ? 260 : 0" class="sider-wrap">
+        <div class="fold-but" @click="expandMenu = !expandMenu">
+          <DoubleLeftOutlined v-if="expandMenu" class="fold-icon" />
+          <DoubleRightOutlined v-else />
+        </div>
         <KnowledgeBase
           @view="handleViewKBDetail"
           v-if="currentMenu === 'knowledge'"
         />
+        <ChatHistory v-else />
       </a-layout-sider>
       <a-layout-content>
         <keep-alive>
@@ -22,13 +27,20 @@
 </template>
 
 <script lang="ts" setup name="Chatbot">
-import { onMounted, computed } from "vue";
-import { Chatbot, DetailComponent, KnowledgeBase } from "./components";
+import { computed } from "vue";
+import {
+  Chatbot,
+  DetailComponent,
+  KnowledgeBase,
+  ChatHistory,
+} from "./components";
+import { DoubleLeftOutlined, DoubleRightOutlined } from "@ant-design/icons-vue";
 
 const route = useRoute();
 
 const currentMenu = ref<string>("chat");
 const currentPage = ref<string>("chat");
+const expandMenu = ref<boolean>(true);
 let kbInfo = reactive<EmptyObjectType>({});
 
 const componentList = ref<EmptyArrayType>([
@@ -60,6 +72,7 @@ const handleViewKBDetail = (row: EmptyObjectType) => {
 const handleBack = () => {
   currentPage.value = "chat";
 };
+
 watch(
   () => route,
   (route) => {
@@ -89,6 +102,31 @@ watch(
     .intel-layout-sider {
       background-color: transparent;
     }
+  }
+}
+.sider-wrap {
+  position: relative;
+  &:hover {
+    .fold-icon {
+      display: block;
+    }
+  }
+  .fold-but {
+    position: absolute;
+    top: 50%;
+    right: -30px;
+    cursor: pointer;
+    z-index: 99;
+    font-size: 20px;
+    width: 40px;
+    height: 50px;
+    padding: 12px 0;
+    text-align: end;
+    color: var(--font-tip-color);
+  }
+  .fold-icon {
+    display: none;
+    font-weight: 600;
   }
 }
 </style>

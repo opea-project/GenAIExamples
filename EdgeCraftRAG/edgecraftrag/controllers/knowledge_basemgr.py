@@ -71,12 +71,15 @@ class KnowledgeManager(BaseMgr):
         if knowledge.active is None:
             knowledge.active = False
         kb = Knowledge(
+            idx=knowledge.idx,
             name=knowledge.name,
             description=knowledge.description,
             active=knowledge.active,
             comp_type=knowledge.comp_type,
             comp_subtype=knowledge.comp_subtype,
             experience_active=knowledge.experience_active,
+            all_document_maps=knowledge.all_document_maps,
+            file_paths=knowledge.file_paths,
         )
         self.add(kb)
         if knowledge.active:

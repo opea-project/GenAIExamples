@@ -3,7 +3,7 @@
 
 import { inject } from "vue";
 import { customNotification } from "./notification";
-import { Local } from "./storage";
+import { sessionAppStore } from "@/store/session";
 
 export const useNotification = () => {
   const customNotificationInjected = inject<typeof customNotification>("customNotification");
@@ -30,15 +30,15 @@ export const formatCapitalize = (string: string, start: number = 0, length: numb
 };
 
 export const getChatSessionId = (): string => {
-  const STORAGE_KEY = "chat_session_id";
+  const sessionStore = sessionAppStore();
 
-  const storedSessionId = Local.get(STORAGE_KEY);
+  const storedSessionId = sessionStore.currentSession;
   if (storedSessionId) {
     return storedSessionId;
   }
   const newSessionId = self.crypto?.randomUUID?.() || generateFallbackId();
 
-  Local.set(STORAGE_KEY, newSessionId);
+  sessionStore.setSessionId(newSessionId);
   return newSessionId;
 };
 
@@ -53,4 +53,49 @@ const generateFallbackId = (): string => {
   } else {
     throw new Error("No secure random number generator available for session ID generation.");
   }
+};
+
+export const downloadJson = (data: object | string, filename: string = "pipeline.json") => {
+  const jsonStr: string = typeof data === "string" ? data : JSON.stringify(data, null, 2);
+
+  const blob: Blob = new Blob([jsonStr], { type: "application/json" });
+
+  const url: string = URL.createObjectURL(blob);
+
+  const a: HTMLAnchorElement = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+};
+
+export const formatTextStrict = (
+  str: string,
+  options?: {
+    preserveSpaces?: boolean;
+    keepOriginalCase?: boolean;
+  },
+): string => {
+  const { preserveSpaces = true, keepOriginalCase = false } = options || {};
+
+  // replace _ and -
+  let processed = str.replace(/[_-]/g, " ");
+
+  if (!preserveSpaces) {
+    processed = processed.replace(/\s+/g, " ");
+  }
+  return processed
+    .split(preserveSpaces ? /(\s+)/ : /\s+/)
+    .map((segment) => {
+      if (segment.trim() === "") {
+        return segment;
+      }
+      const firstChar = segment.charAt(0).toUpperCase();
+      const restChars = keepOriginalCase ? segment.slice(1) : segment.slice(1).toLowerCase();
+      return firstChar + restChars;
+    })
+    .join("");
 };

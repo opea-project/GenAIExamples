@@ -74,10 +74,11 @@ export const getRunDevice = () => {
   });
 };
 
-export const getModelList = (type: string) => {
+export const getModelList = (type: string, params?: Object) => {
   return request({
     url: `/v1/settings/avail-models/${type}`,
     method: "get",
+    params,
   });
 };
 

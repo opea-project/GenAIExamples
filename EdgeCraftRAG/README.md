@@ -7,9 +7,10 @@ quality and performance.
 
 ## What's New
 
-1. Support Intel Arc B60 for model inference
-2. support KBadmin for knowledge base management
-3. support Experience Injection module in UI
+1. Support Agent component and enable deep_search agent
+2. Optimize pipeline execution performance with asynchronous api
+3. Support session list display in UI
+4. Support vllm-based embedding service
 
 ## Table of contents
 

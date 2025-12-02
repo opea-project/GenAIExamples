@@ -18,20 +18,20 @@ LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
 HOST_IP=$ip_address
 
-COMPOSE_FILE="compose_vllm_b60.yaml"
+COMPOSE_FILE="compose.yaml"
 EC_RAG_SERVICE_PORT=16010
 
 MODEL_PATH="${HOME}/models"
 # MODEL_PATH="$WORKPATH/models"
 DOC_PATH="$WORKPATH/tests"
 UI_UPLOAD_PATH="$WORKPATH/tests"
-MAX_MODEL_LEN=8192
+
 HF_ENDPOINT=https://hf-mirror.com
 VLLM_SERVICE_PORT_B60=8086
 TP=1
 vLLM_ENDPOINT="http://${HOST_IP}:${VLLM_SERVICE_PORT_B60}"
 LLM_MODEL="Qwen/Qwen3-8B"
-VLLM_IMAGE_TAG="1.0"
+VLLM_IMAGE_TAG="1.1-preview"
 DP=1
 ZE_AFFINITY_MASK=1
 
@@ -57,13 +57,13 @@ function start_services() {
     cd $WORKPATH/docker_compose/intel/gpu/arc
     source set_env.sh
     # Start Docker Containers
-    docker compose -f $COMPOSE_FILE up -d > ${LOG_PATH}/start_services_with_compose.log
+    docker compose --profile b60 -f $COMPOSE_FILE up -d > ${LOG_PATH}/start_services_with_compose.log
     echo "ipex-serving-xpu is booting, please wait."
     sleep 30s
     n=0
     until [[ "$n" -ge 100 ]]; do
         docker logs ipex-serving-xpu-container > ${LOG_PATH}/ipex-serving-xpu-container.log 2>&1
-        if grep -q "Starting vLLM API server on http://0.0.0.0:" ${LOG_PATH}/ipex-serving-xpu-container.log; then
+        if grep -q "Starting vLLM API server" ${LOG_PATH}/ipex-serving-xpu-container.log; then
             break
         fi
         sleep 6s
@@ -170,6 +170,5 @@ function main() {
     echo "::endgroup::"
 
 }
-
 
 main

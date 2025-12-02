@@ -1,9 +1,11 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
+
 services:
   etcd:
     container_name: milvus-etcd
     image: quay.io/coreos/etcd:v3.5.5
+    restart: always
     environment:
       - ETCD_AUTO_COMPACTION_MODE=revision
       - ETCD_AUTO_COMPACTION_RETENTION=1000
@@ -22,6 +24,7 @@ services:
   minio:
     container_name: milvus-minio
     image: minio/minio:RELEASE.2023-03-20T20-16-18Z
+    restart: always
     environment:
       MINIO_ACCESS_KEY: minioadmin
       MINIO_SECRET_KEY: minioadmin
@@ -41,6 +44,7 @@ services:
   milvus-standalone:
     container_name: milvus-standalone
     image: milvusdb/milvus:v2.4.6
+    restart: always
     command: ["milvus", "run", "standalone"]
     security_opt:
       - seccomp:unconfined
@@ -48,7 +52,7 @@ services:
       ETCD_ENDPOINTS: etcd:2379
       MINIO_ADDRESS: minio:9000
     volumes:
-      - ./milvus.yaml:/milvus/configs/milvus.yaml
+      - ./milvus-config.yaml:/milvus/configs/milvus.yaml
       - ${DOCKER_VOLUME_DIRECTORY:-${PWD}}/volumes/milvus:/var/lib/milvus
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9091/healthz"]
@@ -71,10 +75,12 @@ services:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
-      vLLM_ENDPOINT: ${vLLM_ENDPOINT:-http://${HOST_IP}:${NGINX_PORT:-8086}}
+      vLLM_ENDPOINT: ${vLLM_ENDPOINT:-http://${HOST_IP}:${VLLM_SERVICE_PORT_B60:-8086}}
+      LLM_MODEL: ${LLM_MODEL}
       ENABLE_BENCHMARK: ${ENABLE_BENCHMARK:-false}
-      MAX_MODEL_LEN: ${MAX_MODEL_LEN:-5000}
+      MAX_MODEL_LEN: ${MAX_MODEL_LEN:-49152}
       CHAT_HISTORY_ROUND: ${CHAT_HISTORY_ROUND:-0}
+      METADATA_DATABASE_URL: ${METADATA_DATABASE_URL:-""}
     volumes:
       - ${MODEL_PATH:-${PWD}}:/home/user/models
       - ${DOC_PATH:-${PWD}}:/home/user/docs
@@ -125,6 +131,96 @@ services:
     depends_on:
       - edgecraftrag-server
       - ecrag
+  llm-serving-xpu-b60:
+    container_name: ipex-serving-xpu-container
+    image: intel/llm-scaler-vllm:1.1-preview
+    privileged: true
+    restart: always
+    ports:
+      - ${VLLM_SERVICE_PORT_B60:-8086}:${VLLM_SERVICE_PORT_B60:-8086}
+    volumes:
+      - ${MODEL_PATH}:/workspace/vllm/models
+    devices:
+      - /dev/dri:/dev/dri
+    environment:
+      DTYPE: ${DTYPE:-float16}
+      VLLM_SERVICE_PORT_B60: ${VLLM_SERVICE_PORT_B60:-8086}
+      ZE_AFFINITY_MASK: ${ZE_AFFINITY_MASK:-0}
+      ENFORCE_EAGER: ${ENFORCE_EAGER:-1}
+      TRUST_REMOTE_CODE: ${TRUST_REMOTE_CODE:-1}
+      DISABLE_SLIDING_WINDOW: ${DISABLE_SLIDING_WINDOW:-1}
+      GPU_MEMORY_UTIL: ${GPU_MEMORY_UTIL:-0.8}
+      NO_ENABLE_PREFIX_CACHING: ${NO_ENABLE_PREFIX_CACHING:-1}
+      MAX_NUM_BATCHED_TOKENS: ${MAX_NUM_BATCHED_TOKENS:-8192}
+      DISABLE_LOG_REQUESTS: ${DISABLE_LOG_REQUESTS:-1}
+      MAX_MODEL_LEN: ${MAX_MODEL_LEN:-49152}
+      BLOCK_SIZE: ${BLOCK_SIZE:-64}
+      QUANTIZATION: ${QUANTIZATION:-fp8}
+      LLM_MODEL: ${LLM_MODEL}
+      TP: ${TP:-1}
+      DP: ${DP:-1}
+    entrypoint:
+      /bin/bash -c "
+      cd  /workspace/vllm/models && source /opt/intel/oneapi/setvars.sh --force &&
+      VLLM_OFFLOAD_WEIGHTS_BEFORE_QUANT=1 \
+      TORCH_LLM_ALLREDUCE=1 \
+      VLLM_USE_V1=1 \
+      CCL_ZE_IPC_EXCHANGE=pidfd \
+      VLLM_ALLOW_LONG_MAX_MODEL_LEN=1 \
+      VLLM_WORKER_MULTIPROC_METHOD=spawn \
+      python3 -m vllm.entrypoints.openai.api_server \
+      --model $${LLM_MODEL} \
+      --dtype $${DTYPE} \
+      --enforce-eager \
+      --port $${VLLM_SERVICE_PORT_B60} \
+      --trust-remote-code \
+      --disable-sliding-window \
+      --gpu-memory-util $${GPU_MEMORY_UTIL} \
+      --no-enable-prefix-caching \
+      --max-num-batched-tokens $${MAX_NUM_BATCHED_TOKENS} \
+      --disable-log-requests \
+      --max-model-len $${MAX_MODEL_LEN} \
+      --block-size $${BLOCK_SIZE} \
+      --quantization $${QUANTIZATION} \
+      -tp=$${TP} \
+      -dp=$${DP}"
+    profiles:
+      - b60
+  llm-serving-xpu-770:
+    container_name: ipex-llm-serving-xpu-770
+    image: intelanalytics/ipex-llm-serving-xpu:0.8.3-b20
+    privileged: true
+    restart: always
+    ports:
+      - ${VLLM_SERVICE_PORT_A770:-8086}:${VLLM_SERVICE_PORT_A770:-8086}
+    group_add:
+      - video
+      - ${VIDEOGROUPID:-44}
+      - ${RENDERGROUPID:-109}
+    volumes:
+      - ${LLM_MODEL_PATH:-${MODEL_PATH}/${LLM_MODEL}}:/llm/models
+    devices:
+      - /dev/dri
+    environment:
+      no_proxy: ${no_proxy}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      MODEL_PATH: "/llm/models"
+      SERVED_MODEL_NAME: ${LLM_MODEL}
+      TENSOR_PARALLEL_SIZE: ${TENSOR_PARALLEL_SIZE:-1}
+      MAX_NUM_SEQS: ${MAX_NUM_SEQS:-64}
+      MAX_NUM_BATCHED_TOKENS: ${MAX_NUM_BATCHED_TOKENS:-10240}
+      MAX_MODEL_LEN: ${MAX_MODEL_LEN:-10240}
+      LOAD_IN_LOW_BIT: ${LOAD_IN_LOW_BIT:-fp8}
+      CCL_DG2_USM: ${CCL_DG2_USM:-""}
+      PORT: ${VLLM_SERVICE_PORT_A770:-8086}
+      ZE_AFFINITY_MASK: ${SELECTED_XPU_0:-0}
+    shm_size: '32g'
+    entrypoint: /bin/bash -c "\
+      cd /llm && \
+      bash start-vllm-service.sh"
+    profiles:
+      - a770
 networks:
   default:
     driver: bridge

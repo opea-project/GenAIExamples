@@ -4,19 +4,17 @@
       <div class="chatbot-session">
         <div class="avatar-wrap">
           <SvgIcon
-            name="icon-chatbot"
-            :size="24"
+            :name="fixedAgentStyle.icon"
+            :size="22"
             :style="{ color: 'var(--color-primary)' }"
+            inherit
           />
         </div>
-        <div class="message-wrap">
+        <div class="message-wrap agent-wrap" :style="fixedAgentStyle.styleVars">
           <div v-if="inResponse && !props.message?.content" class="dot-loader">
             <span class="drop" v-for="index in 3" :key="index"></span>
           </div>
-          <div
-            class="think-container"
-            v-if="thinkMode && message.content?.length"
-          >
+          <div class="think-container" v-if="shouldShowThinkContainer">
             <div
               :class="{
                 'think-title': true,
@@ -54,9 +52,51 @@
               ></div>
             </div>
           </div>
-          <div v-html="renderedMarkdown"></div>
-          <div v-if="!inResponse" class="footer-btn">
-            <a-tooltip placement="top" :title="$t('common.copy')">
+          <div class="agent-container" v-if="agentBlocks.length > 0">
+            <div
+              v-for="(agent, index) in agentBlocks"
+              :key="`agent-${index}`"
+              class="agent-block"
+            >
+              <div class="agent-header" @click="toggleAgent(index)">
+                <div class="agent-title">
+                  <SvgIcon name="icon-agent" :size="16" />
+                  <span class="title-wrap">
+                    <span v-if="agent.title" v-html="agent.title"></span>
+                    <span v-else>{{ $t("agent.think") }} {{ index + 1 }}</span>
+                    <SvgIcon
+                      v-if="!agent.completed"
+                      name="icon-loading1"
+                      :size="18"
+                      inherit
+                  /></span>
+                </div>
+                <UpOutlined
+                  v-if="!agent.nofold"
+                  :class="[
+                    'agent-toggle-icon',
+                    { rotate: !agentStates[index]?.collapsed },
+                  ]"
+                />
+              </div>
+              <div
+                class="agent-content"
+                v-show="shouldShowAgentContent(agent, index)"
+              >
+                <div
+                  class="agent-message"
+                  v-html="formatAgentContent(agent.content)"
+                ></div>
+              </div>
+            </div>
+          </div>
+          <div v-if="shouldShowMainContent" v-html="renderedMainMarkdown"></div>
+          <div v-if="!inResponse && readResponse" class="footer-btn">
+            <a-tooltip
+              placement="top"
+              :title="$t('common.copy')"
+              v-if="readResponse.length"
+            >
               <span class="icon-style" @click="handleCopyResponses()">
                 <CopyOutlined /></span
             ></a-tooltip>
@@ -135,6 +175,7 @@
           <template #title>
             <SvgIcon
               name="icon-chatbot1"
+              class="mr-6"
               :size="20"
               :style="{
                 color: 'var(--color-error)',
@@ -158,6 +199,14 @@
               <span class="icon-style" @click="handleEdit()">
                 <EditOutlined /></span
             ></a-tooltip>
+            <a-tooltip
+              v-if="!inResponse && message.errorMessage && lastQuery"
+              placement="top"
+              :title="$t('common.regenerate')"
+            >
+              <span class="icon-style" @click="handleRetry()">
+                <SyncOutlined /></span
+            ></a-tooltip>
           </div>
         </div>
       </template>
@@ -170,7 +219,7 @@
 
 <script lang="ts" setup name="MessageItem">
 import { marked } from "marked";
-import { PropType, ref } from "vue";
+import { PropType, ref, onMounted, computed, watch } from "vue";
 import {
   CheckCircleFilled,
   UpOutlined,
@@ -183,7 +232,9 @@ import { IMessage, Benchmark } from "../../type";
 import CustomRenderer from "@/utils/customRenderer";
 import { useClipboard } from "@/utils/clipboard";
 import "highlight.js/styles/atom-one-dark.css";
+import { chatbotAppStore } from "@/store/chatbot";
 
+const chatbotStore = chatbotAppStore();
 const { copy } = useClipboard();
 
 const props = defineProps({
@@ -193,10 +244,6 @@ const props = defineProps({
     default: () => {},
   },
   inResponse: {
-    type: Boolean,
-    required: true,
-  },
-  think: {
     type: Boolean,
     required: true,
   },
@@ -211,18 +258,61 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  messageKey: {
+    type: String,
+    default: "",
+  },
 });
 
 const emit = defineEmits(["preview", "stop", "regenerate", "resend"]);
+
+type AgentItem = { id: string; icon?: string; css?: string };
+
+const agentsList = ref<AgentItem[]>([
+  {
+    id: "simple",
+    icon: "icon-simple-robot",
+    css: "agent-simple",
+  },
+  {
+    id: "deep_search",
+    icon: "icon-deep_search",
+    css: "agent-recursive",
+  },
+]);
+
+interface AgentBlock {
+  content: string;
+  title: string;
+  completed: boolean;
+  startIndex: number;
+  endIndex?: number;
+  nofold?: boolean;
+  hasSetInitialState?: boolean;
+}
+
+const agentBlocks = ref<AgentBlock[]>([]);
+const agentStates = ref<Record<number, { collapsed: boolean }>>({});
 
 const benchmarkData = computed<Benchmark>(() => {
   return (props.message?.benchmark || {}) as Benchmark;
 });
 const isExpanded = ref<boolean>(false);
 const isCollapsed = ref(true);
-const thinkMode = ref(props.think);
 const editState = ref<boolean>(false);
 const queryInput = ref<string>(props.message.content);
+
+interface FixedAgentStyle {
+  icon: string;
+  css: string;
+  styleVars: Record<string, string>;
+}
+
+const fixedAgentStyle = ref<FixedAgentStyle>({
+  icon: "icon-chatbot",
+  css: "",
+  styleVars: {},
+});
 
 marked.setOptions({
   pedantic: false,
@@ -230,34 +320,218 @@ marked.setOptions({
   breaks: false,
   renderer: CustomRenderer,
 });
-const thinkTagRegexSpecial = /^[\s\S]*?<\/think>/;
 
-const isThinkEnd = computed(() => props.message.content.includes("</think>"));
-const getThinkMode = () => {
-  const { content } = props.message;
-  const endIndex = content.indexOf("</think>");
+const isThinkInsideAgent = computed(() => {
+  const content = props.message.content || "";
+  const thinkStartIndex = content.indexOf("<think>");
 
-  return computed(() => {
-    if (isThinkEnd.value) {
-      return content.substring(0, endIndex);
-    } else if (thinkMode.value) {
-      return content;
-    } else {
-      return "";
-    }
+  if (thinkStartIndex === -1) return false;
+
+  return agentBlocks.value.some((agent) => {
+    return (
+      agent.startIndex < thinkStartIndex &&
+      (agent.endIndex === undefined || thinkStartIndex < agent.endIndex)
+    );
   });
+});
+
+const hasThinkContent = computed(() => {
+  return (
+    props.message.content?.includes("<think>") && !isThinkInsideAgent.value
+  );
+});
+
+const isThinkEnd = computed(() => {
+  return (
+    props.message.content?.includes("</think>") && !isThinkInsideAgent.value
+  );
+});
+
+const thinkContent = computed(() => {
+  if (!hasThinkContent.value) return "";
+
+  const content = props.message.content;
+  const startIndex = content.indexOf("<think>") + 7;
+  const endIndex = isThinkEnd.value
+    ? content.indexOf("</think>")
+    : content.length;
+
+  return content.substring(startIndex, endIndex);
+});
+
+const shouldShowThinkContainer = computed(() => {
+  return hasThinkContent.value && thinkContent.value.trim().length > 0;
+});
+
+const parseAttributes = (attrString: string): Record<string, string> => {
+  const attrs: Record<string, string> = {};
+  const attrRegex = /(\w+)\s*=\s*("([^"]*)"|'([^']*)'|([^\s>]+))/g;
+  let match;
+
+  while ((match = attrRegex.exec(attrString)) !== null) {
+    const key = match[1];
+    const value = match[3] || match[4] || match[5] || "";
+    attrs[key] = value.trim();
+  }
+
+  return attrs;
+};
+
+const parseAgentContentIncremental = (
+  content: string,
+  previousBlocks: AgentBlock[]
+): AgentBlock[] => {
+  const blocks = [...previousBlocks];
+  let currentIndex = 0;
+
+  while (currentIndex < content.length) {
+    const startTag = content.indexOf("<agent", currentIndex);
+    if (startTag === -1) break;
+
+    const endOfStartTag = content.indexOf(">", startTag);
+    if (endOfStartTag === -1) break;
+
+    const attributes = content.substring(startTag + 6, endOfStartTag).trim();
+    const attrs = parseAttributes(attributes);
+
+    const title = attrs.title || "";
+    const tag = attrs?.tag || "";
+
+    const endTag = content.indexOf("</agent>", endOfStartTag);
+
+    if (endTag !== -1) {
+      const agentContent = content.substring(endOfStartTag + 1, endTag).trim();
+
+      const existingBlockIndex = blocks.findIndex(
+        (block) => block.startIndex === startTag
+      );
+
+      if (existingBlockIndex !== -1) {
+        blocks[existingBlockIndex].content = agentContent;
+        if (title) {
+          blocks[existingBlockIndex].title = title;
+        }
+        blocks[existingBlockIndex].completed = true;
+        blocks[existingBlockIndex].endIndex = endTag + 8;
+        blocks[existingBlockIndex].nofold = tag === "nofold";
+        if (!blocks[existingBlockIndex].hasSetInitialState) {
+          if (tag === "nofold") {
+            agentStates.value[existingBlockIndex] = {
+              collapsed: !agentContent.trim(),
+            };
+          } else {
+            agentStates.value[existingBlockIndex] = { collapsed: true };
+          }
+          blocks[existingBlockIndex].hasSetInitialState = true;
+        }
+      } else {
+        const newBlock: AgentBlock = {
+          content: agentContent,
+          title: title,
+          completed: true,
+          nofold: tag === "nofold",
+          startIndex: startTag,
+          endIndex: endTag + 8,
+          hasSetInitialState: true,
+        };
+        blocks.push(newBlock);
+
+        const newIndex = blocks.length - 1;
+        if (tag === "nofold") {
+          agentStates.value[newIndex] = {
+            collapsed: !agentContent.trim(),
+          };
+        } else {
+          agentStates.value[newIndex] = { collapsed: true };
+        }
+      }
+
+      currentIndex = endTag + 8;
+    } else {
+      const agentContent = content.substring(endOfStartTag + 1).trim();
+
+      const existingBlockIndex = blocks.findIndex(
+        (block) => block.startIndex === startTag && !block.completed
+      );
+
+      if (existingBlockIndex !== -1) {
+        blocks[existingBlockIndex].content = agentContent;
+        if (title) {
+          blocks[existingBlockIndex].title = title;
+        }
+      } else {
+        const newBlock: AgentBlock = {
+          content: agentContent,
+          title: title,
+          completed: false,
+          nofold: tag === "nofold",
+          startIndex: startTag,
+          hasSetInitialState: false,
+        };
+        blocks.push(newBlock);
+
+        const newIndex = blocks.length - 1;
+        if (!agentStates.value[newIndex]) {
+          agentStates.value[newIndex] = { collapsed: false };
+        }
+      }
+
+      break;
+    }
+  }
+
+  return blocks;
+};
+
+const getMainContent = (content: string, agentBlocks: AgentBlock[]): string => {
+  if (!content) return "";
+
+  let result = content;
+
+  if (!agentBlocks.length) {
+    return result.replace(/\x1b\[[0-9;]*m/g, "").trim();
+  }
+
+  const sortedBlocks = [...agentBlocks].sort(
+    (a, b) => (b.startIndex || 0) - (a.startIndex || 0)
+  );
+
+  for (const block of sortedBlocks) {
+    if (block.completed && block.endIndex !== undefined) {
+      result =
+        result.substring(0, block.startIndex) +
+        result.substring(block.endIndex);
+    } else {
+      result = result.substring(0, block.startIndex);
+    }
+  }
+
+  result = result.replace(/\x1b\[[0-9;]*m/g, "");
+
+  return result.trim();
+};
+
+const formatAgentContent = (content: string) => {
+  const cleanedContent = content.replace(/\x1b\[[0-9;]*m/g, "");
+  return marked(cleanedContent);
+};
+
+const shouldShowAgentContent = (agent: AgentBlock, index: number): boolean => {
+  if (agent.nofold) {
+    return !!agent.content.trim();
+  }
+  return !agentStates.value[index]?.collapsed;
 };
 
 const thinkMarkdown = computed(() => {
-  return marked(getThinkMode().value);
+  return marked(thinkContent.value);
 });
 
 const readResponse = computed(() => {
   const content = props.message?.content || "";
-
   if (!content) return "";
 
-  if (!thinkMode.value) {
+  if (!hasThinkContent.value) {
     return content;
   }
 
@@ -265,12 +539,60 @@ const readResponse = computed(() => {
     return "";
   }
 
-  const cleanedContent = content.replace(thinkTagRegexSpecial, "");
-  return cleanedContent;
+  const thinkEndIndex = content.indexOf("</think>");
+  if (thinkEndIndex !== -1) {
+    return content.substring(thinkEndIndex + 8);
+  }
+
+  return content;
 });
-const renderedMarkdown = computed(() => {
-  return marked(readResponse.value);
+
+const mainContent = computed(() => {
+  return getMainContent(readResponse.value, agentBlocks.value);
 });
+
+const shouldShowMainContent = computed(() => {
+  return mainContent.value && (!hasThinkContent.value || isThinkEnd.value);
+});
+
+const renderedMainMarkdown = computed(() => {
+  return marked(mainContent.value);
+});
+
+const calculateAgentStyle = () => {
+  const agent = agentsList.value.find(
+    (item) => item.id === chatbotStore.agent?.type
+  );
+
+  const colorIndex = (chatbotStore.agent.index % 5) + 1;
+
+  const styleVars = {
+    "--agent-bg-var": `var(--color-multicolored-bg-${colorIndex})`,
+    "--agent-border-var": `var(--color-multicolored-border-${colorIndex})`,
+  };
+
+  return {
+    icon: agent?.icon || "icon-chatbot",
+    css: agent?.css || "",
+    styleVars,
+  };
+};
+
+const resetAgentState = () => {
+  agentBlocks.value = [];
+  agentStates.value = {};
+};
+
+const toggleAgent = (index: number) => {
+  if (agentBlocks.value[index]?.nofold) {
+    return;
+  }
+  if (!agentStates.value[index]) {
+    agentStates.value[index] = { collapsed: false };
+  }
+  agentStates.value[index].collapsed = !agentStates.value[index].collapsed;
+};
+
 const toggleTabs = () => {
   isExpanded.value = !isExpanded.value;
 };
@@ -280,6 +602,7 @@ const toggleThink = () => {
   emit("stop");
   isCollapsed.value = !isCollapsed.value;
 };
+
 const addClickListeners = () => {
   const images = document.querySelectorAll("#message-container img");
 
@@ -292,29 +615,87 @@ const addClickListeners = () => {
     });
   });
 };
+
 const handleRegenerate = () => {
   const { query = "" } = props.message;
   if (!query) return;
   emit("regenerate", query);
 };
+
+const handleRetry = () => {
+  emit("resend", { index: props.messageIndex, query: queryInput.value });
+};
+
 const handleCopyQuery = async () => {
   await copy(queryInput.value);
 };
+
 const handleCopyResponses = async () => {
   await copy(readResponse.value);
 };
+
 const handleEdit = () => {
   queryInput.value = props.message.content;
   editState.value = true;
 };
+
 const handleCancel = () => {
   editState.value = false;
 };
+
 const handleSend = () => {
   if (!queryInput.value) return;
   emit("resend", { index: props.messageIndex, query: queryInput.value });
   handleCancel();
 };
+
+watch(
+  () => props.messageKey,
+  (newKey, oldKey) => {
+    if (newKey !== oldKey) {
+      resetAgentState();
+      if (props.message?.content) {
+        agentBlocks.value = parseAgentContentIncremental(
+          props.message.content,
+          []
+        );
+      }
+    }
+  }
+);
+
+watch(
+  () => props.message.content,
+  (newContent, oldContent) => {
+    if (
+      newContent &&
+      oldContent &&
+      !newContent.includes(oldContent) &&
+      !oldContent.includes(newContent)
+    ) {
+      resetAgentState();
+    }
+
+    if (newContent) {
+      agentBlocks.value = parseAgentContentIncremental(
+        newContent,
+        agentBlocks.value
+      );
+    } else {
+      resetAgentState();
+    }
+  },
+  { immediate: true }
+);
+
+watch(
+  () => props.message.role,
+  (newRole, oldRole) => {
+    if (newRole !== oldRole) {
+      resetAgentState();
+    }
+  }
+);
 
 watch(
   () => props.inResponse,
@@ -324,6 +705,7 @@ watch(
     }
   }
 );
+
 watch(
   () => isThinkEnd.value,
   (value) => {
@@ -332,6 +714,14 @@ watch(
     }
   }
 );
+
+onMounted(() => {
+  fixedAgentStyle.value = calculateAgentStyle();
+
+  if (props.message?.content) {
+    agentBlocks.value = parseAgentContentIncremental(props.message.content, []);
+  }
+});
 </script>
 
 <style lang="less" scoped>
@@ -380,6 +770,78 @@ watch(
     transform: scale(1);
   }
 }
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.agent-container {
+  margin: 12px 0;
+}
+
+.agent-block {
+  border: 1px solid var(--color-primary-light);
+  border-radius: 8px;
+  margin-bottom: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px var(--bg-box-shadow);
+  border: 1px solid var(--agent-border-var);
+}
+
+.agent-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background-color: rgba(from var(--agent-bg-var) r g b / 0.7);
+  &:hover {
+    background-color: var(--agent-bg-var);
+  }
+  .icon-loading1 {
+    animation: spin 3s linear infinite;
+    position: relative;
+    top: 3px;
+    left: 4px;
+  }
+  .agent-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    color: var(--color-primary);
+    font-size: 14px;
+    .title-wrap {
+      flex: 1;
+    }
+  }
+
+  .agent-toggle-icon {
+    transition: transform 0.3s ease;
+    color: var(--color-info);
+    font-size: 14px;
+  }
+
+  .agent-toggle-icon.rotate {
+    transform: rotate(180deg);
+  }
+}
+
+.agent-content {
+  background: var(--bg-content-color);
+}
+.agent-message {
+  padding: 16px;
+  line-height: 1.6;
+  font-size: 14px;
+  color: var(--font-text-color);
+}
+
 .chatbot-session {
   margin-bottom: 16px;
   font-size: 16px;
@@ -412,6 +874,16 @@ watch(
   padding: 12px 16px;
   width: 100%;
 }
+
+.agent-wrap {
+  background: linear-gradient(
+    to bottom right,
+    rgb(from var(--agent-bg-var) r g b / 0.4),
+    rgb(from var(--bg-content-color) r g b / 0.4),
+    var(--bg-content-color)
+  );
+}
+
 .user-session {
   margin-bottom: 30px;
   display: flex;
@@ -498,6 +970,7 @@ watch(
   background: var(--think-done-bg);
   width: 100%;
   padding: 12px 16px;
+  margin-bottom: 12px;
   border-radius: 6px;
   transition: 0.3s background cubic-bezier(0.4, 0, 0.2, 1);
   .think-title {

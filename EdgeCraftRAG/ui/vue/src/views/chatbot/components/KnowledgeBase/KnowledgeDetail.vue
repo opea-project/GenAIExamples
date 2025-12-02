@@ -6,7 +6,7 @@
         name="file"
         multiple
         :showUploadList="false"
-        accept=".csv,.doc,.docx,.enex,.epub,.html,.md,.odt,.pdf,.ppt,.pptx,.txt,"
+        accept=".csv,.doc,.docx,.enex,.epub,.html,.md,.odt,.pdf,.ppt,.pptx,.txt,.zip"
         :before-upload="handleBeforeUpload"
         :custom-request="customRequest"
       >
@@ -84,7 +84,8 @@
 </template>
 
 <script setup lang="ts" name="KnowledgeBaseDetail">
-import { ref, reactive, createVNode, inject, onMounted } from "vue";
+import { ref, reactive, createVNode, inject, onMounted, computed } from "vue";
+import JSZip from "jszip";
 import {
   requestKnowledgeBaseRelation,
   getKnowledgeBaseDetailByName,
@@ -100,14 +101,17 @@ import {
 import { message, Modal, UploadFile, UploadProps } from "ant-design-vue";
 import { useI18n } from "vue-i18n";
 import eventBus from "@/utils/mitt";
-import type { UploadRequestOption } from "ant-design-vue";
+import type { UploadRequestOption } from "ant-design-vue/lib/upload/interface";
+import { useNotification } from "@/utils/common";
 
 interface KbType {
   name: string;
 }
 const { t } = useI18n();
+const { antNotification } = useNotification();
+
 const kbInfo = inject<KbType>("kbInfo");
-const uploadFileList = ref([]);
+const uploadFileList = ref<UploadFile[]>([]);
 const knowledgeData = reactive<EmptyObjectType>({});
 const pendingFiles = ref<UploadRequestOption[]>([]);
 let isUploading = ref<boolean>(false);
@@ -135,21 +139,80 @@ const queryKnowledgeBaseDetail = async () => {
       loading.value = false;
     });
 };
+
 const handleBeforeUpload = (file: UploadProps["fileList"][number]) => {
   const isFileSize = file.size / 1024 / 1024 < 200;
-
   if (!isFileSize) {
-    message.error(t("knowledge.uploadValid"));
+    antNotification("error", t("common.error"), t("knowledge.uploadValid"));
+
     return;
   }
-
   return isFileSize;
 };
 
-const customRequest = (options: UploadRequestOption) => {
+const handleZipParse = async (options: UploadRequestOption) => {
+  const origFile = options.file as File;
+  try {
+    const arrayBuffer = await origFile.arrayBuffer();
+    const zip = await JSZip.loadAsync(arrayBuffer);
+    const entries: JSZip.JSZipObject[] = [];
+    zip.forEach((relativePath, fileEntry) => {
+      entries.push(fileEntry);
+    });
+
+    const fileEntries = entries.filter((e) => !e.dir);
+
+    if (fileEntries.length === 0) {
+      antNotification("error", t("common.error"), t("knowledge.zipNoFiles"));
+      return;
+    }
+
+    const innerPromises = fileEntries.map(async (entry) => {
+      const blob = await entry.async("blob");
+
+      const filename = entry.name.split("/").pop() || entry.name;
+      const innerFile = new File([blob], filename, {
+        type: blob.type || "application/octet-stream",
+      });
+
+      const newOption: UploadRequestOption = {
+        ...options,
+        file: innerFile,
+        uid: `${(options as any).uid || Date.now()}_${filename}`,
+      } as UploadRequestOption;
+
+      return newOption;
+    });
+
+    const innerOptions = await Promise.all(innerPromises);
+
+    innerOptions.forEach((opt: any) => pendingFiles.value.push(opt));
+
+    totalFiles.value += innerOptions.length;
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+const customRequest = async (options: UploadRequestOption) => {
+  const file = options.file as File;
+  const fileName = file && file.name ? file.name.toLowerCase() : "";
+
+  if (fileName.endsWith(".zip")) {
+    startUpload.value = true;
+    await handleZipParse(options);
+
+    if (!isUploading.value) {
+      isUploading.value = true;
+      uploadInBatches();
+    }
+    return;
+  }
+
   pendingFiles.value.push(options);
   totalFiles.value += 1;
   startUpload.value = true;
+
   if (!isUploading.value) {
     isUploading.value = true;
     uploadInBatches();
@@ -320,7 +383,6 @@ onMounted(() => {
       }
       .intel-slider-handle::after {
         top: 1px;
-        background-color: var(--color-primary-tip) !important;
         box-shadow: 0 0 0 2px var(--color-primary-second) !important;
       }
     }
