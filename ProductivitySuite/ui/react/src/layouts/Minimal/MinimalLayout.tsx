@@ -1,3 +1,6 @@
+// Copyright (C) 2024 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
+
 // About pages or privacy policy are likely minimal layouts
 import { Outlet } from "react-router-dom";
 import styles from "./MinimalLayout.module.scss";

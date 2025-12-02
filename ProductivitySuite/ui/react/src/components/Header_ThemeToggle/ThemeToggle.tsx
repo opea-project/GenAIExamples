@@ -1,3 +1,6 @@
+// Copyright (C) 2024 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
+
 import React, { useContext } from "react";
 import { styled } from "@mui/material/styles";
 import { Switch, Typography, Box } from "@mui/material";

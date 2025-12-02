@@ -1,3 +1,6 @@
+// Copyright (C) 2024 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
+
 // Copyright (c) 2024 Intel Corporation
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,7 +19,12 @@ import { env } from "$env/dynamic/public";
 
 const DOC_BASE_URL = env.DOC_BASE_URL;
 
-export async function fetchTextStream(query: string | Blob, params: string, file: Blob, fileName: string | undefined) {
+export async function fetchTextStream(
+  query: string | Blob,
+  params: string,
+  file: Blob,
+  fileName: string | undefined,
+) {
   const url = `${DOC_BASE_URL}`; // Ensure the URL is constructed correctly
   const formData = new FormData();
 

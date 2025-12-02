@@ -43,11 +43,11 @@ cd docker_compose/amd/cpu/epyc
 
     If Docker is already installed, this step can be skipped.
 
-2.  **Configure Environment:**  
+2.  **Configure Environment:**
     Set required environment variables in your shell:
 
-    **_i) Determine your host's external IP address:_**  
-     Run the following command in your terminal to list network interfaces:
+    **_i) Determine your host's external IP address:_**
+    Run the following command in your terminal to list network interfaces:
 
         ifconfig
 
@@ -61,8 +61,8 @@ cd docker_compose/amd/cpu/epyc
         # Replace with your host's external IP address
         export host_ip="your_external_ip_address"
 
-    **_ii) Generate a HuggingFace Access Token:_**  
-     Some HuggingFace resources, such as some models, are only accessible if you have an access token. If you do not already have a HuggingFace access token, you can create one by first creating an account by following the steps provided at [HuggingFace](https://huggingface.co/) and then generating a [user access token](https://huggingface.co/docs/transformers.js/en/guides/private#step-1-generating-a-user-access-token).
+    **_ii) Generate a HuggingFace Access Token:_**
+    Some HuggingFace resources, such as some models, are only accessible if you have an access token. If you do not already have a HuggingFace access token, you can create one by first creating an account by following the steps provided at [HuggingFace](https://huggingface.co/) and then generating a [user access token](https://huggingface.co/docs/transformers.js/en/guides/private#step-1-generating-a-user-access-token).
 
         # Replace with your Hugging Face Hub API token
         export HF_TOKEN="your_huggingface_token"
@@ -277,8 +277,8 @@ After vLLM profiling is started, users could start asking questions and get resp
 
 ##### Stop vLLM profiling
 
-By following command, users could stop vLLM profiling and generate a \*.pt.trace.json.gz file as profiling result  
- under /mnt folder in codetrans-epyc-vllm-service docker instance.
+By following command, users could stop vLLM profiling and generate a \*.pt.trace.json.gz file as profiling result
+under /mnt folder in codetrans-epyc-vllm-service docker instance.
 
 ```bash
 curl http://${host_ip}:8008/stop_profile \

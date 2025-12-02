@@ -1,3 +1,6 @@
+// Copyright (C) 2024 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
+
 import { Button, Typography, Grid2, styled } from "@mui/material";
 import { AtomIcon, AtomAnimation } from "@icons/Atom";
 import PrimaryInput from "@components/PrimaryInput/PrimaryInput";

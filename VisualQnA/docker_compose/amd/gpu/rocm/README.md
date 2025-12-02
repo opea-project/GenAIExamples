@@ -306,7 +306,12 @@ Checking the response from the service. The response should be similar to JSON:
       "stop_reason": null
     }
   ],
-  "usage": { "prompt_tokens": 15, "total_tokens": 47, "completion_tokens": 32, "prompt_tokens_details": null },
+  "usage": {
+    "prompt_tokens": 15,
+    "total_tokens": 47,
+    "completion_tokens": 32,
+    "prompt_tokens_details": null
+  },
   "prompt_logprobs": null
 }
 ```

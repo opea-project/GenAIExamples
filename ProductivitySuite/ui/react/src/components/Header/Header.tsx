@@ -1,3 +1,6 @@
+// Copyright (C) 2024 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
+
 import { useEffect, useRef, useState } from "react";
 import { styled } from "@mui/material/styles";
 import { Link, useNavigate } from "react-router-dom";
@@ -158,7 +161,9 @@ const Header: React.FC<HeaderProps> = ({
     <HeaderWrapper component="header" className={styles.header}>
       <Box
         ref={toggleRef}
-        className={`${styles.sideWrapper} ${asideOpen ? styles.sideWrapperOpen : ""}`}
+        className={`${styles.sideWrapper} ${
+          asideOpen ? styles.sideWrapperOpen : ""
+        }`}
       >
         <Tooltip
           title={asideOpen ? "Close Sidebar" : "Open Sidebar"}

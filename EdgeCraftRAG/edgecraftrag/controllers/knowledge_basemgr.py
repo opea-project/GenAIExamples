@@ -3,10 +3,11 @@
 
 from typing import Any, Dict, List, Optional
 
+from fastapi import HTTPException, status
+
 from edgecraftrag.api_schema import KnowledgeBaseCreateIn
 from edgecraftrag.base import BaseMgr
 from edgecraftrag.components.knowledge_base import Knowledge
-from fastapi import HTTPException, status
 
 
 class KnowledgeManager(BaseMgr):

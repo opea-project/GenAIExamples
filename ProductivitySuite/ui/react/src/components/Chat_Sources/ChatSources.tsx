@@ -1,3 +1,6 @@
+// Copyright (C) 2024 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
+
 import { Box } from "@mui/material";
 import { conversationSelector } from "@redux/Conversation/ConversationSlice";
 import { useAppSelector } from "@redux/store";

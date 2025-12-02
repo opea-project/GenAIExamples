@@ -17,13 +17,13 @@ index 289d887df..fddbe8ee1 100644
                      nonlocal content_blocks
 +                    nonlocal events
 +                    sources = []
- 
+
                      response_tool_calls = []
- 
+
 @@ -1486,6 +1488,60 @@ async def process_chat_response(
                          try:
                              data = json.loads(data)
- 
+
 +                            tool_content_block = []
 +                            if data.get("tool_name"):
 +                                sources.append(
@@ -81,6 +81,5 @@ index 289d887df..fddbe8ee1 100644
                              data, _ = await process_filter_functions(
                                  request=request,
                                  filter_functions=filter_functions,
--- 
+--
 2.34.1
-

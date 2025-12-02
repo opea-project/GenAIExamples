@@ -26,7 +26,7 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_DB}
     ports:
-      - '5442:5432'
+      - "5442:5432"
     volumes:
       - ./chinook.sql:/docker-entrypoint-initdb.d/chinook.sql
 
@@ -56,7 +56,6 @@ services:
       - APP_TEXT_TO_SQL_URL=http://${host_ip}:${TEXT2SQL_PORT}/v1
     ipc: host
     restart: always
-
 
 networks:
   default:

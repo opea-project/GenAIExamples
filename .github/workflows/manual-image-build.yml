@@ -24,12 +24,12 @@ on:
         type: string
       example:
         default: "ChatQnA"
-        description: 'Build images belong to which example? [AgentQnA,AudioQnA,ChatQnA,CodeGen,CodeTrans,DocIndexRetriever,DocSum,FaqGen,InstructionTuning,MultimodalQnA,ProductivitySuite,RerankFinetuning,SearchQnA,Translation,VideoQnA,VisualQnA,AvatarChatbot,Text2Image,WorkflowExecAgent,DBQnA,EdgeCraftRAG,GraphRAG]'
+        description: "Build images belong to which example? [AgentQnA,AudioQnA,ChatQnA,CodeGen,CodeTrans,DocIndexRetriever,DocSum,FaqGen,InstructionTuning,MultimodalQnA,ProductivitySuite,RerankFinetuning,SearchQnA,Translation,VideoQnA,VisualQnA,AvatarChatbot,Text2Image,WorkflowExecAgent,DBQnA,EdgeCraftRAG,GraphRAG]"
         required: true
         type: string
       services:
         default: "chatqna,chatqna-without-rerank"
-        description: 'Service list to build'
+        description: "Service list to build"
         required: true
         type: string
       tag:
@@ -39,7 +39,7 @@ on:
         type: string
       opea_branch:
         default: "main"
-        description: 'OPEA branch for image build'
+        description: "OPEA branch for image build"
         required: false
         type: string
       inject_commit:

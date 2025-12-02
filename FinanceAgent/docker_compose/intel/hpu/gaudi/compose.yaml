@@ -1,15 +1,12 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-
-x-common-environment:
-  &common-env
+x-common-environment: &common-env
   no_proxy: ${NO_PROXY}
   http_proxy: ${HTTP_PROXY}
   https_proxy: ${HTTPS_PROXY}
 
-x-common-agent-environment:
-  &common-agent-env
+x-common-agent-environment: &common-agent-env
   <<: *common-env
   HF_TOKEN: ${HF_TOKEN}
   llm_endpoint_url: ${LLM_ENDPOINT}
@@ -22,7 +19,6 @@ x-common-agent-environment:
   require_human_feedback: false
 
 services:
-
   vllm-service:
     image: opea/vllm-gaudi:1.22.0
     container_name: vllm-gaudi-server
@@ -65,7 +61,8 @@ services:
       HF_TOKEN: ${HF_TOKEN}
       host_ip: ${HOST_IP}
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://${HOST_IP}:${TEI_EMBEDDER_PORT}/health"]
+      test:
+        ["CMD", "curl", "-f", "http://${HOST_IP}:${TEI_EMBEDDER_PORT}/health"]
       interval: 10s
       timeout: 6s
       retries: 48

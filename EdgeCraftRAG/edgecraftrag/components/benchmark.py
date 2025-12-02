@@ -6,13 +6,13 @@ import threading
 from typing import Any, List, Optional
 
 import requests
-from edgecraftrag.base import BaseComponent, CompType, InferenceType, ModelType
 from prometheus_client.parser import text_string_to_metric_families
 from pydantic import BaseModel, Field, model_serializer
 
+from edgecraftrag.base import BaseComponent, CompType, InferenceType, ModelType
+
 
 class Benchmark(BaseComponent):
-
     def __init__(self, enable_benchmark, inference_type, tokenizer=None, bench_hook=None):
         super().__init__()
         self.enabled = enable_benchmark
@@ -126,7 +126,6 @@ class Benchmark(BaseComponent):
 
 
 def get_vllm_metrics(metrics):
-
     llm_endpoint = os.getenv("vLLM_ENDPOINT", "http://localhost:8008")
     response = requests.get(f"{llm_endpoint}/metrics", headers={"Content-Type": "application/json"})
     if response.status_code == 200:

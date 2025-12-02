@@ -5,13 +5,13 @@ import asyncio
 import os
 from typing import Any, Callable, List, Optional
 
+from llama_index.core.schema import Document
+
 from edgecraftrag.base import BaseMgr
 from edgecraftrag.components.data import File
-from llama_index.core.schema import Document
 
 
 class FilelMgr(BaseMgr):
-
     def __init__(self):
         super().__init__()
 

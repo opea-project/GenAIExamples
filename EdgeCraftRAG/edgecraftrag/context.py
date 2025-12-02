@@ -10,7 +10,6 @@ from edgecraftrag.controllers.pipelinemgr import PipelineMgr
 
 
 class Context:
-
     def __init__(self):
         self.plmgr = PipelineMgr()
         self.nodemgr = NodeMgr()

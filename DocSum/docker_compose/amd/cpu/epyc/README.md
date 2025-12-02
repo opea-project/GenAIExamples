@@ -409,8 +409,8 @@ curl http://${host_ip}:8008/v1/chat/completions \
 
 ##### Stop vLLM profiling
 
-By following command, users could stop vLLM profiling and generate a \*.pt.trace.json.gz file as profiling result  
- under /mnt folder in docsum-epyc-vllm-service docker instance.
+By following command, users could stop vLLM profiling and generate a \*.pt.trace.json.gz file as profiling result
+under /mnt folder in docsum-epyc-vllm-service docker instance.
 
 ```bash
 curl http://${host_ip}:8008/stop_profile \

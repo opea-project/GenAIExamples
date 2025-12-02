@@ -1,3 +1,6 @@
+// Copyright (C) 2024 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
+
 import { useEffect, useState } from "react";
 
 import DropDown from "@components/DropDown/DropDown";
@@ -179,7 +182,9 @@ const PromptSettings: React.FC<PromptSettingsProps> = ({
   return (
     <Box className={styles.promptSettingsWrapper}>
       <Box
-        className={`${styles.promptSettings} ${readOnly ? styles.readOnly : ""}`}
+        className={`${styles.promptSettings} ${
+          readOnly ? styles.readOnly : ""
+        }`}
       >
         {formattedModels && formattedModels.length > 0 && (
           <FormGroup key={formattedModels[0].name}>

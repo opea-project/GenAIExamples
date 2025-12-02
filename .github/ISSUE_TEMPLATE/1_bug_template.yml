@@ -117,7 +117,6 @@ body:
     validations:
       required: true
 
-
   - type: textarea
     id: reproduce
     attributes:
@@ -125,7 +124,6 @@ body:
       description:
     validations:
       required: true
-
 
   - type: textarea
     id: log
@@ -135,7 +133,6 @@ body:
       render: shell
     validations:
       required: false
-
 
   - type: textarea
     id: attachments

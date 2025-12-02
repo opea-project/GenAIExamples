@@ -29,7 +29,11 @@ services:
       - seccomp:unconfined
     ipc: host
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://${host_ip}:${ARB_POSTHEARING_ASSISTANT_TGI_SERVICE_PORT}/health || exit 1"]
+      test:
+        [
+          "CMD-SHELL",
+          "curl -f http://${host_ip}:${ARB_POSTHEARING_ASSISTANT_TGI_SERVICE_PORT}/health || exit 1",
+        ]
       interval: 10s
       timeout: 10s
       retries: 100

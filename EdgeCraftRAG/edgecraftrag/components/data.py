@@ -4,9 +4,10 @@
 from pathlib import Path
 from typing import Any, List, Optional
 
-from edgecraftrag.base import BaseComponent, CompType, FileType
 from llama_index.core.schema import Document
 from pydantic import BaseModel, Field, model_serializer
+
+from edgecraftrag.base import BaseComponent, CompType, FileType
 
 
 class File(BaseComponent):

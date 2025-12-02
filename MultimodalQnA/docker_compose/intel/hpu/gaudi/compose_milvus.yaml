@@ -107,12 +107,24 @@ services:
     cap_add:
       - SYS_NICE
     healthcheck:
-      test: ["CMD-SHELL", "http_proxy='' curl -f http://localhost:${EMM_BRIDGETOWER_PORT}/v1/health_check"]
+      test:
+        [
+          "CMD-SHELL",
+          "http_proxy='' curl -f http://localhost:${EMM_BRIDGETOWER_PORT}/v1/health_check",
+        ]
       interval: 10s
       timeout: 6s
       retries: 18
       start_period: 30s
-    entrypoint: ["python", "bridgetower_server.py", "--device", "hpu", "--model_name_or_path", $EMBEDDING_MODEL_ID]
+    entrypoint:
+      [
+        "python",
+        "bridgetower_server.py",
+        "--device",
+        "hpu",
+        "--model_name_or_path",
+        $EMBEDDING_MODEL_ID,
+      ]
     restart: unless-stopped
   embedding:
     image: ${REGISTRY:-opea}/embedding:${TAG:-latest}

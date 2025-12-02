@@ -1,3 +1,6 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 # Copyright (C) 2025 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
@@ -470,7 +473,6 @@ def is_port_in_use(port: int, host: str = "0.0.0.0") -> bool:
             s.bind((host, port))
             return False
         except OSError as e:
-
             if e.errno == errno.EADDRINUSE or e.errno == getattr(errno, "WSAEADDRINUSE", None):
                 return True
 

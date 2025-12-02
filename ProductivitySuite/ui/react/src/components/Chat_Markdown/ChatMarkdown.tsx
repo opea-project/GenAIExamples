@@ -1,3 +1,6 @@
+// Copyright (C) 2024 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
+
 import React, { lazy, Suspense, useEffect } from "react";
 import markdownStyles from "./markdown.module.scss";
 import ReactMarkdown from "react-markdown";

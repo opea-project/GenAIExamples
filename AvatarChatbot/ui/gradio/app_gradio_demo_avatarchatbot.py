@@ -65,7 +65,6 @@ async def transcribe(audio_input, face_input, model_choice):
 
     async with aiohttp.ClientSession() as session:
         async with session.post(ai_chatbot_url, json=initial_inputs) as response:
-
             # Check the response status code
             if response.status == 200:
                 # response_json = await response.json()

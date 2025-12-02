@@ -1,3 +1,6 @@
+// Copyright (C) 2024 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
+
 // Copyright (c) 2024 Intel Corporation
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -35,7 +38,10 @@ export async function fetchKnowledgeBaseId(file: Blob, fileName: string) {
 	}
 }
 
-export async function fetchKnowledgeBaseIdByPaste(pasteUrlList: any, urlType: string | undefined) {
+export async function fetchKnowledgeBaseIdByPaste(
+	pasteUrlList: any,
+	urlType: string | undefined,
+) {
 	const url = `${BACKEND_BASE_URL}/upload_link`;
 	const data = {
 		link_list: pasteUrlList,

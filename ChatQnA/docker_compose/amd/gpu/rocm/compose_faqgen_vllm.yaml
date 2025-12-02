@@ -26,7 +26,8 @@ services:
       TEI_ENDPOINT: ${CHATQNA_TEI_EMBEDDING_ENDPOINT}
       HF_TOKEN: ${CHATQNA_HUGGINGFACEHUB_API_TOKEN}
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:5000/v1/health_check || exit 1"]
+      test:
+        ["CMD-SHELL", "curl -f http://localhost:5000/v1/health_check || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 50
@@ -112,7 +113,7 @@ services:
     security_opt:
       - seccomp:unconfined
       - apparmor=unconfined
-    command: "--model ${CHATQNA_LLM_MODEL_ID} --swap-space 16 --disable-log-requests --dtype float16 --tensor-parallel-size 4 --host 0.0.0.0 --port 8011 --num-scheduler-steps 1 --distributed-executor-backend \"mp\""
+    command: '--model ${CHATQNA_LLM_MODEL_ID} --swap-space 16 --disable-log-requests --dtype float16 --tensor-parallel-size 4 --host 0.0.0.0 --port 8011 --num-scheduler-steps 1 --distributed-executor-backend "mp"'
     ipc: host
 
   chatqna-llm-faqgen:

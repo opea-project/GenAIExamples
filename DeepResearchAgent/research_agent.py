@@ -28,7 +28,6 @@ class SimpleRequest(BaseModel):
 )
 @opea_telemetry
 async def run(request: SimpleRequest):
-
     question = f"Question: {request.question}"
 
     result = await agent(question)

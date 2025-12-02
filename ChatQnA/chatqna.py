@@ -104,7 +104,6 @@ def align_outputs(self, data, cur_node, inputs, runtime_graph, llm_parameters_di
         assert isinstance(data, list)
         next_data = {"text": inputs["inputs"], "embedding": data[0]}
     elif self.services[cur_node].service_type == ServiceType.RETRIEVER:
-
         docs = [doc["text"] for doc in data["retrieved_docs"]]
 
         with_rerank = runtime_graph.downstream(cur_node)[0].startswith("rerank")
@@ -258,7 +257,6 @@ class ChatQnAService:
         self.endpoint = str(MegaServiceEndpoint.CHAT_QNA)
 
     def add_remote_service(self):
-
         embedding = MicroService(
             name="embedding",
             host=EMBEDDING_SERVER_HOST_IP,
@@ -301,7 +299,6 @@ class ChatQnAService:
         self.megaservice.flow_to(rerank, llm)
 
     def add_remote_service_without_rerank(self):
-
         embedding = MicroService(
             name="embedding",
             host=EMBEDDING_SERVER_HOST_IP,
@@ -392,7 +389,6 @@ class ChatQnAService:
         # self.megaservice.flow_to(llm, guardrail_out)
 
     def add_remote_service_faqgen(self):
-
         embedding = MicroService(
             name="embedding",
             host=EMBEDDING_SERVER_HOST_IP,
@@ -484,7 +480,6 @@ class ChatQnAService:
         return ChatCompletionResponse(model="chatqna", choices=choices, usage=usage)
 
     def start(self):
-
         self.service = MicroService(
             self.__class__.__name__,
             service_role=ServiceRoleType.MEGASERVICE,

@@ -1,3 +1,6 @@
+// Copyright (C) 2024 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
+
 import Header from "@components/Header/Header";
 import { SideBarSpacer } from "@components/SideBar/SideBar";
 import { useState } from "react";

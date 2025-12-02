@@ -122,7 +122,7 @@ export MODELNAME="Intel/neural-chat-7b-v3-3"
 nano ~/docsum-k8s-install/GenAIExamples/DocSum/kubernetes/helm/rocm-values.yaml
 ```
 
-- HIP_VISIBLE_DEVICES - this variable specifies the ID of the GPU that you want to use. 
+- HIP_VISIBLE_DEVICES - this variable specifies the ID of the GPU that you want to use.
 You can specify either one or several comma-separated ones - "0" or "0,1,2,3"
 - TENSOR_PARALLEL_SIZE - must match the number of GPUs used
 - resources:

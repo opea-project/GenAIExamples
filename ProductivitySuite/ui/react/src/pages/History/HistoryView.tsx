@@ -1,3 +1,6 @@
+// Copyright (C) 2024 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
+
 import {
   Box,
   Checkbox,
@@ -164,8 +167,9 @@ const HistoryView: React.FC<HistoryViewProps> = ({ shared }) => {
 
   const handleSearch = (value: string) => {
     const filteredList = shared ? sharedConversations : conversations;
-    const searchResults = filteredList.filter((conversation: Conversation) =>
-      conversation.first_query?.toLowerCase().includes(value.toLowerCase()),
+    const searchResults = filteredList.filter(
+      (conversation: Conversation) =>
+        conversation.first_query?.toLowerCase().includes(value.toLowerCase()),
     );
     setHistoryList(
       value ? searchResults : shared ? sharedConversations : conversations,

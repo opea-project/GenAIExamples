@@ -1,3 +1,6 @@
+// Copyright (C) 2024 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
+
 import { IconButton } from "@mui/material";
 import { Close, TaskOutlined, Language } from "@mui/icons-material";
 import styled from "styled-components";

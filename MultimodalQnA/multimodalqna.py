@@ -51,7 +51,6 @@ def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **k
 
 
 class MultimodalQnAService:
-
     def __init__(self, host="0.0.0.0", port=8000):
         self.host = host
         self.port = port
