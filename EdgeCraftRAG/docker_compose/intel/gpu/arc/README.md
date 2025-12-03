@@ -61,7 +61,7 @@ pip install modelscope
 modelscope download --model $LLM_MODEL --local_dir "${MODEL_PATH}/${LLM_MODEL}"
 # Optionally, you can also download models with huggingface:
 # pip install -U huggingface_hub
-# huggingface-cli download $LLM_MODEL --local-dir "${MODEL_PATH}/${LLM_MODEL}"
+# hf download $LLM_MODEL --local-dir "${MODEL_PATH}/${LLM_MODEL}"
 ```
 
 ### 4. Prepare env variables and configurations
