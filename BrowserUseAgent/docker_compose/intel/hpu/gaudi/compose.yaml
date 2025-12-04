@@ -9,7 +9,7 @@ x-common-environment:
 
 services:
   vllm-gaudi-server:
-    image: ${REGISTRY:-opea}/vllm-gaudi:${TAG:-1.22.0}
+    image: opea/vllm-gaudi:1.22.0
     container_name: vllm-gaudi-server
     ports:
       - ${LLM_ENDPOINT_PORT:-8008}:80

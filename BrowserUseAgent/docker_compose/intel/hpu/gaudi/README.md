@@ -68,7 +68,7 @@ For the default deployment, the following 10 containers should have started:
 ```
 CONTAINER ID   IMAGE                                                COMMAND                  CREATED         STATUS                            PORTS                                                                                                                                       NAMES
 96cb590c749c   opea/browser-use-agent:latest                        "python browser_use_…"   9 seconds ago   Up 8 seconds                      0.0.0.0:8022->8022/tcp, :::8022->8022/tcp                                                                                                   browser-use-agent-server
-8072e1c33a4b   opea/vllm-gaudi:latest                               "python3 -m vllm.ent…"   9 seconds ago   Up 8 seconds (health: starting)   0.0.0.0:8008->80/tcp, [::]:8008->80/tcp                                                                                                     vllm-gaudi-server
+8072e1c33a4b   opea/vllm-gaudi:1.22.0                               "python3 -m vllm.ent…"   9 seconds ago   Up 8 seconds (health: starting)   0.0.0.0:8008->80/tcp, [::]:8008->80/tcp                                                                                                     vllm-gaudi-server
 ```
 
 ### Test the Pipeline
