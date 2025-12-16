@@ -383,8 +383,17 @@ def ingest_with_caption(filepath, text_caption, audio_caption, request: gr.Reque
     is_audio_caption = audio_caption is not None
     if is_audio_caption:
         verified_audio_path = os.path.normpath(audio_caption)
+        if not verified_audio_path.startswith(static_dir):
+            print("Found malicious audio file path!")
+            yield (
+                gr.Textbox(
+                    visible=True,
+                    value="Your uploaded audio file's path is not allowed. Please upload a valid file.",
+                )
+            )
+            return
         caption_basename = "{}{}".format(os.path.splitext(basename)[0], os.path.splitext(verified_audio_path)[-1])
-        caption_file = audio_caption
+        caption_file = verified_audio_path
     else:
         caption_basename = "{}.txt".format(os.path.splitext(basename)[0])
         caption_file = os.path.join(static_dir, caption_basename)
