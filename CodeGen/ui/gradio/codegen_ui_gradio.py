@@ -164,7 +164,13 @@ def generate_code(query, index=None, use_agent=False):
 
 def ingest_file(file, index=None, chunk_size=100, chunk_overlap=150):
     headers = {}
-    file_input = {"files": open(file, "rb")}
+    # Restrict file access to UPLOAD_ROOT directory
+    UPLOAD_ROOT = os.path.abspath("./")
+    normalized_path = os.path.normpath(os.path.join(UPLOAD_ROOT, file))
+    # Ensure the constructed path is still within the upload root
+    if not normalized_path.startswith(UPLOAD_ROOT):
+        raise Exception("Access to the specified file is not allowed.")
+    file_input = {"files": open(normalized_path, "rb")}
 
     if index:
         data = {"index_name": index, "chunk_size": chunk_size, "chunk_overlap": chunk_overlap}
