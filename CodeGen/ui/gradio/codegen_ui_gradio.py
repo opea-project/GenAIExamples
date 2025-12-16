@@ -165,7 +165,7 @@ def generate_code(query, index=None, use_agent=False):
 def ingest_file(file, index=None, chunk_size=100, chunk_overlap=150):
     headers = {}
     # Restrict file access to UPLOAD_ROOT directory
-    UPLOAD_ROOT = os.path.abspath('./')
+    UPLOAD_ROOT = os.path.abspath("./")
     normalized_path = os.path.normpath(os.path.join(UPLOAD_ROOT, file))
     # Ensure the constructed path is still within the upload root
     if not normalized_path.startswith(UPLOAD_ROOT):
