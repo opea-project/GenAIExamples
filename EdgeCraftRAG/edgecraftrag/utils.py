@@ -45,7 +45,14 @@ def get_prompt_template(model_path, prompt_content=None, template_path=None, ena
     if prompt_content is not None:
         template = prompt_content
     elif template_path is not None:
-        template = Path(template_path).read_text(encoding=None)
+        # Safely load the template only if it is inside /templates (or other safe root)
+        safe_root = "/templates"
+        normalized_path = os.path.normpath(os.path.join(safe_root, template_path))
+        if not normalized_path.startswith(safe_root):
+            raise ValueError("Template path is outside of the allowed directory.")
+        if not os.path.exists(normalized_path):
+            raise FileNotFoundError("Template file does not exist.")
+        template = Path(normalized_path).read_text(encoding=None)
     else:
         template = DEFAULT_TEMPLATE
     tokenizer = AutoTokenizer.from_pretrained(model_path)
