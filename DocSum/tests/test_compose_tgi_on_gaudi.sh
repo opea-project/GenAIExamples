@@ -101,6 +101,7 @@ function validate_service() {
     RESPONSE_BODY=$(echo $HTTP_RESPONSE | sed -e 's/HTTPSTATUS\:.*//g')
 
     docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
+    docker logs docsum-gaudi-llm-server >> ${LOG_PATH}/llm-docsum-tgi.log
 
     # check response status
     if [ "$HTTP_STATUS" -ne "200" ]; then
