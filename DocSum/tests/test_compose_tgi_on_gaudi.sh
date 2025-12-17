@@ -90,7 +90,7 @@ function validate_service() {
 
     local MAX_RETRIES=${13:-3}
     local RETRY_DELAY=${14:-2}
-    
+
     local retry_count=0
     local success=false
 
