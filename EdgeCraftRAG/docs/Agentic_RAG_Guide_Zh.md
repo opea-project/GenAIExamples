@@ -9,7 +9,7 @@ EC-RAG目前支持两种类型的智能体：
 - **Simple Agent**: 不包含规划、research的简单轻量级Agent；
 - **Deep Search Agent**: 能够进行多步规划、deep research和深度推理的更高级版本Agent。
 
-## 创建智能体
+## Retrieval
 
 ### 前提条件
 要在EC-RAG中使用智能体，您需要确保满足以下前提条件：
@@ -23,14 +23,14 @@ EC-RAG目前支持两种类型的智能体：
 然后在`创建智能体`窗口中，将`智能体类型`设置为`simple`。
 ![alt text](../assets/img/agent_create_simple_zh.png)
 
-选择`simple`后，窗口内将出现`pipeline名称`和`智能体配置`两个可选项。请您选择带有 vLLM 服务且生成器类型为`FreeChat`的pipeline，并在`智能体配置`中，根据您的需要指定`Max Retrivals`。 
+选择`simple`后，窗口内将出现`pipeline名称`和`智能体配置`两个可选项。请您选择带有 vLLM 服务且生成器类型为`FreeChat`的pipeline，并在`智能体配置`中，根据您的需要指定`Max Retrievals`。 
 ![alt text](../assets/img/agent_config_simple_zh.png)
 
 ### 创建Deep Search Agent智能体
 当您需要创建深度搜索代理时，同样，请切换到`智能体`选项卡，并点击`创建智能体`按钮。在`创建智能体`窗口中，将`智能体类型`设置为`Deep Search`。 
 ![alt text](../assets/img/agent_create_deep-search_zh.png)
 
-在`pipeline名称`和`智能体配置`两个可选项出现后，请选择带有 vLLM 服务且生成器类型为`FreeChat`的pipeline。对于Deep Search智能体，在`智能体配置`部分，可以自定义 5 个参数：`Retrieve Top K`、`Rerank Top K`、`Mece Retrival`、`Max Retrivals`和`Max Plan Steps`。如果您启用了`Mece Retrieval`，智能体在每次行进retrieve时，将不会重复拿取之前的chunck。
+在`pipeline名称`和`智能体配置`两个可选项出现后，请选择带有 vLLM 服务且生成器类型为`FreeChat`的pipeline。对于Deep Search智能体，在`智能体配置`部分，可以自定义 5 个参数：`Retrieve Top K`、`Rerank Top K`、`Mece Retrieval`、`Max Retrievals`和`Max Plan Steps`。如果您启用了`Mece Retrieval`，智能体在每次行进retrieve时，将不会重复拿取之前的chunck。
 ![alt text](../assets/img/agent_config_deep-search_zh.png)
 
 ## 在RAG中使用智能体
