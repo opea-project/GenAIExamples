@@ -435,6 +435,8 @@ async def restore_knowledge_configurations():
         for Knowledgebase_data in all_datas:
             Knoweldge_req = KnowledgeBaseCreateIn(**Knowledgebase_data)
             kb = ctx.knowledgemgr.create_knowledge_base(Knoweldge_req)
+            if not active_pl:
+                continue
             if kb.comp_type == "knowledge" and kb.comp_subtype == "origin_kb":
                 if Knowledgebase_data["file_paths"]:
                     if active_pl.indexer.comp_subtype != "milvus_vector" and Knowledgebase_data["active"]:

@@ -285,10 +285,10 @@ def format_terminal_str(text: str, color: str = "", bold: bool = False, italic: 
     return f"{prefix}{text}{suffix}"
 
 
-_DEFAULT_TEMPLATE_MESSAGES = [
+_LLM_EVAL_DEFAULT_TEMPLATE_MESSAGES = [
     {
         "role": "system",
-        "content": """You are an impartial quality rater for TCB Bonder troubleshooting answers. Your task is to rate if the answer by user well covers the steps in the reference answer.
+        "content": """You are an impartial quality rater for troubleshooting answers. Your task is to rate if the answer by user well covers the steps in the reference answer.
 
 Task instructions:
 - Parse the reference answer into its essential checkpoints (split on punctuation such as "?", ";", or line breaks) and understand what each step expects the technician to do or verify. The order of the checkpoints has low importance.
@@ -299,31 +299,6 @@ Task instructions:
 - The mismatch of the step number between user's answer and reference answer does not matter, as long as all the content is well covered.
 - Keep all reasoning internal; do not expose the intermediate analysis in the final reply.
 - Focus solely on the provided texts. Do not rely on your knowledge.
-
-The following are domain terms you may refer to:
-BFS: Bulk feed system
-BH: Bondhead
-BS: Bond stage/Bond pedestal
-CAH: Carrier handler
-COG: Chrome on glass
-COS: Cover opening station
-COT: Change over trolley
-DCP: Data collection plan
-DFH: Die feed handler
-DL: Down-look
-DPA: Die pick arm
-DTA: Die transfer arm
-FOV: Field of view
-HW: Highway
-MBH: Media buffer handler
-MHS: Material Handling System
-NCF: No clean flux
-OT: Optics table
-PFLU: Power feeder loading unit
-PHS: Pre/Post heat station
-PR: Pattern recognition
-SC: Station controller
-BLPCS: Bond line process control system
 """,
     },
     {
@@ -365,7 +340,7 @@ def llm_evaluate(
     ref_answer,
     llm_answer,
     eval_endpoint,
-    template_messages=_DEFAULT_TEMPLATE_MESSAGES,
+    template_messages=_LLM_EVAL_DEFAULT_TEMPLATE_MESSAGES,
     target_tokens=DEFAULT_TARGET_TOKENS,
     transform_params=DEFAULT_TRANSFORM_PARAMS,
     return_logits=False,

@@ -26,9 +26,10 @@ async def lifespan(app: FastAPI):
         await restore_pipeline_configurations()
         await restore_knowledge_configurations()
         await restore_agent_configurations()
-        yield
     except Exception as e:
-        raise
+        pass
+    finally:
+        yield
 
 
 app = FastAPI(lifespan=lifespan)

@@ -218,8 +218,12 @@ async def update_pipeline_handler(pl, req):
                 case IndexerType.DEFAULT_VECTOR | IndexerType.FAISS_VECTOR | IndexerType.MILVUS_VECTOR:
                     if ind.embedding_model:
                         embed_model = ctx.get_model_mgr().search_model(ind.embedding_model)
+                        embed_type = ind.inference_type
                         if embed_model is None:
-                            ind.embedding_model.model_type = ModelType.EMBEDDING
+                            if embed_type == "local":
+                                ind.embedding_model.model_type = ModelType.EMBEDDING
+                            elif embed_type == "vllm":
+                                ind.embedding_model.model_type = ModelType.VLLM_EMBEDDING
                             embed_model = ctx.get_model_mgr().load_model(ind.embedding_model)
                             ctx.get_model_mgr().add(embed_model)
                     # TODO: **RISK** if considering 2 pipelines with different
