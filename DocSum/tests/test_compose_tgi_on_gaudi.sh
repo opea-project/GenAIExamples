@@ -90,13 +90,13 @@ function validate_service() {
 
     local MAX_RETRIES=${13:-3}  # 默认重试3次
     local RETRY_DELAY=${14:-2}  # 默认重试间隔2秒
-    
+
     local retry_count=0
     local success=false
-    
+
     while [ $retry_count -lt $MAX_RETRIES ] && [ "$success" = false ]; do
         retry_count=$((retry_count + 1))
-        
+
         echo "[ $SERVICE_NAME ] 尝试第 $retry_count/$MAX_RETRIES 次..."
         if [[ $VALIDATE_TYPE == *"json"* ]]; then
             HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL")
