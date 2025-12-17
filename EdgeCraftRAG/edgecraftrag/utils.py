@@ -45,7 +45,7 @@ def get_prompt_template(model_path, prompt_content=None, template_path=None, ena
     if prompt_content is not None:
         template = prompt_content
     elif template_path is not None:
-       # Safely load the template only if it is inside /templates (or other safe root)
+        # Safely load the template only if it is inside /templates (or other safe root)
         safe_root = "/templates"
         normalized_path = os.path.normpath(os.path.join(safe_root, template_path))
         if not normalized_path.startswith(safe_root):

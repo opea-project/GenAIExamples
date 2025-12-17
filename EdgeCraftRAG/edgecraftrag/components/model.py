@@ -48,13 +48,15 @@ class BaseModelComponent(BaseComponent):
 
 class OpenAIEmbeddingModel(BaseModelComponent, OpenAIEmbedding):
     def __init__(self, model_id, api_base, **kwargs):
-        api_base = api_base+"/v1" if api_base and not api_base.endswith("/v1") else api_base
+        api_base = api_base + "/v1" if api_base and not api_base.endswith("/v1") else api_base
         super().__init__(
             model_id=model_id,
             api_base=api_base,
             **kwargs,
         )
-        OpenAIEmbedding.__init__(self, model_id_or_path=model_id, model_name=model_id, api_base=api_base, api_key="unused")
+        OpenAIEmbedding.__init__(
+            self, model_id_or_path=model_id, model_name=model_id, api_base=api_base, api_key="unused"
+        )
         self.comp_type = CompType.MODEL
         self.comp_subtype = ModelType.VLLM_EMBEDDING
         self.model_id = model_id
