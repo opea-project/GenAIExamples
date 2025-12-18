@@ -96,7 +96,7 @@ Before started, please prepare models into MODEL_PATH and prepare docker images
 
 ```bash
 export MODEL_PATH="${PWD}/models" # Your model path
-export LLM_MODEL="Qwen/Qwen3-30B-A3B" 
+export LLM_MODEL="Qwen/Qwen3-30B-A3B"
 ip_address=$(hostname -I | awk '{print $1}')
 # Use `ip a` to check your active ip
 export HOST_IP=$ip_address # Your host ip
@@ -119,7 +119,7 @@ chown 1000:1000 ${MODEL_PATH} ${DOC_PATH} ${TMPFILE_PATH}
 chown 1000:1000 -R $HOME/.cache
 ```
 
-###  Deploy the Service on Arc B60 Using Docker Compose
+### Deploy the Service on Arc B60 Using Docker Compose
 
 ```bash
 # vLLM envs
