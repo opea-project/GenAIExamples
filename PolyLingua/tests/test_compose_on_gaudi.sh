@@ -35,9 +35,20 @@ function build_docker_images() {
     # Build all images using build.yaml
     echo "Building PolyLingua images with --no-cache, check docker_image_build.log for details..."
     service_list="polylingua polylingua-ui llm-textgen"
-    docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log 2>&1
+
+    if ! docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log 2>&1; then
+        echo "::error::Docker Compose build failed. Printing build logs..."
+        cat "${LOG_PATH}/docker_image_build.log"
+        exit 1
+    fi
 
     echo "Image build completed"
+    echo "Verifying built images..."
+    if ! docker images | grep -q "polylingua" || ! docker images | grep -q "polylingua-ui" || ! docker images | grep -q "llm-textgen"; then
+        echo "::error::One or more required images are missing after build!"
+        docker images
+        exit 1
+    fi
     docker images | grep -E "polylingua|llm-textgen"
     sleep 1s
 }
