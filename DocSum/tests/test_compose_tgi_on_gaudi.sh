@@ -88,36 +88,51 @@ function validate_service() {
     local FORM_DATA5="${11}"
     local FORM_DATA6="${12}"
 
-    if [[ $VALIDATE_TYPE == *"json"* ]]; then
-        HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL")
-    else
-        CURL_CMD=(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -F "$FORM_DATA1" -F "$FORM_DATA2" -F "$FORM_DATA3" -F "$FORM_DATA4" -F "$FORM_DATA5" -H 'Content-Type: multipart/form-data' "$URL")
-        if [[ -n "$FORM_DATA6" ]]; then
-            CURL_CMD+=(-F "$FORM_DATA6")
+    local MAX_RETRIES=${13:-3}
+    local RETRY_DELAY=${14:-2}
+
+    local retry_count=0
+    local success=false
+
+    while [ $retry_count -lt $MAX_RETRIES ] && [ "$success" = false ]; do
+        retry_count=$((retry_count + 1))
+
+        echo "[ $SERVICE_NAME ] 尝试第 $retry_count/$MAX_RETRIES 次..."
+        if [[ $VALIDATE_TYPE == *"json"* ]]; then
+            HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL")
+        else
+            CURL_CMD=(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST -F "$FORM_DATA1" -F "$FORM_DATA2" -F "$FORM_DATA3" -F "$FORM_DATA4" -F "$FORM_DATA5" -H 'Content-Type: multipart/form-data' "$URL")
+            if [[ -n "$FORM_DATA6" ]]; then
+                CURL_CMD+=(-F "$FORM_DATA6")
+            fi
+            HTTP_RESPONSE=$("${CURL_CMD[@]}")
         fi
-        HTTP_RESPONSE=$("${CURL_CMD[@]}")
-    fi
-    HTTP_STATUS=$(echo $HTTP_RESPONSE | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
-    RESPONSE_BODY=$(echo $HTTP_RESPONSE | sed -e 's/HTTPSTATUS\:.*//g')
+        HTTP_STATUS=$(echo $HTTP_RESPONSE | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
+        RESPONSE_BODY=$(echo $HTTP_RESPONSE | sed -e 's/HTTPSTATUS\:.*//g')
 
-    docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
+        docker logs ${DOCKER_NAME} >> ${LOG_PATH}/${SERVICE_NAME}.log
 
-    # check response status
-    if [ "$HTTP_STATUS" -ne "200" ]; then
-        echo "[ $SERVICE_NAME ] HTTP status is not 200. Received status was $HTTP_STATUS"
-        exit 1
-    else
-        echo "[ $SERVICE_NAME ] HTTP status is 200. Checking content..."
-    fi
-    # check response body
-    if [[ "$RESPONSE_BODY" != *"$EXPECTED_RESULT"* ]]; then
-        echo "EXPECTED_RESULT==> $EXPECTED_RESULT"
-        echo "RESPONSE_BODY==> $RESPONSE_BODY"
-        echo "[ $SERVICE_NAME ] Content does not match the expected result: $RESPONSE_BODY"
-        exit 1
-    else
-        echo "[ $SERVICE_NAME ] Content is as expected."
-    fi
+        # check response status
+        if [ "$HTTP_STATUS" -ne "200" ]; then
+            echo "[ $SERVICE_NAME ] HTTP status is not 200. Received status was $HTTP_STATUS"
+            exit 1
+        else
+            echo "[ $SERVICE_NAME ] HTTP status is 200. Checking content..."
+        fi
+        # check response body
+        if [[ "$RESPONSE_BODY" != *"$EXPECTED_RESULT"* ]]; then
+            echo "EXPECTED_RESULT==> $EXPECTED_RESULT"
+            echo "RESPONSE_BODY==> $RESPONSE_BODY"
+            echo "[ $SERVICE_NAME ] Content does not match the expected result: $RESPONSE_BODY"
+            if [ $retry_count -lt $max_retries ]; then
+                echo "[ $SERVICE_NAME ] will retry after $retry_delay seconds ..."
+                sleep ${retry_delay}s
+            fi
+        else
+            success=true
+            echo "[ $SERVICE_NAME ] Content is as expected."
+        fi
+    done
 
     sleep 1s
 }
