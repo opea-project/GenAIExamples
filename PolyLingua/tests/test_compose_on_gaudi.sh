@@ -114,25 +114,33 @@ EOF
     fi
 
     # Wait for vLLM service to be ready
-    echo "Waiting for vLLM service to initialize (this may take several minutes)..."
+    echo "Waiting for vLLM service to become healthy (this may take up to 30 minutes)..."
+    local vllm_health_url="http://${ip_address}:8028/health"
+
     n=0
-    until [[ "$n" -ge 100 ]]; do
-        docker logs vllm-gaudi-server > ${LOG_PATH}/vllm_service_start.log 2>&1
-        if grep -E "Uvicorn running|Application startup complete" ${LOG_PATH}/vllm_service_start.log; then
-            echo "vLLM service is ready!"
+    until [[ "$n" -ge 180 ]]; do
+        http_status=$(curl -s -o /dev/null -w "%{http_code}" "$vllm_health_url")
+
+        if [[ "$http_status" -eq 200 ]]; then
+            echo "vLLM service is healthy (returned status 200)!"
             break
         fi
-        if grep -q "error" ${LOG_PATH}/vllm_service_start.log; then
-            echo "Error detected in vLLM service startup"
-            cat ${LOG_PATH}/vllm_service_start.log
+
+        if ! docker ps --filter "name=vllm-gaudi-server" --filter "status=running" -q | grep -q .; then
+            echo "::error::vLLM container has stopped unexpectedly!"
+            docker logs vllm-gaudi-server
             exit 1
         fi
+
+        echo "Waiting for vLLM health endpoint... status: $http_status ($n/180)"
         sleep 10s
         n=$((n+1))
     done
 
-    if [[ "$n" -ge 100 ]]; then
-        echo "Timeout waiting for vLLM service"
+    if [[ "$n" -ge 180 ]]; then
+        echo "::error::Timeout waiting for vLLM service after 30 minutes."
+        echo "Final health check status: $http_status"
+        echo "Dumping container logs:"
         docker logs vllm-gaudi-server
         exit 1
     fi
