@@ -96,7 +96,7 @@ EOF
     echo "Waiting for vLLM service to initialize (this may take several minutes)..."
     n=0
     until [[ "$n" -ge 100 ]]; do
-        docker logs vllm-service > ${LOG_PATH}/vllm_service_start.log 2>&1
+        docker logs vllm-gaudi-server > ${LOG_PATH}/vllm_service_start.log 2>&1
         if grep -E "Uvicorn running|Application startup complete" ${LOG_PATH}/vllm_service_start.log; then
             echo "vLLM service is ready!"
             break
@@ -112,7 +112,7 @@ EOF
 
     if [[ "$n" -ge 100 ]]; then
         echo "Timeout waiting for vLLM service"
-        docker logs vllm-service
+        docker logs vllm-gaudi-server
         exit 1
     fi
 
@@ -198,7 +198,7 @@ function validate_microservices() {
         "http://${ip_address}:8028/v1/chat/completions" \
         "content" \
         "vllm" \
-        "vllm-service" \
+        "vllm-gaudi-server" \
         '{"model": "Qwen/Qwen2.5-7B-Instruct", "messages": [{"role": "user", "content": "Translate Hello to Spanish"}], "max_tokens": 32}'
 
     # Test LLM microservice
@@ -221,7 +221,7 @@ function validate_megaservice() {
         "http://${ip_address}:8888/v1/translation" \
         "choices" \
         "mega-polylingua-basic" \
-        "polylingua-xeon-backend-server" \
+        "polylingua-gaudi-backend-server" \
         '{"language_from": "English", "language_to": "Spanish", "source_language": "Hello, how are you today?"}'
 
     # Test 2: Language auto-detection
@@ -230,7 +230,7 @@ function validate_megaservice() {
         "http://${ip_address}:8888/v1/translation" \
         "choices" \
         "mega-polylingua-auto" \
-        "polylingua-xeon-backend-server" \
+        "polylingua-gaudi-backend-server" \
         '{"language_from": "auto", "language_to": "French", "source_language": "Hello world"}'
 
     # Test 3: Different language pair (English to German)
@@ -239,7 +239,7 @@ function validate_megaservice() {
         "http://${ip_address}:8888/v1/translation" \
         "choices" \
         "mega-polylingua-german" \
-        "polylingua-xeon-backend-server" \
+        "polylingua-gaudi-backend-server" \
         '{"language_from": "English", "language_to": "German", "source_language": "Good morning"}'
 }
 
