@@ -1,3 +1,4 @@
+
 # Legal Information
 
 1. [License](#license)
