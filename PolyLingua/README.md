@@ -111,7 +111,7 @@ The service works with any HuggingFace text generation model. Recommended models
 
 - **swiss-ai/Apertus-8B-Instruct-2509** - Multilingual translation (default)
 - **haoranxu/ALMA-7B** - Specialized translation model
-- \*\*Qwen/Qwen2.5-7B-Instruct88 - Other Common model (Gaudi default)
+- \*\*Qwen/Qwen2.5-7B-Instruct - Other Common model (Gaudi default)
 
 ## 🛠️ Development
 

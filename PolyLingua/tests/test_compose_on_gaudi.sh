@@ -5,11 +5,11 @@
 set -xe
 IMAGE_REPO=${IMAGE_REPO:-"opea"}
 IMAGE_TAG=${IMAGE_TAG:-"latest"}
-echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
-echo "TAG=IMAGE_TAG=${IMAGE_TAG}"
+echo "IMAGE_REPO=${IMAGE_REPO}"
+echo "IMAGE_TAG=${IMAGE_TAG}"
 export REGISTRY=${IMAGE_REPO}
 export TAG=${IMAGE_TAG}
-export MODEL_CACHE=${model_cache:-"./data"}
+export MODEL_CACHE=${MODEL_CACHE:-"./data"}
 
 # Get the directory where this script is located
 SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
@@ -259,7 +259,7 @@ function validate_file_translation() {
         "http://${ip_address}:8888/v1/translation" \
         "choices" \
         "file-translation" \
-        "polylingua-xeon-backend-server" \
+        "polylingua-gaudi-backend-server" \
         '-F "file=@test_data/sample.txt" -F "language_from=English" -F "language_to=Spanish"' \
         "multipart/form-data"
 }
@@ -296,7 +296,7 @@ function validate_ui() {
 }
 
 function stop_docker() {
-    cd $WORKPATH/docker_compose/intel/cpu/xeon/
+    cd $WORKPATH/docker_compose/intel/hpu/gaudi/
     echo "Stopping services..."
     docker compose -f compose.yaml down
     echo "Services stopped"
@@ -306,7 +306,7 @@ function main() {
     echo "======================================"
     echo "PolyLingua E2E Test Suite"
     echo "======================================"
-    echo "Platform: Intel Xeon (CPU)"
+    echo "Platform: Intel Gaudi (HPU)"
     echo "LLM Backend: vLLM"
     echo "IP Address: ${ip_address}"
     echo "======================================"
