@@ -207,7 +207,7 @@ Translate text between languages.
 docker compose logs -f
 
 # Specific service
-docker compose logs -f polylingua-xeon-backend-server
+docker compose logs -f polylingua-backend-server
 docker compose logs -f polylingua-ui-server
 ```
 

@@ -50,9 +50,9 @@ services:
       HF_HUB_ENABLE_HF_TRANSFER: 0
     restart: unless-stopped
 
-  polylingua-gaudi-backend-server:
+  polylingua-backend-server:
     image: ${REGISTRY:-opea}/polylingua:${TAG:-latest}
-    container_name: polylingua-gaudi-backend-server
+    container_name: polylingua-backend-server
     depends_on:
       - vllm-service
       - llm
@@ -73,7 +73,7 @@ services:
     image: ${REGISTRY:-opea}/polylingua-ui:${TAG:-latest}
     container_name: polylingua-ui-server
     depends_on:
-      - polylingua-gaudi-backend-server
+      - polylingua-backend-server
     ports:
       - "5173:5173"
     environment:
@@ -88,7 +88,7 @@ services:
     image: nginx:alpine
     container_name: polylingua-nginx-server
     depends_on:
-      - polylingua-gaudi-backend-server
+      - polylingua-backend-server
       - polylingua-ui-server
     ports:
       - "${NGINX_PORT:-80}:80"

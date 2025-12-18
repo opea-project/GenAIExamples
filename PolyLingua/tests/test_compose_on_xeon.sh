@@ -220,7 +220,7 @@ function validate_megaservice() {
         "http://${ip_address}:8888/v1/translation" \
         "choices" \
         "mega-polylingua-basic" \
-        "polylingua-xeon-backend-server" \
+        "polylingua-backend-server" \
         '{"language_from": "English", "language_to": "Spanish", "source_language": "Hello, how are you today?"}'
 
     # Test 2: Language auto-detection
@@ -229,7 +229,7 @@ function validate_megaservice() {
         "http://${ip_address}:8888/v1/translation" \
         "choices" \
         "mega-polylingua-auto" \
-        "polylingua-xeon-backend-server" \
+        "polylingua-backend-server" \
         '{"language_from": "auto", "language_to": "French", "source_language": "Hello world"}'
 
     # Test 3: Different language pair (English to German)
@@ -238,7 +238,7 @@ function validate_megaservice() {
         "http://${ip_address}:8888/v1/translation" \
         "choices" \
         "mega-polylingua-german" \
-        "polylingua-xeon-backend-server" \
+        "polylingua-backend-server" \
         '{"language_from": "English", "language_to": "German", "source_language": "Good morning"}'
 }
 
@@ -258,7 +258,7 @@ function validate_file_translation() {
         "http://${ip_address}:8888/v1/translation" \
         "choices" \
         "file-translation" \
-        "polylingua-xeon-backend-server" \
+        "polylingua-backend-server" \
         '-F "file=@test_data/sample.txt" -F "language_from=English" -F "language_to=Spanish"' \
         "multipart/form-data"
 }
