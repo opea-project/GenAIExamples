@@ -28,7 +28,7 @@ To create a Simple Agent, you need to switch to `Agents` tab in the `Settings` p
 Then in the `Create Agent` window, set `Agent Type` as `Simple`.
 ![alt text](../assets/img/agent_create_simple.png)
 
-After selecting `Simple`, pipeline selection and Agent configuration will be available. Please select the pipeline with vLLM serving (generator type `FreeChat`). For `Agent Configs`, you may specify `Max Retrivals` as needed.
+After selecting `Simple`, pipeline selection and Agent configuration will be available. Please select the pipeline with vLLM serving (generator type `FreeChat`). For `Agent Configs`, you may specify `Max Retrievals` as needed.
 ![alt text](../assets/img/agent_config_simple.png)
 
 ### Creating a Deep Search Agent
@@ -36,7 +36,7 @@ After selecting `Simple`, pipeline selection and Agent configuration will be ava
 To create a Deep Search Agent, switch to `Agents` tab and click `Create Agent` button. In `Create Agent` window, set `Agent Type` as `Deep Search`.
 ![alt text](../assets/img/agent_create_deep-search.png)
 
-Similarly, please select the pipeline with vLLM serving (generator type `FreeChat`) in `Pipeline Name`. In `Agent Configs` session, 5 parameters coudl be customized: `Retrieve Top K`, `Rerank Top K`, `Mece Retrival`, `Max Retrivals` and `Max Plan Steps`. If `Mece Retrival` is enabled, agent will not retrieve chunks already retrieved in each step.
+Similarly, please select the pipeline with vLLM serving (generator type `FreeChat`) in `Pipeline Name`. In `Agent Configs` session, 5 parameters could be customized: `Retrieve Top K`, `Rerank Top K`, `Mece Retrieval`, `Max Retrievals` and `Max Plan Steps`. If `Mece Retrieval` is enabled, agent will not retrieve chunks already retrieved in each step.
 ![alt text](../assets/img/agent_config_deep-search.png)
 
 ## Using Agents in RAG Pipelines
