@@ -90,7 +90,17 @@ EOF
 
     # Start Docker Containers
     echo "Starting services with docker compose..."
-    docker compose -f compose.yaml up -d > ${LOG_PATH}/start_services_with_compose.log 2>&1
+    if ! docker compose -f compose.yaml up -d > ${LOG_PATH}/start_services_with_compose.log 2>&1; then
+        echo "::error::Docker Compose failed to start. Printing logs..."
+        cat "${LOG_PATH}/start_services_with_compose.log"
+        echo "::group::Docker Compose PS"
+        docker compose -f compose.yaml ps
+        echo "::endgroup::"
+        echo "::group::Docker Logs"
+        docker compose -f compose.yaml logs
+        echo "::endgroup::"
+        exit 1
+    fi
 
     # Wait for vLLM service to be ready
     echo "Waiting for vLLM service to initialize (this may take several minutes)..."
