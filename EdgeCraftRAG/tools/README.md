@@ -5,6 +5,7 @@
 ### Run with Non-Interactive Mode:
 
 You need to set environment before execute script, you can refer to [Prepare env variables and configurations](../docker_compose/intel/gpu/arc/README.md#4-prepare-env-variables-and-configurations) for env details.
+
 ```bash
 # set start up env, below is an example:
 export MODEL_PATH="${PWD}/models"
@@ -36,6 +37,7 @@ bash quick_start.sh
 ```
 
 ### Run with Interactive Mode:
+
 ```bash
 bash -i quick_start.sh
 # In this mode, you can follow the Interactive guide to set env and finish start up
