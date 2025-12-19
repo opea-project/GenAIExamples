@@ -3,7 +3,7 @@
 
 name: Freeze OPEA images release tag
 permissions:
-  contents: read
+  contents: write
 on:
   workflow_dispatch:
     inputs:
