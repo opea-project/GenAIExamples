@@ -1,0 +1,4 @@
+
+# Backup directories
+**/.backup-*
+**/*backup-*
