@@ -1,0 +1,8 @@
+deepagents
+httpx
+langchain_openai
+langchain-tavily
+langgraph-cli[inmem]
+markdownify
+rich
+tavily-python
