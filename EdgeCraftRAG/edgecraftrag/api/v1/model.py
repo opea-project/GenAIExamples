@@ -41,6 +41,10 @@ async def get_model_id(
             if not server_address:
                 server_address = "http://localhost:8086"
             return get_available_vllm_models(server_address)
+        elif model_type == "vLLM_embedding":
+            if not server_address:
+                server_address = "http://localhost:8087"
+            return get_available_vllm_models(server_address)
         else:
             return get_available_models(model_type)
     except Exception as e:

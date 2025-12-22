@@ -4,7 +4,7 @@
 export interface ModelType {
   model_id: string | undefined;
   model_path: string;
-  model_url?: string;
+  api_base?: string;
   device: string;
   weight?: string;
 }

@@ -74,6 +74,10 @@ const props = defineProps({
     type: Object,
     default: () => {},
   },
+  dialogId: {
+    type: String,
+    default: "",
+  },
 });
 
 const { t } = useI18n();
@@ -161,9 +165,8 @@ const handleSubmit = async () => {
   const isValid = await handleSelect();
   if (!isValid) return;
   submitLoading.value = true;
-  const { name } = props.dialogData;
 
-  requestPipelineUpdate(name, formData)
+  requestPipelineUpdate(props.dialogId, formData)
     .then(() => {
       emit("search");
       handleCancel();

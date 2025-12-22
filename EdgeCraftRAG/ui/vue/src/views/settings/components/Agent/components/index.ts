@@ -4,5 +4,7 @@
 import Table from "./Table.vue";
 import UpdateDialog from "./UpdateDialog.vue";
 import DynamicConfigs from "./DynamicConfigs.vue";
+import DetailDrawer from "./DetailDrawer.vue";
+import PipelineDetailDrawer from "../../Pipeline/components/DetailDrawer.vue";
 
-export { Table, UpdateDialog, DynamicConfigs };
+export { Table, UpdateDialog, DynamicConfigs, DetailDrawer, PipelineDetailDrawer };

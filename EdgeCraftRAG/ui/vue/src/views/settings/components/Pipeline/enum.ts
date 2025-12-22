@@ -91,9 +91,11 @@ export const Generator = [
   {
     name: "ChatQnA",
     value: "chatqna",
+    describe: "pipeline.desc.chatQnA",
   },
   {
     name: "FreeChat",
     value: "freechat",
+    describe: "pipeline.desc.freeChat",
   },
 ] as const;

@@ -29,6 +29,7 @@ class IndexerIn(BaseModel):
     embedding_model: Optional[ModelIn] = None
     embedding_url: Optional[str] = None
     vector_url: Optional[str] = None
+    inference_type: Optional[str] = "local"
 
 
 class RetrieverIn(BaseModel):

@@ -6,6 +6,7 @@
       @create="handleCreate"
       @search="handleSearch"
       @update="handleUpdate"
+      @view="handleView"
     />
     <!-- updateDialog -->
     <UpdateDialog
@@ -15,13 +16,32 @@
       @search="handleSearch"
       @close="updateDialog.visible = false"
     />
+    <!-- detailDrawer -->
+    <DetailDrawer
+      v-if="detailDrawer.visible"
+      :drawer-data="detailDrawer.data"
+      @viewPipeline="handlePipelineView"
+      @close="detailDrawer.visible = false"
+    />
+    <!-- detailDrawer -->
+    <PipelineDetailDrawer
+      v-if="pipelineDetailDrawer.visible"
+      :drawer-data="pipelineDetailDrawer.data"
+      @close="pipelineDetailDrawer.visible = false"
+    />
   </div>
 </template>
 
 <script lang="ts" setup name="Agent">
-import { getAgentList, getAgentDetailByName } from "@/api/agent";
+import { getAgentDetailByName, getAgentList } from "@/api/agent";
+import { getPipelineDetailById } from "@/api/pipeline";
 import { onMounted, reactive, ref } from "vue";
-import { UpdateDialog, Table } from "./components";
+import {
+  DetailDrawer,
+  PipelineDetailDrawer,
+  Table,
+  UpdateDialog,
+} from "./components";
 
 const loading = ref<boolean>(true);
 const updateDialog = reactive<DialogType>({
@@ -30,6 +50,14 @@ const updateDialog = reactive<DialogType>({
   type: "create",
 });
 
+const detailDrawer = reactive<DialogType>({
+  visible: false,
+  data: {},
+});
+const pipelineDetailDrawer = reactive<DialogType>({
+  visible: false,
+  data: {},
+});
 const tableData = ref<EmptyArrayType>([]);
 
 const queryAgentList = async () => {
@@ -52,11 +80,38 @@ const handleCreate = () => {
 };
 //edit
 const handleUpdate = async (row: EmptyObjectType) => {
-  const data: any = await getAgentDetailByName(row.name);
-  updateDialog.data = { ...updateDialog.data, ...data };
-  updateDialog.visible = true;
-  updateDialog.type = "edit";
+  try {
+    const data: any = await getAgentDetailByName(row.name);
+    updateDialog.data = { ...updateDialog.data, ...data };
+    updateDialog.visible = true;
+    updateDialog.type = "edit";
+  } catch (error) {
+    console.log(error);
+  }
 };
+//detail
+const handleView = async (row: EmptyObjectType) => {
+  try {
+    const data: any = await getAgentDetailByName(row.name);
+
+    detailDrawer.data = { ...detailDrawer.data, ...data };
+    detailDrawer.visible = true;
+  } catch (error) {
+    console.log(error);
+  }
+};
+//pipeline detail
+const handlePipelineView = async (row: EmptyObjectType) => {
+  try {
+    const data: any = await getPipelineDetailById(row.pipeline_idx);
+
+    pipelineDetailDrawer.data = JSON.parse(data);
+    pipelineDetailDrawer.visible = true;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 //search
 const handleSearch = () => {
   queryAgentList();
@@ -69,6 +124,6 @@ onMounted(() => {
 
 <style scoped lang="less">
 .agent-container {
-  .mt-24;
+  // .mt-24;
 }
 </style>

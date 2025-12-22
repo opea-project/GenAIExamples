@@ -39,10 +39,10 @@ git clone https://github.com/opea-project/GenAIExamples.git
 cd GenAIExamples/EdgeCraftRAG
 ```
 
-Checkout a released version, such as v1.3:
+Checkout a released version, such as v1.5:
 
 ```
-git checkout v1.3
+git checkout v1.5
 ```
 
 ### 3. Prepare models

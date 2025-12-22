@@ -41,6 +41,7 @@ export default {
     manual: "去创建",
     inputTip: "请输入 ",
     connect: "连接",
+    detail: "查看详情",
   },
   system: {
     title: "系统状态",
@@ -100,6 +101,7 @@ export default {
       embedding: "嵌入模型",
       embeddingUrl: "嵌入模型地址",
       embeddingDevice: "模型运行设备",
+      embeddingType: "推理类型",
       retriever: "检索器",
       retrieverType: "检索器类型",
       topk: "检索 top k",
@@ -134,6 +136,8 @@ export default {
       indexerType: "请选择索引器类型",
       embedding: "请选择嵌入模型",
       embeddingUrl: "IP : 端口，(例如 192.168.1.1:13020)",
+      embeddingvllmUrl: "IP : 端口，(例如 192.168.1.1:8087)",
+      embeddingvllmValid: "vLLM嵌入模型还未通过校验",
       embeddingDevice: "请选择嵌入模型运行设备",
       retrieverType: "请选择检索器类型",
       retrieverTypeFormat: "检索器类型只能选择kbadmin",
@@ -159,7 +163,7 @@ export default {
       vllmUrlValid2: "请输入正确的vLLM地址",
       vllmUrlValid3: "vLLM地址无法访问",
       vllmUrlValid4: "测试通过！",
-      vllmUrlValid5: "vLLM地址还未通过校验",
+      vllmUrlValid5: "vLLM模型还未通过校验",
       nodeParserTypeTip: "索引器类型和检索器类型将同时设置为kbadmin",
       indexerTypeTip: "节点解析器类型和检索器类型将同时设置为kbadmin",
       retrieverTypeTip: "索引器类型和节点解析器类型将同时设置为kbadmin",
@@ -206,6 +210,8 @@ export default {
       modelName: "vLLM 模型名称",
       vllm_url: "测试vLLM地址是否可用",
       kbadmin: "第三方知识库系统",
+      chatQnA: "基于知识库的问答系统",
+      freeChat: "开放域对话系统（面向Agent）",
     },
   },
   generation: {
@@ -293,6 +299,7 @@ export default {
       deleteSucc: "Pipeline 删除成功!",
       switchSucc: "Pipeline 状态切换成功!",
       connectSucc: "vLLM 服务连接成功!",
+      connectError: "暂无可用模型!",
     },
     chatbot: {
       updateSucc: "配置更新成功!",
@@ -396,6 +403,7 @@ export default {
       configs: "请录入智能体配置",
       key: "请输入配置名称",
       value: "请输入配置内容",
+      notPipeline: "请先创建生成器类型为 FreeChat 的 Pipeline",
     },
   },
 };

@@ -41,6 +41,7 @@ export default {
     manual: "Create Now",
     inputTip: "Please enter ",
     connect: "Connect",
+    detail: "View details",
   },
   system: {
     title: "System Status",
@@ -101,6 +102,7 @@ export default {
       embedding: "Embedding Model",
       embeddingUrl: "Embedding URL",
       embeddingDevice: "Embedding run device",
+      embeddingType: "Embedding Inference Type",
       retriever: "Retriever",
       retrieverType: "Retriever Type",
       topk: "Search top k",
@@ -135,6 +137,8 @@ export default {
       indexerType: "Please select Indexer Type",
       embedding: "Please select embedding Model",
       embeddingUrl: "IP : Port, (e.g. 192.168.1.1:13020)",
+      embeddingvllmUrl: "IP : Port, (e.g. 192.168.1.1:8087)",
+      embeddingvllmValid: "The embedding model has not passed verification yet",
       embeddingDevice: "Please select Embedding run device",
       retrieverType: "Please select Retriever Type",
       retrieverTypeFormat: "Retriever type can only select kbadmin",
@@ -160,7 +164,7 @@ export default {
       vllmUrlValid2: "Please enter the correct url",
       vllmUrlValid3: "URL cannot be accessed",
       vllmUrlValid4: "Test passed !",
-      vllmUrlValid5: "The URL has not passed verification yet",
+      vllmUrlValid5: "The vLLM model has not passed verification yet",
       nodeParserTypeTip: "Both Indexer Type and  Retriever Type will be set to kbadmin at the same time",
       indexerTypeTip: "Both Node Parser Type and  Retriever Type will be set to kbadmin at the same time",
       retrieverTypeTip: "Both Node Parser Type and  Indexer Type will be set to kbadmin at the same time",
@@ -209,6 +213,8 @@ export default {
       modelName: "vLLM model name",
       vllm_url: " Test if vLLM url is available ",
       kbadmin: "Third party knowledge base engine",
+      chatQnA: "Knowledge-Based Q&A System",
+      freeChat: "Open-Domain Conversation System (Agent-Oriented)",
     },
   },
   generation: {
@@ -297,6 +303,7 @@ export default {
       deleteSucc: "Pipeline deleted successfully !",
       switchSucc: "Pipeline state switch successful !",
       connectSucc: "vLLM service connection successful!",
+      connectError: "No models are currently available!",
     },
     chatbot: {
       updateSucc: "Configuration update successful !",
@@ -361,7 +368,7 @@ export default {
     },
   },
   agent: {
-    agent: "Agent",
+    agent: "Agents",
     create: "Create Agent",
     edit: "Edit Agent",
     detail: "Agent Details",
@@ -399,6 +406,7 @@ export default {
       configs: "Please enter agent configs",
       key: "Please enter config key",
       value: "Please enter config value",
+      notPipeline: "Please create Pipeline with the generator type set to FreeChat first.",
     },
   },
 };

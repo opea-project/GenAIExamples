@@ -86,3 +86,44 @@ This section is the same as default vLLM inference section, please refer to [Pre
 ### 2. Access Kbadmin UI
 
 please refer to [ChatQnA with Kbadmin in UI](./Explore_Edge_Craft_RAG.md#chatqna-with-kbadmin-in-ui)
+
+## Deploy EC-RAG on multi GPUs
+
+In this sample, we will use Qwen3-30B-A3B deployment on 4 Arc B60 GPUs as an example.
+Before started, please prepare models into MODEL_PATH and prepare docker images
+
+### Prepare env variables and configurations
+
+```bash
+export MODEL_PATH="${PWD}/models" # Your model path
+export LLM_MODEL="Qwen/Qwen3-30B-A3B"
+ip_address=$(hostname -I | awk '{print $1}')
+# Use `ip a` to check your active ip
+export HOST_IP=$ip_address # Your host ip
+
+# Check group id of video and render
+export VIDEOGROUPID=$(getent group video | cut -d: -f3)
+export RENDERGROUPID=$(getent group render | cut -d: -f3)
+
+# If you have a proxy configured, execute below line
+export no_proxy=${no_proxy},${HOST_IP},edgecraftrag,edgecraftrag-server
+export NO_PROXY=${NO_PROXY},${HOST_IP},edgecraftrag,edgecraftrag-server
+# If you have a HF mirror configured, it will be imported to the container
+# export HF_ENDPOINT=https://hf-mirror.com # your HF mirror endpoint"
+
+# Make sure all 3 folders have 1000:1000 permission, otherwise
+export DOC_PATH=${PWD}/tests
+export TMPFILE_PATH=${PWD}/tests
+chown 1000:1000 ${MODEL_PATH} ${DOC_PATH} ${TMPFILE_PATH}
+# In addition, also make sure the .cache folder has 1000:1000 permission, otherwise
+chown 1000:1000 -R $HOME/.cache
+```
+
+### Deploy the Service on Arc B60 Using Docker Compose
+
+```bash
+# vLLM envs
+export TP=4 # for multi GPU, you can change TP value
+export ZE_AFFINITY_MASK=0,1,2,3 # for multi GPU, you can export ZE_AFFINITY_MASK=0,1,2...
+docker compose --profile b60 -f docker_compose/intel/gpu/arc/compose.yaml up -d
+```
