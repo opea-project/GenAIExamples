@@ -44,10 +44,10 @@ jobs:
           docker system prune -f
       - name: Checkout out Repo
         uses: actions/checkout@1e31de5234b9f8995739874a8ce0492dc87873e2
-      - name: Install Dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y jq
+      # - name: Install Dependencies
+      #   run: |
+      #     sudo apt-get update
+      #     sudo apt-get install -y jq
       - name: Clone Required Repo
         run: |
           git clone --depth 1 https://github.com/opea-project/GenAIComps.git
