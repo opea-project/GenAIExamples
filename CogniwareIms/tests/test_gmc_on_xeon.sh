@@ -6,132 +6,93 @@ set -e
 
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
-NAMESPACE="${NAMESPACE:-opea}"
 
 function setup_gmc() {
     echo "Setting up GMC..."
-    kubectl apply -f https://github.com/opea-project/GenAIInfra/releases/download/v1.0/gmc.yaml || true
+    kubectl apply -f https://github.com/opea-project/GenAIInfra/releases/download/v1.0/gmc.yaml
 
     # Wait for GMC to be ready
-    kubectl wait --for=condition=Ready pod -l app=gmc-controller -n gmc-system --timeout=300s || true
+    kubectl wait --for=condition=Ready pod -l app=gmc-controller -n gmc-system --timeout=300s
 }
 
-function deploy_cogniwareims() {
-    echo "Deploying CogniwareIMS with GMC..."
+function deploy_inventoryms() {
+    echo "Deploying InventoryMS with GMC..."
 
     # Create namespace
-    kubectl create namespace ${NAMESPACE} 2>/dev/null || echo "Namespace ${NAMESPACE} already exists"
+    kubectl create namespace opea || true
 
-    # Deploy with Helm
-    helm install cogniwareims $WORKPATH/kubernetes/helm \
-        --namespace ${NAMESPACE} \
-        --set global.HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN:-""} \
-        --wait --timeout 10m || {
-        echo "Warning: Deployment may not be fully ready"
-        kubectl get pods -n ${NAMESPACE}
-    }
+    # Deploy microservices
+    kubectl apply -f $WORKPATH/kubernetes/gmc/inventoryms.yaml -n opea
 
-    # Wait for pods
+    # Wait for deployment
     sleep 60
-    kubectl wait --for=condition=Ready pod -l app=cogniwareims-backend -n ${NAMESPACE} --timeout=600s || {
-        echo "Warning: Backend pod may not be ready"
-        kubectl get pods -n ${NAMESPACE}
-    }
+    kubectl wait --for=condition=Ready pod -l app=inventoryms -n opea --timeout=600s
 }
 
 function validate_deployment() {
-    echo "Validating deployment..."
+    echo "Validating GMC deployment..."
+
+    # Check GMConnector status
+    kubectl get gmconnector inventoryms -n opea
 
     # Check pods
-    kubectl get pods -n ${NAMESPACE}
-    kubectl get svc -n ${NAMESPACE}
+    kubectl get pods -n opea
 
-    # Get backend pod
-    BACKEND_POD=$(kubectl get pod -n ${NAMESPACE} -l app=cogniwareims-backend -o jsonpath='{.items[0].metadata.name}' 2>/dev/null) || {
-        echo "Backend pod not found, skipping health checks"
-        return 0
-    }
-
-    if [ -z "$BACKEND_POD" ]; then
-        echo "No backend pod found, skipping validation"
-        return 0
-    fi
-
-    echo "Testing backend pod: $BACKEND_POD"
+    # Get service endpoint
+    BACKEND_POD=$(kubectl get pod -n opea -l app=inventoryms-backend -o jsonpath='{.items[0].metadata.name}')
 
     # Port forward for testing
-    kubectl port-forward -n ${NAMESPACE} pod/$BACKEND_POD 8000:8000 &
+    kubectl port-forward -n opea pod/$BACKEND_POD 8888:8888 &
     PF_PID=$!
-    sleep 10
+    sleep 5
 
     # Test health endpoint
-    echo "Testing health endpoint..."
-    response=$(curl -s http://localhost:8000/api/health 2>/dev/null) || {
-        echo "Health check failed, but continuing..."
-        kill $PF_PID 2>/dev/null || true
-        return 0
-    }
-
+    response=$(curl -s http://localhost:8888/health)
     if echo "$response" | grep -q "healthy"; then
-        echo "✅ Health check passed!"
+        echo "Health check passed!"
     else
-        echo "Health check response: $response"
+        echo "Health check failed!"
+        kill $PF_PID
+        exit 1
     fi
 
-    # Test chat endpoint
-    echo "Testing chat endpoint..."
-    response=$(curl -s -X POST http://localhost:8000/api/chat \
+    # Test chat completion
+    response=$(curl -s -X POST http://localhost:8888/v1/chat/completions \
         -H "Content-Type: application/json" \
         -d '{
-            "message": "What Intel processors are best for inventory systems?",
-            "session_id": "test_session",
-            "user_role": "Inventory Manager"
-        }' 2>/dev/null) || {
-        echo "Chat test failed, but continuing..."
-    }
+            "messages": [
+                {"role": "user", "content": "What Intel processors are available?"}
+            ]
+        }')
 
     if echo "$response" | grep -q "error"; then
-        echo "Chat test returned error"
-    else
-        echo "✅ Chat test passed!"
+        echo "Chat completion test failed!"
+        kill $PF_PID
+        exit 1
     fi
 
-    echo "Validation completed!"
-    kill $PF_PID 2>/dev/null || true
+    echo "All validations passed!"
+    kill $PF_PID
 }
 
 function cleanup() {
     echo "Cleaning up..."
-
-    # Uninstall Helm release
-    helm uninstall cogniwareims --namespace ${NAMESPACE} 2>/dev/null || true
-
-    # Delete namespace
-    kubectl delete namespace ${NAMESPACE} --grace-period=0 --force 2>/dev/null || true
-
-    # Wait for cleanup
-    sleep 5
-
-    echo "Cleanup completed"
+    kubectl delete namespace opea --grace-period=0 --force || true
 }
 
 function main() {
     echo "========================================="
-    echo "CogniwareIMS GMC Test on Intel Xeon"
-    echo "Namespace: ${NAMESPACE}"
+    echo "InventoryMS GMC Test on Intel Xeon"
     echo "========================================="
-
-    # Trap to ensure cleanup on exit
-    trap cleanup EXIT
 
     setup_gmc
-    deploy_cogniwareims
+    deploy_inventoryms
     validate_deployment
+    cleanup
 
     echo "========================================="
-    echo "CogniwareIMS GMC Test Completed!"
+    echo "InventoryMS GMC Test Passed!"
     echo "========================================="
 }
 
 main
-
