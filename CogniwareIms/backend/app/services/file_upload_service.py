@@ -20,9 +20,9 @@ except ImportError:
     load_workbook = None
 
 try:
-    import PyPDF2
+    from pypdf import PdfReader
 except ImportError:
-    PyPDF2 = None
+    PdfReader = None
 
 try:
     from docx import Document
@@ -201,16 +201,16 @@ class FileUploadService:
     async def process_pdf(self, file_path: Path) -> Dict[str, Any]:
         """Process PDF file and add to knowledge base."""
         try:
-            if PyPDF2 is None:
+            if PdfReader is None:
                 return {
                     "success": False,
-                    "error": "PyPDF2 not installed. Run: pip install PyPDF2",
+                    "error": "pypdf not installed. Run: pip install pypdf>=4.0.0",
                 }
 
             documents = []
 
             with open(file_path, "rb") as file:
-                pdf_reader = PyPDF2.PdfReader(file)
+                pdf_reader = PdfReader(file)
                 total_pages = len(pdf_reader.pages)
 
                 for page_num in range(total_pages):

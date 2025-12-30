@@ -4,6 +4,8 @@
 """
 Security utilities - JWT, password hashing, authentication
 Industry-standard security implementation
+
+UPDATED: Migrated from python-jose to PyJWT (security fix for CRITICAL CVE)
 """
 
 import hashlib
@@ -13,9 +15,10 @@ import secrets
 from datetime import datetime, timedelta
 from typing import Any, Dict, Optional
 
+import jwt
 from fastapi import Depends, HTTPException, Security
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from jose import JWTError, jwt
+from jwt.exceptions import InvalidTokenError
 from passlib.context import CryptContext
 
 logger = logging.getLogger(__name__)
@@ -77,6 +80,7 @@ class SecurityManager:
             }
         )
 
+        # PyJWT encode (same API as python-jose)
         encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
         return encoded_jwt
 
@@ -94,9 +98,10 @@ class SecurityManager:
             HTTPException: If token is invalid or expired
         """
         try:
+            # PyJWT decode (same API as python-jose)
             payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
             return payload
-        except JWTError as e:
+        except InvalidTokenError as e:
             logger.warning(f"JWT verification failed: {e}")
             raise HTTPException(
                 status_code=401,
