@@ -1,0 +1,55 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+.venv
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.next/
+out/
+build/
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Logs
+*.log
+logs/
+
+# Environment
+.env
+.env.local
+
+# Docker
+.dockerignore
+
+# Build artifacts
+dist/
+build/
+*.egg-info/
+
+# Data (excluded per OPEA guidelines)
+data/
+*.csv
+*.xlsx
+*.pdf
+*.docx
+
+# Temporary files
+*.tmp
+*.bak
+*.backup
