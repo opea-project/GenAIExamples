@@ -69,4 +69,3 @@ repos:
       - id: flake8
         args: ["--max-line-length=120", "--ignore=E203,W503"]
         files: \.py$
-        exclude: '^((?!CogniwareIms/).)*$'

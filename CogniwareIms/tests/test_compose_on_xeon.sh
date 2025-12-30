@@ -4,8 +4,35 @@
 
 set -e
 
-WORKPATH=$(dirname "$PWD")
+# Calculate WORKPATH - handle both local and CI environments
+# If run from tests/ directory: WORKPATH = parent directory
+# If run from root: WORKPATH = current directory
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+if [ -f "$SCRIPT_DIR/../cogniwareims.py" ]; then
+    # We're in the CogniwareIms directory structure
+    WORKPATH="$(cd "$SCRIPT_DIR/.." && pwd)"
+elif [ -f "$SCRIPT_DIR/../../CogniwareIms/cogniwareims.py" ]; then
+    # We're in GenAIExamples/CogniwareIms/tests
+    WORKPATH="$(cd "$SCRIPT_DIR/../.." && pwd)/CogniwareIms"
+else
+    # Fallback: assume we're in the example directory
+    WORKPATH="$(cd "$SCRIPT_DIR/.." && pwd)"
+fi
+
 LOG_PATH="$WORKPATH/tests"
+
+# Debug output
+echo "SCRIPT_DIR: $SCRIPT_DIR"
+echo "WORKPATH: $WORKPATH"
+echo "Verifying WORKPATH..."
+if [ ! -f "$WORKPATH/cogniwareims.py" ] && [ ! -f "$WORKPATH/CogniwareIms/cogniwareims.py" ]; then
+    echo "WARNING: cogniwareims.py not found in WORKPATH. Attempting to locate..."
+    # Try to find it
+    if [ -f "$(dirname "$SCRIPT_DIR")/cogniwareims.py" ]; then
+        WORKPATH="$(dirname "$SCRIPT_DIR")"
+        echo "Found cogniwareims.py at: $WORKPATH"
+    fi
+fi
 
 # Get IP address with fallback to localhost
 if command -v hostname >/dev/null 2>&1; then
@@ -45,13 +72,27 @@ wait_for_service() {
 
 function build_docker_images() {
     echo "Building Docker images..."
-    cd $WORKPATH/docker_image_build
+    if [ -d "$WORKPATH/docker_image_build" ]; then
+        cd "$WORKPATH/docker_image_build"
+    elif [ -d "$WORKPATH/CogniwareIms/docker_image_build" ]; then
+        cd "$WORKPATH/CogniwareIms/docker_image_build"
+    else
+        echo "ERROR: docker_image_build directory not found"
+        exit 1
+    fi
     docker compose -f build.yaml build
 }
 
 function start_services() {
     echo "Starting Cogniware IMS services on Intel Xeon..."
-    cd $WORKPATH/docker_compose/intel/cpu/xeon
+    if [ -d "$WORKPATH/docker_compose/intel/cpu/xeon" ]; then
+        cd "$WORKPATH/docker_compose/intel/cpu/xeon"
+    elif [ -d "$WORKPATH/CogniwareIms/docker_compose/intel/cpu/xeon" ]; then
+        cd "$WORKPATH/CogniwareIms/docker_compose/intel/cpu/xeon"
+    else
+        echo "ERROR: docker_compose/intel/cpu/xeon directory not found"
+        exit 1
+    fi
 
     # Set environment variables
     export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
@@ -195,7 +236,13 @@ function validate_frontend() {
 
 function stop_services() {
     echo "Stopping services..."
-    cd $WORKPATH/docker_compose/intel/cpu/xeon
+    if [ -d "$WORKPATH/docker_compose/intel/cpu/xeon" ]; then
+        cd "$WORKPATH/docker_compose/intel/cpu/xeon"
+    elif [ -d "$WORKPATH/CogniwareIms/docker_compose/intel/cpu/xeon" ]; then
+        cd "$WORKPATH/CogniwareIms/docker_compose/intel/cpu/xeon"
+    else
+        echo "Warning: docker_compose directory not found, attempting cleanup anyway"
+    fi
     docker compose down -v 2>/dev/null || {
         echo "Warning: Some containers may not have stopped cleanly"
         docker ps -a | grep cogniware || true
