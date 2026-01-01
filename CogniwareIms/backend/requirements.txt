@@ -14,7 +14,7 @@ passlib[bcrypt]==1.7.4
 # HTTP Client - FIXED: Updated aiohttp (memory leak and smuggling fixes)
 aiohttp>=3.11.0  # FIXED: Updated from 3.10.10
 httpx==0.27.2
-httpx-mock==0.11.0  # License: MIT (verified)
+respx>=0.22.0  # Mocking library for httpx (replaces non-existent httpx-mock) - License: BSD-3-Clause
 
 # Form Data - FIXED: Updated python-multipart (DoS vulnerability)
 python-multipart>=0.0.9  # FIXED: Updated from 0.0.12
