@@ -58,6 +58,7 @@ MANIFEST
 
 # Data (excluded per OPEA guidelines)
 data/
+assets/data/
 *.csv
 *.xlsx
 *.pdf
