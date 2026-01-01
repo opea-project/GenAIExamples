@@ -56,6 +56,7 @@ services:
       MODEL_ID: ${EMBEDDING_MODEL_ID:-BAAI/bge-base-en-v1.5}
       PORT: 80
       MAX_BATCH_TOKENS: 16384
+      HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       # Intel Xeon optimizations
       OMP_NUM_THREADS: 4
       KMP_AFFINITY: "granularity=fine,compact,1,0"
@@ -67,7 +68,8 @@ services:
       test: ["CMD", "curl", "-f", "http://localhost:80/health"]
       interval: 30s
       timeout: 10s
-      retries: 3
+      retries: 10
+      start_period: 120s
 
   # Embedding Microservice
   embedding:
@@ -125,6 +127,7 @@ services:
     environment:
       MODEL_ID: ${RERANK_MODEL_ID:-BAAI/bge-reranker-base}
       PORT: 80
+      HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       no_proxy: ${no_proxy}
@@ -132,7 +135,8 @@ services:
       test: ["CMD", "curl", "-f", "http://localhost:80/health"]
       interval: 30s
       timeout: 10s
-      retries: 3
+      retries: 10
+      start_period: 120s
 
   # Reranking Microservice
   reranking:
@@ -179,7 +183,8 @@ services:
       test: ["CMD", "curl", "-f", "http://localhost:80/health"]
       interval: 30s
       timeout: 10s
-      retries: 3
+      retries: 10
+      start_period: 180s
 
   # LLM Microservice
   llm-tgi:
