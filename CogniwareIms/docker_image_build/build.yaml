@@ -3,14 +3,14 @@
 
 # OPEA Cogniware IMS - Docker Image Build Configuration
 # Build context: Parent directory (CogniwareIms root)
-# Dockerfile paths: Relative to context
+# Dockerfile paths: Relative to context (not compose file location)
 
 services:
   # Frontend UI Service
   cogniwareims-ui:
     build:
       context: ../
-      dockerfile: frontend/Dockerfile
+      dockerfile: ./frontend/Dockerfile
       args:
         http_proxy: ${http_proxy}
         https_proxy: ${https_proxy}
@@ -22,7 +22,7 @@ services:
   cogniwareims-backend:
     build:
       context: ../
-      dockerfile: backend/Dockerfile
+      dockerfile: ./backend/Dockerfile
       args:
         http_proxy: ${http_proxy}
         https_proxy: ${https_proxy}
