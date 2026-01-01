@@ -11,9 +11,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements and install dependencies
+# Copy requirements and build wheels
+# Note: We build wheels WITH dependencies to ensure all packages can build correctly
+# The --no-deps flag can fail for packages that need dependencies during build
 COPY backend/requirements.txt .
-RUN pip wheel --no-cache-dir --no-deps --wheel-dir /build/wheels -r requirements.txt
+RUN pip wheel --no-cache-dir --wheel-dir /build/wheels -r requirements.txt
 
 # Production image
 FROM python:3.11-slim
@@ -39,9 +41,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 WORKDIR /app
 
 # Copy wheels from builder and install
+# Install from wheels directory - pip will resolve dependencies from wheels
 COPY --from=builder /build/wheels /wheels
 COPY --from=builder /build/requirements.txt .
-RUN pip install --no-cache /wheels/*
+RUN pip install --no-cache-dir --find-links /wheels -r requirements.txt
 
 # Copy application code
 COPY --chown=appuser:appuser backend/app ./app
