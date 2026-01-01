@@ -2,6 +2,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 # OPEA Cogniware IMS - Docker Image Build Configuration
+# Build context: Parent directory (CogniwareIms root)
+# Dockerfile paths: Relative to context
 
 services:
   # Frontend UI Service
