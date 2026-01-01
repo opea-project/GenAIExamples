@@ -1,6 +1,5 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
-
 """File Upload Service Handles xlsx, csv, pdf, docx file uploads and processing for knowledge base Optimized for Intel
 Xeon processors."""
 
@@ -107,9 +106,7 @@ class FileUploadService:
             documents = []
             for idx, row in df.iterrows():
                 # Create text representation
-                text_parts = [
-                    f"{col}: {row[col]}" for col in df.columns if pd.notna(row[col])
-                ]
+                text_parts = [f"{col}: {row[col]}" for col in df.columns if pd.notna(row[col])]
                 text = " | ".join(text_parts)
 
                 documents.append(
@@ -160,9 +157,7 @@ class FileUploadService:
                 df = pd.read_excel(file_path, sheet_name=sheet_name)
 
                 for idx, row in df.iterrows():
-                    text_parts = [
-                        f"{col}: {row[col]}" for col in df.columns if pd.notna(row[col])
-                    ]
+                    text_parts = [f"{col}: {row[col]}" for col in df.columns if pd.notna(row[col])]
                     text = " | ".join(text_parts)
 
                     all_documents.append(
@@ -369,9 +364,7 @@ class FileUploadService:
 
         return result
 
-    def list_uploaded_files(
-        self, file_type: Optional[str] = None
-    ) -> List[Dict[str, Any]]:
+    def list_uploaded_files(self, file_type: Optional[str] = None) -> List[Dict[str, Any]]:
         """List all uploaded files."""
         files = []
 
@@ -392,9 +385,7 @@ class FileUploadService:
                                 "filename": file_path.name,
                                 "type": file_path.suffix[1:],
                                 "size": stat.st_size,
-                                "uploaded_at": datetime.fromtimestamp(
-                                    stat.st_ctime
-                                ).isoformat(),
+                                "uploaded_at": datetime.fromtimestamp(stat.st_ctime).isoformat(),
                                 "path": str(file_path),
                             }
                         )
@@ -403,6 +394,4 @@ class FileUploadService:
 
 
 # Global instance
-file_upload_service = FileUploadService(
-    upload_dir=os.getenv("UPLOAD_DIR", "/app/uploads")
-)
+file_upload_service = FileUploadService(upload_dir=os.getenv("UPLOAD_DIR", "/app/uploads"))
