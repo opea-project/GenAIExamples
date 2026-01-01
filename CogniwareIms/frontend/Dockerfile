@@ -7,11 +7,17 @@ RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
 # Install dependencies (including dev dependencies for build)
-# Copy package files - ensure both are copied explicitly
-COPY frontend/package.json ./
-COPY frontend/package-lock.json ./
-# Use npm ci for deterministic builds (requires package-lock.json)
-RUN npm ci --legacy-peer-deps || (echo "Warning: npm ci failed, falling back to npm install" && npm install --legacy-peer-deps)
+# Copy package files - copy all package*.json files from frontend
+# This handles both package.json and package-lock.json if it exists
+COPY frontend/package*.json ./
+# Use npm ci if lock file exists, otherwise use npm install
+RUN if [ -f package-lock.json ]; then \
+      echo "Found package-lock.json, using npm ci for deterministic build"; \
+      npm ci --legacy-peer-deps || (echo "npm ci failed, falling back to npm install" && npm install --legacy-peer-deps); \
+    else \
+      echo "package-lock.json not found, using npm install"; \
+      npm install --legacy-peer-deps; \
+    fi
 
 # Rebuild the source code only when needed
 FROM base AS builder
