@@ -47,16 +47,19 @@ services:
   tei-embedding-service:
     image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
     container_name: tei-embedding-server
+    restart: unless-stopped
     ports:
       - "8090:80"
     volumes:
       - "../../../../assets/data:/data"
-    shm_size: 1g
+    shm_size: 2g
     environment:
       MODEL_ID: ${EMBEDDING_MODEL_ID:-BAAI/bge-base-en-v1.5}
       PORT: 80
       MAX_BATCH_TOKENS: 16384
       HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      # Enable faster model downloads
+      HF_HUB_ENABLE_HF_TRANSFER: "1"
       # Intel Xeon optimizations
       OMP_NUM_THREADS: 4
       KMP_AFFINITY: "granularity=fine,compact,1,0"
@@ -69,7 +72,7 @@ services:
       interval: 30s
       timeout: 10s
       retries: 10
-      start_period: 120s
+      start_period: 180s
 
   # Embedding Microservice
   embedding:
@@ -119,15 +122,18 @@ services:
   tei-reranking-service:
     image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
     container_name: tei-reranking-server
+    restart: unless-stopped
     ports:
       - "8808:80"
     volumes:
       - "../../../../assets/data:/data"
-    shm_size: 1g
+    shm_size: 2g
     environment:
       MODEL_ID: ${RERANK_MODEL_ID:-BAAI/bge-reranker-base}
       PORT: 80
       HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      # Enable faster model downloads
+      HF_HUB_ENABLE_HF_TRANSFER: "1"
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       no_proxy: ${no_proxy}
@@ -136,7 +142,7 @@ services:
       interval: 30s
       timeout: 10s
       retries: 10
-      start_period: 120s
+      start_period: 180s
 
   # Reranking Microservice
   reranking:
@@ -164,17 +170,20 @@ services:
   tgi-service:
     image: ghcr.io/huggingface/text-generation-inference:2.0.1
     container_name: tgi-service
+    restart: unless-stopped
     ports:
       - "8008:80"
     volumes:
       - "../../../../assets/data:/data"
-    shm_size: 1g
+    shm_size: 2g
     environment:
       MODEL_ID: ${LLM_MODEL_ID:-Intel/neural-chat-7b-v3-3}
       HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
       MAX_INPUT_LENGTH: 2048
       MAX_TOTAL_TOKENS: 4096
       PORT: 80
+      # Enable faster model downloads
+      HF_HUB_ENABLE_HF_TRANSFER: "1"
       # Intel Xeon optimizations
       OMP_NUM_THREADS: 8
       KMP_AFFINITY: "granularity=fine,compact,1,0"
@@ -184,7 +193,7 @@ services:
       interval: 30s
       timeout: 10s
       retries: 10
-      start_period: 180s
+      start_period: 300s
 
   # LLM Microservice
   llm-tgi:
