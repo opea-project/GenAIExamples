@@ -36,7 +36,7 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ../../../backend/app/db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - ../../../../backend/app/db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
@@ -50,7 +50,7 @@ services:
     ports:
       - "8090:80"
     volumes:
-      - "../../../assets/data:/data"
+      - "../../../../assets/data:/data"
     shm_size: 1g
     environment:
       MODEL_ID: ${EMBEDDING_MODEL_ID:-BAAI/bge-base-en-v1.5}
@@ -120,7 +120,7 @@ services:
     ports:
       - "8808:80"
     volumes:
-      - "../../../assets/data:/data"
+      - "../../../../assets/data:/data"
     shm_size: 1g
     environment:
       MODEL_ID: ${RERANK_MODEL_ID:-BAAI/bge-reranker-base}
@@ -163,7 +163,7 @@ services:
     ports:
       - "8008:80"
     volumes:
-      - "../../../assets/data:/data"
+      - "../../../../assets/data:/data"
     shm_size: 1g
     environment:
       MODEL_ID: ${LLM_MODEL_ID:-Intel/neural-chat-7b-v3-3}
@@ -231,7 +231,7 @@ services:
   # Cogniware IMS Backend (Megaservice + Application Logic)
   cogniwareims-backend:
     build:
-      context: ../../..
+      context: ../../../../  # From docker_compose/intel/cpu/xeon/ go up 4 levels to CogniwareIms root
       dockerfile: backend/Dockerfile
     container_name: cogniwareims-backend
     depends_on:
@@ -269,7 +269,7 @@ services:
       https_proxy: ${https_proxy}
       no_proxy: ${no_proxy}
     volumes:
-      - ../../../assets/data:/app/data:ro
+      - ../../../../assets/data:/app/data:ro
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
       interval: 30s
@@ -279,7 +279,7 @@ services:
   # Cogniware IMS Frontend UI
   cogniwareims-ui:
     build:
-      context: ../../..
+      context: ../../../../  # From docker_compose/intel/cpu/xeon/ go up 4 levels to CogniwareIms root
       dockerfile: frontend/Dockerfile
     container_name: cogniwareims-ui
     depends_on:
