@@ -15,8 +15,8 @@ EXAMPLE_CONFIGS = {
         "docker_compose": {
             "paths": {
                 "debian": {
-                    "xeon": "docker_compose/intel/cpu/xeon/compose.yaml",
-                    "gaudi": "docker_compose/intel/hpu/gaudi/compose.yaml",
+                    "xeon": "docker_compose/intel/cpu/xeon/compose_tgi.yaml",
+                    "gaudi": "docker_compose/intel/hpu/gaudi/compose_tgi.yaml",
                 },
             },
             "set_env_scripts": {
