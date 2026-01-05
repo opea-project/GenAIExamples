@@ -136,7 +136,6 @@ class Deployer:
         if not self.project_name:
             self.project_name = f"{self.example_name.lower().replace(' ', '')}-{self.args.device}"
         compose_files = self._get_docker_compose_files()
-        log_message("DEBUG", f"Compose files found: {compose_files}")
         if not compose_files:
             return None
         cmd = self.compose_command.split()
