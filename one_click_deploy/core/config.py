@@ -10,75 +10,6 @@ COMMON_SCRIPTS_DIR = SCRIPT_ROOT_DIR / "common"
 LOG_FILE_PATH = SCRIPT_ROOT_DIR / "deployment.log"
 
 EXAMPLE_CONFIGS = {
-    "ArbPostHearingAssistant": {
-        "base_dir": "ArbPostHearingAssistant",
-        "docker_compose": {
-            "paths": {
-                "debian": {
-                    "xeon": "docker_compose/intel/cpu/xeon/compose_tgi.yaml",
-                    "gaudi": "docker_compose/intel/hpu/gaudi/compose_tgi.yaml",
-                },
-            },
-            "set_env_scripts": {
-                "xeon": "docker_compose/intel/set_env.sh",
-                "gaudi": "docker_compose/intel/set_env.sh",
-            },
-            "params_to_set_env": {
-                "llm_model": "LLM_MODEL_ID",
-                "hf_token": "HF_TOKEN",
-            },
-        },
-        "supported_os": ["debian"],
-        "default_os": "debian",
-        "supported_devices": {
-            "debian": ["xeon", "gaudi"],
-        },
-        "default_device": "xeon",
-        "offline_support": ["docker"],
-        "ports": {
-            "docker": {
-                "backend": "8888",
-                "llm": "8008",
-            },
-        },
-        "test_connections": {
-            "main_service": {
-                "service_key": "backend",
-                "path": "/v1/arb-post-hearing",
-                "method": "POST",
-                "payload": {
-                    "messages": [{"role": "user", "content": "[10:00 AM] Arbitrator Hon. Rebecca Lawson: Good morning. This hearing is now in session for Case No. ARB/2025/0917. Lets begin with appearances. [10:01 AM] Attorney Michael Grant for Mr. Jonathan Reed: Good morning Your Honor. I represent the claimant Mr. Jonathan Reed. [10:01 AM] Attorney Lisa Chen for Ms. Rachel Morgan: Good morning. I represent the respondent Ms. Rachel Morgan. [10:03 AM] Arbitrator Hon. Rebecca Lawson: Thank you. Lets proceed with Mr. Reeds opening statement. [10:04 AM] Attorney Michael Grant: Ms. Morgan failed to deliver services as per the agreement dated March 15 2023. We have submitted relevant documentation including email correspondence and payment records. The delay caused substantial financial harm to our client. [10:15 AM] Attorney Lisa Chen: We deny any breach of contract. The delays were due to regulatory issues outside our control. Furthermore Mr. Reed did not provide timely approvals which contributed to the delay. [10:30 AM] Arbitrator Hon. Rebecca Lawson: Lets turn to Clause Z of the agreement. Id like both parties to submit written briefs addressing the applicability of the force majeure clause and the timeline of approvals. [11:00 AM] Attorney Michael Grant: Understood. Well submit by the deadline. [11:01 AM] Attorney Lisa Chen: Agreed. [11:02 AM] Arbitrator Hon. Rebecca Lawson: The next hearing is scheduled for October 22 2025 at 1030 AM Eastern Time. Please ensure your witnesses are available for cross examination. [4:45 PM] Arbitrator Hon. Rebecca Lawson: This session is adjourned. Thank you everyone."}],
-                    "type": "text",
-                    "language": "en",
-                    "max_new_tokens": 100,
-                },
-                "headers": {"Content-Type": "application/json"},
-                "expect_code": 200,
-            },
-            "sub_services": [
-                {
-                    "name": "llm_check",
-                    "service_key": "llm",
-                    "path": "/v1/arb-post-hearing",
-                    "method": "POST",
-                    "payload_dynamic_llm_model": True,
-                    "default_llm_model_id_for_test": "mistralai/Mistral-7B-Instruct-v0.2",
-                    "payload_template": {"role": "user", "content": "[10:00 AM] Arbitrator Hon. Rebecca Lawson: Good morning. This hearing is now in session for Case No. ARB/2025/0917. Lets begin with appearances. [10:01 AM] Attorney Michael Grant for Mr. Jonathan Reed: Good morning Your Honor. I represent the claimant Mr. Jonathan Reed. [10:01 AM] Attorney Lisa Chen for Ms. Rachel Morgan: Good morning. I represent the respondent Ms. Rachel Morgan. [10:03 AM] Arbitrator Hon. Rebecca Lawson: Thank you. Lets proceed with Mr. Reeds opening statement. [10:04 AM] Attorney Michael Grant: Ms. Morgan failed to deliver services as per the agreement dated March 15 2023. We have submitted relevant documentation including email correspondence and payment records. The delay caused substantial financial harm to our client. [10:15 AM] Attorney Lisa Chen: We deny any breach of contract. The delays were due to regulatory issues outside our control. Furthermore Mr. Reed did not provide timely approvals which contributed to the delay. [10:30 AM] Arbitrator Hon. Rebecca Lawson: Lets turn to Clause Z of the agreement. Id like both parties to submit written briefs addressing the applicability of the force majeure clause and the timeline of approvals. [11:00 AM] Attorney Michael Grant: Understood. Well submit by the deadline. [11:01 AM] Attorney Lisa Chen: Agreed. [11:02 AM] Arbitrator Hon. Rebecca Lawson: The next hearing is scheduled for October 22 2025 at 1030 AM Eastern Time. Please ensure your witnesses are available for cross examination. [4:45 PM] Arbitrator Hon. Rebecca Lawson: This session is adjourned. Thank you everyone.", "type":"text", "language":"en"},
-                    "headers": {"Content-Type": "application/json"},
-                    "expect_code": 200,
-                    "expect_response_contains": "case_number",
-                }
-            ],
-        },
-        "interactive_params": [
-            {
-                "name": "llm_model",
-                "prompt": "LLM Model ID",
-                "type": str,
-                "help": "e.g., mistralai/Mistral-7B-Instruct-v0.2",
-            },
-        ],
-    },
     "ChatQnA": {
         "base_dir": "ChatQnA",
         "docker_compose": {
@@ -814,6 +745,75 @@ EXAMPLE_CONFIGS = {
                 },
             ],
         },
+    },
+    "ArbPostHearingAssistant": {
+        "base_dir": "ArbPostHearingAssistant",
+        "docker_compose": {
+            "paths": {
+                "debian": {
+                    "xeon": "docker_compose/intel/cpu/xeon/compose_tgi.yaml",
+                    "gaudi": "docker_compose/intel/hpu/gaudi/compose_tgi.yaml",
+                },
+            },
+            "set_env_scripts": {
+                "xeon": "docker_compose/intel/set_env.sh",
+                "gaudi": "docker_compose/intel/set_env.sh",
+            },
+            "params_to_set_env": {
+                "llm_model": "LLM_MODEL_ID",
+                "hf_token": "HF_TOKEN",
+            },
+        },
+        "supported_os": ["debian"],
+        "default_os": "debian",
+        "supported_devices": {
+            "debian": ["xeon", "gaudi"],
+        },
+        "default_device": "xeon",
+        "offline_support": ["docker"],
+        "ports": {
+            "docker": {
+                "backend": "8888",
+                "llm": "8008",
+            },
+        },
+        "test_connections": {
+            "main_service": {
+                "service_key": "backend",
+                "path": "/v1/arb-post-hearing",
+                "method": "POST",
+                "payload": {
+                    "messages": [{"role": "user", "content": "[10:00 AM] Arbitrator Hon. Rebecca Lawson: Good morning. This hearing is now in session for Case No. ARB/2025/0917. Lets begin with appearances. [10:01 AM] Attorney Michael Grant for Mr. Jonathan Reed: Good morning Your Honor. I represent the claimant Mr. Jonathan Reed. [10:01 AM] Attorney Lisa Chen for Ms. Rachel Morgan: Good morning. I represent the respondent Ms. Rachel Morgan. [10:03 AM] Arbitrator Hon. Rebecca Lawson: Thank you. Lets proceed with Mr. Reeds opening statement. [10:04 AM] Attorney Michael Grant: Ms. Morgan failed to deliver services as per the agreement dated March 15 2023. We have submitted relevant documentation including email correspondence and payment records. The delay caused substantial financial harm to our client. [10:15 AM] Attorney Lisa Chen: We deny any breach of contract. The delays were due to regulatory issues outside our control. Furthermore Mr. Reed did not provide timely approvals which contributed to the delay. [10:30 AM] Arbitrator Hon. Rebecca Lawson: Lets turn to Clause Z of the agreement. Id like both parties to submit written briefs addressing the applicability of the force majeure clause and the timeline of approvals. [11:00 AM] Attorney Michael Grant: Understood. Well submit by the deadline. [11:01 AM] Attorney Lisa Chen: Agreed. [11:02 AM] Arbitrator Hon. Rebecca Lawson: The next hearing is scheduled for October 22 2025 at 1030 AM Eastern Time. Please ensure your witnesses are available for cross examination. [4:45 PM] Arbitrator Hon. Rebecca Lawson: This session is adjourned. Thank you everyone."}],
+                    "type": "text",
+                    "language": "en",
+                    "max_new_tokens": 100,
+                },
+                "headers": {"Content-Type": "application/json"},
+                "expect_code": 200,
+            },
+            "sub_services": [
+                {
+                    "name": "llm_check",
+                    "service_key": "llm",
+                    "path": "/v1/arb-post-hearing",
+                    "method": "POST",
+                    "payload_dynamic_llm_model": True,
+                    "default_llm_model_id_for_test": "mistralai/Mistral-7B-Instruct-v0.2",
+                    "payload_template": {"role": "user", "content": "[10:00 AM] Arbitrator Hon. Rebecca Lawson: Good morning. This hearing is now in session for Case No. ARB/2025/0917. Lets begin with appearances. [10:01 AM] Attorney Michael Grant for Mr. Jonathan Reed: Good morning Your Honor. I represent the claimant Mr. Jonathan Reed. [10:01 AM] Attorney Lisa Chen for Ms. Rachel Morgan: Good morning. I represent the respondent Ms. Rachel Morgan. [10:03 AM] Arbitrator Hon. Rebecca Lawson: Thank you. Lets proceed with Mr. Reeds opening statement. [10:04 AM] Attorney Michael Grant: Ms. Morgan failed to deliver services as per the agreement dated March 15 2023. We have submitted relevant documentation including email correspondence and payment records. The delay caused substantial financial harm to our client. [10:15 AM] Attorney Lisa Chen: We deny any breach of contract. The delays were due to regulatory issues outside our control. Furthermore Mr. Reed did not provide timely approvals which contributed to the delay. [10:30 AM] Arbitrator Hon. Rebecca Lawson: Lets turn to Clause Z of the agreement. Id like both parties to submit written briefs addressing the applicability of the force majeure clause and the timeline of approvals. [11:00 AM] Attorney Michael Grant: Understood. Well submit by the deadline. [11:01 AM] Attorney Lisa Chen: Agreed. [11:02 AM] Arbitrator Hon. Rebecca Lawson: The next hearing is scheduled for October 22 2025 at 1030 AM Eastern Time. Please ensure your witnesses are available for cross examination. [4:45 PM] Arbitrator Hon. Rebecca Lawson: This session is adjourned. Thank you everyone.", "type":"text", "language":"en"},
+                    "headers": {"Content-Type": "application/json"},
+                    "expect_code": 200,
+                    "expect_response_contains": "case_number",
+                }
+            ],
+        },
+        "interactive_params": [
+            {
+                "name": "llm_model",
+                "prompt": "LLM Model ID",
+                "type": str,
+                "help": "e.g., mistralai/Mistral-7B-Instruct-v0.2",
+            },
+        ],
     },
 }
 
