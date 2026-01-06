@@ -1,3 +1,6 @@
+# Copyright (C) 2026 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 # Pre-commit hooks configuration for OPEA compliance
 # See https://pre-commit.com for more information
 
