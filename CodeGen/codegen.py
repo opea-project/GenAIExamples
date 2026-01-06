@@ -17,7 +17,7 @@ from comps.cores.proto.api_protocol import (
 from comps.cores.proto.docarray import LLMParams
 from fastapi import Request
 from fastapi.responses import StreamingResponse
-from langchain.prompts import PromptTemplate
+from langchain_core.prompts import PromptTemplate
 
 logger = CustomLogger("opea_dataprep_microservice")
 logflag = os.getenv("LOGFLAG", False)

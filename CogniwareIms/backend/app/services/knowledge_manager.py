@@ -1,6 +1,5 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
-
 """Knowledge Base Manager Handles continuous learning and knowledge base updates Allows users to add new knowledge and
 retrain on combined old+new data."""
 
@@ -107,9 +106,7 @@ class KnowledgeManager:
             logger.error(f"Error adding knowledge: {e}")
             return {"success": False, "error": str(e)}
 
-    async def add_knowledge_from_csv(
-        self, csv_file: Path, auto_train: bool = True
-    ) -> Dict[str, Any]:
+    async def add_knowledge_from_csv(self, csv_file: Path, auto_train: bool = True) -> Dict[str, Any]:
         """Add knowledge from CSV file Each row becomes a document in the knowledge base."""
         try:
             df = pd.read_csv(csv_file)
@@ -117,9 +114,7 @@ class KnowledgeManager:
 
             for idx, row in df.iterrows():
                 # Create text representation
-                text_parts = [
-                    f"{col}: {row[col]}" for col in df.columns if pd.notna(row[col])
-                ]
+                text_parts = [f"{col}: {row[col]}" for col in df.columns if pd.notna(row[col])]
                 text = " | ".join(text_parts)
 
                 # Add to knowledge base
@@ -284,9 +279,7 @@ class KnowledgeManager:
             query_embedding = await embedding_service.embed_text(query)
 
             # Search vector store
-            results = await retrieval_service.search(
-                query_embedding=query_embedding, top_k=top_k, filters=filters
-            )
+            results = await retrieval_service.search(query_embedding=query_embedding, top_k=top_k, filters=filters)
 
             return results
 
@@ -332,9 +325,7 @@ class KnowledgeManager:
             )
             self.save_history()
 
-            logger.info(
-                f"Retraining complete: {success_count}/{len(documents)} documents"
-            )
+            logger.info(f"Retraining complete: {success_count}/{len(documents)} documents")
 
             return {
                 "success": True,
@@ -355,9 +346,7 @@ class KnowledgeManager:
                 "total_documents": total_docs,
                 "last_update": self.history.get("last_update"),
                 "training_runs": len(self.history.get("training_runs", [])),
-                "recent_runs": self.history.get("training_runs", [])[
-                    -5:
-                ],  # Last 5 runs
+                "recent_runs": self.history.get("training_runs", [])[-5:],  # Last 5 runs
                 "storage": {"vector_store": "Redis", "indexed": total_docs},
             }
         except Exception as e:
@@ -377,10 +366,7 @@ class KnowledgeManager:
             }
 
             if not output_file:
-                output_file = (
-                    self.knowledge_dir
-                    / f"export_{datetime.now().strftime('%Y%m%d%H%M%S')}.json"
-                )
+                output_file = self.knowledge_dir / f"export_{datetime.now().strftime('%Y%m%d%H%M%S')}.json"
 
             with open(output_file, "w") as f:
                 json.dump(export_data, f, indent=2)
@@ -402,10 +388,7 @@ class KnowledgeManager:
 
             # Add all documents
             result = await self.add_knowledge_batch(
-                documents=[
-                    {"text": doc["text"], "metadata": doc.get("metadata", {})}
-                    for doc in documents
-                ],
+                documents=[{"text": doc["text"], "metadata": doc.get("metadata", {})} for doc in documents],
                 source=f"import_{import_file.stem}",
             )
 
