@@ -1,6 +1,5 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
-
 """OPEA Interactive Agent Service Handles conversational AI interactions with context awareness."""
 
 import json
@@ -32,9 +31,7 @@ class InteractiveAgent:
     def _add_to_history(self, session_id: str, role: str, content: str):
         """Add message to conversation history."""
         history = self._get_session_history(session_id)
-        history.append(
-            {"role": role, "content": content, "timestamp": datetime.now().isoformat()}
-        )
+        history.append({"role": role, "content": content, "timestamp": datetime.now().isoformat()})
 
         # Keep only last N messages
         if len(history) > self.max_history * 2:  # *2 for user+assistant pairs
@@ -82,9 +79,7 @@ class InteractiveAgent:
                 db_result = await dbqna_service.query_inventory(message)
                 if db_result.get("success"):
                     context_parts.append("Current Database Information:")
-                    context_parts.append(
-                        json.dumps(db_result.get("result", {}), indent=2)
-                    )
+                    context_parts.append(json.dumps(db_result.get("result", {}), indent=2))
                     sources.append({"type": "database", "query": message})
 
             # Step 3: Get conversation history
@@ -99,9 +94,7 @@ class InteractiveAgent:
             )
 
             # Step 5: Generate response
-            response_text = await llm_service.chat_completion(
-                messages=messages, temperature=0.7
-            )
+            response_text = await llm_service.chat_completion(messages=messages, temperature=0.7)
 
             # Step 6: Update conversation history
             self._add_to_history(session_id, "user", message)
@@ -150,18 +143,14 @@ class InteractiveAgent:
         message_lower = message.lower()
         return any(keyword in message_lower for keyword in db_keywords)
 
-    async def _get_rag_context(
-        self, query: str, top_k: int = 3
-    ) -> Optional[Dict[str, Any]]:
+    async def _get_rag_context(self, query: str, top_k: int = 3) -> Optional[Dict[str, Any]]:
         """Get relevant context from knowledge base using RAG."""
         try:
             # Generate query embedding
             query_embedding = await embedding_service.embed_text(query)
 
             # Search vector store
-            results = await retrieval_service.search(
-                query_embedding=query_embedding, top_k=top_k
-            )
+            results = await retrieval_service.search(query_embedding=query_embedding, top_k=top_k)
 
             if not results:
                 return None

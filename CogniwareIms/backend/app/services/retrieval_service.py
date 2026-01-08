@@ -1,6 +1,5 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
-
 """OPEA Retrieval Service Integration Handles semantic search and document retrieval using Redis vector store."""
 
 import json
@@ -27,14 +26,10 @@ class RetrievalService:
     async def get_redis_client(self):
         """Get or create Redis client."""
         if self.redis_client is None:
-            self.redis_client = await redis.from_url(
-                self.redis_url, encoding="utf-8", decode_responses=False
-            )
+            self.redis_client = await redis.from_url(self.redis_url, encoding="utf-8", decode_responses=False)
         return self.redis_client
 
-    async def index_document(
-        self, doc_id: str, text: str, embedding: List[float], metadata: Dict[str, Any]
-    ) -> bool:
+    async def index_document(self, doc_id: str, text: str, embedding: List[float], metadata: Dict[str, Any]) -> bool:
         """Index a document in the vector store."""
         try:
             # Store in Redis
@@ -88,9 +83,7 @@ class RetrievalService:
                     return result.get("results", [])
 
         except Exception as e:
-            logger.warning(
-                f"OPEA retrieval service unavailable, using direct Redis: {e}"
-            )
+            logger.warning(f"OPEA retrieval service unavailable, using direct Redis: {e}")
 
         # Fallback to direct Redis search
         return await self._redis_search(query_embedding, top_k, filters)
@@ -111,9 +104,7 @@ class RetrievalService:
 
             for doc_id in doc_ids:
                 # Get document
-                doc_json = await client.get(
-                    f"doc:{doc_id.decode() if isinstance(doc_id, bytes) else doc_id}"
-                )
+                doc_json = await client.get(f"doc:{doc_id.decode() if isinstance(doc_id, bytes) else doc_id}")
                 if doc_json:
                     doc = json.loads(doc_json)
                     doc_embedding = np.array(doc.get("embedding", []))
@@ -170,9 +161,7 @@ class RetrievalService:
             logger.error(f"Error deleting document {doc_id}: {e}")
             return False
 
-    async def update_document(
-        self, doc_id: str, text: str, embedding: List[float], metadata: Dict[str, Any]
-    ) -> bool:
+    async def update_document(self, doc_id: str, text: str, embedding: List[float], metadata: Dict[str, Any]) -> bool:
         """Update an existing document."""
         # Delete old version
         await self.delete_document(doc_id)
@@ -194,9 +183,7 @@ class RetrievalService:
             logger.error(f"Error retrieving document {doc_id}: {e}")
             return None
 
-    async def get_all_documents(
-        self, limit: int = 100, offset: int = 0
-    ) -> List[Dict[str, Any]]:
+    async def get_all_documents(self, limit: int = 100, offset: int = 0) -> List[Dict[str, Any]]:
         """Get all indexed documents."""
         try:
             client = await self.get_redis_client()
@@ -204,9 +191,7 @@ class RetrievalService:
 
             documents = []
             for i, doc_id in enumerate(list(doc_ids)[offset : offset + limit]):
-                doc = await self.get_document(
-                    doc_id.decode() if isinstance(doc_id, bytes) else doc_id
-                )
+                doc = await self.get_document(doc_id.decode() if isinstance(doc_id, bytes) else doc_id)
                 if doc:
                     documents.append(doc)
 
@@ -233,9 +218,7 @@ class RetrievalService:
             doc_ids = await client.smembers("document_ids")
 
             for doc_id in doc_ids:
-                await self.delete_document(
-                    doc_id.decode() if isinstance(doc_id, bytes) else doc_id
-                )
+                await self.delete_document(doc_id.decode() if isinstance(doc_id, bytes) else doc_id)
 
             logger.warning("Cleared all documents from vector store")
             return True
