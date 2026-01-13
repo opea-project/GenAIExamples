@@ -107,7 +107,9 @@ Based on the context above, provide a detailed and accurate answer:"""
         """
         schema_str = json.dumps(schema, indent=2)
 
-        system_prompt = f"""You are an expert SQL generator. Given a database schema and a natural language question, generate a valid SQL query.
+        system_prompt = (
+            f"""You are an expert SQL generator. Given a database schema and a """
+            f"""natural language question, generate a valid SQL query.
 
 Database Schema:
 {schema_str}
@@ -137,7 +139,9 @@ Rules:
 
     async def summarize_text(self, text: str, max_length: int = 150) -> str:
         """Summarize long text using OPEA DocSummarization pattern."""
-        prompt = f"""Summarize the following text in {max_length} words or less. Focus on key points and important details:
+        prompt = (
+            f"""Summarize the following text in {max_length} words or less. """
+            f"""Focus on key points and important details:
 
 Text:
 {text}
@@ -148,7 +152,9 @@ Summary:"""
 
     async def extract_entities(self, text: str) -> List[Dict[str, str]]:
         """Extract named entities from text Useful for inventory data extraction."""
-        prompt = f"""Extract all product names, SKUs, quantities, and locations from the following text. Return as JSON list.
+        prompt = (
+            f"""Extract all product names, SKUs, quantities, and locations """
+            f"""from the following text. Return as JSON list.
 
 Text: {text}
 
@@ -206,7 +212,11 @@ Insights:"""
 
         context = "\n".join(context_parts)
 
-        system_prompt = """You are an AI assistant for inventory management. Answer questions accurately based on the provided inventory data. Be concise and specific."""
+        system_prompt = (
+            "You are an AI assistant for inventory management. "
+            "Answer questions accurately based on the provided inventory data. "
+            "Be concise and specific."
+        )
 
         return await self.query_with_context(question, context, system_prompt)
 
@@ -248,7 +258,7 @@ Insights:"""
             async with httpx.AsyncClient(timeout=httpx.Timeout(5.0)) as client:
                 response = await client.get(f"{self.base_url}/v1/health_check")
                 return response.status_code == 200
-        except:
+        except Exception:
             return False
 
 

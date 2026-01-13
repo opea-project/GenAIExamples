@@ -12,12 +12,10 @@ RAG, DBQnA, document summarization, and continuous learning. Built with CogniDRE
 """
 
 import os
-from typing import List, Optional
 
 from comps import MegaServiceEndpoint, MicroService, ServiceOrchestrator, ServiceType
 from comps.cores.proto.api_protocol import ChatCompletionRequest
 from fastapi import FastAPI, Request
-from fastapi.responses import StreamingResponse
 
 
 class CogniwareIMSService:
@@ -194,7 +192,7 @@ async def dataprep_endpoint(request: Request):
     - Technical documentation
     - Knowledge base documents
     """
-    data = await request.json()
+    await request.json()  # Process request data
     # Forward to dataprep microservice
     return {"status": "success", "message": "Data prepared successfully"}
 
