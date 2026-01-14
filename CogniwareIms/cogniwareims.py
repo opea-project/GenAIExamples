@@ -84,9 +84,7 @@ class CogniwareIMSService:
         )
 
         # Add services to megaservice
-        self.megaservice.add(embedding_service).add(retriever_service).add(
-            rerank_service
-        ).add(llm_service)
+        self.megaservice.add(embedding_service).add(retriever_service).add(rerank_service).add(llm_service)
         self.megaservice.add(dataprep_service)
 
         # Define service flow for RAG pipeline
@@ -96,9 +94,7 @@ class CogniwareIMSService:
         self.megaservice.flow_to(rerank_service, llm_service)
 
 
-def align_inputs(
-    self, inputs: dict, cur_node: MicroService, runtime_graph: dict
-) -> dict:
+def align_inputs(self, inputs: dict, cur_node: MicroService, runtime_graph: dict) -> dict:
     """Align input format for different microservices.
 
     Args:
@@ -156,9 +152,7 @@ async def cogniwareims_endpoint(request: Request):
     chat_request = ChatCompletionRequest(**data)
 
     # Process through megaservice pipeline
-    result = await cogniwareims_service.megaservice.schedule(
-        initial_inputs={"messages": chat_request.messages}
-    )
+    result = await cogniwareims_service.megaservice.schedule(initial_inputs={"messages": chat_request.messages})
 
     return result
 
