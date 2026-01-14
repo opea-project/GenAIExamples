@@ -3,7 +3,7 @@
 
 services:
   vllm-service:
-    image: opea/vllm-gaudi:1.4
+    image: opea/vllm-gaudi:1.23.0
     container_name: docsum-gaudi-vllm-service
     ports:
       - ${LLM_ENDPOINT_PORT:-8008}:80
