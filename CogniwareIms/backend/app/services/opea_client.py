@@ -1,6 +1,5 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
-
 """OPEA Microservices Client Handles communication with OPEA GenAIComps microservices."""
 
 import logging
@@ -26,37 +25,27 @@ class OPEAClient:
         """Generate embeddings using OPEA embedding service."""
         try:
             async with httpx.AsyncClient(timeout=self.timeout) as client:
-                response = await client.post(
-                    f"{self.embedding_url}/v1/embeddings", json={"text": text}
-                )
+                response = await client.post(f"{self.embedding_url}/v1/embeddings", json={"text": text})
                 response.raise_for_status()
                 result = response.json()
                 return result.get("embedding", [])
         except Exception as e:
             logger.error(f"Embedding generation failed: {e}")
-            raise HTTPException(
-                status_code=500, detail=f"Embedding service error: {str(e)}"
-            )
+            raise HTTPException(status_code=500, detail=f"Embedding service error: {str(e)}")
 
-    async def query_with_rag(
-        self, query: str, context: Optional[str] = None
-    ) -> Dict[str, Any]:
+    async def query_with_rag(self, query: str, context: Optional[str] = None) -> Dict[str, Any]:
         """Query using Retrieval-Augmented Generation."""
         try:
             async with httpx.AsyncClient(timeout=self.timeout) as client:
                 payload = {"question": query, "context": context or ""}
-                response = await client.post(
-                    f"{self.llm_url}/v1/chat/completions", json=payload
-                )
+                response = await client.post(f"{self.llm_url}/v1/chat/completions", json=payload)
                 response.raise_for_status()
                 return response.json()
         except Exception as e:
             logger.error(f"RAG query failed: {e}")
             raise HTTPException(status_code=500, detail=f"LLM service error: {str(e)}")
 
-    async def query_database(
-        self, question: str, database_schema: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+    async def query_database(self, question: str, database_schema: Optional[Dict] = None) -> Dict[str, Any]:
         """Query database using OPEA DBQnA agent."""
         try:
             async with httpx.AsyncClient(timeout=self.timeout) as client:
@@ -87,9 +76,7 @@ class OPEAClient:
         """Summarize document using OPEA DocSummarization agent."""
         try:
             async with httpx.AsyncClient(timeout=self.timeout) as client:
-                response = await client.post(
-                    f"{self.llm_url}/v1/summarize", json={"text": text}
-                )
+                response = await client.post(f"{self.llm_url}/v1/summarize", json={"text": text})
                 response.raise_for_status()
                 result = response.json()
                 return result.get("summary", "")
