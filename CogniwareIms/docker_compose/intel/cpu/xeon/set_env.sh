@@ -21,4 +21,3 @@ export https_proxy=${https_proxy:-""}
 export no_proxy=${no_proxy:-"localhost,127.0.0.1"}
 
 echo "Environment variables set for Cogniware IMS deployment on Intel Xeon"
-
