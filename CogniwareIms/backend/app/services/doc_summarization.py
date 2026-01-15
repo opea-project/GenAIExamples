@@ -1,6 +1,5 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
-
 """OPEA DocSummarization Service Handles document summarization and analysis."""
 
 import json
@@ -69,9 +68,7 @@ Summary:"""
                 "original_length": len(text.split()),
                 "summary": summary.strip(),
                 "summary_length": len(summary.split()),
-                "compression_ratio": round(
-                    len(summary.split()) / max(len(text.split()), 1), 2
-                ),
+                "compression_ratio": round(len(summary.split()) / max(len(text.split()), 1), 2),
                 "type": summary_type,
             }
 
@@ -79,9 +76,7 @@ Summary:"""
             logger.error(f"Summarization error: {e}")
             return {"success": False, "error": str(e)}
 
-    async def summarize_inventory_report(
-        self, report_data: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    async def summarize_inventory_report(self, report_data: Dict[str, Any]) -> Dict[str, Any]:
         """Summarize inventory report data Specialized for inventory metrics."""
         try:
             # Convert report data to narrative text
@@ -124,9 +119,7 @@ Analysis:"""
         if "stock_by_category" in report_data:
             parts.append("\nStock by Category:")
             for cat in report_data["stock_by_category"]:
-                parts.append(
-                    f"  - {cat['category']}: {cat['count']} units ({cat['percentage']}%)"
-                )
+                parts.append(f"  - {cat['category']}: {cat['count']} units ({cat['percentage']}%)")
 
         if "recent_activity" in report_data:
             parts.append("\nRecent Activity:")
@@ -179,9 +172,7 @@ JSON:"""
             logger.error(f"Information extraction error: {e}")
             return {"success": False, "error": str(e)}
 
-    async def summarize_csv_data(
-        self, csv_path: str, sample_size: int = 100
-    ) -> Dict[str, Any]:
+    async def summarize_csv_data(self, csv_path: str, sample_size: int = 100) -> Dict[str, Any]:
         """Summarize CSV file contents."""
         try:
             df = pd.read_csv(csv_path)
@@ -207,25 +198,16 @@ JSON:"""
                 "success": True,
                 "file": csv_path,
                 "statistics": stats,
-                "summary": (
-                    summary["summary"] if summary["success"] else "Summary unavailable"
-                ),
+                "summary": (summary["summary"] if summary["success"] else "Summary unavailable"),
             }
 
         except Exception as e:
             logger.error(f"CSV summarization error: {e}")
             return {"success": False, "error": str(e)}
 
-    async def generate_report_narrative(
-        self, title: str, data_points: List[Dict[str, Any]]
-    ) -> str:
+    async def generate_report_narrative(self, title: str, data_points: List[Dict[str, Any]]) -> str:
         """Generate narrative report from data points."""
-        data_text = "\n".join(
-            [
-                f"- {dp.get('label', 'Item')}: {dp.get('value', 'N/A')}"
-                for dp in data_points
-            ]
-        )
+        data_text = "\n".join([f"- {dp.get('label', 'Item')}: {dp.get('value', 'N/A')}" for dp in data_points])
 
         prompt = f"""Generate a professional narrative report titled "{title}" based on the following data:
 
