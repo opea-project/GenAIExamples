@@ -3,7 +3,7 @@
 
 # OPEA Cogniware IMS - Docker Image Build Configuration
 # Build context: Parent directory (CogniwareIms root)
-# Dockerfile paths: Relative to context (not compose file location)
+# Dockerfile paths: Relative to context
 
 services:
   # Frontend UI Service

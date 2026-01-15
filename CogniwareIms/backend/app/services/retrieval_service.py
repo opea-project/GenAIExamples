@@ -253,7 +253,7 @@ class RetrievalService:
             async with httpx.AsyncClient(timeout=httpx.Timeout(5.0)) as client:
                 response = await client.get(f"{self.base_url}/v1/health_check")
                 status["opea_service"] = response.status_code == 200
-        except Exception:
+        except:
             pass
 
         # Check Redis
@@ -262,7 +262,7 @@ class RetrievalService:
             await client.ping()
             status["redis"] = True
             status["document_count"] = await self.count_documents()
-        except Exception:
+        except:
             pass
 
         return status

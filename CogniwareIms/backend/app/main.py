@@ -9,8 +9,11 @@ Full integration with all OPEA GenAIComps microservices
 import logging
 import os
 from datetime import datetime
+from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+import httpx
+from app.services.csv_processor import csv_processor
 from app.services.dbqna_service import dbqna_service
 from app.services.doc_summarization import doc_summarization
 
@@ -23,6 +26,7 @@ from app.services.knowledge_manager import knowledge_manager
 from app.services.llm_service import llm_service
 from app.services.retrieval_service import retrieval_service
 from fastapi import (
+    Depends,
     FastAPI,
     File,
     HTTPException,
@@ -614,7 +618,7 @@ class ConnectionManager:
         for connection in self.active_connections:
             try:
                 await connection.send_json(message)
-            except Exception:
+            except:
                 pass
 
 

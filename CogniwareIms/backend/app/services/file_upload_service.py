@@ -29,7 +29,9 @@ try:
 except ImportError:
     Document = None
 
+from .embedding_service import embedding_service
 from .knowledge_manager import knowledge_manager
+from .retrieval_service import retrieval_service
 
 logger = logging.getLogger(__name__)
 

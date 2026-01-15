@@ -126,10 +126,7 @@ class InteractiveAgent:
             return {
                 "success": False,
                 "error": str(e),
-                "response": (
-                    "I apologize, but I encountered an error processing your request. "
-                    "Please try rephrasing your question."
-                ),
+                "response": "I apologize, but I encountered an error processing your request. Please try rephrasing your question.",
             }
 
     async def _is_database_query(self, message: str) -> bool:
@@ -200,19 +197,9 @@ class InteractiveAgent:
 
         # System prompt based on user role
         role_prompts = {
-            "Consumer": (
-                "You are a helpful AI assistant for product research and PC building. "
-                "Help users find products and make informed decisions."
-            ),
-            "Inventory Manager": (
-                "You are an AI assistant for inventory management. "
-                "Help with stock queries, warehouse operations, and data analysis. "
-                "Be precise with numbers and locations."
-            ),
-            "Super Admin": (
-                "You are an AI assistant for system administration. "
-                "Provide comprehensive insights and administrative support."
-            ),
+            "Consumer": "You are a helpful AI assistant for product research and PC building. Help users find products and make informed decisions.",
+            "Inventory Manager": "You are an AI assistant for inventory management. Help with stock queries, warehouse operations, and data analysis. Be precise with numbers and locations.",
+            "Super Admin": "You are an AI assistant for system administration. Provide comprehensive insights and administrative support.",
         }
 
         system_content = role_prompts.get(user_role, "You are a helpful AI assistant.")

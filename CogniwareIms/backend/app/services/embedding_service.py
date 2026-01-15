@@ -100,7 +100,7 @@ class EmbeddingService:
                     try:
                         emb = await self.embed_text(text)
                         embeddings.append(emb)
-                    except Exception:
+                    except:
                         embeddings.append([0.0] * 768)  # Zero vector as last resort
 
         return embeddings
@@ -167,7 +167,7 @@ class EmbeddingService:
             async with httpx.AsyncClient(timeout=httpx.Timeout(5.0)) as client:
                 response = await client.get(f"{self.base_url}/v1/health_check")
                 return response.status_code == 200
-        except Exception:
+        except:
             return False
 
 

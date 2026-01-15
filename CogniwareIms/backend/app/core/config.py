@@ -5,7 +5,7 @@
 
 import os
 from functools import lru_cache
-from typing import List
+from typing import List, Optional
 
 from pydantic_settings import BaseSettings
 

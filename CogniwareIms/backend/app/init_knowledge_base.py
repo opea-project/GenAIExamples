@@ -14,10 +14,10 @@ import pandas as pd
 # Add parent directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from app.services.csv_processor import csv_processor  # noqa: E402
-from app.services.embedding_service import embedding_service  # noqa: E402
-from app.services.knowledge_manager import knowledge_manager  # noqa: E402
-from app.services.retrieval_service import retrieval_service  # noqa: E402
+from app.services.csv_processor import csv_processor
+from app.services.embedding_service import embedding_service
+from app.services.knowledge_manager import knowledge_manager
+from app.services.retrieval_service import retrieval_service
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"

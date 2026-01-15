@@ -6,11 +6,11 @@ OPEA DBQnA Service - Database Query & Answer
 Converts natural language to SQL and executes against inventory database
 """
 
-import json
 import logging
 import os
-from typing import Any, Dict
+from typing import Any, Dict, List, Optional
 
+import sqlalchemy
 from sqlalchemy import create_engine, text
 
 from .llm_service import llm_service
@@ -224,7 +224,7 @@ Provide a natural language summary of the results."""
             with engine.connect() as conn:
                 conn.execute(text("SELECT 1"))
             return True
-        except Exception:
+        except:
             return False
 
 

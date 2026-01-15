@@ -8,7 +8,6 @@ import os
 from typing import Any, Dict, List, Optional
 
 import httpx
-from fastapi import HTTPException
 
 logger = logging.getLogger(__name__)
 
@@ -121,15 +120,6 @@ class OPEAClient:
             "llm": self.llm_url,
             "dbqna": self.dbqna_url,
         }
-
-        async def check_service(url: str) -> bool:
-            """Check if a service is available."""
-            try:
-                async with httpx.AsyncClient(timeout=httpx.Timeout(5.0)) as client:
-                    response = await client.get(f"{url}/v1/health_check")
-                    return response.status_code == 200
-            except Exception:
-                return False
 
         status = {}
         for name, url in services.items():
