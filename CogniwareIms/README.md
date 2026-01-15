@@ -91,4 +91,3 @@ Apache 2.0 - See [LICENSE](LICENSE) file for details.
 ## Support
 
 For issues and questions, please open an issue in the OPEA GenAIExamples repository.
-
