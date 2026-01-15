@@ -1,3 +1,6 @@
+# Copyright (C) 2026 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 apiVersion: v2
 name: cogniwareims
 description: OPEA Cogniware IMS - AI-powered Inventory Management System built with Cogn DREAM
