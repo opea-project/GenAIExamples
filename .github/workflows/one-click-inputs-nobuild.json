@@ -204,6 +204,28 @@
         ],
         "clear": ["8", "1", "2", "docker", "$os", "$hardware", "Y"]
       }
+    },
+    "ArbPostHearingAssistant": {
+      "inputs": {
+        "deploy": [
+          "9",
+          "1",
+          "1",
+          "docker",
+          "$os",
+          "$hardware",
+          "$HF_TOKEN",
+          "$http_proxy",
+          "$https_proxy",
+          "$no_proxy",
+          "$LLM_model",
+          "N",
+          "N",
+          "y",
+          "Y"
+        ],
+        "clear": ["9", "1", "2", "docker", "$os", "$hardware", "Y"]
+      }
     }
   },
   "k8s": {
