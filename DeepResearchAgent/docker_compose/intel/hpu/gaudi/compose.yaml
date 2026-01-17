@@ -8,22 +8,12 @@ x-common-environment:
   http_proxy: ${http_proxy}
   https_proxy: ${https_proxy}
 
-x-common-agent-environment:
-  &common-agent-env
-  <<: *common-env
-  HF_TOKEN: ${HF_TOKEN}
-  model: ${LLM_MODEL_ID}
-  TAVILY_API_KEY: ${TAVILY_API_KEY}
-  OPENAI_API_KEY: ${OPENAI_API_KEY}
-  OPENAI_BASE_URL: ${OPENAI_BASE_URL}
-
 services:
-
   vllm-service:
     image: opea/vllm-gaudi:1.22.0
     container_name: vllm-gaudi-server
     ports:
-      - "8000:8000"
+      - ${VLLM_PORT:-8000}:8000
     volumes:
       - ${HF_CACHE_DIR:-./data}:/data
     environment:
@@ -34,10 +24,10 @@ services:
       OMPI_MCA_btl_vader_single_copy_mechanism: none
       LLM_MODEL_ID: ${LLM_MODEL_ID}
       VLLM_TORCH_PROFILER_DIR: "/mnt"
-      VLLM_SKIP_WARMUP: true
+      VLLM_SKIP_WARMUP: ${VLLM_SKIP_WARMUP:-true}
       PT_HPU_ENABLE_LAZY_COLLECTIVES: true
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://$HOST_IP:8000/health || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://${HOST_IP}:${VLLM_PORT:-8000}/health || exit 1"]
       interval: 10s
       timeout: 10s
       retries: 100
@@ -45,7 +35,7 @@ services:
     cap_add:
       - SYS_NICE
     ipc: host
-    command: --model ${LLM_MODEL_ID} --tensor-parallel-size ${NUM_CARDS} --host 0.0.0.0 --port 8000 --max-seq-len-to-capture $MAX_LEN
+    command: --model ${LLM_MODEL_ID} --tensor-parallel-size ${NUM_CARDS} --enable-auto-tool-choice --tool-call-parser ${TOOL_CALL_PARSER} --host 0.0.0.0 --port 8000 --max-seq-len-to-capture ${MAX_LEN}
 
   deep-research-agent-server:
     image: ${REGISTRY:-opea}/deep-research-agent:${TAG:-latest}
@@ -56,4 +46,14 @@ services:
       - "8022:8022"
     ipc: host
     environment:
-      <<: *common-agent-env
+      <<: *common-env
+      HF_TOKEN: ${HF_TOKEN}
+      model: ${LLM_MODEL_ID}
+      TAVILY_API_KEY: ${TAVILY_API_KEY}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      OPENAI_BASE_URL: ${OPENAI_BASE_URL}
+      MAX_CONCURRENT_RESEARCH_UNITS: ${MAX_CONCURRENT_RESEARCH_UNITS:-3}
+      MAX_RESEARCHER_ITERATIONS: ${MAX_RESEARCHER_ITERATIONS:-3}
+      RESEARCHER_INSTRUCTIONS: ${RESEARCHER_INSTRUCTIONS:-""}
+      RESEARCH_WORKFLOW_INSTRUCTIONS: ${RESEARCH_WORKFLOW_INSTRUCTIONS:-""}
+      SUBAGENT_DELEGATION_INSTRUCTIONS: ${SUBAGENT_DELEGATION_INSTRUCTIONS:-""}
