@@ -1,6 +1,5 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
-
 """Graph Generation Service Generates data for charts and visualizations."""
 
 import logging
@@ -14,9 +13,7 @@ logger = logging.getLogger(__name__)
 class GraphGenerator:
     """Generate data structures for frontend charts and graphs."""
 
-    async def generate_stock_trend(
-        self, product_sku: str, days: int = 30
-    ) -> Dict[str, Any]:
+    async def generate_stock_trend(self, product_sku: str, days: int = 30) -> Dict[str, Any]:
         """Generate stock level trend data for time-series charts."""
         # In production, this would query actual historical data
         # For now, generate realistic sample data
@@ -178,9 +175,7 @@ class GraphGenerator:
 
         for day_idx, day in enumerate(days):
             for hour in range(24):
-                activity = (
-                    random.randint(5, 95) if 8 <= hour <= 18 else random.randint(0, 30)
-                )
+                activity = random.randint(5, 95) if 8 <= hour <= 18 else random.randint(0, 30)
                 heatmap.append({"day": day, "hour": hour, "activity": activity})
 
         return {
@@ -189,9 +184,7 @@ class GraphGenerator:
             "dimensions": {"days": days, "hours": 24},
         }
 
-    async def generate_forecast(
-        self, product_sku: str, forecast_days: int = 30
-    ) -> Dict[str, Any]:
+    async def generate_forecast(self, product_sku: str, forecast_days: int = 30) -> Dict[str, Any]:
         """Generate demand forecast using simple moving average In production, would use ML models."""
         # Get historical data (simulated)
         historical = []
@@ -210,9 +203,7 @@ class GraphGenerator:
 
         # Generate forecast
         forecast = []
-        avg_demand = (
-            sum(h["actual"] for h in historical[-7:]) / 7
-        )  # 7-day moving average
+        avg_demand = sum(h["actual"] for h in historical[-7:]) / 7  # 7-day moving average
 
         for i in range(forecast_days):
             date = datetime.now() + timedelta(days=i + 1)
@@ -236,9 +227,7 @@ class GraphGenerator:
             "method": "moving_average",
         }
 
-    async def generate_comparison_chart(
-        self, items: List[str], metric: str = "stock_level"
-    ) -> Dict[str, Any]:
+    async def generate_comparison_chart(self, items: List[str], metric: str = "stock_level") -> Dict[str, Any]:
         """Generate comparison data for multiple items."""
         comparison_data = []
 
