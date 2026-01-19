@@ -1,6 +1,5 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
-
 """Application configuration Centralized settings management following 12-factor app principles."""
 
 import os
@@ -22,14 +21,10 @@ class Settings(BaseSettings):
 
     # API Configuration
     API_V1_PREFIX: str = "/api"
-    ALLOWED_ORIGINS: List[str] = os.getenv(
-        "ALLOWED_ORIGINS", "http://localhost:3000,http://frontend:3000"
-    ).split(",")
+    ALLOWED_ORIGINS: List[str] = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000,http://frontend:3000").split(",")
 
     # Security
-    JWT_SECRET_KEY: str = os.getenv(
-        "JWT_SECRET_KEY", "CHANGE_THIS_IN_PRODUCTION_USE_openssl_rand_hex_32"
-    )
+    JWT_SECRET_KEY: str = os.getenv("JWT_SECRET_KEY", "CHANGE_THIS_IN_PRODUCTION_USE_openssl_rand_hex_32")
     JWT_ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
@@ -39,9 +34,7 @@ class Settings(BaseSettings):
     RATE_LIMIT_PER_MINUTE: int = int(os.getenv("RATE_LIMIT_PER_MINUTE", "60"))
 
     # Database
-    DATABASE_URL: str = os.getenv(
-        "DATABASE_URL", "postgresql://postgres:postgres@postgres:5432/opea_ims"
-    )
+    DATABASE_URL: str = os.getenv("DATABASE_URL", "postgresql://postgres:postgres@postgres:5432/opea_ims")
     DB_POOL_SIZE: int = 10
     DB_MAX_OVERFLOW: int = 20
 
@@ -50,13 +43,9 @@ class Settings(BaseSettings):
     REDIS_MAX_CONNECTIONS: int = 50
 
     # OPEA Services
-    OPEA_EMBEDDING_URL: str = os.getenv(
-        "OPEA_EMBEDDING_URL", "http://embedding-service:6000"
-    )
+    OPEA_EMBEDDING_URL: str = os.getenv("OPEA_EMBEDDING_URL", "http://embedding-service:6000")
     OPEA_LLM_URL: str = os.getenv("OPEA_LLM_URL", "http://llm-service:9000")
-    OPEA_RETRIEVAL_URL: str = os.getenv(
-        "OPEA_RETRIEVAL_URL", "http://retrieval-service:7000"
-    )
+    OPEA_RETRIEVAL_URL: str = os.getenv("OPEA_RETRIEVAL_URL", "http://retrieval-service:7000")
     OPEA_GATEWAY_URL: str = os.getenv("OPEA_GATEWAY_URL", "http://opea-gateway:8888")
 
     # Models

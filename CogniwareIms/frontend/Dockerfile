@@ -1,3 +1,6 @@
+# Copyright (C) 2026 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 # Multi-stage build for Next.js production optimization
 FROM node:18-alpine AS base
 
