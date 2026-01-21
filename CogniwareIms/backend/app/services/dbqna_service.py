@@ -5,6 +5,7 @@ OPEA DBQnA Service - Database Query & Answer
 Converts natural language to SQL and executes against inventory database
 """
 
+import json
 import logging
 import os
 from typing import Any, Dict, List, Optional
