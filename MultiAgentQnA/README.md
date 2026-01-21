@@ -128,7 +128,7 @@ docker ps
 
 ```bash
 git clone https://github.com/opea-project/GenAIExamples.git
-cd GenAISamples/multiagent-qna
+cd GenAIExamples/MultiAgentQnA
 ```
 
 ### Set up the Environment
@@ -168,7 +168,7 @@ INFERENCE_MODEL_NAME=meta-llama/Llama-3.1-8B-Instruct
 Start both API and UI services together with Docker Compose:
 
 ```bash
-# From the rag-chatbot directory
+# From the MultiAgentQnA directory
 docker compose up --build
 
 # Or run in detached mode (background)

@@ -191,7 +191,7 @@ CORS_ORIGINS=*
 Start both API and UI services together with Docker Compose:
 
 ```bash
-# From the doc-summarization directory
+# From the DocSummarization directory
 docker compose up --build
 
 # Or run in detached mode (background)

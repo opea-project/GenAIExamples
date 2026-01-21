@@ -174,7 +174,7 @@ No changes needed. Uses default values.
 Start both API and UI services together with Docker Compose:
 
 ```bash
-# From the rag-chatbot directory
+# From the PdfToPodcast directory
 docker compose up --build
 
 # Or run in detached mode (background)

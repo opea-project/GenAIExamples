@@ -209,7 +209,7 @@ CORS_ALLOW_ORIGINS=["http://localhost:5173", "http://localhost:3000"]
 Start both API and UI services together with Docker Compose:
 
 ```bash
-# From the rag-chatbot directory
+# From the CodeTranslation directory
 docker compose up --build
 
 # Or run in detached mode (background)
