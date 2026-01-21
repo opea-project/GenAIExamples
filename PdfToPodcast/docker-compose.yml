@@ -1,0 +1,93 @@
+services:
+  pdf-service:
+    build:
+      context: ./api/pdf-service
+      dockerfile: Dockerfile
+    container_name: pdf-service
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./api/pdf-service:/app
+    networks:
+      - app_network
+    restart: unless-stopped
+
+  llm-service:
+    build:
+      context: ./api/llm-service
+      dockerfile: Dockerfile
+    container_name: llm-service
+    ports:
+      - "8002:8002"
+    env_file:
+      - ./api/llm-service/.env
+    volumes:
+      - ./api/llm-service:/app
+    networks:
+      - app_network
+    restart: unless-stopped
+
+  tts-service:
+    build:
+      context: ./api/tts-service
+      dockerfile: Dockerfile
+    container_name: tts-service
+    ports:
+      - "8003:8003"
+    env_file:
+      - ./api/tts-service/.env
+    volumes:
+      - ./api/tts-service:/app
+      - ./api/tts-service/static:/app/static
+    networks:
+      - app_network
+    restart: unless-stopped
+
+  # backend Gateway (Python)
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: backend
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./.env
+    depends_on:
+      - pdf-service
+      - llm-service
+      - tts-service
+    volumes:
+      - .:/app
+    networks:
+      - app_network
+    restart: unless-stopped
+
+
+  # Frontend (React)
+  frontend:
+    build:
+      context: ./ui
+      dockerfile: Dockerfile
+    container_name: frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_BACKEND_URL=http://localhost:8000
+      - VITE_API_URL=http://localhost:8000
+    depends_on:
+      - backend
+    networks:
+      - app_network
+    restart: unless-stopped
+
+##################################
+# 🔗 Shared Network
+##################################
+networks:
+  app_network:
+    driver: bridge
+
+volumes:
+  audio-files:
+    driver: local

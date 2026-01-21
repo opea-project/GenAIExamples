@@ -1,0 +1,64 @@
+services:
+  backend:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    container_name: docugen-microagents-backend
+    ports:
+      - "5001:5001"
+    env_file:
+      - ./api/.env
+    environment:
+      - PYTHONUNBUFFERED=1
+      - HOST=0.0.0.0
+      - API_PORT=5001
+    volumes:
+      - ./api:/app
+      - backend-tmp:/app/tmp
+      - /var/run/docker.sock:/var/run/docker.sock  # Docker socket for MCP server
+    networks:
+      - docugen-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  frontend:
+    build:
+      context: ./ui
+      dockerfile: Dockerfile
+    container_name: docugen-microagents-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - HOST=0.0.0.0
+      - PORT=3000
+      - VITE_API_URL=/api
+      - VITE_API_TARGET=http://backend:5001
+    volumes:
+      - ./ui:/app
+      - /app/node_modules
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - docugen-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"require('http').get('http://localhost:3000', (r) => process.exit(r.statusCode === 200 ? 0 : 1))\""]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  docugen-network:
+    driver: bridge
+    name: docugen-microagents-network
+
+volumes:
+  backend-tmp:
+    driver: local

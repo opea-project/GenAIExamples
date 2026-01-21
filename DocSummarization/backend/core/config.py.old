@@ -1,0 +1,107 @@
+"""
+Configuration Management for Doc-Sum Application
+Supports swapping between different LLM and Audio providers
+"""
+
+from pydantic_settings import BaseSettings
+from typing import Optional, Literal
+
+
+class Settings(BaseSettings):
+    """Application Settings - Swap endpoints here for different deployments"""
+
+    # ==================== Service Info ====================
+    SERVICE_NAME: str = "Document Summarization Service"
+    SERVICE_VERSION: str = "1.0.0"
+    SERVICE_PORT: int = 8000
+
+    # ==================== LLM Provider Configuration ====================
+    # Supported: "openai", "groq", "ollama", "vllm", "tgi"
+    LLM_PROVIDER: Literal["openai", "groq", "ollama", "vllm", "tgi"] = "openai"
+
+    # LLM Endpoint URLs (swap based on deployment)
+    LLM_ENDPOINT: str = "https://api.openai.com/v1"  # Change for local models
+    LLM_API_KEY: Optional[str] = None
+    LLM_MODEL: str = "gpt-4o-mini"
+
+    # LLM Generation Parameters
+    LLM_TEMPERATURE: float = 0.7
+    LLM_MAX_TOKENS: int = 2000
+    LLM_MAX_RETRIES: int = 3
+
+    # ==================== Audio Provider Configuration ====================
+    # Supported: "openai", "whisper-local", "faster-whisper"
+    AUDIO_PROVIDER: Literal["openai", "whisper-local", "faster-whisper"] = "openai"
+
+    # Audio Endpoint (for OpenAI Whisper API)
+    AUDIO_ENDPOINT: str = "https://api.openai.com/v1"
+    AUDIO_API_KEY: Optional[str] = None
+    AUDIO_MODEL: str = "whisper-1"
+
+    # ==================== PDF Processing ====================
+    MAX_PDF_SIZE_MB: int = 50
+    PDF_EXTRACT_IMAGES: bool = False  # OCR support (future)
+
+    # ==================== File Upload Limits ====================
+    MAX_FILE_SIZE_MB: int = 100
+    ALLOWED_AUDIO_FORMATS: list = [".mp3", ".wav", ".m4a", ".flac", ".ogg"]
+    ALLOWED_VIDEO_FORMATS: list = [".mp4", ".avi", ".mov", ".mkv"]
+    ALLOWED_PDF_FORMATS: list = [".pdf"]
+
+    # ==================== CORS Configuration ====================
+    CORS_ORIGINS: str = "*"  # Comma-separated list or "*" for all origins
+
+    # ==================== Logging ====================
+    LOG_LEVEL: str = "INFO"
+
+    class Config:
+        env_file = ".env"
+        case_sensitive = True
+
+    # ==================== Deployment Presets ====================
+
+    @classmethod
+    def for_openai(cls):
+        """Preset for OpenAI deployment"""
+        return cls(
+            LLM_PROVIDER="openai",
+            LLM_ENDPOINT="https://api.openai.com/v1",
+            AUDIO_PROVIDER="openai",
+            AUDIO_ENDPOINT="https://api.openai.com/v1"
+        )
+
+    @classmethod
+    def for_groq(cls):
+        """Preset for Groq deployment"""
+        return cls(
+            LLM_PROVIDER="groq",
+            LLM_ENDPOINT="https://api.groq.com/openai/v1",
+            AUDIO_PROVIDER="openai",  # Groq doesn't have audio, use OpenAI
+            AUDIO_ENDPOINT="https://api.openai.com/v1"
+        )
+
+    @classmethod
+    def for_local_ollama(cls):
+        """Preset for local Ollama deployment"""
+        return cls(
+            LLM_PROVIDER="ollama",
+            LLM_ENDPOINT="http://localhost:11434",
+            LLM_MODEL="llama3.2",
+            AUDIO_PROVIDER="whisper-local",
+            AUDIO_ENDPOINT="http://localhost:8000"
+        )
+
+    @classmethod
+    def for_local_vllm(cls):
+        """Preset for local vLLM deployment (AMD/NVIDIA GPUs)"""
+        return cls(
+            LLM_PROVIDER="vllm",
+            LLM_ENDPOINT="http://localhost:8000/v1",
+            LLM_MODEL="meta-llama/Llama-3.2-3B-Instruct",
+            AUDIO_PROVIDER="faster-whisper",
+            AUDIO_ENDPOINT="http://localhost:8001"
+        )
+
+
+# Global settings instance
+settings = Settings()

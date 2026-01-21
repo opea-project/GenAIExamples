@@ -1,0 +1,23 @@
+# Core Web Framework
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+python-multipart==0.0.6
+
+# LLM & AI APIs
+httpx==0.27.2
+requests==2.31.0
+openai==1.54.0  # Required for OpenAI-compatible API interface to Enterprise Inference
+
+# Document Processing
+pypdf==6.1.1
+python-docx==1.1.0
+pdf2image==1.16.3
+pytesseract==0.3.10
+Pillow==10.2.0
+
+# Configuration Management
+python-dotenv==1.0.0
+pydantic==2.5.3
+
+# Utilities
+aiofiles==23.2.1

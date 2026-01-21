@@ -1,0 +1,38 @@
+# Web Framework
+fastapi>=0.109.0
+uvicorn[standard]>=0.27.0
+python-multipart>=0.0.6
+sse-starlette>=1.6.5
+
+# Environment & Config
+python-dotenv>=1.0.0
+pydantic>=2.5.0
+pydantic-settings>=2.1.0
+
+# LangChain & LangGraph (Agentic Framework)
+langchain>=0.1.0
+langchain-openai>=0.0.5
+langgraph>=0.0.20
+langgraph-checkpoint-sqlite>=1.0.0
+langchain-community>=0.0.20
+
+# LLM APIs
+openai>=1.10.0
+httpx>=0.24.0
+requests>=2.31.0
+
+# Git Operations
+gitpython>=3.1.40
+
+# GitHub Integration
+PyGithub>=2.1.1
+
+# MCP (Model Context Protocol)
+mcp>=0.9.0
+
+# Code Analysis
+astroid>=3.0.0
+
+# Utilities
+aiofiles>=23.0.0
+aiosqlite>=0.20.0

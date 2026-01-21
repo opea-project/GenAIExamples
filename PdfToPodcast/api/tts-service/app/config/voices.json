@@ -1,0 +1,50 @@
+{
+  "openai_voices": {
+    "alloy": {
+      "name": "Alloy",
+      "description": "Neutral and balanced voice",
+      "gender": "neutral",
+      "suitable_for": ["host", "guest"]
+    },
+    "echo": {
+      "name": "Echo",
+      "description": "Deep and resonant voice",
+      "gender": "male",
+      "suitable_for": ["host", "guest"]
+    },
+    "fable": {
+      "name": "Fable",
+      "description": "Expressive and dynamic voice",
+      "gender": "female",
+      "suitable_for": ["host", "guest"]
+    },
+    "onyx": {
+      "name": "Onyx",
+      "description": "Strong and authoritative voice",
+      "gender": "male",
+      "suitable_for": ["host"]
+    },
+    "nova": {
+      "name": "Nova",
+      "description": "Warm and friendly voice",
+      "gender": "female",
+      "suitable_for": ["host", "guest"]
+    },
+    "shimmer": {
+      "name": "Shimmer",
+      "description": "Bright and energetic voice",
+      "gender": "female",
+      "suitable_for": ["guest"]
+    }
+  },
+  "default_voices": {
+    "host": "alloy",
+    "guest": "nova"
+  },
+  "audio_settings": {
+    "format": "mp3",
+    "sample_rate": 24000,
+    "model": "tts-1-hd",
+    "speed": 1.0
+  }
+}
