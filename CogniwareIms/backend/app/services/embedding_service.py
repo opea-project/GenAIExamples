@@ -1,6 +1,5 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
-
 """OPEA Embedding Service Integration Handles text vectorization and embedding generation."""
 
 import logging
@@ -60,9 +59,7 @@ class EmbeddingService:
             logger.error(f"Error generating embedding: {e}")
             raise
 
-    async def embed_batch(
-        self, texts: List[str], batch_size: int = 32
-    ) -> List[List[float]]:
+    async def embed_batch(self, texts: List[str], batch_size: int = 32) -> List[List[float]]:
         """Generate embeddings for multiple texts in batches More efficient for large datasets."""
         embeddings = []
 
@@ -80,9 +77,7 @@ class EmbeddingService:
 
                     # Extract embeddings
                     if "data" in result:
-                        batch_embeddings = [
-                            item["embedding"] for item in result["data"]
-                        ]
+                        batch_embeddings = [item["embedding"] for item in result["data"]]
                     else:
                         # Fallback: generate one by one
                         batch_embeddings = []
@@ -105,9 +100,7 @@ class EmbeddingService:
 
         return embeddings
 
-    async def embed_documents(
-        self, documents: List[Dict[str, Any]]
-    ) -> List[Dict[str, Any]]:
+    async def embed_documents(self, documents: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """Embed a list of documents with metadata Returns documents with added embedding field."""
         texts = [doc.get("text", "") for doc in documents]
         embeddings = await self.embed_batch(texts)
@@ -137,9 +130,7 @@ class EmbeddingService:
 
         return float(dot_product / (norm1 * norm2))
 
-    async def find_similar(
-        self, query_text: str, candidate_texts: List[str], top_k: int = 5
-    ) -> List[Dict[str, Any]]:
+    async def find_similar(self, query_text: str, candidate_texts: List[str], top_k: int = 5) -> List[Dict[str, Any]]:
         """Find most similar texts to query using cosine similarity."""
         # Generate query embedding
         query_embedding = await self.embed_text(query_text)
@@ -149,12 +140,8 @@ class EmbeddingService:
 
         # Calculate similarities
         similarities = []
-        for idx, (text, embedding) in enumerate(
-            zip(candidate_texts, candidate_embeddings)
-        ):
-            similarity = self.cosine_similarity(
-                tuple(query_embedding), tuple(embedding)
-            )
+        for idx, (text, embedding) in enumerate(zip(candidate_texts, candidate_embeddings)):
+            similarity = self.cosine_similarity(tuple(query_embedding), tuple(embedding))
             similarities.append({"text": text, "index": idx, "similarity": similarity})
 
         # Sort by similarity and return top k
