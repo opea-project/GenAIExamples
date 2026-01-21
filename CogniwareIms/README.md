@@ -77,13 +77,6 @@ This system uses the OPEA megaservice pattern to orchestrate multiple microservi
 - **Reranking Microservice**: Improve retrieval quality (BAAI/bge-reranker-base)
 - **DataPrep Microservice**: Document ingestion and processing
 
-## Documentation
-
-- [Deployment Guide](docs/DEPLOYMENT_GUIDE.md)
-- [Data Setup](docs/DATA_SETUP.md)
-- [OPEA Compliance](docs/OPEA_COMPLIANCE_SUMMARY.md)
-- [Contributing](docs/CONTRIBUTING.md)
-
 ## License
 
 Apache 2.0 - See [LICENSE](LICENSE) file for details.
@@ -91,4 +84,3 @@ Apache 2.0 - See [LICENSE](LICENSE) file for details.
 ## Support
 
 For issues and questions, please open an issue in the OPEA GenAIExamples repository.
-
