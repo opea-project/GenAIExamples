@@ -7,7 +7,7 @@ langchain-core==0.3.81
 langchain-milvus
 langchain-openai
 langgraph==0.6.10
-llama-index==0.12.36
+llama-index==0.13.0
 llama-index-core==0.13.0
 llama-index-embeddings-openvino==0.5.2
 llama-index-llms-openai==0.3.44
