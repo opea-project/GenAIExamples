@@ -97,8 +97,8 @@ docker ps
 ### Clone the Repository
 
 ```bash
-git clone https://github.com/cld2labs/GenAISamples.git
-cd GenAISamples/rag-chatbot
+git clone https://github.com/opea-project/GenAIExamples.git
+cd GenAIExamples/RAGChatbot
 ```
 
 ### Set up the Environment

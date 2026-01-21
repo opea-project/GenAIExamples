@@ -125,8 +125,8 @@ docker ps
 ### Clone the Repository
 
 ```bash
-git clone https://github.com/cld2labs/GenAISamples.git
-cd GenAISamples/doc-summarization
+git clone https://github.com/opea-project/GenAIExamples.git
+cd GenAIExamples/DocSummarization
 ```
 
 ### Set up the Environment

@@ -278,8 +278,8 @@ git --version
 ### Clone the Repository
 
 ```bash
-git clone https://github.com/cld2labs/GenAISamples.git
-cd GenAISamples/docugen-microagents
+git clone https://github.com/opea-project/GenAIExamples.git
+cd GenAIExamples/DocuGenMicroagents
 ```
 
 ### Docker Deployment (Recommended)
