@@ -1,7 +1,7 @@
 # Copyright (C) 2024
 # SPDX-License-Identifier: Apache-2.0
 
-FROM node:18-alpine AS base
+FROM node:20-alpine AS base
 
 # Install dependencies
 FROM base AS deps
