@@ -101,20 +101,67 @@ function build_docker_images() {
     cd "$build_dir"
     echo "Building from: $(pwd)"
     echo "Verifying build context..."
-    if [ ! -f "../backend/Dockerfile" ]; then
-        echo "ERROR: backend/Dockerfile not found relative to build directory"
+    
+    # Verify context resolves correctly
+    local context_dir="$(cd .. && pwd)"
+    echo "Context directory: $context_dir"
+    
+    if [ ! -f "$context_dir/backend/Dockerfile" ]; then
+        echo "ERROR: backend/Dockerfile not found in context"
+        echo "Context: $context_dir"
+        echo "Expected: $context_dir/backend/Dockerfile"
         echo "Current directory: $(pwd)"
-        echo "Expected: $(pwd)/../backend/Dockerfile"
         exit 1
     fi
-    if [ ! -f "../frontend/Dockerfile" ]; then
-        echo "ERROR: frontend/Dockerfile not found relative to build directory"
+    if [ ! -f "$context_dir/frontend/Dockerfile" ]; then
+        echo "ERROR: frontend/Dockerfile not found in context"
+        echo "Context: $context_dir"
+        echo "Expected: $context_dir/frontend/Dockerfile"
         echo "Current directory: $(pwd)"
-        echo "Expected: $(pwd)/../frontend/Dockerfile"
         exit 1
     fi
-    echo "Build context verified. Starting build..."
-    docker compose -f build.yaml build
+    
+    echo "Build context verified:"
+    echo "  Context: $context_dir"
+    echo "  Backend Dockerfile: $context_dir/backend/Dockerfile ✓"
+    echo "  Frontend Dockerfile: $context_dir/frontend/Dockerfile ✓"
+    echo "Starting build..."
+    
+    # Workaround for Docker Compose path resolution bug
+    # Build images directly with docker build instead of docker compose
+    # This avoids the path resolution issue with docker_compose directory
+    echo "Building images directly with docker build (workaround for compose path issue)..."
+    
+    cd "$context_dir"
+    echo "Building from context: $(pwd)"
+    
+    # Build backend image
+    echo "Building backend image..."
+    docker build \
+        -f backend/Dockerfile \
+        --build-arg http_proxy="${http_proxy}" \
+        --build-arg https_proxy="${https_proxy}" \
+        --build-arg no_proxy="${no_proxy}" \
+        -t opea/cogniwareims-backend:latest \
+        . || {
+        echo "ERROR: Backend build failed"
+        exit 1
+    }
+    
+    # Build frontend image
+    echo "Building frontend image..."
+    docker build \
+        -f frontend/Dockerfile \
+        --build-arg http_proxy="${http_proxy}" \
+        --build-arg https_proxy="${https_proxy}" \
+        --build-arg no_proxy="${no_proxy}" \
+        -t opea/cogniwareims-ui:latest \
+        . || {
+        echo "ERROR: Frontend build failed"
+        exit 1
+    }
+    
+    echo "All images built successfully!"
 }
 
 function start_services() {
