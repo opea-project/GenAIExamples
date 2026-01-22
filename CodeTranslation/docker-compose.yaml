@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    container_name: code-trans-backend
+    ports:
+      - "5001:5001"
+    env_file:
+      - .env
+    environment:
+      - BASE_URL=${BASE_URL}
+      - KEYCLOAK_CLIENT_ID=${KEYCLOAK_CLIENT_ID}
+      - KEYCLOAK_CLIENT_SECRET=${KEYCLOAK_CLIENT_SECRET}
+      - INFERENCE_MODEL_ENDPOINT=${INFERENCE_MODEL_ENDPOINT}
+      - INFERENCE_MODEL_NAME=${INFERENCE_MODEL_NAME}
+      - LLM_TEMPERATURE=${LLM_TEMPERATURE:-0.2}
+      - LLM_MAX_TOKENS=${LLM_MAX_TOKENS:-4096}
+      - MAX_CODE_LENGTH=${MAX_CODE_LENGTH:-10000}
+      - MAX_FILE_SIZE=${MAX_FILE_SIZE:-10485760}
+    networks:
+      - code-trans-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  frontend:
+    build:
+      context: ./ui
+      dockerfile: Dockerfile
+    container_name: code-trans-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - code-trans-network
+    restart: unless-stopped
+
+networks:
+  code-trans-network:
+    driver: bridge
