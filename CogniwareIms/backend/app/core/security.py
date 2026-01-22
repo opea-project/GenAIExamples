@@ -114,12 +114,12 @@ class SecurityManager:
     @staticmethod
     def hash_api_key(api_key: str) -> str:
         """Hash an API key for storage."""
-        return hashlib.sha256(api_key.encode()).hexdigest()
+        return pwd_context.hash(api_key)
 
     @staticmethod
     def verify_api_key(api_key: str, hashed_key: str) -> bool:
         """Verify an API key against its hash."""
-        return hashlib.sha256(api_key.encode()).hexdigest() == hashed_key
+        return pwd_context.verify(api_key, hashed_key)
 
 
 def get_current_user(
