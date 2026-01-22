@@ -1,11 +1,11 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
-
 """
 OPEA DBQnA Service - Database Query & Answer
 Converts natural language to SQL and executes against inventory database
 """
 
+import json
 import logging
 import os
 from typing import Any, Dict, List, Optional
@@ -22,9 +22,7 @@ class DBQnAService:
     """Database Query & Answer service using OPEA LLM for SQL generation."""
 
     def __init__(self):
-        self.database_url = os.getenv(
-            "DATABASE_URL", "postgresql://postgres:postgres@postgres:5432/opea_ims"
-        )
+        self.database_url = os.getenv("DATABASE_URL", "postgresql://postgres:postgres@postgres:5432/opea_ims")
         self.engine = None
         self.schema_cache = None
 
@@ -66,15 +64,9 @@ class DBQnAService:
                         ORDER BY ordinal_position
                     """
                     )
-                    columns = conn.execute(
-                        columns_query, {"table_name": table_name}
-                    ).fetchall()
+                    columns = conn.execute(columns_query, {"table_name": table_name}).fetchall()
 
-                    schema["tables"][table_name] = {
-                        "columns": [
-                            {"name": col, "type": dtype} for col, dtype in columns
-                        ]
-                    }
+                    schema["tables"][table_name] = {"columns": [{"name": col, "type": dtype} for col, dtype in columns]}
 
             self.schema_cache = schema
             return schema
@@ -83,9 +75,7 @@ class DBQnAService:
             logger.error(f"Error getting schema: {e}")
             return {"tables": {}, "relationships": []}
 
-    async def natural_language_query(
-        self, question: str, include_explanation: bool = True
-    ) -> Dict[str, Any]:
+    async def natural_language_query(self, question: str, include_explanation: bool = True) -> Dict[str, Any]:
         """Convert natural language question to SQL and execute.
 
         Args:
@@ -112,9 +102,7 @@ class DBQnAService:
                 columns = result.keys()
 
                 # Convert to dict format
-                data = [
-                    {col: value for col, value in zip(columns, row)} for row in rows
-                ]
+                data = [{col: value for col, value in zip(columns, row)} for row in rows]
 
             response = {
                 "success": True,
