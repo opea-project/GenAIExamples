@@ -1,0 +1,12 @@
+fastapi>=0.115.0
+uvicorn[standard]>=0.32.0
+python-multipart>=0.0.12
+openai>=1.57.0
+pydantic>=2.10.0
+pydantic-settings>=2.7.0
+python-dotenv>=1.0.0
+pydub>=0.25.1
+ffmpeg-python>=0.2.0
+aiofiles>=24.1.0
+httpx>=0.28.0
+mutagen>=1.47.0

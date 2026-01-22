@@ -1,0 +1,56 @@
+services:
+  # Backend Gateway (Python)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: backend
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./backend/.env
+    volumes:
+      - ./backend:/app
+    networks:
+      - app_network
+    restart: unless-stopped
+
+  # Frontend (React)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+    networks:
+      - app_network
+    restart: unless-stopped
+
+networks:
+  app_network:
+    driver: bridge
+
+# =============================================================================
+# Usage Instructions:
+# =============================================================================
+#
+# 1. Copy backend/.env.example to backend/.env and configure your Keycloak credentials
+#
+# 2. Start the application:
+#    docker-compose up -d
+#
+# 3. Access the application:
+#    - Frontend: http://localhost:5173
+#    - Backend API: http://localhost:8000
+#    - API Docs: http://localhost:8000/docs
+#
+# 4. View logs:
+#    docker-compose logs -f
+#
+# 5. Stop the application:
+#    docker-compose down
+#
+# =============================================================================

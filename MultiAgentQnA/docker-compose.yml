@@ -1,0 +1,38 @@
+services:
+  # Backend API (Python)
+  backend:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    container_name: multiagent-qna-backend
+    ports:
+      - "5001:5001"
+    env_file:
+      - ./api/.env
+    volumes:
+      - ./api:/app
+    networks:
+      - app_network
+    restart: unless-stopped
+
+  # Frontend UI (React)
+  frontend:
+    build:
+      context: ./ui
+      dockerfile: Dockerfile
+    container_name: multiagent-qna-frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - app_network
+    restart: unless-stopped
+
+##################################
+# 🔗 Shared Network
+##################################
+networks:
+  app_network:
+    driver: bridge
+

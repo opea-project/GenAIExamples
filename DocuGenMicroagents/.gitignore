@@ -1,0 +1,86 @@
+
+.env
+.env.local
+.env.*.local
+*.env
+
+
+
+# ============================================
+# PYTHON
+# ============================================
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv/
+
+# PyCharm
+.idea/
+
+# VS Code
+.vscode/
+
+# Pytest
+.pytest_cache/
+.coverage
+htmlcov/
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# ============================================
+# NODE.JS / REACT
+# ============================================
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Production build
+build/
+dist/
+
+# React
+.env.development.local
+.env.test.local
+.env.production.local
+
+# ============================================
+# TEMPORARY & CACHE FILES
+# ============================================
+# Temporary cloned repositories
+api/tmp/
+api/temp/
+*/tmp/
+*/temp/
+tests/
+
+# Logs
+*.log
+logs/
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ============================================
+# LANGGRAPH & AI
+# ============================================
+# LangGraph checkpoints (SQLite databases)
+*.db
+*.sqlite
+*.sqlite3
+checkpoints/
+
+tmp/
