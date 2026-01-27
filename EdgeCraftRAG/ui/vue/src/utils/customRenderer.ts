@@ -4,8 +4,7 @@
 import { marked } from "marked";
 import hljs from "highlight.js";
 import { formatCapitalize } from "./common";
-import ClipboardJS from "clipboard";
-import { message } from "ant-design-vue";
+import { useClipboard } from "./clipboard";
 
 interface CodeRenderParams {
   text: string;
@@ -13,80 +12,53 @@ interface CodeRenderParams {
 }
 
 class ClipboardManager {
-  private clipboard: ClipboardJS | null = null;
-  private observer: MutationObserver | null = null;
+  private clipboard;
 
   constructor() {
-    this.autoInit();
+    this.clipboard = useClipboard();
+    this.init();
   }
 
-  private autoInit() {
-    if (typeof document === "undefined") return;
-    const init = () => {
-      this.init(".copy-btn");
-      this.setupMutationObserver();
-    };
+  private init() {
+    document.addEventListener("click", (e) => {
+      const target = e.target as HTMLElement;
+      const copyBtn = target.closest(".copy-btn");
 
-    if (document.readyState === "complete") {
-      init();
-    } else {
-      document.addEventListener("DOMContentLoaded", init);
+      if (copyBtn) {
+        e.preventDefault();
+        this.handleCopyClick(copyBtn as HTMLElement);
+      }
+    });
+  }
+
+  private async handleCopyClick(button: HTMLElement) {
+    const targetId = button.getAttribute("data-clipboard-target");
+    if (!targetId) return;
+
+    const targetElement = document.querySelector(targetId);
+    if (!targetElement) return;
+
+    const textToCopy = targetElement.textContent || "";
+    const success = await this.clipboard.copy(textToCopy);
+
+    if (success) {
+      this.showSuccessIcon(button);
     }
   }
 
-  private init(selector: string) {
-    this.destroy();
-
-    this.clipboard = new ClipboardJS(selector, { container: document.body });
-
-    this.clipboard.on("success", (e) => this.handleSuccess(e));
-    this.clipboard.on("error", (e) => this.handleError(e));
-  }
-
-  private setupMutationObserver() {
-    this.observer = new MutationObserver((mutations) => {
-      const hasNewButtons = mutations.some((mutation) =>
-        Array.from(mutation.addedNodes).some(
-          (node) => node instanceof HTMLElement && (node.matches(".copy-btn") || node.querySelector(".copy-btn")),
-        ),
-      );
-      if (hasNewButtons) this.init(".copy-btn");
-    });
-
-    this.observer.observe(document.body, {
-      childList: true,
-      subtree: true,
-    });
-  }
-
-  destroy() {
-    this.clipboard?.destroy();
-    this.observer?.disconnect();
-    this.clipboard = null;
-    this.observer = null;
-  }
-
-  private handleSuccess(e: ClipboardJS.Event) {
-    e.clearSelection();
-    message.success("Copy Successful !");
-    const button = e.trigger as HTMLElement;
+  private showSuccessIcon(button: HTMLElement) {
     const copyIcon = button.querySelector(".copy-icon") as HTMLElement;
     const successIcon = button.querySelector(".success-icon") as HTMLElement;
 
-    copyIcon.style.display = "none";
-    successIcon.style.display = "block";
+    if (copyIcon && successIcon) {
+      copyIcon.style.display = "none";
+      successIcon.style.display = "block";
 
-    let timeout = null;
-    if (timeout) clearTimeout(timeout);
-
-    timeout = setTimeout(() => {
-      copyIcon.style.display = "block";
-      successIcon.style.display = "none";
-    }, 2000);
-  }
-
-  private handleError(e: ClipboardJS.Event) {
-    message.error("Copy Failure !");
+      setTimeout(() => {
+        copyIcon.style.display = "block";
+        successIcon.style.display = "none";
+      }, 2000);
+    }
   }
 }
 
@@ -108,12 +80,12 @@ const createCustomRenderer = () => {
     const uniqueId = `code-${Date.now()}-${Math.random().toString(16).slice(2)}`;
 
     return `
-      <div  class="intel-highlighter">
+      <div class="intel-highlighter">
         <div class="header-wrap">
           <span class="code-title">${codeTitle}</span>
           <span class="copy-btn" data-clipboard-target="#${uniqueId}">
-            <i class="icon-intel iconfont icon-copy copy-icon" ></i>
-            <i class="icon-intel iconfont icon-copy-success success-icon" ></i>
+            <i class="icon-intel iconfont icon-copy copy-icon"></i>
+            <i class="icon-intel iconfont icon-copy-success success-icon" style="display: none;"></i>
           </span>
         </div>
         <pre class="content-wrap" id="${uniqueId}"><div>${codeHtml}</div></pre>

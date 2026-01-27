@@ -3,12 +3,15 @@
     <div class="message-box" ref="scrollContainer" v-if="messagesLength">
       <div class="intel-markdown">
         <div ref="messageComponent">
-          <div v-for="(msg, index) in messagesList" :key="index">
+          <div
+            v-for="(msg, index) in messagesList"
+            :key="`session-${currentSessionId}-${index}`"
+          >
             <MessageItem
+              :message-key="`session-${currentSessionId}-${index}`"
               :message="msg"
               ref="messageRef"
               :inResponse
-              :think="isThink"
               :message-Index="index"
               :last-query="isLastQuery(index)"
               :last-response="isLastResponse(index)"
@@ -43,7 +46,11 @@
       <div class="button-wrap">
         <div class="flex-left">
           <span
-            :class="{ 'think-btn': true, 'is-deep': isThink }"
+            :class="{
+              'think-btn': true,
+              'is-deep': isThink,
+              'is-disabled': isAgent,
+            }"
             @click="handleThinkChange"
           >
             <SvgIcon name="icon-deep-think" :size="16" inherit />
@@ -81,11 +88,15 @@
           </a-tooltip>
           <a-divider type="vertical" />
           <a-button
+            v-if="!inResponse"
             type="primary"
             :disabled="inResponse || notInput"
             @click="handleSendMessage"
           >
             <SvgIcon name="icon-send" inherit />
+          </a-button>
+          <a-button v-else type="primary" @click="handleStopChat">
+            <SvgIcon name="icon-stop" inherit />
           </a-button>
         </div>
       </div>
@@ -102,27 +113,37 @@
 </template>
 
 <script lang="ts" setup name="Chatbot">
-import { getBenchmark, requestStopChat } from "@/api/chatbot";
+import { getBenchmark, getSessionDetailById } from "@/api/chatbot";
 import lightBulb from "@/assets/svgs/lightBulb.svg";
 import _ from "lodash";
 import { reactive, ref, computed, nextTick } from "vue";
 import { Benchmark, IMessage } from "../../type";
 import MessageItem from "./MessageItem.vue";
-import { handleMessageSend } from "./SseService";
+import { handleMessageSend, StreamController } from "./SseService";
 import { Local } from "@/utils/storage";
-import { ArrowDownOutlined, CloseOutlined } from "@ant-design/icons-vue";
+import { ArrowDownOutlined } from "@ant-design/icons-vue";
 import { throttle } from "lodash";
 import { chatbotAppStore } from "@/store/chatbot";
+import { sessionAppStore } from "@/store/session";
+import emitter from "@/utils/mitt";
+import router from "@/router";
+import { message } from "ant-design-vue";
+import { useI18n } from "vue-i18n";
 
+const { t } = useI18n();
+const route = useRoute();
 const chatbotStore = chatbotAppStore();
+const sessionStore = sessionAppStore();
 const emit = defineEmits(["config"]);
 const ENV_URL = import.meta.env;
+
 const defaultBenchmark = reactive<Benchmark>({
   generator: "",
   postprocessor: "",
   retriever: "",
 });
 
+let streamController = ref<StreamController | null>(null);
 const messagesList = ref<IMessage[]>([]);
 const inputKeywords = ref<string>("");
 const scrollContainer = ref<HTMLElement | null>(null);
@@ -135,13 +156,13 @@ const imageSrc = ref<string>("");
 const isUserScrolling = ref(false);
 const showScrollToBottomBtn = ref(false);
 const resizeObserverRef = ref<ResizeObserver | null>(null);
-const isThink = ref<boolean>(true);
 const enableKB = ref<boolean>(true);
+const isCreatingNewSession = ref(false);
+const shouldIgnoreRouteChange = ref(false);
 
 const inputRef = ref();
 const handleEnvUrl = () => {
   const { VITE_CHATBOT_URL } = ENV_URL;
-
   return `${VITE_CHATBOT_URL}v1/chatqna`;
 };
 
@@ -160,12 +181,15 @@ const handleMessageDisplay = (data: any) => {
     messagesList.value[messagesList.value?.length - 1].content = data;
   }
 };
+
 const notInput = computed(() => {
   return inputKeywords.value.trim() === "";
 });
+
 const messagesLength = computed(() => {
   return messagesList.value?.length;
 });
+
 const lastQueryIndex = computed(() => {
   for (let i = messagesList.value.length - 1; i >= 0; i--) {
     if (messagesList.value[i].role === "user") {
@@ -183,16 +207,44 @@ const lastResponseIndex = computed(() => {
   }
   return -1;
 });
+
+const isAgent = computed(() => {
+  return !!chatbotStore.agent.name;
+});
+
+const isThink = computed({
+  get() {
+    const { enable_thinking = true } =
+      chatbotStore.configuration?.chat_template_kwargs;
+    return enable_thinking;
+  },
+  set(value: boolean) {
+    chatbotStore.setChatbotConfiguration({
+      chat_template_kwargs: {
+        ...chatbotStore.configuration?.chat_template_kwargs,
+        enable_thinking: value,
+      },
+    });
+  },
+});
+
 const isLastQuery = (index: number) => index === lastQueryIndex.value;
 const isLastResponse = (index: number) => index === lastResponseIndex.value;
 
 const handleStreamEnd = () => {
   handleStopDisplay();
   queryBenchmark();
+  updateSessionId();
+  sessionStore.setResponseSessionId("");
 };
+
 const toggleConnection = () => {
   if (inResponse.value) {
-    handleMessageSend(
+    if (streamController.value) {
+      streamController.value.cancel();
+    }
+
+    streamController.value = handleMessageSend(
       handleEnvUrl(),
       formatFormParam(),
       handleMessageDisplay,
@@ -204,11 +256,11 @@ const toggleConnection = () => {
 // Format parameter
 const formatFormParam = () => {
   const { configuration = {} } = Local.get("chatbotConfiguration") || {};
-
   return Object.assign({}, configuration, {
     messages: inputKeywords.value,
   });
 };
+
 const handleEnter = (e: any) => {
   e.preventDefault();
   if (inResponse.value) {
@@ -216,8 +268,10 @@ const handleEnter = (e: any) => {
   }
   handleSendMessage();
 };
+
 const handleSendMessage = async () => {
   if (!inputKeywords.value.trim()) return;
+
   messagesList.value.push(
     {
       role: "user",
@@ -230,13 +284,38 @@ const handleSendMessage = async () => {
       benchmark: _.cloneDeep(defaultBenchmark),
     }
   );
+
   inResponse.value = true;
   toggleConnection();
   inputKeywords.value = "";
   scrollToBottom();
+
+  const { currentSession = "" } = sessionStore;
+  sessionStore.setResponseSessionId(currentSession);
 };
+
 const handleStopDisplay = () => {
   inResponse.value = false;
+};
+const currentSessionId = computed(() => sessionStore.currentSession);
+const updateSessionId = () => {
+  const sessionId = route.query?.sessionId;
+  const storedSessionId = sessionStore.currentSession;
+
+  if (!sessionId && storedSessionId) {
+    shouldIgnoreRouteChange.value = true;
+    router.replace({
+      query: {
+        ...route.query,
+        sessionId: storedSessionId,
+      },
+    });
+    nextTick(() => {
+      setTimeout(() => {
+        shouldIgnoreRouteChange.value = false;
+      }, 100);
+    });
+  }
 };
 
 const queryBenchmark = async () => {
@@ -256,30 +335,39 @@ const queryBenchmark = async () => {
     }
   }
 };
+
 const handleImagePreview = (url: string) => {
   imageSrc.value = url;
   handleImageVisible(true);
 };
+
 const handleImageVisible = (value: boolean = false) => {
   imgVisible.value = value;
 };
+
 const handleNewChat = () => {
+  isCreatingNewSession.value = true;
+  shouldIgnoreRouteChange.value = true;
+
   inputKeywords.value = "";
   messagesList.value = [];
-  Local.remove("chat_session_id");
-};
-const handleThinkChange = () => {
-  isThink.value = !isThink.value;
-  const { chat_template_kwargs } = chatbotStore.configuration;
-
-  const chat_template = {
-    ...chat_template_kwargs,
-    enable_thinking: isThink.value,
-  };
-  chatbotStore.setChatbotConfiguration({
-    chat_template_kwargs: chat_template,
+  sessionStore.setSessionId("");
+  router.replace({
+    query: {},
+  });
+  nextTick(() => {
+    setTimeout(() => {
+      isCreatingNewSession.value = false;
+      shouldIgnoreRouteChange.value = false;
+    }, 100);
   });
 };
+
+const handleThinkChange = () => {
+  if (isAgent.value) return;
+  isThink.value = !isThink.value;
+};
+
 const handleKBChange = () => {
   enableKB.value = !enableKB.value;
   const { chat_template_kwargs } = chatbotStore.configuration;
@@ -293,19 +381,27 @@ const handleKBChange = () => {
     chat_template_kwargs: chat_template,
   });
 };
+
 const handleConfig = () => {
   emit("config");
 };
+
 const handleRegenerate = (query: string) => {
   inputKeywords.value = query;
-
   handleSendMessage();
 };
+
 const handleDelete = ({ index, query }: { index: number; query: string }) => {
   messagesList.value.splice(index);
   inputKeywords.value = query;
-
   handleSendMessage();
+};
+
+const handleStopChat = async () => {
+  if (streamController.value) {
+    streamController.value.cancel();
+    streamController.value = null;
+  }
 };
 
 const scrollToBottom = () => {
@@ -362,6 +458,35 @@ const initResizeObserver = () => {
   }
 };
 
+const initialSessionDetail = (messages: IMessage[]): IMessage[] => {
+  return messages?.map((msg, i, arr) => {
+    if (msg.role === "assistant" && i > 0 && arr[i - 1].role === "user") {
+      return {
+        ...msg,
+        query: arr[i - 1].content,
+      };
+    }
+    return msg;
+  });
+};
+
+const handleViewSessionDetail = async (sessionId: string) => {
+  try {
+    const data: any = await getSessionDetailById(sessionId);
+    if (!data?.session_content?.messages) {
+      handleNewChat();
+      message.error(t("chat.notExist"));
+      return;
+    }
+    messagesList.value = initialSessionDetail(data?.session_content?.messages);
+    nextTick(() => {
+      scrollToBottom();
+    });
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 watch(
   () => messageComponent.value,
   (value) => {
@@ -373,12 +498,40 @@ watch(
   },
   { immediate: true }
 );
+
+watch(
+  () => route.query?.sessionId,
+  (sessionId) => {
+    if (shouldIgnoreRouteChange.value || isCreatingNewSession.value) {
+      shouldIgnoreRouteChange.value = false;
+      return;
+    }
+
+    if (sessionId) {
+      handleViewSessionDetail(String(sessionId));
+      if (sessionId !== sessionStore.responseSession) {
+        inResponse.value = false;
+      } else {
+        inResponse.value = true;
+      }
+    } else {
+      messagesList.value = [];
+    }
+  },
+  { immediate: true }
+);
+
 onMounted(() => {
   const { enable_thinking = true, enable_rag_retrieval = false } =
     chatbotStore.configuration?.chat_template_kwargs;
   isThink.value = enable_thinking;
   enableKB.value = enable_rag_retrieval;
+  emitter.on("new-chat", handleNewChat);
+  if (!route.query?.sessionId) {
+    sessionStore.setSessionId("");
+  }
 });
+
 onBeforeUnmount(() => {
   if (resizeObserver && messageComponent.value) {
     resizeObserver.unobserve(messageComponent.value);
@@ -386,7 +539,13 @@ onBeforeUnmount(() => {
   }
   scrollContainer.value?.removeEventListener("scroll", handleScroll);
 });
+
+onUnmounted(() => {
+  emitter.off("new-chat", handleNewChat);
+  sessionStore.setSessionId("");
+});
 </script>
+
 <style scoped lang="less">
 .chatbot-wrap {
   display: flex;
@@ -519,6 +678,13 @@ onBeforeUnmount(() => {
           border: 1px solid var(--color-primary-second);
           color: var(--color-primary-second);
           background-color: var(--color-primaryBg);
+        }
+        &.is-disabled,
+        .is-disabled:hover {
+          border: 1px solid var(--border-main-color);
+          color: var(--font-text-color);
+          background-color: var(--bg-main-color);
+          cursor: no-drop;
         }
       }
       .send-btn {

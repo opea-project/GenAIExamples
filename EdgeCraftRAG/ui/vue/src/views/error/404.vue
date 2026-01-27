@@ -15,8 +15,6 @@
 import notFound from "@/assets/svgs/404-icon.svg";
 import router from "@/router";
 import { HomeFilled } from "@ant-design/icons-vue";
-import { h } from "vue";
-
 const handleGoHome = () => {
   router.push("/");
 };

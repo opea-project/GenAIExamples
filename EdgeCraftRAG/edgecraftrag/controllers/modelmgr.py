@@ -7,6 +7,7 @@ from edgecraftrag.api_schema import ModelIn
 from edgecraftrag.base import BaseComponent, BaseMgr, CompType, ModelType
 from edgecraftrag.components.model import (
     BaseModelComponent,
+    OpenAIEmbeddingModel,
     OpenVINOEmbeddingModel,
     OpenVINOLLMModel,
     OpenVINORerankModel,
@@ -84,6 +85,11 @@ class ModelMgr(BaseMgr):
                     model_path=model_para.model_path,
                     device=model_para.device,
                     weight=model_para.weight,
+                )
+            case ModelType.VLLM_EMBEDDING:
+                model = OpenAIEmbeddingModel(
+                    model_id=model_para.model_id,
+                    api_base=model_para.api_base,
                 )
             case ModelType.RERANKER:
                 model = OpenVINORerankModel(

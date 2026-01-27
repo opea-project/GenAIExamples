@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 # Use node 20.11.1 as the base image
-FROM node:20.11.1
+FROM node:22
 
 # Update package manager and install Git
 RUN apt-get update -y && apt-get install -y git

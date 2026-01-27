@@ -4,7 +4,7 @@
 import abc
 import uuid
 from enum import Enum
-from typing import Any, Callable, List, Optional
+from typing import Any, Optional
 
 from pydantic import BaseModel, ConfigDict, Field, model_serializer
 
@@ -22,6 +22,9 @@ class CompType(str, Enum):
     QUERYSEARCH = "querysearch"
     FILE = "file"
     CHUNK_NUM = "chunk_num"
+    KNOWLEDGE = "knowledge"
+    AGENT = "agent"
+    SESSION = "session"
 
 
 class ModelType(str, Enum):
@@ -30,6 +33,7 @@ class ModelType(str, Enum):
     RERANKER = "reranker"
     LLM = "llm"
     VLLM = "vllm"
+    VLLM_EMBEDDING = "vllm_embedding"
 
 
 class FileType(str, Enum):
@@ -74,6 +78,7 @@ class PostProcessorType(str, Enum):
 class GeneratorType(str, Enum):
 
     CHATQNA = "chatqna"
+    FREECHAT = "freechat"
 
 
 class InferenceType(str, Enum):
@@ -86,7 +91,18 @@ class CallbackType(str, Enum):
 
     DATAPREP = "dataprep"
     RETRIEVE = "retrieve"
+    RETRIEVE_POSTPROCESS = "retrieve_postprocess"
+    POSTPROCESS = "postprocess"
+    GENERATE = "generate"
     PIPELINE = "pipeline"
+    RUNAGENT = "run_agent"
+    QUERYSEARCH = "query_search"
+
+
+class AgentType(str, Enum):
+
+    SIMPLE = "simple"
+    DEEPSEARCH = "deep_search"
 
 
 class BaseComponent(BaseModel):

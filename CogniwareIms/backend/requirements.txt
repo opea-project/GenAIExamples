@@ -1,0 +1,60 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+
+# HTTP Client - FIXED: Updated aiohttp (memory leak and smuggling fixes)
+aiohttp>=3.11.0  # FIXED: Updated from 3.10.10
+alembic==1.13.3
+bcrypt==4.2.0
+
+# Code Quality (dev dependencies)
+black==24.10.0
+cryptography>=43.0.7  # FIXED: Updated from 43.0.1 (OpenSSL vulnerability)
+email-validator==2.2.0
+# Web Framework
+fastapi==0.115.0
+flake8==7.1.1
+hiredis==3.0.0
+httpx==0.27.2
+mypy==1.11.2
+numpy==2.1.2
+openpyxl==3.1.5
+pandas==2.2.3
+passlib[bcrypt]==1.7.4
+
+# Database
+psycopg2-binary==2.9.10
+
+# Validation
+pydantic==2.9.2
+pydantic-settings==2.5.2
+
+# Security - FIXED: Migrated from python-jose (CRITICAL CVE) to PyJWT
+PyJWT>=2.9.0  # Replaced python-jose[cryptography]==3.3.0
+
+# Data Processing - FIXED: Migrated from PyPDF2 to pypdf (infinite loop fix)
+pypdf>=4.0.0  # Replaced PyPDF2==3.0.1 (License: BSD-3-Clause, verified)
+
+# Logging & Monitoring
+# (using standard library and python-json-logger)
+
+# Testing (dev dependencies)
+pytest==8.3.3
+pytest-asyncio==0.24.0
+pytest-cov==6.0.0
+python-docx==1.1.2
+
+# Utilities
+python-dotenv==1.0.1
+python-json-logger==2.0.7
+
+# Form Data - FIXED: Updated python-multipart (DoS vulnerability)
+python-multipart>=0.0.9  # FIXED: Updated from 0.0.12
+PyYAML==6.0.2
+
+# Redis & Caching
+redis==5.2.0
+respx>=0.22.0  # Mocking library for httpx (replaces non-existent httpx-mock) - License: BSD-3-Clause
+scikit-learn==1.5.2
+sqlalchemy==2.0.35
+uvicorn[standard]==0.31.0

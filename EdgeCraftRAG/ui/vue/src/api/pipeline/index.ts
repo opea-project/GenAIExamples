@@ -17,9 +17,9 @@ export const getPipelineList = () => {
   });
 };
 
-export const getPipelineDetailByName = (name: String) => {
+export const getPipelineDetailById = (id: String) => {
   return request({
-    url: `/v1/settings/pipelines/${name}/json`,
+    url: `/v1/settings/pipelines/${id}/json`,
     method: "get",
   });
 };
@@ -35,9 +35,9 @@ export const requestPipelineCreate = (data: Object) => {
   });
 };
 
-export const requestPipelineUpdate = (name: String, data: Object) => {
+export const requestPipelineUpdate = (id: String, data: Object) => {
   return request({
-    url: `/v1/settings/pipelines/${name}`,
+    url: `/v1/settings/pipelines/${id}`,
     method: "patch",
     data,
     showLoading: true,
@@ -46,9 +46,9 @@ export const requestPipelineUpdate = (name: String, data: Object) => {
   });
 };
 
-export const requestPipelineDelete = (name: String) => {
+export const requestPipelineDelete = (id: String) => {
   return request({
-    url: `/v1/settings/pipelines/${name}`,
+    url: `/v1/settings/pipelines/${id}`,
     method: "delete",
     showLoading: true,
     showSuccessMsg: true,
@@ -56,9 +56,9 @@ export const requestPipelineDelete = (name: String) => {
   });
 };
 
-export const requestPipelineSwitchState = (name: String, data: Object) => {
+export const requestPipelineSwitchState = (id: String, data: Object) => {
   return request({
-    url: `/v1/settings/pipelines/${name}`,
+    url: `/v1/settings/pipelines/${id}`,
     method: "patch",
     data,
     showLoading: true,
@@ -74,10 +74,11 @@ export const getRunDevice = () => {
   });
 };
 
-export const getModelList = (type: string) => {
+export const getModelList = (type: string, params?: Object) => {
   return request({
     url: `/v1/settings/avail-models/${type}`,
     method: "get",
+    params,
   });
 };
 

@@ -14,7 +14,7 @@ WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
 text2image_service_port=9379
-MODEL=stabilityai/stable-diffusion-2-1
+MODEL=stable-diffusion-v1-5/stable-diffusion-v1-5
 export MODEL=${MODEL}
 
 function build_docker_images() {

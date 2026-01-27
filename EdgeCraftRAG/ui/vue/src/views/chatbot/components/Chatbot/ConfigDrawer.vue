@@ -18,7 +18,13 @@
       class="form-wrap"
     >
       <div class="module-wrap">
-        <div class="module-title">{{ $t("generation.retriever") }}</div>
+        <div class="module-title">
+          <p>{{ $t("generation.retriever") }}</p>
+          <div class="warning-wrap">
+            <ExclamationCircleFilled />{{ $t("generation.tips") }}
+          </div>
+        </div>
+
         <a-form-item
           :label="$t('generation.config.top_n')"
           name="top_n"
@@ -26,12 +32,27 @@
         >
           <a-slider
             v-model:value="form.top_n"
-            :min="1"
-            :max="50"
+            :min="0"
+            :max="100"
             :marks="sliderMarks.top_n"
           />
           <div class="tips-wrap">
             <InfoCircleFilled />{{ $t("generation.desc.top_n") }}
+          </div>
+        </a-form-item>
+        <a-form-item
+          :label="$t('pipeline.config.topk')"
+          name="k"
+          class="slider-wrap"
+        >
+          <a-slider
+            v-model:value="form.k"
+            :min="0"
+            :max="500"
+            :marks="sliderMarks.k"
+          />
+          <div class="tips-wrap">
+            <InfoCircleFilled />{{ $t("pipeline.desc.topk") }}
           </div>
         </a-form-item>
       </div>
@@ -128,7 +149,10 @@
   </a-drawer>
 </template>
 <script lang="ts" setup name="DetailDrawer">
-import { InfoCircleFilled } from "@ant-design/icons-vue";
+import {
+  InfoCircleFilled,
+  ExclamationCircleFilled,
+} from "@ant-design/icons-vue";
 import { FormInstance } from "ant-design-vue";
 import { reactive, ref } from "vue";
 import { ConfigType } from "../../type";
@@ -146,7 +170,8 @@ const formRef = ref<FormInstance>();
 const drawerVisible = ref<boolean>(true);
 const submitLoading = ref<boolean>(false);
 const {
-  top_n = 25,
+  top_n = 0,
+  k = 0,
   temperature = 0.01,
   top_p = 0.95,
   top_k = 10,
@@ -157,6 +182,7 @@ const {
 
 const form = reactive<ConfigType>({
   top_n,
+  k,
   temperature,
   top_p,
   top_k,
@@ -166,6 +192,7 @@ const form = reactive<ConfigType>({
 });
 const rules: FormRules = reactive({
   top_n: [{ required: true, trigger: "blur" }],
+  k: [{ required: true, trigger: "blur" }],
   temperature: [{ required: true, trigger: "blur" }],
   top_p: [{ required: true, trigger: "blur" }],
   top_k: [{ required: true, trigger: "blur" }],
@@ -174,12 +201,16 @@ const rules: FormRules = reactive({
 });
 const sliderMarks = reactive<EmptyObjectType>({
   top_n: {
-    1: "1",
-    50: "50",
+    0: "0",
+    100: "100",
   },
   temperature: {
     0: "0",
     1: "1",
+  },
+  k: {
+    0: "0",
+    500: "500",
   },
   top_k: {
     0: "0",
@@ -233,11 +264,24 @@ const handleSubmit = () => {
     font-weight: 500;
     margin-bottom: 12px;
   }
+  .warning-wrap {
+    font-weight: 400;
+    color: var(--color-second-warning);
+    display: flex;
+    gap: 6px;
+    font-size: 12px;
+    .anticon-exclamation-circle {
+      margin-top: 0;
+      font-size: 13px;
+      color: var(--color-warning);
+    }
+  }
   .tips-wrap {
     display: flex;
     color: var(--font-info-color);
     gap: 6px;
     font-size: 12px;
+
     .anticon-info-circle {
       margin-top: 0;
       font-size: 13px;

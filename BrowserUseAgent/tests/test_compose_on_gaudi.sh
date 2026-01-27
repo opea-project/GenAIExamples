@@ -31,9 +31,6 @@ function build_docker_images() {
     docker build --no-cache -t ${REGISTRY}/comps-base:${TAG} --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -f Dockerfile .
     popd && sleep 1s
 
-    VLLM_FORK_VER=v0.9.0.1+Gaudi-1.22.0
-    git clone --depth 1 -b ${VLLM_FORK_VER} --single-branch https://github.com/HabanaAI/vllm-fork.git
-
     echo "Build all the images with --no-cache, check docker_image_build.log for details..."
     docker compose -f build.yaml build --no-cache --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy > ${LOG_PATH}/docker_image_build.log
 

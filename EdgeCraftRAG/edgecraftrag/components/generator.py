@@ -2,16 +2,16 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import asyncio
-import dataclasses
 import json
 import os
 import urllib.request
+from concurrent.futures import ThreadPoolExecutor
 from urllib.parse import urlparse
 
+from comps.cores.proto.api_protocol import ChatCompletionRequest
 from edgecraftrag.base import BaseComponent, CompType, GeneratorType, InferenceType, NodeParserType
-from edgecraftrag.utils import concat_history, get_prompt_template, save_history
+from edgecraftrag.utils import get_prompt_template
 from fastapi.responses import StreamingResponse
-from langchain_core.prompts import PromptTemplate
 from llama_index.llms.openai_like import OpenAILike
 from pydantic import model_serializer
 from unstructured.staging.base import elements_from_base64_gzipped_json
@@ -44,11 +44,11 @@ def extract_unstructured_eles(retrieved_nodes=[], text_gen_context=""):
             continue
         metadata = node.node.metadata
         # extract referenced docs
-        if "filename" in metadata:
+        if "file_name" in metadata:
             reference_doc = (
-                metadata["filename"]
+                metadata["file_name"]
                 if "page_number" not in metadata
-                else metadata["filename"] + " --page" + str(metadata["page_number"])
+                else metadata["file_name"] + " --page" + str(metadata["page_number"])
             )
             reference_docs.add(reference_doc)
         # extract hyperlinks in chunk
@@ -69,18 +69,10 @@ def extract_unstructured_eles(retrieved_nodes=[], text_gen_context=""):
         # extract hyperlinks in chunk
         link_urls.extend(extract_urls(text_gen_context))
     unstructured_str = ""
-    if image_paths:
-        unstructured_str += "\n\n参考图片:\n\n"
-        for image_path in image_paths:
-            unstructured_str += f"![]({image_path})"
-    if link_urls:
-        unstructured_str += "\n\n相关链接:\n\n"
-        for link in link_urls:
-            unstructured_str += f"[{link}]({link})\n\n"
     if reference_docs:
-        unstructured_str += "\n\n内容来源:\n\n"
+        unstructured_str += "\n\n --- \n\n### Document Source:\n"
         for reference_doc in reference_docs:
-            unstructured_str += f"{reference_doc}\n\n"
+            unstructured_str += f"- {reference_doc}\n\n"
     return unstructured_str
 
 
@@ -95,18 +87,13 @@ def build_stream_response(status=None, content=None, error=None):
 
 async def local_stream_generator(lock, llm, prompt_str, unstructured_str):
     async with lock:
-        response = llm.stream_complete(prompt_str)
-        collected_data = []
+        response = await llm.astream_complete(prompt_str)
         try:
-            for r in response:
-                collected_data.append(r.delta)
-                yield r.delta
+            async for r in response:
+                yield r.delta or ""
                 await asyncio.sleep(0)
             if unstructured_str:
-                collected_data.append(unstructured_str)
                 yield unstructured_str
-            res = "".join(collected_data)
-            save_history(res)
         except Exception as e:
             start_idx = str(e).find("message") + len("message")
             result_error = str(e)[start_idx:]
@@ -114,18 +101,16 @@ async def local_stream_generator(lock, llm, prompt_str, unstructured_str):
 
 
 async def stream_generator(llm, prompt_str, unstructured_str):
-    response = llm.stream_complete(prompt_str)
-    collected_data = []
+    response = await llm.astream_complete(prompt_str)
     try:
-        for r in response:
-            collected_data.append(r.delta)
-            yield r.delta
+        async for r in response:
+            yield r.delta or ""
             await asyncio.sleep(0)
         if unstructured_str:
-            collected_data.append(unstructured_str)
             yield unstructured_str
-        res = "".join(collected_data)
-        save_history(res)
+            await asyncio.sleep(0)
+    except asyncio.CancelledError as e:
+        response.aclose()
     except Exception as e:
         start_idx = str(e).find("message") + len("message")
         result_error = str(e)[start_idx:]
@@ -146,7 +131,9 @@ class QnAGenerator(BaseComponent):
             ("\t\n", "\n"),
         )
         self.enable_think = False
-        self.llm = llm_model
+        self.enable_rag_retrieval = True
+        self.prompt_content = prompt_content
+        self.prompt_template_file = prompt_template_file
         if isinstance(llm_model, str):
             self.model_id = llm_model
             self.model_path = llm_model
@@ -154,21 +141,15 @@ class QnAGenerator(BaseComponent):
             llm_instance = llm_model()
             if llm_instance.model_path is None or llm_instance.model_path == "":
                 self.model_id = llm_instance.model_id
-                self.model_path = os.path.join("/home/user/models/", os.getenv("LLM_MODEL", "Qwen/Qwen3-8B"))
+                self.model_path = os.path.join("/home/user/models", os.getenv("LLM_MODEL", "Qwen/Qwen3-8B"))
             else:
                 self.model_id = llm_instance.model_id
                 self.model_path = llm_instance.model_path
-        if self.inference_type == InferenceType.LOCAL:
-            self.lock = asyncio.Lock()
-        self.prompt_content = prompt_content
-        self.prompt_template_file = prompt_template_file
-        self.prompt = self.init_prompt(self.model_path, self.prompt_content, self.prompt_template_file)
+        self.original_template, self.prompt = self.prompt_handler(
+            self.model_path, self.prompt_content, self.prompt_template_file
+        )
 
         self.llm = llm_model
-        if isinstance(llm_model, str):
-            self.model_id = llm_model
-        else:
-            self.model_id = llm_model().model_id
         if self.inference_type == InferenceType.LOCAL:
             self.lock = asyncio.Lock()
         if self.inference_type == InferenceType.VLLM:
@@ -177,7 +158,9 @@ class QnAGenerator(BaseComponent):
                 vllm_endpoint = os.getenv("vLLM_ENDPOINT", "http://localhost:8086")
         self.vllm_endpoint = vllm_endpoint
 
-    def init_prompt(self, model_path, prompt_content=None, prompt_template_file=None, enable_think=False):
+    def prompt_handler(
+        self, model_path, prompt_content=None, prompt_template_file=None, enable_think=False, enable_rag_retrieval=True
+    ):
         if prompt_content:
             return get_prompt_template(model_path, prompt_content, prompt_template_file, enable_think)
         elif prompt_template_file is None:
@@ -185,7 +168,12 @@ class QnAGenerator(BaseComponent):
             prompt_template = get_prompt_template(model_path, prompt_content, prompt_template_file, enable_think)
             return prompt_template
         else:
-            safe_root = "/templates"
+            if enable_rag_retrieval:
+                safe_root = "/templates"
+            else:
+                prompt_content = "### User Guide ###You are a helpful assistant. Please respond to user inquiries with concise and professional answers.### Historical Content ###{chat_history}"
+                return get_prompt_template(model_path, prompt_content, prompt_template_file, enable_think)
+
             prompt_template_file = os.path.normpath(os.path.join(safe_root, prompt_template_file))
             if not prompt_template_file.startswith(safe_root):
                 raise ValueError("Invalid template path")
@@ -199,11 +187,15 @@ class QnAGenerator(BaseComponent):
         if "{chat_history}" not in prompt:
             prompt += "\n<|im_start|>{chat_history}"
         self.prompt_content = prompt
-        self.prompt = self.init_prompt(self.model_path, self.prompt_content, self.prompt_template_file)
+        self.original_template, self.prompt = self.prompt_handler(
+            self.model_path, self.prompt_content, self.prompt_template_file
+        )
 
     def reset_prompt(self):
         self.prompt_content = None
-        self.prompt = self.init_prompt(self.model_path, self.prompt_content, self.prompt_template_file)
+        self.original_template, self.prompt = self.prompt_handler(
+            self.model_path, self.prompt_content, self.prompt_template_file
+        )
 
     def clean_string(self, string):
         ret = string
@@ -222,18 +214,27 @@ class QnAGenerator(BaseComponent):
             origin_text = n.node.text
             text_gen_context += self.clean_string(origin_text.strip())
         query = chat_request.messages
-        chat_history = concat_history(chat_request.messages)
+        chat_history = chat_request.input
         # Modify model think status
         if chat_request.chat_template_kwargs:
+            change_flag = False
+            if "enable_rag_retrieval" in chat_request.chat_template_kwargs:
+                if self.enable_rag_retrieval != chat_request.chat_template_kwargs["enable_rag_retrieval"]:
+                    self.enable_rag_retrieval = chat_request.chat_template_kwargs["enable_rag_retrieval"]
+                    change_flag = True
             if "enable_thinking" in chat_request.chat_template_kwargs:
                 if self.enable_think != chat_request.chat_template_kwargs["enable_thinking"]:
-                    self.prompt = self.init_prompt(
-                        self.model_path,
-                        self.prompt_content,
-                        self.prompt_template_file,
-                        chat_request.chat_template_kwargs["enable_thinking"],
-                    )
                     self.enable_think = chat_request.chat_template_kwargs["enable_thinking"]
+                    change_flag = True
+            if change_flag:
+                self.original_template, self.prompt = self.prompt_handler(
+                    self.model_path,
+                    self.prompt_content,
+                    self.prompt_template_file,
+                    self.enable_think,
+                    self.enable_rag_retrieval,
+                )
+
         if sub_questions:
             final_query = f"{query}\n\n### Sub-questions ###\nThe following list is how you should consider the answer, you MUST follow these steps when responding:\n\n{sub_questions}"
         else:
@@ -241,7 +242,7 @@ class QnAGenerator(BaseComponent):
         prompt_str = self.prompt.format(input=final_query, chat_history=chat_history, context=text_gen_context)
         return text_gen_context, prompt_str
 
-    def run(self, chat_request, retrieved_nodes, node_parser_type, **kwargs):
+    async def run(self, chat_request, retrieved_nodes, node_parser_type, **kwargs):
         if self.llm() is None:
             # This could happen when User delete all LLMs through RESTful API
             raise ValueError("No LLM available, please load LLM")
@@ -259,19 +260,21 @@ class QnAGenerator(BaseComponent):
         self.llm().generate_kwargs = generate_kwargs
         self.llm().max_new_tokens = chat_request.max_tokens
         unstructured_str = ""
-        if node_parser_type == NodeParserType.UNSTRUCTURED:
+        if node_parser_type == NodeParserType.UNSTRUCTURED or node_parser_type == NodeParserType.SIMPLE:
             unstructured_str = extract_unstructured_eles(retrieved_nodes, text_gen_context)
         if chat_request.stream:
-            return StreamingResponse(
-                local_stream_generator(self.lock, self.llm(), prompt_str, unstructured_str),
-                media_type="text/event-stream",
-            )
+            # Asynchronous generator
+            async def generator():
+                async for chunk in local_stream_generator(self.lock, self.llm(), prompt_str, unstructured_str):
+                    yield chunk or ""
+                    await asyncio.sleep(0)
+
+            return generator()
         else:
             result = self.llm().complete(prompt_str)
-            save_history(str(result.text))
             return result
 
-    def run_vllm(self, chat_request, retrieved_nodes, node_parser_type, **kwargs):
+    async def run_vllm(self, chat_request, retrieved_nodes, node_parser_type, **kwargs):
         # query transformation
         sub_questions = kwargs.get("sub_questions", None)
         text_gen_context, prompt_str = self.query_transform(chat_request, retrieved_nodes, sub_questions=sub_questions)
@@ -287,15 +290,19 @@ class QnAGenerator(BaseComponent):
             repetition_penalty=chat_request.repetition_penalty,
         )
         unstructured_str = ""
-        if node_parser_type == NodeParserType.UNSTRUCTURED:
+        if node_parser_type == NodeParserType.UNSTRUCTURED or node_parser_type == NodeParserType.SIMPLE:
             unstructured_str = extract_unstructured_eles(retrieved_nodes, text_gen_context)
         if chat_request.stream:
-            return StreamingResponse(
-                stream_generator(llm, prompt_str, unstructured_str), media_type="text/event-stream"
-            )
+
+            # Asynchronous generator
+            async def generator():
+                async for chunk in stream_generator(llm, prompt_str, unstructured_str):
+                    yield chunk or ""
+                    await asyncio.sleep(0)
+
+            return generator()
         else:
-            result = llm.complete(prompt_str)
-            save_history(str(result))
+            result = await llm.acomplete(prompt_str)
             return result
 
     @model_serializer
@@ -310,69 +317,89 @@ class QnAGenerator(BaseComponent):
         return set
 
 
-@dataclasses.dataclass
-class INSTRUCTIONS:
-    IM_START = "You are an AI assistant that helps users answer questions given a specific context."
-    SUCCINCT = "Ensure your response is succinct"
-    ACCURATE = "Ensure your response is accurate."
-    SUCCINCT_AND_ACCURATE = "Ensure your response is succinct. Try to be accurate if possible."
-    ACCURATE_AND_SUCCINCT = "Ensure your response is accurate. Try to be succinct if possible."
-    NO_RAMBLING = "Avoid posing new questions or self-questioning and answering, and refrain from repeating words in your response."
-    SAY_SOMETHING = "Avoid meaningless answer such a random symbol or blanks."
-    ENCOURAGE = "If you cannot well understand the question, try to translate it into English, and translate the answer back to the language of the question."
-    NO_IDEA = (
-        'If the answer is not discernible, please respond with "Sorry. I have no idea" in the language of the question.'
-    )
-    CLOZE_TEST = """The task is a fill-in-the-blank/cloze test."""
-    NO_MEANINGLESS_SYMBOLS = "Meaningless symbols and ``` should not be included in your response."
-    ADAPT_NATIVE_LANGUAGE = "Please try to think like a person that speak the same language that the question used."
+class FreeChatGenerator(BaseComponent):
 
-
-def _is_cloze(question):
-    return ("()" in question or "（）" in question) and ("填" in question or "fill" in question or "cloze" in question)
-
-
-# depreciated
-def get_instructions(question):
-    # naive pre-retrieval rewrite
-    # cloze
-    if _is_cloze(question):
-        instructions = [
-            INSTRUCTIONS.CLOZE_TEST,
-        ]
-    else:
-        instructions = [
-            INSTRUCTIONS.ACCURATE_AND_SUCCINCT,
-            INSTRUCTIONS.NO_RAMBLING,
-            INSTRUCTIONS.NO_MEANINGLESS_SYMBOLS,
-        ]
-    return ["System: {}".format(_) for _ in instructions]
-
-
-def preprocess_question(question):
-    if _is_cloze(question):
-        question = question.replace(" ", "").replace("（", "(").replace("）", ")")
-        # .replace("()", " <|blank|> ")
-        ret = "User: Please finish the following fill-in-the-blank question marked by $$$ at the beginning and end. Make sure all the () are filled.\n$$$\n{}\n$$$\nAssistant: ".format(
-            question
+    def __init__(self, llm_model, inference_type, vllm_endpoint, **kwargs):
+        BaseComponent.__init__(
+            self,
+            comp_type=CompType.GENERATOR,
+            comp_subtype=GeneratorType.FREECHAT,
         )
-    else:
-        ret = "User: {}\nAssistant: 从上下文提供的信息中可以知道，".format(question)
-    return ret
-
-
-class DocumentedContextRagPromptTemplate(PromptTemplate):
-
-    def format(self, **kwargs) -> str:
-        # context = '\n'.join([clean_string(f"{_.page_content}".strip()) for i, _ in enumerate(kwargs["context"])])
-        context = kwargs["context"]
-        question = kwargs["input"]
-        preprocessed_question = preprocess_question(question)
-        if "instructions" in self.template:
-            instructions = get_instructions(question)
-            prompt_str = self.template.format(
-                context=context, instructions="\n".join(instructions), input=preprocessed_question
-            )
+        self.inference_type = inference_type
+        self.prompt_content = ""
+        self.prompt_template_file = ""
+        self._REPLACE_PAIRS = (
+            ("\n\n", "\n"),
+            ("\t\n", "\n"),
+        )
+        self.enable_think = False
+        if isinstance(llm_model, str):
+            self.model_id = llm_model
+            self.model_path = llm_model
         else:
-            prompt_str = self.template.format(context=context, input=preprocessed_question)
-        return prompt_str
+            llm_instance = llm_model()
+            if llm_instance.model_path is None or llm_instance.model_path == "":
+                self.model_id = llm_instance.model_id
+                self.model_path = os.path.join("/home/user/models", os.getenv("LLM_MODEL", "Qwen/Qwen3-8B"))
+            else:
+                self.model_id = llm_instance.model_id
+                self.model_path = llm_instance.model_path
+
+        self.llm = llm_model
+        if self.inference_type == InferenceType.VLLM:
+            self.vllm_name = llm_model().model_id
+            if vllm_endpoint == "":
+                vllm_endpoint = os.getenv("vLLM_ENDPOINT", "http://localhost:8086")
+        self.vllm_endpoint = vllm_endpoint
+
+    async def run(self, chat_request, retrieved_nodes, node_parser_type, **kwargs):
+        response = await self.run_vllm(chat_request, retrieved_nodes, node_parser_type, **kwargs)
+        return response
+
+    async def run_vllm(self, chat_request, retrieved_nodes, node_parser_type, **kwargs):
+        llm = OpenAILike(
+            api_key="fake",
+            api_base=self.vllm_endpoint + "/v1",
+            max_tokens=chat_request.max_tokens,
+            model=self.vllm_name,
+            top_p=chat_request.top_p,
+            top_k=chat_request.top_k,
+            temperature=chat_request.temperature,
+            streaming=chat_request.stream,
+            repetition_penalty=chat_request.repetition_penalty,
+        )
+        prompt_str = chatcompletion_to_chatml(chat_request)
+        if chat_request.stream:
+
+            # Asynchronous generator
+            async def generator():
+                gen = await llm.astream_complete(prompt_str)
+                async for chunk in gen:
+                    yield chunk.delta or ""
+                    await asyncio.sleep(0)
+
+            return generator()
+        else:
+            result = await llm.acomplete(prompt_str)
+            return str(result)
+
+    @model_serializer
+    def ser_model(self):
+        set = {
+            "idx": self.idx,
+            "generator_type": self.comp_subtype,
+            "inference_type": self.inference_type,
+            "model": self.llm(),
+            "vllm_endpoint": self.vllm_endpoint,
+        }
+        return set
+
+
+def chatcompletion_to_chatml(request: ChatCompletionRequest) -> str:
+    """Convert a ChatCompletionRequest dict to a ChatML-formatted string."""
+    chatml = ""
+    for msg in request.messages:
+        chatml += f"<|im_start|>{msg.get('role', '')}\n{msg.get('content', '')}<|im_end|>\n"
+    # start generation from assistant role
+    chatml += "<|im_start|>assistant\n"
+    return chatml

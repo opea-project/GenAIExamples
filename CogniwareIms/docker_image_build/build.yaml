@@ -1,0 +1,31 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+# OPEA Cogniware IMS - Docker Image Build Configuration
+# Build context: Parent directory (CogniwareIms root)
+# Dockerfile paths: Relative to context
+
+services:
+  # Frontend UI Service
+  cogniwareims-ui:
+    build:
+      context: ../
+      dockerfile: frontend/Dockerfile
+      args:
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
+        no_proxy: ${no_proxy}
+    image: opea/cogniwareims-ui:latest
+    container_name: cogniwareims-ui-builder
+
+  # Backend Service (includes application logic + megaservice)
+  cogniwareims-backend:
+    build:
+      context: ../
+      dockerfile: backend/Dockerfile
+      args:
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
+        no_proxy: ${no_proxy}
+    image: opea/cogniwareims-backend:latest
+    container_name: cogniwareims-backend-builder

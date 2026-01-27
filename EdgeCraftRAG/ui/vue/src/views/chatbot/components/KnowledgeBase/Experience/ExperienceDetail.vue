@@ -153,8 +153,8 @@ const handleCreate = () => {
 };
 //edit
 const handleUpdate = async (row: EmptyObjectType) => {
-  const { question } = row;
-  const data: any = await getExperienceDetailByName({ question });
+  const { idx } = row;
+  const data: any = await getExperienceDetailByName({ idx });
 
   updateDialog.type = "edit";
   updateDialog.data = [data];
@@ -173,8 +173,8 @@ const handleDelete = (row: EmptyObjectType) => {
     okText: t("common.confirm"),
     okType: "danger",
     async onOk() {
-      const { question } = row;
-      await requestExperienceDelete({ question });
+      const { idx } = row;
+      await requestExperienceDelete({ idx });
       paginationData.pageNum = 1;
       handleSearch();
     },

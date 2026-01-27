@@ -1,0 +1,23 @@
+# Copyright (C) 2026 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: v2
+name: cogniwareims
+description: OPEA Cogniware IMS - AI-powered Inventory Management System built with Cogn DREAM
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+keywords:
+  - opea
+  - ai
+  - inventory
+  - management
+  - intel
+  - rag
+  - dbqna
+home: https://github.com/opea-project/GenAIExamples
+sources:
+  - https://github.com/opea-project/GenAIExamples/tree/main/CogniwareIMS
+maintainers:
+  - name: OPEA Community
+    email: info@opea.dev

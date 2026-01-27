@@ -118,7 +118,7 @@ def video2audio(
 
 def read_text_from_file(file, save_file_name):
     import docx2txt
-    from langchain.text_splitter import CharacterTextSplitter
+    from langchain_text_splitters import CharacterTextSplitter
 
     # read text file
     if file.headers["content-type"] == "text/plain":

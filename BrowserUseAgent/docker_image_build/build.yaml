@@ -13,10 +13,3 @@ services:
       context: ../
       dockerfile: ./Dockerfile
     image: ${REGISTRY:-opea}/browser-use-agent:${TAG:-latest}
-
-  vllm-gaudi:
-    build:
-      context: vllm-fork
-      dockerfile: ./docker/Dockerfile.hpu
-    extends: browser-use-agent
-    image: ${REGISTRY:-opea}/vllm-gaudi:${TAG:-latest}

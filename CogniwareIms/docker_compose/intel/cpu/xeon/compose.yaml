@@ -1,0 +1,331 @@
+## Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+# OPEA Cogniware IMS - Docker Compose for Intel Xeon
+# Full-stack AI-powered inventory management system
+
+version: "3.8"
+
+services:
+  # Redis Vector Database & Cache
+  redis-vector-db:
+    image: redis/redis-stack:7.2.0-v9
+    container_name: redis-vector-db
+    ports:
+      - "6379:6379"
+      - "8001:8001" # RedisInsight
+    environment:
+      - REDIS_ARGS=--maxmemory 4gb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: postgres-db
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=opea_ims
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ../../../../backend/app/db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # TEI Embedding Service (Intel Xeon optimized)
+  tei-embedding-service:
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+    container_name: tei-embedding-server
+    restart: unless-stopped
+    ports:
+      - "8090:80"
+    volumes:
+      - "../../../../assets/data:/data"
+    shm_size: 2g
+    environment:
+      MODEL_ID: ${EMBEDDING_MODEL_ID:-BAAI/bge-base-en-v1.5}
+      PORT: 80
+      MAX_BATCH_TOKENS: 16384
+      HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      # Enable faster model downloads
+      HF_HUB_ENABLE_HF_TRANSFER: "1"
+      # Intel Xeon optimizations
+      OMP_NUM_THREADS: 4
+      KMP_AFFINITY: "granularity=fine,compact,1,0"
+      KMP_BLOCKTIME: 1
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      no_proxy: ${no_proxy}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
+      interval: 30s
+      timeout: 15s
+      retries: 20
+      start_period: 600s
+
+  # Embedding Microservice
+  embedding:
+    image: opea/embedding-tei:latest
+    container_name: embedding-tei-server
+    depends_on:
+      tei-embedding-service:
+        condition: service_healthy
+    ports:
+      - "6000:6000"
+    ipc: host
+    environment:
+      TEI_EMBEDDING_ENDPOINT: http://tei-embedding-service:80
+      EMBEDDING_MODEL_ID: ${EMBEDDING_MODEL_ID:-BAAI/bge-base-en-v1.5}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      no_proxy: ${no_proxy}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:6000/v1/health"]
+      interval: 30s
+      timeout: 15s
+      retries: 10
+      start_period: 60s
+
+  # Retriever Microservice
+  retriever:
+    image: opea/retriever-redis:latest
+    container_name: retriever-redis-server
+    depends_on:
+      redis-vector-db:
+        condition: service_healthy
+    ports:
+      - "7000:7000"
+    ipc: host
+    environment:
+      REDIS_URL: ${REDIS_URL:-redis://redis-vector-db:6379}
+      INDEX_NAME: opea_ims_vectors
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      no_proxy: ${no_proxy}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7000/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # TEI Reranking Service
+  tei-reranking-service:
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+    container_name: tei-reranking-server
+    restart: unless-stopped
+    ports:
+      - "8808:80"
+    volumes:
+      - "../../../../assets/data:/data"
+    shm_size: 2g
+    environment:
+      MODEL_ID: ${RERANK_MODEL_ID:-BAAI/bge-reranker-base}
+      PORT: 80
+      HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      # Enable faster model downloads
+      HF_HUB_ENABLE_HF_TRANSFER: "1"
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      no_proxy: ${no_proxy}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
+      interval: 30s
+      timeout: 15s
+      retries: 25
+      start_period: 900s
+
+  # Reranking Microservice
+  reranking:
+    image: opea/reranking-tei:latest
+    container_name: reranking-tei-server
+    depends_on:
+      tei-reranking-service:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    ipc: host
+    environment:
+      TEI_RERANKING_ENDPOINT: http://tei-reranking-service:80
+      RERANK_MODEL_ID: ${RERANK_MODEL_ID:-BAAI/bge-reranker-base}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      no_proxy: ${no_proxy}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/v1/health"]
+      interval: 30s
+      timeout: 15s
+      retries: 10
+      start_period: 60s
+
+  # TGI Service - Intel neural-chat model (Xeon optimized)
+  tgi-service:
+    image: ghcr.io/huggingface/text-generation-inference:2.0.1
+    container_name: tgi-service
+    restart: unless-stopped
+    ports:
+      - "8008:80"
+    volumes:
+      - "../../../../assets/data:/data"
+    shm_size: 2g
+    environment:
+      MODEL_ID: ${LLM_MODEL_ID:-Intel/neural-chat-7b-v3-3}
+      HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      MAX_INPUT_LENGTH: 2048
+      MAX_TOTAL_TOKENS: 4096
+      PORT: 80
+      # Enable faster model downloads
+      HF_HUB_ENABLE_HF_TRANSFER: "1"
+      # Intel Xeon optimizations
+      OMP_NUM_THREADS: 8
+      KMP_AFFINITY: "granularity=fine,compact,1,0"
+      KMP_BLOCKTIME: 1
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
+      interval: 30s
+      timeout: 15s
+      retries: 20
+      start_period: 900s
+
+  # LLM Microservice
+  llm-tgi:
+    image: opea/llm-tgi:latest
+    container_name: llm-tgi-server
+    depends_on:
+      tgi-service:
+        condition: service_healthy
+    ports:
+      - "9000:9000"
+    ipc: host
+    environment:
+      TGI_LLM_ENDPOINT: http://tgi-service:80
+      HUGGINGFACEHUB_API_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      LLM_MODEL_ID: ${LLM_MODEL_ID:-Intel/neural-chat-7b-v3-3}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      no_proxy: ${no_proxy}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/v1/health"]
+      interval: 30s
+      timeout: 15s
+      retries: 10
+      start_period: 60s
+
+  # Data Preparation Microservice
+  dataprep-redis:
+    image: opea/dataprep-redis:latest
+    container_name: dataprep-redis-server
+    depends_on:
+      redis-vector-db:
+        condition: service_healthy
+      tei-embedding-service:
+        condition: service_healthy
+    ports:
+      - "6007:6007"
+    environment:
+      REDIS_URL: ${REDIS_URL:-redis://redis-vector-db:6379}
+      INDEX_NAME: opea_ims_vectors
+      TEI_ENDPOINT: http://tei-embedding-service:80
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      no_proxy: ${no_proxy}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:6007/v1/health"]
+      interval: 30s
+      timeout: 15s
+      retries: 10
+      start_period: 60s
+
+  # Cogniware IMS Backend (Megaservice + Application Logic)
+  cogniwareims-backend:
+    build:
+      context: ../../../../  # From docker_compose/intel/cpu/xeon/ go up 4 levels to CogniwareIms root
+      dockerfile: backend/Dockerfile
+    container_name: cogniwareims-backend
+    depends_on:
+      llm-tgi:
+        condition: service_healthy
+      embedding:
+        condition: service_healthy
+      retriever:
+        condition: service_healthy
+      reranking:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    environment:
+      # OPEA Services
+      LLM_SERVICE_HOST: llm-tgi
+      LLM_SERVICE_PORT: 9000
+      EMBEDDING_SERVICE_HOST: embedding
+      EMBEDDING_SERVICE_PORT: 6000
+      RETRIEVER_SERVICE_HOST: retriever
+      RETRIEVER_SERVICE_PORT: 7000
+      RERANK_SERVICE_HOST: reranking
+      RERANK_SERVICE_PORT: 8000
+      DATAPREP_SERVICE_HOST: dataprep-redis
+      DATAPREP_SERVICE_PORT: 6007
+      # Database
+      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:-postgres}@postgres:5432/opea_ims
+      REDIS_URL: ${REDIS_URL:-redis://redis-vector-db:6379}
+      # Application
+      CSV_DATA_DIR: /app/data
+      LOG_LEVEL: INFO
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      no_proxy: ${no_proxy}
+    volumes:
+      - ../../../../assets/data:/app/data:ro
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Cogniware IMS Frontend UI
+  cogniwareims-ui:
+    build:
+      context: ../../../../  # From docker_compose/intel/cpu/xeon/ go up 4 levels to CogniwareIms root
+      dockerfile: frontend/Dockerfile
+    container_name: cogniwareims-ui
+    depends_on:
+      cogniwareims-backend:
+        condition: service_healthy
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_API_URL: http://cogniwareims-backend:8000
+      NODE_ENV: production
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://localhost:3000",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  redis_data:
+  postgres_data:
+
+networks:
+  default:
+    driver: bridge

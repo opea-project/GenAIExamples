@@ -1,0 +1,85 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+.venv
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnp
+.pnp.js
+.next/
+out/
+build/
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+*.code-workspace
+
+# Logs
+*.log
+logs/
+
+# Environment
+.env
+.env.local
+.env*.local
+.env.production
+
+# Docker
+.dockerignore
+
+# Build artifacts
+*.egg-info/
+*.egg
+MANIFEST
+
+# Data (excluded per OPEA guidelines)
+data/
+assets/data/
+*.csv
+*.xlsx
+*.pdf
+*.docx
+
+# Models (large files)
+models/
+*.bin
+*.safetensors
+*.gguf
+
+# Temporary files
+*.tmp
+*.bak
+*.backup
+tmp/
+temp/
+
+# OS
+Thumbs.db
+
+# Lock files (keep package-lock.json but ignore others)
+yarn.lock
+pnpm-lock.yaml

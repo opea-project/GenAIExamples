@@ -3,10 +3,12 @@
 
 import gc
 import os
+from typing import Optional
 
+import requests
 from edgecraftrag.api_schema import ModelIn
 from edgecraftrag.context import ctx
-from fastapi import FastAPI, HTTPException, status
+from fastapi import FastAPI, HTTPException, Query, status
 
 model_app = FastAPI()
 
@@ -30,11 +32,26 @@ async def get_model_weight(model_id):
 
 # Search available model id
 @model_app.get(path="/v1/settings/avail-models/{model_type}")
-async def get_model_id(model_type):
+async def get_model_id(
+    model_type: str,
+    server_address: Optional[str] = Query(default=None, description="vLLM server address (optional)"),
+):
     try:
-        return get_available_models(model_type)
+        if model_type == "vLLM":
+            if not server_address:
+                server_address = "http://localhost:8086"
+            return get_available_vllm_models(server_address)
+        elif model_type == "vLLM_embedding":
+            if not server_address:
+                server_address = "http://localhost:8087"
+            return get_available_vllm_models(server_address)
+        else:
+            return get_available_models(model_type)
     except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=" GET model failed")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=" GET model failed",
+        )
 
 
 # GET Models
@@ -145,3 +162,21 @@ def get_available_models(model_type):
                 avail_models.append("BAAI/" + item)
 
     return avail_models
+
+
+@model_app.get(path="/v1/available_models")
+def get_available_vllm_models(server_address: str):
+    try:
+        url = f"{server_address}/v1/models"
+        response = requests.get(url, timeout=60)
+        response.raise_for_status()
+        response_data = response.json()
+        model_entries = response_data.get("data", [])
+        models = [entry.get("id") for entry in model_entries if entry.get("id")]
+
+        return models
+
+    except requests.exceptions.RequestException as e:
+        raise HTTPException(status_code=500, detail=f"Failed to connect to vLLM server: {str(e)}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error processing request: {str(e)}")

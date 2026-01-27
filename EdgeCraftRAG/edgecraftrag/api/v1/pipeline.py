@@ -5,14 +5,23 @@ import asyncio
 import json
 import os
 import re
+import time
 import weakref
 from concurrent.futures import ThreadPoolExecutor
 
 from edgecraftrag.api.v1.knowledge_base import Synchronizing_vector_data
 from edgecraftrag.api_schema import MilvusConnectRequest, PipelineCreateIn
-from edgecraftrag.base import IndexerType, InferenceType, ModelType, NodeParserType, PostProcessorType, RetrieverType
+from edgecraftrag.base import (
+    GeneratorType,
+    IndexerType,
+    InferenceType,
+    ModelType,
+    NodeParserType,
+    PostProcessorType,
+    RetrieverType,
+)
 from edgecraftrag.components.benchmark import Benchmark
-from edgecraftrag.components.generator import QnAGenerator
+from edgecraftrag.components.generator import FreeChatGenerator, QnAGenerator
 from edgecraftrag.components.indexer import KBADMINIndexer, VectorIndexer
 from edgecraftrag.components.node_parser import (
     HierarchyNodeParser,
@@ -28,7 +37,9 @@ from edgecraftrag.components.retriever import (
     SimpleBM25Retriever,
     VectorSimRetriever,
 )
+from edgecraftrag.config_repository import MilvusConfigRepository, save_pipeline_configurations
 from edgecraftrag.context import ctx
+from edgecraftrag.env import PIPELINE_FILE
 from fastapi import FastAPI, File, HTTPException, UploadFile, status
 from pymilvus import connections
 
@@ -82,7 +93,9 @@ async def add_pipeline(request: PipelineCreateIn):
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Pipeline name must consist of letters, numbers, and underscores.",
         )
-    return load_pipeline(request)
+    pl = await load_pipeline(request)
+    await save_pipeline_configurations("add", pl)
+    return pl
 
 
 # PATCH Pipeline
@@ -94,15 +107,18 @@ async def update_pipeline(name, request: PipelineCreateIn):
     active_pl = ctx.get_pipeline_mgr().get_active_pipeline()
     if pl == active_pl:
         if request.active:
-            raise HTTPException(status_code=status.HTTP_423_LOCKED, detail="Unable to patch an active pipeline...")
+            raise HTTPException(
+                status_code=status.HTTP_423_LOCKED,
+                detail="Unable to patch an active pipeline...",
+            )
     async with ctx.get_pipeline_mgr()._lock:
         try:
-            update_pipeline_handler(pl, request)
+            await update_pipeline_handler(pl, request)
             pipeline_dict = request.dict()
             pl.update_pipeline_json(pipeline_dict)
         except (ValueError, Exception) as e:
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
-    save_pipeline_to_file()
+    await save_pipeline_configurations("update", pl)
     return pl
 
 
@@ -110,8 +126,12 @@ async def update_pipeline(name, request: PipelineCreateIn):
 @pipeline_app.delete(path="/v1/settings/pipelines/{name}")
 async def remove_pipeline(name):
     try:
+        pl = ctx.get_pipeline_mgr().get_pipeline_by_name_or_id(name)
+        for _, agent in ctx.agentmgr.get_agents().items():
+            if pl.idx == agent.pipeline_idx:
+                raise Exception(f"Please cancel the {agent.name}'s agent associated with the current pipeline first")
         res = ctx.get_pipeline_mgr().remove_pipeline_by_name_or_id(name)
-        save_pipeline_to_file()
+        await save_pipeline_configurations("delete", pl)
         return res
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
@@ -123,35 +143,40 @@ async def upload_file(file: UploadFile = File(...)):
     content = await file.read()
     request = json.loads(content)
     pipeline_req = PipelineCreateIn(**request)
-    return load_pipeline(pipeline_req)
+    pl = await load_pipeline(pipeline_req)
+    await save_pipeline_configurations("add", pl)
+    return pl
 
 
-def load_pipeline(request):
+async def load_pipeline(request):
     pl = ctx.get_pipeline_mgr().get_pipeline_by_name_or_id(request.name)
     if pl is None:
         pipeline_json = request.model_dump_json()
-        pl = ctx.get_pipeline_mgr().create_pipeline(request.name, pipeline_json)
+        if request.idx is not None:
+            pl = ctx.get_pipeline_mgr().create_pipeline(request, pipeline_json)
+        else:
+            pl = ctx.get_pipeline_mgr().create_pipeline(request.name, pipeline_json)
     active_pl = ctx.get_pipeline_mgr().get_active_pipeline()
     if pl == active_pl and request.active:
-        raise HTTPException(status_code=status.HTTP_423_LOCKED, detail="Unable to patch an active pipeline...")
+        raise HTTPException(
+            status_code=status.HTTP_423_LOCKED,
+            detail="Unable to patch an active pipeline...",
+        )
     try:
-        update_pipeline_handler(pl, request)
-        save_pipeline_to_file()
+        await update_pipeline_handler(pl, request)
     except (ValueError, Exception) as e:
         ctx.get_pipeline_mgr().remove_pipeline_by_name_or_id(request.name)
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
     return pl
 
 
-def update_pipeline_handler(pl, req):
+async def update_pipeline_handler(pl, req):
     active_kb = ctx.knowledgemgr.get_active_knowledge_base()
     active_pipeline = ctx.get_pipeline_mgr().get_active_pipeline()
-    kb_name = active_kb.name if active_kb else "default_kb"
-    pl_change = False
+    kb_name = active_kb.name if active_kb else "default"
 
     if req.node_parser is not None:
         np = req.node_parser
-        pl_change = ctx.get_node_parser_mgr().search_parser_change(pl, req)
         found_parser = ctx.get_node_parser_mgr().search_parser(np)
         if found_parser is not None:
             pl.node_parser = found_parser
@@ -193,8 +218,12 @@ def update_pipeline_handler(pl, req):
                 case IndexerType.DEFAULT_VECTOR | IndexerType.FAISS_VECTOR | IndexerType.MILVUS_VECTOR:
                     if ind.embedding_model:
                         embed_model = ctx.get_model_mgr().search_model(ind.embedding_model)
+                        embed_type = ind.inference_type
                         if embed_model is None:
-                            ind.embedding_model.model_type = ModelType.EMBEDDING
+                            if embed_type == "local":
+                                ind.embedding_model.model_type = ModelType.EMBEDDING
+                            elif embed_type == "vllm":
+                                ind.embedding_model.model_type = ModelType.VLLM_EMBEDDING
                             embed_model = ctx.get_model_mgr().load_model(ind.embedding_model)
                             ctx.get_model_mgr().add(embed_model)
                     # TODO: **RISK** if considering 2 pipelines with different
@@ -282,9 +311,12 @@ def update_pipeline_handler(pl, req):
                 ctx.get_model_mgr().add(model)
             # Use weakref to achieve model deletion and memory release
             model_ref = weakref.ref(model)
-            pl.generator = QnAGenerator(
-                model_ref, gen.prompt_path, gen.inference_type, gen.vllm_endpoint, gen.prompt_content
-            )
+            if gen.generator_type == GeneratorType.CHATQNA:
+                pl.generator = QnAGenerator(
+                    model_ref, gen.prompt_path, gen.inference_type, gen.vllm_endpoint, gen.prompt_content
+                )
+            elif gen.generator_type == GeneratorType.FREECHAT:
+                pl.generator = FreeChatGenerator(model_ref, gen.inference_type, gen.vllm_endpoint)
             if pl.enable_benchmark:
                 if "tokenizer" not in locals() or tokenizer is None:
                     _, tokenizer, bench_hook = ctx.get_model_mgr().load_model_ben(gen.model)
@@ -298,56 +330,32 @@ def update_pipeline_handler(pl, req):
         ctx.get_pipeline_mgr().activate_pipeline(pl.name, req.active, ctx.get_node_mgr(), kb_name)
 
     # Create and set up a separate event loop to run asynchronous tasks in threads
-    def run_async_task():
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        try:
-            loop.run_until_complete(Synchronizing_vector_data(active_pipeline, pl, pl_change))
-        except Exception as e:
-            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Synchronization error: {e}")
-        finally:
-            loop.close()
-
-    with ThreadPoolExecutor(max_workers=1) as executor:
-        future = executor.submit(run_async_task)
-        future.result()
+    if req.active:
+        await Synchronizing_vector_data(active_pipeline, pl)
     return pl
 
 
 # Restore pipeline configuration
-def load_pipeline_from_file():
-    CONFIG_DIR = "/home/user/ui_cache/configs"
-    PIPELINE_FILE = os.path.join(CONFIG_DIR, "pipeline.json")
-    if os.path.exists(PIPELINE_FILE):
-        with open(PIPELINE_FILE, "r", encoding="utf-8") as f:
-            all_pipelines = f.read()
-        try:
-            all_data = json.loads(all_pipelines)
-            for pipeline_data in all_data:
-                one_pipelinejson = json.loads(pipeline_data)
-                pipeline_req = PipelineCreateIn(**one_pipelinejson)
-                load_pipeline(pipeline_req)
-        except Exception as e:
-            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
-
-
-# Configuration of the persistence pipeline
-def save_pipeline_to_file():
-    CONFIG_DIR = "/home/user/ui_cache/configs"
-    PIPELINE_FILE = os.path.join(CONFIG_DIR, "pipeline.json")
-
-    if not os.path.exists(CONFIG_DIR):
-        os.makedirs(CONFIG_DIR, exist_ok=True)
+async def restore_pipeline_configurations():
+    milvus_repo = MilvusConfigRepository.create_connection("pipeline_config", 20)
+    all_pipelines = []
+    if milvus_repo:
+        time.sleep(10)
+        all_pipelines_repo = milvus_repo.get_configs()
+        for pipeline in all_pipelines_repo:
+            all_pipelines.append(pipeline.get("config_json"))
+    else:
+        if os.path.exists(PIPELINE_FILE):
+            with open(PIPELINE_FILE, "r", encoding="utf-8") as f:
+                all_pipelines = f.read()
+        if all_pipelines:
+            all_pipelines = json.loads(all_pipelines)
     try:
-        pipelines_data = ctx.get_pipeline_mgr().get_pipelines()
-        all_pipeline_json = []
-        for pipeline in pipelines_data:
-            all_pipeline_json.append(pipeline.get_pipeline_json)
-        json_str = json.dumps(all_pipeline_json, indent=2, ensure_ascii=False)
-        with open(PIPELINE_FILE, "w", encoding="utf-8") as f:
-            f.write(json_str)
+        for pipeline_data in all_pipelines:
+            pipeline_req = PipelineCreateIn(**pipeline_data)
+            await load_pipeline(pipeline_req)
     except Exception as e:
-        print(f"Error saving pipelines: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 
 # Detecting if milvus is connected

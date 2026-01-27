@@ -14,7 +14,7 @@ This section describes how to quickly deploy and test the EdgeCraftRAG service m
 2. [Access the Code](#2-access-the-code)
 3. [Prepare models](#3-prepare-models)
 4. [Prepare env variables and configurations](#4-prepare-env-variables-and-configurations)
-5. [Deploy the Service on Arc A770 Using Docker Compose](#5-deploy-the-service-on-intel-gpu-using-docker-compose)
+5. [Deploy the Service on Arc GPU Using Docker Compose](#5-deploy-the-service-on-intel-gpu-using-docker-compose)
 6. [Access UI](#6-access-ui)
 7. [Cleanup the Deployment](#7-cleanup-the-deployment)
 
@@ -39,10 +39,10 @@ git clone https://github.com/opea-project/GenAIExamples.git
 cd GenAIExamples/EdgeCraftRAG
 ```
 
-Checkout a released version, such as v1.3:
+Checkout a released version, such as v1.5:
 
 ```
-git checkout v1.3
+git checkout v1.5
 ```
 
 ### 3. Prepare models
@@ -66,8 +66,6 @@ modelscope download --model $LLM_MODEL --local_dir "${MODEL_PATH}/${LLM_MODEL}"
 
 ### 4. Prepare env variables and configurations
 
-Below steps are for single Intel Arc GPU inference, if you want to setup multi Intel Arc GPUs inference, please refer to [Multi-ARC Setup](../../../../docs/Advanced_Setup.md#multi-arc-setup)
-
 #### Prepare env variables for vLLM deployment
 
 ```bash
@@ -86,7 +84,9 @@ export NO_PROXY=${NO_PROXY},${HOST_IP},edgecraftrag,edgecraftrag-server
 # export HF_ENDPOINT=https://hf-mirror.com # your HF mirror endpoint"
 
 # Make sure all 3 folders have 1000:1000 permission, otherwise
-chown 1000:1000 ${MODEL_PATH} ${PWD} # the default value of DOC_PATH and TMPFILE_PATH is PWD ,so here we give permission to ${PWD}
+export DOC_PATH=${PWD}/tests
+export TMPFILE_PATH=${PWD}/tests
+chown 1000:1000 ${MODEL_PATH} ${DOC_PATH} ${TMPFILE_PATH}
 # In addition, also make sure the .cache folder has 1000:1000 permission, otherwise
 chown 1000:1000 -R $HOME/.cache
 ```
@@ -110,15 +110,10 @@ export MILVUS_ENABLED=0
 #### option a. Deploy the Service on Arc A770 Using Docker Compose
 
 ```bash
-export VLLM_SERVICE_PORT_0=8100 # You can set your own port for vllm service
-# Generate your nginx config file
-# nginx-conf-generator.sh requires 2 parameters: DP_NUM and output filepath
-bash nginx/nginx-conf-generator.sh 1 nginx/nginx.conf
-# set NGINX_CONFIG_PATH
-export NGINX_CONFIG_PATH="${PWD}/nginx/nginx.conf"
+export VLLM_SERVICE_PORT_A770=8086 # You can set your own port for vllm service
 
 # Launch EC-RAG service with compose
-docker compose -f docker_compose/intel/gpu/arc/compose_vllm.yaml up -d
+docker compose --profile a770 -f docker_compose/intel/gpu/arc/compose.yaml up -d
 ```
 
 #### option b. Deploy the Service on Arc B60 Using Docker Compose
@@ -140,7 +135,7 @@ docker compose -f docker_compose/intel/gpu/arc/compose_vllm.yaml up -d
 # export MAX_MODEL_LEN=49152
 # export BLOCK_SIZE=64
 # export QUANTIZATION=fp8
-docker compose -f docker_compose/intel/gpu/arc/compose_vllm_b60.yaml up -d
+docker compose --profile b60 -f docker_compose/intel/gpu/arc/compose.yaml up -d
 ```
 
 ### 6. Access UI
@@ -157,8 +152,7 @@ Below is the UI front page, for detailed operations on UI and EC-RAG settings, p
 To stop the containers associated with the deployment, execute the following command:
 
 ```
-docker compose -f docker_compose/intel/gpu/arc/compose_vllm.yaml down
-# or docker compose -f docker_compose/intel/gpu/arc/compose_vllm_b60.yaml down
+docker compose -f docker_compose/intel/gpu/arc/compose.yaml down
 ```
 
 All the EdgeCraftRAG containers will be stopped and then removed on completion of the "down" command.
