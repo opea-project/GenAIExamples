@@ -119,8 +119,15 @@ Before you begin, ensure you have the following installed:
 ### Required API Configuration
 
 **For Inference Service (Code Translation):**
-- INFERENCE_API_ENDPOINT: URL of the deployed model inference service
-- INFERENCE_API_TOKEN: API key / bearer token used to authenticate requests
+
+This application supports multiple inference deployment patterns:
+
+- **GenAI Gateway**: Intel's centralized gateway for multi-model access
+- **APISIX Gateway**: API gateway with routing and authentication
+
+Configuration requirements:
+- INFERENCE_API_ENDPOINT: URL to your inference service (GenAI Gateway, APISIX Gateway, etc.)
+- INFERENCE_API_TOKEN: Authentication token/API key for your chosen service
 
 ### Verify Docker Installation
 
@@ -156,6 +163,13 @@ cat > .env << EOF
 BACKEND_PORT=5001
 
 # Inference API Configuration
+# INFERENCE_API_ENDPOINT: URL to your inference service (without /v1 suffix)
+#   - For GenAI Gateway: https://genai-gateway.example.com
+#   - For APISIX Gateway: https://apisix-gateway.example.com/inference
+#
+# INFERENCE_API_TOKEN: Authentication token/API key for the inference service
+#   - For GenAI Gateway: Your GenAI Gateway API key
+#   - For APISIX Gateway: Your APISIX authentication token
 INFERENCE_API_ENDPOINT=https://your-api-endpoint.com/deployment
 INFERENCE_API_TOKEN=your-pre-generated-token-here
 INFERENCE_MODEL_NAME=codellama/CodeLlama-34b-Instruct-hf
@@ -180,6 +194,13 @@ Or manually create `.env` with:
 BACKEND_PORT=5001
 
 # Inference API Configuration
+# INFERENCE_API_ENDPOINT: URL to your inference service (without /v1 suffix)
+#   - For GenAI Gateway: https://genai-gateway.example.com
+#   - For APISIX Gateway: https://apisix-gateway.example.com/inference
+#
+# INFERENCE_API_TOKEN: Authentication token/API key for the inference service
+#   - For GenAI Gateway: Your GenAI Gateway API key
+#   - For APISIX Gateway: Your APISIX authentication token
 INFERENCE_API_ENDPOINT=https://your-api-endpoint.com/deployment
 INFERENCE_API_TOKEN=your-pre-generated-token-here
 INFERENCE_MODEL_NAME=codellama/CodeLlama-34b-Instruct-hf
