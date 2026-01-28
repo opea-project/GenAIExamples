@@ -122,8 +122,8 @@ Before you begin, ensure you have the following installed:
 
 This application supports multiple inference deployment patterns:
 
-- **GenAI Gateway**: Intel's centralized gateway for multi-model access
-- **APISIX Gateway**: API gateway with routing and authentication
+- **GenAI Gateway**: Provide your GenAI Gateway URL and API key
+- **APISIX Gateway**: Provide your APISIX Gateway URL and authentication token
 
 Configuration requirements:
 - INFERENCE_API_ENDPOINT: URL to your inference service (GenAI Gateway, APISIX Gateway, etc.)
