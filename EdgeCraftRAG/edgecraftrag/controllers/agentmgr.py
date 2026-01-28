@@ -5,7 +5,7 @@ from typing import Any, Dict, Optional
 
 from comps.cores.proto.api_protocol import ChatCompletionRequest
 from edgecraftrag.api_schema import AgentCreateIn
-from edgecraftrag.base import AgentType, BaseMgr, CallbackType
+from edgecraftrag.base import AgentType, BaseMgr, CallbackType, GeneratorType
 from edgecraftrag.components.agent import Agent
 from edgecraftrag.components.agents.deep_search.deep_search import DeepSearchAgent
 from edgecraftrag.components.agents.simple import SimpleRAGAgent
@@ -58,7 +58,11 @@ class AgentManager(BaseMgr):
             self.agents[new_agent.idx] = new_agent
             if cfgs.active:
                 self.active_agent_idx = new_agent.idx
-            return new_agent
+
+            # check pipeline freechat generator
+            if not self.get_pipeline_by_name_or_id(cfgs.pipeline_idx).get_generator(GeneratorType.FREECHAT):
+                if not self.get_pipeline_by_name_or_id(cfgs.pipeline_idx).create_freechat_gen_from_chatqna_gen():
+                    return "Create freechat generator for agent bound pipeline failed."
         else:
             return "Create Agent failed."
 

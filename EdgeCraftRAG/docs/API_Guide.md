@@ -60,7 +60,7 @@ Benchmarking activities may significantly reduce system performance.
 export ENABLE_BENCHMARK="true"
 
 # check the benchmark data for pipeline {pipeline_name}
-curl -X GET http://${HOST_IP}:16010/v1/settings/pipelines/{pipeline_name}/benchmark -H "Content-Type: application/json" | jq '.'
+curl -X GET http://${HOST_IP}:16010/v1/settings/pipelines/{pipeline_name}/benchmarks -H "Content-Type: application/json" | jq '.'
 ```
 
 ## Model Management

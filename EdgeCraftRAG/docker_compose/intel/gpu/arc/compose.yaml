@@ -139,7 +139,7 @@ services:
     ports:
       - ${VLLM_SERVICE_PORT_B60:-8086}:${VLLM_SERVICE_PORT_B60:-8086}
     volumes:
-      - ${MODEL_PATH}:/workspace/vllm/models
+      - ${MODEL_PATH-${PWD}}:/workspace/vllm/models
     devices:
       - /dev/dri:/dev/dri
     environment:

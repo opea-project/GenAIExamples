@@ -5,11 +5,11 @@
     <a-tabs v-model:activeKey="activeKey" type="card">
       <a-tab-pane key="pipeline" :tab="$t('pipeline.pipelines')">
         <!-- Pipeline -->
-        <Pipeline />
+        <Pipeline v-if="activeKey === 'pipeline'" />
       </a-tab-pane>
       <a-tab-pane key="agent" :tab="$t('agent.agent')">
         <!-- Agent -->
-        <Agent />
+        <Agent v-if="activeKey === 'agent'" />
       </a-tab-pane>
     </a-tabs>
   </div>

@@ -21,10 +21,14 @@ class CompType(str, Enum):
     GENERATOR = "generator"
     QUERYSEARCH = "querysearch"
     FILE = "file"
-    CHUNK_NUM = "chunk_num"
     KNOWLEDGE = "knowledge"
     AGENT = "agent"
     SESSION = "session"
+
+
+class BenchType(str, Enum):
+
+    CHUNK_NUM = "chunk_num"
 
 
 class ModelType(str, Enum):

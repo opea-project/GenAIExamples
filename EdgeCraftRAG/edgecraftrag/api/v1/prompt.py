@@ -3,6 +3,7 @@
 
 from edgecraftrag.api.v1.pipeline import save_pipeline_configurations
 from edgecraftrag.api_schema import PromptIn
+from edgecraftrag.base import GeneratorType
 from edgecraftrag.context import ctx
 from edgecraftrag.utils import DEFAULT_TEMPLATE
 from fastapi import FastAPI, File, HTTPException, UploadFile, status
@@ -15,7 +16,7 @@ prompt_app = FastAPI()
 async def load_prompt_file(file: UploadFile = File(...)):
     try:
         pl = ctx.get_pipeline_mgr().get_active_pipeline()
-        generator = pl.generator
+        generator = pl.get_generator(GeneratorType.CHATQNA)
         if generator:
             content = await file.read()
             prompt_str = content.decode("utf-8")
@@ -31,7 +32,7 @@ async def load_prompt_file(file: UploadFile = File(...)):
 async def load_prompt(request: PromptIn):
     try:
         pl = ctx.get_pipeline_mgr().get_active_pipeline()
-        generator = pl.generator
+        generator = pl.get_generator(GeneratorType.CHATQNA)
         if generator:
             prompt_str = request.prompt
             generator.set_prompt(prompt_str)
@@ -45,7 +46,7 @@ async def load_prompt(request: PromptIn):
 @prompt_app.get(path="/v1/chatqna/prompt")
 async def get_prompt():
     try:
-        generator = ctx.get_pipeline_mgr().get_active_pipeline().generator
+        generator = ctx.get_pipeline_mgr().get_active_pipeline().get_generator(GeneratorType.CHATQNA)
         if generator:
             return generator.original_template
     except Exception as e:
@@ -55,7 +56,7 @@ async def get_prompt():
 @prompt_app.get(path="/v1/chatqna/prompt/tagged")
 async def get_tagged_prompt():
     try:
-        generator = ctx.get_pipeline_mgr().get_active_pipeline().generator
+        generator = ctx.get_pipeline_mgr().get_active_pipeline().get_generator(GeneratorType.CHATQNA)
         if generator:
             return generator.prompt
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Tagged prompt not found")
@@ -72,7 +73,7 @@ async def get_default_prompt():
 @prompt_app.post(path="/v1/chatqna/prompt/reset")
 async def reset_prompt():
     try:
-        generator = ctx.get_pipeline_mgr().get_active_pipeline().generator
+        generator = ctx.get_pipeline_mgr().get_active_pipeline().get_generator(GeneratorType.CHATQNA)
         if generator:
             generator.reset_prompt()
             return "Reset LLM Prompt Successfully"

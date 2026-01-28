@@ -21,8 +21,8 @@ const getTableColumns = (t: (key: string) => string): TableColumns[] => [
   },
   {
     title: t("agent.pipeline"),
-    dataIndex: "pipeline_idx",
-    key: "pipeline_idx",
+    dataIndex: "pipeline_name",
+    key: "pipeline_name",
     minWidth: 100,
     ellipsis: true,
     visible: true,

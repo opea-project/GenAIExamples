@@ -16,6 +16,15 @@ export const getAgentDetailByName = (name: String) => {
     method: "get",
   });
 };
+
+export const getFreechatList = (params: Object) => {
+  return request({
+    url: "/v1/settings/pipelines",
+    method: "get",
+    params,
+  });
+};
+
 export const requestAgentCreate = (data: Object) => {
   return request({
     url: "/v1/settings/agents",

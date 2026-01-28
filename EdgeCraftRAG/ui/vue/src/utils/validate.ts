@@ -37,7 +37,7 @@ export const isValidPipelineName = (name: string): boolean => {
 
 export const validateServiceAddress = (url: string): boolean => {
   const regex =
-    /^(http:\/\/)(([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,6}|localhost|[0-9]{1,3}(\.[0-9]{1,3}){3})(:[0-9]+)?$/;
+    /^(https?:\/\/)(([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,6}|localhost|[0-9]{1,3}(\.[0-9]{1,3}){3})(:[0-9]+)?$/;
 
   return regex.test(url);
 };

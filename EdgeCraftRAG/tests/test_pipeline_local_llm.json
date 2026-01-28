@@ -30,7 +30,8 @@
       }
     }
   ],
-  "generator": {
+  "generator": [
+    {
     "model": {
       "model_id": "Qwen/Qwen3-8B",
       "model_path": "./models/Qwen/Qwen3-8B/INT4_compressed_weights",
@@ -40,6 +41,7 @@
     "generator_type": "chatqna",
     "prompt_path": "./default_prompt.txt",
     "inference_type": "local"
-  },
+    }
+  ],
   "active": "True"
 }

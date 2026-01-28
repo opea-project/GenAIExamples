@@ -59,7 +59,7 @@ class PipelineCreateIn(BaseModel):
     indexer: Optional[IndexerIn] = None
     retriever: Optional[RetrieverIn] = None
     postprocessor: Optional[list[PostProcessorIn]] = None
-    generator: Optional[GeneratorIn] = None
+    generator: Optional[list[GeneratorIn]] = None
     active: Optional[bool] = False
     documents_cache: Optional[Dict] = None
 
@@ -110,6 +110,7 @@ class AgentCreateIn(BaseModel):
     name: Optional[str] = ""
     type: Optional[base.AgentType] = None
     pipeline_idx: Optional[str] = None
+    pipeline_name: Optional[str] = None
     configs: Optional[dict] = None
     active: Optional[bool] = False
 

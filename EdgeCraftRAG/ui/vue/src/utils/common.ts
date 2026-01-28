@@ -104,7 +104,7 @@ export const getEnumField = <T extends readonly Record<string, any>[]>(
   list: T,
   inputValue: any,
   matchKey: string = "value",
-  outputKey: string = "name",
+  outputKey: string = "name"
 ): any => {
   const item = list.find((item) => item[matchKey] === inputValue);
   return item?.[outputKey];

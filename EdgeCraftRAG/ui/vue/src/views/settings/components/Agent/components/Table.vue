@@ -64,6 +64,7 @@
       v-model:pageSize="paginationData.pageSize"
       showSizeChanger
       :total="paginationData.total"
+      :show-total="total => `${$t('common.total')}: ${total}`"
     />
   </div>
 </template>
@@ -92,8 +93,8 @@
   });
 
   const emit = defineEmits(["create", "update", "search", "view"]);
-  const paginationData = reactive<paginationType>({
-    total: props.tableData.length || 0,
+  const paginationData = reactive<PaginationType>({
+    total: 0,
     pageNum: 1,
     pageSize: 10,
   });
@@ -132,6 +133,13 @@
       },
     });
   };
+  watch(
+    () => props.tableData,
+    newData => {
+      paginationData.total = newData.length;
+    },
+    { immediate: true }
+  );
 </script>
 
 <style scoped lang="less">

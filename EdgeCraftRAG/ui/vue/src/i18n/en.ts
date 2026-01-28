@@ -42,6 +42,15 @@ export default {
     inputTip: "Please enter ",
     connect: "Connect",
     detail: "View details",
+    retry: "Retry",
+    retrying: "Retrying",
+    retryAll: "Retry All",
+    ignore: "Ignore",
+    ignoreAll: "Ignore All",
+    replace: "Replace",
+    replaceAll: "Replace All",
+    count: "Count",
+    total: "Total",
   },
   system: {
     title: "System Status",
@@ -90,6 +99,7 @@ export default {
     deleteTip: "Are you sure delete this pipeline?",
     notActivatedTip: "There is no available pipeline. Please create or activate it first.",
     validErr: "Form validation failed !",
+    urlValidTip: "Test URL or model to proceed.",
     config: {
       basic: "Basic",
       nodeParser: "Node Parser",
@@ -113,6 +123,8 @@ export default {
       rerankDevice: "Rerank run device",
       generator: "Generator",
       generatorType: "Generator Type",
+      generatorAgent: "Agent Generator",
+      generatorChat: "ChatQnA Generator",
       llm: "LLM Inference Type",
       language: "Large Language Model",
       llmDevice: "LLM run device",
@@ -123,6 +135,8 @@ export default {
       modelName: "Model Name",
       vllm_url: "vLLM URL",
       kbadmin: "kbadmin",
+      addAgent: "Agent Configuration",
+      deleteAgentTip: "Are you sure you want to delete the agent generator configuration?",
     },
     valid: {
       nameValid1: "Please input name",
@@ -148,7 +162,7 @@ export default {
       rerank: "Please select Rerank Model",
       rerankDevice: "Please select Rerank run device",
       generatorType: "Please select Generator Type",
-      language: "Please select or enter Large Language Model",
+      language: "Please select Large Language Model",
       llmDevice: "Please select LLM run device",
       weights: "Please select Weights",
       kb_vector_url: "IP : Port, (e.g. 192.168.1.1:29530)",
@@ -165,9 +179,12 @@ export default {
       vllmUrlValid3: "URL cannot be accessed",
       vllmUrlValid4: "Test passed !",
       vllmUrlValid5: "The vLLM model has not passed verification yet",
-      nodeParserTypeTip: "Both Indexer Type and  Retriever Type will be set to kbadmin at the same time",
-      indexerTypeTip: "Both Node Parser Type and  Retriever Type will be set to kbadmin at the same time",
-      retrieverTypeTip: "Both Node Parser Type and  Indexer Type will be set to kbadmin at the same time",
+      nodeParserTypeTip:
+        "Both Indexer Type and  Retriever Type will be set to kbadmin at the same time",
+      indexerTypeTip:
+        "Both Node Parser Type and  Retriever Type will be set to kbadmin at the same time",
+      retrieverTypeTip:
+        "Both Node Parser Type and  Indexer Type will be set to kbadmin at the same time",
       retrieverChangeTip: "Please go to the Indexer stage to complete the data",
       indexerTypeValid1: "Indexer type can only select kbadmin",
       modelRequired: "Please enter embedding model url",
@@ -265,7 +282,8 @@ export default {
     edit: "Edit Knowledge Base",
     deleteTip: "Are you sure delete this knowledge base?",
     activeTip: "Are you sure activate this knowledge base?",
-    uploadTip: "Supports PDF, Word, TXT,Doc,Html,PPT,ZIP formats, with a single file size not exceeding 200M",
+    uploadTip:
+      "Supports PDF, Word, TXT,Doc,Html,PPT,ZIP formats, with a single file size not exceeding 200M",
     notFileTip: "The knowledge base is empty. Go upload your files.",
     name: "Name",
     des: "Description",
@@ -295,6 +313,8 @@ export default {
     successfully: "Successfully ",
     failed: "Failed",
     totalTip: "files",
+    failedFile: "Failed Files",
+    retryFailed: "Upload failed !",
   },
   request: {
     pipeline: {
@@ -390,7 +410,7 @@ export default {
     delConfigs: "Delete Config",
     noData: "No settings configured",
     think: "Agent Thinking",
-    pipeline: "Pipeline ID",
+    pipeline: "Pipeline Name",
     label: {
       name: "Agent Name",
       type: "Agent Type ",
@@ -406,7 +426,7 @@ export default {
       configs: "Please enter agent configs",
       key: "Please enter config key",
       value: "Please enter config value",
-      notPipeline: "Please create Pipeline with the generator type set to FreeChat first.",
+      notPipeline: "Please create a pipeline first.",
     },
   },
 };
