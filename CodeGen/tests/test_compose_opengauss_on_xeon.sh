@@ -44,7 +44,7 @@ function start_services() {
     export GS_DB="postgres"
     export GS_CONNECTION_STRING="opengauss+psycopg2://${GS_USER}:${GS_PASSWORD}@$ip_address:5432/${GS_DB}"
 
-    source ../docker_compose/intel/set_env_opengauss.sh
+    source $WORKPATH/docker_compose/intel/set_env_opengauss.sh
 
     # Start Docker Containers
     docker compose -f compose_opengauss.yaml up -d --quiet-pull > ${LOG_PATH}/start_services_with_compose.log
