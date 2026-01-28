@@ -72,7 +72,9 @@ class Agent(BaseComponent):
     async def _run_pipeline_generate(self, request):
         pl = self.get_bound_pipeline()
         if pl is not None:
-            return await pl.run(cbtype=CallbackType.GENERATE, chat_request=request, generator_type=GeneratorType.FREECHAT)
+            return await pl.run(
+                cbtype=CallbackType.GENERATE, chat_request=request, generator_type=GeneratorType.FREECHAT
+            )
 
     async def run_pipeline_retrieve_and_rerank(self, request):
         pl = self.get_bound_pipeline()

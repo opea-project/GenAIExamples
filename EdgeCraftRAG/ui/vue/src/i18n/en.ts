@@ -179,12 +179,9 @@ export default {
       vllmUrlValid3: "URL cannot be accessed",
       vllmUrlValid4: "Test passed !",
       vllmUrlValid5: "The vLLM model has not passed verification yet",
-      nodeParserTypeTip:
-        "Both Indexer Type and  Retriever Type will be set to kbadmin at the same time",
-      indexerTypeTip:
-        "Both Node Parser Type and  Retriever Type will be set to kbadmin at the same time",
-      retrieverTypeTip:
-        "Both Node Parser Type and  Indexer Type will be set to kbadmin at the same time",
+      nodeParserTypeTip: "Both Indexer Type and  Retriever Type will be set to kbadmin at the same time",
+      indexerTypeTip: "Both Node Parser Type and  Retriever Type will be set to kbadmin at the same time",
+      retrieverTypeTip: "Both Node Parser Type and  Indexer Type will be set to kbadmin at the same time",
       retrieverChangeTip: "Please go to the Indexer stage to complete the data",
       indexerTypeValid1: "Indexer type can only select kbadmin",
       modelRequired: "Please enter embedding model url",
@@ -282,8 +279,7 @@ export default {
     edit: "Edit Knowledge Base",
     deleteTip: "Are you sure delete this knowledge base?",
     activeTip: "Are you sure activate this knowledge base?",
-    uploadTip:
-      "Supports PDF, Word, TXT,Doc,Html,PPT,ZIP formats, with a single file size not exceeding 200M",
+    uploadTip: "Supports PDF, Word, TXT,Doc,Html,PPT,ZIP formats, with a single file size not exceeding 200M",
     notFileTip: "The knowledge base is empty. Go upload your files.",
     name: "Name",
     des: "Description",

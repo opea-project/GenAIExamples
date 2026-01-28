@@ -6,7 +6,7 @@ import threading
 from typing import Any, List, Optional
 
 import requests
-from edgecraftrag.base import BaseComponent, CompType, InferenceType, BenchType
+from edgecraftrag.base import BaseComponent, BenchType, CompType, InferenceType
 from prometheus_client.parser import text_string_to_metric_families
 from pydantic import BaseModel, Field, model_serializer
 

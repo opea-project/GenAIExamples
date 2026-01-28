@@ -1,12 +1,7 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import {
-  CheckCircleFilled,
-  CloseCircleFilled,
-  ExclamationCircleFilled,
-  InfoCircleFilled,
-} from "@ant-design/icons-vue";
+import { CheckCircleFilled, CloseCircleFilled, ExclamationCircleFilled, InfoCircleFilled } from "@ant-design/icons-vue";
 import { notification } from "ant-design-vue";
 import { h } from "vue";
 
@@ -27,7 +22,7 @@ const getNotificationIcon = (type: string) => {
 export const customNotification = (
   type: "success" | "warning" | "error" | "info",
   message: string,
-  description: string | undefined
+  description: string | undefined,
 ) => {
   const { icon, color } = getNotificationIcon(type);
   const styledIcon = icon ? h(icon, { style: { color: `var(${color})` } }) : null;

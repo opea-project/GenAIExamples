@@ -31,19 +31,13 @@ async def retrieval(request: ChatCompletionRequest):
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Retrieval needs to have an active knowledgebase",
             )
-        contexts = await ctx.get_pipeline_mgr().run_retrieve_postprocess(
-            chat_request=request
-        )
+        contexts = await ctx.get_pipeline_mgr().run_retrieve_postprocess(chat_request=request)
         serialized_contexts = serialize_contexts(contexts)
 
-        ragout = RagOut(
-            query=request.messages, contexts=serialized_contexts, response=""
-        )
+        ragout = RagOut(query=request.messages, contexts=serialized_contexts, response="")
         return ragout
     except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)
-        )
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 
 # ChatQnA
@@ -62,9 +56,7 @@ async def chatqna(request: ChatCompletionRequest):
         generator = active_pl.get_generator(GeneratorType.CHATQNA)
         inference_type = generator.inference_type if generator else "local"
 
-        request.input = ctx.get_session_mgr().concat_history(
-            sessionid, inference_type, request.messages
-        )
+        request.input = ctx.get_session_mgr().concat_history(sessionid, inference_type, request.messages)
 
         # Run agent if activated, otherwise, run pipeline
         if ctx.get_agent_mgr().get_active_agent():
@@ -74,9 +66,7 @@ async def chatqna(request: ChatCompletionRequest):
         else:
             generator = active_pl.get_generator(GeneratorType.CHATQNA)
             if not generator:
-                raise Exception(
-                    "code:0000Please make sure chatqna generator is available in pipeline."
-                )
+                raise Exception("code:0000Please make sure chatqna generator is available in pipeline.")
             request.model = generator.model_id
 
         if request.stream:
@@ -110,9 +100,7 @@ async def ragqna(request: ChatCompletionRequest):
         if generator:
             request.model = generator.model_id
         if request.stream:
-            res_gen, contexts = await ctx.get_pipeline_mgr().run_pipeline(
-                chat_request=request
-            )
+            res_gen, contexts = await ctx.get_pipeline_mgr().run_pipeline(chat_request=request)
 
             # Escape newlines for json format as value
             async def res_gen_json():
@@ -125,26 +113,18 @@ async def ragqna(request: ChatCompletionRequest):
             s_contexts = json.dumps(serialize_contexts(contexts))
             context_gen = stream_generator('"contexts":' + s_contexts + ',"response":"')
             final_gen = stream_generator('"}')
-            output_gen = chain_async_generators(
-                [query_gen, context_gen, res_gen_json(), final_gen]
-            )
+            output_gen = chain_async_generators([query_gen, context_gen, res_gen_json(), final_gen])
 
             return StreamingResponse(output_gen, media_type="text/plain")
         else:
-            ret, contexts = await ctx.get_pipeline_mgr().run_pipeline(
-                chat_request=request
-            )
+            ret, contexts = await ctx.get_pipeline_mgr().run_pipeline(chat_request=request)
             serialized_contexts = serialize_contexts(contexts)
 
-            ragout = RagOut(
-                query=request.messages, contexts=serialized_contexts, response=str(ret)
-            )
+            ragout = RagOut(query=request.messages, contexts=serialized_contexts, response=str(ret))
             return ragout
 
     except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)
-        )
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 
 # Detecting if vllm is connected

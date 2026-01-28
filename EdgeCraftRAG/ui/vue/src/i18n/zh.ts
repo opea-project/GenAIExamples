@@ -215,8 +215,7 @@ export default {
       vector: "矢量存储索引",
       simple: "解析文本，优先选择完整的句子。",
       hierarchical: "使用NodeParser将文档拆分为递归层次结构的节点。",
-      sentencewindow:
-        "将文档分割成节点，每个节点代表一个句子。每个节点包含一个来自元数据中周围句子的窗口",
+      sentencewindow: "将文档分割成节点，每个节点代表一个句子。每个节点包含一个来自元数据中周围句子的窗口",
       unstructured: "一个处理非结构化数据的组件",
       milvusVector: "矢量索引存储在Milvus中",
       vector_url: "测试Milvus地址是否可用",

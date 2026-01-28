@@ -3,8 +3,8 @@
 
 import asyncio
 import json
-import time
 import os
+import time
 import urllib.request
 from concurrent.futures import ThreadPoolExecutor
 from urllib.parse import urlparse
@@ -123,6 +123,7 @@ async def stream_generator(llm, prompt_str, unstructured_str, benchmark=None, be
         result_error = str(e)[start_idx:]
         yield f"code:0000{result_error}"
 
+
 def clone_generator(src_generator: BaseComponent, dst_generator_cfg: dict = None):
     if not dst_generator_cfg:
         # If no config is provided, do a pure clone.
@@ -148,15 +149,18 @@ def clone_generator(src_generator: BaseComponent, dst_generator_cfg: dict = None
             return None
         # For QnAGenerator, we also need prompt-related info
         qna_args = shared_args.copy()
-        qna_args.update({
-            "prompt_template_file": src_generator.prompt_template_file,
-            "prompt_content": src_generator.prompt_content,
-        })
+        qna_args.update(
+            {
+                "prompt_template_file": src_generator.prompt_template_file,
+                "prompt_content": src_generator.prompt_content,
+            }
+        )
         new_generator = QnAGenerator(**qna_args)
     elif generator_type == GeneratorType.FREECHAT:
         new_generator = FreeChatGenerator(**shared_args)
 
     return new_generator
+
 
 class QnAGenerator(BaseComponent):
 

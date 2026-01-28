@@ -81,7 +81,7 @@ async def get_pipeline_benchmark():
 async def get_pipeline_benchmarks(name):
     pl = ctx.get_pipeline_mgr().get_pipeline_by_name_or_id(name)
     if pl and pl.benchmark:
-        bench_res = {'pipeline_bench': pl.benchmark.benchmark_data_list, 'llm_bench': pl.benchmark.llm_data_list}
+        bench_res = {"pipeline_bench": pl.benchmark.benchmark_data_list, "llm_bench": pl.benchmark.llm_data_list}
         return bench_res
 
 
@@ -314,10 +314,14 @@ async def update_pipeline_handler(pl, req):
                 # Use weakref to achieve model deletion and memory release
                 model_ref = weakref.ref(model)
                 if gen.generator_type == GeneratorType.CHATQNA:
-                    pl.generator.append(QnAGenerator(model_ref, gen.prompt_path, gen.inference_type, gen.vllm_endpoint, gen.prompt_content))
+                    pl.generator.append(
+                        QnAGenerator(
+                            model_ref, gen.prompt_path, gen.inference_type, gen.vllm_endpoint, gen.prompt_content
+                        )
+                    )
                 elif gen.generator_type == GeneratorType.FREECHAT:
                     pl.generator.append(FreeChatGenerator(model_ref, gen.inference_type, gen.vllm_endpoint))
-                
+
                 if pl.enable_benchmark:
                     if "tokenizer" not in locals() or tokenizer is None:
                         _, tokenizer, bench_hook = ctx.get_model_mgr().load_model_ben(gen.model)

@@ -5,6 +5,7 @@ import json
 import os
 import time
 from typing import Dict, List, Optional
+
 from edgecraftrag.base import GeneratorType
 from edgecraftrag.env import AGENT_FILE, KNOWLEDGEBASE_FILE, PIPELINE_FILE
 from pymilvus import (
@@ -290,7 +291,7 @@ async def save_pipeline_configurations(operation: str = None, pipeline=None):
                 chatqna_gen = pipeline.get_generator(GeneratorType.CHATQNA)
                 if chatqna_gen:
                     if GeneratorType.CHATQNA in gens_data:
-                         gens_data[GeneratorType.CHATQNA]["prompt_content"] = chatqna_gen.prompt_content
+                        gens_data[GeneratorType.CHATQNA]["prompt_content"] = chatqna_gen.prompt_content
             target_data["documents_cache"] = pipeline.documents_cache
             target_data["active"] = pipeline.status.active
 

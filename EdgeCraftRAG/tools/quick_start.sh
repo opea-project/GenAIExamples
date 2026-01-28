@@ -11,7 +11,7 @@ HOST_IP=$ip_address
 #use python venv
 ENV_NAME="ecrag_venv"
 python -m venv $ENV_NAME
- 
+
 # check venv
 if [ ! -d "$ENV_NAME" ]; then
     echo "Failed to create virtual environment"

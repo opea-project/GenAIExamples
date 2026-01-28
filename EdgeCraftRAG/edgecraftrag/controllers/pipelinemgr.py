@@ -64,7 +64,7 @@ class PipelineMgr(BaseMgr):
 
     def get_pipelines(self, gen_type: str = None):
         if gen_type:
-            return [ pl for _, pl in self.components.items() if (pl.get_generator(gen_type) is not None)]
+            return [pl for _, pl in self.components.items() if (pl.get_generator(gen_type) is not None)]
         return [pl for _, pl in self.components.items()]
 
     def activate_pipeline(self, name: str, active: bool, nm: NodeMgr, kb_name: None, cache_prev: bool = False):
@@ -92,10 +92,10 @@ class PipelineMgr(BaseMgr):
 
     def get_active_pipeline(self) -> Pipeline:
         return self._active_pipeline
-    
+
     def get_prev_active_pipeline_name(self) -> str:
         return self._prev_active_pipeline_name
-    
+
     def clear_prev_active_pipeline_name(self):
         self._prev_active_pipeline_name = None
 

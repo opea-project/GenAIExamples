@@ -6,14 +6,23 @@ import json
 import os
 import time
 from concurrent.futures import ThreadPoolExecutor
-from typing import Any, Callable, List, Optional, Dict
+from typing import Any, Callable, Dict, List, Optional
 
 from comps.cores.proto.api_protocol import ChatCompletionRequest
-from edgecraftrag.base import BaseComponent, BenchType, CallbackType, CompType, InferenceType, NodeParserType, RetrieverType, GeneratorType
+from edgecraftrag.base import (
+    BaseComponent,
+    BenchType,
+    CallbackType,
+    CompType,
+    GeneratorType,
+    InferenceType,
+    NodeParserType,
+    RetrieverType,
+)
+from edgecraftrag.components.generator import clone_generator
 from edgecraftrag.components.postprocessor import RerankProcessor
 from edgecraftrag.components.query_preprocess import query_search
 from edgecraftrag.components.retriever import AutoMergeRetriever, SimpleBM25Retriever, VectorSimRetriever
-from edgecraftrag.components.generator import clone_generator
 from edgecraftrag.env import SEARCH_CONFIG_PATH, SEARCH_DIR
 from fastapi.responses import StreamingResponse
 from llama_index.core.schema import Document, QueryBundle
@@ -156,11 +165,15 @@ class Pipeline(BaseComponent):
             if kwargs["cbtype"] == CallbackType.GENERATE:
                 if "chat_request" in kwargs:
                     generator_type = kwargs.get("generator_type", GeneratorType.CHATQNA)
-                    return await self.run_generator_cb(self, chat_request=kwargs["chat_request"], generator_type=generator_type)
+                    return await self.run_generator_cb(
+                        self, chat_request=kwargs["chat_request"], generator_type=generator_type
+                    )
             if kwargs["cbtype"] == CallbackType.PIPELINE:
                 if "chat_request" in kwargs:
                     generator_type = kwargs.get("generator_type", GeneratorType.CHATQNA)
-                    return await self.run_pipeline_cb(self, chat_request=kwargs["chat_request"], generator_type=generator_type)
+                    return await self.run_pipeline_cb(
+                        self, chat_request=kwargs["chat_request"], generator_type=generator_type
+                    )
             if kwargs["cbtype"] == CallbackType.QUERYSEARCH:
                 if "chat_request" in kwargs:
                     return await self.run_query_search_cb(self, chat_request=kwargs["chat_request"])
@@ -298,7 +311,7 @@ class Pipeline(BaseComponent):
                 if gen.comp_subtype == generator_type:
                     return gen
         return None
-    
+
     def create_freechat_gen_from_chatqna_gen(self) -> bool:
         if len(self.generator) == 0 or self.generator[0].comp_subtype != GeneratorType.CHATQNA:
             return False
@@ -317,6 +330,7 @@ class Pipeline(BaseComponent):
             self._origin_json = json.dumps(origin_json)
             return True
         return False
+
 
 async def run_retrieve(pl: Pipeline, chat_request: ChatCompletionRequest) -> Any:
     query = chat_request.messages
@@ -386,7 +400,9 @@ async def run_simple_doc(pl: Pipeline, docs: List[Document]) -> Any:
     if pl.indexer is not None:
         pl.indexer.insert_nodes(n)
     if pl.enable_benchmark:
-        benchmark_data = pl.benchmark.get_benchmark_data(benchmark_index, CompType.NODEPARSER) + time.perf_counter() - start
+        benchmark_data = (
+            pl.benchmark.get_benchmark_data(benchmark_index, CompType.NODEPARSER) + time.perf_counter() - start
+        )
         pl.benchmark.update_benchmark_data(benchmark_index, CompType.NODEPARSER, benchmark_data)
 
         benchmark_data = pl.benchmark.get_benchmark_data(benchmark_index, BenchType.CHUNK_NUM) + len(n)
@@ -413,7 +429,9 @@ async def run_query_search(pl: Pipeline, chat_request: ChatCompletionRequest) ->
     return query, sub_questionss_result
 
 
-async def run_pipeline(pl: Pipeline, chat_request: ChatCompletionRequest, generator_type: str = GeneratorType.CHATQNA) -> Any:
+async def run_pipeline(
+    pl: Pipeline, chat_request: ChatCompletionRequest, generator_type: str = GeneratorType.CHATQNA
+) -> Any:
     benchmark_index = -1
     if pl.enable_benchmark:
         benchmark_index = pl.benchmark.init_benchmark_data()
@@ -488,7 +506,7 @@ async def run_pipeline(pl: Pipeline, chat_request: ChatCompletionRequest, genera
             np_type,
             sub_questions=sub_questionss_result,
             benchmark=pl.benchmark,
-            benchmark_index=benchmark_index
+            benchmark_index=benchmark_index,
         )
     else:
         raise ValueError("LLM inference_type not supported")
@@ -498,7 +516,9 @@ async def run_pipeline(pl: Pipeline, chat_request: ChatCompletionRequest, genera
     return ret, contexts
 
 
-async def run_generator(pl: Pipeline, chat_request: ChatCompletionRequest, generator_type: str = GeneratorType.CHATQNA) -> Any:
+async def run_generator(
+    pl: Pipeline, chat_request: ChatCompletionRequest, generator_type: str = GeneratorType.CHATQNA
+) -> Any:
     np_type = pl.node_parser.comp_subtype
     target_generator = pl.get_generator(generator_type)
     if target_generator is None:

@@ -5,8 +5,8 @@ import json
 import os
 import time
 
-from edgecraftrag.api_schema import AgentCreateIn
 from edgecraftrag.api.v1.knowledge_base import Synchronizing_vector_data
+from edgecraftrag.api_schema import AgentCreateIn
 from edgecraftrag.base import AgentType
 from edgecraftrag.config_repository import MilvusConfigRepository, save_agent_configurations
 from edgecraftrag.context import ctx

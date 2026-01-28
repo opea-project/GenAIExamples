@@ -6,6 +6,7 @@
 
 Experience（经验）是指个人或团队在实践过程中积累的知识和技能，通常通过实际操作、试错和反思获得，是解决实际问题的重要依据。EC-RAG 现已支持添加此类Experience，为您的对话提供更多参考。
 使用Experience之前，请确保Mivlus服务已经启动，并且请指定如下的环境变量:
+
 ```bash
 export METADATA_DATABASE_URL="http://${HOST_IP}:19530"
 ```
@@ -27,6 +28,7 @@ export METADATA_DATABASE_URL="http://${HOST_IP}:19530"
 ![alt text](../assets/img/experience_management_1_zh.png)
 
 ### 添加 Experience
+
 当您需要添加新 Experience 时，请从右侧面板选择`新建经验`：
 ![alt text](../assets/img/experience_management_2_zh.png)
 
@@ -34,6 +36,7 @@ export METADATA_DATABASE_URL="http://${HOST_IP}:19530"
 ![alt text](../assets/img/experience_management_3_zh.png)
 
 ### 查看与修改
+
 添加经验后，它们将以列表形式显示在`经验`选项卡下。您可以点击`+`号展开查看 Experience 内容的详细信息。使用左侧面板里`Experience`旁边的三个点可以激活或停用某个 Experience 库：
 ![alt text](../assets/img/experience_management_4_zh.png)
 
