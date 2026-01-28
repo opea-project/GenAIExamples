@@ -1,10 +1,8 @@
 """
-API Client for authentication and API calls
-Similar to RAG chatbot implementation
+API Client for inference API calls
 """
 
 import logging
-import requests
 import httpx
 from typing import Optional
 from app.config import settings
@@ -14,54 +12,23 @@ logger = logging.getLogger(__name__)
 
 class APIClient:
     """
-    Client for handling authentication and API calls
+    Client for handling inference API calls
     """
 
     def __init__(self):
-        self.base_url = settings.BASE_URL
-        self.token = None
-        self.http_client = None
-        self._authenticate()
-
-    def _authenticate(self) -> None:
-        """
-        Authenticate and obtain access token from Keycloak
-        """
-        token_url = f"{self.base_url}/token"
-        payload = {
-            "grant_type": "client_credentials",
-            "client_id": settings.KEYCLOAK_CLIENT_ID,
-            "client_secret": settings.KEYCLOAK_CLIENT_SECRET,
-        }
-
-        try:
-            response = requests.post(token_url, data=payload, verify=False)
-
-            if response.status_code == 200:
-                self.token = response.json().get("access_token")
-                logger.info(f"✓ Access token obtained: {self.token[:20]}..." if self.token else "Failed to get token")
-
-                # Create httpx client with SSL verification disabled (like -k in curl)
-                self.http_client = httpx.Client(verify=False)
-
-            else:
-                logger.error(f"Error obtaining token: {response.status_code} - {response.text}")
-                raise Exception(f"Authentication failed: {response.status_code}")
-
-        except Exception as e:
-            logger.error(f"Error during authentication: {str(e)}")
-            raise
+        self.endpoint = settings.INFERENCE_API_ENDPOINT
+        self.token = settings.INFERENCE_API_TOKEN
+        self.http_client = httpx.Client(verify=False) if self.token else None
 
     def get_inference_client(self):
         """
         Get OpenAI-style client for inference/completions
-        Uses Llama-3.1-8B-Instruct endpoint
         """
         from openai import OpenAI
 
         return OpenAI(
             api_key=self.token,
-            base_url=f"{self.base_url}/{settings.INFERENCE_MODEL_ENDPOINT}/v1",
+            base_url=f"{self.endpoint}/v1",
             http_client=self.http_client
         )
 

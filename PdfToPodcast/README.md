@@ -1,6 +1,6 @@
 ## PDF to Podcast Generator
 
-AI-powered application that transforms PDF documents into engaging podcast-style audio conversations. This application can be deployed using either OpenAI APIs or enterprise inference endpoints.
+AI-powered application that transforms PDF documents into engaging podcast-style audio conversations using enterprise inference endpoints for script generation and OpenAI TTS for audio synthesis.
 
 ## Table of Contents
 
@@ -24,7 +24,7 @@ PDF to Podcast Generator is a microservices-based application that converts PDF 
 
 - Digital PDF text extraction with support for text-based PDFs up to 10 MB
 - AI-powered script generation with natural host and guest conversation format
-- Supports multiple LLM backends: OpenAI GPT-4 or custom enterprise inference endpoints
+- Enterprise inference endpoints for LLM-based script generation
 - High-quality audio generation using OpenAI TTS with 6 different voice options
 - Modern React web interface with real-time progress tracking
 - Integrated audio player with waveform visualization
@@ -35,7 +35,7 @@ PDF to Podcast Generator is a microservices-based application that converts PDF 
 
 ## Architecture
 
-This application uses a microservices architecture where each service handles a specific part of the podcast generation process. The React frontend communicates with a backend gateway that orchestrates requests across three specialized services: PDF processing, script generation, and audio synthesis. The LLM service can be configured to use either OpenAI GPT models or custom enterprise inference endpoints with Keycloak authentication, while the TTS service uses OpenAI for audio generation. This separation allows for flexible deployment options and easy scaling of individual components.
+This application uses a microservices architecture where each service handles a specific part of the podcast generation process. The React frontend communicates with a backend gateway that orchestrates requests across three specialized services: PDF processing, script generation, and audio synthesis. The LLM service uses enterprise inference endpoints with token-based authentication for script generation, while the TTS service uses OpenAI TTS API for audio generation. This separation allows for flexible deployment options and easy scaling of individual components.
 
 ```mermaid
 graph TB
@@ -54,7 +54,7 @@ graph TB
     end
 
     subgraph "External Services"
-        F[OpenAI GPT-4 / Enterprise LLM]
+        F[Enterprise Inference API]
         G[OpenAI TTS]
     end
 
@@ -90,7 +90,7 @@ This application is built using FastAPI microservices architecture with Docker c
 
 3. **PDF Service (Port 8001)** - Extracts text from PDF files using PyPDF2 and pdfplumber libraries (no external API dependencies)
 
-4. **LLM Service (Port 8002)** - Generates podcast dialogue scripts using OpenAI GPT-4 or custom enterprise inference endpoints with Keycloak authentication
+4. **LLM Service (Port 8002)** - Generates podcast dialogue scripts using enterprise inference endpoints with token-based authentication
 
 5. **TTS Service (Port 8003)** - Synthesizes audio using OpenAI TTS API with multiple voice support and audio mixing
 
@@ -103,8 +103,7 @@ This application is built using FastAPI microservices architecture with Docker c
 Before you begin, ensure you have the following installed:
 
 - **Docker and Docker Compose**
-- **Enterprise inference endpoint access** (Keycloak authentication)
-- **OpenAPI KEY** (Need OpenAPI Key as enterprise inference doesn't have supported models for Audio and Video )
+- **Enterprise inference endpoint access** (token-based authentication)
 
 ### Verify Docker Installation
 
@@ -119,13 +118,28 @@ docker compose version
 docker ps
 ```
 
+### Required API Keys
+
+**For LLM Service (Script Generation):**
+- INFERENCE_API_ENDPOINT: URL of the deployed model inference service
+- INFERENCE_API_TOKEN: API key / bearer token used to authenticate requests
+
+**For TTS Service (Audio Generation):**
+- OpenAI API Key for text-to-speech
+  - Sign up at https://platform.openai.com/
+  - Create API key at https://platform.openai.com/api-keys
+  - Key format starts with `sk-proj-`
+  - Requires access to TTS APIs
+
+---
+
 ## Quick Start Deployment
 
 ### Clone the Repository
 
 ```bash
-git clone https://github.com/opea-project/GenAIExamples.git
-cd GenAIExamples/PdfToPodcast
+git clone https://github.com/cld2labs/GenAISamples.git
+cd GenAISamples/pdf-podcast
 ```
 
 ### Set up the Environment
@@ -156,11 +170,11 @@ Available TTS voices: alloy, echo, fable, onyx, nova, shimmer. Default voices ar
 cp api/llm-service/.env.example api/llm-service/.env
 ```
 
-- Replace these placeholder values:
-  - `BASE_URL` with your enterprise API endpoint
-  - `KEYCLOAK_CLIENT_SECRET` with your actual client secret
-  - `INFERENCE_MODEL_ENDPOINT` if different from default
-  - `INFERENCE_MODEL_NAME` if different from default
+Open `api/llm-service/.env` and configure your inference endpoint:
+
+- Replace `INFERENCE_API_ENDPOINT` with your inference service URL (without /v1)
+- Replace `INFERENCE_API_TOKEN` with your pre-generated bearer token
+- Update `INFERENCE_MODEL_NAME` if different from default (deepseek-ai/DeepSeek-R1-Distill-Qwen-32B)
 
 **4. Backend Service Configuration:**
 
@@ -169,26 +183,42 @@ cp .env.example .env
 ```
 No changes needed. Uses default values.
 
-### Running the Application
 
-Start both API and UI services together with Docker Compose:
+### Running the Application
+Start all services together with Docker Compose:
 
 ```bash
-# From the PdfToPodcast directory
+# From the pdf-podcast directory
 docker compose up --build
 
 # Or run in detached mode (background)
 docker compose up -d --build
 ```
-The Backend will be available at: http://localhost:8000
 
-The UI will be available at: http://localhost:3000
+This will:
+- Pull required Docker images
+- Build all 5 microservices
+- Create containers and internal networking
+- Start services in detached mode
 
-The LLM-service will be available at: http://localhost:8002
+First time deployment takes 5-10 minutes.
 
-The PDF-service will be available at: http://localhost:8001
+**Check all containers are running:**
 
-The TTS-service will be available at: http://localhost:8003
+```bash
+docker compose ps
+```
+
+Expected output shows 5 containers with status "Up":
+
+```
+NAME            PORTS                    STATUS
+frontend        0.0.0.0:3000->3000/tcp   Up
+backend         0.0.0.0:8000->8000/tcp   Up
+pdf-service     0.0.0.0:8001->8001/tcp   Up
+llm-service     0.0.0.0:8002->8002/tcp   Up
+tts-service     0.0.0.0:8003->8003/tcp   Up
+```
 
 **View logs**:
 
@@ -201,6 +231,10 @@ docker compose logs -f backend
 
 # Frontend only
 docker compose logs -f frontend
+
+# llm-service
+docker compose logs -f llm-service
+
 ```
 
 **Verify the services are running**:
@@ -208,10 +242,8 @@ docker compose logs -f frontend
 ```bash
 # Check API health
 curl http://localhost:8002/health
-
-# Check if containers are running
-docker compose ps
 ```
+---
 
 ## User Interface
 
@@ -219,7 +251,7 @@ docker compose ps
 
 Make sure you are at the localhost:3000 url
 
-**Test the Application**
+### Test the Application
 
 1. Upload a PDF file (max 10MB)
 2. Wait for text extraction
@@ -228,8 +260,15 @@ Make sure you are at the localhost:3000 url
 5. Review generated script
 6. Click "Generate Audio" and wait 30-60 seconds
 7. Listen to your podcast
+### Home Page
 
 ![Home Page](./ui/public/homepage.png)
+
+![Home Page Features](./ui/public/homepage2.png)
+
+The home page introduces the application with a clean design showing key features and a simple process guide.
+
+### Generate Page
 
 ![Upload PDF](./ui/public/upload_pdf.png)
 
@@ -238,12 +277,26 @@ Make sure you are at the localhost:3000 url
 ![Final Podcast](./ui/public/final_podcast_page.png)
 
 
-### Stopping the Application
+**Workflow:**
 
+1. **Upload PDF** - Drag and drop or browse to upload PDF (max 10MB)
+2. **Generate Script** - Select voices and generate AI dialogue (15-30 seconds)
+3. **Generate Audio** - Convert script to audio (30-60 seconds)
+4. **Listen and Download** - Play audio with integrated player and download MP3
+### Cleanup
+
+Stop all services:
 
 ```bash
 docker compose down
 ```
+
+Remove all containers and volumes:
+
+```bash
+docker compose down -v
+```
+
 
 ## Troubleshooting
 

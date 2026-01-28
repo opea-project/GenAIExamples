@@ -47,17 +47,13 @@ async def startup_event():
     logger.info("=" * 60)
     logger.info(f"Service running on port {settings.SERVICE_PORT}")
 
-    # Check if custom API is configured
-    if settings.BASE_URL and settings.KEYCLOAK_CLIENT_SECRET:
-        logger.info("LLM Provider: Custom API (Keycloak)")
-        logger.info(f"Custom API Base URL: {settings.BASE_URL}")
+    if settings.INFERENCE_API_ENDPOINT and settings.INFERENCE_API_TOKEN:
+        logger.info("LLM Provider: Inference API")
+        logger.info(f"Inference API Endpoint: {settings.INFERENCE_API_ENDPOINT}")
         logger.info(f"Model: {settings.INFERENCE_MODEL_NAME}")
     else:
-        logger.info("LLM Provider: OpenAI")
-        if settings.OPENAI_API_KEY:
-            logger.info("OpenAI API key configured")
-        else:
-            logger.warning("OpenAI API key not found")
+        logger.error("INFERENCE_API_ENDPOINT and INFERENCE_API_TOKEN are required")
+        raise ValueError("Inference API configuration missing")
 
     logger.info("=" * 60)
 
@@ -69,21 +65,13 @@ async def shutdown_event():
 @app.get("/")
 async def root():
     """Root endpoint"""
-    # Determine actual provider being used
-    if settings.BASE_URL and settings.KEYCLOAK_CLIENT_SECRET:
-        llm_provider = "Custom API (Keycloak)"
-        llm_model = settings.INFERENCE_MODEL_NAME
-    else:
-        llm_provider = "OpenAI"
-        llm_model = settings.DEFAULT_MODEL
-
     return {
         "service": "LLM Script Generation Service",
         "version": "1.0.0",
         "description": "Convert text content into engaging podcast dialogue",
         "config": {
-            "llm_provider": llm_provider,
-            "llm_model": llm_model
+            "llm_provider": "Inference API",
+            "llm_model": settings.INFERENCE_MODEL_NAME
         },
         "endpoints": {
             "generate_script": "POST /generate-script - Generate podcast script",

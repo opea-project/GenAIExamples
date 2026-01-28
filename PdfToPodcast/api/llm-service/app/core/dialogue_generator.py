@@ -11,22 +11,11 @@ class DialogueGenerator:
     Main orchestrator for podcast dialogue generation
     """
 
-    def __init__(
-        self,
-        openai_api_key: Optional[str] = None,
-        default_model: str = "gpt-4-turbo-preview"
-    ):
+    def __init__(self):
         """
         Initialize dialogue generator
-
-        Args:
-            openai_api_key: OpenAI API key
-            default_model: Default model to use
         """
-        self.llm_client = LLMClient(
-            openai_api_key=openai_api_key,
-            default_model=default_model
-        )
+        self.llm_client = LLMClient()
         self.prompt_builder = PromptBuilder()
         self.formatter = ScriptFormatter()
 
@@ -37,7 +26,7 @@ class DialogueGenerator:
         guest_name: str = "Guest",
         tone: str = "conversational",
         max_length: int = 2000,
-        provider: str = "openai",
+        provider: str = "inference",
         **kwargs
     ) -> Dict:
         """
@@ -118,7 +107,7 @@ class DialogueGenerator:
     async def refine_script(
         self,
         script: List[Dict[str, str]],
-        provider: str = "openai"
+        provider: str = "inference"
     ) -> Dict:
         """
         Refine an existing script

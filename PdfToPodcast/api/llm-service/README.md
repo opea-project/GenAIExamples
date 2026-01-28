@@ -1,13 +1,13 @@
 # LLM Script Generation Microservice
 
-Converts PDF text into engaging podcast dialogue using OpenAI GPT-4.
+Converts PDF text into engaging podcast dialogue using enterprise inference endpoints.
 
 ## Features
 
-**OpenAI Integration**
-- GPT-4 Turbo for high-quality scripts
-- GPT-3.5 Turbo for faster generation
+**Inference API Integration**
+- Supports custom inference models
 - Automatic retry with exponential backoff
+- Token-based authentication
 
 **Intelligent Dialogue Generation**
 - Natural, conversational podcast scripts
@@ -42,7 +42,7 @@ Convert text content into podcast dialogue.
   "guest_name": "Sam",
   "tone": "conversational",
   "max_length": 2000,
-  "provider": "openai",
+  "provider": "inference",
   "job_id": "optional-tracking-id"
 }
 ```
@@ -85,7 +85,7 @@ Improve an existing script.
     {"speaker": "host", "text": "..."},
     {"speaker": "guest", "text": "..."}
   ],
-  "provider": "openai"
+  "provider": "inference"
 }
 ```
 
@@ -117,7 +117,8 @@ Check service health and provider availability.
 ```json
 {
   "status": "healthy",
-  "openai_available": true,
+  "llm_available": true,
+  "llm_provider": "Inference API",
   "version": "1.0.0"
 }
 ```
@@ -136,7 +137,7 @@ List available LLM models.
 
 ## Prerequisites
 
-- OpenAI API key
+- Enterprise inference endpoint with token
 - Python 3.9+
 
 ## Installation
@@ -147,7 +148,9 @@ List available LLM models.
 cd microservices/llm-service
 docker build -t llm-service .
 docker run -p 8002:8002 \
-  -e OPENAI_API_KEY=your_key \
+  -e INFERENCE_API_ENDPOINT=your_endpoint \
+  -e INFERENCE_API_TOKEN=your_token \
+  -e INFERENCE_MODEL_NAME=deepseek-ai/DeepSeek-R1-Distill-Qwen-32B \
   llm-service
 ```
 
@@ -163,10 +166,11 @@ Create `.env` file:
 
 ```env
 # Required
-OPENAI_API_KEY=sk-proj-your-key-here
+INFERENCE_API_ENDPOINT=https://your-endpoint.com/deployment
+INFERENCE_API_TOKEN=your-bearer-token-here
+INFERENCE_MODEL_NAME=deepseek-ai/DeepSeek-R1-Distill-Qwen-32B
 
 # Optional
-DEFAULT_MODEL=gpt-4-turbo-preview
 DEFAULT_TONE=conversational
 DEFAULT_MAX_LENGTH=2000
 TEMPERATURE=0.7
@@ -224,25 +228,27 @@ curl http://localhost:8002/health
 
 ## Troubleshooting
 
-### OpenAI API Errors
+### Inference API Errors
 
-**Error**: `AuthenticationError`
-- Check `OPENAI_API_KEY` in environment
-- Verify key is active
+**Error**: `AuthenticationError` / `ValueError`
+- Check `INFERENCE_API_ENDPOINT` and `INFERENCE_API_TOKEN` in environment
+- Verify token is valid and not expired
+- Confirm endpoint URL is correct
 
-**Error**: `RateLimitError`
-- Service will retry automatically
+**Error**: Connection errors
+- Verify network connectivity to inference endpoint
+- Check firewall rules
 
 ### Slow Response Times
 
 **Causes**:
 - Large content (> 5000 words)
-- API rate limits
+- Model processing time
 
 **Solutions**:
 - Break content into sections
-- Use faster model (gpt-3.5-turbo)
 - Reduce max_length
+- Check network latency
 
 ## API Documentation
 

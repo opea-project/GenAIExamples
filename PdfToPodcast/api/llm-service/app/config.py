@@ -9,21 +9,12 @@ class Settings(BaseSettings):
     SERVICE_VERSION: str = "1.0.0"
     SERVICE_PORT: int = 8002
 
-    # API Keys
-    OPENAI_API_KEY: Optional[str] = None
-
-    # Custom API Configuration
-    BASE_URL: Optional[str] = None
-    KEYCLOAK_REALM: str = "master"
-    KEYCLOAK_CLIENT_ID: str = "api"
-    KEYCLOAK_CLIENT_SECRET: Optional[str] = None
-
-    # Model Configuration
-    INFERENCE_MODEL_ENDPOINT: str = "DeepSeek-R1-Distill-Qwen-32B"
+    # Inference API Configuration
+    INFERENCE_API_ENDPOINT: Optional[str] = None
+    INFERENCE_API_TOKEN: Optional[str] = None
     INFERENCE_MODEL_NAME: str = "deepseek-ai/DeepSeek-R1-Distill-Qwen-32B"
 
     # Model settings
-    DEFAULT_MODEL: str = "gpt-4o-mini"  # Updated to current model
     DEFAULT_TONE: str = "conversational"
     DEFAULT_MAX_LENGTH: int = 2000
 
@@ -35,5 +26,6 @@ class Settings(BaseSettings):
     class Config:
         env_file = ".env"
         case_sensitive = True
+        extra = "ignore"
 
 settings = Settings()

@@ -10,10 +10,7 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 # Initialize dialogue generator
-dialogue_generator = DialogueGenerator(
-    openai_api_key=settings.OPENAI_API_KEY,
-    default_model=settings.DEFAULT_MODEL
-)
+dialogue_generator = DialogueGenerator()
 
 class GenerateScriptRequest(BaseModel):
     text: str = Field(..., description="PDF content to convert")
@@ -21,12 +18,12 @@ class GenerateScriptRequest(BaseModel):
     guest_name: str = Field(default="Guest", description="Guest name")
     tone: str = Field(default="conversational", description="Conversation tone")
     max_length: int = Field(default=2000, description="Target word count")
-    provider: str = Field(default="openai", description="LLM provider (openai only)")
+    provider: str = Field(default="inference", description="LLM provider")
     job_id: Optional[str] = Field(default=None, description="Optional job ID")
 
 class RefineScriptRequest(BaseModel):
     script: List[Dict[str, str]] = Field(..., description="Script to refine")
-    provider: str = Field(default="openai", description="LLM provider")
+    provider: str = Field(default="inference", description="LLM provider")
 
 class ValidateContentRequest(BaseModel):
     text: str = Field(..., description="Content to validate")
@@ -60,7 +57,7 @@ async def generate_script(request: GenerateScriptRequest):
     - **guest_name**: Name for the guest (default: "Guest")
     - **tone**: Conversation tone (conversational/educational/professional)
     - **max_length**: Target word count (default: 2000)
-    - **provider**: LLM provider (openai only, default: openai)
+    - **provider**: LLM provider (default: inference)
     - **job_id**: Optional job ID for tracking
 
     Returns podcast script with metadata
@@ -98,7 +95,7 @@ async def refine_script(request: RefineScriptRequest):
     Refine an existing podcast script
 
     - **script**: Current script to refine
-    - **provider**: LLM provider (default: openai)
+    - **provider**: LLM provider (default: inference)
 
     Returns refined script with metadata
     """
@@ -141,19 +138,13 @@ async def validate_content(request: ValidateContentRequest):
 
 @router.get("/health", response_model=HealthResponse)
 async def health_check():
-    """Check service health and LLM provider availability"""
+    """Check service health and inference API availability"""
     llm_available = dialogue_generator.llm_client.is_available()
-
-    # Determine which provider is being used
-    if settings.BASE_URL and settings.KEYCLOAK_CLIENT_SECRET:
-        llm_provider = "Custom API (Keycloak)"
-    else:
-        llm_provider = "OpenAI"
 
     return HealthResponse(
         status="healthy" if llm_available else "degraded",
         llm_available=llm_available,
-        llm_provider=llm_provider,
+        llm_provider="Inference API",
         version="1.0.0"
     )
 
@@ -183,12 +174,8 @@ async def get_available_tones():
 
 @router.get("/models")
 async def get_available_models():
-    """Get list of available LLM models"""
+    """Get configured inference model"""
     return {
-        "openai": [
-            "gpt-4-turbo-preview",
-            "gpt-4",
-            "gpt-3.5-turbo"
-        ],
-        "default": "gpt-4-turbo-preview"
+        "model": settings.INFERENCE_MODEL_NAME,
+        "provider": "Inference API"
     }
