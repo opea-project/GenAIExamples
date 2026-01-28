@@ -14,7 +14,6 @@ export MODEL_CACHE=${model_cache:-"./data"}
 WORKPATH=$(dirname "$PWD")
 LOG_PATH="$WORKPATH/tests"
 ip_address=$(hostname -I | awk '{print $1}')
-export host_ip=$(hostname -I | awk '{print $1}')
 
 function build_docker_images() {
     opea_branch=${opea_branch:-"main"}
@@ -45,7 +44,7 @@ function start_services() {
     export GS_DB="postgres"
     export GS_CONNECTION_STRING="opengauss+psycopg2://${GS_USER}:${GS_PASSWORD}@$ip_address:5432/${GS_DB}"
 
-    source ../set_env_opengauss.sh
+    source ../docker_compose/intel/set_env_opengauss.sh
 
     # Start Docker Containers
     docker compose -f compose_opengauss.yaml up -d --quiet-pull > ${LOG_PATH}/start_services_with_compose.log
