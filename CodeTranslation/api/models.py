@@ -60,7 +60,7 @@ class HealthResponse(BaseModel):
     """Response model for health check"""
     status: str = Field(..., description="Health status")
     model_configured: bool = Field(..., description="Whether model is configured")
-    keycloak_authenticated: bool = Field(..., description="Whether Keycloak auth is successful")
+    inference_authenticated: bool = Field(..., description="Whether inference API auth is successful")
 
 
 class SupportedLanguagesResponse(BaseModel):

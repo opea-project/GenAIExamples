@@ -33,7 +33,7 @@ async def lifespan(app: FastAPI):
     try:
         api_client = get_api_client()
         app.state.api_client = api_client
-        logger.info("✓ API client initialized with Keycloak authentication")
+        logger.info("API client initialized with inference endpoint")
     except Exception as e:
         logger.error(f"Failed to initialize API client: {str(e)}")
         app.state.api_client = None
@@ -81,7 +81,7 @@ def health_check():
     return HealthResponse(
         status="healthy",
         model_configured=bool(config.INFERENCE_MODEL_NAME),
-        keycloak_authenticated=app.state.api_client is not None and app.state.api_client.is_authenticated()
+        inference_authenticated=app.state.api_client is not None and app.state.api_client.is_authenticated()
     )
 
 
@@ -105,7 +105,7 @@ def translate_code_endpoint(request: TranslateRequest):
     if not app.state.api_client:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="API client not initialized. Check Keycloak configuration."
+            detail="API client not initialized. Check inference API configuration."
         )
 
     # Validate languages
@@ -144,7 +144,7 @@ def translate_code_endpoint(request: TranslateRequest):
                 detail="Translation failed. No output received from model."
             )
 
-        logger.info(f"✓ Successfully translated code")
+        logger.info(f"Successfully translated code")
 
         return TranslateResponse(
             translated_code=translated_code,
@@ -196,7 +196,7 @@ async def upload_pdf(file: UploadFile = File(...)):
                 detail="No code content could be extracted from the PDF"
             )
 
-        logger.info(f"✓ Successfully extracted code from PDF: {file.filename}")
+        logger.info(f"Successfully extracted code from PDF: {file.filename}")
 
         return UploadPdfResponse(
             message=f"Successfully extracted code from '{file.filename}'",

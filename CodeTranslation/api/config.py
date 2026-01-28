@@ -8,19 +8,10 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv()
 
-# Custom API Configuration for Keycloak
-BASE_URL = os.getenv("BASE_URL", "https://api.example.com")
-KEYCLOAK_REALM = os.getenv("KEYCLOAK_REALM", "master")
-KEYCLOAK_CLIENT_ID = os.getenv("KEYCLOAK_CLIENT_ID", "api")
-KEYCLOAK_CLIENT_SECRET = os.getenv("KEYCLOAK_CLIENT_SECRET")
-
-# Model Configuration for CodeLlama-34b-instruct
-INFERENCE_MODEL_ENDPOINT = os.getenv("INFERENCE_MODEL_ENDPOINT", "CodeLlama-34b-Instruct")
+# Inference API Configuration
+INFERENCE_API_ENDPOINT = os.getenv("INFERENCE_API_ENDPOINT")
+INFERENCE_API_TOKEN = os.getenv("INFERENCE_API_TOKEN")
 INFERENCE_MODEL_NAME = os.getenv("INFERENCE_MODEL_NAME", "codellama/CodeLlama-34b-Instruct-hf")
-
-# Validate required configuration
-if not KEYCLOAK_CLIENT_SECRET:
-    raise ValueError("KEYCLOAK_CLIENT_SECRET must be set in environment variables")
 
 # Application Settings
 APP_TITLE = "Code Translation API"

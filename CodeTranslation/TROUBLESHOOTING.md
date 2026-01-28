@@ -9,16 +9,16 @@ This document contains all common issues encountered during development and thei
 
 ### API Common Issues
 
-#### "API client not initialized. Check Keycloak configuration."
+#### "API client not initialized. Check inference API configuration."
 
 **Solution**:
 
 1. Create a `.env` file in the root directory
-2. Add your Keycloak credentials:
+2. Add your inference API credentials:
    ```
-   BASE_URL=https://api.example.com
-   KEYCLOAK_CLIENT_ID=api
-   KEYCLOAK_CLIENT_SECRET=your_client_secret
+   INFERENCE_API_ENDPOINT=https://your-api-endpoint.com/deployment
+   INFERENCE_API_TOKEN=your-pre-generated-token-here
+   INFERENCE_MODEL_NAME=codellama/CodeLlama-34b-Instruct-hf
    ```
 3. Restart the server
 
@@ -68,10 +68,11 @@ This document contains all common issues encountered during development and thei
 
 **Solution**:
 
-1. Verify Keycloak authentication is working (check `/health` endpoint)
+1. Verify inference API authentication is working (check `/health` endpoint)
 2. Check if the model endpoint is accessible
-3. Try with simpler code first
-4. Check server logs for API errors
+3. Verify INFERENCE_API_TOKEN is valid and not expired
+4. Try with simpler code first
+5. Check server logs for API errors
 
 #### "No module named 'pypdf'"
 

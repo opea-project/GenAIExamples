@@ -1,7 +1,7 @@
 ## Code Translation
 
 A full-stack code translation application that converts code between programming languages using AI.
-The system integrates a FastAPI backend powered by CodeLlama-34b-instruct, alongside a modern React + Vite + Tailwind CSS frontend for an intuitive translation experience.
+The system integrates a FastAPI backend, alongside a modern React + Vite + Tailwind CSS frontend for an intuitive translation experience.
 
 ## Table of Contents
 
@@ -17,7 +17,7 @@ The system integrates a FastAPI backend powered by CodeLlama-34b-instruct, along
 
 ## Project Overview
 
-The **Code Translation** application demonstrates how large language models can be used to translate code between different programming languages. It accepts source code in one language, processes it through CodeLlama-34b-instruct, and returns translated code in the target language. This project integrates seamlessly with cloud-hosted APIs or local model endpoints, offering flexibility for research, enterprise, or educational use.
+The **Code Translation** application demonstrates how large language models can be used to translate code between different programming languages. It accepts source code in one language, processes it and returns translated code in the target language. This project integrates seamlessly with cloud-hosted APIs or local model endpoints, offering flexibility for research, enterprise, or educational use.
 
 ---
 
@@ -27,9 +27,8 @@ The **Code Translation** application demonstrates how large language models can 
 
 - Code translation between 6 languages (Java, C, C++, Python, Rust, Go)
 - PDF code extraction with pattern recognition
-- CodeLlama-34b-instruct for accurate translations
 - Enterprise inference endpoints
-- Keycloak authentication for secure API access
+- Token-based authentication for inference API
 - Comprehensive error handling and logging
 - File validation and size limits
 - CORS enabled for web integration
@@ -70,8 +69,7 @@ Below is the architecture as it consists of a server that waits for code input o
       end
 
       subgraph "External Services"
-          E[Keycloak Auth]
-          F[CodeLlama-34b Model]
+          E[CodeLlama-34b Model]
       end
 
       A1 --> B
@@ -80,31 +78,29 @@ Below is the architecture as it consists of a server that waits for code input o
       B --> C
       C -->|Extracted Code| B
       B --> D
-      D -->|Get Token| E
-      E -->|Access Token| D
-      D -->|Translate Code + Token| F
-      F -->|Translated Code| D
+      D -->|Translate Code + Token| E
+      E -->|Translated Code| D
       D --> B
       B --> A
 
       style A fill:#e1f5ff
       style B fill:#fff4e1
-      style F fill:#e1ffe1
+      style E fill:#e1ffe1
 ```
 
-This application is built with enterprise inference capabilities using Keycloak for authentication and CodeLlama-34b-instruct for code translation.
+This application is built with enterprise inference capabilities using token-based authentication and CodeLlama-34b-instruct for code translation.
 
 **Service Components:**
 
 1. **React Web UI (Port 3000)** -  Provides side-by-side code comparison interface with language selection, PDF upload, and real-time translation results
 
-2. **FastAPI Backend (Port 5001)** -  Handles code validation, PDF extraction, Keycloak authentication, and orchestrates code translation through CodeLlama model
+2. **FastAPI Backend (Port 5001)** -  Handles code validation, PDF extraction, inference API authentication, and orchestrates code translation through CodeLlama model
 
 **Typical Flow:**
 
 1. User enters code or uploads a PDF through the web UI.
 2. The backend validates the input and extracts code if needed.
-3. The backend authenticates with Keycloak and calls CodeLlama model.
+3. The backend authenticates with inference API and calls CodeLlama model.
 4. The model translates the code to the target language.
 5. The translated code is returned and displayed to the user.
 6. User can copy the translated code with one click.
@@ -118,7 +114,13 @@ This application is built with enterprise inference capabilities using Keycloak 
 Before you begin, ensure you have the following installed:
 
 - **Docker and Docker Compose**
-- **Enterprise inference endpoint access** (Keycloak authentication)
+- **Enterprise inference endpoint access** (token-based authentication)
+
+### Required API Configuration
+
+**For Inference Service (Code Translation):**
+- INFERENCE_API_ENDPOINT: URL of the deployed model inference service
+- INFERENCE_API_TOKEN: API key / bearer token used to authenticate requests
 
 ### Verify Docker Installation
 
@@ -139,7 +141,7 @@ docker ps
 ### Clone the Repository
 
 ```bash
-git clone https://github.com/opea-project/GenAIExamples.git
+git clone https://github.com/cld2labs/GenAIExamples.git
 cd GenAIExamples/CodeTranslation
 ```
 
@@ -153,13 +155,9 @@ cat > .env << EOF
 # Backend API Configuration
 BACKEND_PORT=5001
 
-# Required - Enterprise/Keycloak Configuration
-BASE_URL=https://api.example.com
-KEYCLOAK_CLIENT_ID=api
-KEYCLOAK_CLIENT_SECRET=your_client_secret
-
-# Required - Model Configuration
-INFERENCE_MODEL_ENDPOINT=CodeLlama-34b-Instruct-hf
+# Inference API Configuration
+INFERENCE_API_ENDPOINT=https://your-api-endpoint.com/deployment
+INFERENCE_API_TOKEN=your-pre-generated-token-here
 INFERENCE_MODEL_NAME=codellama/CodeLlama-34b-Instruct-hf
 
 # LLM Settings
@@ -181,13 +179,9 @@ Or manually create `.env` with:
 # Backend API Configuration
 BACKEND_PORT=5001
 
-# Required - Enterprise/Keycloak Configuration
-BASE_URL=https://api.example.com
-KEYCLOAK_CLIENT_ID=api
-KEYCLOAK_CLIENT_SECRET=your_client_secret
-
-# Required - Model Configuration
-INFERENCE_MODEL_ENDPOINT=CodeLlama-34b-Instruct-hf
+# Inference API Configuration
+INFERENCE_API_ENDPOINT=https://your-api-endpoint.com/deployment
+INFERENCE_API_TOKEN=your-pre-generated-token-here
 INFERENCE_MODEL_NAME=codellama/CodeLlama-34b-Instruct-hf
 
 # LLM Settings
@@ -209,7 +203,7 @@ CORS_ALLOW_ORIGINS=["http://localhost:5173", "http://localhost:3000"]
 Start both API and UI services together with Docker Compose:
 
 ```bash
-# From the CodeTranslation directory
+# From the code-translation directory
 docker compose up --build
 
 # Or run in detached mode (background)
