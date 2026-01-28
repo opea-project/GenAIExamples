@@ -141,7 +141,7 @@ docker ps
 ### Clone the Repository
 
 ```bash
-git clone https://github.com/cld2labs/GenAIExamples.git
+git clone https://github.com/opea-project/GenAIExamples.git
 cd GenAIExamples/CodeTranslation
 ```
 
