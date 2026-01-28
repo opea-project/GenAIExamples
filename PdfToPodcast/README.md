@@ -138,8 +138,8 @@ docker ps
 ### Clone the Repository
 
 ```bash
-git clone https://github.com/cld2labs/GenAISamples.git
-cd GenAISamples/pdf-podcast
+git clone https://github.com/cld2labs/GenAIExamples.git
+cd GenAIExamples/PdfToPodcast
 ```
 
 ### Set up the Environment
