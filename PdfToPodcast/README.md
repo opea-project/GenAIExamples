@@ -121,15 +121,23 @@ docker ps
 ### Required API Keys
 
 **For LLM Service (Script Generation):**
-- INFERENCE_API_ENDPOINT: URL of the deployed model inference service
-- INFERENCE_API_TOKEN: API key / bearer token used to authenticate requests
+
+This application supports multiple inference deployment patterns:
+
+- **GenAI Gateway**: Provide your GenAI Gateway URL and API key
+- **APISIX Gateway**: Provide your APISIX Gateway URL and authentication token
+
+Configuration requirements:
+- INFERENCE_API_ENDPOINT: URL to your inference service (GenAI Gateway, APISIX Gateway, etc.)
+- INFERENCE_API_TOKEN: Authentication token/API key for your chosen service
 
 **For TTS Service (Audio Generation):**
-- OpenAI API Key for text-to-speech
-  - Sign up at https://platform.openai.com/
-  - Create API key at https://platform.openai.com/api-keys
-  - Key format starts with `sk-proj-`
-  - Requires access to TTS APIs
+
+OpenAI API Key for text-to-speech:
+- Sign up at https://platform.openai.com/
+- Create API key at https://platform.openai.com/api-keys
+- Key format starts with `sk-proj-`
+- Requires access to TTS APIs
 
 ---
 
