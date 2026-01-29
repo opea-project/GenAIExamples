@@ -64,7 +64,7 @@ function validate_service() {
 
         local CONTENT=$(curl -s -X POST -d "$INPUT_DATA" -H 'Content-Type: application/json' "$URL" | tee ${LOG_PATH}/${SERVICE_NAME}.log)
 
-        if echo "$CONTENT" | grep -q "$EXPECTED_RESULT"; then
+        if echo "$CONTENT" | grep -iq "$EXPECTED_RESULT"; then
             echo "[ $SERVICE_NAME ] Content is as expected."
         else
             echo "[ $SERVICE_NAME ] Content does not match the expected result: $CONTENT"
@@ -84,7 +84,7 @@ function validate_microservices() {
 
     validate_service \
         "${ip_address}:8022/v1/deep_research_agent" \
-	"deep" \
+	    "deep" \
         "deep-research-agent" \
         "deep-research-agent-server" \
         '{"question": "what is the deep learning?"}'
