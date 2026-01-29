@@ -11,6 +11,7 @@ AI-powered application that transforms PDF documents into engaging podcast-style
 - [Quick Start Deployment](#quick-start-deployment)
 - [User Interface](#user-interface)
 - [Troubleshooting](#troubleshooting)
+- [Additional Info](#additional-info)
 
 ---
 
@@ -138,6 +139,22 @@ OpenAI API Key for text-to-speech:
 - Create API key at https://platform.openai.com/api-keys
 - Key format starts with `sk-proj-`
 - Requires access to TTS APIs
+
+### Local Development Configuration
+
+**For Local Testing Only (Optional)**
+
+If you're testing with a local inference endpoint using a custom domain (e.g., `inference.example.com` mapped to localhost in your hosts file):
+
+1. Edit `api/llm-service/.env` and set:
+   ```bash
+   LOCAL_URL_ENDPOINT=inference.example.com
+   ```
+   (Use the domain name from your INFERENCE_API_ENDPOINT without `https://`)
+
+2. This allows Docker containers to resolve your local domain correctly.
+
+**Note:** For public domains or cloud-hosted endpoints, leave the default value `not-needed`.
 
 ---
 
@@ -311,3 +328,12 @@ docker compose down -v
 For detailed troubleshooting guidance and solutions to common issues, refer to:
 
 [TROUBLESHOOTING_and_ADDITIONAL_INFO.md](./TROUBLESHOOTING_and_ADDITIONAL_INFO.md)
+
+## Additional Info
+
+The following models have been validated with pdf-podcast:
+
+| Model | Hardware |
+|-------|----------|
+| **deepseek-ai/DeepSeek-R1-Distill-Qwen-32B** | Gaudi |
+| **Qwen/Qwen3-4B-Instruct-2507** | Xeon |
