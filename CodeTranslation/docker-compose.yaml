@@ -18,6 +18,8 @@ services:
       - MAX_FILE_SIZE=${MAX_FILE_SIZE:-10485760}
     networks:
       - code-trans-network
+    extra_hosts:
+      - "${LOCAL_URL_ENDPOINT}:host-gateway"
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5001/health"]

@@ -12,6 +12,7 @@ The system integrates a FastAPI backend, alongside a modern React + Vite + Tailw
 - [Quick Start Deployment](#quick-start-deployment)
 - [User Interface](#user-interface)
 - [Troubleshooting](#troubleshooting)
+- [Additional Info](#additional-info)
 
 ---
 
@@ -128,6 +129,22 @@ This application supports multiple inference deployment patterns:
 Configuration requirements:
 - INFERENCE_API_ENDPOINT: URL to your inference service (GenAI Gateway, APISIX Gateway, etc.)
 - INFERENCE_API_TOKEN: Authentication token/API key for your chosen service
+
+### Local Development Configuration
+
+**For Local Testing Only (Optional)**
+
+If you're testing with a local inference endpoint using a custom domain (e.g., `inference.example.com` mapped to localhost in your hosts file):
+
+1. Edit `.env` and set:
+   ```bash
+   LOCAL_URL_ENDPOINT=inference.example.com
+   ```
+   (Use the domain name from your INFERENCE_API_ENDPOINT without `https://`)
+
+2. This allows Docker containers to resolve your local domain correctly.
+
+**Note:** For public domains or cloud-hosted endpoints, leave the default value `not-needed`.
 
 ### Verify Docker Installation
 
@@ -307,3 +324,14 @@ docker compose down
 For comprehensive troubleshooting guidance, common issues, and solutions, refer to:
 
 [Troubleshooting Guide - TROUBLESHOOTING.md](./TROUBLESHOOTING.md)
+
+---
+
+## Additional Info
+
+The following models have been validated with code-translation:
+
+| Model | Hardware |
+|-------|----------|
+| **codellama/CodeLlama-34b-Instruct-hf** | Gaudi |
+| **Qwen/Qwen3-4B-Instruct-2507** | Xeon |
