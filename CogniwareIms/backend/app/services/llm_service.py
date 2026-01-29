@@ -1,6 +1,5 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
-
 """OPEA LLM Service Integration Handles text generation, chat, and intelligent responses."""
 
 import json
@@ -44,9 +43,7 @@ class LLMService:
                     "max_tokens": max_tokens or self.max_tokens,
                 }
 
-                response = await client.post(
-                    f"{self.base_url}/v1/chat/completions", json=payload
-                )
+                response = await client.post(f"{self.base_url}/v1/chat/completions", json=payload)
                 response.raise_for_status()
                 result = response.json()
 
@@ -67,9 +64,7 @@ class LLMService:
         messages = [{"role": "user", "content": prompt}]
         return await self.chat_completion(messages, temperature)
 
-    async def query_with_context(
-        self, question: str, context: str, system_prompt: Optional[str] = None
-    ) -> str:
+    async def query_with_context(self, question: str, context: str, system_prompt: Optional[str] = None) -> str:
         """Query LLM with context (RAG pattern)
 
         Args:
@@ -92,13 +87,9 @@ Based on the context above, provide a detailed and accurate answer:"""
 
         messages.append({"role": "user", "content": prompt})
 
-        return await self.chat_completion(
-            messages, temperature=0.3
-        )  # Lower temp for factual responses
+        return await self.chat_completion(messages, temperature=0.3)  # Lower temp for factual responses
 
-    async def generate_sql_query(
-        self, natural_language_query: str, schema: Dict[str, Any]
-    ) -> str:
+    async def generate_sql_query(self, natural_language_query: str, schema: Dict[str, Any]) -> str:
         """Generate SQL query from natural language (for DBQnA)
 
         Args:
@@ -191,9 +182,7 @@ Insights:"""
 
         return await self.generate_text(prompt, temperature=0.5)
 
-    async def answer_inventory_question(
-        self, question: str, inventory_context: List[Dict[str, Any]]
-    ) -> str:
+    async def answer_inventory_question(self, question: str, inventory_context: List[Dict[str, Any]]) -> str:
         """Answer inventory-related questions with context."""
         # Format inventory context
         context_parts = []
@@ -210,9 +199,7 @@ Insights:"""
 
         return await self.query_with_context(question, context, system_prompt)
 
-    async def stream_chat(
-        self, messages: List[Dict[str, str]], temperature: float = 0.7
-    ) -> AsyncGenerator[str, None]:
+    async def stream_chat(self, messages: List[Dict[str, str]], temperature: float = 0.7) -> AsyncGenerator[str, None]:
         """Stream chat responses (for real-time UI updates)"""
         try:
             async with httpx.AsyncClient(timeout=self.timeout) as client:

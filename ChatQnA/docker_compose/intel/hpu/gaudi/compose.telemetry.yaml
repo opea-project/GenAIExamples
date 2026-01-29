@@ -70,7 +70,7 @@ services:
     deploy:
       mode: global
   gaudi-exporter:
-    image: vault.habana.ai/gaudi-metric-exporter/metric-exporter:latest
+    image: vault.habana.ai/gaudi-metric-exporter/metric-exporter:1.22.2-32
     container_name: gaudi-exporter
     privileged: true
     volumes:

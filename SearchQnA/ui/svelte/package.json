@@ -18,7 +18,7 @@
     "@fortawesome/free-solid-svg-icons": "6.2.0",
     "@playwright/test": "^1.45.2",
     "@sveltejs/adapter-auto": "^3.0.0",
-    "@sveltejs/kit": "2.20.6",
+    "@sveltejs/kit": "2.49.5",
     "@sveltejs/vite-plugin-svelte": "^3.0.0",
     "@tailwindcss/typography": "0.5.7",
     "@types/debug": "4.1.7",
