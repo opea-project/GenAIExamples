@@ -13,6 +13,8 @@ services:
       - ./api:/app
     networks:
       - app_network
+    extra_hosts:
+      - "${LOCAL_URL_ENDPOINT}:host-gateway"
     restart: unless-stopped
 
 

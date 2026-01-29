@@ -4,17 +4,105 @@ This document contains all common issues encountered during development and thei
 
 ## Table of Contents
 
+- [Docker Compose Issues](#docker-compose-issues)
 - [API Common Issues](#api-common-issues)
 - [UI Common Issues](#ui-common-issues)
 
-### API Common Issues
+## Docker Compose Issues
 
-#### "OPENAI_API_KEY not found in environment variables"
+### Error: "LOCAL_URL_ENDPOINT variable is not set"
+
+**Problem**:
+```
+level=warning msg="The \"LOCAL_URL_ENDPOINT\" variable is not set. Defaulting to a blank string."
+decoding failed due to the following error(s):
+'services[backend].extra_hosts' bad host name ''
+```
+
+**Solution**:
+
+1. Create a `.env` file in the **root** `rag-chatbot` directory (not in `api/`):
+   ```bash
+   echo "LOCAL_URL_ENDPOINT=not-needed" > .env
+   ```
+2. If using a local domain (e.g., `inference.example.com`), replace `not-needed` with your domain name (without `https://`)
+3. Restart Docker Compose: `docker compose down && docker compose up`
+
+### Error: "404 Not Found" when uploading PDF
+
+**Problem**:
+```
+HTTP Request: POST https://api.example.com/BAAI/bge-base-en-v1.5/v1/embeddings "HTTP/1.1 404 Not Found"
+openai.NotFoundError: Error code: 404 - {'detail': 'Not Found'}
+```
+
+**Solution**:
+
+1. Verify your `api/.env` file has the **correct** API endpoint (not the placeholder):
+   ```bash
+   INFERENCE_API_ENDPOINT=https://your-actual-api-endpoint.com
+   INFERENCE_API_TOKEN=your-actual-token-here
+   ```
+
+2. Check available models on your inference service:
+   ```bash
+   curl https://your-api-endpoint.com/v1/models \
+     -H "Authorization: Bearer your-token"
+   ```
+
+3. Update model names to match the exact names from your API:
+   ```bash
+   EMBEDDING_MODEL_NAME=BAAI/bge-base-en-v1.5
+   INFERENCE_MODEL_NAME=Qwen/Qwen3-4B-Instruct-2507
+   ```
+
+4. Restart containers: `docker compose down && docker compose up --build`
+
+### Containers fail to start
+
+**Problem**: Docker containers won't start or crash immediately
+
+**Solution**:
+
+1. Check logs for specific errors:
+   ```bash
+   docker compose logs backend
+   docker compose logs frontend
+   ```
+
+2. Ensure ports 5001 and 3000 are available:
+   ```bash
+   # Windows
+   netstat -ano | findstr :5001
+   netstat -ano | findstr :3000
+
+   # Unix/Mac
+   lsof -i :5001
+   lsof -i :3000
+   ```
+
+3. Clean up and rebuild:
+   ```bash
+   docker compose down -v
+   docker compose up --build
+   ```
+
+4. Restart Docker Desktop if issues persist
+
+## API Common Issues
+
+#### "INFERENCE_API_ENDPOINT and INFERENCE_API_TOKEN must be set"
 
 **Solution**:
 
 1. Create a `.env` file in the `api` directory
-2. Add your OpenAI API key: `OPENAI_API_KEY=your_key_here`
+2. Add your inference configuration:
+   ```bash
+   INFERENCE_API_ENDPOINT=https://your-actual-api-endpoint.com
+   INFERENCE_API_TOKEN=your-actual-token-here
+   EMBEDDING_MODEL_NAME=BAAI/bge-base-en-v1.5
+   INFERENCE_MODEL_NAME=Qwen/Qwen3-4B-Instruct-2507
+   ```
 3. Restart the server
 
 #### "No documents uploaded"

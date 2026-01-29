@@ -56,15 +56,15 @@ class CustomEmbeddings(Embeddings):
 def get_embeddings(api_key: str) -> Embeddings:
     """
     Create embeddings instance
-    
+
     Args:
         api_key: API key (for compatibility, not used with custom endpoint)
-        
+
     Returns:
         Embeddings instance (CustomEmbeddings if using custom API, OpenAIEmbeddings otherwise)
     """
-    # Check if using custom API
-    if hasattr(config, 'KEYCLOAK_CLIENT_SECRET') and config.KEYCLOAK_CLIENT_SECRET:
+    # Check if using custom inference endpoint
+    if hasattr(config, 'INFERENCE_API_TOKEN') and config.INFERENCE_API_TOKEN:
         return CustomEmbeddings()
     else:
         # Fallback to OpenAI

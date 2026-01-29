@@ -97,15 +97,15 @@ class CustomChatModel(BaseChatModel):
 def get_llm(api_key: str) -> BaseChatModel:
     """
     Get LLM instance (ChatOpenAI or CustomChatModel based on config)
-    
+
     Args:
         api_key: API key
-        
+
     Returns:
         LLM instance
     """
-    # Check if using custom API
-    if hasattr(config, 'KEYCLOAK_CLIENT_SECRET') and config.KEYCLOAK_CLIENT_SECRET:
+    # Check if using custom inference endpoint
+    if hasattr(config, 'INFERENCE_API_TOKEN') and config.INFERENCE_API_TOKEN:
         return CustomChatModel()
     else:
         # Fallback to OpenAI ChatOpenAI

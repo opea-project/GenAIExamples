@@ -32,7 +32,7 @@ logger = logging.getLogger(__name__)
 async def lifespan(app: FastAPI):
     """Lifespan context manager for FastAPI app"""
     # Startup
-    app.state.vectorstore = load_vector_store(config.OPENAI_API_KEY)
+    app.state.vectorstore = load_vector_store(config.INFERENCE_API_TOKEN)
     if app.state.vectorstore:
         logger.info("✓ FAISS vector store loaded successfully")
     else:
@@ -81,7 +81,7 @@ def health_check():
     return HealthResponse(
         status="healthy",
         vectorstore_available=app.state.vectorstore is not None,
-        openai_key_configured=bool(config.OPENAI_API_KEY)
+        openai_key_configured=bool(config.INFERENCE_API_TOKEN)
     )
 
 
@@ -132,7 +132,7 @@ async def upload_pdf(file: UploadFile = File(...)):
             )
         
         # Create embeddings and store in FAISS
-        vectorstore = store_in_vector_storage(chunks, config.OPENAI_API_KEY)
+        vectorstore = store_in_vector_storage(chunks, config.INFERENCE_API_TOKEN)
         
         # Update app state
         app.state.vectorstore = vectorstore
@@ -186,7 +186,7 @@ def query_endpoint(request: QueryRequest):
         result = query_documents(
             request.query,
             app.state.vectorstore,
-            config.OPENAI_API_KEY
+            config.INFERENCE_API_TOKEN
         )
         return QueryResponse(**result)
     except Exception as e:
