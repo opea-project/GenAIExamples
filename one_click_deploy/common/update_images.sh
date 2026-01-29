@@ -64,6 +64,11 @@ get_service_list() {
     local device_name=$2
     local os_name=$3
     case "$example_name" in
+        "ArbPostHearingAssistant")
+            if [[ "$device_name" == "xeon" ]]; then
+                echo "arb-post-hearing-assistant arb-post-hearing-assistant-gradio-ui llm-arb-post-hearing-assistant"
+            fi
+            ;;
         "DocSum")
             if [[ "$device_name" == "gaudi" ]]; then
                 echo "docsum docsum-gradio-ui whisper llm-docsum vllm-gaudi"
@@ -163,6 +168,11 @@ declare -A AGENT_CONFIG=(
     [clone_vllm_fork]=true
     [vllm_fork_version]="${VLLM_FORK_VER}"
 )
+# Config for ArbPostHearingAssistant, not needs vLLM
+declare -A ArbPostHearingAssistant_CONFIG=(
+    [clone_vllm]=false
+    [clone_vllm_fork]=false
+)
 
 # --- Generic Build Function ---
 # This single function handles the build process for any example,
@@ -260,6 +270,9 @@ dispatch_build() {
             ;;
         "AgentQnA")
             config_name="AGENT_CONFIG"
+            ;;
+        "ArbPostHearingAssistant")
+            config_name="ArbPostHearingAssistant_CONFIG"
             ;;
         *)
             error_exit "No build configuration defined for example '${example_name}'. Please add it to the script."
