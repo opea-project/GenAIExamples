@@ -81,6 +81,9 @@ echo "export BACKEND_SERVICE_IP=\"${host_ip}\"" >> .env
 export BACKEND_SERVICE_PORT="8888"
 echo "export BACKEND_SERVICE_PORT=\"8888\"" >> .env
 
+export NUM_CARDS="1"
+echo "export NUM_CARDS=\"1\"" >> .env
+
 # Docker Configuration
 echo ""
 echo "--- Docker Configuration ---"

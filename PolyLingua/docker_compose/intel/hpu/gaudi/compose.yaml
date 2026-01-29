@@ -3,28 +3,33 @@
 
 services:
   vllm-service:
-    image: budstudio/vllm-cpu:0.11.0
-    container_name: vllm-service
+    image: opea/vllm-gaudi:1.22.0
+    container_name: vllm-gaudi-server
     ports:
-      - "8028:8000"
+      - "8028:80"
+    volumes:
+      - "${MODEL_CACHE:-./data}:/root/.cache/huggingface/hub"
+    shm_size: 1g
     environment:
       no_proxy: ${no_proxy}
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       HF_TOKEN: ${HF_TOKEN}
-      HF_HUB_DISABLE_PROGRESS_BARS: 1
-      HF_HUB_ENABLE_HF_TRANSFER: 0
-      host_ip: ${host_ip}
+      HABANA_VISIBLE_DEVICES: all
+      OMPI_MCA_btl_vader_single_copy_mechanism: none
+      VLLM_SKIP_WARMUP: ${VLLM_SKIP_WARMUP:-true}
+      NUM_CARDS: ${NUM_CARDS:-1}
+      VLLM_TORCH_PROFILER_DIR: "/mnt"
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8000/health || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://localhost:80/health || exit 1"]
       interval: 10s
       timeout: 10s
       retries: 100
-    volumes:
-      - "${MODEL_CACHE:-./data}:/root/.cache/huggingface/hub"
-    shm_size: 1g
-    command: --model ${LLM_MODEL_ID} --host 0.0.0.0 --port 8000 --max-model-len 8192
-
+    runtime: habana
+    cap_add:
+      - SYS_NICE
+    ipc: host
+    command: --model ${LLM_MODEL_ID} --tensor-parallel-size ${NUM_CARDS} --host 0.0.0.0 --port 80 --block-size 128 --max-num-seqs 256
   llm:
     image: ${REGISTRY:-opea}/llm-textgen:${TAG:-latest}
     container_name: llm-textgen-server

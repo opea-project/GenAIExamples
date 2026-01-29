@@ -5,11 +5,11 @@
 set -xe
 IMAGE_REPO=${IMAGE_REPO:-"opea"}
 IMAGE_TAG=${IMAGE_TAG:-"latest"}
-echo "REGISTRY=IMAGE_REPO=${IMAGE_REPO}"
-echo "TAG=IMAGE_TAG=${IMAGE_TAG}"
+echo "IMAGE_REPO=${IMAGE_REPO}"
+echo "IMAGE_TAG=${IMAGE_TAG}"
 export REGISTRY=${IMAGE_REPO}
 export TAG=${IMAGE_TAG}
-export MODEL_CACHE=${model_cache:-"./data"}
+export MODEL_CACHE=${MODEL_CACHE:-"./data"}
 
 # Get the directory where this script is located
 SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
@@ -35,15 +35,26 @@ function build_docker_images() {
     # Build all images using build.yaml
     echo "Building PolyLingua images with --no-cache, check docker_image_build.log for details..."
     service_list="polylingua polylingua-ui llm-textgen"
-    docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log 2>&1
+
+    if ! docker compose -f build.yaml build ${service_list} --no-cache > ${LOG_PATH}/docker_image_build.log 2>&1; then
+        echo "::error::Docker Compose build failed. Printing build logs..."
+        cat "${LOG_PATH}/docker_image_build.log"
+        exit 1
+    fi
 
     echo "Image build completed"
+    echo "Verifying built images..."
+    if ! docker images | grep -q "polylingua" || ! docker images | grep -q "polylingua-ui" || ! docker images | grep -q "llm-textgen"; then
+        echo "::error::One or more required images are missing after build!"
+        docker images
+        exit 1
+    fi
     docker images | grep -E "polylingua|llm-textgen"
     sleep 1s
 }
 
 function start_services() {
-    cd $WORKPATH/docker_compose/intel/cpu/xeon/
+    cd $WORKPATH/docker_compose/intel/hpu/gaudi/
     export host_ip=${ip_address}
     export no_proxy="localhost,127.0.0.1,$ip_address"
 
@@ -51,7 +62,7 @@ function start_services() {
     if [ ! -f .env ]; then
         echo "Creating .env file..."
         export HF_TOKEN=${HF_TOKEN}
-        export LLM_MODEL_ID="swiss-ai/Apertus-8B-Instruct-2509"
+        export LLM_MODEL_ID="Qwen/Qwen2.5-7B-Instruct"
         export VLLM_ENDPOINT="http://${host_ip}:8028"
         export LLM_SERVICE_HOST_IP=${host_ip}
         export LLM_SERVICE_PORT=9000
@@ -84,34 +95,53 @@ FRONTEND_SERVICE_PORT=${FRONTEND_SERVICE_PORT}
 NGINX_PORT=${NGINX_PORT}
 REGISTRY=${REGISTRY}
 TAG=${TAG}
+NUM_CARDS=1
 EOF
     fi
 
     # Start Docker Containers
     echo "Starting services with docker compose..."
-    docker compose -f compose.yaml up -d > ${LOG_PATH}/start_services_with_compose.log 2>&1
+    if ! docker compose -f compose.yaml up -d > ${LOG_PATH}/start_services_with_compose.log 2>&1; then
+        echo "::error::Docker Compose failed to start. Printing logs..."
+        cat "${LOG_PATH}/start_services_with_compose.log"
+        echo "::group::Docker Compose PS"
+        docker compose -f compose.yaml ps
+        echo "::endgroup::"
+        echo "::group::Docker Logs"
+        docker compose -f compose.yaml logs
+        echo "::endgroup::"
+        exit 1
+    fi
 
     # Wait for vLLM service to be ready
-    echo "Waiting for vLLM service to initialize (this may take several minutes)..."
+    echo "Waiting for vLLM service to become healthy (this may take up to 30 minutes)..."
+    local vllm_health_url="http://${ip_address}:8028/health"
+
     n=0
-    until [[ "$n" -ge 100 ]]; do
-        docker logs vllm-service > ${LOG_PATH}/vllm_service_start.log 2>&1
-        if grep -E "Uvicorn running|Application startup complete" ${LOG_PATH}/vllm_service_start.log; then
-            echo "vLLM service is ready!"
+    until [[ "$n" -ge 180 ]]; do
+        http_status=$(curl -s -o /dev/null -w "%{http_code}" "$vllm_health_url")
+
+        if [[ "$http_status" -eq 200 ]]; then
+            echo "vLLM service is healthy (returned status 200)!"
             break
         fi
-        if grep -q "error" ${LOG_PATH}/vllm_service_start.log; then
-            echo "Error detected in vLLM service startup"
-            cat ${LOG_PATH}/vllm_service_start.log
+
+        if ! docker ps --filter "name=vllm-gaudi-server" --filter "status=running" -q | grep -q .; then
+            echo "::error::vLLM container has stopped unexpectedly!"
+            docker logs vllm-gaudi-server
             exit 1
         fi
+
+        echo "Waiting for vLLM health endpoint... status: $http_status ($n/180)"
         sleep 10s
         n=$((n+1))
     done
 
-    if [[ "$n" -ge 100 ]]; then
-        echo "Timeout waiting for vLLM service"
-        docker logs vllm-service
+    if [[ "$n" -ge 180 ]]; then
+        echo "::error::Timeout waiting for vLLM service after 30 minutes."
+        echo "Final health check status: $http_status"
+        echo "Dumping container logs:"
+        docker logs vllm-gaudi-server
         exit 1
     fi
 
@@ -197,8 +227,8 @@ function validate_microservices() {
         "http://${ip_address}:8028/v1/chat/completions" \
         "content" \
         "vllm" \
-        "vllm-service" \
-        '{"model": "swiss-ai/Apertus-8B-Instruct-2509", "messages": [{"role": "user", "content": "Translate Hello to Spanish"}], "max_tokens": 32}'
+        "vllm-gaudi-server" \
+        '{"model": "Qwen/Qwen2.5-7B-Instruct", "messages": [{"role": "user", "content": "Translate Hello to Spanish"}], "max_tokens": 32}'
 
     # Test LLM microservice
     validate_services \
@@ -295,7 +325,7 @@ function validate_ui() {
 }
 
 function stop_docker() {
-    cd $WORKPATH/docker_compose/intel/cpu/xeon/
+    cd $WORKPATH/docker_compose/intel/hpu/gaudi/
     echo "Stopping services..."
     docker compose -f compose.yaml down
     echo "Services stopped"
@@ -305,7 +335,7 @@ function main() {
     echo "======================================"
     echo "PolyLingua E2E Test Suite"
     echo "======================================"
-    echo "Platform: Intel Xeon (CPU)"
+    echo "Platform: Intel Gaudi (HPU)"
     echo "LLM Backend: vLLM"
     echo "IP Address: ${ip_address}"
     echo "======================================"
