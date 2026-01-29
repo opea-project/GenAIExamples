@@ -11,7 +11,7 @@ EC-RAG目前支持两种类型的智能体：
 - **Simple Agent**: 不包含规划、research的简单轻量级Agent；
 - **Deep Search Agent**: 能够进行多步规划、deep research和深度推理的更高级版本Agent。
 
-## Retrieval
+## 创建智能体
 
 ### 前提条件
 

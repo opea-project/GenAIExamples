@@ -8,6 +8,26 @@ WORKPATH=$(dirname "$(pwd)")
 ip_address=$(hostname -I | awk '{print $1}')
 HOST_IP=$ip_address
 
+#use python venv
+ENV_NAME="ecrag_venv"
+python -m venv $ENV_NAME
+
+# check venv
+if [ ! -d "$ENV_NAME" ]; then
+    echo "Failed to create virtual environment"
+    exit 1
+fi
+
+# activate venv
+if [ -f "$ENV_NAME/bin/activate" ]; then
+    source $ENV_NAME/bin/activate
+elif [ -f "$ENV_NAME/Scripts/activate" ]; then
+    source $ENV_NAME/Scripts/activate
+else
+    echo "Failed to activate virtual environment"
+    exit 1
+fi
+
 get_user_input() {
     local var_name=$1
     local default_value=$2
@@ -47,10 +67,10 @@ function start_vllm_services() {
     else
         echo "you have not prepare models, starting to download models into ${MODEL_PATH}..."
         mkdir -p $MODEL_PATH
-        pip install --upgrade --upgrade-strategy eager "optimum[openvino]"
+        python -m pip install --upgrade-strategy eager "optimum-intel[openvino]"
         optimum-cli export openvino -m BAAI/bge-small-en-v1.5 ${MODEL_PATH}/BAAI/bge-small-en-v1.5 --task sentence-similarity
         optimum-cli export openvino -m BAAI/bge-reranker-large ${MODEL_PATH}/BAAI/bge-reranker-large --task text-classification
-        pip install -U huggingface_hub
+        pip install huggingface_hub
         huggingface-cli download $LLM_MODEL --local-dir "${MODEL_PATH}/${LLM_MODEL}"
     fi
     HF_CACHE="${HOME}/.cache"
@@ -128,7 +148,7 @@ function start_services() {
         if [ "$your_input" == "yes" ]; then
             echo "start to download models..."
             mkdir -p $MODEL_PATH
-            pip install --upgrade --upgrade-strategy eager "optimum[openvino]"
+            python -m pip install --upgrade-strategy eager "optimum-intel[openvino]"
             optimum-cli export openvino -m BAAI/bge-small-en-v1.5 ${MODEL_PATH}/BAAI/bge-small-en-v1.5 --task sentence-similarity
             optimum-cli export openvino -m BAAI/bge-reranker-large ${MODEL_PATH}/BAAI/bge-reranker-large --task text-classification
             optimum-cli export openvino --model ${LLM_MODEL} ${MODEL_PATH}/${LLM_MODEL}/INT4_compressed_weights --task text-generation-with-past --weight-format int4 --group-size 128 --ratio 0.8
@@ -296,10 +316,10 @@ function start_vLLM_B60_services() {
     else
         echo "you have not prepare models, starting to download models into ${MODEL_PATH}..."
         mkdir -p $MODEL_PATH
-        pip install --upgrade --upgrade-strategy eager "optimum[openvino]"
+        python -m pip install --upgrade-strategy eager "optimum-intel[openvino]"
         optimum-cli export openvino -m BAAI/bge-small-en-v1.5 ${MODEL_PATH}/BAAI/bge-small-en-v1.5 --task sentence-similarity
         optimum-cli export openvino -m BAAI/bge-reranker-large ${MODEL_PATH}/BAAI/bge-reranker-large --task text-classification
-        pip install -U huggingface_hub
+        pip install huggingface_hub
         huggingface-cli download $LLM_MODEL --local-dir "${MODEL_PATH}/${LLM_MODEL}"
     fi
     echo "give permission to related path..."

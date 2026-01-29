@@ -8,6 +8,7 @@ from abc import ABC
 
 import aiohttp
 import numpy
+from edgecraftrag.base import GeneratorType
 from edgecraftrag.config_repository import MilvusConfigRepository
 from omegaconf import OmegaConf
 
@@ -211,8 +212,9 @@ async def query_search(user_input, SEARCH_CONFIG_PATH, SEARCH_DIR, pl):
     top1_issue = None
     sub_questions_result = None
 
-    model_id = pl.generator.model_id
-    vllm_endpoint = pl.generator.vllm_endpoint
+    generator = pl.get_generator(GeneratorType.CHATQNA)
+    model_id = generator.model_id
+    vllm_endpoint = generator.vllm_endpoint
 
     maintenance_data = read_json_files(SEARCH_DIR)
     issues = []

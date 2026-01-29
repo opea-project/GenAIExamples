@@ -62,17 +62,10 @@ const getTableColumns = (t: (key: string) => string): TableColumns[] => [
     visible: true,
   },
   {
-    title: t("pipeline.config.llm"),
-    key: "inference_type",
-    dataIndex: ["generator", "inference_type"],
+    title: t("pipeline.config.generatorType"),
+    key: "generator_type",
+    dataIndex: "generator",
     minWidth: 120,
-    visible: true,
-  },
-  {
-    title: t("pipeline.config.language"),
-    key: "language",
-    dataIndex: ["generator", "model", "model_id"],
-    minWidth: 180,
     visible: true,
   },
   {

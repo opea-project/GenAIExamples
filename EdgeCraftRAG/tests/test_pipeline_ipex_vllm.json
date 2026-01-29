@@ -30,17 +30,19 @@
       }
     }
   ],
-  "generator": {
-    "inference_type": "vllm",
-    "model": {
-      "model_id": "Qwen/Qwen3-8B",
-      "model_path": "",
-      "device": "",
-      "weight": ""
-    },
-    "generator_type": "chatqna",
-    "prompt_path": "./default_prompt.txt",
-    "vllm_endpoint": ""
-  },
+  "generator": [
+    {
+      "inference_type": "vllm",
+      "model": {
+        "model_id": "Qwen/Qwen3-8B",
+        "model_path": "",
+        "device": "",
+        "weight": ""
+      },
+      "generator_type": "chatqna",
+      "prompt_path": "./default_prompt.txt",
+      "vllm_endpoint": ""
+    }
+  ],
   "active": "True"
 }

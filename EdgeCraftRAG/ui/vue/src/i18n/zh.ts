@@ -42,6 +42,15 @@ export default {
     inputTip: "请输入 ",
     connect: "连接",
     detail: "查看详情",
+    retry: "重试",
+    retrying: "重试中",
+    retryAll: "全部重试",
+    ignore: "忽略",
+    ignoreAll: "全部忽略",
+    replace: "替换",
+    replaceAll: "全部替换",
+    count: "总数",
+    total: "总计",
   },
   system: {
     title: "系统状态",
@@ -88,7 +97,7 @@ export default {
     deleteTip: "您确定要删除此Pipeline吗 ？此操作不可恢复。",
     notActivatedTip: "当前无可用Pipeline，请先配置或激活。",
     validErr: "表单验证失败！",
-
+    urlValidTip: "URL 或模型测试通过后方可继续",
     config: {
       basic: "基础",
       nodeParser: "节点解析器",
@@ -112,6 +121,8 @@ export default {
       rerankDevice: "模型运行设备",
       generator: "生成器",
       generatorType: "生成器类型",
+      generatorAgent: "智能体生成器",
+      generatorChat: "会话生成器",
       llm: "推理类型",
       language: "语言大模型",
       llmDevice: "运行设备",
@@ -122,6 +133,8 @@ export default {
       modelName: "模型名称",
       vllm_url: "vLLM 地址",
       kbadmin: "kbadmin",
+      addAgent: "智能体生成器配置",
+      deleteAgentTip: "您确定要删除智能生成器体配置吗？",
     },
     valid: {
       nameValid1: "请输入名称",
@@ -147,7 +160,7 @@ export default {
       rerank: "请选择重排模型",
       rerankDevice: "请选择重排模型运行设备",
       generatorType: "请选择生成器类型",
-      language: "请选择或输入大语言模型",
+      language: "请选择大语言模型",
       llmDevice: "请选择大语言模型运行设备",
       weights: "请选择模型权重",
       kb_vector_url: "IP : 端口，(例如 192.168.1.1:29530)",
@@ -291,6 +304,8 @@ export default {
     successfully: "成功",
     failed: "失败",
     totalTip: "个文件",
+    failedFile: "失败文件",
+    retryFailed: "上传失败！",
   },
   request: {
     pipeline: {
@@ -387,7 +402,7 @@ export default {
     delConfigs: "删除配置",
     noData: "暂无配置",
     think: "智能体思考",
-    pipeline: "Pipeline ID",
+    pipeline: "Pipeline 名称",
     label: {
       name: "智能体名称",
       type: "智能体类型 ",
@@ -403,7 +418,7 @@ export default {
       configs: "请录入智能体配置",
       key: "请输入配置名称",
       value: "请输入配置内容",
-      notPipeline: "请先创建生成器类型为 FreeChat 的 Pipeline",
+      notPipeline: "请先创建Pipeline",
     },
   },
 };

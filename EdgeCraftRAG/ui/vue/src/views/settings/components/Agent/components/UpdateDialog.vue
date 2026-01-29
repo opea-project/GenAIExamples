@@ -219,10 +219,8 @@
 
   const queryPipelineList = async () => {
     const data: any = await getPipelineList();
-    pipelineList.value = data.filter((item: any) => item.generator.generator_type === "freechat");
+    pipelineList.value = data || [];
     showPipelineTip.value = !(pipelineList.value.length > 0);
-
-    console.log(pipelineList.value);
   };
   /* ---- type change ---- */
   const handleTypeChange = () => {

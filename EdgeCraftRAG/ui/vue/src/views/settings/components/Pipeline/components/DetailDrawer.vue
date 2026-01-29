@@ -124,12 +124,7 @@
             :class="['form-wrap', index ? 'bt-border' : '']"
           >
             <li class="item-wrap">
-              <span class="label-wrap">
-                {{ $t("pipeline.config.postProcessorType") }}
-                <template v-if="formData.postprocessor?.length > 1">
-                  {{ index + 1 }}
-                </template></span
-              >
+              <span class="label-wrap"> {{ $t("pipeline.config.postProcessorType") }}</span>
               <span class="content-wrap">{{ item.processor_type }}</span>
             </li>
             <template v-if="item.processor_type === 'reranker'">
@@ -154,34 +149,38 @@
     <div class="module-wrap">
       <a-collapse v-model:activeKey="generatorActive" expandIconPosition="end">
         <a-collapse-panel key="generator" :header="$t('pipeline.config.generator')">
-          <ul class="form-wrap">
+          <ul
+            v-for="(item, index) in formData.generator"
+            key="index"
+            :class="['form-wrap', index ? 'bt-border' : '']"
+          >
             <li class="item-wrap">
               <span class="label-wrap">{{ $t("pipeline.config.generatorType") }}</span>
               <span class="content-wrap">
-                {{ formData.generator.generator_type }}
+                {{ item.generator_type }}
               </span>
             </li>
             <li class="item-wrap">
               <span class="label-wrap">{{ $t("pipeline.config.llm") }}</span>
-              <span class="content-wrap">{{ formData.generator.inference_type }}</span>
+              <span class="content-wrap">{{ item.inference_type }}</span>
             </li>
             <li class="item-wrap">
               <span class="label-wrap">{{ $t("pipeline.config.language") }}</span>
-              <span class="content-wrap">{{ formData.generator.model.model_id }}</span>
+              <span class="content-wrap">{{ item.model.model_id }}</span>
             </li>
-            <template v-if="formData.generator.inference_type === 'local'">
+            <template v-if="item.inference_type === 'local'">
               <li class="item-wrap">
                 <span class="label-wrap">{{ $t("pipeline.config.llmDevice") }}</span>
-                <span class="content-wrap">{{ formData.generator.model.device }}</span>
+                <span class="content-wrap">{{ item.model.device }}</span>
               </li>
               <li class="item-wrap">
                 <span class="label-wrap">{{ $t("pipeline.config.weights") }}</span>
-                <span class="content-wrap">{{ formData.generator.model.weight }}</span>
+                <span class="content-wrap">{{ item.model.weight }}</span>
               </li></template
             >
             <li class="item-wrap" v-else>
               <span class="label-wrap">{{ $t("pipeline.config.vllm_url") }}</span>
-              <span class="content-wrap">{{ formData.generator.vllm_endpoint }}</span>
+              <span class="content-wrap">{{ item.vllm_endpoint }}</span>
             </li>
           </ul>
         </a-collapse-panel>

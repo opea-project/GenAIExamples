@@ -5,12 +5,9 @@
         <span class="title"></span>
         <div class="btn-wrap">
           <a-config-provider :theme="antTheme.subTheme">
-            <a-button
-              type="primary"
-              :icon="h(CloudUploadOutlined)"
-              @click="handleImport()"
-              >{{ $t("experience.import") }}</a-button
-            >
+            <a-button type="primary" :icon="h(CloudUploadOutlined)" @click="handleImport()">{{
+              $t("experience.import")
+            }}</a-button>
           </a-config-provider>
           <a-button type="primary" @click="handleCreate()">
             <template #icon>
@@ -24,7 +21,7 @@
         :columns="tableColumns"
         :data-source="tableList"
         :pagination="false"
-        :row-key="(record) => record?.question"
+        :row-key="record => record?.question"
       >
         <template #expandColumnTitle>
           <div class="expand-column">{{ $t("experience.detail") }}</div>
@@ -66,6 +63,7 @@
         v-model:pageSize="paginationData.pageSize"
         showSizeChanger
         :total="paginationData.total"
+        :show-total="total => `${$t('common.total')}: ${total}`"
       />
       <!-- UpdateDialog -->
       <UpdateDialog
@@ -86,140 +84,141 @@
 </template>
 
 <script lang="ts" setup name="ExperienceDetail">
-import { createVNode, h, ref, onMounted } from "vue";
-import { antTheme } from "@/utils/antTheme";
-import {
-  CloseCircleFilled,
-  CloudUploadOutlined,
-  PlusOutlined,
-  EditFilled,
-  DeleteFilled,
-} from "@ant-design/icons-vue";
-import { Modal } from "ant-design-vue";
-import {
-  getExperienceDetailByName,
-  getExperienceList,
-  requestExperienceDelete,
-} from "@/api/knowledgeBase";
-import { UpdateDialog, ImportDialog } from "./index.ts";
-import { useI18n } from "vue-i18n";
-import eventBus from "@/utils/mitt";
+  import {
+    getExperienceDetailByName,
+    getExperienceList,
+    requestExperienceDelete,
+  } from "@/api/knowledgeBase";
+  import { antTheme } from "@/utils/antTheme";
+  import eventBus from "@/utils/mitt";
+  import {
+    CloseCircleFilled,
+    CloudUploadOutlined,
+    DeleteFilled,
+    EditFilled,
+    PlusOutlined,
+  } from "@ant-design/icons-vue";
+  import { Modal } from "ant-design-vue";
+  import { createVNode, h, onMounted, ref } from "vue";
+  import { useI18n } from "vue-i18n";
+  import { ImportDialog, UpdateDialog } from "./index.ts";
 
-const { t } = useI18n();
-const tableData = ref<EmptyArrayType>([]);
-const tableColumns = computed<EmptyArrayType>(() => [
-  {
-    title: t("experience.label.experience"),
-    dataIndex: "question",
-    ellipsis: true,
-  },
-  {
-    title: t("experience.operation"),
-    dataIndex: "operation",
-    width: "180px",
-    fixed: "right",
-  },
-]);
-
-const paginationData = reactive<paginationType>({
-  total: 0,
-  pageNum: 1,
-  pageSize: 10,
-});
-const updateDialog = reactive<DialogType>({
-  visible: false,
-  type: "create",
-  data: [],
-});
-const importDialog = reactive<DialogType>({
-  visible: false,
-});
-const tableList = computed(() => {
-  const { pageNum, pageSize } = paginationData;
-  const start = (pageNum - 1) * pageSize;
-  const end = start + pageSize;
-  return tableData.value.slice(start, end);
-});
-const queryExperienceList = async () => {
-  const data: any = await getExperienceList();
-
-  tableData.value = [].concat(data || []);
-};
-//create
-const handleCreate = () => {
-  updateDialog.type = "create";
-  updateDialog.data = [];
-  updateDialog.visible = true;
-};
-//edit
-const handleUpdate = async (row: EmptyObjectType) => {
-  const { idx } = row;
-  const data: any = await getExperienceDetailByName({ idx });
-
-  updateDialog.type = "edit";
-  updateDialog.data = [data];
-  updateDialog.visible = true;
-};
-//import
-const handleImport = () => {
-  importDialog.visible = true;
-};
-//delete
-const handleDelete = (row: EmptyObjectType) => {
-  Modal.confirm({
-    title: t("common.delete"),
-    icon: createVNode(CloseCircleFilled, { class: "error-icon" }),
-    content: t("experience.deleteTip"),
-    okText: t("common.confirm"),
-    okType: "danger",
-    async onOk() {
-      const { idx } = row;
-      await requestExperienceDelete({ idx });
-      paginationData.pageNum = 1;
-      handleSearch();
+  const { t } = useI18n();
+  const tableData = ref<EmptyArrayType>([]);
+  const tableColumns = computed<EmptyArrayType>(() => [
+    {
+      title: t("experience.label.experience"),
+      dataIndex: "question",
+      ellipsis: true,
     },
-  });
-};
+    {
+      title: t("experience.operation"),
+      dataIndex: "operation",
+      width: "200px",
+      fixed: "right",
+    },
+  ]);
 
-//search
-const handleSearch = () => {
-  queryExperienceList();
-  eventBus.emit("refresh");
-};
-onMounted(() => {
-  queryExperienceList();
-});
+  const paginationData = reactive<PaginationType>({
+    total: 0,
+    pageNum: 1,
+    pageSize: 10,
+  });
+  const updateDialog = reactive<DialogType>({
+    visible: false,
+    type: "create",
+    data: [],
+  });
+  const importDialog = reactive<DialogType>({
+    visible: false,
+  });
+  const tableList = computed(() => {
+    const { pageNum, pageSize } = paginationData;
+    const start = (pageNum - 1) * pageSize;
+    const end = start + pageSize;
+    return tableData.value.slice(start, end);
+  });
+  const queryExperienceList = async () => {
+    const data: any = await getExperienceList();
+
+    tableData.value = [].concat(data || []);
+    paginationData.total = data?.length || 0;
+  };
+  //create
+  const handleCreate = () => {
+    updateDialog.type = "create";
+    updateDialog.data = [];
+    updateDialog.visible = true;
+  };
+  //edit
+  const handleUpdate = async (row: EmptyObjectType) => {
+    const { idx } = row;
+    const data: any = await getExperienceDetailByName({ idx });
+
+    updateDialog.type = "edit";
+    updateDialog.data = [data];
+    updateDialog.visible = true;
+  };
+  //import
+  const handleImport = () => {
+    importDialog.visible = true;
+  };
+  //delete
+  const handleDelete = (row: EmptyObjectType) => {
+    Modal.confirm({
+      title: t("common.delete"),
+      icon: createVNode(CloseCircleFilled, { class: "error-icon" }),
+      content: t("experience.deleteTip"),
+      okText: t("common.confirm"),
+      okType: "danger",
+      async onOk() {
+        const { idx } = row;
+        await requestExperienceDelete({ idx });
+        paginationData.pageNum = 1;
+        handleSearch();
+      },
+    });
+  };
+
+  //search
+  const handleSearch = () => {
+    queryExperienceList();
+    eventBus.emit("refresh");
+  };
+  onMounted(() => {
+    queryExperienceList();
+  });
 </script>
 
 <style scoped lang="less">
-.experience-container {
-  padding: 24px;
-  .table-container {
-    .p-16;
-    .pb-24;
-    border-radius: 8px;
-    background-color: var(--bg-content-color);
+  .experience-container {
+    padding: 24px;
+    .table-container {
+      .p-16;
+      .pb-24;
+      border-radius: 8px;
+      background-color: var(--bg-content-color);
 
-    .header-wrap {
-      .flex-between;
-      .mb-20;
-    }
-    .title {
-      .fs-16;
-      font-weight: 600;
-      color: var(--font-main-color);
-    }
-    .btn-wrap {
-      display: flex;
-      gap: 12px;
-    }
-    .experience-item {
-      color: var(--font-text-color);
-      .pl-8;
-    }
-    .expand-column {
-      width: 80px;
+      .header-wrap {
+        .flex-between;
+        .mb-20;
+      }
+      .title {
+        .fs-16;
+        font-weight: 600;
+        color: var(--font-main-color);
+      }
+      .btn-wrap {
+        display: flex;
+        gap: 12px;
+      }
+      .experience-item {
+        color: var(--font-text-color);
+        .pl-8;
+      }
+      .expand-column {
+        width: 80px;
+      }
     }
   }
-}
 </style>

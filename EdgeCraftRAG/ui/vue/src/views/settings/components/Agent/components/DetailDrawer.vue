@@ -19,7 +19,7 @@
       <p class="basic-item">
         <span class="label-wrap">{{ $t("agent.pipeline") }}</span>
         <span class="content-wrap"
-          >{{ formData.pipeline_idx }}
+          >{{ formData.pipeline_name }}
           <a-tooltip :title="$t('common.detail')"
             ><EyeOutlined class="click-link" @click="handlePipelineView"
           /></a-tooltip>

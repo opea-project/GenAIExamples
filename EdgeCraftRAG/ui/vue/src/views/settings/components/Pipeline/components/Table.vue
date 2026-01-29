@@ -34,6 +34,9 @@
         <template v-if="column.dataIndex === 'rerank'">
           {{ record.postprocessor.map((item: any) => item?.model?.model_id).join(" ") || "--" }}
         </template>
+        <template v-if="column.dataIndex === 'generator'">
+          {{ record.generator?.map((item: any) => item?.generator_type).join(",") }}
+        </template>
         <template v-if="column.dataIndex === 'status'">
           <span>
             <a-tag :bordered="false" :color="record.status?.active ? 'success' : 'default'">
@@ -99,6 +102,7 @@
       v-model:pageSize="paginationData.pageSize"
       showSizeChanger
       :total="paginationData.total"
+      :show-total="total => `${$t('common.total')}: ${total}`"
     />
   </div>
 </template>
@@ -138,8 +142,8 @@
   });
 
   const emit = defineEmits(["update", "create", "view", "import", "search"]);
-  const paginationData = reactive<paginationType>({
-    total: props.tableData.length || 0,
+  const paginationData = reactive<PaginationType>({
+    total: 0,
     pageNum: 1,
     pageSize: 10,
   });
@@ -214,6 +218,13 @@
   const jumpChatbot = () => {
     router.push({ name: "Chatbot" });
   };
+  watch(
+    () => props.tableData,
+    newData => {
+      paginationData.total = newData.length;
+    },
+    { immediate: true }
+  );
 </script>
 
 <style scoped lang="less">

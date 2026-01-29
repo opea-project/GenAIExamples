@@ -16,6 +16,7 @@ class PipelineMgr(BaseMgr):
 
     def __init__(self):
         self._active_pipeline = None
+        self._prev_active_pipeline_name = None
         self._lock = asyncio.Lock()
         super().__init__()
 
@@ -43,6 +44,8 @@ class PipelineMgr(BaseMgr):
             raise Exception("Pipeline not found...")
         if pl.status.active:
             raise Exception("Unable to remove an active pipeline...")
+        if self._prev_active_pipeline_name and pl.name == self._prev_active_pipeline_name:
+            raise Exception("Pipeline is currently cached, unable to remove...")
         pl.node_parser = None
         pl.indexer = None
         pl.retriever = None
@@ -59,10 +62,12 @@ class PipelineMgr(BaseMgr):
         gc.collect()
         return "Pipeline removed successfully"
 
-    def get_pipelines(self):
+    def get_pipelines(self, gen_type: str = None):
+        if gen_type:
+            return [pl for _, pl in self.components.items() if (pl.get_generator(gen_type) is not None)]
         return [pl for _, pl in self.components.items()]
 
-    def activate_pipeline(self, name: str, active: bool, nm: NodeMgr, kb_name: None):
+    def activate_pipeline(self, name: str, active: bool, nm: NodeMgr, kb_name: None, cache_prev: bool = False):
         pl = self.get_pipeline_by_name_or_id(name)
         if pl is None:
             return
@@ -80,11 +85,19 @@ class PipelineMgr(BaseMgr):
         if prevactive:
             prevactive.status.active = False
             prevactive.update_pipeline_json({"active": prevactive.status.active})
+            if cache_prev:
+                self._prev_active_pipeline_name = prevactive.name
         pl.status.active = True
         self._active_pipeline = pl
 
     def get_active_pipeline(self) -> Pipeline:
         return self._active_pipeline
+
+    def get_prev_active_pipeline_name(self) -> str:
+        return self._prev_active_pipeline_name
+
+    def clear_prev_active_pipeline_name(self):
+        self._prev_active_pipeline_name = None
 
     def notify_node_change(self):
         for _, pl in self.components.items():

@@ -6,6 +6,7 @@ import os
 import time
 from typing import Dict, List, Optional
 
+from edgecraftrag.base import GeneratorType
 from edgecraftrag.env import AGENT_FILE, KNOWLEDGEBASE_FILE, PIPELINE_FILE
 from pymilvus import (
     Collection,
@@ -279,7 +280,18 @@ async def save_pipeline_configurations(operation: str = None, pipeline=None):
         target_data["idx"] = pipeline.idx
         target_idx = target_data.get("idx")
         if "generator" in target_data and operation != "delete":
-            target_data["generator"]["prompt_content"] = pipeline.generator.prompt_content
+            gens_data = target_data["generator"]
+            if isinstance(gens_data, list):
+                for gen in gens_data:
+                    if gen.get("comp_subtype") == GeneratorType.CHATQNA:
+                        chatqna_gen = pipeline.get_generator(GeneratorType.CHATQNA)
+                        if chatqna_gen:
+                            gen["prompt_content"] = chatqna_gen.prompt_content
+            elif isinstance(gens_data, dict):
+                chatqna_gen = pipeline.get_generator(GeneratorType.CHATQNA)
+                if chatqna_gen:
+                    if GeneratorType.CHATQNA in gens_data:
+                        gens_data[GeneratorType.CHATQNA]["prompt_content"] = chatqna_gen.prompt_content
             target_data["documents_cache"] = pipeline.documents_cache
             target_data["active"] = pipeline.status.active
 

@@ -48,8 +48,8 @@ pipeline_app = FastAPI()
 
 # GET Pipelines
 @pipeline_app.get(path="/v1/settings/pipelines")
-async def get_pipelines():
-    return ctx.get_pipeline_mgr().get_pipelines()
+async def get_pipelines(gen_type: str = None):
+    return ctx.get_pipeline_mgr().get_pipelines(gen_type)
 
 
 # GET Pipeline
@@ -81,7 +81,8 @@ async def get_pipeline_benchmark():
 async def get_pipeline_benchmarks(name):
     pl = ctx.get_pipeline_mgr().get_pipeline_by_name_or_id(name)
     if pl and pl.benchmark:
-        return pl.benchmark.benchmark_data_list
+        bench_res = {"pipeline_bench": pl.benchmark.benchmark_data_list, "llm_bench": pl.benchmark.llm_data_list}
+        return bench_res
 
 
 # POST Pipeline
@@ -293,38 +294,42 @@ async def update_pipeline_handler(pl, req):
                     postprocessor = MetadataReplaceProcessor(target_metadata_key="window")
                     pl.postprocessor.append(postprocessor)
 
-    if req.generator:
-        gen = req.generator
-        if gen.model is None:
-            raise Exception("No ChatQnA Model")
-        if gen.inference_type:
-            model = ctx.get_model_mgr().search_model(gen.model)
-            if model is None:
-                if gen.inference_type == InferenceType.VLLM:
-                    gen.model.model_type = ModelType.VLLM
-                else:
-                    gen.model.model_type = ModelType.LLM
+    if req.generator is not None:
+        pl.generator = []
+        for gen in req.generator:
+            if gen.model is None:
+                raise Exception("No ChatQnA Model")
+            if gen.inference_type:
+                model = ctx.get_model_mgr().search_model(gen.model)
+                if model is None:
+                    if gen.inference_type == InferenceType.VLLM:
+                        gen.model.model_type = ModelType.VLLM
+                    else:
+                        gen.model.model_type = ModelType.LLM
+                    if pl.enable_benchmark:
+                        model, tokenizer, bench_hook = ctx.get_model_mgr().load_model_ben(gen.model)
+                    else:
+                        model = ctx.get_model_mgr().load_model(gen.model)
+                    ctx.get_model_mgr().add(model)
+                # Use weakref to achieve model deletion and memory release
+                model_ref = weakref.ref(model)
+                if gen.generator_type == GeneratorType.CHATQNA:
+                    pl.generator.append(
+                        QnAGenerator(
+                            model_ref, gen.prompt_path, gen.inference_type, gen.vllm_endpoint, gen.prompt_content
+                        )
+                    )
+                elif gen.generator_type == GeneratorType.FREECHAT:
+                    pl.generator.append(FreeChatGenerator(model_ref, gen.inference_type, gen.vllm_endpoint))
+
                 if pl.enable_benchmark:
-                    model, tokenizer, bench_hook = ctx.get_model_mgr().load_model_ben(gen.model)
+                    if "tokenizer" not in locals() or tokenizer is None:
+                        _, tokenizer, bench_hook = ctx.get_model_mgr().load_model_ben(gen.model)
+                    pl.benchmark = Benchmark(pl.enable_benchmark, gen.inference_type, tokenizer, bench_hook)
                 else:
-                    model = ctx.get_model_mgr().load_model(gen.model)
-                ctx.get_model_mgr().add(model)
-            # Use weakref to achieve model deletion and memory release
-            model_ref = weakref.ref(model)
-            if gen.generator_type == GeneratorType.CHATQNA:
-                pl.generator = QnAGenerator(
-                    model_ref, gen.prompt_path, gen.inference_type, gen.vllm_endpoint, gen.prompt_content
-                )
-            elif gen.generator_type == GeneratorType.FREECHAT:
-                pl.generator = FreeChatGenerator(model_ref, gen.inference_type, gen.vllm_endpoint)
-            if pl.enable_benchmark:
-                if "tokenizer" not in locals() or tokenizer is None:
-                    _, tokenizer, bench_hook = ctx.get_model_mgr().load_model_ben(gen.model)
-                pl.benchmark = Benchmark(pl.enable_benchmark, gen.inference_type, tokenizer, bench_hook)
+                    pl.benchmark = Benchmark(pl.enable_benchmark, gen.inference_type)
             else:
-                pl.benchmark = Benchmark(pl.enable_benchmark, gen.inference_type)
-        else:
-            raise Exception("Inference Type Not Supported")
+                raise Exception("Inference Type Not Supported")
 
     if pl.status.active != req.active:
         ctx.get_pipeline_mgr().activate_pipeline(pl.name, req.active, ctx.get_node_mgr(), kb_name)

@@ -4,6 +4,7 @@
 import asyncio
 import json
 import os
+import time
 import urllib.request
 from concurrent.futures import ThreadPoolExecutor
 from urllib.parse import urlparse
@@ -100,7 +101,9 @@ async def local_stream_generator(lock, llm, prompt_str, unstructured_str):
             yield f"code:0000{result_error}"
 
 
-async def stream_generator(llm, prompt_str, unstructured_str):
+async def stream_generator(llm, prompt_str, unstructured_str, benchmark=None, benchmark_index=None):
+    enable_benchmark = benchmark.is_enabled() if benchmark else False
+    start_time = time.perf_counter() if enable_benchmark else None
     response = await llm.astream_complete(prompt_str)
     try:
         async for r in response:
@@ -109,12 +112,54 @@ async def stream_generator(llm, prompt_str, unstructured_str):
         if unstructured_str:
             yield unstructured_str
             await asyncio.sleep(0)
+        if enable_benchmark:
+            benchmark.update_benchmark_data(benchmark_index, CompType.GENERATOR, time.perf_counter() - start_time)
+            benchmark.insert_llm_data(benchmark_index)
+
     except asyncio.CancelledError as e:
         response.aclose()
     except Exception as e:
         start_idx = str(e).find("message") + len("message")
         result_error = str(e)[start_idx:]
         yield f"code:0000{result_error}"
+
+
+def clone_generator(src_generator: BaseComponent, dst_generator_cfg: dict = None):
+    if not dst_generator_cfg:
+        # If no config is provided, do a pure clone.
+        dst_generator_cfg = {"generator_type": src_generator.comp_subtype}
+
+    if "generator_type" not in dst_generator_cfg:
+        return None
+
+    generator_type = dst_generator_cfg.get("generator_type")
+    new_generator = None
+
+    # Prepare shared arguments
+    shared_args = {
+        "llm_model": src_generator.llm,
+        "inference_type": src_generator.inference_type,
+        "vllm_endpoint": src_generator.vllm_endpoint,
+    }
+
+    if generator_type == GeneratorType.CHATQNA:
+        if src_generator.comp_subtype == GeneratorType.FREECHAT:
+            # It's not possible to clone a QnAGenerator from a FreeChatGenerator
+            # because there is no prompt info in the source one.
+            return None
+        # For QnAGenerator, we also need prompt-related info
+        qna_args = shared_args.copy()
+        qna_args.update(
+            {
+                "prompt_template_file": src_generator.prompt_template_file,
+                "prompt_content": src_generator.prompt_content,
+            }
+        )
+        new_generator = QnAGenerator(**qna_args)
+    elif generator_type == GeneratorType.FREECHAT:
+        new_generator = FreeChatGenerator(**shared_args)
+
+    return new_generator
 
 
 class QnAGenerator(BaseComponent):
@@ -277,6 +322,8 @@ class QnAGenerator(BaseComponent):
     async def run_vllm(self, chat_request, retrieved_nodes, node_parser_type, **kwargs):
         # query transformation
         sub_questions = kwargs.get("sub_questions", None)
+        benchmark = kwargs.get("benchmark", None)
+        benchmark_index = kwargs.get("benchmark_index", None)
         text_gen_context, prompt_str = self.query_transform(chat_request, retrieved_nodes, sub_questions=sub_questions)
         llm = OpenAILike(
             api_key="fake",
@@ -296,7 +343,7 @@ class QnAGenerator(BaseComponent):
 
             # Asynchronous generator
             async def generator():
-                async for chunk in stream_generator(llm, prompt_str, unstructured_str):
+                async for chunk in stream_generator(llm, prompt_str, unstructured_str, benchmark, benchmark_index):
                     yield chunk or ""
                     await asyncio.sleep(0)
 

@@ -5,7 +5,7 @@ import os
 from abc import abstractmethod
 
 from comps.cores.proto.api_protocol import ChatCompletionRequest
-from edgecraftrag.base import BaseComponent, CallbackType, CompType
+from edgecraftrag.base import BaseComponent, CallbackType, CompType, GeneratorType
 from edgecraftrag.components.agents.utils import remove_think_tags
 from edgecraftrag.utils import stream_generator
 from langgraph.config import get_stream_writer
@@ -72,7 +72,9 @@ class Agent(BaseComponent):
     async def _run_pipeline_generate(self, request):
         pl = self.get_bound_pipeline()
         if pl is not None:
-            return await pl.run(cbtype=CallbackType.GENERATE, chat_request=request)
+            return await pl.run(
+                cbtype=CallbackType.GENERATE, chat_request=request, generator_type=GeneratorType.FREECHAT
+            )
 
     async def run_pipeline_retrieve_and_rerank(self, request):
         pl = self.get_bound_pipeline()

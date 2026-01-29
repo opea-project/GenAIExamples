@@ -6,6 +6,13 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "44297135",
+      "name": "agent",
+      "font_class": "agent1",
+      "unicode": "e64f",
+      "unicode_decimal": 58959
+    },
+    {
       "icon_id": "13542590",
       "name": "simple-robot",
       "font_class": "simple-robot",

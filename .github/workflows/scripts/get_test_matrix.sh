@@ -26,7 +26,7 @@ for example in ${examples}; do
     echo -e "Test supported hardware list: \n${hardware_list}"
 
     run_hardware=""
-    if [[ $(printf '%s\n' "${changed_files[@]}" | grep ${example} | cut -d'/' -f2 | grep -E '\.py|Dockerfile*|ui|docker_image_build' ) ]]; then
+    if [[ $(printf '%s\n' "${changed_files[@]}" | grep ${example} | cut -d'/' -f2 | grep -E '\.py|Dockerfile*|ui|edgecraftrag|docker_image_build' ) ]]; then
         echo "run test on all hardware if megaservice or ui code change..."
         run_hardware=$hardware_list
     elif [[ $(printf '%s\n' "${changed_files[@]}" | grep ${example} | grep 'tests'| cut -d'/' -f3 | grep -vE '^test_|^_test' ) ]]; then

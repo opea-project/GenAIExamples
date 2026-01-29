@@ -206,16 +206,16 @@
 
 <script lang="ts" setup name="Indexer">
   import { getModelList, getRunDevice, requestUrlVerify, requestUrlVllm } from "@/api/pipeline";
-  import { useNotification } from "@/utils/common";
-  import { validateServiceAddress } from "@/utils/validate.ts";
-  import { CheckCircleFilled, InfoCircleOutlined } from "@ant-design/icons-vue";
-  import type { FormInstance, RadioChangeEvent } from "ant-design-vue";
-  import { RuleObject } from "ant-design-vue/es/form/interface";
-  import { SelectValue } from "ant-design-vue/es/select/index";
-  import { computed, onMounted, reactive, ref } from "vue";
-  import { useI18n } from "vue-i18n";
-  import { Indexer } from "../../enum.ts";
-  import { ModelType } from "../../type.ts";
+import { useNotification } from "@/utils/common";
+import { validateServiceAddress } from "@/utils/validate.ts";
+import { CheckCircleFilled, InfoCircleOutlined } from "@ant-design/icons-vue";
+import type { FormInstance, RadioChangeEvent } from "ant-design-vue";
+import { RuleObject } from "ant-design-vue/es/form/interface";
+import { SelectValue } from "ant-design-vue/es/select/index";
+import { computed, nextTick, onMounted, reactive, ref } from "vue";
+import { useI18n } from "vue-i18n";
+import { Indexer } from "../../enum.ts";
+import { ModelType } from "../../type.ts";
 
   const { t } = useI18n();
   const { antNotification } = useNotification();
@@ -298,6 +298,20 @@
   };
 
   const form = reactive<FormType>(initialFormData);
+
+  const hasUntestedEndpoint = computed(() => {
+    if (form.inference_type === "vllm" && !vllmValidatePass.value) {
+      return true;
+    }
+
+    if (form.indexer_type === "milvus_vector" && !validatePass.value) {
+      return true;
+    }
+
+    return false;
+  });
+
+  const isProceed = computed(() => !hasUntestedEndpoint.value);
 
   const isCreate = computed(() => props.formType === "create");
   const isKbadmin = computed(() => form.indexer_type === "kbadmin_indexer");
@@ -426,16 +440,11 @@
       form.embedding_model.model_path = "";
     }
     if (value === "kbadmin_indexer") {
-      form.inference_type = "local";
-      form.vector_url = `${host}:${value === "kbadmin_indexer" ? "29530" : "19530"}`;
+      form.vector_url = `${host}:29530`;
       antNotification("warning", t("common.prompt"), t("pipeline.valid.indexerTypeTip"));
-    } else {
-      form.inference_type = "vllm";
-      form.embedding_model.api_base = `${host}:8087`;
-      nextTick(() => {
-        formRef.value?.validateFields([["embedding_model", "api_base"]]);
-        formRef.value?.validateFields([["vector_url"]]);
-      });
+    } else if (value === "milvus_vector") {
+      form.vector_url = `${host}:19530`;
+      nextTick(() => formRef.value?.validateFields([["vector_url"]]));
     }
   };
 
@@ -479,16 +488,29 @@
       }
     }
   };
+
   const handleModelVisible = async (visible: boolean) => {
     if (visible) {
-      const modelType = isKbadmin.value ? "kbadmin_embedding_model" : "embedding";
-      modelList.value = await queryModelList(modelType);
+      try {
+        const modelType = isKbadmin.value ? "kbadmin_embedding_model" : "embedding";
+        modelList.value = await queryModelList(modelType);
+      } catch (err) {
+        console.error(err);
+      }
     }
   };
 
   const handleEmbeddingModelVisible = async (visible: boolean) => {
-    if (visible && !isConnected.value) {
-      antNotification("warning", t("common.prompt"), t("pipeline.valid.modelTip"));
+    if (visible) {
+      try {
+        if (!isConnected.value) {
+          antNotification("warning", t("common.prompt"), t("pipeline.valid.modelTip"));
+          return;
+        }
+        handleQueryModel();
+      } catch (err) {
+        console.error(err);
+      }
     }
   };
 
@@ -499,15 +521,8 @@
       vllmModelList.value = [].concat(data);
       isConnected.value = vllmModelList.value.length > 0;
 
-      if (!isCreate.value) return;
-
-      if (isConnected.value) {
-        antNotification("success", t("common.success"), t("request.pipeline.connectSucc"));
-      } else {
-        antNotification("warning", t("common.prompt"), t("request.pipeline.connectError"));
-      }
     } catch (error) {
-      console.error("Failed to query model:", error);
+      console.error(error);
     }
   };
 
@@ -526,10 +541,12 @@
         vllmValidatePass.value = true;
         antNotification("success", t("common.success"), t("pipeline.valid.vllmUrlValid4"));
       } else {
+        vllmValidatePass.value = false;
         antNotification("error", t("common.error"), t("pipeline.valid.vllmUrlValid3"));
       }
     } catch (error) {
       console.error("Failed to test model URL:", error);
+      vllmValidatePass.value = false;
       antNotification("error", t("common.error"), t("pipeline.valid.vllmUrlValid3"));
     }
   };
@@ -543,10 +560,12 @@
         validatePass.value = true;
         antNotification("success", t("common.success"), t("pipeline.valid.urlValid4"));
       } else {
+        validatePass.value = false;
         antNotification("error", t("common.error"), t("pipeline.valid.urlValid3"));
       }
     } catch (error) {
       console.error("Failed to test URL:", error);
+      validatePass.value = false;
       antNotification("error", t("common.error"), t("pipeline.valid.urlValid3"));
     }
   };
@@ -565,6 +584,7 @@
       embedding_url: isKbadmin.value ? modelProtocol.value + embedding_url : undefined,
     };
   };
+
   const generateFormData = () => {
     const baseData = { indexer: formatFormParam() };
     const { retriever = {} } = props.formData || {};
@@ -587,9 +607,11 @@
         .then(() => {
           if (isMilvus.value && !validatePass.value) {
             antNotification("warning", t("common.prompt"), t("pipeline.valid.urlValid5"));
+            resolve({ result: false });
             return;
           } else if (isVllm.value && !vllmValidatePass.value) {
             antNotification("warning", t("common.prompt"), t("pipeline.valid.vllmUrlValid5"));
+            resolve({ result: false });
             return;
           }
           resolve({
@@ -605,8 +627,8 @@
 
   defineExpose({
     validate: handleValidate,
+    isProceed,
   });
-
   onMounted(() => {
     if (props.formType === "update") {
       if (isMilvus.value) {
