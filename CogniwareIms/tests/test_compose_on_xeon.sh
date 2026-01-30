@@ -70,7 +70,7 @@ wait_for_service() {
     local service_name=$2
     local max_attempts=${3:-30}
     local attempt=0
-    
+
     echo "Waiting for $service_name..."
     while [ $attempt -lt $max_attempts ]; do
         if curl -s -f "$url" > /dev/null 2>&1; then
@@ -81,7 +81,7 @@ wait_for_service() {
         echo "Waiting for $service_name... (attempt $attempt/$max_attempts)"
         sleep 10
     done
-    
+
     echo "ERROR: $service_name failed to become ready after $((max_attempts * 10)) seconds"
     return 1
 }
@@ -97,7 +97,7 @@ function build_docker_images() {
         echo "ERROR: docker_image_build directory not found"
         exit 1
     fi
-    
+
     cd "$build_dir"
     echo "Building from: $(pwd)"
     echo "Verifying build context..."
@@ -136,7 +136,7 @@ function start_services() {
         fi
         exit 1
     fi
-    
+
     echo "Changing to compose directory: $compose_dir"
     cd "$compose_dir" || {
         echo "ERROR: Failed to cd to $compose_dir"
@@ -157,7 +157,7 @@ function start_services() {
     # Wait for services to be ready
     echo "Waiting for services to initialize..."
     sleep 90
-    
+
     # Check if containers are running
     echo "Checking container status..."
     docker compose ps
@@ -181,7 +181,7 @@ function validate_services() {
         echo "Waiting for Redis container... (attempt $attempt/$max_attempts)"
         sleep 5
     done
-    
+
     if [ $attempt -eq $max_attempts ]; then
         echo "ERROR: Redis failed to become ready"
         docker logs redis-vector-db || true
@@ -203,7 +203,7 @@ function validate_services() {
         echo "Waiting for PostgreSQL container... (attempt $attempt/$max_attempts)"
         sleep 5
     done
-    
+
     if [ $attempt -eq $max_attempts ]; then
         echo "ERROR: PostgreSQL failed to become ready"
         docker logs postgres-db || true
@@ -246,14 +246,14 @@ function validate_backend() {
                 "session_id": "test_session",
                 "user_role": "Inventory Manager"
             }' || echo "")
-        
+
         if [ -z "$response" ]; then
             echo "Empty response from chat endpoint (attempt $((attempt + 1))/$max_attempts)"
             attempt=$((attempt + 1))
             sleep 5
             continue
         fi
-        
+
         if echo "$response" | grep -qi "error"; then
             echo "Chat test failed!"
             echo "Response: $response"
@@ -299,7 +299,7 @@ function stop_services() {
         }
         return
     fi
-    
+
     if [ -n "$compose_dir" ]; then
         cd "$compose_dir" || {
             echo "Warning: Failed to cd to $compose_dir, attempting cleanup from current directory"
@@ -330,4 +330,3 @@ function main() {
 }
 
 main
-
