@@ -1,6 +1,6 @@
 """
 LLM Service for Document Summarization
-Uses Enterprise Inference API via Keycloak authentication
+Uses Enterprise Inference API via token-based authentication
 """
 
 from typing import Iterator, Dict, Any
@@ -52,31 +52,25 @@ class LLMService:
     """
 
     def __init__(self):
-        """Initialize LLM service (authenticates on first use)"""
+        """Initialize LLM service"""
         self.client = None
         self.model = config.INFERENCE_MODEL_NAME
-        self._authenticated = False
+        self._initialized = False
 
-    def _ensure_authenticated(self):
-        """Authenticate with enterprise API (lazy initialization)"""
-        if self._authenticated:
+    def _ensure_initialized(self):
+        """Initialize LLM client (lazy initialization)"""
+        if self._initialized:
             return
 
-        if not config.KEYCLOAK_CLIENT_SECRET:
-            raise ValueError("KEYCLOAK_CLIENT_SECRET must be set in environment variables for text summarization")
-
         logger.info("Initializing LLM Service with Enterprise API")
-        logger.info(f"Base URL: {config.BASE_URL}")
+        logger.info(f"Inference Endpoint: {config.INFERENCE_API_ENDPOINT}")
         logger.info(f"Model: {config.INFERENCE_MODEL_NAME}")
 
-        # Use enterprise API client
+        # Get API client instance
         api_client = get_api_client()
-        if not api_client.is_authenticated():
-            raise ValueError("Enterprise API authentication failed - check Keycloak credentials")
-
         self.client = api_client.get_inference_client()
-        self._authenticated = True
-        logger.info("Enterprise API client initialized successfully")
+        self._initialized = True
+        logger.info("✓ Enterprise API client initialized successfully")
 
     def summarize(
         self,
@@ -97,8 +91,8 @@ class LLMService:
         Returns:
             Summary text or iterator of chunks if streaming
         """
-        # Ensure we're authenticated before making API calls
-        self._ensure_authenticated()
+        # Ensure client is initialized before making API calls
+        self._ensure_initialized()
 
         max_tokens = max_tokens or config.LLM_MAX_TOKENS
         temperature = temperature or config.LLM_TEMPERATURE
@@ -167,16 +161,8 @@ Summary:"""
             Health status dictionary
         """
         try:
-            # Check if Keycloak is configured
-            if not config.KEYCLOAK_CLIENT_SECRET:
-                return {
-                    "status": "not_configured",
-                    "provider": "Enterprise Inference (Keycloak)",
-                    "message": "Keycloak credentials not configured"
-                }
-
-            # Ensure authenticated
-            self._ensure_authenticated()
+            # Ensure client is initialized
+            self._ensure_initialized()
 
             # Try a simple completion
             response = self.client.chat.completions.create(
@@ -187,16 +173,16 @@ Summary:"""
 
             return {
                 "status": "healthy",
-                "provider": "Enterprise Inference (Keycloak)",
+                "provider": "Enterprise Inference (Token-based)",
                 "model": self.model,
-                "base_url": config.BASE_URL
+                "endpoint": config.INFERENCE_API_ENDPOINT
             }
 
         except Exception as e:
             logger.error(f"Health check failed: {str(e)}")
             return {
                 "status": "unhealthy",
-                "provider": "Enterprise Inference (Keycloak)",
+                "provider": "Enterprise Inference (Token-based)",
                 "error": str(e)
             }
 

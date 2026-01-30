@@ -21,18 +21,13 @@ router = APIRouter()
 
 @router.get("/health", response_model=HealthResponse)
 async def health_check():
-    """Health check endpoint - dynamically checks service configuration"""
-    response = {
-        "status": "healthy",
-        "service": config.APP_TITLE,
-        "version": config.APP_VERSION
-    }
-
-    # Only show llm_provider if Keycloak is actually configured
-    if config.BASE_URL and config.KEYCLOAK_CLIENT_SECRET:
-        response["llm_provider"] = "Enterprise Inference (Keycloak)"
-
-    return response
+    """Health check endpoint - checks service configuration"""
+    return HealthResponse(
+        status="healthy",
+        service=config.APP_TITLE,
+        version=config.APP_VERSION,
+        llm_provider="Enterprise Inference (Token-based)"
+    )
 
 
 @router.post("/v1/docsum")

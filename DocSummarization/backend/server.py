@@ -28,7 +28,7 @@ app = FastAPI(
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=config.CORS_ORIGINS.split(",") if config.CORS_ORIGINS != "*" else ["*"],
+    allow_origins=config.CORS_ALLOW_ORIGINS,
     allow_credentials=config.CORS_ALLOW_CREDENTIALS,
     allow_methods=config.CORS_ALLOW_METHODS,
     allow_headers=config.CORS_ALLOW_HEADERS,
@@ -41,38 +41,28 @@ app.include_router(router)
 @app.get("/")
 def root():
     """Root endpoint with service info"""
-    response = {
+    return {
         "message": "Document Summarization Service is running",
         "version": config.APP_VERSION,
         "status": "healthy",
         "docs": "/docs",
-        "health": "/health"
-    }
-
-    # Only show config if services are actually configured
-    if config.BASE_URL and config.KEYCLOAK_CLIENT_SECRET:
-        response["config"] = {
-            "llm_provider": "Enterprise Inference (Keycloak)",
+        "health": "/health",
+        "config": {
+            "llm_provider": "Enterprise Inference (Token-based)",
             "llm_model": config.INFERENCE_MODEL_NAME
         }
-
-    return response
+    }
 
 # Health check endpoint
 @app.get("/health", response_model=HealthResponse)
 def health_check():
-    """Detailed health check - dynamically checks service configuration"""
-    response_data = {
-        "status": "healthy",
-        "service": config.APP_TITLE,
-        "version": config.APP_VERSION
-    }
-
-    # Only show llm_provider if Keycloak is actually configured
-    if config.BASE_URL and config.KEYCLOAK_CLIENT_SECRET:
-        response_data["llm_provider"] = "Enterprise Inference (Keycloak)"
-
-    return HealthResponse(**response_data)
+    """Detailed health check - checks service configuration"""
+    return HealthResponse(
+        status="healthy",
+        service=config.APP_TITLE,
+        version=config.APP_VERSION,
+        llm_provider="Enterprise Inference (Token-based)"
+    )
 
 # Startup event
 @app.on_event("startup")
@@ -81,9 +71,8 @@ async def startup_event():
     logger.info("=" * 60)
     logger.info(f"Starting {config.APP_TITLE} v{config.APP_VERSION}")
     logger.info("=" * 60)
-    logger.info("LLM Provider: Enterprise Inference (Keycloak)")
-    logger.info(f"Base URL: {config.BASE_URL}")
-    logger.info(f"Keycloak Configured: {bool(config.KEYCLOAK_CLIENT_SECRET)}")
+    logger.info("LLM Provider: Enterprise Inference (Token-based)")
+    logger.info(f"Inference Endpoint: {config.INFERENCE_API_ENDPOINT}")
     logger.info(f"Model: {config.INFERENCE_MODEL_NAME}")
     logger.info(f"Port: {config.SERVICE_PORT}")
     logger.info("=" * 60)

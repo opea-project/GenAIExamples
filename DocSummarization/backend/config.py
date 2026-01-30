@@ -8,22 +8,23 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv()
 
-# Enterprise/Keycloak Configuration (Required for LLM)
-BASE_URL = os.getenv("BASE_URL")
-KEYCLOAK_REALM = os.getenv("KEYCLOAK_REALM", "master")
-KEYCLOAK_CLIENT_ID = os.getenv("KEYCLOAK_CLIENT_ID", "api")
-KEYCLOAK_CLIENT_SECRET = os.getenv("KEYCLOAK_CLIENT_SECRET")
+# Inference API Configuration
+INFERENCE_API_ENDPOINT = os.getenv("INFERENCE_API_ENDPOINT", "https://api.example.com")
+INFERENCE_API_TOKEN = os.getenv("INFERENCE_API_TOKEN")
 
-# Model Configuration (Enterprise Inference)
-INFERENCE_MODEL_ENDPOINT = os.getenv("INFERENCE_MODEL_ENDPOINT", "Llama-3.1-8B-Instruct")
+# Model Configuration
 INFERENCE_MODEL_NAME = os.getenv("INFERENCE_MODEL_NAME", "meta-llama/Llama-3.1-8B-Instruct")
 
 # LLM Configuration
 LLM_TEMPERATURE = float(os.getenv("LLM_TEMPERATURE", "0.7"))
 LLM_MAX_TOKENS = int(os.getenv("LLM_MAX_TOKENS", "2000"))
 
-# Validate configuration (checked at runtime, not on import)
-# KEYCLOAK_CLIENT_SECRET is required for text summarization
+# Docker Configuration
+LOCAL_URL_ENDPOINT = os.getenv("LOCAL_URL_ENDPOINT", "not-needed")
+
+# Validate required configuration
+if not INFERENCE_API_ENDPOINT or not INFERENCE_API_TOKEN:
+    raise ValueError("INFERENCE_API_ENDPOINT and INFERENCE_API_TOKEN must be set in .env file")
 
 # Application Settings
 APP_TITLE = "Document Summarization Service"
@@ -43,7 +44,7 @@ MAX_PDF_PAGES = int(os.getenv("MAX_PDF_PAGES", "100"))  # Maximum pages to proce
 WARN_PDF_PAGES = 50  # Warn user if PDF has more than this many pages
 
 # CORS Settings
-CORS_ORIGINS = os.getenv("CORS_ORIGINS", "*")
+CORS_ALLOW_ORIGINS = ["*"]  # Update with specific origins in production
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_METHODS = ["*"]
 CORS_ALLOW_HEADERS = ["*"]

@@ -11,6 +11,8 @@ services:
       - ./backend/.env
     volumes:
       - ./backend:/app
+    extra_hosts:
+      - "${LOCAL_URL_ENDPOINT}:host-gateway"
     networks:
       - app_network
     restart: unless-stopped
@@ -37,20 +39,27 @@ networks:
 # Usage Instructions:
 # =============================================================================
 #
-# 1. Copy backend/.env.example to backend/.env and configure your Keycloak credentials
+# 1. Create .env file in root directory (for Docker Compose variables):
+#    cat > .env << EOF
+#    LOCAL_URL_ENDPOINT=not-needed
+#    EOF
 #
-# 2. Start the application:
-#    docker-compose up -d
+# 2. Copy backend/.env.example to backend/.env and configure your inference API credentials:
+#    cp backend/.env.example backend/.env
+#    # Edit backend/.env with your INFERENCE_API_ENDPOINT and INFERENCE_API_TOKEN
 #
-# 3. Access the application:
+# 3. Start the application:
+#    docker compose up -d --build
+#
+# 4. Access the application:
 #    - Frontend: http://localhost:5173
 #    - Backend API: http://localhost:8000
 #    - API Docs: http://localhost:8000/docs
 #
-# 4. View logs:
-#    docker-compose logs -f
+# 5. View logs:
+#    docker compose logs -f
 #
-# 5. Stop the application:
-#    docker-compose down
+# 6. Stop the application:
+#    docker compose down
 #
 # =============================================================================
