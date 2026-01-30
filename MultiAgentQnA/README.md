@@ -11,6 +11,7 @@ A sophisticated multi-agent Q&A application featuring intelligent task delegatio
 - [Quick Start Deployment](#quick-start-deployment)
 - [User Interface](#user-interface)
 - [Troubleshooting](#troubleshooting)
+- [Additional Info](#additional-info)
 
 ---
 ## Project Overview
@@ -56,8 +57,7 @@ graph TD
     I -->|Response| B
     B -->|Answer| A
 
-    J[Keycloak Auth] -.->|Token| I
-    K[PDF Upload] -->|Documents| H
+    J[PDF Upload] -->|Documents| H
 
     style C fill:#e1f5ff
     style D fill:#fff4e1
@@ -92,10 +92,9 @@ The application consists of:
    - Searches the FAISS vector store for relevant document context
    - Retrieves matching chunks to augment the prompt
 6. The selected agent constructs a specialized prompt with its role, goal, and context.
-7. The system authenticates with Keycloak and obtains an access token.
-8. The agent calls the enterprise LLM API with the token and specialized prompt.
-9. The LLM (Llama-3.1-8B-Instruct) generates a response tailored to the agent's expertise.
-10. The response is returned to the user via the UI with agent attribution showing which specialist handled the query.
+7. The agent calls the enterprise LLM API with the pre-configured token and specialized prompt.
+8. The LLM generates a response tailored to the agent's expertise.
+9. The response is returned to the user via the UI with agent attribution showing which specialist handled the query.
 
 ---
 
@@ -106,7 +105,20 @@ The application consists of:
 Before you begin, ensure you have the following installed:
 
 - **Docker and Docker Compose**
-- **Enterprise inference endpoint access** (Keycloak authentication)
+- **Enterprise inference endpoint access** (token-based authentication)
+
+### Required API Configuration
+
+**For Inference Service:**
+
+This application supports multiple inference deployment patterns:
+
+- **GenAI Gateway**: Provide your GenAI Gateway URL and API key
+- **APISIX Gateway**: Provide your APISIX Gateway URL and authentication token
+
+Configuration requirements:
+- INFERENCE_API_ENDPOINT: URL to your inference service (GenAI Gateway, APISIX Gateway, etc.)
+- INFERENCE_API_TOKEN: Authentication token/API key for your chosen service
 
 ### Verify Docker Installation
 
@@ -133,35 +145,62 @@ cd GenAIExamples/MultiAgentQnA
 
 ### Set up the Environment
 
-This application requires an `.env` file in the `api` directory for proper configuration. Create it with the commands below:
+This application requires **two `.env` files** for proper configuration:
+
+1. **Root `.env` file** (for Docker Compose variables)
+2. **`api/.env` file** (for backend application configuration)
+
+#### Step 1: Create Root `.env` File
 
 ```bash
-# Create the .env file in the api directory
-mkdir -p api
-cat > api/.env << EOF
-BASE_URL=https://your-enterprise-inference-url.com
-KEYCLOAK_CLIENT_ID=your_client_id
-KEYCLOAK_CLIENT_SECRET=your_client_secret
-EMBEDDING_MODEL_ENDPOINT=bge-base-en-v1.5
-INFERENCE_MODEL_ENDPOINT=Llama-3.1-8B-Instruct
-EMBEDDING_MODEL_NAME=bge-base-en-v1.5
-INFERENCE_MODEL_NAME=meta-llama/Llama-3.1-8B-Instruct
+# From the MultiAgentQnA directory
+cat > .env << EOF
+# Docker Compose Configuration
+LOCAL_URL_ENDPOINT=not-needed
 EOF
 ```
 
-Or manually create `api/.env` with:
+**Note:** If using a local domain (e.g., `inference.example.com` mapped to localhost), replace `not-needed` with your domain name (without `https://`).
+
+#### Step 2: Create `api/.env` File
+
+You can either copy from the example file:
 
 ```bash
-BASE_URL=https://your-enterprise-inference-url.com
-KEYCLOAK_CLIENT_ID=your_client_id
-KEYCLOAK_CLIENT_SECRET=your_client_secret
-EMBEDDING_MODEL_ENDPOINT=bge-base-en-v1.5
-INFERENCE_MODEL_ENDPOINT=Llama-3.1-8B-Instruct
-EMBEDDING_MODEL_NAME=bge-base-en-v1.5
-INFERENCE_MODEL_NAME=meta-llama/Llama-3.1-8B-Instruct
+cp api/.env.example api/.env
 ```
 
-**Note**: The docker-compose.yml file automatically loads environment variables from `./api/.env` for the backend service.
+Then edit `api/.env` with your actual credentials, **OR** create it directly:
+
+```bash
+cat > api/.env << EOF
+# Inference API Configuration
+# INFERENCE_API_ENDPOINT: URL to your inference service (without /v1 suffix)
+#   - For GenAI Gateway: https://genai-gateway.example.com
+#   - For APISIX Gateway: https://apisix-gateway.example.com/inference
+INFERENCE_API_ENDPOINT=https://your-actual-api-endpoint.com
+INFERENCE_API_TOKEN=your-actual-token-here
+
+# Model Configuration
+# IMPORTANT: Use the full model names as they appear in your inference service
+# Check available models: curl https://your-api-endpoint.com/v1/models -H "Authorization: Bearer your-token"
+EMBEDDING_MODEL_NAME=BAAI/bge-base-en-v1.5
+INFERENCE_MODEL_NAME=meta-llama/Llama-3.1-8B-Instruct
+
+# Local URL Endpoint (for Docker)
+LOCAL_URL_ENDPOINT=not-needed
+EOF
+```
+
+**Important Configuration Notes:**
+
+- **INFERENCE_API_ENDPOINT**: Your actual inference service URL (replace `https://your-actual-api-endpoint.com`)
+- **INFERENCE_API_TOKEN**: Your actual pre-generated authentication token
+- **EMBEDDING_MODEL_NAME** and **INFERENCE_MODEL_NAME**: Use the exact model names from your inference service
+  - To check available models: `curl https://your-api-endpoint.com/v1/models -H "Authorization: Bearer your-token"`
+- **LOCAL_URL_ENDPOINT**: Only needed if using local domain mapping
+
+**Note**: The docker-compose.yml file automatically loads environment variables from both `.env` (root) and `./api/.env` (backend) files.
 
 ### Running the Application
 
@@ -206,7 +245,7 @@ docker compose ps
 
 **Using the Application**
 
-Make sure you are at the localhost:3000 url
+Make sure you are at the `http://localhost:3000` URL
 
 You will be directed to the main page which has each feature
 
@@ -248,4 +287,14 @@ For comprehensive troubleshooting guidance, common issues, and solutions, refer 
 
 [TROUBLESHOOTING.md](TROUBLESHOOTING.md)
 
+---
 
+## Additional Info
+
+The following models have been validated with MultiAgentQnA:
+
+| Model | Hardware |
+|-------|----------|
+| **meta-llama/Llama-3.1-8B-Instruct** | Gaudi |
+| **Qwen/Qwen3-4B-Instruct-2507** | Xeon |
+| **BAAI/bge-base-en-v1.5** (embeddings) | Gaudi |

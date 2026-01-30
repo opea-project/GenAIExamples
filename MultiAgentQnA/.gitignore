@@ -30,6 +30,7 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
+package-lock.json
 dist/
 .cache/
 
@@ -57,4 +58,7 @@ build/
 .coverage
 .pytest_cache/
 htmlcov/
+
+# Application specific
+rag_index/
 

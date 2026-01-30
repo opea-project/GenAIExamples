@@ -73,7 +73,7 @@ def root():
 @app.get("/health", response_model=HealthResponse)
 def health_check():
     """Detailed health check"""
-    api_configured = bool(config.KEYCLOAK_CLIENT_SECRET or config.OPENAI_API_KEY)
+    api_configured = bool(config.INFERENCE_API_TOKEN)
     return HealthResponse(
         status="healthy",
         api_configured=api_configured
