@@ -213,7 +213,7 @@ No changes needed. Uses default values.
 Start all services together with Docker Compose:
 
 ```bash
-# From the pdf-podcast directory
+# From the PdfToPodcast directory
 docker compose up --build
 
 # Or run in detached mode (background)
@@ -331,7 +331,7 @@ For detailed troubleshooting guidance and solutions to common issues, refer to:
 
 ## Additional Info
 
-The following models have been validated with pdf-podcast:
+The following models have been validated with PdfToPodcast:
 
 | Model | Hardware |
 |-------|----------|

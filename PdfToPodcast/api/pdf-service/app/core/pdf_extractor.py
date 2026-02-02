@@ -1,4 +1,4 @@
-import PyPDF2
+import pypdf
 import pdfplumber
 import io
 import logging
@@ -99,7 +99,7 @@ class PDFExtractor:
         """Extract text using PyPDF2 (fallback method)"""
         try:
             text_parts = []
-            pdf_reader = PyPDF2.PdfReader(io.BytesIO(pdf_bytes))
+            pdf_reader = pypdf.PdfReader(io.BytesIO(pdf_bytes))
             page_count = len(pdf_reader.pages)
 
             for page_num, page in enumerate(pdf_reader.pages, 1):
@@ -126,7 +126,7 @@ class PDFExtractor:
     def _extract_metadata(self, pdf_bytes: bytes) -> Dict:
         """Extract PDF metadata"""
         try:
-            pdf_reader = PyPDF2.PdfReader(io.BytesIO(pdf_bytes))
+            pdf_reader = pypdf.PdfReader(io.BytesIO(pdf_bytes))
             metadata = pdf_reader.metadata
 
             if metadata:
@@ -176,7 +176,7 @@ class PDFExtractor:
 
             # If very little text extracted, likely scanned
             # Threshold: less than 50 characters per page on average
-            pdf_reader = PyPDF2.PdfReader(io.BytesIO(pdf_bytes))
+            pdf_reader = pypdf.PdfReader(io.BytesIO(pdf_bytes))
             page_count = len(pdf_reader.pages)
 
             avg_chars_per_page = text_length / page_count if page_count > 0 else 0
