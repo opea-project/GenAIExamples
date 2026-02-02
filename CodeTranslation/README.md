@@ -201,6 +201,11 @@ MAX_FILE_SIZE=10485760
 
 # CORS Configuration
 CORS_ALLOW_ORIGINS=["http://localhost:5173", "http://localhost:3000"]
+
+# Local URL Endpoint (only needed for non-public domains)
+# If using a local domain like inference.example.com mapped to localhost, set to the domain without https://
+# Otherwise, set to: not-needed
+LOCAL_URL_ENDPOINT=not-needed
 EOF
 ```
 
@@ -232,7 +237,16 @@ MAX_FILE_SIZE=10485760
 
 # CORS Configuration
 CORS_ALLOW_ORIGINS=["http://localhost:5173", "http://localhost:3000"]
+
+# Local URL Endpoint (only needed for non-public domains)
+# If using a local domain like inference.example.com mapped to localhost, set to the domain without https://
+# Otherwise, set to: not-needed
+LOCAL_URL_ENDPOINT=not-needed
 ```
+
+**Important Configuration Notes:**
+
+- **LOCAL_URL_ENDPOINT**: Only needed if using local domain mapping (see [Local Development Configuration](#local-development-configuration))
 
 **Note**: The docker-compose.yaml file automatically loads environment variables from `.env` for the backend service.
 
@@ -241,7 +255,7 @@ CORS_ALLOW_ORIGINS=["http://localhost:5173", "http://localhost:3000"]
 Start both API and UI services together with Docker Compose:
 
 ```bash
-# From the code-translation directory
+# From the CodeTranslation directory
 docker compose up --build
 
 # Or run in detached mode (background)
