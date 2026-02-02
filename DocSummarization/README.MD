@@ -116,6 +116,22 @@ Configuration requirements:
 - INFERENCE_API_ENDPOINT: URL to your inference service (GenAI Gateway, APISIX Gateway, etc.)
 - INFERENCE_API_TOKEN: Authentication token/API key for your chosen service
 
+### Local Development Configuration
+
+**For Local Testing Only (Optional)**
+
+If you're testing with a local inference endpoint using a custom domain (e.g., `inference.example.com` mapped to localhost in your hosts file):
+
+1. Edit `backend/.env` and set:
+   ```bash
+   LOCAL_URL_ENDPOINT=inference.example.com
+   ```
+   (Use the domain name from your INFERENCE_API_ENDPOINT without `https://`)
+
+2. This allows Docker containers to resolve your local domain correctly.
+
+**Note:** For public domains or cloud-hosted endpoints, leave the default value `not-needed`.
+
 ### Verify Docker Installation
 
 ```bash
