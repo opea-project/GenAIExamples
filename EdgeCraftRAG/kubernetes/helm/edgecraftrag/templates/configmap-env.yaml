@@ -1,3 +1,6 @@
+# Copyright (C) 2026 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -33,4 +36,3 @@ data:
   QUANTIZATION: "{{ .Values.llm.QUANTIZATION }}"
   TP: "{{ .Values.llm.TP }}"
   DP: "{{ .Values.llm.DP }}"
-

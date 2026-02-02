@@ -1,3 +1,6 @@
+# Copyright (C) 2026 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 image:
   ecrag:
     registry: opea
@@ -40,7 +43,7 @@ llm:
 ports:
   pipeline: 16010
   mega: 16011
-  ui: 
+  ui:
     port: 8082
     nodePort: 30082
   vllm: 8086

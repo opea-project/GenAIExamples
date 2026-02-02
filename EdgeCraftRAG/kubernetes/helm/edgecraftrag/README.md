@@ -39,7 +39,7 @@ Before installing, you should configure the `edgecraftrag/values.yaml` file acco
      LLM_MODEL: "/path/to/model/inside/container" # Ensure this maps to paths.model
    ```
 
-4. **Persistant Paths**: Ensure the host paths exist for mounting.
+4. **Persistent Paths**: Ensure the host paths exist for mounting.
    ```yaml
    paths:
      model: /home/user/models
@@ -55,7 +55,7 @@ cd kubernetes/helm
 helm install edgecraftrag ./edgecraftrag
 ```
 
-If there're different clusters avaliable, please install the chart with specific kube config, e.g. :
+If there're different clusters available, please install the chart with specific kube config, e.g. :
 
 ```bash
 helm install edgecraftrag ./edgecraftrag --kubeconfig /home/user/.kube/nas.yaml
@@ -87,7 +87,7 @@ To uninstall/delete the `edgecraftrag` deployment:
 helm uninstall edgecraftrag
 ```
 
-If there're different clusters avaliable, please uninstall the chart with specific kube config, e.g. :
+If there're different clusters available, please uninstall the chart with specific kube config, e.g. :
 
 ```bash
 helm uninstall edgecraftrag --kubeconfig /home/user/.kube/nas.yaml
