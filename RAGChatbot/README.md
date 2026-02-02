@@ -162,7 +162,6 @@ cp api/.env.example api/.env
 Then edit `api/.env` with your actual credentials, **OR** create it directly:
 
 ```bash
-mkdir -p api
 cat > api/.env << EOF
 # Inference API Configuration
 # INFERENCE_API_ENDPOINT: URL to your inference service (without /v1 suffix)
@@ -174,7 +173,7 @@ INFERENCE_API_TOKEN=your-actual-token-here
 # Model Configuration
 # IMPORTANT: Use the full model names as they appear in your inference service
 # Check available models: curl https://your-api-endpoint.com/v1/models -H "Authorization: Bearer your-token"
-EMBEDDING_MODEL_NAME=bge-base-en-v1.5
+EMBEDDING_MODEL_NAME=BAAI/bge-base-en-v1.5
 INFERENCE_MODEL_NAME=meta-llama/Llama-3.1-8B-Instruct
 
 # Local URL Endpoint (for Docker)
