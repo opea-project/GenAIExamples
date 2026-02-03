@@ -1,3 +1,6 @@
+# Copyright (C) 2026 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 apiVersion: v2
 name: edgecraftrag
 description: Helm chart for EdgeCraftRAG stack
