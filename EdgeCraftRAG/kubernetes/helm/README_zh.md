@@ -52,13 +52,13 @@
 
 ```bash
 cd kubernetes/helm
-helm install edgecraftrag ./edgecraftrag
+helm install edgecraftrag ./
 ```
 
 如果有不同的集群可用，请使用指定的kube config安装chart，例如：
 
 ```bash
-helm install edgecraftrag ./edgecraftrag --kubeconfig /home/user/.kube/nas.yaml
+helm install edgecraftrag ./ --kubeconfig /home/user/.kube/nas.yaml
 ```
 
 ## 验证
