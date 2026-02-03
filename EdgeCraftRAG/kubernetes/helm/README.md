@@ -52,13 +52,13 @@ To install the chart, please use below command (`edgecraftrag` as an example)
 
 ```bash
 cd kubernetes/helm
-helm install edgecraftrag ./edgecraftrag
+helm install edgecraftrag ./
 ```
 
 If there're different clusters avaliable, please install the chart with specific kube config, e.g. :
 
 ```bash
-helm install edgecraftrag ./edgecraftrag --kubeconfig /home/user/.kube/nas.yaml
+helm install edgecraftrag ./ --kubeconfig /home/user/.kube/nas.yaml
 ```
 
 ## Verification
