@@ -4,6 +4,6 @@ langchain_community
 moviepy==1.0.3
 numpy==1.26.4
 opencv-python==4.10.0.82
-Pillow==10.3.0
+Pillow==12.1.1
 pypdf
 unstructured
