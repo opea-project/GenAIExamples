@@ -55,13 +55,10 @@ class GeneratorIn(BaseModel):
 class PipelineCreateIn(BaseModel):
     idx: Optional[str] = None
     name: Optional[str] = None
-    node_parser: Optional[NodeParserIn] = None
-    indexer: Optional[IndexerIn] = None
     retriever: Optional[RetrieverIn] = None
     postprocessor: Optional[list[PostProcessorIn]] = None
     generator: Optional[list[GeneratorIn]] = None
     active: Optional[bool] = False
-    documents_cache: Optional[Dict] = None
 
 
 class DataIn(BaseModel):
@@ -87,6 +84,8 @@ class KnowledgeBaseCreateIn(BaseModel):
     idx: Optional[str] = None
     name: str
     description: Optional[str] = None
+    node_parser: Optional[NodeParserIn] = None
+    indexer: Optional[IndexerIn] = None
     active: Optional[bool] = None
     comp_type: Optional[str] = "knowledge"
     comp_subtype: Optional[str] = "origin_kb"

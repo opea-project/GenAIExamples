@@ -6,26 +6,25 @@ import json
 import os
 import time
 from concurrent.futures import ThreadPoolExecutor
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any, Callable, List, Optional
 
 from comps.cores.proto.api_protocol import ChatCompletionRequest
 from edgecraftrag.base import (
     BaseComponent,
-    BenchType,
     CallbackType,
     CompType,
     GeneratorType,
     InferenceType,
-    NodeParserType,
     RetrieverType,
 )
+from edgecraftrag.base import NodeParserType
 from edgecraftrag.components.generator import clone_generator
 from edgecraftrag.components.postprocessor import RerankProcessor
 from edgecraftrag.components.query_preprocess import query_search
-from edgecraftrag.components.retriever import AutoMergeRetriever, SimpleBM25Retriever, VectorSimRetriever
+from edgecraftrag.components.retriever import AutoMergeRetriever, SimpleBM25Retriever, VectorSimRetriever, KBadminRetriever
 from edgecraftrag.env import SEARCH_CONFIG_PATH, SEARCH_DIR
 from fastapi.responses import StreamingResponse
-from llama_index.core.schema import Document, QueryBundle
+from llama_index.core.schema import QueryBundle
 from pydantic import BaseModel, Field, model_serializer
 
 
@@ -35,9 +34,7 @@ class PipelineStatus(BaseModel):
 
 class Pipeline(BaseComponent):
 
-    node_parser: Optional[BaseComponent] = Field(default=None)
-    indexer: Optional[BaseComponent] = Field(default=None)
-    retriever: Optional[BaseComponent] = Field(default=None)
+    retrievers: Optional[List[BaseComponent]] = Field(default=None)
     postprocessor: Optional[List[BaseComponent]] = Field(default=None)
     generator: Optional[List[BaseComponent]] = Field(default=None)
     benchmark: Optional[BaseComponent] = Field(default=None)
@@ -46,7 +43,6 @@ class Pipeline(BaseComponent):
     run_retriever_postprocessor_cb: Optional[Callable[..., Any]] = Field(default=None)
     run_retriever_cb: Optional[Callable[..., Any]] = Field(default=None)
     run_postprocessor_cb: Optional[Callable[..., Any]] = Field(default=None)
-    run_data_prepare_cb: Optional[Callable[..., Any]] = Field(default=None)
     run_query_search_cb: Optional[Callable[..., Any]] = Field(default=None)
 
     def __init__(
@@ -54,31 +50,24 @@ class Pipeline(BaseComponent):
         name,
         origin_json=None,
         idx=None,
-        documents_cache=None,
     ):
         super().__init__(name=name, comp_type=CompType.PIPELINE)
         if self.name == "" or self.name is None:
             self.name = self.idx
         if idx is not None:
             self.idx = str(idx)
-        if documents_cache is not None:
-            self.documents_cache = documents_cache
-        else:
-            self.documents_cache = {}
 
-        self.generator = []
         self.enable_benchmark = os.getenv("ENABLE_BENCHMARK", "False").lower() == "true"
         self.run_pipeline_cb = run_pipeline
         self.run_retriever_postprocessor_cb = run_retrieve_postprocess
         self.run_retriever_cb = run_retrieve
         self.run_postprocessor_cb = run_postprocess
         self.run_generator_cb = run_generator
-        self.run_data_prepare_cb = run_simple_doc
         self.run_query_search_cb = run_query_search
-        self._node_changed = False
-        self._index_changed = False
-        self._index_to_retriever_updated = True
-        self._origin_json = origin_json
+        self._origin_json = origin_json if origin_json is not None else "{}"
+        self.retriever_type = ""
+        self.retrieve_topk = 0
+        self.retrievers = []
 
     # TODO: consider race condition
     @property
@@ -92,65 +81,10 @@ class Pipeline(BaseComponent):
                 origin_json[k] = v
         self._origin_json = json.dumps(origin_json)
 
-    @property
-    def node_changed(self) -> bool:
-        return self._node_changed
-
-    def reset_node_status(self) -> bool:
-        self._node_changed = False
-        self._index_changed = False
-        self._index_to_retriever_updated = True
-
-    def check_active(self, nodelist, kb_name):
-        if self._node_changed:
-            if not self._index_changed:
-                print("Reinitializing indexer ...")
-                self.indexer.reinitialize_indexer(kb_name)
-                self._index_changed = True
-                self._index_to_retriever_updated = False
-
-            if nodelist is not None and len(nodelist) > 0:
-                self.update_nodes(nodelist)
-            self._node_changed = False
-
-        # Due to limitation, need to update retriever's db after reinitialize_indexer()
-        if self._index_changed and not self._index_to_retriever_updated:
-            self.update_indexer_to_retriever()
-            self._index_changed = False
-            self._index_to_retriever_updated = True
-
-        self.reset_node_status()
-
-    # TODO: update doc changes
-    # TODO: more operations needed, add, del, modify
-    def update_nodes(self, nodes):
-        if self.indexer is not None:
-            self.indexer.insert_nodes(nodes)
-
-    def update_indexer_to_retriever(self):
-        if self.indexer is not None and self.retriever is not None:
-            old_retriever = self.retriever
-            retriever_type = old_retriever.comp_subtype
-            similarity_top_k = old_retriever.topk
-            match retriever_type:
-                case RetrieverType.VECTORSIMILARITY:
-                    new_retriever = VectorSimRetriever(self.indexer, similarity_top_k=similarity_top_k)
-                case RetrieverType.AUTOMERGE:
-                    new_retriever = AutoMergeRetriever(self.indexer, similarity_top_k=similarity_top_k)
-                case RetrieverType.BM25:
-                    new_retriever = SimpleBM25Retriever(self.indexer, similarity_top_k=similarity_top_k)
-                case _:
-                    new_retriever = old_retriever
-
-            self.retriever = new_retriever
-
     # Implement abstract run function
     # callback dispatcher
     async def run(self, **kwargs) -> Any:
         if "cbtype" in kwargs:
-            if kwargs["cbtype"] == CallbackType.DATAPREP:
-                if "docs" in kwargs:
-                    return await self.run_data_prepare_cb(self, docs=kwargs["docs"])
             if kwargs["cbtype"] == CallbackType.RETRIEVE_POSTPROCESS:
                 if "chat_request" in kwargs:
                     return await self.run_retriever_postprocessor_cb(self, chat_request=kwargs["chat_request"])
@@ -178,107 +112,22 @@ class Pipeline(BaseComponent):
                 if "chat_request" in kwargs:
                     return await self.run_query_search_cb(self, chat_request=kwargs["chat_request"])
 
-    def update(self, node_parser=None, indexer=None, retriever=None, postprocessor=None, generator=None):
-        if node_parser is not None:
-            self.node_parser = node_parser
-        if indexer is not None:
-            self.indexer = indexer
-        if retriever is not None:
-            self.retriever = retriever
+    def update(self, retrievers=None, postprocessor=None, generator=None):
+        if retrievers is not None:
+            self.retrievers = retrievers
         if postprocessor is not None:
             self.postprocessor = postprocessor
         if generator is not None:
             self.generator = generator
 
-    def add_docs_to_list(self, kb_name, file_paths):
-        if self.indexer.comp_subtype != "milvus_vector":
-            return None
-        target_config = self.connect_target_config()
-        if kb_name not in self.documents_cache:
-            self.documents_cache[kb_name] = {"files": [], "config": target_config}
-        if isinstance(file_paths, str):
-            file_paths = [file_paths]
-        self.documents_cache[kb_name]["files"].extend(file_paths)
-
-    def del_docs_to_list(self, kb_name, file_paths):
-        if kb_name not in self.documents_cache:
-            return None
-        if isinstance(file_paths, str):
-            file_paths = [file_paths]
-        for file_path in file_paths:
-            if file_path in self.documents_cache[kb_name]["files"]:
-                self.documents_cache[kb_name]["files"].remove(file_path)
-
-    def clear_document_cache(self, kb_name):
-        if kb_name in self.documents_cache:
-            del self.documents_cache[kb_name]
-
-    def compare_file_lists(self, kb_name, current_files):
-        self.add_docs_to_list(kb_name, [])
-        target_config = self.connect_target_config()
-        if self.documents_cache[kb_name]["config"] == target_config:
-            diff = self.compare_mappings(self.documents_cache[kb_name]["files"], current_files)
-        else:
-            self.documents_cache[kb_name] = {"files": [], "config": self.connect_target_config()}
-            diff = {"add_docs": current_files}
-        return diff
-
-    def compare_mappings(self, stored_files, new_files):
-        stored = set(stored_files)
-        new = set(new_files)
-        return {"add_docs": list(new - stored), "del_docs": list(stored - new)}
-
-    def connect_target_config(self):
-        target_config = ""
-        if self.node_parser.comp_subtype == NodeParserType.SIMPLE:
-            target_config = (
-                "simple"
-                + str(self.node_parser.chunk_size)
-                + str(self.node_parser.chunk_overlap)
-                + self.indexer.model.model_id
-            )
-        elif self.node_parser.comp_subtype == NodeParserType.SENTENCEWINDOW:
-            target_config = "sentencewindow" + str(self.node_parser.window_size) + self.indexer.model.model_id
-        elif self.node_parser.comp_subtype == NodeParserType.HIERARCHY:
-            target_config = "hierarchical" + self.indexer.model.model_id
-        elif self.node_parser.comp_subtype == NodeParserType.UNSTRUCTURED:
-            target_config = (
-                "target_config"
-                + str(self.node_parser.chunk_size)
-                + str(self.node_parser.chunk_overlap)
-                + self.indexer.model.model_id
-            )
-        return target_config
-
-    def nodes_to_document(self, node_dict: dict):
-        nodes = []
-        for node_info in node_dict.values():
-            nodes.append({"start": int(node_info["start_char_idx"]), "text": node_info["text"]})
-        nodes_sorted = sorted(nodes, key=lambda x: x["start"])
-        if not nodes_sorted:
-            return ""
-        merged_text = nodes_sorted[0]["text"]
-        for i in range(1, len(nodes_sorted)):
-            prev_text = merged_text
-            curr_text = nodes_sorted[i]["text"]
-            max_possible_overlap = min(len(prev_text), len(curr_text))
-            overlap_len = 0
-            for j in range(max_possible_overlap, 0, -1):
-                if prev_text.endswith(curr_text[:j]):
-                    overlap_len = j
-                    break
-            merged_text += curr_text[overlap_len:]
-        return merged_text
-
     @model_serializer
     def ser_model(self):
+        retriever_config = self.retrievers[0] if self.retrievers else None
         set = {
             "idx": self.idx,
             "name": self.name,
             "comp_type": self.comp_type,
-            "node_parser": self.node_parser,
-            "indexer": self.indexer,
-            "retriever": self.retriever,
+            "retriever": retriever_config,
             "postprocessor": self.postprocessor,
             "generator": self.generator,
             "status": self.status,
@@ -287,11 +136,6 @@ class Pipeline(BaseComponent):
 
     def model_existed(self, model_id: str) -> bool:
         # judge if the given model is existed in a pipeline by model_id
-        if self.indexer:
-            if hasattr(self.indexer, "_embed_model") and self.indexer._embed_model.model_id == model_id:
-                return True
-            if hasattr(self.indexer, "_llm") and self.indexer._llm.model_id == model_id:
-                return True
         if self.postprocessor:
             for processor in self.postprocessor:
                 if hasattr(processor, "model_id") and processor.model_id == model_id:
@@ -311,6 +155,56 @@ class Pipeline(BaseComponent):
                 if gen.comp_subtype == generator_type:
                     return gen
         return None
+    def update_retriever_config(self, retriever_type: str, retrieve_topk: int):
+        self.retriever_type = retriever_type
+        self.retrieve_topk = retrieve_topk
+
+    def update_retriever_list(self, active_kbs):
+        self.clear_retrievers()
+        for active_kb in active_kbs:
+            indexer = active_kb.indexer
+            if indexer is not None:
+                similarity_top_k = self.retrieve_topk
+                retriever = None
+                if active_kb.comp_subtype == "kbadmin_kb":
+                    # For kbadmin_kb, only KBadminRetriever is supported
+                    retriever = KBadminRetriever(indexer, similarity_top_k=similarity_top_k)
+                else:
+                    match self.retriever_type:
+                        case RetrieverType.VECTORSIMILARITY:
+                            retriever = VectorSimRetriever(indexer, similarity_top_k=similarity_top_k)
+                        case RetrieverType.AUTOMERGE:
+                            retriever = AutoMergeRetriever(indexer, similarity_top_k=similarity_top_k)
+                        case RetrieverType.BM25:
+                            retriever = SimpleBM25Retriever(indexer, similarity_top_k=similarity_top_k)
+                        case _:
+                            raise ValueError(f"Retriever type {self.retriever_type} not supported")
+                if retriever:
+                    self.retrievers.append(retriever)
+
+    def update_retriever(self, kb, prev_indexer):
+        indexer = kb.indexer
+        for i, retriever in enumerate(self.retrievers):
+            if prev_indexer == retriever._index:
+                similarity_top_k = self.retrieve_topk
+                if kb.comp_subtype == "kbadmin_kb":
+                    # For kbadmin_kb, only KBadminRetriever is supported
+                    retriever = KBadminRetriever(indexer, similarity_top_k=similarity_top_k)
+                else:
+                    match self.retriever_type:
+                        case RetrieverType.VECTORSIMILARITY:
+                            retriever = VectorSimRetriever(indexer, similarity_top_k=similarity_top_k)
+                        case RetrieverType.AUTOMERGE:
+                            retriever = AutoMergeRetriever(indexer, similarity_top_k=similarity_top_k)
+                        case RetrieverType.BM25:
+                            retriever = SimpleBM25Retriever(indexer, similarity_top_k=similarity_top_k)
+                        case _:
+                            raise ValueError(f"Retriever type {self.retriever_type} not supported")
+                break
+
+    
+    def clear_retrievers(self):
+        self.retrievers = []
 
     def create_freechat_gen_from_chatqna_gen(self) -> bool:
         if len(self.generator) == 0 or self.generator[0].comp_subtype != GeneratorType.CHATQNA:
@@ -340,7 +234,9 @@ async def run_retrieve(pl: Pipeline, chat_request: ChatCompletionRequest) -> Any
     if pl.enable_benchmark:
         benchmark_index = pl.benchmark.init_benchmark_data()
         start = time.perf_counter()
-    retri_res = pl.retriever.run(query=query, top_k=top_k)
+    retri_res = []
+    for retriever in pl.retrievers:
+        retri_res.extend(retriever.run(query=query, top_k=top_k))
     if pl.enable_benchmark:
         pl.benchmark.update_benchmark_data(benchmark_index, CompType.RETRIEVER, time.perf_counter() - start)
     contexts[CompType.RETRIEVER] = retri_res
@@ -374,7 +270,9 @@ async def run_retrieve_postprocess(pl: Pipeline, chat_request: ChatCompletionReq
     if pl.enable_benchmark:
         benchmark_index = pl.benchmark.init_benchmark_data()
         start = time.perf_counter()
-    retri_res = pl.retriever.run(query=query, top_k=top_k)
+    retri_res = []
+    for retriever in pl.retrievers:
+        retri_res.extend(retriever.run(query=query, top_k=top_k))
     if pl.enable_benchmark:
         pl.benchmark.update_benchmark_data(benchmark_index, CompType.RETRIEVER, time.perf_counter() - start)
     contexts[CompType.RETRIEVER] = retri_res
@@ -389,25 +287,6 @@ async def run_retrieve_postprocess(pl: Pipeline, chat_request: ChatCompletionReq
             retri_res = processor.run(retri_res=retri_res, query_bundle=query_bundle)
             contexts[CompType.POSTPROCESSOR] = retri_res
     return contexts
-
-
-async def run_simple_doc(pl: Pipeline, docs: List[Document]) -> Any:
-    start = 0
-    if pl.enable_benchmark:
-        benchmark_index = pl.benchmark.init_benchmark_data()
-        start = time.perf_counter()
-    n = pl.node_parser.run(docs=docs)
-    if pl.indexer is not None:
-        pl.indexer.insert_nodes(n)
-    if pl.enable_benchmark:
-        benchmark_data = (
-            pl.benchmark.get_benchmark_data(benchmark_index, CompType.NODEPARSER) + time.perf_counter() - start
-        )
-        pl.benchmark.update_benchmark_data(benchmark_index, CompType.NODEPARSER, benchmark_data)
-
-        benchmark_data = pl.benchmark.get_benchmark_data(benchmark_index, BenchType.CHUNK_NUM) + len(n)
-        pl.benchmark.update_benchmark_data(benchmark_index, BenchType.CHUNK_NUM, benchmark_data)
-    return n
 
 
 async def run_query_search(pl: Pipeline, chat_request: ChatCompletionRequest) -> Any:
@@ -437,18 +316,24 @@ async def run_pipeline(
         benchmark_index = pl.benchmark.init_benchmark_data()
     contexts = {}
     retri_res = []
-    active_kb = chat_request.user if chat_request.user else None
+    active_kbs = chat_request.user if chat_request.user else []
     enable_rag_retrieval = (
         chat_request.chat_template_kwargs.get("enable_rag_retrieval", True)
         if chat_request.chat_template_kwargs
         else True
     )
-    if not active_kb:
+    if not active_kbs:
         enable_rag_retrieval = False
-    elif pl.retriever.comp_subtype == "kbadmin_retriever" and active_kb.comp_subtype == "origin_kb":
-        enable_rag_retrieval = False
-    elif pl.retriever.comp_subtype != "kbadmin_retriever" and active_kb.comp_subtype == "kbadmin_kb":
-        enable_rag_retrieval = False
+    # If using multiple knowledge bases, unstructured node parser cannot work with other types of node parser
+    np_types = set()
+    for kb in active_kbs:
+        if kb.comp_subtype == "kbadmin_kb":
+            np_types.add("kbadmin_node_parser")
+        else:
+            np_types.add(kb.node_parser.comp_subtype)
+    if len(np_types) > 1 and NodeParserType.UNSTRUCTURED in np_types:
+        raise ValueError("unstructured node parser cannot work with other types of node parser")
+    np_type = next(iter(np_types), None)
     query = chat_request.messages
     sub_questionss_result = None
     experience_status = True if chat_request.tool_choice == "auto" else False
@@ -466,10 +351,12 @@ async def run_pipeline(
             start = time.perf_counter()
         top_k = (
             None
-            if chat_request.k == pl.retriever.topk or chat_request.k != 0 or chat_request.k is None
+            if chat_request.k == pl.retrievers[0].topk or chat_request.k != 0 or chat_request.k is None
             else chat_request.k
         )
-        retri_res = pl.retriever.run(query=query, top_k=top_k)
+        retri_res = []
+        for retriever in pl.retrievers:
+            retri_res.extend(retriever.run(query=query, top_k=top_k))
         if pl.enable_benchmark:
             pl.benchmark.update_benchmark_data(benchmark_index, CompType.RETRIEVER, time.perf_counter() - start)
             start = time.perf_counter()
@@ -494,7 +381,6 @@ async def run_pipeline(
         _, prompt_str = target_generator.query_transform(chat_request, retri_res)
         input_token_size = pl.benchmark.cal_input_token_size(prompt_str)
 
-    np_type = pl.node_parser.comp_subtype
     if pl.enable_benchmark:
         start = time.perf_counter()
     if target_generator.inference_type == InferenceType.LOCAL:
@@ -519,7 +405,12 @@ async def run_pipeline(
 async def run_generator(
     pl: Pipeline, chat_request: ChatCompletionRequest, generator_type: str = GeneratorType.CHATQNA
 ) -> Any:
-    np_type = pl.node_parser.comp_subtype
+    active_kbs = chat_request.user if chat_request.user else []
+     # If using multiple knowledge bases, unstructured node parser cannot work with other types of node parser
+    np_types = {kb.node_parser.comp_subtype for kb in active_kbs}
+    if len(np_types) > 1 and NodeParserType.UNSTRUCTURED in np_types:
+        raise ValueError("unstructured node parser cannot work with other types of node parser")
+    np_type = active_kbs[0].node_parser.comp_subtype if active_kbs else None
     target_generator = pl.get_generator(generator_type)
     if target_generator is None:
         raise ValueError(f"No Generator ({generator_type}) Specified")

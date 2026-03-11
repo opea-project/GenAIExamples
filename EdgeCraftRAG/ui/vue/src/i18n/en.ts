@@ -8,6 +8,7 @@ export default {
     edit: "Edit",
     add: "Add",
     delete: "Delete",
+    details: "Details",
     active: "Activate",
     deactivate: "Deactivate",
     cancel: "Cancel",
@@ -179,9 +180,12 @@ export default {
       vllmUrlValid3: "URL cannot be accessed",
       vllmUrlValid4: "Test passed !",
       vllmUrlValid5: "The vLLM model has not passed verification yet",
-      nodeParserTypeTip: "Both Indexer Type and  Retriever Type will be set to kbadmin at the same time",
-      indexerTypeTip: "Both Node Parser Type and  Retriever Type will be set to kbadmin at the same time",
-      retrieverTypeTip: "Both Node Parser Type and  Indexer Type will be set to kbadmin at the same time",
+      nodeParserTypeTip:
+        "Both Indexer Type and  Retriever Type will be set to kbadmin at the same time",
+      indexerTypeTip:
+        "Both Node Parser Type and  Retriever Type will be set to kbadmin at the same time",
+      retrieverTypeTip:
+        "Both Node Parser Type and  Indexer Type will be set to kbadmin at the same time",
       retrieverChangeTip: "Please go to the Indexer stage to complete the data",
       indexerTypeValid1: "Indexer type can only select kbadmin",
       modelRequired: "Please enter embedding model url",
@@ -279,10 +283,12 @@ export default {
     edit: "Edit Knowledge Base",
     deleteTip: "Are you sure delete this knowledge base?",
     activeTip: "Are you sure activate this knowledge base?",
-    uploadTip: "Supports PDF, Word, TXT,Doc,Html,PPT,ZIP formats, with a single file size not exceeding 200M",
+    uploadTip:
+      "Supports PDF, Word, TXT,Doc,Html,PPT,ZIP formats, with a single file size not exceeding 200M",
     notFileTip: "The knowledge base is empty. Go upload your files.",
     name: "Name",
     des: "Description",
+    detail: "Knowledge Base Details",
     activated: "Activated",
     nameValid1: "Please input knowledge base name",
     nameValid2: "Name should be between 2 and 30 characters",
@@ -299,7 +305,7 @@ export default {
       "Experience refers to the knowledge and skills acquired through practical involvement, trial, and reflection, serving as a key foundation for solving real-world problems.",
     kbDes:
       "A Knowledge Base is a centralized repository for storing organized information such as documents, FAQs, and guides, enabling teams or users to quickly access and share knowledge.",
-    type: "Type",
+    type: "Knowledge Base Type",
     original: "Original",
     kbadmin: "kbadmin",
     typeValid: "Please select knowledge base type",
@@ -311,6 +317,14 @@ export default {
     totalTip: "files",
     failedFile: "Failed Files",
     retryFailed: "Upload failed !",
+    general: "General",
+    class: "Type",
+    desc: {
+      name: "The name identifier of the knowledge base.",
+      type: "The type identifier of the knowledge base.",
+      description:
+        "Briefly describe the purpose, content scope, or intended use of this knowledge base.",
+    },
   },
   request: {
     pipeline: {

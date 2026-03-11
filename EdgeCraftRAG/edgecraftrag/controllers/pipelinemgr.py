@@ -3,13 +3,12 @@
 
 import asyncio
 import gc
-from typing import Any, List
+from typing import Any
 
 from comps.cores.proto.api_protocol import ChatCompletionRequest
 from edgecraftrag.base import BaseMgr, CallbackType
 from edgecraftrag.components.pipeline import Pipeline
-from edgecraftrag.controllers.nodemgr import NodeMgr
-from llama_index.core.schema import Document
+from edgecraftrag.components.knowledge_base import Knowledge
 
 
 class PipelineMgr(BaseMgr):
@@ -23,12 +22,11 @@ class PipelineMgr(BaseMgr):
     def create_pipeline(self, request, origin_json: str):
         if isinstance(request, str):
             name = request
-            idx, documents_cache = None, None
+            idx = None
         else:
             name = request.name
             idx = request.idx
-            documents_cache = request.documents_cache
-        pl = Pipeline(name, origin_json, idx, documents_cache)
+        pl = Pipeline(name, origin_json, idx)
         self.add(pl)
         return pl
 
@@ -46,8 +44,6 @@ class PipelineMgr(BaseMgr):
             raise Exception("Unable to remove an active pipeline...")
         if self._prev_active_pipeline_name and pl.name == self._prev_active_pipeline_name:
             raise Exception("Pipeline is currently cached, unable to remove...")
-        pl.node_parser = None
-        pl.indexer = None
         pl.retriever = None
         pl.postprocessor = None
         pl.generator = None
@@ -55,8 +51,6 @@ class PipelineMgr(BaseMgr):
         pl.status = None
         pl.run_pipeline_cb = None
         pl.run_retriever_cb = None
-        pl.run_data_prepare_cb = None
-        pl._node_changed = None
         self.remove(pl.idx)
         del pl
         gc.collect()
@@ -67,7 +61,7 @@ class PipelineMgr(BaseMgr):
             return [pl for _, pl in self.components.items() if (pl.get_generator(gen_type) is not None)]
         return [pl for _, pl in self.components.items()]
 
-    def activate_pipeline(self, name: str, active: bool, nm: NodeMgr, kb_name: None, cache_prev: bool = False):
+    def activate_pipeline(self, name: str, active: bool, active_kbs: list[Knowledge], cache_prev: bool = False):
         pl = self.get_pipeline_by_name_or_id(name)
         if pl is None:
             return
@@ -77,10 +71,10 @@ class PipelineMgr(BaseMgr):
             self._active_pipeline = None
             return
 
-        nodelist = None
-        # if pl.node_changed:
-        #     nodelist = nm.get_nodes(pl.node_parser.idx)
-        pl.check_active(nodelist, kb_name)
+        # update activate indexers for pipeline retriever
+        pl.update_retriever_list(active_kbs)
+
+        # set previous active pipeline to inactive
         prevactive = self._active_pipeline
         if prevactive:
             prevactive.status.active = False
@@ -98,10 +92,6 @@ class PipelineMgr(BaseMgr):
 
     def clear_prev_active_pipeline_name(self):
         self._prev_active_pipeline_name = None
-
-    def notify_node_change(self):
-        for _, pl in self.components.items():
-            pl.set_node_change()
 
     async def run_pipeline(self, chat_request: ChatCompletionRequest) -> Any:
         ap = self.get_active_pipeline()
@@ -131,10 +121,4 @@ class PipelineMgr(BaseMgr):
         if ap is not None:
             out = await ap.run(cbtype=CallbackType.POSTPROCESS, chat_request=chat_request, contexts=contexts)
             return out
-        return -1
-
-    async def run_data_prepare(self, docs: List[Document]) -> Any:
-        ap = self.get_active_pipeline()
-        if ap is not None:
-            return await ap.run(cbtype=CallbackType.DATAPREP, docs=docs)
         return -1

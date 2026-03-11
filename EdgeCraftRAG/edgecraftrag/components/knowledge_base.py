@@ -4,19 +4,24 @@
 import json
 import os
 import uuid
+import time
 from typing import Any, Dict, List, Optional, Union
 
-from edgecraftrag.base import BaseComponent, CompType
+from edgecraftrag.base import BaseComponent, BenchType, CompType
 from edgecraftrag.config_repository import (
     MilvusConfigRepository,
     MilvusDocumentRecordRepository,
 )
 from edgecraftrag.env import DOCUMENT_DATA_FILE, EXPERIENCE_FILE
 from llama_index.core.schema import Document
-from pydantic import model_serializer
-
+from pydantic import Field, model_serializer
 
 class Knowledge(BaseComponent):
+
+    node_parser: Optional[BaseComponent] = Field(default=None)
+    indexer: Optional[BaseComponent] = Field(default=None)
+    benchmark: Optional[BaseComponent] = Field(default=None)
+
     def __init__(
         self,
         name: str,
@@ -28,6 +33,7 @@ class Knowledge(BaseComponent):
         idx: Optional[str] = None,
         all_document_maps: Optional[Dict] = None,
         file_paths: Optional[list] = None,
+        origin_json: Optional[str] = None,
         **kwargs,
     ):
         super().__init__(name=name, comp_type=CompType.KNOWLEDGE, **kwargs)
@@ -37,12 +43,13 @@ class Knowledge(BaseComponent):
         self.active = active
         self.comp_type = comp_type
         self.comp_subtype = comp_subtype
+        self.enable_benchmark = os.getenv("ENABLE_BENCHMARK", "False").lower() == "true"
         if idx is not None:
             self.idx = str(idx)
         if all_document_maps is not None:
             self.all_document_maps = all_document_maps
         else:
-            self.all_document_maps: Dict[str, Dict[str, str]] = {}
+            self.all_document_maps: Dict[str, str] = {}
 
         self.document_records: List[Dict[str, str]] = []
 
@@ -55,6 +62,19 @@ class Knowledge(BaseComponent):
 
         self.experience_repo = MilvusConfigRepository.create_connection("experience_data", 1)
         self.document_record_repo = MilvusDocumentRecordRepository.create_connection("document_records", 1)
+        self.nodes = []
+        self._origin_json = origin_json
+
+    @property
+    def get_knowledge_json(self) -> str:
+        return self._origin_json
+
+    def update_knowledge_json(self, knowledge_dict):
+        origin_json = json.loads(self._origin_json)
+        for k, v in knowledge_dict.items():
+            if v is not None:
+                origin_json[k] = v
+        self._origin_json = json.dumps(origin_json)
 
     def _update_file_names(self) -> None:
         self.file_map = {os.path.basename(path): path for path in self.file_paths if path is not None}
@@ -63,17 +83,13 @@ class Knowledge(BaseComponent):
         self,
         file_path: str,
         documents: List[Document],
-        pl_name: str,
-        only_add_file: bool = True,
     ) -> bool:
-        if pl_name not in self.all_document_maps:
-            self.all_document_maps[pl_name] = {}
-        if file_path not in self.all_document_maps[pl_name]:
-            file_id = str(uuid.uuid4())
-            self.all_document_maps[pl_name][file_path] = file_id
-        else:
-            file_id = self.all_document_maps[pl_name][file_path]
 
+        if file_path not in self.all_document_maps:
+            file_id = str(uuid.uuid4())
+            self.all_document_maps[file_path] = file_id
+        else:
+            file_id = self.all_document_maps[file_path]
         records = [
             {
                 "file_id": file_id,
@@ -85,20 +101,19 @@ class Knowledge(BaseComponent):
         ]
         self._add_document_records(records)
 
-        if only_add_file and file_path not in self.file_paths:
+        if file_path not in self.file_paths:
             self.file_paths.append(file_path)
             self._update_file_names()
 
-    def remove_file_path(self, file_path: str, pl_name: str) -> List[str]:
+    def remove_file_path(self, file_path: str) -> List[str]:
         removed_doc_ids = []
-        if pl_name in self.all_document_maps and file_path in self.all_document_maps[pl_name]:
-            file_id = self.all_document_maps[pl_name][file_path]
+        if file_path in self.all_document_maps:
+            file_id = self.all_document_maps[file_path]
             removed_doc_ids = self._remove_document_records_by_file_id(file_id)
-
-            del self.all_document_maps[pl_name][file_path]
-            if file_path in self.file_paths:
-                self.file_paths.remove(file_path)
-                self._update_file_names()
+            del self.all_document_maps[file_path]
+        if file_path in self.file_paths:
+            self.file_paths.remove(file_path)
+            self._update_file_names()
 
         return removed_doc_ids
 
@@ -310,34 +325,9 @@ class Knowledge(BaseComponent):
                         json.dump(result_documents, f, ensure_ascii=False, indent=4)
         return deleted_records
 
-    def get_all_document(self, file_path, pl_name) -> List[Dict[str, Any]]:
-        doc_info_list = []
-        if pl_name not in self.all_document_maps:
-            return doc_info_list
-        file_id = self.all_document_maps[pl_name].get(file_path)
-        if not file_id:
-            return doc_info_list
-
-        if self.document_record_repo:
-            records = self.document_record_repo.get_records_by_file_id(file_id)
-            doc_info_list = [{"doc_id": rec["doc_id"], "metadata": rec.get("metadata", {})} for rec in records]
-        else:
-            if os.path.exists(DOCUMENT_DATA_FILE):
-                with open(DOCUMENT_DATA_FILE, "r", encoding="utf-8") as f:
-                    all_data = json.load(f)
-            doc_info_list = [
-                {"doc_id": item["doc_id"], "metadata": item.get("metadata", {})}
-                for item in all_data
-                if item.get("file_id") == file_id
-            ]
-        return doc_info_list
-
-    def clear_documents(self, pl_name):
-        if pl_name not in self.all_document_maps:
-            return
-        for file_id in self.all_document_maps[pl_name].values():
+    def clear_documents(self):
+        for file_id in self.all_document_maps.values():
             self._remove_document_records_by_file_id(file_id)
-        self.all_document_maps[pl_name] = {}
         return True
 
     # Make sure the folder and its files exist
@@ -357,6 +347,37 @@ class Knowledge(BaseComponent):
         else:
             total = None
         return total
+    
+    def update_nodes(self, nodes: List[Document]):
+        self.nodes = nodes
+
+    def add_nodes(self, nodes: List[Document]):
+        self.nodes.extend(nodes)
+
+    async def run_node_parser(self, docs: List[Document]) -> Any:
+        start = 0
+        if self.enable_benchmark:
+            benchmark_index = self.benchmark.init_benchmark_data()
+            start = time.perf_counter()
+        nodes = self.node_parser.run(docs=docs)
+        if self.enable_benchmark:
+            benchmark_data = (
+                self.benchmark.get_benchmark_data(benchmark_index, CompType.NODEPARSER) + time.perf_counter() - start
+            )
+            self.benchmark.update_benchmark_data(benchmark_index, CompType.NODEPARSER, benchmark_data)
+
+            benchmark_data = self.benchmark.get_benchmark_data(benchmark_index, BenchType.CHUNK_NUM) + len(nodes)
+            self.benchmark.update_benchmark_data(benchmark_index, BenchType.CHUNK_NUM, benchmark_data)
+        self.add_nodes(nodes)
+        return nodes
+        
+    async def update_nodes_to_indexer(self) -> Any:
+        if self.indexer is not None:
+            self.indexer.insert_nodes(self.nodes)
+
+    async def add_nodes_to_indexer(self, nodes) -> Any:
+        if self.indexer is not None:
+            self.indexer.insert_nodes(nodes)
 
     def run(self, **kwargs) -> Any:
         pass
@@ -368,6 +389,8 @@ class Knowledge(BaseComponent):
             "name": self.name,
             "comp_type": self.comp_type,
             "comp_subtype": self.comp_subtype,
+            "node_parser": self.node_parser,
+            "indexer": self.indexer,
             "file_map": self.file_map,
             "description": self.description,
             "active": self.active,

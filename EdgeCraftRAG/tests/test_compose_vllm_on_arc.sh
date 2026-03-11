@@ -28,7 +28,7 @@ UI_UPLOAD_PATH="$WORKPATH/tests"
 
 HF_ENDPOINT=https://hf-mirror.com
 VLLM_SERVICE_PORT_A770=8086
-TENSOR_PARALLEL_SIZE=1
+TP=1
 vLLM_ENDPOINT="http://${HOST_IP}:${VLLM_SERVICE_PORT_A770}"
 LLM_MODEL="Qwen/Qwen3-8B"
 LLM_MODEL_PATH="${MODEL_PATH}/${LLM_MODEL}"
@@ -106,13 +106,8 @@ function validate_rag() {
         "edgecraftrag-server" \
         '@configs/test_pipeline_ipex_vllm.json'
 
-    # add data
-    validate_services \
-        "${HOST_IP}:${EC_RAG_SERVICE_PORT}/v1/data" \
-        "Done" \
-        "data" \
-        "edgecraftrag-server" \
-        '@configs/test_data.json'
+    # add data to knowledge base
+    validate_knowledge
 
     # query
     validate_services \

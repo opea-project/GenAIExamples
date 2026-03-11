@@ -102,13 +102,13 @@ curl -X DELETE http://${HOST_IP}:16010/v1/settings/models/BAAI/bge-reranker-larg
 ### Create a knowledge base
 
 ```bash
-curl -X POST http://${HOST_IP}:16010/v1/knowledge -H "Content-Type: application/json" -d '{"name": "default_kb","description": "Your knowledge base Description","active":true}' | jq '.'
+curl -X POST http://${HOST_IP}:16010/v1/knowledge -H "Content-Type: application/json" -d @tests/configs/test_kb.json | jq '.'
 ```
 
 ### Update a knowledge base
 
 ```bash
-curl -X PATCH http://${HOST_IP}:16010/v1/knowledge/patch -H "Content-Type: application/json" -d '{"name": "default_kb","active":"True","description": "Your knowledge base Description","active":"True"}' | jq '.'
+curl -X PATCH http://${HOST_IP}:16010/v1/knowledge/patch -H "Content-Type: application/json" -d '{"name": "default_kb","active":"True","description": "Your knowledge base Description"}' | jq '.'
 ```
 
 ### Check all knowledge base
@@ -132,52 +132,13 @@ curl -X DELETE http://${HOST_IP}:16010/v1/knowledge/default_kb -H "Content-Type:
 ### Add file to knowledge base
 
 ```bash
-curl -X POST http://${HOST_IP}:16010/v1/knowledge/default_kb/files -H "Content-Type: application/json" -d '{"local_path": "docs/#REPLACE WITH YOUR DIR WITHIN MOUNTED DOC PATH#"}' | jq '.'
+curl -X POST http://${HOST_IP}:16010/v1/knowledge/default_kb/files -H "Content-Type: application/json" -d '{"local_path": "/home/user/ui_cache/#REPLACE WITH YOUR DIR WITHIN MOUNTED DOC PATH#"}' | jq '.'
 ```
 
 ### Delete file to knowledge base
 
 ```bash
-curl -X DELETE http://${HOST_IP}:16010/v1/knowledge/default_kb/files -H "Content-Type: application/json" -d '{"local_path": "docs/#REPLACE WITH YOUR DIR WITHIN MOUNTED DOC PATH#"}' | jq '.'
-```
-
-## File Management
-
-### Add a text
-
-```bash
-curl -X POST http://${HOST_IP}:16010/v1/data -H "Content-Type: application/json" -d '{"text":"#REPLACE WITH YOUR TEXT"}' | jq '.'
-```
-
-### Add files from existed file path
-
-```bash
-curl -X POST http://${HOST_IP}:16010/v1/data -H "Content-Type: application/json" -d '{"local_path":"docs/#REPLACE WITH YOUR DIR WITHIN MOUNTED DOC PATH#"}' | jq '.'
-curl -X POST http://${HOST_IP}:16010/v1/data -H "Content-Type: application/json" -d '{"local_path":"docs/#REPLACE WITH YOUR FILE WITHIN MOUNTED DOC PATH#"}' | jq '.'
-```
-
-### Check all files
-
-```bash
-curl -X GET http://${HOST_IP}:16010/v1/data/files -H "Content-Type: application/json" | jq '.'
-```
-
-### Check one file
-
-```bash
-curl -X GET http://${HOST_IP}:16010/v1/data/files/test2.docx -H "Content-Type: application/json" | jq '.'
-```
-
-### Delete a file
-
-```bash
-curl -X DELETE http://${HOST_IP}:16010/v1/data/files/test2.docx -H "Content-Type: application/json" | jq '.'
-```
-
-### Update a file
-
-```bash
-curl -X PATCH http://${HOST_IP}:16010/v1/data/files/test.pdf -H "Content-Type: application/json" -d '{"local_path":"docs/#REPLACE WITH YOUR FILE WITHIN MOUNTED DOC PATH#"}' | jq '.'
+curl -X DELETE http://${HOST_IP}:16010/v1/knowledge/default_kb/files -H "Content-Type: application/json" -d '{"local_path": "/home/user/ui_cache/#REPLACE WITH YOUR DIR WITHIN MOUNTED DOC PATH#"}' | jq '.'
 ```
 
 ## System Prompt Management

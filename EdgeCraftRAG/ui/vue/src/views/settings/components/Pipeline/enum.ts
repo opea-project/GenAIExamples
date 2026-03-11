@@ -22,11 +22,6 @@ export const NodeParser = [
     value: "unstructured",
     describe: "pipeline.desc.unstructured",
   },
-  {
-    name: "kbadmin",
-    value: "kbadmin_parser",
-    describe: "pipeline.desc.kbadmin",
-  },
 ] as const;
 
 export const Indexer = [
@@ -45,11 +40,6 @@ export const Indexer = [
     value: "milvus_vector",
     describe: "pipeline.desc.milvusVector",
   },
-  {
-    name: "kbadmin",
-    value: "kbadmin_indexer",
-    describe: "pipeline.desc.kbadmin",
-  },
 ] as const;
 export const Retriever = [
   {
@@ -66,11 +56,6 @@ export const Retriever = [
     name: "Bm25",
     value: "bm25",
     describe: "pipeline.desc.bm25",
-  },
-  {
-    name: "kbadmin",
-    value: "kbadmin_retriever",
-    describe: "pipeline.desc.kbadmin",
   },
 ] as const;
 

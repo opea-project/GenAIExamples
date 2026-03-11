@@ -10,59 +10,23 @@ from edgecraftrag.config_repository import MilvusConfigRepository
 from edgecraftrag.context import ctx
 from edgecraftrag.env import UI_DIRECTORY
 from fastapi import FastAPI, File, HTTPException, UploadFile, status
-
+from edgecraftrag.api.v1.knowledge_base import add_file_to_knowledge_base
 data_app = FastAPI()
-
-
-# Upload a text or files
-@data_app.post(path="/v1/data")
-async def add_data(request: DataIn):
-    pl = ctx.get_pipeline_mgr().get_active_pipeline()
-    docs = []
-    if request.text is not None:
-        docs.extend(ctx.get_file_mgr().add_text(text=request.text))
-    if request.local_path is not None:
-        docs.extend(ctx.get_file_mgr().add_files(docs=request.local_path))
-
-    nodelist = await ctx.get_pipeline_mgr().run_data_prepare(docs=docs)
-    if pl.indexer.comp_subtype != "kbadmin_indexer":
-        if nodelist is None or len(nodelist) == 0:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="File not found")
-    ctx.get_node_mgr().add_nodes(pl.node_parser.idx, nodelist)
-    return "Done"
-
-
-# Reindex all files
-@data_app.post(path="/v1/data/reindex")
-async def redindex_data():
-    pl = ctx.get_pipeline_mgr().get_active_pipeline()
-    ctx.get_node_mgr().del_nodes_by_np_idx(pl.node_parser.idx)
-
-    pl.indexer.reinitialize_indexer()
-    pl.update_indexer_to_retriever()
-
-    all_docs = ctx.get_file_mgr().get_all_docs()
-    nodelist = ctx.get_pipeline_mgr().run_data_prepare(docs=all_docs)
-    if nodelist is not None and len(nodelist) > 0:
-        ctx.get_node_mgr().add_nodes(pl.node_parser.idx, nodelist)
-
-    return "Done"
 
 
 # Gets the current nodelist
 @data_app.get(path="/v1/data/nodes")
 async def get_nodes_with_kb(kb_name=None):
     node_lists = {}
-    active_pl = ctx.get_pipeline_mgr().get_active_pipeline()
     if kb_name:
         kb = ctx.get_knowledge_mgr().get_knowledge_base_by_name_or_id(kb_name)
     else:
         kb = ctx.get_knowledge_mgr().get_active_knowledge_base()
-    if active_pl.indexer.comp_subtype == "faiss_vector":
-        return active_pl.indexer.docstore.docs
-    elif active_pl.indexer.comp_subtype == "milvus_vector":
-        collection_name = kb.name + active_pl.name
-        Milvus_node_list = MilvusConfigRepository.create_connection(collection_name, 1, active_pl.indexer.vector_url)
+    if kb.indexer.comp_subtype == "faiss_vector":
+        return kb.indexer.docstore.docs
+    elif kb.indexer.comp_subtype == "milvus_vector":  
+        collection_name = kb.name
+        Milvus_node_list = MilvusConfigRepository.create_connection(collection_name, 1, kb.indexer.vector_url)
         results = Milvus_node_list.get_configs(output_fields=["text", "_node_content", "doc_id"])
         for node_list in results:
             text = node_list.get("text")
@@ -71,7 +35,7 @@ async def get_nodes_with_kb(kb_name=None):
             node_content["text"] = text
             node_lists[node_content.get("id_")] = node_content
         return node_lists
-    node_list = ctx.get_node_mgr().get_nodes(active_pl.node_parser.idx)
+    node_list = ctx.get_node_mgr().get_nodes(kb.node_parser.idx)
     return node_list
 
 
@@ -114,21 +78,6 @@ async def get_document_names():
     return {"total_documents": len(documents), "documents": list(documents.values())}
 
 
-# Upload files by a list of file_path
-@data_app.post(path="/v1/data/files")
-async def add_files(request: FilesIn):
-    docs = []
-    if request.local_paths is not None:
-        docs.extend(ctx.get_file_mgr().add_files(docs=request.local_paths))
-
-    nodelist = ctx.get_pipeline_mgr().run_data_prepare(docs=docs)
-    if nodelist is None or len(nodelist) == 0:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="File not found")
-    pl = ctx.get_pipeline_mgr().get_active_pipeline()
-    ctx.get_node_mgr().add_nodes(pl.node_parser.idx, nodelist)
-    return "Done"
-
-
 # GET files
 @data_app.get(path="/v1/data/files")
 async def get_files():
@@ -141,35 +90,9 @@ async def get_file_docs(name):
     return ctx.get_file_mgr().get_file_by_name_or_id(name)
 
 
-# DELETE a file
-@data_app.delete(path="/v1/data/files/{name}")
-async def delete_file(name):
-    if ctx.get_file_mgr().del_file(name):
-        pl = ctx.get_pipeline_mgr().get_active_pipeline()
-
-        # Current solution: reindexing all docs after deleting one file
-        # TODO: delete the nodes related to the file
-        ctx.get_node_mgr().del_nodes_by_np_idx(pl.node_parser.idx)
-        pl.indexer.reinitialize_indexer()
-        pl.update_indexer_to_retriever()
-
-        all_docs = ctx.get_file_mgr().get_all_docs()
-        nodelist = ctx.get_pipeline_mgr().run_data_prepare(docs=all_docs)
-        if nodelist is not None and len(nodelist) > 0:
-            ctx.get_node_mgr().add_nodes(pl.node_parser.idx, nodelist)
-
-        return f"File {name} is deleted"
-    else:
-        return f"File {name} not found"
-
-
 # Upload & save a file from UI
 @data_app.post(path="/v1/data/file/{file_name}")
 async def upload_file(file_name: str, file: UploadFile = File(...)):
-    if ctx.get_pipeline_mgr().get_active_pipeline() is None:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Please activate pipeline and upload the file"
-        )
     try:
         # DIR for server to save files uploaded by UI
         UPLOAD_DIRECTORY = os.path.normpath(os.path.join(UI_DIRECTORY, file_name))

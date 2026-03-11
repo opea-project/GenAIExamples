@@ -5,7 +5,6 @@ import json
 import os
 import time
 
-from edgecraftrag.api.v1.knowledge_base import Synchronizing_vector_data
 from edgecraftrag.api_schema import AgentCreateIn
 from edgecraftrag.base import AgentType
 from edgecraftrag.config_repository import MilvusConfigRepository, save_agent_configurations
@@ -164,28 +163,24 @@ async def manage_agent_bound_pipeline(bound_pl_idx, request):
     # case3: deactivate agent, while bound pipeline **was** active -> do NOT deactivate bound pipeline, do nothing
     # case4: deactivate agent, while bound pipeline **was NOT** active -> deactivate bound pipeline, activate previous active pipeline if exists
     pl_manager = ctx.get_pipeline_mgr()
-    prev_active_pipeline = pl_manager.get_active_pipeline()
 
-    active_kb = ctx.knowledgemgr.get_active_knowledge_base()
-    kb_name = active_kb.name if active_kb else "default"
+    active_kbs = ctx.knowledgemgr.get_active_knowledge_base()
+    # TODO: update single kb with kbs
+    # kb_name = active_kbs.name if active_kb else "default"
 
     if request.active:
-        pl_manager.activate_pipeline(bound_pl_idx, request.active, ctx.get_node_mgr(), kb_name, cache_prev=True)
+        pl_manager.activate_pipeline(bound_pl_idx, request.active, active_kbs, cache_prev=True)
     else:
         # at deactivate, prev_active_pl can be 1.other pl/2.None/3.current bound_pl
         prev_active_pl = pl_manager.get_prev_active_pipeline_name()
         if prev_active_pl and prev_active_pl != bound_pl_idx:
             # 1, restore to the other pipeline activated
-            pl_manager.activate_pipeline(prev_active_pl, True, ctx.get_node_mgr(), kb_name)
+            pl_manager.activate_pipeline(prev_active_pl, True, active_kbs)
         elif not prev_active_pl:
             # 2, deactivate current bound pipeline, leave no active pipeline as before
-            pl_manager.activate_pipeline(bound_pl_idx, False, ctx.get_node_mgr(), kb_name)
+            pl_manager.activate_pipeline(bound_pl_idx, False, active_kbs)
         else:
             # 3, do nothing
             pass
         # when agent is deactivated, clear cached previous active pipeline
         pl_manager.clear_prev_active_pipeline_name()
-
-    cur_active_pipeline = pl_manager.get_active_pipeline()
-    if prev_active_pipeline and cur_active_pipeline and prev_active_pipeline.idx != cur_active_pipeline.idx:
-        await Synchronizing_vector_data(prev_active_pipeline, cur_active_pipeline)

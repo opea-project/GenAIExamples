@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: llm-serving-xpu
+spec:
+  selector:
+    matchLabels:
+      app: llm-serving-xpu
+  template:
+    metadata:
+      labels:
+        app: llm-serving-xpu
+    spec:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        supplementalGroups:
+        - {{ .Values.gpu.groups.video }}
+        - {{ .Values.gpu.groups.render }}
+      containers:
+        - name: llm-serving-xpu
+          image: "{{ .Values.image.vllm.registry }}/llm-scaler-vllm:{{ .Values.image.vllm.tag }}"
+          imagePullPolicy: IfNotPresent
+          command:
+            - "/bin/bash"
+            - "-c"
+            - "cd /workspace/vllm/models && source /opt/intel/oneapi/setvars.sh --force && \
+               VLLM_OFFLOAD_WEIGHTS_BEFORE_QUANT=1 TORCH_LLM_ALLREDUCE=1 VLLM_USE_V1=1 \
+               CCL_ZE_IPC_EXCHANGE=pidfd VLLM_ALLOW_LONG_MAX_MODEL_LEN=1 VLLM_WORKER_MULTIPROC_METHOD=spawn \
+               python3 -m vllm.entrypoints.openai.api_server \
+               --model $LLM_MODEL --dtype $DTYPE --enforce-eager --port $VLLM_SERVICE_PORT_B60 \
+               --trust-remote-code --disable-sliding-window --gpu-memory-util $GPU_MEMORY_UTIL \
+               --no-enable-prefix-caching --max-num-batched-tokens $MAX_NUM_BATCHED_TOKENS \
+               --disable-log-requests --max-model-len $MAX_MODEL_LEN --block-size $BLOCK_SIZE \
+               --quantization $QUANTIZATION -tp=$TP -dp=$DP"
+          envFrom:
+            - configMapRef:
+                name: edgecraftrag-env
+          ports:
+            - containerPort: {{ .Values.ports.vllm }}
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - name: model-path
+              mountPath: /workspace/vllm/models
+            - name: dri-device
+              mountPath: /dev/dri
+      volumes:
+        - name: model-path
+          hostPath:
+            path: "{{ .Values.paths.model }}"
+        - name: dri-device
+          hostPath:
+            path: /dev/dri
+      tolerations:
+        - key: "gpu"
+          operator: "Exists"
+          effect: "NoSchedule"

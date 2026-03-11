@@ -85,7 +85,7 @@ function start_vllm_services() {
     # vllm ENV
     export VLLM_SERVICE_PORT_A770=8086
 
-    read -p "Tensor parallel size(your tp size [1]), press Enter to confirm, or type a new value:" TENSOR_PARALLEL_SIZE; TENSOR_PARALLEL_SIZE=${TENSOR_PARALLEL_SIZE:-1}
+    read -p "Tensor parallel size(your tp size [1]), press Enter to confirm, or type a new value:" TENSOR_PARALLEL_SIZE; TP=${TP:-1}
     CCL_DG2_USM=$(get_user_input "Set USM (Core=1, Xeon=0, default=0)" 0)
     export HOST_IP=${HOST_IP}
     # export ENV
@@ -97,7 +97,7 @@ function start_vllm_services() {
     export no_proxy="localhost, 127.0.0.1, 192.168.1.1, ${HOST_IP}"
     export MILVUS_ENABLED=${MILVUS_ENABLED}
     export CHAT_HISTORY_ROUND=${CHAT_HISTORY_ROUND}
-    export TENSOR_PARALLEL_SIZE=${TENSOR_PARALLEL_SIZE}
+    export TP=${TP}
     export CCL_DG2_USM=${CCL_DG2_USM}
     export VIDEOGROUPID=$(getent group video | cut -d: -f3)
     export RENDERGROUPID=$(getent group render | cut -d: -f3)
@@ -216,11 +216,11 @@ function quick_start_vllm_services() {
     export MILVUS_ENABLED=${MILVUS_ENABLED:-1}
     export CHAT_HISTORY_ROUND=${CHAT_HISTORY_ROUND:-2}
     export HF_ENDPOINT=${HF_ENDPOINT:-https://hf-mirror.com}
-    export TENSOR_PARALLEL_SIZE=${TENSOR_PARALLEL_SIZE:-1}
+    export TP=${TP:-1}
     export MAX_NUM_SEQS=${MAX_NUM_SEQS:-64}
     export MAX_MODEL_LEN=${MAX_MODEL_LEN:-10240}
     export MAX_NUM_BATCHED_TOKENS=${MAX_NUM_BATCHED_TOKENS:-10240}
-    export LOAD_IN_LOW_BIT=${LOAD_IN_LOW_BIT:-fp8}
+    export QUANTIZATION=${QUANTIZATION:-fp8}
     export CCL_DG2_USM=${CCL_DG2_USM:-0}
     export LLM_MODEL=${LLM_MODEL:-Qwen/Qwen3-8B}
     export LLM_MODEL_PATH=${LLM_MODEL_PATH:-"${MODEL_PATH}/Qwen/Qwen3-8B"}
@@ -350,7 +350,7 @@ function start_vLLM_B60_services() {
     export no_proxy="localhost, 127.0.0.1, 192.168.1.1, ${HOST_IP}"
     export MILVUS_ENABLED=${MILVUS_ENABLED}
     export CHAT_HISTORY_ROUND=${CHAT_HISTORY_ROUND}
-    export SELECTED_XPU_0=${SELECTED_XPU_0}
+    export ZE_AFFINITY_MASK=${ZE_AFFINITY_MASK}
     export VIDEOGROUPID=$(getent group video | cut -d: -f3)
     export RENDERGROUPID=$(getent group render | cut -d: -f3)
     # export vllm ENV

@@ -122,9 +122,17 @@
                         </template>
                       </a-menu-item>
                     </template>
-                    <a-menu-item key="update" @click="handleUpdate(item)">
+                    <a-menu-item key="update" :disabled="item.active" @click="handleUpdate(item)">
                       <EditFilled :style="{ color: 'var(--color-primary-second)' }" />
                       {{ $t("common.edit") }}</a-menu-item
+                    >
+                    <a-menu-item
+                      key="details"
+                      v-if="item.comp_type === 'knowledge'"
+                      @click="handleViewConfiguration(item)"
+                    >
+                      <EyeFilled :style="{ color: 'var(--font-text-color)' }" />
+                      {{ $t("common.details") }}</a-menu-item
                     >
                     <a-menu-item
                       key="delete"
@@ -143,13 +151,33 @@
       </div>
       <a-empty v-else />
     </div>
-    <UpdateDialog
+    <!-- experienceDialog -->
+    <UpdateExperienceDialog
       v-if="updateDialog.visible"
       :dialog-data="updateDialog.data"
       :dialog-type="updateDialog.type"
       :dialog-flag="updateDialog.flag"
       @switch="handleSwitch"
       @close="updateDialog.visible = false"
+    />
+    <!-- createDialog -->
+    <CreateDialog
+      v-if="createDialog.visible"
+      @switch="handleSwitch"
+      @close="createDialog.visible = false"
+    />
+    <!-- editDialog -->
+    <EditDialog
+      v-if="editDialog.visible"
+      :dialog-data="editDialog.data"
+      @switch="handleSwitch"
+      @close="editDialog.visible = false"
+    />
+    <!-- detailDrawer -->
+    <DetailDrawer
+      v-if="detailDrawer.visible"
+      :drawer-data="detailDrawer.data"
+      @close="detailDrawer.visible = false"
     />
     <SelectTypeDialog
       v-if="selectTypeDialog.visible"
@@ -162,25 +190,33 @@
 
 <script lang="ts" setup name="KnowledgeBase">
   import {
-    getKnowledgeBaseDetailByName,
-    getKnowledgeBaseList,
-    requestKnowledgeBaseDelete,
-    requestKnowledgeBaseUpdate,
-  } from "@/api/knowledgeBase";
-  import eventBus from "@/utils/mitt";
-  import {
-    CheckCircleFilled,
-    CheckOutlined,
-    CloseCircleFilled,
-    DeleteFilled,
-    EditFilled,
-    PauseCircleFilled,
-    PlusOutlined,
-  } from "@ant-design/icons-vue";
-  import { Modal } from "ant-design-vue";
-  import { computed, createVNode, onMounted, reactive, ref } from "vue";
-  import { useI18n } from "vue-i18n";
-  import { SelectTypeDialog, UpdateDialog } from "./index";
+  getKnowledgeBaseDetailByName,
+  getKnowledgeBaseJsonByName,
+  getKnowledgeBaseList,
+  requestKnowledgeBaseDelete,
+  requestKnowledgeBaseUpdate,
+} from "@/api/knowledgeBase";
+import eventBus from "@/utils/mitt";
+import {
+  CheckCircleFilled,
+  CheckOutlined,
+  CloseCircleFilled,
+  DeleteFilled,
+  EditFilled,
+  EyeFilled,
+  PauseCircleFilled,
+  PlusOutlined,
+} from "@ant-design/icons-vue";
+import { Modal } from "ant-design-vue";
+import { computed, createVNode, onMounted, reactive, ref } from "vue";
+import { useI18n } from "vue-i18n";
+import {
+  CreateDialog,
+  DetailDrawer,
+  EditDialog,
+  SelectTypeDialog,
+  UpdateExperienceDialog,
+} from "./index";
 
   const emit = defineEmits(["view"]);
   const { t } = useI18n();
@@ -200,10 +236,21 @@
     flag: "knowledge",
     data: {},
   });
+  const createDialog = reactive<DialogType>({
+    visible: false,
+  });
+  const editDialog = reactive<DialogType>({
+    visible: false,
+    id: "",
+    data: {},
+  });
   const selectTypeDialog = reactive<DialogType>({
     visible: false,
   });
-
+  const detailDrawer = reactive<DialogType>({
+    visible: false,
+    data: {},
+  });
   const kbList = ref<EmptyArrayType>([]);
   const isCreated = computed(() => kbList.value.some(item => item.comp_type === "experience"));
 
@@ -217,19 +264,36 @@
   };
   //create
   const handleCreate = (flag = "create") => {
-    updateDialog.type = "create";
-    updateDialog.flag = flag;
-    updateDialog.data = {};
-    updateDialog.visible = true;
+    if (flag === "knowledge") {
+      createDialog.visible = true;
+    } else {
+      updateDialog.type = "create";
+      updateDialog.flag = flag;
+      updateDialog.data = {};
+      updateDialog.visible = true;
+    }
   };
   //edit
   const handleUpdate = async (row: EmptyObjectType) => {
-    const data: any = await getKnowledgeBaseDetailByName(row.name);
+    if (row.comp_type === "knowledge") {
+      const data: any = await getKnowledgeBaseJsonByName(row.name);
+      editDialog.id = row.idx;
+      editDialog.data = JSON.parse(data);
+      editDialog.visible = true;
+    } else {
+      const data: any = await getKnowledgeBaseDetailByName(row.name);
+      updateDialog.data = data;
+      updateDialog.type = "edit";
+      updateDialog.flag = row.comp_type;
+      updateDialog.visible = true;
+    }
+  };
+  //configuration
+  const handleViewConfiguration = async (row: EmptyObjectType) => {
+    const data: any = await getKnowledgeBaseJsonByName(row.name);
 
-    updateDialog.data = data;
-    updateDialog.type = "edit";
-    updateDialog.flag = row.comp_type;
-    updateDialog.visible = true;
+    detailDrawer.data = JSON.parse(data);
+    detailDrawer.visible = true;
   };
   //detail
   const handleView = async (row: EmptyObjectType) => {

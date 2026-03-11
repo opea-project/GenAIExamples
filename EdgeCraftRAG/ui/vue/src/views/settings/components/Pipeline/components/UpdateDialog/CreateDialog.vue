@@ -33,7 +33,7 @@
           type="primary"
           ghost
           @click="handleLast"
-          v-if="currentStep > 1 && currentStep <= 7"
+          v-if="currentStep > 1 && currentStep <= 5"
           >{{ $t("common.prev") }}</a-button
         >
         <span v-else></span>
@@ -45,7 +45,7 @@
             type="primary"
             :disabled="!isProceed"
             @click="handleNext"
-            v-if="currentStep >= 1 && currentStep < 7"
+            v-if="currentStep >= 1 && currentStep < 5"
             >{{ $t("common.next") }}</a-button
           >
           <a-button
@@ -53,7 +53,7 @@
             type="primary"
             :loading="submitLoading"
             @click="handleSubmit"
-            v-else-if="currentStep === 7"
+            v-else-if="currentStep === 5"
             >{{ $t("common.submit") }}</a-button
           >
         </div>
@@ -67,15 +67,7 @@
   import { ExclamationCircleOutlined } from "@ant-design/icons-vue";
   import { computed, markRaw, ref } from "vue";
   import { useI18n } from "vue-i18n";
-  import {
-    Activated,
-    Basic,
-    Generator,
-    Indexer,
-    NodeParser,
-    PostProcessor,
-    Retriever,
-  } from "./index";
+  import { Activated, Basic, Generator, PostProcessor, Retriever } from "./index";
 
   const { t } = useI18n();
   const emit = defineEmits(["search", "close"]);
@@ -93,38 +85,26 @@
       component: markRaw(Basic),
     },
     {
-      label: t("pipeline.config.nodeParser"),
-      index: 2,
-      icon: "icon-node-parser",
-      component: markRaw(NodeParser),
-    },
-    {
-      label: t("pipeline.config.indexer"),
-      index: 3,
-      icon: "icon-indexer",
-      component: markRaw(Indexer),
-    },
-    {
       label: t("pipeline.config.retriever"),
-      index: 4,
+      index: 2,
       icon: "icon-retriever",
       component: markRaw(Retriever),
     },
     {
       label: t("pipeline.config.postProcessor"),
-      index: 5,
+      index: 3,
       icon: "icon-post-processor",
       component: markRaw(PostProcessor),
     },
     {
       label: t("pipeline.config.generator"),
-      index: 6,
+      index: 4,
       icon: "icon-generator",
       component: markRaw(Generator),
     },
     {
       label: t("pipeline.isActive"),
-      index: 7,
+      index: 5,
       icon: "icon-active",
       component: markRaw(Activated),
     },
@@ -147,13 +127,13 @@
   //next，update form
   const handleNext = async () => {
     if (pipelineRef.value) {
-      const { result = false, data = {}, dest = null } = await pipelineRef.value?.validate();
+      const { result = false, data = {} } = await pipelineRef.value?.validate();
 
       if (result) {
         Object.assign(formData, data);
 
-        if (currentStep.value < 7) {
-          currentStep.value = dest ? dest : currentStep.value + 1;
+        if (currentStep.value < 5) {
+          currentStep.value = currentStep.value + 1;
         }
       } else {
         console.log(t("pipeline.validErr"));

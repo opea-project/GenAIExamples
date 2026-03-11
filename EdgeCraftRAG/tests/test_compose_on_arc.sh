@@ -67,13 +67,8 @@ function validate_rag() {
         "edgecraftrag-server" \
         '@configs/test_pipeline_local_llm.json'
 
-    # add data
-    validate_services \
-        "${HOST_IP}:${EC_RAG_SERVICE_PORT}/v1/data" \
-        "Done" \
-        "data" \
-        "edgecraftrag-server" \
-        '@configs/test_data.json'
+    # add data to knowledge base
+    validate_knowledge
 
     # query
     validate_services \

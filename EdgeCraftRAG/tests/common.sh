@@ -2,6 +2,10 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+ip_address=$(hostname -I | awk '{print $1}')
+HOST_IP=$ip_address
+EC_RAG_SERVICE_PORT=16010
+
 function validate_services() {
     local URL="$1"
     local EXPECTED_RESULT="$2"
@@ -43,4 +47,21 @@ function check_gpu_usage() {
         echo "GPU Memory Used is less than 1G. Please check."
         exit 1
     fi
+}
+
+function validate_knowledge() {
+    # add data to knowledge base
+    validate_services \
+        "${HOST_IP}:${EC_RAG_SERVICE_PORT}/v1/knowledge" \
+        "Done" \
+        "data" \
+        "edgecraftrag-server" \
+        '@configs/test_kb.json'
+
+    validate_services \
+        "${HOST_IP}:${EC_RAG_SERVICE_PORT}/v1/knowledge/default_kb/files" \
+        "Done" \
+        "data" \
+        "edgecraftrag-server" \
+        '{"local_path":"/home/user/ui_cache"}'
 }

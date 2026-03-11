@@ -5,6 +5,7 @@ import asyncio
 import os
 from typing import Any, Callable, List, Optional
 
+from pathlib import Path
 from edgecraftrag.base import BaseMgr
 from edgecraftrag.components.data import File
 from llama_index.core.schema import Document
@@ -61,11 +62,13 @@ class FilelMgr(BaseMgr):
             all_docs.extend(file.documents)
         return all_docs
 
-    def get_docs_by_file(self, name) -> List[Document]:
+    def get_docs_by_file(self, file_path) -> List[Document]:
+        name = Path(file_path).name
         file = self.get_file_by_name_or_id(name)
         return file.documents if file else []
 
-    def del_file(self, name):
+    def del_file(self, file_path):
+        name = Path(file_path).name
         file = self.get_file_by_name_or_id(name)
         if file:
             self.remove(file.idx)
@@ -73,7 +76,8 @@ class FilelMgr(BaseMgr):
         else:
             return False
 
-    def update_file(self, name):
+    def update_file(self, file_path):
+        name = Path(file_path).name
         file = self.get_file_by_name_or_id(name)
         if file:
             self.remove(file.idx)

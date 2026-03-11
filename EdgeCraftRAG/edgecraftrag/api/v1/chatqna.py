@@ -4,7 +4,6 @@
 import asyncio
 import json
 from concurrent.futures import ThreadPoolExecutor
-from typing import List
 
 import requests
 from comps.cores.proto.api_protocol import ChatCompletionRequest
@@ -23,9 +22,9 @@ thread_pool = ThreadPoolExecutor(max_workers=16)
 @chatqna_app.post(path="/v1/retrieval")
 async def retrieval(request: ChatCompletionRequest):
     try:
-        active_kb = ctx.knowledgemgr.get_active_knowledge_base()
-        if active_kb:
-            request.user = active_kb
+        active_kbs = ctx.knowledgemgr.get_active_knowledge_base()
+        if active_kbs:
+            request.user = active_kbs
         else:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -48,8 +47,8 @@ async def chatqna(request: ChatCompletionRequest):
         sessionid = request.user
         ctx.get_session_mgr().set_current_session(sessionid)
         experience_kb = ctx.knowledgemgr.get_active_experience()
-        active_kb = ctx.knowledgemgr.get_active_knowledge_base()
-        request.user = active_kb if active_kb else None
+        active_kbs = ctx.knowledgemgr.get_active_knowledge_base()
+        request.user = active_kbs if active_kbs else None
         if experience_kb:
             request.tool_choice = "auto" if experience_kb.experience_active else "none"
 
@@ -70,10 +69,10 @@ async def chatqna(request: ChatCompletionRequest):
             request.model = generator.model_id
 
         if request.stream:
-            run_pipeline_gen, contexts = await ctx.get_pipeline_mgr().run_pipeline(chat_request=request)
+            run_pipeline_gen, _ = await ctx.get_pipeline_mgr().run_pipeline(chat_request=request)
             return StreamingResponse(save_session(sessionid, run_pipeline_gen), media_type="text/plain")
         else:
-            ret, contexts = await ctx.get_pipeline_mgr().run_pipeline(chat_request=request)
+            ret, _ = await ctx.get_pipeline_mgr().run_pipeline(chat_request=request)
             ctx.get_session_mgr().save_current_message(sessionid, "assistant", str(ret))
             return str(ret)
 
