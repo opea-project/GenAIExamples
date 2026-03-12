@@ -180,7 +180,7 @@ services:
     shm_size: 2g
     environment:
       MODEL_ID: ${LLM_MODEL_ID:-Intel/neural-chat-7b-v3-3}
-      HF_TOKEN: ${HUGGINGFACEHUB_API_TOKEN}
+      HF_TOKEN: ${HF_TOKEN}
       MAX_INPUT_LENGTH: 2048
       MAX_TOTAL_TOKENS: 4096
       PORT: 80
