@@ -11,10 +11,10 @@ HOST_IP=$ip_address
 
 # global defaults to avoid docker compose warnings on unset variables
 export HOST_IP=${HOST_IP:-"${ip_address}"}
-export MODEL_PATH=${MODEL_PATH:-"${WORKPATH}/models"}
+export MODEL_PATH=${MODEL_PATH:-"${WORKPATH}/workspace/models"}
 export LLM_MODEL=${LLM_MODEL:-"Qwen/Qwen3-8B"}
-export DOC_PATH=${DOC_PATH:-"${WORKPATH}/tests"}
-export TMPFILE_PATH=${TMPFILE_PATH:-"${WORKPATH}/tests"}
+export DOC_PATH=${DOC_PATH:-"${WORKPATH}/workspace"}
+export TMPFILE_PATH=${TMPFILE_PATH:-"${WORKPATH}/workspace"}
 export MILVUS_ENABLED=${MILVUS_ENABLED:-"0"}
 export CHAT_HISTORY_ROUND=${CHAT_HISTORY_ROUND:-"0"}
 
@@ -82,12 +82,12 @@ function start_vllm_services() {
 
     ip_address=$(hostname -I | awk '{print $1}')
     HOST_IP=$(get_user_input "host ip" "${ip_address}")
-    DOC_PATH=$(get_user_input "DOC_PATH" "$WORKPATH/tests")
-    TMPFILE_PATH=$(get_user_input "TMPFILE_PATH" "$WORKPATH/tests")
+    DOC_PATH=$(get_user_input "DOC_PATH" "$WORKPATH/workspace")
+    TMPFILE_PATH=$(get_user_input "TMPFILE_PATH" "$WORKPATH/workspace")
     MILVUS_ENABLED=$(get_enable_function "MILVUS DB(Enter 1 for enable)" "0")
     CHAT_HISTORY_ROUND=$(get_user_input "chat history round" "0")
     LLM_MODEL=$(get_user_input "your LLM model" "Qwen/Qwen3-8B")
-    MODEL_PATH=$(get_user_input "your model path" "${WORKPATH}/models")
+    MODEL_PATH=$(get_user_input "your model path" "${WORKPATH}/workspace/models")
     read -p "Have you prepare models in ${MODEL_PATH}:(yes/no) [yes]" user_input
     user_input=${user_input:-"yes"}
 
@@ -161,12 +161,12 @@ function start_services() {
 
     ip_address=$(hostname -I | awk '{print $1}')
     HOST_IP=$(get_user_input "host ip" "${ip_address}")
-    DOC_PATH=$(get_user_input "DOC_PATH" "$WORKPATH/tests")
-    TMPFILE_PATH=$(get_user_input "TMPFILE_PATH" "$WORKPATH/tests")
+    DOC_PATH=$(get_user_input "DOC_PATH" "$WORKPATH/workspace")
+    TMPFILE_PATH=$(get_user_input "TMPFILE_PATH" "$WORKPATH/workspace")
     MILVUS_ENABLED=$(get_enable_function "MILVUS DB(Enter 1 for enable)" "0")
     CHAT_HISTORY_ROUND=$(get_user_input "chat history round" "0")
     LLM_MODEL=$(get_user_input "your LLM model" "Qwen/Qwen3-8B")
-    MODEL_PATH=$(get_user_input "your model path" "${WORKPATH}/models")
+    MODEL_PATH=$(get_user_input "your model path" "${WORKPATH}/workspace/models")
     read -p "Have you prepare models in ${MODEL_PATH}:(yes/no) [yes]" user_input
     user_input=${user_input:-"yes"}
 
@@ -319,9 +319,9 @@ function quick_start_vllm_services() {
 
     ip_address=$(hostname -I | awk '{print $1}')
     export HOST_IP=${HOST_IP:-"${ip_address}"}
-    export MODEL_PATH=${MODEL_PATH:-"${WORKPATH}/models"}
-    export DOC_PATH=${DOC_PATH:-"$WORKPATH/tests"}
-    export TMPFILE_PATH=${TMPFILE_PATH:-"$WORKPATH/tests"}
+    export MODEL_PATH=${MODEL_PATH:-"${WORKPATH}/workspace/models"}
+    export DOC_PATH=${DOC_PATH:-"$WORKPATH/workspace"}
+    export TMPFILE_PATH=${TMPFILE_PATH:-"$WORKPATH/workspace"}
     export DP_NUM=${DP_NUM:-1}
     export MILVUS_ENABLED=${MILVUS_ENABLED:-1}
     export CHAT_HISTORY_ROUND=${CHAT_HISTORY_ROUND:-2}
@@ -372,12 +372,12 @@ function quick_start_ov_services() {
 
     ip_address=$(hostname -I | awk '{print $1}')
     export HOST_IP=${HOST_IP:-"${ip_address}"}
-    export DOC_PATH=${DOC_PATH:-"$WORKPATH/tests"}
-    export TMPFILE_PATH=${TMPFILE_PATH:-"$WORKPATH/tests"}
+    export DOC_PATH=${DOC_PATH:-"$WORKPATH/workspace"}
+    export TMPFILE_PATH=${TMPFILE_PATH:-"$WORKPATH/workspace"}
     export MILVUS_ENABLED=${MILVUS_ENABLED:-1}
     export CHAT_HISTORY_ROUND=${CHAT_HISTORY_ROUND:-"0"}
     export LLM_MODEL=${LLM_MODEL:-"Qwen/Qwen3-8B"}
-    export MODEL_PATH=${MODEL_PATH:-"${WORKPATH}/models"}
+    export MODEL_PATH=${MODEL_PATH:-"${WORKPATH}/workspace/models"}
     export VIDEOGROUPID=$(getent group video | cut -d: -f3)
     export RENDERGROUPID=$(getent group render | cut -d: -f3)
     export MAX_MODEL_LEN=5000
@@ -409,12 +409,12 @@ function start_vLLM_B60_services() {
 
     ip_address=$(hostname -I | awk '{print $1}')
     HOST_IP=$(get_user_input "host ip" "${ip_address}")
-    DOC_PATH=$(get_user_input "DOC_PATH" "$WORKPATH/tests")
-    TMPFILE_PATH=$(get_user_input "TMPFILE_PATH" "$WORKPATH/tests")
+    DOC_PATH=$(get_user_input "DOC_PATH" "$WORKPATH/workspace")
+    TMPFILE_PATH=$(get_user_input "TMPFILE_PATH" "$WORKPATH/workspace")
     MILVUS_ENABLED=$(get_enable_function "MILVUS DB(Enter 1 for enable)" "0")
     CHAT_HISTORY_ROUND=$(get_user_input "chat history round" "0")
     LLM_MODEL=$(get_user_input "your LLM model" "Qwen/Qwen3-8B")
-    MODEL_PATH=$(get_user_input "your model path" "${WORKPATH}/models")
+    MODEL_PATH=$(get_user_input "your model path" "${WORKPATH}/workspace/models")
     read -p "Have you prepare models in ${MODEL_PATH}:(yes/no) [yes]" user_input
     user_input=${user_input:-"yes"}
 
@@ -505,9 +505,9 @@ function quick_start_vllm_B60_services() {
 
     ip_address=$(hostname -I | awk '{print $1}')
     export HOST_IP=${HOST_IP:-"${ip_address}"}
-    export MODEL_PATH=${MODEL_PATH:-"${WORKPATH}/models"}
-    export DOC_PATH=${DOC_PATH:-"$WORKPATH/tests"}
-    export TMPFILE_PATH=${TMPFILE_PATH:-"$WORKPATH/tests"}
+    export MODEL_PATH=${MODEL_PATH:-"${WORKPATH}/workspace/models"}
+    export DOC_PATH=${DOC_PATH:-"$WORKPATH/workspace"}
+    export TMPFILE_PATH=${TMPFILE_PATH:-"$WORKPATH/workspace"}
     export MILVUS_ENABLED=${MILVUS_ENABLED:-1}
     export CHAT_HISTORY_ROUND=${CHAT_HISTORY_ROUND:-2}
     export LLM_MODEL=${LLM_MODEL:-Qwen/Qwen3-8B}

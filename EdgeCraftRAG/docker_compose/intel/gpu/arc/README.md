@@ -60,6 +60,8 @@ Run quick start script from the `EdgeCraftRAG` root directory:
 ./tools/quick_start.sh
 ```
 
+The script is located in the `tools` directory. For detailed usage of `quick_start.sh` and `build_images.sh`, please refer to [tools/README.md](../../../../tools/README.md).
+
 By default, this script starts local OpenVINO deployment when no environment variables are configured.
 
 If you prefer manual model preparation, env setup, and docker compose options, please refer to [Manual deployment details in Advanced Setup](../../../../docs/Advanced_Setup.md#manual-deployment-details-for-arc-platform).

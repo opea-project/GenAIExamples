@@ -60,6 +60,8 @@ cd GenAIExamples/EdgeCraftRAG
 ./tools/quick_start.sh
 ```
 
+该脚本位于 `tools` 目录。有关 `quick_start.sh` 和 `build_images.sh` 的详细用法，请参考 [tools/README_zh.md](../../../../tools/README_zh.md)。
+
 在不配置任何环境变量时，脚本默认启动本地 OpenVINO 部署。
 
 如果你希望使用手动方式（模型准备、环境变量配置、Docker Compose 启动），请参考 [Advanced Setup 中的手动部署说明](../../../../docs/Advanced_Setup_zh.md#arc-平台手动部署详细说明)。
