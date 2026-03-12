@@ -1,5 +1,7 @@
 # EC-RAG Experience Guide
 
+[中文版](Experience_Guide_zh.md)
+
 This guide explains how to enable, configure, and use Experience capabilities within EdgeCraftRAG (EC-RAG). It covers the creation and management of experience to enhance the answer quality
 
 ## Overview

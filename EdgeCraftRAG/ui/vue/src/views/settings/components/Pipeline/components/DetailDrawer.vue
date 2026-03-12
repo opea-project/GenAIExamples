@@ -19,84 +19,6 @@
         }}</span>
       </p>
     </div>
-    <!-- Node Parser -->
-    <div class="module-wrap">
-      <a-collapse v-model:activeKey="nodeParserActive" expandIconPosition="end">
-        <a-collapse-panel key="nodeParser" :header="$t('pipeline.config.nodeParser')">
-          <ul class="form-wrap">
-            <li class="item-wrap">
-              <span class="label-wrap">{{ $t("pipeline.config.nodeParser") }}</span>
-              <span class="content-wrap">{{ formData.node_parser.parser_type }}</span>
-            </li>
-            <template v-if="!isHierarchical && !isSentencewindow">
-              <li class="item-wrap">
-                <span class="label-wrap"> {{ $t("pipeline.config.chunkSize") }}</span>
-                <span class="content-wrap">{{ formData.node_parser.chunk_size }}</span>
-              </li>
-              <li class="item-wrap">
-                <span class="label-wrap">{{ $t("pipeline.config.chunkOverlap") }}</span>
-                <span class="content-wrap">{{ formData.node_parser.chunk_overlap }}</span>
-              </li></template
-            >
-            <template v-if="isSentencewindow">
-              <li class="item-wrap">
-                <span class="label-wrap">{{ $t("pipeline.config.windowSize") }}</span>
-                <span class="content-wrap">{{ formData.node_parser.window_size }}</span>
-              </li></template
-            >
-          </ul>
-        </a-collapse-panel>
-      </a-collapse>
-    </div>
-    <!-- Indexer -->
-    <div class="module-wrap">
-      <a-collapse v-model:activeKey="indexerActive" expandIconPosition="end">
-        <a-collapse-panel key="indexer" :header="$t('pipeline.config.indexer')">
-          <ul class="form-wrap">
-            <li class="item-wrap">
-              <span class="label-wrap">{{ $t("pipeline.config.indexerType") }}</span>
-              <span class="content-wrap">{{ formData.indexer.indexer_type }}</span>
-            </li>
-            <li class="item-wrap" v-if="formData.indexer.indexer_type !== 'kbadmin_indexer'">
-              <span class="label-wrap">{{ $t("pipeline.config.llm") }}</span>
-              <span class="content-wrap">{{ formData.indexer.inference_type }}</span>
-            </li>
-            <li
-              class="item-wrap"
-              v-if="
-                formData.indexer.indexer_type === 'kbadmin_indexer' ||
-                formData.indexer.inference_type === 'vllm'
-              "
-            >
-              <span class="label-wrap">{{ $t("pipeline.config.embeddingUrl") }}</span>
-              <span
-                class="content-wrap"
-                v-if="formData.indexer.indexer_type === 'kbadmin_indexer'"
-                >{{ formData.indexer?.embedding_url }}</span
-              >
-              <span class="content-wrap" v-if="formData.indexer.inference_type === 'vllm'">{{
-                formData.indexer.embedding_model.api_base
-              }}</span>
-            </li>
-            <li class="item-wrap">
-              <span class="label-wrap">{{ $t("pipeline.config.embedding") }}</span>
-              <span class="content-wrap">{{ formData.indexer.embedding_model.model_id }}</span>
-            </li>
-            <li class="item-wrap" v-if="formData.indexer.inference_type === 'local'">
-              <span class="label-wrap">{{ $t("pipeline.config.embeddingDevice") }}</span>
-              <span class="content-wrap">{{ formData.indexer.embedding_model.device }}</span>
-            </li>
-            <li
-              class="item-wrap"
-              v-if="['kbadmin_indexer', 'milvus_vector'].includes(formData.indexer.indexer_type)"
-            >
-              <span class="label-wrap">{{ $t("pipeline.config.vector_url") }}</span>
-              <span class="content-wrap">{{ formData.indexer?.vector_url }}</span>
-            </li>
-          </ul>
-        </a-collapse-panel>
-      </a-collapse>
-    </div>
     <!-- Retriever -->
     <div class="module-wrap">
       <a-collapse v-model:activeKey="retrieverActive" expandIconPosition="end">
@@ -189,7 +111,7 @@
   </a-drawer>
 </template>
 <script lang="ts" setup name="DetailDrawer">
-  import { computed, reactive, ref } from "vue";
+  import { reactive, ref } from "vue";
 
   const props = defineProps({
     drawerData: {
@@ -201,22 +123,9 @@
   const emit = defineEmits(["close"]);
   const formData = reactive<EmptyObjectType>(props.drawerData);
   const drawerVisible = ref<boolean>(true);
-  const nodeParserActive = ref<string>("nodeParser");
-  const indexerActive = ref<string>("indexer");
   const retrieverActive = ref<string>("retriever");
   const postProcessorActive = ref<string>("postProcessor");
   const generatorActive = ref<string>("generator");
-
-  const isHierarchical = computed(() => {
-    return (
-      formData.node_parser.parser_type === "hierarchical" ||
-      formData.node_parser.parser_type === "kbadmin_parser"
-    );
-  });
-  const isSentencewindow = computed(() => {
-    return formData.node_parser.parser_type === "sentencewindow";
-  });
-
   const handleClose = () => {
     emit("close");
   };

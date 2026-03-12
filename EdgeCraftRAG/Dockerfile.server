@@ -6,7 +6,7 @@ RUN apt-get remove -y libze-intel-gpu1 libigc1 libigdfcl1 libze-dev || true; \
     apt-get update; \
     apt-get install -y curl
 RUN curl -sL 'https://keyserver.ubuntu.com/pks/lookup?fingerprint=on&op=get&search=0x0C0E6AF955CE463C03FC51574D098D70AFBE5E1F' | tee /etc/apt/trusted.gpg.d/driver.asc
-RUN echo -e "Types: deb\nURIs: https://ppa.launchpadcontent.net/kobuk-team/intel-graphics/ubuntu/\nSuites: plucky\nComponents: main\nSigned-By: /etc/apt/trusted.gpg.d/driver.asc" > /etc/apt/sources.list.d/driver.sources
+RUN echo -e "Types: deb\nURIs: https://ppa.launchpadcontent.net/kobuk-team/intel-graphics/ubuntu/\nSuites: questing\nComponents: main\nSigned-By: /etc/apt/trusted.gpg.d/driver.asc" > /etc/apt/sources.list.d/driver.sources
 RUN apt-get update && apt-get install -y libze-intel-gpu1 libze1 intel-metrics-discovery intel-opencl-icd clinfo intel-gsc && apt-get install -y libze-intel-gpu1 libze1 intel-metrics-discovery intel-opencl-icd clinfo intel-gsc && apt-get install -y libze-dev intel-ocloc libze-intel-gpu-raytracing
 
 RUN useradd -m -s /bin/bash user && \
@@ -18,10 +18,12 @@ RUN mkdir /templates && \
 COPY ./edgecraftrag/prompt_template/default_prompt.txt /templates/
 RUN chown -R user /templates/default_prompt.txt
 
-COPY ./edgecraftrag /home/user/edgecraftrag
-
-RUN mkdir -p /home/user/ui_cache
+RUN mkdir -p /home/user/ui_cache /home/user/edgecraftrag
 ENV UI_UPLOAD_PATH=/home/user/ui_cache
+
+# Copy requirements first so pip install is cached independently from source changes
+COPY ./edgecraftrag/requirements.txt /home/user/edgecraftrag/requirements.txt
+RUN chown -R user /home/user/edgecraftrag
 
 USER user
 
@@ -36,5 +38,8 @@ RUN git clone https://github.com/openvinotoolkit/openvino.genai.git genai
 ENV PYTHONPATH="$PYTHONPATH:/home/user/genai/tools/llm_bench"
 
 RUN python3 -m nltk.downloader -d /home/user/nltk_data punkt_tab averaged_perceptron_tagger_eng
+
+# Copy the full source last — changes here no longer bust the pip cache layers above
+COPY ./edgecraftrag /home/user/edgecraftrag
 
 ENTRYPOINT ["python3", "-m", "edgecraftrag.server"]

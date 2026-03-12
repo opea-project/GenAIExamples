@@ -17,6 +17,20 @@ export const getKnowledgeBaseDetailByName = (kbName: String) => {
   });
 };
 
+export const getKnowledgeBaseFilesByName = (kbName: String, params: Object) => {
+  return request({
+    url: `/v1/knowledge/${kbName}/filemap`,
+    method: "get",
+    params,
+  });
+};
+
+export const getKnowledgeBaseJsonByName = (kbName: String) => {
+  return request({
+    url: `/v1/knowledge/${kbName}/json`,
+    method: "get",
+  });
+};
 export const requestKnowledgeBaseCreate = (data: Object) => {
   return request({
     url: "/v1/knowledge",
@@ -136,10 +150,12 @@ export const requestExperienceRelation = (data: Object) => {
   });
 };
 
-export const getkbadminList = () => {
+export const getkbadminList = (params: Object) => {
   return request({
     url: "/v1/kbadmin/kbs_list",
     method: "get",
+    params,
+    showLoading: true,
   });
 };
 

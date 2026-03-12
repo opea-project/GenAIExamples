@@ -393,6 +393,8 @@ class FreeChatGenerator(BaseComponent):
                 self.model_path = llm_instance.model_path
 
         self.llm = llm_model
+        if self.inference_type == InferenceType.LOCAL:
+            self.lock = asyncio.Lock()
         if self.inference_type == InferenceType.VLLM:
             self.vllm_name = llm_model().model_id
             if vllm_endpoint == "":
@@ -400,8 +402,41 @@ class FreeChatGenerator(BaseComponent):
         self.vllm_endpoint = vllm_endpoint
 
     async def run(self, chat_request, retrieved_nodes, node_parser_type, **kwargs):
-        response = await self.run_vllm(chat_request, retrieved_nodes, node_parser_type, **kwargs)
+        if self.inference_type == InferenceType.LOCAL:
+            response = await self.run_local(chat_request, retrieved_nodes, node_parser_type, **kwargs)
+        elif self.inference_type == InferenceType.VLLM:
+            response = await self.run_vllm(chat_request, retrieved_nodes, node_parser_type, **kwargs)
+        else:
+            raise ValueError("LLM inference_type not supported")
         return response
+
+    async def run_local(self, chat_request, retrieved_nodes, node_parser_type, **kwargs):
+        if self.llm() is None:
+            # This could happen when User delete all LLMs through RESTful API
+            raise ValueError("No LLM available, please load LLM")
+        generate_kwargs = dict(
+            temperature=chat_request.temperature,
+            do_sample=chat_request.temperature > 0.0,
+            top_p=chat_request.top_p,
+            top_k=chat_request.top_k,
+            typical_p=chat_request.typical_p,
+            repetition_penalty=chat_request.repetition_penalty,
+        )
+        self.llm().generate_kwargs = generate_kwargs
+        self.llm().max_new_tokens = chat_request.max_tokens
+        prompt_str = chatcompletion_to_chatml(chat_request)
+        if chat_request.stream:
+
+            # Asynchronous generator
+            async def generator():
+                async for chunk in local_stream_generator(self.lock, self.llm(), prompt_str, ""):
+                    yield chunk or ""
+                    await asyncio.sleep(0)
+
+            return generator()
+        else:
+            result = self.llm().complete(prompt_str)
+            return result
 
     async def run_vllm(self, chat_request, retrieved_nodes, node_parser_type, **kwargs):
         llm = OpenAILike(

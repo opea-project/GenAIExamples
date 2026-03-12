@@ -292,7 +292,6 @@ async def save_pipeline_configurations(operation: str = None, pipeline=None):
                 if chatqna_gen:
                     if GeneratorType.CHATQNA in gens_data:
                         gens_data[GeneratorType.CHATQNA]["prompt_content"] = chatqna_gen.prompt_content
-            target_data["documents_cache"] = pipeline.documents_cache
             target_data["active"] = pipeline.status.active
 
         if pipeline_milvus_repo:
@@ -340,17 +339,14 @@ async def save_knowledge_configurations(operation: str = None, kb=None):
     try:
         if not kb:
             return {"message": "Missing knowledgebase data"}
-        target_kb = {
-            "idx": kb.idx,
-            "name": kb.name,
-            "description": kb.description,
-            "active": kb.active,
-            "file_paths": kb.file_paths,
-            "comp_type": kb.comp_type,
-            "comp_subtype": kb.comp_subtype,
-            "experience_active": kb.experience_active,
-            "all_document_maps": kb.all_document_maps,
-        }
+        json_str = kb.get_knowledge_json
+        # Node parers and indexer is loaded from json file
+        target_kb = json.loads(json_str)
+        target_kb["idx"] = kb.idx
+        target_kb["description"] = kb.description
+        target_kb["experience_active"] = kb.experience_active
+        target_kb["all_document_maps"] = kb.all_document_maps
+        target_kb["file_paths"] = kb.file_paths
         target_idx = target_kb.get("idx")
         if not target_idx:
             return {"message": "Missing 'idx' in knowledgebase data"}

@@ -109,24 +109,24 @@
 
 <script lang="ts" setup name="Table">
   import {
-    getPipelineDetailById,
-    requestPipelineDelete,
-    requestPipelineSwitchState,
-  } from "@/api/pipeline";
-  import TableColumns from "@/components/TableColumns.vue";
-  import router from "@/router";
-  import { antTheme } from "@/utils/antTheme";
-  import { downloadJson } from "@/utils/common";
-  import {
-    CloseCircleFilled,
-    CloudUploadOutlined,
-    CommentOutlined,
-    PlusOutlined,
-  } from "@ant-design/icons-vue";
-  import { Modal } from "ant-design-vue";
-  import { createVNode, h, ref } from "vue";
-  import { useI18n } from "vue-i18n";
-  import getTableColumns from "../columnsList";
+  getPipelineDetailById,
+  requestPipelineDelete,
+  requestPipelineSwitchState,
+} from "@/api/pipeline";
+import TableColumns from "@/components/TableColumns.vue";
+import router from "@/router";
+import { antTheme } from "@/utils/antTheme";
+import { downloadJson } from "@/utils/common";
+import {
+  CloseCircleFilled,
+  CloudUploadOutlined,
+  CommentOutlined,
+  PlusOutlined,
+} from "@ant-design/icons-vue";
+import { Modal } from "ant-design-vue";
+import { createVNode, h, ref } from "vue";
+import { useI18n } from "vue-i18n";
+import getTableColumns from "../columnsList";
 
   const { t } = useI18n();
 

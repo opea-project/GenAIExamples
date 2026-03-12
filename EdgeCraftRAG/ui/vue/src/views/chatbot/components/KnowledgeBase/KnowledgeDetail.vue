@@ -115,32 +115,37 @@
         :description="$t('knowledge.notFileTip')"
       />
       <div class="files-container" v-if="!notFile">
-        <a-row type="flex" wrap :gutter="[20, 10]">
-          <a-col
-            :span="8"
-            v-for="[key, value] in Object.entries(knowledgeData.file_map)"
-            :key="key"
-          >
-            <div class="file-item">
-              <div class="left-wrap">
-                <FileDoneOutlined
-                  :style="{
-                    color: 'var(--color-success)',
-                    fontSize: '20px',
-                  }"
-                />
-                <a-tooltip placement="topLeft" :title="key">
-                  <div class="file-name">{{ key }}</div>
-                </a-tooltip>
-              </div>
-              <div class="right-wrap">
-                <a-tooltip placement="top" :title="$t('common.delete')">
-                  <DeleteFilled class="delete-icon" @click="handleFileDelete(value as string)" />
-                </a-tooltip>
-              </div>
+        <div class="files-list">
+          <div v-for="file in knowledgeData" :key="file.name" class="file-item">
+            <div class="left-wrap">
+              <FileDoneOutlined
+                :style="{
+                  color: 'var(--color-success)',
+                  fontSize: '20px',
+                }"
+              />
+              <a-tooltip placement="topLeft" :title="file.name">
+                <div class="file-name">{{ file.name }}</div>
+              </a-tooltip>
             </div>
-          </a-col>
-        </a-row>
+            <div class="right-wrap">
+              <a-tooltip placement="top" :title="$t('common.delete')">
+                <DeleteFilled class="delete-icon" @click="handleFileDelete(file.path as string)" />
+              </a-tooltip>
+            </div>
+          </div>
+        </div>
+        <div class="pagination-wrap" v-if="paginationData.total > 20">
+          <a-pagination
+            v-model:current="paginationData.pageNum"
+            v-model:pageSize="paginationData.pageSize"
+            :total="paginationData.total"
+            :show-total="total => `${$t('common.total')}: ${total}`"
+            showSizeChanger
+            @change="handlePageChange"
+            @showSizeChange="handleSizeChange"
+          />
+        </div>
       </div>
     </template>
   </div>
@@ -148,7 +153,7 @@
 
 <script setup lang="ts" name="KnowledgeBaseDetail">
   import {
-    getKnowledgeBaseDetailByName,
+    getKnowledgeBaseFilesByName,
     requestFileDelete,
     requestKnowledgeBaseRelation,
     requestUploadFileUrl,
@@ -189,7 +194,7 @@
 
   const kbInfo = inject<KbType>("kbInfo");
   const uploadFileList = ref<UploadFile[]>([]);
-  const knowledgeData = reactive<EmptyObjectType>({});
+  const knowledgeData = ref<EmptyArrayType>([]);
   const pendingFiles = ref<any[]>([]);
   const failedFiles = ref<FailedFile[]>([]);
   const isUploading = ref<boolean>(false);
@@ -201,15 +206,29 @@
   const startUpload = ref<boolean>(false);
   const loading = ref<boolean>(false);
 
-  const notFile = computed(() => {
-    const { file_map = {} } = knowledgeData;
-    return Object.keys(file_map).length === 0;
+  const paginationData = reactive<PaginationType>({
+    total: 0,
+    pageNum: 1,
+    pageSize: 20,
   });
 
-  const queryKnowledgeBaseDetail = async () => {
-    getKnowledgeBaseDetailByName(kbInfo?.name!)
+  const notFile = computed(() => {
+    return knowledgeData.value.length === 0;
+  });
+
+  const queryKnowledgeBaseFiles = async () => {
+    const params = {
+      page_num: paginationData.pageNum,
+      page_size: paginationData.pageSize,
+    };
+    getKnowledgeBaseFilesByName(kbInfo?.name!, params)
       .then((data: any) => {
-        Object.assign(knowledgeData, data);
+        const fileMap = data?.file_map || {};
+        knowledgeData.value = Object.entries(fileMap).map(([name, path]) => ({
+          name,
+          path,
+        }));
+        paginationData.total = data?.total;
       })
       .catch((error: any) => {
         console.error(error);
@@ -331,13 +350,12 @@
           const { file, onSuccess, onError } = options;
           const uploadFile = file as UploadFile;
           const fileName = file.name;
-          const { name } = knowledgeData;
           let res: any = null;
 
           try {
-            res = await requestUploadFileUrl(name, { file });
+            res = await requestUploadFileUrl(kbInfo?.name!, { file });
 
-            await requestKnowledgeBaseRelation(name, { local_path: res });
+            await requestKnowledgeBaseRelation(kbInfo?.name!, { local_path: res });
 
             onSuccess?.(res, uploadFile as any);
             handleSuccess(uploadFile);
@@ -353,7 +371,7 @@
           }
         })
       );
-      queryKnowledgeBaseDetail();
+      queryKnowledgeBaseFiles();
     }
     handleRefresh();
     isUploading.value = false;
@@ -381,11 +399,10 @@
     failedFile.retrying = true;
 
     try {
-      const { name } = knowledgeData;
-      await requestKnowledgeBaseRelation(name, { local_path: failedFile.path });
+      await requestKnowledgeBaseRelation(kbInfo?.name!, { local_path: failedFile.path });
 
       removeFailedFileByName(failedFile.name);
-      queryKnowledgeBaseDetail();
+      queryKnowledgeBaseFiles();
       handleRefresh();
     } catch (error: any) {
       failedFile.retrying = false;
@@ -401,14 +418,12 @@
     failedFile.retrying = true;
 
     try {
-      const { name } = knowledgeData;
+      await requestFileDelete(kbInfo?.name!, { local_path: failedFile.path });
 
-      await requestFileDelete(name, { local_path: failedFile.path });
-
-      await requestKnowledgeBaseRelation(name, { local_path: failedFile.path });
+      await requestKnowledgeBaseRelation(kbInfo?.name!, { local_path: failedFile.path });
 
       removeFailedFileByName(failedFile.name);
-      queryKnowledgeBaseDetail();
+      queryKnowledgeBaseFiles();
       handleRefresh();
     } catch (error: any) {
       failedFile.retrying = false;
@@ -439,11 +454,10 @@
     isRetrying.value = true;
 
     try {
-      const { name } = knowledgeData;
       await Promise.allSettled(
         failedFiles.value.map(async file => {
           try {
-            await requestKnowledgeBaseRelation(name, { local_path: file.path });
+            await requestKnowledgeBaseRelation(kbInfo?.name!, { local_path: file.path });
             removeFailedFileByName(file.name);
             return { name: file.name, success: true };
           } catch (error: any) {
@@ -454,7 +468,7 @@
         })
       );
 
-      queryKnowledgeBaseDetail();
+      queryKnowledgeBaseFiles();
       handleRefresh();
     } catch (error) {
       console.error(error);
@@ -469,12 +483,10 @@
     isRetrying.value = true;
 
     try {
-      const { name } = knowledgeData;
-
       const deleteResults = await Promise.allSettled(
         failedFiles.value.map(async file => {
           try {
-            await requestFileDelete(name, { local_path: file.path });
+            await requestFileDelete(kbInfo?.name!, { local_path: file.path });
             return { name: file.name, success: true };
           } catch (error: any) {
             return { name: file.name, success: false, error };
@@ -491,7 +503,7 @@
         await Promise.allSettled(
           filesToRetry.map(async file => {
             try {
-              await requestKnowledgeBaseRelation(name, { local_path: file.path });
+              await requestKnowledgeBaseRelation(kbInfo?.name!, { local_path: file.path });
               removeFailedFileByName(file.name);
               return { name: file.name, success: true };
             } catch (error: any) {
@@ -503,7 +515,7 @@
         );
       }
 
-      queryKnowledgeBaseDetail();
+      queryKnowledgeBaseFiles();
       handleRefresh();
     } catch (error) {
       console.error(error);
@@ -523,7 +535,26 @@
     }
     return t("knowledge.retryFailed");
   };
+  const handlePageChange = async (page: number) => {
+    try {
+      paginationData.pageNum = page;
+      await queryKnowledgeBaseFiles();
+      setTimeout(() => {
+        const container = document.querySelector(".files-container");
+        if (container) {
+          container.scrollTop = 0;
+        }
+      }, 50);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
+  const handleSizeChange = (page: number, size: number) => {
+    paginationData.pageSize = size;
+    paginationData.pageNum = 1;
+    queryKnowledgeBaseFiles();
+  };
   const handleFileDelete = (local_path: string) => {
     Modal.confirm({
       title: t("common.delete"),
@@ -532,9 +563,8 @@
       okText: t("common.confirm"),
       okType: "danger",
       async onOk() {
-        const { name } = knowledgeData;
-        await requestFileDelete(name, { local_path });
-        queryKnowledgeBaseDetail();
+        await requestFileDelete(kbInfo?.name!, { local_path });
+        queryKnowledgeBaseFiles();
         handleRefresh();
       },
     });
@@ -546,13 +576,13 @@
 
   onMounted(() => {
     loading.value = true;
-    queryKnowledgeBaseDetail();
+    queryKnowledgeBaseFiles();
   });
 </script>
 
 <style lang="less" scoped>
   .detail-wrap {
-    height: 100%;
+    height: calc(100% - 60px);
     .flex-column;
   }
 
@@ -693,37 +723,58 @@
     flex: 1;
     width: 100%;
     padding: 18px;
-    .file-item {
-      padding: 12px;
-      background-color: var(--bg-content-color);
-      border: 1px solid var(--border-main-color);
-      border-radius: 6px;
-      .flex-between;
-      gap: 4px;
-      &:hover {
-        .card-shadow;
-      }
-      .left-wrap {
-        flex: 1;
-        min-width: 0;
-        .flex-left;
-        gap: 6px;
-        .file-name {
-          flex: 1;
-          color: var(--font-main-color);
-          .single-ellipsis;
-          direction: rtl;
-          text-align: left;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    min-height: 0;
+    .files-list {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px 20px;
+      .file-item {
+        padding: 12px;
+        background-color: var(--bg-content-color);
+        border: 1px solid var(--border-main-color);
+        border-radius: 6px;
+        .flex-between;
+        gap: 4px;
+        &:hover {
+          .card-shadow;
         }
-      }
-      .right-wrap {
-        .delete-icon {
-          color: var(--font-tip-color);
-          &:hover {
-            color: var(--color-error);
+        .left-wrap {
+          flex: 1;
+          min-width: 0;
+          .flex-left;
+          gap: 6px;
+          .file-name {
+            flex: 1;
+            color: var(--font-main-color);
+            .single-ellipsis;
+            direction: rtl;
+            text-align: left;
+          }
+        }
+        .right-wrap {
+          .delete-icon {
+            color: var(--font-tip-color);
+            &:hover {
+              color: var(--color-error);
+            }
           }
         }
       }
+    }
+    .pagination-wrap {
+      position: sticky;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 12px 0;
+      background: linear-gradient(to bottom, transparent, var(--bg-main-color) 20px);
+      margin-top: auto;
+      z-index: 10;
+      margin-bottom: 0;
+      .flex-end;
     }
   }
 

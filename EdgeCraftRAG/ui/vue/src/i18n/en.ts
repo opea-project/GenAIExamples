@@ -8,6 +8,7 @@ export default {
     edit: "Edit",
     add: "Add",
     delete: "Delete",
+    details: "Details",
     active: "Activate",
     deactivate: "Deactivate",
     cancel: "Cancel",
@@ -283,6 +284,7 @@ export default {
     notFileTip: "The knowledge base is empty. Go upload your files.",
     name: "Name",
     des: "Description",
+    detail: "Knowledge Base Details",
     activated: "Activated",
     nameValid1: "Please input knowledge base name",
     nameValid2: "Name should be between 2 and 30 characters",
@@ -299,7 +301,7 @@ export default {
       "Experience refers to the knowledge and skills acquired through practical involvement, trial, and reflection, serving as a key foundation for solving real-world problems.",
     kbDes:
       "A Knowledge Base is a centralized repository for storing organized information such as documents, FAQs, and guides, enabling teams or users to quickly access and share knowledge.",
-    type: "Type",
+    type: "Knowledge Base Type",
     original: "Original",
     kbadmin: "kbadmin",
     typeValid: "Please select knowledge base type",
@@ -311,6 +313,13 @@ export default {
     totalTip: "files",
     failedFile: "Failed Files",
     retryFailed: "Upload failed !",
+    general: "General",
+    class: "Type",
+    desc: {
+      name: "The name identifier of the knowledge base.",
+      type: "The type identifier of the knowledge base.",
+      description: "Briefly describe the purpose, content scope, or intended use of this knowledge base.",
+    },
   },
   request: {
     pipeline: {

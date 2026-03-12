@@ -6,7 +6,7 @@ from datetime import datetime
 
 import cpuinfo
 import distro
-import openvino.runtime as ov
+import openvino as ov
 import psutil
 from fastapi import FastAPI, HTTPException, status
 

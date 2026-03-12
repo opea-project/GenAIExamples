@@ -207,14 +207,14 @@ services:
       https_proxy: ${https_proxy}
       MODEL_PATH: "/llm/models"
       SERVED_MODEL_NAME: ${LLM_MODEL}
-      TENSOR_PARALLEL_SIZE: ${TENSOR_PARALLEL_SIZE:-1}
+      TENSOR_PARALLEL_SIZE: ${TP:-1}
       MAX_NUM_SEQS: ${MAX_NUM_SEQS:-64}
       MAX_NUM_BATCHED_TOKENS: ${MAX_NUM_BATCHED_TOKENS:-10240}
       MAX_MODEL_LEN: ${MAX_MODEL_LEN:-10240}
-      LOAD_IN_LOW_BIT: ${LOAD_IN_LOW_BIT:-fp8}
+      LOAD_IN_LOW_BIT: ${QUANTIZATION:-fp8}
       CCL_DG2_USM: ${CCL_DG2_USM:-""}
       PORT: ${VLLM_SERVICE_PORT_A770:-8086}
-      ZE_AFFINITY_MASK: ${SELECTED_XPU_0:-0}
+      ZE_AFFINITY_MASK: ${ZE_AFFINITY_MASK:-0}
     shm_size: '32g'
     entrypoint: /bin/bash -c "\
       cd /llm && \

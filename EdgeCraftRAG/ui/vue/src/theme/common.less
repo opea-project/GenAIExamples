@@ -1,5 +1,6 @@
 .card-shadow {
-  box-shadow: 0px 1px 2px -1px var(--bg-box-shadow),
+  box-shadow:
+    0px 1px 2px -1px var(--bg-box-shadow),
     0px 1px 3px 0px var(--bg-box-shadow);
 }
 .flex-left {
@@ -96,11 +97,7 @@
   }
 }
 .special-button-primary {
-  background: linear-gradient(
-    to bottom,
-    var(--color-primary-hover),
-    var(--color-primary)
-  );
+  background: linear-gradient(to bottom, var(--color-primary-hover), var(--color-primary));
   color: var(--color-white);
   border: none;
   border-radius: 20px;
@@ -240,6 +237,19 @@
   font-size: 12px;
   color: var(--font-tip-color);
   .ml-12;
+}
+
+:deep(.horizontal-form-item) {
+  // .intel-form-item-row {
+  //   display: flex;
+  //   flex-direction: row;
+  // }
+  // .intel-form-item-label {
+  //   width: 100px;
+  // }
+  // .intel-form-item-control {
+  //   flex: 1;
+  // }
 }
 .loopStyle(@counter) when (@counter > 0) {
   .p-@{counter} {

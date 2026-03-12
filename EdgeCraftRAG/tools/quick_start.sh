@@ -4,27 +4,53 @@
 
 set -e
 
-WORKPATH=$(dirname "$(pwd)")
+SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+WORKPATH=$(cd "${SCRIPT_DIR}/.." && pwd)
 ip_address=$(hostname -I | awk '{print $1}')
 HOST_IP=$ip_address
 
-#use python venv
-ENV_NAME="ecrag_venv"
-python -m venv $ENV_NAME
+# global defaults to avoid docker compose warnings on unset variables
+export HOST_IP=${HOST_IP:-"${ip_address}"}
+export MODEL_PATH=${MODEL_PATH:-"${WORKPATH}/workspace/models"}
+export LLM_MODEL=${LLM_MODEL:-"Qwen/Qwen3-8B"}
+export DOC_PATH=${DOC_PATH:-"${WORKPATH}/workspace"}
+export TMPFILE_PATH=${TMPFILE_PATH:-"${WORKPATH}/workspace"}
+export MILVUS_ENABLED=${MILVUS_ENABLED:-"0"}
+export CHAT_HISTORY_ROUND=${CHAT_HISTORY_ROUND:-"0"}
 
-# check venv
-if [ ! -d "$ENV_NAME" ]; then
-    echo "Failed to create virtual environment"
-    exit 1
+#use python venv
+ENV_NAME="${WORKPATH}/ecrag_venv"
+
+# check if python3-venv (ensurepip) is fully available; install if missing
+if ! python3 -c "import ensurepip" &>/dev/null; then
+    echo "python3-venv (ensurepip) not found, installing..."
+    PY_VER=$(python3 -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')")
+    if command -v apt-get &>/dev/null; then
+        sudo apt-get install -y "python${PY_VER}-venv"
+    elif command -v dnf &>/dev/null; then
+        sudo dnf install -y python3-virtualenv
+    elif command -v yum &>/dev/null; then
+        sudo yum install -y python3-virtualenv
+    else
+        echo "ERROR: Cannot install python3-venv: unsupported package manager. Please install it manually."
+        exit 1
+    fi
+fi
+
+# create venv if missing or broken (activate script absent)
+if [ ! -f "${ENV_NAME}/bin/activate" ] && [ ! -f "${ENV_NAME}/Scripts/activate" ]; then
+    echo "Creating virtual environment at ${ENV_NAME}..."
+    rm -rf "${ENV_NAME}"
+    python3 -m venv "${ENV_NAME}"
 fi
 
 # activate venv
-if [ -f "$ENV_NAME/bin/activate" ]; then
-    source $ENV_NAME/bin/activate
-elif [ -f "$ENV_NAME/Scripts/activate" ]; then
-    source $ENV_NAME/Scripts/activate
+if [ -f "${ENV_NAME}/bin/activate" ]; then
+    source "${ENV_NAME}/bin/activate"
+elif [ -f "${ENV_NAME}/Scripts/activate" ]; then
+    source "${ENV_NAME}/Scripts/activate"
 else
-    echo "Failed to activate virtual environment"
+    echo "ERROR: Failed to activate virtual environment at ${ENV_NAME}"
     exit 1
 fi
 
@@ -42,6 +68,13 @@ get_enable_function() {
     echo ${user_input:-$default_value}
 }
 
+print_ui_access_info() {
+    echo ""
+    echo "Service launched successfully."
+    echo "UI access URL: http://${HOST_IP}:8082"
+    echo "If you are accessing from another machine, replace ${HOST_IP} with the server's reachable IP or hostname."
+}
+
 function start_vllm_services() {
     COMPOSE_FILE="compose.yaml"
     echo "stop former service..."
@@ -49,12 +82,12 @@ function start_vllm_services() {
 
     ip_address=$(hostname -I | awk '{print $1}')
     HOST_IP=$(get_user_input "host ip" "${ip_address}")
-    DOC_PATH=$(get_user_input "DOC_PATH" "$WORKPATH/tests")
-    TMPFILE_PATH=$(get_user_input "TMPFILE_PATH" "$WORKPATH/tests")
+    DOC_PATH=$(get_user_input "DOC_PATH" "$WORKPATH/workspace")
+    TMPFILE_PATH=$(get_user_input "TMPFILE_PATH" "$WORKPATH/workspace")
     MILVUS_ENABLED=$(get_enable_function "MILVUS DB(Enter 1 for enable)" "0")
     CHAT_HISTORY_ROUND=$(get_user_input "chat history round" "0")
     LLM_MODEL=$(get_user_input "your LLM model" "Qwen/Qwen3-8B")
-    MODEL_PATH=$(get_user_input "your model path" "${PWD}/models")
+    MODEL_PATH=$(get_user_input "your model path" "${WORKPATH}/workspace/models")
     read -p "Have you prepare models in ${MODEL_PATH}:(yes/no) [yes]" user_input
     user_input=${user_input:-"yes"}
 
@@ -64,6 +97,7 @@ function start_vllm_services() {
         # Reranker: ${MODEL_PATH}/BAAI/bge-reranker-large
         # llm :${MODEL_PATH}/${LLM_MODEL} (从huggingface或modelscope下载的原始模型，而不是经过OpenVINO转换的模型!)
         echo "you skipped model downloading, please make sure you have prepared all models under ${MODEL_PATH}"
+        ensure_required_models_for_vllm
     else
         echo "you have not prepare models, starting to download models into ${MODEL_PATH}..."
         mkdir -p $MODEL_PATH
@@ -85,7 +119,7 @@ function start_vllm_services() {
     # vllm ENV
     export VLLM_SERVICE_PORT_A770=8086
 
-    read -p "Tensor parallel size(your tp size [1]), press Enter to confirm, or type a new value:" TENSOR_PARALLEL_SIZE; TENSOR_PARALLEL_SIZE=${TENSOR_PARALLEL_SIZE:-1}
+    read -p "Tensor parallel size(your tp size [1]), press Enter to confirm, or type a new value:" TENSOR_PARALLEL_SIZE; TP=${TP:-1}
     CCL_DG2_USM=$(get_user_input "Set USM (Core=1, Xeon=0, default=0)" 0)
     export HOST_IP=${HOST_IP}
     # export ENV
@@ -97,7 +131,7 @@ function start_vllm_services() {
     export no_proxy="localhost, 127.0.0.1, 192.168.1.1, ${HOST_IP}"
     export MILVUS_ENABLED=${MILVUS_ENABLED}
     export CHAT_HISTORY_ROUND=${CHAT_HISTORY_ROUND}
-    export TENSOR_PARALLEL_SIZE=${TENSOR_PARALLEL_SIZE}
+    export TP=${TP}
     export CCL_DG2_USM=${CCL_DG2_USM}
     export VIDEOGROUPID=$(getent group video | cut -d: -f3)
     export RENDERGROUPID=$(getent group render | cut -d: -f3)
@@ -116,7 +150,7 @@ function start_vllm_services() {
         n=$((n+1))
     done
     rm -rf ipex-llm-serving-xpu-container.log
-    echo "service launched, please visit UI at ${HOST_IP}:8082"
+    print_ui_access_info
 }
 
 
@@ -127,12 +161,12 @@ function start_services() {
 
     ip_address=$(hostname -I | awk '{print $1}')
     HOST_IP=$(get_user_input "host ip" "${ip_address}")
-    DOC_PATH=$(get_user_input "DOC_PATH" "$WORKPATH/tests")
-    TMPFILE_PATH=$(get_user_input "TMPFILE_PATH" "$WORKPATH/tests")
+    DOC_PATH=$(get_user_input "DOC_PATH" "$WORKPATH/workspace")
+    TMPFILE_PATH=$(get_user_input "TMPFILE_PATH" "$WORKPATH/workspace")
     MILVUS_ENABLED=$(get_enable_function "MILVUS DB(Enter 1 for enable)" "0")
     CHAT_HISTORY_ROUND=$(get_user_input "chat history round" "0")
     LLM_MODEL=$(get_user_input "your LLM model" "Qwen/Qwen3-8B")
-    MODEL_PATH=$(get_user_input "your model path" "${PWD}/models")
+    MODEL_PATH=$(get_user_input "your model path" "${WORKPATH}/workspace/models")
     read -p "Have you prepare models in ${MODEL_PATH}:(yes/no) [yes]" user_input
     user_input=${user_input:-"yes"}
 
@@ -142,6 +176,7 @@ function start_services() {
         # Reranker: ${MODEL_PATH}/BAAI/bge-reranker-large
         # llm :${MODEL_PATH}/${LLM_MODEL}/INT4_compressed_weights
         echo "you skipped model downloading, please make sure you have prepared all models under ${MODEL_PATH}"
+        ensure_required_models_for_ov
     else
         read -p "you have not prepare models, do you need one-click model downloading into ${MODEL_PATH}:(yes/no) [yes]" your_input
         your_input=${your_input:-"yes"}
@@ -185,6 +220,7 @@ function start_services() {
     COMPOSE_FILE="compose.yaml"
     echo "starting service..."
     docker compose -f $WORKPATH/docker_compose/intel/gpu/arc/$COMPOSE_FILE up -d
+    print_ui_access_info
 }
 
 
@@ -200,35 +236,109 @@ function check_baai_folder() {
     fi
 }
 
+ensure_openvino_tooling() {
+    if ! command -v optimum-cli >/dev/null 2>&1; then
+        echo "[Model Check] 'optimum-cli' not found, installing optimum-intel[openvino]..."
+        python -m pip install --upgrade-strategy eager "optimum-intel[openvino]"
+    fi
+}
+
+ensure_huggingface_tooling() {
+    if ! command -v huggingface-cli >/dev/null 2>&1; then
+        echo "[Model Check] 'huggingface-cli' not found, installing huggingface_hub..."
+        python -m pip install huggingface_hub
+    fi
+}
+
+ensure_embedding_and_reranker_models() {
+    local embedding_dir="${MODEL_PATH}/BAAI/bge-small-en-v1.5"
+    local reranker_dir="${MODEL_PATH}/BAAI/bge-reranker-large"
+
+    if [ ! -f "${embedding_dir}/openvino_model.xml" ]; then
+        echo "[Model Check] Embedding model missing: ${embedding_dir}"
+        echo "[Model Check] Downloading embedding model..."
+        ensure_openvino_tooling
+        mkdir -p "${embedding_dir}"
+        optimum-cli export openvino -m BAAI/bge-small-en-v1.5 "${embedding_dir}" --task sentence-similarity
+    else
+        echo "[Model Check] Embedding model exists: ${embedding_dir}"
+    fi
+
+    if [ ! -f "${reranker_dir}/openvino_model.xml" ]; then
+        echo "[Model Check] Reranker model missing: ${reranker_dir}"
+        echo "[Model Check] Downloading reranker model..."
+        ensure_openvino_tooling
+        mkdir -p "${reranker_dir}"
+        optimum-cli export openvino -m BAAI/bge-reranker-large "${reranker_dir}" --task text-classification
+    else
+        echo "[Model Check] Reranker model exists: ${reranker_dir}"
+    fi
+}
+
+ensure_llm_model_for_vllm() {
+    local llm_dir="${MODEL_PATH}/${LLM_MODEL}"
+    if [ ! -f "${llm_dir}/config.json" ]; then
+        echo "[Model Check] vLLM LLM model missing: ${llm_dir}"
+        echo "[Model Check] Downloading LLM model '${LLM_MODEL}'..."
+        ensure_huggingface_tooling
+        mkdir -p "${llm_dir}"
+        huggingface-cli download "${LLM_MODEL}" --local-dir "${llm_dir}"
+    else
+        echo "[Model Check] vLLM LLM model exists: ${llm_dir}"
+    fi
+}
+
+ensure_llm_model_for_ov() {
+    local ov_llm_dir="${MODEL_PATH}/${LLM_MODEL}/INT4_compressed_weights"
+    if [ ! -f "${ov_llm_dir}/openvino_model.xml" ]; then
+        echo "[Model Check] OpenVINO LLM model missing: ${ov_llm_dir}"
+        echo "[Model Check] Downloading and converting LLM model '${LLM_MODEL}' to INT4 OpenVINO..."
+        ensure_openvino_tooling
+        mkdir -p "${ov_llm_dir}"
+        optimum-cli export openvino --model "${LLM_MODEL}" "${ov_llm_dir}" --task text-generation-with-past --weight-format int4 --group-size 128 --ratio 0.8
+    else
+        echo "[Model Check] OpenVINO LLM model exists: ${ov_llm_dir}"
+    fi
+}
+
+ensure_required_models_for_vllm() {
+    ensure_embedding_and_reranker_models
+    ensure_llm_model_for_vllm
+}
+
+ensure_required_models_for_ov() {
+    ensure_embedding_and_reranker_models
+    ensure_llm_model_for_ov
+}
+
 
 function quick_start_vllm_services() {
-    WORKPATH=$(dirname "$PWD")
     COMPOSE_FILE="compose.yaml"
     EC_RAG_SERVICE_PORT=16010
     docker compose -f $WORKPATH/docker_compose/intel/gpu/arc/$COMPOSE_FILE down
 
     ip_address=$(hostname -I | awk '{print $1}')
     export HOST_IP=${HOST_IP:-"${ip_address}"}
-    export MODEL_PATH=${MODEL_PATH:-"${PWD}/models"}
-    export DOC_PATH=${DOC_PATH:-"$WORKPATH/tests"}
-    export TMPFILE_PATH=${TMPFILE_PATH:-"$WORKPATH/tests"}
+    export MODEL_PATH=${MODEL_PATH:-"${WORKPATH}/workspace/models"}
+    export DOC_PATH=${DOC_PATH:-"$WORKPATH/workspace"}
+    export TMPFILE_PATH=${TMPFILE_PATH:-"$WORKPATH/workspace"}
     export DP_NUM=${DP_NUM:-1}
     export MILVUS_ENABLED=${MILVUS_ENABLED:-1}
     export CHAT_HISTORY_ROUND=${CHAT_HISTORY_ROUND:-2}
     export HF_ENDPOINT=${HF_ENDPOINT:-https://hf-mirror.com}
-    export TENSOR_PARALLEL_SIZE=${TENSOR_PARALLEL_SIZE:-1}
+    export TP=${TP:-1}
     export MAX_NUM_SEQS=${MAX_NUM_SEQS:-64}
     export MAX_MODEL_LEN=${MAX_MODEL_LEN:-10240}
     export MAX_NUM_BATCHED_TOKENS=${MAX_NUM_BATCHED_TOKENS:-10240}
-    export LOAD_IN_LOW_BIT=${LOAD_IN_LOW_BIT:-fp8}
+    export QUANTIZATION=${QUANTIZATION:-fp8}
     export CCL_DG2_USM=${CCL_DG2_USM:-0}
     export LLM_MODEL=${LLM_MODEL:-Qwen/Qwen3-8B}
-    export LLM_MODEL_PATH=${LLM_MODEL_PATH:-"${MODEL_PATH}/Qwen/Qwen3-8B"}
+    export LLM_MODEL_PATH=${LLM_MODEL_PATH:-"${MODEL_PATH}/${LLM_MODEL}"}
     export VIDEOGROUPID=$(getent group video | cut -d: -f3)
     export RENDERGROUPID=$(getent group render | cut -d: -f3)
     export VLLM_SERVICE_PORT_A770=8086
 
-    check_baai_folder
+    ensure_required_models_for_vllm
     export HF_CACHE=${HF_CACHE:-"${HOME}/.cache"}
     export no_proxy="localhost, 127.0.0.1, 192.168.1.1, ${HOST_IP}"
     if [ ! -d "${HF_CACHE}" ]; then
@@ -251,7 +361,7 @@ function quick_start_vllm_services() {
         n=$((n+1))
     done
     rm -rf ipex-llm-serving-xpu-container.log
-    echo "service launched, please visit UI at ${HOST_IP}:8082"
+    print_ui_access_info
 }
 
 
@@ -262,17 +372,17 @@ function quick_start_ov_services() {
 
     ip_address=$(hostname -I | awk '{print $1}')
     export HOST_IP=${HOST_IP:-"${ip_address}"}
-    export DOC_PATH=${DOC_PATH:-"$WORKPATH/tests"}
-    export TMPFILE_PATH=${TMPFILE_PATH:-"$WORKPATH/tests"}
+    export DOC_PATH=${DOC_PATH:-"$WORKPATH/workspace"}
+    export TMPFILE_PATH=${TMPFILE_PATH:-"$WORKPATH/workspace"}
     export MILVUS_ENABLED=${MILVUS_ENABLED:-1}
     export CHAT_HISTORY_ROUND=${CHAT_HISTORY_ROUND:-"0"}
     export LLM_MODEL=${LLM_MODEL:-"Qwen/Qwen3-8B"}
-    export MODEL_PATH=${MODEL_PATH:-"${PWD}/models"}
+    export MODEL_PATH=${MODEL_PATH:-"${WORKPATH}/workspace/models"}
     export VIDEOGROUPID=$(getent group video | cut -d: -f3)
     export RENDERGROUPID=$(getent group render | cut -d: -f3)
     export MAX_MODEL_LEN=5000
 
-    check_baai_folder
+    ensure_required_models_for_ov
     export HF_CACHE=${HF_CACHE:-"${HOME}/.cache"}
     if [ ! -d "${HF_CACHE}" ]; then
         mkdir -p "${HF_CACHE}"
@@ -287,23 +397,24 @@ function quick_start_ov_services() {
 
     echo "Starting service..."
     docker compose -f "$WORKPATH/docker_compose/intel/gpu/arc/$COMPOSE_FILE" up -d
+    print_ui_access_info
 }
 
 
 function start_vLLM_B60_services() {
     COMPOSE_FILE="compose.yaml"
     echo "stop former service..."
-    export MODEL_PATH=${MODEL_PATH:-"${PWD}/models"}
+    export MODEL_PATH=${MODEL_PATH:-"${WORKPATH}/models"}
     docker compose -f $WORKPATH/docker_compose/intel/gpu/arc/$COMPOSE_FILE down
 
     ip_address=$(hostname -I | awk '{print $1}')
     HOST_IP=$(get_user_input "host ip" "${ip_address}")
-    DOC_PATH=$(get_user_input "DOC_PATH" "$WORKPATH/tests")
-    TMPFILE_PATH=$(get_user_input "TMPFILE_PATH" "$WORKPATH/tests")
+    DOC_PATH=$(get_user_input "DOC_PATH" "$WORKPATH/workspace")
+    TMPFILE_PATH=$(get_user_input "TMPFILE_PATH" "$WORKPATH/workspace")
     MILVUS_ENABLED=$(get_enable_function "MILVUS DB(Enter 1 for enable)" "0")
     CHAT_HISTORY_ROUND=$(get_user_input "chat history round" "0")
     LLM_MODEL=$(get_user_input "your LLM model" "Qwen/Qwen3-8B")
-    MODEL_PATH=$(get_user_input "your model path" "${PWD}/models")
+    MODEL_PATH=$(get_user_input "your model path" "${WORKPATH}/workspace/models")
     read -p "Have you prepare models in ${MODEL_PATH}:(yes/no) [yes]" user_input
     user_input=${user_input:-"yes"}
 
@@ -313,6 +424,7 @@ function start_vLLM_B60_services() {
         # Reranker: ${MODEL_PATH}/BAAI/bge-reranker-large
         # llm :${MODEL_PATH}/${LLM_MODEL} (从huggingface或modelscope下载的原始模型，而不是经过OpenVINO转换的模型!)
         echo "you skipped model downloading, please make sure you have prepared all models under ${MODEL_PATH}"
+        ensure_required_models_for_vllm
     else
         echo "you have not prepare models, starting to download models into ${MODEL_PATH}..."
         mkdir -p $MODEL_PATH
@@ -350,7 +462,7 @@ function start_vLLM_B60_services() {
     export no_proxy="localhost, 127.0.0.1, 192.168.1.1, ${HOST_IP}"
     export MILVUS_ENABLED=${MILVUS_ENABLED}
     export CHAT_HISTORY_ROUND=${CHAT_HISTORY_ROUND}
-    export SELECTED_XPU_0=${SELECTED_XPU_0}
+    export ZE_AFFINITY_MASK=${ZE_AFFINITY_MASK}
     export VIDEOGROUPID=$(getent group video | cut -d: -f3)
     export RENDERGROUPID=$(getent group render | cut -d: -f3)
     # export vllm ENV
@@ -382,21 +494,20 @@ function start_vLLM_B60_services() {
         n=$((n+1))
     done
     rm -rf ipex-llm-serving-xpu-container.log
-    echo "service launched, please visit UI at ${HOST_IP}:8082"
+    print_ui_access_info
 }
 
 
 function quick_start_vllm_B60_services() {
-    WORKPATH=$(dirname "$PWD")
     COMPOSE_FILE="compose.yaml"
     EC_RAG_SERVICE_PORT=16010
     docker compose -f $WORKPATH/docker_compose/intel/gpu/arc/$COMPOSE_FILE down
 
     ip_address=$(hostname -I | awk '{print $1}')
     export HOST_IP=${HOST_IP:-"${ip_address}"}
-    export MODEL_PATH=${MODEL_PATH:-"${PWD}/models"}
-    export DOC_PATH=${DOC_PATH:-"$WORKPATH/tests"}
-    export TMPFILE_PATH=${TMPFILE_PATH:-"$WORKPATH/tests"}
+    export MODEL_PATH=${MODEL_PATH:-"${WORKPATH}/workspace/models"}
+    export DOC_PATH=${DOC_PATH:-"$WORKPATH/workspace"}
+    export TMPFILE_PATH=${TMPFILE_PATH:-"$WORKPATH/workspace"}
     export MILVUS_ENABLED=${MILVUS_ENABLED:-1}
     export CHAT_HISTORY_ROUND=${CHAT_HISTORY_ROUND:-2}
     export LLM_MODEL=${LLM_MODEL:-Qwen/Qwen3-8B}
@@ -419,7 +530,7 @@ function quick_start_vllm_B60_services() {
     export QUANTIZATION=${QUANTIZATION:-fp8}
 
 
-    check_baai_folder
+    ensure_required_models_for_vllm
     export no_proxy="localhost, 127.0.0.1, 192.168.1.1, ${HOST_IP}"
     sudo chown -R 1000:1000 ${MODEL_PATH} ${DOC_PATH} ${TMPFILE_PATH}
     docker compose --profile b60 -f $WORKPATH/docker_compose/intel/gpu/arc/$COMPOSE_FILE up -d
@@ -434,14 +545,27 @@ function quick_start_vllm_B60_services() {
         n=$((n+1))
     done
     rm -rf ipex-llm-serving-xpu-container.log
-    echo "service launched, please visit UI at ${HOST_IP}:8082"
+    print_ui_access_info
+}
+
+
+function quick_cleanup_services() {
+    COMPOSE_FILE="compose.yaml"
+    echo "Stopping EdgeCraftRAG services..."
+    docker compose -f "$WORKPATH/docker_compose/intel/gpu/arc/$COMPOSE_FILE" down
+    echo "Cleanup completed."
 }
 
 
 function main {
+    if [[ "${1:-}" == "cleanup" ]]; then
+        quick_cleanup_services
+        exit 0
+    fi
+
     if [[ $- == *i* ]]; then
-        read -p "Do you want to start vLLM or local OpenVINO services? (vLLM_A770/vLLM_B60/ov) [vLLM_A770]: " user_input
-        user_input=${user_input:-"vLLM_A770"}
+        read -p "Do you want to start vLLM or local OpenVINO services? (vLLM_A770/vLLM_B60/ov) [ov]: " user_input
+        user_input=${user_input:-"ov"}
         if [[ "$user_input" == "vLLM_A770" ]]; then
             start_vllm_services
         elif [[ "$user_input" == "vLLM_B60" ]]; then

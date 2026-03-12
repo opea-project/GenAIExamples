@@ -7,6 +7,7 @@ export default {
     update: "更新",
     edit: "编辑",
     add: "新增",
+    details: "详情",
     delete: "删除",
     active: "启用",
     deactivate: "停用",
@@ -99,7 +100,7 @@ export default {
     validErr: "表单验证失败！",
     urlValidTip: "URL 或模型测试通过后方可继续",
     config: {
-      basic: "基础",
+      basic: "基本信息",
       nodeParser: "节点解析器",
       nodeParserType: "节点解析器类型",
       chunkSize: "分块大小",
@@ -278,6 +279,7 @@ export default {
     notFileTip: "您还没有上传任何文件，点击“上传”按钮开始添加内容吧～",
     name: "名称",
     des: "描述",
+    detail: "知识库详情",
     activated: "激活状态",
     nameValid1: "请输入知识库名称",
     nameValid2: "请输入 2 到 30 个字符的名称",
@@ -294,7 +296,7 @@ export default {
       "Experience是指个人或团队在实践过程中积累的知识和技能，通常通过实际操作、试错和反思获得，是解决实际问题的重要依据",
     kbDes:
       "知识库是系统化存储信息的集合，用于集中管理文档、常见问题、操作指南等知识内容，便于团队或用户快速查找和共享信息。",
-    type: "类型",
+    type: "知识库类型",
     original: "原始的",
     kbadmin: "kbadmin",
     typeValid: "请选择知识库类型",
@@ -306,6 +308,13 @@ export default {
     totalTip: "个文件",
     failedFile: "失败文件",
     retryFailed: "上传失败！",
+    general: "通用的",
+    class: "类型",
+    desc: {
+      name: "知识库的名称标识",
+      type: "知识库的类型标识",
+      description: "简要说明该知识库的用途、内容范围或适用场景",
+    },
   },
   request: {
     pipeline: {

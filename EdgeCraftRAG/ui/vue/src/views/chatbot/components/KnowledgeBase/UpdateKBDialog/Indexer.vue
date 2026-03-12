@@ -166,7 +166,7 @@
         <FormTooltip :title="$t('pipeline.desc.embeddingDevice')" />
       </a-form-item>
     </template>
-    <a-form-item name="vector_url" :rules="rules.vector_url" v-if="isMilvus || isKbadmin">
+    <a-form-item name="vector_url" :rules="rules.vector_url" v-if="isMilvus">
       <template #label>
         {{ $t("pipeline.config.vector_url") }}
         <span class="eg-wrap">
@@ -206,16 +206,15 @@
 
 <script lang="ts" setup name="Indexer">
   import { getModelList, getRunDevice, requestUrlVerify, requestUrlVllm } from "@/api/pipeline";
-import { useNotification } from "@/utils/common";
-import { validateServiceAddress } from "@/utils/validate.ts";
-import { CheckCircleFilled, InfoCircleOutlined } from "@ant-design/icons-vue";
-import type { FormInstance, RadioChangeEvent } from "ant-design-vue";
-import { RuleObject } from "ant-design-vue/es/form/interface";
-import { SelectValue } from "ant-design-vue/es/select/index";
-import { computed, nextTick, onMounted, reactive, ref } from "vue";
-import { useI18n } from "vue-i18n";
-import { Indexer } from "../../enum.ts";
-import { ModelType } from "../../type.ts";
+  import { useNotification } from "@/utils/common";
+  import { validateServiceAddress } from "@/utils/validate.ts";
+  import { CheckCircleFilled, InfoCircleOutlined } from "@ant-design/icons-vue";
+  import type { FormInstance, RadioChangeEvent } from "ant-design-vue";
+  import { RuleObject } from "ant-design-vue/es/form/interface";
+  import { SelectValue } from "ant-design-vue/es/select/index";
+  import { computed, nextTick, onMounted, reactive, ref } from "vue";
+  import { useI18n } from "vue-i18n";
+  import { Indexer } from "./enum.ts";
 
   const { t } = useI18n();
   const { antNotification } = useNotification();
@@ -231,6 +230,15 @@ import { ModelType } from "../../type.ts";
     },
   });
 
+  interface ModelType {
+    model_id: string | undefined;
+    model_path: string;
+    model_url?: string;
+    device: string;
+    weight?: string;
+    api_base?: string;
+  }
+
   interface FormType {
     indexer_type: string;
     inference_type: string;
@@ -245,9 +253,10 @@ import { ModelType } from "../../type.ts";
   } as any;
 
   const host = window.location.hostname;
-  const { parser_type = "" } = props.formData?.node_parser || {};
+  const isKbadmin = computed(() => props.formData.comp_subtype === "kbadmin_kb");
+
   const {
-    indexer_type = "faiss_vector",
+    indexer_type = isKbadmin.value ? "kbadmin_indexer" : "faiss_vector",
     inference_type = "local",
     vector_url = "",
     embedding_url = `${host}:13020`,
@@ -292,8 +301,8 @@ import { ModelType } from "../../type.ts";
         props.formType === "update"
           ? embedding_model?.model_id
           : indexer_type === "kbadmin_indexer"
-          ? undefined
-          : embedding_model?.model_id,
+            ? undefined
+            : embedding_model?.model_id,
     },
   };
 
@@ -312,14 +321,10 @@ import { ModelType } from "../../type.ts";
   });
 
   const isProceed = computed(() => !hasUntestedEndpoint.value);
-
-  const isCreate = computed(() => props.formType === "create");
-  const isKbadmin = computed(() => form.indexer_type === "kbadmin_indexer");
   const isMilvus = computed(() => form.indexer_type === "milvus_vector");
   const isVllm = computed(() => form.inference_type === "vllm");
 
   const indexerList = computed(() => {
-    if (isCreate.value) return Indexer;
     return Indexer.filter(item =>
       isKbadmin.value ? item.value === "kbadmin_indexer" : item.value !== "kbadmin_indexer"
     );
@@ -328,18 +333,6 @@ import { ModelType } from "../../type.ts";
   const optionIntroduction = computed(() => {
     return Indexer.find(item => item.value === form.indexer_type)?.describe;
   });
-
-  const validateIndeserType = async (_rule: RuleObject, value: string) => {
-    if (!value) {
-      return Promise.reject(t("pipeline.valid.indexerType"));
-    }
-
-    if (parser_type === "kbadmin_parser" && value !== "kbadmin_indexer") {
-      return Promise.reject(t("pipeline.valid.indexerTypeValid1"));
-    }
-
-    return Promise.resolve();
-  };
 
   const validateUnique = (urlType: "vector" | "model") => {
     const messages = {
@@ -377,7 +370,7 @@ import { ModelType } from "../../type.ts";
     indexer_type: [
       {
         required: true,
-        validator: validateIndeserType,
+        message: t("pipeline.valid.indexerType"),
         trigger: "change",
       },
     ],
@@ -431,19 +424,9 @@ import { ModelType } from "../../type.ts";
   const handleTypeChange = (value: SelectValue) => {
     isVectorUrlPass.value = false;
     validatePass.value = false;
-    isConnected.value = false;
-    isModelUrlPass.value = false;
-    vllmValidatePass.value = false;
 
-    if (isCreate.value) {
-      form.embedding_model.model_id = undefined;
-      form.embedding_model.model_path = "";
-    }
-    if (value === "kbadmin_indexer") {
-      form.vector_url = `${host}:29530`;
-      antNotification("warning", t("common.prompt"), t("pipeline.valid.indexerTypeTip"));
-    } else if (value === "milvus_vector") {
-      form.vector_url = `${host}:19530`;
+    if (value === "milvus_vector") {
+      if (props.formType !== "update") form.vector_url = `${host}:19530`;
       nextTick(() => formRef.value?.validateFields([["vector_url"]]));
     }
   };
@@ -451,6 +434,9 @@ import { ModelType } from "../../type.ts";
   const handleInferenceTypeChange = (e: RadioChangeEvent) => {
     form.embedding_model.model_id = undefined;
     form.embedding_model.weight = undefined;
+    isConnected.value = false;
+    isModelUrlPass.value = false;
+    vllmValidatePass.value = false;
 
     if (e.target?.value === "vllm") {
       nextTick(() => formRef.value?.validateFields([["embedding_model", "api_base"]]));
@@ -520,7 +506,6 @@ import { ModelType } from "../../type.ts";
       const data: any = await queryModelList("vLLM_embedding", { server_address });
       vllmModelList.value = [].concat(data);
       isConnected.value = vllmModelList.value.length > 0;
-
     } catch (error) {
       console.error(error);
     }
@@ -575,7 +560,7 @@ import { ModelType } from "../../type.ts";
 
     return {
       indexer_type,
-      inference_type,
+      inference_type: !isKbadmin.value ? inference_type : undefined,
       embedding_model: {
         ...embedding_model,
         api_base: isVllm.value ? modelProtocol.value + embedding_model.api_base : undefined,
@@ -583,21 +568,6 @@ import { ModelType } from "../../type.ts";
       vector_url: isMilvus.value || isKbadmin.value ? protocol.value + vector_url : undefined,
       embedding_url: isKbadmin.value ? modelProtocol.value + embedding_url : undefined,
     };
-  };
-
-  const generateFormData = () => {
-    const baseData = { indexer: formatFormParam() };
-    const { retriever = {} } = props.formData || {};
-
-    if (isKbadmin.value && parser_type !== "kbadmin_parser") {
-      return {
-        ...baseData,
-        node_parser: { parser_type: "kbadmin_parser" },
-        retriever: { ...retriever, retriever_type: "kbadmin_retriever" },
-      };
-    }
-
-    return baseData;
   };
 
   const handleValidate = (): Promise<object> => {
@@ -616,7 +586,7 @@ import { ModelType } from "../../type.ts";
           }
           resolve({
             result: true,
-            data: generateFormData(),
+            data: { indexer: formatFormParam() },
           });
         })
         .catch(() => {
