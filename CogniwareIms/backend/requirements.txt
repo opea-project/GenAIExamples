@@ -8,7 +8,7 @@ alembic==1.13.3
 bcrypt==4.2.0
 
 # Code Quality (dev dependencies)
-black==24.10.0
+black==26.3.1
 cryptography>=43.0.7  # FIXED: Updated from 43.0.1 (OpenSSL vulnerability)
 email-validator==2.2.0
 # Web Framework
