@@ -75,7 +75,7 @@ async def get_knowledge_base(knowledge_name: str):
 
 # Get the specified knowledge base json.
 @kb_app.get("/v1/knowledge/{knowledge_name}/json")
-async def get_knowledge_base(knowledge_name: str):
+async def get_knowledge_base_json(knowledge_name: str):
     kb = ctx.knowledgemgr.get_knowledge_base_by_name_or_id(knowledge_name)
     return kb.get_knowledge_json
 

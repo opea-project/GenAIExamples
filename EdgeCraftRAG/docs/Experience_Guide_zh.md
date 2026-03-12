@@ -1,5 +1,7 @@
 # EC-RAG 经验注入指南
 
+[English](Experience_Guide.md)
+
 本指南将为您介绍如何在 EdgeCraftRAG (EC-RAG) 中启用、配置和使用经验注入（Experience）功能，涵盖 Experience 的创建和管理，旨在提升您使用EC-RAG时的回答质量。
 
 ## 概述

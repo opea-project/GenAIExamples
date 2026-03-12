@@ -347,7 +347,6 @@ async def save_knowledge_configurations(operation: str = None, kb=None):
         target_kb["experience_active"] = kb.experience_active
         target_kb["all_document_maps"] = kb.all_document_maps
         target_kb["file_paths"] = kb.file_paths
-        "experience_active"
         target_idx = target_kb.get("idx")
         if not target_idx:
             return {"message": "Missing 'idx' in knowledgebase data"}

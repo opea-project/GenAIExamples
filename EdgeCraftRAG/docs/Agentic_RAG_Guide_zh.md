@@ -1,5 +1,7 @@
 # EC-RAG智能体指南
 
+[English](Agentic_RAG_Guide.md)
+
 目前，EC-RAG智能体将作为试用版功能开放体验。
 本指南将为您介绍如何在 EdgeCraftRAG (EC-RAG) 中启用、配置和使用智能体（Agent）功能，涵盖不同类型智能体的创建和管理。
 

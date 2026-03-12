@@ -5,14 +5,14 @@ import request from "../request";
 
 export const getAgentList = () => {
   return request({
-    url: "/v1/settings/agents",
+    url: "/v1/agents",
     method: "get",
   });
 };
 
 export const getAgentDetailByName = (name: String) => {
   return request({
-    url: `/v1/settings/agents/${name}`,
+    url: `/v1/agents/${name}`,
     method: "get",
   });
 };
@@ -27,7 +27,7 @@ export const getFreechatList = (params: Object) => {
 
 export const requestAgentCreate = (data: Object) => {
   return request({
-    url: "/v1/settings/agents",
+    url: "/v1/agents",
     method: "post",
     data,
     showLoading: true,
@@ -37,7 +37,7 @@ export const requestAgentCreate = (data: Object) => {
 };
 export const requestAgentUpdate = (name: String, data: Object) => {
   return request({
-    url: `/v1/settings/agents/${name}`,
+    url: `/v1/agents/${name}`,
     method: "patch",
     data,
     showLoading: true,
@@ -48,7 +48,7 @@ export const requestAgentUpdate = (name: String, data: Object) => {
 
 export const requestAgentDelete = (name: String) => {
   return request({
-    url: `/v1/settings/agents/${name}`,
+    url: `/v1/agents/${name}`,
     method: "delete",
     showLoading: true,
     showSuccessMsg: true,
@@ -58,7 +58,7 @@ export const requestAgentDelete = (name: String) => {
 
 export const getAgentConfigs = (type: String) => {
   return request({
-    url: `/v1/settings/agents/configs/${type}`,
+    url: `/v1/agents/configs/${type}`,
     method: "get",
   });
 };

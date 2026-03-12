@@ -16,7 +16,7 @@ agent_app = FastAPI()
 
 
 # GET Agents
-@agent_app.get(path="/v1/settings/agents")
+@agent_app.get(path="/v1/agents")
 async def get_all_agents():
     out = []
     agents = ctx.get_agent_mgr().get_agents()
@@ -38,7 +38,7 @@ async def get_all_agents():
 
 
 # GET Agent
-@agent_app.get(path="/v1/settings/agents/{name}")
+@agent_app.get(path="/v1/agents/{name}")
 async def get_agent(name):
     agent = ctx.get_agent_mgr().get_agent_by_name(name)
     if agent:
@@ -58,7 +58,7 @@ async def get_agent(name):
 
 
 # POST Agent
-@agent_app.post(path="/v1/settings/agents")
+@agent_app.post(path="/v1/agents")
 async def create_agent(request: AgentCreateIn, status_code=status.HTTP_201_CREATED):
     try:
         agent = ctx.get_agent_mgr().create_agent(request)
@@ -70,7 +70,7 @@ async def create_agent(request: AgentCreateIn, status_code=status.HTTP_201_CREAT
 
 
 # PATCH Agent
-@agent_app.patch(path="/v1/settings/agents/{name}")
+@agent_app.patch(path="/v1/agents/{name}")
 async def update_agent(name, request: AgentCreateIn):
     try:
         agentmgr = ctx.get_agent_mgr()
@@ -91,7 +91,7 @@ async def update_agent(name, request: AgentCreateIn):
 
 
 # DELETE Agent
-@agent_app.delete(path="/v1/settings/agents/{name}", status_code=status.HTTP_204_NO_CONTENT)
+@agent_app.delete(path="/v1/agents/{name}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_agent(name):
     try:
         agentmgr = ctx.get_agent_mgr()
@@ -108,7 +108,7 @@ async def delete_agent(name):
 
 
 # GET Agent Type default configs
-@agent_app.get(path="/v1/settings/agents/configs/{agent_type}")
+@agent_app.get(path="/v1/agents/configs/{agent_type}")
 async def get_agent_default_configs(agent_type):
     try:
         if agent_type in [e.value for e in AgentType]:

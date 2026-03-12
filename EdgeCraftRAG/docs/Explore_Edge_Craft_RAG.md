@@ -1,5 +1,7 @@
 # Explore Edge Craft RAG
 
+[中文版](Explore_Edge_Craft_RAG_zh.md)
+
 ## ChatQnA with LLM Example in UI
 
 ### Create Pipeline
@@ -7,7 +9,7 @@
 To create a default pipeline, you need to click the `Create Pipeline` button in the `Pipeline Setting` page.
 ![create_pipeline](../assets/img/create_pipeline.png)
 
-Then follow the pipeline create guide in UI to set your pipeline, please note that in `Indexer Type` you can set MilvusVector as indexer(Please make sure Milvus is enabled before set MilvusVector as indexer, you can refer to [Enable Milvus](../docker_compose/intel/gpu/arc/README.md#deploy-the-service-using-docker-compose)).  
+Then follow the pipeline create guide in UI to set your pipeline, please note that in `Indexer Type` you can set MilvusVector as indexer(Please make sure Milvus is enabled before set MilvusVector as indexer, you can refer to [Enable Milvus](Advanced_Setup.md#deploy-the-service-on-intel-gpu-using-docker-compose)).  
 if choosing MilvusVector, you need to verify vector uri first, please input 'Your_IP:milvus_port' then click `Test` button. Note that milvus_port is 19530
 ![milvus](../assets/img/milvus.png)
 

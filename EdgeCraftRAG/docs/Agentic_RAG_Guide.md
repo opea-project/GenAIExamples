@@ -1,5 +1,7 @@
 # EC-RAG Agent Guide
 
+[中文版](Agentic_RAG_Guide_zh.md)
+
 This guide explains how to enable, configure, and use Agent capabilities within EdgeCraftRAG (EC-RAG). It covers the creation and management of different agent types to enhance retrieval and generation workflows.(Currently, EC-RAG Agent is an experimental option.)
 
 ## Overview

@@ -14,11 +14,9 @@
 
 1. [前置条件](#1-前置条件)
 2. [获取代码](#2-获取代码)
-3. [准备模型](#3-准备模型)
-4. [准备环境变量和配置](#4-准备环境变量和配置)
-5. [使用 Docker Compose 在 Arc GPU 上部署服务](#5-使用-docker-compose-在-intel-gpu-上部署服务)
-6. [访问 UI](#6-访问-ui)
-7. [清理部署](#7-清理部署)
+3. [运行 quick_start.sh](#3-运行-quick_startsh)
+4. [访问 UI](#4-访问-ui)
+5. [清理部署](#5-清理部署)
 
 ### 1. 前置条件
 
@@ -54,133 +52,46 @@ cd GenAIExamples/EdgeCraftRAG
 >git checkout v1.5
 >```
 
-### 3. 准备模型
+### 3. 运行 quick_start.sh
 
-需要准备 3 个模型：**Embedding**、**Reranking**、**LLM**。  
-你需要为这些模型选择推理框架。
-
-#### Embedding 和 Reranking
-
-Embedding 和 reranking 通常由本地 OpenVINO 推理提供服务。准备这 2 个模型：
+在 `EdgeCraftRAG` 根目录下运行快速启动脚本：
 
 ```bash
-# 准备 embedding、reranking 模型：
-export MODEL_PATH="${PWD}/models" # embedding、reranking、LLM 模型路径
-mkdir -p $MODEL_PATH
-pip install --upgrade --upgrade-strategy eager "optimum[openvino]"
-optimum-cli export openvino -m BAAI/bge-small-en-v1.5 ${MODEL_PATH}/BAAI/bge-small-en-v1.5 --task sentence-similarity
-optimum-cli export openvino -m BAAI/bge-reranker-large ${MODEL_PATH}/BAAI/bge-reranker-large --task text-classification
+./tools/quick_start.sh
 ```
 
-#### LLM
+在不配置任何环境变量时，脚本默认启动本地 OpenVINO 部署。
 
-##### openVINO
-如果你只有 Core Ultra 平台，请准备 openVINO 模型：
-你也可以在独立 GPU 上运行 openVINO 模型。
+如果你希望使用手动方式（模型准备、环境变量配置、Docker Compose 启动），请参考 [Advanced Setup 中的手动部署说明](../../../../docs/Advanced_Setup_zh.md#arc-平台手动部署详细说明)。
 
-```bash
-# 准备 openVINO 的 LLM 模型
-optimum-cli export openvino --model Qwen/Qwen3-8B ${MODEL_PATH}/Qwen/Qwen3-8B/INT4_compressed_weights --task text-generation-with-past --weight-format int4 --group-size 128 --ratio 0.8
-```
-
-##### vLLM
-另外，如果你有独立显卡，可以为 vLLM 准备模型：
-
-```bash
-# 准备 vLLM 的 LLM 模型
-export LLM_MODEL="Qwen/Qwen3-8B" # 你的模型 id
-pip install modelscope
-modelscope download --model $LLM_MODEL --local_dir "${MODEL_PATH}/${LLM_MODEL}"
-# 可选：你也可以用 huggingface 下载模型：
-# pip install -U huggingface_hub
-# huggingface-cli download $LLM_MODEL --local-dir "${MODEL_PATH}/${LLM_MODEL}"
-```
-
-### 4. 准备环境变量和配置
-
-#### 为部署准备环境变量
-
-```bash
-ip_address=$(hostname -I | awk '{print $1}')
-# 使用 `ip a` 查看当前活动 ip
-export HOST_IP=$ip_address # 主机 ip
-
-# 查看 video 与 render 的 group id
-export VIDEOGROUPID=$(getent group video | cut -d: -f3)
-export RENDERGROUPID=$(getent group render | cut -d: -f3)
-
-# 若已配置代理，执行以下命令
-export no_proxy=${no_proxy},${HOST_IP},edgecraftrag,edgecraftrag-server
-export NO_PROXY=${NO_PROXY},${HOST_IP},edgecraftrag,edgecraftrag-server
-# 如果配置了 HF 镜像，会传入容器
-# export HF_ENDPOINT=https://hf-mirror.com # 你的 HF 镜像地址"
-
-# 确保以下 3 个文件夹权限为 1000:1000，否则
-export DOC_PATH=${PWD}/tests
-export TMPFILE_PATH=${PWD}/tests
-chown 1000:1000 ${MODEL_PATH} ${DOC_PATH} ${TMPFILE_PATH}
-# 此外还要确保 .cache 文件夹权限为 1000:1000，否则
-chown 1000:1000 -R $HOME/.cache
-```
-
-如需更高级的环境变量和配置，请参考 [Prepare env variables for vLLM deployment](../../../../docs/Advanced_Setup.md#prepare-env-variables-for-vllm-deployment)
-
-为推理设置 Milvus 数据库与聊天历史轮数：
-
-```bash
-# EC-RAG 支持 Milvus 持久化数据库，默认关闭；可设置 MILVUS_ENABLED=1 开启
-export MILVUS_ENABLED=0
-# 如果启用 Milvus，默认存储路径为 PWD，如需修改请取消注释：
-# export DOCKER_VOLUME_DIRECTORY= # 按需修改
-
-# EC-RAG 支持聊天历史轮数设置，默认关闭；可通过 CHAT_HISTORY_ROUND 控制
-# export CHAT_HISTORY_ROUND= # 按需修改
-```
-
-### 5. 使用 Docker Compose 在 Intel GPU 上部署服务
-
-#### Option a. 为 Core Ultra、Arc B60、Arc A770 部署基于 openVINO LLM 的 EC-RAG
-
-请确保已准备好 [openVINO 模型](#openvino)
-
-```bash
-docker compose -f docker_compose/intel/gpu/arc/compose.yaml up -d
-```
-
-#### Option b.1. 为 Arc B60 部署基于 vLLM 的 EC-RAG
-
-请确保已准备好 [vLLM 模型](#vllm)
-
-```bash
-docker compose --profile b60 -f docker_compose/intel/gpu/arc/compose.yaml up -d
-```
-
-#### Option b.2. 为 Arc A770 部署基于 vLLM 的 EC-RAG
-
-请确保已准备好 [vLLM 模型](#vllm)
-
-```bash
-docker compose --profile a770 -f docker_compose/intel/gpu/arc/compose.yaml up -d
-```
-
-### 6. 访问 UI
+### 4. 访问 UI
 
 打开浏览器访问 http://${HOST_IP}:8082
 
+启动完成后，`quick_start.sh` 会输出：
+
+```text
+Service launched successfully.
+UI access URL: http://${HOST_IP}:8082
+If you are accessing from another machine, replace ${HOST_IP} with your server's reachable IP or hostname.
+```
+
 > 浏览器应运行在与控制台相同的主机上；否则你需要使用主机域名而不是 ${HOST_IP} 来访问 UI。
 
-下图为 UI 首页。有关 UI 操作和 EC-RAG 设置的详细说明，请参考 [Explore_Edge_Craft_RAG](../../../../docs/Explore_Edge_Craft_RAG.md)
+下图为 UI 首页。有关 UI 操作和 EC-RAG 设置的详细说明，请参考 [Explore_Edge_Craft_RAG](../../../../docs/Explore_Edge_Craft_RAG_zh.md)
 ![front_page](../../../../assets/img/front_page.png)
 
-### 7. 清理部署
+### 5. 清理部署
 
-若要停止与本次部署关联的容器，请执行以下命令：
+若要停止与本次部署关联的容器，请执行脚本命令：
 
+```bash
+./tools/quick_start.sh cleanup
 ```
-docker compose -f docker_compose/intel/gpu/arc/compose.yaml down
-```
 
-执行完 `down` 命令后，所有 EdgeCraftRAG 容器都会停止并被移除。
+执行完成后，所有 EdgeCraftRAG 容器都会停止并被移除。
+
+如果你希望使用手动 docker compose 清理命令，请参考 [Advanced Setup 中的手动清理说明](../../../../docs/Advanced_Setup_zh.md#6-清理部署手动)。
 
 ## EdgeCraftRAG Docker Compose 文件
 
