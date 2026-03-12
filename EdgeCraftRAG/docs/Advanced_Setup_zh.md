@@ -42,6 +42,7 @@ optimum-cli export openvino -m BAAI/bge-reranker-large ${MODEL_PATH}/BAAI/bge-re
 #### LLM
 
 ##### openVINO
+
 如果仅使用 Core Ultra 平台，请准备 openVINO 模型：  
 你也可以在独立 GPU 上运行 openVINO 模型。
 
@@ -51,6 +52,7 @@ optimum-cli export openvino --model Qwen/Qwen3-8B ${MODEL_PATH}/Qwen/Qwen3-8B/IN
 ```
 
 ##### vLLM
+
 如果你有独立 GPU 并希望使用 vLLM，可按如下方式准备模型：
 
 ```bash

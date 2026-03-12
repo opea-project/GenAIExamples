@@ -3,8 +3,8 @@
 
 import json
 import os
-import uuid
 import time
+import uuid
 from typing import Any, Dict, List, Optional, Union
 
 from edgecraftrag.base import BaseComponent, BenchType, CompType
@@ -15,6 +15,7 @@ from edgecraftrag.config_repository import (
 from edgecraftrag.env import DOCUMENT_DATA_FILE, EXPERIENCE_FILE
 from llama_index.core.schema import Document
 from pydantic import Field, model_serializer
+
 
 class Knowledge(BaseComponent):
 
@@ -347,7 +348,7 @@ class Knowledge(BaseComponent):
         else:
             total = None
         return total
-    
+
     def update_nodes(self, nodes: List[Document]):
         self.nodes = nodes
 
@@ -370,7 +371,7 @@ class Knowledge(BaseComponent):
             self.benchmark.update_benchmark_data(benchmark_index, BenchType.CHUNK_NUM, benchmark_data)
         self.add_nodes(nodes)
         return nodes
-        
+
     async def update_nodes_to_indexer(self) -> Any:
         if self.indexer is not None:
             self.indexer.insert_nodes(self.nodes)

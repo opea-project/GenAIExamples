@@ -37,18 +37,17 @@ Then, you can submit messages in the chat box in `Chat` page.
 ![alt text](../assets/img/Explore_Edge_Craft_RAG_08.jpg)
 
 ## ChatQnA with Kbadmin in UI
- 
+
 ### Kbadmin Knowledge Base
- 
+
 Go to `Knowledge Base` page and click `Create Knowledge Base` button to create your knowledge base.  
 Please select 'kbadmin' in `Type`and select kb name from the kbs you created in kbadmin UI page. Loading kb name might be slow ,please wait with patient
- 
+
 ![alt text](../assets/img/Explore_Edge_Craft_RAG_09.png)
- 
-Ten you can select embedding infomation in 'Indexer' page
- 
+
+Ten you can select embedding information in 'Indexer' page
+
 ![alt text](../assets/img/Explore_Edge_Craft_RAG_10.png)
- 
+
 After creation, you can see kbadmin tag in knowledge base then you can submit messages in the chat box in `Chat` page.
 ![alt text](../assets/img/Explore_Edge_Craft_RAG_11.png)
-

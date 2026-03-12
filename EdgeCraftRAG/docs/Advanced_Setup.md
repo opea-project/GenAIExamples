@@ -42,6 +42,7 @@ optimum-cli export openvino -m BAAI/bge-reranker-large ${MODEL_PATH}/BAAI/bge-re
 #### LLM
 
 ##### openVINO
+
 If you have Core Ultra platform only, please prepare openVINO models:  
 You can also run openVINO models on discrete GPU.
 
@@ -51,6 +52,7 @@ optimum-cli export openvino --model Qwen/Qwen3-8B ${MODEL_PATH}/Qwen/Qwen3-8B/IN
 ```
 
 ##### vLLM
+
 Alternatively, if you have discrete GPU and want to use vLLM, please prepare models for vLLM:
 
 ```bash
@@ -161,5 +163,3 @@ export TP=4 # for multi GPU, you can change TP value
 export ZE_AFFINITY_MASK=0,1,2,3 # for multi GPU, you can export ZE_AFFINITY_MASK=0,1,2...
 docker compose --profile b60 -f docker_compose/intel/gpu/arc/compose.yaml up -d
 ```
-
-

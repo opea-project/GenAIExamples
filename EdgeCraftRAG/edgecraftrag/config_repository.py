@@ -291,7 +291,7 @@ async def save_pipeline_configurations(operation: str = None, pipeline=None):
                 chatqna_gen = pipeline.get_generator(GeneratorType.CHATQNA)
                 if chatqna_gen:
                     if GeneratorType.CHATQNA in gens_data:
-                         gens_data[GeneratorType.CHATQNA]["prompt_content"] = chatqna_gen.prompt_content
+                        gens_data[GeneratorType.CHATQNA]["prompt_content"] = chatqna_gen.prompt_content
             target_data["active"] = pipeline.status.active
 
         if pipeline_milvus_repo:

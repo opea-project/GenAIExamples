@@ -7,8 +7,8 @@ from typing import Any
 
 from comps.cores.proto.api_protocol import ChatCompletionRequest
 from edgecraftrag.base import BaseMgr, CallbackType
-from edgecraftrag.components.pipeline import Pipeline
 from edgecraftrag.components.knowledge_base import Knowledge
+from edgecraftrag.components.pipeline import Pipeline
 
 
 class PipelineMgr(BaseMgr):
