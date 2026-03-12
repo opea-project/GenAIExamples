@@ -7,10 +7,9 @@ quality and performance.
 
 ## What's New
 
-1. Support Agent component and enable deep_search agent
-2. Optimize pipeline execution performance with asynchronous api
-3. Support session list display in UI
-4. Support vllm-based embedding service
+1. Support decouple operation for pipeline and knowledge base
+2. Optimize Agentic workflow user experience
+3. User Guide enhancement
 
 ## Table of contents
 
