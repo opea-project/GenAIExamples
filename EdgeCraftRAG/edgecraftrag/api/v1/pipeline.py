@@ -17,7 +17,6 @@ from edgecraftrag.base import (
 from edgecraftrag.components.benchmark import Benchmark
 from edgecraftrag.components.generator import FreeChatGenerator, QnAGenerator
 from edgecraftrag.components.postprocessor import MetadataReplaceProcessor, RerankProcessor
-
 from edgecraftrag.config_repository import MilvusConfigRepository, save_pipeline_configurations
 from edgecraftrag.context import ctx
 from edgecraftrag.env import PIPELINE_FILE
@@ -217,7 +216,9 @@ async def update_pipeline_handler(pl, req):
                 raise Exception("Inference Type Not Supported")
 
     if pl.status.active != req.active:
-        ctx.get_pipeline_mgr().activate_pipeline(pl.name, req.active, ctx.get_knowledge_mgr().get_active_knowledge_base())
+        ctx.get_pipeline_mgr().activate_pipeline(
+            pl.name, req.active, ctx.get_knowledge_mgr().get_active_knowledge_base()
+        )
     return pl
 
 

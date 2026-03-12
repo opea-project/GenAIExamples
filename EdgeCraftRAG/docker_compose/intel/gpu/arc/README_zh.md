@@ -23,16 +23,19 @@
 EC-RAG 支持 vLLM 部署（默认方式）以及面向 Intel Arc GPU 和 Core Ultra 平台的本地 OpenVINO 部署。前置条件如下：
 
 #### Core Ultra
+
 **操作系统**：Ubuntu 24.04 或更高版本  
 **驱动与库**：请参考 [Installing Client GPUs on Ubuntu Desktop](https://dgpu-docs.intel.com/driver/client/overview.html#installing-client-gpus-on-ubuntu-desktop)  
 **可用推理框架**：openVINO
 
 #### Intel Arc B60
+
 **操作系统**：Ubuntu 25.04 Desktop（适用于 Core Ultra 和 Xeon-W），Ubuntu 25.04 Server（适用于 Xeon-SP）。  
 **驱动与库**：详细安装请参考 [Install Bare Metal Environment](https://github.com/intel/llm-scaler/tree/main/vllm#11-install-bare-metal-environment)  
 **可用推理框架**：openVINO、vLLM
 
 #### Intel Arc A770
+
 **操作系统**：Ubuntu Server 22.04.1 或更高版本（至少 6.2 LTS 内核）  
 **驱动与库**：详细驱动与库安装请参考 [Installing GPUs Drivers](https://dgpu-docs.intel.com/driver/installation-rolling.html#installing-gpu-drivers)  
 **可用推理框架**：openVINO、vLLM
@@ -48,9 +51,9 @@ cd GenAIExamples/EdgeCraftRAG
 
 > **注意**：如果你想切换到某个发布版本，例如 v1.5：
 >
->```
->git checkout v1.5
->```
+> ```
+> git checkout v1.5
+> ```
 
 ### 3. 运行 quick_start.sh
 
@@ -112,11 +115,11 @@ If you are accessing from another machine, replace ${HOST_IP} with your server's
 
 下表全面概述了示例 Docker Compose 文件中各类部署所使用的 EdgeCraftRAG 服务。表中每一行代表一个独立服务，详细说明了可用镜像及其在部署架构中的功能描述。
 
-| 服务名称            | 可选镜像名称                             | 可选 | 描述                                                                                             |
-| ------------------- | ---------------------------------------- | ---- | ------------------------------------------------------------------------------------------------ |
-| etcd                | quay.io/coreos/etcd:v3.5.5               | 否   | 提供分布式键值存储，用于服务发现和配置管理。                                                     |
-| minio               | minio/minio:RELEASE.2023-03-20T20-16-18Z | 否   | 提供对象存储服务，用于存储文档和模型文件。                                                       |
-| milvus-standalone   | milvusdb/milvus:v2.4.6                   | 否   | 提供向量数据库能力，用于管理 embedding 和相似度检索。                                            |
-| edgecraftrag-server | opea/edgecraftrag-server:latest          | 否   | 作为 EdgeCraftRAG 服务后端，具体形态随部署方式不同而变化。                                       |
-| edgecraftrag-ui     | opea/edgecraftrag-ui:latest              | 否   | 提供 EdgeCraftRAG 服务的用户界面。                                                               |
-| ecrag               | opea/edgecraftrag:latest                 | 否   | 作为反向代理，管理 UI 与后端服务之间的流量。                                                     |
+| 服务名称            | 可选镜像名称                             | 可选 | 描述                                                       |
+| ------------------- | ---------------------------------------- | ---- | ---------------------------------------------------------- |
+| etcd                | quay.io/coreos/etcd:v3.5.5               | 否   | 提供分布式键值存储，用于服务发现和配置管理。               |
+| minio               | minio/minio:RELEASE.2023-03-20T20-16-18Z | 否   | 提供对象存储服务，用于存储文档和模型文件。                 |
+| milvus-standalone   | milvusdb/milvus:v2.4.6                   | 否   | 提供向量数据库能力，用于管理 embedding 和相似度检索。      |
+| edgecraftrag-server | opea/edgecraftrag-server:latest          | 否   | 作为 EdgeCraftRAG 服务后端，具体形态随部署方式不同而变化。 |
+| edgecraftrag-ui     | opea/edgecraftrag-ui:latest              | 否   | 提供 EdgeCraftRAG 服务的用户界面。                         |
+| ecrag               | opea/edgecraftrag:latest                 | 否   | 作为反向代理，管理 UI 与后端服务之间的流量。               |

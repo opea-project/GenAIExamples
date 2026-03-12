@@ -20,19 +20,22 @@ This section describes how to quickly deploy and test the EdgeCraftRAG service m
 
 ### 1. Prerequisites
 
-EC-RAG supports vLLM deployment(default method) and local OpenVINO deployment for Intel Arc GPU and Core Ultra Platform. Prerequisites are shown as below:  
+EC-RAG supports vLLM deployment(default method) and local OpenVINO deployment for Intel Arc GPU and Core Ultra Platform. Prerequisites are shown as below:
 
 #### Core Ultra
+
 **OS**: Ubuntu 24.04 or newer  
 **Driver & libraries**: Please refer to [Installing Client GPUs on Ubuntu Desktop](https://dgpu-docs.intel.com/driver/client/overview.html#installing-client-gpus-on-ubuntu-desktop)  
 **Available Inferencing Framework**: openVINO
 
 #### Intel Arc B60
-**OS**: Ubuntu 25.04 Desktop (for Core Ultra and Xeon-W), Ubuntu 25.04 Server (for Xeon-SP).   
+
+**OS**: Ubuntu 25.04 Desktop (for Core Ultra and Xeon-W), Ubuntu 25.04 Server (for Xeon-SP).  
 **Driver & libraries**: Please refer to [Install Bare Metal Environment](https://github.com/intel/llm-scaler/tree/main/vllm#11-install-bare-metal-environment) for detailed setup  
 **Available Inferencing Framework**: openVINO, vLLM
 
 #### Intel Arc A770
+
 **OS**: Ubuntu Server 22.04.1 or newer (at least 6.2 LTS kernel)  
 **Driver & libraries**: Please refer to [Installing GPUs Drivers](https://dgpu-docs.intel.com/driver/installation-rolling.html#installing-gpu-drivers) for detailed driver & libraries setup  
 **Available Inferencing Framework**: openVINO, vLLM
@@ -48,9 +51,9 @@ cd GenAIExamples/EdgeCraftRAG
 
 > **NOTE**: If you want to checkout a released version, such as v1.5:
 >
->```
->git checkout v1.5
->```
+> ```
+> git checkout v1.5
+> ```
 
 ### 3. Run quick_start.sh
 

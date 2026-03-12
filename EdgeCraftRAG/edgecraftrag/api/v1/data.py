@@ -5,12 +5,13 @@ import json
 import os
 from typing import List
 
+from edgecraftrag.api.v1.knowledge_base import add_file_to_knowledge_base
 from edgecraftrag.api_schema import DataIn, FilesIn
 from edgecraftrag.config_repository import MilvusConfigRepository
 from edgecraftrag.context import ctx
 from edgecraftrag.env import UI_DIRECTORY
 from fastapi import FastAPI, File, HTTPException, UploadFile, status
-from edgecraftrag.api.v1.knowledge_base import add_file_to_knowledge_base
+
 data_app = FastAPI()
 
 
@@ -24,7 +25,7 @@ async def get_nodes_with_kb(kb_name=None):
         kb = ctx.get_knowledge_mgr().get_active_knowledge_base()
     if kb.indexer.comp_subtype == "faiss_vector":
         return kb.indexer.docstore.docs
-    elif kb.indexer.comp_subtype == "milvus_vector":  
+    elif kb.indexer.comp_subtype == "milvus_vector":
         collection_name = kb.name
         Milvus_node_list = MilvusConfigRepository.create_connection(collection_name, 1, kb.indexer.vector_url)
         results = Milvus_node_list.get_configs(output_fields=["text", "_node_content", "doc_id"])

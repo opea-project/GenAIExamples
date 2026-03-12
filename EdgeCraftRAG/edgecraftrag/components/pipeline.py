@@ -15,13 +15,18 @@ from edgecraftrag.base import (
     CompType,
     GeneratorType,
     InferenceType,
+    NodeParserType,
     RetrieverType,
 )
-from edgecraftrag.base import NodeParserType
 from edgecraftrag.components.generator import clone_generator
 from edgecraftrag.components.postprocessor import RerankProcessor
 from edgecraftrag.components.query_preprocess import query_search
-from edgecraftrag.components.retriever import AutoMergeRetriever, SimpleBM25Retriever, VectorSimRetriever, KBadminRetriever
+from edgecraftrag.components.retriever import (
+    AutoMergeRetriever,
+    KBadminRetriever,
+    SimpleBM25Retriever,
+    VectorSimRetriever,
+)
 from edgecraftrag.env import SEARCH_CONFIG_PATH, SEARCH_DIR
 from fastapi.responses import StreamingResponse
 from llama_index.core.schema import QueryBundle
@@ -155,6 +160,7 @@ class Pipeline(BaseComponent):
                 if gen.comp_subtype == generator_type:
                     return gen
         return None
+
     def update_retriever_config(self, retriever_type: str, retrieve_topk: int):
         self.retriever_type = retriever_type
         self.retrieve_topk = retrieve_topk
@@ -202,7 +208,6 @@ class Pipeline(BaseComponent):
                             raise ValueError(f"Retriever type {self.retriever_type} not supported")
                 break
 
-    
     def clear_retrievers(self):
         self.retrievers = []
 
@@ -406,7 +411,7 @@ async def run_generator(
     pl: Pipeline, chat_request: ChatCompletionRequest, generator_type: str = GeneratorType.CHATQNA
 ) -> Any:
     active_kbs = chat_request.user if chat_request.user else []
-     # If using multiple knowledge bases, unstructured node parser cannot work with other types of node parser
+    # If using multiple knowledge bases, unstructured node parser cannot work with other types of node parser
     np_types = {kb.node_parser.comp_subtype for kb in active_kbs}
     if len(np_types) > 1 and NodeParserType.UNSTRUCTURED in np_types:
         raise ValueError("unstructured node parser cannot work with other types of node parser")

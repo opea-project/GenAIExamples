@@ -6,13 +6,14 @@ from typing import Any
 import faiss
 from edgecraftrag.base import BaseComponent, CompType, IndexerType
 from edgecraftrag.context import ctx
+from langchain_milvus import Milvus
 from langchain_openai import OpenAIEmbeddings
 from llama_index.core import StorageContext, VectorStoreIndex
 from llama_index.vector_stores.faiss import FaissVectorStore
 from llama_index.vector_stores.milvus import MilvusVectorStore
 from pydantic import model_serializer
-from langchain_milvus import Milvus
 from pymilvus import Collection, MilvusException, connections, utility
+
 
 class VectorIndexer(BaseComponent, VectorStoreIndex):
     def __init__(self, embed_model, vector_type, vector_url="http://localhost:19530", kb_name="default_kb"):

@@ -1,9 +1,9 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+import gc
 from typing import Any, Dict, List, Optional
 
-import gc
 from edgecraftrag.api_schema import KnowledgeBaseCreateIn
 from edgecraftrag.base import BaseMgr
 from edgecraftrag.components.knowledge_base import Knowledge

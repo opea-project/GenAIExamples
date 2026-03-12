@@ -8,8 +8,21 @@ import re
 from typing import Dict, List, Union
 
 from edgecraftrag.api_schema import DataIn, ExperienceIn, KnowledgeBaseCreateIn
+from edgecraftrag.base import (
+    IndexerType,
+    ModelType,
+    NodeParserType,
+)
+from edgecraftrag.components.benchmark import Benchmark
+from edgecraftrag.components.indexer import KBADMINIndexer, VectorIndexer, get_kbs_info
+from edgecraftrag.components.node_parser import (
+    HierarchyNodeParser,
+    KBADMINParser,
+    SimpleNodeParser,
+    SWindowNodeParser,
+    UnstructedNodeParser,
+)
 from edgecraftrag.components.query_preprocess import query_search
-from edgecraftrag.components.indexer import get_kbs_info
 from edgecraftrag.config_repository import (
     MilvusConfigRepository,
     save_knowledge_configurations,
@@ -21,21 +34,7 @@ from edgecraftrag.env import (
     SEARCH_DIR,
     UI_DIRECTORY,
 )
-from edgecraftrag.base import (
-    IndexerType,
-    ModelType,
-    NodeParserType,
-)
-from edgecraftrag.components.benchmark import Benchmark
-from edgecraftrag.components.indexer import KBADMINIndexer, VectorIndexer
-from edgecraftrag.components.node_parser import (
-    HierarchyNodeParser,
-    KBADMINParser,
-    SimpleNodeParser,
-    SWindowNodeParser,
-    UnstructedNodeParser,
-)
-from fastapi import FastAPI, HTTPException, status, Query
+from fastapi import FastAPI, HTTPException, Query, status
 
 kb_app = FastAPI()
 
@@ -51,7 +50,9 @@ async def get_all_knowledge_bases():
 
 # Get knowledge base files in a certain range.
 @kb_app.get("/v1/knowledge/{knowledge_name}/filemap")
-async def get_knowledge_base_filemap(knowledge_name: str, page_num: int = Query(1, ge=1), page_size: int = Query(20, ge=1)):
+async def get_knowledge_base_filemap(
+    knowledge_name: str, page_num: int = Query(1, ge=1), page_size: int = Query(20, ge=1)
+):
     kb = ctx.knowledgemgr.get_knowledge_base_by_name_or_id(knowledge_name)
     if kb and kb.file_map:
         file_map = kb.file_map
@@ -61,7 +62,7 @@ async def get_knowledge_base_filemap(knowledge_name: str, page_num: int = Query(
         if start >= filemap_len:
             return None
         file_map_subset = itertools.islice(file_map.items(), start, end)
-        return {"file_map": dict(file_map_subset),"total": kb.calculate_totals()}
+        return {"file_map": dict(file_map_subset), "total": kb.calculate_totals()}
     else:
         return None
 
@@ -101,7 +102,7 @@ async def create_knowledge_base(knowledge: KnowledgeBaseCreateIn):
                     active_pl.update_retriever_list(ctx.knowledgemgr.get_active_knowledge_base())
             except Exception as e:
                 ctx.knowledgemgr.delete_knowledge_base(knowledge.name)
-                raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))  
+                raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
         await save_knowledge_configurations("add", kb)
         return "Create knowledge base successfully"
     except Exception as e:
@@ -156,7 +157,7 @@ async def update_knowledge_base(knowledge: KnowledgeBaseCreateIn):
                 raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
             # reload data for knowledge base
-            node_parser_changed = (kb_node_parser != kb.node_parser)
+            node_parser_changed = kb_node_parser != kb.node_parser
             if node_parser_changed or kb_indexer != kb.indexer:
                 await handle_reload_data(kb, node_parser_changed)
         elif kb.comp_subtype == "kbadmin_kb":
@@ -176,10 +177,10 @@ async def update_knowledge_base(knowledge: KnowledgeBaseCreateIn):
 @kb_app.post(path="/v1/knowledge/{knowledge_name}/files")
 async def add_file_to_knowledge_base(knowledge_name, file_path: DataIn):
     """
-        1. Parse file into Llamaindex Document and add file to filemgr
-        2. Add file path to knowledge base
-        3. Update nodes and vector store for knowledge base
-        4. Update pipeline retriever if active knowledge base's indexer changed
+    1. Parse file into Llamaindex Document and add file to filemgr
+    2. Add file path to knowledge base
+    3. Update nodes and vector store for knowledge base
+    4. Update pipeline retriever if active knowledge base's indexer changed
     """
     try:
         kb = ctx.knowledgemgr.get_knowledge_base_by_name_or_id(knowledge_name)
@@ -222,7 +223,7 @@ async def add_file_to_knowledge_base(knowledge_name, file_path: DataIn):
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Error uploading file.")
 
         # update retriever with indexer since indexer updated
-        if  kb.active:
+        if kb.active:
             active_pl = ctx.get_pipeline_mgr().get_active_pipeline()
             if active_pl:
                 active_pl.update_retriever(kb, prev_indexer)
@@ -258,7 +259,7 @@ async def remove_file_from_knowledge_base(knowledge_name, file_path: DataIn):
             )
         await remove_document_handler(document_list, kb)
         # update retriever with indexer since indexer updated
-        if  kb.active:
+        if kb.active:
             active_pl = ctx.get_pipeline_mgr().get_active_pipeline()
             if active_pl:
                 active_pl.update_retriever(kb, prev_indexer)
@@ -459,6 +460,7 @@ async def handle_reload_data(kb, node_parser_changed: bool = False):
     # update indexer
     await kb.update_nodes_to_indexer()
 
+
 async def update_kb_handler(kb, knowledge):
     if kb.enable_benchmark:
         kb.benchmark = Benchmark(True, "")
@@ -493,7 +495,9 @@ async def update_kb_handler(kb, knowledge):
             ctx.get_node_parser_mgr().add(kb.node_parser)
     if knowledge.indexer is not None:
         ind = knowledge.indexer
-        found_indexer = ctx.get_indexer_mgr().search_indexer(ind) if ind.indexer_type != IndexerType.MILVUS_VECTOR else None
+        found_indexer = (
+            ctx.get_indexer_mgr().search_indexer(ind) if ind.indexer_type != IndexerType.MILVUS_VECTOR else None
+        )
         if found_indexer is not None:
             kb.indexer = found_indexer
         else:
