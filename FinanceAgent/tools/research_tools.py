@@ -328,8 +328,7 @@ def analyze_balance_sheet(
 
     df_string = "Balance sheet:\n" + balance_sheet
 
-    instruction = dedent(
-        """
+    instruction = dedent("""
         Delve into a detailed scrutiny of the company's balance sheet for the most recent fiscal year, pinpointing
         the structure of assets, liabilities, and shareholders' equity to decode the firm's financial stability and
         operational efficiency. Focus on evaluating the liquidity through current assets versus current liabilities,
@@ -337,8 +336,7 @@ def analyze_balance_sheet(
         Contrast these metrics with previous years' data to highlight financial trends, improvements, or deteriorations.
         Finalize with a strategic assessment of the company's financial leverage, asset management, and capital structure,
         providing insights into its fiscal health and future prospects in a single paragraph. Less than 130 words.
-        """
-    )
+        """)
 
     prompt = combine_prompt(instruction, df_string)
     return prompt
@@ -365,8 +363,7 @@ def analyze_income_stmt(
     df_string = "Income statement:\n" + income_stmt
 
     # Analysis instruction
-    instruction = dedent(
-        """
+    instruction = dedent("""
         Conduct a comprehensive analysis of the company's income statement for the current fiscal year.
         Start with an overall revenue record, including Year-over-Year or Quarter-over-Quarter comparisons,
         and break down revenue sources to identify primary contributors and trends. Examine the Cost of
@@ -377,8 +374,7 @@ def analyze_income_stmt(
         operational challenges. The output should be a strategic overview of the company’s financial health
         in a single paragraph, less than 130 words, summarizing the previous analysis into 4-5 key points under
         respective subheadings with specific discussion and strong data support.
-        """
-    )
+        """)
 
     # Combine the instruction, section text, and income statement
     prompt = combine_prompt(instruction, df_string)
@@ -407,8 +403,7 @@ def analyze_cash_flow(
 
     df_string = "Cash flow statement:\n" + cash_flow
 
-    instruction = dedent(
-        """
+    instruction = dedent("""
         Dive into a comprehensive evaluation of the company's cash flow for the latest fiscal year, focusing on cash inflows
         and outflows across operating, investing, and financing activities. Examine the operational cash flow to assess the
         core business profitability, scrutinize investing activities for insights into capital expenditures and investments,
@@ -416,8 +411,7 @@ def analyze_cash_flow(
         to prior periods to discern trends, sustainability, and liquidity risks. Conclude with an informed analysis of the company's
         cash management effectiveness, liquidity position, and potential for future growth or financial challenges in a single paragraph.
         Less than 130 words.
-        """
-    )
+        """)
 
     prompt = combine_prompt(instruction, df_string)
     return prompt
@@ -457,12 +451,10 @@ def get_share_performance(
 
     df_string = "Past 60 days Stock prices:\n" + json.dumps(prices)
 
-    instruction = dedent(
-        """
+    instruction = dedent("""
         Dive into a comprehensive evaluation of the company's stock price for the latest 60 days.
         Less than 130 words.
-        """
-    )
+        """)
 
     prompt = combine_prompt(instruction, df_string)
     return prompt

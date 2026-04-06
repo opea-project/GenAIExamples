@@ -313,7 +313,7 @@ class Deployer:
 
         # If this is an offline deployment, the mode is already set and should not be prompted.
         if getattr(self.args, "is_offline_deployment", False):
-            log_message("INFO", f"Offline Deployment Mode: {self.args.deploy_mode} (pre-selected)")
+            log_message("INFO", f"Offline Deployment Mode: {self.args.deploy_mode} (preselected)")
         else:
             self.args.deploy_mode = click.prompt(
                 "Deployment Mode", type=click.Choice(["docker", "k8s"]), default="docker"

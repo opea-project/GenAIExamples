@@ -258,7 +258,9 @@ class DeepSearchAgent(Agent):
                     bold=True,
                 ),
             )
-            await stream_writer(f"\n\n⚠️ **Reached maximum retrievals: {self.cfg.max_retrievals}, stopping search**\n\n")
+            await stream_writer(
+                f"\n\n⚠️ **Reached maximum retrievals: {self.cfg.max_retrievals}, stopping search**\n\n"
+            )
             return "stop"
 
         response = await self.llm_generate_astream_writer(state.request)

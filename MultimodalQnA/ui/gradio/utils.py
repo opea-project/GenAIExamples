@@ -105,7 +105,7 @@ class StreamToLogger(object):
 def maintain_aspect_ratio_resize(image, width=None, height=None, inter=cv2.INTER_AREA):
     # Grab the image size and initialize dimensions
     dim = None
-    (h, w) = image.shape[:2]
+    h, w = image.shape[:2]
 
     # Return original image if no need to resize
     if width is None and height is None:

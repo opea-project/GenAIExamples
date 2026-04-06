@@ -45,25 +45,21 @@ class DBQnAService:
             # Get table information
             with engine.connect() as conn:
                 # Get all tables
-                tables_query = text(
-                    """
+                tables_query = text("""
                     SELECT table_name
                     FROM information_schema.tables
                     WHERE table_schema = 'public'
-                """
-                )
+                """)
                 tables = conn.execute(tables_query).fetchall()
 
                 for (table_name,) in tables:
                     # Get columns for each table
-                    columns_query = text(
-                        """
+                    columns_query = text("""
                         SELECT column_name, data_type
                         FROM information_schema.columns
                         WHERE table_name = :table_name
                         ORDER BY ordinal_position
-                    """
-                    )
+                    """)
                     columns = conn.execute(columns_query, {"table_name": table_name}).fetchall()
 
                     schema["tables"][table_name] = {"columns": [{"name": col, "type": dtype} for col, dtype in columns]}
@@ -146,8 +142,7 @@ Provide a natural language summary of the results."""
         try:
             engine = self.get_engine()
             with engine.connect() as conn:
-                query = text(
-                    """
+                query = text("""
                     SELECT
                         p.name as product,
                         p.sku,
@@ -159,8 +154,7 @@ Provide a natural language summary of the results."""
                     JOIN products p ON i.product_id = p.id
                     JOIN warehouses w ON i.warehouse_id = w.id
                     WHERE p.sku = :sku AND w.name = :warehouse
-                """
-                )
+                """)
 
                 result = conn.execute(query, {"sku": sku, "warehouse": warehouse})
                 row = result.fetchone()
