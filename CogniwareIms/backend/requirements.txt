@@ -39,7 +39,7 @@ pypdf>=4.0.0  # Replaced PyPDF2==3.0.1 (License: BSD-3-Clause, verified)
 # (using standard library and python-json-logger)
 
 # Testing (dev dependencies)
-pytest==8.3.3
+pytest==9.0.3
 pytest-asyncio==0.24.0
 pytest-cov==6.0.0
 python-docx==1.1.2
