@@ -45,7 +45,7 @@ pytest-cov==6.0.0
 python-docx==1.1.2
 
 # Utilities
-python-dotenv==1.0.1
+python-dotenv==1.2.2
 python-json-logger==2.0.7
 
 # Form Data - FIXED: Updated python-multipart (DoS vulnerability)
