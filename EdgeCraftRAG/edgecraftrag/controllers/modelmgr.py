@@ -2,15 +2,19 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import asyncio
-
+import os
 from edgecraftrag.api_schema import ModelIn
 from edgecraftrag.base import BaseComponent, BaseMgr, CompType, ModelType
 from edgecraftrag.components.model import (
     BaseModelComponent,
     OpenAIEmbeddingModel,
     OpenVINOEmbeddingModel,
+    OpenVINOGenAIEmbeddingModel,
     OpenVINOLLMModel,
+    OpenVINOGenAILLMModel,
     OpenVINORerankModel,
+    OpenVINOGenAIRerankModel,
+    resolve_model_path,
 )
 
 
@@ -78,37 +82,65 @@ class ModelMgr(BaseMgr):
     @staticmethod
     def load_model(model_para: ModelIn):
         model = None
+        enable_genai = os.getenv("ENABLE_GENAI", "").lower() == "true"
         match model_para.model_type:
             case ModelType.EMBEDDING:
-                model = OpenVINOEmbeddingModel(
-                    model_id=model_para.model_id,
-                    model_path=model_para.model_path,
-                    device=model_para.device,
-                    weight=model_para.weight,
-                )
+                if model_para.device == "NPU" or enable_genai== True:
+                    model = OpenVINOGenAIEmbeddingModel(
+                        model_id=model_para.model_id,
+                        model_path=model_para.model_path,
+                        device=model_para.device,
+                        weight=model_para.weight,
+                    )
+                else:
+                    model = OpenVINOEmbeddingModel(
+                        model_id=model_para.model_id,
+                        model_path=model_para.model_path,
+                        device=model_para.device,
+                        weight=model_para.weight,
+                    )
             case ModelType.VLLM_EMBEDDING:
                 model = OpenAIEmbeddingModel(
                     model_id=model_para.model_id,
                     api_base=model_para.api_base,
                 )
             case ModelType.RERANKER:
-                model = OpenVINORerankModel(
-                    model_id=model_para.model_id,
-                    model_path=model_para.model_path,
-                    device=model_para.device,
-                    weight=model_para.weight,
-                )
+                if enable_genai== True:
+                    model = OpenVINOGenAIRerankModel(
+                        model_id=model_para.model_id,
+                        model_path=model_para.model_path,
+                        device=model_para.device,
+                        weight=model_para.weight,
+                    )
+                else:
+                    model = OpenVINORerankModel(
+                        model_id=model_para.model_id,
+                        model_path=model_para.model_path,
+                        device=model_para.device,
+                        weight=model_para.weight,
+                    )
             case ModelType.LLM:
-                model = OpenVINOLLMModel(
+                model = OpenVINOGenAILLMModel(
                     model_id=model_para.model_id,
                     model_path=model_para.model_path,
                     device=model_para.device,
                     weight=model_para.weight,
                 )
+                # model = OpenVINOLLMModel(
+                #     model_id=model_para.model_id,
+                #     model_path=model_para.model_path,
+                #     device=model_para.device,
+                #     weight=model_para.weight,
+                # )
             case ModelType.VLLM:
                 model = BaseModelComponent(model_id=model_para.model_id, model_path="", device="", weight="")
                 model.comp_type = CompType.MODEL
                 model.comp_subtype = ModelType.VLLM
+                model.model_id_or_path = model_para.model_id
+            case ModelType.OVMS:
+                model = BaseModelComponent(model_id=model_para.model_id, model_path="", device="", weight="")
+                model.comp_type = CompType.MODEL
+                model.comp_subtype = ModelType.OVMS
                 model.model_id_or_path = model_para.model_id
         return model
 
@@ -121,28 +153,34 @@ class ModelMgr(BaseMgr):
             case ModelType.LLM:
                 from optimum.intel import OVModelForCausalLM
 
-                ov_model = OVModelForCausalLM.from_pretrained(
-                    model_para.model_path,
-                    device=model_para.device,
-                    weight=model_para.weight,
-                )
+                resolved_model_path = resolve_model_path(model_para.model_path)
+
+                # ov_model = OVModelForCausalLM.from_pretrained(
+                #     resolved_model_path,
+                #     device=model_para.device,
+                #     weight=model_para.weight,
+                # )
                 from llm_bench_utils.hook_common import get_bench_hook
 
                 num_beams = 1
-                bench_hook = get_bench_hook(num_beams, ov_model)
-                model = OpenVINOLLMModel(
+                bench_hook = None
+                model = OpenVINOGenAILLMModel(
                     model_id=model_para.model_id,
-                    model_path=model_para.model_path,
+                    model_path=resolved_model_path,
                     device=model_para.device,
-                    weight=model_para.weight,
-                    model=ov_model,
+                    weight=model_para.weight
                 )
                 from transformers import AutoTokenizer
 
-                tokenizer = AutoTokenizer.from_pretrained(model_para.model_path, trust_remote_code=True)
+                tokenizer = None
             case ModelType.VLLM:
                 model = BaseModelComponent(model_id=model_para.model_id, model_path="", device="", weight="")
                 model.comp_type = CompType.MODEL
                 model.comp_subtype = ModelType.VLLM
+                model.model_id_or_path = model_para.model_id
+            case ModelType.OVMS:
+                model = BaseModelComponent(model_id=model_para.model_id, model_path="", device="", weight="")
+                model.comp_type = CompType.MODEL
+                model.comp_subtype = ModelType.OVMS
                 model.model_id_or_path = model_para.model_id
         return model, tokenizer, bench_hook

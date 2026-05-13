@@ -51,8 +51,12 @@ class AgentManager(BaseMgr):
             return "Create Agent failed. Pipeline id not found."
         if cfgs.type == AgentType.SIMPLE:
             new_agent = SimpleRAGAgent(cfgs.idx, cfgs.name, cfgs.pipeline_idx, cfgs.configs)
+            new_agent.configs["max_retrievals"]=min(new_agent.configs["max_retrievals"], self.get_pipeline_by_name_or_id(cfgs.pipeline_idx).max_retrieve_topk)
         elif cfgs.type == AgentType.DEEPSEARCH:
             new_agent = DeepSearchAgent(cfgs.idx, cfgs.name, cfgs.pipeline_idx, cfgs.configs)
+            new_agent.configs["retrieve_top_k"]=min(new_agent.configs["retrieve_top_k"], self.get_pipeline_by_name_or_id(cfgs.pipeline_idx).max_retrieve_topk)
+            new_agent.configs["rerank_top_k"]=min(new_agent.configs["rerank_top_k"], self.get_pipeline_by_name_or_id(cfgs.pipeline_idx).max_retrieve_topk)
+
         if new_agent is not None:
             self.set_manager(new_agent)
             self.agents[new_agent.idx] = new_agent
@@ -118,4 +122,5 @@ class AgentManager(BaseMgr):
     async def run_agent(self, chat_request: ChatCompletionRequest) -> Any:
         active_agent = self.get_active_agent()
         if active_agent is not None:
-            return await active_agent.run(cbtype=CallbackType.RUNAGENT, chat_request=chat_request)
+            run_agent_gen = await active_agent.run(cbtype=CallbackType.RUNAGENT, chat_request=chat_request)
+            return run_agent_gen, active_agent.retrievals

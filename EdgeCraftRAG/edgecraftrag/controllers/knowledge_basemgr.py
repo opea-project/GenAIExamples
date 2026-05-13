@@ -1,9 +1,9 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-import gc
 from typing import Any, Dict, List, Optional
 
+import gc
 from edgecraftrag.api_schema import KnowledgeBaseCreateIn
 from edgecraftrag.base import BaseMgr
 from edgecraftrag.components.knowledge_base import Knowledge
@@ -96,6 +96,22 @@ class KnowledgeManager(BaseMgr):
     def delete_knowledge_base(self, name: str):
         kb = self.get_knowledge_base_by_name_or_id(name)
         kb.node_parser = None
+        if kb.idx in self.active_knowledge_idx:
+            self.active_knowledge_idx.remove(kb.idx)
+        if self.active_experience_idx == kb.idx:
+            self.active_experience_idx = None
+        if kb.indexer is not None and getattr(kb.indexer, "model", None) is not None:
+            if getattr(kb.indexer.model, "_model", None) is not None:
+                try:
+                    kb.indexer.model._model.clear_requests()
+                    kb.indexer.model._model = None
+                except Exception as e:
+                    pass
+            try:
+              del kb.indexer.model._ov_pipe
+            except Exception as e:
+                pass
+            kb.indexer.model = None
         kb.indexer = None
         self.remove(kb.idx)
         del kb

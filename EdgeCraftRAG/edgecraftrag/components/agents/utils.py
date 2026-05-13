@@ -8,6 +8,7 @@ import os
 import re
 import sys
 from typing import Any, Dict, List, Optional, Tuple, Union
+from urllib.parse import quote
 
 import numpy
 from pydantic import BaseModel
@@ -124,6 +125,40 @@ class ROLE:
 def remove_tagged(text, tag="think"):
     pattern = f"<{tag}>.*?</{tag}>"
     return re.sub(pattern, "", text, flags=re.DOTALL).strip()
+
+
+def encode_document_file_path(file_path: str) -> str:
+    if not isinstance(file_path, str) or not file_path:
+        return ""
+    return quote(file_path, safe="/:%")
+
+
+def build_document_node_block(doc: Any) -> str:
+    metadata = {}
+    if hasattr(doc, "node") and hasattr(doc.node, "metadata") and isinstance(doc.node.metadata, dict):
+        metadata = doc.node.metadata
+
+    source = metadata.get("file_name", "") if isinstance(metadata, dict) else ""
+    file_path = metadata.get("file_path", "") if isinstance(metadata, dict) else ""
+    page_num = metadata.get("page_label", "") if isinstance(metadata, dict) else ""
+    encoded_file_path = encode_document_file_path(file_path)
+    page_num_str = str(page_num).strip() if page_num is not None else ""
+    page_suffix = f"#page={page_num_str}" if page_num_str else ""
+
+    if hasattr(doc, "text") and isinstance(doc.text, str):
+        node_context = doc.text.strip()
+    elif hasattr(doc, "node") and hasattr(doc.node, "text") and isinstance(doc.node.text, str):
+        node_context = doc.node.text.strip()
+    else:
+        node_context = ""
+
+    return (
+        "<DOCUMENT_NODE>\n"
+        f"<DOCUMENT_NODE_SOURCE>{source}</DOCUMENT_NODE_SOURCE>\n"
+        f"<DOCUMENT_NODE_FILE_PATH>{encoded_file_path}{page_suffix}</DOCUMENT_NODE_FILE_PATH>\n"
+        f"<DOCUMENT_NODE_CONTEXT>{node_context}</DOCUMENT_NODE_CONTEXT>\n"
+        "</DOCUMENT_NODE>\n"
+    )
 
 
 def _extract_pattern_and_text(line: str) -> Optional[Tuple[str, int, str, str]]:

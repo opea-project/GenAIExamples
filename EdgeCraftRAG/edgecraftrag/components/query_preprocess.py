@@ -214,7 +214,7 @@ async def query_search(user_input, SEARCH_CONFIG_PATH, SEARCH_DIR, pl):
 
     generator = pl.get_generator(GeneratorType.CHATQNA)
     model_id = generator.model_id
-    vllm_endpoint = generator.vllm_endpoint
+    vllm_endpoint = getattr(generator, "remote_endpoint", generator.vllm_endpoint)
 
     maintenance_data = read_json_files(SEARCH_DIR)
     issues = []

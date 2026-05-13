@@ -10,26 +10,17 @@ from typing import Any, List, Tuple
 
 from comps.cores.proto.api_protocol import ChatCompletionRequest
 from edgecraftrag.base import AgentType, CallbackType, CompType
-from edgecraftrag.components.agent import Agent, stream_writer
+from edgecraftrag.components.agent import Agent, Retrieval, stream_writer
+from edgecraftrag.components.agents.utils import build_document_node_block
 from langgraph.graph import END, START, StateGraph
 from pydantic import BaseModel, Field
 
-from .config import load_config
+from .config import Config, PromptTemplates, get_default_config
 from .logging_utils import format_terminal_str, log_status
 from .postprocessing import postproc_answer as default_postproc_answer
 from .postprocessing import postproc_plan as default_postproc_plan
 from .postprocessing import postproc_query as default_postproc_query
 from .utils import Role, import_module_from_path
-
-DEFAULT_CONFIG = "./edgecraftrag/components/agents/deep_search/cfgs/default.json"
-
-
-class Retrieval(BaseModel):
-    step: str
-    query: str
-    retrieved: List[Any] = Field(...)
-    reranked: List[Any] = Field(...)
-
 
 class DeepSearchState(BaseModel):
     question: str
@@ -52,21 +43,17 @@ class DeepSearchAgent(Agent):
     def __init__(self, idx, name, pipeline_idx, cfg):
         super().__init__(name=name, agent_type=AgentType.DEEPSEARCH, pipeline_idx=pipeline_idx, configs=cfg)
 
-        # Load the configuration
-        # TODO: remove deep path
-        self.cfg = load_config(DEFAULT_CONFIG)
+        cfg = cfg or {}
+        default_cfg = get_default_config().model_dump()
+        merged_cfg = {**default_cfg, **cfg}
+        merged_cfg["prompt_templates"] = {
+            **default_cfg["prompt_templates"],
+            **cfg.get("prompt_templates", {}),
+        }
+        self.cfg = Config(**merged_cfg)
+        self.configs = merged_cfg
         if idx is not None:
             self.idx = idx
-        if "retrieve_top_k" in cfg:
-            self.cfg.retrieve_top_k = cfg["retrieve_top_k"]
-        if "rerank_top_k" in cfg:
-            self.cfg.rerank_top_k = cfg["rerank_top_k"]
-        if "mece_retrieval" in cfg:
-            self.cfg.mece_retrieval = cfg["mece_retrieval"]
-        if "max_retrievals" in cfg:
-            self.cfg.max_retrievals = cfg["max_retrievals"]
-        if "max_plan_steps" in cfg:
-            self.cfg.max_plan_steps = cfg["max_plan_steps"]
 
         self.graph = self._build_graph()
         self._messages: List[dict] = []
@@ -90,16 +77,30 @@ class DeepSearchAgent(Agent):
 
     @classmethod
     def get_default_configs(cls):
-        cfg = load_config(DEFAULT_CONFIG)
-        return {
-            "retrieve_top_k": cfg.retrieve_top_k,
-            "rerank_top_k": cfg.rerank_top_k,
-            "mece_retrieval": cfg.mece_retrieval,
-            "max_retrievals": cfg.max_retrievals,
-            "max_plan_steps": cfg.max_plan_steps,
-        }
+        return get_default_config().model_dump()
 
     def update(self, cfg):
+        for key in [
+            "system_instruction",
+            "plan_instruction",
+            "query_instruction",
+            "answer_instruction",
+            "recur_summarize_instruction",
+        ]:
+            value = cfg.get(key, None)
+            if value is not None and isinstance(value, str):
+                setattr(self.cfg, key, value)
+                self.configs[key] = value
+
+        prompt_templates = cfg.get("prompt_templates", None)
+        if prompt_templates is not None and isinstance(prompt_templates, dict):
+            updated_templates = {
+                **self.cfg.prompt_templates.model_dump(),
+                **prompt_templates,
+            }
+            self.cfg.prompt_templates = PromptTemplates(**updated_templates)
+            self.configs["prompt_templates"] = updated_templates
+
         retrieve = cfg.get("retrieve_top_k", None)
         if retrieve and isinstance(retrieve, int):
             self.cfg.retrieve_top_k = retrieve
@@ -111,7 +112,7 @@ class DeepSearchAgent(Agent):
             self.configs["rerank_top_k"] = rerank
 
         mr = cfg.get("mece_retrieval", None)
-        if mr and isinstance(mr, int):
+        if mr is not None and isinstance(mr, bool):
             self.cfg.mece_retrieval = mr
             self.configs["mece_retrieval"] = mr
 
@@ -195,8 +196,8 @@ class DeepSearchAgent(Agent):
 
         if mece_retrieve:
             new_retrieved = [node for node in retrieved if node.node_id not in state.context_chunk_ids]
-            # TODO: Using top_k from request, need to change?
-            new_retrieved = new_retrieved[: request.k]
+            effective_top_k = request.k if request.k not in (None, 0) else self.cfg.retrieve_top_k
+            new_retrieved = new_retrieved[:effective_top_k]
         else:
             new_retrieved = retrieved
 
@@ -427,7 +428,7 @@ class DeepSearchAgent(Agent):
                     for doc in retrieval.reranked:
                         node_id = doc.node_id
                         if node_id not in presented_ids:
-                            plan_with_information += f"{doc.text}\n\n"
+                            plan_with_information += build_document_node_block(doc) + "\n"
                             presented_ids.append(node_id)
             else:
                 plan_with_information = "Plan with Retrieved Information:\n"
@@ -439,7 +440,7 @@ class DeepSearchAgent(Agent):
                             related_docs = retrieval.reranked
                             break
                     for doc in related_docs:
-                        plan_with_information += f"- {doc.text}\n"
+                        plan_with_information += build_document_node_block(doc)
                     plan_with_information += "\n"
 
         self._messages = [

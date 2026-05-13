@@ -10,7 +10,7 @@ from comps.cores.proto.api_protocol import ChatCompletionRequest
 from edgecraftrag.api_schema import RagOut
 from edgecraftrag.base import GeneratorType
 from edgecraftrag.context import ctx
-from edgecraftrag.utils import chain_async_generators, serialize_contexts, stream_generator
+from edgecraftrag.utils import chain_async_generators, serialize_contexts, serialize_node_with_score, stream_generator
 from fastapi import Body, FastAPI, HTTPException, status
 from fastapi.responses import StreamingResponse
 
@@ -59,7 +59,7 @@ async def chatqna(request: ChatCompletionRequest):
 
         # Run agent if activated, otherwise, run pipeline
         if ctx.get_agent_mgr().get_active_agent():
-            run_agent_gen = await ctx.get_agent_mgr().run_agent(chat_request=request)
+            run_agent_gen, _ = await ctx.get_agent_mgr().run_agent(chat_request=request)
             return StreamingResponse(save_session(sessionid, run_agent_gen), media_type="text/plain")
 
         else:
@@ -95,6 +95,48 @@ async def ragqna(request: ChatCompletionRequest):
         request.user = active_kb if active_kb else None
         if experience_kb:
             request.tool_choice = "auto" if experience_kb.experience_active else "none"
+
+        def serialize_retrievals(retrievals):
+            return {
+                "retrievals": [
+                    {
+                        "step": retrieval.step,
+                        "query": retrieval.query,
+                        "retrieved": [serialize_node_with_score(node) for node in retrieval.retrieved],
+                        "reranked": [serialize_node_with_score(node) for node in retrieval.reranked],
+                    }
+                    for retrieval in retrievals
+                ]
+            }
+
+        if ctx.get_agent_mgr().get_active_agent():
+            # Save original query string before agent mutates request.messages
+            original_query = request.messages
+            run_agent_gen, retrievals = await ctx.get_agent_mgr().run_agent(chat_request=request)
+
+            if request.stream:
+
+                async def res_gen_json():
+                    async for token in run_agent_gen:
+                        yield json.dumps(token, ensure_ascii=False)[1:-1]
+
+                # Lazily serialize retrievals so it runs after res_gen_json() exhausts
+                async def context_suffix_gen():
+                    yield '","contexts":' + json.dumps(serialize_retrievals(retrievals)) + "}"
+
+                query_gen = stream_generator('{"query":' + json.dumps(original_query, ensure_ascii=False) + ',"response":"')
+                output_gen = chain_async_generators([query_gen, res_gen_json(), context_suffix_gen()])
+
+                return StreamingResponse(output_gen, media_type="text/plain")
+            else:
+                response_tokens = []
+                async for token in run_agent_gen:
+                    response_tokens.append(token)
+                    await asyncio.sleep(0)
+                serialized_contexts = serialize_retrievals(retrievals)
+                ragout = RagOut(query=original_query, contexts=serialized_contexts, response="".join(response_tokens))
+                return ragout
+
         generator = ctx.get_pipeline_mgr().get_active_pipeline().get_generator(GeneratorType.CHATQNA)
         if generator:
             request.model = generator.model_id
@@ -104,10 +146,10 @@ async def ragqna(request: ChatCompletionRequest):
             # Escape newlines for json format as value
             async def res_gen_json():
                 async for token in res_gen:
-                    yield token.replace("\n", "\\n")
+                    yield json.dumps(token, ensure_ascii=False)[1:-1]
 
             # Reconstruct RagOut in stream response
-            query_gen = stream_generator('{"query":"' + request.messages + '",')
+            query_gen = stream_generator('{"query":' + json.dumps(request.messages, ensure_ascii=False) + ',')
 
             s_contexts = json.dumps(serialize_contexts(contexts))
             context_gen = stream_generator('"contexts":' + s_contexts + ',"response":"')
@@ -134,6 +176,29 @@ def check_vllm(request_data: dict = Body(...)):
         model = request_data.get("model_name", "Qwen/Qwen3-8B")
         url = f"{server}/v1/completions"
         payload = {"model": model, "prompt": "Hi", "max_tokens": 16, "temperature": 0}
+
+        response = requests.post(url, json=payload, timeout=60)
+        if response.status_code == 200:
+            return {"status": "200"}
+        else:
+            raise HTTPException(status_code=500)
+    except Exception as e:
+        return {"status": "500", "message": f"connection failed: {str(e)}"}
+
+
+# Detecting if ovms is connected
+@chatqna_app.post(path="/v1/check/ovms")
+def check_ovms(request_data: dict = Body(...)):
+    try:
+        server = request_data.get("server_address", "http://localhost:8000").rstrip("/")
+        model = request_data.get("model_name", "Qwen/Qwen3-8B")
+        url = f"{server}/v3/chat/completions"
+        payload = {
+            "model": model,
+            "messages": [{"role": "user", "content": "Hi"}],
+            "max_tokens": 16,
+            "temperature": 0,
+        }
 
         response = requests.post(url, json=payload, timeout=60)
         if response.status_code == 200:

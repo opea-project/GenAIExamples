@@ -19,7 +19,8 @@ class Benchmark(BaseComponent):
         self.vllm_metrics = {}
         if inference_type == InferenceType.VLLM:
             self.is_vllm = True
-            self.vllm_metrics = self.get_vllm_metrics()
+            if self.enabled:
+                self.vllm_metrics = self.get_vllm_metrics()
         else:
             self.is_vllm = False
         self.tokenizer = tokenizer
@@ -78,6 +79,10 @@ class Benchmark(BaseComponent):
         if self.is_enabled() and idx in self.benchmark_data_list and comp_type in self.benchmark_data_list[idx]:
             self.benchmark_data_list[idx][comp_type] = data
 
+    def update_benchmark_data_genai(self, idx, comp_type, data, model):
+        if self.is_enabled() and idx in self.benchmark_data_list and comp_type in self.benchmark_data_list[idx]:
+            self.benchmark_data_list[idx][comp_type] = data
+
     def get_benchmark_data(self, idx, comp_type):
         if self.is_enabled() and idx in self.benchmark_data_list and comp_type in self.benchmark_data_list[idx]:
             return self.benchmark_data_list[idx][comp_type]
@@ -108,6 +113,17 @@ class Benchmark(BaseComponent):
 
             self.llm_data_list[idx] = metrics
 
+    def insert_llm_data_genai(self, idx, input_token_size=-1, model=None):
+        if self.is_enabled():
+            metrics = {}
+            metrics["input_token_size"] = input_token_size
+            metrics["output_token_size"] = model().perf_metrics.get_num_generated_tokens()
+            metrics["generation_time"] = model().perf_metrics.get_inference_duration().mean/1000
+            metrics["first_token_latency"] = model().perf_metrics.get_ttft().mean/1000
+            metrics["other_tokens_avg_latency"] = model().perf_metrics.get_tpot().mean/1000
+
+        self.llm_data_list[idx] = metrics
+
     def get_vllm_metrics(self):
         # self.vllm_metrics is the previous vllm metric
         vllm_metrics = [
@@ -123,7 +139,14 @@ class Benchmark(BaseComponent):
                 metrics[key] = 0
 
         llm_endpoint = os.getenv("vLLM_ENDPOINT", "http://localhost:8086")
-        response = requests.get(f"{llm_endpoint}/metrics", headers={"Content-Type": "application/json"})
+        try:
+            response = requests.get(
+                f"{llm_endpoint}/metrics",
+                headers={"Content-Type": "application/json"},
+                timeout=3,
+            )
+        except requests.RequestException:
+            return {}
         if response.status_code == 200:
             metrics_data = text_string_to_metric_families(response.text)
         else:
@@ -151,9 +174,9 @@ class Benchmark(BaseComponent):
             set = {
                 "Benchmark enabled": self.enabled,
                 "last_benchmark_data": (
-                    self.benchmark_data_list[self.dict_idx] if self.dict_idx in self.benchmark_data_list else None
+                    self.benchmark_data_list[self.last_idx] if self.last_idx in self.benchmark_data_list else None
                 ),
-                "llm_metrics": self.llm_data_list[self.dict_idx] if self.dict_idx in self.llm_data_list else None,
+                "llm_metrics": self.llm_data_list[self.last_idx] if self.last_idx in self.llm_data_list else None,
             }
         else:
             set = {

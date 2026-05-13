@@ -88,16 +88,16 @@
 </template>
 
 <script setup lang="ts">
-  import { getAgentList, requestAgentUpdate } from "@/api/agent";
-  import { getHistorySessionList, requestSessionDelete } from "@/api/chatbot";
-  import router from "@/router";
-  import { chatbotAppStore } from "@/store/chatbot";
-  import { sessionAppStore } from "@/store/session";
-  import emitter from "@/utils/mitt";
-  import { CloseCircleFilled, DeleteFilled, MessageOutlined } from "@ant-design/icons-vue";
-  import { Modal } from "ant-design-vue";
-  import { createVNode, onMounted, ref, watch } from "vue";
-  import { useI18n } from "vue-i18n";
+  import { getAgentList, requestAgentSetActive } from "@/api/agent";
+import { getHistorySessionList, requestSessionDelete } from "@/api/chatbot";
+import router from "@/router";
+import { chatbotAppStore } from "@/store/chatbot";
+import { sessionAppStore } from "@/store/session";
+import emitter from "@/utils/mitt";
+import { CloseCircleFilled, DeleteFilled, MessageOutlined } from "@ant-design/icons-vue";
+import { Modal } from "ant-design-vue";
+import { createVNode, onMounted, ref, watch } from "vue";
+import { useI18n } from "vue-i18n";
 
   const chatbotStore = chatbotAppStore();
   const sessionStore = sessionAppStore();
@@ -140,6 +140,7 @@
   const handleAgentClick = (agent: AgentItem, index: number) => {
     const { active } = agent;
     const { name, type } = agent;
+    const willActivate = !active;
 
     const text = active ? t("agent.deactivateTip") : t("agent.activeTip");
     Modal.confirm({
@@ -147,7 +148,7 @@
       content: text,
       okText: t("common.confirm"),
       async onOk() {
-        await requestAgentUpdate(name, { active: !active });
+        await requestAgentSetActive(name, willActivate);
         queryAgentList();
         if (!active) {
           handleThinkState();

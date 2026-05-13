@@ -37,6 +37,7 @@ class ModelType(str, Enum):
     RERANKER = "reranker"
     LLM = "llm"
     VLLM = "vllm"
+    OVMS = "ovms"
     VLLM_EMBEDDING = "vllm_embedding"
 
 
@@ -89,6 +90,7 @@ class InferenceType(str, Enum):
 
     LOCAL = "local"
     VLLM = "vllm"
+    OVMS = "ovms"
 
 
 class CallbackType(str, Enum):

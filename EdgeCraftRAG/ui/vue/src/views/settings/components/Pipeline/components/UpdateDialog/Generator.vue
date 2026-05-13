@@ -48,24 +48,26 @@
           @change="() => handleInferenceTypeChange(index)"
         >
           <a-radio value="vllm">{{ $t("pipeline.config.vllm") }}</a-radio>
+          <a-radio value="ovms">{{ $t("pipeline.config.ovms") }}</a-radio>
           <a-radio value="local">{{ $t("pipeline.config.local") }}</a-radio>
         </a-radio-group>
       </a-form-item>
-      <!-- vLLM -->
-      <template v-if="item.inference_type === 'vllm'">
+      <!-- Remote -->
+      <template v-if="isRemoteInference(item.inference_type)">
         <a-form-item
-          :name="['generator', index, 'vllm_endpoint']"
-          :rules="getVllmEndpointRules(index)"
+          :name="['generator', index, getRemoteEndpointField(item.inference_type)]"
+          :rules="getRemoteEndpointRules(index, item.inference_type)"
         >
           <template #label>
-            {{ $t("pipeline.config.vllm_url") }}
-            <span class="eg-wrap">{{ $t("pipeline.valid.vllm_url") }}</span>
+            {{ $t(getRemoteEndpointConfigKey(item.inference_type)) }}
+            <span class="eg-wrap">{{ $t(getRemoteEndpointValidKey(item.inference_type)) }}</span>
           </template>
 
           <a-input
-            v-model:value="item.vllm_endpoint"
-            :placeholder="$t('pipeline.valid.vllm_url')"
-            @change="() => handleVllmEndpointChange(index)"
+            :value="getRemoteEndpointValue(item, item.inference_type)"
+            :placeholder="$t(getRemoteEndpointValidKey(item.inference_type))"
+            @update:value="value => setRemoteEndpointValue(item, item.inference_type, value)"
+            @change="() => handleRemoteEndpointChange(index)"
           >
             <template #addonBefore>
               <a-select v-model:value="generatorStates[index].protocol">
@@ -79,7 +81,7 @@
                 type="primary"
                 class="text-btn"
                 :disabled="!generatorStates[index].isEndpointValid"
-                @click="handleQueryVllmModels(index)"
+                @click="handleQueryRemoteModels(index, item.inference_type)"
               >
                 <CheckCircleFilled
                   v-if="generatorStates[index].isConnected"
@@ -102,11 +104,11 @@
               v-model:value="item.model.model_id"
               showSearch
               :placeholder="$t('pipeline.valid.language')"
-              @change="() => handleVllmModeChange(index)"
-              @dropdownVisibleChange="v => handleVllmModelVisible(v, index)"
+              @change="() => handleRemoteModelChange(index)"
+              @dropdownVisibleChange="v => handleRemoteModelVisible(v, index, item.inference_type)"
             >
               <a-select-option
-                v-for="item in generatorStates[index].vllmModelList"
+                v-for="item in getRemoteModelList(index, item.inference_type)"
                 :key="item"
                 :value="item"
               >
@@ -118,7 +120,7 @@
               type="primary"
               class="text-btn"
               :disabled="!item.model.model_id"
-              @click="handleTestVllmEndpoint(index)"
+              @click="handleTestRemoteEndpoint(index, item.inference_type)"
             >
               <CheckCircleFilled
                 v-if="generatorStates[index].isEndpointTested"
@@ -176,28 +178,6 @@
           </a-select>
           <FormTooltip :title="$t('pipeline.desc.llmDevice')" />
         </a-form-item>
-
-        <a-form-item
-          :label="$t('pipeline.config.weights')"
-          :name="['generator', index, 'model', 'weight']"
-          :rules="rules.weight"
-        >
-          <a-select
-            v-model:value="item.model.weight"
-            showSearch
-            :placeholder="$t('pipeline.valid.weights')"
-            @dropdownVisibleChange="value => handleWeightVisible(value, index)"
-          >
-            <a-select-option
-              v-for="item in generatorStates[index].weightList"
-              :key="item"
-              :value="item"
-            >
-              {{ item }}
-            </a-select-option>
-          </a-select>
-          <FormTooltip :title="t('pipeline.desc.weights')" />
-        </a-form-item>
       </template>
       <div class="icon-wrap">
         <a-tooltip
@@ -221,7 +201,7 @@
   </a-form>
 </template>
 <script lang="ts" setup>
-  import { getModelList, getModelWeight, getRunDevice, requestUrlVllm } from "@/api/pipeline";
+  import { getModelList, getRunDevice, requestUrlOvms, requestUrlVllm } from "@/api/pipeline";
   import { useNotification } from "@/utils/common";
   import { validateServiceAddress } from "@/utils/validate";
   import {
@@ -263,6 +243,7 @@
     generator_type: string;
     inference_type: string;
     vllm_endpoint?: string;
+    ovms_endpoint?: string;
     prompt_path?: string;
     model: ModelType;
   }
@@ -273,9 +254,9 @@
     isConnected: boolean;
     isEndpointTested: boolean;
     vllmModelList: string[];
+    ovmsModelList: string[];
     localModelList: string[];
     deviceList: string[];
-    weightList: string[];
   }
 
   const formRef = ref<FormInstance>();
@@ -286,11 +267,11 @@
       generator_type = "chatqna",
       inference_type = "vllm",
       vllm_endpoint = `${host}:8086`,
+      ovms_endpoint = `${host}:8000`,
       model = {
         model_id: undefined,
         model_path: "",
         device: "AUTO",
-        weight: undefined,
       },
       prompt_path = "./default_prompt.txt",
     } = data;
@@ -299,6 +280,7 @@
       generator_type,
       inference_type,
       vllm_endpoint: formatUrl(vllm_endpoint || `${host}:8086`),
+      ovms_endpoint: formatUrl(ovms_endpoint || `${host}:8000`),
       prompt_path,
       model,
     };
@@ -324,9 +306,9 @@
     isConnected: connected,
     isEndpointTested: false,
     vllmModelList: [],
+    ovmsModelList: [],
     localModelList: [],
     deviceList: [],
-    weightList: [],
   });
 
   const generatorStates = reactive<GeneratorState[]>([]);
@@ -334,7 +316,9 @@
   const initStatesByForm = () => {
     generatorStates.splice(0);
     form.generator.forEach(item => {
-      generatorStates.push(createDefaultState(item.vllm_endpoint));
+      const endpoint =
+        item.inference_type === "ovms" ? item.ovms_endpoint : item.inference_type === "vllm" ? item.vllm_endpoint : undefined;
+      generatorStates.push(createDefaultState(endpoint));
     });
   };
 
@@ -369,28 +353,54 @@
         trigger: "change",
       },
     ],
-    weight: [
-      {
-        required: true,
-        message: t("pipeline.valid.weights"),
-        trigger: "change",
-      },
-    ],
   });
 
   const resetGenerator = (index: number, resetEndpoint = false) => {
-    Object.assign(form.generator[index].model, { model_id: undefined, weight: undefined });
+    Object.assign(form.generator[index].model, { model_id: undefined });
+    const inferenceType = form.generator[index].inference_type;
+    const endpoint =
+      inferenceType === "ovms"
+        ? form.generator[index].ovms_endpoint
+        : inferenceType === "vllm"
+          ? form.generator[index].vllm_endpoint
+          : undefined;
     generatorStates[index] = createDefaultState(
-      resetEndpoint ? undefined : form.generator[index].vllm_endpoint
+      resetEndpoint ? undefined : endpoint
     );
   };
 
   const handleInferenceTypeChange = (index: number) => resetGenerator(index);
-  const handleVllmEndpointChange = (index: number) => resetGenerator(index, true);
+  const handleRemoteEndpointChange = (index: number) => resetGenerator(index, true);
+
+  const isRemoteInference = (inferenceType: string) => inferenceType === "vllm" || inferenceType === "ovms";
+
+  const getRemoteModelType = (inferenceType: string) => (inferenceType === "ovms" ? "OVMS" : "vLLM");
+
+  const getRemoteEndpointField = (inferenceType: string) =>
+    inferenceType === "ovms" ? "ovms_endpoint" : "vllm_endpoint";
+
+  const getRemoteEndpointConfigKey = (inferenceType: string) =>
+    inferenceType === "ovms" ? "pipeline.config.ovms_url" : "pipeline.config.vllm_url";
+
+  const getRemoteEndpointValidKey = (inferenceType: string) =>
+    inferenceType === "ovms" ? "pipeline.valid.ovms_url" : "pipeline.valid.vllm_url";
+
+  const getRemoteModelTipKey = (inferenceType: string) =>
+    inferenceType === "ovms" ? "pipeline.valid.ovmsModelTip" : "pipeline.valid.modelTip";
+
+  const getRemoteEndpointValue = (item: GeneratorConfig, inferenceType: string) =>
+    inferenceType === "ovms" ? item.ovms_endpoint : item.vllm_endpoint;
+
+  const setRemoteEndpointValue = (item: GeneratorConfig, inferenceType: string, value: string) => {
+    if (inferenceType === "ovms") {
+      item.ovms_endpoint = value;
+    } else {
+      item.vllm_endpoint = value;
+    }
+  };
 
   const handleLocalModelChange = (index: number) => {
-    form.generator[index].model.weight = undefined;
-    generatorStates[index].weightList = [];
+    // no-op: weight selection removed for local LLM
   };
 
   const handleLocalModelVisible = async (visible: boolean, index: number) => {
@@ -415,23 +425,18 @@
     }
   };
 
-  const handleWeightVisible = async (visible: boolean, index: number) => {
-    if (visible) {
-      try {
-        const data: any = await getModelWeight(form.generator[index].model.model_id!);
-        generatorStates[index].weightList = data;
-      } catch (err) {
-        console.error(err);
-      }
-    }
-  };
 
-  const getVllmEndpointRules = (index: number): FormRules => [
+  const getRemoteEndpointRules = (index: number, inferenceType: string): FormRules => [
     {
       validator: (_: any, value: string) => {
-        if (!value) return Promise.reject(t("pipeline.valid.vllmUrlValid1"));
+        if (!value)
+          return Promise.reject(
+            t(inferenceType === "ovms" ? "pipeline.valid.ovmsUrlValid1" : "pipeline.valid.vllmUrlValid1")
+          );
         if (!validateServiceAddress(generatorStates[index].protocol + value))
-          return Promise.reject(t("pipeline.valid.vllmUrlValid2"));
+          return Promise.reject(
+            t(inferenceType === "ovms" ? "pipeline.valid.ovmsUrlValid2" : "pipeline.valid.vllmUrlValid2")
+          );
         generatorStates[index].isEndpointValid = true;
         return Promise.resolve();
       },
@@ -440,34 +445,66 @@
     },
   ];
 
-  const handleQueryVllmModels = async (index: number) => {
-    const data: any = await getModelList("vLLM", {
-      server_address: generatorStates[index].protocol + form.generator[index].vllm_endpoint,
+  const handleQueryRemoteModels = async (index: number, inferenceType: string) => {
+    const data: any = await getModelList(getRemoteModelType(inferenceType), {
+      server_address:
+        generatorStates[index].protocol +
+        (inferenceType === "ovms" ? form.generator[index].ovms_endpoint : form.generator[index].vllm_endpoint),
     });
-    generatorStates[index].vllmModelList = data || [];
+    if (inferenceType === "ovms") {
+      generatorStates[index].ovmsModelList = data || [];
+    } else {
+      generatorStates[index].vllmModelList = data || [];
+    }
     generatorStates[index].isConnected = !!data?.length;
   };
 
-  const handleTestVllmEndpoint = async (index: number) => {
-    const res: any = await requestUrlVllm({
-      server_address: generatorStates[index].protocol + form.generator[index].vllm_endpoint,
-      model_name: form.generator[index].model.model_id,
-    });
-    generatorStates[index].isEndpointTested = res?.status === "200";
+  const handleTestRemoteEndpoint = async (index: number, inferenceType: string) => {
+    const requestUrl = inferenceType === "ovms" ? requestUrlOvms : requestUrlVllm;
+    const endpoint =
+      inferenceType === "ovms" ? form.generator[index].ovms_endpoint : form.generator[index].vllm_endpoint;
+    try {
+      const res: any = await requestUrl({
+        server_address: generatorStates[index].protocol + endpoint,
+        model_name: form.generator[index].model.model_id,
+      });
+
+      const statusValue = res?.status ?? res?.code ?? res?.data?.status;
+      const isSuccess =
+        statusValue === 200 ||
+        statusValue === "200" ||
+        statusValue === true ||
+        statusValue === "ok" ||
+        statusValue === "OK";
+
+      generatorStates[index].isEndpointTested = isSuccess;
+
+      if (isSuccess) {
+        generatorStates[index].isConnected = true;
+      } else {
+        antNotification("warning", t("common.prompt"), res?.message || t("pipeline.valid.remoteUrlValid5"));
+      }
+    } catch (err) {
+      generatorStates[index].isEndpointTested = false;
+      throw err;
+    }
   };
 
-  const handleVllmModeChange = (index: number) => {
+  const handleRemoteModelChange = (index: number) => {
     generatorStates[index].isEndpointTested = false;
   };
 
-  const handleVllmModelVisible = (visible: boolean, index: number) => {
+  const getRemoteModelList = (index: number, inferenceType: string) =>
+    inferenceType === "ovms" ? generatorStates[index].ovmsModelList : generatorStates[index].vllmModelList;
+
+  const handleRemoteModelVisible = (visible: boolean, index: number, inferenceType: string) => {
     if (visible) {
       try {
         if (!generatorStates[index].isConnected) {
-          antNotification("warning", t("common.prompt"), t("pipeline.valid.modelTip"));
+          antNotification("warning", t("common.prompt"), t(getRemoteModelTipKey(inferenceType)));
           return;
         }
-        handleQueryVllmModels(index);
+        handleQueryRemoteModels(index, inferenceType);
       } catch (err) {
         console.error(err);
       }
@@ -494,30 +531,11 @@
     generatorStates.splice(index, 1);
   };
 
-  const handleModelPath = (modelId: string, weights?: string, prefix: string = "./models/") => {
-    const modelDirs = {
-      fp16_model: prefix + modelId + "/FP16/",
-      int8_model: prefix + modelId + "/INT8_compressed_weights/",
-      int4_model: prefix + modelId + "/INT4_compressed_weights/",
-    };
-    let modelPath: string = "";
-    switch (weights) {
-      case "INT4":
-        modelPath = modelDirs["int4_model"];
-        break;
-      case "INT8":
-        modelPath = modelDirs["int8_model"];
-        break;
-      default:
-        modelPath = modelDirs["fp16_model"];
-    }
-    return modelPath;
-  };
 
   const hasUntestedVllmEndpoint = computed(() => {
     return form.generator.some((gen, index) => {
       const state = generatorStates[index];
-      return gen.inference_type === "vllm" && !state.isEndpointTested;
+      return isRemoteInference(gen.inference_type) && !state.isEndpointTested;
     });
   });
 
@@ -526,15 +544,21 @@
   const formatFormParam = () => {
     const { generator } = form;
     return generator.map((item, index) => {
-      const { inference_type, vllm_endpoint, model, ...params } = item;
-      const { model_id, weight } = model;
-      model.model_path = handleModelPath(model_id!, weight);
+      const { inference_type, vllm_endpoint, ovms_endpoint, model, ...params } = item;
+      const { model_id } = model;
+      const localModel = {
+        model_id,
+        model_path: model_id || "",
+        device: model.device,
+      };
       return {
         ...params,
         inference_type,
-        model: inference_type === "vllm" ? { model_id } : model,
+        model: isRemoteInference(inference_type) ? { model_id } : localModel,
         vllm_endpoint:
           inference_type === "vllm" ? generatorStates[index].protocol + vllm_endpoint : undefined,
+        ovms_endpoint:
+          inference_type === "ovms" ? generatorStates[index].protocol + ovms_endpoint : undefined,
       };
     });
   };
@@ -546,7 +570,7 @@
         ?.validate()
         .then(() => {
           if (hasUntestedVllmEndpoint.value) {
-            antNotification("warning", t("common.prompt"), t("pipeline.valid.vllmUrlValid5"));
+            antNotification("warning", t("common.prompt"), t("pipeline.valid.remoteUrlValid5"));
             resolve({ result: false });
             return;
           }
@@ -569,8 +593,8 @@
   onMounted(async () => {
     for (let index = 0; index < form.generator.length; index++) {
       const item = form.generator[index];
-      if (item.inference_type === "vllm") {
-        formRef.value?.validateFields([["generator", index, "vllm_endpoint"]]);
+      if (isRemoteInference(item.inference_type)) {
+        formRef.value?.validateFields([["generator", index, getRemoteEndpointField(item.inference_type)]]);
         if (props.formType !== "update") return;
         if (item.model?.model_id) {
           generatorStates[index] = {

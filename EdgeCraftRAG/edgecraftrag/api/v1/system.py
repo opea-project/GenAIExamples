@@ -14,8 +14,6 @@ from fastapi import FastAPI, HTTPException, status
 def get_available_devices():
     core = ov.Core()
     avail_devices = core.available_devices + ["AUTO"]
-    if "NPU" in avail_devices:
-        avail_devices.remove("NPU")
     return avail_devices
 
 

@@ -107,4 +107,13 @@ export const requestUrlVllm = (data: Object) => {
   });
 };
 
+export const requestUrlOvms = (data: Object) => {
+  return request({
+    url: "/v1/check/ovms",
+    method: "post",
+    data,
+    showLoading: true,
+  });
+};
+
 export const importUrl = `${import.meta.env.VITE_API_URL}v1/settings/pipelines/import`;

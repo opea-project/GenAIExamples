@@ -89,7 +89,7 @@ class SessionManager(BaseMgr):
 
     def concat_history(self, sessionid: str, inference_type: str, user_message: str) -> str:
         max_token = 6000
-        if inference_type == InferenceType.VLLM:
+        if inference_type in (InferenceType.VLLM, InferenceType.OVMS):
             vllm_max_len = int(os.getenv("MAX_MODEL_LEN", "10240"))
             if vllm_max_len > 5000:
                 max_token = vllm_max_len - 1024

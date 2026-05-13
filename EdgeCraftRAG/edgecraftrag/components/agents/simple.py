@@ -2,21 +2,48 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import asyncio
+from copy import deepcopy
 from typing import Any, List
 
 from comps.cores.proto.api_protocol import ChatCompletionRequest
 from edgecraftrag.base import AgentType, CallbackType, CompType
-from edgecraftrag.components.agent import Agent, stream_writer
-from edgecraftrag.components.agents.utils import ROLE, format_terminal_str
+from edgecraftrag.components.agent import Agent, Retrieval, stream_writer
+from edgecraftrag.components.agents.utils import ROLE, build_document_node_block, format_terminal_str
 from langgraph.graph import END, START, StateGraph
 from pydantic import BaseModel, Field
 
 
-class Retrieval(BaseModel):
-    step: int
-    query: str
-    retrieved: List[Any] = Field(...)
-    reranked: List[Any] = Field(...)
+class PromptTemplates(BaseModel):
+    system: str
+    generate_query: str
+    context: str
+    contexts: str
+    continue_decision: str
+
+
+class Config(BaseModel):
+    system_instruction: str
+    query_instruction: str
+    answer_instruction: str
+    domain_knowledge: str = ""
+    max_retrievals: int = 3
+    prompt_templates: PromptTemplates
+
+
+DEFAULT_CONFIG = {
+    "system_instruction": "You will be provided with a question from a user, and you need to create queries and execute them based on the question for the final answer.\nYou should only use the information provided in the search results to answer the user's question. \nMake your response in the same language as the user's question./no_think",
+    "query_instruction": 'Every time when asked if more information is needed, check the retrieved contexts and try to identify new content that is related. Then based on what you get and all above, decide if a new query is needed to gather more potential useful information. The query should be a very concise and clear sub-question that is specific to the user\'s question. A good query should include all the related actions or keywords that can help to retrieve the most related context. Response with the query directly.\nDO NOT use any prefix, such as "Query:"/no_think',
+    "answer_instruction": "You have been provided with a question from user:\n{question}\n\nThe following are the plan steps you generated and the corresponding retrieved information:\n{plan_with_information}\n\nBased on the above, come up with a final answer for the user's question. Format the answer as a list of steps that can guide the user to solve the problem.\n\nCitation rules (MUST follow):\n1) Use only the provided DOCUMENT_NODE evidence.\n2) For each claim based on DOCUMENT_NODE_CONTEXT, append a citation after the current paragraph using:\n   - Chinese answer: (来自 [DOCUMENT_NODE_SOURCE](DOCUMENT_NODE_FILE_PATH))\n   - Non-Chinese answer: (from [DOCUMENT_NODE_SOURCE](DOCUMENT_NODE_FILE_PATH))\n3) At the end of your answer, output:\n\n --- \n\n### Document Source:\n- DOCUMENT_NODE_SOURCE\n\nOnly list unique DOCUMENT_NODE_SOURCE values (deduplicated). Do NOT output links/URLs/paths in this final Document Source block./no_think",
+    "domain_knowledge": "",
+    "max_retrievals": 3,
+    "prompt_templates": {
+        "system": """{system_instruction}\n\n{query_instruction}\n\n{domain_knowledge}\n\n""",
+        "generate_query": "Now generate a query for the next retrieval.",
+        "context": """<context>\n{context}\n</context>\n""",
+        "contexts": """The following are the retrieved contexts for current query.\n{contexts}\n""",
+        "continue_decision": "Is more information needed? Answer Yes or No. Then explain why or why not.",
+    },
+}
 
 
 class QnaState(BaseModel):
@@ -34,30 +61,52 @@ class SimpleRAGAgent(Agent):
 
     def __init__(self, idx, name, pipeline_idx, cfg):
         super().__init__(name=name, agent_type=AgentType.SIMPLE, pipeline_idx=pipeline_idx, configs=cfg)
+        cfg = cfg or {}
+        merged_cfg = {**DEFAULT_CONFIG, **cfg}
+        merged_cfg["prompt_templates"] = {
+            **DEFAULT_CONFIG["prompt_templates"],
+            **cfg.get("prompt_templates", {}),
+        }
+        self.cfg = Config(**merged_cfg)
+        self.configs = merged_cfg
+
         self.graph = self._build_graph()
         self._messages = []
         self.conversation_history = []
+        self.retrievals: List[Retrieval] = []
         if idx is not None:
             self.idx = idx
-        if "max_retrievals" in cfg:
-            self.max_retrievals = int(cfg["max_retrievals"])
-        else:
-            self.max_retrievals = 3
+        self.max_retrievals = int(self.cfg.max_retrievals)
         self.postproc_query = postproc_query
         self.postproc_answer = postproc_answer
 
     @classmethod
     def get_default_configs(cls):
-        return {"max_retrievals": 3}
+        return deepcopy(DEFAULT_CONFIG)
 
     def update(self, cfg):
         max_r = cfg.get("max_retrievals", None)
         if max_r and isinstance(max_r, int):
             self.max_retrievals = int(max_r)
             self.configs["max_retrievals"] = self.max_retrievals
-            return True
-        else:
-            return False
+            self.cfg.max_retrievals = self.max_retrievals
+
+        for key in ["system_instruction", "query_instruction", "answer_instruction", "domain_knowledge"]:
+            value = cfg.get(key, None)
+            if value and isinstance(value, str):
+                setattr(self.cfg, key, value)
+                self.configs[key] = value
+
+        prompt_templates = cfg.get("prompt_templates", None)
+        if prompt_templates and isinstance(prompt_templates, dict):
+            updated_templates = {
+                **self.cfg.prompt_templates.model_dump(),
+                **prompt_templates,
+            }
+            self.cfg.prompt_templates = PromptTemplates(**updated_templates)
+            self.configs["prompt_templates"] = updated_templates
+
+        return True
 
     def _build_graph(self):
 
@@ -103,7 +152,7 @@ class SimpleRAGAgent(Agent):
 
         messages = [
             {"role": ROLE.USER, "content": state.question},
-            {"role": ROLE.SYSTEM, "content": PROMPT_TEMPLATE.GENERATE_QUERY},
+            {"role": ROLE.SYSTEM, "content": self.cfg.prompt_templates.generate_query},
         ]
         self._messages.extend(messages)
         self.conversation_history.extend(messages)
@@ -123,14 +172,14 @@ class SimpleRAGAgent(Agent):
         await stream_writer("🤔 **Evaluating if more information is needed...**\n\n")
 
         # Format context for the next decision
-        contexts = PROMPT_TEMPLATE.CONTEXTS.format(
+        contexts = self.cfg.prompt_templates.contexts.format(
             contexts="\n".join(
-                [PROMPT_TEMPLATE.CONTEXT.format(context=doc.text) for doc in state.retrievals[-1].reranked]
+                [self.cfg.prompt_templates.context.format(context=doc.text) for doc in state.retrievals[-1].reranked]
             )
         )
         messages = [
             {"role": ROLE.SYSTEM, "content": contexts},
-            {"role": ROLE.SYSTEM, "content": PROMPT_TEMPLATE.CONTINUE},
+            {"role": ROLE.SYSTEM, "content": self.cfg.prompt_templates.continue_decision},
         ]
         self._messages.extend(messages)
         self.conversation_history.extend(messages)
@@ -169,14 +218,14 @@ class SimpleRAGAgent(Agent):
             if r.step != prev_step:
                 plan_with_information += f"Step {i+1}\n\nRetrieved:\n"
             for doc in r.reranked:
-                plan_with_information += doc.text + "\n"
+                plan_with_information += build_document_node_block(doc)
             plan_with_information += "\n"
             prev_step = r.step
 
         self._messages = [
             {
                 "role": ROLE.SYSTEM,
-                "content": answer_instruction.format(
+                "content": self.cfg.answer_instruction.format(
                     question=state.question, plan_with_information=plan_with_information
                 ),
             }
@@ -202,6 +251,7 @@ class SimpleRAGAgent(Agent):
         if "cbtype" in kwargs:
             if kwargs["cbtype"] == CallbackType.RUNAGENT:
                 request = kwargs["chat_request"]
+                self.retrievals.clear()
 
                 print(
                     "🤿",
@@ -214,9 +264,16 @@ class SimpleRAGAgent(Agent):
                 self._messages = self._build_init_messages(request.messages)
 
                 async def async_gen():
-                    async for chunk in self.graph.astream(state, stream_mode="custom"):
-                        yield chunk
+                    final_state = None
+                    async for mode, chunk in self.graph.astream(state, stream_mode=["custom", "values"]):
+                        if mode == "custom":
+                            yield chunk
+                        elif mode == "values":
+                            final_state = chunk
                         await asyncio.sleep(0)
+                    if isinstance(final_state, dict):
+                        self.retrievals.clear()
+                        self.retrievals.extend(final_state.get("retrievals", []))
 
                 print("✅", format_terminal_str("RAG process completed", color="cyan", bold=True))
                 return async_gen()
@@ -225,10 +282,10 @@ class SimpleRAGAgent(Agent):
         return [
             {
                 "role": ROLE.SYSTEM,
-                "content": PROMPT_TEMPLATE.SYSTEM.format(
-                    system_instruction=system_instruction,
-                    query_instruction=query_instruction,
-                    domain_knowledge="",
+                "content": self.cfg.prompt_templates.system.format(
+                    system_instruction=self.cfg.system_instruction,
+                    query_instruction=self.cfg.query_instruction,
+                    domain_knowledge=self.cfg.domain_knowledge,
                 ),
             }
         ]
@@ -247,28 +304,3 @@ def postproc_query(text, state):
 
 def postproc_answer(text, state):
     return text
-
-
-system_instruction = "You will be provided with a question from a user, and you need to create queries and execute them based on the question for the final answer.\nYou should only use the information provided in the search results to answer the user's question. \nMake your response in the same language as the user's question./no_think"
-query_instruction = 'Every time when asked if more information is needed, check the retrieved contexts and try to identify new content that is related. Then based on what you get and all above, decide if a new query is needed to gather more potential useful information. The query should be a very concise and clear sub-question that is specific to the user\'s question. A good query should include all the related actions or keywords that can help to retrieve the most related context. Response with the query directly.\nDO NOT use any prefix, such as "Query:"/no_think'
-answer_instruction = "You have been provided with a question from user:\n{question}\n\nThe following are the plan steps you generated and the corresponding retrieved information:{plan_with_information}\n\nBased on the above, come up with a final answer for the user's question. Format the answer as a list of steps that can guide the user to solve the problem./no_think"
-
-
-class PROMPT_TEMPLATE:
-    # only contain formatting related instructions here
-
-    SYSTEM = """{system_instruction}
-
-{query_instruction}
-
-{domain_knowledge}
-
-"""
-    GENERATE_QUERY = "Now generate a query for the next retrieval."
-
-    CONTEXT = """<context>\n{context}\n</context>\n"""
-    CONTEXTS = """The following are the retrieved contexts for current query.\n{contexts}\n"""
-
-    CONTINUE = "Is more information needed? Answer Yes or No. Then explain why or why not."
-
-    EXPERIENCES = """The following are question-plan examples by human experts. Refer to them to better make your plan. If you find that there is a question that is highly similar or exactly match the input question, then strictly follow the subquestions to make the plan.\n\n{experiences}\n"""

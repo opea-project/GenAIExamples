@@ -11,6 +11,8 @@ services:
       - ETCD_AUTO_COMPACTION_RETENTION=1000
       - ETCD_QUOTA_BACKEND_BYTES=4294967296
       - ETCD_SNAPSHOT_COUNT=50000
+      - no_proxy=${no_proxy},milvus-standalone,milvus-minio,milvus-etcd
+      - NO_PROXY=${NO_PROXY},milvus-standalone,milvus-minio,milvus-etcd
     volumes:
       - ${DOCKER_VOLUME_DIRECTORY:-${PWD}}/volumes/etcd:/etcd
     command: etcd -advertise-client-urls=http://127.0.0.1:2379 -listen-client-urls http://0.0.0.0:2379 --data-dir /etcd
@@ -28,6 +30,8 @@ services:
     environment:
       MINIO_ACCESS_KEY: minioadmin
       MINIO_SECRET_KEY: minioadmin
+      no_proxy: ${no_proxy},milvus-standalone,milvus-minio,milvus-etcd
+      NO_PROXY: ${NO_PROXY},milvus-standalone,milvus-minio,milvus-etcd
     ports:
       - "${MINIO_PORT1:-5044}:9001"
       - "${MINIO_PORT2:-5043}:9000"
@@ -51,6 +55,12 @@ services:
     environment:
       ETCD_ENDPOINTS: etcd:2379
       MINIO_ADDRESS: minio:9000
+      no_proxy: ${no_proxy},milvus-standalone,milvus-minio,milvus-etcd
+      NO_PROXY: ${NO_PROXY},milvus-standalone,milvus-minio,milvus-etcd
+      HTTP_PROXY: ${HTTP_PROXY}
+      HTTPS_PROXY: ${HTTPS_PROXY}
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
     volumes:
       - ./milvus-config.yaml:/milvus/configs/milvus.yaml
       - ${DOCKER_VOLUME_DIRECTORY:-${PWD}}/volumes/milvus:/var/lib/milvus
@@ -76,11 +86,16 @@ services:
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       vLLM_ENDPOINT: ${vLLM_ENDPOINT:-http://${HOST_IP}:${VLLM_SERVICE_PORT_B60:-8086}}
+      OVMS_ENDPOINT: ${OVMS_ENDPOINT:-http://${HOST_IP}:${OVMS_SERVICE_PORT:-8000}}
       LLM_MODEL: ${LLM_MODEL}
       ENABLE_BENCHMARK: ${ENABLE_BENCHMARK:-false}
       MAX_MODEL_LEN: ${MAX_MODEL_LEN:-49152}
       CHAT_HISTORY_ROUND: ${CHAT_HISTORY_ROUND:-0}
       METADATA_DATABASE_URL: ${METADATA_DATABASE_URL:-""}
+      GPU_MEMORY_UTIL: ${GPU_MEMORY_UTIL:-0.8}
+      VLLM_AFFINITY_MASK: ${ZE_AFFINITY_MASK:-0}
+      ENABLE_GENAI: ${ENABLE_GENAI:-false}
+      TP: ${TP:-1}
     volumes:
       - ${MODEL_PATH:-${PWD}}:/home/user/models
       - ${DOC_PATH:-${PWD}}:/home/user/docs
@@ -91,6 +106,7 @@ services:
       - ${PIPELINE_SERVICE_PORT:-16010}:${PIPELINE_SERVICE_PORT:-16010}
     devices:
       - /dev/dri:/dev/dri
+      - ${ACCEL_DEV:-/dev/dri:/dev/dri}
     group_add:
       - ${VIDEOGROUPID:-44}
       - ${RENDERGROUPID:-109}
@@ -133,7 +149,7 @@ services:
       - ecrag
   llm-serving-xpu-b60:
     container_name: ipex-serving-xpu-container
-    image: intel/llm-scaler-vllm:1.1-preview
+    image: intel/llm-scaler-vllm:0.11.1-b7
     privileged: true
     restart: always
     ports:
@@ -156,6 +172,7 @@ services:
       MAX_MODEL_LEN: ${MAX_MODEL_LEN:-49152}
       BLOCK_SIZE: ${BLOCK_SIZE:-64}
       QUANTIZATION: ${QUANTIZATION:-fp8}
+      TOOL_PARSER: ${TOOL_PARSER:-qwen3_coder}
       LLM_MODEL: ${LLM_MODEL}
       TP: ${TP:-1}
       DP: ${DP:-1}
@@ -183,9 +200,54 @@ services:
       --block-size $${BLOCK_SIZE} \
       --quantization $${QUANTIZATION} \
       -tp=$${TP} \
-      -dp=$${DP}"
+      -dp=$${DP} \
+      --enable_prefix_caching True \
+      --enable-auto-tool-choice \
+      --tool-call-parser $${TOOL_PARSER}"
     profiles:
       - b60
+  ovms-serving:
+    container_name: ovms-serving
+    image: openvino/model_server:latest-gpu
+    restart: always
+    user: ${OVMS_UID:-1000}:${OVMS_GID:-1000}
+    ports:
+      - ${OVMS_SERVICE_PORT:-8000}:8000
+    devices:
+      - /dev/dri:/dev/dri
+    group_add:
+      - ${RENDERGROUPID:-109}
+    volumes:
+      - ${MODEL_PATH:-${PWD}}:/models
+    environment:
+      OVMS_REST_PORT: ${OVMS_SERVICE_PORT:-8000}
+      OVMS_SOURCE_MODEL: ${OVMS_SOURCE_MODEL:-OpenVINO/Qwen3-Coder-30B-A3B-Instruct-int4-ov}
+      OVMS_MODEL_NAME: ${OVMS_MODEL_NAME:-OpenVINO/Qwen3-Coder-30B-A3B-Instruct-int4-ov}
+      OVMS_TARGET_DEVICE: ${OVMS_TARGET_DEVICE:-GPU.0}
+      OVMS_TASK: ${OVMS_TASK:-text_generation}
+      OVMS_CACHE_DIR: ${OVMS_CACHE_DIR:-/models/.ov_cache}
+      OVMS_ENABLE_PREFIX_CACHING: ${OVMS_ENABLE_PREFIX_CACHING:-true}
+      OVMS_TOOL_PARSER: ${OVMS_TOOL_PARSER:-qwen3coder}
+      OVMS_ENABLE_TOOL_GUIDED_GENERATION: ${OVMS_ENABLE_TOOL_GUIDED_GENERATION:-true}
+      OVMS_MAX_NUM_BATCHED_TOKENS: ${OVMS_MAX_NUM_BATCHED_TOKENS:-8192}
+    entrypoint:
+      - /bin/bash
+      - -c
+      - >-
+        /ovms/bin/ovms
+        --rest_port $${OVMS_REST_PORT}
+        --source_model $${OVMS_SOURCE_MODEL}
+        --model_repository_path /models
+        --model_name $${OVMS_MODEL_NAME}
+        --target_device $${OVMS_TARGET_DEVICE}
+        --task $${OVMS_TASK}
+        --cache_dir $${OVMS_CACHE_DIR}
+        --enable_prefix_caching $${OVMS_ENABLE_PREFIX_CACHING}
+        --tool_parser $${OVMS_TOOL_PARSER}
+        --enable_tool_guided_generation $${OVMS_ENABLE_TOOL_GUIDED_GENERATION}
+        --max_num_batched_tokens $${OVMS_MAX_NUM_BATCHED_TOKENS}
+    profiles:
+      - ovms
   llm-serving-xpu-770:
     container_name: ipex-llm-serving-xpu-770
     image: intelanalytics/ipex-llm-serving-xpu:0.8.3-b20

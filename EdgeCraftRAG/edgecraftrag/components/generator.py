@@ -5,13 +5,15 @@ import asyncio
 import json
 import os
 import time
+import weakref
 import urllib.request
 from concurrent.futures import ThreadPoolExecutor
 from urllib.parse import urlparse
 
 from comps.cores.proto.api_protocol import ChatCompletionRequest
 from edgecraftrag.base import BaseComponent, CompType, GeneratorType, InferenceType, NodeParserType
-from edgecraftrag.utils import get_prompt_template
+from edgecraftrag.utils import get_prompt_template, resolve_prompt_template_path
+from edgecraftrag.components.agents.utils import build_document_node_block
 from fastapi.responses import StreamingResponse
 from llama_index.llms.openai_like import OpenAILike
 from pydantic import model_serializer
@@ -86,20 +88,27 @@ def build_stream_response(status=None, content=None, error=None):
     return response
 
 
-async def local_stream_generator(lock, llm, prompt_str, unstructured_str):
+async def local_stream_generator(lock, llm, prompt_str, unstructured_str, benchmark=None, benchmark_index=None):
+    enable_benchmark = benchmark.is_enabled() if benchmark else False
+    start_time = time.perf_counter() if enable_benchmark else None
     async with lock:
-        response = await llm.astream_complete(prompt_str)
+        if enable_benchmark:
+            response = await llm.astream_complete_with_bench(prompt_str)
+        else:
+            response = await llm.astream_complete(prompt_str)
         try:
             async for r in response:
                 yield r.delta or ""
                 await asyncio.sleep(0)
             if unstructured_str:
                 yield unstructured_str
+            if enable_benchmark:
+                benchmark.update_benchmark_data_genai(benchmark_index, CompType.GENERATOR, time.perf_counter() - start_time, weakref.ref(llm))
+                benchmark.insert_llm_data_genai(benchmark_index, benchmark.cal_input_token_size(prompt_str), weakref.ref(llm))
         except Exception as e:
             start_idx = str(e).find("message") + len("message")
             result_error = str(e)[start_idx:]
             yield f"code:0000{result_error}"
-
 
 async def stream_generator(llm, prompt_str, unstructured_str, benchmark=None, benchmark_index=None):
     enable_benchmark = benchmark.is_enabled() if benchmark else False
@@ -140,6 +149,7 @@ def clone_generator(src_generator: BaseComponent, dst_generator_cfg: dict = None
         "llm_model": src_generator.llm,
         "inference_type": src_generator.inference_type,
         "vllm_endpoint": src_generator.vllm_endpoint,
+        "ovms_endpoint": getattr(src_generator, "ovms_endpoint", ""),
     }
 
     if generator_type == GeneratorType.CHATQNA:
@@ -164,7 +174,16 @@ def clone_generator(src_generator: BaseComponent, dst_generator_cfg: dict = None
 
 class QnAGenerator(BaseComponent):
 
-    def __init__(self, llm_model, prompt_template_file, inference_type, vllm_endpoint, prompt_content, **kwargs):
+    def __init__(
+        self,
+        llm_model,
+        prompt_template_file,
+        inference_type,
+        vllm_endpoint,
+        prompt_content,
+        ovms_endpoint="",
+        **kwargs,
+    ):
         BaseComponent.__init__(
             self,
             comp_type=CompType.GENERATOR,
@@ -186,7 +205,12 @@ class QnAGenerator(BaseComponent):
             llm_instance = llm_model()
             if llm_instance.model_path is None or llm_instance.model_path == "":
                 self.model_id = llm_instance.model_id
-                self.model_path = os.path.join("/home/user/models", os.getenv("LLM_MODEL", "Qwen/Qwen3-8B"))
+                if self.inference_type in (InferenceType.VLLM, InferenceType.OVMS):
+                    # Remote inference may not have local model files. Use model id directly
+                    # to avoid invalid absolute-path repo id validation failures.
+                    self.model_path = self.model_id
+                else:
+                    self.model_path = os.path.join("/home/user/models", os.getenv("LLM_MODEL", "Qwen/Qwen3-8B"))
             else:
                 self.model_id = llm_instance.model_id
                 self.model_path = llm_instance.model_path
@@ -195,13 +219,22 @@ class QnAGenerator(BaseComponent):
         )
 
         self.llm = llm_model
+        self.vllm_name  = llm_model().model_id if not isinstance(llm_model, str) else llm_model
         if self.inference_type == InferenceType.LOCAL:
             self.lock = asyncio.Lock()
         if self.inference_type == InferenceType.VLLM:
-            self.vllm_name = llm_model().model_id
             if vllm_endpoint == "":
                 vllm_endpoint = os.getenv("vLLM_ENDPOINT", "http://localhost:8086")
+        if self.inference_type == InferenceType.OVMS:
+            if ovms_endpoint == "":
+                ovms_endpoint = os.getenv("OVMS_ENDPOINT", "http://localhost:8000")
         self.vllm_endpoint = vllm_endpoint
+        self.ovms_endpoint = ovms_endpoint
+
+        if self.inference_type == InferenceType.OVMS:
+            self.remote_endpoint = self.ovms_endpoint
+        else:
+            self.remote_endpoint = self.vllm_endpoint
 
     def prompt_handler(
         self, model_path, prompt_content=None, prompt_template_file=None, enable_think=False, enable_rag_retrieval=True
@@ -214,16 +247,11 @@ class QnAGenerator(BaseComponent):
             return prompt_template
         else:
             if enable_rag_retrieval:
-                safe_root = "/templates"
+                resolve_prompt_template_path(prompt_template_file)
             else:
                 prompt_content = "### User Guide ###You are a helpful assistant. Please respond to user inquiries with concise and professional answers.### Historical Content ###{chat_history}"
                 return get_prompt_template(model_path, prompt_content, prompt_template_file, enable_think)
 
-            prompt_template_file = os.path.normpath(os.path.join(safe_root, prompt_template_file))
-            if not prompt_template_file.startswith(safe_root):
-                raise ValueError("Invalid template path")
-            if not os.path.exists(prompt_template_file):
-                raise ValueError("Template file not exists")
             return get_prompt_template(model_path, prompt_content, prompt_template_file, enable_think)
 
     def set_prompt(self, prompt):
@@ -256,8 +284,7 @@ class QnAGenerator(BaseComponent):
         :return: Generated text_gen_context and prompt_str."""
         text_gen_context = ""
         for n in retrieved_nodes:
-            origin_text = n.node.text
-            text_gen_context += self.clean_string(origin_text.strip())
+            text_gen_context += build_document_node_block(n)
         query = chat_request.messages
         chat_history = chat_request.input
         # Modify model think status
@@ -292,25 +319,20 @@ class QnAGenerator(BaseComponent):
             # This could happen when User delete all LLMs through RESTful API
             raise ValueError("No LLM available, please load LLM")
         # query transformation
+        benchmark = kwargs.get("benchmark", None)
+        benchmark_index = kwargs.get("benchmark_index", None)
         sub_questions = kwargs.get("sub_questions", None)
         text_gen_context, prompt_str = self.query_transform(chat_request, retrieved_nodes, sub_questions=sub_questions)
-        generate_kwargs = dict(
-            temperature=chat_request.temperature,
-            do_sample=chat_request.temperature > 0.0,
-            top_p=chat_request.top_p,
-            top_k=chat_request.top_k,
-            typical_p=chat_request.typical_p,
-            repetition_penalty=chat_request.repetition_penalty,
-        )
-        self.llm().generate_kwargs = generate_kwargs
-        self.llm().max_new_tokens = chat_request.max_tokens
+        # self.llm().config.update_generation_config(config)
+        self.llm().config.update_generation_config(temperature=chat_request.temperature,top_p=chat_request.top_p, top_k=chat_request.top_k, typical_p=chat_request.typical_p, repetition_penalty=chat_request.repetition_penalty, do_sample=chat_request.temperature > 0.0)
+        self.llm().config.max_new_tokens = chat_request.max_tokens
         unstructured_str = ""
-        if node_parser_type == NodeParserType.UNSTRUCTURED or node_parser_type == NodeParserType.SIMPLE:
+        if node_parser_type == NodeParserType.UNSTRUCTURED:
             unstructured_str = extract_unstructured_eles(retrieved_nodes, text_gen_context)
         if chat_request.stream:
             # Asynchronous generator
             async def generator():
-                async for chunk in local_stream_generator(self.lock, self.llm(), prompt_str, unstructured_str):
+                async for chunk in local_stream_generator(self.lock, self.llm(), prompt_str, unstructured_str, benchmark, benchmark_index):
                     yield chunk or ""
                     await asyncio.sleep(0)
 
@@ -319,15 +341,16 @@ class QnAGenerator(BaseComponent):
             result = self.llm().complete(prompt_str)
             return result
 
-    async def run_vllm(self, chat_request, retrieved_nodes, node_parser_type, **kwargs):
+    async def run_remote(self, chat_request, retrieved_nodes, node_parser_type, **kwargs):
         # query transformation
         sub_questions = kwargs.get("sub_questions", None)
         benchmark = kwargs.get("benchmark", None)
         benchmark_index = kwargs.get("benchmark_index", None)
         text_gen_context, prompt_str = self.query_transform(chat_request, retrieved_nodes, sub_questions=sub_questions)
+        api_base_suffix = "/v3" if self.inference_type == InferenceType.OVMS else "/v1"
         llm = OpenAILike(
             api_key="fake",
-            api_base=self.vllm_endpoint + "/v1",
+            api_base=self.remote_endpoint.rstrip("/") + api_base_suffix,
             max_tokens=chat_request.max_tokens,
             model=self.vllm_name,
             top_p=chat_request.top_p,
@@ -337,7 +360,7 @@ class QnAGenerator(BaseComponent):
             repetition_penalty=chat_request.repetition_penalty,
         )
         unstructured_str = ""
-        if node_parser_type == NodeParserType.UNSTRUCTURED or node_parser_type == NodeParserType.SIMPLE:
+        if node_parser_type == NodeParserType.UNSTRUCTURED:
             unstructured_str = extract_unstructured_eles(retrieved_nodes, text_gen_context)
         if chat_request.stream:
 
@@ -352,6 +375,9 @@ class QnAGenerator(BaseComponent):
             result = await llm.acomplete(prompt_str)
             return result
 
+    async def run_vllm(self, chat_request, retrieved_nodes, node_parser_type, **kwargs):
+        return await self.run_remote(chat_request, retrieved_nodes, node_parser_type, **kwargs)
+
     @model_serializer
     def ser_model(self):
         set = {
@@ -360,13 +386,14 @@ class QnAGenerator(BaseComponent):
             "inference_type": self.inference_type,
             "model": self.llm(),
             "vllm_endpoint": self.vllm_endpoint,
+            "ovms_endpoint": self.ovms_endpoint,
         }
         return set
 
 
 class FreeChatGenerator(BaseComponent):
 
-    def __init__(self, llm_model, inference_type, vllm_endpoint, **kwargs):
+    def __init__(self, llm_model, inference_type, vllm_endpoint, ovms_endpoint="", **kwargs):
         BaseComponent.__init__(
             self,
             comp_type=CompType.GENERATOR,
@@ -393,19 +420,28 @@ class FreeChatGenerator(BaseComponent):
                 self.model_path = llm_instance.model_path
 
         self.llm = llm_model
+        self.vllm_name = llm_model().model_id if not isinstance(llm_model, str) else llm_model
         if self.inference_type == InferenceType.LOCAL:
             self.lock = asyncio.Lock()
         if self.inference_type == InferenceType.VLLM:
-            self.vllm_name = llm_model().model_id
             if vllm_endpoint == "":
                 vllm_endpoint = os.getenv("vLLM_ENDPOINT", "http://localhost:8086")
+        if self.inference_type == InferenceType.OVMS:
+            if ovms_endpoint == "":
+                ovms_endpoint = os.getenv("OVMS_ENDPOINT", "http://localhost:8000")
         self.vllm_endpoint = vllm_endpoint
+        self.ovms_endpoint = ovms_endpoint
+
+        if self.inference_type == InferenceType.OVMS:
+            self.remote_endpoint = self.ovms_endpoint
+        else:
+            self.remote_endpoint = self.vllm_endpoint
 
     async def run(self, chat_request, retrieved_nodes, node_parser_type, **kwargs):
         if self.inference_type == InferenceType.LOCAL:
             response = await self.run_local(chat_request, retrieved_nodes, node_parser_type, **kwargs)
-        elif self.inference_type == InferenceType.VLLM:
-            response = await self.run_vllm(chat_request, retrieved_nodes, node_parser_type, **kwargs)
+        elif self.inference_type in (InferenceType.VLLM, InferenceType.OVMS):
+            response = await self.run_remote(chat_request, retrieved_nodes, node_parser_type, **kwargs)
         else:
             raise ValueError("LLM inference_type not supported")
         return response
@@ -438,10 +474,11 @@ class FreeChatGenerator(BaseComponent):
             result = self.llm().complete(prompt_str)
             return result
 
-    async def run_vllm(self, chat_request, retrieved_nodes, node_parser_type, **kwargs):
+    async def run_remote(self, chat_request, retrieved_nodes, node_parser_type, **kwargs):
+        api_base_suffix = "/v3" if self.inference_type == InferenceType.OVMS else "/v1"
         llm = OpenAILike(
             api_key="fake",
-            api_base=self.vllm_endpoint + "/v1",
+            api_base=self.remote_endpoint.rstrip("/") + api_base_suffix,
             max_tokens=chat_request.max_tokens,
             model=self.vllm_name,
             top_p=chat_request.top_p,
@@ -465,6 +502,9 @@ class FreeChatGenerator(BaseComponent):
             result = await llm.acomplete(prompt_str)
             return str(result)
 
+    async def run_vllm(self, chat_request, retrieved_nodes, node_parser_type, **kwargs):
+        return await self.run_remote(chat_request, retrieved_nodes, node_parser_type, **kwargs)
+
     @model_serializer
     def ser_model(self):
         set = {
@@ -473,6 +513,7 @@ class FreeChatGenerator(BaseComponent):
             "inference_type": self.inference_type,
             "model": self.llm(),
             "vllm_endpoint": self.vllm_endpoint,
+            "ovms_endpoint": self.ovms_endpoint,
         }
         return set
 

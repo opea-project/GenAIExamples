@@ -2,13 +2,14 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import asyncio
+import json
 import gc
 from typing import Any
-
+from openvino import Core, Type
 from comps.cores.proto.api_protocol import ChatCompletionRequest
-from edgecraftrag.base import BaseMgr, CallbackType
-from edgecraftrag.components.knowledge_base import Knowledge
+from edgecraftrag.base import BaseMgr, CallbackType, InferenceType
 from edgecraftrag.components.pipeline import Pipeline
+from edgecraftrag.components.knowledge_base import Knowledge
 
 
 class PipelineMgr(BaseMgr):
@@ -44,8 +45,44 @@ class PipelineMgr(BaseMgr):
             raise Exception("Unable to remove an active pipeline...")
         if self._prev_active_pipeline_name and pl.name == self._prev_active_pipeline_name:
             raise Exception("Pipeline is currently cached, unable to remove...")
-        pl.retriever = None
+        pl.retrievers = None
+        if pl.postprocessor != None:
+            for post in pl.postprocessor:
+                try:
+                    post.model._model.clear_requests()
+                except Exception as e:
+                    pass
+                try:
+                    del post.model._model
+                    post.model._model=None
+                except Exception as e:
+                    pass
+                try:
+                    del post.model._ov_pipe
+                except Exception as e:
+                    pass
+                post.model=None
+                post=None
         pl.postprocessor = None
+        for gen in pl.generator:
+            if gen.inference_type:
+                if gen.inference_type == InferenceType.VLLM:
+                    continue
+                else:
+                    llm_model = gen.llm()
+                    if llm_model:
+                        try:
+                            llm_model._model.finish_chat()
+                        except Exception as e:
+                            pass
+                        try:
+                            del llm_model._model
+                            del llm_model._pipe
+                        except Exception as e:
+                            pass
+                        llm_model._model=None
+                        del llm_model
+                del gen
         pl.generator = None
         pl.benchmark = None
         pl.status = None

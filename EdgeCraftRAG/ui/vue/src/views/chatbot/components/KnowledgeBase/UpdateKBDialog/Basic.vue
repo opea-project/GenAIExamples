@@ -8,7 +8,11 @@
     autocomplete="off"
     class="form-wrap"
   >
-    <a-form-item :label="$t('knowledge.type')" name="comp_subtype" class="horizontal-form-item">
+    <a-form-item
+      :label="$t('knowledge.type')"
+      name="comp_subtype"
+      class="horizontal-form-item"
+    >
       <a-radio-group
         v-model:value="form.comp_subtype"
         @change="handleTypeChange"
@@ -64,7 +68,11 @@
         </a-input>
         <FormTooltip :title="$t('pipeline.desc.vector_url')" />
       </a-form-item>
-      <a-form-item :label="$t('knowledge.name')" :rules="rules.kbName" name="name">
+      <a-form-item
+        :label="$t('knowledge.name')"
+        :rules="rules.kbName"
+        name="name"
+      >
         <a-select
           showSearch
           v-model:value="form.name"
@@ -91,224 +99,229 @@
 </template>
 
 <script lang="ts" setup name="Basic">
-  import { getkbadminList } from "@/api/knowledgeBase";
-  import { useNotification } from "@/utils/common";
-  import { isValidName, validateServiceAddress } from "@/utils/validate";
-  import { CheckCircleFilled } from "@ant-design/icons-vue";
-  import type { FormInstance } from "ant-design-vue";
-  import { RuleObject } from "ant-design-vue/es/form";
-  import { computed, reactive, ref } from "vue";
-  import { useI18n } from "vue-i18n";
+import { getkbadminList } from "@/api/knowledgeBase";
+import { useNotification } from "@/utils/common";
+import { isValidName, validateServiceAddress } from "@/utils/validate";
+import { CheckCircleFilled } from "@ant-design/icons-vue";
+import type { FormInstance } from "ant-design-vue";
+import { RuleObject } from "ant-design-vue/es/form";
+import { computed, reactive, ref } from "vue";
+import { useI18n } from "vue-i18n";
 
-  const { t } = useI18n();
-  const { antNotification } = useNotification();
+const { t } = useI18n();
+const { antNotification } = useNotification();
 
-  const props = defineProps({
-    formData: {
-      type: Object,
-      default: () => {},
-    },
-    formType: {
-      type: String,
-      default: "create",
-    },
-  });
+const props = defineProps({
+  formData: {
+    type: Object,
+    default: () => {},
+  },
+  formType: {
+    type: String,
+    default: "create",
+  },
+});
 
-  interface IndexerType {
-    vector_url?: string;
+interface IndexerType {
+  vector_url?: string;
+}
+interface FormType {
+  name: string | undefined;
+  description: string;
+  comp_type: string;
+  comp_subtype: string;
+  indexer: IndexerType;
+}
+const validateName = async (rule: any, value: string) => {
+  if (!value) {
+    return Promise.reject(t("knowledge.nameValid1"));
   }
-  interface FormType {
-    name: string | undefined;
-    description: string;
-    comp_type: string;
-    comp_subtype: string;
-    indexer: IndexerType;
+  const len = value.length;
+  if (len < 2 || len > 30) {
+    return Promise.reject(t("knowledge.nameValid2"));
   }
-  const validateName = async (rule: any, value: string) => {
+  if (!isValidName(value)) {
+    return Promise.reject(t("knowledge.nameValid3"));
+  }
+  return Promise.resolve();
+};
+const validateUnique = () => {
+  return async (_rule: RuleObject, value: string) => {
     if (!value) {
-      return Promise.reject(t("knowledge.nameValid1"));
+      return Promise.reject(new Error(t("pipeline.valid.urlValid1")));
     }
-    const len = value.length;
-    if (len < 2 || len > 30) {
-      return Promise.reject(t("knowledge.nameValid2"));
+
+    const serverUrl = protocol.value + value;
+    if (!validateServiceAddress(serverUrl)) {
+      return Promise.reject(new Error(t("pipeline.valid.urlValid2")));
     }
-    if (!isValidName(value)) {
-      return Promise.reject(t("knowledge.nameValid3"));
-    }
+
+    isVectorUrlPass.value = true;
+
     return Promise.resolve();
   };
-  const validateUnique = () => {
-    return async (_rule: RuleObject, value: string) => {
-      if (!value) {
-        return Promise.reject(new Error(t("pipeline.valid.urlValid1")));
-      }
+};
+const {
+  comp_subtype = "origin_kb",
+  name = "default_kb",
+  description = "",
+  comp_type = "knowledge",
+} = props.formData;
 
-      const serverUrl = protocol.value + value;
-      if (!validateServiceAddress(serverUrl)) {
-        return Promise.reject(new Error(t("pipeline.valid.urlValid2")));
-      }
+const host = window.location.hostname;
+const handleUrlFormat = (url: string) => {
+  return url ? url.replace(/https?:\/\//g, "") : "";
+};
+const { vector_url = "" } = props.formData?.indexer || {};
+const kbList = ref<EmptyArrayType>([]);
+const formRef = ref<FormInstance>();
+const form = reactive<FormType>({
+  comp_subtype,
+  name,
+  description,
+  comp_type,
+  indexer: {
+    vector_url: vector_url ? handleUrlFormat(vector_url) : `${host}:19530`,
+  },
+});
+const isVectorUrlPass = ref<boolean>(false);
+const isConnected = ref<boolean>(false);
+const protocol = ref<string>("http://");
+const isEdit = computed(() => {
+  const { formType } = props;
+  return formType === "update";
+});
+const isOriginal = computed(() => {
+  return form.comp_subtype === "origin_kb";
+});
 
-      isVectorUrlPass.value = true;
-
-      return Promise.resolve();
-    };
-  };
-  const {
-    comp_subtype = "origin_kb",
-    name = "default_kb",
-    description = "",
-    comp_type = "knowledge",
-  } = props.formData;
-
-  const host = window.location.hostname;
-  const handleUrlFormat = (url: string) => {
-    return url ? url.replace(/https?:\/\//g, "") : "";
-  };
-  const { vector_url = "" } = props.formData?.indexer || {};
-  const kbList = ref<EmptyArrayType>([]);
-  const formRef = ref<FormInstance>();
-  const form = reactive<FormType>({
-    comp_subtype,
-    name,
-    description,
-    comp_type,
-    indexer: { vector_url: vector_url ? handleUrlFormat(vector_url) : `${host}:29530` },
-  });
-  const isVectorUrlPass = ref<boolean>(false);
-  const isConnected = ref<boolean>(false);
-  const protocol = ref<string>("http://");
-  const isEdit = computed(() => {
-    const { formType } = props;
-    return formType === "update";
-  });
-  const isOriginal = computed(() => {
-    return form.comp_subtype === "origin_kb";
-  });
-
-  const rules: FormRules = reactive({
-    comp_subtype: [
-      {
-        required: true,
-        message: t("knowledge.typeValid"),
-        trigger: "change",
-      },
-    ],
-    name: [
-      {
-        required: true,
-        validator: validateName,
-        trigger: ["blur", "change"],
-      },
-    ],
-    kbName: [
-      {
-        required: true,
-        message: t("knowledge.nameRequired"),
-        trigger: "change",
-      },
-    ],
-    vector_url: [
-      {
-        required: true,
-        validator: validateUnique(),
-        trigger: "blur",
-      },
-    ],
-  });
-
-  const handleTypeChange = () => {
-    form.name = undefined;
-    isVectorUrlPass.value = false;
-    isConnected.value = false;
-
-    if (form.comp_subtype === "kbadmin_kb") {
-      if (form.indexer.vector_url) {
-        nextTick(() => formRef.value?.validateFields([["indexer", "vector_url"]]));
-      }
-    }
-  };
-
-  const handleUriChange = () => {
-    isVectorUrlPass.value = false;
-    isConnected.value = false;
-    form.name = undefined;
-  };
-  const handleKBVisible = async (visible: boolean) => {
-    if (visible) {
-      try {
-        if (!form.indexer.vector_url) {
-          antNotification("warning", t("common.prompt"), t("pipeline.valid.urlValid1"));
-          return;
-        }
-      } catch (err) {
-        console.error(err);
-      }
-    }
-  };
-  const handlleQueryKB = () => {
-    queryKbadmin();
-  };
-  const queryKbadmin = async () => {
-    const { vector_url } = form.indexer;
-    const url = protocol.value + vector_url;
-
-    const data: any = await getkbadminList({ vector_url: url });
-    kbList.value = [].concat(data);
-    if (kbList.value.length) isConnected.value = true;
-  };
-  const formatFormParam = () => {
-    const { indexer = {} } = props.formData || {};
-    const { vector_url, ...otherParams } = indexer;
-
-    return {
-      ...form,
-      indexer: {
-        vector_url: form.indexer.vector_url,
-        ...otherParams,
-      },
-    };
-  };
-  // Validate the form, throw results form
-  const handleValidate = (): Promise<object> => {
-    return new Promise(resolve => {
-      formRef.value
-        ?.validate()
-        .then(() => {
-          resolve({
-            result: true,
-            data: formatFormParam(),
-          });
-        })
-        .catch(() => {
-          resolve({ result: false });
-        });
-    });
-  };
-  defineExpose({
-    validate: handleValidate,
-  });
-  watch(
-    () => form.comp_subtype,
-    val => {
-      props.formData.comp_subtype = val;
+const rules: FormRules = reactive({
+  comp_subtype: [
+    {
+      required: true,
+      message: t("knowledge.typeValid"),
+      trigger: "change",
     },
-    { immediate: true }
-  );
-  onMounted(() => {
-    if (props.formType === "update" && !isOriginal.value) {
-      isVectorUrlPass.value = isConnected.value = true;
-      queryKbadmin();
+  ],
+  name: [
+    {
+      required: true,
+      validator: validateName,
+      trigger: ["blur", "change"],
+    },
+  ],
+  kbName: [
+    {
+      required: true,
+      message: t("knowledge.nameRequired"),
+      trigger: "change",
+    },
+  ],
+  vector_url: [
+    {
+      required: true,
+      validator: validateUnique(),
+      trigger: "blur",
+    },
+  ],
+});
+
+const handleTypeChange = () => {
+  form.name = undefined;
+  isVectorUrlPass.value = false;
+  isConnected.value = false;
+
+  if (form.comp_subtype === "kbadmin_kb") {
+    form.indexer.vector_url = `${host}:29530`;
+    nextTick(() => formRef.value?.validateFields([["indexer", "vector_url"]]));
+  }
+};
+
+const handleUriChange = () => {
+  isVectorUrlPass.value = false;
+  isConnected.value = false;
+  form.name = undefined;
+};
+const handleKBVisible = async (visible: boolean) => {
+  if (visible) {
+    try {
+      if (!form.indexer.vector_url) {
+        antNotification(
+          "warning",
+          t("common.prompt"),
+          t("pipeline.valid.urlValid1"),
+        );
+        return;
+      }
+    } catch (err) {
+      console.error(err);
     }
+  }
+};
+const handlleQueryKB = () => {
+  queryKbadmin();
+};
+const queryKbadmin = async () => {
+  const { vector_url } = form.indexer;
+  const url = protocol.value + vector_url;
+
+  const data: any = await getkbadminList({ vector_url: url });
+  kbList.value = [].concat(data);
+  if (kbList.value.length) isConnected.value = true;
+};
+const formatFormParam = () => {
+  const { indexer = {} } = props.formData || {};
+  const { vector_url, ...otherParams } = indexer;
+
+  return {
+    ...form,
+    indexer: {
+      vector_url: form.indexer.vector_url,
+      ...otherParams,
+    },
+  };
+};
+// Validate the form, throw results form
+const handleValidate = (): Promise<object> => {
+  return new Promise((resolve) => {
+    formRef.value
+      ?.validate()
+      .then(() => {
+        resolve({
+          result: true,
+          data: formatFormParam(),
+        });
+      })
+      .catch(() => {
+        resolve({ result: false });
+      });
   });
+};
+defineExpose({
+  validate: handleValidate,
+});
+watch(
+  () => form.comp_subtype,
+  (val) => {
+    props.formData.comp_subtype = val;
+  },
+  { immediate: true },
+);
+onMounted(() => {
+  if (props.formType === "update" && !isOriginal.value) {
+    isVectorUrlPass.value = isConnected.value = true;
+    queryKbadmin();
+  }
+});
 </script>
 
 <style scoped lang="less">
-  .text-btn {
-    width: 72px;
-    height: 30px;
-    margin: 0 -11px;
-    border-radius: 0 6px 6px 0;
-    padding: 0;
-    .vertical-center;
-  }
+.text-btn {
+  width: 72px;
+  height: 30px;
+  margin: 0 -11px;
+  border-radius: 0 6px 6px 0;
+  padding: 0;
+  .vertical-center;
+}
 </style>

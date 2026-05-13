@@ -56,6 +56,17 @@ export const requestAgentDelete = (name: String) => {
   });
 };
 
+export const requestAgentSetActive = (name: String, active: boolean) => {
+  return request({
+    url: `/v1/agents/${name}/active`,
+    method: "patch",
+    data: { active },
+    showLoading: true,
+    showSuccessMsg: true,
+    successMsg: active ? "request.agent.activateSucc" : "request.agent.deactivateSucc",
+  });
+};
+
 export const getAgentConfigs = (type: String) => {
   return request({
     url: `/v1/agents/configs/${type}`,

@@ -11,6 +11,7 @@ from edgecraftrag.config_repository import MilvusConfigRepository, save_agent_co
 from edgecraftrag.context import ctx
 from edgecraftrag.env import AGENT_FILE
 from fastapi import FastAPI, HTTPException, status
+from pydantic import BaseModel
 
 agent_app = FastAPI()
 
@@ -79,10 +80,6 @@ async def update_agent(name, request: AgentCreateIn):
             ret = agentmgr.update_agent(name, request)
             if ret:
                 await save_agent_configurations("update", ctx.get_agent_mgr().get_agents())
-                # manage agent bound pipeline status, trigger kb indexing if needed
-                # can be removed once kb indexing is decoupled from pipeline
-                pl_idx = agent.pipeline_idx
-                await manage_agent_bound_pipeline(pl_idx, request)
             return ret
         else:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
@@ -103,6 +100,33 @@ async def delete_agent(name):
                 raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
         else:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    except (ValueError, Exception) as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+
+
+class AgentActiveIn(BaseModel):
+    active: bool
+
+
+# PATCH Agent active status
+@agent_app.patch(path="/v1/agents/{name}/active")
+async def set_agent_active(name, request: AgentActiveIn):
+    try:
+        agentmgr = ctx.get_agent_mgr()
+        agent = agentmgr.get_agent_by_name(name)
+        if not agent:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+        if request.active:
+            result = agentmgr.activate_agent(agent.idx)
+        else:
+            result = agentmgr.deactivate_agent(agent.idx)
+        if result:
+            await save_agent_configurations("update", agentmgr.get_agents())
+            return {"name": name, "active": request.active}
+        else:
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    except HTTPException:
+        raise
     except (ValueError, Exception) as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
@@ -155,32 +179,3 @@ async def load_agent(request: AgentCreateIn):
         agentmgr.remove_agent_by_name(request.name)
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
     return agent
-
-
-async def manage_agent_bound_pipeline(bound_pl_idx, request):
-    # case1: activate agent, while bound pipeline is not active -> activate it, cache previous active pipeline if exists
-    # case2: activate agent, while bound pipeline is already active -> still call activate, for caching current pipeline
-    # case3: deactivate agent, while bound pipeline **was** active -> do NOT deactivate bound pipeline, do nothing
-    # case4: deactivate agent, while bound pipeline **was NOT** active -> deactivate bound pipeline, activate previous active pipeline if exists
-    pl_manager = ctx.get_pipeline_mgr()
-
-    active_kbs = ctx.knowledgemgr.get_active_knowledge_base()
-    # TODO: update single kb with kbs
-    # kb_name = active_kbs.name if active_kb else "default"
-
-    if request.active:
-        pl_manager.activate_pipeline(bound_pl_idx, request.active, active_kbs, cache_prev=True)
-    else:
-        # at deactivate, prev_active_pl can be 1.other pl/2.None/3.current bound_pl
-        prev_active_pl = pl_manager.get_prev_active_pipeline_name()
-        if prev_active_pl and prev_active_pl != bound_pl_idx:
-            # 1, restore to the other pipeline activated
-            pl_manager.activate_pipeline(prev_active_pl, True, active_kbs)
-        elif not prev_active_pl:
-            # 2, deactivate current bound pipeline, leave no active pipeline as before
-            pl_manager.activate_pipeline(bound_pl_idx, False, active_kbs)
-        else:
-            # 3, do nothing
-            pass
-        # when agent is deactivated, clear cached previous active pipeline
-        pl_manager.clear_prev_active_pipeline_name()

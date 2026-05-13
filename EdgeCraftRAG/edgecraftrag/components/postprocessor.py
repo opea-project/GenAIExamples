@@ -18,6 +18,7 @@ class RerankProcessor(BaseComponent):
         )
         self.model = rerank_model
         self.top_n = top_n
+        self.default_top_n = top_n
 
     def run(self, **kwargs) -> Any:
         self.model.top_n = self.top_n

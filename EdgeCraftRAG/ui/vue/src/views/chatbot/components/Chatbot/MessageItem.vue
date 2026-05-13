@@ -94,6 +94,7 @@
           <div v-if="!inResponse && readResponse" class="footer-btn">
             <a-tooltip
               placement="top"
+              :arrow="false"
               :title="$t('common.copy')"
               v-if="readResponse.length"
             >
@@ -103,6 +104,7 @@
             <a-tooltip
               v-if="lastResponse"
               placement="top"
+              :arrow="false"
               :title="$t('common.regenerate')"
             >
               <span class="icon-style" @click="handleRegenerate()">
@@ -187,13 +189,14 @@
         <div class="message-wrap">
           {{ message.content }}
           <div class="footer-btn">
-            <a-tooltip placement="top" :title="$t('common.copy')">
+            <a-tooltip placement="top" :arrow="false" :title="$t('common.copy')">
               <span class="icon-style" @click="handleCopyQuery()">
                 <CopyOutlined /></span
             ></a-tooltip>
             <a-tooltip
               v-if="!inResponse && lastQuery"
               placement="top"
+              :arrow="false"
               :title="$t('common.edit')"
             >
               <span class="icon-style" @click="handleEdit()">
@@ -202,6 +205,7 @@
             <a-tooltip
               v-if="!inResponse && message.errorMessage && lastQuery"
               placement="top"
+              :arrow="false"
               :title="$t('common.regenerate')"
             >
               <span class="icon-style" @click="handleRetry()">
@@ -218,21 +222,21 @@
 </template>
 
 <script lang="ts" setup name="MessageItem">
-import { marked } from "marked";
-import { PropType, ref, onMounted, computed, watch } from "vue";
+import { chatbotAppStore } from "@/store/chatbot";
+import { useClipboard } from "@/utils/clipboard";
+import CustomRenderer from "@/utils/customRenderer";
 import {
   CheckCircleFilled,
-  UpOutlined,
   CopyOutlined,
-  SyncOutlined,
   EditOutlined,
   ExclamationCircleFilled,
+  SyncOutlined,
+  UpOutlined,
 } from "@ant-design/icons-vue";
-import { IMessage, Benchmark } from "../../type";
-import CustomRenderer from "@/utils/customRenderer";
-import { useClipboard } from "@/utils/clipboard";
 import "highlight.js/styles/atom-one-dark.css";
-import { chatbotAppStore } from "@/store/chatbot";
+import { marked } from "marked";
+import { computed, onMounted, PropType, ref, watch } from "vue";
+import { Benchmark, IMessage } from "../../type";
 
 const chatbotStore = chatbotAppStore();
 const { copy } = useClipboard();

@@ -153,11 +153,12 @@ interface FormType {
   postprocessor: ProcessorType[];
 }
 const { postprocessor = [] } = props.formData || [];
+const DEFAULT_RERANK_TOP_N = 5;
 
 const defaultConfig = [
   {
     processor_type: "reranker",
-    top_n: 25,
+    top_n: DEFAULT_RERANK_TOP_N,
     reranker_model: {
       model_id: "BAAI/bge-reranker-large",
       model_path: "./models/BAAI/bge-reranker-large",
@@ -219,7 +220,7 @@ const getOptionIntroduction = (value: string) => {
 const handleTypeChange = (value: SelectValue, row: EmptyObjectType) => {
   if (value === "reranker") {
     Object.assign(row, {
-      top_n: 25,
+      top_n: DEFAULT_RERANK_TOP_N,
       reranker_model: {
         model_id: "BAAI/bge-reranker-large",
         model_path: "./models/BAAI/bge-reranker-large",
@@ -250,7 +251,7 @@ const handleModelChange = (item: EmptyObjectType, value: string) => {
 const handleAdd = () => {
   form.postprocessor.push({
     processor_type: "",
-    top_n: 25,
+    top_n: DEFAULT_RERANK_TOP_N,
     reranker_model: {
       model_id: "",
       model_path: "",

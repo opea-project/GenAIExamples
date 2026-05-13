@@ -32,7 +32,7 @@ Embedding and reranking are usually servered by local OpenVINO inferencing, to p
 
 ```bash
 # Prepare models for embedding, reranking:
-export MODEL_PATH="${PWD}/models" # Your model path for embedding, reranking and LLM models
+export MODEL_PATH="${PWD}/workspace/models" # Your model path for embedding, reranking and LLM models
 mkdir -p $MODEL_PATH
 pip install --upgrade --upgrade-strategy eager "optimum[openvino]"
 optimum-cli export openvino -m BAAI/bge-small-en-v1.5 ${MODEL_PATH}/BAAI/bge-small-en-v1.5 --task sentence-similarity
@@ -42,17 +42,15 @@ optimum-cli export openvino -m BAAI/bge-reranker-large ${MODEL_PATH}/BAAI/bge-re
 #### LLM
 
 ##### openVINO
-
 If you have Core Ultra platform only, please prepare openVINO models:  
 You can also run openVINO models on discrete GPU.
 
 ```bash
 # Prepare LLM model for openVINO
-optimum-cli export openvino --model Qwen/Qwen3-8B ${MODEL_PATH}/Qwen/Qwen3-8B/INT4_compressed_weights --task text-generation-with-past --weight-format int4 --group-size 128 --ratio 0.8
+optimum-cli export openvino --model Qwen/Qwen3-8B ${MODEL_PATH}/OpenVINO/Qwen3-8B-int4-ov --task text-generation-with-past --weight-format int4 --group-size 128 --ratio 0.8
 ```
 
 ##### vLLM
-
 Alternatively, if you have discrete GPU and want to use vLLM, please prepare models for vLLM:
 
 ```bash
@@ -83,11 +81,16 @@ export NO_PROXY=${NO_PROXY},${HOST_IP},edgecraftrag,edgecraftrag-server
 # export HF_ENDPOINT=https://hf-mirror.com # your HF mirror endpoint"
 
 # Make sure all 3 folders have 1000:1000 permission, otherwise
-export DOC_PATH=${PWD}/tests
-export TMPFILE_PATH=${PWD}/tests
+export DOC_PATH=${PWD}/workspace
+export TMPFILE_PATH=${PWD}/workspace
 chown 1000:1000 ${MODEL_PATH} ${DOC_PATH} ${TMPFILE_PATH}
 # In addition, also make sure the .cache folder has 1000:1000 permission, otherwise
 chown 1000:1000 -R $HOME/.cache
+
+# Check whether system support NPU
+if [ -e /dev/accel ]; then
+  export ACCEL_DEV="/dev/accel:/dev/accel"
+fi
 ```
 
 Set Milvus DB and chat history round for inference:
@@ -122,6 +125,18 @@ docker compose --profile b60 -f docker_compose/intel/gpu/arc/compose.yaml up -d
 docker compose --profile a770 -f docker_compose/intel/gpu/arc/compose.yaml up -d
 ```
 
+#### Option c.3. Deploy OVMS based EC-RAG
+
+OVMS uses the OpenVINO LLM model prepared above, for example `${MODEL_PATH}/OpenVINO/Qwen3-8B-int4-ov`.
+
+```bash
+export OVMS_SERVICE_PORT=8000
+export OVMS_SOURCE_MODEL=OpenVINO/Qwen3-8B-int4-ov
+export OVMS_MODEL_NAME=OpenVINO/Qwen3-8B-int4-ov
+
+docker compose --profile ovms -f docker_compose/intel/gpu/arc/compose.yaml up -d
+```
+
 ### 6. Cleanup the Deployment (Manual)
 
 To stop the containers associated with the deployment, execute the following command:
@@ -153,7 +168,7 @@ In this sample, we will use Qwen3-30B-A3B deployment on 4 Arc B60 GPUs as an exa
 Before started, please prepare models into MODEL_PATH and prepare docker images
 
 ```bash
-export MODEL_PATH="${PWD}/models" # Your model path
+export MODEL_PATH="${PWD}/workspace/models" # Same default model path used by quick_start.sh
 export LLM_MODEL="Qwen/Qwen3-30B-A3B"
 pip install modelscope
 modelscope download --model $LLM_MODEL --local_dir "${MODEL_PATH}/${LLM_MODEL}"
@@ -163,3 +178,5 @@ export TP=4 # for multi GPU, you can change TP value
 export ZE_AFFINITY_MASK=0,1,2,3 # for multi GPU, you can export ZE_AFFINITY_MASK=0,1,2...
 docker compose --profile b60 -f docker_compose/intel/gpu/arc/compose.yaml up -d
 ```
+
+

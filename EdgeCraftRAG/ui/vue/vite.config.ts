@@ -19,6 +19,10 @@ const alias: Record<string, string> = {
 };
 
 const viteConfig = defineConfig((mode: ConfigEnv) => {
+  const enableLocalProxy = process.env.ECRAG_LOCAL_PROXY === "1";
+  const apiProxyTarget = process.env.ECRAG_LOCAL_API_PROXY_TARGET ?? "http://localhost:16010";
+  const chatbotProxyTarget = process.env.ECRAG_LOCAL_CHATBOT_PROXY_TARGET ?? "http://localhost:16011";
+
   return {
     plugins: [
       vue(),
@@ -42,14 +46,22 @@ const viteConfig = defineConfig((mode: ConfigEnv) => {
       host: "0.0.0.0",
       port: 7777,
       hmr: true,
-      //   proxy: {
-      //     '/api': {
-      //       target: 'http://10.67.106.236:16010',
-      //       ws: true,
-      //       changeOrigin: true,
-      //       rewrite: (path) => path.replace(/^\/api/, ''),
-      //     },
-      //   },
+      proxy: enableLocalProxy
+        ? {
+            "/v1/chatqna": {
+              target: chatbotProxyTarget,
+              changeOrigin: true,
+            },
+            "/v1": {
+              target: apiProxyTarget,
+              changeOrigin: true,
+            },
+            "/home/user": {
+              target: apiProxyTarget,
+              changeOrigin: true,
+            },
+          }
+        : undefined,
     },
     build: {
       outDir: "dist",
