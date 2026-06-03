@@ -106,18 +106,19 @@ flowchart LR
 
 This CodeGen example can be deployed manually on various hardware platforms using Docker Compose or Kubernetes. Select the appropriate guide based on your target environment:
 
-| Hardware        | Deployment Mode                      | Guide Link                                                                               |
-| :-------------- | :----------------------------------- | :--------------------------------------------------------------------------------------- |
-| Intel Xeon CPU  | Single Node (Docker)                 | [Xeon Docker Compose Guide](./docker_compose/intel/cpu/xeon/README.md)                   |
-| Intel Xeon CPU  | Single Node (Docker) with Monitoring | [Xeon Docker Compose with Monitoring Guide](./docker_compose/intel/cpu/xeon/README.md)   |
-| Intel Gaudi HPU | Single Node (Docker)                 | [Gaudi Docker Compose Guide](./docker_compose/intel/hpu/gaudi/README.md)                 |
-| Intel Gaudi HPU | Single Node (Docker) with Monitoring | [Gaudi Docker Compose with Monitoring Guide](./docker_compose/intel/hpu/gaudi/README.md) |
-| AMD EPYC CPU    | Single Node (Docker)                 | [EPYC Docker Compose Guide](./docker_compose/amd/cpu/epyc/README.md)                     |
-| AMD ROCm GPU    | Single Node (Docker)                 | [ROCm Docker Compose Guide](./docker_compose/amd/gpu/rocm/README.md)                     |
-| Intel Xeon CPU  | Kubernetes (Helm)                    | [Kubernetes Helm Guide](./kubernetes/helm/README.md)                                     |
-| Intel Gaudi HPU | Kubernetes (Helm)                    | [Kubernetes Helm Guide](./kubernetes/helm/README.md)                                     |
-| Intel Xeon CPU  | Kubernetes (GMC)                     | [Kubernetes GMC Guide](./kubernetes/gmc/README.md)                                       |
-| Intel Gaudi HPU | Kubernetes (GMC)                     | [Kubernetes GMC Guide](./kubernetes/gmc/README.md)                                       |
+| Hardware            | Deployment Mode                      | Guide Link                                                                               |
+| :------------------ | :----------------------------------- | :--------------------------------------------------------------------------------------- |
+| Intel Xeon CPU      | Single Node (Docker)                 | [Xeon Docker Compose Guide](./docker_compose/intel/cpu/xeon/README.md)                   |
+| Intel Xeon CPU      | Single Node (Docker) with Monitoring | [Xeon Docker Compose with Monitoring Guide](./docker_compose/intel/cpu/xeon/README.md)   |
+| Intel Gaudi HPU     | Single Node (Docker)                 | [Gaudi Docker Compose Guide](./docker_compose/intel/hpu/gaudi/README.md)                 |
+| Intel Gaudi HPU     | Single Node (Docker) with Monitoring | [Gaudi Docker Compose with Monitoring Guide](./docker_compose/intel/hpu/gaudi/README.md) |
+| Intel Arc GPU (XPU) | Single Node (Docker)                 | [Arc XPU Docker Compose Guide](./docker_compose/intel/xpu/arc/README.md)                 |
+| AMD EPYC CPU        | Single Node (Docker)                 | [EPYC Docker Compose Guide](./docker_compose/amd/cpu/epyc/README.md)                     |
+| AMD ROCm GPU        | Single Node (Docker)                 | [ROCm Docker Compose Guide](./docker_compose/amd/gpu/rocm/README.md)                     |
+| Intel Xeon CPU      | Kubernetes (Helm)                    | [Kubernetes Helm Guide](./kubernetes/helm/README.md)                                     |
+| Intel Gaudi HPU     | Kubernetes (Helm)                    | [Kubernetes Helm Guide](./kubernetes/helm/README.md)                                     |
+| Intel Xeon CPU      | Kubernetes (GMC)                     | [Kubernetes GMC Guide](./kubernetes/gmc/README.md)                                       |
+| Intel Gaudi HPU     | Kubernetes (GMC)                     | [Kubernetes GMC Guide](./kubernetes/gmc/README.md)                                       |
 
 _Note: Building custom microservice images can be done using the resources in [GenAIComps](https://github.com/opea-project/GenAIComps)._
 
@@ -180,15 +181,16 @@ Intel® Optimized Cloud Modules for Terraform provide an automated way to deploy
 
 ## Validated Configurations
 
-| **Deploy Method** | **LLM Engine** | **LLM Model**                  | **Hardware** |
-| ----------------- | -------------- | ------------------------------ | ------------ |
-| Docker Compose    | vLLM, TGI      | Qwen/Qwen2.5-Coder-7B-Instruct | Intel Gaudi  |
-| Docker Compose    | vLLM, TGI      | Qwen/Qwen2.5-Coder-7B-Instruct | Intel Xeon   |
-| Docker Compose    | vLLM, TGI      | Qwen/Qwen2.5-Coder-7B-Instruct | AMD EPYC     |
-| Docker Compose    | vLLM, TGI      | Qwen/Qwen2.5-Coder-7B-Instruct | AMD ROCm     |
-| Helm Charts       | vLLM, TGI      | Qwen/Qwen2.5-Coder-7B-Instruct | Intel Gaudi  |
-| Helm Charts       | vLLM, TGI      | Qwen/Qwen2.5-Coder-7B-Instruct | Intel Xeon   |
-| Helm Charts       | vLLM, TGI      | Qwen/Qwen2.5-Coder-7B-Instruct | AMD ROCm     |
+| **Deploy Method** | **LLM Engine** | **LLM Model**                  | **Hardware**    |
+| ----------------- | -------------- | ------------------------------ | --------------- |
+| Docker Compose    | vLLM, TGI      | Qwen/Qwen2.5-Coder-7B-Instruct | Intel Gaudi     |
+| Docker Compose    | vLLM, TGI      | Qwen/Qwen2.5-Coder-7B-Instruct | Intel Xeon      |
+| Docker Compose    | vLLM           | Qwen/Qwen2.5-Coder-7B-Instruct | Intel Arc (XPU) |
+| Docker Compose    | vLLM, TGI      | Qwen/Qwen2.5-Coder-7B-Instruct | AMD EPYC        |
+| Docker Compose    | vLLM, TGI      | Qwen/Qwen2.5-Coder-7B-Instruct | AMD ROCm        |
+| Helm Charts       | vLLM, TGI      | Qwen/Qwen2.5-Coder-7B-Instruct | Intel Gaudi     |
+| Helm Charts       | vLLM, TGI      | Qwen/Qwen2.5-Coder-7B-Instruct | Intel Xeon      |
+| Helm Charts       | vLLM, TGI      | Qwen/Qwen2.5-Coder-7B-Instruct | AMD ROCm        |
 
 ## Contribution
 
