@@ -8,21 +8,8 @@ import re
 from typing import Dict, List, Union
 
 from edgecraftrag.api_schema import DataIn, ExperienceIn, KnowledgeBaseCreateIn
-from edgecraftrag.base import (
-    IndexerType,
-    ModelType,
-    NodeParserType,
-)
-from edgecraftrag.components.benchmark import Benchmark
-from edgecraftrag.components.indexer import KBADMINIndexer, VectorIndexer, get_kbs_info
-from edgecraftrag.components.node_parser import (
-    HierarchyNodeParser,
-    KBADMINParser,
-    SimpleNodeParser,
-    SWindowNodeParser,
-    UnstructedNodeParser,
-)
 from edgecraftrag.components.query_preprocess import query_search
+from edgecraftrag.components.indexer import get_kbs_info
 from edgecraftrag.config_repository import (
     MilvusConfigRepository,
     save_knowledge_configurations,
@@ -34,7 +21,21 @@ from edgecraftrag.env import (
     SEARCH_DIR,
     UI_DIRECTORY,
 )
-from fastapi import FastAPI, HTTPException, Query, status
+from edgecraftrag.base import (
+    IndexerType,
+    ModelType,
+    NodeParserType,
+)
+from edgecraftrag.components.benchmark import Benchmark
+from edgecraftrag.components.indexer import KBADMINIndexer, VectorIndexer
+from edgecraftrag.components.node_parser import (
+    HierarchyNodeParser,
+    KBADMINParser,
+    SimpleNodeParser,
+    SWindowNodeParser,
+    UnstructedNodeParser,
+)
+from fastapi import FastAPI, HTTPException, status, Query
 
 kb_app = FastAPI()
 
@@ -50,9 +51,7 @@ async def get_all_knowledge_bases():
 
 # Get knowledge base files in a certain range.
 @kb_app.get("/v1/knowledge/{knowledge_name}/filemap")
-async def get_knowledge_base_filemap(
-    knowledge_name: str, page_num: int = Query(1, ge=1), page_size: int = Query(20, ge=1)
-):
+async def get_knowledge_base_filemap(knowledge_name: str, page_num: int = Query(1, ge=1), page_size: int = Query(20, ge=1)):
     kb = ctx.knowledgemgr.get_knowledge_base_by_name_or_id(knowledge_name)
     if kb and kb.file_map:
         file_map = kb.file_map
@@ -62,7 +61,7 @@ async def get_knowledge_base_filemap(
         if start >= filemap_len:
             return None
         file_map_subset = itertools.islice(file_map.items(), start, end)
-        return {"file_map": dict(file_map_subset), "total": kb.calculate_totals()}
+        return {"file_map": dict(file_map_subset),"total": kb.calculate_totals()}
     else:
         return None
 
@@ -102,7 +101,7 @@ async def create_knowledge_base(knowledge: KnowledgeBaseCreateIn):
                     active_pl.update_retriever_list(ctx.knowledgemgr.get_active_knowledge_base())
             except Exception as e:
                 ctx.knowledgemgr.delete_knowledge_base(knowledge.name)
-                raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+                raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))  
         await save_knowledge_configurations("add", kb)
         return "Create knowledge base successfully"
     except Exception as e:
@@ -157,12 +156,17 @@ async def update_knowledge_base(knowledge: KnowledgeBaseCreateIn):
                 raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
             # reload data for knowledge base
-            node_parser_changed = kb_node_parser != kb.node_parser
+            node_parser_changed = (kb_node_parser != kb.node_parser)
             if node_parser_changed or kb_indexer != kb.indexer:
                 await handle_reload_data(kb, node_parser_changed)
         elif kb.comp_subtype == "kbadmin_kb":
             kb.indexer.config_kbadmin_milvus(kb.name)
         active_pl = ctx.get_pipeline_mgr().get_active_pipeline()
+        try:
+            kb.indexer.model._model.clear_requests()
+            kb.indexer.model._model.compile()
+        except Exception as e:
+            pass
         result = ctx.knowledgemgr.update_knowledge_base(knowledge, active_pl)
         # Update knowledge json
         knowledge_dict = knowledge.dict()
@@ -177,10 +181,10 @@ async def update_knowledge_base(knowledge: KnowledgeBaseCreateIn):
 @kb_app.post(path="/v1/knowledge/{knowledge_name}/files")
 async def add_file_to_knowledge_base(knowledge_name, file_path: DataIn):
     """
-    1. Parse file into Llamaindex Document and add file to filemgr
-    2. Add file path to knowledge base
-    3. Update nodes and vector store for knowledge base
-    4. Update pipeline retriever if active knowledge base's indexer changed
+        1. Parse file into Llamaindex Document and add file to filemgr
+        2. Add file path to knowledge base
+        3. Update nodes and vector store for knowledge base
+        4. Update pipeline retriever if active knowledge base's indexer changed
     """
     try:
         kb = ctx.knowledgemgr.get_knowledge_base_by_name_or_id(knowledge_name)
@@ -223,7 +227,7 @@ async def add_file_to_knowledge_base(knowledge_name, file_path: DataIn):
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Error uploading file.")
 
         # update retriever with indexer since indexer updated
-        if kb.active:
+        if  kb.active:
             active_pl = ctx.get_pipeline_mgr().get_active_pipeline()
             if active_pl:
                 active_pl.update_retriever(kb, prev_indexer)
@@ -259,7 +263,7 @@ async def remove_file_from_knowledge_base(knowledge_name, file_path: DataIn):
             )
         await remove_document_handler(document_list, kb)
         # update retriever with indexer since indexer updated
-        if kb.active:
+        if  kb.active:
             active_pl = ctx.get_pipeline_mgr().get_active_pipeline()
             if active_pl:
                 active_pl.update_retriever(kb, prev_indexer)
@@ -413,8 +417,8 @@ async def restore_knowledge_configurations():
             all_data = json.loads(all_Knowledgebases)
             for Knowledgebase_data in all_data:
                 all_datas.append(Knowledgebase_data)
-    try:
-        for Knowledgebase_data in all_datas:
+    for Knowledgebase_data in all_datas:
+        try:
             Knoweldge_req = KnowledgeBaseCreateIn(**Knowledgebase_data)
             knowledge_json = Knoweldge_req.model_dump_json()
             kb = ctx.knowledgemgr.create_knowledge_base(Knoweldge_req, knowledge_json)
@@ -422,9 +426,10 @@ async def restore_knowledge_configurations():
                 await update_kb_handler(kb, Knoweldge_req)
             except Exception as e:
                 ctx.knowledgemgr.delete_knowledge_base(Knoweldge_req.name)
-                raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+                print(f"Error loading knowledge base '{Knoweldge_req.name}': {e}")
+                continue
             if kb.comp_type == "knowledge" and kb.comp_subtype == "origin_kb":
-                if Knowledgebase_data["file_paths"]:
+                if Knowledgebase_data.get("file_paths"):
                     if kb.indexer.comp_subtype == "milvus_vector":
                         kb.indexer.reinitialize_indexer(Knowledgebase_data["name"])
                     else:
@@ -432,12 +437,12 @@ async def restore_knowledge_configurations():
                         await handle_reload_data(kb, node_parser_changed=True)
             elif kb.comp_subtype == "kbadmin_kb":
                 kb.indexer.config_kbadmin_milvus(kb.name)
-        # connect retriever with active kb's indexers
-        active_pl = ctx.get_pipeline_mgr().get_active_pipeline()
-        if active_pl:
-            active_pl.update_retriever_list(ctx.knowledgemgr.get_active_knowledge_base())
-    except Exception as e:
-        print(f"Error load Knowledge base: {e}")
+        except Exception as e:
+            print(f"Error loading knowledge base: {e}")
+    # connect retriever with active kb's indexers
+    active_pl = ctx.get_pipeline_mgr().get_active_pipeline()
+    if active_pl:
+        active_pl.update_retriever_list(ctx.knowledgemgr.get_active_knowledge_base())
 
 
 # reloading data that is not a milvus indexer
@@ -459,7 +464,6 @@ async def handle_reload_data(kb, node_parser_changed: bool = False):
             ctx.get_node_mgr().add_nodes(kb.node_parser.idx, nodelist)
     # update indexer
     await kb.update_nodes_to_indexer()
-
 
 async def update_kb_handler(kb, knowledge):
     if kb.enable_benchmark:
@@ -495,9 +499,7 @@ async def update_kb_handler(kb, knowledge):
             ctx.get_node_parser_mgr().add(kb.node_parser)
     if knowledge.indexer is not None:
         ind = knowledge.indexer
-        found_indexer = (
-            ctx.get_indexer_mgr().search_indexer(ind) if ind.indexer_type != IndexerType.MILVUS_VECTOR else None
-        )
+        found_indexer = ctx.get_indexer_mgr().search_indexer(ind) if ind.indexer_type != IndexerType.MILVUS_VECTOR else None
         if found_indexer is not None:
             kb.indexer = found_indexer
         else:
@@ -527,4 +529,7 @@ async def update_kb_handler(kb, knowledge):
             del kb.indexer
             kb.indexer = new_indexer
             ctx.get_indexer_mgr().add(kb.indexer)
+    active_pl = ctx.get_pipeline_mgr().get_active_pipeline()
+    if active_pl:
+        active_pl.check_top_k(ctx.get_knowledge_mgr().get_all_knowledge_bases())
     return kb

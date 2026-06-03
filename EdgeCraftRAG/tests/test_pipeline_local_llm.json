@@ -20,7 +20,7 @@
     {
       "model": {
         "model_id": "Qwen/Qwen3-8B",
-        "model_path": "./models/Qwen/Qwen3-8B/INT4_compressed_weights",
+        "model_path": "./models/OpenVINO/Qwen3-8B-int4-ov",
         "device": "auto",
         "weight": "INT4"
       },

@@ -50,6 +50,7 @@ class GeneratorIn(BaseModel):
     model: Optional[ModelIn] = None
     inference_type: Optional[str] = "local"
     vllm_endpoint: Optional[str] = None
+    ovms_endpoint: Optional[str] = None
 
 
 class PipelineCreateIn(BaseModel):

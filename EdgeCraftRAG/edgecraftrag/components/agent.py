@@ -3,13 +3,21 @@
 
 import os
 from abc import abstractmethod
+from typing import Any, List
 
 from comps.cores.proto.api_protocol import ChatCompletionRequest
 from edgecraftrag.base import BaseComponent, CallbackType, CompType, GeneratorType
 from edgecraftrag.components.agents.utils import remove_think_tags
 from edgecraftrag.utils import stream_generator
 from langgraph.config import get_stream_writer
-from pydantic import model_serializer
+from pydantic import BaseModel, Field, model_serializer
+
+
+class Retrieval(BaseModel):
+    step: Any
+    query: str
+    retrieved: List[Any] = Field(...)
+    reranked: List[Any] = Field(...)
 
 
 class Agent(BaseComponent):
@@ -22,10 +30,15 @@ class Agent(BaseComponent):
         self.pipeline_idx = pipeline_idx
         self.manager = None
         self.configs = configs
+        self.retrievals: List[Retrieval] = []
 
     @classmethod
     @abstractmethod
     def get_default_configs(cls):
+        pass
+
+    @abstractmethod
+    async def run(self, **kwargs) -> Any:
         pass
 
     def get_bound_pipeline(self):

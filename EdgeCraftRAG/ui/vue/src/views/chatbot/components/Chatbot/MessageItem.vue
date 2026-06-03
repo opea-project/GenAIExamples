@@ -94,6 +94,7 @@
           <div v-if="!inResponse && readResponse" class="footer-btn">
             <a-tooltip
               placement="top"
+              :arrow="false"
               :title="$t('common.copy')"
               v-if="readResponse.length"
             >
@@ -103,6 +104,7 @@
             <a-tooltip
               v-if="lastResponse"
               placement="top"
+              :arrow="false"
               :title="$t('common.regenerate')"
             >
               <span class="icon-style" @click="handleRegenerate()">
@@ -187,13 +189,18 @@
         <div class="message-wrap">
           {{ message.content }}
           <div class="footer-btn">
-            <a-tooltip placement="top" :title="$t('common.copy')">
+            <a-tooltip
+              placement="top"
+              :arrow="false"
+              :title="$t('common.copy')"
+            >
               <span class="icon-style" @click="handleCopyQuery()">
                 <CopyOutlined /></span
             ></a-tooltip>
             <a-tooltip
               v-if="!inResponse && lastQuery"
               placement="top"
+              :arrow="false"
               :title="$t('common.edit')"
             >
               <span class="icon-style" @click="handleEdit()">
@@ -202,6 +209,7 @@
             <a-tooltip
               v-if="!inResponse && message.errorMessage && lastQuery"
               placement="top"
+              :arrow="false"
               :title="$t('common.regenerate')"
             >
               <span class="icon-style" @click="handleRetry()">
@@ -218,21 +226,21 @@
 </template>
 
 <script lang="ts" setup name="MessageItem">
-import { marked } from "marked";
-import { PropType, ref, onMounted, computed, watch } from "vue";
+import { chatbotAppStore } from "@/store/chatbot";
+import { useClipboard } from "@/utils/clipboard";
+import CustomRenderer from "@/utils/customRenderer";
 import {
   CheckCircleFilled,
-  UpOutlined,
   CopyOutlined,
-  SyncOutlined,
   EditOutlined,
   ExclamationCircleFilled,
+  SyncOutlined,
+  UpOutlined,
 } from "@ant-design/icons-vue";
-import { IMessage, Benchmark } from "../../type";
-import CustomRenderer from "@/utils/customRenderer";
-import { useClipboard } from "@/utils/clipboard";
 import "highlight.js/styles/atom-one-dark.css";
-import { chatbotAppStore } from "@/store/chatbot";
+import { marked } from "marked";
+import { computed, onMounted, PropType, ref, watch } from "vue";
+import { Benchmark, IMessage } from "../../type";
 
 const chatbotStore = chatbotAppStore();
 const { copy } = useClipboard();
@@ -379,7 +387,7 @@ const parseAttributes = (attrString: string): Record<string, string> => {
 
 const parseAgentContentIncremental = (
   content: string,
-  previousBlocks: AgentBlock[]
+  previousBlocks: AgentBlock[],
 ): AgentBlock[] => {
   const blocks = [...previousBlocks];
   let currentIndex = 0;
@@ -403,7 +411,7 @@ const parseAgentContentIncremental = (
       const agentContent = content.substring(endOfStartTag + 1, endTag).trim();
 
       const existingBlockIndex = blocks.findIndex(
-        (block) => block.startIndex === startTag
+        (block) => block.startIndex === startTag,
       );
 
       if (existingBlockIndex !== -1) {
@@ -451,7 +459,7 @@ const parseAgentContentIncremental = (
       const agentContent = content.substring(endOfStartTag + 1).trim();
 
       const existingBlockIndex = blocks.findIndex(
-        (block) => block.startIndex === startTag && !block.completed
+        (block) => block.startIndex === startTag && !block.completed,
       );
 
       if (existingBlockIndex !== -1) {
@@ -493,7 +501,7 @@ const getMainContent = (content: string, agentBlocks: AgentBlock[]): string => {
   }
 
   const sortedBlocks = [...agentBlocks].sort(
-    (a, b) => (b.startIndex || 0) - (a.startIndex || 0)
+    (a, b) => (b.startIndex || 0) - (a.startIndex || 0),
   );
 
   for (const block of sortedBlocks) {
@@ -561,7 +569,7 @@ const renderedMainMarkdown = computed(() => {
 
 const calculateAgentStyle = () => {
   const agent = agentsList.value.find(
-    (item) => item.id === chatbotStore.agent?.type
+    (item) => item.id === chatbotStore.agent?.type,
   );
 
   const colorIndex = (chatbotStore.agent.index % 5) + 1;
@@ -657,11 +665,11 @@ watch(
       if (props.message?.content) {
         agentBlocks.value = parseAgentContentIncremental(
           props.message.content,
-          []
+          [],
         );
       }
     }
-  }
+  },
 );
 
 watch(
@@ -679,13 +687,13 @@ watch(
     if (newContent) {
       agentBlocks.value = parseAgentContentIncremental(
         newContent,
-        agentBlocks.value
+        agentBlocks.value,
       );
     } else {
       resetAgentState();
     }
   },
-  { immediate: true }
+  { immediate: true },
 );
 
 watch(
@@ -694,7 +702,7 @@ watch(
     if (newRole !== oldRole) {
       resetAgentState();
     }
-  }
+  },
 );
 
 watch(
@@ -703,7 +711,7 @@ watch(
     if (!newValue) {
       addClickListeners();
     }
-  }
+  },
 );
 
 watch(
@@ -712,7 +720,7 @@ watch(
     if (value) {
       isCollapsed.value = false;
     }
-  }
+  },
 );
 
 onMounted(() => {
@@ -904,7 +912,9 @@ onMounted(() => {
       z-index: 20;
       opacity: 0;
       visibility: hidden;
-      transition: opacity 0.3s ease, visibility 0s linear 2s;
+      transition:
+        opacity 0.3s ease,
+        visibility 0s linear 2s;
       gap: 8px;
       .anticon {
         cursor: pointer;
@@ -1088,7 +1098,9 @@ onMounted(() => {
 }
 .think-transition-enter-active,
 .think-transition-leave-active {
-  transition: opacity 0.2s ease, transform 0.2s ease;
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
 }
 .think-transition-enter-from,
 .think-transition-leave-to {

@@ -4,11 +4,18 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 RUN apt-get update && apt-get install -y gnupg2 wget git
 RUN apt-get remove -y libze-intel-gpu1 libigc1 libigdfcl1 libze-dev || true; \
     apt-get update; \
-    apt-get install -y curl
+    apt-get install -y curl jq
 RUN curl -sL 'https://keyserver.ubuntu.com/pks/lookup?fingerprint=on&op=get&search=0x0C0E6AF955CE463C03FC51574D098D70AFBE5E1F' | tee /etc/apt/trusted.gpg.d/driver.asc
 RUN echo -e "Types: deb\nURIs: https://ppa.launchpadcontent.net/kobuk-team/intel-graphics/ubuntu/\nSuites: questing\nComponents: main\nSigned-By: /etc/apt/trusted.gpg.d/driver.asc" > /etc/apt/sources.list.d/driver.sources
-RUN apt-get update && apt-get install -y libze-intel-gpu1 libze1 intel-metrics-discovery intel-opencl-icd clinfo intel-gsc && apt-get install -y libze-intel-gpu1 libze1 intel-metrics-discovery intel-opencl-icd clinfo intel-gsc && apt-get install -y libze-dev intel-ocloc libze-intel-gpu-raytracing
-
+RUN apt-get update && apt-get install -y libze-intel-gpu1 libze1 intel-metrics-discovery intel-opencl-icd clinfo intel-gsc && apt-get install -y libze-intel-gpu1 libze1 intel-metrics-discovery intel-opencl-icd clinfo intel-gsc && apt-get install -y libze-dev intel-ocloc libze-intel-gpu-raytracing libglib2.0-0 libgl1 libmagic-dev poppler-utils  tesseract-ocr pandoc
+RUN url=$(curl -s https://api.github.com/repos/intel/linux-npu-driver/releases/latest \
+        | jq -r '.assets[] | select(.name | test("ubuntu2404\\.tar\\.gz$")) | .browser_download_url' \
+        | head -n 1) \
+    && wget -O /tmp/linux-npu-driver.tar.gz "$url" \
+    && tar -xf /tmp/linux-npu-driver.tar.gz -C /tmp \
+    && dpkg -i /tmp/*.deb || apt-get install -f -y \
+    && rm -rf /tmp/linux-npu-driver*
+    
 RUN useradd -m -s /bin/bash user && \
     mkdir -p /home/user && \
     chown -R user /home/user/

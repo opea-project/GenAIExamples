@@ -30,7 +30,8 @@ export default {
     export: "Export",
     uploadTip: "Click or drag file to this area to upload",
     loading: "Loading",
-    waitTip: "Please wait patiently and do not refresh the page during this period.",
+    waitTip:
+      "Please wait patiently and do not refresh the page during this period.",
     copy: "Copy",
     send: "Send",
     regenerate: "Regenerate",
@@ -88,7 +89,8 @@ export default {
     activated: "Activated",
     inactive: "Inactive",
     isActive: "Activated",
-    pipelineFormatTip: "Supports JSON format, with file size not exceeding 10M.",
+    pipelineFormatTip:
+      "Supports JSON format, with file size not exceeding 10M.",
     importSuccTip: "Files upload successful!",
     importErrTip: "Files upload failed!",
     name: "Name",
@@ -98,7 +100,8 @@ export default {
     deactivateTip: "Are you sure deactivate this pipeline?",
     activeTip: "Are you sure activate this pipeline?",
     deleteTip: "Are you sure delete this pipeline?",
-    notActivatedTip: "There is no available pipeline. Please create or activate it first.",
+    notActivatedTip:
+      "There is no available pipeline. Please create or activate it first.",
     validErr: "Form validation failed !",
     urlValidTip: "Test URL or model to proceed.",
     config: {
@@ -132,12 +135,15 @@ export default {
       weights: "Weights",
       local: "Local (OpenVINO)",
       vllm: "Remote (vLLM)",
+      ovms: "Remote (OVMS)",
       vector_url: "Vector Database URL",
       modelName: "Model Name",
       vllm_url: "vLLM URL",
+      ovms_url: "OVMS URL",
       kbadmin: "kbadmin",
       addAgent: "Agent Configuration",
-      deleteAgentTip: "Are you sure you want to delete the agent generator configuration?",
+      deleteAgentTip:
+        "Are you sure you want to delete the agent generator configuration?",
     },
     valid: {
       nameValid1: "Please input name",
@@ -145,9 +151,11 @@ export default {
       nameValid3: "The name only supports letters, numbers, and underscores.",
       nodeParserType: "Please select Node Parser Type",
       chunkSizeValid1: "Please select Chunk Size",
-      chunkSizeValid2: "The value of Chunk Size cannot be less than Chunk Overlap",
+      chunkSizeValid2:
+        "The value of Chunk Size cannot be less than Chunk Overlap",
       chunkOverlapValid1: "Please select Chunk Overlap",
-      chunkOverlapValid2: "The value of Chunk Overlap cannot be greater than Chunk Size",
+      chunkOverlapValid2:
+        "The value of Chunk Overlap cannot be greater than Chunk Size",
       windowSize: "Please select Chunk Window Size",
       indexerType: "Please select Indexer Type",
       embedding: "Please select embedding Model",
@@ -169,6 +177,7 @@ export default {
       kb_vector_url: "IP : Port, (e.g. 192.168.1.1:29530)",
       vector_url: "IP : Port, (e.g. 192.168.1.1:19530)",
       vllm_url: "IP : Port, (e.g. 192.168.1.1:8086)",
+      ovms_url: "IP : Port, (e.g. 192.168.1.1:8000)",
       urlValid1: "Please enter vector url",
       urlValid2: "Please enter the correct url",
       urlValid3: "URL cannot be accessed",
@@ -180,30 +189,44 @@ export default {
       vllmUrlValid3: "URL cannot be accessed",
       vllmUrlValid4: "Test passed !",
       vllmUrlValid5: "The vLLM model has not passed verification yet",
-      nodeParserTypeTip: "Both Indexer Type and  Retriever Type will be set to kbadmin at the same time",
-      indexerTypeTip: "Both Node Parser Type and  Retriever Type will be set to kbadmin at the same time",
-      retrieverTypeTip: "Both Node Parser Type and  Indexer Type will be set to kbadmin at the same time",
+      ovmsUrlValid1: "Please enter OVMS url",
+      ovmsUrlValid2: "Please enter the correct url",
+      ovmsUrlValid3: "URL cannot be accessed",
+      ovmsUrlValid4: "Test passed !",
+      ovmsUrlValid5: "The OVMS model has not passed verification yet",
+      remoteUrlValid5: "The remote model has not passed verification yet",
+      nodeParserTypeTip:
+        "Both Indexer Type and  Retriever Type will be set to kbadmin at the same time",
+      indexerTypeTip:
+        "Both Node Parser Type and  Retriever Type will be set to kbadmin at the same time",
+      retrieverTypeTip:
+        "Both Node Parser Type and  Indexer Type will be set to kbadmin at the same time",
       retrieverChangeTip: "Please go to the Indexer stage to complete the data",
       indexerTypeValid1: "Indexer type can only select kbadmin",
       modelRequired: "Please enter embedding model url",
       modelFormat: "Please enter the correct url",
-      retrieverValid: "Please return to the Indexer stage to supplement information.",
+      retrieverValid:
+        "Please return to the Indexer stage to supplement information.",
       modelTip: "Please connect to vLLM service",
+      ovmsModelTip: "Please connect to OVMS service",
     },
     desc: {
       name: "The name identifier of the pipeline",
       nodeParserType: "Node parsing type when you use RAG",
       chunkSize: "Size of each chunk for processing",
       chunkOverlap: "Overlap size between chunks",
-      windowSize: "The number of sentences on each side of a sentence to capture",
-      indexerType: "The type of index structure responsible for building based on the parsed nodes",
+      windowSize:
+        "The number of sentences on each side of a sentence to capture",
+      indexerType:
+        "The type of index structure responsible for building based on the parsed nodes",
       embedding: "Embed the text data to represent it and build a vector index",
       embeddingUrl: "Connecting embedding model url",
       embeddingDevice: "The device used by the embedding model",
       retrieverType:
         "The retrieval type used when retrieving relevant nodes from the index according to the user's experience",
       topk: "The number of top k results to return",
-      postProcessorType: "Select postprocessors for post-processing of the context",
+      postProcessorType:
+        "Select postprocessors for post-processing of the context",
       rerank: "Rerank Model",
       rerankDevice: "Rerank run device",
       generatorType: "Local inference generator or vLLM generator",
@@ -211,17 +234,21 @@ export default {
       llmDevice: "The device used by the  LLM",
       weights: "Model weight",
       reranker: "The model for reranking.",
-      metadataReplace: "Used to replace the node content with a field from the node metadata.",
+      metadataReplace:
+        "Used to replace the node content with a field from the node metadata.",
       vectorsimilarity: "retrieval according to vector similarity",
-      autoMerge: "This retriever will try to merge context into parent context.",
+      autoMerge:
+        "This retriever will try to merge context into parent context.",
       bm25: "A BM25 retriever that uses the BM25 algorithm to retrieve nodes.",
       faissVector: "Embeddings are stored within a Faiss index.",
       vector: "Vector Store Index.",
       simple: "Parse text with a preference for complete sentences.",
-      hierarchical: "Splits a document into a recursive hierarchy Nodes using a NodeParser.",
+      hierarchical:
+        "Splits a document into a recursive hierarchy Nodes using a NodeParser.",
       sentencewindow:
         "Sentence window node parser. Splits a document into Nodes, with each node being a sentence. Each node contains a window from the surrounding sentences in the metadata.",
-      unstructured: "UnstructedNodeParser is a component that processes unstructured data.",
+      unstructured:
+        "UnstructedNodeParser is a component that processes unstructured data.",
       milvusVector: "Embedding vectors stored in milvus",
       vector_url: "Connecting milvus vector url",
       test: "Test",
@@ -280,7 +307,8 @@ export default {
     edit: "Edit Knowledge Base",
     deleteTip: "Are you sure delete this knowledge base?",
     activeTip: "Are you sure activate this knowledge base?",
-    uploadTip: "Supports PDF, Word, TXT,Doc,Html,PPT,ZIP formats, with a single file size not exceeding 200M",
+    uploadTip:
+      "Supports PDF, Word, TXT,Doc,Html,PPT,ZIP formats, with a single file size not exceeding 200M",
     notFileTip: "The knowledge base is empty. Go upload your files.",
     name: "Name",
     des: "Description",
@@ -288,7 +316,8 @@ export default {
     activated: "Activated",
     nameValid1: "Please input knowledge base name",
     nameValid2: "Name should be between 2 and 30 characters",
-    nameValid3: "Alphanumeric and underscore only, starting with a letter or underscore.",
+    nameValid3:
+      "Alphanumeric and underscore only, starting with a letter or underscore.",
     desValid: "Please input knowledge base description",
     activeValid: "Please select whether to activate",
     uploadValid: "Single file size not exceeding 200M.",
@@ -318,7 +347,8 @@ export default {
     desc: {
       name: "The name identifier of the knowledge base.",
       type: "The type identifier of the knowledge base.",
-      description: "Briefly describe the purpose, content scope, or intended use of this knowledge base.",
+      description:
+        "Briefly describe the purpose, content scope, or intended use of this knowledge base.",
     },
   },
   request: {
@@ -349,8 +379,14 @@ export default {
       createSucc: "Agent created successfully!",
       updateSucc: "Agent update successful!",
       deleteSucc: "Agent deleted successfully!",
+      activateSucc: "Agent activated successfully!",
+      deactivateSucc: "Agent deactivated successfully!",
+    },
+    session: {
+      deleteSucc: "Session deleted successfully!",
     },
   },
+
   error: {
     notFoundTip: "Uh oh! It seems like you're lost",
     back: "Go Home",
@@ -405,6 +441,8 @@ export default {
     importErrTip: "Files upload failed!",
     name: "Name",
     id: "ID",
+    type: "Type",
+    state: "State",
     status: "Status",
     operation: "Operation",
     configs: "Configs",

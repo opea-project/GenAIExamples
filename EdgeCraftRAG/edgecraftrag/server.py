@@ -27,7 +27,7 @@ async def lifespan(app: FastAPI):
         await restore_knowledge_configurations()
         await restore_agent_configurations()
     except Exception as e:
-        pass
+        print(f"Error during restore: {e}")
     finally:
         yield
 

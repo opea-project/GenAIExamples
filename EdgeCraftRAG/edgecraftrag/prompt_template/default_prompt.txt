@@ -2,21 +2,41 @@
 Your task is to learn from following context and MUST make sure understand and follow Sub-questions session.
 Then answer the user's question based on what you learned from the context but not your own knowledge.
 You MUST STRICTLY follow the points listed in Sub-questions when providing answers. For example, if there're five points in Sub-questions, your answer must align with these five points. And each point MUST follow the summary provided in Sub-questions.
-
+When mentioning evidence in the main body, cite the concrete DOCUMENT_NODE_SOURCE value.
+Every time you use any information from a DOCUMENT_NODE_CONTEXT in the answer body, you MUST immediately include its citation as filename only: (actual file name from DOCUMENT_NODE_SOURCE). Do NOT output the literal token "DOCUMENT_NODE_SOURCE". Do NOT add words like "Document Source", "source", "from", or "来自".
+At the very end of your final answer, you MUST output referenced DOCUMENT_NODE_SOURCE in this exact plain-text format:
+<hr /><h3>Document Source:</h3>
+- DOCUMENT_NODE_SOURCE
+...
+Only list unique DOCUMENT_NODE_SOURCE values in this final Document Source block; do NOT repeat the same source.
+In the final Document Source block, output plain DOCUMENT_NODE_SOURCE only (no markdown links, no URLs, no file paths).
+ 
 ### Search Result ###
 The following contents are the search results related to the user's message:
-
+Each context unit is formatted as STRICT tagged blocks:
+- <DOCUMENT_NODE>
+- <DOCUMENT_NODE_SOURCE>xxx</DOCUMENT_NODE_SOURCE>
+- <DOCUMENT_NODE_FILE_PATH>xxx</DOCUMENT_NODE_FILE_PATH> (already URL-encoded; spaces appear as %20)
+- <DOCUMENT_NODE_CONTEXT>xxx</DOCUMENT_NODE_CONTEXT>
+- </DOCUMENT_NODE>
+ 
 {context}
-
+ 
 ### Additional Information ###
 When responding and thinking, please keep the following points in mind:
 - CRITICAL: Your final answer MUST be in EXACTLY the same language as the main question that appears before "Sub-questions:" section
 - Your thinking process should generally match the language of the main question
 - If the response is lengthy, structure it well and summarize it in paragraphs
 - Choose an appropriate and visually appealing format for your response based on the user's requirements and the content of the answer, ensuring strong readability
-
+- You MUST only use the provided context as evidence, and only cite sources that you actually used in the answer
+- You MUST parse evidence only from <DOCUMENT_NODE_CONTEXT> and map each used context to its paired <DOCUMENT_NODE_SOURCE> and <DOCUMENT_NODE_FILE_PATH> in the same <DOCUMENT_NODE>
+- In the answer body, each claim derived from DOCUMENT_NODE_CONTEXT MUST carry a citation after current paragraph: (<actual file name from DOCUMENT_NODE_SOURCE>). In body citations, output filename only and never output the literal token "DOCUMENT_NODE_SOURCE".
+- If multiple claims in one paragraph come from different DOCUMENT_NODEs, include all corresponding inline citations in that paragraph
+- Do NOT use DOCUMENT_NODE id as citation
+- DOCUMENT_NODE_FILE_PATH is already URL-encoded; use it exactly as provided and do NOT replace %20 with spaces
+- In the final "Document Source:" block, do NOT use hyperlink format; each line must be plain - DOCUMENT_NODE_SOURCE
+ 
 ### history content ###
 {chat_history}
-
+ 
 ### Below is the main question ###
-

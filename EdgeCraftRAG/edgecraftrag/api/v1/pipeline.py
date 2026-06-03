@@ -6,7 +6,7 @@ import os
 import re
 import time
 import weakref
-
+from openvino import Core, Type
 from edgecraftrag.api_schema import MilvusConnectRequest, PipelineCreateIn
 from edgecraftrag.base import (
     GeneratorType,
@@ -17,6 +17,7 @@ from edgecraftrag.base import (
 from edgecraftrag.components.benchmark import Benchmark
 from edgecraftrag.components.generator import FreeChatGenerator, QnAGenerator
 from edgecraftrag.components.postprocessor import MetadataReplaceProcessor, RerankProcessor
+
 from edgecraftrag.config_repository import MilvusConfigRepository, save_pipeline_configurations
 from edgecraftrag.context import ctx
 from edgecraftrag.env import PIPELINE_FILE
@@ -95,6 +96,11 @@ async def update_pipeline(name, request: PipelineCreateIn):
     async with ctx.get_pipeline_mgr()._lock:
         try:
             await update_pipeline_handler(pl, request)
+            try:
+                pl.postprocessor[0].model._model.clear_requests()
+                pl.postprocessor[0].model._model.compile()
+            except Exception as e:
+                pass
             pipeline_dict = request.dict()
             pl.update_pipeline_json(pipeline_dict)
         except (ValueError, Exception) as e:
@@ -152,9 +158,10 @@ async def load_pipeline(request):
 
 
 async def update_pipeline_handler(pl, req):
-
     if req.retriever is not None:
         retr = req.retriever
+        if pl.max_retrieve_topk != 0:
+            retr.retrieve_topk = min(retr.retrieve_topk, pl.max_retrieve_topk)
         pl.update_retriever_config(retr.retriever_type, retr.retrieve_topk)
 
     if req.postprocessor is not None:
@@ -170,6 +177,8 @@ async def update_pipeline_handler(pl, req):
                             prm.model_type = ModelType.RERANKER
                             reranker_model = ctx.get_model_mgr().load_model(prm)
                             ctx.get_model_mgr().add(reranker_model)
+                        if pl.max_retrieve_topk != 0:
+                            processor.top_n = min(processor.top_n, pl.max_retrieve_topk)
                         postprocessor = RerankProcessor(reranker_model, processor.top_n)
                         pl.postprocessor.append(postprocessor)
                     else:
@@ -188,6 +197,8 @@ async def update_pipeline_handler(pl, req):
                 if model is None:
                     if gen.inference_type == InferenceType.VLLM:
                         gen.model.model_type = ModelType.VLLM
+                    elif gen.inference_type == InferenceType.OVMS:
+                        gen.model.model_type = ModelType.OVMS
                     else:
                         gen.model.model_type = ModelType.LLM
                     if pl.enable_benchmark:
@@ -200,11 +211,18 @@ async def update_pipeline_handler(pl, req):
                 if gen.generator_type == GeneratorType.CHATQNA:
                     pl.generator.append(
                         QnAGenerator(
-                            model_ref, gen.prompt_path, gen.inference_type, gen.vllm_endpoint, gen.prompt_content
+                            model_ref,
+                            gen.prompt_path,
+                            gen.inference_type,
+                            gen.vllm_endpoint,
+                            gen.prompt_content,
+                            gen.ovms_endpoint,
                         )
                     )
                 elif gen.generator_type == GeneratorType.FREECHAT:
-                    pl.generator.append(FreeChatGenerator(model_ref, gen.inference_type, gen.vllm_endpoint))
+                    pl.generator.append(
+                        FreeChatGenerator(model_ref, gen.inference_type, gen.vllm_endpoint, gen.ovms_endpoint)
+                    )
 
                 if pl.enable_benchmark:
                     if "tokenizer" not in locals() or tokenizer is None:
@@ -214,11 +232,11 @@ async def update_pipeline_handler(pl, req):
                     pl.benchmark = Benchmark(pl.enable_benchmark, gen.inference_type)
             else:
                 raise Exception("Inference Type Not Supported")
-
+    flag = pl.check_top_k(ctx.get_knowledge_mgr().get_all_knowledge_bases())
+    if flag == True:
+        await save_pipeline_configurations("update", pl)
     if pl.status.active != req.active:
-        ctx.get_pipeline_mgr().activate_pipeline(
-            pl.name, req.active, ctx.get_knowledge_mgr().get_active_knowledge_base()
-        )
+        ctx.get_pipeline_mgr().activate_pipeline(pl.name, req.active, ctx.get_knowledge_mgr().get_active_knowledge_base())
     return pl
 
 
@@ -237,12 +255,13 @@ async def restore_pipeline_configurations():
                 all_pipelines = f.read()
         if all_pipelines:
             all_pipelines = json.loads(all_pipelines)
-    try:
-        for pipeline_data in all_pipelines:
+    for pipeline_data in all_pipelines:
+        try:
             pipeline_req = PipelineCreateIn(**pipeline_data)
             await load_pipeline(pipeline_req)
-    except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+        except Exception as e:
+            print(f"Error loading pipeline: {e}")
+            continue
 
 
 # Detecting if milvus is connected

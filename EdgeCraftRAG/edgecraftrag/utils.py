@@ -25,6 +25,78 @@ Try to summarize from the context, do some reasoning before response, then respo
 """
 
 
+def resolve_prompt_template_path(template_path: str) -> Path:
+    if not template_path:
+        raise ValueError("Template path is empty.")
+
+    # Support both container path and source-tree path.
+    allowed_roots = [Path("/templates"), Path(__file__).resolve().parent / "prompt_template"]
+    requested = Path(template_path).expanduser()
+
+    if requested.is_absolute():
+        normalized = requested.resolve()
+        if not any(str(normalized).startswith(str(root.resolve())) for root in allowed_roots):
+            raise ValueError("Template path is outside of the allowed directory.")
+        if not normalized.exists():
+            raise FileNotFoundError(f"Template file does not exist: {normalized}")
+        return normalized
+
+    for root in allowed_roots:
+        candidate = (root / requested).resolve()
+        if str(candidate).startswith(str(root.resolve())) and candidate.exists():
+            return candidate
+
+    searched = [str((root / requested).resolve()) for root in allowed_roots]
+    raise FileNotFoundError(f"Template file does not exist. Tried: {searched}")
+
+
+def _resolve_model_path(model_path: str) -> str:
+    if not model_path:
+        return model_path
+
+    path_obj = Path(model_path)
+    if path_obj.is_absolute() and path_obj.exists():
+        return str(path_obj)
+
+    candidates = [
+        Path.cwd() / path_obj,
+        Path(__file__).resolve().parents[1] / path_obj,
+        Path(__file__).resolve().parents[2] / path_obj,
+    ]
+
+    model_env = os.getenv("MODEL_PATH")
+    container_model_root = Path("/home/user/models")
+    if model_env:
+        model_root = Path(model_env).expanduser().resolve()
+        model_parts = list(path_obj.parts)
+        if model_parts[:1] == ["."]:
+            model_parts = model_parts[1:]
+        if model_parts[:1] == ["models"]:
+            model_parts = model_parts[1:]
+        if model_parts:
+            candidates.append(model_root / Path(*model_parts))
+            candidates.append(model_root / path_obj.name)
+
+    model_parts = list(path_obj.parts)
+    if model_parts[:1] == ["."]:
+        model_parts = model_parts[1:]
+    if model_parts[:1] == ["models"]:
+        model_parts = model_parts[1:]
+    if model_parts:
+        candidates.append(container_model_root / Path(*model_parts))
+        candidates.append(container_model_root / path_obj.name)
+
+    for candidate in candidates:
+        try:
+            resolved = candidate.expanduser().resolve()
+        except Exception:
+            continue
+        if resolved.exists():
+            return str(resolved)
+
+    return model_path
+
+
 class DocxParagraphPicturePartitioner:
     @classmethod
     def iter_elements(cls, paragraph: Paragraph, opts: DocxPartitionerOptions) -> Iterator[Image]:
@@ -42,20 +114,15 @@ class DocxParagraphPicturePartitioner:
 
 
 def get_prompt_template(model_path, prompt_content=None, template_path=None, enable_think=False):
+    model_path = _resolve_model_path(model_path)
     if prompt_content is not None:
         template = prompt_content
     elif template_path is not None:
-        # Safely load the template only if it is inside /templates (or other safe root)
-        safe_root = "/templates"
-        normalized_path = os.path.normpath(os.path.join(safe_root, template_path))
-        if not normalized_path.startswith(safe_root):
-            raise ValueError("Template path is outside of the allowed directory.")
-        if not os.path.exists(normalized_path):
-            raise FileNotFoundError("Template file does not exist.")
-        template = Path(normalized_path).read_text(encoding=None)
+        normalized_path = resolve_prompt_template_path(template_path)
+        template = normalized_path.read_text(encoding=None)
     else:
         template = DEFAULT_TEMPLATE
-    tokenizer = AutoTokenizer.from_pretrained(model_path)
+    tokenizer = AutoTokenizer.from_pretrained(model_path, local_files_only=os.path.exists(model_path))
     messages = [{"role": "system", "content": template}, {"role": "user", "content": "\n{input}\n"}]
     prompt_template = tokenizer.apply_chat_template(
         messages,

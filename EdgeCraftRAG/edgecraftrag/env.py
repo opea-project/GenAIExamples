@@ -21,4 +21,4 @@ DOCUMENT_DATA_FILE = os.path.join(UI_DIRECTORY, "document_data.json")
 SESSION_FILE = os.path.join(UI_DIRECTORY, "session.json")
 
 SEARCH_CONFIG_PATH = os.path.join(UI_DIRECTORY, "configs/search_config.yaml")
-SEARCH_DIR = os.path.join(UI_DIRECTORY, "configs/experience_dir/experience.json")
+SEARCH_DIR = os.path.join(UI_DIRECTORY, "experience_dir/experience.json")

@@ -1,0 +1,120 @@
+#!/bin/bash
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+# 执行脚本前请确保镜像已全部下载完毕!
+
+set -e
+
+# 请确保WORKPATH指定到EdgeCraftRAG目录
+WORKPATH=$(dirname "$PWD")/EdgeCraftRAG
+LOG_PATH=$(dirname "$PWD")
+
+ip_address=$(hostname -I | awk '{print $1}')
+HOST_IP=$ip_address
+
+COMPOSE_FILE="compose_vllm.yaml"
+EC_RAG_SERVICE_PORT=16010
+
+# 模型文件路径请参考以下形式存放
+# Indexer: ${HOME}/models/BAAI/bge-small-en-v1.5
+# Reranker: ${HOME}/models/BAAI/bge-reranker-large
+MODEL_PATH="${HOME}/models"
+# 指定成您自己的DOC_PATH和TMPFILE_PATH
+DOC_PATH="$WORKPATH/tests"
+TMPFILE_PATH="$WORKPATH/tests"
+sudo chown -R 1000:1000 ${MODEL_PATH} ${DOC_PATH} ${TMPFILE_PATH}
+sudo chown -R 1000:1000 ${HOME}/.cache/huggingface
+
+DP_NUM=2
+
+MILVUS_ENABLED=0
+MAX_MODEL_LEN=5000
+CHAT_HISTORY_ROUND=5
+NGINX_PORT=8086
+NGINX_PORT_0=8100
+NGINX_PORT_1=8200
+VLLM_SERVICE_PORT_0=8100
+VLLM_SERVICE_PORT_1=8200
+TENSOR_PARALLEL_SIZE=1
+SELECTED_XPU_0=0
+SELECTED_XPU_1=1
+MAX_NUM_SEQS=64
+MAX_NUM_BATCHED_TOKENS=4000
+MAX_MODEL_LEN=3000
+LOAD_IN_LOW_BIT=fp8
+CCL_DG2_USM=""
+HF_ENDPOINT=https://hf-mirror.com
+vLLM_ENDPOINT="http://${HOST_IP}:${NGINX_PORT}"
+LLM_MODEL=Qwen/Qwen3-8B
+# 请设置您下载完成的llm模型路径(LLM_MODEL_PATH下请存放从huggingface或modelscope下载的原始模型，而不是经过OpenVINO转换的模型)
+LLM_MODEL_PATH="${HOME}/models/Qwen/Qwen3-8B"
+NGINX_CONFIG_PATH="$WORKPATH/nginx/nginx.conf"
+
+
+function start_services() {
+    cd $WORKPATH/docker_compose/intel/gpu/arc
+    export MODEL_PATH=${MODEL_PATH}
+    export DOC_PATH=${DOC_PATH}
+    export TMPFILE_PATH=${TMPFILE_PATH}
+    export HOST_IP=${HOST_IP}
+    export LLM_MODEL=${LLM_MODEL}
+    export HF_ENDPOINT=${HF_ENDPOINT}
+    export HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
+    export no_proxy="localhost, 127.0.0.1, 192.168.1.1, ${HOST_IP}"
+    export LLM_MODEL_PATH=${LLM_MODEL_PATH}
+    export NGINX_PORT_0=${NGINX_PORT_0}
+    export NGINX_PORT_1=${NGINX_PORT_1}
+    export VLLM_SERVICE_PORT_0=${VLLM_SERVICE_PORT_0}
+    export VLLM_SERVICE_PORT_1=${VLLM_SERVICE_PORT_1}
+    export TENSOR_PARALLEL_SIZE=${TENSOR_PARALLEL_SIZE}
+    export NGINX_CONFIG_PATH=${NGINX_CONFIG_PATH}
+    export SELECTED_XPU_0=${SELECTED_XPU_0}
+    export SELECTED_XPU_1=${SELECTED_XPU_1}
+    export SELECTED_XPU_2=${SELECTED_XPU_2}
+    export vLLM_ENDPOINT=${vLLM_ENDPOINT}
+    export MAX_NUM_SEQS=${MAX_NUM_SEQS}
+    export MAX_NUM_BATCHED_TOKENS=${MAX_NUM_BATCHED_TOKENS}
+    export MAX_MODEL_LEN=${MAX_MODEL_LEN}
+    export LOAD_IN_LOW_BIT=${LOAD_IN_LOW_BIT}
+    export CCL_DG2_USM=${CCL_DG2_USM}
+    export DP_NUM=${DP_NUM}
+    export MILVUS_ENABLED=${MILVUS_ENABLED}
+    export MAX_MODEL_LEN=${MAX_MODEL_LEN}
+    export CHAT_HISTORY_ROUND=${CHAT_HISTORY_ROUND}
+    export HF_CACHE="$HOME/.cache"
+    # generate nginx config file according to container count
+    bash $WORKPATH/nginx/nginx-conf-generator.sh $DP_NUM $WORKPATH/nginx/nginx.conf
+    # generate yaml file according to container count
+    bash multi-arc-yaml-generator.sh $DP_NUM $COMPOSE_FILE
+
+    # Start Docker Containers
+    docker compose -f $COMPOSE_FILE  up -d 
+    echo "ipex-llm-serving-xpu is booting, please wait."
+    n=0
+    until [[ "$n" -ge 100 ]]; do
+        docker logs ipex-llm-serving-xpu-container-0 > ${LOG_PATH}/ipex-llm-serving-xpu-container.log 2>&1
+        if grep -q "Starting vLLM API server on http://0.0.0.0:" ${LOG_PATH}/ipex-llm-serving-xpu-container.log; then
+            break
+        fi
+        sleep 6s
+        n=$((n+1))
+    done
+}
+
+function stop_docker() {
+    cd $WORKPATH/docker_compose/intel/gpu/arc
+    docker compose -f $COMPOSE_FILE  down
+}
+
+
+function main() {
+    echo "::group::stop_docker"
+    stop_docker
+    echo "::endgroup::"
+
+    echo "::group::start_services"
+    start_services
+    echo "The edgecraftrag services has started successfully."
+}
+
+main

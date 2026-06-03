@@ -124,6 +124,7 @@ declare type TableColumns<T = any> = {
   visible?: boolean;
   fixed?: string | boolean;
   minWidth?: number;
+  width?: number;
   ellipsis?: boolean;
 };
 

@@ -5,9 +5,10 @@ import asyncio
 import json
 import os
 import time
+import gc
 from concurrent.futures import ThreadPoolExecutor
 from typing import Any, Callable, List, Optional
-
+from openvino import Core
 from comps.cores.proto.api_protocol import ChatCompletionRequest
 from edgecraftrag.base import (
     BaseComponent,
@@ -15,18 +16,14 @@ from edgecraftrag.base import (
     CompType,
     GeneratorType,
     InferenceType,
-    NodeParserType,
     RetrieverType,
 )
+from edgecraftrag.base import NodeParserType
 from edgecraftrag.components.generator import clone_generator
 from edgecraftrag.components.postprocessor import RerankProcessor
 from edgecraftrag.components.query_preprocess import query_search
-from edgecraftrag.components.retriever import (
-    AutoMergeRetriever,
-    KBadminRetriever,
-    SimpleBM25Retriever,
-    VectorSimRetriever,
-)
+from edgecraftrag.components.knowledge_base import Knowledge
+from edgecraftrag.components.retriever import AutoMergeRetriever, SimpleBM25Retriever, VectorSimRetriever, KBadminRetriever
 from edgecraftrag.env import SEARCH_CONFIG_PATH, SEARCH_DIR
 from fastapi.responses import StreamingResponse
 from llama_index.core.schema import QueryBundle
@@ -63,6 +60,11 @@ class Pipeline(BaseComponent):
             self.idx = str(idx)
 
         self.enable_benchmark = os.getenv("ENABLE_BENCHMARK", "False").lower() == "true"
+        self.max_util = round((
+            0.95 - float(os.environ.get("GPU_MEMORY_UTIL", 0))
+            if "LLM_MODEL" in os.environ
+            else 0.95
+        ),3)
         self.run_pipeline_cb = run_pipeline
         self.run_retriever_postprocessor_cb = run_retrieve_postprocess
         self.run_retriever_cb = run_retrieve
@@ -72,6 +74,7 @@ class Pipeline(BaseComponent):
         self._origin_json = origin_json if origin_json is not None else "{}"
         self.retriever_type = ""
         self.retrieve_topk = 0
+        self.max_retrieve_topk=0
         self.retrievers = []
 
     # TODO: consider race condition
@@ -160,7 +163,6 @@ class Pipeline(BaseComponent):
                 if gen.comp_subtype == generator_type:
                     return gen
         return None
-
     def update_retriever_config(self, retriever_type: str, retrieve_topk: int):
         self.retriever_type = retriever_type
         self.retrieve_topk = retrieve_topk
@@ -208,6 +210,7 @@ class Pipeline(BaseComponent):
                             raise ValueError(f"Retriever type {self.retriever_type} not supported")
                 break
 
+    
     def clear_retrievers(self):
         self.retrievers = []
 
@@ -230,6 +233,174 @@ class Pipeline(BaseComponent):
             return True
         return False
 
+    def _update_config_and_retrievers(self, changed: bool) -> None:
+        """Helper method to update JSON config and retriever settings."""
+        origin_json = json.loads(self._origin_json)
+        origin_json["retriever"]["retrieve_topk"] = self.retrieve_topk
+        origin_json["retriever"]["max_retrieve_topk"] = self.max_retrieve_topk
+        
+        for retriever in self.retrievers:
+            retriever.topk = self.retrieve_topk
+        
+        if self.postprocessor:
+            for i, processor in enumerate(self.postprocessor):
+                processor.top_n = min(processor.top_n, self.max_retrieve_topk)
+                origin_json["postprocessor"][i]["top_n"] = processor.top_n
+        
+        self._origin_json = json.dumps(origin_json)
+
+    def _resolve_max_util(self, reranker_device: str, core: Core) -> float:
+        """Resolve memory utilization rate based on device and inference type."""
+
+        if self.generator[0].inference_type == InferenceType.LOCAL:
+            if self.generator[0].llm().device == reranker_device:
+                return 0.5
+            else:
+                return 0.95
+        
+        if reranker_device == "CPU" or reranker_device == "NPU":
+            return 0.95
+        
+        device_type_obj = self._safe_get_property(reranker_device, "DEVICE_TYPE", core)
+        reranker_card = 0
+        if reranker_device == "CPU":
+            reranker_device_type = "CPU"
+        elif reranker_device == "NPU":
+            reranker_device_type = "NPU"
+        elif getattr(device_type_obj, "name", "") == "INTEGRATED":
+            reranker_device_type = "iGPU"
+        else:
+            reranker_device_type = "dGPU"
+            reranker_card = int(reranker_device.split(".")[1]) - 1
+
+        dgpu_number = 0
+        for d in core.available_devices:
+            if d.startswith("GPU") and getattr(self._safe_get_property(d, "DEVICE_TYPE", core), "name", "") == "DISCRETE":
+                dgpu_number += 1
+        mask = os.getenv("VLLM_AFFINITY_MASK", "")
+        allowed = set(int(x) for x in mask.split(",") if x.strip().isdigit())
+        max_gpu = max(allowed) if allowed else None
+       
+        if max_gpu >= dgpu_number and int(os.getenv("TP", 1)) > 1:
+            vllm_device_type = "iGPU"
+        else:
+            vllm_device_type = "dGPU"
+        if vllm_device_type == "iGPU" and reranker_device_type == "iGPU":
+            return self.max_util
+        
+        if vllm_device_type == "dGPU" and reranker_device_type == "dGPU":
+            if reranker_card in allowed:
+                return self.max_util
+        return 0.95
+
+    def _parse_vllm_device_mask(self) -> Optional[int]:
+        """Parse VLLM device affinity mask and return device index."""
+        ze_mask = os.environ.get("VLLM_AFFINITY_MASK", "")
+        devices = ze_mask.split(",") if ze_mask else []
+        if devices and devices[0]:
+            try:
+                return int(devices[0])
+            except (ValueError, IndexError):
+                pass
+        return None
+
+    @staticmethod
+    def _safe_get_property(device_name: str, property_name: str, core: Core):
+        """Safely retrieve OpenVINO device property."""
+        try:
+            return core.get_property(device_name, property_name)
+        except Exception:
+            return None
+
+    def _calculate_max_retrieve_topk(
+        self, available_memory_mb: float, hidden_size: Optional[int], num_hidden_layers: Optional[int], embedding_length: int
+    ) -> int:
+        """Calculate maximum top-k based on available memory and model config."""
+        # Constants for calculation
+        MEMORY_CALC_DIVISORS = 2 * 2 * 0.2  # From original formula
+        
+        if not hidden_size or not num_hidden_layers or embedding_length <= 0:
+            return self.retrieve_topk
+        
+        denominator = hidden_size * num_hidden_layers * MEMORY_CALC_DIVISORS * embedding_length
+        max_topk = int(available_memory_mb * 1024 * 1024 / denominator)
+        return max(1, max_topk)  # Ensure at least 1
+
+    def _get_reranker_config(self) -> dict:
+        """Safely retrieve reranker model configuration."""
+        if not self.postprocessor:
+            return {}
+        
+        try:
+            model = self.postprocessor[0].model
+            if hasattr(model, "_model") and hasattr(model._model, "config"):
+                return model._model.config
+            return {}
+        except Exception:
+            return {}
+
+    def check_top_k(self, active_kbs: list[Knowledge]):
+        """Limit top_k based on available GPU memory and model configuration."""
+        # Initialize device and core
+        reranker_model = self.postprocessor[0].model if self.postprocessor else None
+        reranker_device = reranker_model.device if reranker_model else "CPU"
+        core = Core()
+
+        # Only knowledge KBs with initialized indexer/model participate in top-k memory estimation.
+        valid_kbs = []
+        for kb in active_kbs or []:
+            if getattr(kb, "comp_type", None) != "knowledge":
+                continue
+            indexer = getattr(kb, "indexer", None)
+            model = getattr(indexer, "model", None) if indexer is not None else None
+            if indexer is None or model is None:
+                continue
+            valid_kbs.append(kb)
+
+        # Resolve memory utilization rate
+        max_util = self._resolve_max_util(reranker_device, core)
+        # Calculate model and memory sizes
+        reranker_size = reranker_model.size_mb if reranker_model else 0
+        embedding_size = sum(getattr(kb.indexer.model, "size_mb", 0) for kb in valid_kbs)
+        embedding_length = max((getattr(kb.indexer, "d", 0) for kb in valid_kbs), default=0)
+        
+        # Apply default minimums
+        embedding_size = embedding_size or 512
+        embedding_length = embedding_length or 256
+
+        # Try to get GPU max allocation memory
+        gpu_max_alloc_mem_size = self._safe_get_property(reranker_device, "GPU_DEVICE_MAX_ALLOC_MEM_SIZE", core)
+        if gpu_max_alloc_mem_size is None:
+            # Fallback: keep current top-k if device property not available
+            self.max_retrieve_topk = self.retrieve_topk
+            self._update_config_and_retrievers(False)
+            return False
+
+        # Calculate available GPU memory
+        available_memory_mb = gpu_max_alloc_mem_size / 1024 / 1024 * max_util - reranker_size - embedding_size
+        # Get model configuration and calculate max top-k
+        config = self._get_reranker_config()
+        if not isinstance(config, dict) :
+            if not hasattr(config, "to_dict"):
+                config = {}
+            else:
+                config = config.to_dict()
+        
+        num_hidden_layers = config.get("num_hidden_layers") if isinstance(config, dict) else getattr(config, "num_hidden_layers", None)
+        hidden_size = (config.get("hidden_size") or config.get("hidden_dim")) if isinstance(config, dict) else (getattr(config, "hidden_size", None) or getattr(config, "hidden_dim", None))
+        self.max_retrieve_topk = self._calculate_max_retrieve_topk(
+            available_memory_mb, hidden_size, num_hidden_layers, embedding_length
+        )
+
+        # Determine if top-k changed and update accordingly
+        new_retrieve_topk = min(self.retrieve_topk, self.max_retrieve_topk)
+        changed = new_retrieve_topk != self.retrieve_topk
+        if changed:
+            self.retrieve_topk = new_retrieve_topk
+
+        # Update configuration and return flag
+        self._update_config_and_retrievers(changed)
+        return changed
 
 async def run_retrieve(pl: Pipeline, chat_request: ChatCompletionRequest) -> Any:
     query = chat_request.messages
@@ -258,11 +429,15 @@ async def run_postprocess(pl: Pipeline, chat_request: ChatCompletionRequest, con
         for processor in pl.postprocessor:
             if (
                 isinstance(processor, RerankProcessor)
+                and chat_request.top_n is not None
+                and chat_request.top_n != 0
                 and chat_request.top_n != ChatCompletionRequest.model_fields["top_n"].default
             ):
                 processor.top_n = chat_request.top_n
-            retri_res = processor.run(retri_res=contexts.get(CompType.RETRIEVER), query_bundle=query_bundle)
-            contexts[CompType.POSTPROCESSOR] = retri_res
+            elif isinstance(processor, RerankProcessor) and chat_request.top_n == 0:
+                processor.top_n = processor.default_top_n
+            post_res = processor.run(retri_res=contexts.get(CompType.RETRIEVER), query_bundle=query_bundle)
+            contexts[CompType.POSTPROCESSOR] = post_res
     return contexts
 
 
@@ -276,6 +451,7 @@ async def run_retrieve_postprocess(pl: Pipeline, chat_request: ChatCompletionReq
         benchmark_index = pl.benchmark.init_benchmark_data()
         start = time.perf_counter()
     retri_res = []
+    post_res = []
     for retriever in pl.retrievers:
         retri_res.extend(retriever.run(query=query, top_k=top_k))
     if pl.enable_benchmark:
@@ -286,11 +462,15 @@ async def run_retrieve_postprocess(pl: Pipeline, chat_request: ChatCompletionReq
         for processor in pl.postprocessor:
             if (
                 isinstance(processor, RerankProcessor)
+                and chat_request.top_n is not None
+                and chat_request.top_n != 0
                 and chat_request.top_n != ChatCompletionRequest.model_fields["top_n"].default
             ):
                 processor.top_n = chat_request.top_n
-            retri_res = processor.run(retri_res=retri_res, query_bundle=query_bundle)
-            contexts[CompType.POSTPROCESSOR] = retri_res
+            elif isinstance(processor, RerankProcessor) and chat_request.top_n == 0:
+                processor.top_n = processor.default_top_n
+            post_res = processor.run(retri_res=retri_res, query_bundle=query_bundle)
+            contexts[CompType.POSTPROCESSOR] = post_res
     return contexts
 
 
@@ -313,6 +493,14 @@ async def run_query_search(pl: Pipeline, chat_request: ChatCompletionRequest) ->
     return query, sub_questionss_result
 
 
+def cleanup_pipeline_resources(*resources) -> None:
+    for resource in resources:
+        if hasattr(resource, "clear"):
+            resource.clear()
+        del resource
+    gc.collect()
+
+
 async def run_pipeline(
     pl: Pipeline, chat_request: ChatCompletionRequest, generator_type: str = GeneratorType.CHATQNA
 ) -> Any:
@@ -321,6 +509,8 @@ async def run_pipeline(
         benchmark_index = pl.benchmark.init_benchmark_data()
     contexts = {}
     retri_res = []
+    post_res = []
+    top_k = None
     active_kbs = chat_request.user if chat_request.user else []
     enable_rag_retrieval = (
         chat_request.chat_template_kwargs.get("enable_rag_retrieval", True)
@@ -340,6 +530,7 @@ async def run_pipeline(
         raise ValueError("unstructured node parser cannot work with other types of node parser")
     np_type = next(iter(np_types), None)
     query = chat_request.messages
+    query_bundle = None
     sub_questionss_result = None
     experience_status = True if chat_request.tool_choice == "auto" else False
     target_generator = pl.get_generator(generator_type)
@@ -349,17 +540,16 @@ async def run_pipeline(
         start = 0
         if pl.enable_benchmark:
             start = time.perf_counter()
-        if target_generator.inference_type == InferenceType.VLLM and experience_status:
+        if target_generator.inference_type in (InferenceType.VLLM, InferenceType.OVMS) and experience_status:
             query, sub_questionss_result = await run_query_search(pl, chat_request)
         if pl.enable_benchmark:
             pl.benchmark.update_benchmark_data(benchmark_index, CompType.QUERYSEARCH, time.perf_counter() - start)
             start = time.perf_counter()
         top_k = (
             None
-            if chat_request.k == pl.retrievers[0].topk or chat_request.k != 0 or chat_request.k is None
-            else chat_request.k
+            if chat_request.k == pl.retrievers[0].topk or chat_request.k == 0 or chat_request.k is None
+            else min(chat_request.k, pl.retrieve_topk)
         )
-        retri_res = []
         for retriever in pl.retrievers:
             retri_res.extend(retriever.run(query=query, top_k=top_k))
         if pl.enable_benchmark:
@@ -376,24 +566,26 @@ async def run_pipeline(
                     and chat_request.top_n is not None
                     and chat_request.top_n != ChatCompletionRequest.model_fields["top_n"].default
                 ):
-                    processor.top_n = chat_request.top_n
-                retri_res = processor.run(retri_res=retri_res, query_bundle=query_bundle)
-                contexts[CompType.POSTPROCESSOR] = retri_res
+                    processor.top_n = min(chat_request.top_n, top_k) if top_k is not None else chat_request.top_n
+                elif isinstance(processor, RerankProcessor) and chat_request.top_n == 0:
+                    processor.top_n = processor.default_top_n
+                post_res = processor.run(retri_res=retri_res, query_bundle=query_bundle)
+                contexts[CompType.POSTPROCESSOR] = post_res
         if pl.enable_benchmark:
             pl.benchmark.update_benchmark_data(benchmark_index, CompType.POSTPROCESSOR, time.perf_counter() - start)
 
     if pl.enable_benchmark:
-        _, prompt_str = target_generator.query_transform(chat_request, retri_res)
+        _, prompt_str = target_generator.query_transform(chat_request, post_res)
         input_token_size = pl.benchmark.cal_input_token_size(prompt_str)
 
     if pl.enable_benchmark:
         start = time.perf_counter()
     if target_generator.inference_type == InferenceType.LOCAL:
-        ret = await target_generator.run(chat_request, retri_res, np_type)
-    elif target_generator.inference_type == InferenceType.VLLM:
-        ret = await target_generator.run_vllm(
+        ret = await target_generator.run(chat_request, retri_res, np_type, enable_benchmark=pl.enable_benchmark, benchmark=pl.benchmark, benchmark_index=benchmark_index)
+    elif target_generator.inference_type in (InferenceType.VLLM, InferenceType.OVMS):
+        ret = await target_generator.run_remote(
             chat_request,
-            retri_res,
+            post_res,
             np_type,
             sub_questions=sub_questionss_result,
             benchmark=pl.benchmark,
@@ -402,8 +594,16 @@ async def run_pipeline(
     else:
         raise ValueError("LLM inference_type not supported")
     if not isinstance(ret, StreamingResponse) and pl.enable_benchmark:
+        if ( target_generator.inference_type == InferenceType.LOCAL ):
+            if ( not chat_request.stream ): 
+                pl.benchmark.update_benchmark_data_genai(benchmark_index, CompType.GENERATOR, time.perf_counter() - start, pl.generator[0].llm)
+                pl.benchmark.insert_llm_data_genai(benchmark_index, input_token_size, pl.generator[0].llm)
+            cleanup_pipeline_resources(retri_res, post_res, np_types, sub_questionss_result)
+            return ret, contexts
         pl.benchmark.update_benchmark_data(benchmark_index, CompType.GENERATOR, time.perf_counter() - start)
         pl.benchmark.insert_llm_data(benchmark_index, input_token_size)
+    
+    cleanup_pipeline_resources(retri_res, post_res, np_types, sub_questionss_result)
     return ret, contexts
 
 
@@ -411,7 +611,7 @@ async def run_generator(
     pl: Pipeline, chat_request: ChatCompletionRequest, generator_type: str = GeneratorType.CHATQNA
 ) -> Any:
     active_kbs = chat_request.user if chat_request.user else []
-    # If using multiple knowledge bases, unstructured node parser cannot work with other types of node parser
+     # If using multiple knowledge bases, unstructured node parser cannot work with other types of node parser
     np_types = {kb.node_parser.comp_subtype for kb in active_kbs}
     if len(np_types) > 1 and NodeParserType.UNSTRUCTURED in np_types:
         raise ValueError("unstructured node parser cannot work with other types of node parser")
@@ -421,8 +621,8 @@ async def run_generator(
         raise ValueError(f"No Generator ({generator_type}) Specified")
     if target_generator.inference_type == InferenceType.LOCAL:
         ret = await target_generator.run(chat_request, [], np_type)
-    elif target_generator.inference_type == InferenceType.VLLM:
-        ret = await target_generator.run_vllm(chat_request, [], np_type)
+    elif target_generator.inference_type in (InferenceType.VLLM, InferenceType.OVMS):
+        ret = await target_generator.run_remote(chat_request, [], np_type)
     else:
         raise ValueError("LLM inference_type not supported")
     return ret

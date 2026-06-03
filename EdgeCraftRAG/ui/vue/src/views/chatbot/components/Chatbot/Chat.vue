@@ -66,7 +66,7 @@
         </div>
 
         <div class="send-btn">
-          <a-tooltip placement="top" :title="$t('chat.new')">
+          <a-tooltip placement="top" :arrow="false" :title="$t('chat.new')">
             <span class="common-btn">
               <SvgIcon
                 name="icon-newChat"
@@ -76,7 +76,11 @@
               />
             </span>
           </a-tooltip>
-          <a-tooltip placement="top" :title="$t('generation.title')">
+          <a-tooltip
+            placement="top"
+            :arrow="false"
+            :title="$t('generation.title')"
+          >
             <span class="common-btn">
               <SvgIcon
                 name="icon-setting1"
@@ -115,20 +119,19 @@
 <script lang="ts" setup name="Chatbot">
 import { getBenchmark, getSessionDetailById } from "@/api/chatbot";
 import lightBulb from "@/assets/svgs/lightBulb.svg";
-import _ from "lodash";
-import { reactive, ref, computed, nextTick } from "vue";
-import { Benchmark, IMessage } from "../../type";
-import MessageItem from "./MessageItem.vue";
-import { handleMessageSend, StreamController } from "./SseService";
-import { Local } from "@/utils/storage";
-import { ArrowDownOutlined } from "@ant-design/icons-vue";
-import { throttle } from "lodash";
+import router from "@/router";
 import { chatbotAppStore } from "@/store/chatbot";
 import { sessionAppStore } from "@/store/session";
 import emitter from "@/utils/mitt";
-import router from "@/router";
+import { Local } from "@/utils/storage";
+import { ArrowDownOutlined } from "@ant-design/icons-vue";
 import { message } from "ant-design-vue";
+import _, { throttle } from "lodash";
+import { computed, nextTick, reactive, ref } from "vue";
 import { useI18n } from "vue-i18n";
+import { Benchmark, IMessage } from "../../type";
+import MessageItem from "./MessageItem.vue";
+import { handleMessageSend, StreamController } from "./SseService";
 
 const { t } = useI18n();
 const route = useRoute();
@@ -248,7 +251,7 @@ const toggleConnection = () => {
       handleEnvUrl(),
       formatFormParam(),
       handleMessageDisplay,
-      handleStreamEnd
+      handleStreamEnd,
     );
   }
 };
@@ -282,7 +285,7 @@ const handleSendMessage = async () => {
       content: "",
       query: inputKeywords.value,
       benchmark: _.cloneDeep(defaultBenchmark),
-    }
+    },
   );
 
   inResponse.value = true;
@@ -328,7 +331,7 @@ const queryBenchmark = async () => {
         Object.entries(benchmarkData).map(([key, value]: any) => [
           key,
           value ? parseFloat(value.toFixed(4)) : 0,
-        ])
+        ]),
       );
       messagesList.value[messagesList.value.length - 1].benchmark =
         processedBenchmarkData;
@@ -496,7 +499,7 @@ watch(
       });
     }
   },
-  { immediate: true }
+  { immediate: true },
 );
 
 watch(
@@ -518,7 +521,7 @@ watch(
       messagesList.value = [];
     }
   },
-  { immediate: true }
+  { immediate: true },
 );
 
 onMounted(() => {

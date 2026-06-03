@@ -5,13 +5,12 @@ import json
 import os
 from typing import List
 
-from edgecraftrag.api.v1.knowledge_base import add_file_to_knowledge_base
 from edgecraftrag.api_schema import DataIn, FilesIn
 from edgecraftrag.config_repository import MilvusConfigRepository
 from edgecraftrag.context import ctx
 from edgecraftrag.env import UI_DIRECTORY
 from fastapi import FastAPI, File, HTTPException, UploadFile, status
-
+from edgecraftrag.api.v1.knowledge_base import add_file_to_knowledge_base
 data_app = FastAPI()
 
 
@@ -20,24 +19,30 @@ data_app = FastAPI()
 async def get_nodes_with_kb(kb_name=None):
     node_lists = {}
     if kb_name:
-        kb = ctx.get_knowledge_mgr().get_knowledge_base_by_name_or_id(kb_name)
+        kbs = [ctx.get_knowledge_mgr().get_knowledge_base_by_name_or_id(kb_name)]
     else:
-        kb = ctx.get_knowledge_mgr().get_active_knowledge_base()
-    if kb.indexer.comp_subtype == "faiss_vector":
-        return kb.indexer.docstore.docs
-    elif kb.indexer.comp_subtype == "milvus_vector":
-        collection_name = kb.name
-        Milvus_node_list = MilvusConfigRepository.create_connection(collection_name, 1, kb.indexer.vector_url)
-        results = Milvus_node_list.get_configs(output_fields=["text", "_node_content", "doc_id"])
-        for node_list in results:
-            text = node_list.get("text")
-            node_content = json.loads(node_list.get("_node_content"))
-            node_content["doc_id"] = node_list.get("doc_id")
-            node_content["text"] = text
-            node_lists[node_content.get("id_")] = node_content
-        return node_lists
-    node_list = ctx.get_node_mgr().get_nodes(kb.node_parser.idx)
-    return node_list
+        kbs = ctx.get_knowledge_mgr().get_active_knowledge_base() or []
+
+    for kb in kbs:
+        if kb.indexer.comp_subtype == "faiss_vector":
+            docs = kb.indexer.docstore.docs
+            if isinstance(docs, dict):
+                node_lists.update(docs)
+        elif kb.indexer.comp_subtype == "milvus_vector":
+            collection_name = kb.name
+            Milvus_node_list = MilvusConfigRepository.create_connection(collection_name, 1, kb.indexer.vector_url)
+            results = Milvus_node_list.get_configs(output_fields=["text", "_node_content", "doc_id"])
+            for node_list in results:
+                text = node_list.get("text")
+                node_content = json.loads(node_list.get("_node_content"))
+                node_content["doc_id"] = node_list.get("doc_id")
+                node_content["text"] = text
+                node_lists[node_content.get("id_")] = node_content
+        else:
+            node_list = ctx.get_node_mgr().get_nodes(kb.node_parser.idx)
+            if isinstance(node_list, dict):
+                node_lists.update(node_list)
+    return node_lists
 
 
 # GET chunks by document name

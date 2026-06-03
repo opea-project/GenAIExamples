@@ -1,54 +1,95 @@
-# EdgeCraftRAG 工具脚本
-
 [English](README.md)
 
-本目录包含用于构建镜像和启动 EC-RAG 服务的辅助脚本。
+本目录包含 EdgeCraftRAG 的部署、启动和镜像构建脚本。
 
-## 脚本
+# 1.脚本介绍
 
-- `quick_start.sh`：一键启动 OpenVINO 或 vLLM 部署
-- `build_images.sh`：构建 EC-RAG Docker 镜像
+本目录主要脚本如下：
 
----
+- `quick_start.sh`：推荐新用户使用的一键部署脚本，支持自动安装与交互引导
+- `bootstrap.sh`：非交互部署编排器（可独立使用，也可由 quick_start 调用）
+- `model_download.sh`：模型准备脚本（支持 `vllm` / `ov` 模式，支持可选参数 `model_id` 和 `model_path`）
+- `run_ov_baremetal.sh`：OpenVINO 裸金属启动脚本
+- `run_ov_container.sh`：OpenVINO 容器启动脚本
+- `run_vllm_baremetal.sh`：vLLM 裸金属启动脚本
+- `run_vllm_container.sh`：vLLM 容器启动脚本
+- `run_ovms_baremetal.sh`：OVMS 裸金属启动脚本
+- `run_ovms_container.sh`：OVMS 容器启动脚本
+- `build_images.sh`：容器镜像编译脚本
 
-## quick_start.sh
+部署方式说明：
 
-请在 `EdgeCraftRAG` 根目录下运行：
+| 方式 | 描述 | 环境要求 | Milvus 支持 |
+|------|------|----------|-------------|
+| baremetal（裸金属） | 以 Python 进程方式启动服务 | Python 3.10+ | 否（仅内存） |
+| container（容器） | 以 Docker 容器方式启动服务 | Docker / Docker Compose | 是（默认启用） |
 
-```bash
-./tools/quick_start.sh
-```
+提示：如需使用 Milvus，请选择容器部署。
 
-### 默认行为
+# 2.快速部署脚本（新用户）
 
-如果未提供环境变量，脚本会使用以下默认值：
+## 2.1 一键快速部署
 
-```bash
-MODEL_PATH=${WORKSPACE}/workspace/models
-DOC_PATH=${WORKSPACE}/workspace
-TMPFILE_PATH=${WORKSPACE}/workspace
-LLM_MODEL=Qwen/Qwen3-8B
-```
-
-脚本还会自动执行以下操作：
-
-- 自动创建并激活 Python 虚拟环境
-- 在需要时安装 `python3-venv`
-- 检查 `MODEL_PATH` 下必需模型是否存在
-- 自动下载缺失的 embedding、reranker 和 LLM 模型
-- 在启动完成后输出 UI 访问地址
-
-### 非交互模式
-
-默认情况下，非交互模式启动本地 OpenVINO 服务。
+推荐在 `EdgeCraftRAG` 根目录执行：
 
 ```bash
 ./tools/quick_start.sh
 ```
 
-你也可以通过环境变量覆盖默认值：
+脚本会按以下默认行为执行：
+
+- 进入非交互模式（non-interactive）
+- 推理后端默认选择 OpenVINO（`INFERENCE_BACKEND` 未设置时，脚本会自动解析为 `openvino`）
+- 部署方式默认是 baremetal（`DEPLOYMENT_METHOD` 默认 `baremetal`）
+
+在 baremetal 默认模式下，会自动执行：
+
+- 创建并激活 `EdgeCraftRAG/ecrag_venv` 虚拟环境（若不存在）
+- 校验 Python 版本（要求 3.10+，推荐 3.10/3.11）
+- 检查并安装关键 Python 依赖
+- 在裸金属 UI 启动需要时检查并安装 `npm`
+- 校验 Intel GPU 驱动/运行时，若缺失则在 apt 系统上自动安装
+- 检查并自动下载缺失模型（embedding、reranker、OpenVINO LLM）
+- 在调用 `bootstrap.sh` 前将本次部署环境快照写入 `workspace/bootstrap.env`
+- 调用 `bootstrap.sh` 启动服务
+
+对于 vLLM 部署或 container 部署方式，脚本会在部署前校验 Docker 与 Docker Compose。
+在 Ubuntu 24.04 上，如果 Docker 或 Docker Compose 缺失，脚本会尝试自动安装并启动/启用 Docker 服务。
+
+如需跳过 Intel GPU 驱动/运行时校验，可使用：
 
 ```bash
+./tools/quick_start.sh --skip-gpu-driver-check
+```
+
+等价环境变量：
+
+```bash
+export SKIP_INTEL_GPU_DRIVER_CHECK=1
+# 或保留校验但禁用自动安装：
+export AUTO_INSTALL_INTEL_GPU_DRIVER=0
+./tools/quick_start.sh
+```
+
+如需禁用 baremetal 准备阶段的 npm 自动安装，可使用：
+
+```bash
+export AUTO_INSTALL_NPM=0
+./tools/quick_start.sh
+```
+
+启动成功后，终端会输出 UI 访问地址，例如：
+
+```text
+UI access URL: http://${HOST_IP}:8082
+```
+
+补充：如果你事先设置了 `DEPLOYMENT_METHOD=container`，脚本会跳过 venv/pip 检查，并按容器方式继续部署。
+
+可通过环境变量覆盖：
+
+```bash
+export INFERENCE_BACKEND=openvino
 export MODEL_PATH="${PWD}/workspace/models"
 export DOC_PATH="${PWD}/workspace"
 export TMPFILE_PATH="${PWD}/workspace"
@@ -58,118 +99,224 @@ export HOST_IP="$(hostname -I | awk '{print $1}')"
 ./tools/quick_start.sh
 ```
 
-### 使用 `COMPOSE_PROFILES` 选择部署模式
-
-#### Core Ultra、B60 或 A770 上的 OpenVINO
+按硬件选择 `INFERENCE_BACKEND`：
 
 ```bash
+# OpenVINO（默认）
+./tools/quick_start.sh
+
+# vLLM_A770
+export INFERENCE_BACKEND=vllm_a770
+./tools/quick_start.sh
+
+# vLLM_B60
+export INFERENCE_BACKEND=vllm_b60
+./tools/quick_start.sh
+
+# OVMS
+export INFERENCE_BACKEND=ovms
+export OVMS_SOURCE_MODEL=OpenVINO/Qwen3-8B-int4-ov
+export OVMS_MODEL_NAME=OpenVINO/Qwen3-8B-int4-ov
+export OVMS_TARGET_DEVICE=GPU.0
 ./tools/quick_start.sh
 ```
 
-#### Intel Arc A770 上的 vLLM
+对于 OVMS 部署，工具脚本会直接导出 compose 所需的 `OVMS_*` 环境变量。常见可覆盖项包括：`OVMS_SOURCE_MODEL`、`OVMS_MODEL_NAME`、`OVMS_TARGET_DEVICE`、`OVMS_TOOL_PARSER`、`OVMS_MAX_NUM_BATCHED_TOKENS`。
+
+OVMS 相关行为说明：
+
+- `OVMS_SOURCE_MODEL` 会保持你提供的原始模型 ID（例如 `Qwen/Qwen3-8B`），不会自动截断。
+- `quick_start.sh` 与 `bootstrap.sh` 都会将 OVMS 变量写入 `workspace/bootstrap.env` 以便复用。
+- 可通过 `source workspace/bootstrap.env && ./tools/bootstrap.sh` 复用同一套 OVMS 配置。
+
+兼容说明：历史环境变量 `COMPOSE_PROFILES` 仍可使用，但新配置建议统一使用 `INFERENCE_BACKEND`。
+
+`INFERENCE_BACKEND` 支持以下取值：
+
+- `openvino`
+- `vllm_a770`
+- `vllm_b60`
+- `ovms`
+
+
+## 2.2 交互模式
 
 ```bash
-export COMPOSE_PROFILES=vLLM_A770
-./tools/quick_start.sh
+./tools/quick_start.sh -i
 ```
 
-#### Intel Arc B60 上的 vLLM
+交互模式适合首次部署或不确定参数时使用。执行 `./tools/quick_start.sh -i` 后，脚本会逐步提问并自动生成本次部署配置。
+
+交互流程通常包括：
+
+- 选择推理后端：OpenVINO / vLLM_A770 / vLLM_B60 / OVMS
+- 选择部署方式：baremetal / container
+- 配置关键参数：`HOST_IP`、`MODEL_PATH`、`DOC_PATH`、`TMPFILE_PATH`、`LLM_MODEL`
+- 确认配置后开始部署，并在结束后输出访问地址
+
+建议在以下场景使用交互模式：
+
+- 首次安装，不熟悉环境变量名称和默认值
+- 需要快速切换不同硬件或推理后端
+- 希望先确认参数再执行，降低配置出错概率
+
+示例：
 
 ```bash
-export COMPOSE_PROFILES=vLLM_B60
-./tools/quick_start.sh
+cd EdgeCraftRAG
+./tools/quick_start.sh -i
 ```
 
-可选的 B60/vLLM 环境变量：
+## 2.3 交互模式常见输入示例
 
-```bash
-export VLLM_SERVICE_PORT_B60=8086
-export DTYPE=float16
-export TP=1
-export DP=1
-export ZE_AFFINITY_MASK=0
-export ENFORCE_EAGER=1
-export TRUST_REMOTE_CODE=1
-export DISABLE_SLIDING_WINDOW=1
-export GPU_MEMORY_UTIL=0.8
-export NO_ENABLE_PREFIX_CACHING=1
-export MAX_NUM_BATCHED_TOKENS=8192
-export DISABLE_LOG_REQUESTS=1
-export MAX_MODEL_LEN=49152
-export BLOCK_SIZE=64
-export QUANTIZATION=fp8
-```
+以下示例用于说明交互过程中常见的输入内容，实际选项名称以终端提示为准。
 
-### 交互模式
-
-```bash
-bash -i ./tools/quick_start.sh
-```
-
-在交互模式下，脚本会提示你输入：
-
-- 部署模式：`vLLM_A770`、`vLLM_B60` 或 `ov`
-- `HOST_IP`
-- `DOC_PATH`
-- `TMPFILE_PATH`
-- `MODEL_PATH`
-- `LLM_MODEL`
-- 可选的 vLLM 运行参数
-
-### 模型检查与自动下载
-
-脚本会自动检查以下模型路径：
-
-#### 公共模型
+### 示例 A：OpenVINO + baremetal（单机快速体验）
 
 ```text
-${MODEL_PATH}/BAAI/bge-small-en-v1.5
-${MODEL_PATH}/BAAI/bge-reranker-large
+部署后端: OpenVINO
+部署方式: baremetal
+HOST_IP: 192.168.1.20
+MODEL_PATH: /home/scale/edgeai/applications.edge.ai.rag/EdgeCraftRAG/workspace/models
+DOC_PATH: /home/scale/edgeai/applications.edge.ai.rag/EdgeCraftRAG/workspace
+TMPFILE_PATH: /home/scale/edgeai/applications.edge.ai.rag/EdgeCraftRAG/workspace
+LLM_MODEL: Qwen/Qwen3-8B
+确认部署: y
 ```
 
-#### vLLM 模式
+### 示例 B：vLLM_B60 + container（需要 Milvus）
 
 ```text
-${MODEL_PATH}/${LLM_MODEL}
+部署后端: vLLM_B60
+部署方式: container
+HOST_IP: 192.168.1.20
+MODEL_PATH: /home/scale/edgeai/applications.edge.ai.rag/EdgeCraftRAG/workspace/models
+DOC_PATH: /home/scale/edgeai/applications.edge.ai.rag/EdgeCraftRAG/workspace
+TMPFILE_PATH: /home/scale/edgeai/applications.edge.ai.rag/EdgeCraftRAG/workspace
+LLM_MODEL: Qwen/Qwen3-8B
+确认部署: y
 ```
 
-#### OpenVINO 模式
+### 示例 C：vLLM_A770 + container（A770 推荐）
 
 ```text
-${MODEL_PATH}/${LLM_MODEL}/INT4_compressed_weights
+部署后端: vLLM_A770
+部署方式: container
+HOST_IP: 192.168.1.20
+MODEL_PATH: /home/scale/edgeai/applications.edge.ai.rag/EdgeCraftRAG/workspace/models
+DOC_PATH: /home/scale/edgeai/applications.edge.ai.rag/EdgeCraftRAG/workspace
+TMPFILE_PATH: /home/scale/edgeai/applications.edge.ai.rag/EdgeCraftRAG/workspace
+LLM_MODEL: Qwen/Qwen3-8B
+确认部署: y
 ```
 
-如果缺少必需模型，脚本会自动下载并输出提示信息。
-
-### UI 访问输出
-
-启动完成后，脚本会输出：
+### 示例 D：OVMS + container
 
 ```text
-Service launched successfully.
-UI access URL: http://${HOST_IP}:8082
-If you are accessing from another machine, replace ${HOST_IP} with your server's reachable IP or hostname.
+部署后端: OVMS
+部署方式: container
+HOST_IP: 192.168.1.20
+MODEL_PATH: /home/scale/edgeai/applications.edge.ai.rag/EdgeCraftRAG/workspace/models
+DOC_PATH: /home/scale/edgeai/applications.edge.ai.rag/EdgeCraftRAG/workspace
+TMPFILE_PATH: /home/scale/edgeai/applications.edge.ai.rag/EdgeCraftRAG/workspace
+LLM_MODEL: Qwen/Qwen3-8B
+确认部署: y
 ```
 
-### 清理
+提示：
 
-停止并移除已部署容器：
+- 如果是远程服务器，请将 `HOST_IP` 设置为客户端可访问的地址。
+- 如需持久化向量检索数据，请使用 container 部署方式。
+- 若设备为 Intel Arc A770，优先选择 vLLM_A770 对应配置。
+
+清理部署：
 
 ```bash
 ./tools/quick_start.sh cleanup
 ```
 
----
+# 3.启动脚本
 
-## build_images.sh
+## 3.1 bootstrap.sh（非交互编排）
 
-构建全部镜像：
+通过环境变量定义部署参数后执行：
+
+```bash
+export INFERENCE_BACKEND=openvino
+export DEPLOYMENT_METHOD=baremetal
+./tools/bootstrap.sh
+```
+
+使用默认值（openvino + baremetal）：
+
+```bash
+./tools/bootstrap.sh
+```
+
+配置复用：
+
+- `quick_start.sh` 在真正部署前会写入 `workspace/bootstrap.env`。
+- `bootstrap.sh` 也会保存配置，便于下次直接复用。
+- 对于 OVMS，上述文件会包含 `OVMS_SOURCE_MODEL`、`OVMS_MODEL_NAME`、`OVMS_TARGET_DEVICE`、`OVMS_TOOL_PARSER` 等 `OVMS_*` 运行参数。
+
+```bash
+source workspace/bootstrap.env
+./tools/bootstrap.sh
+```
+
+## 3.3 model_download.sh（模型准备）
+
+基础用法：
+
+```bash
+./tools/model_download.sh <mode> [model_id] [model_path]
+```
+
+模式说明：
+
+- `vllm`：准备 embedding/reranker 的 OpenVINO 模型 + vLLM LLM 模型
+- `ov`：准备 embedding/reranker 的 OpenVINO 模型 + OpenVINO INT4 LLM 模型
+
+可选参数：
+
+- `model_id`：仅对本次执行覆盖 `LLM_MODEL`
+- `model_path`：仅对本次执行覆盖 `MODEL_PATH`
+
+示例：
+
+```bash
+./tools/model_download.sh vllm
+./tools/model_download.sh ov Qwen/Qwen3-8B /data/models
+```
+
+环境行为说明：
+
+- 若当前已激活虚拟环境，会优先复用
+- 若未激活虚拟环境，脚本会自动创建并激活 `ecrag_venv`（与 `quick_start.sh` 一致）
+- 若缺失 `python3-venv` 或 `pip`，脚本会在支持的包管理器上自动安装所需前置依赖
+
+## 3.2 直接启动脚本
+
+按推理后端与部署方式可直接调用以下脚本：
+
+- OpenVINO 裸金属：`./tools/run_ov_baremetal.sh`
+- OpenVINO 容器：`./tools/run_ov_container.sh`
+- vLLM 裸金属：`./tools/run_vllm_baremetal.sh`
+- vLLM 容器：`./tools/run_vllm_container.sh`
+- OVMS 裸金属：`./tools/run_ovms_baremetal.sh`
+- OVMS 容器：`./tools/run_ovms_container.sh`
+
+适用于你已明确参数、希望跳过一键引导流程的场景。
+
+# 4.容器镜像编译脚本
+
+编译全部镜像：
 
 ```bash
 ./tools/build_images.sh
 ```
 
-只构建指定镜像：
+按组件编译：
 
 ```bash
 ./tools/build_images.sh mega
@@ -178,4 +325,4 @@ If you are accessing from another machine, replace ${HOST_IP} with your server's
 ./tools/build_images.sh all
 ```
 
-完整部署说明请参考 [../docs/Advanced_Setup_zh.md](../docs/Advanced_Setup_zh.md).
+完整部署说明请参考 [../docs/Advanced_Setup_zh.md](../docs/Advanced_Setup_zh.md)。
