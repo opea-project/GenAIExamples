@@ -5,7 +5,7 @@ html2text>=2025.4.15
 json-repair==0.52.0
 langchain-core==0.3.81
 langchain-milvus==0.2.1
-langchain-openai==0.3.35
+langchain-openai==1.1.14
 langgraph==0.6.10
 opea-comps==1.3
 openai==2.15.0
