@@ -37,7 +37,7 @@ EC-RAG 支持 vLLM 部署（默认方式）以及面向 Intel Arc GPU 和 Core U
 #### Intel Arc A770
 
 **操作系统**：Ubuntu Server 22.04.1 或更高版本（至少 6.2 LTS 内核）  
-**驱动与库**：详细驱动与库安装请参考 [Installing GPUs Drivers](https://dgpu-docs.intel.com/driver/installation-rolling.html#installing-gpu-drivers)  
+**驱动与库**：详细驱动与库安装请参考 [Installing GPUs Drivers](https://dgpu-docs.intel.com/driver/installation.html#installing-gpu-drivers)  
 **可用推理框架**：openVINO、vLLM
 
 ### 2. 获取代码

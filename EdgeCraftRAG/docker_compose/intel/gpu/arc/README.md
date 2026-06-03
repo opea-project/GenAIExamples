@@ -37,7 +37,7 @@ EC-RAG supports vLLM deployment(default method) and local OpenVINO deployment fo
 #### Intel Arc A770
 
 **OS**: Ubuntu Server 22.04.1 or newer (at least 6.2 LTS kernel)  
-**Driver & libraries**: Please refer to [Installing GPUs Drivers](https://dgpu-docs.intel.com/driver/installation-rolling.html#installing-gpu-drivers) for detailed driver & libraries setup  
+**Driver & libraries**: Please refer to [Installing GPUs Drivers](https://dgpu-docs.intel.com/driver/installation.html#installing-gpu-drivers) for detailed driver & libraries setup  
 **Available Inferencing Framework**: openVINO, vLLM
 
 ### 2. Access the Code
