@@ -124,6 +124,36 @@ class SessionManager(BaseMgr):
             return {"session_id": session_id, "exists": False}
         return session.to_dict()
 
+    def delete_session_by_id(self, session_id: str) -> bool:
+        if not session_id or session_id in ("", "None"):
+            raise ValueError("Session ID is required")
+
+        deleted_session = self.get(session_id)
+        if not deleted_session or not isinstance(deleted_session, Session):
+            return False
+
+        self.remove(session_id)
+
+        original_current_session_id = self._current_session_id
+        if self._current_session_id == session_id:
+            self._current_session_id = None
+
+        try:
+            if self.milvus_repo and self.milvus_repo.connected:
+                deleted = self.milvus_repo.delete_config_by_idx(session_id)
+                if not deleted:
+                    raise RuntimeError(f"Failed to delete session {session_id} from Milvus")
+            else:
+                save_result = self.save_to_file()
+                if save_result.get("status") != "success":
+                    raise RuntimeError(save_result.get("message", "Failed to save session file"))
+        except Exception:
+            self.components[session_id] = deleted_session
+            self._current_session_id = original_current_session_id
+            raise
+
+        return True
+
     def _persist_session(self, session_id: str):
         session = self.components.get(session_id)
         if not session:

@@ -17,7 +17,7 @@ const configuration = {
     top_p: 0.95,
     top_k: 10,
     repetition_penalty: 1.03,
-    max_tokens: 1024,
+    max_tokens: 4096,
     stream: true,
     chat_template_kwargs: {
       enable_thinking: true,

@@ -46,7 +46,7 @@ class EdgeCraftRagService:
         input["user"] = request.headers.get("sessionid", None)
         chat_request = ChatCompletionRequest.construct(**input)
         parameters = LLMParams(
-            max_tokens=chat_request.max_tokens if chat_request.max_tokens else 1024,
+            max_tokens=chat_request.max_tokens if chat_request.max_tokens else 4096,
             top_k=chat_request.top_k if chat_request.top_k else 10,
             top_p=chat_request.top_p if chat_request.top_p else 0.95,
             temperature=chat_request.temperature if chat_request.temperature else 0.01,

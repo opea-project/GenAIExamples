@@ -11,11 +11,11 @@ services:
       - ETCD_AUTO_COMPACTION_RETENTION=1000
       - ETCD_QUOTA_BACKEND_BYTES=4294967296
       - ETCD_SNAPSHOT_COUNT=50000
-      - no_proxy=${no_proxy},milvus-standalone,milvus-minio,milvus-etcd
-      - NO_PROXY=${NO_PROXY},milvus-standalone,milvus-minio,milvus-etcd
+      - no_proxy=${no_proxy:-127.0.0.1,localhost},172.16.0.0/12,172.19.0.0/16,etcd,minio,milvus-standalone,milvus-minio,milvus-etcd,ipex-llm-serving-xpu-770
+      - NO_PROXY=${NO_PROXY:-127.0.0.1,localhost},172.16.0.0/12,172.19.0.0/16,etcd,minio,milvus-standalone,milvus-minio,milvus-etcd,ipex-llm-serving-xpu-770
     volumes:
       - ${DOCKER_VOLUME_DIRECTORY:-${PWD}}/volumes/etcd:/etcd
-    command: etcd -advertise-client-urls=http://127.0.0.1:2379 -listen-client-urls http://0.0.0.0:2379 --data-dir /etcd
+    command: etcd -advertise-client-urls=http://etcd:2379 -listen-client-urls http://0.0.0.0:2379 --data-dir /etcd
     healthcheck:
       test: ["CMD", "etcdctl", "endpoint", "health"]
       interval: 30s
@@ -30,8 +30,8 @@ services:
     environment:
       MINIO_ACCESS_KEY: minioadmin
       MINIO_SECRET_KEY: minioadmin
-      no_proxy: ${no_proxy},milvus-standalone,milvus-minio,milvus-etcd
-      NO_PROXY: ${NO_PROXY},milvus-standalone,milvus-minio,milvus-etcd
+      no_proxy: ${no_proxy:-127.0.0.1,localhost,172.16.0.0/12},172.19.0.0/16,etcd,minio,milvus-standalone,milvus-minio,milvus-etcd,ipex-llm-serving-xpu-770
+      NO_PROXY: ${NO_PROXY:-127.0.0.1,localhost,172.16.0.0/12},172.19.0.0/16,etcd,minio,milvus-standalone,milvus-minio,milvus-etcd,ipex-llm-serving-xpu-770
     ports:
       - "${MINIO_PORT1:-5044}:9001"
       - "${MINIO_PORT2:-5043}:9000"
@@ -55,12 +55,12 @@ services:
     environment:
       ETCD_ENDPOINTS: etcd:2379
       MINIO_ADDRESS: minio:9000
-      no_proxy: ${no_proxy},milvus-standalone,milvus-minio,milvus-etcd
-      NO_PROXY: ${NO_PROXY},milvus-standalone,milvus-minio,milvus-etcd
-      HTTP_PROXY: ${HTTP_PROXY}
-      HTTPS_PROXY: ${HTTPS_PROXY}
-      http_proxy: ${http_proxy}
-      https_proxy: ${https_proxy}
+      no_proxy: ${no_proxy:-127.0.0.1,localhost},172.16.0.0/12,172.19.0.0/16,etcd,minio,milvus-standalone,milvus-minio,milvus-etcd,ipex-llm-serving-xpu-770
+      NO_PROXY: ${NO_PROXY:-127.0.0.1,localhost},172.16.0.0/12,172.19.0.0/16,etcd,minio,milvus-standalone,milvus-minio,milvus-etcd,ipex-llm-serving-xpu-770
+      HTTP_PROXY: ${HTTP_PROXY:-}
+      HTTPS_PROXY: ${HTTPS_PROXY:-}
+      http_proxy: ${http_proxy:-}
+      https_proxy: ${https_proxy:-}
     volumes:
       - ./milvus-config.yaml:/milvus/configs/milvus.yaml
       - ${DOCKER_VOLUME_DIRECTORY:-${PWD}}/volumes/milvus:/var/lib/milvus
@@ -82,7 +82,8 @@ services:
     image: ${REGISTRY:-opea}/edgecraftrag-server:${TAG:-latest}
     container_name: edgecraftrag-server
     environment:
-      no_proxy: ${no_proxy}
+      no_proxy: ${no_proxy:-127.0.0.1,localhost},172.16.0.0/12,172.19.0.0/16,etcd,minio,milvus-standalone,milvus-minio,milvus-etcd,ipex-llm-serving-xpu-770
+      NO_PROXY: ${NO_PROXY:-127.0.0.1,localhost},172.16.0.0/12,172.19.0.0/16,etcd,minio,milvus-standalone,milvus-minio,milvus-etcd,ipex-llm-serving-xpu-770
       http_proxy: ${http_proxy}
       https_proxy: ${https_proxy}
       vLLM_ENDPOINT: ${vLLM_ENDPOINT:-http://${HOST_IP}:${VLLM_SERVICE_PORT_B60:-8086}}
@@ -172,6 +173,7 @@ services:
       MAX_MODEL_LEN: ${MAX_MODEL_LEN:-49152}
       BLOCK_SIZE: ${BLOCK_SIZE:-64}
       QUANTIZATION: ${QUANTIZATION:-fp8}
+      MAX_NUM_SEQS: ${MAX_NUM_SEQS:-128}
       TOOL_PARSER: ${TOOL_PARSER:-qwen3_coder}
       LLM_MODEL: ${LLM_MODEL}
       TP: ${TP:-1}
@@ -199,6 +201,7 @@ services:
       --max-model-len $${MAX_MODEL_LEN} \
       --block-size $${BLOCK_SIZE} \
       --quantization $${QUANTIZATION} \
+      --max-num-seqs $${MAX_NUM_SEQS} \
       -tp=$${TP} \
       -dp=$${DP} \
       --enable_prefix_caching True \

@@ -48,6 +48,6 @@ export const requestSessionDelete = (SessionId: String) => {
     method: "delete",
     showLoading: true,
     showSuccessMsg: true,
-    successMsg: "request.knowledge.deleteSucc",
+    successMsg: "request.session.deleteSucc",
   });
 };

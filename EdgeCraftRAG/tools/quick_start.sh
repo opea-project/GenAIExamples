@@ -29,13 +29,13 @@ export AUTO_INSTALL_INTEL_GPU_DRIVER=${AUTO_INSTALL_INTEL_GPU_DRIVER:-"1"}
 export AUTO_INSTALL_NPM=${AUTO_INSTALL_NPM:-"1"}
 export RESTART_ON_RERUN=${RESTART_ON_RERUN:-"0"}
 
-# Proxy settings: interactive override > external env > default fallback
-export http_proxy=${http_proxy:-${HTTP_PROXY:-""}}
-export https_proxy=${https_proxy:-${HTTPS_PROXY:-""}}
-export no_proxy=${no_proxy:-${NO_PROXY:-"localhost,127.0.0.1,${HOST_IP},edgecraftrag,edgecraftrag-server"}}
-export HTTP_PROXY=${HTTP_PROXY:-"${http_proxy}"}
-export HTTPS_PROXY=${HTTPS_PROXY:-"${https_proxy}"}
-export NO_PROXY=${NO_PROXY:-"${no_proxy}"}
+# Explicitly propagate proxy variables to all child scripts/processes.
+export http_proxy=${http_proxy:-${HTTP_PROXY:-}}
+export https_proxy=${https_proxy:-${HTTPS_PROXY:-}}
+export no_proxy=${no_proxy:-${NO_PROXY:-}}
+export HTTP_PROXY=${HTTP_PROXY:-${http_proxy:-}}
+export HTTPS_PROXY=${HTTPS_PROXY:-${https_proxy:-}}
+export NO_PROXY=${NO_PROXY:-${no_proxy:-}}
 
 # vLLM runtime options
 export MAX_MODEL_LEN=${MAX_MODEL_LEN:-"8192"}
@@ -728,12 +728,6 @@ save_bootstrap_env_snapshot() {
             RERANKER_MODEL
             MODEL_DOWNLOAD_SOURCE
             OV_CONVERSION_METHOD
-            http_proxy
-            https_proxy
-            no_proxy
-            HTTP_PROXY
-            HTTPS_PROXY
-            NO_PROXY
             HF_ENDPOINT
             MILVUS_ENABLED
             CHAT_HISTORY_ROUND
@@ -742,6 +736,12 @@ save_bootstrap_env_snapshot() {
             AUTO_INSTALL_INTEL_GPU_DRIVER
             AUTO_INSTALL_NPM
             RESTART_ON_RERUN
+            http_proxy
+            https_proxy
+            no_proxy
+            HTTP_PROXY
+            HTTPS_PROXY
+            NO_PROXY
             VLLM_BACKEND
             TP
             DP
@@ -860,9 +860,6 @@ deploy_openvino_interactive() {
     CHAT_HISTORY_ROUND=$(get_user_input "chat history round" "0")
     LLM_MODEL=$(get_user_input "your LLM model" "Qwen/Qwen3-8B")
     MODEL_PATH=$(get_user_input "your model path" "${WORKPATH}/workspace/models")
-    http_proxy=$(get_user_input "http_proxy" "${http_proxy}")
-    https_proxy=$(get_user_input "https_proxy" "${https_proxy}")
-    no_proxy=$(get_user_input "no_proxy" "${no_proxy}")
 
     # Ask about model preparation
     read -p "Have you prepared models in ${MODEL_PATH}? (yes/no) [yes]: " user_input
@@ -882,12 +879,6 @@ deploy_openvino_interactive() {
     export MILVUS_ENABLED
     export CHAT_HISTORY_ROUND
     export LLM_MODEL
-    export http_proxy
-    export https_proxy
-    export no_proxy
-    export HTTP_PROXY="${http_proxy}"
-    export HTTPS_PROXY="${https_proxy}"
-    export NO_PROXY="${no_proxy}"
 
     # If user explicitly said models are not prepared, force download in interactive mode.
     if [[ "${force_model_download}" == "1" ]]; then
@@ -998,9 +989,6 @@ deploy_vllm_interactive() {
     CHAT_HISTORY_ROUND=$(get_user_input "chat history round" "0")
     LLM_MODEL=$(get_user_input "your LLM model" "Qwen/Qwen3-8B")
     MODEL_PATH=$(get_user_input "your model path" "${WORKPATH}/workspace/models")
-    http_proxy=$(get_user_input "http_proxy" "${http_proxy}")
-    https_proxy=$(get_user_input "https_proxy" "${https_proxy}")
-    no_proxy=$(get_user_input "no_proxy" "${no_proxy}")
 
     # Ask about model preparation
     read -p "Have you prepared models in ${MODEL_PATH}? (yes/no) [yes]: " user_input
@@ -1020,12 +1008,6 @@ deploy_vllm_interactive() {
     export CHAT_HISTORY_ROUND
     export LLM_MODEL
     export VLLM_BACKEND="${backend}"
-    export http_proxy
-    export https_proxy
-    export no_proxy
-    export HTTP_PROXY="${http_proxy}"
-    export HTTPS_PROXY="${https_proxy}"
-    export NO_PROXY="${no_proxy}"
 
     # vLLM specific parameters
     set_vllm_defaults
@@ -1168,9 +1150,6 @@ deploy_ovms_interactive() {
     CHAT_HISTORY_ROUND=$(get_user_input "chat history round" "0")
     LLM_MODEL=$(get_user_input "your LLM model" "Qwen/Qwen3-8B")
     MODEL_PATH=$(get_user_input "your model path" "${WORKPATH}/workspace/models")
-    http_proxy=$(get_user_input "http_proxy" "${http_proxy}")
-    https_proxy=$(get_user_input "https_proxy" "${https_proxy}")
-    no_proxy=$(get_user_input "no_proxy" "${no_proxy}")
     OVMS_SERVICE_PORT=$(get_user_input "OVMS service port" "8000")
 
     # Ask about model preparation
@@ -1189,12 +1168,6 @@ deploy_ovms_interactive() {
     export CHAT_HISTORY_ROUND
     export LLM_MODEL
     export OVMS_SERVICE_PORT
-    export http_proxy
-    export https_proxy
-    export no_proxy
-    export HTTP_PROXY="${http_proxy}"
-    export HTTPS_PROXY="${https_proxy}"
-    export NO_PROXY="${no_proxy}"
     unset OVMS_ENDPOINT OVMS_REST_PORT OVMS_SOURCE_MODEL OVMS_MODEL_REPOSITORY_PATH OVMS_MODEL_NAME \
         OVMS_TARGET_DEVICE OVMS_TASK OVMS_CACHE_DIR OVMS_ENABLE_PREFIX_CACHING OVMS_TOOL_PARSER \
         OVMS_ENABLE_TOOL_GUIDED_GENERATION OVMS_MAX_NUM_BATCHED_TOKENS

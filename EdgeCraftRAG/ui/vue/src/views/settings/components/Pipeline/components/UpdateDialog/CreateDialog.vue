@@ -63,171 +63,173 @@
 </template>
 
 <script lang="ts" setup name="CreateDialog">
-  import { requestPipelineCreate } from "@/api/pipeline";
-  import { ExclamationCircleOutlined } from "@ant-design/icons-vue";
-  import { computed, markRaw, ref } from "vue";
-  import { useI18n } from "vue-i18n";
-  import { Activated, Basic, Generator, PostProcessor, Retriever } from "./index";
+import { requestPipelineCreate } from "@/api/pipeline";
+import { ExclamationCircleOutlined } from "@ant-design/icons-vue";
+import { computed, markRaw, ref } from "vue";
+import { useI18n } from "vue-i18n";
+import { Activated, Basic, Generator, PostProcessor, Retriever } from "./index";
 
-  const { t } = useI18n();
-  const emit = defineEmits(["search", "close"]);
-  const modelVisible = ref<boolean>(true);
-  const formData = reactive<EmptyObjectType>({});
-  const submitLoading = ref<boolean>(false);
-  const currentStep = ref<number>(1);
-  const pipelineRef = ref<any>(null);
-  const isProceed = ref(true);
-  const stepList = ref<EmptyArrayType>([
-    {
-      label: t("pipeline.config.basic"),
-      index: 1,
-      icon: "icon-basic",
-      component: markRaw(Basic),
-    },
-    {
-      label: t("pipeline.config.retriever"),
-      index: 2,
-      icon: "icon-retriever",
-      component: markRaw(Retriever),
-    },
-    {
-      label: t("pipeline.config.postProcessor"),
-      index: 3,
-      icon: "icon-post-processor",
-      component: markRaw(PostProcessor),
-    },
-    {
-      label: t("pipeline.config.generator"),
-      index: 4,
-      icon: "icon-generator",
-      component: markRaw(Generator),
-    },
-    {
-      label: t("pipeline.isActive"),
-      index: 5,
-      icon: "icon-active",
-      component: markRaw(Activated),
-    },
-  ]);
+const { t } = useI18n();
+const emit = defineEmits(["search", "close"]);
+const modelVisible = ref<boolean>(true);
+const formData = reactive<EmptyObjectType>({});
+const submitLoading = ref<boolean>(false);
+const currentStep = ref<number>(1);
+const pipelineRef = ref<any>(null);
+const isProceed = ref(true);
+const stepList = ref<EmptyArrayType>([
+  {
+    label: t("pipeline.config.basic"),
+    index: 1,
+    icon: "icon-basic",
+    component: markRaw(Basic),
+  },
+  {
+    label: t("pipeline.config.retriever"),
+    index: 2,
+    icon: "icon-retriever",
+    component: markRaw(Retriever),
+  },
+  {
+    label: t("pipeline.config.postProcessor"),
+    index: 3,
+    icon: "icon-post-processor",
+    component: markRaw(PostProcessor),
+  },
+  {
+    label: t("pipeline.config.generator"),
+    index: 4,
+    icon: "icon-generator",
+    component: markRaw(Generator),
+  },
+  {
+    label: t("pipeline.isActive"),
+    index: 5,
+    icon: "icon-active",
+    component: markRaw(Activated),
+  },
+]);
 
-  const currentComponent = computed(() => {
-    return stepList.value.find(item => item.index === currentStep.value)?.component;
-  });
+const currentComponent = computed(() => {
+  return stepList.value.find((item) => item.index === currentStep.value)
+    ?.component;
+});
 
-  const onValidationChange = (value: boolean) => {
-    isProceed.value = value;
-  };
-  //last
-  const handleLast = () => {
-    if (currentStep.value > 1) {
-      currentStep.value--;
-    }
-  };
+const onValidationChange = (value: boolean) => {
+  isProceed.value = value;
+};
+//last
+const handleLast = () => {
+  if (currentStep.value > 1) {
+    currentStep.value--;
+    isProceed.value = true;
+  }
+};
 
-  //next，update form
-  const handleNext = async () => {
-    if (pipelineRef.value) {
-      const { result = false, data = {} } = await pipelineRef.value?.validate();
+//next，update form
+const handleNext = async () => {
+  if (pipelineRef.value) {
+    const { result = false, data = {} } = await pipelineRef.value?.validate();
 
-      if (result) {
-        Object.assign(formData, data);
+    if (result) {
+      Object.assign(formData, data);
 
-        if (currentStep.value < 5) {
-          currentStep.value = currentStep.value + 1;
-        }
-      } else {
-        console.log(t("pipeline.validErr"));
+      if (currentStep.value < 5) {
+        currentStep.value = currentStep.value + 1;
       }
+    } else {
+      console.log(t("pipeline.validErr"));
     }
-  };
-  // Submit
-  const handleSubmit = async () => {
-    await handleNext();
+  }
+};
+// Submit
+const handleSubmit = async () => {
+  await handleNext();
 
-    submitLoading.value = true;
-    requestPipelineCreate(formData)
-      .then(() => {
-        emit("search");
-        handleClose();
-      })
-      .catch(error => {
-        console.error(error);
-      })
-      .finally(() => {
-        submitLoading.value = false;
-      });
-  };
+  submitLoading.value = true;
+  requestPipelineCreate(formData)
+    .then(() => {
+      emit("search");
+      handleClose();
+    })
+    .catch((error) => {
+      console.error(error);
+    })
+    .finally(() => {
+      submitLoading.value = false;
+    });
+};
 
-  //close
-  const handleClose = () => {
-    emit("close");
-  };
-  watch(
-    () => pipelineRef.value?.isProceed,
-    val => {
-      if (val !== undefined) isProceed.value = val;
-    }
-  );
+//close
+const handleClose = () => {
+  emit("close");
+};
+watch(
+  () => pipelineRef.value?.isProceed,
+  (val) => {
+    if (val !== undefined) isProceed.value = val;
+  },
+);
 </script>
 
 <style scoped lang="less">
-  @keyframes expandBorder {
-    to {
-      width: 100%;
-      left: 0;
-      transform: none;
-    }
-  }
-  .step-container {
+@keyframes expandBorder {
+  to {
     width: 100%;
-    margin-bottom: 20px;
-    border-radius: 6px 6px 0 0;
-    overflow: hidden;
-    display: flex;
+    left: 0;
+    transform: none;
+  }
+}
+.step-container {
+  width: 100%;
+  margin-bottom: 20px;
+  border-radius: 6px 6px 0 0;
+  overflow: hidden;
+  display: flex;
 
-    .step-wrap {
-      flex: 1;
-      background-color: var(--menu-bg);
-      border-bottom: 1px solid var(--border-main-color);
-      height: 38px;
-      line-height: 38px;
-      text-align: center;
-      color: var(--font-text-color);
+  .step-wrap {
+    flex: 1;
+    background-color: var(--menu-bg);
+    border-bottom: 1px solid var(--border-main-color);
+    height: 38px;
+    line-height: 38px;
+    text-align: center;
+    color: var(--font-text-color);
+    i {
+      position: relative;
+      top: 1px;
+    }
+
+    &.step-active {
+      color: var(--color-primary);
+      font-weight: 600;
+      background-color: var(--color-primaryBg);
+      position: relative;
       i {
-        position: relative;
-        top: 1px;
+        font-weight: 500;
       }
-
-      &.step-active {
-        color: var(--color-primary);
-        font-weight: 600;
-        background-color: var(--color-primaryBg);
-        position: relative;
-        i {
-          font-weight: 500;
-        }
-        &::after {
-          content: "";
-          position: absolute;
-          bottom: 0;
-          left: 50%;
-          transform: translateX(-50%);
-          width: 0;
-          height: 2px;
-          background-color: var(--color-primary-hover);
-          animation: expandBorder 1s forwards;
-        }
+      &::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 0;
+        height: 2px;
+        background-color: var(--color-primary-hover);
+        animation: expandBorder 1s forwards;
       }
     }
   }
-  .body-container {
-    min-height: 400px;
-  }
-  .tips-wrap {
-    .mr-6;
-    display: inline-flex;
-    font-size: 12px;
-    gap: 4px;
-    color: var(--color-second-warning);
-  }
+}
+.body-container {
+  min-height: 400px;
+}
+.tips-wrap {
+  .mr-6;
+  display: inline-flex;
+  font-size: 12px;
+  gap: 4px;
+  color: var(--color-second-warning);
+}
 </style>

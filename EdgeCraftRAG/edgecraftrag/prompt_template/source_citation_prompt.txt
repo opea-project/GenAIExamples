@@ -3,14 +3,22 @@ Your task is to learn from following context and MUST make sure understand and f
 Then answer the user's question based on what you learned from the context but not your own knowledge.
 You MUST STRICTLY follow the points listed in Sub-questions when providing answers. For example, if there're five points in Sub-questions, your answer must align with these five points. And each point MUST follow the summary provided in Sub-questions.
 When mentioning evidence in the main body, cite the concrete DOCUMENT_NODE_SOURCE value.
-Every time you use any information from a DOCUMENT_NODE_CONTEXT in the answer body, you MUST immediately include its citation as filename only: (actual file name from DOCUMENT_NODE_SOURCE). Do NOT output the literal token "DOCUMENT_NODE_SOURCE". Do NOT add words like "Document Source", "source", "from", or "来自".
-At the very end of your final answer, you MUST output referenced DOCUMENT_NODE_SOURCE in this exact plain-text format:
-<hr /><h3>Document Source:</h3>
-- DOCUMENT_NODE_SOURCE
+Citation and MESSAGE_ID rules are conditional:
+- Apply the following rules ONLY when `{context}` contains usable DOCUMENT_NODE evidence and the answer actually uses information from DOCUMENT_NODE_CONTEXT.
+- If `{context}` is empty, has no usable evidence, or the answer does not use DOCUMENT_NODE_CONTEXT, then do NOT generate MESSAGE_ID, do NOT output inline citations, and do NOT output the final `### Search Result ###` block.
+
+When citation is needed:
+1) Before generating the final answer body, internally generate exactly one random 8-digit numeric MESSAGE_ID (10000000-99999999), different from any 8-digit number already in {chat_history}, and avoid obvious patterns (for example: 12345678, repeated digits, or simple sequences). Regenerate if invalid.
+2) Use one fixed MESSAGE_ID for the whole response. In all citation href/id values, use only: `search_result_<MESSAGE_ID>_<N>`.
+3) Never output the literal token "MESSAGE_ID". The first line of the final answer body must not contain "MESSAGE_ID" or a standalone 8-digit MESSAGE_ID. The generated 8-digit ID may appear only inside href/id values matching `search_result_<8-digit-number>_<N>`.
+4) Every claim derived from DOCUMENT_NODE_CONTEXT must include an inline citation immediately in this format: <sup><a href="#search_result_MESSAGE_ID_N" title="[<DOCUMENT_NODE_SOURCE>]">[N]</a></sup>.
+5) At the end, output referenced sources in this exact format:
+\n\n --- \n\n### Search Result ###
+- <a id="search_result_MESSAGE_ID_N"></a>[N] [<DOCUMENT_NODE_SOURCE>](DOCUMENT_NODE_FILE_PATH)
 ...
-Only list unique DOCUMENT_NODE_SOURCE values in this final Document Source block; do NOT repeat the same source.
-In the final Document Source block, output plain DOCUMENT_NODE_SOURCE only (no markdown links, no URLs, no file paths).
- 
+Only list unique DOCUMENT_NODE_SOURCE values; N starts from 1 by first appearance and inline citations must match anchors.
+6) Consistency check before final output: every `search_result_*` href/id in the response must use the same 8-digit MESSAGE_ID.
+
 ### Search Result ###
 The following contents are the search results related to the user's message:
 Each context unit is formatted as STRICT tagged blocks:
@@ -19,9 +27,9 @@ Each context unit is formatted as STRICT tagged blocks:
 - <DOCUMENT_NODE_FILE_PATH>xxx</DOCUMENT_NODE_FILE_PATH> (already URL-encoded; spaces appear as %20)
 - <DOCUMENT_NODE_CONTEXT>xxx</DOCUMENT_NODE_CONTEXT>
 - </DOCUMENT_NODE>
- 
+
 {context}
- 
+
 ### Additional Information ###
 When responding and thinking, please keep the following points in mind:
 - CRITICAL: Your final answer MUST be in EXACTLY the same language as the main question that appears before "Sub-questions:" section
@@ -29,14 +37,13 @@ When responding and thinking, please keep the following points in mind:
 - If the response is lengthy, structure it well and summarize it in paragraphs
 - Choose an appropriate and visually appealing format for your response based on the user's requirements and the content of the answer, ensuring strong readability
 - You MUST only use the provided context as evidence, and only cite sources that you actually used in the answer
+- If `{context}` is empty or has no usable DOCUMENT_NODE_CONTEXT evidence, answer without citations and without `### Search Result ###`; do not fabricate evidence
 - You MUST parse evidence only from <DOCUMENT_NODE_CONTEXT> and map each used context to its paired <DOCUMENT_NODE_SOURCE> and <DOCUMENT_NODE_FILE_PATH> in the same <DOCUMENT_NODE>
-- In the answer body, each claim derived from DOCUMENT_NODE_CONTEXT MUST carry a citation after current paragraph: (<actual file name from DOCUMENT_NODE_SOURCE>). In body citations, output filename only and never output the literal token "DOCUMENT_NODE_SOURCE".
 - If multiple claims in one paragraph come from different DOCUMENT_NODEs, include all corresponding inline citations in that paragraph
 - Do NOT use DOCUMENT_NODE id as citation
 - DOCUMENT_NODE_FILE_PATH is already URL-encoded; use it exactly as provided and do NOT replace %20 with spaces
-- In the final "Document Source:" block, do NOT use hyperlink format; each line must be plain - DOCUMENT_NODE_SOURCE
- 
+
 ### history content ###
 {chat_history}
- 
+
 ### Below is the main question ###

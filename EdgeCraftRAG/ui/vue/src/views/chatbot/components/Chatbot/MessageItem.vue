@@ -189,7 +189,11 @@
         <div class="message-wrap">
           {{ message.content }}
           <div class="footer-btn">
-            <a-tooltip placement="top" :arrow="false" :title="$t('common.copy')">
+            <a-tooltip
+              placement="top"
+              :arrow="false"
+              :title="$t('common.copy')"
+            >
               <span class="icon-style" @click="handleCopyQuery()">
                 <CopyOutlined /></span
             ></a-tooltip>
@@ -383,7 +387,7 @@ const parseAttributes = (attrString: string): Record<string, string> => {
 
 const parseAgentContentIncremental = (
   content: string,
-  previousBlocks: AgentBlock[]
+  previousBlocks: AgentBlock[],
 ): AgentBlock[] => {
   const blocks = [...previousBlocks];
   let currentIndex = 0;
@@ -407,7 +411,7 @@ const parseAgentContentIncremental = (
       const agentContent = content.substring(endOfStartTag + 1, endTag).trim();
 
       const existingBlockIndex = blocks.findIndex(
-        (block) => block.startIndex === startTag
+        (block) => block.startIndex === startTag,
       );
 
       if (existingBlockIndex !== -1) {
@@ -455,7 +459,7 @@ const parseAgentContentIncremental = (
       const agentContent = content.substring(endOfStartTag + 1).trim();
 
       const existingBlockIndex = blocks.findIndex(
-        (block) => block.startIndex === startTag && !block.completed
+        (block) => block.startIndex === startTag && !block.completed,
       );
 
       if (existingBlockIndex !== -1) {
@@ -497,7 +501,7 @@ const getMainContent = (content: string, agentBlocks: AgentBlock[]): string => {
   }
 
   const sortedBlocks = [...agentBlocks].sort(
-    (a, b) => (b.startIndex || 0) - (a.startIndex || 0)
+    (a, b) => (b.startIndex || 0) - (a.startIndex || 0),
   );
 
   for (const block of sortedBlocks) {
@@ -565,7 +569,7 @@ const renderedMainMarkdown = computed(() => {
 
 const calculateAgentStyle = () => {
   const agent = agentsList.value.find(
-    (item) => item.id === chatbotStore.agent?.type
+    (item) => item.id === chatbotStore.agent?.type,
   );
 
   const colorIndex = (chatbotStore.agent.index % 5) + 1;
@@ -661,11 +665,11 @@ watch(
       if (props.message?.content) {
         agentBlocks.value = parseAgentContentIncremental(
           props.message.content,
-          []
+          [],
         );
       }
     }
-  }
+  },
 );
 
 watch(
@@ -683,13 +687,13 @@ watch(
     if (newContent) {
       agentBlocks.value = parseAgentContentIncremental(
         newContent,
-        agentBlocks.value
+        agentBlocks.value,
       );
     } else {
       resetAgentState();
     }
   },
-  { immediate: true }
+  { immediate: true },
 );
 
 watch(
@@ -698,7 +702,7 @@ watch(
     if (newRole !== oldRole) {
       resetAgentState();
     }
-  }
+  },
 );
 
 watch(
@@ -707,7 +711,7 @@ watch(
     if (!newValue) {
       addClickListeners();
     }
-  }
+  },
 );
 
 watch(
@@ -716,7 +720,7 @@ watch(
     if (value) {
       isCollapsed.value = false;
     }
-  }
+  },
 );
 
 onMounted(() => {
@@ -908,7 +912,9 @@ onMounted(() => {
       z-index: 20;
       opacity: 0;
       visibility: hidden;
-      transition: opacity 0.3s ease, visibility 0s linear 2s;
+      transition:
+        opacity 0.3s ease,
+        visibility 0s linear 2s;
       gap: 8px;
       .anticon {
         cursor: pointer;
@@ -1092,7 +1098,9 @@ onMounted(() => {
 }
 .think-transition-enter-active,
 .think-transition-leave-active {
-  transition: opacity 0.2s ease, transform 0.2s ease;
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
 }
 .think-transition-enter-from,
 .think-transition-leave-to {

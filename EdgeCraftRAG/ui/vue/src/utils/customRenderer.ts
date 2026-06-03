@@ -11,6 +11,74 @@ interface CodeRenderParams {
   lang?: string;
 }
 
+const isInternalAnchorLink = (href?: string | null) => {
+  return !!href && href.startsWith("#") && href.length > 1;
+};
+
+const getAnchorTargetId = (href: string) => {
+  return href.slice(1);
+};
+
+const getAnchorScope = (anchorLink: HTMLAnchorElement) => {
+  return anchorLink.closest("[id='message-container']");
+};
+
+const queryAnchorTargetInScope = (
+  scope: Element | Document,
+  targetId: string,
+) => {
+  const decodedTargetId = decodeURIComponent(targetId);
+
+  if (scope instanceof Document) {
+    return (
+      scope.getElementById(targetId) || scope.getElementById(decodedTargetId)
+    );
+  }
+
+  if (typeof CSS !== "undefined" && typeof CSS.escape === "function") {
+    return (
+      scope.querySelector(`#${CSS.escape(targetId)}`) ||
+      scope.querySelector(`#${CSS.escape(decodedTargetId)}`)
+    );
+  }
+
+  return null;
+};
+
+const getAnchorScrollTarget = (targetElement: HTMLElement) => {
+  if (
+    targetElement.tagName.toLowerCase() === "a" &&
+    !targetElement.textContent?.trim() &&
+    targetElement.childElementCount === 0
+  ) {
+    return (
+      (targetElement.nextElementSibling as HTMLElement | null) || targetElement
+    );
+  }
+
+  return targetElement;
+};
+
+const resolveAnchorTarget = (
+  anchorLink: HTMLAnchorElement,
+  targetId: string,
+) => {
+  const decodedTargetId = decodeURIComponent(targetId);
+  const anchorScope = getAnchorScope(anchorLink);
+
+  if (anchorScope) {
+    const scopedTarget = queryAnchorTargetInScope(anchorScope, targetId);
+    if (scopedTarget instanceof HTMLElement) {
+      return scopedTarget;
+    }
+  }
+
+  return (
+    document.getElementById(targetId) ||
+    document.getElementById(decodedTargetId)
+  );
+};
+
 class ClipboardManager {
   private clipboard;
 
@@ -23,11 +91,36 @@ class ClipboardManager {
     document.addEventListener("click", (e) => {
       const target = e.target as HTMLElement;
       const copyBtn = target.closest(".copy-btn");
+      const anchorLink = target.closest(
+        "a[data-anchor-target]",
+      ) as HTMLAnchorElement | null;
 
       if (copyBtn) {
         e.preventDefault();
         this.handleCopyClick(copyBtn as HTMLElement);
+        return;
       }
+
+      if (anchorLink) {
+        e.preventDefault();
+        this.handleAnchorClick(anchorLink);
+      }
+    });
+  }
+
+  private handleAnchorClick(anchorLink: HTMLAnchorElement) {
+    const targetId = anchorLink.getAttribute("data-anchor-target");
+    if (!targetId) return;
+
+    const targetElement = resolveAnchorTarget(anchorLink, targetId);
+    if (!targetElement) return;
+
+    const scrollTarget = getAnchorScrollTarget(targetElement);
+
+    scrollTarget.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+      inline: "nearest",
     });
   }
 
@@ -68,6 +161,12 @@ const createCustomRenderer = () => {
   const renderer = new marked.Renderer();
 
   renderer.link = ({ href, title, text }) => {
+    if (isInternalAnchorLink(href)) {
+      const targetId = getAnchorTargetId(href);
+
+      return `<a href="${href}" data-anchor-target="${targetId}" ${title ? `title="${title}"` : ""}>${text}</a>`;
+    }
+
     return `<a href="${href}" target="_blank" rel="noopener noreferrer" ${title ? `title="${title}"` : ""}>${text}</a>`;
   };
 

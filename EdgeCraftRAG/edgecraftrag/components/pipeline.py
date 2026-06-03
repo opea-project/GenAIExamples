@@ -346,12 +346,23 @@ class Pipeline(BaseComponent):
         reranker_device = reranker_model.device if reranker_model else "CPU"
         core = Core()
 
+        # Only knowledge KBs with initialized indexer/model participate in top-k memory estimation.
+        valid_kbs = []
+        for kb in active_kbs or []:
+            if getattr(kb, "comp_type", None) != "knowledge":
+                continue
+            indexer = getattr(kb, "indexer", None)
+            model = getattr(indexer, "model", None) if indexer is not None else None
+            if indexer is None or model is None:
+                continue
+            valid_kbs.append(kb)
+
         # Resolve memory utilization rate
         max_util = self._resolve_max_util(reranker_device, core)
         # Calculate model and memory sizes
         reranker_size = reranker_model.size_mb if reranker_model else 0
-        embedding_size = sum(index.indexer.model.size_mb for index in active_kbs)
-        embedding_length = max((getattr(index.indexer, "d", 0) for index in active_kbs), default=0)
+        embedding_size = sum(getattr(kb.indexer.model, "size_mb", 0) for kb in valid_kbs)
+        embedding_length = max((getattr(kb.indexer, "d", 0) for kb in valid_kbs), default=0)
         
         # Apply default minimums
         embedding_size = embedding_size or 512
