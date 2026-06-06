@@ -1,25 +1,25 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
-
 """Quick start guide for EdgeCraft RAG CLI."""
 
 import json
 import sys
+
 from cli.client import EcragApiClient
 
 
 def test_connection(host: str = "http://localhost", port: int = 16010):
     """Test connection to EdgeCraft RAG server."""
     client = EcragApiClient(host=host, server_port=port)
-    
+
     try:
         print(f"Testing connection to {client.server_url}...")
         result = client.get_system_info()
-        
+
         if "error" in result:
             print(f"❌ Connection failed: {result['error']}")
             return False
-        
+
         print("✓ Connection successful!")
         print(f"  System Info: {json.dumps(result, indent=2)}")
         return True
@@ -62,7 +62,7 @@ CONFIGURATION:
     export ECRAG_MEGA_PORT=16011
 
 COMMON COMMANDS:
-  
+
   Pipeline Management:
     ecrag pipeline list
     ecrag pipeline get --name <name>

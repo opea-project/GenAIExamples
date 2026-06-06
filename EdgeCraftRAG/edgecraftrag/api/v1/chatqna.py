@@ -124,7 +124,9 @@ async def ragqna(request: ChatCompletionRequest):
                 async def context_suffix_gen():
                     yield '","contexts":' + json.dumps(serialize_retrievals(retrievals)) + "}"
 
-                query_gen = stream_generator('{"query":' + json.dumps(original_query, ensure_ascii=False) + ',"response":"')
+                query_gen = stream_generator(
+                    '{"query":' + json.dumps(original_query, ensure_ascii=False) + ',"response":"'
+                )
                 output_gen = chain_async_generators([query_gen, res_gen_json(), context_suffix_gen()])
 
                 return StreamingResponse(output_gen, media_type="text/plain")
@@ -149,7 +151,7 @@ async def ragqna(request: ChatCompletionRequest):
                     yield json.dumps(token, ensure_ascii=False)[1:-1]
 
             # Reconstruct RagOut in stream response
-            query_gen = stream_generator('{"query":' + json.dumps(request.messages, ensure_ascii=False) + ',')
+            query_gen = stream_generator('{"query":' + json.dumps(request.messages, ensure_ascii=False) + ",")
 
             s_contexts = json.dumps(serialize_contexts(contexts))
             context_gen = stream_generator('"contexts":' + s_contexts + ',"response":"')

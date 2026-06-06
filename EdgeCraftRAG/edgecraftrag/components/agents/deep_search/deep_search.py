@@ -22,6 +22,7 @@ from .postprocessing import postproc_plan as default_postproc_plan
 from .postprocessing import postproc_query as default_postproc_query
 from .utils import Role, import_module_from_path
 
+
 class DeepSearchState(BaseModel):
     question: str
     query: str

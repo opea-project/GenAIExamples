@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
-
 """Canonical setup script for EdgeCraft RAG CLI."""
 
 from setuptools import setup
-
 
 setup(
     name="ecrag-cli",

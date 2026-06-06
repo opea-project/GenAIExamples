@@ -329,12 +329,14 @@ The CLI will display error messages from the API in JSON format. Network errors 
 ## Tips
 
 - Use `--help` with any command to see detailed help:
+
   ```bash
   ecrag pipeline --help
   ecrag pipeline create --help
   ```
 
 - Pipe JSON output to other tools:
+
   ```bash
   ecrag kb list | jq '.[]' | head -n 20
   ```

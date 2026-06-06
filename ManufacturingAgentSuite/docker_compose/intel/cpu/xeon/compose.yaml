@@ -1,0 +1,33 @@
+# Copyright (C) 2026 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  manufacturing-agent-suite:
+    image: python:3.12-slim
+    container_name: manufacturing-agent-suite
+    working_dir: /app
+    command: python /app/manufacturing_agent_suite.py
+    ports:
+      - "8899:8899"
+    environment:
+      OPEA_EXAMPLE_PROFILE: deterministic
+      OPEA_VECTOR_BACKEND: qdrant-profile
+      OPEA_EMBEDDING_PROFILE: deterministic
+    volumes:
+      - "../../../../manufacturing_agent_suite.py:/app/manufacturing_agent_suite.py:ro"
+    depends_on:
+      qdrant:
+        condition: service_started
+    restart: unless-stopped
+
+  qdrant:
+    image: qdrant/qdrant:v1.12.6
+    container_name: manufacturing-agent-suite-qdrant
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    restart: unless-stopped
+
+networks:
+  default:
+    driver: bridge

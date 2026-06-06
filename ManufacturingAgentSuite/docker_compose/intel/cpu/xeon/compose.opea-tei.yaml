@@ -1,0 +1,40 @@
+# Copyright (C) 2026 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  manufacturing-agent-suite:
+    environment:
+      OPEA_EXAMPLE_PROFILE: opea-tei
+      OPEA_EMBEDDING_PROFILE: opea-tei
+      OPEA_EMBEDDING_URL: http://embedding:6000/v1/embeddings
+    depends_on:
+      qdrant:
+        condition: service_started
+      embedding:
+        condition: service_started
+
+  tei-embedding-service:
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.7
+    container_name: manufacturing-agent-suite-tei-embedding
+    ports:
+      - "6006:80"
+    volumes:
+      - "${MODEL_CACHE:-./data}:/data"
+    shm_size: 1g
+    command: --model-id ${EMBEDDING_MODEL_ID:-BAAI/bge-base-en-v1.5} --auto-truncate
+    restart: unless-stopped
+
+  embedding:
+    image: ${REGISTRY:-opea}/embedding:${TAG:-latest}
+    container_name: manufacturing-agent-suite-embedding
+    depends_on:
+      tei-embedding-service:
+        condition: service_started
+    ports:
+      - "6000:6000"
+    environment:
+      TEI_EMBEDDING_ENDPOINT: http://tei-embedding-service:80
+      EMBEDDING_COMPONENT_NAME: OPEA_TEI_EMBEDDING
+      HF_TOKEN: ${HF_TOKEN:-}
+      LOGFLAG: ${LOGFLAG:-False}
+    restart: unless-stopped

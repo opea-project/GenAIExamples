@@ -51,11 +51,19 @@ class AgentManager(BaseMgr):
             return "Create Agent failed. Pipeline id not found."
         if cfgs.type == AgentType.SIMPLE:
             new_agent = SimpleRAGAgent(cfgs.idx, cfgs.name, cfgs.pipeline_idx, cfgs.configs)
-            new_agent.configs["max_retrievals"]=min(new_agent.configs["max_retrievals"], self.get_pipeline_by_name_or_id(cfgs.pipeline_idx).max_retrieve_topk)
+            new_agent.configs["max_retrievals"] = min(
+                new_agent.configs["max_retrievals"],
+                self.get_pipeline_by_name_or_id(cfgs.pipeline_idx).max_retrieve_topk,
+            )
         elif cfgs.type == AgentType.DEEPSEARCH:
             new_agent = DeepSearchAgent(cfgs.idx, cfgs.name, cfgs.pipeline_idx, cfgs.configs)
-            new_agent.configs["retrieve_top_k"]=min(new_agent.configs["retrieve_top_k"], self.get_pipeline_by_name_or_id(cfgs.pipeline_idx).max_retrieve_topk)
-            new_agent.configs["rerank_top_k"]=min(new_agent.configs["rerank_top_k"], self.get_pipeline_by_name_or_id(cfgs.pipeline_idx).max_retrieve_topk)
+            new_agent.configs["retrieve_top_k"] = min(
+                new_agent.configs["retrieve_top_k"],
+                self.get_pipeline_by_name_or_id(cfgs.pipeline_idx).max_retrieve_topk,
+            )
+            new_agent.configs["rerank_top_k"] = min(
+                new_agent.configs["rerank_top_k"], self.get_pipeline_by_name_or_id(cfgs.pipeline_idx).max_retrieve_topk
+            )
 
         if new_agent is not None:
             self.set_manager(new_agent)

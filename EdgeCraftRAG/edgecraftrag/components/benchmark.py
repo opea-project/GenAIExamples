@@ -118,9 +118,9 @@ class Benchmark(BaseComponent):
             metrics = {}
             metrics["input_token_size"] = input_token_size
             metrics["output_token_size"] = model().perf_metrics.get_num_generated_tokens()
-            metrics["generation_time"] = model().perf_metrics.get_inference_duration().mean/1000
-            metrics["first_token_latency"] = model().perf_metrics.get_ttft().mean/1000
-            metrics["other_tokens_avg_latency"] = model().perf_metrics.get_tpot().mean/1000
+            metrics["generation_time"] = model().perf_metrics.get_inference_duration().mean / 1000
+            metrics["first_token_latency"] = model().perf_metrics.get_ttft().mean / 1000
+            metrics["other_tokens_avg_latency"] = model().perf_metrics.get_tpot().mean / 1000
 
         self.llm_data_list[idx] = metrics
 

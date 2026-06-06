@@ -2,10 +2,11 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import json
-import click
 import os
 from pathlib import Path
 from typing import Optional
+
+import click
 from cli.client import EcragApiClient
 from cli.config import get_config
 
@@ -34,26 +35,26 @@ def run_chatqna_query(client: EcragApiClient, query: str, top_n: int, max_tokens
 @click.pass_context
 def cli(ctx, host: Optional[str], port: Optional[int], mega_port: Optional[int]):
     """EdgeCraft RAG CLI Tool.
-    
+
     Configure server connection via command-line options or environment variables:
     - ECRAG_HOST: Server host (default: http://localhost)
     - ECRAG_PORT: Server port (default: 16010)
     - ECRAG_MEGA_PORT: Mega service port (default: 16011)
     """
     ctx.ensure_object(dict)
-    
+
     # Get defaults from config
     config = get_config()
-    
+
     # Use provided options or environment/defaults
     final_host = host or config.host
     final_port = port or config.port
     final_mega_port = mega_port or config.mega_port
-    
+
     # Normalize host URL
     if not final_host.startswith(("http://", "https://")):
         final_host = f"http://{final_host}"
-    
+
     ctx.obj["client"] = EcragApiClient(host=final_host, server_port=final_port, mega_port=final_mega_port)
 
 
@@ -204,7 +205,7 @@ def load(ctx, model_type: str, model_id: str, model_path: str, device: str, weig
 
 @model.command()
 @click.pass_context
-def list(ctx):
+def list(ctx):  # noqa: F811
     """List all models."""
     client = ctx.obj["client"]
     result = client.get_models()
@@ -214,7 +215,7 @@ def list(ctx):
 @model.command()
 @click.option("--id", "model_id", required=True, help="Model ID")
 @click.pass_context
-def get(ctx, model_id: str):
+def get(ctx, model_id: str):  # noqa: F811
     """Get a specific model."""
     client = ctx.obj["client"]
     result = client.get_model(model_id)
@@ -241,7 +242,7 @@ def update(ctx, model_id: str, device: Optional[str], weight: Optional[str]):
 @model.command()
 @click.option("--id", "model_id", required=True, help="Model ID")
 @click.pass_context
-def delete(ctx, model_id: str):
+def delete(ctx, model_id: str):  # noqa: F811
     """Delete a model."""
     client = ctx.obj["client"]
     if click.confirm(f"Are you sure you want to delete model '{model_id}'?"):
@@ -284,7 +285,7 @@ def kb():
 @click.option("--description", help="Knowledge base description")
 @click.option("-f", "--file", type=click.Path(exists=True), help="KB config JSON file")
 @click.pass_context
-def create(ctx, name: str, description: Optional[str], file: Optional[str]):
+def create(ctx, name: str, description: Optional[str], file: Optional[str]):  # noqa: F811
     """Create a knowledge base."""
     client = ctx.obj["client"]
 
@@ -302,7 +303,7 @@ def create(ctx, name: str, description: Optional[str], file: Optional[str]):
 
 @kb.command()
 @click.pass_context
-def list(ctx):
+def list(ctx):  # noqa: F811
     """List all knowledge bases."""
     client = ctx.obj["client"]
     result = client.get_knowledge_bases()
@@ -312,7 +313,7 @@ def list(ctx):
 @kb.command()
 @click.option("-n", "--name", required=True, help="Knowledge base name")
 @click.pass_context
-def get(ctx, name: str):
+def get(ctx, name: str):  # noqa: F811
     """Get a specific knowledge base."""
     client = ctx.obj["client"]
     result = client.get_knowledge_base(name)
@@ -322,7 +323,7 @@ def get(ctx, name: str):
 @kb.command()
 @click.option("-n", "--name", required=True, help="Knowledge base name")
 @click.pass_context
-def get_json(ctx, name: str):
+def get_json(ctx, name: str):  # noqa: F811
     """Get knowledge base JSON data."""
     client = ctx.obj["client"]
     result = client.get_knowledge_base_json(name)
@@ -346,7 +347,7 @@ def filemap(ctx, name: str, page_num: int, page_size: int):
 @click.option("--active", type=bool, help="Set active status")
 @click.option("--description", help="Update description")
 @click.pass_context
-def update(ctx, name: str, active: Optional[bool], description: Optional[str]):
+def update(ctx, name: str, active: Optional[bool], description: Optional[str]):  # noqa: F811
     """Update a knowledge base."""
     client = ctx.obj["client"]
     kb_data = {"name": name}
@@ -361,7 +362,7 @@ def update(ctx, name: str, active: Optional[bool], description: Optional[str]):
 @kb.command()
 @click.option("-n", "--name", required=True, help="Knowledge base name")
 @click.pass_context
-def delete(ctx, name: str):
+def delete(ctx, name: str):  # noqa: F811
     """Delete a knowledge base."""
     client = ctx.obj["client"]
     if click.confirm(f"Are you sure you want to delete knowledge base '{name}'?"):
@@ -402,7 +403,7 @@ def experience():
 
 @experience.command()
 @click.pass_context
-def list(ctx):
+def list(ctx):  # noqa: F811
     """List all experiences."""
     client = ctx.obj["client"]
     result = client.get_experiences()
@@ -412,7 +413,7 @@ def list(ctx):
 @experience.command()
 @click.option("--id", required=True, help="Experience ID")
 @click.pass_context
-def get(ctx, id: str):
+def get(ctx, id: str):  # noqa: F811
     """Get a specific experience."""
     client = ctx.obj["client"]
     result = client.get_experience(id)
@@ -424,7 +425,7 @@ def get(ctx, id: str):
 @click.option("--question", required=True, help="Question")
 @click.option("--content", multiple=True, required=True, help="Answer content")
 @click.pass_context
-def create(ctx, id: str, question: str, content: tuple):
+def create(ctx, id: str, question: str, content: tuple):  # noqa: F811
     """Create or update an experience."""
     client = ctx.obj["client"]
     exp_data = {"idx": id, "question": question, "content": list(content)}
@@ -435,7 +436,7 @@ def create(ctx, id: str, question: str, content: tuple):
 @experience.command()
 @click.option("--id", required=True, help="Experience ID")
 @click.pass_context
-def delete(ctx, id: str):
+def delete(ctx, id: str):  # noqa: F811
     """Delete an experience."""
     client = ctx.obj["client"]
     if click.confirm(f"Are you sure you want to delete experience '{id}'?"):
@@ -464,7 +465,7 @@ def agent():
 
 @agent.command()
 @click.pass_context
-def list(ctx):
+def list(ctx):  # noqa: F811
     """List all agents."""
     client = ctx.obj["client"]
     result = client.get_agents()
@@ -474,7 +475,7 @@ def list(ctx):
 @agent.command()
 @click.option("-n", "--name", required=True, help="Agent name")
 @click.pass_context
-def get(ctx, name: str):
+def get(ctx, name: str):  # noqa: F811
     """Get a specific agent."""
     client = ctx.obj["client"]
     result = client.get_agent(name)
@@ -496,7 +497,7 @@ def configs(ctx, type: str):
 @click.option("--type", required=True, help="Agent type")
 @click.option("--pipeline", required=True, help="Pipeline index or name")
 @click.pass_context
-def create(ctx, name: str, type: str, pipeline: str):
+def create(ctx, name: str, type: str, pipeline: str):  # noqa: F811
     """Create an agent."""
     client = ctx.obj["client"]
     agent_data = {"name": name, "type": type, "pipeline_idx": pipeline}
@@ -508,7 +509,7 @@ def create(ctx, name: str, type: str, pipeline: str):
 @click.option("-n", "--name", required=True, help="Agent name")
 @click.option("--active", type=bool, help="Active status")
 @click.pass_context
-def update(ctx, name: str, active: Optional[bool]):
+def update(ctx, name: str, active: Optional[bool]):  # noqa: F811
     """Update an agent."""
     client = ctx.obj["client"]
     agent_data = {}
@@ -521,7 +522,7 @@ def update(ctx, name: str, active: Optional[bool]):
 @agent.command()
 @click.option("-n", "--name", required=True, help="Agent name")
 @click.pass_context
-def delete(ctx, name: str):
+def delete(ctx, name: str):  # noqa: F811
     """Delete an agent."""
     client = ctx.obj["client"]
     if click.confirm(f"Are you sure you want to delete agent '{name}'?"):
@@ -540,7 +541,7 @@ def prompt():
 
 @prompt.command()
 @click.pass_context
-def get(ctx):
+def get(ctx):  # noqa: F811
     """Get the current system prompt."""
     client = ctx.obj["client"]
     result = client.get_prompt()
@@ -674,7 +675,7 @@ def session():
 
 @session.command()
 @click.pass_context
-def list(ctx):
+def list(ctx):  # noqa: F811
     """List all sessions."""
     client = ctx.obj["client"]
     result = client.get_sessions()
@@ -684,7 +685,7 @@ def list(ctx):
 @session.command()
 @click.option("--id", required=True, help="Session ID")
 @click.pass_context
-def get(ctx, id: str):
+def get(ctx, id: str):  # noqa: F811
     """Get a specific session."""
     client = ctx.obj["client"]
     result = client.get_session(id)
