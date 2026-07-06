@@ -105,7 +105,7 @@ class StreamToLogger(object):
 def maintain_aspect_ratio_resize(image, width=None, height=None, inter=cv2.INTER_AREA):
     # Grab the image size and initialize dimensions
     dim = None
-    (h, w) = image.shape[:2]
+    h, w = image.shape[:2]
 
     # Return original image if no need to resize
     if width is None and height is None:
@@ -219,7 +219,6 @@ def convert_audio_to_base64(audio_path):
 
 def convert_base64_to_audio(b64_str):
     """Decodes the base64 encoded audio data and returns a saved filepath."""
-
     audio_data = base64.b64decode(b64_str)
 
     # Create a temporary file

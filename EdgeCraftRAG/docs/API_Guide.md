@@ -1,6 +1,7 @@
 # Edge Craft Retrieval-Augmented Generation API Guide
 
 > **Base URLs**
+>
 > - EC-RAG Server: `http://${HOST_IP}:16010`
 > - EC-RAG Mega Service: `http://${HOST_IP}:16011`
 

@@ -32,7 +32,6 @@ class CogniwareIMSService:
 
     def add_remote_service(self):
         """Configure and add microservices to the megaservice."""
-
         # LLM Microservice - Text Generation (Intel neural-chat)
         llm_service = MicroService(
             name="llm",

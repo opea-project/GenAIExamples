@@ -24,7 +24,6 @@ def load_yaml(file_path):
 
 def construct_benchmark_config(test_suite_config):
     """Extract relevant data from the YAML based on the specified test cases."""
-
     return {
         "user_queries": test_suite_config.get("user_queries", [1]),
         "concurrency": test_suite_config.get("concurrency", [1]),
@@ -101,7 +100,6 @@ def _get_service_ip(service_name, deployment_type="k8s", service_ip=None, servic
 
 def _create_yaml_content(service, base_url, bench_target, test_phase, num_queries, test_params, concurrency=1):
     """Create content for the run.yaml file."""
-
     # calculate the number of concurrent users
     concurrent_level = int(num_queries // concurrency)
 

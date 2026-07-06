@@ -37,10 +37,10 @@ DEFAULT_CONFIG = {
     "domain_knowledge": "",
     "max_retrievals": 3,
     "prompt_templates": {
-        "system": """{system_instruction}\n\n{query_instruction}\n\n{domain_knowledge}\n\n""",
+        "system": """{system_instruction}\n\n{query_instruction}\n\n{domain_knowledge}\n\n.""",
         "generate_query": "Now generate a query for the next retrieval.",
         "context": """<context>\n{context}\n</context>\n""",
-        "contexts": """The following are the retrieved contexts for current query.\n{contexts}\n""",
+        "contexts": """The following are the retrieved contexts for current query.\n{contexts}\n.""",
         "continue_decision": "Is more information needed? Answer Yes or No. Then explain why or why not.",
     },
 }

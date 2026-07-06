@@ -424,7 +424,7 @@ dataCoord:
     balanceSilentDuration: 300 # The duration after which the channel manager start background channel balancing
     balanceInterval: 360 # The interval with which the channel manager check dml channel balance status
     checkInterval: 1 # The interval in seconds with which the channel manager advances channel states
-    notifyChannelOperationTimeout: 5 # Timeout notifing channel operations (in seconds).
+    notifyChannelOperationTimeout: 5 # Timeout notifying channel operations (in seconds).
   segment:
     maxSize: 1024 # Maximum size of a segment in MB
     diskSegmentMaxSize: 2048 # Maximum size of a segment in MB for collection which has Disk index

@@ -42,12 +42,12 @@
 
 流水线创建完成后，前往 `Knowledge Base` 页面，点击 `Create Knowledge Base` 按钮创建知识库。  
 请在 `Type` 中选择 `kbadmin`，并从 kbadmin UI 页面中已创建的知识库列表中选择 kb 名称。加载kb名称可能比较耗时，请耐心等待。
- 
+
 ![alt text](../assets/img/Explore_Edge_Craft_RAG_09.png)
- 
+
 在 `Indexer` 页面，填写 Embedding 服务和向量数据库信息，注意 Embedding 服务端口为 13020，向量数据库端口为 29530。
- 
+
 ![alt text](../assets/img/Explore_Edge_Craft_RAG_10.png)
- 
+
 然后，在 `Chat` 页面的聊天框中提交您的问题。
 ![alt text](../assets/img/Explore_Edge_Craft_RAG_11.png)

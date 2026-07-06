@@ -6,7 +6,6 @@
 
 from setuptools import setup
 
-
 setup(
     name="ecrag-cli",
     version="0.1.0",

@@ -2,10 +2,11 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import json
-import click
 import os
 from pathlib import Path
 from typing import Optional
+
+import click
 from cli.client import EcragApiClient
 from cli.config import get_config
 
@@ -34,26 +35,26 @@ def run_chatqna_query(client: EcragApiClient, query: str, top_n: int, max_tokens
 @click.pass_context
 def cli(ctx, host: Optional[str], port: Optional[int], mega_port: Optional[int]):
     """EdgeCraft RAG CLI Tool.
-    
+
     Configure server connection via command-line options or environment variables:
     - ECRAG_HOST: Server host (default: http://localhost)
     - ECRAG_PORT: Server port (default: 16010)
     - ECRAG_MEGA_PORT: Mega service port (default: 16011)
     """
     ctx.ensure_object(dict)
-    
+
     # Get defaults from config
     config = get_config()
-    
+
     # Use provided options or environment/defaults
     final_host = host or config.host
     final_port = port or config.port
     final_mega_port = mega_port or config.mega_port
-    
+
     # Normalize host URL
     if not final_host.startswith(("http://", "https://")):
         final_host = f"http://{final_host}"
-    
+
     ctx.obj["client"] = EcragApiClient(host=final_host, server_port=final_port, mega_port=final_mega_port)
 
 

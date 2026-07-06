@@ -93,7 +93,6 @@ class LogitsEstimatorJSON(LogitsEstimator):
         **kwargs,
     ):
         """Initialize the LLM-based relevance estimator."""
-
         super().__init__(
             model_id,
             device,

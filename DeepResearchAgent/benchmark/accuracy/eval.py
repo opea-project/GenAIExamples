@@ -253,7 +253,6 @@ def run_benchmark(
     Returns:
         Tuple of (accuracy score, detailed results)
     """
-
     results = []
     total_questions = len(questions)
     details = []
@@ -275,7 +274,6 @@ def run_benchmark(
 
 def main():
     """Main function to run the benchmark."""
-
     # Set up argument parser
     parser = argparse.ArgumentParser(description="Run scoring with benchmarking options")
     parser.add_argument(

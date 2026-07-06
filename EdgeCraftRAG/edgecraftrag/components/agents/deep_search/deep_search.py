@@ -22,6 +22,7 @@ from .postprocessing import postproc_plan as default_postproc_plan
 from .postprocessing import postproc_query as default_postproc_query
 from .utils import Role, import_module_from_path
 
+
 class DeepSearchState(BaseModel):
     question: str
     query: str
@@ -259,7 +260,9 @@ class DeepSearchAgent(Agent):
                     bold=True,
                 ),
             )
-            await stream_writer(f"\n\n⚠️ **Reached maximum retrievals: {self.cfg.max_retrievals}, stopping search**\n\n")
+            await stream_writer(
+                f"\n\n⚠️ **Reached maximum retrievals: {self.cfg.max_retrievals}, stopping search**\n\n"
+            )
             return "stop"
 
         response = await self.llm_generate_astream_writer(state.request)

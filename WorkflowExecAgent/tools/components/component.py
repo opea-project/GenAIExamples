@@ -17,5 +17,4 @@ class Component:
 
         :returns: API response
         """
-
         return self.request_handler._make_request(*args, **kwargs)

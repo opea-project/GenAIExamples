@@ -24,7 +24,6 @@ class DataInsightAutomationSDK:  # Example SDK class for Data Insight Automation
 
         :returns: Workflow
         """
-
         return Workflow(
             self.request_handler,
             workflow_id=workflow_id,

@@ -24,11 +24,10 @@ try:
 
 except:
     pass
-
-
 # https://github.com/langchain-ai/langchain/blob/master/libs/community/langchain_community/utilities/financial_datasets.py
-"""
-Util that calls several of financial datasets stock market REST APIs.
+\
+"""Util that calls several of financial datasets stock market REST APIs.
+
 Docs: https://docs.financialdatasets.ai/
 """
 
@@ -133,7 +132,6 @@ class FinancialDatasetsAPIWrapper(BaseModel):
         :param limit: the number of results to return, default is 10
         :return: a list of cash flow statements
         """
-
         url = (
             f"{FINANCIAL_DATASETS_BASE_URL}financials/cash-flow-statements/"
             f"?ticker={ticker}"
@@ -318,7 +316,6 @@ def analyze_balance_sheet(
 
     Then return with an instruction on how to analyze the balance sheet.
     """
-
     balance_sheet = financial_datasets_client.run(
         mode="get_balance_sheets",
         ticker=symbol,
@@ -329,10 +326,11 @@ def analyze_balance_sheet(
     df_string = "Balance sheet:\n" + balance_sheet
 
     instruction = dedent(
-        """
-        Delve into a detailed scrutiny of the company's balance sheet for the most recent fiscal year, pinpointing
+        """Delve into a detailed scrutiny of the company's balance sheet for the most recent fiscal year, pinpointing
         the structure of assets, liabilities, and shareholders' equity to decode the firm's financial stability and
-        operational efficiency. Focus on evaluating the liquidity through current assets versus current liabilities,
+        operational efficiency.
+
+        Focus on evaluating the liquidity through current assets versus current liabilities,
         the solvency via long-term debt ratios, and the equity position to gauge long-term investment potential.
         Contrast these metrics with previous years' data to highlight financial trends, improvements, or deteriorations.
         Finalize with a strategic assessment of the company's financial leverage, asset management, and capital structure,
@@ -366,8 +364,8 @@ def analyze_income_stmt(
 
     # Analysis instruction
     instruction = dedent(
-        """
-        Conduct a comprehensive analysis of the company's income statement for the current fiscal year.
+        """Conduct a comprehensive analysis of the company's income statement for the current fiscal year.
+
         Start with an overall revenue record, including Year-over-Year or Quarter-over-Quarter comparisons,
         and break down revenue sources to identify primary contributors and trends. Examine the Cost of
         Goods Sold for potential cost control issues. Review profit margins such as gross, operating,
@@ -397,7 +395,6 @@ def analyze_cash_flow(
 
     Then return with an instruction on how to analyze the cash flow statement.
     """
-
     cash_flow = financial_datasets_client.run(
         mode="get_cash_flow_statements",
         ticker=symbol,
@@ -408,9 +405,10 @@ def analyze_cash_flow(
     df_string = "Cash flow statement:\n" + cash_flow
 
     instruction = dedent(
-        """
-        Dive into a comprehensive evaluation of the company's cash flow for the latest fiscal year, focusing on cash inflows
-        and outflows across operating, investing, and financing activities. Examine the operational cash flow to assess the
+        """Dive into a comprehensive evaluation of the company's cash flow for the latest fiscal year, focusing on cash inflows
+        and outflows across operating, investing, and financing activities.
+
+        Examine the operational cash flow to assess the
         core business profitability, scrutinize investing activities for insights into capital expenditures and investments,
         and review financing activities to understand debt, equity movements, and dividend policies. Compare these cash movements
         to prior periods to discern trends, sustainability, and liquidity risks. Conclude with an informed analysis of the company's
@@ -458,8 +456,8 @@ def get_share_performance(
     df_string = "Past 60 days Stock prices:\n" + json.dumps(prices)
 
     instruction = dedent(
-        """
-        Dive into a comprehensive evaluation of the company's stock price for the latest 60 days.
+        """Dive into a comprehensive evaluation of the company's stock price for the latest 60 days.
+
         Less than 130 words.
         """
     )

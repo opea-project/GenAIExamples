@@ -23,23 +23,15 @@ const getAnchorScope = (anchorLink: HTMLAnchorElement) => {
   return anchorLink.closest("[id='message-container']");
 };
 
-const queryAnchorTargetInScope = (
-  scope: Element | Document,
-  targetId: string,
-) => {
+const queryAnchorTargetInScope = (scope: Element | Document, targetId: string) => {
   const decodedTargetId = decodeURIComponent(targetId);
 
   if (scope instanceof Document) {
-    return (
-      scope.getElementById(targetId) || scope.getElementById(decodedTargetId)
-    );
+    return scope.getElementById(targetId) || scope.getElementById(decodedTargetId);
   }
 
   if (typeof CSS !== "undefined" && typeof CSS.escape === "function") {
-    return (
-      scope.querySelector(`#${CSS.escape(targetId)}`) ||
-      scope.querySelector(`#${CSS.escape(decodedTargetId)}`)
-    );
+    return scope.querySelector(`#${CSS.escape(targetId)}`) || scope.querySelector(`#${CSS.escape(decodedTargetId)}`);
   }
 
   return null;
@@ -51,18 +43,13 @@ const getAnchorScrollTarget = (targetElement: HTMLElement) => {
     !targetElement.textContent?.trim() &&
     targetElement.childElementCount === 0
   ) {
-    return (
-      (targetElement.nextElementSibling as HTMLElement | null) || targetElement
-    );
+    return (targetElement.nextElementSibling as HTMLElement | null) || targetElement;
   }
 
   return targetElement;
 };
 
-const resolveAnchorTarget = (
-  anchorLink: HTMLAnchorElement,
-  targetId: string,
-) => {
+const resolveAnchorTarget = (anchorLink: HTMLAnchorElement, targetId: string) => {
   const decodedTargetId = decodeURIComponent(targetId);
   const anchorScope = getAnchorScope(anchorLink);
 
@@ -73,10 +60,7 @@ const resolveAnchorTarget = (
     }
   }
 
-  return (
-    document.getElementById(targetId) ||
-    document.getElementById(decodedTargetId)
-  );
+  return document.getElementById(targetId) || document.getElementById(decodedTargetId);
 };
 
 class ClipboardManager {
@@ -91,9 +75,7 @@ class ClipboardManager {
     document.addEventListener("click", (e) => {
       const target = e.target as HTMLElement;
       const copyBtn = target.closest(".copy-btn");
-      const anchorLink = target.closest(
-        "a[data-anchor-target]",
-      ) as HTMLAnchorElement | null;
+      const anchorLink = target.closest("a[data-anchor-target]") as HTMLAnchorElement | null;
 
       if (copyBtn) {
         e.preventDefault();

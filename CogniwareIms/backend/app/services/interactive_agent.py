@@ -183,7 +183,6 @@ class InteractiveAgent:
         user_role: str,
     ) -> List[Dict[str, str]]:
         """Build message list for LLM including context and history."""
-
         # System prompt based on user role
         role_prompts = {
             "Consumer": "You are a helpful AI assistant for product research and PC building. Help users find products and make informed decisions.",

@@ -44,7 +44,6 @@ class DocSumUI:
         Returns:
             str: The content of the website or an error message if the url is unsupported.
         """
-
         self.page_content = ""
 
         logger.info(">>> Reading url: %s", url)
@@ -91,7 +90,7 @@ class DocSumUI:
                         ("\n\ndata: b", ""),
                         ("'\n\n", ""),
                         ("'\n", ""),
-                        ('''\'"''', ""),
+                        ("""\'".""", ""),
                     ]
                     for old, new in replacements:
                         cleaned_text = cleaned_text.replace(old, new)
