@@ -2,7 +2,7 @@ docx2txt==0.9
 EbookLib==0.20
 faiss-cpu==1.13.2
 html2text>=2025.4.15
-json-repair==0.52.0
+json-repair==0.60.1
 langchain-core==0.3.81
 langchain-milvus==0.2.1
 langchain-openai==0.3.35
