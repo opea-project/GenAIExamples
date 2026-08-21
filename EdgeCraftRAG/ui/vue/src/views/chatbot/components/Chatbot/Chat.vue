@@ -10,7 +10,6 @@
             <MessageItem
               :message-key="`session-${currentSessionId}-${index}`"
               :message="msg"
-              ref="messageRef"
               :inResponse
               :message-Index="index"
               :last-query="isLastQuery(index)"
@@ -151,8 +150,6 @@ const messagesList = ref<IMessage[]>([]);
 const inputKeywords = ref<string>("");
 const scrollContainer = ref<HTMLElement | null>(null);
 const messageComponent = ref<HTMLElement | null>(null);
-let resizeObserver: ResizeObserver | null = null;
-const messageRef = ref<any>(null);
 const inResponse = ref<boolean>(false);
 const imgVisible = ref<boolean>(false);
 const imageSrc = ref<string>("");
@@ -162,6 +159,7 @@ const resizeObserverRef = ref<ResizeObserver | null>(null);
 const enableKB = ref<boolean>(true);
 const isCreatingNewSession = ref(false);
 const shouldIgnoreRouteChange = ref(false);
+let throttledHandleScroll: ReturnType<typeof throttle> | null = null;
 
 const inputRef = ref();
 const handleEnvUrl = () => {
@@ -455,7 +453,13 @@ const initResizeObserver = () => {
     resizeObserverRef.value = new ResizeObserver(handleResize);
     resizeObserverRef.value.observe(messageComponent.value);
 
-    const throttledHandleScroll = throttle(handleScroll, 100);
+    if (throttledHandleScroll) {
+      scrollContainer.value?.removeEventListener(
+        "scroll",
+        throttledHandleScroll,
+      );
+    }
+    throttledHandleScroll = throttle(handleScroll, 100);
 
     scrollContainer.value?.addEventListener("scroll", throttledHandleScroll);
   }
@@ -536,11 +540,15 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => {
-  if (resizeObserver && messageComponent.value) {
-    resizeObserver.unobserve(messageComponent.value);
-    resizeObserver = null;
+  if (resizeObserverRef.value) {
+    resizeObserverRef.value.disconnect();
+    resizeObserverRef.value = null;
   }
-  scrollContainer.value?.removeEventListener("scroll", handleScroll);
+  if (throttledHandleScroll) {
+    scrollContainer.value?.removeEventListener("scroll", throttledHandleScroll);
+    throttledHandleScroll.cancel();
+    throttledHandleScroll = null;
+  }
 });
 
 onUnmounted(() => {

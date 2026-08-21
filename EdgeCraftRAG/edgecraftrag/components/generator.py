@@ -16,9 +16,32 @@ from edgecraftrag.utils import get_prompt_template, resolve_prompt_template_path
 from edgecraftrag.components.agents.utils import build_document_node_block
 from fastapi.responses import StreamingResponse
 from llama_index.llms.openai_like import OpenAILike
+from llama_index.core.base.llms.types import ChatMessage, CompletionResponse, MessageRole
 from pydantic import model_serializer
 from unstructured.staging.base import elements_from_base64_gzipped_json
 
+
+def _resolve_api_mode() -> str:
+    return os.getenv("ECRAG_LLM_API_MODE", "chat").strip().lower()
+
+def _build_freechat_messages(chat_request):
+    """Build a list of ChatMessage from a raw chat request message list."""
+    messages = []
+    for m in chat_request.messages:
+        if isinstance(m, dict):
+            messages.append(ChatMessage(role=m.get("role", "user"), content=m.get("content", "")))
+        else:
+            messages.append(m)
+    return messages
+
+def _build_chat_messages(template, enable_think, chat_history, text_gen_context, final_query):
+    """Build the SYSTEM/USER ChatMessage list used in chat API mode."""
+    system_content = template.format(input="", chat_history=chat_history, context=text_gen_context)
+    think_tag = "" if enable_think else " /no_think"
+    return [
+        ChatMessage(role=MessageRole.SYSTEM, content=system_content),
+        ChatMessage(role=MessageRole.USER, content=str(final_query) + think_tag),
+    ]
 
 def extract_urls(text):
     urls = []
@@ -88,14 +111,20 @@ def build_stream_response(status=None, content=None, error=None):
     return response
 
 
-async def local_stream_generator(lock, llm, prompt_str, unstructured_str, benchmark=None, benchmark_index=None):
+async def local_stream_generator(lock, llm, prompt_str, unstructured_str, benchmark=None, benchmark_index=None, use_chat=False):
     enable_benchmark = benchmark.is_enabled() if benchmark else False
     start_time = time.perf_counter() if enable_benchmark else None
     async with lock:
         if enable_benchmark:
-            response = await llm.astream_complete_with_bench(prompt_str)
+            if use_chat:
+                response = await llm.astream_chat_with_bench(prompt_str)
+            else:
+                response = await llm.astream_complete_with_bench(prompt_str)
         else:
-            response = await llm.astream_complete(prompt_str)
+            if use_chat:
+                response = await llm.astream_chat(prompt_str)
+            else:
+                response = await llm.astream_complete(prompt_str)
         try:
             async for r in response:
                 yield r.delta or ""
@@ -110,10 +139,13 @@ async def local_stream_generator(lock, llm, prompt_str, unstructured_str, benchm
             result_error = str(e)[start_idx:]
             yield f"code:0000{result_error}"
 
-async def stream_generator(llm, prompt_str, unstructured_str, benchmark=None, benchmark_index=None):
+async def stream_generator(llm, prompt_str, unstructured_str, benchmark=None, benchmark_index=None, use_chat=False):
     enable_benchmark = benchmark.is_enabled() if benchmark else False
     start_time = time.perf_counter() if enable_benchmark else None
-    response = await llm.astream_complete(prompt_str)
+    if use_chat:
+        response = await llm.astream_chat(prompt_str)
+    else:
+        response = await llm.astream_complete(prompt_str)
     try:
         async for r in response:
             yield r.delta or ""
@@ -237,22 +269,24 @@ class QnAGenerator(BaseComponent):
             self.remote_endpoint = self.vllm_endpoint
 
     def prompt_handler(
-        self, model_path, prompt_content=None, prompt_template_file=None, enable_think=False, enable_rag_retrieval=True
+        self, model_path, prompt_content=None, prompt_template_file=None, enable_think=False, enable_rag_retrieval=True, use_chat=None
     ):
+        if use_chat is None:
+            use_chat = _resolve_api_mode() == "chat"
         if prompt_content:
-            return get_prompt_template(model_path, prompt_content, prompt_template_file, enable_think)
+            return get_prompt_template(model_path, prompt_content, prompt_template_file, enable_think, use_chat)
         elif prompt_template_file is None:
             print("There is no template file, using the default template.")
-            prompt_template = get_prompt_template(model_path, prompt_content, prompt_template_file, enable_think)
+            prompt_template = get_prompt_template(model_path, prompt_content, prompt_template_file, enable_think, use_chat)
             return prompt_template
         else:
             if enable_rag_retrieval:
                 resolve_prompt_template_path(prompt_template_file)
             else:
                 prompt_content = "### User Guide ###You are a helpful assistant. Please respond to user inquiries with concise and professional answers.### Historical Content ###{chat_history}"
-                return get_prompt_template(model_path, prompt_content, prompt_template_file, enable_think)
+                return get_prompt_template(model_path, prompt_content, prompt_template_file, enable_think, use_chat)
 
-            return get_prompt_template(model_path, prompt_content, prompt_template_file, enable_think)
+            return get_prompt_template(model_path, prompt_content, prompt_template_file, enable_think, use_chat)
 
     def set_prompt(self, prompt):
         if "{context}" not in prompt:
@@ -276,7 +310,7 @@ class QnAGenerator(BaseComponent):
             ret = ret.replace(*p)
         return ret
 
-    def query_transform(self, chat_request, retrieved_nodes, sub_questions=None):
+    def query_transform(self, chat_request, retrieved_nodes, sub_questions=None, use_chat=False):
         """Generate text_gen_context and prompt_str
         :param chat_request: Request object
         :param retrieved_nodes: List of retrieved nodes
@@ -305,12 +339,18 @@ class QnAGenerator(BaseComponent):
                     self.prompt_template_file,
                     self.enable_think,
                     self.enable_rag_retrieval,
+                    use_chat=use_chat,
                 )
 
         if sub_questions:
             final_query = f"{query}\n\n### Sub-questions ###\nThe following list is how you should consider the answer, you MUST follow these steps when responding:\n\n{sub_questions}"
         else:
             final_query = query
+        if use_chat:
+            messages = _build_chat_messages(
+                self.original_template, self.enable_think, chat_history, text_gen_context, final_query
+            )
+            return text_gen_context, messages
         prompt_str = self.prompt.format(input=final_query, chat_history=chat_history, context=text_gen_context)
         return text_gen_context, prompt_str
 
@@ -322,7 +362,8 @@ class QnAGenerator(BaseComponent):
         benchmark = kwargs.get("benchmark", None)
         benchmark_index = kwargs.get("benchmark_index", None)
         sub_questions = kwargs.get("sub_questions", None)
-        text_gen_context, prompt_str = self.query_transform(chat_request, retrieved_nodes, sub_questions=sub_questions)
+        use_chat = _resolve_api_mode() == "chat"
+        text_gen_context, payload = self.query_transform(chat_request, retrieved_nodes, sub_questions=sub_questions, use_chat=use_chat)
         # self.llm().config.update_generation_config(config)
         self.llm().config.update_generation_config(temperature=chat_request.temperature,top_p=chat_request.top_p, top_k=chat_request.top_k, typical_p=chat_request.typical_p, repetition_penalty=chat_request.repetition_penalty, do_sample=chat_request.temperature > 0.0)
         self.llm().config.max_new_tokens = chat_request.max_tokens
@@ -332,13 +373,17 @@ class QnAGenerator(BaseComponent):
         if chat_request.stream:
             # Asynchronous generator
             async def generator():
-                async for chunk in local_stream_generator(self.lock, self.llm(), prompt_str, unstructured_str, benchmark, benchmark_index):
+                async for chunk in local_stream_generator(self.lock, self.llm(), payload, unstructured_str, benchmark, benchmark_index, use_chat=use_chat):
                     yield chunk or ""
                     await asyncio.sleep(0)
 
             return generator()
         else:
-            result = self.llm().complete(prompt_str)
+            if use_chat:
+                chat_response = self.llm().chat(payload)
+                result = CompletionResponse(text=chat_response.message.content or "")
+            else:
+                result = self.llm().complete(payload)
             return result
 
     async def run_remote(self, chat_request, retrieved_nodes, node_parser_type, **kwargs):
@@ -346,7 +391,8 @@ class QnAGenerator(BaseComponent):
         sub_questions = kwargs.get("sub_questions", None)
         benchmark = kwargs.get("benchmark", None)
         benchmark_index = kwargs.get("benchmark_index", None)
-        text_gen_context, prompt_str = self.query_transform(chat_request, retrieved_nodes, sub_questions=sub_questions)
+        use_chat = _resolve_api_mode() == "chat"
+        text_gen_context, payload = self.query_transform(chat_request, retrieved_nodes, sub_questions=sub_questions, use_chat=use_chat)
         api_base_suffix = "/v3" if self.inference_type == InferenceType.OVMS else "/v1"
         llm = OpenAILike(
             api_key="fake",
@@ -358,6 +404,7 @@ class QnAGenerator(BaseComponent):
             temperature=chat_request.temperature,
             streaming=chat_request.stream,
             repetition_penalty=chat_request.repetition_penalty,
+            is_chat_model=use_chat,
         )
         unstructured_str = ""
         if node_parser_type == NodeParserType.UNSTRUCTURED:
@@ -366,14 +413,18 @@ class QnAGenerator(BaseComponent):
 
             # Asynchronous generator
             async def generator():
-                async for chunk in stream_generator(llm, prompt_str, unstructured_str, benchmark, benchmark_index):
+                async for chunk in stream_generator(llm, payload, unstructured_str, benchmark, benchmark_index, use_chat=use_chat):
                     yield chunk or ""
                     await asyncio.sleep(0)
 
             return generator()
         else:
-            result = await llm.acomplete(prompt_str)
-            return result
+            if use_chat:
+                result = await llm.achat(payload)
+                return CompletionResponse(text=result.message.content or "")
+            else:
+                result = await llm.acomplete(payload)
+                return result
 
     async def run_vllm(self, chat_request, retrieved_nodes, node_parser_type, **kwargs):
         return await self.run_remote(chat_request, retrieved_nodes, node_parser_type, **kwargs)
@@ -460,21 +511,27 @@ class FreeChatGenerator(BaseComponent):
         )
         self.llm().generate_kwargs = generate_kwargs
         self.llm().max_new_tokens = chat_request.max_tokens
-        prompt_str = chatcompletion_to_chatml(chat_request)
+        use_chat = _resolve_api_mode() == "chat"
+        payload = _build_freechat_messages(chat_request) if use_chat else chatcompletion_to_chatml(chat_request)
         if chat_request.stream:
 
             # Asynchronous generator
             async def generator():
-                async for chunk in local_stream_generator(self.lock, self.llm(), prompt_str, ""):
+                async for chunk in local_stream_generator(self.lock, self.llm(), payload, "", use_chat=use_chat):
                     yield chunk or ""
                     await asyncio.sleep(0)
 
             return generator()
         else:
-            result = self.llm().complete(prompt_str)
+            if use_chat:
+                chat_response = self.llm().chat(payload)
+                result = CompletionResponse(text=chat_response.message.content or "")
+            else:
+                result = self.llm().complete(payload)
             return result
 
     async def run_remote(self, chat_request, retrieved_nodes, node_parser_type, **kwargs):
+        use_chat = _resolve_api_mode() == "chat"
         api_base_suffix = "/v3" if self.inference_type == InferenceType.OVMS else "/v1"
         llm = OpenAILike(
             api_key="fake",
@@ -486,21 +543,29 @@ class FreeChatGenerator(BaseComponent):
             temperature=chat_request.temperature,
             streaming=chat_request.stream,
             repetition_penalty=chat_request.repetition_penalty,
+            is_chat_model=use_chat,
         )
-        prompt_str = chatcompletion_to_chatml(chat_request)
+        payload = _build_freechat_messages(chat_request) if use_chat else chatcompletion_to_chatml(chat_request)
         if chat_request.stream:
 
             # Asynchronous generator
             async def generator():
-                gen = await llm.astream_complete(prompt_str)
+                if use_chat:
+                    gen = await llm.astream_chat(payload)
+                else:
+                    gen = await llm.astream_complete(payload)
                 async for chunk in gen:
                     yield chunk.delta or ""
                     await asyncio.sleep(0)
 
             return generator()
         else:
-            result = await llm.acomplete(prompt_str)
-            return str(result)
+            if use_chat:
+                result = await llm.achat(payload)
+                return str(result.message.content or "")
+            else:
+                result = await llm.acomplete(payload)
+                return str(result)
 
     async def run_vllm(self, chat_request, retrieved_nodes, node_parser_type, **kwargs):
         return await self.run_remote(chat_request, retrieved_nodes, node_parser_type, **kwargs)

@@ -1,5 +1,5 @@
 <template>
-  <div id="message-container">
+  <div class="message-container" @click="handleMessageClick">
     <template v-if="message.role === 'assistant'">
       <div class="chatbot-session">
         <div class="avatar-wrap">
@@ -611,17 +611,11 @@ const toggleThink = () => {
   isCollapsed.value = !isCollapsed.value;
 };
 
-const addClickListeners = () => {
-  const images = document.querySelectorAll("#message-container img");
-
-  images.forEach((img) => {
-    img.addEventListener("click", (event) => {
-      const target = event.target as HTMLImageElement;
-      if (target && target.tagName.toLowerCase() === "img") {
-        emit("preview", target.src);
-      }
-    });
-  });
+const handleMessageClick = (event: MouseEvent) => {
+  const target = event.target as HTMLElement | null;
+  if (target?.tagName.toLowerCase() === "img") {
+    emit("preview", (target as HTMLImageElement).src);
+  }
 };
 
 const handleRegenerate = () => {
@@ -701,15 +695,6 @@ watch(
   (newRole, oldRole) => {
     if (newRole !== oldRole) {
       resetAgentState();
-    }
-  },
-);
-
-watch(
-  () => props.inResponse,
-  (newValue) => {
-    if (!newValue) {
-      addClickListeners();
     }
   },
 );

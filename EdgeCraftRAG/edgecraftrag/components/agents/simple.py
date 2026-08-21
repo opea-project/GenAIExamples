@@ -124,7 +124,7 @@ class SimpleRAGAgent(Agent):
 
         return qnagraph.compile()
 
-    async def retrieve(self, state: QnaState) -> dict:
+    async def retrieve(self, state: QnaState, writer=None) -> dict:
         # print(f"State Retrieve {state}")
         request = state.request
         request.messages = state.query
@@ -137,7 +137,8 @@ class SimpleRAGAgent(Agent):
             f"Retrieved {format_terminal_str(str(len(retrieved)), color='magenta', bold=True)} documents, Reranked to top {format_terminal_str(str(len(reranked)), color='magenta', bold=True)}.",
         )
         await stream_writer(
-            f"\n\n🔍 **Retrieved {str(len(retrieved))} documents, Reranked to top {str(len(reranked))}**\n\n"
+            f"\n\n🔍 **Retrieved {str(len(retrieved))} documents, Reranked to top {str(len(reranked))}**\n\n",
+            writer=writer,
         )
 
         new_retrieval = Retrieval(step=state.num_retrievals, query=state.query, retrieved=retrieved, reranked=reranked)
@@ -146,9 +147,9 @@ class SimpleRAGAgent(Agent):
             "retrievals": [*state.retrievals, new_retrieval],
         }
 
-    async def generate_query(self, state: QnaState) -> dict:
+    async def generate_query(self, state: QnaState, writer=None) -> dict:
         # print(f"State generate_query {state}")
-        await stream_writer('<agent title="Understanding the user\'s question">')
+        await stream_writer('<agent title="Understanding the user\'s question">', writer=writer)
 
         messages = [
             {"role": ROLE.USER, "content": state.question},
@@ -157,7 +158,7 @@ class SimpleRAGAgent(Agent):
         self._messages.extend(messages)
         self.conversation_history.extend(messages)
 
-        response = await self.llm_generate_astream_writer(state.request)
+        response = await self.llm_generate_astream_writer(state.request, writer=writer)
 
         message = {"role": ROLE.ASSISTANT, "content": response}
         self._messages.append(message)
@@ -166,10 +167,10 @@ class SimpleRAGAgent(Agent):
             "query": response,
         }
 
-    async def check_retrieved(self, state: QnaState) -> str:
+    async def check_retrieved(self, state: QnaState, writer=None) -> str:
         # print(f"State check_retrieved {state}")
         print("🤔", format_terminal_str("Evaluating if more information is needed", color="green"))
-        await stream_writer("🤔 **Evaluating if more information is needed...**\n\n")
+        await stream_writer("🤔 **Evaluating if more information is needed...**\n\n", writer=writer)
 
         # Format context for the next decision
         contexts = self.cfg.prompt_templates.contexts.format(
@@ -191,27 +192,28 @@ class SimpleRAGAgent(Agent):
                 ),
             )
             await stream_writer(
-                f"\n\n⚠️ **Reached maximum retrievals: {self.max_retrievals}, stopping searching...**\n\n</agent>"
+                f"\n\n⚠️ **Reached maximum retrievals: {self.max_retrievals}, stopping searching...**\n\n</agent>",
+                writer=writer,
             )
             return "stop"
         else:
-            response = await self.llm_generate_astream_writer(state.request)
+            response = await self.llm_generate_astream_writer(state.request, writer=writer)
             message = {"role": ROLE.ASSISTANT, "content": response}
             self._messages.append(message)
             self.conversation_history.append(message)
             if response.upper().startswith("NO"):
                 print("✅", format_terminal_str("Information is sufficient, moving to next step\n", color="green"))
-                await stream_writer("\n\n✅ **Information is sufficient, moving to next step...**\n\n</agent>")
+                await stream_writer("\n\n✅ **Information is sufficient, moving to next step...**\n\n</agent>", writer=writer)
                 return "stop"
             else:
                 print("🔄", format_terminal_str("Need more information, generating new query ...", color="green"))
-                await stream_writer("\n\n🔄 **Need more information, generating new query...**\n\n</agent>")
+                await stream_writer("\n\n🔄 **Need more information, generating new query...**\n\n</agent>", writer=writer)
                 return "continue"
 
-    async def generate_answer(self, state: QnaState) -> dict:
+    async def generate_answer(self, state: QnaState, writer=None) -> dict:
         # print(f"State generate_answer {state}")
         print("📝", format_terminal_str("Generating the final answer ...", color="cyan", bold=True))
-        await stream_writer('<agent title="Generating the final answer ..." tag="nofold"></agent>')
+        await stream_writer('<agent title="Generating the final answer ..." tag="nofold"></agent>', writer=writer)
         plan_with_information = ""
         prev_step = ""
         for i, r in enumerate(state.retrievals):
@@ -232,7 +234,7 @@ class SimpleRAGAgent(Agent):
         ]
         self.conversation_history.extend(self._messages)
 
-        response = await self.llm_generate_astream_writer(state.request)
+        response = await self.llm_generate_astream_writer(state.request, writer=writer)
 
         self.conversation_history.append({"role": ROLE.ASSISTANT, "content": response})
         answer = self.postproc_answer(response, state)

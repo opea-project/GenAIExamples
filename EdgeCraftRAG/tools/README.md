@@ -300,6 +300,7 @@ Examples:
 ```bash
 ./tools/model_download.sh vllm
 ./tools/model_download.sh ov Qwen/Qwen3-8B /data/models
+./tools/model_download.sh ov OpenVINO/Qwen3-8B-int4-ov /data/models
 ```
 
 Environment behavior:
@@ -307,6 +308,13 @@ Environment behavior:
 - if a virtual environment is already active, it is reused
 - otherwise, the script creates/activates `ecrag_venv` automatically (same style as `quick_start.sh`)
 - missing `python3-venv` / `pip` prerequisites are installed automatically when supported by the system package manager
+- `DOWNLOAD_EMBEDDING_RERANKER` controls embedding/reranker download checks:
+	- `1` (default): keep current embedding/reranker download/check logic
+	- `0`: skip embedding/reranker download checks (LLM processing still runs based on mode)
+
+```bash
+DOWNLOAD_EMBEDDING_RERANKER=0 ./tools/model_download.sh ov OpenVINO/Qwen3-8B-int4-ov /data/models
+```
 
 ## 3.2 Direct Startup Scripts
 

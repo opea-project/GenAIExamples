@@ -561,6 +561,22 @@ ensure_llm_model_for_ov() {
     fi
 
     echo "[Model Check] OpenVINO LLM model missing: ${ov_llm_dir}"
+
+    # If user passes an OpenVINO model id/name (contains 'OpenVINO'),
+    # download it directly to the final OV target directory and skip conversion.
+    if [[ "${LLM_MODEL}" == *OpenVINO* ]]; then
+        echo "[Model Check] Detected OpenVINO model id/name '${LLM_MODEL}', downloading directly..."
+        download_model "${LLM_MODEL}" "${ov_llm_dir}"
+
+        if ! openvino_model_exists "${ov_llm_dir}"; then
+            echo "[Model Check] ERROR: Download completed but OpenVINO model is incomplete: ${ov_llm_dir}"
+            exit 1
+        fi
+
+        echo "[Model Check] OpenVINO LLM model ready: ${ov_llm_dir}"
+        return 0
+    fi
+
     resolved_llm_src_dir=$(prepare_source_model "${LLM_MODEL}" "${llm_src_dir}" "${SOURCE_MODEL_PATH}")
     echo "[Model Check] Converting LLM model '${LLM_MODEL}' to ${OV_CONVERSION_METHOD^^} OpenVINO..."
     ensure_openvino_tooling

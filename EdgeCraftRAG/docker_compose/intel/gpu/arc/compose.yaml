@@ -88,6 +88,7 @@ services:
       https_proxy: ${https_proxy}
       vLLM_ENDPOINT: ${vLLM_ENDPOINT:-http://${HOST_IP}:${VLLM_SERVICE_PORT_B60:-8086}}
       OVMS_ENDPOINT: ${OVMS_ENDPOINT:-http://${HOST_IP}:${OVMS_SERVICE_PORT:-8000}}
+      ECRAG_LLM_API_MODE: ${ECRAG_LLM_API_MODE:-chat}
       LLM_MODEL: ${LLM_MODEL}
       ENABLE_BENCHMARK: ${ENABLE_BENCHMARK:-false}
       MAX_MODEL_LEN: ${MAX_MODEL_LEN:-49152}
