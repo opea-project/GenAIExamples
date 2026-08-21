@@ -42,6 +42,7 @@ export default {
     no: "No",
     manual: "Create Now",
     inputTip: "Please enter ",
+    jsonInvalid: "Please enter a valid JSON object or array",
     connect: "Connect",
     detail: "View details",
     retry: "Retry",

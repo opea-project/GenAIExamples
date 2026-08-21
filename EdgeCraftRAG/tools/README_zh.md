@@ -287,6 +287,7 @@ source workspace/bootstrap.env
 ```bash
 ./tools/model_download.sh vllm
 ./tools/model_download.sh ov Qwen/Qwen3-8B /data/models
+./tools/model_download.sh ov OpenVINO/Qwen3-8B-int4-ov /data/models
 ```
 
 环境行为说明：
@@ -294,6 +295,13 @@ source workspace/bootstrap.env
 - 若当前已激活虚拟环境，会优先复用
 - 若未激活虚拟环境，脚本会自动创建并激活 `ecrag_venv`（与 `quick_start.sh` 一致）
 - 若缺失 `python3-venv` 或 `pip`，脚本会在支持的包管理器上自动安装所需前置依赖
+- `DOWNLOAD_EMBEDDING_RERANKER` 用于控制 embedding/reranker 下载检查：
+	- `1`（默认）：保持当前 embedding/reranker 下载/检查逻辑
+	- `0`：跳过 embedding/reranker 下载检查（LLM 仍按当前 mode 执行）
+
+```bash
+DOWNLOAD_EMBEDDING_RERANKER=0 ./tools/model_download.sh ov OpenVINO/Qwen3-8B-int4-ov /data/models
+```
 
 ## 3.2 直接启动脚本
 

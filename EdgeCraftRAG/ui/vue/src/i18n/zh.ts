@@ -41,6 +41,7 @@ export default {
     no: "否",
     manual: "去创建",
     inputTip: "请输入 ",
+    jsonInvalid: "请输入有效的 JSON 对象或数组",
     connect: "连接",
     detail: "查看详情",
     retry: "重试",

@@ -12,6 +12,20 @@ from edgecraftrag.utils import stream_generator
 from langgraph.config import get_stream_writer
 from pydantic import BaseModel, Field, model_serializer
 
+from langchain_core.runnables.config import ensure_config, var_child_runnable_config
+from langgraph._internal._runnable import RunnableCallable
+_orig = RunnableCallable.ainvoke
+
+async def _patched(self, input, config=None, **kwargs):
+    token = var_child_runnable_config.set(config or ensure_config())
+    try:
+        return await _orig(self, input, config, **kwargs)
+    finally:
+        var_child_runnable_config.reset(token)
+
+
+RunnableCallable.ainvoke = _patched
+
 
 class Retrieval(BaseModel):
     step: Any
@@ -59,9 +73,9 @@ class Agent(BaseComponent):
         response = await self._run_pipeline_generate(request)
         return response
 
-    async def llm_generate_astream_writer(self, request, prefix=None, suffix=None) -> str:
+    async def llm_generate_astream_writer(self, request, prefix=None, suffix=None, writer=None) -> str:
         response = ""
-        writer = get_stream_writer()
+        writer = _safe_writer(writer)
         first = True
         generator = await self.llm_generate(request, True)
         async for chunk in generator:
@@ -123,7 +137,15 @@ class Agent(BaseComponent):
         return set
 
 
-async def stream_writer(input):
-    writer = get_stream_writer()
+def _safe_writer(writer=None):
+    if writer is not None:
+        return writer
+    try:
+        return get_stream_writer()
+    except RuntimeError:
+        return lambda chunk: None
+
+async def stream_writer(input, writer=None):
+    writer = _safe_writer(writer)
     async for chunk in stream_generator(input):
         writer(chunk)

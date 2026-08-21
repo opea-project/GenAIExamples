@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: edgecraftrag-ui
+spec:
+  replicas: {{ .Values.replica.ecrag_ui }}
+  selector:
+    matchLabels:
+      app: edgecraftrag-ui
+  template:
+    metadata:
+      labels:
+        app: edgecraftrag-ui
+    spec:
+      containers:
+        - name: edgecraftrag-ui
+          image: "{{ .Values.image.ecrag.registry }}/edgecraftrag-ui:{{ .Values.image.ecrag.tag }}"
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - configMapRef:
+                name: edgecraftrag-env
+          ports:
+            - containerPort: {{ .Values.ports.ui.port }}
+          volumeMounts:
+            - name: model-path
+              mountPath: /home/user/models
+            - name: docs-path
+              mountPath: /home/user/docs
+            - name: tmpfile-path
+              mountPath: /home/user/ui_cache
+            - name: prompt-path
+              mountPath: /templates/custom
+      volumes:
+        - name: model-path
+          hostPath:
+            path: "{{ .Values.paths.model }}"
+        - name: docs-path
+          hostPath:
+            path: "{{ .Values.paths.docs }}"
+        - name: tmpfile-path
+          hostPath:
+            path: "{{ .Values.paths.tmpfile }}"
+        - name: prompt-path
+          hostPath:
+            path: "{{ .Values.paths.prompt }}"

@@ -432,28 +432,6 @@ curl -X GET http://${HOST_IP}:16010/v1/data/documents \
   -H "Content-Type: application/json" | jq '.'
 ```
 
-### Get all files
-
-```bash
-curl -X GET http://${HOST_IP}:16010/v1/data/files \
-  -H "Content-Type: application/json" | jq '.'
-```
-
-### Get a specific file
-
-```bash
-curl -X GET http://${HOST_IP}:16010/v1/data/files/{name} \
-  -H "Content-Type: application/json" | jq '.'
-```
-
-### Upload a file (from UI)
-
-```bash
-curl -X POST "http://${HOST_IP}:16010/v1/data/file/{file_name}" \
-  -H "Content-Type: multipart/form-data" \
-  -F "file=@/path/to/your/document.pdf" | jq '.'
-```
-
 ---
 
 ## Session Management

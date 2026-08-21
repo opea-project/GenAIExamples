@@ -113,7 +113,7 @@ class DocxParagraphPicturePartitioner:
             yield Image(text="IMAGE", metadata=element_metadata)
 
 
-def get_prompt_template(model_path, prompt_content=None, template_path=None, enable_think=False):
+def get_prompt_template(model_path, prompt_content=None, template_path=None, enable_think=False, use_chat=False):
     model_path = _resolve_model_path(model_path)
     if prompt_content is not None:
         template = prompt_content
@@ -122,6 +122,8 @@ def get_prompt_template(model_path, prompt_content=None, template_path=None, ena
         template = normalized_path.read_text(encoding=None)
     else:
         template = DEFAULT_TEMPLATE
+    if use_chat:
+        return template, template
     tokenizer = AutoTokenizer.from_pretrained(model_path, local_files_only=os.path.exists(model_path))
     messages = [{"role": "system", "content": template}, {"role": "user", "content": "\n{input}\n"}]
     prompt_template = tokenizer.apply_chat_template(

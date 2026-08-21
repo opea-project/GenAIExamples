@@ -375,3 +375,22 @@ class OpenVINOGenAILLMModel(BaseModelComponent, OpenVINOGenAILLM):
         completion = self._tokenizer.decode(generated_tokens)
         token = completion[0] 
         return CompletionResponse(text=token, raw={"model_output": token})
+
+    def chat_with_bench(self, messages: Any, **kwargs: Any) -> CompletionResponse:
+        """Chat endpoint with benchmark.
+
+        Applies the model's own chat template via messages_to_prompt (local
+        tokenizer), then reuses complete_with_bench.
+        """
+        prompt = self.messages_to_prompt(messages)
+        return self.complete_with_bench(prompt, formatted=True, **kwargs)
+
+    def stream_chat_with_bench(self, messages: Any, **kwargs: Any) -> CompletionResponseGen:
+        """Streaming chat endpoint with benchmark."""
+        prompt = self.messages_to_prompt(messages)
+        return self.stream_complete_with_bench(prompt, formatted=True, **kwargs)
+
+    async def astream_chat_with_bench(self, messages: Any, **kwargs: Any) -> CompletionResponseAsyncGen:
+        """Async streaming chat endpoint with benchmark."""
+        prompt = self.messages_to_prompt(messages)
+        return await self.astream_complete_with_bench(prompt, formatted=True, **kwargs)

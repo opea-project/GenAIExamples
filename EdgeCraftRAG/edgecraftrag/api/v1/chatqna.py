@@ -8,11 +8,11 @@ from concurrent.futures import ThreadPoolExecutor
 import requests
 from comps.cores.proto.api_protocol import ChatCompletionRequest
 from edgecraftrag.api_schema import RagOut
-from edgecraftrag.base import GeneratorType
+from edgecraftrag.base import GeneratorType, InferenceType
 from edgecraftrag.context import ctx
 from edgecraftrag.utils import chain_async_generators, serialize_contexts, serialize_node_with_score, stream_generator
 from fastapi import Body, FastAPI, HTTPException, status
-from fastapi.responses import StreamingResponse
+from fastapi.responses import JSONResponse, StreamingResponse
 
 chatqna_app = FastAPI()
 thread_pool = ThreadPoolExecutor(max_workers=16)
@@ -220,3 +220,44 @@ async def save_session(sessionid, run_agent_gen):
         yield chunk or ""
         await asyncio.sleep(0)
     session_mgr.save_current_message(sessionid, "assistant", current_content)
+
+def _not_ready(reason: str):
+    return JSONResponse(
+        status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+        content={"status": "not_ready", "reason": reason},
+    )
+
+# Lightweight readiness check before sending a real RAG request
+@chatqna_app.get(path="/v1/ready")
+async def get_ready():
+    pipeline = ctx.get_pipeline_mgr().get_active_pipeline()
+    if pipeline is None or not pipeline.status.active:
+        return _not_ready("No active pipeline")
+
+    generator = pipeline.get_generator(GeneratorType.CHATQNA)
+    if generator is not None and generator.inference_type == InferenceType.VLLM:
+        try:
+            response = requests.get(f"{generator.vllm_endpoint.rstrip('/')}/v1/models", timeout=2)
+            response.raise_for_status()
+        except Exception:
+            return _not_ready("LLM backend unavailable")
+
+    try:
+        active_kbs = ctx.knowledgemgr.get_active_knowledge_base()
+        if not active_kbs:
+            return _not_ready("Retrieval unavailable")
+        request = ChatCompletionRequest(messages="ready")
+        request.user = active_kbs
+        result = await ctx.get_pipeline_mgr().run_retrieve(chat_request=request)
+        if result == -1:
+            return _not_ready("Retrieval unavailable")
+    except Exception:
+        return _not_ready("Retrieval unavailable")
+
+    return {
+        "status": "ready",
+        "pipeline": pipeline.name,
+        "pipeline_active": pipeline.status.active,
+        "llm": "ready",
+        "retrieval": "ready",
+    }
