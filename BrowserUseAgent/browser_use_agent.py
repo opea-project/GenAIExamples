@@ -5,11 +5,11 @@
 import os
 
 from browser_use import Agent, BrowserProfile
+from browser_use.llm import ChatOpenAI
 from comps import opea_microservices, register_microservice
 from comps.cores.telemetry.opea_telemetry import opea_telemetry
 from fastapi import Request
-from langchain_openai import ChatOpenAI
-from pydantic import BaseModel, SecretStr
+from pydantic import BaseModel
 
 LLM = None
 BROWSER_PROFILE = None
@@ -21,7 +21,7 @@ def initiate_llm_and_browser(llm_endpoint: str, model: str, secret_key: str = "s
     # Initialize global LLM and BrowserProfile if not already initialized
     global LLM, BROWSER_PROFILE
     if not LLM:
-        LLM = ChatOpenAI(base_url=f"{llm_endpoint}/v1", model=model, api_key=SecretStr(secret_key), temperature=0.1)
+        LLM = ChatOpenAI(base_url=f"{llm_endpoint}/v1", model=model, api_key=secret_key, temperature=0.1)
     if not BROWSER_PROFILE:
         BROWSER_PROFILE = BrowserProfile(
             headless=True,
@@ -68,7 +68,6 @@ async def run(request: Request):
         task=chat_request.task_prompt,
         llm=llm,
         use_vision=chat_request.use_vision,
-        enable_memory=False,
         browser_profile=browser_profile,
     )
     history = await agent.run(max_steps=chat_request.agent_max_steps)

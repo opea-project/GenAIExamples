@@ -15,7 +15,7 @@ RUN uv pip install --system --upgrade pip setuptools uv && \
     $uvpip pytest-playwright && \
     playwright install chromium --with-deps --no-shell && \
     $uvpip -r requirements.txt && \
-    $uvpip posthog==5.4.0
+    $uvpip posthog==7.7.0
 
 USER user
 ENTRYPOINT ["python", "browser_use_agent.py"]
