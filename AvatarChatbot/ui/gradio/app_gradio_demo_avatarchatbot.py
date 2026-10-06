@@ -51,7 +51,7 @@ def base64_to_int16(base64_string):
 
 
 async def transcribe(audio_input, face_input, model_choice):
-    """Input: mic audio; Output: ai audio, text, text"""
+    """Input: mic audio; Output: ai audio, text, text."""
     global ai_chatbot_url, chat_history, count
     chat_history = ""
     # Preprocess the audio
@@ -195,12 +195,11 @@ if __name__ == "__main__":
         gr.Markdown("<h1 style='font-size: 36px;'>A PyTorch and OPEA based AI Avatar Audio Chatbot</h1>")
         with gr.Row():
             with gr.Column(scale=8):
-                gr.Markdown(
-                    """
-                <p style='font-size: 24px;'>Welcome to our AI Avatar Audio Chatbot! This application leverages PyTorch and <strong>OPEA (Open Platform for Enterprise AI) v0.8</strong> to provide you with a human-like conversational experience. It's run on Intel® Gaudi® AI Accelerator and Intel® Xeon® Processor, with hardware and software optimizations.<br>
-                Please feel free to interact with the AI avatar by choosing your own avatar and talking into the mic.</p>
-                            """
-                )
+                gr.Markdown("""<p style='font-size: 24px;'>Welcome to our AI Avatar Audio Chatbot!
+
+                    This application leverages PyTorch and <strong>OPEA (Open Platform for Enterprise AI) v0.8</strong> to provide you with a human-like conversational experience. It's run on Intel® Gaudi® AI Accelerator and Intel® Xeon® Processor, with hardware and software optimizations.<br>
+                    Please feel free to interact with the AI avatar by choosing your own avatar and talking into the mic.</p>
+                    """)
             with gr.Column(scale=1):
                 # with gr.Row():
                 #     gr.Markdown(f"""
@@ -285,45 +284,40 @@ if __name__ == "__main__":
         # Technical details
         gr.Markdown("<hr>")  # Divider
         with gr.Row():
-            gr.Markdown(
-                """
-                <p style='font-size: 24px;'>OPEA megaservice deployed: <br>
+            gr.Markdown("""<p style='font-size: 24px;'>OPEA megaservice deployed: <br>
                 <ul style='font-size: 24px;'>
                     <li><strong>AvatarChatbot</strong></li>
                 </ul></p>
                 <p style='font-size: 24px;'>OPEA microservices deployed:
+
                 <ul style='font-size: 24px;'>
                     <li><strong>ASR</strong> (service: opea/whisper-gaudi, model: openai/whisper-small)</li>
                     <li><strong>LLM 'text-generation'</strong> (service: opea/llm-textgen, model: Intel/neural-chat-7b-v3-3)</li>
                     <li><strong>TTS</strong> (service: opea/speecht5-gaudi, model: microsoft/speecht5_tts)</li>
                     <li><strong>Animation</strong> (service: opea/animation, model: wav2lip+gfpgan)</li>
                 </ul></p>
-                        """
-            )
+                """)
         with gr.Row():
             gr.Image("assets/img/flowchart.png", label="Megaservice Flowchart")
         with gr.Row():
             gr.Markdown(
-                """
-            <p style='font-size: 24px;'>The AI Avatar Audio Chatbot is powered by the following Intel® AI software:<br>
+                """<p style='font-size: 24px;'>The AI Avatar Audio Chatbot is powered by the following Intel® AI software:<br>
                         <ul style='font-size: 24px;'>
                         <li><strong>Intel Gaudi Software v1.17.0</strong></li>
                         <li><strong>PyTorch v2.3.1 (Eager mode + torch.compile) </strong></li>
                         <li><strong>HPU Graph</strong></li>
                         <li><strong>Intel Neural Compressor (INC)</strong></li>
-                        </ul></p>
-                        """
+                        </ul></p>"""
             )
-
         # Disclaimer
         gr.Markdown("<hr>")  # Divider
         gr.Markdown("<h2 style='font-size: 24px;'>Notices & Disclaimers</h1>")
         gr.Markdown(
+            """<p style='font-size: 20px;'>Intel is committed to respecting human rights and avoiding complicity in human rights abuses.
+
+            See Intel's Global Human Rights Principles. Intel's products and software are intended only to be used in applications that do not cause or contribute to a violation of an internationally recognized human right.<br></p> <p style='font-size: 20px;'>© Intel Corporation.  Intel, the Intel logo, and other Intel marks are trademarks of Intel Corporation or its subsidiaries.  Other names and brands may be claimed as the property of others.<br></p>
+            <p style='font-size: 20px;'>You may not use or facilitate the use of this document in connection with any infringement or other legal analysis concerning Intel products described herein. You agree to grant Intel a non-exclusive, royalty-free license to any patent claim thereafter drafted which includes subject matter disclosed herein.<br></p>
             """
-                    <p style='font-size: 20px;'>Intel is committed to respecting human rights and avoiding complicity in human rights abuses. See Intel's Global Human Rights Principles. Intel's products and software are intended only to be used in applications that do not cause or contribute to a violation of an internationally recognized human right.<br></p>
-                    <p style='font-size: 20px;'>© Intel Corporation.  Intel, the Intel logo, and other Intel marks are trademarks of Intel Corporation or its subsidiaries.  Other names and brands may be claimed as the property of others.<br></p>
-                    <p style='font-size: 20px;'>You may not use or facilitate the use of this document in connection with any infringement or other legal analysis concerning Intel products described herein. You agree to grant Intel a non-exclusive, royalty-free license to any patent claim thereafter drafted which includes subject matter disclosed herein.<br></p>
-                    """
         )
 
         # State transitions

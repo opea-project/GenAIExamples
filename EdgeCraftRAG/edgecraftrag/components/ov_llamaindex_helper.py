@@ -1,20 +1,21 @@
+# Copyright (C) 2026 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+from typing import Any, Dict, List, Optional
+
 from llama_index.core.base.embeddings.base import (
     DEFAULT_EMBED_BATCH_SIZE,
     BaseEmbedding,
 )
-from llama_index.core.postprocessor.types import BaseNodePostprocessor
-from typing import Any, List, Optional, Dict
 from llama_index.core.bridge.pydantic import Field, PrivateAttr
-from llama_index.core.callbacks import CallbackManager
-from llama_index.core.callbacks import CBEventType, EventPayload
+from llama_index.core.callbacks import CallbackManager, CBEventType, EventPayload
 from llama_index.core.instrumentation import get_dispatcher
 from llama_index.core.instrumentation.events.rerank import (
     ReRankEndEvent,
     ReRankStartEvent,
 )
+from llama_index.core.postprocessor.types import BaseNodePostprocessor
 from llama_index.core.schema import MetadataMode, NodeWithScore, QueryBundle
-from llama_index.core.instrumentation import get_dispatcher
-
 
 dispatcher = get_dispatcher(__name__)
 
@@ -48,7 +49,9 @@ class OpenVINOGenAIEmbedding(BaseEmbedding):
             import openvino_genai
 
         except ImportError:
-            raise ImportError("Could not import OpenVINO GenAI package. " "Please install it with `pip install openvino-genai`.")
+            raise ImportError(
+                "Could not import OpenVINO GenAI package. " "Please install it with `pip install openvino-genai`."
+            )
 
         if pooling not in ["cls", "mean"]:
             raise ValueError(f"Pooling {pooling} not supported.")
@@ -62,7 +65,9 @@ class OpenVINOGenAIEmbedding(BaseEmbedding):
         if padding_side:
             config.padding_side = padding_side
         config.pooling_type = (
-            openvino_genai.TextEmbeddingPipeline.PoolingType.MEAN if pooling == "mean" else openvino_genai.TextEmbeddingPipeline.PoolingType.CLS
+            openvino_genai.TextEmbeddingPipeline.PoolingType.MEAN
+            if pooling == "mean"
+            else openvino_genai.TextEmbeddingPipeline.PoolingType.CLS
         )
         config.query_instruction = query_instruction
         try:
@@ -78,7 +83,7 @@ class OpenVINOGenAIEmbedding(BaseEmbedding):
             normalize=normalize,
             query_instruction=query_instruction,
             text_instruction=text_instruction,
-            pad_to_max_length=pad_to_max_length
+            pad_to_max_length=pad_to_max_length,
         )
         self._ov_pipe = openvino_genai.TextEmbeddingPipeline(model_path, device, config, **model_kwargs)
         self._device = device
@@ -133,9 +138,17 @@ class OpenVINOGenAIReranking(BaseNodePostprocessor):
         try:
             import openvino_genai
         except ImportError:
-            raise ImportError("Could not import OpenVINO GenAI package. " "Please install it with `pip install openvino-genai`.")
+            raise ImportError(
+                "Could not import OpenVINO GenAI package. " "Please install it with `pip install openvino-genai`."
+            )
 
-        super().__init__(top_n=top_n, max_length=max_length, model_id_or_path=model_id_or_path, device=device, keep_retrieval_score=keep_retrieval_score)
+        super().__init__(
+            top_n=top_n,
+            max_length=max_length,
+            model_id_or_path=model_id_or_path,
+            device=device,
+            keep_retrieval_score=keep_retrieval_score,
+        )
 
         config = openvino_genai.TextRerankPipeline.Config()
         config.top_n = top_n

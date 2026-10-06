@@ -4,8 +4,8 @@
 
 from __future__ import annotations
 
-from copy import deepcopy
 import json
+from copy import deepcopy
 from pathlib import Path
 from typing import Any, Dict
 
@@ -95,7 +95,6 @@ def load_config(config_path: str) -> Config:
     Returns:
         A fully-populated :class:`Config` instance.
     """
-
     config_file = Path(config_path).expanduser().resolve()
     with config_file.open("r", encoding="utf-8") as handle:
         config_dict: Dict[str, Any] = json.load(handle)

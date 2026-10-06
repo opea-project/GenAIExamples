@@ -33,7 +33,6 @@ class Workflow(Component):
 
         :rtype: string
         """
-
         data = json.dumps({"params": params})
         endpoint = f"serving/servable_workflows/{self.workflow_id}/start"
         self.wf_key = self._make_request(endpoint, "POST", data).get("wf_key", None)
@@ -52,7 +51,6 @@ class Workflow(Component):
 
         :rtype: string
         """
-
         endpoint = f"serving/serving_workflows/{self.wf_key}/status"
         return self._make_request(endpoint, "GET")
 
@@ -66,6 +64,5 @@ class Workflow(Component):
 
         :rtype: string
         """
-
         endpoint = f"serving/serving_workflows/{self.wf_key}/results"
         return self._make_request(endpoint, "GET")

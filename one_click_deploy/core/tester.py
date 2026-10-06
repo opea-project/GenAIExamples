@@ -258,7 +258,6 @@ class AudioQnAConnectionTester(BaseConnectionTester):
         Returns:
             Dictionary containing the payload for the request
         """
-
         # Ensure the required Python package is installed
         check_install_python_pkg("pybase64")
         check_install_python_pkg("urllib3")

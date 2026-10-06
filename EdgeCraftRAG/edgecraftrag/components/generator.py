@@ -5,15 +5,15 @@ import asyncio
 import json
 import os
 import time
-import weakref
 import urllib.request
+import weakref
 from concurrent.futures import ThreadPoolExecutor
 from urllib.parse import urlparse
 
 from comps.cores.proto.api_protocol import ChatCompletionRequest
 from edgecraftrag.base import BaseComponent, CompType, GeneratorType, InferenceType, NodeParserType
-from edgecraftrag.utils import get_prompt_template, resolve_prompt_template_path
 from edgecraftrag.components.agents.utils import build_document_node_block
+from edgecraftrag.utils import get_prompt_template, resolve_prompt_template_path
 from fastapi.responses import StreamingResponse
 from llama_index.llms.openai_like import OpenAILike
 from pydantic import model_serializer
@@ -103,12 +103,17 @@ async def local_stream_generator(lock, llm, prompt_str, unstructured_str, benchm
             if unstructured_str:
                 yield unstructured_str
             if enable_benchmark:
-                benchmark.update_benchmark_data_genai(benchmark_index, CompType.GENERATOR, time.perf_counter() - start_time, weakref.ref(llm))
-                benchmark.insert_llm_data_genai(benchmark_index, benchmark.cal_input_token_size(prompt_str), weakref.ref(llm))
+                benchmark.update_benchmark_data_genai(
+                    benchmark_index, CompType.GENERATOR, time.perf_counter() - start_time, weakref.ref(llm)
+                )
+                benchmark.insert_llm_data_genai(
+                    benchmark_index, benchmark.cal_input_token_size(prompt_str), weakref.ref(llm)
+                )
         except Exception as e:
             start_idx = str(e).find("message") + len("message")
             result_error = str(e)[start_idx:]
             yield f"code:0000{result_error}"
+
 
 async def stream_generator(llm, prompt_str, unstructured_str, benchmark=None, benchmark_index=None):
     enable_benchmark = benchmark.is_enabled() if benchmark else False
@@ -219,7 +224,7 @@ class QnAGenerator(BaseComponent):
         )
 
         self.llm = llm_model
-        self.vllm_name  = llm_model().model_id if not isinstance(llm_model, str) else llm_model
+        self.vllm_name = llm_model().model_id if not isinstance(llm_model, str) else llm_model
         if self.inference_type == InferenceType.LOCAL:
             self.lock = asyncio.Lock()
         if self.inference_type == InferenceType.VLLM:
@@ -324,7 +329,14 @@ class QnAGenerator(BaseComponent):
         sub_questions = kwargs.get("sub_questions", None)
         text_gen_context, prompt_str = self.query_transform(chat_request, retrieved_nodes, sub_questions=sub_questions)
         # self.llm().config.update_generation_config(config)
-        self.llm().config.update_generation_config(temperature=chat_request.temperature,top_p=chat_request.top_p, top_k=chat_request.top_k, typical_p=chat_request.typical_p, repetition_penalty=chat_request.repetition_penalty, do_sample=chat_request.temperature > 0.0)
+        self.llm().config.update_generation_config(
+            temperature=chat_request.temperature,
+            top_p=chat_request.top_p,
+            top_k=chat_request.top_k,
+            typical_p=chat_request.typical_p,
+            repetition_penalty=chat_request.repetition_penalty,
+            do_sample=chat_request.temperature > 0.0,
+        )
         self.llm().config.max_new_tokens = chat_request.max_tokens
         unstructured_str = ""
         if node_parser_type == NodeParserType.UNSTRUCTURED:
@@ -332,7 +344,9 @@ class QnAGenerator(BaseComponent):
         if chat_request.stream:
             # Asynchronous generator
             async def generator():
-                async for chunk in local_stream_generator(self.lock, self.llm(), prompt_str, unstructured_str, benchmark, benchmark_index):
+                async for chunk in local_stream_generator(
+                    self.lock, self.llm(), prompt_str, unstructured_str, benchmark, benchmark_index
+                ):
                     yield chunk or ""
                     await asyncio.sleep(0)
 

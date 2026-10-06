@@ -5,14 +5,12 @@ import warnings
 from typing import Any, List, Optional, cast
 
 import requests
-
 from edgecraftrag.base import BaseComponent, CompType, RetrieverType
 from llama_index.core.indices.vector_store.retrievers import VectorIndexRetriever
 from llama_index.core.retrievers import AutoMergingRetriever
 from llama_index.core.schema import BaseNode, Document, NodeWithScore
 from llama_index.retrievers.bm25 import BM25Retriever
 from pydantic import model_serializer
-
 
 
 class VectorSimRetriever(BaseComponent, VectorIndexRetriever):
@@ -116,7 +114,7 @@ class SimpleBM25Retriever(BaseComponent):
     def run(self, **kwargs) -> Any:
         for k, v in kwargs.items():
             if k == "query":
-                if self._index.comp_subtype == 'milvus_vector':
+                if self._index.comp_subtype == "milvus_vector":
                     raise NotImplementedError("not support BM25 retriever for Milvus vector store")
                 top_k = kwargs["top_k"] if kwargs["top_k"] else self.topk
                 nodes = cast(List[BaseNode], list(self._docstore.docs.values()))

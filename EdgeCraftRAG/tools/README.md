@@ -19,9 +19,9 @@ The main scripts in this directory are:
 
 Deployment methods:
 
-| Method | Description | Requirements | Milvus Support |
-|------|------|----------|-------------|
-| baremetal | Start services as Python processes | Python 3.10+ | No (in-memory only) |
+| Method    | Description                         | Requirements            | Milvus Support           |
+| --------- | ----------------------------------- | ----------------------- | ------------------------ |
+| baremetal | Start services as Python processes  | Python 3.10+            | No (in-memory only)      |
 | container | Start services in Docker containers | Docker / Docker Compose | Yes (enabled by default) |
 
 Note: If you need Milvus, use the container deployment method.

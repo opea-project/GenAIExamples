@@ -5,12 +5,13 @@ import json
 import os
 from typing import List
 
+from edgecraftrag.api.v1.knowledge_base import add_file_to_knowledge_base
 from edgecraftrag.api_schema import DataIn, FilesIn
 from edgecraftrag.config_repository import MilvusConfigRepository
 from edgecraftrag.context import ctx
 from edgecraftrag.env import UI_DIRECTORY
 from fastapi import FastAPI, File, HTTPException, UploadFile, status
-from edgecraftrag.api.v1.knowledge_base import add_file_to_knowledge_base
+
 data_app = FastAPI()
 
 

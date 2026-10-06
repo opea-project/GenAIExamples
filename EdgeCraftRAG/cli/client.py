@@ -2,9 +2,10 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import json
-import requests
-from typing import Optional, Dict, Any
+from typing import Any, Dict, Optional
 from urllib.parse import urljoin
+
+import requests
 
 
 class EcragApiClient:
@@ -12,7 +13,7 @@ class EcragApiClient:
 
     def __init__(self, host: str = "http://localhost", server_port: int = 16010, mega_port: int = 16011):
         """Initialize the API client.
-        
+
         Args:
             host: The host URL (default: http://localhost)
             server_port: The server port (default: 16010)
@@ -21,10 +22,10 @@ class EcragApiClient:
         # Normalize host URL
         if not host.startswith(("http://", "https://")):
             host = f"http://{host}"
-        
+
         # Remove trailing slash if present
         host = host.rstrip("/")
-        
+
         self.server_url = f"{host}:{server_port}"
         self.mega_url = f"{host}:{mega_port}"
 
@@ -170,12 +171,16 @@ class EcragApiClient:
     def add_files_to_kb(self, kb_name: str, local_paths: list) -> Dict[str, Any]:
         """Add files to a knowledge base."""
         url = urljoin(self.server_url, f"/v1/knowledge/{kb_name}/files")
-        return self._request("POST", url, json={"local_paths": local_paths}, headers={"Content-Type": "application/json"})
+        return self._request(
+            "POST", url, json={"local_paths": local_paths}, headers={"Content-Type": "application/json"}
+        )
 
     def delete_files_from_kb(self, kb_name: str, local_paths: list) -> Dict[str, Any]:
         """Delete files from a knowledge base."""
         url = urljoin(self.server_url, f"/v1/knowledge/{kb_name}/files")
-        return self._request("DELETE", url, json={"local_paths": local_paths}, headers={"Content-Type": "application/json"})
+        return self._request(
+            "DELETE", url, json={"local_paths": local_paths}, headers={"Content-Type": "application/json"}
+        )
 
     # Experience Management
     def get_experiences(self) -> Dict[str, Any]:

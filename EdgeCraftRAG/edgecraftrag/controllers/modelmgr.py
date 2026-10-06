@@ -3,6 +3,7 @@
 
 import asyncio
 import os
+
 from edgecraftrag.api_schema import ModelIn
 from edgecraftrag.base import BaseComponent, BaseMgr, CompType, ModelType
 from edgecraftrag.components.model import (
@@ -10,10 +11,10 @@ from edgecraftrag.components.model import (
     OpenAIEmbeddingModel,
     OpenVINOEmbeddingModel,
     OpenVINOGenAIEmbeddingModel,
-    OpenVINOLLMModel,
     OpenVINOGenAILLMModel,
-    OpenVINORerankModel,
     OpenVINOGenAIRerankModel,
+    OpenVINOLLMModel,
+    OpenVINORerankModel,
     resolve_model_path,
 )
 
@@ -85,7 +86,7 @@ class ModelMgr(BaseMgr):
         enable_genai = os.getenv("ENABLE_GENAI", "").lower() == "true"
         match model_para.model_type:
             case ModelType.EMBEDDING:
-                if model_para.device == "NPU" or enable_genai== True:
+                if model_para.device == "NPU" or enable_genai == True:
                     model = OpenVINOGenAIEmbeddingModel(
                         model_id=model_para.model_id,
                         model_path=model_para.model_path,
@@ -105,7 +106,7 @@ class ModelMgr(BaseMgr):
                     api_base=model_para.api_base,
                 )
             case ModelType.RERANKER:
-                if enable_genai== True:
+                if enable_genai == True:
                     model = OpenVINOGenAIRerankModel(
                         model_id=model_para.model_id,
                         model_path=model_para.model_path,
@@ -168,7 +169,7 @@ class ModelMgr(BaseMgr):
                     model_id=model_para.model_id,
                     model_path=resolved_model_path,
                     device=model_para.device,
-                    weight=model_para.weight
+                    weight=model_para.weight,
                 )
                 from transformers import AutoTokenizer
 
