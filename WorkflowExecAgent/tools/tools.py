@@ -7,15 +7,15 @@ from tools.sdk import DataInsightAutomationSDK
 
 
 def workflow_executor(params, workflow_id: int) -> dict:
-    """Workflow executor tool. Runs a workflow and returns the result.
+    """Workflow executor tool.
 
-    :param int workflow_id: Servable workflow id.
+    Runs a workflow and returns the result.
+        :param int workflow_id: Servable workflow id.
 
-    :returns: workflow output results
+        :returns: workflow output results
 
-    :rtype: dict
+        :rtype: dict
     """
-
     # Replace function logic with use-case
 
     sdk = DataInsightAutomationSDK()  # Initialize SDK instance

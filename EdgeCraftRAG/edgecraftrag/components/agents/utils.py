@@ -323,18 +323,19 @@ def format_terminal_str(text: str, color: str = "", bold: bool = False, italic: 
 _LLM_EVAL_DEFAULT_TEMPLATE_MESSAGES = [
     {
         "role": "system",
-        "content": """You are an impartial quality rater for troubleshooting answers. Your task is to rate if the answer by user well covers the steps in the reference answer.
+        "content": """You are an impartial quality rater for troubleshooting answers.
 
-Task instructions:
-- Parse the reference answer into its essential checkpoints (split on punctuation such as "?", ";", or line breaks) and understand what each step expects the technician to do or verify. The order of the checkpoints has low importance.
-- Examine the user's answer and decide if each checkpoint is substantively addressed with accurate, actionable guidance.
-- Treat synonymous language or additional helpful context as a match when it fulfills the intent of the checkpoint.
-- Mark a checkpoint as uncovered if the user's answer omits it, contradicts it, or gives incorrect or unsafe guidance.
-- Ignore extra steps that do not conflict with the reference; they should not reduce the score.
-- The mismatch of the step number between user's answer and reference answer does not matter, as long as all the content is well covered.
-- Keep all reasoning internal; do not expose the intermediate analysis in the final reply.
-- Focus solely on the provided texts. Do not rely on your knowledge.
-""",
+                   Your task is to rate if the answer by user well covers the steps in the reference answer.
+                   Task instructions:
+                   - Parse the reference answer into its essential checkpoints (split on punctuation such as "?", ";", or line breaks) and understand what each step expects the technician to do or verify. The order of the checkpoints has low importance.
+                   - Examine the user's answer and decide if each checkpoint is substantively addressed with accurate, actionable guidance.
+                   - Treat synonymous language or additional helpful context as a match when it fulfills the intent of the checkpoint.
+                   - Mark a checkpoint as uncovered if the user's answer omits it, contradicts it, or gives incorrect or unsafe guidance.
+                   - Ignore extra steps that do not conflict with the reference; they should not reduce the score.
+                   - The mismatch of the step number between user's answer and reference answer does not matter, as long as all the content is well covered.
+                   - Keep all reasoning internal; do not expose the intermediate analysis in the final reply.
+                   - Focus solely on the provided texts. Do not rely on your knowledge.
+                   """,
     },
     {
         "role": "user",
@@ -350,10 +351,10 @@ Reference answer:
         "role": "system",
         "content": """Does the user's answer well cover the steps in the reference answer? Yes or No.
 
-Scoring rubric:
-- Answer "Yes" only when every checkpoint from the reference is fully covered and nothing in the user's answer conflicts with the reference guidance.
-- Answer "No" if any checkpoint is missing, incorrectly addressed, or contradicted by the user's answer.
-""",
+                   Scoring rubric:
+                   - Answer "Yes" only when every checkpoint from the reference is fully covered and nothing in the user's answer conflicts with the reference guidance.
+                   - Answer "No" if any checkpoint is missing, incorrectly addressed, or contradicted by the user's answer.
+                   """,
     },
     {"role": "assistant", "content": '{"label": "'},
 ]

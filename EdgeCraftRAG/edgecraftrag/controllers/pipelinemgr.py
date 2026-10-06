@@ -2,14 +2,15 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import asyncio
-import json
 import gc
+import json
 from typing import Any
-from openvino import Core, Type
+
 from comps.cores.proto.api_protocol import ChatCompletionRequest
 from edgecraftrag.base import BaseMgr, CallbackType, InferenceType
-from edgecraftrag.components.pipeline import Pipeline
 from edgecraftrag.components.knowledge_base import Knowledge
+from edgecraftrag.components.pipeline import Pipeline
+from openvino import Core, Type
 
 
 class PipelineMgr(BaseMgr):
@@ -54,15 +55,15 @@ class PipelineMgr(BaseMgr):
                     pass
                 try:
                     del post.model._model
-                    post.model._model=None
+                    post.model._model = None
                 except Exception as e:
                     pass
                 try:
                     del post.model._ov_pipe
                 except Exception as e:
                     pass
-                post.model=None
-                post=None
+                post.model = None
+                post = None
         pl.postprocessor = None
         for gen in pl.generator:
             if gen.inference_type:
@@ -80,7 +81,7 @@ class PipelineMgr(BaseMgr):
                             del llm_model._pipe
                         except Exception as e:
                             pass
-                        llm_model._model=None
+                        llm_model._model = None
                         del llm_model
                 del gen
         pl.generator = None

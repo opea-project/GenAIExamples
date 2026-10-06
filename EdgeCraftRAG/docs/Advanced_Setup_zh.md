@@ -42,6 +42,7 @@ optimum-cli export openvino -m BAAI/bge-reranker-large ${MODEL_PATH}/BAAI/bge-re
 #### LLM
 
 ##### openVINO
+
 如果仅使用 Core Ultra 平台，请准备 openVINO 模型：  
 你也可以在独立 GPU 上运行 openVINO 模型。
 
@@ -51,6 +52,7 @@ optimum-cli export openvino --model Qwen/Qwen3-8B ${MODEL_PATH}/OpenVINO/Qwen3-8
 ```
 
 ##### vLLM
+
 如果你有独立 GPU 并希望使用 vLLM，可按如下方式准备模型：
 
 ```bash
@@ -104,7 +106,6 @@ export MILVUS_ENABLED=0
 # EC-RAG 支持聊天历史轮数，默认关闭；可通过 CHAT_HISTORY_ROUND 控制
 # export CHAT_HISTORY_ROUND= # 按需修改
 ```
-
 
 ### 使用 Docker Compose 在 Intel GPU 上部署服务
 

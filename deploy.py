@@ -285,7 +285,6 @@ def add_label_to_node(node_name, label):
 
 def add_labels_to_nodes(node_count=None, label=None, node_names=None):
     """Add a label to the specified number of nodes or to specified nodes."""
-
     if node_names:
         # Add label to the specified nodes
         for node_name in node_names:
@@ -365,7 +364,6 @@ def install_helm_release(release_name, chart_name, namespace, hw_values_file, de
     - hw_values_file: The values file for hw specific
     - deploy_values_file: The values file for deployment.
     """
-
     # Check if the namespace exists; if not, create it
     try:
         command = ["kubectl", "get", "namespace", namespace]
@@ -444,7 +442,6 @@ def update_service(release_name, chart_name, namespace, hw_values_file, deploy_v
         deploy_config: The deployment configuration
         chart_name: The chart name for the deployment
     """
-
     # Construct helm upgrade command
     command = [
         "helm",

@@ -198,9 +198,7 @@ def get_available_models(model_type):
     normalized_model_type = (model_type or "").strip().lower()
 
     def _is_llm_model_dir(file_names: set) -> bool:
-        if "openvino_model.xml" in file_names and any(
-            name.endswith(".bin") for name in file_names
-        ):
+        if "openvino_model.xml" in file_names and any(name.endswith(".bin") for name in file_names):
             return True
 
         if "config.json" in file_names and (

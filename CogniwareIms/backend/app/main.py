@@ -152,7 +152,6 @@ async def root():
 @app.get("/api/health")
 async def health_check():
     """Comprehensive health check including all OPEA services."""
-
     embedding_health = await embedding_service.health_check()
     retrieval_health = await retrieval_service.health_check()
     llm_health = await llm_service.health_check()

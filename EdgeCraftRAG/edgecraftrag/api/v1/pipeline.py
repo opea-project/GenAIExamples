@@ -6,7 +6,7 @@ import os
 import re
 import time
 import weakref
-from openvino import Core, Type
+
 from edgecraftrag.api_schema import MilvusConnectRequest, PipelineCreateIn
 from edgecraftrag.base import (
     GeneratorType,
@@ -17,11 +17,11 @@ from edgecraftrag.base import (
 from edgecraftrag.components.benchmark import Benchmark
 from edgecraftrag.components.generator import FreeChatGenerator, QnAGenerator
 from edgecraftrag.components.postprocessor import MetadataReplaceProcessor, RerankProcessor
-
 from edgecraftrag.config_repository import MilvusConfigRepository, save_pipeline_configurations
 from edgecraftrag.context import ctx
 from edgecraftrag.env import PIPELINE_FILE
 from fastapi import FastAPI, File, HTTPException, UploadFile, status
+from openvino import Core, Type
 from pymilvus import connections
 
 pipeline_app = FastAPI()
@@ -236,7 +236,9 @@ async def update_pipeline_handler(pl, req):
     if flag == True:
         await save_pipeline_configurations("update", pl)
     if pl.status.active != req.active:
-        ctx.get_pipeline_mgr().activate_pipeline(pl.name, req.active, ctx.get_knowledge_mgr().get_active_knowledge_base())
+        ctx.get_pipeline_mgr().activate_pipeline(
+            pl.name, req.active, ctx.get_knowledge_mgr().get_active_knowledge_base()
+        )
     return pl
 
 

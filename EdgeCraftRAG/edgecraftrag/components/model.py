@@ -1,24 +1,26 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+import asyncio
 import io
 import os
 from pathlib import Path
-import asyncio
+from threading import Event, Thread
 from typing import Any, Optional
-import openvino_genai
-import openvino as ov
+
 import numpy as np
+import openvino as ov
+import openvino_genai
 from edgecraftrag.base import BaseComponent, CompType, ModelType
+from edgecraftrag.components.ov_llamaindex_helper import OpenVINOGenAIEmbedding, OpenVINOGenAIReranking
+from llama_index.core.base.llms.types import CompletionResponse, CompletionResponseAsyncGen, CompletionResponseGen
 from llama_index.embeddings.huggingface_openvino import OpenVINOEmbedding
 from llama_index.embeddings.openai import OpenAIEmbedding
 from llama_index.llms.openvino import OpenVINOLLM
-from llama_index.postprocessor.openvino_rerank import OpenVINORerank
-from edgecraftrag.components.ov_llamaindex_helper import OpenVINOGenAIEmbedding, OpenVINOGenAIReranking
 from llama_index.llms.openvino_genai import OpenVINOGenAILLM
+from llama_index.postprocessor.openvino_rerank import OpenVINORerank
 from pydantic import Field, model_serializer
-from llama_index.core.base.llms.types import CompletionResponse, CompletionResponseAsyncGen, CompletionResponseGen
-from threading import Event, Thread
+
 
 def resolve_model_path(model_path: str) -> str:
     if not model_path:
@@ -127,18 +129,13 @@ class OpenVINOEmbeddingModel(BaseModelComponent, OpenVINOEmbedding):
         model_path = resolve_model_path(model_path)
         if not model_exist(model_path):
             OpenVINOEmbedding.create_and_save_openvino_model(model_id, model_path)
-        model_kwargs={
-            "ov_config": {
-                "NUM_STREAMS": "1",
-                "PERFORMANCE_HINT": "LATENCY"
-            }
-        }
+        model_kwargs = {"ov_config": {"NUM_STREAMS": "1", "PERFORMANCE_HINT": "LATENCY"}}
         OpenVINOEmbedding.__init__(self, model_id_or_path=model_path, device=device, model_kwargs=model_kwargs)
         if device == "AUTO":
-            real_device=self._model.request.get_property("EXECUTION_DEVICES")[0]
+            real_device = self._model.request.get_property("EXECUTION_DEVICES")[0]
             self._model.to(real_device)
             self._model.compile()
-            device=real_device
+            device = real_device
         buf = io.BytesIO()
         self._model.request.export_model(buf)
         self.size_mb = len(buf.getvalue()) / 1024 / 1024
@@ -150,18 +147,38 @@ class OpenVINOEmbeddingModel(BaseModelComponent, OpenVINOEmbedding):
         self.device = device
         self.weight = ""
 
+
 class OpenVINOGenAIEmbeddingModel(BaseModelComponent, OpenVINOGenAIEmbedding):
 
     def __init__(self, model_id, model_path, device, weight):
-        max_length=512
+        max_length = 512
         model_path = resolve_model_path(model_path)
         if not model_exist(model_path):
             OpenVINOGenAIEmbedding.create_and_save_openvino_model(model_id, model_path)
         if device == "NPU":
-            OpenVINOGenAIEmbedding.__init__(self, model_path=model_path, device=device, embed_batch_size=1, pad_to_max_length=True, max_length=512, normalize=True, pooling="mean", padding_side="right")
+            OpenVINOGenAIEmbedding.__init__(
+                self,
+                model_path=model_path,
+                device=device,
+                embed_batch_size=1,
+                pad_to_max_length=True,
+                max_length=512,
+                normalize=True,
+                pooling="mean",
+                padding_side="right",
+            )
         else:
-            OpenVINOGenAIEmbedding.__init__(self, model_path=model_path, device=device, pad_to_max_length=True, max_length=max_length, normalize=True, pooling="mean", padding_side="right")
-        self.size_mb = round(os.path.getsize(model_path+"/openvino_model.bin")/(1024*1024),3)
+            OpenVINOGenAIEmbedding.__init__(
+                self,
+                model_path=model_path,
+                device=device,
+                pad_to_max_length=True,
+                max_length=max_length,
+                normalize=True,
+                pooling="mean",
+                padding_side="right",
+            )
+        self.size_mb = round(os.path.getsize(model_path + "/openvino_model.bin") / (1024 * 1024), 3)
         self.comp_type = CompType.MODEL
         self.comp_subtype = ModelType.EMBEDDING
         self.model_id = model_id
@@ -170,30 +187,21 @@ class OpenVINOGenAIEmbeddingModel(BaseModelComponent, OpenVINOGenAIEmbedding):
         self.weight = ""
         self.model_id_or_path = model_path
 
+
 class OpenVINORerankModel(BaseModelComponent, OpenVINORerank):
 
     def __init__(self, model_id, model_path, device, weight):
         model_path = resolve_model_path(model_path)
         if not model_exist(model_path):
             OpenVINORerank.create_and_save_openvino_model(model_id, model_path)
-        model_kwargs={
-            "ov_config": {
-                "NUM_STREAMS": "1",
-                "PERFORMANCE_HINT": "LATENCY"
-            }
-        }
+        model_kwargs = {"ov_config": {"NUM_STREAMS": "1", "PERFORMANCE_HINT": "LATENCY"}}
 
-        OpenVINORerank.__init__(
-            self,
-            model_id_or_path=model_path,
-            device=device,
-            model_kwargs=model_kwargs
-        )
+        OpenVINORerank.__init__(self, model_id_or_path=model_path, device=device, model_kwargs=model_kwargs)
         if device == "AUTO":
-            real_device=self._model.request.get_property("EXECUTION_DEVICES")[0]
+            real_device = self._model.request.get_property("EXECUTION_DEVICES")[0]
             self._model.to(real_device)
             self._model.compile()
-            device=real_device
+            device = real_device
         buf = io.BytesIO()
         self._model.request.export_model(buf)
         self.size_mb = len(buf.getvalue()) / 1024 / 1024
@@ -205,10 +213,11 @@ class OpenVINORerankModel(BaseModelComponent, OpenVINORerank):
         self.device = device
         self.weight = ""
 
+
 class OpenVINOGenAIRerankModel(BaseModelComponent, OpenVINOGenAIReranking):
 
     def __init__(self, model_id, model_path, device, weight):
-        max_length=512
+        max_length = 512
         model_path = resolve_model_path(model_path)
         if not model_exist(model_path):
             OpenVINOGenAIReranking.create_and_save_openvino_model(model_id, model_path)
@@ -217,10 +226,10 @@ class OpenVINOGenAIRerankModel(BaseModelComponent, OpenVINOGenAIReranking):
             model_id_or_path=model_path,
             device=device,
             max_length=max_length,
-            pad_to_max_length=True,  
-            padding_side="right"
+            pad_to_max_length=True,
+            padding_side="right",
         )
-        self.size_mb = round(os.path.getsize(model_path+"/openvino_model.bin")/(1024*1024),3)
+        self.size_mb = round(os.path.getsize(model_path + "/openvino_model.bin") / (1024 * 1024), 3)
         self.comp_type = CompType.MODEL
         self.comp_subtype = ModelType.RERANKER
         self.model_id = model_id
@@ -246,6 +255,7 @@ class OpenVINOLLMModel(BaseModelComponent, OpenVINOLLM):
         self.device = device
         self.weight = weight
 
+
 class OpenVINOGenAILLMModel(BaseModelComponent, OpenVINOGenAILLM):
 
     def __init__(self, model_id, model_path, device, weight, model=None):
@@ -265,10 +275,6 @@ class OpenVINOGenAILLMModel(BaseModelComponent, OpenVINOGenAILLM):
         self.model_name = model_id
         self.device_map = device
         self._model = self._pipe
-
-    
-
-    
 
     async def astream_complete_with_bench(
         self, prompt: str, formatted: bool = False, **kwargs: Any
@@ -298,12 +304,10 @@ class OpenVINOGenAILLMModel(BaseModelComponent, OpenVINOGenAILLM):
 
             if "error" in error_holder:
                 raise error_holder["error"]
-        
+
         return gen()
 
-    def stream_complete_with_bench(
-        self, prompt: str, formatted: bool = False, **kwargs: Any
-    ) -> CompletionResponseGen:
+    def stream_complete_with_bench(self, prompt: str, formatted: bool = False, **kwargs: Any) -> CompletionResponseGen:
         """Streaming completion endpoint."""
         full_prompt = prompt
         if not formatted:
@@ -313,7 +317,7 @@ class OpenVINOGenAILLMModel(BaseModelComponent, OpenVINOGenAILLM):
                 full_prompt = f"{self.system_prompt} {full_prompt}"
 
         input_data = self._tokenizer.encode(full_prompt)
-        input_ids =  input_data.input_ids.data
+        input_ids = input_data.input_ids.data
         attention_mask = input_data.attention_mask
         full_prompt = openvino_genai.TokenizedInputs(ov.Tensor(input_ids), attention_mask)
         generation_holder = {}
@@ -322,10 +326,7 @@ class OpenVINOGenAILLMModel(BaseModelComponent, OpenVINOGenAILLM):
         def run_generation() -> None:
             try:
                 generation_holder["result"] = self._pipe.generate(
-                    full_prompt,
-                    self.config,
-                    streamer=self._streamer,
-                    **kwargs
+                    full_prompt, self.config, streamer=self._streamer, **kwargs
                 )
             except Exception as exc:
                 error_holder["error"] = exc
@@ -350,10 +351,7 @@ class OpenVINOGenAILLMModel(BaseModelComponent, OpenVINOGenAILLM):
 
         return gen()
 
-
-    def complete_with_bench(
-        self, prompt: str, formatted: bool = False, **kwargs: Any
-    ) -> CompletionResponse:
+    def complete_with_bench(self, prompt: str, formatted: bool = False, **kwargs: Any) -> CompletionResponse:
         """Completion endpoint."""
         full_prompt = prompt
         if not formatted:
@@ -364,14 +362,13 @@ class OpenVINOGenAILLMModel(BaseModelComponent, OpenVINOGenAILLM):
             elif self.system_prompt:
                 full_prompt = f"{self.system_prompt} {full_prompt}"
 
-        
         input_data = self._tokenizer.encode(full_prompt)
-        input_ids =  input_data.input_ids.data
+        input_ids = input_data.input_ids.data
         attention_mask = input_data.attention_mask
         full_prompt = openvino_genai.TokenizedInputs(ov.Tensor(input_ids), attention_mask)
         generation_result = self._pipe.generate(full_prompt, self.config, **kwargs)
         self.perf_metrics = generation_result.perf_metrics
         generated_tokens = np.array(generation_result.tokens)
         completion = self._tokenizer.decode(generated_tokens)
-        token = completion[0] 
+        token = completion[0]
         return CompletionResponse(text=token, raw={"model_output": token})

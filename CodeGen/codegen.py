@@ -59,7 +59,6 @@ def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **k
     Returns:
     - inputs: The aligned inputs for the current node.
     """
-
     # Check if the current service type is EMBEDDING
     if self.services[cur_node].service_type == ServiceType.EMBEDDING:
         # Store the input query for later use
@@ -100,7 +99,6 @@ class CodeGenService:
 
     def add_remote_service(self):
         """Adds remote microservices to the service orchestrators and defines the flow between them."""
-
         # Define the embedding microservice
         embedding = MicroService(
             name="embedding",
